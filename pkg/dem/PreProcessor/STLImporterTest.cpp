@@ -215,7 +215,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 
 	shared_ptr<RotationEngine> kinematic = shared_ptr<RotationEngine>(new RotationEngine);
  	kinematic->angularVelocity  = angularVelocity;
-	rotationAxis.Normalize();
+	rotationAxis.normalize();
  	kinematic->rotationAxis  = rotationAxis;
  	kinematic->rotateAroundZero = true;
 	

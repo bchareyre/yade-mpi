@@ -72,8 +72,8 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # using spheres 7mm of diameter
 concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
 
-#spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
-spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')
+spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
+#spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')
 O.bodies.append(spheres)
 bb=utils.uniaxialTestFeatures()
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
@@ -105,8 +105,7 @@ O.engines=[
 plot.plots={'eps':('sigma',)} #'sigma.25','sigma.50','sigma.75')}
 plot.maxDataLen=4000
 
-#O.saveTmp('initial');
-O.save('/tmp/init.xml')
+O.saveTmp('initial');
 
 O.timingEnabled=False
 
@@ -118,8 +117,7 @@ def initTest():
 	print "init"
 	if O.iter>0:
 		O.wait();
-		#O.loadTmp('initial')
-		O.load('/tmp/init.xml')
+		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
 	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
 	try:
@@ -148,7 +146,8 @@ def stopIfDamaged():
 	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>(5e-3 if isoPrestress==0 else 5e-2):
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
-			#O.save('/tmp/uniax-tension.xml.bz2')
+			O.save('/tmp/uniax-tension.xml.bz2')
+			print "Saved /tmp/uniax-tension.xml.bz2 (for use with interaction-histogram.py and uniax-post.py)"
 			print "Damaged, switching to compression... "; O.pause()
 			# important! initTest must be launched in a separate thread;
 			# otherwise O.load would wait for the iteration to finish,

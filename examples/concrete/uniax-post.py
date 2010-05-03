@@ -4,8 +4,9 @@
 from yade import post2d
 import pylab # the matlab-like interface of matplotlib
 
-# run uniax.py to get this file
-O.load('/tmp/uniax-tension.xml.bz2')
+loadFile='/tmp/uniax-tension.xml.bz2'
+if not os.path.exists(loadFile): raise RuntimeError("Run uniax.py first so that %s is created"%loadFile)
+O.load(loadFile)
 
 # flattener that project to the xz plane
 flattener=post2d.AxisFlatten(useRef=False,axis=1)

@@ -18,7 +18,7 @@ void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
 	Facet* facet = static_cast<Facet*>(cm.get());
 	const Vector3r& O = se3.position;
-	Matrix3r facetAxisT; se3.orientation.ToRotationMatrix(facetAxisT);
+	Matrix3r facetAxisT; se3.orientation.toRotationMatrix(facetAxisT);
 	const vector<Vector3r>& vertices=facet->vertices;
 	if(!scene->isPeriodic){
 		aabb->min=aabb->max = O + facetAxisT * vertices[0];

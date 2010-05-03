@@ -60,8 +60,8 @@ void KinemCNDEngine::letMove()
 	leftbox->state->pos += Vector3r(dx/2.0,0,0);
 	rightbox->state->pos += Vector3r(dx/2.0,0,0);
 
-	Real Ysup = topbox->state->pos.Y();
-	Real Ylat = leftbox->state->pos.Y();
+	Real Ysup = topbox->state->pos.y();
+	Real Ylat = leftbox->state->pos.y();
 
 
 //	with the corresponding velocities :
@@ -104,10 +104,8 @@ void KinemCNDEngine::computeAlpha()
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
 	}
-	Vector3r axis;
-	Real angle;
-	orientationLeftBox.ToAxisAngle(axis,angle);
-	alpha=Mathr::PI/2.0-angle;		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
+	AngleAxisr aa(angleAxisFromQuat(orientationLeftBox));
+	alpha=Mathr::PI/2.0-aa.angle();		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
 }
 
 void KinemCNDEngine::stopMovement()

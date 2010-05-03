@@ -26,7 +26,7 @@ Real Matrix3_get_item_linear(Matrix3r & self, int idx){ IDX_CHECK(idx,9); return
 
 std::string Vector2_str(const Vector2r & self){ return std::string("Vector2(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+")";}
 std::string Vector3_str(const Vector3r & self){ return std::string("Vector3(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+","+boost::lexical_cast<std::string>(self[2])+")";}
-std::string Quaternion_str(const Quaternionr & self){ Vector3r axis; Real angle; self.ToAxisAngle(axis,angle); return std::string("Quaternion((")+boost::lexical_cast<std::string>(axis[0])+","+boost::lexical_cast<std::string>(axis[1])+","+boost::lexical_cast<std::string>(axis[2])+"),"+boost::lexical_cast<std::string>(angle)+")";}
+std::string Quaternion_str(const Quaternionr & self){ AngleAxisr aa(angleAxisFromQuat(self)); return std::string("Quaternion((")+boost::lexical_cast<std::string>(aa.axis()[0])+","+boost::lexical_cast<std::string>(aa.axis()[1])+","+boost::lexical_cast<std::string>(aa.axis()[2])+"),"+boost::lexical_cast<std::string>(aa.angle())+")";}
 std::string Matrix3_str(const Matrix3r & self){ std::ostringstream oss; oss<<"Matrix3("; for(int i=0; i<3; i++) for(int j=0; j<3; j++) oss<<self(i,j)<<((i==2 && j==2)?")":",")<<((i<2 && j==2)?" ":""); return oss.str(); }
 
 int Vector2_len(){return 2;}
@@ -63,9 +63,8 @@ struct custom_Vector3r_from_tuple{
 
 
 static bp::tuple Quaternion_ToAxisAngle(const Quaternionr& q){
-    Vector3r axis; Real angle;
-    q.ToAxisAngle(axis,angle);
-    return bp::make_tuple(axis,angle);
+	AngleAxisr aa(angleAxisFromQuat(q));
+    return bp::make_tuple(aa.axis(),aa.angle());
 }
 
 BOOST_PYTHON_MODULE(miniWm3Wrap){
@@ -75,9 +74,9 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		// .def(bp::init<const Vector3r&, const Vector3r&, const Vector3r&, bool>((bp::arg("v0"),bp::arg("v1"),bp::arg("v2"),bp::arg("columns"))))
 		.def(bp::init<Real,Real,Real>((bp::arg("n00"),bp::arg("n11"),bp::arg("n22"))))
 		//.def(bp::init<Vector3r>((bp::arg("diag"))))
-		.def("Determinant",&Matrix3r::Determinant)
-		.def("Inverse",&Matrix3r::Inverse)
-		.def("Transpose",&Matrix3r::Transpose)
+		.def("determinant",&Matrix3r::determinant)
+		.def("inverse",&Matrix3r::inverse)
+		.def("transpose",&Matrix3r::transpose)
 		.def(bp::self * bp::self)
 		//.def(bp::self *= bp::self)
 		.def(bp::self + bp::self)
@@ -100,22 +99,28 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		/* extras for matrices */
 		.def("__setitem__",&::Matrix3_set_item_linear)
 		.def("__getitem__",&::Matrix3_get_item_linear)
+		.def_readonly("Identity",Matrix3r::Identity())
+		.def_readonly("Zero",Matrix3r::Zero())
+		// wm3 compat
 		.def_readonly("IDENTITY",Matrix3r::Identity())
 		.def_readonly("ZERO",Matrix3r::Zero())
+		.def("Determinant",&Matrix3r::determinant)
+		.def("Inverse",&Matrix3r::inverse)
+		.def("Transpose",&Matrix3r::transpose)
 	;
 	bp::class_<Quaternionr>("Quaternion",bp::init<>())
 		.def(bp::init<Vector3r,Real>((bp::arg("axis"),bp::arg("angle"))))
 		//.def(bp::init<Matrix3r>((bp::arg("rotMatrix"))))
 		.def(bp::init<Quaternionr>((bp::arg("other"))))
-		.def("Align",&Quaternionr::Align,((bp::arg("v1"),bp::arg("v2"))))
-		.def("Conjugate",&Quaternionr::Conjugate)
-		.def("FromAxisAngle",&Quaternionr::FromAxisAngle,((bp::arg("axis"),bp::arg("angle"))),bp::return_self<>())
-		.def("Rotate",&Quaternionr::Rotate,((bp::arg("v"))))
-		.def("Inverse",&Quaternionr::Inverse)
-		.def("Length",&Quaternionr::Length)
-		.def("Normalize",&Quaternionr::Normalize)
+		.def("setFromTwoVectors",&Quaternionr::setFromTwoVectors,((bp::arg("v1"),bp::arg("v2"))))
+		.def("conjugate",&Quaternionr::Conjugate)
+		//.def("FromAxisAngle",&Quaternionr::FromAxisAngle,((bp::arg("axis"),bp::arg("angle"))),bp::return_self<>())
+		.def("rotate",&Quaternionr::Rotate,((bp::arg("v"))))
+		.def("inverse",&Quaternionr::inverse)
+		.def("norm",&Quaternionr::norm)
+		.def("normalize",&Quaternionr::normalize)
 		//.def("ToRotationMatrix",&Quaternionr::ToRotationMatrix)
-		.def("ToAxisAngle",Quaternion_ToAxisAngle)
+		//.def("ToAxisAngle",Quaternion_ToAxisAngle)
 		.def(bp::self != bp::self)
 		.def(bp::self == bp::self)
 		.def(bp::self * bp::self)
@@ -137,14 +142,23 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__repr__",&::Quaternion_str)
 		.def_readonly("IDENTITY",Matrix3r::Identity())
 		.def_readonly("ZERO",Matrix3r::Zero())
+		// wm3 compat
+		.def("Align",&Quaternionr::setFromTwoVectors,((bp::arg("v1"),bp::arg("v2"))))
+		.def("Conjugate",&Quaternionr::conjugate)
+		//.def("FromAxisAngle",&Quaternionr::FromAxisAngle,((bp::arg("axis"),bp::arg("angle"))),bp::return_self<>())
+		.def("Rotate",&Quaternionr::rotate,((bp::arg("v"))))
+		.def("Inverse",&Quaternionr::inverse)
+		.def("Length",&Quaternionr::norm)
+		.def("Normalize",&Quaternionr::normalize)
 	;
 	bp::class_<Vector2r>("Vector2",bp::init<>())
 		.def(bp::init<Vector2r>((bp::arg("other"))))
 		.def(bp::init<Real,Real>((bp::arg("x"),bp::arg("y"))))
-		.def("Dot",&Vector2r::Dot)
-		.def("Length",&Vector2r::Length)
-		.def("SquaredLength",&Vector2r::SquaredLength)
-		.def("Normalize",&Vector2r::Normalize)
+		.def("dot",&Vector2r::dot)
+		.def("norm",&Vector2r::norm)
+		.def("squaredNorm",&Vector2r::squaredNorm)
+		.def("normalize",&Vector2r::normalize)
+		//
 		.def(bp::self != bp::self)
 		.def(bp::self == bp::self)
 		.def(bp::self * bp::other<Real>())
@@ -162,7 +176,16 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__getitem__",&::Vector2_get_item)
 		.def("__str__",&::Vector2_str)
 		.def("__repr__",&::Vector2_str)
-		.def_readonly("ONE",Vector2r::ONE)
+		.def_readonly("Ones",Vector2r::Ones())
+		.def_readonly("UnitX",Vector2r::UnitX())
+		.def_readonly("UnitY",Vector2r::UnitY())
+		.def_readonly("Zero",Vector2r::Zeros())
+		// wm3 compat
+		.def("Dot",&Vector2r::dot)
+		.def("Length",&Vector2r::norm)
+		.def("SquaredLength",&Vector2r::squaredNorm)
+		.def("Normalize",&Vector2r::normalize)
+		.def_readonly("ONE",Vector2r::Ones())
 		.def_readonly("UNIT_X",Vector2r::UnitX())
 		.def_readonly("UNIT_Y",Vector2r::UnitY())
 		.def_readonly("ZERO",Vector2r::Zero())
@@ -170,11 +193,11 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 	bp::class_<Vector3r>("Vector3",bp::init<>())
 		.def(bp::init<Vector3r>((bp::arg("other"))))
 		.def(bp::init<Real,Real,Real>((bp::arg("x"),bp::arg("y"),bp::arg("z"))))
-		.def("Dot",&Vector3r::Dot)
-		.def("Cross",&Vector3r::Cross)
-		.def("Length",&Vector3r::Length)
-		.def("SquaredLength",&Vector3r::SquaredLength)
-		.def("Normalize",&Vector3r::Normalize)
+		.def("dot",&Vector3r::dot)
+		.def("cross",&Vector3r::cross)
+		.def("norm",&Vector3r::norm)
+		.def("squaredNorm",&Vector3r::squaredNorm)
+		.def("normalize",&Vector3r::normalize)
 		.def(bp::self != bp::self)
 		.def(bp::self == bp::self)
 		.def(bp::self * bp::other<Real>())
@@ -192,7 +215,17 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__getitem__",&::Vector3_get_item)
 		.def("__str__",&::Vector3_str)
 		.def("__repr__",&::Vector3_str)
-		.def_readonly("ONE",Vector3r::ONE)
+		.def_readonly("Ones",Vector3r::Ones())
+		.def_readonly("UnitX",Vector3r::UnitX())
+		.def_readonly("UnitY",Vector3r::UnitY())
+		.def_readonly("UnitZ",Vector3r::UnitZ())
+		.def_readonly("Zero",Vector3r::Zero())
+		// wm3 compat
+		.def("Dot",&Vector3r::dot)
+		.def("Length",&Vector3r::norm)
+		.def("SquaredLength",&Vector3r::squaredNorm)
+		.def("Normalize",&Vector3r::normalize)
+		.def_readonly("ONE",Vector3r::Ones())
 		.def_readonly("UNIT_X",Vector3r::UnitX())
 		.def_readonly("UNIT_Y",Vector3r::UnitY())
 		.def_readonly("UNIT_Z",Vector3r::UnitZ())

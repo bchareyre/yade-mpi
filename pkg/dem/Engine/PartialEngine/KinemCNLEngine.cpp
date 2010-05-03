@@ -75,8 +75,8 @@ void KinemCNLEngine::letMove()
 	Real dx = shearSpeed * dt;
 
 
-	Real Ysup = topbox->state->pos.Y();
-	Real Ylat = leftbox->state->pos.Y();
+	Real Ysup = topbox->state->pos.y();
+	Real Ylat = leftbox->state->pos.y();
 
 // 	Changes in vertical and horizontal position :
 
@@ -86,10 +86,10 @@ void KinemCNLEngine::letMove()
 	leftbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
 	rightbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
 	if(LOG)	cout << "deltaU reellemt applique :" << deltaU << endl;
-	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).Y() << endl;
+	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).y() << endl;
 	
-	Real Ysup_mod = topbox->state->pos.Y();
-	Real Ylat_mod = leftbox->state->pos.Y();
+	Real Ysup_mod = topbox->state->pos.y();
+	Real Ylat_mod = leftbox->state->pos.y();
 
 //	with the corresponding velocities :
 	topbox->state->vel = Vector3r(shearSpeed,deltaU/dt,0);
@@ -130,10 +130,8 @@ void KinemCNLEngine::computeAlpha()
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
 	}
-	Vector3r axis;
-	Real angle;
-	orientationLeftBox.ToAxisAngle(axis,angle);
-	alpha=Mathr::PI/2.0-angle;		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
+	AngleAxisr aa(angleAxisFromQuat(orientationLeftBox));
+	alpha=Mathr::PI/2.0-aa.angle();		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
 }
 
 
@@ -159,7 +157,7 @@ void KinemCNLEngine::computeDu()
 		}
 		
 		alpha=Mathr::PI/2.0;;
-		F_0 = F_sup.Y();
+		F_0 = F_sup.y();
 		cout << "F_0 initialise à : " << F_0 << endl;
 		firstRun=false;
 	}
@@ -172,8 +170,8 @@ void KinemCNLEngine::computeDu()
 	}
 	else
 	{
-		Real Ycourant = topbox->state->pos.Y();
-		deltaU = ( F_sup.Y() - F_0 )/(stiffness);
+		Real Ycourant = topbox->state->pos.y();
+		deltaU = ( F_sup.y() - F_0 )/(stiffness);
 		if(LOG) cout << "Lors du calcul de DU (utile pour deltaU) : F_0 = " << F_0 << "; Ycourant = " << Ycourant << endl;
 	}
 
@@ -225,7 +223,7 @@ void KinemCNLEngine::computeStiffness()
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
-			Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.Length();
+			Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.norm();
 
 			if (fn!=0)
 			{

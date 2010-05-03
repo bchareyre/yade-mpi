@@ -66,37 +66,37 @@ Real& Vector3<Real>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::X () const
+Real Vector3<Real>::x () const
 {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Vector3<Real>::X ()
+Real& Vector3<Real>::x ()
 {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::Y () const
+Real Vector3<Real>::y () const
 {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Vector3<Real>::Y ()
+Real& Vector3<Real>::y ()
 {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::Z () const
+Real Vector3<Real>::z () const
 {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Vector3<Real>::Z ()
+Real& Vector3<Real>::z ()
 {
     return m_afTuple[2];
 }
@@ -267,7 +267,7 @@ Vector3<Real>& Vector3<Real>::operator/= (Real fScalar)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::Length () const
+Real Vector3<Real>::norm () const
 {
     return Math<Real>::Sqrt(
         m_afTuple[0]*m_afTuple[0] +
@@ -276,7 +276,7 @@ Real Vector3<Real>::Length () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::SquaredLength () const
+Real Vector3<Real>::squaredNorm () const
 {
     return
         m_afTuple[0]*m_afTuple[0] +
@@ -285,7 +285,7 @@ Real Vector3<Real>::SquaredLength () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::Dot (const Vector3& rkV) const
+Real Vector3<Real>::dot (const Vector3& rkV) const
 {
     return
         m_afTuple[0]*rkV.m_afTuple[0] +
@@ -294,9 +294,9 @@ Real Vector3<Real>::Dot (const Vector3& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-void Vector3<Real>::Normalize ()
+void Vector3<Real>::normalize ()
 {
-    Real fLength = Length();
+    Real fLength = norm();
 
     if (fLength > Math<Real>::ZERO_TOLERANCE)
     {
@@ -317,7 +317,7 @@ void Vector3<Real>::Normalize ()
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Vector3<Real> Vector3<Real>::Cross (const Vector3& rkV) const
+Vector3<Real> Vector3<Real>::cross (const Vector3& rkV) const
 {
     return Vector3(
         m_afTuple[1]*rkV.m_afTuple[2] - m_afTuple[2]*rkV.m_afTuple[1],
@@ -332,7 +332,7 @@ Vector3<Real> Vector3<Real>::UnitCross (const Vector3& rkV) const
         m_afTuple[1]*rkV.m_afTuple[2] - m_afTuple[2]*rkV.m_afTuple[1],
         m_afTuple[2]*rkV.m_afTuple[0] - m_afTuple[0]*rkV.m_afTuple[2],
         m_afTuple[0]*rkV.m_afTuple[1] - m_afTuple[1]*rkV.m_afTuple[0]);
-    kCross.Normalize();
+    kCross.normalize();
     return kCross;
 }
 //----------------------------------------------------------------------------
@@ -379,16 +379,16 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
         }
     }
 
-    Real fDet = akDiff[0].Dot(akDiff[1].Cross(akDiff[2]));
-    Vector3<Real> kE1cE2 = akDiff[1].Cross(akDiff[2]);
-    Vector3<Real> kE2cE0 = akDiff[2].Cross(akDiff[0]);
-    Vector3<Real> kE0cE1 = akDiff[0].Cross(akDiff[1]);
+    Real fDet = akDiff[0].dot(akDiff[1].cross(akDiff[2]));
+    Vector3<Real> kE1cE2 = akDiff[1].cross(akDiff[2]);
+    Vector3<Real> kE2cE0 = akDiff[2].cross(akDiff[0]);
+    Vector3<Real> kE0cE1 = akDiff[0].cross(akDiff[1]);
     if (Math<Real>::FAbs(fDet) > Math<Real>::ZERO_TOLERANCE)
     {
         Real fInvDet = ((Real)1.0)/fDet;
-        afBary[0] = akDiff[3].Dot(kE1cE2)*fInvDet;
-        afBary[1] = akDiff[3].Dot(kE2cE0)*fInvDet;
-        afBary[2] = akDiff[3].Dot(kE0cE1)*fInvDet;
+        afBary[0] = akDiff[3].dot(kE1cE2)*fInvDet;
+        afBary[1] = akDiff[3].dot(kE2cE0)*fInvDet;
+        afBary[2] = akDiff[3].dot(kE0cE1)*fInvDet;
         afBary[3] = (Real)1.0 - afBary[0] - afBary[1] - afBary[2];
     }
     else
@@ -398,22 +398,22 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
         // to that face.
         Vector3<Real> kE02 = rkV0 - rkV2;
         Vector3<Real> kE12 = rkV1 - rkV2;
-        Vector3<Real> kE02cE12 = kE02.Cross(kE12);
-        Real fMaxSqrArea = kE02cE12.SquaredLength();
+        Vector3<Real> kE02cE12 = kE02.cross(kE12);
+        Real fMaxSqrArea = kE02cE12.squaredNorm();
         int iMaxIndex = 3;
-        Real fSqrArea = kE0cE1.SquaredLength();
+        Real fSqrArea = kE0cE1.squaredNorm();
         if (fSqrArea > fMaxSqrArea)
         {
             iMaxIndex = 0;
             fMaxSqrArea = fSqrArea;
         }
-        fSqrArea = kE1cE2.SquaredLength();
+        fSqrArea = kE1cE2.squaredNorm();
         if (fSqrArea > fMaxSqrArea)
         {
             iMaxIndex = 1;
             fMaxSqrArea = fSqrArea;
         }
-        fSqrArea = kE2cE0.SquaredLength();
+        fSqrArea = kE2cE0.squaredNorm();
         if (fSqrArea > fMaxSqrArea)
         {
             iMaxIndex = 2;
@@ -426,38 +426,38 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
             Vector3<Real> kTmp;
             if (iMaxIndex == 0)
             {
-                kTmp = akDiff[3].Cross(akDiff[1]);
-                afBary[0] = kE0cE1.Dot(kTmp)*fInvSqrArea;
-                kTmp = akDiff[0].Cross(akDiff[3]);
-                afBary[1] = kE0cE1.Dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[3].cross(akDiff[1]);
+                afBary[0] = kE0cE1.dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[0].cross(akDiff[3]);
+                afBary[1] = kE0cE1.dot(kTmp)*fInvSqrArea;
                 afBary[2] = (Real)0.0;
                 afBary[3] = (Real)1.0 - afBary[0] - afBary[1];
             }
             else if (iMaxIndex == 1)
             {
                 afBary[0] = (Real)0.0;
-                kTmp = akDiff[3].Cross(akDiff[2]);
-                afBary[1] = kE1cE2.Dot(kTmp)*fInvSqrArea;
-                kTmp = akDiff[1].Cross(akDiff[3]);
-                afBary[2] = kE1cE2.Dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[3].cross(akDiff[2]);
+                afBary[1] = kE1cE2.dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[1].cross(akDiff[3]);
+                afBary[2] = kE1cE2.dot(kTmp)*fInvSqrArea;
                 afBary[3] = (Real)1.0 - afBary[1] - afBary[2];
             }
             else if (iMaxIndex == 2)
             {
-                kTmp = akDiff[2].Cross(akDiff[3]);
-                afBary[0] = kE2cE0.Dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[2].cross(akDiff[3]);
+                afBary[0] = kE2cE0.dot(kTmp)*fInvSqrArea;
                 afBary[1] = (Real)0.0;
-                kTmp = akDiff[3].Cross(akDiff[0]);
-                afBary[2] = kE2cE0.Dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[3].cross(akDiff[0]);
+                afBary[2] = kE2cE0.dot(kTmp)*fInvSqrArea;
                 afBary[3] = (Real)1.0 - afBary[0] - afBary[2];
             }
             else
             {
                 akDiff[3] = *this - rkV2;
-                kTmp = akDiff[3].Cross(kE12);
-                afBary[0] = kE02cE12.Dot(kTmp)*fInvSqrArea;
-                kTmp = kE02.Cross(akDiff[3]);
-                afBary[1] = kE02cE12.Dot(kTmp)*fInvSqrArea;
+                kTmp = akDiff[3].cross(kE12);
+                afBary[0] = kE02cE12.dot(kTmp)*fInvSqrArea;
+                kTmp = kE02.cross(akDiff[3]);
+                afBary[1] = kE02cE12.dot(kTmp)*fInvSqrArea;
                 afBary[2] = (Real)1.0 - afBary[0] - afBary[1];
                 afBary[3] = (Real)0.0;
             }
@@ -467,34 +467,34 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
             // The tetrahedron is potentially a sliver.  Determine the edge of
             // maximum length and compute barycentric coordinates with respect
             // to that edge.
-            Real fMaxSqrLength = akDiff[0].SquaredLength();
+            Real fMaxSqrLength = akDiff[0].squaredNorm();
             iMaxIndex = 0;  // <V0,V3>
-            Real fSqrLength = akDiff[1].SquaredLength();
+            Real fSqrLength = akDiff[1].squaredNorm();
             if (fSqrLength > fMaxSqrLength)
             {
                 iMaxIndex = 1;  // <V1,V3>
                 fMaxSqrLength = fSqrLength;
             }
-            fSqrLength = akDiff[2].SquaredLength();
+            fSqrLength = akDiff[2].squaredNorm();
             if (fSqrLength > fMaxSqrLength)
             {
                 iMaxIndex = 2;  // <V2,V3>
                 fMaxSqrLength = fSqrLength;
             }
-            fSqrLength = kE02.SquaredLength();
+            fSqrLength = kE02.squaredNorm();
             if (fSqrLength > fMaxSqrLength)
             {
                 iMaxIndex = 3;  // <V0,V2>
                 fMaxSqrLength = fSqrLength;
             }
-            fSqrLength = kE12.SquaredLength();
+            fSqrLength = kE12.squaredNorm();
             if (fSqrLength > fMaxSqrLength)
             {
                 iMaxIndex = 4;  // <V1,V2>
                 fMaxSqrLength = fSqrLength;
             }
             Vector3<Real> kE01 = rkV0 - rkV1;
-            fSqrLength = kE01.SquaredLength();
+            fSqrLength = kE01.squaredNorm();
             if (fSqrLength > fMaxSqrLength)
             {
                 iMaxIndex = 5;  // <V0,V1>
@@ -507,7 +507,7 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
                 if (iMaxIndex == 0)
                 {
                     // P-V3 = t*(V0-V3)
-                    afBary[0] = akDiff[3].Dot(akDiff[0])*fInvSqrLength;
+                    afBary[0] = akDiff[3].dot(akDiff[0])*fInvSqrLength;
                     afBary[1] = (Real)0.0;
                     afBary[2] = (Real)0.0;
                     afBary[3] = (Real)1.0 - afBary[0];
@@ -516,7 +516,7 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
                 {
                     // P-V3 = t*(V1-V3)
                     afBary[0] = (Real)0.0;
-                    afBary[1] = akDiff[3].Dot(akDiff[1])*fInvSqrLength;
+                    afBary[1] = akDiff[3].dot(akDiff[1])*fInvSqrLength;
                     afBary[2] = (Real)0.0;
                     afBary[3] = (Real)1.0 - afBary[1];
                 }
@@ -525,14 +525,14 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
                     // P-V3 = t*(V2-V3)
                     afBary[0] = (Real)0.0;
                     afBary[1] = (Real)0.0;
-                    afBary[2] = akDiff[3].Dot(akDiff[2])*fInvSqrLength;
+                    afBary[2] = akDiff[3].dot(akDiff[2])*fInvSqrLength;
                     afBary[3] = (Real)1.0 - afBary[2];
                 }
                 else if (iMaxIndex == 3)
                 {
                     // P-V2 = t*(V0-V2)
                     akDiff[3] = *this - rkV2;
-                    afBary[0] = akDiff[3].Dot(kE02)*fInvSqrLength;
+                    afBary[0] = akDiff[3].dot(kE02)*fInvSqrLength;
                     afBary[1] = (Real)0.0;
                     afBary[2] = (Real)1.0 - afBary[0];
                     afBary[3] = (Real)0.0;
@@ -542,7 +542,7 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
                     // P-V2 = t*(V1-V2)
                     akDiff[3] = *this - rkV2;
                     afBary[0] = (Real)0.0;
-                    afBary[1] = akDiff[3].Dot(kE12)*fInvSqrLength;
+                    afBary[1] = akDiff[3].dot(kE12)*fInvSqrLength;
                     afBary[2] = (Real)1.0 - afBary[1];
                     afBary[3] = (Real)0.0;
                 }
@@ -550,7 +550,7 @@ void Vector3<Real>::GetBarycentrics (const Vector3<Real>& rkV0,
                 {
                     // P-V1 = t*(V0-V1)
                     akDiff[3] = *this - rkV1;
-                    afBary[0] = akDiff[3].Dot(kE01)*fInvSqrLength;
+                    afBary[0] = akDiff[3].dot(kE01)*fInvSqrLength;
                     afBary[1] = (Real)1.0 - afBary[0];
                     afBary[2] = (Real)0.0;
                     afBary[3] = (Real)0.0;
@@ -582,18 +582,18 @@ void Vector3<Real>::Orthonormalize (Vector3& rkU, Vector3& rkV, Vector3& rkW)
     // product of vectors A and B.
 
     // compute u0
-    rkU.Normalize();
+    rkU.normalize();
 
     // compute u1
-    Real fDot0 = rkU.Dot(rkV); 
+    Real fDot0 = rkU.dot(rkV); 
     rkV -= fDot0*rkU;
-    rkV.Normalize();
+    rkV.normalize();
 
     // compute u2
-    Real fDot1 = rkV.Dot(rkW);
-    fDot0 = rkU.Dot(rkW);
+    Real fDot1 = rkV.dot(rkW);
+    fDot0 = rkU.dot(rkW);
     rkW -= fDot0*rkU + fDot1*rkV;
-    rkW.Normalize();
+    rkW.normalize();
 }
 //----------------------------------------------------------------------------
 template <class Real>
@@ -608,7 +608,7 @@ void Vector3<Real>::GenerateOrthonormalBasis (Vector3& rkU, Vector3& rkV,
 {
     if (!bUnitLengthW)
     {
-        rkW.Normalize();
+        rkW.normalize();
     }
 
     Real fInvLength;
@@ -670,7 +670,7 @@ void Vector3<Real>::ComputeExtremes (int iVQuantity, const Vector3* akPoint,
 template <class Real>
 std::ostream& operator<< (std::ostream& rkOStr, const Vector3<Real>& rkV)
 {
-     return rkOStr << rkV.X() << ' ' << rkV.Y() << ' ' << rkV.Z();
+     return rkOStr << rkV.x() << ' ' << rkV.y() << ' ' << rkV.z();
 }
 //----------------------------------------------------------------------------
 

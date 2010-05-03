@@ -75,12 +75,12 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	if(_flip==Matrix3r::Zero()){
 		bool hasNonzero=false;
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
-			if(i==j){ flip[i][j]=0; continue; }
-			flip[i][j]=-floor(.5+trsf[i][j]/(size[j]/size[i]));
-			if(flip[i][j]!=0) hasNonzero=true;
+			if(i==j){ flip(i,j)=0; continue; }
+			flip(i,j)=-floor(.5+trsf(i,j)/(size[j]/size[i]));
+			if(flip(i,j)!=0) hasNonzero=true;
 		}
 		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::Zero();}
-		LOG_DEBUG("Computed flip matrix: upper "<<flip[0][1]<<","<<flip[0][2]<<","<<flip[1][2]<<"; lower "<<flip[1][0]<<","<<flip[2][0]<<","<<flip[2][1]);
+		LOG_DEBUG("Computed flip matrix: upper "<<flip(0,1)<<","<<flip(0,2)<<","<<flip(1,2)<<"; lower "<<flip(1,0)<<","<<flip(2,0)<<","<<flip(2,1));
 	} else {
 		flip=_flip;
 	}
@@ -94,10 +94,10 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	// change cell trsf here
 	Matrix3r trsfInc;
 	for(int i=0; i<3; i++) for(int j=0; j<3; j++){
-		if(i==j) { if(flip[i][j]!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); trsfInc[i][j]=0; continue; }
+		if(i==j) { if(flip(i,j)!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); trsfInc(i,j)=0; continue; }
 		// make sure non-diagonal entries are "integers"
-		if(flip[i][j]!=double(int(flip[i][j]))) LOG_WARN("Flip matrix entry "<<flip[i][j]<<" at ["<<i<<","<<j<<"] not integer?! (will be rounded)");
-		trsfInc[i][j]=int(flip[i][j])*size[j]/size[i];
+		if(flip(i,j)!=double(int(flip(i,j)))) LOG_WARN("Flip matrix entry "<<flip(i,j)<<" at ["<<i<<","<<j<<"] not integer?! (will be rounded)");
+		trsfInc(i,j)=int(flip(i,j))*size[j]/size[i];
 	}
 	TRWM3MAT(cell->trsf);
 	TRWM3MAT(trsfInc);
@@ -138,8 +138,8 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* rootBody){
 	rootBody->forces.addForce(id1,force);
 	rootBody->forces.addForce(id2,-force);
-	rootBody->forces.addTorque(id1,(contPt-pos1).Cross(force));
-	rootBody->forces.addTorque(id2,-(contPt-pos2).Cross(force));
+	rootBody->forces.addTorque(id1,(contPt-pos1).cross(force));
+	rootBody->forces.addTorque(id2,-(contPt-pos2).cross(force));
 }
 
 
@@ -171,7 +171,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
-		currF=rb->forces.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
+		currF=rb->forces.getForce(b->id).norm(); maxF=max(currF,maxF); sumF+=currF;
 	}
 	Real meanF=sumF/rb->bodies->size(); 
 	// get max force on contacts
@@ -179,7 +179,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
 		shared_ptr<NormShearPhys> nsi=YADE_PTR_CAST<NormShearPhys>(I->interactionPhysics); assert(nsi);
-		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).Length());
+		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).norm());
 	}
 	return (useMaxForce?maxF:meanF)/maxContactF;
 }
@@ -190,7 +190,7 @@ Real Shop::kineticEnergy(Scene* _rb){
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
 		// ½(mv²+ωIω)
-		ret+=.5*(b->state->mass*b->state->vel.SquaredLength()+b->state->angVel.Dot(diagMult(b->state->inertia,b->state->angVel)));
+		ret+=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(diagMult(b->state->inertia,b->state->angVel)));
 	}
 	return ret;
 }
@@ -224,7 +224,7 @@ void Shop::init(){
 	setDefault("phys_young",30e9);
 	setDefault("phys_poisson",.3);
 	setDefault("phys_frictionAngle",0.5236); //30˚
-	setDefault("phys_se3_orientation",Quaternionr(Vector3r(0,0,1),0));
+	setDefault("phys_se3_orientation",Quaternionr::Identity());
 
 	setDefault("aabb_randomColor",false);
 	setDefault("aabb_color",Vector3r(0,1,0));
@@ -1130,7 +1130,7 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 
 Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2)
 {
-	return v0+((v2-v0)*(v1-v0).Length()+(v1-v0)*(v2-v0).Length())/((v1-v0).Length()+(v2-v1).Length()+(v0-v2).Length());
+	return v0+((v2-v0)*(v1-v0).norm()+(v1-v0)*(v2-v0).norm())/((v1-v0).norm()+(v2-v1).norm()+(v0-v2).norm());
 }
 
 void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<ViscElMat> b)

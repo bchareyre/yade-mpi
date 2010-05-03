@@ -11,7 +11,7 @@ class Dem3DofGeom_WallSphere: public Dem3DofGeom{
 	public:
 		virtual ~Dem3DofGeom_WallSphere();
 		/******* API ********/
-		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
+		virtual Real displacementN(){ return (se32.position-contactPoint).norm()-refLength;}
 		virtual Vector3r displacementT(){ relocateContactPoints(); return contPtInTgPlane2()-contPtInTgPlane1(); }
 		virtual Real slipToDisplacementTMax(Real displacementTMax);
 		/***** end API ******/

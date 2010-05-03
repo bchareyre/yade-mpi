@@ -7,11 +7,12 @@ void Cell::integrateAndUpdate(Real dt){
 	// total transformation; M = (Id+G).M = F.M
 	trsf+=_trsfInc*trsf;
 	// Hsize will contain colums with transformed base vectors
-	Matrix3r Hsize(refSize[0],refSize[1],refSize[2]); Hsize=trsf*Hsize;
+	Matrix3r Hsize(Matrix3r::Zero()); Hsize(0,0)=refSize[0]; Hsize(1,1)=refSize[1]; Hsize(2,2)=refSize[2]; // later with eigen: Hsize=Matrix::Zero(); Hsize.diagonal=refSize;
+	Hsize=trsf*Hsize;
 	// lengths of transformed cell vectors, skew cosines
 	Matrix3r Hnorm; // normalized transformed base vectors
 	for(int i=0; i<3; i++){
-		Vector3r base(Hsize.GetColumn(i));
+		Vector3r base(Hsize.col(i));
 		_size[i]=base.norm(); base/=_size[i]; //base is normalized now
 		// was: Hnorm.SetColumn(i,base);
 		// with eigen: Hnorm.col(i)=base;
@@ -23,7 +24,7 @@ void Cell::integrateAndUpdate(Real dt){
 	for(int i=0; i<3; i++){
 		int i1=(i+1)%3, i2=(i+2)%3;
 		// sin between axes is cos of skew
-		_cos[i]=(Hnorm.GetColumn(i1).cross(Hnorm.GetColumn(i2))).squaredNorm();
+		_cos[i]=(Hnorm.col(i1).cross(Hnorm.col(i2))).squaredNorm();
 	}
 	// pure shear trsf: ones on diagonal
 	_shearTrsf=Hnorm;

@@ -103,7 +103,7 @@ void Clump::moveMembers(){
 	#if 0
 		if(Omega::instance().getCurrentIteration()%50==0){
 			Real Erot=.5*clumpRBP->inertia[0]*pow(clumpRBP->angularVelocity[0],2)+.5*clumpRBP->inertia[1]*pow(clumpRBP->angularVelocity[1],2)+.5*clumpRBP->inertia[2]*pow(clumpRBP->angularVelocity[2],2);
-			Real Etrans=.5*clumpRBP->mass*pow(clumpRBP->velocity.Length(),2);
+			Real Etrans=.5*clumpRBP->mass*pow(clumpRBP->velocity.norm(),2);
 			// (0,0,1) is gravity acceleration
 			Real Epot=clumpRBP->se3.position.Dot(Vector3r(0,0,1))*clumpRBP->mass;
 			LOG_TRACE("##"<<clumpId<<" energy "<<Erot+Etrans+Epot<<"\tv "<<Etrans<<"\tw "<<Erot<<"\tp "<<Epot);
@@ -193,7 +193,7 @@ void Clump::updateProperties(bool intersecting){
 			// transform from local to global coords
 			// FIXME: verify this!
 			Quaternionr subState_orientation_conjugate=subState->ori.conjugate();
-			Matrix3r Imatrix(subState->inertia[0],subState->inertia[1],subState->inertia[2]);
+			Matrix3r Imatrix=Matrix3r::Zero(); for(int i=0;i<3;i++) Imatrix(i,i)=subState->inertia[i]; // eigen: Imatrix.diagonal=subState->inertia;
 			// TRWM3MAT(Imatrix); TRWM3QUAT(subRBP_orientation_conjugate);
 			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subState_orientation_conjugate),subState->mass,-1.*subState->pos);
 
@@ -213,7 +213,7 @@ void Clump::updateProperties(bool intersecting){
 	Matrix3r R_g2c(true); //rotation matrix
 	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
 	//TRWM3MAT(Ic_orientG);
-	Ic_orientG.EigenDecomposition(R_g2c,Ic);
+	matrixEigenDecomposition(Ic_orientG,R_g2c,Ic);
 	/*! @bug eigendecomposition might be wrong. see http://article.gmane.org/gmane.science.physics.yade.devel/99 for message. It is worked around below, however.
 	*/
 	// has NaNs for identity matrix!
@@ -240,7 +240,7 @@ void Clump::updateProperties(bool intersecting){
 			shared_ptr<Body> subBody=Body::byId(I->first);
 			state->inertia=subBody->state->inertia*10.; // 10 is arbitrary; just to have inertia of clump bigger
 			// orientation of the clump is broken as well, since is result of EigenDecomposition as well (rotation matrix)
-			state->ori=Quaternionr::IDENTITY;
+			state->ori=Quaternionr::Identity();
 		}
 	#endif
 	TRWM3VEC(state->inertia);
@@ -302,7 +302,7 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I,const Matrix3r& T){
  */
 Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 	Matrix3r T;
-	rot.ToRotationMatrix(T);
+	rot.toRotationMatrix(T);
 	return inertiaTensorRotate(I,T);
 }
 

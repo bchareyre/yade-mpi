@@ -139,33 +139,33 @@ def initTest():
 		maxStrainRate[ax2]=1000*maxStrainRate[axis]
 		goal[axis]=1 if mode=='tension' else -1;
 		goal[ax1]=goal[axis]
-	strainer['maxStrainRate']=maxStrainRate
-	strainer['goal']=goal
+	strainer.maxStrainRate=maxStrainRate
+	strainer.goal=goal
 	try:
 		from yade import qt
 		renderer=qt.Renderer()
-		renderer['scaleDisplacements']=True
-		renderer['displacementScale']=(1000,1000,1000) if mode=='tension' else (100,100,100)
+		renderer.scaleDisplacements=True
+		renderer.displacementScale=(1000,1000,1000) if mode=='tension' else (100,100,100)
 	except ImportError: pass
 	print "init done, will now run."
 	O.step(); O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
-	ss2d3dg['distFactor']=-1.
-	is2aabb['aabbEnlargeFactor']=-1.
+	ss2d3dg.distFactor=-1.
+	is2aabb.aabbEnlargeFactor=-1.
 	O.run()
 
 def stopIfDamaged():
 	global mode
 	if O.iter<2 or not plot.data.has_key('sigma'): return # do nothing at the very beginning
 	sigma,eps=plot.data['sigma'],plot.data['eps']
-	extremum=max(sigma) if (strainer['maxStrainRate']>0) else min(sigma)
+	extremum=max(sigma) if (strainer.maxStrainRate>0) else min(sigma)
 	# FIXME: only temporary, should be .5
 	minMaxRatio=0.5 if mode=='tension' else 0.5
 	if extremum==0: return
-	print O.tags['id'],mode,strainer['strain'][axis],sigma[-1]
+	print O.tags['id'],mode,strainer.strain[axis],sigma[-1]
 	#print 'strain',strainer['strain'],'stress',strainer['stress']
 	import sys;	sys.stdout.flush()
-	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer['strain'][axis])>6e-3:
+	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain[axis])>6e-3:
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
 			#O.save('/tmp/uniax-tension.xml.bz2')
@@ -186,7 +186,7 @@ def stopIfDamaged():
 			sys.exit(0)
 		
 def addPlotData():
-	yade.plot.addData(t=O.time,i=O.iter,eps=strainer['strain'][axis],eps_=strainer['strain'][axis],sigma=strainer['stress'][axis]+isoPrestress,eps1=strainer['strain'][ax1],eps2=strainer['strain'][ax2],sig1=strainer['stress'][ax1],sig2=strainer['stress'][ax2],relResid=updater['avgRelResidual'])
+	yade.plot.addData(t=O.time,i=O.iter,eps=strainer.strain[axis],eps_=strainer.strain[axis],sigma=strainer.stress[axis]+isoPrestress,eps1=strainer.strain[ax1],eps2=strainer.strain[ax2],sig1=strainer.stress[ax1],sig2=strainer.stress[ax2],relResid=updater.avgRelResidual)
 
 initTest()
 # sleep forever if run by yade-multi, exit is called from stopIfDamaged

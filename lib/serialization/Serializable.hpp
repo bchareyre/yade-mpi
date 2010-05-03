@@ -139,7 +139,7 @@ namespace yade{
 #define _DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc)  _DEF_READWRITE_BY_VALUE(thisClass,attr,doc)
 // the conditional should be eliminated by compiler at compile-time, as it depends only on types, not their values
 #define _DEF_READWRITE_CUSTOM(thisClass,attr,doc) { if(yade::py_wrap_ref<typeof(thisClass::attr)>::value) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE(thisClass,attr,doc); }
-#define _DEF_READWRITE_CUSTOM_STATIC(thisClass,attr,doc) { if(yade::py_wrap_ref<typeof(thisClass::attr)>::value) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc); }
+#define _DEF_READWRITE_CUSTOM_STATIC(thisClass,attr,doc) { /* if(yade::py_wrap_ref<typeof(thisClass::attr)>::value)*/ _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); /* else _classObj._DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc);*/ }
 
 // macros for deprecated attribute access
 // gcc<=4.3 is not able to compile this code; we will just not generate any code for deprecated attributes in such case

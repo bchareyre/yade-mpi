@@ -38,7 +38,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 	Vector3r extents = obb->extents;
 
 	// FIXME: do we need rotation matrix? Can't quaternion do just fine?
-	Matrix3r boxAxisT; se31.orientation.ToRotationMatrix(boxAxisT); 
+	Matrix3r boxAxisT; se31.orientation.toRotationMatrix(boxAxisT); 
 	Matrix3r boxAxis = boxAxisT.transpose();
 	
 	Vector3r relPos21 = se32.position-se31.position; // relative position of centroids
@@ -66,7 +66,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		normal_boxLocal[minCBoxDist_index]=(cOnBox_boxLocal[minCBoxDist_index]>0)?1.0:-1.0;
 		
 		normal = boxAxisT*normal_boxLocal;
-		normal.Normalize();
+		normal.normalize();
 		
 		// se32 is sphere's se3
 		/*
@@ -93,13 +93,13 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
 		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 
-		if(isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
+		if(isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.normalize(); }
 		else {scm->prevNormal=scm->normal;}
 			
 		// contact point is in the middle of overlapping volumes
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
 		scm->contactPoint = 0.5*(pt1+pt2);
-		scm->normal = pt1-pt2; scm->normal.Normalize();
+		scm->normal = pt1-pt2; scm->normal.normalize();
 		scm->penetrationDepth = (pt1-pt2).norm();
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
@@ -130,7 +130,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 
 		pt1=cOnBox_box+se31.position;
 
-		cOnBox_sphere.Normalize(); // we want only direction in the following
+		cOnBox_sphere.normalize(); // we want only direction in the following
 
 		pt2=se32.position+cOnBox_sphere*s->radius;
 		
@@ -142,8 +142,8 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		else {scm->prevNormal=scm->normal;}
 		
 		scm->contactPoint = 0.5*(pt1+pt2);
-		//scm->normal = pt1-pt2; scm->normal.Normalize();
-		//scm->penetrationDepth = (pt1-pt2).Length();
+		//scm->normal = pt1-pt2; scm->normal.normalize();
+		//scm->penetrationDepth = (pt1-pt2).norm();
 		scm->normal = -cOnBox_sphere;
 		scm->penetrationDepth = depth;
 		

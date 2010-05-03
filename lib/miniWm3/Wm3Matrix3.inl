@@ -14,11 +14,11 @@ Matrix3<Real>::Matrix3 (bool bZero)
 {
     if (bZero)
     {
-        MakeZero();
+        setZero();
     }
     else
     {
-        MakeIdentity();
+        setIdentity();
     }
 }
 //----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ Matrix3<Real>::Matrix3 (const Vector3<Real>* akV, bool bColumns)
 template <class Real>
 Matrix3<Real>::Matrix3 (Real fM00, Real fM11, Real fM22)
 {
-    MakeDiagonal(fM00,fM11,fM22);
+    MakeDiagonal_(fM00,fM11,fM22);
 }
 //----------------------------------------------------------------------------
 template <class Real>
@@ -187,14 +187,14 @@ int Matrix3<Real>::I (int iRow, int iCol)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real>& Matrix3<Real>::MakeZero ()
+Matrix3<Real>& Matrix3<Real>::setZero ()
 {
     memset(m_afEntry,0,9*sizeof(Real));
     return *this;
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real>& Matrix3<Real>::MakeIdentity ()
+Matrix3<Real>& Matrix3<Real>::setIdentity ()
 {
     m_afEntry[0] = (Real)1.0;
     m_afEntry[1] = (Real)0.0;
@@ -209,7 +209,7 @@ Matrix3<Real>& Matrix3<Real>::MakeIdentity ()
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real>& Matrix3<Real>::MakeDiagonal (Real fM00, Real fM11, Real fM22)
+Matrix3<Real>& Matrix3<Real>::MakeDiagonal_ (Real fM00, Real fM11, Real fM22)
 {
     m_afEntry[0] = fM00;
     m_afEntry[1] = (Real)0.0;
@@ -302,7 +302,7 @@ void Matrix3<Real>::SetColumn (int iCol, const Vector3<Real>& rkV)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Vector3<Real> Matrix3<Real>::GetColumn (int iCol) const
+Vector3<Real> Matrix3<Real>::col (int iCol) const
 {
     assert(0 <= iCol && iCol < 3);
     Vector3<Real> kV;
@@ -535,7 +535,7 @@ Vector3<Real> Matrix3<Real>::operator* (const Vector3<Real>& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real> Matrix3<Real>::Transpose () const
+Matrix3<Real> Matrix3<Real>::transpose () const
 {
     Matrix3 kTranspose;
     for (int iRow = 0; iRow < 3; iRow++)
@@ -591,25 +591,25 @@ Matrix3<Real> Matrix3<Real>::TimesTranspose (const Matrix3& rkM) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real> Matrix3<Real>::Inverse () const
+Matrix3<Real> Matrix3<Real>::inverse () const
 {
     // Invert a 3x3 using cofactors.  This is faster than using a generic
     // Gaussian elimination because of the loop overhead of such a method.
 
     Matrix3 kInverse;
 
-    kInverse[0][0] = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
-    kInverse[0][1] = m_afEntry[2]*m_afEntry[7] - m_afEntry[1]*m_afEntry[8];
-    kInverse[0][2] = m_afEntry[1]*m_afEntry[5] - m_afEntry[2]*m_afEntry[4];
-    kInverse[1][0] = m_afEntry[5]*m_afEntry[6] - m_afEntry[3]*m_afEntry[8];
-    kInverse[1][1] = m_afEntry[0]*m_afEntry[8] - m_afEntry[2]*m_afEntry[6];
-    kInverse[1][2] = m_afEntry[2]*m_afEntry[3] - m_afEntry[0]*m_afEntry[5];
-    kInverse[2][0] = m_afEntry[3]*m_afEntry[7] - m_afEntry[4]*m_afEntry[6];
-    kInverse[2][1] = m_afEntry[1]*m_afEntry[6] - m_afEntry[0]*m_afEntry[7];
-    kInverse[2][2] = m_afEntry[0]*m_afEntry[4] - m_afEntry[1]*m_afEntry[3];
+    kInverse(0,0) = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
+    kInverse(0,1) = m_afEntry[2]*m_afEntry[7] - m_afEntry[1]*m_afEntry[8];
+    kInverse(0,2) = m_afEntry[1]*m_afEntry[5] - m_afEntry[2]*m_afEntry[4];
+    kInverse(1,0) = m_afEntry[5]*m_afEntry[6] - m_afEntry[3]*m_afEntry[8];
+    kInverse(1,1) = m_afEntry[0]*m_afEntry[8] - m_afEntry[2]*m_afEntry[6];
+    kInverse(1,2) = m_afEntry[2]*m_afEntry[3] - m_afEntry[0]*m_afEntry[5];
+    kInverse(2,0) = m_afEntry[3]*m_afEntry[7] - m_afEntry[4]*m_afEntry[6];
+    kInverse(2,1) = m_afEntry[1]*m_afEntry[6] - m_afEntry[0]*m_afEntry[7];
+    kInverse(2,2) = m_afEntry[0]*m_afEntry[4] - m_afEntry[1]*m_afEntry[3];
 
-    Real fDet = m_afEntry[0]*kInverse[0][0] + m_afEntry[1]*kInverse[1][0]+
-        m_afEntry[2]*kInverse[2][0];
+    Real fDet = m_afEntry[0]*kInverse(0,0) + m_afEntry[1]*kInverse(1,0)+
+        m_afEntry[2]*kInverse(2,0);
 
     if (Math<Real>::FAbs(fDet) <= Math<Real>::ZERO_TOLERANCE)
     {
@@ -621,25 +621,25 @@ Matrix3<Real> Matrix3<Real>::Inverse () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real> Matrix3<Real>::Adjoint () const
+Matrix3<Real> Matrix3<Real>::adjoint () const
 {
     Matrix3 kAdjoint;
 
-    kAdjoint[0][0] = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
-    kAdjoint[0][1] = m_afEntry[2]*m_afEntry[7] - m_afEntry[1]*m_afEntry[8];
-    kAdjoint[0][2] = m_afEntry[1]*m_afEntry[5] - m_afEntry[2]*m_afEntry[4];
-    kAdjoint[1][0] = m_afEntry[5]*m_afEntry[6] - m_afEntry[3]*m_afEntry[8];
-    kAdjoint[1][1] = m_afEntry[0]*m_afEntry[8] - m_afEntry[2]*m_afEntry[6];
-    kAdjoint[1][2] = m_afEntry[2]*m_afEntry[3] - m_afEntry[0]*m_afEntry[5];
-    kAdjoint[2][0] = m_afEntry[3]*m_afEntry[7] - m_afEntry[4]*m_afEntry[6];
-    kAdjoint[2][1] = m_afEntry[1]*m_afEntry[6] - m_afEntry[0]*m_afEntry[7];
-    kAdjoint[2][2] = m_afEntry[0]*m_afEntry[4] - m_afEntry[1]*m_afEntry[3];
+    kAdjoint(0,0) = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
+    kAdjoint(0,1) = m_afEntry[2]*m_afEntry[7] - m_afEntry[1]*m_afEntry[8];
+    kAdjoint(0,2) = m_afEntry[1]*m_afEntry[5] - m_afEntry[2]*m_afEntry[4];
+    kAdjoint(1,0) = m_afEntry[5]*m_afEntry[6] - m_afEntry[3]*m_afEntry[8];
+    kAdjoint(1,1) = m_afEntry[0]*m_afEntry[8] - m_afEntry[2]*m_afEntry[6];
+    kAdjoint(1,2) = m_afEntry[2]*m_afEntry[3] - m_afEntry[0]*m_afEntry[5];
+    kAdjoint(2,0) = m_afEntry[3]*m_afEntry[7] - m_afEntry[4]*m_afEntry[6];
+    kAdjoint(2,1) = m_afEntry[1]*m_afEntry[6] - m_afEntry[0]*m_afEntry[7];
+    kAdjoint(2,2) = m_afEntry[0]*m_afEntry[4] - m_afEntry[1]*m_afEntry[3];
 
     return kAdjoint;
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Matrix3<Real>::Determinant () const
+Real Matrix3<Real>::determinant () const
 {
     Real fCo00 = m_afEntry[4]*m_afEntry[8] - m_afEntry[5]*m_afEntry[7];
     Real fCo10 = m_afEntry[5]*m_afEntry[6] - m_afEntry[3]*m_afEntry[8];
@@ -709,7 +709,7 @@ void Matrix3<Real>::ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle) const
             rkAxis[0] = m_afEntry[7]-m_afEntry[5];
             rkAxis[1] = m_afEntry[2]-m_afEntry[6];
             rkAxis[2] = m_afEntry[3]-m_afEntry[1];
-            rkAxis.Normalize();
+            rkAxis.normalize();
         }
         else
         {
@@ -827,7 +827,7 @@ void Matrix3<Real>::Orthonormalize ()
 }
 //----------------------------------------------------------------------------
 template <class Real>
-void Matrix3<Real>::EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const
+void Matrix3<Real>::EigenDecomposition_ (Matrix3& rkRot, Matrix3& rkDiag) const
 {
     // Factor M = R*D*R^T.  The columns of R are the eigenvectors.  The
     // diagonal entries of D are the corresponding eigenvalues.
@@ -851,9 +851,9 @@ void Matrix3<Real>::EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const
         // swap V0 and V1
         for (i = 0; i < 3; i++)
         {
-            fSave = rkRot[i][0];
-            rkRot[i][0] = rkRot[i][1];
-            rkRot[i][1] = fSave;
+            fSave = rkRot(i,0);
+            rkRot(i,0) = rkRot(i,1);
+            rkRot(i,1) = fSave;
         }
         bReflection = !bReflection;
     }
@@ -868,9 +868,9 @@ void Matrix3<Real>::EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const
         // swap V1 and V2
         for (i = 0; i < 3; i++)
         {
-            fSave = rkRot[i][1];
-            rkRot[i][1] = rkRot[i][2];
-            rkRot[i][2] = fSave;
+            fSave = rkRot(i,1);
+            rkRot(i,1) = rkRot(i,2);
+            rkRot(i,2) = fSave;
         }
         bReflection = !bReflection;
     }
@@ -885,23 +885,23 @@ void Matrix3<Real>::EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const
         // swap V0 and V1
         for (i = 0; i < 3; i++)
         {
-            fSave = rkRot[i][0];
-            rkRot[i][0] = rkRot[i][1];
-            rkRot[i][1] = fSave;
+            fSave = rkRot(i,0);
+            rkRot(i,0) = rkRot(i,1);
+            rkRot(i,1) = fSave;
         }
         bReflection = !bReflection;
     }
 
-    rkDiag.MakeDiagonal(afDiag[0],afDiag[1],afDiag[2]);
+    rkDiag.MakeDiagonal_(afDiag[0],afDiag[1],afDiag[2]);
 
     if (bReflection)
     {
         // The orthogonal transformation that diagonalizes M is a reflection.
         // Make the eigenvectors a right--handed system by changing sign on
         // the last column.
-        rkRot[0][2] = -rkRot[0][2];
-        rkRot[1][2] = -rkRot[1][2];
-        rkRot[2][2] = -rkRot[2][2];
+        rkRot(0,2) = -rkRot(0,2);
+        rkRot(1,2) = -rkRot(1,2);
+        rkRot(2,2) = -rkRot(2,2);
     }
 }
 //----------------------------------------------------------------------------
@@ -1828,7 +1828,7 @@ void Matrix3<Real>::SingularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
 
     Matrix3 kA = *this;
     Bidiagonalize(kA,rkL,rkR);
-    rkS.MakeZero();
+    rkS.setZero();
 
     const int iMax = 32;
     const Real fEpsilon = (Real)1e-04;
@@ -1986,41 +1986,41 @@ void Matrix3<Real>::QDUDecomposition (Matrix3& rkQ, Matrix3& rkD,
     // build orthogonal matrix Q
     Real fInvLength = Math<Real>::InvSqrt(m_afEntry[0]*m_afEntry[0] +
         m_afEntry[3]*m_afEntry[3] + m_afEntry[6]*m_afEntry[6]);
-    rkQ[0][0] = m_afEntry[0]*fInvLength;
-    rkQ[1][0] = m_afEntry[3]*fInvLength;
-    rkQ[2][0] = m_afEntry[6]*fInvLength;
+    rkQ(0,0) = m_afEntry[0]*fInvLength;
+    rkQ(1,0) = m_afEntry[3]*fInvLength;
+    rkQ(2,0) = m_afEntry[6]*fInvLength;
 
-    Real fDot = rkQ[0][0]*m_afEntry[1] + rkQ[1][0]*m_afEntry[4] +
-        rkQ[2][0]*m_afEntry[7];
-    rkQ[0][1] = m_afEntry[1]-fDot*rkQ[0][0];
-    rkQ[1][1] = m_afEntry[4]-fDot*rkQ[1][0];
-    rkQ[2][1] = m_afEntry[7]-fDot*rkQ[2][0];
-    fInvLength = Math<Real>::InvSqrt(rkQ[0][1]*rkQ[0][1] +
-        rkQ[1][1]*rkQ[1][1] + rkQ[2][1]*rkQ[2][1]);
-    rkQ[0][1] *= fInvLength;
-    rkQ[1][1] *= fInvLength;
-    rkQ[2][1] *= fInvLength;
+    Real fDot = rkQ(0,0)*m_afEntry[1] + rkQ(1,0)*m_afEntry[4] +
+        rkQ(2,0)*m_afEntry[7];
+    rkQ(0,1) = m_afEntry[1]-fDot*rkQ(0,0);
+    rkQ(1,1) = m_afEntry[4]-fDot*rkQ(1,0);
+    rkQ(2,1) = m_afEntry[7]-fDot*rkQ(2,0);
+    fInvLength = Math<Real>::InvSqrt(rkQ(0,1)*rkQ(0,1) +
+        rkQ(1,1)*rkQ(1,1) + rkQ(2,1)*rkQ(2,1));
+    rkQ(0,1) *= fInvLength;
+    rkQ(1,1) *= fInvLength;
+    rkQ(2,1) *= fInvLength;
 
-    fDot = rkQ[0][0]*m_afEntry[2] + rkQ[1][0]*m_afEntry[5] +
-        rkQ[2][0]*m_afEntry[8];
-    rkQ[0][2] = m_afEntry[2]-fDot*rkQ[0][0];
-    rkQ[1][2] = m_afEntry[5]-fDot*rkQ[1][0];
-    rkQ[2][2] = m_afEntry[8]-fDot*rkQ[2][0];
-    fDot = rkQ[0][1]*m_afEntry[2] + rkQ[1][1]*m_afEntry[5] +
-        rkQ[2][1]*m_afEntry[8];
-    rkQ[0][2] -= fDot*rkQ[0][1];
-    rkQ[1][2] -= fDot*rkQ[1][1];
-    rkQ[2][2] -= fDot*rkQ[2][1];
-    fInvLength = Math<Real>::InvSqrt(rkQ[0][2]*rkQ[0][2] +
-        rkQ[1][2]*rkQ[1][2] + rkQ[2][2]*rkQ[2][2]);
-    rkQ[0][2] *= fInvLength;
-    rkQ[1][2] *= fInvLength;
-    rkQ[2][2] *= fInvLength;
+    fDot = rkQ(0,0)*m_afEntry[2] + rkQ(1,0)*m_afEntry[5] +
+        rkQ(2,0)*m_afEntry[8];
+    rkQ(0,2) = m_afEntry[2]-fDot*rkQ(0,0);
+    rkQ(1,2) = m_afEntry[5]-fDot*rkQ(1,0);
+    rkQ(2,2) = m_afEntry[8]-fDot*rkQ(2,0);
+    fDot = rkQ(0,1)*m_afEntry[2] + rkQ(1,1)*m_afEntry[5] +
+        rkQ(2,1)*m_afEntry[8];
+    rkQ(0,2) -= fDot*rkQ(0,1);
+    rkQ(1,2) -= fDot*rkQ(1,1);
+    rkQ(2,2) -= fDot*rkQ(2,1);
+    fInvLength = Math<Real>::InvSqrt(rkQ(0,2)*rkQ(0,2) +
+        rkQ(1,2)*rkQ(1,2) + rkQ(2,2)*rkQ(2,2));
+    rkQ(0,2) *= fInvLength;
+    rkQ(1,2) *= fInvLength;
+    rkQ(2,2) *= fInvLength;
 
     // guarantee that orthogonal matrix has determinant 1 (no reflections)
-    Real fDet = rkQ[0][0]*rkQ[1][1]*rkQ[2][2] + rkQ[0][1]*rkQ[1][2]*rkQ[2][0]
-        +  rkQ[0][2]*rkQ[1][0]*rkQ[2][1] - rkQ[0][2]*rkQ[1][1]*rkQ[2][0]
-        -  rkQ[0][1]*rkQ[1][0]*rkQ[2][2] - rkQ[0][0]*rkQ[1][2]*rkQ[2][1];
+    Real fDet = rkQ(0,0)*rkQ(1,1)*rkQ(2,2) + rkQ(0,1)*rkQ(1,2)*rkQ(2,0)
+        +  rkQ(0,2)*rkQ(1,0)*rkQ(2,1) - rkQ(0,2)*rkQ(1,1)*rkQ(2,0)
+        -  rkQ(0,1)*rkQ(1,0)*rkQ(2,2) - rkQ(0,0)*rkQ(1,2)*rkQ(2,1);
 
     if (fDet < (Real)0.0)
     {
@@ -2035,33 +2035,33 @@ void Matrix3<Real>::QDUDecomposition (Matrix3& rkQ, Matrix3& rkD,
 
     // build "right" matrix R
     Matrix3 kR;
-    kR[0][0] = rkQ[0][0]*m_afEntry[0] + rkQ[1][0]*m_afEntry[3] +
-        rkQ[2][0]*m_afEntry[6];
-    kR[0][1] = rkQ[0][0]*m_afEntry[1] + rkQ[1][0]*m_afEntry[4] +
-        rkQ[2][0]*m_afEntry[7];
-    kR[1][1] = rkQ[0][1]*m_afEntry[1] + rkQ[1][1]*m_afEntry[4] +
-        rkQ[2][1]*m_afEntry[7];
-    kR[0][2] = rkQ[0][0]*m_afEntry[2] + rkQ[1][0]*m_afEntry[5] +
-        rkQ[2][0]*m_afEntry[8];
-    kR[1][2] = rkQ[0][1]*m_afEntry[2] + rkQ[1][1]*m_afEntry[5] +
-        rkQ[2][1]*m_afEntry[8];
-    kR[2][2] = rkQ[0][2]*m_afEntry[2] + rkQ[1][2]*m_afEntry[5] +
-        rkQ[2][2]*m_afEntry[8];
+    kR(0,0) = rkQ(0,0)*m_afEntry[0] + rkQ(1,0)*m_afEntry[3] +
+        rkQ(2,0)*m_afEntry[6];
+    kR(0,1) = rkQ(0,0)*m_afEntry[1] + rkQ(1,0)*m_afEntry[4] +
+        rkQ(2,0)*m_afEntry[7];
+    kR(1,1) = rkQ(0,1)*m_afEntry[1] + rkQ(1,1)*m_afEntry[4] +
+        rkQ(2,1)*m_afEntry[7];
+    kR(0,2) = rkQ(0,0)*m_afEntry[2] + rkQ(1,0)*m_afEntry[5] +
+        rkQ(2,0)*m_afEntry[8];
+    kR(1,2) = rkQ(0,1)*m_afEntry[2] + rkQ(1,1)*m_afEntry[5] +
+        rkQ(2,1)*m_afEntry[8];
+    kR(2,2) = rkQ(0,2)*m_afEntry[2] + rkQ(1,2)*m_afEntry[5] +
+        rkQ(2,2)*m_afEntry[8];
 
     // the scaling component
-    rkD.MakeDiagonal(kR[0][0],kR[1][1],kR[2][2]);
+    rkD.MakeDiagonal_(kR(0,0),kR(1,1),kR(2,2));
 
     // the shear component
-    Real fInvD0 = ((Real)1.0)/rkD[0][0];
-    rkU[0][0] = (Real)1.0;
-    rkU[0][1] = kR[0][1]*fInvD0;
-    rkU[0][2] = kR[0][2]*fInvD0;
-    rkU[1][0] = (Real)0.0;
-    rkU[1][1] = (Real)1.0;
-    rkU[1][2] = kR[1][2]/rkD[1][1];
-    rkU[2][0] = (Real)0.0;
-    rkU[2][1] = (Real)0.0;
-    rkU[2][2] = (Real)1.0;
+    Real fInvD0 = ((Real)1.0)/rkD(0,0);
+    rkU(0,0) = (Real)1.0;
+    rkU(0,1) = kR(0,1)*fInvD0;
+    rkU(0,2) = kR(0,2)*fInvD0;
+    rkU(1,0) = (Real)0.0;
+    rkU(1,1) = (Real)1.0;
+    rkU(1,2) = kR(1,2)/rkD(1,1);
+    rkU(2,0) = (Real)0.0;
+    rkU(2,1) = (Real)0.0;
+    rkU(2,2) = (Real)1.0;
 }
 //----------------------------------------------------------------------------
 template <class Real>
@@ -2074,9 +2074,9 @@ template <class Real>
 Vector3<Real> operator* (const Vector3<Real>& rkV, const Matrix3<Real>& rkM)
 {
     return Vector3<Real>(
-        rkV[0]*rkM[0][0] + rkV[1]*rkM[1][0] + rkV[2]*rkM[2][0],
-        rkV[0]*rkM[0][1] + rkV[1]*rkM[1][1] + rkV[2]*rkM[2][1],
-        rkV[0]*rkM[0][2] + rkV[1]*rkM[1][2] + rkV[2]*rkM[2][2]);
+        rkV[0]*rkM(0,0) + rkV[1]*rkM(1,0) + rkV[2]*rkM(2,0),
+        rkV[0]*rkM(0,1) + rkV[1]*rkM(1,1) + rkV[2]*rkM(2,1),
+        rkV[0]*rkM(0,2) + rkV[1]*rkM(1,2) + rkV[2]*rkM(2,2));
 }
 //----------------------------------------------------------------------------
 

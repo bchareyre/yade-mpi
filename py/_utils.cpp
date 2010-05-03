@@ -100,7 +100,7 @@ Real elasticEnergyInAABB(py::tuple Aabb){
 			//cerr<<"Interaction crosses Aabb boundary, weight is "<<weight<<endl;
 			//LOG_DEBUG("Interaction crosses Aabb boundary, weight is "<<weight);
 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().Length(),2));
+		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().norm(),2));
 	}
 	return E;
 }
@@ -127,8 +127,9 @@ py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::t
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
 		if(useBB && !isInBB(b1->state->pos,bbMin,bbMax) && !isInBB(b2->state->pos,bbMin,bbMax)) continue;
-		shared_ptr<ScGeom> scg=dynamic_pointer_cast<ScGeom>(i->interactionGeometry); if(!scg) continue;
-		Vector3r n(scg->normal); n[axis]=0.; Real nLen=n.Length();
+		GenericSpheresContact* geom=dynamic_cast<GenericSpheresContact*>(i->interactionGeometry.get());
+		if(!geom) continue;
+		Vector3r n(geom->normal); n[axis]=0.; Real nLen=n.norm();
 		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
 		Real theta=acos(n[axis2]/nLen)*(n[axis3]>0?1:-1); if(theta<0) theta+=Mathr::PI;
 		int binNo=theta/binStep;
@@ -212,7 +213,7 @@ Real sumTorques(py::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
 		const Vector3r& m=rb->forces.getTorque(b->getId());
 		const Vector3r& f=rb->forces.getForce(b->getId());
 		Vector3r r=b->state->pos-axisPt;
-		ret+=axis.Dot(m+r.Cross(f));
+		ret+=axis.dot(m+r.cross(f));
 	}
 	return ret;
 }
@@ -230,7 +231,7 @@ Real sumForces(py::tuple ids, const Vector3r& direction){
 	for(size_t i=0; i<len; i++){
 		body_id_t id=py::extract<int>(ids[i]);
 		const Vector3r& f=rb->forces.getForce(id);
-		ret+=direction.Dot(f);
+		ret+=direction.dot(f);
 	}
 	return ret;
 }
@@ -243,10 +244,10 @@ Real sumFacetNormalForces(vector<body_id_t> ids, int axis=-1){
 	Real ret=0;
 	FOREACH(const body_id_t id, ids){
 		Facet* f=YADE_CAST<Facet*>(Body::byId(id,rb)->shape.get());
-		if(axis<0) ret+=rb->forces.getForce(id).Dot(f->nf);
+		if(axis<0) ret+=rb->forces.getForce(id).dot(f->nf);
 		else {
 			Vector3r ff=rb->forces.getForce(id); ff[axis]=0;
-			ret+=ff.Dot(f->nf);
+			ret+=ff.dot(f->nf);
 		}
 	}
 	return ret;
@@ -374,7 +375,7 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
 		else{ pos1=Body::byId(I->getId1(),rootBody)->state->pos; pos2=Body::byId(I->getId2(),rootBody)->state->pos; }
-		Real dot1=(pos1-planePt).Dot(normal), dot2=(pos2-planePt).Dot(normal);
+		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
 		if(dot1*dot2>0) continue; // both interaction points on the same side of the plane
 		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
 		// otherwise, reverse its contribution

@@ -14,13 +14,13 @@ Dem3DofGeom_WallSphere::~Dem3DofGeom_WallSphere(){}
 void Dem3DofGeom_WallSphere::setTgPlanePts(const Vector3r& p1new, const Vector3r& p2new){
 	TRVAR3(cp1pt,cp2rel,contPtInTgPlane2()-contPtInTgPlane1());	
 	cp1pt=p1new+contactPoint-se31.position;
-	cp2rel=se32.orientation.Conjugate()*Dem3DofGeom_SphereSphere::rollPlanePtToSphere(p2new,effR2,-normal);
+	cp2rel=se32.orientation.conjugate()*Dem3DofGeom_SphereSphere::rollPlanePtToSphere(p2new,effR2,-normal);
 	TRVAR3(cp1pt,cp2rel,contPtInTgPlane2()-contPtInTgPlane1());	
 }
 
 void Dem3DofGeom_WallSphere::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
-	//TRVAR2(p2.Length(),effR2);
-	if(p2.SquaredLength()>pow(effR2,2)){
+	//TRVAR2(p2.norm(),effR2);
+	if(p2.squaredNorm()>pow(effR2,2)){
 		setTgPlanePts(Vector3r::Zero(),p2-p1);
 	}
 }
@@ -31,7 +31,7 @@ Real Dem3DofGeom_WallSphere::slipToDisplacementTMax(Real displacementTMax){
 	if(displacementTMax<=0.){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
 	// otherwise
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Real currDistSq=(p2-p1).SquaredLength();
+	Real currDistSq=(p2-p1).squaredNorm();
 	if(currDistSq<pow(displacementTMax,2)) return 0; // close enough, no slip needed
 	//Vector3r diff=.5*(sqrt(currDistSq)/displacementTMax-1)*(p2-p1); setTgPlanePts(p1+diff,p2-diff);
 	Real scale=displacementTMax/sqrt(currDistSq); setTgPlanePts(scale*p1,scale*p2);
@@ -64,8 +64,8 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 		ws->refLength=ws->effR2;
 		ws->cp1pt=contPt-state1.pos; // initial contact point relative to wall position (orientation is global, since it is coincident with local for a wall)
 		ws->cp2rel=Quaternionr::Identity();
-		ws->cp2rel.Align(Vector3r::UnitX(),state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
-		ws->cp2rel.Normalize();
+		ws->cp2rel.setFromTwoVectors(Vector3r::UnitX(),state2.ori.conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
+		ws->cp2rel.normalize();
 		//LOG_INFO(ws->cp1pt);
 	}
 	ws->se31=state1.se3; ws->se32=state2.se3; ws->se32.position+=shift2;
@@ -109,7 +109,7 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 			}
 			if(shear){
 				GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
-				if(shearLabel) GLUtils::GLDrawNum(ws->displacementT().Length(),contPt,Vector3r(1,1,1));
+				if(shearLabel) GLUtils::GLDrawNum(ws->displacementT().norm(),contPt,Vector3r(1,1,1));
 			}
 		}
 	}

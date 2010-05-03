@@ -83,7 +83,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
 	if (porosity>0) {//cloud porosity is assigned, ignore the given value of rMean
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
-		Vector3r dimensions=mx-mn; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
+		Vector3r dimensions=mx-mn; Real volume=dimensions.x()*dimensions.y()*dimensions.z();
 		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);}	
 	const int maxTry=1000;
 	Vector3r size=mx-mn;
@@ -97,12 +97,12 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			else { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
 			size_t packSize=pack.size(); bool overlap=false;
 			if(!periodic){
-				for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).SquaredLength()) { overlap=true; break; } }
+				for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
 			} else {
 				for(size_t j=0; j<packSize; j++){
 					Vector3r dr;
 					for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
-					if(pow(pack[j].r+r,2)>= dr.SquaredLength()){ overlap=true; break; }
+					if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 				}
 			}
 			if(!overlap) { pack.push_back(Sph(c,r)); break; }

@@ -41,7 +41,7 @@ Real elasticEnergyDensityInAABB(python::tuple Aabb){
 			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
 			assert(weight>=0 && weight<=1);
 		}
-		E+=.5*bc->E*bc->crossSection*pow(bc->epsN,2)+.5*bc->G*bc->crossSection*pow(bc->epsT.Length(),2);
+		E+=.5*bc->E*bc->crossSection*pow(bc->epsN,2)+.5*bc->G*bc->crossSection*pow(bc->epsT.norm(),2);
 	}
 	return E/(box[0]*box[1]*box[2]);
 }
@@ -62,11 +62,11 @@ void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirectio
 		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;
 		const Vector3r x2=axisPoint+axisDirection;
-		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
+		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).dot(x2-x1))/((x2-x1).squaredNorm());
 		Vector3r toAxis=closestAxisPoint-x0;
-		if(subtractDist>0) toAxis*=(toAxis.Length()-subtractDist)/toAxis.Length();
+		if(subtractDist>0) toAxis*=(toAxis.norm()-subtractDist)/toAxis.norm();
 		b->state->vel=toAxis/timeToAxis;
-		Vector3r ppDiff=perturbation*(1./sqrt(3.))*Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom())*b->state->vel.Length();
+		Vector3r ppDiff=perturbation*(1./sqrt(3.))*Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom())*b->state->vel.norm();
 		b->state->vel+=ppDiff;
 	}
 }
@@ -116,7 +116,7 @@ void particleMacroStress(void){
 			assert(i);
 			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(i->interactionGeometry);
 			CpmPhys* phys=YADE_CAST<CpmPhys*>(i->interactionPhysics);
-			Real d=(geom->se31->pos-geom->se32->pos).Length(); // current contact length
+			Real d=(geom->se31->pos-geom->se32->pos).norm(); // current contact length
 			const Vector3r& n=geom->normal;
 			const Real& A=phys->crossSection;
 			const Vector3r& sigmaT=phys->sigmaT;
@@ -187,16 +187,16 @@ struct SpiralInteractionLocator2d{
 				CpmPhys* phys=YADE_CAST<CpmPhys*>(fi.i->interactionPhysics.get());
 				// transformation matrix, to rotate to the plane
 				Vector3r ax(Vector3r::Zero()); ax[axis]=1.;
-				Quaternionr q(AngleAxisr(fi.theta,ax)); q=q.Conjugate();
-				Matrix3r TT; q.ToRotationMatrix(TT);
+				Quaternionr q(AngleAxisr(fi.theta,ax)); q=q.conjugate();
+				Matrix3r TT; q.toRotationMatrix(TT);
 				//
-				Real d=(geom->se31.position-geom->se32.position).Length(); // current contact length
+				Real d=(geom->se31.position-geom->se32.position).norm(); // current contact length
 				const Vector3r& n=TT*geom->normal;
 				const Real& A=phys->crossSection;
 				const Vector3r& sigmaT=TT*phys->sigmaT;
 				const Real& sigmaN=phys->sigmaN;
 				for(int i=0; i<3; i++) for(int j=0;j<3; j++){
-					ss[i][j]+=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
+					ss(i,j)+=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
 				}
 			}
 		}
@@ -273,13 +273,13 @@ class InteractionLocator{
 			const shared_ptr<Interaction>& I(intrs[ids->GetId(k)]);
 			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
 			CpmPhys* phys=YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
-			Real d=(geom->se31.position-geom->se32.position).Length(); // current contact length
+			Real d=(geom->se31.position-geom->se32.position).norm(); // current contact length
 			const Vector3r& n=geom->normal;
 			const Real& A=phys->crossSection;
 			const Vector3r& sigmaT=phys->sigmaT;
 			const Real& sigmaN=phys->sigmaN;
 			for(int i=0; i<3; i++) for(int j=0;j<3; j++){
-				ss[i][j]+=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
+				ss(i,j)+=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
 			}
 			omegaCumm+=phys->omega; kappaCumm+=phys->kappaD;
 		}

@@ -48,7 +48,7 @@ void bestFitOBB(const std::vector<Vector3r>& pts, Vector3r& center, Vector3r& ha
 						bestVolume=volume;
 						angle=angle0;
 						// set return values, in case this will be really the best fit
-						rot=Quaternionr(rot0); rot=rot.Conjugate(); center=center0; halfSize=halfSize0;
+						rot=Quaternionr(rot0); rot=rot.conjugate(); center=center0; halfSize=halfSize0;
 						found=true;
 					}
 				}

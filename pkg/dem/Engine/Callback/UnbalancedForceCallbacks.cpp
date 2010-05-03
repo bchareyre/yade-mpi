@@ -26,7 +26,7 @@ void SumIntrForcesCb::go(IntrCallback* _self, Interaction* i){
 	Vector3r f=nsp->normalForce+nsp->shearForce;
 	if(f==Vector3r::Zero()) return;
 	self->numIntr+=1;
-	self->force+=f.Length();
+	self->force+=f.norm();
 	//cerr<<"[cb#"<<i->getId1()<<"+"<<i->getId2()<<"]";
 }
 
@@ -44,5 +44,5 @@ void SumBodyForcesCb::go(BodyCallback* _self, Body* b){
 	cerr<<"[force="<<self->scene->forces.getForce(b->id)<<"]";
 	self->numBodies+=1;
 	//self->scene->forces.sync();
-	self->force+=self->scene->forces.getForce(b->id).Length();
+	self->force+=self->scene->forces.getForce(b->id).norm();
 }

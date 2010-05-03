@@ -22,11 +22,11 @@ void Bo1_Box_Aabb::go(	const shared_ptr<Shape>& cm,
 	if(scene->isPeriodic && scene->cell->hasShear()) throw logic_error(__FILE__ "Boxes not (yet?) supported in sheared cell.");
 	
 	Matrix3r r;
-	se3.orientation.ToRotationMatrix(r);
+	se3.orientation.toRotationMatrix(r);
 	Vector3r halfSize(Vector3r::Zero());
 	for( int i=0; i<3; ++i )
 		for( int j=0; j<3; ++j )
-			halfSize[i] += fabs( r[i][j] * box->extents[j] );
+			halfSize[i] += fabs( r(i,j) * box->extents[j] );
 	
 	aabb->min = se3.position-halfSize;
 	aabb->max = se3.position+halfSize;

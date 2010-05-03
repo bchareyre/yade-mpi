@@ -92,9 +92,10 @@ public:
     WM3_FUN Matrix3 (const Vector3<Real>& rkU, const Vector3<Real>& rkV);
 
     // create various matrices
-    WM3_FUN Matrix3& MakeZero ();
-    WM3_FUN Matrix3& MakeIdentity ();
-    WM3_FUN Matrix3& MakeDiagonal (Real fM00, Real fM11, Real fM22);
+    EIG_FUN Matrix3& setZero ();
+    EIG_FUN Matrix3& setIdentity ();
+    WM3_OLD Matrix3& MakeDiagonal (Real fM00, Real fM11, Real fM22) { return MakeDiagonal_(fM00,fM11,fM22); }
+            Matrix3& MakeDiagonal_ (Real fM00, Real fM11, Real fM22); // hidden function, do not use from outside
     WM3_FUN Matrix3& FromAxisAngle (const Vector3<Real>& rkAxis, Real fAngle);
     WM3_FUN Matrix3& MakeTensorProduct (const Vector3<Real>& rkU,
         const Vector3<Real>& rkV);
@@ -109,8 +110,8 @@ public:
     WM3_FUN void SetRow (int iRow, const Vector3<Real>& rkV);
     WM3_FUN Vector3<Real> GetRow (int iRow) const;
     WM3_FUN void SetColumn (int iCol, const Vector3<Real>& rkV);
-    WM3_FUN Vector3<Real> GetColumn (int iCol) const;
-	 EIG_FUN Vector3<Real> col(int i) const { return GetColumn(i); }
+    EIG_FUN Vector3<Real> col (int iCol) const;
+	 WM3_OLD Vector3<Real> GetColumn(int i) const { return col(i); }
     WM3_FUN void GetColumnMajor (Real* afCMajor) const;
 
     // assignment
@@ -142,21 +143,21 @@ public:
     Vector3<Real> operator* (const Vector3<Real>& rkV) const;  // M * v
 
     // other operations
-    WM3_FUN Matrix3 Transpose () const;  // M^T
+    EIG_FUN Matrix3 transpose () const;  // M^T
     WM3_FUN Matrix3 TransposeTimes (const Matrix3& rkM) const;  // this^T * M
     WM3_FUN Matrix3 TimesTranspose (const Matrix3& rkM) const;  // this * M^T
-    WM3_FUN Matrix3 Inverse () const;
-    WM3_FUN Matrix3 Adjoint () const;
-    WM3_FUN Real Determinant () const;
+    EIG_FUN Matrix3 inverse () const;
+    EIG_FUN Matrix3 adjoint () const;
+    EIG_FUN Real determinant () const;
     WM3_FUN Real QForm (const Vector3<Real>& rkU,
         const Vector3<Real>& rkV) const;  // u^T*M*v
     WM3_FUN Matrix3 TimesDiagonal (const Vector3<Real>& rkDiag) const;  // M*D
     WM3_FUN Matrix3 DiagonalTimes (const Vector3<Real>& rkDiag) const;  // D*M
 
-	 EIG_FUN Matrix3 transpose() const {return Transpose();}
-	 EIG_FUN Matrix3 adjoint() const {return Adjoint();}
-	 EIG_FUN Matrix3 determinant() const {return Determinant();}
-	 EIG_FUN Matrix3 inverse() const {return Inverse();}
+	 WM3_OLD Matrix3 Transpose() const {return transpose();}
+	 WM3_OLD Matrix3 Adjoint() const {return adjoint();}
+	 WM3_OLD Matrix3 Determinant() const {return determinant();}
+	 WM3_OLD Matrix3 Inverse() const {return inverse();}
 
     // The matrix must be a rotation for these functions to be valid.  The
     // last function uses Gram-Schmidt orthonormalization applied to the
@@ -170,7 +171,8 @@ public:
     // D = diag(d0,d1,d2) is a diagonal matrix whose diagonal entries are d0,
     // d1, and d2.  The eigenvector u[i] corresponds to eigenvector d[i].
     // The eigenvalues are ordered as d0 <= d1 <= d2.
-    WM3_FUN void EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const;
+    WM3_OLD void EigenDecomposition(Matrix3& rkRot, Matrix3& rkDiag) const { EigenDecomposition_(rkRot,rkDiag);}
+    void EigenDecomposition_ (Matrix3& rkRot, Matrix3& rkDiag) const; // hidden function, do not call from outside
 
     // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
     // where yaw is rotation about the Up vector, pitch is rotation about the

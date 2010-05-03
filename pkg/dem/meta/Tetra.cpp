@@ -120,7 +120,8 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 		II->v[0]-=centroid; II->v[1]-=centroid; II->v[2]-=centroid; II->v[3]-=centroid;
 		dist=(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25-centroid;
 		/* use parallel axis theorem */ 
-		I+=TetrahedronInertiaTensor(II->v)  + TetrahedronVolume(II->v)*Matrix3r(dist[0]*dist[0],dist[1]*dist[1],dist[2]*dist[2]);
+		Matrix3r distSq(Matrix3r::Zero()); distSq(0,0)=dist[0]*dist[0]; distSq(1,1)=dist[1]*dist[1]; distSq(2,2)=dist[2]*dist[2]; // could be done more intelligently with eigen
+		I+=TetrahedronInertiaTensor(II->v)+TetrahedronVolume(II->v)*distSq;
 	}
 	
 	/* Now, we have the collision volumetrically described by intersection volume (V), its inertia tensor (I) and centroid (centroid; contact point).
@@ -131,7 +132,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	 *  2. tangent?! hopefully not needed at all. */
 
 	Matrix3r Ip, R; // principal moments of inertia, rotation matrix
-	(void) /* should check convergence*/ I.EigenDecomposition(R,Ip);
+	/* should check convergence*/	matrixEigenDecomposition(I,R,Ip);
 	// according to the documentation in Wm3 header, diagonal entries are in ascending order: d0<=d1<=d2;
 	// but keep it algorithmic for now and just assert that.
 	int ix=(Ip(0,0)<Ip(1,1) && Ip(0,0)<Ip(2,2))?0:( (Ip(1,1)<Ip(0,0) && Ip(1,1)<Ip(2,2))?1:2); // index of the minimum moment of inertia
@@ -140,12 +141,12 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	// assert what the documentation says (d0<=d1<=d2)
 	assert(ix==0);
 	Vector3r minAxis(0,0,0); minAxis[ix]=1; // the axis of minimum inertia
-	Vector3r normal=R*minAxis; normal.Normalize(); // normal is minAxis in global coordinates (normalization shouldn't be needed since R is rotation matrix, but to make sure...)
+	Vector3r normal=R*minAxis; normal.normalize(); // normal is minAxis in global coordinates (normalization shouldn't be needed since R is rotation matrix, but to make sure...)
 
 	// centroid of B
 	Vector3r Bcent=se31.orientation*((B->v[0]+B->v[1]+B->v[2]+B->v[3])*.25)+se31.position;
 	// reverse direction if projection of the (contact_point-centroid_of_B) vector onto the normal is negative (i.e. the normal points more towards A)
-	if((Bcent-centroid).Dot(normal)<0) normal*=-1;
+	if((Bcent-centroid).dot(normal)<0) normal*=-1;
 
 	/* now estimate the area of the solid that is perpendicular to the normal. This will be needed to estimate elastic force based on Young's modulus.
 	 * Suppose we have cuboid, with edges of lengths x,y,z in the direction of respective axes.
@@ -166,9 +167,10 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	 * This will be used to calculate relative deformation, which is needed for elastic response. */
 	const State* physA=Body::byId(interaction->getId1())->state.get(); const State* physB=Body::byId(interaction->getId2())->state.get();
 	// WARNING: Matrix3r(Vector3r(...)) is compiled, but gives zero matrix??!! Use explicitly constructor from diagonal entries
-	Matrix3r IA(physA->inertia[0],physA->inertia[1],physA->inertia[2]); Matrix3r IB(physB->inertia[0],physB->inertia[1],physB->inertia[2]);
+	//Matrix3r IA(physA->inertia[0],physA->inertia[1],physA->inertia[2]); Matrix3r IB(physB->inertia[0],physB->inertia[1],physB->inertia[2]);
+	Matrix3r IA=Matrix3r::Zero(), IB=Matrix3r::Zero(); for(int i=0; i<3; i++){ IA(i,i)=physA->inertia[i]; IB(i,i)=physB->inertia[i]; }
 	// see Clump::inertiaTensorRotate for references
-	IA=R.Transpose()*IA*R; IB=R.Transpose()*IB*R;
+	IA=R.transpose()*IA*R; IB=R.transpose()*IB*R;
 
 	Real maxPenetrationDepthA=sqrt(6*(IA(ix,ix)+IA(ixx,ixx)-IA(ixxx,ixxx))/V);
 	Real maxPenetrationDepthB=sqrt(6*(IB(ix,ix)+IB(ixx,ixx)-IB(ixxx,ixxx))/V);
@@ -213,8 +215,8 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, 
 	for(i=0; i<4; i++){
 		i1=(i+1)%4; i2=(i+2)%4; i3=(i+3)%4;
 		const Vector3r& P(B.v[i]); // reference point on the plane
-		normal=(B.v[i1]-P).Cross(B.v[i2]-P); normal.Normalize(); // normal
-		if((B.v[i3]-P).Dot(normal)>0) normal*=-1; // outer normal
+		normal=(B.v[i1]-P).cross(B.v[i2]-P); normal.normalize(); // normal
+		if((B.v[i3]-P).dot(normal)>0) normal*=-1; // outer normal
 		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
 		for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
 			list<Tetra> splitDecomposition=TetraClipByPlane(*I,P,normal);
@@ -261,13 +263,13 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const V
 	
 	list<Tetra> ret;
 	// scaling factor for Mathr::EPSILON: average edge length
-	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).Length();
+	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).norm();
 
 	/* TRWM3VEC(P); TRWM3VEC(normal); T.dump(); */
 
 	vector<size_t> pos, neg, zer; Real dist[4];
 	for(size_t i=0; i<4; i++){
-		dist[i]=(T.v[i]-P).Dot(normal);
+		dist[i]=(T.v[i]-P).dot(normal);
 		if(dist[i]>scaledEPSILON) pos.push_back(i);
 		else if(dist[i]<-scaledEPSILON) neg.push_back(i);
 		else zer.push_back(i);
@@ -390,12 +392,12 @@ void TetraVolumetricLaw::action()
 		Vector3r F=contactGeom->normal*averageStrain*young*contactGeom->equivalentCrossSection;
 		TRWM3VEC(contactGeom->normal);
 		TRWM3VEC(F);
-		TRWM3VEC((A->state->pos-contactGeom->contactPoint).Cross(F));
+		TRWM3VEC((A->state->pos-contactGeom->contactPoint).cross(F));
 
 		scene->forces.addForce (idA,-F);
 		scene->forces.addForce (idB, F);
-		scene->forces.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).Cross(F));
-		scene->forces.addTorque(idB, (B->state->pos-contactGeom->contactPoint).Cross(F));
+		scene->forces.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).cross(F));
+		scene->forces.addTorque(idB, (B->state->pos-contactGeom->contactPoint).cross(F));
 	}
 }
 
@@ -419,7 +421,7 @@ void TetraVolumetricLaw::action()
 			Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
 			glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
-				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]); n.normalize(); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
+				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]); n.normalize(); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
 					__ONEFACE(3,0,1);
 					__ONEFACE(0,1,2);
 					__ONEFACE(1,2,3);
@@ -572,7 +574,7 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	//! @fixme from right to left: rotate by I_rot, then add original rotation (?!!)
 	rbp->se3.orientation=rbp->se3.orientation*I_Qrot;
 	for(size_t i=0; i<4; i++){
-		tMold->v[i]=I_Qrot.Conjugate()*tMold->v[i];
+		tMold->v[i]=I_Qrot.conjugate()*tMold->v[i];
 	}
 
 	// set inertia
@@ -586,6 +588,6 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 }
 
 
-Real TetrahedronVolume(const Vector3r v[4]) { return fabs((Vector3r(v[3])-Vector3r(v[0])).Dot((Vector3r(v[3])-Vector3r(v[1])).Cross(Vector3r(v[3])-Vector3r(v[2]))))/6.; }
-Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(Vector3r(v[1]-v[0]).Dot(Vector3r(v[2]-v[0]).Cross(v[3]-v[0])))/6.; }
+Real TetrahedronVolume(const Vector3r v[4]) { return fabs((Vector3r(v[3])-Vector3r(v[0])).dot((Vector3r(v[3])-Vector3r(v[1])).cross(Vector3r(v[3])-Vector3r(v[2]))))/6.; }
+Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(Vector3r(v[1]-v[0]).dot(Vector3r(v[2]-v[0]).cross(v[3]-v[0])))/6.; }
 

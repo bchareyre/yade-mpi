@@ -331,8 +331,8 @@ if not env.GetOption('clean'):
 	def CheckLib_maybeMT(conf,lib,header,lang,func): return conf.CheckLibWithHeader(lib+'-mt',['limits.h',header],'c++',func,autoadd=1) or conf.CheckLibWithHeader(lib,['limits.h',header],lang,func,autoadd=1)
 	# in boost::filesystem>=1.35 depends on boost::system being explicitly linked to; if not present, we are probably in <=1.34, where boost::system didn't exist and wasn't needed either 
 	CheckLib_maybeMT(conf,'boost_system','boost/system/error_code.hpp','c++','boost::system::error_code(); /* non-essential */')
-	ok&=CheckLib_maybeMT(conf,'boost_thread','boost/thread/thread.hpp','c++','boost::thread::thread();')
-	ok&=CheckLib_maybeMT(conf,'boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration::time_duration();')
+	ok&=CheckLib_maybeMT(conf,'boost_thread','boost/thread/thread.hpp','c++','boost::thread();')
+	ok&=CheckLib_maybeMT(conf,'boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration();')
 	ok&=CheckLib_maybeMT(conf,'boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
 	ok&=CheckLib_maybeMT(conf,'boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");')
 	ok&=CheckLib_maybeMT(conf,'boost_regex','boost/regex.hpp','c++','boost::regex("");')

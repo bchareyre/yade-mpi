@@ -64,10 +64,10 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
 				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 				contactPhysics->kr = Kr;
-				contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+				contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
+				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
+				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;
 			}
 			contactPhysics->prevNormal = interactionGeometry->normal;
 			contactPhysics->kn = Kn;
@@ -77,10 +77,10 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
 			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 			contactPhysics->kr = Kr;
-			contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+			contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
-			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
-			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
+			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
+			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;
 			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 		}
 		else // !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
@@ -95,10 +95,10 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 				contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
 				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
-				contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+				contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
+				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
+				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;
 			}
 		}
 	}

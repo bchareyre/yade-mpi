@@ -121,7 +121,7 @@ class inSphere: public Predicate {
 	Vector3r center; Real radius;
 public:
 	inSphere(const Vector3r& _center, Real _radius){center=_center; radius=_radius;}
-	virtual bool operator()(const Vector3r& pt, Real pad=0.) const { return ((pt-center).Length()-pad<=radius-pad); }
+	virtual bool operator()(const Vector3r& pt, Real pad=0.) const { return ((pt-center).norm()-pad<=radius-pad); }
 	virtual python::tuple aabb() const {return vvec2ttuple(Vector3r(center[0]-radius,center[1]-radius,center[2]-radius),Vector3r(center[0]+radius,center[1]+radius,center[2]+radius));}
 };
 
@@ -143,11 +143,11 @@ public:
 class inCylinder: public Predicate{
 	Vector3r c1,c2,c12; Real radius,ht;
 public:
-	inCylinder(const Vector3r& _c1, const Vector3r& _c2, Real _radius){c1=_c1; c2=_c2; c12=c2-c1; radius=_radius; ht=c12.Length(); }
+	inCylinder(const Vector3r& _c1, const Vector3r& _c2, Real _radius){c1=_c1; c2=_c2; c12=c2-c1; radius=_radius; ht=c12.norm(); }
 	bool operator()(const Vector3r& pt, Real pad=0.) const {
-		Real u=(pt.Dot(c12)-c1.Dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
+		Real u=(pt.dot(c12)-c1.dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
 		if((u*ht<0+pad) || (u*ht>ht-pad)) return false; // out of cylinder along the axis
-		Real axisDist=((pt-c1).Cross(pt-c2)).Length()/ht;
+		Real axisDist=((pt-c1).cross(pt-c2)).norm()/ht;
 		if(axisDist>radius-pad) return false;
 		return true;
 	}
@@ -172,16 +172,16 @@ class inHyperboloid: public Predicate{
 public:
 	inHyperboloid(const Vector3r& _c1, const Vector3r& _c2, Real _R, Real _r){
 		c1=_c1; c2=_c2; R=_R; a=_r;
-		c12=c2-c1; ht=c12.Length();
+		c12=c2-c1; ht=c12.norm();
 		Real uMax=sqrt(pow(R/a,2)-1); c=ht/(2*uMax);
 	}
 	// WARN: this is not accurate, since padding is taken as perpendicular to the axis, not the the surface
 	bool operator()(const Vector3r& pt, Real pad=0.) const {
-		Real v=(pt.Dot(c12)-c1.Dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
+		Real v=(pt.dot(c12)-c1.dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
 		if((v*ht<0+pad) || (v*ht>ht-pad)) return false; // out of cylinder along the axis
 		Real u=(v-.5)*ht/c; // u from the wolfram parametrization; u is 0 in the center
 		Real rHere=a*sqrt(1+u*u); // pad is taken perpendicular to the axis, not to the surface (inaccurate)
-		Real axisDist=((pt-c1).Cross(pt-c2)).Length()/ht;
+		Real axisDist=((pt-c1).cross(pt-c2)).norm()/ht;
 		if(axisDist>rHere-pad) return false;
 		return true;
 	}
@@ -201,7 +201,7 @@ public:
 		Real x = sqrt((1-pow((pt[1]-c[1]),2)/((abc[1]-pad)*(abc[1]-pad))-pow((pt[2]-c[2]),2)/((abc[2]-pad)*(abc[2]-pad)))*((abc[0]-pad)*(abc[0]-pad)))+c[0]; 
 		Vector3r edgeEllipsoid(x,pt[1],pt[2]); // create a vector of these 3 coordinates
 		//check whether given coordinates lie inside ellipsoid or not
-		if ((pt-c).Length()<=(edgeEllipsoid-c).Length()) return true;
+		if ((pt-c).norm()<=(edgeEllipsoid-c).norm()) return true;
 		else return false;
 	}
 	python::tuple aabb() const {
@@ -238,14 +238,14 @@ class notInNotch: public Predicate{
 public:
 	notInNotch(const Vector3r& _c, const Vector3r& _edge, const Vector3r& _normal, Real _aperture){
 		c=_c;
-		edge=_edge; edge.Normalize();
-		normal=_normal; normal-=edge*edge.Dot(normal); normal.Normalize();
-		inside=edge.Cross(normal);
+		edge=_edge; edge.normalize();
+		normal=_normal; normal-=edge*edge.dot(normal); normal.normalize();
+		inside=edge.cross(normal);
 		aperture=_aperture;
 		// LOG_DEBUG("edge="<<edge<<", normal="<<normal<<", inside="<<inside<<", aperture="<<aperture);
 	}
 	bool operator()(const Vector3r& pt, Real pad=0.) const {
-		Real distUp=normal.Dot(pt-c)-aperture/2, distDown=-normal.Dot(pt-c)-aperture/2, distInPlane=-inside.Dot(pt-c);
+		Real distUp=normal.dot(pt-c)-aperture/2, distDown=-normal.dot(pt-c)-aperture/2, distInPlane=-inside.dot(pt-c);
 		// LOG_DEBUG("pt="<<pt<<", distUp="<<distUp<<", distDown="<<distDown<<", distInPlane="<<distInPlane);
 		if(distInPlane>=pad) return true;
 		if(distUp     >=pad) return true;

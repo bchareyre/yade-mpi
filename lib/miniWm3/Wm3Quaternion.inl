@@ -34,19 +34,19 @@ Quaternion<Real>::Quaternion (const Quaternion& rkQ)
 template <class Real>
 Quaternion<Real>::Quaternion (const Matrix3<Real>& rkRot)
 {
-    FromRotationMatrix(rkRot);
+    FromRotationMatrix_(rkRot);
 }
 //----------------------------------------------------------------------------
 template <class Real>
 Quaternion<Real>::Quaternion (const Vector3<Real>& rkAxis, Real fAngle)
 {
-    FromAxisAngle(rkAxis,fAngle);
+    FromAxisAngle_(rkAxis,fAngle);
 }
 //----------------------------------------------------------------------------
 template <class Real>
 Quaternion<Real>::Quaternion (const Vector3<Real> akRotColumn[3])
 {
-    FromRotationMatrix(akRotColumn);
+    FromRotationMatrix_(akRotColumn);
 }
 //----------------------------------------------------------------------------
 template <class Real>
@@ -76,49 +76,49 @@ Real& Quaternion<Real>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::W () const
+Real Quaternion<Real>::w () const
 {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Quaternion<Real>::W ()
+Real& Quaternion<Real>::w ()
 {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::X () const
+Real Quaternion<Real>::x () const
 {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Quaternion<Real>::X ()
+Real& Quaternion<Real>::x ()
 {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::Y () const
+Real Quaternion<Real>::y () const
 {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Quaternion<Real>::Y ()
+Real& Quaternion<Real>::y ()
 {
     return m_afTuple[2];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::Z () const
+Real Quaternion<Real>::z () const
 {
     return m_afTuple[3];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Quaternion<Real>::Z ()
+Real& Quaternion<Real>::z ()
 {
     return m_afTuple[3];
 }
@@ -281,20 +281,20 @@ template <class Real>
 Quaternion<Real> operator* (Real fScalar, const Quaternion<Real>& rkQ)
 {
     Quaternion<Real> kProd;
-    for (int i = 0; i < 4; i++)
-    {
-        kProd[i] = fScalar*rkQ[i];
-    }
+	 kProd.x()=fScalar*rkQ.x();
+	 kProd.y()=fScalar*rkQ.y();
+	 kProd.z()=fScalar*rkQ.z();
+	 kProd.w()=fScalar*rkQ.w();
     return kProd;
 }
 //----------------------------------------------------------------------------
 template <class Real>
 Quaternion<Real>& Quaternion<Real>::operator+= (const Quaternion& rkQ)
 {
-    for (int i = 0; i < 4; i++)
-    {
-        m_afTuple[i] += rkQ.m_afTuple[i];
-    }
+    x()+=rkQ.x();
+    y()+=rkQ.y();
+    z()+=rkQ.z();
+    w()+=rkQ.w();
     return *this;
 }
 //----------------------------------------------------------------------------
@@ -343,7 +343,7 @@ Quaternion<Real>& Quaternion<Real>::operator/= (Real fScalar)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Quaternion<Real>& Quaternion<Real>::FromRotationMatrix (
+Quaternion<Real>& Quaternion<Real>::FromRotationMatrix_ (
     const Matrix3<Real>& rkRot)
 {
     // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
@@ -390,7 +390,7 @@ Quaternion<Real>& Quaternion<Real>::FromRotationMatrix (
 }
 //----------------------------------------------------------------------------
 template <class Real>
-void Quaternion<Real>::ToRotationMatrix (Matrix3<Real>& rkRot) const
+void Quaternion<Real>::toRotationMatrix (Matrix3<Real>& rkRot) const
 {
     Real fTx  = ((Real)2.0)*m_afTuple[1];
     Real fTy  = ((Real)2.0)*m_afTuple[2];
@@ -427,14 +427,14 @@ Quaternion<Real>& Quaternion<Real>::FromRotationMatrix (
         kRot(1,iCol) = akRotColumn[iCol][1];
         kRot(2,iCol) = akRotColumn[iCol][2];
     }
-    return FromRotationMatrix(kRot);
+    return FromRotationMatrix_(kRot);
 }
 //----------------------------------------------------------------------------
 template <class Real>
 void Quaternion<Real>::ToRotationMatrix (Vector3<Real> akRotColumn[3]) const
 {
     Matrix3<Real> kRot;
-    ToRotationMatrix(kRot);
+    toRotationMatrix(kRot);
     for (int iCol = 0; iCol < 3; iCol++)
     {
         akRotColumn[iCol][0] = kRot(0,iCol);
@@ -444,7 +444,7 @@ void Quaternion<Real>::ToRotationMatrix (Vector3<Real> akRotColumn[3]) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Quaternion<Real>& Quaternion<Real>::FromAxisAngle (
+Quaternion<Real>& Quaternion<Real>::FromAxisAngle_ (
     const Vector3<Real>& rkAxis, Real fAngle)
 {
     // assert:  axis[] is unit length
@@ -463,7 +463,7 @@ Quaternion<Real>& Quaternion<Real>::FromAxisAngle (
 }
 //----------------------------------------------------------------------------
 template <class Real>
-void Quaternion<Real>::ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle)
+void Quaternion<Real>::ToAxisAngle_ (Vector3<Real>& rkAxis, Real& rfAngle)
     const
 {
     // The quaternion representing the rotation is
@@ -490,7 +490,7 @@ void Quaternion<Real>::ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::Length () const
+Real Quaternion<Real>::norm() const
 {
     return Math<Real>::Sqrt(
         m_afTuple[0]*m_afTuple[0] +
@@ -500,7 +500,7 @@ Real Quaternion<Real>::Length () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::SquaredLength () const
+Real Quaternion<Real>::squaredNorm() const
 {
     return
         m_afTuple[0]*m_afTuple[0] +
@@ -521,9 +521,9 @@ Real Quaternion<Real>::Dot (const Quaternion& rkQ) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Quaternion<Real>::Normalize ()
+Real Quaternion<Real>::normalize ()
 {
-    Real fLength = Length();
+    Real fLength = norm();
     int i;
 
     if (fLength > Math<Real>::ZERO_TOLERANCE)
@@ -579,7 +579,7 @@ Quaternion<Real> Quaternion<Real>::Inverse () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Quaternion<Real> Quaternion<Real>::Conjugate () const
+Quaternion<Real> Quaternion<Real>::conjugate () const
 {
     return Quaternion(m_afTuple[0],-m_afTuple[1],-m_afTuple[2],
         -m_afTuple[3]);
@@ -656,7 +656,7 @@ Quaternion<Real> Quaternion<Real>::Log () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Vector3<Real> Quaternion<Real>::Rotate (const Vector3<Real>& rkVector) const
+Vector3<Real> Quaternion<Real>::rotate (const Vector3<Real>& rkVector) const
 {
     // Given a vector u = (x0,y0,z0) and a unit length quaternion
     // q = <w,x,y,z>, the vector v = (x1,y1,z1) which represents the
@@ -677,7 +677,7 @@ Vector3<Real> Quaternion<Real>::Rotate (const Vector3<Real>& rkVector) const
     // the rotated vector.  Typical space-time tradeoff...
 
     Matrix3<Real> kRot;
-    ToRotationMatrix(kRot);
+    toRotationMatrix(kRot);
     return kRot*rkVector;
 }
 //----------------------------------------------------------------------------
@@ -733,7 +733,7 @@ Quaternion<Real>& Quaternion<Real>::Intermediate (const Quaternion& rkQ0,
     const Quaternion& rkQ1, const Quaternion& rkQ2)
 {
     // assert:  Q0, Q1, Q2 all unit-length
-    Quaternion kQ1Inv = rkQ1.Conjugate();
+    Quaternion kQ1Inv = rkQ1.conjugate();
     Quaternion kP0 = kQ1Inv*rkQ0;
     Quaternion kP2 = kQ1Inv*rkQ2;
     Quaternion kArg = -((Real)0.25)*(kP0.Log()+kP2.Log());
@@ -754,47 +754,47 @@ Quaternion<Real>& Quaternion<Real>::Squad (Real fT, const Quaternion& rkQ0,
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Quaternion<Real>& Quaternion<Real>::Align (const Vector3<Real>& rkV1,
+Quaternion<Real>& Quaternion<Real>::setFromTwoVectors (const Vector3<Real>& rkV1,
     const Vector3<Real>& rkV2)
 {
     // If V1 and V2 are not parallel, the axis of rotation is the unit-length
-    // vector U = Cross(V1,V2)/Length(Cross(V1,V2)).  The angle of rotation,
+    // vector U = Cross(V1,V2)/norm()(Cross(V1,V2)).  The angle of rotation,
     // A, is the angle between V1 and V2.  The quaternion for the rotation is
     // q = cos(A/2) + sin(A/2)*(ux*i+uy*j+uz*k) where U = (ux,uy,uz).
     //
     // (1) Rather than extract A = acos(Dot(V1,V2)), multiply by 1/2, then
     //     compute sin(A/2) and cos(A/2), we reduce the computational costs by
-    //     computing the bisector B = (V1+V2)/Length(V1+V2), so cos(A/2) =
+    //     computing the bisector B = (V1+V2)/norm()(V1+V2), so cos(A/2) =
     //     Dot(V1,B).
     //
-    // (2) The rotation axis is U = Cross(V1,B)/Length(Cross(V1,B)), but
-    //     Length(Cross(V1,B)) = Length(V1)*Length(B)*sin(A/2) = sin(A/2), in
+    // (2) The rotation axis is U = Cross(V1,B)/norm()(Cross(V1,B)), but
+    //     norm()(Cross(V1,B)) = norm()(V1)*norm()(B)*sin(A/2) = sin(A/2), in
     //     which case sin(A/2)*(ux*i+uy*j+uz*k) = (cx*i+cy*j+cz*k) where
     //     C = Cross(V1,B).
     //
     // If V1 = V2, then B = V1, cos(A/2) = 1, and U = (0,0,0).  If V1 = -V2,
     // then B = 0.  This can happen even if V1 is approximately -V2 using
-    // floating point arithmetic, since Vector3::Normalize checks for
+    // floating point arithmetic, since Vector3::normalize checks for
     // closeness to zero and returns the zero vector accordingly.  The test
     // for exactly zero is usually not recommend for floating point
-    // arithmetic, but the implementation of Vector3::Normalize guarantees
+    // arithmetic, but the implementation of Vector3::normalize guarantees
     // the comparison is robust.  In this case, the A = pi and any axis
     // perpendicular to V1 may be used as the rotation axis.
 
     Vector3<Real> kBisector = rkV1 + rkV2;
-    kBisector.Normalize();
+    kBisector.normalize();
 
-    Real fCosHalfAngle = rkV1.Dot(kBisector);
+    Real fCosHalfAngle = rkV1.dot(kBisector);
     Vector3<Real> kCross;
 
     m_afTuple[0] = fCosHalfAngle;
 
     if (fCosHalfAngle != (Real)0.0)
     {
-        kCross = rkV1.Cross(kBisector);
-        m_afTuple[1] = kCross.X();
-        m_afTuple[2] = kCross.Y();
-        m_afTuple[3] = kCross.Z();
+        kCross = rkV1.cross(kBisector);
+        m_afTuple[1] = kCross.x();
+        m_afTuple[2] = kCross.y();
+        m_afTuple[3] = kCross.z();
     }
     else
     {
@@ -826,18 +826,18 @@ template <class Real>
 void Quaternion<Real>::DecomposeTwistTimesSwing (
     const Vector3<Real>& rkV1, Quaternion& rkTwist, Quaternion& rkSwing)
 {
-    Vector3<Real> kV2 = Rotate(rkV1);
-    rkSwing = Align(rkV1,kV2);
-    rkTwist = (*this)*rkSwing.Conjugate();
+    Vector3<Real> kV2 = rotate(rkV1);
+    rkSwing = setFromTwoVectors(rkV1,kV2);
+    rkTwist = (*this)*rkSwing.conjugate();
 }
 //----------------------------------------------------------------------------
 template <class Real>
 void Quaternion<Real>::DecomposeSwingTimesTwist (
     const Vector3<Real>& rkV1, Quaternion& rkSwing, Quaternion& rkTwist)
 {
-    Vector3<Real> kV2 = Rotate(rkV1);
-    rkSwing = Align(rkV1,kV2);
-    rkTwist = rkSwing.Conjugate()*(*this);
+    Vector3<Real> kV2 = rotate(rkV1);
+    rkSwing = setFromTwoVectors(rkV1,kV2);
+    rkTwist = rkSwing.conjugate()*(*this);
 }
 //----------------------------------------------------------------------------
 

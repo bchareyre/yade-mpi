@@ -24,8 +24,8 @@ Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}
  */
 Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& planeNormal){
 	Quaternionr normal2pt; normal2pt.setFromTwoVectors(planeNormal,fromXtoPtOri*Vector3r::UnitX());
-	Vector3r axis; Real angle; normal2pt.ToAxisAngle(axis,angle);
-	return (angle*radius) /* length */ *(axis.cross(planeNormal)) /* direction: both are unit vectors */;
+	AngleAxisr aa(angleAxisFromQuat(normal2pt));
+	return (aa.angle()*radius) /* length */ *(aa.axis().cross(planeNormal)) /* direction: both are unit vectors */;
 }
 
 /*! Project point from tangent plane to the sphere.
@@ -42,7 +42,7 @@ Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& from
 Quaternionr Dem3DofGeom_SphereSphere::rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& planeNormal){
 	if (planePt!=Vector3r::Zero()) {
 		Quaternionr normal2pt;
-		Vector3r axis=planeNormal.cross(planePt); axis.Normalize();
+		Vector3r axis=planeNormal.cross(planePt); axis.normalize();
 		Real angle=planePt.norm()/radius;
 		normal2pt=Quaternionr(AngleAxisr(angle,axis));
 		Quaternionr ret; return ret.setFromTwoVectors(Vector3r::UnitX(),normal2pt*planeNormal);
@@ -103,11 +103,10 @@ Vector3r Dem6DofGeom_SphereSphere::relRotVector() const{
 	// FIXME: this is not correct, as it assumes normal will not change (?)
 	Quaternionr relOri12=ori1.conjugate()*ori2;
 	Quaternionr oriDiff=initRelOri12.conjugate()*relOri12;
-	Vector3r axis; Real angle;
-	oriDiff.ToAxisAngle(axis,angle);
-	if(angle>Mathr::PI)angle-=Mathr::TWO_PI;
+	AngleAxisr aa(angleAxisFromQuat(oriDiff));
+	if(aa.angle()>Mathr::PI)aa.angle()-=Mathr::TWO_PI;
 	// cerr<<axis<<";"<<angle<<";"<<ori1<<";"<<ori2<<";"<<oriDiff<<endl;
-	return angle*axis;
+	return aa.angle()*aa.axis();
 }
 
 void Dem6DofGeom_SphereSphere::bendTwistAbs(Vector3r& bend, Real& twist){
@@ -205,7 +204,7 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 		// quasi-constants
 		ss->cp1rel.setFromTwoVectors(Vector3r::UnitX(),state1.ori.conjugate()*normal);
 		ss->cp2rel.setFromTwoVectors(Vector3r::UnitX(),state2.ori.conjugate()*(-normal));
-		ss->cp1rel.Normalize(); ss->cp2rel.Normalize();
+		ss->cp1rel.normalize(); ss->cp2rel.normalize();
 	}
 	ss->normal=normal;
 	ss->contactPoint=state1.pos+(ss->effR1-.5*(ss->refLength-dist))*ss->normal;

@@ -20,7 +20,7 @@ void InterpolatingSpiralEngine::action(){
 
 void SpiralEngine::action(){
 	Real dt=Omega::instance().getTimeStep();
-	axis.Normalize();
+	axis.normalize();
 	Quaternionr q(AngleAxisr(angularVelocity*dt,axis));
 	angleTurned+=angularVelocity*dt;
 	shared_ptr<BodyContainer> bodies = scene->bodies;
@@ -33,18 +33,18 @@ void SpiralEngine::action(){
 		// rotation
 		b->state->pos=q*(b->state->pos-axisPt)+axisPt;
 		b->state->ori=q*b->state->ori;
-		b->state->ori.Normalize(); // to make sure
+		b->state->ori.normalize(); // to make sure
 		// bug: https://bugs.launchpad.net/yade/+bug/398089; since subscribed bodies are not dynamic (assumption), we have to set theri velocities here as well;
 		// otherwise, their displacement will be missed in NewtonIntegrator and when using velocityBins, they will have no influence;
 		// that can cause interactions to be missed, for example
-		b->state->vel=linearVelocity*axis+angularVelocity*axis.Cross(b->state->pos-axisPt); // check this...
+		b->state->vel=linearVelocity*axis+angularVelocity*axis.cross(b->state->pos-axisPt); // check this...
 		b->state->angVel=angularVelocity*axis;
 	}
 }
 
 
 void RotationEngine::action(){
-	rotationAxis.Normalize();
+	rotationAxis.normalize();
 	Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
 	#ifdef YADE_OPENMP
 	const long size=subscribedBodies.size();
@@ -59,10 +59,10 @@ void RotationEngine::action(){
 		if(rotateAroundZero){
 			const Vector3r l=state->pos-zeroPoint;
 			state->pos=q*l+zeroPoint; 
-			state->vel=state->angVel.Cross(l);
+			state->vel=state->angVel.cross(l);
 		}
 	state->ori=q*state->ori;
-	state->ori.Normalize();
+	state->ori.normalize();
 	}
 }
 

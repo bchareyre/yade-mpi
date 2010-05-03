@@ -368,7 +368,7 @@ string DirectShearCis::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r l
 			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*Mathr::UnitRandom();
 			bool overlap=false;
 			for (long j=0; (j<i && !overlap); j++)
-				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).SquaredLength()) overlap=true;
+				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).squaredNorm()) overlap=true;
 			if (!overlap)
 			{
 				sphere_list.push_back(s);

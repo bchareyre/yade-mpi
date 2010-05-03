@@ -19,7 +19,7 @@ void Dem3DofGeom_FacetSphere::setTgPlanePts(const Vector3r& p1new, const Vector3
 }
 
 void Dem3DofGeom_FacetSphere::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
-	//TRVAR2(p2.Length(),effR2);
+	//TRVAR2(p2.norm(),effR2);
 	if(p2.squaredNorm()>pow(effR2,2)){
 		setTgPlanePts(Vector3r::Zero(),p2-p1);
 	}
@@ -104,7 +104,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			if(inCircleR<0){inCircleR=facet->icr; sphereRReduced=0;}
 			if(distMax<inCircleR){// contact with facet's surface
 				penetrationDepth=sphereRadius-L;	
-				normal.Normalize();
+				normal.normalize();
 			} else { // contact with the edge
 				contactPt+=edgeNormals[edgeMax]*(inCircleR-distMax);
 				bool noVertexContact=false;
@@ -121,16 +121,16 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 				#ifdef FACET_TOPO
 					if(noVertexContact && facet->edgeAdjIds[edgeMax]!=Body::ID_NONE){
 						// find angle between our normal and the facet's normal (still local coords)
-						Quaternionr q; q.Align(facet->nf,normal); Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
-						assert(angle>=0 && angle<=Mathr::PI);
-						if(edgeNormals[edgeMax].Dot(axis)<0) angle*=-1.;
+						Quaternionr q; q.Align(facet->nf,normal); AngleAxisr aa(angleAxisFromQuat(q));
+						assert(aa.angle()>=0 && aa.angle()<=Mathr::PI);
+						if(edgeNormals[edgeMax].Dot(aa.axis())<0) aa.angle()*=-1.;
 						bool negFace=normal.Dot(facet->nf)<0; // contact in on the negative facet's face
 						Real halfAngle=(negFace?-1.:1.)*facet->edgeAdjHalfAngle[edgeMax]; 
-						if(halfAngle<0 && angle>halfAngle) return false; // on concave boundary, and if in the other facet's sector, no contact
+						if(halfAngle<0 && aa.angle()>halfAngle) return false; // on concave boundary, and if in the other facet's sector, no contact
 						// otherwise the contact will be created
 					}
 				#endif
-				//TRVAR4(contactLine,contactPt,normal,normal.Length());
+				//TRVAR4(contactLine,contactPt,normal,normal.norm());
 				//TRVAR3(se31.orientation*contactLine,se31.position+se31.orientation*contactPt,se31.orientation*normal);
 				Real norm=normal.norm(); normal/=norm;
 				penetrationDepth=sphereRadius-norm;
@@ -163,7 +163,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=facet->nf;
 		fs->cp2rel.setFromTwoVectors(Vector3r::UnitX(),state2.ori.conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
-		fs->cp2rel.Normalize();
+		fs->cp2rel.normalize();
 	}
 	fs->se31=state1.se3; fs->se32=state2.se3; fs->se32.position+=shift2;
 	fs->normal=normalGlob;

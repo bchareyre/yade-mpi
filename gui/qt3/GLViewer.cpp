@@ -283,7 +283,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		if(manipulatedClipPlane>=0 && manipulatedClipPlane<renderer->numClipPlanes){
 			/* here, we must update both manipulatedFrame orientation and renderer->clipPlaneSe3 orientation in the same way */
 			Quaternionr& ori=renderer->clipPlaneSe3[manipulatedClipPlane].orientation;
-			ori=Quaternionr(Vector3r(0,1,0),Mathr::PI)*ori; 
+			ori=Quaternionr(AngleAxisr(Mathr::PI,Vector3r(0,1,0)))*ori; 
 			manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
 			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane+1)+" reversed.");
 		}
@@ -503,23 +503,22 @@ void GLViewer::postSelection(const QPoint& point)
 		setSelectedName(selection);
 		LOG_DEBUG("New selection "<<selection);
 		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
-		//wasDynamic=Body::byId(selection)->isDynamic;
-		//Body::byId(selection)->isDynamic = false;
 		Quaternionr& q = Body::byId(selection)->state->ori;
 		Vector3r&    v = Body::byId(selection)->state->pos;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q.x(),q.y(),q.z(),q.w()));
 		Omega::instance().getScene()->selectedBody = selection;
-		try{
 			PyGILState_STATE gstate;
-				gstate = PyGILState_Ensure();
+			gstate = PyGILState_Ensure();
 				python::object main=python::import("__main__");
 				python::object global=main.attr("__dict__");
-				python::eval(string("onBodySelect("+lexical_cast<string>(selection)+")").c_str(),global,global);
+				// the try/catch block must be properly nested inside PyGILState_Ensure and PyGILState_Release
+				try{
+					python::eval(string("onBodySelect("+lexical_cast<string>(selection)+")").c_str(),global,global);
+				} catch (python::error_already_set const &) {
+					LOG_DEBUG("unable to call onBodySelect. Not defined?");
+				}
 			PyGILState_Release(gstate);
 			// see https://svn.boost.org/trac/boost/ticket/2781 for exception handling
-		} catch (python::error_already_set const &) {
-			LOG_DEBUG("unable to call onBodySelect. Not defined?");
-		}
 	}
 }
 
@@ -553,7 +552,7 @@ void GLViewer::postDraw(){
 	Real scaleStep=pow(10,(floor(log10(displayedSceneRadius()*2)-.7))); // unconstrained
 	int nSegments=((int)(wholeDiameter/gridStep))+1;
 	Real realSize=nSegments*gridStep;
-	LOG_DEBUG("nSegments="<<nSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
+	//LOG_TRACE("nSegments="<<nSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	glPushMatrix();
 
 	nSegments *= 2; // there's an error in QGLViewer::drawGrid(), so we need to mitigate it by '* 2'

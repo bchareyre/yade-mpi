@@ -42,6 +42,7 @@ class OpenGLRenderingEngine : public Serializable
 		vector<BodyDisp> bodyDisp;
 
 	private:
+		void resetSpecularEmission();
 		// updated after every call to render
 		shared_ptr<Scene> scene; 
 

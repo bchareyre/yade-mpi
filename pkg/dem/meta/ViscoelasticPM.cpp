@@ -56,11 +56,11 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 
 	const Real dt = Omega::instance().getTimeStep();
 
-	Vector3r axis = phys.prevNormal.Cross(geom.normal);
-	shearForce -= shearForce.Cross(axis);
-	const Real angle = dt*0.5*geom.normal.Dot(de1.angVel + de2.angVel);
+	Vector3r axis = phys.prevNormal.cross(geom.normal);
+	shearForce -= shearForce.cross(axis);
+	const Real angle = dt*0.5*geom.normal.dot(de1.angVel + de2.angVel);
 	axis = angle*geom.normal;
-	shearForce -= shearForce.Cross(axis);
+	shearForce -= shearForce.cross(axis);
 
 	const Vector3r c1x = (geom.contactPoint - de1.pos);
 	const Vector3r c2x = (geom.contactPoint - de2.pos);
@@ -71,8 +71,8 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 	//Vector3r _c1x_	=  geom->radius1*geom->normal;
 	//Vector3r _c2x_	= -geom->radius2*geom->normal;
 	//Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
-	const Vector3r relativeVelocity = (de1.vel+de1.angVel.Cross(c1x)) - (de2.vel+de2.angVel.Cross(c2x)) ;
-	const Real normalVelocity	= geom.normal.Dot(relativeVelocity);
+	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) ;
+	const Real normalVelocity	= geom.normal.dot(relativeVelocity);
 	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
 	// As Chiara Modenese suggest, we store the elastic part 
 	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
@@ -83,13 +83,13 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;
 
-	const Real maxFs = phys.normalForce.SquaredLength() * std::pow(phys.tangensOfFrictionAngle,2);
-	if( shearForce.SquaredLength() > maxFs )
+	const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
+	if( shearForce.squaredNorm() > maxFs )
 	{
 		// Then Mohr-Coulomb is violated (so, we slip), 
 		// we have the max value of the shear force, so 
 		// we consider only friction damping.
-		const Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+		const Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
 		shearForce *= ratio;
 	} 
 	else 
@@ -101,7 +101,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 	const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
 	addForce (id1,-f,rootBody);
 	addForce (id2, f,rootBody);
-	addTorque(id1,-c1x.Cross(f),rootBody);
-	addTorque(id2, c2x.Cross(f),rootBody);
+	addTorque(id1,-c1x.cross(f),rootBody);
+	addTorque(id2, c2x.cross(f),rootBody);
 }
 

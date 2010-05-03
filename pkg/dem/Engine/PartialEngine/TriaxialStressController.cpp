@@ -30,7 +30,7 @@ void TriaxialStressController::updateStiffness ()
 	for(  ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal())
 	{
 		const shared_ptr<Interaction>& contact = *ii;
-		Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.Length();
+		Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.norm();
 		if (fn!=0)
 		{
 			int id1 = contact->getId1(), id2 = contact->getId2();
@@ -47,7 +47,7 @@ void TriaxialStressController::updateStiffness ()
 void TriaxialStressController::controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel)
 {
 	scene->forces.sync();
-	Real translation=normal[wall].Dot(getForce(scene,wall_id[wall])-resultantForce); 
+	Real translation=normal[wall].dot(getForce(scene,wall_id[wall])-resultantForce); 
 	const bool log=false;
 	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<getForce(scene,wall_id[wall])<<", resultantForce="<<resultantForce<<", translation="<<translation);
 	if (translation!=0)
@@ -79,16 +79,16 @@ void TriaxialStressController::action()
  		wall_id[4] = wall_front_id;
  		wall_id[5] = wall_back_id;}	
 
-	if(thickness<0) thickness=2.0*YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,scene)->shape)->extents.Y();
+	if(thickness<0) thickness=2.0*YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,scene)->shape)->extents.y();
 	State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
 	State* p_top=Body::byId(wall_top_id,scene)->state.get();
 	State* p_left=Body::byId(wall_left_id,scene)->state.get();
 	State* p_right=Body::byId(wall_right_id,scene)->state.get();
 	State* p_front=Body::byId(wall_front_id,scene)->state.get();
 	State* p_back=Body::byId(wall_back_id,scene)->state.get();
-	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
-	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
-	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+	height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
+	width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
+	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
 	
 	boxVolume = height * width * depth;
 	if (first) {
@@ -118,12 +118,12 @@ void TriaxialStressController::action()
 	}
 	
 	porosity = ( boxVolume - spheresVolume ) /boxVolume;
-	position_top = p_top->se3.position.Y();
-	position_bottom = p_bottom->se3.position.Y();
-	position_right = p_right->se3.position.X();
-	position_left = p_left->se3.position.X();
-	position_front = p_front->se3.position.Z();
-	position_back = p_back->se3.position.Z();
+	position_top = p_top->se3.position.y();
+	position_bottom = p_bottom->se3.position.y();
+	position_right = p_right->se3.position.x();
+	position_left = p_left->se3.position.x();
+	position_front = p_front->se3.position.z();
+	position_back = p_back->se3.position.z();
 	
 	// must be done _after_ height, width, depth have been calculated
 	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
@@ -175,9 +175,9 @@ void TriaxialStressController::computeStressStrain()
 	State* p_front=Body::byId(wall_front_id,scene)->state.get();
 	State* p_back=Body::byId(wall_back_id,scene)->state.get();
 	
- 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
- 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
- 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+ 	height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
+ 	width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
+ 	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
 	
 	meanStress = 0;
 	if (height0 == 0) height0 = height;
@@ -199,7 +199,7 @@ void TriaxialStressController::computeStressStrain()
 	force[wall_front]= getForce(scene,wall_id[wall_front]);  stress[wall_front]=force[wall_front]*invZSurface;
         force[wall_back]=  getForce(scene,wall_id[wall_back]);   stress[wall_back]= force[wall_back]*invZSurface;
 
-	for (int i=0; i<6; i++) meanStress-=stress[i].Dot(normal[i]);
+	for (int i=0; i<6; i++) meanStress-=stress[i].dot(normal[i]);
 	meanStress/=6.;
 }
 
@@ -250,7 +250,7 @@ Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if ((*ii)->isReal()) {
 			const shared_ptr<Interaction>& contact = *ii;
-			Real f = (static_cast<FrictPhys*> ((contact->interactionPhysics.get()))->normalForce+static_cast<FrictPhys*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
+			Real f = (static_cast<FrictPhys*> ((contact->interactionPhysics.get()))->normalForce+static_cast<FrictPhys*>(contact->interactionPhysics.get())->shearForce).squaredNorm();
 			if (f!=0)
 			{
 			MeanForce += Mathr::Sqrt(f);
@@ -270,7 +270,7 @@ Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
 		Real f;
 		for(  ; bi!=biEnd ; ++bi ) {
 			if ((*bi)->isDynamic) {
-				f=getForce(scene,(*bi)->getId()).Length();
+				f=getForce(scene,(*bi)->getId()).norm();
 				MeanUnbalanced += f;
 				if (f!=0) ++nBodies;
 			}
@@ -283,7 +283,7 @@ Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
 		BodyContainer::iterator bi    = bodies->begin();
 		BodyContainer::iterator biEnd = bodies->end();
 		for(  ; bi!=biEnd ; ++bi ) if ((*bi)->isDynamic)
-				MaxUnbalanced = std::max(getForce(scene,(*bi)->getId()).Length(),MaxUnbalanced);
+				MaxUnbalanced = std::max(getForce(scene,(*bi)->getId()).norm(),MaxUnbalanced);
 		if (MeanForce != 0) MaxUnbalanced = MaxUnbalanced/MeanForce;
 		return MaxUnbalanced;
 	}

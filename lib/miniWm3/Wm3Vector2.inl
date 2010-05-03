@@ -63,25 +63,25 @@ Real& Vector2<Real>::operator[] (int i)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector2<Real>::X () const
+Real Vector2<Real>::x () const
 {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Vector2<Real>::X ()
+Real& Vector2<Real>::x ()
 {
     return m_afTuple[0];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector2<Real>::Y () const
+Real Vector2<Real>::y () const
 {
     return m_afTuple[1];
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real& Vector2<Real>::Y ()
+Real& Vector2<Real>::y ()
 {
     return m_afTuple[1];
 }
@@ -239,7 +239,7 @@ Vector2<Real>& Vector2<Real>::operator/= (Real fScalar)
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector2<Real>::Length () const
+Real Vector2<Real>::norm () const
 {
     return Math<Real>::Sqrt(
         m_afTuple[0]*m_afTuple[0] +
@@ -247,7 +247,7 @@ Real Vector2<Real>::Length () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector2<Real>::SquaredLength () const
+Real Vector2<Real>::squaredNorm () const
 {
     return
         m_afTuple[0]*m_afTuple[0] +
@@ -255,7 +255,7 @@ Real Vector2<Real>::SquaredLength () const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector2<Real>::Dot (const Vector2& rkV) const
+Real Vector2<Real>::dot (const Vector2& rkV) const
 {
     return
         m_afTuple[0]*rkV.m_afTuple[0] +
@@ -263,9 +263,9 @@ Real Vector2<Real>::Dot (const Vector2& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector2<Real>::Normalize ()
+Real Vector2<Real>::normalize ()
 {
-    Real fLength = Length();
+    Real fLength = norm();
 
     if (fLength > Math<Real>::ZERO_TOLERANCE)
     {
@@ -293,7 +293,7 @@ template <class Real>
 Vector2<Real> Vector2<Real>::UnitPerp () const
 {
     Vector2 kPerp(m_afTuple[1],-m_afTuple[0]);
-    kPerp.Normalize();
+    kPerp.normalize();
     return kPerp;
 }
 //----------------------------------------------------------------------------
@@ -357,15 +357,15 @@ void Vector2<Real>::GetBarycentrics (const Vector2<Real>& rkV0,
         // The triangle is a sliver.  Determine the longest edge and
         // compute barycentric coordinates with respect to that edge.
         Vector2<Real> kE2 = rkV0 - rkV1;
-        Real fMaxSqrLength = kE2.SquaredLength();
+        Real fMaxSqrLength = kE2.squaredNorm();
         int iMaxIndex = 2;
-        Real fSqrLength = akDiff[1].SquaredLength();
+        Real fSqrLength = akDiff[1].squaredNorm();
         if (fSqrLength > fMaxSqrLength)
         {
             iMaxIndex = 1;
             fMaxSqrLength = fSqrLength;
         }
-        fSqrLength = akDiff[0].SquaredLength();
+        fSqrLength = akDiff[0].squaredNorm();
         if (fSqrLength > fMaxSqrLength)
         {
             iMaxIndex = 0;
@@ -378,7 +378,7 @@ void Vector2<Real>::GetBarycentrics (const Vector2<Real>& rkV0,
             if (iMaxIndex == 0)
             {
                 // P-V2 = t(V0-V2)
-                afBary[0] = akDiff[2].Dot(akDiff[0])*fInvSqrLength;
+                afBary[0] = akDiff[2].dot(akDiff[0])*fInvSqrLength;
                 afBary[1] = (Real)0.0;
                 afBary[2] = (Real)1.0 - afBary[0];
             }
@@ -386,14 +386,14 @@ void Vector2<Real>::GetBarycentrics (const Vector2<Real>& rkV0,
             {
                 // P-V2 = t(V1-V2)
                 afBary[0] = (Real)0.0;
-                afBary[1] = akDiff[2].Dot(akDiff[1])*fInvSqrLength;
+                afBary[1] = akDiff[2].dot(akDiff[1])*fInvSqrLength;
                 afBary[2] = (Real)1.0 - afBary[1];
             }
             else
             {
                 // P-V1 = t(V0-V1)
                 akDiff[2] = *this - rkV1;
-                afBary[0] = akDiff[2].Dot(kE2)*fInvSqrLength;
+                afBary[0] = akDiff[2].dot(kE2)*fInvSqrLength;
                 afBary[1] = (Real)1.0 - afBary[0];
                 afBary[2] = (Real)0.0;
             }
@@ -421,12 +421,12 @@ void Vector2<Real>::Orthonormalize (Vector2& rkU, Vector2& rkV)
     // product of vectors A and B.
 
     // compute u0
-    rkU.Normalize();
+    rkU.normalize();
 
     // compute u1
-    Real fDot0 = rkU.Dot(rkV); 
+    Real fDot0 = rkU.dot(rkV); 
     rkV -= rkU*fDot0;
-    rkV.Normalize();
+    rkV.normalize();
 }
 //----------------------------------------------------------------------------
 template <class Real>
@@ -435,7 +435,7 @@ void Vector2<Real>::GenerateOrthonormalBasis (Vector2& rkU, Vector2& rkV,
 {
     if (!bUnitLengthV)
     {
-        rkV.Normalize();
+        rkV.normalize();
     }
 
     rkU = rkV.Perp();

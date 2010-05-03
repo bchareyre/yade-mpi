@@ -196,8 +196,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 		sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
 		sigmaT=G*epsT; // trial stress
 		Real yieldSigmaT=max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); // Mohr-Coulomb law with damage
-		if(sigmaT.SquaredLength()>yieldSigmaT*yieldSigmaT){
-			sigmaT*=yieldSigmaT/sigmaT.Length(); // stress return
+		if(sigmaT.squaredNorm()>yieldSigmaT*yieldSigmaT){
+			sigmaT*=yieldSigmaT/sigmaT.norm(); // stress return
 			epsPlSum+=yieldSigmaT*contGeom->slipToStrainTMax(yieldSigmaT/G); // adjust strain
 		}
 		relResidualStrength=isCohesive?(kappaD<epsCrackOnset?1.:(1-omega)*(kappaD)/epsCrackOnset):0;
@@ -278,9 +278,9 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 			glDisable(GL_CULL_FACE);
 			glPushMatrix();
 				glTranslatev(midPt);
-				Quaternionr q; q.Align(Vector3r::UnitZ(),geom->normal);
-				Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
-				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+				Quaternionr q; q.setFromTwoVectors(Vector3r::UnitZ(),geom->normal);
+				AngleAxisr aa(angleAxisFromQuat(q));
+				glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 				glBegin(GL_POLYGON);
 					glColor3v(lineColor); 
 					glVertex3d(halfSize,0.,0.);
@@ -296,9 +296,9 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 		const Vector3r& cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
 		if(epsT){
 			Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
-			Real relShear=BC->epsT.Length()/maxShear;
+			Real relShear=BC->epsT.norm()/maxShear;
 			Real scale=.5*geom->refLength;
-			Vector3r dirShear=BC->epsT; dirShear.Normalize();
+			Vector3r dirShear=BC->epsT; dirShear.normalize();
 			if(epsTAxes){
 				GLUtils::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));
 				GLUtils::GLDrawLine(cp-Vector3r(0,scale,0),cp+Vector3r(0,scale,0));
@@ -331,7 +331,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
 		
-		Vector3r normalStress=((1./phys->crossSection)*geom->normal.Dot(phys->normalForce))*geom->normal;
+		Vector3r normalStress=((1./phys->crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
 		bodyStats[id1].sigma+=normalStress; bodyStats[id2].sigma+=normalStress;
 		Vector3r shearStress;
 		for(int i=0; i<3; i++){

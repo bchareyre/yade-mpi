@@ -61,7 +61,7 @@ class Bo1_Tetra_Aabb: public BoundFunctor{
 		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 			Tetra* t=static_cast<Tetra*>(ig.get());
 			Aabb* aabb=static_cast<Aabb*>(bv.get());
-			Quaternionr invRot=se3.orientation.Conjugate();
+			Quaternionr invRot=se3.orientation.conjugate();
 			Vector3r v_g[4]; for(int i=0; i<4; i++) v_g[i]=se3.orientation*t->v[i]; // vertices in global coordinates
 			#define __VOP(op,ix) op(v_g[0][ix],op(v_g[1][ix],op(v_g[2][ix],v_g[3][ix])))
 				aabb->min=se3.position+Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
@@ -114,7 +114,7 @@ class Ig2_Tetra_Tetra_TTetraGeom: public InteractionGeometryFunctor
 		list<Tetra> Tetra2TetraIntersection(const Tetra& A, const Tetra& B);
 		list<Tetra> TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& n);
 		//! Intersection of line given by points A, B and plane given by P and its normal.
-		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).Dot(normal) / (B-A).Dot(normal); /* TRWM3VEC(A); TRWM3VEC(B); TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("t="<<t); TRWM3VEC((A+t*(B-A))); */ return A+t*(B-A); }
+		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).dot(normal) / (B-A).dot(normal); /* TRWM3VEC(A); TRWM3VEC(B); TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("t="<<t); TRWM3VEC((A+t*(B-A))); */ return A+t*(B-A); }
 };
 
 REGISTER_SERIALIZABLE(Ig2_Tetra_Tetra_TTetraGeom);

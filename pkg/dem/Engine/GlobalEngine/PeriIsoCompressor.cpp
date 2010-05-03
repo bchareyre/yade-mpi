@@ -76,7 +76,7 @@ void PeriIsoCompressor::action(){
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
 	assert(scene->dt>0);
-	for(int axis=0; axis<3; axis++){ scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*scene->cell->refSize[axis]); }
+	for(int axis=0; axis<3; axis++){ scene->cell->velGrad(axis,axis)=cellGrow[axis]/(scene->dt*scene->cell->refSize[axis]); }
 	// scene->cell->refSize+=cellGrow;
 
 	// handle state transitions
@@ -98,7 +98,7 @@ void PeriIsoCompressor::action(){
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
 	//"Natural" strain, correct for large deformations, only used for comparison with goals
-	for (int i=0;i<3;i++) strain[i]=Mathr::Log(scene->cell->trsf[i][i]);
+	for (int i=0;i<3;i++) strain[i]=Mathr::Log(scene->cell->trsf(i,i));
 	//stress tensor and stiffness
 	
 	//Compute volume of the deformed cell
@@ -107,7 +107,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	// → this is one more place where Hsize would make things shorter : volume=Hsize.Determinant; The full code relies on the fact that initial Hsize is a box. You didn't modify the equation btw, result is the same as in r1936, which was (with spaces...)
 	//trsf*Matrix3r ( scene->cell->refSize[0],0,0, 0,scene->cell->refSize[1],0,0,0,scene->cell->refSize[2] ) ).Determinant()
 	//remark : the volume of a parallelepiped u1,u2,u3 is always det(u1,u2,u3)
-	Real volume=scene->cell->trsf.Determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
+	Real volume=scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
 
 	//Compute sum(fi*lj) and stiffness
 	stressTensor = Matrix3r::Zero();
@@ -127,7 +127,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		//   (reversedForces?-1.:1.)*(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
 		Vector3r branch= ( reversedForces?-1.:1. ) *gsc->normal* ( gsc->refR1+gsc->refR2 );
 		// tensorial product f*branch
-		stressTensor+=Matrix3r ( f, branch );
+		stressTensor+=makeTensorProduct( f, branch );
 		if( !dynCell )
 		{
 			for ( int i=0; i<3; i++ ) sumStiff[i]+=abs ( gsc->normal[i] ) *nsi->kn+ ( 1-abs ( gsc->normal[i] ) ) *nsi->ks;
@@ -136,11 +136,11 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	}
 	// Compute stressTensor=sum(fi*lj)/Volume (Love equation)
 	stressTensor /= volume;
-	for(int axis=0; axis<3; axis++) stress[axis]=stressTensor[axis][axis];
+	for(int axis=0; axis<3; axis++) stress[axis]=stressTensor(axis,axis);
 	LOG_DEBUG ( "stressTensor : "<<endl
-				<<stressTensor[0][0]<<" "<<stressTensor[0][1]<<" "<<stressTensor[0][2]<<endl
-				<<stressTensor[1][0]<<" "<<stressTensor[1][1]<<" "<<stressTensor[1][2]<<endl
-				<<stressTensor[2][0]<<" "<<stressTensor[2][1]<<" "<<stressTensor[2][2]<<endl
+				<<stressTensor(0,0)<<" "<<stressTensor(0,1)<<" "<<stressTensor(0,2)<<endl
+				<<stressTensor(1,0)<<" "<<stressTensor(1,1)<<" "<<stressTensor(1,2)<<endl
+				<<stressTensor(2,0)<<" "<<stressTensor(2,1)<<" "<<stressTensor(2,2)<<endl
 				<<"unbalanced = "<<Shop::unbalancedForce ( /*useMaxForce=*/false,scene ) );
 
 	if (n>0) stiff=(1./n)*sumStiff;
@@ -186,9 +186,9 @@ void PeriTriaxController::action()
 				LOG_TRACE(axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis]);
 			} else {  //accelerate the deformation using the density of the period, includes Cundall's damping
 				assert( mass>0 );//user set
-				Real dampFactor = 1 - growDamping*Mathr::Sign ( ( scene->cell->velGrad[axis][axis] ) * ( goal[axis]-stress[axis] ) );
-				scene->cell->velGrad[axis][axis]+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
-				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<scene->cell->velGrad[axis][axis] );
+				Real dampFactor = 1 - growDamping*Mathr::Sign ( ( scene->cell->velGrad(axis,axis) ) * ( goal[axis]-stress[axis] ) );
+				scene->cell->velGrad(axis,axis)+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
+				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<scene->cell->velGrad(axis,axis) );
 			}
 		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
@@ -223,7 +223,7 @@ void PeriTriaxController::action()
 	if (!dynCell) for ( int axis=0; axis<3; axis++ )
 	{
 		// either prescribe velocity gradient
-		scene->cell->velGrad[axis][axis]=cellGrow[axis]/scene->dt;
+		scene->cell->velGrad(axis,axis)=cellGrow[axis]/scene->dt;
 		// used only for goal comparisons...
 		strain[axis]+=cellGrow[axis];
 

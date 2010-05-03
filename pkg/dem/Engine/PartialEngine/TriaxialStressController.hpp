@@ -118,12 +118,12 @@ class TriaxialStressController : public BoundaryController
 		stiffness.resize(6);
 		previousTranslation.assign(Vector3r::Zero());
 		for (int i=0; i<6; ++i){normal[i]=stress[i]=force[i]=Vector3r::Zero();stiffness[i]=0;}
-		normal[wall_bottom].Y()=1;
-		normal[wall_top].Y()=-1;
-		normal[wall_left].X()=1;
-		normal[wall_right].X()=-1;
-		normal[wall_front].Z()=-1;
-		normal[wall_back].Z()=1;	
+		normal[wall_bottom].y()=1;
+		normal[wall_top].y()=-1;
+		normal[wall_left].x()=1;
+		normal[wall_right].x()=-1;
+		normal[wall_front].z()=-1;
+		normal[wall_back].z()=1;	
 		porosity=1;
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain (logarithmic).")

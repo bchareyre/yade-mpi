@@ -59,10 +59,10 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	phys->normalForce = ( phys->kn * geom->penetrationDepth - phys->cn * normalVelocity ) * geom->normal;
 	phys->prevNormal = geom->normal;
 
-	Real maxFs = phys->normalForce.SquaredLength() * std::pow(phys->tangensOfFrictionAngle,2);
-	if( shearForce.SquaredLength() > maxFs )
+	Real maxFs = phys->normalForce.squaredNorm() * std::pow(phys->tangensOfFrictionAngle,2);
+	if( shearForce.squaredNorm() > maxFs )
 	{
-		maxFs = Mathr::Sqrt(maxFs) / shearForce.Length();
+		maxFs = Mathr::Sqrt(maxFs) / shearForce.norm();
 		shearForce *= maxFs;
 	}
 

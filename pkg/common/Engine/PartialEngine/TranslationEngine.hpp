@@ -14,7 +14,7 @@
 class TranslationEngine : public PartialEngine {
 	public:
 		virtual void action();
-		virtual void postProcessAttributes(bool deserializing){ if(deserializing) translationAxis.Normalize(); }
+		virtual void postProcessAttributes(bool deserializing){ if(deserializing) translationAxis.normalize(); }
 	YADE_CLASS_BASE_DOC_ATTRS(TranslationEngine,PartialEngine,"This engine is the base class for different engines, which require any kind of motion.",
 		((Real,velocity,,"Velocity [m/s]"))
 		((Vector3r,translationAxis,,"Direction [Vector3]"))

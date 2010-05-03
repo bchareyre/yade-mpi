@@ -95,7 +95,7 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
 
 bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 	if(numClipPlanes<1) return false;
-	for(int i=0;i<numClipPlanes;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).Dot(clipPlaneNormals[i])<0) return true;
+	for(int i=0;i<numClipPlanes;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).dot(clipPlaneNormals[i])<0) return true;
 	return false;
 }
 
@@ -118,7 +118,7 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 		if(scaleDisplacements) bodyDisp[id].pos+=diagMult(dispScale,pos-refPos); // add scaled translation to the point of reference
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
-			Quaternionr relRot=refOri.Conjugate()*ori;
+			Quaternionr relRot=refOri.conjugate()*ori;
 			AngleAxisr aa(angleAxisFromQuat(relRot));
 			aa.angle()*=rotScale;
 			bodyDisp[id].ori=refOri*Quaternionr(aa);
@@ -140,7 +140,12 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glPopMatrix();
 }
 
-
+void OpenGLRenderingEngine::resetSpecularEmission(){
+	const GLfloat specular[4]={.3,.3,.3,1};
+	const GLfloat emission[4]={.1,.1,.1,1};
+	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular);
+	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
+}
 
 void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
@@ -160,24 +165,6 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 	highlightEmission0[0]=highlightEmission0[1]=highlightEmission0[2]=.8*normSquare(now,1);
 	highlightEmission1[0]=highlightEmission1[1]=highlightEmission0[2]=.5*normSaw(now,2);
 		
-
-	// Draw light source
-	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
-	const GLfloat ambientColor[4]={0.5,0.5,0.5,1.0};	
-	//const GLfloat specularColor[4]={0.5,0.5,0.5,1.0};	
-	glClearColor(bgColor[0],bgColor[1],bgColor[2],1.0);
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
-	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1); // important: do lighting calculations on both sides of polygons
-	//glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
-	glEnable(GL_LIGHT0);
-	glDisable(GL_LIGHTING);
-	glPushMatrix();
-		glTranslatef(lightPos[0],lightPos[1],lightPos[2]);
-		glColor3f(1.0,1.0,1.0);
-		glutSolidSphere(3,10,10);
-	glPopMatrix();	
-
 	// clipping
 	assert(clipPlaneNormals.size()==(size_t)numClipPlanes);
 	for(size_t i=0;i<(size_t)numClipPlanes; i++){
@@ -193,13 +180,31 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispInfo();
 
+	// set light source
+	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
+	const GLfloat ambientColor[4]={0.5,0.5,0.5,1.0};	
+	//const GLfloat specularColor[4]={0.5,0.5,0.5,1.0};	
+	glClearColor(bgColor[0],bgColor[1],bgColor[2],1.0);
+	glLightfv(GL_LIGHT0, GL_POSITION,pos);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
+	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1); // important: do lighting calculations on both sides of polygons
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHTING);
+
+	glEnable(GL_CULL_FACE);
+	// http://www.sjbaker.org/steve/omniv/opengl_lighting.html
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+
+	resetSpecularEmission();
+
 	drawPeriodicCell();
 
+	
 	if (dof || id) renderDOF_ID();
 	if (bound) renderBoundingVolume();
 	if (shape){
-		glEnable(GL_LIGHTING);
-		glEnable(GL_CULL_FACE);
 		renderShape();
 	}
 	if (intrAllWire) renderAllInteractionsWire();
@@ -245,6 +250,7 @@ void OpenGLRenderingEngine::renderDOF_ID(){
 				if(id) str += sId;
 				if(dof) str += sDof;
 				const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : Vector3r(1,1,1));
+				glColor3v(h);
 				GLUtils::GLDrawText(str,bodyDisp[b->id].pos,h);
 			}
 			if(current_selection == b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);}
@@ -311,8 +317,8 @@ void OpenGLRenderingEngine::renderShape()
 		glEnable(GL_CLIP_PLANE0);
 	#endif
 
-	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
-	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
+	//const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
+	//const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
 
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->shape) continue;
@@ -321,23 +327,21 @@ void OpenGLRenderingEngine::renderShape()
 		Quaternionr ori=bodyDisp[b->getId()].ori;
 		if(!b->shape || !((b->getGroupMask()&mask) || b->getGroupMask()==0)) continue;
 		glPushMatrix();
-			Real angle;	Vector3r axis;	ori.ToAxisAngle(axis,angle);	
+			AngleAxisr aa(angleAxisFromQuat(ori));	
 			glTranslatef(pos[0],pos[1],pos[2]);
-			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+			glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 			if(current_selection==b->getId() || b->shape->highlight){
-				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
-				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+				// set hightlight
 				const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
-				glColor4(h[0],h[1],h[2],.2);
-				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-				///
+				glMaterialv(GL_FRONT_AND_BACK,GL_EMISSION,h);
+				glMaterialv(GL_FRONT_AND_BACK,GL_SPECULAR,h);
+				//
 				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
-				///
-				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
-				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-				glColor3v(Vector3r::Zero());
-				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+				// reset highlight
+				resetSpecularEmission();
 			} else {
+				// no highlight; in case previous functor fiddled with glMaterial
+				resetSpecularEmission();
 				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
 			}
 		glPopMatrix();
@@ -347,7 +351,7 @@ void OpenGLRenderingEngine::renderShape()
 				// move the label towards the camera by the bounding box so that it is not hidden inside the body
 				const Vector3r& mn=b->bound->min; const Vector3r& mx=b->bound->max; const Vector3r& p=pos;
 				Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
-				Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
+				Vector3r dr=-1.01*(viewDirection.dot(ext)*viewDirection);
 				GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::Ones());
 			}
 		}
@@ -371,7 +375,7 @@ void OpenGLRenderingEngine::renderShape()
 					if(pointClipped(pt)) continue;
 					glPushMatrix();
 						glTranslatev(pt);
-						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+						glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 						shapeDispatcher(b->shape,b->state,/*wire*/ true, viewInfo);
 					glPopMatrix();
 				}

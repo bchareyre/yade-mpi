@@ -22,10 +22,10 @@ void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<InteractionGeometry>& ig, 
 	phys->normalForce=phys->kn*displN*geom->normal;
 
 	/*ShearForce*/
-	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tanFrictionAngle,2);
+	Real maxFsSq=phys->normalForce.squaredNorm()*pow(phys->tanFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
-	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); 
-	trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));}
+	if(trialFs.squaredNorm()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); 
+	trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
 	phys->shearForce = trialFs;
 
 	applyForceAtContactPoint(phys->normalForce + trialFs, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);

@@ -50,10 +50,10 @@
 		 // quaternion for the input rotation matrix
 		 Quaternion (const Matrix3<Real>& rkRot);
 		
-		 EIG_FUN Quaternion(const AngleAxis<Real>& aa){ FromAxisAngle(aa.axis(),aa.angle()); }
+		 EIG_FUN Quaternion(const AngleAxis<Real>& aa){ FromAxisAngle_(aa.axis(),aa.angle()); }
 
 		 // quaternion for the rotation of the axis-angle pair
-		 WM3_FUN Quaternion (const Vector3<Real>& rkAxis, Real fAngle);
+		 WM3_OLD Quaternion (const Vector3<Real>& rkAxis, Real fAngle);
 
 		 // quaternion for the rotation matrix with specified columns
 		 WM3_FUN Quaternion (const Vector3<Real> akRotColumn[3]);
@@ -62,28 +62,28 @@
 		 operator const Real* () const;
 		 operator Real* ();
 		 // different ordering between eigen and wm3!!
-		 __attribute__((warning("Quaternion_index_access: Wm3 and Eigen uses different storage order for quaternions, consider using x(), y(), z(), w() instead!")))
+		 __attribute__((warning("Quaternion_index_access: Wm3 and Eigen uses different storage order for quaternions, better use x(), y(), z(), w()!")))
 		 	WM3_FUN Real operator[] (int i) const;
-		 __attribute__((warning("Quaternion_index_access: Wm3 and Eigen uses different storage order for quaternions, consider using x(), y(), z(), w() instead!")))
+		 __attribute__((warning("Quaternion_index_access: Wm3 and Eigen uses different storage order for quaternions, better use x(), y(), z(), w()!")))
 		 WM3_FUN Real& operator[] (int i);
 
-		 WM3_FUN Real W () const;
-		 WM3_FUN Real& W ();
-		 WM3_FUN Real X () const;
-		 WM3_FUN Real& X ();
-		 WM3_FUN Real Y () const;
-		 WM3_FUN Real& Y ();
-		 WM3_FUN Real Z () const;
-		 WM3_FUN Real& Z ();
+		 EIG_FUN Real w () const;
+		 EIG_FUN Real& w ();
+		 EIG_FUN Real x () const;
+		 EIG_FUN Real& x ();
+		 EIG_FUN Real y () const;
+		 EIG_FUN Real& y ();
+		 EIG_FUN Real z () const;
+		 EIG_FUN Real& z ();
 
-		 EIG_FUN Real x() const{return X();}
-		 EIG_FUN Real& x(){return X();}
-		 EIG_FUN Real y() const{return Y();}
-		 EIG_FUN Real& y(){return Y();}
-		 EIG_FUN Real z() const{return Z();}
-		 EIG_FUN Real& z(){return Z();}
-		 EIG_FUN Real w() const{return W();}
-		 EIG_FUN Real& w(){return W();}
+		 WM3_OLD Real X() const{return x();}
+		 WM3_OLD Real& X(){return x();}
+		 WM3_OLD Real Y() const{return y();}
+		 WM3_OLD Real& Y(){return y();}
+		 WM3_OLD Real Z() const{return z();}
+		 WM3_OLD Real& Z(){return z();}
+		 WM3_OLD Real W() const{return w();}
+		 WM3_OLD Real& W(){return w();}
 
 
 		 // assignment
@@ -92,10 +92,10 @@
     // comparison
     bool operator== (const Quaternion& rkQ) const;
     bool operator!= (const Quaternion& rkQ) const;
-    WM3_FUN bool operator<  (const Quaternion& rkQ) const;
-    WM3_FUN bool operator<= (const Quaternion& rkQ) const;
-    WM3_FUN bool operator>  (const Quaternion& rkQ) const;
-    WM3_FUN bool operator>= (const Quaternion& rkQ) const;
+    WM3_OLD bool operator<  (const Quaternion& rkQ) const;
+    WM3_OLD bool operator<= (const Quaternion& rkQ) const;
+    WM3_OLD bool operator>  (const Quaternion& rkQ) const;
+    WM3_OLD bool operator>= (const Quaternion& rkQ) const;
 
     // arithmetic operations
     Quaternion operator+ (const Quaternion& rkQ) const;
@@ -112,43 +112,47 @@
     Quaternion& operator/= (Real fScalar);
 
     // conversion between quaternions, matrices, and axis-angle
-    WM3_FUN Quaternion& FromRotationMatrix (const Matrix3<Real>& rkRot);
-    WM3_FUN void ToRotationMatrix (Matrix3<Real>& rkRot) const;
+    WM3_FUN Quaternion& FromRotationMatrix (const Matrix3<Real>& rkRot) { return FromRotationMatrix_(rkRot); }
+            Quaternion& FromRotationMatrix_ (const Matrix3<Real>& rkRot); // hidden function, do not call from outside
+    EIG_FUN void toRotationMatrix (Matrix3<Real>& rkRot) const;
     WM3_FUN Quaternion& FromRotationMatrix (const Vector3<Real> akRotColumn[3]);
-    WM3_FUN void ToRotationMatrix (Vector3<Real> akRotColumn[3]) const;
-    WM3_FUN Quaternion& FromAxisAngle (const Vector3<Real>& rkAxis, Real fAngle);
-    WM3_FUN void ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle) const;
+    WM3_OLD void ToRotationMatrix (Vector3<Real> akRotColumn[3]) const;
+            Quaternion& FromAxisAngle_ (const Vector3<Real>& rkAxis, Real fAngle); // hidden function, do not call from outside
+    WM3_OLD Quaternion& FromAxisAngle (const Vector3<Real>& rkAxis, Real fAngle){return FromAxisAngle_(rkAxis,fAngle);}
+            void ToAxisAngle_ (Vector3<Real>& rkAxis, Real& rfAngle) const; // hidden function, do not call from outside
+    WM3_OLD void ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle) const {return ToAxisAngle_(rkAxis,rfAngle);}
 
-	 EIG_FUN Matrix3<Real> toRotationMatrix() const { Matrix3<Real> ret; ToRotationMatrix(ret); return ret;}
+	 WM3_OLD Matrix3<Real> ToRotationMatrix(Matrix3<Real>& rkRot) const { Matrix3<Real> ret; toRotationMatrix(ret); return ret;}
 
     // functions of a quaternion
-    WM3_FUN Real Length () const;  // length of 4-tuple
-    WM3_FUN Real SquaredLength () const;  // squared length of 4-tuple
-    WM3_FUN Real Dot (const Quaternion& rkQ) const;  // dot product of 4-tuples
-    WM3_FUN Real Normalize ();  // make the 4-tuple unit length
-    WM3_FUN Quaternion Inverse () const;  // apply to non-zero quaternion
-    WM3_FUN Quaternion Conjugate () const;
-    WM3_FUN Quaternion Exp () const;  // apply to quaternion with w = 0
-    WM3_FUN Quaternion Log () const;  // apply to unit-length quaternion
-	 EIG_FUN void normalize() { (void)Normalize(); } 
-	 EIG_FUN Quaternion conjugate() const { return Conjugate(); } 
+    WM3_OLD Real Dot (const Quaternion& rkQ) const;  // dot product of 4-tuples
+    EIG_FUN Real normalize ();  // make the 4-tuple unit length
+    EIG_FUN Real norm () const;
+    EIG_FUN Real squaredNorm () const;
+    EIG_FUN Quaternion conjugate () const;
+    WM3_OLD Quaternion Inverse () const;  // apply to non-zero quaternion
+    WM3_OLD Quaternion Exp () const;  // apply to quaternion with w = 0
+    WM3_OLD Quaternion Log () const;  // apply to unit-length quaternion
+	 WM3_OLD void Normalize() { (void)normalize(); } 
+	 WM3_OLD Quaternion Conjugate() const { return conjugate(); } 
 
 
     // rotation of a vector by a quaternion
-    WM3_FUN Vector3<Real> Rotate (const Vector3<Real>& rkVector) const;
+    EIG_FUN Vector3<Real> rotate (const Vector3<Real>& rkVector) const;
+    WM3_OLD Vector3<Real> Rotate (const Vector3<Real>& v) const {return rotate(v);}
 
     // spherical linear interpolation
-    WM3_FUN Quaternion& Slerp (Real fT, const Quaternion& rkP, const Quaternion& rkQ);
+    WM3_OLD Quaternion& Slerp (Real fT, const Quaternion& rkP, const Quaternion& rkQ);
 
-    WM3_FUN Quaternion& SlerpExtraSpins (Real fT, const Quaternion& rkP,
+    WM3_OLD Quaternion& SlerpExtraSpins (Real fT, const Quaternion& rkP,
         const Quaternion& rkQ, int iExtraSpins);
 
     // intermediate terms for spherical quadratic interpolation
-    WM3_FUN Quaternion& Intermediate (const Quaternion& rkQ0,
+    WM3_OLD Quaternion& Intermediate (const Quaternion& rkQ0,
         const Quaternion& rkQ1, const Quaternion& rkQ2);
 
     // spherical quadratic interpolation
-    WM3_FUN Quaternion& Squad (Real fT, const Quaternion& rkQ0,
+    WM3_OLD Quaternion& Squad (Real fT, const Quaternion& rkQ0,
         const Quaternion& rkA0, const Quaternion& rkA1,
         const Quaternion& rkQ1);
 
@@ -157,8 +161,8 @@
     // V2, with angle of that between V1 and V2.  If V1 and V2 are parallel,
     // any axis of rotation will do, such as the permutation (z2,x2,y2), where
     // V2 = (x2,y2,z2).
-    WM3_FUN Quaternion& Align (const Vector3<Real>& rkV1, const Vector3<Real>& rkV2);
-	 EIG_FUN Quaternion& setFromTwoVectors(const Vector3<Real>& a, const Vector3<Real>& b){ return Align(a,b); }
+    EIG_FUN Quaternion& setFromTwoVectors (const Vector3<Real>& rkV1, const Vector3<Real>& rkV2);
+	 WM3_OLD Quaternion& Align(const Vector3<Real>& a, const Vector3<Real>& b){ return setFromTwoVectors(a,b); }
 
     // Decompose a quaternion into q = q_twist * q_swing, where q is 'this'
     // quaternion.  If V1 is the input axis and V2 is the rotation of V1 by

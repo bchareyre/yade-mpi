@@ -178,7 +178,7 @@ void VTKRecorder::action()
 			{
 				const Se3r& O = b->state->se3;
 				const vector<Vector3r>& localPos = facet->vertices;
-				Matrix3r facetAxisT; O.orientation.ToRotationMatrix(facetAxisT);
+				Matrix3r facetAxisT; O.orientation.toRotationMatrix(facetAxisT);
 				vtkSmartPointer<vtkTriangle> tri = vtkSmartPointer<vtkTriangle>::New();
 				vtkIdType nbPoints=facetsPos->GetNumberOfPoints();
 				for (int i=0;i<3;++i) {

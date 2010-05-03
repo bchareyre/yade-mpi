@@ -72,12 +72,12 @@ void FlatGridCollider::updateBodyCells(const shared_ptr<Body>& b){
 			// find closest cell point (to cC); keep coordinate in same line (cPt[i]==cC[i]); take upper/lower point in lower/upper lines (cPt[i]<cC[i])
 			Vector3r ccp;
 			for(int i=0;i<3;i++) ccp[i]=(cPt[i]==cC[i] ? C[i] : (grid.mn[i]+grid.step*(cPt[i]+(cPt[i]<cC[i] ? 1 : 0))));
-			if((C-ccp).SquaredLength()<=r*r){ // closest cell point it inside the spehre; add the sphere to cell at cell position
+			if((C-ccp).squaredNorm()<=r*r){ // closest cell point it inside the spehre; add the sphere to cell at cell position
 				Vector3i cPtIn(grid.fitGrid(cPt));
 				// perhaps slower, but inserts each body only once into the cell (meaningful if outside grid: multiple integer coords coolapse in one cell)
 				{ Grid::idVector& vv=grid(cPtIn); if(vv.size()==0 || *(vv.rbegin())!=b->id) vv.push_back(b->id);}
 				//grid(cPtIn).push_back(b->id);
-				LOG_TRACE("Added sphere #"<<b->id<<" to cell ("<<cPtIn<<")←["<<cPt<<"]; center ("<<C<<"), closest ("<<ccp<<"), dist "<<(C-ccp).Length());
+				LOG_TRACE("Added sphere #"<<b->id<<" to cell ("<<cPtIn<<")←["<<cPt<<"]; center ("<<C<<"), closest ("<<ccp<<"), dist "<<(C-ccp).norm());
 			}
 		}
 		return;

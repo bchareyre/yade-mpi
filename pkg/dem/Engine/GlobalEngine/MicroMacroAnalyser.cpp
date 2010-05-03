@@ -130,9 +130,9 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 
 			TS.grains[Idg].sphere = CGT::Sphere(CGT::Point(pos[0],pos[1],pos[2]),rad);
 //    TS.grains[Idg].translation = trans;
-			Vector3r axis; Real angle;
-			(*bi)->state->ori.ToAxisAngle (axis, angle); axis*=angle;
-			TS.grains[Idg].rotation = CGT::Vecteur(axis[0],axis[1],axis[2]);
+			AngleAxisr aa(angleAxisFromQuat((*bi)->state->ori));
+			Vector3r rotVec=aa.axis()*aa.angle();
+			TS.grains[Idg].rotation = CGT::Vecteur(rotVec[0],rotVec[1],rotVec[2]);
 			TS.box.base = CGT::Point(min(TS.box.base.x(), pos.x()-rad),
 					min(TS.box.base.y(), pos.y()-rad),
 					    min(TS.box.base.z(), pos.z()-rad));

@@ -33,14 +33,14 @@ public:
     WM3_FUN operator Real* ();
     Real operator[] (int i) const;
     Real& operator[] (int i);
-	 EIG_FUN Real x() const{return X();}
-	 EIG_FUN Real& x(){return X();}
-	 EIG_FUN Real y() const{return Y();}
-	 EIG_FUN Real& y(){return Y();}
-    WM3_FUN Real X () const;
-    WM3_FUN Real& X ();
-    WM3_FUN Real Y () const;
-    WM3_FUN Real& Y ();
+	 WM3_OLD Real X() const{return x();}
+	 WM3_OLD Real& X(){return x();}
+	 WM3_OLD Real Y() const{return y();}
+	 WM3_OLD Real& Y(){return y();}
+    EIG_FUN Real x () const;
+    EIG_FUN Real& x ();
+    EIG_FUN Real y () const;
+    EIG_FUN Real& y ();
 
     // assignment
     Vector2& operator= (const Vector2& rkV);
@@ -67,16 +67,16 @@ public:
     Vector2& operator/= (Real fScalar);
 
     // vector operations
-    WM3_FUN Real Length () const;
-    WM3_FUN Real SquaredLength () const;
-    WM3_FUN Real Dot (const Vector2& rkV) const;
-    WM3_FUN Real Normalize ();
+    EIG_FUN Real norm () const;
+    EIG_FUN Real squaredNorm () const;
+    EIG_FUN Real dot (const Vector2& rkV) const;
+    EIG_FUN Real normalize ();
 	 //
-	 EIG_FUN Real norm() const {return Length();}
-	 EIG_FUN Real squaredNorm() const { return SquaredLength(); }
-	 EIG_FUN Real dot(const Vector2& b) const { return Dot(b); }
+	 WM3_OLD Real Length() const {return norm();}
+	 WM3_OLD Real SquaredLength() const { return squaredNorm(); }
+	 WM3_OLD Real Dot(const Vector2& b) const { return dot(b); }
 	 // different prototype here (doesn't return Real)
-	 EIG_FUN void normalize() { (void)Normalize(); } 
+	 WM3_OLD void Normalize() { (void)normalize(); } 
 
 
     // returns (y,-x)

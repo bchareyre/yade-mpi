@@ -69,8 +69,8 @@ struct GridContainer{
 			Vector2r xyMid=cell2xyMid(mid);
 			Vector2r xy(xyMid[0]-xy0[0],xyMid[1]-xy0[1]); // relative mid-cell coords
 			// tricky: move the mid-cell to the corner (or aligned pt on edge) according to position WRT center
-			if(mid[0]!=cxy[0]) xy.X()+=(mid[0]<cxy[0]?1:-1)*.5*cellSizes[0]; else xy.X()=0;
-			if(mid[1]!=cxy[1]) xy.X()+=(mid[1]<cxy[1]?1:-1)*.5*cellSizes[1]; else xy.Y()=0;
+			if(mid[0]!=cxy[0]) xy.x()+=(mid[0]<cxy[0]?1:-1)*.5*cellSizes[0]; else xy.x()=0;
+			if(mid[1]!=cxy[1]) xy.x()+=(mid[1]<cxy[1]?1:-1)*.5*cellSizes[1]; else xy.y()=0;
 			// are we inside the ellipse? pass the filter, then
 			if((pow(xy[0],2)/pow(radii[0],2)+pow(xy[1],2)/pow(radii[1],2))<=1) ret.push_back(mid);
 		}

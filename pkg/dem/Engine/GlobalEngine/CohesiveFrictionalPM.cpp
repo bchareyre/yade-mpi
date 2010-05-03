@@ -71,8 +71,8 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	/* Morh-Coulomb criterion */
 	Real maxFs = abs(Fn)*phys->tanFrictionAngle + phys->FsMax;
 
-	if (shearForce.SquaredLength() > maxFs*maxFs){ 
-	  shearForce*=maxFs/shearForce.Length(); // to fix the shear force to its yielding value
+	if (shearForce.squaredNorm() > maxFs*maxFs){ 
+	  shearForce*=maxFs/shearForce.norm(); // to fix the shear force to its yielding value
 	}
 	
 	/* Apply forces */
@@ -82,25 +82,23 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 
 	/* Moment Rotation Law */
 	// NOTE this part could probably be computed in ScGeom to avoid copy/paste multiplication !!!
-	Quaternionr delta( b1->state->ori * phys->initialOrientation1.Conjugate() *phys->initialOrientation2 * b2->state->ori.Conjugate()); //relative orientation
-	Vector3r axisM;	// axis of rotation - this is the Moment direction UNIT vector.
-	Real angleM;	// angle represents the power of resistant ELASTIC moment
-	delta.ToAxisAngle(axisM,angleM);
-	if(angleM > Mathr::PI) angleM -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
+	Quaternionr delta( b1->state->ori * phys->initialOrientation1.conjugate() *phys->initialOrientation2 * b2->state->ori.conjugate()); //relative orientation
+	AngleAxisr aa(angleAxisFromQuat(delta)); // axis of rotation - this is the Moment direction UNIT vector; angle represents the power of resistant ELASTIC moment
+	if(aa.angle() > Mathr::PI) aa.angle() -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
 	  
-	phys->cumulativeRotation = angleM;
+	phys->cumulativeRotation = aa.angle();
 	  
 	//Find angle*axis. That's all.  But first find angle about contact normal. Result is scalar. Axis is contact normal.
-	Real angle_twist(angleM * axisM.Dot(geom->normal) ); //rotation about normal
+	Real angle_twist(aa.angle() * aa.axis().dot(geom->normal) ); //rotation about normal
 	Vector3r axis_twist(angle_twist * geom->normal);
 	Vector3r moment_twist(axis_twist * phys->kr);
 	  
-	Vector3r axis_bending(angleM*axisM - axis_twist); //total rotation minus rotation about normal
+	Vector3r axis_bending(aa.angle()*aa.axis() - axis_twist); //total rotation minus rotation about normal
 	Vector3r moment_bending(axis_bending * phys->kr);
 	Vector3r moment = moment_twist + moment_bending;
 
-	Real MomentMax = phys->maxBend*std::fabs(phys->normalForce.Length());
-	Real scalarMoment = moment.Length();
+	Real MomentMax = phys->maxBend*std::fabs(phys->normalForce.norm());
+	Real scalarMoment = moment.norm();
 
 	/*Plastic moment */
 	if(scalarMoment > MomentMax) 

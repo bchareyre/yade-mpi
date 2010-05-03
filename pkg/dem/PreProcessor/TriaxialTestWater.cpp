@@ -303,7 +303,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
-	q.Normalize();
+	q.normalize();
 //	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= dynamic;

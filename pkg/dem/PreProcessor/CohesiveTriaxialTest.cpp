@@ -284,7 +284,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
-	q.Normalize();
+	q.normalize();
 	
 	body->isDynamic			= dynamic;
 	

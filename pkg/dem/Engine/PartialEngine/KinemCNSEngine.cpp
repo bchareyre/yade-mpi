@@ -63,8 +63,8 @@ void KinemCNSEngine::letMove()
 	Real dx = shearSpeed * dt;
 
 
-	Real Ysup = topbox->state->pos.Y();
-	Real Ylat = leftbox->state->pos.Y();
+	Real Ysup = topbox->state->pos.y();
+	Real Ylat = leftbox->state->pos.y();
 
 // 	Changes in vertical and horizontal position :
 
@@ -73,8 +73,8 @@ void KinemCNSEngine::letMove()
 	leftbox->state->pos += Vector3r(dx/2.0,deltaH/2.0,0);
 	rightbox->state->pos += Vector3r(dx/2.0,deltaH/2.0,0);
 	
-	Real Ysup_mod = topbox->state->pos.Y();
-	Real Ylat_mod = leftbox->state->pos.Y();
+	Real Ysup_mod = topbox->state->pos.y();
+	Real Ylat_mod = leftbox->state->pos.y();
 
 //	with the corresponding velocities :
 	topbox->state->vel = Vector3r(shearSpeed,deltaH/dt,0);
@@ -94,7 +94,7 @@ void KinemCNSEngine::letMove()
 
 	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 	if(LOG)
-		cout << "Quaternion associe a la rotation incrementale : " << qcorr.W() << " " << qcorr.X() << " " << qcorr.Y() << " " << qcorr.Z() << endl;
+		cout << "Quaternion associe a la rotation incrementale : " << qcorr.w() << " " << qcorr.x() << " " << qcorr.y() << " " << qcorr.z() << endl;
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
 	leftbox->state->ori	= qcorr*leftbox->state->ori;
 	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
@@ -114,10 +114,8 @@ void KinemCNSEngine::computeAlpha()
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
 	}
-	Vector3r axis;
-	Real angle;
-	orientationLeftBox.ToAxisAngle(axis,angle);
-	alpha=Mathr::PI/2.0-angle;		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
+	AngleAxisr aa(angleAxisFromQuat(orientationLeftBox));
+	alpha=Mathr::PI/2.0-aa.angle();		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
 }
 
 
@@ -144,28 +142,28 @@ void KinemCNSEngine::computeDu()
 		}
 
 		alpha=Mathr::PI/2.0;;
-		Y0 = topbox->state->pos.Y();
+		Y0 = topbox->state->pos.y();
 		cout << "Y0 initialise à : " << Y0 << endl;
-		F_0 = F_sup.Y();
+		F_0 = F_sup.y();
 		firstRun=false;
 	}
 		
 // Computation of the current dimensions of the box : //
-	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
-	Real Xright = rightbox->state->pos.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
+	Real Xleft = leftbox->state->pos.x() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.x();
+	Real Xright = rightbox->state->pos.x() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.x();
 
-	Real Zfront = frontbox->state->pos.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
-	Real Zback = backbox->state->pos.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
+	Real Zfront = frontbox->state->pos.z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.z();
+	Real Zback = backbox->state->pos.z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.z();
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //
 
 	computeStiffness();
-	Real Hcurrent = topbox->state->pos.Y();
+	Real Hcurrent = topbox->state->pos.y();
 	Real Fdesired = F_0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired
 
 // Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity :
-	if( F_sup.Y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
+	if( F_sup.y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
 		stiffness *= coeff_dech;
 
 	if( (KnC==0) && (stiffness==0) )
@@ -175,7 +173,7 @@ void KinemCNSEngine::computeDu()
 	}
 	else
 	{
-		deltaH = ( F_sup.Y() - ( Fdesired ))/(stiffness+KnC* 1.0e9 * Scontact);
+		deltaH = ( F_sup.y() - ( Fdesired ))/(stiffness+KnC* 1.0e9 * Scontact);
 	}
 
 	if(LOG) cout << "Alors q je veux KnC = " << KnC << " depuis F_0 = " << F_0 << " et Y0 = " << Y0 << endl;
@@ -217,7 +215,7 @@ void KinemCNSEngine::computeStiffness()
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
-			Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.Length();
+			Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.norm();
 
 			if (fn!=0)
 			{
