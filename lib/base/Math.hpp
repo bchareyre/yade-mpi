@@ -21,14 +21,19 @@
 	#define EIGEN_DONT_ALIGN
 	#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 	#include<Eigen/Core>
-	USING_PART_OF_NAMESPACE_EIGEN
+	#include<Eigen/Geometry>
+	// USING_PART_OF_NAMESPACE_EIGEN
 	//using namespace eigen; // for eigen3
+	// 
+	//template<typename Scalar> using Vector2=Eigen::Matrix<Scalar,2,1>;
+	//template<typename Scalar> using Vector3=Eigen::Matrix<Scalar,3,1>;
+	//template<typename Scalar> using Matrix3=Eigen::Matrix<Scalar,3,3>;
 	typedef Vector2<int> Vector2i;
 	typedef Vector2<Real> Vector2r;
 	typedef Vector3<int> Vector3i;
 	typedef Vector3<Real> Vector3r;
 	typedef Matrix3<Real> Matrix3r;
-	typedef Quaternion<Real> Quaternionr;
+	typedef Eigen::Quaternion<Real> Quaternionr;
 
 	// io
 	template<class ScalarType> std::ostream & operator<<(std::ostream &os, const Vector2<ScalarType>& v){ os << v.x()<<" "<<v.y(); return os; };
@@ -43,6 +48,29 @@
 	template<typename ScalarType> AngleAxis<ScalarType> angleAxisFromQuat(const Quaternion<ScalarType>& q){ return AngleAxis<ScalarType>(q); }
 	// http://eigen.tuxfamily.org/dox/TutorialGeometry.html
 	template<typename ScalarType> Matrix3<ScalarType> matrixFromEulerAnglesXYZ(ScalarType x, ScalarType y, ScalarType z){ Matrix3<ScalarType> ret=AngleAxis<ScalarType>(x,Vector3<ScalarType>::UnitX())*AngleAxis<ScalarType>(y,Vector3<ScalarType>::UnitY())*AngleAxis<ScalarType>(z,Vector3<ScalarType>::UnitZ()); return ret; }
+	/* replace all those by standard math functions
+		this is a non-templated version, to avoid compilation because of static constants;
+	*/
+	namespace Mathr{
+		const Real PI(4.*atan(1.));
+		const Real HALF_PI(.2*PI);
+		const Real TWO_PI(2*PI);
+		const Real MAX_REAL(DBL_MAX);
+		const Real DEG_TO_RAD(PI/180.);
+		const Real RAD_TO_DEG(180./PI);
+		const Real EPSILON(DBL_EPSILON);
+		Real Sign(Real f){ if(f<0) return -1; if(f>0) return 1; return 0; }
+		Real Sqrt(Real f){ return sqrt(f); }
+		Real Log(Real f){ return log(f); }
+		Real Exp(Real f){ return exp(f); }
+		Real ATan(Real f){ return atan(f); }
+		Real Tan(Real f){ return tan(f); }
+		Real Pow(Real base,exponent){ return pow(base,exponent); }
+
+		Real UnitRandom(){ return ((double)rand()/((double)(RAND_MAX))); }
+		Real SymmetricRandom(){ return 2.*(((double)rand())/((double)(RAND_MAX)))-1.; }
+		Real FastInvCos0(Real f){ Real fRoot = sqrt(((Real)1.0)-fValue); Real fResult = -(Real)0.0187293; fResult *= fValue; fResult += (Real)0.0742610; fResult *= fValue; fResult -= (Real)0.2121144; fResult *= fValue; fResult += (Real)1.5707288; fResult *= fRoot; return fResult; }
+	};
 #else
 	#include<Wm3Vector2.h>
 	#include<Wm3Vector3.h>
@@ -94,6 +122,7 @@ template<typename ScalarType> Vector3<ScalarType> componentMinVector(const Vecto
 // eigen3: v1.array()*v2.array()
 template<typename ScalarType> Vector3<ScalarType> diagMult(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){return Vector3<ScalarType>(a.x()*b.x(),a.y()*b.y(),a.z()*b.z());}
 template<typename ScalarType> Vector3<ScalarType> diagDiv(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){return Vector3<ScalarType>(a.x()/b.x(),a.y()/b.y(),a.z()/b.z());}
+
 
 
 /*
@@ -164,9 +193,9 @@ typedef Se3<Real> Se3r;
 // fast serialization (no version infor and no tracking) for basic math types
 // http://www.boost.org/doc/libs/1_42_0/libs/serialization/doc/traits.html#bitwise
 BOOST_IS_BITWISE_SERIALIZABLE(Vector2r);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector2<int>);
+BOOST_IS_BITWISE_SERIALIZABLE(Vector2i);
 BOOST_IS_BITWISE_SERIALIZABLE(Vector3r);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector3<int>);
+BOOST_IS_BITWISE_SERIALIZABLE(Vector3i);
 BOOST_IS_BITWISE_SERIALIZABLE(Quaternionr);
 BOOST_IS_BITWISE_SERIALIZABLE(Se3r);
 BOOST_IS_BITWISE_SERIALIZABLE(Matrix3r);

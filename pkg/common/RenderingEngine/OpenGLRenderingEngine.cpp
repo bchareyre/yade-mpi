@@ -142,7 +142,7 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 
 void OpenGLRenderingEngine::resetSpecularEmission(){
 	const GLfloat specular[4]={.3,.3,.3,1};
-	const GLfloat emission[4]={.1,.1,.1,1};
+	const GLfloat emission[4]={0,0,0,0};
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular);
 	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
 }

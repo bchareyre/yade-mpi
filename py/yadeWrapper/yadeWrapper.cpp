@@ -113,13 +113,17 @@ class pyBodyContainer{
 		#endif
 		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
 	}
-	python::tuple appendClump(vector<shared_ptr<Body> > bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
+	python::tuple appendClump(vector<shared_ptr<Body> > bb){
+		// update clump members
 		vector<body_id_t> ids(appendList(bb));
+		// create and add clump itself
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
 		shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
 		clump->isDynamic=true;
 		proxee->insert(clumpAsBody);
+		// add clump members to the clump
 		FOREACH(body_id_t id, ids) clump->add(id);
+		// update clump
 		clump->updateProperties(false);
 		return python::make_tuple(clump->getId(),ids);
 	}

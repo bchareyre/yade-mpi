@@ -134,7 +134,7 @@ void NewtonIntegrator::action()
 				if (exactAsphericalRot && ((state->inertia[0]!=state->inertia[1] || state->inertia[1]!=state->inertia[2]))){
 					FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
 						const body_id_t& memberId=mm.first;
-						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(b->isClumpMember());
+						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
 						State* memberState=member->state.get();
 						handleClumpMemberAccel(scene,memberId,memberState,state);
 						handleClumpMemberTorque(scene,memberId,memberState,state,M);

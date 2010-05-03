@@ -43,8 +43,6 @@ void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool w
 		glEnd();
 	} else {
 		glDisable(GL_CULL_FACE); 
-  		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cm->color); glColor3v(cm->color); // one of those necessary as well
-		glEnable(GL_LIGHTING); // important
 		Vector3r normal=(facet->vertices[1]-facet->vertices[0]).cross(facet->vertices[2]-facet->vertices[1]); normal.normalize();
 		glBegin(GL_TRIANGLES);
 			glNormal3v(normal); // this makes every triangle different WRT the light direction; important!

@@ -28,17 +28,7 @@ void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool 
 		if (wire || wire2) glutWireSphere(r,glutSlices,glutStacks);
 		else {
  			if(stripes) { glScalef(r,r,r); drawSphere();}
-			else {
-// 				if(glSphereList<0) {
-// 					glSphereList = glGenLists(1);
-// 					glNewList(glSphereList,GL_COMPILE);
-// 					//glShadeModel(GL_SMOOTH); glDisable(GL_LIGHTING);
-// 					glutSolidSphere(1,glutSlices,glutStacks);
-// 					glEndList();}
-// 				
-// 				glScalef(r,r,r);
-// 				glCallList(glSphereList);}
-				glutSolidSphere(r,glutSlices,glutStacks);}
+			else { glutSolidSphere(r,glutSlices,glutStacks);}
 		}
 	if(glutNormalize) glPopAttrib();
 	return;
@@ -67,24 +57,21 @@ void Gl1_Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int d
 		Real angle = atan(v[2]/v[0])/v.norm();
 		GLfloat matAmbient[4];
 		if (angle>-Mathr::PI/6.0 && angle<=Mathr::PI/6.0){
-			matAmbient[0] = 1.0;
-			matAmbient[1] = 1.0;
-			matAmbient[2] = 1.0;
-			matAmbient[3] = 1.0;
+			matAmbient[0] = .3;
+			matAmbient[1] = .3;
+			matAmbient[2] = .3;
+			matAmbient[3] = 1;
 		}else{
 			matAmbient[0] = 0.0;
 			matAmbient[1] = 0.0;
 			matAmbient[2] = 0.0;
-			matAmbient[3] = 1.0;
+			matAmbient[3] = 0;
 		}
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
 		glBegin(GL_TRIANGLES);
-			glNormal3v(v3);
-			glVertex3v(v3);
-			glNormal3v(v2);
-			glVertex3v(v2);
-			glNormal3v(v1);
-			glVertex3v(v1);
+			glNormal3v(v3); glVertex3v(v3);
+			glNormal3v(v2); glVertex3v(v2);
+			glNormal3v(v1); glVertex3v(v1);
 		glEnd();
 		return;
 	}

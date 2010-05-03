@@ -40,34 +40,10 @@ bool isFundamental(Type& )
 			typeid(Type)==typeid(Vector2r)		||
 			typeid(Type)==typeid(Vector2i)		||
 			typeid(Type)==typeid(Vector3r)		||
-			typeid(Type)==typeid(Vector3f)		||
 			typeid(Type)==typeid(Vector3i)		||
 			typeid(Type)==typeid(Matrix3r)		||
 			typeid(Type)==typeid(Quaternionr)	||
 			typeid(Type)==typeid(Se3r)
-#if 0
-			typeid(Type)==typeid(Vector2<signed int>)	  		||
-			typeid(Type)==typeid(Vector2<unsigned int>)		||
-			typeid(Type)==typeid(Vector2<signed long>)		||
-			typeid(Type)==typeid(Vector2<unsigned long>)		||
-			typeid(Type)==typeid(Vector3<long double>)		||
-			typeid(Type)==typeid(Vector3<signed int>)			||
-			typeid(Type)==typeid(Vector3<unsigned int>)		||
-			typeid(Type)==typeid(Vector3<signed long>)		||
-			typeid(Type)==typeid(Vector3<unsigned long>)		||
-			typeid(Type)==typeid(Vector3f)		||
-			typeid(Type)==typeid(Vector3d)		||
-			typeid(Type)==typeid(Vector3i)		||
-			typeid(Type)==typeid(Matrix3f)		||
-			typeid(Type)==typeid(Matrix3d)		||
-			typeid(Type)==typeid(Matrix3<long double>)		||
-			typeid(Type)==typeid(Quaternionf)	||
-			typeid(Type)==typeid(Quaterniond)	||
-			typeid(Type)==typeid(Quaternion<long double>)	||
-			typeid(Type)==typeid(Se3f)		||
-			typeid(Type)==typeid(Se3d) ||
-			typeid(Type)==typeid(Se3<long double>)
-#endif
 		);
 }
 

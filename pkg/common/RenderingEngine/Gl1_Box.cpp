@@ -12,8 +12,6 @@
 
 void Gl1_Box::go(const shared_ptr<Shape>& cg, const shared_ptr<State>&,bool wire,const GLViewInfo&)
 {
-	// FIXME : check that : one of those 2 lines are useless
-  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cg->color[0],cg->color[1],cg->color[2]));
 	glColor3v(cg->color);
 	
 	Vector3r &extents = (static_cast<Box*>(cg.get()))->extents;
