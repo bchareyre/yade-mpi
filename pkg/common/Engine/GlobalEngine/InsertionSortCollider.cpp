@@ -364,7 +364,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id2, InteractionContainer* interactions, Scene*){
 	assert(periodic);
 	// do bboxes overlap in all 3 dimensions?
-	Vector3<int> periods;
+	Vector3i periods;
 	bool overlap=spatialOverlapPeri(id1,id2,scene,periods);
 	// existing interaction?
 	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
@@ -408,7 +408,7 @@ void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id
 	at all, for instance.
 */
 //! return true if bodies bb overlap in all 3 dimensions
-bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scene* scene, Vector3<int>& periods) const {
+bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scene* scene, Vector3i& periods) const {
 	assert(periodic);
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){

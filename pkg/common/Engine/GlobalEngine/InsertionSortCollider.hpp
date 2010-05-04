@@ -158,7 +158,7 @@ class InsertionSortCollider: public Collider{
 	// periodic variants
 	void insertionSortPeri(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
 	void handleBoundInversionPeri(body_id_t,body_id_t,InteractionContainer*,Scene*);
-	bool spatialOverlapPeri(body_id_t,body_id_t,Scene*,Vector3<int>&) const;
+	bool spatialOverlapPeri(body_id_t,body_id_t,Scene*,Vector3i&) const;
 	static Real cellWrap(const Real, const Real, const Real, int&);
 	static Real cellWrapRel(const Real, const Real, const Real);
 
@@ -167,7 +167,7 @@ class InsertionSortCollider: public Collider{
 	//! Predicate called from loop within InteractionContainer::erasePending
 	bool shouldBeErased(body_id_t id1, body_id_t id2, Scene* rb) const {
 		if(!periodic) return !spatialOverlap(id1,id2);
-		else { Vector3<int> periods; return !spatialOverlapPeri(id1,id2,rb,periods); }
+		else { Vector3i periods; return !spatialOverlapPeri(id1,id2,rb,periods); }
 	}
 	virtual bool isActivated();
 

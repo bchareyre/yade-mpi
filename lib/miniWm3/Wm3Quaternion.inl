@@ -390,8 +390,9 @@ Quaternion<Real>& Quaternion<Real>::FromRotationMatrix_ (
 }
 //----------------------------------------------------------------------------
 template <class Real>
-void Quaternion<Real>::toRotationMatrix (Matrix3<Real>& rkRot) const
+Matrix3<Real> Quaternion<Real>::toRotationMatrix () const
 {
+	 Matrix3<Real> rkRot;
     Real fTx  = ((Real)2.0)*m_afTuple[1];
     Real fTy  = ((Real)2.0)*m_afTuple[2];
     Real fTz  = ((Real)2.0)*m_afTuple[3];
@@ -414,6 +415,7 @@ void Quaternion<Real>::toRotationMatrix (Matrix3<Real>& rkRot) const
     rkRot(2,0) = fTxz-fTwy;
     rkRot(2,1) = fTyz+fTwx;
     rkRot(2,2) = (Real)1.0-(fTxx+fTyy);
+	 return rkRot;
 }
 //----------------------------------------------------------------------------
 template <class Real>
@@ -676,8 +678,7 @@ Vector3<Real> Quaternion<Real>::rotate (const Vector3<Real>& rkVector) const
     // matrix requires less space than the matrix and more time to compute
     // the rotated vector.  Typical space-time tradeoff...
 
-    Matrix3<Real> kRot;
-    toRotationMatrix(kRot);
+    Matrix3<Real> kRot=toRotationMatrix();
     return kRot*rkVector;
 }
 //----------------------------------------------------------------------------

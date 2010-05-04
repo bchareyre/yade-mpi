@@ -114,7 +114,7 @@
     // conversion between quaternions, matrices, and axis-angle
     WM3_FUN Quaternion& FromRotationMatrix (const Matrix3<Real>& rkRot) { return FromRotationMatrix_(rkRot); }
             Quaternion& FromRotationMatrix_ (const Matrix3<Real>& rkRot); // hidden function, do not call from outside
-    EIG_FUN void toRotationMatrix (Matrix3<Real>& rkRot) const;
+    EIG_FUN Matrix3<Real> toRotationMatrix () const;
     WM3_FUN Quaternion& FromRotationMatrix (const Vector3<Real> akRotColumn[3]);
     WM3_OLD void ToRotationMatrix (Vector3<Real> akRotColumn[3]) const;
             Quaternion& FromAxisAngle_ (const Vector3<Real>& rkAxis, Real fAngle); // hidden function, do not call from outside
@@ -122,7 +122,7 @@
             void ToAxisAngle_ (Vector3<Real>& rkAxis, Real& rfAngle) const; // hidden function, do not call from outside
     WM3_OLD void ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle) const {return ToAxisAngle_(rkAxis,rfAngle);}
 
-	 WM3_OLD Matrix3<Real> ToRotationMatrix(Matrix3<Real>& rkRot) const { Matrix3<Real> ret; toRotationMatrix(ret); return ret;}
+	 WM3_OLD Matrix3<Real> ToRotationMatrix(Matrix3<Real>& rkRot) const { Matrix3<Real> ret=toRotationMatrix(); return ret;}
 
     // functions of a quaternion
     WM3_OLD Real Dot (const Quaternion& rkQ) const;  // dot product of 4-tuples

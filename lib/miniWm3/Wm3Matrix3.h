@@ -58,7 +58,8 @@ class Matrix3
 public:
     // If bZero is true, create the zero matrix.  Otherwise, create the
     // identity matrix.
-    Matrix3 (bool bZero = true);
+    Matrix3 (){ setIdentity(); }
+	 WM3_OLD Matrix3 (bool setZero);
 
     // copy constructor
     Matrix3 (const Matrix3& rkM);
@@ -177,23 +178,23 @@ public:
     // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
     // where yaw is rotation about the Up vector, pitch is rotation about the
     // Right axis, and roll is rotation about the Direction axis.
-    WM3_FUN Matrix3& FromEulerAnglesXYZ (Real fYAngle, Real fPAngle, Real fRAngle);
-    WM3_FUN Matrix3& FromEulerAnglesXZY (Real fYAngle, Real fPAngle, Real fRAngle);
-    WM3_FUN Matrix3& FromEulerAnglesYXZ (Real fYAngle, Real fPAngle, Real fRAngle);
-    WM3_FUN Matrix3& FromEulerAnglesYZX (Real fYAngle, Real fPAngle, Real fRAngle);
-    WM3_FUN Matrix3& FromEulerAnglesZXY (Real fYAngle, Real fPAngle, Real fRAngle);
-    WM3_FUN Matrix3& FromEulerAnglesZYX (Real fYAngle, Real fPAngle, Real fRAngle);
-    WM3_FUN bool ToEulerAnglesXYZ (Real& rfYAngle, Real& rfPAngle,
+            Matrix3& FromEulerAnglesXYZ_ (Real fYAngle, Real fPAngle, Real fRAngle); // hidden function, do not call from outside
+    WM3_OLD Matrix3& FromEulerAnglesXZY (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_OLD Matrix3& FromEulerAnglesYXZ (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_OLD Matrix3& FromEulerAnglesYZX (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_OLD Matrix3& FromEulerAnglesZXY (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_OLD Matrix3& FromEulerAnglesZYX (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_OLD bool ToEulerAnglesXYZ (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    WM3_FUN bool ToEulerAnglesXZY (Real& rfYAngle, Real& rfPAngle,
+    WM3_OLD bool ToEulerAnglesXZY (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    WM3_FUN bool ToEulerAnglesYXZ (Real& rfYAngle, Real& rfPAngle,
+    WM3_OLD bool ToEulerAnglesYXZ (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    WM3_FUN bool ToEulerAnglesYZX (Real& rfYAngle, Real& rfPAngle,
+    WM3_OLD bool ToEulerAnglesYZX (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    WM3_FUN bool ToEulerAnglesZXY (Real& rfYAngle, Real& rfPAngle,
+    WM3_OLD bool ToEulerAnglesZXY (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    WM3_FUN bool ToEulerAnglesZYX (Real& rfYAngle, Real& rfPAngle,
+    WM3_OLD bool ToEulerAnglesZYX (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
 
     // SLERP (spherical linear interpolation) without quaternions.  Computes

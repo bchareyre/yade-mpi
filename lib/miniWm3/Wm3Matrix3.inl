@@ -906,7 +906,7 @@ void Matrix3<Real>::EigenDecomposition_ (Matrix3& rkRot, Matrix3& rkDiag) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Matrix3<Real>& Matrix3<Real>::FromEulerAnglesXYZ (Real fYAngle, Real fPAngle,
+Matrix3<Real>& Matrix3<Real>::FromEulerAnglesXYZ_ (Real fYAngle, Real fPAngle,
     Real fRAngle)
 {
     Real fCos, fSin;

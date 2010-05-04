@@ -218,7 +218,7 @@ inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state
 }
 
 void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt, const Vector3r& M){
-	Matrix3r A; state->ori.conjugate().toRotationMatrix(A); // rotation matrix from global to local r.f.
+	Matrix3r A=state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2 * M; // global angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
 	const Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
@@ -229,8 +229,8 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2
 	blockRotateDOFs( state->blockedDOFs, angVel_b_half );
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
-	state->ori+=dt*dotQ_half; // Q at time n+1
-	state->angVel=state->ori.rotate(angVel_b_half); // global angular velocity at time n+1/2
+	state->ori=state->ori+dt*dotQ_half; // Q at time n+1
+	state->angVel=state->ori*angVel_b_half; // global angular velocity at time n+1/2
 
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
 		Vector3r r(scene->forces.getRot(id));

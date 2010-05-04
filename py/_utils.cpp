@@ -36,11 +36,11 @@ py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
-		minimum=componentMinVector(minimum,b->state->pos-(centers?Vector3r::Zero():rrr));
-		maximum=componentMaxVector(maximum,b->state->pos+(centers?Vector3r::Zero():rrr));
+		minimum=componentMinVector(minimum,Vector3r(b->state->pos-(centers?Vector3r::Zero():rrr)));
+		maximum=componentMaxVector(maximum,Vector3r(b->state->pos+(centers?Vector3r::Zero():rrr)));
 	}
 	Vector3r dim=maximum-minimum;
-	return py::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
+	return py::make_tuple(Vector3r(minimum+.5*cutoff*dim),Vector3r(maximum-.5*cutoff*dim));
 }
 
 py::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
@@ -345,7 +345,7 @@ Real approxSectionArea(Real coord, int axis){
 		const Vector3r& pos(b->state->pos); const Real r(s->radius);
 		if((pos[axis]>coord && (pos[axis]-r)>coord) || (pos[axis]<coord && (pos[axis]+r)<coord)) continue;
 		Vector2r c(pos[ax1],pos[ax2]);
-		cloud.push_back(c+Vector2r(r,0)); cloud.push_back(c+Vector2r(-r,0));
+		cloud.push_back(c+Vector2r(r,0.)); cloud.push_back(c+Vector2r(-r,0.));
 		cloud.push_back(c+Vector2r( r/2., sqrt3*r)); cloud.push_back(c+Vector2r( r/2.,-sqrt3*r));
 		cloud.push_back(c+Vector2r(-r/2., sqrt3*r)); cloud.push_back(c+Vector2r(-r/2.,-sqrt3*r));
 		if(i++==0){ mm=c, mx=c;}
@@ -446,5 +446,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("wireAll",wireAll,"Set :yref:`Shape::wire` on all bodies to True, rendering them with wireframe only.");
 	py::def("wireNone",wireNone,"Set :yref:`Shape::wire` on all bodies to False, rendering them as solids.");
 	py::def("wireNoSpheres",wireNoSpheres,"Set :yref:`Shape::wire` to True on non-spherical bodies (:yref:`Facets<Facet>`, :yref:`Walls<Wall>`).");
-	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r::Zero()),"Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that periodic cell defines by repetition or its corners regular grid of points in $R^3$; however, all cells generating identical grid are equivalent and can be flipped one over another. This necessiatates adjustment of :yref:`Interaction.cellDist` for interactions that cross boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is accessible as ``Shop::flipCell``.\n\n.. warning::\n\t This function is currently broken and should not be used.");
+	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r(Matrix3r::Zero())),"Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that periodic cell defines by repetition or its corners regular grid of points in $R^3$; however, all cells generating identical grid are equivalent and can be flipped one over another. This necessiatates adjustment of :yref:`Interaction.cellDist` for interactions that cross boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is accessible as ``Shop::flipCell``.\n\n.. warning::\n\t This function is currently broken and should not be used.");
 }

@@ -16,12 +16,12 @@ void Gl1_Aabb::go(const shared_ptr<Bound>& bv, Scene* scene){
 	glColor3v(bv->diffuseColor);
 	// glDisable(GL_LIGHTING);
 	if(!scene->isPeriodic){
-		glTranslatev(.5*(aabb->min+aabb->max));
-		glScalev(aabb->max-aabb->min);
+		glTranslatev(Vector3r(.5*(aabb->min+aabb->max)));
+		glScalev(Vector3r(aabb->max-aabb->min));
 	} else {
-		glTranslatev(scene->cell->shearPt(scene->cell->wrapPt(.5*(aabb->min+aabb->max))));
+		glTranslatev(Vector3r(scene->cell->shearPt(scene->cell->wrapPt(.5*(aabb->min+aabb->max)))));
 		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
-		glScalev(aabb->max-aabb->min);
+		glScalev(Vector3r(aabb->max-aabb->min));
 	}
 	glutWireCube(1);
 }

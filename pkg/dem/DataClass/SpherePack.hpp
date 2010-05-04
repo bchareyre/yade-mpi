@@ -54,7 +54,7 @@ public:
 	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, int num=-1, bool periodic=false, Real porosity=-1);
 
 	// periodic repetition
-	void cellRepeat(Vector3<int> count);
+	void cellRepeat(Vector3i count);
 	void cellFill(Vector3r volume);
 
 	// spatial characteristics
@@ -62,7 +62,7 @@ public:
 	python::tuple aabb_py() const { Vector3r mn,mx; aabb(mn,mx); return python::make_tuple(mn,mx); }
 	void aabb(Vector3r& mn, Vector3r& mx) const {
 		Real inf=std::numeric_limits<Real>::infinity(); mn=Vector3r(inf,inf,inf); mx=Vector3r(-inf,-inf,-inf);
-		FOREACH(const Sph& s, pack){ Vector3r r(s.r,s.r,s.r); mn=componentMinVector(mn,s.c-r); mx=componentMaxVector(mx,s.c+r);}
+		FOREACH(const Sph& s, pack){ Vector3r r(s.r,s.r,s.r); mn=componentMinVector(mn,Vector3r(s.c-r)); mx=componentMaxVector(mx,Vector3r(s.c+r));}
 	}
 	Vector3r midPt() const {Vector3r mn,mx; aabb(mn,mx); return .5*(mn+mx);}
 	Real relDensity() const {

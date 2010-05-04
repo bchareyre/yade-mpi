@@ -402,17 +402,6 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
                 , ( bp::arg("inst") ) );
         
         }
-        { //Quaternion< double >::ToRotationMatrix
-        
-            typedef Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*ToRotationMatrix_function_type )( Vector3< double > * ) const;
-            
-            Quaternion_exposer.def( 
-                "ToRotationMatrix"
-                , ToRotationMatrix_function_type( &Quaternion< double >::ToRotationMatrix )
-                , ( bp::arg("akRotColumn") ) );
-        
-        }
         { //Quaternion< double >::W
         
             typedef Quaternion< double > exported_class_t;

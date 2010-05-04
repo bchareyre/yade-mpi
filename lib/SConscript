@@ -53,7 +53,7 @@ if 'opengl' in env['features']:
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','$QGLVIEWER_LIB']),
 #env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary
 yadeStaticOrSharedLib('yade-support',[
-	env.Combine('yade-support.cpp',
+	env.Combine('yade-support.cpp',['base/Math.cpp']+
 		['factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
 			'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 			'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp',

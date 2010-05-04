@@ -37,13 +37,14 @@ void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool w
 		// normal of edges
 		glColor3(0.0,0.0,1.0); 
 		glBegin(GL_LINES);
-			glVertex3(0.0,0.0,0.0); glVertex3v(icr*ne[0]);
-			glVertex3(0.0,0.0,0.0);	glVertex3v(icr*ne[1]);
-			glVertex3(0.0,0.0,0.0);	glVertex3v(icr*ne[2]);
+			glVertex3(0.0,0.0,0.0); glVertex3v(Vector3r(icr*ne[0]));
+			glVertex3(0.0,0.0,0.0);	glVertex3v(Vector3r(icr*ne[1]));
+			glVertex3(0.0,0.0,0.0);	glVertex3v(Vector3r(icr*ne[2]));
 		glEnd();
 	} else {
 		glDisable(GL_CULL_FACE); 
 		Vector3r normal=(facet->vertices[1]-facet->vertices[0]).cross(facet->vertices[2]-facet->vertices[1]); normal.normalize();
+		glColor3v(cm->color);
 		glBegin(GL_TRIANGLES);
 			glNormal3v(normal); // this makes every triangle different WRT the light direction; important!
 			glVertex3v(facet->vertices[0]);

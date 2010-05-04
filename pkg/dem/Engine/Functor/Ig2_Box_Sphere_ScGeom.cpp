@@ -38,7 +38,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 	Vector3r extents = obb->extents;
 
 	// FIXME: do we need rotation matrix? Can't quaternion do just fine?
-	Matrix3r boxAxisT; se31.orientation.toRotationMatrix(boxAxisT); 
+	Matrix3r boxAxisT=se31.orientation.toRotationMatrix(); 
 	Matrix3r boxAxis = boxAxisT.transpose();
 	
 	Vector3r relPos21 = se32.position-se31.position; // relative position of centroids

@@ -22,73 +22,115 @@
 	#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 	#include<Eigen/Core>
 	#include<Eigen/Geometry>
+	#include<Eigen/QR>
+	#include<Eigen/LU>
+	#include<float.h>
 	// USING_PART_OF_NAMESPACE_EIGEN
 	//using namespace eigen; // for eigen3
 	// 
-	//template<typename Scalar> using Vector2=Eigen::Matrix<Scalar,2,1>;
-	//template<typename Scalar> using Vector3=Eigen::Matrix<Scalar,3,1>;
-	//template<typename Scalar> using Matrix3=Eigen::Matrix<Scalar,3,3>;
-	typedef Vector2<int> Vector2i;
-	typedef Vector2<Real> Vector2r;
-	typedef Vector3<int> Vector3i;
-	typedef Vector3<Real> Vector3r;
-	typedef Matrix3<Real> Matrix3r;
+	// templates of those types with single parameter are not possible (for compat with Wm3), use macros for now
+	#define VECTOR2_TEMPLATE(Scalar) Eigen::Matrix<Scalar,2,1>
+	#define VECTOR3_TEMPLATE(Scalar) Eigen::Matrix<Scalar,3,1>
+	#define MATRIX3_TEMPLATE(Scalar) Eigen::Matrix<Scalar,3,3>
+	// this would be the proper way, but only works in c++-0x (not yet supported by gcc (4.5))
+	#if 0
+		template<typename Scalar> using Vector2=Eigen::Matrix<Scalar,2,1>;
+		template<typename Scalar> using Vector3=Eigen::Matrix<Scalar,3,1>;
+		template<typename Scalar> using Matrix3=Eigen::Matrix<Scalar,3,3>;
+		typedef Vector2<int> Vector2i;
+		typedef Vector2<Real> Vector2r;
+		// etc
+	#endif
+
+	typedef VECTOR2_TEMPLATE(int) Vector2i;
+	typedef VECTOR2_TEMPLATE(Real) Vector2r;
+	typedef VECTOR3_TEMPLATE(int) Vector3i;
+	typedef VECTOR3_TEMPLATE(Real) Vector3r;
+	typedef MATRIX3_TEMPLATE(Real) Matrix3r;
+
 	typedef Eigen::Quaternion<Real> Quaternionr;
+	typedef Eigen::AngleAxis<Real> AngleAxisr;
+	using Eigen::AngleAxis; using Eigen::Quaternion;
 
 	// io
-	template<class ScalarType> std::ostream & operator<<(std::ostream &os, const Vector2<ScalarType>& v){ os << v.x()<<" "<<v.y(); return os; };
-	template<class ScalarType> std::ostream & operator<<(std::ostream &os, const Vector3<ScalarType>& v){ os << v.x()<<" "<<v.y()<<" "<<v.z(); return os; };
-	template<class ScalarType> std::ostream & operator<<(std::ostream &os, const Quaternion<ScalarType>& q){ os<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z(); return os; };
+	template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR2_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y(); return os; };
+	template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR3_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y()<<" "<<v.z(); return os; };
+	template<class Scalar> std::ostream & operator<<(std::ostream &os, const Eigen::Quaternion<Scalar>& q){ os<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z(); return os; };
 	// operators
-	//template<class ScalarType> Vector3<ScalarType> operator*(ScalarType s, const Vector3<ScalarType>& v) {return v*s;}
-	//template<class ScalarType> Matrix3<ScalarType> operator*(ScalarType s, const Matrix3<ScalarType>& m) { return m*s; }
-	//template<class ScalarType> Quaternion<ScalarType> operator*(ScalarType s, const Quaternion<ScalarType>& q) { return q*s; }
-	template<typename ScalarType> void matrixEigenDecomposition(const Matrix3r<ScalarType> m, Matrix3<ScalarType>& mRot, Matrix3<ScalarType>& mDiag){ Eigen::EigenSolver<Matrix3<ScalarType> > a(m); mDiag=a.eigenvalues().real().asDiagonal(); mRot=a.eigenvectors().real(); }
+	//template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(Scalar s, const VECTOR3_TEMPLATE(Scalar)& v) {return v*s;}
+	//template<class Scalar> MATRIX3_TEMPLATE(Scalar) operator*(Scalar s, const MATRIX3_TEMPLATE(Scalar)& m) { return m*s; }
+	//template<class Scalar> Quaternion<Scalar> operator*(Scalar s, const Quaternion<Scalar>& q) { return q*s; }
+	template<typename Scalar> void matrixEigenDecomposition(const MATRIX3_TEMPLATE(Scalar) m, MATRIX3_TEMPLATE(Scalar)& mRot, MATRIX3_TEMPLATE(Scalar)& mDiag){ Eigen::EigenSolver<MATRIX3_TEMPLATE(Scalar)> a(m); mDiag=a.eigenvalues().real().asDiagonal(); mRot=a.eigenvectors().real(); }
 	//__attribute__((warning("Replace this function with direct AngleAxis constructor from Quaternion")))
-	template<typename ScalarType> AngleAxis<ScalarType> angleAxisFromQuat(const Quaternion<ScalarType>& q){ return AngleAxis<ScalarType>(q); }
+	template<typename Scalar> AngleAxis<Scalar> angleAxisFromQuat(const Quaternion<Scalar>& q){ return AngleAxis<Scalar>(q); }
 	// http://eigen.tuxfamily.org/dox/TutorialGeometry.html
-	template<typename ScalarType> Matrix3<ScalarType> matrixFromEulerAnglesXYZ(ScalarType x, ScalarType y, ScalarType z){ Matrix3<ScalarType> ret=AngleAxis<ScalarType>(x,Vector3<ScalarType>::UnitX())*AngleAxis<ScalarType>(y,Vector3<ScalarType>::UnitY())*AngleAxis<ScalarType>(z,Vector3<ScalarType>::UnitZ()); return ret; }
-	/* replace all those by standard math functions
+	template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromEulerAnglesXYZ(Scalar x, Scalar y, Scalar z){ MATRIX3_TEMPLATE(Scalar) m; m=AngleAxis<Scalar>(x,VECTOR3_TEMPLATE(Scalar)::UnitX())*AngleAxis<Scalar>(y,VECTOR3_TEMPLATE(Scalar)::UnitY())*AngleAxis<Scalar>(z,VECTOR3_TEMPLATE(Scalar)::UnitZ()); return m;}
+	template<typename Scalar> bool operator==(const Quaternion<Scalar>& u, const Quaternion<Scalar>& v){ return u.x()==v.x() && u.y()==v.y() && u.z()==v.z() && u.w()==v.w(); }
+	template<typename Scalar> bool operator!=(const Quaternion<Scalar>& u, const Quaternion<Scalar>& v){ return !(u==v); }
+	template<typename Scalar> Quaternion<Scalar> operator*(Scalar f, const Quaternion<Scalar>& q){ return Quaternion<Scalar>(q.coeffs()*f); }
+	template<typename Scalar> Quaternion<Scalar> operator+(Quaternion<Scalar> q1, const Quaternion<Scalar>& q2){ return Quaternion<Scalar>(q1.coeffs()+q2.coeffs()); }	/* replace all those by standard math functions
 		this is a non-templated version, to avoid compilation because of static constants;
 	*/
-	namespace Mathr{
-		const Real PI(4.*atan(1.));
-		const Real HALF_PI(.2*PI);
-		const Real TWO_PI(2*PI);
-		const Real MAX_REAL(DBL_MAX);
-		const Real DEG_TO_RAD(PI/180.);
-		const Real RAD_TO_DEG(180./PI);
-		const Real EPSILON(DBL_EPSILON);
-		Real Sign(Real f){ if(f<0) return -1; if(f>0) return 1; return 0; }
-		Real Sqrt(Real f){ return sqrt(f); }
-		Real Log(Real f){ return log(f); }
-		Real Exp(Real f){ return exp(f); }
-		Real ATan(Real f){ return atan(f); }
-		Real Tan(Real f){ return tan(f); }
-		Real Pow(Real base,exponent){ return pow(base,exponent); }
+	template<typename Scalar>
+	struct Math{
+		static const Scalar PI;
+		static const Scalar HALF_PI;
+		static const Scalar TWO_PI;
+		static const Scalar MAX_REAL;
+		static const Scalar DEG_TO_RAD;
+		static const Scalar RAD_TO_DEG;
+		static const Scalar EPSILON;
+		static const Scalar ZERO_TOLERANCE;
+		static Scalar Sign(Scalar f){ if(f<0) return -1; if(f>0) return 1; return 0; }
+		static Scalar FAbs(Scalar f){ return abs(f); }
+		static Scalar Sqrt(Scalar f){ return sqrt(f); }
+		static Scalar Log(Scalar f){ return log(f); }
+		static Scalar Exp(Scalar f){ return exp(f); }
+		static Scalar ATan(Scalar f){ return atan(f); }
+		static Scalar Tan(Scalar f){ return tan(f); }
+		static Scalar Pow(Scalar base,Scalar exponent){ return pow(base,exponent); }
 
-		Real UnitRandom(){ return ((double)rand()/((double)(RAND_MAX))); }
-		Real SymmetricRandom(){ return 2.*(((double)rand())/((double)(RAND_MAX)))-1.; }
-		Real FastInvCos0(Real f){ Real fRoot = sqrt(((Real)1.0)-fValue); Real fResult = -(Real)0.0187293; fResult *= fValue; fResult += (Real)0.0742610; fResult *= fValue; fResult -= (Real)0.2121144; fResult *= fValue; fResult += (Real)1.5707288; fResult *= fRoot; return fResult; }
+		static Scalar UnitRandom(){ return ((double)rand()/((double)(RAND_MAX))); }
+		static Scalar SymmetricRandom(){ return 2.*(((double)rand())/((double)(RAND_MAX)))-1.; }
+		static Scalar FastInvCos0(Scalar fValue){ Scalar fRoot = sqrt(((Scalar)1.0)-fValue); Scalar fResult = -(Scalar)0.0187293; fResult *= fValue; fResult += (Scalar)0.0742610; fResult *= fValue; fResult -= (Scalar)0.2121144; fResult *= fValue; fResult += (Scalar)1.5707288; fResult *= fRoot; return fResult; }
 	};
+	typedef Math<Real> Mathr;
 #else
 	#include<Wm3Vector2.h>
 	#include<Wm3Vector3.h>
 	#include<Wm3Matrix3.h>
 	#include<Wm3Quaternion.h>
 	#include<Wm3Math.h>
+#if 0
 	namespace Wm3 {
-		template<class T> class Math; typedef Math<Real> Mathr;
-		template<class T> class Matrix3; typedef Matrix3<Real> Matrix3r;
-		template<class T> class Quaternion; typedef Quaternion<Real> Quaternionr;
-		template<class T> class Vector2; typedef Vector2<Real> Vector2r; typedef Vector2<int> Vector2i;
-		template<class T> class Vector3; typedef Vector3<Real> Vector3r; typedef Vector3<int> Vector3i;
-		template<class T> class AngleAxis; typedef AngleAxis<Real> AngleAxisr; // added to the Wm3Quaternion header
+		template<class T> class Math; 		template<class T> class Quaternion; 
+		template<class T> class Matrix3; //typedef Matrix3<Real> Matrix3r;
+		template<class T> class Vector2; //typedef Vector2<Real> Vector2r; typedef Vector2<int> Vector2i;
+		template<class T> class Vector3; //typedef Vector3<Real> Vector3r; typedef Vector3<int> Vector3i;
+		template<class T> class AngleAxis;  // added to the Wm3Quaternion header
 	}
-	using namespace Wm3;
-	template<typename ScalarType> AngleAxis<ScalarType> angleAxisFromQuat(const Quaternion<ScalarType>& q){ AngleAxis<ScalarType> aa; q.ToAxisAngle_(aa.axis(),aa.angle()); return aa; }
-	template<typename ScalarType> void matrixEigenDecomposition(const Matrix3<ScalarType>& m, Matrix3<ScalarType>& mRot, Matrix3<ScalarType>& mDiag){ m.EigenDecomposition_(mRot,mDiag); }
-	template<typename ScalarType> Matrix3<ScalarType> matrixFromEulerAnglesXYZ(ScalarType x, ScalarType y, ScalarType z){ return Matrix3r().FromEulerAnglesXYZ(x,y,z); }
+#endif
+	using Wm3::Quaternion;
+	using Wm3::AngleAxis;
+	typedef Wm3::Math<Real> Mathr;
+	typedef Quaternion<Real> Quaternionr;
+	typedef AngleAxis<Real> AngleAxisr;
+	// workaround for template aliases, to be compatible with Eigen
+	#define VECTOR2_TEMPLATE(Scalar) Wm3::Vector2<Scalar>
+	#define VECTOR3_TEMPLATE(Scalar) Wm3::Vector3<Scalar>
+	#define MATRIX3_TEMPLATE(Scalar) Wm3::Matrix3<Scalar>
+	// typedefs
+	typedef VECTOR2_TEMPLATE(int) Vector2i;
+	typedef VECTOR2_TEMPLATE(Real) Vector2r;
+	typedef VECTOR3_TEMPLATE(int) Vector3i;
+	typedef VECTOR3_TEMPLATE(Real) Vector3r;
+	typedef MATRIX3_TEMPLATE(Real) Matrix3r;
+	//
+	template<typename Scalar> AngleAxis<Scalar> angleAxisFromQuat(const Quaternion<Scalar>& q){ AngleAxis<Scalar> aa; q.ToAxisAngle_(aa.axis(),aa.angle()); return aa; }
+	template<typename Scalar> void matrixEigenDecomposition(const MATRIX3_TEMPLATE(Scalar)& m, MATRIX3_TEMPLATE(Scalar)& mRot, MATRIX3_TEMPLATE(Scalar)& mDiag){ m.EigenDecomposition_(mRot,mDiag); }
+	template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromEulerAnglesXYZ(Scalar x, Scalar y, Scalar z){ return MATRIX3_TEMPLATE(Scalar)().FromEulerAnglesXYZ_(x,y,z); }
+	// only needed for Wm3, Eigen defines already
+	template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(const Quaternion<Scalar>& q, const VECTOR3_TEMPLATE(Scalar)& v){ return q.rotate(v); /* check whether it converts to matrix internally, which is supposedly faster*/ }
 #endif
 
 /*
@@ -97,10 +139,10 @@
  */
 
 // replace by outer product of 2 vectors: v1*v2.transpose();
-template<typename RealType>
-Matrix3<RealType> makeTensorProduct (const Vector3<RealType>& rkU,  const Vector3<RealType>& rkV)
+template<typename Scalar>
+MATRIX3_TEMPLATE(Scalar) makeTensorProduct (const VECTOR3_TEMPLATE(Scalar)& rkU,  const VECTOR3_TEMPLATE(Scalar)& rkV)
 {
-	Matrix3<RealType> ret;
+	MATRIX3_TEMPLATE(Scalar) ret;
    ret(0,0) = rkU[0]*rkV[0];
    ret(0,1) = rkU[0]*rkV[1];
    ret(0,2) = rkU[0]*rkV[2];
@@ -112,17 +154,18 @@ Matrix3<RealType> makeTensorProduct (const Vector3<RealType>& rkU,  const Vector
    ret(2,2) = rkU[2]*rkV[2];
    return ret;
 }
-// eigen2: v.cwise().min() / max()
-// eigen3: v.array().min() / max()
-template<typename ScalarType> Vector2<ScalarType> componentMaxVector(const Vector2<ScalarType>& a, const Vector2<ScalarType>& b){ return Vector2<ScalarType>(std::max(a.x(),b.x()),std::max(a.y(),b.y()));}
-template<typename ScalarType> Vector2<ScalarType> componentMinVector(const Vector2<ScalarType>& a, const Vector2<ScalarType>& b){ return Vector2<ScalarType>(std::min(a.x(),b.x()),std::min(a.y(),b.y()));}
-template<typename ScalarType> Vector3<ScalarType> componentMaxVector(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){ return Vector3<ScalarType>(std::max(a.x(),b.x()),std::max(a.y(),b.y()),std::max(a.z(),b.z()));}
-template<typename ScalarType> Vector3<ScalarType> componentMinVector(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){ return Vector3<ScalarType>(std::min(a.x(),b.x()),std::min(a.y(),b.y()),std::min(a.z(),b.z()));}
+// eigen2: a.cwise().min(b) / max(b)
+// eigen3: a.array().min(b) / max(b)
+template<typename Scalar> VECTOR2_TEMPLATE(Scalar) componentMaxVector(const VECTOR2_TEMPLATE(Scalar)& a, const VECTOR2_TEMPLATE(Scalar)& b){ return VECTOR2_TEMPLATE(Scalar)(std::max(a.x(),b.x()),std::max(a.y(),b.y()));}
+template<typename Scalar> VECTOR2_TEMPLATE(Scalar) componentMinVector(const VECTOR2_TEMPLATE(Scalar)& a, const VECTOR2_TEMPLATE(Scalar)& b){ return VECTOR2_TEMPLATE(Scalar)(std::min(a.x(),b.x()),std::min(a.y(),b.y()));}
+template<typename Scalar> VECTOR3_TEMPLATE(Scalar) componentMaxVector(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return VECTOR3_TEMPLATE(Scalar)(std::max(a.x(),b.x()),std::max(a.y(),b.y()),std::max(a.z(),b.z()));}
+template<typename Scalar> VECTOR3_TEMPLATE(Scalar) componentMinVector(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return VECTOR3_TEMPLATE(Scalar)(std::min(a.x(),b.x()),std::min(a.y(),b.y()),std::min(a.z(),b.z()));}
 // eigen2: v1.cwise()*v2;
 // eigen3: v1.array()*v2.array()
-template<typename ScalarType> Vector3<ScalarType> diagMult(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){return Vector3<ScalarType>(a.x()*b.x(),a.y()*b.y(),a.z()*b.z());}
-template<typename ScalarType> Vector3<ScalarType> diagDiv(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){return Vector3<ScalarType>(a.x()/b.x(),a.y()/b.y(),a.z()/b.z());}
-
+template<typename Scalar> VECTOR3_TEMPLATE(Scalar) diagMult(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){return VECTOR3_TEMPLATE(Scalar)(a.x()*b.x(),a.y()*b.y(),a.z()*b.z());}
+template<typename Scalar> VECTOR3_TEMPLATE(Scalar) diagDiv(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){return VECTOR3_TEMPLATE(Scalar)(a.x()/b.x(),a.y()/b.y(),a.z()/b.z());}
+// eigen: m << m00,m01,m02,m10,m11,m12,m20,m21,m22;
+template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromElements(Scalar m00, Scalar m01, Scalar m02, Scalar m10, Scalar m11, Scalar m12, Scalar m20, Scalar m21, Scalar m22){ MATRIX3_TEMPLATE(Scalar) m; m(0,0)=m00; m(0,1)=m01; m(0,2)=m02; m(1,0)=m10; m(1,1)=m11; m(1,2)=m12; m(2,0)=m20; m(2,1)=m21; m(2,2)=m22; return m; }
 
 
 /*
@@ -133,12 +176,12 @@ __attribute__((unused))
 const Real NaN(std::numeric_limits<Real>::signaling_NaN());
 
 // void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real threshold=1e-6f);
-template<typename ScalarType> void quaterniontoGLMatrix(const Quaternion<ScalarType>& q, ScalarType m[16]){
-	ScalarType w2=2.*q.w(), x2=2.*q.x(), y2=2.*q.y(), z2=2.*q.z();
-	ScalarType x2w=w2*q.w(), y2w=y2*q.w(), z2w=z2*q.w();
-	ScalarType x2x=x2*q.x(), y2x=y2*q.x(), z2x=z2*q.x();
-	ScalarType x2y=y2*q.y(), y2y=y2*q.y(), z2y=z2*q.y();
-	ScalarType x2z=z2*q.z(), y2z=y2*q.z(), z2z=z2*q.z();
+template<typename Scalar> void quaterniontoGLMatrix(const Quaternion<Scalar>& q, Scalar m[16]){
+	Scalar w2=2.*q.w(), x2=2.*q.x(), y2=2.*q.y(), z2=2.*q.z();
+	Scalar x2w=w2*q.w(), y2w=y2*q.w(), z2w=z2*q.w();
+	Scalar x2x=x2*q.x(), y2x=y2*q.x(), z2x=z2*q.x();
+	Scalar x2y=y2*q.y(), y2y=y2*q.y(), z2y=z2*q.y();
+	Scalar x2z=z2*q.z(), y2z=y2*q.z(), z2z=z2*q.z();
 	m[0]=1.-(y2y+z2z); m[4]=y2x-z2w;      m[8]=z2x+y2w;       m[12]=0;
 	m[1]=y2x+z2w;      m[5]=1.-(x2x+z2z); m[9]=z2y-x2w;       m[13]=0;
 	m[2]=z2x-y2w;      m[6]=z2y+x2w;      m[10]=1.-(x2x+y2y); m[14]=0;
@@ -148,30 +191,29 @@ template<typename ScalarType> void quaterniontoGLMatrix(const Quaternion<ScalarT
 
 
 // se3
-template <class RealType>
+template <class Scalar>
 class Se3
 {
 	public :
-		Vector3<RealType>	position;
-		Quaternion<RealType>	orientation;
+		VECTOR3_TEMPLATE(Scalar)	position;
+		Quaternion<Scalar>	orientation;
 		Se3(){};
-		Se3(Vector3<RealType> rkP, Quaternion<RealType> qR){ position = rkP; orientation = qR; }
-		Se3(const Se3<RealType>& s){position = s.position;orientation = s.orientation;}
-		Se3(Se3<RealType>& a,Se3<RealType>& b){
+		Se3(VECTOR3_TEMPLATE(Scalar) rkP, Quaternion<Scalar> qR){ position = rkP; orientation = qR; }
+		Se3(const Se3<Scalar>& s){position = s.position;orientation = s.orientation;}
+		Se3(Se3<Scalar>& a,Se3<Scalar>& b){
 			position  = b.orientation.inverse()*(a.position - b.position);  
 			orientation = b.orientation.inverse()*a.orientation;
 		}
-		Se3<RealType> inverse(){ return Se3(-(orientation.inverse()*position), orientation.inverse());}
+		Se3<Scalar> inverse(){ return Se3(-(orientation.inverse()*position), orientation.inverse());}
 		void toGLMatrix(float m[16]){ orientation.toGLMatrix(m); m[12] = position[0]; m[13] = position[1]; m[14] = position[2];}
-		Vector3<RealType> operator * (const Vector3<RealType>& b ){return orientation*b+position;}
-		Se3<RealType> operator * (const Quaternion<RealType>& b ){return Se3<RealType>(position , orientation*b);}
-		Se3<RealType> operator * (const Se3<RealType>& b ){return Se3<RealType>(orientation*b.position+position,orientation*b.orientation);}
+		VECTOR3_TEMPLATE(Scalar) operator * (const VECTOR3_TEMPLATE(Scalar)& b ){return orientation*b+position;}
+		Se3<Scalar> operator * (const Quaternion<Scalar>& b ){return Se3<Scalar>(position , orientation*b);}
+		Se3<Scalar> operator * (const Se3<Scalar>& b ){return Se3<Scalar>(orientation*b.position+position,orientation*b.orientation);}
 };
 
 // functions
-template<typename ScalarType> ScalarType unitVectorsAngle(const Vector3<ScalarType>& a, const Vector3<ScalarType>& b){ return acos(a.dot(b)); }
+template<typename Scalar> Scalar unitVectorsAngle(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return acos(a.dot(b)); }
 // operators
-template<class ScalarType> Vector3<ScalarType> operator*(const Quaternion<ScalarType>& q, const Vector3<ScalarType>& v){ return q.rotate(v); /* check whether it converts to matrix internally, which is supposedly faster*/ }
 
 /*
  * typedefs
@@ -210,7 +252,7 @@ void serialize(Archive & ar, Vector2r & g, const unsigned int version){
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector2<int> & g, const unsigned int version){
+void serialize(Archive & ar, Vector2i & g, const unsigned int version){
 	int &x=g[0], &y=g[1];
 	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y);
 }
@@ -223,7 +265,7 @@ void serialize(Archive & ar, Vector3r & g, const unsigned int version)
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector3<int> & g, const unsigned int version){
+void serialize(Archive & ar, Vector3i & g, const unsigned int version){
 	int &x=g[0], &y=g[1], &z=g[2];
 	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
 }

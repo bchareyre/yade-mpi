@@ -84,14 +84,14 @@ inline void data_to_binary(vector<Type>& data, vector<unsigned char>& bin)
 }
 
 template< typename RealType>
-struct FundamentalHandler< Vector2<RealType> >
+struct FundamentalHandler< VECTOR2_TEMPLATE(RealType) >
 {
 	static void creator(Archive& ac, any& a)
 	{
 		if (a.type()==typeid(const string*)) // deserialization - reading from string to some Type
 		{
 			const string * tmpStr = any_cast<const string*>(a);
-			Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
+			VECTOR2_TEMPLATE(RealType) * tmp = any_cast<VECTOR2_TEMPLATE(RealType)*>(ac.getAddress());
 		
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
@@ -102,7 +102,7 @@ struct FundamentalHandler< Vector2<RealType> >
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
 			const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
-			Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
+			VECTOR2_TEMPLATE(RealType) * tmp = any_cast<VECTOR2_TEMPLATE(RealType)*>(ac.getAddress());
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
@@ -117,17 +117,17 @@ struct FundamentalHandler< Vector2<RealType> >
 		if (a.type()==typeid(string*)) // serialization - writing from Type to string
 		{
 			string * tmpStr = any_cast<string*>(a);
-			Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
+			VECTOR2_TEMPLATE(RealType) * tmp = any_cast<VECTOR2_TEMPLATE(RealType)*>(ac.getAddress());
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>(tmp->X())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
 					lexical_cast<string>(tmp->Y())			+
 					IOFormatManager::getCustomFundamentalClosingBracket();
 		}
-		else if (a.type()==typeid(vector<unsigned char>*)) // from Vector2<RealType> to binary stream
+		else if (a.type()==typeid(vector<unsigned char>*)) // from VECTOR2_TEMPLATE(RealType) to binary stream
 		{
 			vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
-			Vector2<RealType> * tmp = any_cast<Vector2<RealType>*>(ac.getAddress());
+			VECTOR2_TEMPLATE(RealType) * tmp = any_cast<VECTOR2_TEMPLATE(RealType)*>(ac.getAddress());
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
@@ -142,14 +142,14 @@ struct FundamentalHandler< Vector2<RealType> >
 
 
 template< typename RealType>
-struct FundamentalHandler< Vector3<RealType> >
+struct FundamentalHandler< VECTOR3_TEMPLATE(RealType) >
 {
 	static void creator(Archive& ac, any& a)
 	{
 		if (a.type()==typeid(const string*)) // deserialization - reading from string to some Type
 		{
 			const string * tmpStr = any_cast<const string*>(a);
-			Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
+			VECTOR3_TEMPLATE(RealType) * tmp = any_cast<VECTOR3_TEMPLATE(RealType)*>(ac.getAddress());
 			
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
@@ -161,7 +161,7 @@ struct FundamentalHandler< Vector3<RealType> >
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
 			const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
-			Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
+			VECTOR3_TEMPLATE(RealType) * tmp = any_cast<VECTOR3_TEMPLATE(RealType)*>(ac.getAddress());
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
@@ -177,7 +177,7 @@ struct FundamentalHandler< Vector3<RealType> >
 		if (a.type()==typeid(string*)) // serialization - writing to string from some Type
 		{
 			string * tmpStr = any_cast<string*>(a);
-			Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
+			VECTOR3_TEMPLATE(RealType) * tmp = any_cast<VECTOR3_TEMPLATE(RealType)*>(ac.getAddress());
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>(tmp->x())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
@@ -189,7 +189,7 @@ struct FundamentalHandler< Vector3<RealType> >
 		else if (a.type()==typeid(vector<unsigned char>*)) // from string to binary stream
 		{
 			vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
-			Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
+			VECTOR3_TEMPLATE(RealType) * tmp = any_cast<VECTOR3_TEMPLATE(RealType)*>(ac.getAddress());
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
@@ -205,33 +205,33 @@ struct FundamentalHandler< Vector3<RealType> >
 
 
 template< typename RealType>
-struct FundamentalHandler< Matrix3<RealType> >
+struct FundamentalHandler< MATRIX3_TEMPLATE(RealType) >
 {
 	static void creator(Archive& ac, any& a)
 	{
 		if (a.type()==typeid(const string*)) // deserialization - reading from string to some Type
 		{
 			const string * tmpStr = any_cast<const string*>(a);
-			Matrix3<RealType> * tmp = any_cast<Matrix3<RealType>*>(ac.getAddress());
+			MATRIX3_TEMPLATE(RealType) * tmp = any_cast<MATRIX3_TEMPLATE(RealType)*>(ac.getAddress());
 		
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			*tmp = Matrix3<RealType>(
-							lexical_cast_maybeNanInf<RealType>(tokens[0]),
-							lexical_cast_maybeNanInf<RealType>(tokens[1]),
-							lexical_cast_maybeNanInf<RealType>(tokens[2]),
-							lexical_cast_maybeNanInf<RealType>(tokens[3]),
-							lexical_cast_maybeNanInf<RealType>(tokens[4]),
-							lexical_cast_maybeNanInf<RealType>(tokens[5]),
-							lexical_cast_maybeNanInf<RealType>(tokens[6]),
-							lexical_cast_maybeNanInf<RealType>(tokens[7]),
-							lexical_cast_maybeNanInf<RealType>(tokens[8]));
+			*tmp = MATRIX3_TEMPLATE(RealType)();
+			(*tmp)(0,0)=lexical_cast_maybeNanInf<RealType>(tokens[0]);
+			(*tmp)(0,1)=lexical_cast_maybeNanInf<RealType>(tokens[1]);
+			(*tmp)(0,2)=lexical_cast_maybeNanInf<RealType>(tokens[2]);
+			(*tmp)(1,0)=lexical_cast_maybeNanInf<RealType>(tokens[3]);
+			(*tmp)(1,1)=lexical_cast_maybeNanInf<RealType>(tokens[4]);
+			(*tmp)(1,2)=lexical_cast_maybeNanInf<RealType>(tokens[5]);
+			(*tmp)(2,0)=lexical_cast_maybeNanInf<RealType>(tokens[6]);
+			(*tmp)(2,1)=lexical_cast_maybeNanInf<RealType>(tokens[7]);
+			(*tmp)(2,2)=lexical_cast_maybeNanInf<RealType>(tokens[8]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
 			const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
-			Matrix3<RealType> * tmp = any_cast<Matrix3<RealType>*>(ac.getAddress());
+			MATRIX3_TEMPLATE(RealType) * tmp = any_cast<MATRIX3_TEMPLATE(RealType)*>(ac.getAddress());
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
@@ -253,7 +253,7 @@ struct FundamentalHandler< Matrix3<RealType> >
 		if (a.type()==typeid(string*)) // serialization - writing from Type to string
 		{
 			string * tmpStr = any_cast<string*>(a);
-			Matrix3<RealType> * tmp = any_cast<Matrix3<RealType>*>(ac.getAddress());
+			MATRIX3_TEMPLATE(RealType) * tmp = any_cast<MATRIX3_TEMPLATE(RealType)*>(ac.getAddress());
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>((*tmp)(0,0))		+
 					IOFormatManager::getCustomFundamentalSeparator()	+
@@ -277,7 +277,7 @@ struct FundamentalHandler< Matrix3<RealType> >
 		else if (a.type()==typeid(vector<unsigned char>*)) // from Vector2<RealType> to binary stream
 		{
 			vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
-			Matrix3<RealType> * tmp = any_cast<Matrix3<RealType>*>(ac.getAddress());
+			MATRIX3_TEMPLATE(RealType) * tmp = any_cast<MATRIX3_TEMPLATE(RealType)*>(ac.getAddress());
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
@@ -312,7 +312,7 @@ struct FundamentalHandler< Quaternion<RealType> >
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
 			RealType angle;
-			Vector3<RealType> axis;
+			VECTOR3_TEMPLATE(RealType) axis;
 		
 			if (tokens.size()==3) // Quaternion is written as axis which norm is the angle in radian
 			{
@@ -402,8 +402,7 @@ struct FundamentalHandler< Se3<RealType> >
 			//IOFormatManager::parseFundamental(tokens[1], rotationTokens);
 		
 			RealType angle;
-			Vector3<RealType> axis;
-			Vector3<RealType> position;
+			VECTOR3_TEMPLATE(RealType) axis,position;
 			Quaternion<RealType> orientation;
 		
 			if (tokens.size()==6) // Quaternion is written as axis which norm is the angle in radian
@@ -456,7 +455,7 @@ struct FundamentalHandler< Se3<RealType> >
 			string * tmpStr = any_cast<string*>(a);
 			Se3<RealType> * tmp = any_cast<Se3<RealType>*>(ac.getAddress());
 		
-			Vector3<RealType> position;
+			VECTOR3_TEMPLATE(RealType) position;
 		
 			AngleAxis<RealType> aa(angleAxisFromQuat(tmp->orientation));
 			aa.axis().normalize();

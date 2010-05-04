@@ -112,7 +112,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 		Sg+=dV*(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25;
 	}
 	Vector3r centroid=Sg/V;
-	Matrix3r I(true); // inertia tensor for the composition; zero matrix initially
+	Matrix3r I(Matrix3r::Zero()); // inertia tensor for the composition; zero matrix initially
 		// I is purely geometrical (as if with unit density)
 	
 	// get total 
@@ -405,7 +405,7 @@ void TetraVolumetricLaw::action()
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
 	{
-		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3r(cm->color[0],cm->color[1],cm->color[2]));
 		glColor3v(cm->color);
 		Tetra* t=static_cast<Tetra*>(cm.get());
 		if (0) { // wireframe, as for Tetrahedron
@@ -505,7 +505,7 @@ Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v){
 		2*x2*y2+x3*y2+x4*y2+x1*y3+x2*y3+2*x3*y3+
 		x4*y3+x1*y4+x2*y4+x3*y4+2*x4*y4)/120.;
 
-	return Matrix3r(
+	return matrixFromElements(
 		a   , -b__, -c__,
 		-b__, b   , -a__,
 		-c__, -a__, c    );
@@ -568,8 +568,8 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 
 	// adjust orientation (local axes to principal axes)
 	Matrix3r I_old=TetrahedronInertiaTensor(tMold->v); //≡TetrahedronCentralInertiaTensor
-	Matrix3r I_rot(true), I_new(true); 
-	I_old.EigenDecomposition(I_rot,I_new);
+	Matrix3r I_rot(Matrix3r::Zero()), I_new(Matrix3r::Zero()); 
+	matrixEigenDecomposition(I_old,I_rot,I_new);
 	Quaternionr I_Qrot(I_rot);
 	//! @fixme from right to left: rotate by I_rot, then add original rotation (?!!)
 	rbp->se3.orientation=rbp->se3.orientation*I_Qrot;

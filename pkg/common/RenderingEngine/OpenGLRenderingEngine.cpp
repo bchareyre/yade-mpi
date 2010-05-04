@@ -115,7 +115,7 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling
 		bodyDisp[id].pos=cellPos; // point of reference (inside the cell for periodic)
-		if(scaleDisplacements) bodyDisp[id].pos+=diagMult(dispScale,pos-refPos); // add scaled translation to the point of reference
+		if(scaleDisplacements) bodyDisp[id].pos+=diagMult(dispScale,Vector3r(pos-refPos)); // add scaled translation to the point of reference
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
 			Quaternionr relRot=refOri.conjugate()*ori;
@@ -132,7 +132,7 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		Vector3r size=scene->cell->getSize();
-		if(dispScale!=Vector3r::Ones()) size+=diagMult(dispScale,size-scene->cell->refSize);
+		if(dispScale!=Vector3r::Ones()) size+=diagMult(dispScale,Vector3r(size-scene->cell->refSize));
 		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
 		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
 		glScalev(size);
@@ -222,7 +222,7 @@ void OpenGLRenderingEngine::renderAllInteractionsWire(){
 		shift2=scene->cell->shearPt(shift2);
 		Vector3r rel=Body::byId(i->getId2(),scene)->state->pos+shift2-p1;
 		if(scene->isPeriodic) p1=scene->cell->wrapShearedPt(p1);
-		glBegin(GL_LINES); glVertex3v(p1);glVertex3v(p1+rel);glEnd();
+		glBegin(GL_LINES); glVertex3v(p1);glVertex3v(Vector3r(p1+rel));glEnd();
 	}
 }
 
@@ -363,7 +363,7 @@ void OpenGLRenderingEngine::renderShape()
 			// traverse all periodic cells around the body, to see if any of them touches
 			Vector3r halfSize=b->bound->max-b->bound->min; halfSize*=.5;
 			Vector3r pmin,pmax;
-			Vector3<int> i;
+			Vector3i i;
 			for(i[0]=-1; i[0]<=1; i[0]++) for(i[1]=-1;i[1]<=1; i[1]++) for(i[2]=-1; i[2]<=1; i[2]++){
 				if(i[0]==0 && i[1]==0 && i[2]==0) continue; // middle; already rendered above
 				Vector3r pos2=pos+Vector3r(cellSize[0]*i[0],cellSize[1]*i[1],cellSize[2]*i[2]); // shift, but without shear!

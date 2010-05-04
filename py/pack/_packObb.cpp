@@ -42,7 +42,7 @@ void bestFitOBB(const std::vector<Vector3r>& pts, Vector3r& center, Vector3r& ha
 		for(Real x=angle0[0]-sweep; x<=angle0[0]+sweep; x+=stepSize){
 			for(Real y=angle0[1]-sweep; y<angle0[1]+sweep; y+=stepSize){
 				for(Real z=angle0[2]-sweep; z<angle0[2]+sweep; z+=stepSize){
-					Matrix3r rot0; rot0.FromEulerAnglesXYZ(x,y,z);
+					Matrix3r rot0=matrixFromEulerAnglesXYZ(x,y,z);
 					Real volume=computeOBB(pts,rot0,center0,halfSize0);
 					if(volume<bestVolume){
 						bestVolume=volume;

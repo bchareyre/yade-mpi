@@ -86,7 +86,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	}
 
 	// current cell coords of bodies
-	vector<Vector3<int> > oldCells; oldCells.resize(scene->bodies->size());
+	vector<Vector3i > oldCells; oldCells.resize(scene->bodies->size());
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b) continue; cell->wrapShearedPt(b->state->pos,oldCells[b->getId()]);
 	}
@@ -105,7 +105,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	cell->postProcessAttributes(/*deserializing*/true);
 
 	// new cell coords of bodies
-	vector<Vector3<int> > newCells; newCells.resize(scene->bodies->size());
+	vector<Vector3i > newCells; newCells.resize(scene->bodies->size());
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b) continue;
 		cell->wrapShearedPt(b->state->pos,newCells[b->getId()]);
@@ -1140,8 +1140,8 @@ void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real
     b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
     b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
 
-    if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
-    if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
+    if (Mathr::FAbs(b->cn) <= Mathr::ZERO_TOLERANCE ) b->cn=0;
+    if (Mathr::FAbs(b->cs) <= Mathr::ZERO_TOLERANCE ) b->cs=0;
 }
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale

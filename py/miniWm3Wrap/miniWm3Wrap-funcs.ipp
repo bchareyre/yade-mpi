@@ -15,7 +15,7 @@ void Matrix3_set_item_linear(Matrix3r & self, int idx, Real value){ IDX_CHECK(id
 
 Real Vector2_get_item(const Vector2r & self, int idx){ IDX_CHECK(idx,2); return self[idx]; }
 Real Vector3_get_item(const Vector3r & self, int idx){ IDX_CHECK(idx,3); return self[idx]; }
-Real Quaternion_get_item(const Quaternionr & self, int idx){ IDX_CHECK(idx,4); if(idx==0) return self.w(); if(idx==1) return self.x(); if(idx==2) return self.y(); if(idx==3) return self.z(); }
+Real Quaternion_get_item(const Quaternionr & self, int idx){ IDX_CHECK(idx,4); if(idx==0) return self.w(); if(idx==1) return self.x(); if(idx==2) return self.y(); return self.z(); }
 Real Matrix3_get_item(Matrix3r & self, boost::python::tuple _idx){ int idx[2]; int mx[2]={3,3}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); return self(idx[0],idx[1]); }
 Real Matrix3_get_item_linear(Matrix3r & self, int idx){ IDX_CHECK(idx,9); return self(idx/3,idx%3); }
 
@@ -56,4 +56,4 @@ struct custom_Vector3r_from_tuple{
 	}
 };
 
-
+using namespace Wm3;

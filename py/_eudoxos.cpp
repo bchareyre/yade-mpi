@@ -188,7 +188,7 @@ struct SpiralInteractionLocator2d{
 				// transformation matrix, to rotate to the plane
 				Vector3r ax(Vector3r::Zero()); ax[axis]=1.;
 				Quaternionr q(AngleAxisr(fi.theta,ax)); q=q.conjugate();
-				Matrix3r TT; q.toRotationMatrix(TT);
+				Matrix3r TT=q.toRotationMatrix();
 				//
 				Real d=(geom->se31.position-geom->se32.position).norm(); // current contact length
 				const Vector3r& n=TT*geom->normal;

@@ -155,7 +155,7 @@ void Clump::updateProperties(bool intersecting){
 		c: local clump coordinates */
 	double M=0; // mass
 	Vector3r Sg(0,0,0); // static moment
-	Matrix3r Ig(true /* fill with zeros */ ), Ic(true); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
+	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
 	//Se3r& mySe3(physicalParameters->se3);
 	//const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
 
@@ -210,7 +210,7 @@ void Clump::updateProperties(bool intersecting){
 	Matrix3r Ic_orientG=Clump::inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, state->pos); // inertia at clump's centroid but with world orientation
 	TRWM3MAT(Ic_orientG);
 
-	Matrix3r R_g2c(true); //rotation matrix
+	Matrix3r R_g2c(Matrix3r::Zero()); //rotation matrix
 	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
 	//TRWM3MAT(Ic_orientG);
 	matrixEigenDecomposition(Ic_orientG,R_g2c,Ic);
@@ -274,9 +274,9 @@ Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vec
 	//TRWM3VEC(off); TRVAR2(ooff,m); TRWM3MAT(I);
 	// translation away from centroid
 	/* I^c_jk=I'_jk-M*(delta_jk R.R - R_j*R_k) [http://en.wikipedia.org/wiki/Moments_of_inertia#Parallel_axes_theorem] */
-	I2+=m*Matrix3r(/* dIxx */ ooff-off[0]*off[0], /* dIxy */ -off[0]*off[1], /* dIxz */ -off[0]*off[2],
-		/* sym */ 0, /* dIyy */ ooff-off[1]*off[1], /* dIyz */ -off[1]*off[2],
-		/* sym */ 0, /* sym */ 0, /* dIzz */ ooff-off[2]*off[2]);
+	I2+=m*matrixFromElements(/* dIxx */ ooff-off[0]*off[0], /* dIxy */ -off[0]*off[1], /* dIxz */ -off[0]*off[2],
+		/* sym */ 0., /* dIyy */ ooff-off[1]*off[1], /* dIyz */ -off[1]*off[2],
+		/* sym */ 0., /* sym */ 0., /* dIzz */ ooff-off[2]*off[2]);
 	I2(1,0)=I2(0,1); I2(2,0)=I2(0,2); I2(2,1)=I2(1,2);
 	//TRWM3MAT(I2);
 	return I2;
@@ -301,8 +301,7 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I,const Matrix3r& T){
  * @return inertia tensor in new coordinates
  */
 Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
-	Matrix3r T;
-	rot.toRotationMatrix(T);
+	Matrix3r T=rot.toRotationMatrix();
 	return inertiaTensorRotate(I,T);
 }
 

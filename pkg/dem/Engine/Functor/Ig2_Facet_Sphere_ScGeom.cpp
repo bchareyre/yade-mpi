@@ -28,7 +28,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	/* could be written as (needs to be tested):
 	 * Vector3r cl=se31.orientation.Conjugate()*(se32.position-se31.position);
 	 */
-	Matrix3r facetAxisT; se31.orientation.toRotationMatrix(facetAxisT); 
+	Matrix3r facetAxisT=se31.orientation.toRotationMatrix(); 
 	Matrix3r facetAxis = facetAxisT.transpose();
 	// local orientation
 	Vector3r cl = facetAxis*(se32.position - se31.position);  // "contact line" in facet-local coords

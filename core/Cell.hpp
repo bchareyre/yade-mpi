@@ -63,7 +63,7 @@ class Cell: public Serializable{
 	/*! Return point inside periodic cell, even if shear is applied */
 	Vector3r wrapShearedPt(const Vector3r& pt){ return shearPt(wrapPt(unshearPt(pt))); }
 	/*! Return point inside periodic cell, even if shear is applied; store cell coordinates in period. */
-	Vector3r wrapShearedPt(const Vector3r& pt, Vector3<int>& period){ return shearPt(wrapPt(unshearPt(pt),period)); }
+	Vector3r wrapShearedPt(const Vector3r& pt, Vector3i& period){ return shearPt(wrapPt(unshearPt(pt),period)); }
 	/*! Apply inverse shear on point; to put it inside (unsheared) periodic cell, apply wrapPt on the returned value. */
 	Vector3r unshearPt(const Vector3r& pt){ return _unshearTrsf*pt; }
 	//! Apply shear on point. 
@@ -73,7 +73,7 @@ class Cell: public Serializable{
 		Vector3r ret; for(int i=0;i<3;i++) ret[i]=wrapNum(pt[i],_size[i]); return ret;
 	}
 	/*! Wrap point to inside the periodic cell; period will contain by how many cells it was wrapped. */
-	Vector3r wrapPt(const Vector3r pt, Vector3<int>& period)const{
+	Vector3r wrapPt(const Vector3r pt, Vector3i& period)const{
 		Vector3r ret; for(int i=0; i<3; i++){ ret[i]=wrapNum(pt[i],_size[i],period[i]); } return ret;
 	}
 	/*! Wrap number to interval 0…sz */
