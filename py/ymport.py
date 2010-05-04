@@ -106,13 +106,20 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaterni
 		data = line.split()
 		nodelistVector3[id] = qTemp.Rotate(Vector3(float(data[0])*scale,float(data[1])*scale,float(data[2])*scale))+Vector3(shift[0],shift[1],shift[2])
 		id += 1
-	numTriangles = int(lines[numNodes+findVerticesString+2].split()[0])
+
+	
+	findTriangleString=findVerticesString+numNodes
+	while (lines[findTriangleString].split()[0]<>'Triangles'): #Find the string with the number of Triangles
+		findTriangleString+=1
+	findTriangleString+=1
+	numTriangles = int(lines[findTriangleString].split()[0])
+
 	triList = []
 	for i in range(numTriangles):
 		triList.append([0,0,0,0])
 	
 	tid = 0
-	for line in lines[numNodes+findVerticesString+3:numNodes+findVerticesString+3+numTriangles]:
+	for line in lines[findTriangleString+1:findTriangleString+numTriangles+1]:
 		data = line.split()
 		id1 = int(data[0])-1
 		id2 = int(data[1])-1
