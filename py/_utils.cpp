@@ -431,7 +431,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("inscribedCircleCenter",inscribedCircleCenter,(py::arg("v1"),py::arg("v2"),py::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
 	py::def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	py::def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(py::args("useMaxForce")));
-	py::def("kineticEnergy",Shop__kineticEnergy);
+	py::def("kineticEnergy",Shop__kineticEnergy,"Compute overall kinetic energy of the simulation as\n\n.. math:: \\sum\\frac{1}{2}\\left(m_i\\vec{v}_i^2+\\vec{\\omega}(\\mat{I}\\vec{\\omega}^T)\\right).\n\n.. warning::\n\n\tNo transformation of inertia tensor (in local frame) $\\mat{I}$ is done, although it is multiplied by angular velocity $\\vec{\\omega}$ (in global frame); the value will not be accurate for aspherical particles.\n");
 	py::def("sumForces",sumForces);
 	py::def("sumTorques",sumTorques);
 	py::def("sumFacetNormalForces",sumFacetNormalForces,(py::arg("axis")=-1));
