@@ -1,6 +1,14 @@
 // © 2010 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
+#if 0 // broken, do not use
+// optimize as much as possible even in the debug mode (effective?)
+#if defined(__GNUG__) && __GNUC__ >= 4 && __GNUC_MINOR__ >=4
+	#pragma GCC push_options
+	#pragma GCC optimize "2"
+#endif
+#endif
+
 #ifdef QUAD_PRECISION
 	typedef long double quad;
 	typedef quad Real;
@@ -20,11 +28,11 @@
 	#define EIGEN_DONT_VECTORIZE
 	#define EIGEN_DONT_ALIGN
 	#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
-	#include<Eigen/Core>
-	#include<Eigen/Geometry>
-	#include<Eigen/QR>
-	#include<Eigen/LU>
-	#include<float.h>
+		#include<Eigen/Core>
+		#include<Eigen/Geometry>
+		#include<Eigen/QR>
+		#include<Eigen/LU>
+		#include<float.h>
 	// USING_PART_OF_NAMESPACE_EIGEN
 	//using namespace eigen; // for eigen3
 	// 
@@ -296,4 +304,9 @@ void serialize(Archive & ar, Matrix3r & m, const unsigned int version){
 
 #endif /* __GCCXML */
 
-
+#if 0
+// revert optimization options back
+#if defined(__GNUG__) && __GNUC__ >= 4 && __GNUC_MINOR__ >=4
+	#pragma GCC pop_options
+#endif
+#endif
