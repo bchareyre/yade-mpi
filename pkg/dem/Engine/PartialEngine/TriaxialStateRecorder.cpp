@@ -17,6 +17,7 @@
 #include <boost/lexical_cast.hpp>
 #include <yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/FrictPhys.hpp>
+#include <yade/pkg-dem/Shop.hpp>
 
 CREATE_LOGGER(TriaxialStateRecorder);
 TriaxialStateRecorder::~TriaxialStateRecorder() {};
@@ -24,19 +25,13 @@ TriaxialStateRecorder::~TriaxialStateRecorder() {};
 void TriaxialStateRecorder::action ()
 {
 	// at the beginning of the file; write column titles
-	if(out.tellp()==0){
-		out<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE"<<endl;
-	}
-
-	if ( !triaxialStressController )
-	{
+	if(out.tellp()==0)	out<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE"<<endl;
+	
+	if ( !triaxialStressController ){
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
 		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
-		for ( ;itFirst!=itLast; ++itFirst )
-		{
-
-			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" || ( *itFirst )->getClassName() == "ThreeDTriaxialEngine" )
-			{
+		for ( ;itFirst!=itLast; ++itFirst ){
+			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" || ( *itFirst )->getClassName() == "ThreeDTriaxialEngine" ){
 				LOG_DEBUG ( "stress controller engine found" );
 				triaxialStressController =  YADE_PTR_CAST<TriaxialStressController> ( *itFirst );
 				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
@@ -47,22 +42,15 @@ void TriaxialStateRecorder::action ()
 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialStressController->computeStressStrainInterval == 0 ) )
 		triaxialStressController->computeStressStrain ();
 
-	/// Compute kinetic energy and porosity :
-
-	Real Vs=0, kinematicE = 0;
+	/// Compute porosity :
+	Real Vs=0;
 	Real V = ( triaxialStressController->height ) * ( triaxialStressController->width ) * ( triaxialStressController->depth );
-
 	BodyContainer::iterator bi = scene->bodies->begin();
 	BodyContainer::iterator biEnd = scene->bodies->end();
-
-	for ( ; bi!=biEnd; ++bi )
-	{
+	for ( ; bi!=biEnd; ++bi ){
 		const shared_ptr<Body>& b = *bi;
 		if ( b->isDynamic ){
 			const Vector3r& v = b->state->vel;
-			kinematicE +=
-				0.5* ( b->state->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
-
 			Vs += 1.3333333*Mathr::PI*pow ( YADE_PTR_CAST<Sphere>( b->shape)->radius, 3 );}
 	}
 	porosity = ( V - Vs ) /V;
@@ -76,9 +64,8 @@ void TriaxialStateRecorder::action ()
  	<< lexical_cast<string> ( triaxialStressController->strain[2] ) << " "
  	<< lexical_cast<string> ( triaxialStressController->ComputeUnbalancedForce () ) << " "
  	<< lexical_cast<string> ( porosity ) << " "
- 	<< lexical_cast<string> ( kinematicE )
+ 	<< lexical_cast<string> ( Shop::kineticEnergy() )
  	<< endl;
 }
-
 
 YADE_PLUGIN((TriaxialStateRecorder));
