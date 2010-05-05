@@ -7,7 +7,7 @@ Basic functionality of Omega, such as accessing bodies, materials, interactions.
 import unittest
 import random
 from yade.wrapper import *
-from miniWm3Wrap import *
+from miniEigen import *
 from yade._customConverters import *
 from yade import utils
 from yade import *

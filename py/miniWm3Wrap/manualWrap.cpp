@@ -6,6 +6,8 @@
 #include<sstream>
 
 #include<yade/lib-base/Math.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
+
 
 namespace bp=boost::python;
 
@@ -45,9 +47,9 @@ int Quaternionr_len(){return 4;}
 int Matrix3r_len(){return 9;}
 #undef IDX_CHECK
 
-// automagic converters from tuple to Vector{2,3}{r,i}
-struct custom_Vector3r_from_tuple{
-	custom_Vector3r_from_tuple(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector3r>()); }
+// automagic converters from sequence (list, tuple, …) to Vector{2,3}{r,i}
+struct custom_Vector3r_from_sequence{
+	custom_Vector3r_from_sequence(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector3r>()); }
 	static void* convertible(PyObject* obj_ptr){ if(!PySequence_Check(obj_ptr) || PySequence_Size(obj_ptr)!=3) return 0;	return obj_ptr; }
 	static void construct(PyObject* obj_ptr, bp::converter::rvalue_from_python_stage1_data* data){
 		void* storage=((bp::converter::rvalue_from_python_storage<Vector3r>*)(data))->storage.bytes;
@@ -55,8 +57,8 @@ struct custom_Vector3r_from_tuple{
 		data->convertible=storage;
 	}
 };
-struct custom_Vector3i_from_tuple{
-	custom_Vector3i_from_tuple(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector3i>()); }
+struct custom_Vector3i_from_sequence{
+	custom_Vector3i_from_sequence(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector3i>()); }
 	static void* convertible(PyObject* obj_ptr){ if(!PySequence_Check(obj_ptr) || PySequence_Size(obj_ptr)!=3) return 0;	return obj_ptr; }
 	static void construct(PyObject* obj_ptr, bp::converter::rvalue_from_python_stage1_data* data){
 		void* storage=((bp::converter::rvalue_from_python_storage<Vector3i>*)(data))->storage.bytes;
@@ -64,8 +66,8 @@ struct custom_Vector3i_from_tuple{
 		data->convertible=storage;
 	}
 };
-struct custom_Vector2r_from_tuple{
-	custom_Vector2r_from_tuple(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector2r>()); }
+struct custom_Vector2r_from_sequence{
+	custom_Vector2r_from_sequence(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector2r>()); }
 	static void* convertible(PyObject* obj_ptr){ if(!PySequence_Check(obj_ptr) || PySequence_Size(obj_ptr)!=2) return 0;	return obj_ptr; }
 	static void construct(PyObject* obj_ptr, bp::converter::rvalue_from_python_stage1_data* data){
 		void* storage=((bp::converter::rvalue_from_python_storage<Vector2r>*)(data))->storage.bytes;
@@ -73,8 +75,8 @@ struct custom_Vector2r_from_tuple{
 		data->convertible=storage;
 	}
 };
-struct custom_Vector2i_from_tuple{
-	custom_Vector2i_from_tuple(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector2i>()); }
+struct custom_Vector2i_from_sequence{
+	custom_Vector2i_from_sequence(){	bp::converter::registry::push_back(&convertible,&construct,bp::type_id<Vector2i>()); }
 	static void* convertible(PyObject* obj_ptr){ if(!PySequence_Check(obj_ptr) || PySequence_Size(obj_ptr)!=2) return 0;	return obj_ptr; }
 	static void construct(PyObject* obj_ptr, bp::converter::rvalue_from_python_stage1_data* data){
 		void* storage=((bp::converter::rvalue_from_python_storage<Vector2i>*)(data))->storage.bytes;
@@ -124,37 +126,48 @@ EIG_OP1(Matrix3r,__neg__,-)
 EIG_OP2(Matrix3r,__add__,+,Matrix3r) EIG_OP2_INPLACE(Matrix3r,__iadd__,+=,Matrix3r)
 EIG_OP2(Matrix3r,__sub__,-,Matrix3r) EIG_OP2_INPLACE(Matrix3r,__isub__,-=,Matrix3r)
 EIG_OP2(Matrix3r,__mul__,*,Real) EIG_OP2(Matrix3r,__rmul__,*,Real) EIG_OP2_INPLACE(Matrix3r,__imul__,*=,Real)
+EIG_OP2(Matrix3r,__mul__,*,int) EIG_OP2(Matrix3r,__rmul__,*,int) EIG_OP2_INPLACE(Matrix3r,__imul__,*=,int)
 EIG_OP2(Matrix3r,__mul__,*,Vector3r) EIG_OP2(Matrix3r,__rmul__,*,Vector3r)
 EIG_OP2(Matrix3r,__mul__,*,Matrix3r)
 EIG_OP2(Matrix3r,__div__,/,Real) EIG_OP2_INPLACE(Matrix3r,__idiv__,/=,Real)
+EIG_OP2(Matrix3r,__div__,/,int) EIG_OP2_INPLACE(Matrix3r,__idiv__,/=,int)
 
 EIG_OP1(Vector3r,__neg__,-);
 EIG_OP2(Vector3r,__add__,+,Vector3r); EIG_OP2_INPLACE(Vector3r,__iadd__,+,Vector3r)
 EIG_OP2(Vector3r,__sub__,-,Vector3r); EIG_OP2_INPLACE(Vector3r,__isub__,-,Vector3r)
-EIG_OP2(Vector3r,__mul__,*,Real) EIG_OP2(Vector3r,__rmul__,*,Real)
-EIG_OP2(Vector3r,__div__,/,Real) EIG_OP2_INPLACE(Vector3r,__idiv__,/=,Real)
+EIG_OP2(Vector3r,__mul__,*,Real) EIG_OP2(Vector3r,__rmul__,*,Real) EIG_OP2_INPLACE(Vector3r,__imul__,*=,Real) EIG_OP2(Vector3r,__div__,/,Real) EIG_OP2_INPLACE(Vector3r,__idiv__,/=,Real)
+EIG_OP2(Vector3r,__mul__,*,int) EIG_OP2(Vector3r,__rmul__,*,int) EIG_OP2_INPLACE(Vector3r,__imul__,*=,int) EIG_OP2(Vector3r,__div__,/,int) EIG_OP2_INPLACE(Vector3r,__idiv__,/=,int)
 
 EIG_OP1(Vector3i,__neg__,-);
 EIG_OP2(Vector3i,__add__,+,Vector3i); EIG_OP2_INPLACE(Vector3i,__iadd__,+,Vector3i)
 EIG_OP2(Vector3i,__sub__,-,Vector3i); EIG_OP2_INPLACE(Vector3i,__isub__,-,Vector3i)
-EIG_OP2(Vector3i,__mul__,*,int) EIG_OP2(Vector3i,__rmul__,*,int)
+EIG_OP2(Vector3i,__mul__,*,int) EIG_OP2(Vector3i,__rmul__,*,int)  EIG_OP2_INPLACE(Vector3i,__imul__,*=,int)
 
 EIG_OP1(Vector2r,__neg__,-);
 EIG_OP2(Vector2r,__add__,+,Vector2r); EIG_OP2_INPLACE(Vector2r,__iadd__,+,Vector2r)
 EIG_OP2(Vector2r,__sub__,-,Vector2r); EIG_OP2_INPLACE(Vector2r,__isub__,-,Vector2r)
-EIG_OP2(Vector2r,__mul__,*,Real) EIG_OP2(Vector2r,__rmul__,*,Real)
-EIG_OP2(Vector2r,__div__,/,Real) EIG_OP2_INPLACE(Vector2r,__idiv__,/=,Real)
+EIG_OP2(Vector2r,__mul__,*,Real) EIG_OP2(Vector2r,__rmul__,*,Real) EIG_OP2_INPLACE(Vector2r,__imul__,*=,Real) EIG_OP2(Vector2r,__div__,/,Real) EIG_OP2_INPLACE(Vector2r,__idiv__,/=,Real)
+EIG_OP2(Vector2r,__mul__,*,int) EIG_OP2(Vector2r,__rmul__,*,int) EIG_OP2_INPLACE(Vector2r,__imul__,*=,int) EIG_OP2(Vector2r,__div__,/,int) EIG_OP2_INPLACE(Vector2r,__idiv__,/=,int)
 
 EIG_OP1(Vector2i,__neg__,-);
 EIG_OP2(Vector2i,__add__,+,Vector2i); EIG_OP2_INPLACE(Vector2i,__iadd__,+,Vector2i)
 EIG_OP2(Vector2i,__sub__,-,Vector2i); EIG_OP2_INPLACE(Vector2i,__isub__,-,Vector2i)
-EIG_OP2(Vector2i,__mul__,*,int) EIG_OP2(Vector2i,__rmul__,*,int)
+EIG_OP2(Vector2i,__mul__,*,int)  EIG_OP2_INPLACE(Vector2i,__imul__,*=,int) EIG_OP2(Vector2i,__rmul__,*,int)
 
 
-BOOST_PYTHON_MODULE(miniWm3Wrap){
-	bp::class_<Matrix3r >("Matrix3",bp::init<>())
+BOOST_PYTHON_MODULE(miniEigen){
+	bp::scope().attr("__doc__")="Basic math functions for Yade: small matrix, vector and quaternion classes. This module internally wraps small parts of the `Eigen <http://eigen.tuxfamily.org>`_ library. Refer to its documentation for details.";
+
+	YADE_SET_DOCSTRING_OPTS;
+
+	custom_Vector3r_from_sequence();
+	custom_Vector3i_from_sequence();
+	custom_Vector2r_from_sequence();
+	custom_Vector2i_from_sequence();
+
+	bp::class_<Matrix3r>("Matrix3","3x3 float matrix.\n\nSupported operations (``m`` is a Matrix3, ``f`` if a float/int, ``v`` is a Vector3): ``-m``, ``m+m``, ``m+=m``, ``m-m``, ``m-=m``, ``m*f``, ``f*m``, ``m*=f``, ``m/f``, ``m/=f``, ``m*m``, ``m*v``, ``v*m``, ``m==m``, ``m!=m``.",bp::init<>())
 		.def(bp::init<Matrix3r const &>((bp::arg("m"))))
-		.def("__init__",bp::make_constructor(&Matrix3r_fromElements)) //,(bp::arg("m00"),bp::arg("m01"),bp::arg("m02"),bp::arg("m10"),bp::arg("m11"),bp::arg("m12"),bp::arg("m20"),bp::arg("m21"),bp::arg("m22"))))
+		.def("__init__",bp::make_constructor(&Matrix3r_fromElements,bp::default_call_policies(),(bp::arg("m00"),bp::arg("m01"),bp::arg("m02"),bp::arg("m10"),bp::arg("m11"),bp::arg("m12"),bp::arg("m20"),bp::arg("m21"),bp::arg("m22"))))
 		//
 		.def("determinant",&Matrix3r::determinant)
 		.def("inverse",&Matrix3r_inverse)
@@ -164,9 +177,11 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__add__",&Matrix3r__add__Matrix3r).def("__iadd__",&Matrix3r__iadd__Matrix3r)
 		.def("__sub__",&Matrix3r__sub__Matrix3r).def("__isub__",&Matrix3r__isub__Matrix3r)
 		.def("__mul__",&Matrix3r__mul__Real).def("__rmul__",&Matrix3r__rmul__Real).def("__imul__",&Matrix3r__imul__Real)
+		.def("__mul__",&Matrix3r__mul__int).def("__rmul__",&Matrix3r__rmul__int).def("__imul__",&Matrix3r__imul__int)
 		.def("__mul__",&Matrix3r__mul__Vector3r).def("__rmul__",&Matrix3r__rmul__Vector3r)
 		.def("__mul__",&Matrix3r__mul__Matrix3r)
 		.def("__div__",&Matrix3r__div__Real).def("__idiv__",&Matrix3r__idiv__Real)
+		.def("__div__",&Matrix3r__div__int).def("__idiv__",&Matrix3r__idiv__int)
 		.def(bp::self == bp::self)
 		.def(bp::self != bp::self)
 		//
@@ -175,16 +190,16 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__setitem__",&::Matrix3r_set_item_linear).def("__getitem__",&::Matrix3r_get_item_linear)
 		.def_readonly("Identity",&Matrix3r_Identity).def_readonly("Zero",&Matrix3r_Zero)
 		// wm3 compat
-		.def_readonly("IDENTITY",&Matrix3r_Identity).def_readonly("ZERO",&Matrix3r_Zero).def("Determinant",&Matrix3r::determinant).def("Inverse",&Matrix3r_inverse).def("Transpose",&Matrix3r_transpose)
-		.def("FromAxisAngle",&Matrix3r_fromAxisAngle)
+		.def_readonly("IDENTITY",&Matrix3r_Identity,"|ydeprecated|").def_readonly("ZERO",&Matrix3r_Zero,"|ydeprecated|").def("Determinant",&Matrix3r::determinant,"|ydeprecated|").def("Inverse",&Matrix3r_inverse,"|ydeprecated|").def("Transpose",&Matrix3r_transpose,"|ydeprecated|")
+		.def("FromAxisAngle",&Matrix3r_fromAxisAngle,"|ydeprecated|")
 	;
-	bp::class_<Quaternionr>("Quaternion",bp::init<>())
-		.def("__init__",bp::make_constructor(&Quaternionr_fromAxisAngle))
-		.def("__init__",bp::make_constructor(&Quaternionr_fromAngleAxis))
+	bp::class_<Quaternionr>("Quaternion","Quaternion representing rotation.\n\nSupported operations (``q`` is a Quaternion, ``v`` is a Vector3): ``q*q`` (rotation composition), ``q*=q``, ``q*v`` (rotating ``v`` by ``q``), ``q==q``, ``q!=q``.",bp::init<>())
+		.def("__init__",bp::make_constructor(&Quaternionr_fromAxisAngle,bp::default_call_policies(),(bp::arg("axis"),bp::arg("angle"))))
+		.def("__init__",bp::make_constructor(&Quaternionr_fromAngleAxis,bp::default_call_policies(),(bp::arg("angle"),bp::arg("axis"))))
 		.def(bp::init<Quaternionr>((bp::arg("other"))))
 		.def("setFromTwoVectors",&Quaternionr_setFromTwoVectors,((bp::arg("v1"),bp::arg("v2"))))
 		.def("conjugate",&Quaternionr::conjugate)
-		.def("toAxisAngle",&Quaternionr_toAxisAngle).def("toAngleAxis",&Quaternionr_toAxisAngle)
+		.def("toAxisAngle",&Quaternionr_toAxisAngle).def("toAngleAxis",&Quaternionr_toAngleAxis)
 		.def("Rotate",&Quaternionr_Rotate,((bp::arg("v"))))
 		.def("inverse",&Quaternionr::inverse)
 		.def("norm",&Quaternionr::norm)
@@ -199,12 +214,13 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__setitem__",&::Quaternionr_set_item).def("__getitem__",&::Quaternionr_get_item)
 		.def("__str__",&::Quaternionr_str).def("__repr__",&::Quaternionr_str)
 		.def_readonly("Identity",&Quaternionr_Identity)
+		.def("toAxisAngle",&Quaternionr_toAxisAngle).def("toAngleAxis",&Quaternionr_toAxisAngle)
 		// wm3 compat
-		.def("Align",&Quaternionr_setFromTwoVectors,((bp::arg("v1"),bp::arg("v2")))).def("Conjugate",&Quaternionr::conjugate).def("Inverse",&Quaternionr::inverse).def("Length",&Quaternionr::norm).def("Normalize",&Quaternionr::normalize).def_readonly("IDENTITY",&Quaternionr_Identity)
-		.def("ToAxisAngle",&Quaternionr_toAxisAngle).def("ToAngleAxis",&Quaternionr_toAxisAngle)
+		.def("Align",&Quaternionr_setFromTwoVectors,((bp::arg("v1"),bp::arg("v2"))),"|ydeprecated|").def("Conjugate",&Quaternionr::conjugate,"|ydeprecated|").def("Inverse",&Quaternionr::inverse,"|ydeprecated|").def("Length",&Quaternionr::norm,"|ydeprecated|").def("Normalize",&Quaternionr::normalize,"|ydeprecated|").def_readonly("IDENTITY",&Quaternionr_Identity)
+		.def("ToAxisAngle",&Quaternionr_toAxisAngle,"|ydeprecated|").def("ToAngleAxis",&Quaternionr_toAxisAngle)
 		//.def("Rotate",&Quaternionr::rotate,((bp::arg("v"))))
 	;
-	bp::class_<Vector3r>("Vector3",bp::init<>())
+	bp::class_<Vector3r>("Vector3","3-dimensional float vector.\n\nSupported operatrions (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion from sequence (list,tuple, …) of 3 floats.",bp::init<>())
 		.def(bp::init<Vector3r>((bp::arg("other"))))
 		.def(bp::init<Real,Real,Real>((bp::arg("x"),bp::arg("y"),bp::arg("z"))))
 		// properties
@@ -219,16 +235,18 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__sub__",&Vector3r__sub__Vector3r).def("__isub__",&Vector3r__isub__Vector3r) // -, -=
 		.def("__mul__",&Vector3r__mul__Real).def("__rmul__",&Vector3r__rmul__Real) // f*v, v*f
 		.def("__div__",&Vector3r__div__Real).def("__idiv__",&Vector3r__idiv__Real) // v/f, v/=f
+		.def("__mul__",&Vector3r__mul__int).def("__rmul__",&Vector3r__rmul__int) // f*v, v*f
+		.def("__div__",&Vector3r__div__int).def("__idiv__",&Vector3r__idiv__int) // v/f, v/=f
 		.def(bp::self != bp::self).def(bp::self == bp::self)
 		// specials
 		.def("__len__",&::Vector3r_len).staticmethod("__len__")
 		.def("__setitem__",&::Vector3r_set_item).def("__getitem__",&::Vector3r_get_item)
 		.def("__str__",&::Vector3r_str).def("__repr__",&::Vector3r_str)
 		// wm3 compat
-		.def("Dot",&Vector3r_dot).def("Cross",&Vector3r_cross).def("Length",&Vector3r::norm).def("SquaredLength",&Vector3r::squaredNorm).def("Normalize",&Vector3r::normalize)
-		.def_readonly("ONE",&Vector3r_Ones).def_readonly("ZERO",&Vector3r_Zero).def_readonly("UNIT_X",&Vector3r_UnitX).def_readonly("UNIT_Y",&Vector3r_UnitY).def_readonly("UNIT_Z",&Vector3r_UnitZ)
+		.def("Dot",&Vector3r_dot,"|ydeprecated|").def("Cross",&Vector3r_cross,"|ydeprecated|").def("Length",&Vector3r::norm,"|ydeprecated|").def("SquaredLength",&Vector3r::squaredNorm,"|ydeprecated|").def("Normalize",&Vector3r::normalize,"|ydeprecated|")
+		.def_readonly("ONE",&Vector3r_Ones,"|ydeprecated|").def_readonly("ZERO",&Vector3r_Zero,"|ydeprecated|").def_readonly("UNIT_X",&Vector3r_UnitX,"|ydeprecated|").def_readonly("UNIT_Y",&Vector3r_UnitY,"|ydeprecated|").def_readonly("UNIT_Z",&Vector3r_UnitZ,"|ydeprecated|")
 	;	
-	bp::class_<Vector3i>("Vector3i",bp::init<>())
+	bp::class_<Vector3i>("Vector3i","3-dimensional integer vector.\n\nSupported operatrions (``i`` if an int, ``v`` is a Vector3i): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*i``, ``i*v``, ``v*=i``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence  (list,tuple, …) of 3 integers.",bp::init<>())
 		.def(bp::init<Vector3i>((bp::arg("other"))))
 		.def(bp::init<int,int,int>((bp::arg("x"),bp::arg("y"),bp::arg("z"))))
 		// properties
@@ -248,10 +266,10 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__setitem__",&::Vector3i_set_item).def("__getitem__",&::Vector3i_get_item)
 		.def("__str__",&::Vector3i_str).def("__repr__",&::Vector3i_str)
 		// wm3 compat
-		.def("Dot",&Vector3i_dot).def("Cross",&Vector3i_cross).def("Length",&Vector3i::norm).def("SquaredLength",&Vector3r::squaredNorm)
-		.def_readonly("ONE",&Vector3i_Ones).def_readonly("ZERO",&Vector3i_Zero).def_readonly("UNIT_X",&Vector3i_UnitX).def_readonly("UNIT_Y",&Vector3i_UnitY).def_readonly("UNIT_Z",&Vector3i_UnitZ)
+		.def("Dot",&Vector3i_dot,"|ydeprecated|").def("Cross",&Vector3i_cross,"|ydeprecated|").def("Length",&Vector3i::norm,"|ydeprecated|").def("SquaredLength",&Vector3r::squaredNorm,"|ydeprecated|")
+		.def_readonly("ONE",&Vector3i_Ones,"|ydeprecated|").def_readonly("ZERO",&Vector3i_Zero,"|ydeprecated|").def_readonly("UNIT_X",&Vector3i_UnitX,"|ydeprecated|").def_readonly("UNIT_Y",&Vector3i_UnitY,"|ydeprecated|").def_readonly("UNIT_Z",&Vector3i_UnitZ,"|ydeprecated|")
 	;	
-	bp::class_<Vector2r>("Vector2",bp::init<>())
+	bp::class_<Vector2r>("Vector2","3-dimensional float vector.\n\nSupported operatrions (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list,tuple, …) of 2 floats.",bp::init<>())
 		.def(bp::init<Vector2r>((bp::arg("other"))))
 		.def(bp::init<Real,Real>((bp::arg("x"),bp::arg("y"))))
 		// properties
@@ -266,16 +284,18 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__sub__",&Vector2r__sub__Vector2r).def("__isub__",&Vector2r__isub__Vector2r) // -, -=
 		.def("__mul__",&Vector2r__mul__Real).def("__rmul__",&Vector2r__rmul__Real) // f*v, v*f
 		.def("__div__",&Vector2r__div__Real).def("__idiv__",&Vector2r__idiv__Real) // v/f, v/=f
+		.def("__mul__",&Vector2r__mul__int).def("__rmul__",&Vector2r__rmul__int) // f*v, v*f
+		.def("__div__",&Vector2r__div__int).def("__idiv__",&Vector2r__idiv__int) // v/f, v/=f
 		.def(bp::self != bp::self).def(bp::self == bp::self)
 		// specials
 		.def("__len__",&::Vector2r_len).staticmethod("__len__")
 		.def("__setitem__",&::Vector2r_set_item).def("__getitem__",&::Vector2r_get_item)
 		.def("__str__",&::Vector2r_str).def("__repr__",&::Vector2r_str)
 		// wm3 compat
-		.def("Dot",&Vector2r_dot).def("Length",&Vector2r::norm).def("SquaredLength",&Vector2r::squaredNorm).def("Normalize",&Vector2r::normalize)
-		.def_readonly("ONE",&Vector2r_Ones).def_readonly("ZERO",&Vector2r_Zero).def_readonly("UNIT_X",&Vector2r_UnitX).def_readonly("UNIT_Y",&Vector2r_UnitY)
+		.def("Dot",&Vector2r_dot,"|ydeprecated|").def("Length",&Vector2r::norm,"|ydeprecated|").def("SquaredLength",&Vector2r::squaredNorm,"|ydeprecated|").def("Normalize",&Vector2r::normalize)
+		.def_readonly("ONE",&Vector2r_Ones,"|ydeprecated|").def_readonly("ZERO",&Vector2r_Zero,"|ydeprecated|").def_readonly("UNIT_X",&Vector2r_UnitX,"|ydeprecated|").def_readonly("UNIT_Y",&Vector2r_UnitY)
 	;	
-	bp::class_<Vector2i>("Vector2i",bp::init<>())
+	bp::class_<Vector2i>("Vector2i","2-dimensional integer vector.\n\nSupported operatrions (``i`` if an int, ``v`` is a Vector2i): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*i``, ``i*v``, ``v*=i``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list,tuple, …) of 2 integers.",bp::init<>())
 		.def(bp::init<Vector2i>((bp::arg("other"))))
 		.def(bp::init<int,int>((bp::arg("x"),bp::arg("y"))))
 		// properties
@@ -295,8 +315,8 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__setitem__",&::Vector2i_set_item).def("__getitem__",&::Vector2i_get_item)
 		.def("__str__",&::Vector2i_str).def("__repr__",&::Vector2i_str)
 		// wm3 compat
-		.def("Dot",&Vector2i_dot).def("Length",&Vector2i::norm).def("SquaredLength",&Vector2i::squaredNorm).def("Normalize",&Vector2i::normalize)
-		.def_readonly("ONE",&Vector2i_Ones).def_readonly("ZERO",&Vector2i_Zero).def_readonly("UNIT_X",&Vector2i_UnitX).def_readonly("UNIT_Y",&Vector2i_UnitY)
+		.def("Dot",&Vector2i_dot,"|ydeprecated|").def("Length",&Vector2i::norm,"|ydeprecated|").def("SquaredLength",&Vector2i::squaredNorm,"|ydeprecated|").def("Normalize",&Vector2i::normalize)
+		.def_readonly("ONE",&Vector2i_Ones,"|ydeprecated|").def_readonly("ZERO",&Vector2i_Zero,"|ydeprecated|").def_readonly("UNIT_X",&Vector2i_UnitX,"|ydeprecated|").def_readonly("UNIT_Y",&Vector2i_UnitY)
 	;	
 	
 };

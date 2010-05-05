@@ -21,7 +21,7 @@ from numpy import arange
 from math import sqrt
 from yade import utils
 
-from miniWm3Wrap import *
+from miniEigen import *
 from yade.wrapper import *
 
 

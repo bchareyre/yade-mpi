@@ -40,6 +40,8 @@
 
 using namespace boost::python;
 
+// will be removed later
+#ifndef YADE_NOWM3
 struct custom_Vector3r_from_seq{
 	custom_Vector3r_from_seq(){
 		 converter::registry::push_back(&convertible,&construct,type_id<Vector3r>());
@@ -61,6 +63,9 @@ struct custom_vector3i_to_seq{
 		return incref(ret.ptr());
 	}
 };
+#endif
+
+// move this to the miniEigen wrapper later
 
 /* two-way se3 handling */
 struct custom_se3_to_tuple{
@@ -135,10 +140,12 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(_customConverters){
 	// class_<std::vector<int> >("vecInt").def(indexing::container_suite<std::vector<int> >());
-	custom_Vector3r_from_seq(); // Vector3r is wrapped, it is returned as a Vector3 instance; no to-python converter needed
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
 	// Vector3i to python (not implemented the other way around yet)
+#ifndef YADE_NOWM3
+	custom_Vector3r_from_seq(); // Vector3r is wrapped, it is returned as a Vector3 instance; no to-python converter needed
 	custom_vector3i_to_seq(); to_python_converter<Vector3i,custom_vector3i_to_seq>();
+#endif
 	// StrArrayMap (typedef for std::map<std::string,numpy_boost>) → python dictionary
 	//custom_StrArrayMap_to_dict();
 	// register from-python converter and to-python converter

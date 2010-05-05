@@ -183,7 +183,7 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 	
 	Scalar fields contain 'val' (value from *extractor*), vector fields have 'valX' and 'valY' (2 components returned by the *extractor*).
 	"""
-	from miniWm3Wrap import Vector3
+	from miniEigen import Vector3
 	xx,yy,dd1,dd2,rr=[],[],[],[],[]
 	nDim=0
 	for b in O.bodies:

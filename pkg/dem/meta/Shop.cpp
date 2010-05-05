@@ -504,6 +504,8 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t
 	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines or inside InteractionDispatchers.");
 	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines or inside InteractionDispatchers.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
+	if(!b1) throw runtime_error(("No body #"+lexical_cast<string>(id1)).c_str());
+	if(!b2) throw runtime_error(("No body #"+lexical_cast<string>(id2)).c_str());
 	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2,/*force*/force);
 	assert(force && i);
 	if(!i) return i;

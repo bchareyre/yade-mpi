@@ -3,7 +3,7 @@ Import geometry from various formats ('import' is python keyword, hence the name
 """
 
 from yade.wrapper import *
-from miniWm3Wrap import *
+from miniEigen import *
 from yade import utils
 
 

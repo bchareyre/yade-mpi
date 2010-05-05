@@ -17,7 +17,7 @@ static boost::python::tuple ToAxisAngle_2c4febac34e606b4a98de72d9f8161c9( Quater
     return bp::make_tuple(aa.axis(),aa.angle());
 }
 
-BOOST_PYTHON_MODULE(miniWm3Wrap){
+BOOST_PYTHON_MODULE(miniEigen){
     { //Matrix3< double >
         typedef bp::class_< Matrix3< double > > Matrix3_exposer_t;
         Matrix3_exposer_t Matrix3_exposer = Matrix3_exposer_t( "Matrix3", bp::init< bp::optional< bool > >(( bp::arg("bZero")=(bool)(true) )) );

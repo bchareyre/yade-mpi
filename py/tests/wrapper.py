@@ -8,7 +8,7 @@ but also for other classes that we wrap (like Wm3).
 
 import unittest
 from yade.wrapper import *
-from miniWm3Wrap import *
+from miniEigen import *
 from yade._customConverters import *
 from math import *
 from yade import system

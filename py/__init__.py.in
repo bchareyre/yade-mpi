@@ -59,12 +59,13 @@ globals().update(deprecatedTypes)
 # declare what should be imported for "from yade import *"
 __all__=deprecatedTypes.keys()+['O']
 # fake miniWm3 and wrapper being in yade itself
-import miniWm3Wrap,wrapper
-from miniWm3Wrap import *
+from miniEigen import *
 from wrapper import *
+# import to separate namespace to be able to call dir(miniEigen) and dir(wrapper) below
+import miniEigen,wrapper 
 # out-of-class docstrings for some classes
 import _extraDocs
 # import a few "important" modules along with *
 import utils # some others?
-__all__+=['utils',]+dir(miniWm3Wrap)+dir(wrapper)
+__all__+=['utils',]+dir(miniEigen)+dir(wrapper)
 

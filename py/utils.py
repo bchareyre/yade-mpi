@@ -12,7 +12,7 @@ Devs: please DO NOT ADD more functions here, it is getting too crowded!
 import math,random
 from yade import *
 from yade.wrapper import *
-from miniWm3Wrap import *
+from miniEigen import *
 try: # use psyco if available
 	import psyco
 	psyco.full()
