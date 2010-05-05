@@ -67,12 +67,12 @@ O.engines=[
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
-	),
+	),	
 	GravityEngine(gravity=(0,0,-50)), # gravity artificially high, to make it faster going ;-)
+	NewtonIntegrator(damping=.3),
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-20,subscribedBodies=millIds),
 	SnapshotEngine(iterPeriod=30,fileBase='/tmp/mill-',viewNo=0,label='snapshooter'),
 	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/millVTK-')
-	NewtonIntegrator(damping=.3),
 ]
 
 O.saveTmp()
