@@ -97,6 +97,7 @@ void TriaxialStressController::action()
 		spheresVolume = 0;
 		for ( ; bi!=biEnd; ++bi )
 		{
+			if((*bi)->isClump()) continue;
 			const shared_ptr<Body>& b = *bi;
 			if ( b->isDynamic )
 			{
