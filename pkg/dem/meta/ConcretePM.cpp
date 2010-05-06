@@ -133,7 +133,12 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 
 
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
-	#include"../../../../brefcom-mm.hh"
+	// assure interoperability with older version
+	#define SquaredLength squaredNorm
+	#define Length norm
+		#include"../../../../brefcom-mm.hh"
+	#undef SquaredLength
+	#undef Length
 #endif
 
 

@@ -116,7 +116,7 @@ def initTest():
 	global mode
 	print "init"
 	if O.iter>0:
-		O.wait();
+		O.pause(); O.wait();
 		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
 	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
@@ -148,7 +148,7 @@ def stopIfDamaged():
 			mode='compression'
 			O.save('/tmp/uniax-tension.xml.bz2')
 			print "Saved /tmp/uniax-tension.xml.bz2 (for use with interaction-histogram.py and uniax-post.py)"
-			print "Damaged, switching to compression... "; O.pause()
+			print "Damaged, switching to compression... "
 			# important! initTest must be launched in a separate thread;
 			# otherwise O.load would wait for the iteration to finish,
 			# but it would wait for initTest to return and deadlock would result

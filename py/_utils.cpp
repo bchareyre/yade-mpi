@@ -403,8 +403,8 @@ shared_ptr<Interaction> Shop__createExplicitInteraction(body_id_t id1, body_id_t
 
 //Vector3r Shop__scalarOnColorScale(Real scalar){ return Shop::scalarOnColorScale(scalar);}
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
+Real Shop__unbalancedForce(bool useMaxForce /*false by default*/){return Shop::unbalancedForce(useMaxForce);}
 py::tuple Shop__totalForceInVolume(){Real stiff; Vector3r ret=Shop::totalForceInVolume(stiff); return py::make_tuple(ret,stiff); }
 
 BOOST_PYTHON_MODULE(_utils){
@@ -430,7 +430,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("elasticEnergy",elasticEnergyInAABB);
 	py::def("inscribedCircleCenter",inscribedCircleCenter,(py::arg("v1"),py::arg("v2"),py::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
 	py::def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
-	py::def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(py::args("useMaxForce")));
+	py::def("unbalancedForce",&Shop__unbalancedForce,(py::args("useMaxForce")=false),"Compute the ratio of mean (or maximum, if *useMaxForce*) summary force on bodies and maximum force magnitude on interactions. For perfectly static equilibrium, summary force on all bodies is zero (since forces from interactions cancel out and induce no acceleration of particles); this ratio will tend to zero as simulation stabilizes, though zero is never reached because of finite precision computation. Sufficiently small value can be e.g. 1e-2 or smaller, depending on how much equilibrium it should be.");
 	py::def("kineticEnergy",Shop__kineticEnergy,"Compute overall kinetic energy of the simulation as\n\n.. math:: \\sum\\frac{1}{2}\\left(m_i\\vec{v}_i^2+\\vec{\\omega}(\\mat{I}\\vec{\\omega}^T)\\right).\n\n.. warning::\n\n\tNo transformation of inertia tensor (in local frame) $\\mat{I}$ is done, although it is multiplied by angular velocity $\\vec{\\omega}$ (in global frame); the value will not be accurate for aspherical particles.\n");
 	py::def("sumForces",sumForces);
 	py::def("sumTorques",sumTorques);
