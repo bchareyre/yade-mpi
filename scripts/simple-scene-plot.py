@@ -37,7 +37,7 @@ from yade import plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)
 ## 2. i as function of t on left y-axis ('|||' makes the separation) and z_sph, v_sph (as green circles connected with line) and z_sph_half again as function of t
-plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'),'z_sph_half')}
+plot.plots={'i':('t'),'t':('z_sph',None,('v_sph','go-'),'z_sph_half')}
 
 ## this function is called by plotDataCollector
 ## it should add data with the labels that we will plot
@@ -45,7 +45,7 @@ plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'),'z_sph_half')}
 def myAddPlotData():
 	sph=O.bodies[1]
 	## store some numbers under some labels
-	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sqrt(sum([v**2 for v in sph.state['vel']])))
+	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sph.state.vel.Length())
 
 O.run(int(2./O.dt),True);
 print "Now calling plot.plot() to show the figures (close them to continue)."

@@ -16,6 +16,10 @@ Facet::~Facet()
 
 void Facet::postProcessAttributes(bool deserializing)
 {
+	// if this fails, it means someone did vertices push_back, but they are resized to 3 at Facet initialization already
+	// in the future, a fixed-size array should be used instead of vector<Vector3r> for vertices
+	// this is prevented by yade::serialization now IIRC
+	assert(vertices.size()==3); 
     if (deserializing)
     {
 		Vector3r e[3] = {vertices[1]-vertices[0] ,vertices[2]-vertices[1] ,vertices[0]-vertices[2]};

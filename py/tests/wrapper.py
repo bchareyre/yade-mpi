@@ -3,7 +3,7 @@
 
 """
 This test module covers python/c++ transitions, for both classes deriving from Serializable,
-but also for other classes that we wrap (like Wm3).
+but also for other classes that we wrap (like miniEigen).
 """
 
 import unittest
@@ -66,7 +66,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assertRaises(AttributeError,lambda: Sphere(attributeThatDoesntExist=42))
 		self.assertRaises(AttributeError,lambda: Sphere().attributeThatDoesntExist)
 	
-class TestWm3Wrapper(unittest.TestCase):
+class TestEigenWrapper(unittest.TestCase):
 	def assertSeqAlmostEqual(self,v1,v2):
 		"floating-point comparison of vectors/quaterions"
 		self.assertEqual(len(v1),len(v2));

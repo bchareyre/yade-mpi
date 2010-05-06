@@ -11,13 +11,12 @@ import matplotlib
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
-"Global dictionary containing all data values, common for all plots, in the form {'name':[value,...],...}. Data should be added using plot.addData function. All [value,...] columns have the same length, they are padded with NaN if unspecified."
 data={}
-"dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')"
+"Global dictionary containing all data values, common for all plots, in the form {'name':[value,...],...}. Data should be added using plot.addData function. All [value,...] columns have the same length, they are padded with NaN if unspecified."
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
-"Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
+"dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')"
 labels={}
-#plotLines={} # dictionary x-name -> Line2d objects (that hopefully still correspond to yspec in plots)
+"Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
 
 def reset():
 	"Reset all plot-related variables (data, plots, labels)"
@@ -91,11 +90,12 @@ def plot(noShow=False):
 	"""
 	if not noShow: pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
 	for p in plots:
+		p=p.strip()
 		pylab.figure()
 		plots_p=[_addPointTypeSpecifier(o) for o in _tuplifyYAxis(plots[p])]
 		plots_p_y1,plots_p_y2=[],[]; y1=True
 		for d in plots_p:
-			if d[0]=='|||':
+			if d[0]=='|||' or d[0]==None:
 				y1=False; continue
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
@@ -160,7 +160,7 @@ Returns name fo the gnuplot file created.
 	if not extension: extension=term
 	i=0
 	for p in plots:
-		# print p
+		p=p.strip()
 		plots_p=[_addPointTypeSpecifier(o) for o in _tuplifyYAxis(plots[p])]
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
@@ -170,7 +170,7 @@ Returns name fo the gnuplot file created.
 		if title: fPlot.write("set title '%s'\n"%title)
 		y1=True; plots_y1,plots_y2=[],[]
 		for d in plots_p:
-			if d[0]=='|||':
+			if d[0]=='|||' or d[0]==None:
 				y1=False; continue
 			if y1: plots_y1.append(d)
 			else: plots_y2.append(d)

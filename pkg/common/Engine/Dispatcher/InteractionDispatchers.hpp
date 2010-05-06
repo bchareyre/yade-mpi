@@ -18,7 +18,7 @@ class InteractionDispatchers: public GlobalEngine {
 		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds[omp_get_thread_num()].push_back(idPair(id1,id2)); }
 	#else
 		list<idPair> eraseAfterLoopIds;
-		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds.push_back(id_pair(id1,id2)); }
+		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds.push_back(idPair(id1,id2)); }
 	#endif
 	public:
 		virtual void action();

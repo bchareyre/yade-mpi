@@ -36,7 +36,7 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 		iFacet->color    = Vector3r(0.8,0.3,0.3);
 		for (int j=0; j<3; ++j)
 		{   
-				iFacet->vertices.push_back(v[j]-icc);
+				iFacet->vertices[j]=v[j]-icc;
 		}
 		//iFacet->postProcessAttributes(true); //postProcessAttributes is protected
 		shared_ptr<Body> b(new Body());
