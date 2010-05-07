@@ -569,7 +569,11 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
 def NormalRestitution2DampingRate(en):
-	"""Compute the normal damping rate as a function of the normal coefficient of restitution. """
+	r"""Compute the normal damping rate as a function of the normal coefficient of restitution $e_n$. For $e_n\in\langle0,1\rangle$ damping rate equals
+	
+	.. math:: -\frac{\log e_n}{\sqrt{e_n^2+\pi^2}}
+
+	"""
 	if en == 0.0: return 0.999999999
 	if en == 1.0: return 0.0
 	from math import sqrt,log,pi
