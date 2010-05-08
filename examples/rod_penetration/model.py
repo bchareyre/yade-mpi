@@ -16,7 +16,7 @@ mesh = 'coarse'
 o=Omega() 
 
 ## Import geometry 
-#rod = O.bodies.append(ymport.stl('rod-'+mesh+'.stl',wire=True))
+rod = O.bodies.append(ymport.stl('rod-'+mesh+'.stl',wire=True))
 
 # Spheres
 sphereRadius = 0.01
@@ -78,6 +78,10 @@ import sys,time
 
 print "Start simulation: " + mesh
 nbIter=10000
+
+from yade import qt
+qt.View()
+
 for t in xrange(2):
 	start=time.time();o.run(nbIter);o.wait();finish=time.time() 
 	speed=nbIter/(finish-start); print '%g iter/sec\n'%speed

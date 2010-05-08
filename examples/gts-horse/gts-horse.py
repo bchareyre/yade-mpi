@@ -44,10 +44,14 @@ O.engines=[
 	GravityEngine(gravity=[0,0,-1e4]),
 	NewtonIntegrator(damping=.1)
 ]
-collider['sweepLength'],collider['nBins'],collider['binCoeff']=.1*dim0/30.5,10,2
+collider.sweepLength,collider.nBins,collider.binCoeff=.1*dim0/30.5,10,2
 O.dt=1.5*utils.PWaveTimeStep()
 O.saveTmp()
 O.timingEnabled=True
+
+from yade import qt
+qt.View()
+
 from yade import timing
 O.run(10000,True)
 timing.stats()

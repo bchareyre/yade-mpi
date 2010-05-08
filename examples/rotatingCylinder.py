@@ -1,7 +1,8 @@
+#encoding:UTF-8
 """The script demonstrates rotating cylinder, created with GTS-help (http://gts.sourceforge.net/).
 Inside the cylinder there are a "cloud" of spheres."""
 
-# encoding: utf-8
+
 cylHt,cylRd=1,.2
 nSpheres=2e4
 

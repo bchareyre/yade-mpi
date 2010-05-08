@@ -44,8 +44,8 @@ O.bodies.append(utils.facetBox((0,lengthKnife/2,radiusKnife),(lengthKnife*4,leng
 colorsph1=Vector3(120,234,150);
 colorsph2=Vector3(1,1,0);
 
-colorsph1.Normalize();
-colorsph2.Normalize();
+colorsph1.normalize();
+colorsph2.normalize();
 colorSph=colorsph1
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
 	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))

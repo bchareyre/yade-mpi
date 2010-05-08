@@ -12,7 +12,7 @@ For examples, see
 * :ysrc:`scripts/test/gts-random-pack.py`
 * :ysrc:`scripts/test/pack-cloud.py`
 * :ysrc:`scripts/test/pack-predicates.py`
-* :ysrc:`scripts/test/regular-sphere-pack.py`
+* :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`
 
 """
 
@@ -93,7 +93,7 @@ class inGtsSurface_py(Predicate):
 
 class inSpace(Predicate):
 	"""Predicate returning True for any points, with infinite bounding box."""
-	def __init__(self, _center=Vector3().ZERO): self._center=_center
+	def __init__(self, _center=Vector3().Zero): self._center=_center
 	def aabb(self):
 		inf=float('inf'); return Vector3(-inf,-inf,-inf),Vector3(inf,inf,inf)
 	def center(self): return self._center
@@ -132,7 +132,7 @@ If threshold is given (>0), then
 	if threshold>0: # replace edges of zero length with None; their faces will be skipped
 		def fixEdges(edges):
 			for i,e in enumerate(edges):
-				if (Vector3(e.v1.x,e.v1.y,e.v1.z)-Vector3(e.v2.x,e.v2.y,e.v2.z)).Length()<threshold: edges[i]=None
+				if (Vector3(e.v1.x,e.v1.y,e.v1.z)-Vector3(e.v2.x,e.v2.y,e.v2.z)).norm()<threshold: edges[i]=None
 		for ee in sectEdges: fixEdges(ee)
 		for ee in interSectEdges: fixEdges(ee)
 	surf=gts.Surface()
@@ -162,7 +162,7 @@ def gtsSurfaceBestFitOBB(surf):
 	pts=[Vector3(v.x,v.y,v.z) for v in surf.vertices()]
 	return cloudBestFitOBB(tuple(pts))
 
-def revolutionSurfaceMeridians(sects,angles,origin=Vector3().ZERO,orientation=Quaternion().Identity):
+def revolutionSurfaceMeridians(sects,angles,origin=Vector3().Zero,orientation=Quaternion().Identity):
 	"""Revolution surface given sequences of 2d points and sequence of corresponding angles,
 	returning sequences of 3d points representing meridian sections of the revolution surface.
 	The 2d sections are turned around z-axis, but they can be transformed
@@ -302,7 +302,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 			if isPeri and wantPeri:
 				sp.cellSize=(X,Y,Z); sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2])); sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
 			sp.scale(scale);
-			if orientation: sp.rotate(*orientation.ToAxisAngle())
+			if orientation: sp.rotate(*orientation.toAxisAngle())
 			return filterSpherePack(predicate,sp,material=material)
 		print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
 		sys.stdout.flush()
@@ -354,7 +354,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 	if wantPeri: sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]))
 	if orientation:
 		sp.cellSize=(0,0,0); # reset periodicity to avoid warning when rotating periodic packing
-		sp.rotate(*orientation.ToAxisAngle())
+		sp.rotate(*orientation.toAxisAngle())
 	return filterSpherePack(predicate,sp,material=material,color=color)
 
 # compatibility with the deprecated name, can be removed in the future
@@ -383,7 +383,7 @@ def randomPeriPack(radius,rRelFuzz,initSize):
 	sp=SpherePack()
 	O.periodic=True
 	O.cell.refSize=Vector3(initSize)
-	sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,rRelFuzz,-1,True)
+	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True)
 	O.engines=[ForceResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))

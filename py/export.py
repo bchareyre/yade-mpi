@@ -124,7 +124,7 @@ def text(filename, consider=lambda id: True):
 	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
 	Non-spherical bodies are silently skipped.
 	Returns number of spheres which were written.
-	Example added to scripts/test/regular-sphere-pack.py
+	Example added to examples/regular-sphere-pack/regular-sphere-pack.py
 	"""
 	O=Omega()
 	

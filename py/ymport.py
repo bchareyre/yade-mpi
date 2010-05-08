@@ -80,7 +80,7 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaterni
 	:Returns: list of facets forming the specimen.
 	
 	mesh files can be easily created with `GMSH <http://www.geuz.org/gmsh/>`_.
-	Example added to :ysrc:`scripts/test/regular-sphere-pack.py`
+	Example added to :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`
 	
 	Additional examples of mesh-files can be downloaded from 
 	http://www-roc.inria.fr/gamma/download/download.php
@@ -155,7 +155,7 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	with given [Rmin:Rmax] with null stress inside the specimen.
 	Can be useful for Mining Rock simulation.
 	
-	Example: :ysrc:`scripts/test/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
+	Example: :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
 	
 	* https://answers.launchpad.net/esys-particle/+faq/877
 	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
@@ -190,7 +190,7 @@ def gengeo(mntable,shift=Vector3().Zero,scale=1.0,**kw):
 	with given [Rmin:Rmax] with null stress inside the specimen.
 	Can be useful for Mining Rock simulation.
 	
-	Example: :ysrc:`scripts/test/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
+	Example: :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
 	
 	* https://answers.launchpad.net/esys-particle/+faq/877
 	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html

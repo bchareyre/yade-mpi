@@ -19,7 +19,7 @@ Besides the (point,pad) operator, each predicate defines aabb() method that retu
 for the predicate.
 
 These classes are primarily used for yade.pack.* functions creating packings.
-See scripts/test/regular-sphere-pack.py for an example.
+See examples/regular-sphere-pack/regular-sphere-pack.py for an example.
 
 */
 
