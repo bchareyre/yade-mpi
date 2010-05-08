@@ -10,7 +10,6 @@
 
 #include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/core/Body.hpp>
-#include<Wm3Vector3.h>
 
 
 class KinemCTDEngine : public BoundaryController

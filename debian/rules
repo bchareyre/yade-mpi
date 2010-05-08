@@ -46,8 +46,6 @@ clean:
 	# scons clean
 	## remove builddirs and installation directories
 	rm -rf debian/build-* `find debian/ -name 'yade-*' -type d`
-	## keep this, it takes very little space and annoyingly wipes local configs
-	for f in scons.profile*; do mv $$f $$f~old; done
 	dh_clean 
 
 install: build
@@ -60,11 +58,11 @@ install: build
 	###   (a) use fakeroot-tcp instead of fakeroot
 	###   (b) use just 1 job
 	#debug build
-	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=4 linkStrategy=monolithic features=vtk,gts,log4cxx,opengl,openmp,eigen exclude=snow PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 march= debug=1 CPPPATH=/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4 jobs=1
+	NO_SCONS_GET_RECENT= scons profile=deb buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=4 linkStrategy=monolithic features=vtk,gts,log4cxx,opengl,openmp exclude=snow PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 march= debug=1 CPPPATH=/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2 jobs=1
 	#optimized build
-	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
+	NO_SCONS_GET_RECENT= scons profile=deb PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
 	#install platform-independent files (docs, scripts, examples)
-	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}-doc
+	NO_SCONS_GET_RECENT= scons profile=deb PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}-doc
 
 check: install
 	dh_testdir

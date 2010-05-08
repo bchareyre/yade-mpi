@@ -18,6 +18,9 @@ static boost::python::tuple ToAxisAngle_2c4febac34e606b4a98de72d9f8161c9( Quater
 }
 
 BOOST_PYTHON_MODULE(miniEigen){
+
+	std::cerr<<"WARN: Using deprecated Wm3-based math, soon to be removed. Recompile without the 'wm3' feature."<<std::endl;
+
     { //Matrix3< double >
         typedef bp::class_< Matrix3< double > > Matrix3_exposer_t;
         Matrix3_exposer_t Matrix3_exposer = Matrix3_exposer_t( "Matrix3", bp::init< bp::optional< bool > >(( bp::arg("bZero")=(bool)(true) )) );
@@ -246,6 +249,7 @@ BOOST_PYTHON_MODULE(miniEigen){
         Matrix3_exposer.def( bp::other< Real >() * bp::self );
         Matrix3_exposer.def("__len__",&::Matrix3_len).staticmethod("__len__")   .def("__setitem__",&::Matrix3_set_item)   .def("__getitem__",&::Matrix3_get_item)   .def("__str__",&::Matrix3_str)   .def("__repr__",&::Matrix3_str)  /* extras for matrices */ .def("__setitem__",&::Matrix3_set_item_linear).def("__getitem__",&::Matrix3_get_item_linear);
         Matrix3_exposer.add_property("ZERO",::Matrix3r_ZERO).add_property("IDENTITY",::Matrix3r_IDENTITY);
+        Matrix3_exposer.add_property("Zero",::Matrix3r_ZERO).add_property("Identity",::Matrix3r_IDENTITY);
     }
 
     { //Quaternion< double >
@@ -474,6 +478,7 @@ BOOST_PYTHON_MODULE(miniEigen){
         Quaternion_exposer.def( bp::self_ns::str( bp::self ) );
         Quaternion_exposer.def("__len__",&::Quaternion_len).staticmethod("__len__").def("__setitem__",&::Quaternion_set_item).def("__getitem__",&::Quaternion_get_item).def("__str__",&::Quaternion_str).def("__repr__",&::Quaternion_str);
         Quaternion_exposer.add_property("IDENTITY",::Quaternionr_IDENTITY);
+        Quaternion_exposer.add_property("Identity",::Quaternionr_IDENTITY);
     }
 
     { //Vector2< double >
@@ -575,6 +580,7 @@ BOOST_PYTHON_MODULE(miniEigen){
         Vector2_exposer.def( bp::other< Real >() * bp::self );
         Vector2_exposer.def("__len__",&::Vector2_len)   .staticmethod("__len__").def("__setitem__",&::Vector2_set_item)   .def("__getitem__",&::Vector2_get_item)   .def("__str__",&::Vector2_str)   .def("__repr__",&::Vector2_str);
         Vector2_exposer.add_property("ZERO",::Vector2r_ZERO).add_property("UNIT_X",::Vector2r_UNIT_X).add_property("UNIT_Y",::Vector2r_UNIT_Y).add_property("ONE",::Vector2r_ONE);
+        Vector2_exposer.add_property("Zero",::Vector2r_ZERO).add_property("UnitX",::Vector2r_UNIT_X).add_property("UnitY",::Vector2r_UNIT_Y).add_property("Ones",::Vector2r_ONE);
     }
 
     custom_Vector3r_from_tuple();
@@ -700,5 +706,6 @@ BOOST_PYTHON_MODULE(miniEigen){
         Vector3_exposer.def( bp::self_ns::str( bp::self ) );
         Vector3_exposer.def("__len__",&::Vector3_len)   .staticmethod("__len__").def("__setitem__",&::Vector3_set_item)   .def("__getitem__",&::Vector3_get_item)   .def("__str__",&::Vector3_str)   .def("__repr__",&::Vector3_str);
         Vector3_exposer.add_property("ZERO",::Vector3r_ZERO).add_property("UNIT_X",::Vector3r_UNIT_X).add_property("UNIT_Y",::Vector3r_UNIT_Y).add_property("UNIT_Z",::Vector3r_UNIT_Z).add_property("ONE",::Vector3r_ONE);
+        Vector3_exposer.add_property("Zero",::Vector3r_ZERO).add_property("UnitX",::Vector3r_UNIT_X).add_property("UnitY",::Vector3r_UNIT_Y).add_property("UnitZ",::Vector3r_UNIT_Z).add_property("Ones",::Vector3r_ONE);
     }
 }

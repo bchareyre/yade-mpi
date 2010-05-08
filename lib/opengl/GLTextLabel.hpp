@@ -9,7 +9,6 @@
 #pragma once
 
 #include "GLWindow.hpp"
-#include <Wm3Vector3.h>
 #include<yade/lib-base/Math.hpp>
 
 class GLTextLabel : public GLWindow

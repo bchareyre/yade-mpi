@@ -162,7 +162,7 @@ def gtsSurfaceBestFitOBB(surf):
 	pts=[Vector3(v.x,v.y,v.z) for v in surf.vertices()]
 	return cloudBestFitOBB(tuple(pts))
 
-def revolutionSurfaceMeridians(sects,angles,origin=Vector3().ZERO,orientation=Quaternion().IDENTITY):
+def revolutionSurfaceMeridians(sects,angles,origin=Vector3().ZERO,orientation=Quaternion().Identity):
 	"""Revolution surface given sequences of 2d points and sequence of corresponding angles,
 	returning sequences of 3d points representing meridian sections of the revolution surface.
 	The 2d sections are turned around z-axis, but they can be transformed
@@ -315,7 +315,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.cell.refSize
 		#print x1,y1,z1,radius,rRelFuzz
 		O.materials.append(FrictMat(young=3e10,density=2400))
-		num=sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,rRelFuzz,spheresInCell,True)
+		num=sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,spheresInCell,True)
 		O.engines=[ForceResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=5,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
 		O.materials.append(FrictMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))

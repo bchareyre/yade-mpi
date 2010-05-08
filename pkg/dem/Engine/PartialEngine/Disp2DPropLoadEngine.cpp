@@ -11,7 +11,7 @@
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/core/Scene.hpp>
-#include <yade/lib-miniWm3/Wm3Math.h>
+#include<yade/lib-base/Math.hpp>
 
 
 YADE_PLUGIN((Disp2DPropLoadEngine));

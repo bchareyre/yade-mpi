@@ -12,7 +12,6 @@
 #error "This build doesn't support openGL. Therefore, this header must not be used."
 #endif
 
-#include<Wm3Vector3.h>
 #include<yade/lib-base/Math.hpp>
 
 #include<GL/gl.h>

@@ -139,7 +139,7 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','eigen','nowm3','gl2ps','boost-serialization','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','wm3','gl2ps','boost-serialization','never_use_this_one']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -158,7 +158,6 @@ opts.AddVariables(
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
 	BoolVariable('brief',"Don't show commands being run, only what files are being compiled/linked/installed",True),
-	BoolVariable('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
 opts.Update(env)
@@ -217,7 +216,7 @@ env['buildDir']=buildDir
 # these MUST be first so that builddir's headers are read before any locally installed ones
 buildInc='$buildDir/include/yade-$version'
 env.Append(CPPPATH=[buildInc])
-if env['useMiniWm3']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
+if 'wm3' in env['features']: env.Append(CPPPATH=[buildInc+'/yade/lib-miniWm3'])
 #if env['useLocalQGLViewer']: env.Append(CPPPATH=[buildInc+'/yade/lib-QGLViewer'])
 
 env.SConsignFile(buildDir+'/scons-signatures')
@@ -341,13 +340,11 @@ if not env.GetOption('clean'):
 	env['haveForeach']=conf.CheckCXXHeader('boost/foreach.hpp','<>')
 	if not env['haveForeach']: print "(OK, local version will be used instead)"
 	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=1)
-	if not env['useMiniWm3']:
-		conf.env.Append(CPPPATH='/usr/include/wm3') # packaged version
-		ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 	ok&=(conf.CheckPython()
 		and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
 		and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
 		and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
+	ok&=conf.CheckCXXHeader('Eigen/Core')
 	# for installable stript's shebang ( http://en.wikipedia.org/wiki/Shebang_(Unix) )
 	env['pyExecutable']=sys.executable
 
@@ -385,19 +382,8 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		env.Append(CXXFLAGS='-frounding-math') # required by cgal, otherwise we get assertion failure at startup
 		if not ok: featureNotOK('cgal')
-	if 'eigen' in env['features']:
-		ok=conf.CheckCXXHeader('Eigen/Core')
-		ok=conf.CheckCXXHeader('Eigen/Array')
-		ok=conf.CheckCXXHeader('Eigen/Geometry')
-		ok=conf.CheckCXXHeader('Eigen/Cholesky')
-		ok=conf.CheckCXXHeader('Eigen/LU')
-		if not ok: featureNotOK('eigen',note="You might have to add eigen header directory (e.g. /usr/include/eigen2) to CPPPATH.")
-	if 'nowm3' in env['features'] and 'eigen' not in env['features']:
-		featureNotOK("You selected the 'nowm3' feature; you MUST also select the 'eigen' feature in such case.")
-	# moved to lib/base/Math.hpp instead
-	#if 'nowm3' in env['features']: env.Append(CPPDEFINES=['EIGEN_DONT_VECTORIZE','EIGEN_DONT_ALIGN','EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT'])
-
-	if env['useMiniWm3'] and not 'nowm3' in env['features']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
+	if 'wm3' in env['features']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
+	else: env.Append(LIBS='yade-support')
 
 	env.Append(CPPDEFINES=['YADE_'+f.upper().replace('-','_') for f in env['features']])
 

@@ -1,5 +1,5 @@
 #include<yade/lib-base/Math.hpp>
-#if defined(YADE_NOWM3) and defined(YADE_EIGEN)
+#ifndef YADE_WM3
 	template<> const Real Math<Real>::EPSILON = DBL_EPSILON;
 	template<> const Real Math<Real>::ZERO_TOLERANCE = 1e-20;
 	template<> const Real Math<Real>::MAX_REAL = DBL_MAX;

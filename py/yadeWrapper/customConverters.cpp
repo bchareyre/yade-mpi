@@ -41,7 +41,7 @@
 using namespace boost::python;
 
 // will be removed later
-#ifndef YADE_NOWM3
+#ifdef YADE_WM3
 struct custom_Vector3r_from_seq{
 	custom_Vector3r_from_seq(){
 		 converter::registry::push_back(&convertible,&construct,type_id<Vector3r>());
@@ -142,7 +142,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 	// class_<std::vector<int> >("vecInt").def(indexing::container_suite<std::vector<int> >());
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
 	// Vector3i to python (not implemented the other way around yet)
-#ifndef YADE_NOWM3
+#ifdef YADE_WM3
 	custom_Vector3r_from_seq(); // Vector3r is wrapped, it is returned as a Vector3 instance; no to-python converter needed
 	custom_vector3i_to_seq(); to_python_converter<Vector3i,custom_vector3i_to_seq>();
 #endif

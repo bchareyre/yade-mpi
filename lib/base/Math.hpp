@@ -22,7 +22,7 @@
 /*
  * use Eigen http://eigen.tuxfamily.org
  */
-#if defined(YADE_EIGEN) and defined(YADE_NOWM3)
+#ifndef YADE_WM3
 	// different macros for different versions of eigen:
 	//  http://bitbucket.org/eigen/eigen/issue/96/eigen_dont_align-doesnt-exist-in-205-but-appears-in-web
 	#define EIGEN_DONT_VECTORIZE
@@ -111,6 +111,8 @@
 	};
 	typedef Math<Real> Mathr;
 #else
+	// wm3 fallback
+
 	#include<Wm3Vector2.h>
 	#include<Wm3Vector3.h>
 	#include<Wm3Matrix3.h>

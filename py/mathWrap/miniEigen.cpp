@@ -1,6 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #include<boost/python.hpp>
 #include<boost/lexical_cast.hpp>
+#include<boost/algorithm/string/trim.hpp>
 #include<string>
 #include<stdexcept>
 #include<sstream>
@@ -115,10 +116,11 @@ static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ re
 #define WM3_COMPAT
 
 #ifdef WM3_COMPAT
-	#define WM3_OLD_METH0(klass,old,neww) static klass klass##_##old(){ std::cerr<<"WARN: "<<#klass<<"."<<#old<<" is deprecated, use "<<#klass<<"."<<#neww<<" instead"<<std::endl; return klass().neww(); }
-	#define WM3_OLD_METH1(klass,old,neww,ret)  static ret klass##_##old(klass& self){ std::cerr<<"WARN: "<<#klass<<"."<<#old<<" is deprecated, use "<<#klass<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(); return ret(); }
-	#define WM3_OLD_METH2(klass,klass2,old,neww,ret)  static ret klass##_##old(klass& self,const klass2& arg){ std::cerr<<"WARN: "<<#klass<<"."<<#old<<" is deprecated, use "<<#klass<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(arg); return ret(); }
-	#define WM3_OLD_METH3(klass,klass2,klass3,old,neww,ret)  static ret klass##_##old(klass& self,const klass2& arg1, const klass3& arg2){ std::cerr<<"WARN: "<<#klass<<"."<<#old<<" is deprecated, use "<<#klass<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(arg1,arg2); return ret(); }
+	#define _PYCLASS(klass) boost::algorithm::trim_right_copy_if(std::string(klass),boost::algorithm::is_any_of("r"))
+	#define WM3_OLD_METH0(klass,old,neww) static klass klass##_##old(){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; return klass().neww(); }
+	#define WM3_OLD_METH1(klass,old,neww,ret)  static ret klass##_##old(klass& self){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(); return ret(); }
+	#define WM3_OLD_METH2(klass,klass2,old,neww,ret)  static ret klass##_##old(klass& self,const klass2& arg){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(arg); return ret(); }
+	#define WM3_OLD_METH3(klass,klass2,klass3,old,neww,ret)  static ret klass##_##old(klass& self,const klass2& arg1, const klass3& arg2){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(arg1,arg2); return ret(); }
 	WM3_OLD_METH0(Matrix3r,IDENTITY,Identity)
 	WM3_OLD_METH0(Matrix3r,ZERO,Zero)
 	WM3_OLD_METH1(Matrix3r,Determinant,determinant,Real)

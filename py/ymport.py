@@ -65,7 +65,7 @@ def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
 	surf.translate(shift) 
 	yade.pack.gtsSurface2Facets(surf,**kw)
 
-def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaternion().IDENTITY,**kw):
+def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaternion().Identity,**kw):
 	""" Imports geometry from mesh file and creates facets.
 
 	:Parameters:
@@ -173,7 +173,7 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 		ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
-def gengeo(mntable,shift=Vector3().ZERO,scale=1.0,**kw):
+def gengeo(mntable,shift=Vector3().Zero,scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo library and creates spheres.
 
 	:Parameters:
