@@ -139,23 +139,26 @@ class pyTags{
 		pyTags(const shared_ptr<Scene> _mb): mb(_mb){}
 		const shared_ptr<Scene> mb;
 		bool hasKey(const string& key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
-		string getItem(string key){
+		string getItem(const string& key){
 			FOREACH(string& val, mb->tags){
-				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); algorithm::replace_all(val1,"~"," "); return val1;}
+				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); return val1;}
 			}
 			PyErr_SetString(PyExc_KeyError, "Invalid key.");
 			python::throw_error_already_set(); /* make compiler happy; never reached */ return string();
 		}
-		void setItem(string key,string newVal){
-			string item=algorithm::replace_all_copy(key+"="+newVal," ","~");
+		void setItem(const string& key,const string& item){
+			if(key.find("=")!=string::npos) {
+				PyErr_SetString(PyExc_KeyError, "Key must not contain the '=' character (implementation limitation; sorry).");
+				python::throw_error_already_set();
+			}
 			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=item; return; } }
-			mb->tags.push_back(item);
+			mb->tags.push_back(key+"="+item);
 			}
 		python::list keys(){
 			python::list ret;
 			FOREACH(string val, mb->tags){
 				size_t i=val.find("=");
-				if(i==string::npos) throw runtime_error("Tags must be in the key=value format");
+				if(i==string::npos) throw runtime_error("Tags must be in the key=value format (internal error?)");
 				algorithm::erase_tail(val,val.size()-i); ret.append(val);
 			}
 			return ret;
