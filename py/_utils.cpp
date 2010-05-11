@@ -85,7 +85,7 @@ Real elasticEnergyInAABB(py::tuple Aabb){
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
 		if(!i->interactionPhysics) continue;
 		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->interactionPhysics); if(!bc) continue;
-		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!bc){LOG_ERROR("NormShearPhys contact doesn't have SpheresContactGeomety associated?!"); continue;}
+		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!geom){LOG_ERROR("NormShearPhys contact doesn't have Dem3DofGeom associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -195,7 +195,6 @@ void highlightNone(){
 /*!Sum moments acting on given bodies
  *
  * @param ids is the calculated bodies ids
- * param mask is Body::groupMask that must match for a body to be taken in account.
  * @param axis is the direction of axis with respect to which the moment is calculated.
  * @param axisPt is a point on the axis.
  *
@@ -431,9 +430,9 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("inscribedCircleCenter",inscribedCircleCenter,(py::arg("v1"),py::arg("v2"),py::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
 	py::def("unbalancedForce",&Shop__unbalancedForce,(py::args("useMaxForce")=false),"Compute the ratio of mean (or maximum, if *useMaxForce*) summary force on bodies and maximum force magnitude on interactions. For perfectly static equilibrium, summary force on all bodies is zero (since forces from interactions cancel out and induce no acceleration of particles); this ratio will tend to zero as simulation stabilizes, though zero is never reached because of finite precision computation. Sufficiently small value can be e.g. 1e-2 or smaller, depending on how much equilibrium it should be.");
 	py::def("kineticEnergy",Shop__kineticEnergy,"Compute overall kinetic energy of the simulation as\n\n.. math:: \\sum\\frac{1}{2}\\left(m_i\\vec{v}_i^2+\\vec{\\omega}(\\mat{I}\\vec{\\omega}^T)\\right).\n\n.. warning::\n\n\tNo transformation of inertia tensor (in local frame) $\\mat{I}$ is done, although it is multiplied by angular velocity $\\vec{\\omega}$ (in global frame); the value will not be accurate for aspherical particles.\n");
-	py::def("sumForces",sumForces);
-	py::def("sumTorques",sumTorques);
-	py::def("sumFacetNormalForces",sumFacetNormalForces,(py::arg("axis")=-1));
+	py::def("sumForces",sumForces,(py::arg("ids"),py::arg("direction")),"Return summary force on bodies with given *ids*, projected on the *direction* vector.");
+	py::def("sumTorques",sumTorques,(py::arg("ids"),py::arg("axis"),py::arg("axisPt")),"Sum forces and torques on bodies given in *ids* with respect to axis specified by a point *axisPt* and its direction *axis*.");
+	py::def("sumFacetNormalForces",sumFacetNormalForces,(py::arg("ids"),py::arg("axis")=-1),"Sum force magnitudes on given bodies (must have :yref:`shape<Body.shape>` of the :yref:`Facet` type), considering only part of forces perpendicular to each :yref:`facet's<Facet>` face; if *axis* has positive value, then the specified axis (0=x, 1=y, 2=z) will be used instead of facet's normals.");
 	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
 	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
 	py::def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");

@@ -209,7 +209,7 @@ namespace yade{
 	/* called only at class registration, to set initial values; storage still has to be alocated in the cpp file! */ \
 	void initSetStaticAttributesValue(void){ BOOST_PP_SEQ_FOR_EACH(_STATATTR_SET,thisClass,attrs); } \
 	virtual void pyRegisterClass(python::object _scope) { if(!checkPyClassRegistersItself(#thisClass)) return; initSetStaticAttributesValue(); boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
-		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); \
+		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)); \
 		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
 	}
 

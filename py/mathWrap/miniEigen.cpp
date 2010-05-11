@@ -156,7 +156,7 @@ static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ re
 	WM3_OLD_METH1(Vector2r,SquaredLength,squaredNorm,Real)
 	WM3_OLD_METH2(Vector2r,Vector2r,Dot,dot,Real)
 
-	static void Matrix3r_fromAxisAngle(Matrix3r& self, const Vector3r& axis, const Real angle){ std::cerr<<"Matrix3.fromAxisAngle is deprecated, use constructor from Quaternion instead"<<std::endl; self=AngleAxisr(angle,axis).toRotationMatrix(); }
+	static void Matrix3r_fromAxisAngle(Matrix3r& self, const Vector3r& axis, const Real angle){ std::cerr<<"Matrix3.fromAxisAngle is deprecated, use Quaternion.toRotationMatrix instead"<<std::endl; self=AngleAxisr(angle,axis).toRotationMatrix(); }
 #endif
 
 #define EIG_WRAP_METH1(klass,meth) static klass klass##_##meth(const klass& self){ return self.meth(); }

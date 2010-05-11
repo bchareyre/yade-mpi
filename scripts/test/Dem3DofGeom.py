@@ -30,8 +30,8 @@ O.miscParams=[
 try:
 	from yade import qt
 	renderer=qt.Renderer()
-	renderer['Body_wire']=True
-	renderer['Interaction_geometry']=True
+	renderer.wire=True
+	renderer.intrGeom=True
 	qt.Controller()
 	qt.View()
 except ImportError: pass

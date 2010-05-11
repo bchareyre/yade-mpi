@@ -52,15 +52,14 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , Determinant_function_type( &Matrix3< double >::Determinant ) );
         
         }
-        { //Matrix3< double >::DiagonalTimes
+        { //Matrix3< double >::Determinant
         
             typedef Matrix3< double > exported_class_t;
-            typedef Matrix3< double > ( exported_class_t::*DiagonalTimes_function_type )( Vector3< double > const & ) const;
+            typedef double ( exported_class_t::*Determinant_function_type )(  ) const;
             
             Matrix3_exposer.def( 
-                "DiagonalTimes"
-                , DiagonalTimes_function_type( &Matrix3< double >::DiagonalTimes )
-                , ( bp::arg("rkDiag") ) );
+                "determinant"
+                , Determinant_function_type( &Matrix3< double >::Determinant ) );
         
         }
         { //Matrix3< double >::EigenDecomposition
@@ -86,39 +85,6 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , bp::return_self< >() );
         
         }
-        { //Matrix3< double >::GetColumn
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef Vector3< double > ( exported_class_t::*GetColumn_function_type )( int ) const;
-            
-            Matrix3_exposer.def( 
-                "GetColumn"
-                , GetColumn_function_type( &Matrix3< double >::GetColumn )
-                , ( bp::arg("iCol") ) );
-        
-        }
-        { //Matrix3< double >::GetColumnMajor
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*GetColumnMajor_function_type )( double * ) const;
-            
-            Matrix3_exposer.def( 
-                "GetColumnMajor"
-                , GetColumnMajor_function_type( &Matrix3< double >::GetColumnMajor )
-                , ( bp::arg("afCMajor") ) );
-        
-        }
-        { //Matrix3< double >::GetRow
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef Vector3< double > ( exported_class_t::*GetRow_function_type )( int ) const;
-            
-            Matrix3_exposer.def( 
-                "GetRow"
-                , GetRow_function_type( &Matrix3< double >::GetRow )
-                , ( bp::arg("iRow") ) );
-        
-        }
         { //Matrix3< double >::Inverse
         
             typedef Matrix3< double > exported_class_t;
@@ -129,60 +95,14 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , Inverse_function_type( &Matrix3< double >::Inverse ) );
         
         }
-        { //Matrix3< double >::MakeDiagonal
+        { //Matrix3< double >::Inverse
         
             typedef Matrix3< double > exported_class_t;
-            typedef Matrix3< double > & ( exported_class_t::*MakeDiagonal_function_type )( double,double,double ) ;
+            typedef Matrix3< double > ( exported_class_t::*Inverse_function_type )(  ) const;
             
             Matrix3_exposer.def( 
-                "MakeDiagonal"
-                , MakeDiagonal_function_type( &Matrix3< double >::MakeDiagonal )
-                , ( bp::arg("fM00"), bp::arg("fM11"), bp::arg("fM22") )
-                , bp::return_self< >() );
-        
-        }
-        { //Matrix3< double >::MakeTensorProduct
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef Matrix3< double > & ( exported_class_t::*MakeTensorProduct_function_type )( Vector3< double > const &,Vector3< double > const & ) ;
-            
-            Matrix3_exposer.def( 
-                "MakeTensorProduct"
-                , MakeTensorProduct_function_type( &Matrix3< double >::MakeTensorProduct )
-                , ( bp::arg("rkU"), bp::arg("rkV") )
-                , bp::return_self< >() );
-        
-        }
-        { //Matrix3< double >::Orthonormalize
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*Orthonormalize_function_type )(  ) ;
-            
-            Matrix3_exposer.def( 
-                "Orthonormalize"
-                , Orthonormalize_function_type( &Matrix3< double >::Orthonormalize ) );
-        
-        }
-        { //Matrix3< double >::TimesDiagonal
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef Matrix3< double > ( exported_class_t::*TimesDiagonal_function_type )( Vector3< double > const & ) const;
-            
-            Matrix3_exposer.def( 
-                "TimesDiagonal"
-                , TimesDiagonal_function_type( &Matrix3< double >::TimesDiagonal )
-                , ( bp::arg("rkDiag") ) );
-        
-        }
-        { //Matrix3< double >::TimesTranspose
-        
-            typedef Matrix3< double > exported_class_t;
-            typedef Matrix3< double > ( exported_class_t::*TimesTranspose_function_type )( Matrix3< double > const & ) const;
-            
-            Matrix3_exposer.def( 
-                "TimesTranspose"
-                , TimesTranspose_function_type( &Matrix3< double >::TimesTranspose )
-                , ( bp::arg("rkM") ) );
+                "inverse"
+                , Inverse_function_type( &Matrix3< double >::Inverse ) );
         
         }
         { //Matrix3< double >::Transpose
@@ -195,15 +115,14 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , Transpose_function_type( &Matrix3< double >::Transpose ) );
         
         }
-        { //Matrix3< double >::TransposeTimes
+        { //Matrix3< double >::Transpose
         
             typedef Matrix3< double > exported_class_t;
-            typedef Matrix3< double > ( exported_class_t::*TransposeTimes_function_type )( Matrix3< double > const & ) const;
+            typedef Matrix3< double > ( exported_class_t::*Transpose_function_type )(  ) const;
             
             Matrix3_exposer.def( 
-                "TransposeTimes"
-                , TransposeTimes_function_type( &Matrix3< double >::TransposeTimes )
-                , ( bp::arg("rkM") ) );
+                "transpose"
+                , Transpose_function_type( &Matrix3< double >::Transpose ) );
         
         }
         Matrix3_exposer.def( bp::self != bp::self );
@@ -275,6 +194,18 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , bp::return_self< >() );
         
         }
+        { //Quaternion< double >::Align
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*Align_function_type )( Vector3< double > const &,Vector3< double > const & ) ;
+            
+            Quaternion_exposer.def( 
+                "setFromTwoVectors"
+                , Align_function_type( &Quaternion< double >::Align )
+                , ( bp::arg("rkV1"), bp::arg("rkV2") )
+                , bp::return_self< >() );
+        
+        }
         { //Quaternion< double >::Conjugate
         
             typedef Quaternion< double > exported_class_t;
@@ -285,47 +216,34 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , Conjugate_function_type( &Quaternion< double >::Conjugate ) );
         
         }
-        { //Quaternion< double >::DecomposeSwingTimesTwist
+        { //Quaternion< double >::ToRotationMatrix
         
             typedef Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*DecomposeSwingTimesTwist_function_type )( Vector3< double > const &,Quaternion< double > &,Quaternion< double > & ) ;
+            typedef Quaternion< double > ( exported_class_t::*ToRotationMatrix_function_type )(  ) const;
             
             Quaternion_exposer.def( 
-                "DecomposeSwingTimesTwist"
-                , DecomposeSwingTimesTwist_function_type( &Quaternion< double >::DecomposeSwingTimesTwist )
-                , ( bp::arg("rkV1"), bp::arg("rkSwing"), bp::arg("rkTwist") ) );
+                "ToRotationMatrix"
+                , ToRotationMatrix_function_type( &Quaternion< double >::toRotationMatrix ) );
         
         }
-        { //Quaternion< double >::DecomposeTwistTimesSwing
+        { //Quaternion< double >::ToRotationMatrix
         
             typedef Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*DecomposeTwistTimesSwing_function_type )( Vector3< double > const &,Quaternion< double > &,Quaternion< double > & ) ;
+            typedef Quaternion< double > ( exported_class_t::*ToRotationMatrix_function_type )(  ) const;
             
             Quaternion_exposer.def( 
-                "DecomposeTwistTimesSwing"
-                , DecomposeTwistTimesSwing_function_type( &Quaternion< double >::DecomposeTwistTimesSwing )
-                , ( bp::arg("rkV1"), bp::arg("rkTwist"), bp::arg("rkSwing") ) );
+                "toRotationMatrix"
+                , ToRotationMatrix_function_type( &Quaternion< double >::toRotationMatrix ) );
         
         }
-        { //Quaternion< double >::Dot
+        { //Quaternion< double >::Conjugate
         
             typedef Quaternion< double > exported_class_t;
-            typedef double ( exported_class_t::*Dot_function_type )( Quaternion< double > const & ) const;
+            typedef Quaternion< double > ( exported_class_t::*Conjugate_function_type )(  ) const;
             
             Quaternion_exposer.def( 
-                "Dot"
-                , Dot_function_type( &Quaternion< double >::Dot )
-                , ( bp::arg("rkQ") ) );
-        
-        }
-        { //Quaternion< double >::Exp
-        
-            typedef Quaternion< double > exported_class_t;
-            typedef Quaternion< double > ( exported_class_t::*Exp_function_type )(  ) const;
-            
-            Quaternion_exposer.def( 
-                "Exp"
-                , Exp_function_type( &Quaternion< double >::Exp ) );
+                "conjugate"
+                , Conjugate_function_type( &Quaternion< double >::Conjugate ) );
         
         }
         { //Quaternion< double >::FromAxisAngle
@@ -337,30 +255,6 @@ BOOST_PYTHON_MODULE(miniEigen){
                 "FromAxisAngle"
                 , FromAxisAngle_function_type( &Quaternion< double >::FromAxisAngle )
                 , ( bp::arg("rkAxis"), bp::arg("fAngle") )
-                , bp::return_self< >() );
-        
-        }
-        { //Quaternion< double >::FromRotationMatrix
-        
-            typedef Quaternion< double > exported_class_t;
-            typedef Quaternion< double > & ( exported_class_t::*FromRotationMatrix_function_type )( Matrix3< double > const & ) ;
-            
-            Quaternion_exposer.def( 
-                "FromRotationMatrix"
-                , FromRotationMatrix_function_type( &Quaternion< double >::FromRotationMatrix )
-                , ( bp::arg("rkRot") )
-                , bp::return_self< >() );
-        
-        }
-        { //Quaternion< double >::FromRotationMatrix
-        
-            typedef Quaternion< double > exported_class_t;
-            typedef Quaternion< double > & ( exported_class_t::*FromRotationMatrix_function_type )( Vector3< double > const * ) ;
-            
-            Quaternion_exposer.def( 
-                "FromRotationMatrix"
-                , FromRotationMatrix_function_type( &Quaternion< double >::FromRotationMatrix )
-                , ( bp::arg("akRotColumn") )
                 , bp::return_self< >() );
         
         }
@@ -384,6 +278,26 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , Normalize_function_type( &Quaternion< double >::Normalize ) );
         
         }
+        { //Quaternion< double >::Inverse
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > ( exported_class_t::*Inverse_function_type )(  ) const;
+            
+            Quaternion_exposer.def( 
+                "inverse"
+                , Inverse_function_type( &Quaternion< double >::Inverse ) );
+        
+        }
+        { //Quaternion< double >::Normalize
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef double ( exported_class_t::*Normalize_function_type )(  ) ;
+            
+            Quaternion_exposer.def( 
+                "normalize"
+                , Normalize_function_type( &Quaternion< double >::Normalize ) );
+        
+        }
         { //Quaternion< double >::Rotate
         
             typedef Quaternion< double > exported_class_t;
@@ -402,6 +316,17 @@ BOOST_PYTHON_MODULE(miniEigen){
             
             Quaternion_exposer.def( 
                 "ToAxisAngle"
+                , ToAxisAngle_function_type( &ToAxisAngle_2c4febac34e606b4a98de72d9f8161c9 )
+                , ( bp::arg("inst") ) );
+        
+        }
+        { //Quaternion< double >::ToAxisAngle
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef boost::python::tuple ( *ToAxisAngle_function_type )( Quaternion<double> const & );
+            
+            Quaternion_exposer.def( 
+                "toAxisAngle"
                 , ToAxisAngle_function_type( &ToAxisAngle_2c4febac34e606b4a98de72d9f8161c9 )
                 , ( bp::arg("inst") ) );
         
@@ -443,6 +368,46 @@ BOOST_PYTHON_MODULE(miniEigen){
             
             Quaternion_exposer.def( 
                 "Z"
+                , Z_function_type( &Quaternion< double >::Z ) );
+        
+        }
+        { //Quaternion< double >::W
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef double ( exported_class_t::*W_function_type )(  ) const;
+            
+            Quaternion_exposer.def( 
+                "w"
+                , W_function_type( &Quaternion< double >::W ) );
+        
+        }
+        { //Quaternion< double >::X
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef double ( exported_class_t::*X_function_type )(  ) const;
+            
+            Quaternion_exposer.def( 
+                "x"
+                , X_function_type( &Quaternion< double >::X ) );
+        
+        }
+        { //Quaternion< double >::Y
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef double ( exported_class_t::*Y_function_type )(  ) const;
+            
+            Quaternion_exposer.def( 
+                "y"
+                , Y_function_type( &Quaternion< double >::Y ) );
+        
+        }
+        { //Quaternion< double >::Z
+        
+            typedef Quaternion< double > exported_class_t;
+            typedef double ( exported_class_t::*Z_function_type )(  ) const;
+            
+            Quaternion_exposer.def( 
+                "z"
                 , Z_function_type( &Quaternion< double >::Z ) );
         
         }
@@ -530,6 +495,47 @@ BOOST_PYTHON_MODULE(miniEigen){
                 , SquaredLength_function_type( &Vector2< double >::SquaredLength ) );
         
         }
+        { //Vector2< double >::Dot
+        
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*Dot_function_type )( Vector2< double > const & ) const;
+            
+            Vector2_exposer.def( 
+                "dot"
+                , Dot_function_type( &Vector2< double >::Dot )
+                , ( bp::arg("rkV") ) );
+        
+        }
+        { //Vector2< double >::Length
+        
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*Length_function_type )(  ) const;
+            
+            Vector2_exposer.def( 
+                "norm"
+                , Length_function_type( &Vector2< double >::Length ) );
+        
+        }
+        { //Vector2< double >::Normalize
+        
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*Normalize_function_type )(  ) ;
+            
+            Vector2_exposer.def( 
+                "normalize"
+                , Normalize_function_type( &Vector2< double >::Normalize ) );
+        
+        }
+        { //Vector2< double >::SquaredLength
+        
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*SquaredLength_function_type )(  ) const;
+            
+            Vector2_exposer.def( 
+                "squaredNorm"
+                , SquaredLength_function_type( &Vector2< double >::SquaredLength ) );
+        
+        }
         { //Vector2< double >::X
         
             typedef Vector2< double > exported_class_t;
@@ -547,6 +553,26 @@ BOOST_PYTHON_MODULE(miniEigen){
             
             Vector2_exposer.def( 
                 "Y"
+                , Y_function_type( &Vector2< double >::Y ) );
+        
+        }
+        { //Vector2< double >::X
+        
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*X_function_type )(  ) const;
+            
+            Vector2_exposer.def( 
+                "x"
+                , X_function_type( &Vector2< double >::X ) );
+        
+        }
+        { //Vector2< double >::Y
+        
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*Y_function_type )(  ) const;
+            
+            Vector2_exposer.def( 
+                "y"
                 , Y_function_type( &Vector2< double >::Y ) );
         
         }
@@ -672,6 +698,88 @@ BOOST_PYTHON_MODULE(miniEigen){
             
             Vector3_exposer.def( 
                 "Z"
+                , Z_function_type( &Vector3< double >::Z ) );
+        
+        }
+        { //Vector3< double >::Cross
+        
+            typedef Vector3< double > exported_class_t;
+            typedef Vector3< double > ( exported_class_t::*Cross_function_type )( Vector3< double > const & ) const;
+            
+            Vector3_exposer.def( 
+                "cross"
+                , Cross_function_type( &Vector3< double >::Cross )
+                , ( bp::arg("rkV") ) );
+        
+        }
+        { //Vector3< double >::Dot
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*Dot_function_type )( Vector3< double > const & ) const;
+            
+            Vector3_exposer.def( 
+                "dot"
+                , Dot_function_type( &Vector3< double >::Dot )
+                , ( bp::arg("rkV") ) );
+        
+        }
+        { //Vector3< double >::Length
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*Length_function_type )(  ) const;
+            
+            Vector3_exposer.def( 
+                "norm"
+                , Length_function_type( &Vector3< double >::Length ) );
+        
+        }
+        { //Vector3< double >::Normalize
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*Normalize_function_type )(  ) ;
+            
+            Vector3_exposer.def( 
+                "normalize"
+                , Normalize_function_type( &Vector3< double >::Normalize ) );
+        
+        }
+        { //Vector3< double >::SquaredLength
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*SquaredLength_function_type )(  ) const;
+            
+            Vector3_exposer.def( 
+                "squaredNorm"
+                , SquaredLength_function_type( &Vector3< double >::SquaredLength ) );
+        
+        }
+        { //Vector3< double >::X
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*X_function_type )(  ) const;
+            
+            Vector3_exposer.def( 
+                "x"
+                , X_function_type( &Vector3< double >::X ) );
+        
+        }
+        { //Vector3< double >::Y
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*Y_function_type )(  ) const;
+            
+            Vector3_exposer.def( 
+                "y"
+                , Y_function_type( &Vector3< double >::Y ) );
+        
+        }
+        { //Vector3< double >::Z
+        
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*Z_function_type )(  ) const;
+            
+            Vector3_exposer.def( 
+                "z"
                 , Z_function_type( &Vector3< double >::Z ) );
         
         }
