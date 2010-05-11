@@ -268,7 +268,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
 		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<Facet> iFacet(new Facet);
-		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
+		for(int i=0; i<3; i++){ iFacet->vertices[i]=v[i]-cog;}
 		iFacet->color=Vector3r(1,1,1);
 		body->shape=iFacet;
 	}
