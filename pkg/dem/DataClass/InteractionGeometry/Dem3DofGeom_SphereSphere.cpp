@@ -73,8 +73,8 @@ Real Dem3DofGeom_SphereSphere::slipToDisplacementTMax(Real displacementTMax){
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Real currDistSq=(p2-p1).squaredNorm();
 	if(currDistSq<pow(displacementTMax,2)) return 0; // close enough, no slip needed
-	Vector3r diff=.5*(sqrt(currDistSq)/displacementTMax-1)*(p2-p1);
-	setTgPlanePts(p1+diff,p2-diff);
+	Vector3r diff=.5*(displacementTMax/sqrt(currDistSq)-1)*(p2-p1);
+	setTgPlanePts(p1-diff,p2+diff);
 	return 2*diff.norm();
 }
 
