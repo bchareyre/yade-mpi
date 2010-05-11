@@ -224,7 +224,7 @@ void PeriTriaxController::action()
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
 		//don't modify stress if dynCell, testing only stiff[axis]>0 would not allow switching the control mode in simulations,
-		if (stiff[axis]>0) stress[axis]+=(scene->cell->velGrad[axis][axis]*scene->dt/refSize[axis])*(stiff[axis]/cellArea[axis]);
+		if (stiff[axis]>0) stress[axis]+=(scene->cell->velGrad(axis,axis)*scene->dt/refSize[axis])*(stiff[axis]/cellArea[axis]);
 		//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
  	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
