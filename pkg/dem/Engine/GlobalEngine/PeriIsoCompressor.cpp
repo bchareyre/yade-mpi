@@ -174,37 +174,38 @@ void PeriTriaxController::action()
 	bool doUpdate((scene->currentIteration%globUpdate)==0);
 	if(doUpdate || min(stiff[0],min(stiff[1],stiff[2])) <=0 || dynCell){ strainStressStiffUpdate(); }
 
-	bool allOk=true; Vector3r cellGrow(Vector3r::Zero());
+	bool allOk=true;
 	// apply condition along each axis separately (stress or strain)
+	assert(scene->dt>0.);
 	for(int axis=0; axis<3; axis++){
-		Real maxGrow=maxStrainRate[axis]*scene->dt;
+ 		Real& strain_rate = scene->cell->velGrad(axis,axis);//strain rate on axis
 		if(stressMask & (1<<axis)){   // control stress
 			if(!dynCell){
 				// stiffness K=EA; σ₁=goal stress; Δσ wanted stress difference to apply
-				// ΔεE=(Δl/l)(K/A) - Grow is Δε
-				cellGrow[axis]=(goal[axis]-stress[axis])*cellArea[axis]/(stiff[axis]>0?stiff[axis]:1.);
-				LOG_TRACE(axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis]);
+				// ΔεE=(Δl/l)(K/A) - Grow is Δε, obtained by imposing the strain rate Δε/dt
+				strain_rate=1/scene->dt*(goal[axis]-stress[axis])*cellArea[axis]/(stiff[axis]>0?stiff[axis]:1.);
+				LOG_TRACE(axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", cellGrow="<<strain_rate*scene->dt);
 			} else {  //accelerate the deformation using the density of the period, includes Cundall's damping
 				assert( mass>0 );//user set
-				Real dampFactor = 1 - growDamping*Mathr::Sign ( ( scene->cell->velGrad(axis,axis) ) * ( goal[axis]-stress[axis] ) );
-				scene->cell->velGrad(axis,axis)+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
-				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<scene->cell->velGrad(axis,axis) );
-			}
+				Real dampFactor = 1 - growDamping*Mathr::Sign ( strain_rate * ( goal[axis]-stress[axis] ) );
+				strain_rate+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
+				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate );}
 		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
-			cellGrow[axis]=Mathr::Exp ( goal[axis]-strain[axis] ) -1;
-			LOG_TRACE ( axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis] );
-		}
-		// limit maximum strain rate
-		if (abs(cellGrow[axis])>maxGrow) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxGrow;
-		
-		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
-		cellGrow[axis]=max(cellGrow[axis],-(cellSize[axis]-2.1*maxBodySpan[axis]));
-
+			strain_rate = (Mathr::Exp ( goal[axis]-strain[axis] ) -1)/scene->dt;
+			LOG_TRACE ( axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<strain_rate*scene->dt);
+		}		
 		// steady evolution with fluctuations; see TriaxialStressController
-		cellGrow[axis]=(1-growDamping)*cellGrow[axis]+.8*prevGrow[axis];
+		if (!dynCell) strain_rate=(1-growDamping)*strain_rate+.8*prevGrow[axis];
+		// limit maximum strain rate
+		if (abs(strain_rate)>maxStrainRate[axis]) strain_rate = Mathr::Sign(strain_rate)*maxStrainRate[axis];
+		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
+		strain_rate=max(strain_rate,-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt);
+
 		// crude way of predicting stress, for steps when it is not computed from intrs
-		if(doUpdate) LOG_DEBUG(axis<<": cellGrow="<<cellGrow[axis]<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);
+		if(doUpdate) LOG_DEBUG(axis<<": cellGrow="<<strain_rate*scene->dt<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);
+		// used only for temporary goal comparisons. The exact value is assigned in strainStressStiffUpdate
+		strain[axis]+=strain_rate*scene->dt;
 		// signal if condition not satisfied
 		if(stressMask&(1<<axis)){
 			Real curr=stress[axis];
@@ -218,37 +219,26 @@ void PeriTriaxController::action()
 			}
 		}
 	}
-	assert(scene->dt>0.);
 	// update stress and strain
-	if (!dynCell) for ( int axis=0; axis<3; axis++ )
-	{
-		// either prescribe velocity gradient
-		scene->cell->velGrad(axis,axis)=cellGrow[axis]/scene->dt;
-		// used only for goal comparisons...
-		strain[axis]+=cellGrow[axis];
-
+	if (!dynCell) for ( int axis=0; axis<3; axis++ ){		
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
 		//don't modify stress if dynCell, testing only stiff[axis]>0 would not allow switching the control mode in simulations,
-		if (stiff[axis]>0 && !dynCell) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]);
-			//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
+		if (stiff[axis]>0) stress[axis]+=(scene->cell->velGrad[axis][axis]*scene->dt/refSize[axis])*(stiff[axis]/cellArea[axis]);
+		//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
-	// change cell size now
-	// scene->cell->refSize+=cellGrow;
-
-	strainRate=cellGrow/scene->dt;
-
+ 	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
+	prevGrow = strainRate;
+	
 	if(allOk){
 		if(doUpdate || currUnbalanced<0){
 			currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
-			LOG_DEBUG("Stress/strain="<<(stressMask&1?stress[0]:strain[0])<<","<<(stressMask&2?stress[1]:strain[1])<<","<<(stressMask&4?stress[2]:strain[2])<<", goal="<<goal<<", unbalanced="<<currUnbalanced );
-		}
+			LOG_DEBUG("Stress/strain="<<(stressMask&1?stress[0]:strain[0])<<","<<(stressMask&2?stress[1]:strain[1])<<","<<(stressMask&4?stress[2]:strain[2])<<", goal="<<goal<<", unbalanced="<<currUnbalanced );}
 		if(currUnbalanced<maxUnbalanced){
 			// LOG_INFO("Goal reached, packing stable.");
 			if (!doneHook.empty()){
 				LOG_DEBUG ( "Running doneHook: "<<doneHook );
-				pyRunString(doneHook);
-			}
+				pyRunString(doneHook);}
 			else { Omega::instance().stopSimulationLoop(); }
 		}
 	}
