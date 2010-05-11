@@ -143,7 +143,7 @@ class pyTags{
 			FOREACH(string& val, mb->tags){
 				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); return val1;}
 			}
-			PyErr_SetString(PyExc_KeyError, "Invalid key.");
+			PyErr_SetString(PyExc_KeyError,("Invalid key: "+key+".").c_str());
 			python::throw_error_already_set(); /* make compiler happy; never reached */ return string();
 		}
 		void setItem(const string& key,const string& item){
@@ -151,7 +151,7 @@ class pyTags{
 				PyErr_SetString(PyExc_KeyError, "Key must not contain the '=' character (implementation limitation; sorry).");
 				python::throw_error_already_set();
 			}
-			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=item; return; } }
+			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=key+"="+item; return; } }
 			mb->tags.push_back(key+"="+item);
 			}
 		python::list keys(){
