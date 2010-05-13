@@ -249,7 +249,7 @@ void termHandlerError(int sig){cerr<<"Yade: error exit."<<endl; raise(SIGTERM);}
 class pyOmega{
 	private:
 		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
-		void assertRootBody(){if(!OMEGA.getScene()) throw std::runtime_error("No root body."); }
+		void assertScene(){if(!OMEGA.getScene()) throw std::runtime_error("No Scene instance?!"); }
 		Omega& OMEGA;
 	public:
 	pyOmega(): OMEGA(Omega::instance()){
@@ -306,7 +306,7 @@ class pyOmega{
 	void dt_set(double dt){
 		Scene* scene=OMEGA.getScene().get();
 		// activate timestepper, if possible (throw exception if there is none)
-		if(dt<=0){ if(!scene->timeStepperActivate(true)) /* not activated*/ throw runtime_error("No TimeStepper found."); }
+		if(dt<=0){ if(!scene->timeStepperActivate(true)) /* not activated*/ throw runtime_error("No TimeStepper found in O.engines."); if(dt!=0) scene->dt=-dt; }
 		else { scene->timeStepperActivate(false); scene->dt=dt; }
 	}
 	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
@@ -367,7 +367,7 @@ class pyOmega{
 	void switchScene(){ std::swap(OMEGA.scene,OMEGA.sceneAnother); }
 
 	void save(std::string fileName){
-		assertRootBody();
+		assertScene();
 		OMEGA.saveSimulation(fileName);
 		OMEGA.setSimulationFileName(fileName);
 		LOG_DEBUG("SAVE!");
@@ -389,10 +389,10 @@ class pyOmega{
 		}
 	}
 
-	vector<shared_ptr<Engine> > engines_get(void){assertRootBody(); return OMEGA.getScene()->engines;}
-	void engines_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getScene()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
-	vector<shared_ptr<Engine> > initializers_get(void){assertRootBody(); return OMEGA.getScene()->initializers;}
-	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getScene()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getScene()->needsInitializers=true; }
+	vector<shared_ptr<Engine> > engines_get(void){assertScene(); return OMEGA.getScene()->engines;}
+	void engines_set(const vector<shared_ptr<Engine> >& egs){assertScene(); OMEGA.getScene()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
+	vector<shared_ptr<Engine> > initializers_get(void){assertScene(); return OMEGA.getScene()->initializers;}
+	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertScene(); OMEGA.getScene()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getScene()->needsInitializers=true; }
 
 	python::object labeled_engine_get(string label){
 		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getScene()->engines){
@@ -417,8 +417,8 @@ class pyOmega{
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
 	
-	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getScene()->bodies); }
-	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
+	pyBodyContainer bodies_get(void){assertScene(); return pyBodyContainer(OMEGA.getScene()->bodies); }
+	pyInteractionContainer interactions_get(void){assertScene(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
 	
 	pyForceContainer forces_get(void){return pyForceContainer(OMEGA.getScene());}
 	pyMaterialContainer materials_get(void){return pyMaterialContainer(OMEGA.getScene());}
@@ -441,7 +441,7 @@ class pyOmega{
 		return ret;
 	}
 
-	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getScene());}
+	pyTags tags_get(void){assertScene(); return pyTags(OMEGA.getScene());}
 
 	void interactionContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
@@ -518,7 +518,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
 		.add_property("time",&pyOmega::simulationTime,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
-		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\nIf assigned a non-positive value, dynamic Δt control via a :yref:`TimeStepper` will be enabled (with an exception thrown if there is no :yref:`TimeStepper` among :yref:`O.engines<Omega.engines>`). Assigning positive value will set Δt to that value and will also disable dynamic Δt via :yref:`TimeStepper`, if there is one.\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
+		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\n* assigning zero enables dynamic Δt control via a :yref:`TimeStepper` (raises an exception if there is no :yref:`TimeStepper` among :yref:`O.engines<Omega.engines>`)\n* assigning negative value enables dynamic Δt (as in the previous case) and sets positive timestep ``O.dt=|Δt|`` (will be used until the timestepper is run and updates it)\n* assigning positive value sets Δt to that value and disables dynamic Δt (via :yref:`TimeStepper`, if there is one).\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
 		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
 		.def("load",&pyOmega::load,"Load simulation from file.")
 		.def("reload",&pyOmega::reload,"Reload current simulation")
