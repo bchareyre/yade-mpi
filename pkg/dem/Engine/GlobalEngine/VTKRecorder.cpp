@@ -34,6 +34,7 @@ void VTKRecorder::action()
 		else if(rec=="intr") recActive[REC_INTR]=true;
 		else if(rec=="ids") recActive[REC_IDS]=true;
 		else if(rec=="clumpids") recActive[REC_CLUMPIDS]=true;
+		else if(rec=="materialID") recActive[REC_MATERIALID]=true;
 		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm, intr, ids, clumpids). Ignored.");
 	}
 	// cpm needs interactions
@@ -60,6 +61,10 @@ void VTKRecorder::action()
 	vtkSmartPointer<vtkFloatArray> sphAngVel = vtkSmartPointer<vtkFloatArray>::New();
 	sphAngVel->SetNumberOfComponents(3);
 	sphAngVel->SetName("angVel");
+	vtkSmartPointer<vtkFloatArray> materialID = vtkSmartPointer<vtkFloatArray>::New();
+	materialID->SetNumberOfComponents(1);
+	materialID->SetName("materialID");
+	
 
 	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
@@ -168,6 +173,7 @@ void VTKRecorder::action()
 					cpmSigmaM->InsertNextValue((ss[0]+ss[1]+ss[2])/3.);
 					cpmTau->InsertNextTupleValue(t);
 				}
+				if (recActive[REC_MATERIALID]) materialID->InsertNextValue(b->material->id);
 				continue;
 			}
 		}
@@ -193,6 +199,7 @@ void VTKRecorder::action()
 					float c[3] = {color[0],color[1],color[2]};
 					facetsColors->InsertNextTupleValue(c);
 				}
+				if (recActive[REC_MATERIALID]) materialID->InsertNextValue(b->material->id);
 				continue;
 			}
 		}
@@ -220,6 +227,8 @@ void VTKRecorder::action()
 			spheresUg->GetPointData()->AddArray(cpmSigmaM);
 			spheresUg->GetPointData()->AddArray(cpmTau);
 		}
+		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(materialID);
+		
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
 		string fn=fileName+"spheres."+lexical_cast<string>(scene->currentIteration)+".vtu";
@@ -233,6 +242,7 @@ void VTKRecorder::action()
 		facetsUg->SetPoints(facetsPos);
 		facetsUg->SetCells(VTK_TRIANGLE, facetsCells);
 		if (recActive[REC_COLORS]) facetsUg->GetCellData()->AddArray(facetsColors);
+		if (recActive[REC_MATERIALID]) facetsUg->GetPointData()->AddArray(materialID);
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
 		string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
