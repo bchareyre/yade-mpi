@@ -80,13 +80,13 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 	if(computedSomething)
 	{
 		previousDt = min ( min(newDt , defaultDt), 1.5*previousDt );// at maximum, dt will be multiplied by 1.5 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations 
-		Omega::instance().setTimeStep(previousDt);
+		scene->dt=previousDt;
 		computedOnce = true;	
 	}
-	else if (!computedOnce) Omega::instance().setTimeStep(defaultDt);
+	else if (!computedOnce) scene->dt=defaultDt;
 	LOG_INFO("computed timestep " << newDt <<
-			(Omega::instance().getTimeStep()==newDt ? string(", appplied") :
-			string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
+			(scene->dt==newDt ? string(", appplied") :
+			string(", BUT timestep is ")+lexical_cast<string>(scene->dt))<<".");
 }
 
 void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){

@@ -129,12 +129,6 @@ class Omega: public Singleton<Omega>
 		bool		isInheritingFrom(const string& className, const string& baseClassName );
 		bool		isInheritingFrom_recursive(const string& className, const string& baseClassName );
 
-		void		setTimeStep(const Real);
-		Real		getTimeStep();
-		void		skipTimeStepper(bool s);
-		bool 		timeStepperActive();
-		bool		containTimeStepper();
-
 		const		shared_ptr<Scene>& getScene();
 		void		setScene(shared_ptr<Scene>&);
 		void		resetScene();

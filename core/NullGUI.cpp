@@ -97,8 +97,7 @@ int NullGUI::run(int argc, char* argv[])
 			case 'Q'        : quickSave = optarg;					break;
 			case 'm'        : maxIteration = lexical_cast<long int>(optarg);	break;
 			case 'b'        : binary = true;					break;
-			case 't'        : Omega::instance().setTimeStep
-						(lexical_cast<Real>(optarg));			break;
+			case 't'        : Omega::instance().getScene()->dt=(lexical_cast<Real>(optarg));			break;
 //			case 'g'	: Omega::instance().setGravity
 //						(Vector3r(0,-lexical_cast<Real>(optarg),0));	break;
 			default		:help(); 						return 1;
@@ -148,7 +147,7 @@ int NullGUI::loop()
 	else
 		cerr << "Computing " << maxIteration << " iterations\n";
 
-	cerr << "Using timestep: " << Omega::instance().getTimeStep() << endl;
+	cerr << "Using timestep: " << Omega::instance().getScene()->dt << endl;
 
 	filesystem::path p(snapshotName);
 	if(filesystem::extension(p)==".gz")

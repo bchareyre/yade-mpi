@@ -33,7 +33,7 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 
 	if (I->isFresh(rootBody)) shearForce=Vector3r(0,0,0);
 
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 
 	Vector3r axis = phys->prevNormal.Cross(geom->normal);
 	shearForce -= shearForce.Cross(axis);

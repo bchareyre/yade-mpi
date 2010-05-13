@@ -54,7 +54,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 
 	if (I->isFresh(rootBody)) shearForce=Vector3r(0,0,0);
 
-	const Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 
 	Vector3r axis = phys.prevNormal.cross(geom.normal);
 	shearForce -= shearForce.cross(axis);

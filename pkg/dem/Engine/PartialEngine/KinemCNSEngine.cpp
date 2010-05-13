@@ -59,7 +59,7 @@ void KinemCNSEngine::letMove()
 	if(LOG) cout << "It : " << Omega::instance().getCurrentIteration() << endl;
 	computeDu();
 
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 	Real dx = shearSpeed * dt;
 
 
@@ -182,9 +182,9 @@ void KinemCNSEngine::computeDu()
 	deltaH = (1-wallDamping)*deltaH;
 	if(LOG)	cout << "deltaH apres amortissement :" << deltaH << endl;
 
-	if(abs(deltaH) > max_vel*Omega::instance().getTimeStep())
+	if(abs(deltaH) > max_vel*scene->dt)
 	{
-		deltaH=deltaH/abs(deltaH)*max_vel*Omega::instance().getTimeStep();
+		deltaH=deltaH/abs(deltaH)*max_vel*scene->dt;
 		if(LOG) cout << "Correction appliquee pour ne pas depasser vmax(comp)" << endl;
 	}
 

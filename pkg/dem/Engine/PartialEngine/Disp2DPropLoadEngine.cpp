@@ -89,7 +89,7 @@ void Disp2DPropLoadEngine::action()
 void Disp2DPropLoadEngine::letDisturb()
 {
 
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 	dgamma=cos(theta*Mathr::PI/180.0)*v*dt;
 	dh=sin(theta*Mathr::PI/180.0)*v*dt;
 

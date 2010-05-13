@@ -49,8 +49,8 @@ void UniaxialStrainer::init(){
 	else {absSpeed=strainRate*originalLength;}
 
 	if(!setSpeeds){
-		initAccelTime_s=initAccelTime>=0 ? initAccelTime : Omega::instance().getTimeStep()*(-initAccelTime);
-		LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<", will be reached after "<<initAccelTime_s<<"s ("<<initAccelTime_s/Omega::instance().getTimeStep()<<" steps).");
+		initAccelTime_s=initAccelTime>=0 ? initAccelTime : scene->dt*(-initAccelTime);
+		LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<", will be reached after "<<initAccelTime_s<<"s ("<<initAccelTime_s/scene->dt<<" steps).");
 	} else {
 		/* set speed such that it is linear on the strained axis; transversal speed is not set, which can perhaps create some problems.
 			Note: all bodies in the simulation will have their speed set, since there is no way to tell which ones are part of the specimen
@@ -118,7 +118,7 @@ void UniaxialStrainer::action(){
 		else currentStrainRate=strainRate;
 	} else currentStrainRate=strainRate;
 	// how much do we move (in total, symmetry handled below)
-	Real dAX=currentStrainRate*originalLength*Omega::instance().getTimeStep();
+	Real dAX=currentStrainRate*originalLength*scene->dt;
 	if(!isnan(stopStrain)){
 		Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 		Real newStrain=(axialLength+dAX)/originalLength-1;

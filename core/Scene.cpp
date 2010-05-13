@@ -91,6 +91,8 @@ void Scene::moveToNextTimeStep(){
 	simulationTime+=dt;
 }
 
+
+
 shared_ptr<Engine> Scene::engineByName(string s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->getClassName()==s) return e;
@@ -105,13 +107,34 @@ shared_ptr<Engine> Scene::engineByLabel(string s){
 	return shared_ptr<Engine>();
 }
 
-void Scene::setTimeSteppersActive(bool a)
-{
-	FOREACH(shared_ptr<Engine> e, engines){
-		if (Omega::instance().isInheritingFrom(e->getClassName(),"TimeStepper"))
-			(dynamic_pointer_cast<TimeStepper>(e))->setActive(a);
-	}
+
+bool Scene::timeStepperPresent(){
+	int n=0;
+	FOREACH(const shared_ptr<Engine>&e, engines){ if(dynamic_cast<TimeStepper*>(e.get())) n++; }
+	if(n>1) throw std::runtime_error(string("Multiple ("+lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
+	return n>0;
 }
+
+bool Scene::timeStepperActive(){
+	int n=0; bool ret=false;
+	FOREACH(const shared_ptr<Engine>&e, engines){
+		TimeStepper* ts=dynamic_cast<TimeStepper*>(e.get()); if(ts) { ret=ts->active; n++; }
+	}
+	if(n>1) throw std::runtime_error(string("Multiple ("+lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
+	return ret;
+}
+
+bool Scene::timeStepperActivate(bool a){
+	int n=0;
+	FOREACH(const shared_ptr<Engine> e, engines){
+		TimeStepper* ts=dynamic_cast<TimeStepper*>(e.get());
+		if(ts) { ts->setActive(a); n++; }
+	}
+	if(n>1) throw std::runtime_error(string("Multiple ("+lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
+	return n>0;
+}
+
+
 
 void Scene::checkStateTypes(){
 	FOREACH(const shared_ptr<Body>& b, *bodies){

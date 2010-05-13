@@ -85,8 +85,8 @@ void KinemCTDEngine::action()
 void KinemCTDEngine::letMove()
 {
 	computeAlpha();
-	Real	dt = Omega::instance().getTimeStep()
-		,dh=-compSpeed*dt
+	const Real& dt = scene->dt;
+	Real dh=-compSpeed*dt
 		,dgamma=0
 		;
 

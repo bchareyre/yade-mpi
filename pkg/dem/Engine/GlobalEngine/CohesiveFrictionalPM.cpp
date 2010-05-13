@@ -19,7 +19,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 	Body* b1 = ( *bodies ) [id1].get();
 	Body* b2 = ( *bodies ) [id2].get();
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 	
 	Real displN = geom->penetrationDepth; // NOTE: the sign for penetrationdepth is different from ScGeom and Dem3DofGeom: geom->penetrationDepth>0 when spheres interpenetrate
 	Real Dtensile=phys->FnMax/phys->kn;

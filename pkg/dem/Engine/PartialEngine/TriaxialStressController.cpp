@@ -55,10 +55,10 @@ void TriaxialStressController::controlExternalStress(int wall, Vector3r resultan
 	   if (stiffness[wall]!=0)
 	   {
 			translation /= stiffness[wall];
-			if(log) TRVAR2(translation,wall_max_vel*Omega::instance().getTimeStep())
-			translation = std::min( std::abs(translation), wall_max_vel*Omega::instance().getTimeStep() ) * Mathr::Sign(translation);
+			if(log) TRVAR2(translation,wall_max_vel*scene->dt)
+			translation = std::min( std::abs(translation), wall_max_vel*scene->dt ) * Mathr::Sign(translation);
 	   }
-	   else translation = wall_max_vel * Mathr::Sign(translation)*Omega::instance().getTimeStep();
+	   else translation = wall_max_vel * Mathr::Sign(translation)*scene->dt;
 	}
 	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
 	p->se3.position += previousTranslation[wall];

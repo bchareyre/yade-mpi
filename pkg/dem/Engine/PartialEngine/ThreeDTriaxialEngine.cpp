@@ -96,7 +96,7 @@ void ThreeDTriaxialEngine::action()
 	}
 
 	
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 
 	if(!stressControl_1)  // control in strain if wanted
 	{

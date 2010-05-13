@@ -47,7 +47,7 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
 void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
 	ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());

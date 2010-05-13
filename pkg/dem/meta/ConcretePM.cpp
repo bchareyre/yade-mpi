@@ -160,7 +160,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	 const bool& isCohesive(BC->isCohesive);
 
 	#ifdef CPM_MATERIAL_MODEL
-		Real& epsNPl(BC->epsNPl); const Real& dt=Omega::instance().getTimeStep(); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau);const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType); const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
+		Real& epsNPl(BC->epsNPl); const Real& dt=scene->dt; const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau);const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType); const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
 	#endif
 
 

@@ -190,7 +190,7 @@ class pyInteractionContainer{
 			//if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
 			if(id12.size()==2){
 				shared_ptr<Interaction> i=proxee->find(id12[0],id12[1]);
-				if(i) return i; else throw invalid_argument("No such interaction.");
+				if(i) return i; else { PyErr_SetString(PyExc_IndexError,"No such interaction"); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>(); }
 			}
 			else if(id12.size()==1){ return (*proxee)[id12[0]];}
 			else throw invalid_argument("2 integers (id1,id2) or 1 integer (nth) required.");
@@ -198,7 +198,8 @@ class pyInteractionContainer{
 		/* return nth _real_ iteration from the container (0-based index); this is to facilitate picking random interaction */
 		shared_ptr<Interaction> pyNth(long n){
 			long i=0; FOREACH(shared_ptr<Interaction> I, *proxee){ if(!I->isReal()) continue; if(i++==n) return I; }
-			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
+			PyErr_SetString(PyExc_IndexError,(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").").c_str());
+			python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>();
 		}
 		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
@@ -298,17 +299,20 @@ class pyOmega{
 		}
 	}
 
-	long iter(){ return OMEGA.getCurrentIteration();}
+	long iter(){ return OMEGA.getScene()->currentIteration;}
 	double simulationTime(){return OMEGA.getSimulationTime();}
 	double realTime(){ return OMEGA.getComputationTime(); }
-	double dt_get(){return OMEGA.getTimeStep();}
-	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt); }
-
+	double dt_get(){return OMEGA.getScene()->dt;}
+	void dt_set(double dt){
+		Scene* scene=OMEGA.getScene().get();
+		// activate timestepper, if possible (throw exception if there is none)
+		if(dt<=0){ if(!scene->timeStepperActivate(true)) /* not activated*/ throw runtime_error("No TimeStepper found."); }
+		else { scene->timeStepperActivate(false); scene->dt=dt; }
+	}
+	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIteration; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIteration=s; }
 
-	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
-	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
@@ -514,8 +518,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
 		.add_property("time",&pyOmega::simulationTime,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
-		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (assignable); note that assigning to dt will not turn of TimeStepper, if used.")
-		.add_property("usesTimeStepper",&pyOmega::usesTimeStepper_get,&pyOmega::usesTimeStepper_set,"Enable/disable use of TimeStepper in the simulation")
+		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\nIf assigned a non-positive value, dynamic Δt control via a :yref:`TimeStepper` will be enabled (with an exception thrown if there is no :yref:`TimeStepper` among :yref:`O.engines<Omega.engines>`). Assigning positive value will set Δt to that value and will also disable dynamic Δt via :yref:`TimeStepper`, if there is one.\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
+		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
 		.def("load",&pyOmega::load,"Load simulation from file.")
 		.def("reload",&pyOmega::reload,"Reload current simulation")
 		.def("save",&pyOmega::save,"Save current simulation to file (should be .xml or .xml.bz2)")
@@ -551,12 +555,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(python::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
-#if 0
-			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] save to XML using boost::serialization.")
-			.def("loadXML",&pyOmega::loadXML,"[EXPERIMENTAL] load from XML using boost::serialization.")
-			.def("saveBin",&pyOmega::saveBin,"[EXPERIMENTAL] save to binary file using boost::serialization.")
-			.def("loadBin",&pyOmega::loadBin,"[EXPERIMENTAL] load from binary file using boost::serialization.")
-#endif
 			.def("load2",&pyOmega::loadBoost,"[EXPERIMENTAL] load using boost::serialization (handles compression, XML/binary)")
 			.def("save2",&pyOmega::saveBoost,"[EXPERIMENTAL] save using boost::serialization (handles compression, XML/binary)")
 		#endif

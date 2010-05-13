@@ -185,8 +185,8 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		Omega::instance().joinSimulationLoop();
 
 		bool keepTimeStepperSettings=Omega::instance().getSimulationFileName()==fileName;
-		Real prevDt=Omega::instance().getTimeStep();
-		bool timeStepperUsed=Omega::instance().timeStepperActive();
+		Real prevDt=Omega::instance().getScene()->dt;
+		bool timeStepperUsed=Omega::instance().getScene()->timeStepperActive();
 
 		Omega::instance().setSimulationFileName(fileName);
 		try
@@ -206,13 +206,13 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			if(keepTimeStepperSettings){
 				LOG_DEBUG("The same simulation loaded again, keeping time stepper settings.");
 				// if we were using fixed time, set that fixed value now
-				if(!timeStepperUsed) { Omega::instance().setTimeStep(prevDt); LOG_DEBUG("Using previous fixed time step "<<prevDt);}
+				if(!timeStepperUsed) { Omega::instance().getScene()->dt=prevDt; LOG_DEBUG("Using previous fixed Δt="<<prevDt);}
 				// recover whether timestepper was used or not
-				Omega::instance().skipTimeStepper(!timeStepperUsed);
+				Omega::instance().getScene()->timeStepperActivate(timeStepperUsed);
 				LOG_DEBUG("Timestepper is "<<(timeStepperUsed?"":"NOT ")<<"being used.");
 			}
 			else {
-				LOG_DEBUG("New simulation loaded, timestepper is "<<(Omega::instance().timeStepperActive()?"":"NOT ")<<"being used (as per XML).");
+				LOG_DEBUG("New simulation loaded, timestepper is "<<(Omega::instance().getScene()->timeStepperActive()?"":"NOT ")<<"being used (as per XML).");
 			}
 		}
 		 
@@ -329,7 +329,7 @@ void SimulationController::bgTimeStepClicked(int i)
 	{
 		case 0 : {//Use timeStepper
 			wasUsingTimeStepper=true;
-			Omega::instance().skipTimeStepper(false);
+			Omega::instance().getScene()->timeStepperActivate(true);
 			break;
 			}
 		case 1 : // Try RealTime -- deprecated
@@ -338,7 +338,7 @@ void SimulationController::bgTimeStepClicked(int i)
 		case 2 : {// use fixed time Step
 			changeTimeStep = true;
 			wasUsingTimeStepper=false;
-			Omega::instance().skipTimeStepper(true);
+			Omega::instance().getScene()->timeStepperActivate(false);
 			leTimestep_returnPressed();
 			break;
 		}
@@ -447,16 +447,11 @@ void SimulationController::doUpdate(){
 
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
 
-	//changeSkipTimeStepper = false;
-	//changeTimeStep = false;
-
-	//cerr<<"dt="<<dt<<",exp10="<<exp10<<",10^exp10="<<pow((float)10,exp10)<<endl;
-
 	/* enable/disable controls here, dynamically */
-	hasSimulation=(Omega::instance().getScene() ? Omega::instance().getScene()->bodies->size()>0 : false );
+	hasSimulation=(scene ? scene->bodies->size()>0 : false );
 	bool	isRunning=Omega::instance().isRunning() || syncRunning,
-		hasTimeStepper=Omega::instance().containTimeStepper(),
-		usesTimeStepper=Omega::instance().timeStepperActive(),
+		hasTimeStepper=scene->timeStepperPresent(),
+		usesTimeStepper=scene->timeStepperActive(),
 		hasFileName=(Omega::instance().getSimulationFileName()!="");
 
 	pbStartSimulation->setEnabled(hasSimulation && !isRunning);

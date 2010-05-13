@@ -353,27 +353,4 @@ void Omega::saveSimulation(const string name)
 
 
 
-void Omega::setTimeStep(const Real t){	if(scene) scene->dt=t;}
-Real Omega::getTimeStep(){	if(scene) return scene->dt; else return -1; }
-void Omega::skipTimeStepper(bool s){ if(scene) scene->setTimeSteppersActive(!s);}
-
-bool Omega::timeStepperActive(){
-	if(!scene) return false;
-	FOREACH(const shared_ptr<Engine>& e, scene->engines){
-		if (isInheritingFrom(e->getClassName(),"TimeStepper")){
-			return static_pointer_cast<TimeStepper>(e)->active;
-		}
-	}
-	return false;
-}
-
-bool Omega::containTimeStepper(){
-	if(!scene) return false;
-	FOREACH(const shared_ptr<Engine>& e, scene->engines){
-		if (e && isInheritingFrom(e->getClassName(),"TimeStepper")) return true;
-	}
-	return false;
-}
-
-
 

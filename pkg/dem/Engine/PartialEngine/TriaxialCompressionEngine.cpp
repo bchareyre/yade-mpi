@@ -195,7 +195,7 @@ void TriaxialCompressionEngine::action()
 			LOG_INFO ("Triax Compression started");
 		}
 		if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
-		Real dt = Omega::instance().getTimeStep();
+		const Real& dt = scene->dt;
 		 
 		if (abs(epsilonMax) > abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003;
@@ -214,7 +214,7 @@ void TriaxialCompressionEngine::action()
 		{
 			LOG_INFO ("Compression started");
 		}		
-		Real dt = Omega::instance().getTimeStep();
+		const Real& dt = scene->dt;
 		State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
 		State* p_top=Body::byId(wall_top_id,scene)->state.get();
 		State* p_left=Body::byId(wall_left_id,scene)->state.get();

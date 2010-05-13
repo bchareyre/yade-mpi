@@ -19,7 +19,7 @@ void InterpolatingSpiralEngine::action(){
 }
 
 void SpiralEngine::action(){
-	Real dt=Omega::instance().getTimeStep();
+	const Real& dt=scene->dt;
 	axis.normalize();
 	Quaternionr q(AngleAxisr(angularVelocity*dt,axis));
 	angleTurned+=angularVelocity*dt;

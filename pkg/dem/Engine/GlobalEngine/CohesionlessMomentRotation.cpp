@@ -25,7 +25,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 	Body* b1 = ( *bodies ) [id1].get();
 	Body* b2 = ( *bodies ) [id2].get();
-	Real dt = Omega::instance().getTimeStep(); //Get TimeStep
+	const Real& dt = scene->dt; //Get TimeStep
 
 
 	/*NormalForce */

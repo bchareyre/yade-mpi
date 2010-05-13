@@ -24,7 +24,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 // 	cout << "\n Nvlle it :"<< endl;
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 
 	InteractionContainer::iterator ii    = scene->interactions->begin();	// a supprimer pr passage au go
 	InteractionContainer::iterator iiEnd = scene->interactions->end();	// a supprimer pr passage au go

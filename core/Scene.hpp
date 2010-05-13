@@ -59,7 +59,14 @@ class Scene: public Serializable{
 
 		void moveToNextTimeStep();
 
-		void setTimeSteppersActive(bool a);
+		/* Functions operating on TimeStepper; they all throw exception if there is more than 1 */
+		// return whether a TimeStepper is present
+		bool timeStepperPresent();
+		// true if TimeStepper is present and active, false otherwise
+		bool timeStepperActive();
+		// (de)activate TimeStepper; returns whether the operation was successful (i.e. whether a TimeStepper was found)
+		bool timeStepperActivate(bool activate);
+
 		shared_ptr<Engine> engineByName(string s);
 		shared_ptr<Engine> engineByLabel(string s);
 

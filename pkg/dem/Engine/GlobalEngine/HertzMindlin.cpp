@@ -66,7 +66,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 CREATE_LOGGER(Law2_ScGeom_MindlinPhys_Mindlin);
 
 void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
-	Real dt = Omega::instance().getTimeStep(); // get time step
+	const Real& dt = scene->dt; // get time step
 	
 	int id1 = contact->getId1(); // get id body 1
   	int id2 = contact->getId2(); // get id body 2

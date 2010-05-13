@@ -52,7 +52,7 @@ void KinemCNDEngine::action()
 void KinemCNDEngine::letMove()
 {
 	shared_ptr<BodyContainer> bodies = scene->bodies;
-	Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 	Real dx = shearSpeed * dt;
 
 	topbox->state->pos += Vector3r(dx,0,0);

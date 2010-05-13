@@ -8,7 +8,7 @@ void StepDisplacer::action(){
 	FOREACH(body_id_t id, subscribedBodies){
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(setVelocities){
-			Real dt=Omega::instance().getTimeStep();
+			const Real& dt=scene->dt;
 			b->state->vel=deltaSe3.position/dt;
 			AngleAxisr aa(angleAxisFromQuat(deltaSe3.orientation)); aa.axis().normalize();
 			b->state->angVel=aa.axis()*aa.angle()/dt;

@@ -10,7 +10,7 @@
 #include<yade/core/Scene.hpp>
 
 void TranslationEngine::action(){
-	Real dt=Omega::instance().getTimeStep();
+	const Real& dt=scene->dt;
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)scene->bodies->size());
 		Body* b=Body::byId(id,scene).get();

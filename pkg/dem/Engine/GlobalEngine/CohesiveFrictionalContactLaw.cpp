@@ -52,7 +52,7 @@ void CohesiveFrictionalContactLaw::action()
 
 void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb)
 {
-	const Real dt = Omega::instance().getTimeStep();
+	const Real& dt = scene->dt;
 // 		if (detectBrokenBodies  //Experimental, has no effect
 // 		        && (*bodies)[contact->getId1()]->shape->getClassName() != "box"
 // 		        && (*bodies)[contact->getId2()]->shape->getClassName() != "box") {
