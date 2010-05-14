@@ -69,7 +69,7 @@
 	//template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(Scalar s, const VECTOR3_TEMPLATE(Scalar)& v) {return v*s;}
 	//template<class Scalar> MATRIX3_TEMPLATE(Scalar) operator*(Scalar s, const MATRIX3_TEMPLATE(Scalar)& m) { return m*s; }
 	//template<class Scalar> Quaternion<Scalar> operator*(Scalar s, const Quaternion<Scalar>& q) { return q*s; }
-	template<typename Scalar> void matrixEigenDecomposition(const MATRIX3_TEMPLATE(Scalar) m, MATRIX3_TEMPLATE(Scalar)& mRot, MATRIX3_TEMPLATE(Scalar)& mDiag){ Eigen::EigenSolver<MATRIX3_TEMPLATE(Scalar)> a(m); mDiag=a.eigenvalues().real().asDiagonal(); mRot=a.eigenvectors().real(); }
+	template<typename Scalar> void matrixEigenDecomposition(const MATRIX3_TEMPLATE(Scalar) m, MATRIX3_TEMPLATE(Scalar)& mRot, MATRIX3_TEMPLATE(Scalar)& mDiag){ Eigen::SelfAdjointEigenSolver<MATRIX3_TEMPLATE(Scalar)> a(m); mRot=a.eigenvectors(); mDiag=a.eigenvalues().asDiagonal(); }
 	//__attribute__((warning("Replace this function with direct AngleAxis constructor from Quaternion")))
 	template<typename Scalar> AngleAxis<Scalar> angleAxisFromQuat(const Quaternion<Scalar>& q){ return AngleAxis<Scalar>(q); }
 	// http://eigen.tuxfamily.org/dox/TutorialGeometry.html
