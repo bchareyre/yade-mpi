@@ -17,7 +17,7 @@ has sphere taken off at the back and also a notch) and the body (with cylidrical
 rad,gap=.15,.02
 
 #Add material
-O.materials.append(FrictMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3))
+O.materials.append(FrictMat(young=10e9,poisson=.25,frictionAngle=0.5,density=1e3))
 
 #Parameters, which will be passed into spheres and facets creators
 kw={'material':0}
@@ -88,7 +88,7 @@ O.engines=[
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
-	NewtonIntegrator(damping=.1),
+	NewtonIntegrator(damping=.1,exactAsphericalRot=True),
 	RotationEngine(
 		subscribedBodies=rotateIDs,
 		angularVelocity=10.0,
