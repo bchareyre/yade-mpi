@@ -357,11 +357,6 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		sp.rotate(*orientation.toAxisAngle())
 	return filterSpherePack(predicate,sp,material=material,color=color)
 
-# compatibility with the deprecated name, can be removed in the future
-def triaxialPack(*args,**kw):
-	import warnings; warnings.warn("pack.triaxialPack was renamed to pack.randomDensePack, update your code!",DeprecationWarning,stacklevel=2);
-	return randomDensePack(*args,**kw)
-
 def randomPeriPack(radius,rRelFuzz,initSize):
 	"""Generate periodic dense packing.	EXPERIMENTAL, you at your own risk.
 

@@ -27,11 +27,6 @@ class Collider : public GlobalEngine
 		 * the bodies are in potential interaction geometrically.
 		 */
 		bool mayCollide(const Body*, const Body*);
-		/*! Handle various state transitions of Interaction (isReal, isNew).
-		 *
-		 * Returns whether the interaction should be preserved (true) or deleted (false).
-		 */
-		bool handleExistingInteraction(Interaction*);
 
 		/*! Invalidate all persistent data (if the collider has any), forcing reinitialization at next run.
 		The default implementation does nothing, colliders should override it if it is applicable.
