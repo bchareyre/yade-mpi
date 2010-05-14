@@ -113,7 +113,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	b.state.mass,b.state.inertia=mass,geomInertia*b.mat.density
 	if not noBound: b.bound=Aabb(diffuseColor=[0,1,0])
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1):
+def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1,groupMask=0):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
 
 	Last assigned material is used by default (*material*=-1), and utils.defaultMaterial() will be used if no material is defined at all.
@@ -130,6 +130,8 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 			* if string, it is label of an existing material that will be used
 			* if Material instance, this instance will be used
 			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
+		`groupMask`: integer
+			groupMask for the body
 
 	:return:
 		A Body instance with desired characteristics.
@@ -185,6 +187,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
+	b.groupMask=groupMask
 	return b
 
 def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=-1):
@@ -226,14 +229,25 @@ def wall(position,axis,sense=0,color=None,material=-1):
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1):
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1,groupMask=0):
 	"""Create facet with given parameters.
 
 	:Parameters:
 		`vertices`: [Vector3,Vector3,Vector3]
 			coordinates of vertices in the global coordinate system.
+		`wire`: bool
+			if True, facets are shown as skeleton; otherwise facets are filled
 		`noBound`:
 			do not assign Body().bound
+		`color`: Vector3 or None
+			random color will be assigned if None
+		`material`: int | string | Material instance | callable returning Material instance
+			* if int, O.materials[material] will be used; as a special case, if material==-1 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
+			* if string, it is label of an existing material that will be used
+			* if Material instance, this instance will be used
+			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
+		`groupMask`: integer
+			groupMask for the body
 	
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
@@ -245,6 +259,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
+	b.groupMask=groupMask
 	return b
 
 def facetBox(center,extents,orientation=Quaternion().Identity,wallMask=63,**kw):
