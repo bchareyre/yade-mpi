@@ -1,6 +1,7 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"StepDisplacer.hpp"
 #include<yade/core/State.hpp>
+#include<yade/core/Scene.hpp>
 CREATE_LOGGER(StepDisplacer);
 YADE_PLUGIN((StepDisplacer));
 
