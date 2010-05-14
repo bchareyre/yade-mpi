@@ -35,7 +35,7 @@
 					cpmSigmaM->InsertNextValue((ss[0]+ss[1]+ss[2])/3.);
 					cpmTau->InsertNextTupleValue(t);
 				}
-				if (recActive[REC_MATERIALID]) materialId->InsertNextValue(b->material->id);
+				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
 				continue;
 			}
 		}
@@ -58,7 +58,8 @@
 					float c[3] = {color[0],color[1],color[2]};
 					facetsColors->InsertNextTupleValue(c);
 				}
-				if (recActive[REC_MATERIALID]) materialId->InsertNextValue(b->material->id);
+				if (recActive[REC_MATERIALID]) facetsMaterialId->InsertNextValue(b->material->id);
 				continue;
 			}
 		}
+		

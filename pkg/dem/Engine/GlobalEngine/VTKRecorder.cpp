@@ -38,13 +38,13 @@ void VTKRecorder::action(){
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="velocity") recActive[REC_VELOCITY]=true;
 		else if(rec=="facets") recActive[REC_FACETS]=true;
-		else if(rec=="colors") recActive[REC_COLORS]=true;
+		else if((rec=="colors") || (rec=="color"))recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else if(rec=="intr") recActive[REC_INTR]=true;
 		else if((rec=="ids") || (rec=="id")) recActive[REC_ID]=true;
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, colors, cpm, intr, id, clumpId, materialId). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, color, cpm, intr, id, clumpId, materialId). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -63,23 +63,27 @@ void VTKRecorder::action(){
 	clumpId->SetName("clumpId");
 	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
 	spheresColors->SetNumberOfComponents(3);
-	spheresColors->SetName("colors");
+	spheresColors->SetName("color");
 	vtkSmartPointer<vtkFloatArray> spheresVelocity = vtkSmartPointer<vtkFloatArray>::New();
 	spheresVelocity->SetNumberOfComponents(3);
 	spheresVelocity->SetName("velocity");
 	vtkSmartPointer<vtkFloatArray> sphAngVel = vtkSmartPointer<vtkFloatArray>::New();
 	sphAngVel->SetNumberOfComponents(3);
 	sphAngVel->SetName("angVel");
-	vtkSmartPointer<vtkFloatArray> materialId = vtkSmartPointer<vtkFloatArray>::New();
-	materialId->SetNumberOfComponents(1);
-	materialId->SetName("materialId");
+	vtkSmartPointer<vtkFloatArray> spheresMaterialId = vtkSmartPointer<vtkFloatArray>::New();
+	spheresMaterialId->SetNumberOfComponents(1);
+	spheresMaterialId->SetName("materialId");
+	
 	
 	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkFloatArray> facetsColors = vtkSmartPointer<vtkFloatArray>::New();
 	facetsColors->SetNumberOfComponents(3);
-	facetsColors->SetName("Colors");
+	facetsColors->SetName("color");
+	vtkSmartPointer<vtkFloatArray> facetsMaterialId = vtkSmartPointer<vtkFloatArray>::New();
+	facetsMaterialId->SetNumberOfComponents(1);
+	facetsMaterialId->SetName("materialId");
 
 	// interactions
 	vtkSmartPointer<vtkPoints> intrBodyPos = vtkSmartPointer<vtkPoints>::New();
@@ -170,7 +174,7 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(cpmSigmaM);
 			spheresUg->GetPointData()->AddArray(cpmTau);
 		}
-		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(materialId);
+		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
 		
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
@@ -184,7 +188,7 @@ void VTKRecorder::action(){
 		facetsUg->SetPoints(facetsPos);
 		facetsUg->SetCells(VTK_TRIANGLE, facetsCells);
 		if (recActive[REC_COLORS]) facetsUg->GetCellData()->AddArray(facetsColors);
-		if (recActive[REC_MATERIALID]) facetsUg->GetPointData()->AddArray(materialId);
+		if (recActive[REC_MATERIALID]) facetsUg->GetCellData()->AddArray(facetsMaterialId);
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
 		string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
