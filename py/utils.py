@@ -113,7 +113,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	b.state.mass,b.state.inertia=mass,geomInertia*b.mat.density
 	if not noBound: b.bound=Aabb(diffuseColor=[0,1,0])
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1,groupMask=0):
+def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
 
 	Last assigned material is used by default (*material*=-1), and utils.defaultMaterial() will be used if no material is defined at all.
@@ -130,8 +130,8 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 			* if string, it is label of an existing material that will be used
 			* if Material instance, this instance will be used
 			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
-		`groupMask`: integer
-			groupMask for the body
+		`mask`: integer
+			:yref:`Body.mask` for the body
 
 	:return:
 		A Body instance with desired characteristics.
@@ -187,10 +187,10 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
-	b.groupMask=groupMask
+	b.mask=mask
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=-1):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create box (cuboid) with given parameters.
 
 	:Parameters:
@@ -205,9 +205,10 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	_commonBodySetup(b,V,geomInert,material)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
+	b.mask=mask
 	return b
 
-def wall(position,axis,sense=0,color=None,material=-1):
+def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	"""Return ready-made wall body.
 
 	:Parameters:
@@ -217,6 +218,8 @@ def wall(position,axis,sense=0,color=None,material=-1):
 			orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
 		`sense`: ∈{-1,0,1}
 			sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
+		`mask`: bitmask (as int)
+			:yref:`Body.mask`
 
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
@@ -227,9 +230,10 @@ def wall(position,axis,sense=0,color=None,material=-1):
 	else: pos2=position
 	b.pos=b.refPos=pos2
 	b.dynamic=False
+	b.mask=mask
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1,groupMask=0):
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1):
 	"""Create facet with given parameters.
 
 	:Parameters:
@@ -246,8 +250,8 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 			* if string, it is label of an existing material that will be used
 			* if Material instance, this instance will be used
 			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
-		`groupMask`: integer
-			groupMask for the body
+		`mask`: integer
+			:yref:`Body.mask` for the body
 	
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
@@ -259,7 +263,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
-	b.groupMask=groupMask
+	b.mask=mask
 	return b
 
 def facetBox(center,extents,orientation=Quaternion().Identity,wallMask=63,**kw):
