@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="933.84973"
+   height="497.59039"
+   id="svg2"
+   inkscape:label="Pozadí"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="yade-iter-loop.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.6962044"
+     inkscape:cx="466.92487"
+     inkscape:cy="353.64164"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="977"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <defs
+     id="defs3">
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend">
+      <path
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         id="path5505" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Mend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         id="path5487" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         id="path3302" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Lend">
+      <path
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         id="path3320" />
+    </marker>
+    <inkscape:perspective
+       id="perspective9"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       id="perspective2974" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       id="perspective3017" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       id="perspective3042" />
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mendw"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mendw">
+      <path
+         transform="scale(-0.6,-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="font-size:12px;fill:#d4a700;fill-rule:evenodd;stroke:#d4a700;stroke-width:0.625;stroke-linejoin:round"
+         id="path6134" />
+    </marker>
+    <inkscape:perspective
+       id="perspective6326"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <metadata
+     id="metadata6">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(102.04851,23.145719)"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Vrstva 1">
+    <g
+       style="fill:#ff0000"
+       id="g6763"
+       transform="translate(50.791986,-12.260135)">
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         x="18.571426"
+         y="19.505041"
+         id="text2382"><tspan
+           sodipodi:role="line"
+           id="tspan2384"
+           x="18.571426"
+           y="19.505041">bodies</tspan></text>
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot2386"
+         style="font-size:20px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         transform="translate(-54.285714,-28.571429)"><flowRegion
+           id="flowRegion2388"><rect
+             id="rect2390"
+             width="240.00002"
+             height="110.00001"
+             x="105.71429"
+             y="52.362183"
+             style="font-size:20px;fill:#ff0000" /></flowRegion><flowPara
+           id="flowPara2392">Shape</flowPara><flowPara
+           id="flowPara2870">Material</flowPara><flowPara
+           id="flowPara6761">State</flowPara><flowPara
+           id="flowPara2394">Bound</flowPara><flowPara
+           id="flowPara2396" /></flowRoot>    </g>
+    <g
+       style="fill:#0000ff"
+       transform="translate(125.38682,17.212846)"
+       id="g2466">
+      <flowRoot
+         transform="translate(54.551375,22.281613)"
+         xml:space="preserve"
+         id="flowRoot2398"
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><flowRegion
+           id="flowRegion2400"><rect
+             style="fill:#0000ff"
+             id="rect2402"
+             width="288.57147"
+             height="150.00002"
+             x="412.85715"
+             y="102.36218" /></flowRegion><flowPara
+           id="flowPara2404">interactions</flowPara></flowRoot>      <flowRoot
+         transform="translate(-177.72234,-82.89511)"
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+         id="flowRoot2902"
+         xml:space="preserve"><flowRegion
+           id="flowRegion2904"><rect
+             style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+             y="286.83551"
+             x="607.75238"
+             height="85.820953"
+             width="306.50336"
+             id="rect2906" /></flowRegion><flowPara
+           id="flowPara2908">geometry</flowPara><flowPara
+           id="flowPara2910">    collision detection pass 2</flowPara><flowPara
+           id="flowPara2912">    strain evaluation</flowPara></flowRoot>      <flowRoot
+         style="font-size:40px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         id="flowRoot2914"
+         xml:space="preserve"><flowRegion
+           id="flowRegion2916"><rect
+             style="fill:#0000ff"
+             y="373.53217"
+             x="587.61072"
+             height="92.826736"
+             width="316.13632"
+             id="rect2918" /></flowRegion><flowPara
+           id="flowPara2920" /></flowRoot>      <flowRoot
+         transform="translate(-234.81287,-82.382123)"
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+         id="flowRoot2922"
+         xml:space="preserve"><flowRegion
+           id="flowRegion2924"><rect
+             style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+             y="376.15933"
+             x="602.49805"
+             height="89.323853"
+             width="388.82138"
+             id="rect2926" /></flowRegion><flowPara
+           id="flowPara2928">physics</flowPara><flowPara
+           id="flowPara2930">    properties of new interactions</flowPara></flowRoot>      <flowRoot
+         transform="translate(-220.71327,-48.617406)"
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+         id="flowRoot2932"
+         xml:space="preserve"><flowRegion
+           id="flowRegion2934"><rect
+             style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+             y="423.44843"
+             x="461.5065"
+             height="108.58976"
+             width="442.24057"
+             id="rect2936" /></flowRegion><flowPara
+           id="flowPara2938" /></flowRoot>      <text
+         sodipodi:linespacing="125%"
+         id="text2940"
+         y="379.19141"
+         x="280.95206"
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#0000ff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="379.19141"
+           x="280.95206"
+           id="tspan2942"
+           sodipodi:role="line">constitutive law</tspan><tspan
+           id="tspan2944"
+           y="404.19141"
+           x="280.95206"
+           sodipodi:role="line">    compute forces from strains</tspan></text>
+    </g>
+    <g
+       style="fill:#008000"
+       transform="translate(6.9570471,167.19618)"
+       id="g2477">
+      <g
+         transform="translate(-28.023165,4.3786195)"
+         id="g2950">
+        <flowRoot
+           style="font-size:40px;font-style:normal;font-weight:normal;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+           id="flowRoot2416"
+           xml:space="preserve"><flowRegion
+             id="flowRegion2418"><rect
+               y="230.93361"
+               x="81.428574"
+               height="50.000004"
+               width="154.28571"
+               id="rect2420"
+               style="fill:#008000" /></flowRegion><flowPara
+             id="flowPara2422">forces</flowPara></flowRoot>        <flowRoot
+           style="font-size:20px;font-style:normal;font-weight:normal;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+           id="flowRoot2424"
+           xml:space="preserve"
+           transform="translate(-10.508687,-7.881515)"><flowRegion
+             id="flowRegion2426"><rect
+               style="font-size:20px;fill:#008000"
+               y="286.64789"
+               x="125.71429"
+               height="39.305504"
+               width="147.24493"
+               id="rect2428" /></flowRegion><flowPara
+             id="flowPara2432">(generalized)</flowPara></flowRoot>      </g>
+    </g>
+    <text
+       id="text2442"
+       y="21.132761"
+       x="406.27216"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:#d40000;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="21.132761"
+         x="406.27216"
+         id="tspan2444"
+         sodipodi:role="line">update</tspan><tspan
+         id="tspan2876"
+         y="46.132759"
+         x="406.27216"
+         sodipodi:role="line">bounds</tspan></text>
+    <text
+       id="text2446"
+       y="37.010498"
+       x="544.98999"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:#d40000;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="37.010498"
+         x="544.98999"
+         id="tspan2448"
+         sodipodi:role="line" /><tspan
+         id="tspan2872"
+         y="62.010498"
+         x="544.98999"
+         sodipodi:role="line">collision</tspan><tspan
+         id="tspan2874"
+         y="87.010498"
+         x="544.98999"
+         sodipodi:role="line">detection</tspan><tspan
+         id="tspan2888"
+         y="112.0105"
+         x="544.98999"
+         sodipodi:role="line">pass 1</tspan><tspan
+         id="tspan2890"
+         y="137.0105"
+         x="544.98999"
+         sodipodi:role="line" /></text>
+    <text
+       id="text2462"
+       y="421.38898"
+       x="242.7551"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan2960"
+         y="421.38898"
+         x="242.7551"
+         sodipodi:role="line">other forces</tspan><tspan
+         id="tspan2962"
+         y="446.38898"
+         x="242.7551"
+         sodipodi:role="line">(gravity, BC, ...)</tspan></text>
+    <text
+       id="text2502"
+       y="152.45392"
+       x="-73.480087"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan6707"
+         y="152.45392"
+         x="-73.480087"
+         sodipodi:role="line">miscillaneous engines</tspan><tspan
+         id="tspan3059"
+         y="177.45392"
+         x="-73.480087"
+         sodipodi:role="line">(recorders, ...)</tspan></text>
+    <text
+       id="text2516"
+       y="21.208614"
+       x="234.53363"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:#d40000;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="21.208614"
+         x="234.53363"
+         id="tspan2518"
+         sodipodi:role="line">reset forces</tspan></text>
+    <path
+       sodipodi:nodetypes="csc"
+       id="path2520"
+       d="M 210.85511,1.2490291 C 379.28654,-14.689803 448.66125,-8.7215298 533.95959,7.8913622 725.40953,45.178574 753.01828,124.79542 753.01828,124.79542"
+       style="fill:none;stroke:#940052;stroke-width:3.39219499;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.44981414;stroke-dasharray:none;marker-mid:none;marker-end:none" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path2522"
+       d="M 753.70506,188.55462 C 720.9161,395.61616 188.25561,436.95669 188.25561,436.95669"
+       style="fill:none;stroke:#940052;stroke-width:4.58069611;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.44981414;stroke-dasharray:none;marker-mid:none;marker-end:none" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path2524"
+       d="M 48.131348,424.55668 C -304.76964,177.54408 83.468799,22.082876 83.468799,22.082876"
+       style="fill:none;stroke:#940052;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.44981414;stroke-dasharray:none;marker-mid:none;marker-end:none" />
+    <text
+       id="text2462-1"
+       y="355.28683"
+       x="-27.674311"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan2962-0"
+         y="355.28683"
+         x="-27.674311"
+         sodipodi:role="line">forces → acceleration </tspan></text>
+    <text
+       id="text2462-1-8"
+       y="295.72665"
+       x="-67.929207"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan2962-0-4"
+         y="295.72665"
+         x="-67.929207"
+         sodipodi:role="line">velocity update </tspan></text>
+    <text
+       id="text2462-1-8-9"
+       y="235.08928"
+       x="-93.263123"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan2962-0-4-1"
+         y="235.08928"
+         x="-93.263123"
+         sodipodi:role="line">position update</tspan></text>
+    <path
+       sodipodi:open="true"
+       sodipodi:end="4.3723239"
+       sodipodi:start="0"
+       transform="matrix(-0.40486502,-0.93519185,1.0798024,-0.35064421,303.71379,698.65083)"
+       d="m 605.3014,184.07472 c 0,61.04548 -53.64741,110.53261 -119.82484,110.53261 -66.17743,0 -119.82483,-49.48713 -119.82483,-110.53261 0,-46.83258 31.99518,-88.581795 79.85744,-104.20273"
+       sodipodi:ry="110.53261"
+       sodipodi:rx="119.82484"
+       sodipodi:cy="184.07472"
+       sodipodi:cx="485.47656"
+       id="path3063"
+       style="fill:none;stroke:#d4a700;stroke-width:4.00013828;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mendw)"
+       sodipodi:type="arc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6306"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d4a700;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
+       transform="translate(-161.50944,27.208405)"><flowRegion
+         id="flowRegion6308"><rect
+           id="rect6310"
+           width="228.12607"
+           height="109.90334"
+           x="359.04678"
+           y="99.136024"
+           style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d4a700;fill-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans" /></flowRegion><flowPara
+         id="flowPara6312">simulation</flowPara><flowPara
+         id="flowPara6316">loop </flowPara><flowPara
+         id="flowPara6314" /></flowRoot>    <text
+       id="text2502-7"
+       y="60.136635"
+       x="-39.323704"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan3059-0"
+         y="60.136635"
+         x="-39.323704"
+         sodipodi:role="line">increment</tspan><tspan
+         y="85.136635"
+         x="-39.323704"
+         sodipodi:role="line"
+         id="tspan6348">time by Δt</tspan></text>
+  </g>
+</svg>
