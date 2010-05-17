@@ -228,7 +228,7 @@ def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
 	else: pos2=position
-	b.pos=b.refPos=pos2
+	b.state.pos=b.state.refPos=pos2
 	b.dynamic=False
 	b.mask=mask
 	return b
@@ -610,38 +610,17 @@ If the last point's x coord is zero, it will not be duplicated."""
 
 
 def _deprecatedUtilsFunction(old,new):
+	"Wrapper for deprecated functions, example below."
 	import warnings
 	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category=DeprecationWarning)
 
-def sumBexForces(*args,**kw):
-	"|ydeprecated|"
-	_deprecatedUtilsFunction('sumBexForces','utils.sumForces')
-	return sumForces(*args,**kw)
-def sumBexTorques(*args,**kw):
-	"|ydeprecated|"
-	_deprecatedUtilsFunction('sumBexTorques','utils.sumTorques')
-	return sumTorques(*args,**kw)
-
-def spheresFromFile(*args,**kw):
-	"|ydeprecated|"
-	_deprecatedUtilsFunction('spheresFromFile','yade.import.text')
-	import yade.ymport
-	return yade.ymport.spheresFromFile(*args,**kw)
-def import_stl_geometry(*args,**kw):
-	"|ydeprecated|"
-	_deprecatedUtilsFunction('import_stl_geometry','yade.import.stl')
-	import yade.ymport
-	return yade.ymport.stl(*args,**kw)
-def import_mesh_geometry(*args,**kw):
-	"|ydeprecated|"
-	_deprecatedUtilsFunction('import_mesh_geometry','yade.import.gmsh')
-	import yade.ymport
-	return yade.ymport.stl(*args,**kw)
-def import_LSMGenGeo_geometry(*args,**kw):
-	"|ydeprecated|"
-	_deprecatedUtilsFunction('import_LSMGenGeo_geometry','yade.import.gengeo')
-	import yade.ymport
-	return yade.ymport.gengeo(*args,**kw)
+# example of _deprecatedUtilsFunction usage:
+#
+# def import_mesh_geometry(*args,**kw):
+#    "|ydeprecated|"
+#    _deprecatedUtilsFunction('import_mesh_geometry','yade.import.gmsh')
+#    import yade.ymport
+#    return yade.ymport.stl(*args,**kw)
 
 
 class TableParamReader():
