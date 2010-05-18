@@ -175,7 +175,8 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	}
 	Real meanF=sumF/nb;
 	// get max force on contacts
-	Real maxContactF=0; sumF=0; nb=0;
+	// Real maxContactF=0; 										//It gave a warning. Anton Gladky.
+	sumF=0; nb=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
 		shared_ptr<NormShearPhys> nsi=YADE_PTR_CAST<NormShearPhys>(I->interactionPhysics); assert(nsi);
@@ -1158,4 +1159,33 @@ Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period){
 	Real xxNorm=xNorm-floor(xNorm);
 	if(period) *period=(long)floor(xNorm);
 	return x0+xxNorm*(x1-x0);
+}
+
+void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
+	const shared_ptr<Scene>& scene=Omega::instance().getScene();
+	bodyStates.resize(scene->bodies->size());
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
+		if(!phys) continue;
+		const body_id_t id1=I->getId1(), id2=I->getId2();
+		
+		Real minRad=(geom->refR1<=0?geom->refR2:(geom->refR2<=0?geom->refR1:min(geom->refR1,geom->refR2)));
+		Real crossSection=Mathr::PI*pow(minRad,2);
+		
+		Vector3r normalStress=((1./crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
+		Vector3r shearStress;
+		for(int i=0; i<3; i++){
+			int ix1=(i+1)%3,ix2=(i+2)%3;
+			shearStress[i]=geom->normal[ix1]*phys->shearForce[ix1]+geom->normal[ix2]*phys->shearForce[ix2];
+			shearStress[i]/=crossSection;
+		}
+		
+		bodyStates[id1].normStress+=normalStress;
+		bodyStates[id2].normStress+=normalStress;
+		
+		bodyStates[id1].shearStress+=shearStress;
+		bodyStates[id2].shearStress+=shearStress;
+	}
 }

@@ -22,7 +22,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 // void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
 {
 // 	cout << "\n Nvlle it :"<< endl;
-	shared_ptr<BodyContainer>& bodies = scene->bodies;
+	//shared_ptr<BodyContainer>& bodies = scene->bodies;				//It gave a warning. Anton Gladky.
 
 	const Real& dt = scene->dt;
 

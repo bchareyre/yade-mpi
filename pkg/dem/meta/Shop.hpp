@@ -119,4 +119,15 @@ class Shop{
 		//! Flip cell shear without affecting interactions; if flip is zeros, it will be computed such that abs of shear strain is minimal for each shear component
 		//! Diagonal terms of flip are meaningless and ignored.
 		static Matrix3r flipCell(const Matrix3r& flip=Matrix3r::Zero());
+
+		//! Class for storing stresses, affected on bodies, obtained from Interactions
+		struct bodyState{
+				Vector3r normStress, shearStress;
+				bodyState (){
+					normStress = Vector3r(0.0,0.0,0.0);
+					shearStress = Vector3r(0.0,0.0,0.0);
+				}
+		};
+		//! Function of getting stresses for each body
+		void getStressForEachBody(vector<Shop::bodyState>&);
 };

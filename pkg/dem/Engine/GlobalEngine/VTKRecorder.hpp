@@ -19,14 +19,4 @@ class VTKRecorder: public PeriodicEngine {
 	);
 	DECLARE_LOGGER;
 };
-
-//Class for storing forces, affected on bodies, obtained from Interactions
-class bodyState{
-	public:
-		Vector3r normStress, shearStress;
-		bodyState (){
-			normStress = Vector3r(0.0,0.0,0.0);
-			shearStress = Vector3r(0.0,0.0,0.0);
-		}
-};
 REGISTER_SERIALIZABLE(VTKRecorder);
