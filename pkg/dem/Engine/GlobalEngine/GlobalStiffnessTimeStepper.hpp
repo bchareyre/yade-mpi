@@ -32,7 +32,6 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		void findTimeStepFromBody(const shared_ptr<Body>& body, Scene * ncb);
 	
 	public :
-		//! used as a multiplier on the theoretical critical timestep (compensate some approximations in the computation)
 		virtual ~GlobalStiffnessTimeStepper();
 	
 		virtual void computeTimeStep(Scene*);

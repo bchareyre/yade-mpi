@@ -168,20 +168,21 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	rb->forces.sync();
 	// get maximum force on a body and sum of all forces (for averaging)
-	Real sumF=0,maxF=0,currF;
+	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
-		currF=rb->forces.getForce(b->id).norm(); maxF=max(currF,maxF); sumF+=currF;
+		currF=rb->forces.getForce(b->id).norm(); maxF=max(currF,maxF); sumF+=currF; nb++;
 	}
-	Real meanF=sumF/rb->bodies->size(); 
+	Real meanF=sumF/nb;
 	// get max force on contacts
-	Real maxContactF=0;
+	Real maxContactF=0; sumF=0; nb=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
 		shared_ptr<NormShearPhys> nsi=YADE_PTR_CAST<NormShearPhys>(I->interactionPhysics); assert(nsi);
-		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).norm());
+		sumF+=(nsi->normalForce+nsi->shearForce).norm(); nb++;
 	}
-	return (useMaxForce?maxF:meanF)/maxContactF;
+	sumF/=nb;
+	return (useMaxForce?maxF:meanF)/(sumF);
 }
 
 Real Shop::kineticEnergy(Scene* _rb){
