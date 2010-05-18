@@ -176,7 +176,24 @@ void VTKRecorder::action(){
 		}
 	}
 
-
+	//Additional Vector for storing forces
+	vector<bodyForce> bodyForces;
+	if(recActive[REC_FORCE]){
+		bodyForces.resize(scene->bodies->size());
+		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+			if(!I->isReal()) continue;
+			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+			if(!phys) continue;
+			const body_id_t id1=I->getId1(), id2=I->getId2();
+			
+			bodyForces[id1].norm+=phys->normalForce;
+			bodyForces[id2].norm-=phys->normalForce;
+			
+			bodyForces[id1].shear+=phys->shearForce;
+			bodyForces[id2].shear-=phys->shearForce;
+		}
+	}
+	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 		if(mask!=0 && (b->groupMask & mask)==0) continue;
@@ -208,7 +225,7 @@ void VTKRecorder::action(){
 					spheresAngVelLen->InsertNextValue(angVel.norm());
 				}
 				if(recActive[REC_FORCE]){
-					const Vector3r& force = scene->forces.getForce(b->getId());
+					const Vector3r& force = bodyForces[b->getId()].norm+bodyForces[b->getId()].shear;
 					float f[3] = { force[0],force[1],force[2] };
 					spheresForceVec->InsertNextTupleValue(f);
 					spheresForceLen->InsertNextValue(force.norm());
@@ -248,7 +265,7 @@ void VTKRecorder::action(){
 					facetsColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_FORCE]){
-					const Vector3r& force = scene->forces.getForce(b->getId());
+					const Vector3r& force = bodyForces[b->getId()].norm+bodyForces[b->getId()].shear;
 					float f[3] = { force[0],force[1],force[2] };
 					facetsForceVec->InsertNextTupleValue(f);
 					facetsForceLen->InsertNextValue(force.norm());
@@ -338,4 +355,3 @@ void VTKRecorder::action(){
 	//writer->SetInput(multiblockDataset);
 	//writer->Write();	
 }
-

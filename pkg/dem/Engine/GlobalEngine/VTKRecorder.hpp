@@ -19,5 +19,14 @@ class VTKRecorder: public PeriodicEngine {
 	);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(VTKRecorder);
 
+//Class for storing forces, affected on bodies, obtained from Interactions
+class bodyForce{
+	public:
+		Vector3r norm, shear;
+		bodyForce (){
+			norm = Vector3r(0.0,0.0,0.0);
+			shear = Vector3r(0.0,0.0,0.0);
+		}
+};
+REGISTER_SERIALIZABLE(VTKRecorder);
