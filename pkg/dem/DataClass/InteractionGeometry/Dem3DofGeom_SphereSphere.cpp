@@ -86,7 +86,7 @@ Real Dem3DofGeom_SphereSphere::scaleToDisplacementTMax(Real multiplier){
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Vector3r diff=.5*(multiplier-1)*(p2-p1);
 	setTgPlanePts(p1-diff,p2+diff);
-	return 2*diff.norm();
+	return 0;
 }
 
 
