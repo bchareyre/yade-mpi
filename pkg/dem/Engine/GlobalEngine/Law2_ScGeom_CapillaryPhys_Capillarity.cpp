@@ -30,7 +30,6 @@ using namespace std;
 
 // Law2_ScGeom_CapillaryPhys_Capillarity::Law2_ScGeom_CapillaryPhys_Capillarity() : GlobalEngine()
 // {
-//         sdecGroupMask=1;
 // 
 //         CapillaryPressure=0;
 //         fusionDetection = false;
@@ -108,7 +107,6 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         unsigned int id1 = interaction->getId1();
                         unsigned int id2 = interaction->getId2();
 			
-			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  ) continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 			
                         /// interaction geometry search (this test is to compute capillarity only between spheres (probably a better way to do that)
 			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!

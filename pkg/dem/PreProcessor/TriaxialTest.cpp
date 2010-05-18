@@ -311,7 +311,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 
 	globalStiffnessTimeStepper=shared_ptr<GlobalStiffnessTimeStepper>(new GlobalStiffnessTimeStepper);
-	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	
@@ -368,20 +367,12 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 			ids->physDispatcher=interactionPhysicsDispatcher;
 			ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 			if(!facetWalls && !wallWalls){
-				shared_ptr<Law2_ScGeom_FrictPhys_Basic> see(new Law2_ScGeom_FrictPhys_Basic); see->sdecGroupMask=2;
+				shared_ptr<Law2_ScGeom_FrictPhys_Basic> see(new Law2_ScGeom_FrictPhys_Basic);
 				ids->lawDispatcher->add(see);
 			} else {
 				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_Basic>(new Law2_Dem3DofGeom_FrictPhys_Basic));
 			}
 		rootBody->engines.push_back(ids);
-// 	} else {
-// 		assert(!facetWalls);
-// 		rootBody->engines.push_back(interactionGeometryDispatcher);
-// 		rootBody->engines.push_back(interactionPhysicsDispatcher);
-// 		shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
-// 		elasticContactLaw->sdecGroupMask = 2;
-// 		rootBody->engines.push_back(elasticContactLaw);
-// 	}
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	if(recordIntervalIter>0 && !noFiles) rootBody->engines.push_back(triaxialStateRecorder);

@@ -20,7 +20,6 @@ YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(Elas
 void ElasticContactLaw::action()
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
-	functor->sdecGroupMask=sdecGroupMask;
 	functor->useShear=useShear;
 	functor->neverErase=neverErase;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){

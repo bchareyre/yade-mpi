@@ -301,7 +301,6 @@ void DirectShearCis::createActors(shared_ptr<Scene>& rootBody)
  	
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
 

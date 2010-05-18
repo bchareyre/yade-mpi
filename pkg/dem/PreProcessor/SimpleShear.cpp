@@ -272,7 +272,6 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	
 
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
-	globalStiffnessTimeStepper->sdecGroupMask = 1;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt=1e-5;
 

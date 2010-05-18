@@ -412,24 +412,20 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	gravityCondition->gravity = gravity;
 	
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
-	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
-	elasticContactLaw->sdecGroupMask = 2;
 	elasticContactLaw->neverErase = true;
 	
 
 	// capillary
 	shared_ptr<Law2_ScGeom_CapillaryPhys_Capillarity> capillaryCohesiveLaw(new Law2_ScGeom_CapillaryPhys_Capillarity); 
-	capillaryCohesiveLaw->sdecGroupMask = 2;	
 	capillaryCohesiveLaw->CapillaryPressure = CapillaryPressure;
 // 	capillaryCohesiveLaw->fusionDetection = fusionDetection;
 // 	capillaryCohesiveLaw->binaryFusion = binaryFusion;
 
 	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
-	//stiffnesscounter->sdecGroupMask = 2;
 	//stiffnesscounter->interval = timeStepUpdateInterval;
 	
 	

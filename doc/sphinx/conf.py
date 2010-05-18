@@ -53,7 +53,7 @@ def yaderef_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 	id=id.replace('::','.')
 	#node=nodes.reference(rawtext,docutils.utils.unescape(txt),refuri='http://beta.arcig.cz/~eudoxos/yade/doxygen/?search=%s'%id,**options)
 	#node=nodes.reference(rawtext,docutils.utils.unescape(txt),refuri='yade.wrapper.html#yade.wrapper.%s'%id,**options)
-	return [mkYrefNode(id,txt,rawtext,role,explicitText,options)],[]
+	return [mkYrefNode(id,txt,rawtext,role,explicitText,lineno,options)],[]
 
 def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
 	"Handle the :ysrc:`` role, making hyperlink to bzr repository webpage with that path. Supports :ysrc:`Link text<file/name>` syntax, like usual hyperlinking roles. If target ends with ``/``, it is assumed to be a directory."
@@ -71,7 +71,7 @@ moduleMap={
 	'yade._packObb':'yade.pack'
 }
 
-def mkYrefNode(target,text,rawtext,role,explicitText,options={}):
+def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 	"""Create hyperlink to yade target. Targets starting with literal 'yade.' are absolute, but the leading 'yade.' will be stripped from the link text. Absolute tergets are supposed to live in page named yade.[module].html, anchored at #yade.[module2].[rest of target], where [module2] is identical to [module], unless mapped over by moduleMap.
 	
 	Other targets are supposed to live in yade.wrapper (such as c++ classes)."""
@@ -94,11 +94,15 @@ def mkYrefNode(target,text,rawtext,role,explicitText,options={}):
 	else:
 		uri=(('%%yade.wrapper#yade.wrapper.%s'%target) if writer=='latex' else 'yade.wrapper.html#yade.wrapper.%s'%target)
 		#print writer,uri
-	#refnode=addnodes.pending_xref(rawtext,reftype=role)
-	#refnode['reftarget']=target
-	#refnode+=nodes.literal(rawtext,text,classes=['ref',role])
-	#ret.rawtext,reftype=role,
-	return nodes.reference(rawtext,docutils.utils.unescape(text),refuri=uri,**options)
+	if 0:
+		refnode=addnodes.pending_xref(rawtext,reftype=role,refexplicit=explicitText)
+		refnode.line=lineno
+		refnode['reftarget']=target
+		refnode+=nodes.literal(rawtext,text,classes=['ref',role])
+		return [refnode],[]
+		#ret.rawtext,reftype=role,
+	else:
+		return nodes.reference(rawtext,docutils.utils.unescape(text),refuri=uri,**options)
 	#return [refnode],[]
 
 def ydefault_role(role,rawtext,text,lineno,inliner,options={},content=[]):

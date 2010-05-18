@@ -32,7 +32,6 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		void findTimeStepFromBody(const shared_ptr<Body>& body, Scene * ncb);
 	
 	public :
-		int sdecGroupMask; // FIXME - to be removed -> not used here but set in preprocessors, removing breaks compilation.
 		//! used as a multiplier on the theoretical critical timestep (compensate some approximations in the computation)
 		virtual ~GlobalStiffnessTimeStepper();
 	

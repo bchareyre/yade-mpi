@@ -40,8 +40,6 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 // 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
-		if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
-			continue; // skip other groups,
 
 		State* de1 = Body::byId(id1,scene)->state.get();
 		State* de2 = Body::byId(id2,scene)->state.get();

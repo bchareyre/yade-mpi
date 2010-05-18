@@ -226,7 +226,6 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 		kinematic->subscribedBodies.push_back((*bi)->getId());
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	sdecTimeStepper->sdecGroupMask = 1;
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
 	rootBody->engines.clear();

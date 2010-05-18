@@ -384,13 +384,11 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 
 	
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
-	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	globalStiffnessTimeStepper->timestepSafetyCoefficient = 0.2;
 	
 	shared_ptr<CohesiveFrictionalContactLaw> cohesiveFrictionalContactLaw(new CohesiveFrictionalContactLaw);
-	cohesiveFrictionalContactLaw->sdecGroupMask = 2;
 	
 	
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);

@@ -218,8 +218,6 @@ void Shop::init(){
 
 	defaults["container_is_not_empty"]=boost::any(0); // prevent loops from ensureInit();
 
-	setDefault<int>("body_sdecGroupMask",55);
-	
 	setDefault("phys_density",2e3);
 	setDefault("phys_young",30e9);
 	setDefault("phys_poisson",.3);
@@ -268,14 +266,8 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	//engines
 	rootBody->engines.clear();
 
-	/* big fat FIXME:
-	 * for some */
-	#define GO(type) try{cerr<<"Cast to" #type<<" gives: "<<getDefault<type>("body_sdecGroupMask")<<endl;} catch(boost::bad_any_cast){}
-	/*	GO(unsigned short); GO(short); GO(char);GO(int);GO(unsigned int);GO(long);GO(unsigned long);GO(long long);GO(unsigned long long); */
-	
 	if(getDefault<int>("param_timeStepUpdateInterval")>0){
 		shared_ptr<GlobalStiffnessTimeStepper> sdecTimeStepper(new GlobalStiffnessTimeStepper);
-		sdecTimeStepper->sdecGroupMask=getDefault<int>("body_sdecGroupMask");
 		sdecTimeStepper->timeStepUpdateInterval=getDefault<int>("param_timeStepUpdateInterval");
 		sdecTimeStepper->timeStepUpdateInterval=300;
 		rootBody->engines.push_back(sdecTimeStepper);
@@ -298,7 +290,6 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
-	constitutiveLaw->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
 	rootBody->engines.push_back(constitutiveLaw);
 
 	if(getDefault<Vector3r>("param_gravity")!=Vector3r(0,0,0)){

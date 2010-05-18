@@ -35,7 +35,6 @@ void outv ( Vector3r axis )
 void CohesiveFrictionalContactLaw::action()
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_CohFrictPhys_ElasticPlastic>(new Law2_ScGeom_CohFrictPhys_ElasticPlastic);
-	functor->sdecGroupMask=sdecGroupMask;
 	functor->erosionActivated = erosionActivated;
 	functor->detectBrokenBodies = detectBrokenBodies;
 	functor->always_use_moment_law = always_use_moment_law;
