@@ -6,6 +6,42 @@ from yade.wrapper import *
 from miniEigen import *
 from yade import utils
 
+def textExt(fileName,format='x_y_z_r',shift=[0.0,0.0,0.0],scale=1.0,**kw):
+	"""Load sphere coordinates from file in specific format, create spheres, insert them to the simulation.
+	
+	:Parameters:
+		`filename`: string
+		`format`:
+			the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+		`shift`: [float,float,float]
+			[X,Y,Z] parameter moves the specimen.
+		`scale`: float
+			factor scales the given data.
+		`**kw`: (unused keyword arguments)
+				is passed to :yref:`utils.sphere`
+	:Returns: list of spheres.
+	Lines starting with # are skipped
+	"""
+	infile = open(fileName,"r")
+	lines = infile.readlines()
+	infile.close()
+	ret=[]
+	for line in lines:
+		data = line.split()
+		if (data[0] == "#format"):
+			format=data[1]
+			continue
+		elif (data[0][0] == "#"): continue
+		
+		if (format=='x_y_z_r'):
+			ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
+			
+		elif (format=='x_y_z_r_matId'):
+			ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),material=int(data[4]),**kw))
+			
+		else:
+			raise RuntimeError("Please, specify a correct format output!");
+	return ret
 
 def text(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
@@ -22,16 +58,9 @@ def text(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	:Returns: list of spheres.
 	Lines starting with # are skipped
 	"""
-	infile = open(fileName,"r")
-	lines = infile.readlines()
-	infile.close()
-	ret=[]
-	for line in lines:
-		data = line.split()
-		if (data[0][0] == "#"): continue
-		ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
-	return ret
-
+	
+	return textExt(fileName=fileName,format='x_y_z_r',shift=shift,scale=scale,**kw)
+	
 def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1):
 	""" Import geometry from stl file, return list of created facets."""
 	imp = STLImporter()

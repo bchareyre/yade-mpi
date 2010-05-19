@@ -177,10 +177,7 @@ void VTKRecorder::action(){
 
 	//Additional Vector for storing forces
 	vector<Shop::bodyState> bodyStates;
-	if(recActive[REC_STRESS]){
-		Shop shopTemp;
-		shopTemp.getStressForEachBody(bodyStates);
-	}
+	if(recActive[REC_STRESS]) Shop::getStressForEachBody(bodyStates);
 	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;

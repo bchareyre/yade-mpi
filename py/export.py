@@ -120,11 +120,21 @@ class VTKWriter:
 		outFile.close()
 		self.snapCount+=1
 
-def text(filename, consider=lambda id: True):
-	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
+def textExt(filename, format='x_y_z_r',consider=lambda id: True):
+	"""Save sphere coordinates and other parameters into a text file in specific format.
 	Non-spherical bodies are silently skipped.
-	Returns number of spheres which were written.
-	Example added to examples/regular-sphere-pack/regular-sphere-pack.py
+	Users can add here their own specific format, giving meaningful names.
+	The first file row will contain the format name.
+	Be sure to add the same format specification in ymport.textExt.
+	
+	:parameters:
+	`filename`: string
+		the name of the file, where sphere coordinates will be exported.
+	`format`:
+		the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	`consider`:
+		anonymous function(optional)
+:return: number of spheres which were written.
 	"""
 	O=Omega()
 	
@@ -134,12 +144,33 @@ def text(filename, consider=lambda id: True):
 		raise RuntimeError("Problem to write into the file")
 	
 	count=0
+	
+	out.write('#format ' + format + '\n')
 	for b in O.bodies:
 		try:
 			if ((b.shape.name=="Sphere") and consider(b.id)):
-				out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape['radius']))
+				if (format=='x_y_z_r'):
+					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
+				elif (format=='x_y_z_r_matId'):
+					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				else:
+					raise RuntimeError("Please, specify a correct format output!");
 				count+=1
 		except AttributeError:
 			pass
 	out.close()
 	return count
+	
+def text(filename, consider=lambda id: True):
+	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
+	Non-spherical bodies are silently skipped.
+	Example added to examples/regular-sphere-pack/regular-sphere-pack.py
+:parameters:
+	`filename`: string
+		the name of the file, where sphere coordinates will be exported.
+	`consider`:
+		anonymous function(optional)
+:return: number of spheres which were written.
+	"""
+	return (textExt(filename=filename, format='x_y_z_r',consider=consider))
+

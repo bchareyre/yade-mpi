@@ -129,5 +129,5 @@ class Shop{
 				}
 		};
 		//! Function of getting stresses for each body
-		void getStressForEachBody(vector<Shop::bodyState>&);
+		static void getStressForEachBody(vector<Shop::bodyState>&);
 };
