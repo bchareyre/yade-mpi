@@ -449,6 +449,10 @@ def randomizeColors(onlyDynamic=False):
 		if b.dynamic or not onlyDynamic: b.shape.color=color
 
 def avgNumInteractions(cutoff=0.):
+	"""Return average numer of interactions per particle, also known as *coordination number*.
+
+	:param cutoff: cut some relative part of the sample's bounding box away.
+	"""
 	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 	return sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
 

@@ -41,6 +41,7 @@ void CohesiveFrictionalContactLaw::action()
 	functor->shear_creep=shear_creep;
 	functor->twist_creep=twist_creep;
 	functor->creep_viscosity = creep_viscosity;
+	functor->scene=scene;
 	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
