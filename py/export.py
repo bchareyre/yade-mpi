@@ -120,7 +120,7 @@ class VTKWriter:
 		outFile.close()
 		self.snapCount+=1
 
-def textExt(filename, format='x_y_z_r',consider=lambda id: True):
+def textExt(filename, format='x_y_z_r',consider=lambda id: True, comment=''):
 	"""Save sphere coordinates and other parameters into a text file in specific format.
 	Non-spherical bodies are silently skipped.
 	Users can add here their own specific format, giving meaningful names.
@@ -132,6 +132,9 @@ def textExt(filename, format='x_y_z_r',consider=lambda id: True):
 		the name of the file, where sphere coordinates will be exported.
 	`format`:
 		the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	`comment`:
+		the text, which will be added as a comment at the top of file. 
+		If you want to create several lines of text, please use `\n#` for next lines.
 	`consider`:
 		anonymous function(optional)
 :return: number of spheres which were written.
@@ -146,6 +149,8 @@ def textExt(filename, format='x_y_z_r',consider=lambda id: True):
 	count=0
 	
 	out.write('#format ' + format + '\n')
+	if (comment):
+		out.write('# ' + comment + '\n')
 	for b in O.bodies:
 		try:
 			if ((b.shape.name=="Sphere") and consider(b.id)):
