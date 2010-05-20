@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Olivier Galizzi   olivier.galizzi@imag.fr       *
+*  Copyright (C) 2009 by Bruno Chareyre   bruno.chareyre@hmg.inpg.fr     *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -16,6 +16,9 @@
 
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw)(Law2_Dem6DofGeom_FrictPhys_Beam));
 
+Real Law2_ScGeom_FrictPhys_Basic::Real0=0;
+Real Law2_ScGeom_FrictPhys_Basic::getPlasticDissipation() {return (Real) plasticDissipation;}
+void Law2_ScGeom_FrictPhys_Basic::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
 
 void ElasticContactLaw::action()
 {
@@ -64,7 +67,8 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
-	if (!traceEnergy){//Update force but don't compute energy terms
+	if (!traceEnergy){
+		//Update force but don't compute energy terms (see below))
 		if(useShear){
 			currentContactGeometry->updateShear(de1,de2,dt);
 			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
@@ -77,26 +81,21 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
 			shearForce *= ratio;
 			if(useShear) currentContactGeometry->shear*=ratio;}
-	} else {//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
-		Vector3r prevForce=shearForce;//store prev force for definition of plastic slip
+	} else {
+		//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
 		if(useShear) throw ("energy tracing not defined with useShear==true");
-		/*{
-			currentContactGeometry->updateShear(de1,de2,dt);
-			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;//FIXME : energy terms if useShear?
-		} else {*/
+		Vector3r prevForce=shearForce;//store prev force for definition of plastic slip
 		Vector3r shearDisp = currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
- 		//}
-		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
+			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
 			//define the plastic work input and increment the total plastic energy dissipated
-			plasticDissipation +=
-			(shearDisp+(1/currentContactPhysics->ks)*(shearForce-prevForce))//plastic disp.
-			.dot(shearForce);//active force
 			shearForce *= ratio;
-			//if(useShear) currentContactGeometry->shear*=ratio;
+			plasticDissipation +=
+			((1/currentContactPhysics->ks)*(trialForce-shearForce))//plastic disp.
+			.dot(shearForce);//active force
 		}
 	}	
 	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
@@ -112,12 +111,10 @@ void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, s
 	phys->normalForce=phys->kn*displN*geom->normal;
 	Real maxFsSq=phys->normalForce.squaredNorm()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
-	Real multiplier=maxFsSq/trialFs.squaredNorm();
-// 	if(trialFs.squaredNorm()>maxFsSq){
-// 		geom->slipToDisplacementTMax(sqrt(maxFsSq)/phys->ks); trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
-	if(multiplier<1){
-		multiplier = sqrt(multiplier);
-		geom->scaleToDisplacementTMax(multiplier); trialFs*=multiplier;}
+	Real trialFsSq = trialFs.squaredNorm();
+ 	if(trialFsSq>maxFsSq){
+		Real multiplier=sqrt(maxFsSq/trialFsSq);
+		geom->scaleDisplacementT(multiplier); trialFs*=multiplier;}
 	phys->shearForce=trialFs;
 	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
 }

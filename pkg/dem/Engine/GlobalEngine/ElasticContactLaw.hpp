@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Olivier Galizzi   olivier.galizzi@imag.fr       *
+*  Copyright (C) 2009 by Bruno Chareyre   bruno.chareyre@hmg.inpg.fr     *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -9,26 +9,28 @@
 #pragma once
 
 #include<yade/core/GlobalEngine.hpp>
-
-// only to see whether SCG_SHEAR is defined, may be removed in the future
-#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
-
+#include<yade/lib-base/openmp-accu.hpp>
 
 class Law2_ScGeom_FrictPhys_Basic: public LawFunctor{
 	public:
+		static Real Real0;
+		OpenMPAccumulator<Real,&Law2_ScGeom_FrictPhys_Basic::Real0> plasticDissipation;
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
 		Real elasticEnergy ();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_FrictPhys_Basic,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom`.",
+		Real getPlasticDissipation();
+		void initPlasticDissipation(Real initVal=0);
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_FrictPhys_Basic,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom` (sphere-box interactions are not implemented for the latest).",
 		((bool,neverErase,false,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((bool,useShear,false,"Use ScGeom::updateShear rather than ScGeom::updateShearForce for shear force computation."))
 		((bool,traceEnergy,false,"Define the total energy dissipated in plastic slips at all contacts."))
-		((Real,plasticDissipation,0,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_ScGeom_FrictPhys_Basic::traceEnergy` is true. |yupdate|"))
 		,,
 		.def("elasticEnergy",&Law2_ScGeom_FrictPhys_Basic::elasticEnergy,"Compute and return the total elastic energy in all \"FrictPhys\" contacts")
+		.def("plasticDissipation",&Law2_ScGeom_FrictPhys_Basic::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_ScGeom_FrictPhys_Basic::traceEnergy` is true.")
+		.def("initPlasticDissipation",&Law2_ScGeom_FrictPhys_Basic::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
 	);
 	FUNCTOR2D(ScGeom,FrictPhys);
 	DECLARE_LOGGER;

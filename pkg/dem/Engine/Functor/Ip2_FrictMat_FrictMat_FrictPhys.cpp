@@ -31,15 +31,15 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 	Real Va 	= mat1->poisson;
 	Real Vb 	= mat2->poisson;
 	
-	Real Da,Db; Vector3r normal;	
+	Real Ra,Rb; Vector3r normal;	
 	assert(dynamic_cast<GenericSpheresContact*>(interaction->interactionGeometry.get()));//only in debug mode
 	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->interactionGeometry.get());
-	{Da=sphCont->refR1>0?sphCont->refR1:sphCont->refR2; Db=sphCont->refR2>0?sphCont->refR2:sphCont->refR1; normal=sphCont->normal;}
+	{Ra=sphCont->refR1>0?sphCont->refR1:sphCont->refR2; Rb=sphCont->refR2>0?sphCont->refR2:sphCont->refR1; normal=sphCont->normal;}
 	
-	//harmonic average of the two stiffnesses when (Di.Ei/2) is the stiffness of a contact point on sphere "i"
-	Real Kn = 2*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);
+	//harmonic average of the two stiffnesses when (Ri.Ei/2) is the stiffness of a contact point on sphere "i"
+	Real Kn = 2*Ea*Ra*Eb*Rb/(Ea*Ra+Eb*Rb);
 	//same for shear stiffness
-	Real Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);
+	Real Ks = 2*Ea*Ra*Va*Eb*Rb*Vb/(Ea*Ra*Va+Eb*Rb*Va);
 	
 	contactPhysics->frictionAngle = std::min(mat1->frictionAngle,mat2->frictionAngle);
 	contactPhysics->tangensOfFrictionAngle = std::tan(contactPhysics->frictionAngle); 

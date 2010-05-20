@@ -1,6 +1,7 @@
 // © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
 // © 2004 Janek Kozicki <cosurgi@berlios.de>
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
+// © 2008 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 
 #include "ScGeom.hpp"
 #include<yade/core/Omega.hpp>
@@ -8,7 +9,6 @@ YADE_PLUGIN((ScGeom));
 // At least one virtual method must be in the .cpp file (!!!)
 ScGeom::~ScGeom(){};
 
-#ifdef SCG_SHEAR
 Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
@@ -63,20 +63,16 @@ Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool
 	shear+=shearIncrement;
 	return shearIncrement;
 }
-#endif
 
 Vector3r ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
-
 	Vector3r axis;
 	Real angle;
-
 	// approximated rotations
 		axis = prevNormal.cross(normal); 
 		shearForce -= shearForce.cross(axis);
 		angle = dt*0.5*normal.dot(rbp1->angVel + rbp2->angVel);
 		axis = angle*normal;
 		shearForce -= shearForce.cross(axis);
-		
 	// exact rotations
 	#if 0
 		Quaternionr q;
@@ -92,7 +88,6 @@ Vector3r ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r&
 
 	Vector3r& x = contactPoint;
 	Vector3r c1x, c2x;
-
 	if(avoidGranularRatcheting){
 		/* The following definition of c1x and c2x is to avoid "granular ratcheting" 
 		 *  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
@@ -108,7 +103,6 @@ Vector3r ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r&
 		c1x = (x - rbp1->pos);
 		c2x = (x - rbp2->pos);
 	}
-
 	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
 	Vector3r shearVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = shearVelocity*dt;

@@ -79,14 +79,14 @@ Real Dem3DofGeom_SphereSphere::slipToDisplacementTMax(Real displacementTMax){
 }
 
 /*! As above : perform slip of the projected contact points. Here, we directly give the multiplier applied on the distance for faster results.
- * The slipped distance is returned.
+ * The plastic displacement (vector) is returned.
  */
-Real Dem3DofGeom_SphereSphere::scaleToDisplacementTMax(Real multiplier){
+Vector3r Dem3DofGeom_SphereSphere::scaleDisplacementT(Real multiplier){
 	assert(multiplier>=0 && multiplier<=1);
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Vector3r diff=.5*(multiplier-1)*(p2-p1);
 	setTgPlanePts(p1-diff,p2+diff);
-	return 0;
+	return 2*diff;
 }
 
 
