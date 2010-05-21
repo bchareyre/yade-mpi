@@ -118,7 +118,6 @@ class TriaxialTest : public FileGenerator
 		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`TriaxialTest::SigmaIsoCompaction`."))
 		
 		((int,timeStepUpdateInterval,50,"interval for :yref:`GlobalStiffnessTimeStepper`"))
-		((int,timeStepOutputInterval,50,"interval for outputing general informations on the simulation (stress,unbalanced force,...)"))
 		((int,wallStiffnessUpdateInterval,10,"interval for updating the stiffness of sample/boundaries contacts"))
 		((int,radiusControlInterval,10,"interval between size changes when growing spheres."))
 		((int,numberOfGrains,400,"Number of generated spheres."))
