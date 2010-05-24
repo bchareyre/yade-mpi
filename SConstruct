@@ -363,7 +363,12 @@ if not env.GetOption('clean'):
 		ok=conf.CheckQt(env['QTDIR'])
 		if not ok: featureNotOK('opengl','Building with OpenGL implies qt3 interface, which was not found, although OpenGL was.')
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
-		env['QGLVIEWER_LIB']='yade-QGLViewer';
+		if conf.CheckLibWithHeader(['qglviewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=0):
+			env['QGLVIEWER_LIB']='qglviewer-qt3';
+		else:
+			print"(OK, local version will be used instead)"
+			env['QGLVIEWER_LIB']='yade-QGLViewer';
+			env.Append(CPPDEFINES=['YADE_LOCAL_QGLVIEWER'])
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')

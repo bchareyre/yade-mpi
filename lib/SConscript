@@ -9,49 +9,48 @@ def yadeStaticOrSharedLib(*args,**kw):
 	#return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary(*args,**kw))
 
 if 'opengl' in env['features']:
-	yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],
-		#LIBS=env['LIBS']+['yade-suypportbase','XMLFormatManager']),
-		LIBS=['yade-support']),
-	yadeStaticOrSharedLib('yade-QGLViewer',Split('''
-		QGLViewer/VRenderInterface_Qt3.ui
-		QGLViewer/ImageInterface_Qt3.ui
-		QGLViewer/qglviewer.cpp 
-		QGLViewer/camera.cpp 
-		QGLViewer/manipulatedFrame.cpp 
-		QGLViewer/manipulatedCameraFrame.cpp 
-		QGLViewer/frame.cpp 
-		QGLViewer/saveSnapshot.cpp 
-		QGLViewer/constraint.cpp 
-		QGLViewer/keyFrameInterpolator.cpp 
-		QGLViewer/mouseGrabber.cpp 
-		QGLViewer/quaternion.cpp 
-		QGLViewer/vec.cpp
-		QGLViewer/VRender/BackFaceCullingOptimizer.cpp 
-		QGLViewer/VRender/BSPSortMethod.cpp 
-		QGLViewer/VRender/EPSExporter.cpp 
-		QGLViewer/VRender/Exporter.cpp 
-		QGLViewer/VRender/FIGExporter.cpp 
-		QGLViewer/VRender/gpc.cpp 
-		QGLViewer/VRender/ParserGL.cpp 
-		QGLViewer/VRender/Primitive.cpp 
-		QGLViewer/VRender/PrimitivePositioning.cpp 
-		QGLViewer/VRender/TopologicalSortMethod.cpp 
-		QGLViewer/VRender/VisibilityOptimizer.cpp 
-		QGLViewer/VRender/Vector2.cpp 
-		QGLViewer/VRender/Vector3.cpp 
-		QGLViewer/VRender/NVector3.cpp 
-		QGLViewer/VRender/VRender.cpp
-		'''),
-		# we want to REALLY optimize this, even in debug builds of yade; and suppress all warnings also
-		CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0','-w'],
-		# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
-		# since the generated header is #include'd "...", it looks for it in the original dir
-		# no idea why this _does_ work with gui/qt3. Go figure.
-		CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
-		LIBS=env['LIBS']+['GLU','GL']
-	)
+	yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],LIBS=['yade-support'])
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','$QGLVIEWER_LIB']),
-#env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary
+	if 'YADE_LOCAL_QGLVIEWER' in env['CPPDEFINES']:
+		yadeStaticOrSharedLib('yade-QGLViewer',Split('''
+			QGLViewer/VRenderInterface_Qt3.ui
+			QGLViewer/ImageInterface_Qt3.ui
+			QGLViewer/qglviewer.cpp 
+			QGLViewer/camera.cpp 
+			QGLViewer/manipulatedFrame.cpp 
+			QGLViewer/manipulatedCameraFrame.cpp 
+			QGLViewer/frame.cpp 
+			QGLViewer/saveSnapshot.cpp 
+			QGLViewer/constraint.cpp 
+			QGLViewer/keyFrameInterpolator.cpp 
+			QGLViewer/mouseGrabber.cpp 
+			QGLViewer/quaternion.cpp 
+			QGLViewer/vec.cpp
+			QGLViewer/VRender/BackFaceCullingOptimizer.cpp 
+			QGLViewer/VRender/BSPSortMethod.cpp 
+			QGLViewer/VRender/EPSExporter.cpp 
+			QGLViewer/VRender/Exporter.cpp 
+			QGLViewer/VRender/FIGExporter.cpp 
+			QGLViewer/VRender/gpc.cpp 
+			QGLViewer/VRender/ParserGL.cpp 
+			QGLViewer/VRender/Primitive.cpp 
+			QGLViewer/VRender/PrimitivePositioning.cpp 
+			QGLViewer/VRender/TopologicalSortMethod.cpp 
+			QGLViewer/VRender/VisibilityOptimizer.cpp 
+			QGLViewer/VRender/Vector2.cpp 
+			QGLViewer/VRender/Vector3.cpp 
+			QGLViewer/VRender/NVector3.cpp 
+			QGLViewer/VRender/VRender.cpp
+			'''),
+			# we want to REALLY optimize this, even in debug builds of yade; and suppress all warnings also
+			CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0','-w'],
+			# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
+			# since the generated header is #include'd "...", it looks for it in the original dir
+			# no idea why this _does_ work with gui/qt3. Go figure.
+			CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
+			LIBS=env['LIBS']+['GLU','GL']
+		)
+
 yadeStaticOrSharedLib('yade-support',[
 	env.Combine('yade-support.cpp',['base/Math.cpp']+
 		['factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',

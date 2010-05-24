@@ -4,8 +4,15 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/OpenGLRenderingEngine.hpp>
-#include<yade/lib-QGLViewer/qglviewer.h>
-#include<yade/lib-QGLViewer/constraint.h>
+
+#ifndef YADE_LOCAL_QGLVIEWER
+	#include<QGLViewer/qglviewer.h>
+	#include<QGLViewer/constraint.h>
+#else
+	#include<yade/lib-QGLViewer/qglviewer.h>
+	#include<yade/lib-QGLViewer/constraint.h>
+#endif
+
 #include"YadeQtMainWindow.hpp"
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<set>
