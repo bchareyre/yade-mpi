@@ -38,6 +38,14 @@ Real Dem3DofGeom_WallSphere::slipToDisplacementTMax(Real displacementTMax){
 	return (displacementTMax/scale)*(1-scale);
 }
 
+Vector3r Dem3DofGeom_WallSphere::scaleDisplacementT(Real multiplier){
+	assert(multiplier>=0 && multiplier<=1);
+	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
+	Vector3r diff=.5*(multiplier-1)*(p2-p1);
+	setTgPlanePts(p1-diff,p2+diff);
+	return 2*diff;
+}
+
 CREATE_LOGGER(Ig2_Wall_Sphere_Dem3DofGeom);
 bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	Wall* wall=static_cast<Wall*>(cm1.get());

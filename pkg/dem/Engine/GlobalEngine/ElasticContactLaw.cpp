@@ -25,6 +25,7 @@ void ElasticContactLaw::action()
 	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
 	functor->useShear=useShear;
 	functor->neverErase=neverErase;
+	functor->scene=scene;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG

@@ -27,8 +27,8 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 				return contPtInTgPlane2()-contPtInTgPlane1();
 			#endif
 		}
-		Real slipToDisplacementTMax(Real displacementTMax);
-		Vector3r scaleDisplacementT(Real multiplier);
+		virtual Real slipToDisplacementTMax(Real displacementTMax);
+		virtual Vector3r scaleDisplacementT(Real multiplier);
 		/********* end API ***********/
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Dem3DofGeom_SphereSphere,Dem3DofGeom,"Class representing 2 spheres in contact which computes 3 degrees of freedom (normal and shear deformation).",
