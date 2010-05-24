@@ -123,9 +123,8 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
 		//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
-		//    Vector3r branch=
-		//   (reversedForces?-1.:1.)*(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
-		Vector3r branch= ( reversedForces?-1.:1. ) *gsc->normal* ( gsc->refR1+gsc->refR2 );
+		//    Vector3r branch=(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
+		Vector3r branch= gsc->normal* ( gsc->refR1+gsc->refR2 );
 		// tensorial product f*branch (hand-write the tensor product to prevent matrix instanciation inside the loop by makeTensorProduct)
 		stressTensor(0,0)+=f[0]*branch[0]; stressTensor(1,0)+=f[1]*branch[0]; stressTensor(2,0)+=f[2]*branch[0];
 		stressTensor(0,1)+=f[0]*branch[1]; stressTensor(1,1)+=f[1]*branch[1]; stressTensor(2,1)+=f[2]*branch[1];

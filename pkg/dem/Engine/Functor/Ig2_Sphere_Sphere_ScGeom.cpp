@@ -29,10 +29,8 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 		Real norm=normal.norm(); normal/=norm; // normal is unit vector now
 		Real penetrationDepth=s1->radius+s2->radius-norm;
 		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
-		#ifdef SCG_SHEAR
-			if(isNew) scm->prevNormal=normal; 
-			else scm->prevNormal=scm->normal;
-		#endif
+		if(isNew) scm->prevNormal=normal; 
+		else scm->prevNormal=scm->normal;
 		scm->normal=normal;
 		scm->penetrationDepth=penetrationDepth;
 		scm->radius1=s1->radius;

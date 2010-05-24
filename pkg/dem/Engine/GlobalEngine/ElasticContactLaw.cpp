@@ -98,8 +98,16 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 			((1/currentContactPhysics->ks)*(trialForce-shearForce))//plastic disp.
 			.dot(shearForce);//active force
 		}
-	}	
+	}
+	if (!scene->isPeriodic)
 	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
+	else {//we need to use correct branches in the periodic case, the following apply for spheres only
+		Vector3r force = -currentContactPhysics->normalForce-shearForce;
+		ncb->forces.addForce(id1,force);
+		ncb->forces.addForce(id2,-force);
+		ncb->forces.addTorque(id1,(currentContactGeometry->radius1-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
+		ncb->forces.addTorque(id2,(currentContactGeometry->radius2-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
+	}
 	currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }
 
