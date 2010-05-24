@@ -370,7 +370,7 @@ inheritance_node_attrs = { 'height' : 0.5, 'fontsize' : 12, 'shape' : 'oval' }
 inheritance_edge_attrs = {} 
 
 my_latex_preamble=r'''
-\usepackage{euler}
+\usepackage{euler} % must be loaded before fontspec for the whole doc (below); this must be kept for pngmath, however
 \usepackage{amsmath}
 \usepackage{amsbsy}
 \let\mat\boldsymbol
@@ -525,7 +525,11 @@ htmlhelp_basename = 'Yadedoc'
 
 latex_elements=dict(
 	papersize='a4paper',
-	fontpkg='\\usepackage{fontspec,xunicode,xltxtra}\setmainfont[BoldFont={LMRoman10 Bold}]{CMU Concrete}',
+	fontpkg=r'''
+		\usepackage{euler}
+		\usepackage{fontspec,xunicode,xltxtra}
+		\setmainfont[BoldFont={LMRoman10 Bold}]{CMU Concrete}
+	''',
 	utf8extra='',
 	fncychap='',
 	preamble=my_latex_preamble,

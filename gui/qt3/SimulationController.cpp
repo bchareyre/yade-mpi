@@ -317,34 +317,16 @@ void SimulationController::pbResetClicked()
 }
 
 
+void SimulationController::rbTimeStepperClicked(){
+	wasUsingTimeStepper=true;
+	Omega::instance().getScene()->timeStepperActivate(true);
+}
 
-
-
-
-void SimulationController::bgTimeStepClicked(int i)
-{
-	// cerr<<"CHANGING TIME STEP: i="<<i<<endl;
-	/* i: buttonGroupId, which is 0 for timeStepper, 2 for fixed step */
-	switch (i)
-	{
-		case 0 : {//Use timeStepper
-			wasUsingTimeStepper=true;
-			Omega::instance().getScene()->timeStepperActivate(true);
-			break;
-			}
-		case 1 : // Try RealTime -- deprecated
-			throw logic_error("RealTime timestep is deprecated and you couldn't click on it!");
-			break;
-		case 2 : {// use fixed time Step
-			changeTimeStep = true;
-			wasUsingTimeStepper=false;
-			Omega::instance().getScene()->timeStepperActivate(false);
-			leTimestep_returnPressed();
-			break;
-		}
-		default: break;
-	}
-
+void SimulationController::rbFixedClicked(){
+	changeTimeStep = true;
+	wasUsingTimeStepper=false;
+	Omega::instance().getScene()->timeStepperActivate(false);
+	leTimestep_returnPressed();
 }
 
 

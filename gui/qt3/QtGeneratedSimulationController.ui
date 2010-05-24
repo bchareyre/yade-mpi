@@ -892,7 +892,28 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbGenerate_clicked()</slot>
     </connection>
+    <connection>
+        <sender>rbFixed</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>rbFixedClicked()</slot>
+    </connection>
+    <connection>
+        <sender>rbTimeStepper</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>rbTimeStepperClicked()</slot>
+    </connection>
+    <connection>
+        <sender>leTimestep</sender>
+        <signal>returnPressed()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>leTimestep_returnPressed()</slot>
+    </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
+</includes>
 <forwards>
     <forward>class GLViewer;</forward>
 </forwards>
@@ -923,6 +944,8 @@
     <slot>pyOnelinerEnter()</slot>
     <slot>pbGenerate_clicked()</slot>
     <slot>leTimestep_returnPressed()</slot>
+    <slot>rbFixedClicked()</slot>
+    <slot>rbTimeStepperClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
