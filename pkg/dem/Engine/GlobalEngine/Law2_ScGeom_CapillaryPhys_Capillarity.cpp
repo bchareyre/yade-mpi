@@ -83,7 +83,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
         //compteur1 = 0;
         //compteur2 = 0;
         //cerr << "Law2_ScGeom_CapillaryPhys_Capillarity::action" << endl;
-
+	if (!scene) cerr << "scene not defined!";
         shared_ptr<BodyContainer>& bodies = scene->bodies;
 
         if (fusionDetection) {

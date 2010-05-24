@@ -64,83 +64,83 @@ typedef pair<Vector3r, Real> BasicSphere;
 string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
-TriaxialTestWater::TriaxialTestWater () : FileGenerator()
-{
-	lowerCorner 		= Vector3r(0,0,0);
-	upperCorner 		= Vector3r(0.001,0.001,0.001);
-	thickness 		= 0.00001;
-	importFilename 		= ""; // "./small.sdec.xyz";
-	Key			="";
-	outputFileName 		= "./TriaxialTestWater"+Key+".xml";
-	//nlayers = 1;
-	wall_top 		= true;
-	wall_bottom 		= true;
-	wall_1			= true;
-	wall_2			= true;
-	wall_3			= true;
-	wall_4			= true;
-	wall_top_wire 		= true;
-	wall_bottom_wire	= true;
-	wall_1_wire		= true;
-	wall_2_wire		= true;
-	wall_3_wire		= true;
-	wall_4_wire		= true;
-	spheresColor		= Vector3r(0.8,0.3,0.3);
-	spheresRandomColor	= false;
-	recordIntervalIter	= 20;
-	WallStressRecordFile = "./WallStresses"+Key;
-	capillaryStressRecordFile	= "./CapillaryStresses"+Key;
-
-	rotationBlocked = false;
-	//	boxWalls 		= false;
-	boxWalls 		= true;
-	internalCompaction	=false;
-	
-	dampingForce = 0.2;
-	dampingMomentum = 0.2;
-	defaultDt = 0.0001;
-	
-	timeStepUpdateInterval = 50;
-	timeStepOutputInterval = 50;
-	wallStiffnessUpdateInterval = 10;
-	radiusControlInterval = 10;
-	numberOfGrains = 400;
-	Rdispersion = 0.667;
-	strainRate = 10;
-	maxWallVelocity=0.1;
-	StabilityCriterion = 0.01;
-	autoCompressionActivation = true;
-	maxMultiplier = 1.01;
-	finalMaxMultiplier = 1.001;
-	
-	sphereYoungModulus  = 5000000.0;
-	sphereKsDivKn  = 0.5;	
-	sphereFrictionDeg = 30.0;
-	compactionFrictionDeg   = sphereFrictionDeg;
-	density			= 2600;
-	
-	boxYoungModulus   = 5000000.0;
-	boxKsDivKn  = 0.2;
-	boxFrictionDeg   = 0.f;
-	gravity 	= Vector3r(0,-9.81,0);
-	
-	sigmaIsoCompaction = 5000;
-	sigmaLateralConfinement=sigmaIsoCompaction;
-
-	water = true;
-	CapillaryPressure = 0;
- 	fusionDetection = 1;
-	binaryFusion = 1;
-
-	wallOversizeFactor=1.3;
-	
-//	wall_top_id =0;
-// 	wall_bottom_id =0;
-// 	wall_left_id =0;
-// 	all_right_id =0;
-// 	wall_front_id =0;
-// 	wall_back_id =0;
-}
+// TriaxialTestWater::TriaxialTestWater () : FileGenerator()
+// {
+// 	lowerCorner 		= Vector3r(0,0,0);
+// 	upperCorner 		= Vector3r(0.001,0.001,0.001);
+// 	thickness 		= 0.00001;
+// 	importFilename 		= ""; // "./small.sdec.xyz";
+// 	Key			="";
+// 	outputFileName 		= "./TriaxialTestWater"+Key+".xml";
+// 	//nlayers = 1;
+// 	wall_top 		= true;
+// 	wall_bottom 		= true;
+// 	wall_1			= true;
+// 	wall_2			= true;
+// 	wall_3			= true;
+// 	wall_4			= true;
+// 	wall_top_wire 		= true;
+// 	wall_bottom_wire	= true;
+// 	wall_1_wire		= true;
+// 	wall_2_wire		= true;
+// 	wall_3_wire		= true;
+// 	wall_4_wire		= true;
+// 	spheresColor		= Vector3r(0.8,0.3,0.3);
+// 	spheresRandomColor	= false;
+// 	recordIntervalIter	= 20;
+// 	WallStressRecordFile = "./WallStresses"+Key;
+// 	capillaryStressRecordFile	= "./CapillaryStresses"+Key;
+// 
+// 	rotationBlocked = false;
+// 	//	boxWalls 		= false;
+// 	boxWalls 		= true;
+// 	internalCompaction	=false;
+// 	
+// 	dampingForce = 0.2;
+// 	dampingMomentum = 0.2;
+// 	defaultDt = 0.0001;
+// 	
+// 	timeStepUpdateInterval = 50;
+// 	timeStepOutputInterval = 50;
+// 	wallStiffnessUpdateInterval = 10;
+// 	radiusControlInterval = 10;
+// 	numberOfGrains = 400;
+// 	Rdispersion = 0.667;
+// 	strainRate = 10;
+// 	maxWallVelocity=0.1;
+// 	StabilityCriterion = 0.01;
+// 	autoCompressionActivation = true;
+// 	maxMultiplier = 1.01;
+// 	finalMaxMultiplier = 1.001;
+// 	
+// 	sphereYoungModulus  = 5000000.0;
+// 	sphereKsDivKn  = 0.5;	
+// 	sphereFrictionDeg = 30.0;
+// 	compactionFrictionDeg   = sphereFrictionDeg;
+// 	density			= 2600;
+// 	
+// 	boxYoungModulus   = 5000000.0;
+// 	boxKsDivKn  = 0.2;
+// 	boxFrictionDeg   = 0.f;
+// 	gravity 	= Vector3r(0,-9.81,0);
+// 	
+// 	sigmaIsoCompaction = 5000;
+// 	sigmaLateralConfinement=sigmaIsoCompaction;
+// 
+// 	water = true;
+// 	CapillaryPressure = 0;
+//  	fusionDetection = 1;
+// 	binaryFusion = 1;
+// 
+// 	wallOversizeFactor=1.3;
+// 	
+// //	wall_top_id =0;
+// // 	wall_bottom_id =0;
+// // 	wall_left_id =0;
+// // 	all_right_id =0;
+// // 	wall_front_id =0;
+// // 	wall_back_id =0;
+// }
 
 
 TriaxialTestWater::~TriaxialTestWater ()
@@ -153,17 +153,11 @@ TriaxialTestWater::~TriaxialTestWater ()
 bool TriaxialTestWater::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
-	message="";
-	
+	message="";	
 	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
-
-
 	shared_ptr<Body> body;
-	
-	
-	
 	if(boxWalls)
 	{
 	// bottom box
@@ -280,7 +274,6 @@ bool TriaxialTestWater::generate()
 		createSphere(body,it->first,it->second,false,true);
 		rootBody->bodies->insert(body);
 	}	
-	
 	
 	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
@@ -545,14 +538,11 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 			bool overlap=false;
 			for (long j=0; (j<i && !overlap); j++)
 				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).squaredNorm()) overlap=true;
-			if (!overlap)
-			{
+			if (!overlap){
 				sphere_list.push_back(s);
-				break;
-			}	
-		Rmin = std::min(Rmin,s.second);
-		Rmax = std::max(Rmax,s.second);
-
+				Rmin = std::min(Rmin,s.second);
+				Rmax = std::max(Rmax,s.second);
+				break;}
 		}
 		if (t==tries) return "More than " + lexical_cast<string>(tries) +
 					" tries while generating sphere number " +
