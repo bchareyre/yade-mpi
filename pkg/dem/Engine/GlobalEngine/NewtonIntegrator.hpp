@@ -58,8 +58,6 @@ class NewtonIntegrator : public GlobalEngine{
 	bool cellChanged;
 
 	public:
-		//! Store transformation increment for the current step (updated automatically)
-		Matrix3r cellTrsfInc;
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
@@ -70,7 +68,8 @@ class NewtonIntegrator : public GlobalEngine{
 		((Real,damping,0.2,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))
 		((Real,maxVelocitySq,NaN,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,true,"Enable more exact body rotation integrator for aspherical bodies *only*, using formulation from [Allen1989]_, pg. 89."))
-		((int,homotheticCellResize,((void)"disabled",0),"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled, 1: position update, 2: velocity update."))
+		((bool,homotheticCellResize,false,"Enable artificially moving all bodies with the periodic cell, such that its resizes are homogeneous. The move is reflecting changes in :yref:`Cell::velGrad`, using :yref:`NewtonIntegrator::prevVelGrad`."))
+		((Matrix3r,prevVelGrad,Matrix3r::Zero(),"Store previous velocity gradient (:yref:`Cell::velGrad`) to track acceleration. |yupdate|"))
 		((vector<shared_ptr<BodyCallback> >,callbacks,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
 		,
 		/*ctor*/

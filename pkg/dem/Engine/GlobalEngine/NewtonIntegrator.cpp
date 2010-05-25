@@ -11,9 +11,7 @@
 #include<yade/pkg-dem/Clump.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/lib-base/Math.hpp>
-
-
-
+		
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
 void NewtonIntegrator::cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A){
@@ -65,8 +63,6 @@ void NewtonIntegrator::action()
 {
 	scene->forces.sync();
 	Real dt=scene->dt;
-	// precompute transformation increment; using Cell::getTrsfInc would get increment from the previous step, which is not right... (?) -> should be ok (B.)
-	if(scene->isPeriodic && homotheticCellResize) cellTrsfInc=dt*scene->cell->velGrad;
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
@@ -173,27 +169,22 @@ void NewtonIntegrator::action()
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
 	if(haveBins) velocityBins->binVelSqFinalize();
-	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize(); }
+	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize();prevVelGrad=scene->cell->velGrad; }
 }
 
-inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
+inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, const body_id_t& id, const Real& dt)
 {
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
 	state->vel+=dt*state->accel;
-	state->pos += state->vel*dt;
-	if(scene->forces.getMoveRotUsed()) state->pos+=scene->forces.getMove(id);
-	assert(homotheticCellResize>=0 && homotheticCellResize<=2);
-	if(homotheticCellResize>0){
-		//Vector3r dPos(scene->cell->getTrsfInc()*scene->cell->wrapShearedPt(state->pos));
-		Vector3r dPos(cellTrsfInc*scene->cell->wrapShearedPt(state->pos));
-		// apply cell deformation
-		//if(homotheticCellResize>=1) it is the same test again, useless
-		state->pos+=dPos;
-		// update velocity for usage in rate dependant equations (e.g. viscous law)
-		// FIXME : it is not recommended to do that because it impacts the dynamics (this modified velocity will be used as reference in the next time-step)
-		if(homotheticCellResize==2) state->vel+=dPos/dt;
-	}
 
+	if (scene->forces.getMoveRotUsed()) state->pos+=scene->forces.getMove(id);
+	if (homotheticCellResize) {
+		// update velocity reflecting changes in the macroscopic velocity field, making the problem homothetic.
+		//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
+		//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
+		Vector3r dVel((scene->cell->velGrad-prevVelGrad)*/*scene->cell->wrapShearedPt(*/state->pos/*)*/); state->vel+=dVel;
+	}
+	state->pos += state->vel*dt;
 }
 
 inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
