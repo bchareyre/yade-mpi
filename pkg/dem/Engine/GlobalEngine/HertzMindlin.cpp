@@ -48,9 +48,10 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	Real Gb = Eb/(2*(1+Vb));
 	Real G = (Ga+Gb)/2; // average of shear modulus
 	Real V = (Va+Vb)/2; // average of poisson's ratio
-	Real R = 2*Da*Db/(Da+Db); // harmonic average of the radii
-	Real Kno = 2*G*Mathr::Sqrt(2*R)/(3*(1-V)); // coefficient for normal stiffness
-	Real Kso = 2*std::pow((std::pow(G,2)*3*(1-V)*R),1/3)/(2-V); // coefficient for shear stiffness
+	Real E = Ea*Eb/((1.-std::pow(Va,2.0))*Eb+(1.-std::pow(Vb,2.0))*Ea); // Young modulus
+	Real R = Da*Db/(Da+Db); // equivalent radius
+	Real Kno = 4./3.*E*std::pow(R,0.5); // coefficient for normal stiffness
+	Real Kso = 2*sqrt(4*R)*G/(2-V); // coefficient for shear stiffness
 	Real frictionAngle = std::min(fa,fb);
 
 
@@ -81,23 +82,24 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/*** NORMAL FORCE ***/
 	Real uN = scg->penetrationDepth; // get overlapping  
 	if (uN<0) {ncb->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
-	/*** Hertz-Mindlin's formulation (PFC) ***/
-	phys->kn = phys->kno*Mathr::Sqrt(uN); // normal stiffness
-	Real Fn = phys->kn*uN; // normal Force (scalar)
+	/* Hertz-Mindlin's formulation (PFC)
+	Note that the normal stiffness here is a secant value (so as it is cannot be used in the GSTS)
+	In the first place we get the normal force and then we store kn to be passed to the GSTS */
+	Real Fn = phys->kno*std::pow(uN,1.5);// normal Force (scalar)
 	phys->normalForce = Fn*scg->normal; // normal Force (vector)
+	phys->kn = 3./2.*phys->kno*std::pow(uN,0.5); // here we store the value of kn to compute the time step
 
 
 	/*** SHEAR FORCE ***/
-	phys->ks = phys->kso*std::pow(Fn,1/3); // normal stiffness
+	phys->ks = phys->kso*std::pow(uN,0.5); // get tangential stiffness (this is a tangent value, so we can pass it to the GSTS)
 	Vector3r& trialFs = phys->shearForce;
   	scg->updateShearForce(trialFs, phys->ks, phys->prevNormal, de1, de2, dt, preventGranularRatcheting);
 
  
 	/*** MOHR-COULOMB LAW ***/
-	Real maxFs = phys->normalForce.squaredNorm();
+	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 	if (trialFs.squaredNorm() > maxFs)
 	{Real ratio = Mathr::Sqrt(maxFs)/trialFs.norm(); trialFs *= ratio;}
-	phys->shearForce = trialFs; // store shearForce now that is at the actual value
 
 
 	/*** APPLY FORCES ***/
