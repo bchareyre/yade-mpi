@@ -6,8 +6,8 @@ void Cell::integrateAndUpdate(Real dt){
 	_trsfInc=dt*velGrad;
 	// total transformation; M = (Id+G).M = F.M
 	trsf+=_trsfInc*trsf;
-	// Hsize will contain colums with transformed base vectors
-	Matrix3r Hsize(Matrix3r::Zero()); Hsize(0,0)=refSize[0]; Hsize(1,1)=refSize[1]; Hsize(2,2)=refSize[2]; // later with eigen: Hsize=Matrix::Zero(); Hsize.diagonal=refSize;
+	// Hsize will contain colums with transformed base vectors FIXME : no need to initialize all the time, even if it doesn't hurt, it doesn't make sense.
+	Hsize=Matrix3r::Zero(); Hsize(0,0)=refSize[0]; Hsize(1,1)=refSize[1]; Hsize(2,2)=refSize[2]; // later with eigen: Hsize=Matrix::Zero(); Hsize.diagonal=refSize;
 	Hsize=trsf*Hsize;
 	// lengths of transformed cell vectors, skew cosines
 	Matrix3r Hnorm; // normalized transformed base vectors

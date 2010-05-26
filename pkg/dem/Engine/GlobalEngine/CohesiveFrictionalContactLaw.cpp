@@ -85,7 +85,9 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 		///////////////////////// CREEP START ///////////
 		if (shear_creep) shearForce -= currentContactPhysics->ks*(shearForce*dt/creep_viscosity);
 		///////////////////////// CREEP END ////////////
-		currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
+		Vector3r dus = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt);
+		//Linear elasticity giving "trial" shear force
+		shearForce -= currentContactPhysics->ks*dus;
 
 		Real Fs = currentContactPhysics->shearForce.norm();
 		Real maxFs = currentContactPhysics->shearAdhesion;

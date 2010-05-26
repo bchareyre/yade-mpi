@@ -63,8 +63,9 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	// using scGeom function updateShear(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting)	
 	State* st1 = Body::byId(id1,rootBody)->state.get();
 	State* st2 = Body::byId(id2,rootBody)->state.get();
-	geom->updateShearForce(shearForce, phys->ks, phys->prevNormal, st1, st2, dt, preventGranularRatcheting);
-	
+	Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, preventGranularRatcheting);
+	//Linear elasticity giving "trial" shear force
+	shearForce -= phys->ks*dus;
 	// needed for the next timestep
 	phys->prevNormal = geom->normal;
 		

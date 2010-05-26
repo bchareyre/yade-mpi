@@ -67,14 +67,18 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	Real un=currentContactGeometry->penetrationDepth;
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
-	
+	//FIXME : it would make more sense to compute the shift in some Ig2->getShear, using precomputed velGrad*Hsize in Cell and I->cellDist, but it is not possible with current design (Ig doesn't know scene nor I).
+	Vector3r shiftVel = scene->isPeriodic ? (scene->cell->velGrad*scene->cell->Hsize)*Vector3r(contact->cellDist[0],contact->cellDist[1],contact->cellDist[2]) : Vector3r::Zero();
 	if (!traceEnergy){
 		//Update force but don't compute energy terms (see below))
 		if(useShear){
 			currentContactGeometry->updateShear(de1,de2,dt);
 			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
 		} else {
-			currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);}
+			Vector3r dus = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,/*avoid ratcheting*/true);
+			//Linear elasticity giving "trial" shear force
+			shearForce -= currentContactPhysics->ks*dus;
+		}
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
@@ -85,8 +89,9 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	} else {
 		//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
 		if(useShear) throw ("energy tracing not defined with useShear==true");
+		Vector3r shearDisp = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,true);
 		Vector3r prevForce=shearForce;//store prev force for definition of plastic slip
-		Vector3r shearDisp = currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
+		shearForce -= currentContactPhysics->ks*shearDisp;
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
 		if( shearForce.squaredNorm() > maxFs ){

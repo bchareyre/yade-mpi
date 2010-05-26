@@ -93,7 +93,9 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/*** SHEAR FORCE ***/
 	phys->ks = phys->kso*std::pow(uN,0.5); // get tangential stiffness (this is a tangent value, so we can pass it to the GSTS)
 	Vector3r& trialFs = phys->shearForce;
-  	scg->updateShearForce(trialFs, phys->ks, phys->prevNormal, de1, de2, dt, preventGranularRatcheting);
+  	Vector3r dus =scg->rotateAndGetShear(trialFs, phys->prevNormal, de1, de2, dt, /*define this for periodicity, see :ElasticContactLaw.cpp:71*/ Vector3r::Zero(), preventGranularRatcheting);
+	//Linear elasticity giving "trial" shear force
+	trialFs -= phys->ks*dus;
 
  
 	/*** MOHR-COULOMB LAW ***/
