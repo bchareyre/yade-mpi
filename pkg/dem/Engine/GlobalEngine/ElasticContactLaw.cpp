@@ -68,9 +68,8 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	//FIXME : it would make more sense to compute the shift in some Ig2->getShear, using precomputed velGrad*Hsize in Cell and I->cellDist, but it is not possible with current design (Ig doesn't know scene nor I).
-	Vector3r shiftVel = scene->isPeriodic ? (scene->cell->velGrad*scene->cell->Hsize)*Vector3r(contact->cellDist[0],contact->cellDist[1],contact->cellDist[2]) : Vector3r::Zero();
-	if (!traceEnergy){
-		//Update force but don't compute energy terms (see below))
+	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
+	if (!traceEnergy){//Update force but don't compute energy terms (see below))
 		if(useShear){
 			currentContactGeometry->updateShear(de1,de2,dt);
 			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
