@@ -430,7 +430,7 @@ void SimulationController::doUpdate(){
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
 
 	/* enable/disable controls here, dynamically */
-	hasSimulation=(scene ? scene->bodies->size()>0 : false );
+	hasSimulation=(scene); // ? scene->bodies->size()>0 : false );
 	bool	isRunning=Omega::instance().isRunning() || syncRunning,
 		hasTimeStepper=scene->timeStepperPresent(),
 		usesTimeStepper=scene->timeStepperActive(),

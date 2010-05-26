@@ -70,3 +70,31 @@ class PeriTriaxController: public BoundaryController{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(PeriTriaxController);
+#ifndef YADE_WM3
+
+#include<Eigen/SVD>
+class Peri3dController: public BoundaryController{
+	public:
+		typedef Eigen::Matrix<Real,6,6> Matrix6r;
+		typedef Eigen::Matrix<Real,6,1> Vector6r;
+
+		// stiffness matrix, updated automatically
+		Matrix6r K;
+
+		virtual void action();
+		void update();
+	YADE_CLASS_BASE_DOC_ATTRS(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Stress and strain tensors are computed using formulas derived in [Kuhl2001]_, in particular equations (33) and (35).",
+		((Matrix3r,strain,Matrix3r::Zero(),"Current deformation tensor |yupdate|"))
+		((Matrix3r,stress,Matrix3r::Zero(),"Current stress tensor |yupdate|"))
+		((Matrix3r,goal,Matrix3r::Zero(),"Goal state."))
+		((int,stressMask,((void)"all strains",0),"mask determining whether components of :yref:`goal<Peri3dController.goal>` are strain (0) or stress (1). The order is 00,11,22,12,02,01 from the least significant bit. (e.g. 0b000011 is stress 00 and stress 11)."))
+		((Real,maxStrainRate,1,"Maximum absolute value of strain rate (both normal and shear components of :yref:`Cell.velGrad`)"))
+		// not yet used
+		//((Real,currUnbalanced,NaN,"current unbalanced force |yupdate|"))
+		//((Real,maxUnbalanced,1e-4,"Maximum unbalanced force"))
+	);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Peri3dController);
+
+#endif

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController))
+YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(Peri3dController))
 
 
 CREATE_LOGGER(PeriIsoCompressor);
@@ -245,3 +245,128 @@ void PeriTriaxController::action()
 		}
 	}
 }
+
+#ifndef YADE_WM3
+
+CREATE_LOGGER(Peri3dController);
+void Peri3dController::update(){
+	/* strain
+		polar decomposition of transformation:
+			compute strain tensor from the non-rotational part of trsf, then rotate it back to global coords
+	*/
+	Matrix3r rot,nonrot; //nonrot=skew+normal deformation
+	const Matrix3r& trsf=scene->cell->trsf;
+	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot);
+	// FIXME: should be rot*(log(nonrot)), but matrix logarithm is not yet implemented in eigen
+	strain=rot*(nonrot-Matrix3r::Identity());
+	LOG_TRACE("Updated strain value\n"<<strain);
+	/* stress and stiffness
+	*/
+	K=Matrix6r::Zero();
+	stress=Matrix3r::Zero();
+	const Real volume=scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		// not clear whether this should be the reference or the current distance
+		// current: gives consistent results for same configuration with different initial state
+		// reference: does not change stress tensor when the same forces exist on interactions with changing length
+		//const Real& d0=geom->refLength;
+		const Real d0=(geom->se31.position-geom->se32.position).norm();
+		const Vector3r& n=geom->normal;
+		const Vector3r& fT=phys->shearForce;
+		const Real fN=phys->normalForce.dot(n);
+		for(int i=0; i<3; i++) for(int j=0;j<3; j++){
+			stress(i,j)+=d0*(fN*n[i]*n[j]+.5*(fT[i]*n[j]+fT[j]*n[i]));
+		}
+		const Real& kN=phys->kn; const Real& kT=phys->ks;
+		// mapping between 6x6 matrix indices and tensor indices (Voigt notation)
+		const int map[6][6][4]={
+			{{0,0,0,0},{0,0,1,1},{0,0,2,2},{0,0,1,2},{0,0,2,0},{0,0,0,1}},
+			{{8,8,8,8},{1,1,1,1},{1,1,2,2},{1,1,1,2},{1,1,2,0},{1,1,0,1}},
+			{{8,8,8,8},{8,8,8,8},{2,2,2,2},{2,2,1,2},{2,2,2,0},{2,2,0,1}},
+			{{8,8,8,8},{8,8,8,8},{8,8,8,8},{1,2,1,2},{1,2,2,0},{1,2,0,1}},
+			{{8,8,8,8},{8,8,8,8},{8,8,8,8},{8,8,8,8},{2,0,2,0},{2,0,0,1}},
+			{{8,8,8,8},{8,8,8,8},{8,8,8,8},{8,8,8,8},{8,8,8,8},{0,1,0,1}}};
+		const int kron[3][3]={{1,0,0},{0,1,0},{0,0,1}}; // Kronecker delta
+		for(int p=0; p<6; p++) for(int q=p;q<6;q++){
+			int i=map[p][q][0], j=map[p][q][1], k=map[p][q][2], l=map[p][q][3];
+			K(p,q)+=d0*d0*(kN*n[i]*n[j]*n[k]*n[l]+kT*(.25*(n[j]*n[k]*kron[i][l]+n[j]*n[l]*kron[i][k]+n[i]*n[k]*kron[j][l]+n[i]*n[l]*kron[j][k])-n[i]*n[j]*n[k]*n[l]));
+		}
+	}
+	stress/=volume;
+	K/=volume;
+	for(int p=0; p<6; p++)for(int q=p+1;q<6;q++) K(q,p)=K(p,q);
+	LOG_TRACE("Updated stress\n"<<stress);
+	LOG_TRACE("Updated stiffness tensor\n"<<K);
+}
+
+void Peri3dController::action(){
+	// TODO: only call sometimes
+	update();
+	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
+	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
+	/* 
+	sigma = K * eps
+
+	decompose the stiffness matrix depending on what is prescribed
+
+	| sigma_u | = | Kuu Kup | * | eps_u |
+	| sigma_p |   | Kpu Kpp |   | eps_p |
+
+	then
+
+	eps_u=(Kuu^-1)*(sigma_u-Kup eps_p)
+
+	(we replace all eps and sigma by their rates in the computation)
+	*/
+	int numP=0,numU=0; // number of prescribed and unprescribed strain components
+	for(int i=0;i<6;i++) if(stressMask&(1<<i))numU++;
+	numP=6-numU;
+	// sub-matrices of the stiffness matrix
+	MatrixXr Kuu(numU,numU), Kup(numU,numP);
+	// epsP, epsU, sigU are _rates_
+	VectorXr epsP(numP), epsU(numU), sigU(numU);
+	// conversion from Voigt indices to 3x3 tensor indices (upper-triangle part)
+	const int mapI[6]={0,1,2,1,2,0};
+	const int mapJ[6]={0,1,2,2,0,1};
+	int jU=0,jP=0;
+	for(int j=0; j<6; j++){
+		// prescribed stress, i.e. un-prescribed strain
+		if(stressMask&(1<<j)){
+			sigU[jU]=goal(mapI[j],mapJ[j]);
+			int iU=0;
+			for(int i=0;i<6;i++){ if((stressMask&(1<<i))) Kuu(iU++,jU)=K(i,j);}
+			jU++;
+		} else {
+			epsP[jP]=(j<3?1.:2.)*goal(mapI[j],mapJ[j]); /* multiply tensor shear by 2, see http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations */
+			int iP=0;
+			for(int i=0;i<6;i++){ if((stressMask&(1<<i))) Kup(iP++,jP)=K(i,j);}
+			jP++;
+		}
+	}
+	assert(jU==numU); assert(jP==numP);
+	LOG_TRACE("Kuu=\n"<<Kuu<<"\nKup=\n"<<Kup<<"\nepsP=\n"<<epsP<<"\nsigU=\n"<<sigU);
+	// if Kuu is (nearly) singular, the goal strain is inf and the corresponding velGrad component then NaN
+	// in such case, sanitize it with some random value (irrelevant which one)
+	// FIXME: find a better way for this than determinant (expensive for larger matrices)
+	if(Kuu.rows()*Kuu.cols()>0 && Kuu.determinant()<1e-20){ Kuu+=MatrixXr(Kuu.cols(),Kuu.rows()).setIdentity(); LOG_TRACE("Kuu after sanitization\n"<<Kuu); }
+	epsU=Kuu.inverse()*(sigU-Kup*epsP);
+	// assemble strain tensor (as matrix), from prescribed values epsP and computed values epsU
+	jU=0; jP=0;
+	Matrix3r eps;
+	for(int j=0; j<6; j++){
+		if(stressMask&(1<<j)) eps(mapI[j],mapJ[j])=epsU[jU++];
+		else eps(mapI[j],mapJ[j])=(j<3?1.:.5)*epsP[jP++]; /* multiply shear components back by 1/2 when converting from Voigt vector back to tensor */
+	}
+	eps(2,1)=eps(1,2); eps(0,2)=eps(2,0); eps(1,0)=eps(0,1);
+	Matrix3r& velGrad=scene->cell->velGrad;
+	// rate of (goal strain - current strain)
+	velGrad=(eps-strain)/scene->dt;
+	Real mx=max(abs(velGrad.minCoeff()),abs(velGrad.maxCoeff()));
+	if(mx>abs(maxStrainRate)) velGrad*=abs(maxStrainRate)/mx;
+	LOG_TRACE("epsU=\n"<<epsU<<"\neps=\n"<<"\nabs(maxCoeff)="<<mx<<"\nvelGrad=\n"<<velGrad);
+	// TODO: check unbalanced force and run some hook when the goal state is achieved
+}
+#endif

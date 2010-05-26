@@ -221,6 +221,71 @@ def filterSpherePack(predicate,spherePack,**kw):
 		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 	return ret
 
+def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim):
+	if not memoizeDb: return
+	import cPickle,sqlite3,time,os
+	if os.path.exists(memoizeDb):
+		conn=sqlite3.connect(memoizeDb)
+	else:
+		conn=sqlite3.connect(memoizeDb)
+		c=conn.cursor()
+		c.execute('create table packings (radius real, rRelFuzz real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)')
+	c=conn.cursor()
+	packBlob=buffer(cPickle.dumps(sp.toList_pointsAsTuples(),cPickle.HIGHEST_PROTOCOL))
+	packDim=sp.cellSize if wantPeri else fullDim
+	c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,rRelFuzz,packDim[0],packDim[1],packDim[2],len(sp),time.time(),wantPeri,packBlob,))
+	c.close()
+	conn.commit()
+	print "Packing saved to the database",memoizeDb
+
+def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fillPeriodic,spheresInCell,memoDbg=False):
+	"""Return suitable SpherePack read from *memoizeDb* if found, None otherwise.
+		
+		:param fillPeriodic: whether to fill fullDim by repeating periodic packing
+		:param wantPeri: only consider periodic packings
+	"""
+	import os,os.path,sqlite3,time,cPickle,sys
+	if memoDbg:
+		def memoDbgMsg(s): print s
+	else:
+		def memoDbgMsg(s): pass
+	if not memoizeDb or not os.path.exists(memoizeDb):
+		if memoizeDb: memoDbgMsg("Database %s does not exist."%memoizeDb)
+		return None
+	# find suitable packing and return it directly
+	conn=sqlite3.connect(memoizeDb); c=conn.cursor();
+	try:
+		c.execute('select radius,rRelFuzz,dimx,dimy,dimz,N,timestamp,periodic from packings order by N')
+	except sqlite3.OperationalError:
+		raise RuntimeError("ERROR: database `"+memoizeDb+"' not compatible with randomDensePack (corrupt, deprecated format or not a db created by randomDensePack)")
+	for row in c:
+		R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=radius/R
+		rDev*=scale; X*=scale; Y*=scale; Z*=scale
+		memoDbgMsg("Considering packing (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(R,.5*rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp))))
+		if not isPeri and wantPeri: memoDbgMsg("REJECT: is not periodic, which is requested."); continue
+		if (rRelFuzz==0 and rDev!=0) or (rRelFuzz!=0 and rDev==0) or (rRelFuzz!=0 and abs((rDev-rRelFuzz)/rRelFuzz)>1e-2): memoDbgMsg("REJECT: radius fuzz differs too much (%g, %g desired)"%(rDev,rRelFuzz)); continue # radius fuzz differs too much
+		if isPeri and wantPeri:
+			if spheresInCell>NN: memoDbgMsg("REJECT: Number of spheres in the packing too small"); continue
+			if abs((y1/x1)/(Y/X)-1)>0.3 or abs((z1/x1)/(Z/X)-1)>0.3: memoDbgMsg("REJECT: proportions (y/x=%g, z/x=%g) differ too much from what is desired (%g, %g)."%(Y/X,Z/X,y1/x1,z1/x1)); continue
+		else:
+			if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): memoDbgMsg("REJECT: not large enough"); continue # not large enough
+		memoDbgMsg("ACCEPTED");
+		print "Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
+		c.execute('select pack from packings where timestamp=?',(timestamp,))
+		sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
+		if isPeri and wantPeri:
+			sp.cellSize=(X,Y,Z);
+			if fillPeriodic: sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]));
+		sp.scale(scale);
+		#sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
+		return sp
+		#if orientation: sp.rotate(*orientation.toAxisAngle())
+		#return filterSpherePack(predicate,sp,material=material)
+	#print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
+	#sys.stdout.flush()
+
+
+
 def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The priodicity depens on whether	the spheresInCell parameter is given.
@@ -274,37 +339,13 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		maxR=radius*(1+rRelFuzz)
 		x1=max(x1,8*maxR); y1=max(y1,8*maxR); z1=max(z1,8*maxR); vol1=x1*y1*z1
 		N100*=vol1/vol0 # volume might have been increased, increase number of spheres to keep porosity the same
-	if(memoizeDb and os.path.exists(memoizeDb)):
-		if memoDbg:
-			def memoDbgMsg(s): print s
-		else:
-			def memoDbgMsg(s): pass
-		# find suitable packing and return it directly
-		conn=sqlite3.connect(memoizeDb); c=conn.cursor();
-		try:
-			c.execute('select radius,rRelFuzz,dimx,dimy,dimz,N,timestamp,periodic from packings order by N')
-		except sqlite3.OperationalError:
-			raise RuntimeError("ERROR: database `"+memoizeDb+"' not compatible with randomDensePack (corrupt, deprecated format or not a db created by randomDensePack)")
-		for row in c:
-			R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=radius/R
-			rDev*=scale; X*=scale; Y*=scale; Z*=scale
-			memoDbgMsg("Considering packing (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(R,.5*rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp))))
-			if (rRelFuzz==0 and rDev!=0) or (rRelFuzz==0 and rDev!=0) or (rRelFuzz!=0 and abs((rDev-rRelFuzz)/rRelFuzz)>1e-2): memoDbgMsg("REJECT: radius fuzz differs too much (%g, %g desired)"%(rDev,rRelFuzz)); continue # radius fuzz differs too much
-			if isPeri and wantPeri:
-				if spheresInCell>NN: memoDbgMsg("REJECT: Number of spheres in the packing too small"); continue
-				if abs((y1/x1)/(Y/X)-1)>0.3 or abs((z1/x1)/(Z/X)-1)>0.3: memoDbgMsg("REJECT: proportions (y/x=%g, z/x=%g) differ too much from what is desired (%g, %g)."%(Y/X,Z/X,y1/x1,z1/x1)); continue
-			else:
-				if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): memoDbgMsg("REJECT: not large enough"); continue # not large enough
-			memoDbgMsg("ACCEPTED");
-			print "Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
-			c.execute('select pack from packings where timestamp=?',(timestamp,))
-			sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
-			if isPeri and wantPeri:
-				sp.cellSize=(X,Y,Z); sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2])); sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
-			sp.scale(scale);
-			if orientation: sp.rotate(*orientation.toAxisAngle())
+		sp=_getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fillPeriodic=True,spheresInCell=spheresInCell,memoDbg=False)
+		if sp:
+			if orientation:
+				sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
+				sp.rotate(*orientation.toAxisAngle())
 			return filterSpherePack(predicate,sp,material=material)
-		print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
+		else: print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
 		sys.stdout.flush()
 	O.switchScene(); O.resetThisScene() ### !!
 	if wantPeri:
@@ -337,27 +378,14 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		O.run(); O.wait()
 		sp=SpherePack(); sp.fromSimulation()
 	O.switchScene() ### !!
-	if(memoizeDb):
-		if os.path.exists(memoizeDb):
-			conn=sqlite3.connect(memoizeDb)
-		else:
-			conn=sqlite3.connect(memoizeDb)
-			c=conn.cursor()
-			c.execute('create table packings (radius real, rRelFuzz real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)')
-		c=conn.cursor()
-		packBlob=buffer(cPickle.dumps(sp.toList_pointsAsTuples(),cPickle.HIGHEST_PROTOCOL))
-		packDim=sp.cellSize if wantPeri else fullDim
-		c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,rRelFuzz,packDim[0],packDim[1],packDim[2],len(sp),time.time(),wantPeri,packBlob,))
-		c.close()
-		conn.commit()
-		print "Packing saved to the database",memoizeDb
+	_memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim)
 	if wantPeri: sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]))
 	if orientation:
 		sp.cellSize=(0,0,0); # reset periodicity to avoid warning when rotating periodic packing
 		sp.rotate(*orientation.toAxisAngle())
 	return filterSpherePack(predicate,sp,material=material,color=color)
 
-def randomPeriPack(radius,rRelFuzz,initSize):
+def randomPeriPack(radius,rRelFuzz,initSize,memoizeDb=None):
 	"""Generate periodic dense packing.	EXPERIMENTAL, you at your own risk.
 
 	A cell of initSize is stuffed with as many spheres as possible (ignore the warning from SpherePack::makeCloud about
@@ -374,6 +402,8 @@ def randomPeriPack(radius,rRelFuzz,initSize):
 
 	"""
 	from math import pi
+	sp=_getMemoizedPacking(memoizeDb,radius,rRelFuzz,initSize[0],initSize[1],initSize[2],fullDim=Vector3(0,0,0),wantPeri=True,fillPeriodic=False,spheresInCell=-1,memoDbg=True)
+	if sp: return sp
 	O.switchScene(); O.resetThisScene()
 	sp=SpherePack()
 	O.periodic=True
@@ -387,6 +417,7 @@ def randomPeriPack(radius,rRelFuzz,initSize):
 	O.run(); O.wait()
 	ret=SpherePack()
 	ret.fromSimulation()
+	_memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri=True,fullDim=Vector3(0,0,0)) # fullDim unused
 	O.switchScene()
 	return ret
 
