@@ -127,7 +127,9 @@ void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, s
 	Real trialFsSq = trialFs.squaredNorm();
  	if(trialFsSq>maxFsSq){
 		Real multiplier=sqrt(maxFsSq/trialFsSq);
-		geom->scaleDisplacementT(multiplier); trialFs*=multiplier;}
+		//geom->scaleDisplacementT(multiplier);
+		trialFs*=multiplier;
+	}
 	phys->shearForce=trialFs;
 	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
 }
