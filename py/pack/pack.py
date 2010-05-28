@@ -107,6 +107,7 @@ class inSpace(Predicate):
 
 def gtsSurface2Facets(surf,**kw):
 	"""Construct facets from given GTS surface. **kw is passed to utils.facet."""
+	import gts
 	return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf]
 
 def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
@@ -121,6 +122,7 @@ If threshold is given (>0), then
 
 .. warning:: the algorithm connects points sequentially; if two polylines are mutually rotated or have inverse sense, the algorithm will not detect it and connect them regardless in their given order.
 	"""
+	import gts # will raise an exception in gts-less builds
 	if not len(set([len(pts1) for pts1 in pts]))==1: raise RuntimeError("Polylines must be all of the same length!")
 	vtxs=[[gts.Vertex(x,y,z) for x,y,z in pts1] for pts1 in pts]
 	sectEdges=[[gts.Edge(vtx[i],vtx[i+1]) for i in xrange(0,len(vtx)-1)] for vtx in vtxs]
@@ -159,6 +161,7 @@ def gtsSurfaceBestFitOBB(surf):
 	"""Return (Vector3 center, Vector3 halfSize, Quaternion orientation) describing
 	best-fit oriented bounding box (OBB) for the given surface. See cloudBestFitOBB
 	for details."""
+	import gts
 	pts=[Vector3(v.x,v.y,v.z) for v in surf.vertices()]
 	return cloudBestFitOBB(tuple(pts))
 

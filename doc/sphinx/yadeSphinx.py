@@ -173,9 +173,9 @@ def genReferences():
 	import sys
 	sys.path.append('.')
 	import bib2rst # our module
-	f=open('../references.rst','w')
+	f=open('references.rst','w')
 	f.write('References\n'+40*'='+'\n\n\n')
-	f.write(bib2rst.bib2rst('references.bib'))
+	f.write(bib2rst.bib2rst('../references.bib'))
 	f.close()
 
 

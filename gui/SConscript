@@ -40,6 +40,8 @@ if 'opengl' in env['features']:
 	# Not clear why scons is not picking up the dependency automatically
 	# Do not remove.
 	#
-	gens=['$buildDir/gui/qt3/'+h for h in 'QtGeneratedSimulationController.h','QtGeneratedMessageDialog.h','YadeQtGeneratedMainWindow.h','QtFileGeneratorController.h']
-	env.Depends(['qt3/FileDialog.cpp','qt3/GLViewer.cpp','qt3/MessageDialog.cpp','qt3/QtFileGenerator.cpp','qt3/QtGUI.cpp','qt3/QtGUIPreferences.cpp','qt3/SimulationController.cpp','qt3/YadeQtMainWindow.cpp','qt3/YadeCamera.cpp'],gens)
+	srcs=['FileDialog','GLViewer','MessageDialog','QtFileGenerator','QtGUI','QtGUIPreferences','SimulationController','YadeQtMainWindow','YadeCamera']
+	uis=['QtGeneratedSimulationController','QtGeneratedMessageDialog','YadeQtGeneratedMainWindow',	'QtFileGeneratorController']
+	for ui in uis:
+		for s in srcs: env.AddPreAction('$buildDir/gui/qt3/%s.os'%s,'$QT_UIC -o $buildDir/gui/qt3/%s.h gui/qt3/%s.ui'%(ui,ui))
 

@@ -1,44 +1,48 @@
-#!/bin/sh
-# this script must be run from yade's top-level directory!
-#
-# if there is file RELEASE, it will be the version number ($VERSION) and SNAPSHOT will be empty.
-# Otherwise svn or bzr versioning information will be used. Errors out if RELEASE or .svn or .bzr don't exist.
-#
-# Takes one optional argument with the name of $DISTRIBUTION (default: unstable)
-#
+#!/usr/bin/python
+# encoding: utf-8
+import sys,os.path,re,shutil,time
+DISTRIBUTION=sys.argv[1] if len(sys.argv)>1 else 'unstable'
+if os.path.exists('RELEASE'):
+	VERSION=file('RELEASE').readline().strip()
+	SNAPSHOT=''
+	PRIORITY=int(10000*float(re.sub('[^0-9.]','',VERSION)))
+	if re.match('^.*beta',VERSION): PRIORITY-=100
+	if re.match('^.*rc[0-9]$',VERSION): PRIORITY-=100
+elif os.path.exists('.bzr'):
+	VERSION='bzr'+os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines()[0][:-1]
+	SNAPSHOT='-snapshot'
+	PRIORITY=int(re.sub('[^0-9]','',VERSION))
+else:
+	raise RuntimeError('Revision could not be determined (RELEASE or .bzr)')
+print 'version %s%s, priority %d'%(VERSION,SNAPSHOT,PRIORITY)
+open('VERSION','w').write(VERSION+'\n')
+_VERSION='-'+VERSION #used in templates
 
-## DISTRIBUTION (first argument, otherwise the default "unstable")
-DISTRIBUTION=$1; [ -n "$DISTRIBUTION" ] || DISTRIBUTION="unstable"
-## create VERSION file (from RELEASE or svn or bzr)
-if [ -f RELEASE ]; then	VERSION=`cat RELEASE`; SNAPSHOT=""
-elif [ -d .svn ]; then VERSION="svn$( svn info | egrep '^Revision:' | cut -f2 -d' ')"; SNAPSHOT="-snapshot"
-elif [ -d .bzr ]; then VERSION="bzr$( bzr revno )"; SNAPSHOT="-snapshot"
-else echo 'Revision could not be determined (RELEASE or .svn or .bzr)' >2; exit 1;
-fi
-# compute version priority:
-# * releases get 10000*version (discarding anything not digit and dot)
-# * snapshots get their revision number (discarding anything not digit)
-# This way, releases have always higher number than snapshots and
-# both releases and snapshots are properly ordered
-if [ -f RELEASE ]; then PRIORITY=$( echo 10000\*`cat RELEASE | sed s'/[^0-9.]//g'` | bc | cut -d. -f1 )
-else PRIORITY=$( echo $VERSION | sed s'/[^0-9]//g' )
-fi
-_VERSION="-$VERSION"; echo $VERSION > VERSION
-echo PRIORITY $PRIORITY
-# process templates
-cp debian/yade.postinst-template debian/yade$_VERSION.postinst
-cp debian/yade-dbg.postinst-template debian/yade$_VERSION-dbg.postinst
-cp debian/yade.prerm-template debian/yade$_VERSION.prerm
-cp debian/yade-dbg.prerm-template debian/yade$_VERSION-dbg.prerm
-cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g; s/\@_VERSION\@/$_VERSION/g; s/\@SNAPSHOT\@/$SNAPSHOT/g; s/\@PRIORITY\@/$PRIORITY/g;" debian/control debian/yade$_VERSION.postinst debian/yade$_VERSION-dbg.postinst debian/yade$_VERSION.prerm debian/yade$_VERSION-dbg.prerm;
+# control files
+def copyReplace(f1,f2):
+	"Copy file f1 to f2, evaluating all occurences of @...@ with eval(); they should expand to a string and can contain arbitrary python expressions."
+	ff2=open(f2,'w')
+	for l in open(f1):
+		ff2.write(re.sub(r'@([^@]*)@',lambda m: str(eval(m.group(1))),l))
+for f1,f2 in [
+	('yade.postinst-template','yade-%s.postinst'%VERSION),
+	('yade-dbg.postinst-template','yade-%s-dbg.postinst'%VERSION),
+	('yade.prerm-template','yade-%s.prerm'%VERSION),
+	('yade-dbg.prerm-template','yade-%s-dbg.prerm'%VERSION),
+	('control-template','control')]:
+		copyReplace('debian/'+f1,'debian/'+f2)
+
 # write debian/changelog
-DEBDATE=`date -R`
-cat <<EOF > debian/changelog
-yade$_VERSION (1~$DISTRIBUTION) $DISTRIBUTION; urgency=low
+open('debian/changelog','w').write(
+'''yade-%s (1~%s) %s; urgency=low
 
-  * Automatic debian changelog entry for yade$_VERSION
+  * Automatic debian changelog entry for yade-%s
 
- -- Václav Šmilauer <eudoxos@arcig.cz>  $DEBDATE
-EOF
-# remove generated files that shouldn't be in the orig.tar.gz
-rm -rf tags doc/doxygen doc/html doc/epydoc
+ -- Václav Šmilauer <eudoxos@arcig.cz>  %s
+'''%(VERSION,DISTRIBUTION,DISTRIBUTION,VERSION,time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
+
+# remove some generated files
+for p in ('doc/doxygen','doc/sphinx/_build','tags'):
+	if not os.path.exists(p): continue
+	if os.path.isdir(p): shutil.rmtree(p)
+	else: os.remove(p)

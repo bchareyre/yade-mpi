@@ -1,4 +1,5 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
+#pragma once 
 
 #ifdef YADE_OPENMP
 #include"omp.h"
