@@ -1,4 +1,6 @@
-#encoding:UTF-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """The script demonstrates rotating cylinder, created with GTS-help (http://gts.sourceforge.net/).
 Inside the cylinder there are a "cloud" of spheres."""
 
