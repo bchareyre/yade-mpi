@@ -124,12 +124,15 @@ void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, s
 	phys->normalForce=phys->kn*displN*geom->normal;
 	Real maxFsSq=phys->normalForce.squaredNorm()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
-	Real trialFsSq = trialFs.squaredNorm();
- 	if(trialFsSq>maxFsSq){
-		Real multiplier=sqrt(maxFsSq/trialFsSq);
-		//geom->scaleDisplacementT(multiplier);
-		trialFs*=multiplier;
-	}
+
+//	FIXME : This is generating bug https://bugs.launchpad.net/bugs/585898
+//  	Real trialFsSq = trialFs.squaredNorm();
+//	if(trialFsSq>maxFsSq){
+// 		Real multiplier=sqrt(maxFsSq/trialFsSq);
+// 		geom->scaleDisplacementT(multiplier); trialFs*=multiplier;}
+	//Workaround start
+	if(trialFs.squaredNorm()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)/phys->ks); trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
+	//Workaround end
 	phys->shearForce=trialFs;
 	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
 }
