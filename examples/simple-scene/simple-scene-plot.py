@@ -1,5 +1,5 @@
-#!/usr/local/bin/yade-trunk -x
-# -*- encoding=utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 O.initializers=[
 		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
@@ -45,7 +45,7 @@ plot.plots={'i':('t'),'t':('z_sph',None,('v_sph','go-'),'z_sph_half')}
 def myAddPlotData():
 	sph=O.bodies[1]
 	## store some numbers under some labels
-	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sph.state.vel.Length())
+	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sph.state.vel.norm())
 
 O.run(int(2./O.dt),True);
 print "Now calling plot.plot() to show the figures (close them to continue)."

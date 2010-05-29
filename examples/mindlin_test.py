@@ -1,6 +1,5 @@
-#!/usr/local/bin/yade-trunk -x
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
-# -*- encoding=utf-8 -*-
 ##
 ## SCRIPT TO TEST A NEW CONSTITUTIVE LAW (MINDLIN - nonlinear elastic model)
 
@@ -63,7 +62,7 @@ def myAddPlotData():
 	## store some numbers under some labels
 	plot.addData(fn=i.phys.normalForce[0],step=O.iter,un=2*s0.shape.radius-s1.state.pos[0]+s0.state.pos[0],kn=i.phys.kn)	
 
-O.run(50,True);
+O.run(250,True);
 print "Now calling plot.plot() to show the figure."
 
 ## We will have:

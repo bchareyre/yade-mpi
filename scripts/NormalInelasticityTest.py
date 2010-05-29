@@ -1,3 +1,4 @@
+
 # Script to test the constitutive law contained in NormalInelasticityLaw : consider two spheres whose penetration of the contact evolves => Monitor of the normal force
 
 from yade import plot

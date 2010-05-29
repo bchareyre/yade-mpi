@@ -1,4 +1,5 @@
-# encoding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Small showcase posted at http://www.youtube.com/watch?v=KUv26xlh89I,
 in response to pfc3d's http://www.youtube.com/watch?v=005rdDBoe4w.

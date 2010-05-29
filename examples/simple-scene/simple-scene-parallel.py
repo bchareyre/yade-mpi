@@ -1,8 +1,6 @@
-# -*- encoding=utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-O.initializers=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	]
 O.engines=[
 	# physical actions will not be needed until the contact law comes in;
 	# therefore it can run in parallel with the Aabb engines and collider;
@@ -24,8 +22,12 @@ O.engines=[
 		# ForceResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
 		ForceResetter(),
 		# Engines within the group will be run serially, however
-		[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),	PersistentSAPCollider(),]
+		BoundDispatcher([
+			Bo1_Sphere_Aabb(),
+			Bo1_Box_Aabb(),
+		]),
 	]),
+	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	# the rest must also be run sequentially
@@ -36,8 +38,11 @@ O.engines=[
 ]
 
 from yade import utils
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
-O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
-O.dt=.5*utils.PWaveTimeStep()
+O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0]))
+O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
+from yade import qt
+qt.View()
+qt.Controller()
+O.dt=.001*utils.PWaveTimeStep()
 O.saveTmp()
-#o.run(100000); o.wait(); print o.iter/o.realtime,"iterations/sec"
+O.run(300000); O.wait(); print O.iter/O.realtime,"iterations/sec"

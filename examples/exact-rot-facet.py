@@ -23,12 +23,14 @@ O.engines=[
 ]
 from yade import utils
 scale=.1
-O.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],dynamic=False,color=[1,0,0],young=30e9,poisson=.3))
-O.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],young=30e9,poisson=.3,density=2400,wire=True,dynamic=False))
+O.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],dynamic=False,color=[1,0,0]))
+O.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],wire=True,dynamic=False))
 
-O.dt=.8*utils.PWaveTimeStep()
+O.dt=.4*utils.PWaveTimeStep()
 from yade import qt
+qt.View()
 renderer=qt.Renderer()
-renderer['Interaction_geometry']=True
+renderer.intrGeom=True
 qt.Controller()
 O.step(); O.step(); O.step()
+O.run(20000)

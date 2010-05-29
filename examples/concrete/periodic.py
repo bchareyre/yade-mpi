@@ -1,4 +1,5 @@
-# -*- encoding=utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from __future__ import division
 
 from yade import utils,plot,pack

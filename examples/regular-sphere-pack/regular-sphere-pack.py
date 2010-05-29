@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from yade import pack,ymport,export
 
 """ This script demonstrates how to use 2 components of creating packings:

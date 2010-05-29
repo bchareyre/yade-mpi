@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from yade import pack
 
 """Simple script to create tunnel with random dense packing of spheres.

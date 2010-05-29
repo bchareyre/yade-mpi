@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation with VTK recorder
 from yade import utils
 from numpy import linspace

@@ -1,5 +1,5 @@
-#!/usr/local/bin/yade-trunk -x
-# -*- encoding=utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 ## Omega is the super-class that orchestrates the whole program.
 ## It holds the entire simulation (MetaBody), takes care of loading/saving,
@@ -94,7 +94,7 @@ if False:
 	# Create empty body object
 	b=Body()
 	# set the isDynamic body attribute
-	b['isDynamic']=False
+	b.isDynamic=False
 	# Assign geometrical model (shape) to the body: a box of given size
 	b.shape=Box(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# physical parameters:
@@ -117,7 +117,7 @@ if False:
 o.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
 
 ## Estimate timestep from p-wave speed and multiply it by safety factor of .2
-o.dt=.2*utils.PWaveTimeStep()
+o.dt=.01*utils.PWaveTimeStep()
 
 ## Save the scene to file, so that it can be loaded later. Supported extension are: .xml, .xml.gz, .xml.bz2.
 o.save('/tmp/a.xml.bz2');
@@ -131,4 +131,6 @@ def onBodySelect(id):
 		print i.id1,i.id2,i.phys,i.geom
 
 from yade import qt
+qt.View()
 qt.Controller()
+O.run(20000)

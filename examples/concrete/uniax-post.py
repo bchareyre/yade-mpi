@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # demonstration of the yade.post2d module (see its documentation for details)
 #

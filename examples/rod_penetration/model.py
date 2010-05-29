@@ -1,5 +1,5 @@
-#!/usr/local/bin/yade-trunk -x
-# -*- encoding=utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 from yade import utils
 import random

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """This example demonstrates GTS (http://gts.sourceforge.net/) opportunities for creating surfaces
 VTU-files are created in /tmp directory after simulation. If you open those with paraview
 (or other VTK-based) program, you can create video, make screenshots etc."""

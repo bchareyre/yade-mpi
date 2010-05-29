@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation
 from yade import utils
 from numpy import linspace

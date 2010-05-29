@@ -1,4 +1,5 @@
-# encoding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 """Script showing how to use GTS to import arbitrary triangulated surface,
 which can further be either filled with packing (if used as predicate) or converted

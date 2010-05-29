@@ -20,14 +20,16 @@ O.engines=[
 	NewtonIntegrator(damping=.2)
 ]
 from yade import utils
-O.bodies.append(utils.sphere([0,0,0],1,dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400,wire=True))
-O.bodies.append(utils.sphere([0,sqrt(2),sqrt(2)],1,color=[0,1,0],young=30e9,poisson=.3,density=2400,wire=True))
+O.bodies.append(utils.sphere([0,0,0],1,dynamic=False,color=[1,0,0],wire=True))
+O.bodies.append(utils.sphere([0,sqrt(2),sqrt(2)],1,color=[0,1,0],wire=True))
 
-O.dt=.8*utils.PWaveTimeStep()
+O.dt=.01*utils.PWaveTimeStep()
 O.saveTmp()
 #o.run(100000); o.wait(); print o.iter/o.realtime,'iterations/sec'
 from yade import qt
+qt.View()
 renderer=qt.Renderer()
-renderer['Interaction_geometry']=True
+renderer.intrGeom=True
 qt.Controller()
 O.step(); O.step(); O.step()
+O.run(20000)

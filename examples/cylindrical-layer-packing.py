@@ -1,4 +1,5 @@
-# encoding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from math import *
 
 
@@ -38,16 +39,16 @@ wLat1=utils.box([0+.5*wallDist+.5*wallThickness,0,0],[.5*wallThickness,wallSize,
 wLat2=utils.box([0-.5*wallDist-.5*wallThickness,0,0],[.5*wallThickness,wallSize,wallSize]); o.bodies.append(wLat2);
 
 #angle walls, they cross at the x-axis
-wAng1=utils.box([0,0,0],[.55*wallDist,.5*wallThickness,wallSize*sqrt(2)]); wAng1.phys.ori=Quaternion((1,0,0),pi/4); o.bodies.append(wAng1); 
-wAng2=utils.box([0,0,0],[.55*wallDist,.5*wallThickness,wallSize*sqrt(2)]); wAng2.phys.ori=Quaternion((1,0,0),-pi/4); o.bodies.append(wAng2)
+wAng1=utils.box([0,0,0],[.55*wallDist,.5*wallThickness,wallSize*sqrt(2)]); wAng1.state.ori=Quaternion((1,0,0),pi/4); o.bodies.append(wAng1); 
+wAng2=utils.box([0,0,0],[.55*wallDist,.5*wallThickness,wallSize*sqrt(2)]); wAng2.state.ori=Quaternion((1,0,0),-pi/4); o.bodies.append(wAng2)
 
 #cap
 wCap=utils.box([0,0,wallSize],[.55*wallDist,wallSize,.5*wallThickness]); o.bodies.append(wCap)
 
 # all bodies up to now are fixed and only wire is will be shown
 for b in o.bodies:
-	b.shape['wire']=True
-	b['isDynamic']=False
+	b.shape.wire=True
+	b.isDynamic=False
 
 import random
 def randomColor():
@@ -63,6 +64,12 @@ for ix in range(int(maxima[0])):
 			O.bodies.append(utils.sphere([x,y,z],rBall))
 
 o.save('/tmp/a.xml')
+
+try:
+	from yade import qt
+	qt.Controller()
+	qt.View()
+except ImportError: pass
 
 if 0:
 	import os,time
