@@ -48,8 +48,6 @@ class RenderMutexLock: public boost::mutex::scoped_lock{
 CREATE_LOGGER(Omega);
 SINGLETON_SELF(Omega);
 
-// Omega::~Omega(){LOG_INFO("Shuting down; duration "<<(microsec_clock::local_time()-msStartingSimulationTime)/1000<<" s");}
-
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
 long int Omega::getCurrentIteration(){ return (scene?scene->currentIteration:-1); }
@@ -64,10 +62,8 @@ const shared_ptr<Scene>& Omega::getScene(){return scene;}
 void Omega::setScene(shared_ptr<Scene>& rb){ RenderMutexLock lock; scene=rb;}
 void Omega::resetScene(){ RenderMutexLock lock; scene = shared_ptr<Scene>(new Scene);}
 
-ptime Omega::getMsStartingSimulationTime(){return msStartingSimulationTime;}
-time_duration Omega::getSimulationPauseDuration(){return simulationPauseDuration;}
-Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartingSimulationTime-simulationPauseDuration).total_milliseconds()/1e3; }
-time_duration Omega::getComputationDuration(){return microsec_clock::local_time()-msStartingSimulationTime-simulationPauseDuration;}
+Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartingSimulationTime).total_milliseconds()/1e3; }
+time_duration Omega::getComputationDuration(){return microsec_clock::local_time()-msStartingSimulationTime;}
 
 
 void Omega::initTemps(){
@@ -103,8 +99,6 @@ void Omega::init(){
 
 void Omega::timeInit(){
 	msStartingSimulationTime=microsec_clock::local_time();
-	simulationPauseDuration=msStartingSimulationTime-msStartingSimulationTime;
-	msStartingPauseTime=msStartingSimulationTime;
 }
 
 void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
@@ -125,7 +119,6 @@ void Omega::spawnSingleSimulationLoop(){
 void Omega::startSimulationLoop(){
 	if(!simulationLoop){ LOG_ERROR("No Omega::simulationLoop? Creating one (please report bug)."); createSimulationLoop(); }
 	if (simulationLoop && !simulationLoop->looping()){
-		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		simulationLoop->start();
 	}
 }
@@ -133,7 +126,6 @@ void Omega::startSimulationLoop(){
 
 void Omega::stopSimulationLoop(){
 	if (simulationLoop && simulationLoop->looping()){
-		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->stop();
 	}
 }

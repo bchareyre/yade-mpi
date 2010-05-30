@@ -2,20 +2,18 @@
 Show basic wall functionality (infinite axis-aligned planes).
 """
 from yade import utils
-kw=dict(young=30e9,density=1000)
+O.materials.append(FrictMat(young=30e9,density=1000,poisson=.2,frictionAngle=.5)
 O.bodies.append([
-	utils.wall(1,axis=2,sense=-1,**kw),
-	utils.wall(-5,axis=0,sense=1,**kw),
-	utils.wall(1,axis=1,**kw),
-	utils.wall((1,0,0),0,**kw),
+	utils.wall(1,axis=2,sense=-1),
+	utils.wall(-5,axis=0,sense=1),
+	utils.wall(1,axis=1),
+	utils.wall((1,0,0),0),
 	utils.sphere([0,0,0],.5),
-	utils.sphere([-5,-4,-3],.5,**kw)
+	utils.sphere([-5,-4,-3],.5)
 ])
 Gl1_Wall(div=10)
 
 from yade import qt
-renderer=qt.Renderer()
-renderer['Body_interacting_geom']=True
 qt.Controller()
 qt.View()
 

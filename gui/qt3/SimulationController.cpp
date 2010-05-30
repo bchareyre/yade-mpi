@@ -388,9 +388,8 @@ void SimulationController::doUpdate(){
 	string sim=Omega::instance().getSimulationFileName();
 	tlCurrentSimulation->setText(sim.empty() ? "[no file]" : sim); 
 
-	if(Omega::instance().isRunning()){
-		duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
-		duration -= Omega::instance().getSimulationPauseDuration();
+	{
+		duration = Omega::instance().getComputationDuration();
 
 		unsigned int hours	= duration.hours();
 		unsigned int minutes 	= duration.minutes();
@@ -400,8 +399,8 @@ void SimulationController::doUpdate(){
 		hours			= hours-24*days;
 
 		char strReal[64];
-		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
-		else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
+		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%02d",days,hours,minutes,seconds);
+		else snprintf(strReal,64,"real %02d:%02d:%02d",hours,minutes,seconds);
 		string s(strReal);
 	   // update estimation time
 		if (scene->stopAtIteration>0 && iterPerSec>0){

@@ -133,9 +133,6 @@ class Omega: public Singleton<Omega>
 		void		setScene(shared_ptr<Scene>&);
 		void		resetScene();
 		
-		ptime		getMsStartingSimulationTime();
-		time_duration	getSimulationPauseDuration();
-		
 		void		setSimulationFileName(const string);
 		string	getSimulationFileName();
 		void		loadSimulation();

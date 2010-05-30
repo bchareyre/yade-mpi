@@ -45,10 +45,10 @@ O.engines=[
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
-		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0,accRigidBodyRot=True),
+	NewtonIntegrator(damping=0,exactAsphericalRot=True),
 ]
 
 
@@ -62,34 +62,31 @@ spheres = [ O.bodies[id] for id in sphId ]
 print '\nClump:\n======'
 #print '\nMaterial:'
 if clump.mat:
-	for k in clump.mat.keys():
-		print k,'=',clump.mat[k]
+	print clump.mat.dict()
 else:
 	print 'no material'
 
-print '\nMold:'
-if clump.mold:
-	for k in clump.mold.keys():
-		print k,'=',clump.mold[k]
+print '\nshape:'
+if clump.shape:
+	print k.shape.dict()
 else:
-	print 'no mold'
+	print 'no shape'
 
 print '\nState:'
 if clump.state:
-	for k in clump.state.keys():
-		print k,'=',clump.state[k]
+	print clump.state.dict()
 else:
 	print 'no state'
 
 print '\nControl:'
-mass = sum( [ s.state['mass'] for s in spheres ] )
-xm_ = [ s.state['pos'][0]*s.state['mass'] for s in spheres ]
-ym_ = [ s.state['pos'][1]*s.state['mass'] for s in spheres ]
-zm_ = [ s.state['pos'][2]*s.state['mass'] for s in spheres ]
+mass = sum( [ s.state.mass for s in spheres ] )
+xm_ = [ s.state.pos[0]*s.state.mass for s in spheres ]
+ym_ = [ s.state.pos[1]*s.state.mass for s in spheres ]
+zm_ = [ s.state.pos[2]*s.state.mass for s in spheres ]
 centroid  = Vector3( sum(xm_)/mass, sum(ym_)/mass, sum(zm_)/mass )
 
-def sphereInertiaTenzor(p, m, r, c):
-	''' Inertia tenzor sphere with position p, mass m and radus r relative point c '''
+def sphereInertiaTensor(p, m, r, c):
+	''' Inertia tensor sphere with position p, mass m and radus r relative point c '''
 	I = zeros((3,3))
 	rp = array(p)-array(c)
 	I[0,0] = 2./5.*m*r*r + m*(rp[1]**2+rp[2]**2)
@@ -101,7 +98,7 @@ def sphereInertiaTenzor(p, m, r, c):
 
 I = zeros((3,3))
 for s in spheres:
-	I += sphereInertiaTenzor(s.state['pos'],s.state['mass'],s.mold['radius'],centroid)
+	I += sphereInertiaTensor(s.state.pos,s.state.mass,s.shape.radius,centroid)
 I_eigenvalues, I_eigenvectors = linalg.eig(I)
 
 print 'mass = ', mass

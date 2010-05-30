@@ -47,15 +47,15 @@ for j in xrange(10):
 	clpId,sphId=O.bodies.appendClumped([utils.sphere(Vector3(0,Rs*2*i,(j+1)*Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
 	for id in sphId:
 		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-		s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
+		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
 
 # ... and spheres
 sphAloneId=O.bodies.append( [utils.sphere( Vector3(0.5,Rs*2*i,(j+1)*Rs*2), Rs, material=dfltSpheresMat) for i in xrange(4) ] )
 for id in sphAloneId:
 	s=O.bodies[id]
-	p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-	s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+	p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
+	s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
 
 # Create engines
 O.engines=[
@@ -65,10 +65,10 @@ O.engines=[
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
-		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0,accRigidBodyRot=True),
+	NewtonIntegrator(damping=0,exactAsphericalRot=True),
 ]
 
 renderer = qt.Renderer()
