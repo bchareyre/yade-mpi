@@ -93,7 +93,9 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/*** SHEAR FORCE ***/
 	phys->ks = phys->kso*std::pow(uN,0.5); // get tangential stiffness (this is a tangent value, so we can pass it to the GSTS)
 	Vector3r& trialFs = phys->shearForce;
-  	Vector3r dus =scg->rotateAndGetShear(trialFs, phys->prevNormal, de1, de2, dt, /*define this for periodicity, see :ElasticContactLaw.cpp:71*/ Vector3r::Zero(), preventGranularRatcheting);
+	// define shift to handle periodicity
+	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
+  	Vector3r dus =scg->rotateAndGetShear(trialFs, phys->prevNormal, de1, de2, dt, shiftVel, preventGranularRatcheting);
 	//Linear elasticity giving "trial" shear force
 	trialFs -= phys->ks*dus;
 
@@ -105,7 +107,15 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 
 
 	/*** APPLY FORCES ***/
+	if (!scene->isPeriodic)
 	applyForceAtContactPoint(-phys->normalForce-trialFs , scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position, ncb);
+	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used
+		Vector3r force = -phys->normalForce-trialFs;
+		ncb->forces.addForce(id1,force);
+		ncb->forces.addForce(id2,-force);
+		ncb->forces.addTorque(id1,(scg->radius1-0.5*scg->penetrationDepth)* scg->normal.cross(force));
+		ncb->forces.addTorque(id2,(scg->radius2-0.5*scg->penetrationDepth)* scg->normal.cross(force));
+	}
 	phys->prevNormal = scg->normal;
 }
 

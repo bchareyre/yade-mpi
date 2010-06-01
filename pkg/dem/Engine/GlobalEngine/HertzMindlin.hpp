@@ -49,7 +49,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 	FUNCTOR2D(ScGeom,MindlinPhys);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Mindlin's formulation.",
-			((bool,preventGranularRatcheting,false,"bool to avoid granular ratcheting"))
+			((bool,preventGranularRatcheting,true,"bool to avoid granular ratcheting"))
 
 	);
 	DECLARE_LOGGER;
