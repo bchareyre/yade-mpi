@@ -28,7 +28,7 @@ Features of the interaction law:
 /** This class holds information associated with each body state*/
 class CFpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS(CFpmState,State,"CFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
-		((int,numBrokenCohesive,0,"Number of (cohesive) contacts that damaged completely"))
+		((int,numBrokenCohesive,0,"Number of broken cohesive links. [-]"))
 	);
 };
 REGISTER_SERIALIZABLE(CFpmState);
@@ -106,7 +106,7 @@ class Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM: public LawFunctor{
 		FUNCTOR2D(ScGeom,CFpmPhys);
 
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM,LawFunctor,"Constitutive law for the CFpm model.",
-		  ((bool,preventGranularRatcheting,false,"If true rotations are computed such as granular ratcheting is prevented. See article [Alonso2004]_, pg. 3-10 -- and a lot more papers from the same authors)."))
+		  ((bool,preventGranularRatcheting,true,"If true rotations are computed such as granular ratcheting is prevented. See article [Alonso2004]_, pg. 3-10 -- and a lot more papers from the same authors)."))
 	);
 	DECLARE_LOGGER;	
 };
