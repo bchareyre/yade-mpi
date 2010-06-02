@@ -224,7 +224,7 @@ void Clump::updateProperties(bool intersecting){
 	//TRWM3MAT(Clump::inertiaTensorRotate(Ic_orientG,R_g2c));
 
 	// set quaternion from rotation matrix
-	state->ori=Quaternionr(R_g2c);
+	state->ori=Quaternionr(R_g2c); state->ori.normalize();
 	// now Ic is diagonal
 	state->inertia=Vector3r(Ic(0,0),Ic(1,1),Ic(2,2));
 	state->mass=M;
