@@ -29,7 +29,7 @@ class GlobalStiffnessTimeStepper;
 	
  */
 
-class TriaxialTestWater : public FileGenerator
+class CapillaryTriaxialTest : public FileGenerator
 {
 	private	:
 		Vector3r	 gravity;
@@ -60,11 +60,11 @@ class TriaxialTestWater : public FileGenerator
 		void positionRootBody(shared_ptr<Scene>& rootBody);
 		typedef pair<Vector3r, Real> BasicSphere;	
 	public : 
-		~TriaxialTestWater ();
+		~CapillaryTriaxialTest ();
 		bool generate();
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
-		TriaxialTestWater,FileGenerator,"This preprocessor is a variant of TriaxialTest, including the model of capillary forces developped as part of the PhD of Luc Scholtès. See the documentation of Law2_ScGeom_CapillaryPhys_Capillarity or the main page https://yade-dem.org/wiki/CapillaryTriaxialTest, for more details.\n\n Results obtained with this preprocessor were reported for instance in 'Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75.'"
+		CapillaryTriaxialTest,FileGenerator,"This preprocessor is a variant of TriaxialTest, including the model of capillary forces developped as part of the PhD of Luc Scholtès. See the documentation of Law2_ScGeom_CapillaryPhys_Capillarity or the main page https://yade-dem.org/wiki/CapillaryTriaxialTest, for more details.\n\n Results obtained with this preprocessor were reported for instance in 'Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75.'"
 		,
    		((Vector3r,lowerCorner,Vector3r(0,0,0),"Lower corner of the box."))
 		((Vector3r,upperCorner,Vector3r(1,1,1),"Upper corner of the box."))
@@ -74,7 +74,7 @@ class TriaxialTestWater : public FileGenerator
 		((Real,CapillaryPressure,0,"Define succion in the packing [Pa]. This is the value used in the capillary model."))
 		((bool,water,true,"activate capillary model"))
 		((bool,fusionDetection,false,"test overlaps between liquid bridges on modify forces if overlaps exist"))
-		((bool,binaryFusion,true,"Defines how overlapping bridges affect the capillary forces (see :yref:`TriaxialTestWater::fusionDetection`). If binary=true, the force is null as soon as there is an overlap detected, if not, the force is divided by the number of overlaps."))
+		((bool,binaryFusion,true,"Defines how overlapping bridges affect the capillary forces (see :yref:`CapillaryTriaxialTest::fusionDetection`). If binary=true, the force is null as soon as there is an overlap detected, if not, the force is divided by the number of overlaps."))
 		((string,WallStressRecordFile,"./WallStressesWater"+Key,""))
 		((string,capillaryStressRecordFile,"./capStresses"+Key,""))
 		((string,contactStressRecordFile,"./contStresses"+Key,""))
@@ -110,7 +110,7 @@ class TriaxialTestWater : public FileGenerator
 		((Real,StabilityCriterion,0.01,"Value of unbalanced force for which the system is considered stable. Used in conditionals to switch between loading stages."))
 		((Real,wallOversizeFactor,1.3,"Make boundaries larger than the packing to make sure spheres don't go out during deformation."))
 		((Real,sigmaIsoCompaction,50000,"Confining stress during isotropic compaction."))
-		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`TriaxialTestWater::SigmaIsoCompaction`."))
+		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`CapillaryTriaxialTest::SigmaIsoCompaction`."))
 		
 		((int,timeStepUpdateInterval,50,"interval for :yref:`GlobalStiffnessTimeStepper`"))
 		((int,timeStepOutputInterval,50,"interval for outputing general informations on the simulation (stress,unbalanced force,...)"))
@@ -122,7 +122,7 @@ class TriaxialTestWater : public FileGenerator
 		/* init */
 		,
 		/* constructor */
-  		outputFileName = "./TriaxialTestWater"+Key+".xml";
+  		outputFileName = "./CapillaryTriaxialTest"+Key+".xml";
 		wall_top 		= true;
 		wall_bottom 		= true;
 		wall_1			= true;
@@ -146,7 +146,7 @@ class TriaxialTestWater : public FileGenerator
 };
 
 
-// class TriaxialTestWater : public FileGenerator
+// class CapillaryTriaxialTest : public FileGenerator
 // {
 // 	private	:
 // 		Vector3r	 gravity
@@ -234,8 +234,8 @@ class TriaxialTestWater : public FileGenerator
 // 		void positionRootBody(shared_ptr<Scene>& rootBody);
 // 	
 // 	public : 
-// 		TriaxialTestWater ();
-// 		~TriaxialTestWater ();
+// 		CapillaryTriaxialTest ();
+// 		~CapillaryTriaxialTest ();
 // 		bool generate();
 // 	
 // 	REGISTER_ATTRIBUTES(FileGenerator,
@@ -314,10 +314,10 @@ class TriaxialTestWater : public FileGenerator
 // 		(fusionDetection)
 // 		(binaryFusion)
 // 	);
-// 	REGISTER_CLASS_NAME(TriaxialTestWater);
+// 	REGISTER_CLASS_NAME(CapillaryTriaxialTest);
 // 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 // };
 
-REGISTER_SERIALIZABLE(TriaxialTestWater);
+REGISTER_SERIALIZABLE(CapillaryTriaxialTest);
 
 

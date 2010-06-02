@@ -7,7 +7,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include "TriaxialTestWater.hpp"
+#include "CapillaryTriaxialTest.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
@@ -64,14 +64,14 @@ typedef pair<Vector3r, Real> BasicSphere;
 string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
-// TriaxialTestWater::TriaxialTestWater () : FileGenerator()
+// CapillaryTriaxialTest::CapillaryTriaxialTest () : FileGenerator()
 // {
 // 	lowerCorner 		= Vector3r(0,0,0);
 // 	upperCorner 		= Vector3r(0.001,0.001,0.001);
 // 	thickness 		= 0.00001;
 // 	importFilename 		= ""; // "./small.sdec.xyz";
 // 	Key			="";
-// 	outputFileName 		= "./TriaxialTestWater"+Key+".xml";
+// 	outputFileName 		= "./CapillaryTriaxialTest"+Key+".xml";
 // 	//nlayers = 1;
 // 	wall_top 		= true;
 // 	wall_bottom 		= true;
@@ -143,14 +143,14 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 // }
 
 
-TriaxialTestWater::~TriaxialTestWater ()
+CapillaryTriaxialTest::~CapillaryTriaxialTest ()
 {
 
 }
 
 
 
-bool TriaxialTestWater::generate()
+bool CapillaryTriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	message="";	
@@ -287,7 +287,7 @@ bool TriaxialTestWater::generate()
 }
 
 
-void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
+void CapillaryTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<FrictMat> physics(new FrictMat);
@@ -332,7 +332,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 }
 
 
-void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
+void CapillaryTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<FrictMat> physics(new FrictMat);
@@ -370,7 +370,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 }
 
 
-void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
+void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 {
 	
 	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
@@ -503,7 +503,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 }
 
 
-void TriaxialTestWater::positionRootBody(shared_ptr<Scene>& rootBody)
+void CapillaryTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {	
 }
 
@@ -559,7 +559,7 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 
 
 
-YADE_PLUGIN((TriaxialTestWater));
+YADE_PLUGIN((CapillaryTriaxialTest));
 
 //YADE_REQUIRE_FEATURE(PHYSPAR);
 

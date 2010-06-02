@@ -59,7 +59,7 @@ typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
 string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
-
+/*
 CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 {
 	lowerCorner 		= Vector3r(0,0,0);
@@ -132,7 +132,7 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 // 	all_right_id =0;
 // 	wall_front_id =0;
 // 	wall_back_id =0;
-}
+}*/
 
 
 CohesiveTriaxialTest::~CohesiveTriaxialTest ()
@@ -387,24 +387,20 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	globalStiffnessTimeStepper->timestepSafetyCoefficient = 0.2;
-	
 	shared_ptr<CohesiveFrictionalContactLaw> cohesiveFrictionalContactLaw(new CohesiveFrictionalContactLaw);
-	
-	
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
-	triaxialcompressionEngine-> sigma_iso = sigma_iso;
-	triaxialcompressionEngine-> sigmaLateralConfinement = sigma_iso;
-	triaxialcompressionEngine-> sigmaIsoCompaction = sigma_iso;
+	triaxialcompressionEngine-> sigma_iso = sigmaIsoCompaction;
+	triaxialcompressionEngine-> sigmaLateralConfinement = sigmaLateralConfinement;
+	triaxialcompressionEngine-> sigmaIsoCompaction = sigmaIsoCompaction;
 	triaxialcompressionEngine-> max_vel = 1;
 	triaxialcompressionEngine-> thickness = thickness;
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
 	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
-	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
-	
+	triaxialcompressionEngine->maxMultiplier = maxMultiplier;	
 	
 	// recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
@@ -412,17 +408,6 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialStateRecorder-> file 	= WallStressRecordFile;
 	triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 	//triaxialStateRecorder-> thickness 		= thickness;
-	
-	
-	// moving walls to regulate the stress applied
-	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
-	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
-	triaxialstressController-> sigma_iso = sigma_iso;
-	triaxialstressController-> max_vel = 0.0001;
-	triaxialstressController-> thickness = thickness;
-	triaxialstressController->wall_bottom_activated = false;
-	triaxialstressController->wall_top_activated = false;	
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
