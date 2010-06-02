@@ -42,6 +42,9 @@ if 'opengl' in env['features']:
 	#
 	srcs=['FileDialog','GLViewer','MessageDialog','QtFileGenerator','QtGUI','QtGUIPreferences','SimulationController','YadeQtMainWindow','YadeCamera']
 	uis=['QtGeneratedSimulationController','QtGeneratedMessageDialog','YadeQtGeneratedMainWindow',	'QtFileGeneratorController']
+	import os.path
 	for ui in uis:
-		for s in srcs: env.AddPreAction('$buildDir/gui/qt3/%s.os'%s,'$QT_UIC -o $buildDir/gui/qt3/%s.h gui/qt3/%s.ui'%(ui,ui))
+		if os.path.exists(env.subst('$buildDir/gui/qt3/%s.h'%ui)): continue
+		for s in srcs:
+			env.AddPreAction('$buildDir/gui/qt3/%s.os'%s,'$QT_UIC -o $buildDir/gui/qt3/%s.h gui/qt3/%s.ui'%(ui,ui))
 
