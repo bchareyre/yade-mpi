@@ -285,7 +285,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
+// 	rootBody->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 	if(gravApplied)
 		rootBody->engines.push_back(gravityCondition);
 	if(shearApplied)
