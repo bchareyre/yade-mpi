@@ -279,7 +279,7 @@ static void vertex_aabb(GtsVertex *vertex, pair<Vector3r,Vector3r> *bb)
 }
 
 /*
-This class plays tricks getting aroung pyGTS to get GTS objects and cache bb tree to speed
+This class plays tricks getting around pyGTS to get GTS objects and cache bb tree to speed
 up point inclusion tests. For this reason, we have to link with _gts.so (see corresponding
 SConscript file), which is at the same time the python module.
 */

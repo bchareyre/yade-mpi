@@ -32,7 +32,7 @@ class Scene: public Serializable{
 		shared_ptr<Bound> bound;
 		shared_ptr<BodyContainer>		bodies;
 		vector<shared_ptr<Engine> >		engines;
-		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50
+		vector<shared_ptr<Engine> >		initializers;
 		shared_ptr<InteractionContainer> interactions;
 		//! Container of shared materials. Add elements using Scene::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!
 		vector<shared_ptr<Material> > materials;

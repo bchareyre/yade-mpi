@@ -48,6 +48,7 @@ void TriaxialStateRecorder::action ()
 	BodyContainer::iterator bi = scene->bodies->begin();
 	BodyContainer::iterator biEnd = scene->bodies->end();
 	for ( ; bi!=biEnd; ++bi ){
+		if((*bi)->isClump()) continue;
 		const shared_ptr<Body>& b = *bi;
 		if ( b->isDynamic ){
 			//Sorry, the next string was commented, because it gave a Warning "unused variable v". Anton Gladky

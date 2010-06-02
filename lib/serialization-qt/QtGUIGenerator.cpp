@@ -64,7 +64,7 @@ void QtGUIGenerator::addButtons(QWidget * widget)
 void QtGUIGenerator::reArrange(QWidget * widget)
 {	
 	if (resizeWidth)
-		widgetWidth = 400;
+		widgetWidth = 500;
 	else
 		widgetWidth = widget->size().width();
 
