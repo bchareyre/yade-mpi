@@ -8,8 +8,10 @@
 
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp> // a remplacer par :
+// #include<yade/core/GlobalEngine.hpp> // a remplacer par :
 #include<yade/pkg-common/LawFunctor.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
+#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
@@ -22,6 +24,8 @@ class Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 // 		void action();// a remplacer par :
 		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*);
 
+	FUNCTOR2D(ScGeom,NormalInelasticityPhys);
+
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity,
 				LawFunctor,
 // 				GlobalEngine,
@@ -30,6 +34,7 @@ class Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 				((bool,momentRotationLaw,true,"boolean, true=> computation of a torque (against relative rotation) exchanged between particles"))
 				((bool,momentAlwaysElastic,false,"boolean, true=> the torque (computed only if momentRotationLaw !!) is not limited by a plastic threshold"))
 				);
+	
 };
 
 REGISTER_SERIALIZABLE(Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity);

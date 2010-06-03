@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 
 # Script to test the constitutive law contained in NormalInelasticityLaw : consider two spheres whose penetration of the contact evolves => Monitor of the normal force
 
 from yade import plot
 
 #Def of the material which will be used
-O.materials.append(CohesiveFrictionalMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,label='Materiau1'))
+O.materials.append(CohFrictMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,label='Materiau1'))
 
 #Def of the bodies of the simulations : 2 spheres, with names which will be useful after
 O.bodies.append(utils.sphere([0,0,0], 1, dynamic=False, wire=False, color=None, highlight=False)) #'Materiau1', as the latest material defined will be used
@@ -19,11 +20,13 @@ O.engines=[
 	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(),
-	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([Ip2_2xCohFrictMat_NormalInelasticityPhys()]),
-	PeriodicPythonRunner(iterPeriod=1,command='letMove()'),
-	Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity(coeff_dech=3)
-]
+	InteractionDispatchers(
+			      [Ig2_Sphere_Sphere_ScGeom()],
+			      [Ip2_2xCohFrictMat_NormalInelasticityPhys()],
+			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity(coeff_dech=3)]
+			      ),
+	PeriodicPythonRunner(iterPeriod=1,command='letMove()')
+	]
 
 
 #Def of the python command letMove() :
@@ -41,7 +44,7 @@ def defData():
 	i=O.interactions[1,0]
 	VecFn=i.phys.normalForce
 	VecDist=UpperSphere.state.pos-LowerSphere.state.pos
-	plot.addData(Normfn=VecFn.Length(),FnY=VecFn[1],step=O.iter,un=LowerSphere.shape.radius+UpperSphere.shape.radius-VecDist.Length()) # the 1e-5 because of the "shift2" which appears in the computation of the penetration depth made in Ig2_Sphere_Sphere_ScGeom. It seems that this shift2 = 1e-5
+	plot.addData(Normfn=VecFn.norm(),FnY=VecFn[1],step=O.iter,un=LowerSphere.shape.radius+UpperSphere.shape.radius-VecDist.norm()) # the 1e-5 because of the "shift2" which appears in the computation of the penetration depth made in Ig2_Sphere_Sphere_ScGeom. It seems that this shift2 = 1e-5
 
 
 

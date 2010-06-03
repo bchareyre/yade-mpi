@@ -9,8 +9,6 @@
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 #include<yade/pkg-dem/CohFrictMat.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -238,3 +236,5 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 // }
 // }
 }
+
+
