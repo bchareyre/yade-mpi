@@ -44,7 +44,7 @@ def defData():
 	i=O.interactions[1,0]
 	VecFn=i.phys.normalForce
 	VecDist=UpperSphere.state.pos-LowerSphere.state.pos
-	plot.addData(Normfn=VecFn.norm(),FnY=VecFn[1],step=O.iter,un=LowerSphere.shape.radius+UpperSphere.shape.radius-VecDist.norm()) # the 1e-5 because of the "shift2" which appears in the computation of the penetration depth made in Ig2_Sphere_Sphere_ScGeom. It seems that this shift2 = 1e-5
+	plot.addData(Normfn=VecFn.norm(),NormfnBis=VecFn.norm(),FnY=VecFn[1],step=O.iter,unPerso=LowerSphere.shape.radius+UpperSphere.shape.radius-VecDist.norm(),unVrai=i.geom.penetrationDepth)
 
 
 
@@ -59,7 +59,7 @@ O.engines=O.engines+[PeriodicPythonRunner(iterPeriod=1,command='defData()')]
 O.run(40,True)
 
 # define of the plots to be made : un(step), and Fn(un)
-plot.plots={'step':('un',),'un':('Normfn',)}
+plot.plots={'step':('unVrai',),'unPerso':('Normfn',),'unVrai':('NormfnBis',)}
 plot.plot()
 
 #NB : the shape of the curve Fn(un) seems to not be perfect. It is indeed not because of NormalInelasticityLaw. But of differences between the un computed here in this python script and the one which is computed in Ig2_Sphere_Sphere_ScGeom (see for example this "shift2"). Fn being linked to this last un, these slight differences explain the shape of the curves. If phys.penetrationDepth would exist in python, and thus could be directly considered, I think the curve would be perfect !

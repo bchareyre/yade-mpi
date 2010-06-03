@@ -9,7 +9,7 @@ x+y+z==one
 x.Dot(y)==0
 x.Cross(y)==z
 # methods
-one.Length()
+one.norm()
 
 # quaternions
 # construction (implicit conversion of 3-tuple or list of length 3 to Vector3)
