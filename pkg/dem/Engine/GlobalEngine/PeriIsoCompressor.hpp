@@ -83,7 +83,7 @@ class Peri3dController: public BoundaryController{
 
 		virtual void action();
 		void update();
-	YADE_CLASS_BASE_DOC_ATTRS(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Stress and strain tensors are computed using formulas derived in [Kuhl2001]_, in particular equations (33) and (35).",
+	YADE_CLASS_BASE_DOC_ATTRS(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Detailed documentation is in py/_extraDocs.py.",
 		((Matrix3r,strain,Matrix3r::Zero(),"Current deformation tensor |yupdate|"))
 		((Matrix3r,stress,Matrix3r::Zero(),"Current stress tensor |yupdate|"))
 		((Matrix3r,goal,Matrix3r::Zero(),"Goal state."))

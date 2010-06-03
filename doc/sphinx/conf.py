@@ -373,10 +373,31 @@ my_latex_preamble=r'''
 \usepackage{euler} % must be loaded before fontspec for the whole doc (below); this must be kept for pngmath, however
 \usepackage{amsmath}
 \usepackage{amsbsy}
-\let\mat\boldsymbol
-\global\let\vec\boldsymbol
+
+% symbols
+\let\mat\boldsymbol % matrix
+\let\vec\boldsymbol % vector
+\let\tens\boldsymbol % tensor
+
+% algorithm complexity
+\def\bigO#1{\ensuremath{\mathcal{O}(#1)}}
+
+% variants for greek symbols
+\let\epsilon\varepsilon
 \let\theta\vartheta
 \let\phi\varphi
+
+% shorthands
+\let\sig\sigma
+\let\eps\epsilon
+
+% variables at different points of time 
+\def\prev#1{#1^-}
+\def\pprev#1{#1^\ominus}
+\def\curr#1{#1^{\circ}}
+\def\nnext#1{#1^\oplus}
+\def\next#1{#1^+}
+
 '''
 
 pngmath_latex_preamble=r'\usepackage[active]{preview}\usepackage{amsmath}\usepackage{amssymb}'+my_latex_preamble

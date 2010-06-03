@@ -394,7 +394,6 @@ void SimulationController::doUpdate(){
 		unsigned int hours	= duration.hours();
 		unsigned int minutes 	= duration.minutes();
 		unsigned int seconds	= duration.seconds();
-		unsigned int mseconds	= duration.fractional_seconds()/1000;
 		unsigned int days 	= hours/24;
 		hours			= hours-24*days;
 
