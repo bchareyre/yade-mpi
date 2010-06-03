@@ -27,3 +27,29 @@ import wrapper
 #		.. note::
 #			The c++ documentation will be overwritten by this string.
 #	"""
+
+
+wrapper.Peri3dController.__doc__=r'''
+Class for controlling independently strain and stress tensor components of the periodic cell.
+
+:yref:`goal<Peri3dController.goal>` are the goal values, while :yref:`stressMask<Peri3dController.stressMask` determines which components prescribe stress and which prescribe strain.
+
+Current stiffness and stress tensors are update at every step using formulas presented in [Kuhl2001]_:
+
+.. math::
+
+	\begin{align}
+		\tens{K}&=\frac{1}{V}\sum_c {d_0^c}^2\left[K_N^c \vec{N}^c\otimes\vec{N}^c+K_T^c{\vec{T}^c}^T\cdot\vec{T}^c
+
+
+
+
+
+
+
+
+
+
+
+
+'''

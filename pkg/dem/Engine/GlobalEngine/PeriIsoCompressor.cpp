@@ -10,9 +10,11 @@
 
 using namespace std;
 
-#ifndef YADE_WM3
-YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(Peri3dController))
-#endif
+YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)
+	#ifndef YADE_WM3
+		(Peri3dController)
+	#endif
+)
 
 CREATE_LOGGER(PeriIsoCompressor);
 void PeriIsoCompressor::action(){
