@@ -75,7 +75,7 @@ class State: public Serializable{
 			((ori,se3.orientation)),
 		/* ctor */,
 		/*py*/
-		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always zero, regardless of applied force/torque. List of any combination of 'x','y','z','rx','ry','rz'.")
+		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always constant (equal to zero, or to an user-defined value), regardless of applied force/torque. List of any combination of 'x','y','z','rx','ry','rz'.")
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
 		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.") 

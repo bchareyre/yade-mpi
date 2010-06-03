@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp> // ou 
+// #include <yade/pkg/dem/DataClass/InteractionPhysics/FrictPhys.hpp>
 
 /*! \brief Interaction for using Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity
 

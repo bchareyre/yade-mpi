@@ -9,8 +9,6 @@
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 #include<yade/pkg-dem/CohFrictMat.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -18,33 +16,19 @@ YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 
 
 
-void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplacer par :
-// void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
+void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
 {
-// 	cout << "\n Nvlle it :"<< endl;
-	//shared_ptr<BodyContainer>& bodies = scene->bodies;				//It gave a warning. Anton Gladky.
 
 	const Real& dt = scene->dt;
 
-	InteractionContainer::iterator ii    = scene->interactions->begin();	// a supprimer pr passage au go
-	InteractionContainer::iterator iiEnd = scene->interactions->end();	// a supprimer pr passage au go
-	int nbreInteracTot=0;// a supprimer pr passage au go
-	int nbreInteracMomPlastif=0;// a supprimer pr passage au go
-	for (  ; ii!=iiEnd ; ++ii )// a supprimer pr passage au go
-	{// a supprimer pr passage au go
-        if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
-	if ((*ii)->isReal())// a supprimer pr passage au go
-		{
-		nbreInteracTot++;
-		const shared_ptr<Interaction>& contact = *ii;// supprimable
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
 // 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
 
 		State* de1 = Body::byId(id1,scene)->state.get();
 		State* de2 = Body::byId(id2,scene)->state.get();
-		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
-		NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (contact->interactionPhysics.get());
+		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(iG.get());
+		NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (iP.get());//remplace par :
 
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
@@ -99,10 +83,6 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 					 // probably not useful anymore
                 currentContactPhysics->normalForce = Vector3r::Zero();
                 currentContactPhysics->shearForce = Vector3r::Zero();
-
-                //return;
-                //    else
-                //    currentContactPhysics->normalForce	= -currentContactPhysics->normalAdhesion*currentContactGeometry->normal;
             	}
             else
             	{
@@ -217,7 +197,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 				if(normeMoment>normeMomentMax)
 					{
 					moment *= normeMomentMax/normeMoment;
-					nbreInteracMomPlastif++;
+// 					nbreInteracMomPlastif++;
 					}
 			}
 			scene->forces.addTorque(id1,-moment);
@@ -229,10 +209,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 //             }
 //         }
     }
-// 	cout << " En tout :"<< nbreInteracTot << "interactions (reelles)" << endl;
-    //cerr << "ncount= " << ncount << endl;//REMOVE
-// 	cout << momentAlwaysElastic << endl;
-// 	cout << "Sur " << nbreInteracTot << " interactions (reelles) " << nbreInteracMomPlastif << " se sont vues corriger leur moment" << endl;
 }
-}
-}
+
+
+

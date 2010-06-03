@@ -21,7 +21,7 @@ for i in O.interactions:
 	if not i.isReal: continue
 	norm=i.geom.normal
 	angle=atan(norm[ax2]/norm[ax1])
-	force=i.phys.normalForce.Length()
+	force=i.phys.normalForce.norm()
 	angles.append(angle)
 	forces.append(force)
 # easier: plain histogram
