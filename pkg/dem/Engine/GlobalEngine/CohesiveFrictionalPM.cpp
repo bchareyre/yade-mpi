@@ -10,31 +10,27 @@ YADE_PLUGIN((CFpmMat)(CFpmState)(CFpmPhys)(Ip2_CFpmMat_CFpmMat_CFpmPhys)(Law2_Sc
 /********************** Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM ****************************/
 CREATE_LOGGER(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM);
 
-void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
-	const Real& dt = rootBody->dt;
+void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* scene){
+	const Real& dt = scene->dt;
 
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	CFpmPhys* phys = static_cast<CFpmPhys*>(ip.get());
 	const int &id1 = contact->getId1();
 	const int &id2 = contact->getId2();
-	Body* b1 = Body::byId(id1,rootBody).get();
-	Body* b2 = Body::byId(id2,rootBody).get();
+	Body* b1 = Body::byId(id1,scene).get();
+	Body* b2 = Body::byId(id2,scene).get();
 	
 	Real displN = geom->penetrationDepth; // NOTE: the sign for penetrationdepth is different from ScGeom and Dem3DofGeom: geom->penetrationDepth>0 when spheres interpenetrate
 	Real Dtensile=phys->FnMax/phys->kn;
 	Real Dsoftening = phys->strengthSoftening*Dtensile; 
 	
-	/// HERE IS THE PROBLEM!!! -> works well for simple cases (2 spheres or sphere/wall interactions), but not for triaxial and uniaxial test -> timestep issue???? 
-	/*to set the equilibrium distance between all cohesive elements when they first meet -> stress-free assembly*/
-	if ( contact->isFresh(rootBody) ) { phys->initD = displN; phys->normalForce = Vector3r::Zero(); phys->shearForce = Vector3r::Zero();}
-	Real D = displN - phys->initD; // interparticular distance is computed depending on the equilibrium distance (which is 0 for non cohesive interactions)
-	// those lines make the law equivalent to CohesiveFrictionalContactLaw and make it works in triaxial and uniaxial??????????????????????
- 	//if ( contact->isFresh(rootBody) ) { phys->shearForce = Vector3r::Zero();}
-  	//Real D = displN;
+	/*to set the equilibrium distance between all cohesive elements when they first meet -> allows to work with initial stress-free assembly*/
+	if ( contact->isFresh(scene) ) { phys->initD = displN; phys->normalForce = Vector3r::Zero(); phys->shearForce = Vector3r::Zero();}
+	Real D = displN - phys->initD; // interparticular distance is computed depending on the equilibrium distance
 
 	/* Determination of interaction */
 	if (D < 0){ //spheres do not touch 
-	  if (!phys->isCohesive){ rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; } // destroy the interaction before calculation
+	  if (!phys->isCohesive){ scene->interactions->requestErase(contact->getId1(),contact->getId2()); return; } // destroy the interaction before calculation
 	  if ((phys->isCohesive) && (abs(D) > (Dtensile + Dsoftening))) { // spheres are bonded and the interacting distance is greater than the one allowed ny the defined cohesion
 	    phys->isCohesive=false; 
 	    // update body state with the number of broken bonds
@@ -43,12 +39,12 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	    st1->numBrokenCohesive+=1;
 	    st2->numBrokenCohesive+=1;
 	    //// the same thing but from ConcretePM
-	    //const shared_ptr<Body>& body1=Body::byId(contact->getId1(),rootBody), body2=Body::byId(contact->getId2(),rootBody); assert(body1); assert(body2);
+	    //const shared_ptr<Body>& body1=Body::byId(contact->getId1(),scene), body2=Body::byId(contact->getId2(),scene); assert(body1); assert(body2);
 	    //const shared_ptr<CFpmState>& st1=YADE_PTR_CAST<CFpmState>(body1->state), st2=YADE_PTR_CAST<CFpmState>(body2->state);
 	    //{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive+=1; }
 	    //{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive+=1; }
 	    // end of update
-	    rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+	    scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;
 	  }
 	}	  
 	
@@ -68,8 +64,8 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	Vector3r& shearForce = phys->shearForce; 
 		
 	// using scGeom function rotateAndGetShear	
-	State* st1 = Body::byId(id1,rootBody)->state.get();
-	State* st2 = Body::byId(id2,rootBody)->state.get();
+	State* st1 = Body::byId(id1,scene)->state.get();
+	State* st2 = Body::byId(id2,scene)->state.get();
 	// define shift to handle periodicity
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
   	Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, shiftVel, preventGranularRatcheting);
@@ -90,17 +86,17 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	Vector3r f = phys->normalForce + shearForce;
 	// these lines to adapt to periodic boundary conditions (NOTE applyForceAtContactPoint computes torque induced by normal and shear force too)
 	if (!scene->isPeriodic)  
-	applyForceAtContactPoint(f , geom->contactPoint , id2, st2->se3.position, id1, st1->se3.position, rootBody);
+	applyForceAtContactPoint(f , geom->contactPoint , id2, st2->se3.position, id1, st1->se3.position, scene);
 	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used when scene is periodic
-		rootBody->forces.addForce(id1,-f);
-		rootBody->forces.addForce(id2,f);
-		rootBody->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(-f));
-		rootBody->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(-f));
+		scene->forces.addForce(id1,-f);
+		scene->forces.addForce(id2,f);
+		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(-f));
+		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(-f));
 	}
 	
 	/* Moment Rotation Law */
 	// NOTE this part could probably be computed in ScGeom to avoid copy/paste multiplication !!!
-	Quaternionr delta( b1->state->ori * phys->initialOrientation1.conjugate() *phys->initialOrientation2 * b2->state->ori.conjugate()); //relative orientation
+	Quaternionr delta( b1->state->ori * phys->initialOrientation1.conjugate() *phys->initialOrientation2 * b2->state->ori.conjugate()); delta.normalize(); //relative orientation
 	AngleAxisr aa(angleAxisFromQuat(delta)); // axis of rotation - this is the Moment direction UNIT vector; angle represents the power of resistant ELASTIC moment
 	if(aa.angle() > Mathr::PI) aa.angle() -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
 	  
@@ -131,8 +127,8 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	phys->moment_twist = moment_twist;
 	phys->moment_bending = moment_bending;
 	  
-	rootBody->forces.addTorque(id1,-moment);
-	rootBody->forces.addTorque(id2, moment);
+	scene->forces.addTorque(id1,-moment);
+	scene->forces.addTorque(id2, moment);
 
 }
 
