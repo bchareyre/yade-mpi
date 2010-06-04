@@ -1601,7 +1601,7 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
 	{cell->info().p() = P_zero;cell->info().dv()=0;}
 
         for (int bound=0; bound<6;bound++) {
-                int& id = *boundsIds[bound];
+                int id = boundsIds[bound];
                 Boundary& bi = boundary(id);
                 if (!bi.flowCondition) {
                         Tesselation::Vector_Cell tmp_cells;
@@ -1682,7 +1682,7 @@ void FlowBoundingSphere::GaussSeidel ()
 	iter << j << " " << dp_max/p_max << endl;
 	
 	int cel=0;
-	double Pav;
+	double Pav=0;
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		cel++;
 		Pav+=cell->info().p();
@@ -1987,7 +1987,6 @@ double FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min
 
         char *kk;
         kk = (char*) key.c_str();
-
         return Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
 }
 
@@ -1998,6 +1997,7 @@ void FlowBoundingSphere::AddBoundingPlanes(Real center[3], Real Extents[3], int 
         Corner_min = Point(x_min, y_min, z_min);
         Corner_max = Point(x_max, y_max, z_max);
         Real min_coord = min(Extents[0],min(Extents[1],Extents[2]));
+	
         int coord=0;
         if (min_coord==Extents[0]) {
                 coord=0;
@@ -2057,59 +2057,64 @@ void FlowBoundingSphere::AddBoundingPlanes(Real center[3], Real Extents[3], int 
 
 void FlowBoundingSphere::AddBoundingPlanes()
 {
+	Tesselation& Tes = T[currentTes];
+	
+	y_min_id = Tes.Max_id() + 1; boundsIds[0]=y_min_id;
+        y_max_id = Tes.Max_id() + 2; boundsIds[1]=y_max_id;
+        x_min_id = Tes.Max_id() + 3; boundsIds[2]=x_min_id;
+        x_max_id = Tes.Max_id() + 4; boundsIds[3]=x_max_id;
+        z_min_id = Tes.Max_id() + 5; boundsIds[4]=z_min_id;
+        z_max_id = Tes.Max_id() + 6; boundsIds[5]=z_max_id;
+	 
+	id_offset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
+	
+	AddBoundingPlanes(y_min_id, y_max_id, x_min_id, x_max_id, z_min_id, z_max_id);
+}
+
+void FlowBoundingSphere::AddBoundingPlanes(int bottom_id, int top_id, int left_id, int right_id, int front_id, int back_id)
+{
         Tesselation& Tes = T[currentTes];
         Corner_min = Point(x_min, y_min, z_min);
         Corner_max = Point(x_max, y_max, z_max);
-
-        y_min_id = Tes.Max_id() +1;
-        boundsIds[0]=&y_min_id;
-        y_max_id = Tes.Max_id() +2;
-        boundsIds[1]=&y_max_id;
-        x_min_id = Tes.Max_id() +3;
-        boundsIds[2]=&x_min_id;
-        x_max_id = Tes.Max_id() +4;
-        boundsIds[3]=&x_max_id;
-        z_min_id = Tes.Max_id() +5;
-        boundsIds[4]=&z_min_id;
-        z_max_id = Tes.Max_id() +6;
-        boundsIds[5]=&z_max_id;
-
-        id_offset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
+	
+	y_min_id = bottom_id;y_max_id = top_id;x_min_id = left_id;x_max_id = right_id;z_min_id = front_id;z_max_id = back_id;
+	
+        boundsIds[0]= y_min_id;boundsIds[1]= y_max_id;boundsIds[2]= x_min_id;boundsIds[3]= x_max_id;boundsIds[4]= z_min_id;boundsIds[5]= z_max_id;
 
         Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), Corner_min.y()-FAR*(Corner_max.x()-Corner_min.x()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.x()-Corner_min.x()), y_min_id, true);
-        boundaries[0].p = Corner_min;
-        boundaries[0].normal = Vecteur(0,1,0);
-        boundaries[0].coordinate = 1;
+        boundaries[y_min_id-id_offset].p = Corner_min;
+        boundaries[y_min_id-id_offset].normal = Vecteur(0,1,0);
+        boundaries[y_min_id-id_offset].coordinate = 1;
         cout << "Bottom boundary has been created. ID = " << y_min_id << endl;
 
         Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), Corner_max.y() +FAR*(Corner_max.x()-Corner_min.x()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.x()-Corner_min.x()), y_max_id, true);
-        boundaries[1].p = Corner_max;
-        boundaries[1].normal = Vecteur(0,-1,0);
-        boundaries[1].coordinate = 1;
+        boundaries[y_max_id-id_offset].p = Corner_max;
+        boundaries[y_max_id-id_offset].normal = Vecteur(0,-1,0);
+        boundaries[y_max_id-id_offset].coordinate = 1;
         cout << "Top boundary has been created. ID = " << y_max_id << endl;
 
         Tes.insert(Corner_min.x()-FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), x_min_id, true);
-        boundaries[2].p = Corner_min;
-        boundaries[2].normal = Vecteur(1,0,0);
-        boundaries[2].coordinate = 0;
+        boundaries[x_min_id-id_offset].p = Corner_min;
+        boundaries[x_min_id-id_offset].normal = Vecteur(1,0,0);
+        boundaries[x_min_id-id_offset].coordinate = 0;
         cout << "Left boundary has been created. ID = " << x_min_id << endl;
 
         Tes.insert(Corner_max.x() +FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), x_max_id, true);
-        boundaries[3].p = Corner_max;
-        boundaries[3].normal = Vecteur(-1,0,0);
-        boundaries[3].coordinate = 0;
+        boundaries[x_max_id-id_offset].p = Corner_max;
+        boundaries[x_max_id-id_offset].normal = Vecteur(-1,0,0);
+        boundaries[x_max_id-id_offset].coordinate = 0;
         cout << "Right boundary has been created. ID = " << x_max_id << endl;
 
         Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), 0.5*(Corner_max.y()-Corner_min.y()), Corner_min.z()-FAR*(Corner_max.y()-Corner_min.y()), FAR*(Corner_max.y()-Corner_min.y()), z_min_id, true);
-        boundaries[4].p = Corner_min;
-        boundaries[4].normal = Vecteur(0,0,1);
-        boundaries[4].coordinate = 2;
+        boundaries[z_min_id-id_offset].p = Corner_min;
+        boundaries[z_min_id-id_offset].normal = Vecteur(0,0,1);
+        boundaries[z_min_id-id_offset].coordinate = 2;
         cout << "Front boundary has been created. ID = " << z_min_id << endl;
 
         Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), 0.5*(Corner_max.y()-Corner_min.y()), Corner_max.z() +FAR*(Corner_max.y()-Corner_min.y()), FAR*(Corner_max.y()-Corner_min.y()), z_max_id, true);
-        boundaries[5].p = Corner_max;
-        boundaries[5].normal = Vecteur(0,0,-1);
-        boundaries[5].coordinate = 2;
+        boundaries[z_max_id-id_offset].p = Corner_max;
+        boundaries[z_max_id-id_offset].normal = Vecteur(0,0,-1);
+        boundaries[z_max_id-id_offset].coordinate = 2;
         cout << "Back boundary has been created. ID = " << z_max_id << endl;
 
         for (int k=0;k<6;k++) {

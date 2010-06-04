@@ -54,7 +54,7 @@ class FlowEngine : public PartialEngine
 					((double,Relax,1.9,"Gauss-Seidel relaxation"))
 					((int,PermuteInterval,100000,"Pore space re-triangulation period"))
 					((bool,compute_K,true,"Activates permeability measure within a granular sample"))
-					((bool,meanK_correction,false,"Local permeabilities' correction through meanK threshold"))
+					((bool,meanK_correction,true,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,"Local permeabilities' correction through an optimized threshold"))
 					((double,permeability_factor,1.0,"a permability multiplicator"))
 					((Real,loadFactor,1.1,"Load multiplicator for oedometer test"))

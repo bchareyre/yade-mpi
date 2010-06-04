@@ -28,7 +28,8 @@ FlowEngine::~FlowEngine()
 
 void FlowEngine::action ( )
 {
-	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;Update_Triangulation=false;}
+	if (!flow) 
+	{flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;Update_Triangulation=false;}
 	if ( !isActivated ) return;
 	else
 	{
@@ -47,7 +48,7 @@ void FlowEngine::action ( )
 
 		if ( current_state==3 )
 		{
-			if ( first ) { Build_Triangulation( P_zero );first=false;}
+			if ( first ) { Build_Triangulation( P_zero );}
 
 				timingDeltas->checkpoint("Triangulating");
 				
@@ -73,7 +74,8 @@ void FlowEngine::action ( )
 // 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
 				flow->ComputeTetrahedralForces();
-			
+//				flow->Compute_Forces();
+				
 				timingDeltas->checkpoint("Compute_Forces");
 
 			///End Compute flow and forces
@@ -104,12 +106,21 @@ void FlowEngine::action ( )
 				
 				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
 				
+				std::ofstream max_p ("pressures.txt", std::ios::app);
+				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
+				max_p << j << " " << time << " " << MaxPressure << endl;
+				
+				std::ofstream settle ("settle.txt", std::ios::app);
+				settle << j << " " << time << " " << currentStrain << endl;
+				
 				if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 				{ Update_Triangulation = true; }
 				
 				if ( Update_Triangulation ) { Build_Triangulation( );}
 				
 				timingDeltas->checkpoint("Storing Max Pressure");
+				
+				first=false;
 		}
 	}
 }
@@ -162,6 +173,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->T[flow->currentTes].Compute();
 	
 	flow->Localize ();
+	flow->DisplayStatistics ();
 
 	flow->meanK_LIMIT = meanK_correction;
 	flow->meanK_STAT = meanK_opt;
@@ -186,9 +198,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		Update_Triangulation=!Update_Triangulation;
 		Oedometer_Boundary_Conditions();
 	}
-
 	Initialize_volumes ( );
-	flow->DisplayStatistics ();
 }
 
 void FlowEngine::AddBoundary ()
@@ -216,10 +226,13 @@ void FlowEngine::AddBoundary ()
 			flow->y_max = max ( flow->y_max, center[1]-wall_thickness);
 			flow->z_min = min ( flow->z_min, center[2]+wall_thickness);
 			flow->z_max = max ( flow->z_max, center[2]-wall_thickness);
+
 		}
 	}
 	
-	flow->AddBoundingPlanes();
+	flow->id_offset = flow->T[flow->currentTes].max_id+1;
+
+	flow->AddBoundingPlanes( triaxialCompressionEngine->wall_bottom_id, triaxialCompressionEngine->wall_top_id, triaxialCompressionEngine->wall_left_id, triaxialCompressionEngine->wall_right_id, triaxialCompressionEngine->wall_front_id, triaxialCompressionEngine->wall_back_id );
 }
 
 void FlowEngine::Triangulate ()
@@ -349,9 +362,11 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 
 Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 {
-	Real A[3], AS[3], AT[3];
-	Real B[3], BS[3], BT[3];
-	Real C[3], CS[3], CT[3];
+// 	Real array_quattro[3] = {0, 0, 0};
+
+	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0};
+	Real B[3]={0, 0, 0}, BS[3]={0, 0, 0}, BT[3]={0, 0, 0};
+	Real C[3]={0, 0, 0}, CS[3]={0, 0, 0}, CT[3]={0, 0, 0};
 	int b[2];
 
 	Real Wall_point[2][3];
@@ -401,7 +416,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 
 Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 {
-	Real A[3], AS[3], AT[3], AW[3];
+	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0}, AW[3]={0, 0, 0};
 // 	CGT::Boundary b[3];
 	int b[3];
 	Real Wall_point[3][3];
