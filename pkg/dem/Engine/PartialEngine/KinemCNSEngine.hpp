@@ -65,7 +65,7 @@ class KinemCNSEngine : public BoundaryController
 		((Real,max_vel,1.0,"to limit the speed of the vertical displacements applied to control upper plate [m/s]"))
 		((string,Key,"","string to add at the names of the saved files"))
 		((bool,LOG,false,"boolean controling the output of messages on the screen"))
-		((Real,coeff_dech,1.0,"in the case of the use of 'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity' for ex, where kn(unload)#kn(load). The engine cares to find the value at the first run"))
+		((Real,coeff_dech,1.0,"in the case of the use of 'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity' for ex, where kn(unload)#kn(load). The engine cares to find the value at the first run BROKEN actually"))
 		((Real,wallDamping,0.2,"the vertical displacements done to maintain F equal to F_0 are in fact damped, through this wallDamping")),
 		alpha=Mathr::PI/2.0;
 		temoin=0;

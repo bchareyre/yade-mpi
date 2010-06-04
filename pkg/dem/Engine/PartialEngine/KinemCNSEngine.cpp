@@ -126,19 +126,19 @@ void KinemCNSEngine::computeDu()
 	
 	if(firstRun)
 	{
-		if ( !myLdc )
+		if ( !myLdc )	// FIXME : reenable this feature since Law2 is a functor
 		{
-			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
-			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
-			for ( ;itFirst!=itLast; ++itFirst )
-			{
-				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
-				{
-					myLdc =  YADE_PTR_CAST<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
-					coeff_dech = myLdc ->coeff_dech;
-					if(LOG) cout << "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
-				}
-			}
+// 			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+// 			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
+// 			for ( ;itFirst!=itLast; ++itFirst )
+// 			{
+// 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
+// 				{
+// 					myLdc =  YADE_PTR_CAST<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
+// 					coeff_dech = myLdc ->coeff_dech;
+// 					if(LOG) cout << "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
+// 				}
+// 			}
 		}
 
 		alpha=Mathr::PI/2.0;;
