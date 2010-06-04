@@ -8,7 +8,7 @@
 
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
-#include<yade/pkg-dem/CohFrictMat.hpp>
+#include<yade/pkg-dem/NormalInelasticMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -21,72 +21,76 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 
 	const Real& dt = scene->dt;
 
-		int id1 = contact->getId1();
-		int id2 = contact->getId2();
-// 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
+	int id1 = contact->getId1();
+	int id2 = contact->getId2();
+// 	cout << "contact entre " << id1 << " et " << id2;
 
-		State* de1 = Body::byId(id1,scene)->state.get();
-		State* de2 = Body::byId(id2,scene)->state.get();
-		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(iG.get());
-		NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (iP.get());//remplace par :
+	State* de1 = Body::byId(id1,scene)->state.get();
+	State* de2 = Body::byId(id2,scene)->state.get();
+	NormalInelasticMat* Mat1 = static_cast<NormalInelasticMat*>(Body::byId(id1,scene)->material.get());
+	ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(iG.get());
+	NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (iP.get());
 
-		Vector3r& shearForce 			= currentContactPhysics->shearForce;
+	Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
-		if (contact->isFresh(scene))
-			{
-			shearForce			= Vector3r::Zero();
-			currentContactPhysics->previousun=0.0;
-			currentContactPhysics->previousFn=0.0;
-			currentContactPhysics->unMax=0.0;
-			}
-
-
-		Real previousun = currentContactPhysics->previousun;
-		Real previousFn = currentContactPhysics->previousFn;
-		Real kn = currentContactPhysics->kn;
-// 		cout << "Valeur de kn : " << kn << endl;
-		Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
-
-		Real un = currentContactGeometry->penetrationDepth; // compte positivement lorsq vraie interpenetration
-// 		cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << previousun << " et previousFn =" << previousFn << endl;
-		if(un > currentContactPhysics->unMax)	// on est en charge, et au delà et sur la "droite principale"
-			{
-			Fn = kn*un;
-			currentContactPhysics->unMax = std::abs(un);
-// 			cout << "je suis dans le calcul normal " << endl;
-			}
-		else
-			{
-			Fn = previousFn + coeff_dech * kn * (un-previousun);	// Calcul incrémental de la nvlle force
-// 			cout << "je suis dans l'autre calcul" << endl;
-			if(std::abs(Fn) > std::abs(kn * un))		// verif qu'on ne depasse la courbe
-				Fn = kn*un;
-			if(Fn < 0.0 )	// verif qu'on reste positif FIXME ATTENTION ON S'EST FICHU DU NORMAL ADHESION !!!!
-				{Fn = 0;
-// 				cout << "j'ai corrige pour ne pas etre negatif" << endl;
-				}
-			}
-		
-		currentContactPhysics->normalForce	= Fn*currentContactGeometry->normal;
-// 		cout << "Fn appliquee " << Fn << endl << endl;
-		// actualisation :
-		currentContactPhysics->previousFn = Fn;
-		currentContactPhysics->previousun = un;
-
-            if (   un < 0      )
-            	{ // BREAK due to tension
-
-                //currentContactPhysics->SetBreakingState();
+	if (contact->isFresh(scene))
+		{
+		shearForce			= Vector3r::Zero();
+		currentContactPhysics->previousun=0.0;
+		currentContactPhysics->previousFn=0.0;
+		currentContactPhysics->unMax=0.0;
+		}
 
 
-					 scene->interactions->requestErase(contact->getId1(),contact->getId2());
-					 // probably not useful anymore
+	// *** Computation of normal Force : depends of the history *** //
+	if( currentContactGeometry->penetrationDepth < currentContactPhysics->unMax) 
+		currentContactPhysics->kn *= Mat1->coeff_dech;
+
+	Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
+// 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
+	Real un = currentContactGeometry->penetrationDepth; // compte positivement lorsq vraie interpenetration
+	
+// 	cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << currentContactPhysics->previousun << " et previousFn =" << currentContactPhysics->previousFn << endl;
+	
+	if(un >= currentContactPhysics->unMax)	// on est en charge, et au delà et sur la "droite principale"
+	{
+		Fn = currentContactPhysics->knLower*un;
+		currentContactPhysics->unMax = std::abs(un);
+// 		cout << "je suis dans le calcul normal " << endl;
+	}
+	else// a priori then we need a greater stifness. False in the case when we are already on the limit state, but a correction below will then do the jobthe law2 will do the job in the case with a correction
+	{
+		currentContactPhysics->kn = currentContactPhysics->knLower* Mat1->coeff_dech;
+		Fn = currentContactPhysics->previousFn + currentContactPhysics->kn * (un-currentContactPhysics->previousun);	// Calcul incrémental de la nvlle force
+// 		cout << "je suis dans l'autre calcul" << endl;
+		if(std::abs(Fn) > std::abs(currentContactPhysics->knLower * un))		// verif qu'on ne depasse la courbe
+		{
+		    Fn = currentContactPhysics->knLower*un;
+// 		    cout <<  "j'etais dans l'autre calcul mais j'ai corrige pour ne pas depasser la limite" << endl;
+		}
+		if(Fn < 0.0 )	// verif qu'on reste positif
+		{
+			Fn = 0;
+// 			cout << "j'ai corrige pour ne pas etre negatif" << endl;
+		}
+	}
+	currentContactPhysics->normalForce	= Fn*currentContactGeometry->normal;
+// 	cout << "Fn appliquee " << Fn << endl << endl;
+	// actualisation :
+	currentContactPhysics->previousFn = Fn;
+	currentContactPhysics->previousun = un;
+// 	*** End of computation of normal force *** //
+
+	
+        if (   un < 0      )
+        { // BREAK due to tension
+		 scene->interactions->requestErase(contact->getId1(),contact->getId2());
+		 // probably not useful anymore
                 currentContactPhysics->normalForce = Vector3r::Zero();
                 currentContactPhysics->shearForce = Vector3r::Zero();
-            	}
-            else
-            	{
-
+        }
+        else
+        {
                 Vector3r axis;
                 Real angle;
 
@@ -137,8 +141,6 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
                 
                 if ( Fs  > maxFs )
                 {
-
-			currentContactPhysics->SetBreakingState();
 
 			maxFs = max((Real) 0, Fn * currentContactPhysics->tangensOfFrictionAngle);
 

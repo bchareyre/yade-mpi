@@ -141,6 +141,10 @@ _deprecated={
 	'Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys':'Ip2_ViscElMat_ViscElMat_ViscElPhys', # Fri Apr  9 19:28:48 2010, vaclav@flux
 	'MomentEngine':'TorqueEngine', # Sun May  2 16:09:34 2010, vaclav@flux
 	'JumpChangeSe3':'StepDisplacer', # Sun May  2 16:14:21 2010, vaclav@flux
+	'ContactLaw1':'SomeBetterName', # Fri Jun  4 15:35:38 2010, jduriez@c1solimara-l
+	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:36:41 2010, jduriez@c1solimara-l
+	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:01 2010, jduriez@c1solimara-l
+	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:16 2010, jduriez@c1solimara-l
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

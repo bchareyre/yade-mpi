@@ -7,7 +7,7 @@
 from yade import plot
 
 #Def of the material which will be used
-O.materials.append(CohFrictMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,label='Materiau1'))
+O.materials.append(NormalInelasticMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,coeff_dech=3.0,label='Materiau1'))
 
 #Def of the bodies of the simulations : 2 spheres, with names which will be useful after
 O.bodies.append(utils.sphere([0,0,0], 1, dynamic=False, wire=False, color=None, highlight=False)) #'Materiau1', as the latest material defined will be used
@@ -25,7 +25,7 @@ O.engines=[
 	InteractionDispatchers(
 			      [Ig2_Sphere_Sphere_ScGeom()],
 			      [Ip2_2xCohFrictMat_NormalInelasticityPhys()],
-			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity(coeff_dech=3)]
+			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]
 			      ),
 	PeriodicPythonRunner(iterPeriod=1,command='letMove()')
 	]

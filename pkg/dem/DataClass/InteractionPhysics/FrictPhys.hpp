@@ -13,12 +13,10 @@ class FrictPhys: public NormShearPhys
 {
 	public :
 		// kn,ks,normal inherited from NormShearPhys
-		Real initialKn			// initial normal elastic constant.
-				,initialKs			// initial shear elastic constant.
+		Real frictionAngle 			// angle of friction, according to Coulumb criterion
 				//Those two attributes were removed. If you need them, copy those two lines in your class inheriting from FrictPhys
 // 				,equilibriumDistance		// equilibrium distance
 // 				,initialEquilibriumDistance	// initial equilibrium distance
-				,frictionAngle 			// angle of friction, according to Coulumb criterion
 				;	
 		virtual ~FrictPhys();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"Interaction with friction",

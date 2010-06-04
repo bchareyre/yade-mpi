@@ -8,23 +8,16 @@
 
 #pragma once
 
-#include<yade/pkg-dem/FrictPhys.hpp> // ou 
-// #include <yade/pkg/dem/DataClass/InteractionPhysics/FrictPhys.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
-/*! \brief Interaction for using Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity
-
-This interaction is similar to CohFrictPhys. Among the differences are the unMax, previousun and previousFn (allowing to describe the inelastic unloadings in compression), no more shear and tension Adhesion, no more "fragile", "cohesionBroken" and "cohesionDisablesFriction"
- */
 
 class NormalInelasticityPhys : public FrictPhys
 {
 	public :
-	
-// 		NormalInelasticityPhys();
 		virtual ~NormalInelasticityPhys();
-		void SetBreakingState ();
+
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormalInelasticityPhys,FrictPhys,
-				 "Physics (of interaction) for using :yref:`Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity`",
+				 "Physics (of interaction) for using :yref:`Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity` : with inelastic unloadings",
 				 ((Real,unMax,0.0,"the maximum value of penetration depth of the history of this interaction"))
 				 ((Real,previousun,0.0,"the value of this un at the last time step"))
 				 ((Real,previousFn,0.0,"the value of the normal force at the last time step"))
@@ -37,7 +30,8 @@ class NormalInelasticityPhys : public FrictPhys
 				 ((Vector3r,initialPosition1,Vector3r::Zero(),""))
 				 ((Vector3r,initialPosition2,Vector3r::Zero(),""))
 				 ((Real,forMaxMoment,1.0,"parameter stored for each interaction, and allowing to compute the maximum value of the exchanged torque : TorqueMax= forMaxMoment * NormalForce"))
-				 ((Real,kr,0.0,"the rolling stiffness of the rigidity")),
+				 ((Real,kr,0.0,"the rolling stiffness of the interaction"))
+				 ((Real,knLower,0.0,"the stifness corresponding to a virgin load for example")),
 				 createIndex();
 				 );
 	REGISTER_CLASS_INDEX(NormalInelasticityPhys,FrictPhys);

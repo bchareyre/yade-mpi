@@ -9,15 +9,6 @@
 #include "NormalInelasticityPhys.hpp"
 
 
-
-void NormalInelasticityPhys::SetBreakingState()
-{
-	
-	//if (fragile) {
-
-	
-}
-
 NormalInelasticityPhys::~NormalInelasticityPhys()
 {
 }

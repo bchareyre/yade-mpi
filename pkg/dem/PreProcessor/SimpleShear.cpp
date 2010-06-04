@@ -15,7 +15,7 @@
 
 #include <yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
-#include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>
+#include <yade/pkg-dem/Ip2_2xNormalInelasticMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 
 // #include <yade/pkg-dem/PositionRecorder.hpp>
@@ -260,7 +260,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new Ip2_2xCohFrictMat_NormalInelasticityPhys);
+	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
 	interactionPhysicsDispatcher->add(CL1Rel);
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
