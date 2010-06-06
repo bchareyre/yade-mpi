@@ -27,7 +27,7 @@ done
 
 cd $TOP
 
-for CHANGES in `ls -tr yade-${RELEASE}_$RELEASE-*_source.changes` in $DISTS; do
+for CHANGES in `ls -tr yade-${RELEASE}_$RELEASE-*_source.changes`; do
 	dput ppa:yade-users/ppa $CHANGES
 done
 
