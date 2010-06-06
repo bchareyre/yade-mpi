@@ -188,6 +188,7 @@ global writer
 writer=None
 
 for w in ['latex','html']: #['html','latex']:
+	if 'nolatex' in sys.argv and w=='latex': continue # skip latex build if passed nolatex (used in debian packages)
 	writer=w
 	genWrapperRst()
 	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it

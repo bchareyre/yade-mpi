@@ -236,9 +236,10 @@ if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' i
 		print cmd; os.system(cmd)
 		sys.argv.remove('tags')
 	if 'doc' in sys.argv:
-		cmd="cd doc; doxygen Doxyfile"
-		print cmd; os.system(cmd)
-		sys.argv.remove('doc')
+		raise RuntimeError("'doc' argument not supported by scons now")
+	#	cmd="cd doc; doxygen Doxyfile"
+	#	print cmd; os.system(cmd)
+	#	sys.argv.remove('doc')
 	# still something on the command line? Ignore, but warn about that
 	if len(sys.argv)>1: print "!!! WARNING: Shortcuts (clean,tags,doc) cannot be mixed with regular targets or options; ignoring:\n"+''.join(["!!!\t"+a+"\n" for a in sys.argv[1:]])
 	# bail out

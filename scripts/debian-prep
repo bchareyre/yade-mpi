@@ -34,12 +34,12 @@ for f1,f2 in [
 
 # write debian/changelog
 open('debian/changelog','w').write(
-'''yade-%s (1~%s) %s; urgency=low
+'''yade-%s (%s-%s) %s; urgency=low
 
   * Automatic debian changelog entry for yade-%s
 
  -- Václav Šmilauer <eudoxos@arcig.cz>  %s
-'''%(VERSION,DISTRIBUTION,DISTRIBUTION,VERSION,time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
+'''%(VERSION,VERSION,DISTRIBUTION,DISTRIBUTION,VERSION,time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
 
 # remove some generated files
 for p in ('doc/doxygen','doc/sphinx/_build','tags'):

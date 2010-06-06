@@ -160,7 +160,7 @@ def getNumCores():
 	return nCpu
 numCores=getNumCores()
 
-parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py\n\n  %prog runs yade simulation multiple times with different parameters.\n  See http://yade.wikia.com/wiki/ScriptParametricStudy for details.')
+parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py\n\n  %prog runs yade simulation multiple times with different parameters.\n  See https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-multi for details.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
 parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job."%numCores,metavar='NUM',default=numCores)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads')

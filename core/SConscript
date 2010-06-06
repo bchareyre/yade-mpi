@@ -42,7 +42,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'Material.cpp',
 			'Scene.cpp',
 			'Dispatcher.cpp',
-			'NullGUI.cpp',
 			'Omega.cpp',
 			'Shape.cpp',
 			'SimulationFlow.cpp',

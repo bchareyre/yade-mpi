@@ -1,0 +1,36 @@
+#!/bin/sh
+# prepare sources for building debian packages
+# copy this script to a clean directory and run
+set -e -x
+
+RELEASE="0.50rc1" # version we are preparing packages for
+KEYID=62A21250  # key ID of the creator (password will be asked)
+DISTS="hardy karmic lucid"
+
+TOP=`pwd`
+[ -d yade-$RELEASE.bzr ] || bzr co --lightweight lp:yade yade-$RELEASE.bzr
+rm -rf yade-$RELEASE; cp -r yade-$RELEASE.bzr yade-$RELEASE; rm -rf yade-$RELEASE/.bzr
+tar -c yade-$RELEASE | gzip > yade-${RELEASE}_$RELEASE.orig.tar.gz
+cd yade-$RELEASE
+echo $RELEASE > RELEASE
+NPKGS=0 # track number of packages; the first one will have source included
+for DIST in $DISTS; do
+	scripts/debian-prep $DIST
+	if [ $NPKGS -eq 0 ]; then
+		UPLOAD=-sa # the first package is uploaded with upstream source
+	else
+		UPLOAD=-sd
+	fi
+	debuild -S $UPLOAD -k$KEYID -I;
+	NPKGS=$(( $NPKGS + 1 ))
+done
+
+cd $TOP
+
+for CHANGES in `ls -tr yade-${RELEASE}_$RELEASE-*_source.changes` in $DISTS; do
+	dput ppa:yade-users/ppa $CHANGES
+done
+
+
+
+

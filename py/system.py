@@ -253,6 +253,30 @@ def runServers():
 	info=yade.remote.GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 	sys.stdout.flush()
 
+# inspired by http://crunchyfrog.googlecode.com/svn/tags/0.3.4/utils/command/build_manpage.py
+# many thanks
+
+if 0: # not yet used
+	class ManPageFormatter(optparse.HelpFormatter):
+		def __init__(self,indent_increment=2,max_help_position=24,width=None,short_first=1):
+			optparse.HelpFormatter.__init__(self, indent_increment,max_help_position, width, short_first)
+		def _markup(self, txt):
+			return txt.replace('-', '\\-')
+		def format_usage(self, usage):
+			return self._markup(usage)
+		def format_heading(self, heading):
+			if self.level == 0:
+				return ''
+			return '.TP\n%s\n' % self._markup(heading.upper())
+		def format_option(self, option):
+			result = []
+			opts = self.option_strings[option]
+			result.append('.TP\n.B %s\n' % self._markup(opts))
+			if option.help:
+				help_text = '%s\n' % self._markup(self.expand_default(option))
+				result.append(help_text)
+			return ''.join(result)
+
 
 # consistency check
 # if there are no serializables, then plugins were not loaded yet, probably
