@@ -112,10 +112,8 @@ static Vector3r Vector3r_cross(const Vector3r& self, const Vector3r& v){ return 
 static Vector3i Vector3i_cross(const Vector3i& self, const Vector3i& v){ return self.cross(v); }
 static bool Quaternionr__eq__(const Quaternionr& q1, const Quaternionr& q2){ return q1==q2; }
 static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ return q1!=q2; }
-#ifndef YADE_WM3
-	#include<Eigen/SVD>
-	static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Eigen::SVD<Matrix3r>(self).computeUnitaryPositive(&unitary,&positive); return bp::make_tuple(unitary,positive); }
-#endif
+#include<Eigen/SVD>
+static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Eigen::SVD<Matrix3r>(self).computeUnitaryPositive(&unitary,&positive); return bp::make_tuple(unitary,positive); }
 
 #define WM3_COMPAT
 
@@ -234,9 +232,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("determinant",&Matrix3r::determinant)
 		.def("inverse",&Matrix3r_inverse)
 		.def("transpose",&Matrix3r_transpose)
-		#ifndef YADE_WM3
-			.def("polarDecomposition",&Matrix3r_polarDecomposition)
-		#endif
+		.def("polarDecomposition",&Matrix3r_polarDecomposition)
 
 		//
 		.def("__neg__",&Matrix3r__neg__)

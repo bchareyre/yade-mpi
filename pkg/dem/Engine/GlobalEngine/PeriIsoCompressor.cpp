@@ -10,11 +10,7 @@
 
 using namespace std;
 
-YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)
-	#ifndef YADE_WM3
-		(Peri3dController)
-	#endif
-)
+YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(Peri3dController))
 
 CREATE_LOGGER(PeriIsoCompressor);
 void PeriIsoCompressor::action(){
@@ -249,7 +245,6 @@ void PeriTriaxController::action()
 	}
 }
 
-#ifndef YADE_WM3
 
 CREATE_LOGGER(Peri3dController);
 void Peri3dController::update(){
@@ -372,4 +367,3 @@ void Peri3dController::action(){
 	LOG_TRACE("epsU=\n"<<epsU<<"\neps=\n"<<"\nabs(maxCoeff)="<<mx<<"\nvelGrad=\n"<<velGrad);
 	// TODO: check unbalanced force and run some hook when the goal state is achieved
 }
-#endif
