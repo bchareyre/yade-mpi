@@ -5,7 +5,7 @@
 #pragma once
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/lib-QGLViewer/qglviewer.h>
+#include<QGLViewer/qglviewer.h>
 #include<boost/lexical_cast.hpp>
 #include<sstream>
 #include<iomanip>

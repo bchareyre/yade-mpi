@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include<yade/lib-QGLViewer/qglviewer.h>
+#include<QGLViewer/qglviewer.h>
 #include<iostream>
 
 
