@@ -124,11 +124,14 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
 		//    Vector3r branch=(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
 		Vector3r branch= gsc->normal* ( gsc->refR1+gsc->refR2 );
-		// tensorial product f*branch (hand-write the tensor product to prevent matrix instanciation inside the loop by makeTensorProduct)
-		stressTensor(0,0)+=f[0]*branch[0]; stressTensor(1,0)+=f[1]*branch[0]; stressTensor(2,0)+=f[2]*branch[0];
-		stressTensor(0,1)+=f[0]*branch[1]; stressTensor(1,1)+=f[1]*branch[1]; stressTensor(2,1)+=f[2]*branch[1];
-		stressTensor(0,2)+=f[0]*branch[2]; stressTensor(1,2)+=f[1]*branch[2]; stressTensor(2,2)+=f[2]*branch[2];
-		//stressTensor+=makeTensorProduct( f, branch );
+		#if 0
+			// remove this block later
+			// tensorial product f*branch (hand-write the tensor product to prevent matrix instanciation inside the loop by makeTensorProduct)
+			//stressTensor(0,0)+=f[0]*branch[0]; stressTensor(1,0)+=f[1]*branch[0]; stressTensor(2,0)+=f[2]*branch[0];
+			//stressTensor(0,1)+=f[0]*branch[1]; stressTensor(1,1)+=f[1]*branch[1]; stressTensor(2,1)+=f[2]*branch[1];
+			//stressTensor(0,2)+=f[0]*branch[2]; stressTensor(1,2)+=f[1]*branch[2]; stressTensor(2,2)+=f[2]*branch[2];
+		#endif
+		stressTensor+=f*branch.transpose();
 		if( !dynCell )
 		{
 			for ( int i=0; i<3; i++ ) sumStiff[i]+=abs ( gsc->normal[i] ) *nsi->kn+ ( 1-abs ( gsc->normal[i] ) ) *nsi->ks;

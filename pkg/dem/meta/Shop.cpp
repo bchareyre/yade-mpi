@@ -192,7 +192,7 @@ Real Shop::kineticEnergy(Scene* _rb){
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic()) continue;
 		// ½(mv²+ωIω)
-		ret+=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(diagMult(b->state->inertia,b->state->angVel)));
+		ret+=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(b->state->inertia.cwise()*b->state->angVel));
 	}
 	return ret;
 }

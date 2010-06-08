@@ -402,8 +402,8 @@ void GLViewer::centerScene(){
 			Real inf=std::numeric_limits<Real>::infinity();
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-				max=componentMaxVector(max,b->state->pos);
-				min=componentMinVector(min,b->state->pos);
+				max=max.cwise().max(b->state->pos);
+				min=min.cwise().min(b->state->pos);
 			}
 		} else {LOG_DEBUG("Using rootBody's Aabb");}
 	} else {
@@ -606,7 +606,7 @@ void GLViewer::postDraw(){
 			if(!renderer->clipPlaneActive[planeId] && planeId!=manipulatedClipPlane) continue;
 			glPushMatrix();
 				const Se3r& se3=renderer->clipPlaneSe3[planeId];
-				AngleAxisr aa(angleAxisFromQuat(se3.orientation));	
+				AngleAxisr aa(se3.orientation);	
 				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 				glRotated(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 				Real cff=1;

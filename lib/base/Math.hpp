@@ -70,8 +70,6 @@ template<class Scalar> std::ostream & operator<<(std::ostream &os, const Eigen::
 //template<class Scalar> MATRIX3_TEMPLATE(Scalar) operator*(Scalar s, const MATRIX3_TEMPLATE(Scalar)& m) { return m*s; }
 //template<class Scalar> Quaternion<Scalar> operator*(Scalar s, const Quaternion<Scalar>& q) { return q*s; }
 template<typename Scalar> void matrixEigenDecomposition(const MATRIX3_TEMPLATE(Scalar) m, MATRIX3_TEMPLATE(Scalar)& mRot, MATRIX3_TEMPLATE(Scalar)& mDiag){ Eigen::SelfAdjointEigenSolver<MATRIX3_TEMPLATE(Scalar)> a(m); mRot=a.eigenvectors(); mDiag=a.eigenvalues().asDiagonal(); }
-//__attribute__((warning("Replace this function with direct AngleAxis constructor from Quaternion")))
-template<typename Scalar> AngleAxis<Scalar> angleAxisFromQuat(const Quaternion<Scalar>& q){ return AngleAxis<Scalar>(q); }
 // http://eigen.tuxfamily.org/dox/TutorialGeometry.html
 template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromEulerAnglesXYZ(Scalar x, Scalar y, Scalar z){ MATRIX3_TEMPLATE(Scalar) m; m=AngleAxis<Scalar>(x,VECTOR3_TEMPLATE(Scalar)::UnitX())*AngleAxis<Scalar>(y,VECTOR3_TEMPLATE(Scalar)::UnitY())*AngleAxis<Scalar>(z,VECTOR3_TEMPLATE(Scalar)::UnitZ()); return m;}
 template<typename Scalar> bool operator==(const Quaternion<Scalar>& u, const Quaternion<Scalar>& v){ return u.x()==v.x() && u.y()==v.y() && u.z()==v.z() && u.w()==v.w(); }
@@ -118,32 +116,6 @@ typedef Math<Real> Mathr;
  * TODO
  */
 
-// replace by outer product of 2 vectors: v1*v2.transpose();
-template<typename Scalar>
-MATRIX3_TEMPLATE(Scalar) makeTensorProduct (const VECTOR3_TEMPLATE(Scalar)& rkU,  const VECTOR3_TEMPLATE(Scalar)& rkV)
-{
-	MATRIX3_TEMPLATE(Scalar) ret;
-   ret(0,0) = rkU[0]*rkV[0];
-   ret(0,1) = rkU[0]*rkV[1];
-   ret(0,2) = rkU[0]*rkV[2];
-   ret(1,0) = rkU[1]*rkV[0];
-   ret(1,1) = rkU[1]*rkV[1];
-   ret(1,2) = rkU[1]*rkV[2];
-   ret(2,0) = rkU[2]*rkV[0];
-   ret(2,1) = rkU[2]*rkV[1];
-   ret(2,2) = rkU[2]*rkV[2];
-   return ret;
-}
-// eigen2: a.cwise().min(b) / max(b)
-// eigen3: a.array().min(b) / max(b)
-template<typename Scalar> VECTOR2_TEMPLATE(Scalar) componentMaxVector(const VECTOR2_TEMPLATE(Scalar)& a, const VECTOR2_TEMPLATE(Scalar)& b){ return VECTOR2_TEMPLATE(Scalar)(std::max(a.x(),b.x()),std::max(a.y(),b.y()));}
-template<typename Scalar> VECTOR2_TEMPLATE(Scalar) componentMinVector(const VECTOR2_TEMPLATE(Scalar)& a, const VECTOR2_TEMPLATE(Scalar)& b){ return VECTOR2_TEMPLATE(Scalar)(std::min(a.x(),b.x()),std::min(a.y(),b.y()));}
-template<typename Scalar> VECTOR3_TEMPLATE(Scalar) componentMaxVector(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return VECTOR3_TEMPLATE(Scalar)(std::max(a.x(),b.x()),std::max(a.y(),b.y()),std::max(a.z(),b.z()));}
-template<typename Scalar> VECTOR3_TEMPLATE(Scalar) componentMinVector(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return VECTOR3_TEMPLATE(Scalar)(std::min(a.x(),b.x()),std::min(a.y(),b.y()),std::min(a.z(),b.z()));}
-// eigen2: v1.cwise()*v2;
-// eigen3: v1.array()*v2.array()
-template<typename Scalar> VECTOR3_TEMPLATE(Scalar) diagMult(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){return VECTOR3_TEMPLATE(Scalar)(a.x()*b.x(),a.y()*b.y(),a.z()*b.z());}
-template<typename Scalar> VECTOR3_TEMPLATE(Scalar) diagDiv(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){return VECTOR3_TEMPLATE(Scalar)(a.x()/b.x(),a.y()/b.y(),a.z()/b.z());}
 // eigen: m << m00,m01,m02,m10,m11,m12,m20,m21,m22;
 template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromElements(Scalar m00, Scalar m01, Scalar m02, Scalar m10, Scalar m11, Scalar m12, Scalar m20, Scalar m21, Scalar m22){ MATRIX3_TEMPLATE(Scalar) m; m(0,0)=m00; m(0,1)=m01; m(0,2)=m02; m(1,0)=m10; m(1,1)=m11; m(1,2)=m12; m(2,0)=m20; m(2,1)=m21; m(2,2)=m22; return m; }
 

@@ -11,7 +11,7 @@ void StepDisplacer::action(){
 		if(setVelocities){
 			const Real& dt=scene->dt;
 			b->state->vel=deltaSe3.position/dt;
-			AngleAxisr aa(angleAxisFromQuat(deltaSe3.orientation)); aa.axis().normalize();
+			AngleAxisr aa(deltaSe3.orientation); aa.axis().normalize();
 			b->state->angVel=aa.axis()*aa.angle()/dt;
 			LOG_DEBUG("Angular velocity set to "<<aa.axis()*aa.angle()/dt<<". Axis="<<aa.axis()<<", angle="<<aa.angle());
 		}

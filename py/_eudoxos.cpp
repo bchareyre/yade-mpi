@@ -152,7 +152,7 @@ struct SpiralInteractionLocator2d{
 			if(!ge || !ph) continue;
 			Real r,h,theta;
 			boost::tie(r,h,theta)=Shop::spiralProject(ge->contactPoint,dH_dTheta,axis,NaN,theta0);
-			lo=componentMinVector(lo,Vector2r(r,h)); hi=componentMaxVector(hi,Vector2r(r,h));
+			lo=lo.cwise().min(Vector2r(r,h)); hi=hi.cwise().max(Vector2r(r,h));
 			minD0=min(minD0,ge->refLength); maxD0=max(maxD0,ge->refLength);
 			minTheta=min(minTheta,theta); maxTheta=max(maxTheta,theta);
 			intrs.push_back(FlatInteraction(r,h,theta,i));
