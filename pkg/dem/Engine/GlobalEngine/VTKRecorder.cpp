@@ -157,6 +157,7 @@ void VTKRecorder::action(){
 	if(recActive[REC_INTR]){
 		// save body positions, referenced by ids by vtkLine
 		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+			if (!b) continue;
 			const Vector3r& pos=b->state->pos;
 			intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
 		}
