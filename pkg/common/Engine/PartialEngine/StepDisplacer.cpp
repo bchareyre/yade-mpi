@@ -15,7 +15,7 @@ void StepDisplacer::action(){
 			b->state->angVel=aa.axis()*aa.angle()/dt;
 			LOG_DEBUG("Angular velocity set to "<<aa.axis()*aa.angle()/dt<<". Axis="<<aa.axis()<<", angle="<<aa.angle());
 		}
-		if(!setVelocities || (setVelocities && !b->isDynamic)){
+		if(!setVelocities || (setVelocities && !b->isDynamic())){
 			b->state->pos+=deltaSe3.position;
 			b->state->ori=deltaSe3.orientation*b->state->ori;
 		}

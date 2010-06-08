@@ -143,7 +143,7 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	body->isDynamic			= true;
+	body->setDynamic(true);
 	
 	physics->velocity		= Vector3r(//
 			velocity[0]+velocityRange[0]*randomSymmetricUnit(),

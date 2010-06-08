@@ -175,7 +175,7 @@ void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	body->isDynamic			= true;
+	body->setDynamic(true);
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
@@ -214,7 +214,7 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	shared_ptr<Box> iBox(new Box);
 	
 	
-	body->isDynamic			= false;
+	body->setDynamic(false);
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
@@ -329,7 +329,7 @@ void DirectShearCis::createActors(shared_ptr<Scene>& rootBody)
 
 void DirectShearCis::positionRootBody(shared_ptr<Scene>& rootBody) 
 {
-	rootBody->isDynamic		= false;
+	rootBody->setDynamic(false);
 	
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),Quaternionr::Identity());
