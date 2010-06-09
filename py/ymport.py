@@ -71,7 +71,9 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 		b.shape.Color=color if color else utils.randomColor()
 		b.shape.wire=wire
 		b.shape.highlight=highlight
-		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
+		pos,ori=b.state.pos,b.state.ori
+		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material)
+		b.state.pos,b.state.ori=pos,ori
 	return facets
 
 def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
