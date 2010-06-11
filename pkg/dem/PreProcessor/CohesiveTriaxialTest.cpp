@@ -33,6 +33,8 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
 
 #include<yade/pkg-common/ForceResetter.hpp>
 
@@ -58,81 +60,6 @@ using namespace std;
 typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
 string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
-
-/*
-CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
-{
-	lowerCorner 		= Vector3r(0,0,0);
-	upperCorner 		= Vector3r(1,1,1);
-	thickness 		= 0.001;
-	importFilename 		= "";
-	outputFileName 		= "./CohesiveTriaxialTest.xml";
-	//nlayers = 1;
-	wall_top 		= true;
-	wall_bottom 		= true;
-	wall_1			= true;
-	wall_2			= true;
-	wall_3			= true;
-	wall_4			= true;
-	wall_top_wire 		= true;
-	wall_bottom_wire	= true;
-	wall_1_wire		= true;
-	wall_2_wire		= true;
-	wall_3_wire		= true;
-	wall_4_wire		= true;
-	spheresColor		= Vector3r(0.8,0.3,0.3);
-	spheresRandomColor	= false;
-	recordBottomForce	= true;
-	forceRecordFile		= "./force";
-	recordAveragePositions	= true;
-	positionRecordFile	= "./positions";
-	recordIntervalIter	= 20;
-	velocityRecordFile 	= "./velocities";
-	WallStressRecordFile = "./WallStresses";
-
-	rotationBlocked = false;
-	//	boxWalls 		= false;
-	boxWalls 		= true;
-	internalCompaction	=false;
-
-	dampingForce = 0.2;
-	dampingMomentum = 0.2;
-	defaultDt = 0.001;
-	
-	timeStepUpdateInterval = 50;
-	timeStepOutputInterval = 50;
-	wallStiffnessUpdateInterval = 10;
-	radiusControlInterval = 10;
-	numberOfGrains = 400;
-	radiusDeviation = 0.3;
-	strainRate = 10;
-	StabilityCriterion = 0.01;
-	autoCompressionActivation = false;
-	maxMultiplier = 1.01;
-	finalMaxMultiplier = 1.0001;
-	
-	sphereYoungModulus  = 15000000.0;
-	sphereKsDivKn  = 0.5;
-	sphereFrictionDeg   = 18.0;
-	normalCohesion = 0;
-	shearCohesion = 0;
-	setCohesionOnNewContacts = false;
-	density			= 2600;
-	
-	boxYoungModulus   = 15000000.0;
-	boxKsDivKn  = 0.2;
-	boxFrictionDeg   = 0.f;
-	gravity 	= Vector3r(0,-9.81,0);
-	
-	sigma_iso = 50000;
-	
-//	wall_top_id =0;
-// 	wall_bottom_id =0;
-// 	wall_left_id =0;
-// 	all_right_id =0;
-// 	wall_front_id =0;
-// 	wall_back_id =0;
-}*/
 
 
 CohesiveTriaxialTest::~CohesiveTriaxialTest ()
@@ -375,8 +302,8 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("Bo1_Sphere_Aabb");
-	boundDispatcher->add("Bo1_Box_Aabb");
+	boundDispatcher->add(new Bo1_Sphere_Aabb);
+	boundDispatcher->add(new Bo1_Box_Aabb);
 
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);

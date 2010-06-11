@@ -1,0 +1,2 @@
+#!/bin/sh
+rsync -rv _build/html/ bbeta:www/NoBackup/yade-sphinx

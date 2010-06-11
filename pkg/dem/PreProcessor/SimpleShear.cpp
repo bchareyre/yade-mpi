@@ -37,6 +37,10 @@
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/KinemCNDEngine.hpp>
 
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -256,16 +260,16 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_ScGeom");
-	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
+	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
 	interactionPhysicsDispatcher->add(CL1Rel);
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("Bo1_Sphere_Aabb");
-	boundDispatcher->add("Bo1_Box_Aabb");
+	boundDispatcher->add(new Bo1_Sphere_Aabb);
+	boundDispatcher->add(new Bo1_Box_Aabb);
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

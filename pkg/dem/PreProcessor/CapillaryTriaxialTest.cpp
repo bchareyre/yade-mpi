@@ -27,6 +27,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
@@ -37,6 +38,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 
 #include<yade/pkg-common/ForceResetter.hpp>
 
@@ -381,7 +383,7 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	iS2IS4SContactGeometry->interactionDetectionFactor = distanceFactor;//Detect potential distant interaction (meniscii)
 	
 	interactionGeometryDispatcher->add(iS2IS4SContactGeometry);
-	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
+	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 //	interactionPhysicsDispatcher->add("Ip2_FrictMat_FrictMat_FrictPhys");
@@ -399,7 +401,7 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
 	
 	boundDispatcher->add(interactingSphere2AABB);
-	boundDispatcher->add("Bo1_Box_Aabb");
+	boundDispatcher->add(new Bo1_Box_Aabb);
 
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

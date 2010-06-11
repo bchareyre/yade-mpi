@@ -33,6 +33,17 @@
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Dem3DofGeom_SphereSphere.hpp>
+#include<yade/pkg-dem/Dem3DofGeom_FacetSphere.hpp>
+#include<yade/pkg-dem/Dem3DofGeom_WallSphere.hpp>
+#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Facet_Aabb.hpp>
+#include<yade/pkg-common/Wall.hpp>
+
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
@@ -286,12 +297,12 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	if(!facetWalls && !wallWalls){
-		interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_ScGeom");
-		interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
+		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+		interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 	} else {
-		interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_Dem3DofGeom");
-		interactionGeometryDispatcher->add("Ig2_Facet_Sphere_Dem3DofGeom");
-		interactionGeometryDispatcher->add("Ig2_Wall_Sphere_Dem3DofGeom");
+		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_Dem3DofGeom);
+		interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_Dem3DofGeom);
+		interactionGeometryDispatcher->add(new Ig2_Wall_Sphere_Dem3DofGeom);
 	}
 
 
@@ -301,10 +312,10 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("Bo1_Sphere_Aabb");
-	boundDispatcher->add("Bo1_Box_Aabb");
-	boundDispatcher->add("Bo1_Facet_Aabb");
-	boundDispatcher->add("Bo1_Wall_Aabb");
+	boundDispatcher->add(new Bo1_Sphere_Aabb);
+	boundDispatcher->add(new Bo1_Box_Aabb);
+	boundDispatcher->add(new Bo1_Facet_Aabb);
+	boundDispatcher->add(new Bo1_Wall_Aabb);
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

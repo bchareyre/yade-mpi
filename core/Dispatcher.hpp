@@ -166,16 +166,6 @@ class Dispatcher1D : public Dispatcher,
 			add1DEntry(eu->get1DFunctorType1(),eu->getClassName(),static_pointer_cast<FunctorType>(eu));
 		}
 
-		virtual void add(string euType){
-			shared_ptr<FunctorType> eu=dynamic_pointer_cast<FunctorType>(ClassFactory::instance().createShared(euType));
-			// if(!eu) throw runtime_error("Class `"+euType+"' could not be cast to required 1D Functor");
-			if(!eu){
-				cerr<<__FILE__<<":"<<__LINE__<<" WARNING! dynamic cast of engine unit "<<euType<<" failed, will use static_cast. Go figure why."<<endl;
-				eu=static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(euType));
-			}
-			add(eu);
-		}
-
 		int getDimension() { return 1; }
 	
 		virtual string getFunctorType() 
@@ -251,12 +241,6 @@ class Dispatcher2D : public Dispatcher,
 			storeFunctorName(eu->get2DFunctorType1(),eu->get2DFunctorType2(),eu->getClassName(),eu);
 			add2DEntry(eu->get2DFunctorType1(),eu->get2DFunctorType2(),eu->getClassName(),static_pointer_cast<FunctorType>(eu));
 		}
-		/* add functor by its literal name */
-		virtual void add(string euType){
-			shared_ptr<FunctorType> eu=static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(euType));
-			add(eu);
-		}
-
 
 		virtual int getDimension() { return 2; }
 
