@@ -84,7 +84,8 @@ namespace{
 #include<boost/type_traits/integral_constant.hpp>
 
 namespace{
-	boost::python::object pyGetAttr(const std::string& key){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); /*never reached; avoids warning*/ throw; }
+	//boost::python::object pyGetAttr(const std::string& key){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); /*never reached; avoids warning*/ throw; }
+	// still needed for Serializable::pySetAttr_nowarn
 	void pySetAttr(const std::string& key, const boost::python::object& /* value */){ PyErr_SetString(PyExc_AttributeError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
 	boost::python::list pyKeys(){ return boost::python::list();}
 	bool pyHasKey(const std::string&) { return false; }
@@ -159,9 +160,9 @@ namespace yade{
 
 // register class attributes, putting them to both python ['attr'] access functions and yade::serialization (and boost::serialization, if enabled)
 #define REGISTER_ATTRIBUTES(baseClass,attrs) REGISTER_ATTRIBUTES_DEPREC(_SOME_CLASS,baseClass,attrs,)
-#define REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,attrs,deprec) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
-	/* get attribute with the deprecated ['attr'] syntax; warn */ public: boost::python::object pyGetAttr(const std::string& key) const{ cerr<<"WARN: object['"<<key<<"'] syntax is deprecated, use object."<<key<<" instead."<<endl; BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } \
-	/* set attribute with the deprecated ['attr'] syntax; warn */ void pySetAttr(const std::string& key, const boost::python::object& value) { cerr<<"WARN: object['"<<key<<"']=value syntax is deprecated, use object."<<key<<"=value instead."<<endl; pySetAttr_nowarn(key,value); } \
+#define REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,attrs,deprec) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) public: \
+	/* get attribute with the deprecated ['attr'] syntax; warn */ /* public: boost::python::object pyGetAttr(const std::string& key) const{ cerr<<"WARN: object['"<<key<<"'] syntax is deprecated, use object."<<key<<" instead."<<endl; BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } */ \
+	/* set attribute with the deprecated ['attr'] syntax; warn */ /* void pySetAttr(const std::string& key, const boost::python::object& value) { cerr<<"WARN: object['"<<key<<"']=value syntax is deprecated, use object."<<key<<"=value instead."<<endl; pySetAttr_nowarn(key,value); } */ \
 	/* set from upadeAttributes, no warning */ void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR_DEPREC,thisClass,deprec); baseClass::pySetAttr_nowarn(key,value); } \
 	/* list all attributes (except deprecated ones); could return boost::python::set instead*/ boost::python::list pyKeys() const {  boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; } \
 	/* whether the attribute is defined; includes deprecated attributes! */ bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR_DEPREC,thisClass,deprec); return baseClass::pyHasKey(key); } \
@@ -337,8 +338,8 @@ public :
 		// harmless even if boost::serialization is not used
 		template <class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ };
 
-		virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
-		virtual void pySetAttr(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
+		//virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
+		//virtual void pySetAttr(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
 		virtual void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}

@@ -156,7 +156,9 @@ def makeBaseClassesClickable(f,writer):
 				continue
 			#print l
 			m=re.match(r'(^.*}}{\\emph{inherits )([a-zA-Z0-9_\\() -]*)(}}.*$)',l)
-			if not m: raise RuntimeError("Line %s unmatched?"%l)
+			if not m:
+				#print 'WARN: Line %s unmatched?'%l
+				continue
 			bases=m.group(2)
 			bb=bases.split(r' \(\rightarrow\) ')
 			bbb=r' \(\rightarrow\) '.join([r'\hyperref[yade.wrapper:yade.wrapper.%s]{%s}'%(b.replace(r'\_',r'_'),b) for b in bb])
