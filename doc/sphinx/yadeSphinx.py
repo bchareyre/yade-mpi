@@ -171,6 +171,13 @@ def makeBaseClassesClickable(f,writer):
 			ff.write(l)
 		ff.close()
 
+def escapeTilde(f1,f2):
+	"""Hack to avoid the _bibtex module interpreting ~ as space (\~ does not work?!)
+	Create an new file with tilde replaced by @tilde@; the result is unescaped again."""
+	ll=[l.replace('~','@tilde@') for l in open(f1)]
+	open(f2,'w').write(''.join(ll))
+	
+
 def genReferences():
 	import sys
 	sys.path.append('.')
@@ -179,12 +186,16 @@ def genReferences():
 	f.write('References\n'+40*'='+'\n\n\n')
 	f.write(bib2rst.bib2rst('../references.bib'))
 	f.close()
-
+	escapeTilde('../publications.bib','./_publications.bib')
+	f=open('publications.rst','w')
+	f.write('Publications about Yade\n'+40*'='+'\n\n\n')
+	f.write(bib2rst.bib2rst('_publications.bib').replace('@tilde@','~'))
 
 import sphinx,sys,shutil
 
 genReferences()
 shutil.copyfile('../references.bib',outDir+'/latex/references.bib')
+shutil.copyfile('../publications.bib',outDir+'/latex/publications.bib')
 
 global writer
 writer=None

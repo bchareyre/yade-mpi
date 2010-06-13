@@ -33,7 +33,10 @@ See older `tentative contents <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc
 
   external.rst
 
+  publications.rst
+
   references.rst
+
 
 
 Indices and tables
