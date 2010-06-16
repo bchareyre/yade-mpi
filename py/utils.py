@@ -323,7 +323,7 @@ def facetBox(center,extents,orientation=Quaternion().Identity,wallMask=63,**kw):
 	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
 	
-def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,wallMask=7,closed=1,**kw):
+def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,closed=1,**kw):
 	"""
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
@@ -367,10 +367,9 @@ def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,w
 		Y=radius*math.sin(i)
 		P1.append(Vector3(X,Y,-height/2))
 		P2.append(Vector3(X,Y,+height/2))
-	qTemp = Quaternion(Vector3(orientation[0],orientation[1],orientation[2]),orientation[3])
 	for i in range(0,len(P1)):
-		P1[i]=qTemp.Rotate(P1[i])+Vector3(center[0],center[1],center[2])
-		P2[i]=qTemp.Rotate(P2[i])+Vector3(center[0],center[1],center[2])
+		P1[i]=orientation*(P1[i])+Vector3(center[0],center[1],center[2])
+		P2[i]=orientation*(P2[i])+Vector3(center[0],center[1],center[2])
 		
 	ret=[]
 	for i in range(2,len(P1)):

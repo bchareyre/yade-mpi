@@ -14,7 +14,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw)(Law2_Dem6DofGeom_FrictPhys_Beam));
+YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw));
 
 Real Law2_ScGeom_FrictPhys_Basic::Real0=0;
 Real Law2_ScGeom_FrictPhys_Basic::getPlasticDissipation() {return (Real) plasticDissipation;}
@@ -137,20 +137,3 @@ void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, s
 	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
 }
 
-// same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem6DofGeom_FrictPhys_Beam::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* scene){
-	// normal & shear forces
-	Dem6DofGeom* geom=static_cast<Dem6DofGeom*>(ig.get());
-	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
-	Real displN=geom->displacementN();
-	phys->normalForce=phys->kn*displN*geom->normal;
-	phys->shearForce=phys->ks*geom->displacementT();
-	applyForceAtContactPoint(phys->normalForce+phys->shearForce,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
-	// bend&twist:
-	Vector3r bend; Real twist;
-	geom->bendTwistAbs(bend,twist);
-	Vector3r tt=bend*phys->kn+geom->normal*twist*phys->kn;
-	cerr<<twist<<";"<<bend<<endl;
-	scene->forces.addTorque(contact->getId1(),tt);
-	scene->forces.addTorque(contact->getId2(),-tt);
-}

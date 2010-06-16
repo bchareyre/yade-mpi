@@ -2,11 +2,11 @@
 
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/Omega.hpp>
-YADE_PLUGIN((Dem3DofGeom_SphereSphere)(Dem6DofGeom_SphereSphere)
+YADE_PLUGIN((Dem3DofGeom_SphereSphere)
 	#ifdef YADE_OPENGL
 		(Gl1_Dem3DofGeom_SphereSphere)
 	#endif
-	(Ig2_Sphere_Sphere_Dem3DofGeom)(Ig2_Sphere_Sphere_Dem6DofGeom));
+	(Ig2_Sphere_Sphere_Dem3DofGeom));
 
 
 Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}
@@ -108,24 +108,6 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 }
 
 
-Dem6DofGeom_SphereSphere::~Dem6DofGeom_SphereSphere(){}
-
-Vector3r Dem6DofGeom_SphereSphere::relRotVector() const{
-	// FIXME: this is not correct, as it assumes normal will not change (?)
-	Quaternionr relOri12=ori1.conjugate()*ori2;
-	Quaternionr oriDiff=initRelOri12.conjugate()*relOri12;
-	AngleAxisr aa(oriDiff);
-	if(aa.angle()>Mathr::PI)aa.angle()-=Mathr::TWO_PI;
-	// cerr<<axis<<";"<<angle<<";"<<ori1<<";"<<ori2<<";"<<oriDiff<<endl;
-	return aa.angle()*aa.axis();
-}
-
-void Dem6DofGeom_SphereSphere::bendTwistAbs(Vector3r& bend, Real& twist){
-	const Vector3r& relRot=relRotVector();
-	twist=relRot.dot(normal);
-	bend=relRot-twist*normal;
-}
-
 
 #ifdef YADE_OPENGL
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
@@ -223,19 +205,3 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 	return true;
 }
 
-CREATE_LOGGER(Ig2_Sphere_Sphere_Dem6DofGeom);
-bool Ig2_Sphere_Sphere_Dem6DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
-	bool hadIntrGeom=c->interactionGeometry;
-	if(!Ig2_Sphere_Sphere_Dem3DofGeom::go(cm1,cm2,state1,state2,shift2,force,c)) return false;
-	// HACK: dem3dof functor creates a dem3dof instance; we need to copy-construct dem6dof from it instead
-	// proper solution would be to factor out the computation part from the dem3dof to separate functions and call those from here, or make the dem3dof functor templated on the dem3dof/dem6dof
-	if(!hadIntrGeom){
-		assert(c->interactionGeometry);
-		assert(c->interactionGeometry->getClassName()=="Dem3DofGeom_SphereSphere");
-		const shared_ptr<Dem6DofGeom_SphereSphere> geom(new Dem6DofGeom_SphereSphere(*YADE_CAST<Dem3DofGeom_SphereSphere*>(c->interactionGeometry.get())));
-		geom->initRelOri12=state1.ori.conjugate()*state2.ori;
-		c->interactionGeometry=geom;
-		//TRVAR3(geom->refLength,geom->contactPoint,geom->initRelOri12)
-	}
-	return true;
-}

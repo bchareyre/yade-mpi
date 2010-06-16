@@ -32,8 +32,7 @@ O.dt=2e-2*utils.PWaveTimeStep()
 O.step()
 O.saveTmp()
 rdr=yade.qt.Renderer()
-#rdr['Body_bounding_volume']=True
-rdr['intrAllWire']=True
+rdr.intrAllWire=True
 #from yade import log
 #import yade.qt,time
 #v=yade.qt.View()

@@ -51,15 +51,6 @@ class Law2_Dem3DofGeom_FrictPhys_Basic: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_FrictPhys_Basic);
 
-/* Class for demonstrating beam-like behavior of the contact (normal, shear, bend and twist) */
-class Law2_Dem6DofGeom_FrictPhys_Beam: public LawFunctor{
-	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
-	FUNCTOR2D(Dem6DofGeom,FrictPhys);
-	YADE_CLASS_BASE_DOC(Law2_Dem6DofGeom_FrictPhys_Beam,LawFunctor,"Class for demonstrating beam-like behavior of contact (normal, shear, bend and twist) [broken][experimental]");
-};
-REGISTER_SERIALIZABLE(Law2_Dem6DofGeom_FrictPhys_Beam);
-
 class ElasticContactLaw : public GlobalEngine{
 		shared_ptr<Law2_ScGeom_FrictPhys_Basic> functor;
 	public :

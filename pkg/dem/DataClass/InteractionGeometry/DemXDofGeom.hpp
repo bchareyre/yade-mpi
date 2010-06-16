@@ -55,16 +55,4 @@ class Dem3DofGeom: public GenericSpheresContact{
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom);
 
-#if 1
-/*! Abstract class for providing torsion and bending, in addition to inherited normal and shear strains. */
-class Dem6DofGeom: public Dem3DofGeom {
-	public:
-		//! rotations perpendicular to the normal (bending; in global coords) and parallel with the normal (torsion)
-		virtual void bendTwistAbs(Vector3r& bend, Real& twist) {throw std::logic_error("bendTwistAbs not overridden in derived class.");};
-		void bendTwistRel(Vector3r& bend, Real& twist){ bendTwistAbs(bend,twist); bend/=refLength; twist/=refLength;}
-		virtual ~Dem6DofGeom();
-	YADE_CLASS_BASE_DOC(Dem6DofGeom,Dem3DofGeom,"Abstract class for providing torsion and bending, in addition to inherited normal and shear strains.");
-};
-REGISTER_SERIALIZABLE(Dem6DofGeom);
-#endif
 
