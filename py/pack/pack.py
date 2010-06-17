@@ -276,10 +276,10 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 		print "Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
 		c.execute('select pack from packings where timestamp=?',(timestamp,))
 		sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
+		sp.scale(scale);
 		if isPeri and wantPeri:
 			sp.cellSize=(X,Y,Z);
 			if fillPeriodic: sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]));
-		sp.scale(scale);
 		#sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
 		return sp
 		#if orientation: sp.rotate(*orientation.toAxisAngle())

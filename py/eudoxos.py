@@ -115,41 +115,41 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 def oofemTextExport(fName):
 	"""Export simulation data in text format 
 	
-	The format is line-oriented as follows:
-		# 3 lines of material parameters:
-		1. E G # elastic
-		2. epsCrackOnset relDuctility xiShear transStrainCoeff #tension; epsFr=epsCrackOnset*relDuctility
-		3. cohesionT tanPhi # shear
-		4. [number of spheres] [number of links]
-		5. id x y z r -1/0/1[on negative/no/positive boundary] # spheres
+	The format is line-oriented as follows::
+
+		E G                                                 # elastic material parameters
+		epsCrackOnset relDuctility xiShear transStrainCoeff # tensile parameters; epsFr=epsCrackOnset*relDuctility
+		cohesionT tanPhi                                    # shear parameters
+		number_of_spheres number_of_links
+		id x y z r boundary                                 # spheres; boundary: -1 negative, 0 none, 1 positive
 		…
-		n. id1 id2 contact_point_x cp_y cp_z A # interactions """
-	from yade.wrapper import Omega
+		id1 id2 cp_x cp_y cp_z A                            # interactions; cp = contact point; A = cross-section
+		
+	"""
 	material,bodies,interactions=[],[],[]
-	o=Omega()
 
 	f=open(fName,'w') # fail early on I/O problem
 
-	ph=o.interactions.nth(0).phys # some params are the same everywhere
-	material.append("%g %g"%(ph['E'],ph['G']))
-	material.append("%g %g %g %g"%(ph['epsCrackOnset'],ph['epsFracture'],1e50,0.0))
-	material.append("%g %g"%(ph['undamagedCohesion'],ph['tanFrictionAngle']))
+	ph=O.interactions.nth(0).phys # some params are the same everywhere
+	material.append("%g %g"%(ph.E,ph.G))
+	material.append("%g %g %g %g"%(ph.epsCrackOnset,ph.epsFracture,1e50,0.0))
+	material.append("%g %g"%(ph.undamagedCohesion,ph.tanFrictionAngle))
 
 	# need strainer for getting bodies in positive/negative boundary
-	strainers=[e for e in o.engines if e.name=='UniaxialStrainer']
+	strainers=[e for e in O.engines if e.name=='UniaxialStrainer']
 	if len(strainers)>0: strainer=strainers[0]
 	else: strainer=None
 
-	for b in o.bodies:
-		if strainer and b.id in strainer['negIds']: boundary=-1
-		elif strainer and b.id in strainer['posIds']: boundary=1
+	for b in O.bodies:
+		if not b.shape or b.shape.name!='Sphere': continue
+		if strainer and b.id in strainer.negIds: boundary=-1
+		elif strainer and b.id in strainer.posIds: boundary=1
 		else: boundary=0
-		bodies.append("%d %g %g %g %g %d"%(b.id,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.mold['radius'],boundary))
+		bodies.append("%d %g %g %g %g %d"%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,boundary))
 
-	for i in o.interactions:
-		if not i.geom or not i.phys: continue
-		cp=i.geom['contactPoint']
-		interactions.append("%d %d %g %g %g %g"%(i.id1,i.id2,cp[0],cp[1],cp[2],i.phys['crossSection']))
+	for i in O.interactions:
+		cp=i.geom.contactPoint
+		interactions.append("%d %d %g %g %g %g"%(i.id1,i.id2,cp[0],cp[1],cp[2],i.phys.crossSection))
 	
 	f.write('\n'.join(material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions))
 	f.close()
@@ -205,7 +205,7 @@ def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	strainers=[e for e in o.engines if e.name=='UniaxialStrainer']
 	if len(strainers)>0:
 		strainer=strainers[0]
-		posIds,negIds=strainer['posIds'],strainer['negIds']
+		posIds,negIds=strainer.posIds,strainer.negIds
 	else: strainer=None
 	f=open(fileBase+'.in','w')
 	# header
@@ -220,19 +220,19 @@ def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	f.write("Node 1 coords 3 0.0 0.0 0.0 bc 6 1 1 1 1 1 1\n")
 	f.write("Node 2 coords 3 0.0 0.0 0.0 bc 6 1 2 1 1 1 1\n")
 	for b in o.bodies:
-		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.phys.refPos[0],b.phys.refPos[1],b.phys.refPos[2],b.mold['radius']))
+		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.state.refPos[0],b.state.refPos[1],b.state.refPos[2],b.shape.radius))
 		if b.id in negIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 1 0 0 0 0 ")
 		elif b.id in posIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 2 0 0 0 0 0")
 		f.write('\n')
 	j=1
 	for i in inters:
-		f.write('CohSur3d %d nodes 2 %d %d mat 1 crossSect 1 area %g\n'%(j,i.id1+3,i.id2+3,i.phys['crossSection']))
+		f.write('CohSur3d %d nodes 2 %d %d mat 1 crossSect 1 area %g\n'%(j,i.id1+3,i.id2+3,i.phys.crossSection))
 		j+=1
 	# crosssection
 	f.write("SimpleCS 1 thick 1.0 width 1.0\n")
 	# material
 	ph=inters[0].phys
-	f.write("CohInt 1 kn %g ks %g e0 %g ef %g c 0. ksi %g coh %g tanphi %g damchartime %g damrateexp %g plchartime %g plrateexp %g d 1.0\n"%(ph['E'],ph['G'],ph['epsCrackOnset'],ph['epsFracture'],0.0,ph['undamagedCohesion'],ph['tanFrictionAngle'],ph['dmgTau'],ph['dmgRateExp'],ph['plTau'],ph['plRateExp']))
+	f.write("CohInt 1 kn %g ks %g e0 %g ef %g c 0. ksi %g coh %g tanphi %g damchartime %g damrateexp %g plchartime %g plrateexp %g d 1.0\n"%(ph.E,ph.G,ph.epsCrackOnset,ph.epsFracture,0.0,ph.undamagedCohesion,ph.tanFrictionAngle,ph.dmgTau,ph.dmgRateExp,ph.plTau,ph.plRateExp))
 	# boundary conditions
 	f.write('BoundaryCondition 1 loadTimeFunction 1 prescribedvalue 0.0\n')
 	f.write('BoundaryCondition 2 loadTimeFunction 1 prescribedvalue 1.e-4\n')

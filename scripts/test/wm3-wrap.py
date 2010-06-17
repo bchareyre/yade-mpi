@@ -1,13 +1,13 @@
 # constructors, constants as static objects
-x,y,z,one=Vector3().UNIT_X,Vector3().UNIT_Y,Vector3().UNIT_Z,Vector3().ONE
+x,y,z,one=Vector3.UnitX,Vector3.UnitY,Vector3.UnitZ,Vector3.One
 x2=Vector3(x)
 # conversions to sequence types
 list(x2)
 tuple(x2)
 # operations and operators
 x+y+z==one
-x.Dot(y)==0
-x.Cross(y)==z
+x.dot(y)==0
+x.cross(y)==z
 # methods
 one.norm()
 
@@ -23,5 +23,5 @@ q1*q1*x
 # inverse rotation
 q1.Conjugate()
 # convert to axis-angle representation
-axis,angle=q1.ToAxisAngle()
+axis,angle=q1.toAxisAngle()
 
