@@ -45,17 +45,14 @@ class FlowBoundingSphere
 		int Iterations;
 		
 		Boundary boundaries [6];
+		int walls_id[6];
 		short id_offset;
  		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		
 		void mplot (RTriangulation& Tri, char *filename);
 		void Localize ();
+		void Define_fictious_cells(RTriangulation& Tri);
 		void Compute_Permeability();
-		void AddBoundingPlanes();
-		
-		void AddBoundingPlanes(Real center[3], Real Extents[3], int id);
-// 		void AddBoundingPlanes(int y_min_id, int y_max_id, int x_min_id, int x_max_id, int z_min_id, int z_max_id);
-		void AddBoundingPlanes(bool yade); 
 		
 		void DisplayStatistics();
 		void GaussSeidel ( );
@@ -74,7 +71,12 @@ class FlowBoundingSphere
 		Real minPermLength; //min branch length for Poiseuille
 		
 		double P_SUP, P_INF, P_INS;
+		
 		void AddBoundingPlanes ( Tesselation& Tes, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max );
+		void AddBoundingPlanes(bool yade);
+		void AddBoundingPlanes();
+		void AddBoundingPlanes(Real center[3], Real Extents[3], int id);
+		
 		void Compute_Action ( );
 		void Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
 		void DisplayStatistics ( RTriangulation& Tri );
@@ -86,6 +88,7 @@ class FlowBoundingSphere
 		void Initialize_pressures ( double P_zero );
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
+		void ComputeFacetForces();
 		void save_vtk_file ( RTriangulation &T );
 		void MGPost ( RTriangulation& Tri );
 #ifdef XVIEW
@@ -95,7 +98,7 @@ class FlowBoundingSphere
 		double Permeameter ( RTriangulation& Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
 		double Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, std::string key );
 		double Compute_HydraulicRadius ( RTriangulation& Tri, Cell_handle cell, int j );
-		double PermeameterCurve ( RTriangulation& Tri, char *filename, Real time, int intervals );
+		double PressureProfile ( RTriangulation& Tri, char *filename, Real time, int intervals );
 
 		double dotProduct ( Vecteur x, Vecteur y );
 

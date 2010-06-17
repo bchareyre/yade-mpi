@@ -51,6 +51,8 @@ void FlowEngine::action ( )
 
 				timingDeltas->checkpoint("Triangulating");
 				
+				cout << "new iteration" << endl;
+				
 				UpdateVolumes ( );
 			
 				timingDeltas->checkpoint("Update_Volumes");
@@ -72,8 +74,8 @@ void FlowEngine::action ( )
 			
 // 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
-				flow->ComputeTetrahedralForces();
-			
+				flow->ComputeFacetForces();
+				
 				timingDeltas->checkpoint("Compute_Forces");
 
 			///End Compute flow and forces
@@ -93,7 +95,6 @@ void FlowEngine::action ( )
 				Real time = Omega::instance().getSimulationTime();
 			
 				int j = Omega::instance().getCurrentIteration();
-// 				int j = Omega::instance().getSimulationTime();
 				char file [50];
 				mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string consol = "./Consol/"+flow->key+"%d_Consol";
@@ -102,10 +103,9 @@ void FlowEngine::action ( )
 				char *g = file;
 				timingDeltas->checkpoint("Writing cons_files");
 				
-				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
+				MaxPressure = flow->PressureProfile(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
 				
 				std::ofstream max_p ("pressures.txt", std::ios::app);
-				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
 				max_p << j << " " << time << " " << MaxPressure << endl;
 				
 				std::ofstream settle ("settle.txt", std::ios::app);
@@ -119,8 +119,27 @@ void FlowEngine::action ( )
 				timingDeltas->checkpoint("Storing Max Pressure");
 
 				first=false;
+				
+				cout << "end iteration" << endl;
 		}
 	}
+}
+
+void FlowEngine::BoundaryConditions()
+{
+	flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
+	flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
+	flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
+	flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
+	flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
+	flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
+	
+	flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
+	flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
+	flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
+	flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
+	flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
+	flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
 }
 
 void FlowEngine::Oedometer_Boundary_Conditions()
@@ -140,7 +159,7 @@ void FlowEngine::Oedometer_Boundary_Conditions()
 
 void FlowEngine::Build_Triangulation ()
 {
-	Build_Triangulation (0);
+	Build_Triangulation (0.f);
 }
 
 void FlowEngine::Build_Triangulation (double P_zero)
@@ -152,14 +171,12 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		flow->SLIP_ON_LATERALS=slip_boundary;
 		flow->key = triaxialCompressionEngine->Key;
 		flow->k_factor = permeability_factor;
-		triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)*loadFactor;
 	}
 	else
 	{
 		flow->currentTes=!flow->currentTes;
 		cout << "--------RETRIANGULATION-----------" << endl;
 	}
-// 	currentTes=flow->currentTes;
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
@@ -167,10 +184,11 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	AddBoundary ( );
 	Triangulate ( );
 	
+	
 	cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
 	
-	flow->Localize ();
+	flow->Define_fictious_cells(flow->T[flow->currentTes].Triangulation());
 	flow->DisplayStatistics ();	
 
 	flow->meanK_LIMIT = meanK_correction;
@@ -182,7 +200,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
-		Oedometer_Boundary_Conditions();
+		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
@@ -194,7 +212,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		flow->TOLERANCE=Tolerance;
 		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 		Update_Triangulation=!Update_Triangulation;
-		Oedometer_Boundary_Conditions();
+		BoundaryConditions();
 	}
 
 	Initialize_volumes ( );
@@ -218,7 +236,6 @@ void FlowEngine::AddBoundary ()
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
 
-// 			flow->AddBoundingPlanes ( center, Extent, id );
 			flow->x_min = min ( flow->x_min, center[0]+wall_thickness);
 			flow->x_max = max ( flow->x_max, center[0]-wall_thickness);
 			flow->y_min = min ( flow->y_min, center[1]+wall_thickness);

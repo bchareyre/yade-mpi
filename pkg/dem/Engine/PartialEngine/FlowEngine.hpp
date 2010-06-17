@@ -14,6 +14,9 @@
 
 #ifdef FLOW_ENGINE
 
+class TriaxialCompressionEngine;
+class FlowBoundingSphere;
+
 class FlowEngine : public PartialEngine
 {
 	private:
@@ -37,7 +40,8 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell_triple_fictious (CGT::Cell_handle cell);
 		Real Volume_cell (CGT::Cell_handle cell);
 		void Oedometer_Boundary_Conditions();
-		
+		void BoundaryConditions();
+
 		virtual ~FlowEngine();
 	
 		virtual void action();
@@ -62,8 +66,20 @@ class FlowEngine : public PartialEngine
 					((double, MaxPressure, 0, "Maximal value of water pressure within the sample"))
 					((double, currentStress, 0, "Current value of axial stress"))
 					((double, currentStrain, 0, "Current value of axial strain"))
-					((int, intervals, 30, "Number of layers for pressure measurements")),
-					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
+					((int, intervals, 30, "Number of layers for pressure measurements"))
+					((bool, Flow_imposed_TOP_Boundary, true, "if false involve pressure imposed condition"))
+					((bool, Flow_imposed_BOTTOM_Boundary, true, "if false involve pressure imposed condition"))
+					((bool, Flow_imposed_FRONT_Boundary, true, "if false involve pressure imposed condition"))
+					((bool, Flow_imposed_BACK_Boundary, true, "if false involve pressure imposed condition"))
+					((bool, Flow_imposed_LEFT_Boundary, true, "if false involve pressure imposed condition"))
+					((bool, Flow_imposed_RIGHT_Boundary, true, "if false involve pressure imposed condition"))
+					((double, Pressure_TOP_Boundary, 0, "Pressure imposed on top boundary"))
+					((double, Pressure_BOTTOM_Boundary,  0, "Pressure imposed on bottom boundary"))
+					((double, Pressure_FRONT_Boundary,  0, "Pressure imposed on front boundary"))
+					((double, Pressure_BACK_Boundary,  0, "Pressure imposed on back boundary"))
+					((double, Pressure_LEFT_Boundary,  0, "Pressure imposed on left boundary"))
+					((double, Pressure_RIGHT_Boundary,  0, "Pressure imposed on right boundary"))
+					,timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
 		DECLARE_LOGGER;
 };
 

@@ -148,8 +148,8 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
         boundary(y_max_id).flowCondition=0;
         boundary(y_min_id).value=0;
         boundary(y_max_id).value=1;
-        Localize();
-        clock.top("Localize");
+	Define_fictious_cells(Tri);
+        clock.top("BoundaryConditions");
 
         //GenerateVoxelFile(Tri); ///*GENERATION OF A VOXEL FILE *///
 
@@ -189,7 +189,7 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
 
         /** VISUALISATION FILES **/
         //  save_vtk_file ( Tri );
-        //   PermeameterCurve ( Tri );
+        //   PressureProfile ( Tri );
         MGPost(Tri);
 
         ///*** VUE 3D ***///
@@ -201,87 +201,6 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
         Vue1.Affiche();
 #endif
 // }
-}
-
-void FlowBoundingSphere::SpheresFileCreator()
-{
-        std::ofstream oFile("SAMPLE_POSITIONS",std::ios::out);
-
-        for (long i=0; i<3000; i++) {
-                double x=Rand_d(), y=Rand_d(), z=Rand_d(), rad=Rand_d() *0.03+0.02;
-                oFile  << x << " " << y << " " << z << " " << rad << endl;
-        }
-}
-
-/// FIXME : put this sort of interesting code in your own code library, not here
-// void FlowBoundingSphere::Analytical_Consolidation()
-// {
-// //   std::ofstream oFile ( "Analytical_Consolidation",std::ios::out );
-//
-//  double H = 0.346494;
-//  double Uz = 0, dz = H/10, Us=0;
-//  double Tv=0.00;
-//  double cv=9.860296;
-//  double t=0;
-//  double P = 10353.9;
-//
-// //   for ( Real Tv=0;Tv<0.76;Tv+=0.25 )
-//  for (int it=0;it<10;it++) {
-//   char file [50], file2 [50];
-//   sprintf(file, "%d_Analyt_Consol",it);
-//   sprintf(file2, "%d_Analyt_Settl",it);
-//   char *g = file; char *h = file2;
-//   std::ofstream oFile(g, std::ios::out);
-//   std::ofstream sFile(h, std::ios::out);
-//
-//   for (double z=0; z<=(2*H+0.1); z+=dz) {
-//    Uz=0;Us=0;
-//    double Z = z/(2*H);
-//    for (double m=0.0; m<10000; m++) {
-//     double M = ((2*m+1) *M_PI) /2;
-//     double u_m = +((2*P*(1-cos(m*M_PI)))/(m*M_PI))*(sin((m*M_PI*z)/(2*H)))*exp(-cv*t*pow(((m*M_PI)/(2*H)),2));
-//     double u_s = (2/(M*M))*exp(- (M*M*Tv));
-//
-// //      double u_m = ( 2/M ) *sin ( M*Z ) *exp ( - ( M*M*Tv ) );
-//     Uz+=u_m;
-//     Us+=u_s;
-//    }
-// //     U = 1 - 8/(pow(M_PI,2))*U;
-//
-//    oFile << (Uz) << " " << Z << endl;
-//    sFile << (Us) << " " << Z << endl;
-//   }
-//   Tv+=0.25;
-//   t+=0.0030600;
-//  }
-// }
-
-void FlowBoundingSphere::Boundary_Conditions(RTriangulation& Tri)
-{
-        Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
-        //FIXME You can't use a loop on vertices and v->cell to visit cells, it returns random cells (possibly lateral cells)
-        for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
-                if (V_it->info().isFictious) {
-                        if (boundary(V_it->info().id()).coordinate == 1)
-                                //if ( boundaries[V_it->info().id() ].coordinate == 1 )
-                        {
-                                boundary(V_it->info().id()).flowCondition = 1;
-//     boundaries[V_it->info().id() ].flowCondition = 1;
-                                if (boundaries[V_it->info().id()].p == Corner_min) {
-                                        V_it->cell()->info().p() = P_INF;
-                                        V_it->cell()->info().isExternal = true;
-                                } else {
-                                        V_it->cell()->info().p() = P_SUP;
-                                        V_it->cell()->info().isExternal = true;
-                                }
-                        } else {
-                                boundary(V_it->info().id()).flowCondition = 0;
-                                V_it->cell()->info().p() = V_it->cell()->info().y();
-                        }
-                } else {
-                        V_it->cell()->info().p() = V_it->cell()->info().y();
-                }
-        }
 }
 
 void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
@@ -300,57 +219,25 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 	Tes.Clear();
 }
 
-void FlowBoundingSphere::Localize()
+void FlowBoundingSphere::Define_fictious_cells(RTriangulation& Tri)
 {
-        Vertex_handle V;
-        int pass = 0;
-        RTriangulation& Tri = T[currentTes].Triangulation();
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
-        cout << "Localizing..." << endl;
-        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-                pass = 0;
-                for (int i=0;i<4;i++) {
-                        V = cell->vertex(i);
-                        if (V->info().isFictious) {
-                                ++pass;
-                                //FIXME : remove the isFictious flag and use cell->info().fictious() instead
-//                                 Boundary& bi = boundary(V->info().id());
-                                //     Boundary& bi = boundaries [V->info().id()];
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();     
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	  cell->info().fictious()=0;}
 
-//                                 if (bi.flowCondition) {
-                                if ( V->info().id() != /*(unsigned int)*/ y_min_id && V->info().id() != y_max_id) {
-                                        // Inf/Sup has priority
-                                        if (!cell->info().isSuperior && !cell->info().isInferior) {
-                                                cell->info().isLateral = true;
-                                                cell->info().isInferior=false;
-                                                cell->info().isSuperior=false;
-#ifdef XVIEW
-                                                Vue1.SetSpheresColor(0.1,0.95,0.1,1);
-                                                Vue1.Dessine_Sphere(cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4);
-#endif
-                                        }
-                                } else {
-                                        if (V->info().id() == (unsigned int) y_min_id) {
-                                                cell->info().isInferior=true;
-                                                cell->info().isLateral=false;
-                                                cell->info().isSuperior=false;
-                                        } else {
-                                                cell->info().isSuperior=true;
-                                                cell->info().isLateral=false;
-                                                cell->info().isInferior=false;
-                                        }
-#ifdef XVIEW
-                                        Vue1.SetSpheresColor(1,0.1,0.1,1);
-                                        Vue1.Dessine_Sphere(cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4);
-#endif
-                                }
-                        }
-                }
-                cell->info().fictious()=pass;
-                if (!pass) cell->info().isInside=true;
-                else cell->info().isInside=false;
-        }
-        cout << "Localised -------------" << endl;
+  
+	for (int bound=0; bound<6;bound++) {
+                int& id = *boundsIds[bound];
+                Tesselation::Vector_Cell tmp_cells;
+                tmp_cells.resize(1000);
+                Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+                Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+                for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+		{
+		  Cell_handle& cell = *it;
+		  (cell->info().fictious())+=1;
+		}
+	}
 }
 
 void FlowBoundingSphere::Compute_Permeability()
@@ -523,9 +410,6 @@ void FlowBoundingSphere::DisplayStatistics(RTriangulation& Tri)
                         Inside+=1;
                 } else {
                         Fictious+=1;
-                        if (cell->info().isSuperior) Superior+=1;
-                        else if (cell->info().isInferior) Inferior+=1;
-                        else Lateral+=1;
                 }
         }
         cout << "zeros = " << Zero << endl;
@@ -541,13 +425,70 @@ void FlowBoundingSphere::DisplayStatistics(RTriangulation& Tri)
         long Facets = Tri.number_of_finite_facets();
         cout << "There are " << Facets << " facets " << std::endl;
         cout << "There are " << Inside << " cells INSIDE." << endl;
-        cout << "There are " << Lateral << " cells LATERAL." << endl;
-        cout << "There are " << Inferior << " cells INFERIOR." << endl;
-        cout << "There are " << Superior << " cells SUPERIOR." << endl;
         cout << "There are " << Fictious << " cells FICTIOUS." << endl;
 	
 	vtk_infinite_vertices = fict;
 	vtk_infinite_cells = Fictious;
+}
+
+void FlowBoundingSphere::ComputeFacetForces()
+{
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+        Vecteur nullVect(0,0,0);
+        bool ref = Tri.finite_cells_begin()->info().isvisited;
+	//reset forces
+        for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+                v->info().forces=nullVect;
+        }
+        Cell_handle neighbour_cell;
+        Vertex_handle mirror_vertex;
+        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+                for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j)) && cell->neighbor(j)->info().isvisited==ref) {
+                                neighbour_cell = cell->neighbor(j);
+                                const Vecteur& Surfk = cell->info().facetSurfaces[j];
+                                //FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
+                                //The ratio void surface / facet surface
+                                Real area = sqrt(Surfk.squared_length());
+                                Vecteur facetNormal = Surfk/area;
+                                const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
+                                Real fluidSurfRatio = (area-crossSections[j][0]-crossSections[j][1]-crossSections[j][2])/area;
+                                Vecteur fluidSurfk = cell->info().facetSurfaces[j]*fluidSurfRatio;
+				/// handle fictious vertex since we can get the projected surface easily here
+                                if (cell->vertex(j)->info().isFictious) {
+                                        Real projSurf=abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
+                                        cell->vertex(j)->info().forces = cell->vertex(j)->info().forces -projSurf*boundary(cell->vertex(j)->info().id()).normal*cell->info().p();
+                                }
+                                /// handle the opposite fictious vertex (remember each facet is seen only once)
+                                mirror_vertex = neighbour_cell->vertex(Tri.mirror_index(cell,j));
+                                Vertex_Info& info = neighbour_cell->vertex(Tri.mirror_index(cell,j))->info();
+                                if (info.isFictious) {
+                                        Real projSurf=abs(Surfk[boundary(info.id()).coordinate]);
+                                        info.forces = info.forces - projSurf*boundary(info.id()).normal*neighbour_cell->info().p();
+                                }
+                                /// Apply weighted forces f_k=sqRad_k/sumSqRad*f
+                                Vecteur Facet_Force = (neighbour_cell->info().p()-cell->info().p())*fluidSurfk*cell->info().solidSurfaces[j][3];
+                                for (int y=0; y<3;y++) {
+                                        cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidSurfaces[j][y]/* + (cell->vertex(facetVertices[j][y])->info().isFictious ? 0 : facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y])*/;
+				if (!cell->vertex(facetVertices[j][y])->info().isFictious)
+					cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces +
+ 				 facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y];
+                                }
+                        }
+                cell->info().isvisited=!ref;
+        }
+        cout << "Facet scheme" <<endl;
+        Vecteur TotalForce = nullVect;
+        for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+                if (!v->info().isFictious) {
+                        TotalForce = TotalForce + v->info().forces;
+                        if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+                } else {
+                        if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+                        if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+                }
+        }
+        cout << "TotalForce = "<< TotalForce << endl;
 }
 
 void FlowBoundingSphere::ComputeTetrahedralForces()
@@ -634,7 +575,8 @@ void FlowBoundingSphere::Compute_Forces()
                         V_fict = 0;
                         single_external_force = false, double_external_force=false, triple_external_force=false;
 
-                        if (!cell->info().isInside) {
+//                         if (!cell->info().isInside) {
+			if (cell->info().fictious()!=0){
                                 for (int i=0;i<4;i++) {
                                         if (cell->vertex(i)->info().isFictious) {
                                                 V_fict+=1;
@@ -643,16 +585,11 @@ void FlowBoundingSphere::Compute_Forces()
                         }
 
                         switch (V_fict) {
-                        case(1) : single_external_force=true;
-                                break;
-                        case(2) : double_external_force=true;
-                                break;
-                        case(3) : triple_external_force=true;
-                                break;
-                        }
+                        case(1) : single_external_force=true;break;
+                        case(2) : double_external_force=true;break;
+                        case(3) : triple_external_force=true;break;}
 
-                        p1 = cell->info();
-                        Cell_Force = nullVect, Vertex_force = nullVect;
+                        p1 = cell->info(); Cell_Force = nullVect, Vertex_force = nullVect;
 
                         for (int j=0; j<4; j++) {
                                 neighbour_cell = cell->neighbor(j);
@@ -1072,34 +1009,6 @@ double FlowBoundingSphere::surface_external_single_fictious(Cell_handle cell, Bo
         double sk = sqrt(Sk.squared_length());
 
         return sk;
-}
-
-void FlowBoundingSphere::Fictious_cells()
-{
-        Finite_cells_iterator cell_end = T[currentTes].Triangulation().finite_cells_end();
-
-        int V_fict=0;
-
-        cout << "Localizing fictious cells......" << endl;
-
-        for (Finite_cells_iterator cell = T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++) {
-                V_fict = 0;
-                for (int g=0;g<4;g++) {
-                        if (cell->vertex(g)->info().isFictious) V_fict+=1;
-                }
-                switch (V_fict) {
-                case(0) : cell->info().fictious() = 0;
-                        break;
-                case(1) : cell->info().fictious() = 1;
-                        break;
-                case(2) : cell->info().fictious() = 2;
-                        break;
-                case(3) : cell->info().fictious() = 3;
-                        break;
-                }
-        }
-
-        cout << "Fictious cells localized ------------" << endl;
 }
 
 double FlowBoundingSphere::volume_double_fictious_pore(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1)
@@ -1608,7 +1517,8 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
                         tmp_cells.resize(1000);
                         Tesselation::VCell_iterator cells_it = tmp_cells.begin();
                         Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
-                        for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)(*it)->info().p() = bi.value;
+                        for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+			{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;}
                 }
         }
 }
@@ -1629,20 +1539,11 @@ void FlowBoundingSphere::GaussSeidel ()
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 
         do {
-                int cell2=0;
-
-                dp_max = 0;
-                p_max = 0;
-                p_moy=0;
-                dp_moy=0;
-                sum_p=0;
-                sum_dp=0;
+                int cell2=0; dp_max = 0;p_max = 0;p_moy=0;dp_moy=0;sum_p=0;sum_dp=0;
 
                 for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                         m=0, n=0;
-
-                        //    if ((!cell->info().isSuperior && !cell->info().isInferior)) {
-                        if ( !cell->info().fictious() || cell->info().isLateral ) {
+                        if ( !cell->info().Pcondition ) {
                                 cell2++;
                                 for (int j2=0; j2<4; j2++) {
                                         if (!Tri.is_infinite(cell->neighbor(j2))) {
@@ -1650,27 +1551,21 @@ void FlowBoundingSphere::GaussSeidel ()
                                                 n += (cell->info().k_norm())[j2];
                                         }
                                 }
-
                                 dp = cell->info().p();
                                 if (n!=0) {
                                         //     cell->info().p() =   - ( cell->info().dv() - m ) / ( n );
                                         cell->info().p() = (- (cell->info().dv() - m) / (n) - cell->info().p()) * relax + cell->info().p();
                                 }
-
                                 dp -= cell->info().p();
-
                                 dp_max = std::max(dp_max, std::abs(dp));
                                 p_max = std::max(p_max, std::abs(cell->info().p()));
                                 sum_p += std::abs(cell->info().p());
                                 sum_dp += std::abs(dp);
                         }
                 }
-
                 p_moy = sum_p/cell2;
                 dp_moy = sum_dp/cell2;
-
                 j++;
-
                 if (j % 1000 == 0) {
 //                         cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
 //                         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
@@ -1703,83 +1598,75 @@ void FlowBoundingSphere::GaussSeidel ()
 //  }
 }
 
-
 double FlowBoundingSphere::Permeameter(RTriangulation &Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file)
 {
-        std::ofstream kFile(file, std::ios::out);
+  std::ofstream kFile(file, std::ios::out);
+  double Q2=0, Q1=0;
+  int cellQ1=0, cellQ2=0;
+  double p_out_max=0, p_out_min=100000, p_in_max=0, p_in_min=100000,p_out_moy=0, p_in_moy=0;
+  bool first=false;
+  Finite_cells_iterator cell_end = Tri.finite_cells_end();
+  
+	for (int bound=0; bound<6;bound++) {
+                int& id = *boundsIds[bound];
+                Boundary& bi = boundary(id);
+                if (!bi.flowCondition) {
+                        Tesselation::Vector_Cell tmp_cells;
+                        tmp_cells.resize(1000);
+                        Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+                        Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+                        for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+			{
+			   Cell_handle& cell = *it;
+			   if(!first){for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+				Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
+				cellQ1+=1;
+				p_out_max = std::max(cell->neighbor(j2)->info().p(), p_out_max);
+				p_out_min = std::min(cell->neighbor(j2)->info().p(), p_out_min);
+				p_out_moy += cell->neighbor(j2)->info().p();}}}
+			   else {for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+				Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
+				cellQ2+=1;
+				p_in_max = std::max(cell->neighbor(j2)->info().p(), p_in_max);
+				p_in_min = std::min(cell->neighbor(j2)->info().p(), p_in_min);
+				p_in_moy += cell->neighbor(j2)->info().p();}}}
 
-        double Qin=0, Qout=0;
-        int cellQout=0, cellQin=0;
-        double p_out_max=0, p_out_min=100000, p_in_max=0, p_in_min=100000,p_out_moy=0, p_in_moy=0;
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
-
-        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-                //   if (!cell->info().isSuperior && !cell->info().isInferior) {
-                if (!cell->info().fictious() || cell->info().isLateral) {
-                        for (int j2=0; j2<4; j2++) {
-                                Cell_handle neighbour_cell = cell->neighbor(j2);
-                                //if (neighbour_cell->info().fictious() && boundary(neighbour_cell->(). ) {
-                                if (neighbour_cell->info().isInferior) {
-                                        //PRESSION_EXT=P_Inf;
-                                        //Qout = Qout + ( cell->info().facetSurf() ) [j2]* ( cell->info().p()-PRESSION_EXT );
-//      cout << "outFlow : "<< ( cell->info().k_norm() ) [j2]* ( neighbour_cell->info().p()-cell->info().p() ) <<endl;
-                                        Qout = Qout + (cell->info().k_norm())[j2]* (neighbour_cell->info().p()-cell->info().p());
-                                        cellQout+=1;/*( cell->info().facetSurf() ) [j2]* ( cell->info().p()-PRESSION_EXT )*/;
-                                        p_out_max = std::max(cell->info().p(), p_out_max);
-                                        p_out_min = std::min(cell->info().p(), p_out_min);
-                                        p_out_moy += cell->info().p();
-                                }
-                                if (neighbour_cell->info().isSuperior) {
-                                        //      PRESSION_EXT=P_Sup;
-                                        //Qin = Qin + ( cell->info().facetSurf() ) [j2]* ( cell->info().p()-PRESSION_EXT );
-                                        Qin = Qin + (cell->info().k_norm())[j2]* (cell->info().p()-neighbour_cell->info().p());
-                                        cellQin+=1;
-                                        p_in_max = std::max(cell->info().p(), p_in_max);
-                                        p_in_min = std::min(cell->info().p(), p_in_min);
-                                        p_in_moy += cell->info().p();
-                                }
-                        }
-                }
-        }
-        cout << "the maximum superior pressure is = " << p_in_max << " the min is = " << p_in_min << endl;
-        kFile << "the maximum superior pressure is = " << p_in_max << " the min is = " << p_in_min << endl;
-        cout << "the maximum inferior pressure is = " << p_out_max << " the min is = " << p_out_min << endl;
-        kFile << "the maximum inferior pressure is = " << p_out_max << " the min is = " << p_out_min << endl;
-
-        cout << "superior average pressure is " << p_in_moy/cellQin << endl;
-        kFile << "superior average pressure is " << p_in_moy/cellQin << endl;
-        cout << "inferior average pressure is " << p_out_moy/cellQout << endl;
-        kFile << "inferior average pressure is " << p_out_moy/cellQout << endl;
-
-        cout << "celle comunicanti in basso = " << cellQout << endl;
-        kFile << "celle comunicanti in basso = " << cellQout << endl;
-        cout << "celle comunicanti in alto = " << cellQin << endl;
-        kFile << "celle comunicanti in basso = " << cellQout << endl;
+			}first=true;}
+	}
+	cout << "the maximum superior pressure is = " << p_in_max << " the min is = " << p_in_min << endl;
+	cout << "the maximum inferior pressure is = " << p_out_max << " the min is = " << p_out_min << endl;
+	cout << "superior average pressure is " << p_in_moy/cellQ2 << endl;
+        cout << "inferior average pressure is " << p_out_moy/cellQ1 << endl;
+        cout << "celle comunicanti in basso = " << cellQ1 << endl;
+        cout << "celle comunicanti in alto = " << cellQ2 << endl;
 
         double density = 1;
         double viscosity = 1;
         double gravity = 1;
-        double Vdarcy = Qout/Section;
-
-        double GradP = (P_Inf-P_Sup) /DeltaY;
-
+        double Vdarcy = Q1/Section;
+        double GradP = abs(P_Inf-P_Sup) /DeltaY;
         double GradH = GradP/ (density*gravity);
-
         double Ks= (Vdarcy) /GradH;
-
         double k= Ks*viscosity/ (density*gravity);
 
-        cout << "The incoming average flow rate is = " << Qin << " m^3/s " << endl;
-        kFile << "The incoming average flow rate is = " << Qin << " m^3/s " << endl;
-        cout << "The outgoing average flow rate is = " << Qout << " m^3/s " << endl;
-        kFile << "The outgoing average flow rate is = " << Qout << " m^3/s " << endl;
+        cout << "The incoming average flow rate is = " << Q2 << " m^3/s " << endl;
+        cout << "The outgoing average flow rate is = " << Q1 << " m^3/s " << endl;
         cout << "The gradient of charge is = " << GradH << " [-]" << endl;
-        kFile << "The gradient of charge is = " << GradH << " [-]" << endl;
         cout << "Darcy's velocity is = " << Vdarcy << " m/s" <<endl;
-        kFile << "Darcy's velocity is = " << Vdarcy << " m/s" <<endl;
         cout << "The hydraulic conductivity of the sample is = " << Ks << " m/s" <<endl;
-        kFile << "The hydraulic conductivity of the sample is = " << Ks << " m/s" <<endl;
         cout << "The permeability of the sample is = " << k << " m^2" <<endl;
+        
+	kFile << "the maximum superior pressure is = " << p_in_max << " the min is = " << p_in_min << endl;
+        kFile << "the maximum inferior pressure is = " << p_out_max << " the min is = " << p_out_min << endl;
+        kFile << "superior average pressure is " << p_in_moy/cellQ2 << endl;
+        kFile << "inferior average pressure is " << p_out_moy/cellQ1 << endl;
+        kFile << "celle comunicanti in basso = " << cellQ1 << endl;
+        kFile << "celle comunicanti in basso = " << cellQ1 << endl;
+	kFile << "The incoming average flow rate is = " << Q2 << " m^3/s " << endl;
+        kFile << "The outgoing average flow rate is = " << Q1 << " m^3/s " << endl;
+        kFile << "The gradient of charge is = " << GradH << " [-]" << endl;
+        kFile << "Darcy's velocity is = " << Vdarcy << " m/s" <<endl;
+        kFile << "The hydraulic conductivity of the sample is = " << Ks << " m/s" <<endl;
         kFile << "The permeability of the sample is = " << k << " m^2" <<endl;
         //   cout << "The Darcy permeability of the sample is = " << k_darcy/0.987e-12 << " darcys" << endl;
 	
@@ -1907,18 +1794,14 @@ void FlowBoundingSphere::GenerateVoxelFile(RTriangulation& Tri)
         }
 }
 
-double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, Real time, int intervals)
+double FlowBoundingSphere::PressureProfile(RTriangulation& Tri, char *filename, Real time, int intervals)
 {
 	/** CONSOLIDATION CURVES **/
         Cell_handle permeameter;
-        int n=0;
-        int k=0;
-        int m=0;
-        int o=0;
+        int n=0, k=0;
         vector<double> P_ave;
         std::ofstream consFile(filename, std::ios::out);
-//         consFile << "j " << " time " << "p_ave " << endl;
-//         int intervals = 30;
+
         double Rx = (x_max-x_min) /intervals;
         double Ry = (y_max-y_min) /intervals;
         double Rz = (z_max-z_min) /intervals;
@@ -1927,26 +1810,14 @@ double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename,
                 P_ave.push_back(0);
 		for (double X=x_min; X<=x_max+Ry/10; X=X+Rx) {
 			for (double Z=z_min; Z<=z_max+Ry/10; Z=Z+Rz) {
-                                permeameter = Tri.locate(Point(X, Y, Z));
-                                if (permeameter->info().isInside) {
-                                        n++;
-                                        P_ave[k]+=permeameter->info().p();
-                                }
-                                if (permeameter->info().isInferior) {
-                                        m++;
-                                        P_ave[k]+=permeameter->info().p();
-                                }
-                                if (permeameter->info().isSuperior) {
-                                        o++;
-                                        P_ave[k]+=permeameter->info().p();
-                                }
+                                P_ave[k]+=Tri.locate(Point(X, Y, Z))->info().p();
+				n++;
                         }
                 }
-//                 cout << "P_ave[" << k << "] = " << P_ave[k]/ ( m+n+o ) << " n = " << n << " m = " << m << " o = " << o << endl;
-                P_ave[k]/= (m+n+o);
+                P_ave[k]/= (n);
                 consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
                 if (k==intervals/2) Pressures.push_back(P_ave[k]);
-                n=0, m=0, o=0; k++;
+                n=0; k++;
 	}
 	return P_ave[intervals/2];
 }
@@ -1987,7 +1858,6 @@ double FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min
 
         char *kk;
         kk = (char*) key.c_str();
-
         return Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
 }
 
@@ -1998,6 +1868,7 @@ void FlowBoundingSphere::AddBoundingPlanes(Real center[3], Real Extents[3], int 
         Corner_min = Point(x_min, y_min, z_min);
         Corner_max = Point(x_max, y_max, z_max);
         Real min_coord = min(Extents[0],min(Extents[1],Extents[2]));
+	
         int coord=0;
         if (min_coord==Extents[0]) {
                 coord=0;
