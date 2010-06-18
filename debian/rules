@@ -25,7 +25,7 @@ build-stamp: configure-stamp
 	# Add here commands to compile the package.
 	#$(MAKE)
 	## eudoxos: noting to be done here, will be done at the same time as installation
-	docbook-to-man debian/yade.sgml > yade.1
+	#docbook-to-man debian/yade.sgml > yade.1
 	touch $@
 
 clean:
@@ -60,6 +60,11 @@ install: build
 	cp -r examples scripts debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}
 	# UGLY! generate sphinx docs only if python-sphinx is installed (distinguishes distributions which should build it or not as per debian/control-template build-deps)
 	if dpkg-query -W python-sphinx; then cd doc/sphinx; PYTHONPATH=. YADE_PREFIX=../../debian/yade${_VERSION}/usr/ ../../debian/yade${_VERSION}/usr/bin/yade${_VERSION} yadeSphinx.py; cd _build/latex; xelatex Yade.tex; xelatex Yade.tex; xelatex Yade.tex; cd ../..; mkdir -p ../../debian/yade${_VERSION}-doc/usr/share/doc/yade${_VERSION}; cp -r _build/html _build/latex/Yade.pdf ../../debian/yade${_VERSION}-doc/usr/share/doc/yade${_VERSION}; else echo "Not building HTML documentation, since the python-sphinx package is not installed"; fi
+	# generate manpages
+	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} --generate-manpage yade${_VERSION}.1
+	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION}-multi --generate-manpage yade${_VERSION}-multi.1
+	YADE_PREFIX=debian/yade${_VERSION}-dbg/usr debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg --generate-manpage yade${_VERSION}-dbg.1
+	YADE_PREFIX=debian/yade${_VERSION}-dbg/usr debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg-multi --generate-manpage yade${_VERSION}-dbg-multi.1
 
 check: install
 	dh_testdir
@@ -90,7 +95,8 @@ binary-arch: build install check
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
-	dh_installman
+	dh_installman -p yade${_VERSION} yade${_VERSION}.1 yade${_VERSION}-multi.1
+	dh_installman -p yade${_VERSION}-dbg yade${_VERSION}-dbg.1 yade${_VERSION}-dbg-multi.1
 	dh_link
 	dh_strip --exclude=yade${_VERSION}-dbg   # don't strip the debug package
 	dh_compress

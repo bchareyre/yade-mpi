@@ -108,10 +108,10 @@ Elements are traversed from left to right; each of them keeps inverting (swappin
 
 .. FIXME table
 
-=============== ========================================================
-($\leq$)        the sorting order with the left neighbor is correct, or
-($||$)          the element is at the beginning of the sequence.
-=============== ========================================================
+=================== ========================================================
+($\leq$)            the sorting order with the left neighbor is correct, or
+($||$)              the element is at the beginning of the sequence.
+=================== ========================================================
 
 We start at the leftmost element (the current element is marked $\currelem{i}$)
 
@@ -684,11 +684,11 @@ where $x$ is displacement from the mean (equilibrium) position. The solution of 
 .. math::
 	:label: eq-dt-omega
 	
-	\omega^{(1)}=\sqrt{\frac{m}{K}}
+	\omega^{(1)}=\sqrt{\frac{K}{m}}
 
 does not depend on initial conditions. Since there is one single mass, $\omega_{\rm max}^{(1)}=\omega^{(1)}$. Plugging :eq:`eq-dt-omega` into :eq:`eq-dt-angular`, we obtain
 
-.. math:: \Dtcr^{(1)}=2/\omega_{\rm max}^{(1)}=2\sqrt{K/m}
+.. math:: \Dtcr^{(1)}=2/\omega_{\rm max}^{(1)}=2\sqrt{m/K}
 
 for a single oscillator.
 	
@@ -903,13 +903,13 @@ with cell $x$-size $s_x=10$. The $4_1$ value then means that the real coordinate
 
 Sorting starts from the first element in the cell, i.e. right of $||$, and inverts elements as in the aperiodic variant. The rules are, however, more complicated due to the presence of the boundary $||$:
 
-======================== ==============================================================
-($\leq$)                 stop inverting if neighbors are ordered;
-($||\bullet$)            current element left of $||$ is below 0 (lower period boundary); in this case, decrement element's period, decrease its coordinate by $s_x$ and move $||$ right;
-($\bullet||$)            current element right of $||$ is above $s_x$ (upper period boundary); increment element's period, increase its coordinate by $s_x$ and move $||$ left;
-($\crossBound$)          inversion across $||$ must subtract $s_x$ from the left coordinate during comparison. If the elements are not in order, they are swapped, but they must have their periods changed as they traverse $||$. Apply ($||\circ$) if necessary;
-($||\circ$)              if after ($\crossBound$) the element that is now right of $||$ has $x_i<s_x$, decrease its coordinate by $s_x$ and decrement its period. Do not move $||$.
-======================== ==============================================================
+========================== ==============================================================
+($\leq$)                   stop inverting if neighbors are ordered;
+($||\bullet$)              current element left of $||$ is below 0 (lower period boundary); in this case, decrement element's period, decrease its coordinate by $s_x$ and move $||$ right;
+($\bullet||$)              current element right of $||$ is above $s_x$ (upper period boundary); increment element's period, increase its coordinate by $s_x$ and move $||$ left;
+($\crossBound$)            inversion across $||$ must subtract $s_x$ from the left coordinate during comparison. If the elements are not in order, they are swapped, but they must have their periods changed as they traverse $||$. Apply ($||\circ$) if necessary;
+($||\circ$)                if after ($\crossBound$) the element that is now right of $||$ has $x_i<s_x$, decrease its coordinate by $s_x$ and decrement its period. Do not move $||$.
+========================== ==============================================================
 
 In the first step, ($||\bullet$) is applied, and inversion with $12_2$ happens; then we stop because of ($\leq$):
 

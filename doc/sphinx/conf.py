@@ -156,7 +156,7 @@ def isBoostMethod(what,obj):
 def replaceLaTeX(s):
 	# replace single non-escaped dollars $...$ by :math:`...`
 	# then \$ by single $
-	s=re.sub(r'(?<!\\)\$([^\$]+)(?<!\\)\$',r':math:`\1`',s)
+	s=re.sub(r'(?<!\\)\$([^\$]+)(?<!\\)\$',r'\ :math:`\1`\ ',s)
 	return re.sub(r'\\\$',r'$',s)
 
 def fixSrc(app,docname,source):

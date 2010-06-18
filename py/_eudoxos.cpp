@@ -138,7 +138,7 @@ struct SpiralInteractionLocator2d{
 	shared_ptr<GridContainer<FlatInteraction> > grid;
 	Real thetaSpan;
 	int axis;
-	SpiralInteractionLocator2d(Real dH_dTheta, int _axis, Real periodStart, Real theta0): axis(_axis){
+	SpiralInteractionLocator2d(Real dH_dTheta, int _axis, Real periodStart, Real theta0, Real thetaMin, Real thetaMax): axis(_axis){
 		Scene* scene=Omega::instance().getScene().get();
 		Real inf=std::numeric_limits<Real>::infinity();
 		Vector2r lo=Vector2r(inf,inf), hi(-inf,-inf);
@@ -152,6 +152,8 @@ struct SpiralInteractionLocator2d{
 			if(!ge || !ph) continue;
 			Real r,h,theta;
 			boost::tie(r,h,theta)=Shop::spiralProject(ge->contactPoint,dH_dTheta,axis,periodStart,theta0);
+			if(!isnan(thetaMin) && theta<thetaMin) continue;
+			if(!isnan(thetaMax) && theta>thetaMax) continue;
 			lo=lo.cwise().min(Vector2r(r,h)); hi=hi.cwise().max(Vector2r(r,h));
 			minD0=min(minD0,ge->refLength); maxD0=max(maxD0,ge->refLength);
 			minTheta=min(minTheta,theta); maxTheta=max(maxTheta,theta);
@@ -306,7 +308,7 @@ BOOST_PYTHON_MODULE(_eudoxos){
 	py::def("particleConfinement",particleConfinement);
 	py::def("testNumpy",testNumpy);
 #ifdef YADE_VTK
-	py::class_<InteractionLocator>("InteractionLocator","Locate all (real) interactions in space by their :yref:`contact point<Dem3DofGeom::contactPoint>`. When constructed, all real interactions are spatially indexed (uses vtkPointLocator internally). Use intrsWithinDistance to use those data. \n\n.. note::\n\tData might become inconsistent with real simulation state if simulation is being run between creation of this object and spatial queries.")
+	py::class_<InteractionLocator>("InteractionLocator","Locate all (real) interactions in space by their :yref:`contact point<Dem3DofGeom::contactPoint>`. When constructed, all real interactions are spatially indexed (uses `vtkPointLocator <http://www.vtk.org/doc/release/5.4/html/a01247.html>`_ internally). Use instance methods to use those data. \n\n.. note::\n\tData might become inconsistent with real simulation state if simulation is being run between creation of this object and spatial queries.")
 		.def("intrsAroundPt",&InteractionLocator::intrsAroundPt,((python::arg("point"),python::arg("maxDist"))),"Return list of real interactions that are not further than *maxDist* from *point*.")
 		.def("macroAroundPt",&InteractionLocator::macroAroundPt,((python::arg("point"),python::arg("maxDist"),python::arg("forceVolume")=-1)),"Return tuple of averaged stress tensor (as Matrix3), average omega and average kappa values. *forceVolume* can be used (if positive) rather than the sphere (with *maxDist* radius) volume for the computation. (This is useful if *point* and *maxDist* encompass empty space that you want to avoid.)")
 		.add_property("bounds",&InteractionLocator::getBounds,"Return coordinates of lower and uppoer corner of axis-aligned abounding box of all interactions")
@@ -315,10 +317,10 @@ BOOST_PYTHON_MODULE(_eudoxos){
 #endif
 	py::class_<SpiralInteractionLocator2d>("SpiralInteractionLocator2d",
 		"Locate all real interactions in 2d plane (reduced by spiral projection from 3d, using ``Shop::spiralProject``, which is the same as :yref:`yade.utils.spiralProject`) using their :yref:`contact points<Dem3DofGeom::contactPoint>`. \n\n.. note::\n\tDo not run simulation while using this object.",
-		python::init<Real,int,Real,Real>((python::arg("dH_dTheta"),python::arg("axis")=0,python::arg("periodStart")=NaN,python::arg("theta0")=0),":Parameters:\n\n\tdH_dTheta: float\n\t\tSpiral inclination, i.e. height increase per 1 radian turn;\n\taxis: int\n\t\tAxis of rotation (0=x,1=y,2=z)\n\ttheta: float\n\t\tSpiral angle at zero height (theta intercept)\n\nSee :yref:`yade.utils.spiralProject`.")
+		python::init<Real,int,Real,Real,Real,Real>((python::arg("dH_dTheta"),python::arg("axis")=0,python::arg("periodStart")=NaN,python::arg("theta0")=0,python::arg("thetaMin")=NaN,python::arg("thetaMax")=NaN),":param float dH_dTheta: Spiral inclination, i.e. height increase per 1 radian turn;\n:param int axis: axis of rotation (0=x,1=y,2=z)\n:param float theta: spiral angle at zero height (theta intercept)\n:param float thetaMin: only interactions with $\\theta$≥\\ *thetaMin* will be considered (NaN to deactivate)\n:param float thetaMax: only interactions with $\\theta$≤\\ *thetaMax* will be considered (NaN to deactivate)\n\nSee :yref:`yade.utils.spiralProject`.")
 	)
 		.def("intrsAroundPt",&SpiralInteractionLocator2d::intrsAroundPt,(python::arg("pt2d"),python::arg("radius")),"Return list of interaction objects that are not further from *pt2d* than *radius* in the projection plane")
-		.def("macroAroundPt",&SpiralInteractionLocator2d::macroAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point, rotating the interaction to the projection plane first. The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates.\n\n$\\sigma^{T}$ and $n$ are transformed by angle $\\theta$ as given by :yref:`yade.utils.spiralProject`. \n\nAdditionaly, computes average of :yref:`CpmPhys.omega` ($\\bar\\omega$) and :yref:`CpmPhys.kappaD` ($\\bar\\kappa_D$). *N* is the number of interactions in the volume given. \n\n:Return: tuple of (*N*,$\\tens{\\sigma}$,$\\bar\\omega$,$\\bar\\kappa_D$).\n")
+		.def("macroAroundPt",&SpiralInteractionLocator2d::macroAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point; the interaction ($n$ and $\\sigma^T$ are rotated to the projection plane by $\\theta$ (as given by :yref:`yade.utils.spiralProject`) first, but no skew is applied). The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is ($\\theta$-rotated) interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates and $\\theta$-rotated. \n\nAdditionaly, computes average of :yref:`CpmPhys.omega` ($\\bar\\omega$) and :yref:`CpmPhys.kappaD` ($\\bar\\kappa_D$). *N* is the number of interactions in the volume given.\n\n:return: tuple of (*N*, $\\tens{\\sigma}$, $\\bar\\omega$, $\\bar\\kappa_D$).\n")
 		.add_property("lo",&SpiralInteractionLocator2d::getLo,"Return lower corner of the rectangle containing all interactions.")
 		.add_property("hi",&SpiralInteractionLocator2d::getHi,"Return upper corner of the rectangle containing all interactions.");
 

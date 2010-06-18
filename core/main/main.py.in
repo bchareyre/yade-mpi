@@ -2,7 +2,7 @@
 # encoding: utf-8
 # syntax:python
 
-import sys,os,os.path
+import sys,os,os.path,time
 # get yade path (allow YADE_PREFIX to override)
 prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
@@ -17,7 +17,7 @@ if v[0]==2 and v[1]<=5:
 
 # handle command-line options first
 import optparse
-par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(version,','.join(features)),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s)."%(version,','.join(features)))
+par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog=os.path.basename(sys.argv[0]),version='%s (%s)%s'%(version,','.join(features),' with debugging symbols' if debug else ''),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s %s)."%(version,','.join(features),', with debugging symbols' if debug else ''))
 par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
 par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
@@ -27,6 +27,7 @@ par.add_option('-v',help='Increase logging verbosity; first occurence sets defau
 if debug:
 	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
 par.add_option('-n',help="Run without graphical interface (equivalent to unsetting the DISPLAY environment variable)",dest='nogui',action='store_true')
+par.add_option('--generate-manpage',help="Generate man page documenting this program and exit",dest='manpage',metavar='FILE')
 
 opts,args=par.parse_args()
 # c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
@@ -39,41 +40,24 @@ if opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 
 sys.stderr.write('Welcome to Yade '+version+'\n')
 
-try:
-	# initialization and c++ plugins import
-	import yade
-	# other parts we will need soon
-	import yade.config
-	import yade.wrapper
-	import yade.log
-	import yade.system
-#import yade.plot
-except AttributeError:
-	print """
-==========================================
-======== ERROR: read carefully! ==========
-==========================================
-
-There was AttributeError while importing yade module.
-If you are running Ubuntu 9.10 (karmic) or 10.04 (lucid),
-you just hit a known bug
-https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688
-
-You can work around this bug by updating boost from yade's updated repository
-(as per https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688/comments/6)
-by issuing the following command:
-
-  sudo add-apt-repository ppa:yade-users/external && sudo apt-get update && sudo apt-get upgrade
-
-You should not need to recompile afterwards.
-"""
-	sys.exit(1)
+# initialization and c++ plugins import
+import yade
+# other parts we will need soon
+import yade.config
+import yade.wrapper
+import yade.log
+import yade.system
 
 
 # continue option processing
 
 if opts.updateScripts:
 	yade.system.updateScripts(args)
+	sys.exit(0)
+if opts.manpage:
+	import yade.manpage
+	yade.manpage.generate_manpage(par,yade.config.metadata,opts.manpage,section=1,seealso='yade%s-multi (1)'%suffix)
+	print 'Manual page %s generated.'%opts.manpage
 	sys.exit(0)
 if opts.nice:
 	os.nice(opts.nice)

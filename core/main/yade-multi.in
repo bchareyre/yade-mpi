@@ -6,7 +6,7 @@
 import os, sys, thread, time, logging, pipes
 
 ## replaced by scons automatically
-prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
 executable=os.path.join(prefix,'bin','yade'+suffix)
 ## we just need this ...
@@ -160,7 +160,7 @@ def getNumCores():
 	return nCpu
 numCores=getNumCores()
 
-parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py\n\n  %prog runs yade simulation multiple times with different parameters.\n  See https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-multi for details.')
+parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-multi for details.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
 parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job."%numCores,metavar='NUM',default=numCores)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads')
@@ -172,8 +172,17 @@ parser.add_option('--executable',dest='executable',help='Name of the program to 
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
+parser.add_option('--generate-manpage',help='Generate man page documenting this program and exit',dest='manpage',metavar='FILE')
 opts,args=parser.parse_args()
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
+
+if opts.manpage:
+	import yade.manpage
+	yade.config.metadata['short_desc']='batch system for computational platform Yade'
+	yade.config.metadata['long_desc']='Manage batches of computation jobs for the Yade platform; batches are described using text-file tables with parameters which are passed to individual runs of yade. Jobs are being run with pre-defined number of computational cores as soon as the required number of cores is available. Logs of all computations are stored in files and the batch progress can be watched online at (usually) http://localhost:9080. Unless overridden, the executable yade%s is used to run jobs.'%(yade.config.suffix)
+	yade.manpage.generate_manpage(parser,yade.config.metadata,opts.manpage,section=1,seealso='yade%s (1)\n.br\nhttps://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-multi'%suffix)
+	print 'Manual page %s generated.'%opts.manpage
+	sys.exit(0)
 
 if globalLog:
 	sys.stderr=open(globalLog,"w")
