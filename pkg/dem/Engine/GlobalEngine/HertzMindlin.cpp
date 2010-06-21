@@ -85,32 +85,64 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/* Hertz-Mindlin's formulation (PFC)
 	Note that the normal stiffness here is a secant value (so as it is cannot be used in the GSTS)
 	In the first place we get the normal force and then we store kn to be passed to the GSTS */
-	Real Fn = phys->kno*std::pow(uN,1.5);// normal Force (scalar)
+	Real Fn = phys->kno*std::pow(uN,1.5); // normal Force (scalar)
 	phys->normalForce = Fn*scg->normal; // normal Force (vector)
+
+
+	/*** TANGENTIAL NORMAL STIFFNESS ***/
 	phys->kn = 3./2.*phys->kno*std::pow(uN,0.5); // here we store the value of kn to compute the time step
+	/*** TANGENTIAL SHEAR STIFFNESS ***/
+	phys->ks = phys->kso*std::pow(uN,0.5); // get tangential stiffness (this is a tangent value, so we can pass it to the GSTS)
+
+
+	/*** DAMPING COEFFICIENTS ***/
+	// Inclusion of local damping if requested 
+	if (useDamping){
+		Real mbar = de1->mass*de2->mass / (de1->mass + de2->mass); // equivalent mass
+		Real Cn_crit = 2.*Mathr::Sqrt(mbar*phys->kn); // Critical damping coefficient (normal direction)
+		Real Cs_crit = 2.*Mathr::Sqrt(mbar*phys->ks); // Critical damping coefficient (shear direction)
+		// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
+		cn = Cn_crit*betan; // Damping normal coefficient
+		cs = Cs_crit*betas; // Damping tangential coefficient
+	}
 
 
 	/*** SHEAR FORCE ***/
-	phys->ks = phys->kso*std::pow(uN,0.5); // get tangential stiffness (this is a tangent value, so we can pass it to the GSTS)
-	Vector3r& trialFs = phys->shearForce;
-	// define shift to handle periodicity
+	Vector3r& shearElastic = phys->shearElastic; // reference for shearElastic force
+	// Define shift to handle periodicity
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
-  	Vector3r dus =scg->rotateAndGetShear(trialFs, phys->prevNormal, de1, de2, dt, shiftVel, preventGranularRatcheting);
-	//Linear elasticity giving "trial" shear force
-	trialFs -= phys->ks*dus;
+	// 1. Rotate shear force
+	shearElastic = scg->rotateShear(shearElastic, phys->prevNormal, de1, de2, dt);
+	// 2. Get incident velocity, get shear and normal components
+	// FIXME: Concerning the possibility to avoid granular ratcheting, it is not clear how this works in the case of HM. See the thread http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01947.html
+	Vector3r incidentV = scg->getIncidentVel(de1, de2, dt, shiftVel, preventGranularRatcheting);	
+	Vector3r incidentVn = scg->normal.dot(incidentV)*scg->normal; // contact normal velocity
+	Vector3r incidentVs = incidentV - incidentVn; // contact shear velocity
+	// 3. Get shear force (incrementally)
+	shearElastic = shearElastic - phys->ks*(incidentVs*dt);
 
- 
+
+	/*** VISCOUS DAMPING ***/
+	if (useDamping){ // get normal and shear viscous components
+		phys->normalViscous = cn*incidentVn;
+		phys->shearViscous = cs*incidentVs;
+		// add normal viscous component if damping is included
+		phys->normalForce -= phys->normalViscous;
+	}
+
+
 	/*** MOHR-COULOMB LAW ***/
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
-	if (trialFs.squaredNorm() > maxFs)
-	{Real ratio = Mathr::Sqrt(maxFs)/trialFs.norm(); trialFs *= ratio;}
+	if (shearElastic.squaredNorm() > maxFs){
+		Real ratio = Mathr::Sqrt(maxFs)/shearElastic.norm(); shearElastic *= ratio; phys->shearForce = shearElastic;}
+	else if (useDamping){ /*add current contact damping if we do not slide and if damping is requested*/ phys->shearForce = shearElastic - phys->shearViscous;}
 
 
 	/*** APPLY FORCES ***/
 	if (!scene->isPeriodic)
-	applyForceAtContactPoint(-phys->normalForce-trialFs , scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position, ncb);
+	applyForceAtContactPoint(-phys->normalForce - phys->shearForce, scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position, ncb);
 	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used
-		Vector3r force = -phys->normalForce-trialFs;
+		Vector3r force = -phys->normalForce - phys->shearForce;
 		ncb->forces.addForce(id1,force);
 		ncb->forces.addForce(id2,-force);
 		ncb->forces.addTorque(id1,(scg->radius1-0.5*scg->penetrationDepth)* scg->normal.cross(force));
@@ -118,17 +150,4 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	}
 	phys->prevNormal = scg->normal;
 }
-
-
-
-
-
-
-
-
-      
-
-
-	
-	
 
