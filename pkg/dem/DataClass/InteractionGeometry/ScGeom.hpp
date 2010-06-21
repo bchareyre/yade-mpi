@@ -29,8 +29,8 @@ class ScGeom: public GenericSpheresContact {
 		//!  Periodic variant. Needs the velocity shift across periods for periodic BCs (else it is safe to pass Vector3r::Zero()). Typically obtained as scene->cell->velGrad*scene->cell->Hsize*cellDist. It would be better to define the shift transparently inside the function, but it needs scene and interaction pointers, which we don't have here.
 		Vector3r rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting=true);
 
-		// Add method which only rotates the shear vector.
-		Vector3r rotateShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt);
+		// Add method which only rotates the shear vector (or another vector as well).
+		Vector3r rotate(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt);
 		// Add method which returns the impact velocity (then, inside the contact law, this can be split into shear and normal component). Handle periodicity.
 		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting=true);
 		// Implement another version of getIncidentVel which does not handle periodicity.

@@ -130,7 +130,7 @@ Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNor
 	return shearDisplacement;
 }
 
-Vector3r ScGeom::rotateShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt){
+Vector3r ScGeom::rotate(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt){
 	Vector3r axis;
 	Real angle;
 	// approximated rotations
