@@ -2,9 +2,6 @@
 
 #ifndef _Def_types
 #define _Def_types
-
-
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Cartesian.h>
 #include <CGAL/Regular_triangulation_3.h>
@@ -17,12 +14,15 @@
 
 #include <boost/static_assert.hpp>
 
-//#define FLOW_ENGINE
+#define FLOW_ENGINE
 
 
 namespace CGT{
+//Robust kernel
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+//A bit faster, but gives crash eventualy 
+// typedef CGAL::Cartesian<double> K;
 
-typedef CGAL::Cartesian<double> K;
 typedef CGAL::Regular_triangulation_euclidean_traits_3<K>   				Traits;
 typedef K::Point_3									Point;
 //typedef Traits::Bare_point 								Point;
@@ -48,30 +48,36 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	Real s;// stockage d'une valeur scalaire (ex. d�viateur) pour affichage
 	bool isFictious;
 #ifdef FLOW_ENGINE
+	bool Pcondition;
 	Real t;
 	int fict;
  	Real VolumeVariation;
 	double pression; //stockage d'une valeur de pression pour chaque cellule
+	std::vector<double> Average_Cell_Velocity; //average velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
 	
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
+	// Store the area of triangle-sphere intersections for each facet (used in forces definition)
+	std::vector<Vecteur> facetSphereCrossSections;
 	std::vector<Vecteur> cell_force;
 	std::vector<double> RayHydr;
 // 	std::vector<double> flow_rate;
 	std::vector<double> module_permeability;
-	// In-facet partial surfaces of spheres. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
+	// Partial surfaces of spheres in the double-tetrahedron linking two voronoi centers. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
 	double solidSurfaces [4][4];
 // 	std::vector<Vecteur> vec_forces;
 	Cell_Info (void)
 	{
 		module_permeability.resize(4, 0);
+		Average_Cell_Velocity.resize(4);
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
+		facetSphereCrossSections.resize(4);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		RayHydr.resize(4, 0);
 		isInside = false;
 		inv_sum_k=0;
-		isFictious = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
+		isFictious=false; Pcondition = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
 	}	
 	double inv_sum_k;
 	bool isInside;
@@ -106,6 +112,8 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	
 	inline std::vector<Vecteur>& force (void) {return cell_force;}
 	inline std::vector<double>& Rh (void) {return RayHydr;}
+	
+	inline std::vector<double>& av_vel (void) {return Average_Cell_Velocity;}
 // 	inline vector<Vecteur>& F (void) {return vec_forces;}
 // 	inline vector<double>& Q (void) {return flow_rate;}
 // 	inline vector<Real>& d (void) {return distance;}
