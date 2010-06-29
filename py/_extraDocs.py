@@ -72,35 +72,37 @@ The global elastic stiffness tensor then reads (omitting the $c$ indices of per-
 	
 	K_{ijkl}=\frac{1}{V}\sum_{c}{l}^2\left[K_N n_i n_j n_k n_l+K_T\left(\frac{n_j n_k \delta_{il}+n_j n_l\delta_{ik}+n_i n_k\delta_{jl}+n_i n_l\delta_{jk}}{4}-n_i n_j n_kn_l\right)\right].
 
-Global strain tensor $\tens{\eps}$ is symmetric and has 6 degrees of freedom, whereas the current transformation matrix $\mathcal{T}$ of the cell (:yref:`Cell.trsf`) has 9 independent components -- it has 3 additional for arbitrary rotation, which induces no strain. We perform `polar decomposition <http://en.wikipedia.org/wiki/Polar_decomposition#Matrix_polar_decomposition>`_ $\mathcal{T}=\mat{U}\mat{P}$, where $\mat{U}$ is unitary (representing rotation) and $\mat{P}$ is deformation in the proper sense; after converting $\mat{P}$ to strain, it is rotated back by $\mat{U}$ so that it is in global coordinates. To have `true strain <http://en.wikipedia.org/wiki/True_strain#True_strain>`_, the strain matrix should be obtained via
+Global strain tensor $\tens{\eps}$ is symmetric and has 6 degrees of freedom, whereas the current transformation matrix $\mathcal{T}$ of the cell (:yref:`Cell.trsf`) has 9 independent components -- it has 3 additional for arbitrary rotation, which induces no strain. We perform `polar decomposition <http://en.wikipedia.org/wiki/Polar_decomposition#Matrix_polar_decomposition>`_ $\mathcal{T}=\mat{U}\mat{P}$, where $\mat{U}$ is unitary (representing rotation) and $\mat{P}$ is deformation in the proper sense; after converting $\mat{P}$ to strain, it is rotated back by $\mat{U}$ so that it is in global coordinates. To have `true strain <http://en.wikipedia.org/wiki/True_strain#True_strain>`_, the strain matrix is obtained via
 
 .. math:: \mat{\eps}=\mat{U}\log \mat{P}
 
-but as matrix logarithm is not yet implemented in Eigen, we approximate this (which works only for "small strain" scenarios) as
+computed (see `wikipedia <http://en.wikipedia.org/wiki/Logarithm_of_a_matrix#Calculating_the_logarithm_of_a_diagonalizable_matrix>`_ and [Lu1998]_) by spectral decomposition
 
-.. math:: \mat{\eps}=\mat{U}(\mat{P}-\mat{I}_3)
+.. math::
+	:nowrap:
+	
+	\begin{align*}
+		\mat{\eps}'&=\mat{V}^{-1}\mat{\eps}\mat{V} \\
+		\log(\mat{\eps})&=\mat{V}\log(\mat{\eps}')\mat{V}^{-1}
+	\end{align*}
 
-where $\mat{I}_3$ is 3×3 identity matrix.
+where $\mat{\eps}'$ is diagonal and $\log(\mat{\eps}')$ is a diagonal matrix with $\log(\mat{\eps}')_{ii}=\log(\mat{\eps}'_{ii})$. $\mat{V}$ is orthonormal, therefore $\mat{V}^{-1}=\mat{V}^T$.
 
-Once current values of $\tens{\sigma}$, $\tens{K}$ and $\tens{\eps}$ are known, the control algorithm comes. These tensors are converted to 6-vectors using the `Voigt notation <http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations#Voigt_notation>`_. Since for each component $i\in\{0\dots5\}$ either $\vec{\sig}_i$ of $\vec{\eps}_i$ is prescribed (determined by :yref:`stressMask<Peri3dController.stressMask>`), the equation $\vec{\sig}=\mat{K}\vec{\eps}$ (dealing with large strains, we should use the rate formulation; supposing $\mat{K}$ is quasi-constant in time (linearization), we have $\vec{\dot\sig}=\mat{K}\vec{\dot\eps}$, where all rate terms differ from their counterparts by the same factor $\Delta t$. For that reason, it is only at the end that the rate form is assumed in the proper sense) is decomposed in 2 parts:
+Once current values of $\tens{\sigma}$, $\tens{K}$ and $\tens{\eps}$ are known, the control algorithm comes. These tensors are converted to 6-vectors using the `Voigt notation <http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations#Voigt_notation>`_. Since for each component $i\in\{0\dots5\}$ either $\vec{\sig}_i$ of $\vec{\eps}_i$ is prescribed (determined by :yref:`stressMask<Peri3dController.stressMask>`), the equation $\vec{\sig}=\mat{K}\vec{\eps}$; assuming large strains, we take the rate form $\vec{\dot\sig}=\mat{K}\vec{\dot\eps}$ is decomposed in 2 parts:
 
-* $p$ denotes the part where strain component $\vec{\eps}_i$ is *prescribed*;
-* $u$ denotes the part where strain component $\vec{\eps}_i$ is *unprescribed* (and $\vec{\sig}_i$ is prescribed).
+* $p$ denotes the part where strain component $\vec{\dot\eps}_i$ is *prescribed* (via $\frac{\vec{\eps}^g_i-\vec{\eps}_i}{\Dt}$, where $\vec{\eps}^g_i$ is the corresponding :yref:`goal<Peri3dController.goal>` strain component value);
+* $u$ denotes the part where strain component $\vec{\dot\eps}_i$ is *unprescribed* (and $\vec{\sig}_i$ is prescribed, again via $\frac{\vec{\sig}^g_i-\vec{\sig}_i}{\Dt}$).
 
 The equation then is re-arranged as
 
 .. math:: 
 
-	\begin{Bmatrix}\vec{\sig}_u \\ \vec{\sig}_p\end{Bmatrix}=\begin{bmatrix}\mat{K}_{uu} & \mat{K}_{up} \\ \mat{K}_{pu} & \mat{K}_{pp}\end{bmatrix}\begin{Bmatrix}\vec{\eps}_u \\ \vec{\eps}_p\end{Bmatrix}
+	\begin{Bmatrix}\vec{\dot\sig}_u \\ \vec{\dot\sig}_p\end{Bmatrix}=\begin{bmatrix}\mat{K}_{uu} & \mat{K}_{up} \\ \mat{K}_{pu} & \mat{K}_{pp}\end{bmatrix}\begin{Bmatrix}\vec{\dot\eps}_u \\ \vec{\dot\eps}_p\end{Bmatrix}
 
 Since we can only apply strain (via the :yref:`velocity gradient<Cell.velGrad>`), we must evaluate 
 
-.. math :: \vec{\eps}_u=\mat{K}_{uu}^{-1}(\vec{\sig}_u-\mat{K}_{up}\vec{\eps}_p)
+.. math :: \vec{\dot\eps}_u=\mat{K}_{uu}^{-1}(\vec{\dot\sig}_u-\mat{K}_{up}\vec{\dot\eps}_p)
 
-The goal strain tensor $\tens{\eps}^g$ is the assembled from $\vec{\eps}_u$ and $\vec{\eps}_p$ and is used to prescribe the current :yref:`velocity gradient <Cell.velGrad>`
-
-.. math:: \nabla\vec{v}=\frac{\tens{\eps}^g-\tens{\eps}}{\Delta t}.
-
-If magnitude of any component of $\nabla\vec{v}$ exceeds :yref:`maxStrainRate<Peri3dController.maxStrainRate>`, the whole tensor is scaled accordingly.
+The :yref:`velocity gradient <Cell.velGrad>` is then assembled from $\vec{\eps}_u$ and $\vec{\eps}_p$. If magnitude of any component of $\nabla\vec{v}$ exceeds :yref:`maxStrainRate<Peri3dController.maxStrainRate>`, the whole tensor is scaled accordingly.
 
 '''

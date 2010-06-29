@@ -6,7 +6,7 @@
 from yade import post2d
 import pylab # the matlab-like interface of matplotlib
 
-loadFile='/tmp/uniax-tension.xml.bz2'
+loadFile='/tmp/uniax-tension.yade.gz'
 if not os.path.exists(loadFile): raise RuntimeError("Run uniax.py first so that %s is created"%loadFile)
 O.load(loadFile)
 

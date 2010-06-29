@@ -7,7 +7,6 @@ Standards-Version: 3.7.2
 
 Package: yade@_VERSION@
 Architecture: any
-Provides: yade@SNAPSHOT@
 Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
@@ -16,7 +15,6 @@ Description: Platform for dynamical modeling.
 
 Package: yade@_VERSION@-dbg
 Architecture: any
-Provides: yade@SNAPSHOT@-dbg
 Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, gdb, python-matplotlib, python-tk
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
@@ -25,10 +23,30 @@ Description: Platform for dynamical modeling.
 
 Package: yade@_VERSION@-doc
 Architecture: all
-Provides: yade@SNAPSHOT@-doc
 Recommends: yade@_VERSION@ | yade@_VERSION@-dbg
 Depends: 
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .
  This package contains examples, test scripts and documentation.
+
+Package: yade@SNAPSHOT@
+Architecture: all
+Depends: yade@_VERSION@
+Description: Platform for dynamical modeling.
+ This package depends on the latest
+ @'snapshot' if SNAPSHOT else 'stable release'@ of Yade.
+
+Package: yade@SNAPSHOT@-dbg
+Architecture: all
+Depends: yade@_VERSION@-dbg
+Description: Platform for dynamical modeling.
+ This package depends on the latest debug build of
+ @'snapshot' if SNAPSHOT else 'stable release'@ of Yade.
+
+Package: yade@SNAPSHOT@-doc
+Architecture: all
+Depends: yade@_VERSION@-doc
+Description: Platform for dynamical modeling.
+ This package depends on the latest documentation of
+ @'snapshot' if SNAPSHOT else 'stable release'@ of Yade.

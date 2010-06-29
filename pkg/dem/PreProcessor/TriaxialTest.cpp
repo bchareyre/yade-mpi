@@ -112,8 +112,7 @@ bool TriaxialTest::generate()
 
 	if(thickness<0) thickness=radiusMean;
 	if(facetWalls || wallWalls) thickness=0;
-	if(boxWalls)
-	{
+
 	// bottom box
 	 	Vector3r center		= Vector3r(
 	 						(lowerCorner[0]+upperCorner[0])/2,
@@ -205,7 +204,6 @@ bool TriaxialTest::generate()
 			triaxialcompressionEngine->wall_front_id = body->getId();
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
-	}
 	size_t imax=sphere_pack.pack.size();
 	for(size_t i=0; i<imax; i++){
 		const SpherePack::Sph& sp(sphere_pack.pack[i]);
@@ -345,8 +343,8 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialcompressionEngine->Key = Key;
 	triaxialcompressionEngine->noFiles=noFiles;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
-	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
-	triaxialcompressionEngine->fixedPoroCompaction = fixedPoroCompaction;	
+	triaxialcompressionEngine->fixedPoroCompaction = false;	
+	triaxialcompressionEngine->fixedPorosity=1;
 	// recording global stress
 	if(recordIntervalIter>0 && !noFiles){
 		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);

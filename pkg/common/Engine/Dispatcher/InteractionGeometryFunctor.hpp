@@ -46,6 +46,12 @@ class InteractionGeometryFunctor : 	public Functor2D
 					>
 {
 	public: virtual ~InteractionGeometryFunctor();
+	#ifdef YADE_DEVIRT_FUNCTORS
+		// type of the pointer to devirtualized functor (static method taking the functor instance as the first argument)
+		typedef bool(*StaticFuncPtr)(InteractionGeometryFunctor*, const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&);
+		// return devirtualized functor (static method); must be overridden in derived classes
+		virtual void* getStaticFuncPtr(){ throw runtime_error(("InteractionGeometryFunctor::getStaticFuncPtr() not overridden in class "+getClassName()+".").c_str()); }
+	#endif
 	YADE_CLASS_BASE_DOC(InteractionGeometryFunctor,Functor,"Functor for creating/updating :yref:`Interaction::interactionGeometry` objects.");
 };
 REGISTER_SERIALIZABLE(InteractionGeometryFunctor);

@@ -200,7 +200,7 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, b
 	Vector3r ScGeom::relRotVector() const{
 		Quaternionr relOri12=ori1.Conjugate()*ori2;
 		Quaternionr oriDiff=initRelOri12.Conjugate()*relOri12;
-		Vector3r axis; Real angle;
+			Vector3r axis; Real angle;
 		oriDiff.ToAxisAngle(axis,angle);
 		if(angle>Mathr::PI)angle-=Mathr::TWO_PI;
 		return angle*axis;

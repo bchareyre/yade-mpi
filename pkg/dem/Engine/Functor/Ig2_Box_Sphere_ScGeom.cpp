@@ -17,6 +17,10 @@
 
 
 
+#ifdef YADE_DEVIRT_FUNCTORS
+bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Box_Sphere_ScGeom::go, use getStaticFunctorPtr and call that function instead."); }
+bool Ig2_Box_Sphere_ScGeom::goStatic(InteractionGeometryFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+#else
 bool Ig2_Box_Sphere_ScGeom::go(
 		const shared_ptr<Shape>& cm1,
 		const shared_ptr<Shape>& cm2,
@@ -26,6 +30,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		const bool& force,
 		const shared_ptr<Interaction>& c)
 {
+#endif
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 
 	bool inside=true;

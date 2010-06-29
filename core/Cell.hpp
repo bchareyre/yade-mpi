@@ -69,11 +69,11 @@ class Cell: public Serializable{
 	//! Apply shear on point. 
 	Vector3r shearPt(const Vector3r& pt){ return _shearTrsf*pt; }
 	/*! Wrap point to inside the periodic cell; don't compute number of periods wrapped */
-	Vector3r wrapPt(const Vector3r pt)const{
+	Vector3r wrapPt(const Vector3r& pt)const{
 		Vector3r ret; for(int i=0;i<3;i++) ret[i]=wrapNum(pt[i],_size[i]); return ret;
 	}
 	/*! Wrap point to inside the periodic cell; period will contain by how many cells it was wrapped. */
-	Vector3r wrapPt(const Vector3r pt, Vector3i& period)const{
+	Vector3r wrapPt(const Vector3r& pt, Vector3i& period)const{
 		Vector3r ret; for(int i=0; i<3; i++){ ret[i]=wrapNum(pt[i],_size[i],period[i]); } return ret;
 	}
 	/*! Wrap number to interval 0…sz */
@@ -91,8 +91,11 @@ class Cell: public Serializable{
 	void setTrsf(const Matrix3r& m){ trsf=m; integrateAndUpdate(0); }
 
 	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY
-		(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
+
+	Vector3r wrapShearedPt_py(const Vector3r& pt){ return wrapShearedPt(pt);}
+	Vector3r wrapPt_py(const Vector3r& pt){ return wrapPt(pt);}
+	
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		((Vector3r,refSize,Vector3r(1,1,1),"[will be overridden below]"))
 		((Matrix3r,trsf,Matrix3r::Identity(),"[will be overridden below]"))
 		((Matrix3r,velGrad,Matrix3r::Zero(),"Velocity gradient of the transformation; used in NewtonIntegrator."))
@@ -104,6 +107,13 @@ class Cell: public Serializable{
 		/* accessors that ensure cache coherence */
 		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell.")
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Transformation matrix of the cell.")
+		// debugging only
+		.def("wrap",&Cell::wrapShearedPt_py,"Transform an arbitrary point into a point in the reference cell")
+		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
+		.def("shearPt",&Cell::shearPt,"Apply shear (cell skew+rot) on the point")
+		.def("wrapPt",&Cell::wrapPt_py,"Wrap point inside the reference cell, assuming the cell has no skew+rot.")
+		.def_readonly("shearTrsf",&Cell::_shearTrsf,"Current skew+rot transformation (no resize)")
+		.def_readonly("unshearTrsf",&Cell::_shearTrsf,"Inverse of the current skew+rot transformation (no resize)")
 	);
 };
 REGISTER_SERIALIZABLE(Cell);

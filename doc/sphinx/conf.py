@@ -445,7 +445,7 @@ my_latex_preamble=r'''
 
 '''
 
-pngmath_latex_preamble=r'\usepackage[active]{preview}\usepackage{amsmath}\usepackage{amssymb}'+my_latex_preamble
+pngmath_latex_preamble=r'\usepackage[active]{preview}'+my_latex_preamble
 
 pngmath_use_preview=True
 

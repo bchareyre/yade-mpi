@@ -4,7 +4,21 @@
 Module containing utility functions for plotting inside yade. See :ysrc:`scripts/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
 
 """
-import matplotlib
+import matplotlib,os
+# running in batch
+#
+# If GtkAgg is the default, X must be working, which is not the case
+# with batches (DISPLAY is unset in such case) and importing pylab fails then.
+#
+# Agg does not require the GUI part and works withou any DISPLAY active
+# just fine.
+#
+# see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg04320.html 
+# and https://lists.launchpad.net/yade-users/msg03289.html
+#
+if os.environ.has_key('PARAM_TABLE'):
+	matplotlib.use('Agg')
+
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKCairo')
 #matplotlib.use('QtAgg')

@@ -33,7 +33,7 @@ yade.%s module
 #
 # don't forget to put the module in index.rst as well!
 #
-mods={'eudoxos':['_eudoxos'],'log':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb','_packSpherePadder'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'qt':['_qt'],'linterpolation':[]}
+mods={'export':[],'eudoxos':['_eudoxos'],'log':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb','_packSpherePadder'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'qt':['_qt'],'linterpolation':[]}
 #
 # generate documentation, in alphabetical order
 mm=mods.keys(); mm.sort()
@@ -60,6 +60,7 @@ def autodocClass(klass):
 	docClasses.add(klass)
 	return ".. autoclass:: %s\n\t:members:\n\t:undoc-members:\n\n"%(klass) # \t:inherited-members:\n # \n\t:show-inheritance:
 def autodocDerived(klass,doSections=True):
+	global docClasses
 	ret=''
 	if doSections: ret+='%s\n'%klass+'^'*100+'\n\n'
 	#ret+='.. inheritance-diagram:: %s\n\n'%klass
@@ -68,22 +69,29 @@ def autodocDerived(klass,doSections=True):
 	childs=list(yade.system.childClasses(klass));
 	childs.sort();
 	for k in childs:
-		ret+=autodocClass(k)
+		if not k in docClasses: ret+=autodocClass(k)
 	return ret
 def inheritanceDiagram(klass):
-	"Generate simple inheritance graph for given classname *klass* using dot (http://www.graphviz.org) syntax."
+	"""Generate simple inheritance graph for given classname *klass* using dot (http://www.graphviz.org) syntax.
+	Classes in the docClasses set (already documented) are framed differently and the inheritance tree stops there.
+	"""
+	global docClasses
 	def mkUrl(c):
 		global writer
 		# useless, doesn't work in LaTeX anyway...
 		return ('#yade.wrapper.%s'%c if writer=='html' else '%%yade.wrapper#yade.wrapper.%s'%c) # HTML/LaTeX
-	def mkNode(c): return '\t\t"%s" [shape="box",fontsize=8,style="setlinewidth(0.5)",height=0.2,URL="yade.wrapper.html#yade.wrapper.%s"];\n'%(c,c)
+	def mkNode(c,style='solid',fillcolor=None): return '\t\t"%s" [shape="box",fontsize=8,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#yade.wrapper.%s"];\n'%(c,style,'fillcolor=%s,'%fillcolor if fillcolor else '',c)
 	ret=".. graphviz::\n\n\tdigraph %s {\n\t\trankdir=RL;\n\t\tmargin=.2;\n"%klass+mkNode(klass)
 	childs=yade.system.childClasses(klass)
 	if len(childs)==0: return ''
 	for c in childs:
 		try:
 			base=eval(c).__bases__[0].__name__
-			ret+=mkNode(c)
+			if base!=klass and base in docClasses:
+				continue # skip classes deriving from classes that are already documented
+			if c not in docClasses: ret+=mkNode(c)
+			else: # classes of which childs are documented elsewhere are marked specially
+				ret+=mkNode(c,style='filled,dashed',fillcolor='grey')
 			ret+='\t\t"%s" -> "%s" [arrowsize=0.5,style="setlinewidth(0.5)"];\n'%(c,base)
 		except NameError:
 			pass
@@ -91,11 +99,15 @@ def inheritanceDiagram(klass):
 	return ret+'\t}\n\n'
 
 
-def sect(title,text,tops):
-	return title+'\n'+100*'-'+'\n\n'+text+'\n\n'+'\n\n'.join([autodocDerived(top,doSections=(len(tops)>1)) for top in tops])+'\n'
+def sect(title,text,tops,reverse=False):
+	subsects=[autodocDerived(top,doSections=(len(tops)>1)) for top in tops]
+	if reverse: subsects.reverse()
+	return title+'\n'+100*'-'+'\n\n'+text+'\n\n'+'\n\n'.join(subsects)+'\n'
 
 
 def genWrapperRst():
+	global docClasses
+	docClasses=set() # reset globals
 	wrapper=file('yade.wrapper.rst','w')
 	wrapper.write(""".. _yade.wrapper
 Class reference (yade.wrapper module)
@@ -111,7 +123,7 @@ Class reference (yade.wrapper module)
 """+
 	sect('Bodies','',['Body','Shape','State','Material','Bound'])+
 	sect('Interactions','',['Interaction','InteractionGeometry','InteractionPhysics'])+
-	sect('Global engines','',['GlobalEngine'])+
+	sect('Global engines','',['FieldApplier','Collider','BoundaryController','GlobalEngine'],reverse=True)+
 	sect('Partial engines','',['PartialEngine'])+
 	sect('Bounding volume creation','',['BoundFunctor','BoundDispatcher'])+
 	sect('Interaction Geometry creation','',['InteractionGeometryFunctor','InteractionGeometryDispatcher'])+

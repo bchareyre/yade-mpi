@@ -266,9 +266,10 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 		rDev*=scale; X*=scale; Y*=scale; Z*=scale
 		memoDbgMsg("Considering packing (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(R,.5*rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp))))
 		if not isPeri and wantPeri: memoDbgMsg("REJECT: is not periodic, which is requested."); continue
+		if wantPeri and (X/x1>0.9 or X/x1<0.6):  memoDbgMsg("REJECT: initSize differs too much from scaled packing size."); continue
 		if (rRelFuzz==0 and rDev!=0) or (rRelFuzz!=0 and rDev==0) or (rRelFuzz!=0 and abs((rDev-rRelFuzz)/rRelFuzz)>1e-2): memoDbgMsg("REJECT: radius fuzz differs too much (%g, %g desired)"%(rDev,rRelFuzz)); continue # radius fuzz differs too much
 		if isPeri and wantPeri:
-			if spheresInCell>NN: memoDbgMsg("REJECT: Number of spheres in the packing too small"); continue
+			if spheresInCell>NN and spheresInCell>0: memoDbgMsg("REJECT: Number of spheres in the packing too small"); continue
 			if abs((y1/x1)/(Y/X)-1)>0.3 or abs((z1/x1)/(Z/X)-1)>0.3: memoDbgMsg("REJECT: proportions (y/x=%g, z/x=%g) differ too much from what is desired (%g, %g)."%(Y/X,Z/X,y1/x1,z1/x1)); continue
 		else:
 			if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): memoDbgMsg("REJECT: not large enough"); continue # not large enough
@@ -420,7 +421,7 @@ def randomPeriPack(radius,rRelFuzz,initSize,memoizeDb=None):
 	O.run(); O.wait()
 	ret=SpherePack()
 	ret.fromSimulation()
-	_memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri=True,fullDim=Vector3(0,0,0)) # fullDim unused
+	_memoizePacking(memoizeDb,ret,radius,rRelFuzz,wantPeri=True,fullDim=Vector3(0,0,0)) # fullDim unused
 	O.switchScene()
 	return ret
 

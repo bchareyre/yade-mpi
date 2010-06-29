@@ -59,7 +59,7 @@ void InteractionDispatchers::action(){
 		for(long i=0; i<size; i++){
 			const shared_ptr<Interaction>& I=(*scene->interactions)[i];
 	#else
-		FOREACH(shared_ptr<Interaction> I, *scene->interactions){
+		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 	#endif
 		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->currentIteration) {
 			eraseAfterLoop(I->getId1(),I->getId2());
@@ -80,13 +80,19 @@ void InteractionDispatchers::action(){
 		// InteractionGeometryDispatcher
 		if(!I->functorCache.geom || !I->functorCache.phys){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
-			// returns NULL ptr if no functor exists; remember that and shortcut
-			if(!I->functorCache.geom) { I->functorCache.geomExists=false; continue; }
+			#ifdef YADE_DEVIRT_FUNCTORS
+				if(I->functorCache.geom){ I->functorCache.geomPtr=I->functorCache.geom->getStaticFuncPtr(); /* cerr<<"["<<I->functorCache.geomPtr<<"]"; */ }
+				else
+			#else
+				if(!I->functorCache.geom)
+			#endif
+					// returns NULL ptr if no functor exists; remember that and shortcut
+					{I->functorCache.geomExists=false; continue; }
 		}
 		// arguments for the geom functor are in the reverse order (dispatcher would normally call goReverse).
 		// we don't remember the fact that is reverse, so we swap bodies within the interaction
 		// and can call go in all cases
-		if(swap){I->swapOrder();}
+		if(swap){I->swapOrder(); }
 		// body pointers must be updated, in case we swapped
 		const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
@@ -94,21 +100,22 @@ void InteractionDispatchers::action(){
 		assert(I->functorCache.geom);
 		bool wasReal=I->isReal();
 		bool geomCreated;
-		if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
-		else{ // handle periodicity
+		if(!scene->isPeriodic){
+			#ifdef YADE_DEVIRT_FUNCTORS
+				geomCreated=(*((InteractionGeometryFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
+			#else
+				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
+			#endif
+		} else { // handle periodicity
 			Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
-
 			// in sheared cell, apply shear on the mutual position as well
 			shift2=scene->cell->shearPt(shift2);
-			/* suggested change to avoid one matrix multiplication (with Hsize updated in cell ofc), I'll make the change cleanly if ok.
-				Same sorts of simplifications are possible in many places. Just putting one example here.
-				Hsize will contain colums with transformed base vectors
-				Matrix3r Hsize(scene->cell->refSize[0],scene->cell->refSize[1],scene->cell->refSize[2]); Hsize=scene->cell->trsf*Hsize;
-				Vector3r shift3((Real) I->cellDist[0]*Hsize.GetColumn(0)+(Real)I->cellDist[1]*Hsize.GetColumn(1)+(Real)I->cellDist[2]*Hsize.GetColumn(2));
-				if ((Omega::instance().getCurrentIteration() % 100 == 0)) LOG_DEBUG(shift2 << " vs " << shift3);
-			*/
-
-			geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
+			#ifdef YADE_DEVIRT_FUNCTORS
+				// cast back from void* first
+				geomCreated=(*((InteractionGeometryFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
+			#else
+				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
+			#endif
 		}
 		if(!geomCreated){
 			if(wasReal) LOG_WARN("InteractionGeometryFunctor returned false on existing interaction!");

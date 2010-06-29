@@ -258,16 +258,23 @@ void Peri3dController::update(){
 	Matrix3r rot,nonrot; //nonrot=skew+normal deformation
 	const Matrix3r& trsf=scene->cell->trsf;
 	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot);
-	// FIXME: should be rot*(log(nonrot)), but matrix logarithm is not yet implemented in eigen
-	strain=rot*(nonrot-Matrix3r::Identity());
+	// compute matrix logarithm (see documentation)
+	Eigen::SelfAdjointEigenSolver<Matrix3r> eigDec(nonrot);
+	strain=rot*eigDec.eigenvectors()*eigDec.eigenvalues().cwise().log().asDiagonal()*eigDec.eigenvectors().transpose();
+	#if 0
+		// small strains only
+		strain=rot*(nonrot-Matrix3r::Identity());
+	#endif
 	LOG_TRACE("Updated strain value\n"<<strain);
 	/* stress and stiffness
 	*/
 	K=Matrix6r::Zero();
 	stress=Matrix3r::Zero();
 	const Real volume=scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
+	int nIntr=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
+		nIntr++;
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
 		// not clear whether this should be the reference or the current distance
@@ -299,7 +306,7 @@ void Peri3dController::update(){
 	stress/=volume;
 	K/=volume;
 	for(int p=0; p<6; p++)for(int q=p+1;q<6;q++) K(q,p)=K(p,q);
-	LOG_TRACE("Updated stress\n"<<stress);
+	LOG_TRACE("Updated stress (from "<<nIntr<<" interactions)\n"<<stress);
 	LOG_TRACE("Updated stiffness tensor\n"<<K);
 }
 
@@ -308,6 +315,7 @@ void Peri3dController::action(){
 	update();
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
+	const Real& dt=scene->dt;
 	/* 
 	sigma = K * eps
 
@@ -336,12 +344,12 @@ void Peri3dController::action(){
 	for(int j=0; j<6; j++){
 		// prescribed stress, i.e. un-prescribed strain
 		if(stressMask&(1<<j)){
-			sigU[jU]=goal(mapI[j],mapJ[j]);
+			sigU[jU]=(1/dt)*(goal(mapI[j],mapJ[j])-stress(mapI[j],mapJ[j]));
 			int iU=0;
 			for(int i=0;i<6;i++){ if((stressMask&(1<<i))) Kuu(iU++,jU)=K(i,j);}
 			jU++;
 		} else {
-			epsP[jP]=(j<3?1.:2.)*goal(mapI[j],mapJ[j]); /* multiply tensor shear by 2, see http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations */
+			epsP[jP]=(1/dt)*(j<3?1.:2.)*(goal(mapI[j],mapJ[j])-strain(mapI[j],mapJ[j])); /* multiply tensor shear by 2, see http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations */
 			int iP=0;
 			for(int i=0;i<6;i++){ if((stressMask&(1<<i))) Kup(iP++,jP)=K(i,j);}
 			jP++;
@@ -354,9 +362,9 @@ void Peri3dController::action(){
 	// FIXME: find a better way for this than determinant (expensive for larger matrices)
 	if(Kuu.rows()*Kuu.cols()>0 && Kuu.determinant()<1e-20){ Kuu+=MatrixXr(Kuu.cols(),Kuu.rows()).setIdentity(); LOG_TRACE("Kuu after sanitization\n"<<Kuu); }
 	epsU=Kuu.inverse()*(sigU-Kup*epsP);
-	// assemble strain tensor (as matrix), from prescribed values epsP and computed values epsU
+	// assemble strain rate tensor (as matrix), from prescribed values epsP and computed values epsU
 	jU=0; jP=0;
-	Matrix3r eps;
+	Matrix3r eps; // rate!
 	for(int j=0; j<6; j++){
 		if(stressMask&(1<<j)) eps(mapI[j],mapJ[j])=epsU[jU++];
 		else eps(mapI[j],mapJ[j])=(j<3?1.:.5)*epsP[jP++]; /* multiply shear components back by 1/2 when converting from Voigt vector back to tensor */
@@ -364,7 +372,7 @@ void Peri3dController::action(){
 	eps(2,1)=eps(1,2); eps(0,2)=eps(2,0); eps(1,0)=eps(0,1);
 	Matrix3r& velGrad=scene->cell->velGrad;
 	// rate of (goal strain - current strain)
-	velGrad=(eps-strain)/scene->dt;
+	velGrad=eps;
 	Real mx=max(abs(velGrad.minCoeff()),abs(velGrad.maxCoeff()));
 	if(mx>abs(maxStrainRate)) velGrad*=abs(maxStrainRate)/mx;
 	LOG_TRACE("epsU=\n"<<epsU<<"\neps=\n"<<"\nabs(maxCoeff)="<<mx<<"\nvelGrad=\n"<<velGrad);

@@ -7,7 +7,6 @@
 #include"InteractionPhysics.hpp"
 
 
-
 /////////////////////////////////
 // FIXME - this is in wrong file!
 //#include<boost/strong_typedef.hpp>
@@ -49,6 +48,11 @@ class Interaction : public Serializable
 			// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
 			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
 			bool geomExists;
+			#ifdef YADE_DEVIRT_FUNCTORS
+				// is a InteractionGeometryFunctor::StaticFuncPtr, but we would have to #include a file from pkg-common here
+				// cast at those few places instead, for now
+				void* geomPtr;
+			#endif
 			// shared_ptr's are initialized to NULLs automagically
 			shared_ptr<InteractionGeometryFunctor> geom;
 			shared_ptr<InteractionPhysicsFunctor> phys;

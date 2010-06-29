@@ -87,6 +87,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	//xyPlaneConstraint->setRotationConstraint(qglviewer::AxisPlaneConstraint::FORBIDDEN,qglviewer::Vec(0,0,1));
 	manipulatedFrame()->setConstraint(NULL);
 
+	setKeyDescription(Qt::Key_A,"Toggle visibility of global axes.");
 	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
 	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
@@ -228,6 +229,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	if(false){}
 	/* special keys: Escape and Space */
 	//else if(e->key()==Qt::Key_F9 || e->key()==Qt::Key_F10 || e->key()==Qt::Key_F11 || e->key()==Qt::Key_F12){ YadeQtMainWindow::self->closeView(this); }
+	else if(e->key()==Qt::Key_A){ toggleAxisIsDrawn(); return; }
 	else if(e->key()==Qt::Key_Escape){
 		if(!isManipulating()){ /* CRASH, deleting this: YadeQtMainWindow::self->closeView(this); */ return; }
 		else { resetManipulation(); displayMessage("Manipulating scene."); }

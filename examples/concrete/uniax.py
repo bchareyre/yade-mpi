@@ -53,7 +53,7 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	dtSafety=.8,
 	damping=0.4,
 	strainRateTension=.05,
-	strainRateCompression=1,
+	strainRateCompression=.5,
 	setSpeeds=True,
 	# 1=tension, 2=compression (ANDed; 3=both)
 	doModes=3,
@@ -97,7 +97,7 @@ O.engines=[
 	NewtonIntegrator(damping=damping,label='damper'),
 	CpmStateUpdater(realPeriod=1),
 	UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
-	PeriodicPythonRunner(virtPeriod=3e-5/strainRateTension,realPeriod=1,command='addPlotData()',label='plotDataCollector',initRun=True),
+	PeriodicPythonRunner(virtPeriod=1e-6/strainRateTension,realPeriod=1,command='addPlotData()',label='plotDataCollector',initRun=True),
 	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
@@ -117,7 +117,7 @@ def initTest():
 	global mode
 	print "init"
 	if O.iter>0:
-		O.pause(); O.wait();
+		O.wait();
 		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
 	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
@@ -147,9 +147,9 @@ def stopIfDamaged():
 	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>(5e-3 if isoPrestress==0 else 5e-2):
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
-			O.save('/tmp/uniax-tension.xml.bz2')
-			print "Saved /tmp/uniax-tension.xml.bz2 (for use with interaction-histogram.py and uniax-post.py)"
-			print "Damaged, switching to compression... "
+			O.save('/tmp/uniax-tension.yade.gz')
+			print "Saved /tmp/uniax-tension.yade.gz (for use with interaction-histogram.py and uniax-post.py)"
+			print "Damaged, switching to compression... "; O.pause()
 			# important! initTest must be launched in a separate thread;
 			# otherwise O.load would wait for the iteration to finish,
 			# but it would wait for initTest to return and deadlock would result
@@ -162,8 +162,8 @@ def stopIfDamaged():
 			title=O.tags['description'] if 'description' in O.tags.keys() else O.tags['params']
 			print 'gnuplot',plot.saveGnuplot(O.tags['id'],title=title)
 			print 'Bye.'
-			# O.pause()
-			sys.exit(0)
+			O.pause()
+			#sys.exit(0)
 		
 def addPlotData():
 	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer.strain,'sigma':strainer.avgStress+isoPrestress,

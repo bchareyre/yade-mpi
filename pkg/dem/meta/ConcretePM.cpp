@@ -250,31 +250,30 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 	bool Gl1_CpmPhys::epsT=false;
 	bool Gl1_CpmPhys::epsTAxes=false;
 	bool Gl1_CpmPhys::normal=false;
-	bool Gl1_CpmPhys::colorStrain=false;
+	Real Gl1_CpmPhys::colorStrainRatio=-1;
 
 
 	void Gl1_CpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		const shared_ptr<CpmPhys>& BC=static_pointer_cast<CpmPhys>(ip);
 		const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
+		// FIXME: get the scene for periodicity; ugly!
+		Scene* scene=Omega::instance().getScene().get();
 
 		//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
 		Vector3r lineColor=Shop::scalarOnColorScale(1.-BC->relResidualStrength);
 
-		if(colorStrain) lineColor=Vector3r(
-			min((Real)1.,max((Real)0.,-BC->epsTrans/BC->epsCrackOnset)),
-			min((Real)1.,max((Real)0.,BC->epsTrans/BC->epsCrackOnset)),
-			min((Real)1.,max((Real)0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
+		if(colorStrainRatio>0) lineColor=Shop::scalarOnColorScale(BC->epsN/(BC->epsCrackOnset*colorStrainRatio));
 
 		// FIXME: should be computed by the renderer; for now, use the real values
-		const Se3r& dispSe31=b1->state->se3;
-		const Se3r& dispSe32=b2->state->se3;
+		Vector3r dispPt1=geom->se31.position, dispPt2=geom->se32.position;
+		if(scene->isPeriodic){ dispPt1=scene->cell->wrapShearedPt(dispPt1); dispPt2=dispPt1+(geom->se32.position-geom->se31.position); }
 
-		if(contactLine) GLUtils::GLDrawLine(dispSe31.position,dispSe32.position,lineColor);
-		if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(dispSe32.position+dispSe32.position),lineColor); }
-		else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(dispSe31.position+dispSe32.position),lineColor); }
+		if(contactLine) GLUtils::GLDrawLine(dispPt1,dispPt2,lineColor);
+		if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(dispPt1+dispPt2),lineColor); }
+		else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(dispPt1+dispPt2),lineColor); }
 		if(BC->omega>0 && dmgPlane){
 			Real halfSize=sqrt(1-BC->relResidualStrength)*.5*.705*sqrt(BC->crossSection);
-			Vector3r midPt=.5*Vector3r(dispSe31.position+dispSe32.position);
+			Vector3r midPt=.5*Vector3r(dispPt1+dispPt2);
 			glDisable(GL_CULL_FACE);
 			glPushMatrix();
 				glTranslatev(midPt);
@@ -293,7 +292,8 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 			glPopMatrix();
 		}
 
-		const Vector3r& cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
+		Vector3r cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
+		if(scene->isPeriodic){cp=scene->cell->wrapShearedPt(cp);}
 		if(epsT){
 			Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
 			Real relShear=BC->epsT.norm()/maxShear;

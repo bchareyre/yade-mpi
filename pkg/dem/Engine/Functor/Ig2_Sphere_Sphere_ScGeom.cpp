@@ -10,11 +10,18 @@
 #include<yade/lib-base/Math.hpp>
 #include<yade/core/Omega.hpp>
 
+#ifdef YADE_DEVIRT_FUNCTORS
+bool Ig2_Sphere_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_Sphere_ScGeom::go, use getStaticFunctorPtr and call that function instead."); }
+bool Ig2_Sphere_Sphere_ScGeom::goStatic(InteractionGeometryFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+	const Ig2_Sphere_Sphere_ScGeom* self=static_cast<Ig2_Sphere_Sphere_ScGeom*>(_self);
+	const Real& interactionDetectionFactor=self->interactionDetectionFactor;
+#else
 bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 							const shared_ptr<Shape>& cm2,
 							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
 							const shared_ptr<Interaction>& c)
 {
+#endif
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 
 	Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
@@ -43,6 +50,7 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 	}
 	return false;
 }
+
 
 bool Ig2_Sphere_Sphere_ScGeom::goReverse(	const shared_ptr<Shape>& cm1,
 								const shared_ptr<Shape>& cm2,

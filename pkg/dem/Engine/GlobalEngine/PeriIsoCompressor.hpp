@@ -41,6 +41,7 @@ strainStress[0] and strainStress[2] are stress values, and strainStress[1] is st
 See scripts/test/periodic-triax.py for a simple example.
 
 */
+
 class PeriTriaxController: public BoundaryController{
 	public:
 		virtual void action();
@@ -85,7 +86,7 @@ class Peri3dController: public BoundaryController{
 	YADE_CLASS_BASE_DOC_ATTRS(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Detailed documentation is in py/_extraDocs.py.",
 		((Matrix3r,strain,Matrix3r::Zero(),"Current deformation tensor |yupdate|"))
 		((Matrix3r,stress,Matrix3r::Zero(),"Current stress tensor |yupdate|"))
-		((Matrix3r,goal,Matrix3r::Zero(),"Goal state."))
+		((Matrix3r,goal,Matrix3r::Zero(),"Goal state; only the upper triangular matrix is considered; each component is either prescribed stress or strain, depending on :yref:`stressMask<Peri3dController.stressMask>`."))
 		((int,stressMask,((void)"all strains",0),"mask determining whether components of :yref:`goal<Peri3dController.goal>` are strain (0) or stress (1). The order is 00,11,22,12,02,01 from the least significant bit. (e.g. 0b000011 is stress 00 and stress 11)."))
 		((Real,maxStrainRate,1,"Maximum absolute value of strain rate (both normal and shear components of :yref:`Cell.velGrad`)"))
 		// not yet used

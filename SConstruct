@@ -139,11 +139,12 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','never_use_this_one']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
 	EnumVariable('linkStrategy','How to link plugins together',defOptions['linkStrategy'],['per-class','per-pkg[broken]','monolithic','static[broken]']),
+	('hotPlugins','Files (without the .cpp extension) that will be compiled separately even in the monolithic build (use for those that you modify frequently); comma-separated.',''),
 	('chunkSize','Maximum files to compile in one translation unit when building plugins. (unlimited if <= 0)',7,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
@@ -577,7 +578,7 @@ env.Append(BUILDERS = {'Combine': env.Builder(action = SCons.Action.Action(combi
 
 import yadeSCons
 allPlugs=yadeSCons.scanAllPlugins(None,feats=env['features'])
-buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['linkStrategy'])
+buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['linkStrategy'],env['hotPlugins'].split(','))
 def linkPlugins(plugins):
 	"""Given list of plugins we need to link to, return list of real libraries that we should link to."""
 	ret=set()
