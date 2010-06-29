@@ -15,9 +15,9 @@ Generating yade documentation
 
 2. Python default encoding must be set to utf-8. As it is not the default, PYTHONPATH=. is used to make Python import local sitecustomize.py file at startup which changes this setting. (The value cannot be set after startup, from within the script)
 
-3. Run (from the current directory)
+3. Run (from the current directory, replacing PREFIX by the yade install path)
 
-	PYTHONPATH=. ../../../bin/yade-xxx-xxx yadeSphinx.py [optional outDir; _build by default]
+	PYTHONPATH=. PREFIX/bin/yade-xxx-xxx yadeSphinx.py [optional outDir; _build by default]
 
 It will be create/update $outDir/{html,latex}. The latex file (Yade.tex) is to be processed with xelatex (rather than latex). See README.latex for details.
 
