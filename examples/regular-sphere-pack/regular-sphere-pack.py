@@ -47,24 +47,26 @@ for part in [
 
 
 # Example of utils.facetBox usage 
-q1 = Quaternion(Vector3(0,0,1),(3.14159/3))
-O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),q1,**kwBoxes))
+oriBody = Quaternion(Vector3(0,0,1),(3.14159/3))
+O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-q1 = Quaternion(Vector3(0,0,1),(3.14159/2))
-O.bodies.append(utils.facetBox((0,12,-6+0.9),(1,0.7,0.9),q1,**kwBoxes))
+oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+O.bodies.append(utils.facetBox((0,12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-q1 = Quaternion(Vector3(0,0,1),(3.14159))
-O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),q1,**kwBoxes))
+oriBody = Quaternion(Vector3(0,0,1),(3.14159))
+O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
 # Example of utils.facetCylinder usage, RotationEngine example see below
-q1 = Quaternion(Vector3(0,0,1),(3.14159/2))
-rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,q1,wallMask=4,segmentsNumber=10,**kwBoxes))
+oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,oriBody,wallMask=4,segmentsNumber=10,**kwBoxes))
 
 # Import regular-sphere-pack.mesh into the YADE simulation
-O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
+oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',orientation=oriBody,**kwMeshes))#generates facets from the mesh file
 
 # Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation
-O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=[-7.0,-7.0,-5.9],scale=1.0,color=(1,0,1),**kw))
+oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,-5.9),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
 
 # spheresToFile saves coordinates and radii of all spheres of the simulation into the text file
 #print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
