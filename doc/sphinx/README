@@ -17,7 +17,7 @@ Generating yade documentation
 
 3. Run (from the current directory)
 
-	PYTHONPATH=. yade yadeSphinx.py [optional outDir; _build by default]
+	PYTHONPATH=. ../../../bin/yade-xxx-xxx yadeSphinx.py [optional outDir; _build by default]
 
 It will be create/update $outDir/{html,latex}. The latex file (Yade.tex) is to be processed with xelatex (rather than latex). See README.latex for details.
 
