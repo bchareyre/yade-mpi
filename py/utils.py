@@ -266,7 +266,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	b.mask=mask
 	return b
 
-def facetBox(center,extents,orientation=Quaternion().Identity,wallMask=63,**kw):
+def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	"""
 	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
@@ -306,15 +306,15 @@ def facetBox(center,extents,orientation=Quaternion().Identity,wallMask=63,**kw):
 	def doWall(a,b,c,d):
 		return [facet((a,b,c),**kw),facet((a,c,d),**kw)]
 	ret=[]
-	qTemp = Quaternion(Vector3(orientation[0],orientation[1],orientation[2]),orientation[3])
-	A=qTemp.Rotate(Vector3(mn[0],mn[1],mn[2]))+center
-	B=qTemp.Rotate(Vector3(mx[0],mn[1],mn[2]))+center
-	C=qTemp.Rotate(Vector3(mx[0],mx[1],mn[2]))+center
-	D=qTemp.Rotate(Vector3(mn[0],mx[1],mn[2]))+center
-	E=qTemp.Rotate(Vector3(mn[0],mn[1],mx[2]))+center
-	F=qTemp.Rotate(Vector3(mx[0],mn[1],mx[2]))+center
-	G=qTemp.Rotate(Vector3(mx[0],mx[1],mx[2]))+center
-	H=qTemp.Rotate(Vector3(mn[0],mx[1],mx[2]))+center
+
+	A=orientation*Vector3(mn[0],mn[1],mn[2])+center
+	B=orientation*Vector3(mx[0],mn[1],mn[2])+center
+	C=orientation*Vector3(mx[0],mx[1],mn[2])+center
+	D=orientation*Vector3(mn[0],mx[1],mn[2])+center
+	E=orientation*Vector3(mn[0],mn[1],mx[2])+center
+	F=orientation*Vector3(mx[0],mn[1],mx[2])+center
+	G=orientation*Vector3(mx[0],mx[1],mx[2])+center
+	H=orientation*Vector3(mn[0],mx[1],mx[2])+center
 	if wallMask&1:  ret+=doWall(A,D,H,E)
 	if wallMask&2:  ret+=doWall(B,F,G,C)
 	if wallMask&4:  ret+=doWall(A,E,F,B)
@@ -368,8 +368,8 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 		P1.append(Vector3(X,Y,-height/2))
 		P2.append(Vector3(X,Y,+height/2))
 	for i in range(0,len(P1)):
-		P1[i]=orientation*(P1[i])+Vector3(center[0],center[1],center[2])
-		P2[i]=orientation*(P2[i])+Vector3(center[0],center[1],center[2])
+		P1[i]=orientation*P1[i]+center
+		P2[i]=orientation*P2[i]+center
 		
 	ret=[]
 	for i in range(2,len(P1)):
