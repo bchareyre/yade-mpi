@@ -238,6 +238,7 @@ class InteractionLocator{
 		Scene* scene=Omega::instance().getScene().get();
 		locator=vtkPointLocator::New();
 		points=vtkPoints::New();
+		int count=0;
 		FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 			if(!i->isReal()) continue;
 			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->interactionGeometry.get());
@@ -246,7 +247,9 @@ class InteractionLocator{
 			int id=points->InsertNextPoint(cp[0],cp[1],cp[2]);
 			if(intrs.size()<=(size_t)id){intrs.resize(id+1000);}
 			intrs[id]=i;
+			count++;
 		}
+		if(count==0) throw std::runtime_error("Zero interactions when constructing InteractionLocator!");
 		double bb[6];
 		points->ComputeBounds(); points->GetBounds(bb);
 		mn=Vector3r(bb[0],bb[2],bb[4]); mx=Vector3r(bb[1],bb[3],bb[5]);

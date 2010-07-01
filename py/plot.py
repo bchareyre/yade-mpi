@@ -98,7 +98,10 @@ def plot(noShow=False):
 	You can use 
 	
 		>>> from yade import plot
-		>>> plot.plot(noShow=True).saveFig('someFile.pdf')
+		>>> plot.plot(noShow=True).savefig('someFile.pdf')
+		>>> import os
+		>>> os.path.exists('someFile.pdf')
+		True
 		
 	to save the figure to file automatically.
 	"""

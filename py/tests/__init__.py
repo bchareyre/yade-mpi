@@ -1,10 +1,14 @@
 # encoding: utf-8
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 """All defined functionality tests for yade."""
-import unittest 
+import unittest,inspect
 
 # add any new test suites to the list here, so that they are picked up by testAll
 allTests=['wrapper','omega']
+
+# all yade modules (ugly...)
+import yade.eudoxos,yade.export,yade.linterpolation,yade.log,yade.pack,yade.plot,yade.post2d,yade.qt,yade.timing,yade.utils,yade.ymport
+allModules=(yade.eudoxos,yade.export,yade.linterpolation,yade.log,yade.pack,yade.plot,yade.post2d,yade.qt,yade.timing,yade.utils,yade.ymport)
 
 # fully qualified module names
 allTestsFQ=['yade.tests.'+test for test in allTests]
@@ -24,8 +28,8 @@ def testAll():
 	TestResult object for further examination."""
 	suite=unittest.defaultTestLoader.loadTestsFromNames(allTestsFQ)
 	import doctest
-	import yade.utils
-	suite.addTest(doctest.DocTestSuite(yade.utils))
+	for mod in allModules:
+		suite.addTest(doctest.DocTestSuite(mod))
 	return unittest.TextTestRunner(verbosity=2).run(suite)
 
 	

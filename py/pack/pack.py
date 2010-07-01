@@ -47,6 +47,56 @@ from _packSpheres import *
 from _packObb import *
 from _packSpherePadder import *
 
+##
+# extend _packSphere.SpherePack c++ class by this method
+##
+def SpherePack_toSimulation(self,rot=Matrix3.Identity,**kw):
+	ur"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
+this method also appropriately sets periodic cell information of the simulation.
+
+:param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
+:param **kw: passed to :yref:`yade.utils.sphere`
+:return: list of body ids added (like :yref:`O.bodies.append<BodyContainer.append>`)
+
+	>>> from yade import pack; from math import *
+	>>> sp=pack.SpherePack()
+
+Create random periodic packing with 20 spheres:
+
+	>>> sp.makeCloud((0,0,0),(5,5,5),rMean=.5,rRelFuzz=.5,periodic=True,num=20)
+	20
+
+Virgin simulation is aperiodic:
+
+	>>> O.reset()
+	>>> O.periodic
+	False
+
+Add generated packing to the simulation, rotated by 45° along +z
+
+	>>> sp.toSimulation(rot=Quaternion((0,0,1),pi/4),color=(0,0,1))
+	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+
+Periodic properties are transferred to the simulation correctly:
+
+	>>> O.periodic
+	True
+	>>> O.cell.refSize
+	Vector3(5,5,5)
+	>>> O.cell.trsf
+	Matrix3(0.707107,-0.707107,0, 0.707107,0.707107,0, 0,0,1)
+
+"""
+	if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
+	assert(isinstance(rot,Matrix3))
+	if self.cellSize!=Vector3.Zero:
+		O.periodic=True
+		O.cell.trsf=rot
+		O.cell.refSize=self.cellSize
+	return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
+
+SpherePack.toSimulation=SpherePack_toSimulation
+
 
 class inGtsSurface_py(Predicate):
 	"""This class was re-implemented in c++, but should stay here to serve as reference for implementing

@@ -31,8 +31,17 @@ class IntrSmooth3d():
 
 	To get the averaged value, simply call the instance, passing central point and callable object which received interaction object and returns the desired quantity:
 
-		>>> is3d=IntrSmooth3d(0.003)
-		>>> is3d(Vector3r(0,0,0),lambda i: i.phys.omega)
+		>>> O.reset()
+		>>> from yade import utils
+		>>> O.bodies.append([utils.sphere((0,0,0),1),utils.sphere((0,0,1.9),1)])
+		[0, 1]
+		>>> O.engines=[InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom(),],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
+		>>> utils.createInteraction(0,1) #doctest: +ELLIPSIS
+		<Interaction instance at 0x...>
+
+		>> is3d=IntrSmooth3d(0.003)
+		>> is3d((0,0,0),lambda i: i.phys.normalForce)
+		Vector3(0,0,0)
 	
 	"""
 	def __init__(self,stDev):
@@ -48,7 +57,7 @@ class IntrSmooth3d():
 	def bounds(self): return self.locator.bounds()
 	def count(self): return self.locator.count()
 	def __call__(self,pt,extr):
-		intrs=self.locator.intrsWithinDistance(pt,self.stDev*self.relThreshold)
+		intrs=self.locator.intrsAroundPt(pt,self.stDev*self.relThreshold)
 		if len(intrs)==0: return float('nan')
 		weights,val=0.,0.
 		for i in intrs:
