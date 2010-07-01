@@ -54,10 +54,6 @@ def SpherePack_toSimulation(self,rot=Matrix3.Identity,**kw):
 	ur"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
 this method also appropriately sets periodic cell information of the simulation.
 
-:param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
-:param **kw: passed to :yref:`yade.utils.sphere`
-:return: list of body ids added (like :yref:`O.bodies.append<BodyContainer.append>`)
-
 	>>> from yade import pack; from math import *
 	>>> sp=pack.SpherePack()
 
@@ -86,6 +82,9 @@ Periodic properties are transferred to the simulation correctly:
 	>>> O.cell.trsf
 	Matrix3(0.707107,-0.707107,0, 0.707107,0.707107,0, 0,0,1)
 
+:param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
+:param **kw: passed to :yref:`yade.utils.sphere`
+:return: list of body ids added (like :yref:`O.bodies.append<BodyContainer.append>`)
 """
 	if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
 	assert(isinstance(rot,Matrix3))

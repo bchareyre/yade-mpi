@@ -196,11 +196,13 @@ def genReferences():
 	import bib2rst # our module
 	f=open('references.rst','w')
 	f.write('References\n'+40*'='+'\n\n\n')
+	f.write('.. note:: This file is generated from :ysrc:`doc/references.bib`.\n\n')
 	f.write(bib2rst.bib2rst('../references.bib'))
 	f.close()
 	escapeTilde('../publications.bib','./_publications.bib')
 	f=open('publications.rst','w')
 	f.write('Publications about Yade\n'+40*'='+'\n\n\n')
+	f.write(r'.. note:: This file is generated from `BiBTeX <http://en.wikipedia.org/wiki/Bibtex>`_ file :ysrc:`doc/publications.bib`, which you can also use in your `LaTeX <http://en.wikipedia.org/wiki/LaTeX>`_ papers.'+'\n\n')
 	f.write(bib2rst.bib2rst('_publications.bib').replace('@tilde@','~'))
 
 import sphinx,sys,shutil
