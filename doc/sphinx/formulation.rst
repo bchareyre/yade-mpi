@@ -319,7 +319,7 @@ Such definition, however, has the disadvantage of effectively increasing rigidit
 
 Shear strain
 -------------
-A special (mis)feature of DEM is that each contact is oriented only by two points, current positions of both particles ($\currC_1$ and $\currC_2$). These only define contact normal $\currn$ and the plane perpendicular to it, but no contact-local coordinate system. As a consequence, shear deformation $\curruT$ must always be expressed in global coordinates while satisfying the condition $\curruT \perp \currn$.\footnote{Let us note at this point that due to the absence of contact-local coordinates, plasticity conditions can only be formulated using $\sigma_N$ and $|\vec{\sigma}_T|$, but not $\vec{\sigma}_T$.} In order to keep $\vec{u}_T$ consistent (e.g. that $\vec{u}_T$ must be constant if two spheres retain mutually constant configuration but move arbitrarily in space), then either $\vec{u}_T$ must track spheres' spatial motion or must (somehow) rely on sphere-local data exclusively.
+In order to keep $\vec{u}_T$ consistent (e.g. that $\vec{u}_T$ must be constant if two spheres retain mutually constant configuration but move arbitrarily in space), then either $\vec{u}_T$ must track spheres' spatial motion or must (somehow) rely on sphere-local data exclusively.
 
 These two possibilities lead to two algorithms of computing shear strains. They should give the same results (disregarding numerical imprecision), but there is a trade-off between computational cost of the incremental method and robustness of the total one.
 
@@ -724,8 +724,8 @@ In DEM simulations, per-particle stiffness $\vec{K}_i$ is determined from the st
 
 with $w\in\{x,y,z\}$. Equations :eq:`eq-dtcr-global`, :eq:`eq-dtcr-axes` and :eq:`eq-dtcr-particle-stiffness` determine $\Dtcr$ in a simulation; it is implemented by the :yref:`GlobalStiffnessTimeStepper` engine in Yade. 
 					
-This approach is simplifying, since only translational terms of the stiffness matrix are considered (which is the limiting factor typically) and eigenvalues are estimated from diagonal terms only. Rigorous derivation of critical timestep is possible from overall stiffness and mass matrices; we have to leave it for posterity at this place, for time constraints.
-					
+For computation efficiency reasons, eigenvalues of the stiffness matrices are not computed. They are only approximated using diagonal terms, which give good approximates in typical mechanical systems.
+
 There is one important condition that $\omega_{\rm max}>0$: if there are no contacts between particles and $\omega_{\rm max}=0$, we would obtain value $\Dtcr=\infty$. While formally correct, this value is numerically erroneous: we were silently supposing that stiffness remains constant during each timestep, which is not true if contacts are created as particles collide. In case of no contact, therefore, stiffness must be pre-estimated based on future interactions, as shown in the next section.
 				
 
