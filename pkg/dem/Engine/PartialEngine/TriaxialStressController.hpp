@@ -35,11 +35,10 @@ class TriaxialStressController : public BoundaryController
 		boost::array<Vector3r,6> previousTranslation;
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
 		vector<Real>	stiffness;
-		Vector3r	strain;
+		Real 		strain [3];
 		Vector3r	normal [6];
 		//! The values of stresses 
 		Vector3r	stress [6];
-		Vector3r	wall_stress;
 		Vector3r	force [6];
 		//! Value of spheres volume (solid volume)
 		Real spheresVolume;
@@ -67,7 +66,7 @@ class TriaxialStressController : public BoundaryController
 		void controlInternalStress(Real multiplier);
 		//! update the stiffness of boundary-packing interaction (sum of contacts stiffness on the boundary)
 		void updateStiffness();
-		//! Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain. Update wall_stress
+		//! Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		void computeStressStrain();
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
     		Real ComputeUnbalancedForce(bool maxUnbalanced=false);
@@ -127,7 +126,6 @@ class TriaxialStressController : public BoundaryController
 		normal[wall_back].z()=1;	
 		porosity=1;
 		,
-		.def_readonly("wall_stress",&TriaxialStressController::wall_stress,"Current stress on walls.")
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain (logarithmic).")
  		.def_readonly("porosity",&TriaxialStressController::porosity,"Pososity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")

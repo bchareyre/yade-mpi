@@ -202,10 +202,6 @@ void TriaxialStressController::computeStressStrain()
 
 	for (int i=0; i<6; i++) meanStress-=stress[i].dot(normal[i]);
 	meanStress/=6.;
-
-	wall_stress[0]=stress[wall_right][0];
-	wall_stress[1]=stress[wall_top][1];
-	wall_stress[2]=stress[wall_front][2];
 }
 
 void TriaxialStressController::controlInternalStress ( Real multiplier )
