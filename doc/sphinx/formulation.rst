@@ -217,7 +217,7 @@ The most used class computing interaction properties :yref:`Ip2_FrictMat_FrictMa
 				
 Some formulations define an equivalent cross-section $A_{\rm eq}$, which in that case appears in the $\tilde l_i$ term as $K_i=E_i\tilde l_i=E_i\frac{A_{\rm eq}}{l_i}$. Such is the case for the concrete model (:yref:`Ip2_CpmMat_CpmMat_CpmPhys`), where $A_{\rm eq}=\min(r_1,r_2)$.
 				
-For reasons given above, no pretense about equality of particle-level $E_i$ and macroscopic modulus $E$ should be made. Some formulations, such as \cite{Hentz2003}, introduce parameters to match them numerically. This is not appropriate, in our opinion, since it binds those values to particular features of the sphere arrangement that was used for calibration.
+For reasons given above, no pretense about equality of particle-level $E_i$ and macroscopic modulus $E$ should be made. Some formulations, such as [Hentz2003]_, introduce parameters to match them numerically. This is not appropriate, in our opinion, since it binds those values to particular features of the sphere arrangement that was used for calibration.
 
 Other parameters
 ----------------

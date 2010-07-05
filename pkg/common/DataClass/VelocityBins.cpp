@@ -26,7 +26,7 @@ bool VelocityBins::incrementDists_shouldCollide(Real dt){
 void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLength){
 	// initialization
 		// sanity checks
-		if(nBins<1 || nBins>100){LOG_FATAL("Number of bins must be >=1 and <=100"); abort(); }
+		if(nBins<1 || nBins>100){ throw runtime_error("VelocityBins: Number of bins must be >=1 and <=100"); }
 		if(binOverlap>=1 || binOverlap<=0){ LOG_ERROR("binOverlap set to 0.8 (was "<<binOverlap<<", not in range (0…1) )"); binOverlap=0.8;}
 		// number of bins changed
 		if(nBins!=bins.size()){
@@ -74,7 +74,10 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 			// 2. for the current bin, put the lower margin lower by binOverlap^2, to avoid too many oscillations
 			if((oldBin>=0 && oldBin==(binNo_t)(i-1)) || velSq>=bins[i].binMinVelSq*(oldBin==(binNo_t)i ? pow(binOverlap,2) : 1.) ){ newBin=(binNo_t)i; break;}
 		}
-		if(newBin<0){ LOG_FATAL("Body #"<<b->getId()<<", velSq="<<velSq<<" not put in any bin!?"); abort(); }
+		if(newBin<0){
+			if(isnan(velSq)) throw runtime_error("Body #"+lexical_cast<string>(b->getId())+" has velocity==NaN!");
+			throw logic_error("Body #"+lexical_cast<string>(b->getId())+", velSq="+lexical_cast<string>(velSq)+" was not put in any bin?!");
+		}
 		if(oldBin>=0) { if(newBin>oldBin) moveSlower++; else if(oldBin>newBin) moveFaster++; }
 		bodyBins[b->getId()]=newBin;
 		// LOG_TRACE("#"<<b->getId()<<": vel="<<sqrt(velSq)<<", bin "<<(int)newBin);

@@ -56,6 +56,8 @@ def formatRest(db):
 			line+='%s (%s), **%s**. In *%s*.'%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
 		elif type=='phdthesis':
 			line+='%s (%s), **%s**. PhD thesis at *%s*.'%(author,i['year'],i['title'],i['school'])
+		elif type=='mastersthesis':
+			line+='%s (%s), **%s**. Master thesis at *%s*.'%(author,i['year'],i['title'],i['school'])
 		elif type=='proceedings':
 			if i.has_key('editor'): line+='%s (ed.), '%i['editor']
 			line+='**%s** (%s).'%(i['title'],i['year'])
@@ -72,11 +74,16 @@ def formatRest(db):
 		if i.has_key('url'): line+=' `(fulltext) <%s>`_'%escapeUrl(i['url'])
 		if i.has_key('note'): line+=' (%s)'%i['note']
 		ret.append(line)
-	return ret
+	return [l.replace('@tilde@','~') for l in ret]
 
 def bib2rst(filename):
 	"""Return string representing all items in given bibtex file, formatted as ReST."""
-	db=readBib(filename)
+	import tempfile,shutil,os.path
+	d=tempfile.mkdtemp()
+	bib=d+'/'+os.path.basename(filename)
+	open(bib,'w').write(open(filename).read().replace('~','@tilde@'))
+	db=readBib(bib)
+	shutil.rmtree(d)
 	return '\n\n'.join(formatRest(db))
 if __name__=='__main__':
 	import sys

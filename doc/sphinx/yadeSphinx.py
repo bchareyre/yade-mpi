@@ -182,34 +182,28 @@ def makeBaseClassesClickable(f,writer):
 		for l in out:
 			ff.write(l)
 		ff.close()
-
-def escapeTilde(f1,f2):
-	"""Hack to avoid the _bibtex module interpreting ~ as space (\~ does not work?!)
-	Create an new file with tilde replaced by @tilde@; the result is unescaped again."""
-	ll=[l.replace('~','@tilde@') for l in open(f1)]
-	open(f2,'w').write(''.join(ll))
 	
+def processTemplate(f1,f2):
+	"Copy file f1 to f2, evaluating all occurences of @...@ with eval(); they should expand to a string and can contain arbitrary python expressions."
+	import re
+	def doEval(match):
+		import bib2rst
+		return str(eval(match.group(1)))
+	ff2=open(f2,'w')
+	for l in open(f1):
+		ff2.write(re.sub(r'@([^@]*)@',doEval,l))
 
 def genReferences():
 	import sys
-	sys.path.append('.')
-	import bib2rst # our module
-	f=open('references.rst','w')
-	f.write('References\n'+40*'='+'\n\n\n')
-	f.write('.. note:: This file is generated from :ysrc:`doc/references.bib`.\n\n')
-	f.write(bib2rst.bib2rst('../references.bib'))
-	f.close()
-	escapeTilde('../publications.bib','./_publications.bib')
-	f=open('publications.rst','w')
-	f.write('Publications about Yade\n'+40*'='+'\n\n\n')
-	f.write(r'.. note:: This file is generated from `BiBTeX <http://en.wikipedia.org/wiki/Bibtex>`_ file :ysrc:`doc/publications.bib`, which you can also use in your `LaTeX <http://en.wikipedia.org/wiki/LaTeX>`_ papers.'+'\n\n')
-	f.write(bib2rst.bib2rst('_publications.bib').replace('@tilde@','~'))
+	processTemplate('references.rst.in','references.rst')
+	processTemplate('publications.rst.in','publications.rst')
 
 import sphinx,sys,shutil
+sys.path.append('.') # for bib2rst
 
 genReferences()
-shutil.copyfile('../references.bib',outDir+'/latex/references.bib')
-shutil.copyfile('../publications.bib',outDir+'/latex/publications.bib')
+for bib in ('references','yade-articles','yade-theses','yade-conferences'):
+	shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
 global writer
 writer=None
