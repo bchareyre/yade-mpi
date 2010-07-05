@@ -47,8 +47,8 @@ void InteractionDispatchers::action(){
 	assert(callbackPtrs.size()==callbacks.size());
 	size_t callbacksSize=callbacks.size();
 
-	// precompute transformed cell size 
-	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cell->trsf*scene->cell->refSize;
+	// cache transformed cell size
+	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->Hsize;
 
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
@@ -107,9 +107,9 @@ void InteractionDispatchers::action(){
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 			#endif
 		} else { // handle periodicity
-			Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
+			Vector3r shift2=cellHsize*Vector3r(I->cellDist[0],I->cellDist[1],I->cellDist[2]);
 			// in sheared cell, apply shear on the mutual position as well
-			shift2=scene->cell->shearPt(shift2);
+			//shift2=scene->cell->shearPt(shift2);
 			#ifdef YADE_DEVIRT_FUNCTORS
 				// cast back from void* first
 				geomCreated=(*((InteractionGeometryFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);

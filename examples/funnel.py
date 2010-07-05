@@ -27,7 +27,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(),
-	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/p1')
+	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/p1-')
 ]
 O.dt=utils.PWaveTimeStep()
 

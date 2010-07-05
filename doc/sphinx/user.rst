@@ -1250,6 +1250,81 @@ While job is running, the batch system presents progress via simple HTTP server 
 Postprocessing
 ***************
 
+3d rendering & videos
+======================
+
+There are multiple ways to produce a video of simulation:
+
+#. Capture screen output (the 3d rendering window) during the simulation − there are tools available for that (such as `Istanbul <http://live.gnome.org/Istanbul>`_ or `RecordMyDesktop <http://recordmydesktop.sourceforge.net/about.php>`_, which are also packaged for most Linux distributions).  The output is "what you see is what you get", with all the advantages and disadvantages.
+
+#. Periodic frame snapshot using :yref:`SnapshotEngine` (see :ysrc:`examples/bulldozer.py` for a full example)::
+   
+      O.engines=[
+      	#...
+      	SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',viewNo=0,label='snapshooter')
+      ]
+
+   which will save numbered files like ``/tmp/bulldozer-0000.png``. These files can be processed externally (with `mencoder <http://www.mplayerhq.hu>`_ and similar tools) or directly with the :yref:`yade.utils.encodeVideoFromFrames`::
+
+      utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)
+   
+   The video is encoded in the `Theora <http://www.theora.org>`_ format stored in an ogg container.
+
+#. Specialized post-processing tools, notably `Paraview <http://www.paraview.org>`_. This is described in more detail in the following section.
+
+Paraview
+---------
+
+Saving data during the simulation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Paraview is based on the `Visualization Toolkit <http://www.vtk.org>`_, which defines formats for saving various types of data. One of them (with the ``.vtu`` extension) can be written by a special engine :yref:`VTKRecorder`. It is added to the simulation loop::
+
+	O.engines=[
+		# ...
+		VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/p1-')
+	]
+
+* :yref:`iterPeriod<PeriodicEngine.iterPeriod>` determines how often to save simulation data (besides :yref:`iterPeriod<PeriodicEngine.iterPeriod>`, you can also use :yref:`virtPeriod<PeriodicEngine.virtPeriod>` or :yref:`realPeriod<PeriodicEngine.realPeriod>`). It the period is too high (and data are saved only few times), the video will have few frames. 
+* :yref:`fileName<VTKRecorder.fileName>` is the prefix for files being saved. In this case, output files will be named ``/tmp/p1-spheres.0.vtu`` and ``/tmp/p1-facets.0.vtu``, where the number is the number of iteration; many files are created, putting them in a separate directory is advisable.
+* :yref:`recorders<VTKRecorder.recorders>` determines what data to save (see the :yref:`documentation<VTKRecorder.recorders>`)
+
+Loading data into Paraview
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+All sets of files (``spheres``, ``facets``, …) must be opened one-by-one in Paraview. The open dialogue automatically collapses numbered files in one, making it easy to select all of them:
+
+.. _img-paraview-open-files:
+.. figure:: fig/paraview-open-files.png
+
+Click on the "Apply" button in the "Object inspector" sub-window to make loaded objects visible. You can see tree of displayed objects in the "Pipeline browser":
+
+.. _img-paraview-rendering-apply:
+.. figure:: fig/paraview-rendering-apply.png
+
+Rendering spherical particles
+"""""""""""""""""""""""""""""
+
+.. |paraview-glyph-icon| image:: fig/paraview-glyph-icon.png
+
+Spheres will only appear as points. To make them look as spheres, you have to add "glyph" to the ``p1-spheres.*`` item in the pipeline using the |paraview-glyph-icon| icon. Then set (in the Object insepector)
+
+* "Glyph type" to *Sphere*
+* "Radius" to *1*
+* "Scale mode" to *Scalar* (*Scalar* is set above to be the *radii* value saved in the file, therefore spheres with radius *1* will be scaled by their true radius)
+* "Set scale factor" to *1*
+* optionally uncheck "Mask points" and "Random mode" (they make some particles not to be rendered for performance reasons, controlled by the "Maximum Number of Points")
+
+After clicking "Apply", spheres will appear. They will be rendered over the original white points, which you can disable by clicking on the eye icon next to ``p1-spheres.*`` in the Pipeline browser.
+
+Facet transparency
+"""""""""""""""""""
+If you want to make facet objects transparent, select ``p1-facets.*`` in the Pipline browser, then go to the Object inspector on the Display tab. Under "Style", you can set the "Opacity" value to something smaller than 1.
+
+Animation
+""""""""""
+You can move between frames (snapshots that were saved) via the "Animation" menu. After setting the view angle, zoom etc to your satisfaction, the animation can be saved with *File/Save animation*.
+
 
 **************
 Extending Yade

@@ -146,7 +146,8 @@ class InsertionSortCollider: public Collider{
 	//! Whether the Scene was periodic (to detect the change, which shouldn't happen, but shouldn't crash us either)
 	bool periodic;
 
-
+	// return python representation of the BB struct, as ([...],[...],[...]).
+	python::tuple dumpBounds();
 
 	/*! sorting routine; insertion sort is very fast for strongly pre-sorted lists, which is our case
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details
@@ -219,6 +220,7 @@ class InsertionSortCollider: public Collider{
 		/* py */
 		.def_readonly("strideActive",&InsertionSortCollider::strideActive,"Whether striding is active (read-only; for debugging). |yupdate|")
 		.def_readonly("periodic",&InsertionSortCollider::periodic,"Whether the collider is in periodic mode (read-only; for debugging) |yupdate|")
+		.def("dumpBounds",&InsertionSortCollider::dumpBounds,"Return representation of the internal sort data. The format is ``([...],[...],[...])`` for 3 axes, where each ``...`` is a list of entries (bounds). The entry is a tuple with the fllowing items:\n\n* coordinate (float)\n* body id (int), but negated for negative bounds\n* period numer (int), if the collider is in the periodic regime.");
 	);
 	DECLARE_LOGGER;
 };

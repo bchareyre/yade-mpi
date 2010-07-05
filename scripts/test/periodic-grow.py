@@ -26,8 +26,8 @@ O.saveTmp()
 from yade import qt
 qt.Controller(); qt.View()
 O.run(200,True)
-rate=-1e-4*cubeSize/(O.dt*200)*Matrix3().IDENTITY
-O.cell['velGrad']=rate
+rate=-1e-3*cubeSize/(O.dt*200)*Matrix3.Identity
+O.cell.velGrad=rate
 for i in range(0,25):
 	O.run(2000,True)
 	F,stiff=utils.totalForceInVolume()
