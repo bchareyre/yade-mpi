@@ -67,6 +67,7 @@ class PeriTriaxController: public BoundaryController{
 		((Real,currUnbalanced,NaN,"current unbalanced force (updated every globUpdate) |yupdate|"))
 		((Vector3r,prevGrow,Vector3r::Zero(),"previous cell grow"))
 		((Real,mass,NaN,"mass of the cell (user set)"))
+		((Real,externalWork,0,"Work input from boundary controller."))
 	);
 	DECLARE_LOGGER;
 };

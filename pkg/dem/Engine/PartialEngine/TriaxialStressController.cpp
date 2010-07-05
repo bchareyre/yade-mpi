@@ -62,6 +62,7 @@ void TriaxialStressController::controlExternalStress(int wall, Vector3r resultan
 	}
 	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
 	p->se3.position += previousTranslation[wall];
+	externalWork += previousTranslation[wall].dot(getForce(scene,wall_id[wall]));
 	// this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
 	p->vel=previousTranslation[wall]/scene->dt;
 	//if(log)TRVAR2(previousTranslation,p->se3.position);

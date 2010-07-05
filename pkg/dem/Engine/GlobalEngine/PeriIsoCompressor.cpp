@@ -232,6 +232,8 @@ void PeriTriaxController::action()
 		//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
  	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
+	//Update energy input
+	externalWork+=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->Hsize.determinant();
 	prevGrow = strainRate;
 	
 	if(allOk){

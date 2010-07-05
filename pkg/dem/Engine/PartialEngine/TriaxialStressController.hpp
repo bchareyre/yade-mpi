@@ -99,10 +99,10 @@ class TriaxialStressController : public BoundaryController
 		((Real,height0,0,""))
 		((Real,width0,0,""))
 		((Real,depth0,0,""))		
-		((Real,sigma_iso,0,"applied confining stress (see :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,sigma1,0,"applied stress on axis 1 (overriden if :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,sigma2,0,"applied stress on axis 2 (overriden if :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,sigma3,0,"applied stress on axis 3 (overriden if :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,sigma_iso,0,"prescribed confining stress (see :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,sigma1,0,"prescribed stress on axis 1 (see :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,sigma2,0,"prescribed stress on axis 2 (see :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,sigma3,0,"prescribed stress on axis 3 (see :yref:`TriaxialStressController::isAxisymetric`)"))
 		((bool,isAxisymetric,true,"if true, sigma_iso is assigned to sigma1, 2 and 3 (applies at each iteration and overrides user-set values of s1,2,3)"))
 		((Real,maxMultiplier,1.001,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))	
@@ -112,6 +112,7 @@ class TriaxialStressController : public BoundaryController
 		((bool,internalCompaction,true,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
 		((Real,meanStress,0,"Mean stress in the packing."))
 		((Real,volumetricStrain,0,"Volumetric strain (see :yref:`TriaxialStressController::strain`)."))
+		((Real,externalWork,0,"Energy provided by boundaries."))
  		,
 		/* extra initializers */
 		,
