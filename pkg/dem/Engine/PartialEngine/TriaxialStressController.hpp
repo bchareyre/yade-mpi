@@ -35,7 +35,7 @@ class TriaxialStressController : public BoundaryController
 		boost::array<Vector3r,6> previousTranslation;
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
 		vector<Real>	stiffness;
-		Real 		strain [3];
+		Vector3r	strain;
 		Vector3r	normal [6];
 		//! The values of stresses 
 		Vector3r	stress [6];
@@ -130,7 +130,7 @@ class TriaxialStressController : public BoundaryController
 		porosity=1;
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain (logarithmic).")
- 		.def_readonly("porosity",&TriaxialStressController::porosity,"Pososity of the packing.")
+ 		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")

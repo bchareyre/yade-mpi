@@ -1383,7 +1383,7 @@ What looks as cryptic message is valuable information for developers to locate s
 	#7  0x00000000004a7c5e in call_function (f=Frame 0x1c54620, for file <ipython console>, line 1, in <module> (), throwflag=<value optimized out>) at ../Python/ceval.c:3750
 	#8  PyEval_EvalFrameEx (f=Frame 0x1c54620, for file <ipython console>, line 1, in <module> (), throwflag=<value optimized out>) at ../Python/ceval.c:2412
 
-If you think this might be error in Yade, file a bug report as explained below. Do not forget to attach *full* yade output from terminal, including startup messages and debugger output -- select with right moust button, paste with middle button to the bugreport to to a file and attach it. Attach your simulation script as well.
+If you think this might be error in Yade, file a bug report as explained below. Do not forget to attach *full* yade output from terminal, including startup messages and debugger output -- select with right mouse button, paste with middle button to the bugreport to to a file and attach it. Attach your simulation script as well.
 
 Reporting bugs
 ==============
