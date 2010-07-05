@@ -1,8 +1,8 @@
 O.periodic=True
 O.cell.refSize=Vector3(.55,.55,.55)
-#O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
+O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
 O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
-#O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
+O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
 O.bodies.append(utils.sphere([.3,0,0],.1,dynamic=False))
 O.engines=[
 	ForceResetter(),
@@ -33,7 +33,7 @@ O.step()
 O.saveTmp()
 rrr=yade.qt.Renderer()
 rrr.intrAllWire,rrr.bound=True,True
-isc.watch1,isc.watch2=0,-1
+#isc.watch1,isc.watch2=0,-1
 
 #from yade import log
 #import yade.qt,time
@@ -43,4 +43,5 @@ isc.watch1,isc.watch2=0,-1
 
 from yade import log
 #log.setLevel('Shop',log.TRACE)
-log.setLevel('InsertionSortCollider',log.TRACE)
+#log.setLevel('InsertionSortCollider',log.TRACE)
+

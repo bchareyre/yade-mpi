@@ -13,7 +13,7 @@
 void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
-				, const Body*	)
+				, const Body*)
 {
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
 	Facet* facet = static_cast<Facet*>(cm.get());
@@ -34,7 +34,7 @@ void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 		for(int i=0; i<3; i++){
 			Vector3r v=scene->cell->unshearPt(O+facetAxisT*vertices[i]);
 			aabb->min=aabb->min.cwise().min(v);
-			aabb->max=aabb->min.cwise().max(v);
+			aabb->max=aabb->max.cwise().max(v);
 		}
 	}
 }
