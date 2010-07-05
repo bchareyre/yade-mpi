@@ -390,7 +390,15 @@ void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id
 		interactions->insert(newI);
 		return;
 	}
-	if(!overlap && hasInter){ if(!I->isReal()) interactions->erase(id1,id2); return; }
+	if(!overlap && hasInter){
+		if(!I->isReal()) {
+			interactions->erase(id1,id2);
+			#ifdef PISC_DEBUG
+				if(watchIds(id1,id2)) LOG_DEBUG("Erased intr #"<<id1<<"+#"<<id2);
+			#endif
+		}
+		return;
+	}
 	assert(false); // unreachable
 }
 
@@ -450,12 +458,6 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 	return true;
 }
 
-#ifdef PISC_DEBUG
-	bool InsertionSortCollider::watchIds(body_id_t id1, body_id_t id2) const{
-		return id1==3 || id2==3; //true; //id1==1 || id2==1;
-	}
-#endif
-
 python::tuple InsertionSortCollider::dumpBounds(){
 	python::list bl[3]; // 3 bound lists, inserted into the tuple at the end
 	for(int axis=0; axis<3; axis++){
@@ -463,11 +465,11 @@ python::tuple InsertionSortCollider::dumpBounds(){
 		if(periodic){
 			for(long i=0; i<V.size; i++){
 				long ii=V.norm(i); // start from the period boundary
-				bl[i].append(python::make_tuple(V[ii].coord,(V[ii].flags.isMin?-1:1)*V[ii].id,V[ii].period));
+				bl[axis].append(python::make_tuple(V[ii].coord,(V[ii].flags.isMin?-1:1)*V[ii].id,V[ii].period));
 			}
 		} else {
 			for(long i=0; i<V.size; i++){
-				bl[i].append(python::make_tuple(V[i].coord,(V[i].flags.isMin?-1:1)*V[i].id));
+				bl[axis].append(python::make_tuple(V[i].coord,(V[i].flags.isMin?-1:1)*V[i].id));
 			}
 		}
 	}

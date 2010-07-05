@@ -72,7 +72,7 @@ Possible performance improvements & bugs
 
 // #define to turn on some tracing information for the periodic part
 // all code under this can be probably removed at some point, when the collider will have been tested thoroughly
-// #define PISC_DEBUG
+//#define PISC_DEBUG
 
 
 #ifdef ISC_TIMING
@@ -107,7 +107,8 @@ class InsertionSortCollider: public Collider{
 		}
 	};
 	#ifdef PISC_DEBUG
-		bool watchIds(body_id_t id1,body_id_t id2) const;
+		int watch1, watch2;
+		bool watchIds(body_id_t id1,body_id_t id2) const { return (watch1<0 &&(watch2==id1||watch2==id2))||(watch2<0 && (watch1==id1||watch1==id2))||(watch1==id1 && watch2==id2)||(watch1==id2 && watch2==id1); }
 	#endif
 		// keep this dispatcher and call it ourselves as needed
 		shared_ptr<BoundDispatcher> boundDispatcher;
@@ -213,6 +214,9 @@ class InsertionSortCollider: public Collider{
 			#ifdef ISC_TIMING
 				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 			#endif 
+			#ifdef PISC_DEBUG
+				watch1=watch2=-1; // disable watching
+			#endif
 			for(int i=0; i<3; i++) BB[i].axis=i;
 			periodic=false;
 			strideActive=false;
@@ -220,7 +224,11 @@ class InsertionSortCollider: public Collider{
 		/* py */
 		.def_readonly("strideActive",&InsertionSortCollider::strideActive,"Whether striding is active (read-only; for debugging). |yupdate|")
 		.def_readonly("periodic",&InsertionSortCollider::periodic,"Whether the collider is in periodic mode (read-only; for debugging) |yupdate|")
-		.def("dumpBounds",&InsertionSortCollider::dumpBounds,"Return representation of the internal sort data. The format is ``([...],[...],[...])`` for 3 axes, where each ``...`` is a list of entries (bounds). The entry is a tuple with the fllowing items:\n\n* coordinate (float)\n* body id (int), but negated for negative bounds\n* period numer (int), if the collider is in the periodic regime.");
+		.def("dumpBounds",&InsertionSortCollider::dumpBounds,"Return representation of the internal sort data. The format is ``([...],[...],[...])`` for 3 axes, where each ``...`` is a list of entries (bounds). The entry is a tuple with the fllowing items:\n\n* coordinate (float)\n* body id (int), but negated for negative bounds\n* period numer (int), if the collider is in the periodic regime.")
+		#ifdef PISC_DEBUG
+			.def_readwrite("watch1",&InsertionSortCollider::watch1,"debugging only: watched body Id.")
+			.def_readwrite("watch2",&InsertionSortCollider::watch2,"debugging only: watched body Id.")
+		#endif
 	);
 	DECLARE_LOGGER;
 };

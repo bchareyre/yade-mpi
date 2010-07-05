@@ -1,13 +1,13 @@
 O.periodic=True
 O.cell.refSize=Vector3(.55,.55,.55)
-O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
+#O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
 O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
-O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
+#O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
 O.bodies.append(utils.sphere([.3,0,0],.1,dynamic=False))
 O.engines=[
 	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider(label='isc'),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
@@ -15,7 +15,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-10)),
 	NewtonIntegrator(),
-	PeriodicPythonRunner(command='doCellFlip()',realPeriod=5)
+	#PeriodicPythonRunner(command='doCellFlip()',realPeriod=5)
 ]
 
 def doCellFlip():
@@ -31,8 +31,10 @@ O.cell.trsf=Matrix3(1,0,0, 0,1,.5, 0,0,1)
 O.dt=2e-2*utils.PWaveTimeStep()
 O.step()
 O.saveTmp()
-rdr=yade.qt.Renderer()
-rdr.intrAllWire=True
+rrr=yade.qt.Renderer()
+rrr.intrAllWire,rrr.bound=True,True
+isc.watch1,isc.watch2=0,-1
+
 #from yade import log
 #import yade.qt,time
 #v=yade.qt.View()
@@ -41,4 +43,4 @@ rdr.intrAllWire=True
 
 from yade import log
 #log.setLevel('Shop',log.TRACE)
-#log.setLevel('InsertionSortCollider',log.TRACE)
+log.setLevel('InsertionSortCollider',log.TRACE)
