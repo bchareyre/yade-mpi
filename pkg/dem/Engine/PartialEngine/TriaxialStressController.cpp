@@ -12,15 +12,15 @@
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/State.hpp>
-
+#include<assert.h>
 #include<yade/core/Scene.hpp>
 
 CREATE_LOGGER(TriaxialStressController);
 YADE_PLUGIN((TriaxialStressController));
 
-TriaxialStressController::~TriaxialStressController()
-{	
-}
+TriaxialStressController::~TriaxialStressController(){}
+
+Vector3r TriaxialStressController::getStress(int boundId) {assert (boundId>=0 && boundId<=5); return stress[boundId];}
 
 void TriaxialStressController::updateStiffness ()
 {
