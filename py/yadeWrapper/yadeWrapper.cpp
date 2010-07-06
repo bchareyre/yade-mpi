@@ -9,7 +9,10 @@
 
 #include<boost/python.hpp>
 #include<boost/python/raw_function.hpp>
-#include<boost/python/suite/indexing/vector_indexing_suite.hpp>
+// unused now
+#if 0
+	#include<boost/python/suite/indexing/vector_indexing_suite.hpp>
+#endif
 #include<boost/bind.hpp>
 #include<boost/lambda/bind.hpp>
 #include<boost/thread/thread.hpp>

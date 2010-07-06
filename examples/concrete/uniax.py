@@ -103,7 +103,7 @@ O.engines=[
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 
 # plot stresses in ¼, ½ and ¾ if desired as well; too crowded in the graph that includes confinement, though
-plot.plots={'eps':('sigma',)} #'sigma.25','sigma.50','sigma.75')}
+plot.plots={'eps':('sigma','sigma.50'),'t':('eps')} #'sigma.25','sigma.50','sigma.75')}
 plot.maxDataLen=4000
 
 O.saveTmp('initial');

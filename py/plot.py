@@ -4,7 +4,16 @@
 Module containing utility functions for plotting inside yade. See :ysrc:`scripts/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
 
 """
-import matplotlib,os
+
+## all exported names
+__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverse','addData','saveGnuplot']
+
+# multi-threaded support for Tk
+# safe to import even if Tk will not be used
+import mtTkinter as Tkinter
+
+import matplotlib,os,time
+
 # running in batch
 #
 # If GtkAgg is the default, X must be working, which is not the case
@@ -20,8 +29,8 @@ if os.environ.has_key('PARAM_TABLE'):
 	matplotlib.use('Agg')
 
 #matplotlib.use('TkAgg')
-#matplotlib.use('GTKCairo')
-#matplotlib.use('QtAgg')
+#matplotlib.use('GTKAgg')
+##matplotlib.use('QtAgg')
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
@@ -31,6 +40,13 @@ plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-
 "dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')"
 labels={}
 "Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
+
+live=True
+"Enable/disable live plot updating. Disabled by default for now, since it has a few rough edges."
+liveInterval=1
+"Interval for the live plot updating, in seconds."
+autozoom=True
+"Enable/disable automatic plot rezooming after data update."
 
 def reset():
 	"Reset all plot-related variables (data, plots, labels)"
@@ -78,19 +94,97 @@ def addData(*d_in,**kw):
 		if name in d: data[name].append(d[name]) #numpy.append(data[name],[d[name]],1)
 		else: data[name].append(nan)
 
-def _addPointTypeSpecifier(o):
+# not public functions
+def addPointTypeSpecifier(o):
 	"""Add point type specifier to simple variable name"""
 	if type(o) in [tuple,list]: return o
 	else: return (o,'')
-def _tuplifyYAxis(pp):
+def tuplifyYAxis(pp):
 	"""convert one variable to a 1-tuple"""
 	if type(pp) in [tuple,list]: return pp
 	else: return (pp,)
-def _xlateLabel(l):
+def xlateLabel(l):
 	"Return translated label; return l itself if not in the labels dict."
 	global labels
 	if l in labels.keys(): return labels[l]
 	else: return l
+
+class LineRef:
+	"""Holds reference to plot line and to original data arrays (which change during the simulation),
+	and updates the actual line using those data upon request."""
+	def __init__(self,line,xdata,ydata):
+		self.line,self.xdata,self.ydata=line,xdata,ydata
+	def update(self):
+		self.line.set_xdata(self.xdata)
+		self.line.set_ydata(self.ydata)
+
+currLineRefs=[]
+liveTimeStamp=0 # timestamp when live update was started, so that the old thread knows to stop if that changes
+nan=float('nan')
+
+def createPlots():
+	global currLineRefs
+	figs=set([l.line.get_axes().get_figure() for l in currLineRefs]) # get all current figures
+	for f in figs: pylab.close(f) # close those
+	currLineRefs=[] # remove older plots (breaks live updates of windows that are still open)
+	if len(plots)==0: return # nothing to plot
+	for p in plots:
+		p=p.strip()
+		pylab.figure()
+		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
+		plots_p_y1,plots_p_y2=[],[]; y1=True
+		missing={} # missing data columns
+		if p not in data.keys(): missing[p]=nan
+		for d in plots_p:
+			if d[0]=='|||' or d[0]==None:
+				y1=False; continue
+			if y1: plots_p_y1.append(d)
+			else: plots_p_y2.append(d)
+			if d[0] not in data.keys(): missing[d[0]]=nan
+		addData(missing)
+		# create y1 lines
+		for d in plots_p_y1:
+			line,=pylab.plot(data[p],data[d[0]],d[1])
+			currLineRefs.append(LineRef(line,data[p],data[d[0]]))
+		# create the legend
+		pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
+		pylab.ylabel(','.join([xlateLabel(_p[0]) for _p in plots_p_y1]))
+		# create y2 lines, if any
+		if len(plots_p_y2)>0:
+			# try to move in the color palette a little further (magenta is 5th): r,g,b,c,m,y,k
+			origLinesColor=pylab.rcParams['lines.color']; pylab.rcParams['lines.color']='m'
+			# create the y2 axis
+			pylab.twinx()
+			for d in plots_p_y2:
+				line,=pylab.plot(data[p],data[d[0]],d[1])
+				currLineRefs.append(LineRef(line,data[p],data[d[0]]))
+			# legend
+			pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
+			pylab.rcParams['lines.color']=origLinesColor
+			pylab.ylabel(','.join([xlateLabel(_p[0]) for _p in plots_p_y2]))
+		pylab.xlabel(xlateLabel(p))
+		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
+
+def liveUpdate(timestamp):
+	global liveTimeStamp
+	liveTimeStamp=timestamp
+	while True:
+		if not live or liveTimeStamp!=timestamp: return
+		figs,axes=set(),set()
+		for l in currLineRefs:
+			l.update()
+			figs.add(l.line.get_figure())
+			axes.add(l.line.get_axes())
+		if autozoom:
+			for ax in axes:
+				try:
+					ax.relim() # recompute axes limits
+					ax.autoscale_view()
+				except RuntimeError: pass # happens if data are being updated and have not the same dimension at the very moment
+		for fig in figs:
+			fig.canvas.draw()
+		time.sleep(liveInterval)
+	
 
 def plot(noShow=False):
 	"""Do the actual plot, which is either shown on screen (and nothing is returned: if *noShow* is False) or returned as object (if *noShow* is True).
@@ -105,57 +199,28 @@ def plot(noShow=False):
 		
 	to save the figure to file automatically.
 	"""
-	if not noShow: pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
-	for p in plots:
-		p=p.strip()
-		pylab.figure()
-		plots_p=[_addPointTypeSpecifier(o) for o in _tuplifyYAxis(plots[p])]
-		plots_p_y1,plots_p_y2=[],[]; y1=True
-		for d in plots_p:
-			if d[0]=='|||' or d[0]==None:
-				y1=False; continue
-			if y1: plots_p_y1.append(d)
-			else: plots_p_y2.append(d)
-		#plotLines[p]=
-		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y1],[]))
-		pylab.legend([_xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
-		pylab.ylabel(','.join([_xlateLabel(_p[0]) for _p in plots_p_y1]))
-		if len(plots_p_y2)>0:
-			# try to move in the color palette a little further (magenta is 5th): r,g,b,c,m,y,k
-			origLinesColor=pylab.rcParams['lines.color']; pylab.rcParams['lines.color']='m'
-			# create the y2 axis
-			pylab.twinx()
-			#plotLines[p]+=
-			[pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y2],[]))]
-			pylab.legend([_xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
-			pylab.rcParams['lines.color']=origLinesColor
-			pylab.ylabel(','.join([_xlateLabel(_p[0]) for _p in plots_p_y2]))
-		pylab.xlabel(_xlateLabel(p))
-		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
-	if not noShow: pylab.show()
-	else: return pylab.gcf() # return current figure
-updatePeriod=0
+	createPlots()
+	global currLineRefs
+	if not noShow:
+		if live:
+			import thread
+			thread.start_new_thread(liveUpdate,(time.time(),))
+		# pylab.show() # this blocks for some reason; call show on figures directly
+		figs=set([l.line.get_axes().get_figure() for l in currLineRefs])
+		for f in figs: f.show()
+	else: return pylab.gcf() # return the current figure
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None,varData=False):
 	"""Save data added with :yref:`yade.plot.addData` into (compressed) file and create .gnuplot file that attempts to mimick plots specified with :yref:`yade.plot.plots`.
 
-:parameters:
-	baseName:
-		used for creating baseName.gnuplot (command file for gnuplot),
-		associated baseName.data (data) and output files (if applicable) in the form baseName.[plot number].extension
-	term:
-		specify the gnuplot terminal;
-		defaults to x11, in which case gnuplot will draw persistent windows to screen and terminate; other useful terminals are 'png', 'cairopdf' and so on
-	extension:
-		defaults to terminal name; fine for png for example; if you use 'cairopdf', you should also say extension='pdf' however
-	timestamp:
-		append numeric time to the basename
-	varData:
-		whether file to plot will be declared as variable or be in-place in the plot expression
-	comment:
-		a user comment (may be multiline) that will be embedded in the control file
+:param baseName: used for creating baseName.gnuplot (command file for gnuplot), associated ``baseName.data.bz2`` (data) and output files (if applicable) in the form ``baseName.[plot number].extension``
+:param term: specify the gnuplot terminal; defaults to ``x11``, in which case gnuplot will draw persistent windows to screen and terminate; other useful terminals are ``png``, ``cairopdf`` and so on
+:param extension: extension for ``baseName`` defaults to terminal name; fine for png for example; if you use ``cairopdf``, you should also say ``extension='pdf'`` however
+:param bool timestamp: append numeric time to the basename
+:param bool varData: whether file to plot will be declared as variable or be in-place in the plot expression
+:param comment: a user comment (may be multiline) that will be embedded in the control file
 
-Returns name fo the gnuplot file created.
+:return: name of the gnuplot file created.
 	"""
 	import time,bz2
 	if len(data.keys())==0: raise RuntimeError("No data for plotting were saved.")
@@ -178,10 +243,10 @@ Returns name fo the gnuplot file created.
 	i=0
 	for p in plots:
 		p=p.strip()
-		plots_p=[_addPointTypeSpecifier(o) for o in _tuplifyYAxis(plots[p])]
+		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
-		fPlot.write("set xlabel '%s'\n"%_xlateLabel(p))
+		fPlot.write("set xlabel '%s'\n"%xlateLabel(p))
 		fPlot.write("set grid\n")
 		fPlot.write("set datafile missing 'nan'\n")
 		if title: fPlot.write("set title '%s'\n"%title)
@@ -191,46 +256,14 @@ Returns name fo the gnuplot file created.
 				y1=False; continue
 			if y1: plots_y1.append(d)
 			else: plots_y2.append(d)
-		fPlot.write("set ylabel '%s'\n"%(','.join([_xlateLabel(_p[0]) for _p in plots_y1]))) 
+		fPlot.write("set ylabel '%s'\n"%(','.join([xlateLabel(_p[0]) for _p in plots_y1]))) 
 		if len(plots_y2)>0:
-			fPlot.write("set y2label '%s'\n"%(','.join([_xlateLabel(_p[0]) for _p in plots_y2])))
+			fPlot.write("set y2label '%s'\n"%(','.join([xlateLabel(_p[0]) for _p in plots_y2])))
 			fPlot.write("set y2tics\n")
 		ppp=[]
-		for pp in plots_y1: ppp.append(" %s using %d:%d title '← %s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,_xlateLabel(pp[0]),_xlateLabel(p),))
-		for pp in plots_y2: ppp.append(" %s using %d:%d title '%s(%s) →' with lines axes x1y2"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,_xlateLabel(pp[0]),_xlateLabel(p),))
+		for pp in plots_y1: ppp.append(" %s using %d:%d title '← %s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,xlateLabel(pp[0]),xlateLabel(p),))
+		for pp in plots_y2: ppp.append(" %s using %d:%d title '%s(%s) →' with lines axes x1y2"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,xlateLabel(pp[0]),xlateLabel(p),))
 		fPlot.write("plot "+",".join(ppp)+"\n")
 		i+=1
 	fPlot.close()
 	return baseName+'.gnuplot'
-
-
-	
-import random
-if __name__ == "__main__":
-	for i in range(10):
-		addData({'a':random.random(),'b':random.random(),'t':i*.001,'i':i})
-	print data
-	for i in range(15):
-		addData({'a':random.random(),'c':random.random(),'d':random.random(),'one':1,'t':(i+10)*.001,'i':i+10})
-	print data
-	# all lists must have the same length
-	l=set([len(data[n]) for n in data])
-	print l
-	assert(len(l)==1)
-	plots={'t':('a',('b','g^'),'d'),'i':('a',('one','g^'))}
-	fullPlot()
-	print "PLOT DONE!"
-	fullPlot()
-	plots['t']=('a',('b','r^','d'))
-	print "FULL PLOT DONE!"
-	for i in range(20):
-		addData({'d':.1,'a':.5,'c':.6,'c':random.random(),'t':(i+25)*0.001,'i':i+25})
-	updatePlot()
-	print "UPDATED!"
-	print data['d']
-	import time
-	#time.sleep(60)
-	killPlots()
-	#pylab.clf()
-
-

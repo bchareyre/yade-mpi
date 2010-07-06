@@ -25,7 +25,7 @@ O.engines=[
 from yade import utils
 O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0]))
 O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
-O.dt=.2*utils.PWaveTimeStep()
+O.dt=.002*utils.PWaveTimeStep()
 
 
 ############################################
@@ -46,9 +46,9 @@ def myAddPlotData():
 	sph=O.bodies[1]
 	## store some numbers under some labels
 	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sph.state.vel.norm())
-
-O.run(int(2./O.dt),True);
-print "Now calling plot.plot() to show the figures (close them to continue)."
+print "Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live."
+plot.liveInterval=.2
 plot.plot()
-plot.saveGnuplot('/tmp/a')
+O.run(int(2./O.dt));
+#plot.saveGnuplot('/tmp/a')
 ## you can also access the data in plot.data['i'], plot.data['t'] etc, under the labels they were saved.
