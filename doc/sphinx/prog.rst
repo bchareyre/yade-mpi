@@ -1764,7 +1764,7 @@ Reference counting
 ------------------
 Python internally uses `reference counting <http://en.wikipedia.org/wiki/Reference_counting>`_ on all its objects, which is not visible to casual user. It has to be handled explicitly if using pure `Python/C API <http://docs.python.org/c-api/index.html>`_ with ``Py_INCREF`` and similar functions.
 
-``boost::python`` used in Yade fortunately handles reference counting internally. Additionally, it `automatically integrates <http://wiki.python.org/moin/boost.python/PointersAndSmartPointers>`_ reference counting for ``shared_ptr`` and python objects, if class ``A`` is wrapped as ``boost::python::class_<A,shared_ptr<A>>``. Since *all* Yade classes wrapped using :ref:`YADE_CLASS_BASE_DOC` are wrapped in this way, returning ``shared_ptr<…>`` objects from is the preffered way of passing objects from c++ to python.
+``boost::python`` used in Yade fortunately handles reference counting internally. Additionally, it `automatically integrates <http://wiki.python.org/moin/boost.python/PointersAndSmartPointers>`_ reference counting for ``shared_ptr`` and python objects, if class ``A`` is wrapped as ``boost::python::class_<A,shared_ptr<A>>``. Since *all* Yade classes wrapped using :ref:`YADE_CLASS_BASE_DOC` are wrapped in this way, returning ``shared_ptr<…>`` objects from is the preferred way of passing objects from c++ to python.
 
 Returning ``shared_ptr`` is much more efficient, since only one pointer is returned and reference count internally incremented. Modifying the object from python will modify the (same) object in c++ and vice versa. It also makes sure that the c++ object will not be deleted as long as it is used somewhere in python, preventing (important) source of crashes.
 

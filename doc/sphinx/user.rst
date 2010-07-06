@@ -774,7 +774,7 @@ Enumeration of variables can be tedious if they are many; creating local scope (
 
 .. note:: Only types that can be `pickled <http://docs.python.org/library/pickle.html>`_ can be passed to :yref:`yade.utils.saveVars`.
 
-.. warning:: The :yref:`yade.utils.saveVars` mechanism inherits all problems of global variables (such as shadowing, as shown above). Take care when using it. In particular, conflicting names can he far-reaching consequences.
+.. warning:: The :yref:`yade.utils.saveVars` mechanism inherits all problems of global variables (such as shadowing, as shown above). Take care when using it. In particular, conflicting names can have far-reaching consequences.
 
 
 

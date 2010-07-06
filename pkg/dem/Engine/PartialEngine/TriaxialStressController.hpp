@@ -132,6 +132,7 @@ class TriaxialStressController : public BoundaryController
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain (logarithmic).")
  		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
+		.def_readonly("spheresVolume",&TriaxialStressController::spheresVolume,"Total volume pf spheres.")
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel3",&TriaxialStressController::max_vel3,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
