@@ -162,8 +162,8 @@ def stopIfDamaged():
 			title=O.tags['description'] if 'description' in O.tags.keys() else O.tags['params']
 			print 'gnuplot',plot.saveGnuplot(O.tags['id'],title=title)
 			print 'Bye.'
-			O.pause()
-			#sys.exit(0)
+			#O.pause()
+			sys.exit(0)
 		
 def addPlotData():
 	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer.strain,'sigma':strainer.avgStress+isoPrestress,

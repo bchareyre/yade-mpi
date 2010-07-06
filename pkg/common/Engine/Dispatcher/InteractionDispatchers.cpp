@@ -107,7 +107,7 @@ void InteractionDispatchers::action(){
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 			#endif
 		} else { // handle periodicity
-			Vector3r shift2=cellHsize*Vector3r(I->cellDist[0],I->cellDist[1],I->cellDist[2]);
+			Vector3r shift2=cellHsize*I->cellDist.cast<Real>();
 			// in sheared cell, apply shear on the mutual position as well
 			//shift2=scene->cell->shearPt(shift2);
 			#ifdef YADE_DEVIRT_FUNCTORS

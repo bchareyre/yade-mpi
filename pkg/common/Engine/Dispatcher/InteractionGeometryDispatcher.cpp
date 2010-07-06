@@ -48,7 +48,7 @@ void InteractionGeometryDispatcher::action(){
 	updateScenePtr();
 
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cell->trsf*scene->cell->refSize;
+	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->Hsize;
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
@@ -73,7 +73,7 @@ void InteractionGeometryDispatcher::action(){
 			if(!scene->isPeriodic){
 				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/ false, I);
 			} else{
-				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
+				Vector3r shift2=cellHsize*I->cellDist.cast<Real>();
 				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, /*force*/ false, I);
 			}
 			// reset && erase interaction that existed but now has no geometry anymore
