@@ -74,7 +74,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		
 		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)
 		void setContactProperties(Real frictionDegree);
-
+		
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(
 		TriaxialCompressionEngine,TriaxialStressController,
 		"The engine is a state machine with the following states; transitions my be automatic, see below.\n\n"
@@ -106,7 +106,6 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((Real,epsilonMax,0.5,"Value of axial deformation for which the loading must stop"))
 		((Real,uniaxialEpsilonCurr,1,"Current value of axial deformation during confined loading (is reference to strain[1])"))
 		((Real,fixedPoroCompaction,false,"A special type of compaction with imposed final porosity :yref:`TriaxialCompressionEngine::fixedPorosity` (WARNING : can give unrealistic results!)"))
-		((Real,spheresVolume,1,""))
 		((Real,fixedPorosity,0,"Value of porosity chosen by the user"))
 		((Real,maxStress,0,"Max value of stress during the simulation (for post-processing)"))
 		,
@@ -114,7 +113,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		translationAxisz=Vector3r(0,0,1);
 		currentState=STATE_UNINITIALIZED;
 		previousState=currentState;
-			Phase1End = "Compacted";
+		Phase1End = "Compacted";
 		FinalIterationPhase1 = 0;
 		Iteration = 0;
 		firstRun=true;
@@ -123,7 +122,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		saveSimulation=false;
 		,
 	 	.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
-		 )
+		)
 	DECLARE_LOGGER;
 };
 

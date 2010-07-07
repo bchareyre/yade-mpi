@@ -23,41 +23,6 @@ class Ip2_2xCohFrictMat_CohFrictPhys;
 CREATE_LOGGER(TriaxialCompressionEngine);
 YADE_PLUGIN((TriaxialCompressionEngine));
 
-// TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(strain[1])
-// {
-// 	translationAxis=TriaxialStressController::normal[wall_bottom_id];
-// 	translationAxisx=Vector3r(1,0,0);
-// 	translationAxisz=Vector3r(0,0,1);
-// 	strainRate=0;
-// 	currentStrainRate=0;
-// 	StabilityCriterion=0.001;
-// 	//Phase1=false;
-// 	currentState=STATE_UNINITIALIZED;
-// 	previousState=currentState;
-// 	UnbalancedForce = 1;
-// 	Key = "";
-// 	noFiles=false;
-// 	Phase1End = "Compacted";
-// 	FinalIterationPhase1 = 0;
-// 	Iteration = 0;
-// 	testEquilibriumInterval = 20;
-// 
-// 	autoUnload=true;
-// 	autoCompressionActivation=true;
-// 	autoStopSimulation=true;
-// 
-// 	UnbalancedForce = 1;
-// 	saveSimulation = false;
-// 	firstRun=true;
-// 	previousSigmaIso=sigma_iso;
-// 	frictionAngleDegree = -1;
-// 	epsilonMax = 0.5;
-// 
-// 	fixedPoroCompaction=false;
-//  	boxVolume=0;
-// 	maxStress =0;
-// }
-
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
 {	
 }
@@ -133,13 +98,13 @@ void TriaxialCompressionEngine::updateParameters ()
 				computeStressStrain (); // update stress and strain
 			}
 			// stop simulation if unloaded and compression is not activate automatically
-			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
-				Omega::instance().stopSimulationLoop();
-			}
+// 			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
+// 				Omega::instance().stopSimulationLoop();
+// 			}
 		}
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
-			Omega::instance().stopSimulationLoop();
+// 			Omega::instance().stopSimulationLoop();
 			return;
 		}
 	}
@@ -183,7 +148,7 @@ void TriaxialCompressionEngine::action()
 	}
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{		
-		Omega::instance().stopSimulationLoop();
+// 		Omega::instance().stopSimulationLoop();
 		return;
 	}
 	TriaxialStressController::action();
@@ -205,7 +170,7 @@ void TriaxialCompressionEngine::action()
 			State* p_top=Body::byId(wall_top_id,scene)->state.get();
 			p_top->pos -= 0.5*currentStrainRate*height*translationAxis*dt;
 		} else {
-			Omega::instance().stopSimulationLoop();
+// 			Omega::instance().stopSimulationLoop();
 		}
 	}
 	if ( currentState==STATE_FIXED_POROSITY_COMPACTION )
