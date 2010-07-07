@@ -1,4 +1,4 @@
-/*! This class is for storing the cohesive contacts number 
+/*! This class is for recording number of cohesive contacts 
  * of RPM model in a file. Class derived from Recorder
 */
 #pragma once

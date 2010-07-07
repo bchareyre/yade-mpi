@@ -16,6 +16,13 @@ mechanical behavior of mining rocks.
 #include<yade/pkg-common/ElastMat.hpp>
 
 
+class RpmState: public State {
+	YADE_CLASS_BASE_DOC_ATTRS(RpmState,State,"State information about Rpm body.",
+		((int,specimenNumber,0,"The variable is used for particle size distribution analyze. Indicates, to which part of specimen belongs para of particles."))
+	);
+};
+REGISTER_SERIALIZABLE(RpmState);
+
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
