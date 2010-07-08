@@ -20,18 +20,13 @@ class ParticleSizeDistrbutionRPMRecorder: public Recorder {
 
 struct identicalIds{
 	int id1, id2;
-	identicalIds (int id1r, int id2r){
+	Real mass;
+	identicalIds (int id1r, int id2r, Real massr){
 		assert(id1r<id2r);
 		id1 = id1r;
 		id2 = id2r;
+		mass = massr;
 	}
-	
-	static bool checkIdentical(identicalIds param1, identicalIds param2) {
-		if ((param1.id1 == param2.id1) and (param1.id2 == param2.id2)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	static bool sortArrayIdentIds (identicalIds i, identicalIds d) {return i.mass>d.mass;}
 };
 REGISTER_SERIALIZABLE(ParticleSizeDistrbutionRPMRecorder);

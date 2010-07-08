@@ -19,6 +19,7 @@ mechanical behavior of mining rocks.
 class RpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS(RpmState,State,"State information about Rpm body.",
 		((int,specimenNumber,0,"The variable is used for particle size distribution analyze. Indicates, to which part of specimen belongs para of particles."))
+		((Real,specimenMass,0,"Indicates the mass of the whole stone, which owns the particle."))
 	);
 };
 REGISTER_SERIALIZABLE(RpmState);
