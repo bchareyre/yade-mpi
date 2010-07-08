@@ -660,8 +660,8 @@ Stability considerations
 	% http://imechanica.org/node/7670#comment-13672: Δt_crit=2/ω_max
 	The leapfrog integration scheme is conditionally stable, i.e. not magnifying errors, provided $\Dt<\Dtcr$ where $\Dtcr$ is the *critical timestep*, above which the integration is unstable. Usually, $\Dt$ is taken as a fraction of $\Dtcr$; this fraction is called the *timestep safety factor*, with meaningful values $\in\langle 0,1)$.
 
-Critical timestep (translational)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Critical timestep
+^^^^^^^^^^^^^^^^^
 In order to ensure stability for the explicit integration sceheme, an upper limit is imposed on $\Dt$:
 
 .. math::
@@ -670,12 +670,12 @@ In order to ensure stability for the explicit integration sceheme, an upper limi
 	\Dtcr=\frac{2}{\omega_{\rm max}}
 
 
-where $\omega_{\rm max}$ is the highest angular eigenfrequency within the system.
+where $\omega_{\rm max}$ is the highest eigenfrequency within the system.
 
 Single mass-spring system
 """"""""""""""""""""""""""
 
-Single mass-spring system with mass $m$ and stiffness $K$ is governed by the equation
+Single 1D mass-spring system with mass $m$ and stiffness $K$ is governed by the equation
 
 .. math:: m\ddot{x}=-Kx
 
@@ -699,32 +699,34 @@ In a general mass-spring system, the highest frequency occurs if two connected m
 
 .. math:: \omega_{\rm max}=\max_i\sqrt{K_i^{(2)}/m_i}.
 			
-The overall critical timestep is thena
+The overall critical timestep is then
 
 .. math::
 	:label: eq-dtcr-global
 
 	\Dtcr=\frac{2}{\omega_{\rm max}}=\min_i\, 2\sqrt{\frac{m_i}{K_i^{(2)}}}=\min_i\, 2\sqrt{\frac{m_i}{2K_i}}=\min_i \sqrt{2}\sqrt{\frac{m_i}{K_i}}.
 
-This equation can be used in $R^3$ simulations by evaluating the critical timestep per-axis and requiring
+This equation can be used for all 6 degrees of freedom (DOF) in translation and rotation, by considering generalized mass and stiffness matrices $M$ and $K$, and replacing fractions $\frac{m_i}{K_i}$ by eigen values of $K.M^{-1}$. The critical timestep is then associated to the eigen mode with highest frequency : 
 
 .. math::
 	:label: eq-dtcr-axes
 
-	\Dtcr=\min {\Dtcr}_w,\quad w\in\{x,y,z\}.
+	\Dtcr=\min {\Dtcr}_k,\quad k\in\{1,...,6\}.
+
+
 				
 DEM simulations
 """"""""""""""""
-In DEM simulations, per-particle stiffness $\vec{K}_i$ is determined from the stiffnesses of contacts in which it participates [Chareyre2005]_. Suppose each contact has normal stiffness $K_{Nj}$, shear stiffness $K_{Tj}=\xi K_{Nj}$ and is oriented by normal $\vec{n}_{j}$. $\vec{K}_i$ is then sum of contributions of all contacts in which it participates (indices $j$), with terms along axes equal to
+In DEM simulations, per-particle stiffness $\vec{K}_{ij}$ is determined from the stiffnesses of contacts in which it participates [Chareyre2005]_. Suppose each contact has normal stiffness $K_{Nk}$, shear stiffness $K_{Tk}=\xi K_{Nk}$ and is oriented by normal $\vec{n}_{k}$. A translational stiffness matrix $\vec{K}_ij$ can be defined as the sum of contributions of all contacts in which it participates (indices $k$), as
 
 .. math::
 	:label: eq-dtcr-particle-stiffness
 	
-	\vec{K}_{iw}=\sum_j (K_{Nj}-K_{Tj})\vec{n}_{jw}^2+K_{Tj}=\sum_j K_{Nj}\left((1-\xi)\vec{n}_{jw}^2+\xi\right)
+	\vec{K}_{ij}=\sum_k (K_{Nk}-K_{Tk})\vec{n}_{i}\vec{n}_{j}+K_{Tk}=\sum_j K_{Nk}\left((1-\xi)\vec{n}_{i}\vec{n}_{j}+\xi\right)
 
-with $w\in\{x,y,z\}$. Equations :eq:`eq-dtcr-global`, :eq:`eq-dtcr-axes` and :eq:`eq-dtcr-particle-stiffness` determine $\Dtcr$ in a simulation; it is implemented by the :yref:`GlobalStiffnessTimeStepper` engine in Yade. 
+with $i$ and $j\in\{x,y,z\}$. Equations :eq:`eq-dtcr-global`, :eq:`eq-dtcr-axes` and :eq:`eq-dtcr-particle-stiffness` determine $\Dtcr$ in a simulation. A similar approach generalized to all 6 DOFs is implemented by the :yref:`GlobalStiffnessTimeStepper` engine in Yade. The derivation of generalized stiffness including rotational terms is very similar but not developped here, for simplicity. For full reference, see "PFC3D - Theoretical Background".
 					
-For computation efficiency reasons, eigenvalues of the stiffness matrices are not computed. They are only approximated using diagonal terms, which give good approximates in typical mechanical systems.
+For computation efficiency reasons, eigenvalues of the stiffness matrices are not computed. They are only approximated assuming than DOF's are uncoupled, and using diagonal terms of $K.M^{-1}$. They give good approximates in typical mechanical systems.
 
 There is one important condition that $\omega_{\rm max}>0$: if there are no contacts between particles and $\omega_{\rm max}=0$, we would obtain value $\Dtcr=\infty$. While formally correct, this value is numerically erroneous: we were silently supposing that stiffness remains constant during each timestep, which is not true if contacts are created as particles collide. In case of no contact, therefore, stiffness must be pre-estimated based on future interactions, as shown in the next section.
 				
