@@ -100,7 +100,7 @@ void TriaxialStressController::action()
 		{
 			if((*bi)->isClump()) continue;
 			const shared_ptr<Body>& b = *bi;
-			if ( b->isDynamic() )
+			if ( b->isDynamic() || b->isClumpMember() )
 			{
 				const shared_ptr<Sphere>& sphere =
 						YADE_PTR_CAST<Sphere> ( b->shape );
