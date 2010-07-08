@@ -95,7 +95,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((bool,autoUnload,true,"Auto-switch from isotropic compaction to unloading"))
 		((bool,autoStopSimulation,true,"Stop the simulation when the sample reach STATE_LIMBO, or keep running"))
 		((int,testEquilibriumInterval,20,"interval of checks for transition between phases, higher than 1 saves computation time."))
-		((stateNum,currentState,1,""))
+		((stateNum,currentState,1,"There are 5 possible states in which TriaxialCompressionEngine can be. See above :yref:`yade.wrapper.TriaxialCompressionEngine` "))
 		((stateNum,previousState,1,"Previous state (used to detect manual changes of the state in .xml)"))
 		((Real,sigmaIsoCompaction,1,"Prescribed isotropic pressure during the compaction phase"))
 		((Real,previousSigmaIso,1,"Previous value of inherited sigma_iso (used to detect manual changes of the confining pressure)"))
