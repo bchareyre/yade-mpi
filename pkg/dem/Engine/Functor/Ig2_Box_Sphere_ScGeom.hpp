@@ -3,6 +3,8 @@
 *  olivier.galizzi@imag.fr                                               *
 *  Copyright (C) 2004 by Janek Kozicki                                   *
 *  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *

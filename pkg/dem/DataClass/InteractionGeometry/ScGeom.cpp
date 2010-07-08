@@ -26,27 +26,11 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Real& dt,boo
 
 void ScGeom::precompute(const State& rbp1, const State& rbp2, const Real& dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
 //Precompute data needed for rotating tangent vectors attached to the interaction
-	//This line gives nan randomly, when it happens the same repeated lines will give (0,0,0) below 
 	orthonormal_axis = prevNormal.cross(normal);
-	// Let's try stupid workaround -> not better
-// 	Vector3r& lhs= prevNormal;
-// 	Vector3r& rhs= normal;
-// 	orthonormal_axis[0]=lhs[1] * rhs[2] - lhs[2] * rhs[1];
-// 	orthonormal_axis[1]=lhs[2] * rhs[0] - lhs[0] * rhs[2];
-// 	orthonormal_axis[2]=lhs[0] * rhs[1] - lhs[1] * rhs[0];
-
 	Real angle = dt*0.5*normal.dot(rbp1.angVel + rbp2.angVel);
 	twist_axis = angle*normal;
-	//The previous normal is updated after being used
-// 	prevNormal=normal;
-	if (isnan(orthonormal_axis[0]) || isnan(orthonormal_axis[1]) ||isnan(isnan(orthonormal_axis[2])))
-	{
-		cerr << "axis "<< twist_axis << " "<<orthonormal_axis << " "<<normal<<" "<<prevNormal<<" "<< rbp1.angVel<<" "<< rbp2.angVel<< endl;
-		cerr<<"nan"<<endl;
-		orthonormal_axis = prevNormal.cross(normal); cerr<<orthonormal_axis<<endl;
-		orthonormal_axis = prevNormal.cross(normal); cerr<<orthonormal_axis<<endl;
-		orthonormal_axis = prevNormal.cross(normal); cerr<<orthonormal_axis<<endl;
-	}
+	//The previous normal could be updated here after being used, them remove it from Ig2's? 
+ 	//prevNormal=normal;
 	//Precompute shear increment
 	Vector3r& x = contactPoint;
 	Vector3r c1x, c2x;
@@ -76,14 +60,10 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Real& dt, co
 		c2x = (x - rbp2.pos);
 	}
 	Vector3r relativeVelocity = (rbp2.vel+rbp2.angVel.cross(c2x)) - (rbp1.vel+rbp1.angVel.cross(c1x));
-// 	cerr <<"relativeVelocity"<<relativeVelocity<<endl;
-	//update relative velocity for interactions across periods
-	//if (scene->cell->isPeriodic) shearDisplacement+=scene->cell->velGrad*scene->cell->Hsize*cellDist; FIXME : we need pointer to scene. For now, everything will be computed outside this function, which doens't make much sense.
 	relativeVelocity+=shiftVel;
 	//keep the shear part only
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	shearIncrement = relativeVelocity*dt;
-// 	cerr <<"shearIncrement EOP"<<shearIncrement <<endl;
 }
 
 
@@ -165,12 +145,10 @@ Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNor
 	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
 	
 	//update relative velocity for interactions across periods
-	//if (scene->cell->isPeriodic) shearDisplacement+=scene->cell->velGrad*scene->cell->Hsize*cellDist; FIXME : we need pointer to scene. For now, everything will be computed outside this function, which doens't make much sense.
 	relativeVelocity+=shiftVel;
 	//keep the shear part only
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = relativeVelocity*dt;
-	//shearForce -= ks*shearDisplacement;//this is constitutive behaviour -> moved to Law2 functors
 	return shearDisplacement;
 #endif //IGCACHE
 }
@@ -217,7 +195,6 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, c
 	}
 	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
 	//update relative velocity for interactions across periods
-	//if (scene->cell->isPeriodic) shearDisplacement+=scene->cell->velGrad*scene->cell->Hsize*cellDist; FIXME : we need pointer to scene. For now, everything will be computed outside this function, which doens't make much sense.
 	relativeVelocity+=shiftVel;
 	return relativeVelocity;
 }
