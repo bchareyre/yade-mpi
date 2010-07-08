@@ -74,7 +74,7 @@ class TriaxialTest : public FileGenerator
 		bool generate();
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
-		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. See full documentation at http://yade-dem.org/wiki/TriaxialTest."
+		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. Full documentation in py/_extraDocs.py."
 		,
    		((Vector3r,lowerCorner,Vector3r(0,0,0),"Lower corner of the box."))
 		((Vector3r,upperCorner,Vector3r(1,1,1),"Upper corner of the box."))

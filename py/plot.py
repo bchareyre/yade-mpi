@@ -84,7 +84,6 @@ def addData(*d_in,**kw):
 	if len(data)>0: numSamples=len(data[data.keys()[0]])
 	else: numSamples=0
 	#reduceData(numSamples)
-	nan=float('nan')
 	d=(d_in[0] if len(d_in)>0 else {})
 	d.update(**kw)
 	for name in d:
