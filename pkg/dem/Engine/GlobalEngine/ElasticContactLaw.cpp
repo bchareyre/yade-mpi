@@ -1,6 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi   olivier.galizzi@imag.fr       *
-*  Copyright (C) 2009 by Bruno Chareyre   bruno.chareyre@hmg.inpg.fr     *
+*  Copyright (C) 2005 by Bruno Chareyre   bruno.chareyre@hmg.inpg.fr     *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -11,7 +10,6 @@
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
 #include<yade/core/Scene.hpp>
 
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw));
@@ -63,21 +61,23 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 		return;}
 	State* de1 = Body::byId(id1,ncb)->state.get();
 	State* de2 = Body::byId(id2,ncb)->state.get();
-	Vector3r& shearForce = currentContactPhysics->shearForce;
-	Real un=currentContactGeometry->penetrationDepth;
+	Real& un=currentContactGeometry->penetrationDepth;
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
-	//FIXME : it would make more sense to compute the shift in some Ig2->getShear, using precomputed velGrad*Hsize in Cell and I->cellDist, but it is not possible with current design (Ig doesn't know scene nor I).
+#ifdef IGCACHE
+	Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
+	Vector3r& shearDisp = currentContactGeometry->shearIncrement;
+#else
+	Vector3r& shearForce = currentContactPhysics->shearForce;
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
+	Vector3r shearDisp = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,true);
+// 	cerr << "shearForce "<<shearForce<<" shearIncrement "<<currentContactGeometry->shearIncrement<<endl;
+#endif
 	if (!traceEnergy){//Update force but don't compute energy terms (see below))
 		if(useShear){
 			currentContactGeometry->updateShear(de1,de2,dt);
 			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
-		} else {
-			Vector3r dus = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,/*avoid ratcheting*/true);
-			//Linear elasticity giving "trial" shear force
-			shearForce -= currentContactPhysics->ks*dus;
-		}
+		} else shearForce -= currentContactPhysics->ks*shearDisp;
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
@@ -88,8 +88,6 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	} else {
 		//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
 		if(useShear) throw ("energy tracing not defined with useShear==true");
-		Vector3r shearDisp = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,true);
-		Vector3r prevForce=shearForce;//store prev force for definition of plastic slip
 		shearForce -= currentContactPhysics->ks*shearDisp;
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
@@ -112,6 +110,7 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 		ncb->forces.addTorque(id1,(currentContactGeometry->radius1-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
 		ncb->forces.addTorque(id2,(currentContactGeometry->radius2-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
 	}
+	//FIXME : make sure currentContactPhysics->prevNormal is not used anywhere, remove it from physics and remove this line :
 	currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }
 

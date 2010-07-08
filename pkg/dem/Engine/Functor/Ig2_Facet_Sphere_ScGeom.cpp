@@ -10,7 +10,7 @@
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>
-
+#include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
 CREATE_LOGGER(Ig2_Facet_Sphere_ScGeom);
@@ -95,21 +95,27 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	if (penetrationDepth>0 || c->isReal())
 	{
 		shared_ptr<ScGeom> scm;
+		bool isNew = !c->interactionGeometry;
 		if (c->interactionGeometry)
 			scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 		else
 			scm = shared_ptr<ScGeom>(new ScGeom());
 	  
 		normal = facetAxisT*normal; // in global orientation
-		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 
+		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal;
+		//Update prevNormal (mandatory in ScGeom algoritms)
+		if(isNew) { scm->prevNormal=normal;}
+		else scm->prevNormal=scm->normal;
 		scm->normal = normal; 
 		scm->penetrationDepth = penetrationDepth;
 		scm->radius1 = 2*sphereRadius;
 		scm->radius2 = sphereRadius;
-
 		if (!c->interactionGeometry)
 			c->interactionGeometry = scm;
-
+		if (scene->isPeriodic){
+			Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
+ 			scm->precompute(state1,state2,scene->dt,shiftVel,true);}
+ 		else scm->precompute(state1,state2,scene->dt,true);
 		return true;
 	}
 	return false;

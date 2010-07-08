@@ -13,13 +13,18 @@
  */
 
 #define SCG_SHEAR
+// #define IGCACHE
 
 class ScGeom: public GenericSpheresContact {
 	public:
 		// inherited from GenericSpheresContact: Vector3r& normal; 
-		Real penetrationDepth;
 		Real &radius1, &radius2;
-
+		//cached values
+		Vector3r twist_axis;//rotation vector arounf normal
+		Vector3r orthonormal_axis;//rotation vector in contact plane
+		Real penetrationDepth;
+		Vector3r shearIncrement;
+		
 		//! update shear on this contact given dynamic parameters of bodies. Should be called from constitutive law, exactly once per iteration. Returns shear increment in this update, which is already added to shear.
 		Vector3r updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting=true);
 		
@@ -28,9 +33,17 @@ class ScGeom: public GenericSpheresContact {
 		Vector3r rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt,bool avoidGranularRatcheting=true);
 		//!  Periodic variant. Needs the velocity shift across periods for periodic BCs (else it is safe to pass Vector3r::Zero()). Typically obtained as scene->cell->velGrad*scene->cell->Hsize*cellDist. It would be better to define the shift transparently inside the function, but it needs scene and interaction pointers, which we don't have here.
 		Vector3r rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting=true);
+		
+		//!precompute values of shear increment and interaction rotation data
+		void precompute(const State& rbp1, const State& rbp2, const Real& dt,bool avoidGranularRatcheting=true);
+		//!  Periodic variant. Needs the velocity shift across periods for periodic BCs (else it is safe to pass Vector3r::Zero()). Typically obtained as scene->cell->velGrad*scene->cell->Hsize*cellDist.
+		void precompute(const State& rbp1, const State& rbp2, const Real& dt, const Vector3r& shiftVel, bool avoidGranularRatcheting=true);
 
-		// Add method which only rotates the shear vector (or another vector as well).
-		Vector3r rotate(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt);
+		//! Add method which only rotates the shear vector (or another tangent vector as well). Returns reference of the updated vector.
+		Vector3r& rotate(Vector3r& tangentVector, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt);
+		//! Same rotation using precomputed values
+		Vector3r& rotate(Vector3r& tangentVector);
+		
 		// Add method which returns the impact velocity (then, inside the contact law, this can be split into shear and normal component). Handle periodicity.
 		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting=true);
 		// Implement another version of getIncidentVel which does not handle periodicity.
@@ -42,7 +55,7 @@ class ScGeom: public GenericSpheresContact {
 		((Vector3r,prevNormal,Vector3r::Zero(),"Normal of the contact in the previous step. |ycomp|"))
 		,
 		/* extra initializers */ ((radius1,GenericSpheresContact::refR1)) ((radius2,GenericSpheresContact::refR2)),
-		/* ctor */ createIndex();,
+		/* ctor */ createIndex(); shearIncrement=Vector3r::Zero(); twist_axis=orthonormal_axis=Vector3r::Zero();,
 		/* py */
 		.def_readwrite("penetrationDepth",&ScGeom::penetrationDepth,"documentation")
 	);
