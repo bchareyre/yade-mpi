@@ -28,6 +28,7 @@ class FlowEngine : public PartialEngine
 		Real wall_thickness;
 		bool Update_Triangulation;
 		bool currentTes;
+		int id_offset;
 		
 		void Triangulate ();
 		void AddBoundary ();
@@ -79,6 +80,8 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_BACK_Boundary,  0, "Pressure imposed on back boundary"))
 					((double, Pressure_LEFT_Boundary,  0, "Pressure imposed on left boundary"))
 					((double, Pressure_RIGHT_Boundary,  0, "Pressure imposed on right boundary"))
+					((double, Sinus_Pressure, 0, "Pressure value (amplitude) when sinusoidal pressure is applied"))
+					((int, id_sphere, 0, "Average velocity will be computed for all cells incident to that sphere"))
 					,timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
 		DECLARE_LOGGER;
 };

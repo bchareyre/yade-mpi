@@ -51,8 +51,6 @@ void FlowEngine::action ( )
 
 				timingDeltas->checkpoint("Triangulating");
 				
-				cout << "new iteration" << endl;
-				
 				UpdateVolumes ( );
 			
 				timingDeltas->checkpoint("Update_Volumes");
@@ -72,7 +70,7 @@ void FlowEngine::action ( )
 				
 				if (save_vtk) flow->save_vtk_file(flow->T[flow->currentTes].Triangulation());
 			
-// 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
+ 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
 				flow->ComputeFacetForces();
 				
@@ -81,12 +79,21 @@ void FlowEngine::action ( )
 			///End Compute flow and forces
 
 				CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end ();
-				Vector3r f;int id;
+				Vector3r f; int id;
 				for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
 				{
 					id = V_it->info().id();
+					
+// 					scene->forces.sync();
+// 					const Vector3r& fbef = scene->forces.getForce(id);
+// 					if (id==id_sphere) cout << "force before = " << fbef << endl;
+// 					if (id==id_sphere) cout << "fluid force = " << V_it->info().forces << endl;
 					for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
 					scene->forces.addForce ( id, f );
+					
+// 					scene->forces.sync();
+// 					const Vector3r& faft = scene->forces.getForce(id);
+// 					if (id==id_sphere) cout << "force after = " << faft << endl;
 				//scene->forces.addTorque(id,t);
 				}
 				
@@ -111,16 +118,18 @@ void FlowEngine::action ( )
 				std::ofstream settle ("settle.txt", std::ios::app);
 				settle << j << " " << time << " " << currentStrain << endl;
 				
-				if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
+				first=false;
+				
+				if ( Omega::instance().getCurrentIteration()>1 && Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 				{ Update_Triangulation = true; }
 				
 				if ( Update_Triangulation ) { Build_Triangulation( );}
 				
 				timingDeltas->checkpoint("Storing Max Pressure");
-
-				first=false;
 				
-				cout << "end iteration" << endl;
+// 				int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
+				
+// 				flow->vtk_average_cell_velocity(flow->T[flow->currentTes].Triangulation(), id_sphere, numero);
 		}
 	}
 }
@@ -142,20 +151,6 @@ void FlowEngine::BoundaryConditions()
 	flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
 }
 
-void FlowEngine::Oedometer_Boundary_Conditions()
-{
-	flow->boundary ( flow->y_min_id ).flowCondition=0;
-	flow->boundary ( flow->y_max_id ).flowCondition=0;
-	flow->boundary ( flow->y_min_id ).value=0;
-	flow->boundary ( flow->y_max_id ).value=0;
-	
-	triaxialCompressionEngine->wall_left_activated=0;
-	triaxialCompressionEngine->wall_right_activated=0;
-	triaxialCompressionEngine->wall_front_activated=0;
-	triaxialCompressionEngine->wall_back_activated=0;
-	triaxialCompressionEngine->wall_top_activated=1;
-	triaxialCompressionEngine->wall_bottom_activated=1;
-}
 
 void FlowEngine::Build_Triangulation ()
 {
@@ -180,9 +175,10 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
-
-	AddBoundary ( );
+AddBoundary ( );
 	Triangulate ( );
+	
+	
 	
 	
 	cout << endl << "Tesselating------" << endl << endl;
@@ -202,6 +198,8 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
+// 		flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 5);
+		BoundaryConditions();
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
 	}
@@ -220,6 +218,35 @@ void FlowEngine::Build_Triangulation (double P_zero)
 
 void FlowEngine::AddBoundary ()
 {
+  
+  shared_ptr<Sphere> sph ( new Sphere );
+
+	int Sph_Index = sph->getClassIndexStatic();
+	int contator = 0;
+	
+	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
+	{
+		if ( !b ) continue;
+		if ( b->shape->getClassIndex() ==  Sph_Index )
+		{
+		  Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
+			const body_id_t& id = b->getId();
+			Real rad = s->radius;
+			Real x = b->state->pos[0];
+			Real y = b->state->pos[1];
+			Real z = b->state->pos[2];
+			
+			flow->x_min = min ( flow->x_min, x-rad);
+			flow->x_max = max ( flow->x_max, x+rad);
+			flow->y_min = min ( flow->y_min, y-rad);
+			flow->y_max = max ( flow->y_max, y+rad);
+			flow->z_min = min ( flow->z_min, z-rad);
+			flow->z_max = max ( flow->z_max, z+rad);
+			
+			contator+=1;
+		}
+	}
+	
 	cout << "Adding Boundary------" << endl;
 
 	shared_ptr<Box> bx ( new Box );
@@ -236,16 +263,18 @@ void FlowEngine::AddBoundary ()
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
 
-			flow->x_min = min ( flow->x_min, center[0]+wall_thickness);
-			flow->x_max = max ( flow->x_max, center[0]-wall_thickness);
-			flow->y_min = min ( flow->y_min, center[1]+wall_thickness);
-			flow->y_max = max ( flow->y_max, center[1]-wall_thickness);
-			flow->z_min = min ( flow->z_min, center[2]+wall_thickness);
-			flow->z_max = max ( flow->z_max, center[2]-wall_thickness);
+// 			flow->x_min = min ( flow->x_min, center[0]+wall_thickness);
+// 			flow->x_max = max ( flow->x_max, center[0]-wall_thickness);
+// 			flow->y_min = min ( flow->y_min, center[1]+wall_thickness);
+// 			flow->y_max = max ( flow->y_max, center[1]-wall_thickness);
+// 			flow->z_min = min ( flow->z_min, center[2]+wall_thickness);
+// 			flow->z_max = max ( flow->z_max, center[2]-wall_thickness);
 		}
 	}
 	
-	flow->id_offset = flow->T[flow->currentTes].max_id+1;
+	id_offset = flow->T[flow->currentTes].max_id+1;
+	
+	flow->id_offset = id_offset;
 
 	flow->y_min_id=triaxialCompressionEngine->wall_bottom_id;
 	flow->y_max_id=triaxialCompressionEngine->wall_top_id;
@@ -277,6 +306,13 @@ void FlowEngine::Triangulate ()
 			Real z = b->state->pos[2];
 			
 			flow->T[flow->currentTes].insert(x, y, z, rad, id);
+			
+// 			flow->x_min = min ( flow->x_min, x-rad);
+// 			flow->x_max = max ( flow->x_max, x+rad);
+// 			flow->y_min = min ( flow->y_min, y-rad);
+// 			flow->y_max = max ( flow->y_max, y+rad);
+// 			flow->z_min = min ( flow->z_min, z-rad);
+// 			flow->z_max = max ( flow->z_max, z+rad);
 			
 			contator+=1;
 		}

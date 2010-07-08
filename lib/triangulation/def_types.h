@@ -14,7 +14,7 @@
 
 #include <boost/static_assert.hpp>
 
-#define FLOW_ENGINE
+//#define FLOW_ENGINE
 
 
 namespace CGT{
@@ -57,6 +57,8 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
+	// Reflects the geometrical property of the cell, so that the force by cell fluid on grain "i" is pressure*unitForceVectors[i]
+	std::vector<Vecteur> unitForceVectors;
 	// Store the area of triangle-sphere intersections for each facet (used in forces definition)
 	std::vector<Vecteur> facetSphereCrossSections;
 	std::vector<Vecteur> cell_force;
@@ -73,6 +75,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
 		facetSphereCrossSections.resize(4);
+		unitForceVectors.resize(4);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		RayHydr.resize(4, 0);
 		isInside = false;

@@ -1,3 +1,10 @@
+/*************************************************************************
+*  Copyright (C) 2010 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
 #ifndef _FLOWBOUNDINGSPHERE_H
 #define _FLOWBOUNDINGSPHERE_H
 
@@ -41,6 +48,8 @@ class FlowBoundingSphere
 		double RELAX;
 		double ks; //Hydraulic Conductivity
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
+		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
+		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
 		int Iterations;
 		
@@ -88,7 +97,9 @@ class FlowBoundingSphere
 		void Initialize_pressures ( double P_zero );
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
+		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForces();
+		void ComputeFacetForcesWithCache();
 		void save_vtk_file ( RTriangulation &T );
 		void MGPost ( RTriangulation& Tri );
 #ifdef XVIEW
@@ -141,6 +152,11 @@ class FlowBoundingSphere
 		double volume_double_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
 		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
 		double volume_double_fictious_pore (Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point& PV1, Point& PV2, Vecteur& facetSurface);
+		
+		int Average_Cell_Velocity(int id_sphere, RTriangulation& Tri);
+		void vtk_average_cell_velocity(RTriangulation &T, int id_sphere, int num_cells);
+		void ApplySinusoidalPressure(RTriangulation& Tri, double Pressure, double load_intervals);
+
 };
 
 } //namespace CGT

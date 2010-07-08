@@ -1,3 +1,9 @@
+/*************************************************************************
+*  Copyright (C) 2010 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include "def_types.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
@@ -7,7 +13,7 @@
 #include <new>
 #include <utility>
 #include "vector"
-
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -23,12 +29,14 @@
 
 #define FAST
 #define TESS_BASED_FORCES
+#define FACET_BASED_FORCES 1
+// #define USE_FAST_MATH 1
 
 using namespace std;
 namespace CGT
 {
 
-const bool DEBUG_OUT = false;
+const bool DEBUG_OUT = true;
 
 
 const double ONE_THIRD = 1.0/3.0;
@@ -78,6 +86,8 @@ FlowBoundingSphere::FlowBoundingSphere()
 	distance_correction = true;
 	meanK_LIMIT = true;
 	meanK_STAT = false; K_opt_factor=0;
+	noCache=true;
+	computeAllCells=true;//might be turned false IF the code is reorganized (we can make a separate function to compute unitForceVectors outside Compute_Permeability) AND it really matters for CPU time
 }
 
 void FlowBoundingSphere::Compute_Action()
@@ -203,6 +213,122 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
 // }
 }
 
+int FlowBoundingSphere::Average_Cell_Velocity(int id_sphere, RTriangulation& Tri)
+{
+	Vecteur nullVect(0,0,0);
+	double pos_av_facet [3];
+	int num_cells = 0;
+	
+	double facet_flow_rate;
+	std::ofstream oFile( "Average_Cells_Velocity",std::ios::app);
+	
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	  for (int h=0; h<3;h++) (cell->info().av_vel())[h]=0;}
+	
+	Tesselation::Vector_Cell tmp_cells;
+	tmp_cells.resize(1000);
+	Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+	Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id_sphere],cells_it);
+	for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+	{
+	  num_cells++;
+	  for (int i=0; i<4; i++)
+	  {
+// 	    oFile << endl << "FACET " << i << " -------------" << endl;
+	    for (int i2=0;i2<3;i2++) pos_av_facet[i2] = nullVect[i2];
+	    for (int j=0;j<3;j++)
+	    {
+	      pos_av_facet[j] += ((*it)->vertex(facetVertices[i][j])->point().x())/3 + ((*it)->vertex(facetVertices[i][j])->point().y())/3 +
+	      ((*it)->vertex(facetVertices[i][j])->point().z())/3;
+	    }
+// 	    oFile << "Average position = " ; for (int g=0; g<3; g++) oFile << pos_av_facet[g] << " "; oFile << endl;
+	    facet_flow_rate = ((*it)->info().k_norm())[i] * abs((*it)->info().p() - (*it)->neighbor(Tri.mirror_index((*it), i))->info().p());
+// 	    oFile << "Facet Flow Rate = " << facet_flow_rate << " (p1 = " << (*it)->info().p() << " ,p2 = " << (*it)->neighbor(Tri.mirror_index((*it), i))->info().p() << ", k = " << ((*it)->info().k_norm())[i] <<  ")." << endl;
+	    for (int y=0;y<3;y++) pos_av_facet[y] = pos_av_facet[y]*facet_flow_rate;
+	    for (int y2=0;y2<3;y2++)((*it)->info().av_vel())[y2] = ((*it)->info().av_vel())[y2] + pos_av_facet[y2];
+	  }
+	  for (int y2=0;y2<4;y2++) ((*it)->info().av_vel())[y2] = ((*it)->info().av_vel())[y2]/((*it)->info().volume());
+// 	  oFile << "Volume = " << (*it)->info().volume() << endl;
+	  oFile << ((*it)->info().av_vel())[0] << " " << ((*it)->info().av_vel())[1] << " " << ((*it)->info().av_vel())[2] << "    Cell Pressure = " << (*it)->info().p() << endl;
+	}
+	
+	oFile << endl << "Forces on grain = " << (T[currentTes].vertexHandles[id_sphere]->info().forces)[0] << " " << (T[currentTes].vertexHandles[id_sphere]->info().forces)[1] << " " << (T[currentTes].vertexHandles[id_sphere]->info().forces)[2] << " " << endl << endl;
+	oFile << "-----------------------------------------" << endl << endl << endl;
+	
+	return num_cells;
+}
+
+void FlowBoundingSphere::vtk_average_cell_velocity(RTriangulation &Tri, int id_sphere, int num_cells )
+{
+        static unsigned int number = 0;
+        char filename[80];
+	mkdir("./VTK", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"./VTK/out_%d.vtk", number++);
+
+        basicVTKwritter vtkfile((unsigned int) 4*num_cells, (unsigned int) num_cells);
+
+        vtkfile.open(filename,"test");
+	
+	Tesselation::Vector_Cell tmp_cells;
+	tmp_cells.resize(1000);
+	Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+	Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id_sphere],cells_it);
+	
+        vtkfile.begin_vertices();
+	for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+	{
+	  for (int y2=0; y2<4; y2++){
+	    double x,y,z;
+	    x = (double)((*it)->vertex(y2)->point().point()[0]);
+	    y = (double)((*it)->vertex(y2)->point().point()[1]);
+	    z = (double)((*it)->vertex(y2)->point().point()[2]);
+	    vtkfile.write_point(x,y,z);}
+	}
+	
+        vtkfile.end_vertices();
+	
+        vtkfile.begin_cells();
+	for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+	{
+		vtkfile.write_cell((*it)->vertex(0)->info().id()-id_offset, (*it)->vertex(1)->info().id()-id_offset, (*it)->vertex(2)->info().id()-id_offset, (*it)->vertex(3)->info().id()-id_offset);
+        }
+        vtkfile.end_cells();
+	
+// 	vtkfile.begin_data("Force",POINT_DATA,SCALARS,FLOAT);
+// 	vtkfile.write_data((T[currentTes].vertexHandles[id_sphere]->info().forces)[1]);
+// 	vtkfile.end_data();
+
+	vtkfile.begin_data("Velocity",CELL_DATA,SCALARS,FLOAT);
+
+	for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+	{
+		vtkfile.write_data((*it)->info().av_vel()[1]);
+	}
+	vtkfile.end_data();
+}
+
+void FlowBoundingSphere::ApplySinusoidalPressure(RTriangulation& Tri, double Pressure, double load_intervals)
+{
+
+	double step = 1/load_intervals;
+	Tesselation::Vector_Cell tmp_cells;
+	tmp_cells.resize(1000);
+	Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+	for (double alpha=0; alpha<1.001; alpha+=step)
+	{
+	  Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[y_max_id],cells_it);
+	  for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+	  {
+	    if(!Tri.is_infinite(*it)){
+	      Point& p1 = (*it)->info();
+	      Cell_handle& cell = *it;
+	      if (p1.x()>(alpha*(x_max-x_min)) && p1.x()<((alpha+step)*(x_max-x_min))){cell->info().p() = Pressure+cos(alpha*M_PI)*(Pressure);}
+	  }
+	  }
+	}
+}
+
 void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
         Cell_handle old_cell;
@@ -266,7 +392,7 @@ void FlowBoundingSphere::Compute_Permeability()
                 for (int j=0; j<4; j++) {
                         neighbour_cell = cell->neighbor(j);
                         p2 = neighbour_cell->info();
-                        if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
+			if (!Tri.is_infinite(neighbour_cell) && (neighbour_cell->info().isvisited==ref || computeAllCells)) {
                                 pass+=1;
                                 Rhv = Compute_HydraulicRadius(Tri, cell, j);
                                 if (Rhv<0) NEG++;
@@ -379,7 +505,7 @@ void FlowBoundingSphere::Compute_Permeability()
 
         Real Vtotale = (x_max-x_min) * (y_max-y_min) * (z_max-z_min);
         if (DEBUG_OUT) {
-                cout<<grains<<"grains - " <<"Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << Vtotale-Vgrains << endl;
+                cout<<grains<<"grains - " <<"Vtotale = " << 2*Vtotale << " Vgrains = " << 2*Vgrains << " Vporale1 = " << 2*(Vtotale-Vgrains) << endl;
                 cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
         }
 
@@ -471,24 +597,101 @@ void FlowBoundingSphere::ComputeFacetForces()
                                 for (int y=0; y<3;y++) {
                                         cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidSurfaces[j][y]/* + (cell->vertex(facetVertices[j][y])->info().isFictious ? 0 : facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y])*/;
 				if (!cell->vertex(facetVertices[j][y])->info().isFictious)
-					cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces +
- 				 facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y];
+				{cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces +
+ 				 facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y];}
+				///TEST BEGING
+				//Conclusion, we can't easily get ordered vertices from mirror facet...
+// 				for (int y=0; y<3;y++) {
+// 					int id1 = cell->vertex(facetVertices[j][y])->info().id();
+// 					int id2 = neighbour_cell->vertex(facetVertices[Tri.mirror_index(cell,j)][y])->info().id();
+// 					cerr <<"id1/id2 : "<<id1<<" "<<id2<<endl;}
+								
+				///TEST END
                                 }
                         }
                 cell->info().isvisited=!ref;
         }
-        cout << "Facet scheme" <<endl;
-        Vecteur TotalForce = nullVect;
-        for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-                if (!v->info().isFictious) {
-                        TotalForce = TotalForce + v->info().forces;
-                        if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-                } else {
-                        if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-                        if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-                }
-        }
-        cout << "TotalForce = "<< TotalForce << endl;
+         cout << "Facet scheme" <<endl;
+         Vecteur TotalForce = nullVect;
+         for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+                 if (!v->info().isFictious) {
+                         TotalForce = TotalForce + v->info().forces;
+//                          if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+                 } else {
+                         if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+                         if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+                 }
+         }
+         cout << "TotalForce = "<< TotalForce << endl;
+}
+
+void FlowBoundingSphere::ComputeFacetForcesWithCache()
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	Vecteur nullVect(0,0,0);
+	bool ref = Tri.finite_cells_begin()->info().isvisited;
+	//reset forces
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
+
+	Cell_handle neighbour_cell;
+	Vertex_handle mirror_vertex;
+	Vecteur tempVect;
+	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		//reset cache
+		for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
+		for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
+			neighbour_cell = cell->neighbor(j);
+			const Vecteur& Surfk = cell->info().facetSurfaces[j];
+			//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
+			//The ratio void surface / facet surface
+			Real area = sqrt(Surfk.squared_length());
+			Vecteur facetNormal = Surfk/area;
+			const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
+			Real fluidSurfRatio = (area-crossSections[j][0]-crossSections[j][1]-crossSections[j][2])/area;
+			Vecteur fluidSurfk = cell->info().facetSurfaces[j]*fluidSurfRatio;
+			/// handle fictious vertex since we can get the projected surface easily here
+			if (cell->vertex(j)->info().isFictious) {
+				Real projSurf=abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
+				tempVect=-projSurf*boundary(cell->vertex(j)->info().id()).normal;
+				cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
+				//define the cached value for later use with cache*p
+				cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+			}
+			/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
+			Vecteur Facet_Unit_Force = -fluidSurfk*cell->info().solidSurfaces[j][3];
+			Vecteur Facet_Force = cell->info().p()*Facet_Unit_Force;
+			for (int y=0; y<3;y++) {
+				cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidSurfaces[j][y];
+				//add to cached value
+				cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+Facet_Unit_Force*cell->info().solidSurfaces[j][y];
+				if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
+					cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
+					//add to cached value
+					cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
+				}
+			}
+		
+		}
+	}
+	else //use cached values
+		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
+			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
+	noCache=false;//cache should always be defined after execution of this function
+	
+// 	cout << "Facet cached scheme" <<endl;
+// 	Vecteur TotalForce = nullVect;
+// 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
+// 	{
+// 		if (!v->info().isFictious) {
+// 			TotalForce = TotalForce + v->info().forces;
+// 			if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 		} else {
+// 			if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+// 			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 		}
+// 	}
+// 	cout << "TotalForce = "<< TotalForce << endl;
 }
 
 void FlowBoundingSphere::ComputeTetrahedralForces()
@@ -543,6 +746,7 @@ void FlowBoundingSphere::ComputeTetrahedralForces()
 
 void FlowBoundingSphere::Compute_Forces()
 {
+	
         RTriangulation& Tri = T[currentTes].Triangulation();
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         Vecteur nullVect(0,0,0);
@@ -575,8 +779,7 @@ void FlowBoundingSphere::Compute_Forces()
                         V_fict = 0;
                         single_external_force = false, double_external_force=false, triple_external_force=false;
 
-//                         if (!cell->info().isInside) {
-			if (cell->info().fictious()!=0){
+                        if (!cell->info().isInside) {
                                 for (int i=0;i<4;i++) {
                                         if (cell->vertex(i)->info().isFictious) {
                                                 V_fict+=1;
@@ -585,11 +788,16 @@ void FlowBoundingSphere::Compute_Forces()
                         }
 
                         switch (V_fict) {
-                        case(1) : single_external_force=true;break;
-                        case(2) : double_external_force=true;break;
-                        case(3) : triple_external_force=true;break;}
+                        case(1) : single_external_force=true;
+                                break;
+                        case(2) : double_external_force=true;
+                                break;
+                        case(3) : triple_external_force=true;
+                                break;
+                        }
 
-                        p1 = cell->info(); Cell_Force = nullVect, Vertex_force = nullVect;
+                        p1 = cell->info();
+                        Cell_Force = nullVect, Vertex_force = nullVect;
 
                         for (int j=0; j<4; j++) {
                                 neighbour_cell = cell->neighbor(j);
@@ -803,32 +1011,30 @@ void FlowBoundingSphere::Compute_Forces()
                 if (!v->info().isFictious) {
 //                         if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
                         TotalForce = TotalForce + v->info().forces;
+			if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
                 } else {
                         if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-                        if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-                }
+                        if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;}
         }
+	clock.top("tri/tess force calculation");
         cout << "TotalForce = "<< TotalForce << endl;
-        clock.top("tri/tess force calculation");
+
         //reset forces
         for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                 v->info().forces=nullVect;
         }
         ComputeTetrahedralForces();
-//  if (DEBUG_OUT) {
-        cout << "tetrahedral scheme" <<endl;
-        TotalForce = nullVect;
-        for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-                if (!v->info().isFictious) {
-//                         if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
-                        TotalForce = TotalForce + v->info().forces;
-                } else {
-                        if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-                        if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-                }
-        }
-        clock.top("facets force calculation");
-        cout << "TotalForce = "<< TotalForce << endl;
+        clock.top("tetrahedral force calculation");
+        ComputeFacetForces();
+	clock.top("facets force calculation");
+	cerr<<"FIXME : we are computing forces 20x"<<endl;
+	for (int l=0;l<20;l++){//here, cash is ignored
+		noCache=true;
+		ComputeFacetForcesWithCache();}
+	clock.top("facets force without cache (x20)");
+	for (int l=0;l<20;l++) ComputeFacetForcesWithCache();//here we use cached values from the previous loop
+	clock.top("facets force with cache (x20)");
+	
 }
 
 double FlowBoundingSphere::surface_external_triple_fictious(Cell_handle cell, Boundary b)
@@ -1191,7 +1397,7 @@ double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_han
         int fictious_vertex=0, real_vertex=0; //counts total fictious/real vertices
 
         double Ssolid1=0, Ssolid1n=0, Ssolid2=0, Ssolid2n=0, Ssolid3=0, Ssolid3n=0, Ssolid=0;
-	//solid portions within a pore, for cell () and neighbour_cell (+n). Ssolid total solid surface
+        //solid portions within a pore, for cell () and neighbour_cell (+n). Ssolid total solid surface
 
         //bool fictious_solid = false;
 
@@ -1223,8 +1429,6 @@ double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_han
                         real_vertex+=1;
                 }
         }
-
-
         if (fictious_vertex==2) {
                 double A [3], B[3], C[3];
 
@@ -1269,68 +1473,86 @@ double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_han
                         cell->info().solidSurfaces[j][facetF2]=Ssolid3;
                 } else cell->info().solidSurfaces[j][facetF2]=0;
         }
-
-        else {
-                if (fictious_vertex==1) {
-                        SV1 = cell->vertex(F1);
-                        SV2 = cell->vertex(Re1);
-                        SV3 = cell->vertex(Re2);
-                        Vpore = volume_single_fictious_pore(SV1, SV2, SV3, p1,p2, cell->info().facetSurfaces[j]);
-                        Boundary &bi1 = boundary(SV1->info().id());
-                        if (bi1.flowCondition && !SLIP_ON_LATERALS) {
-                                Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point()-SV3->point())[bi1.coordinate]);
-                                cell->info().solidSurfaces[j][facetF1]=Ssolid1;
-                        }
-                        Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
-                        Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
-                        cell->info().solidSurfaces[j][facetRe1]=Ssolid2+Ssolid2n;
-                        Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
-                        Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
-                        cell->info().solidSurfaces[j][facetRe2]=Ssolid3+Ssolid3n;
-                } else {
-                        SV1 = W[0];
-                        SV2 = W[1];
-                        SV3 = W[2];
-                        cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point()-SV3->point(),SV2->point()-SV3->point());
-                        if (cell->info().facetSurfaces[j]*(p2-p1) > 0) cell->info().facetSurfaces[j] = -1.0*cell->info().facetSurfaces[j];
-                        Vtot = abs(ONE_THIRD*cell->info().facetSurfaces[j]*(p1-p2));
-
-                        Vsolid1=0;
-                        Vsolid2=0;
-                        for (int i=0;i<3;i++) {
-                                Vsolid1 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
-                                Vsolid2 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);
-                        }
-                        Vsolid = Vsolid1 + Vsolid2;
-                        Vsolid_tot += Vsolid;
-                        Vtotalissimo += Vtot;
-
-                        Vpore = Vtot - Vsolid;
-                        Vporale += Vpore;
-
-                        Ssolid1 = fast_spherical_triangle_area(SV1->point(), SV2->point(), p1, p2);
-                        Ssolid1n = fast_spherical_triangle_area(SV1->point(), SV3->point(), p1, p2);
-                        cell->info().solidSurfaces[j][0]=Ssolid1+Ssolid1n;
-                        Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
-                        Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
-                        cell->info().solidSurfaces[j][1]=Ssolid2+Ssolid2n;
-                        Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
-                        Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
-                        cell->info().solidSurfaces[j][2]=Ssolid3+Ssolid3n;
+        else if (fictious_vertex==1) {
+                SV1 = cell->vertex(F1);
+                SV2 = cell->vertex(Re1);
+                SV3 = cell->vertex(Re2);
+                Vpore = volume_single_fictious_pore(SV1, SV2, SV3, p1,p2, cell->info().facetSurfaces[j]);
+                Boundary &bi1 = boundary(SV1->info().id());
+                if (bi1.flowCondition && !SLIP_ON_LATERALS) {
+                        Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point()-SV3->point())[bi1.coordinate]);
+                        cell->info().solidSurfaces[j][facetF1]=Ssolid1;
                 }
-        }
-        Ssolid = Ssolid1+Ssolid1n+Ssolid2+Ssolid2n+Ssolid3+Ssolid3n;
-        cell->info().solidSurfaces[j][3]=1.0/Ssolid;
-        Ssolid_tot += Ssolid;
+                Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
+                Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
+                cell->info().solidSurfaces[j][facetRe1]=Ssolid2+Ssolid2n;
+                Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
+                Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
+                cell->info().solidSurfaces[j][facetRe2]=Ssolid3+Ssolid3n;
+        } else {//fictious_vertex==0
+                SV1 = W[0];
+                SV2 = W[1];
+                SV3 = W[2];
+                cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point()-SV3->point(),SV2->point()-SV3->point());
+                if (cell->info().facetSurfaces[j]*(p2-p1) > 0) cell->info().facetSurfaces[j] = -1.0*cell->info().facetSurfaces[j];
+                Vtot = abs(ONE_THIRD*cell->info().facetSurfaces[j]*(p1-p2));
 
-        //handle symmetry (tested ok)
-        if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0) {
-                //! Include a multiplier so that permeability will be K/2 or K/4 in symmetry conditions
-                Real mult= fictious_vertex==1 ? multSym1 : multSym2;
-                return Vpore/Ssolid*mult;
+
+                Vsolid1=0;
+                Vsolid2=0;
+                for (int i=0;i<3;i++) {
+                        Vsolid1 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
+                        Vsolid2 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);
+                }
+                Vsolid = Vsolid1 + Vsolid2;
+                Vsolid_tot += Vsolid;
+                Vtotalissimo += Vtot;
+
+                Vpore = Vtot - Vsolid;
+                Vporale += Vpore;
+
+                Ssolid1 = fast_spherical_triangle_area(SV1->point(), SV2->point(), p1, p2);
+                Ssolid1n = fast_spherical_triangle_area(SV1->point(), SV3->point(), p1, p2);
+                cell->info().solidSurfaces[j][0]=Ssolid1+Ssolid1n;
+                Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
+                Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
+                cell->info().solidSurfaces[j][1]=Ssolid2+Ssolid2n;
+                Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
+                Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
+                cell->info().solidSurfaces[j][2]=Ssolid3+Ssolid3n;
         }
+
+        //Compute and store the area of sphere-facet intersections for later use
+#ifdef USE_FAST_MATH
+        //FIXME : code not compiling,, do the same as in "else"
+        assert((v[permut3[jj][1]]-v[permut3[jj][0]])*(v[permut3[jj][2]]-v[permut3[jj][0]])>=0 && (v[permut3[jj][1]]-v[permut3[jj][0]])*(v[permut3[jj][2]]-v[permut3[jj][0]])<=1);
+        for (int jj=0;jj<3;jj++)
+                cell->info().facetSphereCrossSections[j][jj]=0.5*v[jj].weight()*Wm3::FastInvCos1((v[permut3[jj][1]]-v[permut3[jj][0]])*(v[permut3[jj][2]]-v[permut3[jj][0]]));
+#else
+        cell->info().facetSphereCrossSections[j]=Vecteur(
+                                W[0]->info().isFictious ? 0 : 0.5*v[0].weight()*acos((v[1]-v[0])*(v[2]-v[0])/sqrt((v[1]-v[0]).squared_length()*(v[2]-v[0]).squared_length())),
+                                W[1]->info().isFictious ? 0 : 0.5*v[1].weight()*acos((v[0]-v[1])*(v[2]-v[1])/sqrt((v[1]-v[0]).squared_length()*(v[2]-v[1]).squared_length())),
+                                W[2]->info().isFictious ? 0 : 0.5*v[2].weight()*acos((v[0]-v[2])*(v[1]-v[2])/sqrt((v[1]-v[2]).squared_length()*(v[2]-v[0]).squared_length())));
+#endif
+#ifdef FACET_BASED_FORCES
+        //FIXME : cannot be done here because we are still comparing the different methods
+// 			if (FACET_BASED_FORCES) cell->info().facetSurfaces[j]=cell->info().facetSurfaces[j]*((facetSurfaces[j].length()-facetSphereCrossSections[j][0]-facetSphereCrossSections[j][1]-facetSphereCrossSections[j][2])/facetSurfaces[j].length());
+#endif
+//         if (DEBUG_OUT) std::cerr << "total facet surface "<< cell->info().facetSurfaces[j] << " with solid sectors : " << cell->info().facetSphereCrossSections[j][0] << " " << cell->info().facetSphereCrossSections[j][1] << " " << cell->info().facetSphereCrossSections[j][2] << " difference "<<sqrt(cell->info().facetSurfaces[j].squared_length())-cell->info().facetSphereCrossSections[j][0]-cell->info().facetSphereCrossSections[j][2]-cell->info().facetSphereCrossSections[j][1]<<endl;
+
+Ssolid = Ssolid1+Ssolid1n+Ssolid2+Ssolid2n+Ssolid3+Ssolid3n;
+cell->info().solidSurfaces[j][3]=1.0/Ssolid;
+Ssolid_tot += Ssolid;
+
+//handle symmetry (tested ok)
+if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0)
+{
+        //! Include a multiplier so that permeability will be K/2 or K/4 in symmetry conditions
+        Real mult= fictious_vertex==1 ? multSym1 : multSym2;
+        return Vpore/Ssolid*mult;
+}
 //  cout << "Vpore " << Vpore << ", Ssolid "<<Ssolid<<endl;
-        return Vpore/Ssolid;
+return Vpore/Ssolid;
 }
 
 double FlowBoundingSphere::dotProduct(Vecteur x, Vecteur y)
@@ -1604,41 +1826,67 @@ double FlowBoundingSphere::Permeameter(RTriangulation &Tri, double P_Inf, double
   double Q2=0, Q1=0;
   int cellQ1=0, cellQ2=0;
   double p_out_max=0, p_out_min=100000, p_in_max=0, p_in_min=100000,p_out_moy=0, p_in_moy=0;
-  bool first=false;
-  Finite_cells_iterator cell_end = Tri.finite_cells_end();
+//   bool first=false;
   
-	for (int bound=0; bound<6;bound++) {
-                int& id = *boundsIds[bound];
-                Boundary& bi = boundary(id);
-                if (!bi.flowCondition) {
-                        Tesselation::Vector_Cell tmp_cells;
-                        tmp_cells.resize(1000);
-                        Tesselation::VCell_iterator cells_it = tmp_cells.begin();
-                        Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
-                        for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
-			{
-			   Cell_handle& cell = *it;
-			   if(!first){for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
-				Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
-				cellQ1+=1;
-				p_out_max = std::max(cell->neighbor(j2)->info().p(), p_out_max);
-				p_out_min = std::min(cell->neighbor(j2)->info().p(), p_out_min);
-				p_out_moy += cell->neighbor(j2)->info().p();}}}
-			   else {for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
-				Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
-				cellQ2+=1;
-				p_in_max = std::max(cell->neighbor(j2)->info().p(), p_in_max);
-				p_in_min = std::min(cell->neighbor(j2)->info().p(), p_in_min);
-				p_in_moy += cell->neighbor(j2)->info().p();}}}
-
-			}first=true;}
-	}
-	cout << "the maximum superior pressure is = " << p_in_max << " the min is = " << p_in_min << endl;
-	cout << "the maximum inferior pressure is = " << p_out_max << " the min is = " << p_out_min << endl;
-	cout << "superior average pressure is " << p_in_moy/cellQ2 << endl;
-        cout << "inferior average pressure is " << p_out_moy/cellQ1 << endl;
-        cout << "celle comunicanti in basso = " << cellQ1 << endl;
-        cout << "celle comunicanti in alto = " << cellQ2 << endl;
+  Tesselation::Vector_Cell tmp_cells;
+  tmp_cells.resize(1000);
+  Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+  
+  Tesselation::VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[y_max_id],cells_it);
+  for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
+  {
+    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+    Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
+    cellQ1+=1;
+    p_out_max = std::max(cell->neighbor(j2)->info().p(), p_out_max);
+    p_out_min = std::min(cell->neighbor(j2)->info().p(), p_out_min);
+    p_out_moy += cell->neighbor(j2)->info().p();}
+  }}}
+  
+  Tesselation::VCell_iterator cell_down_end = Tri.incident_cells(T[currentTes].vertexHandles[y_min_id],cells_it);
+  for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cell_down_end; it++)
+  {
+    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+    Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
+    cellQ2+=1;
+    p_in_max = std::max(cell->neighbor(j2)->info().p(), p_in_max);
+    p_in_min = std::min(cell->neighbor(j2)->info().p(), p_in_min);
+    p_in_moy += cell->neighbor(j2)->info().p();}
+  }}}
+  
+  
+// 	for (int bound=0; bound<6;bound++) {
+//                 int& id = *boundsIds[bound];
+//                 Boundary& bi = boundary(id);
+//                 if (!bi.flowCondition) {
+//                         Tesselation::Vector_Cell tmp_cells;
+//                         tmp_cells.resize(1000);
+//                         Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+//                         Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+//                         for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+// 			{
+// 			   Cell_handle& cell = *it;
+// 			   if(!first){for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+// 				Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
+// 				cellQ1+=1;
+// 				p_out_max = std::max(cell->neighbor(j2)->info().p(), p_out_max);
+// 				p_out_min = std::min(cell->neighbor(j2)->info().p(), p_out_min);
+// 				p_out_moy += cell->neighbor(j2)->info().p();}}}
+// 			   else {for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+// 				Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
+// 				cellQ2+=1;
+// 				p_in_max = std::max(cell->neighbor(j2)->info().p(), p_in_max);
+// 				p_in_min = std::min(cell->neighbor(j2)->info().p(), p_in_min);
+// 				p_in_moy += cell->neighbor(j2)->info().p();}}}
+// 
+// 			}first=true;}
+// 	}
+	cout << "the maximum superior pressure is = " << p_out_max << " the min is = " << p_in_min << endl;
+	cout << "the maximum inferior pressure is = " << p_in_max << " the min is = " << p_out_min << endl;
+	cout << "superior average pressure is " << p_out_moy/cellQ1 << endl;
+        cout << "inferior average pressure is " << p_in_moy/cellQ2 << endl;
+        cout << "celle comunicanti in basso = " << cellQ2 << endl;
+        cout << "celle comunicanti in alto = " << cellQ1 << endl;
 
         double density = 1;
         double viscosity = 1;
@@ -1697,7 +1945,7 @@ void FlowBoundingSphere::save_vtk_file(RTriangulation &T)
 	
         vtkfile.begin_cells();
         for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
-		if (cell->info().fictious()==0){vtkfile.write_cell(cell->vertex(0)->info().id()-6, cell->vertex(1)->info().id()-6, cell->vertex(2)->info().id()-6, cell->vertex(3)->info().id()-6);}
+		if (cell->info().fictious()==0){vtkfile.write_cell(cell->vertex(0)->info().id()-id_offset, cell->vertex(1)->info().id()-id_offset, cell->vertex(2)->info().id()-id_offset, cell->vertex(3)->info().id()-id_offset);}
         }
         vtkfile.end_cells();
 	
@@ -1727,7 +1975,7 @@ void FlowBoundingSphere::MGPost(RTriangulation& Tri)
 
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 //   if ( !cell->info().isFictious )
-                if (cell->info().fictious()!=0) {
+                if (cell->info().fictious()==0) {
                         double p [3] = {0,0,0};
 
                         for (int j2=0; j2!=4; j2++) {
@@ -1738,8 +1986,8 @@ void FlowBoundingSphere::MGPost(RTriangulation& Tri)
                         }
 
                         double pressure =  cell->info().p();
-                        double rad = 0.05;
-
+                        double rad = 0.00025;
+			
                         file << "  <body>" << endl;
                         file << "   <SPHER r=\""  <<  rad << "\">" << endl;
                         file << "    <position x=\""  <<  p[0] << "\" y=\"" << p[1] << "\" z=\"" << p[2] << "\"/>" << endl;
