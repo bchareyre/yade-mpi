@@ -181,7 +181,9 @@ def liveUpdate(timestamp):
 					ax.autoscale_view()
 				except RuntimeError: pass # happens if data are being updated and have not the same dimension at the very moment
 		for fig in figs:
-			fig.canvas.draw()
+			try:
+				fig.canvas.draw()
+			except RuntimeError: pass # happens here too
 		time.sleep(liveInterval)
 	
 
