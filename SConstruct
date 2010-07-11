@@ -368,7 +368,7 @@ if not env.GetOption('clean'):
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
-		if not ok: featureNotOK('vtk',note="You might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
+		if not ok: featureNotOK('vtk',note="Installer can`t find vtk-library. Be sure you have it installed (usually, libvtk5-dev package). Or you might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
 	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config gts --cflags --libs');
 		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)

@@ -19,6 +19,8 @@ See older `tentative contents <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc
 .. toctree::
   :maxdepth: 2
 
+  installation.rst
+
   introduction.rst
 
   formulation.rst
