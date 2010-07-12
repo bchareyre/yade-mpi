@@ -34,6 +34,9 @@
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
 #include<yade/pkg-common/Callbacks.hpp>
+#ifdef YADE_OPENGL
+	#include<yade/pkg-common/GLDrawFunctors.hpp>
+#endif
 
 
 
@@ -139,6 +142,13 @@ BOOST_PYTHON_MODULE(_customConverters){
 		VECTOR_SEQ_CONV(shared_ptr<LawFunctor>);
 		VECTOR_SEQ_CONV(shared_ptr<IntrCallback>);
 		VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
+		#ifdef YADE_OPENGL
+			VECTOR_SEQ_CONV(shared_ptr<GlBoundFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlStateFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlShapeFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlInteractionGeometryFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlInteractionPhysicsFunctor>);
+		#endif
 	#undef VECTOR_SEQ_CONV
 
 	import_array();

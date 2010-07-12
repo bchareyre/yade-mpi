@@ -1,6 +1,8 @@
 #include "Cylinder.hpp"
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#ifdef YADE_OPENGL
+	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#endif
 #include<yade/pkg-common/Aabb.hpp>
 
 Cylinder::~Cylinder(){}
@@ -9,8 +11,13 @@ ChainedState::~ChainedState(){}
 CylScGeom::~CylScGeom(){}
 
 
-YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom)(Gl1_Cylinder)/*(Gl1_ChainedCylinder)*/(Bo1_Cylinder_Aabb)/*(Bo1_ChainedCylinder_Aabb)*/);
-YADE_REQUIRE_FEATURE(OPENGL)
+YADE_PLUGIN(
+	(Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom)
+	#ifdef YADE_OPENGL
+		(Gl1_Cylinder)/*(Gl1_ChainedCylinder)*/
+	#endif
+	(Bo1_Cylinder_Aabb)/*(Bo1_ChainedCylinder_Aabb)*/
+);
 
 vector<vector<int> > ChainedState::chains;
 unsigned int ChainedState::currentChain=0;
@@ -157,6 +164,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::goReverse(	const shared_ptr<Sha
 	return go(cm2,cm1,state2,state1,-shift2,force,c);
 }
 
+#ifdef YADE_OPENGL
 //!##################	RENDERING   #####################
 
 bool Gl1_Cylinder::wire;
@@ -275,6 +283,7 @@ void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quate
 
 //!##################	BOUNDS FUNCTOR   #####################
 
+#endif
 
 void Bo1_Cylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Cylinder* cylinder = static_cast<Cylinder*>(cm.get());

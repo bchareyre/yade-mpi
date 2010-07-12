@@ -5,7 +5,9 @@
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/GLDrawFunctors.hpp>
+#ifdef YADE_OPENGL
+	#include<yade/pkg-common/GLDrawFunctors.hpp>
+#endif
 #include<yade/pkg-common/BoundFunctor.hpp>
 
 
@@ -73,8 +75,9 @@ class ChainedState: public State{
 		/* additional initializers */
 /*			((pos,se3.position))
 			((ori,se3.orientation)),*/
-		/* ctor */,
-		/*py*/,
+		,
+		/* ctor */ createIndex(); ,
+		/*py*/
 // 		.def_readwrite("chains",&ChainedState::chains,"documentation")
 		.def_readwrite("currentChain",&ChainedState::currentChain,"Current active chain (where newly created chained bodies will be appended).")
 		.def("addToChain",&ChainedState::addToChain,(python::arg("bodyId")),"Add body to current active chain")
@@ -116,7 +119,7 @@ class Ig2_ChainedCylinder_ChainedCylinder_ScGeom: public InteractionGeometryFunc
 
 
 
-
+#ifdef YADE_OPENGL
 class Gl1_Cylinder : public GlShapeFunctor{
 	private:
 		static int glCylinderList;
@@ -134,6 +137,7 @@ class Gl1_Cylinder : public GlShapeFunctor{
 	RENDERS(Cylinder);
 	friend class Gl1_ChainedCylinder;
 };
+#endif
 
 //!This doesn't work : the 1D dispatcher will pick Gl1_Cylinder to display ChainedCylinders, workaround : add shift to cylinders (should be a variable of chained cylinders only).
 // class Gl1_ChainedCylinder : public Gl1_Cylinder{
@@ -190,7 +194,9 @@ class Bo1_Cylinder_Aabb : public BoundFunctor
 
 REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
 // REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
+#ifdef YADE_OPENGL
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
+#endif
 // REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
 REGISTER_SERIALIZABLE(Cylinder);
 REGISTER_SERIALIZABLE(ChainedCylinder);

@@ -59,7 +59,7 @@ namespace py=boost::python;
 None of that is used for computation (at least not now), only for post-processing.
 */
 class CpmState: public State {
-	YADE_CLASS_BASE_DOC_ATTRS(CpmState,State,"State information about body use by :ref:`cpm-model`.\n\nNone of that is used for computation (at least not now), only for post-processing.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmState,State,"State information about body use by :ref:`cpm-model`.\n\nNone of that is used for computation (at least not now), only for post-processing.",
 		((Real,epsVolumetric,0,"Volumetric strain around this body (unused for now)"))
 		((int,numBrokenCohesive,0,"Number of (cohesive) contacts that damaged completely"))
 		((int,numContacts,0,"Number of contacts with this body"))
@@ -67,8 +67,10 @@ class CpmState: public State {
 		((Real,epsPlBroken,0,"Plastic strain on contacts already deleted (bogus values)"))
 		((Real,normEpsPl,0,"Sum of plastic strains normalized by number of contacts (bogus values)"))
 		((Vector3r,sigma,Vector3r::Zero(),"Normal stresses on the particle"))
-		((Vector3r,tau,Vector3r::Zero(),"Shear stresses on the particle."))
+		((Vector3r,tau,Vector3r::Zero(),"Shear stresses on the particle.")),
+		/*ctor*/ createIndex();
 	);
+	REGISTER_CLASS_INDEX(CpmState,State);
 };
 REGISTER_SERIALIZABLE(CpmState);
 

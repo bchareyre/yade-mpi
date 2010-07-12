@@ -216,7 +216,7 @@ class DynLibDispatcher
 		  shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1){
 			  	int ix1;
 				if(arg1->getClassIndex()<0) throw runtime_error("No functor for type "+arg1->getClassName()+" (index "+lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
-				if(locateMultivirtualFunctor2D(ix1,arg1)) return callBacks[ix1];
+				if(locateMultivirtualFunctor1D(ix1,arg1)) return callBacks[ix1];
 				return shared_ptr<Executor>();
 		  }
 

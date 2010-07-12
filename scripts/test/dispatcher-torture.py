@@ -10,35 +10,57 @@ $ firefox /tmp/aa.html
 
 """
 
-dispatches={'Law':('InteractionGeometry','InteractionPhysics'),
-'InteractionGeometry':('Shape','Shape'),
-'InteractionPhysics':('Material','Material'),
-'Bound':('Shape','Bound')
-}
+import collections
+Dispatch=collections.namedtuple('Dispatch',['basename','types'])
+
+dispatches=[
+	Dispatch('Law',('InteractionGeometry','InteractionPhysics')),
+	Dispatch('InteractionGeometry',('Shape','Shape')),
+	Dispatch('InteractionPhysics',('Material','Material')),
+	Dispatch('Bound',('Shape','Bound')),
+	Dispatch('GlBound',('Bound',)),
+	Dispatch('GlInteractionGeometry',('InteractionGeometry',)),
+	Dispatch('GlInteractionPhysics',('InteractionPhysics',)),
+	Dispatch('GlShape',('Shape',)),
+	#Dispatch('GlState',('State',)) # broken for now
+]
 
 sys.path.append('.')
 import HTML
 outStr=''
-for D in dispatches.keys():
-	functors=yade.system.childClasses(D+'Functor')
+for D in dispatches:
+	functors=yade.system.childClasses(D.basename+'Functor')
 	# create dispatcher with all available functors
-	dispatcher=eval(D+'Dispatcher([%s])'%(','.join(['%s()'%f for f in functors])))
-	if len(dispatches[D])!=2: raise NotImplementedError("Only 2d dispatchers implemented now.")
-	# lists of types the dispatcher accepts
-	allDim0=list(yade.system.childClasses(dispatches[D][0]))
-	allDim1=list(yade.system.childClasses(dispatches[D][1]))
-	table=HTML.Table(header_row=['']+allDim1)
-	for d0 in allDim0:
-		row=[d0]
-		for d1 in allDim1:
-			dd0,dd1=eval(d0+'()'),eval(d1+'()')
+	dispatcher=eval(D.basename+'Dispatcher([%s])'%(','.join(['%s()'%f for f in functors])))
+	if len(D.types)==1:
+		allDim0=list(yade.system.childClasses(D.types[0]))
+		table=HTML.Table(header_row=allDim0)
+		row=[]
+		for d0 in allDim0:
+			dd0=eval(d0+'()')
 			try:
-				f=dispatcher.dispFunctor(dd0,dd1)
+				f=dispatcher.dispFunctor(dd0)
 				row.append(f.name if f else '-')
-			except RuntimeError: # ambiguous
-				row.append('<b>ambiguous<b>')
+			except RuntimeError as strerror:
+				row.append('<b>ambiguous (%s)</b>'%(strerror))
 		table.rows.append(row)
-	outStr+='\n<h1>%sDispatcher</h1>'%D
+	elif len(D.types)==2:
+		# lists of types the dispatcher accepts
+		allDim0=list(yade.system.childClasses(D.types[0]))
+		allDim1=list(yade.system.childClasses(D.types[1]))
+		table=HTML.Table(header_row=['']+allDim1)
+		for d0 in allDim0:
+			row=['<b>'+d0+'</b>']
+			for d1 in allDim1:
+				dd0,dd1=eval(d0+'()'),eval(d1+'()')
+				try:
+					f=dispatcher.dispFunctor(dd0,dd1)
+					row.append(f.name if f else '-')
+				except RuntimeError: # ambiguous
+					row.append('<b>ambiguous</b>')
+			table.rows.append(row)
+	else: raise ValueError("Dispatcher must be 1D or 2D, not %dD"%len(D.types))
+	outStr+='\n<h1>%sDispatcher</h1>'%D.basename
 	outStr+=str(table)
 print outStr
 quit()

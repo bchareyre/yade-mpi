@@ -1,6 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/core/Dispatcher.hpp>
 /*! State (internal & spatial variables) of a body.
 
 For now, I put position, orientation, velocity and angular velocity here,
@@ -14,7 +16,7 @@ All state variables are initialized to zeros.
 Historical note: this used to be part of the PhysicalParameters class.
 The other data are now in the Material class.
 */
-class State: public Serializable{
+class State: public Serializable, public Indexable{
 	public:
 		/// linear motion (references to inside se3)
 		Vector3r& pos;
@@ -75,10 +77,12 @@ class State: public Serializable{
 			((ori,se3.orientation)),
 		/* ctor */,
 		/*py*/
+		YADE_PY_TOPINDEXABLE(State)
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always constant (equal to zero, or to an user-defined value), regardless of applied force/torque. List of any combination of 'x','y','z','rx','ry','rz'.")
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
 		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.") 
 	);
+	REGISTER_INDEX_COUNTER(State);
 };
 REGISTER_SERIALIZABLE(State);

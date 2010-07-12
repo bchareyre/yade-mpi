@@ -27,9 +27,11 @@ Features of the interaction law:
 
 /** This class holds information associated with each body state*/
 class CFpmState: public State {
-	YADE_CLASS_BASE_DOC_ATTRS(CFpmState,State,"CFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
-		((int,numBrokenCohesive,0,"Number of broken cohesive links. [-]"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CFpmState,State,"CFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
+		((int,numBrokenCohesive,0,"Number of broken cohesive links. [-]")),
+		createIndex();
 	);
+	REGISTER_CLASS_INDEX(CFpmState,State);
 };
 REGISTER_SERIALIZABLE(CFpmState);
 

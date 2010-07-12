@@ -185,7 +185,7 @@ class Dispatcher1D : public Dispatcher,
 				return "";
 		}
 
-	protected :
+	public :
 		void postProcessAttributes(bool deserializing)
 		{
 			Dispatcher::postProcessAttributes(deserializing);
