@@ -135,7 +135,10 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	//length only used for display
 	s->length=length;
 	scm->penetrationDepth=s->initLength-length;
-	scm->contactPoint=pChain->pos+segment;
+	
+// 	scm->contactPoint=pChain->pos+segment;//generates instabilites (TODO)
+	scm->contactPoint=pChain->pos+pChain->ori*Vector3r::UnitZ()*length;
+
 #ifdef IGCACHE
 	if (scene->isPeriodic) {
 		Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
