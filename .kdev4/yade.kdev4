@@ -1,0 +1,3 @@
+[MakeBuilder]
+Make Binary=scons
+Number Of Jobs=3

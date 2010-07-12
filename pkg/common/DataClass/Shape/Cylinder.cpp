@@ -14,7 +14,7 @@ CylScGeom::~CylScGeom(){}
 YADE_PLUGIN(
 	(Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom)
 	#ifdef YADE_OPENGL
-		(Gl1_Cylinder)/*(Gl1_ChainedCylinder)*/
+		(Gl1_Cylinder)(Gl1_ChainedCylinder)
 	#endif
 	(Bo1_Cylinder_Aabb)/*(Bo1_ChainedCylinder_Aabb)*/
 );
@@ -201,22 +201,22 @@ void Gl1_Cylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,boo
 	return;
 }
 
-// void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
-// {
-// 	Real r=(static_cast<ChainedCylinder*>(cm.get()))->radius;
-// 	Real length=(static_cast<ChainedCylinder*>(cm.get()))->length;
-// 	Quaternionr shift = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
-// 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
-// 	glColor3v(cm->color);
-// 	if(glutNormalize) glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
-// // 	glPushMatrix();
-//  	out(shift);
-// 	if (wire || wire2) drawCylinder(true, r,length,shift);
-// 	else drawCylinder(false, r,length,shift);
-// 	if(glutNormalize) glPopAttrib();
-// // 	glPopMatrix();
-// 	return;
-// }
+void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
+{
+	Real r=(static_cast<ChainedCylinder*>(cm.get()))->radius;
+	Real length=(static_cast<ChainedCylinder*>(cm.get()))->length;
+	Quaternionr shift = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
+	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+	glColor3v(cm->color);
+	if(glutNormalize) glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
+// 	glPushMatrix();
+ 	out(shift);
+	if (wire || wire2) drawCylinder(true, r,length,shift);
+	else drawCylinder(false, r,length,shift);
+	if(glutNormalize) glPopAttrib();
+// 	glPopMatrix();
+	return;
+}
 
 void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift) const
 {

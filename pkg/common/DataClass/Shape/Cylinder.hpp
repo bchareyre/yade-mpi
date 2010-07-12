@@ -141,13 +141,13 @@ class Gl1_Cylinder : public GlShapeFunctor{
 #endif
 
 //!This doesn't work : the 1D dispatcher will pick Gl1_Cylinder to display ChainedCylinders, workaround : add shift to cylinders (should be a variable of chained cylinders only).
-// class Gl1_ChainedCylinder : public Gl1_Cylinder{
-// 	public:
-// 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-// 	YADE_CLASS_BASE_DOC(Gl1_ChainedCylinder,Gl1_Cylinder,"Renders :yref:`ChainedCylinder` object including a shift for compensating flexion."
-// 	);
-// 	RENDERS(ChainedCylinder);
-// };
+class Gl1_ChainedCylinder : public Gl1_Cylinder{
+	public:
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+	YADE_CLASS_BASE_DOC(Gl1_ChainedCylinder,Gl1_Cylinder,"Renders :yref:`ChainedCylinder` object including a shift for compensating flexion."
+	);
+	RENDERS(ChainedCylinder);
+};
 
 
 /*
@@ -197,8 +197,8 @@ REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
 // REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
 #ifdef YADE_OPENGL
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
+REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
 #endif
-// REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
 REGISTER_SERIALIZABLE(Cylinder);
 REGISTER_SERIALIZABLE(ChainedCylinder);
 REGISTER_SERIALIZABLE(ChainedState);
