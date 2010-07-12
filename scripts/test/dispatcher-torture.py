@@ -32,8 +32,11 @@ for D in dispatches.keys():
 		row=[d0]
 		for d1 in allDim1:
 			dd0,dd1=eval(d0+'()'),eval(d1+'()')
-			f=dispatcher.dispFunctor(dd0,dd1)
-			row.append(f.name if f else '-')
+			try:
+				f=dispatcher.dispFunctor(dd0,dd1)
+				row.append(f.name if f else '-')
+			except RuntimeError: # ambiguous
+				row.append('<b>ambiguous<b>')
 		table.rows.append(row)
 	outStr+='\n<h1>%sDispatcher</h1>'%D
 	outStr+=str(table)

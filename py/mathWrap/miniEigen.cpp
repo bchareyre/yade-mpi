@@ -99,7 +99,7 @@ struct custom_Vector2i_from_sequence{
 static Matrix3r* Matrix3r_fromElements(Real m00, Real m01, Real m02, Real m10, Real m11, Real m12, Real m20, Real m21, Real m22){ Matrix3r* m(new Matrix3r); (*m)<<m00,m01,m02,m10,m11,m12,m20,m21,m22; return m; }
 static Quaternionr Quaternionr_setFromTwoVectors(Quaternionr& q, const Vector3r& u, const Vector3r& v){ return q.setFromTwoVectors(u,v); }
 static Vector3r Quaternionr_Rotate(Quaternionr& q, const Vector3r& u){ return q*u; }
-//FIXME : risk of memory leak with these "new"?
+// supposed to return raw pointer (or auto_ptr), boost::python takes care of the lifetime management
 static Quaternionr* Quaternionr_fromAxisAngle(const Vector3r& axis, const Real angle){ return new Quaternionr(AngleAxisr(angle,axis)); }
 static Quaternionr* Quaternionr_fromAngleAxis(const Real angle, const Vector3r& axis){ return new Quaternionr(AngleAxisr(angle,axis)); }
 static bp::tuple Quaternionr_toAxisAngle(const Quaternionr& self){ AngleAxisr aa(self); return bp::make_tuple(aa.axis(),aa.angle());}
@@ -116,51 +116,6 @@ static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ re
 #include<Eigen/SVD>
 static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Eigen::SVD<Matrix3r>(self).computeUnitaryPositive(&unitary,&positive); return bp::make_tuple(unitary,positive); }
 
-// #define WM3_COMPAT
-
-#ifdef WM3_COMPAT
-	#define _PYCLASS(klass) boost::algorithm::trim_right_copy_if(std::string(klass),boost::algorithm::is_any_of("r"))
-	#define WM3_OLD_METH0(klass,old,neww) static klass klass##_##old(){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; return klass().neww(); }
-	#define WM3_OLD_METH1(klass,old,neww,ret)  static ret klass##_##old(klass& self){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(); return ret(); }
-	#define WM3_OLD_METH2(klass,klass2,old,neww,ret)  static ret klass##_##old(klass& self,const klass2& arg){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(arg); return ret(); }
-	#define WM3_OLD_METH3(klass,klass2,klass3,old,neww,ret)  static ret klass##_##old(klass& self,const klass2& arg1, const klass3& arg2){ std::cerr<<"WARN: "<<_PYCLASS(#klass)<<"."<<#old<<" is deprecated, use "<<_PYCLASS(#klass)<<"."<<#neww<<" instead"<<std::endl; if(typeid(ret)!=typeid(void)) return self.neww(arg1,arg2); return ret(); }
-	WM3_OLD_METH0(Matrix3r,IDENTITY,Identity)
-	WM3_OLD_METH0(Matrix3r,ZERO,Zero)
-	WM3_OLD_METH1(Matrix3r,Determinant,determinant,Real)
-	WM3_OLD_METH1(Matrix3r,Inverse,inverse,Matrix3r)
-	WM3_OLD_METH1(Matrix3r,Transpose,transpose,Matrix3r)
-
-	WM3_OLD_METH0(Quaternionr,IDENTITY,Identity)
-	bp::tuple Quaternionr_ToAxisAngle(const Quaternionr& self) { std::cerr<<"WARN: Quaternion.ToAxisAngle is deprecated, use Quaternion.toAxisAngle instead"<<std::endl; return Quaternionr_toAxisAngle(self); }
-	WM3_OLD_METH1(Quaternionr,Conjugate,conjugate,Quaternionr)
-	WM3_OLD_METH1(Quaternionr,Inverse,inverse,Quaternionr)
-	WM3_OLD_METH1(Quaternionr,Normalize,normalize,void)
-	WM3_OLD_METH1(Quaternionr,Length,norm,Real)
-	WM3_OLD_METH3(Quaternionr,Vector3r,Vector3r,Align,setFromTwoVectors,Quaternionr)
-
-
-	WM3_OLD_METH0(Vector3r,ZERO,Zero)
-	WM3_OLD_METH0(Vector3r,ONE,Ones)
-	WM3_OLD_METH0(Vector3r,UNIT_X,UnitX)
-	WM3_OLD_METH0(Vector3r,UNIT_Y,UnitY)
-	WM3_OLD_METH0(Vector3r,UNIT_Z,UnitZ)
-	WM3_OLD_METH1(Vector3r,Length,norm,Real)
-	WM3_OLD_METH1(Vector3r,Normalize,normalize,void)
-	WM3_OLD_METH1(Vector3r,SquaredLength,squaredNorm,Real)
-	WM3_OLD_METH2(Vector3r,Vector3r,Dot,dot,Real)
-	WM3_OLD_METH2(Vector3r,Vector3r,Cross,cross,Vector3r)
-
-	WM3_OLD_METH0(Vector2r,ZERO,Zero)
-	WM3_OLD_METH0(Vector2r,ONE,Ones)
-	WM3_OLD_METH0(Vector2r,UNIT_X,UnitX)
-	WM3_OLD_METH0(Vector2r,UNIT_Y,UnitY)
-	WM3_OLD_METH1(Vector2r,Length,norm,Real)
-	WM3_OLD_METH1(Vector2r,Normalize,normalize,void)
-	WM3_OLD_METH1(Vector2r,SquaredLength,squaredNorm,Real)
-	WM3_OLD_METH2(Vector2r,Vector2r,Dot,dot,Real)
-
-	static void Matrix3r_fromAxisAngle(Matrix3r& self, const Vector3r& axis, const Real angle){ std::cerr<<"Matrix3.fromAxisAngle is deprecated, use Quaternion.toRotationMatrix instead"<<std::endl; self=AngleAxisr(angle,axis).toRotationMatrix(); }
-#endif
 
 #define EIG_WRAP_METH1(klass,meth) static klass klass##_##meth(const klass& self){ return self.meth(); }
 //#define EIG_WRAP_METH0(klass,meth) static klass klass##_##meth(){ return klass().meth(); }
@@ -252,12 +207,6 @@ BOOST_PYTHON_MODULE(miniEigen){
 		/* extras for matrices */
 		.def("__setitem__",&::Matrix3r_set_item_linear).def("__getitem__",&::Matrix3r_get_item_linear)
 		.def_readonly("Identity",&Matrix3r_Identity).def_readonly("Zero",&Matrix3r_Zero)
-		#ifdef WM3_COMPAT
-			// wm3 compat
-			.add_static_property("IDENTITY",&Matrix3r_IDENTITY,"|ydeprecated|").add_static_property("ZERO",&Matrix3r_ZERO,"|ydeprecated|")
-			.def("Determinant",&Matrix3r_Determinant,"|ydeprecated|").def("Inverse",&Matrix3r_Inverse,"|ydeprecated|").def("Transpose",&Matrix3r_Transpose,"|ydeprecated|")
-			.def("FromAxisAngle",&Matrix3r_fromAxisAngle,"|ydeprecated|")
-		#endif
 	;
 	bp::class_<Quaternionr>("Quaternion","Quaternion representing rotation.\n\nSupported operations (``q`` is a Quaternion, ``v`` is a Vector3): ``q*q`` (rotation composition), ``q*=q``, ``q*v`` (rotating ``v`` by ``q``), ``q==q``, ``q!=q``.",bp::init<>())
 		.def("__init__",bp::make_constructor(&Quaternionr_fromAxisAngle,bp::default_call_policies(),(bp::arg("axis"),bp::arg("angle"))))
@@ -286,10 +235,6 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("__len__",&Quaternionr_len).staticmethod("__len__")
 		.def("__setitem__",&Quaternionr_set_item).def("__getitem__",&Quaternionr_get_item)
 		.def("__str__",&Quaternionr_str).def("__repr__",&Quaternionr_str)
-		#ifdef WM3_COMPAT
-			.def("Align",&Quaternionr_Align,"|ydeprecated|").def("Conjugate",&Quaternionr_Conjugate,"|ydeprecated|").def("Inverse",&Quaternionr_Inverse,"|ydeprecated|").def("Length",&Quaternionr_Length,"|ydeprecated|").def("Normalize",&Quaternionr_Normalize,"|ydeprecated|").add_static_property("IDENTITY",&Quaternionr_IDENTITY)
-			.def("ToAxisAngle",&Quaternionr_ToAxisAngle,"|ydeprecated|")
-		#endif
 	;
 	bp::class_<Vector3r>("Vector3","3-dimensional float vector.\n\nSupported operatrions (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion from sequence (list,tuple, …) of 3 floats.",bp::init<>())
 		.def(bp::init<Vector3r>((bp::arg("other"))))
@@ -314,11 +259,6 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("__len__",&::Vector3r_len).staticmethod("__len__")
 		.def("__setitem__",&::Vector3r_set_item).def("__getitem__",&::Vector3r_get_item)
 		.def("__str__",&::Vector3r_str).def("__repr__",&::Vector3r_str)
-		#ifdef WM3_COMPAT
-			// wm3 compat
-			.def("Dot",&Vector3r_Dot,"|ydeprecated|").def("Cross",&Vector3r_Cross,"|ydeprecated|").def("Length",&Vector3r_Length,"|ydeprecated|").def("SquaredLength",&Vector3r_SquaredLength,"|ydeprecated|").def("Normalize",&Vector3r_Normalize,"|ydeprecated|")
-			.add_static_property("ONE",&Vector3r_ONE,"|ydeprecated|").add_static_property("ZERO",&Vector3r_ZERO,"|ydeprecated|").add_static_property("UNIT_X",&Vector3r_UNIT_X,"|ydeprecated|").add_static_property("UNIT_Y",&Vector3r_UNIT_Y,"|ydeprecated|").add_static_property("UNIT_Z",&Vector3r_UNIT_Z,"|ydeprecated|")
-		#endif
 	;	
 	bp::class_<Vector3i>("Vector3i","3-dimensional integer vector.\n\nSupported operatrions (``i`` if an int, ``v`` is a Vector3i): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*i``, ``i*v``, ``v*=i``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence  (list,tuple, …) of 3 integers.",bp::init<>())
 		.def(bp::init<Vector3i>((bp::arg("other"))))
@@ -364,11 +304,6 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("__len__",&::Vector2r_len).staticmethod("__len__")
 		.def("__setitem__",&::Vector2r_set_item).def("__getitem__",&::Vector2r_get_item)
 		.def("__str__",&::Vector2r_str).def("__repr__",&::Vector2r_str)
-		#ifdef WM3_COMPAT
-			// wm3 compat
-			.def("Dot",&Vector2r_Dot,"|ydeprecated|").def("Length",&Vector2r_Length,"|ydeprecated|").def("SquaredLength",&Vector2r_SquaredLength,"|ydeprecated|").def("Normalize",&Vector2r_Normalize,"|ydeprecated|")
-			.add_static_property("ONE",&Vector2r_ONE,"|ydeprecated|").add_static_property("ZERO",&Vector2r_ZERO,"|ydeprecated|").add_static_property("UNIT_X",&Vector2r_UNIT_X,"|ydeprecated|").add_static_property("UNIT_Y",&Vector2r_UNIT_Y,"|ydeprecated|")
-		#endif
 	;	
 	bp::class_<Vector2i>("Vector2i","2-dimensional integer vector.\n\nSupported operatrions (``i`` if an int, ``v`` is a Vector2i): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*i``, ``i*v``, ``v*=i``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list,tuple, …) of 2 integers.",bp::init<>())
 		.def(bp::init<Vector2i>((bp::arg("other"))))
