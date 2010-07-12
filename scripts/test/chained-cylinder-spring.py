@@ -59,7 +59,7 @@ yade.qt.View();
  #plot some results
 from math import *
 from yade import plot
-plot.plots={'t':('pos1','|||','vel1')}
+plot.plots={'t':('pos1',None,'vel1')}
 def history():
   	plot.addData(pos1=O.bodies[0].state.pos[1], # potential elastic energy
 		     vel1=O.bodies[0].state.vel[1],

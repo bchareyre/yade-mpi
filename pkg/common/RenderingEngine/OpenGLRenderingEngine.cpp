@@ -29,11 +29,11 @@ void OpenGLRenderingEngine::init(){
 	map<string,DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di){
-		if (Omega::instance().isInheritingFrom((*di).first,"GlStateFunctor")) addStateFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GlBoundFunctor")) addBoundingVolumeFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GlShapeFunctor")) addInteractingGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GlInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GlInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlStateFunctor")) addStateFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlBoundFunctor")) addBoundingVolumeFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlShapeFunctor")) addInteractingGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
 	}
 	postProcessAttributes(true);
 

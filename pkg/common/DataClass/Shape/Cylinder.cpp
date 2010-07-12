@@ -212,9 +212,8 @@ void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State
 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
 	glColor3v(cm->color);
 	if(glutNormalize) glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
-	cerr<<"DispatchOK";
 // 	glPushMatrix();
- 	out(shift);
+ 	//out(shift);
 	if (wire || wire2) drawCylinder(true, r,length,shift);
 	else drawCylinder(false, r,length,shift);
 	if(glutNormalize) glPopAttrib();

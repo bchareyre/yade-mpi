@@ -38,7 +38,7 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
-		if (Omega::instance().isInheritingFrom((*di).first,"FileGenerator"))
+		if (Omega::instance().isInheritingFrom_recursive((*di).first,"FileGenerator"))
 			cbGeneratorName->insertItem((*di).first);
 	}
 

@@ -138,7 +138,6 @@ class Gl1_Cylinder : public GlShapeFunctor{
 	RENDERS(Cylinder);
 	friend class Gl1_ChainedCylinder;
 };
-#endif
 
 //!This doesn't work : the 1D dispatcher will pick Gl1_Cylinder to display ChainedCylinders, workaround : add shift to cylinders (should be a variable of chained cylinders only).
 class Gl1_ChainedCylinder : public Gl1_Cylinder{
@@ -167,6 +166,8 @@ class Gl1_ChainedCylinder : public GlShapeFunctor{
 	);
 	RENDERS(ChainedCylinder);
 };*/
+
+#endif
 
 
 class Bo1_Cylinder_Aabb : public BoundFunctor
