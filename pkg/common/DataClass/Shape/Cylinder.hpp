@@ -26,12 +26,14 @@ class ChainedCylinder: public Cylinder{
 	public:
 		ChainedCylinder(Real _radius, Real _length): Cylinder(_radius,_length){}
 		virtual ~ChainedCylinder ();
+		 
 		//Keep pointers or copies of connected states?
 // 		ChainedState st1, st2;
 		
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ChainedCylinder,Cylinder,"Geometry of a deformable chained cylinder, using geometry :yref:`MinkCylinder`.",
   		((Real,initLength,0,"tensile-free length, used as reference for tensile strain"))
+  		((Quaternionr,chainedOrientation,Quaternionr::Identity(),"Orientation of node-to-node vector"))
 		,createIndex();/*ctor*/
 // 		state=shared_ptr<ChainedState>(new ChainedState);
 
@@ -119,7 +121,7 @@ class Gl1_Cylinder : public GlShapeFunctor{
 	private:
 		static int glCylinderList;
 		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
-		void drawCylinder(bool wire, Real radius, Real length) const;
+		void drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift=Quaternionr::Identity()) const;
 		void initGlLists(void);
 	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
@@ -130,7 +132,37 @@ class Gl1_Cylinder : public GlShapeFunctor{
 		((int,glutStacks,4,"Number of sphere stacks."))
 	);
 	RENDERS(Cylinder);
+	friend class Gl1_ChainedCylinder;
 };
+
+//!This doesn't work : the 1D dispatcher will pick Gl1_Cylinder to display ChainedCylinders, workaround : add shift to cylinders (should be a variable of chained cylinders only).
+// class Gl1_ChainedCylinder : public Gl1_Cylinder{
+// 	public:
+// 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+// 	YADE_CLASS_BASE_DOC(Gl1_ChainedCylinder,Gl1_Cylinder,"Renders :yref:`ChainedCylinder` object including a shift for compensating flexion."
+// 	);
+// 	RENDERS(ChainedCylinder);
+// };
+
+
+/*
+class Gl1_ChainedCylinder : public GlShapeFunctor{
+	private:
+		static int glCylinderList;
+		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
+		void drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift=Quaternionr::Identity()) const;
+		void initGlLists(void);
+	public:
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_ChainedCylinder,GlShapeFunctor,"Renders :yref:`ChainedCylinder` object including a shift for compensating flexion.",
+		((bool,wire,false,"Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``."))
+		((bool,glutNormalize,true,"Fix normals for non-wire rendering"))
+		((int,glutSlices,8,"Number of sphere slices."))
+		((int,glutStacks,4,"Number of sphere stacks."))
+	);
+	RENDERS(ChainedCylinder);
+};*/
+
 
 class Bo1_Cylinder_Aabb : public BoundFunctor
 {
@@ -159,6 +191,7 @@ class Bo1_Cylinder_Aabb : public BoundFunctor
 REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
 // REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
+// REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
 REGISTER_SERIALIZABLE(Cylinder);
 REGISTER_SERIALIZABLE(ChainedCylinder);
 REGISTER_SERIALIZABLE(ChainedState);

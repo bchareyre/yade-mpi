@@ -9,7 +9,7 @@ ChainedState::~ChainedState(){}
 CylScGeom::~CylScGeom(){}
 
 
-YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom)(Gl1_Cylinder)(Bo1_Cylinder_Aabb)/*(Bo1_ChainedCylinder_Aabb)*/);
+YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom)(Gl1_Cylinder)/*(Gl1_ChainedCylinder)*/(Bo1_Cylinder_Aabb)/*(Bo1_ChainedCylinder_Aabb)*/);
 YADE_REQUIRE_FEATURE(OPENGL)
 
 vector<vector<int> > ChainedState::chains;
@@ -17,6 +17,8 @@ unsigned int ChainedState::currentChain=0;
 
 //!##################	IG FUNCTORS   #####################
 
+
+//!Sphere-cylinder or cylinder-cylinder not implemented yet, see Ig2_ChainedCylinder_ChainedCylinder_ScGeom and test/chained-cylinder-spring.py
 #ifdef YADE_DEVIRT_FUNCTORS
 bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_ChainedCylinder_CylScGeom::go, use getStaticFunctorPtr and call that function instead."); }
 bool Ig2_Sphere_ChainedCylinder_CylScGeom::goStatic(InteractionGeometryFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
@@ -105,8 +107,13 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	bool isNew = !c->interactionGeometry;
 	if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 	else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
-	Real length=abs((pChain->ori*Vector3r::UnitZ()).dot(chain2.pos-chain1.pos));
- 	Vector3r segment =pChain->ori*Vector3r::UnitZ()*length;
+// 	Real length=abs((pChain->ori*Vector3r::UnitZ()).dot(chain2.pos-chain1.pos));
+	Real length=(chain2.pos-chain1.pos).norm();
+//  	Vector3r segment =pChain->ori*Vector3r::UnitZ()*length;
+	Vector3r segment =chain2.pos-chain1.pos;
+	if (revert) segment = -segment;
+	s->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),pChain->ori.conjugate()*segment);
+// 	s->chainedOrientation=pChain->ori.conjugate()*s->chainedOrientation;
 	
 	if (revert) segment = -segment; 
 	if(isNew) {scm->normal=scm->prevNormal=segment/length;s->initLength=length;}
@@ -118,7 +125,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	else {
 		scm->radius1=0;
 		scm->radius2=s->initLength;}
-		
+	//length only used for display
 	s->length=length;
 	scm->penetrationDepth=s->initLength-length;
 	scm->contactPoint=pChain->pos+pChain->ori*Vector3r::UnitZ()*length;
@@ -158,6 +165,18 @@ int  Gl1_Cylinder::glutSlices;
 int  Gl1_Cylinder::glutStacks;
 int Gl1_Cylinder::glCylinderList=-1;
 
+// bool Gl1_ChainedCylinder::wire;
+// bool Gl1_ChainedCylinder::glutNormalize;
+// int  Gl1_ChainedCylinder::glutSlices;
+// int  Gl1_ChainedCylinder::glutStacks;
+// int Gl1_ChainedCylinder::glCylinderList=-1;
+
+void out ( Quaternionr q )
+{
+	AngleAxisr aa(q);
+	std::cout << " axis: " <<  aa.axis()[0] << " " << aa.axis()[1] << " " << aa.axis()[2] << ", angle: " << aa.angle() << " | ";
+}
+
 void Gl1_Cylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
 {
 	Real r=(static_cast<Cylinder*>(cm.get()))->radius;
@@ -166,15 +185,32 @@ void Gl1_Cylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,boo
 	glColor3v(cm->color);
 	if(glutNormalize)	glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
 // 	glPushMatrix();
-	if (wire || wire2) drawCylinder(true, r,length);
-	else drawCylinder(false, r,length);
+	Quaternionr shift = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
+	if (wire || wire2) drawCylinder(true, r,length,shift);
+	else drawCylinder(false, r,length,shift);
 	if(glutNormalize) glPopAttrib();
 // 	glPopMatrix();
 	return;
 }
 
+// void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
+// {
+// 	Real r=(static_cast<ChainedCylinder*>(cm.get()))->radius;
+// 	Real length=(static_cast<ChainedCylinder*>(cm.get()))->length;
+// 	Quaternionr shift = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
+// 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+// 	glColor3v(cm->color);
+// 	if(glutNormalize) glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
+// // 	glPushMatrix();
+//  	out(shift);
+// 	if (wire || wire2) drawCylinder(true, r,length,shift);
+// 	else drawCylinder(false, r,length,shift);
+// 	if(glutNormalize) glPopAttrib();
+// // 	glPopMatrix();
+// 	return;
+// }
 
-void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length) const
+void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift) const
 {
 //    GLERROR;
 /*	if (glCylinderList<0) {
@@ -188,23 +224,57 @@ void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length) const
 //     glTranslatef(0.0,0.0,-length*0.5);
    //scaling needs to adapt spheres or they will be elipsoids. They actually seem to disappear when commented glList code is uncommented, the cylinders are displayed correclty.
 //    glScalef(1,length,1);
+   AngleAxisr aa(shift);
+   glRotatef(aa.angle()*180.0/Mathr::PI,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
    gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
    gluQuadricOrientation(quadObj, (GLenum) GLU_INSIDE);
    glutSolidSphere(radius,glutSlices,glutStacks);
    glTranslatef(0.0,0.0,length);
-//    glRotatef(180,0.0,1.0,0.0);
+
    glutSolidSphere(radius,glutSlices,glutStacks);
 //    gluDisk(quadObj,0.0,radius,glutSlices,_loops);
    gluDeleteQuadric(quadObj);
    glPopMatrix();
 //    GLERROR;
-	
+
 // 	glEndList();}
 // 	glCallList(glCylinderList);
 
 }
 
+// void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift) const
+// {
+// //    GLERROR;
+// /*	if (glCylinderList<0) {
+// 		glCylinderList = glGenLists(1);
+// 		glNewList(glCylinderList,GL_COMPILE);*/
+//    glPushMatrix();
+//    GLUquadricObj *quadObj = gluNewQuadric();
+//    gluQuadricDrawStyle(quadObj, (GLenum) (wire ? GLU_SILHOUETTE : GLU_FILL));
+//    gluQuadricNormals(quadObj, (GLenum) GLU_SMOOTH);
+//    gluQuadricOrientation(quadObj, (GLenum) GLU_OUTSIDE);
+// //     glTranslatef(0.0,0.0,-length*0.5);
+//    //scaling needs to adapt spheres or they will be elipsoids. They actually seem to disappear when commented glList code is uncommented, the cylinders are displayed correclty.
+// //    glScalef(1,length,1);
+//    gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
+//    gluQuadricOrientation(quadObj, (GLenum) GLU_INSIDE);
+//    glutSolidSphere(radius,glutSlices,glutStacks);
+//    glTranslatef(0.0,0.0,length);
+//    AngleAxisr aa(shift);
+//    glRotatef(aa.angle(),aa.axis()[0],aa.axis()[1],aa.axis()[2]);
+//    glutSolidSphere(radius,glutSlices,glutStacks);
+// //    gluDisk(quadObj,0.0,radius,glutSlices,_loops);
+//    gluDeleteQuadric(quadObj);
+//    glPopMatrix();
+// //    GLERROR;
+// 	
+// // 	glEndList();}
+// // 	glCallList(glCylinderList);
+// 
+// }
+
 //!##################	BOUNDS FUNCTOR   #####################
+
 
 void Bo1_Cylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Cylinder* cylinder = static_cast<Cylinder*>(cm.get());
