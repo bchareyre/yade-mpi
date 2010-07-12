@@ -128,6 +128,7 @@ class Gl1_Cylinder : public GlShapeFunctor{
 		void initGlLists(void);
 	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+		void out( Quaternionr q );
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Cylinder,GlShapeFunctor,"Renders :yref:`Cylinder` object",
 		((bool,wire,false,"Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``."))
 		((bool,glutNormalize,true,"Fix normals for non-wire rendering"))

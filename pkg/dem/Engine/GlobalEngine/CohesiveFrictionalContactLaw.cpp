@@ -19,17 +19,6 @@ CREATE_LOGGER(Law2_ScGeom_CohFrictPhys_ElasticPlastic);
 
 Vector3r translation_vect_ ( 0.10,0,0 );
 
-void out ( Quaternionr q )
-{
-	AngleAxisr aa(q);
-	std::cout << " axis: " <<  aa.axis()[0] << " " << aa.axis()[1] << " " << aa.axis()[2] << ", angle: " << aa.angle() << " | ";
-}
-
-void outv ( Vector3r axis )
-{
-	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", length: " << axis.norm() << " | ";
-}
-
 
 
 void CohesiveFrictionalContactLaw::action()

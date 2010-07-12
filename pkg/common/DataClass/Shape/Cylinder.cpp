@@ -179,7 +179,7 @@ int Gl1_Cylinder::glCylinderList=-1;
 // int  Gl1_ChainedCylinder::glutStacks;
 // int Gl1_ChainedCylinder::glCylinderList=-1;
 
-void out ( Quaternionr q )
+void Gl1_Cylinder::out( Quaternionr q )
 {
 	AngleAxisr aa(q);
 	std::cout << " axis: " <<  aa.axis()[0] << " " << aa.axis()[1] << " " << aa.axis()[2] << ", angle: " << aa.angle() << " | ";
