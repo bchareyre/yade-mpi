@@ -72,7 +72,7 @@ O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=Vect
 #print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
 
 # spheresFromFile function imports coordinates and radiuses of all spheres of the simulation into the text file
-O.bodies.append(ymport.text('regular-sphere-pack-FromFile',shift=[6.0,6.0,-2.9],scale=0.7,color=(1,1,1),**kw))
+O.bodies.append(ymport.text('regular-sphere-pack-FromFile',shift=Vector3(6.0,6.0,-2.9),scale=0.7,color=(1,1,1),**kw))
 
 try:
 	from yade import qt
