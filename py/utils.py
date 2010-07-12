@@ -208,6 +208,36 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b.mask=mask
 	return b
 
+
+def chCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
+	"""Create and chain a MinkCylinder with given parameters. This shape is the Minkowsky sum of line and sphere.
+
+	:Parameters:
+		`radius`: Real
+			radius of sphere in the Minkowsky sum.
+		`begin`: Vector3
+			first point positioning the line in the Minkowsky sum
+		`last`: Vector3
+			last point positioning the line in the Minkowsky sum
+
+	In order to build a correct chain, last point of element of rank N must correspond to first point of element of rank N+1 in the same chain (with some tolerance, since bounding boxes will be used to create connections."""
+	segment=end-begin
+	b=Body()
+	b.shape=ChainedCylinder(radius=radius,length=segment.norm(),color=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape.segment=b.shape.length*Vector3(0.,0.,1.)
+	V=2*(4./3)*math.pi*radius**3
+	geomInert=(2./5.)*V*radius**2+b.shape.length*b.shape.length*2*(4./3)*math.pi*radius**3
+	b.state=ChainedState()
+	b.state.addToChain(b.id)
+	#b.state.blockedDOFs=['rx','ry','rz']
+	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,resetState=False)
+	b.state.pos=b.state.refPos=begin
+	b.dynamic=dynamic
+	b.mask=mask
+	b.bound=Aabb(diffuseColor=[0,1,0])
+	b.state.ori=b.state.ori.setFromTwoVectors(Vector3(0.,0.,1.),segment)
+	return b
+
 def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	"""Return ready-made wall body.
 

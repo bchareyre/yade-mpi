@@ -74,6 +74,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 	if (un < 0 && (currentContactPhysics->normalForce.squaredNorm() > pow(currentContactPhysics->normalAdhesion,2)
 	               || currentContactPhysics->normalAdhesion==0)) {
 		// BREAK due to tension
+		cerr <<"requesterase";
 		ncb->interactions->requestErase(contact->getId1(),contact->getId2());
 		// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 // 			currentContactPhysics->cohesionBroken = true;
@@ -85,7 +86,12 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 		///////////////////////// CREEP START ///////////
 		if (shear_creep) shearForce -= currentContactPhysics->ks*(shearForce*dt/creep_viscosity);
 		///////////////////////// CREEP END ////////////
+#ifdef IGCACHE
+		Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
+		const Vector3r& dus = currentContactGeometry->shearIncrement;
+#else
 		Vector3r dus = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt);
+#endif
 		//Linear elasticity giving "trial" shear force
 		shearForce -= currentContactPhysics->ks*dus;
 
@@ -98,13 +104,13 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 			if (currentContactPhysics->fragile && !currentContactPhysics->cohesionBroken) {
 				currentContactPhysics->SetBreakingState();
 				maxFs = max((Real) 0, Fn*currentContactPhysics->tangensOfFrictionAngle);
+				
 			}
 			maxFs = maxFs / Fs;
 			if (maxFs>1) cerr << "maxFs>1!!" << endl;
 			shearForce *= maxFs;
 			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
-
 		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
 
 		/// Moment law        ///
@@ -116,16 +122,16 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 			// Quaternionr align(axis,angle);
 			// currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
 			//}
-
-			Quaternionr delta(b1->state->ori * currentContactPhysics->initialOrientation1.conjugate() *
-			                  currentContactPhysics->initialOrientation2 * b2->state->ori.conjugate());
+			Quaternionr delta((b1->state->ori * (currentContactPhysics->initialOrientation1.conjugate())) *
+			                  (currentContactPhysics->initialOrientation2 * (b2->state->ori.conjugate())));
 			if (twist_creep) {
 				delta = delta * currentContactPhysics->twistCreep;
 			}
 
 			AngleAxisr aa(delta); // axis of rotation - this is the Moment direction UNIT vector; // angle represents the power of resistant ELASTIC moment
+			//Eigen::AngleAxisr(q) returns nan's when q close to identity, next tline fixes the pb.
+			if (isnan(aa.angle())) aa.angle()=0;
 			if (aa.angle() > Mathr::PI) aa.angle() -= Mathr::TWO_PI;   // angle is between 0 and 2*pi, but should be between -pi and pi
-
 			Real angle_twist(aa.angle() * aa.axis().dot(currentContactGeometry->normal));
 			Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
 

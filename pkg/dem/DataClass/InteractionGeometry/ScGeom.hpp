@@ -14,7 +14,7 @@
  */
 
 #define SCG_SHEAR
-// #define IGCACHE
+#define IGCACHE
 
 class ScGeom: public GenericSpheresContact {
 	public:

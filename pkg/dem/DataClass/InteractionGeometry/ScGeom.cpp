@@ -126,10 +126,10 @@ Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNor
 
 //Removing this function will need to adapt all laws
 Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
-#ifdef IGCACHE
-	rotate(shearForce);
-	return shearIncrement;
-#else
+// #ifdef IGCACHE
+// 	rotate(shearForce);
+// 	return shearIncrement;
+// #else
 	rotate(shearForce,prevNormal,rbp1,rbp2,dt);
 	Vector3r& x = contactPoint;
 	Vector3r c1x, c2x;
@@ -150,13 +150,13 @@ Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNor
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = relativeVelocity*dt;
 	return shearDisplacement;
-#endif //IGCACHE
+// #endif //IGCACHE
 }
 
 Vector3r& ScGeom::rotate(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt){
-#ifdef IGCACHE
-	return rotate(shearForce);
-#else
+// #ifdef IGCACHE
+// 	return rotate(shearForce);
+// #else
 	Vector3r axis;
 	Real angle;
 	// approximated rotations
@@ -178,7 +178,7 @@ Vector3r& ScGeom::rotate(Vector3r& shearForce, const Vector3r& prevNormal, const
 // 		shearForce        = q*shearForce;
 
 	return shearForce;
-#endif
+// #endif
 }
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
