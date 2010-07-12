@@ -43,7 +43,7 @@ for i in range(0, Ne):
 	omega=60.0/float(Ne); hy=0.10; hz=0.15;
 	px=float(i)*(omega/60.0); py=sin(float(i)*omega)*hy; pz=cos(float(i)*omega)*hz;
 	px2=float(i+1.)*(omega/60.0); py2=sin(float(i+1.)*omega)*hy; pz2=cos(float(i+1.)*omega)*hz;
-	O.bodies.append(utils.chCylinder(begin=Vector3(pz,py,px), radius=0.005,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5)))
+	O.bodies.append(utils.chainedCylinder(begin=Vector3(pz,py,px), radius=0.005,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5)))
 
 def outp(id=1):
 	for i in O.interactions:

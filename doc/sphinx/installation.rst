@@ -2,80 +2,57 @@
 Installation
 ###############
 
-Installation Yade process is relatively simple: `scons <http://www.scons.org/>`_ takes care about it during build process from source code, package manager resolves dependencies while installing a package.
-
-If you met a problem during installation process, please, `let us know <https://launchpad.net/yade>`_.
-
-Download
-===============
-
-First of all you should decide, how to install Yade: from **packages** or from **source code**.
-
-* **packages** allow quickly install the software and use it. But if you need to change something in Yade (add new constitutive laws, new engines etc.) you definitely have to compile Yade from source code
-
-* **source code** compiling requires some more time and effort. After that you will be able to change it according to your needs.
-
-Sorce code
----------------
-
-Release (the latest 0.50) and source code from the trunk are both available.
-
-Release
-^^^^^^^^^^^^^^^
-
-Grab the latest release from Launchpad `yade-0.50 <http://launchpad.net/yade/trunk/0.5/+download/yade-0.50.tar.gz>`_ (1.7MB).
-
-Latest BZR snapshot
-^^^^^^^^^^^^^^^
-You can try the latest yade version from Launchpad. We try to keep it always workable. It can be downloaded, using one of the ways shown below:
-
-* From Launchpad BZR server: ::
-
-	bzr checkout lp:yade
-
-* Daily repository snapshot, `tarball <http://beta.arcig.cz/~eudoxos/yade/yade-trunk-latest.tar.bz2>`_
-
-Also check out a `Quick Bazaar tutorial <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`_. 
+Yade can be installed from packages (precompiled binaries) or source code. The choice depends on what you need: if you don't plan to modify Yade itself, package installation is easier. In the contrary case, you must download and install source code.
 
 Packages
----------------
+----------
 
-For the moment, we have packages for Ubuntu (+derivatives) latest releases.
+Packages are (as of now) provided for several Ubuntu versions from `Yade package archive <https://launchpad.net/~yade-users/+archive/ppa>`_. Different version of Yade can be installed alongisde each other. The ``yade`` vitual package always depends on the latest stable package, while ``yade-snapshot`` will pull the latest snapshot package. To install quickly, run the following::
 
-Ubuntu(+derivatives)
+	sudo add-apt-repository ppa:yade-users/ppa 
+	sudo add-apt-repository ppa:yade-users/external   # optional (updates of other packages)
+	sudo apt-get update
+	sudo apt-get install yade
+
+More detailed instructions are available at the `archive page <https://launchpad.net/~yade-users/+archive/ppa>`_
+
+Source code
+------------
+
+Download
+^^^^^^^^^^
+
+If you want to install from source, you can install either a release (numbered version, which is frozen) or the current developement version (updated by the developers frequently). You should download the development version (called ``trunk``) if you want to modify the source code, as you might encounter problems that will be fixed by the developers. Release version will not be modified (except for updates due to critical and easy-to-fix bugs), but they are in a more stabilized state that trunk generally.
+
+#. Releases can be downloaded from the `download page <https://launchpad.net/yade/+download>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
+
+#. developement version (trunk) can be obtained from the `code repository <https://code.launchpad.net/yade/>`_ at Launchpad. We use `Bazaar <http://www.bazaar-vcs.org>`_ (the ``bzr`` command) for code management (install the ``bzr`` package in your distribution)::
+
+		bzr checkout lp:yade
+
+   will download the whole code repository of ``trunk``. Check out `Quick Bazaar tutorial <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`_ wiki page for more. For those behind firewall, `daily snapshot <http://beta.arcig.cz/~eudoxos/yade/yade-trunk-latest.tar.bz2>`_ of the repository (as compressed archive) is provided.
+
+Release and trunk sources are compiled in the same way.
+
+Prerequisities
 ^^^^^^^^^^^^^^^
 
-First of all you must add Yade ppa:
+Yade relies on a number of external software to run; its installation is checked before the compilation starts. 
 
-* Adding the PPA to Ubuntu 9.10 (Karmic) and later: ::
+* `scons <http://www.scons.org>`_ build system
+* `gcc <http://www.gcc.gnu.org>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
+* `boost <http://www.boost.org/>`_ 1.35 or later
+* `qt3 <http://www.qt.nokia.com>`_ library
+* `freeglut3 <http://freeglut.sourceforge.net>`_
+* `libQGLViewer <http://www.libqglviewer.com>`_
+* `python <http://www.python.org>`_, `numpy <http://numpy.scipy.org>`_, `ipython <http://ipython.scipy.org>`_
+* `matplotlib <http://matplotlib.sf.net>`_
+* `eigen2 <http://eigen.tuxfamily.org>`_ algebra library
+* `gdb <http://www.gnu.org/software/gdb>`_ debugger
+* `sqlite3 <http://www.sqlite.org>`_ database engine
+* `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 
-	sudo add-apt-repository ppa:yade-users/ppa
-
-* For older Ubuntu versions, please, visit `Yade package page <https://launchpad.net/~yade-users/+archive/ppa>`_ and follow instructions from *Adding this PPA to your system* section.  
-
-Prerequistes
-===============
-
-All libraries listed below must be installed with development headers. It's better to install them using your linux's distribution package management system, instead of downloading directly from the website.
-
-Required packages
----------------
-
-* `boost library <http://www.boost.org/>`_ 1.34 or later with components: date-time, filesystem, thread, regex, algorithm, foreach
-* qt3 library, including multithreading (-mt) component
-* freeglut3 / libglut3 development files
-* make
-* g++ (other compilers will most likely not work; you need g++>=4.2 for openMP support)
-* sqlite3
-* scons build system
-* python-dev, python-scientific, python-numeric
-* `eigen  <http://eigen.tuxfamily.org>`_ mathematic library
-* `vtk-headers <http://www.vtk.org/>`_
-
-Installing needed packages for Ubuntu(+derivatives)
----------------
-
-Next command will allow you to install all necessary packages for Ubuntu. Just copy/paste it to your terminal: ::
+Most of the list above is very likely already packaged for your distribution. In Ubuntu, it can be all installed by the following command (cut&paste to the terminal)::
 
 	sudo apt-get install scons libqt3-mt-dev qt3-dev-tools freeglut3-dev \
 	libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
@@ -83,31 +60,27 @@ Next command will allow you to install all necessary packages for Ubuntu. Just c
 	libboost-iostreams-dev liblog4cxx10-dev python-dev libboost-python-dev ipython \
 	python-matplotlib libsqlite3-dev python-numeric python-tk gnuplot doxygen \
 	libgts-dev python-pygraphviz libvtk5-dev python-scientific bzr libeigen2-dev \
-	libqglviewer-qt3-dev
+	libqglviewer-qt3-dev binutils-gold
 
-Source code compiling
-===============
+Compilation
+^^^^^^^^^^^
 
-Being inside the directory where you downloaded the sources (ex "yade" if you use bazaar), run this command to install yade as a local user without root privileages: ::
+Inside the directory where you downloaded the sources (ex "yade" if you use bazaar), install Yade to your home directory (without root priviledges)::
 
 	scons PREFIX=/home/username/YADE
 
-If you have a machine that you are the only user on, you can instead change permission on /usr/local ::
+If you have a machine that you are the only user on, you can instead change permission on ``/usr/local`` and install subsequently without specifying the ``PREFIX``::
 
-	sudo chown username: /usr/local
+	sudo chown user: /usr/local    # replace "user" with your login name
+	scons
 
-If you want to change additional parameters, you can call: ::
+There is a number of options for compilation you can change; run ``scons -h`` to see them (see also :ref:`scons-parameters` in the *Programmer's manual*)
 
-	scons -h
+The compilation process can take a long time, be patient.
 
-It will give a list of possible parameters. Compilation process can take a long time.
+Decreasing RAM usage furing compilation
+"""""""""""""""""""""""""""""""""""""""""
 
-How to decrease Yade RAM demand during compilation
----------------
-
-Last Yade version are demanding a large amount of memory for compilation. If you have less, than 2GB available RAM, it will be, probably difficult to compile a Yade.
-If so, next command will decrease Yade demanding of memory to minimal, but compilation will take longer: ::
+Yade demands a large amount of memory for compilation (due to extensive template use). If you have less than 2GB of RAM, it will be, you might encounter difficulties such as the computer being apparently stalled, compilation taking very long time (hours) or erroring out. This command will minimize RAM usage, but the compilation will take longer -- only one file will be compiled simultaneously and files will be "chunked" together one by one::
 
 	scons jobs=1 chunkSize=1
-
-Upper command dictates Yade to use just 1 core (if your CPU has more, than 1 core, all of them will be used for compiling by default); the second parameter decreases the number of compiled engines to 1 in 1 "portion". See *scons -h* for additional information.

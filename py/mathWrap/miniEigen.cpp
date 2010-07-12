@@ -116,7 +116,7 @@ static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ re
 #include<Eigen/SVD>
 static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Eigen::SVD<Matrix3r>(self).computeUnitaryPositive(&unitary,&positive); return bp::make_tuple(unitary,positive); }
 
-#define WM3_COMPAT
+// #define WM3_COMPAT
 
 #ifdef WM3_COMPAT
 	#define _PYCLASS(klass) boost::algorithm::trim_right_copy_if(std::string(klass),boost::algorithm::is_any_of("r"))

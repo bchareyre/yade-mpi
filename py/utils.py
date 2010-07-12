@@ -22,13 +22,14 @@ import doctest
 # c++ implementations for performance reasons
 from yade._utils import *
 
-def saveVars(mark='',loadNow=False,**kw):
+def saveVars(mark='',loadNow=True,**kw):
 	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
 
-	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use::
+	For example, variables *a*, *b* and *c* are defined. To save them, use::
 
 		>>> from yade import utils
-		>>> utils.saveVars('mark',a=1,b=2,c=3,loadNow=True)
+		>>> utils.saveVars('mark',a=1,b=2,c=3)
+		>>> from yade.params.mark import *
 		>>> a,b,c
 		(1, 2, 3)
 
@@ -36,9 +37,9 @@ def saveVars(mark='',loadNow=False,**kw):
 
 		>>> utils.loadVars('mark')
 
-	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
+	and they will be defined in the yade.params.\ *mark* module
 
-	If *loadParam*==True, variables will be loaded immediately after saving. That effectively makes *\*\*kw* available in builtin namespace.
+	m*==True, variables will be loaded immediately after saving. That effectively makes *\*\*kw* available in builtin namespace.
 	"""
 	import cPickle
 	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
@@ -48,11 +49,25 @@ def loadVars(mark=None):
 	"""Load variables from saveVars, which are saved inside the simulation.
 	If mark==None, all save variables are loaded. Otherwise only those with
 	the mark passed."""
-	import cPickle
-	import __builtin__
+	import cPickle, types, sys, warnings
+	def loadOne(d,mark=None):
+		"""Load given dictionary into a synthesized module yade.params.name (or yade.params if *name* is not given). Update yade.params.__all__ as well."""
+		import yade.params
+		if mark:
+			if mark in yade.params.__dict__: warnings.warn('Overwriting yade.params.%s which already exists.'%mark)
+			modName='yade.params.'+mark
+			mod=types.ModuleType(modName)
+			mod.__dict__.update(d)
+			mod.__all__=list(d.keys()) # otherwise params starting with underscore would not be imported
+			sys.modules[modName]=mod
+			yade.params.__all__.append(mark)
+			yade.params.__dict__[mark]=mod
+		else:
+			yade.params.__all__+=list(d.keys())
+			yade.params.__dict__.update(d)
 	if mark!=None:
 		d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])
-		for k in d: __builtin__.__dict__[k]=d[k]
+		loadOne(d,mark)
 	else: # load everything one by one
 		for m in Omega().tags.keys():
 			if m.startswith('pickledPythonVariablesDictionary'):
@@ -209,18 +224,17 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	return b
 
 
-def chCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
-	"""Create and chain a MinkCylinder with given parameters. This shape is the Minkowsky sum of line and sphere.
+def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
+	"""Create and chain a MinkCylinder with given parameters. This shape is the Minkowski sum of line and sphere.
 
-	:Parameters:
-		`radius`: Real
-			radius of sphere in the Minkowsky sum.
-		`begin`: Vector3
-			first point positioning the line in the Minkowsky sum
-		`last`: Vector3
-			last point positioning the line in the Minkowsky sum
+	:param Real radius: radius of sphere in the Minkowski sum.
+	:param Vector3 begin: first point positioning the line in the Minkowski sum
+	:param Vector3 last: last point positioning the line in the Minkowski sum
 
-	In order to build a correct chain, last point of element of rank N must correspond to first point of element of rank N+1 in the same chain (with some tolerance, since bounding boxes will be used to create connections."""
+	In order to build a correct chain, last point of element of rank N must correspond to first point of element of rank N+1 in the same chain (with some tolerance, since bounding boxes will be used to create connections.
+	
+	:return: Body object with the :yref:`ChainedCylinder` :yref:`shape<Body.shape>`.
+	"""
 	segment=end-begin
 	b=Body()
 	b.shape=ChainedCylinder(radius=radius,length=segment.norm(),color=color if color else randomColor(),wire=wire,highlight=highlight)
@@ -752,7 +766,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	* Omega().tags['params']="name1=val1,name2=val2,…"
 	* Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
 
-	All parameters (default as well as settable) are saved using saveVars('table').
+	All parameters (default as well as settable) are saved using :yref:`yade.utils.saveVars`\ ``('table')``.
 
 	:parameters:
 		`tableFile`:
@@ -769,7 +783,8 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 
 	"""
 	tagsParams=[]
-	dictDefaults,dictParams={},{}
+	# dictParams is what eventually ends up in yade.params.table (default+specified values)
+	dictDefaults,dictParams,dictAssign={},{},{}
 	import os, __builtin__,re
 	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
 		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
@@ -790,15 +805,17 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 			if col not in kw.keys() and (not unknownOk): raise NameError("Parameter `%s' has no default value assigned"%names[i])
 			if vv[col]=='*': vv[col]=kw[col] # use default value for * in the table
 			elif col in kw.keys(): kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
-			print 'ASSIGN',col,vv[col]
-			exec('%s=%s'%(col,vv[col])) in __builtins__; tagsParams+=['%s=%s'%(col,vv[col])]; dictParams[col]=vv[col]
+			#print 'ASSIGN',col,vv[col]
+			tagsParams+=['%s=%s'%(col,vv[col])];
+			dictParams[col]=eval(vv[col])
 	# assign remaining (default) keys to python vars
 	defaults=[]
 	for k in kw.keys():
-		exec("%s=%s"%(k,repr(kw[k]))) in __builtins__
-		defaults+=["%s=%s"%(k,kw[k])]; dictDefaults[k]=kw[k]
+		dictDefaults[k]=kw[k]
+		defaults+=["%s=%s"%(k,kw[k])]; 
 	O.tags['defaultParams']=",".join(defaults)
 	O.tags['params']=",".join(tagsParams)
-	dictParams.update(dictDefaults); saveVars('table',**dictParams)
+	dictParams.update(dictDefaults)
+	saveVars('table',loadNow=True,**dictParams)
 	return len(tagsParams)
 

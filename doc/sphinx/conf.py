@@ -125,11 +125,12 @@ rst_epilog = """
 
 
 def customExclude(app, what, name, obj, skip, options):
-	if name=='<unbound method Serializable.clone>':
+	if obj=='<unbound method Serializable.clone>':
 		print 1000*'@'
 		return False
 	if re.match(r'\bclone\b',name):
-		if 'Serializable' in name: print 1000*'#',name
+		#if 'Serializable' in name: print 1000*'#',name
+		#print 1000*'#',name, obj, what
 		return True
 	if hasattr(obj,'__doc__') and obj.__doc__ and ('|ydeprecated|' in obj.__doc__ or '|ynodoc|' in obj.__doc__): return True
 	#if re.match(r'\b(__init__|__reduce__|__repr__|__str__)\b',name): return True

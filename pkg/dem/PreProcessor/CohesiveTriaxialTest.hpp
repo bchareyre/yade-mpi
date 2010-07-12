@@ -98,7 +98,7 @@ class CohesiveTriaxialTest : public FileGenerator
 		((Real,StabilityCriterion,0.01,"Value of unbalanced force for which the system is considered stable. Used in conditionals to switch between loading stages."))
 		((Real,wallOversizeFactor,1.3,"Make boundaries larger than the packing to make sure spheres don't go out during deformation."))
 		((Real,sigmaIsoCompaction,50000,"Confining stress during isotropic compaction."))
-		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`TriaxialTest::SigmaIsoCompaction`."))
+		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`TriaxialTest::sigmaIsoCompaction`."))
 		
 		((int,timeStepUpdateInterval,50,"interval for :yref:`GlobalStiffnessTimeStepper`"))
 		((int,wallStiffnessUpdateInterval,10,"interval for updating the stiffness of sample/boundaries contacts"))

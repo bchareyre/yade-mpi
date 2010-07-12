@@ -132,7 +132,7 @@ Class reference (yade.wrapper module)
 	sect('Callbacks','',['BodyCallback','IntrCallback'])+
 	sect('Preprocessors','',['FileGenerator'])+
 	sect('Rendering','',['OpenGLRenderingEngine','GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlInteractionGeometryFunctor','GlInteractionPhysicsFunctor'])+
-	sect('Simulation data','',['Omega','BodyContainer','InteractionContainer','ForceContainer'])
+	sect('Simulation data','',['Omega','BodyContainer','InteractionContainer','ForceContainer','MaterialContainer'])
 	+"""
 Other classes
 ---------------

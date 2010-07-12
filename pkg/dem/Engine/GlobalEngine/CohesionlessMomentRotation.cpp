@@ -9,7 +9,7 @@
 /* Contact law have been verified with Plassiard et al. (2009) : A spherical discrete element model: calibration procedure and incremental response */
 
 
-YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_MomentMat_MomentMat_MomentPhys)(MomentPhys));
+YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_MomentMat_MomentMat_MomentPhys)(MomentPhys)(MomentMat));
 
 
 

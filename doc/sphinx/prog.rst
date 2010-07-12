@@ -8,6 +8,7 @@ Build system
 Yade uses [scons]_ build system for managing the build process. It takes care of configuration, compilation and installation. SCons is written in python and its build scripts are in python, too. SCons complete documentation can be found in its manual page.
 
 
+.. _scons-parameters:
 Pre-build configuration
 -----------------------
 We use ``\$`` to denote build variable in strings in this section; in SCons script, they can be used either by writing ``\$variable`` in strings passed to SCons functions, or obtained as attribute of the ``Environment`` instance ``env``, i.e. ``env['variable']``; we use the formed in running text here.
@@ -31,7 +32,7 @@ There is a number of configuration parameters; you can list all of them by ``sco
 ``debug`` [*False* (0)]
 	add debugging symbols to output, enable stack traces on crash
 ``optimize`` [*True* (1)]
-	optimize binaries (#defines NDEBUG; assertions eliminated; YADE_CAST and YADE_PTR_CAST are static casts rather than dynamic; LOG_TRACE and LOG_DEBUG are eliminated)
+	optimize binaries (``#define NDEBUG``; assertions eliminated; ``YADE_CAST`` and ``YADE_PTR_CAST`` are static casts rather than dynamic; LOG_TRACE and LOG_DEBUG are eliminated)
 ``CPPPATH`` [``/usr/include/vtk-5.2:/usr/include/vtk-5.4``]
 	additional colon-separated paths for preprocessor (for atypical header locations). Required by some libraries, such as VTK (reflected by the default)
 ``LIBPATH`` [*(empty)*]
@@ -85,7 +86,7 @@ openmp (YADE_OPENMP)
 gts (YADE_GTS)
 	Enable functionality provided by GNU Triangulated Surface library ([gts]_) and build PyGTS, its python interface; used for surface import and construction.
 cgal (YADE_CGAL)
-	Enable functionality provided by Computation Geometry Algorithms Library ([cgal]_); triangulation code in :yref:`MicroMacroAnalyser` and :yref:`PersistentTriagulationCollider` ses its routines.
+	Enable functionality provided by Computation Geometry Algorithms Library ([cgal]_); triangulation code in :yref:`MicroMacroAnalyser` and :yref:`PersistentTriangulationCollider` ses its routines.
 other
 	There might be more features added in the future. Always refer to ``scons -h`` output for possible values.
 
@@ -240,8 +241,8 @@ The following rules that should be respected; documentation is treated separatel
 * programming style
 
   * Be defensive, if it has no significant performance impact. Use assertions abundantly: they don't affect performance (in the optimized build) and make spotting error conditions much easier.
-  * Use logging abundantly. Again, :yref:`LOG_TRACE` and :yref:`LOG_DEBUG` are eliminated from optimized code; unless turned on explicitly, the ouput will be suppressed even in the debug build (see below).
-  * Use :yref:`YADE_CAST` and :yref:`YADE_PTR_CAST` where you want type-check during debug builds, but fast casting in optimized build. 
+  * Use logging abundantly. Again, ``LOG_TRACE`` and ``LOG_DEBUG`` are eliminated from optimized code; unless turned on explicitly, the ouput will be suppressed even in the debug build (see below).
+  * Use ``YADE_CAST`` and ``YADE_PTR_CAST`` where you want type-check during debug builds, but fast casting in optimized build. 
   * Initialize all class variables in the default constructor. This avoids bugs that may manifest randomly and are difficult to fix. Initializing with NaN's will help you find otherwise unitialized variable. (This is taken care of by :ref:`YADE_CLASS_BASE_DOC` macros for user classes)
 
 
@@ -281,7 +282,7 @@ Functors
 
 	* :yref:`Bo1_Sphere_Aabb` is a :yref:`BoundFunctor` which is called for :yref:`Sphere`, creating an instance of :yref:`Aabb`.
 	* :yref:`Ig2_Facet_Sphere_Dem3DofGeom` is binary functor called for :yref:`Facet` and :yref:`Sphere`, creating and instace of :yref:`Dem3DofGeom`.
-	* :yref:`Law2_Dem3Dof_CpmPhys_Cpm` is binary functor (:yref:`LawFunctor`) called for types :yref:`Dem3Dof (Geom)<Dem3DofGeom>` and :yref:`CpmPhys`.
+	* :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` is binary functor (:yref:`LawFunctor`) called for types :yref:`Dem3Dof (Geom)<Dem3DofGeom>` and :yref:`CpmPhys`.
 
 .. [#opengldispatchers] Not considering OpenGL dispatchers, which might be replaced by regular virtual functions in the future.
 
@@ -450,7 +451,7 @@ To have both speed and safety, Yade provides 2 macros:
 
 Basic numerics
 ---------------
-The floating point type to use in Yade :yref:`Real`, which is by default typedef for ``double``. [#real]_ 
+The floating point type to use in Yade ``Real``, which is by default typedef for ``double``. [#real]_ 
 
 Yade uses the `Eigen <http://eigen.tuxfamily.org>`_ library for computations. It provides classes for 2d and 3d vectors, quaternions and 3x3 matrices templated by number type; their specialization for the ``Real`` type are typedef'ed with the "r" suffix, and occasionally useful integer types with the "i" suffix:
 
@@ -487,7 +488,7 @@ In Python, basic numeric types are wrapped and imported from the ``miniEigen`` m
 Run-time type identification (RTTI)
 -----------------------------------
 
-Since serialization and dispatchers need extended type and inheritance information, which is not sufficiently provided by standard RTTI. Each yade class is therefore derived from :yref:`Factorable` and it must use macro to override its virtual functions providing this extended RTTI:
+Since serialization and dispatchers need extended type and inheritance information, which is not sufficiently provided by standard RTTI. Each yade class is therefore derived from ``Factorable`` and it must use macro to override its virtual functions providing this extended RTTI:
 
 ``YADE_CLASS_BASE_DOC(Foo,Bar Baz,"Docstring)`` creates the following virtual methods (mediated via the ``REGISTER_CLASS_AND_BASE`` macro, which is not user-visible and should not be used directly):
 
@@ -520,7 +521,7 @@ Serialization serves to save simulation to file and restore it later. This proce
 
 This functionality is provided by 3 macros and 2 virtual functions; details are provided below.
 
-:yref:`Serializable::preProcessAttributes`
+``Serializable::preProcessAttributes``
 	*Optional* class virtual function. See :ref:`attributeregistration`.
 
 	Prepare attributes for being (de)serialized.
@@ -537,7 +538,7 @@ This functionality is provided by 3 macros and 2 virtual functions; details are 
 ``REGISTER_SERIALIZABLE``
 	In header file, but *after* the class declaration block. See :ref:`classfactory`.
 	
-	Associate literal name of the class with functions that will create its new instance (:yref:`ClassFactory`).
+	Associate literal name of the class with functions that will create its new instance (``ClassFactory``).
 ``YADE_PLUGIN``
 	In the implementation ``.cpp`` file. See :ref:`plugins`.
 
@@ -550,7 +551,7 @@ Attribute registration
 
 All (serializable) types in Yade are one of the following:
 
-* Type deriving from :yref:`Serializable`, which provide information on how to serialize themselves via overriding the :yref:`Serializable::registerAttributes` method; it declares data members that should be serialzed along with their literal names, by which they are identified. This method then invokes ``registerAttributes`` of its base class (until ``Serializable`` itself is reached); in this way, derived classes properly serialize data of their base classes.
+* Type deriving from :yref:`Serializable`, which provide information on how to serialize themselves via overriding the ``Serializable::registerAttributes`` method; it declares data members that should be serialzed along with their literal names, by which they are identified. This method then invokes ``registerAttributes`` of its base class (until ``Serializable`` itself is reached); in this way, derived classes properly serialize data of their base classes.
 
   This funcionality is hidden behind the macro :ref:`YADE_CLASS_BASE_DOC` used in class declaration body (header file), which takes base class and list of attributes::
 
@@ -558,20 +559,13 @@ All (serializable) types in Yade are one of the following:
 
   Note that attributes are encodes in double parentheses, not separated by commas. Empty attribute list can be given simply by ``YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"documentation",)`` (the last comma is mandatory), or by omiting ``ATTRS`` from macro name and last parameter altogether.
 
-* Fundamental type: strings, various number types, booleans, :yref:`Vector3r` and others. Their "handlers" (serializers and deserializers) are defined in ``lib/serialization``.
+* Fundamental type: strings, various number types, booleans, ``Vector3r`` and others. Their "handlers" (serializers and deserializers) are defined in ``lib/serialization``.
 
 * Standard container of any serializable objects.
 
 * Shared pointer to serializable object.
 
-Currently, Yade relies on its own serialization system (in ``lib/serialization`` and ``lib/serialization-xml``), but there are plans to use boost::serialization instead. This implementation detail is hidden behind the helper macros for regular use.
-
-.. warning:: Yade's serialization system lacks some functionality, notably
-
-	* tracking shared pointers
-	* serialization of some containers (std::map or std::pair, for instance).
-	
-	Such functionality must be explicitly emulated if desired, until Yade switches to boost::serialization.
+Yade uses the excellent `boost::serialization <http://www.boost.org/doc/libs/release/libs/serialization/>`_ library internally for serialization of data.
 
 .. note:: ``YADE_CLASS_BASE_DOC_ATTRS`` also generates code for attribute access from python; this will be discussed later. Since this macro serves both purposes, the consequence is that attributes that are serialized can always be accessed from python.
 
@@ -587,7 +581,7 @@ Class factory
 ^^^^^^^^^^^^^^
 Each serializable class must use ``REGISTER_SERIALIZABLE``, which defines function to create that class by ``ClassFactory``. ``ClassFactory`` is able to instantiate a class given its name (as string), which is necessary for deserialization.
 
-Although mostly used internally by the serialization framework, programmer can ask for a class instantiation using ``shared_ptr<Factorable> f=ClassFactory::instance().createShared("ClassName");``, casting the returned ``shared_ptr<Factorable>`` to desired type afterwards. :yref:`Serializable` itself derives from :yref:`Factorable`, i.e. all serializable types are also factorable (It is possible that different mechanism will be in place if boost::serialization is used, though.)
+Although mostly used internally by the serialization framework, programmer can ask for a class instantiation using ``shared_ptr<Factorable> f=ClassFactory::instance().createShared("ClassName");``, casting the returned ``shared_ptr<Factorable>`` to desired type afterwards. :yref:`Serializable` itself derives from ``Factorable``, i.e. all serializable types are also factorable (It is possible that different mechanism will be in place if boost::serialization is used, though.)
 
 .. _plugins:
 
@@ -886,7 +880,7 @@ Multiple dispatch is generalization of virtual methods: a :yref:`Dispatcher` dec
 
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 
-creates dispatcher :yref:`BoundDispatcher` (a :yref:`Dispatcher1D`), with 2 functors; they receive ``Sphere`` or ``Facet`` instances and create ``Aabb``. This code would look like this in c++:
+creates dispatcher :yref:`BoundDispatcher` (a :yref:`Dispatcher`), with 2 functors; they receive ``Sphere`` or ``Facet`` instances and create ``Aabb``. This code would look like this in c++:
 
 .. code-block:: c++
 
@@ -899,7 +893,7 @@ There are currenly 4 predefined dispatchers (see `dispatcher-names`_) and corres
 Example: InteractionGeometryDispatcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's take (the most complicated perhaps) :yref:`InteractionGeometryDispatcher`. :yref:`InteractionGeometryFunctor`, which is dispatched based on types of 2 :yref:`Shape` instances (a :yref:`Functor2D`), takes a number of arguments and returns bool. The functor "call" is always provided by its overridden ``Functor::go`` method; it always receives the dispatched instances as first argument(s) (2 × ``const shared_ptr<Shape>&``) and a number of other arguments it needs:
+Let's take (the most complicated perhaps) :yref:`InteractionGeometryDispatcher`. :yref:`InteractionGeometryFunctor`, which is dispatched based on types of 2 :yref:`Shape` instances (a :yref:`Functor`), takes a number of arguments and returns bool. The functor "call" is always provided by its overridden ``Functor::go`` method; it always receives the dispatched instances as first argument(s) (2 × ``const shared_ptr<Shape>&``) and a number of other arguments it needs:
 
 .. code-block:: c++
 
@@ -1014,7 +1008,7 @@ Top-level Indexable          used by
 :yref:`InteractionGeometry`  :yref:`LawDispatcher`
 ============================ ===========================
 
-The top-level Indexable must use the :yref:`REGISTER_INDEX_COUNTER` macro, which sets up the machinery for identifying types of derived classes; they must then use the ``REGISTER_CLASS_INDEX`` macro *and* call ``createIndex()`` in their constructor. For instance, taking the :yref:`Shape` class (which is a top-level Indexable):
+The top-level Indexable must use the ``REGISTER_INDEX_COUNTER`` macro, which sets up the machinery for identifying types of derived classes; they must then use the ``REGISTER_CLASS_INDEX`` macro *and* call ``createIndex()`` in their constructor. For instance, taking the :yref:`Shape` class (which is a top-level Indexable):
 
 .. code-block:: c++
 
@@ -1108,7 +1102,7 @@ Finally, dispatcher can be asked to return functor suitable for given argument(s
 
 OpenGL functors
 ^^^^^^^^^^^^^^^
-OpenGL rendering is being done also by 1D functors (dispatched for the type to be rendered). Since it is sufficient to have exactly one class for each rendered type, the functors are found automatically. Their base functor types are ``GlShapeFunctor``, ``GlBoundFunctor``, ``GlInteractionGeometryFunctor`` and so on. These classes register the type they render using the :yref:`RENDERS` macro:
+OpenGL rendering is being done also by 1D functors (dispatched for the type to be rendered). Since it is sufficient to have exactly one class for each rendered type, the functors are found automatically. Their base functor types are ``GlShapeFunctor``, ``GlBoundFunctor``, ``GlInteractionGeometryFunctor`` and so on. These classes register the type they render using the ``RENDERS`` macro:
 
 .. code-block:: c++
 
@@ -1179,7 +1173,7 @@ Maximum number of OpenMP threads is determined by the ``OMP_NUM_THREADS`` enviro
 At places which are susceptible of being accessed concurrently from multiple threads, Yade provides some mutual exclusion mechanisms, discussed elsewhere (FIXME):
 
 * simultaneously writeable container for :ref:`ForceContainer`,
-* mutex for :yref:`Body::State`.
+* mutex for :yref:`Body::state`.
 
 .. _logging:
 
@@ -1397,7 +1391,7 @@ There are special containers for storing bodies, interactions and (generalized) 
 Scene
 ------
 
-:yref:`Scene` is the object containing the whole simulation. Although multiple scenes can be present in the memory, only one of them is active. Saving and loading (serializing and deserializing) the :yref:`Scene` object should make the simulation run from the point where it left off. 
+``Scene`` is the object containing the whole simulation. Although multiple scenes can be present in the memory, only one of them is active. Saving and loading (serializing and deserializing) the ``Scene`` object should make the simulation run from the point where it left off. 
 
 .. note::
 	All :yref:`Engines<Engine>` and functors have interally a ``Scene* scene`` pointer which is updated regularly by engine/functor callers; this ensures that the current scene can be accessed from within user code.
@@ -1590,7 +1584,7 @@ Creating and removing interactions is a rather delicate topic and number of comp
 Terminologically, we distinguish
 
 potential interactions,
-	having neither :yref:`geometry<Interaction::interactionGeometry>` nor :yref:`physics<Interaction::interactionPhysics>`. :yref:`Interaction.real` can be used to query the status (``Interaction::isReal()`` in c++).
+	having neither :yref:`geometry<Interaction::interactionGeometry>` nor :yref:`physics<Interaction::interactionPhysics>`. :yref:`Interaction.isReal` can be used to query the status (``Interaction::isReal()`` in c++).
 
 real interactions,
 	having both :yref:`geometry<Interaction::interactionGeometry>` and :yref:`physics<Interaction::interactionPhysics>`. Below, we shall discuss the possibility of interactions that only have geometry but no physics.
@@ -1698,7 +1692,7 @@ Running simulation consists in looping over :yref:`Engines<Engine>` and calling 
 #. set ``Engine::scene`` pointer to point to the current ``Scene``.
 #. Call ``Engine::isActivated()``; if it returns ``false``, the engine is skipped.
 #. Call ``Engine::action()``
-#. If :yref:`O.timingEnabled<Omega.timingEnabled>`, increment :yref:`Engine::execTime`` by difference from last time reading (either after the previous engine was run, or immediately before the loop started, if this engine comes first). Increment :yref:`Engine::execCount` by 1.
+#. If :yref:`O.timingEnabled<Omega.timingEnabled>`, increment :yref:`Engine::execTime` by the difference from the last time reading (either after the previous engine was run, or immediately before the loop started, if this engine comes first). Increment :yref:`Engine::execCount` by 1.
 
 After engines are processed, :yref:`virtual time<Omega.time>` is incremented by :yref:`timestep<Omega.dt>` and :yref:`iteraction number<Omega.iter>` is incremented by 1.
 

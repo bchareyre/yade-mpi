@@ -24,35 +24,6 @@ class Ip2_2xCohFrictMat_CohFrictPhys;
 CREATE_LOGGER(ThreeDTriaxialEngine);
 YADE_PLUGIN((ThreeDTriaxialEngine));
 
-
-// ThreeDTriaxialEngine::ThreeDTriaxialEngine()
-// {
-// 	translationAxisy=Vector3r(0,1,0);
-// 	translationAxisx=Vector3r(1,0,0);
-// 	translationAxisz=Vector3r(0,0,1);
-// 	strainRate1=0;
-// 	currentStrainRate1=0;
-// 	strainRate2=0;
-// 	currentStrainRate2=0;
-// 	strainRate2=0;
-// 	currentStrainRate2=0;
-// 	//StabilityCriterion=0.001;
-// 	UnbalancedForce = 1;
-// 	Key = "";
-// 	//Iteration = 0;
-// 	//testEquilibriumInterval = 20;
-// 	firstRun=true;
-// 	frictionAngleDegree = -1;
-// 	updateFrictionAngle=false;
-// 
-// 	stressControl_1=false;
-// 	stressControl_2=false;
-// 	stressControl_3=false;
-// 
-//  	boxVolume=0;
-// 
-// }
-
 ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 {	
 }

@@ -237,7 +237,7 @@ Data components
 Bodies
 """""""
 
-Yade simulation (class :yref:`Scene`) is represented by :yref:`Bodies<Body>`, their :yref:`Interactions<Interaction>` and resultant generalized :yref:`forces<Omega.forces>` (all stored internally in special containers).
+Yade simulation (class ``Scene``, but hidden inside :yref:`Omega` in Python) is represented by :yref:`Bodies<Body>`, their :yref:`Interactions<Interaction>` and resultant generalized :yref:`forces<Omega.forces>` (all stored internally in special containers).
 
 Each :yref:`Body` comprises the following:
 
@@ -456,7 +456,7 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionDispatchers` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`InteractionGeometryDispatcher`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes` objects. Dispatched functor resolves exact collision configuration and creates :yref:`InteractionGeometry<Interaction::interactionGeometry>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shapes>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`InteractionGeometry<Interaction::interactionGeometry>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_Dem3DofGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`Dem3DofGeom` instance, if appropriate.
 
@@ -465,7 +465,7 @@ hides 3 internal dispatchers within the :yref:`InteractionDispatchers` engine; t
 	All ``Ig2`` functors derive from :yref:`InteractionGeometryFunctor` (they are documented at the same place).
 
 :yref:`InteractionPhysicsDispatcher`
-	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials`; these functors return return :yref:`InteractionPhysics` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
+	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`InteractionPhysics` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
 	
 	``Ip2`` functors are derived from :yref:`InteractionPhysicsFunctor`.
 
