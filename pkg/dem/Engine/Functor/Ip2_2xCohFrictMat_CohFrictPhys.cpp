@@ -44,8 +44,11 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
-			Real Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 
+			Real Ks;
+			if (Va && Vb) Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
+			else Ks=0;
+				
 			// Jean-Patrick Plassiard, Noura Belhaine, Frederic
 			// Victor Donze, "Calibration procedure for spherical
 			// discrete elements using a local moemnt law".

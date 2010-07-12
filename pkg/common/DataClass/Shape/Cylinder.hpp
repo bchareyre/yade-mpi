@@ -15,7 +15,7 @@ class Cylinder: public Shape{
 	public:
 		Cylinder(Real _radius, Real _length): radius(_radius), length(_length), segment(Vector3r(0,0,1)*_length){ createIndex(); }
 		virtual ~Cylinder ();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Cylinder,Shape,"Geometry of a cylinder, as Minkowsky sum of line and sphere.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Cylinder,Shape,"Geometry of a cylinder, as Minkowski sum of line and sphere.",
 		((Real,radius,NaN,"Radius [m]"))
 		((Real,length,NaN,"Length [m]"))
 		((Vector3r,segment,Vector3r::Zero(),"Length vector")),

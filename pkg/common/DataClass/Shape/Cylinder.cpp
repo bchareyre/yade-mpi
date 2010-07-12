@@ -135,7 +135,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	//length only used for display
 	s->length=length;
 	scm->penetrationDepth=s->initLength-length;
-	scm->contactPoint=pChain->pos+pChain->ori*Vector3r::UnitZ()*length;
+	scm->contactPoint=pChain->pos+segment;
 #ifdef IGCACHE
 	if (scene->isPeriodic) {
 		Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
@@ -209,6 +209,7 @@ void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State
 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
 	glColor3v(cm->color);
 	if(glutNormalize) glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
+	cerr<<"DispatchOK";
 // 	glPushMatrix();
  	out(shift);
 	if (wire || wire2) drawCylinder(true, r,length,shift);
