@@ -18,7 +18,7 @@ class Law2_ScGeom_CohFrictPhys_ElasticPlastic: public LawFunctor{
 	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CohFrictPhys_ElasticPlastic,LawFunctor,"Law for linear traction-compression-bending-twisting, with cohesion+friction and Mohr-Coulomb plasticity surface. Can be elastic-fragile or perfectly elastic-plastic. Creep at contact can be enabled.\n\n.. note::\n This law uses :yref:`ScGeom`.",
 		((bool,neverErase,false,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
-		((bool,momentRotationLaw,false,"use bending/twisting moment at contacts. See :yref:`CohesiveFrictionalContactLaw::always_use_moment_law` for details."))
+		((bool,momentRotationLaw,false,"use bending/twisting moment at contacts. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
 		((bool,always_use_moment_law,false,"If true, use bending/twisting moments at all contacts. If false, compute moments only for cohesive contacts."))
 		((bool,shear_creep,false,"activate creep on the shear force, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
 		((bool,twist_creep,false,"activate creep on the twisting moment, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
