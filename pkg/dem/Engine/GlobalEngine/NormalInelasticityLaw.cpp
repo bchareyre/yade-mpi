@@ -79,6 +79,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 	// actualisation :
 	currentContactPhysics->previousFn = Fn;
 	currentContactPhysics->previousun = un;
+	
 // 	*** End of computation of normal force *** //
 
 	

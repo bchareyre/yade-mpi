@@ -10,7 +10,7 @@ from yade import plot
 O.materials.append(NormalInelasticMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,coeff_dech=3.0,label='Materiau1'))
 
 #Def of the bodies of the simulations : 2 spheres, with names which will be useful after
-O.bodies.append(utils.sphere([0,0,0], 1, dynamic=False, wire=False, color=None, highlight=False)) #'Materiau1', as the latest material defined will be used
+O.bodies.append(utils.sphere([0,0,0], 1, dynamic=False, wire=False, color=None, highlight=False)) #'Materiau1', as the latest material defined, will be used
 O.bodies.append(utils.sphere([0,2,0], 1, dynamic=False, wire=False, color=None, highlight=False))
 
 LowerSphere=O.bodies[0]
