@@ -46,7 +46,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 					specimenNumberId1 = minIdR;
 					specimenNumberId2 = minIdR;
 					identicalIds tempVar(minIdR, maxIdR, 0);
-					arrayIdentIds.push_back(tempVar);
+					arrayIdentIds.push_back(tempVar);							//Put in the container, that 2 ids belong to the same spcimen!
 				}
 			}
 			if (contPhys->isCohesive==true) {	//Check whether they are cohesive
@@ -64,7 +64,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		}
 	}
 	
-	//Check for identical Ids and drop them off.
+	//Updating the container.
 	bool flagChange=true;
 	while (flagChange){
 		flagChange=false;
@@ -72,23 +72,23 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			for (unsigned int d=0; d<arrayIdentIds.size(); d++) {
 				if (i!=d){
 					identicalIds& tempAr1 = arrayIdentIds[i];
-					identicalIds& tempAr2 = arrayIdentIds[d];
-					if ((tempAr1.id2 == tempAr2.id1) and (tempAr2.id1>tempAr1.id1)) {
-						tempAr2.id1 = tempAr1.id1;
+					identicalIds& tempAr2 = arrayIdentIds[d];													//   Initial      New
+					if ((tempAr1.id2 == tempAr2.id1) and (tempAr2.id1>tempAr1.id1)) { //   1 = 2   |=>  1 = 2
+						tempAr2.id1 = tempAr1.id1;																			//   2 = 3   |=>  1 = 3
 						flagChange=true;
 					}
-					if (tempAr1.id2 == tempAr2.id2) {
-						if (tempAr2.id1>tempAr1.id1) {
-							tempAr2.id2 = tempAr2.id1;
+					if (tempAr1.id2 == tempAr2.id2) {																	//   Initial      New
+						if (tempAr2.id1>tempAr1.id1) {																	//   1 = 3   |=>  1 = 3
+							tempAr2.id2 = tempAr2.id1;																		//   2 = 3   |=>  1 = 2
 							tempAr2.id1 = tempAr1.id1;
 							flagChange=true;
-						} else if (tempAr2.id1<tempAr1.id1) {
-							tempAr1.id2 = tempAr1.id1;
-							tempAr1.id1 = tempAr2.id1;
+						} else if (tempAr2.id1<tempAr1.id1) {														//   Initial      New
+							tempAr1.id2 = tempAr1.id1;																		//   2 = 3   |=>  1 = 2
+							tempAr1.id1 = tempAr2.id1;																		//   1 = 3   |=>  1 = 3
 							flagChange=true;
-						} else {
-							arrayIdentIds.erase(arrayIdentIds.begin()+d);
-						}
+						} else {																												//   Initial      New
+							arrayIdentIds.erase(arrayIdentIds.begin()+d);									//   1 = 3   |=>  1 = 3
+						}																																//   1 = 3   |=>  DELETE
 					}
 				}
 			}
@@ -121,20 +121,20 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			totalMass += massTemp;
 			int specimenNumberId = YADE_PTR_CAST<RpmState>(b->state)->specimenNumber;
 			
-			if (specimenNumberId != 0) {
-				bool foundItemInArray = false;
+			if (specimenNumberId != 0) {					//Check, whether particle already belongs to any specimen
+				bool foundItemInArray = false;			//If yes, search for suitable "bin"
 				for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 					if (arrayIdentIds[i].id1 == specimenNumberId) {
-						arrayIdentIds[i].mass+=massTemp;
+						arrayIdentIds[i].mass+=massTemp;//If "bin" for particle with this specimenId found, put its mass there
 						foundItemInArray = true;
 					}
 					if (foundItemInArray) break;
 				}
-				if (!foundItemInArray) {
+				if (!foundItemInArray) {						//If "bin" for particle is not found, create a "bin" for it
 					identicalIds tempVar(specimenNumberId, specimenNumberId+1, massTemp);
 					arrayIdentIds.push_back(tempVar);
 				}
-			} else {
+			} else {									//If the particle was not in contact with other bodies, we give it maximal possible specimenId
 				YADE_PTR_CAST<RpmState>(b->state)->specimenNumber = maximalSpecimenId;
 				identicalIds tempVar(maximalSpecimenId, maximalSpecimenId+1, massTemp);
 				arrayIdentIds.push_back(tempVar);
@@ -151,7 +151,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			int specimenNumberId = YADE_PTR_CAST<RpmState>(b->state)->specimenNumber;
 			for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 				if (arrayIdentIds[i].id1 == specimenNumberId) {
-					YADE_PTR_CAST<RpmState>(b->state)->specimenMass = arrayIdentIds[i].mass;
+					YADE_PTR_CAST<RpmState>(b->state)->specimenMass = arrayIdentIds[i].mass;		//Each particle will contain now the mass of specimen, to which it belongs to
 					break;
 				}
 			}
