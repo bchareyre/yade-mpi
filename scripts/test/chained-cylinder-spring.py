@@ -5,7 +5,7 @@
 # Experiment beam-like behaviour with chained cylinders + CohFrict connexions
 
 from yade import utils
-young=1.0e6
+young=1.0e5
 poisson=10
 density=2.60e3 
 frictionAngle=radians(30)
