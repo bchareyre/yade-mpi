@@ -71,7 +71,7 @@ def formatRest(db):
 		## ReST uses <..> to delimit URL, therefore < and > must be encoded in the URL (http://www.blooberry.com/indexdot/html/topics/urlencoding.htm)
 		def escapeUrl(url): return url.replace('<','%3c').replace('>','%3e')
 		if i.has_key('doi'): line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi'])) 
-		if i.has_key('url'): line+=' `(fulltext) <%s>`_'%escapeUrl(i['url'])
+		if i.has_key('url'): line+=' `(fulltext) <%s>`__'%escapeUrl(i['url'])
 		if i.has_key('note'): line+=' (%s)'%i['note']
 		ret.append(line)
 	return [l.replace('@tilde@','~') for l in ret]

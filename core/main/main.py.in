@@ -40,6 +40,14 @@ if opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 
 sys.stderr.write('Welcome to Yade '+version+'\n')
 
+if 'opengl' in features and 'noqt3' in features:
+	try:
+		from PyQt4 import QtGui
+		qapp=QtGui.QApplication(sys.argv)
+		import thread
+		thread.start_new_thread(qapp.exec_,()) # this will warn, but I don't know a way around that
+	except ImportError: pass
+
 # initialization and c++ plugins import
 import yade
 # other parts we will need soon
@@ -69,13 +77,14 @@ if 'log4cxx' in yade.config.features and opts.verbosity:
 # run servers
 yade.system.runServers()
 
-# open GUI if possible
-qtEnabled=False
-if not opts.nogui:
-	try:
-		import yade.qt
-		qtEnabled=True
-	except ImportError: pass
+if not 'noqt3' in features:
+	# open GUI if possible
+	qtEnabled=False
+	if not opts.nogui:
+		try:
+			import yade.qt
+			qtEnabled=True
+		except ImportError: pass
 
 
 # prepare nice namespace for users
@@ -106,7 +115,7 @@ if 1:
 	if 1:
 		from IPython.Shell import IPShellEmbed
 		ipshell=IPShellEmbed(
-			argv=[],
+			argv=['-q4thread'],
 			#exit_msg='Bye.',
 			banner='[[ ^L clears screen, ^U kills line.'+(' F12 controller, F11 3d view, F10 both, F9 generator, F8 plot.' if qtEnabled else '')+' ]]',
 			rc_override=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py

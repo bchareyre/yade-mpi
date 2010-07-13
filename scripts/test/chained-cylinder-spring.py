@@ -38,7 +38,7 @@ O.engines=[
 ]
 
 #Generate a spiral
-Ne=200
+Ne=400
 for i in range(0, Ne):
 	omega=60.0/float(Ne); hy=0.10; hz=0.15;
 	px=float(i)*(omega/60.0); py=sin(float(i)*omega)*hy; pz=cos(float(i)*omega)*hz;
@@ -67,5 +67,6 @@ def history():
 
 #yade.qt.Renderer().bound=True
 plot.plot()
+O.saveTmp()
 #O.bodies[0].state.angVel=Vector3(0.05,0,0)
 

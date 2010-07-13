@@ -108,11 +108,15 @@ def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 def ydefault_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 	"Handle the :ydefault:`something` role. fixSignature handles it now in the member signature itself, this merely expands to nothing."
 	return [],[]
+def yattrtype_role(role,rawtext,text,lineno,inliner,options={},content=[]):
+	"Handle the :yattrtype:`something` role. fixSignature handles it now in the member signature itself, this merely expands to nothing."
+	return [],[]
 
 from docutils.parsers.rst import roles
 roles.register_canonical_role('yref', yaderef_role)
 roles.register_canonical_role('ysrc', yadesrc_role)
 roles.register_canonical_role('ydefault', ydefault_role)
+roles.register_canonical_role('yattrtype', yattrtype_role)
 
 
 ## http://sphinx.pocoo.org/config.html#confval-rst_epilog
@@ -125,12 +129,8 @@ rst_epilog = """
 
 
 def customExclude(app, what, name, obj, skip, options):
-	if obj=='<unbound method Serializable.clone>':
-		print 1000*'@'
-		return False
-	if re.match(r'\bclone\b',name):
-		#if 'Serializable' in name: print 1000*'#',name
-		#print 1000*'#',name, obj, what
+	if name=='clone':
+		if 'Serializable.clone' in str(obj): return False
 		return True
 	if hasattr(obj,'__doc__') and obj.__doc__ and ('|ydeprecated|' in obj.__doc__ or '|ynodoc|' in obj.__doc__): return True
 	#if re.match(r'\b(__init__|__reduce__|__repr__|__str__)\b',name): return True
@@ -167,6 +167,7 @@ def fixDocstring(app,what,name,obj,options,lines):
 	# remove empty default roles, which is not properly interpreted by docutils parser
 	for i in range(0,len(lines)):
 		lines[i]=lines[i].replace(':ydefault:``','')
+		lines[i]=lines[i].replace(':yattrtype:``','')
 		#lines[i]=re.sub(':``',':` `',lines[i])
 	# remove signature of boost::python function docstring, which is the first line of the docstring
 	if isBoostFunc(what,obj):
@@ -233,6 +234,7 @@ def boostFuncSignature(name,obj,removeSelf=False):
 			# grab the return value
 			try:
 				sig=') -> '+sig.split('->')[-1]
+		#if 'Serializable' in name: print 1000*'#',name
 			except IndexError:
 				sig=')'
 	return '('+sig,strippedDoc

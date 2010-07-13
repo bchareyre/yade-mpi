@@ -46,14 +46,6 @@ class OpenGLRenderingEngine : public Serializable
 		// updated after every call to render
 		shared_ptr<Scene> scene; 
 
-		#if 0
-		DynLibDispatcher<InteractionGeometry, GlInteractionGeometryFunctor, void, TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)> interactionGeometryDispatcher;
-		DynLibDispatcher<InteractionPhysics, GlInteractionPhysicsFunctor, void, TYPELIST_5(const shared_ptr<InteractionPhysics>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)> interactionPhysicsDispatcher;
-
-		DynLibDispatcher<State, GlStateFunctor, void, TYPELIST_1(const shared_ptr<State>&)> stateDispatcher;
-		DynLibDispatcher<Bound, GlBoundFunctor, void, TYPELIST_2(const shared_ptr<Bound>&, Scene*)> boundDispatcher;
-		DynLibDispatcher<Shape, GlShapeFunctor, void, TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&)> shapeDispatcher;
-		#endif
 		GlBoundDispatcher boundDispatcher;
 		GlInteractionGeometryDispatcher interactionGeometryDispatcher;
 		GlInteractionPhysicsDispatcher interactionPhysicsDispatcher;
@@ -80,6 +72,7 @@ class OpenGLRenderingEngine : public Serializable
 		void init();
 		void initgl();
 		void render(const shared_ptr<Scene>& scene, body_id_t selection = body_id_t(-1));
+		void pyRender(){render(Omega::instance().getScene());}
 		void renderWithNames(const shared_ptr<Scene>& );
 	
 	private :
@@ -130,7 +123,8 @@ class OpenGLRenderingEngine : public Serializable
 		/*init*/,
 		/*ctor*/,
 		/*py*/
-		.def("setRefSe3",&OpenGLRenderingEngine::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
+		.def("setRefSe3",&OpenGLRenderingEngine::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.")
+		.def("render",&OpenGLRenderingEngine::pyRender,"Render the scene in the current OpenGL context.")
 	);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderingEngine);

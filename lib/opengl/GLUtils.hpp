@@ -5,17 +5,21 @@
 #pragma once
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<QGLViewer/qglviewer.h>
 #include<boost/lexical_cast.hpp>
 #include<sstream>
 #include<iomanip>
 #include<string>
 
 struct GLUtils{
+	// code copied from qglviewer
+	struct QGLViewer{
+		static void drawArrow(float length=1.0f, float radius=-1.0f, int nbSubdivisions=12);
+		static void drawArrow(const Vector3r& from, const Vector3r& to, float radius=-1.0f, int nbSubdivisions=12);
+	};
 	// render wire of parallelepiped with sides given by vectors a,b,c; zero corner is at origin
 	static void Parallelepiped(const Vector3r& a, const Vector3r& b, const Vector3r& c);
 	static void GLDrawArrow(const Vector3r& from, const Vector3r& to, const Vector3r& color=Vector3r(1,1,1)){
-		glEnable(GL_LIGHTING); glColor3v(color); qglviewer::Vec a(from[0],from[1],from[2]),b(to[0],to[1],to[2]); QGLViewer::drawArrow(a,b);	
+		glEnable(GL_LIGHTING); glColor3v(color); QGLViewer::drawArrow(from,to);	
 	}
 	static void GLDrawLine(const Vector3r& from, const Vector3r& to, const Vector3r& color=Vector3r(1,1,1)){
 		glEnable(GL_LIGHTING); glColor3v(color);

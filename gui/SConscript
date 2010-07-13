@@ -2,7 +2,7 @@
 Import('*')
 linkPlugins=env['linkPlugins']
 
-if 'opengl' in env['features']:
+if 'opengl' in env['features'] and not 'noqt3' in env['features']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('QtGUI',
 			['qt3/FileDialog.cpp',
