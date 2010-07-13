@@ -66,9 +66,15 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	// using scGeom function rotateAndGetShear	
 	State* st1 = Body::byId(id1,scene)->state.get();
 	State* st2 = Body::byId(id2,scene)->state.get();
+
+#ifdef IGCACHE
+	geom->rotate(phys->shearForce);
+	const Vector3r& dus = geom->shearIncrement();
+#else
 	// define shift to handle periodicity
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
   	Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, shiftVel, preventGranularRatcheting);
+#endif
 	/// before changes to adapt periodic scene it was like that: Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, preventGranularRatcheting);
 	//Linear elasticity giving "trial" shear force
 	shearForce -= phys->ks*dus;

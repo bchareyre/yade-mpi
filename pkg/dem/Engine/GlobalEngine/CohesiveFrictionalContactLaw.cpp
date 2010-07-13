@@ -63,7 +63,6 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 	if (un < 0 && (currentContactPhysics->normalForce.squaredNorm() > pow(currentContactPhysics->normalAdhesion,2)
 	               || currentContactPhysics->normalAdhesion==0)) {
 		// BREAK due to tension
-		cerr <<"requesterase";
 		ncb->interactions->requestErase(contact->getId1(),contact->getId2());
 		// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 // 			currentContactPhysics->cohesionBroken = true;
@@ -77,7 +76,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 		///////////////////////// CREEP END ////////////
 #ifdef IGCACHE
 		Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
-		const Vector3r& dus = currentContactGeometry->shearIncrement;
+		const Vector3r& dus = currentContactGeometry->shearIncrement();
 #else
 		Vector3r dus = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt);
 #endif

@@ -156,10 +156,10 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		c->interactionGeometry = scm;
 	}
 #ifdef IGCACHE
-	if (scene->isPeriodic){
-		Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
- 		scm->precompute(state1,state2,scene->dt,shiftVel,true);}
- 	else scm->precompute(state1,state2,scene->dt,true);
+// 	if (scene->isPeriodic){
+// 		Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
+//  		scm->precompute(state1,state2,scene->dt,shiftVel,true);}
+ 	/*else */scm->precompute(state1,state2,scene,c,true);
 #endif
 	return true;
 }

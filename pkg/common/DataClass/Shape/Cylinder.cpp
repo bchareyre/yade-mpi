@@ -16,7 +16,7 @@ YADE_PLUGIN(
 	#ifdef YADE_OPENGL
 		(Gl1_Cylinder)(Gl1_ChainedCylinder)
 	#endif
-	(Bo1_Cylinder_Aabb)/*(Bo1_ChainedCylinder_Aabb)*/
+	(Bo1_Cylinder_Aabb)(Bo1_ChainedCylinder_Aabb)
 );
 
 vector<vector<int> > ChainedState::chains;
@@ -59,10 +59,10 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 		scm->radius1=s1->radius;
 		scm->radius2=s2->radius;
 #ifdef IGCACHE
-		if (scene->isPeriodic) {
-			Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
- 			scm->precompute(state1,state2,scene->dt,shiftVel,true);}
- 		else scm->precompute(state1,state2,scene->dt,true);
+// 		if (scene->isPeriodic) {
+// 			Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
+//  			scm->precompute(state1,state2,scene->dt,shiftVel,true);}
+ 		/*else */scm->precompute(state1,state2,scene,c,true);
 #endif
 		return true;
 	}
@@ -97,64 +97,47 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	const ChainedState *pChain1, *pChain2;
 	pChain1=YADE_CAST<const ChainedState*>(&state1);
 	pChain2=YADE_CAST<const ChainedState*>(&state2);
-	const ChainedState& chain1 = *pChain1;
-	const ChainedState& chain2 = *pChain2;
 	if (!pChain1 || !pChain2) {
 		cerr <<"cast failed8567"<<endl;
 	}
-	bool revert = (pChain2->rank-chain1.rank == -1);
-
+	const bool revert = (pChain2->rank-pChain1->rank == -1);
+	const ChainedState& bchain1 = revert? *pChain2 : *YADE_CAST<const ChainedState*>(&state1);
+	const ChainedState& bchain2 = revert? *pChain1 : *pChain2;
+	if (bchain2.rank-bchain1.rank != 1) {/*cerr<<"Mutual contacts in same chain between not adjacent elements, not handled*/ return false;}
 	if (pChain2->chainNumber!=pChain1->chainNumber) {cerr<<"PROBLEM0124"<<endl; return false;}
-	else if (chain2.rank-chain1.rank != 1 && pChain2->rank-pChain1->rank != -1) {/*cerr<<"PROBLEM0123"<<endl;*/ return false;}
-	const ChainedState* pChain = revert ? pChain2 : pChain1;
-
-	ChainedCylinder *s1=static_cast<ChainedCylinder*>(cm1.get()), *s2=static_cast<ChainedCylinder*>(cm2.get());
-	ChainedCylinder *s = revert ? s2 : s1;
+	
+	ChainedCylinder *bs1=static_cast<ChainedCylinder*>(revert? cm2.get():cm1.get());
+	
 	shared_ptr<ScGeom> scm;
 	bool isNew = !c->interactionGeometry;
 	if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 	else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
-// 	Real length=abs((pChain->ori*Vector3r::UnitZ()).dot(chain2.pos-chain1.pos));
-	Real length=(chain2.pos-chain1.pos).norm();
-//  	Vector3r segment =pChain->ori*Vector3r::UnitZ()*length;
-	Vector3r segment =chain2.pos-chain1.pos;
-	if (revert) segment = -segment;
-	s->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),pChain->ori.conjugate()*segment);
-// 	s->chainedOrientation=pChain->ori.conjugate()*s->chainedOrientation;
-	
-	if (revert) segment = -segment; 
-	if(isNew) {scm->normal=scm->prevNormal=segment/length;s->initLength=length;}
-	else {scm->prevNormal=scm->normal; scm->normal=segment/length;}
-
-	if (!revert) {
-		scm->radius1=s->initLength;
-		scm->radius2=0;}
-	else {
-		scm->radius1=0;
-		scm->radius2=s->initLength;}
-	//length only used for display
-	s->length=length;
-	scm->penetrationDepth=s->initLength-length;
-	
-// 	scm->contactPoint=pChain->pos+segment;//generates instabilites (TODO)
-	scm->contactPoint=pChain->pos+pChain->ori*Vector3r::UnitZ()*length;
+	Real length=(bchain2.pos-bchain1.pos).norm();
+	Vector3r segt =pChain2->pos-pChain1->pos;
+	if(isNew) {scm->normal=scm->prevNormal=segt/length;bs1->initLength=length;}
+	else {scm->prevNormal=scm->normal; scm->normal=segt/length;}
+	scm->radius1=revert ? 0:bs1->initLength;
+	scm->radius2=revert ? bs1->initLength:0;
+	scm->penetrationDepth=bs1->initLength-length;
+	scm->contactPoint=bchain2.pos;
+	//bs1->segment used for fast BBs and projections + display
+	if (revert) segt = -segt;
+	bs1->segment=segt;
+#ifdef YADE_OPENGL 
+	//bs1->length and s1->chainedOrientation used for display only, 
+	bs1->length=length;
+	bs1->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),bchain1.ori.conjugate()*segt);
+#endif
 
 #ifdef IGCACHE
-	if (scene->isPeriodic) {
-		Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
-		scm->precompute(state1,state2,scene->dt,shiftVel,true);}
-	else {
-		scm->precompute(state1,state2,scene->dt,true);
-	}
+	scm->precompute(state1,state2,scene,c,true);
 #else
 	cerr<<"this is not supposed to work without #define IGCACHE"<<endl;
 #endif
 	//Set values that will be considered in Ip2 functor, geometry (precomputed) is really defined with values above
-	scm->radius1=s->initLength*0.5;
-	scm->radius2=s->initLength*0.5;
+	scm->radius1 = scm->radius2 = bs1->initLength*0.5;
 	return true;
 }
-
 
 bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::goReverse(	const shared_ptr<Shape>& cm1,
 								const shared_ptr<Shape>& cm2,
@@ -176,12 +159,6 @@ int  Gl1_Cylinder::glutSlices;
 int  Gl1_Cylinder::glutStacks;
 int Gl1_Cylinder::glCylinderList=-1;
 
-// bool Gl1_ChainedCylinder::wire;
-// bool Gl1_ChainedCylinder::glutNormalize;
-// int  Gl1_ChainedCylinder::glutSlices;
-// int  Gl1_ChainedCylinder::glutStacks;
-// int Gl1_ChainedCylinder::glCylinderList=-1;
-
 void Gl1_Cylinder::out( Quaternionr q )
 {
 	AngleAxisr aa(q);
@@ -194,7 +171,7 @@ void Gl1_Cylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,boo
 	Real length=(static_cast<Cylinder*>(cm.get()))->length;
 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
 	glColor3v(cm->color);
-	if(glutNormalize)	glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
+	if(glutNormalize) glPushAttrib(GL_NORMALIZE);
 // 	glPushMatrix();
 	Quaternionr shift = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
 	if (wire || wire2) drawCylinder(true, r,length,shift);
@@ -204,20 +181,17 @@ void Gl1_Cylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,boo
 	return;
 }
 
-void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
+void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& state,bool wire2, const GLViewInfo&)
 {
 	Real r=(static_cast<ChainedCylinder*>(cm.get()))->radius;
 	Real length=(static_cast<ChainedCylinder*>(cm.get()))->length;
-	Quaternionr shift = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
-	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+	Quaternionr shift;// = (static_cast<ChainedCylinder*>(cm.get()))->chainedOrientation;
+	shift.setFromTwoVectors(Vector3r::UnitZ(),state->ori.conjugate()*(static_cast<ChainedCylinder*>(cm.get()))->segment);
 	glColor3v(cm->color);
-	if(glutNormalize) glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
-// 	glPushMatrix();
- 	//out(shift);
+	if(glutNormalize) glPushAttrib(GL_NORMALIZE);
 	if (wire || wire2) drawCylinder(true, r,length,shift);
 	else drawCylinder(false, r,length,shift);
 	if(glutNormalize) glPopAttrib();
-// 	glPopMatrix();
 	return;
 }
 
@@ -316,15 +290,14 @@ void Bo1_Cylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, c
 // 	aabb->min = scene->cell->unshearPt(se3.position)-minkSize;
 // 	aabb->max = scene->cell->unshearPt(se3.position)+minkSize;
 }
-/*
+
+
 void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Cylinder* cylinder = static_cast<Cylinder*>(cm.get());
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
 	if(!scene->isPeriodic){
-		const Vector3r& O = se3.position-se3.positioncylinder->segment*0.5;
-		//In this case, segment will be updated by Ig2_ChainedCylinder_ChainedCylinder_ScGeom, no need to rotate it
-		Vector3r O2 = se3.position+cylinder->segment*0.5;
-// 		cerr << O<<" "<<O2<<endl;
+		const Vector3r& O = se3.position;
+		Vector3r O2 = se3.position+cylinder->segment;
 		aabb->min=aabb->max=O;
 		for (int k=0;k<3;k++){
 			aabb->min[k]=min(aabb->min[k],min(O[k],O2[k])-cylinder->radius);
@@ -332,8 +305,5 @@ void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>
 		}
 		return;
 	}
-}*/
-
-
-
+}
 

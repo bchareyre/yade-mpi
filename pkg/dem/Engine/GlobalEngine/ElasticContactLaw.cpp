@@ -66,7 +66,7 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 #ifdef IGCACHE
 	Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
-	Vector3r& shearDisp = currentContactGeometry->shearIncrement;
+	const Vector3r& shearDisp = currentContactGeometry->shearIncrement();
 #else
 	Vector3r& shearForce = currentContactPhysics->shearForce;
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();

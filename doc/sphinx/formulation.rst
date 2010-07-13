@@ -717,7 +717,7 @@ This equation can be used for all 6 degrees of freedom (DOF) in translation and 
 				
 DEM simulations
 """"""""""""""""
-In DEM simulations, per-particle stiffness $\vec{K}_{ij}$ is determined from the stiffnesses of contacts in which it participates [Chareyre2005]_. Suppose each contact has normal stiffness $K_{Nk}$, shear stiffness $K_{Tk}=\xi K_{Nk}$ and is oriented by normal $\vec{n}_{k}$. A translational stiffness matrix $\vec{K}_ij$ can be defined as the sum of contributions of all contacts in which it participates (indices $k$), as
+In DEM simulations, per-particle stiffness $\vec{K}_{ij}$ is determined from the stiffnesses of contacts in which it participates [Chareyre2005]_. Suppose each contact has normal stiffness $K_{Nk}$, shear stiffness $K_{Tk}=\xi K_{Nk}$ and is oriented by normal $\vec{n}_{k}$. A translational stiffness matrix $\vec{K}_{ij}$ can be defined as the sum of contributions of all contacts in which it participates (indices $k$), as
 
 .. math::
 	:label: eq-dtcr-particle-stiffness

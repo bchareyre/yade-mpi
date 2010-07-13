@@ -4,6 +4,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/Scene.hpp>
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
@@ -11,17 +12,18 @@
 #include<yade/pkg-common/BoundFunctor.hpp>
 
 
-class Cylinder: public Shape{
+class Cylinder: public Sphere{
 	public:
-		Cylinder(Real _radius, Real _length): radius(_radius), length(_length), segment(Vector3r(0,0,1)*_length){ createIndex(); }
+		Cylinder(Real _radius, Real _length): length(_length) { /*segment=Vector3r(0,0,1)*_length;*/ radius=_radius; createIndex(); }
 		virtual ~Cylinder ();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Cylinder,Shape,"Geometry of a cylinder, as Minkowski sum of line and sphere.",
-		((Real,radius,NaN,"Radius [m]"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Cylinder,Sphere,"Geometry of a cylinder, as Minkowski sum of line and sphere.",
+// 		((Real,radius,NaN,"Radius [m]"))
 		((Real,length,NaN,"Length [m]"))
 		((Vector3r,segment,Vector3r::Zero(),"Length vector")),
-		createIndex(); /*ctor*/
+		createIndex();
+		/*ctor*/
 	);
-	REGISTER_CLASS_INDEX(Cylinder,Shape);
+	REGISTER_CLASS_INDEX(Cylinder,Sphere);
 };
 
 class ChainedCylinder: public Cylinder{
@@ -142,7 +144,7 @@ class Gl1_Cylinder : public GlShapeFunctor{
 //!This doesn't work : the 1D dispatcher will pick Gl1_Cylinder to display ChainedCylinders, workaround : add shift to cylinders (should be a variable of chained cylinders only).
 class Gl1_ChainedCylinder : public Gl1_Cylinder{
 	public:
-		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>& state, bool,const GLViewInfo&);
 	YADE_CLASS_BASE_DOC(Gl1_ChainedCylinder,Gl1_Cylinder,"Renders :yref:`ChainedCylinder` object including a shift for compensating flexion."
 	);
 	RENDERS(ChainedCylinder);
@@ -180,6 +182,18 @@ class Bo1_Cylinder_Aabb : public BoundFunctor
 	);
 };
 
+class Bo1_ChainedCylinder_Aabb : public BoundFunctor
+{
+	public :
+		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
+	FUNCTOR2D(ChainedCylinder,Aabb);
+	YADE_CLASS_BASE_DOC_ATTRS(Bo1_ChainedCylinder_Aabb,BoundFunctor,"Functor creating :yref:`Aabb` from :yref:`ChainedCylinder`.",
+		((Real,aabbEnlargeFactor,((void)"deactivated",-1),"Relative enlargement of the bounding box; deactivated if negative.\n\n.. note::\n\tThis attribute is used to create distant interaction, but is only meaningful with an :yref:`InteractionGeometryFunctor` which will not simply discard such interactions: :yref:`Ig2_Cylinder_Cylinder_Dem3DofGeom::distFactor` / :yref:`Ig2_Cylinder_Cylinder_ScGeom::interactionDetectionFactor` should have the same value as :yref:`aabbEnlargeFactor<Bo1_Cylinder_Aabb::aabbEnlargeFactor>`."))
+	);
+};
+
+
+
 // Keep this : Cylinders and ChainedCylinders will have different centers maybe.
 // class Bo1_ChainedCylinder_Aabb : public Bo1_Cylinder_Aabb
 // {
@@ -195,7 +209,7 @@ class Bo1_Cylinder_Aabb : public BoundFunctor
 
 
 REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
-// REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
+REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
 #ifdef YADE_OPENGL
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
 REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);

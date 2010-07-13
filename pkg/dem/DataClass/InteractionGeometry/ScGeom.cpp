@@ -5,12 +5,15 @@
 
 #include "ScGeom.hpp"
 #include<yade/core/Omega.hpp>
+#include<yade/core/Scene.hpp>
+
+
 YADE_PLUGIN((ScGeom));
 
 // At least one virtual method must be in the .cpp file (!!!)
 ScGeom::~ScGeom(){};
 
-Vector3r& ScGeom::rotate(Vector3r& shearForce){
+Vector3r& ScGeom::rotate(Vector3r& shearForce) const {
 	// approximated rotations
 	shearForce -= shearForce.cross(orthonormal_axis);
 	shearForce -= shearForce.cross(twist_axis);
@@ -19,15 +22,10 @@ Vector3r& ScGeom::rotate(Vector3r& shearForce){
 	return shearForce;
 }
 
-void ScGeom::precompute(const State& rbp1, const State& rbp2, const Real& dt,bool avoidGranularRatcheting){
-	//Pass null shift to the periodic version
-	precompute(rbp1,rbp2,dt,Vector3r::Zero(),avoidGranularRatcheting);
-}
-
-void ScGeom::precompute(const State& rbp1, const State& rbp2, const Real& dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
-//Precompute data needed for rotating tangent vectors attached to the interaction
+//!Precompute data needed for rotating tangent vectors attached to the interaction
+void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, bool avoidGranularRatcheting){
 	orthonormal_axis = prevNormal.cross(normal);
-	Real angle = dt*0.5*normal.dot(rbp1.angVel + rbp2.angVel);
+	Real angle = scene->dt*0.5*normal.dot(rbp1.angVel + rbp2.angVel);
 	twist_axis = angle*normal;
 	//The previous normal could be updated here after being used, them remove it from Ig2's? 
  	//prevNormal=normal;
@@ -60,76 +58,29 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Real& dt, co
 		c2x = (x - rbp2.pos);
 	}
 	Vector3r relativeVelocity = (rbp2.vel+rbp2.angVel.cross(c2x)) - (rbp1.vel+rbp1.angVel.cross(c1x));
-	relativeVelocity+=shiftVel;
+	if (scene->isPeriodic) relativeVelocity += scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
 	//keep the shear part only
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
-	shearIncrement = relativeVelocity*dt;
+	shearInc = relativeVelocity*scene->dt;
 }
 
 
+//Do we need a function for such simple operation? BTW, the original was BAD duplicated code. ;-)
+Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){rotate(shear); shear -= shearInc;}
 
-Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
-
-	Vector3r axis;
-	Real angle;
-
-	Vector3r shearIncrement(Vector3r::Zero());
-
-	// approximated rotations
-		axis = prevNormal.cross(normal); 
-		shearIncrement -= shear.cross(axis);
-		angle = dt*0.5*normal.dot(rbp1->angVel + rbp2->angVel);
-		axis = angle*normal;
-		shearIncrement -= (shear+shearIncrement).cross(axis);
-		
-	// exact rotations (not adapted to shear/shearIncrement!)
-	#if 0
-		Quaternionr q;
-		axis					= prevNormal.Cross(normal);
-		angle					= acos(normal.Dot(prevNormal));
-		q.FromAngleAxis(angle,axis);
-		shearForce        = shearForce*q;
-		angle             = dt*0.5*normal.dot(rbp1->angVel+rbp2->angVel);
-		axis					= normal;
-		q.FromAngleAxis(angle,axis);
-		shearForce        = q*shearForce;
-	#endif
-
-	Vector3r& x = contactPoint;
-	Vector3r c1x, c2x;
-
-	if(avoidGranularRatcheting){
-		// FIXME: For sphere-facet contact this will give an erroneous value of relative velocity...
-		c1x =   radius1*normal; 
-		c2x =  -radius2*normal;
-	}
-	else {
-		// FIXME: It is correct for sphere-sphere and sphere-facet contact
-		c1x = (x - rbp1->pos);
-		c2x = (x - rbp2->pos);
-	}
-
-	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
-	Vector3r shearVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
-	Vector3r shearDisplacement = shearVelocity*dt;
-	shearIncrement -= shearDisplacement;
-
-	shear+=shearIncrement;
-	return shearIncrement;
-}
-
-//Removing this function will need to adapt all laws
+#ifndef IGCACHE
 Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 	//Just pass null shift to the periodic version
 	return rotateAndGetShear(shearForce,prevNormal,rbp1,rbp2,dt,Vector3r::Zero(),avoidGranularRatcheting);
 }
+#endif
 
 //Removing this function will need to adapt all laws
-Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
-// #ifdef IGCACHE
-// 	rotate(shearForce);
-// 	return shearIncrement;
-// #else
+const Vector3r& ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
+#ifdef IGCACHE
+ 	rotate(shearForce);
+ 	return shearInc;
+ #else
 	rotate(shearForce,prevNormal,rbp1,rbp2,dt);
 	Vector3r& x = contactPoint;
 	Vector3r c1x, c2x;
@@ -150,23 +101,23 @@ Vector3r ScGeom::rotateAndGetShear(Vector3r& shearForce, const Vector3r& prevNor
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = relativeVelocity*dt;
 	return shearDisplacement;
-// #endif //IGCACHE
+#endif //IGCACHE
 }
 
 Vector3r& ScGeom::rotate(Vector3r& shearForce, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt){
-// #ifdef IGCACHE
-// 	return rotate(shearForce);
-// #else
+#ifdef IGCACHE
+ 	return rotate(shearForce);
+#else
 	Vector3r axis;
 	Real angle;
 	// approximated rotations
-		axis = prevNormal.cross(normal); 
+		axis = prevNormal.cross(normal);
 		shearForce -= shearForce.cross(axis);
 		angle = dt*0.5*normal.dot(rbp1->angVel + rbp2->angVel);
 		axis = angle*normal;
 		shearForce -= shearForce.cross(axis);
 	// exact rotations
-	
+
 // 		Quaternionr q;
 // 		axis					= prevNormal.Cross(normal);
 // 		angle					= acos(normal.Dot(prevNormal));
@@ -178,7 +129,7 @@ Vector3r& ScGeom::rotate(Vector3r& shearForce, const Vector3r& prevNormal, const
 // 		shearForce        = q*shearForce;
 
 	return shearForce;
-// #endif
+#endif
 }
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){

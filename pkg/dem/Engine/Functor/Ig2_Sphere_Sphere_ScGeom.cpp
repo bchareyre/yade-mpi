@@ -43,10 +43,10 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 		scm->radius1=s1->radius;
 		scm->radius2=s2->radius;
 #ifdef IGCACHE
-		if (scene->isPeriodic) {
-			Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
- 			scm->precompute(state1,state2,scene->dt,shiftVel,true);}
- 		else scm->precompute(state1,state2,scene->dt,true);
+// 		if (scene->isPeriodic) {
+// 			Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
+//  			scm->precompute(state1,state2,scene->dt,shiftVel,true);}
+ 		/*else */scm->precompute(state1,state2,scene,c,true);
 #endif
 				
 		// keep this for reference on how to compute bending and torsion from relative orientation; parts in ScGeom header

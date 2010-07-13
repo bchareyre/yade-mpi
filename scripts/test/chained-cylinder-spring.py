@@ -6,21 +6,21 @@
 
 from yade import utils
 young=1.0e5
-poisson=10
+poisson=5
 density=2.60e3 
 frictionAngle=radians(30)
 O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,label='mat'))
-O.dt=9e-5
+O.dt=1e-4
 
 O.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Cylinder_Aabb()])
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_ChainedCylinder_Aabb()])
 ]
 
 O.engines=[
 	ForceResetter(),
 	BoundDispatcher([
-		Bo1_Cylinder_Aabb(),
+		Bo1_ChainedCylinder_Aabb(),
 		Bo1_Sphere_Aabb()
 	]),
 	InsertionSortCollider(),
@@ -34,7 +34,7 @@ O.engines=[
 	## Motion equation
 	NewtonIntegrator(damping=0.15),
 	PeriodicPythonRunner(iterPeriod=500,command='history()'),
-	#PeriodicPythonRunner(iterPeriod=100,command='yade.qt.center()')
+	PeriodicPythonRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
 ]
 
 #Generate a spiral
@@ -66,7 +66,6 @@ def history():
 		     t=O.time)
 
 #yade.qt.Renderer().bound=True
-#O.run(1,True)
 plot.plot()
 #O.bodies[0].state.angVel=Vector3(0.05,0,0)
 
