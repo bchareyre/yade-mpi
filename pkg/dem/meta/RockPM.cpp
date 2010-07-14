@@ -4,7 +4,7 @@
 #include<yade/pkg-dem/Shop.hpp>
 
 
-YADE_PLUGIN((Law2_Dem3DofGeom_RockPMPhys_Rpm)(RpmMat)(Ip2_RpmMat_RpmMat_RpmPhys)(RpmPhys));
+YADE_PLUGIN((RpmState)(Law2_Dem3DofGeom_RockPMPhys_Rpm)(RpmMat)(Ip2_RpmMat_RpmMat_RpmPhys)(RpmPhys));
 
 
 /********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
