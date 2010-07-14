@@ -127,7 +127,7 @@ py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::t
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
 		if(useBB && !isInBB(b1->state->pos,bbMin,bbMax) && !isInBB(b2->state->pos,bbMin,bbMax)) continue;
-		GenericSpheresContact* geom=dynamic_cast<GenericSpheresContact*>(i->interactionGeometry.get());
+		ScGeom* geom=dynamic_cast<ScGeom*>(i->interactionGeometry.get());
 		if(!geom) continue;
 		Vector3r n(geom->normal); n[axis]=0.; Real nLen=n.norm();
 		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
