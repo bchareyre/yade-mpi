@@ -5,9 +5,13 @@ YADE_PLUGIN((Recorder));
 Recorder::~Recorder(){}
 void Recorder::openAndCheck(){
 	assert(!out.is_open());
-	if(file.empty()) throw ios_base::failure(__FILE__ ": Empty filename.");
-	out.open(file.c_str(), truncate ? fstream::trunc : fstream::app);
-	if(!out.good()) throw ios_base::failure(__FILE__ ": I/O error opening file `"+file+"'.");
+	
+	std::string fileTemp = file;
+	if (addIterNum) fileTemp+="-" + lexical_cast<string>(scene->currentIteration);
+	
+	if(fileTemp.empty()) throw ios_base::failure(__FILE__ ": Empty filename.");
+	out.open(fileTemp.c_str(), truncate ? fstream::trunc : fstream::app);
+	if(!out.good()) throw ios_base::failure(__FILE__ ": I/O error opening file `"+fileTemp+"'.");
 }
 #if 0
 	void Recorder::postProcessAttributes(bool deserializing){

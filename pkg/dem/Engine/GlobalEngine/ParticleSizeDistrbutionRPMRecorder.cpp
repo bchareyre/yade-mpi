@@ -158,17 +158,12 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		}
 	}
 	
-	//Check Masses in bodies loop and in dedicated vector. ONLY for debugging.
-	Real totalMass2 = 0;
-	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
-		totalMass2+=arrayIdentIds[i].mass;
-	}
 	std::sort (arrayIdentIds.begin(), arrayIdentIds.end(), identicalIds::sortArrayIdentIds);
 	
 	//Save data to a file
 	out<<"**********\n";
-	out<<"iter totalMass1 totalMass2 numSpecimen\n";
-	out<<Omega::instance().getCurrentIteration()<<" "<<totalMass<<" "<<totalMass2<<" "<<arrayIdentIds.size()<<"\n";
+	out<<"iter totalMass numSpecimen\n";
+	out<<Omega::instance().getCurrentIteration()<<" "<<totalMass<<" "<<arrayIdentIds.size()<<"\n";
 	out<<"id mass\n";
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<"\n";
