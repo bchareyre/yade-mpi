@@ -4,7 +4,7 @@ from PyQt4.QtGui import *
 
 import re
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 from logging import debug,info,warning,error
 
 class SerializableData(QWidget):
@@ -20,7 +20,6 @@ class SerializableData(QWidget):
 		QWidget.__init__(self,parent)
 		self.ser=ser
 		self.entries=[]
-		print self.ser
 		debug('New Serializable of type %s'%ser.__class__.__name__)
 		self.setWindowTitle(str(ser))
 		self.mkWidgets()
@@ -89,7 +88,7 @@ class SerializableData(QWidget):
 			for i in range(3):
 				subw=QLineEdit('')
 				subw.setText(str(vec[i]))
-				subw.setSizePolicy(QSizePolicy().setHorizontalPolicy(
+				#subw.setSizePolicy(QSizePolicy().setHorizontalPolicy(
 				class updateVec:
 					"bind local args... ugly"
 					def __init__(self,i,ser,name,subw): self.i,self.ser,self.name,self.subw=i,ser,name,subw

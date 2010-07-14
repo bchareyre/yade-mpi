@@ -131,7 +131,7 @@ Class reference (yade.wrapper module)
 	sect('Constitutive laws','',['LawFunctor','LawDispatcher'])+
 	sect('Callbacks','',['BodyCallback','IntrCallback'])+
 	sect('Preprocessors','',['FileGenerator'])+
-	sect('Rendering','',['OpenGLRenderingEngine','GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlInteractionGeometryFunctor','GlInteractionPhysicsFunctor']), # ,'GlShapeDispatcher','GlStateDispatcher','GlBoundDispatcher','GlInteractionGeometryDispatcher','GlInteractionPhysicsDispatcher'])+
+	sect('Rendering','',['OpenGLRenderingEngine','GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlInteractionGeometryFunctor','GlInteractionPhysicsFunctor'])+ # ,'GlShapeDispatcher','GlStateDispatcher','GlBoundDispatcher','GlInteractionGeometryDispatcher','GlInteractionPhysicsDispatcher'])+
 	sect('Simulation data','',['Omega','BodyContainer','InteractionContainer','ForceContainer','MaterialContainer'])
 	+"""
 Other classes

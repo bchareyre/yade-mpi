@@ -1632,6 +1632,29 @@ Creating interactions explicitly
 Interactions may still be created explicitly with :yref:`yade.utils.createInteraction`, without any spatial requirements. This function searches current engines for dispatchers and uses them. :yref:`InteractionGeometryFunctor` is called with the ``force`` parameter, obliging it to return ``true`` even if there is no spatial overlap.
 
 
+Associating Material and State types
+------------------------------------
+
+Some models keep extra :yref:`state<State>` information in the :yref:`Body.state` object, therefore requiring strict association of a :yref:`Material` with a certain :yref:`State` (for instance, :yref:`CpmMat` is associated to :yref:`CpmState` and this combination is supposed by engines such as :yref:`CpmStateUpdater`).
+
+If a :yref:`Material` has such a requirement, it must override 2 virtual methods:
+
+#. :yref:`Material.newAssocState`, which returns a new :yref:`State` object of the corresponding type. The default implementation returns :yref:`State` itself. 
+#. :yref:`Material.stateTypeOk`, which checks whether a given :yref:`State` object is of the corresponding type (this check is run at the beginning of the simulation for all particles).
+
+In c++, the code looks like this (for :yref:`CpmMat`):
+
+.. code-block:: c++
+
+	class CpmMat: public FrictMat {
+	   public:
+	      virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
+	      virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
+	   /* ... */
+	};
+
+This allows to construct :yref:`Body` objects from functions such as :yref:`yade.utils.sphere` only by knowing the requires :yref:`Material` type, enforcing the expectation of the model implementor.
+
 
 Runtime structure
 ==================

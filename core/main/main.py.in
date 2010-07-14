@@ -77,9 +77,9 @@ if 'log4cxx' in yade.config.features and opts.verbosity:
 # run servers
 yade.system.runServers()
 
+qtEnabled=False
 if not 'noqt3' in features:
 	# open GUI if possible
-	qtEnabled=False
 	if not opts.nogui:
 		try:
 			import yade.qt

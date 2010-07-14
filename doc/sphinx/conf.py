@@ -42,6 +42,7 @@ elif 'html' in sys.argv: __builtin__.writer='html'
 else: raise RuntimeError("Must have either 'latex' or 'html' on the command line (hack for reference styles)")
 
 
+
 def yaderef_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 	"Handle the :yref:`` role, by making hyperlink to yade.wrapper.*. It supports :yref:`Link text<link target>` syntax, like usual hyperlinking roles."
 	id=rawtext.split(':',2)[2][1:-1]
@@ -287,6 +288,21 @@ def fixSignature(app, what, name, obj, options, signature, return_annotation):
 	#return None,None
 		
 
+from sphinx import addnodes
+def parse_ystaticattr(env,attr,attrnode):
+	m=re.match(r'([a-zA-Z0-9_]+)\.(.*)\(=(.*)\)',attr)
+	if not m:
+		print 100*'@'+' Static attribute %s not matched'%attr
+		attrnode+=addnodes.desc_name(attr,attr)
+	klass,name,default=m.groups()
+	#attrnode+=addnodes.desc_type('static','static')
+	attrnode+=addnodes.desc_name(name,name)
+	plist=addnodes.desc_parameterlist()
+	if default=='': default='unspecified'
+	plist+=addnodes.desc_parameter('='+default,'='+default)
+	attrnode+=plist
+	attrnode+=addnodes.desc_annotation('  [static]','  [static]')
+	return klass+'.'+name
 
 #############################
 ## set tab size
@@ -305,6 +321,7 @@ def setup(app):
 	app.connect('autodoc-skip-member',customExclude)
 	app.connect('autodoc-process-signature',fixSignature)
 	app.connect('autodoc-process-docstring',fixDocstring)
+	app.add_description_unit('ystaticattr',None,objname='static attribute',indextemplate='pair: %s; static method',parse_node=parse_ystaticattr)
 
 
 import sys, os

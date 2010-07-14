@@ -196,11 +196,12 @@ namespace yade{
 	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(inits attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(inits attrDecls)), inits BOOST_PP_SEQ_FOR_EACH(_DECLINI4,~,attrDecls)) { ctor ; } /* ctor, with initialization of defaults */ \
 	_YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),deprec,extras)
 
-#define _STAT_NONSTAT_ATTR_PY(thisClass,attr,doc) /* _DEF_READWRITE_CUSTOM_STATIC(thisClass,attr,doc) */  _DEF_READWRITE_CUSTOM(thisClass,attr,doc) /* duplicate static and non-static attributes do not work (they apparently trigger to-python converter being added; for now, make then non-static, that's it. */
+#define _STAT_NONSTAT_ATTR_PY(thisClass,attr,doc) _DEF_READWRITE_CUSTOM_STATIC(thisClass,attr,doc) /* _DEF_READWRITE_CUSTOM(thisClass,attr,doc) */ /* duplicate static and non-static attributes do not work (they apparently trigger to-python converter being added; for now, make then non-static, that's it. */
 #define _STATATTR_PY(x,thisClass,z) _STAT_NONSTAT_ATTR_PY(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` :yattrtype:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,0,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
 #define _STATATTR_DECL(x,y,z) static BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
 #define _STRIP_TYPE_DEFAULT_DOC(x,y,z) (BOOST_PP_TUPLE_ELEM(4,1,z))
 #define _STATATTR_SET(x,thisClass,z) thisClass::BOOST_PP_TUPLE_ELEM(4,1,z)=BOOST_PP_TUPLE_ELEM(4,2,z);
+#define _STATATTR_DOC(x,thisClass,z) ".. ystaticattr:: " BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,1,z)) "(=" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) ")" "\n\n\t" BOOST_PP_TUPLE_ELEM(4,3,z) "\n\n"
 
 #define YADE_CLASS_BASE_DOC_STATICATTRS(thisClass,baseClass,docString,attrs)\
 	public: BOOST_PP_SEQ_FOR_EACH(_STATATTR_DECL,~,attrs) /* attribute declarations */ \
@@ -210,7 +211,7 @@ namespace yade{
 	/* called only at class registration, to set initial values; storage still has to be alocated in the cpp file! */ \
 	void initSetStaticAttributesValue(void){ BOOST_PP_SEQ_FOR_EACH(_STATATTR_SET,thisClass,attrs); } \
 	virtual void pyRegisterClass(python::object _scope) { if(!checkPyClassRegistersItself(#thisClass)) return; initSetStaticAttributesValue(); boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
-		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)); \
+		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString "\n\n" BOOST_PP_SEQ_FOR_EACH(_STATATTR_DOC,thisClass,attrs) ); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)); \
 		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
 	}
 
