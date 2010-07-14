@@ -99,18 +99,16 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		bool isNew=!c->interactionGeometry;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
 		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
-
-		if(isNew) { /* same as below */ scm->prevNormal=normal;}
-		else {scm->prevNormal=scm->normal;}
 			
 		// contact point is in the middle of overlapping volumes
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
 		scm->contactPoint = 0.5*(pt1+pt2);
-		scm->normal = normal;
+// 		scm->normal = normal;
 		scm->penetrationDepth = (pt1-pt2).norm();
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
+		scm->precompute(state1,state2,scene,c,normal,isNew,true);
 	} else { // outside
 		Vector3r cOnBox_box = boxAxisT*cOnBox_boxLocal; // projection of sphere's center on closest box surface - relative to box's origin, but GLOBAL orientation!
 		Vector3r cOnBox_sphere = cOnBox_box-relPos21; // same, but origin in sphere's center
@@ -144,23 +142,13 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		bool isNew=!c->interactionGeometry;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
 		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);	
-		if(isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
-		else scm->prevNormal=scm->normal;
 		scm->contactPoint = 0.5*(pt1+pt2);
-		//scm->normal = pt1-pt2; scm->normal.normalize();
-		//scm->penetrationDepth = (pt1-pt2).norm();
-		scm->normal = -cOnBox_sphere;
 		scm->penetrationDepth = depth;
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
+		scm->precompute(state1,state2,scene,c,-cOnBox_sphere,isNew,true);
 	}
-#ifdef IGCACHE
-// 	if (scene->isPeriodic){
-// 		Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
-//  		scm->precompute(state1,state2,scene->dt,shiftVel,true);}
- 	/*else */scm->precompute(state1,state2,scene,c,true);
-#endif
 	return true;
 }
 

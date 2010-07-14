@@ -11,7 +11,7 @@ YADE_PLUGIN((CFpmMat)(CFpmState)(CFpmPhys)(Ip2_CFpmMat_CFpmMat_CFpmPhys)(Law2_Sc
 CREATE_LOGGER(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM);
 
 void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* scene){
-	const Real& dt = scene->dt;
+// 	const Real& dt = scene->dt;
 
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	CFpmPhys* phys = static_cast<CFpmPhys*>(ip.get());
@@ -67,15 +67,15 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	State* st1 = Body::byId(id1,scene)->state.get();
 	State* st2 = Body::byId(id2,scene)->state.get();
 
-#ifdef IGCACHE
+// #ifdef IGCACHE
 	geom->rotate(phys->shearForce);
 	const Vector3r& dus = geom->shearIncrement();
-#else
-	// define shift to handle periodicity
-	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
-  	Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, shiftVel, preventGranularRatcheting);
-#endif
-	/// before changes to adapt periodic scene it was like that: Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, preventGranularRatcheting);
+// #else
+// 	// define shift to handle periodicity
+// 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
+//   	Vector3r dus = geom->rotateAndGetShear(shearForce, phys->prevNormal, st1, st2, dt, shiftVel, preventGranularRatcheting);
+// #endif
+	
 	//Linear elasticity giving "trial" shear force
 	shearForce -= phys->ks*dus;
 	// needed for the next timestep

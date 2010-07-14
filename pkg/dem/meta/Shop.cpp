@@ -40,8 +40,9 @@ class SceneShape; */
 
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-
+#include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
+
 #include<yade/pkg-dem/FrictPhys.hpp>
 
 
