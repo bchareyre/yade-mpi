@@ -38,6 +38,9 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
 /** This class holds information associated with each body */
 class RpmMat: public FrictMat {
+		public:
+			virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new RpmState); }
+			virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<RpmState*>(s); }
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(RpmMat,FrictMat,"Rock material, for use with other Rpm classes.",
 			((int,exampleNumber,0,"Number of the specimen. This value is equal for all particles of one specimen. [-]"))
 			((bool,initCohesive,false,"The flag shows, whether particles of this material can be cohesive. [-]"))
