@@ -20,7 +20,7 @@
 class Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 {
 	public :
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*);
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
 
 	FUNCTOR2D(ScGeom,NormalInelasticityPhys);
 

@@ -1,0 +1,223 @@
+/*************************************************************************
+*  Copyright (C) 2010 by Jerome Duriez                                   *
+*  jerome.duriez@hmg.inpg.fr                                             *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
+#include<yade/pkg-dem/KinemSimpleShearBox.hpp>
+
+#include<yade/core/State.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg-common/Box.hpp>
+
+YADE_PLUGIN((KinemSimpleShearBox))
+
+
+void KinemSimpleShearBox::computeAlpha()
+{
+	Quaternionr orientationLeftBox,orientationRightBox;
+	orientationLeftBox = leftbox->state->ori;
+	orientationRightBox = rightbox->state->ori;
+	if(orientationLeftBox!=orientationRightBox)
+	{
+		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
+	}
+	Real angle;
+	AngleAxisr aa(orientationLeftBox);
+	angle = aa.angle();
+// 	orientationLeftBox.ToAxisAngle(axis,angle);
+	alpha=Mathr::PI/2.0-angle;		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
+}
+
+void KinemSimpleShearBox::computeScontact()
+{
+	Real Xleft = leftbox->state->pos.x() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.x();
+
+	Real Xright = rightbox->state->pos.x() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.x();
+
+	Real Zfront = frontbox->state->pos.z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.z();
+	Real Zback = backbox->state->pos.z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.z();
+
+	Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
+
+}
+
+void KinemSimpleShearBox::letMove(Real dY, Real dX)
+{
+
+	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
+// 	computeDu();
+
+// 	const Real& dt = scene->dt; // dt defini par setBoxes_Dt
+
+	Real Ysup = topbox->state->pos.y();
+	Real Ylat = leftbox->state->pos.y();
+
+// 	Changes in vertical and horizontal position :
+
+	
+	topbox->state->pos += Vector3r(dX,dY,0);
+
+	leftbox->state->pos += Vector3r(dX/2.0,dY/2.0,0);
+	rightbox->state->pos += Vector3r(dX/2.0,dY/2.0,0);
+	if(LOG)	cout << "dY reellemt applique :" << dY << endl;
+	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).y() << endl;
+	
+	Real Ysup_mod = topbox->state->pos.y();
+	Real Ylat_mod = leftbox->state->pos.y();
+
+//	with the corresponding velocities :
+	topbox->state->vel = Vector3r(dX/dt,dY/dt,0);
+	leftbox->state->vel = Vector3r(dX/(2.0 * dt),dY/(2.0 * dt),0);
+	rightbox->state->vel = Vector3r(dX/(2.0 * dt),dY/(2.0*dt),0);
+
+//	Then computation of the angle of the rotation to be done :
+	computeAlpha();
+	if (alpha == Mathr::PI/2.0)	// Case of the very beginning
+	{
+		dalpha = - Mathr::ATan( dX / (Ysup_mod -Ylat_mod) );
+	}
+	else
+	{
+		Real A = (Ysup_mod - Ylat_mod) * 2.0*Mathr::Tan(alpha) / (2.0*(Ysup - Ylat) + dX*Mathr::Tan(alpha) );
+		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
+	}
+
+	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
+
+// On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
+	leftbox->state->ori	= qcorr*leftbox->state->ori;
+	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
+
+	rightbox->state->ori	= qcorr*rightbox->state->ori;
+	rightbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
+
+// 	gamma+=dX;
+}
+
+void KinemSimpleShearBox::stopMovement()
+{
+	// annulation de la vitesse de la plaque du haut
+	topbox->state->vel		=  Vector3r(0,0,0);
+
+	// de la plaque gauche
+	leftbox->state->vel		=  Vector3r(0,0,0);
+	leftbox->state->angVel		=  Vector3r(0,0,0);
+
+	// de la plaque droite
+	rightbox->state->vel		=  Vector3r(0,0,0);
+	rightbox->state->angVel		=  Vector3r(0,0,0);
+}
+
+
+void KinemSimpleShearBox::computeStiffness()
+{
+	int nbre_contacts = 0;
+	stiffness=0.0;
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+	InteractionContainer::iterator iiEnd = scene->interactions->end();
+	for(  ; ii!=iiEnd ; ++ii )
+	{
+		if ((*ii)->isReal())
+		{
+			const shared_ptr<Interaction>& contact = *ii;
+			
+			Real fn = (static_cast<FrictPhys*>(contact->interactionPhysics.get()))->normalForce.norm();
+
+			if (fn!=0)
+			{
+				int id1 = contact->getId1(), id2 = contact->getId2();
+				if ( id_topbox==id1 || id_topbox==id2 )
+					{
+						FrictPhys* currentContactPhysics =
+						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
+						stiffness  += currentContactPhysics->kn;
+						nbre_contacts += 1;
+					}
+			}
+		}
+	}
+	if(LOG)	cout << "nbre billes en contacts : " << nbre_contacts << endl;
+	if(LOG)	cout << "rigidite echantillon calculee : " << stiffness << endl;
+
+}
+
+void KinemSimpleShearBox::setBoxes_Dt()
+{
+	leftbox = Body::byId(id_boxleft);
+	rightbox = Body::byId(id_boxright);
+	frontbox = Body::byId(id_boxfront);
+	backbox = Body::byId(id_boxback);
+	topbox = Body::byId(id_topbox);
+	boxbas = Body::byId(id_boxbas);
+	dt = scene->dt;
+}
+
+
+
+void KinemSimpleShearBox::computeDY(Real KnC)
+{
+
+	scene->forces.sync(); Vector3r F_sup=scene->forces.getForce(id_topbox);
+	
+	if(firstRun)
+	{
+// 		if ( !myLdc )	// FIXME : reenable this feature since Law2 is a functor ?? But difference in stiffnesses normally now taken into account
+// 		{
+// 			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+// 			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
+// 			for ( ;itFirst!=itLast; ++itFirst )
+// 			{
+// 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
+// 				{
+// 					myLdc =  YADE_PTR_CAST<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
+// 					coeff_dech = myLdc ->coeff_dech;
+// 					if(LOG) cout << "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
+// 				}
+// 			}
+// 		}
+
+		alpha=Mathr::PI/2.0;;
+		Y0 = topbox->state->pos.y();
+		cout << "Y0 initialise à : " << Y0 << endl;
+		F0 = F_sup.y();
+		firstRun=false;
+	}
+		
+
+	computeStiffness();
+	Real Hcurrent = topbox->state->pos.y();
+	Real Fdesired = F0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired, with the fact that KnC is in MPa/mm 
+
+// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : => INUTILE maintenant ?
+// 	if( F_sup.y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
+// 		stiffness *= coeff_dech;
+
+	if( (stiffness==0) )
+	{
+		deltaH=0;
+		cerr << "Stiffness(sample) = 0 => DNC in fact : not CNL or CNS..." << endl;
+	}
+	else
+	{
+		deltaH = ( F_sup.y() - ( Fdesired ))/(stiffness);
+	}
+
+	if(LOG) cout << "Alors q je veux KnC = " << KnC << " depuis F0 = " << F0 << " et Y0 = " << Y0 << endl;
+	if(LOG) cout << "deltaH a permettre normalement :" << deltaH << endl;
+
+	deltaH = (1-wallDamping)*deltaH;
+	if(LOG)	cout << "deltaH apres amortissement :" << deltaH << endl;
+
+	if(abs(deltaH) > max_vel*scene->dt)
+	{
+		deltaH=deltaH/abs(deltaH)*max_vel*scene->dt;
+		if(LOG) cout << "Correction appliquee pour ne pas depasser vmax(comp)" << endl;
+	}
+
+}
+
+
+

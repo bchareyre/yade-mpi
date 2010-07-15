@@ -11,7 +11,7 @@
 
 #include "SimpleShear.hpp"
 
-#include <yade/pkg-dem/CohFrictMat.hpp>
+#include <yade/pkg-dem/NormalInelasticMat.hpp>
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 #include <yade/pkg-dem/Ip2_2xNormalInelasticMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -44,6 +44,7 @@
 
 using namespace std;
 
+YADE_PLUGIN((SimpleShear))
 
 SimpleShear::~SimpleShear ()
 {
@@ -115,7 +116,7 @@ bool SimpleShear::generate()
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohFrictMat> mat(new CohFrictMat);
+	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -133,7 +134,6 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 	mat->young			= sphereYoungModulus;
 	mat->poisson			= spherePoissonRatio;
 	mat->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
-	mat->isCohesive			= 1;
 	body->material = mat;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
@@ -157,7 +157,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohFrictMat> mat(new CohFrictMat);
+	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
@@ -168,12 +168,11 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 	body->state->vel		= Vector3r(0,0,0);
 // 	NB : mass and inertia not defined because not used, since Box are not dynamics
 	body->state->pos		= position;
-	body->state->ori			= Quaternionr::Identity();
+	body->state->ori		= Quaternionr::Identity();
 
-	mat->young		= boxYoungModulus;
+	mat->young	= boxYoungModulus;
 	mat->poisson	= boxPoissonRatio;
 	mat->frictionAngle	= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
-	mat->isCohesive	= 1;
 	body->material = mat;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);

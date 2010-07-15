@@ -16,7 +16,7 @@ YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 
 
 
-void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
+void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact)
 {
 
 	const Real& dt = scene->dt;

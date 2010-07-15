@@ -1,7 +1,7 @@
 Generating yade documentation
 ===============================
 
-1. Get sphinx 1.0 (development snapshots are fine) either form 
+1. Get sphinx 1.0 (development snapshots are fine) either from 
 
 * packages at https://launchpad.net/~yade-users/+archive/external
 ** sudo apt-add-repository ppa:yade-users/external; sudo apt-get update; sudo apt-get install python-sphinx python-bibtex
