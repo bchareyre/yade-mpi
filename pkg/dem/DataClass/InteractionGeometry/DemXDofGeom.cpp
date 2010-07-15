@@ -1,5 +1,5 @@
 #include"DemXDofGeom.hpp"
-YADE_PLUGIN((Dem3DofGeom)/*(GenericSpheresContact)*/);
+YADE_PLUGIN((GenericSpheresContact)(Dem3DofGeom));
 Real Dem3DofGeom::displacementN(){throw;}
 Dem3DofGeom::~Dem3DofGeom(){}
-// GenericSpheresContact::~GenericSpheresContact(){}
+GenericSpheresContact::~GenericSpheresContact(){}

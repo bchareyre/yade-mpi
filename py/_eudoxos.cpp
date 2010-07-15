@@ -4,7 +4,6 @@
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/pkg-dem/Shop.hpp>
-#include <yade/pkg-dem/DemXDofGeom.hpp>
 
 #ifdef YADE_VTK
 	#include<vtkPointLocator.h>

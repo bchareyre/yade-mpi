@@ -64,10 +64,15 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	Real& un=currentContactGeometry->penetrationDepth;
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
-
+#ifdef IGCACHE
 	Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
 	const Vector3r& shearDisp = currentContactGeometry->shearIncrement();
-
+#else
+	Vector3r& shearForce = currentContactPhysics->shearForce;
+	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
+	Vector3r shearDisp = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,true);
+// 	cerr << "shearForce "<<shearForce<<" shearIncrement "<<currentContactGeometry->shearIncrement<<endl;
+#endif
 	if (!traceEnergy){//Update force but don't compute energy terms (see below))
 		if(useShear){
 			currentContactGeometry->updateShear(de1,de2,dt);
@@ -81,7 +86,7 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 			shearForce *= ratio;
 			if(useShear) currentContactGeometry->shear*=ratio;}
 	} else {
-		//almost the same with additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
+		//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
 		if(useShear) throw ("energy tracing not defined with useShear==true");
 		shearForce -= currentContactPhysics->ks*shearDisp;
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*

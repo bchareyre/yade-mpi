@@ -231,14 +231,14 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	:param Vector3 begin: first point positioning the line in the Minkowski sum
 	:param Vector3 last: last point positioning the line in the Minkowski sum
 
-	In order to build a correct chain, last point of element of rank N must correspond to first point of element of rank N+1 in the same chain (with some tolerance, since bounding boxes will be used to create connections).
+	In order to build a correct chain, last point of element of rank N must correspond to first point of element of rank N+1 in the same chain (with some tolerance, since bounding boxes will be used to create connections.
 	
 	:return: Body object with the :yref:`ChainedCylinder` :yref:`shape<Body.shape>`.
 	"""
 	segment=end-begin
 	b=Body()
 	b.shape=ChainedCylinder(radius=radius,length=segment.norm(),color=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.shape.segment=segment
+	b.shape.segment=b.shape.length*Vector3(0.,0.,1.)
 	V=2*(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2+b.shape.length*b.shape.length*2*(4./3)*math.pi*radius**3
 	b.state=ChainedState()

@@ -118,12 +118,12 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if ( !I->isReal() ) continue;
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->interactionPhysics.get() );
-		ScGeom* gsc=YADE_CAST<ScGeom*> ( I->interactionGeometry.get() );
+		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->interactionGeometry.get() );
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
 		//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
 		//    Vector3r branch=(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
-		Vector3r branch= gsc->normal* ( gsc->radius1+gsc->radius2 );
+		Vector3r branch= gsc->normal* ( gsc->refR1+gsc->refR2 );
 		#if 0
 			// remove this block later
 			// tensorial product f*branch (hand-write the tensor product to prevent matrix instanciation inside the loop by makeTensorProduct)

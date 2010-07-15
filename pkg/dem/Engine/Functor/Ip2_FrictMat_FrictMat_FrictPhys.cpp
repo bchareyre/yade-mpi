@@ -32,9 +32,9 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 	Real Vb 	= mat2->poisson;
 	
 	Real Ra,Rb; Vector3r normal;	
-	assert(dynamic_cast<ScGeom*>(interaction->interactionGeometry.get()));//only in debug mode
-	ScGeom* sphCont=YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
-	{Ra=sphCont->radius1>0?sphCont->radius1:sphCont->radius2; Rb=sphCont->radius2>0?sphCont->radius2:sphCont->radius1; normal=sphCont->normal;}
+	assert(dynamic_cast<GenericSpheresContact*>(interaction->interactionGeometry.get()));//only in debug mode
+	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->interactionGeometry.get());
+	{Ra=sphCont->refR1>0?sphCont->refR1:sphCont->refR2; Rb=sphCont->refR2>0?sphCont->refR2:sphCont->refR1; normal=sphCont->normal;}
 	
 	//harmonic average of the two stiffnesses when (Ri.Ei/2) is the stiffness of a contact point on sphere "i"
 	Real Kn = 2*Ea*Ra*Eb*Rb/(Ea*Ra+Eb*Rb);

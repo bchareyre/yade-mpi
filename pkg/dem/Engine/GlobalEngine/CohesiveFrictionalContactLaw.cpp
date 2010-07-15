@@ -74,10 +74,12 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 		///////////////////////// CREEP START ///////////
 		if (shear_creep) shearForce -= currentContactPhysics->ks*(shearForce*dt/creep_viscosity);
 		///////////////////////// CREEP END ////////////
-
+#ifdef IGCACHE
 		Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
 		const Vector3r& dus = currentContactGeometry->shearIncrement();
-
+#else
+		Vector3r dus = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt);
+#endif
 		//Linear elasticity giving "trial" shear force
 		shearForce -= currentContactPhysics->ks*dus;
 

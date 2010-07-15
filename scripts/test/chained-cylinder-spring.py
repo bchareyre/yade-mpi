@@ -38,7 +38,7 @@ O.engines=[
 ]
 
 #Generate a spiral
-Ne=200
+Ne=400
 for i in range(0, Ne):
 	omega=60.0/float(Ne); hy=0.10; hz=0.15;
 	px=float(i)*(omega/60.0); py=sin(float(i)*omega)*hy; pz=cos(float(i)*omega)*hz;
