@@ -68,6 +68,7 @@ def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
 # map modules to their html (rst) filenames. Used for sub-modules, where e.g. SpherePack is yade._packSphere.SpherePack, but is documented from yade.pack.rst
 moduleMap={
 	'yade._packPredicates':'yade.pack',
+	'yade._packSpherePadder':'yade.pack',
 	'yade._packSpheres':'yade.pack',
 	'yade._packObb':'yade.pack'
 }
@@ -393,6 +394,7 @@ my_latex_preamble=r'''
 \usepackage{euler} % must be loaded before fontspec for the whole doc (below); this must be kept for pngmath, however
 \usepackage{amsmath}
 \usepackage{amsbsy}
+\usepackage{mathabx}
 \usepackage{underscore}
 \usepackage[all]{xy}
 
