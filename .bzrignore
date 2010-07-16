@@ -27,3 +27,6 @@ doc/sphinx/yade.timing.rst
 doc/sphinx/yade.utils.rst
 doc/sphinx/yade.wrapper.rst
 doc/sphinx/yade.ymport.rst
+.kdev4/yade.kdev4
+yade.kdev4
+
