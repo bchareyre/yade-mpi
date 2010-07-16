@@ -48,7 +48,7 @@ wCap=utils.box([0,0,wallSize],[.55*wallDist,wallSize,.5*wallThickness]); o.bodie
 # all bodies up to now are fixed and only wire is will be shown
 for b in o.bodies:
 	b.shape.wire=True
-	b.isDynamic=False
+	b.dynamic=False
 
 import random
 def randomColor():

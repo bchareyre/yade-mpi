@@ -25,6 +25,7 @@ void KinemCTDEngine::action()
 
 	scene->forces.sync();
 	Real current_NormalForce=(scene->forces.getForce(id_topbox)).y();
+	KinemSimpleShearBox::computeScontact();
 	current_sigma=current_NormalForce/(1000.0*Scontact);	// so we have the current value of sigma, in kPa
 
 	if( ((compSpeed > 0) && (current_sigma < targetSigma)) || ((compSpeed < 0) && (current_sigma > targetSigma)) )

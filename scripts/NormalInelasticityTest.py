@@ -24,7 +24,7 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 			      [Ig2_Sphere_Sphere_ScGeom()],
-			      [Ip2_2xCohFrictMat_NormalInelasticityPhys()],
+			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys()],
 			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]
 			      ),
 	PeriodicPythonRunner(iterPeriod=1,command='letMove()')
@@ -74,28 +74,28 @@ O.saveTmp('EndComp')
 
 # ------ Test of the law in the tangential direction, using StepDisplacer ------ #
 
-DPos=Vector3.Zero
-Vector3.__init__(DPos,1*O.dt,0,0)
+#DPos=Vector3.Zero
+#Vector3.__init__(DPos,1*O.dt,0,0)
 
-O.engines=O.engines[:4]+[StepDisplacer(subscribedBodies=[1],deltaSe3=(DPos,Quaternion.Identity),setVelocities=True)]+O.engines[5:]
-O.run(1000)
-plot.plots={'step':('gamma',),'gamma':('Fx',)}
-plot.plot()
-plot.plots={'Normfn':('Fx',)}
-plot.plot()
-#Comments => 	- evolution of Fx with gamma normal (flat at the beginning because of the order of engines)
-#		- un decreases indeed during this shear, but a zoom on the curves is needed to see it.
-#		- We can observe that the force state of the sample decreases a line with a slope equal to tan(~34.5°)=tan(~0.602 rad). Why not strict equality ? Because of the measure of the slope or because something else ? To see...
+#O.engines=O.engines[:4]+[StepDisplacer(subscribedBodies=[1],deltaSe3=(DPos,Quaternion.Identity),setVelocities=True)]+O.engines[5:]
+#O.run(1000)
+#plot.plots={'step':('gamma',),'gamma':('Fx',)}
+#plot.plot()
+#plot.plots={'Normfn':('Fx',)}
+#plot.plot()
+##Comments => 	- evolution of Fx with gamma normal (flat at the beginning because of the order of engines)
+##		- un decreases indeed during this shear, but a zoom on the curves is needed to see it.
+##		- We can observe that the force state of the sample decreases a line with a slope equal to tan(~34.5°)=tan(~0.602 rad). Why not strict equality ? Because of the measure of the slope or because something else ? To see...
 
 
 
-# ------ Test of the law for the moment, using blockedDOF_s ------ #
-O.loadTmp('EndComp')
+## ------ Test of the law for the moment, using blockedDOF_s ------ #
+#O.loadTmp('EndComp')
 
-#To use blockedDOF_s, the body has to be dynamic....
-UpperSphere.isDynamic=True
-UpperSphere.state.blockedDOFs='x','rx','y','ry','z','rz'
-UpperSphere.state.angVel=Vector3(0,0,1)
+##To use blockedDOF_s, the body has to be dynamic....
+#UpperSphere.dynamic=True
+#UpperSphere.state.blockedDOFs='x','rx','y','ry','z','rz'
+#UpperSphere.state.angVel=Vector3(0,0,1)
 
 
 

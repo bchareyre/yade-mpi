@@ -94,7 +94,7 @@ if False:
 	# Create empty body object
 	b=Body()
 	# set the isDynamic body attribute
-	b.isDynamic=False
+	b.dynamic=False
 	# Assign geometrical model (shape) to the body: a box of given size
 	b.shape=Box(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# physical parameters:
