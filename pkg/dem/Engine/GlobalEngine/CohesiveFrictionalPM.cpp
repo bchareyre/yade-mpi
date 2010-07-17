@@ -10,7 +10,7 @@ YADE_PLUGIN((CFpmMat)(CFpmState)(CFpmPhys)(Ip2_CFpmMat_CFpmMat_CFpmPhys)(Law2_Sc
 /********************** Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM ****************************/
 CREATE_LOGGER(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM);
 
-void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* scene){
+void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	const Real& dt = scene->dt;
 
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
@@ -92,7 +92,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	Vector3r f = phys->normalForce + shearForce;
 	// these lines to adapt to periodic boundary conditions (NOTE applyForceAtContactPoint computes torque induced by normal and shear force too)
 	if (!scene->isPeriodic)  
-	applyForceAtContactPoint(f , geom->contactPoint , id2, st2->se3.position, id1, st1->se3.position, scene);
+	applyForceAtContactPoint(f , geom->contactPoint , id2, st2->se3.position, id1, st1->se3.position);
 	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used when scene is periodic
 		scene->forces.addForce(id1,-f);
 		scene->forces.addForce(id2,f);

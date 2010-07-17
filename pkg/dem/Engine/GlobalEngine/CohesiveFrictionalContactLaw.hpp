@@ -15,7 +15,7 @@
 
 class Law2_ScGeom_CohFrictPhys_ElasticPlastic: public LawFunctor{
 	public:
-	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
+	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CohFrictPhys_ElasticPlastic,LawFunctor,"Law for linear traction-compression-bending-twisting, with cohesion+friction and Mohr-Coulomb plasticity surface. Can be elastic-fragile or perfectly elastic-plastic. Creep at contact can be enabled.\n\n.. note::\n This law uses :yref:`ScGeom`.",
 		((bool,neverErase,false,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((bool,momentRotationLaw,false,"use bending/twisting moment at contacts. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))

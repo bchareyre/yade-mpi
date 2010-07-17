@@ -66,14 +66,14 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 CREATE_LOGGER(Law2_ScGeom_MindlinPhys_Mindlin);
 
-void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
+void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	const Real& dt = scene->dt; // get time step
 	
 	int id1 = contact->getId1(); // get id body 1
   	int id2 = contact->getId2(); // get id body 2
 
-	State* de1 = Body::byId(id1,ncb)->state.get();
-	State* de2 = Body::byId(id2,ncb)->state.get();	
+	State* de1 = Body::byId(id1,scene)->state.get();
+	State* de2 = Body::byId(id2,scene)->state.get();	
 
 	ScGeom* scg = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());	
@@ -81,7 +81,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 
 	/*** NORMAL FORCE ***/
 	Real uN = scg->penetrationDepth; // get overlapping  
-	if (uN<0) {ncb->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
+	if (uN<0) {scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
 	/* Hertz-Mindlin's formulation (PFC)
 	Note that the normal stiffness here is a secant value (so as it is cannot be used in the GSTS)
 	In the first place we get the normal force and then we store kn to be passed to the GSTS */
@@ -140,13 +140,13 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 
 	/*** APPLY FORCES ***/
 	if (!scene->isPeriodic)
-	applyForceAtContactPoint(-phys->normalForce - phys->shearForce, scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position, ncb);
+	applyForceAtContactPoint(-phys->normalForce - phys->shearForce, scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position);
 	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used
 		Vector3r force = -phys->normalForce - phys->shearForce;
-		ncb->forces.addForce(id1,force);
-		ncb->forces.addForce(id2,-force);
-		ncb->forces.addTorque(id1,(scg->radius1-0.5*scg->penetrationDepth)* scg->normal.cross(force));
-		ncb->forces.addTorque(id2,(scg->radius2-0.5*scg->penetrationDepth)* scg->normal.cross(force));
+		scene->forces.addForce(id1,force);
+		scene->forces.addForce(id2,-force);
+		scene->forces.addTorque(id1,(scg->radius1-0.5*scg->penetrationDepth)* scg->normal.cross(force));
+		scene->forces.addTorque(id2,(scg->radius2-0.5*scg->penetrationDepth)* scg->normal.cross(force));
 	}
 	phys->prevNormal = scg->normal;
 }

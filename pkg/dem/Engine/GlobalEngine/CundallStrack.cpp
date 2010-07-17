@@ -12,13 +12,13 @@ YADE_PLUGIN((Law2_Dem3Dof_CSPhys_CundallStrack)(Ip2_2xFrictMat_CSPhys)(CSPhys));
 /********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
 CREATE_LOGGER(Law2_Dem3Dof_CSPhys_CundallStrack);
 
-void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
+void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	CSPhys* phys=static_cast<CSPhys*>(ip.get());
 	
 	/*NormalForce */
 	Real displN=geom->displacementN();
-	if (displN>0){rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
+	if (displN>0){scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
 	phys->normalForce=phys->kn*displN*geom->normal;
 
 	/*ShearForce*/
@@ -28,7 +28,7 @@ void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<InteractionGeometry>& ig, 
 	trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
 	phys->shearForce = trialFs;
 
-	applyForceAtContactPoint(phys->normalForce + trialFs, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
+	applyForceAtContactPoint(phys->normalForce + trialFs, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position);
 	return;				
 	
 }

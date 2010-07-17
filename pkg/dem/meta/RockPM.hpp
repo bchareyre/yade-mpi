@@ -28,7 +28,7 @@ REGISTER_SERIALIZABLE(RpmState);
 
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
 		FUNCTOR2D(Dem3DofGeom,RpmPhys);
 		
 	YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_RockPMPhys_Rpm,LawFunctor,"Constitutive law for the Rpm model");

@@ -135,11 +135,11 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
  */
-void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* rootBody){
-	rootBody->forces.addForce(id1,force);
-	rootBody->forces.addForce(id2,-force);
-	rootBody->forces.addTorque(id1,(contPt-pos1).cross(force));
-	rootBody->forces.addTorque(id2,-(contPt-pos2).cross(force));
+void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* scene){
+	scene->forces.addForce(id1,force);
+	scene->forces.addForce(id2,-force);
+	scene->forces.addTorque(id1,(contPt-pos1).cross(force));
+	scene->forces.addTorque(id2,-(contPt-pos2).cross(force));
 }
 
 

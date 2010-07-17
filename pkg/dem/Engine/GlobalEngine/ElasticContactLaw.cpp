@@ -30,7 +30,7 @@ void ElasticContactLaw::action()
 			// these checks would be redundant in the functor (LawDispatcher does that already)
 			if(!dynamic_cast<ScGeom*>(I->interactionGeometry.get()) || !dynamic_cast<FrictPhys*>(I->interactionPhysics.get())) continue;	
 		#endif
-			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), scene);
+			functor->go(I->interactionGeometry, I->interactionPhysics, I.get());
 	}
 }
 
@@ -47,7 +47,7 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 }
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
-void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
+void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	const Real& dt = scene->dt;
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
@@ -57,10 +57,10 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 		if (neverErase) {
 			currentContactPhysics->shearForce = Vector3r::Zero();
 			currentContactPhysics->normalForce = Vector3r::Zero();}
-		else 	ncb->interactions->requestErase(id1,id2);
+		else 	scene->interactions->requestErase(id1,id2);
 		return;}
-	State* de1 = Body::byId(id1,ncb)->state.get();
-	State* de2 = Body::byId(id2,ncb)->state.get();
+	State* de1 = Body::byId(id1,scene)->state.get();
+	State* de2 = Body::byId(id2,scene)->state.get();
 	Real& un=currentContactGeometry->penetrationDepth;
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
@@ -102,20 +102,20 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 		}
 	}
 	if (!scene->isPeriodic)
-	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
+	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 	else {//we need to use correct branches in the periodic case, the following apply for spheres only
 		Vector3r force = -currentContactPhysics->normalForce-shearForce;
-		ncb->forces.addForce(id1,force);
-		ncb->forces.addForce(id2,-force);
-		ncb->forces.addTorque(id1,(currentContactGeometry->radius1-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
-		ncb->forces.addTorque(id2,(currentContactGeometry->radius2-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
+		scene->forces.addForce(id1,force);
+		scene->forces.addForce(id2,-force);
+		scene->forces.addTorque(id1,(currentContactGeometry->radius1-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
+		scene->forces.addTorque(id2,(currentContactGeometry->radius2-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
 	}
 	//FIXME : make sure currentContactPhysics->prevNormal is not used anywhere, remove it from physics and remove this line :
 	currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene*){
+void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
 	Real displN=geom->displacementN();
@@ -133,6 +133,6 @@ void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, s
 	if(trialFs.squaredNorm()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)/phys->ks); trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
 	//Workaround end
 	phys->shearForce=trialFs;
-	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
+	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position);
 }
 

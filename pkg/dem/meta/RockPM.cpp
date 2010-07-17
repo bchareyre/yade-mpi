@@ -10,7 +10,7 @@ YADE_PLUGIN((RpmState)(Law2_Dem3DofGeom_RockPMPhys_Rpm)(RpmMat)(Ip2_RpmMat_RpmMa
 /********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
 CREATE_LOGGER(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
-void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
+void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
 	
@@ -52,7 +52,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		phys->shearForce = Fs;
 
 		/**Normal Interaction*/
-		applyForceAtContactPoint(phys->normalForce + phys->shearForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
+		applyForceAtContactPoint(phys->normalForce + phys->shearForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position);
 		
 		if ((phys->isCohesive)&&(displN<(-phys->lengthMaxCompression))) {
 			phys->isCohesive = false;					///Destruction
@@ -67,7 +67,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 			 * Destruction.
 			 **/
 			if (displN>(phys->lengthMaxTension)) {
-				rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
+				scene->interactions->requestErase(contact->getId1(),contact->getId2());
 				return; 
 			} else {
 			/**If the distance 
@@ -75,14 +75,14 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 			 * we aply additional forces to keep particles together.
 			 **/
 				phys->normalForce=phys->kn*displN*geom->normal;
-				applyForceAtContactPoint(phys->normalForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
+				applyForceAtContactPoint(phys->normalForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position);
 				return;
 			}
 		} else {
 			/**
 			 * Delete interactions
 			 */ 
-			rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
+			scene->interactions->requestErase(contact->getId1(),contact->getId2());
 			return;
 		}
 	}

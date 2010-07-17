@@ -14,7 +14,7 @@
 
 class Law2_Dem3Dof_CSPhys_CundallStrack: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
 		FUNCTOR2D(Dem3DofGeom,CSPhys);
 		YADE_CLASS_BASE_DOC(Law2_Dem3Dof_CSPhys_CundallStrack,LawFunctor,"Basic constitutive law published originally by Cundall&Strack; it has normal and shear stiffnesses (Kn, Kn) and dry Coulomb friction. Operates on associated :yref:`Dem3DofGeom` and :yref:`CSPhys` instances.");
 		DECLARE_LOGGER;	

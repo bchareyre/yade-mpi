@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 YADE_PLUGIN((ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw));
-void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
+void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
 
 	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
 	ViscoelasticInteraction* phys=static_cast<ViscoelasticInteraction*>(_phys.get());
@@ -20,18 +20,18 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	int id2 = I->getId2();
 	
 	if (geom->penetrationDepth<0) {
-		rootBody->interactions->requestErase(id1,id2);
+		scene->interactions->requestErase(id1,id2);
 		return;
 	}
 
-	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
 	RigidBodyParameters* de1 = YADE_CAST<RigidBodyParameters*>((*bodies)[id1]->physicalParameters.get());
 	RigidBodyParameters* de2 = YADE_CAST<RigidBodyParameters*>((*bodies)[id2]->physicalParameters.get());
 
 	Vector3r& shearForce 			= phys->shearForce;
 
-	if (I->isFresh(rootBody)) shearForce=Vector3r(0,0,0);
+	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
 
 	const Real& dt = scene->dt;
 
@@ -67,10 +67,10 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	}
 
 	Vector3r f				= phys->normalForce + shearForce;
-	addForce (id1,-f,rootBody);
-	addForce (id2, f,rootBody);
-	addTorque(id1,-c1x.Cross(f),rootBody);
-	addTorque(id2, c2x.Cross(f),rootBody);
+	addForce (id1,-f,scene);
+	addForce (id2, f,scene);
+	addTorque(id1,-c1x.Cross(f),scene);
+	addTorque(id2, c2x.Cross(f),scene);
 }
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

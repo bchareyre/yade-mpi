@@ -34,12 +34,12 @@ void CohesiveFrictionalContactLaw::action()
 	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), scene);
+		functor->go(I->interactionGeometry, I->interactionPhysics, I.get());
 	}
 }
 
 
-void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb)
+void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact)
 {
 	const Real& dt = scene->dt;
 // 		if (detectBrokenBodies  //Experimental, has no effect
@@ -49,28 +49,28 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 // 			YADE_CAST<CohFrictMat*> ((*bodies)[contact->getId2()]->material.get())->isBroken = false;}
 	const int &id1 = contact->getId1();
 	const int &id2 = contact->getId2();
-	Body* b1 = Body::byId(id1,ncb).get();
-	Body* b2 = Body::byId(id2,ncb).get();
+	Body* b1 = Body::byId(id1,scene).get();
+	Body* b2 = Body::byId(id2,scene).get();
 	ScGeom* currentContactGeometry  = YADE_CAST<ScGeom*> (ig.get());
 	CohFrictPhys* currentContactPhysics = YADE_CAST<CohFrictPhys*> (ip.get());
 
 	Vector3r& shearForce    = currentContactPhysics->shearForce;
 
-	if (contact->isFresh(ncb)) shearForce   = Vector3r::Zero();
+	if (contact->isFresh(scene)) shearForce   = Vector3r::Zero();
 	Real un     = currentContactGeometry->penetrationDepth;
 	Real Fn    = currentContactPhysics->kn*un;
 	currentContactPhysics->normalForce = Fn*currentContactGeometry->normal;
 	if (un < 0 && (currentContactPhysics->normalForce.squaredNorm() > pow(currentContactPhysics->normalAdhesion,2)
 	               || currentContactPhysics->normalAdhesion==0)) {
 		// BREAK due to tension
-		ncb->interactions->requestErase(contact->getId1(),contact->getId2());
+		scene->interactions->requestErase(contact->getId1(),contact->getId2());
 		// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 // 			currentContactPhysics->cohesionBroken = true;
 // 			currentContactPhysics->normalForce = Vector3r::ZERO;
 // 			currentContactPhysics->shearForce = Vector3r::ZERO;
 	} else {
-		State* de1 = Body::byId(id1,ncb)->state.get();
-		State* de2 = Body::byId(id2,ncb)->state.get();
+		State* de1 = Body::byId(id1,scene)->state.get();
+		State* de2 = Body::byId(id2,scene)->state.get();
 		///////////////////////// CREEP START ///////////
 		if (shear_creep) shearForce -= currentContactPhysics->ks*(shearForce*dt/creep_viscosity);
 		///////////////////////// CREEP END ////////////
@@ -99,7 +99,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 			shearForce *= maxFs;
 			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
-		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
+		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 
 		/// Moment law        ///
 		if (momentRotationLaw && (!currentContactPhysics->cohesionBroken || always_use_moment_law)) {

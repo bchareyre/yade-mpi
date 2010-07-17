@@ -3,7 +3,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
 YADE_PLUGIN((ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw));
-void ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
+void ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(_geom.get());
 	NormShearPhys* phys=static_cast<NormShearPhys*>(_phys.get());
 
@@ -11,7 +11,7 @@ void ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw::go(shared_ptr<InteractionGeom
 	phys->normalForce=(geom->displacementN()*phys->kn)*geom->normal;
 	phys->shearForce=geom->displacementT()*phys->ks;
 
-	applyForceAtContactPoint(phys->normalForce+phys->shearForce, geom->contactPoint, I->getId1(), geom->se31.position, I->getId2(), geom->se32.position, rootBody);
+	applyForceAtContactPoint(phys->normalForce+phys->shearForce, geom->contactPoint, I->getId1(), geom->se31.position, I->getId2(), geom->se32.position);
 }
 
 

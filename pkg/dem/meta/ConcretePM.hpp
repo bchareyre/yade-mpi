@@ -109,7 +109,7 @@ class CpmPhys: public NormShearPhys {
 		static long cummBetaIter, cummBetaCount;
 		/*! auxiliary variable for visualization, recalculated in Law2_Dem3DofGeom_CpmPhys_Cpm at every iteration */
 		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormShearPhys 
-		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r epsT, sigmaT, Fs;
+		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r sigmaT, Fs;
 
 		static Real solveBeta(const Real c, const Real N);
 		Real computeDmgOverstress(Real dt);
@@ -137,11 +137,12 @@ class CpmPhys: public NormShearPhys {
 			((Real,epsTrans,0,"Transversal strain (perpendicular to the contact axis)"))
 			((Real,epsPlSum,0,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,"if not cohesive, interaction is deleted when distance is greater than zero."))
+			((Vector3r,epsT,Vector3r::Zero(),"Total shear strain (either computed from increments with :yref:`ScGeom` or simple copied with :yref:`Dem3DofGeom`) |yupdate|"))
+			((Real,refLength,NaN,"Reference contact length (only used with :yref:`Law2_ScGeom_CpmPhys_Cpm`)"))
 			,
 			createIndex(); epsT=Fs=Vector3r::Zero(); Fn=0; omega=0;
 			,
 			.def_readonly("omega",&CpmPhys::omega,"Damage internal variable")
-			.def_readonly("epsT",&CpmPhys::epsT,"Transversal strain (not used)")
 			.def_readonly("Fn",&CpmPhys::Fn,"Magnitude of normal force.")
 			.def_readonly("Fs",&CpmPhys::Fs,"Magnitude of shear force")
 			.def_readonly("epsN",&CpmPhys::epsN,"Current normal strain")
@@ -176,14 +177,14 @@ REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/*! Damage evolution law */
-	Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
 		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 	}
 	//! return |sigmaT| at plastic surface for given sigmaN etc; not used by the law itself
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle);
 
-	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
 
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
@@ -200,6 +201,20 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
+
+class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
+	public:
+	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+	FUNCTOR2D(ScGeom,CpmPhys);
+	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"An experimental version of :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` which uses :yref:`ScGeom` instead of :yref:`Dem3DofGeom`.",
+		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
+	);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
+		
+
+
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>

@@ -150,7 +150,7 @@ void InteractionDispatchers::action(){
 			assert(!swap); // reverse call would make no sense, as the arguments are of different types
 		}
 		assert(I->functorCache.constLaw);
-		I->functorCache.constLaw->go(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
+		I->functorCache.constLaw->go(I->interactionGeometry,I->interactionPhysics,I.get());
 
 		// process callbacks for this interaction
 		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check

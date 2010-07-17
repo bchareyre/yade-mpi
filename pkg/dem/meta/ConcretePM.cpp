@@ -4,7 +4,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(Gl1_CpmPhys)
 	#endif	
@@ -137,7 +137,7 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 #endif
 
 
-void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* scene){
+void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
@@ -158,22 +158,19 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 		Real& epsNPl(BC->epsNPl); const Real& dt=scene->dt; const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau);const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType); const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
 	#endif
 
-
 	epsN=contGeom->strainN(); epsT=contGeom->strainT();
 	
 	// debugging
-		#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); LOG_FATAL("in interaction #"<<I->getId1()<<"+#"<<I->getId2()); Omega::instance().saveSimulation("/tmp/verificationFailed.xml"); throw;}
-
-		#define NNAN(a) YADE_VERIFY(!isnan(a));
-		#define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
-		#ifdef YADE_DEBUG
-			if(isnan(epsN)){
-				LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
-			throw runtime_error("!! epsN==NaN !!");
-			}
-			NNAN(epsN); NNANV(epsT);
-		#endif
-		NNAN(epsN); NNANV(epsT);
+	#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); LOG_FATAL("in interaction #"<<I->getId1()<<"+#"<<I->getId2()); Omega::instance().saveSimulation("/tmp/verificationFailed.xml"); throw;}
+	#define NNAN(a) YADE_VERIFY(!isnan(a));
+	#define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
+	#ifdef YADE_DEBUG
+		if(isnan(epsN)){
+			LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
+		throw runtime_error("!! epsN==NaN !!");
+		}
+	#endif
+	NNAN(epsN); NNANV(epsT);
 
 	// constitutive law 
 	#ifdef CPM_MATERIAL_MODEL
@@ -186,7 +183,6 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 			else epsN+=sigmaSoft/E+(BC->isoPrestress-sigmaSoft)/(E*relKnSoft);
 		}
 		CPM_MATERIAL_MODEL
-		//cerr<<"kappaD="<<kappaD<<", epsN="<<epsN<<", neverDamage="<<neverDamage<<", epsCrackOnset="<<epsCrackOnset<<", epsFracture="<<epsFracture<<", omega="<<omega<<"="<<funcG(kappaD,epsCrackOnset,epsFracture,neverDamage);
 	#else
 		// simplified public model
 		epsN+=BC->isoPrestress/E;
@@ -223,7 +219,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
-	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, scene);
+	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position);
+	#undef YADE_VERIFY
 }
 
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle){
@@ -233,6 +230,69 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 	//return max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle);
 	throw std::runtime_error("Full CPM model not available in this build");
 #endif
+}
+
+
+CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
+void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
+	ScGeom* contGeom=static_cast<ScGeom*>(_geom.get());
+	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
+	// FIXME: better way to get current positions? Needed for
+	// (1) getting intial equilibrium distance (not stored in ScGeom and distFactor not accessible from here)
+	// (2) applying contact forces back on particles
+	const Vector3r& pos1(Body::byId(I->getId1(),scene)->state->pos); const Vector3r& pos2(Body::byId(I->getId2(),scene)->state->pos);
+	// just the first time
+	if(I->isFresh(scene)){
+		Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
+		BC->crossSection=Mathr::PI*pow(minRad,2);
+		BC->refLength=(pos2-pos1).norm();
+		BC->kn=BC->crossSection*BC->E/BC->refLength;
+		BC->ks=BC->crossSection*BC->G/BC->refLength;
+	}
+	// shorthands
+	Real& epsN(BC->epsN);
+	Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_ScGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
+	const bool& isCohesive(BC->isCohesive);
+	epsN=contGeom->penetrationDepth/BC->refLength;
+	
+	// FIXME: sign?
+	epsT=contGeom->rotate(epsT);
+	epsT+=contGeom->shearIncrement()/BC->refLength; 
+
+	// simplified public model
+	epsN+=BC->isoPrestress/E;
+	// very simplified version of the constitutive law
+	kappaD=max(max(0.,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
+	omega=isCohesive?Law2_Dem3DofGeom_CpmPhys_Cpm::funcG(kappaD,epsCrackOnset,epsFracture,neverDamage):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
+	sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
+	sigmaT=G*epsT; // trial stress
+	Real yieldSigmaT=max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); // Mohr-Coulomb law with damage
+	if(sigmaT.squaredNorm()>yieldSigmaT*yieldSigmaT){
+		Real scale=yieldSigmaT/sigmaT.norm();
+		sigmaT*=scale;
+		epsPlSum+=(epsT-epsT*scale).norm()*yieldSigmaT;
+		epsT*=scale;
+	}
+	relResidualStrength=isCohesive?(kappaD<epsCrackOnset?1.:(1-omega)*(kappaD)/epsCrackOnset):0;
+	sigmaN-=BC->isoPrestress;
+
+	// handle broken contacts
+	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
+		if(isCohesive){
+			const shared_ptr<Body>& body1=Body::byId(I->getId1(),scene), body2=Body::byId(I->getId2(),scene); assert(body1); assert(body2);
+			const shared_ptr<CpmState>& st1=YADE_PTR_CAST<CpmState>(body1->state), st2=YADE_PTR_CAST<CpmState>(body2->state);
+			// nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/
+			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive+=1; st1->epsPlBroken+=epsPlSum; }
+			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive+=1; st2->epsPlBroken+=epsPlSum; }
+		}
+		scene->interactions->requestErase(I->getId1(),I->getId2());
+		return;
+	}
+
+	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
+	Fs=sigmaT*crossSection; BC->shearForce=Fs;
+
+	applyForceAtContactPoint(BC->normalForce+BC->shearForce,contGeom->contactPoint,I->getId1(),pos1,I->getId2(),pos2);
 }
 
 

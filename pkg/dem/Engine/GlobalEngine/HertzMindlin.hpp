@@ -51,7 +51,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinPhys);
 class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 	public:
 		Real cn, cs;
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of contact damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
 			((bool,preventGranularRatcheting,false,"bool to avoid granular ratcheting"))

@@ -32,7 +32,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 }
 
 /* Law2_ScGeom_ViscElPhys_Basic */
-void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
+void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
 
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
@@ -41,18 +41,18 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 	const int id2 = I->getId2();
 	
 	if (geom.penetrationDepth<0) {
-		rootBody->interactions->requestErase(id1,id2);
+		scene->interactions->requestErase(id1,id2);
 		return;
 	}
 
-	const BodyContainer& bodies = *rootBody->bodies;
+	const BodyContainer& bodies = *scene->bodies;
 
 	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
 	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
 
 	Vector3r& shearForce = phys.shearForce;
 
-	if (I->isFresh(rootBody)) shearForce=Vector3r(0,0,0);
+	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
 
 	const Real& dt = scene->dt;
 
@@ -99,9 +99,9 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 	}
 
 	const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
-	addForce (id1,-f,rootBody);
-	addForce (id2, f,rootBody);
-	addTorque(id1,-c1x.cross(f),rootBody);
-	addTorque(id2, c2x.cross(f),rootBody);
+	addForce (id1,-f,scene);
+	addForce (id2, f,scene);
+	addTorque(id1,-c1x.cross(f),scene);
+	addTorque(id2, c2x.cross(f),scene);
 }
 

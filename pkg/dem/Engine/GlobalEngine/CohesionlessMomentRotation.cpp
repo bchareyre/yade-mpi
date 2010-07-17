@@ -16,13 +16,13 @@ YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_MomentMat_Momen
 /********************** Law2_SCG_MomentPhys_CohesionlessMomentRotation ****************************/
 CREATE_LOGGER(Law2_SCG_MomentPhys_CohesionlessMomentRotation);
 
-void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
+void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); //InteractionGeometry
 	MomentPhys* phys = static_cast<MomentPhys*>(ip.get()); //InteractionPhysics
 	int id1 = contact->getId1(); //Id of body1
         int id2 = contact->getId2(); //Id of body2
-	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	Body* b1 = ( *bodies ) [id1].get();
 	Body* b2 = ( *bodies ) [id2].get();
 	const Real& dt = scene->dt; //Get TimeStep
@@ -30,7 +30,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 
 	/*NormalForce */
 	Real displN=geom->penetrationDepth;  //get penetrationDepth from SCG
-	if (displN<0){rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;}  //! NOTE: the sign for penetrationdepth is different from SCG and Dem3DofGeom
+	if (displN<0){scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;}  //! NOTE: the sign for penetrationdepth is different from SCG and Dem3DofGeom
 	Real Fn =phys->kn*displN;   //scalar force
 	phys->normalForce= Fn*geom->normal; //vector force NOTE: normal is position2-position1.  Therefore it is directed from particle1 to particle2
 	
@@ -107,10 +107,10 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 
 	/* Apply forces */
 	Vector3r f = phys->normalForce + shearForce;
-	rootBody->forces.addForce (id1,-f);
-	rootBody->forces.addForce (id2, f);
-	rootBody->forces.addTorque(id1,-(c1x).cross(f)); //about axis perpendicular to normal and force
-	rootBody->forces.addTorque(id2, c2x.cross(f));
+	scene->forces.addForce (id1,-f);
+	scene->forces.addForce (id2, f);
+	scene->forces.addTorque(id1,-(c1x).cross(f)); //about axis perpendicular to normal and force
+	scene->forces.addTorque(id2, c2x.cross(f));
 
 	/* Moment Rotation Law */
 	Quaternionr delta( b1->state->ori * phys->initialOrientation1.conjugate() *phys->initialOrientation2 * b2->state->ori.conjugate()); //relative orientation
@@ -148,8 +148,8 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 	phys->moment_twist = moment_twist;
 	phys->moment_bending = moment_bending;
 	
-	rootBody->forces.addTorque(id1,-moment);
-	rootBody->forces.addTorque(id2, moment);	
+	scene->forces.addTorque(id1,-moment);
+	scene->forces.addTorque(id2, moment);	
 	/// Moment law	END ///
 
 	phys->prevNormal = geom->normal;

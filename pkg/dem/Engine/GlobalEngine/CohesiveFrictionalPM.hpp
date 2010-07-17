@@ -104,7 +104,7 @@ REGISTER_SERIALIZABLE(Ip2_CFpmMat_CFpmMat_CFpmPhys);
 /** 2d functor creating the interaction law (Law2) based on SphereContactGeometry (ScGeom) and CFpmPhys of 2 bodies, returning type CohesiveFrictionalPM */
 class Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,CFpmPhys);
 
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM,LawFunctor,"Constitutive law for the CFpm model.",

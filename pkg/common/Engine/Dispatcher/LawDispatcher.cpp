@@ -14,7 +14,7 @@ void LawDispatcher::action(){
 	#endif
 		if(I->isReal()){
 			assert(I->interactionGeometry); assert(I->interactionPhysics);
-			operator()(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
+			operator()(I->interactionGeometry,I->interactionPhysics,I.get());
 			if(!I->isReal() && I->isFresh(scene)) LOG_ERROR("Law functor deleted interaction that was just created. Please report bug: either this message is spurious, or the functor (or something else) is buggy.");
 		}
 	}

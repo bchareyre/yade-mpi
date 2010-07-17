@@ -11,7 +11,7 @@ class LawDispatcher:
 		InteractionPhysics,  // 2nd base classe for dispatch
 		LawFunctor,     // functor base class
 		void,                // return type
-		TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*),
+		TYPELIST_3(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*),
 		false                // autosymmetry
 	>{
 		public:
