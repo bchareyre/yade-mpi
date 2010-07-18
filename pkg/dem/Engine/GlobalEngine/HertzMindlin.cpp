@@ -112,7 +112,8 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	// Define shift to handle periodicity
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
 	// 1. Rotate shear force
-	shearElastic = scg->rotate(shearElastic, phys->prevNormal, de1, de2, dt);
+// 	shearElastic = scg->rotate(shearElastic, phys->prevNormal, de1, de2, dt);
+	shearElastic = scg->rotate(shearElastic);
 	// 2. Get incident velocity, get shear and normal components
 	// FIXME: Concerning the possibility to avoid granular ratcheting, it is not clear how this works in the case of HM. See the thread http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01947.html
 	Vector3r incidentV = scg->getIncidentVel(de1, de2, dt, shiftVel, preventGranularRatcheting);	

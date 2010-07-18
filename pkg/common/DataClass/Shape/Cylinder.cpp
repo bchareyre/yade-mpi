@@ -52,18 +52,13 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 		Real norm=normal.norm(); normal/=norm; // normal is unit vector now
 		Real penetrationDepth=s1->radius+s2->radius-norm;
 		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
-		if(isNew) scm->prevNormal=normal;
-		else scm->prevNormal=scm->normal;
-		scm->normal=normal;
+// 		if(isNew) scm->prevNormal=normal;
+// 		else scm->prevNormal=scm->normal;
+// 		scm->normal=normal;
 		scm->penetrationDepth=penetrationDepth;
 		scm->radius1=s1->radius;
 		scm->radius2=s2->radius;
-#ifdef IGCACHE
-// 		if (scene->isPeriodic) {
-// 			Vector3r shiftVel = scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>();
-//  			scm->precompute(state1,state2,scene->dt,shiftVel,true);}
- 		/*else */scm->precompute(state1,state2,scene,c,true);
-#endif
+		scm->precompute(state1,state2,scene,c,normal,isNew,true);
 		return true;
 	}
 	return false;
@@ -114,26 +109,20 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
 	Real length=(bchain2.pos-bchain1.pos).norm();
 	Vector3r segt =pChain2->pos-pChain1->pos;
-	if(isNew) {scm->normal=scm->prevNormal=segt/length;bs1->initLength=length;}
-	else {scm->prevNormal=scm->normal; scm->normal=segt/length;}
+	if(isNew) {/*scm->normal=scm->prevNormal=segt/length;*/bs1->initLength=length;}
 	scm->radius1=revert ? 0:bs1->initLength;
 	scm->radius2=revert ? bs1->initLength:0;
 	scm->penetrationDepth=bs1->initLength-length;
 	scm->contactPoint=bchain2.pos;
 	//bs1->segment used for fast BBs and projections + display
-	if (revert) segt = -segt;
-	bs1->segment=segt;
+	bs1->segment= bchain2.pos-bchain1.pos;
 #ifdef YADE_OPENGL 
 	//bs1->length and s1->chainedOrientation used for display only, 
 	bs1->length=length;
 	bs1->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),bchain1.ori.conjugate()*segt);
 #endif
+	scm->precompute(state1,state2,scene,c,segt/length,isNew,true);
 
-#ifdef IGCACHE
-	scm->precompute(state1,state2,scene,c,true);
-#else
-	cerr<<"this is not supposed to work without #define IGCACHE"<<endl;
-#endif
 	//Set values that will be considered in Ip2 functor, geometry (precomputed) is really defined with values above
 	scm->radius1 = scm->radius2 = bs1->initLength*0.5;
 	return true;

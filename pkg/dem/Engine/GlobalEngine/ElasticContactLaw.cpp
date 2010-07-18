@@ -21,7 +21,6 @@ void Law2_ScGeom_FrictPhys_Basic::initPlasticDissipation(Real initVal) {plasticD
 void ElasticContactLaw::action()
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
-	functor->useShear=useShear;
 	functor->neverErase=neverErase;
 	functor->scene=scene;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -48,7 +47,6 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
 void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
-	const Real& dt = scene->dt;
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
 	ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
@@ -64,30 +62,20 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	Real& un=currentContactGeometry->penetrationDepth;
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
-#ifdef IGCACHE
+
 	Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
 	const Vector3r& shearDisp = currentContactGeometry->shearIncrement();
-#else
-	Vector3r& shearForce = currentContactPhysics->shearForce;
-	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
-	Vector3r shearDisp = currentContactGeometry->rotateAndGetShear(shearForce,currentContactPhysics->prevNormal,de1,de2,dt,shiftVel,true);
-// 	cerr << "shearForce "<<shearForce<<" shearIncrement "<<currentContactGeometry->shearIncrement<<endl;
-#endif
+
 	if (!traceEnergy){//Update force but don't compute energy terms (see below))
-		if(useShear){
-			currentContactGeometry->updateShear(de1,de2,dt);
-			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
-		} else shearForce -= currentContactPhysics->ks*shearDisp;
+		shearForce -= currentContactPhysics->ks*shearDisp;
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
-			shearForce *= ratio;
-			if(useShear) currentContactGeometry->shear*=ratio;}
+			shearForce *= ratio;}
 	} else {
-		//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
-		if(useShear) throw ("energy tracing not defined with useShear==true");
+		//almost the same with additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
 		shearForce -= currentContactPhysics->ks*shearDisp;
 		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);

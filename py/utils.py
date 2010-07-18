@@ -238,7 +238,7 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	segment=end-begin
 	b=Body()
 	b.shape=ChainedCylinder(radius=radius,length=segment.norm(),color=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.shape.segment=b.shape.length*Vector3(0.,0.,1.)
+	b.shape.segment=segment
 	V=2*(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2+b.shape.length*b.shape.length*2*(4./3)*math.pi*radius**3
 	b.state=ChainedState()
