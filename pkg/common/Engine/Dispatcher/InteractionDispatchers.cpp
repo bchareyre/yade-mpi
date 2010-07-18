@@ -3,16 +3,21 @@
 YADE_PLUGIN((InteractionDispatchers));
 CREATE_LOGGER(InteractionDispatchers);
 
-//! Pseudo-ctor for InteractionDispatchers, using lists of functors (might be turned into real ctor, perhaps)
-shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff /*, const std::vector<shared_ptr<IntrCallback> >& cbs*/){
-	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
-	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
-	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
-	// FOREACH(shared_ptr<IntrCallback> cb, cbs) instance->callbacks.push_back(cb);
-	return instance;
+void InteractionDispatchers::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
+	if(python::len(t)==0) return; // nothing to do
+	if(python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
+	// parse custom arguments (3 lists) and do in-place modification of args
+	typedef std::vector<shared_ptr<InteractionGeometryFunctor> > vecGeom;
+	typedef std::vector<shared_ptr<InteractionPhysicsFunctor> > vecPhys;
+	typedef std::vector<shared_ptr<LawFunctor> > vecLaw;
+	vecGeom vg=python::extract<vecGeom>(t[0])();
+	vecPhys vp=python::extract<vecPhys>(t[1])();
+	vecLaw vl=python::extract<vecLaw>(t[2])();
+	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, vg) this->geomDispatcher->add(gf);
+	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, vp)  this->physDispatcher->add(pf);
+	FOREACH(shared_ptr<LawFunctor> cf, vl)                 this->lawDispatcher->add(cf);
+	t=python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
 }
-
 
 // #define IDISP_TIMING
 

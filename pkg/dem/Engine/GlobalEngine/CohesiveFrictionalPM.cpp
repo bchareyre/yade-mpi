@@ -11,8 +11,6 @@ YADE_PLUGIN((CFpmMat)(CFpmState)(CFpmPhys)(Ip2_CFpmMat_CFpmMat_CFpmPhys)(Law2_Sc
 CREATE_LOGGER(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM);
 
 void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
-	const Real& dt = scene->dt;
-
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	CFpmPhys* phys = static_cast<CFpmPhys*>(ip.get());
 	const int &id1 = contact->getId1();

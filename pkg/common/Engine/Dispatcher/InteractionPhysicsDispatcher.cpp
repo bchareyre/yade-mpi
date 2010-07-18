@@ -14,12 +14,17 @@
  * 
  * The interaction must be real (needed?).
  */
-void InteractionPhysicsDispatcher::explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i){
+void InteractionPhysicsDispatcher::explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& I){
 	// should we throw instead of asserting?
 	//assert(i->isReal());
 	updateScenePtr();
-	if(!i->interactionGeometry) throw runtime_error(string(__FILE__)+": explicitAction received interaction without interactionGeometry.");
-	operator()(pp1,pp2,i);
+	if(!I->interactionGeometry) throw invalid_argument(string(__FILE__)+": explicitAction received interaction without interactionGeometry.");
+	if(!I->functorCache.phys){
+		bool dummy;
+		I->functorCache.phys=getFunctor2D(pp1,pp2,dummy);
+		if(!I->functorCache.phys) throw invalid_argument("InteractionPhysicsDispatcher::explicitAction did not find a suitable dispatch for types "+pp1->getClassName()+" and "+pp2->getClassName());
+		I->functorCache.phys->go(pp1,pp2,I);
+	}
 }
 
 

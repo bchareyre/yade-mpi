@@ -655,7 +655,7 @@ and the XML looks like this:
 Python attribute access
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The macro :ref:`YADE_CLASS_BASE_DOC` introduced above is (behind the scenes) also used to create functions for accessing attributes from Python. As already noted, set of serialized attributes and set of attributes accessible from Python are identical. Besides attribute access and the ``[]`` operator access, these wrapper classes imitate also other functionality of regular python dictionaries:
+The macro :ref:`YADE_CLASS_BASE_DOC` introduced above is (behind the scenes) also used to create functions for accessing attributes from Python. As already noted, set of serialized attributes and set of attributes accessible from Python are identical. Besides attribute access, these wrapper classes imitate also some functionality of regular python dictionaries:
 
 .. ipython::
 	
@@ -813,6 +813,16 @@ Expected parameters are indicated by macro name components separated with unders
 			);
 		};
 
+
+Special python constructors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The Python wrapper automatically create constructor that takes keyword (named) arguments corresponding to instance attributes; those attributes are set to values provided in the constructor. In some cases, more flexibility is desired (such as :yref:`InteractionDispatchers`, which takes 3 lists of functors). For such cases, you can override the function ``Serializable::pyHandleCustomCtorArgs``, which can arbitrarily modify the new (already existing) instance. It should modify in-place arguments given to it, as they will be passed further down to the routine which sets attribute values. In such cases, you should document the constructor::
+
+	.. admonition:: Special constructor
+
+		Constructs from lists of …
+
+which then appears in the documentation similar to :yref:`InteractionDispatchers`.
 
 Static attributes
 ^^^^^^^^^^^^^^^^^^^

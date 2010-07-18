@@ -42,14 +42,20 @@ class Dem3DofGeom: public GenericSpheresContact{
 		Vector3r strainT(){return displacementT()/refLength;}
 		Real slipToStrainTMax(Real strainTMax){return slipToDisplacementTMax(strainTMax*refLength)/refLength;}
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Dem3DofGeom,GenericSpheresContact,
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Dem3DofGeom,GenericSpheresContact,
 			"Abstract base class for representing contact geometry of 2 elements that has 3 degrees of freedom: normal (1 component) and shear (Vector3r, but in plane perpendicular to the normal).",
 			((Real,refLength,,"some length used to convert displacements to strains. |ycomp|"))
 			((Vector3r,contactPoint,,"some reference point for the interaction (usually in the middle). |ycomp|"))
 			((bool,logCompression,false,"make strain go to -∞ for length going to zero (false by default)."))
 			((Se3r,se31,,"Copy of body #1 se3 (needed to compute torque from the contact, strains etc). |yupdate|"))
 			((Se3r,se32,,"Copy of body #2 se3. |yupdate|")),
-			createIndex()
+			createIndex();,
+			.def("displacementN",&Dem3DofGeom::displacementN)
+			.def("displacementT",&Dem3DofGeom::displacementT)
+			.def("strainN",&Dem3DofGeom::strainN)
+			.def("strainT",&Dem3DofGeom::strainT)
+			.def("slipToDisplacementTMax",&Dem3DofGeom::slipToDisplacementTMax)
+			.def("slipToStrainTMax",&Dem3DofGeom::slipToStrainTMax)
 		);
 		REGISTER_CLASS_INDEX(Dem3DofGeom,InteractionGeometry);
 };

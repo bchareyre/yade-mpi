@@ -271,26 +271,13 @@ Erite plain text. Paragraphs are separated by empty lines (\n\n in c strings). U
 	REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,SerializableTypes::CUSTOM_CLASS,isFundamental);
 
 
-
-
 // helper functions
 template <typename T>
-shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::dict& d){
-	if(python::len(t)>1) throw runtime_error("Zero or one (and not more) non-keyword string argument required");
-	string clss;
-	if(python::len(t)==1){
-		python::extract<string> clss_(t[0]); if(!clss_.check()) throw runtime_error("First argument (if given) must be a string.");
-		clss=clss_();
-		cerr<<"WARN: Constructing class using the Serializable('"<<clss<<"') syntax is deprecated. Use directly "<<clss<<"() instead."<<endl;
-	}
+shared_ptr<T> Serializable_ctor_kwAttrs(python::tuple& t, python::dict& d){
 	shared_ptr<T> instance;
-	if(clss.empty()){ instance=shared_ptr<T>(new T); }
-	else{
-		shared_ptr<Factorable> instance0=ClassFactory::instance().createShared(clss);
-		if(!instance0) throw runtime_error("Invalid class `"+clss+"' (not created by ClassFactory).");
-		instance=dynamic_pointer_cast<T>(instance0);
-		if(!instance) throw runtime_error("Invalid class `"+clss+"' (unable to cast to typeid `"+typeid(T).name()+"')");
-	}
+	instance=shared_ptr<T>(new T);
+	instance->pyHandleCustomCtorArgs(t,d); // can change t and d in-place
+	if(python::len(t)>0) throw runtime_error("Zero (not "+lexical_cast<string>(python::len(t))+") non-keyword constructor arguments required [in Serializable_ctor_kwAttrs; Serializable::pyHandleCustomCtorArgs might had changed it after your call].");
 	instance->pyUpdateAttrs(d);
 	return instance;
 }
@@ -350,6 +337,9 @@ public :
 		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const;
 		// perform class registration; overridden in all classes
 		virtual void pyRegisterClass(boost::python::object _scope);
+		// perform any manipulation of arbitrary constructor arguments coming from python, manipulating them in-place;
+		// the remainder is passed to the Serializable_ctor_kwAttrs of the respective class (note: args must be empty)
+		virtual void pyHandleCustomCtorArgs(boost::python::tuple& args, boost::python::dict& kw){ return; }
 		
 		//! update attributes from dictionary
 		void pyUpdateAttrs(const boost::python::dict& d);

@@ -27,15 +27,25 @@ CREATE_LOGGER(InteractionGeometryDispatcher);
 shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool force){
 	updateScenePtr();
 	if(force){
+		#ifdef YADE_DEVIRT_FUNCTORS
+			throw logic_error("InteractionGeometryDispatcher::explicitAction not supported with the devirt-functors feature (yet)");
+		#endif
 		assert(b1->shape && b2->shape);
-		shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
-		bool op=operator()(b1->shape,b2->shape,*b1->state,*b2->state,/*shift2*/Vector3r::Zero(),/*force*/true,i);
-		if(!op) throw runtime_error("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+") or the dispatchee returned false (it was asked to force creation of InteractionGeometry; that would a bug).");
-		return i;
+		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
+		// FIXME: this code is more or less duplicated from InteractionDispatchers :-(
+		bool swap=false;
+		I->functorCache.geom=getFunctor2D(b1->shape,b2->shape,swap);
+		if(!I->functorCache.geom) throw invalid_argument("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+").");
+		if(swap){I->swapOrder();}
+		const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
+		const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
+		bool succ=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,/*shift2*/Vector3r::Zero(),/*force*/true,I);
+		if(!succ) throw logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force InteractionGeometry creation. Please report bug.");
+		return I;
 	} else {
-		shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
-		b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::Zero(), /*force*/ false, interaction );
-		return interaction;
+		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
+		b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::Zero(), /*force*/ false, I);
+		return I;
 	}
 }
 

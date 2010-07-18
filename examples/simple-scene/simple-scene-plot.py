@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('TkAgg')
 
 O.initializers=[
 		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])

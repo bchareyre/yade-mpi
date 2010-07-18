@@ -148,6 +148,7 @@ def createPlots():
 		# create the legend
 		pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
 		pylab.ylabel(','.join([xlateLabel(_p[0]) for _p in plots_p_y1]))
+		pylab.xlabel(xlateLabel(p))
 		# create y2 lines, if any
 		if len(plots_p_y2)>0:
 			# try to move in the color palette a little further (magenta is 5th): r,g,b,c,m,y,k

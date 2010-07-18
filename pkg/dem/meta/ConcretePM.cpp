@@ -136,6 +136,8 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 	#include"../../../../brefcom-mm.hh"
 #endif
 
+#undef CPM_MATERIAL_MODEL
+
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
@@ -193,7 +195,9 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 		sigmaT=G*epsT; // trial stress
 		Real yieldSigmaT=max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); // Mohr-Coulomb law with damage
 		if(sigmaT.squaredNorm()>yieldSigmaT*yieldSigmaT){
-			sigmaT*=yieldSigmaT/sigmaT.norm(); // stress return
+			Real scale=yieldSigmaT/sigmaT.norm();
+			sigmaT*=scale; // stress return
+			epsT*=scale;
 			epsPlSum+=yieldSigmaT*contGeom->slipToStrainTMax(yieldSigmaT/G); // adjust strain
 		}
 		relResidualStrength=isCohesive?(kappaD<epsCrackOnset?1.:(1-omega)*(kappaD)/epsCrackOnset):0;
@@ -253,7 +257,8 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_
 	Real& epsN(BC->epsN);
 	Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_ScGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 	const bool& isCohesive(BC->isCohesive);
-	epsN=contGeom->penetrationDepth/BC->refLength;
+	// FIXME: penetrationDepth does not account for interactionDetectionFactor!
+	epsN=(pos2-pos1).norm()/BC->refLength-1;
 	
 	// FIXME: sign?
 	epsT=contGeom->rotate(epsT);
@@ -389,7 +394,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
 		if(!phys) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
-		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
 		
 		Vector3r normalStress=((1./phys->crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
 		bodyStats[id1].sigma+=normalStress; bodyStats[id2].sigma+=normalStress;
