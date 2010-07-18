@@ -63,7 +63,12 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 
 	# isotropic confinement (should be negative)
 	isoPrestress=0,
+
+	# use the ScGeom variant
+	scGeom=True
 )
+
+from yade.params.table import *
 
 if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description']
 
@@ -90,9 +95,9 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
 	InsertionSortCollider(sweepLength=.05*sphereRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg') if not scGeom else Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ss2sc')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
-		[Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0)], # deactivated
+		[Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0) if not scGeom else Law2_ScGeom_CpmPhys_Cpm()],
 	),
 	NewtonIntegrator(damping=damping,label='damper'),
 	CpmStateUpdater(realPeriod=1),
@@ -103,8 +108,7 @@ O.engines=[
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 
 # plot stresses in ¼, ½ and ¾ if desired as well; too crowded in the graph that includes confinement, though
-plot.plots={'eps':('sigma','sigma.50'),'t':('eps')} #'sigma.25','sigma.50','sigma.75')}
-plot.maxDataLen=4000
+plot.plots={'eps':('sigma',)} #,'sigma.50')},'t':('eps')} #'sigma.25','sigma.50','sigma.75')}
 
 O.saveTmp('initial');
 
@@ -120,6 +124,7 @@ def initTest():
 		O.wait();
 		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
+	else: plot.plot()
 	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
 	try:
 		from yade import qt
@@ -127,10 +132,12 @@ def initTest():
 		renderer.dispScale=(1000,1000,1000) if mode=='tension' else (100,100,100)
 	except ImportError: pass
 	print "init done, will now run."
-	O.step(); O.step(); # to create initial contacts
+	O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
-	ss2d3dg.distFactor=-1.
+	if not scGeom: ss2d3dg.distFactor=-1.
+	else: ss2sc.interactionDetectionFactor=1.
 	is2aabb.aabbEnlargeFactor=-1.
+
 	O.run()
 
 def stopIfDamaged():

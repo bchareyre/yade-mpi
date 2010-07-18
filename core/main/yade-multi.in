@@ -115,6 +115,7 @@ def runHttpStatsServer():
 	try:
 		server=HTTPServer(('',9080),HttpStatsServer)
 		import thread; thread.start_new_thread(server.serve_forever,())
+		print "http://localhost:9080 shows batch summary"
 	except socket.error:
 		print "WARN: Port 9080 occupied, not starting HTTP stats server"
 

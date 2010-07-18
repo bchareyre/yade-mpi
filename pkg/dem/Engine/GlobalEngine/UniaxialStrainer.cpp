@@ -1,6 +1,7 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"UniaxialStrainer.hpp"
 #include<boost/foreach.hpp>
+#include<stdexcept>
 
 #include<yade/core/Scene.hpp>
 #include<yade/core/InteractionContainer.hpp>
@@ -36,14 +37,14 @@ void UniaxialStrainer::init(){
 	originalLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<axisCoord(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<axisCoord(negIds[0]));
 	LOG_INFO("Setting initial length to "<<originalLength<<" (between #"<<negIds[0]<<" and #"<<posIds[0]<<")");
-	if(originalLength<=0) LOG_FATAL("Initial length is negative or zero (swapped reference particles?)! "<<originalLength);
+	if(originalLength<=0) throw runtime_error(("UniaxialStrainer: Initial length is negative or zero (swapped reference particles?)! "+lexical_cast<string>(originalLength)).c_str());
 	/* this happens is nan propagates from e.g. brefcom consitutive law in case 2 bodies have _exactly_ the same position
 	 * (the the normal strain is 0./0.=nan). That is an user's error, however and should not happen. */
-	if(isnan(originalLength)) LOG_FATAL("Initial length is NaN!");
+	if(isnan(originalLength)) throw logic_error("UniaxialStrainer: Initial length is NaN!");
 	assert(originalLength>0 && !isnan(originalLength));
 
 	assert(!isnan(strainRate) || !isnan(absSpeed));
-	if(!isnan(std::numeric_limits<Real>::quiet_NaN())){ LOG_FATAL("NaN's are not properly supported (compiled, with -ffast-math?), which is required."); throw; }
+	if(!isnan(std::numeric_limits<Real>::quiet_NaN())){ throw runtime_error("UniaxialStrainer: NaN's are not properly supported (compiled with -ffast-math?), which is required."); }
 
 	if(isnan(strainRate)){ strainRate=absSpeed/originalLength; LOG_INFO("Computed new strainRate "<<strainRate); }
 	else {absSpeed=strainRate*originalLength;}
@@ -66,7 +67,7 @@ void UniaxialStrainer::init(){
 			case -1: v0=-absSpeed; v1=0; break;
 			case  0: v0=-absSpeed/2; v1=absSpeed/2; break;
 			case  1: v0=0; v1=absSpeed; break;
-			default: LOG_FATAL("Unknown asymmetry value "<<asymmetry<<" (should be -1,0,1)"); throw;
+			default: throw std::invalid_argument(("UniaxialStrainer: unknown asymmetry value "+lexical_cast<string>(asymmetry)+" (should be -1,0,1)").c_str());
 		}
 		assert(p1>p0);
 		// set speeds for particles on the boundary
@@ -78,31 +79,7 @@ void UniaxialStrainer::init(){
 			b->state->vel[axis]=pNormalized*(v1-v0)+v0;
 		}
 	}
-	stressUpdateInterval=min(1000,max(1,(int)(1e-5/(abs(strainRate)*scene->dt))));
-	LOG_INFO("Stress will be updated every "<<stressUpdateInterval<<" steps.");
-
-	/* if we have default (<0) crossSectionArea, try to get it from root's Aabb;
-	 * this will not work if there are foreign bodies in the simulation,
-	 * in which case you must give the value yourself as engine attribute.
-	 *
-	 * A TODO option is to get crossSectionArea as average area of bounding boxes' of ABBBs
-	 * of posIds and negIds perpendicular to axis. That might be better, except for cases where
-	 * reference particles on either end do not coincide with the specimen cross-section.
-	 *
-	 * */
-	if(crossSectionArea<=0){
-		shared_ptr<Aabb> rbAABB;
-		if (Omega::instance().getScene()->bound && (rbAABB=dynamic_pointer_cast<Aabb>(Omega::instance().getScene()->bound))){
-			int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
-			Vector3r size=rbAABB->max-rbAABB->min;
-			crossSectionArea=size[axis2]*size[axis3];
-			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
-		} else {
-			crossSectionArea=1.;
-			LOG_WARN("No Axis Aligned Bounding BoxModel for scene, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
-		}
-	}
-	assert(crossSectionArea>0);
+	if(isnan(crossSectionArea)){ throw std::invalid_argument("UniaxialStrain.crossSectionArea must be specified."); }
 }
 
 void UniaxialStrainer::action(){

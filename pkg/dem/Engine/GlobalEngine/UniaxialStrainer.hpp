@@ -26,8 +26,6 @@ class UniaxialStrainer: public BoundaryController {
 		virtual bool isActivated(){ return active; }
 		Real sumPosForces,sumNegForces;
 		Real initAccelTime_s /* value always in s, computed from initAccelTime */;
-		//! how often to update forces (initialized automatically)
-		int stressUpdateInterval;
 		/** coordinates of pos/neg bodies in the direction of axis */
 		vector<Real> posCoords,negCoords;
 
@@ -47,12 +45,13 @@ class UniaxialStrainer: public BoundaryController {
 			((Real,originalLength,NaN,"Distance of reference bodies in the direction of axis before straining started (computed automatically) [m]"))
 			((Real,limitStrain,((void)"disabled",0),"Invert the sense of straining (sharply, without transition) one this value of strain is reached. Not effective if 0."))
 			((bool,notYetReversed,true,"Flag whether the sense of straining has already been reversed (only used internally).")) 
-			((Real,crossSectionArea,NaN,"crossSection perpendicular to he strained axis, computed from Aabb of Scene, or given explicitly [m²]"))
+			((Real,crossSectionArea,NaN,"crossSection perpendicular to he strained axis; must be given explicitly [m²]"))
 			((Real,strain,0,"Current strain value, elongation/originalLength |yupdate| [-]")) 
 			((Real,avgStress,0,"Current average stress  |yupdate| [Pa]"))
 			((bool,blockDisplacements,false,"Whether displacement of boundary bodies perpendicular to the strained axis are blocked of are free"))
 			((bool,blockRotations,false,"Whether rotations of boundary bodies are blocked."))
-			((bool,setSpeeds,false,"should we set speeds at the beginning directly, instead of increasing strain rate progressively?")),
+			((bool,setSpeeds,false,"should we set speeds at the beginning directly, instead of increasing strain rate progressively?"))
+			((int,stressUpdateInterval,10,"How often to recompute stress on supports.")),
 			/*ctor*/ needsInit=true;
 		);
 	DECLARE_LOGGER;

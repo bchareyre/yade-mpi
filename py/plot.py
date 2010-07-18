@@ -25,8 +25,10 @@ import matplotlib,os,time
 # see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg04320.html 
 # and https://lists.launchpad.net/yade-users/msg03289.html
 #
+hasDisplay=True # FIXME: this should be moved to yade.config/yade.runtime and initialized at startup properly
 if os.environ.has_key('PARAM_TABLE'):
 	matplotlib.use('Agg')
+	hasDisplay=False
 
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKAgg')
@@ -41,7 +43,7 @@ plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-
 labels={}
 "Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
 
-live=True
+live=True if hasDisplay else False
 "Enable/disable live plot updating. Disabled by default for now, since it has a few rough edges."
 liveInterval=1
 "Interval for the live plot updating, in seconds."
@@ -132,15 +134,17 @@ def createPlots():
 		pylab.figure()
 		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		plots_p_y1,plots_p_y2=[],[]; y1=True
-		missing={} # missing data columns
-		if p not in data.keys(): missing[p]=nan
+		missing=set() # missing data columns
+		if p not in data.keys(): missing.add(p)
 		for d in plots_p:
 			if d[0]=='|||' or d[0]==None:
 				y1=False; continue
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
-			if d[0] not in data.keys(): missing[d[0]]=nan
-		addData(missing)
+			if d[0] not in data.keys(): missing.add(d[0])
+		if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
+			for m in missing: data[m]=[]
+		else: addData(dict((m,nan) for m in missing))
 		# create y1 lines
 		for d in plots_p_y1:
 			line,=pylab.plot(data[p],data[d[0]],d[1])
@@ -206,6 +210,7 @@ def plot(noShow=False):
 	createPlots()
 	global currLineRefs
 	if not noShow:
+		if not hasDisplay: return # would error out with some backends, such as Agg used in batches
 		if live:
 			import thread
 			thread.start_new_thread(liveUpdate,(time.time(),))

@@ -136,7 +136,7 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 	#include"../../../../brefcom-mm.hh"
 #endif
 
-#undef CPM_MATERIAL_MODEL
+// #undef CPM_MATERIAL_MODEL (force trunk version of the model)
 
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){

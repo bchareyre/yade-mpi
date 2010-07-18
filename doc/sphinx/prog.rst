@@ -1194,6 +1194,8 @@ Regardless of whether the :ref:`optional-libraries` log4cxx is used or not, yade
 
 .. [#log4cxxup] Because of (seemingly?) no upstream development of log4cxx and a few problems it has, Yade will very likely move to the hypothetical ``boost::logging`` library once it exists. The logging code will not have to be changed, however, as the log4cxx logic is hidden behind these macros.
 
+Log messages are classified by their *severity*, which is one of ``TRACE`` (tracing variables), ``DEBUG`` (generally uninsteresting messages useful for debugging), ``INFO`` (information messages -- only use sparingly), ``WARN`` (warning), ``FATAL`` (serious error, consider throwing an exception with description instead). Logging level determines which messages will be shown -- by default, ``INFO`` and higher will be shown; if you run yade with ``-v`` or ``-vv``, ``DEBUG`` and ``TRACE`` messages will be also enabled (with log4cxx).
+
 Every class using logging should create logger using these 2 macros (they expand to nothing if log4cxx is not used):
 
 ``DECLARE_LOGGER;``
@@ -1239,7 +1241,7 @@ Python provides rudimentary control for the logging system in ``yade.log`` modul
 
 	Yade [4]: log.setLevel('',log.WARN)                        # sets logging level of all yade.* loggers (they inherit level from the parent logger, except when overridden)
 
-As of now, there is no python interface for performing logging into lo4cxx loggers themselves.
+As of now, there is no python interface for performing logging into log4cxx loggers themselves.
 
 .. _timing:
 
