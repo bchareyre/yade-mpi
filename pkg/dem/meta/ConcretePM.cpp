@@ -245,24 +245,27 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_
 	// (1) getting intial equilibrium distance (not stored in ScGeom and distFactor not accessible from here)
 	// (2) applying contact forces back on particles
 	const Vector3r& pos1(Body::byId(I->getId1(),scene)->state->pos); const Vector3r& pos2(Body::byId(I->getId2(),scene)->state->pos);
+	Real refLength;
 	// just the first time
 	if(I->isFresh(scene)){
+		// done with real sphere radii
 		Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
 		BC->crossSection=Mathr::PI*pow(minRad,2);
-		BC->refLength=(pos2-pos1).norm();
-		BC->kn=BC->crossSection*BC->E/BC->refLength;
-		BC->ks=BC->crossSection*BC->G/BC->refLength;
+		// scale sphere's radii to effective radii (intial equilibrium)
+		Real refLength=(pos2-pos1).norm(); Real distCurr=contGeom->radius1+contGeom->radius2;
+		contGeom->radius1*=refLength/distCurr; contGeom->radius2*=refLength/distCurr;
+		contGeom->penetrationDepth=0;
+		BC->kn=BC->crossSection*BC->E/refLength;
+		BC->ks=BC->crossSection*BC->G/refLength;
 	}
 	// shorthands
 	Real& epsN(BC->epsN);
 	Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_ScGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 	const bool& isCohesive(BC->isCohesive);
-	// FIXME: penetrationDepth does not account for interactionDetectionFactor!
-	epsN=(pos2-pos1).norm()/BC->refLength-1;
+	epsN=contGeom->penetrationDepth/refLength;
 	
-	// FIXME: sign?
 	epsT=contGeom->rotate(epsT);
-	epsT+=contGeom->shearIncrement()/BC->refLength; 
+	epsT+=contGeom->shearIncrement()/refLength; 
 
 	// simplified public model
 	epsN+=BC->isoPrestress/E;

@@ -1382,11 +1382,22 @@ Animation
 You can move between frames (snapshots that were saved) via the "Animation" menu. After setting the view angle, zoom etc to your satisfaction, the animation can be saved with *File/Save animation*.
 
 
+******************************
+Python specialties and tricks
+******************************
+
+.. perhaps turn this section into a list of FAQs on python as gathered from the yade-users list?
+
+
+ 
+
 **************
 Extending Yade
 **************
 
-new constitutive law
+* new particle shape
+* new constitutive law
+
 
 
 ****************

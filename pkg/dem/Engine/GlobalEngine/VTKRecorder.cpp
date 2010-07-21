@@ -8,8 +8,8 @@
 #include<vtkUnstructuredGrid.h>
 #include<vtkXMLUnstructuredGridWriter.h>
 #include<vtkZLibDataCompressor.h>
-//#include<vtkXMLMultiBlockDataWriter.h>
-//#include<vtkMultiBlockDataSet.h>
+#include<vtkXMLMultiBlockDataWriter.h>
+#include<vtkMultiBlockDataSet.h>
 #include<vtkTriangle.h>
 #include<vtkLine.h>
 #include<yade/core/Scene.hpp>
@@ -96,13 +96,17 @@ void VTKRecorder::action(){
 	spheresAngVelLen->SetNumberOfComponents(1);
 	spheresAngVelLen->SetName("angVelLen");		//Length (magnitude) of angular velocity
 	
-	vtkSmartPointer<vtkFloatArray> spheresStressVec = vtkSmartPointer<vtkFloatArray>::New();
-	spheresStressVec->SetNumberOfComponents(3);
-	spheresStressVec->SetName("stressVec");
+	vtkSmartPointer<vtkFloatArray> spheresNormalStressVec = vtkSmartPointer<vtkFloatArray>::New();
+	spheresNormalStressVec->SetNumberOfComponents(3);
+	spheresNormalStressVec->SetName("normalStress");
+
+	vtkSmartPointer<vtkFloatArray> spheresShearStressVec = vtkSmartPointer<vtkFloatArray>::New();
+	spheresShearStressVec->SetNumberOfComponents(3);
+	spheresShearStressVec->SetName("shearStress");
 	
-	vtkSmartPointer<vtkFloatArray> spheresStressLen = vtkSmartPointer<vtkFloatArray>::New();
-	spheresStressLen->SetNumberOfComponents(1);
-	spheresStressLen->SetName("stressLen");
+	vtkSmartPointer<vtkFloatArray> spheresNormalStressNorm = vtkSmartPointer<vtkFloatArray>::New();
+	spheresNormalStressNorm->SetNumberOfComponents(1);
+	spheresNormalStressNorm->SetName("normalStressNorm");
 	
 	vtkSmartPointer<vtkFloatArray> spheresMaterialId = vtkSmartPointer<vtkFloatArray>::New();
 	spheresMaterialId->SetNumberOfComponents(1);
@@ -182,18 +186,11 @@ void VTKRecorder::action(){
 			line->GetPointIds()->SetId(0,I->getId1());
 			line->GetPointIds()->SetId(1,I->getId2());
 			intrCells->InsertNextCell(line);
-			if(recActive[REC_CPM]){		//For CPM model 
-				const CpmPhys* phys = YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
-				intrForceN->InsertNextValue(phys->Fn);
-				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
-				intrAbsForceT->InsertNextTupleValue(fs);
-			} else {									//For all other models
-				const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
-				float fn[3]={abs(phys->normalForce[0]),abs(phys->normalForce[1]),abs(phys->normalForce[2])};
-				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
-				intrForceN->InsertNextTupleValue(fn);
-				intrAbsForceT->InsertNextTupleValue(fs);
-			}
+			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+			float fn[3]={abs(phys->normalForce[0]),abs(phys->normalForce[1]),abs(phys->normalForce[2])};
+			float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
+			intrForceN->InsertNextTupleValue(fn);
+			intrAbsForceT->InsertNextTupleValue(fs);
 		}
 	}
 
@@ -233,10 +230,13 @@ void VTKRecorder::action(){
 					spheresAngVelLen->InsertNextValue(angVel.norm());
 				}
 				if(recActive[REC_STRESS]){
-					const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
-					float s[3] = { stress[0],stress[1],stress[2] };
-					spheresStressVec->InsertNextTupleValue(s);
-					spheresStressLen->InsertNextValue(stress.norm());
+					const Vector3r& stress = bodyStates[b->getId()].normStress;
+					const Vector3r& shear = bodyStates[b->getId()].shearStress;
+					float n[3] = { stress[0],stress[1],stress[2] };
+					float s[3] = { shear [0],shear [1],shear [2] };
+					spheresNormalStressVec->InsertNextTupleValue(n);
+					spheresShearStressVec->InsertNextTupleValue(s);
+					spheresNormalStressNorm->InsertNextValue(stress.norm());
 				}
 				
 				if (recActive[REC_CPM]){
@@ -294,8 +294,8 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDataCompressor> compressor;
 	if(compress) compressor=vtkSmartPointer<vtkZLibDataCompressor>::New();
 
+	vtkSmartPointer<vtkUnstructuredGrid> spheresUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 	if (recActive[REC_SPHERES]){
-		vtkSmartPointer<vtkUnstructuredGrid> spheresUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		spheresUg->SetPoints(spheresPos);
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
@@ -310,8 +310,9 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(spheresAngVelLen);
 		}
 		if (recActive[REC_STRESS]){
-			spheresUg->GetPointData()->AddArray(spheresStressVec);
-			spheresUg->GetPointData()->AddArray(spheresStressLen);
+			spheresUg->GetPointData()->AddArray(spheresNormalStressVec);
+			spheresUg->GetPointData()->AddArray(spheresShearStressVec);
+			spheresUg->GetPointData()->AddArray(spheresNormalStressNorm);
 		}
 		if (recActive[REC_CPM]){
 			spheresUg->GetPointData()->AddArray(cpmDamage);
@@ -326,15 +327,17 @@ void VTKRecorder::action(){
 
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
 		
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-		if(compress) writer->SetCompressor(compressor);
-		string fn=fileName+"spheres."+lexical_cast<string>(scene->currentIteration)+".vtu";
-		writer->SetFileName(fn.c_str());
-		writer->SetInput(spheresUg);
-		writer->Write();
+		if(!multiblock){
+			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			if(compress) writer->SetCompressor(compressor);
+			string fn=fileName+"spheres."+lexical_cast<string>(scene->currentIteration)+".vtu";
+			writer->SetFileName(fn.c_str());
+			writer->SetInput(spheresUg);
+			writer->Write();
+		}
 	}
+	vtkSmartPointer<vtkUnstructuredGrid> facetsUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 	if (recActive[REC_FACETS]){
-		vtkSmartPointer<vtkUnstructuredGrid> facetsUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		facetsUg->SetPoints(facetsPos);
 		facetsUg->SetCells(VTK_TRIANGLE, facetsCells);
 		if (recActive[REC_COLORS]) facetsUg->GetCellData()->AddArray(facetsColors);
@@ -344,35 +347,41 @@ void VTKRecorder::action(){
 		}
 		if (recActive[REC_MATERIALID]) facetsUg->GetCellData()->AddArray(facetsMaterialId);
 		if (recActive[REC_MASK]) facetsUg->GetCellData()->AddArray(facetsMask);
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-		if(compress) writer->SetCompressor(compressor);
-		string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
-		writer->SetFileName(fn.c_str());
-		writer->SetInput(facetsUg);
-		writer->Write();	
+		if(!multiblock){
+			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			if(compress) writer->SetCompressor(compressor);
+			string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
+			writer->SetFileName(fn.c_str());
+			writer->SetInput(facetsUg);
+			writer->Write();	
+		}
 	}
+	vtkSmartPointer<vtkUnstructuredGrid> intrUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 	if (recActive[REC_INTR]){
-		vtkSmartPointer<vtkUnstructuredGrid> intrUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		intrUg->SetPoints(intrBodyPos);
 		intrUg->SetCells(VTK_LINE, intrCells);
-		if (recActive[REC_CPM]){
-			 intrUg->GetCellData()->AddArray(intrForceN);
-			 intrUg->GetCellData()->AddArray(intrAbsForceT);
+		intrUg->GetCellData()->AddArray(intrForceN);
+		intrUg->GetCellData()->AddArray(intrAbsForceT);
+		if(!multiblock){
+			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			if(compress) writer->SetCompressor(compressor);
+			string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtu";
+			writer->SetFileName(fn.c_str());
+			writer->SetInput(intrUg);
+			writer->Write();
 		}
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-		if(compress) writer->SetCompressor(compressor);
-		string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtu";
-		writer->SetFileName(fn.c_str());
-		writer->SetInput(intrUg);
-		writer->Write();
 	}
 
-	//vtkSmartPointer<vtkMultiBlockDataSet> multiblockDataset = vtkSmartPointer<vtkMultiBlockDataSet>::New();
-	//multiblockDataset->SetBlock(0, spheresUg );
-	//multiblockDataset->SetBlock(1, facetsUg );
-	//vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
-	//string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
-	//writer->SetFileName(fn.c_str());
-	//writer->SetInput(multiblockDataset);
-	//writer->Write();	
+	if(multiblock){
+		vtkSmartPointer<vtkMultiBlockDataSet> multiblockDataset = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+		int i=0;
+		if(recActive[REC_SPHERES]) multiblockDataset->SetBlock(i++,spheresUg);
+		if(recActive[REC_FACETS]) multiblockDataset->SetBlock(i++,facetsUg);
+		if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrUg);
+		vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
+		string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
+		writer->SetFileName(fn.c_str());
+		writer->SetInput(multiblockDataset);
+		writer->Write();	
+	}
 }

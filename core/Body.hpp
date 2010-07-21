@@ -86,7 +86,8 @@ class Body: public Serializable{
 		.def_readonly("id",&Body::id,"Unique id of this body") // overwrites automatic def_readwrite("id",...) earlier
 		.def_readonly("clumpId",&Body::clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")
 		.def_readwrite("mat",&Body::material,"Shorthand for :yref:`Body::material`")
-		.add_property("isDynamic",&Body::isDynamic,"Deprecated synonym for :yref:`Body::dynamic`")
+		.add_property("isDynamic",&Body::isDynamic,&Body::setDynamic,"Deprecated synonym for :yref:`Body::dynamic` |ydeprecated|")
+		// .def_readwrite("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether the body will be moved by forces.")
 		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")

@@ -138,7 +138,6 @@ class CpmPhys: public NormShearPhys {
 			((Real,epsPlSum,0,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,"if not cohesive, interaction is deleted when distance is greater than zero."))
 			((Vector3r,epsT,Vector3r::Zero(),"Total shear strain (either computed from increments with :yref:`ScGeom` or simple copied with :yref:`Dem3DofGeom`) |yupdate|"))
-			((Real,refLength,NaN,"Reference contact length (only used with :yref:`Law2_ScGeom_CpmPhys_Cpm`)"))
 			,
 			createIndex(); epsT=Fs=Vector3r::Zero(); Fn=0; omega=0;
 			,
