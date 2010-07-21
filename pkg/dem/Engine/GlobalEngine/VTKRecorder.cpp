@@ -6,7 +6,9 @@
 #include<vtkSmartPointer.h>
 #include<vtkFloatArray.h>
 #include<vtkUnstructuredGrid.h>
+#include<vtkPolyData.h>
 #include<vtkXMLUnstructuredGridWriter.h>
+#include<vtkXMLPolyDataWriter.h>
 #include<vtkZLibDataCompressor.h>
 #include<vtkXMLMultiBlockDataWriter.h>
 #include<vtkMultiBlockDataSet.h>
@@ -172,7 +174,7 @@ void VTKRecorder::action(){
 	if(recActive[REC_INTR]){
 		// save body positions, referenced by ids by vtkLine
 		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-			if (!b) continue;
+			if (!b) { /* we must keep ids contiguous */ intrBodyPos->InsertNextPoint(NaN,NaN,NaN); continue; }
 			const Vector3r& pos=b->state->pos;
 			intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
 		}
@@ -356,18 +358,18 @@ void VTKRecorder::action(){
 			writer->Write();	
 		}
 	}
-	vtkSmartPointer<vtkUnstructuredGrid> intrUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+	vtkSmartPointer<vtkPolyData> intrPd = vtkSmartPointer<vtkPolyData>::New();
 	if (recActive[REC_INTR]){
-		intrUg->SetPoints(intrBodyPos);
-		intrUg->SetCells(VTK_LINE, intrCells);
-		intrUg->GetCellData()->AddArray(intrForceN);
-		intrUg->GetCellData()->AddArray(intrAbsForceT);
+		intrPd->SetPoints(intrBodyPos);
+		intrPd->SetLines(intrCells);
+		intrPd->GetCellData()->AddArray(intrForceN);
+		intrPd->GetCellData()->AddArray(intrAbsForceT);
 		if(!multiblock){
-			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
-			string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtu";
+			string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtp";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(intrUg);
+			writer->SetInput(intrPd);
 			writer->Write();
 		}
 	}
@@ -377,7 +379,7 @@ void VTKRecorder::action(){
 		int i=0;
 		if(recActive[REC_SPHERES]) multiblockDataset->SetBlock(i++,spheresUg);
 		if(recActive[REC_FACETS]) multiblockDataset->SetBlock(i++,facetsUg);
-		if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrUg);
+		if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrPd);
 		vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
 		string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
 		writer->SetFileName(fn.c_str());
