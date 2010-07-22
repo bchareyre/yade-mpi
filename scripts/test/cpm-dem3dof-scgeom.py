@@ -4,7 +4,7 @@ from yade import plot
 # one is handled by Law2_Dem3DofGeom_CpmPhys_Cpm and the other by Law2_ScGeom_CpmPhys_Cpm
 
 # move the second sphere tangentially or rotate it, pick [0] or [1]
-mode=['mov','rot'][0]
+mode=['mov','rot'][1]
 # number of steps to do (some influence on the incremental computation)
 nSteps=100
 

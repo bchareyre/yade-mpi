@@ -10,6 +10,10 @@
 # but are less efficient in multi-threading
 # (that might be due to the implementation of Law2_ScGeom_CpmPhys_Cpm, though)
 #
+# Run the batch using
+#
+# $ yade-trunk-multi --gnuplot=d3d-scg.gnuplot dem3dof-scgeom.table uniax.py
+#
 scGeom	dtSafety
 False	.8
 False .2

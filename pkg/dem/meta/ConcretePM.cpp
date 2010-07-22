@@ -239,33 +239,35 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 
 CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
-	ScGeom* contGeom=static_cast<ScGeom*>(_geom.get());
+	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
-	// FIXME: better way to get current positions? Needed for
-	// (1) getting intial equilibrium distance (not stored in ScGeom and distFactor not accessible from here)
-	// (2) applying contact forces back on particles
-	const Vector3r& pos1(Body::byId(I->getId1(),scene)->state->pos); const Vector3r& pos2(Body::byId(I->getId2(),scene)->state->pos);
-	Real refLength;
 	// just the first time
 	if(I->isFresh(scene)){
 		// done with real sphere radii
-		Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
+		Real minRad=(geom->refR1<=0?geom->refR2:(geom->refR2<=0?geom->refR1:min(geom->refR1,geom->refR2)));
 		BC->crossSection=Mathr::PI*pow(minRad,2);
+		// FIXME: a better way to get current positions? Needed for getting intial equilibrium distance (not stored in ScGeom and distFactor not accessible from here)
+		const Vector3r& pos1(Body::byId(I->getId1(),scene)->state->pos); const Vector3r& pos2(Body::byId(I->getId2(),scene)->state->pos);
 		// scale sphere's radii to effective radii (intial equilibrium)
-		Real refLength=(pos2-pos1).norm(); Real distCurr=contGeom->radius1+contGeom->radius2;
-		contGeom->radius1*=refLength/distCurr; contGeom->radius2*=refLength/distCurr;
-		contGeom->penetrationDepth=0;
+		Real refLength=(pos2-pos1).norm(); Real distCurr=geom->radius1+geom->radius2;
+		geom->radius1*=refLength/distCurr; geom->radius2*=refLength/distCurr;
+		geom->penetrationDepth=0;
+		geom->contactPoint=pos1+(geom->radius1/refLength)*(pos2-pos1);
 		BC->kn=BC->crossSection*BC->E/refLength;
 		BC->ks=BC->crossSection*BC->G/refLength;
 	}
+	// compute particle positions from contact point and penetrationDepth
+	Vector3r pos1=geom->contactPoint-(geom->radius1-.5*geom->penetrationDepth)*geom->normal;
+	Vector3r pos2=geom->contactPoint+(geom->radius2-.5*geom->penetrationDepth)*geom->normal;
+	Real refLength=geom->radius1+geom->radius2;
 	// shorthands
 	Real& epsN(BC->epsN);
 	Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_ScGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 	const bool& isCohesive(BC->isCohesive);
-	epsN=contGeom->penetrationDepth/refLength;
+	epsN=-geom->penetrationDepth/refLength;
 	
-	epsT=contGeom->rotate(epsT);
-	epsT+=contGeom->shearIncrement()/refLength; 
+	epsT=geom->rotate(epsT);
+	epsT+=geom->shearIncrement()/refLength; 
 
 	// simplified public model
 	epsN+=BC->isoPrestress/E;
@@ -297,10 +299,10 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_
 		return;
 	}
 
-	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
+	Fn=sigmaN*crossSection; BC->normalForce=Fn*geom->normal;
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
-	applyForceAtContactPoint(BC->normalForce+BC->shearForce,contGeom->contactPoint,I->getId1(),pos1,I->getId2(),pos2);
+	applyForceAtContactPoint(BC->normalForce+BC->shearForce,geom->contactPoint,I->getId1(),pos1,I->getId2(),pos2);
 }
 
 

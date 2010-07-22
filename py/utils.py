@@ -509,9 +509,12 @@ def plotNumInteractionsHistogram(cutoff=0.):
 	pylab.ylabel('Body count')
 	pylab.show()
 
-def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
+def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
 	"""Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes and
-	(optional but default) histogram of number of interactions per body."""
+	(optional but default) histogram of number of interactions per body.
+	
+	:returns: If *noShow* is ``False``, displays the figure and returns nothing. If *noShow*, the figure object is returned without being displayed (works the same way as :yref:`yade.plot.plot`).
+	"""
 	import pylab,math
 	from yade import utils
 	for axis in [0,1,2]:
@@ -530,7 +533,8 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 		pylab.xlabel('Interactions per body (avg. %g)'%avg)
 		pylab.axvline(x=avg,linewidth=3,color='r')
 		pylab.ylabel('Body count')
-	pylab.show()
+	if noShow: return pylab.gcf()
+	else: pylab.show()
 
 
 

@@ -9,7 +9,7 @@ import numpy
 import os.path
 
 # run uniax.py to get this file
-loadFile='/tmp/uniax-tension.xml.bz2'
+loadFile='/tmp/uniax-tension.yade.gz'
 if not os.path.exists(loadFile): raise RuntimeError("Run uniax.py first so that %s is created"%loadFile)
 O.load(loadFile)
 
@@ -25,7 +25,7 @@ for i in O.interactions:
 	angles.append(angle)
 	forces.append(force)
 # easier: plain histogram
-pylab.hist(angles,weights=forces,bins=20)
+#pylab.hist(angles,weights=forces,bins=20)
 
 
 # polar histogram
@@ -41,6 +41,6 @@ pylab.bar(left=bins[:-1],height=values,width=.7*pi/20);
 
 # predefined function
 pylab.figure()
-utils.plotDirections()
+utils.plotDirections(noShow=True).savefig('/tmp/a.pdf')
 
 pylab.show()
