@@ -1,0 +1,3 @@
+#!/bin/sh
+pyrcc4 -o img_rc.py img.qrc
+pyuic4 controller.ui > ui_controller.py

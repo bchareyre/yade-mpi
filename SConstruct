@@ -139,7 +139,7 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','noqt3','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','noqt3','qt4','never_use_this_one']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -150,7 +150,8 @@ opts.AddVariables(
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
-	('QTDIR','Directories where to look for qt3','/usr/share/qt3:/usr/lib/qt:/usr/lib/qt3:/usr/qt/3:/usr/lib/qt-3.3'),
+	('QTDIR','Directories where to look for qt3','/usr/share/qt3:/usr/lib/qt:/usr/lib/qt3:/usr/qt/3:/usr/lib/qt-3.3:/usr/share/qt4'),
+	('QT4DIR','Directory where Qt4 is installed','/usr/share/qt4'),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
@@ -359,13 +360,21 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
 		# TODO ok=True for darwin platform where openGL (and glut) is native
 		if not ok: featureNotOK('opengl')
-		if not 'noqt3' in env['features']:
+		if not 'noqt3' in env['features'] and 'qt4' not in env['features']:
 			ok=conf.CheckQt(env['QTDIR'])
 			if not ok: featureNotOK('opengl','Building with OpenGL implies qt3 interface, which was not found, although OpenGL was.')
 			env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 			ok=conf.CheckLibWithHeader(['qglviewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=0)
 			if not ok: featureNotOK('opengl','Building with OpenGL implies the QGLViewer library installed (libqglviewer-qt3-dev package in debian/ubuntu)')
 			env['QGLVIEWER_LIB']='qglviewer-qt3';
+		if 'qt4' in env['features']:
+			env['ENV']['PKG_CONFIG_PATH']='/usr/bin/pkg-config'
+			env.Tool('qt4')
+			env.EnableQt4Modules(['QtGui','QtCore','QtXml','QtOpenGL'])
+			ok=conf.CheckLibWithHeader(['qglviewer-qt4'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=0)
+			if not ok: featureNotOK('opengl','Building with Qt4 implies the QGLViewer library installed (libqglviewer-qt4-dev package in debian/ubuntu)')
+			env['QGLVIEWER_LIB']='qglviewer-qt4';
+
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')

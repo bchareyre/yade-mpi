@@ -2,6 +2,21 @@
 Import('*')
 linkPlugins=env['linkPlugins']
 
+if 'qt4' in env['features']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/qt4',[
+		env.File('qt4/img_rc.py'),
+		env.File('qt4/ui_controller.py'),
+		env.File('qt4/SerializableEditor.py'),
+		env.File('qt4/__init__.py'),
+		env.SharedLibrary('_GLViewer',['qt4/_GLViewer.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['GLViewer'],RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')])
+	])
+	env.Command('qt4/img_rc.py','qt4/img.qrc','pyrcc4 -o $buildDir/gui/qt4/img_rc.py gui/qt4/img.qrc')
+	env.Command('qt4/ui_controller.py','qt4/controller.ui','pyuic4 -o $buildDir/gui/qt4/ui_controller.py gui/qt4/controller.ui')
+	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
+		env.SharedLibrary('GLViewer',['qt4/GLViewer.cpp'],LIBS=env['LIBS']+['qglviewer-qt4']+linkPlugins(['OpenGLRenderingEngine']))
+	])
+		
+
 if 'opengl' in env['features'] and not 'noqt3' in env['features']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('QtGUI',

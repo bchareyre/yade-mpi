@@ -7,9 +7,12 @@ import re
 import logging
 logging.basicConfig(level=logging.INFO)
 #from logging import debug,info,warning,error
+from yade import *
 
 
 class AttrEditor():
+	"""Abstract base class handing some aspects common to all attribute editors.
+	Holds exacly one attribute which is updated whenever it changes."""
 	def __init__(self,ser,attr):
 		self.ser,self.attr=ser,attr
 		self.hot=False
@@ -19,13 +22,14 @@ class AttrEditor():
 	def isHot(self,hot=True):
 		"Called when the widget gets focus; mark it hot, change colors etc."
 		if hot==self.hot: return
+		# changing the color does not work...
 		self.hot=hot
 		p=QPalette();
 		if hot: p.setColor(QPalette.WindowText,Qt.red);
 		self.setPalette(p)
 		self.repaint()
-		print self.attr,('hot' if hot else 'cold')
-	def sizeHint(self): return QSize(180,12)
+		#print self.attr,('hot' if hot else 'cold')
+	def sizeHint(self): return QSize(150,12)
 
 class AttrEditor_Bool(AttrEditor,QCheckBox):
 	def __init__(self,parent,ser,attr):
@@ -116,11 +120,12 @@ class SerializableEditor(QWidget):
 		def __init__(self,name,T):
 			self.name,self.T=name,T
 			self.lineNo,self.widget=None,None
-	def __init__(self,ser,parent=None):
+	def __init__(self,ser,parent=None,ignoredAttrs=set()):
 		"Construct window, *ser* is the object we want to show."
 		QtGui.QWidget.__init__(self,parent)
 		self.ser=ser
 		self.entries=[]
+		self.ignoredAttrs=ignoredAttrs
 		logging.debug('New Serializable of type %s'%ser.__class__.__name__)
 		self.setWindowTitle(str(ser))
 		self.mkWidgets()
@@ -158,6 +163,8 @@ class SerializableEditor(QWidget):
 	def mkAttrEntries(self):
 		d=self.ser.dict()
 		for attr,val in self.ser.dict().items():
+			if attr in self.ignoredAttrs:
+				continue
 			if isinstance(val,list):
 				if len(val)==0: t=self.getListTypeFromDocstring(attr)
 				else: t=(val[0].__class__,) # 1-tuple is list of the contained type
@@ -186,13 +193,10 @@ class SerializableEditor(QWidget):
 			if e.widget and not e.widget.hot: e.widget.refresh()
 
 
-
-vr=VTKRecorder()
-s1=SerializableEditor(vr)
-s1.show()
-s2=SerializableEditor(OpenGLRenderingEngine())
-s2.show()
-#import time
-#def aa():
-#	print vr.dict(); time.sleep(1)
+if __name__=='__main__':
+	vr=VTKRecorder()
+	s1=SerializableEditor(vr)
+	s1.show()
+	s2=SerializableEditor(OpenGLRenderingEngine())
+	s2.show()
 

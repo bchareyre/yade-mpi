@@ -72,13 +72,13 @@ O.engines=[
 	GravityEngine(gravity=(0,0,-50)), # gravity artificially high, to make it faster going ;-)
 	NewtonIntegrator(damping=.3),
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-20,subscribedBodies=millIds),
-	SnapshotEngine(iterPeriod=30,fileBase='/tmp/mill-',viewNo=0,label='snapshooter'),
-	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/millVTK-')
+	#SnapshotEngine(iterPeriod=30,fileBase='/tmp/mill-',viewNo=0,label='snapshooter'),
+	VTKRecorder(iterPeriod=100,recorders=['all'],fileName='/tmp/millVTK-',multiblock=False)
 ]
 
 O.saveTmp()
-from yade import qt
-v=qt.View()
-v.eyePosition=(3,.8,.96); v.upVector=(-.4,-.4,.8); v.viewDir=(-.9,-.25,-.3); v.axes=True; v.sceneRadius=1.9
+#from yade import qt
+#v=qt.View()
+#v.eyePosition=(3,.8,.96); v.upVector=(-.4,-.4,.8); v.viewDir=(-.9,-.25,-.3); v.axes=True; v.sceneRadius=1.9
 O.run(20000); O.wait()
-utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/mill.ogg',fps=30)
+#utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/mill.ogg',fps=30)

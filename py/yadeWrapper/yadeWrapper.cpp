@@ -312,6 +312,7 @@ class pyOmega{
 		else { scene->timeStepperActivate(false); scene->dt=dt; }
 	}
 	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
+	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIteration; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIteration=s; }
 
@@ -338,6 +339,8 @@ class pyOmega{
 		if(!OMEGA.simulationLoop->workerThrew) return;
 		LOG_ERROR("Simulation error encountered."); OMEGA.simulationLoop->workerThrew=false; throw OMEGA.simulationLoop->workerException;
 	}
+	bool isRunning(){ return OMEGA.isRunning(); }
+	python::object get_filename(){ string f=OMEGA.getSimulationFileName(); if(f.size()>0) return python::object(f); return python::object();}
 	void load(std::string fileName) {
 		Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; 
 		OMEGA.setSimulationFileName(fileName);
@@ -522,6 +525,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\n* assigning zero enables dynamic Δt control via a :yref:`TimeStepper` (raises an exception if there is no :yref:`TimeStepper` among :yref:`O.engines<Omega.engines>`)\n* assigning negative value enables dynamic Δt (as in the previous case) and sets positive timestep ``O.dt=|Δt|`` (will be used until the timestepper is run and updates it)\n* assigning positive value sets Δt to that value and disables dynamic Δt (via :yref:`TimeStepper`, if there is one).\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
 		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
+		.add_property("dynDtAvailable",&pyOmega::dynDtAvailable_get,"Whether a :yref:`TimeStepper` is amongst :yref:`O.engines<Omega.engines>`, activated or not.")
 		.def("load",&pyOmega::load,"Load simulation from file.")
 		.def("reload",&pyOmega::reload,"Reload current simulation")
 		.def("save",&pyOmega::save,"Save current simulation to file (should be .xml or .xml.bz2)")
@@ -533,6 +537,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("pause",&pyOmega::pause,"Stop simulation execution. (May be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
+		.add_property("running",&pyOmega::isRunning,"Whether background thread is currently running a simulation.")
+		.add_property("filename",&pyOmega::get_filename,"Filename under which the current simulation was saved (None if never saved).")
 		.def("reset",&pyOmega::reset,"Reset simulations completely (including another scene!).")
 		.def("resetThisScene",&pyOmega::resetThisScene,"Reset current scene.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
