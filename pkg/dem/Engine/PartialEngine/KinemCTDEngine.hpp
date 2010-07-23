@@ -9,7 +9,6 @@
 #pragma once
 
 #include<yade/pkg-dem/KinemSimpleShearBox.hpp>
-#include<yade/core/Body.hpp>
 
 
 class KinemCTDEngine : public KinemSimpleShearBox

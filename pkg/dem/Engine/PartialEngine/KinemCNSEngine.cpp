@@ -10,9 +10,6 @@
 
 #include<yade/pkg-dem/KinemCNSEngine.hpp>
 
-#include<yade/core/State.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include<yade/lib-base/Math.hpp>
 
 YADE_PLUGIN((KinemCNSEngine));
 
@@ -26,6 +23,7 @@ void KinemCNSEngine::action()
 	{
 		computeDY(KnC);
 		letMove(shearSpeed * dt,deltaH);
+		gamma+=shearSpeed * dt;
 		if(temoin==0)
 		{
 			temoin=1;

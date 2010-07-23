@@ -8,7 +8,6 @@
 
 #pragma once
 
-// #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Math.hpp>
@@ -38,16 +37,16 @@ class KinemSimpleShearBox : public BoundaryController
 		void 	computeAlpha()
 			,computeScontact()
 			,stopMovement() // to cancel all velocities when end of the loading is reached
-			,letMove(Real dH,Real dgamma) //dH and dgamma being computed by different ways in the different Kinem... Engines
-			,computeStiffness() // useful for CNL and CNS loads
-			,computeDY(Real KnC) // useful for CNL and CNS loads
+			,letMove(Real dgamma,Real dH) //dgamma and dH being computed by different ways in the different Kinem... Engines
+			,computeStiffness() // computes the stiffness of the contact sample - upper side. Useful for CNL and CNS loads
+			,computeDY(Real KnC) // computes vertical displacement to perform to obey to the stiffness of the shear wanted : KnC. Useful for CNL (for which KnC = 0) and CNS loads
 			,setBoxes_Dt()
 			;
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemSimpleShearBox,BoundaryController,
-			 "This class is supposed to be a mother class for all Engines performing loadings on the simple shear box of :yref:`SimpleShear`. Its declaration and implentation will thus contain all what is useful for all Engines",
+			 "This class is supposed to be a mother class for all Engines performing loadings on the simple shear box of :yref:`SimpleShear`. It is not intended to be used by itself, but its declaration and implentation will thus contain all what is useful for all these Engines. The script simpleShear.py illustrates the use of the various corresponding Engines.",
 			((Real,alpha,Mathr::PI/2.0,"the angle from the lower box to the left box (trigo wise). Measured by this Engine, not to be changed by the user."))
-			((std::vector<Real>,temoin_save,,"vector (same length as 'gamma_save'), with 0 or 1 depending whether the save for the corresponding value of gamma has been done (1) or not (0). Not to be changed by the user."))
+			((std::vector<Real>,temoin_save,,"vector (same length as 'gamma_save' for ex), with 0 or 1 depending whether the save for the corresponding value of gamma has been done (1) or not (0). Not to be changed by the user."))
 			((body_id_t,id_topbox,3,"the id of the upper wall"))
 			((body_id_t,id_boxbas,1,"the id of the lower wall"))
 			((body_id_t,id_boxleft,0,"the id of the left wall"))
@@ -56,9 +55,9 @@ class KinemSimpleShearBox : public BoundaryController
 			((body_id_t,id_boxback,4,"the id of the wall at the back of the sample"))
 			((Real,max_vel,1.0,"to limit the speed of the vertical displacements done to control $\\sigma$ (CNL or CNS cases) [$m/s$]"))
 			((Real,wallDamping,0.2,"the vertical displacements done to to control $\\sigma$ (CNL or CNS cases) are in fact damped, through this wallDamping"))
-			((bool,firstRun,true,"boolean set to false as soon as the engine has done its job one time : usefull to know if initial height of, and normal force sustained by, the upper box are known or not (and thus if they have to be initialized)"))
-			((Real,F0,0.0,"the (vertical) force acting on the upper plate on the very first time step (determined by the Engine). Controls of the loadings in case of :yref:`KinemCNSEngine` or :yref:`KinemCNLEngine` will be done according to this initial value [$N$]"))
-			((Real,Y0,0.0,"the height of the upper plate at the very first time step : the engine finds its value [$m$]"))
+			((bool,firstRun,true,"boolean set to false as soon as the engine has done its job one time : usefull to know if initial height of, and normal force sustained by, the upper box are known or not (and thus if they have to be initialized). Not to be changed by the user."))
+			((Real,f0,0.0,"the (vertical) force acting on the upper plate on the very first time step (determined by the Engine). Controls of the loadings in case of :yref:`KinemCNSEngine` or :yref:`KinemCNLEngine` will be done according to this initial value [$N$. Not to be changed by the user.]"))
+			((Real,y0,0.0,"the height of the upper plate at the very first time step : the engine finds its value [$m$]. Not to be changed by the user."))
 			((bool,LOG,false,"boolean controling the output of messages on the screen")) //FIXME : surely something better to use here
 			((string,Key,"","string to add at the names of the saved files")),
 /*			leftbox = Body::byId(id_boxleft,scene);

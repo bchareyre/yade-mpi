@@ -7,9 +7,6 @@
 *************************************************************************/
 
 #include<yade/pkg-dem/KinemCTDEngine.hpp>
-#include<yade/core/State.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include <yade/core/Scene.hpp>
 
 
 YADE_PLUGIN((KinemCTDEngine));
@@ -37,7 +34,7 @@ void KinemCTDEngine::action()
 // 			cout << "Maintenant (toujours dans le if temoin!=0), temoin =" <<lexical_cast<string>(temoin) << endl;
 		}
 		
-		letMove(-compSpeed*dt,0.0);
+		letMove(0.0,-compSpeed*dt);
 	}
 	else if (temoin==0)
 	{
@@ -69,19 +66,6 @@ void KinemCTDEngine::action()
 
 }
 
-
-// void KinemCTDEngine::computeAlpha()
-// {
-// 	Quaternionr orientationLeftBox,orientationRightBox;
-// 	orientationLeftBox = leftbox->state->ori;
-// 	orientationRightBox = rightbox->state->ori;
-// 	if(orientationLeftBox!=orientationRightBox)
-// 	{
-// 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
-// 	}
-// 	AngleAxisr aa(orientationLeftBox);
-// 	alpha=Mathr::PI/2.0-aa.angle();		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
-// }
 
 
 

@@ -9,17 +9,12 @@
 #pragma once
 
 #include<yade/pkg-dem/KinemSimpleShearBox.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/lib-base/Math.hpp>
-#include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 
 
 class KinemCNSEngine : public KinemSimpleShearBox
 {
 	private :
-		shared_ptr<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> myLdc;
-
 		int	temoin,it_stop
 			;
 
@@ -36,6 +31,7 @@ class KinemCNSEngine : public KinemSimpleShearBox
 		((Real,gamma,0.0,"current value of tangential displacement [m]"))
 		((Real,KnC,10.0e6,"the normal rigidity choosen by the user [MPa/mm] - the conversion in Pa/m will be made")),
 		temoin=0;
+		it_stop=0;
 	);
 
 };

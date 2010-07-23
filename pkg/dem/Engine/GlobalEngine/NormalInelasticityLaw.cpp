@@ -16,7 +16,7 @@ YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 
 
 
-void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
+void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact)
 {
 
 	const Real& dt = scene->dt;
@@ -48,11 +48,11 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 
 	Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
 // 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
-	Real un = currentContactGeometry->penetrationDepth; // compte positivement lorsq vraie interpenetration
+	Real un = currentContactGeometry->penetrationDepth; // >0 for real penetration
 	
 // 	cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << currentContactPhysics->previousun << " et previousFn =" << currentContactPhysics->previousFn << endl;
 	
-	if(un >= currentContactPhysics->unMax)	// on est en charge, et au delà et sur la "droite principale"
+	if(un >= currentContactPhysics->unMax)	// case of virgin load : on the "principal line" (limit state of the (un,Fn) space)
 	{
 		Fn = currentContactPhysics->knLower*un;
 		currentContactPhysics->unMax = std::abs(un);
@@ -63,12 +63,12 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 		currentContactPhysics->kn = currentContactPhysics->knLower* Mat1->coeff_dech;
 		Fn = currentContactPhysics->previousFn + currentContactPhysics->kn * (un-currentContactPhysics->previousun);	// Calcul incrémental de la nvlle force
 // 		cout << "je suis dans l'autre calcul" << endl;
-		if(std::abs(Fn) > std::abs(currentContactPhysics->knLower * un))		// verif qu'on ne depasse la courbe
+		if(std::abs(Fn) > std::abs(currentContactPhysics->knLower * un))	// check the limit state is not violated
 		{
 		    Fn = currentContactPhysics->knLower*un;
 // 		    cout <<  "j'etais dans l'autre calcul mais j'ai corrige pour ne pas depasser la limite" << endl;
 		}
-		if(Fn < 0.0 )	// verif qu'on reste positif
+		if(Fn < 0.0 )	// check to stay >=0
 		{
 			Fn = 0;
 // 			cout << "j'ai corrige pour ne pas etre negatif" << endl;
@@ -76,6 +76,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 	}
 	currentContactPhysics->normalForce	= Fn*currentContactGeometry->normal;
 // 	cout << "Fn appliquee " << Fn << endl << endl;
+
 	// actualisation :
 	currentContactPhysics->previousFn = Fn;
 	currentContactPhysics->previousun = un;
@@ -153,8 +154,6 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
                 }
 
 
-                //////// PFC3d SlipModel
-
                 Vector3r f	= currentContactPhysics->normalForce + shearForce;
 		scene->forces.addForce (id1,-f);
 		scene->forces.addForce (id2, f);
@@ -162,7 +161,8 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 		scene->forces.addTorque(id2, c2x.cross(f));
 
 
-	// Moment law					 	 ///
+//	********	Moment law				*******	 //
+
 		if(momentRotationLaw)
 		{
 			{// updates only orientation of contact (local coordinate system)
@@ -178,7 +178,6 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 			AngleAxisr aa(delta); // aa.axis() of rotation - this is the Moment direction UNIT vector; angle represents the power of resistant ELASTIC moment
 			if(angle > Mathr::PI) angle -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
 
-	//This indentation is a rewrite of original equations (the two commented lines), should work exactly the same.
 //Real elasticMoment = currentContactPhysics->kr * std::abs(angle); // positive value (*)
 
 			Real angle_twist(aa.angle() * aa.axis().dot(currentContactGeometry->normal) );
@@ -187,8 +186,6 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 
 			Vector3r axis_bending(aa.angle()*aa.axis() - axis_twist);
 			Vector3r moment_bending(axis_bending * currentContactPhysics->kr);
-
-//Vector3r moment = aa.axis() * elasticMoment * (aa.angle()<0.0?-1.0:1.0); // restore sign. (*)
 
 			Vector3r moment = moment_twist + moment_bending;
 
@@ -206,7 +203,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<Intera
 			scene->forces.addTorque(id1,-moment);
 			scene->forces.addTorque(id2, moment);
 		}
-	// Moment law	END				 	 ///
+//	********	Moment law END				*******	 //
 
                 currentContactPhysics->prevNormal = currentContactGeometry->normal;
 //             }

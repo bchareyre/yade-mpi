@@ -8,7 +8,6 @@
 
 #pragma once
 
-// #include<yade/core/GlobalEngine.hpp> // a remplacer par :
 #include<yade/pkg-common/LawFunctor.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/NormalInelasticityPhys.hpp>
@@ -20,7 +19,7 @@
 class Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 {
 	public :
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*);
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
 
 	FUNCTOR2D(ScGeom,NormalInelasticityPhys);
 

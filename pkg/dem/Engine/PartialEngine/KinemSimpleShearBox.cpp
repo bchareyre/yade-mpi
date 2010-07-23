@@ -44,7 +44,7 @@ void KinemSimpleShearBox::computeScontact()
 
 }
 
-void KinemSimpleShearBox::letMove(Real dY, Real dX)
+void KinemSimpleShearBox::letMove(Real dX, Real dY)
 {
 
 	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
@@ -94,7 +94,6 @@ void KinemSimpleShearBox::letMove(Real dY, Real dX)
 	rightbox->state->ori	= qcorr*rightbox->state->ori;
 	rightbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
-// 	gamma+=dX;
 }
 
 void KinemSimpleShearBox::stopMovement()
@@ -160,7 +159,7 @@ void KinemSimpleShearBox::setBoxes_Dt()
 void KinemSimpleShearBox::computeDY(Real KnC)
 {
 
-	scene->forces.sync(); Vector3r F_sup=scene->forces.getForce(id_topbox);
+	scene->forces.sync(); Vector3r fSup=scene->forces.getForce(id_topbox);
 	
 	if(firstRun)
 	{
@@ -180,19 +179,23 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 // 		}
 
 		alpha=Mathr::PI/2.0;;
-		Y0 = topbox->state->pos.y();
-		cout << "Y0 initialise à : " << Y0 << endl;
-		F0 = F_sup.y();
+		y0 = topbox->state->pos.y();
+// 		cout << "y0 initialise à : " << y0 << endl;
+		f0 = fSup.y();
 		firstRun=false;
 	}
 		
 
 	computeStiffness();
-	Real Hcurrent = topbox->state->pos.y();
-	Real Fdesired = F0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired, with the fact that KnC is in MPa/mm 
+	Real hCurrent = topbox->state->pos.y();
+	computeScontact();
+	Real fDesired = f0 + KnC * 1.0e9 * Scontact * (hCurrent-y0); // The value of the force desired, with the fact that KnC is in MPa/mm 
+// 	cout << "Je veux atteindre a cet it fDesired = "<< fDesired << endl;
+// 	cout << "Alors que f0 =  = "<< f0 << endl;
+// 	cout << "Car terme correctif = " << KnC * 1.0e9 * Scontact * (hCurrent-y0)<< endl;
 
 // Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : => INUTILE maintenant ?
-// 	if( F_sup.y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
+// 	if( fSup.y() > fDesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
 // 		stiffness *= coeff_dech;
 
 	if( (stiffness==0) )
@@ -202,10 +205,10 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 	}
 	else
 	{
-		deltaH = ( F_sup.y() - ( Fdesired ))/(stiffness);
+		deltaH = ( fSup.y() -  fDesired )/(stiffness);
 	}
 
-	if(LOG) cout << "Alors q je veux KnC = " << KnC << " depuis F0 = " << F0 << " et Y0 = " << Y0 << endl;
+	if(LOG) cout << "Alors q je veux KnC = " << KnC << " depuis f0 = " << f0 << " et y0 = " << y0 << endl;
 	if(LOG) cout << "deltaH a permettre normalement :" << deltaH << endl;
 
 	deltaH = (1-wallDamping)*deltaH;
