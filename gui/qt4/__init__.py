@@ -2,8 +2,8 @@
 from PyQt4.QtGui import *
 from PyQt4 import QtCore
 
-from ui_controller import Ui_Controller
-from SerializableEditor import SerializableEditor,SeqSerializable
+from yade.qt.ui_controller import Ui_Controller
+from yade.qt.SerializableEditor import SerializableEditor,SeqSerializable
 from yade import *
 import yade.system
 

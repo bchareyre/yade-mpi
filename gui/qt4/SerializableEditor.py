@@ -216,8 +216,8 @@ class SerializableEditor(QWidget):
 		self.refreshTimer.stop()
 
 
-import sys; sys.path.append('.')
-from ui_SeqSerializable import Ui_SeqSerializable
+#import sys; sys.path.append('.')
+from yade.qt.ui_SeqSerializable import Ui_SeqSerializable
 
 class SeqSerializable(QFrame,Ui_SeqSerializable):
 	def __init__(self,parent,getter,setter,serType):
