@@ -3,21 +3,23 @@ Import('*')
 linkPlugins=env['linkPlugins']
 
 if 'qt4' in env['features']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/qt4',[
+	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/qt',[
 		env.File('qt4/img_rc.py'),
 		env.File('qt4/ui_controller.py'),
+		env.File('qt4/ui_SeqSerializable.py'),
 		env.File('qt4/SerializableEditor.py'),
 		env.File('qt4/__init__.py'),
-		env.SharedLibrary('_GLViewer',['qt4/_GLViewer.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['GLViewer'],RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')])
+		env.SharedLibrary('_GLViewer',['qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['GLViewer'],RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')])
 	])
 	env.Command('qt4/img_rc.py','qt4/img.qrc','pyrcc4 -o $buildDir/gui/qt4/img_rc.py gui/qt4/img.qrc')
 	env.Command('qt4/ui_controller.py','qt4/controller.ui','pyuic4 -o $buildDir/gui/qt4/ui_controller.py gui/qt4/controller.ui')
+	env.Command('qt4/ui_SeqSerializable.py','qt4/SeqSerializable.ui','pyuic4 -o $buildDir/gui/qt4/ui_SeqSerializable.py gui/qt4/SeqSerializable.ui')
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
-		env.SharedLibrary('GLViewer',['qt4/GLViewer.cpp'],LIBS=env['LIBS']+['qglviewer-qt4']+linkPlugins(['OpenGLRenderingEngine']))
+		env.SharedLibrary('GLViewer',['qt4/GLViewer.cpp'],LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['OpenGLRenderer']))
 	])
 		
 
-if 'opengl' in env['features'] and not 'noqt3' in env['features']:
+if 'opengl' in env['features'] and 'qt3' in env['features']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 		env.SharedLibrary('QtGUI',
 			['qt3/FileDialog.cpp',
@@ -35,8 +37,9 @@ if 'opengl' in env['features'] and not 'noqt3' in env['features']:
 				'qt3/QtFileGeneratorController.ui'],
 			LIBS=[# 'PythonUI',
 				'yade-serialization-qt',
-				linkPlugins(['GravityEngines','OpenGLRenderingEngine']),
-				'qglviewer-qt3'],
+				linkPlugins(['GravityEngines','OpenGLRenderer']),
+				env['QGLVIEWER_LIB']
+			],
 			CPPPATH=env['CPPPATH']+['qt3']
 		),
 		env.SharedLibrary('SnapshotEngine',['qt3/SnapshotEngine.cpp'],LIBS=env['LIBS']+['QtGUI','qglviewer-qt3']+linkPlugins(['PeriodicEngines']),CPPPATH=env['CPPPATH']+['qt3']),

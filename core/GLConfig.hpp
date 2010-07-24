@@ -6,7 +6,7 @@
 /*! Storage for general 3d view settings.
 
 Is saved along with simulation and passed to every call to render(...).
-Contains more or less what used to be inside OpenGLRenderingEngine.
+Contains more or less what used to be inside OpenGLRenderer.
 
 */
 class GLConfig: public Serializable{

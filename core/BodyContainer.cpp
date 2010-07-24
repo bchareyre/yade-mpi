@@ -3,9 +3,7 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/Body.hpp>
 
-#ifdef YADE_BOOST_SERIALIZATION
-	BOOST_CLASS_EXPORT(BodyContainer);
-#endif
+BOOST_CLASS_EXPORT(BodyContainer);
 
 unsigned int BodyContainer::findFreeId(){
 	unsigned int max=body.size();

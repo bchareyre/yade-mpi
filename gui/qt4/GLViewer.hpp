@@ -3,7 +3,7 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-common/OpenGLRenderingEngine.hpp>
+#include<yade/pkg-common/OpenGLRenderer.hpp>
 
 #include<QGLViewer/qglviewer.h>
 #include<QGLViewer/constraint.h>
@@ -39,9 +39,10 @@ class GLViewer : public QGLViewer
 	
 	friend class QGLThread;
 	protected:
-		shared_ptr<OpenGLRenderingEngine> renderer;
+		shared_ptr<OpenGLRenderer> renderer;
 
 	private :
+
 		bool			isMoving;
 		bool			wasDynamic;
 		float			cut_plane;
@@ -54,7 +55,9 @@ class GLViewer : public QGLViewer
 		boost::posix_time::ptime last_user_event;
 
      public:
-		virtual void updateGL(void);
+		//virtual void updateGL(void);
+
+		const int viewId;
 
 		void centerMedianQuartile();
 		bool 			drawGridXYZ[3];
@@ -62,9 +65,11 @@ class GLViewer : public QGLViewer
 		int timeDispMask;
 		enum{TIME_REAL=1,TIME_VIRT=2,TIME_ITER=4};
 
-		GLViewer();
+		GLViewer(int viewId, const shared_ptr<OpenGLRenderer>& renderer, QGLWidget* shareWidget=0);
 		virtual ~GLViewer();
-		virtual void paintGL();
+		#if 0
+			virtual void paintGL();
+		#endif
 		virtual void draw();
 		virtual void drawWithNames();
 		void displayMessage(const std::string& s){ QGLViewer::displayMessage(QString(s.c_str()));}
@@ -79,9 +84,9 @@ class GLViewer : public QGLViewer
 		string getState();
 		//! set QGLViewer state from string (XML); QGLVIewer normally only supports loading state from file.
 		void setState(string);
-		//! Load display parameters (QGLViewer and OpenGLRenderingEngine) from Scene::dispParams[n] and use them
+		//! Load display parameters (QGLViewer and OpenGLRenderer) from Scene::dispParams[n] and use them
 		void useDisplayParameters(size_t n);
-		//! Save display parameters (QGOViewer and OpenGLRenderingEngine) to Scene::dispParams[n]
+		//! Save display parameters (QGOViewer and OpenGLRenderer) to Scene::dispParams[n]
 		void saveDisplayParameters(size_t n);
 		//! Get radius of the part of scene that fits the current view
 		float displayedSceneRadius();
@@ -92,7 +97,6 @@ class GLViewer : public QGLViewer
 		QDomElement domElement(const QString& name, QDomDocument& document) const;
 		//! Adds our attributes to the QGLViewer state that can be restored
 		void initFromDOMElement(const QDomElement& element);
-		int viewId;
 
 		// if defined, snapshot will be saved to this file right after being drawn and the string will be reset.
 		// this way the caller will be notified of the frame being saved successfully.
@@ -111,7 +115,7 @@ class GLViewer : public QGLViewer
 		virtual void postDraw();
 		// overridden in the player that doesn't get time from system clock but from the db
 		virtual string getRealTimeString();
-		//virtual void closeEvent(QCloseEvent *e);
+		virtual void closeEvent(QCloseEvent *e);
 		virtual void postSelection(const QPoint& point);
 		virtual void endSelection(const QPoint &point);
 		virtual void mouseDoubleClickEvent(QMouseEvent *e);
@@ -144,10 +148,3 @@ class YadeCamera : public qglviewer::Camera
 		virtual float zNear() const;
 		virtual void setCuttingDistance(float s){cuttingDistance=s;};
 };
-
-struct GLGlobals{
-	static std::vector<shared_ptr<GLViewer> > viewers;
-	static shared_ptr<OpenGLRenderingEngine> renderer;
-	static QTimer redrawTimer;
-};
-

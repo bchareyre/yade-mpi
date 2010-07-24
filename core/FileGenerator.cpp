@@ -4,7 +4,6 @@
 *************************************************************************/
 
 #include<cstdlib>
-#include<yade/lib-multimethods/MultiMethodsExceptions.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 
 #include<yade/core/Omega.hpp>
@@ -27,12 +26,12 @@ void FileGenerator::setFileName(const string& fileName)
 	outputFileName=fileName;
 }
 
-
+#ifndef YADE_NO_YADE_SERIALIZATION
 void FileGenerator::setSerializationLibrary(const string& lib) 
 { 
 	serializationDynlib=lib;
 }
-
+#endif
 
 bool FileGenerator::generate() 
 {
@@ -49,9 +48,6 @@ bool FileGenerator::generateAndSave()
 	try {
 		status=generate(); // will modify message
 	}
-	catch(SerializableError& e){message+=string("SeriazableError: ")+e.what(); return false;}
-	catch(FactoryError& e){message+=string("FactoryError: ")+e.what(); return false;}
-	catch(MultiMethodsError& e){message+=string("MultiMethodsError: ")+e.what(); return false;}
 	catch(std::exception& e){
 		LOG_FATAL("Unhandled exception: "<<typeid(e).name()<<" : "<<e.what());
 		//abort(); // use abort, since we may want to inspect core
@@ -69,13 +65,9 @@ bool FileGenerator::generateAndSave()
 		setProgress(1.0);
 		try
 		{
-			#ifdef YADE_SERIALIZE_USING_BOOST
-				yade::ObjectIO::save(outputFileName,"scene",rootBody);
-			#else
-				IOFormatManager::saveToFile(serializationDynlib, outputFileName, "scene", rootBody);
-			#endif
+			yade::ObjectIO::save(outputFileName,"scene",rootBody);
 		}
-		catch(SerializableError& e)
+		catch(const std::runtime_error& e)
 		{
 			message+=std::string("File "+outputFileName+" cannot be saved: "+e.what());
 			return false;

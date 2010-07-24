@@ -78,13 +78,7 @@ struct PointerHandler<shared_ptr<PointedType> >
 			{
 				// FIXME : creating pointer to custom class is not working!
 
-				std::string error = FactoryExceptions::CantCreateClass + name + "  - Because pointers to custom class are not working!";
-				throw FactoryCantCreate(error.c_str());
-
-//				void * newInstance 	= ClassFactory::instance().createPureCustom(typeStr);
-//				tmpPtr		= any_cast< shared_ptr<PointedType>* >(ac.getAddress());
-//				*tmpPtr 	= shared_ptr<PointedType>(reinterpret_cast<PointedType*>(newInstance));
-//				newAc 		= Archive::create(name,**tmpPtr);
+				throw std::runtime_error(("Class "+name+" could not be factored in the ClassFactory [pointers to custom classes are not working].").c_str());
 			}
 		}
 		else

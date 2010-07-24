@@ -14,7 +14,6 @@
 
 #include<yade/lib-factory/ClassFactory.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-multimethods/MultiMethodsExceptions.hpp>
 #include<yade/lib-loki/Functor.hpp>
 #include<yade/lib-loki/Typelist.hpp>
 #include<yade/lib-loki/TypeManip.hpp>
@@ -223,7 +222,6 @@ class DynLibDispatcher
  	public  : shared_ptr<Executor> makeExecutor(string libName)
 		  {
 			shared_ptr<Executor> executor;
-			try
 			{
 				executor = dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
 				if (!executor){ //dynamic_cast_failed for some reason so try with static_cast
@@ -231,11 +229,6 @@ class DynLibDispatcher
 					//abort();
 					executor = static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
 				}
-			}
-			catch (FactoryCantCreate& fe)
-			{
-				string error = string(fe.what()) + " -- " + MultiMethodsExceptions::NotExistingClass + libName;	
-				throw MultiMethodsNotExistingClass(error.c_str());
 			}
 
 			assert(executor);
@@ -358,8 +351,7 @@ class DynLibDispatcher
 					callBacksInfo	[index1][index2] = 1; // this is reversed call
 				} else
 				{
-					string err = MultiMethodsExceptions::UndefinedOrder + libName;
-					throw MultiMethodsUndefinedOrder(err.c_str());
+					throw std::runtime_error(("Multimethods: checkOrder: undefined dispatch order for "+libName).c_str());
 				}
 			}
 			else // classes are different, no symmetry possible

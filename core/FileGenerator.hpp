@@ -20,13 +20,16 @@ class FileGenerator
 {
 	protected :
 		shared_ptr<Scene>	 rootBody;
-		string serializationDynlib;
+		#ifndef YADE_NO_YADE_SERIALIZATION
+			string serializationDynlib;
+		public:
+			void setSerializationLibrary(const string& lib);
+			std::string getSerializationLibrary() {return serializationDynlib;};
+		#endif
 	public :
 		bool generateAndSave();
 		void setFileName(const string& fileName);
-		void setSerializationLibrary(const string& lib);
 		std::string getFileName() {return outputFileName;}; // stupid? better make that variable public.. ech.
-		std::string getSerializationLibrary() {return serializationDynlib;};
 		//! Describes the result in a user-readable form.
 		std::string message;
 		
@@ -41,7 +44,10 @@ class FileGenerator
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(FileGenerator,Serializable,"Base class for scene generators, preprocessors.",
 		((string,outputFileName,"./scene.xml","Filename to write resulting simulation to")),
-		/* ctor */ serializationDynlib="XMLFormatManager";,
+		#ifndef YADE_NO_YADE_SERIALIZATION
+			/* ctor */ serializationDynlib="XMLFormatManager";
+		#endif
+		,
 		.def("generate",&FileGenerator::pyGenerate,(python::arg("out")),"Generate scene, save to given file")
 		.def("load",&FileGenerator::pyLoad,"Generate scene, save to temporary file and load immediately");
 	);

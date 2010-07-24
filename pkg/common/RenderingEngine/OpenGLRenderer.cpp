@@ -1,7 +1,7 @@
 // © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-#include"OpenGLRenderingEngine.hpp"
+#include"OpenGLRenderer.hpp"
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/core/Timing.hpp>
@@ -18,14 +18,14 @@
 #  include <GL/glut.h>
 #endif
 
-YADE_PLUGIN((OpenGLRenderingEngine));
+YADE_PLUGIN((OpenGLRenderer));
 YADE_REQUIRE_FEATURE(OPENGL)
-CREATE_LOGGER(OpenGLRenderingEngine);
+CREATE_LOGGER(OpenGLRenderer);
 
-bool OpenGLRenderingEngine::initDone=false;
-const int OpenGLRenderingEngine::numClipPlanes;
+bool OpenGLRenderer::initDone=false;
+const int OpenGLRenderer::numClipPlanes;
 
-void OpenGLRenderingEngine::init(){
+void OpenGLRenderer::init(){
 	map<string,DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di){
@@ -53,11 +53,11 @@ void OpenGLRenderingEngine::init(){
 	// reported http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01482.html
 	#if 0
 		int e=glGetError();
-		if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderingEngine::init returned GL error ")+lexical_cast<string>(e)).c_str());
+		if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderer::init returned GL error ")+lexical_cast<string>(e)).c_str());
 	#endif
 }
 
-void OpenGLRenderingEngine::setBodiesRefSe3(){
+void OpenGLRenderer::setBodiesRefSe3(){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
 	scene->cell->refSize=scene->cell->getSize();
@@ -65,7 +65,7 @@ void OpenGLRenderingEngine::setBodiesRefSe3(){
 }
 
 
-void OpenGLRenderingEngine::initgl(){
+void OpenGLRenderer::initgl(){
 	LOG_DEBUG("(re)initializing GL for gldraw methods.\n");
 	BOOST_FOREACH(vector<string>& s,stateFunctorNames) (static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,boundFunctorNames)	(static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
@@ -74,7 +74,7 @@ void OpenGLRenderingEngine::initgl(){
 	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames) (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 }
 
-void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
+void OpenGLRenderer::renderWithNames(const shared_ptr<Scene>& _scene){
 	scene=_scene;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->shape) continue;
@@ -92,14 +92,14 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
 	}
 };
 
-bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
+bool OpenGLRenderer::pointClipped(const Vector3r& p){
 	if(numClipPlanes<1) return false;
 	for(int i=0;i<numClipPlanes;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).dot(clipPlaneNormals[i])<0) return true;
 	return false;
 }
 
 
-void OpenGLRenderingEngine::setBodiesDispInfo(){
+void OpenGLRenderer::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
 	bool scaleRotations=(rotScale!=1.0);
 	bool scaleDisplacements=(dispScale!=Vector3r::Ones());
@@ -126,7 +126,7 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 }
 
 // draw periodic cell, if active
-void OpenGLRenderingEngine::drawPeriodicCell(){
+void OpenGLRenderer::drawPeriodicCell(){
 	if(!scene->isPeriodic) return;
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
@@ -139,14 +139,14 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glPopMatrix();
 }
 
-void OpenGLRenderingEngine::resetSpecularEmission(){
+void OpenGLRenderer::resetSpecularEmission(){
 	const GLfloat specular[4]={.3,.3,.3,1};
 	const GLfloat emission[4]={0,0,0,0};
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular);
 	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
 }
 
-void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
+void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,body_id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
 	if(!initDone) init();
 	assert(initDone);
@@ -211,7 +211,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 	if (intrPhys) renderInteractionPhysics();
 }
 
-void OpenGLRenderingEngine::renderAllInteractionsWire(){
+void OpenGLRenderer::renderAllInteractionsWire(){
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 		glColor3v(i->isReal()? Vector3r(0,1,0) : Vector3r(.5,0,1));
 		Vector3r p1=Body::byId(i->getId1(),scene)->state->pos;
@@ -225,7 +225,7 @@ void OpenGLRenderingEngine::renderAllInteractionsWire(){
 	}
 }
 
-void OpenGLRenderingEngine::renderDOF_ID(){	
+void OpenGLRenderer::renderDOF_ID(){	
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
 	FOREACH(const shared_ptr<Body> b, *scene->bodies){
@@ -257,7 +257,7 @@ void OpenGLRenderingEngine::renderDOF_ID(){
 	}
 }
 
-void OpenGLRenderingEngine::renderInteractionGeometry(){	
+void OpenGLRenderer::renderInteractionGeometry(){	
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -270,7 +270,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(){
 }
 
 
-void OpenGLRenderingEngine::renderInteractionPhysics(){	
+void OpenGLRenderer::renderInteractionPhysics(){	
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -283,7 +283,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(){
 	}
 }
 
-void OpenGLRenderingEngine::renderBoundingVolume(){	
+void OpenGLRenderer::renderBoundingVolume(){	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
@@ -307,7 +307,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(){
 }
 
 
-void OpenGLRenderingEngine::renderShape()
+void OpenGLRenderer::renderShape()
 {
 	// Additional clipping planes: http://fly.srk.fer.hr/~unreal/theredbook/chapter03.html
 	#if 0
@@ -385,7 +385,7 @@ void OpenGLRenderingEngine::renderShape()
 
 
 
-void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
+void OpenGLRenderer::postProcessAttributes(bool deserializing){
 	if(!deserializing) return;
 	for(unsigned int i=0;i<boundFunctorNames.size();i++) boundDispatcher.add1DEntry(boundFunctorNames[i][0],boundFunctorNames[i][1]);
 	for(unsigned int i=0;i<shapeFunctorNames.size();i++) shapeDispatcher.add1DEntry(shapeFunctorNames[i][0],shapeFunctorNames[i][1]);
@@ -393,23 +393,23 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
 }
-void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str2){
+void OpenGLRenderer::addInteractionGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); interactionGeometryFunctorNames.push_back(v);
 }
-void OpenGLRenderingEngine::addInteractionPhysicsFunctor(const string& str2){
+void OpenGLRenderer::addInteractionPhysicsFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); interactionPhysicsFunctorNames.push_back(v);
 }
-void OpenGLRenderingEngine::addStateFunctor(const string& str2){
+void OpenGLRenderer::addStateFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); stateFunctorNames.push_back(v);
 }
-void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str2){
+void OpenGLRenderer::addBoundingVolumeFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); boundFunctorNames.push_back(v);
 }
-void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2){
+void OpenGLRenderer::addInteractingGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); shapeFunctorNames.push_back(v);
 }

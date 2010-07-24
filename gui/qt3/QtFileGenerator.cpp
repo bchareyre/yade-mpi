@@ -119,15 +119,7 @@ void QtFileGenerator::displayFileGeneratorAttributes(shared_ptr<FileGenerator>& 
 
 void QtFileGenerator::cbGeneratorNameActivated(const QString& name)
 {
-//	try { // FIXME - should it be here or not?
 	shared_ptr<FileGenerator> fg = static_pointer_cast<FileGenerator>(ClassFactory::instance().createShared(name));
-/* 	}
-	catch (FactoryError& e)
-	{
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("Error: ") + e.what(),this->parentWidget()->parentWidget()));
-		md->exec();
-	}
-*/
 	displayFileGeneratorAttributes(fg);
 }
 

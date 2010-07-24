@@ -109,9 +109,9 @@ profile=env['profile']
 print '@@@ Using profile',profile,'('+optsFile+') @@@'
 
 # defaults for various profiles
-if profile=='default': defOptions={'debug':0,'variant':'','optimize':1,'linkStrategy':'monolithic'}
-elif profile=='dbg': defOptions={'debug':1,'variant':'-dbg','optimize':0,'linkStrategy':'per-class'}
-else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'linkStrategy':'per-class'}
+if profile=='default': defOptions={'debug':0,'variant':'','optimize':1,'chunkSize':10}
+elif profile=='dbg': defOptions={'debug':1,'variant':'-dbg','optimize':0,'chunkSize':1}
+else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'chunkSize':10}
 
 
 opts=Variables(optsFile)
@@ -139,13 +139,12 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','noqt3','qt4','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','noqt3','qt3','qt4','never_use_this_one']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
-	EnumVariable('linkStrategy','How to link plugins together',defOptions['linkStrategy'],['per-class','per-pkg[broken]','monolithic','static[broken]']),
 	('hotPlugins','Files (without the .cpp extension) that will be compiled separately even in the monolithic build (use for those that you modify frequently); comma-separated.',''),
-	('chunkSize','Maximum files to compile in one translation unit when building plugins. (unlimited if <= 0)',7,None,int),
+	('chunkSize','Maximum files to compile in one translation unit when building plugins. (unlimited if <= 0, per-file linkage is used if 1)',7,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2'), # hardy has vtk-5.0
@@ -165,6 +164,14 @@ opts.Update(env)
 
 if str(env['features'])=='all':
 	print 'ERROR: using "features=all" is illegal, since it breaks feature detection at runtime (SCons limitation). Write out all features separated by commas instead. Sorry.'
+	Exit(1)
+
+if 'noqt3' in env['features']:
+	print 'WARNING: noqt3 feature is deprecated, use qt4 instead.'
+	if 'qt4' not in env['features']: env['features'].append('qt4')
+
+if 'qt3' in env['features'] and 'qt4' in env['features']:
+	print 'ERROR: you specified both qt3 and qt4 features, which are mutually exclusive'
 	Exit(1)
 
 opts.Save(optsFile,env)
@@ -269,37 +276,7 @@ def CheckQt(context, qtdirs):
 			return ret
 	return False
 
-def CheckPython(context):
-	"Checks for functional python/c API. Sets variables if OK and returns true; otherwise returns false."
-	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH'],'LINKFLAGS':context.env['LINKFLAGS']}
-	context.Message('Checking for Python development files... ')
-	if 1:
-		try:
-			#FIXME: once caught, exception disappears along with the actual message of what happened...
-			import distutils.sysconfig as ds
-			context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split() if ds.get_config_var('LIBS') else None)
-			context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
-			ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
-			if not ret: raise RuntimeError
-		except (ImportError,RuntimeError,ds.DistutilsPlatformError):
-			for k in origs.keys(): context.env[k]=origs[k]
-			context.Result(False)
-			return False
-	else:
-		env.ParseConfig("python2.5-dbg-config --cflags")
-		env.ParseConfig("python2.5-dbg-config --ldflags")
-	context.Result(True)
-	return True
 
-def CheckPythonModule(context,modulename):
-	context.Message("Checking for python module `%s' ..."%modulename)
-	try:
-		exec("import %s"%modulename)
-		context.Result(True); return True
-	except ImportError:
-		context.Result(False); return False
-def CheckScientificPython(context): return CheckPythonModule(context,"Scientific")
-def CheckIPython(context): return CheckPythonModule(context,"IPython")
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
 	ret=context.TryLink('#include<iostream>\nint main(int argc, char**argv){std::cerr<<std::endl;return 0;}\n','.cpp')
@@ -311,39 +288,81 @@ def CheckLibStdCxx(context):
 	context.env['libstdcxx']=ret
 	context.Result(ret)
 	return ret
+
+def CheckPython(context):
+	"Checks for functional python/c API. Sets variables if OK and returns true; otherwise returns false."
+	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH'],'LINKFLAGS':context.env['LINKFLAGS']}
+	context.Message('Checking for Python development files... ')
+	try:
+		#FIXME: once caught, exception disappears along with the actual message of what happened...
+		import distutils.sysconfig as ds
+		context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split() if ds.get_config_var('LIBS') else None)
+		context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
+		ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
+		if not ret: raise RuntimeError
+	except (ImportError,RuntimeError,ds.DistutilsPlatformError):
+		for k in origs.keys(): context.env[k]=origs[k]
+		context.Result('error')
+		return False
+	context.Result('ok'); return True
+
+def CheckBoost(context):
+	context.Message('Checking boost libraries... ')
+	libs=[
+		('boost_system','boost/system/error_code.hpp','boost::system::error_code();',False),
+		('boost_thread','boost/thread/thread.hpp','boost::thread();',True),
+		('boost_date_time','boost/date_time/posix_time/posix_time.hpp','boost::posix_time::time_duration();',True),
+		('boost_filesystem','boost/filesystem/path.hpp','boost::filesystem::path();',True),
+		('boost_iostreams','boost/iostreams/device/file.hpp','boost::iostreams::file_sink("");',True),
+		('boost_regex','boost/regex.hpp','boost::regex("");',True),
+		('boost_serialization','boost/archive/archive_exception.hpp','try{} catch (const boost::archive::archive_exception& e) {};',True),
+		('boost_program_options','boost/program_options.hpp','boost::program_options::options_description o;',True),
+		('boost_python','boost/python.hpp','boost::python::scope();',True),
+	]
+	failed=[]
+	def checkLib_maybeMT(lib,header,func):
+		for LIB in (lib,lib+'-mt'):
+			LIBS=env['LIBS'][:]; context.env.Append(LIBS=[LIB])
+			if context.TryLink('#include<'+header+'>\nint main(void){'+func+';}','.cpp'): return True
+			env['LIBS']=LIBS
+		return False
+	for lib,header,func,mandatory in libs:
+		ok=checkLib_maybeMT(lib,header,func)
+		if not ok and mandatory: failed.append(lib)
+	if failed: context.Result('Failures: '+', '.join(failed)); return False
+	context.Result('all ok'); return True
+
+def CheckPythonModules(context):
+	context.Message("Checking for required python modules... ")
+	mods=[('IPython','ipython'),('numpy','python-numpy'),('matplotlib','python-matplotlib'),('Xlib','python-xlib')]
+	if 'qt4' in context.env['features']: mods.append(('PyQt4.QtGui','python-qt4'))
+	failed=[]
+	for m,pkg in mods:
+		try:
+			exec("import %s"%m)
+		except ImportError:
+			failed.append(m+' (package %s)'%pkg)
+	if failed: context.Result('Failures: '+', '.join(failed)); return False
+	context.Result('all ok'); return True
+
 	
 
 if not env.GetOption('clean'):
-	conf=env.Configure(custom_tests={'CheckLibStdCxx':CheckLibStdCxx,'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckIPython':CheckIPython},
-		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log')
-
+	conf=env.Configure(custom_tests={'CheckLibStdCxx':CheckLibStdCxx,'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckBoost':CheckBoost,'CheckPython':CheckPython,'CheckPythonModules':CheckPythonModules},
+		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log'
+	)
 	ok=True
 	ok&=conf.CheckCXX()
 	if not ok:
 			print "\nYour compiler is broken, no point in continuing. See `%s' for what went wrong and use the CXX/CXXFLAGS parameters to change your compiler."%(buildDir+'/config.log')
 			Exit(1)
 	conf.CheckLibStdCxx()
-	# check essential libs
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);',autoadd=1)
-
-	# gentoo has threaded flavour named differently and it must have precedence over the non-threaded one
-	def CheckLib_maybeMT(conf,lib,header,lang,func): return conf.CheckLibWithHeader(lib+'-mt',['limits.h',header],'c++',func,autoadd=1) or conf.CheckLibWithHeader(lib,['limits.h',header],lang,func,autoadd=1)
-	# in boost::filesystem>=1.35 depends on boost::system being explicitly linked to; if not present, we are probably in <=1.34, where boost::system didn't exist and wasn't needed either 
-	CheckLib_maybeMT(conf,'boost_system','boost/system/error_code.hpp','c++','boost::system::error_code(); /* non-essential */')
-	ok&=CheckLib_maybeMT(conf,'boost_thread','boost/thread/thread.hpp','c++','boost::thread();')
-	ok&=CheckLib_maybeMT(conf,'boost_date_time','boost/date_time/posix_time/posix_time.hpp','c++','boost::posix_time::time_duration();')
-	ok&=CheckLib_maybeMT(conf,'boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
-	ok&=CheckLib_maybeMT(conf,'boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");')
-	ok&=CheckLib_maybeMT(conf,'boost_regex','boost/regex.hpp','c++','boost::regex("");')
-	ok&=CheckLib_maybeMT(conf,'boost_serialization','boost/archive/archive_exception.hpp','c++','try{} catch (const boost::archive::archive_exception& e) {};')
-	ok&=CheckLib_maybeMT(conf,'boost_program_options','boost/program_options.hpp','c++','boost::program_options::options_description o;')
+	ok&=(conf.CheckPython() and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
+	ok&=conf.CheckPythonModules()
+	ok&=conf.CheckBoost()
 	env['haveForeach']=conf.CheckCXXHeader('boost/foreach.hpp','<>')
 	if not env['haveForeach']: print "(OK, local version will be used instead)"
-	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=1)
-	ok&=(conf.CheckPython()
-		and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
-		and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
-		and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 	ok&=conf.CheckCXXHeader('Eigen/Core')
 	# for installable stript's shebang ( http://en.wikipedia.org/wiki/Shebang_(Unix) )
 	env['pyExecutable']=sys.executable
@@ -360,7 +379,7 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
 		# TODO ok=True for darwin platform where openGL (and glut) is native
 		if not ok: featureNotOK('opengl')
-		if not 'noqt3' in env['features'] and 'qt4' not in env['features']:
+		if 'qt3' in env['features']:
 			ok=conf.CheckQt(env['QTDIR'])
 			if not ok: featureNotOK('opengl','Building with OpenGL implies qt3 interface, which was not found, although OpenGL was.')
 			env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
@@ -371,10 +390,11 @@ if not env.GetOption('clean'):
 			env['ENV']['PKG_CONFIG_PATH']='/usr/bin/pkg-config'
 			env.Tool('qt4')
 			env.EnableQt4Modules(['QtGui','QtCore','QtXml','QtOpenGL'])
-			ok=conf.CheckLibWithHeader(['qglviewer-qt4'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=0)
-			if not ok: featureNotOK('opengl','Building with Qt4 implies the QGLViewer library installed (libqglviewer-qt4-dev package in debian/ubuntu)')
+			if not conf.TryAction(env.Action('pyrcc4'),'','qrc'): featureNotOK('qt4','The pyrcc4 program is not operational (package pyqt4-dev-tools)')
+			if not conf.TryAction(env.Action('pyuic4'),'','ui'): featureNotOK('qt4','The pyuic4 program is not operational (package pyqt4-dev-tools)')
+			ok=conf.CheckLibWithHeader(['qglviewer-qt4'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1)
+			if not ok: featureNotOK('opengl','Building with Qt4 implies the QGLViewer library installed (package libqglviewer-qt4-dev package in debian/ubuntu)')
 			env['QGLVIEWER_LIB']='qglviewer-qt4';
-
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
@@ -396,8 +416,6 @@ if not env.GetOption('clean'):
 	env.Append(LIBS='yade-support')
 
 	env.Append(CPPDEFINES=['YADE_'+f.upper().replace('-','_') for f in env['features']])
-	# temporary, until #ifdefs removed from the code
-	env.Append(CPPDEFINES=['YADE_BOOST_SERIALIZATION','YADE_SERIALIZE_USING_BOOST'])
 
 	env=conf.Finish()
 
@@ -429,6 +447,7 @@ if env['brief']:
 		INSTALLSTR='> $TARGET',
 		QT_UICCOMSTR='U ${SOURCES}',
 		QT_MOCCOMSTR='M ${SOURCES}',
+		QT4_UICCOMSTR='U ${SOURCES}',
 		QT_MOCFROMHCOMSTR='M ${SOURCES}',
 		QT_MOCFROMCXXCOMSTR='M ${SOURCES}',
 		)
@@ -588,7 +607,7 @@ env.Append(BUILDERS = {'Combine': env.Builder(action = SCons.Action.Action(combi
 
 import yadeSCons
 allPlugs=yadeSCons.scanAllPlugins(None,feats=env['features'])
-buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['linkStrategy'],env['hotPlugins'].split(','))
+buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['chunkSize'],env['hotPlugins'].split(','))
 def linkPlugins(plugins):
 	"""Given list of plugins we need to link to, return list of real libraries that we should link to."""
 	ret=set()

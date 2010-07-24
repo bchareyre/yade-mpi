@@ -83,7 +83,8 @@ def userSession(qt3=False,qt4=False):
 	# something to run?
 	if len(sys.argv)>0:
 		arg0=sys.argv[0]
-		if qt3 or qt4: yade.qt.Controller()
+		if qt3: yade.qt.Controller();
+		if qt4: _c=yade.qt.Controller(); _c.show()
 		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
 			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
 			sys.stderr.write("Running simulation "+arg0+'\n')
@@ -119,7 +120,7 @@ def userSession(qt3=False,qt4=False):
 					# the escape codes might not work on non-linux terminals.
 					]
 					+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if qt3 else []) #F12,F11,F10,F9
-					+(['"\e[24~": "\C-U_c=yade.qt.Controller();_c.show()\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-U_c=yade.qt.Controller(), yade.qt.View(); _c.show()\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if qt4 else []) #F12,F11,F10,F9
+					+(['"\e[24~": "\C-U_c=yade.qt.Controller();_c.show()\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-U_c=yade.qt.Controller(); _c.show(); yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if qt4 else []) #F12,F11,F10,F9
 					+['"\e[19~": "\C-Uimport yade.plot; yade.plot.plot();\C-M"', #F8
 					'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
 					]
@@ -148,13 +149,14 @@ if gui:
 if gui==None:
 	userSession()
 elif gui=='qt3':
-	import yade.qt # raises exception if unable to open the display, but that should have been handled above already
+	# raises exception if unable to open the display, but that should have been handled above already
+	import yade.qt
 	userSession(qt3=True)
 elif gui=='qt4':
 	import PyQt4
 	from PyQt4 import QtGui
 	from PyQt4.QtCore import *
-	import yade.qt4; yade.qt=yade.qt4 # module alias, mimicking the older qt(3) interface if possible
+	import yade.qt # this yade.qt is different from the one that comes with qt3
 	qapp=QtGui.QApplication(sys.argv)
 	userSession(qt4=True)
 O.exitNoBacktrace()

@@ -1168,8 +1168,11 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
-		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
+		//Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
+		// FIXME: slower, but does not crash
+		Dem3DofGeom* geom=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
 		if(!phys) continue;
+		if(!geom) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		
 		Real minRad=(geom->refR1<=0?geom->refR2:(geom->refR2<=0?geom->refR1:min(geom->refR1,geom->refR2)));

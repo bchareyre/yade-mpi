@@ -190,7 +190,7 @@ class SerializableEditor(QWidget):
 vr=VTKRecorder()
 s1=SerializableEditor(vr)
 s1.show()
-s2=SerializableEditor(OpenGLRenderingEngine())
+s2=SerializableEditor(OpenGLRenderer())
 s2.show()
 #import time
 #def aa():

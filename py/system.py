@@ -145,6 +145,7 @@ _deprecated={
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:36:41 2010, jduriez@c1solimara-l
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:01 2010, jduriez@c1solimara-l
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:16 2010, jduriez@c1solimara-l
+	'OpenGLRenderingEngine':'OpenGLRenderer', # Sat Jul 24 06:04:13 2010, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

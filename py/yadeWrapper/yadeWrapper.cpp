@@ -104,8 +104,8 @@ class pyBodyContainer{
 			#8  0x0000000000505cff in BodyRedirectionVectorIterator::getValue (this=0x846f040) at /home/vaclav/yade/trunk/core/containers/BodyRedirectionVector.cpp:47
 			#9  0x00007f0908af41ce in BodyContainerIteratorPointer::operator* (this=0x7fff2e44db60) at /home/vaclav/yade/build-trunk/include/yade-trunk/yade/core/BodyContainer.hpp:63
 			#10 0x00007f0908af420a in boost::foreach_detail_::deref<BodyContainer, mpl_::bool_<false> > (cur=@0x7fff2e44db60) at /usr/include/boost/foreach.hpp:750
-			#11 0x00007f0908adc5a9 in OpenGLRenderingEngine::renderGeometricalModel (this=0x77f1240, rootBody=@0x1f49220) at pkg/common/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine.cpp:441
-			#12 0x00007f0908adfb84 in OpenGLRenderingEngine::render (this=0x77f1240, rootBody=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine.cpp:232
+			#11 0x00007f0908adc5a9 in OpenGLRenderer::renderGeometricalModel (this=0x77f1240, rootBody=@0x1f49220) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:441
+			#12 0x00007f0908adfb84 in OpenGLRenderer::render (this=0x77f1240, rootBody=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:232
 
 		*/
 		#if BOOST_VERSION<103500
@@ -470,17 +470,6 @@ class pyOmega{
 		int numThreads_get(){return 1;}
 		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
 	#endif
-	#ifdef YADE_BOOST_SERIALIZATION
-	void saveBoost(string filename){
-		const shared_ptr<Scene>& scene=OMEGA.getScene();
-		yade::ObjectIO::save(filename,"scene",scene);
-	}
-	void loadBoost(string filename){
-		shared_ptr<Scene> scene(new Scene);
-		yade::ObjectIO::load(filename,"scene",scene);
-		OMEGA.setScene(scene);
-	}
-	#endif
 	
 	shared_ptr<Cell> cell_get(){ if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell; return shared_ptr<Cell>(); }
 	bool periodic_get(void){ return OMEGA.getScene()->isPeriodic; } 
@@ -509,7 +498,12 @@ class pySTLImporter : public STLImporter {};
 shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->shape; }
 void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
 
-void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
+void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile);
+	#ifndef YADE_NO_YADE_SERIALIZATION
+		fg->setSerializationLibrary("XMLFormatManager");
+	#endif
+	bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message);
+};
 void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
 
 BOOST_PYTHON_MODULE(wrapper)
@@ -562,10 +556,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("periodic",&pyOmega::periodic_get,&pyOmega::periodic_set,"Get/set whether the scene is periodic or not (True/False).")
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(python::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
-		#ifdef YADE_BOOST_SERIALIZATION
-			.def("load2",&pyOmega::loadBoost,"[EXPERIMENTAL] load using boost::serialization (handles compression, XML/binary)")
-			.def("save2",&pyOmega::saveBoost,"[EXPERIMENTAL] save using boost::serialization (handles compression, XML/binary)")
-		#endif
 		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
 		.def("tmpFilename",&pyOmega::tmpFilename,"Return unique name of file in temporary directory which will be deleted when yade exits.")
 		;

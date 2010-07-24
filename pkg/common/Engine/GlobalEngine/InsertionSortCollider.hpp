@@ -35,7 +35,7 @@ Clumps do not interfere with periodicity in any way.
 
 Rendering
 ---------
-OpenGLRenderingEngine renders Shape at all periodic positions that touch the
+OpenGLRenderer renders Shape at all periodic positions that touch the
 periodic cell (i.e. Bounds crosses its boundary).
 
 It seems to affect body selection somehow, but that is perhaps not related at all.
@@ -61,7 +61,7 @@ Requirements
 Possible performance improvements & bugs
 ========================================
 
-* PeriodicInsertionSortCollider::{cellWrap,cellWrapRel} OpenGLRenderingEngine::{wrapCell,wrapCellPt} Shop::PeriodicWrap
+* PeriodicInsertionSortCollider::{cellWrap,cellWrapRel} OpenGLRenderer::{wrapCell,wrapCellPt} Shop::PeriodicWrap
 	are all very similar functions. They should be put into separate header and included from all those places.
 
 */

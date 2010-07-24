@@ -79,7 +79,26 @@ struct custom_Se3r_from_seq{
 	}
 };
 
-/*** c++-vector to python-list and python-(list,sequence) to c++-vector converters ***/
+template<typename T>
+struct custom_vvector_to_list{
+	static PyObject* convert(const std::vector<std::vector<T> >& vv){
+		python::list ret; FOREACH(const std::vector<T>& v, vv){
+			python::list ret2;
+			FOREACH(const T& e, v) ret2.append(e);
+			ret.append(ret2);
+		}
+		return incref(ret.ptr());
+	}
+};
+
+template<typename containedType>
+struct custom_list_to_list{
+	static PyObject* convert(const std::list<containedType>& v){
+		python::list ret; FOREACH(const containedType& e, v) ret.append(e);
+		return incref(ret.ptr());
+	}
+};
+/*** c++-list to python-list */
 template<typename containedType>
 struct custom_vector_to_list{
 	static PyObject* convert(const std::vector<containedType>& v){
@@ -147,6 +166,10 @@ BOOST_PYTHON_MODULE(_customConverters){
 	// StrArrayMap (typedef for std::map<std::string,numpy_boost>) → python dictionary
 	//custom_StrArrayMap_to_dict();
 	// register from-python converter and to-python converter
+
+	to_python_converter<std::vector<std::vector<std::string> >,custom_vvector_to_list<std::string> >();
+	//to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
+	to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 
 	// register 2-way conversion between c++ vector and python homogeneous sequence (list/tuple) of corresponding type
 	#define VECTOR_SEQ_CONV(Type) custom_vector_from_seq<Type>();  to_python_converter<std::vector<Type>, custom_vector_to_list<Type> >();

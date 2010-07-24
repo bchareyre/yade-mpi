@@ -9,7 +9,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class OpenGLRenderingEngine : public Serializable
+class OpenGLRenderer : public Serializable
 {
 	public:
 		body_id_t current_selection;
@@ -85,7 +85,7 @@ class OpenGLRenderingEngine : public Serializable
 	
 	public: void postProcessAttributes(bool deserializing);
 
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderingEngine,Serializable,"Class responsible for rendering scene on OpenGL devices.",
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
 		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
 		((Real,rotScale,((void)"disable scaling",1.),"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))
 		((Vector3r,lightPos,Vector3r(75,130,0),"Position of OpenGL light source in the scene."))
@@ -123,11 +123,11 @@ class OpenGLRenderingEngine : public Serializable
 		/*init*/,
 		/*ctor*/,
 		/*py*/
-		.def("setRefSe3",&OpenGLRenderingEngine::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.")
-		.def("render",&OpenGLRenderingEngine::pyRender,"Render the scene in the current OpenGL context.")
+		.def("setRefSe3",&OpenGLRenderer::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.")
+		.def("render",&OpenGLRenderer::pyRender,"Render the scene in the current OpenGL context.")
 	);
 };
-REGISTER_SERIALIZABLE(OpenGLRenderingEngine);
+REGISTER_SERIALIZABLE(OpenGLRenderer);
 
 
 

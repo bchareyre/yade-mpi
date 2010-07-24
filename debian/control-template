@@ -2,12 +2,12 @@ Source: yade@_VERSION@
 Section: x11
 Priority: optional
 Maintainer: Václav Šmilauer <eudoxos@arcig.cz>
-Build-Depends: debhelper (>= 5), scons, libqt3-mt-dev, qt3-dev-tools, freeglut3-dev, libboost-dev (>=1.35), libboost-date-time-dev (>=1.35), libboost-filesystem-dev (>=1.35), libboost-thread-dev (>=1.35), libboost-regex-dev (>=1.35), libboost-python-dev (>=1.35), libboost-iostreams-dev (>=1.35), libboost-program-options-dev, libboost-serialization-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libsqlite3-dev, libgts-dev, python-numpy, g++(>>4.0), libvtk5-dev, libgl1-mesa-dev, gdb, ipython, python-matplotlib, python-tk, libeigen2-dev @', libqglviewer-qt3-dev' if DISTRIBUTION!='hardy' else ''@ @', binutils-gold' if DISTRIBUTION not in ('hardy','intrepid','jaunty','lenny') else ''@ @', texlive-latex-recommended, texlive-latex-extra, lmodern, texlive-pictures, texlive-xetex, python-sphinx, python-bibtex, graphviz, dvipng' if DISTRIBUTION not in ('hardy','intrepid','jaunty','lenny') else ''@
+Build-Depends: debhelper (>= 5), scons, freeglut3-dev, libboost-dev (>=1.35), libboost-date-time-dev (>=1.35), libboost-filesystem-dev (>=1.35), libboost-thread-dev (>=1.35), libboost-regex-dev (>=1.35), libboost-python-dev (>=1.35), libboost-iostreams-dev (>=1.35), libboost-program-options-dev, libboost-serialization-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libgts-dev, python-numpy, g++(>>4.0), libvtk5-dev, libgl1-mesa-dev, gdb, ipython, python-matplotlib, python-tk, libeigen2-dev, libqglviewer-qt4-dev @', binutils-gold' if DISTRIBUTION not in ('hardy','intrepid','jaunty','lenny') else ''@ @', texlive-latex-recommended, texlive-latex-extra, lmodern, texlive-pictures, texlive-xetex, python-sphinx, python-bibtex, graphviz, dvipng' if DISTRIBUTION not in ('hardy','intrepid','jaunty','lenny') else ''@, python-xlib, python-qt4, pyqt4-dev-tools
 Standards-Version: 3.7.2
 
 Package: yade@_VERSION@
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk, python-qt4, python-xlib
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .
@@ -15,7 +15,7 @@ Description: Platform for dynamical modeling.
 
 Package: yade@_VERSION@-dbg
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, gdb, python-matplotlib, python-tk
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, gdb, python-matplotlib, python-tk, python-qt4, python-xlib
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .

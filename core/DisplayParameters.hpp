@@ -4,9 +4,9 @@
  *
  * The interface sort of emulates map string->string (which is not handled by yade-serialization).
  *
- * The "keys" (called displayTypes) are intended to be "OpenGLRenderingEngine" or "GLViewer" (and perhaps other).
+ * The "keys" (called displayTypes) are intended to be "OpenGLRenderer" or "GLViewer" (and perhaps other).
  * The "values" are intended to be XML representation of display parameters, obtained either by yade-serialization
- * with OpenGLRenderingEngine and saveStateToStream with QGLViewer (and GLViewer).
+ * with OpenGLRenderer and saveStateToStream with QGLViewer (and GLViewer).
  *
  */
 

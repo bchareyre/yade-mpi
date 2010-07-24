@@ -16,7 +16,7 @@ void Serializable::pyRegisterClass(boost::python::object _scope) {
 	boost::python::scope thisScope(_scope); 
 	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
 		.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")
-		.def("dict",&Serializable::pyDict,"Return dictionary of attributes.")/* .def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey,"Predicate telling whether given attribute exists.").def("keys",&Serializable::pyKeys,"Return list of attribute names") */
+		.def("dict",&Serializable::pyDict,"Return dictionary of attributes.")
 		.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary").def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs,"Update object attributes from given dictionary, skipping those that the instance doesn't have. Return list of attributes that did *not* exist and were not updated.")
 		.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict(),"Return clone of the instance, created by copying values of all attributes.")
 		/* boost::python pickling support, as per http://www.boost.org/doc/libs/1_42_0/libs/python/doc/v2/pickle.html */ 
@@ -58,7 +58,7 @@ python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
 
 
 
-
+#ifndef YADE_NO_YADE_SERIALIZATION
 void Serializable::unregisterSerializableAttributes(bool deserializing)
 {
 	Archives::iterator ai    = archives.begin();
@@ -109,4 +109,4 @@ bool Serializable::containsOnlyFundamentals()
 	}
 	return true;
 }
-
+#endif

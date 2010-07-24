@@ -31,54 +31,51 @@
 #include<yade/lib-factory/Factorable.hpp>
 #include<yade/lib-pyutil/raw_constructor.hpp>
 #include<yade/lib-pyutil/doc_opts.hpp>
-#include"SerializationExceptions.hpp"
-#include"Archive.hpp"
+
+#if defined(YADE_QT4) || defined(YADE_NOQT3)
+	#define YADE_NO_YADE_SERIALIZATION
+#endif
+
+#ifndef YADE_NO_YADE_SERIALIZATION
+	#include"SerializationExceptions.hpp"
+	#include"Archive.hpp"
+	using namespace ArchiveTypes;
+#endif
 
 #include<yade/lib-base/Math.hpp>
 
-#ifdef YADE_BOOST_SERIALIZATION
 // local copy
-	#include<boost/introspection/has_member_function.hpp>
-#endif
+#include<boost/introspection/has_member_function.hpp>
 
 
 using namespace boost;
 using namespace std;
-using namespace ArchiveTypes;
 
 #define DECLARE_POINTER_TO_MY_CUSTOM_CLASS(Type,attribute,any)		\
 	Type * attribute=any_cast< Type * >(any);
 
-#define REGISTER_ATTRIBUTE_(attribute)                                   \
-                registerAttribute( #attribute, attribute );
-
-
-
-
+#ifdef YADE_NO_YADE_SERIALIZATION
+	#define REGISTER_ATTRIBUTE_(attribute)
+#else
+	#define REGISTER_ATTRIBUTE_(attribute) registerAttribute( #attribute, attribute );
+#endif
 
 // placeholder function for registration with empty base
 namespace{
 	void registerAttributes(){}
 };
 
-#ifdef YADE_BOOST_SERIALIZATION
-	// uncomment to completely replace yade's serialization while loading/saving simulations everywhere
-	// #define YADE_SERIALIZE_USING_BOOST
-	#define _REGISTER_BOOST_ATTRIBUTES_REPEAT(x,y,z) ar & BOOST_SERIALIZATION_NVP(z);
-	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
-		friend class boost::serialization::access; \
-		private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ \
-			ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass);  \
-			/* will not work if preProcessAttributes is not virtual (it will not be called, but will be compile-time error, since this->preProcessAttributes will be undefined */ \
-			if(boost::introspection::has_non_const_member_function_preProcessAttributes<typeof(*this)>::value) this->preProcessAttributes(ArchiveT::is_loading::value); \
-			BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) \
-			if(boost::introspection::has_non_const_member_function_postProcessAttributes<typeof(*this)>::value) this->postProcessAttributes(ArchiveT::is_loading::value); \
-		}
-#else
-	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
-#endif
+#define _REGISTER_BOOST_ATTRIBUTES_REPEAT(x,y,z) ar & BOOST_SERIALIZATION_NVP(z);
+#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
+	friend class boost::serialization::access; \
+	private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ \
+		ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass);  \
+		/* will not work if preProcessAttributes is not virtual (it will not be called, but will be compile-time error, since this->preProcessAttributes will be undefined */ \
+		if(boost::introspection::has_non_const_member_function_preProcessAttributes<typeof(*this)>::value) this->preProcessAttributes(ArchiveT::is_loading::value); \
+		BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) \
+		if(boost::introspection::has_non_const_member_function_postProcessAttributes<typeof(*this)>::value) this->postProcessAttributes(ArchiveT::is_loading::value); \
+	}
 
-#define _REGISTER_ATTRIBUTES_REPEAT(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
 
 #include<boost/python.hpp>
 #include<boost/type_traits/integral_constant.hpp>
@@ -159,10 +156,15 @@ namespace yade{
 #endif
 
 // register class attributes, putting them to both python ['attr'] access functions and yade::serialization (and boost::serialization, if enabled)
+#ifdef YADE_NO_YADE_SERIALIZATION
+	#define _REGISTER_YADE_ATTRIBUTES(baseClass,attrs)
+#else
+	#define _REGISTER_ATTRIBUTES_REPEAT(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
+	#define _REGISTER_YADE_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) }
+#endif
+
 #define REGISTER_ATTRIBUTES(baseClass,attrs) REGISTER_ATTRIBUTES_DEPREC(_SOME_CLASS,baseClass,attrs,)
-#define REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,attrs,deprec) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) public: \
-	/* get attribute with the deprecated ['attr'] syntax; warn */ /* public: boost::python::object pyGetAttr(const std::string& key) const{ cerr<<"WARN: object['"<<key<<"'] syntax is deprecated, use object."<<key<<" instead."<<endl; BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } */ \
-	/* set attribute with the deprecated ['attr'] syntax; warn */ /* void pySetAttr(const std::string& key, const boost::python::object& value) { cerr<<"WARN: object['"<<key<<"']=value syntax is deprecated, use object."<<key<<"=value instead."<<endl; pySetAttr_nowarn(key,value); } */ \
+#define REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,attrs,deprec)  _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) public: \
 	/* set from upadeAttributes, no warning */ void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR_DEPREC,thisClass,deprec); baseClass::pySetAttr_nowarn(key,value); } \
 	/* list all attributes (except deprecated ones); could return boost::python::set instead*/ boost::python::list pyKeys() const {  boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; } \
 	/* whether the attribute is defined; includes deprecated attributes! */ bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR_DEPREC,thisClass,deprec); return baseClass::pyHasKey(key); } \
@@ -256,19 +258,17 @@ Erite plain text. Paragraphs are separated by empty lines (\n\n in c strings). U
 #define YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(klass,base,doc,attrs,ctor,py) YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,ctor,py)
 #define YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,inits,ctor,py) YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(klass,base,doc,attrs,,inits,ctor,py)
 
-// for both fundamental and non-fundamental cases
-#define REGISTER_SERIALIZABLE_GENERIC(name,isFundamental) 						\
-	REGISTER_FACTORABLE(name);								\
-	REGISTER_SERIALIZABLE_DESCRIPTOR(name,name,SerializableTypes::SERIALIZABLE,isFundamental);
-
-// implied non-fundamental
-#define REGISTER_SERIALIZABLE(name) REGISTER_SERIALIZABLE_GENERIC(name,false)
-// explicit fundamental
-#define REGISTER_SERIALIZABLE_FUNDAMENTAL(name) REGISTER_SERIALIZABLE_GENERIC(name,true);
-
-#define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 					\
-	REGISTER_FACTORABLE(sname);								\
-	REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,SerializableTypes::CUSTOM_CLASS,isFundamental);
+#ifdef YADE_NO_YADE_SERIALIZATION
+	#define REGISTER_SERIALIZABLE(name) REGISTER_FACTORABLE(name);
+#else
+	// implied non-fundamental
+	#define REGISTER_SERIALIZABLE(name) REGISTER_FACTORABLE(name); REGISTER_SERIALIZABLE_DESCRIPTOR(name,name,SerializableTypes::SERIALIZABLE,/*isFundamental*/false);
+	//REGISTER_SERIALIZABLE_GENERIC(name,false)
+	// explicit fundamental
+	//#define REGISTER_SERIALIZABLE_FUNDAMENTAL(name) REGISTER_SERIALIZABLE_GENERIC(name,true);
+	// for both fundamental and non-fundamental cases
+	//#define REGISTER_SERIALIZABLE_GENERIC(name,isFundamental) REGISTER_FACTORABLE(name); REGISTER_SERIALIZABLE_DESCRIPTOR(name,name,SerializableTypes::SERIALIZABLE,isFundamental);
+#endif
 
 
 // helper functions
@@ -295,7 +295,6 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 	return inst;
 }
 
-#ifdef YADE_BOOST_SERIALIZATION
 // support templates for boost::introspection::has_member_function
 // signature bool(bool) MUST match actual functions (i.e. returning bool, taking bool as parameter)
 // creates boost::introspection::has_non_const_member_function_preProcessAttributes<class>
@@ -303,31 +302,42 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 // inside attribute registration macros above
 BOOST_HAS_NON_CONST_MEMBER_FUNCTION(preProcessAttributes,void(bool))
 BOOST_HAS_NON_CONST_MEMBER_FUNCTION(postProcessAttributes,void(bool))
-#endif
 
 class Serializable : public Factorable
 {
-public :
-	typedef list< shared_ptr<Archive> >	Archives;
-		Serializable() {};
-		virtual ~Serializable() {};
-	
-		void unregisterSerializableAttributes(bool deserializing);
-		void registerSerializableAttributes(bool deserializing);
-		bool findAttribute(const string& name,shared_ptr<Archive>& arc);
-		bool containsOnlyFundamentals();
-		Archives& getArchives() 	{ return archives; };
-		
-		virtual void yadeSerialize(any& a)	{ throw SerializableError((SerializationExceptions::SetFunctionNotDeclared+string(" for type ")+a.type().name()).c_str()); };
-		virtual void yadeDeserialize(any& a) { throw SerializableError((SerializationExceptions::GetFunctionNotDeclared+string(" for type ")+a.type().name()).c_str()); };
-
-		virtual void postProcessAttributes(bool /*deserializing*/) {};
-
-		// harmless even if boost::serialization is not used
+	#ifndef YADE_NO_YADE_SERIALIZATION
+		public:
+			typedef list< shared_ptr<Archive> >	Archives;
+			Archives				archives;
+			friend class Archive;
+			void unregisterSerializableAttributes(bool deserializing);
+			void registerSerializableAttributes(bool deserializing);
+			bool findAttribute(const string& name,shared_ptr<Archive>& arc);
+			bool containsOnlyFundamentals();
+		public:
+			Archives& getArchives() 	{ return archives; };
+			virtual void yadeSerialize(any& a)	{ throw SerializableError((SerializationExceptions::SetFunctionNotDeclared+string(" for type ")+a.type().name()).c_str()); };
+			virtual void yadeDeserialize(any& a) { throw SerializableError((SerializationExceptions::GetFunctionNotDeclared+string(" for type ")+a.type().name()).c_str()); };
+			virtual void registerAttributes() {};
+			template <typename Type>
+			void registerAttribute(const string& name, Type& attribute){
+				BOOST_FOREACH(shared_ptr<Archive> a,archives){if(a->getName()==name){ /* cerr<<"Attribute "<<name<<" already registered."<<endl; */ return;}};
+				shared_ptr<Archive> ac = Archive::create(name,attribute);
+				archives.push_back(ac);
+			}
+	#endif
+	public:
 		template <class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ };
 
-		//virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
-		//virtual void pySetAttr(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
+		// if we drop yade::serialization, it could be make non-virtual and called via argument-dependent lookup
+		// currently, we have to find out whether the method exists using BOOST_HAS_NON_CONST_MEMBER_FUNCTION above
+		// otherwise it would be called multiple times, for each level in the hierarchy that does not override them
+		virtual void preProcessAttributes(bool /*deserializing*/) {};
+		virtual void postProcessAttributes(bool /*deserializing*/) {};
+	
+		Serializable() {};
+		virtual ~Serializable() {};
+
 		virtual void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
@@ -347,28 +357,12 @@ public :
 		python::list pyUpdateExistingAttrs(const boost::python::dict& d);
 		//! string representation of this object
 		std::string pyStr() { return "<"+getClassName()+" instance at "+lexical_cast<string>(this)+">"; }
-		
-
-	private :
-		Archives				archives;
-		friend class Archive;
-	
-	protected :
-		virtual void registerAttributes() {};
-		virtual void preProcessAttributes(bool /*deserializing*/) {};
-
-		template <typename Type>
-		void registerAttribute(const string& name, Type& attribute)
-		{
-			BOOST_FOREACH(shared_ptr<Archive> a,archives){if(a->getName()==name){ /* cerr<<"Attribute "<<name<<" already registered."<<endl; */ return;}};
-			shared_ptr<Archive> ac = Archive::create(name,attribute);
-			archives.push_back(ac);
-		}
 
 	REGISTER_CLASS_NAME(Serializable);
 	REGISTER_BASE_CLASS_NAME(Factorable);
 };
-
-#include "MultiTypeHandler.tpp"
+#ifndef YADE_NO_YADE_SERIALIZATION
+	#include "MultiTypeHandler.tpp"
+#endif
 
 

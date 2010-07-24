@@ -22,7 +22,7 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		shared_ptr<SimulationController> controller;
 		shared_ptr<QtFileGenerator> generator;
 		vector<shared_ptr<GLViewer> > glViews;
-		shared_ptr<OpenGLRenderingEngine> renderer;
+		shared_ptr<OpenGLRenderer> renderer;
 		size_t viewNo(shared_ptr<GLViewer>);
 
 		void ensureRenderer();

@@ -1,6 +1,6 @@
 #include<yade/gui-qt3/YadeQtMainWindow.hpp>
 #include<boost/python.hpp>
-#include<yade/pkg-common/OpenGLRenderingEngine.hpp>
+#include<yade/pkg-common/OpenGLRenderer.hpp>
 
 #include<qapplication.h>
 #include<qcolor.h>
@@ -31,7 +31,7 @@ YadeQtMainWindow* ensuredMainWindow(){if(!qtGuiIsActive()){qtGuiActivate(); whil
 
 void centerViews(void){ensuredMainWindow()->centerViews();}
 void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
-shared_ptr<OpenGLRenderingEngine> ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return ensuredMainWindow()->renderer;}
+shared_ptr<OpenGLRenderer> ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return ensuredMainWindow()->renderer;}
 
 #define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
 POST_SYNTH_EVENT(CONTROLLER,controller);
@@ -103,7 +103,7 @@ BOOST_PYTHON_MODULE(_qt){
 	def("Controller",evtCONTROLLER,"Start simulation controller");
 	def("View",evtVIEW,"Create new 3d view.");
 	def("center",centerViews,"Center all views.");
-	def("Renderer",ensuredRenderer,"Return wrapped :yref:`OpenGLRenderingEngine`; the renderer is constructed if it doesn't exist yet.");
+	def("Renderer",ensuredRenderer,"Return wrapped :yref:`OpenGLRenderer`; the renderer is constructed if it doesn't exist yet.");
 	def("close",Quit,"Close all open qt windows.");
 	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
 	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI.");
@@ -123,12 +123,12 @@ BOOST_PYTHON_MODULE(_qt){
 		.add_property("ortho",&pyGLViewer::get_orthographic,&pyGLViewer::set_orthographic,"Whether orthographic projection is used; if false, use perspective projection.")
 		.add_property("screenSize",&pyGLViewer::get_screenSize,&pyGLViewer::set_screenSize,"Size of the viewer's window, in scree pixels")
 		.add_property("timeDisp",&pyGLViewer::get_timeDisp,&pyGLViewer::set_timeDisp,"Time displayed on in the vindow; is a string composed of characters *r*, *v*, *i* standing respectively for real time, virtual time, iteration number.")
-		// .add_property("bgColor",&pyGLViewer::get_bgColor,&pyGLViewer::set_bgColor) // useless: OpenGLRenderingEngine::Background_color is used via openGL directly, bypassing QGLViewer background property
+		// .add_property("bgColor",&pyGLViewer::get_bgColor,&pyGLViewer::set_bgColor) // useless: OpenGLRenderer::Background_color is used via openGL directly, bypassing QGLViewer background property
 		.def("fitAABB",&pyGLViewer::fitAABB,(python::arg("mn"),python::arg("mx")),"Adjust scene bounds so that Axis-aligned bounding box given by its lower and upper corners *mn*, *mx* fits in.")
 		.def("fitSphere",&pyGLViewer::fitSphere,(python::arg("center"),python::arg("radius")),"Adjust scene bounds so that sphere given by *center* and *radius* fits in.")
 		.def("showEntireScene",&pyGLViewer::showEntireScene)
 		.def("center",&pyGLViewer::center,(python::arg("median")=true),"Center view. View is centered either so that all bodies fit inside (*median*=False), or so that 75\% of bodies fit inside (*median*=True).")
-		.def("saveState",&pyGLViewer::saveDisplayParameters,(python::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderingEngine`.")
+		.def("saveState",&pyGLViewer::saveDisplayParameters,(python::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderer`.")
 		.def("loadState",&pyGLViewer::useDisplayParameters,(python::arg("slot")),"Load display parameters from slot saved previously into, identified by its number.")
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
 		;

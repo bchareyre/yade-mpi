@@ -3,11 +3,11 @@ from PyQt4.QtGui import *
 from PyQt4 import QtCore
 
 from ui_controller import Ui_Controller
-from SerializableEditor import SerializableEditor
+from SerializableEditor import SerializableEditor,SeqSerializable
 from yade import *
 import yade.system
 
-from yade.qt4._GLViewer import *
+from yade.qt._GLViewer import *
 
 
 
@@ -19,8 +19,7 @@ class Controller(QWidget,Ui_Controller):
 		QWidget.__init__(self)
 		self.setupUi(self)
 		self.generator=None # updated automatically
-		self.renderer=rendererInstance #from _GLViewer # OpenGLRenderingEngine() # only hold one instance of the renderer
-		self.views=[]
+		self.renderer=Renderer() # only hold one instance, managed by OpenGLManager
 		self.addPreprocessors()
 		self.addRenderers()
 		global controller
@@ -29,19 +28,22 @@ class Controller(QWidget,Ui_Controller):
 		self.refreshTimer.timeout.connect(self.refreshEvent)
 		self.refreshTimer.start(200)
 		self.dtEditUpdate=True # to avoid updating while being edited
+		# show off with this one as well now
 	def addPreprocessors(self):
 		for c in yade.system.childClasses('FileGenerator'):
 			self.generatorCombo.addItem(c)
 	def addRenderers(self):
-		self.displayCombo.addItem('OpenGLRenderingEngine')
+		self.displayCombo.addItem('OpenGLRenderer'); afterSep=1
 		for bc in ('GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlInteractionGeometryFunctor','GlInteractionPhysicsFunctor'):
-			self.displayCombo.insertSeparator(10000)
-			def addClass(c):
+			if afterSep>0: self.displayCombo.insertSeparator(10000); afterSep=0
+			for c in yade.system.childClasses(bc) | set([bc]):
 				inst=eval(c+'()');
-				if len(set(inst.dict().keys())-set(['label']))>0: self.displayCombo.addItem(c)
-			addClass(bc)
-			for c in yade.system.childClasses(bc):
-				addClass(c)
+				if len(set(inst.dict().keys())-set(['label']))>0:
+					self.displayCombo.addItem(c); afterSep+=1
+	def inspectSlot(self):
+		self.inspector=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
+		self.inspector.setWindowTitle('O.engines')
+		self.inspector.show()
 	def setTabActive(self,what):
 		if what=='simulation': ix=0
 		elif what=='display': ix=1
@@ -55,6 +57,13 @@ class Controller(QWidget,Ui_Controller):
 		self.generator=gen
 		se=SerializableEditor(gen,parent=self.generatorArea,ignoredAttrs=set(['outputFileName']))
 		self.generatorArea.setWidget(se)
+	def pythonComboSlot(self,cmd):
+		try:
+			code=compile(str(cmd),'<UI entry>','exec')
+			exec code in globals()
+		except:
+			import traceback
+			traceback.print_exc()
 	def generateSlot(self):
 		filename=str(self.generatorFilenameEdit.text())
 		if self.generatorMemoryCheck.isChecked(): filename=':memory:'+filename
@@ -63,8 +72,10 @@ class Controller(QWidget,Ui_Controller):
 		if self.generatorAutoCheck:
 			O.load(filename)
 			self.setTabActive('simulation')
+			if len(views())==0:
+				v=View(); v.center()
 	def displayComboSlot(self,dispStr):
-		ser=(self.renderer if dispStr=='OpenGLRenderingEngine' else eval(str(dispStr)+'()'))
+		ser=(self.renderer if dispStr=='OpenGLRenderer' else eval(str(dispStr)+'()'))
 		se=SerializableEditor(ser,parent=self.displayArea,ignoredAttrs=set(['label']))
 		self.displayArea.setWidget(se)
 	def loadSlot(self):
@@ -101,17 +112,26 @@ class Controller(QWidget,Ui_Controller):
 	def stepSlot(self):
 		O.step()
 	def new3dSlot(self):
-		v=GLViewer()
-		self.views.append(v)
-	def setReferenceSlot(self): print 'setReferenceSlot()'
-	def centerSlot(self): print 'centerSlot()'
-	def xyzSlot(self): print 'xyzSlot()'
-	def yzxSlot(self): print 'yzxSlot()'
-	def zxySlot(self): print 'zxySlot()'
+		View()
+	def setReferenceSlot(self):
+		for b in O.bodies:
+			b.state.refPos=b.state.pos
+			b.state.refOri=b.state.ori
+	def centerSlot(self):
+		centerAllViews()
+	def setViewAxes(self,dir,up):
+		try:
+			v=views()[0]
+			v.viewDir=dir
+			v.upVector=up
+			v.center()
+		except IndexError: pass
+	def xyzSlot(self): self.setViewAxes((0,0,-1),(0,1,0))
+	def yzxSlot(self): self.setViewAxes((-1,0,0),(0,0,1))
+	def zxySlot(self): self.setViewAxes((0,-1,0),(1,0,0))
 	def refreshEvent(self):
 		self.refreshValues()
 		self.activateControls()
-		#for v in self.views: v.updateGL()
 	def deactivateControls(self):
 		self.realTimeLabel.setText('')
 		self.virtTimeLabel.setText('')
@@ -163,11 +183,10 @@ class Controller(QWidget,Ui_Controller):
 		s=int(t); ms=int(t*1000)%1000; us=int(t*1000000)%1000; ns=int(t*1000000000)%1000
 		self.virtTimeLabel.setText(u'%03ds%03dm%03dμ%03dn'%(s,ms,us,ns))
 		
-def View(): return GLViewer()
-
 def Generator():
 	global controller
-	if not controller: controller=Controller(); controller.show()
+	if not controller: controller=Controller();
+	controller.show()
 	controller.setTabActive('generator')
 
 if __name__=='__main__':

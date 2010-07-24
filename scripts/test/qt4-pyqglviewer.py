@@ -4,7 +4,7 @@ from PyQGLViewer import *
 class Viewer(QGLViewer):
 	def __init__(self):
 		QGLViewer.__init__(self)
-		self.renderer=OpenGLRenderingEngine()
+		self.renderer=OpenGLRenderer()
 	def init(self):
 		self.setAxisIsDrawn(True)
 		self.setGridIsDrawn(True)

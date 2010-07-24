@@ -106,6 +106,13 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QPushButton" name="inspectButton">
+             <property name="text">
+              <string>Inspect</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>
@@ -507,8 +514,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>297</width>
-            <height>408</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
          </widget>
@@ -631,6 +638,65 @@
       <attribute name="title">
        <string>Python</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QComboBox" name="pythonCombo">
+           <property name="font">
+            <font>
+             <family>Monospace</family>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>IBeamCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="insertPolicy">
+            <enum>QComboBox::InsertAtTop</enum>
+           </property>
+           <property name="minimumContentsLength">
+            <number>1</number>
+           </property>
+           <property name="duplicatesEnabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>&lt;i&gt;(Output appears in the terminal)&lt;/i&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -647,8 +713,8 @@
    <slot>loadSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>105</x>
-     <y>59</y>
+     <x>101</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -663,8 +729,8 @@
    <slot>saveSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
-     <y>73</y>
+     <x>202</x>
+     <y>64</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -679,8 +745,8 @@
    <slot>dtFixedSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>94</x>
-     <y>164</y>
+     <x>143</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -695,8 +761,8 @@
    <slot>dtDynSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>161</y>
+     <x>271</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -711,8 +777,8 @@
    <slot>dtEditedSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
-     <y>213</y>
+     <x>147</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -727,7 +793,7 @@
    <slot>playSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
+     <x>116</x>
      <y>304</y>
     </hint>
     <hint type="destinationlabel">
@@ -743,7 +809,7 @@
    <slot>pauseSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
+     <x>268</x>
      <y>304</y>
     </hint>
     <hint type="destinationlabel">
@@ -759,8 +825,8 @@
    <slot>stepSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>62</x>
-     <y>354</y>
+     <x>79</x>
+     <y>363</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -775,8 +841,8 @@
    <slot>reloadSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
-     <y>354</y>
+     <x>194</x>
+     <y>363</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -791,8 +857,8 @@
    <slot>new3dSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>93</x>
-     <y>395</y>
+     <x>99</x>
+     <y>404</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -807,8 +873,8 @@
    <slot>setReferenceSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>193</x>
-     <y>395</y>
+     <x>196</x>
+     <y>404</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -823,8 +889,8 @@
    <slot>centerSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
-     <y>395</y>
+     <x>293</x>
+     <y>404</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -839,8 +905,8 @@
    <slot>xyzSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>451</y>
+     <x>93</x>
+     <y>460</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -855,8 +921,8 @@
    <slot>yzxSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>193</x>
-     <y>451</y>
+     <x>196</x>
+     <y>460</y>
     </hint>
     <hint type="destinationlabel">
      <x>243</x>
@@ -871,8 +937,8 @@
    <slot>zxySlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
-     <y>451</y>
+     <x>293</x>
+     <y>460</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -887,8 +953,8 @@
    <slot>generateSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>447</y>
+     <x>101</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -903,8 +969,8 @@
    <slot>dtEditNoupdateSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>200</y>
+     <x>147</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -919,8 +985,8 @@
    <slot>dtEditNoupdateSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>188</x>
-     <y>192</y>
+     <x>147</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -935,8 +1001,8 @@
    <slot>generatorComboSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>109</x>
-     <y>67</y>
+     <x>101</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -951,12 +1017,44 @@
    <slot>displayComboSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>160</x>
-     <y>55</y>
+     <x>101</x>
+     <y>45</y>
     </hint>
     <hint type="destinationlabel">
      <x>301</x>
      <y>108</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pythonCombo</sender>
+   <signal>activated(QString)</signal>
+   <receiver>Controller</receiver>
+   <slot>pythonComboSlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>304</x>
+     <y>68</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inspectButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Controller</receiver>
+   <slot>inspectSlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>58</y>
     </hint>
    </hints>
   </connection>
@@ -981,5 +1079,8 @@
   <slot>dtEditNoupdateSlot()</slot>
   <slot>generatorComboSlot()</slot>
   <slot>displayComboSlot()</slot>
+  <slot>pythonComboSlot()</slot>
+  <slot>pythonEditSlot()</slot>
+  <slot>inspectSlot()</slot>
  </slots>
 </ui>

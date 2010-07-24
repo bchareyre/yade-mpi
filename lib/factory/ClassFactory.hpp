@@ -30,7 +30,6 @@
 #include<boost/preprocessor.hpp>
 
 
-#include "FactoryExceptions.hpp"
 #include "DynLibManager.hpp"
 
 /*! define the following macro to enable experimenta boost::serialization support
@@ -39,23 +38,19 @@
 	Loading is not yet implemented (should be easy)
 */
 
-//#define YADE_BOOST_SERIALIZATION
+#include<boost/archive/binary_oarchive.hpp>
+#include<boost/archive/binary_iarchive.hpp>
+#include<boost/archive/xml_oarchive.hpp>
+#include<boost/archive/xml_iarchive.hpp>
 
-#ifdef YADE_BOOST_SERIALIZATION
-	#include<boost/archive/binary_oarchive.hpp>
-	#include<boost/archive/binary_iarchive.hpp>
-	#include<boost/archive/xml_oarchive.hpp>
-	#include<boost/archive/xml_iarchive.hpp>
+#include<boost/serialization/export.hpp> // must come after all supported archive types
 
-	#include<boost/serialization/export.hpp> // must come after all supported archive types
-
-	#include<boost/serialization/base_object.hpp>
-	#include<boost/serialization/shared_ptr.hpp>
-	#include<boost/serialization/list.hpp>
-	#include<boost/serialization/vector.hpp>
-	#include<boost/serialization/map.hpp>
-	#include<boost/serialization/nvp.hpp>
-#endif
+#include<boost/serialization/base_object.hpp>
+#include<boost/serialization/shared_ptr.hpp>
+#include<boost/serialization/list.hpp>
+#include<boost/serialization/vector.hpp>
+#include<boost/serialization/map.hpp>
+#include<boost/serialization/nvp.hpp>
 
 
 #define REGISTER_FACTORABLE(name) 						\
@@ -182,11 +177,7 @@ class ClassFactory : public Singleton<ClassFactory>
  * be unique and avoids use of __COUNTER__ which didn't appear in gcc until 4.3.
  */
 
-#ifdef YADE_BOOST_SERIALIZATION
-	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z); BOOST_SERIALIZATION_FACTORY_0(z);
-#else
-	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z)
-#endif
+#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z); BOOST_SERIALIZATION_FACTORY_0(z);
 
 // the __attribute__((constructor(priority))) construct not supported before gcc 4.3
 // it will only produce warning from log4cxx if not used

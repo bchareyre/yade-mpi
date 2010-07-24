@@ -1,19 +1,24 @@
 #include"VTKRecorder.hpp"
-#include<vtkCellArray.h>
-#include<vtkPoints.h>
-#include<vtkPointData.h>
-#include<vtkCellData.h>
-#include<vtkSmartPointer.h>
-#include<vtkFloatArray.h>
-#include<vtkUnstructuredGrid.h>
-#include<vtkPolyData.h>
-#include<vtkXMLUnstructuredGridWriter.h>
-#include<vtkXMLPolyDataWriter.h>
-#include<vtkZLibDataCompressor.h>
-#include<vtkXMLMultiBlockDataWriter.h>
-#include<vtkMultiBlockDataSet.h>
-#include<vtkTriangle.h>
-#include<vtkLine.h>
+
+// avoid warnings in VTK code (does not work?!)
+#pragma GCC diagnostic ignored "-Wdeprecated"
+	#include<vtkCellArray.h>
+	#include<vtkPoints.h>
+	#include<vtkPointData.h>
+	#include<vtkCellData.h>
+	#include<vtkSmartPointer.h>
+	#include<vtkFloatArray.h>
+	#include<vtkUnstructuredGrid.h>
+	#include<vtkPolyData.h>
+	#include<vtkXMLUnstructuredGridWriter.h>
+	#include<vtkXMLPolyDataWriter.h>
+	#include<vtkZLibDataCompressor.h>
+	#include<vtkXMLMultiBlockDataWriter.h>
+	#include<vtkMultiBlockDataSet.h>
+	#include<vtkTriangle.h>
+	#include<vtkLine.h>
+#pragma GCC diagnostic warning "-Wdeprecated"
+
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>

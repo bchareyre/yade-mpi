@@ -59,7 +59,7 @@ void GLViewer::paintGL(void){
 
 GLViewer::~GLViewer(){ /* get the GL mutex when closing */ GLLock lock(this); }
 
-GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)//, qglThread(this,rendererInit)
+GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderer> _renderer, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
 	isMoving=false;
 	renderer=_renderer; renderer->init();
@@ -173,14 +173,10 @@ void GLViewer::useDisplayParameters(size_t n){
 	if(dispParams.size()<=(size_t)n){LOG_ERROR("Display parameters #"<<n<<" don't exist (number of entries "<<dispParams.size()<<")"); return;}
 	const shared_ptr<DisplayParameters>& dp=dispParams[n];
 	string val;
-	if(dp->getValue("OpenGLRenderingEngine",val)){ istringstream oglre(val);
-		#ifdef YADE_SERIALIZE_USING_BOOST 
-			yade::ObjectIO::load<typeof(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
-		#else
-			IOFormatManager::loadFromStream("XMLFormatManager",oglre,"renderer",renderer);
-		#endif
+	if(dp->getValue("OpenGLRenderer",val)){ istringstream oglre(val);
+		yade::ObjectIO::load<typeof(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
 	}
-	else { LOG_WARN("OpenGLRenderingEngine configuration not found in display parameters, skipped.");}
+	else { LOG_WARN("OpenGLRenderer configuration not found in display parameters, skipped.");}
 	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val);}
 	else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
 }
@@ -191,12 +187,8 @@ void GLViewer::saveDisplayParameters(size_t n){
 	if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
 	shared_ptr<DisplayParameters>& dp=dispParams[n];
 	ostringstream oglre;
-	#ifdef YADE_SERIALIZE_USING_BOOST
-		yade::ObjectIO::save<typeof(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
-	#else
-		IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
-	#endif
-	dp->setValue("OpenGLRenderingEngine",oglre.str());
+	yade::ObjectIO::save<typeof(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
+	dp->setValue("OpenGLRenderer",oglre.str());
 	dp->setValue("GLViewer",GLViewer::getState());
 }
 
@@ -394,7 +386,7 @@ void GLViewer::centerScene(){
 	if(rb->isPeriodic){ centerPeriodic(); return; }
 
 	if(rb->bodies->size()<renderer->selectBodyLimit){LOG_INFO("Less than "+lexical_cast<string>(renderer->selectBodyLimit)+" bodies, moving possible. Select with shift, press 'm' to move.");}
-	else{LOG_INFO("More than "+lexical_cast<string>(renderer->selectBodyLimit)+" (OpenGLRenderingEngine::selectBodyLimit) bodies. Moving not possible.");}
+	else{LOG_INFO("More than "+lexical_cast<string>(renderer->selectBodyLimit)+" (OpenGLRenderer::selectBodyLimit) bodies. Moving not possible.");}
 	Vector3r min,max;	
 	if(rb->bound){
 		min=rb->bound->min; max=rb->bound->max;
@@ -601,7 +593,7 @@ void GLViewer::postDraw(){
 		stopScreenCoordinatesSystem();
 	}
 
-	// cutting planes (should be moved to OpenGLRenderingEngine perhaps?)
+	// cutting planes (should be moved to OpenGLRenderer perhaps?)
 	// only painted if one of those is being manipulated
 	if(manipulatedClipPlane>=0){
 		for(int planeId=0; planeId<renderer->numClipPlanes; planeId++){

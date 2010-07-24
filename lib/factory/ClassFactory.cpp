@@ -58,13 +58,11 @@ shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 				// I.e. almost everything in yade-libs and some others installed locally...
 				// Don't log that, it would confuse users.
 				//LOG_FATAL("Can't create class "<<name<<" - was never registered.");
-				std::string error = FactoryExceptions::ClassNotRegistered + name;
-				throw FactoryClassNotRegistered(error.c_str());
+				throw std::runtime_error(("Class "+name+" not registered in the ClassFactory.").c_str());
 			}
 			return createShared(name);
 		}
-		std::string error = FactoryExceptions::CantCreateClass + name;
-		throw FactoryCantCreate(error.c_str());
+		throw std::runtime_error(("Class "+name+" could not be factored in the ClassFactory.").c_str());
 	}
 	return ( i -> second.createShared ) ();
 }
@@ -80,13 +78,11 @@ Factorable* ClassFactory::createPure( std::string name )
 		{
 			if( map.find( name ) == map.end() )
 			{
-				std::string error = FactoryExceptions::ClassNotRegistered + name;
-				throw FactoryClassNotRegistered(error.c_str());
+				throw std::runtime_error(("Class "+name+" not registered in the ClassFactory.").c_str());
 			}
 			return createPure(name);
 		}
-		std::string error = FactoryExceptions::CantCreateClass + name;
-		throw FactoryCantCreate(error.c_str());
+		throw std::runtime_error(("Class "+name+" could not be factored in the ClassFactory.").c_str());
 	}
 	return ( i -> second.create ) ();
 }
@@ -94,11 +90,7 @@ Factorable* ClassFactory::createPure( std::string name )
 void * ClassFactory::createPureCustom( std::string name )
 {
 	FactorableCreatorsMap::const_iterator i = map.find( name );
-	if( i == map.end() )
-	{
-		std::string error = FactoryExceptions::CantCreateClass + name;
-		throw FactoryCantCreate(error.c_str());
-	}
+	if( i == map.end() ) throw std::runtime_error(("Class "+name+" could not be factored in the ClassFactory.").c_str());
 	return ( i -> second.createPureCustom ) ();
 }
 

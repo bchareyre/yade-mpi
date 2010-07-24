@@ -118,13 +118,13 @@ YadeQtMainWindow::~YadeQtMainWindow()
 
 void YadeQtMainWindow::Quit(){ emit close(); }
 
-void YadeQtMainWindow::closeEvent(QCloseEvent *e){ renderer=shared_ptr<OpenGLRenderingEngine>(); closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e);  }
+void YadeQtMainWindow::closeEvent(QCloseEvent *e){ renderer=shared_ptr<OpenGLRenderer>(); closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e);  }
 
 void YadeQtMainWindow::ensureRenderer(){
 	if(!renderer){
-		LOG_DEBUG("Creating OpenGLRenderingEngine instance.");
-		shared_ptr<Factorable> tmpRenderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
-		renderer=static_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
+		LOG_DEBUG("Creating OpenGLRenderer instance.");
+		shared_ptr<Factorable> tmpRenderer=ClassFactory::instance().createShared("OpenGLRenderer");
+		renderer=static_pointer_cast<OpenGLRenderer>(tmpRenderer);
 		renderer->init();
 	}
 
@@ -213,7 +213,7 @@ void YadeQtMainWindow::closeView(GLViewer* glv){
 					LOG_DEBUG("Deleting primary view (no other views exist).");
 					glViews.clear();
 					// why delete renderer if we close view? That obliterates all renderer settings.
-					// renderer=shared_ptr<OpenGLRenderingEngine>();
+					// renderer=shared_ptr<OpenGLRenderer>();
 				}else{LOG_INFO("Cannot close primary view, other views still exist.");}
 				return;
 			}

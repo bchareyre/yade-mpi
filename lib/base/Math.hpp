@@ -178,9 +178,6 @@ typedef Se3<Real> Se3r;
  */
 
 
-// gccxml chokes on the boost::serialization code; this part is not needed if wrapping miniWm3 anyway
-#if !defined(__GCCXML__) and defined(YADE_BOOST_SERIALIZATION)
-
 #include<boost/serialization/nvp.hpp>
 #include<boost/serialization/is_bitwise_serializable.hpp>
 
@@ -245,8 +242,6 @@ void serialize(Archive & ar, Matrix3r & m, const unsigned int version){
 
 } // namespace serialization
 } // namespace boost
-
-#endif /* __GCCXML */
 
 #if 0
 // revert optimization options back

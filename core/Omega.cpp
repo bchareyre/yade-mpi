@@ -13,8 +13,10 @@
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
 #include<yade/lib-base/Math.hpp>
-#include<yade/lib-serialization/IOFormatManager.hpp>
-#include<yade/lib-serialization/FormatChecker.hpp>
+#ifndef YADE_NO_YADE_SERIALIZATION
+	#include<yade/lib-serialization/IOFormatManager.hpp>
+	#include<yade/lib-serialization/FormatChecker.hpp>
+#endif
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<cstdlib>
@@ -149,7 +151,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 			}
 			if(dynlibs[name].isSerializable) pythonables.push_back(name);
 		}
-		catch (FactoryError& e){
+		catch (std::runtime_error& e){
 			/* FIXME: this catches all errors! Some of them are not harmful, however:
 			 * when a class is not factorable, it is OK to skip it; */	
 		}

@@ -9,9 +9,6 @@
 #pragma once
 
 
-#include "MultiMethodsExceptions.hpp"
-
-
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-loki/Typelist.hpp>
 #include<yade/lib-loki/Functor.hpp>
@@ -105,17 +102,15 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 	
 		ResultType error(int n)
 		{
-			std::string err = std::string(MultiMethodsExceptions::BadVirtualCall) + "types are:\n" 
-			+ "1. " + typeid(Parm1).name() + "\n" 
+			throw std::runtime_error(("Multimethods: bad virtual call (probably go/goReverse was not overridden with the same argument types; only fundamental types and pure pointers are passed by value, all other types (including shared_ptr<>) are passed by reference); types in the call were:\n" 
+			+ string("1. ") + typeid(Parm1).name() + "\n" 
 			+ "2. " + typeid(Parm2).name() + "\n"
 			+ "3. " + typeid(Parm3).name() + "\n"
 			+ "4. " + typeid(Parm4).name() + "\n"
 			+ "5. " + typeid(Parm5).name() + "\n"
 			+ "6. " + typeid(Parm6).name() + "\n"
 			+ "7. " + typeid(Parm7).name() + "\n"
-			+ "number of types used in the call: " + boost::lexical_cast<string>(n) + "\n\n";
-			cerr << err.c_str();
-			throw MultiMethodsBadVirtualCall(err.c_str());
+			+ "number of types used in the call: " + boost::lexical_cast<string>(n) + "\n").c_str());
 		}
 
 	public :
