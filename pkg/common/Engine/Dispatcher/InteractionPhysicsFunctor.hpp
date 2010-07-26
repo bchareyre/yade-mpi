@@ -14,7 +14,7 @@
 #include <string>
 
 //! Abstract interface for all classes that build InteractionPhysics from two interacting Body's PhysicalParameters
-class InteractionPhysicsFunctor : 	public Functor2D
+class InteractionPhysicsFunctor: public Functor2D
 					<
 		 				void ,
 		 				TYPELIST_3(	  const shared_ptr<Material>&

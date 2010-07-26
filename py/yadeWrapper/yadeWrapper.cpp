@@ -277,10 +277,11 @@ class pyOmega{
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
 			if(!e->label.empty()){
 				pyRunString("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')");
+				//boost::python::scope("__builtins__").attr(e->label)=e;
 			}
 			if(isChildClassOf(e->getClassName(),"Dispatcher")){
 				shared_ptr<Dispatcher> ee=dynamic_pointer_cast<Dispatcher>(e);
-				FOREACH(const shared_ptr<Functor>& f, ee->functorArguments){
+				FOREACH(const shared_ptr<Functor>& f, ee->functors){
 					if(!f->label.empty()){
 						pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");
 					}
@@ -289,9 +290,9 @@ class pyOmega{
 			if(e->getClassName()=="InteractionDispatchers"){
 				shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(e);
 				list<shared_ptr<Functor> > eus;
-				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functors) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functors) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functors) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(!eu->label.empty()){
 						pyRunString("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')");
@@ -404,16 +405,16 @@ class pyOmega{
 			if(eng->label==label){ return python::object(eng); }
 			shared_ptr<Dispatcher> me=dynamic_pointer_cast<Dispatcher>(eng);
 			if(me){
-				FOREACH(const shared_ptr<Functor>& eu, me->functorArguments){
+				FOREACH(const shared_ptr<Functor>& eu, me->functors){
 					if(eu->label==label) return python::object(eu);
 				}
 			}
 			shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(eng);
 			if(ee){
 				list<shared_ptr<Functor> > eus;
-				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functors) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functors) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functors) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(eu->label==label) return python::object(eu);
 				}

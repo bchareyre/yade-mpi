@@ -25,6 +25,9 @@ void Serializable::pyRegisterClass(boost::python::object _scope) {
 		.add_property("__getstate_manages_dict__",&Serializable::getClassName,"just define the attr, return some bogus data")
 		// constructor with dictionary of attributes
 		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
+		// comparison operators
+		.def(boost::python::self == boost::python::self)
+		.def(boost::python::self != boost::python::self)
 		;
 }
 

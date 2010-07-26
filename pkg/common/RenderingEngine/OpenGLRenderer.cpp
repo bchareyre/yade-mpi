@@ -24,22 +24,20 @@ CREATE_LOGGER(OpenGLRenderer);
 
 bool OpenGLRenderer::initDone=false;
 const int OpenGLRenderer::numClipPlanes;
+OpenGLRenderer::~OpenGLRenderer(){}
 
 void OpenGLRenderer::init(){
-	map<string,DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
-	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
-	for(;di!=diEnd;++di){
-		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlStateFunctor")) addStateFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlBoundFunctor")) addBoundingVolumeFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlShapeFunctor")) addInteractingGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom_recursive((*di).first,"GlInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
+	typedef std::pair<string,DynlibDescriptor> strDldPair; // necessary as FOREACH, being macro, cannot have the "," inside the argument (preprocessor does not parse templates)
+	FOREACH(const strDldPair& item, Omega::instance().getDynlibsDescriptor()){
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlStateFunctor")) stateFunctorNames.push_back(item.first);
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlBoundFunctor")) boundFunctorNames.push_back(item.first);
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlShapeFunctor")) shapeFunctorNames.push_back(item.first);
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlInteractionGeometryFunctor")) interactionGeometryFunctorNames.push_back(item.first);
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlInteractionPhysicsFunctor")) interactionPhysicsFunctorNames.push_back(item.first);
 	}
-	postProcessAttributes(true);
+	initgl(); // creates functor objects in the proper sense
 
 	clipPlaneNormals.resize(numClipPlanes);
-
-	initgl();
 
 	static bool glutInitDone=false;
 	if(!glutInitDone){
@@ -67,11 +65,13 @@ void OpenGLRenderer::setBodiesRefSe3(){
 
 void OpenGLRenderer::initgl(){
 	LOG_DEBUG("(re)initializing GL for gldraw methods.\n");
-	BOOST_FOREACH(vector<string>& s,stateFunctorNames) (static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,boundFunctorNames)	(static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,shapeFunctorNames)	(static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames) (static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames) (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	#define _SETUP_DISPATCHER(names,FunctorType,dispatcher) dispatcher.clear(); FOREACH(string& s,names) {shared_ptr<FunctorType> f(static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(s))); f->initgl(); dispatcher.add(f);}
+		_SETUP_DISPATCHER(stateFunctorNames,GlStateFunctor,stateDispatcher);
+		_SETUP_DISPATCHER(boundFunctorNames,GlBoundFunctor,boundDispatcher);
+		_SETUP_DISPATCHER(shapeFunctorNames,GlShapeFunctor,shapeDispatcher);
+		_SETUP_DISPATCHER(interactionGeometryFunctorNames,GlInteractionGeometryFunctor,interactionGeometryDispatcher);
+		_SETUP_DISPATCHER(interactionPhysicsFunctorNames,GlInteractionPhysicsFunctor,interactionPhysicsDispatcher);
+	#undef _SETUP_DISPATCHER
 }
 
 void OpenGLRenderer::renderWithNames(const shared_ptr<Scene>& _scene){
@@ -383,33 +383,3 @@ void OpenGLRenderer::renderShape()
 	}
 }
 
-
-
-void OpenGLRenderer::postProcessAttributes(bool deserializing){
-	if(!deserializing) return;
-	for(unsigned int i=0;i<boundFunctorNames.size();i++) boundDispatcher.add1DEntry(boundFunctorNames[i][0],boundFunctorNames[i][1]);
-	for(unsigned int i=0;i<shapeFunctorNames.size();i++) shapeDispatcher.add1DEntry(shapeFunctorNames[i][0],shapeFunctorNames[i][1]);
-	for(unsigned int i=0;i<stateFunctorNames.size();i++) stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
-	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
-	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
-}
-void OpenGLRenderer::addInteractionGeometryFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); interactionGeometryFunctorNames.push_back(v);
-}
-void OpenGLRenderer::addInteractionPhysicsFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); interactionPhysicsFunctorNames.push_back(v);
-}
-void OpenGLRenderer::addStateFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); stateFunctorNames.push_back(v);
-}
-void OpenGLRenderer::addBoundingVolumeFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); boundFunctorNames.push_back(v);
-}
-void OpenGLRenderer::addInteractingGeometryFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); shapeFunctorNames.push_back(v);
-}

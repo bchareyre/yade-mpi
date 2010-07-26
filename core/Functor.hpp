@@ -16,7 +16,7 @@
 class TimingDeltas;
 class Scene;
 
-class Functor : public Serializable
+class Functor: public Serializable
 {
 	public: virtual vector<std::string> getFunctorTypes(){throw;}
 	shared_ptr<TimingDeltas> timingDeltas;
@@ -39,7 +39,7 @@ template
 	class ReturnType,
 	class AttributesType
 >
-class Functor1D : 	public Functor,
+class Functor1D: public Functor,
 			public FunctorWrapper<ReturnType, AttributesType>
 {
 	public:
@@ -56,7 +56,7 @@ template
 	class ReturnType,
 	class AttributesType
 >
-class Functor2D :	public Functor,
+class Functor2D:	public Functor,
 			public FunctorWrapper<ReturnType, AttributesType>
 {
 	public:

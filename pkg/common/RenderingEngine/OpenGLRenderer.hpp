@@ -41,6 +41,8 @@ class OpenGLRenderer : public Serializable
 		//! display data for individual bodies
 		vector<BodyDisp> bodyDisp;
 
+		virtual ~OpenGLRenderer();
+
 	private:
 		void resetSpecularEmission();
 		// updated after every call to render
@@ -53,7 +55,7 @@ class OpenGLRenderer : public Serializable
 		GlStateDispatcher stateDispatcher;
 
 
-		vector<vector<string> >
+		vector<string>
 			stateFunctorNames,
 			boundFunctorNames,
 			shapeFunctorNames, 
@@ -82,9 +84,6 @@ class OpenGLRenderer : public Serializable
 		void renderBoundingVolume();
 		void renderShape();
 		void renderAllInteractionsWire();
-	
-	public: void postProcessAttributes(bool deserializing);
-
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
 		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
 		((Real,rotScale,((void)"disable scaling",1.),"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))

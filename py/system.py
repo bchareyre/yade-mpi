@@ -11,7 +11,7 @@ from yade import runtime
 from yade import config
 O=wrapper.Omega()
 
-def childClasses(base,recurse=True):
+def childClasses(base,recurse=True,includeBase=False):
 	"""Enumerate classes deriving from given base (as string), recursively by default. Returns set."""
 	ret=set(O.childClassesNonrecursive(base)); ret2=set()
 	if not recurse: return ret

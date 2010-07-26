@@ -219,24 +219,7 @@ class DynLibDispatcher
 				return shared_ptr<Executor>();
 		  }
 
- 	public  : shared_ptr<Executor> makeExecutor(string libName)
-		  {
-			shared_ptr<Executor> executor;
-			{
-				executor = dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-				if (!executor){ //dynamic_cast_failed for some reason so try with static_cast
-					//cerr<<__FILE__<<":"<<__LINE__<<" ERROR dynamic_casting executor of type "<<libName<<", using static_cast (WHY?)"<<endl;
-					//abort();
-					executor = static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
-				}
-			}
-
-			assert(executor);
-			
-			return executor;
-		  }
-		
- 	public  : void add1DEntry( string baseClassName, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
+ 	public  : void add1DEntry( string baseClassName, shared_ptr<Executor> executor)
 		  {
 
 			// create base class, to access its index. (we can't access static variable, because
@@ -256,7 +239,6 @@ class DynLibDispatcher
 			int maxCurrentIndex = base->getMaxCurrentlyUsedClassIndex();
 			callBacks.resize( maxCurrentIndex+1 );	// make sure that there is a place for new Functor
 
-			shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
 			callBacks[index] = executor;
 						
 			#if 0
@@ -297,7 +279,7 @@ class DynLibDispatcher
 		  }
 
 		
-	public  : void add2DEntry( string baseClassName1, string baseClassName2, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
+	public  : void add2DEntry( string baseClassName1, string baseClassName2, shared_ptr<Executor> executor)
 		  {
 			shared_ptr<BaseClass1> baseClass1 = YADE_PTR_CAST<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
 			shared_ptr<BaseClass2> baseClass2 = YADE_PTR_CAST<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));
@@ -330,8 +312,6 @@ class DynLibDispatcher
 			for( IteratorInfo2 cii = callBacksInfo.begin() ; cii != callBacksInfo.end() ; ++cii )
 				cii->resize(maxCurrentIndex2+1);
 	
-			shared_ptr<Executor> executor = ex ? ex : makeExecutor(libName);	// create the requested functor
-		
 			if( typeid(BaseClass1) == typeid(BaseClass2) ) // both base classes are the same
 			{
 				callBacks	[index2][index1] = executor;
@@ -351,7 +331,7 @@ class DynLibDispatcher
 					callBacksInfo	[index1][index2] = 1; // this is reversed call
 				} else
 				{
-					throw std::runtime_error(("Multimethods: checkOrder: undefined dispatch order for "+libName).c_str());
+					throw std::runtime_error(("Multimethods: checkOrder: undefined dispatch order for "+executor->getClassName()).c_str());
 				}
 			}
 			else // classes are different, no symmetry possible
@@ -361,7 +341,7 @@ class DynLibDispatcher
 			}
 
 			#if 0
-				cerr <<" New class added to MultiMethodsManager 2D: " << libName << endl;
+				cerr <<"Added new 2d functor "<<executor->getClassName()<<", callBacks size is "<<callBacks.size()<<","<<(callBacks.size()>0?callBacks[0].size():0)<<endl;
 			#endif
 		  }
 		
@@ -379,7 +359,7 @@ class DynLibDispatcher
 		}
 		/*! Return representation of the dispatch matrix as vector of int,int,string (i.e. index1,index2,functor name) */
 		vector<DynLibDispatcher_Item2D> dataDispatchMatrix2D(){
-			vector<DynLibDispatcher_Item2D> ret; for(size_t i=0; i<callBacks.size(); i++){ for(size_t j=0; j<callBacks.size(); j++){ if(callBacks[i][j]) ret.push_back(DynLibDispatcher_Item2D(i,j,callBacks[i][j]->getClassName())); } }
+			vector<DynLibDispatcher_Item2D> ret; for(size_t i=0; i<callBacks.size(); i++){ for(size_t j=0; j<callBacks[i].size(); j++){ /*cerr<<"["<<i<<","<<j<<"]";*/ if(callBacks[i][j]) { /* cerr<<"()"; */ ret.push_back(DynLibDispatcher_Item2D(i,j,callBacks[i][j]->getClassName())); } } }
 			return ret;
 		}
 		/*! Return representation of the dispatch matrix as vector of int,string (i.e. index,functor name) */
@@ -456,26 +436,6 @@ class DynLibDispatcher
 		};
 
 		
-// add multivirtual function to 3D
-
-//  to be written when needed.... - not too difficult
-// // 		void postProcessDispatcher3D(bool d)
-// // 		{
-// // 		}
-// // 		
-// // 		void storeFunctorName(const string& str1,const string& str2,const string& str3,const string& str4,shared_ptr<Executor>& ex)
-// // 		{
-// // 		}
-// 		
-// 		void add(string baseClassName1 , string baseClassName2 , string baseClassName3 , string libName)
-// 		{
-// 		}
-// 		
-// 		bool locateMultivirtualFunctor3D(int& index1, int& index2, int& index3,
-// 			shared_ptr<BaseClass1>& base1, shared_ptr<BaseClass2>& base2, shared_ptr<BaseClass3>& base3 )
-// 		{
-// 			return false;
-// 		}
 		
 // calling multivirtual function, 1D
 

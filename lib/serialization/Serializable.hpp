@@ -337,6 +337,9 @@ class Serializable : public Factorable
 	
 		Serializable() {};
 		virtual ~Serializable() {};
+		// comparison of strong equality of 2 objects (by their address)
+		bool operator==(const Serializable& other){ return this==&other; }
+		bool operator!=(const Serializable& other){ return this!=&other; }
 
 		virtual void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };

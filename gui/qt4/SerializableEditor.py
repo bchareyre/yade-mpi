@@ -138,6 +138,7 @@ class SerializableEditor(QWidget):
 		"Construct window, *ser* is the object we want to show."
 		QtGui.QWidget.__init__(self,parent)
 		self.ser=ser
+		self.hot=False
 		self.entries=[]
 		self.ignoredAttrs=ignoredAttrs
 		logging.debug('New Serializable of type %s'%ser.__class__.__name__)
@@ -167,7 +168,8 @@ class SerializableEditor(QWidget):
 			'int':int,'long':int,'body_id_t':long,'size_t':long,
 			'Real':float,'float':float,'double':float,
 			'Vector3r':Vector3,'Matrix3r':Matrix3,
-			'string':str,'BodyCallback':BodyCallback,'IntrCallback':IntrCallback
+			'string':str,
+			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,
 		}
 		for T,ret in vecMap.items():
 			if vecTest(T,cxxT):
@@ -194,24 +196,34 @@ class SerializableEditor(QWidget):
 	def mkWidget(self,entry):
 		typeMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Vector3:AttrEditor_Vector3,Matrix3:AttrEditor_Matrix3,(str,):AttrEditor_ListStr}
 		Klass=typeMap.get(entry.T,None)
-		if not Klass: return None
-		widget=Klass(self,self.ser,entry.name)
-		widget.setFocusPolicy(Qt.StrongFocus)
-		return widget
+		if Klass:
+			widget=Klass(self,self.ser,entry.name)
+			widget.setFocusPolicy(Qt.StrongFocus)
+			return widget
+		if entry.T.__class__==tuple:
+			if (issubclass(entry.T[0],Serializable) or entry.T[0]==Serializable):
+				widget=SeqSerializable(self,lambda: getattr(self.ser,entry.name),lambda x: setattr(self.ser,entry.name,x),entry.T[0])
+				return widget
+			return None
+		if issubclass(entry.T,Serializable) or entry.T==Serializable:
+			widget=SerializableEditor(getattr(self.ser,entry.name),parent=self)
+			return widget
+		return None
 	def mkWidgets(self):
 		self.mkAttrEntries()
-		grid=QtGui.QGridLayout()
+		grid=QFormLayout()
+		grid.setContentsMargins(2,2,2,2)
 		grid.setVerticalSpacing(0)
+		grid.setLabelAlignment(Qt.AlignRight)
 		for lineNo,entry in enumerate(self.entries):
-			grid.addWidget(QtGui.QLabel(entry.name),lineNo,0)
 			entry.widget=self.mkWidget(entry)
-			if entry.widget: grid.addWidget(entry.widget,lineNo,1)
-			else: grid.addWidget(QtGui.QLabel('<i>unhandled type</i>'),lineNo,1)
+			grid.addRow(entry.name,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
 		self.setLayout(grid)
 		self.refreshEvent()
 	def refreshEvent(self):
 		for e in self.entries:
 			if e.widget and not e.widget.hot: e.widget.refresh()
+	def refresh(self): pass
 	def closeEvent(self,*args):
 		self.refreshTimer.stop()
 
@@ -227,9 +239,11 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		self.getter,self.setter=getter,setter
 		self.tb=self.objectToolBox
 		self.tb.sizeHint=lambda: QSize(120,15)
+		self.hot=False
 		self.serType=serType
 		self.clearToolBox()
 		self.fillToolBox()
+		self.changedSlot()
 		self.refreshTimer=QTimer()
 		self.refreshTimer.timeout.connect(self.refreshEvent)
 		self.refreshTimer.start(1000) # 1s should be enough
@@ -260,12 +274,20 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		self.tb.removeItem(self.tb.currentIndex())
 		w.close()
 		self.update(); self.relabelItems()
+	def changedSlot(self):
+		cnt=self.tb.count()
+		ix=self.tb.currentIndex()
+		self.moveUpButton.setEnabled(ix>0 and cnt>0)
+		self.moveDownButton.setEnabled(ix<cnt-1 and cnt>0)
+		self.killButton.setEnabled(cnt>0)
 	def newSlot(self,*args):
-		import yade.system
-		base=self.serType.__name__; childs=list(yade.system.childClasses(base)|set([base])); childs.sort()
-		klass,ok=QInputDialog.getItem(self,'Insert new item','Classes inheriting from '+base,childs,editable=False)
-		if not ok or len(klass)==0: return
-		ix=self.tb.currentIndex(); ser=eval(str(klass)+'()')
+		base=self.serType.__name__;
+		#klass,ok=QInputDialog.getItem(self,'Insert new item','Classes inheriting from '+base,childs,editable=False)
+		#if not ok or len(klass)==0: return
+		dialog=NewSerializableDialog(self,base,includeBase=True)
+		if not dialog.exec_(): return # cancelled
+		ser=dialog.result()
+		ix=self.tb.currentIndex(); 
 		self.tb.insertItem(ix,SerializableEditor(ser,parent=None),self.mkItemLabel(ser,ix))
 		self.tb.setCurrentIndex(ix)
 		self.update(); self.relabelItems()
@@ -273,15 +295,45 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		self.setter([self.tb.widget(i).ser for i in range(0,self.tb.count())])
 	def refreshEvent(self):
 		curr=self.getter()
-		# HACK: implement == and != properly for Serializable (based on address); str embeds address, so it is ok functionality-wise
-		if sum([str(curr[i])!=str(self.tb.widget(i).ser) for i in range(self.tb.count())])==0 and len(curr)==self.tb.count(): return # same length and contents
+		# == and != compares addresses on Serializables
+		if sum([curr[i]!=self.tb.widget(i).ser for i in range(self.tb.count())])==0 and len(curr)==self.tb.count(): return # same length and contents
 		# something changed in the sequence order, so we have to rebuild from scratch; keep index at least
 		logging.debug('Rebuilding list from scratch')
 		ix=self.tb.currentIndex()
 		self.clearToolBox();	self.fillToolBox()
 		self.tb.setCurrentIndex(ix)
+	def refresh(self): pass # refreshEvent(self)
 	def closeEvent(self,*args):
 		self.refreshTimer.stop()
+
+class NewSerializableDialog(QDialog):
+	def __init__(self,parent,baseClassName,includeBase=True):
+		import yade.system
+		QDialog.__init__(self,parent)
+		self.setWindowTitle('Create new object of type %s'%baseClassName)
+		self.layout=QVBoxLayout(self)
+		self.combo=QComboBox(self)
+		childs=list(yade.system.childClasses(baseClassName,includeBase=includeBase)); childs.sort()
+		self.combo.addItems(childs)
+		self.combo.currentIndexChanged.connect(self.comboSlot)
+		self.scroll=QScrollArea(self)
+		self.buttons=QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel);
+		self.buttons.accepted.connect(self.accept)
+		self.buttons.rejected.connect(self.reject)
+		self.layout.addWidget(self.combo)
+		self.layout.addWidget(self.scroll)
+		self.layout.addWidget(self.buttons)
+		self.ser=None
+		self.combo.setCurrentIndex(0); self.comboSlot(0)
+		self.setWindowModality(Qt.WindowModal)
+	def comboSlot(self,index):
+		item=str(self.combo.itemText(index))
+		self.ser=eval(item+'()')
+		self.scroll.setWidget(SerializableEditor(self.ser,self.scroll))
+		self.scroll.show()
+	def result(self): return self.ser
+	def sizeHint(self): return QSize(180,400)
+
 
 
 #print __name__
@@ -292,7 +344,12 @@ if 0:
 	#s1.show()
 	#s2=SerializableEditor(OpenGLRenderer())
 	#s2.show()
-	O.engines=[InsertionSortCollider(),VTKRecorder(),NewtonIntegrator()]
-	ss=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
-	ss.show()
+	#O.engines=[InsertionSortCollider(),VTKRecorder(),NewtonIntegrator()]
+	#ss=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
+	#ss.show()
+	nsd=NewSerializableDialog(None,'Engine')
+	if nsd.exec_():
+		retVal=nsd.result()
+		print 'Returning',retVal
+	
 
