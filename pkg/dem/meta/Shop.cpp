@@ -32,10 +32,8 @@ class SceneShape; */
 
 #include<yade/pkg-common/ForceResetter.hpp>
 
-#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
-#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
-#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>

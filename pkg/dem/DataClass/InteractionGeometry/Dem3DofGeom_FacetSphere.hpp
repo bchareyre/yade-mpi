@@ -53,7 +53,7 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_FacetSphere);
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_FacetSphere);
 #endif
 
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	Vector3r getClosestSegmentPt(const Vector3r& P, const Vector3r& A, const Vector3r& B){
 		// algo: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/

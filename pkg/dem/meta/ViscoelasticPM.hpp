@@ -6,8 +6,7 @@
 
 #include<yade/core/Material.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
-#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/LawFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 /* Simple viscoelastic model */
  

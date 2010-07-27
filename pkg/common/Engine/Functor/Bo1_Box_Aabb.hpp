@@ -9,7 +9,7 @@
 #pragma once
 
 
-#include<yade/pkg-common/BoundFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 
 class Bo1_Box_Aabb : public BoundFunctor{

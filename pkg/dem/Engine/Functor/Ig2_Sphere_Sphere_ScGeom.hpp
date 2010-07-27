@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 class Ig2_Sphere_Sphere_ScGeom: public InteractionGeometryFunctor{
 	public:

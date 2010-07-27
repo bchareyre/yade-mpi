@@ -63,7 +63,7 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_SphereSphere);
 #endif
 
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);

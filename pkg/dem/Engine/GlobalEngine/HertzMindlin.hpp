@@ -11,11 +11,10 @@ Mindlin is a set of classes to include the Hertz-Mindlin formulation for the con
 
 #include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-common/LawFunctor.hpp>
 
 
 /******************** MindlinPhys *********************************/

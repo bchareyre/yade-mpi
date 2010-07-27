@@ -50,6 +50,7 @@ class pyGLViewer{
 		bool get_scale(){GLV; return glv->drawScale;} void set_scale(bool b){GLV; glv->drawScale=b;}
 		bool get_orthographic(){GLV; return glv->camera()->type()==qglviewer::Camera::ORTHOGRAPHIC;}
 		void set_orthographic(bool b){GLV; return glv->camera()->setType(b ? qglviewer::Camera::ORTHOGRAPHIC : qglviewer::Camera::PERSPECTIVE);}
+		int get_selection(void){ GLV; return glv->selectedName(); } void set_selection(int s){ GLV; glv->setSelectedName(s); }
 		#define FLOAT_GET_SET(property,getter,setter)void set_##property(Real r){GLV; setter(r);} Real get_##property(){GLV; return getter();}
 		FLOAT_GET_SET(sceneRadius,glv->sceneRadius,glv->setSceneRadius);
 		void fitAABB(const Vector3r& min, const Vector3r& max){GLV;  glv->camera()->fitBoundingBox(qglviewer::Vec(min[0],min[1],min[2]),qglviewer::Vec(max[0],max[1],max[2]));}
@@ -112,6 +113,7 @@ BOOST_PYTHON_MODULE(_GLViewer){
 		.def("saveState",&pyGLViewer::saveDisplayParameters,(py::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderer`.")
 		.def("loadState",&pyGLViewer::useDisplayParameters,(py::arg("slot")),"Load display parameters from slot saved previously into, identified by its number.")
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
+		.add_property("selection",&pyGLViewer::get_selection,&pyGLViewer::set_selection)
 		;
 }
 

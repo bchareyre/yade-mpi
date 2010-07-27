@@ -32,7 +32,7 @@
 #include<yade/lib-pyutil/raw_constructor.hpp>
 #include<yade/lib-pyutil/doc_opts.hpp>
 
-#if defined(YADE_QT4) || defined(YADE_NOQT3)
+#if defined(YADE_QT4) || (defined(YADE_NOQT3) || !defined(YADE_QT3))
 	#define YADE_NO_YADE_SERIALIZATION
 #endif
 
@@ -179,7 +179,7 @@ namespace yade{
 	REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC2,thisClass,attrs),deprec) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
 	/* accessors for deprecated attributes, with warnings */ BOOST_PP_SEQ_FOR_EACH(_ACCESS_DEPREC,thisClass,deprec) \
-	/* python class registration */ virtual void pyRegisterClass(python::object _scope) { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()); BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs); (void) _classObj BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec); (void) _classObj extras ; }
+	/* python class registration */ virtual void pyRegisterClass(python::object _scope) { checkPyClassRegistersItself(#thisClass); boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()); BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs); (void) _classObj BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec); (void) _classObj extras ; }
 	// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
 // #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,,extras)
 
@@ -212,7 +212,7 @@ namespace yade{
 	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIP_TYPE_DEFAULT_DOC,~,attrs)) \
 	/* called only at class registration, to set initial values; storage still has to be alocated in the cpp file! */ \
 	void initSetStaticAttributesValue(void){ BOOST_PP_SEQ_FOR_EACH(_STATATTR_SET,thisClass,attrs); } \
-	virtual void pyRegisterClass(python::object _scope) { if(!checkPyClassRegistersItself(#thisClass)) return; initSetStaticAttributesValue(); boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
+	virtual void pyRegisterClass(python::object _scope) { checkPyClassRegistersItself(#thisClass); initSetStaticAttributesValue(); boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
 		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString "\n\n" BOOST_PP_SEQ_FOR_EACH(_STATATTR_DOC,thisClass,attrs) ); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)); \
 		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
 	}
@@ -347,7 +347,7 @@ class Serializable : public Factorable
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
 		// check whether the class registers itself or whether it calls virtual function of some base class;
 		// that means that the class doesn't register itself properly
-		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const;
+		virtual void checkPyClassRegistersItself(const std::string& thisClassName) const;
 		// perform class registration; overridden in all classes
 		virtual void pyRegisterClass(boost::python::object _scope);
 		// perform any manipulation of arbitrary constructor arguments coming from python, manipulating them in-place;

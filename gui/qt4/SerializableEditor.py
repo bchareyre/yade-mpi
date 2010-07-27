@@ -1,3 +1,4 @@
+# encoding: utf-8
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import QtGui
@@ -30,6 +31,9 @@ class AttrEditor():
 		self.repaint()
 		#print self.attr,('hot' if hot else 'cold')
 	def sizeHint(self): return QSize(150,12)
+	def setAttribute(self,ser,attr,val):
+		try: setattr(ser,attr,val)
+		except AttributeError: self.setEnabled(False) # read-only attribute
 
 class AttrEditor_Bool(AttrEditor,QCheckBox):
 	def __init__(self,parent,ser,attr):
@@ -38,7 +42,7 @@ class AttrEditor_Bool(AttrEditor,QCheckBox):
 		self.clicked.connect(self.update)
 	def refresh(self):
 		self.setChecked(getattr(self.ser,self.attr))
-	def update(self): setattr(self.ser,self.attr,self.isChecked())
+	def update(self): self.setAttribute(self.ser,self.attr,self.isChecked())
 
 class AttrEditor_Int(AttrEditor,QSpinBox):
 	def __init__(self,parent,ser,attr):
@@ -46,8 +50,13 @@ class AttrEditor_Int(AttrEditor,QSpinBox):
 		QSpinBox.__init__(self,parent)
 		self.setRange(int(-1e10),int(1e10)); self.setSingleStep(1);
 		self.valueChanged.connect(self.update)
-	def refresh(self): self.setValue(getattr(self.ser,self.attr))
-	def update(self): setattr(self.ser,self.attr,self.value()); self.isHot(False)
+	def refresh(self):
+		val=getattr(self.ser,self.attr)
+		#print 'INT',self.ser,self.attr,val
+		self.setValue(val)
+	def update(self):
+		sim,ui=getattr(self.ser,self.attr),self.value()
+		if sim!=ui: self.setAttribute(self.ser,self.attr,ui)
 
 class AttrEditor_Str(AttrEditor,QLineEdit):
 	def __init__(self,parent,ser,attr):
@@ -56,7 +65,7 @@ class AttrEditor_Str(AttrEditor,QLineEdit):
 		self.textEdited.connect(self.isHot)
 		self.editingFinished.connect(self.update)
 	def refresh(self): self.setText(getattr(self.ser,self.attr))
-	def update(self): setattr(self.ser,self.attr,str(self.text())); self.isHot(False)
+	def update(self): self.setAttribute(self.ser,self.attr,str(self.text())); self.isHot(False)
 
 class AttrEditor_Float(AttrEditor,QLineEdit):
 	def __init__(self,parent,ser,attr):
@@ -66,7 +75,7 @@ class AttrEditor_Float(AttrEditor,QLineEdit):
 		self.editingFinished.connect(self.update)
 	def refresh(self): self.setText(str(getattr(self.ser,self.attr)))
 	def update(self):
-		try: setattr(self.ser,self.attr,float(self.text()))
+		try: self.setAttribute(self.ser,self.attr,float(self.text()))
 		except ValueError: self.refresh()
 		self.isHot(False)
 
@@ -95,7 +104,7 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 				w=self.grid.itemAtPosition(row,col).widget()
 				if w.isModified(): val[self.idxConverter(row,col)]=float(w.text())
 			logging.debug('setting'+str(val))
-			setattr(self.ser,self.attr,val)
+			self.setAttribute(self.ser,self.attr,val)
 		except ValueError: self.refresh()
 		self.isHot(False)
 
@@ -106,6 +115,9 @@ class AttrEditor_Matrix3(AttrEditor_MatrixX):
 	def __init__(self,parent,ser,attr):
 		AttrEditor_MatrixX.__init__(self,parent,ser,attr,3,3,lambda r,c:(r,c))
 class AttrEditor_Quaternion(AttrEditor_MatrixX):
+	def __init__(self,parent,ser,attr):
+		AttrEditor_MatrixX.__init__(self,parent,ser,attr,1,4,lambda r,c:c)
+class AttrEditor_Se3(AttrEditor_MatrixX):
 	def __init__(self,parent,ser,attr):
 		AttrEditor_MatrixX.__init__(self,parent,ser,attr,1,4,lambda r,c:c)
 
@@ -122,10 +134,10 @@ class AttrEditor_ListStr(AttrEditor,QPlainTextEdit):
 	def update(self):
 		if self.hasFocus(): self.isHot()
 		t=self.toPlainText()
-		setattr(self.ser,self.attr,str(t).strip().split('\n'))
+		self.setAttribute(self.ser,self.attr,str(t).strip().split('\n'))
 		if not self.hasFocus(): self.isHot(False)
 
-class SerializableEditor(QWidget):
+class SerializableEditor(QFrame):
 	"Class displaying and modifying serializable attributes of a yade object."
 	import collections
 	import logging
@@ -134,17 +146,18 @@ class SerializableEditor(QWidget):
 		def __init__(self,name,T):
 			self.name,self.T=name,T
 			self.lineNo,self.widget=None,None
-	def __init__(self,ser,parent=None,ignoredAttrs=set()):
+	def __init__(self,ser,parent=None,ignoredAttrs=set(),showType=False):
 		"Construct window, *ser* is the object we want to show."
-		QtGui.QWidget.__init__(self,parent)
+		QtGui.QFrame.__init__(self,parent)
 		self.ser=ser
+		self.showType=showType
 		self.hot=False
 		self.entries=[]
 		self.ignoredAttrs=ignoredAttrs
 		logging.debug('New Serializable of type %s'%ser.__class__.__name__)
 		self.setWindowTitle(str(ser))
 		self.mkWidgets()
-		self.refreshTimer=QTimer()
+		self.refreshTimer=QTimer(self)
 		self.refreshTimer.timeout.connect(self.refreshEvent)
 		self.refreshTimer.start(500)
 	def getListTypeFromDocstring(self,attr):
@@ -169,7 +182,7 @@ class SerializableEditor(QWidget):
 			'Real':float,'float':float,'double':float,
 			'Vector3r':Vector3,'Matrix3r':Matrix3,
 			'string':str,
-			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,
+			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,'BoundFunctor':BoundFunctor,'InteractionGeometryFunctor':InteractionGeometryFunctor,'InteractionPhysicsFunctor':InteractionPhysicsFunctor,'LawFunctor':LawFunctor
 		}
 		for T,ret in vecMap.items():
 			if vecTest(T,cxxT):
@@ -184,17 +197,21 @@ class SerializableEditor(QWidget):
 			logging.error('TypeError when getting attributes of '+str(self.ser)+',skipping. ')
 			import traceback
 			traceback.print_exc()
-		for attr,val in self.ser.dict().items():
-			if attr in self.ignoredAttrs:
+		for attr in self.ser.dict():
+			val=getattr(self.ser,attr) # get the value using serattr, as it might be different from what the dictionary provides (e.g. Body.blockedDOFs)
+			t=None
+			if attr in self.ignoredAttrs or attr=='blockedDOFs': # HACK here
 				continue
 			if isinstance(val,list):
-				if len(val)==0: t=self.getListTypeFromDocstring(attr)
-				else: t=(val[0].__class__,) # 1-tuple is list of the contained type
+				t=self.getListTypeFromDocstring(attr)
+				if not t and len(val)==0: t=(val[0].__class__,) # 1-tuple is list of the contained type
+				#if not t: raise RuntimeError('Unable to guess type of '+str(self.ser)+'.'+attr)
 			else: t=val.__class__
 			#logging.debug('Attr %s is of type %s'%(attr,((t[0].__name__,) if isinstance(t,tuple) else t.__name__)))
 			self.entries.append(self.EntryData(name=attr,T=t))
 	def mkWidget(self,entry):
-		typeMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Vector3:AttrEditor_Vector3,Matrix3:AttrEditor_Matrix3,(str,):AttrEditor_ListStr}
+		if not entry.T: return None
+		typeMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Quaternion:AttrEditor_Quaternion,Vector3:AttrEditor_Vector3,Matrix3:AttrEditor_Matrix3,(str,):AttrEditor_ListStr}
 		Klass=typeMap.get(entry.T,None)
 		if Klass:
 			widget=Klass(self,self.ser,entry.name)
@@ -206,7 +223,8 @@ class SerializableEditor(QWidget):
 				return widget
 			return None
 		if issubclass(entry.T,Serializable) or entry.T==Serializable:
-			widget=SerializableEditor(getattr(self.ser,entry.name),parent=self)
+			widget=SerializableEditor(getattr(self.ser,entry.name),parent=self,showType=self.showType)
+			widget.setFrameShape(QFrame.Box); widget.setFrameShadow(QFrame.Raised); widget.setLineWidth(1)
 			return widget
 		return None
 	def mkWidgets(self):
@@ -215,7 +233,11 @@ class SerializableEditor(QWidget):
 		grid.setContentsMargins(2,2,2,2)
 		grid.setVerticalSpacing(0)
 		grid.setLabelAlignment(Qt.AlignRight)
-		for lineNo,entry in enumerate(self.entries):
+		if self.showType:
+			lab=QLabel(u'<b>→  '+self.ser.__class__.__name__+u'  ←</b>')
+			lab.setFrameShape(QFrame.Box); lab.setFrameShadow(QFrame.Sunken); lab.setLineWidth(2); lab.setAlignment(Qt.AlignHCenter)
+			grid.setWidget(0,QFormLayout.SpanningRole,lab)
+		for entry in self.entries:
 			entry.widget=self.mkWidget(entry)
 			grid.addRow(entry.name,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
 		self.setLayout(grid)
@@ -224,9 +246,6 @@ class SerializableEditor(QWidget):
 		for e in self.entries:
 			if e.widget and not e.widget.hot: e.widget.refresh()
 	def refresh(self): pass
-	def closeEvent(self,*args):
-		self.refreshTimer.stop()
-
 
 #import sys; sys.path.append('.')
 from yade.qt.ui_SeqSerializable import Ui_SeqSerializable
@@ -244,7 +263,7 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		self.clearToolBox()
 		self.fillToolBox()
 		self.changedSlot()
-		self.refreshTimer=QTimer()
+		self.refreshTimer=QTimer(self)
 		self.refreshTimer.timeout.connect(self.refreshEvent)
 		self.refreshTimer.start(1000) # 1s should be enough
 	def clearToolBox(self):
@@ -296,15 +315,13 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 	def refreshEvent(self):
 		curr=self.getter()
 		# == and != compares addresses on Serializables
-		if sum([curr[i]!=self.tb.widget(i).ser for i in range(self.tb.count())])==0 and len(curr)==self.tb.count(): return # same length and contents
+		if len(curr)==self.tb.count() and sum([curr[i]!=self.tb.widget(i).ser for i in range(self.tb.count())])==0: return # same length and contents
 		# something changed in the sequence order, so we have to rebuild from scratch; keep index at least
 		logging.debug('Rebuilding list from scratch')
 		ix=self.tb.currentIndex()
 		self.clearToolBox();	self.fillToolBox()
 		self.tb.setCurrentIndex(ix)
 	def refresh(self): pass # refreshEvent(self)
-	def closeEvent(self,*args):
-		self.refreshTimer.stop()
 
 class NewSerializableDialog(QDialog):
 	def __init__(self,parent,baseClassName,includeBase=True):

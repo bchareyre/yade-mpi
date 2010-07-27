@@ -1,7 +1,7 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/Shape.hpp>
-#include<yade/pkg-common/BoundFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 
 /*! Object representing infinite plane aligned with the coordinate system (axis-aligned wall). */

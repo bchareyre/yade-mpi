@@ -66,9 +66,6 @@ if yade.config.debug and opts.noGdb:
 if 'log4cxx' in yade.config.features and opts.verbosity:
 	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,2)])
 
-# run servers
-yade.system.runServers()
-
 # modify sys.argv in-place so that it can be handled by userSession
 sys.argv=yade.runtime.argv=args
 yade.runtime.opts=opts
@@ -80,7 +77,6 @@ def userSession(qt3=False,qt4=False):
 	# prepare nice namespace for users
 	import yade
 	import sys
-	# something to run?
 	if len(sys.argv)>0:
 		arg0=sys.argv[0]
 		if qt3: yade.qt.Controller();
@@ -90,15 +86,25 @@ def userSession(qt3=False,qt4=False):
 			sys.stderr.write("Running simulation "+arg0+'\n')
 			O=yade.wrapper.Omega(); O.load(arg0); O.run()
 		if arg0.endswith('.py'):
-			sys.stderr.write("Running script "+arg0+'\n')
-			try:
-				execfile(arg0,globals())
-			except SystemExit: raise
-			except: # all other exceptions
-				import traceback
-				traceback.print_exc()
-				if yade.runtime.opts.exitAfter: sys.exit(1)
-			if yade.runtime.opts.exitAfter: sys.exit(0)
+			def runScript(script):
+				sys.stderr.write("Running script "+arg0+'\n')
+				try:
+					execfile(script,globals())
+				except SystemExit: raise
+				except: # all other exceptions
+					import traceback
+					traceback.print_exc()
+					if yade.runtime.opts.exitAfter: sys.exit(1)
+				if yade.runtime.opts.exitAfter: sys.exit(0)
+			#if qt4:
+			#	class RunScriptThread(QThread):
+			#		def __init__(self,script): QThread.__init__(self); self.script=script
+			#		def run(self): runScript(self.script)
+			#	worker=RunScriptThread(arg0)
+			#	worker.start()
+			#	print 'worker started'
+			#else:
+			runScript(arg0)
 	# show python console
 	if 1:
 		from IPython.Shell import IPShellEmbed
@@ -129,12 +135,12 @@ def userSession(qt3=False,qt4=False):
 		ipshell()
 		# save history -- a workaround for atexit handlers not being run (why?)
 		# http://lists.ipython.scipy.org/pipermail/ipython-user/2008-September/005839.html
-		#import IPython.ipapi
-		#IPython.ipapi.get().IP.atexit_operations()
+		import IPython.ipapi
+		IPython.ipapi.get().IP.atexit_operations()
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
-if 'opengl' in features and not 'noqt3' in features: gui='qt3'
+if 'qt3' in features: gui='qt3'
 if 'qt4' in features: gui='qt4'
 if opts.nogui: gui=None
 if gui:
@@ -146,6 +152,12 @@ if gui:
 		Xlib.display._BaseDisplay(); # contrary to display.Display, _BaseDisplay does not check for extensions and that avoids spurious message "Xlib.protocol.request.QueryExtension" (bug?)
 	except Xlib.error.DisplayError:
 		gui=None
+
+# run remote access things, before actually starting the user session
+from yade import remote
+yade.remote.useQThread=(gui=='qt4')
+yade.remote.runServers()
+
 if gui==None:
 	userSession()
 elif gui=='qt3':

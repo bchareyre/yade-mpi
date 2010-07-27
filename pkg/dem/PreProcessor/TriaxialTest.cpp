@@ -19,11 +19,9 @@
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundDispatcher.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
-#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
-#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>

@@ -12,7 +12,7 @@
 
 
 void Serializable::pyRegisterClass(boost::python::object _scope) {
-	if(!checkPyClassRegistersItself("Serializable")) return;
+	checkPyClassRegistersItself("Serializable");
 	boost::python::scope thisScope(_scope); 
 	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
 		.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")
@@ -31,11 +31,8 @@ void Serializable::pyRegisterClass(boost::python::object _scope) {
 		;
 }
 
-bool Serializable::checkPyClassRegistersItself(const std::string& thisClassName) const {
-	if(getClassName()!=thisClassName){
-		std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR*; will be inaccessible from python."<<std::endl; return false;
-	}
-	return true;
+void Serializable::checkPyClassRegistersItself(const std::string& thisClassName) const {
+	if(getClassName()!=thisClassName) throw std::logic_error(("Class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR*, would not be accessible from python.").c_str());
 }
 
 
@@ -47,6 +44,7 @@ void Serializable::pyUpdateAttrs(const python::dict& d){
 		string key=python::extract<string>(t[0]);
 		pySetAttr_nowarn(key,t[1]);
 	}
+	postProcessAttributes(/*deserializing*/true); // to make sure
 }
 
 python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
@@ -56,6 +54,7 @@ python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
 		string key=python::extract<string>(t[0]);
 		if(pyHasKey(key)) pySetAttr_nowarn(key,t[1]); else ret.append(t[0]);
 	}
+	postProcessAttributes(/*deserializing*/true); // to make sure
 	return ret; 
 }
 

@@ -39,8 +39,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.File('runtime.py'),
 	env.File('manpage.py'),
 	env.File('_extraDocs.py'),
-	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',])),
-	env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundFunctor InteractionGeometryFunctor InteractionPhysicsFunctor LawFunctor")))
+	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','Dispatching','InteractionDispatchers','ParallelEngine','Clump','STLImporter',])),
+	env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['Dispatching']))
 ])
 env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
 	env.File('__init__.py','tests'),

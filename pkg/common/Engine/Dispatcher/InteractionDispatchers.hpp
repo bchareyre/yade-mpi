@@ -2,9 +2,7 @@
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/pkg-common/Callbacks.hpp>
-#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
-#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
-#include<yade/pkg-common/LawDispatcher.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 class InteractionDispatchers: public GlobalEngine {
 	bool alreadyWarnedNoCollider;

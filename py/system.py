@@ -13,7 +13,8 @@ O=wrapper.Omega()
 
 def childClasses(base,recurse=True,includeBase=False):
 	"""Enumerate classes deriving from given base (as string), recursively by default. Returns set."""
-	ret=set(O.childClassesNonrecursive(base)); ret2=set()
+	ret=set(O.childClassesNonrecursive(base)); ret2=set();
+	if includeBase: ret|=set([base])
 	if not recurse: return ret
 	for bb in ret:
 		ret2|=childClasses(bb)
@@ -236,47 +237,6 @@ def setExitHandlers():
 		sys.exit=wrapper.Omega().exitNoBacktrace
 	# this seems to be not needed anymore:
 	#sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
-
-def runServers():
-	"""Run python telnet server and info socket. They will be run at localhost on ports 9000 (or higher if used) and 21000 (or higer if used) respectively.
-	
-	The python telnet server accepts only connection from localhost,
-	after authentication by random cookie, which is printed on stdout
-	at server startup.
-
-	The info socket provides read-only access to several simulation parameters
-	at runtime. Each connection receives pickled dictionary with those values.
-	This socket is primarily used by yade-multi batch scheduler.
-	"""
-	import yade.remote
-	srv=yade.remote.GenericTCPServer(handler=yade.remote.PythonConsoleSocketEmulator,title='TCP python prompt',cookie=True,minPort=9000)
-	yade.runtime.cookie=srv.server.cookie
-	info=yade.remote.GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
-	sys.stdout.flush()
-
-# inspired by http://crunchyfrog.googlecode.com/svn/tags/0.3.4/utils/command/build_manpage.py
-# many thanks
-
-if 0: # not yet used
-	class ManPageFormatter(optparse.HelpFormatter):
-		def __init__(self,indent_increment=2,max_help_position=24,width=None,short_first=1):
-			optparse.HelpFormatter.__init__(self, indent_increment,max_help_position, width, short_first)
-		def _markup(self, txt):
-			return txt.replace('-', '\\-')
-		def format_usage(self, usage):
-			return self._markup(usage)
-		def format_heading(self, heading):
-			if self.level == 0:
-				return ''
-			return '.TP\n%s\n' % self._markup(heading.upper())
-		def format_option(self, option):
-			result = []
-			opts = self.option_strings[option]
-			result.append('.TP\n.B %s\n' % self._markup(opts))
-			if option.help:
-				help_text = '%s\n' % self._markup(self.expand_default(option))
-				result.append(help_text)
-			return ''.join(result)
 
 
 # consistency check

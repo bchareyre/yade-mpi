@@ -4,6 +4,7 @@ from PyQt4 import QtCore
 
 from yade.qt.ui_controller import Ui_Controller
 from yade.qt.SerializableEditor import SerializableEditor,SeqSerializable
+from yade.qt.Inspector import *
 from yade import *
 import yade.system
 
@@ -41,8 +42,7 @@ class Controller(QWidget,Ui_Controller):
 				if len(set(inst.dict().keys())-set(['label']))>0:
 					self.displayCombo.addItem(c); afterSep+=1
 	def inspectSlot(self):
-		self.inspector=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
-		self.inspector.setWindowTitle('O.engines')
+		self.inspector=SimulationInspector(parent=None)
 		self.inspector.show()
 	def setTabActive(self,what):
 		if what=='simulation': ix=0
@@ -189,9 +189,9 @@ def Generator():
 	controller.show()
 	controller.setTabActive('generator')
 
-if __name__=='__main__':
-	from PyQt4 import QtGui
-	import sys
-	qapp=QtGui.QApplication(sys.argv)
-	c=Controller().show()
-	qapp.exec_()
+#if __name__=='__main__':
+#	from PyQt4 import QtGui
+#	import sys
+#	qapp=QtGui.QApplication(sys.argv)
+#	c=Controller().show()
+#	qapp.exec_()

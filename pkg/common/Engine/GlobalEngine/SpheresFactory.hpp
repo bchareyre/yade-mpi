@@ -8,7 +8,7 @@
 #pragma once
 
 #include <yade/pkg-common/PeriodicEngines.hpp>
-#include <yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include <yade/pkg-common/Dispatching.hpp>
 #include <yade/core/Collider.hpp>
 #include <yade/core/Scene.hpp>
 #include <vector>

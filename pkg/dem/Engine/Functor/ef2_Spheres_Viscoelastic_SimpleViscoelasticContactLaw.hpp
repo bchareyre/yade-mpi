@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/LawFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 /// This class provides linear viscoelastic contact model
 class ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw : public LawFunctor

@@ -34,7 +34,7 @@
 
 #include<yade/pkg-dem/STLImporter.hpp>
 
-#include<yade/core/Dispatcher.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Functor.hpp>
@@ -279,27 +279,35 @@ class pyOmega{
 				pyRunString("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')");
 				//boost::python::scope("__builtins__").attr(e->label)=e;
 			}
-			if(isChildClassOf(e->getClassName(),"Dispatcher")){
-				shared_ptr<Dispatcher> ee=dynamic_pointer_cast<Dispatcher>(e);
-				FOREACH(const shared_ptr<Functor>& f, ee->functors){
-					if(!f->label.empty()){
-						pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");
-					}
-				}
+			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(!f->label.empty()){ pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");}} }
+			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
+			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(InteractionGeometryDispatcher); _TRY_DISPATCHER(InteractionPhysicsDispatcher); _TRY_DISPATCHER(LawDispatcher);
+			InteractionDispatchers* id=dynamic_cast<InteractionDispatchers*>(e.get());
+			if(id){
+				_DO_FUNCTORS(id->geomDispatcher->functors,InteractionGeometryFunctor);
+				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
+				_DO_FUNCTORS(id->lawDispatcher->functors,LawFunctor);
 			}
-			if(e->getClassName()=="InteractionDispatchers"){
-				shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(e);
-				list<shared_ptr<Functor> > eus;
-				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functors) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functors) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functors) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,eus){
-					if(!eu->label.empty()){
-						pyRunString("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')");
-					}
-				}
-			}
+			#undef _DO_FUNCTORS
+			#undef _TRY_DISPATCHER
 		}
+	}
+	python::object labeled_engine_get(string label){
+		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
+			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(f->label==label) return python::object(f); }}
+			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
+			if(e->label==label){ return python::object(e); }
+			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(InteractionGeometryDispatcher); _TRY_DISPATCHER(InteractionPhysicsDispatcher); _TRY_DISPATCHER(LawDispatcher);
+			InteractionDispatchers* id=dynamic_cast<InteractionDispatchers*>(e.get());
+			if(id){
+				_DO_FUNCTORS(id->geomDispatcher->functors,InteractionGeometryFunctor);
+				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
+				_DO_FUNCTORS(id->lawDispatcher->functors,LawFunctor);
+			}
+			#undef _DO_FUNCTORS
+			#undef _TRY_DISPATCHER
+		}
+		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
 
 	long iter(){ return OMEGA.getScene()->currentIteration;}
@@ -400,28 +408,6 @@ class pyOmega{
 	vector<shared_ptr<Engine> > initializers_get(void){assertScene(); return OMEGA.getScene()->initializers;}
 	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertScene(); OMEGA.getScene()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getScene()->needsInitializers=true; }
 
-	python::object labeled_engine_get(string label){
-		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getScene()->engines){
-			if(eng->label==label){ return python::object(eng); }
-			shared_ptr<Dispatcher> me=dynamic_pointer_cast<Dispatcher>(eng);
-			if(me){
-				FOREACH(const shared_ptr<Functor>& eu, me->functors){
-					if(eu->label==label) return python::object(eu);
-				}
-			}
-			shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(eng);
-			if(ee){
-				list<shared_ptr<Functor> > eus;
-				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functors) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functors) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functors) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,eus){
-					if(eu->label==label) return python::object(eu);
-				}
-			}
-		}
-		throw std::invalid_argument(string("No engine labeled `")+label+"'");
-	}
 	
 	pyBodyContainer bodies_get(void){assertScene(); return pyBodyContainer(OMEGA.getScene()->bodies); }
 	pyInteractionContainer interactions_get(void){assertScene(); return pyInteractionContainer(OMEGA.getScene()->interactions); }

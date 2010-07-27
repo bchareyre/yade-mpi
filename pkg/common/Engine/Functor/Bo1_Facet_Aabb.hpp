@@ -8,7 +8,7 @@
  
 #pragma once
 
-#include <yade/pkg-common/BoundFunctor.hpp>
+#include <yade/pkg-common/Dispatching.hpp>
 
 class Bo1_Facet_Aabb : public BoundFunctor{
 	public:

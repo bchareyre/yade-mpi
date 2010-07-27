@@ -65,7 +65,7 @@ void OpenGLRenderer::setBodiesRefSe3(){
 
 void OpenGLRenderer::initgl(){
 	LOG_DEBUG("(re)initializing GL for gldraw methods.\n");
-	#define _SETUP_DISPATCHER(names,FunctorType,dispatcher) dispatcher.clear(); FOREACH(string& s,names) {shared_ptr<FunctorType> f(static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(s))); f->initgl(); dispatcher.add(f);}
+	#define _SETUP_DISPATCHER(names,FunctorType,dispatcher) dispatcher.clearMatrix(); FOREACH(string& s,names) {shared_ptr<FunctorType> f(static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(s))); f->initgl(); dispatcher.add(f);}
 		_SETUP_DISPATCHER(stateFunctorNames,GlStateFunctor,stateDispatcher);
 		_SETUP_DISPATCHER(boundFunctorNames,GlBoundFunctor,boundDispatcher);
 		_SETUP_DISPATCHER(shapeFunctorNames,GlShapeFunctor,shapeDispatcher);

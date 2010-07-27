@@ -36,13 +36,15 @@ REGISTER_SERIALIZABLE(Functor);
 
 template
 <
-	class ReturnType,
-	class AttributesType
+	class _DispatchType1,
+	class _ReturnType,
+	class _ArgumentTypes
 >
 class Functor1D: public Functor,
-			public FunctorWrapper<ReturnType, AttributesType>
+			public FunctorWrapper<_ReturnType, _ArgumentTypes>
 {
 	public:
+		typedef _DispatchType1 DispatchType1; typedef _ReturnType ReturnType; typedef _ArgumentTypes ArgumentTypes; 
 		#define FUNCTOR1D(type1) public: std::string get1DFunctorType1(void){return string(#type1);}
 		virtual std::string get1DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
 		virtual vector<string> getFunctorTypes(void){vector<string> ret; ret.push_back(get1DFunctorType1()); return ret;};
@@ -53,13 +55,16 @@ class Functor1D: public Functor,
 
 template
 <
-	class ReturnType,
-	class AttributesType
+	class _DispatchType1,
+	class _DispatchType2,
+	class _ReturnType,
+	class _ArgumentTypes
 >
 class Functor2D:	public Functor,
-			public FunctorWrapper<ReturnType, AttributesType>
+			public FunctorWrapper<_ReturnType, _ArgumentTypes>
 {
 	public:
+		typedef _DispatchType1 DispatchType1; typedef _DispatchType2 DispatchType2; typedef _ReturnType ReturnType; typedef _ArgumentTypes ArgumentTypes; 
 		#define FUNCTOR2D(type1,type2) public: std::string get2DFunctorType1(void){return string(#type1);}; std::string get2DFunctorType2(void){return string(#type2);};
 		virtual std::string get2DFunctorType1(void){throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
 		virtual std::string get2DFunctorType2(void){throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}

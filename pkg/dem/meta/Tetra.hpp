@@ -9,8 +9,7 @@
 #include<yade/core/GlobalEngine.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
-#include<yade/pkg-common/BoundFunctor.hpp>
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 
 /* Our mold of tetrahedron: just 4 vertices.

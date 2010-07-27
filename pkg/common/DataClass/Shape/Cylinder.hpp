@@ -3,13 +3,12 @@
 #include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/Scene.hpp>
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
 #endif
-#include<yade/pkg-common/BoundFunctor.hpp>
 
 
 class Cylinder: public Sphere{

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 class Ip2_2xCohFrictMat_CohFrictPhys : public InteractionPhysicsFunctor
 {

@@ -30,10 +30,7 @@
 
 #include<yade/core/Engine.hpp>
 
-#include<yade/pkg-common/BoundFunctor.hpp>
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
-#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/LawFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/pkg-common/Callbacks.hpp>
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
@@ -169,7 +166,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 
 	to_python_converter<std::vector<std::vector<std::string> >,custom_vvector_to_list<std::string> >();
 	//to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
-	to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
+	//to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 
 	// register 2-way conversion between c++ vector and python homogeneous sequence (list/tuple) of corresponding type
 	#define VECTOR_SEQ_CONV(Type) custom_vector_from_seq<Type>();  to_python_converter<std::vector<Type>, custom_vector_to_list<Type> >();

@@ -166,9 +166,10 @@ class DynLibDispatcher
 		  {
 			// FIXME - static_assert( typeid(BaseClass1) == typeid(Parm1) ); // 1D
 			// FIXME - static_assert( typeid(BaseClass2) == typeid(Parm2) ); // 2D
-			callBacks.clear();
-			callBacksInfo.clear();
+			clearMatrix();
 		  };
+		  
+			void clearMatrix(){ callBacks.clear(); callBacksInfo.clear(); }
 		
  	public  : shared_ptr<Executor> getExecutor(const string& baseClassName1,const string& baseClassName2)
 		  {
@@ -219,7 +220,8 @@ class DynLibDispatcher
 				return shared_ptr<Executor>();
 		  }
 
- 	public  : void add1DEntry( string baseClassName, shared_ptr<Executor> executor)
+ 	public  :
+		void add1DEntry( string baseClassName, shared_ptr<Executor> executor)
 		  {
 
 			// create base class, to access its index. (we can't access static variable, because
@@ -279,7 +281,8 @@ class DynLibDispatcher
 		  }
 
 		
-	public  : void add2DEntry( string baseClassName1, string baseClassName2, shared_ptr<Executor> executor)
+	public:
+		void add2DEntry( string baseClassName1, string baseClassName2, shared_ptr<Executor> executor)
 		  {
 			shared_ptr<BaseClass1> baseClass1 = YADE_PTR_CAST<BaseClass1>(ClassFactory::instance().createShared(baseClassName1));
 			shared_ptr<BaseClass2> baseClass2 = YADE_PTR_CAST<BaseClass2>(ClassFactory::instance().createShared(baseClassName2));

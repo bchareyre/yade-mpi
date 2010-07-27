@@ -15,39 +15,46 @@
 #include<yade/core/Omega.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 
-class Dispatcher: public Engine
-{
-	public :
-		typedef list<shared_ptr<Functor> >::iterator FunctorListIterator;
-		//! Should be called by the dispatcher before every loop (could be somehow optimized, since it will change very rarely)
-		void updateScenePtr() { FOREACH(shared_ptr<Functor> f, functors){ f->scene=scene; } }
+#include<boost/preprocessor/cat.hpp>
 
-		void clear(){ functors.clear(); }
-		
-		virtual ~Dispatcher();
-		
-		virtual string getFunctorType() { throw; };
-		virtual int getDimension() { throw; };
-		virtual string getBaseClassType(unsigned int ) { throw; };
-
-		// emulate postProcessAttributes of real dispatchers that are never otherwise called; this hack will be removed once dispatchers are types on their own
-		virtual void Dispatcher_postProcessAttributes_deserializing(){ throw runtime_error("Dispatcher::Dispatcher_postProcessAttributes_deserializing should never be called (must be overridden in Dispatcher1D/Dispatcher2D)"); }
-		void postProcessAttributes(bool deserializing){
-			if(!deserializing) return;
-			Dispatcher_postProcessAttributes_deserializing();
-		}
-
-	YADE_CLASS_BASE_DOC_ATTRS(Dispatcher,Engine,"Engine dispatching control to its associated functors, based on types of argument it receives.",
-		((list<shared_ptr<Functor> >,functors,,"Instances of functors"))
-	);
+// real base class for all dispatchers (the other one are templates)
+class Dispatcher: public Engine{
+	public:
+	// these functions look to be completely unused...?
+	virtual string getFunctorType() { throw; };
+	virtual int getDimension() { throw; };
+	virtual string getBaseClassType(unsigned int ) { throw; };
+	//
+	virtual ~Dispatcher();
+	YADE_CLASS_BASE_DOC(Dispatcher,Engine,"Engine dispatching control to its associated functors, based on types of argument it receives. This abstract base class provides no functionality in itself.")
 };
 REGISTER_SERIALIZABLE(Dispatcher);
 
+/* Each real dispatcher derives from Dispatcher1D or Dispatcher2D (both templates), which in turn derive from Dispatcher (an Engine) and DynLibDispatcher (the dispatch logic).
+Because we need literal functor and class names for registration in python, we provide macro that creates the real dispatcher class with everything needed.
+*/
 
-// HELPER MACROS
-// supposed to be passed to YADE_CLASS_BASE_DOC_ATTRS_PY in the 5th argument; takes class name as arg
-#define YADE_PY_DISPATCHER(DispatcherT) .def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>),"Construct with list of associated functors.").add_property("functors",&Dispatcher_functors_get<DispatcherT>,&Dispatcher_functors_set<DispatcherT>,"Functors objects associated with this dispatcher.").def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
+#define _YADE_DISPATCHER1D_FUNCTOR_ADD(FunctorT,f) virtual void addFunctor(shared_ptr<FunctorT> f){ add1DEntry(f->get1DFunctorType1(),f); }
+#define _YADE_DISPATCHER2D_FUNCTOR_ADD(FunctorT,f) virtual void addFunctor(shared_ptr<FunctorT> f){ add2DEntry(f->get2DFunctorType1(),f->get2DFunctorType2(),f); }
 
+#define _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(Dim,DispatcherT,FunctorT,doc,attrs,ctor,py) \
+	typedef FunctorT FunctorType; \
+	void updateScenePtr(){ FOREACH(shared_ptr<FunctorT> f, functors){ f->scene=scene; }} \
+	virtual void postProcessAttributes(bool deserializing){ if(deserializing) { clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(static_pointer_cast<FunctorT>(f)); } } \
+	virtual void add(FunctorT* f){ add(shared_ptr<FunctorT>(f)); } \
+	virtual void add(shared_ptr<FunctorT> f){ bool dupe=false; string fn=f->getClassName(); FOREACH(const shared_ptr<FunctorT>& f, functors) { if(fn==f->getClassName()) dupe=true; } if(!dupe) functors.push_back(f); addFunctor(f); } \
+	BOOST_PP_CAT(_YADE_DISPATCHER,BOOST_PP_CAT(Dim,D_FUNCTOR_ADD))(FunctorT,f) \
+	boost::python::list functors_get(void) const { boost::python::list ret; FOREACH(const shared_ptr<FunctorT>& f, functors){ ret.append(f); } return ret; } \
+	void functors_set(const vector<shared_ptr<FunctorT> >& ff){ functors.clear(); FOREACH(const shared_ptr<FunctorT>& f, ff) add(f); postProcessAttributes(true); } \
+	void pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){ if(python::len(t)==0)return; if(python::len(t)!=1) throw invalid_argument("Exactly one list of " BOOST_PP_STRINGIZE(FunctorT) " must be given."); typedef std::vector<shared_ptr<FunctorT> > vecF; vecF vf=boost::python::extract<vecF>(t[0])(); functors_set(vf); t=python::tuple(); } \
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DispatcherT,Dispatcher,"Dispatcher calling :yref:`functors<" BOOST_PP_STRINGIZE(FunctorT) ">` based on received argument type(s).\n\n" doc, \
+		((vector<shared_ptr<FunctorT> >,functors,,"Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs, \
+		/*ctor*/ ctor, /*py*/ py .add_property("functors",&DispatcherT::functors_get,&DispatcherT::functors_set,"Functors associated with this dispatcher." " :yattrtype:`vector<shared_ptr<" BOOST_PP_STRINGIZE(FunctorT) "> >` ") \
+		.def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws."); \
+	)
+
+#define YADE_DISPATCHER1D_FUNCTOR_DOC_ATTRS_CTOR_PY(DispatcherT,FunctorT,doc,attrs,ctor,py) _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(1,DispatcherT,FunctorT,doc,attrs,ctor,py)
+#define YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(DispatcherT,FunctorT,doc,attrs,ctor,py) _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(2,DispatcherT,FunctorT,doc,attrs,ctor,py)
 
 // HELPER FUNCTIONS
 
@@ -123,26 +130,24 @@ shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typena
 
 template
 <
-	class baseClass,
 	class FunctorType,
-	class FunctorReturnType,
-	class FunctorArguments,
 	bool autoSymmetry=true
 >
 class Dispatcher1D : public Dispatcher,
 				public DynLibDispatcher
-				<	  TYPELIST_1(baseClass)		// base classes for dispatch
+				<	  TYPELIST_1(typename FunctorType::DispatchType1)		// base classes for dispatch
 					, FunctorType		// class that provides multivirtual call
-					, FunctorReturnType		// return type
-					, FunctorArguments
+					, typename FunctorType::ReturnType		// return type
+					, typename FunctorType::ArgumentTypes
 					, autoSymmetry
 				>
 {
 
 	public :
+		typedef typename FunctorType::DispatchType1 baseClass;
 		typedef baseClass argType1;
 		typedef FunctorType functorType;
-		typedef DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry> dispatcherBase;
+		typedef DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,typename FunctorType::ReturnType,typename FunctorType::ArgumentTypes,autoSymmetry> dispatcherBase;
 
 		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass> arg){ return getExecutor(arg); }
 		python::dict dump(bool convertIndicesToNames){
@@ -154,13 +159,6 @@ class Dispatcher1D : public Dispatcher,
 				} else ret[python::make_tuple(item.ix1)]=item.functorName;
 			}
 			return ret;
-		}
-		virtual void add(FunctorType* eu){ add(shared_ptr<FunctorType>(eu)); }
-		virtual void add(shared_ptr<FunctorType> eu){
-			bool dupe=false; string eun=eu->getClassName();
-			FOREACH(const shared_ptr<Functor>& f, functors) { if(eun==f->getClassName()) dupe=true; }
-			if(!dupe) functors.push_back(eu);
-			add1DEntry(eu->get1DFunctorType1(),eu);
 		}
 
 		int getDimension() { return 1; }
@@ -176,13 +174,6 @@ class Dispatcher1D : public Dispatcher,
 		}
 
 
-		virtual void Dispatcher_postProcessAttributes_deserializing(){ Dispatcher1D::postProcessAttributes(true); }
-		// never gets called directly, but via the proxy above (hack)
-		void postProcessAttributes(bool deserializing){
-			if(!deserializing) return;
-			FOREACH(shared_ptr<Functor> f, functors) add(static_pointer_cast<FunctorType>(f));
-		}
-
 	public:
 	REGISTER_ATTRIBUTES(Dispatcher,);
 	REGISTER_CLASS_AND_BASE(Dispatcher1D,Dispatcher DynLibDispatcher);
@@ -191,27 +182,24 @@ class Dispatcher1D : public Dispatcher,
 
 template
 <
-	class baseClass1, 
-	class baseClass2,
 	class FunctorType,
-	class FunctorReturnType,
-	class FunctorArguments,
 	bool autoSymmetry=true
 >
 class Dispatcher2D : public Dispatcher,
 				public DynLibDispatcher
-				<	  TYPELIST_2(baseClass1,baseClass2)	// base classes for dispatch
+				<	  TYPELIST_2(typename FunctorType::DispatchType1,typename FunctorType::DispatchType2) // base classes for dispatch
 					, FunctorType			// class that provides multivirtual call
-					, FunctorReturnType			// return type
-					, FunctorArguments			// argument of engine unit
+					, typename FunctorType::ReturnType    // return type
+					, typename FunctorType::ArgumentTypes // argument of engine unit
 					, autoSymmetry
 				>
 {
 	public :
+		typedef typename FunctorType::DispatchType1 baseClass1; typedef typename FunctorType::DispatchType2 baseClass2;
 		typedef baseClass1 argType1;
 		typedef baseClass2 argType2;
 		typedef FunctorType functorType;
-		typedef DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry> dispatcherBase;
+		typedef DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,typename FunctorType::ReturnType,typename FunctorType::ArgumentTypes,autoSymmetry> dispatcherBase;
 		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1> arg1, shared_ptr<baseClass2> arg2){ return getExecutor(arg1,arg2); }
 		python::dict dump(bool convertIndicesToNames){
 			python::dict ret;
@@ -222,15 +210,6 @@ class Dispatcher2D : public Dispatcher,
 				} else ret[python::make_tuple(item.ix1,item.ix2)]=item.functorName;
 			}
 			return ret;
-		}
-		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
-		virtual void add(FunctorType* eu){ add(shared_ptr<FunctorType>(eu)); }
-		/* add functor by shared pointer */
-		virtual void add(shared_ptr<FunctorType> eu){
-			bool dupe=false; string eun=eu->getClassName();
-			FOREACH(const shared_ptr<Functor>& f, functors) { if(eun==f->getClassName()) dupe=true; }
-			if(!dupe) functors.push_back(eu);
-			add2DEntry(eu->get2DFunctorType1(),eu->get2DFunctorType2(),eu);
 		}
 
 		virtual int getDimension() { return 2; }
@@ -244,13 +223,6 @@ class Dispatcher2D : public Dispatcher,
 			else if (i==1){ shared_ptr<baseClass2> bc(new baseClass2); return bc->getClassName();}
 			else return "";
 		}
-		virtual void Dispatcher_postProcessAttributes_deserializing(){ Dispatcher2D::postProcessAttributes(true); }
-		// never gets called directly, but via the proxy above (hack)
-		void postProcessAttributes(bool deserializing){
-			if(!deserializing) return;
-			FOREACH(shared_ptr<Functor> f, functors) add(static_pointer_cast<FunctorType>(f));
-		}
-
 	public:
 	REGISTER_ATTRIBUTES(Dispatcher,);
 	REGISTER_CLASS_AND_BASE(Dispatcher2D,Dispatcher DynLibDispatcher);

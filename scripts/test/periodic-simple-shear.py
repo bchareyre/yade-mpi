@@ -9,7 +9,7 @@ O.cell.refSize=Vector3(.1,.1,.1)
 #O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
 sp=pack.SpherePack()
 radius=5e-3
-num=sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
+num=sp.makeCloud(Vector3.Zero,O.cell.refSize,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
 O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 
@@ -44,8 +44,8 @@ def triaxDone():
 O.dt=utils.PWaveTimeStep()
 O.run(7000);
 qt.View()
-r=qt.Renderer()
-r['Background_color']=1,1,1
+#r=qt.Renderer()
+#r.bgColor=1,1,1
 O.wait()
 
 O.cell.velGrad[1,2]=0

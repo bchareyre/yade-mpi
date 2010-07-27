@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 
 class Ig2_Facet_Sphere_ScGeom : public InteractionGeometryFunctor
 {

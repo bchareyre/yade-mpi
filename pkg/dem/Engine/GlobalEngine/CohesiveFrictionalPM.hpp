@@ -3,9 +3,8 @@
 #pragma once
 
 #include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/Dispatching.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-common/LawFunctor.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 
 /*

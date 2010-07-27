@@ -10,6 +10,12 @@ import SocketServer
 import sys,time
 
 from yade import *
+import yade.runtime
+
+useQThread=False
+"Set before using any of our classes to use QThread for background execution instead of the standard thread module. Mixing the two (in case the qt4 UI is running, for instance) does not work well."
+
+bgThreads=[] # needed to keep background threads alive
 
 class InfoSocketProvider(SocketServer.BaseRequestHandler):
 	"""Class providing dictionary of important simulation information,
@@ -104,14 +110,41 @@ class GenericTCPServer:
 				else:
 					sys.stderr.write(title+" on %s:%d\n"%(host if host else 'localhost',self.port))
 				if background:
-					import thread; thread.start_new_thread(self.server.serve_forever,())
+					if useQThread:
+						from PyQt4.QtCore import QThread
+						class WorkerThread(QThread):
+							def __init__(self,server): QThread.__init__(self); self.server=server
+							def run(self): self.server.serve_forever()
+						wt=WorkerThread(self.server)
+						wt.start()
+						global bgThreads; bgThreads.append(wt)
+					else:
+						import thread; thread.start_new_thread(self.server.serve_forever,())
 				else: self.server.serve_forever()
 			except socket.error:
 				tryPort+=1
 		if self.port==-1: raise RuntimeError("No free port to listen on in range %d-%d"%(minPort,maxPort))
 
 
-if __name__=='__main__':
-	p=GenericTCPServer(PythonConsoleSocketEmulator,'Python TCP server',background=False)
-	#while True: time.sleep(2)
+def runServers():
+	"""Run python telnet server and info socket. They will be run at localhost on ports 9000 (or higher if used) and 21000 (or higer if used) respectively.
+	
+	The python telnet server accepts only connection from localhost,
+	after authentication by random cookie, which is printed on stdout
+	at server startup.
+
+	The info socket provides read-only access to several simulation parameters
+	at runtime. Each connection receives pickled dictionary with those values.
+	This socket is primarily used by yade-multi batch scheduler.
+	"""
+	srv=GenericTCPServer(handler=yade.remote.PythonConsoleSocketEmulator,title='TCP python prompt',cookie=True,minPort=9000)
+	yade.runtime.cookie=srv.server.cookie
+	info=GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
+	sys.stdout.flush()
+
+
+
+#if __name__=='__main__':
+#	p=GenericTCPServer(PythonConsoleSocketEmulator,'Python TCP server',background=False)
+#	#while True: time.sleep(2)
 
