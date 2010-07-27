@@ -26,9 +26,9 @@ void Matrix3r_set_item(Matrix3r & self, bp::tuple _idx, Real value){ int idx[2];
 void Matrix3r_set_item_linear(Matrix3r & self, int idx, Real value){ IDX_CHECK(idx,9); self(idx/3,idx%3)=value; }
 
 Real Vector3r_get_item(const Vector3r & self, int idx){ IDX_CHECK(idx,3); return self[idx]; }
-int  Vector3i_get_item(const Vector3r & self, int idx){ IDX_CHECK(idx,3); return self[idx]; }
+int  Vector3i_get_item(const Vector3i & self, int idx){ IDX_CHECK(idx,3); return self[idx]; }
 Real Vector2r_get_item(const Vector2r & self, int idx){ IDX_CHECK(idx,2); return self[idx]; }
-int  Vector2i_get_item(const Vector2r & self, int idx){ IDX_CHECK(idx,2); return self[idx]; }
+int  Vector2i_get_item(const Vector2i & self, int idx){ IDX_CHECK(idx,2); return self[idx]; }
 
 Real Quaternionr_get_item(const Quaternionr & self, int idx){ IDX_CHECK(idx,4); if(idx==0) return self.x(); if(idx==1) return self.y(); if(idx==2) return self.z(); return self.w(); }
 Real Matrix3r_get_item(Matrix3r & self, bp::tuple _idx){ int idx[2]; int mx[2]={3,3}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); return self(idx[0],idx[1]); }

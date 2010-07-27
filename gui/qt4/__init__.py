@@ -10,12 +10,54 @@ import yade.system
 
 from yade.qt._GLViewer import *
 
+maxWebWindows=2
+"Number of webkit windows that will be cycled to show help on clickable objects"
+webWindows=[] 
+"holds instances of QtWebKit windows; clicking an url will open it in the window that was the least recently updated"
+sphinxOnlineDocPath='https://www.yade-dem.org/sphinx/'
+"Base URL for the documentation. Packaged versions should change to the local installation directory."
+
+# find if we have docs installed locally from package
+import yade.config
+import os.path
+sphinxLocalDocPath=yade.config.prefix+'/share/doc/yade'+yade.config.suffix+'/html/'
+# sorry
+_eudoxosLocalPathHack=sphinxLocalDocPath='/home/vaclav/yt/doc/sphinx/_build/html/'
+if os.path.exists(_eudoxosLocalPathHack): sphinxLocalDocPath=_eudoxosLocalPathHack
+# end sorry
+sphinxWrapperPart='yade.wrapper.html'
+sphinxDocWrapperPage=(('file://'+sphinxLocalDocPath) if os.path.exists(sphinxLocalDocPath+'/'+sphinxWrapperPart) else sphinxOnlineDocPath)+'/'+sphinxWrapperPart
+
+
+def openUrl(url):
+	from PyQt4 import QtWebKit
+	global maxWebWindows,webWindows
+	reuseLast=False
+	# use the last window if the class is the same and only the attribute differs
+	try:
+		reuseLast=(len(webWindows)>0 and str(webWindows[-1].url()).split('#')[-1].split('.')[2]==url.split('#')[-1].split('.')[2])
+	except: pass
+	if not reuseLast:
+		if len(webWindows)<maxWebWindows: webWindows.append(QtWebKit.QWebView())
+		else: webWindows=webWindows[1:]+[webWindows[0]]
+	web=webWindows[-1]
+	web.load(QUrl(url)); web.setWindowTitle(url);
+	if 1:
+		def killSidebar(result):
+			frame=web.page().mainFrame()
+			frame.evaluateJavaScript("var bv=$('.bodywrapper'); bv.css('margin','0 0 0 0');")
+			frame.evaluateJavaScript("var sbw=$('.sphinxsidebarwrapper'); sbw.css('display','none');")
+			frame.evaluateJavaScript("var sb=$('.sphinxsidebar'); sb.css('display','none'); ")
+			frame.evaluateJavaScript("var sb=$('.sidebar'); sb.css('width','0px'); ")
+			web.loadFinished.disconnect(killSidebar)
+		web.loadFinished.connect(killSidebar)
+	web.show();	web.raise_()
 
 
 global _controller
 controller=None
 
-class Controller(QWidget,Ui_Controller):
+class ControllerClass(QWidget,Ui_Controller):
 	def __init__(self,parent=None):
 		QWidget.__init__(self)
 		self.setupUi(self)
@@ -55,7 +97,7 @@ class Controller(QWidget,Ui_Controller):
 		"update generator parameters when a new one is selected"
 		gen=eval(str(genStr)+'()')
 		self.generator=gen
-		se=SerializableEditor(gen,parent=self.generatorArea,ignoredAttrs=set(['outputFileName']))
+		se=SerializableEditor(gen,parent=self.generatorArea,ignoredAttrs=set(['outputFileName']),showType=True)
 		self.generatorArea.setWidget(se)
 	def pythonComboSlot(self,cmd):
 		try:
@@ -76,7 +118,7 @@ class Controller(QWidget,Ui_Controller):
 				v=View(); v.center()
 	def displayComboSlot(self,dispStr):
 		ser=(self.renderer if dispStr=='OpenGLRenderer' else eval(str(dispStr)+'()'))
-		se=SerializableEditor(ser,parent=self.displayArea,ignoredAttrs=set(['label']))
+		se=SerializableEditor(ser,parent=self.displayArea,ignoredAttrs=set(['label']),showType=True)
 		self.displayArea.setWidget(se)
 	def loadSlot(self):
 		f=QFileDialog.getOpenFileName(self,'Load simulation','','Yade simulations (*.xml *.xml.bz2 *.xml.gz *.yade *.yade.gz *.yade.bz2);; *.*')
@@ -185,9 +227,14 @@ class Controller(QWidget,Ui_Controller):
 		
 def Generator():
 	global controller
-	if not controller: controller=Controller();
-	controller.show()
+	if not controller: controller=ControllerClass();
+	controller.show(); controller.raise_()
 	controller.setTabActive('generator')
+def Controller():
+	global controller
+	if not controller: controller=ControllerClass();
+	controller.show(); controller.raise_()
+	controller.setTabActive('simulation')
 
 #if __name__=='__main__':
 #	from PyQt4 import QtGui

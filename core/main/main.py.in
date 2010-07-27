@@ -79,8 +79,7 @@ def userSession(qt3=False,qt4=False):
 	import sys
 	if len(sys.argv)>0:
 		arg0=sys.argv[0]
-		if qt3: yade.qt.Controller();
-		if qt4: _c=yade.qt.Controller(); _c.show()
+		if qt3 or qt4: yade.qt.Controller();
 		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
 			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
 			sys.stderr.write("Running simulation "+arg0+'\n')
@@ -125,8 +124,7 @@ def userSession(qt3=False,qt4=False):
 					# only with the gui
 					# the escape codes might not work on non-linux terminals.
 					]
-					+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if qt3 else []) #F12,F11,F10,F9
-					+(['"\e[24~": "\C-U_c=yade.qt.Controller();_c.show()\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-U_c=yade.qt.Controller(); _c.show(); yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if qt4 else []) #F12,F11,F10,F9
+					+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if (qt3 or qt4) else []) #F12,F11,F10,F9
 					+['"\e[19~": "\C-Uimport yade.plot; yade.plot.plot();\C-M"', #F8
 					'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
 					]

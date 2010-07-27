@@ -9,6 +9,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 #from logging import debug,info,warning,error
 from yade import *
+import yade.qt
+
+seqSerializableShowType=True # show type headings in serializable sequences (takes vertical space, but makes the type hyperlinked)
 
 
 class AttrEditor():
@@ -80,6 +83,47 @@ class AttrEditor_Float(AttrEditor,QLineEdit):
 		self.isHot(False)
 
 class AttrEditor_MatrixX(AttrEditor,QFrame):
+	def __init__(self,parent,ser,attr,rows,cols,idxConverter,variableCols=False,emptyCell=None):
+		'idxConverter converts row,col tuple to either (row,col), (col) etc depending on what access is used for []'
+		AttrEditor.__init__(self,ser,attr)
+		QFrame.__init__(self,parent)
+		self.rows,self.cols,self.variableCols=rows,cols,variableCols
+		self.idxConverter=idxConverter
+		self.setContentsMargins(0,0,0,0)
+		val=getattr(self.ser,self.attr)
+		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		for row,col in itertools.product(range(self.rows),range(self.cols)):
+			if self.variableCols and col>=len(val[row]):
+				if emptyCell: self.grid.addWidget(QLabel(emptyCell,self),row,col)
+				continue
+			w=QLineEdit('')
+			self.grid.addWidget(w,row,col);
+			w.textEdited.connect(self.isHot)
+			w.editingFinished.connect(self.update)
+	def refresh(self):
+		val=getattr(self.ser,self.attr)
+		for row,col in itertools.product(range(self.rows),range(self.cols)):
+			if self.variableCols and col>=len(val[row]): continue
+			self.grid.itemAtPosition(row,col).widget().setText(str(self.getItem(val,row,col)))
+	def getItem(self,obj,row,col):
+		if self.variableCols: return obj[row][col]
+		else: return obj[self.idxConverter(row,col)]
+	def setItem(self,val,row,col,newVal):
+		if self.variableCols: val[row][col]=newVal
+		else: val[self.idxConverter(row,col)]=newVal
+	def update(self):
+		try:
+			val=getattr(self.ser,self.attr)
+			for row,col in itertools.product(range(self.rows),range(self.cols)):
+				if self.variableCols and col>=len(val[row]): continue
+				w=self.grid.itemAtPosition(row,col).widget()
+				if w.isModified(): self.setItem(val,row,col,float(w.text()))
+			logging.debug('setting'+str(val))
+			self.setAttribute(self.ser,self.attr,val)
+		except ValueError: self.refresh()
+		self.isHot(False)
+
+class AttrEditor_MatrixXi(AttrEditor,QFrame):
 	def __init__(self,parent,ser,attr,rows,cols,idxConverter):
 		'idxConverter converts row,col tuple to either (row,col), (col) etc depending on what access is used for []'
 		AttrEditor.__init__(self,ser,attr)
@@ -89,28 +133,39 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 		self.setContentsMargins(0,0,0,0)
 		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
-			w=QLineEdit('');
+			w=QSpinBox()
+			w.setRange(int(-1e10),int(1e10)); w.setSingleStep(1);
 			self.grid.addWidget(w,row,col);
-			w.textEdited.connect(self.isHot)
-			w.editingFinished.connect(self.update)
+			w.valueChanged.connect(self.update)
+		self.refresh()
 	def refresh(self):
 		val=getattr(self.ser,self.attr)
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
-			self.grid.itemAtPosition(row,col).widget().setText(str(val[self.idxConverter(row,col)]))
+			self.grid.itemAtPosition(row,col).widget().setValue(val[self.idxConverter(row,col)])
 	def update(self):
-		try:
-			val=getattr(self.ser,self.attr)
-			for row,col in itertools.product(range(self.rows),range(self.cols)):
-				w=self.grid.itemAtPosition(row,col).widget()
-				if w.isModified(): val[self.idxConverter(row,col)]=float(w.text())
-			logging.debug('setting'+str(val))
-			self.setAttribute(self.ser,self.attr,val)
-		except ValueError: self.refresh()
-		self.isHot(False)
+		return
+		val=getattr(self.ser,self.attr); modified=False
+		for row,col in itertools.product(range(self.rows),range(self.cols)):
+			w=self.grid.itemAtPosition(row,col).widget()
+			if w.value()!=val[self.idxConverter(row,col)]:
+				modified=True; val[self.idxConverter(row,col)]=w.value()
+		if not modified: return
+		logging.debug('setting'+str(val))
+		setattribute(self.ser,self.attr,val)
+
+class AttrEditor_Vector3i(AttrEditor_MatrixXi):
+	def __init__(self,parent,ser,attr):
+		AttrEditor_MatrixXi.__init__(self,parent,ser,attr,1,3,lambda r,c:c)
+class AttrEditor_Vector2i(AttrEditor_MatrixXi):
+	def __init__(self,parent,ser,attr):
+		AttrEditor_MatrixXi.__init__(self,parent,ser,attr,1,2,lambda r,c:c)
 
 class AttrEditor_Vector3(AttrEditor_MatrixX):
 	def __init__(self,parent,ser,attr):
 		AttrEditor_MatrixX.__init__(self,parent,ser,attr,1,3,lambda r,c:c)
+class AttrEditor_Vector2(AttrEditor_MatrixX):
+	def __init__(self,parent,ser,attr):
+		AttrEditor_MatrixX.__init__(self,parent,ser,attr,1,2,lambda r,c:c)
 class AttrEditor_Matrix3(AttrEditor_MatrixX):
 	def __init__(self,parent,ser,attr):
 		AttrEditor_MatrixX.__init__(self,parent,ser,attr,3,3,lambda r,c:(r,c))
@@ -119,7 +174,7 @@ class AttrEditor_Quaternion(AttrEditor_MatrixX):
 		AttrEditor_MatrixX.__init__(self,parent,ser,attr,1,4,lambda r,c:c)
 class AttrEditor_Se3(AttrEditor_MatrixX):
 	def __init__(self,parent,ser,attr):
-		AttrEditor_MatrixX.__init__(self,parent,ser,attr,1,4,lambda r,c:c)
+		AttrEditor_MatrixX.__init__(self,parent,ser,attr,2,4,idxConverter=None,variableCols=True,emptyCell=u'←<i>pos</i> ↙<i>ori</i>')
 
 class AttrEditor_ListStr(AttrEditor,QPlainTextEdit):
 	def __init__(self,parent,ser,attr):
@@ -136,6 +191,11 @@ class AttrEditor_ListStr(AttrEditor,QPlainTextEdit):
 		t=self.toPlainText()
 		self.setAttribute(self.ser,self.attr,str(t).strip().split('\n'))
 		if not self.hasFocus(): self.isHot(False)
+
+class Se3FakeType: pass
+
+_fundamentalEditorMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Quaternion:AttrEditor_Quaternion,Vector2:AttrEditor_Vector2,Vector3:AttrEditor_Vector3,Matrix3:AttrEditor_Matrix3,Vector3i:AttrEditor_Vector3i,Vector2i:AttrEditor_Vector2i,Se3FakeType:AttrEditor_Se3,(str,):AttrEditor_ListStr}
+_fundamentalInitValues={bool:True,str:'',int:0,float:0.0,Quaternion:Quaternion.Identity,Vector3:Vector3.Zero,Matrix3:Matrix3.Zero,Se3FakeType:(Vector3.Zero,Quaternion.Identity),Vector3i:Vector3i.Zero,Vector2i:Vector2i.Zero,Vector2:Vector2.Zero}
 
 class SerializableEditor(QFrame):
 	"Class displaying and modifying serializable attributes of a yade object."
@@ -180,13 +240,14 @@ class SerializableEditor(QFrame):
 		vecMap={
 			'int':int,'long':int,'body_id_t':long,'size_t':long,
 			'Real':float,'float':float,'double':float,
-			'Vector3r':Vector3,'Matrix3r':Matrix3,
+			'Vector3r':Vector3,'Matrix3r':Matrix3,'Se3r':Se3FakeType,
 			'string':str,
-			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,'BoundFunctor':BoundFunctor,'InteractionGeometryFunctor':InteractionGeometryFunctor,'InteractionPhysicsFunctor':InteractionPhysicsFunctor,'LawFunctor':LawFunctor
+			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,'BoundFunctor':BoundFunctor,'InteractionGeometryFunctor':InteractionGeometryFunctor,'InteractionPhysicsFunctor':InteractionPhysicsFunctor,'LawFunctor':LawFunctor,
+			'GlShapeFunctor':GlShapeFunctor,'GlStateFunctor':GlStateFunctor,'GlInteractionGeometryFunctor':GlInteractionGeometryFunctor,'GlInteractionPhysicsFunctor':GlInteractionPhysicsFunctor,'GlBoundFunctor':GlBoundFunctor
 		}
 		for T,ret in vecMap.items():
 			if vecTest(T,cxxT):
-				logging.debug("Got type %s from cxx type %s"%(ret.__name__,cxxT))
+				logging.debug("Got type %s from cxx type %s"%(repr(ret),cxxT))
 				return (ret,)
 		logging.error("Unable to guess python type from cxx type '%s'"%cxxT)
 		return None
@@ -197,7 +258,8 @@ class SerializableEditor(QFrame):
 			logging.error('TypeError when getting attributes of '+str(self.ser)+',skipping. ')
 			import traceback
 			traceback.print_exc()
-		for attr in self.ser.dict():
+		attrs=self.ser.dict().keys(); attrs.sort()
+		for attr in attrs:
 			val=getattr(self.ser,attr) # get the value using serattr, as it might be different from what the dictionary provides (e.g. Body.blockedDOFs)
 			t=None
 			if attr in self.ignoredAttrs or attr=='blockedDOFs': # HACK here
@@ -206,13 +268,35 @@ class SerializableEditor(QFrame):
 				t=self.getListTypeFromDocstring(attr)
 				if not t and len(val)==0: t=(val[0].__class__,) # 1-tuple is list of the contained type
 				#if not t: raise RuntimeError('Unable to guess type of '+str(self.ser)+'.'+attr)
+			# hack for Se3, which is returned as (Vector3,Quaternion) in python
+			elif isinstance(val,tuple) and len(val)==2 and val[0].__class__==Vector3 and val[1].__class__==Quaternion: t=Se3FakeType
 			else: t=val.__class__
 			#logging.debug('Attr %s is of type %s'%(attr,((t[0].__name__,) if isinstance(t,tuple) else t.__name__)))
 			self.entries.append(self.EntryData(name=attr,T=t))
+	def getDocstring(self,attr=None):
+		"If attr is *None*, return docstring of the Serializable itself"
+		doc=(getattr(self.ser.__class__,attr).__doc__ if attr else self.ser.__class__.__doc__)
+		if not doc: return None
+		doc=re.sub(':y(attrtype|default):`[^`]*`','',doc)
+		doc=re.sub(':yref:`([^`]*)`','\\1',doc)
+		import textwrap
+		wrapper=textwrap.TextWrapper(replace_whitespace=False)
+		return wrapper.fill(textwrap.dedent(doc))
+	def getLabelWithUrl(self,attr=None):
+		# the class for which is the attribute defined is the top-most base where it still exists... (is there a more straight-forward way?!)
+		# we only walk the direct inheritance
+		if attr:
+			klass=self.ser.__class__
+			while attr in dir(klass.__bases__[0]): klass=klass.__bases__[0]
+			#import textwrap; linkName='<br>'.join(textwrap.wrap(attr,width=10))
+			linkName=attr
+		else:
+			klass=self.ser.__class__
+			linkName=klass.__name__
+		return '<a href="%s#yade.wrapper.%s%s">%s</a>'%(yade.qt.sphinxDocWrapperPage,klass.__name__,(('.'+attr) if attr else ''),linkName)
 	def mkWidget(self,entry):
 		if not entry.T: return None
-		typeMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Quaternion:AttrEditor_Quaternion,Vector3:AttrEditor_Vector3,Matrix3:AttrEditor_Matrix3,(str,):AttrEditor_ListStr}
-		Klass=typeMap.get(entry.T,None)
+		Klass=_fundamentalEditorMap.get(entry.T,None)
 		if Klass:
 			widget=Klass(self,self.ser,entry.name)
 			widget.setFocusPolicy(Qt.StrongFocus)
@@ -234,12 +318,14 @@ class SerializableEditor(QFrame):
 		grid.setVerticalSpacing(0)
 		grid.setLabelAlignment(Qt.AlignRight)
 		if self.showType:
-			lab=QLabel(u'<b>→  '+self.ser.__class__.__name__+u'  ←</b>')
-			lab.setFrameShape(QFrame.Box); lab.setFrameShadow(QFrame.Sunken); lab.setLineWidth(2); lab.setAlignment(Qt.AlignHCenter)
+			lab=QLabel(u'<b>→  '+self.getLabelWithUrl()+u'  ←</b>')
+			lab.setFrameShape(QFrame.Box); lab.setFrameShadow(QFrame.Sunken); lab.setLineWidth(2); lab.setAlignment(Qt.AlignHCenter); lab.linkActivated.connect(yade.qt.openUrl)
+			lab.setToolTip(self.getDocstring())
 			grid.setWidget(0,QFormLayout.SpanningRole,lab)
 		for entry in self.entries:
 			entry.widget=self.mkWidget(entry)
-			grid.addRow(entry.name,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
+			label=QLabel(self); label.setText(self.getLabelWithUrl(entry.name)); label.setToolTip(self.getDocstring(entry.name)); label.linkActivated.connect(yade.qt.openUrl)
+			grid.addRow(label,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
 		self.setLayout(grid)
 		self.refreshEvent()
 	def refreshEvent(self):
@@ -247,7 +333,6 @@ class SerializableEditor(QFrame):
 			if e.widget and not e.widget.hot: e.widget.refresh()
 	def refresh(self): pass
 
-#import sys; sys.path.append('.')
 from yade.qt.ui_SeqSerializable import Ui_SeqSerializable
 
 class SeqSerializable(QFrame,Ui_SeqSerializable):
@@ -272,10 +357,13 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		ret=ser.label if (hasattr(self,'label') and len(ser.label)>0) else str(ser).replace('instance at','')
 		return ('' if pos<0 else str(pos)+'. ')+ret
 	def relabelItems(self):
-		for i in range(self.tb.count()): self.tb.setItemText(i,self.mkItemLabel(self.tb.widget(i).ser,i))
+		for i in range(self.tb.count()):
+			self.tb.setItemText(i,self.mkItemLabel(self.tb.widget(i).ser,i))
+			self.tb.setItemToolTip(i,self.tb.widget(i).getDocstring(None))
 	def fillToolBox(self):
 		for i,ser in enumerate(self.getter()):
-			self.tb.addItem(SerializableEditor(ser,parent=None),self.mkItemLabel(ser,i))
+			self.tb.addItem(SerializableEditor(ser,parent=None,showType=seqSerializableShowType),self.mkItemLabel(ser,i))
+			self.relabelItems() # updates tooltips
 	def moveUpSlot(self):
 		ix=self.tb.currentIndex();
 		if ix==0: return # already all way up
@@ -307,7 +395,7 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		if not dialog.exec_(): return # cancelled
 		ser=dialog.result()
 		ix=self.tb.currentIndex(); 
-		self.tb.insertItem(ix,SerializableEditor(ser,parent=None),self.mkItemLabel(ser,ix))
+		self.tb.insertItem(ix,SerializableEditor(ser,parent=None,showType=seqSerializableShowType),self.mkItemLabel(ser,ix))
 		self.tb.setCurrentIndex(ix)
 		self.update(); self.relabelItems()
 	def update(self):
@@ -323,6 +411,35 @@ class SeqSerializable(QFrame,Ui_SeqSerializable):
 		self.tb.setCurrentIndex(ix)
 	def refresh(self): pass # refreshEvent(self)
 
+class NewFundamentalDialog(QDialog):
+	def __init__(self,parent,attrName,typeObj,typeStr):
+		QDialog.__init__(self,parent)
+		self.setWindowTitle('%s (type %s)'%(attrName,typeStr))
+		self.layout=QVBoxLayout(self)
+		self.scroll=QScrollArea(self)
+		self.scroll.setWidgetResizable(True)
+		self.buttons=QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel);
+		self.buttons.accepted.connect(self.accept)
+		self.buttons.rejected.connect(self.reject)
+		self.layout.addWidget(self.scroll)
+		self.layout.addWidget(self.buttons)
+		self.setWindowModality(Qt.WindowModal)
+		class FakeObjClass: pass
+		self.fakeObj=FakeObjClass()
+		self.attrName=attrName
+		Klass=_fundamentalEditorMap.get(typeObj,None)
+		initValue=_fundamentalInitValues.get(typeObj,typeObj())
+		setattr(self.fakeObj,attrName,initValue)
+		if Klass:
+			self.widget=Klass(None,self.fakeObj,attrName)
+			self.scroll.setWidget(self.widget)
+			self.scroll.show()
+			self.widget.refresh()
+		else: raise RuntimeError("Unable to construct new dialog for type %s"%(typeStr))
+	def result(self):
+		self.widget.update()
+		return getattr(self.fakeObj,self.attrName)
+
 class NewSerializableDialog(QDialog):
 	def __init__(self,parent,baseClassName,includeBase=True):
 		import yade.system
@@ -334,6 +451,7 @@ class NewSerializableDialog(QDialog):
 		self.combo.addItems(childs)
 		self.combo.currentIndexChanged.connect(self.comboSlot)
 		self.scroll=QScrollArea(self)
+		self.scroll.setWidgetResizable(True)
 		self.buttons=QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Cancel);
 		self.buttons.accepted.connect(self.accept)
 		self.buttons.rejected.connect(self.reject)
@@ -346,7 +464,7 @@ class NewSerializableDialog(QDialog):
 	def comboSlot(self,index):
 		item=str(self.combo.itemText(index))
 		self.ser=eval(item+'()')
-		self.scroll.setWidget(SerializableEditor(self.ser,self.scroll))
+		self.scroll.setWidget(SerializableEditor(self.ser,self.scroll,showType=True))
 		self.scroll.show()
 	def result(self): return self.ser
 	def sizeHint(self): return QSize(180,400)

@@ -111,7 +111,9 @@ class BodyInspector(QWidget):
 				return
 			else: v[0].selection=self.idGlSync=self.bodyId # changed here, set in the viewer
 		meId=self.bodyIdBox.value(); pos=self.intrWithCombo.currentIndex()
-		meLabel=makeBodyLabel(O.bodies[meId])
+		try:
+			meLabel=makeBodyLabel(O.bodies[meId])
+		except IndexError: meLabel=u'…'
 		self.plusLabel.setText(' '.join(meLabel.split()[1:])+'  <b>+</b>') # do not repeat the id
 		self.bodyIdBox.setMaximum(len(O.bodies)-1)
 		others=[(i.id1 if i.id1!=meId else i.id2) for i in O.interactions.withBody(self.bodyIdBox.value()) if i.isReal]
