@@ -118,8 +118,7 @@ static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r uni
 
 
 #define EIG_WRAP_METH1(klass,meth) static klass klass##_##meth(const klass& self){ return self.meth(); }
-//#define EIG_WRAP_METH0(klass,meth) static klass klass##_##meth(){ return klass().meth(); }
-#define EIG_WRAP_METH0(klass,meth) static const klass klass##_##meth=klass().meth();
+#define EIG_WRAP_METH0(klass,meth) static klass klass##_##meth(){ return klass().meth(); }
 EIG_WRAP_METH1(Matrix3r,transpose);
 EIG_WRAP_METH1(Matrix3r,inverse);
 
@@ -206,7 +205,9 @@ BOOST_PYTHON_MODULE(miniEigen){
  		.def("__len__",&::Matrix3r_len).staticmethod("__len__").def("__setitem__",&::Matrix3r_set_item).def("__getitem__",&::Matrix3r_get_item).def("__str__",&::Matrix3r_str).def("__repr__",&::Matrix3r_str)
 		/* extras for matrices */
 		.def("__setitem__",&::Matrix3r_set_item_linear).def("__getitem__",&::Matrix3r_get_item_linear)
-		.def_readonly("Identity",&Matrix3r_Identity).def_readonly("Zero",&Matrix3r_Zero)
+		.add_static_property("Identity",&Matrix3r_Identity)
+		.add_static_property("Zero",&Matrix3r_Zero)
+		
 	;
 	bp::class_<Quaternionr>("Quaternion","Quaternion representing rotation.\n\nSupported operations (``q`` is a Quaternion, ``v`` is a Vector3): ``q*q`` (rotation composition), ``q*=q``, ``q*v`` (rotating ``v`` by ``q``), ``q==q``, ``q!=q``.",bp::init<>())
 		.def("__init__",bp::make_constructor(&Quaternionr_fromAxisAngle,bp::default_call_policies(),(bp::arg("axis"),bp::arg("angle"))))
@@ -215,7 +216,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def(bp::init<Quaternionr>((bp::arg("other"))))
 		.def_pickle(Quaternionr_pickle())
 		// properties
-		.def_readonly("Identity",&Quaternionr_Identity)
+		.add_static_property("Identity",&Quaternionr_Identity)
 		// methods
 		.def("setFromTwoVectors",&Quaternionr_setFromTwoVectors,((bp::arg("u"),bp::arg("v"))))
 		.def("conjugate",&Quaternionr::conjugate)
@@ -241,8 +242,8 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def(bp::init<Real,Real,Real>((bp::arg("x"),bp::arg("y"),bp::arg("z"))))
 		.def_pickle(Vector3r_pickle())
 		// properties
-		.def_readonly("Ones",&Vector3r_Ones).def_readonly("Zero",&Vector3r_Zero)
-		.def_readonly("UnitX",&Vector3r_UnitX).def_readonly("UnitY",&Vector3r_UnitY).def_readonly("UnitZ",&Vector3r_UnitZ)
+		.add_static_property("Ones",&Vector3r_Ones).add_static_property("Zero",&Vector3r_Zero)
+		.add_static_property("UnitX",&Vector3r_UnitX).add_static_property("UnitY",&Vector3r_UnitY).add_static_property("UnitZ",&Vector3r_UnitZ)
 		// methods
 		.def("dot",&Vector3r_dot).def("cross",&Vector3r_cross)
 		.def("norm",&Vector3r::norm).def("squaredNorm",&Vector3r::squaredNorm).def("normalize",&Vector3r::normalize)
@@ -265,8 +266,8 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def(bp::init<int,int,int>((bp::arg("x"),bp::arg("y"),bp::arg("z"))))
 		.def_pickle(Vector3i_pickle())
 		// properties
-		.def_readonly("Ones",&Vector3i_Ones).def_readonly("Zero",&Vector3i_Zero)
-		.def_readonly("UnitX",&Vector3i_UnitX).def_readonly("UnitY",&Vector3i_UnitY).def_readonly("UnitZ",&Vector3i_UnitZ)
+		.add_static_property("Ones",&Vector3i_Ones).add_static_property("Zero",&Vector3i_Zero)
+		.add_static_property("UnitX",&Vector3i_UnitX).add_static_property("UnitY",&Vector3i_UnitY).add_static_property("UnitZ",&Vector3i_UnitZ)
 		// methods
 		.def("dot",&Vector3i_dot).def("cross",&Vector3i_cross)
 		.def("norm",&Vector3i::norm).def("squaredNorm",&Vector3i::squaredNorm)
@@ -286,8 +287,8 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def(bp::init<Real,Real>((bp::arg("x"),bp::arg("y"))))
 		.def_pickle(Vector2r_pickle())
 		// properties
-		.def_readonly("Ones",&Vector2r_Ones).def_readonly("Zero",&Vector2r_Zero)
-		.def_readonly("UnitX",&Vector2r_UnitX).def_readonly("UnitY",&Vector2r_UnitY)
+		.add_static_property("Ones",&Vector2r_Ones).add_static_property("Zero",&Vector2r_Zero)
+		.add_static_property("UnitX",&Vector2r_UnitX).add_static_property("UnitY",&Vector2r_UnitY)
 		// methods
 		.def("dot",&Vector2r_dot)
 		.def("norm",&Vector2r::norm).def("squaredNorm",&Vector2r::squaredNorm).def("normalize",&Vector2r::normalize)
@@ -310,8 +311,8 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def(bp::init<int,int>((bp::arg("x"),bp::arg("y"))))
 		.def_pickle(Vector2i_pickle())
 		// properties
-		.def_readonly("Ones",&Vector2i_Ones).def_readonly("Zero",&Vector2i_Zero)
-		.def_readonly("UnitX",&Vector2i_UnitX).def_readonly("UnitY",&Vector2i_UnitY)
+		.add_static_property("Ones",&Vector2i_Ones).add_static_property("Zero",&Vector2i_Zero)
+		.add_static_property("UnitX",&Vector2i_UnitX).add_static_property("UnitY",&Vector2i_UnitY)
 		// methods
 		.def("dot",&Vector2i_dot)
 		.def("norm",&Vector2i::norm).def("squaredNorm",&Vector2i::squaredNorm).def("normalize",&Vector2i::normalize)
