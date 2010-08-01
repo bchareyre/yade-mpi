@@ -9,6 +9,7 @@
 #include<yade/core/InteractionPhysics.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/core/Dispatcher.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 class VelocityBins;
 
