@@ -6,9 +6,48 @@ from yade import *
 from yade.qt.SerializableEditor import *
 import yade.qt
 
-class EngineInspector(SeqSerializable):
+
+class EngineInspector(QWidget):
 	def __init__(self,parent=None):
-		SeqSerializable.__init__(self,parent=parent,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
+		QWidget.__init__(self,parent)
+		grid=QGridLayout(self); grid.setSpacing(0); grid.setMargin(0)
+		self.serEd=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
+		grid.addWidget(self.serEd)
+		self.setLayout(grid)
+#class MaterialsInspector(QWidget):
+#	def __init__(self,parent=None):
+#		QWidget.__init__(self,parent)
+#		grid=QGridLayout(self); grid.setSpacing(0); grid.setMargin(0)
+#		self.serEd=SeqSerializable(parent=None,getter=lambda:O.materials,setter=lambda x:setattr(O,'materials',x),serType=Engine)
+#		grid.addWidget(self.serEd)
+#		self.setLayout(grid)
+
+class CellInspector(QWidget):
+	def __init__(self,parent=None):
+		QWidget.__init__(self,parent)
+		self.layout=QVBoxLayout(self) #; self.layout.setSpacing(0); self.layout.setMargin(0)
+		self.periCheckBox=QCheckBox('periodic boundary',self)
+		self.periCheckBox.clicked.connect(self.update)
+		self.layout.addWidget(self.periCheckBox)
+		self.scroll=QScrollArea(self); self.scroll.setWidgetResizable(True)
+		self.layout.addWidget(self.scroll)
+		self.setLayout(self.layout)
+		self.refresh()
+		self.refreshTimer=QTimer(self)
+		self.refreshTimer.timeout.connect(self.refresh)
+		self.refreshTimer.start(1000)
+	def refresh(self):
+		self.periCheckBox.setChecked(O.periodic)
+		editor=self.scroll.widget()
+		if not O.periodic and editor: self.scroll.takeWidget()
+		if (O.periodic and not editor) or (editor and editor.ser!=O.cell):
+			self.scroll.setWidget(SerializableEditor(O.cell,parent=self,showType=True))
+	def update(self):
+		self.scroll.takeWidget() # do this before changing periodicity, otherwise the SerializableEditor will raise exception about None object
+		O.periodic=self.periCheckBox.isChecked()
+		self.refresh()
+		
+	
 
 def makeBodyLabel(b):
 	ret=str(b.id)+' '
@@ -52,7 +91,7 @@ class BodyInspector(QWidget):
 		topBox.addWidget(self.gotoIntrButton)
 		topBoxWidget.setLayout(topBox)
 		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
-		self.grid.addWidget(topBoxWidget,0,0)
+		self.grid.addWidget(topBoxWidget)
 		self.scroll=QScrollArea(self)
 		self.scroll.setWidgetResizable(True)
 		self.grid.addWidget(self.scroll)
@@ -199,8 +238,9 @@ class SimulationInspector(QWidget):
 		self.engineInspector=EngineInspector(parent=None)
 		self.bodyInspector=BodyInspector(parent=None,intrLinkCallback=self.changeIntrIds)
 		self.intrInspector=InteractionInspector(parent=None,bodyLinkCallback=self.changeBodyId)
+		self.cellInspector=CellInspector(parent=None)
 
-		for i,name,widget in [(0,'Engines',self.engineInspector),(1,'Bodies',self.bodyInspector),(2,'Interactions',self.intrInspector)]:
+		for i,name,widget in [(0,'Engines',self.engineInspector),(1,'Bodies',self.bodyInspector),(2,'Interactions',self.intrInspector),(3,'Cell',self.cellInspector)]:
 			self.tabWidget.addTab(widget,name)
 		grid=QGridLayout(self); grid.setSpacing(0); grid.setMargin(0)
 		grid.addWidget(self.tabWidget)

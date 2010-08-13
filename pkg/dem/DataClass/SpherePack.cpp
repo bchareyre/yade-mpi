@@ -78,19 +78,61 @@ void SpherePack::fromSimulation() {
 	if(scene->isPeriodic) { cellSize=scene->cell->getSize(); }
 }
 
-long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity){
+long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass){
 	static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
-	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
-	if (porosity>0) {//cloud porosity is assigned, ignore the given value of rMean
-		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
+	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
+	vector<Real> psdRadii; // hold psdSizes as volume if distributeMass is in use, as plain radii (rather than diameters) if not
+	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution
+	int mode=-1; bool err=false;
+	// determine the way we generate radii
+	if(rMean>0) mode=RDIST_RMEAN;
+	if(porosity>0){
+		err=(mode>=0); mode=RDIST_POROSITY;
+		if(num<0) throw invalid_argument("SpherePack.makeCloud: when specifying porosity, num must be given as well.");
 		Vector3r dimensions=mx-mn; Real volume=dimensions.x()*dimensions.y()*dimensions.z();
-		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);}	
+		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
+		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);
+	}
+	if(psdSizes.size()>0){
+		err=(mode>=0); mode=RDIST_PSD;
+		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+lexical_cast<string>(psdSizes.size())+"!="+lexical_cast<string>(psdCumm.size())).c_str());
+		if(psdSizes.size()<=1) throw invalid_argument("SpherePack.makeCloud: psdSizes must have at least 2 items");
+		if((*psdCumm.begin())!=0. && (*psdCumm.rbegin())!=1.) throw invalid_argument("SpherePack.makeCloud: first and last items of psdCumm *must* be exactly 0 and 1.");
+		psdRadii.reserve(psdSizes.size());
+		for(size_t i=0; i<psdSizes.size(); i++) {
+			psdRadii.push_back(/* radius, not diameter */ .5*psdSizes[i]);
+			if(distributeMass) psdCumm2.push_back(1-pow(1-psdCumm[i],psdScaleExponent)); // 5/2. is an approximate (fractal) dimension, empirically determined
+			LOG_DEBUG(i<<". "<<psdRadii[i]<<", cdf="<<psdCumm[i]<<", cdf2="<<(distributeMass?lexical_cast<string>(psdCumm2[i]):string("--")));
+			// check monotonicity
+			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
+		}
+	}
+	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: exactly one of rMean, porosity, psdSizes & psdCumm arguments must be specified.");
+	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
 	const int maxTry=1000;
 	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
+	Real r=0;
 	for(int i=0; (i<num) || (num<0); i++) {
+		// determine radius of the next sphere we will attempt to place in space
 		int t;
-		Real r=2*(rnd()-.5)*rRelFuzz*rMean+rMean; 
+		switch(mode){
+			case RDIST_RMEAN:
+			case RDIST_POROSITY: 
+				if(distributeMass) r=pow3Interp(rnd(),rMean*(1-rRelFuzz),rMean*(1+rRelFuzz));
+				else r=rMean*(2*(rnd()-.5)*rRelFuzz+1); // uniform distribution in rMean*(1±rRelFuzz)
+				break;
+			case RDIST_PSD:
+				if(distributeMass){
+					Real norm;
+					int piece=psdGetPiece(rnd(),psdCumm2,norm);
+					r=pow3Interp(norm,psdRadii[piece],psdRadii[piece+1]);
+				} else {
+					Real norm; int piece=psdGetPiece(rnd(),psdCumm,norm);
+					r=psdRadii[piece]+norm*(psdRadii[piece+1]-psdRadii[piece]);
+				}
+		}
+		// try to put the sphere into a free spot
 		for(t=0; t<maxTry; ++t){
 			Vector3r c;
 			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
@@ -139,4 +181,34 @@ void SpherePack::cellRepeat(Vector3i count){
 		}
 	}
 	cellSize=Vector3r(cellSize[0]*count[0],cellSize[1]*count[1],cellSize[2]*count[2]);
+}
+
+int SpherePack::psdGetPiece(Real x, const vector<Real>& cumm, Real& norm){
+	int sz=cumm.size(); int i=0;
+	while(i<sz && cumm[i]<=x) i++; // upper interval limit index
+	if((i==sz-1) && cumm[i]<=x){ i=sz-2; norm=1.; return i;}
+	i--; // lower interval limit intex
+	norm=(x-cumm[i])/(cumm[i+1]-cumm[i]);
+	//LOG_TRACE("count="<<sz<<", x="<<x<<", piece="<<i<<" in "<<cumm[i]<<"…"<<cumm[i+1]<<", norm="<<norm);
+	return i;
+}
+
+python::tuple SpherePack::psd(int bins, bool mass) const {
+	if(pack.size()==0) return python::make_tuple(python::list(),python::list()); // empty packing
+	// find extrema
+	Real minD=std::numeric_limits<Real>::infinity(); Real maxD=-minD;
+	// volume, but divided by π*4/3
+	Real vol=0; long N=pack.size();
+	FOREACH(const Sph& s, pack){ maxD=max(2*s.r,maxD); minD=min(2*s.r,minD); vol+=pow(s.r,3); }
+	if(minD==maxD){ minD-=.5; maxD+=.5; } // emulates what numpy.histogram does
+	// create bins and bin edges
+	vector<Real> hist(bins,0); vector<Real> cumm(bins+1,0); /* cummulative values compute from hist at the end */
+	vector<Real> edges(bins+1); for(int i=0; i<=bins; i++){ edges[i]=minD+i*(maxD-minD)/bins; }
+	// weight each grain by its "volume" relative to overall "volume"
+	FOREACH(const Sph& s, pack){
+		int bin=int(bins*(2*s.r-minD)/(maxD-minD)); bin=min(bin,bins-1); // to make sure
+		if (mass) hist[bin]+=pow(s.r,3)/vol; else hist[bin]+=1./N;
+	}
+	for(int i=0; i<bins; i++) cumm[i+1]=min(1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
+	return python::make_tuple(edges,cumm);
 }

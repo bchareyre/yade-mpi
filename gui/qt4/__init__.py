@@ -3,19 +3,20 @@ from PyQt4.QtGui import *
 from PyQt4 import QtCore
 
 from yade.qt.ui_controller import Ui_Controller
-from yade.qt.SerializableEditor import SerializableEditor,SeqSerializable
+
 from yade.qt.Inspector import *
 from yade import *
 import yade.system
 
 from yade.qt._GLViewer import *
 
-maxWebWindows=2
+maxWebWindows=1
 "Number of webkit windows that will be cycled to show help on clickable objects"
 webWindows=[] 
 "holds instances of QtWebKit windows; clicking an url will open it in the window that was the least recently updated"
 sphinxOnlineDocPath='https://www.yade-dem.org/sphinx/'
 "Base URL for the documentation. Packaged versions should change to the local installation directory."
+
 
 # find if we have docs installed locally from package
 import yade.config
@@ -29,6 +30,8 @@ sphinxWrapperPart='yade.wrapper.html'
 sphinxDocWrapperPage=(('file://'+sphinxLocalDocPath) if os.path.exists(sphinxLocalDocPath+'/'+sphinxWrapperPart) else sphinxOnlineDocPath)+'/'+sphinxWrapperPart
 
 
+
+
 def openUrl(url):
 	from PyQt4 import QtWebKit
 	global maxWebWindows,webWindows
@@ -36,6 +39,7 @@ def openUrl(url):
 	# use the last window if the class is the same and only the attribute differs
 	try:
 		reuseLast=(len(webWindows)>0 and str(webWindows[-1].url()).split('#')[-1].split('.')[2]==url.split('#')[-1].split('.')[2])
+		#print str(webWindows[-1].url()).split('#')[-1].split('.')[2],url.split('#')[-1].split('.')[2]
 	except: pass
 	if not reuseLast:
 		if len(webWindows)<maxWebWindows: webWindows.append(QtWebKit.QWebView())
@@ -54,7 +58,6 @@ def openUrl(url):
 	web.show();	web.raise_()
 
 
-global _controller
 controller=None
 
 class ControllerClass(QWidget,Ui_Controller):
@@ -108,8 +111,10 @@ class ControllerClass(QWidget,Ui_Controller):
 			traceback.print_exc()
 	def generateSlot(self):
 		filename=str(self.generatorFilenameEdit.text())
-		if self.generatorMemoryCheck.isChecked(): filename=':memory:'+filename
-		print 'Will save to ',filename
+		if self.generatorMemoryCheck.isChecked():
+			filename=':memory:'+filename
+			print 'BUG: Saving to memory slots freezes Yade (cause unknown). Cross fingers.'
+		#print 'Will save to ',filename
 		self.generator.generate(filename)
 		if self.generatorAutoCheck:
 			O.load(filename)
@@ -235,6 +240,10 @@ def Controller():
 	if not controller: controller=ControllerClass();
 	controller.show(); controller.raise_()
 	controller.setTabActive('simulation')
+def Inspector():
+	global controller
+	if not controller: controller=ControllerClass();
+	controller.inspectSlot()
 
 #if __name__=='__main__':
 #	from PyQt4 import QtGui

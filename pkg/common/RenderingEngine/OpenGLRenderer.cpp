@@ -274,11 +274,12 @@ void OpenGLRenderer::renderInteractionPhysics(){
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-			if(!I->interactionPhysics) continue;
+			shared_ptr<InteractionPhysics> ip(I->interactionPhysics);
+			if(!ip) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			body_id_t id1=I->getId1(), id2=I->getId2();
 			if(!(bodyDisp[id1].isDisplayed||bodyDisp[id2].isDisplayed)) continue;
-			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,intrWire); glPopMatrix();
+			glPushMatrix(); interactionPhysicsDispatcher(ip,I,b1,b2,intrWire); glPopMatrix();
 		}
 	}
 }

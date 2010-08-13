@@ -44,7 +44,7 @@ void Serializable::pyUpdateAttrs(const python::dict& d){
 		string key=python::extract<string>(t[0]);
 		pySetAttr_nowarn(key,t[1]);
 	}
-	postProcessAttributes(/*deserializing*/true); // to make sure
+	if(ll>0) postProcessAttributes(/*deserializing*/true); // to make sure
 }
 
 python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
@@ -54,7 +54,7 @@ python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
 		string key=python::extract<string>(t[0]);
 		if(pyHasKey(key)) pySetAttr_nowarn(key,t[1]); else ret.append(t[0]);
 	}
-	postProcessAttributes(/*deserializing*/true); // to make sure
+	if(ll>0) postProcessAttributes(/*deserializing*/true); // to make sure
 	return ret; 
 }
 

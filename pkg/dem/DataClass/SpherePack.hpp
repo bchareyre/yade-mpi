@@ -30,6 +30,7 @@ class SpherePack{
 		return (xNorm-floor(xNorm))*(x1-x0);
 	}
 public:
+	enum {RDIST_RMEAN, RDIST_POROSITY, RDIST_PSD};
 	struct Sph{
 		Vector3r c; Real r;
 		Sph(const Vector3r& _c, Real _r): c(_c), r(_r){};
@@ -37,7 +38,8 @@ public:
 	};
 	std::vector<Sph> pack;
 	Vector3r cellSize;
-	SpherePack(): cellSize(Vector3r::Zero()){};
+	Real psdScaleExponent;
+	SpherePack(): cellSize(Vector3r::Zero()), psdScaleExponent(2.5){};
 	SpherePack(const python::list& l):cellSize(Vector3r::Zero()){ fromList(l); }
 	// add single sphere
 	void add(const Vector3r& c, Real r){ pack.push_back(Sph(c,r)); }
@@ -51,7 +53,13 @@ public:
 	void fromSimulation();
 
 	// random generation; if num<0, insert as many spheres as possible; if porosity>0, recompute meanRadius (porosity>0.65 recommended) and try generating this porosity with num spheres.
-	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, int num=-1, bool periodic=false, Real porosity=-1);
+	long makeCloud(Vector3r min, Vector3r max, Real rMean=-1, Real rFuzz=0, int num=-1, bool periodic=false, Real porosity=-1, const vector<Real>& psdSizes=vector<Real>(), const vector<Real>& psdCumm=vector<Real>(), bool distributeMass=false);
+	// return number of piece for x in piecewise function defined by cumm with non-decreasing elements ∈(0,1)
+	// norm holds normalized coordinate withing the piece
+	int psdGetPiece(Real x, const vector<Real>& cumm, Real& norm);
+
+	// interpolate a variable with power distribution (exponent -3) between two margin values, given uniformly distributed x∈(0,1)
+	Real pow3Interp(Real x,Real a,Real b){ return pow(x*(pow(b,-2)-pow(a,-2))+pow(a,-2),-1./2); }
 
 	// periodic repetition
 	void cellRepeat(Vector3i count);
@@ -71,6 +79,7 @@ public:
 		sphVol*=(4/3.)*Mathr::PI;
 		return sphVol/(dd[0]*dd[1]*dd[2]);
 	}
+	python::tuple psd(int bins=10, bool mass=false) const;
 
 	// transformations
 	void translate(const Vector3r& shift){ FOREACH(Sph& s, pack) s.c+=shift; }
