@@ -12,16 +12,10 @@ O.bodies.append([
         utils.facet([[-0.707,-0.707,0.1],[0,1.414,0],[1.414,0,0]],dynamic=False,color=[1,0,0],young=Young,poisson=Poisson),
         utils.facet([[0,1.414,0],[1.414,0,0],[0.707,0.707,-2.0]],dynamic=False,color=[1,0,0],young=Young,poisson=Poisson)])
 
-## Initializers 
-O.initializers=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
-	]
-
 ## Engines 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
 	ElasticContactLaw(),

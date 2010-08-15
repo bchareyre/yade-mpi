@@ -35,8 +35,7 @@ O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(label='collider'),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='collider'),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

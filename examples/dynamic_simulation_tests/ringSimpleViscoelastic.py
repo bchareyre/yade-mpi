@@ -43,25 +43,17 @@ spheresCount=0
 spheresCount+=fill_cylinder_with_spheres(sphereRadius,0.5,0.10,[0,0,0],radians(0))
 print "Number of spheres: %d" % spheresCount
 
-## Initializers 
-o.initializers=[
-	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
-	]
 
 ## Engines 
 o.engines=[
 	## Resets forces and momenta the act on bodies
 	ForceResetter(),
 
-	## Associates bounding volume to each body.
-	BoundDispatcher([
+	## Using bounding boxes find possible body collisions.
+	InsertionSortCollider([
 		Bo1_Sphere_Aabb(),
 		Bo1_Facet_Aabb(),
 	]),
-
-	## Using bounding boxes find possible body collisions.
-	InsertionSortCollider(),
 	# Interactions
 	InteractionDispatchers(
 		## Create geometry information about each potential collision.

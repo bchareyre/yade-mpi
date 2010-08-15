@@ -31,8 +31,7 @@ O.bodies[1].state.blockedDOFs=['rx','ry','rz'] # block particles rotations
 # list of engines
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_MindlinPhys(label='damping')],

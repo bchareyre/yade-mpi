@@ -6,10 +6,10 @@ O.bodies.append([
 	utils.sphere([-1,0,2],1,dynamic=True,color=(1,0,0),wire=True),
 ])
 O.engines=[
-	BoundDispatcher([
+	#ForceResetter(),
+	InsertionSortCollider([
 		Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()
 	]),
-	InsertionSortCollider(),
 	InteractionGeometryDispatcher([
 		Ig2_Sphere_Sphere_Dem3DofGeom(),
 		Ig2_Facet_Sphere_Dem3DofGeom(),

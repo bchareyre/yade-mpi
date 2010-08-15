@@ -39,6 +39,7 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/pkg-common/ParallelEngine.hpp>
+#include<yade/pkg-common/Collider.hpp>
 
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 
@@ -277,7 +278,6 @@ class pyOmega{
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
 			if(!e->label.empty()){
 				pyRunString("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')");
-				//boost::python::scope("__builtins__").attr(e->label)=e;
 			}
 			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(!f->label.empty()){ pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");}} }
 			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
@@ -288,6 +288,8 @@ class pyOmega{
 				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
 				_DO_FUNCTORS(id->lawDispatcher->functors,LawFunctor);
 			}
+			Collider* coll=dynamic_cast<Collider*>(e.get());
+			if(coll){ _DO_FUNCTORS(coll->boundDispatcher->functors,BoundFunctor); }
 			#undef _DO_FUNCTORS
 			#undef _TRY_DISPATCHER
 		}
@@ -304,6 +306,8 @@ class pyOmega{
 				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
 				_DO_FUNCTORS(id->lawDispatcher->functors,LawFunctor);
 			}
+			Collider* coll=dynamic_cast<Collider*>(e.get());
+			if(coll){ _DO_FUNCTORS(coll->boundDispatcher->functors,BoundFunctor); }
 			#undef _DO_FUNCTORS
 			#undef _TRY_DISPATCHER
 		}

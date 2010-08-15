@@ -5,8 +5,7 @@ from yade import log,timing
 log.setLevel("InsertionSortCollider",log.TRACE)
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

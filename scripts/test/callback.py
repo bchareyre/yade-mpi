@@ -5,8 +5,7 @@ O.bodies.append([
 ])
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

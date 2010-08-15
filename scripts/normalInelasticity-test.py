@@ -23,8 +23,7 @@ upperSphere=O.bodies[1]
 #Def of the engines taking part to the simulation loop
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionDispatchers(
 			      [Ig2_Sphere_Sphere_ScGeom()],
 			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys(betaR=0.24)],

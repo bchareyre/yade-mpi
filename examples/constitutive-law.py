@@ -1,16 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-O.initializers=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	]
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InsertionSortCollider(),
-	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
-	LawDispatcher([Law2_ScGeom_FrictPhys_Basic()]),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
+	InteractionDispatchers(
+		[Ig2_Sphere_Sphere_ScGeom()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_ScGeom_FrictPhys_Basic()]
+	),
 	GravityEngine(gravity=(0,0,-1000)),
 	NewtonIntegrator(damping=0.2)
 ]

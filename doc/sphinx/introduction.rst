@@ -407,8 +407,7 @@ Simulation loop, shown at img. img-yade-iter-loop_, can be described as follows 
 		# reset forces
 		ForceResetter(),
 		# approximate collision detection, create interactions
-		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-		InsertionSortCollider(),
+		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 		# handle interactions
 		InteractionDispatchers(
 			[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
@@ -439,11 +438,11 @@ Dispatchers and functors
 
 For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. The line::
 
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 
-creates a :yref:`BoundDispatcher`. It traverses all bodies and will, based on :yref:`shape<Shape>` type of each :yref:`body<Body>`, dispatch one of the functors to create/update :yref:`bound<Bound>` for that particular body. In the case shown, it has 2 functors, one handling :yref:`spheres<Sphere>`, another :yref:`facets<Facet>`. 
+creates :yref:`InsertionSortCollider` (it internally uses :yref:`BoundDispatcher`, but that is a detail). It traverses all bodies and will, based on :yref:`shape<Shape>` type of each :yref:`body<Body>`, dispatch one of the functors to create/update :yref:`bound<Bound>` for that particular body. In the case shown, it has 2 functors, one handling :yref:`spheres<Sphere>`, another :yref:`facets<Facet>`. 
 	
-The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`), which accepts ``1`` type :yref:`Sphere` and creates an :yref:`Aabb` (axis-aligned bounding box; it is derived from :yref:`Bound`). The :yref:`Aabb` objects are used by :yref:`InsertionSortCollider`, which does the actual approximate collision detection. All ``Bo1`` functors derive from :yref:`BoundFunctor`.
+The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`), which accepts ``1`` type :yref:`Sphere` and creates an :yref:`Aabb` (axis-aligned bounding box; it is derived from :yref:`Bound`). The :yref:`Aabb` objects are used by :yref:`InsertionSortCollider` itself. All ``Bo1`` functors derive from :yref:`BoundFunctor`.
 
 The next part, reading
 

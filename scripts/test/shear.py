@@ -8,8 +8,7 @@ O.bodies.append([
 	utils.sphere([0,0,1],.5000001,dynamic=True,color=(0,0,1))
 ])
 O.engines=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),

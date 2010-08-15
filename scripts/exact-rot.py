@@ -1,13 +1,9 @@
 #!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 from math import *
-O.initializers=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
-]
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionGeometryDispatcher([
 		Ig2_Sphere_Sphere_ScGeom(),
 		Ig2_Facet_Sphere_ScGeom(),

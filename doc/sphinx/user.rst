@@ -397,12 +397,11 @@ In code, such scenario might look similar to this one (labeling is explained in 
 
 	O.engines=[
 	   ForceResetter(),
-	   BoundDispatcher([
+	   InsertionSortCollider([
 	      # enlarge here
 	      Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='bo1s'),
 	      Bo1_Facet_Aabb(),
-	   ]),
-	   InsertionSortCollider(),
+		]),
 	   InteractionDispatchers(
 	      [
 	         # enlarge here
@@ -473,8 +472,7 @@ Each of these points corresponds to one or several engines::
 
 	O.engines=[
 	   ForceResetter(),          # reset forces
-	   BoundDispatcher(),        # update bounding boxes, for use by the next engine
-	   InsertionSortCollider(),  # detect new collisions
+	   InsertionSortCollider([...]),  # approximate collision detection
 	   InteractionDispatchers([...],[...],[...]) # handle interactions
 	   NewtonIntegrator()        # apply forces and update positions
 	]
@@ -503,13 +501,12 @@ In the above example, we omited functors, only writing ellipses ``...`` instead.
 
 Bo1 functors
 ^^^^^^^^^^^^
-``Bo1`` functors must be chosen depending on the collider in use.
+``Bo1`` functors must be chosen depending on the collider in use; they are given directly to the collider (which internally uses :yref:`BoundDispatcher`).
 
 At this moment (May 2010), the most common choice is :yref:`InsertionSortCollider`, which uses :yref:`Aabb`; functors creating :yref:`Aabb` must be used in that case. Depending on particle :yref:`shapes<Shape>` in your simulation, choose appropriate functors::
 
    O.engines=[...,
-      BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-      InsertionSortCollider(),
+      InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
       ...
    ]
 

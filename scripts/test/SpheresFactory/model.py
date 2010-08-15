@@ -17,16 +17,11 @@ factory3 = utils.import_stl_geometry('square.stl',color=[0.4,0.4,0.7],noInteract
 ## Timestep 
 O.dt=0.0001
 
-## Initializers 
-O.initializers=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
-	]
 
 ## Engines 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionGeometryDispatcher([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),
 	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ConstitutiveLawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic()]),

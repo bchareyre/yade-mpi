@@ -306,12 +306,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add(ss);
 	
 		
-	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new Bo1_Sphere_Aabb);
-	boundDispatcher->add(new Bo1_Box_Aabb);
-	boundDispatcher->add(new Bo1_Facet_Aabb);
-	boundDispatcher->add(new Bo1_Wall_Aabb);
-		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
@@ -362,12 +356,16 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	#endif	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-	rootBody->engines.push_back(boundDispatcher);
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	rootBody->engines.push_back(collider);
 // 	if(fast){ // The old code was doing the same slower, still here in case we want to make comparisons again
 		collider->sweepLength=.05*radiusMean;
 		collider->nBins=5; collider->binCoeff=2; /* gives a 2^5=32× difference between the lower and higher bin sweep lengths */
+		collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
+		collider->boundDispatcher->add(new Bo1_Box_Aabb);
+		collider->boundDispatcher->add(new Bo1_Facet_Aabb);
+		collider->boundDispatcher->add(new Bo1_Wall_Aabb);
+
 		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
@@ -386,9 +384,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
 	rootBody->engines.push_back(newton);
-	//if (0) rootBody->engines.push_back(shared_ptr<Engine>(new MicroMacroAnalyser));
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundDispatcher);	
 }
 
 void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)

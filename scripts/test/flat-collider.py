@@ -6,7 +6,7 @@ O.bodies.append(pack.regularOrtho(pack.inAlignedBox((3,3,3),(7,7,4)),radius=.05,
 O.engines=[
 	ForceResetter(),
 	FlatGridCollider(step=.2,aabbMin=(0,0,0),aabbMax=(10,10,5),verletDist=0.005),
-	#BoundDispatcher([Bo1_Sphere_Aabb()]), InsertionSortCollider(sweepLength=0.005),
+	# InsertionSortCollider([Bo1_Sphere_Aabb()],sweepLength=0.005),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

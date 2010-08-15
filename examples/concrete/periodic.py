@@ -94,8 +94,7 @@ import yade.plot as yp
 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
-	InsertionSortCollider(sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
+	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),],sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],

@@ -11,8 +11,7 @@ O.dt=utils.PWaveTimeStep()
 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(label='isc'),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='isc'),
 	InteractionDispatchers(
 		[Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
@@ -33,6 +32,5 @@ O.timingEnabled=True
 isc['sweepLength']=.1
 isc['nBins']=5
 #log.setLevel('InsertionSortCollider',log.DEBUG)
-#log.setLevel('BoundDispatcher',log.DEBUG)
 O.saveTmp()
 O.step()

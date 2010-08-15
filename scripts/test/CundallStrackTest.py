@@ -4,8 +4,7 @@
 o=Omega() 
 o.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),]),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),
 	InteractionPhysicsDispatcher([Ip2_2xFrictMat_CSPhys()]),
 	LawDispatcher([Law2_Dem3Dof_CSPhys_CundallStrack()]),

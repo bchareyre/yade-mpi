@@ -12,18 +12,12 @@ frictionAngle=radians(30)
 O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,label='mat'))
 O.dt=1e-4
 
-O.initializers=[
-	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_ChainedCylinder_Aabb()])
-]
-
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([
+	InsertionSortCollider([
 		Bo1_ChainedCylinder_Aabb(),
 		Bo1_Sphere_Aabb()
 	]),
-	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
 		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True,normalCohesion=1e13,shearCohesion=1e13)],

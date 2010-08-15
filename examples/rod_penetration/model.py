@@ -41,23 +41,17 @@ print "done\n"
 #o.dt=utils.PWaveTimeStep()
 o.dt=0.0001
 
-## Initializers 
-o.initializers=[
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
-	]
 
 ## Engines 
 o.engines=[
 	## Resets forces and momenta the act on bodies
 	ForceResetter(),
 
-	## Associates bounding volume to each body.
-	BoundDispatcher([
+	## Using bounding boxes find possible body collisions.
+	InsertionSortCollider([
 		Bo1_Sphere_Aabb(),
 		Bo1_Facet_Aabb(),
 	]),
-	## Using bounding boxes find possible body collisions.
-	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

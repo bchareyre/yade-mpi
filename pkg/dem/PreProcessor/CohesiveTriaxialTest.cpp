@@ -299,9 +299,9 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
-	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new Bo1_Sphere_Aabb);
-	boundDispatcher->add(new Bo1_Box_Aabb);
+	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
+	collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
+	collider->boundDispatcher->add(new Bo1_Box_Aabb);
 
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
@@ -336,8 +336,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-	rootBody->engines.push_back(boundDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	rootBody->engines.push_back(collider);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(cohesiveFrictionalContactLaw);
@@ -347,9 +346,6 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	//rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
 	rootBody->engines.push_back(newton);
 
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundDispatcher);
-	
 }
 
 

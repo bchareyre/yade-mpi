@@ -395,11 +395,11 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	
-	shared_ptr<Bo1_Sphere_Aabb> interactingSphere2AABB(new Bo1_Sphere_Aabb);
-	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
-	
-	boundDispatcher->add(interactingSphere2AABB);
-	boundDispatcher->add(new Bo1_Box_Aabb);
+	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
+	shared_ptr<Bo1_Sphere_Aabb> bo1sphere(new Bo1_Sphere_Aabb);
+	bo1sphere->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
+	collider->boundDispatcher->add(bo1sphere);
+	collider->boundDispatcher->add(new Bo1_Box_Aabb);
 
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -470,8 +470,7 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
-	rootBody->engines.push_back(boundDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	rootBody->engines.push_back(collider);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);

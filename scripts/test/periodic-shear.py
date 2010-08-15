@@ -6,8 +6,7 @@ O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
 O.bodies.append(utils.sphere([.3,0,0],.1,dynamic=False))
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(label='isc'),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='isc'),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

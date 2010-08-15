@@ -71,8 +71,7 @@ for k,l in itertools.product(arange(0,9),arange(0,9)):
 # Create engines
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(nBins=5,sweepLength=.1*Rs),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],nBins=5,sweepLength=.1*Rs),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],

@@ -1,11 +1,9 @@
-O.initializers=[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),])]
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([
+	InsertionSortCollider([
 		Bo1_Sphere_Aabb(),
 		Bo1_Box_Aabb(),
 	]),
-	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

@@ -199,9 +199,9 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
 	interactionPhysicsDispatcher->add(CL1Rel);
 
-	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new Bo1_Sphere_Aabb);
-	boundDispatcher->add(new Bo1_Box_Aabb);
+	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
+	collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
+	collider->boundDispatcher->add(new Bo1_Box_Aabb);
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -217,18 +217,13 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
-	rootBody->engines.push_back(boundDispatcher);	
-	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	rootBody->engines.push_back(collider);	
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 // 	rootBody->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 	if(gravApplied)
 		rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
-// 	rootBody->engines.push_back(possnap);
-// 	rootBody->engines.push_back(forcesnap);
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundDispatcher);
 }
 
 

@@ -7,8 +7,7 @@
 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(nBins=5,sweepLength=5e-3),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],nBins=5,sweepLength=5e-3),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Facet_Sphere_Dem3DofGeom()],

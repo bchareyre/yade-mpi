@@ -16,8 +16,7 @@ magnitudes=[.5*maxMag*(sin(t*(freq*2*pi))+1) for t in times] # generate points o
 
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

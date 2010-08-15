@@ -59,13 +59,9 @@ O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 #---- Def of the engines ----#
 
-O.initializers=[
-		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
-]
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_2xNormalInelasticMat_NormalInelasticityPhys()],

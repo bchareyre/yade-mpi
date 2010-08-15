@@ -7,11 +7,6 @@
 
 o=Omega() # for advaned folks: this creates default MetaBody as well
 
-## Initializers are run before the simulation.
-o.initializers=[
-	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),])
-]
 
 ## Engines are called consecutively at each iteration. Their order matters.
 ##
@@ -22,15 +17,12 @@ o.engines=[
 	## Resets forces and momenta the act on bodies
 	ForceResetter(),
 	## associates bounding volume - in this case, AxisAlignedBoundingBox (Aabb) - to each body.
-	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, BoxModel, or MetaBody (rootBody).
-	## AABBs will be used to detect collisions later, by PersistentSAPCollider
-	BoundDispatcher([
+	## Using bounding boxes created, find possible body collisions.
+	## These possible collisions are inserted in O.interactions container (Scene::interactions in c++).
+	InsertionSortCollider([
 		Bo1_Sphere_Aabb(),
 		Bo1_Box_Aabb(),
 	]),
-	## Using bounding boxes created by the previous engine, find possible body collisions.
-	## These possible collisions are inserted in Omega.interactions container (MetaBody::transientInteractions in c++).
-	InsertionSortCollider(),
 	## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
 	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
 	## Note that there is no EngineUnit for box-box collision. They are not implemented.
@@ -102,7 +94,7 @@ if False:
 	mass=8*.5*.5*.5*2400
 	# * se3 (position & orientation) as 3 position coordinates, then 3 direction axis coordinates and rotation angle
 	b.phys=BodyMacroParameters(se3=[0,0,0,1,0,0,0],mass=mass,inertia=[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],young=30e9,poisson=.3)
-	# other information about Aabb will be updated during simulation by relevant BoundDispatcher
+	# other information about Aabb will be updated during simulation by the collider
 	b.bound=Aabb(color=[0,1,0])
 	# add the body to the simulation
 	o.bodies.append(b)

@@ -17,8 +17,7 @@ O.bodies.append([utils.sphere(c,r) for c,r in sp])
 
 O.engines=[
 	ForceResetter(), 
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionDispatchers(
 	[Ig2_Sphere_Sphere_Dem3DofGeom(),
 		Ig2_Facet_Sphere_Dem3DofGeom()],

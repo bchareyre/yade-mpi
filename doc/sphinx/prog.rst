@@ -888,15 +888,15 @@ Multiple dispatch is generalization of virtual methods: a :yref:`Dispatcher` dec
 
 .. code-block:: python
 
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 
-creates dispatcher :yref:`BoundDispatcher` (a :yref:`Dispatcher`), with 2 functors; they receive ``Sphere`` or ``Facet`` instances and create ``Aabb``. This code would look like this in c++:
+creates :yref:`InsertionSortCollider`, which internally contains :yref:`Collider.boundDispatcher`, a :yref:`BoundDispatcher` (a :yref:`Dispatcher`), with 2 functors; they receive ``Sphere`` or ``Facet`` instances and create ``Aabb``. This code would look like this in c++:
 
 .. code-block:: c++
 
-	shared_ptr<BoundDispatcher> boundDispatcher=shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new Bo1_Sphere_Aabb());
-	boundDispatcher->add(new Bo1_Facet_Aabb());
+	shared_ptr<InsertionSortCollider> collider=(new InsertionSortCollider);
+	collider->boundDispatcher->add(new Bo1_Sphere_Aabb());
+	collider->boundDispatcher->add(new Bo1_Facet_Aabb());
 
 There are currenly 4 predefined dispatchers (see `dispatcher-names`_) and corresponding functor types. They are inherit from template instantiations of ``Dispatcher1D`` or ``Dispatcher2D`` (for functors, ``Functor1D`` or ``Functor2D``). These templates themselves derive from ``DynlibDispatcher`` (for dispatchers) and ``FunctorWrapper`` (for functors).
 

@@ -3,13 +3,10 @@
 ##
 ## SCRIPT TO TEST A NEW CONSTITUTIVE LAW (MINDLIN - nonlinear elastic model)
 
-O.initializers=[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])]
-
 ## list of engines
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_MindlinPhys()],

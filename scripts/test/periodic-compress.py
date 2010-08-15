@@ -11,8 +11,7 @@ log.setLevel("PeriIsoCompressor",log.DEBUG)
 O.timingEnabled=True
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

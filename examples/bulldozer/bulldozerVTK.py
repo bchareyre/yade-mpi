@@ -68,12 +68,9 @@ for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(
 
 O.dt=.2*tc
 
-O.initializers=[ BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]) ]
-
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],

@@ -4,8 +4,7 @@
 # Test case for sphere-facet interaction.
 O.engines=[
 	ForceResetter(),
-	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InsertionSortCollider(),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Facet_Sphere_Dem3DofGeom()],
