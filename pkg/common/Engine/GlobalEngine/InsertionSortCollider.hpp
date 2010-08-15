@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
 #pragma once
-#include<yade/core/Collider.hpp>
+#include<yade/pkg-common/Collider.hpp>
 #include<yade/core/Scene.hpp>
 class InteractionContainer;
 
@@ -81,7 +81,6 @@ Possible performance improvements & bugs
 	#define ISC_CHECKPOINT(cpt)
 #endif
 
-class BoundDispatcher;
 class NewtonIntegrator;
 
 class InsertionSortCollider: public Collider{
@@ -110,8 +109,6 @@ class InsertionSortCollider: public Collider{
 		int watch1, watch2;
 		bool watchIds(Body::id_t id1,Body::id_t id2) const { return (watch1<0 &&(watch2==id1||watch2==id2))||(watch2<0 && (watch1==id1||watch1==id2))||(watch1==id1 && watch2==id2)||(watch1==id2 && watch2==id1); }
 	#endif
-		// keep this dispatcher and call it ourselves as needed
-		shared_ptr<BoundDispatcher> boundDispatcher;
 		// we need this to find out about current maxVelocitySq
 		shared_ptr<NewtonIntegrator> newton;
 		// if False, no type of striding is used

@@ -13,7 +13,7 @@
 
 void Gl1_Aabb::go(const shared_ptr<Bound>& bv, Scene* scene){
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
-	glColor3v(bv->diffuseColor);
+	glColor3v(bv->color);
 	// glDisable(GL_LIGHTING);
 	if(!scene->isPeriodic){
 		glTranslatev(Vector3r(.5*(aabb->min+aabb->max)));

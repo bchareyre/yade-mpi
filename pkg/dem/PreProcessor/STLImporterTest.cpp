@@ -90,7 +90,7 @@ bool STLImporterTest::generate()
 	// create bodies
 	for(int i=0,e=imp.number_of_facets;i<e;++i)
 	{
-	    shared_ptr<Body> b(new Body(Body::id_t(0),1));
+	    shared_ptr<Body> b(new Body); b->groupMask=1;
     
 	    b->setDynamic(false);
 	    
@@ -107,7 +107,7 @@ bool STLImporterTest::generate()
 
 	    // bounding box 
 		shared_ptr<Aabb> aabb(new Aabb);
-		aabb->diffuseColor		= Vector3r(0,1,0);
+		aabb->color		= Vector3r(0,1,0);
 		b->bound	= aabb;
 	    
 	    rootBody->bodies->insert(b);
@@ -143,7 +143,7 @@ bool STLImporterTest::generate()
 
 void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(Body::id_t(0),1));
+	body = shared_ptr<Body>(new Body); body->groupMask(1);
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -167,10 +167,10 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
-	aabb->diffuseColor		= Vector3r(0,1,0);
+	aabb->color		= Vector3r(0,1,0);
 
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
+	iSphere->color		= Vector3r(0.8,0.3,0.3);
 
 	body->shape	= iSphere;
 	body->bound		= aabb;
@@ -257,7 +257,7 @@ void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	physics->acceleration			= Vector3r::Zero();
 		
 	shared_ptr<Aabb> aabb(new Aabb);
-	aabb->diffuseColor			= Vector3r(0,0,1);
+	aabb->color			= Vector3r(0,0,1);
 	
 	rootBody->bound		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;

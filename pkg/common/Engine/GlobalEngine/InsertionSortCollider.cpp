@@ -66,7 +66,7 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 }
 
 vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
-	if(periodic){ LOG_FATAL("Probing with periodic boundary not implemented."); abort(); }
+	if(periodic){ throw invalid_argument("InsertionSortCollider::probeBoundingVolume: handling periodic boundary not implemented."); }
 	vector<Body::id_t> ret;
 	for( vector<Bounds>::iterator 
 			it=BB[0].vec.begin(),et=BB[0].vec.end(); it < et; ++it)
@@ -146,7 +146,14 @@ void InsertionSortCollider::action(){
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
-		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene); 
+		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene);
+
+		// compatibility block, can be removed later
+		findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
+
+		// update bounds via boundDispatcher
+		boundDispatcher->scene=scene;
+		boundDispatcher->action();
 		
 
 		// STRIDE
@@ -154,7 +161,7 @@ void InsertionSortCollider::action(){
 				// get NewtonIntegrator, to ask for the maximum velocity value
 				if(!newton){
 					FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
-					if(!newton){ LOG_FATAL("Unable to locate NewtonIntegrator within engines, aborting."); abort(); }
+					if(!newton){ throw runtime_error("InsertionSortCollider.sweepLength>0, but unable to locate NewtonIntegrator within O.engines."); }
 				}
 			}
 	ISC_CHECKPOINT("init");
@@ -166,16 +173,6 @@ void InsertionSortCollider::action(){
 			}
 			if(strideActive){
 				assert(sweepLength>0);
-				// get the BoundDispatcher and turn it off; we will call it ourselves
-				if(!boundDispatcher){
-					FOREACH(shared_ptr<Engine>& e, scene->engines){ boundDispatcher=dynamic_pointer_cast<BoundDispatcher>(e); if(boundDispatcher) break; }
-					if(!boundDispatcher){ LOG_FATAL("Unable to locate BoundDispatcher within engines, aborting."); abort(); }
-					boundDispatcher->activated=false; // deactive the engine, we will call it ourselves from now (just when needed)
-				} else {
-					// if we just hijacked it, it was already called in this step; only call it explicitly if we already had it
-					boundDispatcher->scene=scene;
-					boundDispatcher->action();
-				}
 				if(nBins<=0){
 					// reset bins, in case they were active but are not anymore
 					if(newton->velocityBins) newton->velocityBins=shared_ptr<VelocityBins>(); if(boundDispatcher->velocityBins) boundDispatcher->velocityBins=shared_ptr<VelocityBins>();
@@ -199,14 +196,7 @@ void InsertionSortCollider::action(){
 					newton->velocityBins->setBins(scene,newton->maxVelocitySq,sweepLength);
 				}
 			} else { /* !strideActive */
-				if(boundDispatcher){
-					// stride was active (since we own boundDispatcher) but is not now anymore
-					// was not yet run in this step, do it now
-					boundDispatcher->scene=scene;
-					boundDispatcher->action();
-					// release boundDispatcher and let it do its work by itself from now on
-					boundDispatcher->activated=true;
-				}
+				boundDispatcher->sweepDist=0;
 			}
 
 	ISC_CHECKPOINT("bound");

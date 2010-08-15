@@ -289,7 +289,7 @@ bool CapillaryTriaxialTest::generate()
 
 void CapillaryTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body(Body::id_t(0),2));
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 
@@ -320,7 +320,7 @@ void CapillaryTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positi
 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 	}
 	
-	aabb->diffuseColor		= Vector3r(0,1,0);
+	aabb->color		= Vector3r(0,1,0);
 	
 	iSphere->radius			= radius;
 	iSphere->color		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
@@ -334,7 +334,7 @@ void CapillaryTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positi
 
 void CapillaryTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body(Body::id_t(0),2));
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Box> iBox(new Box);
@@ -358,7 +358,7 @@ void CapillaryTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position,
 	physics->poisson		= boxKsDivKn;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 
-	aabb->diffuseColor		= Vector3r(1,0,0);
+	aabb->color		= Vector3r(1,0,0);
 	
 	iBox->extents			= extents;
 	iBox->color		= Vector3r(1,1,1);

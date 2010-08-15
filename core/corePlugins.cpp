@@ -3,7 +3,6 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/Bound.hpp>
 #include<yade/core/Cell.hpp>
-#include<yade/core/Collider.hpp>
 #include<yade/core/Dispatcher.hpp>
 #include<yade/core/Engine.hpp>
 #include<yade/core/FileGenerator.hpp>
@@ -17,4 +16,4 @@
 #include<yade/core/Shape.hpp>
 #include<yade/core/State.hpp>
 #include<yade/core/TimeStepper.hpp>
-YADE_PLUGIN((Body)(Bound)(Cell)(Collider)(Dispatcher)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(InteractionGeometry)(InteractionPhysics)(Material)(PartialEngine)(Shape)(State)(TimeStepper));
+YADE_PLUGIN((Body)(Bound)(Cell)(Dispatcher)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(InteractionGeometry)(InteractionPhysics)(Material)(PartialEngine)(Shape)(State)(TimeStepper));

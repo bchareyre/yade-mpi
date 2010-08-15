@@ -7,6 +7,9 @@
 #include<yade/pkg-common/LinearInterpolate.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
+#include<yade/core/InteractionGeometry.hpp>
+#include<yade/core/InteractionPhysics.hpp>
+
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
 
 void ForceEngine::action(){

@@ -113,7 +113,7 @@ bool SimpleShear::generate()
 
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body); body->groupMask=1;
 	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<SphereModel> gSphere(new SphereModel);
@@ -134,12 +134,12 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 	mat->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 	body->material = mat;
 
-	aabb->diffuseColor		= Vector3r(0,1,0);
+	aabb->color		= Vector3r(0,1,0);
 
 
 /*	gSphere->radius			= radius;
 	// de quoi avoir des bandes (huit en largeur) de couleur differentes :
-	gSphere->diffuseColor		= ((int)(Mathr::Floor(8*position.X()/length)))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
+	gSphere->color		= ((int)(Mathr::Floor(8*position.X()/length)))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 	gSphere->wire			= false;
 	gSphere->shadowCaster		= true;*/
 	
@@ -154,7 +154,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new Body(0,1));
+	body = shared_ptr<Body>(new Body); body->groupMask=1;
 	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<BoxModel> gBox(new BoxModel);
@@ -173,10 +173,10 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 	mat->frictionAngle	= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
 	body->material = mat;
 
-	aabb->diffuseColor		= Vector3r(1,0,0);
+	aabb->color		= Vector3r(1,0,0);
 
 /*	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3r(1,0,0);
+	gBox->color		= Vector3r(1,0,0);
 	gBox->wire			= true;
 	gBox->shadowCaster		= false;*/
 	

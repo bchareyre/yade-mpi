@@ -240,7 +240,7 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	b.state.pos=b.state.refPos=begin
 	b.dynamic=dynamic
 	b.mask=mask
-	b.bound=Aabb(diffuseColor=[0,1,0])
+	b.bound=Aabb(color=[0,1,0])
 	b.state.ori=b.state.ori.setFromTwoVectors(Vector3(0.,0.,1.),segment)
 	return b
 

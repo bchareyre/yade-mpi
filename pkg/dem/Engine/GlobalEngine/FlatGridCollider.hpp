@@ -1,6 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include<vector>
-#include<yade/core/Collider.hpp>
+#include<yade/pkg-common/Collider.hpp>
 class NewtonIntegrator;
 class FlatGridCollider: public Collider{
 	struct Grid{

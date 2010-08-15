@@ -138,7 +138,7 @@ Vector3r SpheresFactory::generatePositionInVolume()
 }
 void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& position, Real r)
 {
-	body = shared_ptr<Body>(new Body(Body::id_t(0),1));
+	body = shared_ptr<Body>(new Body); body->groupMask=1;
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -163,10 +163,10 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	if (poisson) 		physics->poisson		= poisson;
 	if (frictionAngle) 	physics->frictionAngle	= frictionAngle;
 
-	aabb->diffuseColor		= Vector3r(0,1,0);
+	aabb->color		= Vector3r(0,1,0);
 
 	iSphere->radius			= r;
-	iSphere->diffuseColor	= Vector3r(0.8,0.3,0.3);
+	iSphere->color	= Vector3r(0.8,0.3,0.3);
 
 	body->shape	= iSphere;
 	body->bound		= aabb;

@@ -222,8 +222,7 @@ bool TriaxialTest::generate()
 
 void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body(Body::id_t(0),2));
-	//shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
@@ -237,9 +236,9 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	mat->young			= sphereYoungModulus;
 	mat->poisson			= sphereKsDivKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
-	aabb->diffuseColor		= Vector3r(0,1,0);
+	aabb->color		= Vector3r(0,1,0);
 	iSphere->radius			= radius;
-	//iSphere->diffuseColor		= Vector3r(0.4,0.1,0.1);
+	//iSphere->color		= Vector3r(0.4,0.1,0.1);
 	iSphere->color           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	body->shape	= iSphere;
 	body->bound	= aabb;
@@ -249,10 +248,10 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 
 void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body(Body::id_t(0),2));
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	body->setDynamic(false);
 	shared_ptr<Aabb> aabb(new Aabb);
-	aabb->diffuseColor		= Vector3r(1,0,0);
+	aabb->color		= Vector3r(1,0,0);
 	body->bound		= aabb;
 	body->state->pos=position;
 	shared_ptr<FrictMat> mat(new FrictMat);

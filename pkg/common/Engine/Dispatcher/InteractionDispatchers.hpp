@@ -33,9 +33,9 @@ class InteractionDispatchers: public GlobalEngine {
 				#endif
 			,
 			/*py*/
-			.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher,"InteractionGeometryDispatcher object that is used for dispatch.")
-			.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher,"InteractionPhysicsDispatcher object used for dispatch.")
-			.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher,"LawDispatcher object used for dispatch.");
+			.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher,":yref:`InteractionGeometryDispatcher` object that is used for dispatch.")
+			.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher,":yref:`InteractionPhysicsDispatcher` object used for dispatch.")
+			.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher,":yref:`LawDispatcher` object used for dispatch.");
 		);
 		DECLARE_LOGGER;
 };

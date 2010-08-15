@@ -62,14 +62,11 @@ class Body: public Serializable{
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
-		// Constructor/Destructor
-		Body (Body::id_t newId, int newGroup);
-
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
 		((Body::id_t,id,Body::ID_NONE,"[will be overridden]"))
 
 		((int,groupMask,1,"Bitmask for determining interactions."))
-		((int,flags,FLAG_DYNAMIC | FLAG_BOUNDED,"DO NOT ACCESS DIRECTLY; documented below"))
+		((int,flags,FLAG_DYNAMIC|FLAG_BOUNDED,"DO NOT ACCESS DIRECTLY; documented below"))
 
 		((shared_ptr<Material>,material,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,"Physical :yref:`state<State>`."))

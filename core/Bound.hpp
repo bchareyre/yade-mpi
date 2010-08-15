@@ -22,8 +22,10 @@
 class Bound: public Serializable, public Indexable{
 	public:
 		Vector3r min,max;
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
-		((Vector3r,diffuseColor,Vector3r(1,1,1),"Color for rendering this object")),
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
+		((Vector3r,color,Vector3r(1,1,1),"Color for rendering this object")),
+		/*deprec*/ ((diffuseColor,color,"For consistency with Shape.color")),
+		/* init */,
 		/* ctor*/ min=max=Vector3r::Zero(),
 		/*py*/
 		YADE_PY_TOPINDEXABLE(Bound)

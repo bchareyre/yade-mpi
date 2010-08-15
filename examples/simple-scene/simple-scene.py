@@ -96,14 +96,14 @@ if False:
 	# set the isDynamic body attribute
 	b.dynamic=False
 	# Assign geometrical model (shape) to the body: a box of given size
-	b.shape=Box(extents=[.5,.5,.5],diffuseColor=[1,0,0])
+	b.shape=Box(extents=[.5,.5,.5],color=[1,0,0])
 	# physical parameters:
 	# store mass to a temporary
 	mass=8*.5*.5*.5*2400
 	# * se3 (position & orientation) as 3 position coordinates, then 3 direction axis coordinates and rotation angle
 	b.phys=BodyMacroParameters(se3=[0,0,0,1,0,0,0],mass=mass,inertia=[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],young=30e9,poisson=.3)
 	# other information about Aabb will be updated during simulation by relevant BoundDispatcher
-	b.bound=Aabb(diffuseColor=[0,1,0])
+	b.bound=Aabb(color=[0,1,0])
 	# add the body to the simulation
 	o.bodies.append(b)
 

@@ -482,9 +482,6 @@ class pyOmega{
 
 class pySTLImporter : public STLImporter {};
 
-shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->shape; }
-void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
-
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile);
 	bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message);
 };

@@ -6,7 +6,6 @@ if 'qt4' in env['features']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/qt',[
 		env.File('qt4/img_rc.py'),
 		env.File('qt4/ui_controller.py'),
-		env.File('qt4/ui_SeqSerializable.py'),
 		env.File('qt4/SerializableEditor.py'),
 		env.File('qt4/Inspector.py'),
 		env.File('qt4/__init__.py'),
