@@ -389,8 +389,8 @@ class SerializableEditor(QFrame):
 def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1,count=-1):
 	ret=u''
 	if num>=0:
-		if count<=0: ret+=u'%d / %d.'%(num,count)
-		else ret+=u'%d. '%num
+		if count>=0: ret+=u'%d/%d. '%(num,count)
+		else: ret+=u'%d. '%num
 	if href: ret+=(u' <b>' if boldHref else u' ')+serializableHref(ser)+(u'</b> ' if boldHref else u' ')
 	else: ret+=ser.__class__.__name__+' '
 	if hasattr(ser,'label') and ser.label: ret+=u' “'+unicode(ser.label)+u'”'
@@ -418,6 +418,7 @@ class SeqSerializableComboBox(QFrame):
 		for w in buttons[0:2]+[self.combo,]+buttons[2:4]: topLineLayout.addWidget(w)
 		self.layout.addWidget(topLineFrame) # nested layout
 		self.scroll=QScrollArea(self); self.scroll.setWidgetResizable(True)
+		self.scroll.sizeHint=lambda: QSize(0,0)
 		self.layout.addWidget(self.scroll)
 		self.seqEdit=None # currently edited serializable
 		self.setLayout(self.layout)
