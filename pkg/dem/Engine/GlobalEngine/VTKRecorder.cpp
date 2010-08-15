@@ -13,10 +13,12 @@
 	#include<vtkXMLUnstructuredGridWriter.h>
 	#include<vtkXMLPolyDataWriter.h>
 	#include<vtkZLibDataCompressor.h>
-	#include<vtkXMLMultiBlockDataWriter.h>
-	#include<vtkMultiBlockDataSet.h>
 	#include<vtkTriangle.h>
 	#include<vtkLine.h>
+	#ifdef YADE_VTK_MULTIBLOCK
+		#include<vtkXMLMultiBlockDataWriter.h>
+		#include<vtkMultiBlockDataSet.h>
+	#endif
 #pragma GCC diagnostic warning "-Wdeprecated"
 
 #include<yade/core/Scene.hpp>
@@ -334,7 +336,10 @@ void VTKRecorder::action(){
 
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
 		
-		if(!multiblock){
+		#ifdef YADE_VTK_MULTIBLOCK
+		if(!multiblock)
+		#endif
+			{
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			string fn=fileName+"spheres."+lexical_cast<string>(scene->currentIteration)+".vtu";
@@ -354,7 +359,10 @@ void VTKRecorder::action(){
 		}
 		if (recActive[REC_MATERIALID]) facetsUg->GetCellData()->AddArray(facetsMaterialId);
 		if (recActive[REC_MASK]) facetsUg->GetCellData()->AddArray(facetsMask);
-		if(!multiblock){
+		#ifdef YADE_VTK_MULTIBLOCK
+			if(!multiblock)
+		#endif
+			{
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
@@ -369,7 +377,10 @@ void VTKRecorder::action(){
 		intrPd->SetLines(intrCells);
 		intrPd->GetCellData()->AddArray(intrForceN);
 		intrPd->GetCellData()->AddArray(intrAbsForceT);
-		if(!multiblock){
+		#ifdef YADE_VTK_MULTIBLOCK
+			if(!multiblock)
+		#endif
+			{
 			vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtp";
@@ -378,17 +389,18 @@ void VTKRecorder::action(){
 			writer->Write();
 		}
 	}
-
-	if(multiblock){
-		vtkSmartPointer<vtkMultiBlockDataSet> multiblockDataset = vtkSmartPointer<vtkMultiBlockDataSet>::New();
-		int i=0;
-		if(recActive[REC_SPHERES]) multiblockDataset->SetBlock(i++,spheresUg);
-		if(recActive[REC_FACETS]) multiblockDataset->SetBlock(i++,facetsUg);
-		if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrPd);
-		vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
-		string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
-		writer->SetFileName(fn.c_str());
-		writer->SetInput(multiblockDataset);
-		writer->Write();	
-	}
+	#ifdef YADE_VTK_MULTIBLOCK
+		if(multiblock){
+			vtkSmartPointer<vtkMultiBlockDataSet> multiblockDataset = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+			int i=0;
+			if(recActive[REC_SPHERES]) multiblockDataset->SetBlock(i++,spheresUg);
+			if(recActive[REC_FACETS]) multiblockDataset->SetBlock(i++,facetsUg);
+			if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrPd);
+			vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
+			string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
+			writer->SetFileName(fn.c_str());
+			writer->SetInput(multiblockDataset);
+			writer->Write();	
+		}
+	#endif
 }
