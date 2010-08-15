@@ -399,16 +399,16 @@ void GLViewer::centerScene(){
 		min=rb->bound->min; max=rb->bound->max;
 		if(std::max(max[0]-min[0],std::max(max[1]-min[1],max[2]-min[2]))<=0){
 			// Aabb is not yet calculated...
-			LOG_DEBUG("rootBody's bound not yet calculated or has one dimension zero, attempt get that from bodies' positions.");
+			LOG_DEBUG("scene's bound not yet calculated or has one dimension zero, attempt get that from bodies' positions.");
 			Real inf=std::numeric_limits<Real>::infinity();
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 				max=max.cwise().max(b->state->pos);
 				min=min.cwise().min(b->state->pos);
 			}
-		} else {LOG_DEBUG("Using rootBody's Aabb");}
+		} else {LOG_DEBUG("Using scene's Aabb");}
 	} else {
-		LOG_DEBUG("No rootBody's Aabb; setting scene in cube (-1,-1,-1)x(1,1,1)");
+		LOG_DEBUG("No scene's Aabb; setting scene in cube (-1,-1,-1)x(1,1,1)");
 		min=Vector3r(-1,-1,-1); max=Vector3r(1,1,1);
 	}
 	LOG_DEBUG("Got scene box min="<<min<<" and max="<<max);

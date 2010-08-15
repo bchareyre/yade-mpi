@@ -365,15 +365,15 @@ Real approxSectionArea(Real coord, int axis){
 */
 Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 	Vector3r ret(Vector3r::Zero());
-	Scene* rootBody=Omega::instance().getScene().get();
-	FOREACH(const shared_ptr<Interaction>&I, *rootBody->interactions){
+	Scene* scene=Omega::instance().getScene().get();
+	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if(!I->isReal()) continue;
 		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->interactionPhysics.get());
 		if(!nsi) continue;
 		Vector3r pos1,pos2;
 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
-		else{ pos1=Body::byId(I->getId1(),rootBody)->state->pos; pos2=Body::byId(I->getId2(),rootBody)->state->pos; }
+		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
 		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
 		if(dot1*dot2>0) continue; // both interaction points on the same side of the plane
 		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;

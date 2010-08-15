@@ -64,12 +64,12 @@ void STLImporterTest::postProcessAttributes(bool)
 }
 
 
-bool STLImporterTest::generate()
+bool STLImporterTest::generate(std::string& message)
 {
-	rootBody = shared_ptr<Scene>(new Scene);
-	positionRootBody(rootBody);
+	scene = shared_ptr<Scene>(new Scene);
+	positionRootBody(scene);
 
-	rootBody->dt = 0.001; //default time step
+	scene->dt = 0.001; //default time step
 
 ////////////////////////////////////
 ///////// Container
@@ -110,10 +110,10 @@ bool STLImporterTest::generate()
 		aabb->color		= Vector3r(0,1,0);
 		b->bound	= aabb;
 	    
-	    rootBody->bodies->insert(b);
+	    scene->bodies->insert(b);
 	}
 	// import bodies (create geometry)
-	imp.import(rootBody->bodies);
+	imp.import(scene->bodies);
 
 ///////// spheres
 	float all = nbSpheres[0]*nbSpheres[1]*nbSpheres[2];
@@ -128,7 +128,7 @@ bool STLImporterTest::generate()
 			{
 				shared_ptr<Body> sphere;
 				createSphere(sphere,i,j,k);
-				rootBody->bodies->insert(sphere);
+				scene->bodies->insert(sphere);
 
 				setProgress(current++/all);
 			}
@@ -136,7 +136,7 @@ bool STLImporterTest::generate()
 	
 
 ///////// engines
-	createActors(rootBody);
+	createActors(scene);
 
 	return true;
 }
@@ -177,7 +177,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body->physicalParameters	= physics;
 }
 
-void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
+void STLImporterTest::createActors(shared_ptr<Scene>& scene)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -219,36 +219,36 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	
 	shared_ptr<Shape> facet(new Facet);
-	for(BodyContainer::iterator bi = rootBody->bodies->begin(), biEnd=rootBody->bodies->end(); bi!=biEnd; ++bi)
+	for(BodyContainer::iterator bi = scene->bodies->begin(), biEnd=scene->bodies->end(); bi!=biEnd; ++bi)
 	    if ( (*bi)->shape->getClassIndex() == facet->getClassIndex() )
 		kinematic->subscribedBodies.push_back((*bi)->getId());
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
-	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-	rootBody->engines.push_back(sdecTimeStepper);
-	rootBody->engines.push_back(boundDispatcher);	
-	rootBody->engines.push_back(shared_ptr<Engine>(new SpatialQuickSortCollider));
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new ElasticContactLaw));
-	rootBody->engines.push_back(gravityCondition);
-	rootBody->engines.push_back(actionDampingDispatcher);
-	rootBody->engines.push_back(applyActionDispatcher);
-	rootBody->engines.push_back(positionIntegrator);
-	rootBody->engines.push_back(orientationIntegrator);
-	rootBody->engines.push_back(kinematic);
+	scene->engines.clear();
+	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
+	scene->engines.push_back(sdecTimeStepper);
+	scene->engines.push_back(boundDispatcher);	
+	scene->engines.push_back(shared_ptr<Engine>(new SpatialQuickSortCollider));
+	scene->engines.push_back(interactionGeometryDispatcher);
+	scene->engines.push_back(interactionPhysicsDispatcher);
+	scene->engines.push_back(shared_ptr<Engine>(new ElasticContactLaw));
+	scene->engines.push_back(gravityCondition);
+	scene->engines.push_back(actionDampingDispatcher);
+	scene->engines.push_back(applyActionDispatcher);
+	scene->engines.push_back(positionIntegrator);
+	scene->engines.push_back(orientationIntegrator);
+	scene->engines.push_back(kinematic);
  	
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundDispatcher);
+	scene->initializers.clear();
+	scene->initializers.push_back(boundDispatcher);
 }
 
 
-void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody) 
+void STLImporterTest::positionRootBody(shared_ptr<Scene>& scene) 
 {
-	rootBody->setDynamic(false);
+	scene->setDynamic(false);
 	
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3				= Se3r(Vector3r(0,0,0),Quaternionr::Identity());
@@ -259,8 +259,8 @@ void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->color			= Vector3r(0,0,1);
 	
-	rootBody->bound		= YADE_PTR_CAST<Bound>(aabb);
-	rootBody->physicalParameters 		= physics;
+	scene->bound		= YADE_PTR_CAST<Bound>(aabb);
+	scene->physicalParameters 		= physics;
 }
 
 

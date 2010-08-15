@@ -35,8 +35,8 @@ class STLImporterTest : public FileGenerator
 		int		 timeStepUpdateInterval;
 
 		void createSphere(shared_ptr<Body>& body, int i, int j, int k);
-		void createActors(shared_ptr<Scene>& rootBody);
-		void positionRootBody(shared_ptr<Scene>& rootBody);
+		void createActors(shared_ptr<Scene>& scene);
+		void positionRootBody(shared_ptr<Scene>& scene);
 
 	// construction
 	public :
@@ -45,7 +45,7 @@ class STLImporterTest : public FileGenerator
 		
 
 	protected :
-		bool generate();
+		bool generate(std::string& message);
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(minRadius)(maxRadius)(spheresHeight)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(gravity)(density)(disorder)(stlFileName)(wire)(angularVelocity)(rotationAxis)(dampingForce)(dampingMomentum)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(STLImporterTest);

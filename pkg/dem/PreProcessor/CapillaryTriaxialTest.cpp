@@ -64,99 +64,17 @@ typedef pair<Vector3r, Real> BasicSphere;
 string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
-// CapillaryTriaxialTest::CapillaryTriaxialTest () : FileGenerator()
-// {
-// 	lowerCorner 		= Vector3r(0,0,0);
-// 	upperCorner 		= Vector3r(0.001,0.001,0.001);
-// 	thickness 		= 0.00001;
-// 	importFilename 		= ""; // "./small.sdec.xyz";
-// 	Key			="";
-// 	outputFileName 		= "./CapillaryTriaxialTest"+Key+".xml";
-// 	//nlayers = 1;
-// 	wall_top 		= true;
-// 	wall_bottom 		= true;
-// 	wall_1			= true;
-// 	wall_2			= true;
-// 	wall_3			= true;
-// 	wall_4			= true;
-// 	wall_top_wire 		= true;
-// 	wall_bottom_wire	= true;
-// 	wall_1_wire		= true;
-// 	wall_2_wire		= true;
-// 	wall_3_wire		= true;
-// 	wall_4_wire		= true;
-// 	spheresColor		= Vector3r(0.8,0.3,0.3);
-// 	spheresRandomColor	= false;
-// 	recordIntervalIter	= 20;
-// 	WallStressRecordFile = "./WallStresses"+Key;
-// 	capillaryStressRecordFile	= "./CapillaryStresses"+Key;
-// 
-// 	rotationBlocked = false;
-// 	//	boxWalls 		= false;
-// 	boxWalls 		= true;
-// 	internalCompaction	=false;
-// 	
-// 	dampingForce = 0.2;
-// 	dampingMomentum = 0.2;
-// 	defaultDt = 0.0001;
-// 	
-// 	timeStepUpdateInterval = 50;
-// 	timeStepOutputInterval = 50;
-// 	wallStiffnessUpdateInterval = 10;
-// 	radiusControlInterval = 10;
-// 	numberOfGrains = 400;
-// 	Rdispersion = 0.667;
-// 	strainRate = 10;
-// 	maxWallVelocity=0.1;
-// 	StabilityCriterion = 0.01;
-// 	autoCompressionActivation = true;
-// 	maxMultiplier = 1.01;
-// 	finalMaxMultiplier = 1.001;
-// 	
-// 	sphereYoungModulus  = 5000000.0;
-// 	sphereKsDivKn  = 0.5;	
-// 	sphereFrictionDeg = 30.0;
-// 	compactionFrictionDeg   = sphereFrictionDeg;
-// 	density			= 2600;
-// 	
-// 	boxYoungModulus   = 5000000.0;
-// 	boxKsDivKn  = 0.2;
-// 	boxFrictionDeg   = 0.f;
-// 	gravity 	= Vector3r(0,-9.81,0);
-// 	
-// 	sigmaIsoCompaction = 5000;
-// 	sigmaLateralConfinement=sigmaIsoCompaction;
-// 
-// 	water = true;
-// 	CapillaryPressure = 0;
-//  	fusionDetection = 1;
-// 	binaryFusion = 1;
-// 
-// 	wallOversizeFactor=1.3;
-// 	
-// //	wall_top_id =0;
-// // 	wall_bottom_id =0;
-// // 	wall_left_id =0;
-// // 	all_right_id =0;
-// // 	wall_front_id =0;
-// // 	wall_back_id =0;
-// }
-
-
-CapillaryTriaxialTest::~CapillaryTriaxialTest ()
-{
-
-}
+CapillaryTriaxialTest::~CapillaryTriaxialTest () { }
 
 
 
-bool CapillaryTriaxialTest::generate()
+bool CapillaryTriaxialTest::generate(std::string& message)
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	message="";	
-	rootBody = shared_ptr<Scene>(new Scene);
-	createActors(rootBody);
-	positionRootBody(rootBody);
+	scene = shared_ptr<Scene>(new Scene);
+	createActors(scene);
+	positionRootBody(scene);
 	shared_ptr<Body> body;
 	if(boxWalls)
 	{
@@ -172,7 +90,7 @@ bool CapillaryTriaxialTest::generate()
 	
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			}
@@ -190,7 +108,7 @@ bool CapillaryTriaxialTest::generate()
 	
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_top_id = body->getId();
 			//triaxialStateRecorder->wall_top_id = body->getId();
 			}
@@ -206,7 +124,7 @@ bool CapillaryTriaxialTest::generate()
 	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_left_id = body->getId();
 			//triaxialStateRecorder->wall_left_id = body->getId();
 			}
@@ -222,7 +140,7 @@ bool CapillaryTriaxialTest::generate()
 	 	
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_right_id = body->getId();
 			//triaxialStateRecorder->wall_right_id = body->getId();
 			}
@@ -237,7 +155,7 @@ bool CapillaryTriaxialTest::generate()
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
 			//triaxialStateRecorder->wall_back_id = body->getId();
 			}
@@ -253,7 +171,7 @@ bool CapillaryTriaxialTest::generate()
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_front_id = body->getId();
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
@@ -272,7 +190,7 @@ bool CapillaryTriaxialTest::generate()
 	{
 		cerr << "sphere (" << it->first << " " << it->second << ")"<<endl;
 		createSphere(body,it->first,it->second,false,true);
-		rootBody->bodies->insert(body);
+		scene->bodies->insert(body);
 	}	
 	
 	return true;
@@ -370,7 +288,7 @@ void CapillaryTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position,
 }
 
 
-void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
+void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 	
 	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
@@ -467,42 +385,42 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	#endif
 	
 	
-	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-//	rootBody->engines.push_back(sdecTimeStepper);	
-	rootBody->engines.push_back(collider);
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(elasticContactLaw);
+	scene->engines.clear();
+	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
+//	scene->engines.push_back(sdecTimeStepper);	
+	scene->engines.push_back(collider);
+	scene->engines.push_back(interactionGeometryDispatcher);
+	scene->engines.push_back(interactionPhysicsDispatcher);
+	scene->engines.push_back(elasticContactLaw);
 
 	// capillary
 	
 	
-	//rootBody->engines.push_back(stiffnesscounter);
-	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
-	rootBody->engines.push_back(globalStiffnessTimeStepper);
+	//scene->engines.push_back(stiffnesscounter);
+	//scene->engines.push_back(stiffnessMatrixTimeStepper);
+	scene->engines.push_back(globalStiffnessTimeStepper);
 	if(water)
 	{
-		rootBody->engines.push_back(capillaryCohesiveLaw);
-		rootBody->engines.push_back(capillaryStressRecorder);
+		scene->engines.push_back(capillaryCohesiveLaw);
+		scene->engines.push_back(capillaryStressRecorder);
 	}
-	rootBody->engines.push_back(triaxialcompressionEngine);
-	rootBody->engines.push_back(triaxialStateRecorder);
-	//rootBody->engines.push_back(gravityCondition);
+	scene->engines.push_back(triaxialcompressionEngine);
+	scene->engines.push_back(triaxialStateRecorder);
+	//scene->engines.push_back(gravityCondition);
 	
-	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
+	scene->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
 	
 	//if(!rotationBlocked)
-	//	rootBody->engines.push_back(orientationIntegrator);
-	//rootBody->engines.push_back(triaxialstressController);
+	//	scene->engines.push_back(orientationIntegrator);
+	//scene->engines.push_back(triaxialstressController);
 	
-	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundDispatcher);
+	scene->initializers.clear();
+	scene->initializers.push_back(boundDispatcher);
 	
 }
 
 
-void CapillaryTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
+void CapillaryTriaxialTest::positionRootBody(shared_ptr<Scene>& scene)
 {	
 }
 

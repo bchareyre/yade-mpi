@@ -68,13 +68,13 @@ CohesiveTriaxialTest::~CohesiveTriaxialTest ()
 
 
 
-bool CohesiveTriaxialTest::generate()
+bool CohesiveTriaxialTest::generate(std::string& message)
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
-	rootBody = shared_ptr<Scene>(new Scene);
-	createActors(rootBody);
-	positionRootBody(rootBody);
+	scene = shared_ptr<Scene>(new Scene);
+	createActors(scene);
+	positionRootBody(scene);
 
 	shared_ptr<Body> body;
 	
@@ -92,7 +92,7 @@ bool CohesiveTriaxialTest::generate()
 	
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 //			forcerec->startId = body->getId();
@@ -112,7 +112,7 @@ bool CohesiveTriaxialTest::generate()
 	
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_top_id = body->getId();
 			//triaxialStateRecorder->wall_top_id = body->getId();
 			}
@@ -128,7 +128,7 @@ bool CohesiveTriaxialTest::generate()
 	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_left_id = body->getId();
 			//triaxialStateRecorder->wall_left_id = body->getId();
 			}
@@ -144,7 +144,7 @@ bool CohesiveTriaxialTest::generate()
 	 	
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_right_id = body->getId();
 			//triaxialStateRecorder->wall_right_id = body->getId();
 			}
@@ -159,7 +159,7 @@ bool CohesiveTriaxialTest::generate()
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
 			//triaxialStateRecorder->wall_back_id = body->getId();
 			}
@@ -175,7 +175,7 @@ bool CohesiveTriaxialTest::generate()
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_front_id = body->getId();
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
@@ -193,7 +193,7 @@ bool CohesiveTriaxialTest::generate()
 	{
 		cerr << "sphere (" << it->first << " " << it->second << endl;
 		createSphere(body,it->first,it->second,true);
-		rootBody->bodies->insert(body);
+		scene->bodies->insert(body);
 	}
 	
 	return true;
@@ -283,7 +283,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 }
 
 
-void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
+void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -334,22 +334,22 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 	//triaxialStateRecorder-> thickness 		= thickness;
 	
-	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-	rootBody->engines.push_back(collider);
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(cohesiveFrictionalContactLaw);
-	rootBody->engines.push_back(triaxialcompressionEngine);
-	rootBody->engines.push_back(globalStiffnessTimeStepper);
-	rootBody->engines.push_back(triaxialStateRecorder);
-	//rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
-	rootBody->engines.push_back(newton);
+	scene->engines.clear();
+	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
+	scene->engines.push_back(collider);
+	scene->engines.push_back(interactionGeometryDispatcher);
+	scene->engines.push_back(interactionPhysicsDispatcher);
+	scene->engines.push_back(cohesiveFrictionalContactLaw);
+	scene->engines.push_back(triaxialcompressionEngine);
+	scene->engines.push_back(globalStiffnessTimeStepper);
+	scene->engines.push_back(triaxialStateRecorder);
+	//scene->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
+	scene->engines.push_back(newton);
 
 }
 
 
-void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
+void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& scene)
 {	
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->color		= Vector3r(0,0,1);

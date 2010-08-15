@@ -46,13 +46,13 @@ class CohesiveTriaxialTest : public FileGenerator
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool dynamic);
-		void createActors(shared_ptr<Scene>& rootBody);
-		void positionRootBody(shared_ptr<Scene>& rootBody);
+		void createActors(shared_ptr<Scene>& scene);
+		void positionRootBody(shared_ptr<Scene>& scene);
 	
 	public : 
 		//CohesiveTriaxialTest ();
 		~CohesiveTriaxialTest ();
-		virtual bool generate();
+		virtual bool generate(std::string& message);
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		CohesiveTriaxialTest,FileGenerator,"This preprocessor is a variant of TriaxialTest using the cohesive-frictional contact law with moments. It sets up a scene for cohesive triaxial tests. See full documentation at http://yade-dem.org/wiki/TriaxialTest.\n\n Cohesion is initially 0 by default. The suggested usage is to define cohesion values in a second step, after isotropic compaction : define shear and normal cohesions in :yref:`Ip2_2xCohFrictMat_CohFrictPhys`, then turn :yref:`Ip2_2xCohFrictMat_CohFrictPhys`::setCohesionNow true to assign them at each contact at next iteration."
 		,
@@ -109,7 +109,6 @@ class CohesiveTriaxialTest : public FileGenerator
 		/* init */
 		,
 		/* constructor */
-  		outputFileName = "./CohesiveTriaxialTest"+Key+".xml";
 		wall_top 		= true;
 		wall_bottom 		= true;
 		wall_1			= true;

@@ -23,7 +23,7 @@ bool VelocityBins::incrementDists_shouldCollide(Real dt){
 	return false;
 }
 
-void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLength){
+void VelocityBins::setBins(Scene* scene, Real currMaxVelSq, Real refSweepLength){
 	// initialization
 		// sanity checks
 		if(nBins<1 || nBins>100){ throw runtime_error("VelocityBins: Number of bins must be >=1 and <=100"); }
@@ -34,7 +34,7 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 			bins.resize(nBins);	
 		}
 		// number of bodies changed
-		if(bodyBins.size()!=rootBody->bodies->size()) bodyBins.resize(rootBody->bodies->size(),-1);
+		if(bodyBins.size()!=scene->bodies->size()) bodyBins.resize(scene->bodies->size(),-1);
 		// set the new overall refMaxVelSq
 		if(refMaxVelSq<0){ refMaxVelSq=currMaxVelSq; /* first time */}
 		else {
@@ -64,7 +64,7 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 			bin.currDist=0; bin.currMaxVelSq=0; bin.nBodies=0;
 		}
 	long moveFaster=0, moveSlower=0;
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b) continue;
 		Real velSq=VelocityBins::getBodyVelSq(b->state.get());
 		binNo_t newBin=-1, oldBin=bodyBins[b->getId()];
@@ -85,8 +85,8 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 	}
 	#ifdef YADE_LOG4CXX
 		// if debugging output
-		if(logger->isDebugEnabled() && (rootBody->currentIteration-histLast>=histInterval || histLast<0)){
-			histLast=rootBody->currentIteration;
+		if(logger->isDebugEnabled() && (scene->currentIteration-histLast>=histInterval || histLast<0)){
+			histLast=scene->currentIteration;
 			LOG_INFO(bodyBins.size()<<" bodies (moves: "<<moveFaster<<" faster, "<<moveSlower<<" slower), refMaxVel="<<sqrt(refMaxVelSq));
 			for(size_t i=0; i<nBins; i++){
 				int nChars=int(80*(bins[i].nBodies/Real(bodyBins.size())));

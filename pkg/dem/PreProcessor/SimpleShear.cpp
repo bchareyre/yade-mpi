@@ -52,26 +52,26 @@ SimpleShear::~SimpleShear ()
 
 
 
-bool SimpleShear::generate()
+bool SimpleShear::generate(std::string& message)
 {
-	rootBody = shared_ptr<Scene>(new Scene);
-	createActors(rootBody);
+	scene = shared_ptr<Scene>(new Scene);
+	createActors(scene);
 
 
 // Box walls
 	shared_ptr<Body> w1;	// The left one :
 	createBox(w1,Vector3r(-thickness/2.0,(height)/2.0,0),Vector3r(thickness/2.0,5*(height/2.0+thickness),width/2.0));
-	rootBody->bodies->insert(w1);
+	scene->bodies->insert(w1);
 
 
 	shared_ptr<Body> w2;	// The lower one :
 	createBox(w2,Vector3r(length/2.0,-thickness/2.0,0),Vector3r(length/2.0,thickness/2.0,width/2.0));
 	YADE_PTR_CAST<FrictMat> (w2->material)->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
-	rootBody->bodies->insert(w2);
+	scene->bodies->insert(w2);
 
 	shared_ptr<Body> w3;	// The right one
 	createBox(w3,Vector3r(length+thickness/2.0,height/2.0,0),Vector3r(thickness/2.0,5*(height/2.0+thickness),width/2.0));
-	rootBody->bodies->insert(w3);
+	scene->bodies->insert(w3);
 
 	shared_ptr<Body> w4; // The upper one
 	createBox(w4,Vector3r(length/2.0,height+thickness/2.0,0),Vector3r(length/2.0,thickness/2.0,width/2.0));
@@ -80,12 +80,12 @@ bool SimpleShear::generate()
 // To close the front and the back of the box 
 	shared_ptr<Body> w5;	// behind
 	createBox(w5,Vector3r(length/2.0,height/2.0,-width/2.0-thickness/2.0),	Vector3r(2.5*length/2.0,height/2.0+thickness,thickness/2.0));
-	rootBody->bodies->insert(w5);
+	scene->bodies->insert(w5);
 
 	shared_ptr<Body> w6;	// the front
 	createBox(w6,Vector3r(length/2.0,height/2.0,width/2.0+thickness/2.0),
 	Vector3r(2.5*length/2.0,height/2.0+thickness,thickness/2.0));
-	rootBody->bodies->insert(w6);
+	scene->bodies->insert(w6);
 
 
 // the list which will contain the positions of centers and the radii of the created spheres
@@ -104,7 +104,7 @@ bool SimpleShear::generate()
 	for (;it!=it_end; ++it)
 	{
 		createSphere(body,it->first,it->second);
-		rootBody->bodies->insert(body);
+		scene->bodies->insert(body);
 	}
 	
 	message =res.first;
@@ -189,7 +189,7 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 }
 
 
-void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
+void SimpleShear::createActors(shared_ptr<Scene>& scene)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
@@ -214,16 +214,16 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 
 
 
-	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-	rootBody->engines.push_back(globalStiffnessTimeStepper);
-	rootBody->engines.push_back(collider);	
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
-// 	rootBody->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
+	scene->engines.clear();
+	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
+	scene->engines.push_back(globalStiffnessTimeStepper);
+	scene->engines.push_back(collider);	
+	scene->engines.push_back(interactionGeometryDispatcher);
+	scene->engines.push_back(interactionPhysicsDispatcher);
+// 	scene->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 	if(gravApplied)
-		rootBody->engines.push_back(gravityCondition);
-	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
+		scene->engines.push_back(gravityCondition);
+	scene->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
 }
 
 

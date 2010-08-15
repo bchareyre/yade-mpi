@@ -21,7 +21,7 @@ class SimpleShear : public FileGenerator
 {
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius);
-		void createActors(shared_ptr<Scene>& rootBody);
+		void createActors(shared_ptr<Scene>& scene);
 		//method to create a list (containing the positions of centers and radii) of n non interpenetrating spheres, occupying a rectangle with a given (rather high) porosity (issued from TriaxialTest) :
 		string GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowerCorner,Vector3r upperCorner,long number,Real rad_std_dev, Real porosity);
 // 		to create the same list but by reading a text file containing the informations :
@@ -30,7 +30,7 @@ class SimpleShear : public FileGenerator
 
 	public :
 		~SimpleShear ();
-		bool generate();
+		bool generate(std::string& message);
 
 
 	YADE_CLASS_BASE_DOC_ATTRS(SimpleShear,FileGenerator,"Preprocessor for creating a numerical model of a simple shear box.\n\n\t- Boxes (6) constitute the different sides of the box itself\n \t- Spheres are contained in the box. The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.\n \n \t Thanks to the Engines (in pkg/common/Engine/PartialEngine) KinemCNDEngine, KinemCNSEngine and KinemCNLEngine, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples.\n \n \tNB about micro-parameters : their values correspond to those used in [Duriez2009a]_.",

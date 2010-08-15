@@ -242,61 +242,61 @@ void Shop::init(){
 }
 
 /*! Create root body. */
-shared_ptr<Scene> Shop::rootBody(){
+shared_ptr<Scene> Shop::scene(){
 	return shared_ptr<Scene>(new Scene);
 }
 
 
 /*! Assign default set of actors (initializers and engines) to an existing Scene.
  */
-void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
+void Shop::rootBodyActors(shared_ptr<Scene> scene){
 	// initializers	
-	rootBody->initializers.clear();
+	scene->initializers.clear();
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add(new Bo1_Sphere_Aabb);
 	boundDispatcher->add(new Bo1_Box_Aabb);
 	boundDispatcher->add(new Bo1_Tetra_Aabb);
-	rootBody->initializers.push_back(boundDispatcher);
+	scene->initializers.push_back(boundDispatcher);
 
 	//engines
-	rootBody->engines.clear();
+	scene->engines.clear();
 
 	if(getDefault<int>("param_timeStepUpdateInterval")>0){
 		shared_ptr<GlobalStiffnessTimeStepper> sdecTimeStepper(new GlobalStiffnessTimeStepper);
 		sdecTimeStepper->timeStepUpdateInterval=getDefault<int>("param_timeStepUpdateInterval");
 		sdecTimeStepper->timeStepUpdateInterval=300;
-		rootBody->engines.push_back(sdecTimeStepper);
+		scene->engines.push_back(sdecTimeStepper);
 	}
 
-	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
+	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 
-	rootBody->engines.push_back(boundDispatcher);
+	scene->engines.push_back(boundDispatcher);
 
-	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	scene->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Ig2_Tetra_Tetra_TTetraGeom);
-	rootBody->engines.push_back(interactionGeometryDispatcher);
+	scene->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(new Ip2_FrictMat_FrictMat_FrictPhys);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
+	scene->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
-	rootBody->engines.push_back(constitutiveLaw);
+	scene->engines.push_back(constitutiveLaw);
 
 	if(getDefault<Vector3r>("param_gravity")!=Vector3r(0,0,0)){
 		shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 		gravityCondition->gravity=getDefault<Vector3r>("param_gravity");
-		rootBody->engines.push_back(gravityCondition);
+		scene->engines.push_back(gravityCondition);
 	}
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=max(getDefault<double>("param_damping"),0.);
-	rootBody->engines.push_back(newton);
+	scene->engines.push_back(newton);
 }
 
 
@@ -355,11 +355,11 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 
 
 void Shop::saveSpheresToFile(string fname){
-	const shared_ptr<Scene>& rootBody=Omega::instance().getScene();
+	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	ofstream f(fname.c_str());
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 
-	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
+	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b->isDynamic()) continue;
 		shared_ptr<Sphere>	intSph=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!intSph) continue;
@@ -370,9 +370,9 @@ void Shop::saveSpheresToFile(string fname){
 }
 
 Real Shop::getSpheresVolume(){
-	const shared_ptr<Scene>& rootBody=Omega::instance().getScene();
+	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	Real vol=0;
-	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
+	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b->isDynamic()) continue;
 		shared_ptr<Sphere> intSph=YADE_PTR_CAST<Sphere>(b->shape);
 		vol += 4.18879020*pow(intSph->radius,3);

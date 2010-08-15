@@ -56,12 +56,12 @@ class CapillaryTriaxialTest : public FileGenerator
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
-		void createActors(shared_ptr<Scene>& rootBody);
-		void positionRootBody(shared_ptr<Scene>& rootBody);
+		void createActors(shared_ptr<Scene>& scene);
+		void positionRootBody(shared_ptr<Scene>& scene);
 		typedef pair<Vector3r, Real> BasicSphere;	
 	public : 
 		~CapillaryTriaxialTest ();
-		bool generate();
+		bool generate(std::string& message);
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		CapillaryTriaxialTest,FileGenerator,"This preprocessor is a variant of TriaxialTest, including the model of capillary forces developped as part of the PhD of Luc Scholtès. See the documentation of Law2_ScGeom_CapillaryPhys_Capillarity or the main page https://yade-dem.org/wiki/CapillaryTriaxialTest, for more details.\n\n Results obtained with this preprocessor were reported for instance in 'Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75.'"
@@ -122,7 +122,6 @@ class CapillaryTriaxialTest : public FileGenerator
 		/* init */
 		,
 		/* constructor */
-  		outputFileName = "./CapillaryTriaxialTest"+Key+".xml";
 		wall_top 		= true;
 		wall_bottom 		= true;
 		wall_1			= true;

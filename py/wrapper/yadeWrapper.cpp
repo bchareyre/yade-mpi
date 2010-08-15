@@ -105,8 +105,8 @@ class pyBodyContainer{
 			#8  0x0000000000505cff in BodyRedirectionVectorIterator::getValue (this=0x846f040) at /home/vaclav/yade/trunk/core/containers/BodyRedirectionVector.cpp:47
 			#9  0x00007f0908af41ce in BodyContainerIteratorPointer::operator* (this=0x7fff2e44db60) at /home/vaclav/yade/build-trunk/include/yade-trunk/yade/core/BodyContainer.hpp:63
 			#10 0x00007f0908af420a in boost::foreach_detail_::deref<BodyContainer, mpl_::bool_<false> > (cur=@0x7fff2e44db60) at /usr/include/boost/foreach.hpp:750
-			#11 0x00007f0908adc5a9 in OpenGLRenderer::renderGeometricalModel (this=0x77f1240, rootBody=@0x1f49220) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:441
-			#12 0x00007f0908adfb84 in OpenGLRenderer::render (this=0x77f1240, rootBody=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:232
+			#11 0x00007f0908adc5a9 in OpenGLRenderer::renderGeometricalModel (this=0x77f1240, scene=@0x1f49220) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:441
+			#12 0x00007f0908adfb84 in OpenGLRenderer::render (this=0x77f1240, scene=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:232
 
 		*/
 		#if BOOST_VERSION<103500
@@ -251,7 +251,7 @@ void termHandlerError(int sig){cerr<<"Yade: error exit."<<endl; raise(SIGTERM);}
 
 class pyOmega{
 	private:
-		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
+		// can be safely removed now, since pyOmega makes an empty scene in the constructor, if there is none
 		void assertScene(){if(!OMEGA.getScene()) throw std::runtime_error("No Scene instance?!"); }
 		Omega& OMEGA;
 	public:
@@ -484,13 +484,6 @@ class pyOmega{
 	std::string tmpFilename(){ return OMEGA.tmpFilename(); }
 };
 
-class pySTLImporter : public STLImporter {};
-
-void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile);
-	bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message);
-};
-void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
-
 BOOST_PYTHON_MODULE(wrapper)
 {
 	python::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
@@ -597,8 +590,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__getitem__",&pyMaterialContainer::getitem_label)
 		.def("__len__",&pyMaterialContainer::len);
 
-	python::class_<pySTLImporter>("STLImporter")
-		.def("ymport",&pySTLImporter::import);
+	python::class_<STLImporter>("STLImporter").def("ymport",&STLImporter::import);
 
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 

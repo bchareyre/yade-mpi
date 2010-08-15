@@ -50,8 +50,8 @@ class Shop{
 			ensureInit(); //cerr<<"Shop: Setting `"<<key<<"'="<<value<<" (type `"<<typeid(valType).name()<<"')."<<endl;
 			defaults[key]=boost::any(value);}
 
-		//! creates empty rootBody along with its parameters (bound etc.)
-		static shared_ptr<Scene> rootBody();
+		//! creates empty scene along with its parameters (bound etc.)
+		static shared_ptr<Scene> scene();
 		/*! creates engines and initilizers within given Scene: elastic contact law, with gravity, timestepper and damping.
 		 *
 		 * All parameters are take from Shop::defaults, which are user-settable.

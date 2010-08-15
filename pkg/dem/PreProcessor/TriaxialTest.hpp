@@ -66,12 +66,12 @@ class TriaxialTest : public FileGenerator
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
-		void createActors(shared_ptr<Scene>& rootBody);
-		void positionRootBody(shared_ptr<Scene>& rootBody);
+		void createActors(shared_ptr<Scene>& scene);
+		void positionRootBody(shared_ptr<Scene>& scene);
 		typedef pair<Vector3r, Real> BasicSphere;	
 	public : 
 		~TriaxialTest ();
-		bool generate();
+		bool generate(string& message);
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. Full documentation in py/_extraDocs.py."
@@ -123,7 +123,6 @@ class TriaxialTest : public FileGenerator
 		/* init */
 		,
 		/* constructor */
-  		outputFileName = "./TriaxialTest"+Key+".xml";
 		wall_top 		= true;
 		wall_bottom 		= true;
 		wall_1			= true;

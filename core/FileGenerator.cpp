@@ -15,31 +15,16 @@
 CREATE_LOGGER(FileGenerator);
 
 
-FileGenerator::~FileGenerator () 
-{
-
-}
+bool FileGenerator::generate(std::string& msg){ throw invalid_argument("Calling abstract FileGenerator::generate() does not make sense."); }
 
 
-void FileGenerator::setFileName(const string& fileName) 
-{ 
-	outputFileName=fileName;
-}
-
-bool FileGenerator::generate() 
-{
-	message="FileGenerator (base class) generates nothing.";
-	return false;
-}
-
-
-bool FileGenerator::generateAndSave()
+bool FileGenerator::generateAndSave(const string& outputFileName, string& message)
 {
 	bool status;
 	message="";
 	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 	try {
-		status=generate(); // will modify message
+		status=generate(message); // will modify message
 	}
 	catch(std::exception& e){
 		LOG_FATAL("Unhandled exception: "<<typeid(e).name()<<" : "<<e.what());
@@ -50,15 +35,12 @@ bool FileGenerator::generateAndSave()
 	// generation wasn't successful
 	if(status==false) return false;
 
-	if(shouldTerminate()){ message+="Generation aborted."; return false; }
 	else {
 		boost::posix_time::ptime now2 = boost::posix_time::second_clock::local_time();
 		boost::posix_time::time_duration generationTime = now2 - now; // generation time, without save time
-		setStatus("saving...");
-		setProgress(1.0);
 		try
 		{
-			yade::ObjectIO::save(outputFileName,"scene",rootBody);
+			yade::ObjectIO::save(outputFileName,"scene",scene);
 		}
 		catch(const std::runtime_error& e)
 		{
@@ -75,16 +57,9 @@ bool FileGenerator::generateAndSave()
 	}
 }
 
-void FileGenerator::singleAction()
-{
-	setStatus("generating model...");
-	bool st=generateAndSave();
-	setReturnValue(st);
-};
-
 void FileGenerator::pyGenerate(const string& out){
-	setFileName(out);
-	bool ret=generateAndSave();
+	string message;
+	bool ret=generateAndSave(out,message);
 	LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<message);
 	if(ret==false) throw runtime_error(getClassName()+" reported error: "+message);
 }

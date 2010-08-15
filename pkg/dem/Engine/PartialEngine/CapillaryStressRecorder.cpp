@@ -49,8 +49,8 @@ void CapillaryStressRecorder::action()
 	sig23_cap=0, Vwater = 0, CapillaryPressure = 0;
 	int j = 0;
 	
-// 	// should be written like this with rootBody declared previously or in the action(Scene* rootBody):
-// 	FOREACH(const shared_ptr<Interaction>& i, *rootBody->interactions){
+// 	// should be written like this with scene declared previously or in the action(Scene* scene):
+// 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 // 		if(!i->isReal()) continue;
 		
 	InteractionContainer::iterator ii    = scene->interactions->begin();

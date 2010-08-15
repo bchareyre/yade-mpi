@@ -12,7 +12,7 @@
 
 /*! Body representing clump (rigid aggregate) composed by other existing bodies.
 
-	Clump is one of bodies that reside in rootBody->bodies.
+	Clump is one of bodies that reside in scene->bodies.
 	When an existing body is added to ::Clump, it's ::Body::dynamic flag is set to false
 	(it is still subscribed to all its engines, to make it possible to remove it from the clump again).
 	All forces acting on Clump::members are made to act on the clump itself, which will ensure that they

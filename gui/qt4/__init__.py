@@ -100,7 +100,7 @@ class ControllerClass(QWidget,Ui_Controller):
 		"update generator parameters when a new one is selected"
 		gen=eval(str(genStr)+'()')
 		self.generator=gen
-		se=SerializableEditor(gen,parent=self.generatorArea,ignoredAttrs=set(['outputFileName']),showType=True)
+		se=SerializableEditor(gen,parent=self.generatorArea,showType=True)
 		self.generatorArea.setWidget(se)
 	def pythonComboSlot(self,cmd):
 		try:

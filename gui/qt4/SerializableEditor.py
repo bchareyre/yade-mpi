@@ -386,9 +386,11 @@ class SerializableEditor(QFrame):
 			if e.widget and not e.widget.hot: e.widget.refresh()
 	def refresh(self): pass
 
-def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1):
+def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1,count=-1):
 	ret=u''
-	if num>=0: ret+=u'%d. '%num
+	if num>=0:
+		if count<=0: ret+=u'%d / %d.'%(num,count)
+		else ret+=u'%d. '%num
 	if href: ret+=(u' <b>' if boldHref else u' ')+serializableHref(ser)+(u'</b> ' if boldHref else u' ')
 	else: ret+=ser.__class__.__name__+' '
 	if hasattr(ser,'label') and ser.label: ret+=u' “'+unicode(ser.label)+u'”'
@@ -459,7 +461,7 @@ class SeqSerializableComboBox(QFrame):
 		if len(currSeq)>0:
 			prevIx=-1
 			for i,s in enumerate(currSeq):
-				self.combo.addItem(makeSerializableLabel(s,num=i,addr=False))
+				self.combo.addItem(makeSerializableLabel(s,num=i,count=len(currSeq),addr=False))
 				if s==ser: prevIx=i
 			if forceIx>=0: newIx=forceIx # force the index (used from newSlot to make the new element active)
 			elif prevIx>=0: newIx=prevIx # if found what was active before, use it

@@ -63,7 +63,7 @@ using namespace std;
 
 TriaxialTest::~TriaxialTest () {}
 
-bool TriaxialTest::generate()
+bool TriaxialTest::generate(string& message)
 {
 	message="";
 	
@@ -103,10 +103,10 @@ bool TriaxialTest::generate()
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
 		sphere_pack.fromFile(importFilename);
 		sphere_pack.aabb(lowerCorner,upperCorner);}
-	// setup rootBody here, since radiusMean is now at its true value (if it was negative)
-	rootBody = shared_ptr<Scene>(new Scene);
-	positionRootBody(rootBody);
-	createActors(rootBody);
+	// setup scene here, since radiusMean is now at its true value (if it was negative)
+	scene = shared_ptr<Scene>(new Scene);
+	positionRootBody(scene);
+	createActors(scene);
 
 	if(thickness<0) thickness=radiusMean;
 	if(facetWalls || wallWalls) thickness=0;
@@ -123,7 +123,7 @@ bool TriaxialTest::generate()
 	
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			}
@@ -137,7 +137,7 @@ bool TriaxialTest::generate()
 	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_top_id = body->getId();
 			//triaxialStateRecorder->wall_top_id = body->getId();
 			}
@@ -152,7 +152,7 @@ bool TriaxialTest::generate()
 	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_left_id = body->getId();
 			//triaxialStateRecorder->wall_left_id = body->getId();
 			}
@@ -168,7 +168,7 @@ bool TriaxialTest::generate()
 	 	
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_right_id = body->getId();
 			//triaxialStateRecorder->wall_right_id = body->getId();
 			}
@@ -183,7 +183,7 @@ bool TriaxialTest::generate()
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
 			//triaxialStateRecorder->wall_back_id = body->getId();
 			}	
@@ -198,7 +198,7 @@ bool TriaxialTest::generate()
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {
-			rootBody->bodies->insert(body);
+			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_front_id = body->getId();
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
@@ -208,11 +208,11 @@ bool TriaxialTest::generate()
 		LOG_DEBUG("sphere (" << sp.c << " " << sp.r << ")");
 		createSphere(body,sp.c,sp.r,false,true);
 		if(biaxial2dTest){ body->state->blockedDOFs=State::DOF_Z; }
-		rootBody->bodies->insert(body);
+		scene->bodies->insert(body);
 	}
 	if(defaultDt<0){
-		defaultDt=Shop::PWaveTimeStep(rootBody);
-		rootBody->dt=defaultDt;
+		defaultDt=Shop::PWaveTimeStep(scene);
+		scene->dt=defaultDt;
 		globalStiffnessTimeStepper->defaultDt=defaultDt;
 		LOG_INFO("Computed default (PWave) timestep "<<defaultDt);
 	}
@@ -287,7 +287,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 }
 
 
-void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
+void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -354,10 +354,10 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialstressController->wall_top_activated = false;	
 		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	#endif	
-	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
+	scene->engines.clear();
+	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
-	rootBody->engines.push_back(collider);
+	scene->engines.push_back(collider);
 // 	if(fast){ // The old code was doing the same slower, still here in case we want to make comparisons again
 		collider->sweepLength=.05*radiusMean;
 		collider->nBins=5; collider->binCoeff=2; /* gives a 2^5=32× difference between the lower and higher bin sweep lengths */
@@ -376,16 +376,16 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 			} else {
 				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_Basic>(new Law2_Dem3DofGeom_FrictPhys_Basic));
 			}
-		rootBody->engines.push_back(ids);
-	rootBody->engines.push_back(globalStiffnessTimeStepper);
-	rootBody->engines.push_back(triaxialcompressionEngine);
-	if(recordIntervalIter>0 && !noFiles) rootBody->engines.push_back(triaxialStateRecorder);
+		scene->engines.push_back(ids);
+	scene->engines.push_back(globalStiffnessTimeStepper);
+	scene->engines.push_back(triaxialcompressionEngine);
+	if(recordIntervalIter>0 && !noFiles) scene->engines.push_back(triaxialStateRecorder);
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
-	rootBody->engines.push_back(newton);
+	scene->engines.push_back(newton);
 }
 
-void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
+void TriaxialTest::positionRootBody(shared_ptr<Scene>& scene)
 {
 }
