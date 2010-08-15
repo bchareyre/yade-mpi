@@ -25,7 +25,7 @@ class TriaxialStressController : public BoundaryController
 {
 	private :
 		bool first;
-		inline const Vector3r getForce(Scene* rb, body_id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of action */ }
+		inline const Vector3r getForce(Scene* rb, Body::id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of action */ }
 	public :
 		//! internal index values for retrieving walls
 		enum { wall_bottom=0, wall_top, wall_left, wall_right, wall_front, wall_back };

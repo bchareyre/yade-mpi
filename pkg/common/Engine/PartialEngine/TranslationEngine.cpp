@@ -11,8 +11,8 @@
 
 void TranslationEngine::action(){
 	const Real& dt=scene->dt;
-	FOREACH(body_id_t id,subscribedBodies){
-		assert(id<(body_id_t)scene->bodies->size());
+	FOREACH(Body::id_t id,subscribedBodies){
+		assert(id<(Body::id_t)scene->bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
 		b->state->pos+=dt*velocity*translationAxis;

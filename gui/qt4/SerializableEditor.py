@@ -291,7 +291,7 @@ class SerializableEditor(QFrame):
 			m=re.match(regexp,cxxT)
 			return m
 		vecMap={
-			'bool':bool,'int':int,'long':int,'body_id_t':long,'size_t':long,
+			'bool':bool,'int':int,'long':int,'Body::id_t':long,'size_t':long,
 			'Real':float,'float':float,'double':float,
 			'Vector3r':Vector3,'Matrix3r':Matrix3,'Se3r':Se3FakeType,
 			'string':str,

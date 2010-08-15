@@ -132,8 +132,8 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 				
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
 		if (!ii->isReal()) continue;
-		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((ii)->getId1())]->material);
-		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((ii)->getId2())]->material);
+		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId1())]->material);
+		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId2())]->material);
 		//FIXME - why dynamic_cast fails here?
 		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->interactionPhysics.get());
 		Real fa = sdec1->frictionAngle;

@@ -111,13 +111,13 @@ void PersistentTriangulationCollider::action ()
 			Tes->nextFacet ( interaction_pair );
 
 			// look if the pair (id1,id2) already exists in the overleppingBB collection
-			const shared_ptr<Interaction>& interaction=interactions->find ( body_id_t ( id1 ),body_id_t ( id2 ) );
+			const shared_ptr<Interaction>& interaction=interactions->find ( Body::id_t ( id1 ),Body::id_t ( id2 ) );
 			bool found= ( interaction!=0 );//Bruno's Hack
 
 			// inserts the pair p=(id1,id2) if the two Aabb overlaps and if p does not exists in the overlappingBB
 			if ( !found )
 			{
-				interactions->insert ( body_id_t ( id1 ),body_id_t ( id2 ) );
+				interactions->insert ( Body::id_t ( id1 ),Body::id_t ( id2 ) );
 				//cerr << "inserted " << id1 << "-" << id2<<endl;
 			}
 			else interaction->isNeighbor = true;

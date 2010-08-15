@@ -115,9 +115,9 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	BodyContainer::iterator biEnd = bodies->end();
 	BodyContainer::iterator bi = biBegin;
 	Ng = 0;
-	vector<body_id_t> fictiousVtx;
+	vector<Body::id_t> fictiousVtx;
 	for (; bi!=biEnd ; ++bi) {
-		const body_id_t Idg = (*bi)->getId();
+		const Body::id_t Idg = (*bi)->getId();
 		TS.grains[Idg].id = Idg;
 		if (!(*bi)->isDynamic()) {
 			TS.grains[Idg].isSphere = false; fictiousVtx.push_back(Idg);}
@@ -165,8 +165,8 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			CGT::TriaxialState::Contact *c = new CGT::TriaxialState::Contact;
 			TS.contacts.push_back(c);
 			CGT::TriaxialState::VectorGrain& grains = TS.grains;
-			body_id_t id1 = (*ii)->getId1();
-			body_id_t id2 = (*ii)->getId2();
+			Body::id_t id1 = (*ii)->getId1();
+			Body::id_t id2 = (*ii)->getId2();
 
 			c->grain1 = & (TS.grains[id1]);
 			c->grain2 = & (TS.grains[id2]);

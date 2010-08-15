@@ -15,10 +15,10 @@
 #include "Omega.hpp"
 
 //! This could be -1 if id_t is re-typedef'ed as `int'
-const body_id_t Body::ID_NONE=body_id_t(-1);
+const Body::id_t Body::ID_NONE=Body::id_t(-1);
 
-const shared_ptr<Body>& Body::byId(body_id_t _id, Scene* rb){return (*((rb?rb:Omega::instance().getScene().get())->bodies))[_id];}
-const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<Scene> rb){return (*(rb->bodies))[_id];}
+const shared_ptr<Body>& Body::byId(Body::id_t _id, Scene* rb){return (*((rb?rb:Omega::instance().getScene().get())->bodies))[_id];}
+const shared_ptr<Body>& Body::byId(Body::id_t _id, shared_ptr<Scene> rb){return (*(rb->bodies))[_id];}
 
-Body::Body(body_id_t newId, int newGroup): id(newId), groupMask(newGroup), state(shared_ptr<State>(new State)), clumpId(ID_NONE){}
+Body::Body(Body::id_t newId, int newGroup): id(newId), groupMask(newGroup), state(shared_ptr<State>(new State)), clumpId(ID_NONE){}
 

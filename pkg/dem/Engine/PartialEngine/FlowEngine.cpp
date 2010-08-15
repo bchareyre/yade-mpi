@@ -230,7 +230,7 @@ void FlowEngine::AddBoundary ()
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
 		  Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const body_id_t& id = b->getId();
+			const Body::id_t& id = b->getId();
 			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];
@@ -258,7 +258,7 @@ void FlowEngine::AddBoundary ()
 		if ( b->shape->getClassIndex() == Bx_Index )
 		{
 			Box* w = YADE_CAST<Box*> ( b->shape.get() );
-// 			const body_id_t& id = b->getId();
+// 			const Body::id_t& id = b->getId();
 			Real center [3], Extent[3];
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
@@ -299,7 +299,7 @@ void FlowEngine::Triangulate ()
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
 			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const body_id_t& id = b->getId();
+			const Body::id_t& id = b->getId();
 			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];

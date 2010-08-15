@@ -12,7 +12,7 @@
 class OpenGLRenderer : public Serializable
 {
 	public:
-		body_id_t current_selection;
+		Body::id_t current_selection;
 
 		static const int numClipPlanes=3;
 
@@ -73,7 +73,7 @@ class OpenGLRenderer : public Serializable
 			
 		void init();
 		void initgl();
-		void render(const shared_ptr<Scene>& scene, body_id_t selection = body_id_t(-1));
+		void render(const shared_ptr<Scene>& scene, Body::id_t selection = Body::id_t(-1));
 		void pyRender(){render(Omega::instance().getScene());}
 		void renderWithNames(const shared_ptr<Scene>& );
 	

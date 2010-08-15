@@ -100,7 +100,7 @@ python::dict testNumpy(){
 void particleMacroStress(void){
 	Scene* scene=Omega::instance().getScene().get();
 	// find interactions of each particle
-	std::vector<std::list<body_id_t> > bIntr(scene->bodies->size());
+	std::vector<std::list<Body::id_t> > bIntr(scene->bodies->size());
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 		if(!i->isReal) continue;
 		// only contacts between 2 spheres
@@ -110,10 +110,10 @@ void particleMacroStress(void){
 		bIntr[i.getId1()].push_back(i.getId2());
 		bIntr[i.getId2()].push_back(i.getId1());
 	}
-	for(body_id_t id1=0; id1<(body_id_t)bIntr.size(); id1++){
+	for(Body::id_t id1=0; id1<(Body::id_t)bIntr.size(); id1++){
 		if(bIntr[id1].size()==0) continue;
 		Matrix3r ss(Matrix3r::Zero()); // stress tensor on current particle
-		FOREACH(body_id_t id2, bIntr[id1]){
+		FOREACH(Body::id_t id2, bIntr[id1]){
 			const shared_ptr<Interaction> i=scene->interactions->find(id1,id2);
 			assert(i);
 			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(i->interactionGeometry);

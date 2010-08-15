@@ -20,7 +20,7 @@ class UniaxialStrainer: public BoundaryController {
 	private:
 		bool needsInit;
 		void computeAxialForce();
-		Real& axisCoord(body_id_t id){ return Body::byId(id,scene)->state->pos[axis]; };
+		Real& axisCoord(Body::id_t id){ return Body::byId(id,scene)->state->pos[axis]; };
 		void init();
 	public:
 		virtual bool isActivated(){ return active; }
@@ -40,8 +40,8 @@ class UniaxialStrainer: public BoundaryController {
 			((Real,currentStrainRate,NaN,"Current strain rate (update automatically). |yupdate|"))
 			((int,axis,2,"The axis which is strained (0,1,2 for x,y,z)"))
 			((int,asymmetry,((void)"symmetric",0),"If 0, straining is symmetric for negIds and posIds; for 1 (or -1), only posIds are strained and negIds don't move (or vice versa)")) 
-			((vector<body_id_t>,posIds,,"Bodies on which strain will be applied (on the positive end along the axis)"))
-			((vector<body_id_t>,negIds,,"Bodies on which strain will be applied (on the negative end along the axis)"))
+			((vector<Body::id_t>,posIds,,"Bodies on which strain will be applied (on the positive end along the axis)"))
+			((vector<Body::id_t>,negIds,,"Bodies on which strain will be applied (on the negative end along the axis)"))
 			((Real,originalLength,NaN,"Distance of reference bodies in the direction of axis before straining started (computed automatically) [m]"))
 			((Real,limitStrain,((void)"disabled",0),"Invert the sense of straining (sharply, without transition) one this value of strain is reached. Not effective if 0."))
 			((bool,notYetReversed,true,"Flag whether the sense of straining has already been reversed (only used internally).")) 

@@ -10,9 +10,9 @@
  */
 class FacetTopologyAnalyzer: public GlobalEngine{
 	struct VertexData{
-		VertexData(body_id_t _id, int _vertexNo, Vector3r _pos, Real _coord): id(_id), vertexNo(_vertexNo), coord(_coord), pos(_pos){index=3*id+vertexNo; isLowestIndex=true; vertexId=-1;}
+		VertexData(Body::id_t _id, int _vertexNo, Vector3r _pos, Real _coord): id(_id), vertexNo(_vertexNo), coord(_coord), pos(_pos){index=3*id+vertexNo; isLowestIndex=true; vertexId=-1;}
 		//! Facet (body id) that we represent
-		body_id_t id;
+		Body::id_t id;
 		//! vertex number within this Facet
 		int vertexNo;
 		//! projected coordinate along projectionAxis
@@ -35,11 +35,11 @@ class FacetTopologyAnalyzer: public GlobalEngine{
 		bool operator()(const shared_ptr<VertexData>& v1, const shared_ptr<VertexData>& v2){return v1->index<v2->index;}
 	};
 	struct FacetTopology{
-		FacetTopology(body_id_t _id): id(_id){vertices[0]=vertices[1]=vertices[2]=-1;}
+		FacetTopology(Body::id_t _id): id(_id){vertices[0]=vertices[1]=vertices[2]=-1;}
 		//! integrized vertices
 		long vertices[3];
 		//! facet id, for back reference
-		body_id_t id;
+		Body::id_t id;
 		long minVertex(){return min(vertices[0],min(vertices[1],vertices[2]));}
 		long maxVertex(){return max(vertices[0],max(vertices[1],vertices[2]));}
 		struct MinVertexComparator{

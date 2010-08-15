@@ -113,8 +113,6 @@ def defaultMaterial():
 
 def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True):
 	"""Assign common body parameters."""
-	#if 'physParamsClass' in matKw.keys(): raise ArgumentError("You as passing physParamsClass as argument, but it is no longer used. Use material instead.")
-	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
 	if isinstance(material,int):
 		if material<0 and len(O.materials)==0: O.materials.append(defaultMaterial());
 		b.mat=O.materials[material]
@@ -126,27 +124,23 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	if resetState: b.state=b.mat.newAssocState()
 	mass=volume*b.mat.density
 	b.state.mass,b.state.inertia=mass,geomInertia*b.mat.density
-	if not noBound: b.bound=Aabb(diffuseColor=[0,1,0])
+	b.bounded=(not noBound)
 
 def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
 
 	Last assigned material is used by default (*material*=-1), and utils.defaultMaterial() will be used if no material is defined at all.
 
-	:Parameters:
-		`center`: Vector3
-			center
-		`radius`: float
-			radius
-		`color`: Vector3 or None
-			random color will be assigned if None
-		`material`: int | string | Material instance | callable returning Material instance
-			* if int, O.materials[material] will be used; as a special case, if material==-1 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
-			* if string, it is label of an existing material that will be used
-			* if Material instance, this instance will be used
-			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
-		`mask`: integer
-			:yref:`Body.mask` for the body
+	:param Vector3 center: center
+	:param float radius: radius
+	:param Vector3-or-None: body's color, as normalized RGB; random color will be assigned if ``None`.
+	:param material:
+		specify :yref:`Body.material`; different types are accepted:
+			* int: O.materials[material] will be used; as a special case, if material==-1 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
+			* string: label of an existing material that will be used
+			* :yref:`Material` instance: this instance will be used
+			* callable: will be called without arguments; returned Material value will be used (Material factory object, if you like)
+	:param int mask: :yref:`Body.mask` for the body
 
 	:return:
 		A Body instance with desired characteristics.
@@ -208,9 +202,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create box (cuboid) with given parameters.
 
-	:Parameters:
-		`extents`: Vector3
-			half-sizes along x,y,z axes
+	:param Vector3 extents: half-sizes along x,y,z axes
 	
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
@@ -256,14 +248,9 @@ def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	"""Return ready-made wall body.
 
 	:Parameters:
-		`position`: float or Vector3
-			center of the wall. If float, it is the position along given axis, the other 2 components being zero
-		`axis`: ∈{0,1,2}
-			orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
-		`sense`: ∈{-1,0,1}
-			sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
-		`mask`: bitmask (as int)
-			:yref:`Body.mask`
+	:param float-or-Vector3 position: center of the wall. If float, it is the position along given axis, the other 2 components being zero
+	:param ∈{0,1,2} axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
+	:param ∈{-1,0,1} sense: sense in which to interact (0: both, -1: negative, +1: positive; see :yref:`Wall`)
 
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
@@ -281,21 +268,10 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	"""Create facet with given parameters.
 
 	:Parameters:
-		`vertices`: [Vector3,Vector3,Vector3]
-			coordinates of vertices in the global coordinate system.
-		`wire`: bool
-			if True, facets are shown as skeleton; otherwise facets are filled
-		`noBound`:
-			do not assign Body().bound
-		`color`: Vector3 or None
-			random color will be assigned if None
-		`material`: int | string | Material instance | callable returning Material instance
-			* if int, O.materials[material] will be used; as a special case, if material==-1 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
-			* if string, it is label of an existing material that will be used
-			* if Material instance, this instance will be used
-			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
-		`mask`: integer
-			:yref:`Body.mask` for the body
+	:param [Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
+	:param bool wire: if ``True``, facets are shown as skeleton; otherwise facets are filled
+	:param bool noBound: set :yref:`Body.bounded`
+	:param Vector3-or-None color: color of the facet; random color will be assigned if ``None``.
 	
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()

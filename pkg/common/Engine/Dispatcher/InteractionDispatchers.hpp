@@ -6,14 +6,14 @@
 
 class InteractionDispatchers: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
-	typedef std::pair<body_id_t, body_id_t> idPair;
+	typedef std::pair<Body::id_t, Body::id_t> idPair;
 	// store interactions that should be deleted after loop in action, not later
 	#ifdef YADE_OPENMP
 		vector<list<idPair> > eraseAfterLoopIds;
-		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds[omp_get_thread_num()].push_back(idPair(id1,id2)); }
+		void eraseAfterLoop(Body::id_t id1,Body::id_t id2){ eraseAfterLoopIds[omp_get_thread_num()].push_back(idPair(id1,id2)); }
 	#else
 		list<idPair> eraseAfterLoopIds;
-		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds.push_back(idPair(id1,id2)); }
+		void eraseAfterLoop(Body::id_t id1,Body::id_t id2){ eraseAfterLoopIds.push_back(idPair(id1,id2)); }
 	#endif
 	public:
 		virtual void pyHandleCustomCtorArgs(python::tuple& t, python::dict& d);

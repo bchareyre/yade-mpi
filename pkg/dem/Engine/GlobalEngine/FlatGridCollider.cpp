@@ -92,7 +92,7 @@ void FlatGridCollider::updateCollisions(){
 	FOREACH(const Grid::idVector& v, grid.data){
 		size_t sz=v.size();
 		for(size_t i=0; i<sz; i++) for(size_t j=i+1; j<sz; j++){
-			body_id_t id1=v[i], id2=v[j];
+			Body::id_t id1=v[i], id2=v[j];
 			if(id1==id2) continue; // at grid boundary, it is possible to have one body more times in one cell
 			const shared_ptr<Interaction>& I=intrs->find(id1,id2);
 			if(I){ I->iterLastSeen=iter; continue; }

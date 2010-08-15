@@ -12,7 +12,7 @@ void StepDisplacer::action(){
 		rot=deltaSe3.orientation;
 		deltaSe3.position=Vector3r(NaN,NaN,NaN); // to detect next manual change of deltaSe3
 	}
-	FOREACH(body_id_t id, subscribedBodies){
+	FOREACH(Body::id_t id, subscribedBodies){
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(setVelocities){
 			const Real& dt=scene->dt;

@@ -24,8 +24,8 @@ void SpiralEngine::action(){
 	Quaternionr q(AngleAxisr(angularVelocity*dt,axis));
 	angleTurned+=angularVelocity*dt;
 	shared_ptr<BodyContainer> bodies = scene->bodies;
-	FOREACH(body_id_t id,subscribedBodies){
-		assert(id<(body_id_t)bodies->size());
+	FOREACH(Body::id_t id,subscribedBodies){
+		assert(id<(Body::id_t)bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
 		// translation
@@ -50,9 +50,9 @@ void RotationEngine::action(){
 	const long size=subscribedBodies.size();
 	#pragma omp parallel for schedule(static)
 	for(long i=0; i<size; i++){
-		const body_id_t& id=subscribedBodies[i];
+		const Body::id_t& id=subscribedBodies[i];
 	#else
-	FOREACH(body_id_t id,subscribedBodies){
+	FOREACH(Body::id_t id,subscribedBodies){
 	#endif
 		State* state=Body::byId(id,scene)->state.get();
 		state->angVel=rotationAxis*angularVelocity;

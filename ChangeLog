@@ -515,7 +515,7 @@ r.1182 (Bruno)
   - Add files related to capillary law.
 
 r.1181 (Janek)
-  - introduced body_id_t(ype) so that bodies are not numbered as an int, but as a body_id_t
+  - introduced Body::id_t(ype) so that bodies are not numbered as an int, but as a Body::id_t
   - added center 'scene button' on first tab of simulation controller
 
 r.1180 (Vaclav)

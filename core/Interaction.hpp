@@ -30,10 +30,10 @@ class Interaction : public Serializable
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 
-		Interaction(body_id_t newId1,body_id_t newId2);
+		Interaction(Body::id_t newId1,Body::id_t newId2);
 
-		const body_id_t& getId1() const {return id1;};
-		const body_id_t& getId2() const {return id2;};
+		const Body::id_t& getId1() const {return id1;};
+		const Body::id_t& getId2() const {return id2;};
 
 		//! swaps order of bodies within the interaction
 		void swapOrder();
@@ -62,8 +62,8 @@ class Interaction : public Serializable
 		void init();
 			
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
-		((body_id_t,id1,0,"[override below]"))
-		((body_id_t,id2,0,"[override below]"))
+		((Body::id_t,id1,0,"[override below]"))
+		((Body::id_t,id2,0,"[override below]"))
 		((long,iterMadeReal,-1,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionDispatchers`, therefore they are made friends of Interaction"))
 		((shared_ptr<InteractionGeometry>,interactionGeometry,,"Geometry part of the interaction."))
 		((shared_ptr<InteractionPhysics>,interactionPhysics,,"Physical (material) part of the interaction."))

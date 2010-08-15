@@ -6,7 +6,7 @@
 void PressTestEngine::action(){
 	if (curentDirection != stop) {
 		if (curentDirection==forward) { 										 ///<Forward direction of the press
-			FOREACH(body_id_t id, subscribedBodies){
+			FOREACH(Body::id_t id, subscribedBodies){
 				assert(scene->bodies->exists(id));
 				currentVerticalForce = scene->forces.getForce(id)[2]; 	///<Define current vertical force
 				minimalForce = maxVerticalForce*0.1;									///<Define minimal edge of the force (10% from Maximal)

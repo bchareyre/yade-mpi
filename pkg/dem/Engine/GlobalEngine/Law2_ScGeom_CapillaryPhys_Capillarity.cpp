@@ -566,7 +566,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
 	interactionsOnBody.clear();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	
-	body_id_t MaxId = -1;
+	Body::id_t MaxId = -1;
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for(  ; bi!=biEnd ; ++bi )

@@ -21,7 +21,7 @@ CREATE_LOGGER(TesselationWrapper);
 struct RTraits_for_spatial_sort : public CGT::RTriangulation::Geom_traits {
 	//typedef typename _Triangulation::Geom_traits Gt;
 	typedef CGT::RTriangulation::Geom_traits Gt;
-	typedef std::pair<const CGT::Sphere*,body_id_t> Point_3;
+	typedef std::pair<const CGT::Sphere*,Body::id_t> Point_3;
 
 	struct Less_x_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
@@ -54,7 +54,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	CGT::Tesselation& Tes = *(TW.Tes);
 	CGT::RTriangulation& T = Tes.Triangulation();
 	std::vector<CGT::Sphere> spheres;
-	std::vector<std::pair<const CGT::Sphere*,body_id_t> > pointsPtrs;
+	std::vector<std::pair<const CGT::Sphere*,Body::id_t> > pointsPtrs;
 	spheres.reserve(bodies->size());
 	pointsPtrs.reserve(bodies->size());
 
@@ -62,8 +62,8 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	BodyContainer::iterator biEnd = bodies->end();
 	BodyContainer::iterator bi = biBegin;
 
-	body_id_t Ng = 0;
-	body_id_t MaxId=0;
+	Body::id_t Ng = 0;
+	Body::id_t MaxId=0;
 	TW.mean_radius = 0;
 	for (; bi!=biEnd ; ++bi) {
 		if ((*bi)->isDynamic()) { //then it is a sphere (not a wall) FIXME : need test if isSphere
@@ -90,7 +90,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	CGT::RTriangulation::Cell_handle hint;
 
 	TW.n_spheres = 0;
-	for (std::vector<std::pair<const CGT::Sphere*,body_id_t> >::const_iterator
+	for (std::vector<std::pair<const CGT::Sphere*,Body::id_t> >::const_iterator
 			p = pointsPtrs.begin();p != pointsPtrs.end(); ++p) {
 		CGT::RTriangulation::Locate_type lt;
 		CGT::RTriangulation::Cell_handle c;
@@ -330,7 +330,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 		int dim1[]={bodiesDim};
 		int dim2[]={bodiesDim,9};
 		/// This is the code that needs numpy include
-		//numpy_boost<body_id_t,1> id(dim1);
+		//numpy_boost<Body::id_t,1> id(dim1);
  		numpy_boost<double,1> vol(dim1);
  		numpy_boost<double,1> poro(dim1);
  		numpy_boost<double,2> def(dim2);
@@ -338,7 +338,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		for (CGT::RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
  			//id[]=V_it->info().id()
  			//if(!b) continue;
- 			const body_id_t id = V_it->info().id();
+ 			const Body::id_t id = V_it->info().id();
  			Real sphereVol = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
  			vol[id]=V_it->info().v();			
  			poro[id]=(V_it->info().v() - sphereVol)/V_it->info().v();

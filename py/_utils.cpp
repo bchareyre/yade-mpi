@@ -148,7 +148,7 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 	int maxIntr=0;
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
-		const body_id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
+		const Body::id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id1]+=1;
 		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id2]+=1;
 		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
@@ -228,7 +228,7 @@ Real sumForces(py::tuple ids, const Vector3r& direction){
 	Real ret=0;
 	size_t len=py::len(ids);
 	for(size_t i=0; i<len; i++){
-		body_id_t id=py::extract<int>(ids[i]);
+		Body::id_t id=py::extract<int>(ids[i]);
 		const Vector3r& f=rb->forces.getForce(id);
 		ret+=direction.dot(f);
 	}
@@ -238,10 +238,10 @@ Real sumForces(py::tuple ids, const Vector3r& direction){
 /* Sum force acting on facets given by their ids in the sense of their respective normals.
    If axis is given, it will sum forces perpendicular to given axis only (not the the facet normals).
 */
-Real sumFacetNormalForces(vector<body_id_t> ids, int axis=-1){
+Real sumFacetNormalForces(vector<Body::id_t> ids, int axis=-1){
 	shared_ptr<Scene> rb=Omega::instance().getScene(); rb->forces.sync();
 	Real ret=0;
-	FOREACH(const body_id_t id, ids){
+	FOREACH(const Body::id_t id, ids){
 		Facet* f=YADE_CAST<Facet*>(Body::byId(id,rb)->shape.get());
 		if(axis<0) ret+=rb->forces.getForce(id).dot(f->nf);
 		else {
@@ -398,7 +398,7 @@ py::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real per
 }
 //BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
 
-shared_ptr<Interaction> Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ return Shop::createExplicitInteraction(id1,id2,/*force*/true);}
+shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id_t id2){ return Shop::createExplicitInteraction(id1,id2,/*force*/true);}
 
 //Vector3r Shop__scalarOnColorScale(Real scalar){ return Shop::scalarOnColorScale(scalar);}
 

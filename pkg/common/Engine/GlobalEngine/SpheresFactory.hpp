@@ -27,7 +27,7 @@ public:
 	virtual void action();
 
 	/// @brief The geometry of the section on which spheres will be placed. 
-	vector<body_id_t> factoryFacets; 
+	vector<Body::id_t> factoryFacets; 
 
     /// @brief Factory section may be a surface or volume (convex). 
     /// By default it is a surface. To make its a volume set volumeSection=true

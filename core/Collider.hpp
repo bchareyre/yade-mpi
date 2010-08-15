@@ -20,7 +20,7 @@ class Collider : public GlobalEngine
 		 *
 		 * returns list of body ids with which there is potential overlap.
 		 */
-		virtual  vector<body_id_t> probeBoundingVolume(const Bound&){throw;}
+		virtual  vector<Body::id_t> probeBoundingVolume(const Bound&){throw;}
 		/*! Tell whether given bodies may interact, for other than spatial reasons.
 		 *
 		 * Concrete collider implementations should call this function if

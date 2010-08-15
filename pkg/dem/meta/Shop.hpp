@@ -15,16 +15,12 @@
 
 #include<boost/function.hpp>
 
-/*
-#include<yade/core/Scene.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/core/Omega.hpp>
-*/
 class Scene;
 class Body;
 class SimpleViscoelasticBodyParameters;
 class ViscElMat;
 class FrictMat;
+class Interaction;
 
 using namespace std;
 using boost::shared_ptr;
@@ -105,10 +101,10 @@ class Shop{
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 
 		//! create transientInteraction between 2 bodies, using existing Dispatcher in Omega
-		static shared_ptr<Interaction> createExplicitInteraction(body_id_t id1, body_id_t id2, bool force);
+		static shared_ptr<Interaction> createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool force);
 
 		//! apply force on contact point on both bodies (reversed on body 2)
-		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* scene);
+		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, Body::id_t id1, const Vector3r& pos1, Body::id_t id2, const Vector3r& pos2, Scene* scene);
 
 		//! map scalar variable to 1d colorscale
 		static Vector3r scalarOnColorScale(Real x, Real xmin=0., Real xmax=1.);

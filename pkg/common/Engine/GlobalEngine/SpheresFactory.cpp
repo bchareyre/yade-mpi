@@ -89,8 +89,8 @@ void SpheresFactory::action()
 		createSphere(sphere,position,r);
 
 		bool is_overlap=false;
-		vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
-		FOREACH(body_id_t id, probedBodies){
+		vector<Body::id_t> probedBodies=bI->probeBoundingVolume(bv);
+		FOREACH(Body::id_t id, probedBodies){
 			if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry,/*force*/false){
 				is_overlap=true;
 				break;
@@ -115,7 +115,7 @@ void SpheresFactory::action()
 
 Vector3r SpheresFactory::generatePositionOnSurface()
 {
-    body_id_t facetId = factoryFacets[(*randomFacet)()];
+    Body::id_t facetId = factoryFacets[(*randomFacet)()];
     Real t1 = randomUnit();
     Real t2 = randomUnit()*(1-t1);
 
@@ -138,7 +138,7 @@ Vector3r SpheresFactory::generatePositionInVolume()
 }
 void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& position, Real r)
 {
-	body = shared_ptr<Body>(new Body(body_id_t(0),1));
+	body = shared_ptr<Body>(new Body(Body::id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);

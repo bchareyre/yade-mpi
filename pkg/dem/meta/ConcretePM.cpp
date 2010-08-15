@@ -398,7 +398,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		if(!I->isReal()) continue;
 		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
 		if(!phys) continue;
-		const body_id_t id1=I->getId1(), id2=I->getId2();
+		const Body::id_t id1=I->getId1(), id2=I->getId2();
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
 		
 		Vector3r normalStress=((1./phys->crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
@@ -422,7 +422,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		nAvgRelResidual+=1;
 	}
 	FOREACH(shared_ptr<Body> B, *scene->bodies){
-		const body_id_t& id=B->getId();
+		const Body::id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
 		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
 		if(!state) continue;

@@ -69,7 +69,7 @@ void SpatialQuickSortCollider::action()
 			&& rank[j]->max[2] > min[2])
 			{
 				id2=rank[j]->id;
-				if ( (interaction = interactions->find(body_id_t(id),body_id_t(id2))) == 0)
+				if ( (interaction = interactions->find(Body::id_t(id),Body::id_t(id2))) == 0)
 				{
 					interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
 					interactions->insert(interaction);

@@ -146,7 +146,7 @@ void OpenGLRenderer::resetSpecularEmission(){
 	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
 }
 
-void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,body_id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
+void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
 	if(!initDone) init();
 	assert(initDone);
@@ -277,7 +277,7 @@ void OpenGLRenderer::renderInteractionPhysics(){
 			shared_ptr<InteractionPhysics> ip(I->interactionPhysics);
 			if(!ip) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
-			body_id_t id1=I->getId1(), id2=I->getId2();
+			Body::id_t id1=I->getId1(), id2=I->getId2();
 			if(!(bodyDisp[id1].isDisplayed||bodyDisp[id2].isDisplayed)) continue;
 			glPushMatrix(); interactionPhysicsDispatcher(ip,I,b1,b2,intrWire); glPopMatrix();
 		}

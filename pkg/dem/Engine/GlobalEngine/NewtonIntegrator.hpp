@@ -41,14 +41,14 @@ class VelocityBins;
 
 class NewtonIntegrator : public GlobalEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A);
-	inline void handleClumpMemberAccel(Scene* ncb, const body_id_t& memberId, State* memberState, State* clumpState);
-	inline void handleClumpMemberAngAccel(Scene* ncb, const body_id_t& memberId, State* memberState, State* clumpState);
-	inline void handleClumpMemberTorque(Scene* ncb, const body_id_t& memberId, State* memberState, State* clumpState, Vector3r& M);
-	inline void saveMaximaVelocity(Scene* ncb, const body_id_t& id, State* state);
+	inline void handleClumpMemberAccel(Scene* ncb, const Body::id_t& memberId, State* memberState, State* clumpState);
+	inline void handleClumpMemberAngAccel(Scene* ncb, const Body::id_t& memberId, State* memberState, State* clumpState);
+	inline void handleClumpMemberTorque(Scene* ncb, const Body::id_t& memberId, State* memberState, State* clumpState, Vector3r& M);
+	inline void saveMaximaVelocity(Scene* ncb, const Body::id_t& id, State* state);
 	bool haveBins;
-	inline void leapfrogTranslate(Scene* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog translate
-	inline void leapfrogSphericalRotate(Scene* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog rotate of spherical body
-	inline void leapfrogAsphericalRotate(Scene* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
+	inline void leapfrogTranslate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt); // leap-frog translate
+	inline void leapfrogSphericalRotate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt); // leap-frog rotate of spherical body
+	inline void leapfrogAsphericalRotate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);

@@ -90,12 +90,12 @@ class InsertionSortCollider: public Collider{
 		//! coordinate along the given sortAxis
 		Real coord;
 		//! id of the body this bound belongs to
-		body_id_t id;
+		Body::id_t id;
 		//! periodic cell coordinate
 		int period;
 		//! is it the minimum (true) or maximum (false) bound?
 		struct{ unsigned hasBB:1; unsigned isMin:1; } flags;
-		Bounds(Real coord_, body_id_t id_, bool isMin): coord(coord_), id(id_), period(0){ flags.isMin=isMin; }
+		Bounds(Real coord_, Body::id_t id_, bool isMin): coord(coord_), id(id_), period(0){ flags.isMin=isMin; }
 		bool operator<(const Bounds& b) const {
 			/* handle special case of zero-width bodies, which could otherwise get min/max swapped in the unstable std::sort */
 			if(id==b.id && coord==b.coord) return flags.isMin;
@@ -108,7 +108,7 @@ class InsertionSortCollider: public Collider{
 	};
 	#ifdef PISC_DEBUG
 		int watch1, watch2;
-		bool watchIds(body_id_t id1,body_id_t id2) const { return (watch1<0 &&(watch2==id1||watch2==id2))||(watch2<0 && (watch1==id1||watch1==id2))||(watch1==id1 && watch2==id2)||(watch1==id2 && watch2==id1); }
+		bool watchIds(Body::id_t id1,Body::id_t id2) const { return (watch1<0 &&(watch2==id1||watch2==id2))||(watch2<0 && (watch1==id1||watch1==id2))||(watch1==id1 && watch2==id2)||(watch1==id2 && watch2==id1); }
 	#endif
 		// keep this dispatcher and call it ourselves as needed
 		shared_ptr<BoundDispatcher> boundDispatcher;
@@ -154,20 +154,20 @@ class InsertionSortCollider: public Collider{
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details
 	*/
 	void insertionSort(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
-	void handleBoundInversion(body_id_t,body_id_t,InteractionContainer*,Scene*);
-	bool spatialOverlap(body_id_t,body_id_t) const;
+	void handleBoundInversion(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
+	bool spatialOverlap(Body::id_t,Body::id_t) const;
 
 	// periodic variants
 	void insertionSortPeri(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
-	void handleBoundInversionPeri(body_id_t,body_id_t,InteractionContainer*,Scene*);
-	bool spatialOverlapPeri(body_id_t,body_id_t,Scene*,Vector3i&) const;
+	void handleBoundInversionPeri(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
+	bool spatialOverlapPeri(Body::id_t,Body::id_t,Scene*,Vector3i&) const;
 	static Real cellWrap(const Real, const Real, const Real, int&);
 	static Real cellWrapRel(const Real, const Real, const Real);
 
 
 	public:
 	//! Predicate called from loop within InteractionContainer::erasePending
-	bool shouldBeErased(body_id_t id1, body_id_t id2, Scene* rb) const {
+	bool shouldBeErased(Body::id_t id1, Body::id_t id2, Scene* rb) const {
 		if(!periodic) return !spatialOverlap(id1,id2);
 		else { Vector3i periods; return !spatialOverlapPeri(id1,id2,rb,periods); }
 	}
@@ -176,7 +176,7 @@ class InsertionSortCollider: public Collider{
 	// force reinitialization at next run
 	virtual void invalidatePersistentData(){ for(int i=0; i<3; i++){ BB[i].vec.clear(); BB[i].size=0; }}
 
-	vector<body_id_t> probeBoundingVolume(const Bound&);
+	vector<Body::id_t> probeBoundingVolume(const Bound&);
 
 	virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InsertionSortCollider,Collider,"\

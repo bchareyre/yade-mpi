@@ -4,8 +4,8 @@
 #include<string.h>
 #include<vector>
 #include<yade/lib-base/Math.hpp>
-// for body_id_t
-#include<yade/core/Interaction.hpp>
+// for Body::id_t
+#include<yade/core/Body.hpp>
 
 #include<boost/static_assert.hpp>
 // make sure that (void*)&vec[0]==(void*)&vec
@@ -57,7 +57,7 @@ class ForceContainer{
 		bool synced,moveRotUsed;
 		boost::mutex globalMutex;
 
-		inline void ensureSize(body_id_t id){
+		inline void ensureSize(Body::id_t id){
 			assert(nThreads>omp_get_thread_num());
 			if (size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));
 		}
@@ -67,8 +67,8 @@ class ForceContainer{
 		/*! Function to allow friend classes to get force even if not synced.
 		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
 		* for a particular body id. */
-		const Vector3r& getForceUnsynced (body_id_t id){ensureSize(id); return _force[id];}
-		const Vector3r& getTorqueUnsynced(body_id_t id){ensureSize(id); return _force[id];}
+		const Vector3r& getForceUnsynced (Body::id_t id){ensureSize(id); return _force[id];}
+		const Vector3r& getTorqueUnsynced(Body::id_t id){ensureSize(id); return _force[id];}
 		friend class PhysicalActionDamperUnit;
 	public:
 		ForceContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0){
@@ -80,14 +80,14 @@ class ForceContainer{
 		}
 
 		/* To be benchmarked: sum thread data in getForce/getTorque upon request for each body individually instead of by the sync() function globally */
-		const Vector3r& getForce(body_id_t id)         { ensureSize(id); ensureSynced(); return _force[id]; }
-		void  addForce(body_id_t id, const Vector3r& f){ ensureSize(id); synced=false;   _forceData[omp_get_thread_num()][id]+=f;}
-		const Vector3r& getTorque(body_id_t id)        { ensureSize(id); ensureSynced(); return _torque[id]; }
-		void addTorque(body_id_t id, const Vector3r& t){ ensureSize(id); synced=false;   _torqueData[omp_get_thread_num()][id]+=t;}
-		const Vector3r& getMove(body_id_t id)          { ensureSize(id); ensureSynced(); return _move[id]; }
-		void  addMove(body_id_t id, const Vector3r& m) { ensureSize(id); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
-		const Vector3r& getRot(body_id_t id)           { ensureSize(id); ensureSynced(); return _rot[id]; }
-		void  addRot(body_id_t id, const Vector3r& r)  { ensureSize(id); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
+		const Vector3r& getForce(Body::id_t id)         { ensureSize(id); ensureSynced(); return _force[id]; }
+		void  addForce(Body::id_t id, const Vector3r& f){ ensureSize(id); synced=false;   _forceData[omp_get_thread_num()][id]+=f;}
+		const Vector3r& getTorque(Body::id_t id)        { ensureSize(id); ensureSynced(); return _torque[id]; }
+		void addTorque(Body::id_t id, const Vector3r& t){ ensureSize(id); synced=false;   _torqueData[omp_get_thread_num()][id]+=t;}
+		const Vector3r& getMove(Body::id_t id)          { ensureSize(id); ensureSynced(); return _move[id]; }
+		void  addMove(Body::id_t id, const Vector3r& m) { ensureSize(id); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
+		const Vector3r& getRot(Body::id_t id)           { ensureSize(id); ensureSynced(); return _rot[id]; }
+		void  addRot(Body::id_t id, const Vector3r& r)  { ensureSize(id); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
 
 		/* Sum contributions from all threads, save to _force&_torque.
 		 * Locks globalMutex, since one thread modifies common data (_force&_torque).
@@ -162,21 +162,21 @@ class ForceContainer {
 		std::vector<Vector3r> _move;
 		std::vector<Vector3r> _rot;
 		size_t size;
-		inline void ensureSize(body_id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
+		inline void ensureSize(Body::id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
 		friend class PhysicalActionDamperUnit;
-		const Vector3r& getForceUnsynced (body_id_t id){ return getForce(id);}
-		const Vector3r& getTorqueUnsynced(body_id_t id){ return getForce(id);}
+		const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
+		const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
 		bool moveRotUsed;
 	public:
 		ForceContainer(): size(0), moveRotUsed(false), syncCount(0){}
-		const Vector3r& getForce(body_id_t id){ensureSize(id); return _force[id];}
-		void  addForce(body_id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
-		const Vector3r& getTorque(body_id_t id){ensureSize(id); return _torque[id];}
-		void  addTorque(body_id_t id,const Vector3r& t){ensureSize(id); _torque[id]+=t;}
-		const Vector3r& getMove(body_id_t id){ensureSize(id); return _move[id];}
-		void  addMove(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
-		const Vector3r& getRot(body_id_t id){ensureSize(id); return _rot[id];}
-		void  addRot(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
+		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}
+		void  addForce(Body::id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
+		const Vector3r& getTorque(Body::id_t id){ensureSize(id); return _torque[id];}
+		void  addTorque(Body::id_t id,const Vector3r& t){ensureSize(id); _torque[id]+=t;}
+		const Vector3r& getMove(Body::id_t id){ensureSize(id); return _move[id];}
+		void  addMove(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
+		const Vector3r& getRot(Body::id_t id){ensureSize(id); return _rot[id];}
+		void  addRot(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
 		//! Set all forces to zero
 		void reset(){
 			memset(&_force [0],0,sizeof(Vector3r)*size);

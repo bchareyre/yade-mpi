@@ -4,7 +4,7 @@
 class NewtonIntegrator;
 class FlatGridCollider: public Collider{
 	struct Grid{
-		typedef std::vector<body_id_t> idVector;
+		typedef std::vector<Body::id_t> idVector;
 		Vector3i size;
 		Vector3r mn, mx;
 		Real step;

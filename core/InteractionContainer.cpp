@@ -12,13 +12,13 @@ BOOST_CLASS_EXPORT(InteractionContainer);
 
 bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	boost::mutex::scoped_lock lock(drawloopmutex);
-	body_id_t id1=i->getId1(), id2=i->getId2();
+	Body::id_t id1=i->getId1(), id2=i->getId2();
 	if (id1>id2) swap(id1,id2);
 
 	if((size_t)id1>=vecmap.size()) vecmap.resize(id1+1); // resize linear map to accomodate id1
 
 	// inserted element maps id2->currSize; currSize will be incremented immediately
-	if(!vecmap[id1].insert(pair<body_id_t,size_t>(id2,currSize)).second) return false; // id1,id2 pair already present
+	if(!vecmap[id1].insert(pair<Body::id_t,size_t>(id2,currSize)).second) return false; // id1,id2 pair already present
 		
 	//assert(intrs.size()==currSize);
 	intrs.resize(++currSize); // currSize updated
@@ -30,7 +30,7 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 }
 
 
-bool InteractionContainer::insert(body_id_t id1,body_id_t id2)
+bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 {
 	shared_ptr<Interaction> i(new Interaction(id1,id2) );
 	return insert(i);	
@@ -47,11 +47,11 @@ void InteractionContainer::clear(){
 }
 
 
-bool InteractionContainer::erase(body_id_t id1,body_id_t id2){
+bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
 	if((size_t)id1>=vecmap.size()) return false; // id1 out of bounds
-	map<body_id_t,size_t>::iterator mii;
+	map<Body::id_t,size_t>::iterator mii;
 	mii=vecmap[id1].find(id2);
 	if(mii==vecmap[id1].end()) return false; // id2 not in interaction with id1
 	// interaction found; erase from vecmap and then from intrs as well
@@ -74,18 +74,18 @@ bool InteractionContainer::erase(body_id_t id1,body_id_t id2){
 }
 
 
-const shared_ptr<Interaction>& InteractionContainer::find(body_id_t id1,body_id_t id2){
+const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	if (id1>id2) swap(id1,id2);
 
 	if ((size_t)id1>=vecmap.size()) { empty=shared_ptr<Interaction>(); return empty; }
 
-	map<body_id_t,size_t>::iterator mii;
+	map<Body::id_t,size_t>::iterator mii;
 	mii = vecmap[id1].find(id2);
 	if (mii!=vecmap[id1].end()) return intrs[(*mii).second];
 	else { empty=shared_ptr<Interaction>(); return empty; }
 }
 
-void InteractionContainer::requestErase(body_id_t id1, body_id_t id2, bool force){
+void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool force){
 	find(id1,id2)->reset(); IdsForce v={id1,id2,force};
 	#ifdef YADE_OPENMP
 		threadsPendingErase[omp_get_thread_num()].push_back(v);

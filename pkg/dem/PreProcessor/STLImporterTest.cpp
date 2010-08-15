@@ -90,7 +90,7 @@ bool STLImporterTest::generate()
 	// create bodies
 	for(int i=0,e=imp.number_of_facets;i<e;++i)
 	{
-	    shared_ptr<Body> b(new Body(body_id_t(0),1));
+	    shared_ptr<Body> b(new Body(Body::id_t(0),1));
     
 	    b->setDynamic(false);
 	    
@@ -143,7 +143,7 @@ bool STLImporterTest::generate()
 
 void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
-	body = shared_ptr<Body>(new Body(body_id_t(0),1));
+	body = shared_ptr<Body>(new Body(Body::id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);

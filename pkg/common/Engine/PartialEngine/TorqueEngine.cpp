@@ -2,7 +2,7 @@
 #include<yade/core/Scene.hpp>
 
 void TorqueEngine::action(){
-	FOREACH(const body_id_t id, subscribedBodies){
+	FOREACH(const Body::id_t id, subscribedBodies){
 		// check that body really exists?
 		scene->forces.addTorque(id,moment);
 	}

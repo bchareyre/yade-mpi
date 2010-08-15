@@ -18,7 +18,7 @@ YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
 
 // return true if bodies bb overlap in all 3 dimensions
-bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2) const {
+bool InsertionSortCollider::spatialOverlap(Body::id_t id1, Body::id_t id2) const {
 	assert(!periodic);
 	return
 		(minima[3*id1+0]<=maxima[3*id2+0]) && (maxima[3*id1+0]>=minima[3*id2+0]) &&
@@ -27,7 +27,7 @@ bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2) const {
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
-void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, InteractionContainer* interactions, Scene*){
+void InsertionSortCollider::handleBoundInversion(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(!periodic);
 	assert(id1!=id2);
 	// do bboxes overlap in all 3 dimensions?
@@ -65,9 +65,9 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 	}
 }
 
-vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
+vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 	if(periodic){ LOG_FATAL("Probing with periodic boundary not implemented."); abort(); }
-	vector<body_id_t> ret;
+	vector<Body::id_t> ret;
 	for( vector<Bounds>::iterator 
 			it=BB[0].vec.begin(),et=BB[0].vec.end(); it < et; ++it)
 	{
@@ -215,7 +215,7 @@ void InsertionSortCollider::action(){
 		for(long i=0; i<2*nBodies; i++){
 			for(int j=0; j<3; j++){
 				VecBounds& BBj=BB[j];
-				const body_id_t id=BBj[i].id;
+				const Body::id_t id=BBj[i].id;
 				const shared_ptr<Body>& b=Body::byId(id,scene);
 				if(b){
 					const shared_ptr<Bound>& bv=b->bound;
@@ -230,7 +230,7 @@ void InsertionSortCollider::action(){
 			}	
 		}
 	// for each body, copy its minima and maxima, for quick checks of overlaps later
-	for(body_id_t id=0; id<nBodies; id++){
+	for(Body::id_t id=0; id<nBodies; id++){
 		BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(b){
@@ -272,10 +272,10 @@ void InsertionSortCollider::action(){
 					// start from the lower bound (i.e. skipping upper bounds)
 					// skip bodies without bbox, because they don't collide
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
-					const body_id_t& iid=V[i].id;
+					const Body::id_t& iid=V[i].id;
 					// go up until we meet the upper bound
 					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
-						const body_id_t& jid=V[j].id;
+						const Body::id_t& jid=V[j].id;
 						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
 						if(!V[j].flags.isMin) continue;
 						/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
@@ -286,11 +286,11 @@ void InsertionSortCollider::action(){
 			} else { // periodic case: see comments above
 				for(long i=0; i<2*nBodies; i++){
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
-					const body_id_t& iid=V[i].id;
+					const Body::id_t& iid=V[i].id;
 					long cnt=0;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
 					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
-						const body_id_t& jid=V[j].id;
+						const Body::id_t& jid=V[j].id;
 						if(!V[j].flags.isMin) continue;
 						handleBoundInversionPeri(iid,jid,interactions,scene);
 						if(cnt++>2*(long)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
@@ -361,7 +361,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
-void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id2, InteractionContainer* interactions, Scene*){
+void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(periodic);
 	// do bboxes overlap in all 3 dimensions?
 	Vector3i periods;
@@ -416,7 +416,7 @@ void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id
 	at all, for instance.
 */
 //! return true if bodies bb overlap in all 3 dimensions
-bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scene* scene, Vector3i& periods) const {
+bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Scene* scene, Vector3i& periods) const {
 	assert(periodic);
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){

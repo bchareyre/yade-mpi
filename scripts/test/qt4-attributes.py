@@ -144,7 +144,7 @@ class SerializableEditor(QWidget):
 			m=re.match(regexp,cxxT)
 			return m
 		vecMap={
-			'int':int,'long':int,'body_id_t':long,'size_t':long,
+			'int':int,'long':int,'Body::id_t':long,'size_t':long,
 			'Real':float,'float':float,'double':float,
 			'Vector3r':Vector3,'Matrix3r':Matrix3,
 			'string':str

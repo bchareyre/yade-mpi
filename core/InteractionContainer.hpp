@@ -36,7 +36,7 @@ class InteractionContainer: public Serializable{
 		// linear array of container interactions
 		vector<shared_ptr<Interaction> > intrs;
 		// array where vecmap[id1] maps id2 to index in intrs (unsigned int)
-		vector<map<body_id_t,size_t> > vecmap;
+		vector<map<Body::id_t,size_t> > vecmap;
 		// always in sync with intrs.size()
 		size_t currSize;
 		shared_ptr<Interaction> empty;
@@ -57,10 +57,10 @@ class InteractionContainer: public Serializable{
 		const_iterator begin() const {return intrs.begin();}
      	const_iterator end()   const {return intrs.end();}
 		// insertion/deletion
-		bool insert(body_id_t id1,body_id_t id2);
+		bool insert(Body::id_t id1,Body::id_t id2);
 		bool insert(const shared_ptr<Interaction>& i);
-		bool erase(body_id_t id1,body_id_t id2);
-		const shared_ptr<Interaction>& find(body_id_t id1,body_id_t id2);
+		bool erase(Body::id_t id1,Body::id_t id2);
+		const shared_ptr<Interaction>& find(Body::id_t id1,Body::id_t id2);
 		// index access
 		shared_ptr<Interaction>& operator[](size_t id){return intrs[id];}
 		const shared_ptr<Interaction>& operator[](size_t id) const { return intrs[id];}
@@ -77,14 +77,14 @@ class InteractionContainer: public Serializable{
 		// iteration number when the collider was last run; set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionDispatchers (such as SpatialQuickSortCollider). Other colliders (such as InsertionSortCollider) set it it -1, which is the default
 		long iterColliderLastRun;
 		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state) and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
-		void requestErase(body_id_t id1, body_id_t id2, bool force=false);
+		void requestErase(Body::id_t id1, Body::id_t id2, bool force=false);
 		/*! List of pairs of interactions that will be (maybe) erased by the collider; if force==true, they will be deleted unconditionally.
 			
 			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you).
 
 			If there is, at one point, a multi-threaded collider, pendingEraseMutex should be moved to the public part and used from there as well.
 		*/
-		struct IdsForce{ body_id_t id1; body_id_t id2; bool force; };
+		struct IdsForce{ Body::id_t id1; Body::id_t id2; bool force; };
 		#ifdef YADE_OPENMP
 			vector<list<IdsForce> > threadsPendingErase;
 		#endif
@@ -110,7 +110,7 @@ class InteractionContainer: public Serializable{
 
 			Class using this interface (which is presumably a collider) must define the 
 					
-				bool shouldBeErased(body_id_t, body_id_t) const
+				bool shouldBeErased(Body::id_t, Body::id_t) const
 
 			method which will be called for every interaction.
 

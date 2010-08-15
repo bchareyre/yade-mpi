@@ -95,8 +95,8 @@ void ResetRandomPosition::action()
 				if (is_overlap) continue; // new attempt
 
 				// Test overlap with other bodies
-				vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
-				FOREACH(body_id_t id, probedBodies){
+				vector<Body::id_t> probedBodies=bI->probeBoundingVolume(bv);
+				FOREACH(Body::id_t id, probedBodies){
 					if (iGME->explicitAction(b,Body::byId(id),/*force*/false)->interactionGeometry){
 						is_overlap=true;
 						break;
@@ -128,7 +128,7 @@ void ResetRandomPosition::action()
 
 Vector3r ResetRandomPosition::generatePositionOnSurface()
 {
-    body_id_t facetId = factoryFacets[(*randomFacet)()];
+    Body::id_t facetId = factoryFacets[(*randomFacet)()];
     Real t1 = randomUnit();
     Real t2 = randomUnit()*(1-t1);
 

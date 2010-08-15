@@ -20,8 +20,8 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		if(!i->isReal()) continue;				//Check whether they are real
 		const shared_ptr<RpmPhys>& contPhys = YADE_PTR_CAST<RpmPhys>(i->interactionPhysics);
 		
-		body_id_t id1 = i->getId1();			//Get bodies ids from interaction
-		body_id_t id2 = i->getId2();
+		Body::id_t id1 = i->getId1();			//Get bodies ids from interaction
+		Body::id_t id2 = i->getId2();
 		
 		const Sphere* sphere1 = dynamic_cast<Sphere*>(Body::byId(id1)->shape.get()); 
 		const Sphere* sphere2 = dynamic_cast<Sphere*>(Body::byId(id2)->shape.get()); 

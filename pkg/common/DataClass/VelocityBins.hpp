@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
 
-#include<yade/core/Interaction.hpp> // for body_id_t
+#include<yade/core/Interaction.hpp> // for Body::id_t
 #include<yade/core/State.hpp>
 #include<vector>
 #ifdef YADE_OPENMP
@@ -71,7 +71,7 @@ class VelocityBins{
 	// reset per-bin max velocities
 	void binVelSqInitialize(Real velSqInit=0.);
 	// use body max velocity -- called for every body at every step (from NewtonIntegrator, normally)
-	void binVelSqUse(body_id_t id, Real velSq);
+	void binVelSqUse(Body::id_t id, Real velSq);
 	// actually assign max velocities to their respective bins
 	void binVelSqFinalize();
 

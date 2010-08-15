@@ -21,17 +21,16 @@
 
 class Scene;
 
-typedef int body_id_t;
-
 class Body: public Serializable{
 	public:
+		typedef int id_t;
 		// bits for Body::flags
 		enum { FLAG_DYNAMIC=1, FLAG_BOUNDED=2 }; /* add powers of 2 as needed */
 		//! symbolic constant for body that doesn't exist.
-		static const body_id_t ID_NONE;
+		static const Body::id_t ID_NONE;
 		//! get Body pointer given its id. 
-		static const shared_ptr<Body>& byId(body_id_t _id,Scene* rb=NULL);
-		static const shared_ptr<Body>& byId(body_id_t _id,shared_ptr<Scene> rb);
+		static const shared_ptr<Body>& byId(Body::id_t _id,Scene* rb=NULL);
+		static const shared_ptr<Body>& byId(Body::id_t _id,shared_ptr<Scene> rb);
 
 		
 		//! Whether this Body is a Clump.
@@ -61,7 +60,7 @@ class Body: public Serializable{
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
 		virtual void userForcedDisplacementRedrawHook(){return;}
 
-		body_id_t getId() const {return id;};
+		Body::id_t getId() const {return id;};
 
 		int getGroupMask() {return groupMask; };
 		bool maskOk(int mask){return (mask==0 || (groupMask&mask));}
@@ -70,10 +69,10 @@ class Body: public Serializable{
 		friend class BodyContainer;
 
 		// Constructor/Destructor
-		Body (body_id_t newId, int newGroup);
+		Body (Body::id_t newId, int newGroup);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
-		((body_id_t,id,Body::ID_NONE,"[will be overridden]"))
+		((Body::id_t,id,Body::ID_NONE,"[will be overridden]"))
 
 		((int,groupMask,1,"Bitmask for determining interactions."))
 		((int,flags,FLAG_DYNAMIC | FLAG_BOUNDED,"|ynodoc| Bits of various flags; do not access this attribute directly, use :yref:`dynamic <Body.dynamic>`, :yref:`bounded <Body.bounded>` instead (in ``c++``, use ``isDynamic()``/``setDynamic(bool)`` and ``isBounded()``/``setBounded(bool)`` inlines for access)."))

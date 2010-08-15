@@ -83,17 +83,17 @@ class pyBodyContainer{
 	const shared_ptr<BodyContainer> proxee;
 	pyBodyIterator pyIter(){return pyBodyIterator(proxee);}
 	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
-	shared_ptr<Body> pyGetitem(body_id_t _id){
+	shared_ptr<Body> pyGetitem(Body::id_t _id){
 		int id=(_id>=0 ? _id : proxee->size()+_id);
 		if(id<0 || (size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
 		else return (*proxee)[id];
 	}
-	body_id_t append(shared_ptr<Body> b){
+	Body::id_t append(shared_ptr<Body> b){
 		// shoud be >=0, but Body is by default created with id 0... :-|
 		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); python::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
-	vector<body_id_t> appendList(vector<shared_ptr<Body> > bb){
+	vector<Body::id_t> appendList(vector<shared_ptr<Body> > bb){
 		/* prevent crash when adding lots of bodies (not clear why it happens exactly, bt is like this:
 
 			#3  <signal handler called>
@@ -113,26 +113,26 @@ class pyBodyContainer{
 		#else
 			boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
 		#endif
-		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
+		vector<Body::id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
 	}
 	python::tuple appendClump(vector<shared_ptr<Body> > bb){
 		// update clump members
-		vector<body_id_t> ids(appendList(bb));
+		vector<Body::id_t> ids(appendList(bb));
 		// create and add clump itself
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
 		shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
 		clump->setDynamic(true);
 		proxee->insert(clumpAsBody);
 		// add clump members to the clump
-		FOREACH(body_id_t id, ids) clump->add(id);
+		FOREACH(Body::id_t id, ids) clump->add(id);
 		// update clump
 		clump->updateProperties(false);
 		return python::make_tuple(clump->getId(),ids);
 	}
-	vector<body_id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
+	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
-	bool erase(body_id_t id){ return proxee->erase(id); }
+	bool erase(Body::id_t id){ return proxee->erase(id); }
 };
 
 
@@ -187,7 +187,7 @@ class pyInteractionContainer{
 		const shared_ptr<InteractionContainer> proxee;
 		pyInteractionContainer(const shared_ptr<InteractionContainer>& _proxee): proxee(_proxee){}
 		pyInteractionIterator pyIter(){return pyInteractionIterator(proxee);}
-		shared_ptr<Interaction> pyGetitem(vector<body_id_t> id12){
+		shared_ptr<Interaction> pyGetitem(vector<Body::id_t> id12){
 			//if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
 			//if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
 			if(id12.size()==2){

@@ -9,6 +9,7 @@
 
 #include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/core/Interaction.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -113,7 +114,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	scene->interactions->eraseNonReal();
 	// adjust Interaction::cellDist for real interactions; 
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
-		body_id_t id1=i->getId1(),id2=i->getId2();
+		Body::id_t id1=i->getId1(),id2=i->getId2();
 		// this must be the same for both old and new interaction: cell2-cell1+cellDist
 		// c₂-c₁+c₁₂=k; c'₂+c₁'+c₁₂'=k   (new cell coords have ')
 		// c₁₂'=(c₂-c₁+c₁₂)-(c₂'-c₁')
@@ -133,7 +134,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
  */
-void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* scene){
+void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, Body::id_t id1, const Vector3r& pos1, Body::id_t id2, const Vector3r& pos2, Scene* scene){
 	scene->forces.addForce(id1,force);
 	scene->forces.addForce(id2,-force);
 	scene->forces.addTorque(id1,(contPt-pos1).cross(force));
@@ -480,11 +481,11 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 	}
 }
 
-shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2, bool force){
+shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool force){
 	InteractionGeometryDispatcher* geomMeta=NULL;
 	InteractionPhysicsDispatcher* physMeta=NULL;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("Interaction #")+lexical_cast<string>(id1)+"+#"+lexical_cast<string>(id2)+" already exists.");
+	if(rb->interactions->find(Body::id_t(id1),Body::id_t(id2))!=0) throw runtime_error(string("Interaction #")+lexical_cast<string>(id1)+"+#"+lexical_cast<string>(id2)+" already exists.");
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsDispatcher*>(e.get()); if(physMeta) continue; }
@@ -1171,7 +1172,7 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 		Dem3DofGeom* geom=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
 		if(!phys) continue;
 		if(!geom) continue;
-		const body_id_t id1=I->getId1(), id2=I->getId2();
+		const Body::id_t id1=I->getId1(), id2=I->getId2();
 		
 		Real minRad=(geom->refR1<=0?geom->refR2:(geom->refR2<=0?geom->refR1:min(geom->refR1,geom->refR2)));
 		Real crossSection=Mathr::PI*pow(minRad,2);

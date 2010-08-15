@@ -17,14 +17,14 @@ void UniaxialStrainer::init(){
 	assert(posIds.size()>0);
 	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
-	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,scene); posCoords.push_back(b->state->pos[axis]);
+	FOREACH(Body::id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,scene); posCoords.push_back(b->state->pos[axis]);
 		if(blockDisplacements && blockRotations) b->state->blockedDOFs=State::DOF_ALL;
 		else{
 			if(!blockDisplacements) b->state->blockedDOFs=State::axisDOF(axis); else b->state->blockedDOFs=State::DOF_XYZ;
 			if(blockRotations) b->state->blockedDOFs|=State::DOF_RXRYRZ;
 		}
 	}
-	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,scene); negCoords.push_back(b->state->pos[axis]);
+	FOREACH(Body::id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,scene); negCoords.push_back(b->state->pos[axis]);
 		if(blockDisplacements && blockRotations) b->state->blockedDOFs=State::DOF_ALL;
 		else{
 			if(!blockDisplacements) b->state->blockedDOFs=State::axisDOF(axis); else b->state->blockedDOFs=State::DOF_XYZ;
@@ -136,6 +136,6 @@ void UniaxialStrainer::action(){
 void UniaxialStrainer::computeAxialForce(){
 	sumPosForces=sumNegForces=0;
 	scene->forces.sync();
-	FOREACH(body_id_t id, negIds) sumNegForces+=scene->forces.getForce(id)[axis];
-	FOREACH(body_id_t id, posIds) sumPosForces-=scene->forces.getForce(id)[axis];
+	FOREACH(Body::id_t id, negIds) sumNegForces+=scene->forces.getForce(id)[axis];
+	FOREACH(Body::id_t id, posIds) sumPosForces-=scene->forces.getForce(id)[axis];
 }

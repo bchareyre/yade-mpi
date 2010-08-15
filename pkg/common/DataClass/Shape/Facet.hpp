@@ -46,7 +46,7 @@ class Facet : public Shape {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Facet,Shape,"Facet (triangular particle) geometry.",
 		((vector<Vector3r>,vertices,vector<Vector3r>(3),"[overridden below]"))
 		#ifdef FACET_TOPO
-		((vector<body_id_t>,edgeAdjIds,vector<body_id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
+		((vector<Body::id_t>,edgeAdjIds,vector<Body::id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
 		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),"half angle between normals of this facet and the adjacent facet [experimental]"))
 		#endif
 		,

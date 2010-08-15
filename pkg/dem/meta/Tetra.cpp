@@ -371,7 +371,7 @@ void TetraVolumetricLaw::action()
 		const shared_ptr<TTetraGeom>& contactGeom(dynamic_pointer_cast<TTetraGeom>(I->interactionGeometry));
 		if(!contactGeom) continue;
 
-		const body_id_t idA=I->getId1(), idB=I->getId2();
+		const Body::id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 			
 		const shared_ptr<ElastMat>& physA(dynamic_pointer_cast<ElastMat>(A->material));

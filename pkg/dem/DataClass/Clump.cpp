@@ -40,7 +40,7 @@ void ClumpMemberMover::action(){
  * @pre Body must have valid (non-NULL) Body::physicalParameters
  * @pre Body must have id that is smaller than the clump's id (reason: processing order in NewtonIntegrator)
  */
-void Clump::add(body_id_t subId){
+void Clump::add(Body::id_t subId){
 	shared_ptr<Body> subBody=Body::byId(subId);
 
 	// preconditions
@@ -62,7 +62,7 @@ void Clump::add(body_id_t subId){
 
 /*! @pre Body with given id must be in the clump.
  */
-void Clump::del(body_id_t subId){
+void Clump::del(Body::id_t subId){
 	// erase the subBody; removing body that is not part of the clump is error
 	assert(members.erase(subId)==1);
 	// restore body's internal parameters;

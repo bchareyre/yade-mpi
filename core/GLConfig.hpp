@@ -12,7 +12,7 @@ Contains more or less what used to be inside OpenGLRenderer.
 class GLConfig: public Serializable{
 
 	Vector3r lightPos,bgColor;
-	body_id_t currSel;
+	Body::id_t currSel;
 	bool dof,id,bbox,geom,wire,intrGeom,intrPhys;
 	int mask;
 	bool scaleDisplacements,scaleRotations;

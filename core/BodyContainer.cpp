@@ -14,7 +14,7 @@ unsigned int BodyContainer::findFreeId(){
 }
 
 unsigned int BodyContainer::insert(shared_ptr<Body>& b){
-	body_id_t newId=findFreeId();
+	Body::id_t newId=findFreeId();
 	return insert(b,newId);
 }
 

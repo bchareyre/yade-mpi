@@ -63,10 +63,10 @@ class LawFunctor: public Functor2D<
 >{
 	public: virtual ~LawFunctor();
 	/*! Convenience functions to get forces/torques quickly. */
-	void addForce (const body_id_t id, const Vector3r& f,Scene* rb){rb->forces.addForce (id,f);}
-	void addTorque(const body_id_t id, const Vector3r& t,Scene* rb){rb->forces.addTorque(id,t);}
+	void addForce (const Body::id_t id, const Vector3r& f,Scene* rb){rb->forces.addForce (id,f);}
+	void addTorque(const Body::id_t id, const Vector3r& t,Scene* rb){rb->forces.addTorque(id,t);}
 	/*! Convenience function to apply force and torque from one force at contact point. Not sure if this is the right place for it. */
-	void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contactPoint, const body_id_t id1, const Vector3r& pos1, const body_id_t id2, const Vector3r& pos2){
+	void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contactPoint, const Body::id_t id1, const Vector3r& pos1, const Body::id_t id2, const Vector3r& pos2){
 		addForce(id1, force,scene); addTorque(id1, (contactPoint-pos1).cross(force),scene);
 		addForce(id2,-force,scene); addTorque(id2,-(contactPoint-pos2).cross(force),scene);
 	}

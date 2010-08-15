@@ -81,7 +81,7 @@ class Scene: public Serializable{
 
 		bool needsInitializers;
 		// for GL selection
-		body_id_t selectedBody;
+		Body::id_t selectedBody;
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(Serializable,

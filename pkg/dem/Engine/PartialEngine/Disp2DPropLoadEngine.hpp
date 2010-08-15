@@ -54,12 +54,12 @@ class Disp2DPropLoadEngine : public BoundaryController
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Disp2DPropLoadEngine,BoundaryController,
 		"Disturbs a simple shear sample in a given displacement direction\n\nThis engine allows to apply, on a simple shear sample, a loading controlled by du/dgamma = cste, which is equivalent to du + cste' * dgamma = 0 (proportionnal path loadings).\nTo do so, the upper plate of the simple shear box is moved in a given direction (corresponding to a given du/dgamma), whereas lateral plates are moved so that the box remains closed.\nThis engine can easily be used to perform directionnal probes, with a python script launching successivly the same .xml which contains this engine, after having modified the direction of loading (see *theta* attribute). That's why this Engine contains a *saveData* procedure which can save data on the state of the sample at the end of the loading (in case of successive loadings - for successive directions - through a python script, each line would correspond to one direction of loading).",
-		((body_id_t,id_topbox,3,"the id of the upper wall"))
-		((body_id_t,id_boxbas,1,"the id of the lower wall"))
-		((body_id_t,id_boxleft,0,"the id of the left wall"))
-		((body_id_t,id_boxright,2,"the id of the right wall"))
-		((body_id_t,id_boxfront,5,"the id of the wall in front of the sample"))
-		((body_id_t,id_boxback,4,"the id of the wall at the back of the sample"))
+		((Body::id_t,id_topbox,3,"the id of the upper wall"))
+		((Body::id_t,id_boxbas,1,"the id of the lower wall"))
+		((Body::id_t,id_boxleft,0,"the id of the left wall"))
+		((Body::id_t,id_boxright,2,"the id of the right wall"))
+		((Body::id_t,id_boxfront,5,"the id of the wall in front of the sample"))
+		((Body::id_t,id_boxback,4,"the id of the wall at the back of the sample"))
 		((Real,theta,0.0,"the angle, in a (gamma,h=-u) plane from the gamma - axis to the perturbation vector (trigo wise) [degrees]"))
 		((Real,v,0.0,"the speed at which the perturbation is imposed. In case of samples which are more sensitive to normal loadings than tangential ones, one possibility is to take v = V_shear - | (V_shear-V_comp)*sin(theta) | => v=V_shear in shear; V_comp in compression [m/s]"))
 		((int,nbre_iter,0,"the number of iterations of loading to perform"))
