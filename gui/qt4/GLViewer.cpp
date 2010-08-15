@@ -11,7 +11,6 @@
 #include"GLViewer.hpp"
 #include"OpenGLManager.hpp"
 
-#include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>

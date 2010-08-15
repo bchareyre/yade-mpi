@@ -384,8 +384,6 @@ class SerializableEditor(QFrame):
 			if e.widget and not e.widget.hot: e.widget.refresh()
 	def refresh(self): pass
 
-from yade.qt.ui_SeqSerializable import Ui_SeqSerializable
-
 def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1):
 	ret=u''
 	if num>=0: ret+=u'%d. '%num

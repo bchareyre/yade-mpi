@@ -20,12 +20,6 @@ class FileGenerator
 {
 	protected :
 		shared_ptr<Scene>	 rootBody;
-		#ifndef YADE_NO_YADE_SERIALIZATION
-			string serializationDynlib;
-		public:
-			void setSerializationLibrary(const string& lib);
-			std::string getSerializationLibrary() {return serializationDynlib;};
-		#endif
 	public :
 		bool generateAndSave();
 		void setFileName(const string& fileName);
@@ -44,9 +38,7 @@ class FileGenerator
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(FileGenerator,Serializable,"Base class for scene generators, preprocessors.",
 		((string,outputFileName,"./scene.xml","Filename to write resulting simulation to")),
-		#ifndef YADE_NO_YADE_SERIALIZATION
-			/* ctor */ serializationDynlib="XMLFormatManager";
-		#endif
+		/*ctor*/
 		,
 		.def("generate",&FileGenerator::pyGenerate,(python::arg("out")),"Generate scene, save to given file")
 		.def("load",&FileGenerator::pyLoad,"Generate scene, save to temporary file and load immediately");

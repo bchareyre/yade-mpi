@@ -486,9 +486,6 @@ shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Bo
 void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
 
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile);
-	#ifndef YADE_NO_YADE_SERIALIZATION
-		fg->setSerializationLibrary("XMLFormatManager");
-	#endif
 	bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message);
 };
 void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }

@@ -9,14 +9,11 @@ def yadeStaticOrSharedLib(*args,**kw):
 	#return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary(*args,**kw))
 
 if 'opengl' in env['features']:
-	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','GLU']),
-	if 'qt3' in env['features']:
-		yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],LIBS=['yade-support'])
+	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','GLU']),
 
 yadeStaticOrSharedLib('yade-support',[
 	env.Combine('yade-support.cpp',['base/Math.cpp']+
 		['factory/ClassFactory.cpp','factory/DynLibManager.cpp','multimethods/Indexable.cpp','serialization/Serializable.cpp','pyutil/gil.cpp']
-		+([] if not 'qt3' in env['features'] else ['serialization/SerializableSingleton.cpp','serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/SerializationExceptions.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp'])
 		# compile TesselationWrapper only if cgal is enabled
 		+(Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/Timer.cpp triangulation/basicVTKwritter.cpp triangulation/FlowBoundingSphere.cpp triangulation/Deformation.cpp triangulation/Empilement.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TriaxialState.cpp') if 'cgal' in env['features'] else [])),
 	],LIBS=['dl','m']+[],CXXFLAGS=env['CXXFLAGS']+['-fPIC']

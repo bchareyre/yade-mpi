@@ -34,8 +34,9 @@
 #include <iostream>
 
 #include<yade/lib-base/Math.hpp>
-#include<yade/lib-loki/Singleton.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
+
+#include<yade/lib-base/Singleton.hpp>
 
 #include "SimulationFlow.hpp"
 

@@ -139,7 +139,7 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','noqt3','qt3','qt4','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','qt4','never_use_this_one']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -149,7 +149,6 @@ opts.AddVariables(
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
-	('QTDIR','Directories where to look for qt3','/usr/share/qt3:/usr/lib/qt:/usr/lib/qt3:/usr/qt/3:/usr/lib/qt-3.3:/usr/share/qt4'),
 	('QT4DIR','Directory where Qt4 is installed','/usr/share/qt4'),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
 	('CXX','The c++ compiler','g++'),
@@ -164,14 +163,6 @@ opts.Update(env)
 
 if str(env['features'])=='all':
 	print 'ERROR: using "features=all" is illegal, since it breaks feature detection at runtime (SCons limitation). Write out all features separated by commas instead. Sorry.'
-	Exit(1)
-
-if 'noqt3' in env['features']:
-	print 'WARNING: noqt3 feature is deprecated, use qt4 instead.'
-	if 'qt4' not in env['features']: env['features'].append('qt4')
-
-if 'qt3' in env['features'] and 'qt4' in env['features']:
-	print 'ERROR: you specified both qt3 and qt4 features, which are mutually exclusive'
 	Exit(1)
 
 opts.Save(optsFile,env)
@@ -259,22 +250,23 @@ if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' i
 # ensure non-None
 env.Append(CPPPATH='',LIBPATH='',LIBS='',CXXFLAGS='',SHCCFLAGS='')
 
-def CheckQt(context, qtdirs):
-	"Attempts to localize qt3 installation in given qtdirs. Sets necessary variables if found and returns True; otherwise returns False."
-	# make sure they exist and save them for restoring if a test fails
-	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH']}
-	qtdirs=qtdirs[0].split()
-	for qtdir in qtdirs:
-		context.Message( 'Checking for qt-mt in '+qtdir+'... ' )
-		context.env['QTDIR']=qtdir
-		context.env.Append(LIBS='qt-mt',LIBPATH=qtdir+'/lib',CPPPATH=qtdir+'/include' )
-		ret=context.TryLink('#include<qapplication.h>\nint main(int argc, char **argv){QApplication qapp(argc, argv);return 0;}\n','.cpp')
-		context.Result(ret)
-		if not ret:
-			for k in origs.keys(): context.env[k]=origs[k]
-		else:
-			return ret
-	return False
+if 0:
+	def CheckQt(context, qtdirs):
+		"Attempts to localize qt3 installation in given qtdirs. Sets necessary variables if found and returns True; otherwise returns False."
+		# make sure they exist and save them for restoring if a test fails
+		origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH']}
+		qtdirs=qtdirs[0].split()
+		for qtdir in qtdirs:
+			context.Message( 'Checking for qt-mt in '+qtdir+'... ' )
+			context.env['QTDIR']=qtdir
+			context.env.Append(LIBS='qt-mt',LIBPATH=qtdir+'/lib',CPPPATH=qtdir+'/include' )
+			ret=context.TryLink('#include<qapplication.h>\nint main(int argc, char **argv){QApplication qapp(argc, argv);return 0;}\n','.cpp')
+			context.Result(ret)
+			if not ret:
+				for k in origs.keys(): context.env[k]=origs[k]
+			else:
+				return ret
+		return False
 
 
 def CheckCXX(context):
@@ -348,7 +340,7 @@ def CheckPythonModules(context):
 	
 
 if not env.GetOption('clean'):
-	conf=env.Configure(custom_tests={'CheckLibStdCxx':CheckLibStdCxx,'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckBoost':CheckBoost,'CheckPython':CheckPython,'CheckPythonModules':CheckPythonModules},
+	conf=env.Configure(custom_tests={'CheckLibStdCxx':CheckLibStdCxx,'CheckCXX':CheckCXX,'CheckBoost':CheckBoost,'CheckPython':CheckPython,'CheckPythonModules':CheckPythonModules}, # 'CheckQt':CheckQt
 		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log'
 	)
 	ok=True
@@ -364,6 +356,7 @@ if not env.GetOption('clean'):
 	env['haveForeach']=conf.CheckCXXHeader('boost/foreach.hpp','<>')
 	if not env['haveForeach']: print "(OK, local version will be used instead)"
 	ok&=conf.CheckCXXHeader('Eigen/Core')
+	ok&=conf.CheckCXXHeader('loki/NullType.h')
 	# for installable stript's shebang ( http://en.wikipedia.org/wiki/Shebang_(Unix) )
 	env['pyExecutable']=sys.executable
 
@@ -379,13 +372,6 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
 		# TODO ok=True for darwin platform where openGL (and glut) is native
 		if not ok: featureNotOK('opengl')
-		if 'qt3' in env['features']:
-			ok=conf.CheckQt(env['QTDIR'])
-			if not ok: featureNotOK('opengl','Building with OpenGL implies qt3 interface, which was not found, although OpenGL was.')
-			env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
-			ok=conf.CheckLibWithHeader(['qglviewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=0)
-			if not ok: featureNotOK('opengl','Building with OpenGL implies the QGLViewer library installed (libqglviewer-qt3-dev package in debian/ubuntu)')
-			env['QGLVIEWER_LIB']='qglviewer-qt3';
 		if 'qt4' in env['features']:
 			env['ENV']['PKG_CONFIG_PATH']='/usr/bin/pkg-config'
 			env.Tool('qt4')

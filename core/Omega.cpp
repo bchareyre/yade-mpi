@@ -13,10 +13,6 @@
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
 #include<yade/lib-base/Math.hpp>
-#ifndef YADE_NO_YADE_SERIALIZATION
-	#include<yade/lib-serialization/IOFormatManager.hpp>
-	#include<yade/lib-serialization/FormatChecker.hpp>
-#endif
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<cstdlib>
