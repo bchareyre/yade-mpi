@@ -134,7 +134,7 @@ def customExclude(app, what, name, obj, skip, options):
 	if name=='clone':
 		if 'Serializable.clone' in str(obj): return False
 		return True
-	if hasattr(obj,'__doc__') and obj.__doc__ and ('|ydeprecated|' in obj.__doc__ or '|ynodoc|' in obj.__doc__): return True
+	if hasattr(obj,'__doc__') and obj.__doc__ and ('|ydeprecated|' in obj.__doc__ or '|yhidden|' in obj.__doc__): return True
 	#if re.match(r'\b(__init__|__reduce__|__repr__|__str__)\b',name): return True
 	if name.startswith('_'):
 		if name=='__init__':

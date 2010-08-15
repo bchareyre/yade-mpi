@@ -11,7 +11,6 @@ YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (Bo1_Tetra_Aabb)
 
 Tetra::~Tetra(){}
 TTetraGeom::~TTetraGeom(){}
-Bo1_Tetra_Aabb::~Bo1_Tetra_Aabb(){}
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
@@ -21,6 +20,17 @@ Bo1_Tetra_Aabb::~Bo1_Tetra_Aabb(){}
 
 #include<yade/pkg-common/Aabb.hpp>
 
+void Bo1_Tetra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
+	Tetra* t=static_cast<Tetra*>(ig.get());
+	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
+	Quaternionr invRot=se3.orientation.conjugate();
+	Vector3r v_g[4]; for(int i=0; i<4; i++) v_g[i]=se3.orientation*t->v[i]; // vertices in global coordinates
+	#define __VOP(op,ix) op(v_g[0][ix],op(v_g[1][ix],op(v_g[2][ix],v_g[3][ix])))
+		aabb->min=se3.position+Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
+		aabb->max=se3.position+Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
+	#undef __VOP
+}
 
 CREATE_LOGGER(Ig2_Tetra_Tetra_TTetraGeom);
 

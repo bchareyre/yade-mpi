@@ -57,18 +57,8 @@ REGISTER_SERIALIZABLE(TTetraGeom);
  * Self-contained. */
 class Bo1_Tetra_Aabb: public BoundFunctor{
 	public:
-		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
-			Tetra* t=static_cast<Tetra*>(ig.get());
-			Aabb* aabb=static_cast<Aabb*>(bv.get());
-			Quaternionr invRot=se3.orientation.conjugate();
-			Vector3r v_g[4]; for(int i=0; i<4; i++) v_g[i]=se3.orientation*t->v[i]; // vertices in global coordinates
-			#define __VOP(op,ix) op(v_g[0][ix],op(v_g[1][ix],op(v_g[2][ix],v_g[3][ix])))
-				aabb->min=se3.position+Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
-				aabb->max=se3.position+Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
-			#undef __VOP
-		}
-		virtual ~Bo1_Tetra_Aabb();
-		FUNCTOR2D(Tetra,Aabb);
+		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
+		FUNCTOR1D(Tetra);
 	YADE_CLASS_BASE_DOC(Bo1_Tetra_Aabb,BoundFunctor,"Create/update :yref:`Aabb` of a :yref:`Tetra`");
 };
 REGISTER_SERIALIZABLE(Bo1_Tetra_Aabb);

@@ -12,7 +12,8 @@
 
 void Bo1_Sphere_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Sphere* sphere = static_cast<Sphere*>(cm.get());
-	Aabb* aabb = static_cast<Aabb*>(bv.get());
+	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	Vector3r halfSize = (aabbEnlargeFactor>0?aabbEnlargeFactor:1.)*Vector3r(sphere->radius,sphere->radius,sphere->radius);
 	if(!scene->isPeriodic){
 		aabb->min=se3.position-halfSize; aabb->max=se3.position+halfSize;

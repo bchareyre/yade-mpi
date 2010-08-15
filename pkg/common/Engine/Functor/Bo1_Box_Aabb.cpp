@@ -14,10 +14,11 @@
 void Bo1_Box_Aabb::go(	const shared_ptr<Shape>& cm,
 				shared_ptr<Bound>& bv,
 				const Se3r& se3,
-				const Body*	)
+				const Body*	b)
 {
 	Box* box = static_cast<Box*>(cm.get());
-	Aabb* aabb = static_cast<Aabb*>(bv.get());
+	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
 
 	if(scene->isPeriodic && scene->cell->hasShear()) throw logic_error(__FILE__ "Boxes not (yet?) supported in sheared cell.");
 	

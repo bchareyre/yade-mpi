@@ -1807,7 +1807,7 @@ When an object is passed from c++ to python or vice versa, then either
 #. the type is basic type which is transparently passed between c++ and python (int, bool, std::string etc)
 #. the type is wrapped by boost::python (such as Yade classes, ``Vector3`` and so on), in which case wrapped object is returned; [#wrap]_
 
-Other classes, including template containers such as ``std::vector`` must have their custom converters written separately. Some of them are provided in :ysrc:`py/yadeWrapper/customConverters.cpp`, notably converters between python (homogeneous, i.e. with all elements of the same type) sequences and c++ ``std::vector`` of corresponding type; look in that source file to add your own converter or for inspiration.
+Other classes, including template containers such as ``std::vector`` must have their custom converters written separately. Some of them are provided in :ysrc:`py/wrapper/customConverters.cpp`, notably converters between python (homogeneous, i.e. with all elements of the same type) sequences and c++ ``std::vector`` of corresponding type; look in that source file to add your own converter or for inspiration.
 
 When an object is crossing c++/python boundary, boost::python's global "converters registry" is searched for class that can perform conversion between corresponding c++ and python types. The "converters registry" is common for the whole program instance: there is no need to register converters in each script (by importing ``_customConverters``, for instance), as that is done by yade at startup already.
 

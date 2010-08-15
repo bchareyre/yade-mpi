@@ -253,7 +253,8 @@ void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quate
 
 void Bo1_Cylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Cylinder* cylinder = static_cast<Cylinder*>(cm.get());
-	Aabb* aabb = static_cast<Aabb*>(bv.get());
+	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	if(!scene->isPeriodic){
 		const Vector3r& O = se3.position;
 		Vector3r O2 = se3.position+se3.orientation*cylinder->segment;
@@ -283,7 +284,8 @@ void Bo1_Cylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, c
 
 void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Cylinder* cylinder = static_cast<Cylinder*>(cm.get());
-	Aabb* aabb = static_cast<Aabb*>(bv.get());
+	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	if(!scene->isPeriodic){
 		const Vector3r& O = se3.position;
 		Vector3r O2 = se3.position+cylinder->segment;

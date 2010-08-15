@@ -49,12 +49,6 @@ class Body: public Serializable{
 		bool isBounded() const {return flags & FLAG_BOUNDED; }
 		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
 
-		#if 0
-			// future versions: make sure state is not NULL when called
-			bool isDynamic() const { return state->blockedDOFs!=State::DOF_ALL; }
-			setDynamic(bool dyn) { state->blockedDOFs=State::DOF_ALL; }
-		#endif
-
 		/*! Hook for clump to update position of members when user-forced reposition and redraw (through GUI) occurs.
 		 * This is useful only in cases when engines that do that in every iteration are not active - i.e. when the simulation is paused.
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
@@ -75,7 +69,7 @@ class Body: public Serializable{
 		((Body::id_t,id,Body::ID_NONE,"[will be overridden]"))
 
 		((int,groupMask,1,"Bitmask for determining interactions."))
-		((int,flags,FLAG_DYNAMIC | FLAG_BOUNDED,"|ynodoc| Bits of various flags; do not access this attribute directly, use :yref:`dynamic <Body.dynamic>`, :yref:`bounded <Body.bounded>` instead (in ``c++``, use ``isDynamic()``/``setDynamic(bool)`` and ``isBounded()``/``setBounded(bool)`` inlines for access)."))
+		((int,flags,FLAG_DYNAMIC | FLAG_BOUNDED,"DO NOT ACCESS DIRECTLY; documented below"))
 
 		((shared_ptr<Material>,material,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,"Physical :yref:`state<State>`."))
@@ -85,12 +79,15 @@ class Body: public Serializable{
 		((int,clumpId,Body::ID_NONE,"[will be overridden]")),
 		/* ctor */,
 		/* py */
+		// make those read-only from python
 		.def_readonly("id",&Body::id,"Unique id of this body") // overwrites automatic def_readwrite("id",...) earlier
 		.def_readonly("clumpId",&Body::clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")
+		.def_readonly("flags",&Body::flags,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded. In python, use :yref:`Body.dynamic` and :yref:`Body.bounded`. :ydefault:`FLAG_DYNAMIC | FLAG_BOUNDED` ")
+		//
 		.def_readwrite("mat",&Body::material,"Shorthand for :yref:`Body::material`")
 		.add_property("isDynamic",&Body::isDynamic,&Body::setDynamic,"Deprecated synonym for :yref:`Body::dynamic` |ydeprecated|")
-		.add_property("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether this body will be moved by forces. :ydefault:`true`")
-		.add_property("bounded",&Body::isBounded,&Body::setBounded,"Whether this body should have :yref:`Body.bound` created. Note that bodies without a :yref:`bound <Body.bound>` do not participate in collision detection. :ydefault:`true`")
+		.add_property("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether this body will be moved by forces. (In c++, use ``Body::isDynamic``/``Body::setDynamic``) :ydefault:`true`")
+		.add_property("bounded",&Body::isBounded,&Body::setBounded,"Whether this body should have :yref:`Body.bound` created. Note that bodies without a :yref:`bound <Body.bound>` do not participate in collision detection. (In c++, use ``Body::isBounded``/``Body::setBounded``) :ydefault:`true`")
 		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")

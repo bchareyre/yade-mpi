@@ -315,6 +315,8 @@ class SerializableEditor(QFrame):
 		for attr in attrs:
 			val=getattr(self.ser,attr) # get the value using serattr, as it might be different from what the dictionary provides (e.g. Body.blockedDOFs)
 			t=None
+			doc=getattr(self.ser.__class__,attr).__doc__;
+			if '|yhidden|' in doc: continue
 			if attr in self.ignoredAttrs or attr=='blockedDOFs': # HACK here
 				continue
 			if isinstance(val,list):

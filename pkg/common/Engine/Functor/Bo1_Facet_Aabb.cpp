@@ -13,9 +13,10 @@
 void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
-				, const Body*)
+				, const Body* b)
 {
-	Aabb* aabb = static_cast<Aabb*>(bv.get());
+	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	Facet* facet = static_cast<Facet*>(cm.get());
 	const Vector3r& O = se3.position;
 	Matrix3r facetAxisT=se3.orientation.toRotationMatrix();

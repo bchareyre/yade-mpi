@@ -25,16 +25,17 @@ void BoundDispatcher::action()
 	for(int id=0; id<numBodies; id++){
 		if(!bodies->exists(id)) continue; // don't delete this check  - Janek
 		const shared_ptr<Body>& b=(*bodies)[id];
-		shared_ptr<Shape>& ig=b->shape;
-		if(!ig || !b->bound) continue;
+		shared_ptr<Shape>& shape=b->shape;
+		if(!shape || !b->isBounded()) continue;
 		#ifdef BV_FUNCTOR_CACHE
-			if(!ig->boundFunctor){ bool swap=false; ig->boundFunctor=this->getFunctor2D(ig,b->bound,swap); /* no sense, different types: */ assert(!swap); if(!ig->boundFunctor) continue; }
-			// LOG_DEBUG("ig->boundFunctor.get()=="<<ig->boundFunctor.get()<<" for "<<b->shape->getClassName()<<", #"<<id);
-			//if(!ig->boundFunctor) throw runtime_error("boundFunctor not found for #"+lexical_cast<string>(id)); assert(ig->boundFunctor);
-			ig->boundFunctor->go(ig,b->bound,b->state->se3,b.get());
+			if(!shape->boundFunctor){ shape->boundFunctor=this->getFunctor1D(shape); if(!shape->boundFunctor) continue; }
+			// LOG_DEBUG("shape->boundFunctor.get()=="<<shape->boundFunctor.get()<<" for "<<b->shape->getClassName()<<", #"<<id);
+			//if(!shape->boundFunctor) throw runtime_error("boundFunctor not found for #"+lexical_cast<string>(id)); assert(shape->boundFunctor);
+			shape->boundFunctor->go(shape,b->bound,b->state->se3,b.get());
 		#else
-			operator()(ig,b->bound,b->state->se3,b.get());
+			operator()(shape,b->bound,b->state->se3,b.get());
 		#endif
+		if(!b->bound) continue; // the functor did not create new bound
 		if(sweepDist>0){
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
 			aabb->min-=Vector3r(sweepDist,sweepDist,sweepDist);

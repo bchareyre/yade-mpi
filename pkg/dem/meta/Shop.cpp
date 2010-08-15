@@ -17,6 +17,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
+#include<yade/pkg-dem/ViscoelasticPM.hpp>
 
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg-common/Bo1_Box_Aabb.hpp>
@@ -24,12 +25,6 @@
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
-//#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
-#include<yade/pkg-dem/ViscoelasticPM.hpp>
-/*class Bo1_Sphere_Aabb;
-class Bo1_Box_Aabb;
-class SceneShape; */
-
 
 #include<yade/pkg-common/ForceResetter.hpp>
 

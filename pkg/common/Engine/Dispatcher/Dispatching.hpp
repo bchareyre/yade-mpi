@@ -17,8 +17,8 @@ class VelocityBins;
 	functors
 *********************/
 
-class BoundFunctor: public Functor2D<
-	/*dispatch types*/ Shape, Bound,
+class BoundFunctor: public Functor1D<
+	/*dispatch types*/ Shape,
 	/*return type*/    void ,
 	/*argument types*/ TYPELIST_4(const shared_ptr<Shape>&, shared_ptr<Bound>&, const Se3r&, const Body*)
 >{
@@ -79,7 +79,7 @@ REGISTER_SERIALIZABLE(LawFunctor);
 	dispatchers
 *********************/
 
-class BoundDispatcher: public Dispatcher2D<	
+class BoundDispatcher: public Dispatcher1D<	
 	/* functor type*/ BoundFunctor
 >{
 	public:
@@ -87,7 +87,7 @@ class BoundDispatcher: public Dispatcher2D<
 		virtual bool isActivated(){ return activated; }
 		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
-	YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(BoundDispatcher,BoundFunctor,/*optional doc*/,
+	YADE_DISPATCHER1D_FUNCTOR_DOC_ATTRS_CTOR_PY(BoundDispatcher,BoundFunctor,/*optional doc*/,
 		/*additional attrs*/
 		((bool,activated,true,"Whether the engine is activated (only should be changed by the collider)"))
 		((Real,sweepDist,0,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider)."))

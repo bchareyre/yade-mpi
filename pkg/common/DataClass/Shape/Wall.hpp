@@ -22,7 +22,7 @@ REGISTER_SERIALIZABLE(Wall);
 class Bo1_Wall_Aabb: public BoundFunctor{
 	public:
 		virtual void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
-	FUNCTOR2D(Wall,Aabb);
+	FUNCTOR1D(Wall);
 	YADE_CLASS_BASE_DOC(Bo1_Wall_Aabb,BoundFunctor,"Creates/updates an :yref:`Aabb` of a :yref:`Wall`");
 };
 REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
