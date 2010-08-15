@@ -18,6 +18,7 @@
 #include"DisplayParameters.hpp"
 #include"ForceContainer.hpp"
 #include"GroupRelationData.hpp"
+#include"InteractionContainer.hpp"
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255 

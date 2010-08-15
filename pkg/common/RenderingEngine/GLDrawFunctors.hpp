@@ -11,6 +11,7 @@
 #include<yade/core/Dispatcher.hpp>
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionPhysics.hpp>
 
 #define RENDERS(name) public: virtual string renders() const { return #name;}; FUNCTOR1D(name);

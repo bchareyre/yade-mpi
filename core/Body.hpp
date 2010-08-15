@@ -15,22 +15,18 @@
 #include"State.hpp"
 #include"Material.hpp"
 
-#include"InteractionContainer.hpp"
-#include"Interaction.hpp"
-
 #include<yade/lib-base/Math.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
-#define ISDYNAMIC_REDEFINED
-
 class Scene;
 
+typedef int body_id_t;
+
 class Body: public Serializable{
-	public	:
-		/*! \brief Numerical type for ::Body::id.
-		 * \bug  Current code mixes signed and unsigned int, this might be a way to enforce consistence. */
-		// typedef unsigned int id_t;
+	public:
+		// bits for Body::flags
+		enum { FLAG_DYNAMIC=1, FLAG_BOUNDED=2 }; /* add powers of 2 as needed */
 		//! symbolic constant for body that doesn't exist.
 		static const body_id_t ID_NONE;
 		//! get Body pointer given its id. 
@@ -45,15 +41,21 @@ class Body: public Serializable{
 		bool isClumpMember() const {return clumpId!=ID_NONE && id!=clumpId;}
 		//! Whether this body is standalone (neither Clump, nor member of a Clump)
 		bool isStandalone() const {return clumpId==ID_NONE;}
+
 		//! Whether this body has all DOFs blocked
-		// temporary versions
-		bool isDynamic() const {return dynamic;}
-		void setDynamic(bool dyn){ dynamic=dyn; }
+		// inline accessors
+		// logic: http://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit-in-c
+		bool isDynamic() const {return flags & FLAG_DYNAMIC; }
+		void setDynamic(bool d){ if(d) flags|=FLAG_DYNAMIC; else flags&=~(FLAG_DYNAMIC); }
+		bool isBounded() const {return flags & FLAG_BOUNDED; }
+		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
+
 		#if 0
 			// future versions: make sure state is not NULL when called
 			bool isDynamic() const { return state->blockedDOFs!=State::DOF_ALL; }
 			setDynamic(bool dyn) { state->blockedDOFs=State::DOF_ALL; }
 		#endif
+
 		/*! Hook for clump to update position of members when user-forced reposition and redraw (through GUI) occurs.
 		 * This is useful only in cases when engines that do that in every iteration are not active - i.e. when the simulation is paused.
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
@@ -72,8 +74,9 @@ class Body: public Serializable{
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
 		((body_id_t,id,Body::ID_NONE,"[will be overridden]"))
+
 		((int,groupMask,1,"Bitmask for determining interactions."))
-		((bool,dynamic,true,"Whether this body will be moved by forces."))
+		((int,flags,FLAG_DYNAMIC | FLAG_BOUNDED,"|ynodoc| Bits of various flags; do not access this attribute directly, use :yref:`dynamic <Body.dynamic>`, :yref:`bounded <Body.bounded>` instead (in ``c++``, use ``isDynamic()``/``setDynamic(bool)`` and ``isBounded()``/``setBounded(bool)`` inlines for access)."))
 
 		((shared_ptr<Material>,material,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,"Physical :yref:`state<State>`."))
@@ -87,7 +90,8 @@ class Body: public Serializable{
 		.def_readonly("clumpId",&Body::clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")
 		.def_readwrite("mat",&Body::material,"Shorthand for :yref:`Body::material`")
 		.add_property("isDynamic",&Body::isDynamic,&Body::setDynamic,"Deprecated synonym for :yref:`Body::dynamic` |ydeprecated|")
-		// .def_readwrite("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether the body will be moved by forces.")
+		.add_property("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether this body will be moved by forces. :ydefault:`true`")
+		.add_property("bounded",&Body::isBounded,&Body::setBounded,"Whether this body should have :yref:`Body.bound` created. Note that bodies without a :yref:`bound <Body.bound>` do not participate in collision detection. :ydefault:`true`")
 		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")

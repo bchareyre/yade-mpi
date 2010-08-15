@@ -3,16 +3,13 @@
 //
 #pragma once
 #include<yade/lib-serialization/Serializable.hpp>
-#include"InteractionGeometry.hpp"
-#include"InteractionPhysics.hpp"
+//#include<yade/core/InteractionGeometry.hpp>
+//#include<yade/core/InteractionPhysics.hpp>
+#include<yade/core/Body.hpp>
 
 
-/////////////////////////////////
-// FIXME - this is in wrong file!
-//#include<boost/strong_typedef.hpp>
-//BOOST_STRONG_TYPEDEF(int, body_id_t)
-typedef int body_id_t;
-
+class InteractionGeometry;
+class InteractionPhysics;
 class InteractionGeometryFunctor;
 class InteractionPhysicsFunctor;
 class LawFunctor;
