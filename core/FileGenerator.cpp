@@ -26,13 +26,6 @@ void FileGenerator::setFileName(const string& fileName)
 	outputFileName=fileName;
 }
 
-#ifndef YADE_NO_YADE_SERIALIZATION
-void FileGenerator::setSerializationLibrary(const string& lib) 
-{ 
-	serializationDynlib=lib;
-}
-#endif
-
 bool FileGenerator::generate() 
 {
 	message="FileGenerator (base class) generates nothing.";

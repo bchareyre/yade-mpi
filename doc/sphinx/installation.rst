@@ -50,18 +50,19 @@ Yade relies on a number of external software to run; its installation is checked
 * `eigen2 <http://eigen.tuxfamily.org>`_ algebra library
 * `gdb <http://www.gnu.org/software/gdb>`_ debugger
 * `sqlite3 <http://www.sqlite.org>`_ database engine
+* `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 
 Most of the list above is very likely already packaged for your distribution. In Ubuntu, it can be all installed by the following command (cut&paste to the terminal)::
 
-	sudo apt-get install scons libqt3-mt-dev qt3-dev-tools freeglut3-dev \
+	sudo apt-get install scons freeglut3-dev libloki-dev \
 	libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
 	libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
 	libboost-iostreams-dev liblog4cxx10-dev python-dev libboost-python-dev ipython \
 	python-matplotlib libsqlite3-dev python-numeric python-tk gnuplot doxygen \
 	libgts-dev python-pygraphviz libvtk5-dev python-scientific bzr libeigen2-dev \
-	libqglviewer-qt3-dev binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
-	libqglviewer-qt4-dev 
+	binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
+	libqglviewer-qt4-dev
 
 Compilation
 ^^^^^^^^^^^

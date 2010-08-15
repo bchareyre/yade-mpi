@@ -26,7 +26,8 @@
 #endif
 
 
-#include<yade/lib-loki/Singleton.hpp>
+#include<yade/lib-base/Singleton.hpp>
+
 #include<boost/preprocessor.hpp>
 
 
