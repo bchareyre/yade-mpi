@@ -54,7 +54,7 @@ void SpatialQuickSortCollider::action()
 	}
 	
 	const shared_ptr<InteractionContainer>& interactions=scene->interactions;
-	scene->interactions->iterColliderLastRun=scene->currentIteration;
+	scene->interactions->iterColliderLastRun=scene->iter;
 
 	sort(rank.begin(), rank.end(), xBoundComparator()); // sotring along X
 
@@ -80,7 +80,7 @@ void SpatialQuickSortCollider::action()
 					interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
 					interactions->insert(interaction);
 				}
-				interaction->iterLastSeen=scene->currentIteration; 
+				interaction->iterLastSeen=scene->iter; 
 			}
 	    }
 	}

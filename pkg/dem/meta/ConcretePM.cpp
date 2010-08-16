@@ -39,7 +39,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 		cpmPhys->tanFrictionAngle=tan(mat1->frictionAngle);
 		cpmPhys->undamagedCohesion=mat1->sigmaT;
 		cpmPhys->epsFracture=mat1->relDuctility*mat1->epsCrackOnset;
-		cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->currentIteration<cohesiveThresholdIter);
+		cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->iter<cohesiveThresholdIter);
 		#define _CPATTR(a) cpmPhys->a=mat1->a
 			_CPATTR(epsCrackOnset);
 			_CPATTR(neverDamage);
@@ -57,7 +57,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 			cpmPhys->tanFrictionAngle=tan(.5*(mat1->frictionAngle+mat2->frictionAngle));
 			cpmPhys->undamagedCohesion=.5*(mat1->sigmaT+mat2->sigmaT);
 			cpmPhys->epsFracture=.5*(mat1->relDuctility+mat2->relDuctility)*.5*(mat1->epsCrackOnset+mat2->epsCrackOnset);
-			cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->currentIteration<cohesiveThresholdIter);
+			cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->iter<cohesiveThresholdIter);
 			_AVGATTR(epsCrackOnset);
 			cpmPhys->neverDamage=(mat1->neverDamage || mat2->neverDamage);
 			_AVGATTR(dmgTau);

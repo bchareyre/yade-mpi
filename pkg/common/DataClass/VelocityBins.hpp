@@ -1,8 +1,9 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
 
-#include<yade/core/Interaction.hpp> // for Body::id_t
+#include<yade/core/Body.hpp> // for Body::id_t
 #include<yade/core/State.hpp>
+#include<yade/core/Interaction.hpp>
 #include<vector>
 #ifdef YADE_OPENMP
 	#include<omp.h>

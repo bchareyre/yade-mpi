@@ -189,7 +189,7 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 		
 		Real penetrationDepth=s1->radius+s2->radius-ss->refLength;
 		
-		if(Omega::instance().getCurrentIteration()<=10){
+		if(scene->iter<=10){
 			ss->effR1=s1->radius-.5*penetrationDepth; ss->effR2=s2->radius-.5*penetrationDepth;
 		} else {ss->effR1=s1->radius; ss->effR2=s2->radius;}
 		

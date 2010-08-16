@@ -32,14 +32,14 @@ void KinemCNSEngine::action()
 	else if (temoin<2)
 	{
 		stopMovement();		// INDISPENSABLE !
-		it_stop=Omega::instance().getCurrentIteration();
+		it_stop=scene->iter;
 		cout << "Cisaillement arrete : gammaLim atteint a l'iteration "<< it_stop << endl;
 		temoin=2;
 	}
-	else if (temoin==2 && (Omega::instance().getCurrentIteration()==(it_stop+5000)) )
+	else if (temoin==2 && (scene->iter==(it_stop+5000)) )
 	{
-		Omega::instance().saveSimulation(Key + "finCis" +lexical_cast<string> (Omega::instance().getCurrentIteration() ) + ".xml");
-		Omega::instance().stopSimulationLoop();
+		Omega::instance().saveSimulation(Key + "finCis" +lexical_cast<string> (scene->iter ) + ".xml");
+		Omega::instance().pause();
 	}
 
 }
@@ -48,7 +48,7 @@ void KinemCNSEngine::action()
 {
 	shared_ptr<BodyContainer> bodies = scene->bodies;
 
-	if(LOG) cout << "It : " << Omega::instance().getCurrentIteration() << endl;
+	if(LOG) cout << "It : " << scene->iter << endl;
 	
 
 	const Real& dt = scene->dt;

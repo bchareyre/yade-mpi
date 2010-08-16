@@ -99,12 +99,12 @@ void TriaxialCompressionEngine::updateParameters ()
 			}
 			// stop simulation if unloaded and compression is not activate automatically
 // 			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
-// 				Omega::instance().stopSimulationLoop();
+// 				Omega::instance().pause();
 // 			}
 		}
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
-// 			Omega::instance().stopSimulationLoop();
+// 			Omega::instance().pause();
 			return;
 		}
 	}
@@ -125,7 +125,7 @@ void TriaxialCompressionEngine::action()
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
 	}
-	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
+	if ( scene->iter % testEquilibriumInterval == 0 )
 	{
 		updateParameters ();
 		maxStress = max(maxStress,stress[wall_top][1]);
@@ -135,11 +135,11 @@ void TriaxialCompressionEngine::action()
 	{
 		if(!noFiles){
 			string fileName = "./"+ Key + "_" + Phase1End + "_" +
-							  lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
+							  lexical_cast<string> ( scene->iter ) + "_" +
 							  lexical_cast<string> ( currentState ) + ".xml";
 			LOG_INFO ( "saving snapshot: "<<fileName );
 			Omega::instance().saveSimulation ( fileName );
-			fileName="./"+ Key + "_"+Phase1End+"_"+lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
+			fileName="./"+ Key + "_"+Phase1End+"_"+lexical_cast<string> ( scene->iter ) + "_" +
 					 lexical_cast<string> ( currentState ) +".spheres";
 			LOG_INFO ( "saving spheres: "<<fileName );
 			Shop::saveSpheresToFile ( fileName );
@@ -148,18 +148,18 @@ void TriaxialCompressionEngine::action()
 	}
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{		
-// 		Omega::instance().stopSimulationLoop();
+// 		Omega::instance().pause();
 		return;
 	}
 	TriaxialStressController::action();
 
 	if ( currentState==STATE_TRIAX_LOADING )
 	{
-		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
+		if ( scene->iter % 100 == 0 )
 		{
 			LOG_INFO ("Triax Compression started");
 		}
-		if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
+		if (scene->iter % 100 == 0) LOG_DEBUG("Compression active.");
 		const Real& dt = scene->dt;
 		 
 		if (abs(epsilonMax) > abs(strain[1])) {
@@ -170,12 +170,12 @@ void TriaxialCompressionEngine::action()
 			State* p_top=Body::byId(wall_top_id,scene)->state.get();
 			p_top->pos -= 0.5*currentStrainRate*height*translationAxis*dt;
 		} else {
-// 			Omega::instance().stopSimulationLoop();
+// 			Omega::instance().pause();
 		}
 	}
 	if ( currentState==STATE_FIXED_POROSITY_COMPACTION )
 	{
-		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
+		if ( scene->iter % 100 == 0 )
 		{
 			LOG_INFO ("Compression started");
 		}		

@@ -26,7 +26,7 @@ void FlatGridCollider::action(){
 	}
 	fastestBodyMaxDist=0;
 	// make interaction loop delete unseen potential interactions
-	scene->interactions->iterColliderLastRun=scene->currentIteration;
+	scene->interactions->iterColliderLastRun=scene->iter;
 	// adjust grid if necessary
 	updateGrid();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -87,7 +87,7 @@ void FlatGridCollider::updateBodyCells(const shared_ptr<Body>& b){
 
 void FlatGridCollider::updateCollisions(){
 	shared_ptr<InteractionContainer>& intrs=scene->interactions;
-	const long& iter=scene->currentIteration;
+	const long& iter=scene->iter;
 	// create interactions for all combinations of bodies within one cell
 	FOREACH(const Grid::idVector& v, grid.data){
 		size_t sz=v.size();

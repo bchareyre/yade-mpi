@@ -48,20 +48,11 @@ SINGLETON_SELF(Omega);
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
-long int Omega::getCurrentIteration(){ return (scene?scene->currentIteration:-1); }
-void Omega::setCurrentIteration(long int i) { if(scene) scene->currentIteration=i; }
-
-Real Omega::getSimulationTime() { return scene?scene->simulationTime:-1;};
-
-void Omega::setSimulationFileName(const string f){simulationFileName = f;}
-string Omega::getSimulationFileName(){return simulationFileName;}
-
 const shared_ptr<Scene>& Omega::getScene(){return scene;}
-void Omega::setScene(shared_ptr<Scene>& rb){ RenderMutexLock lock; scene=rb;}
 void Omega::resetScene(){ RenderMutexLock lock; scene = shared_ptr<Scene>(new Scene);}
 
-Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartingSimulationTime).total_milliseconds()/1e3; }
-time_duration Omega::getComputationDuration(){return microsec_clock::local_time()-msStartingSimulationTime;}
+Real Omega::getRealTime(){ return (microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
+time_duration Omega::getRealTime_duration(){return microsec_clock::local_time()-startupLocalTime;}
 
 
 void Omega::initTemps(){
@@ -82,13 +73,12 @@ std::string Omega::tmpFilename(){
 }
 
 void Omega::reset(){
-	//finishSimulationLoop();
-	joinSimulationLoop();
+	stop();
 	init();
 }
 
 void Omega::init(){
-	simulationFileName="";
+	sceneFile="";
 	resetScene();
 	sceneAnother=shared_ptr<Scene>(new Scene);
 	timeInit();
@@ -96,25 +86,20 @@ void Omega::init(){
 }
 
 void Omega::timeInit(){
-	msStartingSimulationTime=microsec_clock::local_time();
+	startupLocalTime=microsec_clock::local_time();
 }
 
 void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
-void Omega::finishSimulationLoop(){ LOG_DEBUG(""); if (simulationLoop&&simulationLoop->looping())simulationLoop->stop();}
-void Omega::joinSimulationLoop(){ LOG_DEBUG(""); finishSimulationLoop(); if (simulationLoop) simulationLoop=shared_ptr<ThreadRunner>(); }
+void Omega::stop(){ LOG_DEBUG("");  if (simulationLoop&&simulationLoop->looping())simulationLoop->stop(); if (simulationLoop) simulationLoop=shared_ptr<ThreadRunner>(); }
 
-/* WARNING: single simulation is still run asynchronously; the call will return before the iteration is finished.
- */
-void Omega::spawnSingleSimulationLoop(){
+/* WARNING: even a single simulation step is run asynchronously; the call will return before the iteration is finished. */
+void Omega::step(){
 	if (simulationLoop){
-		msStartingPauseTime = microsec_clock::local_time();
 		simulationLoop->spawnSingleAction();
 	}
 }
 
-
-
-void Omega::startSimulationLoop(){
+void Omega::run(){
 	if(!simulationLoop){ LOG_ERROR("No Omega::simulationLoop? Creating one (please report bug)."); createSimulationLoop(); }
 	if (simulationLoop && !simulationLoop->looping()){
 		simulationLoop->start();
@@ -122,7 +107,7 @@ void Omega::startSimulationLoop(){
 }
 
 
-void Omega::stopSimulationLoop(){
+void Omega::pause(){
 	if (simulationLoop && simulationLoop->looping()){
 		simulationLoop->stop();
 	}
@@ -229,84 +214,45 @@ void Omega::loadPlugins(vector<string> pluginFiles){
 	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
 }
 
-void Omega::scanPlugins(vector<string> baseDirs){
-	vector<string> pluginFiles;
-	FOREACH(const string& baseDir, baseDirs){
-		// silently skip non-existent plugin directories
-		if(!filesystem::exists(baseDir)) continue;
-		try{
-			filesystem::recursive_directory_iterator Iend;
-			for(filesystem::recursive_directory_iterator I(baseDir); I!=Iend; ++I){ 
-				filesystem::path pth=I->path();
-				if(filesystem::is_directory(pth) || !algorithm::starts_with(pth.leaf(),"lib") || !algorithm::ends_with(pth.leaf(),".so")) { LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<"."); continue; }
-				filesystem::path name(filesystem::basename(pth));
-				if(name.leaf().length()<1) continue; // filter out 0-length filenames
-				LOG_DEBUG("Will load plugin "<<pth.leaf());
-				pluginFiles.push_back(pth.string());
-			}
-		} catch(filesystem::basic_filesystem_error<filesystem::path>& e) {
-			LOG_FATAL("Error from recursive plugin directory scan (unreadable directory?): "<<e.what());
-			throw;
-		}
-	}
-	loadPlugins(pluginFiles);
-}
-
-void Omega::loadSimulationFromStream(std::istream& stream){
-	LOG_DEBUG("Loading simulation from stream.");
-	resetScene();
-	RenderMutexLock lock;
-	yade::ObjectIO::load<typeof(scene),boost::archive::xml_iarchive>(stream,"scene",scene);
-}
-
-void Omega::saveSimulationToStream(std::ostream& stream){
-	LOG_DEBUG("Saving simulation to stream.");
-	yade::ObjectIO::save<typeof(scene),boost::archive::xml_oarchive>(stream,"scene",scene);
-}
-
-void Omega::loadSimulation(){
-	if(simulationFileName.size()==0) throw runtime_error("Empty simulation filename to load.");
-	bool isMem=algorithm::starts_with(simulationFileName,":memory:");
-	if(!isMem && !filesystem::exists(simulationFileName)) throw runtime_error("Simulation file to load doesn't exist: "+simulationFileName);
-	if(isMem && memSavedSimulations.count(simulationFileName)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+simulationFileName);
+void Omega::loadSimulation(const string& f){
+	bool isMem=algorithm::starts_with(f,":memory:");
+	if(!isMem && !filesystem::exists(f)) throw runtime_error("Simulation file to load doesn't exist: "+f);
+	if(isMem && memSavedSimulations.count(f)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+f);
 	
-	LOG_INFO("Loading file " + simulationFileName);
+	LOG_INFO("Loading file "+f);
 	{
-		joinSimulationLoop(); // stop current simulation if running
+		stop(); // stop current simulation if running
 		resetScene();
 		RenderMutexLock lock;
 		if(isMem){
-			istringstream iss(memSavedSimulations[simulationFileName]);
+			istringstream iss(memSavedSimulations[f]);
 			yade::ObjectIO::load<typeof(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
 		} else {
-			yade::ObjectIO::load(simulationFileName,"scene",scene);
+			yade::ObjectIO::load(f,"scene",scene);
 		}
 	}
-
-	if( scene->getClassName() != "Scene") throw runtime_error("Wrong file format (scene is not a Scene!?) in "+simulationFileName);
-
+	if(scene->getClassName()!="Scene") throw logic_error("Wrong file format (scene is not a Scene!?) in "+f);
+	sceneFile=f;
 	timeInit();
-
 	LOG_DEBUG("Simulation loaded");
 }
 
 
 
-void Omega::saveSimulation(const string name)
-{
-	if(name.size()==0) throw runtime_error("Name of file to save has zero length.");
-	LOG_INFO("Saving file " << name);
-
-	if(algorithm::starts_with(name,":memory:")){
-		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
+void Omega::saveSimulation(const string& f){
+	if(f.size()==0) throw runtime_error("f of file to save has zero length.");
+	LOG_INFO("Saving file " << f);
+	if(algorithm::starts_with(f,":memory:")){
+		if(memSavedSimulations.count(f)>0) LOG_INFO("Overwriting in-memory saved simulation "<<f);
 		ostringstream oss;
 		yade::ObjectIO::save<typeof(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
-		memSavedSimulations[name]=oss.str();
+		memSavedSimulations[f]=oss.str();
 	}
 	else {
 		// handles automatically the XML/binary distinction as well as gz/bz2 compression
-		yade::ObjectIO::save(name,"scene",scene); 
+		yade::ObjectIO::save(f,"scene",scene); 
 	}
+	sceneFile=f;
 }
 
 

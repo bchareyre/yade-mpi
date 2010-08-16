@@ -49,7 +49,7 @@ void PersistentTriangulationCollider::action ()
 	bool triangulationIteration = false;
 
 //BEGIN VORONOI TESSELATION
-	if ( !isTriangulated || Omega::instance().getCurrentIteration() % 50 == 0 )
+	if ( !isTriangulated || scene->iter % 50 == 0 )
 	{
 //TesselationWrapper Tes;
 		Tes->clear();
@@ -69,7 +69,7 @@ void PersistentTriangulationCollider::action ()
 		//}
 //  else
 //  {
-//   //if (Omega::instance().getCurrentIteration() % 100 == 0) {
+//   //if (scene->iter % 100 == 0) {
 //   if (1) {
 //   Tes->RemoveBoundingPlanes();
 //   BodyContainer::iterator bi    = bodies->begin();

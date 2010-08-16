@@ -14,6 +14,6 @@ void CohesiveStateRPMRecorder::action() {
 		}
 	}
 	//Save data to a file
-	out<<Omega::instance().getCurrentIteration()<<" "<<numberCohesiveContacts<<"\n";
+	out<<scene->iter<<" "<<numberCohesiveContacts<<"\n";
 	out.close();
 }

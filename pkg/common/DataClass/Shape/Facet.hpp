@@ -52,7 +52,7 @@ class Facet : public Shape {
 		,
 		/* ctor */ createIndex();,
 		/* must be separate to call postProcessAttributes(0) when changed, to keep internal data consistent */
-		.add_property("vertices",&Facet::getVertices,&Facet::setVertices,"Vertex positions in local coordinates.")
+		.add_property("vertices",&Facet::getVertices,&Facet::setVertices,"Vertex positions in local coordinates. :yattrtype:`vector<Vector3r>` ")
 	);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Facet,Shape);

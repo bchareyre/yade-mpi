@@ -57,7 +57,7 @@ void yadeInitialize(python::list& pp){
 	Omega& O(Omega::instance());
 	O.init();
 	O.origArgv=NULL; O.origArgc=0; // not needed, anyway
-	O.yadeConfigPath=string(getenv("HOME"))+"/.yade" SUFFIX;
+	std::string confDir=string(getenv("HOME"))+"/.yade" SUFFIX;
 	O.initTemps();
 	#ifdef YADE_DEBUG
 		ofstream gdbBatch;
@@ -68,8 +68,8 @@ void yadeInitialize(python::list& pp){
 	#endif
 	#ifdef YADE_LOG4CXX
 		// read logging configuration from file and watch it (creates a separate thread)
-		if(filesystem::exists(O.yadeConfigPath+"/logging.conf")){
-			std::string logConf=O.yadeConfigPath+"/logging.conf";
+		if(filesystem::exists(confDir+"/logging.conf")){
+			std::string logConf=confDir+"/logging.conf";
 			log4cxx::PropertyConfigurator::configure(logConf);
 			LOG_INFO("Loaded "<<logConf);
 		}

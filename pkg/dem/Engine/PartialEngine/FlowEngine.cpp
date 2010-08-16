@@ -60,7 +60,7 @@ void FlowEngine::action ( )
 				if (!first) flow->GaussSeidel ( );
 				timingDeltas->checkpoint("Gauss-Seidel");
 				
-				if (save_mplot){int j = Omega::instance().getCurrentIteration();
+				if (save_mplot){int j = scene->iter;
 				char plotfile [50];
 				mkdir("./mplot", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string visu_consol = "./mplot/"+flow->key+"%d_Visu_Consol";
@@ -99,9 +99,9 @@ void FlowEngine::action ( )
 				
 				timingDeltas->checkpoint("Applying Forces");
 			
-				Real time = Omega::instance().getSimulationTime();
+				Real time = scene->time;
 			
-				int j = Omega::instance().getCurrentIteration();
+				int j = scene->iter;
 				char file [50];
 				mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string consol = "./Consol/"+flow->key+"%d_Consol";
@@ -120,7 +120,7 @@ void FlowEngine::action ( )
 				
 				first=false;
 				
-				if ( Omega::instance().getCurrentIteration()>1 && Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
+				if ( scene->iter>1 && scene->iter % PermuteInterval == 0 )
 				{ Update_Triangulation = true; }
 				
 				if ( Update_Triangulation ) { Build_Triangulation( );}

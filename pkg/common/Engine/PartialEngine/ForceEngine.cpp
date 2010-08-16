@@ -20,7 +20,7 @@ void ForceEngine::action(){
 }
 
 void InterpolatingDirectedForceEngine::action(){
-	Real virtTime=wrap ? Shop::periodicWrap(scene->simulationTime,*times.begin(),*times.rbegin()) : scene->simulationTime;
+	Real virtTime=wrap ? Shop::periodicWrap(scene->time,*times.begin(),*times.rbegin()) : scene->time;
 	direction.normalize(); 
 	force=linearInterpolate<Real>(virtTime,times,magnitudes,_pos)*direction;
 	ForceEngine::action();

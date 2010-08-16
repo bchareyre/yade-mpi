@@ -141,7 +141,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 
                         Real D = alpha*(b2->state->pos-b1->state->pos).norm()-alpha*(currentContactGeometry->radius1+ currentContactGeometry->radius2); // scGeom->penetrationDepth could probably be used here?
 
-                        if ((currentContactGeometry->penetrationDepth>=0)||(D<=0)) //||(Omega::instance().getCurrentIteration() < 1) ) // a simplified way to define meniscii everywhere
+                        if ((currentContactGeometry->penetrationDepth>=0)||(D<=0)) //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
 			{
                                 D=0; // defines Fcap when spheres interpenetrate //FIXME : D<0 leads to wrong interpolation has D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
                                 if (fusionDetection && !currentContactPhysics->meniscus) bodiesMenisciiList.insert((*ii));

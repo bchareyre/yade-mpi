@@ -47,7 +47,7 @@ void KinemSimpleShearBox::computeScontact()
 void KinemSimpleShearBox::letMove(Real dX, Real dY)
 {
 
-	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
+	if(LOG)	cout << "It : " << scene->iter << endl;
 // 	computeDu();
 
 // 	const Real& dt = scene->dt; // dt defini par setBoxes_Dt

@@ -185,7 +185,7 @@ void Ip2_CFpmMat_CFpmMat_CFpmPhys::go(const shared_ptr<Material>& b1, const shar
 	contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 	
 	///to set if the contact is cohesive or not
-	if ( (scene->currentIteration < cohesiveTresholdIteration) && ((tensileStrength>0) || (cohesion>0)) && (yade1->type == yade2->type)){ contactPhysics->isCohesive=true; }
+	if ( (scene->iter < cohesiveTresholdIteration) && ((tensileStrength>0) || (cohesion>0)) && (yade1->type == yade2->type)){ contactPhysics->isCohesive=true; }
 	
 	if ( contactPhysics->isCohesive ) {
 	  contactPhysics->FnMax = tensileStrength*crossSection;

@@ -39,7 +39,7 @@ void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 
 void MicroMacroAnalyser::action()
 {
-	//cerr << "MicroMacroAnalyser::action() (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
+	//cerr << "MicroMacroAnalyser::action() (interval="<< interval <<", iteration="<< scene->iter<<")" << endl;
 	if (!triaxialCompressionEngine) {
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
 		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
@@ -58,7 +58,7 @@ void MicroMacroAnalyser::action()
 		ofile.open(outputFile.c_str(), std::ios::app);
 		if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
 		initialized=true;
-	} else if (Omega::instance().getCurrentIteration() % interval == 0) {
+	} else if (scene->iter % interval == 0) {
 		setState(2, true, compIncrt);
 		if (compDeformation) {
 			analyser->ComputeParticlesDeformation();
@@ -68,7 +68,7 @@ void MicroMacroAnalyser::action()
 			analyser->DefToFile(oss.str().c_str());
 		}
 		CGT::Tenseur_sym3 epsg(analyser->grad_u_total);
-		ofile << Omega::instance().getCurrentIteration() << analyser->Delta_epsilon(1,1)<<" "<<analyser->Delta_epsilon(2,2)<<" "<<analyser->Delta_epsilon(3,3)<<" "<<epsg(1,1)<<" "<<epsg(2,2)<< " "<<epsg(3,3)<<" "<<epsg(1,2)<<" "<<epsg(1,3)<<" "<<epsg(2,3)<<endl;
+		ofile << scene->iter << analyser->Delta_epsilon(1,1)<<" "<<analyser->Delta_epsilon(2,2)<<" "<<analyser->Delta_epsilon(3,3)<<" "<<epsg(1,1)<<" "<<epsg(2,2)<< " "<<epsg(3,3)<<" "<<epsg(1,2)<<" "<<epsg(1,3)<<" "<<epsg(2,3)<<endl;
 		analyser->SwitchStates();
 	}
 	//cerr << "ENDOF MicroMacro::action" << endl;
@@ -89,7 +89,7 @@ void MicroMacroAnalyser::setState(unsigned int state, bool save_states, bool com
 	}
 	if (save_states) {
 		ostringstream oss;
-		//oss<<stateFileName<<"_"<<Omega::instance().getCurrentIteration();
+		//oss<<stateFileName<<"_"<<scene->iter;
 		oss<<stateFileName<<"_"<<stateNumber++;
 		TS.to_file(oss.str().c_str(),/*use bz2?*/ true);
 	}

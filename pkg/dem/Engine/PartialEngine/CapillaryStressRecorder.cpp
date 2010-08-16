@@ -155,7 +155,7 @@ void CapillaryStressRecorder::action()
 	SIG_13_cap = sig13_cap/V;
 	SIG_23_cap = sig23_cap/V;
 	
-	out << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+	out << lexical_cast<string> ( scene->iter ) << " "
 		<< lexical_cast<string>(SIG_11_cap) << " " 
 		<< lexical_cast<string>(SIG_22_cap) << " " 
 		<< lexical_cast<string>(SIG_33_cap) << " " 

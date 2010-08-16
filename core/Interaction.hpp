@@ -3,13 +3,12 @@
 //
 #pragma once
 #include<yade/lib-serialization/Serializable.hpp>
-//#include<yade/core/InteractionGeometry.hpp>
-//#include<yade/core/InteractionPhysics.hpp>
+// keep those two here, template instantiation & boost::python gets broken otherwise, e.g. https://bugs.launchpad.net/bugs/618766
+#include<yade/core/InteractionGeometry.hpp> 
+#include<yade/core/InteractionPhysics.hpp>
 #include<yade/core/Body.hpp>
 
 
-class InteractionGeometry;
-class InteractionPhysics;
 class InteractionGeometryFunctor;
 class InteractionPhysicsFunctor;
 class LawFunctor;

@@ -14,7 +14,7 @@
 
 Interaction::Interaction(Body::id_t newId1,Body::id_t newId2): id1(newId1), id2(newId2), cellDist(Vector3i(0,0,0)){ reset(); }
 
-bool Interaction::isFresh(Scene* rb){ return iterMadeReal==rb->currentIteration;}
+bool Interaction::isFresh(Scene* rb){ return iterMadeReal==rb->iter;}
 
 void Interaction::init(){
 	isNeighbor = true;//NOTE : TriangulationCollider needs that

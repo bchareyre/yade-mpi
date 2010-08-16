@@ -41,7 +41,7 @@ void SampleCapillaryPressureEngine::updateParameters()
 	  if ((S > (sigma_iso - (sigma_iso*SigmaPrecision))) && (S < (sigma_iso + (sigma_iso*SigmaPrecision)))) {
 	    
 	    string fileName = "../data/" + Phase1End + "_" + 
-	    lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
+	    lexical_cast<string>(scene->iter) + ".xml";
 	    cerr << "saving snapshot: " << fileName << " ...";
 	    Omega::instance().saveSimulation(fileName);
 	    pressureVariationActivated = true;
@@ -55,7 +55,7 @@ void SampleCapillaryPressureEngine::action()
 	TriaxialStressController::action();
 	if (pressureVariationActivated)		
 		{
-			if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "pressure variation!!" << endl;
+			if (scene->iter % 100 == 0) cerr << "pressure variation!!" << endl;
 		
 			if ((Pressure>=0) && (Pressure<=1000000000)) Pressure += PressureVariation;
 			capillaryCohesiveLaw->CapillaryPressure = Pressure;
@@ -66,7 +66,7 @@ void SampleCapillaryPressureEngine::action()
 		else { capillaryCohesiveLaw->CapillaryPressure = Pressure;
 		       capillaryCohesiveLaw->fusionDetection = fusionDetection;
 		       capillaryCohesiveLaw->binaryFusion = binaryFusion;}
-		if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "capillary pressure = " << Pressure << endl;
+		if (scene->iter % 100 == 0) cerr << "capillary pressure = " << Pressure << endl;
 		capillaryCohesiveLaw->scene=scene;;
 		capillaryCohesiveLaw->action();
 		UnbalancedForce = ComputeUnbalancedForce(scene);

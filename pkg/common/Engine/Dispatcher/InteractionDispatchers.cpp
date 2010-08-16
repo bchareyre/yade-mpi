@@ -57,7 +57,7 @@ void InteractionDispatchers::action(){
 
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
-	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
+	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
 		#pragma omp parallel for schedule(guided)
@@ -66,7 +66,7 @@ void InteractionDispatchers::action(){
 	#else
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 	#endif
-		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->currentIteration) {
+		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
 		}
@@ -140,7 +140,7 @@ void InteractionDispatchers::action(){
 		I->functorCache.phys->go(b1->material,b2->material,I);
 		assert(I->interactionPhysics);
 
-		if(!wasReal) I->iterMadeReal=scene->currentIteration; // mark the interaction as created right now
+		if(!wasReal) I->iterMadeReal=scene->iter; // mark the interaction as created right now
 
 		// LawDispatcher
 		// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction

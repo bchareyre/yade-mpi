@@ -14,7 +14,7 @@
 
 bool TimeStepper::isActivated()
 {
-	return (active && (scene->currentIteration % timeStepUpdateInterval == 0));
+	return (active && (scene->iter % timeStepUpdateInterval == 0));
 }
 
 

@@ -23,9 +23,9 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 
 	//Create cohesive interractions only once
 	if (setCohesionNow && cohesionDefinitionIteration==-1) {
-		cohesionDefinitionIteration=Omega::instance().getCurrentIteration();
+		cohesionDefinitionIteration=scene->iter;
 	}
-	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=Omega::instance().getCurrentIteration()) {
+	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=scene->iter) {
 		cohesionDefinitionIteration = -1;
 		setCohesionNow = 0;}
 		

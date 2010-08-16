@@ -314,9 +314,9 @@ class pyOmega{
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
 
-	long iter(){ return OMEGA.getScene()->currentIteration;}
-	double simulationTime(){return OMEGA.getSimulationTime();}
-	double realTime(){ return OMEGA.getComputationTime(); }
+	long iter(){ return OMEGA.getScene()->iter;}
+	double time(){return OMEGA.getScene()->time;}
+	double realTime(){ return OMEGA.getRealTime(); }
 	double dt_get(){return OMEGA.getScene()->dt;}
 	void dt_set(double dt){
 		Scene* scene=OMEGA.getScene().get();
@@ -326,8 +326,8 @@ class pyOmega{
 	}
 	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
 	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
-	long stopAtIter_get(){return OMEGA.getScene()->stopAtIteration; }
-	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIteration=s; }
+	long stopAtIter_get(){return OMEGA.getScene()->stopAtIter; }
+	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIter=s; }
 
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
@@ -337,14 +337,15 @@ class pyOmega{
 		void forceSyncCount_set(unsigned long count){ OMEGA.getScene()->forces.syncCount=count;}
 
 	void run(long int numIter=-1,bool doWait=false){
-		if(numIter>0) OMEGA.getScene()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
-		OMEGA.startSimulationLoop();
+		Scene* scene=OMEGA.getScene().get();
+		if(numIter>0) scene->stopAtIter=scene->iter+numIter;
+		OMEGA.run();
 		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
 		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
-		LOG_DEBUG("RUN"<<((OMEGA.getScene()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getScene()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
+		LOG_DEBUG("RUN"<<((scene->stopAtIter-scene->iter)>0?string(" ("+lexical_cast<string>(scene->stopAtIter-scene->iter)+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}
-	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
+	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.pause(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
 	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getScene()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
 	void wait(){
 		if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return;
@@ -353,18 +354,18 @@ class pyOmega{
 		LOG_ERROR("Simulation error encountered."); OMEGA.simulationLoop->workerThrew=false; throw OMEGA.simulationLoop->workerException;
 	}
 	bool isRunning(){ return OMEGA.isRunning(); }
-	python::object get_filename(){ string f=OMEGA.getSimulationFileName(); if(f.size()>0) return python::object(f); return python::object();}
+	python::object get_filename(){ string f=OMEGA.sceneFile; if(f.size()>0) return python::object(f); return python::object();}
 	void load(std::string fileName) {
-		Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; 
-		OMEGA.setSimulationFileName(fileName);
-		OMEGA.loadSimulation();
+		Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; 
+		OMEGA.loadSimulation(fileName);
 		OMEGA.createSimulationLoop();
 		mapLabeledEntitiesToVariables();
 		LOG_DEBUG("LOAD!");
 	}
-	void reload(){	load(OMEGA.getSimulationFileName());}
+	void reload(){	load(OMEGA.sceneFile);}
 	void saveTmp(string mark=""){ save(":memory:"+mark);}
 	void loadTmp(string mark=""){ load(":memory:"+mark);}
+	python::list lsTmp(){ python::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
 	void tmpToFile(string mark, string filename){
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
 		iostreams::filtering_ostream out;
@@ -380,14 +381,15 @@ class pyOmega{
 	}
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
-	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; OMEGA.resetScene(); OMEGA.createSimulationLoop();}
-	void resetTime(){ OMEGA.getScene()->currentIteration=0; OMEGA.getScene()->simulationTime=0; OMEGA.timeInit(); }
+	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetScene(); OMEGA.createSimulationLoop();}
+	void resetTime(){ OMEGA.getScene()->iter=0; OMEGA.getScene()->time=0; OMEGA.timeInit(); }
 	void switchScene(){ std::swap(OMEGA.scene,OMEGA.sceneAnother); }
+	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
 
 	void save(std::string fileName){
 		assertScene();
 		OMEGA.saveSimulation(fileName);
-		OMEGA.setSimulationFileName(fileName);
+		// OMEGA.sceneFile=fileName; // done in Omega::saveSimulation;
 		LOG_DEBUG("SAVE!");
 	}
 	
@@ -493,7 +495,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
-		.add_property("time",&pyOmega::simulationTime,"Return virtual (model world) time of the simulation.")
+		.add_property("time",&pyOmega::time,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\n* assigning zero enables dynamic Δt control via a :yref:`TimeStepper` (raises an exception if there is no :yref:`TimeStepper` among :yref:`O.engines<Omega.engines>`)\n* assigning negative value enables dynamic Δt (as in the previous case) and sets positive timestep ``O.dt=|Δt|`` (will be used until the timestepper is run and updates it)\n* assigning positive value sets Δt to that value and disables dynamic Δt (via :yref:`TimeStepper`, if there is one).\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
 		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
@@ -503,6 +505,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("save",&pyOmega::save,"Save current simulation to file (should be .xml or .xml.bz2)")
 		.def("loadTmp",&pyOmega::loadTmp,(python::args("mark")=""),"Load simulation previously stored in memory by saveTmp. *mark* optionally distinguishes multiple saved simulations")
 		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
+		.def("lsTmp",&pyOmega::lsTmp,"Return list of all memory-saved simulations.")
 		.def("tmpToFile",&pyOmega::tmpToFile,(python::arg("fileName"),python::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
 		.def("tmpToString",&pyOmega::tmpToString,(python::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")
 		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.")
@@ -517,6 +520,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example::\n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider.nBins=5 ## collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
+		.def("_sceneObj",&pyOmega::scene_get,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (Scene::engines).")
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (Scene::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (Scene::initializers).")

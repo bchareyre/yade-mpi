@@ -85,8 +85,8 @@ void VelocityBins::setBins(Scene* scene, Real currMaxVelSq, Real refSweepLength)
 	}
 	#ifdef YADE_LOG4CXX
 		// if debugging output
-		if(logger->isDebugEnabled() && (scene->currentIteration-histLast>=histInterval || histLast<0)){
-			histLast=scene->currentIteration;
+		if(logger->isDebugEnabled() && (scene->iter-histLast>=histInterval || histLast<0)){
+			histLast=scene->iter;
 			LOG_INFO(bodyBins.size()<<" bodies (moves: "<<moveFaster<<" faster, "<<moveSlower<<" slower), refMaxVel="<<sqrt(refMaxVelSq));
 			for(size_t i=0; i<nBins; i++){
 				int nChars=int(80*(bins[i].nBodies/Real(bodyBins.size())));

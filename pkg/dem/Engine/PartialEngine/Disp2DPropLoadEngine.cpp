@@ -42,7 +42,7 @@ void Disp2DPropLoadEngine::action()
 
 	if(firstIt)
 	{
-		it_begin=Omega::instance().getCurrentIteration();
+		it_begin=scene->iter;
 		H0=topbox->state->pos.y();
 		X0=topbox->state->pos.x();
 		Vector3r F_sup=scene->forces.getForce(id_topbox);
@@ -74,10 +74,10 @@ void Disp2DPropLoadEngine::action()
 	}
 
 
-	if ( (Omega::instance().getCurrentIteration()-it_begin) < nbre_iter)
+	if ( (scene->iter-it_begin) < nbre_iter)
 	{	letDisturb();
 	}
-	else if ( (Omega::instance().getCurrentIteration()-it_begin) == nbre_iter)
+	else if ( (scene->iter-it_begin) == nbre_iter)
 	{
 		stopMovement();
 		string fileName=Key + "DR"+lexical_cast<string> (nbre_iter)+"ItAtV_"+lexical_cast<string> (v)+"done.xml";

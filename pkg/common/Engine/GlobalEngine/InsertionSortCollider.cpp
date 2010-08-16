@@ -184,7 +184,7 @@ void InsertionSortCollider::action(){
 					} else { // no motion
 						boundDispatcher->sweepDist=0; // nothing moves, no need to make bboxes larger
 					}
-					LOG_DEBUG(scene->simulationTime<<"s: stride ≈"<<stride<<"; maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
+					LOG_DEBUG(scene->time<<"s: stride ≈"<<stride<<"; maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
 					fastestBodyMaxDist=0; // reset
 				} else { // nBins>=1
 					if(!newton->velocityBins){ newton->velocityBins=shared_ptr<VelocityBins>(new VelocityBins(nBins,newton->maxVelocitySq,binCoeff,binOverlap)); }

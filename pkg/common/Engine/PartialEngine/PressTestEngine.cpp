@@ -25,7 +25,7 @@ void PressTestEngine::action(){
 						 */ 
 						curentDirection=backward;
 						TranslationEngine::velocity *= -pressVelocityForw2Back;
-						currentIterationAfterDestruction = (Omega::instance().getCurrentIteration())/pressVelocityForw2Back*riseUpPressHigher;
+						currentIterationAfterDestruction = scene->iter/pressVelocityForw2Back*riseUpPressHigher;
 					}
 				}  else if (((currentIterationAfterDestruction!=0)&&(maxVerticalForce !=0))) {
 					/**
@@ -42,7 +42,7 @@ void PressTestEngine::action(){
 				TranslationEngine::action();
 			} else {
 				curentDirection=stop;														///<If the press is in normal position -> STOP
-				Omega::instance().stopSimulationLoop();					///<Stop simulation loop
+				Omega::instance().pause();					///<Stop simulation loop
 			}
 		}
 	}

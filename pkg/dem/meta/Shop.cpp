@@ -497,7 +497,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	assert(force && i);
 	if(!i) return i;
 	physMeta->explicitAction(b1->material,b2->material,i);
-	i->iterMadeReal=rb->currentIteration;
+	i->iterMadeReal=rb->iter;
 	rb->interactions->insert(i);
 	return i;
 }

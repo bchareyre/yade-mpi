@@ -72,9 +72,9 @@ class Scene: public Serializable{
 		shared_ptr<Engine> engineByLabel(string s);
 
 		Real dt;
-		long currentIteration;
-		Real simulationTime;
-		long stopAtIteration;
+		long iter;
+		Real time;
+		long stopAtIter;
 		Real stopAtVirtTime;
 		Real stopAtRealTime;
 		bool isPeriodic;
@@ -95,9 +95,9 @@ class Scene: public Serializable{
 		(miscParams)
 		(dispParams)
 		(dt)
-		(currentIteration)
-		(simulationTime)
-		(stopAtIteration)
+		(iter)
+		(time)
+		(stopAtIter)
 		(isPeriodic)
 		(cell)
 	);

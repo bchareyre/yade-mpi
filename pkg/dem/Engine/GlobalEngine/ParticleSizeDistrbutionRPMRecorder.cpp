@@ -163,7 +163,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	//Save data to a file
 	out<<"**********\n";
 	out<<"iter totalMass numSpecimen\n";
-	out<<Omega::instance().getCurrentIteration()<<" "<<totalMass<<" "<<arrayIdentIds.size()<<"\n";
+	out<<scene->iter<<" "<<totalMass<<" "<<arrayIdentIds.size()<<"\n";
 	out<<"id mass\n";
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<"\n";

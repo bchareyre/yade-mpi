@@ -54,7 +54,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 
 bool GlobalStiffnessTimeStepper::isActivated()
 {
-	return (active && ((!computedOnce) || (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0) || (Omega::instance().getCurrentIteration() < (long int) 2) ));
+	return (active && ((!computedOnce) || (scene->iter % timeStepUpdateInterval == 0) || (scene->iter < (long int) 2) ));
 }
 
 void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)

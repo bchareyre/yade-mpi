@@ -12,13 +12,9 @@
 
 void SimulationFlow::singleAction()
 {
-	Omega& OO=Omega::instance();
-	if (OO.getScene()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
-	{
-		OO.getScene()->moveToNextTimeStep();
-		if(OO.getScene()->stopAtIteration>0 && OO.getCurrentIteration()==OO.getScene()->stopAtIteration){
-			setTerminate(true);
-		}
-	}
+	Scene* scene=Omega::instance().getScene().get();
+	if (!scene) throw logic_error("SimulationFlow::singleAction: no Scene object?!");
+	scene->moveToNextTimeStep();
+	if(scene->stopAtIter>0 && scene->iter==scene->stopAtIter) setTerminate(true);
 };
 

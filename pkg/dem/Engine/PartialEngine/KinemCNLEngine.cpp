@@ -35,14 +35,14 @@ void KinemCNLEngine::action()
 	else if (temoin<2)
 	{
 		stopMovement();		// INDISPENSABLE !
-		it_stop=Omega::instance().getCurrentIteration();
+		it_stop=scene->iter;
 		cout << "Shear stopped : gammaLim reached at it "<< it_stop << endl;
 		temoin=2;
 	}
-	else if (temoin==2 && (Omega::instance().getCurrentIteration()==(it_stop+5000)) )
+	else if (temoin==2 && (scene->iter==(it_stop+5000)) )
 	{
-		Omega::instance().saveSimulation(Key + "endShear" +lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + ".xml");
-		Omega::instance().stopSimulationLoop();
+		Omega::instance().saveSimulation(Key + "endShear" +lexical_cast<string> ( scene->iter ) + ".xml");
+		Omega::instance().pause();
 	}
 
 	for(unsigned int j=0;j<gamma_save.size();j++)

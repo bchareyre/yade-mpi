@@ -189,7 +189,7 @@ primary and secondary simulation.
 
 Graphical interface
 --------------------
-Yade can be optionally compiled with qt3-based graphical interface. It can be started by pressing ``F12`` in the command-line, and also is started automatically when running a script.
+Yade can be optionally compiled with qt4-based graphical interface. It can be started by pressing ``F12`` in the command-line, and also is started automatically when running a script.
 
 .. image:: fig/qt-gui.png
 

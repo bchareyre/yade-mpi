@@ -11,6 +11,6 @@ void ForceRecorder::action(){
 	};
 	
 	//Save data to a file
-	out<<Omega::instance().getCurrentIteration()<<" "<<totalForce[0]<<" "<<totalForce[1]<<" "<<totalForce[2]<<" "<<totalForce.norm()<<"\n";
+	out<<scene->iter<<" "<<totalForce[0]<<" "<<totalForce[1]<<" "<<totalForce[2]<<" "<<totalForce.norm()<<"\n";
 	out.close();
 }

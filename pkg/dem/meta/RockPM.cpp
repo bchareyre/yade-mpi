@@ -95,9 +95,8 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	if(interaction->interactionPhysics) return; 
 
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
-	Omega& OO=Omega::instance();
 	assert(contGeom);
-	//LOG_WARN(Omega::instance().getCurrentIteration());
+	//LOG_WARN(scene->iter);
 	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
 	const shared_ptr<RpmMat>& rpm2=YADE_PTR_CAST<RpmMat>(pp2);
 	
@@ -122,7 +121,7 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	
 	initDistance = contGeom->displacementN();
 
-	if ((rpm1->exampleNumber==rpm2->exampleNumber)&&(initDistance<(contPhys->lengthMaxTension))&&(initCohesive)&&(OO.getCurrentIteration()<=cohesiveThresholdIter)) {
+	if ((rpm1->exampleNumber==rpm2->exampleNumber)&&(initDistance<(contPhys->lengthMaxTension))&&(initCohesive)&&(scene->iter<=cohesiveThresholdIter)) {
 		contPhys->isCohesive=true;
 	}
 

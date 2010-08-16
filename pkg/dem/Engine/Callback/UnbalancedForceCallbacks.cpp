@@ -10,7 +10,7 @@ int SumIntrForcesCb::int0=0;
 Real SumIntrForcesCb::Real0=0;
 
 IntrCallback::FuncPtr SumIntrForcesCb::stepInit(){
-	// if(scene->currentIteration%100 != 0) return NULL;
+	// if(scene->iter%100 != 0) return NULL;
 
 	cerr<<"("<<(Real)force<<","<<(int)numIntr<<")";
 	// reset accumulators

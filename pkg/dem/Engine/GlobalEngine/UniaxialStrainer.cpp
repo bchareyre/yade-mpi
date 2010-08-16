@@ -90,8 +90,7 @@ void UniaxialStrainer::action(){
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
 	if(abs(currentStrainRate)<abs(strainRate)){
-		Real t=Omega::instance().getSimulationTime();
-		if(initAccelTime_s!=0) currentStrainRate=(t/initAccelTime_s)*strainRate;
+		if(initAccelTime_s!=0) currentStrainRate=(scene->time/initAccelTime_s)*strainRate;
 		else currentStrainRate=strainRate;
 	} else currentStrainRate=strainRate;
 	// how much do we move (in total, symmetry handled below)
@@ -103,7 +102,7 @@ void UniaxialStrainer::action(){
 			dAX=originalLength*(stopStrain+1)-axialLength;
 			LOG_INFO("Reached stopStrain "<<stopStrain<<", deactivating self and stopping in "<<idleIterations+1<<" iterations.");
 			this->active=false;
-			scene->stopAtIteration=Omega::instance().getCurrentIteration()+1+idleIterations;
+			scene->stopAtIter=scene->iter+1+idleIterations;
 		}
 	}
 	if(asymmetry==0) dAX*=.5; // apply half on both sides if straining symetrically
@@ -127,7 +126,7 @@ void UniaxialStrainer::action(){
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
 	// update forces and stresses
-	if(Omega::instance().getCurrentIteration()%stressUpdateInterval==0) {
+	if(scene->iter%stressUpdateInterval==0) {
 		computeAxialForce();
 		avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
 	}

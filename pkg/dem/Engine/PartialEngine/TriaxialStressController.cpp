@@ -129,10 +129,10 @@ void TriaxialStressController::action()
 	
 	// must be done _after_ height, width, depth have been calculated
 	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
-	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<100) updateStiffness();
-	bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
+	if (scene->iter % stiffnessUpdateInterval == 0 || scene->iter<100) updateStiffness();
+	bool isARadiusControlIteration = (scene->iter % radiusControlInterval == 0);
 	
-	if (Omega::instance().getCurrentIteration() % computeStressStrainInterval == 0 ||
+	if (scene->iter % computeStressStrainInterval == 0 ||
 		 (internalCompaction && isARadiusControlIteration) )
 		computeStressStrain();
 

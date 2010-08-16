@@ -32,7 +32,7 @@ void PeriIsoCompressor::action(){
 		
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
-	const long& step=scene->currentIteration;
+	const long& step=scene->iter;
 	Vector3r cellSize=scene->cell->getSize(); //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	Real minSize=min(cellSize[0],min(cellSize[1],cellSize[2])), maxSize=max(cellSize[0],max(cellSize[1],cellSize[2]));
@@ -175,7 +175,7 @@ void PeriTriaxController::action()
 		LOG_DEBUG("cellSize="<<cellSize<<", maxBodySpan="<<maxBodySpan);
 		throw runtime_error("Minimum cell size is smaller than 2.1*maxBodySpan (periodic collider requirement)");
 	}
-	bool doUpdate((scene->currentIteration%globUpdate)==0);
+	bool doUpdate((scene->iter%globUpdate)==0);
 	if(doUpdate || min(stiff[0],min(stiff[1],stiff[2])) <=0 || dynCell){ strainStressStiffUpdate(); }
 
 	bool allOk=true;
@@ -245,7 +245,7 @@ void PeriTriaxController::action()
 			if (!doneHook.empty()){
 				LOG_DEBUG ( "Running doneHook: "<<doneHook );
 				pyRunString(doneHook);}
-			else { Omega::instance().stopSimulationLoop(); }
+			else { Omega::instance().pause(); }
 		}
 	}
 }

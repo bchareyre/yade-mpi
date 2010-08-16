@@ -95,7 +95,7 @@ void InteractionGeometryDispatcher::action(){
 
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->Hsize;
-	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
+	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
 		#pragma omp parallel for
@@ -104,7 +104,7 @@ void InteractionGeometryDispatcher::action(){
 	#else
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 	#endif
-			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->currentIteration) {
+			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 				scene->interactions->requestErase(I->getId1(),I->getId2());
 				continue;
 			}
@@ -161,7 +161,7 @@ void InteractionPhysicsDispatcher::action()
 				bool hadPhys=interaction->interactionPhysics;
 				operator()(b1->material, b2->material, interaction);
 				assert(interaction->interactionPhysics);
-				if(!hadPhys) interaction->iterMadeReal=scene->currentIteration;
+				if(!hadPhys) interaction->iterMadeReal=scene->iter;
 			}
 		}
 }

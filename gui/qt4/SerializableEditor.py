@@ -418,7 +418,6 @@ class SeqSerializableComboBox(QFrame):
 		for w in buttons[0:2]+[self.combo,]+buttons[2:4]: topLineLayout.addWidget(w)
 		self.layout.addWidget(topLineFrame) # nested layout
 		self.scroll=QScrollArea(self); self.scroll.setWidgetResizable(True)
-		self.scroll.sizeHint=lambda: QSize(0,0)
 		self.layout.addWidget(self.scroll)
 		self.seqEdit=None # currently edited serializable
 		self.setLayout(self.layout)
@@ -498,7 +497,6 @@ class SeqSerializableComboBox(QFrame):
 		curr,nxt=currSeq[i:i+2]; currSeq[i],currSeq[i+1]=nxt,curr; self.setter(currSeq)
 		self.refreshEvent(forceIx=i+1)
 	def refresh(self): pass # API compat with SerializableEditor
-
 
 SeqSerializable=SeqSerializableComboBox
 

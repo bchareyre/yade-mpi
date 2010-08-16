@@ -342,7 +342,7 @@ void VTKRecorder::action(){
 			{
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
-			string fn=fileName+"spheres."+lexical_cast<string>(scene->currentIteration)+".vtu";
+			string fn=fileName+"spheres."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			writer->SetInput(spheresUg);
 			writer->Write();
@@ -365,7 +365,7 @@ void VTKRecorder::action(){
 			{
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
-			string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
+			string fn=fileName+"facets."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			writer->SetInput(facetsUg);
 			writer->Write();	
@@ -383,7 +383,7 @@ void VTKRecorder::action(){
 			{
 			vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
-			string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtp";
+			string fn=fileName+"intrs."+lexical_cast<string>(scene->iter)+".vtp";
 			writer->SetFileName(fn.c_str());
 			writer->SetInput(intrPd);
 			writer->Write();
@@ -397,7 +397,7 @@ void VTKRecorder::action(){
 			if(recActive[REC_FACETS]) multiblockDataset->SetBlock(i++,facetsUg);
 			if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrPd);
 			vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
-			string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
+			string fn=fileName+lexical_cast<string>(scene->iter)+".vtm";
 			writer->SetFileName(fn.c_str());
 			writer->SetInput(multiblockDataset);
 			writer->Write();	

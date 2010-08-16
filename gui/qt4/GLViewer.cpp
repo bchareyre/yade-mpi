@@ -628,7 +628,7 @@ void GLViewer::postDraw(){
 		glColor3v(Vector3r(1,1,1));
 		if(timeDispMask & GLViewer::TIME_VIRT){
 			ostringstream oss;
-			Real t=Omega::instance().getSimulationTime();
+			const Real& t=Omega::instance().getScene()->time;
 			unsigned min=((unsigned)t/60),sec=(((unsigned)t)%60),msec=((unsigned)(1e3*t))%1000,usec=((unsigned long)(1e6*t))%1000,nsec=((unsigned long)(1e9*t))%1000;
 			if(min>0) oss<<_W2<<min<<":"<<_W2<<sec<<"."<<_W3<<msec<<"m"<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
 			else if (sec>0) oss<<_W2<<sec<<"."<<_W3<<msec<<"m"<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
@@ -645,8 +645,8 @@ void GLViewer::postDraw(){
 		}
 		if(timeDispMask & GLViewer::TIME_ITER){
 			ostringstream oss;
-			oss<<"#"<<Omega::instance().getCurrentIteration();
-			if(rb->stopAtIteration>rb->currentIteration) oss<<" ("<<setiosflags(ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->currentIteration)/rb->stopAtIteration<<"%)";
+			oss<<"#"<<rb->iter;
+			if(rb->stopAtIter>rb->iter) oss<<" ("<<setiosflags(ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->iter)/rb->stopAtIter<<"%)";
 			QGLViewer::drawText(x,y,oss.str().c_str());
 			y-=lineHt;
 		}
@@ -679,7 +679,7 @@ void GLViewer::postDraw(){
 
 string GLViewer::getRealTimeString(){
 	ostringstream oss;
-	time_duration t=Omega::instance().getComputationDuration();
+	time_duration t=Omega::instance().getRealTime_duration();
 	unsigned d=t.hours()/24,h=t.hours()%24,m=t.minutes(),s=t.seconds();
 	oss<<"clock ";
 	if(d>0) oss<<d<<"days "<<_W2<<h<<":"<<_W2<<m<<":"<<_W2<<s;

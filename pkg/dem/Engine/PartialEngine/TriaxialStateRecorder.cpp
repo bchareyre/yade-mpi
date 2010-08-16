@@ -39,7 +39,7 @@ void TriaxialStateRecorder::action ()
 		}
 		if ( !triaxialStressController ) LOG_DEBUG ( "stress controller engine NOT found" );
 	}
-	if ( ! ( Omega::instance().getCurrentIteration() % triaxialStressController->computeStressStrainInterval == 0 ) )
+	if ( ! ( scene->iter % triaxialStressController->computeStressStrainInterval == 0 ) )
 		triaxialStressController->computeStressStrain ();
 
 	/// Compute porosity :
@@ -57,7 +57,7 @@ void TriaxialStateRecorder::action ()
 	}
 	porosity = ( V - Vs ) /V;
 	
-	out << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+	out << lexical_cast<string> ( scene->iter ) << " "
  	<< lexical_cast<string> ( triaxialStressController->stress[triaxialStressController->wall_right][0] ) << " "
  	<< lexical_cast<string> ( triaxialStressController->stress[triaxialStressController->wall_top][1] ) << " "
  	<< lexical_cast<string> ( triaxialStressController->stress[triaxialStressController->wall_front][2] ) << " "

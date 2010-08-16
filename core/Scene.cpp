@@ -32,9 +32,9 @@ bool TimingInfo::enabled=false;
 
 Scene::Scene(): bodies(new BodyContainer), interactions(new InteractionContainer), cell(new Cell){	
 	needsInitializers=true;
-	currentIteration=0;
-	simulationTime=0;
-	stopAtIteration=0;
+	iter=0;
+	time=0;
+	stopAtIter=0;
 	stopAtRealTime=0; // not yet implemented
 	stopAtVirtTime=0; // not yet implemented either
 	dt=1e-8;
@@ -87,8 +87,8 @@ void Scene::moveToNextTimeStep(){
 		e->action();
 		if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 	}
-	currentIteration++;
-	simulationTime+=dt;
+	iter++;
+	time+=dt;
 }
 
 

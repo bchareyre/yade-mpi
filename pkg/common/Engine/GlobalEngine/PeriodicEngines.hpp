@@ -11,9 +11,9 @@ class PeriodicEngine:  public GlobalEngine {
 		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 		virtual ~PeriodicEngine(); // vtable
 		virtual bool isActivated(){
-			const Real& virtNow=scene->simulationTime;
+			const Real& virtNow=scene->time;
 			Real realNow=getClock();
-			const long& iterNow=scene->currentIteration;
+			const long& iterNow=scene->iter;
 			if((nDo<0 || nDone<nDo) &&
 				((virtPeriod>0 && virtNow-virtLast>=virtPeriod) ||
 				 (realPeriod>0 && realNow-realLast>=realPeriod) ||

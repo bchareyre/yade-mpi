@@ -101,7 +101,7 @@ void Clump::moveMembers(){
 	 */
 	// const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
 	#if 0
-		if(Omega::instance().getCurrentIteration()%50==0){
+		if(Omega::instance().getScene()->iter%50==0){
 			Real Erot=.5*clumpRBP->inertia[0]*pow(clumpRBP->angularVelocity[0],2)+.5*clumpRBP->inertia[1]*pow(clumpRBP->angularVelocity[1],2)+.5*clumpRBP->inertia[2]*pow(clumpRBP->angularVelocity[2],2);
 			Real Etrans=.5*clumpRBP->mass*pow(clumpRBP->velocity.norm(),2);
 			// (0,0,1) is gravity acceleration
