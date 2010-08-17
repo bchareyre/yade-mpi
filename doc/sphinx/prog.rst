@@ -1697,27 +1697,27 @@ Omega
 ^^^^^^
 The :yref:`Omega` class handles all simulation-related functionality: loading/saving, running, pausing. 
 
-In python, the wrapper class to the singleton is instantiated [#oinst]_ as global variable ``O``. Because there is no separate ``Scene`` class in python, :yref:`Omega` is used to access its contents from python. Although multiple ``Scene`` objects may be instantiated in c++, it is always the current scene that :yref:`Omega` represents.
+In python, the wrapper class to the singleton is instantiated [#oinst]_ as global variable ``O``. For convenience, :yref:`Omega` is used as proxy for scene's attribute: although multiple ``Scene`` objects may be instantiated in c++, it is always the current scene that :yref:`Omega` represents.
 
 The correspondence of data is literal: :yref:`Omega.materials` corresponds to ``Scene::materials`` of the current scene; likewise for :yref:`materials<Omega.materials>`, :yref:`bodies<Omega.bodies>`, :yref:`interactions<Omega.interactions>`, :yref:`tags<Omega.tags>`, :yref:`cell<Omega.cell>`, :yref:`engines<Omega.engines>`, :yref:`initializers<Omega.initializers>`, :yref:`miscParams<Omega.miscParams>`.
 
-Some variables do not correspond literally, for historical reasons (which should be fixed):
+To give an overview of (some) variables:
 
 ======================== ===================================
 Python                   c++
 ======================== ===================================
-:yref:`Omega.iter`       ``Scene::currentIteration``
+:yref:`Omega.iter`       ``Scene::iter``
 :yref:`Omega.dt`         ``Scene::dt``
-:yref:`Omega.time`       ``Scene::simulationTime``
-:yref:`Omega.realtime`   ``Omega::getComputationTime()``
-:yref:`Omega.stopAtIter` ``Scene::stopAtIteration``
+:yref:`Omega.time`       ``Scene::time``
+:yref:`Omega.realtime`   ``Omega::getRealTime()``
+:yref:`Omega.stopAtIter` ``Scene::stopAtIter``
 ======================== ===================================
 
 ``Omega`` in c++ contains pointer to the current scene (``Omega::scene``, retrieved by ``Omega::instance().getScene()``). Using :yref:`Omega.switchScene`, it is possible to swap this pointer with ``Omega::sceneAnother``, a completely independent simulation. This can be useful for example (and this motivated this functionality) if while constructing simulation, another simulation has to be run to dynamically generate (i.e. by running simulation) packing of spheres. 
 
 .. rubric:: Footnotes
 
-.. [#oinst] It is understood that instantiating ``Omega()`` in python only instantiated the wrapper class, not the singleton itself.
+.. [#oinst] It is understood that instantiating ``Omega()`` in python only instantiates the wrapper class, not the singleton itself.
 
 Engine loop
 ------------
