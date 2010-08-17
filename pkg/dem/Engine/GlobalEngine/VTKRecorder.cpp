@@ -176,7 +176,9 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> rpmSpecMass = vtkSmartPointer<vtkFloatArray>::New();
 	rpmSpecMass->SetNumberOfComponents(1);
 	rpmSpecMass->SetName("rpmSpecMass");
-	
+	vtkSmartPointer<vtkFloatArray> rpmSpecDiam = vtkSmartPointer<vtkFloatArray>::New();
+	rpmSpecDiam->SetNumberOfComponents(1);
+	rpmSpecDiam->SetName("rpmSpecDiam");
 
 	if(recActive[REC_INTR]){
 		// save body positions, referenced by ids by vtkLine
@@ -261,6 +263,7 @@ void VTKRecorder::action(){
 				if (recActive[REC_RPM]){
 					rpmSpecNum->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenNumber);
 					rpmSpecMass->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenMass);
+					rpmSpecDiam->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->maxDiametrParticle);
 				}
 				
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
@@ -332,6 +335,7 @@ void VTKRecorder::action(){
 		if (recActive[REC_RPM]){
 			spheresUg->GetPointData()->AddArray(rpmSpecNum);
 			spheresUg->GetPointData()->AddArray(rpmSpecMass);
+			spheresUg->GetPointData()->AddArray(rpmSpecDiam);
 		}
 
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);

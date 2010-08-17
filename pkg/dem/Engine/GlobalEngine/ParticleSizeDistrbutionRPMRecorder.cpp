@@ -13,6 +13,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		if (!b) continue;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenNumber = 0;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenMass = 0;
+		YADE_PTR_CAST<RpmState>(b->state)->maxDiametrParticle = 0;
 	}
 	
 	//Check all interactions
@@ -143,6 +144,31 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		}
 	}
 	
+	
+	//Find maximal distance between spheres of one specimen
+	FOREACH(const shared_ptr<Body>& b1, *scene->bodies){
+		if (!b1) continue;
+		FOREACH(const shared_ptr<Body>& b2, *scene->bodies){
+			if (!b2) continue;
+			const Sphere* sphere1 = dynamic_cast<Sphere*>(b1->shape.get());							//Check, whether it is a sphere
+			const Sphere* sphere2 = dynamic_cast<Sphere*>(b2->shape.get());
+			int specimenNumberId1 = YADE_PTR_CAST<RpmState>(b1->state)->specimenNumber;	//Get specimenNumberId
+			int specimenNumberId2 = YADE_PTR_CAST<RpmState>(b2->state)->specimenNumber;
+			
+			if (((sphere1)&&(sphere2))&&(b1 != b2)&&(specimenNumberId1==specimenNumberId2)) {
+				Real distBetweenSpheres = (b1->state->pos - b2->state->pos).norm() + sphere1->radius + sphere2->radius;
+				for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
+					if ((arrayIdentIds[i].id1 == specimenNumberId1) or (arrayIdentIds[i].id1 == specimenNumberId2)) {
+						if (arrayIdentIds[i].maxDistanceBetweenSpheres<distBetweenSpheres) {
+							arrayIdentIds[i].maxDistanceBetweenSpheres = distBetweenSpheres;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	//Update specimen masses
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
@@ -152,6 +178,10 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 				if (arrayIdentIds[i].id1 == specimenNumberId) {
 					YADE_PTR_CAST<RpmState>(b->state)->specimenMass = arrayIdentIds[i].mass;		//Each particle will contain now the mass of specimen, to which it belongs to
+					if (arrayIdentIds[i].maxDistanceBetweenSpheres==0) {
+						arrayIdentIds[i].maxDistanceBetweenSpheres=sphere->radius;
+					}
+					YADE_PTR_CAST<RpmState>(b->state)->maxDiametrParticle = arrayIdentIds[i].maxDistanceBetweenSpheres;		//Each particle will contain now the maximal diametr of the specimen, to which it belongs to
 					break;
 				}
 			}
@@ -164,9 +194,9 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	out<<"**********\n";
 	out<<"iter totalMass numSpecimen\n";
 	out<<scene->iter<<" "<<totalMass<<" "<<arrayIdentIds.size()<<"\n";
-	out<<"id mass\n";
+	out<<"id mass maxDistanceBetweenSph\n";
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
-		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<"\n";
+		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<" "<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\n";
 	}
 	out.close();
 }
