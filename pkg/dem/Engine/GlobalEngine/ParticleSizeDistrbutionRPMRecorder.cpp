@@ -187,16 +187,85 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			}
 		}
 	}
-	
 	std::sort (arrayIdentIds.begin(), arrayIdentIds.end(), identicalIds::sortArrayIdentIds);
 	
+	//Material Analyze===============================================================================================
+	vector<materialAnalyze> materialAnalyzeIds;
+	materialAnalyzeIds.clear();
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		if (!b) continue;
+		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+		if (sphere) {
+			int specimenNumberId = YADE_PTR_CAST<RpmState>(b->state)->specimenNumber;
+			int materialId = b->material->id;
+			
+			//Check, whether this specimenId is in array
+			bool foundSuitableRecording = false;
+			for (unsigned int i=0; i<materialAnalyzeIds.size(); i++) {
+				if ((materialAnalyzeIds[i].specId == specimenNumberId) and (materialAnalyzeIds[i].matId == materialId)) {
+					materialAnalyzeIds[i].particleNumber++;
+					materialAnalyzeIds[i].mass+=YADE_PTR_CAST<RpmState>(b->state)->specimenMass;
+					foundSuitableRecording = true;
+					break;
+				}
+			}
+			//If not found the recording, create one
+			if (!foundSuitableRecording) {
+				materialAnalyze tempVar (materialId, specimenNumberId, 1, YADE_PTR_CAST<RpmState>(b->state)->specimenMass);
+				materialAnalyzeIds.push_back(tempVar);
+			}
+		}
+	}
+	std::sort (materialAnalyzeIds.begin(), materialAnalyzeIds.end(), materialAnalyze::sortMaterialAnalyze);
+	
+	for (unsigned int i=0; i<materialAnalyzeIds.size(); i++) {
+		std::cout<<materialAnalyzeIds[i].matId<<" "<<materialAnalyzeIds[i].specId<<" "<<materialAnalyzeIds[i].mass<<" "<<materialAnalyzeIds[i].particleNumber<<"\n";
+	}
+	std::cout<<"\n";
+	
+	//Define, how many material columns we need:
+	vector<int> materialCount;
+	materialCount.clear();
+	for (unsigned int i=0; i<materialAnalyzeIds.size(); i++) {
+		bool foundItem = false;
+		for (unsigned int w=0; w<materialCount.size(); w++) {
+			if (materialCount[w]==materialAnalyzeIds[i].matId) {
+				foundItem = true;
+				break;
+			}
+		}
+		if (foundItem==false) {materialCount.push_back(materialAnalyzeIds[i].matId);}
+	}
+	for (unsigned int w=0; w<materialCount.size(); w++) { std::cout<<materialCount[w]<<" ";}
+	std::cout<<"\n";
+		
+	//=================================================================================================================
 	//Save data to a file
 	out<<"**********\n";
 	out<<"iter totalMass numSpecimen\n";
 	out<<scene->iter<<" "<<totalMass<<" "<<arrayIdentIds.size()<<"\n";
-	out<<"id mass maxDistanceBetweenSph\n";
+	out<<"id mass maxDistanceBetweenSph ";
+	
+	for (unsigned int w=0; w<materialCount.size(); w++) { out<<"mat_"<<materialCount[w]<<" partN_"<<materialCount[w]<<" ";}
+	out<<"\n";
+	
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
-		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<" "<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\n";
+		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<" "<<arrayIdentIds[i].maxDistanceBetweenSpheres<<" ";
+		//Find Material Info
+		for (unsigned int w=0; w<materialCount.size(); w++) {
+			bool findItem=false;
+			for (unsigned int l=0; l<materialAnalyzeIds.size(); l++) {
+				if ((materialAnalyzeIds[l].matId==materialCount[w])&&(materialAnalyzeIds[l].specId==arrayIdentIds[i].id1)) {
+					out<<materialAnalyzeIds[l].mass<<" "<<materialAnalyzeIds[l].particleNumber<<" ";
+					findItem=true;
+				}
+			}
+			if (!findItem) {
+				out<<"0 0 ";
+			}
+		}
+		
+		out<<"\n";
 	}
 	out.close();
 }

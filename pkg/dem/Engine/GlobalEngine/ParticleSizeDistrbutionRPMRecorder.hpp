@@ -31,4 +31,17 @@ struct identicalIds{
 	}
 	static bool sortArrayIdentIds (identicalIds i, identicalIds d) {return i.mass>d.mass;}
 };
+
+struct materialAnalyze{
+	int matId, specId, particleNumber;
+	Real mass;
+	materialAnalyze (int matIdR, int specIdR, int particleNumberR, Real massR){
+		matId = matIdR;
+		specId = specIdR;
+		particleNumber = particleNumberR;
+		mass = massR;
+	}
+	static bool sortMaterialAnalyze (materialAnalyze i, materialAnalyze d) {return d.specId>i.specId;}
+};
+
 REGISTER_SERIALIZABLE(ParticleSizeDistrbutionRPMRecorder);
