@@ -21,12 +21,13 @@ class ParticleSizeDistrbutionRPMRecorder: public Recorder {
 
 struct identicalIds{
 	int id1, id2;
-	Real mass, maxDistanceBetweenSpheres;
-	identicalIds (int id1r, int id2r, Real massr){
+	Real mass, vol, maxDistanceBetweenSpheres;
+	identicalIds (int id1r, int id2r, Real massr, Real volr){
 		assert(id1r<id2r);
 		id1 = id1r;
 		id2 = id2r;
 		mass = massr;
+		vol = volr;
 		maxDistanceBetweenSpheres = 0;
 	}
 	static bool sortArrayIdentIds (identicalIds i, identicalIds d) {return i.mass>d.mass;}
@@ -34,12 +35,13 @@ struct identicalIds{
 
 struct materialAnalyze{
 	int matId, specId, particleNumber;
-	Real mass;
-	materialAnalyze (int matIdR, int specIdR, int particleNumberR, Real massR){
+	Real mass, vol;
+	materialAnalyze (int matIdR, int specIdR, int particleNumberR, Real massR, Real volR){
 		matId = matIdR;
 		specId = specIdR;
 		particleNumber = particleNumberR;
 		mass = massR;
+		vol = volR;
 	}
 	static bool sortMaterialAnalyze (materialAnalyze i, materialAnalyze d) {return d.specId>i.specId;}
 };

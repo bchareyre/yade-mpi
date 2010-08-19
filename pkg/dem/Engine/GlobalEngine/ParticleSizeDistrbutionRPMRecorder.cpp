@@ -13,7 +13,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		if (!b) continue;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenNumber = 0;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenMass = 0;
-		YADE_PTR_CAST<RpmState>(b->state)->maxDiametrParticle = 0;
+		YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam = 0;
 	}
 	
 	//Check all interactions
@@ -46,7 +46,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 					int maxIdR = std::max(specimenNumberId1, specimenNumberId2);
 					specimenNumberId1 = minIdR;
 					specimenNumberId2 = minIdR;
-					identicalIds tempVar(minIdR, maxIdR, 0);
+					identicalIds tempVar(minIdR, maxIdR, 0, 0);
 					arrayIdentIds.push_back(tempVar);							//Put in the container, that 2 ids belong to the same spcimen!
 				}
 			}
@@ -113,13 +113,17 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	int maximalSpecimenId = curBin;
 	arrayIdentIds.clear();
 	Real totalMass = 0;
+	Real totalVol = 0;
+	Real const constForVol = 4.0/3.0;
 	//Calculate specimen masses, create vector for storing it
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		if (sphere) {
 			Real massTemp = b->state->mass;
+			Real volTemp = constForVol*Mathr::PI*pow ( sphere->radius, 3 );
 			totalMass += massTemp;
+			totalVol += volTemp;
 			int specimenNumberId = YADE_PTR_CAST<RpmState>(b->state)->specimenNumber;
 			
 			if (specimenNumberId != 0) {					//Check, whether particle already belongs to any specimen
@@ -127,17 +131,18 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 				for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 					if (arrayIdentIds[i].id1 == specimenNumberId) {
 						arrayIdentIds[i].mass+=massTemp;//If "bin" for particle with this specimenId found, put its mass there
+						arrayIdentIds[i].vol+=volTemp;//If "bin" for particle with this specimenId found, put its volume there
 						foundItemInArray = true;
 					}
 					if (foundItemInArray) break;
 				}
 				if (!foundItemInArray) {						//If "bin" for particle is not found, create a "bin" for it
-					identicalIds tempVar(specimenNumberId, specimenNumberId+1, massTemp);
+					identicalIds tempVar(specimenNumberId, specimenNumberId+1, massTemp, volTemp);
 					arrayIdentIds.push_back(tempVar);
 				}
 			} else {									//If the particle was not in contact with other bodies, we give it maximal possible specimenId
 				YADE_PTR_CAST<RpmState>(b->state)->specimenNumber = maximalSpecimenId;
-				identicalIds tempVar(maximalSpecimenId, maximalSpecimenId+1, massTemp);
+				identicalIds tempVar(maximalSpecimenId, maximalSpecimenId+1, massTemp, volTemp);
 				arrayIdentIds.push_back(tempVar);
 				maximalSpecimenId++;
 			}
@@ -181,7 +186,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 					if (arrayIdentIds[i].maxDistanceBetweenSpheres==0) {
 						arrayIdentIds[i].maxDistanceBetweenSpheres=sphere->radius;
 					}
-					YADE_PTR_CAST<RpmState>(b->state)->maxDiametrParticle = arrayIdentIds[i].maxDistanceBetweenSpheres;		//Each particle will contain now the maximal diametr of the specimen, to which it belongs to
+					YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam = arrayIdentIds[i].maxDistanceBetweenSpheres;		//Each particle will contain now the maximal diametr of the specimen, to which it belongs to
 					break;
 				}
 			}
@@ -204,24 +209,21 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			for (unsigned int i=0; i<materialAnalyzeIds.size(); i++) {
 				if ((materialAnalyzeIds[i].specId == specimenNumberId) and (materialAnalyzeIds[i].matId == materialId)) {
 					materialAnalyzeIds[i].particleNumber++;
-					materialAnalyzeIds[i].mass+=YADE_PTR_CAST<RpmState>(b->state)->specimenMass;
+					materialAnalyzeIds[i].mass+=b->state->mass;
+					materialAnalyzeIds[i].vol+=constForVol*Mathr::PI*pow ( sphere->radius, 3 );
 					foundSuitableRecording = true;
 					break;
 				}
 			}
 			//If not found the recording, create one
 			if (!foundSuitableRecording) {
-				materialAnalyze tempVar (materialId, specimenNumberId, 1, YADE_PTR_CAST<RpmState>(b->state)->specimenMass);
+				Real spheresVolume = constForVol*Mathr::PI*pow ( sphere->radius, 3 );
+				materialAnalyze tempVar (materialId, specimenNumberId, 1, b->state->mass, spheresVolume);
 				materialAnalyzeIds.push_back(tempVar);
 			}
 		}
 	}
 	std::sort (materialAnalyzeIds.begin(), materialAnalyzeIds.end(), materialAnalyze::sortMaterialAnalyze);
-	
-	for (unsigned int i=0; i<materialAnalyzeIds.size(); i++) {
-		std::cout<<materialAnalyzeIds[i].matId<<" "<<materialAnalyzeIds[i].specId<<" "<<materialAnalyzeIds[i].mass<<" "<<materialAnalyzeIds[i].particleNumber<<"\n";
-	}
-	std::cout<<"\n";
 	
 	//Define, how many material columns we need:
 	vector<int> materialCount;
@@ -236,36 +238,39 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		}
 		if (foundItem==false) {materialCount.push_back(materialAnalyzeIds[i].matId);}
 	}
-	for (unsigned int w=0; w<materialCount.size(); w++) { std::cout<<materialCount[w]<<" ";}
-	std::cout<<"\n";
 		
 	//=================================================================================================================
 	//Save data to a file
 	out<<"**********\n";
-	out<<"iter totalMass numSpecimen\n";
-	out<<scene->iter<<" "<<totalMass<<" "<<arrayIdentIds.size()<<"\n";
-	out<<"id mass maxDistanceBetweenSph ";
+	out<<"iter\ttotalMass\ttotalVol\tnumSpec\tmatNum\n";
+	out<<scene->iter<<"\t"<<totalMass<<"\t"<<totalVol<<"\t"<<arrayIdentIds.size()<<"\t"<<materialCount.size()<<"\n\n";
+	out<<"id\tmassSpec\tvolSpec \tmaxDiamSpec\t";
 	
-	for (unsigned int w=0; w<materialCount.size(); w++) { out<<"mat_"<<materialCount[w]<<" partN_"<<materialCount[w]<<" ";}
+	if (materialCount.size() > 1) {
+		for (unsigned int w=0; w<materialCount.size(); w++) { out<<"mat_"<<materialCount[w]<<"_Mass\tmat_"<<materialCount[w]<<"_Vol\tmat_"<<materialCount[w]<<"_PartNum\t";}
+	}
 	out<<"\n";
 	
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
-		out<<arrayIdentIds[i].id1<<" "<<arrayIdentIds[i].mass<<" "<<arrayIdentIds[i].maxDistanceBetweenSpheres<<" ";
-		//Find Material Info
-		for (unsigned int w=0; w<materialCount.size(); w++) {
-			bool findItem=false;
-			for (unsigned int l=0; l<materialAnalyzeIds.size(); l++) {
-				if ((materialAnalyzeIds[l].matId==materialCount[w])&&(materialAnalyzeIds[l].specId==arrayIdentIds[i].id1)) {
-					out<<materialAnalyzeIds[l].mass<<" "<<materialAnalyzeIds[l].particleNumber<<" ";
-					findItem=true;
+		out<<arrayIdentIds[i].id1<<"\t"<<arrayIdentIds[i].mass<<"\t"<<arrayIdentIds[i].vol<<"\t"<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\t";
+		if (materialCount.size() > 1) {
+			//Find Material Info
+			for (unsigned int w=0; w<materialCount.size(); w++) {
+				bool findItem=false;
+				vector<int> indexToDelete;
+				for (unsigned int l=0; l<materialAnalyzeIds.size(); l++) {
+					if ((materialAnalyzeIds[l].matId==materialCount[w])&&(materialAnalyzeIds[l].specId==arrayIdentIds[i].id1)) {
+						out<<materialAnalyzeIds[l].mass<<"\t"<<materialAnalyzeIds[l].vol<<"\t"<<materialAnalyzeIds[l].particleNumber<<"\t";
+						findItem=true;
+					}
+				}
+				if (!findItem) {
+					out<<"0\t0\t0\t";
 				}
 			}
-			if (!findItem) {
-				out<<"0 0 ";
-			}
 		}
-		
 		out<<"\n";
 	}
+	
 	out.close();
 }

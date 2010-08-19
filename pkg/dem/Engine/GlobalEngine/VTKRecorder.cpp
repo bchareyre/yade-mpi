@@ -263,7 +263,7 @@ void VTKRecorder::action(){
 				if (recActive[REC_RPM]){
 					rpmSpecNum->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenNumber);
 					rpmSpecMass->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenMass);
-					rpmSpecDiam->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->maxDiametrParticle);
+					rpmSpecDiam->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam);
 				}
 				
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
