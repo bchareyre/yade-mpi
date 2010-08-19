@@ -13,6 +13,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		if (!b) continue;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenNumber = 0;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenMass = 0;
+		YADE_PTR_CAST<RpmState>(b->state)->specimenVol = 0;
 		YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam = 0;
 	}
 	
@@ -174,7 +175,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		}
 	}
 	
-	//Update specimen masses
+	//Update specimen masses and volumes
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
@@ -187,6 +188,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 						arrayIdentIds[i].maxDistanceBetweenSpheres=sphere->radius;
 					}
 					YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam = arrayIdentIds[i].maxDistanceBetweenSpheres;		//Each particle will contain now the maximal diametr of the specimen, to which it belongs to
+					YADE_PTR_CAST<RpmState>(b->state)->specimenVol = arrayIdentIds[i].vol;		//Each particle will contain now the volume of the specimen, to which it belongs to
 					break;
 				}
 			}
