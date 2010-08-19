@@ -240,7 +240,8 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 		}
 		if (foundItem==false) {materialCount.push_back(materialAnalyzeIds[i].matId);}
 	}
-		
+	std::sort (materialCount.begin(), materialCount.end());
+	
 	//=================================================================================================================
 	//Save data to a file
 	out<<"**********\n";
