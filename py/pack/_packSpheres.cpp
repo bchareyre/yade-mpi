@@ -33,9 +33,9 @@ BOOST_PYTHON_MODULE(_packSpheres){
 		.def("__iter__",&SpherePack::getIterator,"Return iterator over spheres.")
 		.def_readwrite("psdScaleExponent",&SpherePack::psdScaleExponent,"Exponent used to scale cummulative distribution function values so that standard uniform distribution is mapped to uniform mass distribution. Theoretically, this value is 3, but that usually overfavors small particles. The dafault value is 2.5.")
 		;
-	python::class_<SpherePack::iterator>("SpherePackIterator",python::init<SpherePack::iterator&>())
-		.def("__iter__",&SpherePack::iterator::iter)
-		.def("next",&SpherePack::iterator::next)
+	python::class_<SpherePack::_iterator>("SpherePackIterator",python::init<SpherePack::_iterator&>())
+		.def("__iter__",&SpherePack::_iterator::iter)
+		.def("next",&SpherePack::_iterator::next)
 	;
 }
 

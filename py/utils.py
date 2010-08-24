@@ -96,7 +96,7 @@ def typedEngine(name):
 	>>> utils.typedEngine("NewtonIntegrator") == O.engines[1]
 	True
 	"""
-	return [e for e in Omega().engines if e.name==name][0]
+	return [e for e in Omega().engines if e.__class__.__name__==name][0]
 
 def downCast(obj,newClassName):
 	"""Cast given object to class deriving from the same yade root class and copy all parameters from given object.
@@ -562,7 +562,7 @@ def replaceCollider(colliderEngine):
 	"""Replaces collider (Collider) engine with the engine supplied. Raises error if no collider is in engines."""
 	colliderIdx=-1
 	for i,e in enumerate(O.engines):
-		if O.isChildClassOf(e.name,"Collider"):
+		if O.isChildClassOf(e.__class__.__name__,"Collider"):
 			colliderIdx=i
 			break
 	if colliderIdx<0: raise RuntimeError("No Collider found within O.engines.")

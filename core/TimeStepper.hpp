@@ -24,8 +24,8 @@ class TimeStepper: public GlobalEngine{
 		
 		YADE_CLASS_BASE_DOC_ATTRS(
 			TimeStepper,GlobalEngine,"Engine defining time-step (fundamental class)",
-			((bool,active,true,"is the engine active?"))
-			((unsigned int,timeStepUpdateInterval,1,"dt update interval")));
+			((bool,active,true,,"is the engine active?"))
+			((unsigned int,timeStepUpdateInterval,1,,"dt update interval")));
 };
 
 REGISTER_SERIALIZABLE(TimeStepper);

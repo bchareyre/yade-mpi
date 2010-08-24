@@ -35,13 +35,12 @@ class Material: public Serializable, public Indexable{
 		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<Scene> scene) {return byLabel(label,scene.get());}
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Material,Serializable,"Material properties of a :yref:`body<Body>`.",
-		((int,id,((void)"not shared",-1),"[id of shared material, overridden below]"))
-		((string,label,,"Textual identifier for this material; can be used for shared materials lookup in :yref:`MaterialContainer`."))
-		((Real,density,1000,"Density of the material [kg/m³]")),
+		((int,id,((void)"not shared",-1),Attr::pyReadonly,"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise. This value is set automatically when the material is inserted to the simulation via :yref:`O.materials.append<MaterialContainer.append>`. (This id was necessary since before boost::serialization was used, shared pointers were not tracked properly; it might disappear in the future)"))
+		((string,label,,,"Textual identifier for this material; can be used for shared materials lookup in :yref:`MaterialContainer`."))
+		((Real,density,1000,,"Density of the material [kg/m³]")),
 		/* ctor */,
 		/*py*/
 		.def("newAssocState",&Material::newAssocState,"Return new :yref:`State` instance, which is associated with this :yref:`Material`. Some materials have special requirement on :yref:`Body::state` type and calling this function when the body is created will ensure that they match. (This is done automatically if you use utils.sphere, … functions from python).")
-		.def_readonly("id",&Material::id,"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise. This value is set automatically when the material is inserted to the simulation via :yref:`O.materials.append<MaterialContainer.append>`. (This id is necessary since yade::serialization doesn't track shared pointers, but might disappear in the future)")
 		YADE_PY_TOPINDEXABLE(Material)
 	);
 	REGISTER_INDEX_COUNTER(Material);

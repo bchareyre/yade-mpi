@@ -24,18 +24,11 @@ class TestObjectInstantiation(unittest.TestCase):
 	def testClassCtors(self):
 		# correct instances created with Foo() syntax
 		for r in allClasses:
-			# this catch should be removed once all classes register with YADE_CLASS_BASE_DOC_* 
-			try:
-				obj=eval(r)();
-				self.assert_(obj.name==r,'Failed for '+r)
-			except NameError: pass
+			obj=eval(r)();
+			self.assert_(obj.__class__.__name__==r,'Failed for '+r)
 	def testRootDerivedCtors_attrs_few(self):
 		# attributes passed when using the Foo(attr1=value1,attr2=value2) syntax
 		gm=Shape(wire=True); self.assert_(gm.wire==True)
-	# not applicable for OpenGL-less builds... seems all other classes do derive from something below Serializable
-	#def testNonderived_attrs_few(self):
-	#	# classes deriving just from Serializable can be instantiated by their name directly, including attributes
-	#	gld3d=Gl1_Sphere(glutSlices=24); self.assert_(glds.name=='Gl1_Sphere')
 	def testDispatcherCtor(self):
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one
@@ -46,12 +39,12 @@ class TestObjectInstantiation(unittest.TestCase):
 		# InteractionDispatchers takes 3 lists
 		id=InteractionDispatchers([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
-		self.assert_(id.geomDispatcher.name=='InteractionGeometryDispatcher')
-		self.assert_(id.physDispatcher.functors[0].name=='Ip2_FrictMat_FrictMat_FrictPhys')
-		self.assert_(id.lawDispatcher.functors[0].name=='Law2_Dem3DofGeom_FrictPhys_Basic')
+		self.assert_(id.geomDispatcher.__class__==InteractionGeometryDispatcher)
+		self.assert_(id.physDispatcher.functors[0].__class__==Ip2_FrictMat_FrictMat_FrictPhys)
+		self.assert_(id.lawDispatcher.functors[0].__class__==Law2_Dem3DofGeom_FrictPhys_Basic)
 	def testParallelEngineCtor(self):
 		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),ForceResetter()]])
-		self.assert_(pe.slaves[0].name=='InsertionSortCollider')
+		self.assert_(pe.slaves[0].__class__==InsertionSortCollider)
 		self.assert_(len(pe.slaves[1])==2)
 		pe.slaves=[]
 		self.assert_(len(pe.slaves)==0)

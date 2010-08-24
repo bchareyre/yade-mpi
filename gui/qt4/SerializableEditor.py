@@ -85,7 +85,7 @@ class AttrEditor_Int(AttrEditor,QSpinBox):
 	def __init__(self,parent,getter,setter):
 		AttrEditor.__init__(self,getter,setter)
 		QSpinBox.__init__(self,parent)
-		self.setRange(int(-1e10),int(1e10)); self.setSingleStep(1);
+		self.setRange(int(-1e9),int(1e9)); self.setSingleStep(1);
 		self.valueChanged.connect(self.update)
 	def refresh(self): self.setValue(self.getter())
 	def update(self):  self.trySetter(self.value())
@@ -209,7 +209,7 @@ class AttrEditor_MatrixXi(AttrEditor,QFrame):
 		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
 			w=QSpinBox()
-			w.setRange(int(-1e10),int(1e10)); w.setSingleStep(1);
+			w.setRange(int(-1e9),int(1e9)); w.setSingleStep(1);
 			self.grid.addWidget(w,row,col);
 			w.valueChanged.connect(self.update)
 		self.refresh()
@@ -537,7 +537,10 @@ class NewSerializableDialog(QDialog):
 		self.setWindowTitle('Create new object of type %s'%baseClassName)
 		self.layout=QVBoxLayout(self)
 		self.combo=QComboBox(self)
-		childs=list(yade.system.childClasses(baseClassName,includeBase=includeBase)); childs.sort()
+		childs=list(yade.system.childClasses(baseClassName,includeBase=False)); childs.sort()
+		if includeBase:
+			self.combo.addItem(baseClassName)
+			self.combo.insertSeparator(1000)
 		self.combo.addItems(childs)
 		self.combo.currentIndexChanged.connect(self.comboSlot)
 		self.scroll=QScrollArea(self)

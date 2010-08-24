@@ -46,7 +46,6 @@ class STLImporterTest : public FileGenerator
 
 	protected :
 		bool generate(std::string& message);
-		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(minRadius)(maxRadius)(spheresHeight)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(gravity)(density)(disorder)(stlFileName)(wire)(angularVelocity)(rotationAxis)(dampingForce)(dampingMomentum)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(STLImporterTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);

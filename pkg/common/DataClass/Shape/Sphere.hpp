@@ -10,7 +10,7 @@ class Sphere: public Shape{
 		Sphere(Real _radius): radius(_radius){ createIndex(); }
 		virtual ~Sphere ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Sphere,Shape,"Geometry of spherical particle.",
-		((Real,radius,NaN,"Radius [m]")),
+		((Real,radius,NaN,,"Radius [m]")),
 		createIndex(); /*ctor*/
 	);
 	REGISTER_CLASS_INDEX(Sphere,Shape);

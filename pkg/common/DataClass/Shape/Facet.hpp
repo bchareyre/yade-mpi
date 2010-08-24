@@ -33,26 +33,16 @@ class Facet : public Shape {
 	/// Unit vertice vectors
 	Vector3r vu[3];
 
-	void postProcessAttributes(bool deserializing);
-
-	void setVertices(const vector<Vector3r>& v){
-		if(v.size()!=3) throw runtime_error("Facet must have exactly 3 vertices.");
-		assert(vertices.size()==3);
-		for(int i=0; i<3; i++) vertices[i]=v[i];
-		Facet::postProcessAttributes(true);
-	}
-	vector<Vector3r> getVertices(){ vector<Vector3r> ret(3); for(int i=0; i<3; i++) ret[i]=vertices[i]; return ret;}
+	void postLoad(Facet&);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Facet,Shape,"Facet (triangular particle) geometry.",
-		((vector<Vector3r>,vertices,vector<Vector3r>(3),"[overridden below]"))
+		((vector<Vector3r>,vertices,vector<Vector3r>(3),(Attr::pyCallPostLoad | Attr::pyNoResize),"Vertex positions in local coordinates."))
 		#ifdef FACET_TOPO
-		((vector<Body::id_t>,edgeAdjIds,vector<Body::id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
-		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),"half angle between normals of this facet and the adjacent facet [experimental]"))
+		((vector<Body::id_t>,edgeAdjIds,vector<Body::id_t>(3,Body::ID_NONE),,"Facet id's that are adjacent to respective edges [experimental]"))
+		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),,"half angle between normals of this facet and the adjacent facet [experimental]"))
 		#endif
 		,
 		/* ctor */ createIndex();,
-		/* must be separate to call postProcessAttributes(0) when changed, to keep internal data consistent */
-		.add_property("vertices",&Facet::getVertices,&Facet::setVertices,"Vertex positions in local coordinates. :yattrtype:`vector<Vector3r>` ")
 	);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Facet,Shape);

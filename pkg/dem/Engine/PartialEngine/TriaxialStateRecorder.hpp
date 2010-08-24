@@ -33,7 +33,7 @@ class TriaxialStateRecorder : public Recorder
 		virtual void action();
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(TriaxialStateRecorder,Recorder,"Engine recording triaxial variables (see the variables list in the first line of the output file). This recorder needs :yref:`TriaxialCompressionEngine` or :yref:`ThreeDTriaxialEngine` present in the simulation).",
-		((Real,porosity,1,"porosity of the packing [-]")), //Is it really needed to have this value as a serializable?
+		((Real,porosity,1,,"porosity of the packing [-]")), //Is it really needed to have this value as a serializable?
 		initRun=true;
 		);
 	DECLARE_LOGGER;

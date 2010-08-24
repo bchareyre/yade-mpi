@@ -20,8 +20,8 @@ class CohFrictMat : public FrictMat
 
 /// Serialization
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictMat,FrictMat,"",
-		((bool,isBroken,true,""))
-		((bool,isCohesive,true,"")),
+		((bool,isBroken,true,,""))
+		((bool,isCohesive,true,,"")),
 		createIndex();
 					);
 /// Indexable

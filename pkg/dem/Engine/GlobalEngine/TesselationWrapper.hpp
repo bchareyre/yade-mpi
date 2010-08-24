@@ -89,7 +89,7 @@ public:
 	MicroMacroAnalyser mma;
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.",
-	((unsigned int,n_spheres,0,"|ycomp|"))
+	((unsigned int,n_spheres,0,,"|ycomp|"))
 	,/*ctor*/
   	Tes = new CGT::Tesselation;
 	clear();

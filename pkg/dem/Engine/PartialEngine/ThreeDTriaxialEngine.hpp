@@ -52,19 +52,19 @@ class ThreeDTriaxialEngine : public TriaxialStressController
 		"For a strain control the imposed strain is specified by 'strainRatei'.\n"
 		"With this engine you can also perform internal compaction by growing the size of particles by using ``TriaxialStressController::controlInternalStress``. For that, just switch on 'internalCompaction=1' and fix sigma_iso=value of mean pressure that you want at the end of the internal compaction.\n"
 		,
-		((Real, strainRate1,0,"target strain rate in direction 1 (./s)"))
-		((Real, currentStrainRate1,0,"current strain rate in direction 1 - converging to :yref:'ThreeDTriaxialEngine::strainRate1' (./s)"))
-		((Real, strainRate2,0,"target strain rate in direction 2 (./s)"))
-		((Real, currentStrainRate2,0,"current strain rate in direction 2 - converging to :yref:'ThreeDTriaxialEngine::strainRate2' (./s)"))
-		((Real, strainRate3,0,"target strain rate in direction 3 (./s)"))
-		((Real, currentStrainRate3,0,"current strain rate in direction 3 - converging to :yref:'ThreeDTriaxialEngine::strainRate3' (./s)"))
-		((Real, UnbalancedForce,1,"mean resultant forces divided by mean contact force"))
-		((Real, frictionAngleDegree,-1,"Value of friction used in the simulation if (updateFrictionAngle)"))
-		((bool, updateFrictionAngle,false,"Switch to activate the update of the intergranular frictionto the value :yref:'ThreeDTriaxialEngine::frictionAngleDegree")) 
-		((bool, stressControl_1,true,"Switch to choose a stress or a strain control in directions 1"))
-		((bool, stressControl_2,true,"Switch to choose a stress or a strain control in directions 2"))
-		((bool, stressControl_3,true,"Switch to choose a stress or a strain control in directions 3"))
-		((std::string,Key,"","A string appended at the end of all files, use it to name simulations."))
+		((Real, strainRate1,0,,"target strain rate in direction 1 (./s)"))
+		((Real, currentStrainRate1,0,,"current strain rate in direction 1 - converging to :yref:'ThreeDTriaxialEngine::strainRate1' (./s)"))
+		((Real, strainRate2,0,,"target strain rate in direction 2 (./s)"))
+		((Real, currentStrainRate2,0,,"current strain rate in direction 2 - converging to :yref:'ThreeDTriaxialEngine::strainRate2' (./s)"))
+		((Real, strainRate3,0,,"target strain rate in direction 3 (./s)"))
+		((Real, currentStrainRate3,0,,"current strain rate in direction 3 - converging to :yref:'ThreeDTriaxialEngine::strainRate3' (./s)"))
+		((Real, UnbalancedForce,1,,"mean resultant forces divided by mean contact force"))
+		((Real, frictionAngleDegree,-1,,"Value of friction used in the simulation if (updateFrictionAngle)"))
+		((bool, updateFrictionAngle,false,,"Switch to activate the update of the intergranular frictionto the value :yref:'ThreeDTriaxialEngine::frictionAngleDegree")) 
+		((bool, stressControl_1,true,,"Switch to choose a stress or a strain control in directions 1"))
+		((bool, stressControl_2,true,,"Switch to choose a stress or a strain control in directions 2"))
+		((bool, stressControl_3,true,,"Switch to choose a stress or a strain control in directions 3"))
+		((std::string,Key,"",,"A string appended at the end of all files, use it to name simulations."))
 		,
 		translationAxisy=Vector3r(0,1,0);
 		translationAxisx=Vector3r(1,0,0);

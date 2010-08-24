@@ -27,7 +27,7 @@ Features of the interaction law:
 /** This class holds information associated with each body state*/
 class CFpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CFpmState,State,"CFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
-		((int,numBrokenCohesive,0,"Number of broken cohesive links. [-]")),
+		((int,numBrokenCohesive,0,,"Number of broken cohesive links. [-]")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(CFpmState,State);
@@ -41,7 +41,7 @@ class CFpmMat: public FrictMat {
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CFpmState*>(s); }
 		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CFpmMat,FrictMat,"cohesive frictional material, for use with other CFpm classes",
-	  ((int,type,0,"Type of the particle. If particles of two different types interact, it will be with friction only (no cohesion).[-]")),
+	  ((int,type,0,,"Type of the particle. If particles of two different types interact, it will be with friction only (no cohesion).[-]")),
 	  createIndex();
 	);
 	REGISTER_CLASS_INDEX(CFpmMat,FrictMat);
@@ -54,21 +54,21 @@ class CFpmPhys: public NormShearPhys {
 		virtual ~CFpmPhys();
 	
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CFpmPhys,NormShearPhys,"Representation of a single interaction of the CFpm type, storage for relevant parameters",
-		  ((Real,initD,0,"equilibrium distance for particles. Computed as the initial interparticular distance when bonded particle interact. initD=0 for non cohesive interactions."))
-		  ((bool,isCohesive,false,"If false, particles interact in a frictional way. If true, particles are bonded regarding the given cohesion and tensileStrength."))
-		  ((Real, frictionAngle,0,"defines Coulomb friction. [deg]"))
-		  ((Real,tanFrictionAngle,0,"Tangent of frictionAngle. [-]"))
-		  ((Real,FnMax,0,"Defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection, with crossSection=pi*Rmin^2. [Pa]"))
-		  ((Real,FsMax,0,"Defines the maximum admissible tangential force in shear FsMax=cohesion*FnMax, with crossSection=pi*Rmin^2. [Pa]"))
-		  ((Real,strengthSoftening,0,"Defines the softening when Dtensile is reached to avoid explosion. Typically, when D > Dtensile, Fn=FnMax - (kn/strengthSoftening)*(Dtensile-D). [-]"))
-		  ((Real,cumulativeRotation,0,"Cumulated rotation... [-]"))
-		  ((Real,kr,0,"Defines the stiffness to compute the resistive moment in rotation. [-]"))
-		  ((Real,maxBend,0,"Defines the maximum admissible resistive moment in rotation Mtmax=maxBend*Fn, maxBend=eta*meanRadius. [m]"))
-		  ((Vector3r,prevNormal,Vector3r::Zero(),"Normal to the contact at previous time step."))
-		  ((Vector3r,moment_twist,Vector3r::Zero()," [N.m]"))
-		  ((Vector3r,moment_bending,Vector3r::Zero()," [N.m]"))
-		  ((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),"Used for moment computation."))
-		  ((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),"Used for moment computation."))
+		  ((Real,initD,0,,"equilibrium distance for particles. Computed as the initial interparticular distance when bonded particle interact. initD=0 for non cohesive interactions."))
+		  ((bool,isCohesive,false,,"If false, particles interact in a frictional way. If true, particles are bonded regarding the given cohesion and tensileStrength."))
+		  ((Real, frictionAngle,0,,"defines Coulomb friction. [deg]"))
+		  ((Real,tanFrictionAngle,0,,"Tangent of frictionAngle. [-]"))
+		  ((Real,FnMax,0,,"Defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection, with crossSection=pi*Rmin^2. [Pa]"))
+		  ((Real,FsMax,0,,"Defines the maximum admissible tangential force in shear FsMax=cohesion*FnMax, with crossSection=pi*Rmin^2. [Pa]"))
+		  ((Real,strengthSoftening,0,,"Defines the softening when Dtensile is reached to avoid explosion. Typically, when D > Dtensile, Fn=FnMax - (kn/strengthSoftening)*(Dtensile-D). [-]"))
+		  ((Real,cumulativeRotation,0,,"Cumulated rotation... [-]"))
+		  ((Real,kr,0,,"Defines the stiffness to compute the resistive moment in rotation. [-]"))
+		  ((Real,maxBend,0,,"Defines the maximum admissible resistive moment in rotation Mtmax=maxBend*Fn, maxBend=eta*meanRadius. [m]"))
+		  ((Vector3r,prevNormal,Vector3r::Zero(),,"Normal to the contact at previous time step."))
+		  ((Vector3r,moment_twist,Vector3r::Zero(),," [N.m]"))
+		  ((Vector3r,moment_bending,Vector3r::Zero(),," [N.m]"))
+		  ((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),,"Used for moment computation."))
+		  ((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),,"Used for moment computation."))
 		  ,
 		  createIndex();
 		  ,
@@ -87,14 +87,14 @@ class Ip2_CFpmMat_CFpmMat_CFpmPhys: public InteractionPhysicsFunctor{
 		DECLARE_LOGGER;
 		
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CFpmMat_CFpmMat_CFpmPhys,InteractionPhysicsFunctor,"Converts 2 CFpmmat instances to CFpmPhys with corresponding parameters.",
-		  ((int,cohesiveTresholdIteration,1,"Should new contacts be cohesive? They will before this iter, they won't afterward."))
-		  ((bool,useAlphaBeta,false,"If true, stiffnesses are computed based on Alpha and Beta."))
-		  ((Real,Alpha,0,"Defines the ratio ks/kn."))
-		  ((Real,Beta,0,"Defines the ratio kr/(ks*meanRadius^2) to compute the resistive moment in rotation. [-]"))
-		  ((Real,eta,0,"Defines the maximum admissible resistive moment in rotation MtMax=eta*meanRadius*Fn. [-]"))
-		  ((Real,tensileStrength,0,"Defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection. [Pa]"))
-		  ((Real,cohesion,0,"Defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection. [Pa]"))
-		  ((Real,strengthSoftening,0,"Defines the softening when Dtensile is reached to avoid explosion of the contact. Typically, when D > Dtensile, Fn=FnMax - (kn/strengthSoftening)*(Dtensile-D). [-]"))
+		  ((int,cohesiveTresholdIteration,1,,"Should new contacts be cohesive? They will before this iter, they won't afterward."))
+		  ((bool,useAlphaBeta,false,,"If true, stiffnesses are computed based on Alpha and Beta."))
+		  ((Real,Alpha,0,,"Defines the ratio ks/kn."))
+		  ((Real,Beta,0,,"Defines the ratio kr/(ks*meanRadius^2) to compute the resistive moment in rotation. [-]"))
+		  ((Real,eta,0,,"Defines the maximum admissible resistive moment in rotation MtMax=eta*meanRadius*Fn. [-]"))
+		  ((Real,tensileStrength,0,,"Defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection. [Pa]"))
+		  ((Real,cohesion,0,,"Defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection. [Pa]"))
+		  ((Real,strengthSoftening,0,,"Defines the softening when Dtensile is reached to avoid explosion of the contact. Typically, when D > Dtensile, Fn=FnMax - (kn/strengthSoftening)*(Dtensile-D). [-]"))
 		);
 };
 REGISTER_SERIALIZABLE(Ip2_CFpmMat_CFpmMat_CFpmPhys);
@@ -107,7 +107,7 @@ class Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM: public LawFunctor{
 		FUNCTOR2D(ScGeom,CFpmPhys);
 
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM,LawFunctor,"Constitutive law for the CFpm model.",
-		  ((bool,preventGranularRatcheting,true,"If true rotations are computed such as granular ratcheting is prevented. See article [Alonso2004]_, pg. 3-10 -- and a lot more papers from the same authors)."))
+		  ((bool,preventGranularRatcheting,true,,"If true rotations are computed such as granular ratcheting is prevented. See article [Alonso2004]_, pg. 3-10 -- and a lot more papers from the same authors)."))
 	);
 	DECLARE_LOGGER;	
 };

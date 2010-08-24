@@ -21,11 +21,11 @@ class Gl1_Sphere : public GlShapeFunctor{
 	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Sphere,GlShapeFunctor,"Renders :yref:`Sphere` object",
-		((bool,wire,false,"Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``."))
-		((bool,stripes,false,"In non-wire rendering, show stripes clearly showing particle rotation."))
-		((bool,glutNormalize,true,"Fix normals for non-wire rendering; see http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html"))
-		((int,glutSlices,12,"Number of sphere slices; not used with ``stripes`` (see `glut{Solid,Wire}Sphere reference <http://www.opengl.org/documentation/specs/glut/spec3/node81.html>`_)"))
-		((int,glutStacks,6,"Number of sphere stacks; not used with ``stripes`` (see `glut{Solid,Wire}Sphere reference <http://www.opengl.org/documentation/specs/glut/spec3/node81.html>`_)"))
+		((bool,wire,false,,"Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``."))
+		((bool,stripes,false,,"In non-wire rendering, show stripes clearly showing particle rotation."))
+		((bool,glutNormalize,true,,"Fix normals for non-wire rendering; see http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html"))
+		((int,glutSlices,12,,"Number of sphere slices; not used with ``stripes`` (see `glut{Solid,Wire}Sphere reference <http://www.opengl.org/documentation/specs/glut/spec3/node81.html>`_)"))
+		((int,glutStacks,6,,"Number of sphere stacks; not used with ``stripes`` (see `glut{Solid,Wire}Sphere reference <http://www.opengl.org/documentation/specs/glut/spec3/node81.html>`_)"))
 	);
 	RENDERS(Sphere);
 };

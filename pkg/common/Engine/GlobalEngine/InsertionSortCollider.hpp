@@ -197,16 +197,16 @@ class InsertionSortCollider: public Collider{
 		\n\n \
 		If you additionally set ``nBins`` to >=1, not all particles will have their bound enlarged by ``sweepLength``; instead, they will be put to bins (in the statistical sense) based on magnitude of their velocity; ``sweepLength`` will only be used for particles in the fastest bin, whereas only proportionally smaller length will be used for slower particles; The coefficient between bin's velocities is given by ``binCoeff``.\
 	",
-		((int,sortAxis,0,"Axis for the initial contact detection."))
-		((bool,sortThenCollide,false,"Separate sorting and colliding phase; it is MUCH slower, but all interactions are processed at every step; this effectively makes the collider non-persistent, not remembering last state. (The default behavior relies on the fact that inversions during insertion sort are overlaps of bounding boxes that just started/ceased to exist, and only processes those; this makes the collider much more efficient.)"))
-		((Real,sweepLength,((void)"Stride deactivated",-1),"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if negative."))
-		((Real,sweepFactor,1.05,"Overestimation factor for the sweep velocity; must be >=1.0. Has no influence on sweepLength, only on the computed stride. [DEPRECATED, is used only when bins are not used]."))
-		((Real,fastestBodyMaxDist,-1,"Maximum displacement of the fastest body since last run; if >= sweepLength, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
-		((int,nBins,0,"Number of velocity bins for striding. If <=0, bin-less strigin is used (this is however DEPRECATED)."))
-		((Real,binCoeff,5,"Coefficient of bins for velocities, i.e. if ``binCoeff==5``, successive bins have 5 × smaller velocity peak than the previous one. (Passed to VelocityBins)"))
-		((Real,binOverlap,0.8,"Relative bins hysteresis, to avoid moving body back and forth if its velocity is around the border value. (Passed to VelocityBins)"))
-		((Real,maxRefRelStep,.3,"(Passed to VelocityBins)"))
-		((int,histInterval,100,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins.")),
+		((int,sortAxis,0,,"Axis for the initial contact detection."))
+		((bool,sortThenCollide,false,,"Separate sorting and colliding phase; it is MUCH slower, but all interactions are processed at every step; this effectively makes the collider non-persistent, not remembering last state. (The default behavior relies on the fact that inversions during insertion sort are overlaps of bounding boxes that just started/ceased to exist, and only processes those; this makes the collider much more efficient.)"))
+		((Real,sweepLength,((void)"Stride deactivated",-1),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if negative."))
+		((Real,sweepFactor,1.05,,"Overestimation factor for the sweep velocity; must be >=1.0. Has no influence on sweepLength, only on the computed stride. [DEPRECATED, is used only when bins are not used]."))
+		((Real,fastestBodyMaxDist,-1,,"Maximum displacement of the fastest body since last run; if >= sweepLength, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
+		((int,nBins,0,,"Number of velocity bins for striding. If <=0, bin-less strigin is used (this is however DEPRECATED)."))
+		((Real,binCoeff,5,,"Coefficient of bins for velocities, i.e. if ``binCoeff==5``, successive bins have 5 × smaller velocity peak than the previous one. (Passed to VelocityBins)"))
+		((Real,binOverlap,0.8,,"Relative bins hysteresis, to avoid moving body back and forth if its velocity is around the border value. (Passed to VelocityBins)"))
+		((Real,maxRefRelStep,.3,,"(Passed to VelocityBins)"))
+		((int,histInterval,100,,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins.")),
 		/* ctor */
 			#ifdef ISC_TIMING
 				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);

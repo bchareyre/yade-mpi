@@ -58,7 +58,7 @@ Scene::Scene(): bodies(new BodyContainer), interactions(new InteractionContainer
 
 
 
-void Scene::postProcessAttributes(bool deserializing){
+void Scene::postLoad(Scene&){
 	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b) continue; // erased body

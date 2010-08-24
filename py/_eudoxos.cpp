@@ -1,4 +1,6 @@
-#include<yade/lib-pyutil/numpy.hpp>
+#if 0
+	#include<yade/lib-pyutil/numpy.hpp>
+#endif
 
 #include<yade/pkg-dem/ConcretePM.hpp>
 #include<boost/python.hpp>
@@ -49,9 +51,6 @@ Real elasticEnergyDensityInAABB(python::tuple Aabb){
 }
 #endif
 
-// copied from _utils.cpp
-Vector3r tuple2vec(const py::tuple& t){return Vector3r(py::extract<double>(t[0])(),py::extract<double>(t[1])(),py::extract<double>(t[2])());}
-
 /*! Set velocity of all dynamic particles so that if their motion were unconstrained,
  * axis given by axisPoint and axisDirection would be reached in timeToAxis
  * (or, point at distance subtractDist from axis would be reached).
@@ -78,6 +77,8 @@ void particleConfinement(){
 	CpmStateUpdater csu; csu.update();
 }
 
+// makes linker error out with monolithic build..
+#if 0
 python::dict testNumpy(){
 	Scene* scene=Omega::instance().getScene().get();
 	int dim1[]={scene->bodies->size()};
@@ -94,6 +95,7 @@ python::dict testNumpy(){
 	ret["vel"]=vel;
 	return ret;
 }
+#endif
 
 #if 0
 /* Compute stress tensor on each particle */
@@ -306,12 +308,14 @@ class InteractionLocator{
 #endif
 
 BOOST_PYTHON_MODULE(_eudoxos){
-	import_array();
 	YADE_SET_DOCSTRING_OPTS;
 	py::def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(py::args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
 	// def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
 	py::def("particleConfinement",particleConfinement);
-	py::def("testNumpy",testNumpy);
+	#if 0
+		import_array();
+		py::def("testNumpy",testNumpy);
+	#endif
 #ifdef YADE_VTK
 	py::class_<InteractionLocator>("InteractionLocator","Locate all (real) interactions in space by their :yref:`contact point<Dem3DofGeom::contactPoint>`. When constructed, all real interactions are spatially indexed (uses `vtkPointLocator <http://www.vtk.org/doc/release/5.4/html/a01247.html>`_ internally). Use instance methods to use those data. \n\n.. note::\n\tData might become inconsistent with real simulation state if simulation is being run between creation of this object and spatial queries.")
 		.def("intrsAroundPt",&InteractionLocator::intrsAroundPt,((python::arg("point"),python::arg("maxDist"))),"Return list of real interactions that are not further than *maxDist* from *point*.")

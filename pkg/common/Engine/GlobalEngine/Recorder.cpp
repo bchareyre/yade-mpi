@@ -13,9 +13,3 @@ void Recorder::openAndCheck(){
 	out.open(fileTemp.c_str(), truncate ? fstream::trunc : fstream::app);
 	if(!out.good()) throw ios_base::failure(__FILE__ ": I/O error opening file `"+fileTemp+"'.");
 }
-#if 0
-	void Recorder::postProcessAttributes(bool deserializing){
-		if(deserializing) openAndCheck();
-		else{ if(out.is_open()) out.flush(); }
-	}
-#endif

@@ -133,8 +133,11 @@ class InteractionContainer: public Serializable{
 			return ret;
 		}
 
-	virtual void preProcessAttributes(bool deserializing);
-	virtual void postProcessAttributes(bool deserializing);
+	void preLoad(InteractionContainer&);
+	void postLoad(InteractionContainer&);
+	void preSave(InteractionContainer&);
+	void postSave(InteractionContainer&);
+
 
 	REGISTER_ATTRIBUTES(Serializable,(interaction)(serializeSorted));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);

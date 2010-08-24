@@ -16,11 +16,11 @@ class ViscElMat : public Material {
 	public:
 		virtual ~ViscElMat();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
-		((Real,kn,NaN,"Normal elastic stiffness"))
-		((Real,cn,NaN,"Normal viscous constant"))
-		((Real,ks,NaN,"Shear elastic stiffness"))
-		((Real,cs,NaN,"Shear viscous constant"))
-		((Real,frictionAngle,NaN,"Friction angle [rad]")),
+		((Real,kn,NaN,,"Normal elastic stiffness"))
+		((Real,cn,NaN,,"Normal viscous constant"))
+		((Real,ks,NaN,,"Shear elastic stiffness"))
+		((Real,cs,NaN,,"Shear viscous constant"))
+		((Real,frictionAngle,NaN,,"Friction angle [rad]")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(ViscElMat,Material);
@@ -32,8 +32,8 @@ class ViscElPhys : public FrictPhys {
 	public:
 		virtual ~ViscElPhys();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"InteractionPhysics created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
-		((Real,cn,NaN,"Normal viscous constant"))
-		((Real,cs,NaN,"Shear viscous constant")),
+		((Real,cn,NaN,,"Normal viscous constant"))
+		((Real,cs,NaN,,"Shear viscous constant")),
 		createIndex();
 	)
 };

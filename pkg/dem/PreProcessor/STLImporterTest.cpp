@@ -58,12 +58,6 @@ STLImporterTest::~STLImporterTest()
 }
 
 
-void STLImporterTest::postProcessAttributes(bool)
-{
-
-}
-
-
 bool STLImporterTest::generate(std::string& message)
 {
 	scene = shared_ptr<Scene>(new Scene);

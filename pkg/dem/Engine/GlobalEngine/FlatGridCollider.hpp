@@ -36,10 +36,10 @@ class FlatGridCollider: public Collider{
 	DECLARE_LOGGER;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FlatGridCollider,Collider,"Non-optimized grid collider, storing grid as dense flat array. Each body is assigned to (possibly multiple) cells, which are arranged in regular grid between *aabbMin* and *aabbMax*, with cell size *step* (same in all directions). Bodies outsize (*aabbMin*, *aabbMax*) are handled gracefully, assigned to closest cells (this will create spurious potential interactions). *verletDist* determines how much is each body enlarged to avoid collision detection at every step.\n\n.. note::\n\tThis collider keeps all cells in linear memory array, therefore will be memory-inefficient for sparse simulations.\n\n.. warning::\n\t:yref:`Body::bound` objects are not used, :yref:`BoundFunctors<BoundFunctor>` are not used either: assigning cells to bodies is hard-coded internally. Currently handles :yref:`Shapes<Shape>` are: :yref:`Sphere`.\n\n.. note::\n\tPeriodic boundary is not handled (yet).\n\n",
-		((Real,verletDist,0,"Length by which enlarge space occupied by each particle; avoids running collision detection at every step."))
-		((Vector3r,aabbMin,Vector3r::Zero(),"Lower corner of grid."))
-		((Vector3r,aabbMax,Vector3r::Zero(),"Upper corner of grid (approximate, might be rouded up to *minStep*."))
-		((Real,step,0,"Step in the grid (cell size)")),
+		((Real,verletDist,0,,"Length by which enlarge space occupied by each particle; avoids running collision detection at every step."))
+		((Vector3r,aabbMin,Vector3r::Zero(),,"Lower corner of grid."))
+		((Vector3r,aabbMax,Vector3r::Zero(),,"Upper corner of grid (approximate, might be rouded up to *minStep*."))
+		((Real,step,0,,"Step in the grid (cell size)")),
 		initIndices();
 	);
 };

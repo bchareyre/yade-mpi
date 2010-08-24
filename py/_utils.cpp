@@ -22,11 +22,7 @@ namespace py = boost::python;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.utils");
 #endif
 
-py::tuple vec2tuple(const Vector3r& v){return py::make_tuple(v[0],v[1],v[2]);}
-Vector3r tuple2vec(const py::tuple& t){return Vector3r(py::extract<double>(t[0])(),py::extract<double>(t[1])(),py::extract<double>(t[2])());}
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
-
-bool ptInAABB(py::tuple p, py::tuple bbMin, py::tuple bbMax){return isInBB(tuple2vec(p),tuple2vec(bbMin),tuple2vec(bbMax));}
 
 /* \todo implement groupMask */
 py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
@@ -416,7 +412,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
 	py::def("getSpheresVolume",getSpheresVolume,"Compute the total volume of spheres in the simulation (might crash for now if dynamic bodies are not spheres)");
 	py::def("aabbExtrema",aabbExtrema,(py::arg("cutoff")=0.0,py::arg("centers")=false),"Return coordinates of box enclosing all bodies\n\n:param bool centers: do not take sphere radii in account, only their centroids\n:param float∈〈0…1〉 cutoff: relative dimension by which the box will be cut away at its boundaries.\n\n\n:return: (lower corner, upper corner) as (Vector3,Vector3)\n\n");
-	py::def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
+	py::def("ptInAABB",isInBB,"Return True/False whether the point p is within box given by its min and max corners");
 	py::def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(py::args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
 	#if 0

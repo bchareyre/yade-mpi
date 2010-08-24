@@ -9,8 +9,8 @@ class Wall: public Shape{
 	public:
 		virtual ~Wall(); // vtable
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Wall,Shape,"Object representing infinite plane aligned with the coordinate system (axis-aligned wall).",
-		((int,sense,0,"Which side of the wall interacts: -1 for negative only, 0 for both, +1 for positive only"))
-		((int,axis,0,"Axis of the normal; can be 0,1,2 for +x, +y, +z respectively (Body's orientation is disregarded for walls)")),
+		((int,sense,0,,"Which side of the wall interacts: -1 for negative only, 0 for both, +1 for positive only"))
+		((int,axis,0,,"Axis of the normal; can be 0,1,2 for +x, +y, +z respectively (Body's orientation is disregarded for walls)")),
 		/*ctor*/createIndex();
 	);
 	REGISTER_CLASS_INDEX(Wall,Shape);
@@ -33,7 +33,7 @@ REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 		RENDERS(Wall);
 		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Wall,GlShapeFunctor,"Renders :yref:`Wall` object",
-			((int,div,20,"Number of divisions of the wall inside visible scene part."))
+			((int,div,20,,"Number of divisions of the wall inside visible scene part."))
 		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Wall);

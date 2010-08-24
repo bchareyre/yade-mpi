@@ -10,7 +10,9 @@
 	#include<indexing_suite/vector.hpp>
 #endif
 
-#include<yade/lib-pyutil/numpy.hpp>
+#if 0
+	#include<yade/lib-pyutil/numpy.hpp>
+#endif
 
 #include<boost/python.hpp>
 #include<boost/python/class.hpp>
@@ -121,13 +123,14 @@ struct custom_vector_from_seq{
 };
 
 
-
+#if 0
 template<typename numT, int dim>
 struct custom_numpyBoost_to_py{
 	static PyObject* convert(numpy_boost<numT, dim> nb){
 		return nb.py_ptr(); // handles incref internally
 	}
 };
+#endif
 
 #if 0
 template<typename T>
@@ -195,11 +198,13 @@ BOOST_PYTHON_MODULE(_customConverters){
 		#endif
 	#undef VECTOR_SEQ_CONV
 
-	import_array();
-	to_python_converter<numpy_boost<Real,1>, custom_numpyBoost_to_py<Real,1> >();
-	to_python_converter<numpy_boost<Real,2>, custom_numpyBoost_to_py<Real,2> >();
-	to_python_converter<numpy_boost<int,1>, custom_numpyBoost_to_py<int,1> >();
-	to_python_converter<numpy_boost<int,2>, custom_numpyBoost_to_py<int,2> >();
+	#if 0
+		import_array();
+		to_python_converter<numpy_boost<Real,1>, custom_numpyBoost_to_py<Real,1> >();
+		to_python_converter<numpy_boost<Real,2>, custom_numpyBoost_to_py<Real,2> >();
+		to_python_converter<numpy_boost<int,1>, custom_numpyBoost_to_py<int,1> >();
+		to_python_converter<numpy_boost<int,2>, custom_numpyBoost_to_py<int,2> >();
+	#endif
 
 }
 

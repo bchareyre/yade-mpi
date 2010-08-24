@@ -14,7 +14,7 @@ class TorqueEngine: public PartialEngine{
 	public:
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(TorqueEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step.",
-		((Vector3r,moment,Vector3r::Zero(),"Torque value to be applied."))
+		((Vector3r,moment,Vector3r::Zero(),,"Torque value to be applied."))
 	);
 };
 REGISTER_SERIALIZABLE(TorqueEngine);

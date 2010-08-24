@@ -16,6 +16,3 @@ Functor::~Functor(){}; // vtable
 
 
 Dispatcher::~Dispatcher(){}
-//void Dispatcher::postProcessAttributes(bool deserializing){
-//	FOREACH(const shared_ptr<Functor>& f, functors) add(f);
-//}

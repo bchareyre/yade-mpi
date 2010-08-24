@@ -14,27 +14,24 @@ Facet::~Facet()
 }
 
 
-void Facet::postProcessAttributes(bool deserializing)
+void Facet::postLoad(Facet&)
 {
 	// if this fails, it means someone did vertices push_back, but they are resized to 3 at Facet initialization already
 	// in the future, a fixed-size array should be used instead of vector<Vector3r> for vertices
 	// this is prevented by yade::serialization now IIRC
-	assert(vertices.size()==3); 
-    if (deserializing)
-    {
-		Vector3r e[3] = {vertices[1]-vertices[0] ,vertices[2]-vertices[1] ,vertices[0]-vertices[2]};
-		#define CHECK_EDGE(i) if(e[i].squaredNorm()==0){LOG_FATAL("Facet has coincident vertices "<<i<<" ("<<vertices[i]<<") and "<<(i+1)%3<<" ("<<vertices[(i+1)%3]<<")!");}
-			CHECK_EDGE(0); CHECK_EDGE(1);CHECK_EDGE(2);
-		#undef CHECK_EDGE
-		nf = e[0].cross(e[1]); nf.normalize();
-		for(int i=0; i<3; ++i) 
-		{
-			ne[i]=e[i].cross(nf); ne[i].normalize();
-			vl[i]=vertices[i].norm();
-			vu[i]=vertices[i]/vl[i];
-		}
-		Real p = e[0].norm()+e[1].norm()+e[2].norm();
-		icr = e[0].norm()*ne[0].dot(e[2])/p;
+	if(vertices.size()!=3){ throw runtime_error(("Facet must have exactly 3 vertices (not "+lexical_cast<string>(vertices.size())+")").c_str()); }
+	Vector3r e[3] = {vertices[1]-vertices[0] ,vertices[2]-vertices[1] ,vertices[0]-vertices[2]};
+	#define CHECK_EDGE(i) if(e[i].squaredNorm()==0){LOG_FATAL("Facet has coincident vertices "<<i<<" ("<<vertices[i]<<") and "<<(i+1)%3<<" ("<<vertices[(i+1)%3]<<")!");}
+		CHECK_EDGE(0); CHECK_EDGE(1);CHECK_EDGE(2);
+	#undef CHECK_EDGE
+	nf = e[0].cross(e[1]); nf.normalize();
+	for(int i=0; i<3; ++i){
+		ne[i]=e[i].cross(nf); ne[i].normalize();
+		vl[i]=vertices[i].norm();
+		vu[i]=vertices[i]/vl[i];
 	}
+	Real p = e[0].norm()+e[1].norm()+e[2].norm();
+	icr = e[0].norm()*ne[0].dot(e[2])/p;
 }
+
 YADE_PLUGIN((Facet));

@@ -37,7 +37,7 @@ class TestMaterialStateAssociativity(unittest.TestCase):
 		self.assertRaises(RuntimeError,lambda: O.step())
 	def testMaterialReturnsState(self):
 		"CpmMat returns CpmState when asked for newAssocState"
-		self.assert_(CpmMat().newAssocState().name=='CpmState')
+		self.assert_(CpmMat().newAssocState().__class__==CpmState)
 
 class TestBodies(unittest.TestCase):
 	def setUp(self):

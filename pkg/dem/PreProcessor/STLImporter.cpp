@@ -38,7 +38,7 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 		{   
 				iFacet->vertices[j]=v[j]-icc;
 		}
-		//iFacet->postProcessAttributes(true); //postProcessAttributes is protected
+		// iFacet->postLoad
 		shared_ptr<Body> b(new Body);
 		b->state->pos=b->state->refPos=icc;
 		b->state->ori=b->state->refOri=Quaternionr::Identity();

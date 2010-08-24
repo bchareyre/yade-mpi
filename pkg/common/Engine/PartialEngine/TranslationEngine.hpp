@@ -14,10 +14,11 @@
 class TranslationEngine : public PartialEngine {
 	public:
 		virtual void action();
-		virtual void postProcessAttributes(bool deserializing){ if(deserializing) translationAxis.normalize(); }
+		void postLoad(TranslationEngine&){ translationAxis.normalize(); } // should be called whenever translationAxis is changed
+
 	YADE_CLASS_BASE_DOC_ATTRS(TranslationEngine,PartialEngine,"This engine is the base class for different engines, which require any kind of motion.",
-		((Real,velocity,,"Velocity [m/s]"))
-		((Vector3r,translationAxis,,"Direction [Vector3]"))
+		((Real,velocity,,,"Velocity [m/s]"))
+		((Vector3r,translationAxis,,,"Direction [Vector3]"))
 	);
 };
 REGISTER_SERIALIZABLE(TranslationEngine);

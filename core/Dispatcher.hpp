@@ -40,15 +40,15 @@ Because we need literal functor and class names for registration in python, we p
 #define _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(Dim,DispatcherT,FunctorT,doc,attrs,ctor,py) \
 	typedef FunctorT FunctorType; \
 	void updateScenePtr(){ FOREACH(shared_ptr<FunctorT> f, functors){ f->scene=scene; }} \
-	virtual void postProcessAttributes(bool deserializing){ if(deserializing) { clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(static_pointer_cast<FunctorT>(f)); } } \
+	void postLoad(DispatcherT&){ clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(static_pointer_cast<FunctorT>(f)); } \
 	virtual void add(FunctorT* f){ add(shared_ptr<FunctorT>(f)); } \
 	virtual void add(shared_ptr<FunctorT> f){ bool dupe=false; string fn=f->getClassName(); FOREACH(const shared_ptr<FunctorT>& f, functors) { if(fn==f->getClassName()) dupe=true; } if(!dupe) functors.push_back(f); addFunctor(f); } \
 	BOOST_PP_CAT(_YADE_DISPATCHER,BOOST_PP_CAT(Dim,D_FUNCTOR_ADD))(FunctorT,f) \
 	boost::python::list functors_get(void) const { boost::python::list ret; FOREACH(const shared_ptr<FunctorT>& f, functors){ ret.append(f); } return ret; } \
-	void functors_set(const vector<shared_ptr<FunctorT> >& ff){ functors.clear(); FOREACH(const shared_ptr<FunctorT>& f, ff) add(f); postProcessAttributes(true); } \
+	void functors_set(const vector<shared_ptr<FunctorT> >& ff){ functors.clear(); FOREACH(const shared_ptr<FunctorT>& f, ff) add(f); postLoad(*this); } \
 	void pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){ if(python::len(t)==0)return; if(python::len(t)!=1) throw invalid_argument("Exactly one list of " BOOST_PP_STRINGIZE(FunctorT) " must be given."); typedef std::vector<shared_ptr<FunctorT> > vecF; vecF vf=boost::python::extract<vecF>(t[0])(); functors_set(vf); t=python::tuple(); } \
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DispatcherT,Dispatcher,"Dispatcher calling :yref:`functors<" BOOST_PP_STRINGIZE(FunctorT) ">` based on received argument type(s).\n\n" doc, \
-		((vector<shared_ptr<FunctorT> >,functors,,"Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs, \
+		((vector<shared_ptr<FunctorT> >,functors,,,"Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs, \
 		/*ctor*/ ctor, /*py*/ py .add_property("functors",&DispatcherT::functors_get,&DispatcherT::functors_set,"Functors associated with this dispatcher." " :yattrtype:`vector<shared_ptr<" BOOST_PP_STRINGIZE(FunctorT) "> >` ") \
 		.def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws."); \
 	)
@@ -149,7 +149,7 @@ class Dispatcher1D : public Dispatcher,
 		typedef FunctorType functorType;
 		typedef DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,typename FunctorType::ReturnType,typename FunctorType::ArgumentTypes,autoSymmetry> dispatcherBase;
 
-		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass> arg){ return getExecutor(arg); }
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass> arg){ return dispatcherBase::getExecutor(arg); }
 		python::dict dump(bool convertIndicesToNames){
 			python::dict ret;
 			FOREACH(const DynLibDispatcher_Item1D& item, dispatcherBase::dataDispatchMatrix1D()){
@@ -200,7 +200,7 @@ class Dispatcher2D : public Dispatcher,
 		typedef baseClass2 argType2;
 		typedef FunctorType functorType;
 		typedef DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,typename FunctorType::ReturnType,typename FunctorType::ArgumentTypes,autoSymmetry> dispatcherBase;
-		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1> arg1, shared_ptr<baseClass2> arg2){ return getExecutor(arg1,arg2); }
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1> arg1, shared_ptr<baseClass2> arg2){ return dispatcherBase::getExecutor(arg1,arg2); }
 		python::dict dump(bool convertIndicesToNames){
 			python::dict ret;
 			FOREACH(const DynLibDispatcher_Item2D& item, dispatcherBase::dataDispatchMatrix2D()){

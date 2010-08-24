@@ -35,12 +35,11 @@ using namespace std;
 //         fusionDetection = false;
 //         binaryFusion = true;
 // 
-// 		  // capillary setup moved to postProcessAttributes
+// 		  // capillary setup moved to postLoad
 // 
 // }
 
-void Law2_ScGeom_CapillaryPhys_Capillarity::postProcessAttributes(bool deserializing){
-  if(!deserializing) return;
+void Law2_ScGeom_CapillaryPhys_Capillarity::postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&){
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
   capillary->fill("M(r=1)");

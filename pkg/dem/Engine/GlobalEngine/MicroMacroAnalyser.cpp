@@ -28,13 +28,11 @@ CREATE_LOGGER(MicroMacroAnalyser);
 
 MicroMacroAnalyser::~MicroMacroAnalyser(){ /*delete analyser;*/} //no need, its a shared_ptr now...
 
-void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
+void MicroMacroAnalyser::postLoad(MicroMacroAnalyser&)
 {
-	if (deserializing) {
-		bool file_exists = std::ifstream(outputFile.c_str());  //if file does not exist, we will write colums titles
-		ofile.open(outputFile.c_str(), std::ios::app);
-		if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
-	}
+	bool file_exists = std::ifstream(outputFile.c_str());  //if file does not exist, we will write colums titles
+	ofile.open(outputFile.c_str(), std::ios::app);
+	if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
 }
 
 void MicroMacroAnalyser::action()

@@ -22,8 +22,8 @@ class CapillaryPressureEngine : public PartialEngine
 		virtual ~CapillaryPressureEngine();
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryPressureEngine,PartialEngine,".. note::\n\tthis engine is deprecated and probably not very useful! It was designed to produce a variation of the capillary pressure (see :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`).",
-		((Real,Pressure,0.,"Initial value of the capillary pressure Uc = Ugas-Uliquid. [Pa]."))
-		((Real,PressureVariation,0.,"Variation of the capillary pressure (each iteration). [Pa]")),
+		((Real,Pressure,0.,,"Initial value of the capillary pressure Uc = Ugas-Uliquid. [Pa]."))
+		((Real,PressureVariation,0.,,"Variation of the capillary pressure (each iteration). [Pa]")),
 		;
 		);
 	DECLARE_LOGGER;

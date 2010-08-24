@@ -113,12 +113,17 @@ def ydefault_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 def yattrtype_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 	"Handle the :yattrtype:`something` role. fixSignature handles it now in the member signature itself, this merely expands to nothing."
 	return [],[]
+# FIXME: should return readable representation of bits of the number (yade.wrapper.AttrFlags enum)
+def yattrflags_role(role,rawtext,text,lineno,inliner,options={},content=[]):
+	"Handle the :yattrflags:`something` role. fixSignature handles it now in the member signature itself."
+	return [],[]
 
 from docutils.parsers.rst import roles
 roles.register_canonical_role('yref', yaderef_role)
 roles.register_canonical_role('ysrc', yadesrc_role)
 roles.register_canonical_role('ydefault', ydefault_role)
 roles.register_canonical_role('yattrtype', yattrtype_role)
+roles.register_canonical_role('yattrflags', yattrflags_role)
 
 
 ## http://sphinx.pocoo.org/config.html#confval-rst_epilog
@@ -170,6 +175,7 @@ def fixDocstring(app,what,name,obj,options,lines):
 	for i in range(0,len(lines)):
 		lines[i]=lines[i].replace(':ydefault:``','')
 		lines[i]=lines[i].replace(':yattrtype:``','')
+		lines[i]=lines[i].replace(':yattrflags:``','')
 		#lines[i]=re.sub(':``',':` `',lines[i])
 	# remove signature of boost::python function docstring, which is the first line of the docstring
 	if isBoostFunc(what,obj):

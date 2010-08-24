@@ -89,8 +89,8 @@ class BoundDispatcher: public Dispatcher1D<
 	DECLARE_LOGGER;
 	YADE_DISPATCHER1D_FUNCTOR_DOC_ATTRS_CTOR_PY(BoundDispatcher,BoundFunctor,/*optional doc*/,
 		/*additional attrs*/
-		((bool,activated,true,"Whether the engine is activated (only should be changed by the collider)"))
-		((Real,sweepDist,0,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider)."))
+		((bool,activated,true,,"Whether the engine is activated (only should be changed by the collider)"))
+		((Real,sweepDist,0,,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider)."))
 		,/*ctor*/,/*py*/
 	);
 };

@@ -53,15 +53,15 @@ class PeriodicEngine:  public GlobalEngine {
 		\
 		will print iteration number every 10000 iterations or every 5 seconds of wall clock time, whiever comes first since it was \
 		last run.",
-		((Real,virtPeriod,((void)"deactivated",0),"Periodicity criterion using virtual (simulation) time (deactivated if <= 0)"))
-		((Real,realPeriod,((void)"deactivated",0),"Periodicity criterion using real (wall clock, computation, human) time (deactivated if <=0)"))
-		((long,iterPeriod,((void)"deactivated",0),"Periodicity criterion using step number (deactivated if <= 0)"))
-		((long,nDo,((void)"deactivated",-1),"Limit number of executions by this number (deactivated if negative)"))
-		((bool,initRun,false,"Run the first time we are called as well."))
-		((Real,virtLast,0,"Tracks virtual time of last run |yupdate|."))
-		((Real,realLast,0,"Tracks real time of last run |yupdate|."))
-		((long,iterLast,0,"Tracks step number of last run |yupdate|."))
-		((long,nDone,0,"Track number of executions (cummulative) |yupdate|.")),
+		((Real,virtPeriod,((void)"deactivated",0),,"Periodicity criterion using virtual (simulation) time (deactivated if <= 0)"))
+		((Real,realPeriod,((void)"deactivated",0),,"Periodicity criterion using real (wall clock, computation, human) time (deactivated if <=0)"))
+		((long,iterPeriod,((void)"deactivated",0),,"Periodicity criterion using step number (deactivated if <= 0)"))
+		((long,nDo,((void)"deactivated",-1),,"Limit number of executions by this number (deactivated if negative)"))
+		((bool,initRun,false,,"Run the first time we are called as well."))
+		((Real,virtLast,0,,"Tracks virtual time of last run |yupdate|."))
+		((Real,realLast,0,,"Tracks real time of last run |yupdate|."))
+		((long,iterLast,0,,"Tracks step number of last run |yupdate|."))
+		((long,nDone,0,,"Track number of executions (cummulative) |yupdate|.")),
 		/* this will be put inside the ctor */ realLast=getClock();
 	);
 };

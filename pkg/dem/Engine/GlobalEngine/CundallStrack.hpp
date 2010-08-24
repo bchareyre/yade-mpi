@@ -34,8 +34,8 @@ class CSPhys: public NormShearPhys {
 	public:
 	virtual ~CSPhys();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CSPhys,NormShearPhys,"Physical properties for :yref:`Cundall&Strack constitutive law<Law2_Dem3Dof_CSPhys_CundallStrack>`, created by :yref:`Ip2_2xFrictMat_CSPhys`.",
-		((Real,frictionAngle,NaN,"Friction angle of the interaction. |ycomp|"))
-		((Real,tanFrictionAngle,NaN,"Precomputed tangent of :yref:`CSPhys::frictionAngle`. |ycomp|")),
+		((Real,frictionAngle,NaN,,"Friction angle of the interaction. |ycomp|"))
+		((Real,tanFrictionAngle,NaN,,"Precomputed tangent of :yref:`CSPhys::frictionAngle`. |ycomp|")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(CSPhys,NormShearPhys);

@@ -20,8 +20,8 @@ class FrictPhys: public NormShearPhys
 				;	
 		virtual ~FrictPhys();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"Interaction with friction",
-		((Vector3r,prevNormal,Vector3r::Zero(),"unit normal of the contact plane in previous step"))
-		((Real,tangensOfFrictionAngle,NaN,"tan of angle of friction")),
+		((Vector3r,prevNormal,Vector3r::Zero(),,"unit normal of the contact plane in previous step"))
+		((Real,tangensOfFrictionAngle,NaN,,"tan of angle of friction")),
 		createIndex()
 	);
 	REGISTER_CLASS_INDEX(FrictPhys,NormShearPhys);

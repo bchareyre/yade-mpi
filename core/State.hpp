@@ -61,17 +61,17 @@ class State: public Serializable, public Indexable{
 	//State(): se3(Vector3r::Zero(),Quaternionr::Identity()),pos(se3.position),vel(Vector3r::Zero()),accel(Vector3r::Zero()),mass(0.),ori(se3.orientation),angVel(Vector3r::Zero()),angAccel(Vector3r::Zero()),angMom(Vector3r::Zero()),inertia(Vector3r::Zero()),refPos(Vector3r::Zero()),refOri(Quaternionr::Identity()),blockedDOFs(DOF_NONE){}
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
-		((Se3r,se3,Se3r(Vector3r::Zero(),Quaternionr::Identity()),"Position and orientation as one object."))
-		((Vector3r,vel,Vector3r::Zero(),"Current linear velocity."))
-		((Vector3r,accel,Vector3r::Zero(),"Current acceleration."))
-		((Real,mass,0,"Mass of this body"))
-		((Vector3r,angVel,Vector3r::Zero(),"Current angular velocity"))
-		((Vector3r,angAccel,Vector3r::Zero(),"Current angular acceleration"))
-		((Vector3r,angMom,Vector3r::Zero(),"Current angular momentum"))
-		((Vector3r,inertia,Vector3r::Zero(),"Inertia of associated body, in local coordinate system."))
-		((Vector3r,refPos,Vector3r::Zero(),"Reference position"))
-		((Quaternionr,refOri,Quaternionr::Identity(),"Reference orientation"))
-		((unsigned,blockedDOFs,,"[Will be overridden]")),
+		((Se3r,se3,Se3r(Vector3r::Zero(),Quaternionr::Identity()),,"Position and orientation as one object."))
+		((Vector3r,vel,Vector3r::Zero(),,"Current linear velocity."))
+		((Vector3r,accel,Vector3r::Zero(),,"Current acceleration."))
+		((Real,mass,0,,"Mass of this body"))
+		((Vector3r,angVel,Vector3r::Zero(),,"Current angular velocity"))
+		((Vector3r,angAccel,Vector3r::Zero(),,"Current angular acceleration"))
+		((Vector3r,angMom,Vector3r::Zero(),,"Current angular momentum"))
+		((Vector3r,inertia,Vector3r::Zero(),,"Inertia of associated body, in local coordinate system."))
+		((Vector3r,refPos,Vector3r::Zero(),,"Reference position"))
+		((Quaternionr,refOri,Quaternionr::Identity(),,"Reference orientation"))
+		((unsigned,blockedDOFs,,,"[Will be overridden]")),
 		/* additional initializers */
 			((pos,se3.position))
 			((ori,se3.orientation)),

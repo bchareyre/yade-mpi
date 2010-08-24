@@ -16,7 +16,7 @@ class Box: public Shape{
 		Box(const Vector3r& _extents): extents(_extents){}
 		virtual ~Box ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Box,Shape,"Box (cuboid) particle geometry. (Avoid using in new code, prefer :yref:`Facet` instead.",
-		((Vector3r,extents,,"Half-size of the cuboid")),
+		((Vector3r,extents,,,"Half-size of the cuboid")),
 		/* ctor */ createIndex();
 	);
 	REGISTER_CLASS_INDEX(Box,Shape);

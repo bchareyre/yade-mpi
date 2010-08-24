@@ -42,16 +42,17 @@ class MicroMacroAnalyser : public GlobalEngine
 		CGT::TriaxialState& makeState(unsigned int state, const char* filename = NULL);
 		//const vector<CGT::Tenseur3>& makeDeformationArray(const char* state_file1, const char* state_file0);
 		shared_ptr<CGT::KinematicLocalisationAnalyser> analyser;
-		virtual void postProcessAttributes(bool deserializing);
+		void postLoad(MicroMacroAnalyser&);
+
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(MicroMacroAnalyser,GlobalEngine,"Compute fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing.",
-		((unsigned int,stateNumber,0,"A number incremented and appended at the end of output files to reflect increment number."))
-		((unsigned int,incrtNumber,1,""))
-		((std::string,outputFile,"MicroMacroAnalysis","Base name for increment analysis output file."))
-		((std::string,stateFileName,"state","Base name of state files."))
-		((int,interval,100,"Number of timesteps between analyzed states."))
-		((bool,compDeformation,false,"Is the engine just saving states or also computing and outputing deformations for each increment?"))
-		((bool,compIncrt,false,"Should increments of force and displacements be defined on [n,n+1]? If not, states will be saved with only positions and forces (no displacements)."))
+		((unsigned int,stateNumber,0,,"A number incremented and appended at the end of output files to reflect increment number."))
+		((unsigned int,incrtNumber,1,,""))
+		((std::string,outputFile,"MicroMacroAnalysis",,"Base name for increment analysis output file."))
+		((std::string,stateFileName,"state",,"Base name of state files."))
+		((int,interval,100,,"Number of timesteps between analyzed states."))
+		((bool,compDeformation,false,,"Is the engine just saving states or also computing and outputing deformations for each increment?"))
+		((bool,compIncrt,false,,"Should increments of force and displacements be defined on [n,n+1]? If not, states will be saved with only positions and forces (no displacements)."))
 		,/*init*/
   		,/*ctor*/
 		analyser = shared_ptr<CGT::KinematicLocalisationAnalyser> (new CGT::KinematicLocalisationAnalyser);

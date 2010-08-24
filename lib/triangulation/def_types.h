@@ -14,6 +14,8 @@
 
 #include <boost/static_assert.hpp>
 
+#include<yade/lib-base/Math.hpp> // typedef for Real
+
 //#define FLOW_ENGINE
 
 

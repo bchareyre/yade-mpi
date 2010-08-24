@@ -138,17 +138,18 @@ struct compPtrInteraction{
 	}
 };
 
-void InteractionContainer::preProcessAttributes(bool deserializing){
-	if(deserializing) { interaction.clear(); return; } 
+void InteractionContainer::preSave(InteractionContainer&){
 	FOREACH(const shared_ptr<Interaction>& I, *this){
 		if(I->interactionGeometry || I->interactionPhysics) interaction.push_back(I);
 		// since requestErase'd interactions have no interaction physics/geom, they are not saved
 	}
 	if(serializeSorted) std::sort(interaction.begin(),interaction.end(),compPtrInteraction());
 }
+void InteractionContainer::postSave(InteractionContainer&){ interaction.clear(); }
 
-void InteractionContainer::postProcessAttributes(bool deserializing){
-	if(!deserializing){interaction.clear(); return;}
+
+void InteractionContainer::preLoad(InteractionContainer&){ interaction.clear(); }
+void InteractionContainer::postLoad(InteractionContainer&){
 	clear();
 	FOREACH(const shared_ptr<Interaction>& I, interaction){ insert(I); }
 	interaction.clear();

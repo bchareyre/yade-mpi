@@ -14,7 +14,7 @@ class ParticleSizeDistrbutionRPMRecorder: public Recorder {
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ParticleSizeDistrbutionRPMRecorder,Recorder,
 		"Store number of PSD in RPM model to file.",
-		((int,numberCohesiveContacts,0,"Number of cohesive contacts found at last run. [-]")),
+		((int,numberCohesiveContacts,0,,"Number of cohesive contacts found at last run. [-]")),
 		initRun=true;);
 	DECLARE_LOGGER;
 };

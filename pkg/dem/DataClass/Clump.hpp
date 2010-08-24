@@ -75,7 +75,7 @@ class Clump: public Body {
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Clump,Body,"Rigid aggregate of bodies",
-		((memberMap,members,,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)")),
+		((memberMap,members,,,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)")),
 		/*ctor*/setDynamic(true); /* possible source of crash is setDynamic manipulates Body::State! */
 	);
 	DECLARE_LOGGER;

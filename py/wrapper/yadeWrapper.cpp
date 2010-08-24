@@ -492,6 +492,13 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	YADE_SET_DOCSTRING_OPTS;
 
+	python::enum_<yade::Attr::flags>("AttrFlags")
+		.value("noSave",yade::Attr::noSave)
+		.value("pyReadonly",yade::Attr::pyReadonly)
+		.value("pyCallPostLoad",yade::Attr::pyCallPostLoad)
+		.value("pyNoResize",yade::Attr::pyNoResize)
+    ;
+
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")

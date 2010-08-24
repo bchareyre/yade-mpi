@@ -20,10 +20,10 @@ class Ip2_2xCohFrictMat_CohFrictPhys : public InteractionPhysicsFunctor
 		
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_CohFrictPhys,InteractionPhysicsFunctor,
 		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic`.",
-		((bool,setCohesionNow,false,""))
-		((bool,setCohesionOnNewContacts,false,""))
-		((Real,normalCohesion,10000000,""))
-		((Real,shearCohesion,10000000,""))
+		((bool,setCohesionNow,false,,""))
+		((bool,setCohesionOnNewContacts,false,,""))
+		((Real,normalCohesion,10000000,,""))
+		((Real,shearCohesion,10000000,,""))
 		,
 		cohesionDefinitionIteration = -1; 
 		);

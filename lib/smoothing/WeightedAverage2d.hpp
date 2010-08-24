@@ -113,33 +113,26 @@ struct WeightedAverage{
 	}
 };
 
-/* Compute nonlocal average with isotropic Gaussian kernel.
- *
- */
-template<typename T, typename Tvalue>
-struct SymmGaussianDistributionAverage: public WeightedAverage<T,Tvalue> {
-	Real stDev, relThreshold;
-	SymmGaussianDistributionAverage(const shared_ptr<GridContainer<T> >& _grid, Real _stDev, Real _relThreshold=3): WeightedAverage<T,Tvalue>(_grid), stDev(_stDev), relThreshold(_relThreshold){}
-	virtual Real getWeight(const Vector2r& meanPt, const T& e){	
-		Vector2r pos=getPosition(e);
-		Real rSq=pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
-		if(rSq>pow(relThreshold*stDev,2)) return 0.; // discard points further than relThreshold*stDev, by default 3*stDev
-		return (1./(stDev*sqrt(2*M_PI)))*exp(-rSq/(2*stDev*stDev));
-	}
-	virtual vector<Vector2i> filterCells(const Vector2r& refPt){return WeightedAverage<T,Tvalue>::grid->circleFilter(refPt,stDev*relThreshold);}
-};
-
 /* Class for doing template specialization of gaussian kernel average on SGDA_Scalar2d and for testing */
 struct Scalar2d{
 	Vector2r pos;
 	Real val;
 };
 
-/* Final specialization; it only needs to define getValue and getPosition -- these functions contain knowledge about the element class itself */
-struct SGDA_Scalar2d: public SymmGaussianDistributionAverage<Scalar2d,Real>{
-	SGDA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): SymmGaussianDistributionAverage<Scalar2d,Real>(_grid,_stDev,_relThreshold){}
-	virtual Real getValue(const Scalar2d& dp){return (Real)dp.val;}
-	virtual Vector2r getPosition(const Scalar2d& dp){return dp.pos;}
+/* Symmetric Gaussian Distribution Average with scalar values
+ */
+struct SGDA_Scalar2d: public WeightedAverage<Scalar2d,Real> {
+	Real stDev, relThreshold;
+	SGDA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): WeightedAverage<Scalar2d,Real>(_grid), stDev(_stDev), relThreshold(_relThreshold){}
+	virtual Real getWeight(const Vector2r& meanPt, const Scalar2d& e){	
+		Vector2r pos=getPosition(e);
+		Real rSq=pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
+		if(rSq>pow(relThreshold*stDev,2)) return 0.; // discard points further than relThreshold*stDev, by default 3*stDev
+		return (1./(stDev*sqrt(2*M_PI)))*exp(-rSq/(2*stDev*stDev));
+	}
+	vector<Vector2i> filterCells(const Vector2r& refPt){return WeightedAverage<Scalar2d,Real>::grid->circleFilter(refPt,stDev*relThreshold);}
+	Real getValue(const Scalar2d& dp){return (Real)dp.val;}
+	Vector2r getPosition(const Scalar2d& dp){return dp.pos;}
 };
 
 /* simplified interface for python:

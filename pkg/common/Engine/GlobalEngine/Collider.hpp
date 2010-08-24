@@ -37,10 +37,8 @@ class Collider: public GlobalEngine {
 		void findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
 
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Collider,GlobalEngine,"Abstract class for finding spatial collisions between bodies. \n\n.. admonition:: Special constructor\n\n\tDerived colliders (unless they override ``pyHandleCustomCtorArgs``) can be given list of :yref:`BoundFunctors <BoundFunctor>` which is used to initialize the internal :yref:`boundDispatcher <Collider.boundDispatcher>` instance.",
-		((shared_ptr<BoundDispatcher>,boundDispatcher,new BoundDispatcher,"[overridden below to be read-only]")),
-		/*ctor*/,
-		.def_readonly("boundDispatcher",&Collider::boundDispatcher,":yref:`BoundDispatcher` object that is used for creating :yref:`bounds <Body.bound>` on collider's request as necessary.")
+	YADE_CLASS_BASE_DOC_ATTRS(Collider,GlobalEngine,"Abstract class for finding spatial collisions between bodies. \n\n.. admonition:: Special constructor\n\n\tDerived colliders (unless they override ``pyHandleCustomCtorArgs``) can be given list of :yref:`BoundFunctors <BoundFunctor>` which is used to initialize the internal :yref:`boundDispatcher <Collider.boundDispatcher>` instance.",
+		((shared_ptr<BoundDispatcher>,boundDispatcher,new BoundDispatcher,Attr::pyReadonly,":yref:`BoundDispatcher` object that is used for creating :yref:`bounds <Body.bound>` on collider's request as necessary."))
 	);
 };
 REGISTER_SERIALIZABLE(Collider);

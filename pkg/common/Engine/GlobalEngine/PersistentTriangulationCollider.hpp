@@ -41,7 +41,7 @@ class PersistentTriangulationCollider : public Collider
 		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(
 		PersistentTriangulationCollider,Collider,"Collision detection engine based on regular triangulation. Handles spheres and flat boundaries (considered as infinite-sized bounding spheres).",
-		((bool,haveDistantTransient,false,"Keep distant interactions? If True, don't delete interactions once bodies don't overlap anymore; constitutive laws will be responsible for requesting deletion. If False, delete as soon as there is no object penetration."))
+		((bool,haveDistantTransient,false,,"Keep distant interactions? If True, don't delete interactions once bodies don't overlap anymore; constitutive laws will be responsible for requesting deletion. If False, delete as soon as there is no object penetration."))
 		,
 		isTriangulated = false;
 		Tes = new (TesselationWrapper);

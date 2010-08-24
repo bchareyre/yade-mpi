@@ -8,6 +8,13 @@
 
 #pragma once
 
+// conditionally disable GroupRelationData, remove the #if 0 to re-enable
+// is anyone using those? Vincent?
+
+#if 0
+#define YADE_GROUP_RELATION_DATA
+
+
 #include<yade/lib-serialization/Serializable.hpp>
 
 #include <iostream>
@@ -104,9 +111,9 @@ public:
   REGISTER_ATTRIBUTES(Serializable,(commands_));
   REGISTER_CLASS_AND_BASE(GroupRelationData,Serializable);
  
-  protected : virtual void preProcessAttributes  (bool deserializing);
-  public    : virtual void postProcessAttributes (bool deserializing);
+  public:
+	void postLoad(GroupRelationData&);
 };
 REGISTER_SERIALIZABLE(GroupRelationData);
 
-
+#endif

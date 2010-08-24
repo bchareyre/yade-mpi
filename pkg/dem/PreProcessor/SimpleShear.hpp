@@ -34,20 +34,20 @@ class SimpleShear : public FileGenerator
 
 
 	YADE_CLASS_BASE_DOC_ATTRS(SimpleShear,FileGenerator,"Preprocessor for creating a numerical model of a simple shear box.\n\n\t- Boxes (6) constitute the different sides of the box itself\n \t- Spheres are contained in the box. The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.\n \n \t Thanks to the Engines (in pkg/common/Engine/PartialEngine) KinemCNDEngine, KinemCNSEngine and KinemCNLEngine, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples.\n \n \tNB about micro-parameters : their values correspond to those used in [Duriez2009a]_.",
-				  ((string,filename,"../porosite0_44.txt","file with the list of spheres centers and radii"))
-				  ((Vector3r,gravity,Vector3r(0,-9.81,0),"vector corresponding to used gravity [$m/s^2$]"))
-				  ((Real,thickness,0.001,"thickness of the boxes constituting the shear box [$m$]"))
-				  ((Real,length,0.1,"initial length (along x-axis) of the shear box [$m$]"))
-				  ((Real,height,0.02,"initial height (along y-axis) of the shear box [$m$]"))
-				  ((Real,width,0.04,"initial width (along z-axis) of the shear box [$m$]"))
-				  ((Real,density,2600,"density of the spheres [$kg/m^3$]"))
-				  ((Real,sphereYoungModulus,4.0e9,"value of :yref:`ElastMat::young` for the spheres [$Pa$]"))
-				  ((Real,spherePoissonRatio,0.04,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
-				  ((Real,sphereFrictionDeg,37,"value of :yref:`ElastMat::poisson` for the spheres [$^\\degree$] (the necessary conversion in $rad$ is done automatically)"))
-				  ((Real,boxYoungModulus,4.0e9,"value of :yref:`ElastMat::young` for the boxes [$Pa$]"))
-				  ((Real,boxPoissonRatio,0.04,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
-				  ((bool,gravApplied,false,"depending on this, :yref:`GravityEngine` is added or not to the scene to take into account the weight of particles"))
-				  ((int,timeStepUpdateInterval,50,"value of :yref:`TimeStepper::timeStepUpdateInterval` for the :yref:`TimeStepper` used here"))
+				  ((string,filename,"../porosite0_44.txt",,"file with the list of spheres centers and radii"))
+				  ((Vector3r,gravity,Vector3r(0,-9.81,0),,"vector corresponding to used gravity [$m/s^2$]"))
+				  ((Real,thickness,0.001,,"thickness of the boxes constituting the shear box [$m$]"))
+				  ((Real,length,0.1,,"initial length (along x-axis) of the shear box [$m$]"))
+				  ((Real,height,0.02,,"initial height (along y-axis) of the shear box [$m$]"))
+				  ((Real,width,0.04,,"initial width (along z-axis) of the shear box [$m$]"))
+				  ((Real,density,2600,,"density of the spheres [$kg/m^3$]"))
+				  ((Real,sphereYoungModulus,4.0e9,,"value of :yref:`ElastMat::young` for the spheres [$Pa$]"))
+				  ((Real,spherePoissonRatio,0.04,,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
+				  ((Real,sphereFrictionDeg,37,,"value of :yref:`ElastMat::poisson` for the spheres [$^\\degree$] (the necessary conversion in $rad$ is done automatically)"))
+				  ((Real,boxYoungModulus,4.0e9,,"value of :yref:`ElastMat::young` for the boxes [$Pa$]"))
+				  ((Real,boxPoissonRatio,0.04,,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
+				  ((bool,gravApplied,false,,"depending on this, :yref:`GravityEngine` is added or not to the scene to take into account the weight of particles"))
+				  ((int,timeStepUpdateInterval,50,,"value of :yref:`TimeStepper::timeStepUpdateInterval` for the :yref:`TimeStepper` used here"))
 				  );
 };
 

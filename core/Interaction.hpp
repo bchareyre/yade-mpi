@@ -61,18 +61,16 @@ class Interaction : public Serializable
 		void init();
 			
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
-		((Body::id_t,id1,0,"[override below]"))
-		((Body::id_t,id2,0,"[override below]"))
-		((long,iterMadeReal,-1,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionDispatchers`, therefore they are made friends of Interaction"))
-		((shared_ptr<InteractionGeometry>,interactionGeometry,,"Geometry part of the interaction."))
-		((shared_ptr<InteractionPhysics>,interactionPhysics,,"Physical (material) part of the interaction."))
-		((Vector3i,cellDist,Vector3i(0,0,0),"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have the priod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)")),
+		((Body::id_t,id1,0,Attr::pyReadonly,":yref:`Id<Body::id>` of the first body in this interaction."))
+		((Body::id_t,id2,0,Attr::pyReadonly,":yref:`Id<Body::id>` of the first body in this interaction."))
+		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionDispatchers`, therefore they are made friends of Interaction"))
+		((shared_ptr<InteractionGeometry>,interactionGeometry,,,"Geometry part of the interaction."))
+		((shared_ptr<InteractionPhysics>,interactionPhysics,,,"Physical (material) part of the interaction."))
+		((Vector3i,cellDist,Vector3i(0,0,0),,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have the priod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)")),
 		/* ctor */ init(),
 		/*py*/
 		.def_readwrite("geom",&Interaction::interactionGeometry,"Shorthand for :yref:`Interaction::interactionGeometry`")
 		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for :yref:`Interaction::interactionPhysics`")
-		.def_readonly("id1",&Interaction::id1,":yref:`Id<Body::id>` of the first body in this interaction.")
-		.def_readonly("id2",&Interaction::id2,":yref:`Id<Body::id>` of the second body in this interaction.")
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
 	);
 };

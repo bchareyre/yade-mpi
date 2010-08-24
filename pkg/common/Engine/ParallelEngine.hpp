@@ -14,7 +14,7 @@ class ParallelEngine: public Engine {
 		boost::python::list slaves_get();
 		void slaves_set(const boost::python::list& slaves);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ParallelEngine,Engine,"Engine for running other Engine in parallel.",
-		((slaveContainer,slaves,,"[will be overridden]")),
+		((slaveContainer,slaves,,,"[will be overridden]")),
 		/*ctor*/,
 		/*py*/
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list),"Construct from (possibly nested) list of slaves.")

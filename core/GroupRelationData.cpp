@@ -8,6 +8,8 @@
 
 #include "GroupRelationData.hpp"
 
+#ifdef YADE_GROUP_RELATION_DATA
+
 GroupRelationData::GroupRelationData() : ngrp_(2), npar_(0)
 { 
   isActivated_ = false;
@@ -294,19 +296,8 @@ void GroupRelationData::write(ostream & os)
 }
 */
 
-void GroupRelationData::preProcessAttributes(bool deserializing)
+void GroupRelationData::postLoad(GroupRelationData&)
 {
-  if(deserializing)
-  {
-    //
-  }
-}
-
-
-void GroupRelationData::postProcessAttributes(bool deserializing)
-{
-  if(deserializing)
-  {
     string cmdstring = "";
     for (unsigned int i = 0 ; i< commands_.size() ; ++i)
       cmdstring = cmdstring + commands_[i] + " ";
@@ -317,9 +308,8 @@ void GroupRelationData::postProcessAttributes(bool deserializing)
     cout << istr.str() << endl;
 
     read(istr);
-  }
 }
 
 
 
-
+#endif

@@ -55,7 +55,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'yade-support',
 			'rt', # realtime lib, for clock_gettime 
 			]+
-			([env['QGLVIEWER_LIB']] if 'qt3' in env['features'] else [])+
 			(['yade-opengl'] if 'opengl' in env['features'] else [])
 			,
 	)

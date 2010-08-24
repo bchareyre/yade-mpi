@@ -21,7 +21,7 @@ class Tetra: public Shape{
 		virtual ~Tetra();
 	protected:
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Tetra,Shape,"Tetrahedron geometry.",
-			((std::vector<Vector3r>,v,std::vector<Vector3r>(4),"Tetrahedron vertices in global coordinate system.")),
+			((std::vector<Vector3r>,v,std::vector<Vector3r>(4),,"Tetrahedron vertices in global coordinate system.")),
 			/*ctor*/createIndex();
 		);
 		REGISTER_CLASS_INDEX(Tetra,Shape);
@@ -38,13 +38,13 @@ class TTetraGeom: public InteractionGeometry{
 		virtual ~TTetraGeom();
 	protected:
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(TTetraGeom,InteractionGeometry,"Geometry of interaction between 2 :yref:`tetrahedra<Tetra>`, including volumetric characteristics",
-			((Real,penetrationVolume,NaN,"Volume of overlap [m³]"))
-			((Real,equivalentCrossSection,NaN,"Cross-section of the overlap (perpendicular to the axis of least inertia"))
-			((Real,maxPenetrationDepthA,NaN,"??"))
-			((Real,maxPenetrationDepthB,NaN,"??"))
-			((Real,equivalentPenetrationDepth,NaN,"??"))
-			((Vector3r,contactPoint,,"Contact point (global coords)"))
-			((Vector3r,normal,,"Normal of the interaction, directed in the sense of least inertia of the overlap volume")),
+			((Real,penetrationVolume,NaN,,"Volume of overlap [m³]"))
+			((Real,equivalentCrossSection,NaN,,"Cross-section of the overlap (perpendicular to the axis of least inertia"))
+			((Real,maxPenetrationDepthA,NaN,,"??"))
+			((Real,maxPenetrationDepthB,NaN,,"??"))
+			((Real,equivalentPenetrationDepth,NaN,,"??"))
+			((Vector3r,contactPoint,,,"Contact point (global coords)"))
+			((Vector3r,normal,,,"Normal of the interaction, directed in the sense of least inertia of the overlap volume")),
 			createIndex();
 		);
 		FUNCTOR2D(Tetra,Tetra);
@@ -100,8 +100,8 @@ class Ig2_Tetra_Tetra_TTetraGeom: public InteractionGeometryFunctor
 		YADE_CLASS_BASE_DOC(Ig2_Tetra_Tetra_TTetraGeom,InteractionGeometryFunctor,"Create/update geometry of collision between 2 :yref:`tetrahedra<Tetra>` (:yref:`TTetraGeom` instance)");
 		DECLARE_LOGGER;
 	private:
-		list<Tetra> Tetra2TetraIntersection(const Tetra& A, const Tetra& B);
-		list<Tetra> TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& n);
+		std::list<Tetra> Tetra2TetraIntersection(const Tetra& A, const Tetra& B);
+		std::list<Tetra> TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& n);
 		//! Intersection of line given by points A, B and plane given by P and its normal.
 		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).dot(normal) / (B-A).dot(normal); /* TRWM3VEC(A); TRWM3VEC(B); TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("t="<<t); TRWM3VEC((A+t*(B-A))); */ return A+t*(B-A); }
 };

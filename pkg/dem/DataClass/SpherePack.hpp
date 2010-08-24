@@ -92,16 +92,16 @@ public:
 	// iteration 
 	size_t len() const{ return pack.size(); }
 	python::tuple getitem(size_t idx){ if(idx<0 || idx>=pack.size()) throw runtime_error("Index "+lexical_cast<string>(idx)+" out of range 0.."+lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
-	struct iterator{
+	struct _iterator{
 		const SpherePack& sPack; size_t pos;
-		iterator(const SpherePack& _sPack): sPack(_sPack), pos(0){}
-		iterator iter(){ return *this;}
+		_iterator(const SpherePack& _sPack): sPack(_sPack), pos(0){}
+		_iterator iter(){ return *this;}
 		python::tuple next(){
 			if(pos==sPack.pack.size()){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
 			return sPack.pack[pos++].asTuple();
 		}
 	};
-	SpherePack::iterator getIterator() const{ return SpherePack::iterator(*this);};
+	_iterator getIterator() const{ return _iterator(*this);};
 	DECLARE_LOGGER;
 };
 

@@ -96,7 +96,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	TRWM3MAT(cell->trsf);
 	TRWM3MAT(trsfInc);
 	cell->trsf+=trsfInc;
-	cell->postProcessAttributes(/*deserializing*/true);
+	cell->postLoad(*cell);
 
 	// new cell coords of bodies
 	vector<Vector3i > newCells; newCells.resize(scene->bodies->size());
@@ -164,7 +164,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->isDynamic()) continue;
+		if(!b || !b->isDynamic()) continue;
 		currF=rb->forces.getForce(b->id).norm(); maxF=max(currF,maxF); sumF+=currF; nb++;
 	}
 	Real meanF=sumF/nb;
@@ -184,7 +184,7 @@ Real Shop::kineticEnergy(Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	Real ret=0.;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->isDynamic()) continue;
+		if(!b || !b->isDynamic()) continue;
 		// ½(mv²+ωIω)
 		ret+=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(b->state->inertia.cwise()*b->state->angVel));
 	}

@@ -19,7 +19,7 @@ class NormalInelasticMat : public FrictMat
 
 /// Serialization
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormalInelasticMat,FrictMat,"Material class for particles whose contact obey to a normal inelasticity (governed by this *coeff_dech*).",
-		((Real,coeff_dech,1.0,"=kn(unload) / kn(load)"))
+		((Real,coeff_dech,1.0,,"=kn(unload) / kn(load)"))
 		,
 		createIndex();
 					);

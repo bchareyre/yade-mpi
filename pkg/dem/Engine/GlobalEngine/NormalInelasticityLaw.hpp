@@ -26,8 +26,8 @@ class Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity,
 				LawFunctor,
 				"Contact law including cohesion, moment transfer and inelastic compression behaviour\n\n For what concerns moment transfer it is inspired indirectly by the work of Plassiard & Belheine, see the corresponding articles in [DeghmReport2006]_ for example).\n\n It allows moreover to set inelastic unloadings in compression between bodies.\n\n The Relationsships corresponding are Ip2_2xNormalInelasticMat_NormalInelasticityPhys, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated.\n\n To use it you should also use :\n- :yref:`NormalInelasticMat` \n- :yref:`Ip2_2xNormalInelasticMat_NormalInelasticityPhys` (=> which involves interactions of :yref:`NormalInelasticityPhys` type).\n\n The effects of this law are illustrated in scripts/NormalInelasticityTest.py",
-				((bool,momentRotationLaw,true,"boolean, true=> computation of a torque (against relative rotation) exchanged between particles"))
-				((bool,momentAlwaysElastic,false,"boolean, true=> the torque (computed only if momentRotationLaw !!) is not limited by a plastic threshold"))
+				((bool,momentRotationLaw,true,,"boolean, true=> computation of a torque (against relative rotation) exchanged between particles"))
+				((bool,momentAlwaysElastic,false,,"boolean, true=> the torque (computed only if momentRotationLaw !!) is not limited by a plastic threshold"))
 				);
 	
 };

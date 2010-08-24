@@ -1,5 +1,6 @@
 #include<stdexcept>
 #include<yade/core/Material.hpp>
+#include<yade/core/Scene.hpp>
 #include<boost/foreach.hpp>
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH

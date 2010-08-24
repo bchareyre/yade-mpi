@@ -29,7 +29,7 @@ class Ig2_Facet_Sphere_ScGeom : public InteractionGeometryFunctor
 					const bool& force,
 					const shared_ptr<Interaction>& c);
 	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_ScGeom,InteractionGeometryFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Facet` and :yref:`Sphere`.",
-		((Real,shrinkFactor,((void)"no shrinking",0),"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multipled by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
+		((Real,shrinkFactor,((void)"no shrinking",0),,"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multipled by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
 	);
 	DECLARE_LOGGER;
 	FUNCTOR2D(Facet,Sphere);

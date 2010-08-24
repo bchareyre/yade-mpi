@@ -17,8 +17,9 @@
 #include"Material.hpp"
 #include"DisplayParameters.hpp"
 #include"ForceContainer.hpp"
-#include"GroupRelationData.hpp"
 #include"InteractionContainer.hpp"
+
+#include"GroupRelationData.hpp"
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255 
@@ -54,7 +55,9 @@ class Scene: public Serializable{
 		//! "hash maps" of display parameters (since yade::serialization has no support for maps, emulate it via vector of strings in format key=value)
 		vector<shared_ptr<DisplayParameters> > dispParams;
 
-		shared_ptr<GroupRelationData>           grpRelationData;
+		#ifdef YADE_GROUP_RELATION_DATA
+			shared_ptr<GroupRelationData>           grpRelationData;
+		#endif
 
 		Scene();
 
@@ -82,11 +85,14 @@ class Scene: public Serializable{
 		bool needsInitializers;
 		// for GL selection
 		Body::id_t selectedBody;
-	protected :
-		virtual void postProcessAttributes(bool deserializing);
+
+		void postLoad(Scene&);
+
 	REGISTER_ATTRIBUTES(Serializable,
 		(tags)
-		(grpRelationData)
+		#ifdef YADE_GROUP_RELATION_DATA
+			(grpRelationData)
+		#endif
 		(engines)
 		(initializers)
 		(bodies)

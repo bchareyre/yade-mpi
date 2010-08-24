@@ -46,16 +46,16 @@ private:
 
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ResetRandomPosition,GlobalEngine,"Creates spheres during simulation, placing them at random positions. Every time called, one new sphere will be created and inserted in the simulation.",
-		((vector<Body::id_t>,factoryFacets,,"The geometry of the section where spheres will be placed; they will be placed on facets or in volume between them depending on *volumeSection* flag."))
-		((std::vector<int>,subscribedBodies,,"Affected bodies."))
-		((Vector3r,point,Vector3r::Zero(),"??"))
-		((Vector3r,normal,Vector3r(0,1,0),"??"))
-		((bool,volumeSection,((void)"define factory by facets.",false),"Create new spheres inside factory volume rather than on its surface."))
-		((int,maxAttempts,20,"Max attemps to place sphere. If placing the sphere in certain random position would cause an overlap with any other physical body in the model, SpheresFactory will try to find another position."))
-		((Vector3r,velocity,Vector3r::Zero(),"Mean velocity of spheres."))
-		((Vector3r,velocityRange,Vector3r::Zero(),"Half size of a velocities distribution interval. New sphere will have random velocity within the range velocity±velocityRange."))
-		((Vector3r,angularVelocity,Vector3r::Zero(),"Mean angularVelocity of spheres."))
-		((Vector3r,angularVelocityRange,Vector3r::Zero(),"Half size of a angularVelocity distribution interval. New sphere will have random angularVelocity within the range angularVelocity±angularVelocityRange.")),
+		((vector<Body::id_t>,factoryFacets,,,"The geometry of the section where spheres will be placed; they will be placed on facets or in volume between them depending on *volumeSection* flag."))
+		((std::vector<int>,subscribedBodies,,,"Affected bodies."))
+		((Vector3r,point,Vector3r::Zero(),,"??"))
+		((Vector3r,normal,Vector3r(0,1,0),,"??"))
+		((bool,volumeSection,((void)"define factory by facets.",false),,"Create new spheres inside factory volume rather than on its surface."))
+		((int,maxAttempts,20,,"Max attemps to place sphere. If placing the sphere in certain random position would cause an overlap with any other physical body in the model, SpheresFactory will try to find another position."))
+		((Vector3r,velocity,Vector3r::Zero(),,"Mean velocity of spheres."))
+		((Vector3r,velocityRange,Vector3r::Zero(),,"Half size of a velocities distribution interval. New sphere will have random velocity within the range velocity±velocityRange."))
+		((Vector3r,angularVelocity,Vector3r::Zero(),,"Mean angularVelocity of spheres."))
+		((Vector3r,angularVelocityRange,Vector3r::Zero(),,"Half size of a angularVelocity distribution interval. New sphere will have random angularVelocity within the range angularVelocity±angularVelocityRange.")),
 		first_run=true;
 	);
 };

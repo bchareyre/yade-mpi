@@ -149,11 +149,13 @@ opts.AddVariables(
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
+	('libstdcxx','Specify libstdc++ location by hand (opened dynamically at startup); only needed when compiling with clang',None),
 	('QT4DIR','Directory where Qt4 is installed','/usr/share/qt4'),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
+	BoolVariable('mono','[experimental] Build only one shared library and make all other files (python objects, for instance) only be symlinks.',0),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
@@ -276,6 +278,10 @@ def CheckCXX(context):
 	return ret
 def CheckLibStdCxx(context):
 	context.Message('Finding libstdc++ library... ')
+	if context.env.has_key('libstdcxx') and context.env['libstdcxx']:
+		l=context.env['libstdcxx']
+		context.Result(l+' (specified by the user)')
+		return l
 	ret=os.popen(context.env['CXX']+' -print-file-name=libstdc++.so').readlines()[0][:-1]
 	context.env['libstdcxx']=ret
 	context.Result(ret)
@@ -388,6 +394,7 @@ if not env.GetOption('clean'):
 	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config gts --cflags --libs');
 		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)
+		env.Append(CPPDEFINES='PYGTS_HAS_NUMPY')
 		if not ok: featureNotOK('gts')
 	if 'log4cxx' in env['features']:
 		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
@@ -399,7 +406,7 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		env.Append(CXXFLAGS='-frounding-math') # required by cgal, otherwise we get assertion failure at startup
 		if not ok: featureNotOK('cgal')
-	env.Append(LIBS='yade-support')
+	if not env['mono']: env.Append(LIBS='yade-support')
 
 	env.Append(CPPDEFINES=['YADE_'+f.upper().replace('-','_') for f in env['features']])
 
@@ -487,7 +494,7 @@ if env['PLATFORM']=='darwin':
 	#env.Append(LINKFLAGS=['-Z']) # ?? FIXME
 	env.Append(FRAMEWORKS=['CoreServices','Carbon'])
 else:
-	env.Append(LINKFLAGS=['-rdynamic','-z','origin']) 
+	env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin']) 
 	if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
 
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
@@ -606,8 +613,12 @@ def linkPlugins(plugins):
 env['linkPlugins']=linkPlugins
 env['buildPlugs']=buildPlugs
 
-# read top-level SConscript file. It is used only so that build_dir is set. This file reads all necessary SConscripts
-env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
+if env['mono']:
+	env.SConscript('SConscript-mono',build_dir=buildDir,duplicate=0)
+
+else:
+	# read top-level SConscript file. It is used only so that build_dir is set. This file reads all necessary SConscripts
+	env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
 #################################################################################
 ## remove plugins that are in the target dir but will not be installed now

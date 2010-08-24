@@ -11,7 +11,7 @@ class PeriodicPythonRunner: public PeriodicEngine {
 		virtual void action(){ if(command.size()>0) pyRunString(command); }
 	YADE_CLASS_BASE_DOC_ATTRS(PeriodicPythonRunner,PeriodicEngine,
 		"Execute a python command periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
-		((string,command,"","Command to be run by python interpreter. Not run if empty."))
+		((string,command,"",,"Command to be run by python interpreter. Not run if empty."))
 	);
 };
 REGISTER_SERIALIZABLE(PeriodicPythonRunner);

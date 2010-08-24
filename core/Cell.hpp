@@ -90,16 +90,16 @@ class Cell: public Serializable{
 	Matrix3r getTrsf(){ return trsf; }
 	void setTrsf(const Matrix3r& m){ trsf=m; integrateAndUpdate(0); }
 
-	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
+	void postLoad(Cell&){ integrateAndUpdate(0); }
 
 	Vector3r wrapShearedPt_py(const Vector3r& pt){ return wrapShearedPt(pt);}
 	Vector3r wrapPt_py(const Vector3r& pt){ return wrapPt(pt);}
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
-		((Vector3r,refSize,Vector3r(1,1,1),"[will be overridden below]"))
-		((Matrix3r,trsf,Matrix3r::Identity(),"[will be overridden below]"))
-		((Matrix3r,velGrad,Matrix3r::Zero(),"Velocity gradient of the transformation; used in NewtonIntegrator."))
-		((Matrix3r,Hsize,Matrix3r::Zero(),"The current period size (one column per box edge) |yupdate|")),
+		((Vector3r,refSize,Vector3r(1,1,1),,"[will be overridden below]"))
+		((Matrix3r,trsf,Matrix3r::Identity(),,"[will be overridden below]"))
+		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in NewtonIntegrator."))
+		((Matrix3r,Hsize,Matrix3r::Zero(),,"The current period size (one column per box edge) |yupdate|")),
 		/*ctor*/ integrateAndUpdate(0),
 
 		/*py*/
