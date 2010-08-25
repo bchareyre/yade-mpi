@@ -323,7 +323,7 @@ void FlowBoundingSphere::ApplySinusoidalPressure(RTriangulation& Tri, double Pre
 	    if(!Tri.is_infinite(*it)){
 	      Point& p1 = (*it)->info();
 	      Cell_handle& cell = *it;
-	      if (p1.x()>(alpha*(x_max-x_min)) && p1.x()<((alpha+step)*(x_max-x_min))){cell->info().p() = Pressure+cos(alpha*M_PI)*(Pressure);}
+	      if (p1.x()>(alpha*(x_max-x_min)) && p1.x()<((alpha+step)*(x_max-x_min))){cell->info().p() = (Pressure/2)*(1+cos(alpha*M_PI));}
 	  }
 	  }
 	}
@@ -355,7 +355,7 @@ void FlowBoundingSphere::Define_fictious_cells(RTriangulation& Tri)
 	for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
                 Tesselation::Vector_Cell tmp_cells;
-                tmp_cells.resize(1000);
+                tmp_cells.resize(10000);
                 Tesselation::VCell_iterator cells_it = tmp_cells.begin();
                 Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
                 for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
@@ -1789,8 +1789,8 @@ void FlowBoundingSphere::GaussSeidel ()
                 dp_moy = sum_dp/cell2;
                 j++;
                 if (j % 1000 == 0) {
-//                         cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
-//                         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
+                        cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
+                        cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
                         //     save_vtk_file ( Tri );
                 }
         } while (((dp_max/p_max) > tolerance) /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
@@ -1949,9 +1949,9 @@ void FlowBoundingSphere::save_vtk_file(RTriangulation &T)
         }
         vtkfile.end_cells();
 	
-	vtkfile.begin_data("Force",POINT_DATA,SCALARS,FLOAT);
+	vtkfile.begin_data("Force",POINT_DATA,VECTORS,FLOAT);
 	for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v)
-	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[1]);}
+	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[0],(v->info().forces)[1],(v->info().forces)[2]);}
 	vtkfile.end_data();
 
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);

@@ -60,7 +60,7 @@ void FlowEngine::action ( )
 				if (!first) flow->GaussSeidel ( );
 				timingDeltas->checkpoint("Gauss-Seidel");
 				
-				if (save_mplot){int j = scene->iter;
+				if (save_mplot){int j = Omega::instance().getCurrentIteration();
 				char plotfile [50];
 				mkdir("./mplot", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string visu_consol = "./mplot/"+flow->key+"%d_Visu_Consol";
@@ -83,25 +83,16 @@ void FlowEngine::action ( )
 				for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
 				{
 					id = V_it->info().id();
-					
-// 					scene->forces.sync();
-// 					const Vector3r& fbef = scene->forces.getForce(id);
-// 					if (id==id_sphere) cout << "force before = " << fbef << endl;
-// 					if (id==id_sphere) cout << "fluid force = " << V_it->info().forces << endl;
 					for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
 					scene->forces.addForce ( id, f );
-					
-// 					scene->forces.sync();
-// 					const Vector3r& faft = scene->forces.getForce(id);
-// 					if (id==id_sphere) cout << "force after = " << faft << endl;
 				//scene->forces.addTorque(id,t);
 				}
 				
 				timingDeltas->checkpoint("Applying Forces");
 			
-				Real time = scene->time;
+				Real time = Omega::instance().getSimulationTime();
 			
-				int j = scene->iter;
+				int j = Omega::instance().getCurrentIteration();
 				char file [50];
 				mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string consol = "./Consol/"+flow->key+"%d_Consol";
@@ -118,12 +109,13 @@ void FlowEngine::action ( )
 				std::ofstream settle ("settle.txt", std::ios::app);
 				settle << j << " " << time << " " << currentStrain << endl;
 				
-				first=false;
-				
-				if ( scene->iter>1 && scene->iter % PermuteInterval == 0 )
+				if ( scene->iter % PermuteInterval == 0 )
 				{ Update_Triangulation = true; }
 				
-				if ( Update_Triangulation ) { Build_Triangulation( );}
+				if ( Update_Triangulation && !first) { Build_Triangulation( );}
+				
+				first=false;
+				Update_Triangulation = false;
 				
 				timingDeltas->checkpoint("Storing Max Pressure");
 				
@@ -175,11 +167,9 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
-AddBoundary ( );
+
+	AddBoundary ( );
 	Triangulate ( );
-	
-	
-	
 	
 	cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
@@ -198,21 +188,21 @@ AddBoundary ( );
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
-// 		flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 5);
-		BoundaryConditions();
+  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 5);
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
 	}
 	else
 	{
 		cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
+		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
-		flow->TOLERANCE=Tolerance;
-		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
-		Update_Triangulation=!Update_Triangulation;
 		BoundaryConditions();
+		flow->Initialize_pressures( P_zero );
+		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
+ 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 5);
 	}
-
 	Initialize_volumes ( );
 }
 
@@ -230,7 +220,7 @@ void FlowEngine::AddBoundary ()
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
 		  Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const Body::id_t& id = b->getId();
+			const body_id_t& id = b->getId();
 			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];
@@ -258,17 +248,10 @@ void FlowEngine::AddBoundary ()
 		if ( b->shape->getClassIndex() == Bx_Index )
 		{
 			Box* w = YADE_CAST<Box*> ( b->shape.get() );
-// 			const Body::id_t& id = b->getId();
+// 			const body_id_t& id = b->getId();
 			Real center [3], Extent[3];
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
-
-// 			flow->x_min = min ( flow->x_min, center[0]+wall_thickness);
-// 			flow->x_max = max ( flow->x_max, center[0]-wall_thickness);
-// 			flow->y_min = min ( flow->y_min, center[1]+wall_thickness);
-// 			flow->y_max = max ( flow->y_max, center[1]-wall_thickness);
-// 			flow->z_min = min ( flow->z_min, center[2]+wall_thickness);
-// 			flow->z_max = max ( flow->z_max, center[2]-wall_thickness);
 		}
 	}
 	
@@ -299,20 +282,13 @@ void FlowEngine::Triangulate ()
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
 			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const Body::id_t& id = b->getId();
+			const body_id_t& id = b->getId();
 			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];
 			Real z = b->state->pos[2];
 			
 			flow->T[flow->currentTes].insert(x, y, z, rad, id);
-			
-// 			flow->x_min = min ( flow->x_min, x-rad);
-// 			flow->x_max = max ( flow->x_max, x+rad);
-// 			flow->y_min = min ( flow->y_min, y-rad);
-// 			flow->y_max = max ( flow->y_max, y+rad);
-// 			flow->z_min = min ( flow->z_min, z-rad);
-// 			flow->z_max = max ( flow->z_max, z+rad);
 			
 			contator+=1;
 		}
@@ -413,8 +389,6 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 	                                      CGT::Vecteur ( v2[0],v2[1],v2[2] ) ) *
 	                flow->boundaries[b].normal ) * ( 0.33333333333* ( V[0][flow->boundaries[b].coordinate]+ V[1][flow->boundaries[b].coordinate]+ V[2][flow->boundaries[b].coordinate] ) - Wall_point[flow->boundaries[b].coordinate] );
 
-// 	cout << "volume single cell =" << Volume << endl;
-
 	return abs ( Volume );
 }
 
@@ -469,8 +443,6 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 
 	Real Volume = ( CGAL::cross_product ( v1,v2 ) *flow->boundaries[b[0]].normal ) *h;
 
-// 	cout << "volume double cell =" << Volume << endl;
-
 	return abs ( Volume );
 }
 
@@ -512,8 +484,6 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 
 	Real Volume = ( CGAL::cross_product ( v1,v2 ) ) * h;
 
-// 	cout << "volume triple cell =" << Volume << endl;
-
 	return abs ( Volume );
 }
 
@@ -536,8 +506,6 @@ Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
 	CGT::Point p4 ( ( A[3] ) [0], ( A[3] ) [1], ( A[3] ) [2] );
 
 	Real Volume = ( std::abs ( ( CGT::Tetraedre ( p1,p2,p3,p4 ).volume() ) ) );
-//
-// 	cout << "volume normal cell =" << Volume << endl;
 
 	return abs ( Volume );
 }
