@@ -115,6 +115,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	arrayIdentIds.clear();
 	Real totalMass = 0;
 	Real totalVol = 0;
+	Real totalPartNum = 0;
 	Real const constForVol = 4.0/3.0;
 	//Calculate specimen masses, create vector for storing it
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -125,6 +126,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			Real volTemp = constForVol*Mathr::PI*pow ( sphere->radius, 3 );
 			totalMass += massTemp;
 			totalVol += volTemp;
+			totalPartNum += 1;
 			int specimenNumberId = YADE_PTR_CAST<RpmState>(b->state)->specimenNumber;
 			
 			if (specimenNumberId != 0) {					//Check, whether particle already belongs to any specimen
@@ -133,6 +135,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 					if (arrayIdentIds[i].id1 == specimenNumberId) {
 						arrayIdentIds[i].mass+=massTemp;//If "bin" for particle with this specimenId found, put its mass there
 						arrayIdentIds[i].vol+=volTemp;//If "bin" for particle with this specimenId found, put its volume there
+						arrayIdentIds[i].particleNumber+=1; //Calculate the number of particles in on specimen
 						foundItemInArray = true;
 					}
 					if (foundItemInArray) break;
@@ -245,17 +248,18 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	//=================================================================================================================
 	//Save data to a file
 	out<<"**********\n";
-	out<<"iter\ttotalMass\ttotalVol\tnumSpec\tmatNum\n";
-	out<<scene->iter<<"\t"<<totalMass<<"\t"<<totalVol<<"\t"<<arrayIdentIds.size()<<"\t"<<materialCount.size()<<"\n\n";
-	out<<"id\tmassSpec\tvolSpec \tmaxDiamSpec\t";
+	out<<"iter\ttotalMass\ttotalVol\ttotalPartNum\tnumSpec\tmatNum\n";
+	out<<scene->iter<<"\t"<<totalMass<<"\t"<<totalVol<<"\t"<<totalPartNum<<"\t"<<arrayIdentIds.size()<<"\t"<<materialCount.size()<<"\n\n";
+	out<<"id\tmassSpec\tvolSpec\tmaxDiamSpec\tpartNum\t";
 	
+
 	if (materialCount.size() > 1) {
 		for (unsigned int w=0; w<materialCount.size(); w++) { out<<"mat_"<<materialCount[w]<<"_Mass\tmat_"<<materialCount[w]<<"_Vol\tmat_"<<materialCount[w]<<"_PartNum\t";}
 	}
 	out<<"\n";
 	
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
-		out<<arrayIdentIds[i].id1<<"\t"<<arrayIdentIds[i].mass<<"\t"<<arrayIdentIds[i].vol<<"\t"<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\t";
+		out<<arrayIdentIds[i].id1<<"\t"<<arrayIdentIds[i].mass<<"\t"<<arrayIdentIds[i].vol<<"\t"<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\t"<<arrayIdentIds[i].particleNumber<<"\t";
 		if (materialCount.size() > 1) {
 			//Find Material Info
 			for (unsigned int w=0; w<materialCount.size(); w++) {

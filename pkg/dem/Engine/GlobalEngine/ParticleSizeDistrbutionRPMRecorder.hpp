@@ -20,7 +20,7 @@ class ParticleSizeDistrbutionRPMRecorder: public Recorder {
 };
 
 struct identicalIds{
-	int id1, id2;
+	int id1, id2,particleNumber;
 	Real mass, vol, maxDistanceBetweenSpheres;
 	identicalIds (int id1r, int id2r, Real massr, Real volr){
 		assert(id1r<id2r);
@@ -29,6 +29,7 @@ struct identicalIds{
 		mass = massr;
 		vol = volr;
 		maxDistanceBetweenSpheres = 0;
+		particleNumber = 1;
 	}
 	static bool sortArrayIdentIds (identicalIds i, identicalIds d) {return i.mass>d.mass;}
 };
