@@ -60,7 +60,7 @@ void FlowEngine::action ( )
 				if (!first) flow->GaussSeidel ( );
 				timingDeltas->checkpoint("Gauss-Seidel");
 				
-				if (save_mplot){int j = Omega::instance().getCurrentIteration();
+				if (save_mplot){int j = scene->iter;
 				char plotfile [50];
 				mkdir("./mplot", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string visu_consol = "./mplot/"+flow->key+"%d_Visu_Consol";
@@ -90,9 +90,9 @@ void FlowEngine::action ( )
 				
 				timingDeltas->checkpoint("Applying Forces");
 			
-				Real time = Omega::instance().getSimulationTime();
+				Real time = scene->time;
 			
-				int j = Omega::instance().getCurrentIteration();
+				int j = scene->iter;
 				char file [50];
 				mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 				string consol = "./Consol/"+flow->key+"%d_Consol";
@@ -220,7 +220,7 @@ void FlowEngine::AddBoundary ()
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
 		  Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const body_id_t& id = b->getId();
+			//const Body::id_t& id = b->getId();
 			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];
@@ -248,7 +248,7 @@ void FlowEngine::AddBoundary ()
 		if ( b->shape->getClassIndex() == Bx_Index )
 		{
 			Box* w = YADE_CAST<Box*> ( b->shape.get() );
-// 			const body_id_t& id = b->getId();
+// 			const Body::id_t& id = b->getId();
 			Real center [3], Extent[3];
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
@@ -282,7 +282,7 @@ void FlowEngine::Triangulate ()
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
 			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const body_id_t& id = b->getId();
+			const Body::id_t& id = b->getId();
 			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];
