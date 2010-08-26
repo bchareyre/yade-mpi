@@ -27,20 +27,13 @@
 #include<unistd.h>
 #include<time.h>
 
+
+YADE_PLUGIN((Scene));
+CREATE_LOGGER(Scene);
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-Scene::Scene(): bodies(new BodyContainer), interactions(new InteractionContainer), cell(new Cell){	
-	needsInitializers=true;
-	iter=0;
-	time=0;
-	stopAtIter=0;
-	stopAtRealTime=0; // not yet implemented
-	stopAtVirtTime=0; // not yet implemented either
-	dt=1e-8;
-	selectedBody=-1;
-	isPeriodic=false;
-
+void Scene::fillDefaultTags(){
 	// fill default tags
 	struct passwd* pw;
 	char hostname[HOST_NAME_MAX];
@@ -59,6 +52,7 @@ Scene::Scene(): bodies(new BodyContainer), interactions(new InteractionContainer
 
 
 void Scene::postLoad(Scene&){
+	// FIXME: this should be no longer necessary with boost::serialization, but it must be checked
 	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b) continue; // erased body
@@ -77,36 +71,46 @@ void Scene::moveToNextTimeStep(){
 		forces.resize(bodies->size());
 		needsInitializers=false;
 	}
-	if(isPeriodic) cell->integrateAndUpdate(dt);
-	//forces.reset(); // uncomment if ForceResetter is removed
-	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
-	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
-	FOREACH(const shared_ptr<Engine>& e, engines){
-		e->scene=this;
-		if(!e->isActivated()) continue;
-		e->action();
-		if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
+	if(!subStepping && subStep<0){
+		// ** 1. ** prologue
+		if(isPeriodic) cell->integrateAndUpdate(dt);
+		//forces.reset(); // uncomment if ForceResetter is removed
+		bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
+		TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
+		// ** 2. ** engines
+		FOREACH(const shared_ptr<Engine>& e, engines){
+			e->scene=this;
+			if(!e->isActivated()) continue;
+			e->action();
+			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
+		}
+		// ** 3. ** epilogue
+		iter++;
+		time+=dt;
+	} else {
+		/* IMPORTANT: take care to copy EXACTLY the same sequence as is in the block above !! */
+		if(TimingInfo::enabled){ TimingInfo::enabled=false; LOG_INFO("O.timingEnabled disabled, since O.subStepping is used."); }
+		// ** 1. ** prologue
+		if(subStep<-1 || subStep>(int)engines.size()){ LOG_WARN("Invalid value of Scene::subStep ("<<subStep<<"), setting to -1 (prologue will be run)."); subStep=-1; }
+		if(subStep==-1){ if(isPeriodic) cell->integrateAndUpdate(dt); }
+		// ** 2. ** engines
+		else if(subStep>=0 && subStep<(int)engines.size()){ const shared_ptr<Engine>& e(engines[subStep]); e->scene=this; if(e->isActivated()) e->action(); }
+		// ** 3. ** epilogue
+		else if(subStep==(int)engines.size()){ iter++; time+=dt; /* gives -1 along with the increment afterwards */ subStep=-2; }
+		// (?!)
+		else { /* never reached */ assert(false); }
+		subStep++;
 	}
-	iter++;
-	time+=dt;
 }
 
 
 
-shared_ptr<Engine> Scene::engineByName(string s){
+shared_ptr<Engine> Scene::engineByName(const string& s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->getClassName()==s) return e;
 	}
 	return shared_ptr<Engine>();
 }
-
-shared_ptr<Engine> Scene::engineByLabel(string s){
-	FOREACH(shared_ptr<Engine> e, engines){
-		if(e->label==s) return e;
-	}
-	return shared_ptr<Engine>();
-}
-
 
 bool Scene::timeStepperPresent(){
 	int n=0;

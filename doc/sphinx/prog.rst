@@ -519,16 +519,12 @@ Serialization serves to save simulation to file and restore it later. This proce
 * creating class instances based solely on its name;
 * knowing what classes are defined inside a particular shared library (plugin).
 
-This functionality is provided by 3 macros and 2 virtual functions; details are provided below.
+This functionality is provided by 3 macros and 4 optional methods; details are provided below.
 
-``Serializable::preProcessAttributes``
-	*Optional* class virtual function. See :ref:`attributeregistration`.
-
-	Prepare attributes for being (de)serialized.
-:yref:`Serializable::postProcessAttributes`
-	*Optional* class virtual function.
-
-	Process attributes after being (de)serialized. See :ref:`attributeregistration`.
+``Serializable::preLoad``, ``Serializable::preSave``, ``Serializable::postLoad``, ``Serializable::postSave``
+	Prepare attributes before serialization (saving) or deserialization (loading) or process them after serialization or deserialization.
+	
+	See :ref:`attributeregistration`.
 ``YADE_CLASS_BASE_DOC_*``
 	Inside the class declaration (i.e. in the ``.hpp`` file within the ``class Foo { /* … */};`` block). See :ref:`attributeregistration`.
 
@@ -555,7 +551,7 @@ All (serializable) types in Yade are one of the following:
 
   This funcionality is hidden behind the macro :ref:`YADE_CLASS_BASE_DOC` used in class declaration body (header file), which takes base class and list of attributes::
 
-	YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"class documentation",((type1,attribute1,initValue1,"Documentation for attribute 1"))((type2,attribute2,initValue2,"Documentation for attribute 2"));
+	YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"class documentation",((type1,attribute1,initValue1,,"Documentation for attribute 1"))((type2,attribute2,initValue2,,"Documentation for attribute 2"));
 
   Note that attributes are encodes in double parentheses, not separated by commas. Empty attribute list can be given simply by ``YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"documentation",)`` (the last comma is mandatory), or by omiting ``ATTRS`` from macro name and last parameter altogether.
 
@@ -718,8 +714,8 @@ Expected parameters are indicated by macro name components separated with unders
 
 	.. code-block:: c++
 
-		((type1,attr1,initValue1,"Attribute 1 documentation"))
-		((type2,attr2,,"Attribute 2 documentation"))  // initValue unspecified
+		((type1,attr1,initValue1,attrFlags,"Attribute 1 documentation"))
+		((type2,attr2,,,"Attribute 2 documentation"))  // initValue and attrFlags unspecified
 
 	This will expand to
 	
@@ -738,20 +734,35 @@ Expected parameters are indicated by macro name components separated with unders
 
 		No initial value will be assigned for attribute of which initial value is left empty (as is for attr2 in the above example). Note that you still have to write the commas.
 
-	#. Registration of the attribute in the serialization system
+	#. Registration of the attribute in the serialization system (unless disabled by attrFlags -- see below)
 
-	#. Registration of the attribute in python, so that it can be accessed as ``klass().name1``.
-		The attribute will be read-write; to avoid this, override it by read-only attribute of the same name in the py section (see below).
+	#. Registration of the attribute in python (unless disabled by attrFlags), so that it can be accessed as ``klass().name1``.
+		The attribute is read-write by default, see attrFlags to change that.
 	
 		This attribute will carry the docstring provided, along with knowledge of the initial value. You can add text description to the default value using the comma operator of c++ and casting the char* to (void):
 
 		.. code-block:: c++
 
-			((Real,dmgTau,((void)"deactivated if negative",-1),"Characteristic time for normal viscosity. [s]"))
+			((Real,dmgTau,((void)"deactivated if negative",-1),,"Characteristic time for normal viscosity. [s]"))
 
 		leading to :yref:`CpmMat::dmgTau`.
 
 		The attribute is registered via ``boost::python::add_property`` specifying ``return_by_value`` policy rather than ``return_internal_reference``, which is the default when using ``def_readwrite``. The reason is that we need to honor custom converters for those values; see note in :ref:`customconverters` for details.
+
+	.. admonition:: Attribute flags
+
+		By default, an attribute will be serialized and will be read-write from python. There is a number of flags that can be passed as the 4th argument (empty by default) to change that:
+
+		* ``Attr::noSave`` avoids serialization of the attribute (while still keeping its accessibility from Python)
+		* ``Attr::pyReadonly`` makes the attribute read-only from Python
+		* ``Attr::pyCallPostLoad`` will call ``postLoad`` function to handle attribute change after its value is set from Python; this is to ensure consistency of other precomputed data which depend on this value (such as ``Cell.trsf`` and such)
+		* ``Attr::pyHidden`` will not expose the attribute to Python at all
+		* ``Attr::pyNoResize`` will not permit changing size of the array from Python [not yet used]
+
+		Flags can be combined as usual using bitwise disjunction ``|`` (such as ``Attr::noSave | Attr::pyReadonly``), though in such case the value should be parenthesized to avoid a warning with some compilers (g++ specifically), i.e. ``(Attr::noSave | Attr::pyReadonly)``.
+
+		Currently, the flags logic handled at runtime; that means that even for attributes with ``Attr::noSave``, their serialization template must be defined (although it will never be used). In the future, the implementation might be template-based, avoiding this necessity.
+
 
 ``deprec``
 	List of deprecated attribute names. The syntax is ::
@@ -787,7 +798,7 @@ Expected parameters are indicated by macro name components separated with unders
 	.. note:: 
 		The code must not contain commas ouside parentheses (since preprocessor uses commas to separate macro arguments). If you need complex things at construction time, create a separate init() function and call it from the constructor instead.
 ``py``
-	will be appeneded directly after generated python code that registers the class and all its attributes. You can use it to make accessible data member which you do not want to be serialized, or to override an already-existing attribute of the same name in order to make it read-only from python (taken from :yref:`CpmPhys`):
+	will be appeneded directly after generated python code that registers the class and all its attributes. You can use it to access class methods from python, for instance, to override an existing attribute with the same name etc:
 
 	.. code-block:: c++
 
@@ -795,23 +806,6 @@ Expected parameters are indicated by macro name components separated with unders
 		.def_readonly("Fn",&CpmPhys::Fn,"Magnitude of normal force.")
 
 	``def_readonly`` will not work for custom types (such as std::vector), as it bypasses conversion registry; see :ref:`customconverters` for details.
-
-	Changing some attributes might render other data within the object inconsistent (cache coherency); for instance, :yref:`Cell` must update :yref:`Cell.size` each time :yref:`Cell.trsf` is updated, since :yref:`Cell.size` is not computed every time, but cached value is used instead. In that case, getter and setter functions must be defined, which will, besides getting/setting value of the attribute itself also run appropriate cache update function; we override refSize that was already registered; ``integrateAndUpdate(0)`` triggers cache update in this case:
-
-	.. code-block:: c++
-
-		class Cell{
-		public:
-			Vector3r getRefSize(){ return refSize; }
-			void setRefSize(const Vector3r& s){ refSize=s; integrateAndUpdate(0); }
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"doc",
-			/* … */
-			((Vector3r,refSize,Vector3r(1,1,1),"[will be overridden below]")),
-			/* ctor */,
-			/* py */
-				.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell.")
-			);
-		};
 
 
 Special python constructors

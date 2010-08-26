@@ -69,7 +69,8 @@ class ForceContainer{
 		* for a particular body id. */
 		const Vector3r& getForceUnsynced (Body::id_t id){ensureSize(id); return _force[id];}
 		const Vector3r& getTorqueUnsynced(Body::id_t id){ensureSize(id); return _force[id];}
-		friend class PhysicalActionDamperUnit;
+		// dummy function to avoid template resolution failure
+		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
 		ForceContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0){
 			nThreads=omp_get_max_threads();
@@ -163,10 +164,11 @@ class ForceContainer {
 		std::vector<Vector3r> _rot;
 		size_t size;
 		inline void ensureSize(Body::id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
-		friend class PhysicalActionDamperUnit;
 		const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
 		const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
 		bool moveRotUsed;
+		// dummy function to avoid template resolution failure
+		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
 		ForceContainer(): size(0), moveRotUsed(false), syncCount(0){}
 		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}

@@ -15,6 +15,7 @@ class SimulationFlow // FIXME ; bad name
 {
 	public:
 		virtual void	singleAction();
+	DECLARE_LOGGER;
 };
 
 

@@ -132,7 +132,7 @@ Class reference (yade.wrapper module)
 	sect('Callbacks','',['BodyCallback','IntrCallback'])+
 	sect('Preprocessors','',['FileGenerator'])+
 	sect('Rendering','',['OpenGLRenderer','GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlInteractionGeometryFunctor','GlInteractionPhysicsFunctor'])+ # ,'GlShapeDispatcher','GlStateDispatcher','GlBoundDispatcher','GlInteractionGeometryDispatcher','GlInteractionPhysicsDispatcher'])+
-	sect('Simulation data','',['Omega','BodyContainer','InteractionContainer','ForceContainer','MaterialContainer'])
+	sect('Simulation data','',['Omega','BodyContainer','InteractionContainer','ForceContainer','MaterialContainer','Scene','Cell'])
 	+"""
 Other classes
 ---------------
@@ -208,7 +208,7 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences'):
 global writer
 writer=None
 
-for w in ['latex','html']: #['html','latex']:
+for w in ['html','latex']: #['html','latex']:
 	if 'nolatex' in sys.argv and w=='latex': continue # skip latex build if passed nolatex (used in debian packages)
 	writer=w
 	genWrapperRst()

@@ -400,7 +400,7 @@ my_latex_preamble=r'''
 \usepackage{euler} % must be loaded before fontspec for the whole doc (below); this must be kept for pngmath, however
 \usepackage{amsmath}
 \usepackage{amsbsy}
-\usepackage{mathabx}
+%\usepackage{mathabx}
 \usepackage{underscore}
 \usepackage[all]{xy}
 

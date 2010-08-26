@@ -122,7 +122,9 @@ def onBodySelect(id):
 		O.bodies[i.id2 if i.id1==id else i.id1].shape.highlight=True
 		print i.id1,i.id2,i.phys,i.geom
 
-from yade import qt
-qt.View()
-qt.Controller()
+try:
+	from yade import qt
+	qt.View()
+	qt.Controller()
+except ImportError: pass
 O.run(20000)

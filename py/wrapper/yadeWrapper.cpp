@@ -315,6 +315,10 @@ class pyOmega{
 	}
 
 	long iter(){ return OMEGA.getScene()->iter;}
+	int subStep(){ return OMEGA.getScene()->subStep; }
+	bool subStepping_get(){ return OMEGA.getScene()->subStepping; }
+	void subStepping_set(bool val){ OMEGA.getScene()->subStepping=val; }
+
 	double time(){return OMEGA.getScene()->time;}
 	double realTime(){ return OMEGA.getRealTime(); }
 	double dt_get(){return OMEGA.getScene()->dt;}
@@ -501,6 +505,8 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
+		.add_property("subStep",&pyOmega::subStep,"Get the current subStep number (only meaningful if O.subStepping==True)")
+		.add_property("subStepping",&pyOmega::subStepping_get,&pyOmega::subStepping_set,"Get/set whether subStepping is active.")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
 		.add_property("time",&pyOmega::time,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")

@@ -152,7 +152,7 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 
 #define _REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,attrs,deprec)  _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) public: \
 	void pySetAttr(const std::string& key, const boost::python::object& value){BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR_DEPREC,thisClass,deprec); baseClass::pySetAttr(key,value); } \
-	/* list all attributes (except deprecated ones); could return boost::python::set instead*/ boost::python::list pyKeys() const {  boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; } \
+	/* list all attributes (except deprecated ones); could return boost::python::set instead*/ /* boost::python::list pyKeys() const {  boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; }  */ \
 	/* return dictionary of all acttributes and values; deprecated attributes omitted */ boost::python::dict pyDict() const { boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; } \
 	virtual void callPostLoad(void){ baseClass::callPostLoad(); postLoad(*this); }
 
@@ -265,7 +265,7 @@ class Serializable: public Factorable {
 		//static void pyUpdateAttrs(const shared_ptr<Serializable>&, const boost::python::dict& d);
 
 		virtual void pySetAttr(const std::string& key, const boost::python::object& value){ PyErr_SetString(PyExc_AttributeError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); };
-		virtual boost::python::list pyKeys() const { return boost::python::list(); };
+		//virtual boost::python::list pyKeys() const { return boost::python::list(); };
 		virtual boost::python::dict pyDict() const { return boost::python::dict(); }
 		virtual void callPostLoad(void){ postLoad(*this); }
 		// check whether the class registers itself or whether it calls virtual function of some base class;
@@ -292,6 +292,6 @@ shared_ptr<T> Serializable_ctor_kwAttrs(python::tuple& t, python::dict& d){
 	instance=shared_ptr<T>(new T);
 	instance->pyHandleCustomCtorArgs(t,d); // can change t and d in-place
 	if(python::len(t)>0) throw runtime_error("Zero (not "+lexical_cast<string>(python::len(t))+") non-keyword constructor arguments required [in Serializable_ctor_kwAttrs; Serializable::pyHandleCustomCtorArgs might had changed it after your call].");
-	instance->pyUpdateAttrs(d); instance->callPostLoad();
+	if(python::len(d)>0){ instance->pyUpdateAttrs(d); instance->callPostLoad(); }
 	return instance;
 }

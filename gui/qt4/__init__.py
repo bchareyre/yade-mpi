@@ -152,14 +152,11 @@ class ControllerClass(QWidget,Ui_Controller):
 		except ValueError: pass
 		self.dtEdit.setText(str(O.dt))
 		self.dtEditUpdate=True
-	def playSlot(self):
-		O.run()
-	def pauseSlot(self):
-		O.pause()
-	def stepSlot(self):
-		O.step()
-	def new3dSlot(self):
-		View()
+	def playSlot(self):	O.run()
+	def pauseSlot(self): O.pause()
+	def stepSlot(self):  O.step()
+	def subStepSlot(self,value): O.subStepping=bool(value)
+	def new3dSlot(self):	View()
 	def setReferenceSlot(self):
 		for b in O.bodies:
 			b.state.refPos=b.state.pos
@@ -187,6 +184,7 @@ class ControllerClass(QWidget,Ui_Controller):
 		self.playButton.setEnabled(False)
 		self.pauseButton.setEnabled(False)
 		self.stepButton.setEnabled(False)
+		self.subStepCheckbox.setEnabled(False)
 		self.reloadButton.setEnabled(False)
 		self.dtFixedRadio.setEnabled(False)
 		self.dtDynRadio.setEnabled(False)
@@ -201,11 +199,13 @@ class ControllerClass(QWidget,Ui_Controller):
 			self.pauseButton.setEnabled(running)
 			self.reloadButton.setEnabled(O.filename is not None)
 			self.stepButton.setEnabled(not running)
+			self.subStepCheckbox.setEnabled(not running)
 		else:
 			self.playButton.setEnabled(False)
 			self.pauseButton.setEnabled(False)
 			self.reloadButton.setEnabled(False)
 			self.stepButton.setEnabled(False)
+			self.subStepCheckbox.setEnabled(False)
 		self.dtFixedRadio.setEnabled(True)
 		self.dtDynRadio.setEnabled(O.dynDtAvailable)
 		dynDt=O.dynDt
@@ -220,13 +220,24 @@ class ControllerClass(QWidget,Ui_Controller):
 
 	def refreshValues(self):
 		rt=int(O.realtime); t=O.time; iter=O.iter; iterPerSec=iter/(rt if rt>0 else 1.); stopAtIter=O.stopAtIter
+		if not O.running: iterPerSec=0
+		subStepInfo=''
+		if O.subStepping:
+			subStep=O.subStep
+			if subStep==-1: subStepInfo=u'→ <i>prologue</i>'
+			elif subStep>=0 and subStep<len(O.engines):
+				e=O.engines[subStep]; subStepInfo=u'→ %s'%(e.label if e.label else e.__class__.__name__)
+			elif subStep==len(O.engines): subStepInfo=u'→ <i>epilogue</i>'
+			else: raise RuntimeError("Invalid O.subStep value %d, should be ∈{-1,…,len(o.engines)}"%subStep)
+			subStepInfo="<br><small>sub %d/%d [%s]</small>"%(subStep,len(O.engines),subStepInfo)
+		self.subStepCheckbox.setChecked(O.subStepping) # might have been changed async
 		if stopAtIter<=iter:
 			self.realTimeLabel.setText('%02d:%02d:%02d'%(rt//3600,rt//60,rt%60))
-			self.iterLabel.setText('#%ld, %.1f/s'%(iter,iterPerSec))
+			self.iterLabel.setText('#%ld, %.1f/s %s'%(iter,iterPerSec,subStepInfo))
 		else:
 			e=int((stopAtIter-iter)*iterPerSec)
 			self.realTimeLabel.setText('%02d:%02d:%02d (ETA %02d:%02d:%02d)'%(rt//3600,rt//60,rt%60,e//3600,e//60,e%60))
-			self.iterLabel.setText('#%ld / %ld, %.1f/s'%(O.iter,stopAtIter,iterPerSec))
+			self.iterLabel.setText('#%ld / %ld, %.1f/s %s'%(O.iter,stopAtIter,iterPerSec,subStepInfo))
 		s=int(t); ms=int(t*1000)%1000; us=int(t*1000000)%1000; ns=int(t*1000000000)%1000
 		self.virtTimeLabel.setText(u'%03ds%03dm%03dμ%03dn'%(s,ms,us,ns))
 		

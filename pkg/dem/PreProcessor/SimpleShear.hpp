@@ -43,7 +43,7 @@ class SimpleShear : public FileGenerator
 				  ((Real,density,2600,,"density of the spheres [$kg/m^3$]"))
 				  ((Real,sphereYoungModulus,4.0e9,,"value of :yref:`ElastMat::young` for the spheres [$Pa$]"))
 				  ((Real,spherePoissonRatio,0.04,,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
-				  ((Real,sphereFrictionDeg,37,,"value of :yref:`ElastMat::poisson` for the spheres [$^\\degree$] (the necessary conversion in $rad$ is done automatically)"))
+				  ((Real,sphereFrictionDeg,37,,"value of :yref:`ElastMat::poisson` for the spheres [$^\\circ$] (the necessary conversion in $rad$ is done automatically)"))
 				  ((Real,boxYoungModulus,4.0e9,,"value of :yref:`ElastMat::young` for the boxes [$Pa$]"))
 				  ((Real,boxPoissonRatio,0.04,,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
 				  ((bool,gravApplied,false,,"depending on this, :yref:`GravityEngine` is added or not to the scene to take into account the weight of particles"))
