@@ -90,16 +90,23 @@ void Scene::moveToNextTimeStep(){
 	} else {
 		/* IMPORTANT: take care to copy EXACTLY the same sequence as is in the block above !! */
 		if(TimingInfo::enabled){ TimingInfo::enabled=false; LOG_INFO("O.timingEnabled disabled, since O.subStepping is used."); }
-		// ** 1. ** prologue
-		if(subStep<-1 || subStep>(int)engines.size()){ LOG_WARN("Invalid value of Scene::subStep ("<<subStep<<"), setting to -1 (prologue will be run)."); subStep=-1; }
-		if(subStep==-1){ if(isPeriodic) cell->integrateAndUpdate(dt); }
-		// ** 2. ** engines
-		else if(subStep>=0 && subStep<(int)engines.size()){ const shared_ptr<Engine>& e(engines[subStep]); e->scene=this; if(e->isActivated()) e->action(); }
-		// ** 3. ** epilogue
-		else if(subStep==(int)engines.size()){ iter++; time+=dt; /* gives -1 along with the increment afterwards */ subStep=-2; }
-		// (?!)
-		else { /* never reached */ assert(false); }
-		subStep++;
+		if(subStep<-1 || subStep>(int)engines.size()){ LOG_ERROR("Invalid value of Scene::subStep ("<<subStep<<"), setting to -1 (prologue will be run)."); subStep=-1; }
+		// if subStepping is disabled, it means we have not yet finished last step completely; in that case, do that here by running all remaining substeps at once
+		// if subStepping is enabled, just run the step we need (the loop is traversed only once, with subs==subStep)
+		int maxSubStep=subStep;
+		if(!subStepping){ maxSubStep=engines.size(); LOG_INFO("Running remaining sub-steps ("<<subStep<<"…"<<maxSubStep<<") before disabling sub-stepping."); }
+		for(int subs=subStep; subs<=maxSubStep; subs++){
+			assert(subs>=-1 && subs<=(int)engines.size());
+			// ** 1. ** prologue
+			if(subs==-1){ if(isPeriodic) cell->integrateAndUpdate(dt); }
+			// ** 2. ** engines
+			else if(subs>=0 && subs<(int)engines.size()){ const shared_ptr<Engine>& e(engines[subs]); e->scene=this; if(e->isActivated()) e->action(); }
+			// ** 3. ** epilogue
+			else if(subs==(int)engines.size()){ iter++; time+=dt; /* gives -1 along with the increment afterwards */ subStep=-2; }
+			// (?!)
+			else { /* never reached */ assert(false); }
+		}
+		subStep++; // if not substepping, this will make subStep=-2+1=-1, which is what we want
 	}
 }
 
