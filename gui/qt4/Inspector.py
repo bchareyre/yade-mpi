@@ -79,19 +79,30 @@ class BodyInspector(QWidget):
 		self.intrWithCombo=QComboBox(self);
 		self.gotoBodyButton=QPushButton(u'→ #',self)
 		self.gotoIntrButton=QPushButton(u'→ #+#',self)
-		topBoxWidget=QWidget(self)
-		topBox=QHBoxLayout(topBoxWidget)
-		hashLabel=QLabel('#',self); hashLabel.setFixedWidth(10)
+		# id selector
+		topBoxWidget=QWidget(self); topBox=QHBoxLayout(topBoxWidget); topBox.setMargin(0); #topBox.setSpacing(0); 
+		hashLabel=QLabel('#',self); hashLabel.setFixedWidth(8)
 		topBox.addWidget(hashLabel)
 		topBox.addWidget(self.bodyIdBox)
-		self.plusLabel=QLabel('+',self)
-		topBox.addWidget(self.plusLabel)
+		self.plusLabel=QLabel('+',self); topBox.addWidget(self.plusLabel)
+		hashLabel2=QLabel('#',self); hashLabel2.setFixedWidth(8); topBox.addWidget(hashLabel2)
 		topBox.addWidget(self.intrWithCombo)
+		topBox.addStretch()
 		topBox.addWidget(self.gotoBodyButton)
 		topBox.addWidget(self.gotoIntrButton)
 		topBoxWidget.setLayout(topBox)
+		# forces display
+		forcesWidget=QFrame(self); forcesWidget.setFrameShape(QFrame.Box); self.forceGrid=QGridLayout(forcesWidget); 
+		self.forceGrid.setVerticalSpacing(0); self.forceGrid.setHorizontalSpacing(9); self.forceGrid.setMargin(4);
+		for i,j in itertools.product((0,1,2,3),(-1,0,1,2)):
+			lab=QLabel('<small>'+('force','torque','move','rot')[i]+'</small>' if j==-1 else ''); self.forceGrid.addWidget(lab,i,j+1);
+			if j>=0: lab.setAlignment(Qt.AlignRight)
+			if i>1: lab.hide() # do not show forced moves and rotations by default (they will appear if non-zero)
+		self.showMovRot=False
+		#
 		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
 		self.grid.addWidget(topBoxWidget)
+		self.grid.addWidget(forcesWidget)
 		self.scroll=QScrollArea(self)
 		self.scroll.setWidgetResizable(True)
 		self.grid.addWidget(self.scroll)
@@ -106,6 +117,20 @@ class BodyInspector(QWidget):
 		self.intrWithCombo.setMinimumWidth(80)
 		self.setWindowTitle('Body #%d'%self.bodyId)
 		self.gotoBodySlot()
+	def displayForces(self):
+		if self.bodyId<0: return
+		try:
+			val=[O.forces.f(self.bodyId),O.forces.t(self.bodyId),O.forces.move(self.bodyId),O.forces.rot(self.bodyId)]
+			hasMovRot=(val[2]!=Vector3.Zero or val[3]!=Vector3.Zero)
+			if hasMovRot!=self.showMovRot:
+				for i,j in itertools.product((2,3),(-1,0,1,2)):
+					if hasMovRot: self.forceGrid.itemAtPosition(i,j+1).widget().show()
+					else: self.forceGrid.itemAtPosition(i,j+1).widget().hide()
+				self.showMovRot=hasMovRot
+			rows=((0,1,2,3) if hasMovRot else (0,1))
+			for i,j in itertools.product(rows,(0,1,2)):
+				self.forceGrid.itemAtPosition(i,j+1).widget().setText('<small>'+str(val[i][j])+'</small>')
+		except IndexError:pass
 	def tryShowBody(self):
 		try:
 			b=O.bodies[self.bodyId]
@@ -169,6 +194,7 @@ class BodyInspector(QWidget):
 			self.gotoBodyButton.setEnabled(True); self.gotoIntrButton.setEnabled(True)
 		self.gotoBodyButton.setText(u'→ %s'%other)
 		self.gotoIntrButton.setText(u'→ %s + %s'%(meLabel,other))
+		self.displayForces()
 		
 class InteractionInspector(QWidget):
 	def __init__(self,ids=None,parent=None,bodyLinkCallback=None):

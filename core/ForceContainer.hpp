@@ -64,11 +64,13 @@ class ForceContainer{
 
 		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
 
-		/*! Function to allow friend classes to get force even if not synced.
-		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
-		* for a particular body id. */
-		const Vector3r& getForceUnsynced (Body::id_t id){ensureSize(id); return _force[id];}
-		const Vector3r& getTorqueUnsynced(Body::id_t id){ensureSize(id); return _force[id];}
+		#if 0
+			/*! Function to allow friend classes to get force even if not synced.
+			* Dangerous! The caller must know what it is doing! (i.e. don't read after write
+			* for a particular body id. */
+			const Vector3r& getForceUnsynced (Body::id_t id){ensureSize(id); return _force[id];}
+			const Vector3r& getTorqueUnsynced(Body::id_t id){ensureSize(id); return _force[id];}
+		#endif
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
@@ -80,7 +82,6 @@ class ForceContainer{
 			}
 		}
 
-		/* To be benchmarked: sum thread data in getForce/getTorque upon request for each body individually instead of by the sync() function globally */
 		const Vector3r& getForce(Body::id_t id)         { ensureSize(id); ensureSynced(); return _force[id]; }
 		void  addForce(Body::id_t id, const Vector3r& f){ ensureSize(id); synced=false;   _forceData[omp_get_thread_num()][id]+=f;}
 		const Vector3r& getTorque(Body::id_t id)        { ensureSize(id); ensureSynced(); return _torque[id]; }
@@ -89,6 +90,13 @@ class ForceContainer{
 		void  addMove(Body::id_t id, const Vector3r& m) { ensureSize(id); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
 		const Vector3r& getRot(Body::id_t id)           { ensureSize(id); ensureSynced(); return _rot[id]; }
 		void  addRot(Body::id_t id, const Vector3r& r)  { ensureSize(id); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
+		/* To be benchmarked: sum thread data in getForce/getTorque upon request for each body individually instead of by the sync() function globally */
+		// this function is used from python so that running simulation is not slowed down by sync'ing on occasions
+		// since Vector3r writes are not atomic, it might (rarely) return wrong value, if the computation is running meanwhile
+		Vector3r getForceSingle (Body::id_t id){ ensureSize(id); Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=_forceData [t][id]; } return ret; }
+		Vector3r getTorqueSingle(Body::id_t id){ ensureSize(id); Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=_torqueData[t][id]; } return ret; }
+		Vector3r getMoveSingle  (Body::id_t id){ ensureSize(id); Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=_moveData  [t][id]; } return ret; }
+		Vector3r getRotSingle   (Body::id_t id){ ensureSize(id); Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=_rotData   [t][id]; } return ret; }
 
 		/* Sum contributions from all threads, save to _force&_torque.
 		 * Locks globalMutex, since one thread modifies common data (_force&_torque).
@@ -164,8 +172,10 @@ class ForceContainer {
 		std::vector<Vector3r> _rot;
 		size_t size;
 		inline void ensureSize(Body::id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
-		const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
-		const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
+		#if 0
+			const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
+			const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
+		#endif
 		bool moveRotUsed;
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
@@ -179,6 +189,12 @@ class ForceContainer {
 		void  addMove(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
 		const Vector3r& getRot(Body::id_t id){ensureSize(id); return _rot[id];}
 		void  addRot(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
+		// single getters do the same as globally synced ones in the non-parallel flavor
+		const Vector3r& getForceSingle (Body::id_t id){ ensureSize(id); return _force [id]; }
+		const Vector3r& getTorqueSingle(Body::id_t id){ ensureSize(id); return _torque[id]; }
+		const Vector3r& getMoveSingle  (Body::id_t id){ ensureSize(id); return _move  [id]; }
+		const Vector3r& getRotSingle   (Body::id_t id){ ensureSize(id); return _rot   [id]; }
+
 		//! Set all forces to zero
 		void reset(){
 			memset(&_force [0],0,sizeof(Vector3r)*size);

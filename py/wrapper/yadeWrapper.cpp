@@ -219,10 +219,10 @@ class pyForceContainer{
 	public:
 		pyForceContainer(shared_ptr<Scene> _scene): scene(_scene) { }
 		void checkId(long id){ if(id<0 || (size_t)id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* never reached */ throw; } }
-		Vector3r force_get(long id){  checkId(id); scene->forces.sync(); return scene->forces.getForce(id); }
-		Vector3r torque_get(long id){ checkId(id); scene->forces.sync(); return scene->forces.getTorque(id); }
-		Vector3r move_get(long id){   checkId(id); scene->forces.sync(); return scene->forces.getMove(id); }
-		Vector3r rot_get(long id){    checkId(id); scene->forces.sync(); return scene->forces.getRot(id); }
+		Vector3r force_get(long id){  checkId(id); return scene->forces.getForceSingle(id); /* scene->forces.sync(); return scene->forces.getForce(id); */}
+		Vector3r torque_get(long id){ checkId(id); return scene->forces.getTorqueSingle(id); }
+		Vector3r move_get(long id){   checkId(id); return scene->forces.getMoveSingle(id); }
+		Vector3r rot_get(long id){    checkId(id); return scene->forces.getRotSingle(id); }
 		void force_add(long id, const Vector3r& f){  checkId(id); scene->forces.addForce (id,f); }
 		void torque_add(long id, const Vector3r& t){ checkId(id); scene->forces.addTorque(id,t);}
 		void move_add(long id, const Vector3r& t){   checkId(id); scene->forces.addMove(id,t);}
