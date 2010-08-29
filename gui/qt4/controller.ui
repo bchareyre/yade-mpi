@@ -420,9 +420,12 @@
          <item>
           <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="0">
-            <widget class="QPushButton" name="new3dButton">
+            <widget class="QPushButton" name="show3dButton">
              <property name="text">
-              <string>New 3D</string>
+              <string>Show 3D</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -844,22 +847,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>new3dButton</sender>
-   <signal>clicked()</signal>
-   <receiver>Controller</receiver>
-   <slot>new3dSlot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>93</x>
-     <y>429</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>5</x>
-     <y>469</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>referenceButton</sender>
    <signal>clicked()</signal>
    <receiver>Controller</receiver>
@@ -946,8 +933,8 @@
    <slot>generateSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>280</x>
-     <y>490</y>
+     <x>101</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>284</x>
@@ -994,8 +981,8 @@
    <slot>generatorComboSlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>104</x>
-     <y>58</y>
+     <x>101</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>284</x>
@@ -1099,6 +1086,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>show3dButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Controller</receiver>
+   <slot>show3dSlot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>418</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-2</x>
+     <y>422</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadSlot()</slot>
@@ -1107,7 +1110,6 @@
   <slot>playSlot()</slot>
   <slot>pauseSlot()</slot>
   <slot>stepSlot()</slot>
-  <slot>new3dSlot()</slot>
   <slot>setReferenceSlot()</slot>
   <slot>centerSlot()</slot>
   <slot>dtFixedSlot()</slot>
@@ -1124,5 +1126,6 @@
   <slot>pythonEditSlot()</slot>
   <slot>inspectSlot()</slot>
   <slot>subStepSlot()</slot>
+  <slot>show3dSlot(bool)</slot>
  </slots>
 </ui>

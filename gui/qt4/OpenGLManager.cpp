@@ -47,6 +47,7 @@ void OpenGLManager::closeViewSlot(int id){
 		views.resize(views.size()-1); // releases the pointer as well
 	}
 	if(id==0){
+		LOG_DEBUG("Closing primary view.");
 		if(views.size()==1) views.clear();
 		else{ LOG_INFO("Cannot close primary view, secondary views still exist."); }
 	}

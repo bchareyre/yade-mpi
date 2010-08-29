@@ -22,6 +22,7 @@ class OpenGLManager: public QObject{
 		void emitResizeView(int id, int wd, int ht){ emit resizeView(id,wd,ht); }
 		void emitCreateView(){ emit createView(); }
 		void emitStartTimer(){ emit startTimerSignal(); }
+		void emitCloseView(int id){ emit closeView(id); }
 	signals:
 		void createView();
 		void resizeView(int id, int wd, int ht);

@@ -9,10 +9,10 @@ if 'qt4' in env['features']:
 		env.File('qt4/SerializableEditor.py'),
 		env.File('qt4/Inspector.py'),
 		env.File('qt4/__init__.py'),
-		env.SharedLibrary('_GLViewer',['qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['GLViewer'],RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')])
+		env.SharedLibrary('_GLViewer',['qt4/GLViewer.cpp','qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[env['QGLVIEWER_LIB']],RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')])
 	])
 	env.Command('qt4/img_rc.py','qt4/img.qrc','pyrcc4 -o $buildDir/gui/qt4/img_rc.py gui/qt4/img.qrc')
 	env.Command('qt4/ui_controller.py','qt4/controller.ui','pyuic4 -o $buildDir/gui/qt4/ui_controller.py gui/qt4/controller.ui')
-	env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
-		env.SharedLibrary('GLViewer',['qt4/GLViewer.cpp'],LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['OpenGLRenderer']))
-	])
+	#env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
+	#	env.SharedLibrary('GLViewer',['qt4/GLViewer.cpp'],LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['OpenGLRenderer']))
+	#])

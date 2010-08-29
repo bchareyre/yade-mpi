@@ -5,6 +5,7 @@
 #include<yade/lib-pyutil/doc_opts.hpp>
 
 #include<QApplication>
+#include<QCloseEvent>
 
 #ifdef YADE_LOG4CXX
 log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.qt4");
@@ -37,6 +38,7 @@ class pyGLViewer{
 	public:
 		#define GLV if((OpenGLManager::self->views.size()<=viewNo) || !(OpenGLManager::self->views[viewNo])) throw runtime_error("No view #"+lexical_cast<string>(viewNo)); GLViewer* glv=OpenGLManager::self->views[viewNo].get();
 		pyGLViewer(size_t _viewNo=0): viewNo(_viewNo){}
+		void close(){ GLV; QCloseEvent* e(new QCloseEvent); QApplication::postEvent(glv,e); }
 		py::tuple get_grid(){GLV; return py::make_tuple(glv->drawGridXYZ[0],glv->drawGridXYZ[1],glv->drawGridXYZ[2]);}
 		void set_grid(py::tuple t){GLV; for(int i=0;i<3;i++)glv->drawGridXYZ[i]=py::extract<bool>(t[i])();}
 		#define VEC_GET_SET(property,getter,setter) Vector3r get_##property(){GLV; qglviewer::Vec v=getter(); return Vector3r(v[0],v[1],v[2]); } void set_##property(const Vector3r& t){GLV;  setter(qglviewer::Vec(t[0],t[1],t[2]));}
@@ -113,6 +115,7 @@ BOOST_PYTHON_MODULE(_GLViewer){
 		.def("saveState",&pyGLViewer::saveDisplayParameters,(py::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderer`.")
 		.def("loadState",&pyGLViewer::useDisplayParameters,(py::arg("slot")),"Load display parameters from slot saved previously into, identified by its number.")
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
+		.def("close",&pyGLViewer::close)
 		.add_property("selection",&pyGLViewer::get_selection,&pyGLViewer::set_selection)
 		;
 }

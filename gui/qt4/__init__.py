@@ -156,13 +156,19 @@ class ControllerClass(QWidget,Ui_Controller):
 	def pauseSlot(self): O.pause()
 	def stepSlot(self):  O.step()
 	def subStepSlot(self,value): O.subStepping=bool(value)
-	def new3dSlot(self):	View()
+	def show3dSlot(self, show):
+		vv=views()
+		assert(len(vv) in (0,1))
+		if show:
+			if len(vv)==0: View()
+		else:
+			if len(vv)>0: vv[0].close()
 	def setReferenceSlot(self):
 		for b in O.bodies:
 			b.state.refPos=b.state.pos
 			b.state.refOri=b.state.ori
 	def centerSlot(self):
-		centerAllViews()
+		for v in views(): v.center()
 	def setViewAxes(self,dir,up):
 		try:
 			v=views()[0]
@@ -240,6 +246,7 @@ class ControllerClass(QWidget,Ui_Controller):
 			self.iterLabel.setText('#%ld / %ld, %.1f/s %s'%(O.iter,stopAtIter,iterPerSec,subStepInfo))
 		s=int(t); ms=int(t*1000)%1000; us=int(t*1000000)%1000; ns=int(t*1000000000)%1000
 		self.virtTimeLabel.setText(u'%03ds%03dm%03dμ%03dn'%(s,ms,us,ns))
+		self.show3dButton.setChecked(len(views())>0)
 		
 def Generator():
 	global controller
