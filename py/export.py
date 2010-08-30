@@ -153,7 +153,7 @@ def textExt(filename, format='x_y_z_r',consider=lambda id: True, comment=''):
 		out.write('# ' + comment + '\n')
 	for b in O.bodies:
 		try:
-			if ((b.shape.name=="Sphere") and consider(b.id)):
+			if (isinstance(b.shape,Sphere) and consider(b.id)):
 				if (format=='x_y_z_r'):
 					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
 				elif (format=='x_y_z_r_matId'):
