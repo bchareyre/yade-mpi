@@ -58,6 +58,9 @@ public:
 	// norm holds normalized coordinate withing the piece
 	int psdGetPiece(Real x, const vector<Real>& cumm, Real& norm);
 
+	// function to generate the packing based on a given psd
+	long particleSD(Vector3r min, Vector3r max, Real rMean, bool periodic=false, string name="", int numSph=400, const vector<Real>& radii=vector<Real>(), const vector<Real>& passing=vector<Real>());
+
 	// interpolate a variable with power distribution (exponent -3) between two margin values, given uniformly distributed x∈(0,1)
 	Real pow3Interp(Real x,Real a,Real b){ return pow(x*(pow(b,-2)-pow(a,-2))+pow(a,-2),-1./2); }
 
@@ -101,7 +104,7 @@ public:
 			return sPack.pack[pos++].asTuple();
 		}
 	};
-	_iterator getIterator() const{ return _iterator(*this);};
+	SpherePack::_iterator getIterator() const{ return SpherePack::_iterator(*this);};
 	DECLARE_LOGGER;
 };
 

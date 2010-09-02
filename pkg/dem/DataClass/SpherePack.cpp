@@ -20,6 +20,7 @@ CREATE_LOGGER(SpherePack);
 using namespace std;
 using namespace boost;
 
+
 void SpherePack::fromList(const python::list& l){
 	pack.clear();
 	size_t len=python::len(l);
@@ -40,7 +41,7 @@ python::list SpherePack::toList() const {
 
 python::list SpherePack::toList_pointsAsTuples() const {
 	python::list ret;
-	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(python::make_tuple(s.c[0],s.c[1],s.c[2]),s.r));
+	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c[0],s.c[1],s.c[2],s.r));
 	return ret;
 };
 
@@ -205,3 +206,61 @@ python::tuple SpherePack::psd(int bins, bool mass) const {
 	for(int i=0; i<bins; i++) cumm[i+1]=min(1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
 	return python::make_tuple(edges,cumm);
 }
+
+// New code to include the psd giving few points of it
+const float pi = 3.1415926;
+long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing){
+	Real Vtot=numSph*4./3.*pi*pow(rMean,3.); // total volume of the packing (computed with rMean)
+	
+	// calculate number of spheres necessary per each radius to match the wanted psd
+	// passing has to contain increasing values
+	vector<Real> numbers;
+	for (size_t i=0; i<radii.size(); i++){
+		Real volS=4./3.*pi*pow(radii[i],3.);
+		if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
+		else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
+		
+		cout<<"numbers["<<i<<"] = "<<numbers[i]<<endl;
+		cout<<"radii["<<i<<"] = "<<radii[i]<<endl;
+		cout<<"vol tot = "<<Vtot<<endl;
+		cout<<"v_sphere = "<<volS<<endl;
+		cout<<"passing["<<i<<"] = "<<passing[i]<<endl;
+		cout<<"passing["<<i-1<<"] = "<<passing[i-1]<<endl<<endl;
+	}
+
+	static boost::minstd_rand randGen(TimingInfo::getNow(true));
+	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
+
+	const int maxTry=1000;
+	Vector3r size=mx-mn;
+	if(periodic)(cellSize=size);
+	for (int ii=0; ii<radii.size(); ii++){
+		Real r=radii[ii]; // select radius
+		for(int i=0; i<numbers[ii]; i++) { // place as many spheres as required by the psd for the selected radius into the free spot
+			int t;
+			for(t=0; t<maxTry; ++t){
+				Vector3r c;
+				if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
+				else { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
+				size_t packSize=pack.size(); bool overlap=false;
+				if(!periodic){
+					for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
+				} else {
+					for(size_t j=0; j<packSize; j++){
+						Vector3r dr;
+						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
+					}
+				}
+				if(!overlap) { pack.push_back(Sph(c,r)); break; }
+			}
+			if (t==maxTry) {
+				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<numbers[ii]<<" with radius"<<radii[ii]);
+				return i;
+			}
+		}
+	}
+	return pack.size();
+}
+
+
