@@ -19,7 +19,7 @@ O.engines=[
 	###
 	### You want snapshot to be taken every 1 sec (realTimeLim) or every 50 iterations (iterLim),
 	### whichever comes soones. virtTimeLim attribute is unset, hence virtual time period is not taken into account.
-	PeriodicPythonRunner(iterPeriod=1,command='myAddPlotData()')
+	PyRunner(iterPeriod=1,command='myAddPlotData()')
 ]
 
 ## define and append material

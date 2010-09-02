@@ -18,7 +18,7 @@ O.engines=[
 		[Law2_ScGeom_FrictPhys_Basic(),]
 	),
 	GravityEngine(gravity=(0,0,gravity)), ## here we use the 'gravity' parameter
-	PeriodicPythonRunner(iterPeriod=100,command='myAddPlotData()',label='plotDataCollector'),
+	PyRunner(iterPeriod=100,command='myAddPlotData()',label='plotDataCollector'),
 	NewtonIntegrator(damping=0.4)
 ]
 O.bodies.append([

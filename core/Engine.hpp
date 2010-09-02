@@ -42,11 +42,12 @@ class Engine: public Serializable{
 		void timingInfo_nsec_set(TimingInfo::delta d){ timingInfo.nsec=d;}
 		long timingInfo_nExec_get(){return timingInfo.nExec;};
 		void timingInfo_nExec_set(long d){ timingInfo.nExec=d;}
-		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(); }
+		void explicitAction(); 
 
 	DECLARE_LOGGER;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
+		((bool,dead,false,,"If true, this engine will not run at all; can be used for making an engine temporarily deactivated and only resurrect it at a later point."))
 		((string,label,,,"Textual label for this object; must be valid python identifier, you can refer to it directly from python.")),
 		/* ctor */ scene=Omega::instance().getScene().get() ,
 		/* py */

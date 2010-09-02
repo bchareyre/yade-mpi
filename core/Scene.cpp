@@ -67,7 +67,7 @@ void Scene::postLoad(Scene&){
 void Scene::moveToNextTimeStep(){
 	if(needsInitializers){
 		checkStateTypes();
-		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(!e->isActivated()) continue;e->action(); } 
+		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(e->dead || !e->isActivated()) continue; e->action(); } 
 		forces.resize(bodies->size());
 		needsInitializers=false;
 	}
@@ -80,7 +80,7 @@ void Scene::moveToNextTimeStep(){
 		// ** 2. ** engines
 		FOREACH(const shared_ptr<Engine>& e, engines){
 			e->scene=this;
-			if(!e->isActivated()) continue;
+			if(e->dead || !e->isActivated()) continue;
 			e->action();
 			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
@@ -100,7 +100,7 @@ void Scene::moveToNextTimeStep(){
 			// ** 1. ** prologue
 			if(subs==-1){ if(isPeriodic) cell->integrateAndUpdate(dt); }
 			// ** 2. ** engines
-			else if(subs>=0 && subs<(int)engines.size()){ const shared_ptr<Engine>& e(engines[subs]); e->scene=this; if(e->isActivated()) e->action(); }
+			else if(subs>=0 && subs<(int)engines.size()){ const shared_ptr<Engine>& e(engines[subs]); e->scene=this; if(!e->dead && e->isActivated()) e->action(); }
 			// ** 3. ** epilogue
 			else if(subs==(int)engines.size()){ iter++; time+=dt; /* gives -1 along with the increment afterwards */ subStep=-2; }
 			// (?!)

@@ -8,7 +8,7 @@ class VTKWriter:
 	"""
 	USAGE:
 	create object vtk_writer = VTKWriter('base_file_name'),
-	add to engines PeriodicPythonRunner with command='vtk_writer.snapshot()'
+	add to engines PyRunner with command='vtk_writer.snapshot()'
 	"""
 	def __init__(self,baseName='snapshot',startSnap=0):
 		self.snapCount = startSnap

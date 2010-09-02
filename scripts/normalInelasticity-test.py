@@ -29,7 +29,7 @@ O.engines=[
 			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys(betaR=0.24)],
 			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]
 			      ),
-	PeriodicPythonRunner(iterPeriod=1,command='letMove()')
+	PyRunner(iterPeriod=1,command='letMove()')
 	]
 
 
@@ -60,7 +60,7 @@ O.dt=1e-5
 
 yade.qt.View()
 O.run(2,True) #cycles "for free", so that the interaction between spheres will be defined (with his physics and so on)
-O.engines=O.engines+[PeriodicPythonRunner(iterPeriod=1,command='defData()')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='defData()')]
 
 
 
@@ -111,7 +111,7 @@ upperSphere.state.blockedDOFs='x','rx','y','ry','z','rz'
 upperSphere.state.angVel=Vector3(0,0,1)
 upperSphere.state.vel=Vector3(0,0,0)
 i=O.interactions[1,0]
-O.engines=O.engines[:4]+[NewtonIntegrator()]+O.engines[5:]#+[PeriodicPythonRunner(iterPeriod=1,command='printInfo()')]
+O.engines=O.engines[:4]+[NewtonIntegrator()]+O.engines[5:]#+[PyRunner(iterPeriod=1,command='printInfo()')]
 
 
 def printInfo():

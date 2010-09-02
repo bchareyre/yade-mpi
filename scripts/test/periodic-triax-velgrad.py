@@ -25,7 +25,7 @@ O.engines=[
 	),
 	#PeriTriaxController(goal=[-1e3,-1e3,-1e3],stressMask=7,globUpdate=5,maxStrainRate=[5.,5.,5.],label='triax'),
 	NewtonIntegrator(damping=.6, homotheticCellResize=0),
-	PeriodicPythonRunner(command='utils.flipCell()',iterPeriod=1000),
+	PyRunner(command='utils.flipCell()',iterPeriod=1000),
 ]
 O.dt=0.5*utils.PWaveTimeStep()
 O.run(1)

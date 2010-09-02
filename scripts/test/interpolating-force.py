@@ -32,7 +32,7 @@ O.engines=[
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
 	NewtonIntegrator(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)
-	PeriodicPythonRunner(iterPeriod=1,command='myAddPlotData()')
+	PyRunner(iterPeriod=1,command='myAddPlotData()')
 ]
 
 O.bodies.append([

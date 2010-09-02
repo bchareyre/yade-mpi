@@ -5,14 +5,14 @@
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/lib-pyutil/gil.hpp>
 
-class PeriodicPythonRunner: public PeriodicEngine {
+class PyRunner: public PeriodicEngine {
 	public :
 		/* virtual bool isActivated: not overridden, PeriodicEngine handles that */
 		virtual void action(){ if(command.size()>0) pyRunString(command); }
-	YADE_CLASS_BASE_DOC_ATTRS(PeriodicPythonRunner,PeriodicEngine,
+	YADE_CLASS_BASE_DOC_ATTRS(PyRunner,PeriodicEngine,
 		"Execute a python command periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
 		((string,command,"",,"Command to be run by python interpreter. Not run if empty."))
 	);
 };
-REGISTER_SERIALIZABLE(PeriodicPythonRunner);
+REGISTER_SERIALIZABLE(PyRunner);
 

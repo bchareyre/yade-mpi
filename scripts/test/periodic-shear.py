@@ -14,7 +14,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-10)),
 	NewtonIntegrator(),
-	#PeriodicPythonRunner(command='doCellFlip()',realPeriod=5)
+	#PyRunner(command='doCellFlip()',realPeriod=5)
 ]
 
 def doCellFlip():

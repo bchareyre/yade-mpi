@@ -106,8 +106,8 @@ O.engines=[
 	#UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	#
 	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),label='strainer',reversedForces=False,globUpdate=2),
-	PeriodicPythonRunner(virtPeriod=1e-5/strainRateTension,realLim=2,command='addPlotData()',label='plotDataCollector'),
-	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
+	PyRunner(virtPeriod=1e-5/strainRateTension,realLim=2,command='addPlotData()',label='plotDataCollector'),
+	PyRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 

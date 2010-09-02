@@ -78,11 +78,13 @@ class Shop{
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);
 
-		//! Compute the total volume of spheres (FIXME : isDynamic => isSphere is assumed to avoid dynamic_casts, maybe improve that with class indexes)
-		static Real getSpheresVolume();
+		//! Compute the total volume of spheres
+		static Real getSpheresVolume(const shared_ptr<Scene>& rb=shared_ptr<Scene>());
+		//! Compute porosity; volume must be given for aperiodic simulations
+		static Real getPorosity(const shared_ptr<Scene>& rb=shared_ptr<Scene>(),Real volume=-1);
 
 		//! Estimate timestep based on P-wave propagation speed
-		static Real PWaveTimeStep(shared_ptr<Scene> rb=shared_ptr<Scene>());
+		static Real PWaveTimeStep(const shared_ptr<Scene> rb=shared_ptr<Scene>());
 
 		//! return 2d coordinates of a 3d point within plane defined by rotation axis and inclination of spiral, wrapped to the 0th period
 		static boost::tuple<Real, Real, Real> spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0);
@@ -126,4 +128,5 @@ class Shop{
 		};
 		//! Function of getting stresses for each body
 		static void getStressForEachBody(vector<Shop::bodyState>&);
+
 };

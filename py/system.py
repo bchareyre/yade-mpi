@@ -147,6 +147,7 @@ _deprecated={
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:01 2010, jduriez@c1solimara-l
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:16 2010, jduriez@c1solimara-l
 	'OpenGLRenderingEngine':'OpenGLRenderer', # Sat Jul 24 06:04:13 2010, vaclav@flux
+	'PeriodicPythonRunner':'PyRunner', # Wed Sep  1 16:41:50 2010, chia@engs-018373
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
@@ -194,28 +195,20 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 	Classes that are neither root nor derived are exposed via callable object that constructs a Serializable of given type and passes the parameters.
 	"""
 	proxyNamespace={}
-	# classes derived from wrappers (but not from Serializable directly)
-	#for root in _pyRootClasses:
-	#	try:
-	#		rootType=wrapper.__dict__[root]
-	#	except KeyError:
-	#		print 'WARNING: class %s not defined'%root
-	#	for p in childClasses(root):
-	#		if proxyNamespace.has_key(p): continue
-	#		proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
-	#		_proxiedClasses.add(p)
-	#	# inject wrapped class itself into proxyNamespace
-	#	proxyNamespace[root]=rootType
-	# classes that derive just from Serializable: the remaining ones
-	#for p in _allSerializables-_proxiedClasses-_pyRootClasses:
-	#	if proxyNamespace.has_key(p): continue
-	#	proxyNamespace[p]=type(p,(wrapper.Serializable,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 
 	import yade.wrapper
 	for c in _allSerializables:
 		try:
 			proxyNamespace[c]=yade.wrapper.__dict__[c]
 		except KeyError: pass # not registered properly
+
+	# added 2/9/2010, should be removed before christmas 2010!
+	def Serializable_name(obj):
+		nm=obj.__class__.__name__
+		print 'WARN: %s.name is deprecated, use:\nWARN: * %s.__class__.__name__ to get the class name (as string)\nWARN: * isinstance(object,%s) to test whether object is of type %s.\n'%(nm,nm,nm,nm)
+		return nm
+	print 'Adding Serializable.name'
+	yade.wrapper.Serializable.name=property(Serializable_name)
 
 	# deprecated names
 	for oldName in _deprecated.keys():
@@ -228,6 +221,7 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 				return yade.wrapper.__dict__[self.new](*args,**kw)
 		proxyNamespace[oldName]=warnWrap(oldName,_deprecated[oldName])
 	return proxyNamespace
+
 
 def setExitHandlers():
 	"""Set exit handler to avoid gdb run if log4cxx crashes at exit."""

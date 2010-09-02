@@ -369,15 +369,29 @@ void Shop::saveSpheresToFile(string fname){
 	f.close();
 }
 
-Real Shop::getSpheresVolume(){
-	const shared_ptr<Scene>& scene=Omega::instance().getScene();
+Real Shop::getSpheresVolume(const shared_ptr<Scene>& _scene){
+	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
 	Real vol=0;
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
-		if (!b->isDynamic()) continue;
-		shared_ptr<Sphere> intSph=YADE_PTR_CAST<Sphere>(b->shape);
-		vol += 4.18879020*pow(intSph->radius,3);
+		if (!b || !b->isDynamic()) continue;
+		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
+		if(!s) continue;
+		vol += (4/3.)*Mathr::PI*pow(s->radius,3);
 	}
 	return vol;
+}
+
+Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume){
+	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
+	Real V;
+	if(!scene->isPeriodic){
+		if(_volume<=0) throw std::invalid_argument("utils.porosity must be given (positive) *volume* for aperiodic simulations.");
+		V=_volume;
+	} else {
+		V=scene->cell->getVolume();
+	}
+	Real Vs=Shop::getSpheresVolume();
+	return (V-Vs)/V;
 }
 
 
@@ -427,9 +441,8 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vec
 	return spheres;
 }
 
-Real Shop::PWaveTimeStep(shared_ptr<Scene> _rb){
-	shared_ptr<Scene> rb=_rb;
-	if(!rb)rb=Omega::instance().getScene();
+Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
+	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->material || !b->shape) continue;

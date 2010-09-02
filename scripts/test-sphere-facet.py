@@ -27,7 +27,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-10),label='gravitator'),
 	NewtonIntegrator(damping=.3),
-	PeriodicPythonRunner(iterPeriod=4000,command='setGravity()'),
+	PyRunner(iterPeriod=4000,command='setGravity()'),
 	]
 O.bodies.append([
 	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),

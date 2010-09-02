@@ -6,7 +6,7 @@ from yade.qt.ui_controller import Ui_Controller
 
 from yade.qt.Inspector import *
 from yade import *
-import yade.system
+import yade.system, yade.config
 
 from yade.qt._GLViewer import *
 
@@ -18,16 +18,18 @@ sphinxOnlineDocPath='https://www.yade-dem.org/sphinx/'
 "Base URL for the documentation. Packaged versions should change to the local installation directory."
 
 
-# find if we have docs installed locally from package
-import yade.config
 import os.path
+# find if we have docs installed locally from package
 sphinxLocalDocPath=yade.config.prefix+'/share/doc/yade'+yade.config.suffix+'/html/'
-# sorry
-_eudoxosLocalPathHack=sphinxLocalDocPath='/home/vaclav/yt/doc/sphinx/_build/html/'
-if os.path.exists(_eudoxosLocalPathHack): sphinxLocalDocPath=_eudoxosLocalPathHack
-# end sorry
-sphinxWrapperPart='yade.wrapper.html'
-sphinxDocWrapperPage=(('file://'+sphinxLocalDocPath) if os.path.exists(sphinxLocalDocPath+'/'+sphinxWrapperPart) else sphinxOnlineDocPath)+'/'+sphinxWrapperPart
+sphinxBuildDocPath=yade.config.sourceRoot+'/doc/sphinx/_build/html/'
+# we prefer the packaged documentation for this version, if installed
+if   os.path.exists(sphinxLocalDocPath+'/index.html'): sphinxPrefix='file://'+sphinxLocalDocPath
+# otherwise look for documentation generated in the source tree
+elif  os.path.exists(sphinxBuildDocPath+'/index.html'): sphinxPrefix='file://'+sphinxBuildDocPath
+# fallback to online docs
+else: sphinxPrefix=sphinxOnlineDocPath
+
+sphinxDocWrapperPage=sphinxPrefix+'/yade.wrapper.html'
 
 
 

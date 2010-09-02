@@ -13,7 +13,7 @@ O.engines=[
 	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
 	ElasticContactLaw(useShear=False,label='elasticLaw'),
-	PeriodicPythonRunner(iterPeriod=10000,command='interInfo()'),
+	PyRunner(iterPeriod=10000,command='interInfo()'),
 ]
 
 O.dt=1e-8

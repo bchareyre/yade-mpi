@@ -101,8 +101,8 @@ O.engines=[
 	NewtonIntegrator(damping=damping,label='damper'),
 	CpmStateUpdater(realPeriod=1),
 	UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
-	PeriodicPythonRunner(virtPeriod=1e-6/strainRateTension,realPeriod=1,command='addPlotData()',label='plotDataCollector',initRun=True),
-	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
+	PyRunner(virtPeriod=1e-6/strainRateTension,realPeriod=1,command='addPlotData()',label='plotDataCollector',initRun=True),
+	PyRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 

@@ -18,7 +18,7 @@ void ParallelEngine::action(){
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {
 			//cerr<<"["<<omp_get_thread_num()<<":"<<e->getClassName()<<"]";
 			e->scene=scene;
-			if(e->isActivated()) { e->action(); }
+			if(e->dead || !e->isActivated()) e->action();
 		}
 	}
 }

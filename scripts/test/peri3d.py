@@ -19,7 +19,7 @@ O.engines=[
 	#Peri3dController(goal=Matrix3(-.1,0,0, 0,-.1,0, 0,0,-.1),stressMask=0,maxStrainRate=1e-1,label='p3d'),
 	#Peri3dController(goal=Matrix3(0,.2,0, 0,0,0, 0,0,0),stressMask=0,maxStrainRate=1,label='p3d'),
 	Peri3dController(goal=Matrix3(.2,0,0, 0,0,0, 0,0,0),stressMask=0b000110,maxStrainRate=.1,label='p3d'),
-	PeriodicPythonRunner(iterPeriod=10,command='addData()')
+	PyRunner(iterPeriod=10,command='addData()')
 ]
 O.step()
 bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1

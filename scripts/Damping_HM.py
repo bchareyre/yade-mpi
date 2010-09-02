@@ -39,7 +39,7 @@ O.engines=[
 	),
 	ForceEngine(force=(-20,0,0),subscribedBodies=[1],label='force'),	
 	NewtonIntegrator(damping=0.0),
-	PeriodicPythonRunner(iterPeriod=1,command='myAddPlotData()'),
+	PyRunner(iterPeriod=1,command='myAddPlotData()'),
 ]
 
 #__________________________________________________________________

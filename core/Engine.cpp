@@ -7,3 +7,7 @@ void Engine::action(){
 	throw std::logic_error("Engine::action() called.");
 }
 
+void Engine::explicitAction(){
+	scene=Omega::instance().getScene().get(); action();
+}
+

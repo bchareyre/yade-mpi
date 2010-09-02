@@ -72,6 +72,7 @@ if 'Variables' not in dir():
 
 env=Environment(tools=['default','scanreplace'],toolpath=['scripts'])
 profileFile='scons.current-profile'
+env['sourceRoot']=os.getcwd()
 
 profOpts=Variables(profileFile)
 profOpts.Add(('profile','Config profile to use (predefined: default or "", dbg); append ! to use it but not save for next build (in scons.current-profile)','default'))

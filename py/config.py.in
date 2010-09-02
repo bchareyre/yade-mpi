@@ -11,6 +11,7 @@ libstdcxx='${libstdcxx}'
 features='${features}'.split(',')
 revision='${realVersion}'
 version='${version}'
+sourceRoot='${sourceRoot}'
 debug=bool(${debug})
 
 libDir=prefix+'/lib/yade'+suffix

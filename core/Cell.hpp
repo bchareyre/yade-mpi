@@ -89,6 +89,8 @@ class Cell: public Serializable{
 	void setRefSize(const Vector3r& s){ refSize=s; integrateAndUpdate(0); }
 	Matrix3r getTrsf(){ return trsf; }
 	void setTrsf(const Matrix3r& m){ trsf=m; integrateAndUpdate(0); }
+	// return current cell volume
+	Real getVolume(){ return Hsize.determinant(); }
 
 	void postLoad(Cell&){ integrateAndUpdate(0); }
 
@@ -107,6 +109,7 @@ class Cell: public Serializable{
 		/* accessors that ensure cache coherence */
 		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell.")
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Transformation matrix of the cell.")
+		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// debugging only
 		.def("wrap",&Cell::wrapShearedPt_py,"Transform an arbitrary point into a point in the reference cell")
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")

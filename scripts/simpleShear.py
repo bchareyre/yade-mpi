@@ -68,7 +68,7 @@ O.engines=[
 		[Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]
 	),
 	NewtonIntegrator(damping=.2)
-	,PeriodicPythonRunner(iterPeriod=50,command='defData()')
+	,PyRunner(iterPeriod=50,command='defData()')
 	]
 
 def defData():

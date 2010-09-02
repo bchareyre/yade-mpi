@@ -104,6 +104,9 @@ void NewtonIntegrator::action()
 			if (b->isStandalone()){
 				// translate equation
 				const Vector3r& f=scene->forces.getForce(id); 
+				#ifdef YADE_DEBUG
+					if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
+				#endif
 				state->accel=f/state->mass; 
 				if (!scene->isPeriodic || homotheticCellResize==0)
 					cundallDamp(dt,f,state->vel,state->accel);
@@ -111,9 +114,14 @@ void NewtonIntegrator::action()
 					Vector3r velFluctuation(state->vel-prevVelGrad*state->pos);
 					cundallDamp(dt,f,velFluctuation,state->accel);}
 				leapfrogTranslate(scene,state,id,dt);
-				// rotate equation: exactAsphericalRot is disabled or the body is spherical
+
+				// rotate equation
+				const Vector3r& m=scene->forces.getTorque(id); 
+				#ifdef YADE_DEBUG
+					if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
+				#endif
+				// exactAsphericalRot is disabled or the body is spherical
 				if (!exactAsphericalRot || (state->inertia[0]==state->inertia[1] && state->inertia[1]==state->inertia[2])){
-					const Vector3r& m=scene->forces.getTorque(id); 
 					state->angAccel=m.cwise()/state->inertia;
 					cundallDamp(dt,m,state->angVel,state->angAccel);
 					leapfrogSphericalRotate(scene,state,id,dt);

@@ -47,9 +47,9 @@ class PeriodicEngine:  public GlobalEngine {
 		overrides also Engine::isActivated, it should also take in account return value from PeriodicEngine::isActivated, \
 		since otherwise the periodicity will not be functional. \n\n\
 		\
-		Example with PeriodicPythonRunner, which derives from PeriodicEngine; likely to be encountered in python scripts):: \n\n\
+		Example with PyRunner, which derives from PeriodicEngine; likely to be encountered in python scripts):: \n\n\
 		\
-			PeriodicPythonRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\n\n\
+			PyRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\n\n\
 		\
 		will print iteration number every 10000 iterations or every 5 seconds of wall clock time, whiever comes first since it was \
 		last run.",

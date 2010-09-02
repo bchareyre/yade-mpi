@@ -27,8 +27,8 @@ O.engines=[
 	GravityEngine(gravity=[0,-9.81,0]),
 	## Motion equation
 	NewtonIntegrator(damping=0.15),
-	PeriodicPythonRunner(iterPeriod=500,command='history()'),
-	PeriodicPythonRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
+	PyRunner(iterPeriod=500,command='history()'),
+	PyRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
 ]
 
 #Generate a spiral
