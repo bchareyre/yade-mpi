@@ -234,7 +234,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 	const int maxTry=1000;
 	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
-	for (int ii=0; ii<radii.size(); ii++){
+	for (unsigned int ii=0; ii<radii.size(); ii++){
 		Real r=radii[ii]; // select radius
 		for(int i=0; i<numbers[ii]; i++) { // place as many spheres as required by the psd for the selected radius into the free spot
 			int t;
