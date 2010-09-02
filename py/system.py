@@ -207,7 +207,6 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 		nm=obj.__class__.__name__
 		print 'WARN: %s.name is deprecated, use:\nWARN: * %s.__class__.__name__ to get the class name (as string)\nWARN: * isinstance(object,%s) to test whether object is of type %s.\n'%(nm,nm,nm,nm)
 		return nm
-	print 'Adding Serializable.name'
 	yade.wrapper.Serializable.name=property(Serializable_name)
 
 	# deprecated names
