@@ -55,7 +55,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	int fict;
  	Real VolumeVariation;
 	double pression; //stockage d'une valeur de pression pour chaque cellule
-	std::vector<double> Average_Cell_Velocity; //average velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
+	Vecteur Average_Cell_Velocity; //average velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
 	
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
@@ -73,7 +73,6 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	Cell_Info (void)
 	{
 		module_permeability.resize(4, 0);
-		Average_Cell_Velocity.resize(4);
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
 		facetSphereCrossSections.resize(4);
@@ -114,11 +113,10 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	
 	inline std::vector<double>& k_norm (void) {return module_permeability;}
 	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
-	
 	inline std::vector<Vecteur>& force (void) {return cell_force;}
 	inline std::vector<double>& Rh (void) {return RayHydr;}
 	
-	inline std::vector<double>& av_vel (void) {return Average_Cell_Velocity;}
+	inline Vecteur& av_vel (void) {return Average_Cell_Velocity;}
 // 	inline vector<Vecteur>& F (void) {return vec_forces;}
 // 	inline vector<double>& Q (void) {return flow_rate;}
 // 	inline vector<Real>& d (void) {return distance;}
@@ -133,8 +131,10 @@ class Vertex_Info : /*public Point,*/ public Vecteur {
 	Real s;// stockage d'une valeur scalaire (ex. d�viateur) pour affichage
 	unsigned int i;
 	Real vol;
-	
-
+#ifdef FLOW_ENGINE
+	Vecteur Grain_Velocity;
+	Real volume_incident_cells;
+#endif
 public:
 	bool isFictious;
 
@@ -155,6 +155,8 @@ public:
 #ifdef FLOW_ENGINE
 	Vecteur forces;
 	inline Vecteur& force (void) {return forces;}
+	inline Vecteur& vel (void) {return Grain_Velocity;}
+	inline Real& vol_cells (void) {return volume_incident_cells;}
 #endif
 	//operator Point& (void) {return (Point&) *this;}
 };

@@ -142,7 +142,8 @@ class FlowBoundingSphere
 		
 		bool isInsideSphere ( RTriangulation& Tri, double x, double y, double z );
 		
-		void SliceField ( RTriangulation& Tri );
+		void SliceField ();
+		void ComsolField();
 
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
 		
@@ -152,8 +153,11 @@ class FlowBoundingSphere
 		double volume_double_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
 		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
 		double volume_double_fictious_pore (Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point& PV1, Point& PV2, Vecteur& facetSurface);
-		
+
+		double PoreVolume (RTriangulation& Tri, Cell_handle cell);
 		int Average_Cell_Velocity(int id_sphere, RTriangulation& Tri);
+		void Average_Cell_Velocity();
+		void Average_Grain_Velocity();
 		void vtk_average_cell_velocity(RTriangulation &T, int id_sphere, int num_cells);
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Pressure, double load_intervals);
 

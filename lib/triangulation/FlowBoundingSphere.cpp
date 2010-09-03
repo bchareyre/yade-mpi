@@ -54,11 +54,12 @@ const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
 const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
 
 vector<double> Pressures;
-int vtk_infinite_vertices, vtk_infinite_cells;
 /*static*/
 Point Corner_min;
 /*static*/
 Point Corner_max;
+
+int vtk_infinite_vertices=0, vtk_infinite_cells=0;
 
 // Tesselation Tes;
 
@@ -164,10 +165,13 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
         //GenerateVoxelFile(Tri); ///*GENERATION OF A VOXEL FILE *///
 
         /** INITIALIZATION OF VOLUMES AND PRESSURES **/
+	Real totV=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		cell->info().volume() = PoreVolume(Tri,cell); totV+=cell->info().volume();
                 cell->info().dv() = 0;
         }
+        cerr << "TOTAL VOID VOLUME: "<<totV<<endl;
 
         clock.top("initializing delta_volumes");
 
@@ -213,50 +217,80 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
 // }
 }
 
-int FlowBoundingSphere::Average_Cell_Velocity(int id_sphere, RTriangulation& Tri)
+void FlowBoundingSphere::Average_Cell_Velocity()
 {
-	Vecteur nullVect(0,0,0);
-	double pos_av_facet [3];
-	int num_cells = 0;
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        Point pos_av_facet;
+        int num_cells = 0;
+        double facet_flow_rate;
+        std::ofstream oFile ( "Average_Cells_Velocity",std::ios::app );
+	Real tVel=0; Real tVol=0;
+        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+        for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+		cell->info().av_vel() =CGAL::NULL_VECTOR;
+                num_cells++;
+                for ( int i=0; i<4; i++ ) {
+                        Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+                        Real area = sqrt ( Surfk.squared_length() );
+			Surfk = Surfk/area;
+//                         Vecteur facetNormal = Surfk/area;
+                        Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+// 			 pos_av_facet=CGAL::ORIGIN + ((cell->vertex(facetVertices[i][0])->point() - CGAL::ORIGIN) +
+// 	    			(cell->vertex(facetVertices[i][1])->point() - CGAL::ORIGIN) +
+// 	    			(cell->vertex(facetVertices[i][2])->point() - CGAL::ORIGIN))*0.3333333333;
+                        pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+                        facet_flow_rate = (cell->info().k_norm())[i] * (cell->neighbor (i)->info().p() - cell->info().p());
+                        cell->info().av_vel() = cell->info().av_vel() + facet_flow_rate* ( pos_av_facet-CGAL::ORIGIN );
+ 		}
+ 		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
+                cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
+// 		cerr << cell->info().av_vel()<<" "<<facet_flow_rate<<" "<<cell->info().volume()<<endl;
+//                 oFile << cell->info().av_vel() << "Cell Pressure = " << cell->info().p() << endl;
+        }
+//         cerr <<"TOT Vol/Vel: "<<tVol<<" "<<tVel<<endl;
+}
+
+void FlowBoundingSphere::Average_Grain_Velocity()
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
 	
-	double facet_flow_rate;
-	std::ofstream oFile( "Average_Cells_Velocity",std::ios::app);
+	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
+        for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
+	  V_it->info().vel() = CGAL::NULL_VECTOR;
+	  V_it->info().vol_cells() = 0;}
 	
+        Point pos_av_facet;
+        double facet_flow_rate;
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-	  for (int h=0; h<3;h++) (cell->info().av_vel())[h]=0;}
-	
-	Tesselation::Vector_Cell tmp_cells;
-	tmp_cells.resize(1000);
-	Tesselation::VCell_iterator cells_it = tmp_cells.begin();
-	Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id_sphere],cells_it);
-	for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+        for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) 
 	{
-	  num_cells++;
-	  for (int i=0; i<4; i++)
+	  int pass=0;
+	  for ( int i=0; i<4; i++ ) 
 	  {
-// 	    oFile << endl << "FACET " << i << " -------------" << endl;
-	    for (int i2=0;i2<3;i2++) pos_av_facet[i2] = nullVect[i2];
-	    for (int j=0;j<3;j++)
-	    {
-	      pos_av_facet[j] += ((*it)->vertex(facetVertices[i][j])->point().x())/3 + ((*it)->vertex(facetVertices[i][j])->point().y())/3 +
-	      ((*it)->vertex(facetVertices[i][j])->point().z())/3;
+	    if(!Tri.is_infinite(cell->neighbor(i))){
+	    pass+=1;
+	    Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+            Real area = sqrt ( Surfk.squared_length() );
+	    Surfk = Surfk/area;
+	    Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+	    pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+	    facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p() );
+	   
+	    for (int g=0;g<4;g++)
+	    {cell->vertex ( g )->info().vel() = cell->vertex ( g )->info().vel() + facet_flow_rate*( pos_av_facet-CGAL::ORIGIN );}
 	    }
-// 	    oFile << "Average position = " ; for (int g=0; g<3; g++) oFile << pos_av_facet[g] << " "; oFile << endl;
-	    facet_flow_rate = ((*it)->info().k_norm())[i] * abs((*it)->info().p() - (*it)->neighbor(Tri.mirror_index((*it), i))->info().p());
-// 	    oFile << "Facet Flow Rate = " << facet_flow_rate << " (p1 = " << (*it)->info().p() << " ,p2 = " << (*it)->neighbor(Tri.mirror_index((*it), i))->info().p() << ", k = " << ((*it)->info().k_norm())[i] <<  ")." << endl;
-	    for (int y=0;y<3;y++) pos_av_facet[y] = pos_av_facet[y]*facet_flow_rate;
-	    for (int y2=0;y2<3;y2++)((*it)->info().av_vel())[y2] = ((*it)->info().av_vel())[y2] + pos_av_facet[y2];
+	    else cout << "CI SONO INFINITE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+	   }
+	    for (int g=0;g<pass;g++) 
+	    {cell->vertex ( g )->info().vol_cells() = cell->vertex ( g )->info().vol_cells() + cell->info().volume();}
 	  }
-	  for (int y2=0;y2<4;y2++) ((*it)->info().av_vel())[y2] = ((*it)->info().av_vel())[y2]/((*it)->info().volume());
-// 	  oFile << "Volume = " << (*it)->info().volume() << endl;
-	  oFile << ((*it)->info().av_vel())[0] << " " << ((*it)->info().av_vel())[1] << " " << ((*it)->info().av_vel())[2] << "    Cell Pressure = " << (*it)->info().p() << endl;
-	}
 	
-	oFile << endl << "Forces on grain = " << (T[currentTes].vertexHandles[id_sphere]->info().forces)[0] << " " << (T[currentTes].vertexHandles[id_sphere]->info().forces)[1] << " " << (T[currentTes].vertexHandles[id_sphere]->info().forces)[2] << " " << endl << endl;
-	oFile << "-----------------------------------------" << endl << endl << endl;
-	
-	return num_cells;
+// 	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
+        for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
+	  V_it->info().vel() = V_it->info().vel() / V_it->info().vol_cells();}
+	  
+// 	for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
+// 	  V_it->info().vel() = V_it->info().vel() / sqrt ( V_it->info().vel().squared_length() );}
 }
 
 void FlowBoundingSphere::vtk_average_cell_velocity(RTriangulation &Tri, int id_sphere, int num_cells )
@@ -520,7 +554,7 @@ void FlowBoundingSphere::DisplayStatistics()
 
 void FlowBoundingSphere::DisplayStatistics(RTriangulation& Tri)
 {
-        int Zero =0, Inside=0, Superior=0, Inferior=0, Lateral=0, Fictious=0;
+        int Zero =0, Inside=0, Fictious=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 int zeros =0;
@@ -615,6 +649,7 @@ void FlowBoundingSphere::ComputeFacetForces()
          Vecteur TotalForce = nullVect;
          for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                  if (!v->info().isFictious) {
+			 if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
                          TotalForce = TotalForce + v->info().forces;
 //                          if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
                  } else {
@@ -637,6 +672,7 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
+	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
 	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		//reset cache
 		for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
@@ -665,6 +701,7 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 				cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidSurfaces[j][y];
 				//add to cached value
 				cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+Facet_Unit_Force*cell->info().solidSurfaces[j][y];
+				//uncomment to get total force / comment to get only viscous forces (Bruno)
 				if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
 					cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
 					//add to cached value
@@ -866,7 +903,7 @@ void FlowBoundingSphere::Compute_Forces()
 
                                         Vecteur v_int = cell->vertex(j)->point() - facet_spheres[0];
                                         //a vector oriented toward the interior of the cell
-                                        info = dotProduct(v_int, n);      //check "n" versus this vector v_ext
+					info=v_int*n;
 
                                         if (info < 0) {
                                                 n = -n;
@@ -1382,6 +1419,31 @@ double FlowBoundingSphere::volume_single_fictious_pore(Vertex_handle SV1, Vertex
         return (Vpore);
 }
 
+double FlowBoundingSphere::PoreVolume (RTriangulation& Tri, Cell_handle cell)
+{
+	Real v;
+	switch (cell->info().fictious()) {
+                        case(0) :
+				v=std::abs(Tri.tetrahedron(cell).volume());
+				for (int k=0;k<4;k++) v-= spherical_triangle_volume(cell->vertex(permut4[k][0])->point(),
+					cell->vertex(permut4[k][1])->point(),
+					cell->vertex(permut4[k][2])->point(),
+					cell->vertex(permut4[k][3])->point());
+				return v;
+                        case(1) : 
+                                return 0;
+                        case(2) : 
+                                return 0;
+			case(3) : 
+                                return 0;
+	}
+
+// 				for (int i=0;i<3;i++) {
+//                         Vsolid1 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
+//                         Vsolid2 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);
+//                 }
+}
+
 double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_handle cell, int j)
 {
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
@@ -1462,13 +1524,13 @@ double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_han
                 //area vector of triangle (p1,sphere,p2)
                 Vecteur p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,cell->vertex(Re1)->point()-p2);
                 if (bi1.flowCondition && !SLIP_ON_LATERALS) {
-                        //projection on bondary 1
+                        //projection on boundary 1
                         Ssolid2 = abs(p1p2v1Surface[bi1.coordinate]);
                         cell->info().solidSurfaces[j][facetF1]=Ssolid2;
                 } else cell->info().solidSurfaces[j][facetF1]=0;
 
                 if (bi2.flowCondition && !SLIP_ON_LATERALS) {
-                        //projection on bondary 2
+                        //projection on boundary 2
                         Ssolid3 = abs(p1p2v1Surface[bi2.coordinate]);
                         cell->info().solidSurfaces[j][facetF2]=Ssolid3;
                 } else cell->info().solidSurfaces[j][facetF2]=0;
@@ -1554,18 +1616,6 @@ if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0)
 //  cout << "Vpore " << Vpore << ", Ssolid "<<Ssolid<<endl;
 return Vpore/Ssolid;
 }
-
-double FlowBoundingSphere::dotProduct(Vecteur x, Vecteur y)
-{
-        int i;
-        double sum=0;
-
-        for (i=0; i<3; i++) {
-                sum += x[i]*y[i];
-        }
-        return sum;
-}
-
 
 Vecteur FlowBoundingSphere::surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3)
 {
@@ -1789,8 +1839,8 @@ void FlowBoundingSphere::GaussSeidel ()
                 dp_moy = sum_dp/cell2;
                 j++;
                 if (j % 1000 == 0) {
-                        cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
-                        cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
+                        // cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
+                        // cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
                         //     save_vtk_file ( Tri );
                 }
         } while (((dp_max/p_max) > tolerance) /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
@@ -1945,21 +1995,31 @@ void FlowBoundingSphere::save_vtk_file(RTriangulation &T)
 	
         vtkfile.begin_cells();
         for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
-		if (cell->info().fictious()==0){vtkfile.write_cell(cell->vertex(0)->info().id()-id_offset, cell->vertex(1)->info().id()-id_offset, cell->vertex(2)->info().id()-id_offset, cell->vertex(3)->info().id()-id_offset);}
+		if (!cell->info().fictious()){vtkfile.write_cell(cell->vertex(0)->info().id()-6, cell->vertex(1)->info().id()-6, cell->vertex(2)->info().id()-6, cell->vertex(3)->info().id()-6);}
         }
         vtkfile.end_cells();
 	
-	vtkfile.begin_data("Force",POINT_DATA,VECTORS,FLOAT);
-	for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v)
-	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[0],(v->info().forces)[1],(v->info().forces)[2]);}
-	vtkfile.end_data();
+// 	vtkfile.begin_data("Force",POINT_DATA,VECTORS,FLOAT);
+// 	for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v)
+// 	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[0],(v->info().forces)[1],(v->info().forces)[2]);}
+// 	vtkfile.end_data();
 
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
-
 	for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
-		if (cell->info().fictious()==0){vtkfile.write_data(cell->info().p());}
+		if (!cell->info().fictious()){vtkfile.write_data(cell->info().p());}
 	}
 	vtkfile.end_data();
+	
+	vtkfile.begin_data("Velocity",POINT_DATA,VECTORS,FLOAT);
+	for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v)
+	{if (!v->info().isFictious) vtkfile.write_data((v->info().vel())[0],(v->info().vel())[1],(v->info().vel())[2]);}
+	vtkfile.end_data();
+	
+// 	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
+// 	for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
+// 		if (!cell->info().fictious()){vtkfile.write_data((cell->info().av_vel())[0],(cell->info().av_vel())[1],(cell->info().av_vel())[2]);}
+// 	}
+// 	vtkfile.end_data();
 }
 
 void FlowBoundingSphere::MGPost(RTriangulation& Tri)
@@ -2260,21 +2320,22 @@ bool FlowBoundingSphere::isInsideSphere(RTriangulation& Tri, double x, double y,
         return false;
 }
 
-void FlowBoundingSphere::SliceField(RTriangulation& Tri)
+void FlowBoundingSphere::SliceField()
 {
         /** Pressure field along one cutting plane **/
-
+	RTriangulation& Tri = T[currentTes].Triangulation();
         Cell_handle permeameter;
 
         std::ofstream consFile("slices",std::ios::out);
 
-        int intervals = 200;
-        double Rx = 10* (x_max-x_min) /intervals;
+        int intervals = 400;
+        double Rx = 20* (x_max-x_min) /intervals;
         double Ry = (y_max-y_min) /intervals;
         double Rz = (z_max-z_min) /intervals;
         cout<<Rx<<" "<<Ry<<" "<<Rz<<" "<<z_max<<" "<<z_min<<" "<<y_max<<" "<<y_min<<" "<<x_max<<" "<<x_min<<endl;
 
-        for (double X=min(x_min,x_max); X<=max(x_min,x_max); X=X+abs(Rx)) {
+//         for (double X=min(x_min,x_max); X<=max(x_min,x_max); X=X+abs(Rx)) {
+	double X=0.5;  
                 for (double Y=min(y_max,y_min); Y<=max(y_max,y_min); Y=Y+abs(Ry)) {
                         for (double Z=min(z_min,z_max); Z<=max(z_min,z_max); Z=Z+abs(Rz)) {
                                 if (!isInsideSphere(Tri,X,Y,Z)) {
@@ -2286,9 +2347,68 @@ void FlowBoundingSphere::SliceField(RTriangulation& Tri)
                         consFile << endl;
                 }
                 consFile << endl;
-        }
+//         }
         consFile.close();
 }
+
+
+void FlowBoundingSphere::ComsolField()
+{
+	//Compute av. velocity first, because in the following permeabilities will be overwritten with "junk" (in fact velocities from comsol)
+	Average_Cell_Velocity();
+	
+  	RTriangulation& Tri = T[currentTes].Triangulation();
+        Cell_handle c;
+  	ifstream loadFile("vx_grid_03_07_ns.txt"); 
+	ifstream loadFileY("vy_grid_03_07_ns.txt"); 
+	ifstream loadFileZ("vz_grid_03_07_ns.txt");
+	int Nx=100; int Ny=10; int Nz=100;
+	std::ofstream consFile("velComp",std::ios::out);
+	
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
+		cell->info().dv()=0;
+		cell->info().module_permeability[0]=cell->info().module_permeability[1]=cell->info().module_permeability[2]=0;
+	}	
+	
+	vector<Real> X, Y, Z;
+	Real buffer;
+	for (int xi=0;xi<Nx;xi++) {loadFile >> buffer; X.push_back(buffer); loadFileY >> buffer; loadFileZ >> buffer;}
+	for (int yi=0;yi<Ny;yi++) {loadFile >> buffer; Y.push_back(buffer); loadFileY >> buffer; loadFileZ >> buffer;}
+	for (int zi=0;zi<Nz;zi++) {loadFile >> buffer; Z.push_back(buffer); loadFileY >> buffer; loadFileZ >> buffer;}
+	
+	Real vx, vy, vz;
+	Real meanCmsVel=0; int totCmsPoints = 0;
+	for (int zi=0;zi<Nz;zi++)
+	  	for (int yi=0;yi<Ny;yi++)
+		  	for (int xi=0;xi<Nx;xi++) {
+			  	loadFile >> vx; loadFileY >> vy; loadFileZ >> vz; 
+				if (!isInsideSphere(Tri,X[xi], Y[yi], Z[zi]) && vx!=0) {
+                                        c = Tri.locate(Point(X[xi], Y[yi], Z[zi]));
+                                        c->info().module_permeability[0]+=vx;
+					c->info().module_permeability[1]+=vy;
+					c->info().module_permeability[2]+=vz;
+					c->info().dv()+=1;
+					meanCmsVel+=vy; totCmsPoints++;} 
+	}
+	int kk=0;
+	Vecteur diff;
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end && kk<10000; cell++){
+		if (cell->info().fictious() || cell->info().dv()<60) continue;
+		for (int k=0;k<3;k++) cell->info().module_permeability[k]/=cell->info().dv();
+		cerr << cell->info().module_permeability[0]<<" "<< cell->info().module_permeability[1]<<" "<< cell->info().module_permeability[2]<<" "<<cell->info().dv()<<" "<< cell->info().av_vel()<<endl; 
+		Real m=sqrt(pow(cell->info().module_permeability[0],2)+pow(cell->info().module_permeability[1],2)+pow(cell->info().module_permeability[2],2));
+		Vecteur comFlow (cell->info().module_permeability[0],cell->info().module_permeability[1],cell->info().module_permeability[2]);
+		Real angle=asin(sqrt(cross_product(comFlow,cell->info().av_vel()).squared_length())/(sqrt(comFlow.squared_length())*sqrt(cell->info().av_vel().squared_length())));
+		cerr<<"norms : "<<m<<" vs. "<<sqrt(cell->info().av_vel().squared_length())<<" angle "<<180*angle/3.1415<<endl;
+		consFile<<m<<" "<<sqrt(cell->info().av_vel().squared_length())<<" "<<180*angle/3.1415<<endl;
+		diff = diff + (comFlow - cell->info().av_vel());
+		kk++;
+	}
+	cerr << "meanCmsVel "<<meanCmsVel/totCmsPoints<<" mean diff "<<diff/kk<<endl;
+}
+
+
 
 } //namespace CGT
 

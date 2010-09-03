@@ -48,7 +48,7 @@ void FlowEngine::action ( )
 		if ( current_state==3 )
 		{
 			if ( first ) { Build_Triangulation( P_zero );}
-
+      
 				timingDeltas->checkpoint("Triangulating");
 				
 				UpdateVolumes ( );
@@ -67,8 +67,6 @@ void FlowEngine::action ( )
 				const char* key_visu_consol = visu_consol.c_str();
 				sprintf (plotfile, key_visu_consol, j);	char *gg = plotfile;
 				flow->mplot(flow->T[flow->currentTes].Triangulation(), gg);}
-				
-				if (save_vtk) flow->save_vtk_file(flow->T[flow->currentTes].Triangulation());
 			
  				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
@@ -118,6 +116,9 @@ void FlowEngine::action ( )
 				Update_Triangulation = false;
 				
 				timingDeltas->checkpoint("Storing Max Pressure");
+				
+				flow->Average_Grain_Velocity();
+				if (save_vtk) flow->save_vtk_file(flow->T[flow->currentTes].Triangulation());
 				
 // 				int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
 				
@@ -201,7 +202,8 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
 		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
- 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 5);
+
+ 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15);
 	}
 	Initialize_volumes ( );
 }
@@ -209,7 +211,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 void FlowEngine::AddBoundary ()
 {
   
-  shared_ptr<Sphere> sph ( new Sphere );
+	shared_ptr<Sphere> sph ( new Sphere );
 
 	int Sph_Index = sph->getClassIndexStatic();
 	int contator = 0;
