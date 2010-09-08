@@ -1143,8 +1143,8 @@ void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real
     b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
     b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
 
-    if (Mathr::FAbs(b->cn) <= Mathr::ZERO_TOLERANCE ) b->cn=0;
-    if (Mathr::FAbs(b->cs) <= Mathr::ZERO_TOLERANCE ) b->cs=0;
+    if (abs(b->cn) <= Mathr::ZERO_TOLERANCE ) b->cn=0;
+    if (abs(b->cs) <= Mathr::ZERO_TOLERANCE ) b->cs=0;
 }
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale
