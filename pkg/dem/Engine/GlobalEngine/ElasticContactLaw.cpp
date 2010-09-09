@@ -49,57 +49,53 @@ CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
 void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
-	ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
-	FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());
-	if(currentContactGeometry->penetrationDepth <0){
+	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
+	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
+	if(geom->penetrationDepth <0){
 		if (neverErase) {
-			currentContactPhysics->shearForce = Vector3r::Zero();
-			currentContactPhysics->normalForce = Vector3r::Zero();}
+			phys->shearForce = Vector3r::Zero();
+			phys->normalForce = Vector3r::Zero();}
 		else 	scene->interactions->requestErase(id1,id2);
 		return;}
 	State* de1 = Body::byId(id1,scene)->state.get();
 	State* de2 = Body::byId(id2,scene)->state.get();
-	Real& un=currentContactGeometry->penetrationDepth;
-	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
-	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
+	Real& un=geom->penetrationDepth;
+	TRVAR3(geom->penetrationDepth,de1->se3.position,de2->se3.position);
+	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
 
-	Vector3r& shearForce = currentContactGeometry->rotate(currentContactPhysics->shearForce);
-	const Vector3r& shearDisp = currentContactGeometry->shearIncrement();
+	Vector3r& shearForce = geom->rotate(phys->shearForce);
+	const Vector3r& shearDisp = geom->shearIncrement();
+	shearForce -= phys->ks*shearDisp;
+	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
 	if (!traceEnergy){//Update force but don't compute energy terms (see below))
-		shearForce -= currentContactPhysics->ks*shearDisp;
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
-		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
-			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
 			shearForce *= ratio;}
 	} else {
 		//almost the same with additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
-		shearForce -= currentContactPhysics->ks*shearDisp;
-		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
-			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
 			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
 			//define the plastic work input and increment the total plastic energy dissipated
 			shearForce *= ratio;
 			plasticDissipation +=
-			((1/currentContactPhysics->ks)*(trialForce-shearForce))//plastic disp.
+			((1/phys->ks)*(trialForce-shearForce))//plastic disp.
 			.dot(shearForce);//active force
 		}
 	}
 	if (!scene->isPeriodic)
-	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
+		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 	else {//we need to use correct branches in the periodic case, the following apply for spheres only
-		Vector3r force = -currentContactPhysics->normalForce-shearForce;
+		Vector3r force = -phys->normalForce-shearForce;
 		scene->forces.addForce(id1,force);
 		scene->forces.addForce(id2,-force);
-		scene->forces.addTorque(id1,(currentContactGeometry->radius1-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
-		scene->forces.addTorque(id2,(currentContactGeometry->radius2-0.5*currentContactGeometry->penetrationDepth)* currentContactGeometry->normal.cross(force));
+		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 	}
-	//FIXME : make sure currentContactPhysics->prevNormal is not used anywhere, remove it from physics and remove this line :
-	currentContactPhysics->prevNormal = currentContactGeometry->normal;
+	//FIXME : make sure phys->prevNormal is not used anywhere, remove it from physics and remove this line :
+	phys->prevNormal = geom->normal;
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom

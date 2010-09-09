@@ -9,7 +9,9 @@ BOOST_PYTHON_MODULE(_packSpheres){
 	python::class_<SpherePack>("SpherePack","Set of spheres represented as centers and radii. This class is returned by :yref:`yade.pack.randomDensePack`, :yref:`yade.pack.randomPeriPack` and others. The object supports iteration over spheres, as in \n\n\t>>> sp=SpherePack()\n\t>>> for center,radius in sp: print center,radius\n\n\t>>> for sphere in sp: print sphere[0],sphere[1]   ## same, but without unpacking the tuple automatically\n\n\t>>> for i in range(0,len(sp)): print sp[i][0], sp[i][1]   ## same, but accessing spheres by index\n",python::init<python::optional<python::list> >(python::args("list"),"Empty constructor, optionally taking list [ ((cx,cy,cz),r), … ] for initial data." ))
 		.def("add",&SpherePack::add,"Add single sphere to packing, given center as 3-tuple and radius")
 		.def("toList",&SpherePack::toList,"Return packing data as python list.")
+		#if 0
 		.def("toList_pointsAsTuples",&SpherePack::toList_pointsAsTuples,"Return packing data as python list, but using only pure-python data types (3-tuples instead of Vector3) (for pickling with cPickle)")
+		#endif
 		.def("fromList",&SpherePack::fromList,"Make packing from given list, same format as for constructor. Discards current data.")
 		.def("load",&SpherePack::fromFile,(python::arg("fileName")),"Load packing from external text file (current data will be discarded).")
 		.def("save",&SpherePack::toFile,(python::arg("fileName")),"Save packing to external text file (will be overwritten).")

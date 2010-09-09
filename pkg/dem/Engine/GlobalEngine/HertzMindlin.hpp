@@ -64,6 +64,16 @@ class Ip2_FrictMat_FrictMat_MindlinPhys: public InteractionPhysicsFunctor{
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinPhys);
 
+class Law2_ScGeom_MindlinPhys_HertzWithLinearShear: public LawFunctor{
+	public:
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
+		FUNCTOR2D(ScGeom,MindlinPhys);
+		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_HertzWithLinearShear,LawFunctor,
+			"Constitutive law for the Hertz formulation (using :yref:`MindlinPhys.kno`) and linear beahvior in shear (using :yref:`MindlinPhys.kso` for stiffness and :yref:`FrictPhys.tangensOfFrictionAngle`). \n\n.. note:: No viscosity or damping. If you need those, look at  :yref:`Law2_ScGeom_MindlinPhys_Mindlin`, which also includes non-linear Mindlin shear.",
+				((int,nonLin,0,,"Shear force nonlinearity (the value determines how many features of the non-linearity are taken in account). 1: ks as in HM 2: shearElastic increment computed as in HM 3. granular ratcheting disabled."))
+		);
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_HertzWithLinearShear);
 
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
@@ -85,7 +95,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
-			((bool,preventGranularRatcheting,false,,"bool to avoid granular ratcheting"))
+			((bool,preventGranularRatcheting,true,,"bool to avoid granular ratcheting"))
 			((bool,includeAdhesion,false,,"bool to include the adhesion force following the DMT formulation. If true, also the normal elastic energy takes into account the adhesion effect."))
 			((bool,useDamping,false,,"bool to include contact damping"))
 			((bool,calcEnergy,false,,"bool to calculate energy terms (shear potential energy, dissipation of energy due to friction and dissipation of energy due to normal and tangential damping)"))

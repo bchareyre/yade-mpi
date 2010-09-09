@@ -8,7 +8,7 @@
 
 #define pi 3.14159265 
 
-YADE_PLUGIN((MindlinPhys)(Ip2_FrictMat_FrictMat_MindlinPhys)(Law2_ScGeom_MindlinPhys_Mindlin));
+YADE_PLUGIN((MindlinPhys)(Ip2_FrictMat_FrictMat_MindlinPhys)(Law2_ScGeom_MindlinPhys_HertzWithLinearShear)(Law2_ScGeom_MindlinPhys_Mindlin));
 
 Real Law2_ScGeom_MindlinPhys_Mindlin::Real0=0;
 Real Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation() {return (Real) frictionDissipation;}
@@ -99,14 +99,51 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 	return normEnergy;
 }
 
+void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+	Body::id_t id1(contact->getId1()), id2(contact->getId2());
+	ScGeom* geom = static_cast<ScGeom*>(ig.get());
+	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
+	const Real uN=geom->penetrationDepth;
+	if (uN<0) {scene->interactions->requestErase(id1,id2); return;}
+	// normal force
+	Real Fn=phys->kno*pow(uN,3/2.);
+	phys->normalForce=Fn*geom->normal;
+	//phys->kn=3./2.*phys->kno*std::pow(uN,0.5); // update stiffness, not needed
+	
+	// shear force
+	Vector3r& Fs=geom->rotate(phys->shearForce);
+	Real ks= nonLin>0 ? phys->kso*std::pow(uN,0.5) : phys->kso;
+	Vector3r shearIncrement;
+	if(nonLin>1){
+		State *de1=Body::byId(id1,scene)->state.get(), *de2=Body::byId(id2,scene)->state.get();	
+		Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
+		Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shiftVel, /*preventGranularRatcheting*/ nonLin>2 );	
+		Vector3r incidentVn = geom->normal.dot(incidentV)*geom->normal; // contact normal velocity
+		Vector3r incidentVs = incidentV-incidentVn; // contact shear velocity
+		shearIncrement=incidentVs*scene->dt;
+	} else { shearIncrement=geom->shearIncrement(); }
+	Fs-=ks*shearIncrement;
+	// Mohr-Coulomb slip
+	Real maxFs2=pow(Fn,2)*pow(phys->tangensOfFrictionAngle,2);
+	if(Fs.squaredNorm()>maxFs2) Fs*=sqrt(maxFs2)/Fs.norm();
+
+	// apply forces
+	Vector3r f=-phys->normalForce-phys->shearForce; /* should be a reference returned by geom->rotate */ assert(phys->shearForce==Fs); 
+	scene->forces.addForce(id1,f);
+	scene->forces.addForce(id2,-f);
+	scene->forces.addTorque(id1,(geom->radius1-.5*geom->penetrationDepth)*geom->normal.cross(f));
+	scene->forces.addTorque(id2,(geom->radius2-.5*geom->penetrationDepth)*geom->normal.cross(f));
+}
+
+
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 CREATE_LOGGER(Law2_ScGeom_MindlinPhys_Mindlin);
 
 void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
 	const Real& dt = scene->dt; // get time step
 	
-	int id1 = contact->getId1(); // get id body 1
-  	int id2 = contact->getId2(); // get id body 2
+	Body::id_t id1 = contact->getId1(); // get id body 1
+ 	Body::id_t id2 = contact->getId2(); // get id body 2
 
 	State* de1 = Body::byId(id1,scene)->state.get();
 	State* de2 = Body::byId(id2,scene)->state.get();	
@@ -271,7 +308,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/****************/
 	
 	if (!scene->isPeriodic)
-	applyForceAtContactPoint(-phys->normalForce - phys->shearForce, scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position);
+		applyForceAtContactPoint(-phys->normalForce - phys->shearForce, scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position);
 	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used
 		Vector3r force = -phys->normalForce - phys->shearForce;
 		scene->forces.addForce(id1,force);

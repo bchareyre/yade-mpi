@@ -182,6 +182,8 @@ def createPlots(subPlots=False):
 			pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
 			pylab.rcParams['lines.color']=origLinesColor
 			pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y2])) if p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2] else xylabels[p][2])
+			## should be repeated for y2 axis, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, it seems)
+			# if scientific: pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
 
 		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
 

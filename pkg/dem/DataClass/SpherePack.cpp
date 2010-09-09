@@ -28,6 +28,11 @@ void SpherePack::fromList(const python::list& l){
 		const python::tuple& t=python::extract<python::tuple>(l[i]);
 		python::extract<Vector3r> vec(t[0]);
 		if(vec.check()) { pack.push_back(Sph(vec(),python::extract<double>(t[1]))); continue; }
+		#if 0
+			// compatibility block
+			python::extract<python::tuple> tup(t[0]);
+			if(tup.check()) { pack.push_back(Sph(Vector3r(python::extract<double>(tup[0]),python::extract<double>(tup[1]),python::extract<double>(tup[2]))),python::extract<double>(t[1])); continue; }
+		#endif
 		PyErr_SetString(PyExc_TypeError, "List elements must be (tuple or Vector3, float)!");
 		python::throw_error_already_set();
 	}
@@ -38,12 +43,14 @@ python::list SpherePack::toList() const {
 	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c,s.r));
 	return ret;
 };
-
+#if 0
 python::list SpherePack::toList_pointsAsTuples() const {
 	python::list ret;
 	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c[0],s.c[1],s.c[2],s.r));
 	return ret;
 };
+#endif
+
 
 void SpherePack::fromFile(string file) {
 	typedef pair<Vector3r,Real> pairVector3rReal;

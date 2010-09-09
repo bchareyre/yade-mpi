@@ -283,7 +283,7 @@ def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim):
 		c=conn.cursor()
 		c.execute('create table packings (radius real, rRelFuzz real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)')
 	c=conn.cursor()
-	packBlob=buffer(cPickle.dumps(sp.toList_pointsAsTuples(),cPickle.HIGHEST_PROTOCOL))
+	packBlob=buffer(cPickle.dumps(sp.toList(),cPickle.HIGHEST_PROTOCOL))
 	packDim=sp.cellSize if wantPeri else fullDim
 	c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,rRelFuzz,packDim[0],packDim[1],packDim[2],len(sp),time.time(),wantPeri,packBlob,))
 	c.close()
@@ -441,8 +441,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 def randomPeriPack(radius,rRelFuzz,initSize,memoizeDb=None):
 	"""Generate periodic dense packing.	EXPERIMENTAL, you at your own risk.
 
-	A cell of initSize is stuffed with as many spheres as possible (ignore the warning from SpherePack::makeCloud about
-	not being able to	add any more spheres), then we run periodic compression with PeriIsoCompressor, just like with
+	A cell of initSize is stuffed with as many spheres as possible, then we run periodic compression with PeriIsoCompressor, just like with
 	randomDensePack.
 
 	:param radius: mean sphere radius
@@ -450,9 +449,6 @@ def randomPeriPack(radius,rRelFuzz,initSize,memoizeDb=None):
 	:param initSize: initial size of the periodic cell.
 
 	:return: SpherePack object, which also contains periodicity information.
-
-	:todo: memoization in db; what criteria??
-
 	"""
 	from math import pi
 	sp=_getMemoizedPacking(memoizeDb,radius,rRelFuzz,initSize[0],initSize[1],initSize[2],fullDim=Vector3(0,0,0),wantPeri=True,fillPeriodic=False,spheresInCell=-1,memoDbg=True)
@@ -462,7 +458,7 @@ def randomPeriPack(radius,rRelFuzz,initSize,memoizeDb=None):
 	O.periodic=True
 	O.cell.refSize=Vector3(initSize)
 	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True)
-	O.engines=[ForceResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
+	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 	O.dt=utils.PWaveTimeStep()

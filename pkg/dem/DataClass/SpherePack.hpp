@@ -47,7 +47,9 @@ public:
 	// I/O
 	void fromList(const python::list& l);
 	python::list toList() const;
-	python::list toList_pointsAsTuples() const;
+	#if 0
+		python::list toList_pointsAsTuples() const;
+	#endif
 	void fromFile(const string file);
 	void toFile(const string file) const;
 	void fromSimulation();
