@@ -28,7 +28,10 @@ FlowEngine::~FlowEngine()
 
 void FlowEngine::action ( )
 {
-	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;Update_Triangulation=false;}
+	if (!flow) {
+	  flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);
+	  network = shared_ptr<CGT::Network> (new CGT::Network);
+	  first=true;Update_Triangulation=false;}
 	if ( !isActivated ) return;
 	else
 	{
@@ -66,9 +69,9 @@ void FlowEngine::action ( )
 				string visu_consol = "./mplot/"+flow->key+"%d_Visu_Consol";
 				const char* key_visu_consol = visu_consol.c_str();
 				sprintf (plotfile, key_visu_consol, j);	char *gg = plotfile;
-				flow->mplot(flow->T[flow->currentTes].Triangulation(), gg);}
+				flow->mplot(gg);}
 			
- 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
+ 				flow->MGPost();
 
 				flow->ComputeFacetForces();
 				
@@ -76,9 +79,9 @@ void FlowEngine::action ( )
 
 			///End Compute flow and forces
 
-				CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end ();
+				CGT::Finite_vertices_iterator vertices_end = network->T[network->currentTes].Triangulation().finite_vertices_end ();
 				Vector3r f; int id;
-				for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
+				for ( CGT::Finite_vertices_iterator V_it = network->T[network->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
 				{
 					id = V_it->info().id();
 					for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
@@ -99,7 +102,7 @@ void FlowEngine::action ( )
 				char *g = file;
 				timingDeltas->checkpoint("Writing cons_files");
 				
-				MaxPressure = flow->PressureProfile(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
+				MaxPressure = flow->PressureProfile( g, time, intervals);
 				
 				std::ofstream max_p ("pressures.txt", std::ios::app);
 				max_p << j << " " << time << " " << MaxPressure << endl;
@@ -118,30 +121,30 @@ void FlowEngine::action ( )
 				timingDeltas->checkpoint("Storing Max Pressure");
 				
 				flow->Average_Grain_Velocity();
-				if (save_vtk) flow->save_vtk_file(flow->T[flow->currentTes].Triangulation());
+				if (save_vtk) flow->save_vtk_file();
 				
-// 				int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
+// 				int numero = flow->Average_Cell_Velocity(id_sphere, network->T[network->currentTes].Triangulation());
 				
-// 				flow->vtk_average_cell_velocity(flow->T[flow->currentTes].Triangulation(), id_sphere, numero);
+// 				flow->vtk_average_cell_velocity(network->T[network->currentTes].Triangulation(), id_sphere, numero);
 		}
 	}
 }
 
 void FlowEngine::BoundaryConditions()
 {
-	flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
-	flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
-	flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
-	flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
-	flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
-	flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
+	network->boundary ( network->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
+	network->boundary ( network->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
+	network->boundary ( network->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
+	network->boundary ( network->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
+	network->boundary ( network->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
+	network->boundary ( network->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
 	
-	flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
-	flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
-	flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
-	flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
-	flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
-	flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
+	network->boundary ( network->y_min_id ).value=Pressure_BOTTOM_Boundary;
+	network->boundary ( network->y_max_id ).value=Pressure_TOP_Boundary;
+	network->boundary ( network->x_max_id ).value=Pressure_RIGHT_Boundary;
+	network->boundary ( network->x_min_id ).value=Pressure_LEFT_Boundary;
+	network->boundary ( network->z_max_id ).value=Pressure_FRONT_Boundary;
+	network->boundary ( network->z_min_id ).value=Pressure_BACK_Boundary;
 }
 
 
@@ -154,29 +157,29 @@ void FlowEngine::Build_Triangulation (double P_zero)
 {
 	if (first)
 	{
-		flow->currentTes=0;
-		flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
+		network->currentTes=0;
+		network->Vtotalissimo=0; network->Vsolid_tot=0; network->Vporale=0; network->Ssolid_tot=0;
 		flow->SLIP_ON_LATERALS=slip_boundary;
 		flow->key = triaxialCompressionEngine->Key;
 		flow->k_factor = permeability_factor;
 	}
 	else
 	{
-		flow->currentTes=!flow->currentTes;
+		network->currentTes=!network->currentTes;
 		cout << "--------RETRIANGULATION-----------" << endl;
 	}
-	flow->T[flow->currentTes].Clear();
-	flow->T[flow->currentTes].max_id=-1;
-	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
+	network->T[network->currentTes].Clear();
+	network->T[network->currentTes].max_id=-1;
+	network->x_min = 1000.0, network->x_max = -10000.0, network->y_min = 1000.0, network->y_max = -10000.0, network->z_min = 1000.0, network->z_max = -10000.0;
 
 	AddBoundary ( );
 	Triangulate ( );
 	
 	cout << endl << "Tesselating------" << endl << endl;
-	flow->T[flow->currentTes].Compute();
+	network->T[network->currentTes].Compute();
 	
-	flow->Define_fictious_cells(flow->T[flow->currentTes].Triangulation());
-	flow->DisplayStatistics ();	
+	network->Define_fictious_cells();
+	network->DisplayStatistics ();	
 
 	flow->meanK_LIMIT = meanK_correction;
 	flow->meanK_STAT = meanK_opt;
@@ -184,26 +187,26 @@ void FlowEngine::Build_Triangulation (double P_zero)
 
 	if (first)
 	{
-		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		CGT::Finite_cells_iterator cell_end = network->T[network->currentTes].Triangulation().finite_cells_end();
+		for ( CGT::Finite_cells_iterator cell = network->T[network->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
+		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( network->x_min, network->x_max, network->y_min, network->y_max, network->z_min, network->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
-  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 5);
+  		if (WaveAction) flow->ApplySinusoidalPressure(network->T[network->currentTes].Triangulation(), Sinus_Pressure, 5);
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
 	}
 	else
 	{
 		cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
-		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		CGT::Finite_cells_iterator cell_end = network->T[network->currentTes].Triangulation().finite_cells_end();
+		for ( CGT::Finite_cells_iterator cell = network->T[network->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
+		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( network->x_min, network->x_max, network->y_min, network->y_max, network->z_min, network->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
-		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
+		flow->Interpolate ( network->T[!network->currentTes], network->T[network->currentTes] );
 
- 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15);
+ 		if (WaveAction) flow->ApplySinusoidalPressure(network->T[network->currentTes].Triangulation(), Sinus_Pressure, 15);
 	}
 	Initialize_volumes ( );
 }
@@ -228,12 +231,12 @@ void FlowEngine::AddBoundary ()
 			Real y = b->state->pos[1];
 			Real z = b->state->pos[2];
 			
-			flow->x_min = min ( flow->x_min, x-rad);
-			flow->x_max = max ( flow->x_max, x+rad);
-			flow->y_min = min ( flow->y_min, y-rad);
-			flow->y_max = max ( flow->y_max, y+rad);
-			flow->z_min = min ( flow->z_min, z-rad);
-			flow->z_max = max ( flow->z_max, z+rad);
+			network->x_min = min ( network->x_min, x-rad);
+			network->x_max = max ( network->x_max, x+rad);
+			network->y_min = min ( network->y_min, y-rad);
+			network->y_max = max ( network->y_max, y+rad);
+			network->z_min = min ( network->z_min, z-rad);
+			network->z_max = max ( network->z_max, z+rad);
 			
 			contator+=1;
 		}
@@ -257,18 +260,18 @@ void FlowEngine::AddBoundary ()
 		}
 	}
 	
-	id_offset = flow->T[flow->currentTes].max_id+1;
+	id_offset = network->T[network->currentTes].max_id+1;
 	
-	flow->id_offset = id_offset;
+	network->id_offset = id_offset;
 
-	flow->y_min_id=triaxialCompressionEngine->wall_bottom_id;
-	flow->y_max_id=triaxialCompressionEngine->wall_top_id;
-	flow->x_max_id=triaxialCompressionEngine->wall_right_id;
-	flow->x_min_id=triaxialCompressionEngine->wall_left_id;
-	flow->z_min_id=triaxialCompressionEngine->wall_back_id;
-	flow->z_max_id=triaxialCompressionEngine->wall_front_id;
+	network->y_min_id=triaxialCompressionEngine->wall_bottom_id;
+	network->y_max_id=triaxialCompressionEngine->wall_top_id;
+	network->x_max_id=triaxialCompressionEngine->wall_right_id;
+	network->x_min_id=triaxialCompressionEngine->wall_left_id;
+	network->z_min_id=triaxialCompressionEngine->wall_back_id;
+	network->z_max_id=triaxialCompressionEngine->wall_front_id;
 
-	flow->AddBoundingPlanes(true);
+	network->AddBoundingPlanes(true);
 }
 
 void FlowEngine::Triangulate ()
@@ -290,27 +293,27 @@ void FlowEngine::Triangulate ()
 			Real y = b->state->pos[1];
 			Real z = b->state->pos[2];
 			
-			flow->T[flow->currentTes].insert(x, y, z, rad, id);
+			network->T[network->currentTes].insert(x, y, z, rad, id);
 			
 			contator+=1;
 		}
 	}
-	double SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
+	double SectionArea = ( network->x_max - network->x_min ) * ( network->z_max-network->z_min );
 
 	cout << "Section area = " << SectionArea << endl;
 // 	cout << "Rmoy " << Rmoy << endl;
-	cout << "x_min = " << flow->x_min << endl;
-	cout << "x_max = " << flow->x_max << endl;
-	cout << "y_max = " << flow->y_max << endl;
-	cout << "y_min = " << flow->y_min << endl;
-	cout << "z_min = " << flow->z_min << endl;
-	cout << "z_max = " << flow->z_max << endl;
+	cout << "x_min = " << network->x_min << endl;
+	cout << "x_max = " << network->x_max << endl;
+	cout << "y_max = " << network->y_max << endl;
+	cout << "y_min = " << network->y_min << endl;
+	cout << "z_min = " << network->z_min << endl;
+	cout << "z_max = " << network->z_max << endl;
 }
 
 void FlowEngine::Initialize_volumes ()
 {
-	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	CGT::Finite_cells_iterator cell_end = network->T[network->currentTes].Triangulation().finite_cells_end();
+	for ( CGT::Finite_cells_iterator cell = network->T[network->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
@@ -328,8 +331,8 @@ void FlowEngine::UpdateVolumes ()
 	cout << "Updating volumes.............." << endl;
 
 	Real deltaT = scene->dt;
-	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	CGT::Finite_cells_iterator cell_end = network->T[network->currentTes].Triangulation().finite_cells_end();
+	for ( CGT::Finite_cells_iterator cell = network->T[network->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
@@ -376,10 +379,10 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 		}
 		else
 		{
-			b = cell->vertex ( y )->info().id()-flow->id_offset;
+			b = cell->vertex ( y )->info().id()-network->id_offset;
 			const shared_ptr<Body>& wll = Body::byId ( b , scene );
-			for ( int i=0;i<3;i++ ) Wall_point[i] = flow->boundaries[b].p[i];
-	Wall_point[flow->boundaries[b].coordinate] = wll->state->pos[flow->boundaries[b].coordinate]+(flow->boundaries[b].normal[flow->boundaries[b].coordinate])*wall_thickness;
+			for ( int i=0;i<3;i++ ) Wall_point[i] = network->boundaries[b].p[i];
+	Wall_point[network->boundaries[b].coordinate] = wll->state->pos[network->boundaries[b].coordinate]+(network->boundaries[b].normal[network->boundaries[b].coordinate])*wall_thickness;
 		}
 	}
 
@@ -389,7 +392,7 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 
 	Real Volume = ( CGAL::cross_product ( CGT::Vecteur ( v1[0],v1[1],v1[2] ),
 	                                      CGT::Vecteur ( v2[0],v2[1],v2[2] ) ) *
-	                flow->boundaries[b].normal ) * ( 0.33333333333* ( V[0][flow->boundaries[b].coordinate]+ V[1][flow->boundaries[b].coordinate]+ V[2][flow->boundaries[b].coordinate] ) - Wall_point[flow->boundaries[b].coordinate] );
+	                network->boundaries[b].normal ) * ( 0.33333333333* ( V[0][network->boundaries[b].coordinate]+ V[1][network->boundaries[b].coordinate]+ V[2][network->boundaries[b].coordinate] ) - Wall_point[network->boundaries[b].coordinate] );
 
 	return abs ( Volume );
 }
@@ -413,10 +416,10 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 	{
 		if ( cell->vertex ( g )->info().isFictious )
 		{
-			b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
+			b[j] = cell->vertex ( g )->info().id()-network->id_offset;
 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
-			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
-			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate] +(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness;
+			for ( int i=0;i<3;i++ ) Wall_point[j][i] = network->boundaries[b[j]].p[i];
+			Wall_point[j][network->boundaries[b[j]].coordinate] = wll->state->pos[network->boundaries[b[j]].coordinate] +(network->boundaries[b[j]].normal[network->boundaries[b[j]].coordinate])*wall_thickness;
 			j++;
 		}
 		else if ( first_sph )
@@ -433,17 +436,17 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 		}
 	}
 
-	AS[flow->boundaries[b[0]].coordinate]=BS[flow->boundaries[b[0]].coordinate] = Wall_point[0][flow->boundaries[b[0]].coordinate];
-	AT[flow->boundaries[b[1]].coordinate]=BT[flow->boundaries[b[1]].coordinate] = Wall_point[1][flow->boundaries[b[1]].coordinate];
+	AS[network->boundaries[b[0]].coordinate]=BS[network->boundaries[b[0]].coordinate] = Wall_point[0][network->boundaries[b[0]].coordinate];
+	AT[network->boundaries[b[1]].coordinate]=BT[network->boundaries[b[1]].coordinate] = Wall_point[1][network->boundaries[b[1]].coordinate];
 
 	for ( int h=0;h<3;h++ ) {C[h]= ( A[h]+B[h] ) /2; CS[h]= ( AS[h]+BS[h] ) /2; CT[h]= ( AT[h]+BT[h] ) /2;}
 
 	CGT::Vecteur v1 ( AT[0]-BT[0],AT[1]-BT[1],AT[2]-BT[2] );
 	CGT::Vecteur v2 ( C[0]-CT[0],C[1]-CT[1],C[2]-CT[2] );
 
-	Real h = C[flow->boundaries[b[0]].coordinate]- CS[flow->boundaries[b[0]].coordinate];
+	Real h = C[network->boundaries[b[0]].coordinate]- CS[network->boundaries[b[0]].coordinate];
 
-	Real Volume = ( CGAL::cross_product ( v1,v2 ) *flow->boundaries[b[0]].normal ) *h;
+	Real Volume = ( CGAL::cross_product ( v1,v2 ) *network->boundaries[b[0]].normal ) *h;
 
 	return abs ( Volume );
 }
@@ -461,10 +464,10 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 	{
 		if ( cell->vertex ( g )->info().isFictious )
 		{
-			b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
+			b[j] = cell->vertex ( g )->info().id()-network->id_offset;
 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
-			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
-			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate]+(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness;
+			for ( int i=0;i<3;i++ ) Wall_point[j][i] = network->boundaries[b[j]].p[i];
+			Wall_point[j][network->boundaries[b[j]].coordinate] = wll->state->pos[network->boundaries[b[j]].coordinate]+(network->boundaries[b[j]].normal[network->boundaries[b[j]].coordinate])*wall_thickness;
 			j++;
 		}
 		else
@@ -475,9 +478,9 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 		}
 	}
 
-	AS[flow->boundaries[b[0]].coordinate]= AT[flow->boundaries[b[0]].coordinate]= AW[flow->boundaries[b[0]].coordinate]= Wall_point[0][flow->boundaries[b[0]].coordinate];
-	AT[flow->boundaries[b[1]].coordinate]= Wall_point[1][flow->boundaries[b[1]].coordinate];
-	AW[flow->boundaries[b[2]].coordinate]= Wall_point[2][flow->boundaries[b[2]].coordinate];
+	AS[network->boundaries[b[0]].coordinate]= AT[network->boundaries[b[0]].coordinate]= AW[network->boundaries[b[0]].coordinate]= Wall_point[0][network->boundaries[b[0]].coordinate];
+	AT[network->boundaries[b[1]].coordinate]= Wall_point[1][network->boundaries[b[1]].coordinate];
+	AW[network->boundaries[b[2]].coordinate]= Wall_point[2][network->boundaries[b[2]].coordinate];
 
 	CGT::Vecteur v1 ( AS[0]-AT[0],AS[1]-AT[1],AS[2]-AT[2] );
 	CGT::Vecteur v2 ( AS[0]-AW[0],AS[1]-AW[1],AS[2]-AW[2] );
@@ -572,11 +575,11 @@ for ( int j=0;j<4;j++ )
 {
 	if ( cell->vertex ( j )->info().isFictious )
 	{
-		CGT::Boundary b = flow->boundaries[cell->vertex ( j )->info().id() ];
+		CGT::Boundary b = network->boundaries[cell->vertex ( j )->info().id() ];
 		const shared_ptr<Body>& wall = Body::byId
 				( cell->vertex ( j )->info().id(), scene );
 
-		surface = flow->surface_external_triple_fictious ( pos, cell, b );
+		surface = network->surface_external_triple_fictious ( pos, cell, b );
 
 		Real Vs = sph->state->vel[b.coordinate];
 		Real Vw = wall->state->vel[b.coordinate];
@@ -621,7 +624,7 @@ for ( int j=0;j<4;j++ )
 // 					}
 // 					else if ( first_boundary )
 // 					{
-// 						b1 = flow->boundaries[cell->vertex ( g )->info().id() ];
+// 						b1 = network->boundaries[cell->vertex ( g )->info().id() ];
 // 						const shared_ptr<Body>& wll1 = Body::byId
 // 						                               ( cell->vertex ( g )->info().id() , scene );
 //
@@ -630,7 +633,7 @@ for ( int j=0;j<4;j++ )
 // 					}
 // 					else
 // 					{
-// 						b2 = flow->boundaries[cell->vertex ( g )->info().id() ];
+// 						b2 = network->boundaries[cell->vertex ( g )->info().id() ];
 // 						const shared_ptr<Body>& wll2 = Body::byId
 // 						                               ( cell->vertex ( g )->info().id() , scene );
 //
