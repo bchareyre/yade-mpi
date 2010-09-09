@@ -11,8 +11,8 @@ psdSizes,psdCumm=[.02,.04,.06,.08,.1],[0.,.1,.7,.9,1.]
 pylab.plot(psdSizes,psdCumm,label='precribed mass PSD')
 sp1=pack.SpherePack(); sp1.psdScaleExponent=2 # this exponent is somewhat empirical, see docs of SpherePack
 sp1.makeCloud((0,0,0),(1,1,1),psdSizes=psdSizes,psdCumm=psdCumm,distributeMass=True)
-pylab.plot(*sp1.psd(bins=30,mass=True),label='Mass PSD of %d random spheres'%len(sp1))
-pylab.plot(*sp1.psd(bins=30,mass=False),label='Size PSD of %d andom spheres'%len(sp1))
+pylab.semilogx(*sp1.psd(bins=30,mass=True),label='Mass PSD of %d random spheres'%len(sp1))
+pylab.semilogx(*sp1.psd(bins=30,mass=False),label='Size PSD of %d andom spheres'%len(sp1))
 pylab.legend()
 
 # uniform distribution of size (sp2) and of mass (sp3)

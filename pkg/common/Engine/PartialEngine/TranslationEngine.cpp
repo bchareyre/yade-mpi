@@ -11,7 +11,7 @@
 
 void TranslationEngine::action(){
 	const Real& dt=scene->dt;
-	FOREACH(Body::id_t id,subscribedBodies){
+	FOREACH(Body::id_t id,ids){
 		assert(id<(Body::id_t)scene->bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;

@@ -215,7 +215,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& scene)
 	shared_ptr<Shape> facet(new Facet);
 	for(BodyContainer::iterator bi = scene->bodies->begin(), biEnd=scene->bodies->end(); bi!=biEnd; ++bi)
 	    if ( (*bi)->shape->getClassIndex() == facet->getClassIndex() )
-		kinematic->subscribedBodies.push_back((*bi)->getId());
+		kinematic->ids.push_back((*bi)->getId());
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;

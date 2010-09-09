@@ -34,6 +34,7 @@ class MindlinPhys: public FrictPhys{
 			((Vector3r,shearElastic,Vector3r::Zero(),,"Total elastic shear force"))
 			((Vector3r,usElastic,Vector3r::Zero(),,"Total elastic shear displacement (only elastic part)"))
 			((Vector3r,usTotal,Vector3r::Zero(),,"Total elastic shear displacement (elastic+plastic part)"))
+			((Real,radius,NaN,,"Contact radius (only computed with :yref:`Law2_ScGeom_MindlinPhys_Mindlin::calcEnergy`)"))
 
 			//((Real,gamma,0.0,"Surface energy parameter [J/m^2] per each unit contact surface, to derive DMT formulation from HM"))
 			((Real,adhesionForce,0.0,,"Force of adhesion as predicted by DMT"))

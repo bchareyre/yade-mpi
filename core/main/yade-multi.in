@@ -3,22 +3,29 @@
 #
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, thread, time, logging, pipes
+import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re
+
+#socket.setdefaulttimeout(10) 
 
 ## replaced by scons automatically
 prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
 executable=os.path.join(prefix,'bin','yade'+suffix)
 ## we just need this ...
-import yade.utils, yade.config
+import yade, yade.utils, yade.config, yade.remote
 
 
 class JobInfo():
 	def __init__(self,num,id,command,log,nSlots):
 		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
 		self.command=command; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots; self.infoSocket=None
+		match=re.match('(.* > )(.*)( 2>&1)',self.command)
+		self.commandHref=(match.group(1)+'<a href="jobs/%d/log">'%self.num+match.group(2)+'</a>'+match.group(3)) if match else self.command
+		#print self.commandHref
+		self.hasXmlrpc=False
 		self.status='PENDING'
 		self.threadNum=None
+		self.plotsLastUpdate,self.plotsFile=0.,yade.Omega().tmpFilename()+'.'+yade.remote.plotImgFormat
 	def saveInfo(self):
 		log=file(self.log,'a')
 		log.write("""
@@ -31,26 +38,30 @@ started : %s
 finished: %s
 """%(self.id,self.exitStatus,'OK' if self.exitStatus==0 else 'FAILED',self.duration,self.command,time.asctime(time.localtime(self.started)),time.asctime(time.localtime(self.finished))));
 		log.close()
+	def ensureXmlrpc(self):
+		if not self.hasXmlrpc:
+			for l in open(self.log,'r'):
+				if not l.startswith('XMLRPC info provider on'): continue
+				url=l[:-1].split()[4]
+				self.xmlrpcConn=xmlrpclib.ServerProxy(url,allow_none=True)
+				self.hasXmlrpc=True
 	def getInfoDict(self):
 		if self.status!='RUNNING': return None
-		if not self.infoSocket:
-			for l in open(self.log,'r'):
-				if not l.startswith('TCP info provider on'): continue
-				hostPort=l[:-1].split()[4].split(':')
-				self.infoSocket=hostPort[0],int(hostPort[1])
-		if not self.infoSocket:
-			return None
-		import socket,pickle
-		s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		s.settimeout(2)
-		s.connect(self.infoSocket)
-		try:
-			data=s.recv(2048)
-			s.close()
-			return pickle.loads(data)
-		except socket.timeout:
-			s.close()
-			return None
+		self.ensureXmlrpc()
+		return self.xmlrpcConn.basicInfo()
+	def updatePlots(self):
+		if self.status!='RUNNING': return
+		self.ensureXmlrpc()
+		if time.time()-self.plotsLastUpdate<5: return
+		self.plotsLastUpdate=time.time()
+		img=self.xmlrpcConn.plot()
+		if not img:
+			if os.path.exists(self.plotsFile): os.remove(self.plotsFile)
+			return
+		f=open(self.plotsFile,'wb')
+		f.write(img.data)
+		f.close()
+		#print yade.remote.plotImgFormat,'(%d bytes) written to %s'%(os.path.getsize(self.plotsFile),self.plotsFile)
 
 	def htmlStats(self):
 		ret='<tr>'
@@ -59,6 +70,7 @@ finished: %s
 		elif self.status=='RUNNING': ret+='<td bgcolor="yellow">%s</td>'%t2hhmmss(time.time()-self.started)
 		elif self.status=='DONE': ret+='<td bgcolor="%s">%s</td>'%('lime' if self.exitStatus==0 else 'red',self.duration)
 		info=self.getInfoDict()
+		self.updatePlots() # checks for last update time
 		if info:
 			ret+='<td>'
 			if info['stopAtIter']>0:
@@ -70,7 +82,20 @@ finished: %s
 		else:
 			ret+='<td> (no info) </td>'
 		ret+='<td>%d</td>'%self.nSlots
-		ret+='<td>%s</td>'%self.command
+		# TODO: make clickable so that it can be served full-size
+		if os.path.exists(self.plotsFile):
+			if 0: pass
+				## all this mess to embed SVG; clicking on it does not work, though
+				## question posted at http://www.abclinuxu.cz/poradna/linux/show/314041
+				## see also http://www.w3schools.com/svg/svg_inhtml.asp and http://dutzend.blogspot.com/2010/04/svg-im-anklickbar-machen.html
+				#img='<object data="/jobs/%d/plots" type="%s" width="300px" alt="[plots]"/>'%(self.num,yade.remote.plotImgMimetype)
+				#img='<iframe src="/jobs/%d/plots" type="%s" width="300px" alt="[plots]"/>'%(self.num,yade.remote.plotImgMimetype)
+				#img='<embed src="/jobs/%d/plots" type="%s" width="300px" alt="[plots]"/>'%(self.num,yade.remote.plotImgMimetype)a
+			img='<img src="/jobs/%d/plots" width="300px" alt="[plots]">'%(self.num)
+			ret+='<td><a href="/jobs/%d/plots">%s</a></td>'%(self.num,img)
+		else: ret+='<td> (no plots) </td>'
+		if self.status=='PENDING': ret+='<td>%s</td>'%self.command
+		else: ret+='<td>%s</td>'%self.commandHref
 		ret+='</tr>'
 		return ret
 def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
@@ -94,30 +119,66 @@ def globalHtmlStats():
 	return ret
 
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
-import socket
+import socket,re
 class HttpStatsServer(BaseHTTPRequestHandler):
 	def do_GET(self):
-		self.send_response(200)
-		self.send_header('Content-type','text/html')
-		self.send_header('refresh','5')
-		self.end_headers()
-		self.wfile.write('<HTML><TITLE>Yade-multi at %s overview</TITLE><BODY>'%(socket.gethostname()))
-		self.wfile.write(globalHtmlStats())
-		self.wfile.write('<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>slots</th><th>command</th></tr>')
-		for j in jobs:
-			self.wfile.write(j.htmlStats())
-		self.wfile.write('</TABLE></BODY></HTML>')
-		global httpLastServe
-		httpLastServe=time.time()
+		if not self.path or self.path=='/': self.sendGlobal()
+		else:
+			#print 'Document',self.path,'requested'
+			plotMatch=re.match('/jobs/([0-9]+)/plots',self.path)
+			if plotMatch:
+				jobId=int(plotMatch.group(1));
+				if jobId>=len(jobs): self.send_error(404)
+				jobs[jobId].updatePlots() # internally checks for last update time
+				self.sendFile(jobs[jobId].plotsFile,contentType=yade.remote.plotImgMimetype,refresh=5)
+				return
+			logMatch=re.match('/jobs/([0-9]+)/log',self.path)
+			if logMatch:
+				jobId=int(logMatch.group(1));
+				if jobId>=len(jobs): self.send_error(404)
+				## once we authenticate properly, send the whole file
+				## self.sendFile(jobs[jobId].log,contentType='text/plain',refresh=5)
+				## now we have to filter away the cookie
+				cookieRemoved=False; data=''
+				for l in open(jobs[jobId].log):
+					if not cookieRemoved and l.startswith('TCP python prompt on'):
+						ii=l.find('auth cookie `'); l=l[:ii+13]+'******'+l[ii+19:]; cookieRemoved=True
+					data+=l
+				self.sendHttp(data,contentType='text/plain',refresh=5)
+				return
+			self.send_error(404)
 		return
 	def log_request(self,req): pass
+	def sendGlobal(self):
+		html='<HTML><TITLE>Yade-multi at %s overview</TITLE><BODY>\n'%(socket.gethostname())
+		html+=globalHtmlStats()
+		html+='<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>slots</th><th>plots</th><th>command</th></tr>\n'
+		for j in jobs: html+=j.htmlStats()+'\n'
+		html+='</TABLE></BODY></HTML>'
+		self.sendHttp(html,contentType='text/html',refresh=5) # refresh sent as header
+	def sendFile(self,fileName,contentType,**headers):
+		f=open(fileName)
+		self.sendHttp(f.read(),contentType=contentType,**headers)
+	def sendHttp(self,data,contentType,**headers):
+		self.send_response(200)
+		self.send_header('Content-type',contentType)
+		for h in headers: self.send_header(h,str(headers[h]))
+		self.end_headers()
+		self.wfile.write(data)
+		global httpLastServe
+		httpLastServe=time.time()
 def runHttpStatsServer():
-	try:
-		server=HTTPServer(('',9080),HttpStatsServer)
-		import thread; thread.start_new_thread(server.serve_forever,())
-		print "http://localhost:9080 shows batch summary"
-	except socket.error:
-		print "WARN: Port 9080 occupied, not starting HTTP stats server"
+	maxPort=11000; port=9080
+	while port<maxPort:
+		try:
+			server=HTTPServer(('',port),HttpStatsServer)
+			import thread; thread.start_new_thread(server.serve_forever,())
+			print "http://localhost:%d shows batch summary"%port
+			break
+		except socket.error:
+			port+=1
+	if port==maxPort:
+		print "WARN: No free port in range 9080-11000, not starting HTTP stats server!"
 
 
 def runJob(job):

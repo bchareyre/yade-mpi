@@ -193,7 +193,9 @@ void PeriTriaxController::action()
 				assert( mass>0 );//user set
 				Real dampFactor = 1 - growDamping*Mathr::Sign ( strain_rate * ( goal[axis]-stress[axis] ) );
 				strain_rate+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
+				//if ((scene->iter%5000)==0){cerr << axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate<<endl;}
 				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate );}
+			
 		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
 			strain_rate = (Mathr::Exp ( goal[axis]-strain[axis] ) -1)/scene->dt;
@@ -204,7 +206,11 @@ void PeriTriaxController::action()
 		// limit maximum strain rate
 		if (abs(strain_rate)>maxStrainRate[axis]) strain_rate = Mathr::Sign(strain_rate)*maxStrainRate[axis];
 		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
+		
+		//if ((scene->iter%5000)==0){cerr<< axis <<": velGrad="<<strain_rate<<", maxCellsize"<<-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt<<endl;}
 		strain_rate=max(strain_rate,-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt);
+		//if ((scene->iter%5000)==0){cerr <<"velGrad="<<strain_rate<<endl<<endl;}
+
 
 		// crude way of predicting stress, for steps when it is not computed from intrs
 		if(doUpdate) LOG_DEBUG(axis<<": cellGrow="<<strain_rate*scene->dt<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);

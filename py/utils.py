@@ -725,6 +725,15 @@ if __name__=="__main__":
 	from pprint import *
 	pprint(TableParamReader(file).paramDict())
 	
+def runningInBatch():
+	'Tell whether we are running inside the batch or separately.'
+	import os
+	return os.environ.has_key('PARAM_TABLE')
+
+def waitIfBatch():
+	'Block the simulation if running inside a batch. Typically used at the end of script so that it does not finish prematurely in batch mode (the execution would be ended in such a case).'
+	if runningInBatch(): O.wait()
+
 def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw):
 	"""
 	Read parameters from a file and assign them to __builtin__ variables.

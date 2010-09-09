@@ -24,7 +24,7 @@ void SpiralEngine::action(){
 	Quaternionr q(AngleAxisr(angularVelocity*dt,axis));
 	angleTurned+=angularVelocity*dt;
 	shared_ptr<BodyContainer> bodies = scene->bodies;
-	FOREACH(Body::id_t id,subscribedBodies){
+	FOREACH(Body::id_t id,ids){
 		assert(id<(Body::id_t)bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
@@ -47,12 +47,12 @@ void RotationEngine::action(){
 	rotationAxis.normalize();
 	Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
 	#ifdef YADE_OPENMP
-	const long size=subscribedBodies.size();
+	const long size=ids.size();
 	#pragma omp parallel for schedule(static)
 	for(long i=0; i<size; i++){
-		const Body::id_t& id=subscribedBodies[i];
+		const Body::id_t& id=ids[i];
 	#else
-	FOREACH(Body::id_t id,subscribedBodies){
+	FOREACH(Body::id_t id,ids){
 	#endif
 		State* state=Body::byId(id,scene)->state.get();
 		state->angVel=rotationAxis*angularVelocity;

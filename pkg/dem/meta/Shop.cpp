@@ -180,13 +180,16 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	return (useMaxForce?maxF:meanF)/(sumF);
 }
 
-Real Shop::kineticEnergy(Scene* _rb){
+Real Shop::kineticEnergy(Scene* _rb, Body::id_t* maxId){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	Real ret=0.;
+	Real maxE=0; if(maxId) *maxId=Body::ID_NONE;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->isDynamic()) continue;
 		// ½(mv²+ωIω)
-		ret+=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(b->state->inertia.cwise()*b->state->angVel));
+		Real E=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(b->state->inertia.cwise()*b->state->angVel));
+		if(maxId) { if(E>maxE) *maxId=b->getId(); maxE=max(E,maxE); }
+		ret+=E;
 	}
 	return ret;
 }

@@ -54,9 +54,9 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	Real Gb = Eb/(2*(1+Vb));
 	Real G = (Ga+Gb)/2; // average of shear modulus
 	Real V = (Va+Vb)/2; // average of poisson's ratio
-	Real E = Ea*Eb/((1.-std::pow(Va,2.0))*Eb+(1.-std::pow(Vb,2.0))*Ea); // Young modulus
+	Real E = Ea*Eb/((1.-std::pow(Va,2))*Eb+(1.-std::pow(Vb,2))*Ea); // Young modulus
 	Real R = Da*Db/(Da+Db); // equivalent radius
-	Real Kno = 4./3.*E*std::pow(R,0.5); // coefficient for normal stiffness
+	Real Kno = 4./3.*E*sqrt(R); // coefficient for normal stiffness
 	Real Kso = 2*sqrt(4*R)*G/(2-V); // coefficient for shear stiffness
 	Real frictionAngle = std::min(fa,fb);
 
@@ -132,6 +132,11 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 			if (Fn < 0.0) {phys->isAdhesive = true;} // set true the bool to count the number of adhesive contacts
 			}
 	phys->normalForce = Fn*scg->normal; // normal Force (vector)
+
+	if (calcEnergy){
+		Real R=scg->radius1*scg->radius2/(scg->radius1+scg->radius2);
+		phys->radius=pow((Fn+(includeAdhesion?phys->adhesionForce:0.))*pow(R,3/2.)/phys->kno,1/3.); // not used anywhere
+	}
 
 	/*******************************/
 	/* TANGENTIAL NORMAL STIFFNESS */
@@ -217,6 +222,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/* MOHR-COULOMB law */
 	/********************/
 	
+	phys->shearViscous=Vector3r::Zero(); // reset so that during sliding, the previous values is not there
 	if (!includeAdhesion) {
 		Real maxFs = Fn*phys->tangensOfFrictionAngle;
 		if (shearElastic.squaredNorm() > maxFs*maxFs){
@@ -231,7 +237,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 		else if (!useDamping) {phys->shearForce = shearElastic;} // update the shear force at the elastic value if no damping is present and if we passed MC
 	}
 	else { // Mohr-Coulomb formulation adpated due to the presence of adhesion (see Thornton, 1991). FIXME: is this correct?
-		Real maxFs = max(0.,Fn*phys->tangensOfFrictionAngle); // adhesionForce already included in normalForce (above)
+		Real maxFs = phys->tangensOfFrictionAngle*(phys->adhesionForce+Fn); // adhesionForce already included in normalForce (above)
 		if (shearElastic.squaredNorm() > maxFs*maxFs){
 			noShearDamp = true; // no damping is added in the shear direction, hence no need to account for shear damping dissipation
 			Real ratio = maxFs/shearElastic.norm(); shearElastic *= ratio; phys->shearForce = shearElastic; /*store only elastic shear displacement*/ us_elastic *= ratio;

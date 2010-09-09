@@ -225,7 +225,6 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 		cout<<"vol tot = "<<Vtot<<endl;
 		cout<<"v_sphere = "<<volS<<endl;
 		cout<<"passing["<<i<<"] = "<<passing[i]<<endl;
-		cout<<"passing["<<i-1<<"] = "<<passing[i-1]<<endl<<endl;
 	}
 
 	static boost::minstd_rand randGen(TimingInfo::getNow(true));
@@ -234,7 +233,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 	const int maxTry=1000;
 	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
-	for (unsigned int ii=0; ii<radii.size(); ii++){
+	for (int ii=(int)radii.size()-1; ii>=0; ii--){
 		Real r=radii[ii]; // select radius
 		for(int i=0; i<numbers[ii]; i++) { // place as many spheres as required by the psd for the selected radius into the free spot
 			int t;

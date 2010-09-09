@@ -6,8 +6,8 @@ Remote connections to yade: authenticated python command-line over telnet and an
 These classes are used internally in gui/py/PythonUI_rc.py and are not intended for direct use.
 """
 
-import SocketServer
-import sys,time
+import SocketServer,xmlrpclib,socket
+import sys,time,os
 
 from yade import *
 import yade.runtime
@@ -15,15 +15,25 @@ import yade.runtime
 useQThread=False
 "Set before using any of our classes to use QThread for background execution instead of the standard thread module. Mixing the two (in case the qt4 UI is running, for instance) does not work well."
 
+plotImgFormat,plotImgMimetype='png','image/png'
+#plotImgFormat,plotImgMimetype='svg','image/svg+xml'
+
 bgThreads=[] # needed to keep background threads alive
 
-class InfoSocketProvider(SocketServer.BaseRequestHandler):
-	"""Class providing dictionary of important simulation information,
-	without authenticating the access."""
-	def handle(self):
-		import pickle, os
+class InfoProvider:
+	def basicInfo(self):
 		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,realtime=O.realtime,time=O.time,id=O.tags['id'] if O.tags.has_key('id') else None,threads=os.environ['OMP_NUM_THREADS'] if os.environ.has_key('OMP_NUM_THREADS') else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
-		self.request.send(pickle.dumps(ret))
+		sys.stdout.flush(); sys.stderr.flush()
+		return ret
+	def plot(self):
+		from yade import plot
+		if len(plot.plots)==0: return None
+		fig=plot.plot(subPlots=True,noShow=True)
+		img=O.tmpFilename()+'.'+plotImgFormat
+		fig.savefig(img,dpi=200)
+		f=open(img,'rb'); data=f.read(); f.close(); os.remove(img)
+		#print 'returning '+plotImgFormat
+		return xmlrpclib.Binary(data)
 		
 
 class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
@@ -91,6 +101,20 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 		print self.client_address, 'disconnected!'
 		self.request.send('\nBye ' + str(self.client_address) + '\n')
 
+
+def _runInBackground(func):
+	if useQThread:
+		from PyQt4.QtCore import QThread
+		class WorkerThread(QThread):
+			def __init__(self,func_): QThread.__init__(self); self.func=func_
+			def run(self): self.func()
+		wt=WorkerThread(func)
+		wt.start()
+		global bgThreads; bgThreads.append(wt)
+	else:
+		import thread; thread.start_new_thread(func,())
+
+
 class GenericTCPServer:
 	"Base class for socket server, handling port allocation, initial logging and thead backgrounding."
 	def __init__(self,handler,title,cookie=True,minPort=9000,host='',maxPort=65536,background=True):
@@ -109,17 +133,7 @@ class GenericTCPServer:
 					sys.stderr.write(title+" on %s:%d, auth cookie `%s'\n"%(host if host else 'localhost',self.port,self.server.cookie))
 				else:
 					sys.stderr.write(title+" on %s:%d\n"%(host if host else 'localhost',self.port))
-				if background:
-					if useQThread:
-						from PyQt4.QtCore import QThread
-						class WorkerThread(QThread):
-							def __init__(self,server): QThread.__init__(self); self.server=server
-							def run(self): self.server.serve_forever()
-						wt=WorkerThread(self.server)
-						wt.start()
-						global bgThreads; bgThreads.append(wt)
-					else:
-						import thread; thread.start_new_thread(self.server.serve_forever,())
+				if background: _runInBackground(self.server.serve_forever)
 				else: self.server.serve_forever()
 			except socket.error:
 				tryPort+=1
@@ -139,8 +153,24 @@ def runServers():
 	"""
 	srv=GenericTCPServer(handler=yade.remote.PythonConsoleSocketEmulator,title='TCP python prompt',cookie=True,minPort=9000)
 	yade.runtime.cookie=srv.server.cookie
-	info=GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
+	#info=GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
+	## XMPRPC server for general information:
+	if 1:
+		from SimpleXMLRPCServer import SimpleXMLRPCServer
+		port,maxPort=21000,65535 # minimum port number
+		while port<maxPort:
+			try:
+				info=SimpleXMLRPCServer(('',port),logRequests=False,allow_none=True); break
+			except socket.error: port+=1
+		if port==maxPort: raise RuntimeError("No free port to listen on in range 21000-%d"%maxPort)
+		# register methods, as per http://docs.python.org/library/simplexmlrpcserver.html#simplexmlrpcserver-example
+		info.register_instance(InfoProvider()) # gets all defined methods by introspection
+		#prov=InfoProvider()
+		#for m in prov.exposedMethods(): info.register_function(m)
+		_runInBackground(info.serve_forever)
+		print 'XMLRPC info provider on http://localhost:%d'%port
 	sys.stdout.flush()
+
 
 
 

@@ -49,7 +49,7 @@ class PeriTriaxController: public BoundaryController{
 	YADE_CLASS_BASE_DOC_ATTRS(PeriTriaxController,BoundaryController,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
 		((bool,reversedForces,false,,"For broken constitutive laws, normalForce and shearForce on interactions are in the reverse sense. see `bugreport <https://bugs.launchpad.net/yade/+bug/493102>`_"))
 		((bool,dynCell,false,,"Imposed stress can be controlled using the packing stiffness or by applying the laws of dynamic (dynCell=true). Don't forget to assign a mass to the cell (PeriTriaxController->mass)."))
-		((Vector3r,goal,Vector3r::Zero(),,"Desired stress or strain values (depending on stressMask), strains defined as ``strain(i)=log(Fii)``"))
+		((Vector3r,goal,Vector3r::Zero(),,"Desired stress or strain values (depending on stressMask), strains defined as ``strain(i)=log(Fii)``.\n\n.. warning:: Strains are relative to the :yref:`O.cell.refSize<Cell.refSize>` (reference cell size), not the current one (e.g. at the moment when the new strain value is set)."))
 		((int,stressMask,((void)"all strains",0),,"mask determining strain/stress (0/1) meaning for goal components"))
 		((Vector3r,maxStrainRate,Vector3r(1,1,1),,"Maximum strain rate of the periodic cell."))
 		((Real,maxUnbalanced,1e-4,,"maximum unbalanced force."))

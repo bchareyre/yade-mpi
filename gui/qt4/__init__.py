@@ -75,6 +75,8 @@ class ControllerClass(QWidget,Ui_Controller):
 		self.refreshTimer=QtCore.QTimer()
 		self.refreshTimer.timeout.connect(self.refreshEvent)
 		self.refreshTimer.start(200)
+		self.iterPerSecTimeout=1 # how often to recompute the number of iterations per second
+		self.iterTimes,self.iterValues,self.iterPerSec=[],[],0 # arrays to keep track of the simulation speed
 		self.dtEditUpdate=True # to avoid updating while being edited
 		# show off with this one as well now
 	def addPreprocessors(self):
@@ -227,8 +229,16 @@ class ControllerClass(QWidget,Ui_Controller):
 		self.fileLabel.setText(fn if fn else '<i>[no file]</i>')
 
 	def refreshValues(self):
-		rt=int(O.realtime); t=O.time; iter=O.iter; iterPerSec=iter/(rt if rt>0 else 1.); stopAtIter=O.stopAtIter
-		if not O.running: iterPerSec=0
+		rt=int(O.realtime); t=O.time; iter=O.iter;
+		assert(len(self.iterTimes)==len(self.iterValues))
+		if len(self.iterTimes)==0: self.iterTimes.append(rt); self.iterValues.append(iter); self.iterPerSec=0 # update always for the first time
+		elif rt-self.iterTimes[-1]>self.iterPerSecTimeout: # update after a timeout
+			if len(self.iterTimes)==1: self.iterTimes.append(self.iterTimes[0]); self.iterValues.append(self.iterValues[0]) # 2 values, first one is bogus
+			self.iterTimes[0]=self.iterTimes[1]; self.iterValues[0]=self.iterValues[1]
+			self.iterTimes[1]=rt; self.iterValues[1]=iter;
+			self.iterPerSec=(self.iterValues[-1]-self.iterValues[-2])/(self.iterTimes[-1]-self.iterTimes[-2])
+		if not O.running: self.iterPerSec=0
+		stopAtIter=O.stopAtIter
 		subStepInfo=''
 		if O.subStepping:
 			subStep=O.subStep
@@ -241,11 +251,11 @@ class ControllerClass(QWidget,Ui_Controller):
 		self.subStepCheckbox.setChecked(O.subStepping) # might have been changed async
 		if stopAtIter<=iter:
 			self.realTimeLabel.setText('%02d:%02d:%02d'%(rt//3600,rt//60,rt%60))
-			self.iterLabel.setText('#%ld, %.1f/s %s'%(iter,iterPerSec,subStepInfo))
+			self.iterLabel.setText('#%ld, %.1f/s %s'%(iter,self.iterPerSec,subStepInfo))
 		else:
-			e=int((stopAtIter-iter)*iterPerSec)
+			e=int((stopAtIter-iter)*self.iterPerSec)
 			self.realTimeLabel.setText('%02d:%02d:%02d (ETA %02d:%02d:%02d)'%(rt//3600,rt//60,rt%60,e//3600,e//60,e%60))
-			self.iterLabel.setText('#%ld / %ld, %.1f/s %s'%(O.iter,stopAtIter,iterPerSec,subStepInfo))
+			self.iterLabel.setText('#%ld / %ld, %.1f/s %s'%(O.iter,stopAtIter,self.iterPerSec,subStepInfo))
 		s=int(t); ms=int(t*1000)%1000; us=int(t*1000000)%1000; ns=int(t*1000000000)%1000
 		self.virtTimeLabel.setText(u'%03ds%03dm%03dμ%03dn'%(s,ms,us,ns))
 		self.show3dButton.setChecked(len(views())>0)
