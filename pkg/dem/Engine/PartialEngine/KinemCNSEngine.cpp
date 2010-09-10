@@ -76,12 +76,12 @@ void KinemCNSEngine::action()
 //	Then computation of the angle of the rotation to be done :
 	if (alpha == Mathr::PI/2.0)	// Case of the very beginning
 	{
-		dalpha = - Mathr::ATan( dx / (Ysup_mod -Ylat_mod) );
+		dalpha = - atan( dx / (Ysup_mod -Ylat_mod) );
 	}
 	else
 	{
-		Real A = (Ysup_mod - Ylat_mod) * 2.0*Mathr::Tan(alpha) / (2.0*(Ysup - Ylat) + dx*Mathr::Tan(alpha) );
-		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
+		Real A = (Ysup_mod - Ylat_mod) * 2.0*tan(alpha) / (2.0*(Ysup - Ylat) + dx*tan(alpha) );
+		dalpha = atan( (A - tan(alpha))/(1.0 + A * tan(alpha)));
 	}
 
 	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));

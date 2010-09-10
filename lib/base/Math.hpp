@@ -95,13 +95,6 @@ struct Math{
 	static const Scalar EPSILON;
 	static const Scalar ZERO_TOLERANCE;
 	static Scalar Sign(Scalar f){ if(f<0) return -1; if(f>0) return 1; return 0; }
-	static Scalar FAbs(Scalar f){ return abs(f); }
-	static Scalar Sqrt(Scalar f){ return sqrt(f); }
-	static Scalar Log(Scalar f){ return log(f); }
-	static Scalar Exp(Scalar f){ return exp(f); }
-	static Scalar ATan(Scalar f){ return atan(f); }
-	static Scalar Tan(Scalar f){ return tan(f); }
-	static Scalar Pow(Scalar base,Scalar exponent){ return pow(base,exponent); }
 
 	static Scalar UnitRandom(){ return ((double)rand()/((double)(RAND_MAX))); }
 	static Scalar SymmetricRandom(){ return 2.*(((double)rand())/((double)(RAND_MAX)))-1.; }

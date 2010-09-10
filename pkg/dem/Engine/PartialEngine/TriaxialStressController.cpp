@@ -185,9 +185,9 @@ void TriaxialStressController::computeStressStrain()
 	if (height0 == 0) height0 = height;
 	if (width0 == 0) width0 = width;
 	if (depth0 == 0) depth0 = depth;
-	strain[0] = Mathr::Log(width0/width);
-	strain[1] = Mathr::Log(height0/height);
-	strain[2] = Mathr::Log(depth0/depth);
+	strain[0] = log(width0/width);
+	strain[1] = log(height0/height);
+	strain[2] = log(depth0/depth);
 	volumetricStrain=strain[0]+strain[1]+strain[2];
 	
 	Real invXSurface = 1.f/(height*depth);
@@ -255,7 +255,7 @@ Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
 			Real f = (static_cast<FrictPhys*> ((contact->interactionPhysics.get()))->normalForce+static_cast<FrictPhys*>(contact->interactionPhysics.get())->shearForce).squaredNorm();
 			if (f!=0)
 			{
-			MeanForce += Mathr::Sqrt(f);
+			MeanForce += sqrt(f);
 			++nForce;
 			}
 		}

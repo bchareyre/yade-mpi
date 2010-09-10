@@ -62,7 +62,7 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	Real maxFs = phys->normalForce.squaredNorm() * std::pow(phys->tangensOfFrictionAngle,2);
 	if( shearForce.squaredNorm() > maxFs )
 	{
-		maxFs = Mathr::Sqrt(maxFs) / shearForce.norm();
+		maxFs = sqrt(maxFs) / shearForce.norm();
 		shearForce *= maxFs;
 	}
 

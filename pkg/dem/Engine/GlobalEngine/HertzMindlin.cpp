@@ -195,8 +195,8 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	if (useDamping){
 		Real mbar = (!b1->isDynamic() && b2->isDynamic()) ? de2->mass : ((!b2->isDynamic() && b1->isDynamic()) ? de1->mass : (de1->mass*de2->mass / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
 		//Real mbar = de1->mass*de2->mass / (de1->mass + de2->mass); // equivalent mass
-		Real Cn_crit = 2.*Mathr::Sqrt(mbar*phys->kn); // Critical damping coefficient (normal direction)
-		Real Cs_crit = 2.*Mathr::Sqrt(mbar*phys->ks); // Critical damping coefficient (shear direction)
+		Real Cn_crit = 2.*sqrt(mbar*phys->kn); // Critical damping coefficient (normal direction)
+		Real Cs_crit = 2.*sqrt(mbar*phys->ks); // Critical damping coefficient (shear direction)
 		// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
 		cn = Cn_crit*betan; // Damping normal coefficient
 		cs = Cs_crit*betas; // Damping tangential coefficient
@@ -339,7 +339,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	Real uN = scg->penetrationDepth; // get overlapping  
 	if (uN<0) {ncb->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
 	/*** Hertz-Mindlin's formulation (PFC) ***/
-	phys->kn = phys->kno*Mathr::Sqrt(uN); // normal stiffness
+	phys->kn = phys->kno*sqrt(uN); // normal stiffness
 	Real Fn = phys->kn*uN; // normal Force (scalar)
 	phys->normalForce = Fn*scg->normal; // normal Force (vector)
 
@@ -355,7 +355,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	/*** MOHR-COULOMB LAW ***/
 	Real maxFs = phys->normalForce.squaredNorm();
 	if (trialFs.squaredNorm() > maxFs)
-	{Real ratio = Mathr::Sqrt(maxFs)/trialFs.norm(); trialFs *= ratio;}
+	{Real ratio = sqrt(maxFs)/trialFs.norm(); trialFs *= ratio;}
 	
 
 	/*** APPLY FORCES ***/

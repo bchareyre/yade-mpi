@@ -97,7 +97,7 @@ void PeriIsoCompressor::action(){
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
 	//"Natural" strain, correct for large deformations, only used for comparison with goals
-	for (int i=0;i<3;i++) strain[i]=Mathr::Log(scene->cell->trsf(i,i));
+	for (int i=0;i<3;i++) strain[i]=log(scene->cell->trsf(i,i));
 	//stress tensor and stiffness
 	
 	//Compute volume of the deformed cell
@@ -198,7 +198,7 @@ void PeriTriaxController::action()
 			
 		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
-			strain_rate = (Mathr::Exp ( goal[axis]-strain[axis] ) -1)/scene->dt;
+			strain_rate = (exp ( goal[axis]-strain[axis] ) -1)/scene->dt;
 			LOG_TRACE ( axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<strain_rate*scene->dt);
 		}		
 		// steady evolution with fluctuations; see TriaxialStressController

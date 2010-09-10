@@ -232,7 +232,7 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowe
 	sphere_list.clear();
 	long tries = 1000; //nb max of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
-	Real mean_radius = Mathr::Pow(dimensions.x()*dimensions.y()*dimensions.z()*(1-porosity)/(4.0/3.0*Mathr::PI*number),1.0/3.0);
+	Real mean_radius = pow(dimensions.x()*dimensions.y()*dimensions.z()*(1-porosity)/(4.0/3.0*Mathr::PI*number),1.0/3.0);
 	cerr << " mean radius " << mean_radius << endl;;
 
 // 	std::cerr << "generating aggregates ... ";

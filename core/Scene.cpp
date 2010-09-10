@@ -82,7 +82,7 @@ void Scene::moveToNextTimeStep(){
 		// ** 2. ** engines
 		FOREACH(const shared_ptr<Engine>& e, engines){
 			e->scene=this;
-			if(e->dead || !e->isActivated()) ;
+			if(e->dead || !e->isActivated()) continue;
 			e->action();
 			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}

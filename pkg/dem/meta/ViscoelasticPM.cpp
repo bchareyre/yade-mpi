@@ -89,7 +89,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 		// Then Mohr-Coulomb is violated (so, we slip), 
 		// we have the max value of the shear force, so 
 		// we consider only friction damping.
-		const Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
+		const Real ratio = sqrt(maxFs) / shearForce.norm();
 		shearForce *= ratio;
 	} 
 	else 

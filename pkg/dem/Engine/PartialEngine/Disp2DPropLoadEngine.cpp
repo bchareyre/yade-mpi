@@ -113,12 +113,12 @@ void Disp2DPropLoadEngine::letDisturb()
 	computeAlpha();
 	if (alpha == Mathr::PI/2.0)	// Case of the very beginning
 	{
-		dalpha = - Mathr::ATan( dgamma / (Ysup_mod -Ylat_mod) );
+		dalpha = - atan( dgamma / (Ysup_mod -Ylat_mod) );
 	}
 	else
 	{
-		Real A = (Ysup_mod - Ylat_mod) * 2.0*Mathr::Tan(alpha) / (2.0*(Ysup - Ylat) + dgamma*Mathr::Tan(alpha) );
-		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
+		Real A = (Ysup_mod - Ylat_mod) * 2.0*tan(alpha) / (2.0*(Ysup - Ylat) + dgamma*tan(alpha) );
+		dalpha = atan( (A - tan(alpha))/(1.0 + A * tan(alpha)));
 	}
 
 	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
