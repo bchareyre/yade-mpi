@@ -139,7 +139,7 @@ def createPlots(subPlots=False):
 	if subPlots:
 		# compute number of rows and colums for plots we have
 		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
-		print 'subplot',subCols,subRows
+		#print 'subplot',subCols,subRows
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip()
 		if not subPlots: pylab.figure()

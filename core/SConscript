@@ -3,13 +3,13 @@ Import('*')
 
 pyMain='$PREFIX/bin/yade$SUFFIX'
 main=env.ScanReplace('main/main.py.in')
-multi=env.ScanReplace('main/yade-multi.in')
+batch=env.ScanReplace('main/yade-batch.in')
 env.AlwaysBuild(main)
-env.AlwaysBuild(multi)
+env.AlwaysBuild(batch)
 env.InstallAs(pyMain,main)
-env.InstallAs(pyMain+'-multi',multi)
+env.InstallAs(pyMain+'-batch',batch)
 env.AddPostAction(pyMain,Chmod(pyMain,0755))
-env.AddPostAction(pyMain+'-multi',Chmod(pyMain+'-multi',0755))
+env.AddPostAction(pyMain+'-batch',Chmod(pyMain+'-batch',0755))
 
 env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.SharedLibrary('boot',['main/pyboot.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-support','core'])

@@ -7,7 +7,7 @@ These classes are used internally in gui/py/PythonUI_rc.py and are not intended 
 """
 
 import SocketServer,xmlrpclib,socket
-import sys,time,os
+import sys,time,os,math
 
 from yade import *
 import yade.runtime
@@ -30,7 +30,9 @@ class InfoProvider:
 		if len(plot.plots)==0: return None
 		fig=plot.plot(subPlots=True,noShow=True)
 		img=O.tmpFilename()+'.'+plotImgFormat
-		fig.savefig(img,dpi=200)
+		sqrtFigs=math.sqrt(len(plot.plots))
+		fig.set_size_inches(5*sqrtFigs,7*sqrtFigs)
+		fig.savefig(img)
 		f=open(img,'rb'); data=f.read(); f.close(); os.remove(img)
 		#print 'returning '+plotImgFormat
 		return xmlrpclib.Binary(data)

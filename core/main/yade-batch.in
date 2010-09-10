@@ -1,9 +1,10 @@
 #!${pyExecutable}
 # encoding: utf-8
+# vim: syntax=python
 #
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re
+import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil
 
 #socket.setdefaulttimeout(10) 
 
@@ -50,9 +51,10 @@ finished: %s
 		self.ensureXmlrpc()
 		return self.xmlrpcConn.basicInfo()
 	def updatePlots(self):
+		global opts
 		if self.status!='RUNNING': return
 		self.ensureXmlrpc()
-		if time.time()-self.plotsLastUpdate<5: return
+		if time.time()-self.plotsLastUpdate<opts.plotTimeout: return
 		self.plotsLastUpdate=time.time()
 		img=self.xmlrpcConn.plot()
 		if not img:
@@ -235,6 +237,8 @@ parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
 parser.add_option('--generate-manpage',help='Generate man page documenting this program and exit',dest='manpage',metavar='FILE')
+parser.add_option('--plot-update',type='int',dest='plotAlwaysUpdateTime',help='Interval (in seconds) at which job plots will be updated even if not requested via HTTP. Non-positive values will make the plots not being updated and saved unless requested via HTTP (see --plot-timeout for controlling maximum age of those).  Plots are saved at exit under the same name as the log file, with the .log extension removed. (default: 60 seconds)',metavar='TIME',default=60)
+parser.add_option('--plot-timeout',type='int',dest='plotTimeout',help='Maximum age (in seconds) of plots served over HTTP; they will be updated if they are older. (default: 10 seconds)',metavar='TIME',default=10)
 opts,args=parser.parse_args()
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
 
@@ -310,16 +314,28 @@ sys.stdout.flush()
 
 httpLastServe=0
 runHttpStatsServer()
+if opts.plotAlwaysUpdateTime>0:
+	# update plots periodically regardless of whether they are requested via HTTP
+	def updateAllPlots():
+		time.sleep(opts.plotAlwaysUpdateTime)
+		for job in jobs: job.updatePlots()
+	thread.start_new_thread(updateAllPlots,())
 
 # OK, go now
 if not dryRun: runJobs(jobs,maxJobs)
 
 print 'All jobs finished, total time ',t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None]))
 
+plots=[]
+for j in jobs:
+	if not os.path.exists(j.plotsFile): continue
+	f=(j.log[:-3] if j.log.endswith('.log') else j.log+'.')+yade.remote.plotImgFormat
+	shutil.copy(j.plotsFile,f)
+	plots.append(f)
+if plots: print 'Plot files:',' '.join(plots)
+
 # for easy grepping in logfiles:
-print 'Log files:'
-for job in jobs: print job.log,
-print
+print 'Log files:',' '.join([j.log for j in jobs])
 
 if not gnuplotOut:
 	print 'Bye.'
@@ -352,9 +368,9 @@ else:
 	gp.write('plot '+','.join(plots))
 	print "gnuplot",gnuplotOut
 	print "Plot written, bye."
-if httpWait and time.time()-httpLastServe<10:
+if httpWait and time.time()-httpLastServe<30:
 	print "(continue serving http until no longer requested  as per --http-wait)"
-	while time.time()-httpLastServe<10:
+	while time.time()-httpLastServe<30:
 		time.sleep(1)
 
 yade.Omega().exitNoBacktrace()

@@ -33,7 +33,7 @@ void SpherePack::fromList(const python::list& l){
 			python::extract<python::tuple> tup(t[0]);
 			if(tup.check()) { pack.push_back(Sph(Vector3r(python::extract<double>(tup[0]),python::extract<double>(tup[1]),python::extract<double>(tup[2]))),python::extract<double>(t[1])); continue; }
 		#endif
-		PyErr_SetString(PyExc_TypeError, "List elements must be (tuple or Vector3, float)!");
+		PyErr_SetString(PyExc_TypeError, "List elements must be (Vector3, float)!");
 		python::throw_error_already_set();
 	}
 };

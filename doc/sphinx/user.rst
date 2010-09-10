@@ -711,8 +711,10 @@ id
 	Unique identifier of this Yade instance (or of the instance which created a loded simulation). It is composed of date, time and process number. Useful if you run simulations in parallel and want to avoid overwriting each other's outputs; embed ``O.tags['id']`` in output filenames (either as directory name, or as part of the file's name itself) to avoid it. This is explained in :ref:`batch-output-separate` in detail.
 isoTime
 	Time when simulation was created (with second resolution).
+d.id, id.d
+	Simulation description and id joind by period (and vice-versa). Description is used in batch jobs; in non-batch jobs, these tags are identical to id.
 
-You can add your own tags by simply assigning value, with the restriction that the left-handside object must be a string:
+You can add your own tags by simply assigning value, with the restriction that the left-handside object must be a string and must not contain ``=``.
 
 .. ipython::
 	
@@ -1122,7 +1124,7 @@ Info provider
 
 This functionality is used by the batch system (described below) to be informed about individual simulation progress and estimated times. If you want to access this information yourself, you can study :ysrc:`core/main/yade-multi.in` for details.
 
-Batch queuing and execution (yade-multi)
+Batch queuing and execution (yade-batch)
 ========================================
 
 Yade features light-weight system for running one simulation with different parameters; it handles assignment of parameter values to python variables in simulation script, scheduling jobs based on number of available and required cores and more. The whole batch consists of 2 files:
@@ -1137,14 +1139,14 @@ parameter table
 
 The batch can be run as ::
 
-	yade-multi parameters.table simulation.py
+	yade-batch parameters.table simulation.py
 
 and it will intelligently run one simulation for each parameter table line.
 
 Example
 --------
 
-This example is found in :ysrc:`scripts/multi.table` and :ysrc:`scripts/multi.py`.
+This example is found in :ysrc:`scripts/batch.table` and :ysrc:`scripts/batch.py`.
 
 Suppsoe we want to study influence of parameters *density* and *initialVelocity* on position of a sphere falling on fixed box. We create parameter table like this::
 
@@ -1183,42 +1185,42 @@ after the call to :yref:`yade.utils.readParamsFromTable`, corresponding python v
 
 Let us see what happens when running the batch::
 
-	\$ yade-multi multi.table multi.py
-	Will run `/usr/local/bin/yade-trunk' on `multi.py' with nice value 10, output redirected to `multi.@.log', 4 jobs at a time.
-	Will use table `multi.table', with available lines 2, 3, 4, 5, 6, 7.
+	\$ yade-batch batch.table batch.py
+	Will run `/usr/local/bin/yade-trunk' on `batch.py' with nice value 10, output redirected to `batch.@.log', 4 jobs at a time.
+	Will use table `batch.table', with available lines 2, 3, 4, 5, 6, 7.
 	Will use lines  2 (reference), 3 (hi_v), 4 (lo_v), 5 (hi_rho), 6 (hi_rho_v), 7 (hi_rh0_lo_v).
 	Master process pid 7030
 
 These lines inform us about general batch information: `nice <http://en.wikipedia.org/wiki/Nice_%28Unix%29>`_ level, log file names, how many cores will be used (4); table name, and line numbers that contain parameters; finally, which lines will be used; master `PID <http://en.wikipedia.org/wiki/Process_identifier>`_ is useful for killing (stopping) the whole batch with the ``kill`` command. ::
 
 	Job summary:
-	   #0 (reference/4): PARAM_TABLE=multi.table:2 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x multi.py > multi.reference.log 2>&1
-	   #1 (hi_v/4): PARAM_TABLE=multi.table:3 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x multi.py > multi.hi_v.log 2>&1
-	   #2 (lo_v/4): PARAM_TABLE=multi.table:4 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x multi.py > multi.lo_v.log 2>&1
-	   #3 (hi_rho/4): PARAM_TABLE=multi.table:5 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x multi.py > multi.hi_rho.log 2>&1
-	   #4 (hi_rho_v/4): PARAM_TABLE=multi.table:6 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x multi.py > multi.hi_rho_v.log 2>&1
-	   #5 (hi_rh0_lo_v/4): PARAM_TABLE=multi.table:7 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x multi.py > multi.hi_rh0_lo_v.log 2>&1
+	   #0 (reference/4): PARAM_TABLE=batch.table:2 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x batch.py > batch.reference.log 2>&1
+	   #1 (hi_v/4): PARAM_TABLE=batch.table:3 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x batch.py > batch.hi_v.log 2>&1
+	   #2 (lo_v/4): PARAM_TABLE=batch.table:4 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x batch.py > batch.lo_v.log 2>&1
+	   #3 (hi_rho/4): PARAM_TABLE=batch.table:5 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x batch.py > batch.hi_rho.log 2>&1
+	   #4 (hi_rho_v/4): PARAM_TABLE=batch.table:6 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x batch.py > batch.hi_rho_v.log 2>&1
+	   #5 (hi_rh0_lo_v/4): PARAM_TABLE=batch.table:7 DISPLAY=  /usr/local/bin/yade-trunk --threads=4 --nice=10 -x batch.py > batch.hi_rh0_lo_v.log 2>&1
 
 displays all jobs with command-lines that will be run for each of them. At this moment, the batch starts to be run. ::
 
 	#0 (reference/4) started on Tue Apr 13 13:59:32 2010
-	#0 (reference/4) done    (exit status 0), duration 00:00:01, log multi.reference.log
+	#0 (reference/4) done    (exit status 0), duration 00:00:01, log batch.reference.log
 	#1 (hi_v/4) started on Tue Apr 13 13:59:34 2010
-	#1 (hi_v/4) done    (exit status 0), duration 00:00:01, log multi.hi_v.log
+	#1 (hi_v/4) done    (exit status 0), duration 00:00:01, log batch.hi_v.log
 	#2 (lo_v/4) started on Tue Apr 13 13:59:35 2010
-	#2 (lo_v/4) done    (exit status 0), duration 00:00:01, log multi.lo_v.log
+	#2 (lo_v/4) done    (exit status 0), duration 00:00:01, log batch.lo_v.log
 	#3 (hi_rho/4) started on Tue Apr 13 13:59:37 2010
-	#3 (hi_rho/4) done    (exit status 0), duration 00:00:01, log multi.hi_rho.log
+	#3 (hi_rho/4) done    (exit status 0), duration 00:00:01, log batch.hi_rho.log
 	#4 (hi_rho_v/4) started on Tue Apr 13 13:59:38 2010
-	#4 (hi_rho_v/4) done    (exit status 0), duration 00:00:01, log multi.hi_rho_v.log
+	#4 (hi_rho_v/4) done    (exit status 0), duration 00:00:01, log batch.hi_rho_v.log
 	#5 (hi_rh0_lo_v/4) started on Tue Apr 13 13:59:40 2010
-	#5 (hi_rh0_lo_v/4) done    (exit status 0), duration 00:00:01, log multi.hi_rh0_lo_v.log
+	#5 (hi_rh0_lo_v/4) done    (exit status 0), duration 00:00:01, log batch.hi_rh0_lo_v.log
 
 information about job status changes is being printed, until::
 
 	All jobs finished, total time  00:00:08
 	Log files:
-	multi.reference.log multi.hi_v.log multi.lo_v.log multi.hi_rho.log multi.hi_rho_v.log multi.hi_rh0_lo_v.log
+	batch.reference.log batch.hi_v.log batch.lo_v.log batch.hi_rho.log batch.hi_rho_v.log batch.hi_rh0_lo_v.log
 	Bye.
 
 .. batch-output-separate:
@@ -1260,9 +1262,9 @@ If number of cores for a job exceeds total number of cores, warning is issued an
 Merging gnuplot from individual jobs
 -------------------------------------
 
-Frequently, it is desirable to obtain single figure for all jobs in the batch, for comparison purposes. Somewhat heiristic way for this functionality is provided by the batch system. ``yade-multi`` must be run with the ``--gnuplot`` option, specifying some file name that will be used for the merged figure::
+Frequently, it is desirable to obtain single figure for all jobs in the batch, for comparison purposes. Somewhat heiristic way for this functionality is provided by the batch system. ``yade-batch`` must be run with the ``--gnuplot`` option, specifying some file name that will be used for the merged figure::
 
-	yade-trunk --gnuplot merged.gnuplot multi.table multi.py
+	yade-trunk --gnuplot merged.gnuplot batch.table batch.py
 
 Data are collected in usual way during the simulation (using :yref:`yade.plot.addData`) and saved to gnuplot file via :yref:`yade.plot.saveGnuplot` (it creates 2 files: gnuplot command file and compressed data file). The batch system *scans*, once the job is finished, log file for line of the form ``gnuplot [something]``. Therefore, in onrder to print this *magic line* we put::
 
