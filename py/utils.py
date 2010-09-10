@@ -341,7 +341,7 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
 	
-def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,closed=1,**kw):
+def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=2.0*math.pi,**kw):
 	"""
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
@@ -359,6 +359,7 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 				number of edges on the cylinder surface (>=5)
 			`wallMask`: bitmask
 				determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
+			`angleRange`: this variable allows to create only part of cylinder, 2.0*math.pi means the whole cylinder, 1.0*math.pi - the half etc;
 			`**kw`: (unused keyword arguments)
 				passed to utils.facet;
 	"""
@@ -375,7 +376,7 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 		wallMask=7
 	# ___________________________
 	import numpy
-	anglesInRad = numpy.linspace(0, 2.0*math.pi, segmentsNumber+1, endpoint=True)
+	anglesInRad = numpy.linspace(0, angleRange, segmentsNumber+1, endpoint=True)
 	P1=[]; P2=[]
 	P1.append(Vector3(0,0,-height/2))
 	P2.append(Vector3(0,0,+height/2))
