@@ -388,7 +388,9 @@ if not env.GetOption('clean'):
 			ok=conf.CheckLibWithHeader(['qglviewer-qt4'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1)
 			okFedora=conf.CheckLibWithHeader(['libQGLViewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1)
 			if not (ok or okFedora): featureNotOK('opengl','Building with Qt4 implies the QGLViewer library installed (package libqglviewer-qt4-dev package in debian/ubuntu or libQGLViewer in RPM-based distros)')
-			env['QGLVIEWER_LIB']='qglviewer-qt4';
+			if ok: env['QGLVIEWER_LIB']='qglviewer-qt4';
+			if okFedora: env['QGLVIEWER_LIB']='libQGLViewer';
+			
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
