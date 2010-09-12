@@ -64,6 +64,15 @@ Most of the list above is very likely already packaged for your distribution. In
 	binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
 	libqglviewer-qt4-dev
 
+command line (cut&paste to the terminal under root privileges) for Fedora (not good tested yet!)::
+	yum install scons qt3-devel freeglut-devel boost-devel boost-date-time \
+	boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
+	log4cxx log4cxx-devel python-devel boost-python ipython python-matplotlib \
+	sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
+	graphviz-python vtk-devel ScientificPython bzr eigen2-devel libQGLViewer-devel \
+	loki-lib-devel python-xlib PyQt4 PyQt4-devel
+
+
 Compilation
 ^^^^^^^^^^^
 
