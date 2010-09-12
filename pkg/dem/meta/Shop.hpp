@@ -102,6 +102,7 @@ class Shop{
 		static Real kineticEnergy(Scene* _rb=NULL, Body::id_t* maxId=NULL);
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 
+
 		//! create transientInteraction between 2 bodies, using existing Dispatcher in Omega
 		static shared_ptr<Interaction> createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool force);
 
@@ -129,4 +130,6 @@ class Shop{
 		//! Function of getting stresses for each body
 		static void getStressForEachBody(vector<Shop::bodyState>&);
 
+		//! Function to compute overall ("macroscopic") stress of periodic cell
+		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
 };
