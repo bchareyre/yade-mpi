@@ -1,7 +1,7 @@
 #!${pyExecutable}
 # encoding: utf-8
-# vim: syntax=python
 #
+# vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil
@@ -130,7 +130,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 			plotMatch=re.match('/jobs/([0-9]+)/plots',self.path)
 			if plotMatch:
 				jobId=int(plotMatch.group(1));
-				if jobId>=len(jobs): self.send_error(404)
+				if jobId>=len(jobs) or not os.path.exists(jobs[jobId].plotsFile): self.send_error(404)
 				jobs[jobId].updatePlots() # internally checks for last update time
 				self.sendFile(jobs[jobId].plotsFile,contentType=yade.remote.plotImgMimetype,refresh=5)
 				return
@@ -152,7 +152,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		return
 	def log_request(self,req): pass
 	def sendGlobal(self):
-		html='<HTML><TITLE>Yade-multi at %s overview</TITLE><BODY>\n'%(socket.gethostname())
+		html='<HTML><TITLE>Yade-batch at %s overview</TITLE><BODY>\n'%(socket.gethostname())
 		html+=globalHtmlStats()
 		html+='<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>slots</th><th>plots</th><th>command</th></tr>\n'
 		for j in jobs: html+=j.htmlStats()+'\n'
@@ -194,7 +194,13 @@ def runJob(job):
 	job.duration=t2hhmmss(dt)
 	strStatus='done   ' if job.exitStatus==0 else 'FAILED '
 	job.status='DONE'
-	print "#%d (%s%s) %s (exit status %d), duration %s, log %s"%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,strStatus,job.exitStatus,job.duration,job.log)
+	havePlot=False
+	if os.path.exists(job.plotsFile):
+		f=(job.log[:-3] if job.log.endswith('.log') else job.log+'.')+yade.remote.plotImgFormat
+		shutil.copy(job.plotsFile,f)
+		job.plotsFile=f
+		havePlot=True
+	print "#%d (%s%s) %s (exit status %d), duration %s, log %s%s"%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,strStatus,job.exitStatus,job.duration,job.log,(', plot %s'%(job.plotsFile) if havePlot else ''))
 	job.saveInfo()
 	
 def runJobs(jobs,numSlots):
@@ -229,7 +235,7 @@ parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number o
 parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job."%numCores,metavar='NUM',default=numCores)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads')
 parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
-parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-multi itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
+parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%executable,default=executable,metavar='FILE')
@@ -329,9 +335,7 @@ print 'All jobs finished, total time ',t2hhmmss(sum([j.finished-j.started for j 
 plots=[]
 for j in jobs:
 	if not os.path.exists(j.plotsFile): continue
-	f=(j.log[:-3] if j.log.endswith('.log') else j.log+'.')+yade.remote.plotImgFormat
-	shutil.copy(j.plotsFile,f)
-	plots.append(f)
+	plots.append(j.plotsFile)
 if plots: print 'Plot files:',' '.join(plots)
 
 # for easy grepping in logfiles:

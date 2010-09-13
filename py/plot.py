@@ -81,6 +81,13 @@ def reverseData():
 	"""
 	for k in data: data[k].reverse()
 
+def addDataColumns(dd):
+	'''Add new columns with NaN data, without adding anything to other columns. Does nothing for columns that already exist'''
+	numSamples=len(data[data.keys()[0]]) if len(data)>0 else 0
+	for d in dd:
+		if d in data.keys(): continue
+		d[d]=[nan for i in range(numSamples)]
+
 def addData(*d_in,**kw):
 	"""Add data from arguments name1=value1,name2=value2 to yade.plot.data.
 	(the old {'name1':value1,'name2':value2} is deprecated, but still supported)
@@ -156,7 +163,9 @@ def createPlots(subPlots=False):
 			if d[0] not in data.keys(): missing.add(d[0])
 		if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
 			for m in missing: data[m]=[]
-		else: addData(dict((m,nan) for m in missing))
+		else:
+			print 'Missing columns in plot.data, adding NaN: ',','.join(list(missing))
+			addDataColumns(missing)
 		# create y1 lines
 		for d in plots_p_y1:
 			line,=pylab.plot(data[pStrip],data[d[0]],d[1])

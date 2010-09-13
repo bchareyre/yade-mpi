@@ -788,7 +788,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		vv=allTab[tableLine]
 		O.tags['line']='l%d'%tableLine
 		O.tags['description']=vv['description']
-		O.tags['d.id']=O.tags['id']+'.'+O.tags['description']; O.tags['id.d']=O.tags['description']+'.'+O.tags['id']
+		O.tags['id.d']=O.tags['id']+'.'+O.tags['description']; O.tags['d.id']=O.tags['description']+'.'+O.tags['id']
 		# assign values specified in the table to python vars
 		# !something cols are skipped, those are env vars we don't treat at all (they are contained in description, though)
 		for col in vv.keys():
