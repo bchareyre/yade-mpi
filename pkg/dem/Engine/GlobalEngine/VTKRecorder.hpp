@@ -13,6 +13,7 @@ class VTKRecorder: public PeriodicEngine {
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(VTKRecorder,PeriodicEngine,"Engine recording snapshots of simulation into series of *.vtu files, readable by VTK-based postprocessing programs such as Paraview. Both bodies (spheres and facets) and interactions can be recorded, with various vector/scalar quantities that are defined on them.\n\n:yref:`PeriodicEngine.initRun` is initialized to ``True`` automatically.",
 		((bool,compress,false,,"Compress output XML files [experimental]."))
+		((bool,ascii,false,,"Store data as readable text in the XML file (sets `vtkXMLWriter <http://www.vtk.org/doc/nightly/html/classvtkXMLWriter.html>`__ data mode to ``vtkXMLWriter::Ascii``, while the default is ``Appended``"))
 		((bool,skipFacetIntr,true,,"Skip interactions with facets, when saving interactions"))
 		((bool,skipNondynamic,false,,"Skip non-dynamic spheres (but not facets)."))
 		#ifdef YADE_VTK_MULTIBLOCK

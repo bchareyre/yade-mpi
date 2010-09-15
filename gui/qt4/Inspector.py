@@ -11,7 +11,7 @@ class EngineInspector(QWidget):
 	def __init__(self,parent=None):
 		QWidget.__init__(self,parent)
 		grid=QGridLayout(self); grid.setSpacing(0); grid.setMargin(0)
-		self.serEd=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine)
+		self.serEd=SeqSerializable(parent=None,getter=lambda:O.engines,setter=lambda x:setattr(O,'engines',x),serType=Engine,path='O.engines')
 		grid.addWidget(self.serEd)
 		self.setLayout(grid)
 #class MaterialsInspector(QWidget):
@@ -41,7 +41,7 @@ class CellInspector(QWidget):
 		editor=self.scroll.widget()
 		if not O.periodic and editor: self.scroll.takeWidget()
 		if (O.periodic and not editor) or (editor and editor.ser!=O.cell):
-			self.scroll.setWidget(SerializableEditor(O.cell,parent=self,showType=True))
+			self.scroll.setWidget(SerializableEditor(O.cell,parent=self,showType=True,path='O.cell'))
 	def update(self):
 		self.scroll.takeWidget() # do this before changing periodicity, otherwise the SerializableEditor will raise exception about None object
 		O.periodic=self.periCheckBox.isChecked()
@@ -134,7 +134,7 @@ class BodyInspector(QWidget):
 	def tryShowBody(self):
 		try:
 			b=O.bodies[self.bodyId]
-			self.serEd=SerializableEditor(b,showType=True,parent=self)
+			self.serEd=SerializableEditor(b,showType=True,parent=self,path='O.bodies[%d]'%self.bodyId)
 		except IndexError:
 			self.serEd=QFrame(self)
 			self.bodyId=-1
@@ -225,7 +225,7 @@ class InteractionInspector(QWidget):
 	def setupInteraction(self):
 		try:
 			intr=O.interactions[self.ids[0],self.ids[1]]
-			self.serEd=SerializableEditor(intr,showType=True,parent=self.scroll)
+			self.serEd=SerializableEditor(intr,showType=True,parent=self.scroll,path='O.interactions[%d,%d]'%(self.ids[0],self.ids[1]))
 			self.scroll.setWidget(self.serEd)
 			self.gotoId1Button.setText('#'+makeBodyLabel(O.bodies[self.ids[0]]))
 			self.gotoId2Button.setText('#'+makeBodyLabel(O.bodies[self.ids[1]]))

@@ -256,13 +256,14 @@ class SerializableEditor(QFrame):
 	import logging
 	# each attribute has one entry associated with itself
 	class EntryData:
-		def __init__(self,name,T):
-			self.name,self.T=name,T
+		def __init__(self,name,T,flags=0):
+			self.name,self.T,self.flags=name,T,flags
 			self.lineNo,self.widget=None,None
-	def __init__(self,ser,parent=None,ignoredAttrs=set(),showType=False):
+	def __init__(self,ser,parent=None,ignoredAttrs=set(),showType=False,path=None):
 		"Construct window, *ser* is the object we want to show."
 		QtGui.QFrame.__init__(self,parent)
 		self.ser=ser
+		self.path=(ser.label if hasattr(ser,'label') else path)
 		self.showType=showType
 		self.hot=False
 		self.entries=[]
@@ -326,13 +327,15 @@ class SerializableEditor(QFrame):
 			# hack for Se3, which is returned as (Vector3,Quaternion) in python
 			elif isinstance(val,tuple) and len(val)==2 and val[0].__class__==Vector3 and val[1].__class__==Quaternion: t=Se3FakeType
 			else: t=val.__class__
+			match=re.search(':yattrflags:`\s*([0-9]+)\s*`',doc) # non-empty attribute
+			flags=int(match.group(1)) if match else 0
 			#logging.debug('Attr %s is of type %s'%(attr,((t[0].__name__,) if isinstance(t,tuple) else t.__name__)))
 			self.entries.append(self.EntryData(name=attr,T=t))
 	def getDocstring(self,attr=None):
 		"If attr is *None*, return docstring of the Serializable itself"
 		doc=(getattr(self.ser.__class__,attr).__doc__ if attr else self.ser.__class__.__doc__)
-		if not doc: return None
-		doc=re.sub(':y(attrtype|default):`[^`]*`','',doc)
+		if not doc: return ''
+		doc=re.sub(':y(attrtype|default|attrflags):`[^`]*`','',doc)
 		doc=re.sub(':yref:`([^`]*)`','\\1',doc)
 		import textwrap
 		wrapper=textwrap.TextWrapper(replace_whitespace=False)
@@ -345,6 +348,7 @@ class SerializableEditor(QFrame):
 		if Klass:
 			widget=Klass(self,getter=getter,setter=setter)
 			widget.setFocusPolicy(Qt.StrongFocus)
+			if (entry.flags & AttrFlags.pyReadonly): widget.setEnabled(False)
 			return widget
 		# sequences
 		if entry.T.__class__==tuple:
@@ -352,7 +356,7 @@ class SerializableEditor(QFrame):
 			# sequence of serializables
 			T=entry.T[0]
 			if (issubclass(T,Serializable) or T==Serializable):
-				widget=SeqSerializable(self,getter,setter,T)
+				widget=SeqSerializable(self,getter,setter,T,path=(self.path+'.'+entry.name if self.path else None))
 				return widget
 			if (T in _fundamentalEditorMap):
 				widget=SeqFundamentalEditor(self,getter,setter,T)
@@ -360,7 +364,11 @@ class SerializableEditor(QFrame):
 			return None
 		# a serializable
 		if issubclass(entry.T,Serializable) or entry.T==Serializable:
-			widget=SerializableEditor(getattr(self.ser,entry.name),parent=self,showType=self.showType)
+			obj=getattr(self.ser,entry.name)
+			if hasattr(obj,'label') and obj.label: path=obj.label
+			elif self.path: path=self.path+'.'+entry.name
+			else: path=None
+			widget=SerializableEditor(getattr(self.ser,entry.name),parent=self,showType=self.showType,path=(self.path+'.'+entry.name if self.path else None))
 			widget.setFrameShape(QFrame.Box); widget.setFrameShadow(QFrame.Raised); widget.setLineWidth(1)
 			return widget
 		return None
@@ -373,11 +381,11 @@ class SerializableEditor(QFrame):
 		if self.showType:
 			lab=QLabel(makeSerializableLabel(self.ser,addr=True,href=True))
 			lab.setFrameShape(QFrame.Box); lab.setFrameShadow(QFrame.Sunken); lab.setLineWidth(2); lab.setAlignment(Qt.AlignHCenter); lab.linkActivated.connect(yade.qt.openUrl)
-			lab.setToolTip(self.getDocstring())
+			lab.setToolTip(('<b>'+self.path+'</b><br>' if self.path else '')+self.getDocstring())
 			grid.setWidget(0,QFormLayout.SpanningRole,lab)
 		for entry in self.entries:
 			entry.widget=self.mkWidget(entry)
-			label=QLabel(self); label.setText(serializableHref(self.ser,entry.name)); label.setToolTip(self.getDocstring(entry.name)); label.linkActivated.connect(yade.qt.openUrl)
+			label=QLabel(self); label.setText(serializableHref(self.ser,entry.name)); label.setToolTip(('<b>'+self.path+'.'+entry.name+'</b><br>' if self.path else '')+self.getDocstring(entry.name)); label.linkActivated.connect(yade.qt.openUrl)
 			grid.addRow(label,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
 		self.setLayout(grid)
 		self.refreshEvent()
@@ -403,9 +411,9 @@ def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1,count=-1
 	return ret
 
 class SeqSerializableComboBox(QFrame):
-	def __init__(self,parent,getter,setter,serType):
+	def __init__(self,parent,getter,setter,serType,path=None):
 		QFrame.__init__(self,parent)
-		self.getter,self.setter,self.serType=getter,setter,serType
+		self.getter,self.setter,self.serType,self.path=getter,setter,serType,path
 		self.layout=QVBoxLayout(self)
 		topLineFrame=QFrame(self)
 		topLineLayout=QHBoxLayout(topLineFrame);
@@ -440,7 +448,7 @@ class SeqSerializableComboBox(QFrame):
 		self.combo.setEnabled(ix>=0)
 		if ix>=0:
 			ser=currSeq[ix]
-			self.seqEdit=SerializableEditor(ser,parent=self,showType=seqSerializableShowType)
+			self.seqEdit=SerializableEditor(ser,parent=self,showType=seqSerializableShowType,path=(self.path+'['+str(ix)+']' if self.path else None))
 			self.scroll.setWidget(self.seqEdit)
 		else:
 			self.scroll.setWidget(QFrame())

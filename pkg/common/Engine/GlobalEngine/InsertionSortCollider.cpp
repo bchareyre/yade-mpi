@@ -249,6 +249,7 @@ void InsertionSortCollider::action(){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel; it seems that there is no time gain running in parallel, though
 				// important to reset loInx for periodic simulation (!!)
 				for(int i=0; i<3; i++) { BB[i].loIdx=0; std::sort(BB[i].vec.begin(),BB[i].vec.end()); }
+				numReinit++;
 			} else { // sortThenCollide
 				if(!periodic) for(int i=0; i<3; i++) insertionSort(BB[i],interactions,scene,false);
 				else for(int i=0; i<3; i++) insertionSortPeri(BB[i],interactions,scene,false);

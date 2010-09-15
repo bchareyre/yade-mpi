@@ -17,12 +17,10 @@ import yade, yade.utils, yade.config, yade.remote
 
 
 class JobInfo():
-	def __init__(self,num,id,command,log,nSlots):
+	def __init__(self,num,id,command,hrefCommand,log,nSlots,script,table,lineNo):
 		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
-		self.command=command; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots; self.infoSocket=None
-		match=re.match('(.* > )(.*)( 2>&1)',self.command)
-		self.commandHref=(match.group(1)+'<a href="jobs/%d/log">'%self.num+match.group(2)+'</a>'+match.group(3)) if match else self.command
-		#print self.commandHref
+		self.command=command; self.hrefCommand=hrefCommand; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots; self.infoSocket=None
+		self.script=script; self.table=table; self.lineNo=lineNo
 		self.hasXmlrpc=False
 		self.status='PENDING'
 		self.threadNum=None
@@ -96,8 +94,7 @@ finished: %s
 			img='<img src="/jobs/%d/plots" width="300px" alt="[plots]">'%(self.num)
 			ret+='<td><a href="/jobs/%d/plots">%s</a></td>'%(self.num,img)
 		else: ret+='<td> (no plots) </td>'
-		if self.status=='PENDING': ret+='<td>%s</td>'%self.command
-		else: ret+='<td>%s</td>'%self.commandHref
+		ret+='<td>%s</td>'%self.hrefCommand
 		ret+='</tr>'
 		return ret
 def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
@@ -126,29 +123,34 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 	def do_GET(self):
 		if not self.path or self.path=='/': self.sendGlobal()
 		else:
-			#print 'Document',self.path,'requested'
-			plotMatch=re.match('/jobs/([0-9]+)/plots',self.path)
-			if plotMatch:
-				jobId=int(plotMatch.group(1));
-				if jobId>=len(jobs) or not os.path.exists(jobs[jobId].plotsFile): self.send_error(404)
-				jobs[jobId].updatePlots() # internally checks for last update time
-				self.sendFile(jobs[jobId].plotsFile,contentType=yade.remote.plotImgMimetype,refresh=5)
-				return
-			logMatch=re.match('/jobs/([0-9]+)/log',self.path)
-			if logMatch:
-				jobId=int(logMatch.group(1));
-				if jobId>=len(jobs): self.send_error(404)
+			jobMatch=re.match('/jobs/([0-9]+)/(.*)',self.path)
+			if not jobMatch:
+				self.send_error(404); return
+			jobId=int(jobMatch.group(1))
+			if jobId>=len(jobs):
+				self.send_error(404); return
+			job=jobs[jobId]
+			rest=jobMatch.group(2)
+			if rest=='plots':
+				job.updatePlots() # internally checks for last update time
+				self.sendFile(job.plotsFile,contentType=yade.remote.plotImgMimetype,refresh=(0 if job.status=='DONE' else 5))
+			elif rest=='log':
+				if not os.path.exists(job.log):
+					self.send_error(404); return
 				## once we authenticate properly, send the whole file
-				## self.sendFile(jobs[jobId].log,contentType='text/plain',refresh=5)
+				## self.sendTextFile(jobs[jobId].log,refresh=5)
 				## now we have to filter away the cookie
 				cookieRemoved=False; data=''
-				for l in open(jobs[jobId].log):
+				for l in open(job.log):
 					if not cookieRemoved and l.startswith('TCP python prompt on'):
 						ii=l.find('auth cookie `'); l=l[:ii+13]+'******'+l[ii+19:]; cookieRemoved=True
 					data+=l
-				self.sendHttp(data,contentType='text/plain',refresh=5)
-				return
-			self.send_error(404)
+				self.sendHttp(data,contentType='text/plain;charset=utf-8;',refresh=(0 if job.status=='DONE' else 5))
+			elif rest=='script':
+				self.sendPygmentizedFile(job.script,linenostep=5)
+			elif rest=='table':
+				self.sendPygmentizedFile(job.table,hl_lines=[job.lineNo],linenostep=1)
+			else: self.send_error(404)
 		return
 	def log_request(self,req): pass
 	def sendGlobal(self):
@@ -158,7 +160,13 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		for j in jobs: html+=j.htmlStats()+'\n'
 		html+='</TABLE></BODY></HTML>'
 		self.sendHttp(html,contentType='text/html',refresh=5) # refresh sent as header
+	def sendTextFile(self,fileName,**headers):
+		if not os.path.exists(fileName): self.send_error(404); return
+		import codecs
+		f=codecs.open(f,encoding='utf-8')
+		self.sendHttp(f.read(),contentType='text/plain;charset=utf-8;',**headers)
 	def sendFile(self,fileName,contentType,**headers):
+		if not os.path.exists(fileName): self.send_error(404); return
 		f=open(fileName)
 		self.sendHttp(f.read(),contentType=contentType,**headers)
 	def sendHttp(self,data,contentType,**headers):
@@ -169,6 +177,18 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		self.wfile.write(data)
 		global httpLastServe
 		httpLastServe=time.time()
+	def sendPygmentizedFile(self,f,**kw):
+		if not os.path.exists(f):
+			self.send_error(404); return
+		try:
+			import codecs
+			from pygments import highlight
+			from pygments.lexers import PythonLexer
+			from pygments.formatters import HtmlFormatter
+			data=highlight(codecs.open(f,encoding='utf-8').read(),PythonLexer(),HtmlFormatter(linenos=True,full=True,encoding='utf-8',title=os.path.abspath(f),**kw))
+			self.sendHttp(data,contentType='text/html;charset=utf-8;')
+		except ImportError:
+			self.sendTextFile(f)
 def runHttpStatsServer():
 	maxPort=11000; port=9080
 	while port<maxPort:
@@ -309,7 +329,13 @@ for i,l in enumerate(useLines):
 			nSlots=maxJobs
 		else:
 			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
-	jobs.append(JobInfo(i,params[l]['description'],'PARAM_TABLE=%s:%d DISPLAY= %s %s --threads=%d %s -x %s > %s 2>&1'%(table,l,' '.join(envVars),executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',simul,pipes.quote(logFile)),logFile,nSlots))
+	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
+	env='PARAM_TABLE=<a href="/jobs/%d/table">%s:%d</a> DISPLAY= %s '%(i,table,l,' '.join(envVars))
+	cmd='%s --threads=%d %s -x <a href="/jobs/%d/script">%s</a>'%(executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',i,simul)
+	log='> <a href="jobs/%d/log">%s</a> 2>&1'%(i,pipes.quote(logFile))
+	hrefCmd=env+cmd+log
+	fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
+	jobs.append(JobInfo(i,params[l]['description'],fullCmd,hrefCmd,logFile,nSlots,script=simul,table=table,lineNo=l))
 
 print "Master process pid",os.getpid()
 

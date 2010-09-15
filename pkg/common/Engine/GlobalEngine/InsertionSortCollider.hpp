@@ -206,7 +206,9 @@ class InsertionSortCollider: public Collider{
 		((Real,binCoeff,5,,"Coefficient of bins for velocities, i.e. if ``binCoeff==5``, successive bins have 5 × smaller velocity peak than the previous one. (Passed to VelocityBins)"))
 		((Real,binOverlap,0.8,,"Relative bins hysteresis, to avoid moving body back and forth if its velocity is around the border value. (Passed to VelocityBins)"))
 		((Real,maxRefRelStep,.3,,"(Passed to VelocityBins)"))
-		((int,histInterval,100,,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins.")),
+		((int,histInterval,100,,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins."))
+		((int,numReinit,0,Attr::pyReadonly,"Cummulative number of bound array re-initialization."))
+		,
 		/* ctor */
 			#ifdef ISC_TIMING
 				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);

@@ -161,11 +161,12 @@ def createPlots(subPlots=False):
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
 			if d[0] not in data.keys(): missing.add(d[0])
-		if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
-			for m in missing: data[m]=[]
-		else:
-			print 'Missing columns in plot.data, adding NaN: ',','.join(list(missing))
-			addDataColumns(missing)
+		if missing:
+			if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
+				for m in missing: data[m]=[]
+			else:
+				print 'Missing columns in plot.data, adding NaN: ',','.join(list(missing))
+				addDataColumns(missing)
 		# create y1 lines
 		for d in plots_p_y1:
 			line,=pylab.plot(data[pStrip],data[d[0]],d[1])

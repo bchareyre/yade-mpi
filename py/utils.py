@@ -775,7 +775,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	tagsParams=[]
 	# dictParams is what eventually ends up in yade.params.table (default+specified values)
 	dictDefaults,dictParams,dictAssign={},{},{}
-	import os, __builtin__,re
+	import os, __builtin__,re,math
 	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
 		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
 		O.tags['line']='l!'
@@ -798,7 +798,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 			elif col in kw.keys(): kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
 			#print 'ASSIGN',col,vv[col]
 			tagsParams+=['%s=%s'%(col,vv[col])];
-			dictParams[col]=eval(vv[col])
+			dictParams[col]=eval(vv[col],math.__dict__)
 	# assign remaining (default) keys to python vars
 	defaults=[]
 	for k in kw.keys():
