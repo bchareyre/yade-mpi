@@ -19,6 +19,15 @@ class TestEngines(unittest.TestCase): pass
 class TestIO(unittest.TestCase): pass
 class TestTags(unittest.TestCase): pass 
 
+
+class TestCell(unittest.TestCase):
+	def setUp(self):
+		O.reset(); O.periodic=True
+	def testAttributesAreCrossUpdated(self):
+		"updates Hsize automatically when refSize is updated"
+		O.cell.refSize=(2.55,11,45)
+		self.assert_(O.cell.Hsize==Matrix3(2.55,0,0, 0,11,0, 0,0,45));
+
 class TestMaterialStateAssociativity(unittest.TestCase):
 	def setUp(self): O.reset()
 	def testThrowsAtBadCombination(self):

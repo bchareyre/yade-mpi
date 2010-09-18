@@ -29,6 +29,7 @@ if debug:
 par.add_option('-n',help="Run without graphical interface (equivalent to unsetting the DISPLAY environment variable)",dest='nogui',action='store_true')
 par.add_option('--generate-manpage',help="Generate man page documenting this program and exit",dest='manpage',metavar='FILE')
 par.add_option('--rebuild',help="Re-run build in the source directory, then run the updated yade with the same command line except --rebuild. The build profile for this build (${profile}) and its stored parameters will be used.",dest='rebuild',action='store_true')
+par.add_option('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
 par.disable_interspersed_args()
 
 opts,args=par.parse_args()
@@ -45,6 +46,26 @@ if opts.rebuild:
 	argv=[v for v in sys.argv if v!='--rebuild']
 	print 'Running yade using',' '.join(argv)
 	sys.exit(subprocess.call(argv))
+
+# run regression test suite and exit
+if opts.test:
+	import yade.tests
+	try:
+		result=yade.tests.testAll()
+	except:
+		print 20*'*'+' UNEXPECTED EXCEPTION WHILE RUNNING TESTS '+20*'*'
+		print 20*'*'+' '+str(sys.exc_info()[0])
+		print 20*'*'+" Please report bug at http://bugs.launchpad.net/yade providing the following traceback:"
+		import traceback; traceback.print_exc()
+		print 20*'*'+' Thank you '+20*'*'
+		sys.exit(2)
+	if result.wasSuccessful():
+		print "*** ALL TESTS PASSED ***"
+		sys.exit(0)
+	else:
+		print 20*'*'+' SOME TESTS FAILED '+20*'*'
+		sys.exit(1)
+
 
 # c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
 # do this early, to have debug messages in the boot code (plugin registration etc)

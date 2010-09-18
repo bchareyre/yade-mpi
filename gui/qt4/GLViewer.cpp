@@ -20,6 +20,9 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/version.hpp>
 #include<boost/python.hpp>
+#include<sstream>
+#include<iomanip>
+#include<boost/algorithm/string/case_conv.hpp>
 #include<yade/lib-serialization/ObjectIO.hpp>
 
 #include<QtGui/qevent.h>
@@ -30,6 +33,36 @@ using namespace boost;
 	#include<gl2ps.h>
 #endif
 
+YADE_PLUGIN((SnapshotEngine));
+
+/*****************************************************************************
+*********************************** SnapshotEngine ***************************
+*****************************************************************************/
+
+CREATE_LOGGER(SnapshotEngine);
+void SnapshotEngine::action(){
+	shared_ptr<GLViewer> glv;
+	const int viewNo=0;
+	if(!OpenGLManager::self || ((size_t)viewNo>=OpenGLManager::self->views.size()) || !(glv=OpenGLManager::self->views[viewNo])){
+		if(!ignoreErrors) throw invalid_argument("View #"+lexical_cast<string>(viewNo)+" doesn't exist.");
+		return;
+	}
+	ostringstream fss; fss<<fileBase<<setw(5)<<setfill('0')<<counter++<<"."<<boost::algorithm::to_lower_copy(format);
+	LOG_DEBUG("GL view #"<<viewNo<<" → "<<fss.str())
+	glv->setSnapshotFormat(QString(format.c_str()));
+	glv->nextFrameSnapshotFilename=fss.str();
+	// wait for the renderer to save the frame (will happen at next postDraw)
+	timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=10000000; /* 10 ms */
+	long waiting=0;
+	while(!glv->nextFrameSnapshotFilename.empty()){
+		nanosleep(&t1,&t2);
+		if(((++waiting) % 1000)==0) LOG_WARN("Already waiting "<<waiting/100<<"s for snapshot to be saved. Something went wrong?");
+	}
+	savedSnapshots.push_back(fss.str());
+	usleep((long)(msecSleep*1000));
+}
+
+
 CREATE_LOGGER(GLViewer);
 
 GLLock::GLLock(GLViewer* _glv): boost::try_mutex::scoped_lock(Omega::instance().renderMutex), glv(_glv){
@@ -37,29 +70,6 @@ GLLock::GLLock(GLViewer* _glv): boost::try_mutex::scoped_lock(Omega::instance().
 }
 GLLock::~GLLock(){ glv->doneCurrent(); }
 
-
-
-// this KILLS performace with qt4!!
-
-#if 0
-// void GLViewer::updateGL(void){/*GLLock lock(this); */QGLViewer::updateGL();}
-/* additionally try: doneCurrent; glFlush; glSwapBuffers after paintGL */
-void GLViewer::paintGL(void){
-	/* paintGL encapsulated preDraw, draw and postDraw within QGLViewer. If the mutex cannot be locked,
-	 * we just return without repainting */
-	boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex);
-	#if BOOST_VERSION<103500
-		if(lock.locked())
-	#else
-		if(lock.owns_lock())
-	#endif
-		{
-			this->makeCurrent();
-			QGLViewer::paintGL();
-		}
-	this->doneCurrent();
-}
-#endif
 
 GLViewer::~GLViewer(){ /* get the GL mutex when closing */ GLLock lock(this); /* cerr<<"Destructing view #"<<viewId<<endl;*/ }
 

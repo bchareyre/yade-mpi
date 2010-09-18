@@ -97,6 +97,7 @@ struct custom_Vector2i_from_sequence{
 };
 
 static Matrix3r* Matrix3r_fromElements(Real m00, Real m01, Real m02, Real m10, Real m11, Real m12, Real m20, Real m21, Real m22){ Matrix3r* m(new Matrix3r); (*m)<<m00,m01,m02,m10,m11,m12,m20,m21,m22; return m; }
+static Vector3r Matrix3r_diagonal(const Matrix3r& m){ return Vector3r(m.diagonal()); }
 static Quaternionr Quaternionr_setFromTwoVectors(Quaternionr& q, const Vector3r& u, const Vector3r& v){ return q.setFromTwoVectors(u,v); }
 static Vector3r Quaternionr_Rotate(Quaternionr& q, const Vector3r& u){ return q*u; }
 // supposed to return raw pointer (or auto_ptr), boost::python takes care of the lifetime management
@@ -188,6 +189,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("inverse",&Matrix3r_inverse)
 		.def("transpose",&Matrix3r_transpose)
 		.def("polarDecomposition",&Matrix3r_polarDecomposition)
+		.def("diagonal",&Matrix3r_diagonal)
 
 		//
 		.def("__neg__",&Matrix3r__neg__)

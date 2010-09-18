@@ -69,8 +69,8 @@ install: build
 check: install
 	dh_testdir
 	dh_testroot
-	YADE_PREFIX=debian/yade${_VERSION}-dbg/usr debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg -x scripts/regression-tests.py
-	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} -x scripts/regression-tests.py
+	YADE_PREFIX=debian/yade${_VERSION}-dbg/usr debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg --test
+	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} --test
 
 # Build architecture-independent files here.
 binary-indep: build install

@@ -52,7 +52,7 @@ liveInterval=1
 "Interval for the live plot updating, in seconds."
 autozoom=True
 "Enable/disable automatic plot rezooming after data update."
-scientific=True
+scientific=True if hasattr(pylab,'ticklabel_format') else False  ## safe default for older matplotlib versions
 "Use scientific notation for axes ticks."
 axesWd=0
 "Linewidth (in points) to make *x* and *y* axes better visible; not activated if non-positive."
@@ -228,6 +228,7 @@ def plot(noShow=False,subPlots=False):
 	You can use 
 	
 		>>> from yade import plot
+		>>> plot.plots={'foo':('bar',)}
 		>>> plot.plot(noShow=True).savefig('someFile.pdf')
 		>>> import os
 		>>> os.path.exists('someFile.pdf')

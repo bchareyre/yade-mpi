@@ -109,6 +109,7 @@ def globalHtmlStats():
 	else:
 		failed=len([j for j in jobs if j.exitStatus!=0])
 		lastFinished=max([j.finished for j in jobs])
+		# FIXME: do not report sum of runnign time of all jobs, only the real timespan
 		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s.</p>'%('red' if failed else 'lime',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
 	ret+='<p>Pid %d</p>'%(os.getpid())
 	ret+='<p>%d slots available, %d used, %d free.</p>'%(maxJobs,usedSlots,maxJobs-usedSlots)
@@ -125,10 +126,10 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		else:
 			jobMatch=re.match('/jobs/([0-9]+)/(.*)',self.path)
 			if not jobMatch:
-				self.send_error(404); return
+				self.send_error(404,self.path); return
 			jobId=int(jobMatch.group(1))
 			if jobId>=len(jobs):
-				self.send_error(404); return
+				self.send_error(404,self.path); return
 			job=jobs[jobId]
 			rest=jobMatch.group(2)
 			if rest=='plots':
@@ -136,7 +137,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 				self.sendFile(job.plotsFile,contentType=yade.remote.plotImgMimetype,refresh=(0 if job.status=='DONE' else 5))
 			elif rest=='log':
 				if not os.path.exists(job.log):
-					self.send_error(404); return
+					self.send_error(404,self.path); return
 				## once we authenticate properly, send the whole file
 				## self.sendTextFile(jobs[jobId].log,refresh=5)
 				## now we have to filter away the cookie
@@ -150,7 +151,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 				self.sendPygmentizedFile(job.script,linenostep=5)
 			elif rest=='table':
 				self.sendPygmentizedFile(job.table,hl_lines=[job.lineNo],linenostep=1)
-			else: self.send_error(404)
+			else: self.send_error(404,self.path)
 		return
 	def log_request(self,req): pass
 	def sendGlobal(self):
@@ -330,8 +331,8 @@ for i,l in enumerate(useLines):
 		else:
 			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
 	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
-	env='PARAM_TABLE=<a href="/jobs/%d/table">%s:%d</a> DISPLAY= %s '%(i,table,l,' '.join(envVars))
-	cmd='%s --threads=%d %s -x <a href="/jobs/%d/script">%s</a>'%(executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',i,simul)
+	env='PARAM_TABLE=<a href="jobs/%d/table">%s:%d</a> DISPLAY= %s '%(i,table,l,' '.join(envVars))
+	cmd='%s --threads=%d %s -x <a href="jobs/%d/script">%s</a>'%(executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',i,simul)
 	log='> <a href="jobs/%d/log">%s</a> 2>&1'%(i,pipes.quote(logFile))
 	hrefCmd=env+cmd+log
 	fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)

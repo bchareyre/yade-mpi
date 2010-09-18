@@ -61,43 +61,44 @@ class Cell: public Serializable{
 	//! "integrate" velGrad, update cached values used by public getter
 	void integrateAndUpdate(Real dt);
 	/*! Return point inside periodic cell, even if shear is applied */
-	Vector3r wrapShearedPt(const Vector3r& pt){ return shearPt(wrapPt(unshearPt(pt))); }
+	Vector3r wrapShearedPt(const Vector3r& pt) const { return shearPt(wrapPt(unshearPt(pt))); }
 	/*! Return point inside periodic cell, even if shear is applied; store cell coordinates in period. */
-	Vector3r wrapShearedPt(const Vector3r& pt, Vector3i& period){ return shearPt(wrapPt(unshearPt(pt),period)); }
+	Vector3r wrapShearedPt(const Vector3r& pt, Vector3i& period) const { return shearPt(wrapPt(unshearPt(pt),period)); }
 	/*! Apply inverse shear on point; to put it inside (unsheared) periodic cell, apply wrapPt on the returned value. */
-	Vector3r unshearPt(const Vector3r& pt){ return _unshearTrsf*pt; }
+	Vector3r unshearPt(const Vector3r& pt) const { return _unshearTrsf*pt; }
 	//! Apply shear on point. 
-	Vector3r shearPt(const Vector3r& pt){ return _shearTrsf*pt; }
+	Vector3r shearPt(const Vector3r& pt) const { return _shearTrsf*pt; }
 	/*! Wrap point to inside the periodic cell; don't compute number of periods wrapped */
-	Vector3r wrapPt(const Vector3r& pt)const{
+	Vector3r wrapPt(const Vector3r& pt) const {
 		Vector3r ret; for(int i=0;i<3;i++) ret[i]=wrapNum(pt[i],_size[i]); return ret;
 	}
 	/*! Wrap point to inside the periodic cell; period will contain by how many cells it was wrapped. */
-	Vector3r wrapPt(const Vector3r& pt, Vector3i& period)const{
+	Vector3r wrapPt(const Vector3r& pt, Vector3i& period) const {
 		Vector3r ret; for(int i=0; i<3; i++){ ret[i]=wrapNum(pt[i],_size[i],period[i]); } return ret;
 	}
 	/*! Wrap number to interval 0…sz */
-	static Real wrapNum(const Real& x, const Real& sz){
+	static Real wrapNum(const Real& x, const Real& sz) {
 		Real norm=x/sz; return (norm-floor(norm))*sz;
 	}
 	/*! Wrap number to interval 0…sz; store how many intervals were wrapped in period */
-	static Real wrapNum(const Real& x, const Real& sz, int& period){
+	static Real wrapNum(const Real& x, const Real& sz, int& period) {
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
 
-	Vector3r getRefSize(){ return refSize; }
+	Vector3r getRefSize() const { return refSize; }
 	void setRefSize(const Vector3r& s){ refSize=s; integrateAndUpdate(0); }
-	Matrix3r getTrsf(){ return trsf; }
+	Matrix3r getTrsf() const { return trsf; }
 	void setTrsf(const Matrix3r& m){ trsf=m; integrateAndUpdate(0); }
 	// return current cell volume
-	Real getVolume(){ return Hsize.determinant(); }
+	Real getVolume() const { return Hsize.determinant(); }
 
 	void postLoad(Cell&){ integrateAndUpdate(0); }
 
-	Vector3r wrapShearedPt_py(const Vector3r& pt){ return wrapShearedPt(pt);}
-	Vector3r wrapPt_py(const Vector3r& pt){ return wrapPt(pt);}
+	Vector3r wrapShearedPt_py(const Vector3r& pt) const { return wrapShearedPt(pt);}
+	Vector3r wrapPt_py(const Vector3r& pt) const { return wrapPt(pt);}
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
+		/* TODO: remove the overrides, add Attr::pyCallPostLoad */
 		((Vector3r,refSize,Vector3r(1,1,1),,"[will be overridden below]"))
 		((Matrix3r,trsf,Matrix3r::Identity(),,"[will be overridden below]"))
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in NewtonIntegrator."))

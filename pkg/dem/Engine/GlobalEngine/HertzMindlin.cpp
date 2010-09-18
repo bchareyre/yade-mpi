@@ -166,7 +166,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	Real Fn = phys->kno*std::pow(uN,1.5); // normal Force (scalar)
 	if (includeAdhesion) {
 			Fn -= phys->adhesionForce; // include adhesion force to account for the effect of Van der Waals interactions
-			if (Fn < 0.0) {phys->isAdhesive = true;} // set true the bool to count the number of adhesive contacts
+			phys->isAdhesive = (Fn<0); // set true the bool to count the number of adhesive contacts
 			}
 	phys->normalForce = Fn*scg->normal; // normal Force (vector)
 

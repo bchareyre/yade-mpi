@@ -11,6 +11,29 @@
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<set>
 
+#include<yade/pkg-common/PeriodicEngines.hpp>
+
+/*****************************************************************************
+*********************************** SnapshotEngine ***************************
+*****************************************************************************/
+/* NOTE: this engine bypasses usual registration of plugins;
+	pyRegisterClass must be called in the module import stanza in gui/qt4/_GLViewer.cpp
+*/
+class SnapshotEngine: public PeriodicEngine{
+	public:
+	virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(SnapshotEngine,PeriodicEngine,"Periodically save snapshots of GLView(s) as .png files. Files are named *fileBase*+*counter*+'.png' (counter is left-padded by 0s, i.e. snap00004.png).",
+		((string,format,"PNG",,"Format of snapshots (one of JPEG, PNG, EPS, PS, PPM, BMP) `QGLViewer documentation <http://www.libqglviewer.com/refManual/classQGLViewer.html#abbb1add55632dced395e2f1b78ef491c>`_. File extension will be lowercased *format*. Validity of format is not checked."))
+		((string,fileBase,"",,"Basename for snapshots"))
+		((int,counter,0,,"Number that will be appended to fileBase when the next snapshot is saved (incremented at every save). |yupdate|"))
+		// ((int,viewNo,((void)"primary view",0),"The GLView number that we save."))
+		((bool,ignoreErrors,true,,"Silently return if selected view doesn't exist"))
+		((vector<string>,savedSnapshots,,,"Files that have been created so far"))
+		((int,msecSleep,0,,"number of msec to sleep after snapshot (to prevent 3d hw problems) [ms]"))
+	);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(SnapshotEngine);
 
 /*! Class handling user interaction with the openGL rendering of simulation.
  *
@@ -148,3 +171,6 @@ class YadeCamera : public qglviewer::Camera
 		virtual float zNear() const;
 		virtual void setCuttingDistance(float s){cuttingDistance=s;};
 };
+
+
+

@@ -181,11 +181,21 @@ void VTKRecorder::action(){
 	rpmSpecDiam->SetName("rpmSpecDiam");
 
 	if(recActive[REC_INTR]){
+		// holds information about cell distance between spatial and displayed position of each particle
+		vector<Vector3i> wrapCellDist; if (scene->isPeriodic){ wrapCellDist.resize(scene->bodies->size()); }
 		// save body positions, referenced by ids by vtkLine
 		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-			if (!b) { /* we must keep ids contiguous */ intrBodyPos->InsertNextPoint(NaN,NaN,NaN); continue; }
-			const Vector3r& pos=b->state->pos;
-			intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
+			if (!b) {
+				/* must keep ids contiguous, so that position in the array corresponds to Body::id */
+				intrBodyPos->InsertNextPoint(NaN,NaN,NaN);
+				continue;
+			}
+			if(!scene->isPeriodic){ intrBodyPos->InsertNextPoint(b->state->pos[0],b->state->pos[1],b->state->pos[2]); }
+			else {
+				Vector3r pos=scene->cell->wrapShearedPt(b->state->pos,wrapCellDist[b->id]);
+				intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
+			}
+			assert(intrBodyPos->GetNumberOfPoints()==b->id+1);
 		}
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			if(!I->isReal()) continue;
@@ -193,15 +203,47 @@ void VTKRecorder::action(){
 				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId1())->shape.get()))) continue;
 				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId2())->shape.get()))) continue;
 			}
-			vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
-			line->GetPointIds()->SetId(0,I->getId1());
-			line->GetPointIds()->SetId(1,I->getId2());
-			intrCells->InsertNextCell(line);
+			/* For the periodic boundary conditions,
+				find out whether the interaction crosses the boundary of the periodic cell;
+				if it does, display the interaction on both sides of the cell, with one of the
+				points sticking out in each case.
+				Since vtkLines must connect points with an ID assigned, we will create a new additional
+				point for each point outside the cell. It might create some data redundancy, but
+				let us suppose that the number of interactions crossing the cell boundary is low compared
+				to total numer of interactions
+			*/
+			// how many times to add values defined on interactions, depending on how many times the interaction is saved
+			int numAddValues=1;
+			// aperiodic boundary, or interaction is inside the cell
+			if(!scene->isPeriodic || (scene->isPeriodic && (I->cellDist==wrapCellDist[I->getId2()]-wrapCellDist[I->getId1()]))){
+				vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+				line->GetPointIds()->SetId(0,I->getId1());
+				line->GetPointIds()->SetId(1,I->getId2());
+				intrCells->InsertNextCell(line);
+			} else {
+				assert(scene->isPeriodic);
+				// spatial positions of particles
+				const Vector3r& p01(Body::byId(I->getId1())->state->pos); const Vector3r& p02(Body::byId(I->getId2())->state->pos);
+				// create two line objects; each of them has one endpoint inside the cell and the other one sticks outside
+				// A,B are the "fake" bodies outside the cell for id1 and id2 respectively, p1,p2 are the displayed points
+				// distance in cell units for shifting A away from p1; negated value is shift of B away from p2
+				Vector3r ptA(p01+scene->cell->Hsize*(wrapCellDist[I->getId2()]-I->cellDist).cast<Real>());
+				Vector3r ptB(p02+scene->cell->Hsize*(wrapCellDist[I->getId1()]-I->cellDist).cast<Real>());
+				vtkIdType idPtA=intrBodyPos->InsertNextPoint(ptA[0],ptA[1],ptA[2]), idPtB=intrBodyPos->InsertNextPoint(ptB[0],ptB[1],ptB[2]);
+				vtkSmartPointer<vtkLine> line1B(vtkSmartPointer<vtkLine>::New()); line1B->GetPointIds()->SetId(0,I->getId1()); line1B->GetPointIds()->SetId(1,idPtB);
+				vtkSmartPointer<vtkLine> lineA2(vtkSmartPointer<vtkLine>::New()); lineA2->GetPointIds()->SetId(0,idPtA); line1B->GetPointIds()->SetId(1,I->getId2());
+				numAddValues=2;
+			}
 			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
-			float fn[3]={abs(phys->normalForce[0]),abs(phys->normalForce[1]),abs(phys->normalForce[2])};
+			const GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
+			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
+			float fn=phys->normalForce.dot(geom->normal); 
 			float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
-			intrForceN->InsertNextTupleValue(fn);
-			intrAbsForceT->InsertNextTupleValue(fs);
+			// add the value once for each interaction object that we created (might be 2 for the periodic boundary)
+			for(int i=0; i<numAddValues; i++){
+				intrForceN->InsertNextValue(fn);
+				intrAbsForceT->InsertNextTupleValue(fs);
+			}
 		}
 	}
 
@@ -217,7 +259,7 @@ void VTKRecorder::action(){
 			if (sphere){
 				if(skipNondynamic && !b->isDynamic()) continue;
 				vtkIdType pid[1];
-				const Vector3r& pos = b->state->pos;
+				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
 				pid[0] = spheresPos->InsertNextPoint(pos[0], pos[1], pos[2]);
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
@@ -273,13 +315,13 @@ void VTKRecorder::action(){
 		if (recActive[REC_FACETS]){
 			const Facet* facet = dynamic_cast<Facet*>(b->shape.get()); 
 			if (facet){
-				const Se3r& O = b->state->se3;
+				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
 				const vector<Vector3r>& localPos = facet->vertices;
-				Matrix3r facetAxisT=O.orientation.toRotationMatrix();
+				Matrix3r facetAxisT=b->state->ori.toRotationMatrix();
 				vtkSmartPointer<vtkTriangle> tri = vtkSmartPointer<vtkTriangle>::New();
 				vtkIdType nbPoints=facetsPos->GetNumberOfPoints();
 				for (int i=0;i<3;++i){
-					Vector3r globalPos = O.position + facetAxisT * localPos[i];
+					Vector3r globalPos = pos + facetAxisT * localPos[i];
 					facetsPos->InsertNextPoint(globalPos[0], globalPos[1], globalPos[2]);
 					tri->GetPointIds()->SetId(i,nbPoints+i);
 				}

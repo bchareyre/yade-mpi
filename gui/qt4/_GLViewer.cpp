@@ -86,7 +86,9 @@ BOOST_PYTHON_MODULE(_GLViewer){
 	
 	OpenGLManager* glm=new OpenGLManager(); // keep this singleton object forever
 	glm->emitStartTimer();
-	
+
+	// HACK: register SnapshotEngine here
+	SnapshotEngine se; se.pyRegisterClass(py::scope());
 
 	py::def("View",createView,"Create a new 3d view.");
 	py::def("center",centerViews,"Center all views.");

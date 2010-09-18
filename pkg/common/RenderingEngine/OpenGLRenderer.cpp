@@ -155,6 +155,11 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 	scene=_scene;
 
 	// assign scene inside functors
+	boundDispatcher.updateScenePtr();
+	interactionGeometryDispatcher.updateScenePtr();
+	interactionPhysicsDispatcher.updateScenePtr();
+	shapeDispatcher.updateScenePtr();
+	stateDispatcher.updateScenePtr();
 
 	// just to make sure, since it is not initialized by default
 	if(!scene->bound) scene->bound=shared_ptr<Aabb>(new Aabb);
@@ -203,9 +208,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 	
 	if (dof || id) renderDOF_ID();
 	if (bound) renderBoundingVolume();
-	if (shape){
-		renderShape();
-	}
+	if (shape) renderShape();
 	if (intrAllWire) renderAllInteractionsWire();
 	if (intrGeom) renderInteractionGeometry();
 	if (intrPhys) renderInteractionPhysics();

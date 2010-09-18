@@ -1204,6 +1204,42 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 	}
 }
 
+/* Return the stress tensor decomposed in 2 contributions, from normal and shear forces.
+The formulation follows the [Thornton2000]_ article
+"Numerical simulations of deviatoric shear deformation of granular media", eq (3) and (4)
+ */
+py::tuple Shop::normalShearStressTensors(bool compressionPositive){
+	Scene* scene=Omega::instance().getScene().get();
+	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
+	Matrix3r sigN(Matrix3r::Zero()),sigT(Matrix3r::Zero());
+	const Matrix3r& cellHsize(scene->cell->Hsize);
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		const Vector3r& n=geom->normal;
+		// if compression has positive sign, we need to change sign for both normal and shear force
+		// make copy to Fs since shearForce is used at multiple places (less efficient, but avoids confusion)
+		Vector3r Fs=(compressionPositive?-1:1)*phys->shearForce;
+		Real N=(compressionPositive?-1:1)*phys->normalForce.dot(n), T=Fs.norm();
+		bool hasShear=(T>0);
+		Vector3r t; if(hasShear) t=Fs/T;
+		// Real R=(Body::byId(I->getId2(),scene)->state->pos+cellHsize*I->cellDist.cast<Real>()-Body::byId(I->getId1(),scene)->state->pos).norm();
+		Real R=.5*(geom->refR1+geom->refR2);
+		for(int i=0; i<3; i++) for(int j=i; j<3; j++){
+			sigN(i,j)+=R*N*n[i]*n[j];
+			if(hasShear) sigT(i,j)+=R*T*n[i]*t[j];
+		}
+	}
+	Real vol=scene->cell->getVolume();
+	sigN*=2/vol; sigT*=2/vol;
+	// fill terms under the diagonal
+	sigN(1,0)=sigN(0,1); sigN(2,0)=sigN(0,2); sigN(2,1)=sigN(1,2);
+	sigT(1,0)=sigT(0,1); sigT(2,0)=sigT(0,2); sigT(2,1)=sigT(1,2);
+	return py::make_tuple(sigN,sigT);
+}
+
+
 Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }

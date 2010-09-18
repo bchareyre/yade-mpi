@@ -1,0 +1,24 @@
+#pragma once
+
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/lib-opengl/GLUtils.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
+#include<GL/glu.h>
+
+
+class Gl1_NormPhys: public GlInteractionPhysicsFunctor{	
+		static GLUquadric* gluQuadric; // needed for gluCylinder, initialized by ::go if no initialized yet
+	public:
+		virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_NormPhys,GlInteractionPhysicsFunctor,"Renders :yref:`NormPhys` objects as cylinders of which diameter and color depends on :yref:`NormPhys:normForce` magnitude.",
+		((Real,maxFn,0,,"Value of :yref:`NormPhys.normalForce` corresponding to :yref:`maxDiameter<Gl1_NormPhys.maxDiameter>`. This value will be increased (but *not decreased*) automatically."))
+		((int,signFilter,0,,"If non-zero, only display contacts with negative (-1) or positive (+1) normal forces; if zero, all contacts will be displayed."))
+		((Real,refRadius,std::numeric_limits<Real>::infinity(),,"Reference (minimum) particle radius; used only if :yref:`maxRadius<Gl1_NormPhys.maxRadius>` is negative. This value will be decreased (but *not increased*) automatically. |yupdate|"))
+		((Real,maxRadius,-1,,"Cylinder radius corresponding to the maximum normal force. If negative, auto-updated :yref:`refRadius<Gl1_NormPhys.refRadius>` will be used instead."))
+		((int,slices,6,,"Number of sphere slices; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))
+		((int,stacks,1,,"Number of sphere stacks; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))
+	);
+	RENDERS(NormPhys);
+};
+REGISTER_SERIALIZABLE(Gl1_NormPhys);
+

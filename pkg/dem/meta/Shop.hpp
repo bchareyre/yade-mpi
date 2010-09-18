@@ -24,6 +24,7 @@ class Interaction;
 
 using namespace std;
 using boost::shared_ptr;
+namespace py = boost::python;
 
 /*! Miscillaneous utility functions which are believed to be generally useful.
  *
@@ -132,4 +133,7 @@ class Shop{
 
 		//! Function to compute overall ("macroscopic") stress of periodic cell
 		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
+		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
+		//! (contribution of normal and shear forces)
+		static py::tuple normalShearStressTensors(bool compressionPositive=false);
 };

@@ -466,13 +466,31 @@ def randomizeColors(onlyDynamic=False):
 		color=(random.random(),random.random(),random.random())
 		if b.dynamic or not onlyDynamic: b.shape.color=color
 
-def avgNumInteractions(cutoff=0.):
-	"""Return average numer of interactions per particle, also known as *coordination number*.
+def avgNumInteractions(cutoff=0.,skipFree=False):
+	r"""Return average numer of interactions per particle, also known as *coordination number* $Z$. This number is defined as 
+
+	.. math:: Z=2C/N
+
+	where $C$ is number of contacts and $N$ is number of particles.
+
+	With *skipFree*, particles not contributing to stable state of the packing are skipped, following equation (8) given in [Thornton2000]_:
+
+	.. math:: Z_m=\frac{2C-N_1}{N-N_0-N_1}
 
 	:param cutoff: cut some relative part of the sample's bounding box away.
-	"""
-	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
-	return sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
+	:param skipFree: 	"""
+	if cutoff==0 and not skipFree: return 2*O.interactions.countReal()*1./len(O.bodies)
+	else:
+		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
+		## CC is 2*C
+		CC=sum([nums[i]*counts[i] for i in range(len(nums))]); N=sum(counts)
+		if not skipFree: return CC*1./N
+		## find bins with 0 and 1 spheres
+		N0=0 if (0 not in nums) else counts[nums.index(0)]
+		N1=0 if (1 not in nums) else counts[nums.index(1)]
+		NN=N-N0-N1
+		return (CC-N1)*1./NN if NN>0 else float('nan')
+
 
 def plotNumInteractionsHistogram(cutoff=0.):
 	"Plot histogram with number of interactions per body, optionally cutting away *cutoff* relative axis-aligned box from specimen margin."
@@ -512,51 +530,31 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
 	else: pylab.show()
 
 
+def encodeVideoFromFrames(*args,**kw):
+	"|ydeprecated|"
+	_deprecatedUtilsFunction('utils.encodeVideoFromFrames','utils.makeVideo')
+	return makeVideo(*args,**kw)
 
+def makeVideo(frameSpec,out,renameNotOverwrite=True,fps=24,bps=2400):
+	"""Create a video from external image files using `mencoder <http://www.mplayerhq.hu>`__. Two-pass encoding using the default mencoder codec (mpeg4) is performed, running multi-threaded with number of threads equal to number of OpenMP threads allocated for Yade.
 
-
-def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
-	"""Create .ogg video from external image files.
-
-	:parameters:
-		`frameSpec`: wildcard | sequence of filenames
-			If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order.
-			
-			.. warning::
-				GStreamer is picky about the wildcard; if you pass a wrong one, if will not complain, but silently stall.
-		`out`: filename
-			file to save video into
-		`renameNotOverwrite`: bool
-			if True, existing same-named video file will have ~[number] appended; will be overwritten otherwise.
-		`fps`:
-			Frames per second.
+	:param frameSpec: wildcard | sequence of filenames. If list or tuple, filenames to be encoded in given order; otherwise wildcard understood by mencoder's mf:// URI option (shell wildcards such as ``/tmp/snap-*.png`` or and printf-style pattern like ``/tmp/snap-%05d.png``)
+	:param str out: file to save video into
+	:param bool renameNotOverwrite: if True, existing same-named video file will have -*number* appended; will be overwritten otherwise.
+	:param int fps: Frames per second (``-mf fps=…``)
+	:param int bps: Bitrate (``-lavcopts vbitrate=…``)
 	"""
-	import pygst,sys,gobject,os,tempfile,shutil,os.path
-	pygst.require("0.10")
-	import gst
+	import os,os.path,subprocess
 	if renameNotOverwrite and os.path.exists(out):
-		i=0;
+		i=0
 		while(os.path.exists(out+"~%d"%i)): i+=1
 		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
-	if frameSpec.__class__==list or frameSpec.__class__==tuple:
-		# create a new common prefix, symlink given files to prefix-%05d.png in their order, adjust wildcard, go ahead.
-		tmpDir=tempfile.mkdtemp()
-		for no,frame in enumerate(frameSpec):
-			os.symlink(os.path.abspath(frame),os.path.join(tmpDir,'%07d'%no))
-		wildcard=os.path.join(tmpDir,'%07d')
-	else:
-		tmpDir=None; wildcard=frameSpec
-	print "Encoding video from %s to %s"%(wildcard,out)
-	pipeline=gst.parse_launch('multifilesrc location="%s" index=0 caps="image/png,framerate=\(fraction\)%d/1" ! pngdec ! ffmpegcolorspace ! theoraenc sharpness=2 quality=63 ! oggmux ! filesink location="%s"'%(wildcard,fps,out))
-	bus=pipeline.get_bus()
-	bus.add_signal_watch()
-	mainloop=gobject.MainLoop();
-	bus.connect("message::eos",lambda bus,msg: mainloop.quit())
-	pipeline.set_state(gst.STATE_PLAYING)
-	mainloop.run()
-	pipeline.set_state(gst.STATE_NULL); pipeline.get_state()
-	# remove symlinked frames, if any
-	if tmpDir: shutil.rmtree(tmpDir)
+	if isinstance(frameSpec,list) or isinstance(frameSpec,tuple): frameSpec=','.join(frameSpec)
+	for passNo in (1,2):
+		cmd=['mencoder','mf://%s'%frameSpec,'-mf','fps=%d'%int(fps),'-ovc','lavc','-lavcopts','vbitrate=%d:vpass=%d:threads=%d:%s'%(int(bps),passNo,O.numThreads,'turbo' if passNo==1 else ''),'-o',('/dev/null' if passNo==1 else out)]
+		print 'Pass %d:'%passNo,' '.join(cmd)
+		ret=subprocess.call(cmd)
+		if ret!=0: raise RuntimeError("Error when running mencoder.")
 
 
 def replaceCollider(colliderEngine):

@@ -216,22 +216,26 @@ python::tuple SpherePack::psd(int bins, bool mass) const {
 
 // New code to include the psd giving few points of it
 const float pi = 3.1415926;
-long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing){
-	Real Vtot=numSph*4./3.*pi*pow(rMean,3.); // total volume of the packing (computed with rMean)
-	
-	// calculate number of spheres necessary per each radius to match the wanted psd
-	// passing has to contain increasing values
+long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount){
 	vector<Real> numbers;
-	for (size_t i=0; i<radii.size(); i++){
-		Real volS=4./3.*pi*pow(radii[i],3.);
-		if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
-		else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
+	if(!passingIsNotPercentageButCount){
+		Real Vtot=numSph*4./3.*pi*pow(rMean,3.); // total volume of the packing (computed with rMean)
 		
-		cout<<"numbers["<<i<<"] = "<<numbers[i]<<endl;
-		cout<<"radii["<<i<<"] = "<<radii[i]<<endl;
-		cout<<"vol tot = "<<Vtot<<endl;
-		cout<<"v_sphere = "<<volS<<endl;
-		cout<<"passing["<<i<<"] = "<<passing[i]<<endl;
+		// calculate number of spheres necessary per each radius to match the wanted psd
+		// passing has to contain increasing values
+		for (size_t i=0; i<radii.size(); i++){
+			Real volS=4./3.*pi*pow(radii[i],3.);
+			if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
+			else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
+			
+			cout<<"numbers["<<i<<"] = "<<numbers[i]<<endl;
+			cout<<"radii["<<i<<"] = "<<radii[i]<<endl;
+			cout<<"vol tot = "<<Vtot<<endl;
+			cout<<"v_sphere = "<<volS<<endl;
+			cout<<"passing["<<i<<"] = "<<passing[i]<<endl;
+		}
+	} else {
+		FOREACH(Real p, passing) numbers.push_back(p);
 	}
 
 	static boost::minstd_rand randGen(TimingInfo::getNow(true));
