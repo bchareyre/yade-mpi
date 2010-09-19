@@ -1257,22 +1257,29 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 		Vector3r& n=geom->normal;
 		Vector3r& fT=phys->shearForce;
 		Real fN=phys->normalForce.dot(n);
-		Real fT0=fT[0]; Real fT1=fT[1]; Real fT2=fT[2];
+
+		stress += l*(fN*n*n.transpose() + .5*(fT*n.transpose() + n*fT.transpose()));
+
+		/*Real fT0=fT[0]; Real fT1=fT[1]; Real fT2=fT[2];
 		Real n0=n[0]; Real n1=n[1]; Real n2=n[2];
 		
-		Real s00 = n0*n0*fN + fT0*n0;
-		Real s01 = n0*n1*fN + .5*(fT0*n1 + fT1*n0);
-		Real s02 = n0*n2*fN + .5*(fT0*n2 + fT2*n0);
-		Real s11 = n1*n1*fN + fT1*n1;
-		Real s12 = n1*n2*fN + .5*(fT1*n2 + fT2*n1);
-		Real s22 = n2*n2*fN + fT2*n2;
+		Real s00 = l*(n0*n0*fN + fT0*n0);
+		Real s01 = l*(n0*n1*fN + .5*(fT0*n1 + fT1*n0));
+		Real s02 = l*(n0*n2*fN + .5*(fT0*n2 + fT2*n0));
+		Real s11 = l*(n1*n1*fN + fT1*n1);
+		Real s12 = l*(n1*n2*fN + .5*(fT1*n2 + fT2*n1));
+		Real s22 = l*(n2*n2*fN + fT2*n2);
 		
 		stress(0,0) += s00;
-		stress(0,1) += stress(1,0) = s01;
-		stress(0,2) += stress(2,0) = s02;
+		stress(0,1) += s01;
+		stress(1,0) += s01;
+		stress(0,2) += s02;
+		stress(2,0) += s02;
 		stress(1,1) += s11;
-		stress(1,2) += stress(2,1) = s12;
+		stress(1,2) += s12;
+		stress(2,1) += s12;
 		stress(2,2) += s22;
+		*/
 	}
 	stress/=volume;
 	return stress;
