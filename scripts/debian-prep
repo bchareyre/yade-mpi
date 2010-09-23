@@ -7,10 +7,14 @@ if os.path.exists('RELEASE'):
 	UPDATE=(file('UPDATE').readline().strip() if os.path.exists('UPDATE') else '')
 	print 'UPDATE is %s'%UPDATE
 	SNAPSHOT=''
-	PRIORITY=int(10000*float(re.sub('[^0-9.]','',VERSION)))
-	if re.match('^.*beta',VERSION): PRIORITY-=100
-	if re.match('^.*rc[0-9]$',VERSION): PRIORITY-=100
-	if UPDATE: PRIORITY+=int(re.sub('[^0-9]','',UPDATE))
+	PRIORITY = 0
+	if ((re.sub('[^0-9.]','',VERSION))==''):
+		PRIORITY = 200
+	else:
+		PRIORITY=int(10000*float(re.sub('[^0-9.]','',VERSION)))
+		if re.match('^.*beta',VERSION): PRIORITY-=100
+		if re.match('^.*rc[0-9]$',VERSION): PRIORITY-=100
+		if UPDATE: PRIORITY+=int(re.sub('[^0-9]','',UPDATE))
 elif os.path.exists('.bzr'):
 	VERSION='bzr'+os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines()[0][:-1]
 	SNAPSHOT='-snapshot'
