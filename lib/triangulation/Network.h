@@ -15,7 +15,7 @@
 #include "Timer.h"
 #include "stdafx.h"
 #include "Empilement.h"
-
+#ifdef FLOW_ENGINE
 namespace CGT{
 
 struct Boundary
@@ -79,5 +79,5 @@ class Network
 };
 
 } //namespaceCGT
-
+#endif //FLOW_ENGINE
 #endif

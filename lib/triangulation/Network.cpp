@@ -11,7 +11,7 @@
 #include <sys/types.h>
 
 #include "Network.h"
-
+#ifdef FLOW_ENGINE
 #define FAST
 
 const double ONE_THIRD = 1.0/3.0;
@@ -579,3 +579,4 @@ void Network::DisplayStatistics()
 //  return  aire_triangle_spherique;
 // }
 } //namespace CGT
+#endif //FLOW_ENGINE
