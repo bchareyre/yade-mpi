@@ -1212,7 +1212,7 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
 	Matrix3r sigN(Matrix3r::Zero()),sigT(Matrix3r::Zero());
-	const Matrix3r& cellHsize(scene->cell->Hsize);
+	//const Matrix3r& cellHsize(scene->cell->Hsize);   //Disabled because of warning.
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
