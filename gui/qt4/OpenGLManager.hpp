@@ -23,6 +23,9 @@ class OpenGLManager: public QObject{
 		void emitCreateView(){ emit createView(); }
 		void emitStartTimer(){ emit startTimerSignal(); }
 		void emitCloseView(int id){ emit closeView(id); }
+		// create a new view and wait for it to become available; return the view number
+		// if timout (in seconds) elapses without the view to come up, reports error and returns -1
+		int waitForNewView(float timeout=5., bool center=true);
 	signals:
 		void createView();
 		void resizeView(int id, int wd, int ht);

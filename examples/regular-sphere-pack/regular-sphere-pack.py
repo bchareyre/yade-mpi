@@ -91,7 +91,7 @@ O.engines=[
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
 	NewtonIntegrator(damping=.1,exactAsphericalRot=True),
 	RotationEngine(
-		subscribedBodies=rotateIDs,
+		ids=rotateIDs,
 		angularVelocity=10.0,
 		rotationAxis=[0,0,1],
 		rotateAroundZero=1,

@@ -26,10 +26,10 @@ class SnapshotEngine: public PeriodicEngine{
 		((string,format,"PNG",,"Format of snapshots (one of JPEG, PNG, EPS, PS, PPM, BMP) `QGLViewer documentation <http://www.libqglviewer.com/refManual/classQGLViewer.html#abbb1add55632dced395e2f1b78ef491c>`_. File extension will be lowercased *format*. Validity of format is not checked."))
 		((string,fileBase,"",,"Basename for snapshots"))
 		((int,counter,0,,"Number that will be appended to fileBase when the next snapshot is saved (incremented at every save). |yupdate|"))
-		// ((int,viewNo,((void)"primary view",0),"The GLView number that we save."))
-		((bool,ignoreErrors,true,,"Silently return if selected view doesn't exist"))
-		((vector<string>,savedSnapshots,,,"Files that have been created so far"))
+		((bool,ignoreErrors,true,,"Only report errors instead of throwing exceptions, in case of timeouts."))
+		((vector<string>,snapshots,,,"Files that have been created so far"))
 		((int,msecSleep,0,,"number of msec to sleep after snapshot (to prevent 3d hw problems) [ms]"))
+		((Real,deadTimeout,3,,"Timeout for 3d operations (opening new view, saving snapshot); after timing out, throw exception (or only report error if *ignoreErrors*) and make myself :yref:`dead<Engine.dead>`. [s]"))
 	);
 	DECLARE_LOGGER;
 };

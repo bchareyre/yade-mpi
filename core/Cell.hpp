@@ -94,22 +94,18 @@ class Cell: public Serializable{
 
 	void postLoad(Cell&){ integrateAndUpdate(0); }
 
+	// to resolve overloads
 	Vector3r wrapShearedPt_py(const Vector3r& pt) const { return wrapShearedPt(pt);}
 	Vector3r wrapPt_py(const Vector3r& pt) const { return wrapPt(pt);}
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
-		/* TODO: remove the overrides, add Attr::pyCallPostLoad */
-		((Vector3r,refSize,Vector3r(1,1,1),,"[will be overridden below]"))
-		((Matrix3r,trsf,Matrix3r::Identity(),,"[will be overridden below]"))
+		((Vector3r,refSize,Vector3r(1,1,1),Attr::triggerPostLoad,"Reference size of the cell."))
+		((Matrix3r,trsf,Matrix3r::Identity(),Attr::triggerPostLoad,"Current transformation matrix of the cell."))
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in NewtonIntegrator."))
-		((Matrix3r,Hsize,Matrix3r::Zero(),,"The current period size (one column per box edge) |yupdate|")),
+		((Matrix3r,Hsize,Matrix3r::Zero(),Attr::readonly,"The current cell size (one column per box edge), computed from *refSize* and *trsf* |yupdate|")),
 		/*ctor*/ integrateAndUpdate(0),
-
 		/*py*/
 		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")
-		/* accessors that ensure cache coherence */
-		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell.")
-		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Transformation matrix of the cell.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// debugging only
 		.def("wrap",&Cell::wrapShearedPt_py,"Transform an arbitrary point into a point in the reference cell")

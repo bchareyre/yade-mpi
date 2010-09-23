@@ -19,16 +19,14 @@ import matplotlib,os,time,math
 # If GtkAgg is the default, X must be working, which is not the case
 # with batches (DISPLAY is unset in such case) and importing pylab fails then.
 #
-# Agg does not require the GUI part and works withou any DISPLAY active
+# Agg does not require the GUI part and works without any DISPLAY active
 # just fine.
 #
 # see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg04320.html 
 # and https://lists.launchpad.net/yade-users/msg03289.html
 #
-hasDisplay=True # FIXME: this should be moved to yade.config/yade.runtime and initialized at startup properly
-if os.environ.has_key('PARAM_TABLE'):
-	matplotlib.use('Agg')
-	hasDisplay=False
+import yade.runtime
+if not yade.runtime.hasDisplay: matplotlib.use('Agg')
 
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKAgg')
@@ -46,7 +44,7 @@ xylabels={}
 "Dictionary of 2-tuples specifying (xlabel,ylabel) for respective plots; if either of them is None, the default auto-generated title is used."
 
 
-live=True if hasDisplay else False
+live=True if yade.runtime.hasDisplay else False
 "Enable/disable live plot updating. Disabled by default for now, since it has a few rough edges."
 liveInterval=1
 "Interval for the live plot updating, in seconds."
@@ -241,7 +239,7 @@ def plot(noShow=False,subPlots=False):
 	createPlots(subPlots=subPlots)
 	global currLineRefs
 	if not noShow:
-		if not hasDisplay: return # would error out with some backends, such as Agg used in batches
+		if not yade.runtime.hasDisplay: return # would error out with some backends, such as Agg used in batches
 		if live:
 			import thread
 			thread.start_new_thread(liveUpdate,(time.time(),))

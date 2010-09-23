@@ -29,7 +29,7 @@ OpenGLRenderer::~OpenGLRenderer(){}
 void OpenGLRenderer::init(){
 	typedef std::pair<string,DynlibDescriptor> strDldPair; // necessary as FOREACH, being macro, cannot have the "," inside the argument (preprocessor does not parse templates)
 	FOREACH(const strDldPair& item, Omega::instance().getDynlibsDescriptor()){
-		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlStateFunctor")) stateFunctorNames.push_back(item.first);
+		// if (Omega::instance().isInheritingFrom_recursive(item.first,"GlStateFunctor")) stateFunctorNames.push_back(item.first);
 		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlBoundFunctor")) boundFunctorNames.push_back(item.first);
 		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlShapeFunctor")) shapeFunctorNames.push_back(item.first);
 		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlInteractionGeometryFunctor")) interactionGeometryFunctorNames.push_back(item.first);
@@ -66,31 +66,13 @@ void OpenGLRenderer::setBodiesRefSe3(){
 void OpenGLRenderer::initgl(){
 	LOG_DEBUG("(re)initializing GL for gldraw methods.\n");
 	#define _SETUP_DISPATCHER(names,FunctorType,dispatcher) dispatcher.clearMatrix(); FOREACH(string& s,names) {shared_ptr<FunctorType> f(static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(s))); f->initgl(); dispatcher.add(f);}
-		_SETUP_DISPATCHER(stateFunctorNames,GlStateFunctor,stateDispatcher);
+		// _SETUP_DISPATCHER(stateFunctorNames,GlStateFunctor,stateDispatcher);
 		_SETUP_DISPATCHER(boundFunctorNames,GlBoundFunctor,boundDispatcher);
 		_SETUP_DISPATCHER(shapeFunctorNames,GlShapeFunctor,shapeDispatcher);
 		_SETUP_DISPATCHER(interactionGeometryFunctorNames,GlInteractionGeometryFunctor,interactionGeometryDispatcher);
 		_SETUP_DISPATCHER(interactionPhysicsFunctorNames,GlInteractionPhysicsFunctor,interactionPhysicsDispatcher);
 	#undef _SETUP_DISPATCHER
 }
-
-void OpenGLRenderer::renderWithNames(const shared_ptr<Scene>& _scene){
-	scene=_scene;
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b || !b->shape) continue;
-		glPushMatrix();
-		const Se3r& se3=b->state->se3;
-		AngleAxisr aa(se3.orientation);
-		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-		glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
-		//if(b->shape->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
-			glPushName(b->getId());
-			shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
-			glPopName();
-		//}
-		glPopMatrix();
-	}
-};
 
 bool OpenGLRenderer::pointClipped(const Vector3r& p){
 	if(numClipPlanes<1) return false;
@@ -146,7 +128,7 @@ void OpenGLRenderer::resetSpecularEmission(){
 	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
 }
 
-void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
+void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection){
 
 	if(!initDone) init();
 	assert(initDone);
@@ -159,7 +141,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 	interactionGeometryDispatcher.updateScenePtr();
 	interactionPhysicsDispatcher.updateScenePtr();
 	shapeDispatcher.updateScenePtr();
-	stateDispatcher.updateScenePtr();
+	// stateDispatcher.updateScenePtr();
 
 	// just to make sure, since it is not initialized by default
 	if(!scene->bound) scene->bound=shared_ptr<Aabb>(new Aabb);
@@ -207,7 +189,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 
 	
 	if (dof || id) renderDOF_ID();
-	if (bound) renderBoundingVolume();
+	if (bound) renderBound();
 	if (shape) renderShape();
 	if (intrAllWire) renderAllInteractionsWire();
 	if (intrGeom) renderInteractionGeometry();
@@ -238,14 +220,8 @@ void OpenGLRenderer::renderDOF_ID(){
 			if(current_selection==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
 			{ // write text
 				glColor3f(1.0-bgColor[0],1.0-bgColor[1],1.0-bgColor[2]);
-				unsigned DOF = b->state->blockedDOFs;
-				std::string sDof = std::string("") 
-										+ (((DOF & State::DOF_X )!=0)?"X":" ")
-										+ (((DOF & State::DOF_Y )!=0)?"Y":" ")
-										+ (((DOF & State::DOF_Z )!=0)?"Z":" ")
-										+ (((DOF & State::DOF_RX)!=0)?"RX":"  ")
-										+ (((DOF & State::DOF_RY)!=0)?"RY":"  ")
-										+ (((DOF & State::DOF_RZ)!=0)?"RZ":"  ");
+				unsigned d = b->state->blockedDOFs;
+				std::string sDof = std::string()+(((d&State::DOF_X )!=0)?"x":"")+(((d&State::DOF_Y )!=0)?"y":" ")+(((d&State::DOF_Z )!=0)?"z":"")+(((d&State::DOF_RX)!=0)?"X":"")+(((d&State::DOF_RY)!=0)?"Y":"")+(((d&State::DOF_RZ)!=0)?"Z":"");
 				std::string sId = boost::lexical_cast<std::string>(b->getId());
 				std::string str;
 				if(dof && id) sId += " ";
@@ -261,6 +237,7 @@ void OpenGLRenderer::renderDOF_ID(){
 }
 
 void OpenGLRenderer::renderInteractionGeometry(){	
+	interactionGeometryDispatcher.scene=scene.get(); interactionGeometryDispatcher.updateScenePtr();
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -274,6 +251,7 @@ void OpenGLRenderer::renderInteractionGeometry(){
 
 
 void OpenGLRenderer::renderInteractionPhysics(){	
+	interactionPhysicsDispatcher.scene=scene.get(); interactionPhysicsDispatcher.updateScenePtr();
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -287,7 +265,9 @@ void OpenGLRenderer::renderInteractionPhysics(){
 	}
 }
 
-void OpenGLRenderer::renderBoundingVolume(){	
+void OpenGLRenderer::renderBound(){	
+	boundDispatcher.scene=scene.get(); boundDispatcher.updateScenePtr();
+
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
@@ -311,17 +291,8 @@ void OpenGLRenderer::renderBoundingVolume(){
 }
 
 
-void OpenGLRenderer::renderShape()
-{
-	// Additional clipping planes: http://fly.srk.fer.hr/~unreal/theredbook/chapter03.html
-	#if 0
-		GLdouble clip0[4]={.0,1.,0.,0.}; // y<0
-		glClipPlane(GL_CLIP_PLANE0,clip0);
-		glEnable(GL_CLIP_PLANE0);
-	#endif
-
-	//const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
-	//const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
+void OpenGLRenderer::renderShape(bool withNames){
+	shapeDispatcher.scene=scene.get(); shapeDispatcher.updateScenePtr();
 
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->shape) continue;
@@ -339,7 +310,9 @@ void OpenGLRenderer::renderShape()
 				glMaterialv(GL_FRONT_AND_BACK,GL_EMISSION,h);
 				glMaterialv(GL_FRONT_AND_BACK,GL_SPECULAR,h);
 				//
-				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
+				if(withNames) glPushName(b->getId());
+					shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
+				if(withNames) glPopName();
 				// reset highlight
 				resetSpecularEmission();
 			} else {

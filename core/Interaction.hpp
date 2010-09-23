@@ -61,8 +61,8 @@ class Interaction : public Serializable
 		void init();
 			
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
-		((Body::id_t,id1,0,Attr::pyReadonly,":yref:`Id<Body::id>` of the first body in this interaction."))
-		((Body::id_t,id2,0,Attr::pyReadonly,":yref:`Id<Body::id>` of the first body in this interaction."))
+		((Body::id_t,id1,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
+		((Body::id_t,id2,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
 		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionDispatchers`, therefore they are made friends of Interaction"))
 		((shared_ptr<InteractionGeometry>,interactionGeometry,,,"Geometry part of the interaction."))
 		((shared_ptr<InteractionPhysics>,interactionPhysics,,,"Physical (material) part of the interaction."))

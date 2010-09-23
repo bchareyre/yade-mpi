@@ -498,9 +498,9 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	python::enum_<yade::Attr::flags>("AttrFlags")
 		.value("noSave",yade::Attr::noSave)
-		.value("pyReadonly",yade::Attr::pyReadonly)
-		.value("pyCallPostLoad",yade::Attr::pyCallPostLoad)
-		.value("pyNoResize",yade::Attr::pyNoResize)
+		.value("readonly",yade::Attr::readonly)
+		.value("triggerPostLoad",yade::Attr::triggerPostLoad)
+		.value("noResize",yade::Attr::noResize)
     ;
 
 	python::class_<pyOmega>("Omega")

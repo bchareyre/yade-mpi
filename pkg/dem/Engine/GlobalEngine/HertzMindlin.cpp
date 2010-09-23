@@ -8,7 +8,13 @@
 
 #define pi 3.14159265 
 
-YADE_PLUGIN((MindlinPhys)(Ip2_FrictMat_FrictMat_MindlinPhys)(Law2_ScGeom_MindlinPhys_HertzWithLinearShear)(Law2_ScGeom_MindlinPhys_Mindlin));
+YADE_PLUGIN(
+	(MindlinPhys)
+	(Ip2_FrictMat_FrictMat_MindlinPhys)
+	(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz)
+	(Law2_ScGeom_MindlinPhys_HertzWithLinearShear)
+	(Law2_ScGeom_MindlinPhys_Mindlin)
+);
 
 Real Law2_ScGeom_MindlinPhys_Mindlin::Real0=0;
 Real Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation() {return (Real) frictionDissipation;}
@@ -97,6 +103,45 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 			}
 	}
 	return normEnergy;
+}
+
+void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+	Body::id_t id1(contact->getId1()), id2(contact->getId2());
+	ScGeom* geom = static_cast<ScGeom*>(ig.get());
+	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
+	const Real uN=geom->penetrationDepth;
+	if (uN<0) {scene->interactions->requestErase(id1,id2); return;}
+	// normal force
+	Real Fn=phys->kno*pow(uN,3/2.);
+	phys->normalForce=Fn*geom->normal;
+	// exactly zero would not work with the shear formulation, and would give zero shear force anyway
+	if(Fn==0) return;
+	//phys->kn=3./2.*phys->kno*std::pow(uN,0.5); // update stiffness, not needed
+
+	// contact radius
+	Real R=geom->radius1*geom->radius2/(geom->radius1+geom->radius2);
+	phys->radius=pow(Fn*pow(R,3/2.)/phys->kno,1/3.);
+	
+	// shear force: transform, but keep the old value for now
+	geom->rotate(phys->usTotal);
+	Vector3r usOld=phys->usTotal;
+	Vector3r dUs=geom->shearIncrement();
+	phys->usTotal-=dUs;
+
+#if 0
+	Vector3r shearIncrement;
+	shearIncrement=geom->shearIncrement();
+	Fs-=ks*shearIncrement;
+	// Mohr-Coulomb slip
+	Real maxFs2=pow(Fn,2)*pow(phys->tangensOfFrictionAngle,2);
+	if(Fs.squaredNorm()>maxFs2) Fs*=sqrt(maxFs2)/Fs.norm();
+#endif
+	// apply forces
+	Vector3r f=-phys->normalForce-phys->shearForce; 
+	scene->forces.addForce(id1,f);
+	scene->forces.addForce(id2,-f);
+	scene->forces.addTorque(id1,(geom->radius1-.5*geom->penetrationDepth)*geom->normal.cross(f));
+	scene->forces.addTorque(id2,(geom->radius2-.5*geom->penetrationDepth)*geom->normal.cross(f));
 }
 
 void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){

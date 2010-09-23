@@ -49,7 +49,7 @@ using namespace std;
 namespace yade{
 	namespace Attr{
 		// keep in sync with py/wrapper/yadeWrapper.cpp !
-		enum flags { noSave=1, pyReadonly=2, pyCallPostLoad=4, pyHidden=8, pyNoResize=16, };
+		enum flags { noSave=1, readonly=2, triggerPostLoad=4, hidden=8, noResize=16, };
 	};
 };
 using namespace yade;
@@ -103,14 +103,14 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 #define _DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc)  _DEF_READWRITE_BY_VALUE(thisClass,attr,doc)
 // the conditional yade::py_wrap_ref should be eliminated by compiler at compile-time, as it depends only on types, not their values
 // most of this could be written with templates, including flags (ints can be template args)
-#define _DEF_READWRITE_CUSTOM(thisClass,attr) if(!(_ATTR_FLG(attr) & yade::Attr::pyHidden)){ bool _ro(_ATTR_FLG(attr) & Attr::pyReadonly), _post(_ATTR_FLG(attr) & Attr::pyCallPostLoad), _ref(yade::py_wrap_ref<typeof(thisClass::_ATTR_NAM(attr))>::value); std::string docStr(_ATTR_DOC(attr)); docStr+=" :yattrflags:`"+boost::lexical_cast<string>(_ATTR_FLG(attr))+"` "; \
+#define _DEF_READWRITE_CUSTOM(thisClass,attr) if(!(_ATTR_FLG(attr) & yade::Attr::hidden)){ bool _ro(_ATTR_FLG(attr) & Attr::readonly), _post(_ATTR_FLG(attr) & Attr::triggerPostLoad), _ref(yade::py_wrap_ref<typeof(thisClass::_ATTR_NAM(attr))>::value); std::string docStr(_ATTR_DOC(attr)); docStr+=" :yattrflags:`"+boost::lexical_cast<string>(_ATTR_FLG(attr))+"` "; \
 	if      ( _ref && !_ro && !_post) _classObj.def_readwrite(_ATTR_NAM_STR(attr),&thisClass::_ATTR_NAM(attr),docStr.c_str()); \
 	else if ( _ref && !_ro &&  _post) _classObj.add_property(_ATTR_NAM_STR(attr),boost::python::make_getter(&thisClass::_ATTR_NAM(attr)),make_setter_postLoad<thisClass,typeof(thisClass::_ATTR_NAM(attr)),&thisClass::_ATTR_NAM(attr)>,docStr.c_str()); \
 	else if ( _ref &&  _ro)           _classObj.def_readonly(_ATTR_NAM_STR(attr),&thisClass::_ATTR_NAM(attr),docStr.c_str()); \
 	else if (!_ref && !_ro && !_post) _classObj._DEF_READWRITE_BY_VALUE(thisClass,_ATTR_NAM(attr),docStr.c_str()); \
 	else if (!_ref && !_ro &&  _post) _classObj._DEF_READWRITE_BY_VALUE_POSTLOAD(thisClass,_ATTR_NAM(attr),docStr.c_str()); \
 	else if (!_ref &&  _ro)           _classObj._DEF_READONLY_BY_VALUE(thisClass,_ATTR_NAM(attr),docStr.c_str()); \
-	if(_ro && _post) std::cerr<<"WARN: " BOOST_PP_STRINGIZE(thisClass) "::" _ATTR_NAM_STR(attr) " with the yade::Attr::pyReadonly flag also uselessly sets yade::Attr::pyCallPostLoad."<<std::endl; \
+	if(_ro && _post) std::cerr<<"WARN: " BOOST_PP_STRINGIZE(thisClass) "::" _ATTR_NAM_STR(attr) " with the yade::Attr::readonly flag also uselessly sets yade::Attr::triggerPostLoad."<<std::endl; \
 }
 #define _DEF_READWRITE_CUSTOM_STATIC(thisClass,attr,doc) { /* if(yade::py_wrap_ref<typeof(thisClass::attr)>::value)*/ _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); /* else _classObj._DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc);*/ }
 

@@ -59,34 +59,34 @@ class Scene: public Serializable{
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Scene,Serializable,"Object comprising the whole simulation.",
 		#ifdef YADE_GROUP_RELATION_DATA
-			((shared_ptr<GroupRelationData>,grpRelationData,,Attr::pyHidden,"Assigns float value to all possible combinations of body group that interact."))
+			((shared_ptr<GroupRelationData>,grpRelationData,,Attr::hidden,"Assigns float value to all possible combinations of body group that interact."))
 		#endif
 		((Real,dt,1e-8,,"Current timestep for integration."))
-		((long,iter,0,Attr::pyReadonly,"Current iteration (computational step) number"))
+		((long,iter,0,Attr::readonly,"Current iteration (computational step) number"))
 		((bool,subStepping,false,,"Whether we currently advance by one engine in every step (rather than by single run through all engines)."))
-		((int,subStep,-1,Attr::pyReadonly,"Number of sub-step; not to be changed directly. -1 means to run loop prologue (cell integration), 0…n-1 runs respective engines (n is number of engines), n runs epilogue (increment step number and time."))
-		((Real,time,0,Attr::pyReadonly,"Simulation time (virtual time) [s]"))
+		((int,subStep,-1,Attr::readonly,"Number of sub-step; not to be changed directly. -1 means to run loop prologue (cell integration), 0…n-1 runs respective engines (n is number of engines), n runs epilogue (increment step number and time."))
+		((Real,time,0,Attr::readonly,"Simulation time (virtual time) [s]"))
 		((long,stopAtIter,0,,"Iteration after which to stop the simulation."))
 		#if 0
 			// not yet implemented
 			((Real,stopAtTime,0,,"Time at which to stop the simulation"))
 			((Real,stopAtRealTime,0,,"Time at which to stop the simulation"))
 		#endif
-		((bool,isPeriodic,false,Attr::pyReadonly,"Whether periodic boundary conditions are active."))
-		((bool,needsInitializers,true,Attr::pyReadonly,"Whether initializers will be run before the first step."))
+		((bool,isPeriodic,false,Attr::readonly,"Whether periodic boundary conditions are active."))
+		((bool,needsInitializers,true,Attr::readonly,"Whether initializers will be run before the first step."))
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 
 		((list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
-		((vector<shared_ptr<Engine> >,engines,,Attr::pyHidden,"Engines sequence in the simulation."))
-		((vector<shared_ptr<Engine> >,initializers,,Attr::pyHidden,"Engines that will be run only once, before the first step."))
-		((shared_ptr<BodyContainer>,bodies,new BodyContainer,Attr::pyHidden,"Bodies contained in the scene."))
-		((shared_ptr<InteractionContainer>,interactions,new InteractionContainer,Attr::pyHidden,"All interactions between bodies."))
-		((vector<shared_ptr<Material> >,materials,,Attr::pyHidden,"Container of shared materials. Add elements using Scene::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!"))
-		((shared_ptr<Bound>,bound,,Attr::pyHidden,"Bounding box of the scene (only used for rendering and initialized if needed)."))
+		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))
+		((vector<shared_ptr<Engine> >,initializers,,Attr::hidden,"Engines that will be run only once, before the first step."))
+		((shared_ptr<BodyContainer>,bodies,new BodyContainer,Attr::hidden,"Bodies contained in the scene."))
+		((shared_ptr<InteractionContainer>,interactions,new InteractionContainer,Attr::hidden,"All interactions between bodies."))
+		((vector<shared_ptr<Material> >,materials,,Attr::hidden,"Container of shared materials. Add elements using Scene::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!"))
+		((shared_ptr<Bound>,bound,,Attr::hidden,"Bounding box of the scene (only used for rendering and initialized if needed)."))
 
-		((shared_ptr<Cell>,cell,new Cell,Attr::pyHidden,"Information on periodicity; only should be used if Scene::isPeriodic."))
-		((vector<shared_ptr<Serializable> >,miscParams,,Attr::pyHidden,"Store for arbitrary Serializable objects; will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)"))
-		((vector<shared_ptr<DisplayParameters> >,dispParams,,Attr::pyHidden,"'hash maps' of display parameters (since yade::serialization had no support for maps, emulate it via vector of strings in format key=value)"))
+		((shared_ptr<Cell>,cell,new Cell,Attr::hidden,"Information on periodicity; only should be used if Scene::isPeriodic."))
+		((vector<shared_ptr<Serializable> >,miscParams,,Attr::hidden,"Store for arbitrary Serializable objects; will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)"))
+		((vector<shared_ptr<DisplayParameters> >,dispParams,,Attr::hidden,"'hash maps' of display parameters (since yade::serialization had no support for maps, emulate it via vector of strings in format key=value)"))
 
 		,
 		/*ctor*/ fillDefaultTags();

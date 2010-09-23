@@ -207,7 +207,7 @@ class InsertionSortCollider: public Collider{
 		((Real,binOverlap,0.8,,"Relative bins hysteresis, to avoid moving body back and forth if its velocity is around the border value. (Passed to VelocityBins)"))
 		((Real,maxRefRelStep,.3,,"(Passed to VelocityBins)"))
 		((int,histInterval,100,,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins."))
-		((int,numReinit,0,Attr::pyReadonly,"Cummulative number of bound array re-initialization."))
+		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
 		,
 		/* ctor */
 			#ifdef ISC_TIMING

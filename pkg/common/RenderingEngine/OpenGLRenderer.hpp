@@ -52,11 +52,11 @@ class OpenGLRenderer : public Serializable
 		GlInteractionGeometryDispatcher interactionGeometryDispatcher;
 		GlInteractionPhysicsDispatcher interactionPhysicsDispatcher;
 		GlShapeDispatcher shapeDispatcher;
-		GlStateDispatcher stateDispatcher;
+		// GlStateDispatcher stateDispatcher;
 
 
 		vector<string>
-			stateFunctorNames,
+			// stateFunctorNames,
 			boundFunctorNames,
 			shapeFunctorNames, 
 			interactionGeometryFunctorNames,
@@ -65,7 +65,7 @@ class OpenGLRenderer : public Serializable
 		DECLARE_LOGGER;
 
 	public :
-		void addStateFunctor(const string& str);
+		// void addStateFunctor(const string& str);
 		void addBoundingVolumeFunctor(const string& str);
 		void addInteractingGeometryFunctor(const string& str);
 		void addInteractionGeometryFunctor(const string& str);
@@ -73,17 +73,16 @@ class OpenGLRenderer : public Serializable
 			
 		void init();
 		void initgl();
-		void render(const shared_ptr<Scene>& scene, Body::id_t selection = Body::id_t(-1));
+		void render(const shared_ptr<Scene>& scene, Body::id_t selection=Body::id_t(-1));
 		void pyRender(){render(Omega::instance().getScene());}
-		void renderWithNames(const shared_ptr<Scene>& );
 	
-	private :
 		void renderDOF_ID();
 		void renderInteractionPhysics();
 		void renderInteractionGeometry();
-		void renderBoundingVolume();
-		void renderShape();
+		void renderBound();
+		void renderShape(bool withNames=false);
 		void renderAllInteractionsWire();
+
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
 		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),,"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
 		((Real,rotScale,((void)"disable scaling",1.),,"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))

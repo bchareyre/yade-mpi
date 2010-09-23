@@ -754,12 +754,12 @@ Expected parameters are indicated by macro name components separated with unders
 		By default, an attribute will be serialized and will be read-write from python. There is a number of flags that can be passed as the 4th argument (empty by default) to change that:
 
 		* ``Attr::noSave`` avoids serialization of the attribute (while still keeping its accessibility from Python)
-		* ``Attr::pyReadonly`` makes the attribute read-only from Python
-		* ``Attr::pyCallPostLoad`` will call ``postLoad`` function to handle attribute change after its value is set from Python; this is to ensure consistency of other precomputed data which depend on this value (such as ``Cell.trsf`` and such)
-		* ``Attr::pyHidden`` will not expose the attribute to Python at all
-		* ``Attr::pyNoResize`` will not permit changing size of the array from Python [not yet used]
+		* ``Attr::readonly`` makes the attribute read-only from Python
+		* ``Attr::triggerPostLoad`` will trigger call to ``postLoad`` function to handle attribute change after its value is set from Python; this is to ensure consistency of other precomputed data which depend on this value (such as ``Cell.trsf`` and such)
+		* ``Attr::hidden`` will not expose the attribute to Python at all
+		* ``Attr::noResize`` will not permit changing size of the array from Python [not yet used]
 
-		Flags can be combined as usual using bitwise disjunction ``|`` (such as ``Attr::noSave | Attr::pyReadonly``), though in such case the value should be parenthesized to avoid a warning with some compilers (g++ specifically), i.e. ``(Attr::noSave | Attr::pyReadonly)``.
+		Flags can be combined as usual using bitwise disjunction ``|`` (such as ``Attr::noSave | Attr::readonly``), though in such case the value should be parenthesized to avoid a warning with some compilers (g++ specifically), i.e. ``(Attr::noSave | Attr::readonly)``.
 
 		Currently, the flags logic handled at runtime; that means that even for attributes with ``Attr::noSave``, their serialization template must be defined (although it will never be used). In the future, the implementation might be template-based, avoiding this necessity.
 

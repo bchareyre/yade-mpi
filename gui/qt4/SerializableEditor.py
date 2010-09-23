@@ -348,7 +348,7 @@ class SerializableEditor(QFrame):
 		if Klass:
 			widget=Klass(self,getter=getter,setter=setter)
 			widget.setFocusPolicy(Qt.StrongFocus)
-			if (entry.flags & AttrFlags.pyReadonly): widget.setEnabled(False)
+			if (entry.flags & AttrFlags.readonly): widget.setEnabled(False)
 			return widget
 		# sequences
 		if entry.T.__class__==tuple:

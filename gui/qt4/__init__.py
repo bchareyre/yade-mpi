@@ -1,4 +1,7 @@
 # encoding: utf-8
+import yade.runtime
+if not yade.runtime.hasDisplay: raise ImportError("Connecting to DISPLAY at Yade startup failed, unable to activate the qt4 interface.")
+
 from PyQt4.QtGui import *
 from PyQt4 import QtCore
 

@@ -63,17 +63,17 @@ class Body: public Serializable{
 		friend class BodyContainer;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
-		((Body::id_t,id,Body::ID_NONE,Attr::pyReadonly,"Unique id of this body."))
+		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
 		((int,groupMask,1,,"Bitmask for determining interactions."))
-		((int,flags,FLAG_DYNAMIC|FLAG_BOUNDED,Attr::pyReadonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded. In python, use :yref:`Body.dynamic` and :yref:`Body.bounded`."))
+		((int,flags,FLAG_DYNAMIC|FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded. In python, use :yref:`Body.dynamic` and :yref:`Body.bounded`."))
 
 		((shared_ptr<Material>,material,,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,,"Physical :yref:`state<State>`."))
 		((shared_ptr<Shape>,shape,,,"Geometrical :yref:`Shape`."))
 		((shared_ptr<Bound>,bound,,,":yref:`Bound`, approximating volume for the purposes of collision detection."))
 
-		((int,clumpId,Body::ID_NONE,Attr::pyReadonly,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")),
+		((int,clumpId,Body::ID_NONE,Attr::readonly,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")),
 		/* ctor */,
 		/* py */
 		//

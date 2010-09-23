@@ -20,32 +20,44 @@ void Gl1_NormPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr
 	if(!gluQuadric){ gluQuadric=gluNewQuadric(); if(!gluQuadric) throw runtime_error("Gl1_NormPhys::go unable to allocate new GLUquadric object (out of memory?)."); }
 	NormPhys* np=static_cast<NormPhys*>(ip.get());
 	shared_ptr<InteractionGeometry> ig(i->interactionGeometry); if(!ig) return; // changed meanwhile?
-	GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*>(ig.get());
-	//if(!gsc) cerr<<"Gl1_NormPhys: InteractionGeometry is not a GenericSpheresContact, but a "<<ig->getClassName()<<endl;
-	Real fnNorm=np->normalForce.dot(gsc->normal);
+	GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(ig.get());
+	//if(!geom) cerr<<"Gl1_NormPhys: InteractionGeometry is not a GenericSpheresContact, but a "<<ig->getClassName()<<endl;
+	Real fnNorm=np->normalForce.dot(geom->normal);
 	if((signFilter>0 && fnNorm<0) || (signFilter<0 && fnNorm>0)) return;
 	int fnSign=fnNorm>0?1:-1;
 	fnNorm=abs(fnNorm); 
 	maxFn=max(fnNorm,maxFn);
 	Real realMaxRadius;
 	if(maxRadius<0){
-		if(gsc->refR1>0) refRadius=min(gsc->refR1,refRadius);
-		if(gsc->refR2>0) refRadius=min(gsc->refR2,refRadius);
+		if(geom->refR1>0) refRadius=min(geom->refR1,refRadius);
+		if(geom->refR2>0) refRadius=min(geom->refR2,refRadius);
 		realMaxRadius=refRadius;
 	}
 	else realMaxRadius=maxRadius;
 	Real radius=realMaxRadius*(fnNorm/maxFn); // use logarithmic scale here?
 	Vector3r color=Shop::scalarOnColorScale(fnNorm*fnSign,-maxFn,maxFn);
-	Vector3r p1=b1->state->pos, p2=b2->state->pos;
-	Vector3r relPos;
-	if(scene->isPeriodic){
-		relPos=p2+scene->cell->Hsize*i->cellDist.cast<Real>()-p1;
-		p1=scene->cell->wrapShearedPt(p1);
-		p2=p1+relPos;
-	} else {
-		relPos=p2-p1;
-	}
-	Real dist=relPos.norm();
+	# if 0
+		// get endpoints from body positions
+		Vector3r p1=b1->state->pos, p2=b2->state->pos;
+		Vector3r relPos;
+		if(scene->isPeriodic){
+			relPos=p2+scene->cell->Hsize*i->cellDist.cast<Real>()-p1;
+			p1=scene->cell->wrapShearedPt(p1);
+			p2=p1+relPos;
+		} else {
+			relPos=p2-p1;
+		}
+		Real dist=relPos.norm();
+	#else
+		// get endpoints from geom
+		// max(r,0) handles r<0 which is the case for "radius" of the facet in Dem3DofGeom_FacetSphere
+		Vector3r cp=scene->isPeriodic? scene->cell->wrapShearedPt(geom->contactPoint) : geom->contactPoint;
+		//if(i->getId1()==0) cerr<<(scene->isPeriodic?"p":".");
+		Vector3r p1=cp-max(geom->refR1,0.)*geom->normal;
+		Vector3r relPos=/*p2*/(cp+max(geom->refR2,0.)*geom->normal)-p1;
+		Real dist=max(geom->refR1,0.)+max(geom->refR2,0.);
+	#endif
+
 
 	glDisable(GL_CULL_FACE); 
 	glPushMatrix();

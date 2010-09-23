@@ -64,6 +64,16 @@ class Ip2_FrictMat_FrictMat_MindlinPhys: public InteractionPhysicsFunctor{
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinPhys);
 
+class Law2_ScGeom_MindlinPhys_MindlinDeresiewitz: public LawFunctor{
+	public:
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
+		FUNCTOR2D(ScGeom,MindlinPhys);
+		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz,LawFunctor,
+			"Hertz-Mindlin contact law with partial slip solution, as described in [Thornton1991]_.",
+		);
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz);
+
 class Law2_ScGeom_MindlinPhys_HertzWithLinearShear: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
@@ -106,8 +116,8 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 			//((Real,frictionDissipation,0.0,"Energy dissipation due to sliding"))
 			//((Real,normDampDissip,0.0,"Energy dissipation due to sliding"))
 			//((Real,shearDampDissip,0.0,"Energy dissipation due to sliding"))
-			((Real,cn,0.0,Attr::pyReadonly,"Damping normal coefficient"))
-			((Real,cs,0.0,Attr::pyReadonly,"Damping tangetial coefficient"))
+			((Real,cn,0.0,Attr::readonly,"Damping normal coefficient"))
+			((Real,cs,0.0,Attr::readonly,"Damping tangetial coefficient"))
 			,
 			/* ctor */
 			,

@@ -99,13 +99,19 @@ finished: %s
 		return ret
 def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 
+def totalRunningTime():
+	tt0,tt1=[j.started for j in jobs if j.started],[j.finished for j in jobs if j.finished]+[time.time()]
+	# it is safe to suppose that 
+	if len(tt0)==0: return 0 # no job has been started at all
+	return max(tt1)-min(tt0)
+
 def globalHtmlStats():
 	t0=min([j.started for j in jobs if j.started!=None])
 	unfinished=len([j for j in jobs if j.status!='DONE'])
 	usedSlots=sum([j.nSlots for j in jobs if j.status=='RUNNING'])
 	global maxJobs
 	if unfinished:
-		ret='<p>Running for %s, since %s.</p>'%(t2hhmmss(time.time()-t0),time.ctime(t0))
+		ret='<p>Running for %s, since %s.</p>'%(t2hhmmss(totalRunningTime()),time.ctime(t0))
 	else:
 		failed=len([j for j in jobs if j.exitStatus!=0])
 		lastFinished=max([j.finished for j in jobs])
@@ -171,8 +177,10 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		f=open(fileName)
 		self.sendHttp(f.read(),contentType=contentType,**headers)
 	def sendHttp(self,data,contentType,**headers):
+		"Send file over http, using appropriate content-type. Headers are converted to strings. The *refresh* header is handled specially: if the value is 0, it is not sent at all."
 		self.send_response(200)
 		self.send_header('Content-type',contentType)
+		if 'refresh' in headers and headers['refresh']==0: del headers['refresh']
 		for h in headers: self.send_header(h,str(headers[h]))
 		self.end_headers()
 		self.wfile.write(data)
@@ -357,7 +365,7 @@ if opts.plotAlwaysUpdateTime>0:
 # OK, go now
 if not dryRun: runJobs(jobs,maxJobs)
 
-print 'All jobs finished, total time ',t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None]))
+print 'All jobs finished, total time ',t2hhmmss(totalRunningTime())
 
 plots=[]
 for j in jobs:

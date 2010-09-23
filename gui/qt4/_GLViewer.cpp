@@ -74,7 +74,11 @@ class pyGLViewer{
 };
 
 // ask to create a new view and wait till it exists
-pyGLViewer createView(){ size_t origViewNo=OpenGLManager::self->views.size(); OpenGLManager::self->emitCreateView(); while(OpenGLManager::self->views.size()!=origViewNo+1) usleep(50000); return pyGLViewer((*OpenGLManager::self->views.rbegin())->viewId); }
+pyGLViewer createView(){ 
+	int id=OpenGLManager::self->waitForNewView();
+	if(id<0) throw std::runtime_error("Unable to open new 3d view.");
+	return pyGLViewer((*OpenGLManager::self->views.rbegin())->viewId);
+}
 
 py::list getAllViews(){ py::list ret; FOREACH(const shared_ptr<GLViewer>& v, OpenGLManager::self->views){ if(v) ret.append(pyGLViewer(v->viewId)); } return ret; };
 void centerViews(void){ OpenGLManager::self->centerAllViews(); }

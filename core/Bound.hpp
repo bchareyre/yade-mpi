@@ -23,8 +23,8 @@ class Bound: public Serializable, public Indexable{
 	public:
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
 		((Vector3r,color,Vector3r(1,1,1),,"Color for rendering this object"))
-		((Vector3r,min,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::pyReadonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
-		((Vector3r,max,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::pyReadonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
+		((Vector3r,min,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::readonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
+		((Vector3r,max,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::readonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
 		,
 		/*deprec*/ ((diffuseColor,color,"For consistency with Shape.color")),
 		/* init */,

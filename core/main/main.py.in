@@ -84,6 +84,7 @@ import yade.config
 import yade.wrapper
 import yade.log
 import yade.system
+import yade.runtime
 
 # continue option processing
 
@@ -109,13 +110,13 @@ yade.runtime.opts=opts
 from yade import *
 from math import *
 
-def userSession(qt3=False,qt4=False):
+def userSession(qt4=False):
 	# prepare nice namespace for users
 	import yade
 	import sys
 	if len(sys.argv)>0:
 		arg0=sys.argv[0]
-		if qt3 or qt4: yade.qt.Controller();
+		if qt4: yade.qt.Controller();
 		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
 			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
 			sys.stderr.write("Running simulation "+arg0+'\n')
@@ -146,7 +147,7 @@ def userSession(qt3=False,qt4=False):
 		ipshell=IPShellEmbed(
 			#exit_msg='Bye.',
 			banner='[[ ^L clears screen, ^U kills line. '+
-				', '.join((['F12 controller','F11 3d view','F10 both','F9 generator'] if (qt3 or qt4) else [])+['F8 plot'])+'. ]]',
+				', '.join((['F12 controller','F11 3d view','F10 both','F9 generator'] if (qt4) else [])+['F8 plot'])+'. ]]',
 			rc_override=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py
 				prompt_in1='Yade [\#]: ',
 				prompt_in2='     .\D.: ',
@@ -160,7 +161,7 @@ def userSession(qt3=False,qt4=False):
 					# only with the gui
 					# the escape codes might not work on non-linux terminals.
 					]
-					+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if (qt3 or qt4) else []) #F12,F11,F10,F9
+					+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if (qt4) else []) #F12,F11,F10,F9
 					+['"\e[19~": "\C-Uimport yade.plot; yade.plot.plot();\C-M"', #F8
 					'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
 					]
@@ -174,7 +175,7 @@ def userSession(qt3=False,qt4=False):
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
-if 'qt3' in features: gui='qt3'
+yade.runtime.hasDisplay=False # this is the default initialized in the module, anyway
 if 'qt4' in features: gui='qt4'
 if opts.nogui: gui=None
 if gui:
@@ -183,7 +184,9 @@ if gui:
 	# we however want to handle this gracefully, therefore
 	# we test the connection with bare xlib first, which merely raises DisplayError
 	try:
-		Xlib.display._BaseDisplay(); # contrary to display.Display, _BaseDisplay does not check for extensions and that avoids spurious message "Xlib.protocol.request.QueryExtension" (bug?)
+		# contrary to display.Display, _BaseDisplay does not check for extensions and that avoids spurious message "Xlib.protocol.request.QueryExtension" (bug?)
+		Xlib.display._BaseDisplay();
+		yade.runtime.hasDisplay=True
 	except Xlib.error.DisplayError:
 		gui=None
 
@@ -194,11 +197,9 @@ yade.remote.runServers()
 
 if gui==None:
 	userSession()
-elif gui=='qt3':
-	# raises exception if unable to open the display, but that should have been handled above already
-	import yade.qt
-	userSession(qt3=True)
 elif gui=='qt4':
+	## we already tested that DISPLAY is available and can be opened
+	## otherwise Qt4 might crash at this point
 	import PyQt4
 	from PyQt4 import QtGui
 	from PyQt4.QtCore import *
