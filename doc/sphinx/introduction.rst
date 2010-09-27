@@ -325,7 +325,7 @@ Suppose now interactions have been already created. We can access them by the id
 .. ipython::
 	:suppress:
 
-	In [1]: O.engines=[InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
+	In [1]: O.engines=[InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 
 	In [2]: utils.createInteraction(0,1);
 
@@ -409,7 +409,7 @@ Simulation loop, shown at img. img-yade-iter-loop_, can be described as follows 
 		# approximate collision detection, create interactions
 		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 		# handle interactions
-		InteractionDispatchers(
+		InteractionLoop(
 			[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 			[Ip2_FrictMat_FrictMat_FrictPhys()],
 			[Law2_Dem3Dof_Elastic_Elastic()],
@@ -448,13 +448,13 @@ The next part, reading
 
 .. code-block:: python
 
-	InteractionDispatchers(
+	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 
-hides 3 internal dispatchers within the :yref:`InteractionDispatchers` engine; they all operate on interactions and are, for performance reasons, put together:
+hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`InteractionGeometryDispatcher`
 	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shapes>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`InteractionGeometry<Interaction::interactionGeometry>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.

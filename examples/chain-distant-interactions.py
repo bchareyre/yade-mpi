@@ -5,7 +5,7 @@
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InteractionDispatchers(
+	InteractionLoop(
 		## Create geometry information about each potential collision.
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		## Create physical information about the interaction.

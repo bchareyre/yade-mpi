@@ -7,7 +7,7 @@ O.engines=[
 	ForceResetter(),
 	FlatGridCollider(step=.2,aabbMin=(0,0,0),aabbMax=(10,10,5),verletDist=0.005),
 	# InsertionSortCollider([Bo1_Sphere_Aabb()],sweepLength=0.005),
-	InteractionDispatchers(
+	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],

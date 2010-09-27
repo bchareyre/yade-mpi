@@ -40,7 +40,7 @@ O.engines=[
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	## Interactions
-	InteractionDispatchers(
+	InteractionLoop(
 		## Create geometry information about each potential collision.
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		## Create physical information about the interaction.

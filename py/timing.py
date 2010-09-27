@@ -59,7 +59,7 @@ def _engines_stats(engines,totalTime,level):
 			else: execTime=e.execTime
 			lines+=_delta_stats(e.timingDeltas,execTime,level+1)
 		if isinstance(e,Dispatcher): lines+=_engines_stats(e.functors,e.execTime,level+1)
-		if isinstance(e,InteractionDispatchers):
+		if isinstance(e,InteractionLoop):
 			lines+=_engines_stats(e.geomDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.physDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.lawDispatcher.functors,e.execTime,level+1)

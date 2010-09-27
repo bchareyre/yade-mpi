@@ -33,6 +33,8 @@ class Material: public Serializable, public Indexable{
 		static const shared_ptr<Material> byId(int id, shared_ptr<Scene> scene) {return byId(id,scene.get());}
 		static const shared_ptr<Material> byLabel(const std::string& label, Scene* scene=NULL);
 		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<Scene> scene) {return byLabel(label,scene.get());}
+		// return index of material, given its label
+		static const int byLabelIndex(const std::string& label, Scene* scene=NULL);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Material,Serializable,"Material properties of a :yref:`body<Body>`.",
 		((int,id,((void)"not shared",-1),Attr::readonly,"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise. This value is set automatically when the material is inserted to the simulation via :yref:`O.materials.append<MaterialContainer.append>`. (This id was necessary since before boost::serialization was used, shared pointers were not tracked properly; it might disappear in the future)"))

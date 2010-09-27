@@ -24,7 +24,7 @@ upperSphere=O.bodies[1]
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
-	InteractionDispatchers(
+	InteractionLoop(
 			      [Ig2_Sphere_Sphere_ScGeom()],
 			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys(betaR=0.24)],
 			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]

@@ -29,7 +29,7 @@
 #include<yade/pkg-common/ForceResetter.hpp>
 
 #include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/InteractionDispatchers.hpp>
+#include<yade/pkg-common/InteractionLoop.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -500,12 +500,12 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsDispatcher*>(e.get()); if(physMeta) continue; }
-		InteractionDispatchers* id(dynamic_cast<InteractionDispatchers*>(e.get()));
+		InteractionLoop* id(dynamic_cast<InteractionLoop*>(e.get()));
 		if(id){ geomMeta=id->geomDispatcher.get(); physMeta=id->physDispatcher.get(); }
 		if(geomMeta&&physMeta){break;}
 	}
-	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines or inside InteractionDispatchers.");
-	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines or inside InteractionDispatchers.");
+	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines or inside InteractionLoop.");
+	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines or inside InteractionLoop.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	if(!b1) throw runtime_error(("No body #"+lexical_cast<string>(id1)).c_str());
 	if(!b2) throw runtime_error(("No body #"+lexical_cast<string>(id2)).c_str());

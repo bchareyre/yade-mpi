@@ -7,7 +7,7 @@
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InteractionDispatchers(
+	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_MindlinPhys()],
 		[Law2_ScGeom_MindlinPhys_Mindlin()]

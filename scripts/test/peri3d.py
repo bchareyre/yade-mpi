@@ -9,7 +9,7 @@ log.setLevel('Peri3dController',log.TRACE)
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=1.5,label='bo1s')]),
-	InteractionDispatchers(
+	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=1.5,label='ig2ss')],
 		#[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()]
 		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_Dem3DofGeom_CpmPhys_Cpm()]

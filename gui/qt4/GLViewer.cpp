@@ -393,7 +393,8 @@ void GLViewer::centerMedianQuartile(){
 	}
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	FOREACH(shared_ptr<Body> b, *scene->bodies){
+		if(!b) continue;
 		for(int i=0; i<3; i++) coords[i].push_back(b->state->pos[i]);
 	}
 	Vector3r median,interQuart;
@@ -413,8 +414,7 @@ void GLViewer::centerScene(){
 	if (!rb) return;
 	if(rb->isPeriodic){ centerPeriodic(); return; }
 
-	if(rb->bodies->size()<renderer->selectBodyLimit){LOG_INFO("Less than "+lexical_cast<string>(renderer->selectBodyLimit)+" bodies, moving possible. Select with shift, press 'm' to move.");}
-	else{LOG_INFO("More than "+lexical_cast<string>(renderer->selectBodyLimit)+" (OpenGLRenderer::selectBodyLimit) bodies. Moving not possible.");}
+	LOG_INFO("Select with shift, press 'm' to move.");
 	Vector3r min,max;	
 	if(rb->bound){
 		min=rb->bound->min; max=rb->bound->max;
@@ -502,11 +502,10 @@ void GLViewer::draw()
 }
 
 void GLViewer::drawWithNames(){
-	cerr<<"[selection redraw]";
 	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
 	const shared_ptr<Scene> scene(Omega::instance().getScene());
-	//
-	if(scene && (scene->bodies->size()<renderer->selectBodyLimit)) renderer->renderShape(true);
+	renderer->scene=scene;
+	renderer->renderShape();
 }
 
 // new object selected.

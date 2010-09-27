@@ -810,13 +810,13 @@ Expected parameters are indicated by macro name components separated with unders
 
 Special python constructors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The Python wrapper automatically create constructor that takes keyword (named) arguments corresponding to instance attributes; those attributes are set to values provided in the constructor. In some cases, more flexibility is desired (such as :yref:`InteractionDispatchers`, which takes 3 lists of functors). For such cases, you can override the function ``Serializable::pyHandleCustomCtorArgs``, which can arbitrarily modify the new (already existing) instance. It should modify in-place arguments given to it, as they will be passed further down to the routine which sets attribute values. In such cases, you should document the constructor::
+The Python wrapper automatically create constructor that takes keyword (named) arguments corresponding to instance attributes; those attributes are set to values provided in the constructor. In some cases, more flexibility is desired (such as :yref:`InteractionLoop`, which takes 3 lists of functors). For such cases, you can override the function ``Serializable::pyHandleCustomCtorArgs``, which can arbitrarily modify the new (already existing) instance. It should modify in-place arguments given to it, as they will be passed further down to the routine which sets attribute values. In such cases, you should document the constructor::
 
 	.. admonition:: Special constructor
 
 		Constructs from lists of …
 
-which then appears in the documentation similar to :yref:`InteractionDispatchers`.
+which then appears in the documentation similar to :yref:`InteractionLoop`.
 
 Static attributes
 ^^^^^^^^^^^^^^^^^^^
@@ -1158,7 +1158,7 @@ There is parallelism at 3 levels:
 	``Engine2`` will be run after ``Engine1``, but in parallel with ``Engine3``.
 
 	.. warning:: It is your reponsibility to avoid concurrent access to data when using ParallelEngine. Make sure you understand *very well* what the engines run in parallel do.
-* Parallelism inside Engines. Some loops over bodies or interactions are parallelized (notably :yref:`InteractionDispatchers` and :yref:`NewtonIntegrator`, which are treated in detail later (FIXME: link)):
+* Parallelism inside Engines. Some loops over bodies or interactions are parallelized (notably :yref:`InteractionLoop` and :yref:`NewtonIntegrator`, which are treated in detail later (FIXME: link)):
 
 	.. code-block:: c++
 
@@ -1343,7 +1343,7 @@ The output might look like this (note that functors are nested inside dispatcher
 	"damageChecker"                       9               3272μs              0.00%      
 	TOTAL                                            102077490μs            100.00%      
 
-.. warning:: Do not use :yref:`TimingDeltas` in parallel sections, results might not be meaningful. In particular, avoid timing functors inside :yref:`InteractionDispatchers` when running with multiple OpenMP threads.
+.. warning:: Do not use :yref:`TimingDeltas` in parallel sections, results might not be meaningful. In particular, avoid timing functors inside :yref:`InteractionLoop` when running with multiple OpenMP threads.
 
 ``TimingDeltas`` data are accessible from Python as list of (*label*,*time*,*count*) tuples, one tuple representing each checkpoint:
 
@@ -1605,7 +1605,7 @@ During each step in the simulation, the following operations are performed on in
 
 #. Collider erases interactions that were requested for being erased (see below).
 
-#. :yref:`InteractionDispatchers` (via :yref:`InteractionGeometryDispatcher`) calls appropriate :yref:`InteractionGeometryFunctor` based on :yref:`Shape` combination of both bodies, if such functor exists. For real interactions, the functor updates associated :yref:`InteractionGeometry`. For potential interactions, the functor returns
+#. :yref:`InteractionLoop` (via :yref:`InteractionGeometryDispatcher`) calls appropriate :yref:`InteractionGeometryFunctor` based on :yref:`Shape` combination of both bodies, if such functor exists. For real interactions, the functor updates associated :yref:`InteractionGeometry`. For potential interactions, the functor returns
 
 	``false``
 		if there is no geometrical overlap, and the interaction will stillremain potential-only
@@ -1620,9 +1620,9 @@ During each step in the simulation, the following operations are performed on in
 	.. note::
 		If there is no functor suitable to handle given combination of :yref:`shapes<Shape>`, the interaction will be left in potential state, without raising any error.
 
-#. For real interactions (already existing or jsut created in last step), :yref:`InteractionDispatchers` (via :yref:`InteractionPhysicsDispatcher`) calls appropriate :yref:`InteractionPhysicsFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`InteractionPhysics` instance. It is an error if no suitable functor is found, and an exception will be thrown.
+#. For real interactions (already existing or jsut created in last step), :yref:`InteractionLoop` (via :yref:`InteractionPhysicsDispatcher`) calls appropriate :yref:`InteractionPhysicsFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`InteractionPhysics` instance. It is an error if no suitable functor is found, and an exception will be thrown.
 
-#. For real interactions, :yref:`InteractionDispatchers` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combintation of :yref:`InteractionGeometry` and :yref:`InteractionPhysics` of the interaction. Again, it is an error if no functor capable of handling it is found.
+#. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combintation of :yref:`InteractionGeometry` and :yref:`InteractionPhysics` of the interaction. Again, it is an error if no functor capable of handling it is found.
 
 #. :yref:`LawDispatcher` can decide that an interaction should be removed (such as if bodies get too far apart for non-cohesive laws; or in case of complete damage for damage models). This is done by calling
 

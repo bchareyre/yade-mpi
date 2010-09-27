@@ -68,7 +68,7 @@ shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shar
 		#endif
 		assert(b1->shape && b2->shape);
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
-		// FIXME: this code is more or less duplicated from InteractionDispatchers :-(
+		// FIXME: this code is more or less duplicated from InteractionLoop :-(
 		bool swap=false;
 		I->functorCache.geom=getFunctor2D(b1->shape,b2->shape,swap);
 		if(!I->functorCache.geom) throw invalid_argument("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+").");

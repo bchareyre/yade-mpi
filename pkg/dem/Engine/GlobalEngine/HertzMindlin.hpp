@@ -15,6 +15,7 @@ Mindlin is a set of classes to include the Hertz-Mindlin formulation for the con
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg-common/MatchMaker.hpp>
 
 
 #include <set>
@@ -40,6 +41,9 @@ class MindlinPhys: public FrictPhys{
 			((Real,adhesionForce,0.0,,"Force of adhesion as predicted by DMT"))
 			((bool,isAdhesive,false,,"bool to identify if the contact is adhesive, that is to say if the contact force is attractive"))
 
+			((Real,betan,0.0,,"Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
+			((Real,betas,0.0,,"Fraction of the viscous damping coefficient (shear direction) equal to $\\frac{c_{s}}{C_{s,crit}}$."))
+
 			//((Real,shearEnergy,0.0,,"Shear elastic potential energy"))
 			//((Real,frictionDissipation,0.0,,"Energy dissipation due to sliding"))
 			//((Real,normDampDissip,0.0,,"Energy dissipation due to sliding"))
@@ -57,8 +61,12 @@ class Ip2_FrictMat_FrictMat_MindlinPhys: public InteractionPhysicsFunctor{
 	public :
 	virtual void go(const shared_ptr<Material>& b1,	const shared_ptr<Material>& b2,	const shared_ptr<Interaction>& interaction);
 	FUNCTOR2D(FrictMat,FrictMat);
-	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_MindlinPhys,InteractionPhysicsFunctor,"Calculate some physical parameters needed to obtain the normal and shear stiffnesses according to the Hertz-Mindlin's formulation (as implemented in PFC).",
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_MindlinPhys,InteractionPhysicsFunctor,"Calculate some physical parameters needed to obtain the normal and shear stiffnesses according to the Hertz-Mindlin's formulation (as implemented in PFC).\n\nViscous parameters can be specified either using coefficients of restitution ($e_n$, $e_s$) or viscous damping coefficient ($\\beta_n$, $\\beta_s$). The following rules apply:\n#. If the $\\beta_n$ ($\\beta_s$) coefficient is given, it is assigned to :yref:`MindlinPhys.betan` (:yref:`MindlinPhys.betas`) directly.\n#. If $e_n$ is given, :yref:`MindlinPhys.betan` is computed using $\\beta_n=-(\\log e_n)/\\sqrt{\\pi^2+(\\log e_n)^2}$. The same applies to $e_s$, :yref:`MindlinPhys.betas`.\n#. It is an error (exception) to specify both $e_n$ and $\\beta_n$ ($e_s$ and $\\beta_s$).\n#. If neither $e_n$ nor $\\beta_n$ is given, zero value for :yref:`MindlinPhys.betan` is used; there will be no viscous effects.\n#.If neither $e_s$ nor $\\beta_s$ is given, the value of :yref:`MindlinPhys.betan` is used for :yref:`MindlinPhys.betas` as well.\n\nThe $e_n$, $\\beta_n$, $e_s$, $\\beta_s$ are :yref:`MatchMaker` objects; they can be constructed from float values to always return constant value.\n\nSee :ysrc:`scripts/shots.py` for an example of specifying $e_n$ based on combination of parameters.",
 			((Real,gamma,0.0,,"Surface energy parameter [J/m^2] per each unit contact surface, to derive DMT formulation from HM"))
+			((shared_ptr<MatchMaker>,en,,,"Normal coefficient of restitution $e_n$."))
+			((shared_ptr<MatchMaker>,es,,,"Shear coefficient of restitution $e_s$."))
+			((shared_ptr<MatchMaker>,betan,,,"Normal viscous damping coefficient $\\beta_n$."))
+			((shared_ptr<MatchMaker>,betas,,,"Shear viscous damping coefficient $\\beta_s$."))
 	);
 	DECLARE_LOGGER;
 };
@@ -87,6 +95,9 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_HertzWithLinearShear);
 
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
+		// just for the deprecation warning, can be removed later
+		Real _beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys; 
+		bool _nothing;
 	public:
 		static Real Real0;
 		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> frictionDissipation;
@@ -104,23 +115,22 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 
 
 		FUNCTOR2D(ScGeom,MindlinPhys);
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
 			((bool,preventGranularRatcheting,true,,"bool to avoid granular ratcheting"))
 			((bool,includeAdhesion,false,,"bool to include the adhesion force following the DMT formulation. If true, also the normal elastic energy takes into account the adhesion effect."))
-			((bool,useDamping,false,,"bool to include contact damping"))
 			((bool,calcEnergy,false,,"bool to calculate energy terms (shear potential energy, dissipation of energy due to friction and dissipation of energy due to normal and tangential damping)"))
-			((Real,betan,0.0,,"Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
-			((Real,betas,0.0,,"Fraction of the viscous damping coefficient (shear direction) equal to $\\frac{c_{s}}{C_{s,crit}}$."))
 			// FIXME: all the energy attributes should be openMPAccumulator
 			//((Real,shearEnergy,0.0,"Shear elastic potential energy"))
 			//((Real,frictionDissipation,0.0,"Energy dissipation due to sliding"))
 			//((Real,normDampDissip,0.0,"Energy dissipation due to sliding"))
 			//((Real,shearDampDissip,0.0,"Energy dissipation due to sliding"))
-			((Real,cn,0.0,Attr::readonly,"Damping normal coefficient"))
-			((Real,cs,0.0,Attr::readonly,"Damping tangetial coefficient"))
-			,
-			/* ctor */
-			,
+			, /*deprec*/
+			((betan,_beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys,"!Moved to MindlinPhys, where the value is assigned by the appropriate Ip2 functor."))
+			((betas,_beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys,"!Moved to MindlinPhys, where the value is assigned by the appropriate Ip2 functor."))
+			((useDamping,_nothing,"Damping is now turned on automatically if either of MindlinPhys.betan or MindlinPhys.betas are non-zero."))
+			, /* init */
+			, /* ctor */
+			, /* py */
 			.def("contactsAdhesive",&Law2_ScGeom_MindlinPhys_Mindlin::contactsAdhesive,"Compute total number of adhesive contacts.")
 			.def("normElastEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy,"Compute normal elastic potential energy. It handle the DMT formulation if :yref:`Law2_ScGeom_MindlinPhys_Mindlin::includeAdhesion` is set to true.")
 			.def("frictionDissipation",&Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation,"Energy dissipated by frictional behavior.")

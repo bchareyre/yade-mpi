@@ -290,16 +290,28 @@ void OpenGLRenderer::renderBound(){
 	}
 }
 
+// this function is called for both rendering as well as
+// in the selection mode
 
-void OpenGLRenderer::renderShape(bool withNames){
+// nice reading on OpenGL selection
+// http://glprogramming.com/red/chapter13.html
+
+void OpenGLRenderer::renderShape(){
 	shapeDispatcher.scene=scene.get(); shapeDispatcher.updateScenePtr();
 
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	// instead of const shared_ptr&, get proper shared_ptr;
+	// Less efficient in terms of performance, since memory has to be written (not measured, though),
+	// but it is still better than crashes if the body gets deleted meanwile.
+	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if(!b || !b->shape) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		Vector3r pos=bodyDisp[b->getId()].pos;
 		Quaternionr ori=bodyDisp[b->getId()].ori;
 		if(!b->shape || !((b->getGroupMask()&mask) || b->getGroupMask()==0)) continue;
+
+		// ignored in non-selection mode, use it always
+		glPushName(b->id);
+
 		glPushMatrix();
 			AngleAxisr aa(ori);	
 			glTranslatef(pos[0],pos[1],pos[2]);
@@ -309,10 +321,7 @@ void OpenGLRenderer::renderShape(bool withNames){
 				const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
 				glMaterialv(GL_FRONT_AND_BACK,GL_EMISSION,h);
 				glMaterialv(GL_FRONT_AND_BACK,GL_SPECULAR,h);
-				//
-				if(withNames) glPushName(b->getId());
-					shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
-				if(withNames) glPopName();
+				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
 				// reset highlight
 				resetSpecularEmission();
 			} else {
@@ -349,6 +358,7 @@ void OpenGLRenderer::renderShape(bool withNames){
 					pmin[2]<=cellSize[2] && pmax[2]>=0) {
 					Vector3r pt=scene->cell->shearPt(pos2);
 					if(pointClipped(pt)) continue;
+					glLoadName(b->id);
 					glPushMatrix();
 						glTranslatev(pt);
 						glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
@@ -357,6 +367,9 @@ void OpenGLRenderer::renderShape(bool withNames){
 				}
 			}
 		}
+		glPopName();
 	}
 }
+
+
 

@@ -51,7 +51,7 @@ def openUrl(url):
 		else: webWindows=webWindows[1:]+[webWindows[0]]
 	web=webWindows[-1]
 	web.load(QUrl(url)); web.setWindowTitle(url);
-	if 1:
+	if 0:
 		def killSidebar(result):
 			frame=web.page().mainFrame()
 			frame.evaluateJavaScript("var bv=$('.bodywrapper'); bv.css('margin','0 0 0 0');")

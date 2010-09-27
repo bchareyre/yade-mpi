@@ -12,6 +12,8 @@
 class OpenGLRenderer : public Serializable
 {
 	public:
+		int _nothing; // remove later, only target for deprecated selectBodyLimit
+
 		Body::id_t current_selection;
 
 		static const int numClipPlanes=3;
@@ -45,8 +47,6 @@ class OpenGLRenderer : public Serializable
 
 	private:
 		void resetSpecularEmission();
-		// updated after every call to render
-		shared_ptr<Scene> scene; 
 
 		GlBoundDispatcher boundDispatcher;
 		GlInteractionGeometryDispatcher interactionGeometryDispatcher;
@@ -65,6 +65,9 @@ class OpenGLRenderer : public Serializable
 		DECLARE_LOGGER;
 
 	public :
+		// updated after every call to render
+		shared_ptr<Scene> scene; 
+
 		// void addStateFunctor(const string& str);
 		void addBoundingVolumeFunctor(const string& str);
 		void addInteractingGeometryFunctor(const string& str);
@@ -80,7 +83,8 @@ class OpenGLRenderer : public Serializable
 		void renderInteractionPhysics();
 		void renderInteractionGeometry();
 		void renderBound();
-		void renderShape(bool withNames=false);
+		// called also to render selectable entitites;
+		void renderShape();
 		void renderAllInteractionsWire();
 
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
@@ -99,7 +103,6 @@ class OpenGLRenderer : public Serializable
 		((int,mask,((void)"draw everything",~0),,"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
 		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::Zero(),Quaternionr::Identity())),,"Position and orientation of clipping planes"))
 		((vector<bool>,clipPlaneActive,vector<bool>(numClipPlanes,false),,"Activate/deactivate respective clipping planes"))
-		((size_t,selectBodyLimit,1000,,"Limit number of bodies to allow picking body with mouse (performance reasons)"))
 		((bool,intrAllWire,false,,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
 		/*deprec*/
 			((Light_position,lightPos,))
@@ -117,6 +120,7 @@ class OpenGLRenderer : public Serializable
 			((rotationScale,rotScale,))
 			((scaleDisplacements,id,"! This option is no longer necessary, set dispScale to value different from (1,1,1) to have scaling applied."))
 			((scaleRotations,id,"! This option is no longer necessary, set rotScale to value different from 1.0 to have scaling applied."))
+			((selectBodyLimit,_nothing,"There is no longer a limit on selecting particles; the routine is called only with shift-click and has no performance impact otherwise."))
 		,
 		/*init*/,
 		/*ctor*/,

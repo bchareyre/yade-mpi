@@ -3,7 +3,7 @@ o=Omega()
 o.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),Bo1_Facet_Aabb()]),
-	InteractionDispatchers([Ig2_Facet_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],),
+	InteractionLoop([Ig2_Facet_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],),
 	GravityEngine(gravity=[0,0,-10]),
 	NewtonIntegrator(damping=0.01),
 ]

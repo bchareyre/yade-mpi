@@ -41,7 +41,7 @@
 #include<yade/pkg-common/ParallelEngine.hpp>
 #include<yade/pkg-common/Collider.hpp>
 
-#include<yade/pkg-common/InteractionDispatchers.hpp>
+#include<yade/pkg-common/InteractionLoop.hpp>
 
 // #include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/Clump.hpp>
@@ -244,6 +244,7 @@ class pyMaterialContainer{
 		int append(shared_ptr<Material> m){ scene->materials.push_back(m); m->id=scene->materials.size()-1; return m->id; }
 		vector<int> appendList(vector<shared_ptr<Material> > mm){ vector<int> ret; FOREACH(shared_ptr<Material>& m, mm) ret.push_back(append(m)); return ret; }
 		int len(){ return (int)scene->materials.size(); }
+		int index(const std::string& label){ return Material::byLabelIndex(label,scene.get()); }
 };
 
 void termHandlerNormal(int sig){cerr<<"Yade: normal exit."<<endl; raise(SIGTERM);}
@@ -282,7 +283,7 @@ class pyOmega{
 			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(!f->label.empty()){ pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");}} }
 			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
 			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(InteractionGeometryDispatcher); _TRY_DISPATCHER(InteractionPhysicsDispatcher); _TRY_DISPATCHER(LawDispatcher);
-			InteractionDispatchers* id=dynamic_cast<InteractionDispatchers*>(e.get());
+			InteractionLoop* id=dynamic_cast<InteractionLoop*>(e.get());
 			if(id){
 				_DO_FUNCTORS(id->geomDispatcher->functors,InteractionGeometryFunctor);
 				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
@@ -300,7 +301,7 @@ class pyOmega{
 			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
 			if(e->label==label){ return python::object(e); }
 			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(InteractionGeometryDispatcher); _TRY_DISPATCHER(InteractionPhysicsDispatcher); _TRY_DISPATCHER(LawDispatcher);
-			InteractionDispatchers* id=dynamic_cast<InteractionDispatchers*>(e.get());
+			InteractionLoop* id=dynamic_cast<InteractionLoop*>(e.get());
 			if(id){
 				_DO_FUNCTORS(id->geomDispatcher->functors,InteractionGeometryFunctor);
 				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
@@ -567,7 +568,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
 		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
-		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionDispatchers in the next step.")
+		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);
 	python::class_<pyBodyIterator>("BodyIterator",python::init<pyBodyIterator&>())
 		.def("__iter__",&pyBodyIterator::pyIter)
@@ -603,6 +604,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pyMaterialContainer>("MaterialContainer","Container for :yref:`Materials<Material>`. A material can be accessed using \n\n #. numerical index in range(0,len(cont)), like cont[2]; \n #. textual label that was given to the material, like cont['steel']. This etails traversing all materials and should not be used frequently.",python::init<pyMaterialContainer&>())
 		.def("append",&pyMaterialContainer::append,"Add new shared :yref:`Material`; changes its id and return it.")
 		.def("append",&pyMaterialContainer::appendList,"Append list of :yref:`Material` instances, return list of ids.")
+		.def("index",&pyMaterialContainer::index,"Return id of material, given its label.")
 		.def("__getitem__",&pyMaterialContainer::getitem_id)
 		.def("__getitem__",&pyMaterialContainer::getitem_label)
 		.def("__len__",&pyMaterialContainer::len);

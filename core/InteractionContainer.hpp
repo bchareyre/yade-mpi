@@ -74,7 +74,7 @@ class InteractionContainer: public Serializable{
 		boost::mutex drawloopmutex;
 		// sort interactions before serializations; useful if comparing XML files from different runs (false by default)
 		bool serializeSorted;
-		// iteration number when the collider was last run; set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionDispatchers (such as SpatialQuickSortCollider). Other colliders (such as InsertionSortCollider) set it it -1, which is the default
+		// iteration number when the collider was last run; set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionLoop (such as SpatialQuickSortCollider). Other colliders (such as InsertionSortCollider) set it it -1, which is the default
 		long iterColliderLastRun;
 		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state) and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
 		void requestErase(Body::id_t id1, Body::id_t id2, bool force=false);

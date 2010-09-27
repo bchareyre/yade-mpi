@@ -35,7 +35,7 @@ class IntrSmooth3d():
 		>>> from yade import utils
 		>>> O.bodies.append([utils.sphere((0,0,0),1),utils.sphere((0,0,1.9),1)])
 		[0, 1]
-		>>> O.engines=[InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom(),],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
+		>>> O.engines=[InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom(),],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 		>>> utils.createInteraction(0,1) #doctest: +ELLIPSIS
 		<Interaction instance at 0x...>
 

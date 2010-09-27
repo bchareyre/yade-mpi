@@ -402,7 +402,7 @@ In code, such scenario might look similar to this one (labeling is explained in 
 	      Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='bo1s'),
 	      Bo1_Facet_Aabb(),
 		]),
-	   InteractionDispatchers(
+	   InteractionLoop(
 	      [
 	         # enlarge here
 	         Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ig2ss'),
@@ -442,9 +442,9 @@ It is possible to create an interaction between a pair of particles independentl
 	     ...:    utils.sphere([0,0,1000],1)
 	     ...: ])
 
-	# only add InteractionDispatchers, no other engines are needed now
+	# only add InteractionLoop, no other engines are needed now
 	Yade [1]: O.engines=[
-	     ...:    InteractionDispatchers(
+	     ...:    InteractionLoop(
 	     ...:        [Ig2_Sphere_Sphere_Dem3DofGeom(),],
 	     ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
 	     ...:        [] # not needed now
@@ -453,7 +453,7 @@ It is possible to create an interaction between a pair of particles independentl
 
 	Yade [1]: i=utils.createInteraction(0,1)
 
-	# created by functors in InteractionDispatchers
+	# created by functors in InteractionLoop
 	Yade [2]: i.geom, i.phys
 
 This method will be rather slow if many interaction are to be created (the functor lookup will be repeated for each of them). In such case, ask on yade-dev@lists.launchpad.net to have the :yref:`yade.utils.createInteraction` function accept list of pairs id's as well.
@@ -473,11 +473,11 @@ Each of these points corresponds to one or several engines::
 	O.engines=[
 	   ForceResetter(),          # reset forces
 	   InsertionSortCollider([...]),  # approximate collision detection
-	   InteractionDispatchers([...],[...],[...]) # handle interactions
+	   InteractionLoop([...],[...],[...]) # handle interactions
 	   NewtonIntegrator()        # apply forces and update positions
 	]
 
-The order of engines is important. In majority of cases, you will put any additional engine after :yref:`InteractionDispatchers`:
+The order of engines is important. In majority of cases, you will put any additional engine after :yref:`InteractionLoop`:
 
 * if it apply force, it should come before :yref:`NewtonIntegrator`, otherwise the force will never be effective.
 * if it makes use of bodies' positions, it should also come before :yref:`NewtonIntegrator`, otherwise, positions at the next step will be used (this might not be critical in many cases, such as output for visualization with :yref:`VTKRecorder`).
@@ -526,11 +526,11 @@ Ig2 functors
 #. shape combinations that should collide;
    for instance::
 
-      InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[],[])
+      InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[],[])
 
    will handle collisions for :yref:`Sphere` + :yref:`Sphere`, but not for :yref:`Facet` + :yref:`Sphere` -- if that is desired, an additional functor must be used::
    
-      InteractionDispatchers([
+      InteractionLoop([
          Ig2_Sphere_Sphere_Dem3DofGeom(),
          Ig2_Facet_Sphere_Dem3DofGeom()
       ],[],[])
@@ -539,7 +539,7 @@ Ig2 functors
 
 #. :yref:`InteractionGeometry` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` accepts :yref:`Dem3DofGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`ScGeom`, the above example would simply change to::
 
-      InteractionDispatchers([
+      InteractionLoop([
          Ig2_Sphere_Sphere_ScGeom(),
          Ig2_Facet_Sphere_ScGeom()
       ],[],[])
@@ -579,7 +579,7 @@ Suppose we want to use the :yref:`Law2_ScGeom_FrictPhys_Basic` constitutive law.
 
 The result will be therefore::
 
-   InteractionDispatchers(
+   InteractionLoop(
       [Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
       [Ip2_FrictMat_FrictMat_FrictPhys()],
       [Law2_ScGeom_FrictPhys_Basic()]
@@ -595,7 +595,7 @@ In this case, our goal is to use the :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` consti
 
 Therefore, we will use::
 
-   InteractionDispatchers(
+   InteractionLoop(
       [Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
       [Ip2_CpmMat_CpmMat_CpmPhys()],
       [Law2_Dem3DofGeom_CpmPhys_Cpm()]

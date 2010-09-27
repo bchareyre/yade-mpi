@@ -4,7 +4,7 @@
 #include<yade/pkg-common/Callbacks.hpp>
 #include<yade/pkg-common/Dispatching.hpp>
 
-class InteractionDispatchers: public GlobalEngine {
+class InteractionLoop: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
 	typedef std::pair<Body::id_t, Body::id_t> idPair;
 	// store interactions that should be deleted after loop in action, not later
@@ -18,7 +18,7 @@ class InteractionDispatchers: public GlobalEngine {
 	public:
 		virtual void pyHandleCustomCtorArgs(python::tuple& t, python::dict& d);
 		virtual void action();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionDispatchers,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.\n\n.. admonition:: Special constructor\n\n\tConstructs from 3 lists of :yref:`Ig2<InteractionGeometryFunctor>`, :yref:`Ip2<InteractionPhysicsFunctor>`, :yref:`Law<LawFunctor>` functors respectively; they will be passed to interal dispatchers, which you might retrieve. (NOT YET DONE: Optionally, list of :yref:`IntrCallbacks<IntrCallback>` can be provided as fourth argument.)",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionLoop,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.\n\n.. admonition:: Special constructor\n\n\tConstructs from 3 lists of :yref:`Ig2<InteractionGeometryFunctor>`, :yref:`Ip2<InteractionPhysicsFunctor>`, :yref:`Law<LawFunctor>` functors respectively; they will be passed to interal dispatchers, which you might retrieve. (NOT YET DONE: Optionally, list of :yref:`IntrCallbacks<IntrCallback>` can be provided as fourth argument.)",
 			((shared_ptr<InteractionGeometryDispatcher>,geomDispatcher,new InteractionGeometryDispatcher,Attr::readonly,":yref:`InteractionGeometryDispatcher` object that is used for dispatch."))
 			((shared_ptr<InteractionPhysicsDispatcher>,physDispatcher,new InteractionPhysicsDispatcher,Attr::readonly,":yref:`InteractionPhysicsDispatcher` object used for dispatch."))
 			((shared_ptr<LawDispatcher>,lawDispatcher,new LawDispatcher,Attr::readonly,":yref:`LawDispatcher` object used for dispatch."))
@@ -36,5 +36,8 @@ class InteractionDispatchers: public GlobalEngine {
 		);
 		DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(InteractionDispatchers);
+REGISTER_SERIALIZABLE(InteractionLoop);
+
+// old name, issue warning when used in external code
+__attribute__((deprecated)) typedef InteractionLoop InteractionDispatchers;
 

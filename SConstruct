@@ -590,6 +590,20 @@ env.Export('env');
 ######
 ### combining builder
 #####
+# since paths are aboslute, sometime they are not picked up
+# hack it away by writing the combined files into a text file
+# and when it changes, force rebuild of all combined files
+# changes to $buildDir/combined-files are cheked at the end of 
+# the SConscript file
+import md5
+combinedFiles=env.subst('$buildDir/combined-files')
+
+if os.path.exists(combinedFiles):
+	combinedFilesMd5=md5.md5(file(combinedFiles).read()).hexdigest()
+	os.remove(combinedFiles)
+else:
+	combinedFilesMd5=None
+
 # http://www.scons.org/wiki/CombineBuilder
 import SCons.Action
 import SCons.Builder
@@ -600,6 +614,11 @@ def combiner_build(target, source, env):
 	open(str(target[0]),'w').write(out)
 	env.AlwaysBuild(target[0])
 	return 0
+def CombineWrapper(target,source):
+	open(combinedFiles,'a').write(env.subst(target)+': '+' '.join([env.subst(s) for s in source])+'\n')
+	return env.Combine(target,source)
+env.CombineWrapper=CombineWrapper
+	
 env.Append(BUILDERS = {'Combine': env.Builder(action = SCons.Action.Action(combiner_build, "> $TARGET"),target_factory = env.fs.File,)})
 
 import yadeSCons
@@ -643,5 +662,15 @@ if not COMMAND_LINE_TARGETS:
 # must be explicitly requested to be installed, e.g.:
 #    scons /usr/local/share/doc
 env.Install('$PREFIX/share/doc/yade$SUFFIX-doc/',['examples','scripts','doc'])
+
+
+### check if combinedFiles is different; if so, force rebuild of all of them
+combinedFilesMd5New=md5.md5(open(combinedFiles).read()).hexdigest()
+if combinedFilesMd5!=combinedFilesMd5New:
+	print 'Rebuilding combined files, since the md5 has changed.'
+	combs=[l.split(':')[0] for l in open(combinedFiles)]
+	for c in combs:
+		env.AlwaysBuild(c)
+		env.Default(c)
 
 #Progress('.', interval=100, file=sys.stderr)

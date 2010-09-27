@@ -93,7 +93,7 @@ area_25,area_50,area_75=utils.approxSectionArea(coord_25,axis),utils.approxSecti
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),],sweepLength=.05*sphereRadius,nBins=5,binCoeff=5),
-	InteractionDispatchers(
+	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg') if not scGeom else Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ss2sc')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
 		[Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0) if not scGeom else Law2_ScGeom_CpmPhys_Cpm()],

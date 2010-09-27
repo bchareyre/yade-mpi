@@ -41,7 +41,7 @@ class CohesiveFrictionalContactLaw : public GlobalEngine
 		long iter;/// used for checking if new iteration
 		void action();
 		
-	YADE_CLASS_BASE_DOC_ATTRS(CohesiveFrictionalContactLaw,GlobalEngine,"[DEPRECATED] Loop over interactions applying :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic` on all interactions.\n\n.. note::\n  Use :yref:`InteractionDispatchers` and :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic` instead of this class for performance reasons.",
+	YADE_CLASS_BASE_DOC_ATTRS(CohesiveFrictionalContactLaw,GlobalEngine,"[DEPRECATED] Loop over interactions applying :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic` on all interactions.\n\n.. note::\n  Use :yref:`InteractionLoop` and :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic` instead of this class for performance reasons.",
 		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((bool,momentRotationLaw,false,,"use bending/twisting moment at contacts. See :yref:`CohesiveFrictionalContactLaw::always_use_moment_law` for details."))
 		((bool,always_use_moment_law,false,,"If true, use bending/twisting moments at all contacts. If false, compute moments only for cohesive contacts."))

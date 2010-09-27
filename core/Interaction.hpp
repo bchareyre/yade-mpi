@@ -18,13 +18,13 @@ class Interaction : public Serializable
 {
 	private	:
 		friend class InteractionPhysicsDispatcher;
-		friend class InteractionDispatchers;
+		friend class InteractionLoop;
 	public :
 		bool isReal() const {return (bool)interactionGeometry && (bool)interactionPhysics;}
 		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
 		bool isFresh(Scene* rb);
 
-		//! At which step this interaction was last detected by the collider. InteractionDispatcher will remove it if InteractionContainer::iterColliderLastRun==currentStep and iterLastSeen<currentStep
+		//! At which step this interaction was last detected by the collider. InteractionLoop will remove it if InteractionContainer::iterColliderLastRun==currentStep and iterLastSeen<currentStep
 		long iterLastSeen;      
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
@@ -39,7 +39,7 @@ class Interaction : public Serializable
 
 		bool operator<(const Interaction& other) const { return getId1()<other.getId1() || (getId1()==other.getId1() && getId2()<other.getId2()); }
 
-		//! cache functors that are called for this interaction. Currently used by InteractionDispatchers.
+		//! cache functors that are called for this interaction. Currently used by InteractionLoop.
 		struct {
 			// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
 			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
@@ -63,7 +63,7 @@ class Interaction : public Serializable
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
 		((Body::id_t,id1,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
 		((Body::id_t,id2,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
-		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionDispatchers`, therefore they are made friends of Interaction"))
+		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionLoop`, therefore they are made friends of Interaction"))
 		((shared_ptr<InteractionGeometry>,interactionGeometry,,,"Geometry part of the interaction."))
 		((shared_ptr<InteractionPhysics>,interactionPhysics,,,"Physical (material) part of the interaction."))
 		((Vector3i,cellDist,Vector3i(0,0,0),,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have the priod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)")),

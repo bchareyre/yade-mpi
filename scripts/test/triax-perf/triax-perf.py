@@ -1,7 +1,7 @@
 # Performance test for running
 #
 #  1. Regular TriaxialTest with 3 independent dispatchers (geom, phys, constitutive law)
-#  2. TriaxialTest with InteractionDispatchers (common loop and functor cache)
+#  2. TriaxialTest with InteractionLoop (common loop and functor cache)
 #
 # Run the test like this:
 #

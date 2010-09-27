@@ -74,6 +74,25 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	mindlinPhys->kno = Kno; // this is just a coeff
 	mindlinPhys->kso = Kso; // this is just a coeff
 	mindlinPhys->adhesionForce = Adhesion;
+
+	/* compute viscous coefficients */
+	if(en && betan) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of en, betan can be specified.");
+	if(es && betas) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of es, betas can be specified.");
+
+	// en specified, compute betan
+	if(en){
+		Real logE=log((*en)(mat1->id,mat2->id));
+		mindlinPhys->betan=-logE/sqrt(pow(Mathr::PI,2)+pow(logE,2));
+	}
+	// betan specified, use that value directly; otherwise give zero
+	else mindlinPhys->betan=betan ? (*betan)(mat1->id,mat2->id) : 0;
+
+	// same for es, except that when not given, use the value of betan
+	if(es){
+		Real logE=log((*es)(mat1->id,mat2->id));
+		mindlinPhys->betas=-logE/sqrt(pow(Mathr::PI,2)+pow(logE,2));
+	}
+	else mindlinPhys->betas=betas ? (*betas)(mat1->id,mat2->id) : mindlinPhys->betan;
 }
 
 
@@ -199,6 +218,11 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 	const shared_ptr<Body>& b1=Body::byId(id1,scene); // not sure here (I need it because I want to know if the body isDynamic or not)
 	const shared_ptr<Body>& b2=Body::byId(id2,scene); // not sure here
 
+	bool useDamping=(phys->betan!=0. || phys->betas!=0.);
+
+	// tangential and normal stiffness coefficients, recomputed from betan,betas at every step
+	Real cn=0, cs=0;
+
 	/****************/
 	/* NORMAL FORCE */
 	/****************/
@@ -243,8 +267,8 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 		Real Cn_crit = 2.*sqrt(mbar*phys->kn); // Critical damping coefficient (normal direction)
 		Real Cs_crit = 2.*sqrt(mbar*phys->ks); // Critical damping coefficient (shear direction)
 		// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
-		cn = Cn_crit*betan; // Damping normal coefficient
-		cs = Cs_crit*betas; // Damping tangential coefficient
+		cn = Cn_crit*phys->betan; // Damping normal coefficient
+		cs = Cs_crit*phys->betas; // Damping tangential coefficient
 		if(phys->kn<0 || phys->ks<0){ cerr<<"Negative stiffness kn="<<phys->kn<<" ks="<<phys->ks<<" for ##"<<b1->getId()<<"+"<<b2->getId()<<", step "<<scene->iter<<endl; }
 	}
 

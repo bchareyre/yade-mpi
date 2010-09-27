@@ -1,9 +1,9 @@
-#include"InteractionDispatchers.hpp"
+#include"InteractionLoop.hpp"
 
-YADE_PLUGIN((InteractionDispatchers));
-CREATE_LOGGER(InteractionDispatchers);
+YADE_PLUGIN((InteractionLoop));
+CREATE_LOGGER(InteractionLoop);
 
-void InteractionDispatchers::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
+void InteractionLoop::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
 	if(python::len(t)==0) return; // nothing to do
 	if(python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
 	// parse custom arguments (3 lists) and do in-place modification of args
@@ -27,7 +27,7 @@ void InteractionDispatchers::pyHandleCustomCtorArgs(python::tuple& t, python::di
 	#define IDISP_CHECKPOINT(cpt)
 #endif
 
-void InteractionDispatchers::action(){
+void InteractionLoop::action(){
 	#ifdef IDISP_TIMING
 		timingDeltas->start();
 	#endif

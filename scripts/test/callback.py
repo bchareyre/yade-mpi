@@ -6,7 +6,7 @@ O.bodies.append([
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
-	InteractionDispatchers(
+	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_Basic()]
@@ -16,7 +16,7 @@ O.engines=[
 ]
 O.dt=utils.PWaveTimeStep()
 
-disp=utils.typedEngine('InteractionDispatchers')
+disp=utils.typedEngine('InteractionLoop')
 
 disp.callbacks=[SumIntrForcesCb()]
 newton.callbacks=[SumBodyForcesCb()]

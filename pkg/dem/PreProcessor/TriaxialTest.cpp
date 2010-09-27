@@ -28,7 +28,7 @@
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/Wall.hpp>
 #include<yade/pkg-common/ForceResetter.hpp>
-#include<yade/pkg-common/InteractionDispatchers.hpp>
+#include<yade/pkg-common/InteractionLoop.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
@@ -366,7 +366,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 		collider->boundDispatcher->add(new Bo1_Facet_Aabb);
 		collider->boundDispatcher->add(new Bo1_Wall_Aabb);
 
-		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
+		shared_ptr<InteractionLoop> ids(new InteractionLoop);
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
 			ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);

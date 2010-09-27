@@ -11,7 +11,7 @@
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-common/InteractionDispatchers.hpp>
+#include<yade/pkg-common/InteractionLoop.hpp>
 //#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include"ResetRandomPosition.hpp"
 #include<sstream>
@@ -41,10 +41,10 @@ void ResetRandomPosition::action()
 		iGME=dynamic_cast<InteractionGeometryDispatcher*>(scene->engineByName("InteractionGeometryDispatcher").get());
 		if (!iGME) 
 		{
-			InteractionDispatchers* iDsp=dynamic_cast<InteractionDispatchers*>(scene->engineByName("InteractionDispatchers").get());
+			InteractionLoop* iDsp=dynamic_cast<InteractionLoop*>(scene->engineByName("InteractionLoop").get());
 			if (!iDsp)
 			{
-				LOG_FATAL("Can't find nor InteractionGeometryDispatcher nor InteractionDispatchers." );
+				LOG_FATAL("Can't find nor InteractionGeometryDispatcher nor InteractionLoop." );
 				return;
 			}
 			iGME=dynamic_cast<InteractionGeometryDispatcher*>(iDsp->geomDispatcher.get());

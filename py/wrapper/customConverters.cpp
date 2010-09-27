@@ -37,6 +37,7 @@
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
 #endif
+#include<yade/pkg-common/MatchMaker.hpp>
 
 
 
@@ -123,6 +124,18 @@ struct custom_vector_from_seq{
 };
 
 
+struct custom_ptrMatchMaker_from_float{
+	custom_ptrMatchMaker_from_float(){ converter::registry::push_back(&convertible,&construct,type_id<shared_ptr<MatchMaker> >()); }
+	static void* convertible(PyObject* obj_ptr){ if(!PyNumber_Check(obj_ptr)) { cerr<<"Not convertible to MatchMaker"<<endl; return 0; } return obj_ptr; }
+	static void construct(PyObject* obj_ptr, converter::rvalue_from_python_stage1_data* data){
+		void* storage=((converter::rvalue_from_python_storage<shared_ptr<MatchMaker> >*)(data))->storage.bytes;
+		new (storage) shared_ptr<MatchMaker>(new MatchMaker); // allocate the object at given address
+		shared_ptr<MatchMaker>* mm=(shared_ptr<MatchMaker>*)(storage); // convert that address to our type
+		(*mm)->fallback="val"; (*mm)->val=PyFloat_AsDouble(obj_ptr); (*mm)->postLoad(**mm);
+		data->convertible=storage;
+	}
+};
+
 #if 0
 template<typename numT, int dim>
 struct custom_numpyBoost_to_py{
@@ -162,6 +175,8 @@ BOOST_PYTHON_MODULE(_customConverters){
 	#endif
 
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
+
+	custom_ptrMatchMaker_from_float();
 
 	// StrArrayMap (typedef for std::map<std::string,numpy_boost>) → python dictionary
 	//custom_StrArrayMap_to_dict();
