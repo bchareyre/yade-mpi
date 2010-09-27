@@ -170,6 +170,9 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 					if ((arrayIdentIds[i].id1 == specimenNumberId1) or (arrayIdentIds[i].id1 == specimenNumberId2)) {
 						if (arrayIdentIds[i].maxDistanceBetweenSpheres<distBetweenSpheres) {
 							arrayIdentIds[i].maxDistanceBetweenSpheres = distBetweenSpheres;
+							arrayIdentIds[i].maxX = abs(b1->state->pos[0] - b2->state->pos[0]) + sphere1->radius + sphere2->radius;
+							arrayIdentIds[i].maxY = abs(b1->state->pos[1] - b2->state->pos[1]) + sphere1->radius + sphere2->radius;
+							arrayIdentIds[i].maxZ = abs(b1->state->pos[2] - b2->state->pos[2]) + sphere1->radius + sphere2->radius;
 							break;
 						}
 					}
@@ -188,7 +191,11 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 				if (arrayIdentIds[i].id1 == specimenNumberId) {
 					YADE_PTR_CAST<RpmState>(b->state)->specimenMass = arrayIdentIds[i].mass;		//Each particle will contain now the mass of specimen, to which it belongs to
 					if (arrayIdentIds[i].maxDistanceBetweenSpheres==0) {
-						arrayIdentIds[i].maxDistanceBetweenSpheres=sphere->radius;
+						arrayIdentIds[i].maxDistanceBetweenSpheres=sphere->radius*2.0;
+						
+						arrayIdentIds[i].maxX = sphere->radius*2.0;
+						arrayIdentIds[i].maxY = sphere->radius*2.0;
+						arrayIdentIds[i].maxZ = sphere->radius*2.0;
 					}
 					YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam = arrayIdentIds[i].maxDistanceBetweenSpheres;		//Each particle will contain now the maximal diametr of the specimen, to which it belongs to
 					YADE_PTR_CAST<RpmState>(b->state)->specimenVol = arrayIdentIds[i].vol;		//Each particle will contain now the volume of the specimen, to which it belongs to
@@ -250,7 +257,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	out<<"**********\n";
 	out<<"iter\ttotalMass\ttotalVol\ttotalPartNum\tnumSpec\tmatNum\n";
 	out<<scene->iter<<"\t"<<totalMass<<"\t"<<totalVol<<"\t"<<totalPartNum<<"\t"<<arrayIdentIds.size()<<"\t"<<materialCount.size()<<"\n\n";
-	out<<"id\tmassSpec\tvolSpec\tmaxDiamSpec\tpartNum\t";
+	out<<"id\tmassSpec\tvolSpec\tmaxDiamSpec\tmaxX\tmaxY\tmaxZ\tpartNum\t";
 	
 
 	if (materialCount.size() > 1) {
@@ -259,7 +266,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	out<<"\n";
 	
 	for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
-		out<<arrayIdentIds[i].id1<<"\t"<<arrayIdentIds[i].mass<<"\t"<<arrayIdentIds[i].vol<<"\t"<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\t"<<arrayIdentIds[i].particleNumber<<"\t";
+		out<<arrayIdentIds[i].id1<<"\t"<<arrayIdentIds[i].mass<<"\t"<<arrayIdentIds[i].vol<<"\t"<<arrayIdentIds[i].maxDistanceBetweenSpheres<<"\t"<<arrayIdentIds[i].maxX<<"\t"<<arrayIdentIds[i].maxY<<"\t"<<arrayIdentIds[i].maxZ<<"\t"<<arrayIdentIds[i].particleNumber<<"\t";
 		if (materialCount.size() > 1) {
 			//Find Material Info
 			for (unsigned int w=0; w<materialCount.size(); w++) {
