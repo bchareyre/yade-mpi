@@ -1,5 +1,5 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
-
+#pragma once
 #include<yade/lib-serialization/Serializable.hpp>
 #include<string>
 
