@@ -36,11 +36,11 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class Gl1_Dem3DofGeom_WallSphere:public GlInteractionGeometryFunctor{
+	class Gl1_Dem3DofGeom_WallSphere:public GlIGeomFunctor{
 		public:
-			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+			virtual void go(const shared_ptr<IGeom>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		RENDERS(Dem3DofGeom_WallSphere);
-		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_WallSphere,GlInteractionGeometryFunctor,"Render interaction of wall and sphere (represented by Dem3DofGeom_WallSphere)",
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_WallSphere,GlIGeomFunctor,"Render interaction of wall and sphere (represented by Dem3DofGeom_WallSphere)",
 			((bool,normal,false,,"Render interaction normal"))
 			((bool,rolledPoints,false,,"Render points rolled on the spheres (tracks the original contact point)"))
 			((bool,unrolledPoints,false,,"Render original contact points unrolled to the contact plane"))
@@ -52,17 +52,17 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 #endif
 
 #include<yade/pkg-common/Dispatching.hpp>
-class Ig2_Wall_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
+class Ig2_Wall_Sphere_Dem3DofGeom:public IGeomFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 			c->swapOrder(); return go(cm2,cm1,state2,state1,-shift2,force,c);
-			LOG_ERROR("!! goReverse might not work in Ig2_Wall_Sphere_Dem3DofGeom. InteractionGeometryDispatcher should swap interaction members first and call go(...) afterwards.");
+			LOG_ERROR("!! goReverse might not work in Ig2_Wall_Sphere_Dem3DofGeom. IGeomDispatcher should swap interaction members first and call go(...) afterwards.");
 		}
 
 	FUNCTOR2D(Wall,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Wall,Sphere);
-	YADE_CLASS_BASE_DOC(Ig2_Wall_Sphere_Dem3DofGeom,InteractionGeometryFunctor,"Create/update contact of :yref:`Wall` and :yref:`Sphere` (:yref:`Dem3DofGeom_WallSphere` instance)");
+	YADE_CLASS_BASE_DOC(Ig2_Wall_Sphere_Dem3DofGeom,IGeomFunctor,"Create/update contact of :yref:`Wall` and :yref:`Sphere` (:yref:`Dem3DofGeom_WallSphere` instance)");
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ig2_Wall_Sphere_Dem3DofGeom);

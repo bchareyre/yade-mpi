@@ -50,6 +50,9 @@ for root,dirs,files in os.walk(libDir):
 		if not (f.startswith('lib') and f.endswith('.so')): continue
 		plugin=os.path.join(libDir,root,f)
 		plugins.append(plugin)
+if 'YADE_DEBUG' in os.environ:
+	print 'The following plugins will be loaded:'
+	for p in plugins: print '\t'+p
 
 # c++ initialization code
 import boot

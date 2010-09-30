@@ -140,7 +140,7 @@ struct compPtrInteraction{
 
 void InteractionContainer::preSave(InteractionContainer&){
 	FOREACH(const shared_ptr<Interaction>& I, *this){
-		if(I->interactionGeometry || I->interactionPhysics) interaction.push_back(I);
+		if(I->geom || I->phys) interaction.push_back(I);
 		// since requestErase'd interactions have no interaction physics/geom, they are not saved
 	}
 	if(serializeSorted) std::sort(interaction.begin(),interaction.end(),compPtrInteraction());

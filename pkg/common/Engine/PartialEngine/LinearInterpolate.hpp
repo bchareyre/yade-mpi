@@ -16,8 +16,8 @@
  *
  * @return value at "time" t; out of range: t<t0 → value(t0), t>t_last → value(t_last)
  */
-template<typename T>
-T linearInterpolate(const Real t, const std::vector<Real>& tt, const std::vector<T>& values, size_t& pos){
+template<typename T, typename timeT>
+T linearInterpolate(const Real t, const std::vector<timeT>& tt, const std::vector<T>& values, size_t& pos){
 	assert(tt.size()==values.size());
 	if(t<=tt[0]){ pos=0; return values[0];}
 	if(t>=*tt.rbegin()){ pos=tt.size()-2; return *values.rbegin();}
@@ -42,7 +42,7 @@ T linearInterpolate(const Real t, const std::vector<Real>& tt, const std::vector
 		}
 		size_t pos;
 		for(Real t=0; t<10; t+=0.1){
-			std::cout<<t<<" "<<linearInterpolate<Real>(t,tt,vv,pos)<<std::endl;
+			std::cout<<t<<" "<<linearInterpolate<Real,Real>(t,tt,vv,pos)<<std::endl;
 		}
 	}
 #endif 

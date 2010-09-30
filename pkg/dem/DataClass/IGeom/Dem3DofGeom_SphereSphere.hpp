@@ -48,11 +48,11 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class Gl1_Dem3DofGeom_SphereSphere:public GlInteractionGeometryFunctor{
+	class Gl1_Dem3DofGeom_SphereSphere:public GlIGeomFunctor{
 		public:
-			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+			virtual void go(const shared_ptr<IGeom>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		RENDERS(Dem3DofGeom_SphereSphere);
-		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_SphereSphere,GlInteractionGeometryFunctor,"Render interaction of 2 spheres (represented by Dem3DofGeom_SphereSphere)",
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_SphereSphere,GlIGeomFunctor,"Render interaction of 2 spheres (represented by Dem3DofGeom_SphereSphere)",
 			((bool,normal,false,,"Render interaction normal"))
 			((bool,rolledPoints,false,,"Render points rolled on the spheres (tracks the original contact point)"))
 			((bool,unrolledPoints,false,,"Render original contact points unrolled to the contact plane"))
@@ -64,14 +64,14 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 #endif
 
 #include<yade/pkg-common/Dispatching.hpp>
-class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
+class Ig2_Sphere_Sphere_Dem3DofGeom:public IGeomFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
 	FUNCTOR2D(Sphere,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor,
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_Dem3DofGeom,IGeomFunctor,
 		"Functor handling contact of 2 spheres, producing Dem3DofGeom instance",
 		((Real,distFactor,-1,,"Factor of sphere radius such that sphere \"touch\" if their centers are not further than distFactor*(r1+r2); if negative, equilibrium distance is the sum of the sphere's radii."))
 	);

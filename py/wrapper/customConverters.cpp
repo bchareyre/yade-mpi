@@ -36,6 +36,7 @@
 #include<yade/pkg-common/Callbacks.hpp>
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	#include<yade/pkg-common/OpenGLRenderer.hpp>
 #endif
 #include<yade/pkg-common/MatchMaker.hpp>
 
@@ -199,8 +200,8 @@ BOOST_PYTHON_MODULE(_customConverters){
 		VECTOR_SEQ_CONV(shared_ptr<Material>);
 		VECTOR_SEQ_CONV(shared_ptr<Serializable>);
 		VECTOR_SEQ_CONV(shared_ptr<BoundFunctor>);
-		VECTOR_SEQ_CONV(shared_ptr<InteractionGeometryFunctor>);
-		VECTOR_SEQ_CONV(shared_ptr<InteractionPhysicsFunctor>);
+		VECTOR_SEQ_CONV(shared_ptr<IGeomFunctor>);
+		VECTOR_SEQ_CONV(shared_ptr<IPhysFunctor>);
 		VECTOR_SEQ_CONV(shared_ptr<LawFunctor>);
 		VECTOR_SEQ_CONV(shared_ptr<IntrCallback>);
 		VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
@@ -208,8 +209,9 @@ BOOST_PYTHON_MODULE(_customConverters){
 			VECTOR_SEQ_CONV(shared_ptr<GlBoundFunctor>);
 			VECTOR_SEQ_CONV(shared_ptr<GlStateFunctor>);
 			VECTOR_SEQ_CONV(shared_ptr<GlShapeFunctor>);
-			VECTOR_SEQ_CONV(shared_ptr<GlInteractionGeometryFunctor>);
-			VECTOR_SEQ_CONV(shared_ptr<GlInteractionPhysicsFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlIGeomFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlIPhysFunctor>);
+			VECTOR_SEQ_CONV(shared_ptr<GlExtraDrawer>);
 		#endif
 	#undef VECTOR_SEQ_CONV
 

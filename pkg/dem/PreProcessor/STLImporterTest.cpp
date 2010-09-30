@@ -174,11 +174,11 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 void STLImporterTest::createActors(shared_ptr<Scene>& scene)
 {
 	
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_ScGeom");
 	interactionGeometryDispatcher->add("Ig2_Facet_Sphere_ScGeom");
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);

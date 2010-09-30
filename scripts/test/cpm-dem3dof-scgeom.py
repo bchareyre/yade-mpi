@@ -20,9 +20,9 @@ O.bodies.append([utils.sphere(p1,r1,dynamic=False),utils.sphere(p2,r2,dynamic=Fa
 O.bodies.append([utils.sphere(p1+offset,r1,dynamic=False),utils.sphere(p2+offset,r2,dynamic=True)])
 
 
-O.engines=[InteractionGeometryDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),InteractionPhysicsDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]
+O.engines=[IGeomDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),IPhysDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]
 i1=utils.createInteraction(0,1) # caches functors, no need to specify them in the main loop
-O.engines=[InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),InteractionPhysicsDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]
+O.engines=[IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom()]),IPhysDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]
 i2=utils.createInteraction(2,3)
 
 O.engines=[

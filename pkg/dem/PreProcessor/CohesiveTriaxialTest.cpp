@@ -286,17 +286,17 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 	
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	shared_ptr<InteractionGeometryFunctor> s1(new Ig2_Sphere_Sphere_ScGeom);
+	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
+	shared_ptr<IGeomFunctor> s1(new Ig2_Sphere_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s1);
-	shared_ptr<InteractionGeometryFunctor> s2(new Ig2_Box_Sphere_ScGeom);
+	shared_ptr<IGeomFunctor> s2(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s2);
 
 	shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> cohesiveFrictionalRelationships = shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> (new Ip2_2xCohFrictMat_CohFrictPhys);
 	cohesiveFrictionalRelationships->shearCohesion = shearCohesion;
 	cohesiveFrictionalRelationships->normalCohesion = normalCohesion;
 	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);

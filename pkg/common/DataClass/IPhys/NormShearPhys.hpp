@@ -2,17 +2,17 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#include<yade/core/InteractionPhysics.hpp>
+#include<yade/core/IPhys.hpp>
 
-class NormPhys:public InteractionPhysics {
+class NormPhys:public IPhys {
 	public:
 		virtual ~NormPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormPhys,InteractionPhysics,"Abstract class for interactions that have normal stiffness.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormPhys,IPhys,"Abstract class for interactions that have normal stiffness.",
 		((Real,kn,NaN,,"Normal stiffness"))
 		((Vector3r,normalForce,Vector3r::Zero(),,"Normal force after previous step (in global coordinates).")),
 		createIndex();
 	);
-	REGISTER_CLASS_INDEX(NormPhys,InteractionPhysics);
+	REGISTER_CLASS_INDEX(NormPhys,IPhys);
 };
 REGISTER_SERIALIZABLE(NormPhys);
 

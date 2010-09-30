@@ -7,8 +7,8 @@
 #include<yade/pkg-common/LinearInterpolate.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-#include<yade/core/InteractionGeometry.hpp>
-#include<yade/core/InteractionPhysics.hpp>
+#include<yade/core/IGeom.hpp>
+#include<yade/core/IPhys.hpp>
 
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
 
@@ -22,7 +22,7 @@ void ForceEngine::action(){
 void InterpolatingDirectedForceEngine::action(){
 	Real virtTime=wrap ? Shop::periodicWrap(scene->time,*times.begin(),*times.rbegin()) : scene->time;
 	direction.normalize(); 
-	force=linearInterpolate<Real>(virtTime,times,magnitudes,_pos)*direction;
+	force=linearInterpolate<Real,Real>(virtTime,times,magnitudes,_pos)*direction;
 	ForceEngine::action();
 }
 

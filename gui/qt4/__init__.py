@@ -87,7 +87,7 @@ class ControllerClass(QWidget,Ui_Controller):
 			self.generatorCombo.addItem(c)
 	def addRenderers(self):
 		self.displayCombo.addItem('OpenGLRenderer'); afterSep=1
-		for bc in ('GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlInteractionGeometryFunctor','GlInteractionPhysicsFunctor'):
+		for bc in ('GlShapeFunctor','GlStateFunctor','GlBoundFunctor','GlIGeomFunctor','GlIPhysFunctor'):
 			if afterSep>0: self.displayCombo.insertSeparator(10000); afterSep=0
 			for c in yade.system.childClasses(bc) | set([bc]):
 				inst=eval(c+'()');

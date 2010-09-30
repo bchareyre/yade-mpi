@@ -13,15 +13,17 @@
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<yade/core/Dispatcher.hpp>
 
-class InteractionPhysics : public Serializable, public Indexable
+class IGeom : public Serializable, public Indexable
 {
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionPhysics,Serializable,"Physical (material) properties of :yref:`interaction<Interaction>`.",
-		/*attrs*/,
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(IGeom,Serializable,"Geometrical configuration of interaction",
+		/*no attrs*/,
 		/*ctor*/,
-		/*py*/YADE_PY_TOPINDEXABLE(InteractionPhysics)
+		/*py*/
+		YADE_PY_TOPINDEXABLE(IGeom)
 	);
-	REGISTER_INDEX_COUNTER(InteractionPhysics);
+	REGISTER_INDEX_COUNTER(IGeom);
 };
-REGISTER_SERIALIZABLE(InteractionPhysics);
+
+REGISTER_SERIALIZABLE(IGeom);
 
 

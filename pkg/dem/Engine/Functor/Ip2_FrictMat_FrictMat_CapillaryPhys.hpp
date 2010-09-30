@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/Dispatching.hpp>
 
-class Ip2_FrictMat_FrictMat_CapillaryPhys : public InteractionPhysicsFunctor
+class Ip2_FrictMat_FrictMat_CapillaryPhys : public IPhysFunctor
 {
 	public :
 		virtual void go(	const shared_ptr<Material>& b1,
@@ -18,7 +18,7 @@ class Ip2_FrictMat_FrictMat_CapillaryPhys : public InteractionPhysicsFunctor
 					const shared_ptr<Interaction>& interaction);
 
 	FUNCTOR2D(FrictMat,FrictMat);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_FrictMat_FrictMat_CapillaryPhys,InteractionPhysicsFunctor, "RelationShips to use with Law2_ScGeom_CapillaryPhys_Capillarity\n\n In these RelationShips all the interaction attributes are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<InteractionPhysicsFunctor>`, most of the attributes are computed only once, when the interaction is new.",,;);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_FrictMat_FrictMat_CapillaryPhys,IPhysFunctor, "RelationShips to use with Law2_ScGeom_CapillaryPhys_Capillarity\n\n In these RelationShips all the interaction attributes are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<IPhysFunctor>`, most of the attributes are computed only once, when the interaction is new.",,;);
 	
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_CapillaryPhys);

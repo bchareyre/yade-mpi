@@ -14,7 +14,7 @@
 
 #include<yade/pkg-common/Dispatching.hpp>
 
-class Ig2_Box_Sphere_ScGeom : public InteractionGeometryFunctor
+class Ig2_Box_Sphere_ScGeom : public IGeomFunctor
 {
 	public :
 		virtual bool go(	const shared_ptr<Shape>& cm1,
@@ -35,10 +35,10 @@ class Ig2_Box_Sphere_ScGeom : public InteractionGeometryFunctor
 
 	#ifdef YADE_DEVIRT_FUNCTORS
 		void* getStaticFuncPtr(){ return (void*)&Ig2_Box_Sphere_ScGeom::goStatic; }
-		static bool goStatic(InteractionGeometryFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		static bool goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 	#endif
 
-	YADE_CLASS_BASE_DOC(Ig2_Box_Sphere_ScGeom,InteractionGeometryFunctor,"Create an interaction geometry :yref:`ScGeom` from :yref:`Box` and :yref:`Sphere`")
+	YADE_CLASS_BASE_DOC(Ig2_Box_Sphere_ScGeom,IGeomFunctor,"Create an interaction geometry :yref:`ScGeom` from :yref:`Box` and :yref:`Sphere`")
 	FUNCTOR2D(Box,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
 };

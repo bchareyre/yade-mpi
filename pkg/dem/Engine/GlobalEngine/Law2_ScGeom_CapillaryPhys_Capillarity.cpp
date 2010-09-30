@@ -118,8 +118,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			Body* b1 = (*bodies)[id1].get();
 			Body* b2 = (*bodies)[id2].get();
 
-                        ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->interactionGeometry.get());
-                        CapillaryPhys* currentContactPhysics = static_cast<CapillaryPhys*>(interaction->interactionPhysics.get());
+                        ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->geom.get());
+                        CapillaryPhys* currentContactPhysics = static_cast<CapillaryPhys*>(interaction->phys.get());
 
                         /// Capillary components definition:
 
@@ -204,7 +204,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	{	//cerr << "interaction " << ii << endl;
                 if ((*ii)->isReal()) 
 		{
-                        CapillaryPhys* currentContactPhysics	=	static_cast<CapillaryPhys*>((*ii)->interactionPhysics.get());
+                        CapillaryPhys* currentContactPhysics	=	static_cast<CapillaryPhys*>((*ii)->phys.get());
                         if (currentContactPhysics->meniscus) 
 			{
                                 if (fusionDetection) 
@@ -248,7 +248,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 	//Reset fusion numbers
 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
-        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryPhys*>((*ii)->interactionPhysics.get())->fusionNumber=0;
+        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryPhys*>((*ii)->phys.get())->fusionNumber=0;
 	
 	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
 	Real angle1, angle2;
@@ -262,14 +262,14 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 			for ( firstMeniscus=bodiesMenisciiList[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )//FOR EACH MENISCUS ON THIS BODY...
 			{
 				//if (*firstMeniscus)->isReal();
-				CapillaryPhys* interactionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->interactionPhysics.get());
+				CapillaryPhys* interactionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->phys.get());
 				currentMeniscus = firstMeniscus; ++currentMeniscus;
 				
 				if (i == (*firstMeniscus)->getId1()) angle1=interactionPhysics1->Delta1;//get angle of meniscus1 on body i
 				else angle1=interactionPhysics1->Delta2;
 
 				for ( ;currentMeniscus!= lastMeniscus; ++currentMeniscus) {//... CHECK FUSION WITH ALL OTHER MENISCII ON THE BODY
-					CapillaryPhys* interactionPhysics2 = YADE_CAST<CapillaryPhys*>((*currentMeniscus)->interactionPhysics.get());
+					CapillaryPhys* interactionPhysics2 = YADE_CAST<CapillaryPhys*>((*currentMeniscus)->phys.get());
 
 					if (i == (*currentMeniscus)->getId1()) angle2=interactionPhysics2->Delta1;//get angle of meniscus2 on body i
 					else angle2=interactionPhysics2->Delta2;
@@ -278,8 +278,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 
 					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;	
 					
-					Vector3r normalFirstMeniscus = YADE_CAST<ScGeom*>((*firstMeniscus)->interactionGeometry.get())->normal;
-					Vector3r normalCurrentMeniscus = YADE_CAST<ScGeom*>((*currentMeniscus)->interactionGeometry.get())->normal;
+					Vector3r normalFirstMeniscus = YADE_CAST<ScGeom*>((*firstMeniscus)->geom.get())->normal;
+					Vector3r normalCurrentMeniscus = YADE_CAST<ScGeom*>((*currentMeniscus)->geom.get())->normal;
 					
 					//if (i != (*firstMeniscus)->getId1()) normalFirstMeniscus = -normalFirstMeniscus;
 					//if (i != (*currentMeniscus)->getId1()) normalCurrentMeniscus = -normalCurrentMeniscus;
@@ -303,9 +303,9 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 					//if ((angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(normalFirstMeniscus.Dot(normalCurrentMeniscus)))
 					
 // 					if (//check here if wet angles are overlaping (check with squares is faster since SquaredLength of cross product gives squared sinus)
-// 					(angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(static_cast<ScGeom*>((*firstMeniscus)->interactionGeometry.get())->normal
+// 					(angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(static_cast<ScGeom*>((*firstMeniscus)->geom.get())->normal
 // 					.Dot(
-// 					static_cast<ScGeom*>((*currentMeniscus)->interactionGeometry.get())->normal))) 
+// 					static_cast<ScGeom*>((*currentMeniscus)->geom.get())->normal))) 
 					{
 						++(interactionPhysics1->fusionNumber); ++(interactionPhysics2->fusionNumber);//count +1 if 2 meniscii are overlaping
 					};
@@ -582,7 +582,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
         InteractionContainer::iterator iiEnd = scene->interactions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal()) {
-                	if (static_cast<CapillaryPhys*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);
+                	if (static_cast<CapillaryPhys*>((*ii)->phys.get())->meniscus) insert(*ii);
                 }
         }
                 	

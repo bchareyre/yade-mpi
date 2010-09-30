@@ -52,7 +52,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	Facet* facet=static_cast<Facet*>(cm1.get());
 	Real sphereRadius=static_cast<Sphere*>(cm2.get())->radius;
 
-	// InteractionGeometryFunctor::go(cm1,cm2,state1,state2,shift2,force,c);
+	// IGeomFunctor::go(cm1,cm2,state1,state2,shift2,force,c);
 
 	#if 1
 		/* new code written from scratch, to make sure the algorithm is correct; it is about the same speed 
@@ -154,11 +154,11 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	shared_ptr<Dem3DofGeom_FacetSphere> fs;
 	Vector3r normalGlob=state1.ori*normal;
 	bool isNew=false;
-	if(c->interactionGeometry) fs=YADE_PTR_CAST<Dem3DofGeom_FacetSphere>(c->interactionGeometry);
+	if(c->geom) fs=YADE_PTR_CAST<Dem3DofGeom_FacetSphere>(c->geom);
 	else {
 		// LOG_TRACE("Creating new Dem3DofGeom_FacetSphere");
 		fs=shared_ptr<Dem3DofGeom_FacetSphere>(new Dem3DofGeom_FacetSphere());
-		c->interactionGeometry=fs;
+		c->geom=fs;
 		isNew=true;
 		fs->effR2=sphereRadius-penetrationDepth;
 		fs->refR1=-1; fs->refR2=sphereRadius;
@@ -195,7 +195,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	bool Gl1_Dem3DofGeom_FacetSphere::shear=false;
 	bool Gl1_Dem3DofGeom_FacetSphere::shearLabel=false;
 
-	void Gl1_Dem3DofGeom_FacetSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_Dem3DofGeom_FacetSphere::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_FacetSphere* fs = static_cast<Dem3DofGeom_FacetSphere*>(ig.get());
 		const Se3r& se31=b1->state->se3,se32=b2->state->se3;
 		const Vector3r& pos1=se31.position; const Vector3r& pos2=se32.position;

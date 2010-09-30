@@ -32,9 +32,9 @@ MindlinPhys::~MindlinPhys(){}; // destructor
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_MindlinPhys);
 
 void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
-	if(interaction->interactionPhysics) return; // no updates of an already existing contact necessary
+	if(interaction->phys) return; // no updates of an already existing contact necessary
 	shared_ptr<MindlinPhys> mindlinPhys(new MindlinPhys());
-	interaction->interactionPhysics = mindlinPhys;
+	interaction->phys = mindlinPhys;
 	FrictMat* mat1 = YADE_CAST<FrictMat*>(b1.get());
 	FrictMat* mat2 = YADE_CAST<FrictMat*>(b2.get());
 
@@ -49,7 +49,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 
 
 	/* from interaction geometry */
-	ScGeom* scg = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());		
+	ScGeom* scg = YADE_CAST<ScGeom*>(interaction->geom.get());		
 	Real Da = scg->radius1; 
 	Real Db = scg->radius2; 
 	Vector3r normal=scg->normal; 
@@ -102,7 +102,7 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::contactsAdhesive() // It is returning some
 	Real contactsAdhesive=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->interactionPhysics.get());
+		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->phys.get());
 		if (phys->isAdhesive) {contactsAdhesive += 1;}
 	}
 	return contactsAdhesive;
@@ -114,8 +114,8 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 	Real normEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		ScGeom* scg = dynamic_cast<ScGeom*>(I->interactionGeometry.get());
-		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->interactionPhysics.get());
+		ScGeom* scg = dynamic_cast<ScGeom*>(I->geom.get());
+		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->phys.get());
 		if (phys) {
 			if (includeAdhesion) {normEnergy += (std::pow(scg->penetrationDepth,5./2.)*2./5.*phys->kno - phys->adhesionForce*scg->penetrationDepth);}
 			else {normEnergy += std::pow(scg->penetrationDepth,5./2.)*2./5.*phys->kno;} // work done in the normal direction. NOTE: this is the integral
@@ -124,7 +124,7 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 	return normEnergy;
 }
 
-void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Body::id_t id1(contact->getId1()), id2(contact->getId2());
 	ScGeom* geom = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
@@ -163,7 +163,7 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<InteractionGeomet
 	scene->forces.addTorque(id2,(geom->radius2-.5*geom->penetrationDepth)*geom->normal.cross(f));
 }
 
-void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Body::id_t id1(contact->getId1()), id2(contact->getId2());
 	ScGeom* geom = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
@@ -203,7 +203,7 @@ void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<InteractionGeom
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 CREATE_LOGGER(Law2_ScGeom_MindlinPhys_Mindlin);
 
-void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	const Real& dt = scene->dt; // get time step
 	
 	Body::id_t id1 = contact->getId1(); // get id body 1
@@ -391,7 +391,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 
 
 #if 0
-void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
+void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact, Scene* ncb){
 	const Real& dt = scene->dt; // get time step
 	
 	int id1 = contact->getId1(); // get id body 1

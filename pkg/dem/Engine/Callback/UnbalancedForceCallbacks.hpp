@@ -12,7 +12,7 @@ class SumIntrForcesCb: public IntrCallback{
 		OpenMPAccumulator<Real,&SumIntrForcesCb::Real0> force;
 		static void go(IntrCallback*,Interaction*);
 		virtual IntrCallback::FuncPtr stepInit();
-	YADE_CLASS_BASE_DOC(SumIntrForcesCb,IntrCallback,"Callback summing magnitudes of forces over all interactions. :yref:`InteractionPhysics` of interactions must derive from :yref:`NormShearPhys` (responsability fo the user).");
+	YADE_CLASS_BASE_DOC(SumIntrForcesCb,IntrCallback,"Callback summing magnitudes of forces over all interactions. :yref:`IPhys` of interactions must derive from :yref:`NormShearPhys` (responsability fo the user).");
 };
 REGISTER_SERIALIZABLE(SumIntrForcesCb);
 

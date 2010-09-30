@@ -8,11 +8,11 @@ from math import *
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),Bo1_Facet_Aabb()]),
-	InteractionGeometryDispatcher([
+	IGeomDispatcher([
 		Ig2_Sphere_Sphere_ScGeom(),
 		Ig2_Facet_Sphere_ScGeom(),
 	]),
-	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(),
 	RotationEngine(subscribedBodies=[1],rotationAxis=[1,0,0],angularVelocity=.01),
 	NewtonIntegrator(damping=0.2)

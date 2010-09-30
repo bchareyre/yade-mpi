@@ -293,7 +293,7 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& scene)
 	
 	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
 	
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	
 	shared_ptr<Ig2_Sphere_Sphere_ScGeom> iS2IS4SContactGeometry(new Ig2_Sphere_Sphere_ScGeom);
 	iS2IS4SContactGeometry->interactionDetectionFactor = distanceFactor;//Detect potential distant interaction (meniscii)
@@ -301,13 +301,13 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& scene)
 	interactionGeometryDispatcher->add(iS2IS4SContactGeometry);
 	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 //	interactionPhysicsDispatcher->add("Ip2_FrictMat_FrictMat_FrictPhys");
 // Unhandled exception: St13runtime_error : Class `Ip2_FrictMat_FrictMat_FrictPhys' could not be cast to required 2D Functor	
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW
-	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_FrictMat_FrictMat_CapillaryPhys);
+	shared_ptr<IPhysFunctor> ss(new Ip2_FrictMat_FrictMat_CapillaryPhys);
 	interactionPhysicsDispatcher->add(ss);
 	
 		

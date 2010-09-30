@@ -296,8 +296,8 @@ class SerializableEditor(QFrame):
 			'Real':float,'float':float,'double':float,
 			'Vector3r':Vector3,'Matrix3r':Matrix3,'Se3r':Se3FakeType,
 			'string':str,
-			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,'BoundFunctor':BoundFunctor,'InteractionGeometryFunctor':InteractionGeometryFunctor,'InteractionPhysicsFunctor':InteractionPhysicsFunctor,'LawFunctor':LawFunctor,
-			'GlShapeFunctor':GlShapeFunctor,'GlStateFunctor':GlStateFunctor,'GlInteractionGeometryFunctor':GlInteractionGeometryFunctor,'GlInteractionPhysicsFunctor':GlInteractionPhysicsFunctor,'GlBoundFunctor':GlBoundFunctor
+			'BodyCallback':BodyCallback,'IntrCallback':IntrCallback,'BoundFunctor':BoundFunctor,'IGeomFunctor':IGeomFunctor,'IPhysFunctor':IPhysFunctor,'LawFunctor':LawFunctor,
+			'GlShapeFunctor':GlShapeFunctor,'GlStateFunctor':GlStateFunctor,'GlIGeomFunctor':GlIGeomFunctor,'GlIPhysFunctor':GlIPhysFunctor,'GlBoundFunctor':GlBoundFunctor,'GlExtraDrawer':GlExtraDrawer
 		}
 		for T,ret in vecMap.items():
 			if vecTest(T,cxxT):

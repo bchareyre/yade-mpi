@@ -12,7 +12,7 @@ YADE_PLUGIN((Law2_Dem3Dof_CSPhys_CundallStrack)(Ip2_2xFrictMat_CSPhys)(CSPhys));
 /********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
 CREATE_LOGGER(Law2_Dem3Dof_CSPhys_CundallStrack);
 
-void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	CSPhys* phys=static_cast<CSPhys*>(ip.get());
 	
@@ -37,9 +37,9 @@ CREATE_LOGGER(Ip2_2xFrictMat_CSPhys);
 
 void Ip2_2xFrictMat_CSPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
 	
-	if(interaction->interactionPhysics) return; 
+	if(interaction->phys) return; 
 
-	Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(interaction->interactionGeometry.get());
+	Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(interaction->geom.get());
 			
 	assert(d3dg);
 
@@ -68,7 +68,7 @@ void Ip2_2xFrictMat_CSPhys::go(const shared_ptr<Material>& b1, const shared_ptr<
 	contactPhysics->frictionAngle			= std::min(fa,fb); 
 	contactPhysics->tanFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
 			
-	interaction->interactionPhysics = contactPhysics;
+	interaction->phys = contactPhysics;
 }
 
 CSPhys::~CSPhys(){};

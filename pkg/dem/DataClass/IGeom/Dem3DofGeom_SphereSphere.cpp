@@ -118,7 +118,7 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 	bool Gl1_Dem3DofGeom_SphereSphere::shear=false;
 	bool Gl1_Dem3DofGeom_SphereSphere::shearLabel=false;
 
-	void Gl1_Dem3DofGeom_SphereSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_Dem3DofGeom_SphereSphere::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_SphereSphere* ss = static_cast<Dem3DofGeom_SphereSphere*>(ig.get());
 		//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
 		const Se3r& se31=b1->state->se3,se32=b2->state->se3;
@@ -177,10 +177,10 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 
 	Real dist=normal.norm(); normal/=dist; /* normal is unit vector now */
 	shared_ptr<Dem3DofGeom_SphereSphere> ss;
-	if(c->interactionGeometry) ss=YADE_PTR_CAST<Dem3DofGeom_SphereSphere>(c->interactionGeometry);
+	if(c->geom) ss=YADE_PTR_CAST<Dem3DofGeom_SphereSphere>(c->geom);
 	else {
 		ss=shared_ptr<Dem3DofGeom_SphereSphere>(new Dem3DofGeom_SphereSphere());
-		c->interactionGeometry=ss;
+		c->geom=ss;
 		
 		// constants
 		if(distFactor>0) ss->refLength=dist;

@@ -29,7 +29,7 @@ REGISTER_SERIALIZABLE(RpmState);
 
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(Dem3DofGeom,RpmPhys);
 		
 	YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_RockPMPhys_Rpm,LawFunctor,"Constitutive law for the Rpm model");
@@ -56,12 +56,12 @@ class RpmMat: public FrictMat {
 REGISTER_SERIALIZABLE(RpmMat);
 
 
-class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsFunctor{
+class Ip2_RpmMat_RpmMat_RpmPhys: public IPhysFunctor{
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		FUNCTOR2D(RpmMat,RpmMat);
 		DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(Ip2_RpmMat_RpmMat_RpmPhys,InteractionPhysicsFunctor,"Convert 2 RpmMat instances to RpmPhys with corresponding parameters.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_RpmMat_RpmMat_RpmPhys,IPhysFunctor,"Convert 2 RpmMat instances to RpmPhys with corresponding parameters.",
 		((Real,initDistance,0,,"Initial distance between spheres at the first step."))
 	);
 };

@@ -38,19 +38,19 @@ void ResetRandomPosition::action()
 			LOG_FATAL("Can't find Collider." );
 			return;
 		}
-		iGME=dynamic_cast<InteractionGeometryDispatcher*>(scene->engineByName("InteractionGeometryDispatcher").get());
+		iGME=dynamic_cast<IGeomDispatcher*>(scene->engineByName("IGeomDispatcher").get());
 		if (!iGME) 
 		{
 			InteractionLoop* iDsp=dynamic_cast<InteractionLoop*>(scene->engineByName("InteractionLoop").get());
 			if (!iDsp)
 			{
-				LOG_FATAL("Can't find nor InteractionGeometryDispatcher nor InteractionLoop." );
+				LOG_FATAL("Can't find nor IGeomDispatcher nor InteractionLoop." );
 				return;
 			}
-			iGME=dynamic_cast<InteractionGeometryDispatcher*>(iDsp->geomDispatcher.get());
+			iGME=dynamic_cast<IGeomDispatcher*>(iDsp->geomDispatcher.get());
 			if (!iGME)
 			{
-				LOG_FATAL("Can't find InteractionGeometryDispatcher." );
+				LOG_FATAL("Can't find IGeomDispatcher." );
 				return;
 			}
 		}
@@ -86,7 +86,7 @@ void ResetRandomPosition::action()
 				// Test overlap with already shifted bodies
 				FOREACH(shared_ptr<Body> sb, shiftedBodies)
 				{
-					if (iGME->explicitAction(b,sb,/*force*/false)->interactionGeometry)
+					if (iGME->explicitAction(b,sb,/*force*/false)->geom)
 					{
 						is_overlap=true;
 						break;
@@ -97,7 +97,7 @@ void ResetRandomPosition::action()
 				// Test overlap with other bodies
 				vector<Body::id_t> probedBodies=bI->probeBoundingVolume(bv);
 				FOREACH(Body::id_t id, probedBodies){
-					if (iGME->explicitAction(b,Body::byId(id),/*force*/false)->interactionGeometry){
+					if (iGME->explicitAction(b,Body::byId(id),/*force*/false)->geom){
 						is_overlap=true;
 						break;
 					}

@@ -20,9 +20,9 @@ Their container (VecBounds) holds position of where the space wraps.
 The sorting algorithm is changed in such way that periods are changed when body crosses cell boundary.
 
 Interaction::cellDist holds information about relative cell coordinates of the 2nd body
-relative to the 1st one. Dispatchers (InteractionGeometryDispatcher and InteractionLoop)
-use this information to pass modified position of the 2nd body to InteractionGeometryFunctors.
-Since properly behaving InteractionGeometryFunctor's and LawFunctor's do not take positions
+relative to the 1st one. Dispatchers (IGeomDispatcher and InteractionLoop)
+use this information to pass modified position of the 2nd body to IGeomFunctors.
+Since properly behaving IGeomFunctor's and LawFunctor's do not take positions
 directly from Body::state, the interaction is computed with the periodic positions.
 
 Positions of bodies (in the sense of Body::state) and their natural bboxes are not wrapped

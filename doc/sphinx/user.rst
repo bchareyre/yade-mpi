@@ -374,7 +374,7 @@ In some cases, you might want to create rigid aggregate of individual particles 
 Creating interactions
 ======================
 
-In typical cases, interactions are created during simulations as particles collide. This is done by a :yref:`Collider` detecting approximate contact between particles and then an :yref:`InteractionGeometryFunctor` detecting exact collision.
+In typical cases, interactions are created during simulations as particles collide. This is done by a :yref:`Collider` detecting approximate contact between particles and then an :yref:`IGeomFunctor` detecting exact collision.
 
 Some material models (such as the :yref:`concrete model<Law2_Dem3DofGeom_CpmPhys_Cpm>`) rely on initial interaction network which is denser than geometrical contact of spheres: sphere's radii as "enlarged" by a dimensionless factor called *interaction radius* (or *interaction ratio*) to create this initial network. This is done typically in this way (see :ysrc:`examples/concrete/uniax.py` for an example):
 
@@ -521,7 +521,7 @@ There are other colliders as well, though their usage is only experimental:
 Ig2 functors
 ^^^^^^^^^^^^^
 
-``Ig2`` functor choice (all of the derive from :yref:`InteractionGeometryFunctor`) depends on 
+``Ig2`` functor choice (all of the derive from :yref:`IGeomFunctor`) depends on 
 
 #. shape combinations that should collide;
    for instance::
@@ -537,7 +537,7 @@ Ig2 functors
    
    Again, missing combination will cause given shape combinations to freely interpenetrate one another.
 
-#. :yref:`InteractionGeometry` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` accepts :yref:`Dem3DofGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`ScGeom`, the above example would simply change to::
+#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` accepts :yref:`Dem3DofGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`ScGeom`, the above example would simply change to::
 
       InteractionLoop([
          Ig2_Sphere_Sphere_ScGeom(),
@@ -547,11 +547,11 @@ Ig2 functors
 Ip2 functors
 ^^^^^^^^^^^^
 
-``Ip2`` functors (deriving from :yref:`InteractionPhysicsFunctor`) must be chosen depending on
+``Ip2`` functors (deriving from :yref:`IPhysFunctor`) must be chosen depending on
 
 #. :yref:`Material` combinations within the simulation. In most cases, ``Ip2`` functors handle 2 instances of the same :yref:`Material` class (such as :yref:`Ip2_FrictMat_FrictMat_FrictPhys` for 2 bodies with :yref:`FrictMat`) 
 
-#. :yref:`InteractionPhysics` accepted by the constitutive law (``Law2`` functor), which is the second part of the ``Law2`` functor's name (e.g. :yref:`Law2_ScGeom_FrictPhys_Basic` accepts :yref:`FrictPhys`)
+#. :yref:`IPhys` accepted by the constitutive law (``Law2`` functor), which is the second part of the ``Law2`` functor's name (e.g. :yref:`Law2_ScGeom_FrictPhys_Basic` accepts :yref:`FrictPhys`)
 
 .. note:: Unlike with ``Bo1`` and ``Ig2`` functors, unhandled combination of :yref:`Materials<Material>` is an error condition signaled by an exception.
 
@@ -560,9 +560,9 @@ Law2 functor(s)
 
 ``Law2`` functor was the ultimate criterion for the choice of ``Ig2`` and ``Ig2`` functors; there are no restrictions on its choice in itself, as it only applies forces without creating new objects.
 
-In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :yref:`InteractionGeometry` and :yref:`InteractionPhysics` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :yref:`Shapes<Shape>` and :yref:`Materials<Material>`).
+In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :yref:`IGeom` and :yref:`IPhys` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :yref:`Shapes<Shape>` and :yref:`Materials<Material>`).
 
-.. note:: As in the case of ``Ip2`` functors, receiving a combination of :yref:`InteractionGeometry` and :yref:`InteractionPhysics` which is not handled by any ``Law2`` functor is an error.
+.. note:: As in the case of ``Ip2`` functors, receiving a combination of :yref:`IGeom` and :yref:`IPhys` which is not handled by any ``Law2`` functor is an error.
 
 Examples
 ^^^^^^^^
@@ -575,7 +575,7 @@ Suppose we want to use the :yref:`Law2_ScGeom_FrictPhys_Basic` constitutive law.
 
 #. the ``Ig2`` functors most create :yref:`ScGeom`. Since we have :yref:`spheres<Sphere>` and :yref:`walls<Wall>` in the simulation, we will need functors accepting :yref:`Sphere` + :yref:`Sphere` and :yref:`Wall` + :yref:`Sphere` combinations. We don't want interactions between walls themselves (as a matter of fact, there is no such functor anyway). That gives us :yref:`Ig2_Sphere_Sphere_ScGeom` and ``Ig2_Wall_Sphere_ScGeom`` (as a matter of facet, there is no such functor now, although it is `planned <https://blueprints.launchpad.net/yade/+spec/walls-spheres-contact-geometry>`_)
 
-#. the ``Ip2`` functors should create :yref:`FrictPhys`. Looking at :yref:`InteractionPhysicsFunctors<InteractionPhysicsFunctor>`, there is only :yref:`Ip2_FrictMat_FrictMat_FrictPhys`. That obliges us to use :yref:`FrictMat` for particles.
+#. the ``Ip2`` functors should create :yref:`FrictPhys`. Looking at :yref:`InteractionPhysicsFunctors<IPhysFunctor>`, there is only :yref:`Ip2_FrictMat_FrictMat_FrictPhys`. That obliges us to use :yref:`FrictMat` for particles.
 
 The result will be therefore::
 

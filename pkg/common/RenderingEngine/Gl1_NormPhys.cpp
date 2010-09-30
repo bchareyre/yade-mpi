@@ -16,12 +16,12 @@ int Gl1_NormPhys::signFilter;
 int Gl1_NormPhys::slices;
 int Gl1_NormPhys::stacks;
 
-void Gl1_NormPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 	if(!gluQuadric){ gluQuadric=gluNewQuadric(); if(!gluQuadric) throw runtime_error("Gl1_NormPhys::go unable to allocate new GLUquadric object (out of memory?)."); }
 	NormPhys* np=static_cast<NormPhys*>(ip.get());
-	shared_ptr<InteractionGeometry> ig(i->interactionGeometry); if(!ig) return; // changed meanwhile?
+	shared_ptr<IGeom> ig(i->geom); if(!ig) return; // changed meanwhile?
 	GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(ig.get());
-	//if(!geom) cerr<<"Gl1_NormPhys: InteractionGeometry is not a GenericSpheresContact, but a "<<ig->getClassName()<<endl;
+	//if(!geom) cerr<<"Gl1_NormPhys: IGeom is not a GenericSpheresContact, but a "<<ig->getClassName()<<endl;
 	Real fnNorm=np->normalForce.dot(geom->normal);
 	if((signFilter>0 && fnNorm<0) || (signFilter<0 && fnNorm>0)) return;
 	int fnSign=fnNorm>0?1:-1;

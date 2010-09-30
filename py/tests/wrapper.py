@@ -39,7 +39,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		# InteractionLoop takes 3 lists
 		id=InteractionLoop([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
-		self.assert_(id.geomDispatcher.__class__==InteractionGeometryDispatcher)
+		self.assert_(id.geomDispatcher.__class__==IGeomDispatcher)
 		self.assert_(id.physDispatcher.functors[0].__class__==Ip2_FrictMat_FrictMat_FrictPhys)
 		self.assert_(id.lawDispatcher.functors[0].__class__==Law2_Dem3DofGeom_FrictPhys_Basic)
 	def testParallelEngineCtor(self):

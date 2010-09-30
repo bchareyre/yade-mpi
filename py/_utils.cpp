@@ -78,9 +78,9 @@ Real elasticEnergyInAABB(py::tuple Aabb){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
-		if(!i->interactionPhysics) continue;
-		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->interactionPhysics); if(!bc) continue;
-		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!geom){LOG_ERROR("NormShearPhys contact doesn't have Dem3DofGeom associated?!"); continue;}
+		if(!i->phys) continue;
+		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->phys); if(!bc) continue;
+		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->geom); if(!geom){LOG_ERROR("NormShearPhys contact doesn't have Dem3DofGeom associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -122,7 +122,7 @@ py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::t
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
 		if(useBB && !isInBB(b1->state->pos,bbMin,bbMax) && !isInBB(b2->state->pos,bbMin,bbMax)) continue;
-		GenericSpheresContact* geom=dynamic_cast<GenericSpheresContact*>(i->interactionGeometry.get());
+		GenericSpheresContact* geom=dynamic_cast<GenericSpheresContact*>(i->geom.get());
 		if(!geom) continue;
 		Vector3r n(geom->normal); n[axis]=0.; Real nLen=n.norm();
 		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
@@ -363,10 +363,10 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 	Scene* scene=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if(!I->isReal()) continue;
-		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->interactionPhysics.get());
+		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->phys.get());
 		if(!nsi) continue;
 		Vector3r pos1,pos2;
-		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
+		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->geom.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
 		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
 		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
@@ -412,7 +412,7 @@ Real maxOverlapRatio(){
 		if(!I->isReal()) continue;
 		Sphere *s1(dynamic_cast<Sphere*>(Body::byId(I->getId1(),scene)->shape.get())), *s2(dynamic_cast<Sphere*>(Body::byId(I->getId2(),scene)->shape.get()));
 		if((!s1) || (!s2)) continue;
-		ScGeom* geom=dynamic_cast<ScGeom*>(I->interactionGeometry.get());
+		ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());
 		if(!geom) continue;
 		Real rEq=2*s1->radius*s2->radius/(s1->radius+s2->radius);
 		ret=max(ret,geom->penetrationDepth/rEq);
@@ -456,7 +456,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
 	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
 	py::def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
-	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`InteractionGeometryDispatcher` and :yref:`InteractionPhysicsDispatcher` (might be both hidden in :yref:`InteractionLoop`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<InteractionGeometryDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning::\n\tThis function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
+	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`IGeomDispatcher` and :yref:`IPhysDispatcher` (might be both hidden in :yref:`InteractionLoop`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<IGeomDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning::\n\tThis function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
 	py::def("spiralProject",spiralProject,(py::arg("pt"),py::arg("dH_dTheta"),py::arg("axis")=2,py::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),py::arg("theta0")=0));
 	py::def("pointInsidePolygon",pointInsidePolygon);
 	py::def("scalarOnColorScale",Shop::scalarOnColorScale);

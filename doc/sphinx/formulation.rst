@@ -178,9 +178,9 @@ Results of using Verlet distance depend highly on the nature of simulation and c
 
 Creating interaction between particles
 ================================================
-Collision detection described above is only approximate. Exact collision detection depends on the geometry of individual particles and is handled separately. In Yade terminology, the :yref:`Collider` creates only *potential* interactions; potential interactions are evaluated exactly using specialized algorithms for collision of two spheres or other combinations. Exact collision detection must be run at every timestep since it is at every step that particles can change their mutual position (the collider is only run sometimes if the Verlet distance optimization is in use). Some exact collision detection algorithms are described in :ref:`sect-strain-evaluation`; in Yade, they are implemented in classes deriving from :yref:`InteractionGeometryFunctor` (prefixed with ``Ig2``).
+Collision detection described above is only approximate. Exact collision detection depends on the geometry of individual particles and is handled separately. In Yade terminology, the :yref:`Collider` creates only *potential* interactions; potential interactions are evaluated exactly using specialized algorithms for collision of two spheres or other combinations. Exact collision detection must be run at every timestep since it is at every step that particles can change their mutual position (the collider is only run sometimes if the Verlet distance optimization is in use). Some exact collision detection algorithms are described in :ref:`sect-strain-evaluation`; in Yade, they are implemented in classes deriving from :yref:`IGeomFunctor` (prefixed with ``Ig2``).
 		
-Besides detection of geometrical overlap (which corresponds to :yref:`InteractionGeometry` in Yade), there are also non-geometrical properties of the interaction to be determined (:yref:`InteractionPhysics`). In Yade, they are computed for every new interaction by calling a functor deriving from :yref:`InteractionPhysicsFunctor` (prefixed with ``Ip2``) which accepts the given combination of :yref:`Material` types of both particles.
+Besides detection of geometrical overlap (which corresponds to :yref:`IGeom` in Yade), there are also non-geometrical properties of the interaction to be determined (:yref:`IPhys`). In Yade, they are computed for every new interaction by calling a functor deriving from :yref:`IPhysFunctor` (prefixed with ``Ip2``) which accepts the given combination of :yref:`Material` types of both particles.
 
 Stiffnesses
 -----------
@@ -437,7 +437,7 @@ The constitutive law presented here is the most usual DEM formulation, originall
 		
 In DEM generally, some constitutive laws are expressed using strains and stresses while others prefer displacement/force formulation. The law described here falls in the latter category.
 
-When new contact is established (discussed in :ref:`sect-simulation-loop`) it has its properties (:yref:`InteractionPhysics`) computed from :yref:`Materials<Material>` associated with both particles. In the simple case of frictional material :yref:`FrictMat`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` creates a new :yref:`FrictPhys` instance, which defines normal stiffness $K_N$, shear stiffness $K_T$ and friction angle $\phi$.
+When new contact is established (discussed in :ref:`sect-simulation-loop`) it has its properties (:yref:`IPhys`) computed from :yref:`Materials<Material>` associated with both particles. In the simple case of frictional material :yref:`FrictMat`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` creates a new :yref:`FrictPhys` instance, which defines normal stiffness $K_N$, shear stiffness $K_T$ and friction angle $\phi$.
 
 At each step, given normal and shear displacements $u_N$, $\uT$, normal and shear forces are computed (if $u_N>0$, the contact is deleted without generating any forces):
 
@@ -884,7 +884,7 @@ This algorithm is implemented in :yref:`InsertionSortCollider` and is used whene
 
 Exact collision detection
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-When the collider detects approximate contact (on the :yref:`Aabb` level) and the contact does not yet exist, it creates *potential* contact, which is subsequently checked by exact collision algorithms (depending on the combination of :yref:`Shapes<Shape>`). Since particles can interact over many periodic cells (recall we never change their positions in simulation space), the collider embeds the relative cell coordinate of particles in the interaction itself (:yref:`Interaction.cellDist`) as an *integer* vector $c$. Multiplying current cell size $\mat{T}\vec{s}$ by $c$ component-wise, we obtain particle offset $\Delta \vec{x}$ in aperiodic $R^3$; this value is passed (from :yref:`InteractionLoop`) to the functor computing exact collision (:yref:`InteractionGeometryFunctor`), which adds it to the position of the particle :yref:`Interaction.id2`.
+When the collider detects approximate contact (on the :yref:`Aabb` level) and the contact does not yet exist, it creates *potential* contact, which is subsequently checked by exact collision algorithms (depending on the combination of :yref:`Shapes<Shape>`). Since particles can interact over many periodic cells (recall we never change their positions in simulation space), the collider embeds the relative cell coordinate of particles in the interaction itself (:yref:`Interaction.cellDist`) as an *integer* vector $c$. Multiplying current cell size $\mat{T}\vec{s}$ by $c$ component-wise, we obtain particle offset $\Delta \vec{x}$ in aperiodic $R^3$; this value is passed (from :yref:`InteractionLoop`) to the functor computing exact collision (:yref:`IGeomFunctor`), which adds it to the position of the particle :yref:`Interaction.id2`.
 
 By storing the integral offset $c$, $\Delta\vec{x}$ automatically updates as cell parameters change.
 

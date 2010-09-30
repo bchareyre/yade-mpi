@@ -20,7 +20,7 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 	//Check all interactions
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 		if(!i->isReal()) continue;				//Check whether they are real
-		const shared_ptr<RpmPhys>& contPhys = YADE_PTR_CAST<RpmPhys>(i->interactionPhysics);
+		const shared_ptr<RpmPhys>& contPhys = YADE_PTR_CAST<RpmPhys>(i->phys);
 		
 		Body::id_t id1 = i->getId1();			//Get bodies ids from interaction
 		Body::id_t id2 = i->getId2();

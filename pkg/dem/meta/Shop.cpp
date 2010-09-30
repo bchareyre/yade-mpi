@@ -142,14 +142,14 @@ void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contP
 Designed for being used with periodic cell, where diving the resulting components by
 areas of the cell will give average stress in that direction.
 
-Requires all .isReal() interaction to have interactionPhysics deriving from NormShearPhys.
+Requires all .isReal() interaction to have phys deriving from NormShearPhys.
 */
 Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	Vector3r force(Vector3r::Zero()); Real stiff=0; long n=0;
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
-		NormShearPhys* nsi=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		NormShearPhys* nsi=YADE_CAST<NormShearPhys*>(I->phys.get());
 		force+=Vector3r(abs(nsi->normalForce[0]+nsi->shearForce[0]),abs(nsi->normalForce[1]+nsi->shearForce[1]),abs(nsi->normalForce[2]+nsi->shearForce[2]));
 		stiff+=(1/3.)*nsi->kn+(2/3.)*nsi->ks; // count kn in one direction and ks in the other two
 		n++;
@@ -173,7 +173,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	sumF=0; nb=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
-		shared_ptr<NormShearPhys> nsi=YADE_PTR_CAST<NormShearPhys>(I->interactionPhysics); assert(nsi);
+		shared_ptr<NormShearPhys> nsi=YADE_PTR_CAST<NormShearPhys>(I->phys); assert(nsi);
 		sumF+=(nsi->normalForce+nsi->shearForce).norm(); nb++;
 	}
 	sumF/=nb;
@@ -278,13 +278,13 @@ void Shop::rootBodyActors(shared_ptr<Scene> scene){
 
 	scene->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Ig2_Tetra_Tetra_TTetraGeom);
 	scene->engines.push_back(interactionGeometryDispatcher);
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
+	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	interactionPhysicsDispatcher->add(new Ip2_FrictMat_FrictMat_FrictPhys);
 	scene->engines.push_back(interactionPhysicsDispatcher);
 		
@@ -493,19 +493,19 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 }
 
 shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool force){
-	InteractionGeometryDispatcher* geomMeta=NULL;
-	InteractionPhysicsDispatcher* physMeta=NULL;
+	IGeomDispatcher* geomMeta=NULL;
+	IPhysDispatcher* physMeta=NULL;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	if(rb->interactions->find(Body::id_t(id1),Body::id_t(id2))!=0) throw runtime_error(string("Interaction #")+lexical_cast<string>(id1)+"+#"+lexical_cast<string>(id2)+" already exists.");
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
-		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }
-		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsDispatcher*>(e.get()); if(physMeta) continue; }
+		if(!geomMeta) { geomMeta=dynamic_cast<IGeomDispatcher*>(e.get()); if(geomMeta) continue; }
+		if(!physMeta) { physMeta=dynamic_cast<IPhysDispatcher*>(e.get()); if(physMeta) continue; }
 		InteractionLoop* id(dynamic_cast<InteractionLoop*>(e.get()));
 		if(id){ geomMeta=id->geomDispatcher.get(); physMeta=id->physDispatcher.get(); }
 		if(geomMeta&&physMeta){break;}
 	}
-	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines or inside InteractionLoop.");
-	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines or inside InteractionLoop.");
+	if(!geomMeta) throw runtime_error("No IGeomDispatcher in engines or inside InteractionLoop.");
+	if(!physMeta) throw runtime_error("No IPhysDispatcher in engines or inside InteractionLoop.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	if(!b1) throw runtime_error(("No body #"+lexical_cast<string>(id1)).c_str());
 	if(!b2) throw runtime_error(("No body #"+lexical_cast<string>(id2)).c_str());
@@ -1177,10 +1177,10 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 	bodyStates.resize(scene->bodies->size());
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
-		//Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
+		const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->phys.get());
+		//Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
 		// FIXME: slower, but does not crash
-		Dem3DofGeom* geom=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get());	//For the moment only for Dem3DofGeom!!!
+		Dem3DofGeom* geom=dynamic_cast<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
 		if(!phys) continue;
 		if(!geom) continue;
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
@@ -1215,8 +1215,8 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 	//const Matrix3r& cellHsize(scene->cell->Hsize);   //Disabled because of warning.
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
-		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		const Vector3r& n=geom->normal;
 		// if compression has positive sign, we need to change sign for both normal and shear force
 		// make copy to Fs since shearForce is used at multiple places (less efficient, but avoids confusion)
@@ -1249,8 +1249,8 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 	Matrix3r stress = Matrix3r::Zero();
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
-		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		Real l;
 		if (smallStrains){l = geom->refLength;}
 		else l=(geom->se31.position-geom->se32.position).norm();

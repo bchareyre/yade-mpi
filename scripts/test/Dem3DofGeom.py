@@ -10,7 +10,7 @@ O.engines=[
 	InsertionSortCollider([
 		Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()
 	]),
-	InteractionGeometryDispatcher([
+	IGeomDispatcher([
 		Ig2_Sphere_Sphere_Dem3DofGeom(),
 		Ig2_Facet_Sphere_Dem3DofGeom(),
 		Ig2_Wall_Sphere_Dem3DofGeom()

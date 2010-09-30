@@ -54,6 +54,8 @@ scientific=True if hasattr(pylab,'ticklabel_format') else False  ## safe default
 "Use scientific notation for axes ticks."
 axesWd=0
 "Linewidth (in points) to make *x* and *y* axes better visible; not activated if non-positive."
+current=-1
+"Point that is being tracked with a scatter point. -1 is for the last point, set to *nan* to disable."
 
 def reset():
 	"Reset all plot-related variables (data, plots, labels)"
@@ -125,11 +127,18 @@ def xlateLabel(l):
 class LineRef:
 	"""Holds reference to plot line and to original data arrays (which change during the simulation),
 	and updates the actual line using those data upon request."""
-	def __init__(self,line,xdata,ydata):
-		self.line,self.xdata,self.ydata=line,xdata,ydata
+	def __init__(self,line,scatter,xdata,ydata):
+		self.line,self.scatter,self.xdata,self.ydata=line,scatter,xdata,ydata
 	def update(self):
+		import numpy
 		self.line.set_xdata(self.xdata)
 		self.line.set_ydata(self.ydata)
+		try:
+			x,y=[self.xdata[current]],[self.ydata[current]]
+		except IndexError: x,y=0,0
+		# this could be written in a nicer way, very likely
+		pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
+		self.scatter.set_offsets(pt)
 
 currLineRefs=[]
 liveTimeStamp=0 # timestamp when live update was started, so that the old thread knows to stop if that changes
@@ -168,7 +177,9 @@ def createPlots(subPlots=False):
 		# create y1 lines
 		for d in plots_p_y1:
 			line,=pylab.plot(data[pStrip],data[d[0]],d[1])
-			currLineRefs.append(LineRef(line,data[pStrip],data[d[0]]))
+			scatterPt=([0],[0]) if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
+			scatter=pylab.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
+			currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 		# create the legend
 		pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
 		pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y1])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
@@ -185,7 +196,9 @@ def createPlots(subPlots=False):
 			pylab.twinx()
 			for d in plots_p_y2:
 				line,=pylab.plot(data[pStrip],data[d[0]],d[1])
-				currLineRefs.append(LineRef(line,data[pStrip],data[d[0]]))
+				scatterPt=([0],[0]) if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
+				scatter=pylab.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
+				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 			# legend
 			pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
 			pylab.rcParams['lines.color']=origLinesColor

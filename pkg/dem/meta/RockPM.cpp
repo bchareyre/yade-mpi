@@ -10,7 +10,7 @@ YADE_PLUGIN((RpmState)(Law2_Dem3DofGeom_RockPMPhys_Rpm)(RpmMat)(Ip2_RpmMat_RpmMa
 /********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
 CREATE_LOGGER(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
-void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
 	
@@ -92,9 +92,9 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 CREATE_LOGGER(Ip2_RpmMat_RpmMat_RpmPhys);
 
 void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
-	if(interaction->interactionPhysics) return; 
+	if(interaction->phys) return; 
 
-	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
+	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->geom.get());
 	assert(contGeom);
 	//LOG_WARN(scene->iter);
 	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
@@ -126,7 +126,7 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	}
 
 	
-	interaction->interactionPhysics=contPhys;
+	interaction->phys=contPhys;
 }
 
 RpmPhys::~RpmPhys(){};

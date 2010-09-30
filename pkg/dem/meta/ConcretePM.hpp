@@ -159,12 +159,12 @@ REGISTER_SERIALIZABLE(CpmPhys);
 /*! @brief Convert macroscopic properties to CpmPhys with corresponding parameters.
  *
  * */
-class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsFunctor{
+class Ip2_CpmMat_CpmMat_CpmPhys: public IPhysFunctor{
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		FUNCTOR2D(CpmMat,CpmMat);
 		DECLARE_LOGGER;
-		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,InteractionPhysicsFunctor,"Convert 2 :yref:`CpmMat` instances to :yref:`CpmPhys` with corresponding parameters. Uses simple (arithmetic) averages if material are different. Simple copy of parameters is performed if the :yref:`material<CpmMat>` is shared between both particles. See :ref:`cpm-model` for detals.",
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,IPhysFunctor,"Convert 2 :yref:`CpmMat` instances to :yref:`CpmPhys` with corresponding parameters. Uses simple (arithmetic) averages if material are different. Simple copy of parameters is performed if the :yref:`material<CpmMat>` is shared between both particles. See :ref:`cpm-model` for detals.",
 			((long,cohesiveThresholdIter,10,,"Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive (10 by default)."))
 		);
 };
@@ -182,7 +182,7 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	//! return |sigmaT| at plastic surface for given sigmaN etc; not used by the law itself
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle);
 
-	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
@@ -202,7 +202,7 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
 class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
-	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 	FUNCTOR2D(ScGeom,CpmPhys);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"An experimental version of :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` which uses :yref:`ScGeom` instead of :yref:`Dem3DofGeom`.",
 		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),,"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
@@ -216,12 +216,12 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class Gl1_CpmPhys: public GlInteractionPhysicsFunctor {
-		public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+	class Gl1_CpmPhys: public GlIPhysFunctor {
+		public: virtual void go(const shared_ptr<IPhys>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		virtual ~Gl1_CpmPhys() {};
 		RENDERS(CpmPhys);
 		DECLARE_LOGGER;
-		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_CpmPhys,GlInteractionPhysicsFunctor,"Render :yref:`CpmPhys` objects of interactions.",
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_CpmPhys,GlIPhysFunctor,"Render :yref:`CpmPhys` objects of interactions.",
 			((bool,contactLine,true,,"Show contact line"))
 			((bool,dmgLabel,true,,"Numerically show contact damage parameter"))
 			((bool,dmgPlane,false,,"[what is this?]"))

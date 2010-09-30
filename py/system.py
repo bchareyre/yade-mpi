@@ -26,9 +26,9 @@ _noPropsClasses=set(['InteractionContainer','BodyContainer','Functor','Engine','
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
 	'GlobalEngine','PartialEngine','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
-	'BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State']
+	'BoundFunctor','IGeomFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State']
 	# childless classes
-	+['BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine']
+	+['BoundDispatcher','IGeomDispatcher','IPhysDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine']
 )
 ## set of classes for which the proxies were created
 _proxiedClasses=set()
@@ -149,6 +149,12 @@ _deprecated={
 	'OpenGLRenderingEngine':'OpenGLRenderer', # Sat Jul 24 06:04:13 2010, vaclav@flux
 	'PeriodicPythonRunner':'PyRunner', # Wed Sep  1 16:41:50 2010, chia@engs-018373
 	'InteractionDispatchers':'InteractionLoop', # Mon Sep 27 13:44:54 2010, chia@engs-018373
+	'InteractionGeometry':'IGeom', # Thu Sep 30 10:39:24 2010, chia@engs-018373
+	'InteractionPhysics':'IPhys', # Thu Sep 30 10:39:43 2010, chia@engs-018373
+	'InteractionGeometryFunctor':'IGeomFunctor', # Thu Sep 30 14:27:43 2010, chia@engs-018373
+	'InteractionPhysicsFunctor':'IPhysFunctor', # Thu Sep 30 14:27:53 2010, chia@engs-018373
+	'InteractionPhysicsDispatcher':'IPhysDispatcher', # Thu Sep 30 14:28:12 2010, chia@engs-018373
+	'InteractionGeometryDispatcher':'IGeomDispatcher', # Thu Sep 30 14:28:22 2010, chia@engs-018373
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

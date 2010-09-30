@@ -259,17 +259,17 @@ Dispatchers
 
 .. _dispatcher-names:
 
-	===================================== ================ ============================ =========================== ================================== ===============
-	dispatcher                            arity            dispatch types               created type                functor type                       functor prefix
-	===================================== ================ ============================ =========================== ================================== ===============
-	:yref:`BoundDispatcher`               1                :yref:`Shape`                :yref:`Bound`               :yref:`BoundFunctor`               ``Bo1``
-	:yref:`InteractionGeometryDispatcher` 2 (symetric)     2 × :yref:`Shape`            :yref:`InteractionGeometry` :yref:`InteractionGeometryFunctor` ``Ig2``
-	:yref:`InteractionPhysicsDispatcher`  2 (symetric)     2 × :yref:`Material`         :yref:`InteractionPhysics`  :yref:`InteractionPhysicsFunctor`  ``Ip2``
-	:yref:`LawDispatcher`                 2 (asymetric)    :yref:`InteractionGeometry`, *(none)*                    :yref:`LawFunctor`                 ``Law2``
-	                                                       :yref:`InteractionPhysics`
-	===================================== ================ ============================ =========================== ================================== ===============
+	========================== ================ ====================== ============== ===================== ===============
+	dispatcher                 arity            dispatch types         created type   functor type          functor prefix
+	========================== ================ ====================== ============== ===================== ===============
+	:yref:`BoundDispatcher`    1                :yref:`Shape`          :yref:`Bound`  :yref:`BoundFunctor`  ``Bo1``
+	:yref:`IGeomDispatcher`    2 (symetric)     2 × :yref:`Shape`      :yref:`IGeom`  :yref:`IGeomFunctor`  ``Ig2``
+	:yref:`IPhysDispatcher`    2 (symetric)     2 × :yref:`Material`   :yref:`IPhys`  :yref:`IPhysFunctor`  ``Ip2``
+	:yref:`LawDispatcher`      2 (asymetric)    :yref:`IGeom`          *(none)*       :yref:`LawFunctor`    ``Law2``
+	                                            :yref:`IPhys`
+	========================== ================ ====================== ============== ===================== ===============
 
-	Respective abstract functors for each dispatchers are :yref:`BoundFunctor`, :yref:`InteractionGeometryFunctor`, :yref:`InteractionPhysicsFunctor` and :yref:`LawFunctor`.
+	Respective abstract functors for each dispatchers are :yref:`BoundFunctor`, :yref:`IGeomFunctor`, :yref:`IPhysFunctor` and :yref:`LawFunctor`.
 
 Functors
 	Functor name is composed of 3 parts, separated by underscore.
@@ -897,11 +897,11 @@ There are currenly 4 predefined dispatchers (see `dispatcher-names`_) and corres
 Example: InteractionGeometryDispatcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's take (the most complicated perhaps) :yref:`InteractionGeometryDispatcher`. :yref:`InteractionGeometryFunctor`, which is dispatched based on types of 2 :yref:`Shape` instances (a :yref:`Functor`), takes a number of arguments and returns bool. The functor "call" is always provided by its overridden ``Functor::go`` method; it always receives the dispatched instances as first argument(s) (2 × ``const shared_ptr<Shape>&``) and a number of other arguments it needs:
+Let's take (the most complicated perhaps) :yref:`InteractionGeometryDispatcher`. :yref:`IGeomFunctor`, which is dispatched based on types of 2 :yref:`Shape` instances (a :yref:`Functor`), takes a number of arguments and returns bool. The functor "call" is always provided by its overridden ``Functor::go`` method; it always receives the dispatched instances as first argument(s) (2 × ``const shared_ptr<Shape>&``) and a number of other arguments it needs:
 
 .. code-block:: c++
 
-	class InteractionGeometryFunctor: public Functor2D<
+	class IGeomFunctor: public Functor2D<
 	   bool,                                 //return type
 	   TYPELIST_7(const shared_ptr<Shape>&,  // 1st class for dispatch 
 	      const shared_ptr<Shape>&,          // 2nd class for dispatch
@@ -920,12 +920,12 @@ The dispatcher is declared as follows:
 	class InteractionGeometryDispatcher: public Dispatcher2D<	
 	   Shape,                       // 1st class for dispatch
 	   Shape,                       // 2nd class for dispatch
-	   InteractionGeometryFunctor,  // functor type
+	   IGeomFunctor,  // functor type
 	   bool,                        // return type of the functor
 
 	   // follow argument types for functor call
 	   // they must be exactly the same as types
-	   // given to the InteractionGeometryFunctor above.
+	   // given to the IGeomFunctor above.
 	   TYPELIST_7(const shared_ptr<Shape>&,  
 	      const shared_ptr<Shape>&,
 	      const State&,
@@ -943,20 +943,20 @@ The dispatcher is declared as follows:
 	>
 	{ /* … */ }
 
-Functor derived from InteractionGeometryFunctor must then 
+Functor derived from IGeomFunctor must then 
 
 * override the ::go method with appropriate arguments (they must match exactly types given to ``TYPELIST_*`` macro);
 * declare what types they should be dispatched for, and in what order if they are not the same.
 
 .. code-block:: c++
 
-	class Ig2_Facet_Sphere_Dem3DofGeom: public InteractionGeometryFunctor{
+	class Ig2_Facet_Sphere_Dem3DofGeom: public IGeomFunctor{
 	   public:
 
-	   // override the InteractionGeometryFunctor::go
+	   // override the IGeomFunctor::go
 	   //   (it is really inherited from FunctorWrapper template,
 	   //    therefore not declare explicitly in the
-	   //    InteractionGeometryFunctor declaration as such)
+	   //    IGeomFunctor declaration as such)
 	   // since dispatcher dispatches only for declared types
 	   //   (or types derived from them), we can do 
 	   //   static_cast<Facet>(shape1) and static_cast<Sphere>(shape2)
@@ -1008,8 +1008,8 @@ Top-level Indexable          used by
 ============================ ===========================
 :yref:`Shape`                :yref:`BoundFunctor`, :yref:`InteractionGeometryDispatcher`
 :yref:`Material`             :yref:`InteractionPhysicsDispatcher`
-:yref:`InteractionPhysics`   :yref:`LawDispatcher`
-:yref:`InteractionGeometry`  :yref:`LawDispatcher`
+:yref:`IPhys`   :yref:`LawDispatcher`
+:yref:`IGeom`  :yref:`LawDispatcher`
 ============================ ===========================
 
 The top-level Indexable must use the ``REGISTER_INDEX_COUNTER`` macro, which sets up the machinery for identifying types of derived classes; they must then use the ``REGISTER_CLASS_INDEX`` macro *and* call ``createIndex()`` in their constructor. For instance, taking the :yref:`Shape` class (which is a top-level Indexable):
@@ -1305,8 +1305,8 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 
 	.. code-block:: c++
 
-		void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom,
-		                                      shared_ptr<InteractionPhysics>& _phys,
+		void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
+		                                      shared_ptr<IPhys>& _phys,
 		                                      Interaction* I,
 		                                      Scene* scene)
 		{
@@ -1375,9 +1375,9 @@ Yade provides 3d rendering based on [QGLViewer]_. It is not meant to be full-fea
 .. warning:: There are 2 possible causes of crash, which are not prevented because of serious performance penalty that would result:
 
 	#. access to :yref:`BodyContainer`, in particular deleting bodies from simulation; this is a rare operation, though.
-	#. deleting Interaction::interactionPhysics or Interaction::interactionGeometry.
+	#. deleting Interaction::phys or Interaction::geom.
 
-Renderable entities (:yref:`Shape`, :yref:`State`, :yref:`Bound`, :yref:`InteractionGeometry`, :yref:`InteractionPhysics`) have their associated `OpenGL functors`_. An entity is rendered if
+Renderable entities (:yref:`Shape`, :yref:`State`, :yref:`Bound`, :yref:`IGeom`, :yref:`IPhys`) have their associated `OpenGL functors`_. An entity is rendered if
 
 #. Rendering such entities is enabled by appropriate attribute in :yref:`OpenGLRenderingEngine`
 #. Functor for that particular entity type is found via the :ref:`dispatch mechanism<multiple-dispatch>`.
@@ -1520,7 +1520,7 @@ As with BodyContainer, iteration over interactions should use the ``FOREACH`` ma
 	   /* … */
 	}
 
-Again, note the usage const reference for ``i``. The check ``if(!i->isReal())`` filters away interactions that exist only *potentially*, i.e. there is only :yref:`Bound` overlap of the two bodies, but not (yet) overlap of bodies themselves. The ``i->isReal()`` function is equivalent to ``i->interactionGeometry && i->interactionPhysics``. Details are again explained in :ref:`interaction-flow`.
+Again, note the usage const reference for ``i``. The check ``if(!i->isReal())`` filters away interactions that exist only *potentially*, i.e. there is only :yref:`Bound` overlap of the two bodies, but not (yet) overlap of bodies themselves. The ``i->isReal()`` function is equivalent to ``i->geom && i->phys``. Details are again explained in :ref:`interaction-flow`.
 
 In some cases, such as OpenMP-loops requiring integral index (OpenMP >= 3.0 allows parallelization using random-access iterator as well), you need to iterate over interaction indices instead:
 
@@ -1590,10 +1590,10 @@ Creating and removing interactions is a rather delicate topic and number of comp
 Terminologically, we distinguish
 
 potential interactions,
-	having neither :yref:`geometry<Interaction::interactionGeometry>` nor :yref:`physics<Interaction::interactionPhysics>`. :yref:`Interaction.isReal` can be used to query the status (``Interaction::isReal()`` in c++).
+	having neither :yref:`geometry<Interaction::geom>` nor :yref:`physics<Interaction::phys>`. :yref:`Interaction.isReal` can be used to query the status (``Interaction::isReal()`` in c++).
 
 real interactions,
-	having both :yref:`geometry<Interaction::interactionGeometry>` and :yref:`physics<Interaction::interactionPhysics>`. Below, we shall discuss the possibility of interactions that only have geometry but no physics.
+	having both :yref:`geometry<Interaction::geom>` and :yref:`physics<Interaction::phys>`. Below, we shall discuss the possibility of interactions that only have geometry but no physics.
 
 During each step in the simulation, the following operations are performed on interactions in a typical simulation:
 
@@ -1605,24 +1605,24 @@ During each step in the simulation, the following operations are performed on in
 
 #. Collider erases interactions that were requested for being erased (see below).
 
-#. :yref:`InteractionLoop` (via :yref:`InteractionGeometryDispatcher`) calls appropriate :yref:`InteractionGeometryFunctor` based on :yref:`Shape` combination of both bodies, if such functor exists. For real interactions, the functor updates associated :yref:`InteractionGeometry`. For potential interactions, the functor returns
+#. :yref:`InteractionLoop` (via :yref:`InteractionGeometryDispatcher`) calls appropriate :yref:`IGeomFunctor` based on :yref:`Shape` combination of both bodies, if such functor exists. For real interactions, the functor updates associated :yref:`IGeom`. For potential interactions, the functor returns
 
 	``false``
 		if there is no geometrical overlap, and the interaction will stillremain potential-only
 	``true``
-		if there is geometrical overlap; the functor will have created an :yref:`InteractionGeometry` in such case.
+		if there is geometrical overlap; the functor will have created an :yref:`IGeom` in such case.
 	
 	.. note ::
 		For *real* interactions, the functor *must* return ``true``, even if there is no more spatial overlap between bodies. If you wish to delete an interaction without geometrical overlap, you have to do this in the :yref:`LawFunctor`.
 		
-		This behavior is deliberate, since different :yref:`laws<LawFunctor>` have different requirements, though ideally using relatively small number of generally useful :yref:`geometry functors<InteractionGeometryFunctor>`.
+		This behavior is deliberate, since different :yref:`laws<LawFunctor>` have different requirements, though ideally using relatively small number of generally useful :yref:`geometry functors<IGeomFunctor>`.
 
 	.. note::
 		If there is no functor suitable to handle given combination of :yref:`shapes<Shape>`, the interaction will be left in potential state, without raising any error.
 
-#. For real interactions (already existing or jsut created in last step), :yref:`InteractionLoop` (via :yref:`InteractionPhysicsDispatcher`) calls appropriate :yref:`InteractionPhysicsFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`InteractionPhysics` instance. It is an error if no suitable functor is found, and an exception will be thrown.
+#. For real interactions (already existing or jsut created in last step), :yref:`InteractionLoop` (via :yref:`InteractionPhysicsDispatcher`) calls appropriate :yref:`IPhysFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`IPhys` instance. It is an error if no suitable functor is found, and an exception will be thrown.
 
-#. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combintation of :yref:`InteractionGeometry` and :yref:`InteractionPhysics` of the interaction. Again, it is an error if no functor capable of handling it is found.
+#. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combintation of :yref:`IGeom` and :yref:`IPhys` of the interaction. Again, it is an error if no functor capable of handling it is found.
 
 #. :yref:`LawDispatcher` can decide that an interaction should be removed (such as if bodies get too far apart for non-cohesive laws; or in case of complete damage for damage models). This is done by calling
 
@@ -1635,7 +1635,7 @@ During each step in the simulation, the following operations are performed on in
 
 Creating interactions explicitly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Interactions may still be created explicitly with :yref:`yade.utils.createInteraction`, without any spatial requirements. This function searches current engines for dispatchers and uses them. :yref:`InteractionGeometryFunctor` is called with the ``force`` parameter, obliging it to return ``true`` even if there is no spatial overlap.
+Interactions may still be created explicitly with :yref:`yade.utils.createInteraction`, without any spatial requirements. This function searches current engines for dispatchers and uses them. :yref:`IGeomFunctor` is called with the ``force`` parameter, obliging it to return ``true`` even if there is no spatial overlap.
 
 
 Associating Material and State types

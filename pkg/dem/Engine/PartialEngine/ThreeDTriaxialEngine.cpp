@@ -135,7 +135,7 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId1())]->material);
 		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId2())]->material);
 		//FIXME - why dynamic_cast fails here?
-		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->interactionPhysics.get());
+		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->phys.get());
 		Real fa = sdec1->frictionAngle;
 		Real fb = sdec2->frictionAngle;
 		contactPhysics->frictionAngle			= std::min(fa,fb);

@@ -20,19 +20,19 @@ void Interaction::init(){
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
 	iterMadeReal=-1;
 	functorCache.geomExists=true;
-	//functorCache.geom=shared_ptr<InteractionGeometryFunctor>(); functorCache.phys=shared_ptr<InteractionPhysicsFunctor>(); functorCache.constLaw=shared_ptr<LawFunctor>();
+	//functorCache.geom=shared_ptr<IGeomFunctor>(); functorCache.phys=shared_ptr<IPhysFunctor>(); functorCache.constLaw=shared_ptr<LawFunctor>();
 }
 
 void Interaction::reset(){
-	interactionGeometry=shared_ptr<InteractionGeometry>();
-	interactionPhysics=shared_ptr<InteractionPhysics>();
+	geom=shared_ptr<IGeom>();
+	phys=shared_ptr<IPhys>();
 	init();
 }
 
 
 void Interaction::swapOrder(){
-	if(interactionGeometry || interactionPhysics){
-		throw std::logic_error("Bodies in interaction cannot be swapped if they have interactionGeometry or interactionPhysics.");
+	if(geom || phys){
+		throw std::logic_error("Bodies in interaction cannot be swapped if they have geom or phys.");
 	}
 	std::swap(id1,id2);
 	cellDist*=-1;

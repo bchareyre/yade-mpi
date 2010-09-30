@@ -10,7 +10,7 @@ YADE_PLUGIN((CFpmMat)(CFpmState)(CFpmPhys)(Ip2_CFpmMat_CFpmMat_CFpmPhys)(Law2_Sc
 /********************** Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM ****************************/
 CREATE_LOGGER(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM);
 
-void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	CFpmPhys* phys = static_cast<CFpmPhys*>(ip.get());
 	const int &id1 = contact->getId1();
@@ -135,9 +135,9 @@ CREATE_LOGGER(Ip2_CFpmMat_CFpmMat_CFpmPhys);
 void Ip2_CFpmMat_CFpmMat_CFpmPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
 	
 	/* avoid any updates if the interaction already exists */
-	if(interaction->interactionPhysics) return; 
+	if(interaction->phys) return; 
 
-	ScGeom* geom=dynamic_cast<ScGeom*>(interaction->interactionGeometry.get());
+	ScGeom* geom=dynamic_cast<ScGeom*>(interaction->geom.get());
 	assert(geom);
 
 	const shared_ptr<CFpmMat>& yade1 = YADE_PTR_CAST<CFpmMat>(b1);
@@ -193,7 +193,7 @@ void Ip2_CFpmMat_CFpmMat_CFpmPhys::go(const shared_ptr<Material>& b1, const shar
 	  contactPhysics->FsMax = cohesion*crossSection;
 	}
 	
-	interaction->interactionPhysics = contactPhysics;
+	interaction->phys = contactPhysics;
 }
 
 CFpmPhys::~CFpmPhys(){}

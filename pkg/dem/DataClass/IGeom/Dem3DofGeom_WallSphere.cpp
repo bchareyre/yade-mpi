@@ -63,10 +63,10 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 	else normalGlob[wall->axis]=wall->sense==1?1.:-1;
 
 	shared_ptr<Dem3DofGeom_WallSphere> ws;
-	if(c->interactionGeometry) ws=YADE_PTR_CAST<Dem3DofGeom_WallSphere>(c->interactionGeometry);
+	if(c->geom) ws=YADE_PTR_CAST<Dem3DofGeom_WallSphere>(c->geom);
 	else {
 		ws=shared_ptr<Dem3DofGeom_WallSphere>(new Dem3DofGeom_WallSphere());
-		c->interactionGeometry=ws;
+		c->geom=ws;
 		ws->effR2=abs(dist);
 		ws->refR1=-1; ws->refR2=sphereRadius;
 		ws->refLength=ws->effR2;
@@ -92,7 +92,7 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 	bool Gl1_Dem3DofGeom_WallSphere::shear=false;
 	bool Gl1_Dem3DofGeom_WallSphere::shearLabel=false;
 
-	void Gl1_Dem3DofGeom_WallSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_Dem3DofGeom_WallSphere::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_WallSphere* ws=static_cast<Dem3DofGeom_WallSphere*>(ig.get());
 		const Se3r& se31=b1->state->se3,se32=b2->state->se3;
 		const Vector3r& pos1=se31.position; const Vector3r& pos2=se32.position;

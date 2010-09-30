@@ -102,11 +102,11 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 	FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
 		if(!contact->isReal()) continue;
 
-		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(contact->interactionGeometry.get()); assert(geom);
-		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(contact->interactionPhysics.get()); assert(phys);
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(contact->geom.get()); assert(geom);
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(contact->phys.get()); assert(phys);
 		// all we need for getting stiffness
 		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->refR1; Real& radius2=geom->refR2;
-		Real fn = (static_cast<NormShearPhys *> (contact->interactionPhysics.get()))->normalForce.squaredNorm();
+		Real fn = (static_cast<NormShearPhys *> (contact->phys.get()))->normalForce.squaredNorm();
 		if (fn==0) continue;//Is it a problem with some laws? I still don't see why.
 		
 		//Diagonal terms of the translational stiffness matrix

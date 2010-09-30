@@ -77,9 +77,9 @@ private:
 	/// It is necessary in order to probe the bounding volume for new sphere.
 	Collider* bI;
 	
-	/// @brief Pointer to InteractionGeometryDispatcher.
+	/// @brief Pointer to IGeomDispatcher.
 	/// It is necessary in order to detect a real overlap with other bodies.
-	InteractionGeometryDispatcher* iGME;
+	IGeomDispatcher* iGME;
 
 	bool first_run;
 

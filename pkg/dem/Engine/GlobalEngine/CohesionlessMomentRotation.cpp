@@ -16,10 +16,10 @@ YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_MomentMat_Momen
 /********************** Law2_SCG_MomentPhys_CohesionlessMomentRotation ****************************/
 CREATE_LOGGER(Law2_SCG_MomentPhys_CohesionlessMomentRotation);
 
-void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	
-	ScGeom* geom = static_cast<ScGeom*>(ig.get()); //InteractionGeometry
-	MomentPhys* phys = static_cast<MomentPhys*>(ip.get()); //InteractionPhysics
+	ScGeom* geom = static_cast<ScGeom*>(ig.get()); //IGeom
+	MomentPhys* phys = static_cast<MomentPhys*>(ip.get()); //IPhys
 	int id1 = contact->getId1(); //Id of body1
         int id2 = contact->getId2(); //Id of body2
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
@@ -162,9 +162,9 @@ CREATE_LOGGER(Ip2_MomentMat_MomentMat_MomentPhys);
 
 void Ip2_MomentMat_MomentMat_MomentPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
 	
-	if(interaction->interactionPhysics) return; 
+	if(interaction->phys) return; 
 
-	ScGeom* scg=dynamic_cast<ScGeom*>(interaction->interactionGeometry.get());
+	ScGeom* scg=dynamic_cast<ScGeom*>(interaction->geom.get());
 			
 	assert(scg);
 
@@ -222,7 +222,7 @@ void Ip2_MomentMat_MomentMat_MomentPhys::go(const shared_ptr<Material>& b1, cons
 	contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 	contactPhysics->prevNormal 		= scg->normal; //This is also done in the Contact Law.  It is not redundant because this class is only called ONCE!
 
-	interaction->interactionPhysics = contactPhysics;
+	interaction->phys = contactPhysics;
 }
 
 MomentPhys::~MomentPhys(){}

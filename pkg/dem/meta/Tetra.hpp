@@ -5,7 +5,7 @@
 #include<vector>
 
 #include<yade/core/Shape.hpp>
-#include<yade/core/InteractionGeometry.hpp>
+#include<yade/core/IGeom.hpp>
 #include<yade/core/GlobalEngine.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
@@ -33,11 +33,11 @@ REGISTER_SERIALIZABLE(Tetra);
  * This is expressed as penetration volume properties: centroid, volume, orientation of principal axes, inertia.
  *
  * Self-contained. */
-class TTetraGeom: public InteractionGeometry{
+class TTetraGeom: public IGeom{
 	public:
 		virtual ~TTetraGeom();
 	protected:
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(TTetraGeom,InteractionGeometry,"Geometry of interaction between 2 :yref:`tetrahedra<Tetra>`, including volumetric characteristics",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(TTetraGeom,IGeom,"Geometry of interaction between 2 :yref:`tetrahedra<Tetra>`, including volumetric characteristics",
 			((Real,penetrationVolume,NaN,,"Volume of overlap [m³]"))
 			((Real,equivalentCrossSection,NaN,,"Cross-section of the overlap (perpendicular to the axis of least inertia"))
 			((Real,maxPenetrationDepthA,NaN,,"??"))
@@ -48,7 +48,7 @@ class TTetraGeom: public InteractionGeometry{
 			createIndex();
 		);
 		FUNCTOR2D(Tetra,Tetra);
-		REGISTER_CLASS_INDEX(TTetraGeom,InteractionGeometry);
+		REGISTER_CLASS_INDEX(TTetraGeom,IGeom);
 };
 REGISTER_SERIALIZABLE(TTetraGeom);
 
@@ -90,14 +90,14 @@ REGISTER_SERIALIZABLE(TetraVolumetricLaw);
 /*! @fixme implement Tetra2BoxBang by representing box as 6 tetrahedra. */
 
 /*! Create TTetraGeom (collision geometry) from colliding Tetra's. */
-class Ig2_Tetra_Tetra_TTetraGeom: public InteractionGeometryFunctor
+class Ig2_Tetra_Tetra_TTetraGeom: public IGeomFunctor
 {
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw std::logic_error("Ig2_Tetra_Tetra_TTetraGeom::goReverse called, but the functor is symmetric."); }
 		FUNCTOR2D(Tetra,Tetra);
 		DEFINE_FUNCTOR_ORDER_2D(Tetra,Tetra);
-		YADE_CLASS_BASE_DOC(Ig2_Tetra_Tetra_TTetraGeom,InteractionGeometryFunctor,"Create/update geometry of collision between 2 :yref:`tetrahedra<Tetra>` (:yref:`TTetraGeom` instance)");
+		YADE_CLASS_BASE_DOC(Ig2_Tetra_Tetra_TTetraGeom,IGeomFunctor,"Create/update geometry of collision between 2 :yref:`tetrahedra<Tetra>` (:yref:`TTetraGeom` instance)");
 		DECLARE_LOGGER;
 	private:
 		std::list<Tetra> Tetra2TetraIntersection(const Tetra& A, const Tetra& B);

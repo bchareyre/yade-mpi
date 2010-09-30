@@ -21,7 +21,7 @@
 
 #ifdef YADE_DEVIRT_FUNCTORS
 bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Box_Sphere_ScGeom::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_Box_Sphere_ScGeom::goStatic(InteractionGeometryFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+bool Ig2_Box_Sphere_ScGeom::goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 #else
 bool Ig2_Box_Sphere_ScGeom::go(
 		const shared_ptr<Shape>& cm1,
@@ -96,9 +96,9 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		pt1 = se32.position+normal*minCBoxDist;
 		pt2 = se32.position-normal*s->radius;
 		Vector3r normal = pt1-pt2; normal.normalize();
-		bool isNew=!c->interactionGeometry;
+		bool isNew=!c->geom;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
-		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
+		else scm = YADE_PTR_CAST<ScGeom>(c->geom);
 			
 		// contact point is in the middle of overlapping volumes
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
@@ -107,7 +107,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		scm->penetrationDepth = (pt1-pt2).norm();
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
-		c->interactionGeometry = scm;
+		c->geom = scm;
 		scm->precompute(state1,state2,scene,c,normal,isNew,true);
 	} else { // outside
 		Vector3r cOnBox_box = boxAxisT*cOnBox_boxLocal; // projection of sphere's center on closest box surface - relative to box's origin, but GLOBAL orientation!
@@ -139,14 +139,14 @@ bool Ig2_Box_Sphere_ScGeom::go(
 
 		pt2=se32.position+cOnBox_sphere*s->radius;
 		
-		bool isNew=!c->interactionGeometry;
+		bool isNew=!c->geom;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
-		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);	
+		else scm = YADE_PTR_CAST<ScGeom>(c->geom);	
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->penetrationDepth = depth;
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
-		c->interactionGeometry = scm;
+		c->geom = scm;
 		scm->precompute(state1,state2,scene,c,-cOnBox_sphere,isNew,true);
 	}
 	return true;

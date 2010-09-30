@@ -63,10 +63,10 @@ void SpheresFactory::action()
 			LOG_FATAL("Can't find Collider." );
 			return;
 		}
-		iGME=dynamic_cast<InteractionGeometryDispatcher*>(scene->engineByName("InteractionGeometryDispatcher").get());
+		iGME=dynamic_cast<IGeomDispatcher*>(scene->engineByName("IGeomDispatcher").get());
 		if (!iGME) 
 		{
-			LOG_FATAL("Can't find InteractionGeometryDispatcher." );
+			LOG_FATAL("Can't find IGeomDispatcher." );
 			return;
 		}
 		first_run=false;
@@ -91,7 +91,7 @@ void SpheresFactory::action()
 		bool is_overlap=false;
 		vector<Body::id_t> probedBodies=bI->probeBoundingVolume(bv);
 		FOREACH(Body::id_t id, probedBodies){
-			if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry,/*force*/false){
+			if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->geom,/*force*/false){
 				is_overlap=true;
 				break;
 			}

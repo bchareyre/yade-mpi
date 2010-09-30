@@ -1,12 +1,12 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/InteractionGeometry.hpp>
+#include<yade/core/IGeom.hpp>
 
 /*! Abstract class that unites ScGeom and Dem3DofGeom,
 	created for the purposes of GlobalStiffnessTimeStepper.
 	It might be removed in the future. */
-class GenericSpheresContact: public InteractionGeometry{
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(GenericSpheresContact,InteractionGeometry,
+class GenericSpheresContact: public IGeom{
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(GenericSpheresContact,IGeom,
 		"Class uniting :yref:`ScGeom` and :yref:`Dem3DofGeom`, for the purposes of :yref:`GlobalStiffnessTimeStepper`. (It might be removed inthe future). Do not use this class directly.",
 		((Vector3r,normal,,,"Unit vector oriented along the interaction. |yupdate|"))
 		((Vector3r,contactPoint,,,"some reference point for the interaction (usually in the middle). |ycomp|"))
@@ -14,7 +14,7 @@ class GenericSpheresContact: public InteractionGeometry{
 		((Real,refR2,,,"Reference radius of particle #2. |ycomp|")),
 		createIndex();
 	);
-	REGISTER_CLASS_INDEX(GenericSpheresContact,InteractionGeometry);
+	REGISTER_CLASS_INDEX(GenericSpheresContact,IGeom);
 
 	virtual ~GenericSpheresContact(); // vtable
 };
@@ -57,7 +57,7 @@ class Dem3DofGeom: public GenericSpheresContact{
 			.def("slipToDisplacementTMax",&Dem3DofGeom::slipToDisplacementTMax)
 			.def("slipToStrainTMax",&Dem3DofGeom::slipToStrainTMax)
 		);
-		REGISTER_CLASS_INDEX(Dem3DofGeom,InteractionGeometry);
+		REGISTER_CLASS_INDEX(Dem3DofGeom,IGeom);
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom);
 

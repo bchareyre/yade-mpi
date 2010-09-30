@@ -25,9 +25,9 @@ private:
 	/// @brief Pointer to Collider.
 	/// It is necessary in order to probe the bounding volume for new sphere.
 	Collider* bI;
-	/// @brief Pointer to InteractionGeometryDispatcher.
+	/// @brief Pointer to IGeomDispatcher.
 	/// It is necessary in order to detect a real overlap with other bodies.
-	InteractionGeometryDispatcher* iGME;
+	IGeomDispatcher* iGME;
 
 	std::vector<shared_ptr<Body> > shiftedBodies;
 

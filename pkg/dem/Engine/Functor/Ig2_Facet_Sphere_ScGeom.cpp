@@ -95,9 +95,9 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	if (penetrationDepth>0 || c->isReal())
 	{
 		shared_ptr<ScGeom> scm;
-		bool isNew = !c->interactionGeometry;
-		if (c->interactionGeometry)
-			scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
+		bool isNew = !c->geom;
+		if (c->geom)
+			scm = YADE_PTR_CAST<ScGeom>(c->geom);
 		else
 			scm = shared_ptr<ScGeom>(new ScGeom());
 	  
@@ -106,7 +106,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 		scm->penetrationDepth = penetrationDepth;
 		scm->radius1 = 2*sphereRadius;
 		scm->radius2 = sphereRadius;
-		if (isNew) c->interactionGeometry = scm;
+		if (isNew) c->geom = scm;
 		scm->precompute(state1,state2,scene,c,normal,isNew,true);
 		return true;
 	}

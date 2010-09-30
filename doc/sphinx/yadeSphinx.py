@@ -122,12 +122,12 @@ Class reference (yade.wrapper module)
 
 """+
 	sect('Bodies','',['Body','Shape','State','Material','Bound'])+
-	sect('Interactions','',['Interaction','InteractionGeometry','InteractionPhysics'])+
+	sect('Interactions','',['Interaction','IGeom','IPhys'])+
 	sect('Global engines','',['FieldApplier','Collider','BoundaryController','GlobalEngine'],reverse=True)+
 	sect('Partial engines','',['PartialEngine'])+
 	sect('Bounding volume creation','',['BoundFunctor','BoundDispatcher'])+
-	sect('Interaction Geometry creation','',['InteractionGeometryFunctor','InteractionGeometryDispatcher'])+
-	sect('Interaction Physics creation','',['InteractionPhysicsFunctor','InteractionPhysicsDispatcher'])+
+	sect('Interaction Geometry creation','',['IGeomFunctor','IGeomDispatcher'])+
+	sect('Interaction Physics creation','',['IPhysFunctor','IPhysDispatcher'])+
 	sect('Constitutive laws','',['LawFunctor','LawDispatcher'])+
 	sect('Callbacks','',['BodyCallback','IntrCallback'])+
 	sect('Preprocessors','',['FileGenerator'])+

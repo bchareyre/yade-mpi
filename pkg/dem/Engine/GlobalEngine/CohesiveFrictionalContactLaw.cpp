@@ -34,12 +34,12 @@ void CohesiveFrictionalContactLaw::action()
 	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		functor->go(I->interactionGeometry, I->interactionPhysics, I.get());
+		functor->go(I->geom, I->phys, I.get());
 	}
 }
 
 
-void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact)
+void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
 	const Real& dt = scene->dt;
 // 		if (detectBrokenBodies  //Experimental, has no effect
@@ -64,7 +64,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 	               || currentContactPhysics->normalAdhesion==0)) {
 		// BREAK due to tension
 		scene->interactions->requestErase(contact->getId1(),contact->getId2());
-		// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
+		// contact->phys was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 // 			currentContactPhysics->cohesionBroken = true;
 // 			currentContactPhysics->normalForce = Vector3r::ZERO;
 // 			currentContactPhysics->shearForce = Vector3r::ZERO;

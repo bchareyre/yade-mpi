@@ -11,7 +11,7 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/pkg-common/Dispatching.hpp>
 
-class Ig2_Facet_Sphere_ScGeom : public InteractionGeometryFunctor
+class Ig2_Facet_Sphere_ScGeom : public IGeomFunctor
 {
 	public :
 		virtual bool go(const shared_ptr<Shape>& cm1,
@@ -28,7 +28,7 @@ class Ig2_Facet_Sphere_ScGeom : public InteractionGeometryFunctor
 					const Vector3r& shift2,
 					const bool& force,
 					const shared_ptr<Interaction>& c);
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_ScGeom,InteractionGeometryFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Facet` and :yref:`Sphere`.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Facet` and :yref:`Sphere`.",
 		((Real,shrinkFactor,((void)"no shrinking",0),,"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multipled by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
 	);
 	DECLARE_LOGGER;

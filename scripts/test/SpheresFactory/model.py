@@ -22,8 +22,8 @@ O.dt=0.0001
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InteractionGeometryDispatcher([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),
-	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	IGeomDispatcher([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),
+	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ConstitutiveLawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic()]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=0.3),

@@ -18,9 +18,11 @@
 #  include <GL/glut.h>
 #endif
 
-YADE_PLUGIN((OpenGLRenderer));
+YADE_PLUGIN((OpenGLRenderer)(GlExtraDrawer));
 YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(OpenGLRenderer);
+
+void GlExtraDrawer::render(){ throw runtime_error("GlExtraDrawer::render called from class "+getClassName()+". (did you forget to override it in the derived class?)"); }
 
 bool OpenGLRenderer::initDone=false;
 const int OpenGLRenderer::numClipPlanes;
@@ -32,8 +34,8 @@ void OpenGLRenderer::init(){
 		// if (Omega::instance().isInheritingFrom_recursive(item.first,"GlStateFunctor")) stateFunctorNames.push_back(item.first);
 		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlBoundFunctor")) boundFunctorNames.push_back(item.first);
 		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlShapeFunctor")) shapeFunctorNames.push_back(item.first);
-		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlInteractionGeometryFunctor")) interactionGeometryFunctorNames.push_back(item.first);
-		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlInteractionPhysicsFunctor")) interactionPhysicsFunctorNames.push_back(item.first);
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlIGeomFunctor")) geomFunctorNames.push_back(item.first);
+		if (Omega::instance().isInheritingFrom_recursive(item.first,"GlIPhysFunctor")) physFunctorNames.push_back(item.first);
 	}
 	initgl(); // creates functor objects in the proper sense
 
@@ -69,8 +71,8 @@ void OpenGLRenderer::initgl(){
 		// _SETUP_DISPATCHER(stateFunctorNames,GlStateFunctor,stateDispatcher);
 		_SETUP_DISPATCHER(boundFunctorNames,GlBoundFunctor,boundDispatcher);
 		_SETUP_DISPATCHER(shapeFunctorNames,GlShapeFunctor,shapeDispatcher);
-		_SETUP_DISPATCHER(interactionGeometryFunctorNames,GlInteractionGeometryFunctor,interactionGeometryDispatcher);
-		_SETUP_DISPATCHER(interactionPhysicsFunctorNames,GlInteractionPhysicsFunctor,interactionPhysicsDispatcher);
+		_SETUP_DISPATCHER(geomFunctorNames,GlIGeomFunctor,geomDispatcher);
+		_SETUP_DISPATCHER(physFunctorNames,GlIPhysFunctor,physDispatcher);
 	#undef _SETUP_DISPATCHER
 }
 
@@ -138,8 +140,8 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 
 	// assign scene inside functors
 	boundDispatcher.updateScenePtr();
-	interactionGeometryDispatcher.updateScenePtr();
-	interactionPhysicsDispatcher.updateScenePtr();
+	geomDispatcher.updateScenePtr();
+	physDispatcher.updateScenePtr();
 	shapeDispatcher.updateScenePtr();
 	// stateDispatcher.updateScenePtr();
 
@@ -187,13 +189,22 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 
 	drawPeriodicCell();
 
-	
 	if (dof || id) renderDOF_ID();
 	if (bound) renderBound();
 	if (shape) renderShape();
 	if (intrAllWire) renderAllInteractionsWire();
-	if (intrGeom) renderInteractionGeometry();
-	if (intrPhys) renderInteractionPhysics();
+	if (intrGeom) renderIGeom();
+	if (intrPhys) renderIPhys();
+
+	FOREACH(const shared_ptr<GlExtraDrawer> d, extraDrawers){
+		if(d->dead) continue; 
+		glPushMatrix();
+			d->scene=scene.get();
+			d->render();
+		glPopMatrix();
+	}
+
+
 }
 
 void OpenGLRenderer::renderAllInteractionsWire(){
@@ -236,31 +247,31 @@ void OpenGLRenderer::renderDOF_ID(){
 	}
 }
 
-void OpenGLRenderer::renderInteractionGeometry(){	
-	interactionGeometryDispatcher.scene=scene.get(); interactionGeometryDispatcher.updateScenePtr();
+void OpenGLRenderer::renderIGeom(){	
+	geomDispatcher.scene=scene.get(); geomDispatcher.updateScenePtr();
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-			if(!I->interactionGeometry) continue;
+			if(!I->geom) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			if(!(bodyDisp[I->getId1()].isDisplayed||bodyDisp[I->getId2()].isDisplayed)) continue;
-			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,intrWire); glPopMatrix();
+			glPushMatrix(); geomDispatcher(I->geom,I,b1,b2,intrWire); glPopMatrix();
 		}
 	}
 }
 
 
-void OpenGLRenderer::renderInteractionPhysics(){	
-	interactionPhysicsDispatcher.scene=scene.get(); interactionPhysicsDispatcher.updateScenePtr();
+void OpenGLRenderer::renderIPhys(){	
+	physDispatcher.scene=scene.get(); physDispatcher.updateScenePtr();
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-			shared_ptr<InteractionPhysics> ip(I->interactionPhysics);
+			shared_ptr<IPhys> ip(I->phys);
 			if(!ip) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			Body::id_t id1=I->getId1(), id2=I->getId2();
 			if(!(bodyDisp[id1].isDisplayed||bodyDisp[id2].isDisplayed)) continue;
-			glPushMatrix(); interactionPhysicsDispatcher(ip,I,b1,b2,intrWire); glPopMatrix();
+			glPushMatrix(); physDispatcher(ip,I,b1,b2,intrWire); glPopMatrix();
 		}
 	}
 }

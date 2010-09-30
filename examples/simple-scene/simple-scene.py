@@ -26,7 +26,7 @@ o.engines=[
 	## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
 	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
 	## Note that there is no EngineUnit for box-box collision. They are not implemented.
-	InteractionGeometryDispatcher([
+	IGeomDispatcher([
 		Ig2_Sphere_Sphere_ScGeom(),
 		Ig2_Box_Sphere_ScGeom()
 	]),
@@ -34,7 +34,7 @@ o.engines=[
 	## This may consist in deriving contact rigidity from elastic moduli of each body, for example.
 	## The purpose is that the contact may be "solved" without reference to related bodies,
 	## only with the information contained in contact geometry and physics.
-	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	## "Solver" of the contact, also called (consitutive) law.
 	## Based on the information in interaction physics and geometry, it applies corresponding forces on bodies in interaction.
 	ElasticContactLaw(),

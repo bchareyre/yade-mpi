@@ -29,23 +29,23 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 {
 	NormalInelasticMat* sdec1 = static_cast<NormalInelasticMat*>(b1.get());
 	NormalInelasticMat* sdec2 = static_cast<NormalInelasticMat*>(b2.get());
-	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
+	ScGeom* geom = YADE_CAST<ScGeom*>(interaction->geom.get());
 	
 	
-	if(interactionGeometry) // so it is ScGeom  - NON PERMANENT LINK
+	if(geom) // so it is ScGeom  - NON PERMANENT LINK
 	{
-		if(!interaction->interactionPhysics)
+		if(!interaction->phys)
 		{
 //std::cerr << " isNew, id1: " << interaction->getId1() << " id2: " << interaction->getId2()  << "\n";
-			interaction->interactionPhysics = shared_ptr<NormalInelasticityPhys>(new NormalInelasticityPhys());
-			NormalInelasticityPhys* contactPhysics = YADE_CAST<NormalInelasticityPhys*>(interaction->interactionPhysics.get());
+			interaction->phys = shared_ptr<NormalInelasticityPhys>(new NormalInelasticityPhys());
+			NormalInelasticityPhys* contactPhysics = YADE_CAST<NormalInelasticityPhys*>(interaction->phys.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
 			Real Va 	= sdec1->poisson;
 			Real Vb 	= sdec2->poisson;
-			Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
-			Real Db 	= interactionGeometry->radius2; // FIXME - as above
+			Real Da 	= geom->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
+			Real Db 	= geom->radius2; // FIXME - as above
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 
@@ -64,7 +64,7 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 
 			// Lot of suppress here around (>) r2276. Normally not bad but ? See Ip2_2xCohFrictMat_CohFrictPhys.cpp to re-find the initial §...
 			
-			contactPhysics->prevNormal 			= interactionGeometry->normal;
+			contactPhysics->prevNormal 			= geom->normal;
 			
 			contactPhysics->knLower = Kn;
 			contactPhysics->kn = Kn;
@@ -75,7 +75,7 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
 			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 			contactPhysics->kr = Kr;
-			contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
+			contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),geom->normal);
 			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
 			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
 			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;

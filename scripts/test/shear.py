@@ -9,8 +9,8 @@ O.bodies.append([
 ])
 O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
+	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
 	ElasticContactLaw(useShear=False,label='elasticLaw'),
 	PyRunner(iterPeriod=10000,command='interInfo()'),

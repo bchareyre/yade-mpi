@@ -78,15 +78,15 @@ class CFpmPhys: public NormShearPhys {
 };
 REGISTER_SERIALIZABLE(CFpmPhys);
 
-/** 2d functor creating InteractionPhysics (Ip2) taking CFpmMat and CFpmMat of 2 bodies, returning type CFpmPhys */
-class Ip2_CFpmMat_CFpmMat_CFpmPhys: public InteractionPhysicsFunctor{
+/** 2d functor creating IPhys (Ip2) taking CFpmMat and CFpmMat of 2 bodies, returning type CFpmPhys */
+class Ip2_CFpmMat_CFpmMat_CFpmPhys: public IPhysFunctor{
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		
 		FUNCTOR2D(CFpmMat,CFpmMat);
 		DECLARE_LOGGER;
 		
-		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CFpmMat_CFpmMat_CFpmPhys,InteractionPhysicsFunctor,"Converts 2 CFpmmat instances to CFpmPhys with corresponding parameters.",
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CFpmMat_CFpmMat_CFpmPhys,IPhysFunctor,"Converts 2 CFpmmat instances to CFpmPhys with corresponding parameters.",
 		  ((int,cohesiveTresholdIteration,1,,"Should new contacts be cohesive? They will before this iter, they won't afterward."))
 		  ((bool,useAlphaBeta,false,,"If true, stiffnesses are computed based on Alpha and Beta."))
 		  ((Real,Alpha,0,,"Defines the ratio ks/kn."))
@@ -103,7 +103,7 @@ REGISTER_SERIALIZABLE(Ip2_CFpmMat_CFpmMat_CFpmPhys);
 /** 2d functor creating the interaction law (Law2) based on SphereContactGeometry (ScGeom) and CFpmPhys of 2 bodies, returning type CohesiveFrictionalPM */
 class Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,CFpmPhys);
 
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM,LawFunctor,"Constitutive law for the CFpm model.",

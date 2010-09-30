@@ -18,7 +18,7 @@ class Law2_ScGeom_FrictPhys_Basic: public LawFunctor{
 	public:
 		static Real Real0;
 		OpenMPAccumulator<Real,&Law2_ScGeom_FrictPhys_Basic::Real0> plasticDissipation;
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		Real elasticEnergy ();
 		Real getPlasticDissipation();
 		void initPlasticDissipation(Real initVal=0);
@@ -43,7 +43,7 @@ This class serves also as tutorial and is documented in detail at
 */
 class Law2_Dem3DofGeom_FrictPhys_Basic: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(Dem3DofGeom,FrictPhys);
 		YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_FrictPhys_Basic,LawFunctor,"Constitutive law for linear compression, no tension, and linear plasticity surface.\n\nThis class serves also as tutorial and is documented in detail at https://yade-dem.org/index.php/ConstitutiveLawHowto.");
 };

@@ -123,7 +123,7 @@ void KinemSimpleShearBox::computeStiffness()
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
-			Real fn = (static_cast<FrictPhys*>(contact->interactionPhysics.get()))->normalForce.norm();
+			Real fn = (static_cast<FrictPhys*>(contact->phys.get()))->normalForce.norm();
 
 			if (fn!=0)
 			{
@@ -131,7 +131,7 @@ void KinemSimpleShearBox::computeStiffness()
 				if ( id_topbox==id1 || id_topbox==id2 )
 					{
 						FrictPhys* currentContactPhysics =
-						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
+						static_cast<FrictPhys*> ( contact->phys.get() );
 						stiffness  += currentContactPhysics->kn;
 						nbre_contacts += 1;
 					}

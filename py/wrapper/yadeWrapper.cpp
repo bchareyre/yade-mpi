@@ -282,11 +282,11 @@ class pyOmega{
 			}
 			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(!f->label.empty()){ pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");}} }
 			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
-			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(InteractionGeometryDispatcher); _TRY_DISPATCHER(InteractionPhysicsDispatcher); _TRY_DISPATCHER(LawDispatcher);
+			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(IGeomDispatcher); _TRY_DISPATCHER(IPhysDispatcher); _TRY_DISPATCHER(LawDispatcher);
 			InteractionLoop* id=dynamic_cast<InteractionLoop*>(e.get());
 			if(id){
-				_DO_FUNCTORS(id->geomDispatcher->functors,InteractionGeometryFunctor);
-				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
+				_DO_FUNCTORS(id->geomDispatcher->functors,IGeomFunctor);
+				_DO_FUNCTORS(id->physDispatcher->functors,IPhysFunctor);
 				_DO_FUNCTORS(id->lawDispatcher->functors,LawFunctor);
 			}
 			Collider* coll=dynamic_cast<Collider*>(e.get());
@@ -300,11 +300,11 @@ class pyOmega{
 			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(f->label==label) return python::object(f); }}
 			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
 			if(e->label==label){ return python::object(e); }
-			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(InteractionGeometryDispatcher); _TRY_DISPATCHER(InteractionPhysicsDispatcher); _TRY_DISPATCHER(LawDispatcher);
+			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(IGeomDispatcher); _TRY_DISPATCHER(IPhysDispatcher); _TRY_DISPATCHER(LawDispatcher);
 			InteractionLoop* id=dynamic_cast<InteractionLoop*>(e.get());
 			if(id){
-				_DO_FUNCTORS(id->geomDispatcher->functors,InteractionGeometryFunctor);
-				_DO_FUNCTORS(id->physDispatcher->functors,InteractionPhysicsFunctor);
+				_DO_FUNCTORS(id->geomDispatcher->functors,IGeomFunctor);
+				_DO_FUNCTORS(id->physDispatcher->functors,IPhysFunctor);
 				_DO_FUNCTORS(id->lawDispatcher->functors,LawFunctor);
 			}
 			Collider* coll=dynamic_cast<Collider*>(e.get());

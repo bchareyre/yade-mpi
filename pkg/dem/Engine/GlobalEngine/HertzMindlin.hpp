@@ -57,11 +57,11 @@ REGISTER_SERIALIZABLE(MindlinPhys);
 
 
 /******************** Ip2_FrictMat_FrictMat_MindlinPhys *******/
-class Ip2_FrictMat_FrictMat_MindlinPhys: public InteractionPhysicsFunctor{
+class Ip2_FrictMat_FrictMat_MindlinPhys: public IPhysFunctor{
 	public :
 	virtual void go(const shared_ptr<Material>& b1,	const shared_ptr<Material>& b2,	const shared_ptr<Interaction>& interaction);
 	FUNCTOR2D(FrictMat,FrictMat);
-	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_MindlinPhys,InteractionPhysicsFunctor,"Calculate some physical parameters needed to obtain the normal and shear stiffnesses according to the Hertz-Mindlin's formulation (as implemented in PFC).\n\nViscous parameters can be specified either using coefficients of restitution ($e_n$, $e_s$) or viscous damping coefficient ($\\beta_n$, $\\beta_s$). The following rules apply:\n#. If the $\\beta_n$ ($\\beta_s$) coefficient is given, it is assigned to :yref:`MindlinPhys.betan` (:yref:`MindlinPhys.betas`) directly.\n#. If $e_n$ is given, :yref:`MindlinPhys.betan` is computed using $\\beta_n=-(\\log e_n)/\\sqrt{\\pi^2+(\\log e_n)^2}$. The same applies to $e_s$, :yref:`MindlinPhys.betas`.\n#. It is an error (exception) to specify both $e_n$ and $\\beta_n$ ($e_s$ and $\\beta_s$).\n#. If neither $e_n$ nor $\\beta_n$ is given, zero value for :yref:`MindlinPhys.betan` is used; there will be no viscous effects.\n#.If neither $e_s$ nor $\\beta_s$ is given, the value of :yref:`MindlinPhys.betan` is used for :yref:`MindlinPhys.betas` as well.\n\nThe $e_n$, $\\beta_n$, $e_s$, $\\beta_s$ are :yref:`MatchMaker` objects; they can be constructed from float values to always return constant value.\n\nSee :ysrc:`scripts/shots.py` for an example of specifying $e_n$ based on combination of parameters.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_MindlinPhys,IPhysFunctor,"Calculate some physical parameters needed to obtain the normal and shear stiffnesses according to the Hertz-Mindlin's formulation (as implemented in PFC).\n\nViscous parameters can be specified either using coefficients of restitution ($e_n$, $e_s$) or viscous damping coefficient ($\\beta_n$, $\\beta_s$). The following rules apply:\n#. If the $\\beta_n$ ($\\beta_s$) coefficient is given, it is assigned to :yref:`MindlinPhys.betan` (:yref:`MindlinPhys.betas`) directly.\n#. If $e_n$ is given, :yref:`MindlinPhys.betan` is computed using $\\beta_n=-(\\log e_n)/\\sqrt{\\pi^2+(\\log e_n)^2}$. The same applies to $e_s$, :yref:`MindlinPhys.betas`.\n#. It is an error (exception) to specify both $e_n$ and $\\beta_n$ ($e_s$ and $\\beta_s$).\n#. If neither $e_n$ nor $\\beta_n$ is given, zero value for :yref:`MindlinPhys.betan` is used; there will be no viscous effects.\n#.If neither $e_s$ nor $\\beta_s$ is given, the value of :yref:`MindlinPhys.betan` is used for :yref:`MindlinPhys.betas` as well.\n\nThe $e_n$, $\\beta_n$, $e_s$, $\\beta_s$ are :yref:`MatchMaker` objects; they can be constructed from float values to always return constant value.\n\nSee :ysrc:`scripts/shots.py` for an example of specifying $e_n$ based on combination of parameters.",
 			((Real,gamma,0.0,,"Surface energy parameter [J/m^2] per each unit contact surface, to derive DMT formulation from HM"))
 			((shared_ptr<MatchMaker>,en,,,"Normal coefficient of restitution $e_n$."))
 			((shared_ptr<MatchMaker>,es,,,"Shear coefficient of restitution $e_s$."))
@@ -74,7 +74,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinPhys);
 
 class Law2_ScGeom_MindlinPhys_MindlinDeresiewitz: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
+		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz,LawFunctor,
 			"Hertz-Mindlin contact law with partial slip solution, as described in [Thornton1991]_.",
@@ -84,7 +84,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz);
 
 class Law2_ScGeom_MindlinPhys_HertzWithLinearShear: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
+		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_HertzWithLinearShear,LawFunctor,
 			"Constitutive law for the Hertz formulation (using :yref:`MindlinPhys.kno`) and linear beahvior in shear (using :yref:`MindlinPhys.kso` for stiffness and :yref:`FrictPhys.tangensOfFrictionAngle`). \n\n.. note:: No viscosity or damping. If you need those, look at  :yref:`Law2_ScGeom_MindlinPhys_Mindlin`, which also includes non-linear Mindlin shear.",
@@ -105,7 +105,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> normDampDissip;
 		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> shearDampDissip;
 
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		Real normElastEnergy();
 		Real getfrictionDissipation();
 		Real getshearEnergy();

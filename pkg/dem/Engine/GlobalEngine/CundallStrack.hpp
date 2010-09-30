@@ -13,18 +13,18 @@
 
 class Law2_Dem3Dof_CSPhys_CundallStrack: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I);
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(Dem3DofGeom,CSPhys);
 		YADE_CLASS_BASE_DOC(Law2_Dem3Dof_CSPhys_CundallStrack,LawFunctor,"Basic constitutive law published originally by Cundall&Strack; it has normal and shear stiffnesses (Kn, Kn) and dry Coulomb friction. Operates on associated :yref:`Dem3DofGeom` and :yref:`CSPhys` instances.");
 		DECLARE_LOGGER;	
 };
 REGISTER_SERIALIZABLE(Law2_Dem3Dof_CSPhys_CundallStrack);
 
-class Ip2_2xFrictMat_CSPhys: public InteractionPhysicsFunctor{
+class Ip2_2xFrictMat_CSPhys: public IPhysFunctor{
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		FUNCTOR2D(FrictMat,FrictMat);
-		YADE_CLASS_BASE_DOC(Ip2_2xFrictMat_CSPhys,InteractionPhysicsFunctor,"Functor creating :yref:`CSPhys` from  two :yref:`FrictMat`. See :yref:`Law2_Dem3Dof_CSPhys_CundallStrack` for details.");
+		YADE_CLASS_BASE_DOC(Ip2_2xFrictMat_CSPhys,IPhysFunctor,"Functor creating :yref:`CSPhys` from  two :yref:`FrictMat`. See :yref:`Law2_Dem3Dof_CSPhys_CundallStrack` for details.");
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_2xFrictMat_CSPhys);

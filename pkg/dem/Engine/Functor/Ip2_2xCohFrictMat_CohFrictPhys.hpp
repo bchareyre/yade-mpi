@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/Dispatching.hpp>
 
-class Ip2_2xCohFrictMat_CohFrictPhys : public InteractionPhysicsFunctor
+class Ip2_2xCohFrictMat_CohFrictPhys : public IPhysFunctor
 {
 	public :
 		virtual void go(	const shared_ptr<Material>& b1,
@@ -18,7 +18,7 @@ class Ip2_2xCohFrictMat_CohFrictPhys : public InteractionPhysicsFunctor
 					const shared_ptr<Interaction>& interaction);
 		int cohesionDefinitionIteration;
 		
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_CohFrictPhys,InteractionPhysicsFunctor,
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_CohFrictPhys,IPhysFunctor,
 		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic`.",
 		((bool,setCohesionNow,false,,""))
 		((bool,setCohesionOnNewContacts,false,,""))

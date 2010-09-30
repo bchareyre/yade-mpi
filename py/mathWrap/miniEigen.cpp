@@ -248,7 +248,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.add_static_property("UnitX",&Vector3r_UnitX).add_static_property("UnitY",&Vector3r_UnitY).add_static_property("UnitZ",&Vector3r_UnitZ)
 		// methods
 		.def("dot",&Vector3r_dot).def("cross",&Vector3r_cross)
-		.def("norm",&Vector3r::norm).def("squaredNorm",&Vector3r::squaredNorm).def("normalize",&Vector3r::normalize)
+		.def("norm",&Vector3r::norm).def("squaredNorm",&Vector3r::squaredNorm).def("normalize",&Vector3r::normalize).def("normalized",&Vector3r::normalized)
 		// operators
 		.def("__neg__",&Vector3r__neg__) // -v
 		.def("__add__",&Vector3r__add__Vector3r).def("__iadd__",&Vector3r__iadd__Vector3r) // +, +=

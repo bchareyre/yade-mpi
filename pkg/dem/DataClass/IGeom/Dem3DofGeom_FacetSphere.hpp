@@ -38,11 +38,11 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_FacetSphere);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class Gl1_Dem3DofGeom_FacetSphere:public GlInteractionGeometryFunctor{
+	class Gl1_Dem3DofGeom_FacetSphere:public GlIGeomFunctor{
 		public:
-			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+			virtual void go(const shared_ptr<IGeom>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		RENDERS(Dem3DofGeom_FacetSphere);
-		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_FacetSphere,GlInteractionGeometryFunctor,"Render interaction of facet and sphere (represented by Dem3DofGeom_FacetSphere)",
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_FacetSphere,GlIGeomFunctor,"Render interaction of facet and sphere (represented by Dem3DofGeom_FacetSphere)",
 			((bool,normal,false,,"Render interaction normal"))
 			((bool,rolledPoints,false,,"Render points rolled on the sphere & facet (original contact point)"))
 			((bool,unrolledPoints,false,,"Render original contact points unrolled to the contact plane"))
@@ -54,7 +54,7 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_FacetSphere);
 #endif
 
 #include<yade/pkg-common/Dispatching.hpp>
-class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
+class Ig2_Facet_Sphere_Dem3DofGeom:public IGeomFunctor{
 	Vector3r getClosestSegmentPt(const Vector3r& P, const Vector3r& A, const Vector3r& B){
 		// algo: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
 		Vector3r BA=B-A;
@@ -65,12 +65,12 @@ class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 			c->swapOrder(); return go(cm2,cm1,state2,state1,-shift2,force,c);
-			LOG_ERROR("!! goReverse maybe doesn't work in Ig2_Facet_Sphere_Dem3DofGeom. InteractionGeometryDispatcher should swap interaction members first and call go(...) afterwards.");
+			LOG_ERROR("!! goReverse maybe doesn't work in Ig2_Facet_Sphere_Dem3DofGeom. IGeomDispatcher should swap interaction members first and call go(...) afterwards.");
 		}
 
 	FUNCTOR2D(Facet,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_Dem3DofGeom,InteractionGeometryFunctor,"Compute geometry of facet-sphere contact with normal and shear DOFs. As in all other Dem3DofGeom-related classes, total formulation of both shear and normal deformations is used. See :yref:`Dem3DofGeom_FacetSphere` for more information.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_Dem3DofGeom,IGeomFunctor,"Compute geometry of facet-sphere contact with normal and shear DOFs. As in all other Dem3DofGeom-related classes, total formulation of both shear and normal deformations is used. See :yref:`Dem3DofGeom_FacetSphere` for more information.",
 		// unused: ((Real,shrinkFactor,0.,,"Reduce the facet's size, probably to avoid singularities at common facets' edges (?)"))
 	);
 	DECLARE_LOGGER;

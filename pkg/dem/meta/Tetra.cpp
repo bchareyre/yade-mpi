@@ -60,9 +60,9 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	
 	shared_ptr<TTetraGeom> bang;
 	// depending whether it's a new interaction: create new one, or use the existing one.
-	if (!interaction->interactionGeometry) bang=shared_ptr<TTetraGeom>(new TTetraGeom());
-	else bang=YADE_PTR_CAST<TTetraGeom>(interaction->interactionGeometry);	
-	interaction->interactionGeometry=bang;
+	if (!interaction->geom) bang=shared_ptr<TTetraGeom>(new TTetraGeom());
+	else bang=YADE_PTR_CAST<TTetraGeom>(interaction->geom);	
+	interaction->geom=bang;
 	
 	// use wildmagick's intersection routine?
 	#if 0
@@ -376,9 +376,9 @@ CREATE_LOGGER(TetraVolumetricLaw);
 void TetraVolumetricLaw::action()
 {
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use interactionPhysics at all
-		if (!I->interactionGeometry) continue; // Ig2_Tetra_Tetra_TTetraGeom::go returned false for this interaction, skip it
-		const shared_ptr<TTetraGeom>& contactGeom(dynamic_pointer_cast<TTetraGeom>(I->interactionGeometry));
+		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use phys at all
+		if (!I->geom) continue; // Ig2_Tetra_Tetra_TTetraGeom::go returned false for this interaction, skip it
+		const shared_ptr<TTetraGeom>& contactGeom(dynamic_pointer_cast<TTetraGeom>(I->geom));
 		if(!contactGeom) continue;
 
 		const Body::id_t idA=I->getId1(), idB=I->getId2();
@@ -393,7 +393,7 @@ void TetraVolumetricLaw::action()
 
 		/* Do not use NormPhys::kn (as calculated by ElasticBodySimpleRelationship).
 		 * NormPhys::kn is not Young's modulus, it is calculated by MacroMicroElasticRelationships. So perhaps
-		 * a new InteractionPhysicsFunctor will be needed that will just pass the average Young's modulus here?
+		 * a new IPhysFunctor will be needed that will just pass the average Young's modulus here?
 		 * For now, just go back to Young's moduli directly here. */
 		Real young=.5*(physA->young+physB->young);
 		TRVAR3(young,averageStrain,contactGeom->equivalentCrossSection);

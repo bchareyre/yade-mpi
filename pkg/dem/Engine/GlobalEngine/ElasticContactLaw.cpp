@@ -27,9 +27,9 @@ void ElasticContactLaw::action()
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (LawDispatcher does that already)
-			if(!dynamic_cast<ScGeom*>(I->interactionGeometry.get()) || !dynamic_cast<FrictPhys*>(I->interactionPhysics.get())) continue;	
+			if(!dynamic_cast<ScGeom*>(I->geom.get()) || !dynamic_cast<FrictPhys*>(I->phys.get())) continue;	
 		#endif
-			functor->go(I->interactionGeometry, I->interactionPhysics, I.get());
+			functor->go(I->geom, I->phys, I.get());
 	}
 }
 
@@ -38,7 +38,7 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 	Real energy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		FrictPhys* phys = dynamic_cast<FrictPhys*>(I->interactionPhysics.get());
+		FrictPhys* phys = dynamic_cast<FrictPhys*>(I->phys.get());
 		if(phys) {
 			energy += 0.5*(phys->normalForce.squaredNorm()/phys->kn + phys->shearForce.squaredNorm()/phys->ks);}
 	}
@@ -46,7 +46,7 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 }
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
-void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
@@ -99,7 +99,7 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact){
+void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
 	Real displN=geom->displacementN();

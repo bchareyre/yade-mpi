@@ -12,7 +12,7 @@
 
 #ifdef YADE_DEVIRT_FUNCTORS
 bool Ig2_Sphere_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_Sphere_ScGeom::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_Sphere_Sphere_ScGeom::goStatic(InteractionGeometryFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+bool Ig2_Sphere_Sphere_ScGeom::goStatic(IGeomFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	const Ig2_Sphere_Sphere_ScGeom* self=static_cast<Ig2_Sphere_Sphere_ScGeom*>(_self);
 	const Real& interactionDetectionFactor=self->interactionDetectionFactor;
 #else
@@ -29,9 +29,9 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.squaredNorm();
 	if (penetrationDepthSq>0 || c->isReal() || force){
 		shared_ptr<ScGeom> scm;
-		bool isNew = !c->interactionGeometry;
-		if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
-		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
+		bool isNew = !c->geom;
+		if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->geom);
+		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->geom=scm; }
 
 		Real norm=normal.norm(); normal/=norm; // normal is unit vector now
 		Real penetrationDepth=s1->radius+s2->radius-norm;

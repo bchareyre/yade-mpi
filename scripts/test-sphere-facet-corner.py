@@ -16,8 +16,8 @@ O.bodies.append([
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
-	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
+	IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()]),
+	IPhysDispatcher([MacroMicroElasticRelationships()]),
 	ElasticContactLaw(),
 	GravityEngine(gravity=(0,0,-10)),
 	NewtonIntegrator(damping=.3)

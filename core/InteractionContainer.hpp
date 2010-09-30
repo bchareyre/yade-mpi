@@ -93,7 +93,7 @@ class InteractionContainer: public Serializable{
 
 			This should be called only in rare cases that collider is not used but still interactions should be erased.
 			Otherwise collider should decide on a case-by-case basis, which interaction to erase for good and which to keep in the potential state
-			(without interactionGeometry and interactionPhysics).
+			(without geom and phys).
 
 			This function doesn't lock pendingEraseMutex, as it is (supposedly) called from no-parallel sections only once per iteration
 		*/

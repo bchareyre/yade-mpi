@@ -9,8 +9,8 @@ o=Omega()
 o.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
-	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
+	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(),
 	GlobalStiffnessTimeStepper(defaultDt=1e-4,active=True,timeStepUpdateInterval=500),
 	AxialGravityEngine(axisPoint=(0,0,0),axisDirection=(1,0,0),acceleration=1e4),

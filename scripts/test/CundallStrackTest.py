@@ -5,8 +5,8 @@ o=Omega()
 o.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),]),
-	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),
-	InteractionPhysicsDispatcher([Ip2_2xFrictMat_CSPhys()]),
+	IGeomDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),
+	IPhysDispatcher([Ip2_2xFrictMat_CSPhys()]),
 	LawDispatcher([Law2_Dem3Dof_CSPhys_CundallStrack()]),
 	GravityEngine(gravity=[0,0,-9.81]),
 	NewtonIntegrator(damping = 0.01)

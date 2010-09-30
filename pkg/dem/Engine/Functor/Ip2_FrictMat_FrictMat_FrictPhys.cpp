@@ -21,19 +21,19 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 					, const shared_ptr<Material>& b2
 					, const shared_ptr<Interaction>& interaction)
 {
-	if(interaction->interactionPhysics) return;
+	if(interaction->phys) return;
 	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(b1);
 	const shared_ptr<FrictMat>& mat2 = YADE_PTR_CAST<FrictMat>(b2);
-	interaction->interactionPhysics = shared_ptr<FrictPhys>(new FrictPhys());
-	const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->interactionPhysics);
+	interaction->phys = shared_ptr<FrictPhys>(new FrictPhys());
+	const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->phys);
 	Real Ea 	= mat1->young;
 	Real Eb 	= mat2->young;
 	Real Va 	= mat1->poisson;
 	Real Vb 	= mat2->poisson;
 	
 	Real Ra,Rb; Vector3r normal;	
-	assert(dynamic_cast<GenericSpheresContact*>(interaction->interactionGeometry.get()));//only in debug mode
-	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->interactionGeometry.get());
+	assert(dynamic_cast<GenericSpheresContact*>(interaction->geom.get()));//only in debug mode
+	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
 	{Ra=sphCont->refR1>0?sphCont->refR1:sphCont->refR2; Rb=sphCont->refR2>0?sphCont->refR2:sphCont->refR1; normal=sphCont->normal;}
 	
 	//harmonic average of the two stiffnesses when (Ri.Ei/2) is the stiffness of a contact point on sphere "i"

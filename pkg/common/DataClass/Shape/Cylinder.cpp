@@ -28,7 +28,7 @@ unsigned int ChainedState::currentChain=0;
 //!Sphere-cylinder or cylinder-cylinder not implemented yet, see Ig2_ChainedCylinder_ChainedCylinder_ScGeom and test/chained-cylinder-spring.py
 #ifdef YADE_DEVIRT_FUNCTORS
 bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_ChainedCylinder_CylScGeom::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_Sphere_ChainedCylinder_CylScGeom::goStatic(InteractionGeometryFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+bool Ig2_Sphere_ChainedCylinder_CylScGeom::goStatic(IGeomFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	const Ig2_Sphere_ChainedCylinder_CylScGeom* self=static_cast<Ig2_Sphere_ChainedCylinder_CylScGeom*>(_self);
 	const Real& interactionDetectionFactor=self->interactionDetectionFactor;
 #else
@@ -45,9 +45,9 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.squaredNorm();
 	if (penetrationDepthSq>0 || c->isReal() || force){
 		shared_ptr<ScGeom> scm;
-		bool isNew = !c->interactionGeometry;
-		if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
-		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
+		bool isNew = !c->geom;
+		if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->geom);
+		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->geom=scm; }
 
 		Real norm=normal.norm(); normal/=norm; // normal is unit vector now
 		Real penetrationDepth=s1->radius+s2->radius-norm;
@@ -79,7 +79,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::goReverse(	const shared_ptr<Shape>& c
 
 #ifdef YADE_DEVIRT_FUNCTORS
 bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_ChainedCylinder_CylScGeom::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::goStatic(InteractionGeometryFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::goStatic(IGeomFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	const Ig2_ChainedCylinder_ChainedCylinder_ScGeom* self=static_cast<Ig2_ChainedCylinder_ChainedCylinder_ScGeom*>(_self);
 	const Real& interactionDetectionFactor=self->interactionDetectionFactor;
 #else
@@ -104,9 +104,9 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	ChainedCylinder *bs1=static_cast<ChainedCylinder*>(revert? cm2.get():cm1.get());
 	
 	shared_ptr<ScGeom> scm;
-	bool isNew = !c->interactionGeometry;
-	if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
-	else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
+	bool isNew = !c->geom;
+	if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->geom);
+	else { scm=shared_ptr<ScGeom>(new ScGeom()); c->geom=scm; }
 	Real length=(bchain2.pos-bchain1.pos).norm();
 	Vector3r segt =pChain2->pos-pChain1->pos;
 	if(isNew) {/*scm->normal=scm->prevNormal=segt/length;*/bs1->initLength=length;}

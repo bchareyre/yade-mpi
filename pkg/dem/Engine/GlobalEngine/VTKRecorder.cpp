@@ -234,8 +234,8 @@ void VTKRecorder::action(){
 				vtkSmartPointer<vtkLine> lineA2(vtkSmartPointer<vtkLine>::New()); lineA2->GetPointIds()->SetId(0,idPtA); line1B->GetPointIds()->SetId(1,I->getId2());
 				numAddValues=2;
 			}
-			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
-			const GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
+			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->phys.get());
+			const GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());
 			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
 			float fn=phys->normalForce.dot(geom->normal); 
 			float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};

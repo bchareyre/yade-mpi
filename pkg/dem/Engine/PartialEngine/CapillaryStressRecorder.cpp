@@ -61,7 +61,7 @@ void CapillaryStressRecorder::action()
                 {	
                 	const shared_ptr<Interaction>& interaction = *ii;
                 
-                	CapillaryPhys* meniscusParameters = static_cast<CapillaryPhys*>(interaction->interactionPhysics.get());
+                	CapillaryPhys* meniscusParameters = static_cast<CapillaryPhys*>(interaction->phys.get());
                         
                         if (meniscusParameters->meniscus)
                         {

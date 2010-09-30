@@ -13,7 +13,7 @@ YADE_PLUGIN((RotationEngine)(SpiralEngine)(InterpolatingSpiralEngine));
 
 void InterpolatingSpiralEngine::action(){
 	Real virtTime=wrap ? Shop::periodicWrap(scene->time,*times.begin(),*times.rbegin()) : scene->time;
-	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,_pos);
+	angularVelocity=linearInterpolate<Real,Real>(virtTime,times,angularVelocities,_pos);
 	linearVelocity=angularVelocity*slope;
 	SpiralEngine::action();
 }

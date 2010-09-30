@@ -30,14 +30,14 @@ void TriaxialStressController::updateStiffness ()
 	for(  ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal())
 	{
 		const shared_ptr<Interaction>& contact = *ii;
-		Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.norm();
+		Real fn = (static_cast<FrictPhys*>	(contact->phys.get()))->normalForce.norm();
 		if (fn!=0)
 		{
 			int id1 = contact->getId1(), id2 = contact->getId2();
 			for (int index=0; index<6; ++index) if ( wall_id[index]==id1 || wall_id[index]==id2 )
 			{
 				FrictPhys* currentContactPhysics =
-				static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
+				static_cast<FrictPhys*> ( contact->phys.get() );
 				stiffness[index]  += currentContactPhysics->kn;
 			}
 		}
@@ -225,12 +225,12 @@ void TriaxialStressController::controlInternalStress ( Real multiplier )
 	for (; ii!=iiEnd ; ++ii)
 	{
 		if ((*ii)->isReal()) {
-			ScGeom* contact = static_cast<ScGeom*>((*ii)->interactionGeometry.get());
+			ScGeom* contact = static_cast<ScGeom*>((*ii)->geom.get());
 			if ((*(scene->bodies))[(*ii)->getId1()]->isDynamic())
 				contact->radius1 = static_cast<Sphere*>((* (scene->bodies))[(*ii)->getId1()]->shape.get())->radius;
 			if ((* (scene->bodies))[(*ii)->getId2()]->isDynamic())
 				contact->radius2 = static_cast<Sphere*>((* (scene->bodies))[(*ii)->getId2()]->shape.get())->radius;
-			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->interactionPhysics);
+			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->phys);
 			contactPhysics->kn*=multiplier; contactPhysics->ks*=multiplier;
 		}
 	}
@@ -252,7 +252,7 @@ Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if ((*ii)->isReal()) {
 			const shared_ptr<Interaction>& contact = *ii;
-			Real f = (static_cast<FrictPhys*> ((contact->interactionPhysics.get()))->normalForce+static_cast<FrictPhys*>(contact->interactionPhysics.get())->shearForce).squaredNorm();
+			Real f = (static_cast<FrictPhys*> ((contact->phys.get()))->normalForce+static_cast<FrictPhys*>(contact->phys.get())->shearForce).squaredNorm();
 			if (f!=0)
 			{
 			MeanForce += sqrt(f);

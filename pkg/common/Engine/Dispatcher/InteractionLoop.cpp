@@ -7,14 +7,14 @@ void InteractionLoop::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
 	if(python::len(t)==0) return; // nothing to do
 	if(python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
 	// parse custom arguments (3 lists) and do in-place modification of args
-	typedef std::vector<shared_ptr<InteractionGeometryFunctor> > vecGeom;
-	typedef std::vector<shared_ptr<InteractionPhysicsFunctor> > vecPhys;
+	typedef std::vector<shared_ptr<IGeomFunctor> > vecGeom;
+	typedef std::vector<shared_ptr<IPhysFunctor> > vecPhys;
 	typedef std::vector<shared_ptr<LawFunctor> > vecLaw;
 	vecGeom vg=python::extract<vecGeom>(t[0])();
 	vecPhys vp=python::extract<vecPhys>(t[1])();
 	vecLaw vl=python::extract<vecLaw>(t[2])();
-	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, vg) this->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, vp)  this->physDispatcher->add(pf);
+	FOREACH(shared_ptr<IGeomFunctor> gf, vg) this->geomDispatcher->add(gf);
+	FOREACH(shared_ptr<IPhysFunctor> pf, vp)  this->physDispatcher->add(pf);
 	FOREACH(shared_ptr<LawFunctor> cf, vl)                 this->lawDispatcher->add(cf);
 	t=python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
 }
@@ -82,7 +82,7 @@ void InteractionLoop::action(){
 		if(!b1_->shape || !b2_->shape) { assert(!I->isReal()); continue; }
 
 		bool swap=false;
-		// InteractionGeometryDispatcher
+		// IGeomDispatcher
 		if(!I->functorCache.geom || !I->functorCache.phys){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
 			#ifdef YADE_DEVIRT_FUNCTORS
@@ -107,7 +107,7 @@ void InteractionLoop::action(){
 		bool geomCreated;
 		if(!scene->isPeriodic){
 			#ifdef YADE_DEVIRT_FUNCTORS
-				geomCreated=(*((InteractionGeometryFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
+				geomCreated=(*((IGeomFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 			#else
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 			#endif
@@ -117,45 +117,45 @@ void InteractionLoop::action(){
 			//shift2=scene->cell->shearPt(shift2);
 			#ifdef YADE_DEVIRT_FUNCTORS
 				// cast back from void* first
-				geomCreated=(*((InteractionGeometryFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
+				geomCreated=(*((IGeomFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			#else
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			#endif
 		}
 		if(!geomCreated){
-			if(wasReal) LOG_WARN("InteractionGeometryFunctor returned false on existing interaction!");
+			if(wasReal) LOG_WARN("IGeomFunctor returned false on existing interaction!");
 			if(wasReal) scene->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
 			continue; // in any case don't care about this one anymore
 		}
 
-		// InteractionPhysicsDispatcher
+		// IPhysDispatcher
 		if(!I->functorCache.phys){
 			I->functorCache.phys=physDispatcher->getFunctor2D(b1->material,b2->material,swap);
 			assert(!swap); // InteractionPhysicsEngineUnits are symmetric
 		}
 		//assert(I->functorCache.phys);
 		if(!I->functorCache.phys){
-			throw std::runtime_error("Undefined or ambiguous InteractionPhysics dispatch for types "+b1->material->getClassName()+" and "+b2->material->getClassName()+".");
+			throw std::runtime_error("Undefined or ambiguous IPhys dispatch for types "+b1->material->getClassName()+" and "+b2->material->getClassName()+".");
 		}
 		I->functorCache.phys->go(b1->material,b2->material,I);
-		assert(I->interactionPhysics);
+		assert(I->phys);
 
 		if(!wasReal) I->iterMadeReal=scene->iter; // mark the interaction as created right now
 
 		// LawDispatcher
 		// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction
-		// would not have interactionGeometry and interactionPhysics yet.
+		// would not have geom and phys yet.
 		if(!I->functorCache.constLaw){
-			I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->interactionGeometry,I->interactionPhysics,swap);
+			I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->geom,I->phys,swap);
 			if(!I->functorCache.constLaw){
-				LOG_FATAL("None of given Law2 functors can handle interaction #"<<I->getId1()<<"+"<<I->getId2()<<", types geom:"<<I->interactionGeometry->getClassName()<<"="<<I->interactionGeometry->getClassIndex()<<" and phys:"<<I->interactionPhysics->getClassName()<<"="<<I->interactionPhysics->getClassIndex()<<" (LawDispatcher::getFunctor2D returned empty functor)");
+				LOG_FATAL("None of given Law2 functors can handle interaction #"<<I->getId1()<<"+"<<I->getId2()<<", types geom:"<<I->geom->getClassName()<<"="<<I->geom->getClassIndex()<<" and phys:"<<I->phys->getClassName()<<"="<<I->phys->getClassIndex()<<" (LawDispatcher::getFunctor2D returned empty functor)");
 				//abort();
 				exit(1);
 			}
 			assert(!swap); // reverse call would make no sense, as the arguments are of different types
 		}
 		assert(I->functorCache.constLaw);
-		I->functorCache.constLaw->go(I->interactionGeometry,I->interactionPhysics,I.get());
+		I->functorCache.constLaw->go(I->geom,I->phys,I.get());
 
 		// process callbacks for this interaction
 		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check

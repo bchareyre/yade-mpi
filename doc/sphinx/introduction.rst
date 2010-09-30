@@ -313,11 +313,11 @@ Interactions
 
 :yref:`Interactions<Interaction>` are always between pair of bodies; usually, they are created by the collider based on spatial proximity; they can, however, be created explicitly and exist independently of distance. Each interaction has 2 components:
 
-:yref:`InteractionGeometry`
+:yref:`IGeom`
 	holding geometrical configuration of the two particles in collision; it is updated automatically as the particles in question move and can be queried for various geometrical characteristics, such as penetration distance or shear strain.
 	
 	Based on combination of types of :yref:`Shapes<Shape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<Dem3DofGeom_SphereSphere>`, :yref:`Facet+Sphere<Dem3DofGeom_FacetSphere>` etc.
-:yref:`InteractionPhysics`
+:yref:`IPhys`
 	representing non-geometrical features of the interaction; some are computed from :yref:`Materials<Material>` of the particles in contact using some averaging algorithm (such as contact stiffness from Young's moduli of particles), others might be internal variables like damage.
 
 Suppose now interactions have been already created. We can access them by the id pair:
@@ -457,21 +457,21 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`InteractionGeometryDispatcher`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shapes>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`InteractionGeometry<Interaction::interactionGeometry>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shapes>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_Dem3DofGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`Dem3DofGeom` instance, if appropriate.
 
 	#. The second functor, :yref:`Ig2_Facet_Sphere_Dem3DofGeom`, is called for interaction of :yref:`Facet` with :yref:`Sphere` and might create (again) a :yref:`Dem3DofGeom` instance.
 
-	All ``Ig2`` functors derive from :yref:`InteractionGeometryFunctor` (they are documented at the same place).
+	All ``Ig2`` functors derive from :yref:`IGeomFunctor` (they are documented at the same place).
 
 :yref:`InteractionPhysicsDispatcher`
-	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`InteractionPhysics` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
+	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`IPhys` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
 	
-	``Ip2`` functors are derived from :yref:`InteractionPhysicsFunctor`.
+	``Ip2`` functors are derived from :yref:`IPhysFunctor`.
 
 :yref:`LawDispatcher`
-	dispatches to the third set of functors, based on combinations of :yref:`InteractionGeometry` and :yref:`InteractionPhysics` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent "constitutive law"; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
+	dispatches to the third set of functors, based on combinations of :yref:`IGeom` and :yref:`IPhys` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent "constitutive law"; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
 
 	``Law2`` functors all inherit from :yref:`LawFunctor`.
 

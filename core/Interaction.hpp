@@ -4,23 +4,23 @@
 #pragma once
 #include<yade/lib-serialization/Serializable.hpp>
 // keep those two here, template instantiation & boost::python gets broken otherwise, e.g. https://bugs.launchpad.net/bugs/618766
-#include<yade/core/InteractionGeometry.hpp> 
-#include<yade/core/InteractionPhysics.hpp>
+#include<yade/core/IGeom.hpp> 
+#include<yade/core/IPhys.hpp>
 #include<yade/core/Body.hpp>
 
 
-class InteractionGeometryFunctor;
-class InteractionPhysicsFunctor;
+class IGeomFunctor;
+class IPhysFunctor;
 class LawFunctor;
 class Scene;
 
 class Interaction : public Serializable
 {
 	private	:
-		friend class InteractionPhysicsDispatcher;
+		friend class IPhysDispatcher;
 		friend class InteractionLoop;
 	public :
-		bool isReal() const {return (bool)interactionGeometry && (bool)interactionPhysics;}
+		bool isReal() const {return (bool)geom && (bool)phys;}
 		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
 		bool isFresh(Scene* rb);
 
@@ -45,13 +45,13 @@ class Interaction : public Serializable
 			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
 			bool geomExists;
 			#ifdef YADE_DEVIRT_FUNCTORS
-				// is a InteractionGeometryFunctor::StaticFuncPtr, but we would have to #include a file from pkg-common here
+				// is a IGeomFunctor::StaticFuncPtr, but we would have to #include a file from pkg-common here
 				// cast at those few places instead, for now
 				void* geomPtr;
 			#endif
 			// shared_ptr's are initialized to NULLs automagically
-			shared_ptr<InteractionGeometryFunctor> geom;
-			shared_ptr<InteractionPhysicsFunctor> phys;
+			shared_ptr<IGeomFunctor> geom;
+			shared_ptr<IPhysFunctor> phys;
 			shared_ptr<LawFunctor> constLaw;
 		} functorCache;
 
@@ -63,14 +63,12 @@ class Interaction : public Serializable
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
 		((Body::id_t,id1,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
 		((Body::id_t,id2,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
-		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionLoop`, therefore they are made friends of Interaction"))
-		((shared_ptr<InteractionGeometry>,interactionGeometry,,,"Geometry part of the interaction."))
-		((shared_ptr<InteractionPhysics>,interactionPhysics,,,"Physical (material) part of the interaction."))
+		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of geom and phys) created. (Should be touched only by :yref:`IPhysDispatcher` and :yref:`InteractionLoop`, therefore they are made friends of Interaction"))
+		((shared_ptr<IGeom>,geom,,,"Geometry part of the interaction."))
+		((shared_ptr<IPhys>,phys,,,"Physical (material) part of the interaction."))
 		((Vector3i,cellDist,Vector3i(0,0,0),,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have the priod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)")),
 		/* ctor */ init(),
 		/*py*/
-		.def_readwrite("geom",&Interaction::interactionGeometry,"Shorthand for :yref:`Interaction::interactionGeometry`")
-		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for :yref:`Interaction::interactionPhysics`")
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
 	);
 };

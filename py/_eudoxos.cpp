@@ -32,8 +32,8 @@ Real elasticEnergyDensityInAABB(python::tuple Aabb){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
-		if(!i->interactionPhysics) continue;
-		shared_ptr<CpmPhys> bc=dynamic_pointer_cast<CpmPhys>(i->interactionPhysics); if(!bc) continue;
+		if(!i->phys) continue;
+		shared_ptr<CpmPhys> bc=dynamic_pointer_cast<CpmPhys>(i->phys); if(!bc) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -118,8 +118,8 @@ void particleMacroStress(void){
 		FOREACH(Body::id_t id2, bIntr[id1]){
 			const shared_ptr<Interaction> i=scene->interactions->find(id1,id2);
 			assert(i);
-			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(i->interactionGeometry);
-			CpmPhys* phys=YADE_CAST<CpmPhys*>(i->interactionPhysics);
+			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(i->geom);
+			CpmPhys* phys=YADE_CAST<CpmPhys*>(i->phys);
 			Real d=(geom->se31->pos-geom->se32->pos).norm(); // current contact length
 			const Vector3r& n=geom->normal;
 			const Real& A=phys->crossSection;
@@ -151,8 +151,8 @@ struct SpiralInteractionLocator2d{
 		std::list<FlatInteraction> intrs;
 		// first pass: find extrema for positions and interaction lengths, build interaction list
 		FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
-			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->interactionGeometry.get());
-			CpmPhys* ph=dynamic_cast<CpmPhys*>(i->interactionPhysics.get());
+			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->geom.get());
+			CpmPhys* ph=dynamic_cast<CpmPhys*>(i->phys.get());
 			if(!ge || !ph) continue;
 			Real r,h,theta;
 			boost::tie(r,h,theta)=Shop::spiralProject(ge->contactPoint,dH_dTheta,axis,periodStart,theta0);
@@ -190,8 +190,8 @@ struct SpiralInteractionLocator2d{
 		FOREACH(const Vector2i& v, grid->circleFilter(pt,radius)){
 			FOREACH(const FlatInteraction& fi, grid->grid[v[0]][v[1]]){
 				if((pow(fi.r-pt[0],2)+pow(fi.h-pt[1],2))>radius*radius) continue; // too far
-				Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(fi.i->interactionGeometry.get());
-				CpmPhys* phys=YADE_CAST<CpmPhys*>(fi.i->interactionPhysics.get());
+				Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(fi.i->geom.get());
+				CpmPhys* phys=YADE_CAST<CpmPhys*>(fi.i->phys.get());
 				// transformation matrix, to rotate to the plane
 				Vector3r ax(Vector3r::Zero()); ax[axis]=1.;
 				Quaternionr q(AngleAxisr(fi.theta,ax)); q=q.conjugate();
@@ -245,7 +245,7 @@ class InteractionLocator{
 		int count=0;
 		FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 			if(!i->isReal()) continue;
-			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->interactionGeometry.get());
+			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->geom.get());
 			if(!ge) continue;
 			const Vector3r& cp(ge->contactPoint);
 			int id=points->InsertNextPoint(cp[0],cp[1],cp[2]);
@@ -286,8 +286,8 @@ class InteractionLocator{
 		Real omegaCumm=0, kappaCumm=0;
 		for(int k=0; k<numIds; k++){
 			const shared_ptr<Interaction>& I(intrs[ids->GetId(k)]);
-			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
-			CpmPhys* phys=YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
+			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
+			CpmPhys* phys=YADE_CAST<CpmPhys*>(I->phys.get());
 			Real d=(geom->se31.position-geom->se32.position).norm(); // current contact length
 			const Vector3r& n=geom->normal;
 			const Real& A=phys->crossSection;

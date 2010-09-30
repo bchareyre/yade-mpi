@@ -191,12 +191,12 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 
 void SimpleShear::createActors(shared_ptr<Scene>& scene)
 {
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
+	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
+	shared_ptr<IPhysFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
 	interactionPhysicsDispatcher->add(CL1Rel);
 
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);

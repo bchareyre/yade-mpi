@@ -9,6 +9,15 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
+struct GlExtraDrawer: public Serializable{
+	Scene* scene;
+	virtual void render();
+	YADE_CLASS_BASE_DOC_ATTRS(GlExtraDrawer,Serializable,"Performing arbitrary OpenGL drawing commands; called from :yref:`OpenGLRenderer` (see :yref:`OpenGLRenderer.extraDrawers`) once regular rendering routines will have finished.\n\nThis class itself does not render anything, derived classes should override the *render* method.",
+		((bool,dead,false,,"Deactivate the object (on error/exception)."))
+	);
+};
+REGISTER_SERIALIZABLE(GlExtraDrawer);
+
 class OpenGLRenderer : public Serializable
 {
 	public:
@@ -49,8 +58,8 @@ class OpenGLRenderer : public Serializable
 		void resetSpecularEmission();
 
 		GlBoundDispatcher boundDispatcher;
-		GlInteractionGeometryDispatcher interactionGeometryDispatcher;
-		GlInteractionPhysicsDispatcher interactionPhysicsDispatcher;
+		GlIGeomDispatcher geomDispatcher;
+		GlIPhysDispatcher physDispatcher;
 		GlShapeDispatcher shapeDispatcher;
 		// GlStateDispatcher stateDispatcher;
 
@@ -59,8 +68,8 @@ class OpenGLRenderer : public Serializable
 			// stateFunctorNames,
 			boundFunctorNames,
 			shapeFunctorNames, 
-			interactionGeometryFunctorNames,
-			interactionPhysicsFunctorNames;
+			geomFunctorNames,
+			physFunctorNames;
 
 		DECLARE_LOGGER;
 
@@ -68,20 +77,14 @@ class OpenGLRenderer : public Serializable
 		// updated after every call to render
 		shared_ptr<Scene> scene; 
 
-		// void addStateFunctor(const string& str);
-		void addBoundingVolumeFunctor(const string& str);
-		void addInteractingGeometryFunctor(const string& str);
-		void addInteractionGeometryFunctor(const string& str);
-		void addInteractionPhysicsFunctor(const string& str);
-			
 		void init();
 		void initgl();
 		void render(const shared_ptr<Scene>& scene, Body::id_t selection=Body::id_t(-1));
 		void pyRender(){render(Omega::instance().getScene());}
 	
 		void renderDOF_ID();
-		void renderInteractionPhysics();
-		void renderInteractionGeometry();
+		void renderIPhys();
+		void renderIGeom();
 		void renderBound();
 		// called also to render selectable entitites;
 		void renderShape();
@@ -98,11 +101,12 @@ class OpenGLRenderer : public Serializable
 		((bool,bound,false,,"Render body :yref:`Bound`"))
 		((bool,shape,true,,"Render body :yref:`Shape`"))
 		((bool,intrWire,false,,"If rendering interactions, use only wires to represent them."))
-		((bool,intrGeom,false,,"Render :yref:`Interaction::interactionGeometry` objects."))
-		((bool,intrPhys,false,,"Render :yref:`Interaction::interactionPhysics` objects"))
+		((bool,intrGeom,false,,"Render :yref:`Interaction::geom` objects."))
+		((bool,intrPhys,false,,"Render :yref:`Interaction::phys` objects"))
 		((int,mask,((void)"draw everything",~0),,"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
 		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::Zero(),Quaternionr::Identity())),,"Position and orientation of clipping planes"))
 		((vector<bool>,clipPlaneActive,vector<bool>(numClipPlanes,false),,"Activate/deactivate respective clipping planes"))
+		((vector<shared_ptr<GlExtraDrawer> >,extraDrawers,,,"Additional rendering components (:yref:`GlExtraDrawer`)."))
 		((bool,intrAllWire,false,,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
 		/*deprec*/
 			((Light_position,lightPos,))

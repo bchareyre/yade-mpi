@@ -290,7 +290,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 	
-	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
+	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	if(!facetWalls && !wallWalls){
 		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
 		interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
@@ -301,8 +301,8 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	}
 
 
-	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
+	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
+	shared_ptr<IPhysFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(ss);
 	
 		

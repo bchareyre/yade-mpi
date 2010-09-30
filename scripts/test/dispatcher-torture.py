@@ -14,13 +14,13 @@ import collections
 Dispatch=collections.namedtuple('Dispatch',['basename','types'])
 
 dispatches=[
-	Dispatch('Law',('InteractionGeometry','InteractionPhysics')),
-	Dispatch('InteractionGeometry',('Shape','Shape')),
-	Dispatch('InteractionPhysics',('Material','Material')),
+	Dispatch('Law',('IGeom','IPhys')),
+	Dispatch('IGeom',('Shape','Shape')),
+	Dispatch('IPhys',('Material','Material')),
 	Dispatch('Bound',('Shape','Bound')),
 	Dispatch('GlBound',('Bound',)),
-	Dispatch('GlInteractionGeometry',('InteractionGeometry',)),
-	Dispatch('GlInteractionPhysics',('InteractionPhysics',)),
+	Dispatch('GlInteractionGeometry',('IGeom',)),
+	Dispatch('GlInteractionPhysics',('IPhys',)),
 	Dispatch('GlShape',('Shape',)),
 	#Dispatch('GlState',('State',)) # broken for now
 ]

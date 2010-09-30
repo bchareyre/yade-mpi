@@ -21,7 +21,7 @@ IntrCallback::FuncPtr SumIntrForcesCb::stepInit(){
 
 void SumIntrForcesCb::go(IntrCallback* _self, Interaction* i){
 	SumIntrForcesCb* self=static_cast<SumIntrForcesCb*>(_self);
-	NormShearPhys* nsp=YADE_CAST<NormShearPhys*>(i->interactionPhysics.get());
+	NormShearPhys* nsp=YADE_CAST<NormShearPhys*>(i->phys.get());
 	assert(nsp!=NULL); // only effective in debug mode
 	Vector3r f=nsp->normalForce+nsp->shearForce;
 	if(f==Vector3r::Zero()) return;

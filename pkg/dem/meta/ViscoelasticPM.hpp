@@ -31,7 +31,7 @@ REGISTER_SERIALIZABLE(ViscElMat);
 class ViscElPhys : public FrictPhys {
 	public:
 		virtual ~ViscElPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"InteractionPhysics created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant")),
 		createIndex();
@@ -41,12 +41,12 @@ REGISTER_SERIALIZABLE(ViscElPhys);
 
 /// Convert material to interaction physics.
 // Uses the rule of consecutively connection.
-class Ip2_ViscElMat_ViscElMat_ViscElPhys: public InteractionPhysicsFunctor {
+class Ip2_ViscElMat_ViscElMat_ViscElPhys: public IPhysFunctor {
 	public :
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	YADE_CLASS_BASE_DOC(Ip2_ViscElMat_ViscElMat_ViscElPhys,InteractionPhysicsFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.");
+	YADE_CLASS_BASE_DOC(Ip2_ViscElMat_ViscElMat_ViscElPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.");
 	FUNCTOR2D(ViscElMat,ViscElMat);
 
 };
@@ -56,7 +56,7 @@ REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_ViscElPhys);
 /// This class provides linear viscoelastic contact model
 class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 	public :
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*);
+		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 	FUNCTOR2D(ScGeom,ViscElPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`.");
 };

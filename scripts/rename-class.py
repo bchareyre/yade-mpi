@@ -37,7 +37,7 @@ for root, dirs, files in os.walk('.'):
 			moveDirCnt+=1
 
 print "Replaced %d occurences, moved %d files and %d directories"%(replCnt,moveCnt,moveDirCnt)
-print "Update python scripts (if wanted) by running: perl -pi -e 's/\\b%s\\b/%s/g' `ls **/*.py |grep -v py/system.py`"%(oldClass,newClass)
+print "Update python scripts (if wanted) by running: perl -pi -e 's/\\b%s\\b/%s/g' `ls **/*.py **/*.rst |grep -v py/system.py`"%(oldClass,newClass)
 import time,pwd,socket
 # update python deprecation records
 if replCnt+moveCnt+moveDirCnt==0:

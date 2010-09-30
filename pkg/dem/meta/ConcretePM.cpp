@@ -17,9 +17,9 @@ CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 
 void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
 	// no updates of an already existing contact necessary
-	if(interaction->interactionPhysics) return;
+	if(interaction->phys) return;
 	shared_ptr<CpmPhys> cpmPhys(new CpmPhys());
-	interaction->interactionPhysics=cpmPhys;
+	interaction->phys=cpmPhys;
 	CpmMat* mat1=YADE_CAST<CpmMat*>(pp1.get());
 	CpmMat* mat2=YADE_CAST<CpmMat*>(pp2.get());
 
@@ -139,7 +139,7 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 // #undef CPM_MATERIAL_MODEL (force trunk version of the model)
 
 
-void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
+void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
@@ -238,7 +238,7 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 
 
 CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
-void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
+void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 	// just the first time
@@ -323,9 +323,9 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_
 	Real Gl1_CpmPhys::colorStrainRatio=-1;
 
 
-	void Gl1_CpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_CpmPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		const shared_ptr<CpmPhys>& BC=static_pointer_cast<CpmPhys>(ip);
-		const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
+		const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->geom);
 		// FIXME: get the scene for periodicity; ugly!
 		Scene* scene=Omega::instance().getScene().get();
 
@@ -362,7 +362,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_
 			glPopMatrix();
 		}
 
-		Vector3r cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
+		Vector3r cp=static_pointer_cast<Dem3DofGeom>(i->geom)->contactPoint;
 		if(scene->isPeriodic){cp=scene->cell->wrapShearedPt(cp);}
 		if(epsT){
 			Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
@@ -396,10 +396,10 @@ void CpmStateUpdater::update(Scene* _scene){
 	avgRelResidual=0; Real nAvgRelResidual=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
+		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->phys);
 		if(!phys) continue;
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
-		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
 		
 		Vector3r normalStress=((1./phys->crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
 		bodyStats[id1].sigma+=normalStress; bodyStats[id2].sigma+=normalStress;

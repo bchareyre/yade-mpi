@@ -5,8 +5,8 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/State.hpp>
 #include<yade/core/Shape.hpp>
-#include<yade/core/InteractionGeometry.hpp>
-#include<yade/core/InteractionPhysics.hpp>
+#include<yade/core/IGeom.hpp>
+#include<yade/core/IPhys.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/core/Dispatcher.hpp>
 #include<yade/pkg-common/Aabb.hpp>
@@ -28,38 +28,38 @@ class BoundFunctor: public Functor1D<
 REGISTER_SERIALIZABLE(BoundFunctor);
 
 
-class InteractionGeometryFunctor: public Functor2D<
+class IGeomFunctor: public Functor2D<
 	/*dispatch types*/ Shape,Shape,
 	/*return type*/    bool,
 	/*argument types*/ TYPELIST_7(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&) 
 >{
-	public: virtual ~InteractionGeometryFunctor();
+	public: virtual ~IGeomFunctor();
 	#ifdef YADE_DEVIRT_FUNCTORS
 		// type of the pointer to devirtualized functor (static method taking the functor instance as the first argument)
-		typedef bool(*StaticFuncPtr)(InteractionGeometryFunctor*, const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&);
+		typedef bool(*StaticFuncPtr)(IGeomFunctor*, const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&);
 		// return devirtualized functor (static method); must be overridden in derived classes
-		virtual void* getStaticFuncPtr(){ throw runtime_error(("InteractionGeometryFunctor::getStaticFuncPtr() not overridden in class "+getClassName()+".").c_str()); }
+		virtual void* getStaticFuncPtr(){ throw runtime_error(("IGeomFunctor::getStaticFuncPtr() not overridden in class "+getClassName()+".").c_str()); }
 	#endif
-	YADE_CLASS_BASE_DOC(InteractionGeometryFunctor,Functor,"Functor for creating/updating :yref:`Interaction::interactionGeometry` objects.");
+	YADE_CLASS_BASE_DOC(IGeomFunctor,Functor,"Functor for creating/updating :yref:`Interaction::geom` objects.");
 };
-REGISTER_SERIALIZABLE(InteractionGeometryFunctor);
+REGISTER_SERIALIZABLE(IGeomFunctor);
 
 
-class InteractionPhysicsFunctor: public Functor2D<
+class IPhysFunctor: public Functor2D<
 	/*dispatch types*/ Material, Material,
 	/*retrun type*/    void,
 	/*argument types*/ TYPELIST_3(const shared_ptr<Material>&, const shared_ptr<Material>&, const shared_ptr<Interaction>&)
 >{
-	public: virtual ~InteractionPhysicsFunctor();
-	YADE_CLASS_BASE_DOC(InteractionPhysicsFunctor,Functor,"Functor for creating/updating :yref:`Interaction::interactionPhysics` objects.");
+	public: virtual ~IPhysFunctor();
+	YADE_CLASS_BASE_DOC(IPhysFunctor,Functor,"Functor for creating/updating :yref:`Interaction::phys` objects.");
 };
-REGISTER_SERIALIZABLE(InteractionPhysicsFunctor);
+REGISTER_SERIALIZABLE(IPhysFunctor);
 
 
 class LawFunctor: public Functor2D<
-	/*dispatch types*/ InteractionGeometry,InteractionPhysics,
+	/*dispatch types*/ IGeom,IPhys,
 	/*return type*/    void,
-	/*argument types*/ TYPELIST_3(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*)
+	/*argument types*/ TYPELIST_3(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*)
 >{
 	public: virtual ~LawFunctor();
 	/*! Convenience functions to get forces/torques quickly. */
@@ -97,29 +97,29 @@ class BoundDispatcher: public Dispatcher1D<
 REGISTER_SERIALIZABLE(BoundDispatcher);
 
 
-class InteractionGeometryDispatcher:	public Dispatcher2D<	
-	/* functor type*/ InteractionGeometryFunctor,
+class IGeomDispatcher:	public Dispatcher2D<	
+	/* functor type*/ IGeomFunctor,
 	/* autosymmetry*/ false
 >{
 	bool alreadyWarnedNoCollider;
 	public:
 		virtual void action();
 		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool force);
-	YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(InteractionGeometryDispatcher,InteractionGeometryFunctor,/* doc is optional*/,/*attrs*/,/*ctor*/alreadyWarnedNoCollider=false;,/*py*/);
+	YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(IGeomDispatcher,IGeomFunctor,/* doc is optional*/,/*attrs*/,/*ctor*/alreadyWarnedNoCollider=false;,/*py*/);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(InteractionGeometryDispatcher);
+REGISTER_SERIALIZABLE(IGeomDispatcher);
 
 
-class InteractionPhysicsDispatcher: public Dispatcher2D<
-	/*functor type*/ InteractionPhysicsFunctor
+class IPhysDispatcher: public Dispatcher2D<
+	/*functor type*/ IPhysFunctor
 >{		
 	public:
 		virtual void action();
 		void explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i);
-	YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(InteractionPhysicsDispatcher,InteractionPhysicsFunctor,/*doc is optional*/,/*attrs*/,/*ctor*/,/*py*/);
+	YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(IPhysDispatcher,IPhysFunctor,/*doc is optional*/,/*attrs*/,/*ctor*/,/*py*/);
 };
-REGISTER_SERIALIZABLE(InteractionPhysicsDispatcher);
+REGISTER_SERIALIZABLE(IPhysDispatcher);
 
 
 class LawDispatcher: public Dispatcher2D<

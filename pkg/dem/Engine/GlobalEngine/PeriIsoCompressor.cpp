@@ -117,8 +117,8 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	// → a vector with functors so we can law->functs->pushback(myThing), and access to the fundamental members (forces, stiffness, normal, etc.). Implementing the second part is less clear in my mind. Inheriting from law::funct(force&, stiffness&, ...)?
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if ( !I->isReal() ) continue;
-		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->interactionPhysics.get() );
-		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->interactionGeometry.get() );
+		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
+		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->geom.get() );
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
 		//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
@@ -283,8 +283,8 @@ void Peri3dController::update(){
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		nIntr++;
-		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
-		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		// not clear whether this should be the reference or the current distance
 		// current: gives consistent results for same configuration with different initial state
 		// reference: does not change stress tensor when the same forces exist on interactions with changing length

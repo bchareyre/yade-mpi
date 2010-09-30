@@ -15,7 +15,7 @@ ViscElPhys::~ViscElPhys(){}
 
 /* Ip2_ViscElMat_ViscElMat_ViscElPhys */
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
-	if(interaction->interactionPhysics) return;
+	if(interaction->phys) return;
 	ViscElMat* sdec1 = static_cast<ViscElMat*>(b1.get());
 	ViscElMat* sdec2 = static_cast<ViscElMat*>(b2.get());
 	ViscElPhys* phys = new ViscElPhys();
@@ -28,11 +28,11 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	phys->tangensOfFrictionAngle = std::tan(std::min(sdec1->frictionAngle, sdec2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
 	phys->prevNormal = Vector3r(0,0,0);
-	interaction->interactionPhysics = shared_ptr<ViscElPhys>(phys);
+	interaction->phys = shared_ptr<ViscElPhys>(phys);
 }
 
 /* Law2_ScGeom_ViscElPhys_Basic */
-void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I){
+void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
