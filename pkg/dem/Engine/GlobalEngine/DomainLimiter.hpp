@@ -29,7 +29,7 @@ class LawTester: public PartialEngine{
 		((vector<int>,pathSteps,((void)"(constant step)",vector<int>(1,1)),Attr::triggerPostLoad,"Step number for corresponding values in :yref:`path<LawTester.path>`; if shorter than path, distance between last 2 values is used for the rest."))
 		((vector<int>,_pathT,,(Attr::readonly|Attr::noSave),"Time value corresponding to points on path, computed from *pathSteps*. Length is always the same as path."))
 		((vector<Vector3r>,_pathV,,(Attr::readonly|Attr::noSave),"Path values, computed from *path* by appending zero initial value."))
-		((shared_ptr<Interaction>,I,,,"Interaction object being tracked."))
+		((shared_ptr<Interaction>,I,,(Attr::hidden),"Interaction object being tracked."))
 		((Vector3r,axX,,,"Local x-axis in global coordinates (normal of the contact) |yupdate|"))
 		((Vector3r,axY,,,"Local y-axis in global coordinates; perpendicular to axX; initialized arbitrarily, but tracked to be consistent. |yupdate|"))
 		((Vector3r,axZ,,Attr::noSave,"Local z-axis in global coordinates; computed from axX and axY. |yupdate|"))

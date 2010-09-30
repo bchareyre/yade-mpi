@@ -138,7 +138,7 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 #define _PYSET_ATTR(x,y,z) if(key==_ATTR_NAM_STR(z)) { _ATTR_NAM(z)=boost::python::extract<typeof(_ATTR_NAM(z))>(value); return; }
 #define _PYKEYS_ATTR(x,y,z) ret.append(_ATTR_NAM_STR(z));
 #define _PYHASKEY_ATTR(x,y,z) if(key==_ATTR_NAM_STR(z)) return true;
-#define _PYDICT_ATTR(x,y,z) ret[_ATTR_NAM_STR(z)]=boost::python::object(_ATTR_NAM(z));
+#define _PYDICT_ATTR(x,y,z) if(!(_ATTR_FLG(z) & yade::Attr::hidden)) ret[_ATTR_NAM_STR(z)]=boost::python::object(_ATTR_NAM(z));
 #define _REGISTER_BOOST_ATTRIBUTES_REPEAT(x,y,z) if((_ATTR_FLG(z) & yade::Attr::noSave)==0) { ar & BOOST_SERIALIZATION_NVP(_ATTR_NAM(z)); }
 #define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
 	friend class boost::serialization::access; \
