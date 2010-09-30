@@ -10,36 +10,36 @@
     <projectname>Yade</projectname>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
-    <description/>
-    <defaultencoding/>
+    <description></description>
+    <defaultencoding></defaultencoding>
     <versioncontrol/>
   </general>
   <kdevcustomproject>
     <run>
-      <mainprogram>/home/vincent/yade-local/trunk</mainprogram>
+      <mainprogram>/usr/bin/python</mainprogram>
       <directoryradio>executable</directoryradio>
-      <programargs/>
-      <globaldebugarguments/>
+      <programargs>/home/chia/yade/inst/bin/yade-r2446</programargs>
+      <globaldebugarguments>/home/chia/yade/inst/bin/yade-r2446-dbg</globaldebugarguments>
       <globalcwd>/tmp</globalcwd>
       <useglobalprogram>false</useglobalprogram>
-      <terminal>false</terminal>
-      <autocompile>false</autocompile>
-      <autoinstall>false</autoinstall>
+      <terminal>true</terminal>
+      <autocompile>true</autocompile>
+      <autoinstall>true</autoinstall>
       <autokdesu>false</autokdesu>
       <envvars/>
     </run>
     <build>
       <buildtool>make</buildtool>
-      <builddir/>
+      <builddir></builddir>
     </build>
     <make>
       <abortonerror>false</abortonerror>
-      <numberofjobs>10</numberofjobs>
+      <numberofjobs>4</numberofjobs>
       <prio>0</prio>
       <dontact>false</dontact>
       <makebin>scons</makebin>
-      <defaulttarget/>
-      <makeoptions/>
+      <defaulttarget></defaulttarget>
+      <makeoptions></makeoptions>
       <selectedenvironment>default</selectedenvironment>
       <environments>
         <default>
@@ -66,9 +66,9 @@
     <blacklist/>
     <other>
       <prio>0</prio>
-      <otherbin/>
-      <defaulttarget/>
-      <otheroptions/>
+      <otherbin>scons</otherbin>
+      <defaulttarget></defaulttarget>
+      <otheroptions></otheroptions>
       <selectedenvironment>default</selectedenvironment>
       <environments>
         <default/>
@@ -77,18 +77,18 @@
   </kdevcustomproject>
   <kdevdebugger>
     <general>
-      <dbgshell/>
-      <gdbpath/>
-      <configGdbScript/>
-      <runShellScript/>
-      <runGdbScript/>
+      <dbgshell></dbgshell>
+      <gdbpath></gdbpath>
+      <configGdbScript></configGdbScript>
+      <runShellScript></runShellScript>
+      <runGdbScript></runGdbScript>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>
       <raiseGDBOnStart>false</raiseGDBOnStart>
     </general>
     <display>
-      <staticmembers>false</staticmembers>
+      <staticmembers>true</staticmembers>
       <demanglenames>true</demanglenames>
       <outputradix>10</outputradix>
     </display>
@@ -154,7 +154,7 @@
       <root>/usr/share/qt3</root>
       <designerintegration>EmbeddedKDevDesigner</designerintegration>
       <qmake>/usr/bin/qmake-qt3</qmake>
-      <designer></designer>
+      <designer>/usr/bin/designer</designer>
       <designerpluginpaths/>
     </qt>
     <codecompletion>
@@ -183,7 +183,7 @@
       <resolveIncludePathsUsingMakeExperimental>false</resolveIncludePathsUsingMakeExperimental>
     </codecompletion>
     <creategettersetter>
-      <prefixGet/>
+      <prefixGet></prefixGet>
       <prefixSet>set</prefixSet>
       <prefixVariable>m_,_</prefixVariable>
       <parameterName>theValue</parameterName>
@@ -205,9 +205,9 @@
   </cppsupportpart>
   <kdevdocumentation>
     <projectdoc>
-      <docsystem/>
-      <docurl/>
-      <usermanualurl/>
+      <docsystem></docsystem>
+      <docurl></docurl>
+      <usermanualurl></usermanualurl>
     </projectdoc>
   </kdevdocumentation>
   <kdevfileview>
@@ -222,7 +222,8 @@
     </tree>
   </kdevfileview>
   <ctagspart>
-    <customArguments/>
+    <customArguments>-R --extra=+q --fields=+n --exclude='.*' --exclude=attic --exclude=doc --exclude=scons-local --exclude=include --exclude=lib/triangulation --exclude=debian --exclude='*.so' --exclude='*.s' --exclude='*.ii' --langmap=c++:+.inl,c++:+.tpp,c++:+.ipp</customArguments>
     <activeTagsFiles/>
+    <customTagfilePath>/home/chia/yade/src/r2446/tags</customTagfilePath>
   </ctagspart>
 </kdevelop>

@@ -35,17 +35,21 @@ ctypes.cdll.LoadLibrary(libstdcxx)
 # find plugin directory
 import os,os.path
 import config
-libDir=(config.prefix if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'])+'/lib/yade'+config.suffix
+if 'YADE_PREFIX' in os.environ: libDir=os.environ['YADE_PREFIX']+'/lib/yade'+config.suffix
+else: libDir=config.libDir
 libDir=os.path.abspath(libDir) # needed if YADE_PREFIX is a relative path
 # find plugins recursively
 plugins=[]
 # might add followlinks=True to os.walk, for python>=2.6
 for root,dirs,files in os.walk(libDir):
+	# for some reason, does not really work?
+	#dirs=[d for d in dirs if d!='dbg']
 	for f in files:
+		# ouch, ugly!
+		if not config.debug and '/dbg/' in root: continue
 		if not (f.startswith('lib') and f.endswith('.so')): continue
 		plugin=os.path.join(libDir,root,f)
 		plugins.append(plugin)
-	
 
 # c++ initialization code
 import boot

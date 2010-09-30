@@ -259,7 +259,7 @@ def getNumCores():
 	return nCpu
 numCores=getNumCores()
 
-parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-multi for details.')
+parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
 parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job."%numCores,metavar='NUM',default=numCores)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads')
@@ -268,6 +268,7 @@ parser.add_option('--global-log',dest='globalLog',help='Filename where to redire
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%executable,default=executable,metavar='FILE')
+parser.add_option('--debug',dest='debug',action='store_true',help='Run the executable with --debug.',default=False)
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)

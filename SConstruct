@@ -75,45 +75,20 @@ profileFile='scons.current-profile'
 env['sourceRoot']=os.getcwd()
 
 profOpts=Variables(profileFile)
-profOpts.Add(('profile','Config profile to use (predefined: default or "", dbg); append ! to use it but not save for next build (in scons.current-profile)','default'))
+profOpts.Add(('profile','Config profile to use (predefined: default or ""); append ! to use it but not save for next build (in scons.current-profile)','default'))
 profOpts.Update(env)
 # multiple profiles - run them all at the same time
 # take care not to save current profile for those parallel builds
 if env['profile']=='': env['profile']='default'
 # save the profile only if the last char is not !
-if env['profile'][-1]=='!': env['profile']=env['profile'][:-1]
-else: profOpts.Save(profileFile,env)
-
-if ',' in env['profile']:
-	profiles=env['profile'].split(',')
-	import threading,subprocess
-	def runProfile(profile): subprocess.call([sys.argv[0],'-Q','profile='+profile+'!'])
-	profileThreads=[]
-	for arg in sys.argv[2:]:
-		print "WARNING: parallel-building, extra argument `%s' ignored!"%arg
-	for p in profiles:
-		t=threading.Thread(target=runProfile,name='profile_'+p,args=(p,))
-		t.start()
-		profileThreads.append(t)
-	import atexit
-	def killAllProfileThreads():
-		for t in profileThreads:
-			t.join(0.1)
-	atexit.register(killAllProfileThreads)
-	for t in profileThreads:
-		t.join()
-	Exit()
+saveProfile=True
+if env['profile'][-1]=='!': env['profile'],noSaveProfile=env['profile'][:-1],False
+if saveProfile: profOpts.Save(profileFile,env)
 
 if env['profile']=='': env['profile']='default'
 optsFile='scons.profile-'+env['profile']
 profile=env['profile']
 print '@@@ Using profile',profile,'('+optsFile+') @@@'
-
-# defaults for various profiles
-if profile=='default': defOptions={'debug':0,'variant':'','optimize':1,'chunkSize':10}
-elif profile=='dbg': defOptions={'debug':1,'variant':'-dbg','optimize':0,'chunkSize':1}
-else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'chunkSize':10}
-
 
 opts=Variables(optsFile)
 ## compatibility hack again
@@ -134,10 +109,10 @@ opts.AddVariables(
 	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
 	('PREFIX','Install path prefix','/usr/local'),
 	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.',None),
-	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten',defOptions['variant'],None,lambda x:x),
-	BoolVariable('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
+	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten','' if profile=='default' else '-'+profile,None,lambda x:x),
+	BoolVariable('debug', 'Enable debugging information',0),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
-	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
+	BoolVariable('optimize','Turn on heavy optimizations',1),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','qt4','never_use_this_one']),
@@ -157,6 +132,7 @@ opts.AddVariables(
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
 	BoolVariable('mono','[experimental] Build only one shared library and make all other files (python objects, for instance) only be symlinks.',0),
+	('execCheck','Name of the main script that should be installed; if the current one differs, an erro is raised (do not use directly, only intended for --rebuild',None),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
@@ -168,7 +144,7 @@ if str(env['features'])=='all':
 	print 'ERROR: using "features=all" is illegal, since it breaks feature detection at runtime (SCons limitation). Write out all features separated by commas instead. Sorry.'
 	Exit(1)
 
-opts.Save(optsFile,env)
+if saveProfile: opts.Save(optsFile,env)
 # fix expansion in python substitution by assigning the right value if not specified
 if not env.has_key('runtimePREFIX') or not env['runtimePREFIX']: env['runtimePREFIX']=env['PREFIX']
 
@@ -209,7 +185,8 @@ import yadeSCons
 if not env.has_key('realVersion') or not env['realVersion']: env['realVersion']=yadeSCons.getRealVersion() or 'unknown' # unknown if nothing returned
 if not env.has_key('version'): env['version']=env['realVersion']
 
-env['SUFFIX']='-'+env['version']+env['variant']
+env['SUFFIX_NODEBUG']='-'+env['version']+env['variant']
+env['SUFFIX']=env['SUFFIX_NODEBUG']+('' if not env['debug'] else '/dbg')
 print "Yade version is `%s' (%s), installed files will be suffixed with `%s'."%(env['version'],env['realVersion'],env['SUFFIX'])
 # make buildDir absolute, saves hassles later
 buildDir=os.path.abspath(env.subst('$buildPrefix/build$SUFFIX'))
@@ -648,9 +625,13 @@ else:
 ## only when installing without requesting special path (we would have no way
 ## to know what should be installed overall.
 if not COMMAND_LINE_TARGETS:
-	toInstall=[str(node) for node in env.FindInstalledFiles()]
+	toInstall=set([str(node) for node in env.FindInstalledFiles()])
 	for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
+		# do not go inside the debug directly, plugins are different there
 		for f in files:
+			# skip debug files, if in the non-debug build
+			if not env['debug'] and '/dbg/' in root: continue
+			#print 'Considering',f
 			ff=os.path.join(root,f)
 			# do not delete python-optimized files and symbolic links (lib_gts__python-module.so, for instance)
 			if ff not in toInstall and not ff.endswith('.pyo') and not ff.endswith('.pyc') and not os.path.islink(ff) and not os.path.basename(ff).startswith('.nfs'):
