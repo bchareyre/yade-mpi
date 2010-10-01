@@ -94,9 +94,9 @@ binary-arch: build install check
 #	dh_installcron
 #	dh_installinfo
 	dh_installman -p yade${_VERSION} yade${_VERSION}.1 yade${_VERSION}-batch.1
-	dh_installman -p yade${_VERSION}-dbg yade${_VERSION}-dbg.1 yade${_VERSION}-dbg-batch.1
+#	dh_installman -p yade${_VERSION}-dbg yade${_VERSION}-dbg.1 yade${_VERSION}-dbg-batch.1
 	dh_link
-	dh_strip --exclude=yade${_VERSION}-dbg   # don't strip the debug package
+#	dh_strip --exclude=yade${_VERSION}-dbg   # don't strip the debug package
 	dh_compress
 	dh_fixperms
 #	dh_perl
