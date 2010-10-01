@@ -11,6 +11,7 @@ Yade uses [scons]_ build system for managing the build process. It takes care of
 .. _scons-parameters:
 Pre-build configuration
 -----------------------
+
 We use ``\$`` to denote build variable in strings in this section; in SCons script, they can be used either by writing ``\$variable`` in strings passed to SCons functions, or obtained as attribute of the ``Environment`` instance ``env``, i.e. ``env['variable']``; we use the formed in running text here.
 
 In order to allow parallel installation of multiple yade versions, the installation location follows the pattern ``\$PREFIX/lib/yade\$SUFFIX`` for libraries and ``\$PREFIX/bin/yade\$SUFFIX`` for executables (in the following, we will refer only to the first one). ``\$SUFFIX`` takes the form ``-\$version\$variant``, which further allows multiple different builds of the same version (typically, optimized and debug builds). For instance, the default debug build of version 0.5 would be  installed in ``/usr/local/lib/yade-0.5-dbg/``, the executable being ``/usr/local/bin/yade-0.5-dbg``.
@@ -894,10 +895,10 @@ creates :yref:`InsertionSortCollider`, which internally contains :yref:`Collider
 
 There are currenly 4 predefined dispatchers (see `dispatcher-names`_) and corresponding functor types. They are inherit from template instantiations of ``Dispatcher1D`` or ``Dispatcher2D`` (for functors, ``Functor1D`` or ``Functor2D``). These templates themselves derive from ``DynlibDispatcher`` (for dispatchers) and ``FunctorWrapper`` (for functors).
 
-Example: InteractionGeometryDispatcher
+Example: IGeomDispatcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's take (the most complicated perhaps) :yref:`InteractionGeometryDispatcher`. :yref:`IGeomFunctor`, which is dispatched based on types of 2 :yref:`Shape` instances (a :yref:`Functor`), takes a number of arguments and returns bool. The functor "call" is always provided by its overridden ``Functor::go`` method; it always receives the dispatched instances as first argument(s) (2 × ``const shared_ptr<Shape>&``) and a number of other arguments it needs:
+Let's take (the most complicated perhaps) :yref:`IGeomDispatcher`. :yref:`IGeomFunctor`, which is dispatched based on types of 2 :yref:`Shape` instances (a :yref:`Functor`), takes a number of arguments and returns bool. The functor "call" is always provided by its overridden ``Functor::go`` method; it always receives the dispatched instances as first argument(s) (2 × ``const shared_ptr<Shape>&``) and a number of other arguments it needs:
 
 .. code-block:: c++
 
@@ -917,7 +918,7 @@ The dispatcher is declared as follows:
 
 .. code-block:: c++
 
-	class InteractionGeometryDispatcher: public Dispatcher2D<	
+	class IGeomDispatcher: public Dispatcher2D<	
 	   Shape,                       // 1st class for dispatch
 	   Shape,                       // 2nd class for dispatch
 	   IGeomFunctor,  // functor type
@@ -1003,14 +1004,14 @@ Indexing dispatch types
 
 Classes entering the dispatch mechanism must provide for fast identification of themselves and of their parent class. [#rttiindex]_ This is called class indexing and all such classes derive from :yref:`Indexable`. There are ``top-level`` Indexables (types that the dispatchers accept) and each derived class registers its index related to this top-level Indexable. Currently, there are:
 
-============================ ===========================
-Top-level Indexable          used by
-============================ ===========================
-:yref:`Shape`                :yref:`BoundFunctor`, :yref:`InteractionGeometryDispatcher`
-:yref:`Material`             :yref:`InteractionPhysicsDispatcher`
-:yref:`IPhys`   :yref:`LawDispatcher`
-:yref:`IGeom`  :yref:`LawDispatcher`
-============================ ===========================
+==================== ===========================
+Top-level Indexable  used by
+==================== ===========================
+:yref:`Shape`        :yref:`BoundFunctor`, :yref:`IGeomDispatcher`
+:yref:`Material`     :yref:`IPhysDispatcher`
+:yref:`IPhys`        :yref:`LawDispatcher`
+:yref:`IGeom`        :yref:`LawDispatcher`
+==================== ===========================
 
 The top-level Indexable must use the ``REGISTER_INDEX_COUNTER`` macro, which sets up the machinery for identifying types of derived classes; they must then use the ``REGISTER_CLASS_INDEX`` macro *and* call ``createIndex()`` in their constructor. For instance, taking the :yref:`Shape` class (which is a top-level Indexable):
 
@@ -1077,7 +1078,7 @@ Dispatchers can also be inspected, using the .dispMatrix() method:
 
 .. ipython::
 
-	Yade [3]: ig=InteractionGeometryDispatcher([
+	Yade [3]: ig=IGeomDispatcher([
 	   ...:    Ig2_Sphere_Sphere_Dem3DofGeom(),
 	   ...:    Ig2_Facet_Sphere_Dem3DofGeom(),
 	   ...:    Ig2_Wall_Sphere_Dem3DofGeom()
@@ -1106,7 +1107,7 @@ Finally, dispatcher can be asked to return functor suitable for given argument(s
 
 OpenGL functors
 ^^^^^^^^^^^^^^^
-OpenGL rendering is being done also by 1D functors (dispatched for the type to be rendered). Since it is sufficient to have exactly one class for each rendered type, the functors are found automatically. Their base functor types are ``GlShapeFunctor``, ``GlBoundFunctor``, ``GlInteractionGeometryFunctor`` and so on. These classes register the type they render using the ``RENDERS`` macro:
+OpenGL rendering is being done also by 1D functors (dispatched for the type to be rendered). Since it is sufficient to have exactly one class for each rendered type, the functors are found automatically. Their base functor types are ``GlShapeFunctor``, ``GlBoundFunctor``, ``GlIGeomFunctor`` and so on. These classes register the type they render using the ``RENDERS`` macro:
 
 .. code-block:: c++
 
@@ -1328,8 +1329,8 @@ The output might look like this (note that functors are nested inside dispatcher
 	ForceReseter                        400               9449μs              0.01%      
 	BoundDispatcher                     400            1171770μs              1.15%      
 	InsertionSortCollider               400            9433093μs              9.24%      
-	InteractionGeometryDispatcher       400           15177607μs             14.87%      
-	InteractionPhysicsDispatcher        400            9518738μs              9.33%      
+	IGeomDispatcher       400           15177607μs             14.87%      
+	IPhysDispatcher        400            9518738μs              9.33%      
 	LawDispatcher                       400           64810867μs             63.49%      
 	  Law2_Dem3DofGeom_CpmPhys_Cpm                                                     
 	    setup                           4926145            7649131μs             15.25%  
@@ -1605,7 +1606,7 @@ During each step in the simulation, the following operations are performed on in
 
 #. Collider erases interactions that were requested for being erased (see below).
 
-#. :yref:`InteractionLoop` (via :yref:`InteractionGeometryDispatcher`) calls appropriate :yref:`IGeomFunctor` based on :yref:`Shape` combination of both bodies, if such functor exists. For real interactions, the functor updates associated :yref:`IGeom`. For potential interactions, the functor returns
+#. :yref:`InteractionLoop` (via :yref:`IGeomDispatcher`) calls appropriate :yref:`IGeomFunctor` based on :yref:`Shape` combination of both bodies, if such functor exists. For real interactions, the functor updates associated :yref:`IGeom`. For potential interactions, the functor returns
 
 	``false``
 		if there is no geometrical overlap, and the interaction will stillremain potential-only
@@ -1620,7 +1621,7 @@ During each step in the simulation, the following operations are performed on in
 	.. note::
 		If there is no functor suitable to handle given combination of :yref:`shapes<Shape>`, the interaction will be left in potential state, without raising any error.
 
-#. For real interactions (already existing or jsut created in last step), :yref:`InteractionLoop` (via :yref:`InteractionPhysicsDispatcher`) calls appropriate :yref:`IPhysFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`IPhys` instance. It is an error if no suitable functor is found, and an exception will be thrown.
+#. For real interactions (already existing or jsut created in last step), :yref:`InteractionLoop` (via :yref:`IPhysDispatcher`) calls appropriate :yref:`IPhysFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`IPhys` instance. It is an error if no suitable functor is found, and an exception will be thrown.
 
 #. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combintation of :yref:`IGeom` and :yref:`IPhys` of the interaction. Again, it is an error if no functor capable of handling it is found.
 

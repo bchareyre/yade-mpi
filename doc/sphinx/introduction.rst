@@ -456,7 +456,7 @@ The next part, reading
 
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
-:yref:`InteractionGeometryDispatcher`
+:yref:`IGeomDispatcher`
 	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shapes>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_Dem3DofGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`Dem3DofGeom` instance, if appropriate.
@@ -465,7 +465,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 	All ``Ig2`` functors derive from :yref:`IGeomFunctor` (they are documented at the same place).
 
-:yref:`InteractionPhysicsDispatcher`
+:yref:`IPhysDispatcher`
 	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`IPhys` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
 	
 	``Ip2`` functors are derived from :yref:`IPhysFunctor`.
