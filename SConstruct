@@ -646,7 +646,7 @@ env.Install('$PREFIX/share/doc/yade$SUFFIX-doc/',['examples','scripts','doc'])
 
 
 ### check if combinedFiles is different; if so, force rebuild of all of them
-if not os.path.exists(combinedFiles) or combinedFilesMd5!=md5.md5(open(combinedFiles).read()).hexdigest():
+if os.path.exists(combinedFiles) and combinedFilesMd5!=md5.md5(open(combinedFiles).read()).hexdigest():
 	print 'Rebuilding combined files, since the md5 has changed.'
 	combs=[l.split(':')[0] for l in open(combinedFiles)]
 	for c in combs:
