@@ -42,6 +42,9 @@ class LawTester: public PartialEngine{
 		((Real,renderLength,0,,"Characteristic length for the purposes of rendering, set equal to the smaller radius."))
 		((Vector3r,contPt,Vector3r::Zero(),,"Contact point (for rendering only)"))
 		//((int,sense,1,,"Determines what particle is moved: negative for id1, positive for id2, 0 for both."))
+		// applyWeight
+		// shearRotWeight
+		// reset force components along individual axes, instead of blocking DOFs which have no specific direction (for the force control)
 	);
 };
 REGISTER_SERIALIZABLE(LawTester);

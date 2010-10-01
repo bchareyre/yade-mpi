@@ -42,7 +42,7 @@ if opts.rebuild:
 	import subprocess
 	# rebuild
 	sourceRoot,profile='${sourceRoot}','${profile}' # replaced at install-time
-	cmd=['scons','-Q','-C',sourceRoot,'profile=%s!'%profile,'debug=%d'%(1 if opts.debug else 0),'optimize=0','execCheck=%s'%(prefix+'/bin/yade'+suffix)]
+	cmd=['scons','-Q','-C',sourceRoot,'profile=%s!'%profile,'debug=%d'%(1 if opts.debug else 0),'optimize=%d'%(0 if opts.debug else 1),'execCheck=%s'%(prefix+'/bin/yade'+suffix)]
 	print 'Rebuilding yade using',' '.join(cmd)
 	if subprocess.call(cmd): raise RuntimeError('Error rebuilding Yade (--rebuild).')
 	# run ourselves

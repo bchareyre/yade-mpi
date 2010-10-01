@@ -9,9 +9,9 @@ import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil
 #socket.setdefaulttimeout(10) 
 
 ## replaced by scons automatically
-prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
+prefix,suffix,suffixNoDebug='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}','${SUFFIX_NODEBUG}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
-executable=os.path.join(prefix,'bin','yade'+suffix)
+executable=os.path.join(prefix,'bin','yade'+suffixNoDebug)
 ## we just need this ...
 import yade, yade.utils, yade.config, yade.remote
 
@@ -281,8 +281,8 @@ logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=
 if opts.manpage:
 	import yade.manpage
 	yade.config.metadata['short_desc']='batch system for computational platform Yade'
-	yade.config.metadata['long_desc']='Manage batches of computation jobs for the Yade platform; batches are described using text-file tables with parameters which are passed to individual runs of yade. Jobs are being run with pre-defined number of computational cores as soon as the required number of cores is available. Logs of all computations are stored in files and the batch progress can be watched online at (usually) http://localhost:9080. Unless overridden, the executable yade%s is used to run jobs.'%(yade.config.suffix)
-	yade.manpage.generate_manpage(parser,yade.config.metadata,opts.manpage,section=1,seealso='yade%s (1)\n.br\nhttps://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-multi'%suffix)
+	yade.config.metadata['long_desc']='Manage batches of computation jobs for the Yade platform; batches are described using text-file tables with parameters which are passed to individual runs of yade. Jobs are being run with pre-defined number of computational cores as soon as the required number of cores is available. Logs of all computations are stored in files and the batch progress can be watched online at (usually) http://localhost:9080. Unless overridden, the executable yade%s is used to run jobs.'%(suffixNoDebug)
+	yade.manpage.generate_manpage(parser,yade.config.metadata,opts.manpage,section=1,seealso='yade%s (1)\n.br\nhttps://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch'%suffixNoDebug)
 	print 'Manual page %s generated.'%opts.manpage
 	sys.exit(0)
 
@@ -341,7 +341,7 @@ for i,l in enumerate(useLines):
 			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
 	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
 	env='PARAM_TABLE=<a href="jobs/%d/table">%s:%d</a> DISPLAY= %s '%(i,table,l,' '.join(envVars))
-	cmd='%s --threads=%d %s -x <a href="jobs/%d/script">%s</a>'%(executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',i,simul)
+	cmd='%s%s --threads=%d %s -x <a href="jobs/%d/script">%s</a>'%(executable,' --debug' if opts.debug else '',int(nSlots),'--nice=%s'%nice if nice!=None else '',i,simul)
 	log='> <a href="jobs/%d/log">%s</a> 2>&1'%(i,pipes.quote(logFile))
 	hrefCmd=env+cmd+log
 	fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
