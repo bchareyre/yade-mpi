@@ -48,8 +48,8 @@ open('debian/changelog','w').write(
 
   * Automatic debian changelog entry for yade-%s
 
- -- Václav Šmilauer <eudoxos@arcig.cz>  %s
-'''%(VERSION,VERSION,UPDATE,DISTRIBUTION,DISTRIBUTION,VERSION,time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
+ -- %s <%s>  %s
+'''%(VERSION,VERSION,UPDATE,DISTRIBUTION,DISTRIBUTION,VERSION,os.environ['DEBFULLNAME'],os.environ['DEBEMAIL'],time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
 
 # remove some generated files
 for p in ('doc/doxygen','doc/sphinx/_build','tags'):
