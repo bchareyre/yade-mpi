@@ -1,0 +1,50 @@
+#!/usr/bin/python
+# encoding: utf-8
+
+#Initial script to create build-bot
+import sys,os,numpy,shutil
+
+revNo = 2460
+distributivesNames = numpy.array(['lucid','maverick'])		#Supported distributives
+distributivesArch = numpy.array(['x86_64','amd64'])				#Supported achitectures
+
+defaultPath = sys.path[0]    #Default Path for builds
+try:
+	if (sys.argv[1]): defaultPath = os.path.normpath(sys.argv[1])
+except IndexError:
+	pass
+
+
+if os.path.exists(defaultPath+'/cleanBzr'):
+	print "CleanBZR folder exists"
+	print "Updating to the latest bzr version"
+	os.chdir(defaultPath+'/cleanBzr/yade')
+	os.system('bzr up')
+	revNo=os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines()[0][:-1]
+else: 
+	os.mkdir(defaultPath+'/cleanBzr')
+	print "CleanBZR created"
+	print "Checking out the latest bzr version"
+	os.chdir(defaultPath+'/cleanBzr/')
+	os.system('bzr checkout lp:yade --lightweight')
+	os.chdir('yade')
+	revNo=os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines()[0][:-1]
+
+
+os.chdir(defaultPath)
+
+for distrName in distributivesNames:
+	if os.path.exists(distrName) and (os.path.isdir(distrName)):
+		shutil.rmtree(distrName)
+	os.mkdir(distrName)
+	os.chdir(distrName)
+	for archName in distributivesArch:
+		os.mkdir(archName)
+		shutil.copytree('../cleanBzr/yade',archName+'/yade')
+		os.chdir(archName+'/yade')
+		os.system('scripts/debian-prep ' + distrName)
+		os.chdir('..')
+		os.rename('yade', 'yade-bzr'+str(revNo)+'-bzr'+str(revNo))
+		os.system('dpkg-source -b -I yade-bzr'+str(revNo)+'-bzr'+str(revNo))
+		os.chdir('..')
+	os.chdir('..')
