@@ -2,12 +2,13 @@
 # encoding: utf-8
 
 #Initial script to create build-bot
-import sys,os,numpy,shutil
+import sys,os,numpy,shutil,glob
 
 revNo = 2460
 distributivesNames = numpy.array(['lucid','maverick'])		#Supported distributives
-distributivesArch = numpy.array(['x86_64','amd64'])				#Supported achitectures
+distributivesArch = numpy.array(['i386','amd64'])				#Supported achitectures
 
+#Default path for builds can be inputed in command line parameters
 defaultPath = sys.path[0]    #Default Path for builds
 try:
 	if (sys.argv[1]): defaultPath = os.path.normpath(sys.argv[1])
@@ -15,6 +16,19 @@ except IndexError:
 	pass
 
 
+
+# Check, whether base files for building exist	
+for distrName in distributivesNames:
+	for archName in distributivesArch:
+		distr_plus_arch = distrName+'_'+archName
+		if not(os.path.exists('/var/cache/pbuilder/'+distr_plus_arch+'.tgz')):
+			os.system('sudo pbuilder --create --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz --distribution '+distrName+' --architecture '+archName+' --components "main universe" --debootstrapopts --variant=buildd')
+		os.system('sudo pbuilder --update --override-config --components "main universe" --distribution '+distrName+' --othermirror "deb http://ppa.launchpad.net/yade-users/external/ubuntu '+distrName+' main |" --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz')
+
+
+
+
+#Update to the latest revision or checkout
 if os.path.exists(defaultPath+'/cleanBzr'):
 	print "CleanBZR folder exists"
 	print "Updating to the latest bzr version"
@@ -30,21 +44,29 @@ else:
 	os.chdir('yade')
 	revNo=os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines()[0][:-1]
 
-
 os.chdir(defaultPath)
+VERSION = 'bzr'+str(revNo)
 
+# Prepare .dsc files for pbuilder
 for distrName in distributivesNames:
 	if os.path.exists(distrName) and (os.path.isdir(distrName)):
 		shutil.rmtree(distrName)
 	os.mkdir(distrName)
 	os.chdir(distrName)
+	shutil.copytree('../cleanBzr/yade','yade')
+	os.chdir('yade')
+	os.system('scripts/debian-prep ' + distrName)
+	os.chdir('..')
+	os.rename('yade', 'yade-'+VERSION+'-'+VERSION)
+	os.system('dpkg-source -b -I yade-'+VERSION+'-'+VERSION)
+	dscFile = glob.glob('*.dsc')[0]
 	for archName in distributivesArch:
 		os.mkdir(archName)
-		shutil.copytree('../cleanBzr/yade',archName+'/yade')
-		os.chdir(archName+'/yade')
-		os.system('scripts/debian-prep ' + distrName)
-		os.chdir('..')
-		os.rename('yade', 'yade-bzr'+str(revNo)+'-bzr'+str(revNo))
-		os.system('dpkg-source -b -I yade-bzr'+str(revNo)+'-bzr'+str(revNo))
-		os.chdir('..')
+		commanToBuild = 'sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+' --debbuildopts "-j2" '+str(dscFile)
+		print commanToBuild
+		os.system('sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+' --debbuildopts "-j2" '+dscFile)
 	os.chdir('..')
+
+
+#os.chdir('..')
+#os.chdir('..')
