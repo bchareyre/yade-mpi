@@ -46,11 +46,11 @@ for f1,f2 in [
 try:
 	open('debian/changelog','w').write(
 	'''yade-%s (%s%s-%s1) %s; urgency=low
-	
-	  * Automatic debian changelog entry for yade-%s
-	
-	 -- %s <%s>  %s
-	'''%(VERSION,VERSION,UPDATE,DISTRIBUTION,DISTRIBUTION,VERSION,os.environ['DEBFULLNAME'],os.environ['DEBEMAIL'],time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
+
+  * Automatic debian changelog entry for yade-%s
+
+ -- %s <%s>  %s
+'''%(VERSION,VERSION,UPDATE,DISTRIBUTION,DISTRIBUTION,VERSION,os.environ['DEBFULLNAME'],os.environ['DEBEMAIL'],time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
 except KeyError:
 	print "Please, set DEBEMAIL and DEBFULLNAME as described here http://www.debian.org/doc/maint-guide/ch-first.en.html"
 
