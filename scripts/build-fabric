@@ -22,8 +22,8 @@ for distrName in distributivesNames:
 	for archName in distributivesArch:
 		distr_plus_arch = distrName+'_'+archName
 		if not(os.path.exists('/var/cache/pbuilder/'+distr_plus_arch+'.tgz')):
-			os.system('sudo pbuilder --create --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz --distribution '+distrName+' --architecture '+archName+' --components "main universe" --debootstrapopts --variant=buildd')
-		os.system('sudo pbuilder --update --override-config --components "main universe" --distribution '+distrName+' --othermirror "deb http://ppa.launchpad.net/yade-users/external/ubuntu '+distrName+' main |" --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz')
+			os.system('sudo pbuilder --create --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --distribution '+distrName+' --architecture '+archName+' --components "main universe" --debootstrapopts --variant=buildd')
+		os.system('sudo pbuilder --update --override-config --components "main universe" --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --distribution '+distrName+' --othermirror "deb http://ppa.launchpad.net/yade-users/external/ubuntu '+distrName+' main |" --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz')
 
 
 
@@ -62,9 +62,7 @@ for distrName in distributivesNames:
 	dscFile = glob.glob('*.dsc')[0]
 	for archName in distributivesArch:
 		os.mkdir(archName)
-		commanToBuild = 'sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+' --debbuildopts "-j2" '+str(dscFile)
-		print commanToBuild
-		os.system('sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+' --debbuildopts "-j2" '+dscFile)
+		os.system('sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+'  --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --debbuildopts "-j1" '+dscFile)
 	os.chdir('..')
 
 
