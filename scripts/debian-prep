@@ -37,6 +37,7 @@ for f1,f2 in [
 	('yade-dbg.postinst-template','yade-%s-dbg.postinst'%VERSION),
 	('yade.prerm-template','yade-%s.prerm'%VERSION),
 	('yade-dbg.prerm-template','yade-%s-dbg.prerm'%VERSION),
+	('yade.menu-template','yade-%s.menu'%VERSION),
 	('control-template','control')]:
 		copyReplace('debian/'+f1,'debian/'+f2)
 

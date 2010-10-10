@@ -63,6 +63,8 @@ install: build
 	# generate manpages
 	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} --generate-manpage yade${_VERSION}.1
 	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION}-batch --generate-manpage yade${_VERSION}-batch.1
+	# copy pixmap files in relevant directories
+	cp debian/*.xpm /usr/share/pixmaps
 
 check: install
 	dh_testdir
@@ -83,7 +85,7 @@ binary-arch: build install check
 	dh_installdocs
 	dh_installexamples
 #	dh_install
-#	dh_installmenu
+	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate
 #	dh_installemacsen
