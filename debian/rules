@@ -58,13 +58,15 @@ install: build
 	#NO_SCONS_GET_RECENT= scons profile=deb PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}-doc
 	mkdir -p debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}
 	cp -r examples scripts debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}
+	# copy pixmap files in relevant directories
+	mkdir -p debian/yade${_VERSION}/usr/share/pixmaps
+	cp debian/*.xpm debian/yade${_VERSION}/usr/share/pixmaps
+
 	# UGLY! generate sphinx docs only if python-sphinx is installed (distinguishes distributions which should build it or not as per debian/control-template build-deps)
 	if dpkg-query -W python-sphinx; then cd doc/sphinx; PYTHONPATH=. YADE_PREFIX=../../debian/yade${_VERSION}/usr/ ../../debian/yade${_VERSION}/usr/bin/yade${_VERSION} yadeSphinx.py; cd _build/latex; xelatex Yade.tex; xelatex Yade.tex; xelatex Yade.tex; cd ../..; mkdir -p ../../debian/yade${_VERSION}-doc/usr/share/doc/yade${_VERSION}; cp -r _build/html _build/latex/Yade.pdf ../../debian/yade${_VERSION}-doc/usr/share/doc/yade${_VERSION}; else echo "Not building HTML documentation, since the python-sphinx package is not installed"; fi
 	# generate manpages
 	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} --generate-manpage yade${_VERSION}.1
 	YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION}-batch --generate-manpage yade${_VERSION}-batch.1
-	# copy pixmap files in relevant directories
-	cp debian/*.xpm /usr/share/pixmaps
 
 check: install
 	dh_testdir
