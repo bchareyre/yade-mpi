@@ -2,20 +2,19 @@
 # encoding: utf-8
 
 #Initial script to create build-bot
-import sys,os,numpy,shutil,glob
+import sys,os,shutil,glob,argparse
 
 revNo = 0
-distributionsNames = numpy.array(['lucid','maverick'])		#Supported distributions
-distributionsArch = numpy.array(['i386','amd64'])				#Supported achitectures
 
-#Default path for builds can be inputed in command line parameters
-defaultPath = sys.path[0]    #Default Path for builds
-try:
-	if (sys.argv[1]): defaultPath = os.path.normpath(sys.argv[1])
-except IndexError:
-	pass
+parser = argparse.ArgumentParser(description='Build packages for different distributions')
+parser.add_argument('--buildpath', metavar=os.path.normpath(sys.path[0]), default = os.path.normpath(sys.path[0]) , help ='path, where all files for building will be stored ) [default: current directory]')
+parser.add_argument('--distributions', metavar="lucid maverick", default = "lucid maverick" , help ='distributions for building [default: lucid maverick]')
+parser.add_argument('--architectures', metavar="i386 amd64", default = "i386 amd64" , help ='architectures to building [default: i386 amd64]')
+args = parser.parse_args()
 
-
+defaultPath = args.buildpath
+distributionsNames = args.distributions.split()
+distributionsArch = args.architectures.split()
 
 # Check, whether base files for building exist	
 for distrName in distributionsNames:
@@ -61,4 +60,5 @@ for distrName in distributionsNames:
 		os.mkdir(archName)
 		os.system('sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+'  --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --debbuildopts "-j1" '+dscFile)
 	os.chdir('..')
+
 
