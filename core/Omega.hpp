@@ -115,6 +115,9 @@ class Omega: public Singleton<Omega>{
 		Real getRealTime();
 		time_duration getRealTime_duration();
 
+		// configuration directory used for logging config and possibly other things
+		std::string confDir;
+
 	DECLARE_LOGGER;
 
 	Omega(){ LOG_DEBUG("Constructing Omega."); }

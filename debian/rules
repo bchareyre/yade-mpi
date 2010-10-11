@@ -47,11 +47,9 @@ install: build
 	##TMP dh_clean -k 
 	dh_installdirs
 	## files VERSION and _VERSION contain snapshot version without/with leading '-' respectively (like svn1113 and -svn1113)
-	### WARNING: !!!! with jobs>1, fakeroot may hang; 2 workarounds:
-	###   (a) use fakeroot-tcp instead of fakeroot
-	###   (b) use just 1 job
 	#debug build
-	NO_SCONS_GET_RECENT= scons profile=default buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=1 jobs=1 features=vtk,gts,opengl,openmp,qt4 PREFIX=debian/yade${_VERSION}/usr variant='' optimize=0 march= debug=1 CPPPATH=/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2 QT4DIR=/usr/share/qt4
+	# the last argument specified that we only want files in lib installed -- common files (the executable) are already in the optimized package
+	NO_SCONS_GET_RECENT= scons profile=default buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=1 jobs=1 features=vtk,gts,opengl,openmp,qt4 PREFIX=debian/yade${_VERSION}-dbg/usr variant='' optimize=0 march= debug=1 CPPPATH=/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2 QT4DIR=/usr/share/qt4 debian/yade${_VERSION}-dbg/usr/lib
 	#optimized build
 	NO_SCONS_GET_RECENT= scons profile=default PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
 	#install platform-independent files (docs, scripts, examples)

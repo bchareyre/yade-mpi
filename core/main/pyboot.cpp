@@ -50,14 +50,14 @@
 #endif
 
 /* Initialize yade, loading given plugins */
-void yadeInitialize(python::list& pp){
+void yadeInitialize(python::list& pp, const std::string& confDir){
 
 	PyEval_InitThreads();
 
 	Omega& O(Omega::instance());
 	O.init();
 	O.origArgv=NULL; O.origArgc=0; // not needed, anyway
-	std::string confDir=string(getenv("HOME"))+"/.yade" SUFFIX;
+	O.confDir=confDir;
 	O.initTemps();
 	#ifdef YADE_DEBUG
 		ofstream gdbBatch;

@@ -1,7 +1,7 @@
 # syntax: python
 Import('*')
 
-pyMain='$PREFIX/bin/yade$SUFFIX_NODEBUG'
+pyMain='$PREFIX/bin/yade$SUFFIX'
 main=env.ScanReplace('main/main.py.in')
 batch=env.ScanReplace('main/yade-batch.in')
 env.AlwaysBuild(main)
@@ -14,16 +14,11 @@ env.AddPostAction(pyMain+'-batch',Chmod(pyMain+'-batch',0755))
 if 'execCheck' in env and env['execCheck']!=env.subst(pyMain):
 	raise RuntimeError('execCheck option (%s) does not match what is about to be installed (%s)'%(env['execCheck'],env.subst(pyMain)))
 
-env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
+env.Install('$LIBDIR/py/yade',[
 	env.SharedLibrary('boot',['main/pyboot.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-support','core'])
 ])
 
-# env.InstallAs('$PREFIX/bin/yade$SUFFIX-cxx',env.Program('yade',['main/main.cpp'],LIBS=env['LIBS']+['yade-support','core'],CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['version']+'\\"'),]))
-## remove old executable
-## might be removed in the future
-import os.path, os
-
-env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+env.Install('$LIBDIR/lib',[
 	env.SharedLibrary('core',
 		env.Combine('core.cpp',[
 			'Body.cpp',

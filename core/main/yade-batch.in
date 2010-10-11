@@ -9,9 +9,10 @@ import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil
 #socket.setdefaulttimeout(10) 
 
 ## replaced by scons automatically
-prefix,suffix,suffixNoDebug='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}','${SUFFIX_NODEBUG}'
-sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
-executable=os.path.join(prefix,'bin','yade'+suffixNoDebug)
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
+libDir=prefix+'/lib/yade'+suffix # run the batch always in non-debug mode (the spawned processes do honor debuggin flag, however)
+sys.path.append(os.path.join(libDir,'py'))
+executable=os.path.join(prefix,'bin','yade'+suffix)
 ## we just need this ...
 import yade, yade.utils, yade.config, yade.remote
 
@@ -281,8 +282,8 @@ logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=
 if opts.manpage:
 	import yade.manpage
 	yade.config.metadata['short_desc']='batch system for computational platform Yade'
-	yade.config.metadata['long_desc']='Manage batches of computation jobs for the Yade platform; batches are described using text-file tables with parameters which are passed to individual runs of yade. Jobs are being run with pre-defined number of computational cores as soon as the required number of cores is available. Logs of all computations are stored in files and the batch progress can be watched online at (usually) http://localhost:9080. Unless overridden, the executable yade%s is used to run jobs.'%(suffixNoDebug)
-	yade.manpage.generate_manpage(parser,yade.config.metadata,opts.manpage,section=1,seealso='yade%s (1)\n.br\nhttps://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch'%suffixNoDebug)
+	yade.config.metadata['long_desc']='Manage batches of computation jobs for the Yade platform; batches are described using text-file tables with parameters which are passed to individual runs of yade. Jobs are being run with pre-defined number of computational cores as soon as the required number of cores is available. Logs of all computations are stored in files and the batch progress can be watched online at (usually) http://localhost:9080. Unless overridden, the executable yade%s is used to run jobs.'%(suffix)
+	yade.manpage.generate_manpage(parser,yade.config.metadata,opts.manpage,section=1,seealso='yade%s (1)\n.br\nhttps://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch'%suffix)
 	print 'Manual page %s generated.'%opts.manpage
 	sys.exit(0)
 

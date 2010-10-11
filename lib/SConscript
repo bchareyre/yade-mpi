@@ -5,8 +5,7 @@ import os.path
 
 # will switch according to scons configuration to one or another
 def yadeStaticOrSharedLib(*args,**kw):
-	return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.SharedLibrary(*args,**kw))
-	#return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary(*args,**kw))
+	return env.Install('$LIBDIR/lib',env.SharedLibrary(*args,**kw))
 
 if 'opengl' in env['features']:
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','GLU']),

@@ -328,10 +328,10 @@ class DynLibDispatcher
 		
 
 		bool locateMultivirtualFunctor1D(int& index, shared_ptr<BaseClass1>& base) {
+			if(callBacks.empty()) return false;
 			index = base->getClassIndex();
 			assert( index >= 0 && (unsigned int)( index ) < callBacks.size());
-			if( callBacks[index] )
-				return true;
+			if(callBacks[index]) return true;
 			
 			int depth=1;
 			int index_tmp = base->getBaseClassIndex(depth);
@@ -361,6 +361,7 @@ class DynLibDispatcher
 		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2) {
 			//#define _DISP_TRACE(msg) cerr<<"@DT@"<<__LINE__<<" "<<msg<<endl;
 			#define _DISP_TRACE(msg)
+			if(callBacks.empty()) return false;
 			index1=base1->getClassIndex(); index2 = base2->getClassIndex();
 			assert(index1>=0); assert(index2>=0); 
 			assert((unsigned int)(index1)<callBacks.size()); assert((unsigned int)(index2)<callBacks[index1].size());

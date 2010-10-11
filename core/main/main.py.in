@@ -4,18 +4,19 @@
 
 import sys,os,os.path,time
 # get yade path (allow YADE_PREFIX to override)
-prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX_NODEBUG}'
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
 features,version='${features}'.split(','),'${realVersion}'
 
 ## find available builds
 nonDebugLibDir=prefix+'/lib/yade'+suffix
-hasDebug,hasNonDebug=os.path.exists(nonDebugLibDir+'/dbg/lib'),os.path.exists(nonDebugLibDir+'/lib')
-if not hasDebug and not hasNonDebug:
-	raise RuntimeError('Neither non-debug nor debug build found! ('+nonDebugLibDir+'/lib, '+nonDebugLibDir+'/dbg/lib)')
-elif hasDebug and hasNonDebug: buildsAvailable='both optimized and debug build'
+debugLibDir=nonDebugLibDir+'/dbg'
+hasDebug,hasNonDebug=os.path.exists(debugLibDir+'/lib'),os.path.exists(nonDebugLibDir+'/lib')
+if hasDebug and hasNonDebug: buildsAvailable='both non-debug and debug build'
 elif hasDebug and not hasNonDebug: buildsAvaible='debug build only'
-elif not hasDebug and hasNonDebug: buildsAvailable='optimized build only'
+elif not hasDebug and hasNonDebug: buildsAvailable='non-debug build only'
+else:
+	raise RuntimeError('Neither non-debug nor debug build found! ('+nonDebugLibDir+'/lib, '+debugLibDir+'/lib)')
 
 
 # handle command-line options first
@@ -42,7 +43,7 @@ if opts.rebuild:
 	import subprocess
 	# rebuild
 	sourceRoot,profile='${sourceRoot}','${profile}' # replaced at install-time
-	cmd=['scons','-Q','-C',sourceRoot,'profile=%s!'%profile,'debug=%d'%(1 if opts.debug else 0),'optimize=%d'%(0 if opts.debug else 1),'execCheck=%s'%(prefix+'/bin/yade'+suffix)]
+	cmd=['scons','-Q','-C',sourceRoot,'profile=%s!'%profile,'debug=%d'%(1 if opts.debug else 0),'execCheck=%s'%(prefix+'/bin/yade'+suffix)]
 	print 'Rebuilding yade using',' '.join(cmd)
 	if subprocess.call(cmd): raise RuntimeError('Error rebuilding Yade (--rebuild).')
 	# run ourselves
@@ -53,17 +54,18 @@ if opts.rebuild:
 if opts.debug:
 	if not hasDebug:
 		raise RuntimeError('Debug build not available with this installation (running with --rebuild might help)')
-	## fix the prefix, so that yade/__init__.py picks the right plugin files
-	suffix+='/dbg'
+	libDir=debugLibDir
+else:
+	libDir=nonDebugLibDir
 
-	## remove later
-	## python2.5 relative module imports workaround
-	v=sys.version_info
-	if v[0]==2 and v[1]<=5:
-		for submodule in ('yade','gts','yade/tests'):
-			sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py',submodule))
+## remove later
+## python2.5 relative module imports workaround
+v=sys.version_info
+if v[0]==2 and v[1]<=5:
+	for submodule in ('yade','gts','yade/tests'):
+		sys.path.append(os.path.join(libDir,'py',submodule))
 
-sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
+sys.path.append(os.path.join(libDir,'py'))
 
 # run regression test suite and exit
 if opts.test:

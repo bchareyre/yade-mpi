@@ -109,10 +109,10 @@ opts.AddVariables(
 	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
 	('PREFIX','Install path prefix','/usr/local'),
 	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.',None),
-	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten','' if profile=='default' else '-'+profile,None,lambda x:x),
+	('variant','Build variant, will be suffixed to all files, along with version.','' if profile=='default' else '-'+profile,None,lambda x:x),
 	BoolVariable('debug', 'Enable debugging information',0),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
-	BoolVariable('optimize','Turn on heavy optimizations',1),
+	('optimize','Turn on optimizations (-1, 0 or 1); negative value sets optimization based on debugging: not optimize with debugging and vice versa.',-1,None,int),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','qt4','never_use_this_one']),
@@ -147,6 +147,8 @@ if str(env['features'])=='all':
 if saveProfile: opts.Save(optsFile,env)
 # fix expansion in python substitution by assigning the right value if not specified
 if not env.has_key('runtimePREFIX') or not env['runtimePREFIX']: env['runtimePREFIX']=env['PREFIX']
+# set optimization based on debug, if required
+if env['optimize']<0: env['optimize']=not env['debug']
 
 # handle colon-separated lists:
 for k in ('CPPPATH','LIBPATH','QTDIR','PATH'):
@@ -185,11 +187,11 @@ import yadeSCons
 if not env.has_key('realVersion') or not env['realVersion']: env['realVersion']=yadeSCons.getRealVersion() or 'unknown' # unknown if nothing returned
 if not env.has_key('version'): env['version']=env['realVersion']
 
-env['SUFFIX_NODEBUG']='-'+env['version']+env['variant']
-env['SUFFIX']=env['SUFFIX_NODEBUG']+('' if not env['debug'] else '/dbg')
+env['SUFFIX']='-'+env['version']+env['variant']
+env['SUFFIX_DBG']=env['SUFFIX']+('' if not env['debug'] else '/dbg')
+env['LIBDIR']='$PREFIX/lib/yade$SUFFIX_DBG'
 print "Yade version is `%s' (%s), installed files will be suffixed with `%s'."%(env['version'],env['realVersion'],env['SUFFIX'])
-# make buildDir absolute, saves hassles later
-buildDir=os.path.abspath(env.subst('$buildPrefix/build$SUFFIX'))
+buildDir=os.path.abspath(env.subst('$buildPrefix/build$SUFFIX_DBG'))
 print "All intermediary files will be in `%s'."%env.subst(buildDir)
 env['buildDir']=buildDir
 # these MUST be first so that builddir's headers are read before any locally installed ones
@@ -362,12 +364,12 @@ if not env.GetOption('clean'):
 			env.EnableQt4Modules(['QtGui','QtCore','QtXml','QtOpenGL'])
 			if not conf.TryAction(env.Action('pyrcc4'),'','qrc'): featureNotOK('qt4','The pyrcc4 program is not operational (package pyqt4-dev-tools)')
 			if not conf.TryAction(env.Action('pyuic4'),'','ui'): featureNotOK('qt4','The pyuic4 program is not operational (package pyqt4-dev-tools)')
-			ok=conf.CheckLibWithHeader(['qglviewer-qt4'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1)
-			okFedora=conf.CheckLibWithHeader(['libQGLViewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1)
-			if not (ok or okFedora): featureNotOK('opengl','Building with Qt4 implies the QGLViewer library installed (package libqglviewer-qt4-dev package in debian/ubuntu or libQGLViewer in RPM-based distros)')
-			if ok: env['QGLVIEWER_LIB']='qglviewer-qt4';
-			if okFedora: env['QGLVIEWER_LIB']='libQGLViewer';
-			
+			if conf.CheckLibWithHeader(['qglviewer-qt4'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1):
+				env['QGLVIEWER_LIB']='qglviewer-qt4'
+			elif conf.CheckLibWithHeader(['libQGLViewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1):
+				env['QGLVIEWER_LIB']='libQGLViewer'
+			else: featureNotOK('qt4','Building with Qt4 implies the QGLViewer library installed (package libqglviewer-qt4-dev package in debian/ubuntu, libQGLViewer in RPM-based distributions)')
+
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
@@ -434,15 +436,13 @@ env['PREFIX']=os.path.abspath(env['PREFIX'])
 
 libDirs=('extra','gui','lib','py','plugins')
 # where are we going to be installed... pkg/dem becomes pkg-dem
-instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x) for x in libDirs]
+instLibDirs=[os.path.join('$LIBDIR',x) for x in libDirs]
 ## runtime library search directories; there can be up to 2 levels of libs, so we do in in quite a crude way here:
 ## FIXME: use syntax as shown here: http://www.scons.org/wiki/UsingOrigin
-relLibDirs=['../'+x for x in libDirs]+['../../'+x for x in libDirs]+[env.subst('../lib/yade$SUFFIX/lib')]
+relLibDirs=['../'+x for x in libDirs]+['../../'+x for x in libDirs]+[env.subst('../lib/yade$SUFFIX_DBG/lib')]
 runtimeLibDirs=[env.Literal('\\$$ORIGIN/'+x) for x in relLibDirs]
-#runtimeLibDirs=[os.path.join(r"'$$$$ORIGIN'/../",x) for x in libDirs]+[os.path.join(r"'$$$$ORIGIN'/../../",x) for x in libDirs]+["'$$$$ORIGIN'/../lib/yade$SUFFIX/lib"]
 
 ### PREPROCESSOR FLAGS
-env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"')])
 if env['QUAD_PRECISION']: env.Append(CPPDEFINES='QUAD_PRECISION')
 
 ### COMPILER
@@ -626,7 +626,7 @@ else:
 ## to know what should be installed overall.
 if not COMMAND_LINE_TARGETS:
 	toInstall=set([str(node) for node in env.FindInstalledFiles()])
-	for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
+	for root,dirs,files in os.walk(env.subst('$LIBDIR')):
 		# do not go inside the debug directly, plugins are different there
 		for f in files:
 			# skip debug files, if in the non-debug build

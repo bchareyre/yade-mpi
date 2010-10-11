@@ -153,9 +153,9 @@ def buildPluginLibs(env,plugInfo):
 			# thanks to http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python :
 			else: srcs=[env.CombineWrapper('$buildDir/'+obj+'%d.cpp'%j,srcs[i:i+chunkSize]) for j,i in enumerate(range(0,len(srcs),chunkSize))]
 		#if linkStrategy!='static':
-		env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.SharedLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
+		env.Install('$LIBDIR/plugins',env.SharedLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
 		#else:
-		#	env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.StaticLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
+		#	env.Install('$LIBDIR/plugins',env.StaticLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
 	
 
 	

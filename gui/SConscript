@@ -3,7 +3,7 @@ Import('*')
 linkPlugins=env['linkPlugins']
 
 if 'qt4' in env['features']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/qt',[
+	env.Install('$LIBDIR/py/yade/qt',[
 		env.File('qt4/img_rc.py'),
 		env.File('qt4/ui_controller.py'),
 		env.File('qt4/SerializableEditor.py'),
