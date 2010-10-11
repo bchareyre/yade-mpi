@@ -31,6 +31,7 @@ void CohesiveFrictionalContactLaw::action()
 	functor->twist_creep=twist_creep;
 	functor->creep_viscosity = creep_viscosity;
 	functor->scene=scene;
+	functor->momentRotationLaw=momentRotationLaw;
 	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
@@ -53,7 +54,6 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<IGeom>& ig, shared_p
 	Body* b2 = Body::byId(id2,scene).get();
 	ScGeom* currentContactGeometry  = YADE_CAST<ScGeom*> (ig.get());
 	CohFrictPhys* currentContactPhysics = YADE_CAST<CohFrictPhys*> (ip.get());
-
 	Vector3r& shearForce    = currentContactPhysics->shearForce;
 
 	if (contact->isFresh(scene)) shearForce   = Vector3r::Zero();
