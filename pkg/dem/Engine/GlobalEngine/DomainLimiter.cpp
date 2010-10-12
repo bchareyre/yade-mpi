@@ -123,20 +123,35 @@ void LawTester::action(){
 		int sign=(i==0?-1:1);
 		Real weight=(i==0?1-idWeight:idWeight);
 		Real radius=(i==0?gsc->refR1:gsc->refR2);
+		// signed and weighted displacement to be applied on this sphere (reversed for #0)
+		// some rotations must cancel the sign, by multiplying by sign again
 		Vector3r diff=sign*valDiff*weight;
 
 		// normal displacement
+
 		vel[i]=axX*diff[0]/scene->dt;
-		// shear rotation: angle
-		Real rotZ=rotWeight*diff[1]/radius, rotY=rotWeight*diff[2]/radius;
+
+		// shear rotation
+
+		//   multiplication by sign cancels sign in diff, since rotation is non-symmetric (to increase shear, both spheres have the same rotation)
+		//   (unlike shear displacement, which is symmetric)
+		// rotation around Z (which gives y-shear) must be inverted: +ry gives +εzm while -rz gives +εy
+		Real rotZ=-sign*rotWeight*diff[1]/radius, rotY=sign*rotWeight*diff[2]/radius;
 		angVel[i]=(rotY*axY+rotZ*axZ)/scene->dt;
+
 		// shear displacement
-		//Real arcAngleY=atan(weight*(1-rotWeight)*sign*valDiff[1]/radius), arcAngleZ=atan(weight*(1-rotWeight)*sign*valDiff[2]/radius);
-		Real arcAngleY=(1-rotWeight)*diff[1]/radius, arcAngleZ=(1-rotWeight)*diff[2]/radius;
-		//Real arcAngleY=arcLenY/radius, arcAngleZ=arcLenZ/radius;
+
+		// angle that is traversed by a sphere in order to give desired diff when displaced on the branch of r1+r2
+		// FIXME: is the branch value correct here?!
+		Real arcAngleY=atan((1-rotWeight)*diff[1]/radius), arcAngleZ=atan((1-rotWeight)*diff[2]/radius);
+		// same, but without the atan, which can be disregarded for small increments:
+		//    Real arcAngleY=(1-rotWeight)*diff[1]/radius, arcAngleZ=(1-rotWeight)*diff[2]/radius; 
 		vel[i]+=axY*radius*sin(arcAngleY)/scene->dt; vel[i]+=axZ*radius*sin(arcAngleZ)/scene->dt;
+
 		// compensate distance increase caused by motion along the perpendicular axis
-		vel[i]-=sign*axX*.5*radius*((1-cos(arcAngleY))+(1-cos(arcAngleZ)))/scene->dt;
+		// cos(argAngle*) is always positive, regardless of the orientation
+		// and the compensation is always in the -εx sense (-sign → +1 for #0, -1 for #1)
+		vel[i]+=-sign*axX*radius*((1-cos(arcAngleY))+(1-cos(arcAngleZ)))/scene->dt;
 
 		LOG_DEBUG("vel="<<vel[i]<<", angVel="<<angVel[i]<<", rotY,rotZ="<<rotY<<","<<rotZ<<", arcAngle="<<arcAngleY<<","<<arcAngleZ<<", sign="<<sign<<", weight="<<weight);
 
@@ -169,6 +184,9 @@ void LawTester::action(){
 CREATE_LOGGER(GlExtra_LawTester);
 
 void GlExtra_LawTester::render(){
+	// scene object changed (after reload, for instance), for re-initialization
+	if(tester && tester->scene!=scene) tester=shared_ptr<LawTester>();
+
 	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
 
@@ -180,16 +198,18 @@ void GlExtra_LawTester::render(){
 	glMultMatrixd(Eigen::Transform3d(tester->trsf).data());
 
 
-	//glEnable(GL_LIGHTING); 
+	glDisable(GL_LIGHTING); 
 	//glColor3v(Vector3r(1,0,1));
 	//glBegin(GL_LINES); glVertex3v(Vector3r::Zero()); glVertex3v(.1*Vector3r::Ones()); glEnd(); 
 	//GLUtils::GLDrawText(string("This is the contact point!"),Vector3r::Zero(),Vector3r(1,0,1));
 
 	// local axes
 	glLineWidth(2.);
-	GLUtils::GLDrawLine(Vector3r::Zero(),.5*tester->renderLength*Vector3r::UnitX(),Vector3r(1,.3,.3));
-	GLUtils::GLDrawLine(Vector3r::Zero(),.5*tester->renderLength*Vector3r::UnitY(),Vector3r(.3,1,.3));
-	GLUtils::GLDrawLine(Vector3r::Zero(),.5*tester->renderLength*Vector3r::UnitZ(),Vector3r(.3,.3,1));
+	for(int i=0; i<3; i++){
+		Vector3r pt=Vector3r::Zero(); pt[i]=.5*tester->renderLength; Vector3r color=.3*Vector3r::Ones(); color[i]=1;
+		GLUtils::GLDrawLine(Vector3r::Zero(),pt,color);
+		GLUtils::GLDrawText(string(i==0?"x":(i==1?"y":"z")),pt,color);
+	}
 
 	// put the origin to the initial (no-shear) point, so that the current point appears at the contact point
 	glTranslatev(Vector3r(0,tester->ptOurs[1],tester->ptOurs[2]));
@@ -197,7 +217,7 @@ void GlExtra_LawTester::render(){
 
 	const int t(tester->step); const vector<int>& TT(tester->_pathT); const vector<Vector3r>& VV(tester->_pathV);
 	size_t numSegments=TT.size();
-	const Vector3r colorBefore=Vector3r(.5,1,.5), colorAfter=Vector3r(1,.5,.5);
+	const Vector3r colorBefore=Vector3r(.7,1,.7), colorAfter=Vector3r(1,.7,.7);
 
 	// scale displacement, if they have the strain meaning
 	Real scale=1;

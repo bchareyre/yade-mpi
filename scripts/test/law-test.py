@@ -20,15 +20,16 @@ r1,r2=.1,.2
 # place sphere 1 at the origin
 pt1=Vector3(0,0,0)
 # random orientation of the interaction
-# normal=Vector3(random.random()-.5,random.random()-.5,random.random()-.5)
-normal=Vector3(1,0,0)
+normal=Vector3(random.random()-.5,random.random()-.5,random.random()-.5)
+#normal=Vector3(1,0,0)
 O.bodies.append([
-	utils.sphere(pt1,r1,wire=True,color=(.5,.5,.5)),
-	utils.sphere(pt1+.999999*(r1+r2)*normal.normalized(),r2,wire=True,color=(.5,.5,.5))
+	utils.sphere(pt1,r1,wire=True,color=(.7,.7,.7)),
+	utils.sphere(pt1+.999999*(r1+r2)*normal.normalized(),r2,wire=True,color=(0,0,0))
 ])
 
 O.engines=[
 	ForceResetter(),
+	PyRunner(iterPeriod=1,command='import time; time.sleep(.01)'),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom()],
@@ -36,10 +37,10 @@ O.engines=[
 		[Law2_ScGeom_FrictPhys_Basic()]
 	),
 	LawTester(ids=[0,1],path=[
-		(-.1,0,0),(-.1,.1,0),(0,.1,0), # towards, shear, back to intial normal distance
+		(-.1,0,0),(-.1,.1,0),(-1e-5,.1,0), # towards, shear, back to intial normal distance
 		(-.02,.1,.1),(-.02,-.1,.1),(-.02,-.1,-.1),(-.02,.1,-.1),(-.02,.1,.1), # go in square in the shear plane without changing normal deformation
-		(0,0,0) # back to the origin
-		],pathSteps=[5000],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=1,idWeight=1),
+		(-1e-4,0,0) # back to the origin, but keep some overlap to not delete the interaction
+		],pathSteps=[50],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=.2,idWeight=.2),
 	PyRunner(iterPeriod=1,command='addPlotData()'),
 	NewtonIntegrator()
 ]
