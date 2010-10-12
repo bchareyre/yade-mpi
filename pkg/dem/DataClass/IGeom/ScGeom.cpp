@@ -73,3 +73,12 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, b
 	//Just pass null shift to the periodic version
 	return getIncidentVel(rbp1,rbp2,dt,Vector3r::Zero(),avoidGranularRatcheting);
 }
+
+Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranularRatcheting){
+	if(i->geom.get()!=this) throw invalid_argument("ScGeom object is not the same as Interaction.geom.");
+	Scene* scene=Omega::instance().getScene().get();
+	return getIncidentVel(Body::byId(i->getId1(),scene)->state.get(),Body::byId(i->getId2(),scene)->state.get(),
+		scene->dt,
+		scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*i->cellDist.cast<Real>()) : Vector3r::Zero(),
+		avoidGranularRatcheting);
+}

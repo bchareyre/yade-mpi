@@ -125,7 +125,8 @@ opts.AddVariables(
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2:/usr/include/vtk'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
-	('libstdcxx','Specify libstdc++ location by hand (opened dynamically at startup); only needed when compiling with clang',None),
+	('libstdcxx','Specify libstdc++ location by hand (opened dynamically at startup), usually not needed',None),
+	('QT4CXX','Specify a different compiler for files including qt4; this is necessary for older qt version (<=4.7) which don\'t compile with clang',None),
 	('QT4DIR','Directory where Qt4 is installed','/usr/share/qt4'),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
 	('CXX','The c++ compiler','g++'),
@@ -262,8 +263,11 @@ def CheckLibStdCxx(context):
 		l=context.env['libstdcxx']
 		context.Result(l+' (specified by the user)')
 		return l
-	ret=os.popen(context.env['CXX']+' -print-file-name=libstdc++.so').readlines()[0][:-1]
-	context.env['libstdcxx']=ret
+	ret=os.popen(context.env['CXX']+' -print-file-name=libstdc++.so.6').readlines()[0][:-1]
+	if ret[0]!='/':
+		context.Result('Relative path "%s" was given by compiler %s, must specify libstdcxx=.. explicitly.'%(ret,context.env['CXX']))
+		Exit(1)
+	context.env['libstdcxx']=os.path.abspath(ret) # removes .. in g++ path
 	context.Result(ret)
 	return ret
 
@@ -369,7 +373,6 @@ if not env.GetOption('clean'):
 			elif conf.CheckLibWithHeader(['libQGLViewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1):
 				env['QGLVIEWER_LIB']='libQGLViewer'
 			else: featureNotOK('qt4','Building with Qt4 implies the QGLViewer library installed (package libqglviewer-qt4-dev package in debian/ubuntu, libQGLViewer in RPM-based distributions)')
-
 	if 'vtk' in env['features']:
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
@@ -464,6 +467,12 @@ env.Prepend(CXXFLAGS=['-pipe','-Wall'])
 
 if env['PGO']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
 if env['PGO']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
+
+if 'clang' in env['CXX']:
+	print 'Probably using clang to compile, adding -Wno-unused-variable -Wno-mismatched-tags -Wno-constant-logical-operand -Qunused-arguments'
+	env.Append(CXXFLAGS=['-Wno-unused-variable','-Wno-mismatched-tags','-Wno-constant-logical-operand','-Qunused-arguments'])
+	if 'openmp' in env['features']: print 'WARNING: building with clang and OpenMP, expect errors!'
+
 
 ### LINKER
 ## libs for all plugins
