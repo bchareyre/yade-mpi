@@ -13,7 +13,7 @@
 #
 from yade import utils,plot
 import random, yade.log
-yade.log.setLevel('LawTester',yade.log.TRACE)
+#yade.log.setLevel('LawTester',yade.log.TRACE)
 
 # sphere's radii
 r1,r2=.1,.2
@@ -23,8 +23,8 @@ pt1=Vector3(0,0,0)
 # normal=Vector3(random.random()-.5,random.random()-.5,random.random()-.5)
 normal=Vector3(1,0,0)
 O.bodies.append([
-	utils.sphere(pt1,r1,wire=True),
-	utils.sphere(pt1+.999999*(r1+r2)*normal.normalized(),r2,wire=True)
+	utils.sphere(pt1,r1,wire=True,color=(.5,.5,.5)),
+	utils.sphere(pt1+.999999*(r1+r2)*normal.normalized(),r2,wire=True,color=(.5,.5,.5))
 ])
 
 O.engines=[
@@ -36,10 +36,10 @@ O.engines=[
 		[Law2_ScGeom_FrictPhys_Basic()]
 	),
 	LawTester(ids=[0,1],path=[
-		#(-.1,0,0),(-.1,.1,0) #,(-.1,0,.1)
 		(-.1,0,0),(-.1,.1,0),(0,.1,0), # towards, shear, back to intial normal distance
-		(-.02,.1,.1),(-.02,-.1,.1),(-.02,-.1,-.1),(-.02,.1,-.1),(-.02,.1,.1) # go in square in the shear plane without changing normal deformation
-		],pathSteps=[10],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=1,idWeight=1),
+		(-.02,.1,.1),(-.02,-.1,.1),(-.02,-.1,-.1),(-.02,.1,-.1),(-.02,.1,.1), # go in square in the shear plane without changing normal deformation
+		(0,0,0) # back to the origin
+		],pathSteps=[5000],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=1,idWeight=1),
 	PyRunner(iterPeriod=1,command='addPlotData()'),
 	NewtonIntegrator()
 ]
@@ -56,7 +56,7 @@ try:
 	rr=qt.Renderer()
 	rr.extraDrawers=[GlExtra_LawTester()]
 except ImportError: pass
-O.dt=1e2
+O.dt=1
 
 O.saveTmp()
 O.run()

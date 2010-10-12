@@ -1,4 +1,5 @@
 #include<yade/pkg-dem/DomainLimiter.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 YADE_PLUGIN((DomainLimiter)(LawTester)
 	#ifdef YADE_OPENGL
@@ -85,6 +86,7 @@ void LawTester::action(){
 		axZ=axX.cross(axY);
 		LOG_DEBUG("Initial axes x="<<axX<<", y="<<axY<<", z="<<axZ);
 		renderLength=.5*(gsc->refR1+gsc->refR2);
+		refLength=gsc->refR1+gsc->refR2;
 	} else { // udpate of an existing interaction
 		if(scGeom){
 			scGeom->rotate(axY); scGeom->rotate(axZ);
@@ -169,36 +171,64 @@ CREATE_LOGGER(GlExtra_LawTester);
 void GlExtra_LawTester::render(){
 	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
+
 	//if(tester->renderLength<=0) return;
 	glColor3v(Vector3r(1,0,1));
 
-	glLineWidth(2.0f);
-	glEnable(GL_LINE_SMOOTH);
-	glLoadIdentity();
-
+	// switch to local coordinates
 	glTranslatev(tester->contPt);
+	glMultMatrixd(Eigen::Transform3d(tester->trsf).data());
 
-	glBegin(GL_LINES); glVertex3v(Vector3r::Zero()); glVertex3v(.1*Vector3r::Ones()); glEnd(); 
-	GLUtils::GLDrawText(string("This is the contact point!"),Vector3r::Zero(),Vector3r(1,0,1));
 
-	cerr<<".";
+	//glEnable(GL_LIGHTING); 
+	//glColor3v(Vector3r(1,0,1));
+	//glBegin(GL_LINES); glVertex3v(Vector3r::Zero()); glVertex3v(.1*Vector3r::Ones()); glEnd(); 
+	//GLUtils::GLDrawText(string("This is the contact point!"),Vector3r::Zero(),Vector3r(1,0,1));
 
-	glBegin(GL_LINES);
-		glVertex3v(Vector3r::Zero());
-		glVertex3v(tester->renderLength*tester->axX);
-		glVertex3v(Vector3r::Zero());
-		glVertex3v(tester->renderLength*tester->axY);
-		glVertex3v(Vector3r::Zero());
-		glVertex3v(tester->renderLength*tester->axZ);
-		glVertex3v(Vector3r::Zero());
-		glVertex3v(tester->ptOurs);
-	glEnd();
-	#if 1
-	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->renderLength*tester->axX,Vector3r(1,0,0));
-	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->renderLength*tester->axY,Vector3r(0,1,0));
-	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->renderLength*tester->axZ,Vector3r(0,0,1));
-	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->ptOurs,Vector3r(1,1,0));
-	GLUtils::GLDrawArrow(Vector3r::Zero(),Vector3r::Ones(),Vector3r(.5,.5,1));
-	#endif
+	// local axes
+	glLineWidth(2.);
+	GLUtils::GLDrawLine(Vector3r::Zero(),.5*tester->renderLength*Vector3r::UnitX(),Vector3r(1,.3,.3));
+	GLUtils::GLDrawLine(Vector3r::Zero(),.5*tester->renderLength*Vector3r::UnitY(),Vector3r(.3,1,.3));
+	GLUtils::GLDrawLine(Vector3r::Zero(),.5*tester->renderLength*Vector3r::UnitZ(),Vector3r(.3,.3,1));
+
+	// put the origin to the initial (no-shear) point, so that the current point appears at the contact point
+	glTranslatev(Vector3r(0,tester->ptOurs[1],tester->ptOurs[2]));
+
+
+	const int t(tester->step); const vector<int>& TT(tester->_pathT); const vector<Vector3r>& VV(tester->_pathV);
+	size_t numSegments=TT.size();
+	const Vector3r colorBefore=Vector3r(.5,1,.5), colorAfter=Vector3r(1,.5,.5);
+
+	// scale displacement, if they have the strain meaning
+	Real scale=1;
+	if(tester->displIsRel) scale=tester->refLength;
+
+	// find maximum displacement, draw axes in the shear plane
+	Real displMax=0;
+	FOREACH(const Vector3r& v, VV) displMax=max(v.squaredNorm(),displMax);
+	displMax=1.2*scale*sqrt(displMax);
+
+	glLineWidth(1.);
+	GLUtils::GLDrawLine(Vector3r(0,-displMax,0),Vector3r(0,displMax,0),Vector3r(.5,0,0));
+	GLUtils::GLDrawLine(Vector3r(0,0,-displMax),Vector3r(0,0,displMax),Vector3r(.5,0,0));
+
+	// draw path
+	glLineWidth(4.);
+	for(size_t segment=0; segment<numSegments-1; segment++){
+		// different colors before and after the current point
+		Real t0=TT[segment],t1=TT[segment+1];
+		const Vector3r &from=-VV[segment]*scale, &to=-VV[segment+1]*scale;
+		// current segment
+		if(t>t0 && t<t1){
+			Real norm=(t-t0)/(t1-t0);
+			GLUtils::GLDrawLine(from,from+(to-from)*norm,colorBefore);
+			GLUtils::GLDrawLine(from+(to-from)*norm,to,colorAfter);
+		} else {	// other segment
+			GLUtils::GLDrawLine(from,to,t<t0?colorAfter:colorBefore);
+		}
+	}
+
+	glLineWidth(1.);
 }
-#endif
+
+#endif /* YADE_OPENGL */
