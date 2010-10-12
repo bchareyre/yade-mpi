@@ -13,7 +13,7 @@ nonDebugLibDir=prefix+'/lib/yade'+suffix
 debugLibDir=nonDebugLibDir+'/dbg'
 hasDebug,hasNonDebug=os.path.exists(debugLibDir+'/lib'),os.path.exists(nonDebugLibDir+'/lib')
 if hasDebug and hasNonDebug: buildsAvailable='both non-debug and debug build'
-elif hasDebug and not hasNonDebug: buildsAvaible='debug build only'
+elif hasDebug and not hasNonDebug: buildsAvailable='debug build only'
 elif not hasDebug and hasNonDebug: buildsAvailable='non-debug build only'
 else:
 	raise RuntimeError('Neither non-debug nor debug build found! ('+nonDebugLibDir+'/lib, '+debugLibDir+'/lib)')
