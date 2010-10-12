@@ -89,7 +89,7 @@ void LawTester::action(){
 		if(scGeom){
 			scGeom->rotate(axY); scGeom->rotate(axZ);
 			scGeom->rotate(shearTot);
-			shearTot-=scGeom->shearIncrement();
+			shearTot+=scGeom->shearIncrement();
 			ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
 		}
 		else{ // d3dGeom
@@ -103,30 +103,57 @@ void LawTester::action(){
 	trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
 	trsfQ=Quaternionr(trsf);
 	contPt=gsc->contactPoint;
+	Real refLength=gsc->refR1+gsc->refR2;
 	
 	// here we go ahead, finally
 	Vector3r val=linearInterpolate<Vector3r,int>(step,_pathT,_pathV,_interpPos);
 	Vector3r valDiff=val-prevVal; prevVal=val;
-	if(pathIsRel){
+	if(displIsRel){
 		LOG_DEBUG("Relative diff is "<<valDiff<<" (will be normalized by "<<gsc->refR1+gsc->refR2<<")");
-		valDiff*=gsc->refR1+gsc->refR2;
+		valDiff*=refLength;
 	}
 	LOG_DEBUG("Absolute diff is "<<valDiff);
 	ptOurs+=valDiff;
 
-	#if 0
-		// we compute displacement for the 2nd particles; cff1 and cff2 determine how to apply it on both particles, depending on sense:
-		// 0 is the symmetric case (-.5,.5); -1 applies only to the first particle, i.e. (-1,0), +1 only to the second one (0,+1)
-		Real r1_r2=gsc->radius1/gsc->radius2; // ratio of radii
-		Real cff1=(sense<0?-1:(sense>0?0:-.5)), cff2=(sense<0?0:(sense<0?0:.5));
-	#endif
 	// shear is applied as rotation of id2: dε=r₁dθ → dθ=dε/r₁;
-	Real rot2y=valDiff[1]/gsc->refR2, rot2z=valDiff[2]/gsc->refR2;
-	Vector3r angVel2=(rot2y*axY+rot2z*axZ)/scene->dt;
-	Vector3r linVel2=axX*valDiff[0]/scene->dt;
-	state2->angVel=angVel2;
-	state2->vel=linVel2;
-	LOG_DEBUG("Body #"<<id2<<", setting vel="<<linVel2<<", angVel="<<angVel2);
+	Vector3r vel[2],angVel[2];
+	for(int i=0; i<2; i++){
+		int sign=(i==0?-1:1);
+		Real weight=(i==0?1-idWeight:idWeight);
+		Real radius=(i==0?gsc->refR1:gsc->refR2);
+		Vector3r diff=sign*valDiff*weight;
+
+		// normal displacement
+		vel[i]=axX*diff[0]/scene->dt;
+		// shear rotation: angle
+		Real rotZ=rotWeight*diff[1]/radius, rotY=rotWeight*diff[2]/radius;
+		angVel[i]=(rotY*axY+rotZ*axZ)/scene->dt;
+		// shear displacement
+		//Real arcAngleY=atan(weight*(1-rotWeight)*sign*valDiff[1]/radius), arcAngleZ=atan(weight*(1-rotWeight)*sign*valDiff[2]/radius);
+		Real arcAngleY=(1-rotWeight)*diff[1]/radius, arcAngleZ=(1-rotWeight)*diff[2]/radius;
+		//Real arcAngleY=arcLenY/radius, arcAngleZ=arcLenZ/radius;
+		vel[i]+=axY*radius*sin(arcAngleY)/scene->dt; vel[i]+=axZ*radius*sin(arcAngleZ)/scene->dt;
+		// compensate distance increase caused by motion along the perpendicular axis
+		vel[i]-=sign*axX*.5*radius*((1-cos(arcAngleY))+(1-cos(arcAngleZ)))/scene->dt;
+
+		LOG_DEBUG("vel="<<vel[i]<<", angVel="<<angVel[i]<<", rotY,rotZ="<<rotY<<","<<rotZ<<", arcAngle="<<arcAngleY<<","<<arcAngleZ<<", sign="<<sign<<", weight="<<weight);
+
+		//Vector3r vel=(rotY*axY+rotZ*axZ)/scene->dt;
+		//Vector3r linVel=axX*valDiff[0]/scene->dt;
+	}
+	state1->vel=vel[0]; state1->angVel=angVel[0];
+	state2->vel=vel[1]; state2->angVel=angVel[1];
+	LOG_DEBUG("Body #"<<id1<<", setting vel="<<vel[0]<<", angVel="<<angVel[0]);
+	LOG_DEBUG("Body #"<<id2<<", setting vel="<<vel[1]<<", angVel="<<angVel[1]);
+
+	#if 0
+		Real rot2y=valDiff[1]/gsc->refR2, rot2z=valDiff[2]/gsc->refR2;
+		Vector3r angVel2=(rot2y*axY+rot2z*axZ)/scene->dt;
+		Vector3r linVel2=axX*valDiff[0]/scene->dt;
+		state2->angVel=angVel2;
+		state2->vel=linVel2;
+		LOG_DEBUG("Body #"<<id2<<", setting vel="<<linVel2<<", angVel="<<angVel2);
+	#endif
 
 	step++;
 }
@@ -143,26 +170,34 @@ void GlExtra_LawTester::render(){
 	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
 	//if(tester->renderLength<=0) return;
-	glColor3v(Vector3r(0,1,0));
+	glColor3v(Vector3r(1,0,1));
+
+	glLineWidth(2.0f);
+	glEnable(GL_LINE_SMOOTH);
+	glLoadIdentity();
+
+	glTranslatev(tester->contPt);
+
 	glBegin(GL_LINES); glVertex3v(Vector3r::Zero()); glVertex3v(.1*Vector3r::Ones()); glEnd(); 
-	//cerr<<".";
-	return; 
+	GLUtils::GLDrawText(string("This is the contact point!"),Vector3r::Zero(),Vector3r(1,0,1));
+
+	cerr<<".";
 
 	glBegin(GL_LINES);
-		glVertex3v(tester->contPt);
-		glVertex3v(tester->contPt+tester->renderLength*tester->axX);
-		glVertex3v(tester->contPt);
-		glVertex3v(tester->contPt+tester->renderLength*tester->axY);
-		glVertex3v(tester->contPt);
-		glVertex3v(tester->contPt+tester->renderLength*tester->axZ);
-		glVertex3v(tester->contPt);
-		glVertex3v(tester->contPt+tester->ptOurs);
+		glVertex3v(Vector3r::Zero());
+		glVertex3v(tester->renderLength*tester->axX);
+		glVertex3v(Vector3r::Zero());
+		glVertex3v(tester->renderLength*tester->axY);
+		glVertex3v(Vector3r::Zero());
+		glVertex3v(tester->renderLength*tester->axZ);
+		glVertex3v(Vector3r::Zero());
+		glVertex3v(tester->ptOurs);
 	glEnd();
-	#if 0
-	GLUtils::GLDrawArrow(tester->contPt,tester->contPt+tester->renderLength*tester->axX,Vector3r(1,0,0));
-	GLUtils::GLDrawArrow(tester->contPt,tester->contPt+tester->renderLength*tester->axY,Vector3r(0,1,0));
-	GLUtils::GLDrawArrow(tester->contPt,tester->contPt+tester->renderLength*tester->axZ,Vector3r(0,0,1));
-	GLUtils::GLDrawArrow(tester->contPt,tester->contPt+tester->ptOurs,Vector3r(1,1,0));
+	#if 1
+	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->renderLength*tester->axX,Vector3r(1,0,0));
+	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->renderLength*tester->axY,Vector3r(0,1,0));
+	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->renderLength*tester->axZ,Vector3r(0,0,1));
+	GLUtils::GLDrawArrow(Vector3r::Zero(),tester->contPt+tester->ptOurs,Vector3r(1,1,0));
 	GLUtils::GLDrawArrow(Vector3r::Zero(),Vector3r::Ones(),Vector3r(.5,.5,1));
 	#endif
 }

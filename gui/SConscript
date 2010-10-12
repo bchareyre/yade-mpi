@@ -2,6 +2,8 @@
 Import('*')
 linkPlugins=env['linkPlugins']
 
+haveQt4Cxx=('QT4CXX' in env and env['QT4CXX'])
+
 if 'qt4' in env['features']:
 	env.Install('$LIBDIR/py/yade/qt',[
 		env.File('qt4/img_rc.py'),
@@ -9,7 +11,7 @@ if 'qt4' in env['features']:
 		env.File('qt4/SerializableEditor.py'),
 		env.File('qt4/Inspector.py'),
 		env.File('qt4/__init__.py'),
-		env.SharedLibrary('_GLViewer',['qt4/GLViewer.cpp','qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['PeriodicEngines']),RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')],CXX=env['QT4CXX'] if env['QT4CXX'] else env['CXX'],CXXFLAGS=[f for f in env['CXXFLAGS'] if not f.startswith('-Q')])
+		env.SharedLibrary('_GLViewer',['qt4/GLViewer.cpp','qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['PeriodicEngines']),RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')],CXX=env['QT4CXX'] if haveQt4Cxx else env['CXX'],CXXFLAGS=[f for f in env['CXXFLAGS'] if not f.startswith('-Q')] if haveQt4Cxx else env['CXXFLAGS'])
 	])
 	env.Command('qt4/img_rc.py','qt4/img.qrc','pyrcc4 -o $buildDir/gui/qt4/img_rc.py gui/qt4/img.qrc')
 	env.Command('qt4/ui_controller.py','qt4/controller.ui','pyuic4 -o $buildDir/gui/qt4/ui_controller.py gui/qt4/controller.ui')

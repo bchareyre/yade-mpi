@@ -25,7 +25,7 @@ class LawTester: public PartialEngine{
 		((Vector3r,ptOurs,Vector3r::Zero(),,"Current absolute configuration -- computed by ourselves from applied increments; should correspond to posTot."))
 		((Vector3r,shearTot,Vector3r::Zero(),,"Current total shear, in global coordinates (computed differently for :yref:`ScGeom` and :yref:`Dem3DofGeom`)."))
 		((Vector3r,ptGeom,Vector3r::Zero(),,"Current absolute configuration, in local coordinates; computed from *shearTot*, indirectly  from :yref:`IGeom`. |yupdate|"))
-		((bool,pathIsRel,true,,"Whether values in *path* are normalized by contact length."))
+		((bool,displIsRel,true,,"Whether displacement values in *path* are normalized by reference contact length (r1+r2 for 2 spheres)."))
 		((vector<int>,pathSteps,((void)"(constant step)",vector<int>(1,1)),Attr::triggerPostLoad,"Step number for corresponding values in :yref:`path<LawTester.path>`; if shorter than path, distance between last 2 values is used for the rest."))
 		((vector<int>,_pathT,,(Attr::readonly|Attr::noSave),"Time value corresponding to points on path, computed from *pathSteps*. Length is always the same as path."))
 		((vector<Vector3r>,_pathV,,(Attr::readonly|Attr::noSave),"Path values, computed from *path* by appending zero initial value."))
@@ -41,9 +41,8 @@ class LawTester: public PartialEngine{
 		((string,doneHook,,,"Python command (as string) to run when end of the path is achieved. If empty, the engine will be set :yref:`dead<Engine.dead>`."))
 		((Real,renderLength,0,,"Characteristic length for the purposes of rendering, set equal to the smaller radius."))
 		((Vector3r,contPt,Vector3r::Zero(),,"Contact point (for rendering only)"))
-		//((int,sense,1,,"Determines what particle is moved: negative for id1, positive for id2, 0 for both."))
-		// applyWeight
-		// shearRotWeight
+		((Real,idWeight,1,,"Float ∈〈0,1〉 determining on which particle are displacements applied (0 for id1, 1 for id2); intermediate values will apply respective part to each of them."))
+		((Real,rotWeight,1,,"Float ∈〈0,1〉 determining whether shear displacement is applied as rotation or displacement on arc (0 is displacemetn-only, 1 is rotation-only)."))
 		// reset force components along individual axes, instead of blocking DOFs which have no specific direction (for the force control)
 	);
 };
