@@ -60,7 +60,7 @@ void LawTester::action(){
 	GenericSpheresContact* gsc=dynamic_cast<GenericSpheresContact*>(I->geom.get());
 	ScGeom* scGeom=dynamic_cast<ScGeom*>(I->geom.get());
 	Dem3DofGeom* d3dGeom=dynamic_cast<Dem3DofGeom*>(I->geom.get());
-	NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());
+	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
 	if(!scGeom && !d3dGeom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom.");
 	assert(!((bool)scGeom && (bool)d3dGeom)); // nonsense
