@@ -53,9 +53,11 @@ if opts.rebuild:
 
 if opts.debug:
 	if not hasDebug:
-		raise RuntimeError('Debug build not available with this installation (running with --rebuild might help)')
+		raise RuntimeError('Debug build not available (run without --debug, or try --debug --rebuild)')
 	libDir=debugLibDir
 else:
+	if not hasNonDebug:
+		raise RuntimeError('Non-debug build not available (running with --debug, or try --rebuild)')
 	libDir=nonDebugLibDir
 
 ## remove later

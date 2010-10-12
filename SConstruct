@@ -267,7 +267,8 @@ def CheckLibStdCxx(context):
 	if ret[0]!='/':
 		context.Result('Relative path "%s" was given by compiler %s, must specify libstdcxx=.. explicitly.'%(ret,context.env['CXX']))
 		Exit(1)
-	context.env['libstdcxx']=os.path.abspath(ret) # removes .. in g++ path
+	ret=os.path.abspath(ret) # removes .. in the path returned by g++
+	context.env['libstdcxx']=ret
 	context.Result(ret)
 	return ret
 
@@ -469,9 +470,10 @@ if env['PGO']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fp
 if env['PGO']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
 
 if 'clang' in env['CXX']:
-	print 'Probably using clang to compile, adding -Wno-unused-variable -Wno-mismatched-tags -Wno-constant-logical-operand -Qunused-arguments'
+	print 'Looks like we use clang, adding some flags to avoid warning flood.'
 	env.Append(CXXFLAGS=['-Wno-unused-variable','-Wno-mismatched-tags','-Wno-constant-logical-operand','-Qunused-arguments'])
-	if 'openmp' in env['features']: print 'WARNING: building with clang and OpenMP, expect errors!'
+	if 'openmp' in env['features']: print 'WARNING: building with clang and OpenMP feature, expect compilation errors!'
+	if env['optimize']: print 'WARNING: clang\'s optimized builds might crash at startup (if so, recompile with opimize=0)!'
 
 
 ### LINKER
@@ -523,7 +525,7 @@ def installHeaders(prefix=None):
 				if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
 					m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
 					if not m:
-						print "WARNING: file %s skipped while scanning for headers (no module)"
+						print "WARNING: file %s skipped while scanning for headers (no module)"%(root+'/'+f)
 						continue
 					subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
 					if not prefix: # local include directory: do symlinks
