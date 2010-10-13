@@ -1,0 +1,93 @@
+# syntax: python
+Import('*')
+
+
+srcs=[] # list of single source files that will be compiled in chunks based on chunkSize
+extraSrcs=[] # list of _chunks_ (list/tuple) of sources that will be compiled separately
+pyMods=[] # list of symbolic links that will point to the resulting library; their sources must be specified in srcs/extraSrcs
+libs=[]
+
+### core
+
+pyMain='$PREFIX/bin/yade$SUFFIX'
+env['PLUGINDIR']='$PREFIX/lib/yade$SUFFIX'
+main=env.ScanReplace('core/main/main.py.in')
+batch=env.ScanReplace('core/main/yade-batch.in')
+env.AlwaysBuild(main)
+env.AlwaysBuild(batch)
+env.InstallAs(pyMain,main)
+env.InstallAs(pyMain+'-batch',batch)
+env.AddPostAction(pyMain,Chmod(pyMain,0755))
+env.AddPostAction(pyMain+'-batch',Chmod(pyMain+'-batch',0755))
+
+extraSrcs+=[['core/'+f for f in ['Body.cpp','BodyContainer.cpp','Bound.cpp','Cell.cpp','PartialEngine.cpp','Engine.cpp','FileGenerator.cpp','FrontEnd.cpp','Interaction.cpp','InteractionContainer.cpp','GroupRelationData.cpp','Material.cpp','Scene.cpp','Dispatcher.cpp','Omega.cpp','Shape.cpp','SimulationFlow.cpp','State.cpp','ThreadRunner.cpp','ThreadWorker.cpp','TimeStepper.cpp','corePlugins.cpp','main/pyboot.cpp']]]
+pyMods+=['boot']
+
+# libs
+srcs+=['lib/'+f for f in ['base/Math.cpp','factory/ClassFactory.cpp','factory/DynLibManager.cpp','multimethods/Indexable.cpp','serialization/Serializable.cpp','pyutil/gil.cpp']]
+if 'opengl' in env['features']:
+	srcs+=['lib/opengl/GLUtils.cpp']
+	libs+=['GL','GLU','glut']
+if 'cgal' in env['features']:
+	extraSrcs+=[['lib/'+f for f in Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/Timer.cpp triangulation/basicVTKwritter.cpp triangulation/FlowBoundingSphere.cpp triangulation/Deformation.cpp triangulation/Empilement.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TriaxialState.cpp')]]
+
+# py
+if 'gts' in env['features']:
+	extraSrcs+=['py/'+f for f in ('3rd-party/pygts-0.3.1/cleanup.c','3rd-party/pygts-0.3.1/edge.c','3rd-party/pygts-0.3.1/face.c','3rd-party/pygts-0.3.1/object.c','3rd-party/pygts-0.3.1/point.c','3rd-party/pygts-0.3.1/pygts.c','3rd-party/pygts-0.3.1/segment.c','3rd-party/pygts-0.3.1/surface.c','3rd-party/pygts-0.3.1/triangle.c','3rd-party/pygts-0.3.1/vertex.c')]
+	pyMods+=['../gts/_gts']
+	env.Install('$PLUGINDIR/py/gts',[env.File('py/3rd-party/pygts-0.3.1/__init__.py'),env.File('py/3rd-party/pygts-0.3.1/pygts.py')])
+
+pyMods+=['../miniEigen','WeightedAverage2d','log','_utils','_packPredicates','_packSpheres','_packObb','wrapper','_customConverters','_eudoxos','_packSpherePadder']
+srcs+=['py/mathWrap/miniEigen.cpp','py/WeightedAverage2d.cpp','py/_eudoxos.cpp','py/log.cpp','py/_utils.cpp','py/pack/_packPredicates.cpp','py/pack/_packSpheres.cpp','py/pack/_packObb.cpp','py/wrapper/yadeWrapper.cpp','py/wrapper/customConverters.cpp']
+extraSrcs+=[ ['py/pack/_packSpherePadder.cpp','py/pack/SpherePadder/SpherePadder.cpp','py/pack/SpherePadder/TetraMesh.cpp','py/pack/SpherePadder/CellPartition.cpp']+(['py/pack/SpherePadder/SpherePackingTriangulation.cpp'] if 'cgal' in env['features'] else []) ]
+
+env.Install('$PLUGINDIR/py/yade',[
+	env.AlwaysBuild(env.ScanReplace('py/__init__.py.in')),
+	env.AlwaysBuild(env.ScanReplace('py/config.py.in'))
+	]
+	+[env.File('py/'+f) for f in  ['utils.py','ymport.py','export.py','eudoxos.py','plot.py','params.py','linterpolation.py','timing.py','pack/pack.py','remote.py','system.py','export.py','post2d.py','runtime.py','manpage.py','_extraDocs.py',]]
+)
+env.Install('$PLUGINDIR/py/yade/tests',[env.File('__init__.py','py/tests'),env.File('wrapper.py','py/tests'),env.File('omega.py','py/tests')
+])
+
+env.Install('$PLUGINDIR/py',[
+	env.File('mtTkinter.py','py/3rd-party/mtTkinter-0.3'),
+])
+
+# gui
+if 'qt4' in env['features']:
+	env.Install('$PLUGINDIR/py/yade/qt',[env.File('gui/'+f) for f in ['qt4/img_rc.py','qt4/ui_controller.py','qt4/SerializableEditor.py','qt4/Inspector.py','qt4/__init__.py',]])
+	env.Command('gui/qt4/img_rc.py','gui/qt4/img.qrc','pyrcc4 -o $buildDir/gui/qt4/img_rc.py gui/qt4/img.qrc')
+	env.Command('gui/qt4/ui_controller.py','gui/qt4/controller.ui','pyuic4 -o $buildDir/gui/qt4/ui_controller.py gui/qt4/controller.ui')
+	srcs+=['gui/qt4/GLViewer.cpp','gui/qt4/_GLViewer.cpp','gui/qt4/OpenGLManager.cpp']
+	pyMods+=['qt/_GLViewer']
+	libs+=[env['QGLVIEWER_LIB']]
+
+# pkg
+pluginsSrcs=[p.src for p in env['buildPlugs'].values()]
+srcs+=pluginsSrcs
+
+
+# building itself
+env['LIBS']=env['LIBS']+libs
+
+extraChunks=[(ff if isinstance(ff,str) else env.Combine('chunk%d.%s'%(i,ff[0].split('.')[-1]),ff)) for i,ff in enumerate(extraSrcs)]
+#import pprint; pprint.pprint(extraSrcs)
+chunkSize=env['chunkSize']
+if chunkSize>1:
+	srcsChunks=[srcs[chunkSize*i:chunkSize*(i+1)] for i in range(0,1+len(srcs)/chunkSize)]
+	env.Install('$PLUGINDIR',env.SharedLibrary('yade',[env.Combine('yade%d.cpp'%i,chunkSrcs) for i,chunkSrcs in enumerate(srcsChunks)]+extraChunks))
+elif chunkSize==1:
+	env.Install('$PLUGINDIR',env.SharedLibrary('yade',srcs+extraChunks))
+else: # chunkSize<=0
+	env.Install('$PLUGINDIR',env.SharedLibrary('yade',[env.Combine('yade.cpp',srcs)]+extraChunks))
+
+yadeSo=env.subst('$PLUGINDIR/libyade.so')
+import os, os.path
+for m in pyMods:
+	mm=env.subst('$PLUGINDIR/py/yade/'+m+'.so')
+	d=os.path.dirname(mm);
+	if not os.path.exists(d): os.makedirs(d)
+	relpath=os.path.relpath(yadeSo,d)
+	env.Command(mm,yadeSo,'ln -s -f "%s" "%s"'%(relpath,mm))
+

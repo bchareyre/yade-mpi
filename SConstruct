@@ -451,7 +451,6 @@ if env['QUAD_PRECISION']: env.Append(CPPDEFINES='QUAD_PRECISION')
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb2',CPPDEFINES=['YADE_DEBUG'])
-else: env.Append(CXXFLAGS='-O3')
 if 'openmp' in env['features']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
 if env['optimize']:
 	# NDEBUG is used in /usr/include/assert.h: when defined, asserts() are no-ops
@@ -471,9 +470,9 @@ if env['PGO']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofil
 
 if 'clang' in env['CXX']:
 	print 'Looks like we use clang, adding some flags to avoid warning flood.'
-	env.Append(CXXFLAGS=['-Wno-unused-variable','-Wno-mismatched-tags','-Wno-constant-logical-operand','-Qunused-arguments'])
+	env.Append(CXXFLAGS=['-Wno-unused-variable','-Wno-mismatched-tags','-Wno-constant-logical-operand','-Qunused-arguments','-Wno-empty-body'])
 	if 'openmp' in env['features']: print 'WARNING: building with clang and OpenMP feature, expect compilation errors!'
-	if env['optimize']: print 'WARNING: clang\'s optimized builds might crash at startup (if so, recompile with opimize=0)!'
+	if env['march']: print 'WARNING: specifying march with clang\'s might lead to crash at startup (if so, recompile with march= )!'
 
 
 ### LINKER

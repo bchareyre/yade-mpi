@@ -107,7 +107,7 @@ class AttrEditor_Float(AttrEditor,QLineEdit):
 		self.textEdited.connect(self.isHot)
 		self.selectionChanged.connect(self.isHot)
 		self.editingFinished.connect(self.update)
-	def refresh(self): self.setText(str(self.getter()))
+	def refresh(self): self.setText(str(self.getter())); self.home(False)
 	def update(self):
 		try: self.trySetter(float(self.text()))
 		except ValueError: self.refresh()
@@ -129,7 +129,7 @@ class AttrEditor_Quaternion(AttrEditor,QFrame):
 	def refresh(self):
 		val=self.getter(); axis,angle=val.toAxisAngle()
 		for i in (0,1,2,4):
-			self.grid.itemAt(i).widget().setText(str(axis[i] if i<3 else angle))
+			w=self.grid.itemAt(i).widget(); w.setText(str(axis[i] if i<3 else angle)); w.home(False)
 	def update(self):
 		try:
 			x=[float((self.grid.itemAt(i).widget().text())) for i in (0,1,2,4)]
@@ -156,8 +156,9 @@ class AttrEditor_Se3(AttrEditor,QFrame):
 	def refresh(self):
 		pos,ori=self.getter(); axis,angle=ori.toAxisAngle()
 		for i in (0,1,2,4):
-			self.grid.itemAtPosition(1,i).widget().setText(str(axis[i] if i<3 else angle))
-		for i in (0,1,2): self.grid.itemAtPosition(0,i).widget().setText(str(pos[i]))
+			w=self.grid.itemAtPosition(1,i).widget(); w.setText(str(axis[i] if i<3 else angle)); w.home(False)
+		for i in (0,1,2):
+			w=self.grid.itemAtPosition(0,i).widget(); w.setText(str(pos[i])); w.home(False)
 	def update(self):
 		try:
 			q=[float((self.grid.itemAtPosition(1,i).widget().text())) for i in (0,1,2,4)]
@@ -186,7 +187,9 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 	def refresh(self):
 		val=self.getter()
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
-			self.grid.itemAtPosition(row,col).widget().setText(str(val[self.idxConverter(row,col)]))
+			w=self.grid.itemAtPosition(row,col).widget()
+			w.setText(str(val[self.idxConverter(row,col)]))
+			w.home(False) # make the left-most part visible, if the text is wider than the widget
 	def update(self):
 		try:
 			val=self.getter()
@@ -216,7 +219,7 @@ class AttrEditor_MatrixXi(AttrEditor,QFrame):
 	def refresh(self):
 		val=self.getter()
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
-			self.grid.itemAtPosition(row,col).widget().setValue(val[self.idxConverter(row,col)])
+			w=self.grid.itemAtPosition(row,col).widget().setValue(val[self.idxConverter(row,col)])
 	def update(self):
 		val=self.getter(); modified=False
 		for row,col in itertools.product(range(self.rows),range(self.cols)):

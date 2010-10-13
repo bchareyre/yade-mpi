@@ -11,12 +11,12 @@ features,version='${features}'.split(','),'${realVersion}'
 ## find available builds
 nonDebugLibDir=prefix+'/lib/yade'+suffix
 debugLibDir=nonDebugLibDir+'/dbg'
-hasDebug,hasNonDebug=os.path.exists(debugLibDir+'/lib'),os.path.exists(nonDebugLibDir+'/lib')
+hasDebug,hasNonDebug=os.path.exists(debugLibDir+'/py/yade/__init__.py'),os.path.exists(nonDebugLibDir+'/py/yade/__init__.py')
 if hasDebug and hasNonDebug: buildsAvailable='both non-debug and debug build'
 elif hasDebug and not hasNonDebug: buildsAvailable='debug build only'
 elif not hasDebug and hasNonDebug: buildsAvailable='non-debug build only'
 else:
-	raise RuntimeError('Neither non-debug nor debug build found! ('+nonDebugLibDir+'/lib, '+debugLibDir+'/lib)')
+	raise RuntimeError('Neither non-debug nor debug build found! ('+nonDebugLibDir+'/py/yade/__init__.py, '+debugLibDir+'/py/yade/__init__.py)')
 
 
 # handle command-line options first
@@ -57,8 +57,10 @@ if opts.debug:
 	libDir=debugLibDir
 else:
 	if not hasNonDebug:
-		raise RuntimeError('Non-debug build not available (running with --debug, or try --rebuild)')
-	libDir=nonDebugLibDir
+		print 'WARNING: non-debug build not available, running with --debug instead (try --rebuild to get the non-debug build).'
+		#raise RuntimeError('Non-debug build not available (run with --debug, or try --rebuild)')
+	else:
+		libDir=nonDebugLibDir
 
 ## remove later
 ## python2.5 relative module imports workaround

@@ -40,7 +40,7 @@ env.Install('$LIBDIR/py/yade',[
 	env.File('manpage.py'),
 	env.File('_extraDocs.py'),
 	env.SharedLibrary('wrapper',['wrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','Dispatching','InteractionLoop','ParallelEngine','Clump','STLImporter',])),
-	env.SharedLibrary('_customConverters',['wrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['Dispatching']))
+	env.SharedLibrary('_customConverters',['wrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['Dispatching']+(['GLDrawFunctors','OpenGLRenderer'] if 'opengl' in env['features'] else [])))
 ])
 env.Install('$LIBDIR/py/yade/tests',[
 	env.File('__init__.py','tests'),

@@ -6,6 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef pi
+	#undef pi
+#endif
+
 #include<boost/random.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/Aabb.hpp>
