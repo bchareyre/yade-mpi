@@ -67,8 +67,9 @@ void LawTester::action(){
 	assert(!((bool)scGeom && (bool)d3dGeom)); // nonsense
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
-	if(state1->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id1); state1->blockedDOFs=State::DOF_ALL;}
-	if(state2->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id2); state2->blockedDOFs=State::DOF_ALL;}
+	scene->forces.sync();
+	if(state1->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id1); state1->blockedDOFs=State::DOF_RXRYRZ;}
+	if(state2->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id2); state2->blockedDOFs=State::DOF_RXRYRZ;}
 
 	if(step>*(_pathT.rbegin())){
 		LOG_INFO("Last step done, setting zero velocities on #"<<id1<<", #"<<id2<<".");
@@ -117,8 +118,12 @@ void LawTester::action(){
 	LOG_DEBUG("Absolute diff is "<<valDiff);
 	ptOurs+=valDiff;
 
+	// reset velocities where displacement is controlled
+	//for(int i=0; i<3; i++){ if(forceControl[i]==0){ state1.vel[i]=0; state2.vel[i]=0; }
+	
 	// shear is applied as rotation of id2: dε=r₁dθ → dθ=dε/r₁;
 	Vector3r vel[2],angVel[2];
+	State* states[]={state1,state2};
 	for(int i=0; i<2; i++){
 		int sign=(i==0?-1:1);
 		Real weight=(i==0?1-idWeight:idWeight);
@@ -163,15 +168,13 @@ void LawTester::action(){
 	LOG_DEBUG("Body #"<<id1<<", setting vel="<<vel[0]<<", angVel="<<angVel[0]);
 	LOG_DEBUG("Body #"<<id2<<", setting vel="<<vel[1]<<", angVel="<<angVel[1]);
 
-	#if 0
-		Real rot2y=valDiff[1]/gsc->refR2, rot2z=valDiff[2]/gsc->refR2;
-		Vector3r angVel2=(rot2y*axY+rot2z*axZ)/scene->dt;
-		Vector3r linVel2=axX*valDiff[0]/scene->dt;
-		state2->angVel=angVel2;
-		state2->vel=linVel2;
-		LOG_DEBUG("Body #"<<id2<<", setting vel="<<linVel2<<", angVel="<<angVel2);
-	#endif
-
+	/* find out where are we at in the path, run hooks if approriate */
+	// _pathT has the first (zero) value added by us, so we skip it
+	int nPathT=_pathT.size();
+	for(int i=1; i<nPathT; i++){
+		// i-th point on _pathT is (i-1)th on path; run corresponding hook, if it exists
+		if(step==_pathT[i] && hooks.size()>(i-1) && !hooks[i-1].empty()) pyRunString(hooks[i-1]);
+	}
 	step++;
 }
 

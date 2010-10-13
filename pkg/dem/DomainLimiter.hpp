@@ -20,12 +20,14 @@ class LawTester: public PartialEngine{
 		virtual void action();
 		void postLoad(LawTester&);
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of normal and shear displacements.",
+	YADE_CLASS_BASE_DOC_ATTRS(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of normal and shear displacements. See :ysrc:`scripts/test/law-test.py`. ",
 		((vector<Vector3r>,path,,Attr::triggerPostLoad,"Loading path, where each Vector3 contains desired normal displacement and two components of the shear displacement (in local coordinate system, which is being tracked automatically."))
+		((vector<string>,hooks,,,"Python commands to be run when the corresponding point in path is reached, before doing other things in that particular step. See also :yref:`doneHook<LawTester.doneHook>`. "))
 		((Vector3r,ptOurs,Vector3r::Zero(),,"Current absolute configuration -- computed by ourselves from applied increments; should correspond to posTot."))
 		((Vector3r,shearTot,Vector3r::Zero(),,"Current total shear, in global coordinates (computed differently for :yref:`ScGeom` and :yref:`Dem3DofGeom`)."))
 		((Vector3r,ptGeom,Vector3r::Zero(),,"Current absolute configuration, in local coordinates; computed from *shearTot*, indirectly  from :yref:`IGeom`. |yupdate|"))
 		((bool,displIsRel,true,,"Whether displacement values in *path* are normalized by reference contact length (r1+r2 for 2 spheres)."))
+		((Vector3i,forceControl,Vector3i::Zero(),,"Select which components of path (non-zero value) have force (stress) rather than displacement (strain) meaning."))
 		((vector<int>,pathSteps,((void)"(constant step)",vector<int>(1,1)),Attr::triggerPostLoad,"Step number for corresponding values in :yref:`path<LawTester.path>`; if shorter than path, distance between last 2 values is used for the rest."))
 		((vector<int>,_pathT,,(Attr::readonly|Attr::noSave),"Time value corresponding to points on path, computed from *pathSteps*. Length is always the same as path."))
 		((vector<Vector3r>,_pathV,,(Attr::readonly|Attr::noSave),"Path values, computed from *path* by appending zero initial value."))

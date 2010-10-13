@@ -196,7 +196,7 @@ buildDir=os.path.abspath(env.subst('$buildPrefix/build$SUFFIX_DBG'))
 print "All intermediary files will be in `%s'."%env.subst(buildDir)
 env['buildDir']=buildDir
 # these MUST be first so that builddir's headers are read before any locally installed ones
-buildInc='$buildDir/include/yade-$version'
+buildInc='$buildDir/include'
 env.Append(CPPPATH=[buildInc])
 
 env.SConsignFile(buildDir+'/scons-signatures')
@@ -478,63 +478,14 @@ if 'clang' in env['CXX']:
 ### LINKER
 ## libs for all plugins
 env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
-
-# if this is not present, vtables & typeinfos for classes in yade binary itself would not be exported, plugins wouldn't work
-if env['PLATFORM']=='darwin': 
-	print 'darwin platform'
-	#env.Append(LINKFLAGS=['-Z']) # ?? FIXME
-	env.Append(FRAMEWORKS=['CoreServices','Carbon'])
-else:
-	env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin']) 
-	if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
+env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin']) 
+if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
 
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=runtimeLibDirs)
 # find already compiled but not yet installed libraries for linking
 env.Append(LIBPATH=instLibDirs) # this is if we link to libs that are installed, which is the case now
 
-
-def installHeaders(prefix=None):
-	"""symlink all in-tree headers into  some include directory so that we can build before headers are installed.
-	If prefix is given, headers will be copied there.
-	If not, include tree will be created and syumlinked in buildDir, using relative symlinks."""
-	global env
-	import os,string,re
-	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep
-	if not prefix: yadeRoot=buildDir
-	else: yadeRoot=prefix
-	yadeInc=join(yadeRoot,'include','yade-%s'%env['version'],'yade')
-
-	paths = ['.']
-	for root, dirs, files in os.walk('.'):
-		for dir in dirs:
-			if os.path.islink(os.path.join(root,dir)):
-				paths.append(os.path.join(root,dir))
-	for path in paths:
-		for root, dirs, files in os.walk(path,topdown=True):
-			for d in ('.svn'): ## skip all files that are not part of sources in the proper sense!
-				try: dirs.remove(d)
-				except ValueError: pass
-			# exclude non-lib directories (like doc, scripts, ...)
-			if not re.match(r'\.[/\\](core|lib|pkg|gui|extra)[/\\]?.*',root): continue
-			if 'noSymlinkHeaders' in root: continue
-			# exclude headers from excluded stuff
-			if re.match(r'^.*/('+'|'.join(env['exclude'])+')/',root): continue
-			for f in files:
-				if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
-					m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
-					if not m:
-						print "WARNING: file %s skipped while scanning for headers (no module)"%(root+'/'+f)
-						continue
-					subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
-					if not prefix: # local include directory: do symlinks
-						if not isdir(subInc): os.makedirs(subInc)
-						linkName=join(subInc,f); linkTarget=relpath(linkName,join(root,f))
-						if not exists(linkName):
-							if lexists(linkName): os.remove(linkName) # broken symlink: remove it
-							os.symlink(linkTarget,linkName)
-					else: # install directory: use scons' Install facility
-						env.Install(subInc,join(root,f))
 
 def relpath(pf,pt):
 	"""Returns relative path from pf (path from) to pt (path to) as string.
@@ -553,10 +504,19 @@ if not env.GetOption('clean'):
 	# how to make that executed automatically??! For now, run always.
 	#env.AddPreAction(installAlias,installHeaders)
 	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep
-	installHeaders() # install to buildDir always
-	if 0: # do not install headers
-		installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
-	boostDir=buildDir+'/include/yade-'+env['version']+'/boost'
+	#installHeaders() # install to buildDir always
+	#if 0: # do not install headers
+	#	installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
+
+	yadeInc=join(buildDir,'include/yade')
+	if not os.path.exists(yadeInc): os.makedirs(yadeInc)
+	import glob
+	for p in ['core','extra']+glob.glob('lib/*')+glob.glob('pkg/*')+glob.glob('gui'):
+		link=yadeInc+'/'+p.replace('/','-')
+		if os.path.isdir(p) and not os.path.exists(link):
+			if lexists(link): os.remove(link) # dangling symlink
+			os.symlink(relpath(link,p),link)
+	boostDir=buildDir+'/include/boost'
 	if not exists(boostDir): os.makedirs(boostDir)
 	def mkSymlink(link,target):
 		if not exists(link):
@@ -565,12 +525,9 @@ if not env.GetOption('clean'):
 	if not env['haveForeach']:
 		mkSymlink(boostDir+'/foreach.hpp','extra/foreach.hpp_local')
 	#mkSymlink(boostDir+'/python','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')
-	if os.path.exists(boostDir+'/python'): os.remove(boostDir+'/python') # remove deprecated symlink from previous line that can break things if it is left there; remove this at some point in the future
-	mkSymlink(buildDir+'/include/yade-'+env['version']+'/indexing_suite','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')
+	mkSymlink(buildDir+'/include/indexing_suite','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')
 	mkSymlink(boostDir+'/math','extra/floating_point_utilities_v3/boost/math')
-	#env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
 	env.Default(env.Alias('install',['$PREFIX/bin','$PREFIX/lib'])) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
-
 
 env.Export('env');
 
