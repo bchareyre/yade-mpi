@@ -64,10 +64,6 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<IGeom>& ig, shared_p
 	               || currentContactPhysics->normalAdhesion==0)) {
 		// BREAK due to tension
 		scene->interactions->requestErase(contact->getId1(),contact->getId2());
-		// contact->phys was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
-// 			currentContactPhysics->cohesionBroken = true;
-// 			currentContactPhysics->normalForce = Vector3r::ZERO;
-// 			currentContactPhysics->shearForce = Vector3r::ZERO;
 	} else {
 		State* de1 = Body::byId(id1,scene)->state.get();
 		State* de2 = Body::byId(id2,scene)->state.get();
@@ -90,10 +86,8 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<IGeom>& ig, shared_p
 			if (currentContactPhysics->fragile && !currentContactPhysics->cohesionBroken) {
 				currentContactPhysics->SetBreakingState();
 				maxFs = max((Real) 0, Fn*currentContactPhysics->tangensOfFrictionAngle);
-				
 			}
 			maxFs = maxFs / Fs;
-			if (maxFs>1) cerr << "maxFs>1!!" << endl;
 			shearForce *= maxFs;
 			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}

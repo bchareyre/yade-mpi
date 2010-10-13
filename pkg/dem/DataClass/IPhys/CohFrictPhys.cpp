@@ -10,10 +10,9 @@
 
 void CohFrictPhys::SetBreakingState()
 {	
-	if (fragile) {
-		cohesionBroken = true;
-		normalAdhesion = 0;
-		shearAdhesion = 0;}	
+	cohesionBroken = true;
+	normalAdhesion = 0;
+	shearAdhesion = 0;
 }
 
 CohFrictPhys::~CohFrictPhys()
