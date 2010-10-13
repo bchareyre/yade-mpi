@@ -8,7 +8,7 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-//! This is the simplest law with Kn, Ks and Coulomb.  It is a duplication of Law2_Dem3DofGeom_FrictPhys_Basic, but it is cleaner.
+//! This is the simplest law with Kn, Ks and Coulomb.  It is a duplication of Law2_Dem3DofGeom_FrictPhys_CundallStrack, but it is cleaner.
 //! It also shows clearly to a beginner on how to write a Constitutive Law.  In a sense, it is similar to RockPM
 
 class Law2_Dem3Dof_CSPhys_CundallStrack: public LawFunctor{

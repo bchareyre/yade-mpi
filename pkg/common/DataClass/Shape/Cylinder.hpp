@@ -191,8 +191,6 @@ class Bo1_ChainedCylinder_Aabb : public BoundFunctor
 	);
 };
 
-
-
 // Keep this : Cylinders and ChainedCylinders will have different centers maybe.
 // class Bo1_ChainedCylinder_Aabb : public Bo1_Cylinder_Aabb
 // {
@@ -204,18 +202,15 @@ class Bo1_ChainedCylinder_Aabb : public BoundFunctor
 // 	);
 // };
 
-
-
-
 REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
 REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
-#ifdef YADE_OPENGL
-REGISTER_SERIALIZABLE(Gl1_Cylinder);
-REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
-#endif
 REGISTER_SERIALIZABLE(Cylinder);
 REGISTER_SERIALIZABLE(ChainedCylinder);
 REGISTER_SERIALIZABLE(ChainedState);
 REGISTER_SERIALIZABLE(CylScGeom);
 REGISTER_SERIALIZABLE(Ig2_Sphere_ChainedCylinder_CylScGeom);
 REGISTER_SERIALIZABLE(Ig2_ChainedCylinder_ChainedCylinder_ScGeom);
+#ifdef YADE_OPENGL
+REGISTER_SERIALIZABLE(Gl1_Cylinder);
+REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
+#endif

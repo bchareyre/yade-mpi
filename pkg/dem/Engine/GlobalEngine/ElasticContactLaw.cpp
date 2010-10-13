@@ -12,15 +12,15 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw));
+YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_Dem3DofGeom_FrictPhys_CundallStrack)(ElasticContactLaw));
 
-Real Law2_ScGeom_FrictPhys_Basic::Real0=0;
-Real Law2_ScGeom_FrictPhys_Basic::getPlasticDissipation() {return (Real) plasticDissipation;}
-void Law2_ScGeom_FrictPhys_Basic::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
+Real Law2_ScGeom_FrictPhys_CundallStrack::Real0=0;
+Real Law2_ScGeom_FrictPhys_CundallStrack::getPlasticDissipation() {return (Real) plasticDissipation;}
+void Law2_ScGeom_FrictPhys_CundallStrack::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
 
 void ElasticContactLaw::action()
 {
-	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
+	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack>(new Law2_ScGeom_FrictPhys_CundallStrack);
 	functor->neverErase=neverErase;
 	functor->scene=scene;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -33,7 +33,7 @@ void ElasticContactLaw::action()
 	}
 }
 
-Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
+Real Law2_ScGeom_FrictPhys_CundallStrack::elasticEnergy()
 {
 	Real energy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -45,8 +45,8 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 	return energy;
 }
 
-CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
-void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+CREATE_LOGGER(Law2_ScGeom_FrictPhys_CundallStrack);
+void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
@@ -99,7 +99,7 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+void Law2_Dem3DofGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
 	Real displN=geom->displacementN();

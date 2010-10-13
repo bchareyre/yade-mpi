@@ -15,7 +15,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys(),],
-		[Law2_ScGeom_FrictPhys_Basic(),]
+		[Law2_ScGeom_FrictPhys_CundallStrack(),]
 	),
 	GravityEngine(gravity=(0,0,gravity)), ## here we use the 'gravity' parameter
 	PyRunner(iterPeriod=100,command='myAddPlotData()',label='plotDataCollector'),

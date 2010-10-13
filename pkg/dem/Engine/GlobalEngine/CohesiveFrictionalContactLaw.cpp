@@ -14,8 +14,8 @@
 #include<yade/core/Scene.hpp>
 
 
-YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom_CohFrictPhys_ElasticPlastic));
-CREATE_LOGGER(Law2_ScGeom_CohFrictPhys_ElasticPlastic);
+YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom_CohFrictPhys_CohesionMoment));
+CREATE_LOGGER(Law2_ScGeom_CohFrictPhys_CohesionMoment);
 
 Vector3r translation_vect_ ( 0.10,0,0 );
 
@@ -23,7 +23,7 @@ Vector3r translation_vect_ ( 0.10,0,0 );
 
 void CohesiveFrictionalContactLaw::action()
 {
-	if(!functor) functor=shared_ptr<Law2_ScGeom_CohFrictPhys_ElasticPlastic>(new Law2_ScGeom_CohFrictPhys_ElasticPlastic);
+	if(!functor) functor=shared_ptr<Law2_ScGeom_CohFrictPhys_CohesionMoment>(new Law2_ScGeom_CohFrictPhys_CohesionMoment);
 	functor->erosionActivated = erosionActivated;
 	functor->detectBrokenBodies = detectBrokenBodies;
 	functor->always_use_moment_law = always_use_moment_law;
@@ -40,7 +40,7 @@ void CohesiveFrictionalContactLaw::action()
 }
 
 
-void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
+void Law2_ScGeom_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
 	const Real& dt = scene->dt;
 // 		if (detectBrokenBodies  //Experimental, has no effect
