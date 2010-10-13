@@ -24,8 +24,6 @@ Vector3r translation_vect_ ( 0.10,0,0 );
 void CohesiveFrictionalContactLaw::action()
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_CohFrictPhys_CohesionMoment>(new Law2_ScGeom_CohFrictPhys_CohesionMoment);
-	functor->erosionActivated = erosionActivated;
-	functor->detectBrokenBodies = detectBrokenBodies;
 	functor->always_use_moment_law = always_use_moment_law;
 	functor->shear_creep=shear_creep;
 	functor->twist_creep=twist_creep;

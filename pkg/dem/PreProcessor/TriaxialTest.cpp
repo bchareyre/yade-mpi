@@ -371,10 +371,10 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 			ids->physDispatcher=interactionPhysicsDispatcher;
 			ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 			if(!facetWalls && !wallWalls){
-				shared_ptr<Law2_ScGeom_FrictPhys_Basic> see(new Law2_ScGeom_FrictPhys_Basic);
+				shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> see(new Law2_ScGeom_FrictPhys_CundallStrack);
 				ids->lawDispatcher->add(see);
 			} else {
-				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_Basic>(new Law2_Dem3DofGeom_FrictPhys_Basic));
+				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_CundallStrack>(new Law2_Dem3DofGeom_FrictPhys_CundallStrack));
 			}
 		scene->engines.push_back(ids);
 	scene->engines.push_back(globalStiffnessTimeStepper);
