@@ -22,6 +22,7 @@ void DomainLimiter::action(){
 
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
+#include<yade/pkg-dem/L3Geom.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-common/LinearInterpolate.hpp>
 #include<yade/lib-pyutil/gil.hpp>
@@ -61,10 +62,11 @@ void LawTester::action(){
 	GenericSpheresContact* gsc=dynamic_cast<GenericSpheresContact*>(I->geom.get());
 	ScGeom* scGeom=dynamic_cast<ScGeom*>(I->geom.get());
 	Dem3DofGeom* d3dGeom=dynamic_cast<Dem3DofGeom*>(I->geom.get());
+	L3Geom* l3Geom=dynamic_cast<L3Geom*>(I->geom.get());
 	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
-	if(!scGeom && !d3dGeom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom.");
-	assert(!((bool)scGeom && (bool)d3dGeom)); // nonsense
+	if(!scGeom && !d3dGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom.");
+	assert(!((bool)scGeom && (bool)d3dGeom) && (bool)l3Geom); // nonsense
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
 	scene->forces.sync();
@@ -78,35 +80,38 @@ void LawTester::action(){
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 		return;
 	}
-
-	axX=gsc->normal; /* just in case */ axX.normalize();
-	if(doInit){ // initialization of the new interaction
-		// take vector in the y or z direction, depending on its length; arbitrary, but one of them is sure to be non-zero
-		axY=axX.cross(axX[1]>axX[2]?Vector3r::UnitY():Vector3r::UnitZ());
-		axY.normalize();
-		axZ=axX.cross(axY);
-		LOG_DEBUG("Initial axes x="<<axX<<", y="<<axY<<", z="<<axZ);
-		renderLength=.5*(gsc->refR1+gsc->refR2);
-		refLength=gsc->refR1+gsc->refR2;
-	} else { // udpate of an existing interaction
-		if(scGeom){
-			scGeom->rotate(axY); scGeom->rotate(axZ);
-			scGeom->rotate(shearTot);
-			shearTot+=scGeom->shearIncrement();
-			ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
+	/* initialize or update local axes and trsf */
+	if(!l3Geom){
+		axX=gsc->normal; /* just in case */ axX.normalize();
+		if(doInit){ // initialization of the new interaction
+			// take vector in the y or z direction, depending on its length; arbitrary, but one of them is sure to be non-zero
+			axY=axX.cross(axX[1]>axX[2]?Vector3r::UnitY():Vector3r::UnitZ());
+			axY.normalize();
+			axZ=axX.cross(axY);
+			LOG_DEBUG("Initial axes x="<<axX<<", y="<<axY<<", z="<<axZ);
+		} else { // udpate of an existing interaction
+			if(scGeom){
+				scGeom->rotate(axY); scGeom->rotate(axZ);
+				scGeom->rotate(shearTot);
+				shearTot+=scGeom->shearIncrement();
+				ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
+			}
+			else{ // d3dGeom
+				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
+				// essentially copies code from ScGeom, which is not very nice indeed; oh well…
+				Vector3r vRel=(state2->vel+state2->angVel.cross(-gsc->refR2*gsc->normal))-(state1->vel+state1->angVel.cross(gsc->refR1*gsc->normal));
+			}
 		}
-		else{ // d3dGeom
-			throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
-			// essentially copies code from ScGeom, which is not very nice indeed; oh well…
-			Vector3r vRel=(state2->vel+state2->angVel.cross(-gsc->refR2*gsc->normal))-(state1->vel+state1->angVel.cross(gsc->refR1*gsc->normal));
-		}
+		// update the transformation
+		// the matrix is orthonormal, since axX, axY are normalized and and axZ is their corss-product
+		trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
+	} else {
+		trsf=l3Geom->trsf;
 	}
-	// update the transformation
-	// the matrix is orthonormal, since axX, axY are normalized and and axZ is their corss-product
-	trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
 	trsfQ=Quaternionr(trsf);
 	contPt=gsc->contactPoint;
-	Real refLength=gsc->refR1+gsc->refR2;
+	refLength=gsc->refR1+gsc->refR2;
+	renderLength=.5*refLength;
 	
 	// here we go ahead, finally
 	Vector3r val=linearInterpolate<Vector3r,int>(step,_pathT,_pathV,_interpPos);

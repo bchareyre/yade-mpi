@@ -2,7 +2,7 @@
 #include<yade/pkg-dem/L3Geom.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc));
+YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Law2_L3Geom_FrictPhys_Linear));
 
 L3Geom::~L3Geom(){}
 
@@ -105,4 +105,13 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 };
 
 
+void Law2_L3Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
+	const shared_ptr<L3Geom> geom=static_pointer_cast<L3Geom>(ig); const shared_ptr<FrictPhys> phys=static_pointer_cast<FrictPhys>(ip);
+	// compute force:
+	Vector3r localF=geom->u.cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
+	// transform back to global coords
+	Vector3r globalF=Quaternionr(geom->trsf).conjugate()*localF;
+	// apply force and torque
+	applyForceAtBranch(globalF,I->getId1(),geom->normal*(geom->refR1+.5*geom->u[0]),I->getId2(),-geom->normal*(geom->refR1+.5*geom->u[0]));
+}
 
