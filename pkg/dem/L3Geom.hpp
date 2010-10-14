@@ -8,11 +8,12 @@
 #include<yade/pkg-dem/FrictPhys.hpp>
 
 struct L3Geom: public GenericSpheresContact{
+	Real& uN;
+	Vector2r& uT; 
 	virtual ~L3Geom();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(L3Geom,GenericSpheresContact,"Geometry of contact given in local coordinates with 3 degress of freedom: normal and two in shear plane. [experimental]",
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(L3Geom,GenericSpheresContact,"Geometry of contact given in local coordinates with 3 degress of freedom: normal and two in shear plane. [experimental]",
 		((Vector3r,u,Vector3r::Zero(),,"Displacement components, in local coordinates. |yupdate|"))
-		/*((Vector3r,u0,Vector3r::Zero(),,"Zero displacement value; u0 will be always subtracted from the *geometrical* displacement by appropriate :yref:`IGeomFunctor`, resulting in *u*. This value can be changed for instance\n\n#. by :yref:`IGeomFunctor`, e.g. to take in account large shear displacement value unrepresentable by underlying geomeric algorithm based on quaternions)\n#. by :yref:`LawFunctor`, to account for normal equilibrium position different from zero geometric overlap (set once, just after the interaction is created)\n#. by :yref:`LawFunctor` to account for plastic slip.\n\n.. note:: Never set an absolute value of *u0*, only increment, since both :yref:`IGeomFunctor` and :yref:`LawFunctor` use it. If you need to keep track of plastic deformation, store it in :yref:`IPhys` isntead (this might be changed: have *u0* for :yref:`LawFunctor` exclusively, and a separate value stored (when that is needed) inside classes deriving from :yref:`L3Geom`."))
-		*/
+		// ((Vector3r,u0,Vector3r::Zero(),,"Zero displacement value; u0 will be always subtracted from the *geometrical* displacement by appropriate :yref:`IGeomFunctor`, resulting in *u*. This value can be changed for instance\n\n#. by :yref:`IGeomFunctor`, e.g. to take in account large shear displacement value unrepresentable by underlying geomeric algorithm based on quaternions)\n#. by :yref:`LawFunctor`, to account for normal equilibrium position different from zero geometric overlap (set once, just after the interaction is created)\n#. by :yref:`LawFunctor` to account for plastic slip.\n\n.. note:: Never set an absolute value of *u0*, only increment, since both :yref:`IGeomFunctor` and :yref:`LawFunctor` use it. If you need to keep track of plastic deformation, store it in :yref:`IPhys` isntead (this might be changed: have *u0* for :yref:`LawFunctor` exclusively, and a separate value stored (when that is needed) inside classes deriving from :yref:`L3Geom`."))
 		/* Is it better to store trsf as Matrix3 or Quaternion?
 			* Quaternions are much easier to re-normalize, which we should do to avoid numerical drift.
 			* Multiplication of vector with quaternion is internally done by converting to matrix first, anyway
@@ -20,7 +21,13 @@ struct L3Geom: public GenericSpheresContact{
 		*/
 		((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
 		,
+		/*init*/
+		((uN,u[0])) ((uT,*((Vector2r*)&u[1])))
+		,
 		/*ctor*/ createIndex();
+		, /*py*/
+		//.def_readonly("uN",&L3Geom::uN,"Normal component of *u*")
+		//.def_readonly("uT",&L3Geom::uT,"Shear component of *u*")
 	);
 	REGISTER_CLASS_INDEX(L3Geom,GenericSpheresContact);
 };

@@ -66,12 +66,14 @@ void LawTester::action(){
 	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
 	if(!scGeom && !d3dGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom.");
-	assert(!((bool)scGeom && (bool)d3dGeom) && (bool)l3Geom); // nonsense
+	assert(!((bool)scGeom && (bool)d3dGeom && (bool)l3Geom)); // nonsense
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
 	scene->forces.sync();
-	if(state1->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id1); state1->blockedDOFs=State::DOF_RXRYRZ;}
-	if(state2->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id2); state2->blockedDOFs=State::DOF_RXRYRZ;}
+	//if(state1->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id1); state1->blockedDOFs=State::DOF_RXRYRZ;}
+	//if(state2->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id2); state2->blockedDOFs=State::DOF_RXRYRZ;}
+	if(state1->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id1); state1->blockedDOFs=State::DOF_ALL;}
+	if(state2->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id2); state2->blockedDOFs=State::DOF_ALL;}
 
 	if(step>*(_pathT.rbegin())){
 		LOG_INFO("Last step done, setting zero velocities on #"<<id1<<", #"<<id2<<".");
@@ -104,9 +106,11 @@ void LawTester::action(){
 		}
 		// update the transformation
 		// the matrix is orthonormal, since axX, axY are normalized and and axZ is their corss-product
-		trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
+		trsf.col(0)=axX; trsf.col(1)=axY; trsf.col(2)=axZ;
 	} else {
 		trsf=l3Geom->trsf;
+		axX=trsf.col(0); axY=trsf.col(1); axZ=trsf.col(2);
+		ptGeom=l3Geom->u;
 	}
 	trsfQ=Quaternionr(trsf);
 	contPt=gsc->contactPoint;

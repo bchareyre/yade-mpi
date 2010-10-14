@@ -15,8 +15,9 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 
 	// contact exists, go ahead
 
-	Real uN=relPos.norm()-(r1+r2);
-	Vector3r normal=relPos.normalized();
+	Real dist=relPos.norm();
+	Real uN=dist-(r1+r2);
+	Vector3r normal=relPos/dist;
 	Vector3r contPt=se31.position+(r1+0.5*uN)*normal;
 
 	// create geometry
@@ -111,6 +112,8 @@ void Law2_L3Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& 
 	Vector3r localF=geom->u.cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
 	// transform back to global coords
 	Vector3r globalF=Quaternionr(geom->trsf).conjugate()*localF;
+	// only for keeping track of the force
+	phys->normalForce=geom->normal*globalF.dot(geom->normal); phys->shearForce=globalF-phys->normalForce;
 	// apply force and torque
 	applyForceAtBranch(globalF,I->getId1(),geom->normal*(geom->refR1+.5*geom->u[0]),I->getId2(),-geom->normal*(geom->refR1+.5*geom->u[0]));
 }

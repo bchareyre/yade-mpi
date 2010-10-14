@@ -73,7 +73,7 @@ class LawFunctor: public Functor2D<
 	/*! Convenience function to apply force and torque from one force, given branch vectors from body centroids (x1,x2) to contact point cp, i.e. cp-x1, cp-x2. */
 	void applyForceAtBranch(const Vector3r& force, const Body::id_t id1, const Vector3r& cx1, const Body::id_t id2, const Vector3r& cx2){
 		addForce(id1, force,scene); addTorque(id1,cx1.cross( force),scene);
-		addForce(id1,-force,scene); addTorque(id1,cx2.cross(-force),scene);
+		addForce(id2,-force,scene); addTorque(id2,cx2.cross(-force),scene);
 	}
 	YADE_CLASS_BASE_DOC(LawFunctor,Functor,"Functor for applying constitutive laws on :yref:`interactions<Interaction>`.");
 };
