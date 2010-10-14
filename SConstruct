@@ -477,8 +477,10 @@ if 'clang' in env['CXX']:
 
 ### LINKER
 ## libs for all plugins
-env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
-env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin']) 
+if not env['mono']:
+	env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
+	env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin'])
+
 if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
 
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
@@ -581,6 +583,7 @@ env['linkPlugins']=linkPlugins
 env['buildPlugs']=buildPlugs
 
 if env['mono']:
+	env['topLevelDir']=os.path.abspath(os.getcwd())
 	env.SConscript('SConscript-mono',build_dir=buildDir,duplicate=0)
 
 else:

@@ -1,4 +1,4 @@
-# syntax: python
+# vim: syntax=python
 Import('*')
 
 
@@ -67,20 +67,28 @@ if 'qt4' in env['features']:
 pluginsSrcs=[p.src for p in env['buildPlugs'].values()]
 srcs+=pluginsSrcs
 
-
 # building itself
 env['LIBS']=env['LIBS']+libs
+import os.path
 
-extraChunks=[(ff if isinstance(ff,str) else env.Combine('chunk%d.%s'%(i,ff[0].split('.')[-1]),ff)) for i,ff in enumerate(extraSrcs)]
+def makeChunk(chunk,srcs,baseDir=None):
+	if not baseDir: baseDir=env['buildDir']
+	chunk2=baseDir+'/'+chunk
+	f=open(chunk2,'w')
+	for s in srcs: f.write('#include<%s>\n'%os.path.abspath(env['topLevelDir']+'/'+s))
+	return chunk2
+	
+
+extraChunks=[(ff if isinstance(ff,str) else makeChunk('chunk%02d.%s'%(i,ff[0].split('.')[-1]),ff)) for i,ff in enumerate(extraSrcs)]
 #import pprint; pprint.pprint(extraSrcs)
 chunkSize=env['chunkSize']
 if chunkSize>1:
 	srcsChunks=[srcs[chunkSize*i:chunkSize*(i+1)] for i in range(0,1+len(srcs)/chunkSize)]
-	env.Install('$PLUGINDIR',env.SharedLibrary('yade',[env.Combine('yade%d.cpp'%i,chunkSrcs) for i,chunkSrcs in enumerate(srcsChunks)]+extraChunks))
+	env.Install('$PLUGINDIR',env.SharedLibrary('yade',[makeChunk('yade%02d.cpp'%i,chunkSrcs) for i,chunkSrcs in enumerate(srcsChunks)]+extraChunks))
 elif chunkSize==1:
 	env.Install('$PLUGINDIR',env.SharedLibrary('yade',srcs+extraChunks))
 else: # chunkSize<=0
-	env.Install('$PLUGINDIR',env.SharedLibrary('yade',[env.Combine('yade.cpp',srcs)]+extraChunks))
+	env.Install('$PLUGINDIR',env.SharedLibrary('yade',[makeChunk('yade.cpp',srcs)]+extraChunks))
 
 yadeSo=env.subst('$PLUGINDIR/libyade.so')
 import os, os.path

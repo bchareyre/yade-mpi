@@ -182,6 +182,7 @@ void LawTester::action(){
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/pkg-common/GLDrawFunctors.hpp>
+#include<yade/pkg-common/OpenGLRenderer.hpp>
 #include<GL/glu.h>
 
 CREATE_LOGGER(GlExtra_LawTester);

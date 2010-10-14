@@ -18,12 +18,15 @@ try:
 	import dl
 except ImportError:
 	import DLFCN as dl
-# see file:///usr/share/doc/python2.6/html/library/sys.html#sys.setdlopenflags
-# and various web posts on the topic, e.g.
-# * http://gcc.gnu.org/faq.html#dso
-# * http://www.code-muse.com/blog/?p=58
-# * http://wiki.python.org/moin/boost.python/CrossExtensionModuleDependencies
-sys.setdlopenflags(dl.RTLD_NOW | dl.RTLD_GLOBAL)
+if not eval('${mono}'):
+	# see file:///usr/share/doc/python2.6/html/library/sys.html#sys.setdlopenflags
+	# and various web posts on the topic, e.g.
+	# * http://gcc.gnu.org/faq.html#dso
+	# * http://www.code-muse.com/blog/?p=58
+	# * http://wiki.python.org/moin/boost.python/CrossExtensionModuleDependencies
+	sys.setdlopenflags(dl.RTLD_NOW | dl.RTLD_GLOBAL)
+else: sys.setdlopenflags(dl.RTLD_NOW)
+
 # important: initialize c++ by importing libstdc++ directly
 # see http://www.abclinuxu.cz/poradna/programovani/show/286322
 # https://bugs.launchpad.net/bugs/490744
