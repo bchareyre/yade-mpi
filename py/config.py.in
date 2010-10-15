@@ -8,7 +8,7 @@ import os,datetime,os.path
 prefix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX']
 suffix='${SUFFIX}'
 debug=bool(${debug})
-libDir=os.path.abspath('$runtimePREFIX/lib/yade$SUFFIX'+('/dbg' if debug else ''))
+libDir=os.path.abspath(prefix+'/lib/yade$SUFFIX'+('/dbg' if debug else ''))
 confDir=os.environ['HOME']+'/.yade$SUFFIX'
 libstdcxx='${libstdcxx}'
 features='${features}'.split(',')

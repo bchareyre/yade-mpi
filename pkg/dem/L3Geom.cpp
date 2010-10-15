@@ -2,11 +2,22 @@
 #include<yade/pkg-dem/L3Geom.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Law2_L3Geom_FrictPhys_Linear));
+YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Law2_L3Geom_FrictPhys_Linear)(Law2_L6Geom_FrictPhys_Linear));
 
 L3Geom::~L3Geom(){}
+L6Geom::~L6Geom(){}
 
 bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I){
+	return genericGo(/*is6Dof*/false,s1,s2,state1,state2,shift2,force,I);
+};
+
+bool Ig2_Sphere_Sphere_L6Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I){
+	return genericGo(/*is6Dof*/true,s1,s2,state1,state2,shift2,force,I);
+};
+
+
+bool Ig2_Sphere_Sphere_L3Geom_Inc::genericGo(bool is6Dof, const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I){
+
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	const Real& r1(static_pointer_cast<Sphere>(s1)->radius); const Real& r2(static_pointer_cast<Sphere>(s2)->radius);
 	Vector3r relPos=(se32.position+shift2)-se31.position;
@@ -21,8 +32,10 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 	Vector3r contPt=se31.position+(r1+0.5*uN)*normal;
 
 	// create geometry
-	if(!I->geom){ 
-		I->geom=shared_ptr<L3Geom>(new L3Geom); const shared_ptr<L3Geom>& g(static_pointer_cast<L3Geom>(I->geom));
+	if(!I->geom){
+		if(is6Dof) I->geom=shared_ptr<L6Geom>(new L6Geom);
+		else       I->geom=shared_ptr<L3Geom>(new L3Geom);
+		const shared_ptr<L3Geom>& g(static_pointer_cast<L3Geom>(I->geom));
 		g->contactPoint=contPt;
 		g->refR1=r1; g->refR2=r1;
 		g->normal=normal; const Vector3r& locX(g->normal);
@@ -31,6 +44,7 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 		Vector3r locZ=g->normal.cross(locY);
 		g->trsf.col(0)=locX; g->trsf.col(1)=locY; g->trsf.col(2)=locZ;
 		g->u=Vector3r(uN,0,0); // zero shear displacement
+		// L6Geom::phi is initialized to Vector3r::Zero() automatically
 		return true;
 	}
 	
@@ -47,7 +61,8 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 	// contrary to what ScGeom::precompute does now (r2486), we take average normal, i.e. .5*(prevNormal+currNormal),
 	// so that all terms in the equation are in the previous mid-step
 	// the re-normalization might not be necessary for very small increments, but better do it
-	Vector3r avgNormal=.5*(prevNormal+currNormal); avgNormal.normalize();
+	Vector3r avgNormal=(approxMask|APPROX_NO_MID_NORMAL) ? prevNormal : .5*(prevNormal+currNormal);
+	if(!(approxMask|APPROX_NO_RENORM_MID_NORMAL) && !(approxMask|APPROX_NO_MID_NORMAL)) avgNormal.normalize(); // normalize only if used and if requested via approxMask
 	// twist vector of the normal from the last step
 	Vector3r normTwistVec=avgNormal*scene->dt*.5*avgNormal.dot(state1.angVel+state2.angVel);
 	// compute relative velocity
@@ -76,6 +91,7 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 	for(int i=1; i<3; i++){
 		currTrsf.col(i)=prevTrsf.col(i)-prevTrsf.col(i).cross(normRotVec)-prevTrsf.col(i).cross(normTwistVec);
 	}
+	if(!(approxMask | APPROX_NO_RENORM_TRSF)){ /* renormalizing quternion is faster*/ currTrsf=Matrix3r(Quaternionr(currTrsf).normalized()); }
 
 	/* Previous local trsf u'⁻ must be updated to current u'⁰. We have transformation T⁻ and T⁰,
 		δ(a) denotes increment of a as defined above.  Two possibilities:
@@ -88,7 +104,8 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 			This could be perhaps simplified by using T⁰ or T⁻ since they will not differ much,
 			but it would have to be verified somehow.
 	*/
-	Quaternionr midTrsf=Quaternionr(prevTrsf).slerp(.5,Quaternionr(currTrsf));
+	// if requested via approxMask, just use prevTrsf
+	Quaternionr midTrsf=(approxMask|APPROX_NO_MID_TRSF) ? Quaternionr(prevTrsf) : Quaternionr(prevTrsf).slerp(.5,Quaternionr(currTrsf));
 	
 	// updates of geom here
 
@@ -101,6 +118,13 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_
 	g->refR1=r1; g->refR2=r2;
 	g->normal=currNormal;
 	g->contactPoint=contPt;
+
+	if(is6Dof){
+		const shared_ptr<L6Geom> g6=static_pointer_cast<L6Geom>(g);
+		// update phi, from the difference of angular velocities
+		// the difference is transformed to local coord using the midTrsf transformation
+		g6->phi+=midTrsf*(scene->dt*(state2.angVel-state1.angVel));
+	}
 
 	return true;
 };
@@ -118,3 +142,14 @@ void Law2_L3Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& 
 	applyForceAtBranch(globalF,I->getId1(),geom->normal*(geom->refR1+.5*geom->u[0]),I->getId2(),-geom->normal*(geom->refR1+.5*geom->u[0]));
 }
 
+void Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
+	// same as for L3Geom, except of the torque term
+	const shared_ptr<L6Geom> geom=static_pointer_cast<L6Geom>(ig); const shared_ptr<FrictPhys> phys=static_pointer_cast<FrictPhys>(ip);
+	Vector3r localF=geom->u.cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
+	Vector3r localT=charLen*(geom->phi.cwise()*Vector3r(phys->kn,phys->ks,phys->ks));
+	Quaternionr invTrsf=Quaternionr(geom->trsf).conjugate();
+	Vector3r globalF=invTrsf*localF, globalT=invTrsf*localT;
+	phys->normalForce=geom->normal*globalF.dot(geom->normal); phys->shearForce=globalF-phys->normalForce;
+	applyForceAtBranch(globalF,I->getId1(),geom->normal*(geom->refR1+.5*geom->u[0]),I->getId2(),-geom->normal*(geom->refR1+.5*geom->u[0]));
+	scene->forces.addTorque(I->getId1(),globalT); scene->forces.addTorque(I->getId2(),-globalT);
+}

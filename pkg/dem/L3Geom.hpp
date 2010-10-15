@@ -8,8 +8,8 @@
 #include<yade/pkg-dem/FrictPhys.hpp>
 
 struct L3Geom: public GenericSpheresContact{
-	Real& uN;
-	Vector2r& uT; 
+	const Real& uN;
+	const Vector2r& uT; 
 	virtual ~L3Geom();
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(L3Geom,GenericSpheresContact,"Geometry of contact given in local coordinates with 3 degress of freedom: normal and two in shear plane. [experimental]",
 		((Vector3r,u,Vector3r::Zero(),,"Displacement components, in local coordinates. |yupdate|"))
@@ -22,7 +22,7 @@ struct L3Geom: public GenericSpheresContact{
 		((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
 		,
 		/*init*/
-		((uN,u[0])) ((uT,*((Vector2r*)&u[1])))
+		((uN,u[0])) ((uT,Vector2r::Map(&u[1])))
 		,
 		/*ctor*/ createIndex();
 		, /*py*/
@@ -33,25 +33,41 @@ struct L3Geom: public GenericSpheresContact{
 };
 REGISTER_SERIALIZABLE(L3Geom);
 
-/*
-class L3Geom_Sphere_Sphere: public L3Geom{
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(L3Geom_Sphere_Sphere,L3Geom,"Local geometry of contact between two spherical particles with 3 DoFs. [experimental]",
-		((
 
-}
-*/
+struct L6Geom: public L3Geom{
+	virtual ~L6Geom();
+	YADE_CLASS_BASE_DOC_ATTRS(L6Geom,L3Geom,"Geoemtric of contact in local coordinates with 6 degrees of freedom. [experimental]",
+		((Vector3r,phi,Vector3r::Zero(),,"Rotation components, in local coordinates. |yupdate|"))
+	);
+};
+REGISTER_SERIALIZABLE(L6Geom);
+
 
 struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{
 		virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+		virtual bool genericGo(bool is6Dof, const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+
+	enum { APPROX_NO_RENORM_TRSF=1, APPROX_NO_MID_TRSF=2, APPROX_NO_MID_NORMAL=4, APPROX_NO_RENORM_MID_NORMAL=8 };
 
 	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom_Inc,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres.\n\n.. note:: The initial value of *u[0]* (normal displacement) might be non-zero, with or without *distFactor*, since it is given purely by sphere's geometry. If you want to set \"equilibrium distance\", do it in the contact law as explained in :yref:`L3Geom.u0`.",
 		((bool,noRatch,true,,"See :yref:`ScGeom.avoidGranularRatcheting`."))
 		((Real,distFactor,1,,"Create interaction if spheres are not futher than distFactor*(r1+r2)."))
+		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n1: do not renormalize transformation matrix at every step\n2: use previous transformation to transform velocities (which are known at mid-steps), instead of mid-step transformation computed as quaternion slerp at t=0.5.\n4: do not take average (mid-step) normal when computing relative shear displacement, use previous value instead\n8: do not re-normalize average (mid-step) normal, if used.…\nBy default, the mask is zero and neither of these approximations is used."))
 	);
 	FUNCTOR2D(Sphere,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L3Geom_Inc);
+
+
+struct Ig2_Sphere_Sphere_L6Geom_Inc: public Ig2_Sphere_Sphere_L3Geom_Inc{
+	virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+	YADE_CLASS_BASE_DOC(Ig2_Sphere_Sphere_L6Geom_Inc,Ig2_Sphere_Sphere_L3Geom_Inc,"Incrementally compute :yref:`L6Geom` for contact of 2 spheres.");
+	FUNCTOR2D(Sphere,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
+};
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L6Geom_Inc);
+
 
 struct Law2_L3Geom_FrictPhys_Linear: public LawFunctor{
 	virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
@@ -59,3 +75,13 @@ struct Law2_L3Geom_FrictPhys_Linear: public LawFunctor{
 	YADE_CLASS_BASE_DOC(Law2_L3Geom_FrictPhys_Linear,LawFunctor,"Basic law for testing :yref:`L3Geom` -- linear in both normal and shear sense, without slip or breakage.");
 };
 REGISTER_SERIALIZABLE(Law2_L3Geom_FrictPhys_Linear);
+
+
+struct Law2_L6Geom_FrictPhys_Linear: public LawFunctor{
+	virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+	FUNCTOR2D(L6Geom,FrictPhys);
+	YADE_CLASS_BASE_DOC_ATTRS(Law2_L6Geom_FrictPhys_Linear,LawFunctor,"Basic law for testing :yref:`L3Geom` -- linear in both normal and shear sense, without slip or breakage.",
+		((Real,charLen,1,,"Characteristic length with the meaning of the stiffness ratios bending/shear and torsion/normal."))
+	);
+};
+REGISTER_SERIALIZABLE(Law2_L6Geom_FrictPhys_Linear);

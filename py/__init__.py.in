@@ -42,11 +42,11 @@ import config
 plugins=[]
 # might add followlinks=True to os.walk, for python>=2.6
 for root,dirs,files in os.walk(config.libDir):
-	# for some reason, does not really work?
-	#dirs=[d for d in dirs if d!='dbg']
+	# skip any directory named 'dbg' in the non-debug build
+	if 'dbg' in dirs: dirs.remove('dbg')
 	for f in files:
 		# ouch, ugly!
-		if not config.debug and '/dbg/' in root: continue
+		#if not config.debug and '/dbg/' in root: continue
 		if not (f.startswith('lib') and f.endswith('.so')): continue
 		plugin=os.path.join(config.libDir,root,f)
 		plugins.append(plugin)

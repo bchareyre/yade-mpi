@@ -32,16 +32,16 @@ class TestObjectInstantiation(unittest.TestCase):
 	def testDispatcherCtor(self):
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one
-		cld1=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic(),Law2_Dem3DofGeom_FrictPhys_Basic()]); self.assert_(len(cld1.functors)==1)
+		cld1=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_CundallStrack(),Law2_Dem3DofGeom_FrictPhys_CundallStrack()]); self.assert_(len(cld1.functors)==1)
 		# two different make two different, right?
-		cld2=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
-	def testInteractionDispatchersCtor(self):
+		cld2=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_CundallStrack(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
+	def testInteractionLoopCtor(self):
 		# InteractionLoop takes 3 lists
-		id=InteractionLoop([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],)
+		id=InteractionLoop([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
 		self.assert_(id.geomDispatcher.__class__==IGeomDispatcher)
 		self.assert_(id.physDispatcher.functors[0].__class__==Ip2_FrictMat_FrictMat_FrictPhys)
-		self.assert_(id.lawDispatcher.functors[0].__class__==Law2_Dem3DofGeom_FrictPhys_Basic)
+		self.assert_(id.lawDispatcher.functors[0].__class__==Law2_Dem3DofGeom_FrictPhys_CundallStrack)
 	def testParallelEngineCtor(self):
 		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),ForceResetter()]])
 		self.assert_(pe.slaves[0].__class__==InsertionSortCollider)

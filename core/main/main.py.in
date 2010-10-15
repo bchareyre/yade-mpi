@@ -211,7 +211,9 @@ if gui:
 		# contrary to display.Display, _BaseDisplay does not check for extensions and that avoids spurious message "Xlib.protocol.request.QueryExtension" (bug?)
 		Xlib.display._BaseDisplay();
 		yade.runtime.hasDisplay=True
-	except Xlib.error.DisplayError:
+	except: 
+		# usually Xlib.error.DisplayError, but there can be Xlib.error.XauthError etc as well
+		# let's just pretend any exception means the display would not work
 		gui=None
 
 # run remote access things, before actually starting the user session

@@ -31,16 +31,18 @@ CREATE_LOGGER(LawTester);
 
 void LawTester::postLoad(LawTester&){
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
-	if(path.empty()) throw invalid_argument("LawTester.path: at least one point must be given.");
+	if(path.empty() && rotPath.empty()) throw invalid_argument("LawTester.{path,rotPath}: at least one point must be given.");
 	if(pathSteps.empty()) throw invalid_argument("LawTester.pathSteps: at least one value must be given.");
+	size_t pathSize=max(path.size(),rotPath.size());
 	// update path points
-	_pathV.clear(); _pathV.push_back(Vector3r::Zero());
-	for(size_t i=0; i<path.size(); i++) _pathV.push_back(path[i]);
+	_pathU.clear(); _pathU.push_back(Vector3r::Zero());
+	_pathR.clear(); _pathR.push_back(Vector3r::Zero());
+	for(size_t i=0; i<pathSize; i++) { _pathU.push_back(i<path.size()?path[i]:*(path.rbegin())); _pathR.push_back(i<rotPath.size()?rotPath[i]:*(rotPath.rbegin())); }
 	// update time points from distances, repeat last distance if shorter than path
 	_pathT.clear(); _pathT.push_back(0);
 	for(size_t i=0; i<pathSteps.size(); i++) _pathT.push_back(_pathT[i]+pathSteps[i]);
 	int lastDist=pathSteps[pathSteps.size()-1];
-	for(size_t i=pathSteps.size(); i<path.size(); i++) _pathT.push_back(*(_pathT.rbegin())+lastDist);
+	for(size_t i=pathSteps.size(); i<pathSize; i++) _pathT.push_back(*(_pathT.rbegin())+lastDist);
 }
 
 void LawTester::action(){
@@ -63,9 +65,10 @@ void LawTester::action(){
 	ScGeom* scGeom=dynamic_cast<ScGeom*>(I->geom.get());
 	Dem3DofGeom* d3dGeom=dynamic_cast<Dem3DofGeom*>(I->geom.get());
 	L3Geom* l3Geom=dynamic_cast<L3Geom*>(I->geom.get());
+	L6Geom* l6Geom=dynamic_cast<L6Geom*>(I->geom.get());
 	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
-	if(!scGeom && !d3dGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom.");
+	if(!scGeom && !d3dGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom (or L6Geom).");
 	assert(!((bool)scGeom && (bool)d3dGeom && (bool)l3Geom)); // nonsense
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
@@ -97,6 +100,7 @@ void LawTester::action(){
 				scGeom->rotate(shearTot);
 				shearTot+=scGeom->shearIncrement();
 				ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
+				rotGeom=Vector3r(NaN,NaN,NaN);
 			}
 			else{ // d3dGeom
 				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
@@ -111,6 +115,7 @@ void LawTester::action(){
 		trsf=l3Geom->trsf;
 		axX=trsf.col(0); axY=trsf.col(1); axZ=trsf.col(2);
 		ptGeom=l3Geom->u;
+		if(l6Geom) rotGeom=l6Geom->phi;
 	}
 	trsfQ=Quaternionr(trsf);
 	contPt=gsc->contactPoint;
@@ -118,14 +123,17 @@ void LawTester::action(){
 	renderLength=.5*refLength;
 	
 	// here we go ahead, finally
-	Vector3r val=linearInterpolate<Vector3r,int>(step,_pathT,_pathV,_interpPos);
-	Vector3r valDiff=val-prevVal; prevVal=val;
+	Vector3r u=linearInterpolate<Vector3r,int>(step,_pathT,_pathU,_interpPos);
+	Vector3r phi=linearInterpolate<Vector3r,int>(step,_pathT,_pathR,_interpPosRot);
+	Vector3r dU=u-uPrev; uPrev=u;
+	Vector3r dPhi=phi-phiPrev; phiPrev=phi;
 	if(displIsRel){
-		LOG_DEBUG("Relative diff is "<<valDiff<<" (will be normalized by "<<gsc->refR1+gsc->refR2<<")");
-		valDiff*=refLength;
+		LOG_DEBUG("Relative displacement diff is "<<dU<<" (will be normalized by "<<gsc->refR1+gsc->refR2<<")");
+		dU*=refLength;
 	}
-	LOG_DEBUG("Absolute diff is "<<valDiff);
-	ptOurs+=valDiff;
+	LOG_DEBUG("Absolute diff is: displacement "<<dU<<", rotation "<<dPhi);
+	ptOurs+=dU;
+	rotOurs+=dPhi;
 
 	// reset velocities where displacement is controlled
 	//for(int i=0; i<3; i++){ if(forceControl[i]==0){ state1.vel[i]=0; state2.vel[i]=0; }
@@ -137,29 +145,31 @@ void LawTester::action(){
 		int sign=(i==0?-1:1);
 		Real weight=(i==0?1-idWeight:idWeight);
 		Real radius=(i==0?gsc->refR1:gsc->refR2);
-		// signed and weighted displacement to be applied on this sphere (reversed for #0)
+		// signed and weighted displacement/rotation to be applied on this sphere (reversed for #0)
 		// some rotations must cancel the sign, by multiplying by sign again
-		Vector3r diff=sign*valDiff*weight;
+		Vector3r ddU=sign*dU*weight;
+		Vector3r ddPhi=sign*dPhi*weight;
+		vel[i]=angVel[i]=Vector3r::Zero();
 
 		// normal displacement
 
-		vel[i]=axX*diff[0]/scene->dt;
+		vel[i]+=axX*ddU[0]/scene->dt;
 
 		// shear rotation
 
-		//   multiplication by sign cancels sign in diff, since rotation is non-symmetric (to increase shear, both spheres have the same rotation)
+		//   multiplication by sign cancels sign in ddU, since rotation is non-symmetric (to increase shear, both spheres have the same rotation)
 		//   (unlike shear displacement, which is symmetric)
 		// rotation around Z (which gives y-shear) must be inverted: +ry gives +εzm while -rz gives +εy
-		Real rotZ=-sign*rotWeight*diff[1]/radius, rotY=sign*rotWeight*diff[2]/radius;
-		angVel[i]=(rotY*axY+rotZ*axZ)/scene->dt;
+		Real rotZ=-sign*rotWeight*ddU[1]/radius, rotY=sign*rotWeight*ddU[2]/radius;
+		angVel[i]+=(rotY*axY+rotZ*axZ)/scene->dt;
 
 		// shear displacement
 
-		// angle that is traversed by a sphere in order to give desired diff when displaced on the branch of r1+r2
+		// angle that is traversed by a sphere in order to give desired ddU when displaced on the branch of r1+r2
 		// FIXME: is the branch value correct here?!
-		Real arcAngleY=atan((1-rotWeight)*diff[1]/radius), arcAngleZ=atan((1-rotWeight)*diff[2]/radius);
+		Real arcAngleY=atan((1-rotWeight)*ddU[1]/radius), arcAngleZ=atan((1-rotWeight)*ddU[2]/radius);
 		// same, but without the atan, which can be disregarded for small increments:
-		//    Real arcAngleY=(1-rotWeight)*diff[1]/radius, arcAngleZ=(1-rotWeight)*diff[2]/radius; 
+		//    Real arcAngleY=(1-rotWeight)*ddU[1]/radius, arcAngleZ=(1-rotWeight)*ddU[2]/radius; 
 		vel[i]+=axY*radius*sin(arcAngleY)/scene->dt; vel[i]+=axZ*radius*sin(arcAngleZ)/scene->dt;
 
 		// compensate distance increase caused by motion along the perpendicular axis
@@ -167,10 +177,11 @@ void LawTester::action(){
 		// and the compensation is always in the -εx sense (-sign → +1 for #0, -1 for #1)
 		vel[i]+=-sign*axX*radius*((1-cos(arcAngleY))+(1-cos(arcAngleZ)))/scene->dt;
 
+		// rotation
+		angVel[i]+=trsf*ddPhi;
+
 		LOG_DEBUG("vel="<<vel[i]<<", angVel="<<angVel[i]<<", rotY,rotZ="<<rotY<<","<<rotZ<<", arcAngle="<<arcAngleY<<","<<arcAngleZ<<", sign="<<sign<<", weight="<<weight);
 
-		//Vector3r vel=(rotY*axY+rotZ*axZ)/scene->dt;
-		//Vector3r linVel=axX*valDiff[0]/scene->dt;
 	}
 	state1->vel=vel[0]; state1->angVel=angVel[0];
 	state2->vel=vel[1]; state2->angVel=angVel[1];
@@ -228,7 +239,7 @@ void GlExtra_LawTester::render(){
 	glTranslatev(Vector3r(0,tester->ptOurs[1],tester->ptOurs[2]));
 
 
-	const int t(tester->step); const vector<int>& TT(tester->_pathT); const vector<Vector3r>& VV(tester->_pathV);
+	const int t(tester->step); const vector<int>& TT(tester->_pathT); const vector<Vector3r>& VV(tester->_pathU);
 	size_t numSegments=TT.size();
 	const Vector3r colorBefore=Vector3r(.7,1,.7), colorAfter=Vector3r(1,.7,.7);
 
