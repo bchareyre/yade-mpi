@@ -107,7 +107,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 		scm->radius1 = 2*sphereRadius;
 		scm->radius2 = sphereRadius;
 		if (isNew) c->geom = scm;
-		scm->precompute(state1,state2,scene,c,normal,isNew,true);
+		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);
 		return true;
 	}
 	return false;

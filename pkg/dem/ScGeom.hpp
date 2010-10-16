@@ -27,14 +27,14 @@ class ScGeom: public GenericSpheresContact {
 		virtual ~ScGeom();
 		
 		//!precompute values of shear increment and interaction rotation data. Update contact normal to the vurrentNormal value. Precondition : the value of normal is not updated outside (and before) this function.
-		void precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, bool avoidGranularRatcheting=true);
+		void precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, const Vector3r& shift2, bool avoidGranularRatcheting=true);
 
 		//! Rotates a "shear" vector to keep track of contact orientation. Returns reference of the updated vector.
 		Vector3r& rotate(Vector3r& tangentVector) const;
 		const Vector3r& shearIncrement() const {return shearInc;}
 
 		// Add method which returns the impact velocity (then, inside the contact law, this can be split into shear and normal component). Handle periodicity.
-		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting=true);
+		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, const Vector3r& shift2, bool avoidGranularRatcheting=true);
 		// Implement another version of getIncidentVel which does not handle periodicity.
 		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting=true);
 		

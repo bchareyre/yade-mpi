@@ -2,9 +2,26 @@
 #include<yade/pkg-dem/L3Geom.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Law2_L3Geom_FrictPhys_Linear)(Law2_L6Geom_FrictPhys_Linear));
+YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Law2_L3Geom_FrictPhys_ElPerfPl)(Law2_L6Geom_FrictPhys_Linear));
 
 L3Geom::~L3Geom(){}
+void L3Geom::applyLocalForceTorque(const Vector3r& localF, const Vector3r& localT, const Interaction* I, Scene* scene, NormShearPhys* nsp) const {
+	Vector3r globF=trsf.transpose()*localF; // trsf is orthonormal, therefore inverse==transpose
+	Vector3r x1c(normal*(refR1+.5*u[0])), x2c(normal*(refR1+.5*u[0]));
+	if(nsp){ nsp->normalForce=normal*globF.dot(normal); nsp->shearForce=globF-nsp->normalForce; }
+	Vector3r globT=Vector3r::Zero();
+	// add torque, if any
+	if(localT!=Vector3r::Zero()){	globT=trsf.transpose()*localT; }
+	// apply force and torque
+	scene->forces.addForce(I->getId1(), globF); scene->forces.addTorque(I->getId1(),x1c.cross( globF)+globT);
+	scene->forces.addForce(I->getId2(),-globF); scene->forces.addTorque(I->getId2(),x2c.cross(-globF)-globT);
+}
+
+void L3Geom::applyLocalForce(const Vector3r& localF, const Interaction* I, Scene* scene, NormShearPhys* nsp) const {
+	applyLocalForceTorque(localF,Vector3r::Zero(),I,scene,nsp);
+}
+
+
 L6Geom::~L6Geom(){}
 
 bool Ig2_Sphere_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I){
@@ -130,26 +147,33 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::genericGo(bool is6Dof, const shared_ptr<Shape
 };
 
 
-void Law2_L3Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
-	const shared_ptr<L3Geom> geom=static_pointer_cast<L3Geom>(ig); const shared_ptr<FrictPhys> phys=static_pointer_cast<FrictPhys>(ip);
-	// compute force:
-	Vector3r localF=geom->u.cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
-	// transform back to global coords
-	Vector3r globalF=Quaternionr(geom->trsf).conjugate()*localF;
-	// only for keeping track of the force
-	phys->normalForce=geom->normal*globalF.dot(geom->normal); phys->shearForce=globalF-phys->normalForce;
-	// apply force and torque
-	applyForceAtBranch(globalF,I->getId1(),geom->normal*(geom->refR1+.5*geom->u[0]),I->getId2(),-geom->normal*(geom->refR1+.5*geom->u[0]));
+void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
+	L3Geom* geom=static_cast<L3Geom*>(ig.get()); FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
+
+	// compute force
+	Vector3r localF=geom->relU().cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
+	// break if necessary
+	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I->getId1(),I->getId2()); }
+
+	if(!noSlip){
+		// plastic slip, if necessary
+		Real maxFs=localF[0]*phys->tangensOfFrictionAngle; Vector2r Fs=Vector2r::Map(&localF[1]);
+		if(Fs.squaredNorm()>maxFs*maxFs){
+			Real ratio=sqrt(maxFs*maxFs/Fs.squaredNorm());
+			geom->u0+=(1-ratio)*Vector3r(0,geom->relU()[1],geom->relU()[2]); // increment plastic displacement
+			Fs*=ratio; // decrement shear force value;
+		}
+	}
+	// apply force: this converts the force to global space, updates NormShearPhys::{normal,shear}Force, applies to particles
+	geom->applyLocalForce(localF,I,scene,phys);
 }
 
 void Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
-	// same as for L3Geom, except of the torque term
-	const shared_ptr<L6Geom> geom=static_pointer_cast<L6Geom>(ig); const shared_ptr<FrictPhys> phys=static_pointer_cast<FrictPhys>(ip);
-	Vector3r localF=geom->u.cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
-	Vector3r localT=charLen*(geom->phi.cwise()*Vector3r(phys->kn,phys->ks,phys->ks));
-	Quaternionr invTrsf=Quaternionr(geom->trsf).conjugate();
-	Vector3r globalF=invTrsf*localF, globalT=invTrsf*localT;
-	phys->normalForce=geom->normal*globalF.dot(geom->normal); phys->shearForce=globalF-phys->normalForce;
-	applyForceAtBranch(globalF,I->getId1(),geom->normal*(geom->refR1+.5*geom->u[0]),I->getId2(),-geom->normal*(geom->refR1+.5*geom->u[0]));
-	scene->forces.addTorque(I->getId1(),globalT); scene->forces.addTorque(I->getId2(),-globalT);
+	L6Geom* geom=static_cast<L6Geom*>(ig.get()); FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
+
+	// simple linear relationships
+	Vector3r localF=geom->relU().cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
+	Vector3r localT=charLen*(geom->relPhi().cwise()*Vector3r(phys->kn,phys->ks,phys->ks));
+
+	geom->applyLocalForceTorque(localF,localT,I,scene,phys);
 }

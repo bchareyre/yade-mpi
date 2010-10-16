@@ -20,7 +20,7 @@ Vector3r& ScGeom::rotate(Vector3r& shearForce) const {
 }
 
 //!Precompute data needed for rotating tangent vectors attached to the interaction
-void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, bool avoidGranularRatcheting){
+void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, const Vector3r& shift2, bool avoidGranularRatcheting){
 	if(!isNew) {
 		orthonormal_axis = normal.cross(currentNormal);
 		Real angle = scene->dt*0.5*normal.dot(rbp1.angVel + rbp2.angVel);
@@ -29,13 +29,13 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene
 	//Update contact normal
 	normal=currentNormal;
 	//Precompute shear increment
-	Vector3r relativeVelocity=getIncidentVel(&rbp1,&rbp2,scene->dt,scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>()) : Vector3r::Zero(),avoidGranularRatcheting);
+	Vector3r relativeVelocity=getIncidentVel(&rbp1,&rbp2,scene->dt,shift2,scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>()) : Vector3r::Zero(),avoidGranularRatcheting);
 	//keep the shear part only
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	shearInc = relativeVelocity*scene->dt;
 }
 
-Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, bool avoidGranularRatcheting){
+Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shift2, const Vector3r& shiftVel, bool avoidGranularRatcheting){
 	Vector3r& x = contactPoint;
 	Vector3r c1x, c2x;
 	if(avoidGranularRatcheting){
@@ -61,7 +61,7 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, c
 	} else {
 		// FIXME: It is correct for sphere-sphere and sphere-facet contact
 		c1x = (x - rbp1->pos);
-		c2x = (x - rbp2->pos);
+		c2x = (x - rbp2->pos + shift2);
 	}
 	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
 	//update relative velocity for interactions across periods
@@ -71,7 +71,7 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, c
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 	//Just pass null shift to the periodic version
-	return getIncidentVel(rbp1,rbp2,dt,Vector3r::Zero(),avoidGranularRatcheting);
+	return getIncidentVel(rbp1,rbp2,dt,Vector3r::Zero(),Vector3r::Zero(),avoidGranularRatcheting);
 }
 
 Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranularRatcheting){
@@ -79,6 +79,7 @@ Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranular
 	Scene* scene=Omega::instance().getScene().get();
 	return getIncidentVel(Body::byId(i->getId1(),scene)->state.get(),Body::byId(i->getId2(),scene)->state.get(),
 		scene->dt,
-		scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*i->cellDist.cast<Real>()) : Vector3r::Zero(),
+		scene->isPeriodic ? Vector3r(                     scene->cell->Hsize*i->cellDist.cast<Real>()): Vector3r::Zero(), // shift2
+		scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*i->cellDist.cast<Real>()) : Vector3r::Zero(), // shiftVel
 		avoidGranularRatcheting);
 }

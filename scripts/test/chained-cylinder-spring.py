@@ -21,7 +21,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
 		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True,normalCohesion=1e13,shearCohesion=1e13)],
-		[Law2_ScGeom_CohFrictPhys_ElasticPlastic(momentRotationLaw=True,label='law')]
+		[Law2_ScGeom_CohFrictPhys_CohesionMoment(momentRotationLaw=True,label='law')]
 	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),

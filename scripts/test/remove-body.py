@@ -12,7 +12,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	GravityEngine(gravity=[0,0,-10]),
 	NewtonIntegrator(damping=0.01),

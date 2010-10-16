@@ -39,7 +39,7 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 		scm->penetrationDepth=penetrationDepth;
 		scm->radius1=s1->radius;
 		scm->radius2=s2->radius;
-		scm->precompute(state1,state2,scene,c,normal,isNew,avoidGranularRatcheting);
+		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,avoidGranularRatcheting);
 		return true;
 	}
 	return false;

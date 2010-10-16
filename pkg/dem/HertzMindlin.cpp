@@ -180,8 +180,9 @@ void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	Vector3r shearIncrement;
 	if(nonLin>1){
 		State *de1=Body::byId(id1,scene)->state.get(), *de2=Body::byId(id2,scene)->state.get();	
+		Vector3r shift2=scene->isPeriodic ? Vector3r(scene->cell->Hsize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
 		Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
-		Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shiftVel, /*preventGranularRatcheting*/ nonLin>2 );	
+		Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shift2, shiftVel, /*preventGranularRatcheting*/ nonLin>2 );	
 		Vector3r incidentVn = geom->normal.dot(incidentV)*geom->normal; // contact normal velocity
 		Vector3r incidentVs = incidentV-incidentVn; // contact shear velocity
 		shearIncrement=incidentVs*scene->dt;
@@ -278,13 +279,14 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	
 	Vector3r& shearElastic = phys->shearElastic; // reference for shearElastic force
 	// Define shift to handle periodicity
+	Vector3r shift2   = scene->isPeriodic ? Vector3r(                      scene->cell->Hsize *contact->cellDist.cast<Real>()) : Vector3r::Zero();
 	Vector3r shiftVel = scene->isPeriodic ? Vector3r((scene->cell->velGrad*scene->cell->Hsize)*contact->cellDist.cast<Real>()) : Vector3r::Zero();
 	// 1. Rotate shear force
 	shearElastic = scg->rotate(shearElastic);
 	Vector3r prev_FsElastic = shearElastic; // save shear force at previous time step
 	// 2. Get incident velocity, get shear and normal components
 	// FIXME: Concerning the possibility to avoid granular ratcheting, it is not clear how this works in the case of HM. See the thread http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01947.html
-	Vector3r incidentV = scg->getIncidentVel(de1, de2, dt, shiftVel, preventGranularRatcheting);	
+	Vector3r incidentV = scg->getIncidentVel(de1, de2, dt, shift2, shiftVel, preventGranularRatcheting);	
 	Vector3r incidentVn = scg->normal.dot(incidentV)*scg->normal; // contact normal velocity
 	Vector3r incidentVs = incidentV - incidentVn; // contact shear velocity
 	// 3. Get shear force (incrementally)

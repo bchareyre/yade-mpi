@@ -21,7 +21,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()]
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]
 	),
 	#PeriTriaxController(goal=[-1e3,-1e3,-1e3],stressMask=7,globUpdate=5,maxStrainRate=[5.,5.,5.],label='triax'),
 	NewtonIntegrator(damping=.6, homotheticCellResize=0),

@@ -55,7 +55,7 @@ int Matrix3r_len(){return 9;}
 // pickling support
 struct Matrix3r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Matrix3r& x){ return bp::make_tuple(x(0,0),x(0,1),x(0,2),x(1,0),x(1,1),x(1,2),x(2,0),x(2,1),x(2,2));} };
 struct Quaternionr_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Quaternionr& x){ return bp::make_tuple(x.w(),x.x(),x.y(),x.z());} };
-struct Vector6r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector3r& x){ return bp::make_tuple(x[0],x[1],x[2],x[3],x[4],x[5]);} };
+struct Vector6r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector6r& x){ return bp::make_tuple(x[0],x[1],x[2],x[3],x[4],x[5]);} };
 struct Vector3r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector3r& x){ return bp::make_tuple(x[0],x[1],x[2]);} };
 struct Vector3i_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector3i& x){ return bp::make_tuple(x[0],x[1],x[2]);} };
 struct Vector2r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector2r& x){ return bp::make_tuple(x[0],x[1]);} };
@@ -180,6 +180,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def_pickle(Matrix3r_pickle())
 		//
 		.def("determinant",&Matrix3r::determinant)
+		.def("trace",&Matrix3r::trace)
 		.def("inverse",&Matrix3r_inverse)
 		.def("transpose",&Matrix3r_transpose)
 		.def("polarDecomposition",&Matrix3r_polarDecomposition)

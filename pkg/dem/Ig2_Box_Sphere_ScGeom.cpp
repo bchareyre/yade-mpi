@@ -108,7 +108,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->geom = scm;
-		scm->precompute(state1,state2,scene,c,normal,isNew,true);
+		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);
 	} else { // outside
 		Vector3r cOnBox_box = boxAxisT*cOnBox_boxLocal; // projection of sphere's center on closest box surface - relative to box's origin, but GLOBAL orientation!
 		Vector3r cOnBox_sphere = cOnBox_box-relPos21; // same, but origin in sphere's center
@@ -147,7 +147,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->geom = scm;
-		scm->precompute(state1,state2,scene,c,-cOnBox_sphere,isNew,true);
+		scm->precompute(state1,state2,scene,c,-cOnBox_sphere,isNew,shift2,true);
 	}
 	return true;
 }

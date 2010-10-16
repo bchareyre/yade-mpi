@@ -58,7 +58,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 		scm->penetrationDepth=penetrationDepth;
 		scm->radius1=s1->radius;
 		scm->radius2=s2->radius;
-		scm->precompute(state1,state2,scene,c,normal,isNew,true);
+		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);
 		return true;
 	}
 	return false;
@@ -121,7 +121,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	bs1->length=length;
 	bs1->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),bchain1.ori.conjugate()*segt);
 #endif
-	scm->precompute(state1,state2,scene,c,segt/length,isNew,true);
+	scm->precompute(state1,state2,scene,c,segt/length,isNew,shift2,true);
 
 	//Set values that will be considered in Ip2 functor, geometry (precomputed) is really defined with values above
 	scm->radius1 = scm->radius2 = bs1->initLength*0.5;

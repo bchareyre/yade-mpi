@@ -20,7 +20,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_ScGeom_FrictPhys_Basic()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	# subscribedBodies: what bodies is force applied to
 	# direction: direction of the force (normalized automatically), constant

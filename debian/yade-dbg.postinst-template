@@ -20,7 +20,6 @@ set -e
 
 case "$1" in
     configure)
-	 	update-alternatives --install /usr/bin/yade-dbg yade-dbg /usr/bin/yade@_VERSION@-dbg @PRIORITY@ --slave /usr/bin/yade-dbg-batch yade-dbg-batch /usr/bin/yade@_VERSION@-dbg-batch --slave /usr/share/man/man1/yade-dbg.1.gz yade-dbg.1.gz /usr/share/man/man1/yade@_VERSION@-dbg.1.gz --slave /usr/share/man/man1/yade-dbg-batch.1.gz yade-dbg-batch.1.gz /usr/share/man/man1/yade@_VERSION@-dbg-batch.1.gz
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

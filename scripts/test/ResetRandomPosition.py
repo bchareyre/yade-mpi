@@ -49,7 +49,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
-		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
 	NewtonIntegrator(damping=0),

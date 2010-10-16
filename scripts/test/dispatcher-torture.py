@@ -19,8 +19,8 @@ dispatches=[
 	Dispatch('IPhys',('Material','Material')),
 	Dispatch('Bound',('Shape','Bound')),
 	Dispatch('GlBound',('Bound',)),
-	Dispatch('GlInteractionGeometry',('IGeom',)),
-	Dispatch('GlInteractionPhysics',('IPhys',)),
+	Dispatch('GlIGeom',('IGeom',)),
+	Dispatch('GlIPhys',('IPhys',)),
 	Dispatch('GlShape',('Shape',)),
 	#Dispatch('GlState',('State',)) # broken for now
 ]

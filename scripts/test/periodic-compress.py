@@ -15,7 +15,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	PeriIsoCompressor(charLen=.5,stresses=[-50e9,-1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
 	NewtonIntegrator(damping=.4,homotheticCellResize=1)

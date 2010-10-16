@@ -37,7 +37,10 @@ void LawTester::postLoad(LawTester&){
 	// update path points
 	_pathU.clear(); _pathU.push_back(Vector3r::Zero());
 	_pathR.clear(); _pathR.push_back(Vector3r::Zero());
-	for(size_t i=0; i<pathSize; i++) { _pathU.push_back(i<path.size()?path[i]:*(path.rbegin())); _pathR.push_back(i<rotPath.size()?rotPath[i]:*(rotPath.rbegin())); }
+	for(size_t i=0; i<pathSize; i++) {
+		_pathU.push_back(i<path.size()?path[i]:(path.empty()?Vector3r::Zero():*(path.rbegin())));
+		_pathR.push_back(i<rotPath.size()?rotPath[i]:(rotPath.empty()?Vector3r::Zero():*(rotPath.rbegin())));
+	}
 	// update time points from distances, repeat last distance if shorter than path
 	_pathT.clear(); _pathT.push_back(0);
 	for(size_t i=0; i<pathSteps.size(); i++) _pathT.push_back(_pathT[i]+pathSteps[i]);
@@ -78,6 +81,7 @@ void LawTester::action(){
 	if(state1->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id1); state1->blockedDOFs=State::DOF_ALL;}
 	if(state2->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id2); state2->blockedDOFs=State::DOF_ALL;}
 
+
 	if(step>*(_pathT.rbegin())){
 		LOG_INFO("Last step done, setting zero velocities on #"<<id1<<", #"<<id2<<".");
 		state1->vel=state1->angVel=state2->vel=state2->angVel=Vector3r::Zero();
@@ -86,6 +90,7 @@ void LawTester::action(){
 		return;
 	}
 	/* initialize or update local axes and trsf */
+	rotGeom=Vector3r(NaN,NaN,NaN); // this is meaningful only with l6geom
 	if(!l3Geom){
 		axX=gsc->normal; /* just in case */ axX.normalize();
 		if(doInit){ // initialization of the new interaction
@@ -100,7 +105,6 @@ void LawTester::action(){
 				scGeom->rotate(shearTot);
 				shearTot+=scGeom->shearIncrement();
 				ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
-				rotGeom=Vector3r(NaN,NaN,NaN);
 			}
 			else{ // d3dGeom
 				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
