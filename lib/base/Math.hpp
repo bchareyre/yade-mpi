@@ -24,6 +24,8 @@
  */
 // different macros for different versions of eigen:
 //  http://bitbucket.org/eigen/eigen/issue/96/eigen_dont_align-doesnt-exist-in-205-but-appears-in-web
+
+//#define EIGEN2_SUPPORT  //This makes Eigen3 migration easier
 #define EIGEN_DONT_VECTORIZE
 #define EIGEN_DONT_ALIGN
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT

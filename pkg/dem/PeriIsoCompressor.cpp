@@ -418,7 +418,20 @@ void Peri3dController::action(){
 	// Actual action (see the documentation for more info)
 	const Matrix3r& trsf=scene->cell->trsf;
 	// compute rotational and nonrotational (strain in local coordinates) part of trsf
-	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot); 
+	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot);
+	/*
+	//Eigen3 does not have computeUnitaryPositive() implemented. Next few lines of code replace missing functions. Tested. Anton,
+	Matrix3r mU, mV, mS;
+        Eigen::JacobiSVD<Matrix3r> svd(trsf, Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+        mU = svd.matrixU();
+        mV = svd.matrixV();
+        mS = svd.singularValues().asDiagonal();
+
+        rot = mU * mV.adjoint();
+        nonrot = mV * mS * mV.adjoint(); 
+	*/
+	 
 	// prescribed velocity gradient (strain tensor rate) in global coordinates
 	epsilonRate = strainRate.toMatrix(/*strain=*/true); 
 	/* transformation of prescribed strain rate (computed by predictor) into local cell coordinates,
