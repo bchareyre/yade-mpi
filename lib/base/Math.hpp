@@ -38,7 +38,10 @@
 #define EIGEN_NO_DEBUG
 #include<Eigen/Core>
 #include<Eigen/Geometry>
-#include<Eigen/Array>
+	#if EIGEN_MAJOR_VERSION<20		//Eigen3 definition, while it is not realized
+
+		#include<Eigen/Array>
+	#endif
 #include<Eigen/QR>
 #include<Eigen/LU>
 #include<Eigen/SVD>
@@ -124,12 +127,18 @@ typedef Math<Real> Mathr;
 template<typename MatrixT>
 void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT* positive){
 	assert(unitary); assert(positive); 
-	#if EIGEN_WORLD_VERSION<3
+	#if EIGEN_MAJOR_VERSION<20		//Eigen3 definition, while it is not realized
+	
 		Eigen::SVD<MatrixT>(in).computeUnitaryPositive(unitary,positive);
 	#else
 		Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
-		*unitary=svd.matrixU() * svd.matrixV().adjoint();
-		*positive=svd.matrixV() * svd.singularValues().asDiagonal() * svg.matrixV().adjoint;
+		MatrixT mU, mV, mS;
+		mU = svd.matrixU();
+        	mV = svd.matrixV();
+        	mS = svd.singularValues().asDiagonal();
+
+		*unitary=mU() * mV().adjoint();
+		*positive=mV() * mS().asDiagonal() * mV().adjoint;
 	#endif
 }
 
