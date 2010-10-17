@@ -193,6 +193,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 		VECTOR_SEQ_CONV(bool);
 		VECTOR_SEQ_CONV(Real);
 		VECTOR_SEQ_CONV(Se3r);
+		VECTOR_SEQ_CONV(Vector2r);
 		VECTOR_SEQ_CONV(Vector3r);
 		VECTOR_SEQ_CONV(std::string);
 		VECTOR_SEQ_CONV(shared_ptr<Body>);

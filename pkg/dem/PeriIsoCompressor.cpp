@@ -257,12 +257,193 @@ void PeriTriaxController::action()
 }
 
 
+
+
+CREATE_LOGGER(Peri3dController);
+void Peri3dController::action(){
+	if(!scene->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
+	const Real& dt=scene->dt;
+	assert(dt>0);
+
+	/* "Constructor" (if (step==0) )
+			ps is the vector of indices, where stress is prescribed
+			pe is the vector of indices, where strain is prescribed
+		 	example: goal = 0b000110 : ps=(1,2,0,0,0,0), pe=(0,3,4,5,0,0)
+			lenPs (lenPe) is the meaningful length of ps (pe) (the zeros at the end of ps and pe has no meaning),
+				i.e. the number of indices with prescribed stress (strain)
+	*/
+	bool stressBasedSimulation=false; // true when all stresses are prescribed or if all prescribed strains equal zero
+	if (progress==0) {
+		lenPs=0; lenPe=0;
+		ps=Vector6i::Zero();
+		pe=Vector6i::Zero();
+		stressGoal = Vector6r::Zero();
+		strainGoal = Vector6r::Zero();
+		for (int i=0; i<6; i++){
+			if (stressMask&(1<<i)){ // if stress is prescribed at direction i, add this direction to ps and increase lenPs by one
+				ps(lenPs++)=i;
+				stressGoal(i) = goal(i);
+			} else{ // if strain is prescribed at direction i, add this direction to pe and increase lenPe by one
+				pe(lenPe++)=i;
+				strainGoal(i) = goal(i);
+			}
+		}
+
+		// variables used in evaluation of ideal stress and ideal strain for each part defined by ##Path
+		paths[0]=&xxPath; paths[1]=&yyPath; paths[2]=&zzPath; paths[3]=&yzPath; paths[4]=&zxPath; paths[5]=&xyPath; // pointers to the Paths
+		pathSizes[0]=xxPath.size(); pathSizes[1]=yyPath.size(); pathSizes[2]=zzPath.size();
+		pathSizes[3]=yzPath.size(); pathSizes[4]=zxPath.size(); pathSizes[5]=xyPath.size();
+		for (int i=0; i<6; i++) {pathsCounter[i] = 0;} // inidicator in which part of the path we are
+
+		// path[0] is a pointer to xxPath
+		// path[0]->operator[](j) is j-th Vector2r in path[0]
+		// PATH_OP_OP(0,j,k) = path[0]->operator[](j).operator(k) is k-th element of j-th Vector2r of xxPath
+		#define PATH_OP_OP(pi,op1i,op2i) paths[pi]->operator[](op1i).operator()(op2i)
+
+		for (int i=0; i<6; i++) { 
+			for (int j=1; j<pathSizes[i]; j++) {
+				// check if the user defined time axis is monothonically increasing
+				{ if ( PATH_OP_OP(i,j-1,0) >= PATH_OP_OP(i,j,0) ) {
+					throw runtime_error("Peri3dCoontroller.##Path: Time in ##Path must be monothonically increasing");
+				}}
+			}
+			for (int j=0; j<pathSizes[i]; j++) {
+				// convert relative progress values of ##Path to absolute values
+				PATH_OP_OP(i,j,0) *= 1./PATH_OP_OP(i,pathSizes[i]-1,0);
+				// convert relative stress/strain values of ##Path to absolute stress strain values
+				if (abs(PATH_OP_OP(i,pathSizes[i]-1,1)) >= 1e-9) { // the final value is not 0 (otherwise always absolute values are considered)
+					PATH_OP_OP(i,j,1) *= goal(i)/PATH_OP_OP(i,pathSizes[i]-1,1);
+				}
+			}
+		}
+
+		// set weather the simulation is "stress based" (all stress components prescribed or all prescribed strains equal zero)
+		if (lenPe == 0) { stressBasedSimulation = true; }
+		else { 
+			stressBasedSimulation = true;
+			for (int i=0; i<lenPe; i++) { stressBasedSimulation = stressBasedSimulation && PATH_OP_OP(pe(i),1,1)<1e9; }
+		}
+	}
+	
+	// increase the pathCounter by one if we cross to the next part of path
+	for (int i=0; i<6; i++) {
+		if (progress >= PATH_OP_OP(i,pathsCounter[i],0)) { pathsCounter[i]++; }
+	}
+
+	/* values of prescribed stress (strain) rate in respect to prescribed path.
+	   The strain indices where stress is prescribed will be overwritten by predictor */
+	for (int i=0; i<lenPe; i++){
+		int j = pe(i);
+		if (pathSizes[j] == 1) { // path has only one part (only final values are prescribed)
+			strainRate(j) = strainGoal(j)/(nSteps*dt); // ideal strain rate in respect of dSteps and dValue
+		}
+		else if (pathsCounter[j] == 0) { // path has more parts, but we are still at the first one
+			const Real& dProgress = PATH_OP_OP(j,0,0); // progress difference of respective part of the path
+			const Real& dValue = PATH_OP_OP(j,0,1); // strain difference at the respective part of the path
+			strainRate(j) = dValue/(dProgress*nSteps*dt); // ideal strain rate in respect of dSteps and dValue
+		}
+		else if (progress < 1.) {
+			const Real dProgress = PATH_OP_OP(j,pathsCounter[j],0) - PATH_OP_OP(j,pathsCounter[j]-1,0); // progress difference of respective part of the path
+			const Real dValue = PATH_OP_OP(j,pathsCounter[j],1) - PATH_OP_OP(j,pathsCounter[j]-1,1); // strain difference at the respective part of the path
+			strainRate(j) = dValue/(dProgress*nSteps*dt); // ideal strain rate in respect of dSteps and dValue
+		}
+		else { strainRate(j) = 0; }
+	}
+	for (int i=0; i<lenPs; i++){
+		int j = ps(i);
+		if (pathSizes[j] == 1) { // path has only one part (only final values are prescribed)
+			stressRate(j) = stressGoal(j)/(nSteps*dt); // ideal stress rate in respect of dSteps and dValue
+		}
+		else if (pathsCounter[j] == 0) { // path has more parts, but we are still at the first one
+			const Real& dProgress = PATH_OP_OP(j,0,0); // progress difference of respective part of the path
+			const Real& dValue = PATH_OP_OP(j,0,1); // stress difference at the respective part of the path
+			stressRate(j) = dValue/(dProgress*nSteps*dt); // ideal stress rate in respect of dSteps and dValue
+		}
+		else if (progress < 1.) {
+			const Real dProgress = PATH_OP_OP(j,pathsCounter[j],0) - PATH_OP_OP(j,pathsCounter[j]-1,0); //  progress difference of respective part of the path
+			const Real dValue = PATH_OP_OP(j,pathsCounter[j],1) - PATH_OP_OP(j,pathsCounter[j]-1,1); // stress difference at the respective part of the path
+			stressRate(j) = dValue/(dProgress*nSteps*dt); // ideal stress rate in respect of dSteps and dValue
+		}
+		else { stressRate(j) = 0; }
+	}
+
+	// Update - update values from previous step to current step
+	stressOld = stress; // stresssOld = stress at previous step
+	sigma = Shop::stressTensorOfPeriodicCell(/*smallStrains=*/true); // current stress tensor
+	stress = stress.fromMatrix(sigma); // current stress vector
+	stressIdeal += stressRate*dt; // stress that would be obtained if the predictor would be perfect
+	strain += strainRate*dt; // current strain vector
+	epsilon = strain.toMatrix(/*strain=*/true); // current strain tensor
+
+	/* StrainPredictor
+			extremely primitive predictor, but roboust enough and works fine :-) could be replaced by some more rigorous in future.
+			In the direction with prescribed strain rate this prescribed strain rate is applied.
+			In direction with prescribed stress: from values of stress and strain in previous two steps the value of strain rate
+			is predicted so as the stress in the next step would be as close as possible to the ideal stress value,
+			see the documentation for more info
+	*/
+	if (lenPs > 0){ // if at least 1 stress component is prescribed (otherwise prescribed strain is applied in all 6 directions
+		if (progress == 0 && stressBasedSimulation) { // the very first step, use compliance estimation (compliance matrix for elastic isotropic material)
+			Real complianceEstimation[6][6] = {
+				{1/youngEstimation, -poissonEstimation/youngEstimation, -poissonEstimation/youngEstimation, 0,0,0},
+				{-poissonEstimation/youngEstimation, 1/youngEstimation, -poissonEstimation/youngEstimation, 0,0,0},
+				{-poissonEstimation/youngEstimation, -poissonEstimation/youngEstimation, 1/youngEstimation, 0,0,0},
+				{0,0,0, (1+poissonEstimation)/youngEstimation,0,0},
+				{0,0,0, 0,(1+poissonEstimation)/youngEstimation,0},
+				{0,0,0, 0,0,(1+poissonEstimation)/youngEstimation}};
+			for (int i=0; i<lenPs; i++) {
+				strainRate(ps(i)) = 0;
+				for (int j=0; j<lenPs; j++) { strainRate(ps(i)) += complianceEstimation[ps(i)][ps(j)]*stressRate[ps(j)]; }
+				for (int j=0; j<lenPe; j++) { strainRate(ps(i)) += complianceEstimation[ps(i)][ps(j)]*stressRate[ps(j)]; }
+			}
+			//for (int i=0; i<lenPs; i++) { strainRate(ps(i)) -= maxStrainRate; }
+		}
+		else { // actual predictor
+			Real sr=strainRate.maxabs();
+			for (int i=0; i<lenPs; i++) {
+				int j=ps(i);
+				// linear extrapolation of stress error (difference between actual and ideal stress)
+				Real linPred = 2*(stress(j)-stressIdeal(j)) - (stressOld(j)-(stressIdeal(j)-stressRate(j)*dt));
+				// correction of strain in respect to the extrapolated stress error
+				if (linPred>0){strainRate(j) -= sr*mod;}
+				else {strainRate(j) += sr*mod;}
+			}
+		}
+	}
+	
+	// correction coefficient ix strainRate.maxabs() > maxStrainRate
+	Real srCorr = (strainRate.maxabs() > maxStrainRate)? (maxStrainRate/strainRate.maxabs()):1.;
+	strainRate *= srCorr;
+
+	// Actual action (see the documentation for more info)
+	const Matrix3r& trsf=scene->cell->trsf;
+	// compute rotational and nonrotational (strain in local coordinates) part of trsf
+	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot); 
+	// prescribed velocity gradient (strain tensor rate) in global coordinates
+	epsilonRate = strainRate.toMatrix(/*strain=*/true); 
+	/* transformation of prescribed strain rate (computed by predictor) into local cell coordinates,
+	   multiplying by time to obtain strain increment and adding it to nonrot (current strain in local coordinates)*/
+	nonrot += rot.transpose()*(epsilonRate*dt)*rot; 
+	Matrix3r& velGrad=scene->cell->velGrad;
+	// compute new trsf as rot*nonrot, substract actual trsf (= trsf increment), divide by dt (=trsf rate = velGrad
+	//trsf = rot*nonrot;
+	//velGrad = (rot*nonrot - trsf)/dt;
+	velGrad = ((rot*nonrot)*trsf.inverse()- Matrix3r::Identity()) / dt ;
+	progress += srCorr/nSteps;
+
+	if (progress >= 1. || strain.maxabs() > maxStrain) {
+		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; }
+		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
+	}
+}
+
+/*
 CREATE_LOGGER(Peri3dController);
 void Peri3dController::update(){
-	/* strain
+	/ * strain
 		polar decomposition of transformation:
 			compute strain tensor from the non-rotational part of trsf, then rotate it back to global coords
-	*/
+	/
 	Matrix3r rot,nonrot; //nonrot=skew+normal deformation
 	const Matrix3r& trsf=scene->cell->trsf;
 	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot);
@@ -274,8 +455,8 @@ void Peri3dController::update(){
 		strain=rot*(nonrot-Matrix3r::Identity());
 	#endif
 	LOG_TRACE("Updated strain value\n"<<strain);
-	/* stress and stiffness
-	*/
+	/ * stress and stiffness
+	/
 	K=Matrix6r::Zero();
 	stress=Matrix3r::Zero();
 	const Real volume=scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
@@ -324,7 +505,7 @@ void Peri3dController::action(){
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
 	const Real& dt=scene->dt;
-	/* 
+	/ * 
 	sigma = K * eps
 
 	decompose the stiffness matrix depending on what is prescribed
@@ -337,7 +518,7 @@ void Peri3dController::action(){
 	eps_u=(Kuu^-1)*(sigma_u-Kup eps_p)
 
 	(we replace all eps and sigma by their rates in the computation)
-	*/
+	/
 	int numP=0,numU=0; // number of prescribed and unprescribed strain components
 	for(int i=0;i<6;i++) if(stressMask&(1<<i))numU++;
 	numP=6-numU;
@@ -357,7 +538,7 @@ void Peri3dController::action(){
 			for(int i=0;i<6;i++){ if((stressMask&(1<<i))) Kuu(iU++,jU)=K(i,j);}
 			jU++;
 		} else {
-			epsP[jP]=(1/dt)*(j<3?1.:2.)*(goal(mapI[j],mapJ[j])-strain(mapI[j],mapJ[j])); /* multiply tensor shear by 2, see http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations */
+			epsP[jP]=(1/dt)*(j<3?1.:2.)*(goal(mapI[j],mapJ[j])-strain(mapI[j],mapJ[j])); / * multiply tensor shear by 2, see http://en.wikiversity.org/wiki/Introduction_to_Elasticity/Constitutive_relations /
 			int iP=0;
 			for(int i=0;i<6;i++){ if((stressMask&(1<<i))) Kup(iP++,jP)=K(i,j);}
 			jP++;
@@ -375,7 +556,7 @@ void Peri3dController::action(){
 	Matrix3r eps; // rate!
 	for(int j=0; j<6; j++){
 		if(stressMask&(1<<j)) eps(mapI[j],mapJ[j])=epsU[jU++];
-		else eps(mapI[j],mapJ[j])=(j<3?1.:.5)*epsP[jP++]; /* multiply shear components back by 1/2 when converting from Voigt vector back to tensor */
+		else eps(mapI[j],mapJ[j])=(j<3?1.:.5)*epsP[jP++]; / * multiply shear components back by 1/2 when converting from Voigt vector back to tensor /
 	}
 	eps(2,1)=eps(1,2); eps(0,2)=eps(2,0); eps(1,0)=eps(0,1);
 	Matrix3r& velGrad=scene->cell->velGrad;
@@ -386,3 +567,4 @@ void Peri3dController::action(){
 	LOG_TRACE("epsU=\n"<<epsU<<"\neps=\n"<<"\nabs(maxCoeff)="<<mx<<"\nvelGrad=\n"<<velGrad);
 	// TODO: check unbalanced force and run some hook when the goal state is achieved
 }
+*/

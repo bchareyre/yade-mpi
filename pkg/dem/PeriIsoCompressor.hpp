@@ -73,6 +73,50 @@ class PeriTriaxController: public BoundaryController{
 };
 REGISTER_SERIALIZABLE(PeriTriaxController);
 
+//my old version...
+#include<Eigen/SVD>
+class Peri3dController: public BoundaryController{
+	public:
+		Vector6r stressOld, stressGoal, strainGoal;
+		Vector6i pe, ps;
+		Matrix3r sigma, epsilon, epsilonRate, rot, nonrot;
+		int pathSizes[6], pathsCounter[6], lenPe, lenPs;
+		vector<Vector2r>* paths[6];
+		
+		virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Detailed documentation is in py/_extraDocs.py.",
+		((Vector6r,stress,Vector6r::Zero(),,"Current stress vector ($\\sigma_x$,$\\sigma_y$,$\\sigma_z$,$\\tau_{yz}$,$\\tau_{zx}$,$\\tau_{xy}$)|yupdate|."))
+		((Vector6r,strain,Vector6r::Zero(),,"Current strain (deformation) vector ($\\varepsilon_x$,$\\varepsilon_y$,$\\varepsilon_z$,$\\gamma_{yz}$,$\\gamma_{zx}$,$\\gamma_{xy}$) |yupdate|."))
+		((Vector6r,strainRate,Vector6r::Zero(),,"Current strain rate vector."))
+		((Vector6r,stressRate,Vector6r::Zero(),,"Current stress rate vector (that is prescribed, the actual one slightly differ)."))
+		((Vector6r,stressIdeal,Vector6r::Zero(),,"Ideal stress vector at current time step."))
+		((Vector6r,goal,Vector6r::Zero(),,"Goal state; only the upper triangular matrix is considered; each component is either prescribed stress or strain, depending on :yref:`stressMask<Peri3dController.stressMask>`."))
+		((int,stressMask,((void)"all strains",0),,"mask determining whether components of :yref:`goal<Peri3dController.goal>` are strain (0) or stress (1). The order is 00,11,22,12,02,01 from the least significant bit. (e.g. 0b000011 is stress 00 and stress 11)."))
+		((int,nSteps,1000,,"Number of steps of the simulation."))
+		((Real,progress,0.,,"Actual progress of the simulation with Controller."))
+		((Real,mod,.1,,"Predictor modificator, by trail-and-error analysis the value 0.1 was found as the best."))
+		((string,doneHook,,,"Python command (as string) to run when :yref:`nSteps<Peri3dController.nSteps>` is achieved. If empty, the engine will be set :yref:`dead<Engine.dead>`."))
+		((vector<Vector2r>,xxPath,vector<Vector2r>(1,Vector2r::Ones()),,"\"Time function\" (piecewise linear) for xx direction. Sequence of couples of numbers. First number is time, second number desired value of respective quantity (stress or strain). The last couple is considered as final state (equal to (:yref:`nSteps<Peri3dController.nSteps>`, :yref:`goal<Peri3dController.goal>`)), other values are relative to this state.\n\nExample: nSteps=1000, goal[0]=300, xxPath=((2,3),(4,1),(5,2))\n\nat step 400 (=5*1000/2) the value is 450 (=3*300/2),\n\nat step 800 (=4*1000/5) the value is 150 (=1*300/2),\n\nat step 1000 (=5*1000/5=nSteps) the value is 300 (=2*300/2=goal[0]).\n\nSee example :ysrc:`scripts/test/peri3dController_example1` for illusration."))
+		((vector<Vector2r>,yyPath,vector<Vector2r>(1,Vector2r::Ones()),,"Time function for yy direction, see :yref:`xxPath<Peri3dController.xxPath>`"))
+		((vector<Vector2r>,zzPath,vector<Vector2r>(1,Vector2r::Ones()),,"Time function for zz direction, see :yref:`xxPath<Peri3dController.xxPath>`"))
+		((vector<Vector2r>,yzPath,vector<Vector2r>(1,Vector2r::Ones()),,"Time function for yz direction, see :yref:`xxPath<Peri3dController.xxPath>`"))
+		((vector<Vector2r>,zxPath,vector<Vector2r>(1,Vector2r::Ones()),,"Time function for zx direction, see :yref:`xxPath<Peri3dController.xxPath>`"))
+		((vector<Vector2r>,xyPath,vector<Vector2r>(1,Vector2r::Ones()),,"Time function for xy direction, see :yref:`xxPath<Peri3dController.xxPath>`"))
+		((Real,maxStrainRate,1e3,,"Maximal absolute value of strain rate (both normal and shear components of :yref:`strain<Peri3dController.strain>`)"))
+		((Real,maxStrain,1e6,,"Maximal asolute value of :yref:`strain<Peri3dController.strain>` allowed in the simulation. If reached, the simulation is considered as finished"))
+		((Real,youngEstimation,1e20,,"Estimation of macroscopic Young's modulus, used for the first simulation step"))
+		((Real,poissonEstimation,.25,,"Estimation of macroscopic Poisson's ratio, used used for the first simulation step"))
+		// not yet used
+		//((Real,currUnbalanced,NaN,,"current unbalanced force |yupdate|"))
+		//((Real,maxUnbalanced,1e-4,,"Maximum unbalanced force"))
+			
+	);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Peri3dController);
+
+
+/*
 #include<Eigen/SVD>
 class Peri3dController: public BoundaryController{
 	public:
@@ -97,4 +141,4 @@ class Peri3dController: public BoundaryController{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Peri3dController);
-
+*/

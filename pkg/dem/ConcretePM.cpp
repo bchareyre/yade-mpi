@@ -131,7 +131,6 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 
 /********************** Law2_Dem3DofGeom_CpmPhys_Cpm ****************************/
 
-
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
 	#include"../../brefcom-mm.hh"
 #endif
