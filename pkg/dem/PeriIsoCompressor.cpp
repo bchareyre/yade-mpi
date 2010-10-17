@@ -370,10 +370,10 @@ void Peri3dController::action(){
 	// Update - update values from previous step to current step
 	stressOld = stress; // stresssOld = stress at previous step
 	sigma = Shop::stressTensorOfPeriodicCell(/*smallStrains=*/true); // current stress tensor
-	stress = stress.fromMatrix(sigma); // current stress vector
+	stress = tensor_toVoigt(sigma); // current stress vector
 	stressIdeal += stressRate*dt; // stress that would be obtained if the predictor would be perfect
 	strain += strainRate*dt; // current strain vector
-	epsilon = strain.toMatrix(/*strain=*/true); // current strain tensor
+	epsilon = voigt_toSymmTensor(strain,/*strain=*/true); // current strain tensor
 
 	/* StrainPredictor
 			extremely primitive predictor, but roboust enough and works fine :-) could be replaced by some more rigorous in future.
@@ -399,7 +399,7 @@ void Peri3dController::action(){
 			//for (int i=0; i<lenPs; i++) { strainRate(ps(i)) -= maxStrainRate; }
 		}
 		else { // actual predictor
-			Real sr=strainRate.maxabs();
+			Real sr=strainRate.cwise().abs().maxCoeff();
 			for (int i=0; i<lenPs; i++) {
 				int j=ps(i);
 				// linear extrapolation of stress error (difference between actual and ideal stress)
@@ -412,28 +412,16 @@ void Peri3dController::action(){
 	}
 	
 	// correction coefficient ix strainRate.maxabs() > maxStrainRate
-	Real srCorr = (strainRate.maxabs() > maxStrainRate)? (maxStrainRate/strainRate.maxabs()):1.;
+	Real srCorr = (strainRate.cwise().abs().maxCoeff() > maxStrainRate)? (maxStrainRate/strainRate.cwise().abs().maxCoeff()):1.;
 	strainRate *= srCorr;
 
 	// Actual action (see the documentation for more info)
 	const Matrix3r& trsf=scene->cell->trsf;
 	// compute rotational and nonrotational (strain in local coordinates) part of trsf
-	Eigen::SVD<Matrix3r>(trsf).computeUnitaryPositive(&rot,&nonrot);
-	/*
-	//Eigen3 does not have computeUnitaryPositive() implemented. Next few lines of code replace missing functions. Tested. Anton,
-	Matrix3r mU, mV, mS;
-        Eigen::JacobiSVD<Matrix3r> svd(trsf, Eigen::ComputeThinU | Eigen::ComputeThinV);
-
-        mU = svd.matrixU();
-        mV = svd.matrixV();
-        mS = svd.singularValues().asDiagonal();
-
-        rot = mU * mV.adjoint();
-        nonrot = mV * mS * mV.adjoint(); 
-	*/
+	Matrix_computeUnitaryPositive(trsf,&rot,&nonrot);
 	 
 	// prescribed velocity gradient (strain tensor rate) in global coordinates
-	epsilonRate = strainRate.toMatrix(/*strain=*/true); 
+	epsilonRate = voigt_toSymmTensor(strainRate,/*strain=*/true); 
 	/* transformation of prescribed strain rate (computed by predictor) into local cell coordinates,
 	   multiplying by time to obtain strain increment and adding it to nonrot (current strain in local coordinates)*/
 	nonrot += rot.transpose()*(epsilonRate*dt)*rot; 
@@ -444,7 +432,7 @@ void Peri3dController::action(){
 	velGrad = ((rot*nonrot)*trsf.inverse()- Matrix3r::Identity()) / dt ;
 	progress += srCorr/nSteps;
 
-	if (progress >= 1. || strain.maxabs() > maxStrain) {
+	if (progress >= 1. || strain.cwise().abs().maxCoeff() > maxStrain) {
 		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; }
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 	}

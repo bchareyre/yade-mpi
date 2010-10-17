@@ -515,10 +515,11 @@ Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v){
 		2*x2*y2+x3*y2+x4*y2+x1*y3+x2*y3+2*x3*y3+
 		x4*y3+x1*y4+x2*y4+x3*y4+2*x4*y4)/120.;
 
-	return matrixFromElements(
+	Matrix3r ret; ret<<
 		a   , -b__, -c__,
 		-b__, b   , -a__,
-		-c__, -a__, c    );
+		-c__, -a__, c    ;
+	return ret;
 
 	#undef x1
 	#undef y1

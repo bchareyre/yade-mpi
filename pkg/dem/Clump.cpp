@@ -274,9 +274,10 @@ Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vec
 	//TRWM3VEC(off); TRVAR2(ooff,m); TRWM3MAT(I);
 	// translation away from centroid
 	/* I^c_jk=I'_jk-M*(delta_jk R.R - R_j*R_k) [http://en.wikipedia.org/wiki/Moments_of_inertia#Parallel_axes_theorem] */
-	I2+=m*matrixFromElements(/* dIxx */ ooff-off[0]*off[0], /* dIxy */ -off[0]*off[1], /* dIxz */ -off[0]*off[2],
+	Matrix3r dI; dI<</* dIxx */ ooff-off[0]*off[0], /* dIxy */ -off[0]*off[1], /* dIxz */ -off[0]*off[2],
 		/* sym */ 0., /* dIyy */ ooff-off[1]*off[1], /* dIyz */ -off[1]*off[2],
-		/* sym */ 0., /* sym */ 0., /* dIzz */ ooff-off[2]*off[2]);
+		/* sym */ 0., /* sym */ 0., /* dIzz */ ooff-off[2]*off[2];
+	I2+=m*dI;
 	I2(1,0)=I2(0,1); I2(2,0)=I2(0,2); I2(2,1)=I2(1,2);
 	//TRWM3MAT(I2);
 	return I2;

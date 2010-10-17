@@ -25,24 +25,35 @@
 // different macros for different versions of eigen:
 //  http://bitbucket.org/eigen/eigen/issue/96/eigen_dont_align-doesnt-exist-in-205-but-appears-in-web
 
-//#define EIGEN2_SUPPORT  //This makes Eigen3 migration easier
-#define EIGEN_DONT_VECTORIZE
-#define EIGEN_DONT_ALIGN
+#define EIGEN2_SUPPORT  // This makes Eigen3 migration easier
+
+// disable optimization which are "unsafe":
+//    eigen objects cannot be passed by-value, otherwise they will no be aligned
+#if 1
+	#define EIGEN_DONT_VECTORIZE
+	#define EIGEN_DONT_ALIGN
+#endif
+
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #define EIGEN_NO_DEBUG
-	#include<Eigen/Core>
-	#include<Eigen/Geometry>
-	#include<Eigen/Array>
-	#include<Eigen/QR>
-	#include<Eigen/LU>
-	#include<float.h>
+#include<Eigen/Core>
+#include<Eigen/Geometry>
+#include<Eigen/Array>
+#include<Eigen/QR>
+#include<Eigen/LU>
+#include<Eigen/SVD>
+#include<float.h>
+
 // USING_PART_OF_NAMESPACE_EIGEN
 //using namespace eigen; // for eigen3
 // 
-// templates of those types with single parameter are not possible (for compat with Wm3), use macros for now
+
+// templates of those types with single parameter are not possible, use macros for now
 #define VECTOR2_TEMPLATE(Scalar) Eigen::Matrix<Scalar,2,1>
 #define VECTOR3_TEMPLATE(Scalar) Eigen::Matrix<Scalar,3,1>
+#define VECTOR6_TEMPLATE(Scalar) Eigen::Matrix<Scalar,6,1>
 #define MATRIX3_TEMPLATE(Scalar) Eigen::Matrix<Scalar,3,3>
+
 // this would be the proper way, but only works in c++-0x (not yet supported by gcc (4.5))
 #if 0
 	template<typename Scalar> using Vector2=Eigen::Matrix<Scalar,2,1>;
@@ -57,18 +68,19 @@ typedef VECTOR2_TEMPLATE(int) Vector2i;
 typedef VECTOR2_TEMPLATE(Real) Vector2r;
 typedef VECTOR3_TEMPLATE(int) Vector3i;
 typedef VECTOR3_TEMPLATE(Real) Vector3r;
+typedef VECTOR6_TEMPLATE(Real) Vector6r;
+typedef VECTOR6_TEMPLATE(int) Vector6i;
 typedef MATRIX3_TEMPLATE(Real) Matrix3r;
 
 typedef Eigen::Quaternion<Real> Quaternionr;
 typedef Eigen::AngleAxis<Real> AngleAxisr;
 using Eigen::AngleAxis; using Eigen::Quaternion;
 
-
 // io
 template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR2_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y(); return os; };
 template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR3_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y()<<" "<<v.z(); return os; };
+template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR6_TEMPLATE(Scalar)& v){ os << v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<" "<<v[4]<<" "<<v[5]; return os; };
 template<class Scalar> std::ostream & operator<<(std::ostream &os, const Eigen::Quaternion<Scalar>& q){ os<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z(); return os; };
-
 // operators
 //template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(Scalar s, const VECTOR3_TEMPLATE(Scalar)& v) {return v*s;}
 //template<class Scalar> MATRIX3_TEMPLATE(Scalar) operator*(Scalar s, const MATRIX3_TEMPLATE(Scalar)& m) { return m*s; }
@@ -80,6 +92,8 @@ template<typename Scalar> bool operator==(const Quaternion<Scalar>& u, const Qua
 template<typename Scalar> bool operator!=(const Quaternion<Scalar>& u, const Quaternion<Scalar>& v){ return !(u==v); }
 template<typename Scalar> bool operator==(const MATRIX3_TEMPLATE(Scalar)& m, const MATRIX3_TEMPLATE(Scalar)& n){ for(int i=0;i<3;i++)for(int j=0;j<3;j++)if(m(i,j)!=n(i,j)) return false; return true; }
 template<typename Scalar> bool operator!=(const MATRIX3_TEMPLATE(Scalar)& m, const MATRIX3_TEMPLATE(Scalar)& n){ return !(m==n); }
+template<typename Scalar> bool operator==(const VECTOR6_TEMPLATE(Scalar)& u, const VECTOR6_TEMPLATE(Scalar)& v){ return u[0]==v[0] && u[1]==v[1] && u[2]==v[2] && u[3]==v[3] && u[4]==v[4] && u[5]==v[5]; }
+template<typename Scalar> bool operator!=(const VECTOR6_TEMPLATE(Scalar)& u, const VECTOR6_TEMPLATE(Scalar)& v){ return !(u==v); }
 template<typename Scalar> bool operator==(const VECTOR3_TEMPLATE(Scalar)& u, const VECTOR3_TEMPLATE(Scalar)& v){ return u.x()==v.x() && u.y()==v.y() && u.z()==v.z(); }
 template<typename Scalar> bool operator!=(const VECTOR3_TEMPLATE(Scalar)& u, const VECTOR3_TEMPLATE(Scalar)& v){ return !(u==v); }
 template<typename Scalar> bool operator==(const VECTOR2_TEMPLATE(Scalar)& u, const VECTOR2_TEMPLATE(Scalar)& v){ return u.x()==v.x() && u.y()==v.y(); }
@@ -106,76 +120,40 @@ struct Math{
 };
 typedef Math<Real> Mathr;
 
-/*
- * Compatibility bridge for Wm3 and eigen (will be removed once Wm3 is dropped and replaced by respective eigen constructs;
- * see https://www.yade-dem.org/wiki/Wm3→Eigen
- *
- * TODO
- */
-
-// eigen: m << m00,m01,m02,m10,m11,m12,m20,m21,m22;
-template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromElements(Scalar m00, Scalar m01, Scalar m02, Scalar m10, Scalar m11, Scalar m12, Scalar m20, Scalar m21, Scalar m22){ MATRIX3_TEMPLATE(Scalar) m; m(0,0)=m00; m(0,1)=m01; m(0,2)=m02; m(1,0)=m10; m(1,1)=m11; m(1,2)=m12; m(2,0)=m20; m(2,1)=m21; m(2,2)=m22; return m; }
+/* this was removed in eigen3, see http://forum.kde.org/viewtopic.php?f=74&t=90914 */
+template<typename MatrixT>
+void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT* positive){
+	assert(unitary); assert(positive); 
+	#if EIGEN_WORLD_VERSION<3
+		Eigen::SVD<MatrixT>(in).computeUnitaryPositive(unitary,positive);
+	#else
+		Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
+		*unitary=svd.matrixU() * svd.matrixV().adjoint();
+		*positive=svd.matrixV() * svd.singularValues().asDiagonal() * svg.matrixV().adjoint;
+	#endif
+}
 
 /*
  * Extra yade math functions and classes
  */
 
-// Vector6r
-class Vector6r : public Eigen::Matrix<Real,6,1> {
-	// from http://www.ros.org/wiki/eigen
-	typedef Eigen::Matrix<Real,6,1> BaseClass;
-	public:
-		Vector6r() : BaseClass() {};
-		template<typename OtherDerived> Vector6r(const Eigen::MatrixBase<OtherDerived>& other) : BaseClass(other) {}
-		Vector6r(Real v0, Real v1, Real v2, Real v3, Real v4, Real v5){
-			this->operator()(0)=v0; this->operator()(1)=v1; this->operator()(2)=v2;
-			this->operator()(3)=v3; this->operator()(4)=v4; this->operator()(5)=v5;
-		};
-		using BaseClass::operator=;
-		// conversion from tensor (Matrix3r=(xx,xy,xz, yx,yy,yz, zx,zy,zz)) to Verctor6=(xx,yy,zz,yz,zx,xy)
-		Vector6r fromMatrix (const Matrix3r& m, const bool strain=false) {
-			Real k=(strain? 2.:1.);
-			Vector6r ret;
-			ret(0)=m(0,0); ret(1)=m(1,1); ret(2)=m(2,2);
-			ret(3)=k*.5*(m(1,2)+m(2,1)); ret(4)=k*.5*(m(2,0)+m(0,2)); ret(5)=k*.5*(m(0,1)+m(1,0));
-			return ret;
-		};
-		// conversion from Verctor6=(xx,yy,zz,yz,zx,xy) to tensor (Matrix3r=(xx,xy,xz, yx,yy,yz, zx,zy,zz))
-		Matrix3r toMatrix (const bool strain=false) {
-			Matrix3r ret;
-			Real k=(strain? .5:1.);
-			ret(0,0)=this->operator()(0); ret(1,1)=this->operator()(1); ret(2,2)=this->operator()(2);
-			ret(0,1)=ret(1,0)=k*this->operator()(5); ret(0,2)=ret(2,0)=k*this->operator()(4); ret(1,2)=ret(2,1)=k*this->operator()(3);
-			return ret;
-		};
-		Real maxabs (void) {
-			Real ret = 0.;
-			for (int i=0; i<6; i++) {
-				if (ret < abs(this->operator()(i))) {ret = abs(this->operator()(i));}
-			}
-			return ret;
-		}
-};
-//std::ostream & operator<<(std::ostream &os, const Vector6r& v){ os << v(0)<<" "<<v(1)<<" "<<v(2)<<" "<<v(3)<<" "<<v(4)<<" "<<v(5); return os; };
-//bool operator==(const Vector6r& u, const Vector6r& v){ return u(0)==v(0) && u(1)==v(1) && u(2)==v(2) && u(3)==v(3) && u(4)==v(4) && u(5)==v(5); }
-//bool operator!=(const Vector6r& u, const Vector6r& v){ return !(u==v); }
 
-// Vector6i
-class Vector6i : public Eigen::Matrix<int,6,1> {
-	// from http://www.ros.org/wiki/eigen
-	typedef Eigen::Matrix<int,6,1> BaseClass;
-	public:
-		Vector6i() : BaseClass() {};
-		template<typename OtherDerived> Vector6i(const Eigen::MatrixBase<OtherDerived>& other) : BaseClass(other) {}
-		Vector6i(int v0, int v1, int v2, int v3, int v4, int v5){
-			this->operator()(0)=v0; this->operator()(1)=v1; this->operator()(2)=v2;
-			this->operator()(3)=v3; this->operator()(4)=v4; this->operator()(5)=v5;
-		};
-		using BaseClass::operator=;
-};
-//std::ostream & operator<<(std::ostream &os, const Vector6i& v){ os << v(0)<<" "<<v(1)<<" "<<v(2)<<" "<<v(3)<<" "<<v(4)<<" "<<v(5); return os; };
-//bool operator==(const Vector6i& u, const Vector6i& v){ return u(0)==v(0) && u(1)==v(1) && u(2)==v(2) && u(3)==v(3) && u(4)==v(4) && u(5)==v(5); }
-//bool operator!=(const Vector6i& u, const Vector6i& v){ return !(u==v); }
+/* convert Vector6r in the Voigt notation to corresponding 2nd order symmetric tensor (stored as Matrix3r)
+	if strain is true, then multiply non-diagonal parts by .5
+*/
+template<typename Scalar>
+MATRIX3_TEMPLATE(Scalar) voigt_toSymmTensor(const VECTOR6_TEMPLATE(Scalar)& v, bool strain=false){
+	Real k=(strain?.5:1.);
+	MATRIX3_TEMPLATE(Scalar) ret; ret<<v[0],k*v[5],k*v[4], k*v[5],v[1],k*v[3], k*v[4],k*v[3],v[2]; return ret;
+}
+/* convert 2nd order tensor to 6-vector (Voigt notation), symmetrizing the tensor;
+	if strain is true, multiply non-diagonal compoennts by 2.
+*/
+template<typename Scalar>
+VECTOR6_TEMPLATE(Scalar) tensor_toVoigt(const MATRIX3_TEMPLATE(Scalar)& m, bool strain=false){
+	int k=(strain?2:1);
+	VECTOR6_TEMPLATE(Scalar) ret; ret<<m(0,0),m(1,1),m(2,2),k*.5*(m(1,2)+m(2,1)),k*.5*(m(2,0)+m(0,2)),k*.5*(m(0,1)+m(1,0)); return ret;
+}
 
 
 __attribute__((unused))
@@ -276,8 +254,7 @@ void serialize(Archive & ar, Vector3i & g, const unsigned int version){
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector6r & g, const unsigned int version)
-{
+void serialize(Archive & ar, Vector6r & g, const unsigned int version){
 	Real &v0=g[0], &v1=g[1], &v2=g[2], &v3=g[3], &v4=g[4], &v5=g[5];
 	ar & BOOST_SERIALIZATION_NVP(v0) & BOOST_SERIALIZATION_NVP(v1) & BOOST_SERIALIZATION_NVP(v2) & BOOST_SERIALIZATION_NVP(v3) & BOOST_SERIALIZATION_NVP(v4) & BOOST_SERIALIZATION_NVP(v5);
 }
