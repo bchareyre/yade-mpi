@@ -107,7 +107,7 @@ static Vector3i Vector3i_cross(const Vector3i& self, const Vector3i& v){ return 
 static bool Quaternionr__eq__(const Quaternionr& q1, const Quaternionr& q2){ return q1==q2; }
 static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ return q1!=q2; }
 #include<Eigen/SVD>
-static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Eigen::SVD<Matrix3r>(self).computeUnitaryPositive(&unitary,&positive); return bp::make_tuple(unitary,positive); }
+static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
 
 
 #define EIG_WRAP_METH1(klass,meth) static klass klass##_##meth(const klass& self){ return self.meth(); }

@@ -137,8 +137,8 @@ void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT*
         	mV = svd.matrixV();
         	mS = svd.singularValues().asDiagonal();
 
-		*unitary=mU() * mV().adjoint();
-		*positive=mV() * mS().asDiagonal() * mV().adjoint;
+		*unitary=mU * mV.adjoint();
+		*positive=mV * mS * mV.adjoint();
 	#endif
 }
 
