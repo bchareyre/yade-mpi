@@ -166,15 +166,18 @@ void ParticleSizeDistrbutionRPMRecorder::action() {
 			
 			if (((sphere1)&&(sphere2))&&(b1 != b2)&&(specimenNumberId1==specimenNumberId2)) {
 				Real distBetweenSpheres = (b1->state->pos - b2->state->pos).norm() + sphere1->radius + sphere2->radius;
+				Real maxX = abs(b1->state->pos[0] - b2->state->pos[0]) + sphere1->radius + sphere2->radius;
+				Real maxY = abs(b1->state->pos[1] - b2->state->pos[1]) + sphere1->radius + sphere2->radius;
+				Real maxZ = abs(b1->state->pos[2] - b2->state->pos[2]) + sphere1->radius + sphere2->radius;
 				for (unsigned int i=0; i<arrayIdentIds.size(); i++) {
 					if ((arrayIdentIds[i].id1 == specimenNumberId1) or (arrayIdentIds[i].id1 == specimenNumberId2)) {
 						if (arrayIdentIds[i].maxDistanceBetweenSpheres<distBetweenSpheres) {
 							arrayIdentIds[i].maxDistanceBetweenSpheres = distBetweenSpheres;
-							arrayIdentIds[i].maxX = abs(b1->state->pos[0] - b2->state->pos[0]) + sphere1->radius + sphere2->radius;
-							arrayIdentIds[i].maxY = abs(b1->state->pos[1] - b2->state->pos[1]) + sphere1->radius + sphere2->radius;
-							arrayIdentIds[i].maxZ = abs(b1->state->pos[2] - b2->state->pos[2]) + sphere1->radius + sphere2->radius;
-							break;
 						}
+						if (arrayIdentIds[i].maxX < maxX) {arrayIdentIds[i].maxX = maxX;}
+						if (arrayIdentIds[i].maxY < maxY) {arrayIdentIds[i].maxY = maxY;}
+						if (arrayIdentIds[i].maxZ < maxZ) {arrayIdentIds[i].maxZ = maxZ;}
+						break;
 					}
 				}
 			}
