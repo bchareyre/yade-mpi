@@ -22,29 +22,34 @@ class TestObjectInstantiation(unittest.TestCase):
 	def setUp(self):
 		pass # no setup needed for tests here
 	def testClassCtors(self):
+		"Correct types are instantiated"
 		# correct instances created with Foo() syntax
 		for r in allClasses:
 			obj=eval(r)();
 			self.assert_(obj.__class__.__name__==r,'Failed for '+r)
 	def testRootDerivedCtors_attrs_few(self):
+		"Class ctor's attributes"
 		# attributes passed when using the Foo(attr1=value1,attr2=value2) syntax
 		gm=Shape(wire=True); self.assert_(gm.wire==True)
 	def testDispatcherCtor(self):
+		"Dispatcher ctors with functors"
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one
 		cld1=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_CundallStrack(),Law2_Dem3DofGeom_FrictPhys_CundallStrack()]); self.assert_(len(cld1.functors)==1)
 		# two different make two different, right?
 		cld2=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_CundallStrack(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
 	def testInteractionLoopCtor(self):
+		"InteractionLoop special ctor"
 		# InteractionLoop takes 3 lists
 		id=InteractionLoop([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
-		self.assert_(id.geomDispatcher.__class__==IGeomDispatcher)
-		self.assert_(id.physDispatcher.functors[0].__class__==Ip2_FrictMat_FrictMat_FrictPhys)
-		self.assert_(id.lawDispatcher.functors[0].__class__==Law2_Dem3DofGeom_FrictPhys_CundallStrack)
+		self.assert_(id.geomDispatcher.__class__==IGeomDispatcher().__class__)
+		self.assert_(id.physDispatcher.functors[0].__class__==Ip2_FrictMat_FrictMat_FrictPhys().__class__)
+		self.assert_(id.lawDispatcher.functors[0].__class__==Law2_Dem3DofGeom_FrictPhys_CundallStrack().__class__)
 	def testParallelEngineCtor(self):
+		"ParallelEngine special ctor"
 		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),ForceResetter()]])
-		self.assert_(pe.slaves[0].__class__==InsertionSortCollider)
+		self.assert_(pe.slaves[0].__class__==InsertionSortCollider().__class__)
 		self.assert_(len(pe.slaves[1])==2)
 		pe.slaves=[]
 		self.assert_(len(pe.slaves)==0)
@@ -65,11 +70,13 @@ class TestEigenWrapper(unittest.TestCase):
 		self.assertEqual(len(v1),len(v2));
 		for i in range(len(v1)): self.assertAlmostEqual(v1[i],v2[i],msg='Component '+str(i)+' of '+str(v1)+' and '+str(v2))
 	def testVector2(self):
+		"Vector2 operations"
 		v=Vector2(1,2); v2=Vector2(3,4)
 		self.assert_(v+v2==Vector2(4,6))
 		self.assert_(Vector2().UnitX.dot(Vector2().UnitY)==0)
 		self.assert_(Vector2().Zero.norm()==0)
 	def testVector3(self):
+		"Vector3 operations"
 		v=Vector3(3,4,5); v2=Vector3(3,4,5)
 		self.assert_(v[0]==3 and v[1]==4 and v[2]==5)
 		self.assert_(v.squaredNorm()==50)
@@ -81,6 +88,7 @@ class TestEigenWrapper(unittest.TestCase):
 		self.assert_(x.dot(y)==0)
 		self.assert_(x.cross(y)==z)
 	def testQuaternion(self):
+		"Quaternion operations"
 		# construction
 		q1=Quaternion((0,0,1),pi/2)
 		q2=Quaternion(Vector3(0,0,1),pi/2)
@@ -92,6 +100,7 @@ class TestEigenWrapper(unittest.TestCase):
 		self.assertSeqAlmostEqual(q1.toAxisAngle()[0],(0,0,1))
 		self.assertAlmostEqual(q1.toAxisAngle()[1],pi/2)
 	def testMatrix3(self):
+		"Matrix3 operations"
 		#construction
 		m1=Matrix3(1,0,0,0,1,0,0,0,1)
 		# comparison

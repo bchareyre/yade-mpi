@@ -165,6 +165,7 @@ def userSession(qt4=False):
 			#	print 'worker started'
 			#else:
 			runScript(arg0)
+	if yade.runtime.opts.exitAfter: sys.exit(0)
 	# show python console
 	if 1:
 		from IPython.Shell import IPShellEmbed

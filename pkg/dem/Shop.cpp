@@ -180,15 +180,62 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	return (useMaxForce?maxF:meanF)/(sumF);
 }
 
-Real Shop::kineticEnergy(Scene* _rb, Body::id_t* maxId){
-	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
+Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
+	Scene* scene=_scene ? _scene : Omega::instance().getScene().get();
 	Real ret=0.;
 	Real maxE=0; if(maxId) *maxId=Body::ID_NONE;
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	const bool isPeriodic=scene->isPeriodic;
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->isDynamic()) continue;
+		const State* state(b->state.get());
 		// ½(mv²+ωIω)
-		Real E=.5*(b->state->mass*b->state->vel.squaredNorm()+b->state->angVel.dot(b->state->inertia.cwise()*b->state->angVel));
-		if(maxId) { if(E>maxE) *maxId=b->getId(); maxE=max(E,maxE); }
+		Vector3r vel;
+		if(!isPeriodic) vel=b->state->vel;
+		else{
+			/* Kinetic energy is defined with regards to absolute space (or off by a constant for system in steady motion).
+				However, in the periodic case with non-zero velocity gradient, there is no such inertial system,
+				as velocity depends on absolute coordinate in space (NewtonIntegrator::homotheticCellResize).
+				There are several inconsistent options (and no consistent one):
+
+				1. Subtract the contribution of homotheticCellResize; such kinetic energy however materializes
+				   when there is an interaction between particles, and it would come apparently from nowhere.
+
+				2. Compute the kinetic energy for particles translated inside the periodic cell. That way,
+				   we avoid the dependency on absolute space position, while still keeping the contribution
+					of homothetic resize. This comes at the cost of discontinuity which is apparent for 1 particle.
+
+					Suppose that particle A is inside the base cell (i.e. between the origin and O.cell.size) and that
+					it has some velocity away from the origin. Applying velocity gradient, velocity of the particle will
+					be augmented by the amount corrseponding to its distance from the origin. At some moment, A will
+					leave the base cell. Kinetic energy computed from coordinates wrapped inside the base cell will suddenly
+					drop, since the wrapped coordinate will jump from O.cell.size[i] to 0.
+
+					With increasing number of particles, this effect will become less and less apparent,
+					eventually approaching zero. Moreoved, for dense packings, two directions of motion accross the cell
+					boundary will compensate each other.
+
+				3. Propose some special form of potential energy related to the periodic cell. Not sure if that is doable,
+					since the amount of energy depends also on what interaction (with which particles) will be established
+					in the future.
+
+				*/
+			Vector3i period; Vector3r basePos=scene->cell->wrapShearedPt(state->pos,period);
+			vel=state->vel-scene->cell->velGrad*(state->pos-basePos);
+			// TODO: move NewtonIntegrator.homotheticCellResize to Cell.homotheticDeformation so that
+			// we have access to how is the velocity adjusted
+			// in addition, create function in Cell that will compute velocity compensations etc for us
+			// since it might be used in more places than just here (code audit needed)
+		}
+		Real E=.5*(state->mass*vel.squaredNorm());
+		if(b->isAspherical()){
+			Matrix3r T(state->ori);
+			// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
+			// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
+			Matrix3r mI; mI.diagonal()=state->inertia;
+			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
+		}
+		else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
+		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}
 	return ret;

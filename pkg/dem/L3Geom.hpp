@@ -1,4 +1,5 @@
 
+#pragma once
 #include<yade/core/IGeom.hpp>
 #include<yade/core/IPhys.hpp>
 #include<yade/core/Shape.hpp>

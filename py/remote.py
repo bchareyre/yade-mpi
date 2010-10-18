@@ -26,16 +26,22 @@ class InfoProvider:
 		sys.stdout.flush(); sys.stderr.flush()
 		return ret
 	def plot(self):
-		from yade import plot
-		if len(plot.plots)==0: return None
-		fig=plot.plot(subPlots=True,noShow=True)
-		img=O.tmpFilename()+'.'+plotImgFormat
-		sqrtFigs=math.sqrt(len(plot.plots))
-		fig.set_size_inches(5*sqrtFigs,7*sqrtFigs)
-		fig.savefig(img)
-		f=open(img,'rb'); data=f.read(); f.close(); os.remove(img)
-		#print 'returning '+plotImgFormat
-		return xmlrpclib.Binary(data)
+		try
+			from yade import plot
+			if len(plot.plots)==0: return None
+			fig=plot.plot(subPlots=True,noShow=True)
+			img=O.tmpFilename()+'.'+plotImgFormat
+			sqrtFigs=math.sqrt(len(plot.plots))
+			fig.set_size_inches(5*sqrtFigs,7*sqrtFigs)
+			fig.savefig(img)
+			f=open(img,'rb'); data=f.read(); f.close(); os.remove(img)
+			#print 'returning '+plotImgFormat
+			return xmlrpclib.Binary(data)
+		except:
+			print 'Error updating plots:'
+			import traceback
+			traceback.print_exc()
+			return None
 		
 
 class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):

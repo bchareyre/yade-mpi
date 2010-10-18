@@ -60,7 +60,12 @@ CREATE_LOGGER(IGeomDispatcher);
 
 shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool force){
 	scene=Omega::instance().getScene().get(); // to make sure if called from outside of the loop
-	if(scene->isPeriodic) throw logic_error("IGeomDispatcher::explicitAction does not support periodic boundary conditions (O.periodic==True)");
+	Vector3i cellDist=Vector3i::Zero();
+	if(scene->isPeriodic) {
+		//throw logic_error("IGeomDispatcher::explicitAction does not support periodic boundary conditions (O.periodic==True)");
+		for(int i=0; i<3; i++) cellDist[i]=-(int)((b2->state->pos[i]-b1->state->pos[i])/scene->cell->getSize()[i]+.5);
+	}
+	Vector3r shift2=scene->cell->Hsize*cellDist.cast<Real>();
 	updateScenePtr();
 	if(force){
 		#ifdef YADE_DEVIRT_FUNCTORS
@@ -68,6 +73,7 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 		#endif
 		assert(b1->shape && b2->shape);
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
+		I->cellDist=cellDist;
 		// FIXME: this code is more or less duplicated from InteractionLoop :-(
 		bool swap=false;
 		I->functorCache.geom=getFunctor2D(b1->shape,b2->shape,swap);
@@ -75,12 +81,13 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 		if(swap){I->swapOrder();}
 		const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
-		bool succ=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,/*shift2*/Vector3r::Zero(),/*force*/true,I);
+		bool succ=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/true,I);
 		if(!succ) throw logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force IGeom creation. Please report bug.");
 		return I;
 	} else {
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
-		b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::Zero(), /*force*/ false, I);
+		I->cellDist=cellDist;
+		b1->shape && b2->shape && operator()(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/ false,I);
 		return I;
 	}
 }

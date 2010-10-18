@@ -6,8 +6,6 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-#define pi 3.14159265 
-
 YADE_PLUGIN(
 	(MindlinPhys)
 	(Ip2_FrictMat_FrictMat_MindlinPhys)
@@ -66,7 +64,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	Real Kso = 2*sqrt(4*R)*G/(2-V); // coefficient for shear stiffness
 	Real frictionAngle = std::min(fa,fb);
 
-	Real Adhesion = 4.*pi*R*gamma; // calculate adhesion force as predicted by DMT theory
+	Real Adhesion = 4.*Mathr::PI*R*gamma; // calculate adhesion force as predicted by DMT theory
 
 	/* pass values calculated from above to MindlinPhys */
 	mindlinPhys->tangensOfFrictionAngle = std::tan(frictionAngle); 

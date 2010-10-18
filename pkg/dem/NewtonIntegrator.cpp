@@ -121,7 +121,7 @@ void NewtonIntegrator::action()
 					if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
 				#endif
 				// exactAsphericalRot is disabled or the body is spherical
-				if (!exactAsphericalRot || (state->inertia[0]==state->inertia[1] && state->inertia[1]==state->inertia[2])){
+				if (!exactAsphericalRot || !b->isAspherical()){
 					state->angAccel=m.cwise()/state->inertia;
 					cundallDamp(dt,m,state->angVel,state->angAccel);
 					leapfrogSphericalRotate(scene,state,id,dt);
@@ -139,7 +139,7 @@ void NewtonIntegrator::action()
 				Vector3r M(m);
 				// sum force on clump memebrs
 				// exactAsphericalRot enabled and clump is aspherical
-				if (exactAsphericalRot && ((state->inertia[0]!=state->inertia[1] || state->inertia[1]!=state->inertia[2]))){
+				if (exactAsphericalRot && b->isAspherical()){
 					FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
@@ -197,7 +197,7 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 		if (homotheticCellResize>1) state->vel+=prevVelGrad*state->vel*dt;
 		
 		//In all cases, reflect macroscopic (periodic cell) acceleration in the velocity. This is the dominant term in the update in most cases
-		Vector3r dVel=(scene->cell->velGrad-prevVelGrad)*/*scene->cell->wrapShearedPt(*/state->pos/*)*/;
+		Vector3r dVel=(scene->cell->velGrad-prevVelGrad)*state->pos;
 		state->vel+=dVel;
 	}
 	state->vel+=dt*state->accel;

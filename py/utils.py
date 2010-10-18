@@ -196,6 +196,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
+	b.aspherical=False
 	b.mask=mask
 	return b
 
@@ -213,6 +214,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
 	b.mask=mask
+	b.aspherical=True
 	return b
 
 
@@ -261,6 +263,7 @@ def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	else: pos2=position
 	b.state.pos=b.state.refPos=pos2
 	b.dynamic=False
+	b.aspherical=True # never used, since the wall is not dynamic
 	b.mask=mask
 	return b
 
@@ -281,6 +284,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
+	b.aspherical=True
 	b.mask=mask
 	return b
 

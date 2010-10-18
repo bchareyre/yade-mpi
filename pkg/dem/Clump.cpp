@@ -248,6 +248,8 @@ void Clump::updateProperties(bool intersecting){
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
 	state->vel=state->angVel=Vector3r::Zero();
 
+	if(state->inertia[0]!=state->inertia[1] || state->inertia[0]!=state->inertia[2]) this->setAspherical(true);
+
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
 	// Conjugate is equivalent to Inverse for normalized quaternions
 	for(memberMap::iterator I=members.begin(); I!=members.end(); I++){

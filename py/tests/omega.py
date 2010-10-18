@@ -14,7 +14,7 @@ from yade import *
 
 ## TODO tests
 class TestInteractions(unittest.TestCase): pass
-class TestBex(unittest.TestCase): pass
+class TestForce(unittest.TestCase): pass
 class TestEngines(unittest.TestCase): pass 
 class TestIO(unittest.TestCase): pass
 class TestTags(unittest.TestCase): pass 
