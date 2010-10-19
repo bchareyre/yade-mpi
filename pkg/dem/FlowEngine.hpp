@@ -11,20 +11,14 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/lib-triangulation/FlowBoundingSphere.h>
-#include<yade/lib-triangulation/Network.h>
 
 #ifdef FLOW_ENGINE
-
-class TriaxialCompressionEngine;
-class FlowBoundingSphere;
-class Network;
 
 class FlowEngine : public PartialEngine
 {
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<CGT::FlowBoundingSphere> flow;
-		shared_ptr<CGT::Network> network;
 	public :	
 		Vector3r gravity;
 		int current_state;
@@ -58,6 +52,7 @@ class FlowEngine : public PartialEngine
 					((bool, slip_boundary, true,, "Controls friction condition on lateral walls"))
 					((bool, blocked_grains, false,, "Grains will/won't be moved by forces"))
 					((bool,WaveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
+					((bool, CachedForces, true,,"Des/Activate the cached forces calculation"))
 // 					((bool,currentTes,false,,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,,"Initial internal pressure for oedometer test"))
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))

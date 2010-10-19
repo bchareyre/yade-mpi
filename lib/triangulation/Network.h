@@ -15,7 +15,7 @@
 #include "Timer.h"
 #include "stdafx.h"
 #include "Empilement.h"
-#ifdef FLOW_ENGINE
+
 namespace CGT{
 
 struct Boundary
@@ -56,9 +56,9 @@ class Network
 		void AddBoundingPlanes(bool yade);
 		void AddBoundingPlanes();
 		void Define_fictious_cells( );
-		void Detect_facet_fictious_vertices (Cell_handle& cell, int& j);
+		int Detect_facet_fictious_vertices (Cell_handle& cell, int& j);
 		double Volume_Pore (Cell_handle cell);
-		double Volume_Pore_VoronoiFraction ( Cell_handle& cell, int& j, CGT::Boundary* boundaries);
+		double Volume_Pore_VoronoiFraction ( Cell_handle& cell, int& j);
 		double volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
 		double volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface);
 		double spherical_triangle_volume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3);
@@ -69,8 +69,8 @@ class Network
 		Real fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3);
 		double volume_double_fictious_pore(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1);
 		double volume_single_fictious_pore(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1);
-		double Surface_Solid_Pore( Cell_handle cell, int j, Boundary* boundaries, bool SLIP_ON_LATERALS);
-// 		double Pore::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
+		double Surface_Solid_Pore( Cell_handle cell, int j, bool SLIP_ON_LATERALS);
+		double spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
 		
 		Vecteur surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3);
 // 		Vecteur surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3);
@@ -79,5 +79,5 @@ class Network
 };
 
 } //namespaceCGT
-#endif //FLOW_ENGINE
+
 #endif

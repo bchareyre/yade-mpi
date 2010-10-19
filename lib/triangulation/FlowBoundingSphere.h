@@ -18,7 +18,7 @@
 #include "Network.h"
 
 #ifdef XVIEW
-//#include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
+#include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
 #ifdef FLOW_ENGINE
@@ -27,7 +27,7 @@ using namespace std;
 
 namespace CGT{
 
-class FlowBoundingSphere : Network
+class FlowBoundingSphere : public Network
 {
 	public:
 		virtual ~FlowBoundingSphere();
@@ -46,6 +46,7 @@ class FlowBoundingSphere : Network
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
 		int Iterations;
+		bool RAVERAGE;
 		
 // 		Boundary boundaries [6];
 		int walls_id[6];
@@ -57,6 +58,7 @@ class FlowBoundingSphere : Network
 
 		void Compute_Permeability();
 		
+		double Vpore, Ssolid;
 
 		void GaussSeidel ( );
 // 		void Compute_Forces ();
@@ -85,7 +87,7 @@ class FlowBoundingSphere : Network
 		void SpheresFileCreator ();
 // 		void Analytical_Consolidation ( );
 		
-		void Boundary_Conditions ( RTriangulation& Tri );
+// 		void Boundary_Conditions ( RTriangulation& Tri );
 		void Initialize_pressures ( double P_zero );
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
@@ -100,10 +102,12 @@ class FlowBoundingSphere : Network
 #endif
 		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
 		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key);
-		double Compute_HydraulicRadius (Cell_handle cell, int j, Boundary boundaries [6]  );
+		double Compute_HydraulicRadius (Cell_handle cell, int j );
 		double PressureProfile ( char *filename, Real& time, int& intervals );
 
 		double dotProduct ( Vecteur x, Vecteur y );
+		double Compute_EffectiveRadius(Cell_handle cell, int j);
+		double Compute_EquivalentRadius(Cell_handle cell, int j);
 
 // 		double crossProduct ( double x[3], double y[3] );
 
@@ -152,6 +156,10 @@ class FlowBoundingSphere : Network
 		void Average_Grain_Velocity();
 		void vtk_average_cell_velocity(RTriangulation &T, int id_sphere, int num_cells);
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Pressure, double load_intervals);
+		
+// 		double surface_external_triple_fictious(Real position[3], Cell_handle cell, Boundary b);
+// 		double surface_external_double_fictious(Cell_handle cell, Boundary b);
+// 		double surface_external_single_fictious(Cell_handle cell, Boundary b);
 
 };
 

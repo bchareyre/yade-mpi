@@ -11,7 +11,7 @@
 #include <sys/types.h>
 
 #include "Network.h"
-#ifdef FLOW_ENGINE
+
 #define FAST
 
 const double ONE_THIRD = 1.0/3.0;
@@ -51,9 +51,11 @@ double Network::Volume_Pore ( Cell_handle cell)
 			case(3) : return 0;}
 }
 
-void Network::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
+int Network::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
 {
-        Sphere v [3];
+	fictious_vertex = 0;
+	int real_vertex=0;
+	Sphere v [3];
         Vertex_handle W [3];
 	
         for (int kk=0; kk<3; kk++) {
@@ -69,21 +71,20 @@ void Network::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
 			{Re2=facetVertices[j][kk];facetRe3=kk;}
                         real_vertex+=1;}}
         facet_detected = true;
+	return fictious_vertex;
 }
 
-double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j, Boundary* boundaries)
+double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
 {
-  Point p1 = cell->info();
-  Point p2 = cell->neighbor(j)->info();
+  Point& p1 = cell->info();
+  Point& p2 = cell->neighbor(j)->info();
   
-  fictious_vertex =0, real_vertex=0;
-  
-  /*if (!facet_detected)*/ Detect_facet_fictious_vertices (cell,j);
+  fictious_vertex = Detect_facet_fictious_vertices (cell,j);
   
   Sphere v [3];
   Vertex_handle W [3];
   for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);v[kk] = cell->vertex(facetVertices[j][kk])->point();}
-  
+
   switch (fictious_vertex) {
     case (0) : {
 		Vertex_handle& SV1 = W[0];
@@ -103,23 +104,11 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j, Boundary
 		Vsolid_tot += Vsolid1 + Vsolid2;
 		Vporale += Vtot - (Vsolid1 + Vsolid2);
 
-		return Vtot - (Vsolid1 + Vsolid2); /**Vpore**/
+		/**Vpore**/ return Vtot - (Vsolid1 + Vsolid2); 
     }; break;
     case (1) : {return volume_single_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetRe1]), cell->vertex(facetVertices[j][facetRe2]), p1,p2, cell->info().facetSurfaces[j]);}; break;
     case (2) : {return volume_double_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;
     }
-    //Compute and store the area of sphere-facet intersections for later use
-#ifdef USE_FAST_MATH
-        //FIXME : code not compiling,, do the same as in "else"
-        assert((v[permut3[jj][1]]-v[permut3[jj][0]])*(v[permut3[jj][2]]-v[permut3[jj][0]])>=0 && (v[permut3[jj][1]]-v[permut3[jj][0]])*(v[permut3[jj][2]]-v[permut3[jj][0]])<=1);
-        for (int jj=0;jj<3;jj++)
-                cell->info().facetSphereCrossSections[j][jj]=0.5*v[jj].weight()*Wm3::FastInvCos1((v[permut3[jj][1]]-v[permut3[jj][0]])*(v[permut3[jj][2]]-v[permut3[jj][0]]));
-#else
-        cell->info().facetSphereCrossSections[j]=Vecteur(
-                                W[0]->info().isFictious ? 0 : 0.5*v[0].weight()*acos((v[1]-v[0])*(v[2]-v[0])/sqrt((v[1]-v[0]).squared_length()*(v[2]-v[0]).squared_length())),
-                                W[1]->info().isFictious ? 0 : 0.5*v[1].weight()*acos((v[0]-v[1])*(v[2]-v[1])/sqrt((v[1]-v[0]).squared_length()*(v[2]-v[1]).squared_length())),
-                                W[2]->info().isFictious ? 0 : 0.5*v[2].weight()*acos((v[0]-v[2])*(v[1]-v[2])/sqrt((v[1]-v[2]).squared_length()*(v[2]-v[0]).squared_length())));
-#endif
 }
 
 double Network::volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
@@ -202,6 +191,37 @@ double Network::fast_spherical_triangle_area(const Sphere& STA1, const Point& ST
         return rayon2 * fast_solid_angle(STA1,STA2,STA3,PTA1);
 }
 
+double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
+{
+ double rayon = STA1.weight();
+ if ( rayon == 0.0 ) return 0.0;
+
+ Vecteur v12 = STA2.point() - STA1.point();
+ Vecteur v13 = STA3.point() - STA1.point();
+ Vecteur v14 = PTA1 - STA1.point();
+
+ double norme12 = ( v12.squared_length() );
+ double norme13 = ( v13.squared_length() );
+ double norme14 = ( v14.squared_length() );
+
+ double cosA = v12*v13 / sqrt ( ( norme13 * norme12 ) );
+ double cosB = v12*v14 / sqrt ( ( norme14 * norme12 ) );
+ double cosC = v14*v13 / sqrt ( ( norme13 * norme14 ) );
+
+ double A = acos ( cosA );
+ double B = acos ( cosB );
+ double C = acos ( cosC );
+ if ( A==0 || B==0 || C==0 ) return 0;
+
+ double a = acos ( ( cosA - cosB * cosC ) / ( sin ( B ) * sin ( C ) ) );
+ double b = acos ( ( cosB - cosC * cosA ) / ( sin ( C ) * sin ( A ) ) );
+ double c = acos ( ( cosC - cosA * cosB ) / ( sin ( A ) * sin ( B ) ) );
+
+ double aire_triangle_spherique = rayon * ( a + b + c - M_PI );
+
+ return  aire_triangle_spherique;
+}
+
 Real Network::fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3)
 {
         //! This function needs to be fast because it is used heavily. Avoid using vector operations which require constructing vectors (~50% of cpu time in the non-fast version), and compute angle using the 3x faster formula of Oosterom and StrackeeVan Oosterom, A; Strackee, J (1983). "The Solid Angle of a Plane Triangle". IEEE Trans. Biom. Eng. BME-30 (2): 125-126. (or check http://en.wikipedia.org/wiki/Solid_angle)
@@ -237,13 +257,13 @@ Real Network::fast_solid_angle(const Point& STA1, const Point& PTA1, const Point
         return abs(2*atan(ratio));
 }
 
-double Network::Surface_Solid_Pore(Cell_handle cell, int j, Boundary* boundaries, bool SLIP_ON_LATERALS)
+double Network::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS)
 {
-  fictious_vertex =0, real_vertex=0;
-  /*if (!facet_detected)*/ Detect_facet_fictious_vertices(cell,j);
+  if (!facet_detected) fictious_vertex=Detect_facet_fictious_vertices(cell,j);
   
-  Point p1 = cell->info();
-  Point p2 = cell->neighbor(j)->info();
+  RTriangulation& Tri = T[currentTes].Triangulation();
+  Point& p1 = cell->info();
+  Point& p2 = cell->neighbor(j)->info();
   
   double Ssolid = 0;
   double Ssolid1= 0, Ssolid1n= 0, Ssolid2= 0, Ssolid2n= 0, Ssolid3= 0, Ssolid3n= 0;
@@ -270,6 +290,7 @@ double Network::Surface_Solid_Pore(Cell_handle cell, int j, Boundary* boundaries
                 Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
                 Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
                 cell->info().solidSurfaces[j][2]=Ssolid3+Ssolid3n;
+
     }; break;
     case (1) : {
 		Vertex_handle SV1 = cell->vertex(facetVertices[j][facetF1]);
@@ -334,8 +355,9 @@ double Network::Surface_Solid_Pore(Cell_handle cell, int j, Boundary* boundaries
     }
     
     Ssolid = Ssolid1+Ssolid1n+Ssolid2+Ssolid2n+Ssolid3+Ssolid3n;
+    
     cell->info().solidSurfaces[j][3]=1.0/Ssolid;
-     Ssolid_tot += Ssolid;
+    Ssolid_tot += Ssolid;
     
     return Ssolid;
 
@@ -579,4 +601,3 @@ void Network::DisplayStatistics()
 //  return  aire_triangle_spherique;
 // }
 } //namespace CGT
-#endif //FLOW_ENGINE

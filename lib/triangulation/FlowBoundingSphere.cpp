@@ -20,11 +20,11 @@
 #include "Network.h"
 
 
-//#define XVIEW
+// #define XVIEW
 #include "FlowBoundingSphere.h"//include after #define XVIEW
 
 #ifdef XVIEW
-//#include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
+// #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
 #ifdef FLOW_ENGINE
@@ -46,6 +46,10 @@ const double minLength = 0.20;//percentage of mean rad
 //! Factors including the effect of 1/2 symmetry in hydraulic radii
 const Real multSym1 = 1/pow(2,0.25);
 const Real multSym2 = 1/pow(4,0.25);
+
+const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
+const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
+
 
 const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 
@@ -69,7 +73,7 @@ FlowBoundingSphere::FlowBoundingSphere()
         tess_based_force = true;
         for (int i=0;i<6;i++) boundsIds[i] = 0;
         minPermLength=-1;
-	SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
+	SLIP_ON_LATERALS = false;//no-slip/symmetry conditions on lateral boundaries
 	TOLERANCE = 1e-06;
 	RELAX = 1.9;
 	ks=0;
@@ -79,6 +83,7 @@ FlowBoundingSphere::FlowBoundingSphere()
 	noCache=true;
 	computeAllCells=true;//might be turned false IF the code is reorganized (we can make a separate function to compute unitForceVectors outside Compute_Permeability) AND it really matters for CPU time
 	DEBUG_OUT = true;
+	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 }
 
 Tesselation& FlowBoundingSphere::Compute_Action()
@@ -121,7 +126,8 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         }
         Rmoy /= nOfSpheres;
         minPermLength = Rmoy*minLength;
-	cout << "Rmoy = " << Rmoy << endl;
+	if (DEBUG_OUT) cout << "Rmoy = " << Rmoy << endl;
+	if (DEBUG_OUT) cout << "x_min = " << x_min << " x_max = " << x_max << " y_min = " << y_min << " y_max = " << y_max << " y_max = " << z_min << " x_min = " << z_max << endl;
 	
         Vertex_handle Vh;
 	Cell_handle neighbour_cell, cell, location;
@@ -189,7 +195,8 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
 // 	K_sigma << K_opt_factor << " " << ks << " "<< Iterations << endl;
         clock.top("Permeameter");
 
-        ComputeFacetForces();
+//         ComputeFacetForces();
+	ComputeFacetForcesWithCache();
         clock.top("Compute_Forces");
 
         /** VISUALISATION FILES **/
@@ -205,6 +212,8 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         Dessine_Short_Tesselation(Vue1, Tes);
         Vue1.Affiche();
 #endif
+	if (SLIP_ON_LATERALS) cout << "SLIP CONDITION IS ACTIVATED" << endl;
+	else cout << "NOSLIP CONDITION IS ACTIVATED" << endl;
 // }
   return Tes;
 }
@@ -271,7 +280,7 @@ void FlowBoundingSphere::Average_Grain_Velocity()
 	    for (int g=0;g<4;g++)
 	    {cell->vertex ( g )->info().vel() = cell->vertex ( g )->info().vel() + facet_flow_rate*( pos_av_facet-CGAL::ORIGIN );}
 	    }
-	    else cout << "CI SONO INFINITE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+// 	    else cout << "CI SONO INFINITE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 	   }
 	    for (int g=0;g<pass;g++) 
 	    {cell->vertex ( g )->info().vol_cells() = cell->vertex ( g )->info().vol_cells() + cell->info().volume();}
@@ -388,11 +397,11 @@ void FlowBoundingSphere::ComputeFacetForces()
                         }
                 cell->info().isvisited=!ref;
         }
-         cout << "Facet scheme" <<endl;
+         if (DEBUG_OUT) cout << "Facet scheme" <<endl;
          Vecteur TotalForce = nullVect;
          for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                  if (!v->info().isFictious) {
-			 if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 			 if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
                          TotalForce = TotalForce + v->info().forces;
 //                          if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
                  } else {
@@ -459,19 +468,19 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
 	noCache=false;//cache should always be defined after execution of this function
 	
-// 	cout << "Facet cached scheme" <<endl;
-// 	Vecteur TotalForce = nullVect;
-// 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
-// 	{
-// 		if (!v->info().isFictious) {
-// 			TotalForce = TotalForce + v->info().forces;
+	cout << "Facet cached scheme" <<endl;
+	Vecteur TotalForce = nullVect;
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
+	{
+		if (!v->info().isFictious) {
+			TotalForce = TotalForce + v->info().forces;
 // 			if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-// 		} else {
-// 			if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-// 			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-// 		}
-// 	}
-// 	cout << "TotalForce = "<< TotalForce << endl;
+		} else {
+			if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+		}
+	}
+	cout << "TotalForce = "<< TotalForce << endl;
 }
 
 void FlowBoundingSphere::ComputeTetrahedralForces()
@@ -511,7 +520,7 @@ void FlowBoundingSphere::ComputeTetrahedralForces()
                         }
                 cell->info().isvisited=!ref;
         }
-	cout << "tetrahedral scheme" <<endl;
+	if (DEBUG_OUT) cout << "tetrahedral scheme" <<endl;
 	Vecteur TotalForce = nullVect;
 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
 		if (!v->info().isFictious) {
@@ -563,13 +572,12 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 
 void FlowBoundingSphere::Compute_Permeability()
 {
-        cout << "----Computing_Permeability------" << endl;
+       if (DEBUG_OUT)  cout << "----Computing_Permeability------" << endl;
 	RTriangulation& Tri = T[currentTes].Triangulation();
         Vsolid_tot = 0, Vtotalissimo = 0, Vporale = 0, Ssolid_tot = 0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 
         Cell_handle neighbour_cell;
-        Point p1, p2;
 
         double Rhv=0, k=0, distance = 0, radius = 0, viscosity = 1;
         int NEG=0, POS=0, pass=0;
@@ -578,20 +586,48 @@ void FlowBoundingSphere::Compute_Permeability()
 
         Vecteur n;
 
-        std::ofstream oFile( "Hydraulic_Radius",std::ios::out);
+        std::ofstream oFile( "Radii",std::ios::out);
+	std::ofstream fFile( "Radii_Fictious",std::ios::out);
         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
 	Real meanK=0, STDEV=0;
         Real infiniteK=1e10;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-                p1 = cell->info();
+                Point& p1 = cell->info();
                 for (int j=0; j<4; j++) {
                         neighbour_cell = cell->neighbor(j);
-                        p2 = neighbour_cell->info();
+                        Point& p2 = neighbour_cell->info();
 			if (!Tri.is_infinite(neighbour_cell) && (neighbour_cell->info().isvisited==ref || computeAllCells)) {
-                                pass+=1;
-                                Rhv = Compute_HydraulicRadius(cell, j, boundaries);
+                                //Compute and store the area of sphere-facet intersections for later use
+				Vertex_handle W [3];
+				for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);}
+				Sphere& v0 = W[0]->point(); Sphere& v1 = W[1]->point(); Sphere& v2 = W[2]->point();
+#ifdef USE_FAST_MATH
+				//FIXME : code not compiling,, do the same as in "else"
+				assert((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point())>=0 && (W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point())<=1);
+				for (int jj=0;jj<3;jj++)
+				  cell->info().facetSphereCrossSections[j][jj]=0.5*W[jj]->point().weight()*Wm3::FastInvCos1((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point()));
+#else
+				cell->info().facetSphereCrossSections[j]=Vecteur(
+				W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
+				W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
+				W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
+#endif
+				pass+=1;
+                                Rhv = Compute_HydraulicRadius(cell, j);
                                 if (Rhv<0) NEG++;
                                 else POS++;
+                                
+                                /** COMPUTE EFFECTIVE RADIUS (radius of sphere inscribed in a facet) and EQUIVALENT (radius of the sphere whose surface is equivalent to fluidSurface) **/
+				double reff = Compute_EffectiveRadius(cell, j);
+				double requiv = Compute_EquivalentRadius(cell,j);
+				
+// 				if ((reff+requiv)/2 > 2*Rhv) {cout << "Here it is ---------- " << endl << "p1 = <" << cell->info() << ">; p2 = <" << neighbour_cell->info() << ">;" << endl << "Rav = " << (reff+requiv)/2 << " Rhydr = " <<  2*Rhv << endl << endl << "Vpore = " << Vpore << " Ssolid = " << Ssolid << " cell_fictious = " << cell->info().fictious() << " neighbour_cell_fictious = " << neighbour_cell->info().fictious() << endl << endl << "facet vertices = <" << cell->vertex(facetVertices[j][0])->point() << ">;,<" << cell->vertex(facetVertices[j][1])->point() << ">;,<" << cell->vertex(facetVertices[j][2])->point() << ">;" << endl << endl;}
+// 				else cout << "NORMAL CASE" << endl << "p1 = <" << cell->info() << ">; p2 = <" << neighbour_cell->info() << ">;" << endl << "Rav = " << (reff+requiv)/2 << " Rhydr = " <<  2*Rhv << endl << endl << "Vpore = " << Vpore << " Ssolid = " << Ssolid << " cell_fictious = " << cell->info().fictious() << " neighbour_cell_fictious = " << neighbour_cell->info().fictious() << endl << endl << "facet vertices = <" << cell->vertex(facetVertices[j][0])->point() << ">;,<" << cell->vertex(facetVertices[j][1])->point() << ">;,<" << cell->vertex(facetVertices[j][2])->point() << ">;" << endl << endl;
+				if (cell->info().fictious()==0){
+				oFile << 2*Rhv << " ";				  
+				oFile << (reff+requiv)/2 << endl;}
+				else {fFile << 2*Rhv << " ";fFile << (reff+requiv)/2 << endl;}
+				
                                 (cell->info().Rh())[j]=Rhv;
                                 (neighbour_cell->info().Rh())[Tri.mirror_index(cell, j)]= Rhv;
 //                                 if (DEBUG_OUT)
@@ -600,7 +636,9 @@ void FlowBoundingSphere::Compute_Permeability()
                                 Vecteur l = p1 - p2;
                                 distance = sqrt(l.squared_length());
                                 n = l/distance;
-                                radius = 2* Rhv;
+
+				if (!RAVERAGE) radius = 2* Rhv;
+                                else radius = (reff+requiv)/2;
 
                                 if (radius==0) {
                                         cout << "INS-INS PROBLEM!!!!!!!" << endl;
@@ -689,17 +727,70 @@ void FlowBoundingSphere::Compute_Permeability()
                 cout<<grains<<"grains - " <<"Vtotale = " << 2*Vtotale << " Vgrains = " << 2*Vgrains << " Vporale1 = " << 2*(Vtotale-Vgrains) << endl;
                 cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
         }
+        
+        if (!RAVERAGE) cout << "------Hydraulic Radius is used for permeability computation------" << endl << endl;
+        else cout << "------Average Radius is used for permeability computation------" << endl << endl;
 
 	cout << "-----Computed_Permeability-----" << endl;
 }
 
-double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j, Boundary boundaries [6])
+double FlowBoundingSphere::Compute_EffectiveRadius(Cell_handle cell, int j)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
         
-        double Vpore = Volume_Pore_VoronoiFraction(cell, j, boundaries);
-	double Ssolid = Surface_Solid_Pore(cell, j, boundaries, SLIP_ON_LATERALS);
+	Vecteur B = cell->vertex(facetVertices[j][1])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
+	Vecteur x = B/sqrt(B.squared_length());
+	Vecteur C = cell->vertex(facetVertices[j][2])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
+	Vecteur z = CGAL::cross_product(x,C);
+	z = z/sqrt(z.squared_length());
+	Vecteur y = CGAL::cross_product(x,z);
+	y = y/sqrt(y.squared_length());
+	
+	double b1[2]; b1[0] = B*x; b1[1] = B*y;
+	double c1[2]; c1[0] = C*x; c1[1] = C*y;
+	
+	double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
+	double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
+	double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
+	
+	double A = ((pow(rA,2))*(1-c1[0]/b1[0])+((pow(rB,2)*c1[0])/b1[0])-pow(rC,2)+pow(c1[0],2)+pow(c1[1],2)-((pow(b1[0],2)+pow(b1[1],2))*c1[0]/b1[0]))/(2*c1[1]-2*b1[1]*c1[0]/b1[0]);
+	double BB = (rA-rC-((rA-rB)*c1[0]/b1[0]))/(c1[1]-b1[1]*c1[0]/b1[0]);
+	double CC = (pow(rA,2)-pow(rB,2)+pow(b1[0],2)+pow(b1[1],2))/(2*b1[0]);
+	double D = (rA-rB)/b1[0];
+	double E = b1[1]/b1[0];
+	double F = pow(CC,2)+pow(E,2)*pow(A,2)-2*CC*E*A;
+	
+	double c = -F-pow(A,2)+pow(rA,2);
+	double b = 2*rA-2*(D-BB*E)*(CC-E*A)-2*A*BB;
+	double a = 1-pow((D-BB*E),2)-pow(BB,2);
+	
+	if ((pow(b,2)-4*a*c)<0){cout << "NEGATIVE DETERMINANT" << endl; }
+	double reff = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
+	if (reff<0 || reff==0) {cout << "reff1 = " << reff << endl; reff = (-b-sqrt(pow(b,2)-4*a*c))/(2*a); cout << endl << "reff2 = " << reff << endl;return reff;} else
+	return reff;
+}
+
+double FlowBoundingSphere::Compute_EquivalentRadius(Cell_handle cell, int j)
+{
+	const Vecteur& Surfk = cell->info().facetSurfaces[j];
+	//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
+	//The ratio void surface / facet surface
+	Real area = sqrt(Surfk.squared_length());
+	Vecteur facetNormal = Surfk/area;
+	const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
+	Real fluidSurf = (area-crossSections[j][0]-crossSections[j][1]-crossSections[j][2]);
+	double r_equiv = sqrt(fluidSurf/M_PI);
+	return r_equiv;
+}
+
+double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j)
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+        if (Tri.is_infinite(cell->neighbor(j))) return 0;
+        
+        /*double */Vpore = Volume_Pore_VoronoiFraction(cell, j);
+	/*double */Ssolid = Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS);
 
 	#ifdef FACET_BASED_FORCES
 		//FIXME : cannot be done here because we are still comparing the different methods
@@ -708,14 +799,12 @@ double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j, Boun
 	//         if (DEBUG_OUT) std::cerr << "total facet surface "<< cell->info().facetSurfaces[j] << " with solid sectors : " << cell->info().facetSphereCrossSections[j][0] << " " << cell->info().facetSphereCrossSections[j][1] << " " << cell->info().facetSphereCrossSections[j][2] << " difference "<<sqrt(cell->info().facetSurfaces[j].squared_length())-cell->info().facetSphereCrossSections[j][0]-cell->info().facetSphereCrossSections[j][2]-cell->info().facetSphereCrossSections[j][1]<<endl;
 
 	//handle symmetry (tested ok)
-	
 	if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0)
 	{
 		//! Include a multiplier so that permeability will be K/2 or K/4 in symmetry conditions
 		Real mult= fictious_vertex==1 ? multSym1 : multSym2;
 		return Vpore/Ssolid*mult;
 	}
-
 	return Vpore/Ssolid;
 }
 
