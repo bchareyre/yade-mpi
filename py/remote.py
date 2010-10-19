@@ -26,7 +26,7 @@ class InfoProvider:
 		sys.stdout.flush(); sys.stderr.flush()
 		return ret
 	def plot(self):
-		try
+		try:
 			from yade import plot
 			if len(plot.plots)==0: return None
 			fig=plot.plot(subPlots=True,noShow=True)
