@@ -573,8 +573,6 @@ void Network::DisplayStatistics()
 	vtk_infinite_cells = Fictious;
 }
 
-#endif //FLOW_ENGINE
-
 // double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
 // {
 //  double rayon = STA1.weight();
@@ -606,3 +604,5 @@ void Network::DisplayStatistics()
 //  return  aire_triangle_spherique;
 // }
 } //namespace CGT
+
+#endif //FLOW_ENGINE
