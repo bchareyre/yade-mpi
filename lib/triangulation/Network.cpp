@@ -1,3 +1,5 @@
+#ifdef FLOW_ENGINE
+
 #include "def_types.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 #include <CGAL/Width_3.h>
@@ -11,6 +13,8 @@
 #include <sys/types.h>
 
 #include "Network.h"
+
+
 
 #define FAST
 
@@ -569,6 +573,7 @@ void Network::DisplayStatistics()
 	vtk_infinite_cells = Fictious;
 }
 
+#endif //FLOW_ENGINE
 
 // double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
 // {

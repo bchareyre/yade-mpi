@@ -4,6 +4,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef FLOW_ENGINE
 
 #include "def_types.h"
 // #include "def_flow_types.h"
@@ -27,7 +28,6 @@
 // #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
-#ifdef FLOW_ENGINE
 
 #define FAST
 #define TESS_BASED_FORCES

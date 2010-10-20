@@ -5,6 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef FLOW_ENGINE
 
 #include "FlowEngine.hpp"
 #include<yade/core/Scene.hpp>
@@ -17,7 +18,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#ifdef FLOW_ENGINE
 
 YADE_REQUIRE_FEATURE (CGAL);
 CREATE_LOGGER (FlowEngine);

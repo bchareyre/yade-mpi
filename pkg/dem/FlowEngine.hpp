@@ -5,14 +5,14 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+#ifdef FLOW_ENGINE
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/lib-triangulation/FlowBoundingSphere.h>
 
-#ifdef FLOW_ENGINE
+
 
 class FlowEngine : public PartialEngine
 {
