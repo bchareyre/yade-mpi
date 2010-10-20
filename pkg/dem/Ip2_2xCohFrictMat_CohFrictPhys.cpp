@@ -19,7 +19,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 {
 	CohFrictMat* sdec1 = static_cast<CohFrictMat*>(b1.get());
 	CohFrictMat* sdec2 = static_cast<CohFrictMat*>(b2.get());
-	ScGeom* geom = YADE_CAST<ScGeom*>(interaction->geom.get());
+	ScGeom6D* geom = YADE_CAST<ScGeom6D*>(interaction->geom.get());
 
 	//Create cohesive interractions only once
 	if (setCohesionNow && cohesionDefinitionIteration==-1) {
@@ -29,10 +29,8 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 		cohesionDefinitionIteration = -1;
 		setCohesionNow = 0;}
 		
-	if (geom)
-	{
-		if (!interaction->phys)
-		{
+	if (geom) {
+		if (!interaction->phys) {
 			interaction->phys = shared_ptr<CohFrictPhys>(new CohFrictPhys());
 			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->phys.get());
 			Real Ea 	= sdec1->young;
@@ -61,47 +59,22 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 				contactPhysics->cohesionBroken = false;
 				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(Db, Da),2);
 				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(Db, Da),2);;
-
-				contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
-				contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
-				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
-				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
-				contactPhysics->kr = Kr;
-				contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),geom->normal);
-				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;
+				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
 			}
-			contactPhysics->prevNormal = geom->normal;
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
-			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
-			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
-			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
-			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 			contactPhysics->kr = Kr;
-			contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),geom->normal);
-			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
-			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
-			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;
 			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
+
 		}
-		else // !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
-		{
+		else {// !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
 			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->phys.get());
 			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive)
 			{
 				contactPhysics->cohesionBroken = false;
 				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(geom->radius2, geom->radius1),2);
 				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(geom->radius2, geom->radius1),2);
-				contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
-				contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
-				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
-				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
-				contactPhysics->initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),geom->normal);
-				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.conjugate() * contactPhysics->initialContactOrientation;
-				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.conjugate() * contactPhysics->initialContactOrientation;
+				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
 			}
 		}
 	}

@@ -287,7 +287,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 	
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
-	shared_ptr<IGeomFunctor> s1(new Ig2_Sphere_Sphere_ScGeom);
+	shared_ptr<IGeomFunctor> s1(new Ig2_Sphere_Sphere_ScGeom6D);
 	interactionGeometryDispatcher->add(s1);
 	shared_ptr<IGeomFunctor> s2(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s2);

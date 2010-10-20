@@ -1,10 +1,6 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// © 2004 Janek Kozicki <cosurgi@berlios.de>
+// © 2007 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #pragma once
 
@@ -37,4 +33,23 @@ class Ig2_Sphere_Sphere_ScGeom: public IGeomFunctor{
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_ScGeom);
+
+class Ig2_Sphere_Sphere_ScGeom6D: public Ig2_Sphere_Sphere_ScGeom{
+	public:
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+	#ifdef YADE_DEVIRT_FUNCTORS
+		void* getStaticFuncPtr(){ return (void*)&Ig2_Sphere_Sphere_ScGeom6D::goStatic; }
+		static bool goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+	#endif
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_ScGeom6D,Ig2_Sphere_Sphere_ScGeom,"Create/update a :yref:`ScGeom6D` instance representing intersection of two :yref:`Spheres<Sphere>`.",
+		((bool,updateRotations,true,,"Precompute relative rotations. Turning this false can speed up simulations when rotations are not needed in constitutive laws (e.g. when spheres are compressed without cohesion and moment in early stage of a triaxial test), but is not foolproof. Change this value only if you know what you are doing."))
+		((bool,creep,false,,"Substract rotational creep from relative rotation. The rotational creep :yref:`ScGeom6D::twistCreep` is a quaternion and has to be updated inside a constitutive law, see for instance :yref:`Law2_ScGeom_CohFrictPhys_CohesionMoment`."
+		))
+	);
+	FUNCTOR2D(Sphere,Sphere);
+	// needed for the dispatcher, even if it is symmetric
+	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
+};
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_ScGeom6D);
 

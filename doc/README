@@ -1,9 +1,6 @@
 All documentation is at http://www.yade-dem.org, in particular see 
 https://yade-dem.org/index.php/Reference_documentation
 
-To generate documentation (doxygen for c++ and epydoc for python classes), run
-
-	doxygen Doxyfile
-	yade-* yade-epydoc.py
+To generate documentation see sphinx/README
 
 

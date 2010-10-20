@@ -5,7 +5,7 @@
 # Experiment beam-like behaviour with chained cylinders + CohFrict connexions
 
 from yade import utils
-young=1.0e5
+young=1.0e6
 poisson=5
 density=2.60e3 
 frictionAngle=radians(30)
@@ -28,11 +28,11 @@ O.engines=[
 	## Motion equation
 	NewtonIntegrator(damping=0.15),
 	PyRunner(iterPeriod=500,command='history()'),
-	PyRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
+	#PyRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
 ]
 
 #Generate a spiral
-Ne=400
+Ne=200
 for i in range(0, Ne):
 	omega=60.0/float(Ne); hy=0.10; hz=0.15;
 	px=float(i)*(omega/60.0); py=sin(float(i)*omega)*hy; pz=cos(float(i)*omega)*hz;

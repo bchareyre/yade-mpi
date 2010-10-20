@@ -1,6 +1,31 @@
 [Buildset]
 BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x08\x00y\x00a\x00d\x00e)
 
+[Launch]
+Launch Configurations=Launch Configuration 0
+
+[Launch][Launch Configuration 0]
+Configured Launch Modes=execute
+Configured Launchers=nativeAppLauncher
+Name=yade-debug
+Type=Native Application
+
+[Launch][Launch Configuration 0][Data]
+Arguments=\s/home/3S-LAB/bchareyre/yade/yade-test-kdev/bin/yade-true-true --debug -j 1  /home/3S-LAB/bchareyre2/yade/yade-test-kdev/yade/scripts/test/chained-cylinder-spring.py
+Debugger Shell=
+Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
+Dependency Action=Nothing
+Display Demangle Names=true
+Display Static Members=false
+EnvironmentGroup=default
+Executable=python
+GDB Path=gdb
+Remote GDB Config Script=
+Remote GDB Run Script=
+Remote GDB Shell Script=
+Try Setting Breakpoints On Loading Libraries=true
+Working Directory=
+isExecutable=true
 [MakeBuilder]
 Make Binary=scons
 Number Of Jobs=3

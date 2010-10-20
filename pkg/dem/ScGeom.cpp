@@ -7,8 +7,9 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((ScGeom));
+YADE_PLUGIN((ScGeom)(ScGeom6D));
 ScGeom::~ScGeom(){};
+ScGeom6D::~ScGeom6D(){};
 
 Vector3r& ScGeom::rotate(Vector3r& shearForce) const {
 	// approximated rotations
@@ -82,4 +83,33 @@ Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranular
 		scene->isPeriodic ? Vector3r(                     scene->cell->Hsize*i->cellDist.cast<Real>()): Vector3r::Zero(), // shift2
 		scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*i->cellDist.cast<Real>()) : Vector3r::Zero(), // shiftVel
 		avoidGranularRatcheting);
+}
+
+//!Precompute relative rotations (and precompute ScGeom3D)
+void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool isNew, bool creep){
+	if (isNew) {
+		initRotations(rbp1,rbp2);
+	} else {
+		Quaternionr delta((rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate())));
+		if (creep) delta = delta * twistCreep;
+		AngleAxisr aa(delta); // axis of rotation - this is the Moment direction UNIT vector; // angle represents the power of resistant ELASTIC moment
+		//Eigen::AngleAxisr(q) returns nan's when q close to identity, next tline fixes the pb.
+		if (isnan(aa.angle())) aa.angle()=0;
+		if (aa.angle() > Mathr::PI) aa.angle() -= Mathr::TWO_PI;   // angle is between 0 and 2*pi, but should be between -pi and pi
+		twist = (aa.angle() * aa.axis().dot(normal));
+		bending = Vector3r(aa.angle()*aa.axis() - twist*normal);
+	}
+}
+
+void ScGeom6D::initRotations(const State& state1, const State& state2)
+{
+	initialOrientation1	= state1.ori;
+	initialOrientation2	= state2.ori;
+	initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),normal);
+	currentContactOrientation = initialContactOrientation;
+	orientationToContact1   = initialOrientation1.conjugate() * initialContactOrientation;
+	orientationToContact2	= initialOrientation2.conjugate() * initialContactOrientation;
+	twist=0;
+	bending=Vector3r::Zero();
+	twistCreep=Quaternionr(1.0,0.0,0.0,0.0);
 }

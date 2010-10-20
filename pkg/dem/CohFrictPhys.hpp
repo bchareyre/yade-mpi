@@ -27,15 +27,6 @@ class CohFrictPhys : public FrictPhys
 		// internal attributes
 		((Vector3r,moment_twist,Vector3r(0,0,0),,""))
 		((Vector3r,moment_bending,Vector3r(0,0,0),,""))
-		((Vector3r,initialPosition1,Vector3r(0,0,0),,""))
-		((Vector3r,initialPosition2,Vector3r(0,0,0),,""))
-		((Quaternionr,orientationToContact1,Quaternionr(1.0,0.0,0.0,0.0),,""))
-		((Quaternionr,orientationToContact2,Quaternionr(1.0,0.0,0.0,0.0),,""))
-		((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),,""))
-		((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),,""))
-		((Quaternionr,twistCreep,Quaternionr(1.0,0.0,0.0,0.0),,""))
-		((Quaternionr,currentContactOrientation,Quaternionr(1.0,0.0,0.0,0.0),,""))
-		((Quaternionr,initialContactOrientation,Quaternionr(1.0,0.0,0.0,0.0),,""))
 		,
 		createIndex();
 	);

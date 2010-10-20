@@ -103,10 +103,10 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	
 	ChainedCylinder *bs1=static_cast<ChainedCylinder*>(revert? cm2.get():cm1.get());
 	
-	shared_ptr<ScGeom> scm;
+	shared_ptr<ScGeom6D> scm;
 	bool isNew = !c->geom;
-	if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->geom);
-	else { scm=shared_ptr<ScGeom>(new ScGeom()); c->geom=scm; }
+	if(!isNew) scm=YADE_PTR_CAST<ScGeom6D>(c->geom);
+	else { scm=shared_ptr<ScGeom6D>(new ScGeom6D()); c->geom=scm; }
 	Real length=(bchain2.pos-bchain1.pos).norm();
 	Vector3r segt =pChain2->pos-pChain1->pos;
 	if(isNew) {/*scm->normal=scm->prevNormal=segt/length;*/bs1->initLength=length;}
@@ -122,7 +122,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	bs1->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),bchain1.ori.conjugate()*segt);
 #endif
 	scm->precompute(state1,state2,scene,c,segt/length,isNew,shift2,true);
-
+	scm->precomputeRotations(state1,state2,isNew,false);
 	//Set values that will be considered in Ip2 functor, geometry (precomputed) is really defined with values above
 	scm->radius1 = scm->radius2 = bs1->initLength*0.5;
 	return true;

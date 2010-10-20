@@ -53,3 +53,31 @@ class ScGeom: public GenericSpheresContact {
 };
 REGISTER_SERIALIZABLE(ScGeom);
 
+class ScGeom6D: public ScGeom {
+	public:
+		virtual ~ScGeom6D();
+		const Real& getTwist() const {return twist;}
+		const Vector3r& getBending() const {return bending;}
+
+		void precomputeRotations(const State& rbp1, const State& rbp2, bool isNew, bool creep=false);
+		void initRotations(const State& rbp1, const State& rbp2);
+	
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ScGeom6D,ScGeom,"Class representing :yref:`geometry<IGeom>` of two :yref:`bodies<Body>` in contact. The contact has 6 DOFs (normal, 2×shear, twist, 2xbending) and uses :yref:`ScGeom` incremental algorithm for updating shear.",
+		((Quaternionr,orientationToContact1,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Quaternionr,orientationToContact2,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Quaternionr,twistCreep,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Quaternionr,currentContactOrientation,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Quaternionr,initialContactOrientation,Quaternionr(1.0,0.0,0.0,0.0),,""))
+		((Real,twist,0,(Attr::noSave | Attr::readonly),"Elastic twist angle of the contact."))
+		((Vector3r,bending,Vector3r::Zero(),(Attr::noSave | Attr::readonly),"Bending at contact as a vector defining axis of rotation and angle (angle=norm)."))
+		,
+		/* extra initializers */,
+		/* ctor */ createIndex(); twist=0;bending=Vector3r::Zero();,
+ 		/* py */
+	);
+	REGISTER_CLASS_INDEX(ScGeom6D,ScGeom);
+};
+REGISTER_SERIALIZABLE(ScGeom6D);
+
