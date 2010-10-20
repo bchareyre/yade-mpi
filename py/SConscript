@@ -47,6 +47,7 @@ env.Install('$LIBDIR/py/yade/tests',[
 	env.File('wrapper.py','tests'),
 	env.File('omega.py','tests'),
 	env.File('pbc.py','tests'),
+	env.File('cohesive-chain.py','tests'),
 ])
 
 # 3rd party modules:

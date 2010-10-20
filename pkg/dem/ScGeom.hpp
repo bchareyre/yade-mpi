@@ -74,7 +74,7 @@ class ScGeom6D: public ScGeom {
 		((Vector3r,bending,Vector3r::Zero(),(Attr::noSave | Attr::readonly),"Bending at contact as a vector defining axis of rotation and angle (angle=norm)."))
 		,
 		/* extra initializers */,
-		/* ctor */ createIndex(); twist=0;bending=Vector3r::Zero();,
+		/* ctor */ createIndex();,
  		/* py */
 	);
 	REGISTER_CLASS_INDEX(ScGeom6D,ScGeom);
