@@ -1158,12 +1158,12 @@ Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, con
 	return v0+((v2-v0)*(v1-v0).norm()+(v1-v0)*(v2-v0).norm())/((v1-v0).norm()+(v2-v1).norm()+(v0-v2).norm());
 }
 
-void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<ViscElMat> b)
+void Shop::getViscoelasticFromSpheresInteraction( Real tc, Real en, Real es, shared_ptr<ViscElMat> b)
 {
-    b->kn = m/tc/tc * ( Mathr::PI*Mathr::PI + pow(log(en),2) );
-    b->cn = -2.0*m/tc * log(en);
-    b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + pow(log(es),2) );
-    b->cs = -2.0/7.0 * m/tc * log(es);
+    b->kn = 1/tc/tc * ( Mathr::PI*Mathr::PI + pow(log(en),2) );
+    b->cn = -2.0 /tc * log(en);
+    b->ks = 2.0/7.0 /tc/tc * ( Mathr::PI*Mathr::PI + pow(log(es),2) );
+    b->cs = -2.0/7.0 /tc * log(es);
 
     if (abs(b->cn) <= Mathr::ZERO_TOLERANCE ) b->cn=0;
     if (abs(b->cs) <= Mathr::ZERO_TOLERANCE ) b->cs=0;

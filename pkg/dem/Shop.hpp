@@ -94,9 +94,9 @@ class Shop{
 		static Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
 
 		/// Get viscoelastic parameters kn,cn,ks,cs from analytical solution of
-		/// a problem of interaction of pair spheres with mass m, collision
+		/// a problem of interaction of pair spheres with mass 1, collision
 		/// time tc and restitution coefficients en,es.
-	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<ViscElMat> b);
+	    static void getViscoelasticFromSpheresInteraction(Real tc, Real en, Real es, shared_ptr<ViscElMat> b);
 
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, Scene* _rb=NULL);

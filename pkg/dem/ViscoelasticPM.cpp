@@ -15,17 +15,22 @@ ViscElPhys::~ViscElPhys(){}
 
 /* Ip2_ViscElMat_ViscElMat_ViscElPhys */
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
+	// no updates of an existing contact 
 	if(interaction->phys) return;
-	ViscElMat* sdec1 = static_cast<ViscElMat*>(b1.get());
-	ViscElMat* sdec2 = static_cast<ViscElMat*>(b2.get());
+	ViscElMat* mat1 = static_cast<ViscElMat*>(b1.get());
+	ViscElMat* mat2 = static_cast<ViscElMat*>(b2.get());
+	const Real mass1 = Body::byId(interaction->getId1())->state->mass;
+	const Real mass2 = Body::byId(interaction->getId2())->state->mass;
+	const Real kn1 = mat1->kn*mass1; const Real cn1 = mat1->cn*mass1;
+	const Real ks1 = mat1->ks*mass1; const Real cs1 = mat1->cs*mass1;
+	const Real kn2 = mat2->kn*mass2; const Real cn2 = mat2->cn*mass2;
+	const Real ks2 = mat2->ks*mass2; const Real cs2 = mat2->cs*mass2;
 	ViscElPhys* phys = new ViscElPhys();
-	phys->kn = sdec1->kn * sdec2->kn / (sdec1->kn + sdec2->kn);
-	phys->ks = sdec1->ks * sdec2->ks / (sdec1->ks + sdec2->ks);
-	phys->cn = ( (sdec1->cn==0) ? 0 : 1/sdec1->cn ) + ( (sdec2->cn==0) ? 0 : 1/sdec2->cn );
-	phys->cs = ( (sdec1->cs==0) ? 0 : 1/sdec1->cs ) + ( (sdec2->cs==0) ? 0 : 1/sdec2->cs );
-	if (phys->cn) phys->cn = 1/phys->cn;
-	if (phys->cs) phys->cs = 1/phys->cs;
-	phys->tangensOfFrictionAngle = std::tan(std::min(sdec1->frictionAngle, sdec2->frictionAngle)); 
+	phys->kn = 1/(kn1?1/kn1:0 + kn2?1/kn2:0);
+	phys->ks = 1/(ks1?1/ks1:0 + ks2?1/ks2:0);
+	phys->cn = cn1?1/cn1:0 + cn2?1/cn2:0; phys->cn = phys->cn?1/phys->cn:0;
+	phys->cs = cs1?1/cs1:0 + cs2?1/cs2:0; phys->cs = phys->cs?1/phys->cs:0;
+	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
 	phys->prevNormal = Vector3r(0,0,0);
 	interaction->phys = shared_ptr<ViscElPhys>(phys);
