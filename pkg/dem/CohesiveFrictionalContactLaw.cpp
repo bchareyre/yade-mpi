@@ -13,13 +13,10 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-
 YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom_CohFrictPhys_CohesionMoment));
 CREATE_LOGGER(Law2_ScGeom_CohFrictPhys_CohesionMoment);
 
 Vector3r translation_vect_ ( 0.10,0,0 );
-
-
 
 void CohesiveFrictionalContactLaw::action()
 {
@@ -27,14 +24,11 @@ void CohesiveFrictionalContactLaw::action()
 	functor->always_use_moment_law = always_use_moment_law;
 	functor->shear_creep=shear_creep;
 	functor->twist_creep=twist_creep;
-	functor->creep_viscosity = creep_viscosity;
+	functor->creep_viscosity=creep_viscosity;
 	functor->scene=scene;
-	functor->momentRotationLaw=momentRotationLaw;
-	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		functor->go(I->geom, I->phys, I.get());
-	}
+		functor->go(I->geom, I->phys, I.get());}
 }
 
 void Law2_ScGeom_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
@@ -53,7 +47,6 @@ void Law2_ScGeom_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_p
 	if (un < 0 && (currentContactPhysics->normalForce.squaredNorm() > pow(currentContactPhysics->normalAdhesion,2)
 	               || currentContactPhysics->normalAdhesion==0)) {
 		// BREAK due to tension
-		
 		scene->interactions->requestErase(contact->getId1(),contact->getId2());
 	} else {
 		State* de1 = Body::byId(id1,scene)->state.get();
@@ -85,7 +78,7 @@ void Law2_ScGeom_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_p
 		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 
 		/// Moment law        ///
-		if (momentRotationLaw && (!currentContactPhysics->cohesionBroken || always_use_moment_law)) {
+		if (currentContactPhysics->momentRotationLaw && (!currentContactPhysics->cohesionBroken || always_use_moment_law)) {
 			if (twist_creep) {
 				Real viscosity_twist = creep_viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
 				Real angle_twist_creeped = currentContactGeometry->getTwist() * (1 - dt/viscosity_twist);
@@ -101,6 +94,5 @@ void Law2_ScGeom_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_p
 			scene->forces.addTorque(id2, moment);
 		}
 		/// Moment law END       ///
-		currentContactPhysics->prevNormal = currentContactGeometry->normal;
 	}
 }

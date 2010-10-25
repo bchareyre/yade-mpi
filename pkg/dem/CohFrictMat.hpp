@@ -21,7 +21,10 @@ class CohFrictMat : public FrictMat
 /// Serialization
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictMat,FrictMat,"",
 		((bool,isBroken,true,,""))
-		((bool,isCohesive,true,,"")),
+		((bool,isCohesive,true,,""))
+		((Real,normalCohesion,10000000,,""))
+		((Real,shearCohesion,10000000,,""))
+		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details.")),
 		createIndex();
 					);
 /// Indexable
