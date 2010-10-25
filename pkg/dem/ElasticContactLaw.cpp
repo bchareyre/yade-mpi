@@ -94,8 +94,6 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 	}
-	//FIXME : make sure phys->prevNormal is not used anywhere, remove it from physics and remove this line :
-	phys->prevNormal = geom->normal;
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom

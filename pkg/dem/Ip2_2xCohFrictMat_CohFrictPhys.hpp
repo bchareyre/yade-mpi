@@ -22,8 +22,6 @@ class Ip2_2xCohFrictMat_CohFrictPhys : public IPhysFunctor
 		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom_CohFrictPhys_CohesionMoment`.",
 		((bool,setCohesionNow,false,,""))
 		((bool,setCohesionOnNewContacts,false,,""))
-		((Real,normalCohesion,10000000,,""))
-		((Real,shearCohesion,10000000,,""))
 		,
 		cohesionDefinitionIteration = -1; 
 		);

@@ -9,7 +9,7 @@ young=1.0e6
 poisson=5
 density=2.60e3 
 frictionAngle=radians(30)
-O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,label='mat'))
+O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,normalCohesion=1e13,shearCohesion=1e13,momentRotationLaw=True,label='mat'))
 O.dt=1e-4
 
 O.engines=[
@@ -20,8 +20,8 @@ O.engines=[
 	]),
 	InteractionLoop(
 		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
-		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True,normalCohesion=1e13,shearCohesion=1e13)],
-		[Law2_ScGeom_CohFrictPhys_CohesionMoment(momentRotationLaw=True,label='law')]
+		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True)],
+		[Law2_ScGeom_CohFrictPhys_CohesionMoment(label='law')]
 	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),

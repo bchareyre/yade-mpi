@@ -57,13 +57,14 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive)
 			{
 				contactPhysics->cohesionBroken = false;
-				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(Db, Da),2);
-				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(Db, Da),2);;
+				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(Db, Da),2);
+				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(Db, Da),2);
 				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
 			}
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
 			contactPhysics->kr = Kr;
+			contactPhysics->momentRotationLaw=(sdec1->momentRotationLaw && sdec2->momentRotationLaw);
 			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 
 		}
@@ -72,8 +73,8 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive)
 			{
 				contactPhysics->cohesionBroken = false;
-				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(geom->radius2, geom->radius1),2);
-				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(geom->radius2, geom->radius1),2);
+				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
+				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
 				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
 			}
 		}

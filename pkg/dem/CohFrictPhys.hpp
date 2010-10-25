@@ -24,9 +24,11 @@ class CohFrictPhys : public FrictPhys
 		((Real,kr,0,,"rotational stiffness [N.m/rad]"))
 		((Real,normalAdhesion,0,,"tensile strength"))
 		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`Law2_ScGeom_CohFrictPhys_CohesionMoment::always_use_moment_law`)"))
+		((bool,momentRotationLaw,false,,"use bending/twisting moment at contacts. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
+		((Real,creep_viscosity,-1,,"creep viscosity [Pa.s/m]."))
 		// internal attributes
-		((Vector3r,moment_twist,Vector3r(0,0,0),,""))
-		((Vector3r,moment_bending,Vector3r(0,0,0),,""))
+		((Vector3r,moment_twist,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Twist moment"))
+		((Vector3r,moment_bending,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Bending moment"))
 		,
 		createIndex();
 	);
