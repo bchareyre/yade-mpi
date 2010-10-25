@@ -31,7 +31,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	Matrix3r facetAxisT=se31.orientation.toRotationMatrix(); 
 	Matrix3r facetAxis = facetAxisT.transpose();
 	// local orientation
-	Vector3r cl = facetAxis*(se32.position - se31.position);  // "contact line" in facet-local coords
+	Vector3r cl = facetAxis*(se32.position + shift2 - se31.position);  // "contact line" in facet-local coords
 
 	//
 	// BEGIN everything in facet-local coordinates
@@ -102,7 +102,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 			scm = shared_ptr<ScGeom>(new ScGeom());
 	  
 		normal = facetAxisT*normal; // in global orientation
-		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal;
+		scm->contactPoint = se32.position + shift2 - (sphereRadius-0.5*penetrationDepth)*normal;
 		scm->penetrationDepth = penetrationDepth;
 		scm->radius1 = 2*sphereRadius;
 		scm->radius2 = sphereRadius;

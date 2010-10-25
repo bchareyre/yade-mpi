@@ -67,8 +67,10 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	axis = angle*geom.normal;
 	shearForce -= shearForce.cross(axis);
 
-	const Vector3r c1x = (geom.contactPoint - de1.pos);
-	const Vector3r c2x = (geom.contactPoint - de2.pos);
+	//const Vector3r c1x = (geom.contactPoint - de1.pos);
+	//const Vector3r c2x = (geom.contactPoint - de2.pos);
+	const Vector3r c1x = geom.radius1*geom.normal;
+	const Vector3r c2x = -geom.radius2*geom.normal;
 	/// The following definition of c1x and c2x is to avoid "granular ratcheting" 
 	///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
 	///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
