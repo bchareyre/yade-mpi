@@ -98,6 +98,8 @@ if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
 # this must be done before loading yade libs ("import yade" below)
 # has no effeect after libgomp initializes
 if opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
+elif int('$defThreads')>0:
+	os.environ['OMP_NUM_THREADS']='$defThreads'
 
 sys.stderr.write('Welcome to Yade '+version+'%s\n'%(' (debug build)' if opts.debug else ''))
 

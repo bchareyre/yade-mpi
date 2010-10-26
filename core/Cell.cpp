@@ -35,6 +35,8 @@ void Cell::integrateAndUpdate(Real dt){
 	_hasShear=(trsf(0,1)!=0 || trsf(0,2)!=0 || trsf(1,0)!=0 || trsf(1,2)!=0 || trsf(2,0)!=0 || trsf(2,1)!=0);
 	// OpenGL shear matrix (used frequently)
 	fillGlShearTrsfMatrix(_glShearTrsfMatrix);
+
+	if(!(homoDeform==HOMO_NONE || homoDeform==HOMO_POS || homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND)) throw std::invalid_argument("Cell.homoDeform must be in {0,1,2,3}.");
 }
 
 void Cell::fillGlShearTrsfMatrix(double m[16]){

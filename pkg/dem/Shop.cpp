@@ -192,10 +192,8 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 		Vector3r vel=b->state->vel;
 		if(isPeriodic){
 			/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
-			vel-=scene->cell->velGrad*state->pos;
-			// TODO: move NewtonIntegrator.homotheticCellResize to Cell.homotheticDeformation so that
-			// we have access to how is the velocity adjusted
-			// in addition, create function in Cell that will compute velocity compensations etc for us
+			vel=scene->cell->bodyFluctuationVel(state->pos,vel);
+			// create function in Cell that will compute velocity compensations etc for us
 			// since it might be used in more places than just here (code audit needed)
 		}
 		Real E=.5*(state->mass*vel.squaredNorm());

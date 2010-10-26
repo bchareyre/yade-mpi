@@ -63,10 +63,17 @@ void NewtonIntegrator::action()
 {
 	scene->forces.sync();
 	Real dt=scene->dt;
+	if(scene->isPeriodic && homotheticCellResize>=0){
+		LOG_WARN("Newton.homotheticCellResize is deprecated, use Cell.homoDeform instead. Setting Cell.homoDeform for you now, but the compatibility interface will be removed in the future.");
+		scene->cell->homoDeform=(homotheticCellResize==0?Cell::HOMO_NONE:(homotheticCellResize==1?Cell::HOMO_VEL:Cell::HOMO_VEL_2ND));
+		homotheticCellResize=-1;
+	}
+	homoDeform=(scene->isPeriodic ? scene->cell->homoDeform : -1); // -1 for aperiodic simulations
+	dVelGrad=scene->cell->velGrad-prevVelGrad;
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
-	if(scene->isPeriodic && (prevCellSize!=scene->cell->getSize())){ cellChanged=true; maxVelocitySq=(prevCellSize-scene->cell->getSize()).squaredNorm()/pow(dt,2); }
+	if(scene->isPeriodic && ((prevCellSize!=scene->cell->getSize())) && /* initial value */!isnan(prevCellSize[0]) ){ cellChanged=true; maxVelocitySq=(prevCellSize-scene->cell->getSize()).squaredNorm()/pow(dt,2); }
 	else { maxVelocitySq=0; cellChanged=false; }
 	haveBins=(bool)velocityBins;
 	if(haveBins) velocityBins->binVelSqInitialize(maxVelocitySq);
@@ -108,7 +115,7 @@ void NewtonIntegrator::action()
 					if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
 				#endif
 				state->accel=f/state->mass; 
-				if (!scene->isPeriodic || homotheticCellResize==0)
+				if (!scene->isPeriodic || homoDeform==Cell::HOMO_NONE)
 					cundallDamp(dt,f,state->vel,state->accel);
 				else {//Apply damping on velocity fluctuations only rather than true velocity meanfield+fluctuation.
 					Vector3r velFluctuation(state->vel-prevVelGrad*state->pos);
@@ -181,7 +188,7 @@ void NewtonIntegrator::action()
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
 	if(haveBins) velocityBins->binVelSqFinalize();
-	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize();prevVelGrad=scene->cell->velGrad; }
+	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize(); prevVelGrad=scene->cell->velGrad; }
 }
 
 inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, const Body::id_t& id, const Real& dt)
@@ -189,16 +196,18 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
 	
 	if (scene->forces.getMoveRotUsed()) state->pos+=scene->forces.getMove(id);
-	if (homotheticCellResize>0) {
+	if (homoDeform==Cell::HOMO_VEL || homoDeform==Cell::HOMO_VEL_2ND) {
 		// update velocity reflecting changes in the macroscopic velocity field, making the problem homothetic.
 		//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
 		//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow). Emulating Cundall is an option, I don't especially recommend it. I know homothetic 1 and 2 expressions tend to identical values in the limit of dense quasi-static situations. They can give slitghly different results in other cases, and I'm still not sure which one should be considered better, if any (Cundall formula is in contradiction with molecular dynamics litterature).
-		if (homotheticCellResize>1) state->vel+=prevVelGrad*state->vel*dt;
+		if (homoDeform==Cell::HOMO_VEL_2ND) state->vel+=scene->cell->prevVelGrad*state->vel*dt;
 		
 		//In all cases, reflect macroscopic (periodic cell) acceleration in the velocity. This is the dominant term in the update in most cases
-		Vector3r dVel=(scene->cell->velGrad-prevVelGrad)*state->pos;
+		Vector3r dVel=dVelGrad*state->pos;
 		state->vel+=dVel;
+	} else if (homoDeform==Cell::HOMO_POS){
+		state->pos+=scene->cell->velGrad*state->pos*dt;
 	}
 	state->vel+=dt*state->accel;
 	state->pos += state->vel*dt;

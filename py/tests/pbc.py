@@ -27,17 +27,34 @@ class TestPBC(unittest.TestCase):
 		O.bodies.append(utils.sphere(self.initPos,.5))
 		#print O.bodies[1].state.pos
 		O.bodies[1].state.vel=self.initVel
-		O.dt=1e-5
-		O.engines=[NewtonIntegrator(homotheticCellResize=2)]
+		O.engines=[NewtonIntegrator()]
 		O.cell.velGrad=Matrix3(0,0,0, 0,0,0, 0,0,-1)
-	def testHomotheticResize(self):
-		"PBC: homothetic cell resize adjusts particle velocity"
+		O.cell.homoDeform=3
+		O.dt=0 # do not change positions with dt=0 in NewtonIntegrator, but still update velocities from velGrad
+	def testHomotheticResizeVel(self):
+		"PBC: (homoDeform==3) homothetic cell deformation adjusts particle velocity"
+		O.dt=1e-5
 		O.step()
 		s1=O.bodies[1].state
 		self.assertAlmostEqual(s1.vel[2],self.initVel[2]+self.initPos[2]*O.cell.velGrad[2,2])
+	def testHomotheticResizePos(self):
+		"PBC: (homoDeform==1) homothetic cell deformation adjusts particle position"
+		O.cell.homoDeform=1
+		O.step()
+		s1=O.bodies[1].state
+		self.assertAlmostEqual(s1.vel[2],self.initVel[2])
+		self.assertAlmostEqual(s1.pos[2],self.initPos[2]+self.initPos[2]*O.cell.velGrad[2,2]*O.dt)
 	def testScGeomIncidentVelocity(self):
-		"PBC: ScGeom computes incident velocity correctly"
-		O.dt=0 # do not change positions with dt=0 in NewtonIntegrator, but still update velocities from velGrad
+		"PBC: (homoDeform==3) ScGeom computes incident velocity correctly"
+		O.step()
+		O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
+		i=utils.createInteraction(0,1)
+		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=True))
+		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=False))
+		self.assertAlmostEqual(self.relDist[1],1-i.geom.penetrationDepth)
+	def testScGeomIncidentVelocity_homoPos(self):
+		"PBC: (homoDeform==1) ScGeom computes incident velocity correctly"
+		O.cell.homoDeform=1
 		O.step()
 		O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 		i=utils.createInteraction(0,1)
@@ -45,13 +62,16 @@ class TestPBC(unittest.TestCase):
 		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=False))
 		self.assertAlmostEqual(self.relDist[1],1-i.geom.penetrationDepth)
 	def testKineticEnergy(self):
-		"PBC: utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient"
-		O.dt=1e-50 # with timestep almost zero, just update the velocity in the integrator
+		"PBC: (homoDeform==3) utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient"
 		O.step() # updates velocity with homotheticCellResize
 		# ½(mv²+ωIω)
 		# #0 is still, no need to add it; #1 has zero angular velocity
 		# we must take self.initVel since O.bodies[1].state.vel now contains the homothetic resize which utils.kineticEnergy is supposed to compensate back 
 		Ek=.5*O.bodies[1].state.mass*self.initVel.squaredNorm()
 		self.assertAlmostEqual(Ek,utils.kineticEnergy())
+	def testKineticEnergy_homoPos(self):
+		"PBC: (homoDeform==1) utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient"
+		O.cell.homoDeform=1; O.step()
+		self.assertAlmostEqual(.5*O.bodies[1].state.mass*self.initVel.squaredNorm(),utils.kineticEnergy())
 
 

@@ -30,7 +30,7 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene
 	//Update contact normal
 	normal=currentNormal;
 	//Precompute shear increment
-	Vector3r relativeVelocity=getIncidentVel(&rbp1,&rbp2,scene->dt,shift2,scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*c->cellDist.cast<Real>()) : Vector3r::Zero(),avoidGranularRatcheting);
+	Vector3r relativeVelocity=getIncidentVel(&rbp1,&rbp2,scene->dt,shift2,scene->isPeriodic ? scene->cell->intrShiftVel(c->cellDist) : Vector3r::Zero(),avoidGranularRatcheting);
 	//keep the shear part only
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	shearInc = relativeVelocity*scene->dt;
@@ -80,8 +80,8 @@ Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranular
 	Scene* scene=Omega::instance().getScene().get();
 	return getIncidentVel(Body::byId(i->getId1(),scene)->state.get(),Body::byId(i->getId2(),scene)->state.get(),
 		scene->dt,
-		scene->isPeriodic ? Vector3r(                     scene->cell->Hsize*i->cellDist.cast<Real>()): Vector3r::Zero(), // shift2
-		scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*i->cellDist.cast<Real>()) : Vector3r::Zero(), // shiftVel
+		scene->isPeriodic ? scene->cell->intrShiftPos(i->cellDist): Vector3r::Zero(), // shift2
+		scene->isPeriodic ? scene->cell->intrShiftVel(i->cellDist): Vector3r::Zero(), // shiftVel
 		avoidGranularRatcheting);
 }
 

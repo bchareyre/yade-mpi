@@ -34,10 +34,10 @@ class NewtonIntegrator : public GlobalEngine{
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
-	// cell size from previous step, used to detect change, find max velocity and update positions if linearCellResize enabled
-	Vector3r prevCellSize;
 	// whether the cell has changed from the previous step
 	bool cellChanged;
+	int homoDeform; // updated from scene at every call; -1 for aperiodic simulations, otherwise equal to scene->cell->homoDeform
+	Matrix3r dVelGrad; // dtto
 
 	public:
 		#ifdef YADE_OPENMP
@@ -50,12 +50,13 @@ class NewtonIntegrator : public GlobalEngine{
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))
 		((Real,maxVelocitySq,NaN,,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulation from [Allen1989]_, pg. 89."))
-		((unsigned short,homotheticCellResize,0,,"Enable velocity updates insuring that all bodies move homogeneously while the periodic cell deforms. 0: No update, 1: Reflect on each body the changes in macroscopic velocity field :yref:`Cell::velGrad`, using Δv_i=Δ(grad(v_macro))*x_i. 2: Emulate the Cundall-style equation Δx_i=(grad(v_macro))*x_i, by adding a convective term in the velocity update."))
+		((int,homotheticCellResize,-1,Attr::hidden,"[This attribute is deprecated, use Cell::homoDeform instead.]"))
+		// Enable velocity updates insuring that all bodies move homogeneously while the periodic cell deforms. 0: No update, 1: Reflect on each body the changes in macroscopic velocity field :yref:`Cell::velGrad`, using Δv_i=Δ(grad(v_macro))*x_i. 2: Emulate the Cundall-style equation Δx_i=(grad(v_macro))*x_i, by adding a convective term in the velocity update."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track acceleration. |yupdate|"))
 		((vector<shared_ptr<BodyCallback> >,callbacks,,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
+		((Vector3r,prevCellSize,Vector3r(NaN,NaN,NaN),Attr::hidden,"cell size from previous step, used to detect change and find max velocity"))
 		,
 		/*ctor*/
-			prevCellSize=Vector3r::Zero();
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif

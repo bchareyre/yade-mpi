@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: yade@_VERSION@
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk, python-qt4, python-xlib, mencoder
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk, python-qt4, python-xlib, mencoder, gnuplot
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .

@@ -10,7 +10,7 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
+params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 from yade import ymport
@@ -26,7 +26,7 @@ for i in xrange(nbSpheres[0]):
             y = (j*2 - nbSpheres[1])*sphereRadius*1.1
             z = (k*2 - nbSpheres[2])*sphereRadius*1.1
             s=utils.sphere([x,y,z],sphereRadius,material=sphereMat)
-            p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
+            p=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
             s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
             O.bodies.append(s)
 
@@ -55,7 +55,7 @@ O.engines=[
 ## Saving results
 	#VTKRecorder(virtPeriod=0.04,fileName='/tmp/stlimp-',recorders=['spheres','facets']),
 	## Apply kinematics to walls
-	RotationEngine(subscribedBodies=fctIds,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
+	RotationEngine(ids=fctIds,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
 ]
 
 from yade import qt

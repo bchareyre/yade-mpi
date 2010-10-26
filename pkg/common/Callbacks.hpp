@@ -10,6 +10,7 @@ class Scene;
 
 class IntrCallback: public Serializable{
 	public:
+	virtual ~IntrCallback(); // vtable
 	typedef void(*FuncPtr)(IntrCallback*,Interaction*);
 	// should be set at every step by InteractionLoop
 	Scene* scene;
@@ -25,6 +26,7 @@ REGISTER_SERIALIZABLE(IntrCallback);
 
 class BodyCallback: public Serializable{
 	public:
+	virtual ~BodyCallback(); // vtable
 	typedef void(*FuncPtr)(BodyCallback*,Body*);
 	// set at every step, before stepInit() is called
 	Scene* scene;

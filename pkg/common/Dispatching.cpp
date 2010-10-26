@@ -101,7 +101,8 @@ void IGeomDispatcher::action(){
 	updateScenePtr();
 
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->Hsize;
+	const bool isPeriodic(scene->isPeriodic);
+	Matrix3r cellHsize; if(isPeriodic) cellHsize=scene->cell->Hsize;
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
@@ -123,7 +124,7 @@ void IGeomDispatcher::action(){
 			bool wasReal=I->isReal();
 			if (!b1->shape || !b2->shape) { assert(!wasReal); continue; } // some bodies do not have shape
 			bool geomCreated;
-			if(!scene->isPeriodic){
+			if(!isPeriodic){
 				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/ false, I);
 			} else{
 				Vector3r shift2=cellHsize*I->cellDist.cast<Real>();

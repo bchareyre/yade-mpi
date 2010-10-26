@@ -21,15 +21,6 @@ def childClasses(base,recurse=True,includeBase=False):
 	return ret | ret2
 
 _allSerializables=childClasses('Serializable')
-# classes that cannot be instantiated in python directly, and will have no properties generated for them
-_noPropsClasses=set(['InteractionContainer','BodyContainer','Functor','Engine','Dispatcher'])
-# classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
-_pyRootClasses=set([
-	'GlobalEngine','PartialEngine','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
-	'BoundFunctor','IGeomFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State']
-	# childless classes
-	+['BoundDispatcher','IGeomDispatcher','IPhysDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine']
-)
 ## set of classes for which the proxies were created
 _proxiedClasses=set()
 
@@ -127,15 +118,11 @@ _deprecated={
 	'Ip2_BMP_BMP_CSPhys':'Ip2_2xFrictMat_CSPhys', # Wed Mar 10 15:08:56 2010, eudoxos@frigo
 	'CinemDTCEngine':'KinemCTDEngine', # Tue Mar 16 13:54:21 2010, jduriez@c1solimara-l
 	'NormalInelasticityLaw':'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity', # Wed Mar 17 15:50:59 2010, jduriez@c1solimara-l
-	'OldName':'NewName', # Tue Mar 30 14:11:13 2010, sch50p@fluent-ph
 	'CapillaryCohesiveLaw':'CapillaryLaw', # Tue Mar 30 14:11:36 2010, sch50p@fluent-ph
-	'Simplecd':'/home/sch50p/YADE-bzr/yade/pkg/dem/PreProcessor', # Tue Mar 30 14:13:03 2010, sch50p@fluent-ph
 	'SimpleElasticRelationshipsWater':'Ip2_Frictmat_FrictMat_CapillaryLawPhys', # Tue Mar 30 14:20:36 2010, sch50p@fluent-ph
-	'OldName':'NewName', # Wed Mar 31 09:22:48 2010, sch50p@fluent-ph
 	'CapillaryLaw':'Law2_ScGeom_CapillaryPhys_Capillarity', # Wed Mar 31 09:23:36 2010, sch50p@fluent-ph
 	'CapillaryParameters':'CapillaryPhys', # Wed Mar 31 09:25:03 2010, sch50p@fluent-ph
 	'Ip2_FrictMat_FrictMat_CapillaryLawPhys':'Ip2_FrictMat_FrictMat_CapillaryPhys', # Wed Mar 31 09:26:04 2010, sch50p@fluent-ph
-	'Ip2_Frictmat_FrictMat_CapillaryLawPhys':'Ip2_FrictMat_FrictMat_CapillaryPhys', # Wed Mar 31 09:26:56 2010, sch50p@fluent-ph
 	'SimpleViscoelasticMat':'ViscElMat', # Fri Apr  9 19:25:38 2010, vaclav@flux
 	'SimpleViscoelasticPhys':'ViscElPhys', # Fri Apr  9 19:26:34 2010, vaclav@flux
 	'Law2_Spheres_Viscoelastic_SimpleViscoelastic':'Law2_ScGeom_ViscElPhys_Basic', # Fri Apr  9 19:28:02 2010, vaclav@flux

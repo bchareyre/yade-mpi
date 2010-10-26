@@ -16,8 +16,23 @@ from yade import *
 class TestInteractions(unittest.TestCase): pass
 class TestForce(unittest.TestCase): pass
 class TestEngines(unittest.TestCase): pass 
-class TestIO(unittest.TestCase): pass
 class TestTags(unittest.TestCase): pass 
+
+class TestIO(unittest.TestCase):
+	def testSaveAllClasses(self):
+		'All classes can be saved and loaded with boost::serialization'
+		import yade.system
+		failed=set()
+		for c in yade.system.childClasses('Serializable'):
+			O.reset()
+			try:
+				O.miscParams=[eval(c)()]
+				O.saveTmp()
+				O.loadTmp()
+			except (RuntimeError,ValueError):
+				failed.add(c)
+		self.assert_(len(failed)==0,'Failed classes were: '+' '.join(failed))
+
 
 
 class TestCell(unittest.TestCase):

@@ -134,6 +134,7 @@ opts.AddVariables(
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
 	BoolVariable('mono','[experimental] Build only one shared library and make all other files (python objects, for instance) only be symlinks.',0),
 	('execCheck','Name of the main script that should be installed; if the current one differs, an erro is raised (do not use directly, only intended for --rebuild',None),
+	('defThreads','Default number of OpenMP threads to run with, unless overridden with -j. Keep unset (negative) to default to using all cores.',-1),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),

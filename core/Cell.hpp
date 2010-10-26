@@ -85,6 +85,12 @@ class Cell: public Serializable{
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
 
+	// relative position and velocity for interaction accross multiple cells
+	Vector3r intrShiftPos(const Vector3i& cellDist) const { return Hsize*cellDist.cast<Real>(); }
+	Vector3r intrShiftVel(const Vector3i& cellDist) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return velGrad*Hsize*cellDist.cast<Real>(); return Vector3r::Zero(); }
+	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
+	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-velGrad*pos); return vel; }
+
 	Vector3r getRefSize() const { return refSize; }
 	void setRefSize(const Vector3r& s){ refSize=s; integrateAndUpdate(0); }
 	Matrix3r getTrsf() const { return trsf; }
@@ -97,12 +103,16 @@ class Cell: public Serializable{
 	// to resolve overloads
 	Vector3r wrapShearedPt_py(const Vector3r& pt) const { return wrapShearedPt(pt);}
 	Vector3r wrapPt_py(const Vector3r& pt) const { return wrapPt(pt);}
+
+	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		((Vector3r,refSize,Vector3r(1,1,1),Attr::triggerPostLoad,"Reference size of the cell."))
 		((Matrix3r,trsf,Matrix3r::Identity(),Attr::triggerPostLoad,"Current transformation matrix of the cell."))
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in NewtonIntegrator."))
-		((Matrix3r,Hsize,Matrix3r::Zero(),Attr::readonly,"The current cell size (one column per box edge), computed from *refSize* and *trsf* |yupdate|")),
+		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
+		((Matrix3r,Hsize,Matrix3r::Zero(),Attr::readonly,"The current cell size (one column per box edge), computed from *refSize* and *trsf* |yupdate|"))
+		((int,homoDeform,3,Attr::triggerPostLoad,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions or velocities of particles. The values have the following meaning: 0: no homothetic deformation, 1: set absolute particle positions directly (when ``velGrad`` is non-zero), but without changing their velocity, 2: adjust particle velocity (only when ``velGrad`` changed) with Δv_i=Δ ∇v x_i. 3: as 2, but include a 2nd order term in addition -- the derivative of 1 (convective term in the velocity update).")),
 		/*ctor*/ integrateAndUpdate(0),
 		/*py*/
 		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")

@@ -29,6 +29,7 @@ for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
 	
 KnifeP=[Knife,[p+Vector3(0,lengthKnife,0) for p in Knife]]
 KnifePoly=pack.sweptPolylines2gtsSurface(KnifeP,threshold=1e-4)
+KnifeIDs=[]
 KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False))
 
 
@@ -49,14 +50,17 @@ colorsph2=Vector3(1,1,0);
 colorsph1.normalize();
 colorsph2.normalize();
 colorSph=colorsph1
+#O.bodies.append(utils.sphere([0,0,0],1))
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
-	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))
+	continue
+	#ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:
 		colorSph=colorsph1
 
 
+from yade import qt
 
 O.dt=2*utils.PWaveTimeStep() # We do not need now a high accuracy
 O.engines=[
@@ -68,16 +72,17 @@ O.engines=[
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
 	GravityEngine(gravity=(0,0,-9.8)),
-	TranslationEngine(translationAxis=[1,0,0],velocity=5,subscribedBodies=KnifeIDs), # Buldozer motion
+	TranslationEngine(translationAxis=[1,0,0],velocity=5,ids=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=.3),
-	SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',viewNo=0,label='snapshooter'),
+	#qt.SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',label='snapshooter'),
 ]
+O.engines=[]
+print len(O.bodies)
 
 O.saveTmp()
-from yade import qt
 qt.Controller()
 qt.View()
 r=qt.Renderer()
 r.lightPos=Vector3(0,0,50)
 O.run(2000); O.wait()
-utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)
+#utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)

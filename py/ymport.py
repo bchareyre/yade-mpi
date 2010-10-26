@@ -69,8 +69,7 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 	facets=imp.ymport(file)
 	for b in facets:
 		b.dynamic=dynamic
-		b.shape.postProcessAttributes(True)
-		b.shape.Color=color if color else utils.randomColor()
+		b.shape.color=color if color else utils.randomColor()
 		b.shape.wire=wire
 		b.shape.highlight=highlight
 		pos,ori=b.state.pos,b.state.ori
