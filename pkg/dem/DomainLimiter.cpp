@@ -30,6 +30,7 @@ void DomainLimiter::action(){
 CREATE_LOGGER(LawTester);
 
 void LawTester::postLoad(LawTester&){
+	if(ids.size()==0) return; // uninitialized object, don't do nothing at all
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
 	if(path.empty() && rotPath.empty()) throw invalid_argument("LawTester.{path,rotPath}: at least one point must be given.");
 	if(pathSteps.empty()) throw invalid_argument("LawTester.pathSteps: at least one value must be given.");
@@ -49,6 +50,7 @@ void LawTester::postLoad(LawTester&){
 }
 
 void LawTester::action(){
+	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
 	LOG_DEBUG("=================== LawTester step "<<step<<" ========================");
 	const shared_ptr<Interaction> Inew=scene->interactions->find(ids[0],ids[1]);
 	string strIds("##"+lexical_cast<string>(ids[0])+"+"+lexical_cast<string>(ids[1]));
