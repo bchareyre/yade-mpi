@@ -20,8 +20,8 @@ class Ip2_2xCohFrictMat_CohFrictPhys : public IPhysFunctor
 		
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_CohFrictPhys,IPhysFunctor,
 		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom_CohFrictPhys_CohesionMoment`.",
-		((bool,setCohesionNow,false,,""))
-		((bool,setCohesionOnNewContacts,false,,""))
+		((bool,setCohesionNow,false,,"If true, assign cohesion to all existing contacts in current time-step. The flag is turned false automatically, so that assignment is done in the current timestep only."))
+		((bool,setCohesionOnNewContacts,false,,"If true, assign cohesion at all new contacts. If false, only existing contacts can be cohesive (also see :yref:`Ip2_2xCohFrictMat_CohFrictPhys::setCohesionNow`), and new contacts are only frictional."))
 		,
 		cohesionDefinitionIteration = -1; 
 		);

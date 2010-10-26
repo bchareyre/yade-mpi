@@ -94,7 +94,16 @@ void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool is
 		if (creep) delta = delta * twistCreep;
 		AngleAxisr aa(delta); // axis of rotation - this is the Moment direction UNIT vector; // angle represents the power of resistant ELASTIC moment
 		//Eigen::AngleAxisr(q) returns nan's when q close to identity, next tline fixes the pb.
+// #define Q_DEBUG
+#ifdef Q_DEBUG
+		if (isnan(aa.angle())) {
+			cerr<<"NaN found after quaternion product"<<endl;
+			cerr<<"rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate()) is:"<<endl;
+			cerr<<rbp1.ori<<" * "<<initialOrientation1.conjugate()<<" * "<<initialOrientation2<<" * "<<rbp2.ori.conjugate()<<endl<<"with sub-products :"<<endl<<rbp1.ori * (initialOrientation1.conjugate())<<" * "<<initialOrientation2 * (rbp2.ori.conjugate())<<endl;
+		}
+#else
 		if (isnan(aa.angle())) aa.angle()=0;
+#endif
 		if (aa.angle() > Mathr::PI) aa.angle() -= Mathr::TWO_PI;   // angle is between 0 and 2*pi, but should be between -pi and pi
 		twist = (aa.angle() * aa.axis().dot(normal));
 		bending = Vector3r(aa.angle()*aa.axis() - twist*normal);
