@@ -17,7 +17,7 @@ dispatches=[
 	Dispatch('Law',('IGeom','IPhys')),
 	Dispatch('IGeom',('Shape','Shape')),
 	Dispatch('IPhys',('Material','Material')),
-	Dispatch('Bound',('Shape','Bound')),
+	Dispatch('Bound',('Shape',)),
 	Dispatch('GlBound',('Bound',)),
 	Dispatch('GlIGeom',('IGeom',)),
 	Dispatch('GlIPhys',('IPhys',)),
@@ -55,7 +55,7 @@ for D in dispatches:
 				dd0,dd1=eval(d0+'()'),eval(d1+'()')
 				try:
 					f=dispatcher.dispFunctor(dd0,dd1)
-					row.append(f.name if f else '-')
+					row.append(f.__class__.__name__ if f else '-')
 				except RuntimeError: # ambiguous
 					row.append('<b>ambiguous</b>')
 			table.rows.append(row)
