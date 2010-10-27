@@ -16,7 +16,7 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
+params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 
@@ -32,8 +32,6 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
 					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,material=sphereMat)
-					p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
-					s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
 					o.bodies.append(s)
 					spheresCount+=1
 	return spheresCount

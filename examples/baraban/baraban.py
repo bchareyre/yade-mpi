@@ -16,7 +16,7 @@ sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAng
 from yade import ymport
 fctIds=O.bodies.append(ymport.stl('baraban.stl',color=(1,0,0),material=facetMat))
 ## Spheres
-sphereRadius = 0.05
+sphereRadius = 0.2
 nbSpheres = (10,10,10)
 #nbSpheres = (50,50,50)
 for i in xrange(nbSpheres[0]):
@@ -26,8 +26,6 @@ for i in xrange(nbSpheres[0]):
             y = (j*2 - nbSpheres[1])*sphereRadius*1.1
             z = (k*2 - nbSpheres[2])*sphereRadius*1.1
             s=utils.sphere([x,y,z],sphereRadius,material=sphereMat)
-            p=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
-            s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
             O.bodies.append(s)
 
 ## Timestep 
