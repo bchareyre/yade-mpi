@@ -95,12 +95,17 @@ void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool is
 		AngleAxisr aa(delta); // axis of rotation - this is the Moment direction UNIT vector; // angle represents the power of resistant ELASTIC moment
 		//Eigen::AngleAxisr(q) returns nan's when q close to identity, next tline fixes the pb.
 // add -DYADE_SCGEOM_DEBUG to CXXFLAGS to enable this piece or just do
-//   #define YADE_SCGEOM_DEBUG (but do not commit with that enabled in the code)
+// #define YADE_SCGEOM_DEBUG //(but do not commit with that enabled in the code)
 #ifdef YADE_SCGEOM_DEBUG
 		if (isnan(aa.angle())) {
 			cerr<<"NaN angle found in angleAxisr(q), for quaternion "<<delta<<", after quaternion product"<<endl;
-			cerr<<"rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate()) is:"<<endl;
-			cerr<<rbp1.ori<<" * "<<initialOrientation1.conjugate()<<" * "<<initialOrientation2<<" * "<<rbp2.ori.conjugate()<<endl<<"with sub-products :"<<endl<<rbp1.ori * (initialOrientation1.conjugate())<<" * "<<initialOrientation2 * (rbp2.ori.conjugate())<<endl;
+			cerr<<"rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate()) with quaternions :"<<endl;
+			cerr<<rbp1.ori<<" * "<<initialOrientation1<<" * "<<initialOrientation2<<" * "<<rbp2.ori<<endl<<" and sub-products :"<<endl<<rbp1.ori * (initialOrientation1.conjugate())<<" * "<<initialOrientation2 * (rbp2.ori.conjugate())<<endl;
+			cerr <<"q.w (before normalization) "<<delta.w();
+			delta.normalize();
+			cerr <<"q.w (after) "<<delta.w()<<endl;
+			AngleAxisr bb(delta);
+			cerr<<delta<<" "<<bb.angle()<<endl;
 		}
 #else
 		if (isnan(aa.angle())) aa.angle()=0;

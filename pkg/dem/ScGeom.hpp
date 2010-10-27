@@ -25,6 +25,12 @@ class ScGeom: public GenericSpheresContact {
 		// inherited from GenericSpheresContact: Vector3r& normal; 
 		Real &radius1, &radius2;
 		virtual ~ScGeom();
+		inline ScGeom& operator= (const ScGeom& source){
+			normal=source.normal; contactPoint=source.contactPoint;
+			twist_axis=source.twist_axis; orthonormal_axis=source.orthonormal_axis;
+			radius1=source.radius1; radius2=source.radius2;
+			penetrationDepth=source.penetrationDepth; shearInc=source.shearInc;
+			return *this;}
 		
 		//!precompute values of shear increment and interaction rotation data. Update contact normal to the vurrentNormal value. Precondition : the value of normal is not updated outside (and before) this function.
 		void precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, const Vector3r& shift2, bool avoidGranularRatcheting=true);
@@ -61,7 +67,7 @@ class ScGeom6D: public ScGeom {
 
 		void precomputeRotations(const State& rbp1, const State& rbp2, bool isNew, bool creep=false);
 		void initRotations(const State& rbp1, const State& rbp2);
-	
+  		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ScGeom6D,ScGeom,"Class representing :yref:`geometry<IGeom>` of two :yref:`bodies<Body>` in contact. The contact has 6 DOFs (normal, 2×shear, twist, 2xbending) and uses :yref:`ScGeom` incremental algorithm for updating shear.",
 		((Quaternionr,orientationToContact1,Quaternionr(1.0,0.0,0.0,0.0),,""))
 		((Quaternionr,orientationToContact2,Quaternionr(1.0,0.0,0.0,0.0),,""))

@@ -226,6 +226,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 	physics->shearCohesion = shearCohesion;
 	physics->normalCohesion = normalCohesion;
+	physics->momentRotationLaw = 1;
 	
 	if((!dynamic) && (!boxWalls))
 	{
@@ -274,6 +275,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 	physics->shearCohesion = 0;
 	physics->normalCohesion = 0;
+	physics->momentRotationLaw = 0;
 	
 	aabb->color		= Vector3r(1,0,0);
 	
@@ -293,7 +295,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	shared_ptr<IGeomFunctor> s1(new Ig2_Sphere_Sphere_ScGeom6D);
 	interactionGeometryDispatcher->add(s1);
-	shared_ptr<IGeomFunctor> s2(new Ig2_Box_Sphere_ScGeom);
+	shared_ptr<IGeomFunctor> s2(new Ig2_Box_Sphere_ScGeom6D);
 	interactionGeometryDispatcher->add(s2);
 
 	shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> cohesiveFrictionalRelationships = shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> (new Ip2_2xCohFrictMat_CohFrictPhys);
