@@ -67,20 +67,17 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	axis = angle*geom.normal;
 	shearForce -= shearForce.cross(axis);
 
-	//const Vector3r c1x = (geom.contactPoint - de1.pos);
-	//const Vector3r c2x = (geom.contactPoint - de2.pos);
-	const Vector3r c1x = geom.radius1*geom.normal;
-	const Vector3r c2x = -geom.radius2*geom.normal;
-	/// The following definition of c1x and c2x is to avoid "granular ratcheting" 
-	///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
-	///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
-	///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
-	//Vector3r _c1x_	=  geom->radius1*geom->normal;
-	//Vector3r _c2x_	= -geom->radius2*geom->normal;
-	//Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
-	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) ;
+	// Handle periodicity.
+	const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
+	const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
+
+	const Vector3r c1x = (geom.contactPoint - de1.pos);
+	const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
+	
+	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
 	const Real normalVelocity	= geom.normal.dot(relativeVelocity);
 	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
+
 	// As Chiara Modenese suggest, we store the elastic part 
 	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
 	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
