@@ -26,10 +26,10 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	const Real kn2 = mat2->kn*mass2; const Real cn2 = mat2->cn*mass2;
 	const Real ks2 = mat2->ks*mass2; const Real cs2 = mat2->cs*mass2;
 	ViscElPhys* phys = new ViscElPhys();
-	phys->kn = 1/(kn1?1/kn1:0 + kn2?1/kn2:0);
-	phys->ks = 1/(ks1?1/ks1:0 + ks2?1/ks2:0);
-	phys->cn = cn1?1/cn1:0 + cn2?1/cn2:0; phys->cn = phys->cn?1/phys->cn:0;
-	phys->cs = cs1?1/cs1:0 + cs2?1/cs2:0; phys->cs = phys->cs?1/phys->cs:0;
+	phys->kn = 1/( (kn1?1/kn1:0) + (kn2?1/kn2:0) );
+	phys->ks = 1/( (ks1?1/ks1:0) + (ks2?1/ks2:0) );
+	phys->cn = (cn1?1/cn1:0) + (cn2?1/cn2:0); phys->cn = phys->cn?1/phys->cn:0;
+	phys->cs = (cs1?1/cs1:0) + (cs2?1/cs2:0); phys->cs = phys->cs?1/phys->cs:0;
 	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
 	phys->prevNormal = Vector3r(0,0,0);
