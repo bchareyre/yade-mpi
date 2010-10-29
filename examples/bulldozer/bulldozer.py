@@ -50,10 +50,8 @@ colorsph2=Vector3(1,1,0);
 colorsph1.normalize();
 colorsph2.normalize();
 colorSph=colorsph1
-#O.bodies.append(utils.sphere([0,0,0],1))
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
-	continue
-	#ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))
+	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:
@@ -69,15 +67,13 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	GravityEngine(gravity=(0,0,-9.8)),
 	TranslationEngine(translationAxis=[1,0,0],velocity=5,ids=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=.3),
 	#qt.SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',label='snapshooter'),
 ]
-O.engines=[]
-print len(O.bodies)
 
 O.saveTmp()
 qt.Controller()

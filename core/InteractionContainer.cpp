@@ -7,8 +7,6 @@
 	#include<omp.h>
 #endif
 
-BOOST_CLASS_EXPORT(InteractionContainer);
-//BOOST_SERIALIZATION_FACTORY_0(InteractionContainer);
 
 bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	boost::mutex::scoped_lock lock(drawloopmutex);

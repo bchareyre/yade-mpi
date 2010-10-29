@@ -58,9 +58,7 @@ if opts.debug:
 else:
 	if not hasNonDebug:
 		print 'WARNING: non-debug build not available, running with --debug instead (try --rebuild to get the non-debug build).'
-		#raise RuntimeError('Non-debug build not available (run with --debug, or try --rebuild)')
-	else:
-		libDir=nonDebugLibDir
+	libDir=nonDebugLibDir
 
 ## remove later
 ## python2.5 relative module imports workaround
@@ -119,7 +117,7 @@ if opts.updateScripts:
 	sys.exit(0)
 if opts.manpage:
 	import yade.manpage
-	yade.manpage.generate_manpage(par,yade.config.metadata,opts.manpage,section=1,seealso='yade%s-multi (1)'%suffix)
+	yade.manpage.generate_manpage(par,yade.config.metadata,opts.manpage,section=1,seealso='yade%s-batch (1)'%suffix)
 	print 'Manual page %s generated.'%opts.manpage
 	sys.exit(0)
 if opts.nice:

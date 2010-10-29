@@ -6,9 +6,6 @@
 
 YADE_PLUGIN((SumIntrForcesCb)(SumBodyForcesCb));
 
-int SumIntrForcesCb::int0=0;
-Real SumIntrForcesCb::Real0=0;
-
 IntrCallback::FuncPtr SumIntrForcesCb::stepInit(){
 	// if(scene->iter%100 != 0) return NULL;
 

@@ -7,3 +7,6 @@ template<> const Real Math<Real>::TWO_PI = 2.0*Math<Real>::PI;
 template<> const Real Math<Real>::HALF_PI = 0.5*Math<Real>::PI;
 template<> const Real Math<Real>::DEG_TO_RAD = Math<Real>::PI/180.0;
 template<> const Real Math<Real>::RAD_TO_DEG = 180.0/Math<Real>::PI;
+
+template<> int ZeroInitializer<int>(){ return (int)0; }
+template<> Real ZeroInitializer<Real>(){ return (Real)0; }

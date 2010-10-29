@@ -5,7 +5,7 @@ CREATE_LOGGER(ForceRecorder);
 
 void ForceRecorder::action(){
 	totalForce=Vector3r::Zero();
-	FOREACH(Body::id_t id, subscribedBodies){
+	FOREACH(Body::id_t id, ids){
 		assert(scene->bodies->exists(id)); 
 		totalForce+=scene->forces.getForce(id);
 	};

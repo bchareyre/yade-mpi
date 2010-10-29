@@ -27,7 +27,7 @@ i2=utils.createInteraction(2,3)
 
 O.engines=[
 	InteractionLoop([],[],[Law2_ScGeom_CpmPhys_Cpm(),Law2_Dem3DofGeom_CpmPhys_Cpm(yieldSurfType=0)]),
-	StepDisplacer(subscribedBodies=[1,3],setVelocities=True,label='jumper'), # displace non-dynamic #1, set velocity on #3
+	StepDisplacer(ids=[1,3],setVelocities=True,label='jumper'), # displace non-dynamic #1, set velocity on #3
 	NewtonIntegrator(damping=0),
 	PyRunner(iterPeriod=1,initRun=True,command='plotData()'),
 ]

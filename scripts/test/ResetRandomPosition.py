@@ -53,7 +53,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
 	NewtonIntegrator(damping=0),
-	ResetRandomPosition(factoryFacets=fctIds,velocity=(0,0,-2),virtPeriod=0.01,subscribedBodies=spheres,point=(0,0,-.5),normal=(0,0,1),maxAttempts=100),
+	ResetRandomPosition(factoryFacets=fctIds,velocity=(0,0,-2),virtPeriod=0.01,ids=spheres,point=(0,0,-.5),normal=(0,0,1),maxAttempts=100),
 ]
 
 #renderer = qt.Renderer()

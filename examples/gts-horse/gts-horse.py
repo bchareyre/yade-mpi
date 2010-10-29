@@ -25,6 +25,8 @@ surf=gts.read(open('horse.coarse.gts'))
 
 O.materials.append(FrictMat(young=30e9,density=2000))
 
+print 'surface closed',surf.is_closed(),'volume',surf.volume()
+
 if surf.is_closed():
 	pred=pack.inGtsSurface(surf)
 	aabb=pred.aabb()
@@ -39,7 +41,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	GravityEngine(gravity=[0,0,-1e4]),
 	NewtonIntegrator(damping=.1)

@@ -31,6 +31,7 @@ class TestIO(unittest.TestCase):
 				O.loadTmp()
 			except (RuntimeError,ValueError):
 				failed.add(c)
+		failed=list(failed); failed.sort()
 		self.assert_(len(failed)==0,'Failed classes were: '+' '.join(failed))
 
 

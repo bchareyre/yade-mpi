@@ -14,7 +14,6 @@ YADE_PLUGIN(
 	(Law2_ScGeom_MindlinPhys_Mindlin)
 );
 
-Real Law2_ScGeom_MindlinPhys_Mindlin::Real0=0;
 Real Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation() {return (Real) frictionDissipation;}
 Real Law2_ScGeom_MindlinPhys_Mindlin::getshearEnergy() {return (Real) shearEnergy;}
 Real Law2_ScGeom_MindlinPhys_Mindlin::getnormDampDissip() {return (Real) normDampDissip;}

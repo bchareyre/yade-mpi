@@ -79,6 +79,13 @@ typedef Eigen::Quaternion<Real> Quaternionr;
 typedef Eigen::AngleAxis<Real> AngleAxisr;
 using Eigen::AngleAxis; using Eigen::Quaternion;
 
+// in some cases, we want to initialize types that have no default constructor (OpenMPAccumulator, for instance)
+// template specialization will help us here
+template<typename EigenMatrix> EigenMatrix ZeroInitializer(){ return EigenMatrix::Zero(); };
+template<> int ZeroInitializer<int>();
+template<> Real ZeroInitializer<Real>();
+
+
 // io
 template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR2_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y(); return os; };
 template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR3_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y()<<" "<<v.z(); return os; };

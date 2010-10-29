@@ -132,7 +132,7 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 /********************** Law2_Dem3DofGeom_CpmPhys_Cpm ****************************/
 
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
-	#include"../../brefcom-mm.hh"
+	#include"../../../brefcom-mm.hh"
 #endif
 
 // #undef CPM_MATERIAL_MODEL (force trunk version of the model)

@@ -29,6 +29,7 @@
 #include<map>
 
 #include<yade/lib-base/Math.hpp>
+#include<yade/lib-base/openmp-accu.hpp>
 
 #include<yade/core/Engine.hpp>
 
@@ -78,6 +79,20 @@ struct custom_Se3r_from_seq{
 		} else throw std::logic_error(__FILE__ ": First, the sequence size for Se3r object was 2 or 7, but now is not? (programming error, please report!");
 		data->convertible=storage;
 	}
+};
+
+
+struct custom_OpenMPAccumulator_to_float{ static PyObject* convert(const OpenMPAccumulator<Real>& acc){ return incref(PyFloat_FromDouble(acc.get())); } };
+struct custom_OpenMPAccumulator_from_float{
+	custom_OpenMPAccumulator_from_float(){  converter::registry::push_back(&convertible,&construct,type_id<OpenMPAccumulator<Real> >()); }
+	static void* convertible(PyObject* obj_ptr){ return PyFloat_Check(obj_ptr) ? obj_ptr : 0; }
+	static void construct(PyObject* obj_ptr, converter::rvalue_from_python_stage1_data* data){ void* storage=((converter::rvalue_from_python_storage<OpenMPAccumulator<Real> >*)(data))->storage.bytes; new (storage) OpenMPAccumulator<Real>; ((OpenMPAccumulator<Real>*)storage)->set(extract<Real>(obj_ptr)); data->convertible=storage; }
+};
+struct custom_OpenMPAccumulator_to_int  { static PyObject* convert(const OpenMPAccumulator<int>& acc){ return incref(PyInt_FromLong((long)acc.get())); } };
+struct custom_OpenMPAccumulator_from_int{
+	custom_OpenMPAccumulator_from_int(){  converter::registry::push_back(&convertible,&construct,type_id<OpenMPAccumulator<int> >()); }
+	static void* convertible(PyObject* obj_ptr){ return PyInt_Check(obj_ptr) ? obj_ptr : 0; }
+	static void construct(PyObject* obj_ptr, converter::rvalue_from_python_stage1_data* data){ void* storage=((converter::rvalue_from_python_storage<OpenMPAccumulator<int> >*)(data))->storage.bytes; new (storage) OpenMPAccumulator<int>; ((OpenMPAccumulator<int>*)storage)->set(extract<int>(obj_ptr)); data->convertible=storage; }
 };
 
 template<typename T>
@@ -176,6 +191,10 @@ BOOST_PYTHON_MODULE(_customConverters){
 	#endif
 
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
+
+	custom_OpenMPAccumulator_from_float(); to_python_converter<OpenMPAccumulator<Real>, custom_OpenMPAccumulator_to_float>(); 
+	custom_OpenMPAccumulator_from_int(); to_python_converter<OpenMPAccumulator<int>, custom_OpenMPAccumulator_to_int>(); 
+	// todo: OpenMPAccumulator<int>
 
 	custom_ptrMatchMaker_from_float();
 

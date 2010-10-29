@@ -22,7 +22,7 @@ O.engines=[
 	[Ig2_Sphere_Sphere_Dem3DofGeom(),
 		Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()]
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(),
@@ -34,5 +34,5 @@ O.dt=utils.PWaveTimeStep()
 from yade import qt
 qt.Controller()
 qt.View()
-
+O.saveTmp()
 O.run(8500)

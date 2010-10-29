@@ -50,6 +50,7 @@ void LawTester::postLoad(LawTester&){
 }
 
 void LawTester::action(){
+	Vector2r foo; // avoid undefined ~Vector2r with clang?
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
 	LOG_DEBUG("=================== LawTester step "<<step<<" ========================");
 	const shared_ptr<Interaction> Inew=scene->interactions->find(ids[0],ids[1]);
@@ -146,7 +147,7 @@ void LawTester::action(){
 	
 	// shear is applied as rotation of id2: dε=r₁dθ → dθ=dε/r₁;
 	Vector3r vel[2],angVel[2];
-	State* states[]={state1,state2};
+	//State* states[]={state1,state2};
 	for(int i=0; i<2; i++){
 		int sign=(i==0?-1:1);
 		Real weight=(i==0?1-idWeight:idWeight);

@@ -22,13 +22,13 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	# subscribedBodies: what bodies is force applied to
+	# ids: what bodies is force applied to
 	# direction: direction of the force (normalized automatically), constant
 	# magnitudes: series of force magnitude
 	# times: time points at which magnitudes are defined
 	# wrap: continue from t0 once t_last is reached
 	# label: automatically defines python variable of that name pointing to this engine
-	InterpolatingDirectedForceEngine(subscribedBodies=[1],direction=[0,0,-1],magnitudes=magnitudes,times=times,wrap=True,label='forcer'),
+	InterpolatingDirectedForceEngine(ids=[1],direction=[0,0,-1],magnitudes=magnitudes,times=times,wrap=True,label='forcer'),
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
 	NewtonIntegrator(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)

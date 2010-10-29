@@ -14,9 +14,21 @@
 
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_Dem3DofGeom_FrictPhys_CundallStrack)(ElasticContactLaw));
 
-Real Law2_ScGeom_FrictPhys_CundallStrack::Real0=0;
+#if 0
 Real Law2_ScGeom_FrictPhys_CundallStrack::getPlasticDissipation() {return (Real) plasticDissipation;}
 void Law2_ScGeom_FrictPhys_CundallStrack::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
+Real Law2_ScGeom_FrictPhys_CundallStrack::elasticEnergy()
+{
+	Real energy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		FrictPhys* phys = dynamic_cast<FrictPhys*>(I->phys.get());
+		if(phys) {
+			energy += 0.5*(phys->normalForce.squaredNorm()/phys->kn + phys->shearForce.squaredNorm()/phys->ks);}
+	}
+	return energy;
+}
+#endif
 
 void ElasticContactLaw::action()
 {
@@ -31,18 +43,6 @@ void ElasticContactLaw::action()
 		#endif
 			functor->go(I->geom, I->phys, I.get());
 	}
-}
-
-Real Law2_ScGeom_FrictPhys_CundallStrack::elasticEnergy()
-{
-	Real energy=0;
-	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-		if(!I->isReal()) continue;
-		FrictPhys* phys = dynamic_cast<FrictPhys*>(I->phys.get());
-		if(phys) {
-			energy += 0.5*(phys->normalForce.squaredNorm()/phys->kn + phys->shearForce.squaredNorm()/phys->ks);}
-	}
-	return energy;
 }
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_CundallStrack);
@@ -68,7 +68,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	shearForce -= phys->ks*shearDisp;
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-	if (!traceEnergy){//Update force but don't compute energy terms (see below))
+	if (!scene->trackEnergy){//Update force but don't compute energy terms (see below))
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = sqrt(maxFs) / shearForce.norm();
@@ -80,10 +80,10 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
 			//define the plastic work input and increment the total plastic energy dissipated
 			shearForce *= ratio;
-			plasticDissipation +=
-			((1/phys->ks)*(trialForce-shearForce))//plastic disp.
-			.dot(shearForce);//active force
+			scene->energy->add(((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/,"plastDissip",plastDissipIx,/*reset*/false);
 		}
+		// compute elastic energy as well
+		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
 	}
 	if (!scene->isPeriodic)
 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);

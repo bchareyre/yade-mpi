@@ -58,7 +58,7 @@ for i in (0,1): # red and blue spheres
 
 print "Numer of grains",len(O.bodies)-len(millIds)
 
-O.dt=utils.PWaveTimeStep()
+O.dt=.5*utils.PWaveTimeStep()
 
 O.engines=[
 	ForceResetter(),
@@ -66,18 +66,18 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),	
 	GravityEngine(gravity=(0,0,-50)), # gravity artificially high, to make it faster going ;-)
 	NewtonIntegrator(damping=.3),
-	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-20,subscribedBodies=millIds),
+	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-20,ids=millIds),
 	#SnapshotEngine(iterPeriod=30,fileBase='/tmp/mill-',viewNo=0,label='snapshooter'),
-	VTKRecorder(iterPeriod=100,recorders=['all'],fileName='/tmp/millVTK-',multiblock=False)
+	#VTKRecorder(iterPeriod=100,recorders=['all'],fileName='/tmp/millVTK-')
 ]
 
 O.saveTmp()
-#from yade import qt
-#v=qt.View()
-#v.eyePosition=(3,.8,.96); v.upVector=(-.4,-.4,.8); v.viewDir=(-.9,-.25,-.3); v.axes=True; v.sceneRadius=1.9
-O.run(20000); O.wait()
+from yade import qt
+v=qt.View()
+v.eyePosition=(3,.8,.96); v.upVector=(-.4,-.4,.8); v.viewDir=(-.9,-.25,-.3); v.axes=True; v.sceneRadius=1.9
+#O.run(20000); O.wait()
 #utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/mill.ogg',fps=30)

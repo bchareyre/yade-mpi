@@ -11,7 +11,7 @@ O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
 	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
-	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
+	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,ids=[1]),
 	ElasticContactLaw(useShear=False,label='elasticLaw'),
 	PyRunner(iterPeriod=10000,command='interInfo()'),
 ]

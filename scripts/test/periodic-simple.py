@@ -15,7 +15,7 @@ O.engines=[
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	GravityEngine(gravity=[0,0,-10]),
-	TranslationEngine(translationAxis=(1,0,0),velocity=10,subscribedBodies=[0]),
+	TranslationEngine(translationAxis=(1,0,0),velocity=10,ids=[0]),
 	NewtonIntegrator(damping=.4)
 ]
 O.bodies.append(utils.sphere([-4,0,11],2,dynamic=False))

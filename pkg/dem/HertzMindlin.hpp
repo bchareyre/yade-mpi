@@ -99,11 +99,6 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 		Real _beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys; 
 		bool _nothing;
 	public:
-		static Real Real0;
-		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> frictionDissipation;
-		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> shearEnergy;
-		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> normDampDissip;
-		OpenMPAccumulator<Real,&Law2_ScGeom_MindlinPhys_Mindlin::Real0> shearDampDissip;
 
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		Real normElastEnergy();
@@ -120,10 +115,10 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 			((bool,includeAdhesion,false,,"bool to include the adhesion force following the DMT formulation. If true, also the normal elastic energy takes into account the adhesion effect."))
 			((bool,calcEnergy,false,,"bool to calculate energy terms (shear potential energy, dissipation of energy due to friction and dissipation of energy due to normal and tangential damping)"))
 			// FIXME: all the energy attributes should be openMPAccumulator
-			//((Real,shearEnergy,0.0,"Shear elastic potential energy"))
-			//((Real,frictionDissipation,0.0,"Energy dissipation due to sliding"))
-			//((Real,normDampDissip,0.0,"Energy dissipation due to sliding"))
-			//((Real,shearDampDissip,0.0,"Energy dissipation due to sliding"))
+			((OpenMPAccumulator<Real>,frictionDissipation,,Attr::noSave,"Energy dissipation due to sliding"))
+			((OpenMPAccumulator<Real>,shearEnergy,,Attr::noSave,"Shear elastic potential energy"))
+			((OpenMPAccumulator<Real>,normDampDissip,,Attr::noSave,"Energy dissipation due to sliding"))
+			((OpenMPAccumulator<Real>,shearDampDissip,,Attr::noSave,"Energy dissipation due to sliding"))
 			, /*deprec*/
 			((betan,_beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys,"!Moved to MindlinPhys, where the value is assigned by the appropriate Ip2 functor."))
 			((betas,_beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys,"!Moved to MindlinPhys, where the value is assigned by the appropriate Ip2 functor."))
@@ -132,11 +127,12 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 			, /* ctor */
 			, /* py */
 			.def("contactsAdhesive",&Law2_ScGeom_MindlinPhys_Mindlin::contactsAdhesive,"Compute total number of adhesive contacts.")
+
 			.def("normElastEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy,"Compute normal elastic potential energy. It handle the DMT formulation if :yref:`Law2_ScGeom_MindlinPhys_Mindlin::includeAdhesion` is set to true.")
-			.def("frictionDissipation",&Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation,"Energy dissipated by frictional behavior.")
-			.def("shearEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::getshearEnergy,"Shear elastic potential energy.")
-			.def("normDampDissip",&Law2_ScGeom_MindlinPhys_Mindlin::getnormDampDissip,"Energy dissipated by normal damping.")
-			.def("shearDampDissip",&Law2_ScGeom_MindlinPhys_Mindlin::getshearDampDissip,"Energy dissipated by tangential damping.")
+			//.def("frictionDissipation",&Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation,"Energy dissipated by frictional behavior.")
+			//.def("shearEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::getshearEnergy,"Shear elastic potential energy.")
+			//.def("normDampDissip",&Law2_ScGeom_MindlinPhys_Mindlin::getnormDampDissip,"Energy dissipated by normal damping.")
+			//.def("shearDampDissip",&Law2_ScGeom_MindlinPhys_Mindlin::getshearDampDissip,"Energy dissipated by tangential damping.")
 	);
 	DECLARE_LOGGER;
 };

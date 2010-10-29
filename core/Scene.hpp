@@ -10,16 +10,15 @@
 
 #pragma once
 
-#include"Body.hpp"
-#include"Cell.hpp"
-#include"BodyContainer.hpp"
-#include"Engine.hpp"
-#include"Material.hpp"
-#include"DisplayParameters.hpp"
-#include"ForceContainer.hpp"
-#include"InteractionContainer.hpp"
-
-#include"GroupRelationData.hpp"
+#include<yade/core/Body.hpp>
+#include<yade/core/Cell.hpp>
+#include<yade/core/BodyContainer.hpp>
+#include<yade/core/Engine.hpp>
+#include<yade/core/Material.hpp>
+#include<yade/core/DisplayParameters.hpp>
+#include<yade/core/ForceContainer.hpp>
+#include<yade/core/InteractionContainer.hpp>
+#include<yade/core/EnergyTracker.hpp>
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255 
@@ -73,6 +72,7 @@ class Scene: public Serializable{
 			((Real,stopAtRealTime,0,,"Time at which to stop the simulation"))
 		#endif
 		((bool,isPeriodic,false,Attr::readonly,"Whether periodic boundary conditions are active."))
+		((bool,trackEnergy,false,Attr::readonly,"Whether energies are being traced."))
 		((bool,needsInitializers,true,Attr::readonly,"Whether initializers will be run before the first step."))
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 
@@ -81,6 +81,7 @@ class Scene: public Serializable{
 		((vector<shared_ptr<Engine> >,initializers,,Attr::hidden,"Engines that will be run only once, before the first step."))
 		((shared_ptr<BodyContainer>,bodies,new BodyContainer,Attr::hidden,"Bodies contained in the scene."))
 		((shared_ptr<InteractionContainer>,interactions,new InteractionContainer,Attr::hidden,"All interactions between bodies."))
+		((shared_ptr<EnergyTracker>,energy,new EnergyTracker,Attr::hidden,"Energy values, if energy tracking is enabled."))
 		((vector<shared_ptr<Material> >,materials,,Attr::hidden,"Container of shared materials. Add elements using Scene::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!"))
 		((shared_ptr<Bound>,bound,,Attr::hidden,"Bounding box of the scene (only used for rendering and initialized if needed)."))
 
@@ -93,5 +94,5 @@ class Scene: public Serializable{
 	);
 	DECLARE_LOGGER;
 };
-
+REGISTER_SERIALIZABLE(Scene);
 

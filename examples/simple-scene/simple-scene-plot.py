@@ -9,7 +9,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_ScGeom_FrictPhys_Basic()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=.2),
@@ -46,7 +46,7 @@ def myAddPlotData():
 	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sph.state.vel.norm())
 print "Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live."
 plot.liveInterval=.2
-plot.plot()
+plot.plot(subPlots=True)
 O.run(int(2./O.dt));
 #plot.saveGnuplot('/tmp/a')
 ## you can also access the data in plot.data['i'], plot.data['t'] etc, under the labels they were saved.

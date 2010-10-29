@@ -3,8 +3,6 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/Body.hpp>
 
-BOOST_CLASS_EXPORT(BodyContainer);
-
 unsigned int BodyContainer::findFreeId(){
 	unsigned int max=body.size();
 	for(; lowestFree<max; lowestFree++){

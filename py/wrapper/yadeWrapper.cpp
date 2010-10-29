@@ -31,6 +31,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/ThreadRunner.hpp>
 #include<yade/core/FileGenerator.hpp>
+#include<yade/core/EnergyTracker.hpp>
 
 #include<yade/pkg-dem/STLImporter.hpp>
 
@@ -473,6 +474,10 @@ class pyOmega{
 	bool periodic_get(void){ return OMEGA.getScene()->isPeriodic; } 
 	void periodic_set(bool v){ OMEGA.getScene()->isPeriodic=v; }
 
+	shared_ptr<EnergyTracker> energy_get(){ return OMEGA.getScene()->energy; }
+	bool trackEnergy_get(void){ return OMEGA.getScene()->trackEnergy; }
+	void trackEnergy_set(bool e){ OMEGA.getScene()->trackEnergy=e; }
+
 	void disableGdb(){
 		signal(SIGSEGV,SIG_DFL);
 		signal(SIGABRT,SIG_DFL);
@@ -542,6 +547,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")
 		.add_property("forces",&pyOmega::forces_get,":yref:`ForceContainer` (forces, torques, displacements) in the current simulation.")
+		.add_property("energy",&pyOmega::energy_get,":yref:`EnergyTracker` of the current simulation. (meaningful only with :yref:`O.trackEnergy<Omega.trackEnergy>`)")
+		.add_property("trackEnergy",&pyOmega::trackEnergy_get,&pyOmega::trackEnergy_set,"When energy tracking is enabled or disabled in this simulation.")
 		.add_property("tags",&pyOmega::tags_get,"Tags (string=string dictionary) of the current simulation (container supporting string-index access/assignment)")
 		.def("childClassesNonrecursive",&pyOmega::listChildClassesNonrecursive,"Return list of all classes deriving from given class, as registered in the class factory")
 		.def("isChildClassOf",&pyOmega::isChildClassOf,"Tells whether the first class derives from the second one (both given as strings).")
