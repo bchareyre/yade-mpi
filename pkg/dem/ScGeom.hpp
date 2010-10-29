@@ -32,7 +32,7 @@ class ScGeom: public GenericSpheresContact {
 			penetrationDepth=source.penetrationDepth; shearInc=source.shearInc;
 			return *this;}
 		
-		//!precompute values of shear increment and interaction rotation data. Update contact normal to the vurrentNormal value. Precondition : the value of normal is not updated outside (and before) this function.
+		//!precompute values of shear increment and interaction rotation data. Update contact normal to the currentNormal value. Precondition : the value of normal is not updated outside (and before) this function.
 		void precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, const Vector3r& shift2, bool avoidGranularRatcheting=true);
 
 		//! Rotates a "shear" vector to keep track of contact orientation. Returns reference of the updated vector.
