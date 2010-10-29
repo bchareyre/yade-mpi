@@ -19,6 +19,7 @@
 #	include<memory>
 	using std::shared_ptr;
 #endif
+#include<boost/version.hpp>
 #include<boost/python.hpp>
 #include<boost/type_traits.hpp>
 #include<boost/lexical_cast.hpp>
@@ -228,7 +229,13 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(inits attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_MAKE_INITIALIZER,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(inits attrDecls)), inits BOOST_PP_SEQ_FOR_EACH(_ATTR_MAKE_INIT_TUPLE,~,attrDecls)) { ctor ; } /* ctor, with initialization of defaults */ \
 	_YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_ATTRS_EMBED_INI_TYP_IN_DOC,~,attrDecls),deprec,extras)
 
-#define REGISTER_SERIALIZABLE(name) REGISTER_FACTORABLE(name); BOOST_CLASS_EXPORT_KEY(name);
+// see https://bugs.launchpad.net/yade/+bug/666876
+// we have to change things at a few other places as well
+#if BOOST_VERSION>=104200
+	#define REGISTER_SERIALIZABLE(name) REGISTER_FACTORABLE(name); BOOST_CLASS_EXPORT_KEY(name);
+#else
+	#define REGISTER_SERIALIZABLE(name) REGISTER_FACTORABLE(name); 
+#endif
 
 // for static classes (Gl1 functors, for instance)
 #define YADE_CLASS_BASE_DOC_STATICATTRS(thisClass,baseClass,docString,attrs)\

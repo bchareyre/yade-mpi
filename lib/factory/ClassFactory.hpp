@@ -38,6 +38,7 @@
 	Python wrapper defines O.saveXML('file.xml') to try it out.
 	Loading is not yet implemented (should be easy)
 */
+#include<boost/version.hpp>
 
 #include<boost/archive/binary_oarchive.hpp>
 #include<boost/archive/binary_iarchive.hpp>
@@ -178,7 +179,11 @@ class ClassFactory : public Singleton<ClassFactory>
  * be unique and avoids use of __COUNTER__ which didn't appear in gcc until 4.3.
  */
 
-#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT_IMPLEMENT(z); BOOST_SERIALIZATION_FACTORY_0(z);
+#if BOOST_VERSION>=104200
+	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT_IMPLEMENT(z); BOOST_SERIALIZATION_FACTORY_0(z);
+#else
+	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z); BOOST_SERIALIZATION_FACTORY_0(z);
+#endif
 
 // the __attribute__((constructor(priority))) construct not supported before gcc 4.3
 // it will only produce warning from log4cxx if not used
