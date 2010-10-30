@@ -137,12 +137,12 @@ void particleMacroStress(void){
 #endif
 #include<yade/lib-smoothing/WeightedAverage2d.hpp>
 /* Fastly locate interactions within given distance from a point in 2d (projected to plane) */
-struct SpiralInteractionLocator2d{
+struct HelixInteractionLocator2d{
 	struct FlatInteraction{ Real r,h,theta; shared_ptr<Interaction> i; FlatInteraction(Real _r, Real _h, Real _theta, const shared_ptr<Interaction>& _i): r(_r), h(_h), theta(_theta), i(_i){}; };
 	shared_ptr<GridContainer<FlatInteraction> > grid;
 	Real thetaSpan;
 	int axis;
-	SpiralInteractionLocator2d(Real dH_dTheta, int _axis, Real periodStart, Real theta0, Real thetaMin, Real thetaMax): axis(_axis){
+	HelixInteractionLocator2d(Real dH_dTheta, int _axis, Real periodStart, Real theta0, Real thetaMin, Real thetaMax): axis(_axis){
 		Scene* scene=Omega::instance().getScene().get();
 		Real inf=std::numeric_limits<Real>::infinity();
 		Vector2r lo=Vector2r(inf,inf), hi(-inf,-inf);
@@ -324,13 +324,13 @@ BOOST_PYTHON_MODULE(_eudoxos){
 		.add_property("count",&InteractionLocator::getCnt,"Number of interactions held")
 	;
 #endif
-	py::class_<SpiralInteractionLocator2d>("SpiralInteractionLocator2d",
+	py::class_<HelixInteractionLocator2d>("HelixInteractionLocator2d",
 		"Locate all real interactions in 2d plane (reduced by spiral projection from 3d, using ``Shop::spiralProject``, which is the same as :yref:`yade.utils.spiralProject`) using their :yref:`contact points<Dem3DofGeom::contactPoint>`. \n\n.. note::\n\tDo not run simulation while using this object.",
 		python::init<Real,int,Real,Real,Real,Real>((python::arg("dH_dTheta"),python::arg("axis")=0,python::arg("periodStart")=NaN,python::arg("theta0")=0,python::arg("thetaMin")=NaN,python::arg("thetaMax")=NaN),":param float dH_dTheta: Spiral inclination, i.e. height increase per 1 radian turn;\n:param int axis: axis of rotation (0=x,1=y,2=z)\n:param float theta: spiral angle at zero height (theta intercept)\n:param float thetaMin: only interactions with $\\theta$≥\\ *thetaMin* will be considered (NaN to deactivate)\n:param float thetaMax: only interactions with $\\theta$≤\\ *thetaMax* will be considered (NaN to deactivate)\n\nSee :yref:`yade.utils.spiralProject`.")
 	)
-		.def("intrsAroundPt",&SpiralInteractionLocator2d::intrsAroundPt,(python::arg("pt2d"),python::arg("radius")),"Return list of interaction objects that are not further from *pt2d* than *radius* in the projection plane")
-		.def("macroAroundPt",&SpiralInteractionLocator2d::macroAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point; the interaction ($n$ and $\\sigma^T$ are rotated to the projection plane by $\\theta$ (as given by :yref:`yade.utils.spiralProject`) first, but no skew is applied). The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is ($\\theta$-rotated) interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates and $\\theta$-rotated. \n\nAdditionaly, computes average of :yref:`CpmPhys.omega` ($\\bar\\omega$) and :yref:`CpmPhys.kappaD` ($\\bar\\kappa_D$). *N* is the number of interactions in the volume given.\n\n:return: tuple of (*N*, $\\tens{\\sigma}$, $\\bar\\omega$, $\\bar\\kappa_D$).\n")
-		.add_property("lo",&SpiralInteractionLocator2d::getLo,"Return lower corner of the rectangle containing all interactions.")
-		.add_property("hi",&SpiralInteractionLocator2d::getHi,"Return upper corner of the rectangle containing all interactions.");
+		.def("intrsAroundPt",&HelixInteractionLocator2d::intrsAroundPt,(python::arg("pt2d"),python::arg("radius")),"Return list of interaction objects that are not further from *pt2d* than *radius* in the projection plane")
+		.def("macroAroundPt",&HelixInteractionLocator2d::macroAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point; the interaction ($n$ and $\\sigma^T$ are rotated to the projection plane by $\\theta$ (as given by :yref:`yade.utils.spiralProject`) first, but no skew is applied). The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is ($\\theta$-rotated) interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates and $\\theta$-rotated. \n\nAdditionaly, computes average of :yref:`CpmPhys.omega` ($\\bar\\omega$) and :yref:`CpmPhys.kappaD` ($\\bar\\kappa_D$). *N* is the number of interactions in the volume given.\n\n:return: tuple of (*N*, $\\tens{\\sigma}$, $\\bar\\omega$, $\\bar\\kappa_D$).\n")
+		.add_property("lo",&HelixInteractionLocator2d::getLo,"Return lower corner of the rectangle containing all interactions.")
+		.add_property("hi",&HelixInteractionLocator2d::getHi,"Return upper corner of the rectangle containing all interactions.");
 
 }

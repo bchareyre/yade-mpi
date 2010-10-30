@@ -273,4 +273,3 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 	return pack.size();
 }
 
-

@@ -4,7 +4,7 @@
 YADE_PLUGIN((ForceResetter));
 
 void ForceResetter::action(){
-	scene->forces.reset();
+	scene->forces.reset(scene->iter);
 	if(scene->trackEnergy) scene->energy->resetResettables();
 }
 

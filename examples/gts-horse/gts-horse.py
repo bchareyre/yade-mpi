@@ -44,16 +44,14 @@ O.engines=[
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	GravityEngine(gravity=[0,0,-1e4]),
-	NewtonIntegrator(damping=.1)
+	NewtonIntegrator(damping=.1),
+	PyRunner(iterPeriod=10000,command='timing.stats(); O.pause();')
 ]
 collider.sweepLength,collider.nBins,collider.binCoeff=.1*dim0/30.5,10,2
 O.dt=1.5*utils.PWaveTimeStep()
 O.saveTmp()
 O.timingEnabled=True
 
+from yade import timing
 from yade import qt
 qt.View()
-
-from yade import timing
-O.run(10000,True)
-timing.stats()

@@ -74,7 +74,7 @@ class ForceContainer{
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0){
+		ForceContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0), lastReset(0){
 			nThreads=omp_get_max_threads();
 			for(int i=0; i<nThreads; i++){
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
@@ -120,7 +120,8 @@ class ForceContainer{
 			}
 			synced=true; syncCount++;
 		}
-		unsigned long syncCount; 
+		unsigned long syncCount;
+		long lastReset;
 
 		/* Change size of containers (number of bodies).
 		 * Locks globalMutex, since on threads modifies other threads' data.
@@ -140,7 +141,7 @@ class ForceContainer{
 		}
 		/*! Reset all data, also reset summary forces/torques and mark the container clean. */
 		// perhaps should be private and friend Scene or whatever the only caller should be
-		void reset(){
+		void reset(long iter){
 			for(int thread=0; thread<nThreads; thread++){
 				memset(&_forceData [thread][0],0,sizeof(Vector3r)*size);
 				memset(&_torqueData[thread][0],0,sizeof(Vector3r)*size);
@@ -156,6 +157,7 @@ class ForceContainer{
 				memset(&_rot   [0], 0,sizeof(Vector3r)*size);
 			}
 			synced=true; moveRotUsed=false;
+			lastReset=iter;
 		}
 		//! say for how many threads we have allocated space
 		const int& getNumAllocatedThreads() const {return nThreads;}
@@ -180,7 +182,7 @@ class ForceContainer {
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), moveRotUsed(false), syncCount(0){}
+		ForceContainer(): size(0), moveRotUsed(false), syncCount(0), lastReset(0){}
 		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}
 		void  addForce(Body::id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(Body::id_t id){ensureSize(id); return _torque[id];}
@@ -196,7 +198,7 @@ class ForceContainer {
 		const Vector3r& getRotSingle   (Body::id_t id){ ensureSize(id); return _rot   [id]; }
 
 		//! Set all forces to zero
-		void reset(){
+		void reset(long iter){
 			memset(&_force [0],0,sizeof(Vector3r)*size);
 			memset(&_torque[0],0,sizeof(Vector3r)*size);
 			if(moveRotUsed){
@@ -204,10 +206,13 @@ class ForceContainer {
 				memset(&_rot   [0],0,sizeof(Vector3r)*size);
 				moveRotUsed=false;
 			}
+			lastReset=iter;
 		}
 		//! No-op for API compatibility with the threaded version
 		void sync(){return;}
 		unsigned long syncCount;
+		// interaction in which the container was last reset; used by NewtonIntegrator to detect whether ForceResetter was not forgotten
+		long lastReset;
 		/*! Resize the container; this happens automatically,
 		 * but you may want to set the size beforehand to avoid resizes as the simulation grows. */
 		void resize(size_t newSize){

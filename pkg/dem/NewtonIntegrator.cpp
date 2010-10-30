@@ -62,7 +62,8 @@ void NewtonIntegrator::saveMaximaVelocity(Scene* scene, const Body::id_t& id, St
 void NewtonIntegrator::action()
 {
 	scene->forces.sync();
-	Real dt=scene->dt;
+	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
+	const Real& dt=scene->dt;
 	if(scene->isPeriodic && homotheticCellResize>=0){
 		LOG_WARN("Newton.homotheticCellResize is deprecated, use Cell.homoDeform instead. Setting Cell.homoDeform for you now, but the compatibility interface will be removed in the future.");
 		scene->cell->homoDeform=(homotheticCellResize==0?Cell::HOMO_NONE:(homotheticCellResize==1?Cell::HOMO_VEL:Cell::HOMO_VEL_2ND));

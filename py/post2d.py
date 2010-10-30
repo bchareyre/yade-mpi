@@ -2,18 +2,22 @@
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 """
 Module for 2d postprocessing, containing classes to project points from 3d to 2d in various ways,
-providing basic but flexible framework for extracting arbitrary scalar values from bodies and plotting the
-results. There are 2 basic components: flatteners and extractors.
+providing basic but flexible framework for extracting arbitrary scalar values from bodies/interactions
+and plotting the results. There are 2 basic components: flatteners and extractors.
+
+The algorithms operate on bodies (default) or interactions, depending on the ``intr`` parameter
+of post2d.data.
 
 Flatteners
 ==========
 Instance of classes that convert 3d (model) coordinates to 2d (plot) coordinates. Their interface is
-defined by the Flatten class (__call__, planar, normal).
+defined by the :yref:`yade.post2d.Flatten` class (``__call__``, ``planar``, ``normal``).
 
 Extractors
 ==========
-Callable objects returning scalar or vector value, given a body object. If a 3d vector is returned,
-Flattener.planar is called, which should return only in-plane components of the vector.
+Callable objects returning scalar or vector value, given a body/interaction object.
+If a 3d vector is returned, Flattener.planar is called, which should return only in-plane
+components of the vector.
 
 Example
 =======
@@ -60,29 +64,23 @@ class Flatten:
 	"""Abstract class for converting 3d point into 2d. Used by post2d.data2d."""
 	def __init__(self): pass
 	def __call__(self,b):
-		"""Given a Body instance, should return either 2d coordinates as a 2-tuple, or None if the Body should be discarded.""" 
+		"Given a :yref:`Body` / :yref:`Interaction` instance, should return either 2d coordinates as a 2-tuple, or None if the Body should be discarded." 
 		pass
 	def planar(self,pos,vec):
 		"Given position and vector value, project the vector value to the flat plane and return its 2 in-plane components."
 	def normal(self,pos,vec):
 		"Given position and vector value, return lenght of the vector normal to the flat plane."
 
-class SpiralFlatten(Flatten):
-	"""Class converting 3d point to 2d based on projection from spiral.
+class HelixFlatten(Flatten):
+	"""Class converting 3d point to 2d based on projection from helix.
 	The y-axis in the projection corresponds to the rotation axis"""
 	def __init__(self,useRef,thetaRange,dH_dTheta,axis=2,periodStart=0):
 		"""
-		:parameters:
-			`useRef`: bool
-				use reference positions rather than actual positions
-			`thetaRange`: (thetaMin,thetaMax) tuple
-				bodies outside this range will be discarded
-			`dH_dTheta`:float
-				inclination of the spiral (per radian)
-			`axis`: {0,1,2}
-				axis of rotation of the spiral
-			`periodStart`: float
-				height of the spiral for zero angle
+		:param bool useRef:       use reference positions rather than actual positions
+		:param (θmin,θmax) thetaRange: bodies outside this range will be discarded
+		:param float dH_dTheta:   inclination of the spiral (per radian)
+		:param {0,1,2} axis:      axis of rotation of the spiral
+		:param float periodStart: height of the spiral for zero angle
 		"""
 		self.useRef,self.thetaRange,self.dH_dTheta,self.axis,self.periodStart=useRef,thetaRange,dH_dTheta,axis,periodStart
 		self.ax1,self.ax2=(axis+1)%3,(axis+2)%3
@@ -105,7 +103,7 @@ class SpiralFlatten(Flatten):
 		
 
 class CylinderFlatten(Flatten):
-	"""Class for converting 3d point to 2d based on projection from circle.
+	"""Class for converting 3d point to 2d based on projection onto plane from circle.
 	The y-axis in the projection corresponds to the rotation axis; the x-axis is distance form the axis.
 	"""
 	def __init__(self,useRef,axis=2):
@@ -135,46 +133,39 @@ class CylinderFlatten(Flatten):
 		
 
 class AxisFlatten(Flatten):
-	def __init__(self,useRef,axis=2):
+	def __init__(self,useRef=False,axis=2):
 		"""
-		:parameters:
-			`useRef`: bool
-				use reference positions rather than actual positions.
-			`axis`: {0,1,2}
-				axis normal to the plane; the return value will be simply position with this component dropped.
+		:param bool useRef: use reference positions rather than actual positions (only meaningful when operating on Bodies)
+		:param {0,1,2}	axis: axis normal to the plane; the return value will be simply position with this component dropped.
 		"""
 		if axis not in (0,1,2): raise IndexError("axis must be one of 0,1,2 (not %d)"%axis)
 		self.useRef,self.axis=useRef,axis
 		self.ax1,self.ax2=(self.axis+1)%3,(self.axis+2)%3
 	def __call__(self,b):
-		p=b.state.refPos if self.useRef else b.state.pos
+		p=((b.state.refPos if self.useRef else b.state.pos) if isinstance(b,Body) else b.geom.contactPoint)
 		return (p[self.ax1],p[self.ax2])
 	def planar(self,pos,vec):
 		return vec[self.ax1],vec[self.ax2]
 	def normal(self,pos,vec):
 		return vec[self.axis]
 
-def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50,50),margin=(0,0)):
-	"""Filter all bodies (spheres only), project them to 2d and extract required scalar value;
+def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50,50),margin=(0,0),radius=1):
+	"""Filter all bodies/interactions, project them to 2d and extract required scalar value;
 	return either discrete array of positions and values, or smoothed data, depending on whether the stDev
 	value is specified.
 
-	:parameters:
-		`extractor`: callable
-			receives Body instance, should return scalar, a 2-tuple (vector fields) or None (to skip that body)
-		`flattener`: callable
-			receives Body instance and returns its 2d coordinates or None (to skip that body)
-		`onlyDynamic`: bool
-			skip all non-dynamic bodies
-		`stDev`: float or *None*
-			standard deviation for averaging, enables smoothing; None (default) means raw mode.
-		`relThreshold`: float
-			threshold for the gaussian weight function relative to stDev (smooth mode only)
-		`div`: (int,int)
-			number of cells for the gaussian grid (smooth mode only)
-		`margin`: (float,float)
-			margin around bounding box for data (smooth mode only)
+	The ``intr`` parameter determines whether we operate on bodies or interactions;
+	the extractor provided should expect to receive body/interaction.
 
+	:param callable extractor: receives :yref:`Body` (or :yref:`Interaction`, if ``intr`` is ``True``) instance, should return scalar, a 2-tuple (vector fields) or None (to skip that body/interaction)
+	:param callable flattener: :yref:`yade.post2d.Flatten` instance, receiving body/interaction, returns its 2d coordinates or ``None`` (to skip that body/interaction)
+	:param bool intr: operate on interactions rather than bodies
+	:param bool onlyDynamic: skip all non-dynamic bodies
+	:param float/None stDev: standard deviation for averaging, enables smoothing; ``None`` (default) means raw mode, where discrete points are returned
+	:param float relThreshold: threshold for the gaussian weight function relative to stDev (smooth mode only)
+	:param (int,int) div: number of cells for the gaussian grid (smooth mode only)
+	:param (float,float) margin: x,y margins around bounding box for data (smooth mode only)
+	:param float/callable radius: Fallback value for radius (for raw plotting) for non-spherical bodies or interactions; if a callable, receives body/interaction and returns radius
 	:return: dictionary
 	
 	Returned dictionary always containing keys 'type' (one of 'rawScalar','rawVector','smoothScalar','smoothVector', depending on value of smooth and on return value from extractor), 'x', 'y', 'bbox'.
@@ -186,9 +177,9 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 	from miniEigen import Vector3
 	xx,yy,dd1,dd2,rr=[],[],[],[],[]
 	nDim=0
-	for b in O.bodies:
-		if onlyDynamic and not b.dynamic: continue
-		if not isinstance(b.shape,Sphere): continue
+	objects=O.interactions if intr else O.bodies
+	for b in objects:
+		if not intr and onlyDynamic and not b.dynamic: continue
 		xy,d=flattener(b),extractor(b)
 		if xy==None or d==None: continue
 		if nDim==0: nDim=1 if isinstance(d,float) else 2
@@ -200,7 +191,11 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 			dd1.append(d1); dd2.append(d2)
 		else:
 			raise RuntimeError("Extractor must return float or 2 or 3 (not %d) floats"%nDim)
-		xx.append(xy[0]); yy.append(xy[1]); rr.append(b.shape.radius)
+		if stDev==None: # radii are needed in the raw mode exclusively
+			if not intr and isinstance(b.shape,Sphere): r=b.shape.radius
+			else: r=(radius(b) if callable(radius) else radius)
+			rr.append(r)
+		xx.append(xy[0]); yy.append(xy[1]);
 	if stDev==None:
 		bbox=(min(xx),min(yy)),(max(xx),max(yy))
 		if nDim==1: return {'type':'rawScalar','x':xx,'y':yy,'val':dd1,'radii':rr,'bbox':bbox}
@@ -226,7 +221,7 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 	if nDim==1: return {'type':'smoothScalar','x':xxx,'y':yyy,'val':ddd,'bbox':(llo,hhi)} 
 	else: return {'type':'smoothVector','x':xxx,'y':yyy,'valX':ddd,'valY':ddd2,'bbox':(llo,hhi)}
 	
-def plot(data,axes=None,alpha=.5,clabel=True,**kw):
+def plot(data,axes=None,alpha=.5,clabel=True,cbar=False,**kw):
 	"""Given output from post2d.data, plot the scalar as discrete or smooth plot.
 
 	For raw discrete data, plot filled circles with radii of particles, colored by the scalar value.
@@ -235,15 +230,12 @@ def plot(data,axes=None,alpha=.5,clabel=True,**kw):
 
 	For vector data (raw or smooth), plot quiver (vector field), with arrows colored by the magnitude.
 
-	:parameters:
-		`axes`: matplotlib.axes instance
-			axes where the figure will be plotted; if None, will be created from scratch.
-		`data`:
-			value returned by :yref:`yade.post2d.data`
-		`clable`: bool
-			show contour labels (smooth mode only)
+	:param axes: matplotlib.axes\ instance where the figure will be plotted; if None, will be created from scratch.
+	:param data: value returned by :yref:`yade.post2d.data`
+	:param bool clabel: show contour labels (smooth mode only)
+	:param bool cbar: show colorbar (equivalent to calling pylab.colorbar(mappable) on the returned mappable)
 
-	:return: tuple of (axes,mappable); mappable can be used in further calls to pylab.colorbar.
+	:return: tuple of ``(axes,mappable)``; mappable can be used in further calls to pylab.colorbar.
 	"""
 	import pylab,math
 	if not axes: axes=pylab.gca()
@@ -258,6 +250,7 @@ def plot(data,axes=None,alpha=.5,clabel=True,**kw):
 		bb=coll.get_datalim(coll.get_transform())
 		axes.add_collection(coll)
 		axes.set_xlim(bb.xmin,bb.xmax); axes.set_ylim(bb.ymin,bb.ymax)
+		if cbar: axes.get_figure().colorbar(coll)
 		axes.grid(True); axes.set_aspect('equal')
 		return axes,coll
 	elif data['type']=='smoothScalar':
@@ -267,6 +260,7 @@ def plot(data,axes=None,alpha=.5,clabel=True,**kw):
 		axes.update_datalim(loHi)
 		if clabel: axes.clabel(ct,inline=1,fontsize=10)
 		axes.set_xlim(loHi[0][0],loHi[1][0]); axes.set_ylim(loHi[0][1],loHi[1][1])
+		if cbar: axes.get_figure().colorbar(img)
 		axes.grid(True); axes.set_aspect('equal')
 		return axes,img
 	elif data['type'] in ('rawVector','smoothVector'):
@@ -278,6 +272,7 @@ def plot(data,axes=None,alpha=.5,clabel=True,**kw):
 		quiv=axes.quiver(data['x'],data['y'],data['valX'],data['valY'],scalars,**kw)
 		#axes.update_datalim(loHi)
 		axes.set_xlim(loHi[0][0],loHi[1][0]); axes.set_ylim(loHi[0][1],loHi[1][1])
+		if cbar: axes.get_figure().colorbar(coll)
 		axes.grid(True); axes.set_aspect('equal')
 		return axes,quiv
 

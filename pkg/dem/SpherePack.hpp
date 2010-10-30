@@ -93,6 +93,10 @@ public:
 		Vector3r mid=midPt(); Quaternionr q(AngleAxisr(angle,axis)); FOREACH(Sph& s, pack) s.c=q*(s.c-mid)+mid;
 	}
 	void scale(Real scale){ Vector3r mid=midPt(); cellSize*=scale; FOREACH(Sph& s, pack) {s.c=scale*(s.c-mid)+mid; s.r*=abs(scale); } }
+	#if 0
+		void shrinkMaxRelOverlap(Real maxRelOverlap);
+		Real maxRelOverlap();
+	#endif
 
 	// iteration 
 	size_t len() const{ return pack.size(); }

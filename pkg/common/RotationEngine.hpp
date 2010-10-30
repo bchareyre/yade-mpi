@@ -23,12 +23,12 @@ class RotationEngine: public PartialEngine{
 };
 REGISTER_SERIALIZABLE(RotationEngine);
 
-/* Engine applying both rotation and translation, along the same axis, whence the name SpiralEngine
+/* Engine applying both rotation and translation, along the same axis, whence the name HelixEngine
  */
-class SpiralEngine:public PartialEngine{
+class HelixEngine:public PartialEngine{
 	public:
 	virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS(SpiralEngine,PartialEngine,"Engine applying both rotation and translation, along the same axis, whence the name SpiralEngine",
+	YADE_CLASS_BASE_DOC_ATTRS(HelixEngine,PartialEngine,"Engine applying both rotation and translation, along the same axis, whence the name HelixEngine",
 		((Real,angularVelocity,0,,"Angular velocity [rad/s]"))
 		((Real,linearVelocity,0,,"Linear velocity [m/s]"))
 		((Vector3r,axis,Vector3r::UnitX(),,"Axis of translation and rotation; will be normalized by the engine."))
@@ -36,7 +36,7 @@ class SpiralEngine:public PartialEngine{
 		((Real,angleTurned,0,,"How much have we turned so far. |yupdate| [rad]"))
 	);
 };
-REGISTER_SERIALIZABLE(SpiralEngine);
+REGISTER_SERIALIZABLE(HelixEngine);
 
 /*! Engine applying spiral motion, finding current angular velocity by linearly interpolating in
  * times and velocities and translation by using slope parameter.
@@ -45,12 +45,12 @@ REGISTER_SERIALIZABLE(SpiralEngine);
  * after the last time point. If wrap is specified, time will wrap around the last times value to the first one (note that no interpolation
  * between last and first values is done).
  * */
-class InterpolatingSpiralEngine: public SpiralEngine{
+class InterpolatingHelixEngine: public HelixEngine{
 	//! holder of interpolation state, should not be touched by the user.
 	size_t _pos;
 	public:
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InterpolatingSpiralEngine,SpiralEngine,"Engine applying spiral motion, finding current angular velocity by linearly interpolating in times and velocities and translation by using slope parameter. \n\n The interpolation assumes the margin value before the first time point and last value after the last time point. If wrap is specified, time will wrap around the last times value to the first one (note that no interpolation between last and first values is done).",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InterpolatingHelixEngine,HelixEngine,"Engine applying spiral motion, finding current angular velocity by linearly interpolating in times and velocities and translation by using slope parameter. \n\n The interpolation assumes the margin value before the first time point and last value after the last time point. If wrap is specified, time will wrap around the last times value to the first one (note that no interpolation between last and first values is done).",
 		((vector<Real>,times,,,"List of time points at which velocities are given; must be increasing [s]"))
 		((vector<Real>,angularVelocities,,,"List of angular velocities; manadatorily of same length as times. [rad/s]"))
 		((bool,wrap,false,,"Wrap t if t>times_n, i.e. t_wrapped=t-N*(times_n-times_0)"))
@@ -58,7 +58,7 @@ class InterpolatingSpiralEngine: public SpiralEngine{
 		/*ctor*/ _pos=0;
 	);
 };
-REGISTER_SERIALIZABLE(InterpolatingSpiralEngine);
+REGISTER_SERIALIZABLE(InterpolatingHelixEngine);
 
 
 

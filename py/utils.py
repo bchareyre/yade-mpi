@@ -350,35 +350,21 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
 	
-	:Parameters:
-			`center`: Vector3
-				center of the created cylinder
-			`radius`: float
-				cylinder radius
-			`height`: float
-				cylinder height
-			`orientation`: Quaternion
-				orientation of the cylinder
-			`segmentsNumber`: int
-				number of edges on the cylinder surface (>=5)
-			`wallMask`: bitmask
-				determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
-			`angleRange`: this variable allows to create only part of cylinder, 2.0*math.pi means the whole cylinder, 1.0*math.pi - the half etc;
-			`**kw`: (unused keyword arguments)
-				passed to utils.facet;
+	:param Vector3 center: center of the created cylinder
+	:param float radius:  cylinder radius
+	:param float height: cylinder height
+	:param Quaternion orientation: orientation of the cylinder; the reference orientation has axis along the $+x$ axis.
+	:param int segmentsNumber: number of edges on the cylinder surface (>=5)
+	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
+	:param float angleRange: allows to create only part of cylinder, 2.0*math.pi means the whole cylinder, 1.0*math.pi - the half etc;
+	:param **kw: (unused keyword arguments) passed to utils.facet;
 	"""
 	
-	#Defense from zero dimensions
-	if (segmentsNumber<3):
-		raise RuntimeError("The segmentsNumber should be at least 3");
-	if (height<=0):
-		raise RuntimeError("The height should have the positive value");
-	if (radius<=0):
-		raise RuntimeError("The radius should have the positive value");
-	if (wallMask>7):
-		print "wallMask must be 7 or less"
-		wallMask=7
-	# ___________________________
+	# check zero dimentions
+	if (segmentsNumber<3): raise RuntimeError("The segmentsNumber should be at least 3");
+	if (height<=0): raise RuntimeError("The height should have the positive value");
+	if (radius<=0): raise RuntimeError("The radius should have the positive value");
+
 	import numpy
 	anglesInRad = numpy.linspace(0, angleRange, segmentsNumber+1, endpoint=True)
 	P1=[]; P2=[]
