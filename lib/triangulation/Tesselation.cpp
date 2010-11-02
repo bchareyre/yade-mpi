@@ -133,20 +133,11 @@ Plan Tesselation::Dual ( Vertex_handle S1, Vertex_handle S2 )
 
 Point Tesselation::Dual ( const Cell_handle &cell )
 {
-	//Sphere S0 = cell->vertex(0)->point();
-	//Plan P12 = PlanRadical(S0 , cell->vertex(1)->point());
-	//Plan P13 = PlanRadical(S0 , cell->vertex(2)->point());
-	//Plan P14 = PlanRadical(S0 , cell->vertex(3)->point());
-	//std::cout << std::endl << "Plans : " << std::endl << P12 << std::endl << P13 << std::endl << P14 << std::endl << std::endl;
-	//cell->info() = Intersect(P12, P13, P14);
-	//std::cout << "voro calcule : " << cell->info() << std::endl;
 	return cell->info();
 }
 
 void Tesselation::Compute ()
 {
-
-//  std::cout << "Tesselation::Compute ()" << std::endl;
 	redirect();
 	Finite_cells_iterator cell_end = Tri->finite_cells_end();
 	for ( Finite_cells_iterator cell = Tri->finite_cells_begin(); cell != cell_end; cell++ )
@@ -157,10 +148,6 @@ void Tesselation::Compute ()
 		const Sphere& S2 = cell->vertex ( 2 )->point();
 		const Sphere& S3 = cell->vertex ( 3 )->point();
 		Real x,y,z;
-//   Plan P12 = PlanRadical(S0 , cell->vertex(1)->point());
-//   Plan P13 = PlanRadical(S0 , cell->vertex(2)->point());
-//   Plan P14 = PlanRadical(S0 , cell->vertex(3)->point());
-//   cell->info() = Intersect(P12, P13, P14);
 		CGAL::weighted_circumcenterC3 (
 			S0.point().x(), S0.point().y(), S0.point().z(), S0.weight(),
 			S1.point().x(), S1.point().y(), S1.point().z(), S1.weight(),
@@ -168,13 +155,7 @@ void Tesselation::Compute ()
 			S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
 			x, y, z );
 		cell->info() =Point ( x,y,z );
-		//cout << "voronoi cell : " <<  cell->vertex(0)->info().id() << " "
-		//  <<  cell->vertex(1)->info().id() << " "
-		//  <<  cell->vertex(2)->info().id() << " "
-		//  <<  cell->vertex(3)->info().id() << "(center : " << (Point) cell->info() << ")" << endl;
 	}
-
-	
 	computed = true;
 }
 
@@ -446,7 +427,6 @@ void Tesselation::ComputeVolumes ( void )
 	{
 		AssignPartialVolume ( ed_it );
 	}
-
 	//Delete volume for spheres on the boarders of the packing
 	//FIXME: find a way to compute a volume correctly for spheres of the boarders.
 

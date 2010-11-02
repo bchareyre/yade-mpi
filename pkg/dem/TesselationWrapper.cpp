@@ -154,11 +154,10 @@ void TesselationWrapper::clear2(void) //for testing purpose
 //  facet_it = Tes->Triangulation().finite_edges_end ();
 }
 
-bool TesselationWrapper::insertSceneSpheres(const Scene* scene)
+void TesselationWrapper::insertSceneSpheres(const Scene* scene)
 {
 	const shared_ptr<BodyContainer>& bodies = scene->bodies;
 	build_triangulation_with_ids(bodies, *this);
-	return 1;
 }
 
 double TesselationWrapper::Volume(unsigned int id) {return Tes->Volume(id);}

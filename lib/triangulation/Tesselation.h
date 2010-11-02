@@ -70,7 +70,7 @@ public:
 	static Plan	Dual	(Vertex_handle S1, Vertex_handle S2);
 	static Segment  Dual	(Finite_facets_iterator &facet);	//G�n�re le segment dual d'une facette finie
 	static Real	Volume	(Finite_cells_iterator cell);
-	inline void 		AssignPartialVolume	(Finite_edges_iterator& ed_it);
+	inline void 	AssignPartialVolume	(Finite_edges_iterator& ed_it);
 	void		ResetVCellVolumes	(void);
 	void		ComputeVolumes		(void);//Compute volume each voronoi cell
 	void		ComputePorosity		(void);//Compute volume and porosity of each voronoi cell

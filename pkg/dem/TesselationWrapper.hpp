@@ -20,11 +20,16 @@
  * \brief Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.
  * More accessors in course of implementation. Feel free to suggest new ones.
  *
- * Usage :
- * TW.setState(0)
- * O.run(1000); O.wait()
- * TW.setState(1)
- * array = TW.getVolPoroDef(True) //syntax here?
+ * Example usage script :
+ *
+ *tt=TriaxialTest()
+ *tt.generate("test.xml")
+ *O.load("test.xml")
+ *O.run(100) //for unknown reasons, this procedure crashes at iteration 0
+ *TW=TesselationWrapper()
+ *TW.triangulate(O._sceneObj()) //compute regular Delaunay triangulation, don't construct tesselation
+ *TW.computeVolumes() //will silently tesselate the packing, then assign volumes to each Voronoi cell
+ *TW.volume(10) //get volume associated to sphere of id 10
  * 
  */
 
@@ -44,7 +49,7 @@ public:
     	/// Insert a sphere, "id" will be used by some getters to retrieve spheres
     	bool insert(double x, double y, double z, double rad, unsigned int id);
 	/// A faster version of insert, inserting all spheres in scene
-	bool insertSceneSpheres(const Scene* scene);
+	void insertSceneSpheres(const Scene* scene);
 	/// Move one sphere to the new position (x,y,z) and maintain triangulation (invalidates the tesselation)
 	bool move (double x, double y, double z, double rad, unsigned int id);
 	
@@ -98,7 +103,10 @@ public:
 	facet_it = Tes->Triangulation().finite_edges_begin();
 	inf=1e10;
 	,/*py*/
+	.def("triangulate",&TesselationWrapper::insertSceneSpheres,"triangulate spheres of the packing")
  	.def("setState",&TesselationWrapper::setState,(python::arg("state")=0),"Make the current state the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get only volmumes and porosity.")
+ 	.def("volume",&TesselationWrapper::Volume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
+ 	.def("computeVolumes",&TesselationWrapper::ComputeVolumes,"Compute volumes of all Voronoi's cells.")
 	.def("getVolPoroDef",&TesselationWrapper::getVolPoroDef,(python::arg("deformation")=false),"Return a table with per-sphere computed quantities. Include deformations on the increment defined by states 0 and 1 if deformation=True (make sure to define states 0 and 1 consistently).")
 	);	
 	DECLARE_LOGGER;
