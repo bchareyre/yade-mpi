@@ -14,6 +14,8 @@
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 
+#include<boost/math/distributions/normal.hpp>
+
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
 #endif
@@ -32,6 +34,7 @@ struct GridContainer{
 	public:
 		Vector2r getLo(){return lo;}
 		Vector2r getHi(){return hi;}
+		Vector2r getCellSize(){ return cellSizes; }
 		vector<vector<vector<T> > > grid;
 	/* construct grid from lower left corner, upper right corner and number of cells in each direction */
 	GridContainer(Vector2r _lo, Vector2r _hi, Vector2i _nCells): lo(_lo), hi(_hi), nCells(_nCells){
@@ -95,21 +98,29 @@ struct GridContainer{
 template<typename T, typename Tvalue>
 struct WeightedAverage{
 	const shared_ptr<GridContainer<T> > grid;
+	Real weightedSupportArea; // must be computed by derived class
 	WeightedAverage(const shared_ptr<GridContainer<T> >& _grid):grid(_grid){};
 	virtual Vector2r getPosition(const T&)=0;
 	virtual Real getWeight(const Vector2r& refPt, const T&)=0;
 	virtual Tvalue getValue(const T&)=0;
 	virtual vector<Vector2i> filterCells(const Vector2r& refPt)=0;
 	Tvalue computeAverage(const Vector2r& refPt){
+		Real sumValues, sumWeights; sumValuesWeights(refPt,sumValues,sumWeights);
+		return sumValues/sumWeights;
+	}
+	Tvalue computeAvgPerUnitArea(const Vector2r& refPt){
+		Real sumValues, sumWeights; sumValuesWeights(refPt,sumValues,sumWeights);
+		return sumValues/weightedSupportArea;
+	}
+	void sumValuesWeights(const Vector2r& refPt, Real& sumValues, Real& sumWeights){
 		vector<Vector2i> filtered=filterCells(refPt);
-		Real sumValues=0, sumWeights=0;
+		sumValues=sumWeights=0;
 		FOREACH(Vector2i cell, filtered){
 			FOREACH(const T& element, grid->grid[cell[0]][cell[1]]){
 				Real weight=getWeight(refPt,element);
 				sumValues+=weight*getValue(element); sumWeights+=weight;
 			}
 		}
-		return sumValues/sumWeights;
 	}
 };
 
@@ -122,13 +133,25 @@ struct Scalar2d{
 /* Symmetric Gaussian Distribution Average with scalar values
  */
 struct SGDA_Scalar2d: public WeightedAverage<Scalar2d,Real> {
-	Real stDev, relThreshold;
-	SGDA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): WeightedAverage<Scalar2d,Real>(_grid), stDev(_stDev), relThreshold(_relThreshold){}
+	Real stDev, relThreshold; boost::math::normal_distribution<Real> distrib;
+	SGDA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): WeightedAverage<Scalar2d,Real>(_grid), stDev(_stDev), relThreshold(_relThreshold), distrib(0,stDev) {
+		// approximate probability density function between -stDev*relThreshold,stDev*relThreshold
+		// it is enough to get Φ(-stDev*relThreshold) and subtract twice from 1 (symmetry)
+		// http://en.wikipedia.org/wiki/Normal_distribution#Numerical_approximations_for_the_normal_CDF
+		// using Abramowitz & Stegun approximation, which has error less that 7.5e-8 (fine for us)
+		
+		// FIXME: algorithm not correct, as it takes 1d quantile, while we would need PDF for symmetric 2d gaussian!
+		Real clippedQuantile=boost::math::cdf(distrib,-stDev*relThreshold);
+		Real area=M_PI*pow(relThreshold*stDev,2); // area of the support
+		weightedSupportArea=(1-2*clippedQuantile)*area;
+		
+	}
 	virtual Real getWeight(const Vector2r& meanPt, const Scalar2d& e){	
 		Vector2r pos=getPosition(e);
-		Real rSq=pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
+		Real rSq=(meanPt-pos).squaredNorm(); //pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
 		if(rSq>pow(relThreshold*stDev,2)) return 0.; // discard points further than relThreshold*stDev, by default 3*stDev
-		return (1./(stDev*sqrt(2*M_PI)))*exp(-rSq/(2*stDev*stDev));
+		//return (1./(stDev*sqrt(2*M_PI)))*exp(-rSq/(2*stDev*stDev));
+		return boost::math::pdf(distrib,sqrt(rSq));
 	}
 	vector<Vector2i> filterCells(const Vector2r& refPt){return WeightedAverage<Scalar2d,Real>::grid->circleFilter(refPt,stDev*relThreshold);}
 	Real getValue(const Scalar2d& dp){return (Real)dp.val;}
@@ -166,7 +189,8 @@ class pyGaussAverage{
 		return false;
 	}
 	bool addPt(Real val, python::tuple pos){Scalar2d d; d.pos=tuple2vec2r(pos); if(ptIsClipped(d.pos)) return false; d.val=val; sgda->grid->add(d,d.pos); return true; } 
-	Real avg(python::tuple _pt){Vector2r pt=tuple2vec2r(_pt); if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgda->computeAverage(pt);}
+	Real avg(Vector2r pt){ if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgda->computeAverage(pt);}
+	Real avgPerUnitArea(Vector2r pt){ if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgda->computeAvgPerUnitArea(pt); }
 	Real stDev_get(){return sgda->stDev;} void stDev_set(Real s){sgda->stDev=s;}
 	Real relThreshold_get(){return sgda->relThreshold;} void relThreshold_set(Real rt){sgda->relThreshold=rt;}
 	python::tuple aabb_get(){return python::make_tuple(sgda->grid->getLo(),sgda->grid->getHi());}
@@ -204,5 +228,11 @@ class pyGaussAverage{
 		}
 		return python::make_tuple(x,y,val);
 	}
+	Vector2i nCells_get(){ return sgda->grid->getSize(); }
+	int cellNum(const Vector2i& cell){ return sgda->grid->grid[cell[0]][cell[1]].size(); }
+	Real cellSum(const Vector2i& cell){ Real sum=0; FOREACH(const Scalar2d& v, sgda->grid->grid[cell[0]][cell[1]]) sum+=v.val; return sum; }
+	Real cellAvg(const Vector2i& cell){ return cellSum(cell)/cellNum(cell); }
+	Real cellArea(){ Vector2r sz=sgda->grid->getCellSize(); return sz[0]*sz[1]; }
+	Vector2r cellDim(){ return sgda->grid->getCellSize(); }
 };
 

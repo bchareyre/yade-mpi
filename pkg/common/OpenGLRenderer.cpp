@@ -209,6 +209,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 
 void OpenGLRenderer::renderAllInteractionsWire(){
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+		if(!i->functorCache.geomExists) continue;
 		glColor3v(i->isReal()? Vector3r(0,1,0) : Vector3r(.5,0,1));
 		Vector3r p1=Body::byId(i->getId1(),scene)->state->pos;
 		const Vector3r& size=scene->cell->getSize();

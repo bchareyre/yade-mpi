@@ -253,7 +253,7 @@ class ControllerClass(QWidget,Ui_Controller):
 			subStepInfo="<br><small>sub %d/%d [%s]</small>"%(subStep,len(O.engines),subStepInfo)
 		self.subStepCheckbox.setChecked(O.subStepping) # might have been changed async
 		if stopAtIter<=iter:
-			self.realTimeLabel.setText('%02d:%02d:%02d'%(rt//3600,rt//60,rt%60))
+			self.realTimeLabel.setText('%02d:%02d:%02d'%(rt//3600,(rt%3600)//60,rt%60))
 			self.iterLabel.setText('#%ld, %.1f/s %s'%(iter,self.iterPerSec,subStepInfo))
 		else:
 			e=int((stopAtIter-iter)*self.iterPerSec)

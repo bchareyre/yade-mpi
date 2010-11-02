@@ -1,2 +1,2 @@
 #!/bin/sh
-rsync -rv _build/html/ gamma:www/NoBackup/yade-sphinx
+rsync -rv _build/html/ ggamma:www/NoBackup/yade-sphinx

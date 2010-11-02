@@ -345,7 +345,7 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
 	
-def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=2.0*math.pi,**kw):
+def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,**kw):
 	"""
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
@@ -356,7 +356,8 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	:param Quaternion orientation: orientation of the cylinder; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the cylinder surface (>=5)
 	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
-	:param float angleRange: allows to create only part of cylinder, 2.0*math.pi means the whole cylinder, 1.0*math.pi - the half etc;
+	:param (θmin,Θmax) angleRange: allows to create only part of cylinder by specifying range of angles; if ``None``, (0,2*pi) is assumed.
+	:param bool closeGap: close range skipped in angleRange with triangular facets at cylinder bases.
 	:param **kw: (unused keyword arguments) passed to utils.facet;
 	"""
 	
@@ -366,7 +367,11 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	if (radius<=0): raise RuntimeError("The radius should have the positive value");
 
 	import numpy
-	anglesInRad = numpy.linspace(0, angleRange, segmentsNumber+1, endpoint=True)
+	if angleRange==None: angleRange=(0,2*math.pi)
+	if isinstance(angleRange,float):
+		print u'WARNING: utils.facetCylinder,angleRange should be (Θmin,Θmax), not just Θmax (one number), update your code.'
+		angleRange=(0,angleRange)
+	anglesInRad = numpy.linspace(angleRange[0], angleRange[1], segmentsNumber+1, endpoint=True)
 	P1=[]; P2=[]
 	P1.append(Vector3(0,0,-height/2))
 	P2.append(Vector3(0,0,+height/2))
@@ -389,6 +394,14 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 		if wallMask&4:
 			ret.append(facet((P1[i],P2[i],P2[i-1]),**kw))
 			ret.append(facet((P2[i-1],P1[i-1],P1[i]),**kw))
+	if closeGap and (angleRange[0]%(2*math.pi))!=(angleRange[1]%(2*math.pi)): # some part is skipped
+		pts=[(radius*math.cos(angleRange[i]),radius*math.sin(angleRange[i])) for i in (0,1)]
+		for Z in -height/2,height/2:
+			#print (pts[0][0],pts[0][1],Z),(pts[1][0],pts[1][1],Z),(0,0,Z)
+			pp=[(pts[0][0],pts[0][1],Z),(pts[1][0],pts[1][1],Z),(0,0,Z)]
+			pp=[orientation*p+center for p in pp]
+			ret.append(facet(pp,**kw))
+		
 	return ret
 	
 	

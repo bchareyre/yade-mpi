@@ -426,6 +426,7 @@ void GLViewer::centerScene(){
 			Real inf=std::numeric_limits<Real>::infinity();
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+				if(!b) continue;
 				max=max.cwise().max(b->state->pos);
 				min=min.cwise().min(b->state->pos);
 			}

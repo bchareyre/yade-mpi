@@ -59,6 +59,7 @@ This example can be found in examples/concrete/uniax-post.py ::
 
 """
 from yade.wrapper import *
+from miniEigen import *
 
 class Flatten:
 	"""Abstract class for converting 3d point into 2d. Used by post2d.data2d."""
@@ -149,7 +150,7 @@ class AxisFlatten(Flatten):
 	def normal(self,pos,vec):
 		return vec[self.axis]
 
-def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50,50),margin=(0,0),radius=1):
+def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold=3.,perArea=0,div=(50,50),margin=(0,0),radius=1):
 	"""Filter all bodies/interactions, project them to 2d and extract required scalar value;
 	return either discrete array of positions and values, or smoothed data, depending on whether the stDev
 	value is specified.
@@ -163,6 +164,7 @@ def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold
 	:param bool onlyDynamic: skip all non-dynamic bodies
 	:param float/None stDev: standard deviation for averaging, enables smoothing; ``None`` (default) means raw mode, where discrete points are returned
 	:param float relThreshold: threshold for the gaussian weight function relative to stDev (smooth mode only)
+	:param int perArea: if 1, compute weightedSum/weightedArea rather than weighted average (weightedSum/sumWeights); the first is useful to compute average stress; if 2, compute averages on subdivision elements, not using weight function
 	:param (int,int) div: number of cells for the gaussian grid (smooth mode only)
 	:param (float,float) margin: x,y margins around bounding box for data (smooth mode only)
 	:param float/callable radius: Fallback value for radius (for raw plotting) for non-spherical bodies or interactions; if a callable, receives body/interaction and returns radius
@@ -214,14 +216,29 @@ def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold
 	xxx,yyy=[numpy.arange(llo[i]+.5*step[i],hhi[i],step[i]) for i in [0,1]]
 	ddd=numpy.zeros((len(yyy),len(xxx)),float)
 	ddd2=numpy.zeros((len(yyy),len(xxx)),float)
+	# set the type of average we are going to use
+	if perArea==0:
+		def compAvg(gauss,coord): return float(gauss.avg(coord))
+	elif perArea==1:
+		def compAvg(gauss,coord,cellCoord): return gauss.avgPerUnitArea(coord)
+	elif perArea==2:
+		def compAvg(gauss,coord,cellCoord):
+			s=gauss.cellSum(cellCoord);
+			return (s/gauss.cellArea) if s>0 else float('nan')
+	elif perArea==3:
+		def compAvg(gauss,coord,cellCoord):
+			s=gauss.cellSum(cellCoord);
+			return s if s>0 else float('nan')
+	else: raise RuntimeError('Invalid value of *perArea*, must be one of 0,1,2,3.')
+	#
 	for cx in range(0,div[0]):
 		for cy in range(0,div[1]):
-			ddd[cy,cx]=float(ga.avg((xxx[cx],yyy[cy])))
-			if nDim>1: ddd2[cy,cx]=float(ga2.avg((xxx[cx],yyy[cy])))
-	if nDim==1: return {'type':'smoothScalar','x':xxx,'y':yyy,'val':ddd,'bbox':(llo,hhi)} 
-	else: return {'type':'smoothVector','x':xxx,'y':yyy,'valX':ddd,'valY':ddd2,'bbox':(llo,hhi)}
+			ddd[cy,cx]=compAvg(ga,(xxx[cx],yyy[cy]),(cx,cy))
+			if nDim>1: ddd2[cy,cx]=compAvg(ga2,(xxx[cx],yyy[cy]),(cx,cy))
+	if nDim==1: return {'type':'smoothScalar','x':xxx,'y':yyy,'val':ddd,'bbox':(llo,hhi),'perArea':perArea,'grid':ga} 
+	else: return {'type':'smoothVector','x':xxx,'y':yyy,'valX':ddd,'valY':ddd2,'bbox':(llo,hhi),'grid':ga,'grid2':ga2}
 	
-def plot(data,axes=None,alpha=.5,clabel=True,cbar=False,**kw):
+def plot(data,axes=None,alpha=.5,clabel=True,cbar=False,aspect='equal',**kw):
 	"""Given output from post2d.data, plot the scalar as discrete or smooth plot.
 
 	For raw discrete data, plot filled circles with radii of particles, colored by the scalar value.
@@ -232,7 +249,7 @@ def plot(data,axes=None,alpha=.5,clabel=True,cbar=False,**kw):
 
 	:param axes: matplotlib.axes\ instance where the figure will be plotted; if None, will be created from scratch.
 	:param data: value returned by :yref:`yade.post2d.data`
-	:param bool clabel: show contour labels (smooth mode only)
+	:param bool clabel: show contour labels (smooth mode only), or annotate cells with numbers inside (with perArea==2)
 	:param bool cbar: show colorbar (equivalent to calling pylab.colorbar(mappable) on the returned mappable)
 
 	:return: tuple of ``(axes,mappable)``; mappable can be used in further calls to pylab.colorbar.
@@ -251,17 +268,23 @@ def plot(data,axes=None,alpha=.5,clabel=True,cbar=False,**kw):
 		axes.add_collection(coll)
 		axes.set_xlim(bb.xmin,bb.xmax); axes.set_ylim(bb.ymin,bb.ymax)
 		if cbar: axes.get_figure().colorbar(coll)
-		axes.grid(True); axes.set_aspect('equal')
+		axes.grid(True); axes.set_aspect(aspect)
 		return axes,coll
 	elif data['type']=='smoothScalar':
 		loHi=data['bbox']
-		img=axes.imshow(data['val'],extent=(loHi[0][0],loHi[1][0],loHi[0][1],loHi[1][1]),origin='lower',aspect='equal',**kw)
-		ct=axes.contour(data['x'],data['y'],data['val'],colors='k',origin='lower',extend='both')
+		if data['perArea'] in (0,1):
+			img=axes.imshow(data['val'],extent=(loHi[0][0],loHi[1][0],loHi[0][1],loHi[1][1]),origin='lower',aspect=aspect,**kw)
+			ct=axes.contour(data['x'],data['y'],data['val'],colors='k',origin='lower',extend='both')
+			if clabel: axes.clabel(ct,inline=1,fontsize=10)
+		else:
+			img=axes.imshow(data['val'],extent=(loHi[0][0],loHi[1][0],loHi[0][1],loHi[1][1]),origin='lower',aspect=aspect,interpolation='nearest',**kw)
+			xStep=(data['x'][1]-data['x'][0]) if len(data['x'])>1 else 0
+			for y,valLine in zip(data['y'],data['val']):
+				for x,val in zip(data['x'],valLine): axes.text(x-.4*xStep,y,('-' if math.isnan(val) else '%5g'%val),size=4)
 		axes.update_datalim(loHi)
-		if clabel: axes.clabel(ct,inline=1,fontsize=10)
 		axes.set_xlim(loHi[0][0],loHi[1][0]); axes.set_ylim(loHi[0][1],loHi[1][1])
 		if cbar: axes.get_figure().colorbar(img)
-		axes.grid(True); axes.set_aspect('equal')
+		axes.grid(True if data['perArea'] in (0,1) else False); axes.set_aspect(aspect)
 		return axes,img
 	elif data['type'] in ('rawVector','smoothVector'):
 		import numpy
@@ -273,7 +296,7 @@ def plot(data,axes=None,alpha=.5,clabel=True,cbar=False,**kw):
 		#axes.update_datalim(loHi)
 		axes.set_xlim(loHi[0][0],loHi[1][0]); axes.set_ylim(loHi[0][1],loHi[1][1])
 		if cbar: axes.get_figure().colorbar(coll)
-		axes.grid(True); axes.set_aspect('equal')
+		axes.grid(True); axes.set_aspect(aspect)
 		return axes,quiv
 
 

@@ -20,11 +20,18 @@ BOOST_PYTHON_MODULE(WeightedAverage2d)
 	boost::python::class_<pyGaussAverage>("GaussAverage",python::init<python::tuple,python::tuple,python::tuple,Real,python::optional<Real> >(python::args("min","max","nCells","stDev","relThreshold"),"Create empty container for data, which can be added using add and later retrieved using avg."))
 		.def("add",&pyGaussAverage::addPt)
 		.def("avg",&pyGaussAverage::avg)
+		.def("avgPerUnitArea",&pyGaussAverage::avgPerUnitArea)
+		.def("cellNum",&pyGaussAverage::cellNum)
+		.def("cellSum",&pyGaussAverage::cellSum)
+		.def("cellAvg",&pyGaussAverage::cellAvg)
 		.add_property("stDev",&pyGaussAverage::stDev_get,&pyGaussAverage::stDev_set)
 		.add_property("relThreshold",&pyGaussAverage::relThreshold_get,&pyGaussAverage::relThreshold_set)
 		.add_property("clips",&pyGaussAverage::clips_get,&pyGaussAverage::clips_set)
 		.add_property("data",&pyGaussAverage::data_get)
 		.add_property("aabb",&pyGaussAverage::aabb_get)
+		.add_property("nCells",&pyGaussAverage::nCells_get)
+		.add_property("cellArea",&pyGaussAverage::cellArea)
+		.add_property("cellDim",&pyGaussAverage::cellDim)
 	;
 };
 

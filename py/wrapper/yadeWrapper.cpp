@@ -213,6 +213,7 @@ class pyInteractionContainer{
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
 		void eraseNonReal(){ proxee->eraseNonReal(); }
+		void erase(Body::id_t id1, Body::id_t id2){ proxee->requestErase(id1,id2); }
 };
 
 class pyForceContainer{
@@ -589,6 +590,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("withBody",&pyInteractionContainer::withBody,"Return list of real interactions of given body.")
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll,"Return list of all (real as well as non-real) interactions of given body.")
 		.def("eraseNonReal",&pyInteractionContainer::eraseNonReal,"Erase all interactions that are not :yref:`real <InteractionContainer.isReal>`.")
+		.def("erase",&pyInteractionContainer::erase,"Erase one interaction, given by id1, id2 (internally, ``requestErase`` is called -- the interaction might still exist as potential, if the :yref:`Collider` decides so).")
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
 		.def("clear",&pyInteractionContainer::clear,"Remove all interactions");
 	python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())

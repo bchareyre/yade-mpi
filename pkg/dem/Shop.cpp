@@ -201,7 +201,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 			Matrix3r T(state->ori);
 			// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
 			// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
-			Matrix3r mI; mI.diagonal()=state->inertia;
+			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
 		}
 		else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
@@ -465,7 +465,7 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->material || !b->shape) continue;
+		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<ElastMat> ebp=dynamic_pointer_cast<ElastMat>(b->material);
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!ebp || !s) continue;
