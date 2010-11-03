@@ -27,7 +27,7 @@
  *O.load("test.xml")
  *O.run(100) //for unknown reasons, this procedure crashes at iteration 0
  *TW=TesselationWrapper()
- *TW.triangulate(O._sceneObj()) //compute regular Delaunay triangulation, don't construct tesselation
+ *TW.triangulate() //compute regular Delaunay triangulation, don't construct tesselation
  *TW.computeVolumes() //will silently tesselate the packing
  *TW.volume(10) //get volume associated to sphere of id 10
  * 
@@ -49,7 +49,7 @@ public:
     	/// Insert a sphere, "id" will be used by some getters to retrieve spheres
     	bool insert(double x, double y, double z, double rad, unsigned int id);
 	/// A faster version of insert, inserting all spheres in scene
-	void insertSceneSpheres(const Scene* scene);
+	void insertSceneSpheres();
 	/// Move one sphere to the new position (x,y,z) and maintain triangulation (invalidates the tesselation)
 	bool move (double x, double y, double z, double rad, unsigned int id);
 	
@@ -93,7 +93,7 @@ public:
 	CGT::Finite_edges_iterator facet_it;
 	MicroMacroAnalyser mma;
 	
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere. Example script :\n tt=TriaxialTest()\ntt.generate('test.xml')\nO.load('test.xml')\nO.run(100) //for unknown reasons, this procedure crashes at iteration 0\nTW=TesselationWrapper()\nTW.triangulate(O._sceneObj()) //compute regular Delaunay triangulation, don't construct tesselation\nTW.computeVolumes() //will silently tesselate the packing\nTW.volume(10) //get volume associated to sphere of id 10",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere. Example script :\n tt=TriaxialTest()\ntt.generate('test.xml')\nO.load('test.xml')\nO.run(100) //for unknown reasons, this procedure crashes at iteration 0\nTW=TesselationWrapper()\nTW.triangulate() //compute regular Delaunay triangulation, don't construct tesselation\nTW.computeVolumes() //will silently tesselate the packing\nTW.volume(10) //get volume associated to sphere of id 10",
 	((unsigned int,n_spheres,0,,"|ycomp|"))
 	,/*ctor*/
   	Tes = new CGT::Tesselation;

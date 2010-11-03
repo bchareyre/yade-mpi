@@ -11,6 +11,7 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
+#include <yade/lib-triangulation/Timer.h>
 
 YADE_PLUGIN((TesselationWrapper));
 YADE_REQUIRE_FEATURE(CGAL)
@@ -154,10 +155,14 @@ void TesselationWrapper::clear2(void) //for testing purpose
 //  facet_it = Tes->Triangulation().finite_edges_end ();
 }
 
-void TesselationWrapper::insertSceneSpheres(const Scene* scene)
+void TesselationWrapper::insertSceneSpheres()
 {
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
+	Scene* scene=Omega::instance().getScene().get();
+// 	Real_timer clock;
+//         clock.start();
+        const shared_ptr<BodyContainer>& bodies = scene->bodies;
 	build_triangulation_with_ids(bodies, *this);
+// 	clock.top("Triangulation");
 }
 
 double TesselationWrapper::Volume(unsigned int id) {return Tes->Volume(id);}

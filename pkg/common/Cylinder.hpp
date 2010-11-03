@@ -36,7 +36,7 @@ class ChainedCylinder: public Cylinder{
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ChainedCylinder,Cylinder,"Geometry of a deformable chained cylinder, using geometry :yref:`MinkCylinder`.",
   		((Real,initLength,0,,"tensile-free length, used as reference for tensile strain"))
-  		((Quaternionr,chainedOrientation,Quaternionr::Identity(),,"Orientation of node-to-node vector"))
+  		((Quaternionr,chainedOrientation,Quaternionr::Identity(),,"Deviation of node1 orientation from node-to-node vector"))
 		,createIndex();/*ctor*/
 // 		state=shared_ptr<ChainedState>(new ChainedState);
 
@@ -48,7 +48,11 @@ class CylScGeom: public ScGeom{
 	public:
 		virtual ~CylScGeom ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CylScGeom,ScGeom,"Geometry of a cylinder-sphere contact.",
-		((bool,onNode,false,,"contact on node")),
+		((bool,onNode,false,,"contact on node?"))
+		((Vector3r,start,Vector3r::Zero(),,"position of 1st node |yupdate|"))
+		((Vector3r,end,Vector3r::Zero(),,"position of 2nd node |yupdate|"))
+		((Body::id_t,id3,0,,"id of next chained cylinder |yupdate|"))
+		((Real,relPos,0,,"position of the contact on the cylinder (0: node-, 1:node+) |yupdate|")),
 		createIndex(); /*ctor*/
 	);
 	REGISTER_CLASS_INDEX(CylScGeom,ScGeom);
@@ -57,21 +61,21 @@ class CylScGeom: public ScGeom{
 
 class ChainedState: public State{
 	public:
-		static vector<vector<int> > chains;
+		static vector<vector<Body::id_t> > chains;
 		static unsigned int currentChain;
-		vector<int> barContacts;
-		vector<int> nodeContacts;
+		vector<Body::id_t> barContacts;
+		vector<Body::id_t> nodeContacts;
 
 		virtual ~ChainedState ();
-		void addToChain(int bodyId) {
+		void addToChain(Body::id_t bodyId) {
 			if (chains.size()<=currentChain) chains.resize(currentChain+1);
 			chainNumber=currentChain;
  			rank=chains[currentChain].size();
- 			chains[currentChain].push_back(rank);}
+ 			chains[currentChain].push_back(bodyId);}
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ChainedState,State,"State of a chained bodies, containing information on connectivity in order to track contacts jumping over contiguous elements. Chains are 1D lists from which id of chained bodies are retrieved via :yref:rank<ChainedState::rank>` and :yref:chainNumber<ChainedState::chainNumber>`.",
- 		((int,rank,0,,"rank in the chain"))
- 		((int,chainNumber,0,,"chain id"))
+ 		((unsigned int,rank,0,,"rank in the chain"))
+ 		((unsigned int,chainNumber,0,,"chain id"))
 		,
 		/* additional initializers */
 /*			((pos,se3.position))

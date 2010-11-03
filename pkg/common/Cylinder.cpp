@@ -38,30 +38,88 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 							const shared_ptr<Interaction>& c)
 {
 #endif
-	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
+// 	cerr<<"Ig2_Sphere_ChainedCylinder_CylScGeom::go"<<endl;
+	const State* sphereSt=YADE_CAST<const State*>(&state1);
+	const ChainedState* cylinderSt=YADE_CAST<const ChainedState*>(&state2);
+	ChainedCylinder *cylinder=YADE_CAST<ChainedCylinder*>(cm2.get());
+	Sphere *sphere=YADE_CAST<Sphere*>(cm1.get());
+	assert(sphereSt && cylinderSt && cylinder && sphere);
+	if (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1)) {cerr << "last cylinder - ignored"<<endl; return false;}
 
-	Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
-	Vector3r normal=(se32.position+shift2)-se31.position;
-	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.squaredNorm();
-	if (penetrationDepthSq>0 || c->isReal() || force){
-		shared_ptr<ScGeom> scm;
-		bool isNew = !c->geom;
-		if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->geom);
-		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->geom=scm; }
+// 	int i1=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+// 	cerr << "i1 : "<<i1<< " i2: "<<cylinderSt->rank<<" pos: "<<Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene)->state->pos<< " - "<<cylinderSt->pos<<endl;
 
-		Real norm=normal.norm(); normal/=norm; // normal is unit vector now
-		Real penetrationDepth=s1->radius+s2->radius-norm;
-		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
-// 		if(isNew) scm->prevNormal=normal;
-// 		else scm->prevNormal=scm->normal;
-// 		scm->normal=normal;
-		scm->penetrationDepth=penetrationDepth;
-		scm->radius1=s1->radius;
-		scm->radius2=s2->radius;
-		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);
-		return true;
+	//FIXME : definition of segment in next line breaks periodicity
+	Vector3r segment = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene)->state->pos-cylinderSt->pos;
+	Vector3r branch = sphereSt->pos-cylinderSt->pos-shift2;
+	bool isNew = !c->geom;
+
+	//Check position of projection on cylinder axis
+// 	if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && !c->isReal())) return (false);//position _after_ end of cylinder
+	if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && isNew)) return (false);//position _after_ end of cylinder
+// 	if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && c->isReal())) cerr<<"pb1"<<endl;
+
+	Real length = segment.norm();
+	Vector3r direction = segment/length;
+	Real dist = direction.dot(branch);
+// 	if ((dist<-interactionDetectionFactor*cylinder->radius) && !c->isReal()) return (false);//position _before_ start of cylinder
+	if ((dist<-interactionDetectionFactor*cylinder->radius) && isNew) return (false);//position _before_ start of cylinder
+		
+	//Check sphere-cylinder distance
+	Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
+	branch = projectedP-sphereSt->pos;
+// 	if ((branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) && !c->isReal()) return (false);
+	if ((branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) && isNew) return (false);
+
+	shared_ptr<CylScGeom> scm;
+	if(!isNew) scm=YADE_PTR_CAST<CylScGeom>(c->geom);
+	else { scm=shared_ptr<CylScGeom>(new CylScGeom()); c->geom=scm; }
+	
+	scm->radius1=sphere->radius;
+	scm->radius2=cylinder->radius;
+	scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+	scm->start=cylinderSt->pos+shift2; scm->end=scm->start+segment;
+
+	//FIXME : there should be other checks without distanceFactor?
+	if (dist<0.0) {//We have sphere-node contact
+		Vector3r normal=(cylinderSt->pos+shift2)-sphereSt->pos;
+		Real norm=normal.norm();
+		scm->onNode=true; scm->relPos=0;
+		scm->penetrationDepth=sphere->radius+cylinder->radius-norm;
+		scm->contactPoint=sphereSt->pos+(sphere->radius-0.5*scm->penetrationDepth)*normal;
+		scm->precompute(state1,state2,scene,c,normal/norm,isNew,shift2,true);//use sphere-sphere precompute (a node is a sphere)
+	} else {//we have sphere-cylinder contact
+		scm->onNode=false; scm->relPos=dist/length;
+		Real norm=branch.norm();
+		Vector3r normal=branch/norm;
+		scm->penetrationDepth= sphere->radius+cylinder->radius-norm;
+		if (dist>length) {
+			scm->penetrationDepth=sphere->radius+cylinder->radius-(cylinderSt->pos+segment-sphereSt->pos).norm();
+			//FIXME : handle contact jump on next element
+		}
+		scm->contactPoint = sphereSt->pos+scm->normal*(sphere->radius-0.5*scm->penetrationDepth);
+
+		//FIXME : replace the block below with smart use of shift2=shift2 + cylinder_spin.cross(branch) - doesn't compile currently
+
+		//precompute stuff manually (sphere-sphere precompute doesn't apply here if we want to avoid ratcheting
+		/*
+		if(!isNew) {
+			scm->orthonormal_axis = scm->normal.cross(normal);
+			Real angle = scene->dt*0.5*scm->normal.dot(sphereSt->angVel + cylinderSt->angVel);
+			scm->twist_axis = angle*normal;}
+		else scm->twist_axis=scm->orthonormal_axis=Vector3r::Zero();
+		//Update contact normal
+		scm->normal=normal;
+		Vector3r c1x =  sphere->radius*normal;
+		Vector3r c2x = -cylinder->radius*normal;
+		Vector3r relativeVelocity = (cylinderSt->vel+cylinderSt->angVel.cross(c2x)) - (sphereSt->vel+sphereSt->angVel.cross(c1x));
+		//keep the shear part only
+		relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
+		scm->shearInc = relativeVelocity*scene->dt;
+		*/
+
 	}
-	return false;
+	return true;
 }
 
 
@@ -73,7 +131,9 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::goReverse(	const shared_ptr<Shape>& c
 								const bool& force,
 								const shared_ptr<Interaction>& c)
 {
-	return go(cm1,cm2,state2,state1,-shift2,force,c);
+ 	cerr<<"Ig2_Sphere_ChainedCylinder_CylScGeom::goReverse"<<endl;
+	c->swapOrder();
+	return go(cm2,cm1,state2,state1,-shift2,force,c);
 }
 
 
@@ -95,7 +155,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom::go(	const shared_ptr<Shape>& cm
 	if (!pChain1 || !pChain2) {
 		cerr <<"cast failed8567"<<endl;
 	}
-	const bool revert = (pChain2->rank-pChain1->rank == -1);
+	const bool revert = ((int) pChain2->rank- (int) pChain1->rank == -1);
 	const ChainedState& bchain1 = revert? *pChain2 : *YADE_CAST<const ChainedState*>(&state1);
 	const ChainedState& bchain2 = revert? *pChain1 : *pChain2;
 	if (bchain2.rank-bchain1.rank != 1) {/*cerr<<"Mutual contacts in same chain between not adjacent elements, not handled*/ return false;}
