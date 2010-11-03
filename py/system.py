@@ -145,6 +145,7 @@ _deprecated={
 	'Law2_ScGeom_FrictPhys_Basic':'Law2_ScGeom_FrictPhys_CundallStrack', # Wed Oct 13 17:40:42 2010, bchareyre@dt-rv020
 	'Law2_Dem3DofGeom_FrictPhys_Basic':'Law2_Dem3DofGeom_FrictPhys_CundallStrack', # Wed Oct 13 17:45:32 2010, bchareyre@dt-rv020
 	'Law2_ScGeom_CohFrictPhys_ElasticPlastic':'Law2_ScGeom_CohFrictPhys_CohesionMoment', # Wed Oct 13 17:47:09 2010, bchareyre@dt-rv020
+	'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity':'Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity', # Thu Oct 28 18:09:16 2010, jduriez@c1solimara-l
 	'SpiralEngine':'HelixEngine', # Sat Oct 30 05:52:06 2010, vaclav@flux
 	'InterpolatingSpiralEngine':'InterpolatingHelixEngine', # Sat Oct 30 05:52:21 2010, vaclav@flux
 	'SpiralInteractionLocator2d':'HelixInteractionLocator2d', # Sat Oct 30 05:53:04 2010, vaclav@flux

@@ -16,21 +16,21 @@
 
 
 
-class Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
+class Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 {
 	public :
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 
 	FUNCTOR2D(ScGeom,NormalInelasticityPhys);
 
-	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity,
+	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity,
 				LawFunctor,
-				"Contact law used to simulate granulate filler in rock joints [Duriez2009a]_. It includes possibility of cohesion, moment transfer and inelastic compression behaviour (to reproduce the normal inelasticity observed for rock joints, for the latter).\n\n The moment transfer relation corresponds to the adaptation of the work of Plassiard & Belheine (see in [DeghmReport2006]_ for example), which was realized by J. Kozicki, and which is also present in other ''Law2'' (see http://www.mail-archive.com/yade-users@lists.launchpad.net/msg02444.html for a ''state of art'').\n\n As others :yref:`LawFunctor`, it uses pre-computed data of the interactions (rigidities, friction angles -with their tan()-, orientations of the interactions); this work is done here in :yref:`Ip2_2xNormalInelasticMat_NormalInelasticityPhys`.\n\n To use this you should also use :yref:`NormalInelasticMat` as material type of the bodies.\n\n The effects of this law are illustrated in scripts/normalInelasticityTest.py",
+				"Contact law used to simulate granulate filler in rock joints [Duriez2009a]_, [Duriez2010]_. It includes possibility of cohesion, moment transfer and inelastic compression behaviour (to reproduce the normal inelasticity observed for rock joints, for the latter).\n\n The moment transfer relation corresponds to the adaptation of the work of Plassiard & Belheine (see in [DeghmReport2006]_ for example), which was realized by J. Kozicki, and is now coded in ScGeom6D.\n\n As others :yref:`LawFunctor`, it uses pre-computed data of the interactions (rigidities, friction angles -with their tan()-, orientations of the interactions); this work is done here in :yref:`Ip2_2xNormalInelasticMat_NormalInelasticityPhys`.\n\n To use this you should also use :yref:`NormalInelasticMat` as material type of the bodies.\n\n The effects of this law are illustrated in scripts/normalInelasticityTest.py",
 				((bool,momentRotationLaw,true,,"boolean, true=> computation of a torque (against relative rotation) exchanged between particles"))
 				((bool,momentAlwaysElastic,false,,"boolean, true=> the torque (computed only if momentRotationLaw !!) is not limited by a plastic threshold"))
 				);
 	
 };
 
-REGISTER_SERIALIZABLE(Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity);
+REGISTER_SERIALIZABLE(Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity);
 

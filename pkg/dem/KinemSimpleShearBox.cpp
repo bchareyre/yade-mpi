@@ -169,11 +169,11 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 // 			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 // 			for ( ;itFirst!=itLast; ++itFirst )
 // 			{
-// 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
+// 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity" ) 
 // 				{
-// 					myLdc =  YADE_PTR_CAST<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
+// 					myLdc =  YADE_PTR_CAST<Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
 // 					coeff_dech = myLdc ->coeff_dech;
-// 					if(LOG) cout << "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
+// 					if(LOG) cout << "Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
 // 				}
 // 			}
 // 		}
@@ -194,7 +194,7 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 // 	cout << "Alors que f0 =  = "<< f0 << endl;
 // 	cout << "Car terme correctif = " << KnC * 1.0e9 * Scontact * (hCurrent-y0)<< endl;
 
-// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity : => INUTILE maintenant ?
+// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : => INUTILE maintenant ?
 // 	if( fSup.y() > fDesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
 // 		stiffness *= coeff_dech;
 

@@ -220,7 +220,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& scene)
 	scene->engines.push_back(collider);	
 	scene->engines.push_back(interactionGeometryDispatcher);
 	scene->engines.push_back(interactionPhysicsDispatcher);
-// 	scene->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
+// 	scene->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity));
 	if(gravApplied)
 		scene->engines.push_back(gravityCondition);
 	scene->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));

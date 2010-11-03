@@ -12,11 +12,11 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
+YADE_PLUGIN((Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity));
 
 
 
-void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>& iG, shared_ptr<IPhys>& iP, Interaction* contact)
+void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>& iG, shared_ptr<IPhys>& iP, Interaction* contact)
 {
 
 	const Real& dt = scene->dt;
@@ -28,7 +28,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
 	State* de1 = Body::byId(id1,scene)->state.get();
 	State* de2 = Body::byId(id2,scene)->state.get();
 	NormalInelasticMat* Mat1 = static_cast<NormalInelasticMat*>(Body::byId(id1,scene)->material.get());
-	ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(iG.get());
+	ScGeom6D* currentContactGeometry		= YADE_CAST<ScGeom6D*>(iG.get());
 	NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (iP.get());
 
 	Vector3r& shearForce 			= currentContactPhysics->shearForce;
@@ -42,9 +42,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
 		}
 
 
-	// *** Computation of normal Force : depends of the history *** //
-	if( currentContactGeometry->penetrationDepth < currentContactPhysics->unMax) 
-		currentContactPhysics->kn *= Mat1->coeff_dech;
+//	********	Computation of normal Force : depends of the history			*******	 //
 
 	Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
 // 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
@@ -58,12 +56,13 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
 		currentContactPhysics->unMax = std::abs(un);
 // 		cout << "je suis dans le calcul normal " << endl;
 	}
-	else// a priori then we need a greater stifness. False in the case when we are already on the limit state, but a correction below will then do the jobthe law2 will do the job in the case with a correction
+	else// a priori then we need a greater stifness. False in the case when we are already on the limit state, but a correction below will then do the job
 	{
 		currentContactPhysics->kn = currentContactPhysics->knLower* Mat1->coeff_dech;
-		Fn = currentContactPhysics->previousFn + currentContactPhysics->kn * (un-currentContactPhysics->previousun);	// Calcul incrémental de la nvlle force
+		// Incremental computation of the new normal force :
+		Fn = currentContactPhysics->previousFn + currentContactPhysics->kn * (un-currentContactPhysics->previousun);
 // 		cout << "je suis dans l'autre calcul" << endl;
-		if(std::abs(Fn) > std::abs(currentContactPhysics->knLower * un))	// check the limit state is not violated
+		if(std::abs(Fn) > std::abs(currentContactPhysics->knLower * un))	// check if the limit state is not violated
 		{
 		    Fn = currentContactPhysics->knLower*un;
 // 		    cout <<  "j'etais dans l'autre calcul mais j'ai corrige pour ne pas depasser la limite" << endl;
@@ -83,7 +82,9 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
 	
 // 	*** End of computation of normal force *** //
 
-	
+
+
+//	********	Tangential force				*******	 //
         if (   un < 0      )
         { // BREAK due to tension
 		 scene->interactions->requestErase(contact->getId1(),contact->getId2());
@@ -119,15 +120,14 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
                 // 		q.fromAngleAxis(angle,axis);
                 // 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 
-                /// 							 ///
-
+		
                 Vector3r x				= currentContactGeometry->contactPoint;
                 Vector3r c1x				= (x - de1->se3.position);
                 Vector3r c2x				= (x - de2->se3.position);
                 /// The following definition of c1x and c2x is to avoid "granular ratcheting" 
 		///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
 		///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
-		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
+		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors, or discussions on yade mailing lists)
                 Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
                 Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
                 Vector3r relativeVelocity		= (de2->vel+de2->angVel.cross(_c2x_)) - (de1->vel+de1->angVel.cross(_c1x_));
@@ -143,12 +143,11 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
                 
                 if ( Fs  > maxFs )
                 {
-
 			maxFs = max((Real) 0, Fn * currentContactPhysics->tangensOfFrictionAngle);
 
 			maxFs = maxFs / Fs;
 			if (maxFs>1)
-                        	cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        	cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!" << endl;
                     	shearForce *= maxFs;
 			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();
                 }
@@ -159,37 +158,37 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>
 		scene->forces.addForce (id2, f);
 		scene->forces.addTorque(id1,-c1x.cross(f));
 		scene->forces.addTorque(id2, c2x.cross(f));
+// 	*** End of computation of tangential force *** //
 
 
 //	********	Moment law				*******	 //
 
 		if(momentRotationLaw)
 		{
-			{// updates only orientation of contact (local coordinate system)
-				Vector3r axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal); axis.normalize();
-				Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
-				Quaternionr align(AngleAxisr(angle,axis));
-				currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
-			}
-
-			Quaternionr delta( de1->se3.orientation * currentContactPhysics->initialOrientation1.conjugate() *
-		                           currentContactPhysics->initialOrientation2 * de2->se3.orientation.conjugate());
-
-			AngleAxisr aa(delta); // aa.axis() of rotation - this is the Moment direction UNIT vector; angle represents the power of resistant ELASTIC moment
-			if(angle > Mathr::PI) angle -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
+// 			{// updates only orientation of contact (local coordinate system)
+// 				Vector3r axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal); axis.normalize();
+// 				Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
+// 				Quaternionr align(AngleAxisr(angle,axis));
+// 				currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
+// 			}
+// 
+// 			Quaternionr delta( de1->se3.orientation * currentContactPhysics->initialOrientation1.conjugate() *
+// 		                           currentContactPhysics->initialOrientation2 * de2->se3.orientation.conjugate());
+// 
+// 			AngleAxisr aa(delta); // aa.axis() of rotation - this is the Moment direction UNIT vector; angle represents the power of resistant ELASTIC moment
+// 			if(angle > Mathr::PI) angle -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
 
 //Real elasticMoment = currentContactPhysics->kr * std::abs(angle); // positive value (*)
 
-			Real angle_twist(aa.angle() * aa.axis().dot(currentContactGeometry->normal) );
-			Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
-			Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
-
-			Vector3r axis_bending(aa.angle()*aa.axis() - axis_twist);
-			Vector3r moment_bending(axis_bending * currentContactPhysics->kr);
+// 			Real angle_twist(aa.angle() * aa.axis().dot(currentContactGeometry->normal) );
+// 			Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
+			Vector3r moment_twist( (currentContactGeometry->getTwist()*currentContactPhysics->kr)*currentContactGeometry->normal );
+// 			Vector3r axis_bending(aa.angle()*aa.axis() - axis_twist);
+			Vector3r moment_bending( currentContactGeometry->getBending() * currentContactPhysics->kr );
 
 			Vector3r moment = moment_twist + moment_bending;
 
-// 	Limitation par seuil plastique
+// 	Limitation by plastic threshold
 			if (!momentAlwaysElastic)
 			{
 				Real normeMomentMax = currentContactPhysics->forMaxMoment * std::fabs(Fn);

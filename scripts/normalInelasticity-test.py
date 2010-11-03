@@ -5,7 +5,10 @@
 #- then, test in tangential direction
 #- finally for what concerns moment transfer, with relative orientation changes (use frictionAngle=0.0 in this case to study more easily what's going on)
 
-#Different graphs illustrate the effects of the different loadings. The run is paused at each plot window (so that there is time to observe them). Type "Return" in the Yade terminal to go ahead.
+#Different graphs illustrate the effects of the different loadings. The run is paused at each plot window (so that there is time to observe them). Push on "Return", while being in the Yade terminal, to go ahead.
+
+#All comments concern r2528
+
 
 from yade import plot
 
@@ -27,7 +30,7 @@ O.engines=[
 	InteractionLoop(
 			      [Ig2_Sphere_Sphere_ScGeom()],
 			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys(betaR=0.24)],
-			      [Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]
+			      [Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity()]
 			      ),
 	PyRunner(iterPeriod=1,command='letMove()')
 	]
@@ -55,7 +58,7 @@ def defData():
 
 
 # ------ Test of the law in the normal direction, using python commands to let move ------ #
-
+print 'Beginning of normal loading'
 O.dt=1e-5
 
 yade.qt.View()
@@ -70,7 +73,8 @@ O.run(40,True)
 plot.plots={'step':('unVrai',),'unPerso':('normFn',),'unVrai':('normFnBis',)}
 plot.plot()
 raw_input()
-
+print 'End of normal loading'
+print ''
 #NB : these different unVrai and unPerso illustrate the definition of penetrationDepth really used in the code (computed in Ig2_Sphere_Sphere_ScGeom) which is slightly different from R1 + R2 - Distance (see for example this "shift2"). According to the really used penetrationDepth, Fn evolves as it should
 
 #O.saveTmp('EndComp')
@@ -79,10 +83,11 @@ raw_input()
 
 # ------ Test of the law in the tangential direction, using StepDisplacer ------ #
 
+print 'Beginning of tangential loading'
+
 dpos=Vector3.Zero
 Vector3.__init__(dpos,1*O.dt,0,0)
-
-O.engines=O.engines[:4]+[StepDisplacer(subscribedBodies=[1],deltaSe3=(dpos,Quaternion.Identity),setVelocities=True)]+O.engines[5:]
+O.engines=O.engines[:3]+[StepDisplacer(ids=[1],mov=dpos,setVelocities=True)]+O.engines[4:]
 O.run(1000)
 plot.plots={'step':('gamma',),'gamma':('fx',)}
 plot.plot()
@@ -92,19 +97,20 @@ plot.plot()
 raw_input()
 #pylab.show() #to pause on the plot window. Effective only first time
 
-#-- Comments --#
+print 'End of tangential loading'
+print ''
+
+#-- Comments (r2528) --#
 #	- evolution of Fx with gamma normal (flat at the beginning because of the order of engines)
 #	- un decreases indeed during this shear, but maybe a zoom on the curves is needed to see it.
 #	- We can observe that the force state of the sample decreases a line with a slope equal to tan(~34.5°)=tan(~0.602 rad). Why not strict equality ? Because of the measure of the slope or because something else ? To see...
 #	- during this phase O.forces.t(0).norm() / O.forces.f(0)[0] seems to increase between 0.502 and 0.507 (according to r=[T[i]/F[i] for i in range(50,T.__len__()-20) ])
-#		Note to explain this that Fx = O.forces.f(0)[0] is more and more different from Ft, from which we can expect Ft = 	
-#		Torque /Radius
-
-
+#		Note to explain this that Fx = O.forces.f(0)[0] is more and more different from Ft, from which we can expect Ft = Torque /Radius
 
 ## ------ Test of the law for the moment, using blockedDOF_s ------ #
 #O.loadTmp('EndComp')
 
+print 'Beginning of rotationnal loading'
 ##To use blockedDOF_s, the body has to be dynamic....
 upperSphere.dynamic=True
 upperSphere.state.blockedDOFs='x','rx','y','ry','z','rz'
@@ -119,7 +125,8 @@ def printInfo():
   print upperSphere.state.ori
   print i.geom.penetrationDepth
   
-
 O.run(8000,True)
 plot.plots={'step':('torque',)}
 plot.plot()
+
+#-- Comments : TO DO

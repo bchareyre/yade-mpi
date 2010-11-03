@@ -65,7 +65,7 @@ O.engines=[
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_2xNormalInelasticMat_NormalInelasticityPhys()],
-		[Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity()]
+		[Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity()]
 	),
 	NewtonIntegrator(damping=.2)
 	,PyRunner(iterPeriod=50,command='defData()')
