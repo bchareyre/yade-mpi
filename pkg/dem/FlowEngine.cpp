@@ -49,17 +49,17 @@ void FlowEngine::action ( )
 
 		if ( current_state==3 )
 		{
-			if ( first ) { Build_Triangulation( P_zero );}
+			if ( first ) Build_Triangulation( P_zero );
       
-				timingDeltas->checkpoint("Triangulating");
+			timingDeltas->checkpoint("Triangulating");
 				
-				UpdateVolumes ( );
+			UpdateVolumes ( );
 			
-				timingDeltas->checkpoint("Update_Volumes");
+			timingDeltas->checkpoint("Update_Volumes");
 			
 			///Compute flow and and forces here
 			
-				if (!first) flow->GaussSeidel ( );
+			if (!first) flow->GaussSeidel ( );
 				timingDeltas->checkpoint("Gauss-Seidel");
 				
 				if (save_mplot){int j = scene->iter;
@@ -242,6 +242,18 @@ void FlowEngine::AddBoundary ()
 			contator+=1;
 		}
 	}
+		flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
+	flow->Vtotale = (flow->x_max-flow->x_min) * (flow->y_max-flow->y_min) * (flow->z_max-flow->z_min);
+
+	if (flow->DEBUG_OUT) {cout << "Section area = " << flow->SectionArea << endl;
+	cout << "Vtotale = " << flow->Vtotale << endl;
+// 	cout << "Rmoy " << Rmoy << endl;
+	cout << "x_min = " << flow->x_min << endl;
+	cout << "x_max = " << flow->x_max << endl;
+	cout << "y_max = " << flow->y_max << endl;
+	cout << "y_min = " << flow->y_min << endl;
+	cout << "z_min = " << flow->z_min << endl;
+	cout << "z_max = " << flow->z_max << endl;}
 	
 	if (flow->DEBUG_OUT) cout << "Adding Boundary------" << endl;
 
@@ -277,40 +289,32 @@ void FlowEngine::AddBoundary ()
 
 void FlowEngine::Triangulate ()
 {
-	shared_ptr<Sphere> sph ( new Sphere );
-
-	int Sph_Index = sph->getClassIndexStatic();
-	int contator = 0;
-	
-	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
-	{
-		if ( !b ) continue;
-		if ( b->shape->getClassIndex() ==  Sph_Index )
-		{
-			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-			const Body::id_t& id = b->getId();
-			Real rad = s->radius;
-			Real x = b->state->pos[0];
-			Real y = b->state->pos[1];
-			Real z = b->state->pos[2];
-			
-			flow->T[flow->currentTes].insert(x, y, z, rad, id);
-			
-			contator+=1;
-		}
-	}
-	flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
-	flow->Vtotale = (flow->x_max-flow->x_min) * (flow->y_max-flow->y_min) * (flow->z_max-flow->z_min);
-
-	if (flow->DEBUG_OUT) {cout << "Section area = " << flow->SectionArea << endl;
-	cout << "Vtotale = " << flow->Vtotale << endl;
-// 	cout << "Rmoy " << Rmoy << endl;
-	cout << "x_min = " << flow->x_min << endl;
-	cout << "x_max = " << flow->x_max << endl;
-	cout << "y_max = " << flow->y_max << endl;
-	cout << "y_min = " << flow->y_min << endl;
-	cout << "z_min = " << flow->z_min << endl;
-	cout << "z_max = " << flow->z_max << endl;}
+///Using Tesselation wrapper (faster)
+	TesselationWrapper TW;
+	if (TW.Tes) delete TW.Tes;
+	TW.Tes = &(flow->T[flow->currentTes]);//point to the current Tes we have in Flowengine
+	TW.insertSceneSpheres();//TW is now really inserting in FlowEngine, using the faster insert(begin,end)
+	TW.Tes = NULL;//otherwise, Tes would be deleted by ~TesselationWrapper() at the end of the function.
+///Using one-by-one insertion
+//	shared_ptr<Sphere> sph ( new Sphere );
+//	int Sph_Index = sph->getClassIndexStatic();
+// 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
+// 	{
+// 		if ( !b ) continue;
+// 		if ( b->shape->getClassIndex() ==  Sph_Index )
+// 		{
+// 			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
+// 			const Body::id_t& id = b->getId();
+// 			Real rad = s->radius;
+// 			Real x = b->state->pos[0];
+// 			Real y = b->state->pos[1];
+// 			Real z = b->state->pos[2];
+// 			
+// 			flow->T[flow->currentTes].insert(x, y, z, rad, id);
+// 			
+// 			contator+=1;
+// 		}
+// 	}
 }
 
 void FlowEngine::Initialize_volumes ()

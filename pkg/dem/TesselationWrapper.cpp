@@ -66,8 +66,12 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	Body::id_t Ng = 0;
 	Body::id_t MaxId=0;
 	TW.mean_radius = 0;
+
+	shared_ptr<Sphere> sph (new Sphere);
+	int Sph_Index = sph->getClassIndexStatic();
 	for (; bi!=biEnd ; ++bi) {
-		if ((*bi)->isDynamic()) { //then it is a sphere (not a wall) FIXME : need test if isSphere
+		if ( (*bi)->shape->getClassIndex() ==  Sph_Index ) {
+// 		if ((*bi)->isDynamic()) { //then it is a sphere (not a wall) FIXME : need test if isSphere
 			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
 			const Vector3r& pos = (*bi)->state->pos;
 			const Real rad = s->radius;
@@ -128,7 +132,7 @@ double thickness = 0;
 
 
 
-TesselationWrapper::~TesselationWrapper() { delete Tes;}
+TesselationWrapper::~TesselationWrapper() { if (Tes) delete Tes;}
 
 void TesselationWrapper::clear(void)
 {
