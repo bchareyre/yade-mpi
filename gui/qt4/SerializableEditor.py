@@ -214,8 +214,9 @@ class AttrEditor_MatrixXi(AttrEditor,QFrame):
 			w=QSpinBox()
 			w.setRange(int(-1e9),int(1e9)); w.setSingleStep(1);
 			self.grid.addWidget(w,row,col);
-			w.valueChanged.connect(self.update)
-		self.refresh()
+		self.refresh() # refresh before connecting signals!
+		for row,col in itertools.product(range(self.rows),range(self.cols)):
+			self.grid.itemAtPosition(row,col).widget().valueChanged.connect(self.update)
 	def refresh(self):
 		val=self.getter()
 		for row,col in itertools.product(range(self.rows),range(self.cols)):

@@ -50,3 +50,20 @@ class AxialGravityEngine: public FieldApplier {
 };
 REGISTER_SERIALIZABLE(AxialGravityEngine);
 
+class HdapsGravityEngine: public GravityEngine{
+	public:
+	Vector2i readSysfsFile(const std::string& name);
+	virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(HdapsGravityEngine,GravityEngine,"Read accelerometer in Thinkpad laptops (`HDAPS <http://en.wikipedia.org/wiki/Active_hard_drive_protection>`__ and accordingly set gravity within the simulation. This code draws from `hdaps-gl <https://sourceforge.net/project/showfiles.php?group_id=138242>`__ .",
+		((string,hdapsDir,"/sys/devices/platform/hdaps",,"Hdaps directory; contains ``position`` (with accelerometer readings) and ``calibration`` (zero acceleration)."))
+		((Real,msecUpdate,50,,"How often to update the reading."))
+		((int,updateThreshold,4,,"Minimum difference of reading from the file before updating gravity, to avoid jitter."))
+		((Real,lastReading,-1,Attr::hidden|Attr::noSave,"Time of the last reading."))
+		((Vector2i,accel,Vector2i::Zero(),(Attr::noSave|Attr::readonly),"reading from the sysfs file"))
+		((Vector2i,calibrate,Vector2i::Zero(),,"Zero position; if NaN, will be read from the *hdapsDir* / calibrate."))
+		((bool,calibrated,false,,"Whether *calibrate* was already updated. Do not set to ``True`` by hand unless you also give a meaningful value for *calibrate*."))
+		((Vector3r,zeroGravity,Vector3r(0,0,-1),,"Gravity if the accelerometer is in flat (zero) position."))
+	);
+};
+REGISTER_SERIALIZABLE(HdapsGravityEngine);
+

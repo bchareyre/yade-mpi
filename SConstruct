@@ -159,9 +159,9 @@ for k in ('CPPPATH','LIBPATH','QTDIR','PATH'):
 
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
-# ccache needs $HOME to be set; colorgcc needs $TERM; distcc wants DISTCC_HOSTS
+# ccache needs $HOME to be set, also CCACHE_PREFIX if used; colorgcc needs $TERM; distcc wants DISTCC_HOSTS
 # fakeroot needs FAKEROOTKEY and LD_PRELOAD
-propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS','LD_PRELOAD','FAKEROOTKEY','LD_LIBRARY_PATH']
+propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS','LD_PRELOAD','FAKEROOTKEY','LD_LIBRARY_PATH','CCACHE_PREFIX']
 for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 if env.has_key('PATH'): env.Append(ENV={'PATH':env['PATH']})
@@ -585,11 +585,11 @@ env['buildPlugs']=buildPlugs
 
 if env['mono']:
 	env['topLevelDir']=os.path.abspath(os.getcwd())
-	env.SConscript('SConscript-mono',build_dir=buildDir,duplicate=0)
+	env.SConscript('SConscript-mono',variant_dir=buildDir,duplicate=0)
 
 else:
-	# read top-level SConscript file. It is used only so that build_dir is set. This file reads all necessary SConscripts
-	env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
+	# read top-level SConscript file. It is used only so that variant_dir is set. This file reads all necessary SConscripts
+	env.SConscript(dirs=['.'],variant_dir=buildDir,duplicate=0)
 
 #################################################################################
 ## remove plugins that are in the target dir but will not be installed now
