@@ -4,6 +4,7 @@
 
 #include<vector>
 #include<map>
+#include<stdexcept>
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-base/Math.hpp>
@@ -51,22 +52,19 @@
  
  */
 
-class Clump: public Body {
-		//! mapping of body IDs to their relative positions; replaces members and subSe3s;
+class Clump: public Shape {
 	public:
-		typedef std::map<Body::id_t,Se3r> memberMap;
-		virtual ~Clump(){};
-		//! \brief add Body to the Clump
-		void add(Body::id_t);
-		//! \brief remove Body from the Clump
-		void del(Body::id_t);
+		typedef std::map<Body::id_t,Se3r> MemberMap;
+
+		static void add(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
+		static void del(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
 		//! Recalculate physical properties of Clump.
-		void updateProperties(bool intersecting);
+		static void updateProperties(const shared_ptr<Body>& clump, bool intersecting);
 		//! Calculate positions and orientations of members based on my own Se3.
-		void moveMembers();
+		static void moveMembers(const shared_ptr<Body>& clump, Scene* scene);
 		//! update member positions after clump being moved by mouse (in case simulation is paused and engines will not do that).
-		void userForcedDisplacementRedrawHook(){moveMembers();}
-	private: // may be made public, but once properly tested...
+		void userForcedDisplacementRedrawHook(){ throw runtime_error("Clump::userForcedDisplacementRedrawHook not yet implemented (with Clump as subclass of Shape).");}
+
 		//! Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
 		static Matrix3r inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off);
 		//! Recalculate body's inertia tensor in rotated coordinates.
@@ -74,24 +72,12 @@ class Clump: public Body {
 		//! Recalculate body's inertia tensor in rotated coordinates.
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
 	
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Clump,Body,"Rigid aggregate of bodies",
-		((memberMap,members,,,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)")),
-		/*ctor*/setDynamic(true); /* possible source of crash is setDynamic manipulates Body::State! */
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Clump,Shape,"Rigid aggregate of bodies",
+		((MemberMap,members,,Attr::hidden,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)"))
+		// ((vector<int>,ids,,Attr::readonly,"Ids of constituent particles (only informative; direct modifications will have no effect)."))
+		,/*ctor*/ createIndex();
 	);
 	DECLARE_LOGGER;
+	REGISTER_CLASS_INDEX(Clump,Shape);
 };
 REGISTER_SERIALIZABLE(Clump);
-
-// NewtonIntegrator calls Clump::moveMembers directly, no need for a dedicated engine
-#if 0
-/*! Update ::Clump::members positions so that the Clump behaves as a rigid body. */
-class ClumpMemberMover: public PartialEngine {
-	public:
-		//! Interates over scene->bodies and calls Clump::moveSubBodies() for clumps.
-		virtual void action();
-		virtual ~ClumpMemberMover(){};
-	YADE_CLASS_BASE_DOC(ClumpMemberMover,PartialEngine,"Update Clump::members positions and orientations so that Clump behaves as rigid body. This engine is only used internally by NewtonIntegrator, not directly.");
-	DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(ClumpMemberMover);
-#endif

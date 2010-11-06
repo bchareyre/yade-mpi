@@ -15,12 +15,6 @@
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravityEngine));
 
 void GravityEngine::action(){
-	/* skip bodies that are within a clump;
-	 * even if they are marked isDynamic==false, forces applied to them are passed to the clump, which is dynamic;
-	 * and since clump is a body with mass equal to the sum of masses of its components, it would have gravity applied twice.
-	 *
-	 * The choice is to skip (b->isClumpMember()) or (b->isClump()). We rather skip members,
-	 * since that will apply smaller number of forces. */
 	#ifdef YADE_OPENMP
 		const BodyContainer& bodies=*(scene->bodies.get());
 		const long size=(long)bodies.size();
@@ -30,7 +24,8 @@ void GravityEngine::action(){
 	#else
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 	#endif
-		if(!b || b->isClumpMember()) continue;
+		// skip clumps, only apply forces on their constituents
+		if(!b || b->isClump()) continue;
 		scene->forces.addForce(b->getId(),gravity*b->state->mass);
 	}
 }
@@ -38,7 +33,7 @@ void GravityEngine::action(){
 void CentralGravityEngine::action(){
 	const Vector3r& centralPos=Body::byId(centralBody)->state->pos;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b || b->isClumpMember() || b->getId()==centralBody) continue; // skip clump members and central body
+		if(!b || b->isClump() || b->getId()==centralBody) continue; // skip clumps and central body
 		Real F=accel*b->state->mass;
 		Vector3r toCenter=centralPos-b->state->pos; toCenter.normalize();
 		scene->forces.addForce(b->getId(),F*toCenter);
@@ -48,7 +43,7 @@ void CentralGravityEngine::action(){
 
 void AxialGravityEngine::action(){
 	FOREACH(const shared_ptr<Body>&b, *scene->bodies){
-		if(!b || b->isClumpMember()) continue;
+		if(!b || b->isClump()) continue;
 		/* http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html */
 		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;

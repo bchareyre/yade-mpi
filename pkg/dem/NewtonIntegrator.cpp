@@ -138,6 +138,8 @@ void NewtonIntegrator::action()
 					leapfrogAsphericalRotate(scene,state,id,dt,m);
 				}
 			} else if (b->isClump()){
+				// reset acceleration of the clump itself; computed from accels on constituents
+				state->accel=state->angAccel=Vector3r::Zero();
 				// clump mass forces
 				const Vector3r& f=scene->forces.getForce(id);
 				Vector3r dLinAccel=f/state->mass;
@@ -148,7 +150,7 @@ void NewtonIntegrator::action()
 				// sum force on clump memebrs
 				// exactAsphericalRot enabled and clump is aspherical
 				if (exactAsphericalRot && b->isAspherical()){
-					FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
+					FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
 						State* memberState=member->state.get();
@@ -163,7 +165,7 @@ void NewtonIntegrator::action()
 					Vector3r dAngAccel=M.cwise()/state->inertia;
 					cundallDamp(dt,M,state->angVel,dAngAccel);
 					state->angAccel+=dAngAccel;
-					FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
+					FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
 						State* memberState=member->state.get();
@@ -175,7 +177,7 @@ void NewtonIntegrator::action()
 					leapfrogTranslate(scene,state,id,dt);
 					leapfrogSphericalRotate(scene,state,id,dt);
 				}
-				static_cast<Clump*>(b.get())->moveMembers();
+				Clump::moveMembers(b,scene);
 			}
 			saveMaximaVelocity(scene,id,state);
 

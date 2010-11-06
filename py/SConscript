@@ -43,11 +43,7 @@ env.Install('$LIBDIR/py/yade',[
 	env.SharedLibrary('_customConverters',['wrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['Dispatching','MatchMaker']+(['GLDrawFunctors','OpenGLRenderer'] if 'opengl' in env['features'] else [])))
 ])
 env.Install('$LIBDIR/py/yade/tests',[
-	env.File('__init__.py','tests'),
-	env.File('wrapper.py','tests'),
-	env.File('omega.py','tests'),
-	env.File('pbc.py','tests'),
-	env.File('cohesive-chain.py','tests'),
+	env.File(env.Glob('tests/*.py'),'tests'),
 ])
 
 # 3rd party modules:

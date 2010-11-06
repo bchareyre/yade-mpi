@@ -20,7 +20,7 @@ class TestTags(unittest.TestCase): pass
 
 class TestIO(unittest.TestCase):
 	def testSaveAllClasses(self):
-		'All classes can be saved and loaded with boost::serialization'
+		'I/O: All classes can be saved and loaded with boost::serialization'
 		import yade.system
 		failed=set()
 		for c in yade.system.childClasses('Serializable'):

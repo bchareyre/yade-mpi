@@ -128,9 +128,16 @@ def globalHtmlStats():
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import socket,re
 class HttpStatsServer(BaseHTTPRequestHandler):
+	favicon=None # binary favicon, created when first requested
 	def do_GET(self):
 		if not self.path or self.path=='/': self.sendGlobal()
 		else:
+			if self.path=='/favicon.ico':
+				if not self.__class__.favicon:
+					import base64
+					self.__class__.favicon=base64.b64decode(yade.remote.b64favicon)
+				self.sendHttp(self.__class__.favicon,contentType='image/vnd.microsoft.icon')
+				return
 			jobMatch=re.match('/jobs/([0-9]+)/(.*)',self.path)
 			if not jobMatch:
 				self.send_error(404,self.path); return

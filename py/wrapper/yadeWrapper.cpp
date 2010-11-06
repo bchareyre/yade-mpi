@@ -117,19 +117,25 @@ class pyBodyContainer{
 		#endif
 		vector<Body::id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
 	}
-	python::tuple appendClump(vector<shared_ptr<Body> > bb){
-		// update clump members
-		vector<Body::id_t> ids(appendList(bb));
+	Body::id_t clump(vector<Body::id_t> ids){
 		// create and add clump itself
+		shared_ptr<Body> clumpBody=shared_ptr<Body>(new Body());
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
-		shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
-		clump->setDynamic(true);
-		proxee->insert(clumpAsBody);
+		clumpBody->shape=clump;
+		clumpBody->setDynamic(true);
+		clumpBody->setBounded(false);
+		proxee->insert(clumpBody);
 		// add clump members to the clump
-		FOREACH(Body::id_t id, ids) clump->add(id);
-		// update clump
-		clump->updateProperties(false);
-		return python::make_tuple(clump->getId(),ids);
+		Scene* scene(Omega::instance().getScene().get());
+		FOREACH(Body::id_t id, ids) Clump::add(clumpBody,Body::byId(id,scene));
+		Clump::updateProperties(clumpBody,/*intersecting*/ false);
+		return clumpBody->getId();
+	}
+	python::tuple appendClump(vector<shared_ptr<Body> > bb){
+		// append constituent particles
+		vector<Body::id_t> ids(appendList(bb));
+		// clump them together (the clump fcn) and return
+		return python::make_tuple(clump(ids),ids);
 	}
 	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
@@ -575,6 +581,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("append",&pyBodyContainer::append,"Append one Body instance, return its id.")
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
 		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids.")
+		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns clump id.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);
