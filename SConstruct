@@ -514,11 +514,12 @@ if not env.GetOption('clean'):
 	yadeInc=join(buildDir,'include/yade')
 	if not os.path.exists(yadeInc): os.makedirs(yadeInc)
 	import glob
-	for p in ['core','extra']+glob.glob('lib/*')+glob.glob('pkg/*')+glob.glob('gui'):
-		link=yadeInc+'/'+p.replace('/','-')
-		if os.path.isdir(p) and not os.path.exists(link):
-			if lexists(link): os.remove(link) # dangling symlink
-			os.symlink(relpath(link,p),link)
+	# old compat paths
+	#for p in ['core','extra']+glob.glob('lib/*')+glob.glob('pkg/*')+glob.glob('gui'):
+	#	link=yadeInc+'/'+p.replace('/','-')
+	#	if os.path.isdir(p) and not os.path.exists(link):
+	#		if lexists(link): os.remove(link) # dangling symlink
+	#		os.symlink(relpath(link,p),link)
 	boostDir=buildDir+'/include/boost'
 	if not exists(boostDir): os.makedirs(boostDir)
 	def mkSymlink(link,target):
