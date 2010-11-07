@@ -1,9 +1,9 @@
 
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/Gl1_NormPhys.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/common/Gl1_NormPhys.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 YADE_PLUGIN((Gl1_NormPhys));
 YADE_REQUIRE_FEATURE(OPENGL);

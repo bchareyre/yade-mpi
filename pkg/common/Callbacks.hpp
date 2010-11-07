@@ -2,7 +2,7 @@
 #pragma once 
 
 #include<stdexcept>
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 
 class Interaction;
 class Body;

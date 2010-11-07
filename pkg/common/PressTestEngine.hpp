@@ -1,6 +1,6 @@
 
 #pragma once
-#include<yade/pkg-common/TranslationEngine.hpp>
+#include<yade/pkg/common/TranslationEngine.hpp>
 #include<yade/core/PartialEngine.hpp>
 
 class PressTestEngine: public TranslationEngine{

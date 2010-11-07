@@ -2,7 +2,7 @@
 //  Copyright (C) 2004 by Janek Kozicki <cosurgi@berlios.de>
 //
 #pragma once
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 // keep those two here, template instantiation & boost::python gets broken otherwise, e.g. https://bugs.launchpad.net/bugs/618766
 #include<yade/core/IGeom.hpp> 
 #include<yade/core/IPhys.hpp>

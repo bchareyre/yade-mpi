@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 class Ip2_FrictMat_FrictMat_FrictPhys: public IPhysFunctor{
 	public:

@@ -1,7 +1,7 @@
 #include"RockPM.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 
 YADE_PLUGIN((RpmState)(Law2_Dem3DofGeom_RockPMPhys_Rpm)(RpmMat)(Ip2_RpmMat_RpmMat_RpmPhys)(RpmPhys));

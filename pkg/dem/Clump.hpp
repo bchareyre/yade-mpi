@@ -6,8 +6,8 @@
 #include<map>
 #include<stdexcept>
 #include<yade/core/Body.hpp>
-#include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Logging.hpp>
+#include<yade/lib/base/Math.hpp>
 #include<yade/core/PartialEngine.hpp>
 
 

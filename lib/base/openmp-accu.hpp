@@ -2,7 +2,7 @@
 #pragma once 
 
 // for ZeroInitializer template
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 #include<boost/serialization/split_free.hpp>
 #include<boost/lexical_cast.hpp>

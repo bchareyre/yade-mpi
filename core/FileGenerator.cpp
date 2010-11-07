@@ -7,8 +7,8 @@
 #include<boost/date_time/posix_time/posix_time.hpp>
 
 #include<yade/core/Omega.hpp>
-#include<yade/lib-pyutil/gil.hpp>
-#include<yade/lib-serialization/ObjectIO.hpp>
+#include<yade/lib/pyutil/gil.hpp>
+#include<yade/lib/serialization/ObjectIO.hpp>
 
 #include"FileGenerator.hpp"
 

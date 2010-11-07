@@ -1,17 +1,17 @@
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/lib-computational-geometry/Hull2d.hpp>
-#include<yade/lib-pyutil/doc_opts.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/lib/computational-geometry/Hull2d.hpp>
+#include<yade/lib/pyutil/doc_opts.hpp>
 #include<cmath>
-#include<yade/pkg-dem/ViscoelasticPM.hpp>
+#include<yade/pkg/dem/ViscoelasticPM.hpp>
 
 #include<numpy/ndarrayobject.h>
 

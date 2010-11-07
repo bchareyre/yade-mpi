@@ -1,9 +1,9 @@
 #include "Cylinder.hpp"
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
 #endif
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}

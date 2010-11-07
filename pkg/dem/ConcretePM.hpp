@@ -46,11 +46,11 @@ There are other classes, which are not strictly necessary:
 
 #pragma once
 
-#include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
 
 namespace py=boost::python;
 
@@ -215,7 +215,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 
 
 #ifdef YADE_OPENGL
-	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
 	class Gl1_CpmPhys: public GlIPhysFunctor {
 		public: virtual void go(const shared_ptr<IPhys>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		virtual ~Gl1_CpmPhys() {};

@@ -26,7 +26,7 @@
 #endif
 
 
-#include<yade/lib-base/Singleton.hpp>
+#include<yade/lib/base/Singleton.hpp>
 
 #include<boost/preprocessor.hpp>
 

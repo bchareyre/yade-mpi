@@ -7,7 +7,7 @@
 *************************************************************************/
 
 
-#include<yade/pkg-dem/KinemCNDEngine.hpp>
+#include<yade/pkg/dem/KinemCNDEngine.hpp>
 
 
 YADE_PLUGIN((KinemCNDEngine));

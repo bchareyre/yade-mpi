@@ -1,6 +1,6 @@
 
-#include<yade/pkg-dem/NozzleFactory.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/dem/NozzleFactory.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>

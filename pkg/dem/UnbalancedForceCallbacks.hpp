@@ -1,7 +1,7 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/pkg-common/Callbacks.hpp>
-#include<yade/lib-base/openmp-accu.hpp>
+#include<yade/pkg/common/Callbacks.hpp>
+#include<yade/lib/base/openmp-accu.hpp>
 
 class SumIntrForcesCb: public IntrCallback{
 	public:

@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include"SpherePadder/SpherePadder.hpp"
-#include<yade/lib-pyutil/doc_opts.hpp>
+#include<yade/lib/pyutil/doc_opts.hpp>
 
 
 BOOST_PYTHON_MODULE(_packSpherePadder){

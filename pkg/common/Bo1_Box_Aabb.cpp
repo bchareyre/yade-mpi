@@ -7,8 +7,8 @@
 *************************************************************************/
  
 #include "Bo1_Box_Aabb.hpp"
-#include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Box.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 
 void Bo1_Box_Aabb::go(	const shared_ptr<Shape>& cm,

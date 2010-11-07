@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ViscoelasticInteraction.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/ViscoelasticInteraction.hpp>
+#include<yade/pkg/common/RigidBodyParameters.hpp>
 YADE_PLUGIN((ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw));
 void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 

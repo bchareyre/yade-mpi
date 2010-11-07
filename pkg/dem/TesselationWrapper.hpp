@@ -7,14 +7,14 @@
 *************************************************************************/
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include<yade/core/Omega.hpp>
 #include <utility>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-triangulation/Tesselation.h>
+#include<yade/lib/triangulation/Tesselation.h>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
-#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
+#include<yade/pkg/dem/MicroMacroAnalyser.hpp>
 
 /*! \class TesselationWrapper
  * \brief Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.

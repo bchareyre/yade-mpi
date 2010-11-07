@@ -9,14 +9,14 @@
 #include "TriaxialCompressionEngine.hpp"
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/lambda/lambda.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/FrictPhys.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 
 class Ip2_2xCohFrictMat_CohFrictPhys;
 

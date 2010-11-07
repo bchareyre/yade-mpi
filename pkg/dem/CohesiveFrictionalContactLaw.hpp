@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 

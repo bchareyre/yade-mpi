@@ -16,8 +16,8 @@ using namespace boost;
 	#define FOREACH BOOST_FOREACH
 #endif
 
-#include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Logging.hpp>
+#include<yade/lib/base/Math.hpp>
 
 /*! Class representing geometry of spherical packing, with some utility functions.
 

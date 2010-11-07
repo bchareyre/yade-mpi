@@ -3,7 +3,7 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-common/OpenGLRenderer.hpp>
+#include<yade/pkg/common/OpenGLRenderer.hpp>
 
 #include<QGLViewer/qglviewer.h>
 #include<QGLViewer/constraint.h>
@@ -11,7 +11,7 @@
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<set>
 
-#include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
 
 /*****************************************************************************
 *********************************** SnapshotEngine ***************************

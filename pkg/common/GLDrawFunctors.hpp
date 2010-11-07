@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include<yade/lib-multimethods/FunctorWrapper.hpp>
+#include<yade/lib/multimethods/FunctorWrapper.hpp>
 #include<yade/core/Bound.hpp>
 #include<yade/core/State.hpp>
 #include<yade/core/Shape.hpp>

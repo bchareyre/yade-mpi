@@ -8,7 +8,7 @@
 
 #include "Gl1_Facet.hpp"
 #include <yade/pkg-common/Facet.hpp>
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
 
 bool Gl1_Facet::normals=false;
 

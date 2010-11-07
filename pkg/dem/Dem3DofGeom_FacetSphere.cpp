@@ -1,7 +1,7 @@
 // © Václav Šmilauer <eudoxos@arcig.cz>
 #include "Dem3DofGeom_FacetSphere.hpp"
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
 YADE_PLUGIN((Dem3DofGeom_FacetSphere)
 	#ifdef YADE_OPENGL
 		(Gl1_Dem3DofGeom_FacetSphere)
@@ -186,8 +186,8 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 
 #ifdef YADE_OPENGL
 
-	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	#include<yade/lib-opengl/GLUtils.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/GLUtils.hpp>
 
 	bool Gl1_Dem3DofGeom_FacetSphere::normal=false;
 	bool Gl1_Dem3DofGeom_FacetSphere::rolledPoints=false;

@@ -2,11 +2,11 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"OpenGLRenderer.hpp"
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/lib-opengl/GLUtils.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include<yade/lib/opengl/GLUtils.hpp>
 #include<yade/core/Timing.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 #ifdef __APPLE__
 #  include <OpenGL/glu.h>

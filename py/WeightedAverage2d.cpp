@@ -1,4 +1,4 @@
-#include<yade/lib-smoothing/WeightedAverage2d.hpp>
+#include<yade/lib/smoothing/WeightedAverage2d.hpp>
 
 /* Tell whether point is inside polygon
  *

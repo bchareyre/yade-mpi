@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/BoundaryController.hpp>
+#include<yade/pkg/common/BoundaryController.hpp>
 
 class PeriIsoCompressor: public BoundaryController{
 	Real avgStiffness; Real maxDisplPerStep; Vector3r sumForces, sigma; 

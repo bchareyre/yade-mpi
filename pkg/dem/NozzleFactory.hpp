@@ -1,7 +1,7 @@
 // Kovthanan …
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg-common/Collider.hpp>
+#include<yade/pkg/common/Collider.hpp>
 
 
 class NozzleFactory: public GlobalEngine {

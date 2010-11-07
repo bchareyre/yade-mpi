@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-base/Logging.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
+#include<yade/lib/base/Logging.hpp>
 
 #include "Scene.hpp"
 #include "ThreadWorker.hpp"

@@ -8,9 +8,9 @@
 
 #include"NewtonIntegrator.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-dem/Clump.hpp>
-#include<yade/pkg-common/VelocityBins.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/pkg/dem/Clump.hpp>
+#include<yade/pkg/common/VelocityBins.hpp>
+#include<yade/lib/base/Math.hpp>
 		
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);

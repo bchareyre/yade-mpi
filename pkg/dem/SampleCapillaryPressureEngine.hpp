@@ -10,8 +10,8 @@
 #define SAMPLE_CAPILLARY_PRESSURE_ENGINE_HPP
 
 #include<yade/core/PartialEngine.hpp>
-#include<yade/lib-base/Math.hpp>
-#include<yade/pkg-dem/TriaxialStressController.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/pkg/dem/TriaxialStressController.hpp>
 #include <string>
 
 /*! \brief Isotropic compression + suction variation test */

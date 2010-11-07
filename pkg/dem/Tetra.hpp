@@ -8,8 +8,8 @@
 #include<yade/core/IGeom.hpp>
 #include<yade/core/GlobalEngine.hpp>
 
-#include<yade/pkg-common/Aabb.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Aabb.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 
 /* Our mold of tetrahedron: just 4 vertices.
@@ -64,7 +64,7 @@ class Bo1_Tetra_Aabb: public BoundFunctor{
 REGISTER_SERIALIZABLE(Bo1_Tetra_Aabb);
 
 #ifdef YADE_OPENGL
-	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
 	/*! Draw Tetra using OpenGL */
 	class Gl1_Tetra: public GlShapeFunctor{	
 		public:

@@ -4,9 +4,9 @@
 #include<yade/core/IPhys.hpp>
 #include<yade/core/Shape.hpp>
 #include<yade/core/State.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 
 struct L3Geom: public GenericSpheresContact{
 	const Real& uN;

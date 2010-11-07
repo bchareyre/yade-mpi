@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
+#include<yade/lib/multimethods/Indexable.hpp>
 #include<yade/core/Dispatcher.hpp>
 /*! State (internal & spatial variables) of a body.
 

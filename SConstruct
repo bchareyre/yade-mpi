@@ -510,9 +510,15 @@ if not env.GetOption('clean'):
 	#installHeaders() # install to buildDir always
 	#if 0: # do not install headers
 	#	installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
+	def mkSymlink(link,target):
+		if exists(link) and not islink(link): os.remove(link)
+		if not exists(link):
+			if lexists(link): os.remove(link) # remove dangling symlink
+			os.symlink(relpath(link,target),link)
 
 	yadeInc=join(buildDir,'include/yade')
-	if not os.path.exists(yadeInc): os.makedirs(yadeInc)
+	mkSymlink(yadeInc,'.')
+	#if not os.path.exists(yadeInc): os.makedirs(yadeInc)
 	import glob
 	# old compat paths
 	#for p in ['core','extra']+glob.glob('lib/*')+glob.glob('pkg/*')+glob.glob('gui'):
@@ -522,10 +528,6 @@ if not env.GetOption('clean'):
 	#		os.symlink(relpath(link,p),link)
 	boostDir=buildDir+'/include/boost'
 	if not exists(boostDir): os.makedirs(boostDir)
-	def mkSymlink(link,target):
-		if not exists(link):
-			if lexists(link): os.remove(link) # remove dangling symlink
-			os.symlink(relpath(link,target),link)
 	if not env['haveForeach']:
 		mkSymlink(boostDir+'/foreach.hpp','extra/foreach.hpp_local')
 	#mkSymlink(boostDir+'/python','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')

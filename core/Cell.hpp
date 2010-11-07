@@ -14,8 +14,8 @@ The transformation has normal part and rotation/shear part. the shearPt, unshear
 
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
+#include<yade/lib/base/Math.hpp>
 
 class Cell: public Serializable{
 	public:

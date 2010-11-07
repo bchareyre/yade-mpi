@@ -7,8 +7,8 @@
 *************************************************************************/
  
 #include "Bo1_Sphere_Aabb.hpp"
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 void Bo1_Sphere_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Sphere* sphere = static_cast<Sphere*>(cm.get());

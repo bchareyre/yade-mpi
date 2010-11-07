@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include "Gl1_Sphere.hpp"
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
 
 bool Gl1_Sphere::wire;
 bool Gl1_Sphere::stripes;

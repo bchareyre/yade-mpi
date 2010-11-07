@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"Ip2_2xNormalInelasticMat_NormalInelasticityPhys.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
-#include<yade/pkg-dem/NormalInelasticMat.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/NormalInelasticityPhys.hpp>
+#include<yade/pkg/dem/NormalInelasticMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

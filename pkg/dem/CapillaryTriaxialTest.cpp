@@ -9,38 +9,38 @@
 *************************************************************************/
 #include "CapillaryTriaxialTest.hpp"
 
-#include<yade/pkg-dem/ElasticContactLaw.hpp>
+#include<yade/pkg/dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
-// #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
-#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_CapillaryPhys.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
+// #include<yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
+#include<yade/pkg/dem/Ip2_FrictMat_FrictMat_CapillaryPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
-#include<yade/pkg-dem/TriaxialStressController.hpp>
-#include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include<yade/pkg/dem/TriaxialStressController.hpp>
+#include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 #include <yade/pkg-dem/CapillaryStressRecorder.hpp>
 
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/InsertionSortCollider.hpp>
+#include<yade/pkg/common/InsertionSortCollider.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
-#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg/common/Bo1_Box_Aabb.hpp>
 
-#include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-dem/NewtonIntegrator.hpp>
+#include<yade/pkg/common/GravityEngines.hpp>
+#include<yade/pkg/dem/NewtonIntegrator.hpp>
 
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
-#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
+#include<yade/pkg/common/Box.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
 
-#include<yade/pkg-common/ForceResetter.hpp>
+#include<yade/pkg/common/ForceResetter.hpp>
 
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>

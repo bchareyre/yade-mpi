@@ -9,8 +9,8 @@
 #include<boost/any.hpp>
 #include<boost/lambda/lambda.hpp>
 
-#include<yade/lib-base/Math.hpp>
-#include<yade/lib-base/Logging.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/lib/base/Logging.hpp>
 #include<yade/core/Body.hpp>
 
 #include<boost/function.hpp>

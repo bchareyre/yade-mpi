@@ -11,11 +11,11 @@
 *************************************************************************/
 
 #include"Ig2_Box_Sphere_ScGeom.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Box.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 
 

@@ -8,27 +8,27 @@
 
 
 #include"STLImporterTest.hpp"
-#include<yade/pkg-common/SpatialQuickSortCollider.hpp>
-#include<yade/pkg-dem/STLImporter.hpp>
-#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg/common/SpatialQuickSortCollider.hpp>
+#include<yade/pkg/dem/STLImporter.hpp>
+#include<yade/pkg/common/Facet.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/Aabb.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/ForceResetter.hpp>
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/StateMetaEngine.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
-#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
-#include<yade/pkg-common/RotationEngine.hpp>
+#include<yade/pkg/common/Aabb.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/CundallNonViscousDamping.hpp>
+#include<yade/pkg/common/CundallNonViscousDamping.hpp>
+#include<yade/pkg/common/GravityEngines.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/PhysicalActionApplier.hpp>
+#include<yade/pkg/common/ForceResetter.hpp>
+#include<yade/pkg/common/PhysicalActionDamper.hpp>
+#include<yade/pkg/common/StateMetaEngine.hpp>
+#include<yade/pkg/dem/BodyMacroParameters.hpp>
+#include<yade/pkg/dem/ElasticContactLaw.hpp>
+#include<yade/pkg/dem/ElasticCriterionTimeStepper.hpp>
+#include<yade/pkg/dem/MacroMicroElasticRelationships.hpp>
+#include<yade/pkg/common/RotationEngine.hpp>
 
 STLImporterTest::STLImporterTest() : FileGenerator()
 {

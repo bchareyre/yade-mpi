@@ -3,10 +3,10 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"Ig2_Sphere_Sphere_ScGeom.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 #include<yade/core/Omega.hpp>
 
 #ifdef YADE_DEVIRT_FUNCTORS

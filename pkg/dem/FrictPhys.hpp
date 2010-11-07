@@ -7,7 +7,7 @@
 *************************************************************************/
 #pragma once
 
-#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
 
 class FrictPhys: public NormShearPhys
 {

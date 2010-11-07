@@ -2,8 +2,8 @@
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
 #include<string>
-#include<yade/lib-base/openmp-accu.hpp>
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/base/openmp-accu.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH

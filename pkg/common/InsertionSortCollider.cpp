@@ -4,9 +4,9 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/VelocityBins.hpp>
-#include<yade/pkg-dem/NewtonIntegrator.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/VelocityBins.hpp>
+#include<yade/pkg/dem/NewtonIntegrator.hpp>
 
 #include<algorithm>
 #include<vector>

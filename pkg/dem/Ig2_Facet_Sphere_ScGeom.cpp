@@ -7,11 +7,11 @@
 *************************************************************************/
 
 #include"Ig2_Facet_Sphere_ScGeom.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 CREATE_LOGGER(Ig2_Facet_Sphere_ScGeom);
 

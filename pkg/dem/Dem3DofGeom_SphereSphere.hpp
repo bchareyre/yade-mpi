@@ -1,5 +1,5 @@
 #pragma once
-#include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 
 class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 	public:
@@ -47,7 +47,7 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 
 #ifdef YADE_OPENGL
-	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
 	class Gl1_Dem3DofGeom_SphereSphere:public GlIGeomFunctor{
 		public:
 			virtual void go(const shared_ptr<IGeom>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
@@ -63,7 +63,7 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_SphereSphere);
 #endif
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 class Ig2_Sphere_Sphere_Dem3DofGeom:public IGeomFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);

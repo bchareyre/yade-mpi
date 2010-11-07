@@ -8,7 +8,7 @@
  
 #pragma once
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 class Bo1_Sphere_Aabb : public BoundFunctor
 {

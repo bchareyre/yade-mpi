@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 /*! \brief The RelationShips for using Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity
 

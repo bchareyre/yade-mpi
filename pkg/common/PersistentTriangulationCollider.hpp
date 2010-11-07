@@ -7,13 +7,13 @@
 *************************************************************************/
 
 #pragma once
-#include<yade/pkg-common/Collider.hpp>
+#include<yade/pkg/common/Collider.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include <list>
 #include <set>
 #include <vector>
 #include <algorithm>
-#include<yade/pkg-dem/TesselationWrapper.hpp>
+#include<yade/pkg/dem/TesselationWrapper.hpp>
 
 /*! \brief Collision detection engine based on regular triangulation.
  

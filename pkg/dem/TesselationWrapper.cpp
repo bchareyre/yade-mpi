@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/lib-pyutil/numpy.hpp>
+#include<yade/lib/pyutil/numpy.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
 #include <yade/lib-triangulation/Timer.h>
 

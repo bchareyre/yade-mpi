@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/lib-base/Math.hpp>
-#include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
+#include<yade/lib/multimethods/Indexable.hpp>
 #include<yade/core/Dispatcher.hpp>
 
 class IPhys : public Serializable, public Indexable

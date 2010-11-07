@@ -2,7 +2,7 @@
 
 #include"CundallStrack.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 //! tested in scripts/test/CundallStrack.py
 
 YADE_PLUGIN((Law2_Dem3Dof_CSPhys_CundallStrack)(Ip2_2xFrictMat_CSPhys)(CSPhys));

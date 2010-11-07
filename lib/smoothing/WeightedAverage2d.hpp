@@ -30,7 +30,7 @@
 using namespace std;
 using namespace boost;
 
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 
 template<typename T>

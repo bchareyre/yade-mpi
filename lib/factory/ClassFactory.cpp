@@ -11,7 +11,7 @@
 #include "ClassFactory.hpp"
 
 #include<boost/algorithm/string/regex.hpp>
-#include<yade/lib-base/Logging.hpp>
+#include<yade/lib/base/Logging.hpp>
 
 CREATE_LOGGER(ClassFactory);
 SINGLETON_SELF(ClassFactory);

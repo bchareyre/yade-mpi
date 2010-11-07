@@ -2,7 +2,7 @@
 
 
 #include"HertzMindlin.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

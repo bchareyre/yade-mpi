@@ -1,5 +1,5 @@
 #include"FacetTopologyAnalyzer.hpp"
-#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg/common/Facet.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 

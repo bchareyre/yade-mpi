@@ -1,6 +1,6 @@
 
-#include<yade/pkg-dem/L3Geom.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/dem/L3Geom.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Law2_L3Geom_FrictPhys_ElPerfPl)(Law2_L6Geom_FrictPhys_Linear));
 

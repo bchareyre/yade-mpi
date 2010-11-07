@@ -8,11 +8,11 @@ mechanical behavior of mining rocks.
 
 #pragma once
 
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 
 
 class RpmState: public State {

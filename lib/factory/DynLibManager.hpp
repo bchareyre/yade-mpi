@@ -16,7 +16,7 @@
 #include <map>
 #include <vector>
 
-#include<yade/lib-base/Logging.hpp>
+#include<yade/lib/base/Logging.hpp>
 
 using namespace std;
 

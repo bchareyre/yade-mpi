@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 class Ig2_Box_Sphere_ScGeom : public IGeomFunctor
 {

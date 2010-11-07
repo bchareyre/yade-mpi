@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
+#include<yade/lib/multimethods/Indexable.hpp>
 #include<yade/core/Dispatcher.hpp>
 
 #define BV_FUNCTOR_CACHE

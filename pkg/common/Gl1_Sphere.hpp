@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/GLDrawFunctors.hpp>
 
 class Gl1_Sphere : public GlShapeFunctor{	
 	private:

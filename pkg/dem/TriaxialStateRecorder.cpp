@@ -11,7 +11,7 @@
 #include "TriaxialStateRecorder.hpp"
 // #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStressController.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
