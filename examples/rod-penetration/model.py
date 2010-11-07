@@ -75,6 +75,9 @@ nbIter=10000
 from yade import qt
 qt.View()
 
+O.stopAtIter=nbIter
+O.run()
+
 #for t in xrange(2):
 #	start=time.time();O.run(nbIter);O.wait();finish=time.time() 
 #	speed=nbIter/(finish-start); print '%g iter/sec\n'%speed

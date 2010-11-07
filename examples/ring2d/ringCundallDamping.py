@@ -4,23 +4,10 @@
 from yade import utils
 from yade import ymport
 
-## Omega
-o=Omega() 
-
-## PhysicalParameters 
-Density=2400
-frictionAngle=radians(35)
 sphereRadius=0.05
-tc = 0.001
-en = 0.3
-es = 0.3
 
 ## Import wall's geometry
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
-facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
-sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
-
-walls = O.bodies.append(ymport.stl('ring.stl',material=facetMat))
+walls = O.bodies.append(ymport.stl('ring.stl'))
 
 def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylinderOrigin,cylinderSlope):
 	spheresCount=0
@@ -31,16 +18,14 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					x = cylinderOrigin[0]+2*r*sphereRadius*cos(dfi*a)
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
-					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,material=sphereMat)
-					o.bodies.append(s)
+					o.bodies.append(utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius))
 					spheresCount+=1
 	return spheresCount
 
-# Spheres
+## Spheres
 spheresCount=0
 spheresCount+=fill_cylinder_with_spheres(sphereRadius,0.5,0.10,[0,0,0],radians(0))
 print "Number of spheres: %d" % spheresCount
-
 
 ## Engines 
 o.engines=[
@@ -52,30 +37,26 @@ o.engines=[
 		Bo1_Sphere_Aabb(),
 		Bo1_Facet_Aabb(),
 	]),
-	# Interactions
 	InteractionLoop(
-		## Create geometry information about each potential collision.
-		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
-		## Create physical information about the interaction.
-		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
-		## Constitutive law
-		[Law2_ScGeom_ViscElPhys_Basic()],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
-	## Cundall damping must been disabled!
-	NewtonIntegrator(damping=0),
-	## Apply kinematics to walls
-    ## angularVelocity = 0.73 rad/sec = 7 rpm
-	RotationEngine(subscribedBodies=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
 
+	## NOTE: Non zero Cundall damping affected a dynamic simulation!
+	NewtonIntegrator(damping=0.3),
+
+	## Apply kinematics to walls
+   ## angularVelocity = 0.73 rad/sec = 7 rpm
+	RotationEngine(subscribedBodies=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
 ]
 
 for b in o.bodies:
-    if b.shape.name=='Sphere':
-        b.state.blockedDOFs=['z']
+    if isinstance(b.shape,Sphere): b.state.blockedDOFs=['z'] # blocked movement along Z
 
-o.dt=0.02*tc
+o.dt=0.02*utils.PWaveTimeStep()
 
 o.saveTmp('init');
 

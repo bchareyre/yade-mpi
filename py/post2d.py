@@ -218,7 +218,7 @@ def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold
 	ddd2=numpy.zeros((len(yyy),len(xxx)),float)
 	# set the type of average we are going to use
 	if perArea==0:
-		def compAvg(gauss,coord): return float(gauss.avg(coord))
+		def compAvg(gauss,coord,cellCoord): return float(gauss.avg(coord))
 	elif perArea==1:
 		def compAvg(gauss,coord,cellCoord): return gauss.avgPerUnitArea(coord)
 	elif perArea==2:

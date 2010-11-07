@@ -80,5 +80,6 @@ qt.Controller()
 qt.View()
 r=qt.Renderer()
 r.lightPos=Vector3(0,0,50)
-O.run(2000); O.wait()
+O.stopAtIter=2000
+O.run()
 #utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)

@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The script demonstrates rotating cylinder, created with GTS-help (http://gts.sourceforge.net/).
-Inside the cylinder there are a "cloud" of spheres."""
-
+Inside the cylinder there is a "cloud" of spheres."""
 
 cylHt,cylRd=1,.2
 nSpheres=2e4
@@ -22,7 +21,7 @@ def unitCylinder(nDiv=24):
 	of height 2 and radius 2, centered at origin, axis coincident with
 	the z-axis.
 
-	@param nDiv: polyhedron approximating circle.
+	:param int nDiv: polyhedron approximating circle.
 	"""
 	import numpy; from yade import pack
 	thetas=numpy.linspace(0,2*pi,nDiv,endpoint=True)

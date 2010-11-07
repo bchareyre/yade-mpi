@@ -50,7 +50,7 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	relDuctility=30,
 
 	intRadius=1.5,
-	dtSafety=.01,
+	dtSafety=.8,
 	damping=0.4,
 	strainRateTension=.05,
 	strainRateCompression=.5,
@@ -65,7 +65,7 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	isoPrestress=0,
 
 	# use the ScGeom variant
-	scGeom=True
+	scGeom=False
 )
 
 from yade.params.table import *
@@ -177,7 +177,9 @@ def addPlotData():
 		'sigma.50':utils.forcesOnCoordPlane(coord_50,axis)[axis]/area_50+isoPrestress,
 		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,
 		})
-
+plot.plot()
+O.run()
+utils.waitIfBatch()
 #initTest()
 # sleep forever if run by yade-multi, exit is called from stopIfDamaged
 #if os.environ.has_key('PARAM_TABLE'): time.sleep(1e12)
