@@ -52,7 +52,7 @@ def defData():
 	vecFn=i.phys.normalForce
 	vecDist=upperSphere.state.pos-lowerSphere.state.pos
 	plot.addData(normFn=vecFn.norm(),normFnBis=vecFn.norm(),fnY=vecFn[1],step=O.iter,
-	  unPerso=lowerSphere.shape.radius+upperSphere.shape.radius-vecDist.norm(),unVrai=i.geom.penetrationDepth,
+	  unPerso=lowerSphere.shape.radius+upperSphere.shape.radius-vecDist.norm(),unTrue=i.geom.penetrationDepth,
 	  gamma=upperSphere.state.pos[0]-lowerSphere.state.pos[0],fx=O.forces.f(0)[0],torque=O.forces.t(1)[2])
 	#print i.geom.penetrationDepth
 
@@ -65,17 +65,16 @@ yade.qt.View()
 O.run(2,True) #cycles "for free", so that the interaction between spheres will be defined (with his physics and so on)
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='defData()')]
 
-
-
 O.run(40,True)
+print 'End of normal loading'
+
 
 # define of the plots to be made : un(step), and Fn(un)
-plot.plots={'step':('unVrai',),'unPerso':('normFn',),'unVrai':('normFnBis',)}
+plot.plots={'step':('unTrue',),'unPerso':('normFn',),'unTrue':('normFnBis',)}
 plot.plot()
 raw_input()
-print 'End of normal loading'
 print ''
-#NB : these different unVrai and unPerso illustrate the definition of penetrationDepth really used in the code (computed in Ig2_Sphere_Sphere_ScGeom) which is slightly different from R1 + R2 - Distance (see for example this "shift2"). According to the really used penetrationDepth, Fn evolves as it should
+#NB : these different unTrue and unPerso illustrate the definition of penetrationDepth really used in the code (computed in Ig2_Sphere_Sphere_ScGeom) which is slightly different from R1 + R2 - Distance (see for example this "shift2"). According to the really used penetrationDepth, Fn evolves as it should
 
 #O.saveTmp('EndComp')
 #O.save('FinN_I_Test.xml')
@@ -89,6 +88,7 @@ dpos=Vector3.Zero
 Vector3.__init__(dpos,1*O.dt,0,0)
 O.engines=O.engines[:3]+[StepDisplacer(ids=[1],mov=dpos,setVelocities=True)]+O.engines[4:]
 O.run(1000)
+print 'End of tangential loading'
 plot.plots={'step':('gamma',),'gamma':('fx',)}
 plot.plot()
 raw_input()
@@ -97,7 +97,6 @@ plot.plot()
 raw_input()
 #pylab.show() #to pause on the plot window. Effective only first time
 
-print 'End of tangential loading'
 print ''
 
 #-- Comments (r2528) --#
@@ -126,6 +125,8 @@ def printInfo():
   print i.geom.penetrationDepth
   
 O.run(8000,True)
+print 'End of rotationnal loading'
+
 plot.plots={'step':('torque',)}
 plot.plot()
 
