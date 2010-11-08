@@ -165,10 +165,10 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 
 		if(momentRotationLaw)
 		{
-			Vector3r moment_twist( (currentContactGeometry->getTwist()*currentContactPhysics->kr)*currentContactGeometry->normal );
-			Vector3r moment_bending( currentContactGeometry->getBending() * currentContactPhysics->kr );
+			currentContactPhysics->moment_twist = (currentContactGeometry->getTwist()*currentContactPhysics->kr)*currentContactGeometry->normal ;
+			currentContactPhysics->moment_bending = currentContactGeometry->getBending() * currentContactPhysics->kr;
 
-			Vector3r moment = moment_twist + moment_bending;
+			moment = currentContactPhysics->moment_twist + currentContactPhysics->moment_bending;
 
 // 	Limitation by plastic threshold
 			if (!momentAlwaysElastic)

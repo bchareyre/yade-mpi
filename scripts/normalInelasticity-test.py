@@ -28,7 +28,7 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-			      [Ig2_Sphere_Sphere_ScGeom()],
+			      [Ig2_Sphere_Sphere_ScGeom6D()],
 			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys(betaR=0.24)],
 			      [Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity()]
 			      ),
@@ -70,9 +70,10 @@ print 'End of normal loading'
 
 
 # define of the plots to be made : un(step), and Fn(un)
-plot.plots={'step':('unTrue',),'unPerso':('normFn',),'unTrue':('normFnBis',)}
+plot.plots={'step':('unTrue','torque',),'unPerso':('normFn',),'unTrue':('normFnBis',)}
 plot.plot()
 raw_input()
+print 'Type Return to go ahead'
 print ''
 #NB : these different unTrue and unPerso illustrate the definition of penetrationDepth really used in the code (computed in Ig2_Sphere_Sphere_ScGeom) which is slightly different from R1 + R2 - Distance (see for example this "shift2"). According to the really used penetrationDepth, Fn evolves as it should
 
@@ -89,12 +90,14 @@ Vector3.__init__(dpos,1*O.dt,0,0)
 O.engines=O.engines[:3]+[StepDisplacer(ids=[1],mov=dpos,setVelocities=True)]+O.engines[4:]
 O.run(1000)
 print 'End of tangential loading'
-plot.plots={'step':('gamma',),'gamma':('fx',)}
+plot.plots={'step':('gamma','torque',),'gamma':('fx',)}
 plot.plot()
 raw_input()
+print 'Type Return to go ahead'
 plot.plots={'normFn':('fx',)}
 plot.plot()
 raw_input()
+print 'Type Return to go ahead'
 #pylab.show() #to pause on the plot window. Effective only first time
 
 print ''
@@ -116,7 +119,8 @@ upperSphere.state.blockedDOFs='x','rx','y','ry','z','rz'
 upperSphere.state.angVel=Vector3(0,0,1)
 upperSphere.state.vel=Vector3(0,0,0)
 i=O.interactions[1,0]
-O.engines=O.engines[:4]+[NewtonIntegrator()]+O.engines[5:]#+[PyRunner(iterPeriod=1,command='printInfo()')]
+
+O.engines=O.engines[:3]+[NewtonIntegrator()]+O.engines[4:]#+[PyRunner(iterPeriod=1,command='printInfo()')]
 
 
 def printInfo():
@@ -129,5 +133,6 @@ print 'End of rotationnal loading'
 
 plot.plots={'step':('torque',)}
 plot.plot()
+print 'Type Return to go ahead'
 
 #-- Comments : TO DO
