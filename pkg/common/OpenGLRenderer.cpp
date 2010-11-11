@@ -323,7 +323,7 @@ void OpenGLRenderer::renderShape(){
 
 		// ignored in non-selection mode, use it always
 		glPushName(b->id);
-		bool highlight=(b->id==selId || b->clumpId==selId || b->shape->highlight);
+		bool highlight=(b->id==selId || (b->clumpId>=0 && b->clumpId==selId) || b->shape->highlight);
 
 		glPushMatrix();
 			AngleAxisr aa(ori);	
@@ -332,7 +332,7 @@ void OpenGLRenderer::renderShape(){
 			if(highlight){
 				// set hightlight
 				// different color for body highlighted by selection and by the shape attribute
-				const Vector3r& h((selId==b->id||selId==b->clumpId) ? highlightEmission0 : highlightEmission1);
+				const Vector3r& h((selId==b->id||(b->clumpId>=0 && selId==b->clumpId)) ? highlightEmission0 : highlightEmission1);
 				glMaterialv(GL_FRONT_AND_BACK,GL_EMISSION,h);
 				glMaterialv(GL_FRONT_AND_BACK,GL_SPECULAR,h);
 				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);

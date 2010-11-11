@@ -277,18 +277,23 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& _clumps, bool periodic, int num){
 	// recenter given clumps and compute their margins
 	vector<SpherePack> clumps; /* vector<Vector3r> margins; */ Vector3r boxMargins(Vector3r::Zero()); Real maxR=0;
+	vector<Real> boundRad; // squared radii of bounding sphere for each clump
 	FOREACH(const shared_ptr<SpherePack>& c, _clumps){
 		SpherePack c2(*c); 
 		c2.translate(c2.midPt()); //recenter
 		clumps.push_back(c2);
+		Real rSq=0;
+		FOREACH(const Sph& s, c2.pack) rSq=max(rSq,s.c.squaredNorm()+pow(s.r,2));
+		boundRad.push_back(sqrt(rSq));
 		Vector3r cMn,cMx; c2.aabb(cMn,cMx); // centered at zero now, this gives margin
 		//margins.push_back(periodic?cMx:Vector3r::Zero()); 
 		//boxMargins=boxMargins.cwise().max(cMx);
 		FOREACH(const Sph& s, c2.pack) maxR=max(maxR,s.r); // keep track of maximum sphere radius
 	}
+	std::list<ClumpInfo> clumpInfos;
 	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
-	const int maxTry=1000;
+	const int maxTry=200;
 	int nGen=0; // number of clumps generated
 	// random point coordinate generator, with non-zero margins if aperiodic
 	static boost::minstd_rand randGen(TimingInfo::getNow(true));
@@ -306,8 +311,36 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 			Quaternionr ori(rndUnit(),rndUnit(),rndUnit(),rndUnit()); ori.normalize();
 			// copy the packing and rotate
 			SpherePack C(clumps[clumpChoice]); C.rotateAroundOrigin(ori); C.translate(pos);
+			const Real& rad(boundRad[clumpChoice]);
+			ClumpInfo ci; // to be used later, but must be here because of goto's
 
 			// find collisions
+			// check against bounding spheres of other clumps, and only check individual spheres if there is overlap
+			if(!periodic){
+				// check overlap with box margins first
+				if((pos+rad*Vector3r::Ones()).cwise().max(mx)!=mx || (pos-rad*Vector3r::Ones()).cwise().min(mn)!=mn){ FOREACH(const Sph& s, C.pack) if((s.c+s.r*Vector3r::Ones()).cwise().max(mx)!=mx || (s.c-s.r*Vector3r::Ones()).cwise().min(mn)!=mn) goto overlap; }
+				// check overlaps with bounding spheres of other clumps
+				FOREACH(const ClumpInfo& cInfo, clumpInfos){
+					bool detailedCheck=false;
+					// check overlaps between individual spheres and bounding sphere of the other clump
+					if((pos-cInfo.center).squaredNorm()<pow(rad+cInfo.rad,2)){ FOREACH(const Sph& s, C.pack) if(pow(s.r+cInfo.rad,2)>(s.c-cInfo.center).squaredNorm()){ detailedCheck=true; break; }}
+					// check sphere-by-sphere, since bounding spheres did overlap
+					if(detailedCheck){ FOREACH(const Sph& s, C.pack) for(int id=cInfo.minId; id<=cInfo.maxId; id++) if((s.c-pack[id].c).squaredNorm()<pow(s.r+pack[id].r,2)) goto overlap;}
+				}
+			} else {
+				FOREACH(const ClumpInfo& cInfo, clumpInfos){
+					// bounding spheres overlap (in the periodic space)
+					if(periPtDistSq(pos,cInfo.center)<pow(rad+cInfo.rad,2)){
+						bool detailedCheck=false;
+						// check spheres with bounding sphere of the other clump
+						FOREACH(const Sph& s, C.pack) if(pow(s.r+cInfo.rad,2)>periPtDistSq(s.c,cInfo.center)){ detailedCheck=true; break; }
+						// check sphere-by-sphere
+						if(detailedCheck){ FOREACH(const Sph& s, C.pack) for(int id=cInfo.minId; id<=cInfo.maxId; id++) if(periPtDistSq(s.c,pack[id].c)<pow(s.r+pack[id].r,2)) goto overlap; }
+					}
+				}
+			}
+
+			#if 0
 			// crude algorithm: check all spheres against all other spheres (slow!!)
 			// use vtkPointLocator, add all existing points and check distance of r+maxRadius, then refine
 			// for periodicity, duplicate points close than boxMargins to the respective boundary
@@ -332,9 +365,14 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 					}
 				}
 			}
+			#endif
 
 			// add the clump, if no collisions
-			FOREACH(const Sph& s, C.pack){ pack.push_back(Sph(s.c,s.r,/*number clumps consecutively*/nGen)); }
+			/*number clumps consecutively*/ ci.clumpId=nGen; ci.center=pos; ci.rad=rad; ci.minId=pack.size(); ci.maxId=pack.size()+C.pack.size(); 
+			FOREACH(const Sph& s, C.pack){
+				pack.push_back(Sph(s.c,s.r,ci.clumpId));
+			}
+			clumpInfos.push_back(ci);
 			nGen++;
 			//cerr<<"O";
 			break; // break away from the try-loop

@@ -27,6 +27,13 @@ class SpherePack{
 		Real xNorm=(x-x0)/(x1-x0);
 		return (xNorm-floor(xNorm))*(x1-x0);
 	}
+	Real periPtDistSq(const Vector3r& p1, const Vector3r& p2){
+		Vector3r dr;
+		for(int ax=0; ax<3; ax++) dr[ax]=min(cellWrapRel(p1[ax],p2[ax],p2[ax]+cellSize[ax]),cellWrapRel(p2[ax],p1[ax],p1[ax]+cellSize[ax]));
+		return dr.squaredNorm();
+	}
+	struct ClumpInfo{ int clumpId; Vector3r center; Real rad; int minId, maxId; };
+
 public:
 	enum {RDIST_RMEAN, RDIST_POROSITY, RDIST_PSD};
 	struct Sph{
