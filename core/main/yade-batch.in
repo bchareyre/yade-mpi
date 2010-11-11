@@ -76,7 +76,7 @@ finished: %s
 			ret+='<td>'
 			if info['stopAtIter']>0:
 				ret+='<nobr>%2.2f%% done</nobr><br/><nobr>step %d/%d</nobr>'%(info['iter']*100./info['stopAtIter'],info['iter'],info['stopAtIter'])
-				finishTime = str(time.ctime(time.time()+int(round(info['stopAtIter']/info['iter']/info['realtime']))))
+				finishTime = str(time.ctime(time.time()+int(round(info['stopAtIter']/(info['iter']/info['realtime'])))))
 				ret+='<br/><font size="1"><nobr>%s finishes</nobr></font><br/>'%finishTime
 			else: ret+='<nobr>step %d</nobr>'%(info['iter'])
 			if info['realtime']!=0: ret+='<br/><nobr>avg %g/sec</nobr>'%(info['iter']/info['realtime'])
