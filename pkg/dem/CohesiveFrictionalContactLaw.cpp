@@ -13,14 +13,14 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom_CohFrictPhys_CohesionMoment));
-CREATE_LOGGER(Law2_ScGeom_CohFrictPhys_CohesionMoment);
+YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom6D_CohFrictPhys_CohesionMoment));
+CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 
 Vector3r translation_vect_ ( 0.10,0,0 );
 
 void CohesiveFrictionalContactLaw::action()
 {
-	if(!functor) functor=shared_ptr<Law2_ScGeom_CohFrictPhys_CohesionMoment>(new Law2_ScGeom_CohFrictPhys_CohesionMoment);
+	if(!functor) functor=shared_ptr<Law2_ScGeom6D_CohFrictPhys_CohesionMoment>(new Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 	functor->always_use_moment_law = always_use_moment_law;
 	functor->shear_creep=shear_creep;
 	functor->twist_creep=twist_creep;
@@ -31,7 +31,7 @@ void CohesiveFrictionalContactLaw::action()
 		functor->go(I->geom, I->phys, I.get());}
 }
 
-void Law2_ScGeom_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
+void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
 	const Real& dt = scene->dt;
 	const int &id1 = contact->getId1();

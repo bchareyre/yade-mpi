@@ -30,9 +30,9 @@ class TestCohesiveChain(unittest.TestCase):
 			Bo1_ChainedCylinder_Aabb(),
 			Bo1_Sphere_Aabb()]),
 		InteractionLoop(
-			[Ig2_ChainedCylinder_ChainedCylinder_ScGeom(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
+			[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
 			[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True)],
-			[Law2_ScGeom_CohFrictPhys_CohesionMoment()]),
+			[Law2_ScGeom6D_CohFrictPhys_CohesionMoment()]),
 		## Apply gravity
 		GravityEngine(gravity=[0,-9.81,0]),
 		## Motion equation

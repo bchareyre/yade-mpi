@@ -5,11 +5,11 @@
 # Experiment beam-like behaviour with chained cylinders + CohFrict connexions
 
 from yade import utils
-young=1.0e6
-poisson=5
+young=1.0e5
+poisson=4
 density=2.60e3 
 frictionAngle=radians(30)
-O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,normalCohesion=1e13,shearCohesion=1e13,momentRotationLaw=True,label='mat'))
+O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,normalCohesion=1e13,shearCohesion=1e13,momentRotationLaw=False,label='mat'))
 O.dt=1e-4
 
 O.engines=[
@@ -19,9 +19,9 @@ O.engines=[
 		Bo1_Sphere_Aabb()
 	]),
 	InteractionLoop(
-		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
+		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
 		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True)],
-		[Law2_ScGeom_CohFrictPhys_CohesionMoment(label='law')]
+		[Law2_ScGeom6D_CohFrictPhys_CohesionMoment(label='law')]
 	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),

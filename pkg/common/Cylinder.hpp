@@ -106,7 +106,7 @@ class Ig2_Sphere_ChainedCylinder_CylScGeom: public IGeomFunctor{
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,ChainedCylinder);
 };
 
-class Ig2_ChainedCylinder_ChainedCylinder_ScGeom: public IGeomFunctor{
+class Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D: public IGeomFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
@@ -114,7 +114,7 @@ class Ig2_ChainedCylinder_ChainedCylinder_ScGeom: public IGeomFunctor{
 		void* getStaticFuncPtr(){ return (void*)&Ig2_Sphere_ChainedCylinder_CylScGeom::goStatic; }
 		static bool goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 	#endif
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_ChainedCylinder_ChainedCylinder_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing connexion between :yref:`chained cylinders<ChainedCylinder>`.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing connexion between :yref:`chained cylinders<ChainedCylinder>`.",
 		((Real,interactionDetectionFactor,1,,"Enlarge both radii by this factor (if >1), to permit creation of distant interactions."))
 	);
 	FUNCTOR2D(ChainedCylinder,ChainedCylinder);
@@ -213,7 +213,7 @@ REGISTER_SERIALIZABLE(ChainedCylinder);
 REGISTER_SERIALIZABLE(ChainedState);
 REGISTER_SERIALIZABLE(CylScGeom);
 REGISTER_SERIALIZABLE(Ig2_Sphere_ChainedCylinder_CylScGeom);
-REGISTER_SERIALIZABLE(Ig2_ChainedCylinder_ChainedCylinder_ScGeom);
+REGISTER_SERIALIZABLE(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D);
 #ifdef YADE_OPENGL
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
 REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);

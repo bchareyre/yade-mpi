@@ -23,7 +23,7 @@ class CohFrictPhys : public FrictPhys
 		((bool,fragile,true,,"do cohesion disapear when contact strength is exceeded?"))
 		((Real,kr,0,,"rotational stiffness [N.m/rad]"))
 		((Real,normalAdhesion,0,,"tensile strength"))
-		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`Law2_ScGeom_CohFrictPhys_CohesionMoment::always_use_moment_law`)"))
+		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::always_use_moment_law`)"))
 		((bool,momentRotationLaw,false,,"use bending/twisting moment at contacts. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
 		((Real,creep_viscosity,-1,,"creep viscosity [Pa.s/m]."))
 		// internal attributes
