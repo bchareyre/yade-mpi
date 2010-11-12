@@ -12,10 +12,12 @@ O.engines=[
 	PyRunner(iterPeriod=10,command='addPlotData()')
 ]
 O.trackEnergy=True
+O.step() # to have energy categories
 
-def addPlotData(): plot.addData(i=O.iter,**O.energy)
+def addPlotData():
+	plot.addData(i=O.iter,total=O.energy.total(),**O.energy)
 
-plot.plots={'i':('elastPotential','plastDissip')}
+plot.plots={'i':['total',]+O.energy.keys()}
 plot.plot(subPlots=True)
 
 O.dt=utils.PWaveTimeStep()

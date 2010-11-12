@@ -465,7 +465,7 @@ def relpath(pf,pt):
 if not env.GetOption('clean'):
 	# how to make that executed automatically??! For now, run always.
 	#env.AddPreAction(installAlias,installHeaders)
-	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep
+	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep,dirname
 	#installHeaders() # install to buildDir always
 	#if 0: # do not install headers
 	#	installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
@@ -476,18 +476,13 @@ if not env.GetOption('clean'):
 			shutil.rmtree(link)
 		if not exists(link):
 			if lexists(link): os.remove(link) # remove dangling symlink
+			d=os.path.dirname(link)
+			if not exists(d): os.makedirs(d)
 			os.symlink(relpath(link,target),link)
 
 	yadeInc=join(buildDir,'include/yade')
 	mkSymlink(yadeInc,'.')
-	#if not os.path.exists(yadeInc): os.makedirs(yadeInc)
 	import glob
-	# old compat paths
-	#for p in ['core','extra']+glob.glob('lib/*')+glob.glob('pkg/*')+glob.glob('gui'):
-	#	link=yadeInc+'/'+p.replace('/','-')
-	#	if os.path.isdir(p) and not os.path.exists(link):
-	#		if lexists(link): os.remove(link) # dangling symlink
-	#		os.symlink(relpath(link,p),link)
 	boostDir=buildDir+'/include/boost'
 	if not exists(boostDir): os.makedirs(boostDir)
 	if not env['haveForeach']:

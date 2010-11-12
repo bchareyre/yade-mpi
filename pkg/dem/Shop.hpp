@@ -51,13 +51,6 @@ class Shop{
 			ensureInit(); //cerr<<"Shop: Setting `"<<key<<"'="<<value<<" (type `"<<typeid(valType).name()<<"')."<<endl;
 			defaults[key]=boost::any(value);}
 
-		//! creates empty scene along with its parameters (bound etc.)
-		static shared_ptr<Scene> scene();
-		/*! creates engines and initilizers within given Scene: elastic contact law, with gravity, timestepper and damping.
-		 *
-		 * All parameters are take from Shop::defaults, which are user-settable.
-		 */
-		static void rootBodyActors(shared_ptr<Scene>);
 		//! create default sphere, along with its bound etc. 
 		static shared_ptr<Body> sphere(Vector3r center, Real radius, shared_ptr<Material> mat);
 		//! create default box with everything needed
@@ -101,6 +94,8 @@ class Shop{
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, Scene* _rb=NULL);
 		static Real kineticEnergy(Scene* _rb=NULL, Body::id_t* maxId=NULL);
+		static Real kineticEnergy_singleParticle(Scene* scene, const shared_ptr<Body>& b);
+
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 
 

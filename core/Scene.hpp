@@ -73,12 +73,12 @@ class Scene: public Serializable{
 		#endif
 		((bool,isPeriodic,false,Attr::readonly,"Whether periodic boundary conditions are active."))
 		((bool,trackEnergy,false,Attr::readonly,"Whether energies are being traced."))
-		((bool,needsInitializers,true,Attr::readonly,"Whether initializers will be run before the first step."))
+		((bool,runInternalConsistencyChecks,true,Attr::hidden,"Run internal consistency check, right before the very first simulation step."))
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 
 		((list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
 		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))
-		((vector<shared_ptr<Engine> >,initializers,,Attr::hidden,"Engines that will be run only once, before the first step."))
+		((vector<shared_ptr<Engine> >,_nextEngines,,Attr::hidden,"Engines to be used from the next step on; is returned transparently by O.engines if in the middle of the loop (controlled by subStep>=0)."))
 		((shared_ptr<BodyContainer>,bodies,new BodyContainer,Attr::hidden,"Bodies contained in the scene."))
 		((shared_ptr<InteractionContainer>,interactions,new InteractionContainer,Attr::hidden,"All interactions between bodies."))
 		((shared_ptr<EnergyTracker>,energy,new EnergyTracker,Attr::hidden,"Energy values, if energy tracking is enabled."))

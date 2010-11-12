@@ -14,6 +14,7 @@ class GravityEngine: public FieldApplier{
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GravityEngine,FieldApplier,"Engine applying constant acceleration to all bodies.",
 		((Vector3r,gravity,Vector3r::Zero(),,"Acceleration [kgms⁻²]"))
+		((int,gravPotIx,-1,(Attr::noSave|Attr::hidden),"Index for gravPot energy"))
 		,/*ctor*/,/*py*/
 	);
 };

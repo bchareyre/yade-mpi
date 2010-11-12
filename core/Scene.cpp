@@ -67,13 +67,19 @@ void Scene::postLoad(Scene&){
 
 
 void Scene::moveToNextTimeStep(){
-	if(needsInitializers){
+	if(runInternalConsistencyChecks){
+		runInternalConsistencyChecks=false;
 		checkStateTypes();
-		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(e->dead || !e->isActivated()) continue; e->action(); } 
-		forces.resize(bodies->size());
-		needsInitializers=false;
+		forces.resize(bodies->size()); // optimization, not necessary
+	}
+	// substepping or not, update engines from _nextEngines, if defined
+	if(!_nextEngines.empty() && subStep<0){
+		engines=_nextEngines;
+		_nextEngines.clear();
 	}
 	if(!subStepping && subStep<0){
+		/* set substep to 0 during the loop, so that engines/nextEngines handler know whether we are inside the loop currently */
+		subStep=0;
 		// ** 1. ** prologue
 		if(isPeriodic) cell->integrateAndUpdate(dt);
 		//forces.reset(); // uncomment if ForceResetter is removed
@@ -89,6 +95,7 @@ void Scene::moveToNextTimeStep(){
 		// ** 3. ** epilogue
 		iter++;
 		time+=dt;
+		subStep=-1;
 	} else {
 		/* IMPORTANT: take care to copy EXACTLY the same sequence as is in the block above !! */
 		if(TimingInfo::enabled){ TimingInfo::enabled=false; LOG_INFO("O.timingEnabled disabled, since O.subStepping is used."); }

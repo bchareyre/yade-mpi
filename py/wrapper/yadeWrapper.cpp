@@ -422,12 +422,17 @@ class pyOmega{
 		}
 	}
 
-	vector<shared_ptr<Engine> > engines_get(void){assertScene(); return OMEGA.getScene()->engines;}
-	void engines_set(const vector<shared_ptr<Engine> >& egs){assertScene(); OMEGA.getScene()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
-	vector<shared_ptr<Engine> > initializers_get(void){assertScene(); return OMEGA.getScene()->initializers;}
-	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertScene(); OMEGA.getScene()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getScene()->needsInitializers=true; }
+	vector<shared_ptr<Engine> > engines_get(void){assertScene(); Scene* scene=OMEGA.getScene().get(); return scene->_nextEngines.empty()?scene->engines:scene->_nextEngines;}
+	void engines_set(const vector<shared_ptr<Engine> >& egs){
+		assertScene(); Scene* scene=OMEGA.getScene().get();
+		if(scene->subStep<0) scene->engines=egs; // not inside the engine loop right now, ok to update directly
+		else scene->_nextEngines=egs; // inside the engine loop, update _nextEngines; O.engines picks that up automatically, and Scene::moveToNextTimestep will put them in place of engines at the start of the next loop
+		mapLabeledEntitiesToVariables();
+	}
+	// raw access to engines/_nextEngines, for debugging
+	vector<shared_ptr<Engine> > currEngines_get(){ return OMEGA.getScene()->engines; }
+	vector<shared_ptr<Engine> > nextEngines_get(){ return OMEGA.getScene()->_nextEngines; }
 
-	
 	pyBodyContainer bodies_get(void){assertScene(); return pyBodyContainer(OMEGA.getScene()->bodies); }
 	pyInteractionContainer interactions_get(void){assertScene(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
 	
@@ -518,7 +523,7 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
-		.add_property("subStep",&pyOmega::subStep,"Get the current subStep number (only meaningful if O.subStepping==True)")
+		.add_property("subStep",&pyOmega::subStep,"Get the current subStep number (only meaningful if O.subStepping==True); -1 when outside the loop, otherwise either 0 (O.subStepping==False) or number of engine to be run (O.subStepping==True)")
 		.add_property("subStepping",&pyOmega::subStepping_get,&pyOmega::subStepping_set,"Get/set whether subStepping is active.")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
 		.add_property("time",&pyOmega::time,"Return virtual (model world) time of the simulation.")
@@ -548,8 +553,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
 		.def("_sceneObj",&pyOmega::scene_get,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (Scene::engines).")
+		.add_property("_currEngines",&pyOmega::currEngines_get,"Currently running engines; debugging only!")
+		.add_property("_nextEngines",&pyOmega::nextEngines_get,"Engines for the next step, if different from the current ones, otherwise empty; debugging only!")
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (Scene::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
-		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (Scene::initializers).")
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")

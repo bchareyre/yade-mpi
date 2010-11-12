@@ -10,6 +10,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/dem/Clump.hpp>
 #include<yade/pkg/common/VelocityBins.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 #include<yade/lib/base/Math.hpp>
 		
 YADE_PLUGIN((NewtonIntegrator));
@@ -180,6 +181,7 @@ void NewtonIntegrator::action()
 				Clump::moveMembers(b,scene);
 			}
 			saveMaximaVelocity(scene,id,state);
+			// if(scene->trackEnergy && (b->isStandalone() || b->isClumpMember())) scene->energy->add(Shop::kineticEnergy_singleParticle(scene,b),"kin",kinEnergyIx,/*non-incremental*/true);
 
 			// process callbacks
 			for(size_t i=0; i<callbacksSize; i++){

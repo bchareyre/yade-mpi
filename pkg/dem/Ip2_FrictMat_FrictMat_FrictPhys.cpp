@@ -41,7 +41,7 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 	//same for shear stiffness
 	Real Ks = 2*Ea*Ra*Va*Eb*Rb*Vb/(Ea*Ra*Va+Eb*Rb*Va);
 	
-	contactPhysics->frictionAngle = frictAngle ? std::min(mat1->frictionAngle,mat2->frictionAngle) : (*frictAngle)(mat1->id,mat2->id,mat1->frictionAngle,mat2->frictionAngle);
+	contactPhysics->frictionAngle = (!frictAngle) ? std::min(mat1->frictionAngle,mat2->frictionAngle) : (*frictAngle)(mat1->id,mat2->id,mat1->frictionAngle,mat2->frictionAngle);
 	contactPhysics->tangensOfFrictionAngle = std::tan(contactPhysics->frictionAngle); 
 	contactPhysics->prevNormal = normal;
 	contactPhysics->kn = Kn;

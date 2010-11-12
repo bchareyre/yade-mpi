@@ -27,6 +27,7 @@ void GravityEngine::action(){
 		// skip clumps, only apply forces on their constituents
 		if(!b || b->isClump()) continue;
 		scene->forces.addForce(b->getId(),gravity*b->state->mass);
+		if(scene->trackEnergy) scene->energy->add(gravity.dot(b->state->pos)*b->state->mass,"gravPot",gravPotIx,/*reset at ever step*/true);
 	}
 }
 

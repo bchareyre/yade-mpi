@@ -414,9 +414,6 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& scene)
 	//	scene->engines.push_back(orientationIntegrator);
 	//scene->engines.push_back(triaxialstressController);
 	
-	scene->initializers.clear();
-	scene->initializers.push_back(boundDispatcher);
-	
 }
 
 

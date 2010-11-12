@@ -43,6 +43,7 @@ class EnergyTracker: public Serializable{
 		int id=-1; set(val,name,id);
 	}
 	void clear(){ energies.clear(); names.clear(); resetStep.clear();}
+	Real total(){ Real ret=0; size_t sz=energies.size(); for(size_t id=0; id<sz; id++) ret+=energies.get(id); return ret; }
 
 	py::list keys_py(){ py::list ret; FOREACH(pairStringInt p, names) ret.append(p.first); return ret; }
 	void resetResettables(){ size_t sz=energies.size(); for(size_t id=0; id<sz; id++){ if(resetStep[id]) energies.reset(id); } }
@@ -60,6 +61,7 @@ class EnergyTracker: public Serializable{
 			.def("__setitem__",&EnergyTracker::setItem_py,"Set energy value for given name (will create a non-resettable item, if it does not exist yet).")
 			.def("clear",&EnergyTracker::clear,"Clear all stored values.")
 			.def("keys",&EnergyTracker::keys_py,"Return defined energies.")
+			.def("total",&EnergyTracker::total,"Return sum of all energies.")
 	)
 };
 REGISTER_SERIALIZABLE(EnergyTracker);

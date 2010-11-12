@@ -15,8 +15,51 @@ from yade import *
 ## TODO tests
 class TestInteractions(unittest.TestCase): pass
 class TestForce(unittest.TestCase): pass
-class TestEngines(unittest.TestCase): pass 
 class TestTags(unittest.TestCase): pass 
+
+class TestEngines(unittest.TestCase):
+	def setUp(self): O.reset()
+	def testSubstepping(self):
+		'Engines: substepping'
+		O.engines=[ForceResetter(),PyRunner(initRun=True,iterPeriod=1,command='pass'),GravityEngine()]
+		# value outside the loop
+		self.assert_(O.subStep==-1)
+		# O.subStep is meaningful when substepping
+		O.subStepping=True
+		O.step(); self.assert_(O.subStep==0)
+		O.step(); self.assert_(O.subStep==1)
+		# when substepping is turned off in the middle of the loop, the next step finishes the loop
+		O.subStepping=False
+		O.step(); self.assert_(O.subStep==-1)
+		print 'substep is',O.subStep
+		# subStep==0 inside the loop without substepping
+		O.engines=[PyRunner(initRun=True,iterPeriod=1,command='if O.subStep!=0: raise RuntimeError("O.subStep!=0 inside the loop with O.subStepping==False!")')]
+		O.step()
+	def testEnginesModificationInsideLoop(self):
+		'Engines: can be modified inside the loop transparently.'
+		O.engines=[
+			PyRunner(initRun=True,iterPeriod=1,command='from yade import *; O.engines=[ForceResetter(),GravityEngine(),NewtonIntegrator()]'), # change engines here
+			ForceResetter() # useless engine
+		]
+		O.subStepping=True
+		# run prologue and the first engine, which modifies O.engines
+		O.step(); O.step(); self.assert_(O.subStep==1)
+		self.assert_(len(O.engines)==3) # gives modified engine sequence transparently
+		self.assert_(len(O._nextEngines)==3)
+		self.assert_(len(O._currEngines)==2)
+		O.step(); O.step(); # run the 2nd ForceResetter, and epilogue
+		self.assert_(O.subStep==-1)
+		# start the next step, nextEngines should replace engines automatically
+		O.step()
+		self.assert_(O.subStep==0)
+		self.assert_(len(O._nextEngines)==0)
+		self.assert_(len(O.engines)==3)
+		self.assert_(len(O._currEngines)==3)
+	def testDead(self):
+		'Engines: dead engines are not run'
+		O.engines=[PyRunner(dead=True,initRun=True,iterPeriod=1,command='pass')]
+		O.step(); self.assert_(O.engines[0].nDone==0)
+
 
 class TestIO(unittest.TestCase):
 	def testSaveAllClasses(self):
@@ -33,7 +76,6 @@ class TestIO(unittest.TestCase):
 				failed.add(c)
 		failed=list(failed); failed.sort()
 		self.assert_(len(failed)==0,'Failed classes were: '+' '.join(failed))
-
 
 
 class TestCell(unittest.TestCase):

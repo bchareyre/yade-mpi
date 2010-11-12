@@ -180,31 +180,34 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	return (useMaxForce?maxF:meanF)/(sumF);
 }
 
+Real Shop::kineticEnergy_singleParticle(Scene* scene,const shared_ptr<Body>& b){
+	const State* state(b->state.get());
+	// ½(mv²+ωIω)
+	Real E=0;
+	if(scene->isPeriodic){
+		/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
+		E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos,state->vel).squaredNorm();
+	} else {
+		E=.5*(state->mass*state->vel.squaredNorm());
+	}
+	if(b->isAspherical()){
+		Matrix3r T(state->ori);
+		// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
+		// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
+		Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
+		E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
+	}
+	else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
+	return E;
+}
+
 Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 	Scene* scene=_scene ? _scene : Omega::instance().getScene().get();
 	Real ret=0.;
 	Real maxE=0; if(maxId) *maxId=Body::ID_NONE;
-	const bool isPeriodic=scene->isPeriodic;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->isDynamic()) continue;
-		const State* state(b->state.get());
-		// ½(mv²+ωIω)
-		Vector3r vel=b->state->vel;
-		if(isPeriodic){
-			/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
-			vel=scene->cell->bodyFluctuationVel(state->pos,vel);
-			// create function in Cell that will compute velocity compensations etc for us
-			// since it might be used in more places than just here (code audit needed)
-		}
-		Real E=.5*(state->mass*vel.squaredNorm());
-		if(b->isAspherical()){
-			Matrix3r T(state->ori);
-			// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
-			// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
-			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
-			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
-		}
-		else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
+		Real E=Shop::kineticEnergy_singleParticle(scene,b);
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}
@@ -259,64 +262,6 @@ void Shop::init(){
 	setDefault("param_pythonInitExpr",string("print 'Hello world!'"));
 	setDefault("param_pythonRunExpr",string(""));
 
-}
-
-/*! Create root body. */
-shared_ptr<Scene> Shop::scene(){
-	return shared_ptr<Scene>(new Scene);
-}
-
-
-/*! Assign default set of actors (initializers and engines) to an existing Scene.
- */
-void Shop::rootBodyActors(shared_ptr<Scene> scene){
-	// initializers	
-	scene->initializers.clear();
-
-	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new Bo1_Sphere_Aabb);
-	boundDispatcher->add(new Bo1_Box_Aabb);
-	boundDispatcher->add(new Bo1_Tetra_Aabb);
-	scene->initializers.push_back(boundDispatcher);
-
-	//engines
-	scene->engines.clear();
-
-	if(getDefault<int>("param_timeStepUpdateInterval")>0){
-		shared_ptr<GlobalStiffnessTimeStepper> sdecTimeStepper(new GlobalStiffnessTimeStepper);
-		sdecTimeStepper->timeStepUpdateInterval=getDefault<int>("param_timeStepUpdateInterval");
-		sdecTimeStepper->timeStepUpdateInterval=300;
-		scene->engines.push_back(sdecTimeStepper);
-	}
-
-	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
-
-	scene->engines.push_back(boundDispatcher);
-
-	scene->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
-
-	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
-	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
-	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
-	interactionGeometryDispatcher->add(new Ig2_Tetra_Tetra_TTetraGeom);
-	scene->engines.push_back(interactionGeometryDispatcher);
-
-	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
-	interactionPhysicsDispatcher->add(new Ip2_FrictMat_FrictMat_FrictPhys);
-	scene->engines.push_back(interactionPhysicsDispatcher);
-		
-	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
-	scene->engines.push_back(constitutiveLaw);
-
-	if(getDefault<Vector3r>("param_gravity")!=Vector3r(0,0,0)){
-		shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
-		gravityCondition->gravity=getDefault<Vector3r>("param_gravity");
-		scene->engines.push_back(gravityCondition);
-	}
-	
-	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
-	newton->damping=max(getDefault<double>("param_damping"),0.);
-	scene->engines.push_back(newton);
 }
 
 
