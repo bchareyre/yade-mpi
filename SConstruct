@@ -39,28 +39,6 @@ if len(ver)>2: sconsVersion+=float(ver[2])
 #
 
 ##########################################################################################
-########## PROXY TO NEWER SCONS (DOWNLOADED IF NEEDED) ###################################
-##########################################################################################
-#print sconsVersion
-if sconsVersion<9806.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
-	# sconsVersion<10200.0 
-	# tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-1.2.0.d20090223.tar.gz","/scons-local-1.2.0.d20090223")
-	tgzParams=("http://heanet.dl.sourceforge.net/sourceforge/scons/scons-local-1.0.0.tar.gz","/scons-local-1.0.0")
-	newPrefix="./scons-local";
-	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]
-	if not os.path.exists(newDir):
-		print "Scons version too old, downloading new version. All subsequent calls will be proxied to the new version transparently."
-		import urllib,tarfile
-		(filename,headers)=urllib.urlretrieve(newUrl)
-		print filename,"\n",headers
-		tar=tarfile.open(filename, "r:gz")
-		for tarinfo in tar: tar.extract(tarinfo,newPrefix)
-		print "Done extracting scons to",newDir
-		assert(os.path.exists(newDir))
-	if os.path.exists(newDir):
-		Exit(os.execv(newPrefix+"/scons.py",[newPrefix+'/scons.py']+sys.argv[1:]))
-
-##########################################################################################
 ############# OPTIONS ####################################################################
 ##########################################################################################
 
@@ -233,25 +211,6 @@ if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' i
 
 # ensure non-None
 env.Append(CPPPATH='',LIBPATH='',LIBS='',CXXFLAGS='',SHCCFLAGS='')
-
-if 0:
-	def CheckQt(context, qtdirs):
-		"Attempts to localize qt3 installation in given qtdirs. Sets necessary variables if found and returns True; otherwise returns False."
-		# make sure they exist and save them for restoring if a test fails
-		origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH']}
-		qtdirs=qtdirs[0].split()
-		for qtdir in qtdirs:
-			context.Message( 'Checking for qt-mt in '+qtdir+'... ' )
-			context.env['QTDIR']=qtdir
-			context.env.Append(LIBS='qt-mt',LIBPATH=qtdir+'/lib',CPPPATH=qtdir+'/include' )
-			ret=context.TryLink('#include<qapplication.h>\nint main(int argc, char **argv){QApplication qapp(argc, argv);return 0;}\n','.cpp')
-			context.Result(ret)
-			if not ret:
-				for k in origs.keys(): context.env[k]=origs[k]
-			else:
-				return ret
-		return False
-
 
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
