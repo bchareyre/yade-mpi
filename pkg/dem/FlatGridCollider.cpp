@@ -1,10 +1,10 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz> 
-#include<yade/pkg-dem/FlatGridCollider.hpp>
+#include<yade/pkg/dem/FlatGridCollider.hpp>
 #include<yade/core/Scene.hpp>
 
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/NewtonIntegrator.hpp>
-//#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/dem/NewtonIntegrator.hpp>
+//#include<yade/pkg/common/Facet.hpp>
 
 YADE_PLUGIN((FlatGridCollider));
 CREATE_LOGGER(FlatGridCollider);

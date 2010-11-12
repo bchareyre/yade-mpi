@@ -7,7 +7,7 @@
 *************************************************************************/
 #pragma once
 
-#include <yade/pkg-common/Collider.hpp>
+#include <yade/pkg/common/Collider.hpp>
 #include <yade/core/InteractionContainer.hpp>
 #include <vector>
 

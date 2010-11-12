@@ -8,7 +8,7 @@
 
 
 
-#include<yade/pkg-dem/KinemCNSEngine.hpp>
+#include<yade/pkg/dem/KinemCNSEngine.hpp>
 
 
 YADE_PLUGIN((KinemCNSEngine));

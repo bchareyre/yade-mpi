@@ -9,11 +9,11 @@
 
 #include "FlowEngine.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Wall.hpp>
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Wall.hpp>
+#include<yade/pkg/common/Box.hpp>
 
 #include <sys/stat.h>
 #include <sys/types.h>

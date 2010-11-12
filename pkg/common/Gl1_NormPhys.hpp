@@ -1,8 +1,8 @@
 #pragma once
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/lib-opengl/GLUtils.hpp>
-#include<yade/pkg-common/GLDrawFunctors.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include<yade/lib/opengl/GLUtils.hpp>
+#include<yade/pkg/common/GLDrawFunctors.hpp>
 #include<GL/glu.h>
 
 

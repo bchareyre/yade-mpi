@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Timing.hpp>
-#include<yade/lib-base/Logging.hpp>
+#include<yade/lib/base/Logging.hpp>
 #include<stdexcept>
 
 #include<boost/foreach.hpp>

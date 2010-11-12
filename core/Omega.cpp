@@ -12,9 +12,9 @@
 #include"Scene.hpp"
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
-#include<yade/lib-base/Math.hpp>
-#include<yade/lib-multimethods/FunctorWrapper.hpp>
-#include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/lib/multimethods/FunctorWrapper.hpp>
+#include<yade/lib/multimethods/Indexable.hpp>
 #include<cstdlib>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
@@ -24,7 +24,7 @@
 #include<boost/version.hpp>
 #include<boost/python.hpp>
 
-#include<yade/lib-serialization/ObjectIO.hpp>
+#include<yade/lib/serialization/ObjectIO.hpp>
 
 
 #include<cxxabi.h>

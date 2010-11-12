@@ -1,11 +1,11 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/pkg-dem/SpherePack.hpp>
+#include<yade/pkg/dem/SpherePack.hpp>
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>

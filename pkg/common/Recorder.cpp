@@ -1,5 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
-#include<yade/pkg-common/Recorder.hpp>
+#include<yade/pkg/common/Recorder.hpp>
 YADE_PLUGIN((Recorder));
 
 Recorder::~Recorder(){}

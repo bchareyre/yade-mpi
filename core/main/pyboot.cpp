@@ -1,5 +1,5 @@
 #include<yade/core/Omega.hpp>
-#include<yade/lib-base/Logging.hpp>
+#include<yade/lib/base/Logging.hpp>
 
 #include<signal.h>
 #include<cstdlib>

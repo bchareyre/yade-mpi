@@ -4,8 +4,8 @@
 
 #include"ForceEngine.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/LinearInterpolate.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/common/LinearInterpolate.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 #include<yade/core/IGeom.hpp>
 #include<yade/core/IPhys.hpp>

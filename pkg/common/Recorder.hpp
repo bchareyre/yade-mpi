@@ -1,6 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
-#include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
 #include<fstream>
 #include<string>
 class Recorder: public PeriodicEngine{

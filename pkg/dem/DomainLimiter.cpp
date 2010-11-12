@@ -1,5 +1,5 @@
-#include<yade/pkg-dem/DomainLimiter.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/DomainLimiter.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 YADE_PLUGIN((DomainLimiter)(LawTester)
 	#ifdef YADE_OPENGL
@@ -20,12 +20,12 @@ void DomainLimiter::action(){
 	}
 }
 
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/L3Geom.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-common/LinearInterpolate.hpp>
-#include<yade/lib-pyutil/gil.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/L3Geom.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/common/LinearInterpolate.hpp>
+#include<yade/lib/pyutil/gil.hpp>
 
 CREATE_LOGGER(LawTester);
 
@@ -206,10 +206,10 @@ void LawTester::action(){
 }
 
 #ifdef YADE_OPENGL
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/lib-opengl/GLUtils.hpp>
-#include<yade/pkg-common/GLDrawFunctors.hpp>
-#include<yade/pkg-common/OpenGLRenderer.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include<yade/lib/opengl/GLUtils.hpp>
+#include<yade/pkg/common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/OpenGLRenderer.hpp>
 #include<GL/glu.h>
 
 CREATE_LOGGER(GlExtra_LawTester);

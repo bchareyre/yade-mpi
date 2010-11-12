@@ -1,6 +1,6 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/pkg-common/MatchMaker.hpp>
+#include<yade/pkg/common/MatchMaker.hpp>
 #include<boost/foreach.hpp>
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH

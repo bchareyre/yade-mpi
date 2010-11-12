@@ -30,11 +30,11 @@
 #include<string>
 #include<vector>
 #include<iostream>
-#include<yade/lib-factory/Factorable.hpp>
-#include<yade/lib-pyutil/raw_constructor.hpp>
-#include<yade/lib-pyutil/doc_opts.hpp>
+#include<yade/lib/factory/Factorable.hpp>
+#include<yade/lib/pyutil/raw_constructor.hpp>
+#include<yade/lib/pyutil/doc_opts.hpp>
 
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 using namespace boost;
 using namespace std;

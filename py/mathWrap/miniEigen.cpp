@@ -7,8 +7,8 @@
 #include<sstream>
 #include<iostream>
 
-#include<yade/lib-base/Math.hpp>
-#include<yade/lib-pyutil/doc_opts.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/lib/pyutil/doc_opts.hpp>
 
 
 namespace bp=boost::python;

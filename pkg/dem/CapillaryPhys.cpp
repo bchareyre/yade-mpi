@@ -1,4 +1,4 @@
-#include <yade/pkg-dem/CapillaryPhys.hpp>
+#include <yade/pkg/dem/CapillaryPhys.hpp>
 
 CapillaryPhys::~CapillaryPhys()
 {

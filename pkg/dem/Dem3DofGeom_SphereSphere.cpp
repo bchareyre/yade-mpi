@@ -1,6 +1,6 @@
 #include "Dem3DofGeom_SphereSphere.hpp"
 
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include<yade/core/Omega.hpp>
 YADE_PLUGIN((Dem3DofGeom_SphereSphere)
 	#ifdef YADE_OPENGL
@@ -110,8 +110,8 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 
 
 #ifdef YADE_OPENGL
-	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	#include<yade/lib-opengl/GLUtils.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/GLUtils.hpp>
 	bool Gl1_Dem3DofGeom_SphereSphere::normal=false;
 	bool Gl1_Dem3DofGeom_SphereSphere::rolledPoints=false;
 	bool Gl1_Dem3DofGeom_SphereSphere::unrolledPoints=false;

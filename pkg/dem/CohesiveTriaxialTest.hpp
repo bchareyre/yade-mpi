@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/FileGenerator.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 class TriaxialStressController;
 class TriaxialCompressionEngine;

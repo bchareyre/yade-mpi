@@ -1,7 +1,7 @@
 #include<boost/python.hpp>
 #include<string>
-#include<yade/lib-base/Logging.hpp>
-#include<yade/lib-pyutil/doc_opts.hpp>
+#include<yade/lib/base/Logging.hpp>
+#include<yade/lib/pyutil/doc_opts.hpp>
 using namespace boost;
 enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 

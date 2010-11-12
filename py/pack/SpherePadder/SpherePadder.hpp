@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/Math.hpp>
-#include<yade/pkg-dem/SpherePack.hpp>
+#include<yade/lib/base/Logging.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/pkg/dem/SpherePack.hpp>
 
 #include "TetraMesh.hpp"
 #include "CellPartition.hpp"

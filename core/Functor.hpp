@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-multimethods/FunctorWrapper.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
+#include<yade/lib/multimethods/FunctorWrapper.hpp>
 
 class TimingDeltas;
 class Scene;

@@ -13,7 +13,7 @@
 #include<yade/core/Engine.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/lib-multimethods/DynLibDispatcher.hpp>
+#include<yade/lib/multimethods/DynLibDispatcher.hpp>
 
 #include<boost/preprocessor/cat.hpp>
 

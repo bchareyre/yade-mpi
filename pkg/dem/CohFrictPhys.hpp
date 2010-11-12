@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 
 class CohFrictPhys : public FrictPhys
 {

@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-common/BoundaryController.hpp>
+#include<yade/pkg/common/BoundaryController.hpp>
 #include<yade/core/Body.hpp>
 
 

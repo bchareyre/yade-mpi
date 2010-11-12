@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 
 #include<boost/foreach.hpp>
 #ifndef FOREACH

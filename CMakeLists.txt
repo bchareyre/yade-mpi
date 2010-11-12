@@ -1,0 +1,26 @@
+project(Yade C CXX)
+cmake_minimum_required(VERSION 2.8)
+
+include(FindPythonLibs)
+include(FindPythonInterp)
+include(FindOpenMP)
+include(FindOpenGL)
+include(FindQt4)
+include(FindBoost)
+include(FindVTK)
+include(FeatureSummary)
+
+find_package(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization)
+find_package(Qt4 COMPONENTS QtCore QtGgui QtOpenGL)
+find_package(VTK COMPONENTS Common REQUIRED) 
+
+find_path(GTS_INCLUDE_DIR gts.h)
+find_library(GTS gts)
+
+FOREACH(FEAT "OPENMP" "OPENGL" "VTK" "LOG4CXX" "GTS" "CGAL")
+	if(DEFINED "${FEAT}")
+		set("YADE_${FEAT}")
+	endif()
+ENDFOREACH()
+PRINT_ENABLED_FEATURES()
+PRINT_DISABLED_FEATURES()

@@ -1,5 +1,5 @@
 #pragma once
-#include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
 
 // multiblock features don't seem to exist prioor to 5.2 
 #if (VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=2) || (VTK_MAJOR_VERSION > 5)

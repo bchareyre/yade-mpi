@@ -9,7 +9,7 @@
 #pragma once
 
 
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 
 #include<loki/Typelist.h>
 #include<loki/Functor.h>

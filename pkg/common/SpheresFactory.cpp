@@ -8,11 +8,11 @@
 
 #include<boost/random.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/Aabb.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/lib-pyutil/gil.hpp>
+#include<yade/pkg/common/Aabb.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/dem/BodyMacroParameters.hpp>
+#include<yade/lib/pyutil/gil.hpp>
 #include"SpheresFactory.hpp"
 #include<sstream>
 

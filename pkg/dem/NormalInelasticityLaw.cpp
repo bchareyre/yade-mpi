@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg-dem/NormalInelasticityLaw.hpp>
+#include<yade/pkg/dem/NormalInelasticityLaw.hpp>
 
-#include<yade/pkg-dem/NormalInelasticMat.hpp>
+#include<yade/pkg/dem/NormalInelasticMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

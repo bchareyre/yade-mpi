@@ -1,6 +1,6 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
-#include<yade/pkg-common/Wall.hpp>
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Wall.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 #include<limits>
 
 YADE_PLUGIN((Wall)(Bo1_Wall_Aabb)
@@ -23,7 +23,7 @@ void Bo1_Wall_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const
 
 
 #ifdef YADE_OPENGL
-	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
 	int  Gl1_Wall::div=20;
 
 	void Gl1_Wall::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& pp, bool, const GLViewInfo& glinfo){   

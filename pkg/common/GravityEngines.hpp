@@ -1,7 +1,7 @@
 // 2004 © Janek Kozicki <cosurgi@berlios.de>
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #pragma once
-#include<yade/pkg-common/FieldApplier.hpp>
+#include<yade/pkg/common/FieldApplier.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Body.hpp>
 #ifdef YADE_OPENMP

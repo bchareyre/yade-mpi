@@ -9,7 +9,7 @@
 #pragma once
 
 #include <yade/core/PartialEngine.hpp>
-#include <yade/lib-base/Math.hpp>
+#include <yade/lib/base/Math.hpp>
 
 class Law2_ScGeom_CapillaryPhys_Capillarity;
 

@@ -3,7 +3,7 @@
 
 #include"CohesionlessMomentRotation.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 
 /* Contact law have been verified with Plassiard et al. (2009) : A spherical discrete element model: calibration procedure and incremental response */

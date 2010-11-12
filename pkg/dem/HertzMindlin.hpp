@@ -9,18 +9,18 @@ Mindlin is a set of classes to include the Hertz-Mindlin formulation for the con
 
 #pragma once
 
-#include<yade/pkg-dem/FrictPhys.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-common/MatchMaker.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/common/MatchMaker.hpp>
 
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
-#include<yade/lib-base/openmp-accu.hpp>
+#include<yade/lib/base/openmp-accu.hpp>
 
 
 /******************** MindlinPhys *********************************/

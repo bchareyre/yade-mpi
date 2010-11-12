@@ -9,8 +9,8 @@
 
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/lib-base/Math.hpp>
-#include<yade/pkg-common/Callbacks.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/pkg/common/Callbacks.hpp>
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-dem/KinemSimpleShearBox.hpp>
+#include<yade/pkg/dem/KinemSimpleShearBox.hpp>
 
 
 

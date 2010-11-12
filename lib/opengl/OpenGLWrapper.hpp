@@ -12,7 +12,7 @@
 #error "This build doesn't support openGL. Therefore, this header must not be used."
 #endif
 
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 
 // disable temporarily

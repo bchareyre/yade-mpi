@@ -8,11 +8,11 @@
 #pragma once
 
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
-#include<yade/lib-base/openmp-accu.hpp>
+#include<yade/lib/base/openmp-accu.hpp>
 
 class Law2_ScGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:

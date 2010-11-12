@@ -11,7 +11,7 @@
 #include"GLViewer.hpp"
 #include"OpenGLManager.hpp"
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Interaction.hpp>
@@ -23,7 +23,7 @@
 #include<sstream>
 #include<iomanip>
 #include<boost/algorithm/string/case_conv.hpp>
-#include<yade/lib-serialization/ObjectIO.hpp>
+#include<yade/lib/serialization/ObjectIO.hpp>
 
 #include<QtGui/qevent.h>
 

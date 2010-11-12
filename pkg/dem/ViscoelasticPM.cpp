@@ -1,7 +1,7 @@
 // 2009 © Sergei Dorofeenko <sega@users.berlios.de>
 #include"ViscoelasticPM.hpp"
 #include<yade/core/State.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

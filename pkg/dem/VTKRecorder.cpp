@@ -22,11 +22,11 @@
 #pragma GCC diagnostic warning "-Wdeprecated"
 
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-dem/ConcretePM.hpp>
-#include<yade/pkg-dem/RockPM.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/dem/ConcretePM.hpp>
+#include<yade/pkg/dem/RockPM.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 
 YADE_PLUGIN((VTKRecorder));

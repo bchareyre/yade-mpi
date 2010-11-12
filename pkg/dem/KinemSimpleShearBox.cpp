@@ -6,11 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg-dem/KinemSimpleShearBox.hpp>
+#include<yade/pkg/dem/KinemSimpleShearBox.hpp>
 
 #include<yade/core/State.hpp>
-#include<yade/pkg-dem/FrictPhys.hpp>
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/common/Box.hpp>
 
 YADE_PLUGIN((KinemSimpleShearBox))
 

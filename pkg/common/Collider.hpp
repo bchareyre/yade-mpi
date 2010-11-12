@@ -12,7 +12,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/GlobalEngine.hpp>
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 class Collider: public GlobalEngine {
 	public:

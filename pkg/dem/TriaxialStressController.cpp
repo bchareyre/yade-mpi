@@ -7,10 +7,10 @@
 *************************************************************************/
  
 #include"TriaxialStressController.hpp"
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Box.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/core/State.hpp>
 #include<assert.h>
 #include<yade/core/Scene.hpp>

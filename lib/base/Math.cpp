@@ -1,4 +1,4 @@
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 template<> const Real Math<Real>::EPSILON = DBL_EPSILON;
 template<> const Real Math<Real>::ZERO_TOLERANCE = 1e-20;
 template<> const Real Math<Real>::MAX_REAL = DBL_MAX;

@@ -7,12 +7,12 @@
 *************************************************************************/
 
 #include"Ig2_Facet_Sphere_ScGeom.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-common/Wall.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/common/Wall.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 
 YADE_PLUGIN((Ig2_Facet_Sphere_ScGeom)(Ig2_Wall_Sphere_ScGeom));
 

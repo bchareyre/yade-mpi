@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include "Gl1_Box.hpp"
-#include<yade/pkg-common/Box.hpp>
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/pkg/common/Box.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
 
 void Gl1_Box::go(const shared_ptr<Shape>& cg, const shared_ptr<State>&,bool wire,const GLViewInfo&)
 {

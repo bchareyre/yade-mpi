@@ -1,4 +1,4 @@
-#include<yade/pkg-common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/GLDrawFunctors.hpp>
 YADE_PLUGIN(
 (GlBoundFunctor)(GlShapeFunctor)(GlIGeomFunctor)(GlIPhysFunctor)(GlStateFunctor)
 (GlBoundDispatcher)(GlShapeDispatcher)(GlIGeomDispatcher)(GlIPhysDispatcher)(GlStateDispatcher)

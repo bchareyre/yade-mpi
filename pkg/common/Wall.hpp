@@ -1,7 +1,7 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/Shape.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 
 /*! Object representing infinite plane aligned with the coordinate system (axis-aligned wall). */
@@ -27,7 +27,7 @@ class Bo1_Wall_Aabb: public BoundFunctor{
 };
 REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 #ifdef YADE_OPENGL
-	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
 	class Gl1_Wall: public GlShapeFunctor{	
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);

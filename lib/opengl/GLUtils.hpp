@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
 #include<boost/lexical_cast.hpp>
 #include<sstream>
 #include<iomanip>

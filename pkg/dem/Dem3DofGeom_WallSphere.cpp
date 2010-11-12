@@ -1,7 +1,7 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
-#include<yade/pkg-dem/Dem3DofGeom_WallSphere.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Wall.hpp>
+#include<yade/pkg/dem/Dem3DofGeom_WallSphere.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Wall.hpp>
 YADE_PLUGIN((Dem3DofGeom_WallSphere)
 	#ifdef YADE_OPENGL
 		(Gl1_Dem3DofGeom_WallSphere)
@@ -83,8 +83,8 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 }
 #ifdef YADE_OPENGL
 
-	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	#include<yade/lib-opengl/GLUtils.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/GLUtils.hpp>
 
 	bool Gl1_Dem3DofGeom_WallSphere::normal=false;
 	bool Gl1_Dem3DofGeom_WallSphere::rolledPoints=false;

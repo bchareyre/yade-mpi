@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg-common/Callbacks.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Callbacks.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 class InteractionLoop: public GlobalEngine {
 	bool alreadyWarnedNoCollider;

@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
+#include<yade/lib/triangulation/KinematicLocalisationAnalyser.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 #include <string>

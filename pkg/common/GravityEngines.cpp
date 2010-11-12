@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/pkg/common/GravityEngines.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/core/Scene.hpp>
 #include<boost/regex.hpp>
 //#include<stdio.h>

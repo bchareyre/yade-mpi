@@ -10,7 +10,7 @@
 
 #include "Omega.hpp"
 
-#include<yade/lib-factory/Factorable.hpp>
+#include<yade/lib/factory/Factorable.hpp>
 
 class FrontEnd : public Factorable
 {	

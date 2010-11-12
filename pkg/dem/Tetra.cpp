@@ -16,9 +16,9 @@ TTetraGeom::~TTetraGeom(){}
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/State.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 void Bo1_Tetra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 	Tetra* t=static_cast<Tetra*>(ig.get());
@@ -412,7 +412,7 @@ void TetraVolumetricLaw::action()
 }
 
 #ifdef YADE_OPENGL
-	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
 	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3r(cm->color[0],cm->color[1],cm->color[2]));

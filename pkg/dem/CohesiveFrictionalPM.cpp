@@ -2,7 +2,7 @@
 
 #include"CohesiveFrictionalPM.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 
 YADE_PLUGIN((CFpmMat)(CFpmState)(CFpmPhys)(Ip2_CFpmMat_CFpmMat_CFpmPhys)(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM));

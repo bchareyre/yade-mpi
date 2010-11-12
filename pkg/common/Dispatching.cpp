@@ -1,5 +1,5 @@
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/VelocityBins.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/VelocityBins.hpp>
 
 
 YADE_PLUGIN((BoundFunctor)(IGeomFunctor)(IPhysFunctor)(LawFunctor)(BoundDispatcher)(IGeomDispatcher)(IPhysDispatcher)(LawDispatcher));

@@ -2,8 +2,8 @@
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/lib-pyutil/gil.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<yade/lib/pyutil/gil.hpp>
 
 class PyRunner: public PeriodicEngine {
 	public :

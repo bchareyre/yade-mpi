@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg-common/Collider.hpp>
+#include<yade/pkg/common/Collider.hpp>
 
 YADE_PLUGIN((Collider));
 

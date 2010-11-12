@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 
 
 class NormalInelasticityPhys : public FrictPhys

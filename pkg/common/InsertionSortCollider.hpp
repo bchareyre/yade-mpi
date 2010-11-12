@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
 #pragma once
-#include<yade/pkg-common/Collider.hpp>
+#include<yade/pkg/common/Collider.hpp>
 #include<yade/core/Scene.hpp>
 class InteractionContainer;
 

@@ -1,10 +1,10 @@
 // CWBoon@2009  booncw@hotmail.com //
 
 #pragma once
-#include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 

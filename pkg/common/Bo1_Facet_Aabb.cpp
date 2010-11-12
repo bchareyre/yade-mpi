@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#include <yade/pkg-common/Facet.hpp>
-#include "Bo1_Facet_Aabb.hpp"
-#include <yade/pkg-common/Aabb.hpp>
+#include <yade/pkg/common/Facet.hpp>
+#include <yade/pkg/common/Bo1_Facet_Aabb.hpp>
+#include <yade/pkg/common/Aabb.hpp>
 
 void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 				, shared_ptr<Bound>& bv

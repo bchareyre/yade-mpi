@@ -5,7 +5,7 @@
 
 #include<yade/core/Scene.hpp>
 #include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 YADE_PLUGIN((UniaxialStrainer));
 /************************ UniaxialStrainer **********************/

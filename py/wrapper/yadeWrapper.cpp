@@ -24,28 +24,28 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/version.hpp>
 
-#include<yade/lib-base/Logging.hpp>
-#include<yade/lib-pyutil/gil.hpp>
-#include<yade/lib-pyutil/raw_constructor.hpp>
-#include<yade/lib-pyutil/doc_opts.hpp>
+#include<yade/lib/base/Logging.hpp>
+#include<yade/lib/pyutil/gil.hpp>
+#include<yade/lib/pyutil/raw_constructor.hpp>
+#include<yade/lib/pyutil/doc_opts.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/ThreadRunner.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/EnergyTracker.hpp>
 
-#include<yade/pkg-dem/STLImporter.hpp>
+#include<yade/pkg/dem/STLImporter.hpp>
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Functor.hpp>
-#include<yade/pkg-common/ParallelEngine.hpp>
-#include<yade/pkg-common/Collider.hpp>
+#include<yade/pkg/common/ParallelEngine.hpp>
+#include<yade/pkg/common/Collider.hpp>
 
-#include<yade/pkg-common/InteractionLoop.hpp>
+#include<yade/pkg/common/InteractionLoop.hpp>
 
-// #include<yade/pkg-dem/Shop.hpp>
-#include<yade/pkg-dem/Clump.hpp>
+// #include<yade/pkg/dem/Shop.hpp>
+#include<yade/pkg/dem/Clump.hpp>
 
 // local copy
 #include<boost/math/nonfinite_num_facets.hpp>
@@ -56,7 +56,7 @@
 using namespace boost;
 using namespace std;
 
-#include<yade/lib-serialization/ObjectIO.hpp>
+#include<yade/lib/serialization/ObjectIO.hpp>
 
 #include<yade/extra/boost_python_len.hpp>
 

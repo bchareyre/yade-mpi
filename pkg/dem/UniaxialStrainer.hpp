@@ -3,8 +3,8 @@
 #include<fstream>
 #include<limits>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-dem/Shop.hpp>
-#include<yade/pkg-common/BoundaryController.hpp>
+#include<yade/pkg/dem/Shop.hpp>
+#include<yade/pkg/common/BoundaryController.hpp>
 
 #ifndef FOREACH
 #define FOREACH BOOST_FOREACH

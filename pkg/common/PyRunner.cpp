@@ -1,2 +1,2 @@
-#include<yade/pkg-common/PyRunner.hpp>
+#include<yade/pkg/common/PyRunner.hpp>
 YADE_PLUGIN((PyRunner));

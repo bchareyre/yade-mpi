@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include"Ip2_FrictMat_FrictMat_CapillaryPhys.hpp"
-#include<yade/pkg-dem/ScGeom.hpp>
-#include <yade/pkg-dem/CapillaryPhys.hpp>
-#include<yade/pkg-dem/FrictPhys.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include <yade/pkg/dem/CapillaryPhys.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

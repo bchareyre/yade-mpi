@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #pragma once
-#include <yade/pkg-common/Recorder.hpp>
+#include <yade/pkg/common/Recorder.hpp>
 
 #include <string>
 #include <fstream>

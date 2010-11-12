@@ -9,7 +9,7 @@
 #pragma once
 
 
-#include<yade/pkg-common/ElastMat.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 
 
 class NormalInelasticMat : public FrictMat

@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Gl1_Facet.hpp"
-#include <yade/pkg-common/Facet.hpp>
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/pkg/common/Gl1_Facet.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
 
 bool Gl1_Facet::normals=false;
 

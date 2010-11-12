@@ -15,7 +15,7 @@
 #define YADE_GROUP_RELATION_DATA
 
 
-#include<yade/lib-serialization/Serializable.hpp>
+#include<yade/lib/serialization/Serializable.hpp>
 
 #include <iostream>
 #include <sstream>

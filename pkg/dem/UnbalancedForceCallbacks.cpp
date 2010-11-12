@@ -1,5 +1,5 @@
-#include<yade/pkg-dem/UnbalancedForceCallbacks.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg/dem/UnbalancedForceCallbacks.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>

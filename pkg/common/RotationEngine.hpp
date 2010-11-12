@@ -3,7 +3,7 @@
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
-#include<yade/lib-base/Math.hpp>
+#include<yade/lib/base/Math.hpp>
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif

@@ -1,7 +1,7 @@
 #pragma once
-#include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 // for static roll/unroll functions in Dem3DofGeom_SphereSphere
-#include<yade/pkg-dem/Dem3DofGeom_SphereSphere.hpp>
+#include<yade/pkg/dem/Dem3DofGeom_SphereSphere.hpp>
 
 class Dem3DofGeom_WallSphere: public Dem3DofGeom{
 
@@ -35,7 +35,7 @@ class Dem3DofGeom_WallSphere: public Dem3DofGeom{
 REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 
 #ifdef YADE_OPENGL
-	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
 	class Gl1_Dem3DofGeom_WallSphere:public GlIGeomFunctor{
 		public:
 			virtual void go(const shared_ptr<IGeom>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
@@ -51,7 +51,7 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_WallSphere);
 #endif
 
-#include<yade/pkg-common/Dispatching.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 class Ig2_Wall_Sphere_Dem3DofGeom:public IGeomFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);

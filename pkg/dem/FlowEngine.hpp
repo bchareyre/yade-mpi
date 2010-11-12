@@ -9,8 +9,8 @@
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
-#include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
-#include<yade/lib-triangulation/FlowBoundingSphere.h>
+#include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
+#include<yade/lib/triangulation/FlowBoundingSphere.h>
 
 
 

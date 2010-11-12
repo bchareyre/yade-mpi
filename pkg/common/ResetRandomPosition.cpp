@@ -12,11 +12,11 @@
 
 #include<boost/random.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/Aabb.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-common/InteractionLoop.hpp>
-//#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg/common/Aabb.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/common/InteractionLoop.hpp>
+//#include<yade/pkg/dem/BodyMacroParameters.hpp>
 #include"ResetRandomPosition.hpp"
 #include<sstream>
 

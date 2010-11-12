@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include"Gl1_Aabb.hpp"
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/pkg-common/Aabb.hpp>
+#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
 
 void Gl1_Aabb::go(const shared_ptr<Bound>& bv, Scene* scene){

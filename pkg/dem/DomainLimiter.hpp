@@ -1,5 +1,5 @@
 
-#include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/core/PartialEngine.hpp>
 
 class DomainLimiter: public PeriodicEngine{
@@ -59,7 +59,7 @@ class LawTester: public PartialEngine{
 REGISTER_SERIALIZABLE(LawTester);
 
 #ifdef YADE_OPENGL
-#include<yade/pkg-common/OpenGLRenderer.hpp>
+#include<yade/pkg/common/OpenGLRenderer.hpp>
 
 class GlExtra_LawTester: public GlExtraDrawer{
 	public:

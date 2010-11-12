@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <yade/pkg-common/Recorder.hpp>
+#include <yade/pkg/common/Recorder.hpp>
 
 /*! \brief Record the stress-strain state of a sample in simulations using TriaxialCompressionEngine
 

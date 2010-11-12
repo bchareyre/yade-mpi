@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include "CohesiveFrictionalContactLaw.hpp"
-#include<yade/pkg-dem/CohFrictMat.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/CohFrictPhys.hpp>
+#include<yade/pkg/dem/CohFrictMat.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/CohFrictPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

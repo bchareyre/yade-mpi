@@ -1,12 +1,12 @@
 
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
-#include<yade/pkg-dem/PeriIsoCompressor.hpp>
-#include<yade/pkg-dem/Shop.hpp>
+#include<yade/pkg/dem/PeriIsoCompressor.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/NormShearPhys.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/lib-pyutil/gil.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/lib/pyutil/gil.hpp>
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <yade/pkg-common/Recorder.hpp>
+#include <yade/pkg/common/Recorder.hpp>
 #include <yade/core/Scene.hpp>
 
 class ForceRecorder: public Recorder {

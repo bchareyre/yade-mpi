@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/NormalInelasticityPhys.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 

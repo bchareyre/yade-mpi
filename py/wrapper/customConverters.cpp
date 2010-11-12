@@ -11,7 +11,7 @@
 #endif
 
 #if 0
-	#include<yade/lib-pyutil/numpy.hpp>
+	#include<yade/lib/pyutil/numpy.hpp>
 #endif
 
 #include<boost/python.hpp>
@@ -28,19 +28,19 @@
 #include<iostream>
 #include<map>
 
-#include<yade/lib-base/Math.hpp>
-#include<yade/lib-base/openmp-accu.hpp>
+#include<yade/lib/base/Math.hpp>
+#include<yade/lib/base/openmp-accu.hpp>
 
 #include<yade/core/Engine.hpp>
 
-#include<yade/pkg-common/Dispatching.hpp>
-#include<yade/pkg-common/Callbacks.hpp>
-#include<yade/pkg-dem/SpherePack.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/Callbacks.hpp>
+#include<yade/pkg/dem/SpherePack.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	#include<yade/pkg-common/OpenGLRenderer.hpp>
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
+	#include<yade/pkg/common/OpenGLRenderer.hpp>
 #endif
-#include<yade/pkg-common/MatchMaker.hpp>
+#include<yade/pkg/common/MatchMaker.hpp>
 
 
 
