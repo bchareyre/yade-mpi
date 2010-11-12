@@ -11,7 +11,7 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
-#include <yade/lib-triangulation/Timer.h>
+#include <yade/lib/triangulation/Timer.h>
 
 YADE_PLUGIN((TesselationWrapper));
 YADE_REQUIRE_FEATURE(CGAL)
@@ -118,7 +118,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 
 
 // is this a joke?? #include<limits> std::numeric_limits<double>::infinity();
-//__attribute__((unused)) static double inf = 1e10; 
+//__attribute__((unused)) static double inf = 1e10;
 double pminx=0;
 double pminy=0;
 double pminz=0;
@@ -348,7 +348,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  			//if(!b) continue;
  			const Body::id_t id = V_it->info().id();
  			Real sphereVol = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
- 			vol[id]=V_it->info().v();			
+ 			vol[id]=V_it->info().v();
  			poro[id]=(V_it->info().v() - sphereVol)/V_it->info().v();
 			if (deformation) MATRIX3R_TO_NUMPY(mma.analyser->ParticleDeformation[id],def[id]);
  			//cerr << V_it->info().v()<<" "<<ParticleDeformation[id]<<endl;
@@ -356,6 +356,6 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		python::dict ret;
  		ret["vol"]=vol;
  		ret["poro"]=poro;
- 		if (deformation) ret["def"]=def;		
+ 		if (deformation) ret["def"]=def;
  		return ret;
 }

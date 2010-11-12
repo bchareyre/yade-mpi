@@ -90,6 +90,7 @@ void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool is
 	if (isNew) {
 		initRotations(rbp1,rbp2);
 	} else {
+		rbp1.ori.normalize(); rbp2.ori.normalize(); initialOrientation2.normalize(); initialOrientation1.normalize();
 		Quaternionr delta((rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate())));
 		if (creep) delta = delta * twistCreep;
 		AngleAxisr aa(delta); // axis of rotation - this is the Moment direction UNIT vector; // angle represents the power of resistant ELASTIC moment

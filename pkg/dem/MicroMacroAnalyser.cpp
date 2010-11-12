@@ -15,7 +15,7 @@
 #include <yade/pkg/common/Sphere.hpp>
 #include<yade/lib/triangulation/KinematicLocalisationAnalyser.hpp>
 #include<yade/lib/triangulation/TriaxialState.h>
-#include <yade/lib-triangulation/Tenseur3.h>
+#include <yade/lib/triangulation/Tenseur3.h>
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
@@ -104,7 +104,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	else if (state==2) ts = analyser->TS1;
 	else LOG_ERROR("state must be 1 or 2, instead of " << state);
 	CGT::TriaxialState& TS = *ts;
-	
+
 	TS.reset();
 	long Ng = bodies->size();
 	TS.mean_radius=0;
@@ -143,7 +143,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	TS.mean_radius /= Ng;//rayon moyen
 	LOG_INFO(" loaded : " << Ng << " grains with mean radius = " << TS.mean_radius);
 	if (fictiousVtx.size()>=6){//boxes found, simulate them with big spheres
-		CGT::Point& Pmin = TS.box.base; CGT::Point& Pmax = TS.box.sommet; 
+		CGT::Point& Pmin = TS.box.base; CGT::Point& Pmax = TS.box.sommet;
 		Real FAR = 1e4;
 		TS.grains[fictiousVtx[0]].sphere = CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.x()-Pmin.x()));
 		TS.grains[fictiousVtx[1]].sphere = CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.x()-Pmin.x()));
@@ -200,7 +200,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}
 		}
 		if (!triaxialCompressionEngine) LOG_ERROR("stress controller engine not found");}
-	
+
 	if (triaxialCompressionEngine) {
 		TS.wszzh = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
 		TS.wsxxd = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0];

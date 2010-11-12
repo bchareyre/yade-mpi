@@ -14,15 +14,15 @@
 
 #include <boost/static_assert.hpp>
 
-#include<yade/lib-base/Math.hpp> // typedef for Real
+#include<yade/lib/base/Math.hpp> // typedef for Real
 
 //#define FLOW_ENGINE
 
 namespace CGT{
 //Robust kernel
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-//A bit faster, but gives crash eventualy 
-// typedef CGAL::Cartesian<double> K;
+// typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+//A bit faster, but gives crash eventualy
+typedef CGAL::Cartesian<double> K;
 
 typedef CGAL::Regular_triangulation_euclidean_traits_3<K>   				Traits;
 typedef K::Point_3									Point;
@@ -55,7 +55,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
  	Real VolumeVariation;
 	double pression; //stockage d'une valeur de pression pour chaque cellule
 	Vecteur Average_Cell_Velocity; //average velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
-	
+
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
 	// Reflects the geometrical property of the cell, so that the force by cell fluid on grain "i" is pressure*unitForceVectors[i]
@@ -81,7 +81,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		isInside = false;
 		inv_sum_k=0;
 		isFictious=false; Pcondition = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
-	}	
+	}
 	double inv_sum_k;
 	bool isInside;
 	bool isInferior;
@@ -109,12 +109,12 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	inline Real& dv (void) {return VolumeVariation;}
 	inline int& fictious (void) {return fict;}
 	inline double& p (void) {return pression;}
-	
+
 	inline std::vector<double>& k_norm (void) {return module_permeability;}
 	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
 	inline std::vector<Vecteur>& force (void) {return cell_force;}
 	inline std::vector<double>& Rh (void) {return RayHydr;}
-	
+
 	inline Vecteur& av_vel (void) {return Average_Cell_Velocity;}
 // 	inline vector<Vecteur>& F (void) {return vec_forces;}
 // 	inline vector<double>& Q (void) {return flow_rate;}
@@ -150,7 +150,7 @@ public:
 	inline Real& f (void) {return s;}
 	inline Real& v (void) {return vol;}
 	inline const unsigned int& id (void) const {return i;}
-	
+
 #ifdef FLOW_ENGINE
 	Vecteur forces;
 	inline Vecteur& force (void) {return forces;}
@@ -166,7 +166,7 @@ public:
 //	Vecteur u; //... et son d�placement
 //} Info;
 //
-//Point& operator(info ) 
+//Point& operator(info )
 
 
 
