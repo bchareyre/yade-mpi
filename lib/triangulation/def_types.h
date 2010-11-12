@@ -20,9 +20,9 @@
 
 namespace CGT{
 //Robust kernel
-// typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 //A bit faster, but gives crash eventualy
-typedef CGAL::Cartesian<double> K;
+// typedef CGAL::Cartesian<double> K;
 
 typedef CGAL::Regular_triangulation_euclidean_traits_3<K>   				Traits;
 typedef K::Point_3									Point;
