@@ -239,7 +239,9 @@ void PeriTriaxController::action()
 	}
  	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
 	//Update energy input
-	externalWork+=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->Hsize.determinant();
+	Real dW=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->Hsize.determinant();
+	externalWork+=dW;
+	if(scene->trackEnergy) scene->energy->add(dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
 	prevGrow = strainRate;
 	
 	if(allOk){

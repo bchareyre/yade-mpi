@@ -89,6 +89,8 @@ void NewtonIntegrator::action()
 	}
 	assert(callbackPtrs.size()==callbacks.size());
 	size_t callbacksSize=callbacks.size();
+	const bool trackEnergy(scene->trackEnergy);
+	const bool isPeriodic(scene->isPeriodic);
 
 
 	#ifdef YADE_OPENMP
@@ -109,44 +111,58 @@ void NewtonIntegrator::action()
 				saveMaximaVelocity(scene,id,state);
 				continue;
 			}
+			const Vector3r& f=scene->forces.getForce(id);
+			const Vector3r& m=scene->forces.getTorque(id);
+			#ifdef YADE_DEBUG
+				if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
+				if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
+			#endif
+			// fluctuation velocity does not contain meanfield velocity in periodic boundaries
+			// in aperiodic boundaries, it is equal to absolute velocity
+			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel):state->vel;
+
+			// track energy -- numerical damping and kinetic energy
+			if(trackEnergy){
+				assert(b->isStandalone() || b->isClumpMember());
+				// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
+				if(damping!=0.){
+					scene->energy->add(fluctVel.cwise().abs().dot(f.cwise().abs())*damping*dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
+					// no damping for rotation of aspherical particles (corresponds to the code below)
+					if(!b->isAspherical()) scene->energy->add(state->angVel.cwise().abs().dot(m.cwise().abs())*damping*dt,"nonviscDamp",nonviscDampIx,false);
+				}
+				// kinetic energy
+				Real Ek=.5*state->mass*fluctVel.squaredNorm();
+				// rotational terms
+				if(b->isAspherical()){
+					Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
+					Matrix3r T(state->ori);
+					Ek+=.5*b->state->angVel.transpose().dot((T.transpose()*mI*T)*b->state->angVel);
+				} else { Ek+=state->angVel.dot(state->inertia.cwise()*state->angVel); }
+				scene->energy->add(Ek,"kinetic",kinEnergyIx,/*non-incremental*/true);
+			}
 
 			if (b->isStandalone()){
 				// translate equation
-				const Vector3r& f=scene->forces.getForce(id); 
-				#ifdef YADE_DEBUG
-					if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
-				#endif
 				state->accel=f/state->mass; 
-				if (!scene->isPeriodic || homoDeform==Cell::HOMO_NONE)
-					cundallDamp(dt,f,state->vel,state->accel);
-				else {//Apply damping on velocity fluctuations only rather than true velocity meanfield+fluctuation.
-					Vector3r velFluctuation(state->vel-prevVelGrad*state->pos);
-					cundallDamp(dt,f,velFluctuation,state->accel);}
+				cundallDamp(dt,f,fluctVel,state->accel);
 				leapfrogTranslate(scene,state,id,dt);
-
 				// rotate equation
-				const Vector3r& m=scene->forces.getTorque(id); 
-				#ifdef YADE_DEBUG
-					if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
-				#endif
 				// exactAsphericalRot is disabled or the body is spherical
 				if (!exactAsphericalRot || !b->isAspherical()){
 					state->angAccel=m.cwise()/state->inertia;
 					cundallDamp(dt,m,state->angVel,state->angAccel);
 					leapfrogSphericalRotate(scene,state,id,dt);
 				} else { // exactAsphericalRot enabled & aspherical body
-					const Vector3r& m=scene->forces.getTorque(id); 
+					// no damping in this case
 					leapfrogAsphericalRotate(scene,state,id,dt,m);
 				}
 			} else if (b->isClump()){
 				// reset acceleration of the clump itself; computed from accels on constituents
 				state->accel=state->angAccel=Vector3r::Zero();
 				// clump mass forces
-				const Vector3r& f=scene->forces.getForce(id);
 				Vector3r dLinAccel=f/state->mass;
-				cundallDamp(dt,f,state->vel,dLinAccel);
+				cundallDamp(dt,f,fluctVel,dLinAccel);
 				state->accel+=dLinAccel;
-				const Vector3r& m=scene->forces.getTorque(id);
 				Vector3r M(m);
 				// sum force on clump memebrs
 				// exactAsphericalRot enabled and clump is aspherical
@@ -181,7 +197,6 @@ void NewtonIntegrator::action()
 				Clump::moveMembers(b,scene);
 			}
 			saveMaximaVelocity(scene,id,state);
-			// if(scene->trackEnergy && (b->isStandalone() || b->isClumpMember())) scene->energy->add(Shop::kineticEnergy_singleParticle(scene,b),"kin",kinEnergyIx,/*non-incremental*/true);
 
 			// process callbacks
 			for(size_t i=0; i<callbacksSize; i++){

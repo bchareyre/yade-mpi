@@ -15,6 +15,8 @@
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravityEngine));
 
 void GravityEngine::action(){
+	const bool trackEnergy(scene->trackEnergy);
+	const Real dt(scene->dt);
 	#ifdef YADE_OPENMP
 		const BodyContainer& bodies=*(scene->bodies.get());
 		const long size=(long)bodies.size();
@@ -27,7 +29,8 @@ void GravityEngine::action(){
 		// skip clumps, only apply forces on their constituents
 		if(!b || b->isClump()) continue;
 		scene->forces.addForce(b->getId(),gravity*b->state->mass);
-		if(scene->trackEnergy) scene->energy->add(gravity.dot(b->state->pos)*b->state->mass,"gravPot",gravPotIx,/*reset at ever step*/true);
+		// work done by gravity is "negative", since the energy appears in the system from outside
+		if(trackEnergy) scene->energy->add(-gravity.dot(b->state->vel)*b->state->mass*dt,"gravWork",fieldWorkIx,/*non-incremental*/false);
 	}
 }
 

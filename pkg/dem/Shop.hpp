@@ -94,7 +94,6 @@ class Shop{
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, Scene* _rb=NULL);
 		static Real kineticEnergy(Scene* _rb=NULL, Body::id_t* maxId=NULL);
-		static Real kineticEnergy_singleParticle(Scene* scene, const shared_ptr<Body>& b);
 
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 

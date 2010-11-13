@@ -180,34 +180,29 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	return (useMaxForce?maxF:meanF)/(sumF);
 }
 
-Real Shop::kineticEnergy_singleParticle(Scene* scene,const shared_ptr<Body>& b){
-	const State* state(b->state.get());
-	// ½(mv²+ωIω)
-	Real E=0;
-	if(scene->isPeriodic){
-		/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
-		E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos,state->vel).squaredNorm();
-	} else {
-		E=.5*(state->mass*state->vel.squaredNorm());
-	}
-	if(b->isAspherical()){
-		Matrix3r T(state->ori);
-		// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
-		// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
-		Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
-		E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
-	}
-	else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
-	return E;
-}
-
 Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 	Scene* scene=_scene ? _scene : Omega::instance().getScene().get();
 	Real ret=0.;
 	Real maxE=0; if(maxId) *maxId=Body::ID_NONE;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->isDynamic()) continue;
-		Real E=Shop::kineticEnergy_singleParticle(scene,b);
+		const State* state(b->state.get());
+		// ½(mv²+ωIω)
+		Real E=0;
+		if(scene->isPeriodic){
+			/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
+			E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos,state->vel).squaredNorm();
+		} else {
+			E=.5*(state->mass*state->vel.squaredNorm());
+		}
+		if(b->isAspherical()){
+			Matrix3r T(state->ori);
+			// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
+			// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
+			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
+			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
+		}
+		else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}

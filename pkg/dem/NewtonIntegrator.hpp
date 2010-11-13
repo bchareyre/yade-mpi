@@ -51,11 +51,11 @@ class NewtonIntegrator : public GlobalEngine{
 		((Real,maxVelocitySq,NaN,,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulation from [Allen1989]_, pg. 89."))
 		((int,homotheticCellResize,-1,Attr::hidden,"[This attribute is deprecated, use Cell::homoDeform instead.]"))
-		// Enable velocity updates insuring that all bodies move homogeneously while the periodic cell deforms. 0: No update, 1: Reflect on each body the changes in macroscopic velocity field :yref:`Cell::velGrad`, using Δv_i=Δ(grad(v_macro))*x_i. 2: Emulate the Cundall-style equation Δx_i=(grad(v_macro))*x_i, by adding a convective term in the velocity update."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track acceleration. |yupdate|"))
 		((vector<shared_ptr<BodyCallback> >,callbacks,,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
 		((Vector3r,prevCellSize,Vector3r(NaN,NaN,NaN),Attr::hidden,"cell size from previous step, used to detect change and find max velocity"))
 		((bool,warnNoForceReset,true,,"Warn when forces were not resetted in this step by :yref:`ForceResetter`; this mostly points to :yref:`ForceResetter` being forgotten incidentally and should be disabled only with a good reason."))
+		((int,nonviscDampIx,-1,(Attr::hidden|Attr::noSave),"Index of the energy dissipated using the non-viscous damping (:yref:`damping<NewtonIntegrator.damping>`)."))
 		((int,kinEnergyIx,-1,(Attr::hidden|Attr::noSave),"Index for kinetic energy in scene->energies."))
 		,
 		/*ctor*/

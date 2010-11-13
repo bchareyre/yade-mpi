@@ -68,6 +68,7 @@ class PeriTriaxController: public BoundaryController{
 		((Vector3r,prevGrow,Vector3r::Zero(),,"previous cell grow"))
 		((Real,mass,NaN,,"mass of the cell (user set)"))
 		((Real,externalWork,0,,"Work input from boundary controller."))
+		((int,velGradWorkIx,-1,(Attr::hidden|Attr::noSave),"Index for work done by velocity gradient, if tracking energy"))
 	);
 	DECLARE_LOGGER;
 };
