@@ -66,24 +66,25 @@ TriaxialTest::~TriaxialTest () {}
 bool TriaxialTest::generate(string& message)
 {
 	message="";
-	
+
 	if(biaxial2dTest && (8.0*(upperCorner[2]-lowerCorner[2]))>(upperCorner[0]-lowerCorner[0]))
 	{
 		message="Biaxial test can be generated only if Z size is more than 8 times smaller than X size";
 		return false;
 	}
 	if(facetWalls&&wallWalls){ LOG_WARN("Turning TriaxialTest::facetWalls off, since wallWalls were selected as well."); }
-	
+
 	shared_ptr<Body> body;
 
-	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size;
+	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size and porosity;
 	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
 	 */
-	Real porosity=.8;
+	Real porosity=.75;
 	SpherePack sphere_pack;
 	if(importFilename==""){
 		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.x()*dimensions.y()*dimensions.z();
-		if(radiusMean<=0) radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
+		long num;
+		if(radiusMean<=0) num=sphere_pack.makeCloud(lowerCorner,upperCorner,-1,radiusStdDev,numberOfGrains,porosity);
 		else {
 			bool fixedDims[3];
 			fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
@@ -93,11 +94,12 @@ bool TriaxialTest::generate(string& message)
 			LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling "<<nScaled<<" dimensions by "<<boxScaleFactor);
 			dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;
 			upperCorner=lowerCorner+dimensions;
+			num=sphere_pack.makeCloud(lowerCorner,upperCorner,radiusMean,radiusStdDev,numberOfGrains);
 		}
-		long num=sphere_pack.makeCloud(lowerCorner,upperCorner,radiusMean,radiusStdDev,numberOfGrains);
+
 		message+="Generated a sample with " + lexical_cast<string>(num) + " spheres inside box of dimensions: ("
-			+ lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + "," 
-			+ lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + "," 
+			+ lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + ","
+			+ lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + ","
 			+ lexical_cast<string>(upperCorner[2]-lowerCorner[2]) + ").";}
 	else {
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
@@ -120,14 +122,14 @@ bool TriaxialTest::generate(string& message)
 	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 							thickness/2.0,
 	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	
+
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			}
-		//forcerec->id = body->getId();	
+		//forcerec->id = body->getId();
 	// top box
 	 	center			= Vector3r(	(lowerCorner[0]+upperCorner[0])/2,
 	 						upperCorner[1]+thickness/2.0,
@@ -165,7 +167,7 @@ bool TriaxialTest::generate(string& message)
 	 						thickness/2.0,
 	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	 	
+
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
 			scene->bodies->insert(body);
@@ -186,7 +188,7 @@ bool TriaxialTest::generate(string& message)
 			scene->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
 			//triaxialStateRecorder->wall_back_id = body->getId();
-			}	
+			}
 	// box 4
 	 	center			= Vector3r(
 	 						(lowerCorner[0]+upperCorner[0])/2,
@@ -225,8 +227,8 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
-	
-	body->setDynamic(dynamic);	
+
+	body->setDynamic(dynamic);
 	body->state->mass		= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	body->state->inertia		= Vector3r( 	2.0/5.0*body->state->mass*radius*radius,
 							2.0/5.0*body->state->mass*radius*radius,
@@ -289,7 +291,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 
 void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
-	
+
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	if(!facetWalls && !wallWalls){
 		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
@@ -304,16 +306,16 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	shared_ptr<IPhysFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(ss);
-	
-		
+
+
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
-	
+
 
 	globalStiffnessTimeStepper=shared_ptr<GlobalStiffnessTimeStepper>(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
-	
+
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
@@ -334,7 +336,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	triaxialcompressionEngine->Key = Key;
 	triaxialcompressionEngine->noFiles=noFiles;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
-	triaxialcompressionEngine->fixedPoroCompaction = false;	
+	triaxialcompressionEngine->fixedPoroCompaction = false;
 	triaxialcompressionEngine->fixedPorosity=1;
 	// recording global stress
 	if(recordIntervalIter>0 && !noFiles){
@@ -342,7 +344,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 		triaxialStateRecorder-> file 		= WallStressRecordFile + Key;
 		triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 	}
-	#if 0	
+	#if 0
 	// moving walls to regulate the stress applied, but no loading
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
@@ -351,9 +353,9 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	triaxialstressController-> max_vel = 0.0001;
 	triaxialstressController-> thickness = thickness;
 	triaxialstressController->wall_bottom_activated = false;
-	triaxialstressController->wall_top_activated = false;	
+	triaxialstressController->wall_top_activated = false;
 		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	#endif	
+	#endif
 	scene->engines.clear();
 	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
@@ -380,7 +382,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	scene->engines.push_back(globalStiffnessTimeStepper);
 	scene->engines.push_back(triaxialcompressionEngine);
 	if(recordIntervalIter>0 && !noFiles) scene->engines.push_back(triaxialStateRecorder);
-	
+
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
 	scene->engines.push_back(newton);
