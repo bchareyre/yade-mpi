@@ -149,6 +149,8 @@ _deprecated={
 	'SpiralEngine':'HelixEngine', # Sat Oct 30 05:52:06 2010, vaclav@flux
 	'InterpolatingSpiralEngine':'InterpolatingHelixEngine', # Sat Oct 30 05:52:21 2010, vaclav@flux
 	'SpiralInteractionLocator2d':'HelixInteractionLocator2d', # Sat Oct 30 05:53:04 2010, vaclav@flux
+	'Law2_ScGeom_CohFrictPhys_CohesionMoment':'Law2_ScGeom6D_CohFrictPhys_CohesionMoment', # Fri Nov 12 18:45:23 2010, bchareyre@dt-rv020
+	'Ig2_ChainedCylinder_ChainedCylinder_ScGeom':'Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D', # Fri Nov 12 18:47:44 2010, bchareyre@dt-rv020
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
