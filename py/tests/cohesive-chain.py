@@ -2,7 +2,7 @@
 # 2010 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 
 '''
-Motion of a "sinusoidal" beam made of cylinders
+Motion of a "sinusoidal" beam made of cylinders. The test checks the position and velocity of the free end of the bending beam subjected to gravitational load. It is similar to scripts/test/chained-cylinder-spring.py but with less elements. positions and velocity are compared during the transient oscillations, only positions are compared for the larger time since residual velocity is compiler-dependent (see https://lists.launchpad.net/yade-dev/msg06178.html).
 '''
 
 import unittest
@@ -58,4 +58,6 @@ class TestCohesiveChain(unittest.TestCase):
 		v2=O.bodies[0].state.vel[1];p2=O.bodies[0].state.pos[1]
 		#print v2,p2
 		self.assertTrue(abs(tv1-v1)<abs(tolerance*tv1) and abs(tp1-p1)<abs(tolerance*tp1))
-		self.assertTrue(abs(tv2-v2)<abs(tolerance*tv2) and abs(tp2-p2)<abs(tolerance*tp2))
+		self.assertTrue(abs(tp2-p2)<abs(tolerance*tp2))
+		#self.assertTrue(abs(tv2-v2)<abs(tolerance*tv2) and abs(tp2-p2)<abs(tolerance*tp2)) #velocity comparison disabled, see comment above
+		
