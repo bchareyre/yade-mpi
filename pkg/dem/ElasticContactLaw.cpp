@@ -80,7 +80,8 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
 			//define the plastic work input and increment the total plastic energy dissipated
 			shearForce *= ratio;
-			scene->energy->add(((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/,"plastDissip",plastDissipIx,/*reset*/false);
+			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
 		}
 		// compute elastic energy as well
 		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);

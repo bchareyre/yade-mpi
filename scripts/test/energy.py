@@ -9,7 +9,7 @@ O.bodies.append(utils.wall(position=0,axis=2))
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
-	InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),
+	InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys(frictAngle=0)],[Law2_ScGeom_FrictPhys_CundallStrack()]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=0.),
 	PyRunner(iterPeriod=10,command='addPlotData()'),
@@ -29,7 +29,7 @@ O.trackEnergy=True
 #
 # (unfortunately even if we were changing plot.plots periodically,
 # plots would not pick up changes in plot.plots during live plotting)
-O.run(200,True)  
+O.run(400,True)  
 plot.plots={'i':['total',]+O.energy.keys()}
 plot.plot(subPlots=True)
 

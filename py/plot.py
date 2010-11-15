@@ -278,6 +278,25 @@ def plot(noShow=False,subPlots=False):
 		else: return figs
 
 def saveDataTxt(fileName,vars=None):
+	"""Save plot data into a (optionally compressed) text file. The first line contains a comment (starting with ``#``) giving variable name for each of the columns. This format is suitable for being loaded for further processing (outside yade) with ``numpy.genfromtxt`` function, which recognizes those variable names (creating numpy array with named entries) and handles decompression transparently.
+
+	>>> from yade import plot
+	>>> plot.reset()
+	>>> plot.addData(a=1,b=11,c=21,d=31)  # add some data here
+	>>> plot.addData(a=2,b=12,c=22,d=32)
+	>>> plot.data=={'a':[1,2],'b':[11,12],'c':[21,22],'d':[31, 32]} # cannot check output directly, since dict ordering is random and doctest would fail
+	True
+	>>> plot.saveDataTxt('/tmp/dataFile.txt.bz2',vars=('a','b','c'))
+	>>> import numpy
+	>>> d=numpy.genfromtxt('/tmp/dataFile.txt.bz2',dtype=None,names=True)
+	>>> d['a']
+	array([1, 2])
+	>>> d['b']
+	array([11, 12])
+
+	:param fileName: file to save data to; if it ends with ``.bz2`` / ``.gz``, the file will be compressed using bzip2 / gzip. 
+	:param vars: Sequence (tuple/list/set) of variable names to be saved. If ``None`` (default), all variables in :yref:`yade.plot.plot` are saved.
+	"""
 	import bz2,gzip
 	if not vars:
 		vars=data.keys(); vars.sort()
