@@ -182,7 +182,7 @@ def createPlots(subPlots=False):
 			currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 		# create the legend
 		l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
-		l.draggable(True)
+		if hasattr(l,'draggable'): l.draggable(True)
 		pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y1])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
 		pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
 		if scientific: pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
@@ -202,7 +202,7 @@ def createPlots(subPlots=False):
 				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 			# legend
 			l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
-			l.draggable(True)
+			if hasattr(l,'draggable'): l.draggable(True)
 			pylab.rcParams['lines.color']=origLinesColor
 			pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y2])) if p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2] else xylabels[p][2])
 			## should be repeated for y2 axis, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, it seems)
