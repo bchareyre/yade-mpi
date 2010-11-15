@@ -282,9 +282,9 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 		SpherePack c2(*c); 
 		c2.translate(c2.midPt()); //recenter
 		clumps.push_back(c2);
-		Real rSq=0;
-		FOREACH(const Sph& s, c2.pack) rSq=max(rSq,s.c.squaredNorm()+pow(s.r,2));
-		boundRad.push_back(sqrt(rSq));
+		Real r=0;
+		FOREACH(const Sph& s, c2.pack) r=max(r,s.c.norm()+s.r);
+		boundRad.push_back(r);
 		Vector3r cMn,cMx; c2.aabb(cMn,cMx); // centered at zero now, this gives margin
 		//margins.push_back(periodic?cMx:Vector3r::Zero()); 
 		//boxMargins=boxMargins.cwise().max(cMx);

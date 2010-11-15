@@ -1,8 +1,10 @@
 from yade import pack,plot
 
-# bunch of balls, with an infinite plane just underneath
 sp=pack.SpherePack();
-sp.makeCloud((0,0,0),(1,1,1),.05,.5);
+# bunch of balls, with an infinite plane just underneath
+if 0: sp.makeCloud((0,0,0),(1,1,1),.05,.5);
+# use clumps of 2 spheres instead, to have rotation without friction 
+else: sp.makeClumpCloud((0,0,0),(1,1,1),[pack.SpherePack([((0,0,0),.05),((0,0,.08),.02)])],periodic=False)
 sp.toSimulation()
 O.bodies.append(utils.wall(position=0,axis=2))
 
@@ -21,6 +23,7 @@ def addPlotData():
 
 # turn on energy tracking
 O.trackEnergy=True
+O.saveTmp()
 # run a bit to have all energy categories in O.energy.keys().
 
 # The number of steps when all energy contributions are already non-zero

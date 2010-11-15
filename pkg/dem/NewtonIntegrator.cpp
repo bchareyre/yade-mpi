@@ -123,7 +123,7 @@ void NewtonIntegrator::action()
 
 			// track energy -- numerical damping and kinetic energy
 			if(trackEnergy){
-				assert(b->isStandalone() || b->isClumpMember());
+				assert(b->isStandalone() || b->isClump());
 				// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
 				if(damping!=0.){
 					scene->energy->add(fluctVel.cwise().abs().dot(f.cwise().abs())*damping*dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
