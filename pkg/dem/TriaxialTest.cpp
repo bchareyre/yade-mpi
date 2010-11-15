@@ -76,15 +76,15 @@ bool TriaxialTest::generate(string& message)
 
 	shared_ptr<Body> body;
 
-	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size and porosity;
+	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size;
 	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
 	 */
-	Real porosity=.75;
+	Real porosity=.8;
 	SpherePack sphere_pack;
 	if(importFilename==""){
 		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.x()*dimensions.y()*dimensions.z();
 		long num;
-		if(radiusMean<=0) num=sphere_pack.makeCloud(lowerCorner,upperCorner,-1,radiusStdDev,numberOfGrains,porosity);
+		if(radiusMean<=0) num=sphere_pack.makeCloud(lowerCorner,upperCorner,-1,radiusStdDev,numberOfGrains,false /*periodic?*/,porosity);
 		else {
 			bool fixedDims[3];
 			fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
