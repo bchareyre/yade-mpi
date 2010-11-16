@@ -21,6 +21,7 @@
 #include "Network.h"
 
 
+
 // #define XVIEW
 #include "FlowBoundingSphere.h"//include after #define XVIEW
 
@@ -63,17 +64,17 @@ FlowBoundingSphere::~FlowBoundingSphere()
 
 FlowBoundingSphere::FlowBoundingSphere()
 {
-  x_min = 1000.0, x_max = -10000.0, y_min = 1000.0, y_max = -10000.0, z_min = 1000.0, z_max = -10000.0;
-  currentTes = 0;
-  nOfSpheres = 0;
-  fictious_vertex = 0;
-  SectionArea = 0, Height=0, Vtotale=0;
-  vtk_infinite_vertices=0, vtk_infinite_cells=0;
-  
-        tess_based_force = true;
-        for (int i=0;i<6;i++) boundsIds[i] = 0;
-        minPermLength=-1;
-	SLIP_ON_LATERALS = false;//no-slip/symmetry conditions on lateral boundaries
+	x_min = 1000.0, x_max = -10000.0, y_min = 1000.0, y_max = -10000.0, z_min = 1000.0, z_max = -10000.0;
+	currentTes = 0;
+	nOfSpheres = 0;
+	fictious_vertex = 0;
+	SectionArea = 0, Height=0, Vtotale=0;
+	vtk_infinite_vertices=0, vtk_infinite_cells=0;
+	
+	tess_based_force = true;
+	for (int i=0;i<6;i++) boundsIds[i] = 0;
+	minPermLength=-1;
+	SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
 	TOLERANCE = 1e-06;
 	RELAX = 1.9;
 	ks=0;
@@ -82,11 +83,11 @@ FlowBoundingSphere::FlowBoundingSphere()
 	meanK_STAT = false; K_opt_factor=0;
 	noCache=true;
 	computeAllCells=true;//might be turned false IF the code is reorganized (we can make a separate function to compute unitForceVectors outside Compute_Permeability) AND it really matters for CPU time
-	DEBUG_OUT = true;
+	DEBUG_OUT = false;
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 }
 
-Tesselation& FlowBoundingSphere::Compute_Action()
+void FlowBoundingSphere::Compute_Action()
 {
         Compute_Action(0,NULL,NULL);
 }
@@ -554,6 +555,32 @@ void FlowBoundingSphere::ApplySinusoidalPressure(RTriangulation& Tri, double Pre
 	}
 }
 
+void FlowBoundingSphere::ApplySinusoidalPressure_Space_Time(RTriangulation& Tri, double Pressure, double load_intervals, double time, double dt)
+{
+	//FIXME : rivedere!! 
+	
+	double step = 1/load_intervals;
+	Tesselation::Vector_Cell tmp_cells;
+	tmp_cells.resize(1000);
+	Tesselation::VCell_iterator cells_it = tmp_cells.begin();
+	for (double alpha=0; alpha<1.001; alpha+=step)
+	{
+	  Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[y_max_id],cells_it);
+	  for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+	  {
+	    if(!Tri.is_infinite(*it)){
+	      Point& p1 = (*it)->info();
+	      Cell_handle& cell = *it;
+	      if (p1.x()>(alpha*(x_max-x_min)) && p1.x()<((alpha+step)*(x_max-x_min)))
+	      {
+		if (alpha<0.5) cell->info().p() = (Pressure/2)*(1+cos(alpha*M_PI)-(1-cos(time/(20*dt)))*M_PI);
+		if (alpha>0.5) cell->info().p() = (Pressure/2)*(1+cos(alpha*M_PI)+(1-cos(time/(20*dt)))*M_PI);
+	      }
+	  }
+	  }
+	}
+}
+
 void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
         Cell_handle old_cell;
@@ -572,7 +599,7 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 
 void FlowBoundingSphere::Compute_Permeability()
 {
-       if (DEBUG_OUT)  cout << "----Computing_Permeability------" << endl;
+        if (DEBUG_OUT)  cout << "----Computing_Permeability------" << endl;
 	RTriangulation& Tri = T[currentTes].Triangulation();
         Vsolid_tot = 0, Vtotalissimo = 0, Vporale = 0, Ssolid_tot = 0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -586,9 +613,9 @@ void FlowBoundingSphere::Compute_Permeability()
 
         Vecteur n;
 
-        std::ofstream oFile( "Radii",std::ios::out);
-	std::ofstream fFile( "Radii_Fictious",std::ios::out);
-        std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
+//         std::ofstream oFile( "Radii",std::ios::out);
+// 	std::ofstream fFile( "Radii_Fictious",std::ios::out);
+//         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
 	Real meanK=0, STDEV=0;
         Real infiniteK=1e10;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
@@ -613,6 +640,7 @@ void FlowBoundingSphere::Compute_Permeability()
 				W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
 #endif
 				pass+=1;
+// 				cerr << "test1" << endl;
                                 Rhv = Compute_HydraulicRadius(cell, j);
                                 if (Rhv<0) NEG++;
                                 else POS++;
@@ -623,10 +651,10 @@ void FlowBoundingSphere::Compute_Permeability()
 				
 // 				if ((reff+requiv)/2 > 2*Rhv) {cout << "Here it is ---------- " << endl << "p1 = <" << cell->info() << ">; p2 = <" << neighbour_cell->info() << ">;" << endl << "Rav = " << (reff+requiv)/2 << " Rhydr = " <<  2*Rhv << endl << endl << "Vpore = " << Vpore << " Ssolid = " << Ssolid << " cell_fictious = " << cell->info().fictious() << " neighbour_cell_fictious = " << neighbour_cell->info().fictious() << endl << endl << "facet vertices = <" << cell->vertex(facetVertices[j][0])->point() << ">;,<" << cell->vertex(facetVertices[j][1])->point() << ">;,<" << cell->vertex(facetVertices[j][2])->point() << ">;" << endl << endl;}
 // 				else cout << "NORMAL CASE" << endl << "p1 = <" << cell->info() << ">; p2 = <" << neighbour_cell->info() << ">;" << endl << "Rav = " << (reff+requiv)/2 << " Rhydr = " <<  2*Rhv << endl << endl << "Vpore = " << Vpore << " Ssolid = " << Ssolid << " cell_fictious = " << cell->info().fictious() << " neighbour_cell_fictious = " << neighbour_cell->info().fictious() << endl << endl << "facet vertices = <" << cell->vertex(facetVertices[j][0])->point() << ">;,<" << cell->vertex(facetVertices[j][1])->point() << ">;,<" << cell->vertex(facetVertices[j][2])->point() << ">;" << endl << endl;
-				if (cell->info().fictious()==0){
-				oFile << 2*Rhv << " ";				  
-				oFile << (reff+requiv)/2 << endl;}
-				else {fFile << 2*Rhv << " ";fFile << (reff+requiv)/2 << endl;}
+// 				if (cell->info().fictious()==0){
+// 				oFile << 2*Rhv << " ";				  
+// 				oFile << (reff+requiv)/2 << endl;}
+// 				else {fFile << 2*Rhv << " ";fFile << (reff+requiv)/2 << endl;}
 				
                                 (cell->info().Rh())[j]=Rhv;
                                 (neighbour_cell->info().Rh())[Tri.mirror_index(cell, j)]= Rhv;
@@ -655,7 +683,7 @@ void FlowBoundingSphere::Compute_Permeability()
 				
 				meanK += (cell->info().k_norm())[j];
 
-				if (!meanK_LIMIT) kFile << ( cell->info().k_norm() )[j] << endl;
+// 				if (!meanK_LIMIT) kFile << ( cell->info().k_norm() )[j] << endl;
 //     (neighbour_cell->info().facetSurf())[Tri.mirror_index(cell, j)]= (-k) *n;
                         }
                         //    else if ( Tri.is_infinite ( neighbour_cell )) k = 0;//connection to an infinite cells
@@ -667,9 +695,9 @@ void FlowBoundingSphere::Compute_Permeability()
 	if (DEBUG_OUT) cout << "PassCompK = " << pass << endl;
 
 	if (meanK_LIMIT) {
-	cout << "meanK = " << meanK << endl;
+	if (DEBUG_OUT) cout << "meanK = " << meanK << endl;
         Real maxKdivKmean = MAXK_DIV_KMEAN;
-	cout << "maxKdivKmean = " << maxKdivKmean << endl;
+	if (DEBUG_OUT) cout << "maxKdivKmean = " << maxKdivKmean << endl;
 	ref = Tri.finite_cells_begin()->info().isvisited; pass=0;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 for (int j=0; j<4; j++) {
@@ -678,7 +706,7 @@ void FlowBoundingSphere::Compute_Permeability()
 				pass++;
 				(cell->info().k_norm())[j] = min((cell->info().k_norm())[j], maxKdivKmean*meanK);
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
-				kFile << (cell->info().k_norm())[j] << endl;
+// 				kFile << (cell->info().k_norm())[j] << endl;
 				}
 			}cell->info().isvisited = !ref;
                 }
@@ -726,12 +754,12 @@ void FlowBoundingSphere::Compute_Permeability()
         if (DEBUG_OUT) {
                 cout<<grains<<"grains - " <<"Vtotale = " << 2*Vtotale << " Vgrains = " << 2*Vgrains << " Vporale1 = " << 2*(Vtotale-Vgrains) << endl;
                 cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
-        }
+        
         
         if (!RAVERAGE) cout << "------Hydraulic Radius is used for permeability computation------" << endl << endl;
         else cout << "------Average Radius is used for permeability computation------" << endl << endl;
 
-	cout << "-----Computed_Permeability-----" << endl;
+	cout << "-----Computed_Permeability-----" << endl;}
 }
 
 double FlowBoundingSphere::Compute_EffectiveRadius(Cell_handle cell, int j)
@@ -786,10 +814,12 @@ double FlowBoundingSphere::Compute_EquivalentRadius(Cell_handle cell, int j)
 
 double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j)
 {
+//   cerr << "test11" << endl;
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
-        
+//         cerr << "test12" << endl;
         /*double */Vpore = Volume_Pore_VoronoiFraction(cell, j);
+// 	cerr << "test13" << endl;
 	/*double */Ssolid = Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS);
 
 	#ifdef FACET_BASED_FORCES
@@ -797,7 +827,7 @@ double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j)
 	// 			if (FACET_BASED_FORCES) cell->info().facetSurfaces[j]=cell->info().facetSurfaces[j]*((facetSurfaces[j].length()-facetSphereCrossSections[j][0]-facetSphereCrossSections[j][1]-facetSphereCrossSections[j][2])/facetSurfaces[j].length());
 	#endif
 	//         if (DEBUG_OUT) std::cerr << "total facet surface "<< cell->info().facetSurfaces[j] << " with solid sectors : " << cell->info().facetSphereCrossSections[j][0] << " " << cell->info().facetSphereCrossSections[j][1] << " " << cell->info().facetSphereCrossSections[j][2] << " difference "<<sqrt(cell->info().facetSurfaces[j].squared_length())-cell->info().facetSphereCrossSections[j][0]-cell->info().facetSphereCrossSections[j][2]-cell->info().facetSphereCrossSections[j][1]<<endl;
-
+// cerr << "test14" << endl;
 	//handle symmetry (tested ok)
 	if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0)
 	{
@@ -805,6 +835,7 @@ double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j)
 		Real mult= fictious_vertex==1 ? multSym1 : multSym2;
 		return Vpore/Ssolid*mult;
 	}
+// 	cerr << "test15" << endl;
 	return Vpore/Ssolid;
 }
 
@@ -832,7 +863,7 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
 
 void FlowBoundingSphere::GaussSeidel ()
 {
-	std::ofstream iter ("Gauss_Iterations", std::ios::app);
+// 	std::ofstream iter ("Gauss_Iterations", std::ios::app);
 	std::ofstream p_av ("P_moyenne", std::ios::app);
 	RTriangulation& Tri = T[currentTes].Triangulation();
         int j = 0;
@@ -840,8 +871,8 @@ void FlowBoundingSphere::GaussSeidel ()
         double tolerance = TOLERANCE;
         double relax = RELAX;
 
-        cout << "tolerance = " << tolerance << endl;
-        cout << "relax = " << relax << endl;
+       if(DEBUG_OUT){ cout << "tolerance = " << tolerance << endl;
+        cout << "relax = " << relax << endl;}
 
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 
@@ -881,7 +912,7 @@ void FlowBoundingSphere::GaussSeidel ()
         } while (((dp_max/p_max) > tolerance) /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
         cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
-	iter << j << " " << dp_max/p_max << endl;
+// 	iter << j << " " << dp_max/p_max << endl;
 	
 	int cel=0;
 	double Pav=0;
@@ -939,12 +970,13 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
     p_in_moy += cell->neighbor(j2)->info().p();}
   }}}
   
+	if (DEBUG_OUT){
 	cout << "the maximum superior pressure is = " << p_out_max << " the min is = " << p_in_min << endl;
 	cout << "the maximum inferior pressure is = " << p_in_max << " the min is = " << p_out_min << endl;
 	cout << "superior average pressure is " << p_out_moy/cellQ1 << endl;
         cout << "inferior average pressure is " << p_in_moy/cellQ2 << endl;
         cout << "celle comunicanti in basso = " << cellQ2 << endl;
-        cout << "celle comunicanti in alto = " << cellQ1 << endl;
+        cout << "celle comunicanti in alto = " << cellQ1 << endl;}
 
         double density = 1;
         double viscosity = 1;
@@ -955,6 +987,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         double Ks= (Vdarcy) /GradH;
         double k= Ks*viscosity/ (density*gravity);
 
+	if (DEBUG_OUT){
         cout << "The incoming average flow rate is = " << Q2 << " m^3/s " << endl;
         cout << "The outgoing average flow rate is = " << Q1 << " m^3/s " << endl;
         cout << "The gradient of charge is = " << GradH << " [-]" << endl;
@@ -973,7 +1006,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         kFile << "The gradient of charge is = " << GradH << " [-]" << endl;
         kFile << "Darcy's velocity is = " << Vdarcy << " m/s" <<endl;
         kFile << "The hydraulic conductivity of the sample is = " << Ks << " m/s" <<endl;
-        kFile << "The permeability of the sample is = " << k << " m^2" <<endl;
+        kFile << "The permeability of the sample is = " << k << " m^2" <<endl;}
         //   cout << "The Darcy permeability of the sample is = " << k_darcy/0.987e-12 << " darcys" << endl;
 	
 	return Ks;
@@ -1164,7 +1197,7 @@ void FlowBoundingSphere::mplot (char *filename)
 
 double FlowBoundingSphere::Sample_Permeability(double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key)
 {
-	RTriangulation& Tri = T[currentTes].Triangulation();
+// 	RTriangulation& Tri = T[currentTes].Triangulation();
         double Section = (x_Max-x_Min) * (z_Max-z_Min);
         double DeltaY = y_Max-y_Min;
         boundary(y_min_id).flowCondition=0;
@@ -1190,32 +1223,33 @@ bool FlowBoundingSphere::isInsideSphere(double& x, double& y, double& z)
         return false;
 }
 
-void FlowBoundingSphere::SliceField()
+void FlowBoundingSphere::SliceField(char *filename)
 {
         /** Pressure field along one cutting plane **/
 	RTriangulation& Tri = T[currentTes].Triangulation();
         Cell_handle permeameter;
 
-        std::ofstream consFile("slices",std::ios::out);
+        std::ofstream consFile(filename,std::ios::out);
 
         int intervals = 400;
         double Rx = 20* (x_max-x_min) /intervals;
         double Ry = (y_max-y_min) /intervals;
         double Rz = (z_max-z_min) /intervals;
-        cout<<Rx<<" "<<Ry<<" "<<Rz<<" "<<z_max<<" "<<z_min<<" "<<y_max<<" "<<y_min<<" "<<x_max<<" "<<x_min<<endl;
+//         cout<<Rx<<" "<<Ry<<" "<<Rz<<" "<<z_max<<" "<<z_min<<" "<<y_max<<" "<<y_min<<" "<<x_max<<" "<<x_min<<endl;
 
 //         for (double X=min(x_min,x_max); X<=max(x_min,x_max); X=X+abs(Rx)) {
 	double X=0.5;  
                 for (double Y=min(y_max,y_min); Y<=max(y_max,y_min); Y=Y+abs(Ry)) {
                         for (double Z=min(z_min,z_max); Z<=max(z_min,z_max); Z=Z+abs(Rz)) {
-                                if (!isInsideSphere(X,Y,Z)) {
-                                        permeameter = Tri.locate(Point(X, Y, Z));
-                                        consFile << permeameter->info().p() <<" ";
-                                        //cout <<"valeur trouvée";
-                                } else consFile << "Nan ";
+			  permeameter = Tri.locate(Point(X, Y, Z));
+			  consFile << permeameter->info().p() <<" ";
+//                                 if (!isInsideSphere(X,Y,Z)) {
+//                                         permeameter = Tri.locate(Point(X, Y, Z));
+//                                         consFile << permeameter->info().p() <<" ";
+//                                         //cout <<"valeur trouvée";
+//                                 } else consFile << "Nan ";
                         }
-                        consFile << endl;
-                }
+                        consFile << endl;}
                 consFile << endl;
 //         }
         consFile.close();

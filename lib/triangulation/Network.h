@@ -39,6 +39,7 @@ class Network
 		Tesselation T [2];
 		bool currentTes;
 		double x_min, x_max, y_min, y_max, z_min, z_max, Rmoy, SectionArea, Height, Vtotale;
+		bool DEBUG_OUT;
 		int nOfSpheres;
 		int x_min_id, x_max_id, y_min_id, y_max_id, z_min_id, z_max_id;
 		int* boundsIds [6];
@@ -48,7 +49,7 @@ class Network
 		Boundary boundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		short id_offset;
-		int vtk_infinite_vertices, vtk_infinite_cells;
+		int vtk_infinite_vertices, vtk_infinite_cells, num_particles;
 		
 // 		int F1, F2, Re1, Re2; //values between 0..3, refers to one cell's fictious(F)/real(Re) vertices
 // 		int facetRe1, facetRe2, facetRe3, facetF1, facetF2; //indices relative to the facet

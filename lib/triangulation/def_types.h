@@ -16,8 +16,6 @@
 
 #include<yade/lib/base/Math.hpp> // typedef for Real
 
-//#define FLOW_ENGINE
-
 namespace CGT{
 //Robust kernel
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;

@@ -11,8 +11,9 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
 #include<yade/lib/triangulation/FlowBoundingSphere.h>
+#include<yade/pkg/dem/TesselationWrapper.hpp>
 
-
+class TesselationWrapper;
 
 class FlowEngine : public PartialEngine
 {
@@ -26,7 +27,11 @@ class FlowEngine : public PartialEngine
 		bool Update_Triangulation;
 		bool currentTes;
 		int id_offset;
-		
+	//	double IS;
+		double eps_vol_max;
+		double Eps_Vol_Cumulative;
+		int ReTrg;
+			
 		void Triangulate ();
 		void AddBoundary ();
 		void Build_Triangulation (double P_zero );
@@ -49,15 +54,21 @@ class FlowEngine : public PartialEngine
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
 					((bool,save_mplot,false,,"Enable/disable mplot files creation"))
+					((bool, save_mgpost, false,,"Enable/disable mgpost file creation"))
+					((bool, slice_pressures, false, ,"Enable/Disable slice pressure measurement"))
+					((bool, consolidation,false,,"Enable/Disable storing consolidation files"))
 					((bool, slip_boundary, true,, "Controls friction condition on lateral walls"))
 					((bool, blocked_grains, false,, "Grains will/won't be moved by forces"))
 					((bool,WaveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
+					((bool, TimeBC, false,,"Activate evolution in time of pressure B.C."))
 					((bool, CachedForces, true,,"Des/Activate the cached forces calculation"))
+					((bool, Debug, false,,"Activate debug messages"))
 // 					((bool,currentTes,false,,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,,"Initial internal pressure for oedometer test"))
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
 					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
 					((int,PermuteInterval,100000,,"Pore space re-triangulation period"))
+					((double,EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
 					((bool,compute_K,true,,"Activates permeability measure within a granular sample"))
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))

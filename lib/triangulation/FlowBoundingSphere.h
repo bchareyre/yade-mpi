@@ -42,7 +42,7 @@ class FlowBoundingSphere : public Network
 		double RELAX;
 		double ks; //Hydraulic Conductivity
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
-		bool DEBUG_OUT;
+// 		bool DEBUG_OUT;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
@@ -55,7 +55,7 @@ class FlowBoundingSphere : public Network
 //  		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		
 		void mplot ( char *filename);
-		void Localize ();
+		void Localize();
 
 		void Compute_Permeability();
 		
@@ -82,7 +82,7 @@ class FlowBoundingSphere : public Network
 // 		void AddBoundingPlanes();
 // 		void AddBoundingPlanes(Real center[3], Real Extents[3], int id);
 		
-		Tesselation& Compute_Action ( );
+		void Compute_Action ( );
 		Tesselation& Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
 // 		Vecteur external_force_single_fictious ( Cell_handle cell );
 		void SpheresFileCreator ();
@@ -139,7 +139,7 @@ class FlowBoundingSphere : public Network
 		
 		bool isInsideSphere ( double& x, double& y, double& z );
 		
-		void SliceField ();
+		void SliceField (char *filename);
 		void ComsolField();
 
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
@@ -157,7 +157,7 @@ class FlowBoundingSphere : public Network
 		void Average_Grain_Velocity();
 		void vtk_average_cell_velocity(RTriangulation &T, int id_sphere, int num_cells);
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Pressure, double load_intervals);
-		
+		void ApplySinusoidalPressure_Space_Time(RTriangulation& Tri, double Pressure, double load_intervals, double time, double dt);
 // 		double surface_external_triple_fictious(Real position[3], Cell_handle cell, Boundary b);
 // 		double surface_external_double_fictious(Cell_handle cell, Boundary b);
 // 		double surface_external_single_fictious(Cell_handle cell, Boundary b);

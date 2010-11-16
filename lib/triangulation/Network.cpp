@@ -1,3 +1,4 @@
+
 #ifdef FLOW_ENGINE
 
 #include "def_types.h"
@@ -13,7 +14,6 @@
 #include <sys/types.h>
 
 #include "Network.h"
-
 
 
 #define FAST
@@ -82,13 +82,10 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
 {
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
-  
   fictious_vertex = Detect_facet_fictious_vertices (cell,j);
-  
   Sphere v [3];
   Vertex_handle W [3];
   for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);v[kk] = cell->vertex(facetVertices[j][kk])->point();}
-
   switch (fictious_vertex) {
     case (0) : {
 		Vertex_handle& SV1 = W[0];
@@ -111,8 +108,7 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
 		/**Vpore**/ return Vtot - (Vsolid1 + Vsolid2); 
     }; break;
     case (1) : {return volume_single_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetRe1]), cell->vertex(facetVertices[j][facetRe2]), p1,p2, cell->info().facetSurfaces[j]);}; break;
-    case (2) : {return volume_double_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;
-    }
+    case (2) : {return volume_double_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;}
 }
 
 double Network::volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
@@ -265,7 +261,7 @@ double Network::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERAL
 {
   if (!facet_detected) fictious_vertex=Detect_facet_fictious_vertices(cell,j);
   
-  RTriangulation& Tri = T[currentTes].Triangulation();
+//   RTriangulation& Tri = T[currentTes].Triangulation();
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
   
@@ -469,41 +465,41 @@ void Network::AddBoundingPlanes(bool yade)
         boundsIds[4]= &z_min_id;
         boundsIds[5]= &z_max_id;
 
-        Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), Corner_min.y()-FAR*(Corner_max.x()-Corner_min.x()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.x()-Corner_min.x()), y_min_id, true);
+        Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), Corner_min.y()-FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.z()+Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), y_min_id, true);
         boundaries[y_min_id-id_offset].p = Corner_min;
         boundaries[y_min_id-id_offset].normal = Vecteur(0,1,0);
         boundaries[y_min_id-id_offset].coordinate = 1;
-        cout << "Bottom boundary has been created. ID = " << y_min_id << endl;
+        if(DEBUG_OUT) cout << "Bottom boundary has been created. ID = " << y_min_id << endl;
 
-        Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), Corner_max.y() +FAR*(Corner_max.x()-Corner_min.x()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.x()-Corner_min.x()), y_max_id, true);
+        Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), Corner_max.y() +FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.z()+Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), y_max_id, true);
         boundaries[y_max_id-id_offset].p = Corner_max;
         boundaries[y_max_id-id_offset].normal = Vecteur(0,-1,0);
         boundaries[y_max_id-id_offset].coordinate = 1;
-        cout << "Top boundary has been created. ID = " << y_max_id << endl;
+        if(DEBUG_OUT) cout << "Top boundary has been created. ID = " << y_max_id << endl;
 
-        Tes.insert(Corner_min.x()-FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), x_min_id, true);
+        Tes.insert(Corner_min.x()-FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.y()+Corner_min.y()), 0.5*(Corner_max.z()+Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), x_min_id, true);
         boundaries[x_min_id-id_offset].p = Corner_min;
         boundaries[x_min_id-id_offset].normal = Vecteur(1,0,0);
         boundaries[x_min_id-id_offset].coordinate = 0;
-        cout << "Left boundary has been created. ID = " << x_min_id << endl;
+        if(DEBUG_OUT) cout << "Left boundary has been created. ID = " << x_min_id << endl;
 
-        Tes.insert(Corner_max.x() +FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.z()-Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), x_max_id, true);
+        Tes.insert(Corner_max.x() +FAR*(Corner_max.y()-Corner_min.y()), 0.5*(Corner_max.y()+Corner_min.y()), 0.5*(Corner_max.z()+Corner_min.z()), FAR*(Corner_max.y()-Corner_min.y()), x_max_id, true);
         boundaries[x_max_id-id_offset].p = Corner_max;
         boundaries[x_max_id-id_offset].normal = Vecteur(-1,0,0);
         boundaries[x_max_id-id_offset].coordinate = 0;
-        cout << "Right boundary has been created. ID = " << x_max_id << endl;
+        if(DEBUG_OUT) cout << "Right boundary has been created. ID = " << x_max_id << endl;
 
-        Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), 0.5*(Corner_max.y()-Corner_min.y()), Corner_min.z()-FAR*(Corner_max.y()-Corner_min.y()), FAR*(Corner_max.y()-Corner_min.y()), z_min_id, true);
+        Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), 0.5*(Corner_max.y()+Corner_min.y()), Corner_min.z()-FAR*(Corner_max.y()-Corner_min.y()), FAR*(Corner_max.y()-Corner_min.y()), z_min_id, true);
         boundaries[z_min_id-id_offset].p = Corner_min;
         boundaries[z_min_id-id_offset].normal = Vecteur(0,0,1);
         boundaries[z_min_id-id_offset].coordinate = 2;
-        cout << "Front boundary has been created. ID = " << z_min_id << endl;
+        if(DEBUG_OUT) cout << "Front boundary has been created. ID = " << z_min_id << endl;
 
         Tes.insert(0.5*(Corner_min.x() +Corner_max.x()), 0.5*(Corner_max.y()-Corner_min.y()), Corner_max.z() +FAR*(Corner_max.y()-Corner_min.y()), FAR*(Corner_max.y()-Corner_min.y()), z_max_id, true);
         boundaries[z_max_id-id_offset].p = Corner_max;
         boundaries[z_max_id-id_offset].normal = Vecteur(0,0,-1);
         boundaries[z_max_id-id_offset].coordinate = 2;
-        cout << "Back boundary has been created. ID = " << z_max_id << endl;
+        if(DEBUG_OUT) cout << "Back boundary has been created. ID = " << z_max_id << endl;
 
         for (int k=0;k<6;k++) {
                 boundaries[k].flowCondition = 1;
@@ -571,6 +567,7 @@ void Network::DisplayStatistics()
 	
 	vtk_infinite_vertices = fict;
 	vtk_infinite_cells = Fictious;
+	num_particles = real;
 }
 
 // double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
