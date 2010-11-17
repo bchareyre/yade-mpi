@@ -3,7 +3,7 @@
 
 YADE_PLUGIN((DomainLimiter)(LawTester)
 	#ifdef YADE_OPENGL
-		(GlExtra_LawTester)
+		(GlExtra_LawTester)(GlExtra_OctreeCubes)
 	#endif
 );
 
@@ -284,6 +284,44 @@ void GlExtra_LawTester::render(){
 	}
 
 	glLineWidth(1.);
+}
+
+
+void GlExtra_OctreeCubes::postLoad(GlExtra_OctreeCubes&){
+	if(boxesFile.empty()) return;
+	boxes.clear();
+	ifstream txt(boxesFile.c_str());
+	while(!txt.eof()){
+		Real data[8];
+		for(int i=0; i<8; i++){ if(i<7 && txt.eof()) goto done; txt>>data[i]; }
+		OctreeBox ob; Vector3r mn(data[0],data[1],data[2]), mx(data[3],data[4],data[5]);
+		ob.center=.5*(mn+mx); ob.extents=(.5*(mx-mn)); ob.level=(int)data[6]; ob.fill=(int)data[7];
+		// for(int i=0; i<=ob.level; i++) cerr<<"\t"; cerr<<ob.level<<": "<<mn<<"; "<<mx<<"; "<<ob.center<<"; "<<ob.extents<<"; "<<ob.fill<<endl;
+		boxes.push_back(ob);
+	}
+	done:
+	std::cerr<<"GlExtra_OctreeCubes::postLoad: loaded "<<boxes.size()<<" boxes."<<std::endl;
+}
+
+void GlExtra_OctreeCubes::render(){
+	FOREACH(const OctreeBox& ob, boxes){
+		if(ob.fill<fillRangeDraw[0] || ob.fill>fillRangeDraw[1]) continue;
+		if(ob.level<levelRangeDraw[0] || ob.level>levelRangeDraw[1]) continue;
+		bool doFill=(ob.fill>=fillRangeFill[0] && ob.fill<=fillRangeFill[1] && (ob.fill!=0 || !noFillZero));
+		// -2: empty
+		// -1: recursion limit, empty
+		// 0: subdivided
+		// 1: recursion limit, full
+		// 2: full
+		Vector3r color=(ob.fill==-2?Vector3r(1,0,0):(ob.fill==-1?Vector3r(1,1,0):(ob.fill==0?Vector3r(0,0,1):(ob.fill==1)?Vector3r(0,1,0):(ob.fill==2)?Vector3r(0,1,1):Vector3r(1,1,1))));
+		glColor3v(color);
+		glPushMatrix();
+			glTranslatev(ob.center);
+			glScalef(2*ob.extents[0],2*ob.extents[1],2*ob.extents[2]);
+		 	if (doFill) glutSolidCube(1);
+			else glutWireCube(1);
+		glPopMatrix();
+	}
 }
 
 #endif /* YADE_OPENGL */

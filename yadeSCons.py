@@ -26,7 +26,7 @@ def grepForIncludes(root,f):
 	for l in open(root+'/'+f):
 		if re.match(r'\s*#endif.*$',l): skipping=False; continue
 		if skipping: continue
-		m=re.match(r'^\s*#include\s*<yade/([^/]*)/(.*)>.*$',l)
+		m=re.match(r'^\s*#include\s*<yade/([^/]+/[^/]+)/(.*)>.*$',l)
 		if m:
 			incMod=m.group(1); baseName=m.group(2).split('.')[0];
 			if incMod=='core' or incMod.startswith('lib/'): continue
@@ -67,7 +67,7 @@ def scanAllPlugins(cacheFile,feats):
 						cond,feat=m.group(1),m.group(2).lower()
 						if (cond=='ifdef' and feat not in features) or (cond=='ifndef' and feat in features): skipping=True
 					if re.match(r'\s*YADE_PLUGIN\(.*',l): isPlugin=True
-					m=re.match(r'^\s*#include\s*<yade/([^/]*)/(.*)>.*$',l)
+					m=re.match(r'^\s*#include\s*<yade/([^/]+/[^/]+)/(.*)>.*$',l)
 					if m:
 						incMod=m.group(1); incHead=m.group(2); baseName=incHead.split('.')[0]; assert(len(incHead.split('.'))==2)
 						if incMod=='core' or incMod.startswith('lib/'): continue

@@ -360,7 +360,7 @@ class SerializableEditor(QFrame):
 			# sequence of serializables
 			T=entry.T[0]
 			if (issubclass(T,Serializable) or T==Serializable):
-				widget=SeqSerializable(self,getter,setter,T,path=(self.path+'.'+entry.name if self.path else None))
+				widget=SeqSerializable(self,getter,setter,T,path=(self.path+'.'+entry.name if self.path else None),shrink=True)
 				return widget
 			if (T in _fundamentalEditorMap):
 				widget=SeqFundamentalEditor(self,getter,setter,T)
@@ -415,9 +415,9 @@ def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1,count=-1
 	return ret
 
 class SeqSerializableComboBox(QFrame):
-	def __init__(self,parent,getter,setter,serType,path=None):
+	def __init__(self,parent,getter,setter,serType,path=None,shrink=False):
 		QFrame.__init__(self,parent)
-		self.getter,self.setter,self.serType,self.path=getter,setter,serType,path
+		self.getter,self.setter,self.serType,self.path,self.shrink=getter,setter,serType,path,shrink
 		self.layout=QVBoxLayout(self)
 		topLineFrame=QFrame(self)
 		topLineLayout=QHBoxLayout(topLineFrame);
@@ -427,6 +427,7 @@ class SeqSerializableComboBox(QFrame):
 		buttonSlots=(self.newSlot,self.killSlot,self.upSlot,self.downSlot) # same order as buttons
 		for b in buttons: b.setStyleSheet('QPushButton { font-size: 15pt; }'); b.setFixedWidth(30); b.setFixedHeight(30)
 		self.combo=QComboBox(self)
+		self.combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 		for w in buttons[0:2]+[self.combo,]+buttons[2:4]: topLineLayout.addWidget(w)
 		self.layout.addWidget(topLineFrame) # nested layout
 		self.scroll=QScrollArea(self); self.scroll.setWidgetResizable(True)
@@ -454,9 +455,19 @@ class SeqSerializableComboBox(QFrame):
 			ser=currSeq[ix]
 			self.seqEdit=SerializableEditor(ser,parent=self,showType=seqSerializableShowType,path=(self.path+'['+str(ix)+']' if self.path else None))
 			self.scroll.setWidget(self.seqEdit)
+			if self.shrink:
+				self.sizeHint=lambda: QSize(100,1000)
+				self.scroll.sizeHint=lambda: QSize(100,1000)
+				self.sizePolicy().setVerticalPolicy(QSizePolicy.Expanding)
+				self.scroll.sizePolicy().setVerticalPolicy(QSizePolicy.Expanding)
+				self.setMinimumHeight(min(300,self.seqEdit.height()+self.combo.height()+10))
+				self.setMaximumHeight(100000)
+				self.scroll.setMaximumHeight(100000)
 		else:
 			self.scroll.setWidget(QFrame())
-			#self.scroll.sizeHint=lambda: QSize(0,0)
+			if self.shrink:
+				self.setMaximumHeight(self.combo.height()+10);
+				self.scroll.setMaximumHeight(0)
 	def serLabel(self,ser,i=-1):
 		return ('' if i<0 else str(i)+'. ')+str(ser)[1:-1].replace('instance at ','')
 	def refreshEvent(self,forceIx=-1):

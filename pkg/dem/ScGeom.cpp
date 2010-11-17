@@ -3,7 +3,7 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 // © 2006 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 
-#include "ScGeom.hpp"
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 

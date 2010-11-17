@@ -70,5 +70,21 @@ class GlExtra_LawTester: public GlExtraDrawer{
 	);
 };
 REGISTER_SERIALIZABLE(GlExtra_LawTester);
+
+class GlExtra_OctreeCubes: public GlExtraDrawer{
+	public:
+	struct OctreeBox{ Vector3r center, extents; int fill; int level; };
+	std::vector<OctreeBox> boxes;
+	void postLoad(GlExtra_OctreeCubes&);
+	virtual void render();
+	YADE_CLASS_BASE_DOC_ATTRS(GlExtra_OctreeCubes,GlExtraDrawer,"Render boxed read from file",
+		((string,boxesFile,,Attr::triggerPostLoad,"File to read boxes from; ascii files with ``x0 y0 z0 x1 y1 z1 c`` records, where ``c`` is an integer specifying fill (0 for wire, 1 for filled)."))
+		((Vector2i,fillRangeFill,Vector2i(2,2),,"Range of fill indices that will be filled."))
+		((Vector2i,fillRangeDraw,Vector2i(-2,2),,"Range of fill indices that will be rendered."))
+		((Vector2i,levelRangeDraw,Vector2i(-2,2),,"Range of levels that will be rendered."))
+		((bool,noFillZero,true,,"Do not fill 0-fill boxed (those that are further subdivided)"))
+	);
+};
+REGISTER_SERIALIZABLE(GlExtra_OctreeCubes);
 #endif
 
