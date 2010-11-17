@@ -56,7 +56,7 @@ class Network
 		int fictious_vertex;
 // 		bool facet_detected;
 		
-		void DisplayStatistics();
+// 		void DisplayStatistics();
 		void AddBoundingPlanes(bool yade);
 		void AddBoundingPlanes();
 		void Define_fictious_cells( );

@@ -49,9 +49,9 @@ struct RTraits_for_spatial_sort : public CGT::RTriangulation::Geom_traits {
 //and setting the info field to the bodies id.
 //Possible improvements : use bodies pointers to avoid one copy, use aabb's lists to replace the shuffle/sort part
 // template <class Triangulation>
-void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, TesselationWrapper &TW)
+void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, TesselationWrapper &TW, bool reset=true)
 {
-	TW.clear();
+	if (reset) TW.clear();
 	CGT::Tesselation& Tes = *(TW.Tes);
 	CGT::RTriangulation& T = Tes.Triangulation();
 	std::vector<CGT::Sphere> spheres;
@@ -64,7 +64,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	BodyContainer::iterator bi = biBegin;
 
 	Body::id_t Ng = 0;
-	Body::id_t MaxId=0;
+	Body::id_t& MaxId=Tes.max_id;
 	TW.mean_radius = 0;
 
 	shared_ptr<Sphere> sph (new Sphere);
@@ -159,13 +159,13 @@ void TesselationWrapper::clear2(void) //for testing purpose
 //  facet_it = Tes->Triangulation().finite_edges_end ();
 }
 
-void TesselationWrapper::insertSceneSpheres()
+void TesselationWrapper::insertSceneSpheres(bool reset)
 {
 	Scene* scene=Omega::instance().getScene().get();
 // 	Real_timer clock;
 //         clock.start();
         const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	build_triangulation_with_ids(bodies, *this);
+	build_triangulation_with_ids(bodies, *this, reset);
 // 	clock.top("Triangulation");
 }
 

@@ -5,7 +5,6 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifdef FLOW_ENGINE
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
@@ -14,13 +13,18 @@
 #include<yade/pkg/dem/TesselationWrapper.hpp>
 
 class TesselationWrapper;
+#ifdef LINSOLV
+#define FlowSolver CGT::FlowBoundingSphereLinSolv
+#else
+#define FlowSolver CGT::FlowBoundingSphere
+#endif
 
 class FlowEngine : public PartialEngine
 {
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
-		shared_ptr<CGT::FlowBoundingSphere> flow;
-	public :	
+		shared_ptr<FlowSolver> flow;
+	public :
 		Vector3r gravity;
 		int current_state;
 		Real wall_thickness;
@@ -31,7 +35,6 @@ class FlowEngine : public PartialEngine
 		double eps_vol_max;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
-			
 		void Triangulate ();
 		void AddBoundary ();
 		void Build_Triangulation (double P_zero );
@@ -46,9 +49,9 @@ class FlowEngine : public PartialEngine
 		void BoundaryConditions();
 
 		virtual ~FlowEngine();
-	
+
 		virtual void action();
-		
+
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
@@ -99,4 +102,4 @@ class FlowEngine : public PartialEngine
 
 REGISTER_SERIALIZABLE(FlowEngine);
 
-#endif
+// #endif

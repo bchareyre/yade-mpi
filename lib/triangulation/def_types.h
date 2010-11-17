@@ -14,7 +14,7 @@
 
 #include <boost/static_assert.hpp>
 
-#include<yade/lib/base/Math.hpp> // typedef for Real
+// #include<yade/lib/base/Math.hpp> // typedef for Real
 
 namespace CGT{
 //Robust kernel
@@ -47,6 +47,8 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	Real s;// stockage d'une valeur scalaire (ex. d�viateur) pour affichage
 	bool isFictious;
 #ifdef FLOW_ENGINE
+	//For vector storage of all cells
+	unsigned int index;
 	bool Pcondition;
 	Real t;
 	int fict;
@@ -79,7 +81,9 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		isInside = false;
 		inv_sum_k=0;
 		isFictious=false; Pcondition = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
-	}
+		index=0;
+	}	
+
 	double inv_sum_k;
 	bool isInside;
 	bool isInferior;

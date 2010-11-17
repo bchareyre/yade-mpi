@@ -26,6 +26,8 @@
 
 using namespace std;
 
+
+
 namespace CGT{
 
 class FlowBoundingSphere : public Network
@@ -33,7 +35,7 @@ class FlowBoundingSphere : public Network
 	public:
 		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
-		
+
 // 		int x_min_id, x_max_id, y_min_id, y_max_id, z_min_id, z_max_id;
 // 		int* boundsIds [6];
 // 		bool currentTes;
@@ -43,30 +45,32 @@ class FlowBoundingSphere : public Network
 		double ks; //Hydraulic Conductivity
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
 // 		bool DEBUG_OUT;
+		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
+
+		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
+
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
 		int Iterations;
+
 		bool RAVERAGE;
-		
 // 		Boundary boundaries [6];
 		int walls_id[6];
 // 		short id_offset;
 //  		Boundary& boundary (int b) {return boundaries[b-id_offset];}
-		
+
 		void mplot ( char *filename);
 		void Localize();
 
 		void Compute_Permeability();
-		
-		double Vpore, Ssolid;
-
 		void GaussSeidel ( );
+
 // 		void Compute_Forces ();
 		void Fictious_cells ( );
 
 // 		Tesselation T [2];
-		
+
 // 		double x_min, x_max, y_min, y_max, z_min, z_max, Rmoy;
 // 		Real Vsolid_tot, Vtotalissimo, Vporale, Ssolid_tot;
 		double k_factor; //permeability moltiplicator
@@ -74,20 +78,21 @@ class FlowBoundingSphere : public Network
 		std::vector<double> Pressures; //for automatic write maximum pressures during consolidation
 		bool tess_based_force; //allow the force computation method to be chosen from FlowEngine
 		Real minPermLength; //min branch length for Poiseuille
-		
+
 		double P_SUP, P_INF, P_INS;
-		
+
 // 		void AddBoundingPlanes ( Tesselation& Tes, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max );
 // 		void AddBoundingPlanes(bool yade);
 // 		void AddBoundingPlanes();
 // 		void AddBoundingPlanes(Real center[3], Real Extents[3], int id);
-		
-		void Compute_Action ( );
+
+		Tesselation& Compute_Action ( );
 		Tesselation& Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
+		Tesselation& LoadPositions(int argc, char *argv[ ], char *envp[ ]);
 // 		Vecteur external_force_single_fictious ( Cell_handle cell );
 		void SpheresFileCreator ();
 // 		void Analytical_Consolidation ( );
-		
+		void DisplayStatistics();
 // 		void Boundary_Conditions ( RTriangulation& Tri );
 		void Initialize_pressures ( double P_zero );
 		/// Define forces using the same averaging volumes as for permeability
@@ -115,13 +120,13 @@ class FlowBoundingSphere : public Network
 // 		double surface_solid_facet ( Sphere ST1, Sphere ST2, Sphere ST3 );
 // 		Vecteur surface_double_fictious_facet ( Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3 );
 // 		Vecteur surface_single_fictious_facet ( Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3 );
-		
+
 // 		double surface_solid_double_fictious_facet ( Vertex_handle ST1, Vertex_handle ST2, Vertex_handle ST3 );
-		
+
 // 		double surface_external_triple_fictious (Cell_handle cell, Boundary b );
-// 		double surface_external_triple_fictious ( Real position[3], Cell_handle cell, Boundary b );		
+// 		double surface_external_triple_fictious ( Real position[3], Cell_handle cell, Boundary b );
 // 		double surface_external_double_fictious ( Cell_handle cell, Boundary b );
-		
+
 // 		double surface_external_single_fictious ( Cell_handle cell, Boundary b );
 
 		void GenerateVoxelFile ( );
@@ -131,19 +136,19 @@ class FlowBoundingSphere : public Network
 		void Build_Tessalation ( RTriangulation& Tri );
 
 // 		double spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
-		
+
 // 		double fast_spherical_triangle_area ( const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1 );
 // 		Real solid_angle ( const Point& STA1, const Point& STA2, const Point& STA3, const Point& PTA1 );
 // 		double spherical_triangle_volume ( const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3 );
 // 		Real fast_solid_angle ( const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3 );
-		
+
 		bool isInsideSphere ( double& x, double& y, double& z );
-		
+
 		void SliceField (char *filename);
 		void ComsolField();
 
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
-		
+
 // 		double volume_single_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
 		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
 // 		double volume_single_fictious_pore ( const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
@@ -161,6 +166,14 @@ class FlowBoundingSphere : public Network
 // 		double surface_external_triple_fictious(Real position[3], Cell_handle cell, Boundary b);
 // 		double surface_external_double_fictious(Cell_handle cell, Boundary b);
 // 		double surface_external_single_fictious(Cell_handle cell, Boundary b);
+
+		///TAUCS
+		int SetLinearSystem();
+		int SetLinearSystemFullGS();
+		void VectorizedGaussSeidel ();
+		int TaucsSolveTest();
+		int PardisoSolveTest();
+		///END_TAUCS
 
 };
 
