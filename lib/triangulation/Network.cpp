@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "Network.h"
+#include "Network.hpp"
 
 
 #define FAST

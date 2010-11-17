@@ -17,11 +17,11 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "Network.h"
+#include "Network.hpp"
 #include <omp.h>
 
 // #define XVIEW
-#include "FlowBoundingSphere.h"//include after #define XVIEW
+#include "FlowBoundingSphere.hpp"//include after #define XVIEW
 
 #ifdef XVIEW
 // #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
@@ -468,7 +468,6 @@ void FlowBoundingSphere::ComputeFacetForces()
 // 					int id1 = cell->vertex(facetVertices[j][y])->info().id();
 // 					int id2 = neighbour_cell->vertex(facetVertices[Tri.mirror_index(cell,j)][y])->info().id();
 // 					cerr <<"id1/id2 : "<<id1<<" "<<id2<<endl;}
-
 					///TEST END
 				}
 			}
@@ -1031,6 +1030,7 @@ void FlowBoundingSphere::GaussSeidel()
                 #endif
 		p_moy = sum_p/cell2;
                 dp_moy = sum_dp/cell2;
+		
 		#ifdef GS_OPEN_MP
 		#pragma omp master
 		#endif
@@ -1130,7 +1130,6 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         cout << "The outgoing average flow rate is = " << Q1 << " m^3/s " << endl;
         cout << "The gradient of charge is = " << GradH << " [-]" << endl;
         cout << "Darcy's velocity is = " << Vdarcy << " m/s" <<endl;
-
         cout << "The permeability of the sample is = " << k << " m^2" <<endl;}
 
 	kFile << "the maximum superior pressure is = " << p_in_max << " the min is = " << p_in_min << endl;

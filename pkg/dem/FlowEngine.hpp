@@ -9,7 +9,7 @@
 
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
-#include<yade/lib/triangulation/FlowBoundingSphere.h>
+#include<yade/lib/triangulation/FlowBoundingSphere.hpp>
 #include<yade/pkg/dem/TesselationWrapper.hpp>
 
 class TesselationWrapper;
@@ -32,7 +32,6 @@ class FlowEngine : public PartialEngine
 		bool currentTes;
 		int id_offset;
 	//	double IS;
-		double eps_vol_max;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
 		void Triangulate ();
@@ -71,7 +70,8 @@ class FlowEngine : public PartialEngine
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
 					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
 					((int,PermuteInterval,100000,,"Pore space re-triangulation period"))
-					((double,EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
+					((double, eps_vol_max, 0,,"Maximal absolute volumetric strain computed at each iteration"))
+					((double, EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
 					((bool,compute_K,true,,"Activates permeability measure within a granular sample"))
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))

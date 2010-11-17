@@ -16,7 +16,7 @@
 #include "Timer.h"
 #include "stdafx.h"
 #include "Empilement.h"
-#include "Network.h"
+#include "Network.hpp"
 
 #ifdef XVIEW
 #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW

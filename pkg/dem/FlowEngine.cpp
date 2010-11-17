@@ -50,10 +50,9 @@ void FlowEngine::action ( )
 			if ( first ) Build_Triangulation( P_zero );
 
 			timingDeltas->checkpoint("Triangulating");
-			eps_vol_max=0.f;
-			std::ofstream eps_vol ("Epsilon_volume.txt", std::ios::app);
+
+			eps_vol_max=0.f;	
 			UpdateVolumes ( );
-			eps_vol << eps_vol_max << endl;
 			Eps_Vol_Cumulative += eps_vol_max;
 			if (Eps_Vol_Cumulative > ReTrg*EpsVolPercent_RTRG) {Update_Triangulation = true; ReTrg++;}
 
