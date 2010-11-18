@@ -64,7 +64,8 @@ class FlowBoundingSphere : public Network
 		void Localize();
 
 		void Compute_Permeability();
-		void GaussSeidel ( );
+		virtual void GaussSeidel ( );
+		virtual void ResetNetwork();
 
 // 		void Compute_Forces ();
 		void Fictious_cells ( );
@@ -167,17 +168,15 @@ class FlowBoundingSphere : public Network
 // 		double surface_external_double_fictious(Cell_handle cell, Boundary b);
 // 		double surface_external_single_fictious(Cell_handle cell, Boundary b);
 
-		///TAUCS
-		int SetLinearSystem();
-		int SetLinearSystemFullGS();
-		void VectorizedGaussSeidel ();
-		int TaucsSolveTest();
-		int PardisoSolveTest();
-		///END_TAUCS
-
 };
 
 } //namespace CGT
+
+#ifdef LINSOLV
+#include "FlowBoundingSphereLinSolv.hpp"
+#endif
+
+
 #endif //FLOW_ENGINE
 
 #endif

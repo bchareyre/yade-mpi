@@ -24,80 +24,77 @@ FlowEngine::~FlowEngine()
 {
 }
 
-void FlowEngine::action ( )
+void FlowEngine::action()
 {
 	if (!flow) {
-	flow = shared_ptr<FlowSolver> (new FlowSolver);
-	first=true;Update_Triangulation=false;/*IS=0.f;*/eps_vol_max=0.f;Eps_Vol_Cumulative=0.f;ReTrg=1.0;}
-	if ( !isActivated ) return;
+		flow = shared_ptr<FlowSolver> (new FlowSolver);
+		first=true;
+		Update_Triangulation=false;/*IS=0.f;*/
+		eps_vol_max=0.f;
+		Eps_Vol_Cumulative=0.f;
+		ReTrg=1.0;
+	}
+	if (!isActivated) return;
 	else
 	{
 		timingDeltas->start();
 
-		if ( !triaxialCompressionEngine )
-		{vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();for ( ;itFirst!=itLast; ++itFirst ){
-		if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ){
-		cout << "stress controller engine found - FlowEngine" << endl;
-		triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );}}
-		if ( !triaxialCompressionEngine ) cout << "stress controller engine NOT found" << endl;}
+		if (!triaxialCompressionEngine)
+		{
+			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
+			for (;itFirst!=itLast; ++itFirst) {
+				if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {
+					cout << "stress controller engine found - FlowEngine" << endl;
+					triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}}
+			if (!triaxialCompressionEngine) cout << "stress controller engine NOT found" << endl;
+		}
 
 		currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
 		currentStrain = triaxialCompressionEngine->strain[1];
 		current_state = triaxialCompressionEngine->currentState;
 
-		if ( current_state==3 )
+// 		if ( current_state==3 )
 		{
-			if ( first ) Build_Triangulation( P_zero );
-
+			if (first) Build_Triangulation(P_zero);
 			timingDeltas->checkpoint("Triangulating");
 
-			eps_vol_max=0.f;	
+			eps_vol_max=0.f;
 			UpdateVolumes ( );
 			Eps_Vol_Cumulative += eps_vol_max;
-			if (Eps_Vol_Cumulative > ReTrg*EpsVolPercent_RTRG) {Update_Triangulation = true; ReTrg++;}
-
+			if (Eps_Vol_Cumulative > ReTrg*EpsVolPercent_RTRG) {
+				Update_Triangulation = true;
+				ReTrg++;}
 			timingDeltas->checkpoint("Update_Volumes");
 
-			///Compute flow and and forces here
-			if (!first) flow->GaussSeidel ( );
+			if (!first) {
+				///Compute flow and and forces here
+				flow->GaussSeidel();
+				timingDeltas->checkpoint("Gauss-Seidel");
+				if (save_mgpost) flow->MGPost();
+				if (!CachedForces) flow->ComputeFacetForces();
+				else flow->ComputeFacetForcesWithCache();
+				timingDeltas->checkpoint("Compute_Forces");
 
-			timingDeltas->checkpoint("Gauss-Seidel");
-
-			if (save_mplot) {
-				int j = scene->iter;
-				char plotfile [50];
-				mkdir("./mplot", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-				string visu_consol = "./mplot/"+flow->key+"%d_Visu_Consol";
-				const char* key_visu_consol = visu_consol.c_str();
-				sprintf(plotfile, key_visu_consol, j);
-				char *gg = plotfile;
-				flow->mplot(gg);}
-
-			if (save_mgpost) flow->MGPost();
-
-			if (!CachedForces) flow->ComputeFacetForces();
-			else flow->ComputeFacetForcesWithCache();
-
-			timingDeltas->checkpoint("Compute_Forces");
-
-			///End Compute flow and forces
-			//int number_of_particles = flow->num_particles;
-			CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end ();
-			Vector3r f; int id;
-			//IS = 0.f;
-			//std::ofstream Istab ("Stability.txt", std::ios::app);
-			for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
-			{
-				id = V_it->info().id();
-				for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
-				scene->forces.addForce ( id, f );
-				//scene->forces.sync();
-				//IS += (scene->forces.getForce(id).norm())/number_of_particles;
+				///End Compute flow and forces
+				//int number_of_particles = flow->num_particles;
+				CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
+				Vector3r f;
+				int id;
+				//IS = 0.f;
+				//std::ofstream Istab ("Stability.txt", std::ios::app);
+				for (CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++)
+				{
+					id = V_it->info().id();
+					for (int y=0;y<3;y++) f[y] = (V_it->info().forces)[y];
+					scene->forces.addForce(id, f);
+					//scene->forces.sync();
+					//IS += (scene->forces.getForce(id).norm())/number_of_particles;
+				}
+				timingDeltas->checkpoint("Applying Forces");
 			}
 			//cout << "STABILITY INDEX - IS = " << IS << endl;
 			//Istab << scene->time << " " << IS << endl;
-
-			timingDeltas->checkpoint("Applying Forces");
 
 			Real time = scene->time;
 			int j = scene->iter;
@@ -116,30 +113,28 @@ void FlowEngine::action ( )
 				max_p << j << " " << time << " " << MaxPressure << endl;
 
 				std::ofstream settle("settle.txt", std::ios::app);
-				settle << j << " " << time << " " << currentStrain << endl;}
-
+				settle << j << " " << time << " " << currentStrain << endl;
+			}
 // 			if ( scene->iter % PermuteInterval == 0 )
 // 			{ Update_Triangulation = true; }
 
-			if ( Update_Triangulation && !first) { Build_Triangulation( );}
-
+			if (Update_Triangulation && !first) {
+				Build_Triangulation();
+				Update_Triangulation = false;
+			}
 			first=false;
-			Update_Triangulation = false;
-
-			timingDeltas->checkpoint("Storing Max Pressure");
-
-// 				flow->Average_Grain_Velocity();
+//			flow->Average_Grain_Velocity();
 			if (save_vtk) flow->save_vtk_file();
 
 			if (slice_pressures)
 			{
-			  char slifile [30];
-			  mkdir("./Slices", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-			  string slice = "./Slices/Slice_"+flow->key+"_%d";
-			  const char* keyslice = slice.c_str();
-			  sprintf (slifile, keyslice, j);
-			  char *f = "slifile";
-			  flow->SliceField(f);
+				char slifile [30];
+				mkdir("./Slices", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+				string slice = "./Slices/Slice_"+flow->key+"_%d";
+				const char* keyslice = slice.c_str();
+				sprintf(slifile, keyslice, j);
+				char *f = "slifile";
+				flow->SliceField(f);
 			}
 // 				int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
 // 				flow->vtk_average_cell_velocity(flow->T[flow->currentTes].Triangulation(), id_sphere, numero);
@@ -172,20 +167,18 @@ void FlowEngine::Build_Triangulation ()
 
 void FlowEngine::Build_Triangulation (double P_zero)
 {
-	if (first)
-	{
-		flow->currentTes=0;
-		flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
-		flow->SLIP_ON_LATERALS=slip_boundary;
-		flow->key = triaxialCompressionEngine->Key;
-		flow->k_factor = permeability_factor;
-		flow->DEBUG_OUT = Debug;
-	}
-	else
-	{
+	flow->ResetNetwork();
+	if (first) flow->currentTes=0;
+	else {
 		flow->currentTes=!flow->currentTes;
-		if (Debug) cout << "--------RETRIANGULATION-----------" << endl;
-	}
+		if (Debug) cout << "--------RETRIANGULATION-----------" << endl;}
+
+	flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
+	flow->SLIP_ON_LATERALS=slip_boundary;
+	flow->key = triaxialCompressionEngine->Key;
+	flow->k_factor = permeability_factor;
+	flow->DEBUG_OUT = Debug;
+
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
@@ -206,7 +199,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	{
 		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		/*if (compute_K) {*/flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );/*}*/
+		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
   		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15);
@@ -221,14 +214,15 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
-		flow->Initialize_pressures( P_zero );// FIXME : why, if we are going to interpolate after that?
+		flow->Initialize_pressures(P_zero);// FIXME : why, if we are going to interpolate after that?
 		flow->TOLERANCE=Tolerance;//So it can be changed at run time
-		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
-
+		flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15);
+		else if (TimeBC) flow->ApplySinusoidalPressure_Space_Time(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15, scene->time, scene->dt);
+		flow->TOLERANCE=Tolerance;
+		flow->RELAX=Relax;
 	}
-	Initialize_volumes ( );
-	flow->noCache=true;
+	Initialize_volumes();
 }
 
 void FlowEngine::AddBoundary ()

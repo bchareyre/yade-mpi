@@ -179,7 +179,7 @@ long Tesselation::New_liste_adjacent_edges ( Vertex_handle vertex0, Real** Coord
 				pass = true;
 				if ( !Tri->is_infinite ( ( *facet ).first ) && !Tri->is_infinite ( ( *facet ).first->neighbor ( ( *facet ).second ) ) )
 				{
-					cout << "p.x()     = " << p.x() << "p.y()     = " << p.y() << "p.z()     = " << p.z() << endl;
+// 					cout << "p.x()     = " << p.x() << "p.y()     = " << p.y() << "p.z()     = " << p.z() << endl;
 					p = ( *facet ).first->info();
 					( *Coordonnes ) [k++] = p.x(); ( *Coordonnes ) [k++] = p.y(); ( *Coordonnes ) [k++] = p.z();
 					p = ( *facet ).first->neighbor ( ( *facet ).second )->info();

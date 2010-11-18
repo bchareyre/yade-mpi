@@ -32,7 +32,7 @@
 #define TESS_BASED_FORCES
 #define FACET_BASED_FORCES 1
 
-#ifdef YADE_OPEN_MP
+#ifdef YADE_OPENMP
 //   #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
 #endif
 
@@ -92,6 +92,9 @@ FlowBoundingSphere::FlowBoundingSphere()
 	OUTPUT_BOUDARIES_RADII = false;
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 }
+
+void FlowBoundingSphere::ResetNetwork() {noCache=true;}
+
 Tesselation& FlowBoundingSphere::Compute_Action()
 {
         return Compute_Action(0,NULL,NULL);
@@ -1036,14 +1039,14 @@ void FlowBoundingSphere::GaussSeidel()
 		#endif
 		j++;
 //                  		if (j % 100 == 0) {
-//                         // cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
+//                         cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
 //                         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
 //                         //     save_vtk_file ( Tri );
 //                  }
 	#ifdef GS_OPEN_MP
 	} while (j<1500);
 	#else
-	} while ((dp_max/p_max) > tolerance /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
+	} while ((dp_max/p_max) > tolerance && j<4000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 	#endif
 	}
 
@@ -1171,7 +1174,6 @@ void FlowBoundingSphere::DisplayStatistics()
                         Fictious+=1;
                 }
         }
-
         int fict=0, real=0;
         for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                 if (v->info().isFictious) fict+=1;
