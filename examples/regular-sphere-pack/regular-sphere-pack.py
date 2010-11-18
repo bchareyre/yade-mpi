@@ -69,10 +69,16 @@ oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
 O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,-5.9),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
 
 # spheresToFile saves coordinates and radii of all spheres of the simulation into the text file
-#print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
+print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
 
 # spheresFromFile function imports coordinates and radiuses of all spheres of the simulation into the text file
 O.bodies.append(ymport.text('regular-sphere-pack-FromFile',shift=Vector3(6.0,6.0,-2.9),scale=0.7,color=(1,1,1),**kw))
+
+#Demonstration of HarmonicMotionEngine
+O.bodies.append(pack.regularHexa(pack.inSphere((-10,5,-5),1.5),radius=rad*2.0,gap=gap,color=(0.2,0.5,0.9),material=0))
+O.bodies.append(utils.facetBox((-10,5,-5),(2,2,2),wallMask=15,**kwMeshes))
+vibrationPlate = O.bodies.append(utils.facetBox((-10,5,-5),(2,2,2),wallMask=16,**kwBoxes))
+
 
 try:
 	from yade import qt
@@ -95,7 +101,8 @@ O.engines=[
 		angularVelocity=10.0,
 		rotationAxis=[0,0,1],
 		rotateAroundZero=1,
-		zeroPoint=[6.0,6.0,0.0])
+		zeroPoint=[6.0,6.0,0.0]),
+	HarmonicMotionEngine(A=[0,0,0.5], w=[0,0,80.0], fi = [0.0,0.0,pi], ids = vibrationPlate)
 ]
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
 O.dt=utils.PWaveTimeStep()

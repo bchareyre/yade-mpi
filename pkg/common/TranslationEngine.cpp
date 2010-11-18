@@ -20,4 +20,17 @@ void TranslationEngine::action(){
 	}
 }
 
-YADE_PLUGIN((TranslationEngine));
+void HarmonicMotionEngine::action(){
+	const Real& dt=scene->dt;
+	const Real& time=scene->time;
+	FOREACH(Body::id_t id,ids){
+		assert(id<(Body::id_t)scene->bodies->size());
+		Body* b=Body::byId(id,scene).get();
+		if(!b) continue;
+		Vector3r velocity = ((((w*time + fi).cwise().sin())*(-1.0)).cwise()*A).cwise()*w;
+		b->state->pos+=dt*velocity;
+		b->state->vel=velocity;
+	}
+}
+
+YADE_PLUGIN((TranslationEngine)(HarmonicMotionEngine));
