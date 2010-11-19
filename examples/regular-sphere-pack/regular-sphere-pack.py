@@ -75,9 +75,15 @@ print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
 O.bodies.append(ymport.text('regular-sphere-pack-FromFile',shift=Vector3(6.0,6.0,-2.9),scale=0.7,color=(1,1,1),**kw))
 
 #Demonstration of HarmonicMotionEngine
-O.bodies.append(pack.regularHexa(pack.inSphere((-10,5,-5),1.5),radius=rad*2.0,gap=gap,color=(0.2,0.5,0.9),material=0))
+O.bodies.append(pack.regularHexa(pack.inSphere((-10,5,-5),1.5),radius=rad*2.0,gap=rad/3.0,color=(0.2,0.5,0.9),material=0))
 O.bodies.append(utils.facetBox((-10,5,-5),(2,2,2),wallMask=15,**kwMeshes))
 vibrationPlate = O.bodies.append(utils.facetBox((-10,5,-5),(2,2,2),wallMask=16,**kwBoxes))
+
+#Demonstration of HarmonicRotationEngine
+O.bodies.append(pack.regularHexa(pack.inSphere((-15,5,-5),1.5),radius=rad*2.0,gap=rad/3.0,color=(0.5,0.5,0.1),material=0))
+O.bodies.append(utils.facetBox((-15,5,-5),(2,2,2),wallMask=15,**kwMeshes))
+vibrationRotationPlate = O.bodies.append(utils.facetBox((-15,5,-5),(2,2,2),wallMask=16,**kwBoxes))
+
 
 
 try:
@@ -102,7 +108,8 @@ O.engines=[
 		rotationAxis=[0,0,1],
 		rotateAroundZero=1,
 		zeroPoint=[6.0,6.0,0.0]),
-	HarmonicMotionEngine(A=[0,0,0.5], f=[0,0,50.0], fi = [0.0,0.0,pi], ids = vibrationPlate)
+	HarmonicMotionEngine(A=[0,0,0.5], f=[0,0,20.0], fi = [0.0,0.0,pi], ids = vibrationPlate),
+	HarmonicRotationEngine(A=0.2, f=20.0, fi = pi, rotationAxis=[1.0,0.0,0.0], rotateAroundZero = True, zeroPoint = [-15.0,3.0,-7.0], ids = vibrationRotationPlate) 
 ]
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
 O.dt=utils.PWaveTimeStep()

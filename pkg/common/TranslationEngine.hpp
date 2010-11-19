@@ -21,18 +21,17 @@ class TranslationEngine : public PartialEngine {
 		((Vector3r,translationAxis,,,"Direction [Vector3]"))
 	);
 };
+REGISTER_SERIALIZABLE(TranslationEngine);
 
-class HarmonicMotionEngine : public TranslationEngine {
+class HarmonicMotionEngine : public PartialEngine {
 	public:
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS(HarmonicMotionEngine,TranslationEngine,"This engine implements the harmonic oscillation of bodies. http://en.wikipedia.org/wiki/Simple_harmonic_motion#Dynamics_of_simple_harmonic_motion ; please, set dynamic=False for bodies, droven by this engine, otherwise amplitude will be 2x more, than awaited.",
+	YADE_CLASS_BASE_DOC_ATTRS(HarmonicMotionEngine,PartialEngine,"This engine implements the harmonic oscillation of bodies. http://en.wikipedia.org/wiki/Simple_harmonic_motion#Dynamics_of_simple_harmonic_motion",
 		((Vector3r,A,Vector3r::Zero(),,"Amplitude [m]"))
 		((Vector3r,f,Vector3r::Zero(),,"Frequency [hertz]"))
 		((Vector3r,fi,Vector3r(Mathr::PI/2.0, Mathr::PI/2.0, Mathr::PI/2.0),,"Initial phase [radians]. By default, the body oscillates around initial position."))
 	);
 };
-
-REGISTER_SERIALIZABLE(TranslationEngine);
 REGISTER_SERIALIZABLE(HarmonicMotionEngine);
 
 

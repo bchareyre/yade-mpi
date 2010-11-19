@@ -60,6 +60,13 @@ class InterpolatingHelixEngine: public HelixEngine{
 };
 REGISTER_SERIALIZABLE(InterpolatingHelixEngine);
 
-
-
-
+class HarmonicRotationEngine:public RotationEngine{
+	public:
+	virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(HarmonicRotationEngine,RotationEngine,"This engine implements the harmonic-rotation oscillation of bodies. http://en.wikipedia.org/wiki/Simple_harmonic_motion#Dynamics_of_simple_harmonic_motion ; please, set dynamic=False for bodies, droven by this engine, otherwise amplitude will be 2x more, than awaited.",
+		((Real,A,0,,"Amplitude [rad]"))
+		((Real,f,0,,"Frequency [hertz]"))
+		((Real,fi,Mathr::PI/2.0,,"Initial phase [radians]. By default, the body oscillates around initial position."))
+	);
+};
+REGISTER_SERIALIZABLE(HarmonicRotationEngine);

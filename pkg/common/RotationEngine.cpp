@@ -9,7 +9,7 @@
 
 #include<yade/pkg/common/LinearInterpolate.hpp>
 
-YADE_PLUGIN((RotationEngine)(HelixEngine)(InterpolatingHelixEngine));
+YADE_PLUGIN((RotationEngine)(HelixEngine)(InterpolatingHelixEngine)(HarmonicRotationEngine));
 
 void InterpolatingHelixEngine::action(){
 	Real virtTime=wrap ? Shop::periodicWrap(scene->time,*times.begin(),*times.rbegin()) : scene->time;
@@ -54,15 +54,26 @@ void RotationEngine::action(){
 	#else
 	FOREACH(Body::id_t id,ids){
 	#endif
-		State* state=Body::byId(id,scene)->state.get();
-		state->angVel=rotationAxis*angularVelocity;
+		assert(id<(Body::id_t)scene->bodies->size());
+		Body* b=Body::byId(id,scene).get();
+		if(!b) continue;
+		
+		b->state->angVel=rotationAxis*angularVelocity;
 		if(rotateAroundZero){
-			const Vector3r l=state->pos-zeroPoint;
-			state->pos=q*l+zeroPoint; 
-			state->vel=state->angVel.cross(l);
+			const Vector3r l=b->state->pos-zeroPoint;
+			if (!b->isDynamic())	b->state->pos=q*l+zeroPoint; 
+			b->state->vel=b->state->angVel.cross(l);
 		}
-	state->ori=q*state->ori;
-	state->ori.normalize();
+		if (!b->isDynamic())	{
+			b->state->ori=q*b->state->ori;
+			b->state->ori.normalize();
+		}
 	}
 }
 
+void HarmonicRotationEngine::action(){
+	const Real& time=scene->time;
+	Real w = f*2.0*Mathr::PI; 			//Angular frequency
+	angularVelocity = -1.0*A*w*sin(w*time + fi);
+	RotationEngine::action();
+}
