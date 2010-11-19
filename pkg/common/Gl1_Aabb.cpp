@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef YADE_OPENGL
+
 #include"Gl1_Aabb.hpp"
 #include<yade/lib/opengl/OpenGLWrapper.hpp>
 #include<yade/pkg/common/Aabb.hpp>
@@ -27,4 +29,5 @@ void Gl1_Aabb::go(const shared_ptr<Bound>& bv, Scene* scene){
 }
 
 YADE_PLUGIN((Gl1_Aabb));
-YADE_REQUIRE_FEATURE(OPENGL)
+
+#endif /* YADE_OPENGL */

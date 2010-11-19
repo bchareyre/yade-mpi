@@ -169,5 +169,3 @@ void CapillaryStressRecorder::action()
 	
 }
 
-//YADE_REQUIRE_FEATURE(PHYSPAR);
-

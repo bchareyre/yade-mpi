@@ -79,6 +79,7 @@ class Scene: public Serializable{
 		((list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
 		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))
 		((vector<shared_ptr<Engine> >,_nextEngines,,Attr::hidden,"Engines to be used from the next step on; is returned transparently by O.engines if in the middle of the loop (controlled by subStep>=0)."))
+		// NOTE: bodies must come before interactions, since InteractionContainer is initialized with a reference to BodyContainer::body
 		((shared_ptr<BodyContainer>,bodies,new BodyContainer,Attr::hidden,"Bodies contained in the scene."))
 		((shared_ptr<InteractionContainer>,interactions,new InteractionContainer,Attr::hidden,"All interactions between bodies."))
 		((shared_ptr<EnergyTracker>,energy,new EnergyTracker,Attr::hidden,"Energy values, if energy tracking is enabled."))
@@ -90,7 +91,9 @@ class Scene: public Serializable{
 		((vector<shared_ptr<DisplayParameters> >,dispParams,,Attr::hidden,"'hash maps' of display parameters (since yade::serialization had no support for maps, emulate it via vector of strings in format key=value)"))
 
 		,
-		/*ctor*/ fillDefaultTags();
+		/*ctor*/
+			fillDefaultTags();
+			interactions->postLoad__calledFromScene(bodies);
 	);
 	DECLARE_LOGGER;
 };

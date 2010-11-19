@@ -7,26 +7,73 @@
 	#include<omp.h>
 #endif
 
+// begin internal functions
 
 bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
+	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	Body::id_t id1=i->getId1(), id2=i->getId2();
-	if (id1>id2) swap(id1,id2);
-
-	if((size_t)id1>=vecmap.size()) vecmap.resize(id1+1); // resize linear map to accomodate id1
-
-	// inserted element maps id2->currSize; currSize will be incremented immediately
-	if(!vecmap[id1].insert(pair<Body::id_t,size_t>(id2,currSize)).second) return false; // id1,id2 pair already present
-		
-	//assert(intrs.size()==currSize);
-	intrs.resize(++currSize); // currSize updated
-	//assert(intrs.size()==currSize);
-
-	intrs[currSize-1]=i; // assign last element
-	
+	if (id1>id2) swap(id1,id2); 
+	assert(bodies->size()>id1); assert(bodies->size()>id2); // the bodies must exist already
+	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
+	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
+	//assert(linIntrs.size()==currSize);
+	linIntrs.resize(++currSize); // currSize updated
+	//assert(linIntrs.size()==currSize);
+	linIntrs[currSize-1]=i; // assign last element
+	i->linIx=currSize-1; // store the index back-reference in the interaction (so that it knows how to erase/move itself)
 	return true;
 }
 
+
+void InteractionContainer::clear(){
+	assert(bodies);
+	boost::mutex::scoped_lock lock(drawloopmutex);
+	FOREACH(const shared_ptr<Body>& b, *bodies) b->intrs.clear(); // delete interactions from bodies
+	linIntrs.clear(); // clear the linear container
+	pendingErase.clear();
+	currSize=0;
+}
+
+
+bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
+	assert(bodies);
+	boost::mutex::scoped_lock lock(drawloopmutex);
+	if (id1>id2) swap(id1,id2);
+	assert(id1<bodies->size() && id2<bodies->size()); // (possibly) existing ids
+	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1); // get the body; check it is not deleted
+	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
+	// this used to return false
+	if(I==b1->intrs.end()) throw std::logic_error(("InteractionContainer::erase: attempt to delete non-existent interaction ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2)).c_str());
+	// erase from body and then from linIntrs as well
+	int linIx=I->second->linIx; 
+	b1->intrs.erase(I);
+	// iid is not the last element; we have to move last one to its place
+	if (linIx<currSize-1) {
+		linIntrs[linIx]=linIntrs[currSize-1];
+		linIntrs[linIx]->linIx=linIx; // update the back-reference inside the interaction
+	}
+	//assert(linIntrs.size()==currSize);
+	// in either case, last element can be removed now
+	linIntrs.resize(--currSize); // currSize updated
+	//assert(linIntrs.size()==currSize);
+	return true;
+}
+
+
+const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
+	assert(bodies);
+	if (id1>id2) swap(id1,id2);
+	assert(id1<bodies->size() && id2<bodies->size());
+	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1);
+	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
+	if (I!=b1->intrs.end()) return I->second;
+	else { empty=shared_ptr<Interaction>(); return empty; }
+}
+
+// end internal functions
+
+// the rest uses internal functions to access data structures, and does not have to be modified if they change
 
 bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 {
@@ -34,54 +81,6 @@ bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 	return insert(i);	
 }
 
-
-void InteractionContainer::clear(){
-	boost::mutex::scoped_lock lock(drawloopmutex);
-
-	vecmap.clear();
-	intrs.clear();
-	pendingErase.clear();
-	currSize=0;
-}
-
-
-bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
-	boost::mutex::scoped_lock lock(drawloopmutex);
-	if (id1>id2) swap(id1,id2);
-	if((size_t)id1>=vecmap.size()) return false; // id1 out of bounds
-	map<Body::id_t,size_t>::iterator mii;
-	mii=vecmap[id1].find(id2);
-	if(mii==vecmap[id1].end()) return false; // id2 not in interaction with id1
-	// interaction found; erase from vecmap and then from intrs as well
-	size_t iid=(*mii).second;
-	vecmap[id1].erase(mii);
-	// iid is not the last element; we have to move last one to its place
-	if (iid<currSize-1) {
-		intrs[iid]=intrs[currSize-1];
-		// adjust map, so that id1,id2 points to element at iid, which used to be last
-		id1=intrs[iid]->getId1();
-		id2=intrs[iid]->getId2();
-		if (id1>id2) swap(id1,id2);
-		vecmap[id1][id2]=iid;
-	}
-	//assert(intrs.size()==currSize);
-	// in either case, last element can be removed now
-	intrs.resize(--currSize); // currSize updated
-	//assert(intrs.size()==currSize);
-	return true;
-}
-
-
-const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
-	if (id1>id2) swap(id1,id2);
-
-	if ((size_t)id1>=vecmap.size()) { empty=shared_ptr<Interaction>(); return empty; }
-
-	map<Body::id_t,size_t>::iterator mii;
-	mii = vecmap[id1].find(id2);
-	if (mii!=vecmap[id1].end()) return intrs[(*mii).second];
-	else { empty=shared_ptr<Interaction>(); return empty; }
-}
 
 void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool force){
 	find(id1,id2)->reset(); IdsForce v={id1,id2,force};
@@ -147,7 +146,9 @@ void InteractionContainer::postSave(InteractionContainer&){ interaction.clear();
 
 
 void InteractionContainer::preLoad(InteractionContainer&){ interaction.clear(); }
-void InteractionContainer::postLoad(InteractionContainer&){
+
+void InteractionContainer::postLoad__calledFromScene(const shared_ptr<BodyContainer>& bb){
+	bodies=&bb->body; // update the internal pointer
 	clear();
 	FOREACH(const shared_ptr<Interaction>& I, interaction){ insert(I); }
 	interaction.clear();

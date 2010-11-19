@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef YADE_CGAL
+
 #include<yade/lib/pyutil/numpy.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
@@ -14,7 +16,6 @@
 #include <yade/lib/triangulation/Timer.h>
 
 YADE_PLUGIN((TesselationWrapper));
-YADE_REQUIRE_FEATURE(CGAL)
 CREATE_LOGGER(TesselationWrapper);
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
@@ -359,3 +360,5 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		if (deformation) ret["def"]=def;
  		return ret;
 }
+
+#endif /* YADE_CGAL */

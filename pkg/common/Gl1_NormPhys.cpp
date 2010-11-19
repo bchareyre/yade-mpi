@@ -1,3 +1,4 @@
+#ifdef YADE_OPENGL
 
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Gl1_NormPhys.hpp>
@@ -6,7 +7,6 @@
 #include<yade/pkg/dem/Shop.hpp>
 
 YADE_PLUGIN((Gl1_NormPhys));
-YADE_REQUIRE_FEATURE(OPENGL);
 
 GLUquadric* Gl1_NormPhys::gluQuadric=NULL;
 Real Gl1_NormPhys::maxFn;
@@ -74,3 +74,4 @@ void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>
 	glPopMatrix();
 }
 
+#endif /* YADE_OPENGL */

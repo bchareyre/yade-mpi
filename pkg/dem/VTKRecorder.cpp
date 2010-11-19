@@ -1,3 +1,5 @@
+#ifdef YADE_VTK
+
 #include"VTKRecorder.hpp"
 
 // avoid warnings in VTK code (does not work?!)
@@ -30,7 +32,6 @@
 
 
 YADE_PLUGIN((VTKRecorder));
-YADE_REQUIRE_FEATURE(VTK)
 CREATE_LOGGER(VTKRecorder);
 
 void VTKRecorder::action(){
@@ -454,3 +455,6 @@ void VTKRecorder::action(){
 		}
 	#endif
 }
+
+
+#endif /* YADE_VTK */

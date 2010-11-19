@@ -17,10 +17,8 @@ Interaction::Interaction(Body::id_t newId1,Body::id_t newId2): id1(newId1), id2(
 bool Interaction::isFresh(Scene* rb){ return iterMadeReal==rb->iter;}
 
 void Interaction::init(){
-	isNeighbor = true;//NOTE : TriangulationCollider needs that
 	iterMadeReal=-1;
 	functorCache.geomExists=true;
-	//functorCache.geom=shared_ptr<IGeomFunctor>(); functorCache.phys=shared_ptr<IPhysFunctor>(); functorCache.constLaw=shared_ptr<LawFunctor>();
 }
 
 void Interaction::reset(){

@@ -75,12 +75,6 @@ def scanAllPlugins(cacheFile,feats):
 							linkDeps.update(grepForIncludes(root,m.group(2)))
 						linkDeps.add(incHead.split('.')[0])
 						continue
-					m=re.match('^\s*YADE_REQUIRE_FEATURE\s*\(\s*(.*)\s*\).*$',l)
-					if m:
-						featureDeps.add(m.group(1).upper())
-					m=re.match('^s*YADE_LINK_EXTRA_LIB\((.*)\).*$',l)
-					if m:
-						linkDeps.add('!'+m.group(1)) # hack!! see getPLuginLibs
 					m=re.match('^\s*#include\s*"([^/]*)".*$',l)
 					if m:
 						inc=m.group(1); incBaseName=m.group(1).split('.')[0]

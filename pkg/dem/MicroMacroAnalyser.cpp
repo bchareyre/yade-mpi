@@ -5,7 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+#ifdef YADE_CGAL
 
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
@@ -23,7 +23,6 @@
 #include "MicroMacroAnalyser.hpp"
 
 YADE_PLUGIN((MicroMacroAnalyser));
-YADE_REQUIRE_FEATURE(CGAL)
 CREATE_LOGGER(MicroMacroAnalyser);
 
 MicroMacroAnalyser::~MicroMacroAnalyser(){ /*delete analyser;*/} //no need, its a shared_ptr now...
@@ -222,3 +221,5 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 // {
 // 	return analyser->ComputeParticlesDeformation(state_file1, state_file0);
 // }
+
+#endif /* YADE_CGAL */

@@ -18,10 +18,14 @@
 #  define FOREACH BOOST_FOREACH
 #endif
 
-/* This InteractionContainer implementation stores interactions internally in 2 containers:
-a std::vector (which allows for const-time linear traversal) and
-std::vector of id1 holding std::map of id2 (allowing for fast search by id1,id2). Synchronization
-of both is handles by insert & erase methods.
+/* This InteractionContainer implementation has reference to the body container and
+stores interactions in 2 places:
+
+* Internally in a std::vector; that allows for const-time linear traversal.
+  Each interaction internally holds back-reference to the position in this container in Interaction::linIx.
+* Inside Body::intrs (in the body with min(id1,id2)).
+
+Both must be kep in sync, which is handled by insert & erase methods.
 
 It was originally written by 2008 © Sergei Dorofeenko <sega@users.berlios.de>,
 later devirtualized and put here.
@@ -29,21 +33,35 @@ later devirtualized and put here.
 Alternative implementations of InteractionContainer should implement the same API. Due to performance
 reasons, no base class with virtual methods defining such API programatically is defined (it could
 be possible to create class template for this, though).
+
+Future (?):
+
+* The shared_ptr<Interaction> might be duplicated in body id2 as well. That would allow to retrieve
+  in a straigthforward manner all interactions with given body id, for instance. Performance implications
+  are not clear.
+
+* the linear vector might be removed; in favor of linear traversal of bodies by their subdomains,
+  then traversing the map in each body. If the previous point would come to realization, half of the
+  interactions would have to be skipped explicitly in such a case.
+
 */
 class InteractionContainer: public Serializable{
-	private :
+	private:
 		typedef vector<shared_ptr<Interaction> > ContainerT;
 		// linear array of container interactions
-		vector<shared_ptr<Interaction> > intrs;
-		// array where vecmap[id1] maps id2 to index in intrs (unsigned int)
-		vector<map<Body::id_t,size_t> > vecmap;
-		// always in sync with intrs.size()
+		ContainerT linIntrs;
+		// pointer to body container, since each body holds (some) interactions
+		// this must always point to scene->bodies->body
+		const BodyContainer::ContainerT* bodies;
+		// always in sync with intrs.size(), to avoid that function call
 		size_t currSize;
 		shared_ptr<Interaction> empty;
 		// used only during serialization/deserialization
 		vector<shared_ptr<Interaction> > interaction;
-	public :
+	public:
+		// required by the class factory... :-|
 		InteractionContainer(): currSize(0),serializeSorted(false),iterColliderLastRun(-1){
+			bodies=NULL;
 			#ifdef YADE_OPENMP
 				threadsPendingErase.resize(omp_get_max_threads());
 			#endif
@@ -52,18 +70,18 @@ class InteractionContainer: public Serializable{
 		// iterators
 		typedef ContainerT::iterator iterator;
 		typedef ContainerT::const_iterator const_iterator;
-		iterator begin(){return intrs.begin();}
-     	iterator end()  {return intrs.end();}
-		const_iterator begin() const {return intrs.begin();}
-     	const_iterator end()   const {return intrs.end();}
+		iterator begin(){return linIntrs.begin();}
+		iterator end()  {return linIntrs.end();}
+		const_iterator begin() const {return linIntrs.begin();}
+		const_iterator end()   const {return linIntrs.end();}
 		// insertion/deletion
 		bool insert(Body::id_t id1,Body::id_t id2);
 		bool insert(const shared_ptr<Interaction>& i);
 		bool erase(Body::id_t id1,Body::id_t id2);
 		const shared_ptr<Interaction>& find(Body::id_t id1,Body::id_t id2);
 		// index access
-		shared_ptr<Interaction>& operator[](size_t id){return intrs[id];}
-		const shared_ptr<Interaction>& operator[](size_t id) const { return intrs[id];}
+		shared_ptr<Interaction>& operator[](size_t id){return linIntrs[id];}
+		const shared_ptr<Interaction>& operator[](size_t id) const { return linIntrs[id];}
 		size_t size(){ return currSize; }
 		// simulation API
 
@@ -133,8 +151,9 @@ class InteractionContainer: public Serializable{
 			return ret;
 		}
 
+	// we must call Scene's ctor (and from Scene::postLoad), since we depend on the existing BodyContainer at that point.
+	void postLoad__calledFromScene(const shared_ptr<BodyContainer>&);
 	void preLoad(InteractionContainer&);
-	void postLoad(InteractionContainer&);
 	void preSave(InteractionContainer&);
 	void postSave(InteractionContainer&);
 

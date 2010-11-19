@@ -5,7 +5,7 @@ Programmer's manual
 Build system
 =============
 
-Yade uses [scons]_ build system for managing the build process. It takes care of configuration, compilation and installation. SCons is written in python and its build scripts are in python, too. SCons complete documentation can be found in its manual page.
+Yade uses `scons <http://www.scons.org>`__ build system for managing the build process. It takes care of configuration, compilation and installation. SCons is written in python and its build scripts are in python, too. SCons complete documentation can be found in its manual page.
 
 
 .. _scons-parameters:
@@ -60,34 +60,34 @@ Essentials
 """""""""""""
 
 compiler
-	Obviously c++ compiler is necessary. Yade relies on several extensions of ``g++`` from the [gcc]_ suite and cannot (probably) be built with other compilers.
+	Obviously c++ compiler is necessary. Yade relies on several extensions of ``g++`` from the `gcc <http://gcc.gnu.org`__ suite and cannot (probably) be built with other compilers.
 boost
-	[boost]_ is a large collection of peer-reviewed c++ libraries. Yade currently uses thread, date_time, filesystem, iostreams, regex, serialization, program_options, foreach, python; typically the whole boost bundle will be installed. If you need functionality from other modules, you can make presence of that module mandatory. Only be careful about relying on very new features; due to range of systems yade is or might be used on, it is better to be moderately conservative (read: roughly 3 years backwards compatibility).
+	`boost <http://www.boost.org>`__ is a large collection of peer-reviewed c++ libraries. Yade currently uses thread, date_time, filesystem, iostreams, regex, serialization, program_options, foreach, python; typically the whole boost bundle will be installed. If you need functionality from other modules, you can make presence of that module mandatory. Only be careful about relying on very new features; due to range of systems yade is or might be used on, it is better to be moderately conservative (read: roughly 3 years backwards compatibility).
 python
-	[python]_ is the scripting language used by yade. Besides [boost::python]_, yade further requires
+	`python <http://www.python.org`__ is the scripting language used by yade. Besides [boost::python]_, yade further requires
 
-	* [ipython]_ (terminal interaction)
-	* [matplotlib]_ (plotting)
-	* [numpy]_ (matlab-like numerical functionality and accessing numpy arrays from ``c``/``c++`` efficiently)
+	* `ipython <http://www.ipython.org>`__ (terminal interaction)
+	* `matplotlib <http://matplotlib.sf.net>`__ (plotting)
+	* `numpy <http://www.numpy.org`__ (matlab-like numerical functionality and accessing numpy arrays from ``c``/``c++`` efficiently)
 
 .. _optional-libraries:
 Optional libraries (features)
 """"""""""""""""""""""""""""""
 
-The `features` parameter controls optional functionality. Each enabled feature defines preprocessor macro `YADE_FEATURE` (name uppercased) to enable selective exclude/include of parts of code. In some cases, it would be meaningless to compile some file at all (e.g. `VTKRecorder` without the `vtk` feature). This can be controller using the `YADE_REQUIRE_FEATURE` places in the respective implementation file (see the :ref:`linking` section for more details).
+The `features` parameter controls optional functionality. Each enabled feature defines preprocessor macro `YADE_FEATURE` (name uppercased) to enable selective exclude/include of parts of code. Code of which compilation depends on a particular features should use ``#ifdef YADE_FEATURE`` constructs to exclude dependent parts.
 
 log4cxx (YADE_LOG4CXX)
-	Enable flexible logging system ([log4cxx]_), which permits to assign logging levels on per-class basis; doesn't change API, only redefines `LOG_INFO` and other macros accordingly; see :ref:`log4cxx` for details.
+	Enable flexible logging system (`log4cxx <http://log4cxx.apache.org>`__), which permits to assign logging levels on per-class basis; doesn't change API, only redefines `LOG_INFO` and other macros accordingly; see :ref:`log4cxx` for details.
 opengl (YADE_OPENGL)
 	Enable 3d rendering as well as the Qt3-based graphical user interface (in addition to python console).
 vtk (YADE_VTK)
-	Enable functionality using Visualization Toolkit ([vtk]_; e.g. :yref:`VTKRecorder` exporting to files readable with ParaView).
+	Enable functionality using Visualization Toolkit (`vtk <http://www.vtk.org>`__; e.g. :yref:`VTKRecorder` exporting to files readable with ParaView).
 openmp (YADE_OPENMP)
 	Enable parallelization using OpenMP, non-intrusive shared-memory parallelization framework; it is only supported for ``g++`` > 4.0. Parallel computation leads to significant performance increase and should be enabled unless you have a special reason for not doing so (e.g. single-core machine). See :ref:`upyade-parallel` for details.
 gts (YADE_GTS)
-	Enable functionality provided by GNU Triangulated Surface library ([gts]_) and build PyGTS, its python interface; used for surface import and construction.
+	Enable functionality provided by GNU Triangulated Surface library (`gts <http://gts.sf.net>`__) and build PyGTS, its python interface; used for surface import and construction.
 cgal (YADE_CGAL)
-	Enable functionality provided by Computation Geometry Algorithms Library ([cgal]_); triangulation code in :yref:`MicroMacroAnalyser` and :yref:`PersistentTriangulationCollider` ses its routines.
+	Enable functionality provided by Computation Geometry Algorithms Library (`cgal <http://www.cgal.org>`__); triangulation code in :yref:`MicroMacroAnalyser` and :yref:`PersistentTriangulationCollider` ses its routines.
 other
 	There might be more features added in the future. Always refer to ``scons -h`` output for possible values.
 
@@ -101,26 +101,6 @@ Before compilation, SCons will check for presence of libraries required by their
 
 .. note::
 	Features are not auto-detected on purpose; otherwise problem with library detection might build Yade without expected features, causing specifically problems for automatized builds.
-
-.. [gcc] http://gcc.gnu.org
-.. [boost] http://www.boost.org
-.. [ipython] http://ipython.scipy.org
-.. [matplotlib] http://matplotlib.sf.net
-.. [numpy] http://numpy.scipy.org
-.. [scons] http://www.scons.org
-.. [cgal] http://www.cgal.org
-.. [gts] http://gts.sourceforge.net
-.. [eigen] http://eigen.tuxfamily.org
-.. [log4cxx] http://log4cxx.apache.org
-.. [vtk] http://www.vtk.org
-.. [epydoc] http://epydoc.sourceforge.net
-.. [doxygen] http://www.doxygen.org
-.. [python] http://www.python.org
-.. [rest] http://docutils.sourceforge.net/rst.html
-.. [sphinx] http://sphinx.pocoo.org
-.. [OpenMP] http://www.openmp.org
-.. [wm3] http://www.geometrictools.com/
-.. [QGLViewer] http://www.libqglviewer.com/
 
 Building
 -------------
@@ -310,7 +290,7 @@ As much as it is meaningful, you should also
 * provide a simple python script demonstrating the new functionality in ``scripts/test``.
 
 
-Historically, Yade was using Doxygen for in-source documentation. This documentation is still available (by running ``scons doc``), but was rarely written and used by programmers, and had all the disadvantages of auto-generated documentation. Then, as Python became ubiquitous in yade, python was documented using epydoc generator. Finally, hand-written documentation (this one) started to be written using Sphinx, which was developed originally for documenting Python itself. Disadvantages of the original scatter were different syntaxes, impossibility for cross-linking, non-interactivity and frequently not being up-to-date.
+Historically, Yade was using Doxygen for in-source documentation. This documentation is still available (by running ``scons doc``), but was rarely written and used by programmers, and had all the disadvantages of auto-generated documentation. Then, as Python became ubiquitous in yade, python was documented using epydoc generator. Finally, hand-written documentation (this one) started to be written using `Sphinx <http://sphinx.pocoo.org>`__, which was developed originally for documenting Python itself. Disadvantages of the original scatter were different syntaxes, impossibility for cross-linking, non-interactivity and frequently not being up-to-date.
 
 .. _sphinxdocumentation:
 
@@ -318,7 +298,7 @@ Sphinx documentation
 ^^^^^^^^^^^^^^^^^^^^^
 Most c++ classes are wrapped in Python, which provides good introspection and interactive documentation (try writing ``Material?`` in the ipython prompt; or ``help(CpmState)``).
 
-Syntax of documentation is [rest]_ (reStructuredText, see `reStructuredText Primer <http://sphinx.pocoo.org/rest.html>`_). It is the same for c++ and python code.
+Syntax of documentation is `ReST <http://docutils.sourceforge.net/rst.html`__ (reStructuredText, see `reStructuredText Primer <http://sphinx.pocoo.org/rest.html>`__). It is the same for c++ and python code.
 
 * Documentation of c++ classes exposed to python is given as 3rd argument to :ref:`YADE_CLASS_BASE_DOC` introduced below.
 
@@ -411,7 +391,7 @@ To generate Yade's documentation locally, get a copy of the `ydoc branch <https:
 Internal c++ documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-[doxygen]_ was used for automatic generation of c++ code. Since user-visible classes are defined with sphinx now, it is not meaningful to use doxygen to generate overall documentation. However, take care to document well internal parts of code using regular comments, including public and private data members.
+`doxygen <http://www.doxygen.org>`__ was used for automatic generation of c++ code. Since user-visible classes are defined with sphinx now, it is not meaningful to use doxygen to generate overall documentation. However, take care to document well internal parts of code using regular comments, including public and private data members.
 
 
 Support framework
@@ -1141,7 +1121,7 @@ You can list available functors of a particular type by querying child classes o
 Parallel execution
 ------------------
 
-Yade was originally not designed with parallel computation in mind, but rather with maximum flexibility (for good or for bad). Parallel execution was added later; in order to not have to rewrite whole Yade from scratch, relatively non-instrusive way of parallelizing was used: [OpenMP]_. OpenMP is standartized shared-memory parallel execution environment, where parallel sections are marked by special ``#pragma`` in the code (which means that they can compile with compiler that doesn't support OpenMP) and a few functions to query/manipulate OpenMP runtime if necessary.
+Yade was originally not designed with parallel computation in mind, but rather with maximum flexibility (for good or for bad). Parallel execution was added later; in order to not have to rewrite whole Yade from scratch, relatively non-instrusive way of parallelizing was used: `OpenMP <http://www.openmp.org>`__. OpenMP is standartized shared-memory parallel execution environment, where parallel sections are marked by special ``#pragma`` in the code (which means that they can compile with compiler that doesn't support OpenMP) and a few functions to query/manipulate OpenMP runtime if necessary.
 
 There is parallelism at 3 levels:
 
@@ -1369,7 +1349,7 @@ The finer :yref:`TimingDeltas` timing can have major performance impact and shou
 
 OpenGL Rendering
 -----------------
-Yade provides 3d rendering based on [QGLViewer]_. It is not meant to be full-featured rendering and post-processing, but rather a way to quickly check that scene is as intended or that simulation behaves sanely. 
+Yade provides 3d rendering based on `QGLViewer <http://www.libqglviewer.com>`__. It is not meant to be full-featured rendering and post-processing, but rather a way to quickly check that scene is as intended or that simulation behaves sanely. 
 
 .. note:: Although 3d rendering runs in a separate thread, it has performance impact on the computation itself, since interaction container requires mutual exclusion for interaction creation/deletion. The ``InteractionContainer::drawloopmutex`` is either held by the renderer (:yref:`OpenGLRenderingEngine`) or by the insertion/deletion routine. 
 

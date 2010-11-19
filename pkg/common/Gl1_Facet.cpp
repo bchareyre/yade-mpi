@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef YADE_OPENGL
+
 #include<yade/pkg/common/Gl1_Facet.hpp>
 #include<yade/pkg/common/Facet.hpp>
 #include<yade/lib/opengl/OpenGLWrapper.hpp>
@@ -55,4 +57,5 @@ void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool w
 }
 
 YADE_PLUGIN((Gl1_Facet));
-YADE_REQUIRE_FEATURE(OPENGL)
+
+#endif /* YADE_OPENGL */

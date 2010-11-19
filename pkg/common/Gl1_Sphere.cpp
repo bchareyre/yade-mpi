@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef YADE_OPENGL
+
 #include "Gl1_Sphere.hpp"
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/lib/opengl/OpenGLWrapper.hpp>
@@ -34,7 +36,6 @@ void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool 
 	return;
 }
 YADE_PLUGIN((Gl1_Sphere));
-YADE_REQUIRE_FEATURE(OPENGL)
 
 
 /***************************** WARNING *********************
@@ -134,3 +135,5 @@ void Gl1_Sphere::initGlLists(void){
 		//drawSphere();
 	glEndList();
 }
+
+#endif /* YADE_OPENGL */

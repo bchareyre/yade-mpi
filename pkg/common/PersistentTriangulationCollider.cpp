@@ -4,6 +4,8 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_CGAL
+
 #include"PersistentTriangulationCollider.hpp"
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>
@@ -15,7 +17,6 @@
 #include<yade/pkg/common/ElastMat.hpp>
 
 
-YADE_REQUIRE_FEATURE(CGAL)
 using namespace std;
 		
 // PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
@@ -53,15 +54,11 @@ void PersistentTriangulationCollider::action ()
 	{
 //TesselationWrapper Tes;
 		Tes->clear();
-		BodyContainer::iterator bi    = bodies->begin();
-		BodyContainer::iterator biEnd = bodies->end();
-		for ( ; bi!=biEnd ; ++bi )
-		{
-			if ( ( *bi )->isDynamic() )
-			{//means "is it a sphere (not a wall)"
-				const Sphere* s = YADE_CAST<Sphere*> ( ( *bi )->shape.get() );
-				Tes->insert ( (*bi)->state->pos[0],(*bi)->state->pos[1],(*bi)->state->pos[2], s->radius, ( *bi )->getId() );
-			}
+		FOREACH(const shared_ptr<Body>& b, scene->bodies){
+			if(!b || !b->isDynamic()) continue;
+			//means "is it a sphere (not a wall)"
+			const Sphere* s = YADE_CAST<Sphere*>(b->shape.get());
+			Tes->insert ( b->state->pos[0],b->state->pos[1],b->state->pos[2], s->radius, b->getId() );
 		}
 		Tes->AddBoundingPlanes();
 		isTriangulated = true;
@@ -95,14 +92,6 @@ void PersistentTriangulationCollider::action ()
 
 
 	interactions = scene->interactions;
-	InteractionContainer::iterator I_end = interactions->end();
-	for ( InteractionContainer::iterator I=interactions->begin(); I!=I_end; ++I )
-	{
-		// FIXME: eudoxos commented out as isReal and isNew is removed...
-		//  if ( ( *I )->isReal ) ( *I )->isNew=false;
-		//  if ( !haveDistantTransient ) ( *I )->isReal=false; // reset this flag, is used later... (??)
-		( *I )->isNeighbor = false;// will be set again just below
-	}
 
 	if ( triangulationIteration )
 	{
@@ -125,31 +114,14 @@ void PersistentTriangulationCollider::action ()
 				interactions->insert ( Body::id_t ( id1 ),Body::id_t ( id2 ) );
 				//cerr << "inserted " << id1 << "-" << id2<<endl;
 			}
-			else interaction->isNeighbor = true;
+			// interactions with iterLastSeen<scene->iter will be deleted by InteractionLoop, if the collider was run at that step as well
+			interaction->iterLastSeen=scene->iter;
 			// removes the pair p=(id1,id2) if the two Aabb do not overlapp any more and if p already exists in the overlappingBB
 		}
-
-		vector< pair<unsigned int,unsigned int> > toErase;
-		I_end = interactions->end();
-		for ( InteractionContainer::iterator I=interactions->begin(); I!=I_end; ++I )
-		{
-			if (!(*I)->isNeighbor && !(haveDistantTransient && ( *I )->isReal()))//FIXME : isReal correct to check that the interaction has not been "requestErased"?
-			{
-				toErase.push_back ( pair<unsigned int,unsigned int> ( ( *I )->getId1() , ( *I )->getId2() ) );
-				//cerr << "to delete " << ( *I )->getId1() << "-" << ( *I )->getId2() << "(isNeighbor=" << ( *I )->isNeighbor<< endl;
-			}
-			//interactions->erase ( ( *I )->getId1() , ( *I )->getId2() );
-		}
-		vector< pair<unsigned int,unsigned int> >::iterator it = toErase.begin();
-		vector< pair<unsigned int,unsigned int> >::iterator it_end = toErase.end();
-		for ( ;it!=it_end;++it )
-		{
-			interactions->erase ( it->first , it->second );
-			//cerr << "deleted " << it->first << "-" << it->second<<endl;
-		}
 	}
+
 }
 
 YADE_PLUGIN((PersistentTriangulationCollider));
 
-
+#endif /* YADE_CGAL */

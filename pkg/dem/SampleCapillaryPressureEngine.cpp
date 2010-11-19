@@ -72,4 +72,3 @@ void SampleCapillaryPressureEngine::action()
 		UnbalancedForce = ComputeUnbalancedForce(scene);
 }
 
-//YADE_REQUIRE_FEATURE(PHYSPAR);

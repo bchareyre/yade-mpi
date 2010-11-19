@@ -12,6 +12,7 @@
 #endif
 
 class Body;
+class InteractionContainer;
 
 /*
 Container of bodies implemented as flat std::vector. It handles body removal and
@@ -22,10 +23,12 @@ Any alternative implementation should use the same API.
 class BodyContainer: public Serializable{
 	private:
 		typedef std::vector<shared_ptr<Body> > ContainerT;
-		std::vector<shared_ptr<Body> > body;
+		ContainerT body;
 		unsigned int lowestFree;
 		unsigned int findFreeId();
 	public:
+		friend class InteractionContainer;  // accesses the body vector directly
+
 		typedef ContainerT::iterator iterator;
 		typedef ContainerT::const_iterator const_iterator;
 

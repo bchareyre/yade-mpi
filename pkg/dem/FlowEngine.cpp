@@ -5,6 +5,8 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_CGAL
+
 #ifdef FLOW_ENGINE
 #include "FlowEngine.hpp"
 #include<yade/core/Scene.hpp>
@@ -17,7 +19,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-YADE_REQUIRE_FEATURE (CGAL);
 CREATE_LOGGER (FlowEngine);
 
 FlowEngine::~FlowEngine()
@@ -537,6 +538,8 @@ Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
 
 YADE_PLUGIN ((FlowEngine));
 #endif //FLOW_ENGINE
+
+#endif /* YADE_CGAL */
 
 // YADE_REQUIRE_FEATURE(PHYSPAR);
 

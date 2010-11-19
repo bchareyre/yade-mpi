@@ -10,6 +10,7 @@
 #pragma once
 
 #include<iostream>
+#include<map>
 #include"Shape.hpp"
 #include"Bound.hpp"
 #include"State.hpp"
@@ -20,10 +21,15 @@
 #include<yade/lib/multimethods/Indexable.hpp>
 
 class Scene;
+class Interaction;
 
 class Body: public Serializable{
 	public:
+		// numerical types for storing ids
 		typedef int id_t;
+		// internal structure to hold some interaction of a body; used by InteractionContainer;
+		typedef std::map<Body::id_t, shared_ptr<Interaction> > MapId2IntrT;
+
 		// bits for Body::flags
 		enum { FLAG_DYNAMIC=1, FLAG_BOUNDED=2, FLAG_ASPHERICAL=4 }; /* add powers of 2 as needed */
 		//! symbolic constant for body that doesn't exist.
@@ -74,8 +80,8 @@ class Body: public Serializable{
 		((shared_ptr<State>,state,new State,,"Physical :yref:`state<State>`."))
 		((shared_ptr<Shape>,shape,,,"Geometrical :yref:`Shape`."))
 		((shared_ptr<Bound>,bound,,,":yref:`Bound`, approximating volume for the purposes of collision detection."))
-
-		((int,clumpId,Body::ID_NONE,Attr::readonly,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")),
+		((MapId2IntrT,intrs,,Attr::hidden,"Map from otherId to Interaction with otherId, managed by InteractionContainer. NOTE: (currently) does not contain all interactions with this body (only those where otherId>id), since performance issues with such data duplication have not yet been investigated."))
+		((int,clumpId,Body::ID_NONE,(Attr::readonly|Attr::noSave),"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")),
 		/* ctor */,
 		/* py */
 		//

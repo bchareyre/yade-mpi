@@ -1,6 +1,8 @@
 // © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
+#ifdef YADE_OPENGL
+
 #include"OpenGLRenderer.hpp"
 #include<yade/lib/opengl/OpenGLWrapper.hpp>
 #include<yade/lib/opengl/GLUtils.hpp>
@@ -19,7 +21,6 @@
 #endif
 
 YADE_PLUGIN((OpenGLRenderer)(GlExtraDrawer));
-YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(OpenGLRenderer);
 
 void GlExtraDrawer::render(){ throw runtime_error("GlExtraDrawer::render called from class "+getClassName()+". (did you forget to override it in the derived class?)"); }
@@ -386,4 +387,4 @@ void OpenGLRenderer::renderShape(){
 }
 
 
-
+#endif /* YADE_OPENGL */
