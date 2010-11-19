@@ -23,13 +23,16 @@ void TranslationEngine::action(){
 void HarmonicMotionEngine::action(){
 	const Real& dt=scene->dt;
 	const Real& time=scene->time;
+	Vector3r w = f*2.0*Mathr::PI; 			//Angular frequency
+	Vector3r velocity = ((((w*time + fi).cwise().sin())*(-1.0)).cwise()*A).cwise()*w; //Linear velocity at current time
+	
 	FOREACH(Body::id_t id,ids){
 		assert(id<(Body::id_t)scene->bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
-		Vector3r velocity = ((((w*time + fi).cwise().sin())*(-1.0)).cwise()*A).cwise()*w;
-		b->state->pos+=dt*velocity;
+		
 		b->state->vel=velocity;
+		b->state->pos+=dt*velocity;
 	}
 }
 

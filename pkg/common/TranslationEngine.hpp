@@ -25,10 +25,10 @@ class TranslationEngine : public PartialEngine {
 class HarmonicMotionEngine : public TranslationEngine {
 	public:
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS(HarmonicMotionEngine,TranslationEngine,"This engine implements the harmonic oscillation of bodies. http://en.wikipedia.org/wiki/Simple_harmonic_motion#Dynamics_of_simple_harmonic_motion",
+	YADE_CLASS_BASE_DOC_ATTRS(HarmonicMotionEngine,TranslationEngine,"This engine implements the harmonic oscillation of bodies. http://en.wikipedia.org/wiki/Simple_harmonic_motion#Dynamics_of_simple_harmonic_motion ; please, set dynamic=False for bodies, droven by this engine, otherwise amplitude will be 2x more, than awaited.",
 		((Vector3r,A,Vector3r::Zero(),,"Amplitude [m]"))
-		((Vector3r,w,Vector3r::Zero(),,"Angular frequency [hertz]"))
-		((Vector3r,fi,Vector3r::Zero(),,"Initial phase [radians]"))
+		((Vector3r,f,Vector3r::Zero(),,"Frequency [hertz]"))
+		((Vector3r,fi,Vector3r(Mathr::PI/2.0, Mathr::PI/2.0, Mathr::PI/2.0),,"Initial phase [radians]. By default, the body oscillates around initial position."))
 	);
 };
 

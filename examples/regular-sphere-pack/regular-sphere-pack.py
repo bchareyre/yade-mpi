@@ -102,7 +102,7 @@ O.engines=[
 		rotationAxis=[0,0,1],
 		rotateAroundZero=1,
 		zeroPoint=[6.0,6.0,0.0]),
-	HarmonicMotionEngine(A=[0,0,0.5], w=[0,0,80.0], fi = [0.0,0.0,pi], ids = vibrationPlate)
+	HarmonicMotionEngine(A=[0,0,0.5], f=[0,0,50.0], fi = [0.0,0.0,pi], ids = vibrationPlate)
 ]
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
 O.dt=utils.PWaveTimeStep()
