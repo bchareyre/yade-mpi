@@ -24,6 +24,7 @@ class FlowEngine : public PartialEngine
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<FlowSolver> flow;
+		int retriangulationLastIter;
 	public :
 		Vector3r gravity;
 		int current_state;
@@ -82,6 +83,7 @@ class FlowEngine : public PartialEngine
 					((double, currentStress, 0,, "Current value of axial stress"))
 					((double, currentStrain, 0,, "Current value of axial strain"))
 					((int, intervals, 30,, "Number of layers for pressure measurements"))
+					((int, useSolver, 1,, "Solver to use"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))

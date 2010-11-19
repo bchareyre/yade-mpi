@@ -27,7 +27,6 @@
 // #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
-
 #define FAST
 #define TESS_BASED_FORCES
 #define FACET_BASED_FORCES 1
@@ -1033,7 +1032,7 @@ void FlowBoundingSphere::GaussSeidel()
                 #endif
 		p_moy = sum_p/cell2;
                 dp_moy = sum_dp/cell2;
-		
+
 		#ifdef GS_OPEN_MP
 		#pragma omp master
 		#endif

@@ -33,7 +33,8 @@ void FlowEngine::action()
 		Update_Triangulation=false;/*IS=0.f;*/
 		eps_vol_max=0.f;
 		Eps_Vol_Cumulative=0.f;
-		ReTrg=1.0;
+		ReTrg=1;
+		retriangulationLastIter=0;
 	}
 	if (!isActivated) return;
 	else
@@ -63,9 +64,12 @@ void FlowEngine::action()
 			eps_vol_max=0.f;
 			UpdateVolumes ( );
 			Eps_Vol_Cumulative += eps_vol_max;
-			if (Eps_Vol_Cumulative > ReTrg*EpsVolPercent_RTRG) {
+			if (Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>100) {
 				Update_Triangulation = true;
-				ReTrg++;}
+				Eps_Vol_Cumulative=0;
+				retriangulationLastIter=0;
+				ReTrg++;
+			} else  retriangulationLastIter++;
 			timingDeltas->checkpoint("Update_Volumes");
 
 			if (!first) {
@@ -179,6 +183,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->key = triaxialCompressionEngine->Key;
 	flow->k_factor = permeability_factor;
 	flow->DEBUG_OUT = Debug;
+	flow->useSolver = useSolver;
 
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
@@ -348,6 +353,7 @@ void FlowEngine::UpdateVolumes ()
 {
 	if (Debug) cout << "Updating volumes.............." << endl;
 	Real deltaT = scene->dt;
+	Real invDeltaT = 1/scene->dt;
 	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
@@ -355,25 +361,25 @@ void FlowEngine::UpdateVolumes ()
 		{
 			case ( 3 ):
 			{
-				cell->info().dv() = ( Volume_cell_triple_fictious ( cell ) - cell->info().volume() ) /deltaT;
+				cell->info().dv() = ( Volume_cell_triple_fictious ( cell ) - cell->info().volume() ) *invDeltaT;
 				eps_vol_max = max(eps_vol_max, (abs(cell->info().dv()*deltaT))/cell->info().volume());
 				cell->info().volume() = Volume_cell_triple_fictious ( cell );
 			}break;
 			case ( 2 ) :
 			{
-				cell->info().dv() = ( Volume_cell_double_fictious ( cell )-cell->info().volume() ) /deltaT;
+				cell->info().dv() = ( Volume_cell_double_fictious ( cell )-cell->info().volume() ) *invDeltaT;
 				eps_vol_max = max(eps_vol_max, (abs(cell->info().dv()*deltaT))/cell->info().volume());
 				cell->info().volume() = Volume_cell_double_fictious ( cell );
 			}break;
 			case ( 1 ) :
 			{
-				cell->info().dv() = ( Volume_cell_single_fictious ( cell )-cell->info().volume() ) /deltaT;
+				cell->info().dv() = ( Volume_cell_single_fictious ( cell )-cell->info().volume() ) *invDeltaT;
 				eps_vol_max = max(eps_vol_max, (abs(cell->info().dv()*deltaT))/cell->info().volume());
 				cell->info().volume() = Volume_cell_single_fictious ( cell );
 			}break;
 			case ( 0 ) :
 			{
-				cell->info().dv() = ( Volume_cell ( cell )-cell->info().volume() ) /deltaT;
+				cell->info().dv() = ( Volume_cell ( cell )-cell->info().volume() ) *invDeltaT;
 				eps_vol_max = max(eps_vol_max, (abs(cell->info().dv()*deltaT))/cell->info().volume());
 				cell->info().volume() = Volume_cell ( cell );
 			}break;

@@ -168,6 +168,9 @@ class FlowBoundingSphere : public Network
 // 		double surface_external_double_fictious(Cell_handle cell, Boundary b);
 // 		double surface_external_single_fictious(Cell_handle cell, Boundary b);
 
+		//Solver?
+		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)
+
 };
 
 } //namespace CGT
