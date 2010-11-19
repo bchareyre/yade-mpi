@@ -11,6 +11,7 @@ from miniEigen import *
 from yade._customConverters import *
 from yade import utils
 from yade import *
+from math import *
 
 ## TODO tests
 class TestInteractions(unittest.TestCase): pass
@@ -59,6 +60,34 @@ class TestEngines(unittest.TestCase):
 		'Engines: dead engines are not run'
 		O.engines=[PyRunner(dead=True,initRun=True,iterPeriod=1,command='pass')]
 		O.step(); self.assert_(O.engines[0].nDone==0)
+	def testTranslationRotationEngines(self):
+		tolerance = 1e-5
+		angVelTemp = 5.0
+		O.reset()
+		id_dyn_transl = O.bodies.append(utils.sphere((0.0,0.0,0.0),1.0,dynamic=True))
+		id_nodyn_transl = O.bodies.append(utils.sphere((0.0,5.0,0.0),1.0,dynamic=False))
+		id_dyn_rot = O.bodies.append(utils.sphere((0.0,0.0,10.0),1.0,dynamic=False))
+		id_nodyn_rot = O.bodies.append(utils.sphere((0.0,5.0,10.0),1.0,dynamic=False))
+		O.engines=[
+			
+			TranslationEngine(velocity = 1.0, translationAxis = [1.0,0,0], ids = [id_dyn_transl]),
+			TranslationEngine(velocity = 1.0, translationAxis = [1.0,0,0], ids = [id_nodyn_transl]),
+			RotationEngine(angularVelocity = pi/angVelTemp, rotationAxis = [0.0,1.0,0.0], rotateAroundZero = True, zeroPoint = [0.0,0.0,0.0], ids = [id_dyn_rot]),
+			RotationEngine(angularVelocity = pi/angVelTemp, rotationAxis = [0.0,1.0,0.0], rotateAroundZero = True, zeroPoint = [0.0,5.0,0.0], ids = [id_nodyn_rot]),
+			ForceResetter(),
+			NewtonIntegrator()
+		]
+		O.dt = 1.0
+		print
+		for i in range(0,5):
+			O.step()
+			self.assertTrue(int(O.bodies[id_dyn_transl].state.pos[0]) == O.iter)									#Check translation of dynamic bodies
+			self.assertTrue(int(O.bodies[id_nodyn_transl].state.pos[0]) == O.iter)								#Check translation of nondynamic bodies
+			self.assertTrue((O.bodies[id_nodyn_rot].state.pos[0] - 10*sin(pi/angVelTemp*O.iter))/10*sin(pi/angVelTemp*O.iter)<tolerance)		#Check rotation of nondynamic bodies
+			self.assertTrue((O.bodies[id_nodyn_rot].state.pos[2] - 10*cos(pi/angVelTemp*O.iter))/10*cos(pi/angVelTemp*O.iter)<tolerance)		#Check rotation of nondynamic bodies
+			
+			#self.assertTrue((O.bodies[id_dyn_rot].state.pos[0] - 10*sin(pi/angVelTemp*O.iter))/10*sin(pi/angVelTemp*O.iter)<tolerance)		#Check rotation of dynamic bodies
+			#self.assertTrue((O.bodies[id_dyn_rot].state.pos[2] - 10*cos(pi/angVelTemp*O.iter))/10*cos(pi/angVelTemp*O.iter)<tolerance)		#Check rotation of dynamic bodies
 
 
 class TestIO(unittest.TestCase):

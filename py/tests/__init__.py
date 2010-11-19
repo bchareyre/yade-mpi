@@ -19,7 +19,7 @@ allTestsFQ=['yade.tests.'+test for test in allTests]
 
 def testModule(module):
 	"""Run all tests defined in the module specified, return TestResult object 
-	(http://www.python.org/doc/2.6/lib/unittest.html#testresult-objects.html)
+	(http://docs.python.org/library/unittest.html#unittest.TextTestResult)
 	for further processing.
 
 	@param module: fully-qualified module name, e.g. yade.tests.wrapper
