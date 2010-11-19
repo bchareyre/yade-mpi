@@ -54,7 +54,7 @@ void PersistentTriangulationCollider::action ()
 	{
 //TesselationWrapper Tes;
 		Tes->clear();
-		FOREACH(const shared_ptr<Body>& b, scene->bodies){
+		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 			if(!b || !b->isDynamic()) continue;
 			//means "is it a sphere (not a wall)"
 			const Sphere* s = YADE_CAST<Sphere*>(b->shape.get());
