@@ -58,14 +58,7 @@ void InteractionLoop::action(){
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
-	#ifdef YADE_OPENMP
-		const long size=scene->interactions->size();
-		#pragma omp parallel for schedule(guided)
-		for(long i=0; i<size; i++){
-			const shared_ptr<Interaction>& I=(*scene->interactions)[i];
-	#else
-		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-	#endif
+	YADE_PARALLEL_FOREACH_BODY(const shared_ptr<Body>& b, scene->bodies){ if(!b) continue; FOREACH(const shared_ptr<Interaction>& I, b->intrs){
 		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
@@ -173,4 +166,5 @@ void InteractionLoop::action(){
 		FOREACH(idPair p, eraseAfterLoopIds) scene->interactions->erase(p.first,p.second);
 		eraseAfterLoopIds.clear();
 	#endif
+}
 }

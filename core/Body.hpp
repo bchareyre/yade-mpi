@@ -74,7 +74,8 @@ class Body: public Serializable{
 		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
 		((int,groupMask,1,,"Bitmask for determining interactions."))
-		((int,flags,FLAG_DYNAMIC|FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded. In python, use :yref:`Body.dynamic` and :yref:`Body.bounded`."))
+		((int,flags,FLAG_DYNAMIC|FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
+		((Body::id_t,subDomId,Body::ID_NONE,(Attr::noSave|Attr::readonly),"Subdomain number and position within the subdomain encoded in one single number; holds back-reference to BodyContainer::subDomains location, so that erasing a body knows where to go. See BodyContainer for details."))
 
 		((shared_ptr<Material>,material,,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,,"Physical :yref:`state<State>`."))

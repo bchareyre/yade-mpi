@@ -14,7 +14,7 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	Body::id_t id1=i->getId1(), id2=i->getId2();
 	if (id1>id2) swap(id1,id2); 
-	assert(bodies->size()>id1); assert(bodies->size()>id2); // the bodies must exist already
+	assert((Body::id_t)bodies->size()>id1); assert((Body::id_t)bodies->size()>id2); // the bodies must exist already
 	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
 	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
 	//assert(linIntrs.size()==currSize);
@@ -40,7 +40,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
-	assert(id1<bodies->size() && id2<bodies->size()); // (possibly) existing ids
+	assert(id1<(Body::id_t)bodies->size() && id2<(Body::id_t)bodies->size()); // (possibly) existing ids
 	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1); // get the body; check it is not deleted
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	// this used to return false
@@ -49,7 +49,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	int linIx=I->second->linIx; 
 	b1->intrs.erase(I);
 	// iid is not the last element; we have to move last one to its place
-	if (linIx<currSize-1) {
+	if (linIx<(int)currSize-1) {
 		linIntrs[linIx]=linIntrs[currSize-1];
 		linIntrs[linIx]->linIx=linIx; // update the back-reference inside the interaction
 	}
@@ -64,7 +64,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
 	if (id1>id2) swap(id1,id2);
-	assert(id1<bodies->size() && id2<bodies->size());
+	assert(id1<(Body::id_t)bodies->size() && id2<(Body::id_t)bodies->size());
 	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1);
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	if (I!=b1->intrs.end()) return I->second;

@@ -91,17 +91,11 @@ void NewtonIntegrator::action()
 	const bool trackEnergy(scene->trackEnergy);
 	const bool isPeriodic(scene->isPeriodic);
 
-
+	const int numSubdomains=scene->bodies->numSubdomains();
 	#ifdef YADE_OPENMP
 		FOREACH(Real& thrMaxVSq, threadMaxVelocitySq) { thrMaxVSq=0; }
-		const BodyContainer& bodies=*(scene->bodies.get());
-		const long size=(long)bodies.size();
-		#pragma omp parallel for schedule(static)
-		for(long _id=0; _id<size; _id++){
-			const shared_ptr<Body>& b(bodies[_id]);
-	#else
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 	#endif
+	YADE_PARALLEL_FOREACH_BODY(const shared_ptr<Body>& b, scene->bodies){
 			if(!b) continue;
 			State* state=b->state.get();
 			const Body::id_t& id=b->getId();
