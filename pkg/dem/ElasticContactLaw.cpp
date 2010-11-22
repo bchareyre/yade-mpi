@@ -52,7 +52,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
 	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
 	if(geom->penetrationDepth <0){
-		if (neverErase) {
+		if (unlikely(neverErase)) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
 		else 	scene->interactions->requestErase(id1,id2);
@@ -68,14 +68,14 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	shearForce -= phys->ks*shearDisp;
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-	if (!scene->trackEnergy){//Update force but don't compute energy terms (see below))
+	if (likely(!scene->trackEnergy)){//Update force but don't compute energy terms (see below))
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = sqrt(maxFs) / shearForce.norm();
 			shearForce *= ratio;}
 	} else {
 		//almost the same with additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
-		if( shearForce.squaredNorm() > maxFs ){
+		if(shearForce.squaredNorm() > maxFs){
 			Real ratio = sqrt(maxFs) / shearForce.norm();
 			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
 			//define the plastic work input and increment the total plastic energy dissipated

@@ -72,7 +72,7 @@ Possible performance improvements & bugs
 
 // #define to turn on some tracing information for the periodic part
 // all code under this can be probably removed at some point, when the collider will have been tested thoroughly
-//#define PISC_DEBUG
+// #define PISC_DEBUG
 
 
 #ifdef ISC_TIMING
@@ -101,7 +101,7 @@ class InsertionSortCollider: public Collider{
 			return coord<b.coord;
 		}
 		bool operator>(const Bounds& b) const {
-			if(id==b.id && coord==b.coord) return b.flags.isMin;
+			if(id==b.id && coord==b.coord) return !flags.isMin;
 			return coord>b.coord;
 		}
 	};

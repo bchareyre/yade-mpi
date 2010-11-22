@@ -36,7 +36,7 @@ void InsertionSortCollider::handleBoundInversion(Body::id_t id1, Body::id_t id2,
 	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
 	bool hasInter=(bool)I;
 	// interaction doesn't exist and shouldn't, or it exists and should
-	if(!overlap && !hasInter) return;
+	if(likely(!overlap && !hasInter)) return;
 	if(overlap && hasInter){  return; }
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
@@ -57,8 +57,14 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 		const Bounds viInit=v[i]; long j=i-1; /* cache hasBB; otherwise 1% overall performance hit */ const bool viInitBB=viInit.flags.hasBB;
 		while(j>=0 && v[j]>viInit){
 			v[j+1]=v[j];
+			#ifdef PISC_DEBUG
+				if(watchIds(v[j].id,viInit.id)) cerr<<"Swapping #"<<v[j].id<<"  with #"<<viInit.id<<" ("<<setprecision(80)<<v[j].coord<<">"<<setprecision(80)<<viInit.coord<<" along axis "<<v.axis<<")"<<endl;
+				if(v[j].id==viInit.id){ cerr<<"Inversion of body #"<<v[j].id<<" with itself, "<<v[j].flags.isMin<<" & "<<viInit.flags.isMin<<", isGreater "<<(v[j]>viInit)<<", "<<(v[j].coord>viInit.coord)<<endl; j--; continue; }
+			#endif
 			// no collisions without bounding boxes
-			if(doCollide && viInitBB && v[j].flags.hasBB) handleBoundInversion(viInit.id,v[j].id,interactions,scene);
+			// also, do not collide body with itself; it sometimes happens for facets aligned perpendicular to an axis, for reasons that are not very clear
+			// see https://bugs.launchpad.net/yade/+bug/669095
+			if(likely(doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id))) handleBoundInversion(viInit.id,v[j].id,interactions,scene);
 			j--;
 		}
 		v[j+1]=viInit;
@@ -207,7 +213,7 @@ void InsertionSortCollider::action(){
 				VecBounds& BBj=BB[j];
 				const Body::id_t id=BBj[i].id;
 				const shared_ptr<Body>& b=Body::byId(id,scene);
-				if(b){
+				if(likely(b)){
 					const shared_ptr<Bound>& bv=b->bound;
 					// coordinate is min/max if has bounding volume, otherwise both are the position. Add periodic shift so that we are inside the cell
 					// watch out for the parentheses around ?: within ?: (there was unwanted conversion of the Reals to bools!)
@@ -223,9 +229,9 @@ void InsertionSortCollider::action(){
 	for(Body::id_t id=0; id<nBodies; id++){
 		BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
 		const shared_ptr<Body>& b=Body::byId(id,scene);
-		if(b){
+		if(likely(b)){
 			const shared_ptr<Bound>& bv=b->bound;
-			if(bv) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
+			if(likely(bv)) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
 			else{ const Vector3r& pos=b->state->pos; memcpy(&minima[3*id],&pos,3*sizeof(Real)); memcpy(&maxima[3*id],&pos,3*sizeof(Real)); }
 		} else { memset(&minima[3*id],0,3*sizeof(Real)); memset(&maxima[3*id],0,3*sizeof(Real)); }
 	}
@@ -262,7 +268,7 @@ void InsertionSortCollider::action(){
 				for(long i=0; i<2*nBodies; i++){
 					// start from the lower bound (i.e. skipping upper bounds)
 					// skip bodies without bbox, because they don't collide
-					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
+					if(unlikely(!(V[i].flags.isMin && V[i].flags.hasBB))) continue;
 					const Body::id_t& iid=V[i].id;
 					// go up until we meet the upper bound
 					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
@@ -276,7 +282,7 @@ void InsertionSortCollider::action(){
 				}
 			} else { // periodic case: see comments above
 				for(long i=0; i<2*nBodies; i++){
-					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
+					if(unlikely(!(V[i].flags.isMin && V[i].flags.hasBB))) continue;
 					const Body::id_t& iid=V[i].id;
 					long cnt=0;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
@@ -336,14 +342,17 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 			Bounds& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
 			vNew=v[j];
 			// inversions close the the split need special care
-			if(j==loIdx && vi.coord<0) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
-			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
-			if(doCollide && viHasBB && v[j].flags.hasBB){
-				if(vi.id==vNew.id){ // BUG!!
+			if(unlikely(j==loIdx && vi.coord<0)) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+			else if(unlikely(j1==loIdx)) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
+			if(likely(doCollide && viHasBB && v[j].flags.hasBB)){
+				// see https://bugs.launchpad.net/yade/+bug/669095 and similar problem in aperiodic insertionSort
+				#if 0
+				if(vi.id==vNew.id){
 					LOG_FATAL("Inversion of body's #"<<vi.id<<" boundary with its other boundary, "<<v[j].coord<<" meets "<<vi.coord);
 					throw runtime_error(__FILE__ ": Body's boundary metting its opposite boundary.");
 				}
-				handleBoundInversionPeri(vi.id,vNew.id,interactions,scene);
+				#endif
+				if(likely(vi.id!=vNew.id)) handleBoundInversionPeri(vi.id,vNew.id,interactions,scene);
 			}
 			j=v.norm(j-1);
 		}
@@ -364,7 +373,7 @@ void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t 
 		if(watchIds(id1,id2)) LOG_DEBUG("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
 	#endif
 	// interaction doesn't exist and shouldn't, or it exists and should
-	if(!overlap && !hasInter) return;
+	if(likely(!overlap && !hasInter)) return;
 	if(overlap && hasInter){  return; }
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
@@ -435,7 +444,7 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 				TRVAR4(pmn1,pmx1,pmn2,pmx2);
 			}
 		#endif
-		if(((pmn1!=pmx1) || (pmn2!=pmx2))){
+		if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
 			Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
 			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<")");
 			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");

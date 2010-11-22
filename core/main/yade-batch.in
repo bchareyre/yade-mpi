@@ -18,9 +18,9 @@ import yade, yade.utils, yade.config, yade.remote
 
 
 class JobInfo():
-	def __init__(self,num,id,command,hrefCommand,log,nSlots,script,table,lineNo):
+	def __init__(self,num,id,command,hrefCommand,log,nCores,script,table,lineNo):
 		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
-		self.command=command; self.hrefCommand=hrefCommand; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots; self.infoSocket=None
+		self.command=command; self.hrefCommand=hrefCommand; self.num=num; self.log=log; self.id=id; self.nCores=nCores; self.cores=set(); self.infoSocket=None
 		self.script=script; self.table=table; self.lineNo=lineNo
 		self.hasXmlrpc=False
 		self.status='PENDING'
@@ -84,7 +84,7 @@ finished: %s
 			ret+='</td>'
 		else:
 			ret+='<td> (no info) </td>'
-		ret+='<td>%d</td>'%self.nSlots
+		ret+='<td>%d%s</td>'%(self.nCores,(' ('+','.join([str(c) for c in self.cores])+')') if self.cores and self.status=='RUNNING' else '')
 		# TODO: make clickable so that it can be served full-size
 		if os.path.exists(self.plotsFile):
 			if 0: pass
@@ -111,7 +111,7 @@ def totalRunningTime():
 def globalHtmlStats():
 	t0=min([j.started for j in jobs if j.started!=None])
 	unfinished=len([j for j in jobs if j.status!='DONE'])
-	usedSlots=sum([j.nSlots for j in jobs if j.status=='RUNNING'])
+	nUsedCores=sum([j.nCores for j in jobs if j.status=='RUNNING'])
 	global maxJobs
 	if unfinished:
 		ret='<p>Running for %s, since %s.</p>'%(t2hhmmss(totalRunningTime()),time.ctime(t0))
@@ -121,7 +121,8 @@ def globalHtmlStats():
 		# FIXME: do not report sum of runnign time of all jobs, only the real timespan
 		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s.</p>'%('red' if failed else 'lime',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
 	ret+='<p>Pid %d</p>'%(os.getpid())
-	ret+='<p>%d slots available, %d used, %d free.</p>'%(maxJobs,usedSlots,maxJobs-usedSlots)
+	allCores,busyCores=set(range(0,maxJobs)),set().union(*(j.cores for j in jobs if j.status=='RUNNING'))
+	ret+='<p>%d cores available, %d used + %d free. ([%s] = [%s] + [%s])</p>'%(maxJobs,nUsedCores,maxJobs-nUsedCores,','.join([str(c) for c in allCores]),','.join([str(c) for c in busyCores]),','.join([str(c) for s in (allCores-busyCores)]))
 	ret+='<h3>Jobs</h3>'
 	nFailed=len([j for j in jobs if j.status=='DONE' and j.exitStatus!=0])
 	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:lime">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
@@ -173,7 +174,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 	def sendGlobal(self):
 		html='<HTML><TITLE>Yade-batch at %s overview</TITLE><BODY>\n'%(socket.gethostname())
 		html+=globalHtmlStats()
-		html+='<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>slots</th><th>plots</th><th>command</th></tr>\n'
+		html+='<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>cores</th><th>plots</th><th>command</th></tr>\n'
 		for j in jobs: html+=j.htmlStats()+'\n'
 		html+='</TABLE></BODY></HTML>'
 		self.sendHttp(html,contentType='text/html',refresh=5) # refresh sent as header
@@ -225,7 +226,14 @@ def runHttpStatsServer():
 def runJob(job):
 	job.status='RUNNING'
 	job.started=time.time();
-	print '#%d (%s%s) started on %s'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,time.asctime())
+	print '#%d (%s%s%s) started on %s'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores,(' ['+','.join([str(c) for c in job.cores])+']') if job.cores else '',time.asctime())
+	#print '#%d cores',%(job.num,job.cores)
+	if job.cores:
+		def coresReplace(s): return s.replace('[threadspec]','--cores=%s'%(','.join(str(c) for c in job.cores)))
+		job.command=coresReplace(job.command)
+		job.hrefCommand=coresReplace(job.hrefCommand)
+	else:
+		job.command=job.command.replace('[threadspec]','--threads=%d'%job.nThreads); job.hrefCommand=job.hrefCommand.replace('[threadspec]','--threads=%d'%job.nThreads)
 	job.exitStatus=os.system(job.command)
 	if job.exitStatus!=0 and len([l for l in open(job.log) if l.startswith('Yade: normal exit.')])>0: job.exitStatus=0
 	job.finished=time.time()
@@ -239,23 +247,28 @@ def runJob(job):
 		shutil.copy(job.plotsFile,f)
 		job.plotsFile=f
 		havePlot=True
-	print "#%d (%s%s) %s (exit status %d), duration %s, log %s%s"%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,strStatus,job.exitStatus,job.duration,job.log,(', plot %s'%(job.plotsFile) if havePlot else ''))
+	print "#%d (%s%s) %s (exit status %d), duration %s, log %s%s"%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores,strStatus,job.exitStatus,job.duration,job.log,(', plot %s'%(job.plotsFile) if havePlot else ''))
 	job.saveInfo()
 	
-def runJobs(jobs,numSlots):
+def runJobs(jobs,numCores):
 	running,pending=0,len(jobs)
 	inf=1000000
 	while (running>0) or (pending>0):
-		pending,running,done=sum([j.nSlots for j in jobs if j.status=='PENDING']),sum([j.nSlots for j in jobs if j.status=='RUNNING']),sum([j.nSlots for j in jobs if j.status=='DONE'])
-		#print [j.status for j in jobs]
-		freeSlots=numSlots-running
-		minRequire=min([inf]+[j.nSlots for j in jobs if j.status=='PENDING'])
+		pending,running,done=sum([j.nCores for j in jobs if j.status=='PENDING']),sum([j.nCores for j in jobs if j.status=='RUNNING']),sum([j.nCores for j in jobs if j.status=='DONE'])
+		numFreeCores=numCores-running
+		minRequire=min([inf]+[j.nCores for j in jobs if j.status=='PENDING'])
 		if minRequire==inf: minRequire=0
-		#print pending,'pending;',running,'running;',done,'done;',freeSlots,'free;',minRequire,'min'
-		if minRequire>freeSlots and running==0:
-			freeSlots=minRequire
+		#print pending,'pending;',running,'running;',done,'done;',numFreeCores,'free;',minRequire,'min'
+		overloaded=False
+		if minRequire>numFreeCores and running==0: overloaded=True # a job wants more cores than the total we have
 		for j in [j for j in jobs if j.status=='PENDING']:
-			if j.nSlots<=freeSlots:
+			if j.nCores<=numFreeCores or overloaded:
+				freeCores=set(range(0,numCores))-set().union(*(j.cores for j in jobs if j.status=='RUNNING'))
+				#print 'freeCores:',freeCores,'numFreeCores:',numFreeCores,'overloaded',overloaded
+				if not overloaded:
+					#assert(len(freeCores)<=numFreeCores)
+					j.cores=list(freeCores)[0:j.nCores] # take required number of free cores
+				# if overloaded, do not assign cores directly
 				thread.start_new_thread(runJob,(j,))
 				break
 		time.sleep(.5)
@@ -268,10 +281,11 @@ def getNumCores():
 	if os.environ.has_key("OMP_NUM_THREADS"): return min(int(os.environ['OMP_NUM_THREADS']),nCpu)
 	return nCpu
 numCores=getNumCores()
+maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
 
 parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
-parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job."%numCores,metavar='NUM',default=numCores)
+parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=maxOmpThreads)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads')
 parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
 parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
@@ -338,27 +352,29 @@ for i,l in enumerate(useLines):
 	logFile=logFormat.replace('%',str(l))
 	logFile=logFile.replace('@',params[l]['description'])
 	envVars=[]
-	nSlots=opts.defaultThreads
+	nCores=opts.defaultThreads
 	for col in params[l].keys():
 		if col[0]!='!': continue
 		if col=='!OMP_NUM_THREADS':
-			nSlots=int(params[l][col]); maxCpu=getNumCores()
+			nCores=int(params[l][col]); maxCpu=getNumCores()
 		elif col=='!EXEC': executable=params[l][col]
 		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
-	if nSlots>maxJobs:
+	if nCores>maxJobs:
 		if opts.forceThreads:
-			logging.info('Forcing job #%d to use only %d slots (max available) instead of %d requested'%(i,maxJobs,nSlots))
-			nSlots=maxJobs
+			logging.info('Forcing job #%d to use only %d cores (max available) instead of %d requested'%(i,maxJobs,nCores))
+			nCores=maxJobs
 		else:
-			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
+			logging.warning('WARNING: job #%d will use %d cores but only %d are available'%(i,nCores,maxJobs))
+		if 'openmp' not in yade.config.features and nCores>1:
+			logging.warning('Job #%d will be uselessly run with %d threads (compiled without OpenMP support).'%(i,nCores))
 	executables.add(executable)
 	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
 	env='PARAM_TABLE=<a href="jobs/%d/table">%s:%d</a> DISPLAY= %s '%(i,table,l,' '.join(envVars))
-	cmd='%s%s --threads=%d %s -x <a href="jobs/%d/script">%s</a>'%(executable,' --debug' if opts.debug else '',int(nSlots),'--nice=%s'%nice if nice!=None else '',i,simul)
+	cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(executable,' --debug' if opts.debug else '','--nice=%s'%nice if nice!=None else '',i,simul)
 	log='> <a href="jobs/%d/log">%s</a> 2>&1'%(i,pipes.quote(logFile))
 	hrefCmd=env+cmd+log
 	fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
-	jobs.append(JobInfo(i,params[l]['description'],fullCmd,hrefCmd,logFile,nSlots,script=simul,table=table,lineNo=l))
+	jobs.append(JobInfo(i,params[l]['description'],fullCmd,hrefCmd,logFile,nCores,script=simul,table=table,lineNo=l))
 
 print "Master process pid",os.getpid()
 
@@ -373,7 +389,7 @@ if opts.rebuild:
 
 print "Job summary:"
 for job in jobs:
-	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots),job.command
+	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command
 sys.stdout.flush()
 
 

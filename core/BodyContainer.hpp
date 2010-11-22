@@ -19,7 +19,7 @@ class InteractionContainer;
 #ifdef YADE_OPENMP
 	#define YADE_PARALLEL_FOREACH_BODY(b,bodies) \
 		const int _numSubdomains=bodies->numSubdomains(); \
-		_Pragma("omp parallel for schedule(static)") \
+		_Pragma("omp parallel for schedule(static,1)") \
 		for(int _subDomain=0; _subDomain<_numSubdomains; _subDomain++) \
 		FOREACH(b, bodies->getSubdomain(_subDomain))
 #else

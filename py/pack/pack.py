@@ -271,19 +271,29 @@ def regularHexa(predicate,radius,gap,**kw):
 		if predicate((x,y,z),radius): ret+=[utils.sphere((x,y,z),radius=radius,**kw)]
 	return ret
 
-def filterSpherePack(predicate,spherePack,**kw):
+def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
 	"""Using given SpherePack instance, return spheres the satisfy predicate.
 	The packing will be recentered to match the predicate and warning is given if the predicate
 	is larger than the packing."""
+	if returnSpherePack==None:
+		warnings.warn('The default behavior will change; specify returnSpherePack=True for the new behavior, and False to get rid of this warning (your code will break in the future, however). The returned SpherePack object can be added to the simulation using SpherePack.toSimulation()',category=FutureWarning)
+		returnSpherePack=False
 	mn,mx=predicate.aabb()
 	dimP,centP=predicate.dim(),predicate.center()
 	dimS,centS=spherePack.dim(),spherePack.center()
 	if dimP[0]>dimS[0] or dimP[1]>dimS[1] or dimP[2]>dimS[2]: warnings.warn("Packing's dimension (%s) doesn't fully contain dimension of the predicate (%s)."%(dimS,dimP))
 	spherePack.translate(centP-centS)
-	ret=[]
-	for s in spherePack:
-		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
-	return ret
+	if returnSpherePack:
+		ret=SpherePack()
+		for c,r in spherePack:
+			if predicate(c,r): ret.add(c,r)
+		return ret
+	else:
+		# return particles to be added to O.bodies
+		ret=[]
+		for s in spherePack:
+			if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
+		return ret
 
 def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim):
 	if not memoizeDb: return
