@@ -354,7 +354,8 @@ Real approxSectionArea(Real coord, int axis){
 /* Find all interactions deriving from NormShearPhys that cross plane given by a point and normal
 	(the normal may not be normalized in this case, though) and sum forces (both normal and shear) on them.
 	
-	Return a 3-tuple with the components along global x,y,z axes.
+	Returns a 3-tuple with the components along global x,y,z axes, which can be viewed as "action from lower part, towards
+	upper part" (lower and upper parts with respect to the plane's normal).
 
 	(This could be easily extended to return sum of only normal forces or only of shear forces.)
 */
@@ -370,9 +371,10 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
 		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
 		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
-		if(dot1*dot2>0) continue; // both interaction points on the same side of the plane
+		if(dot1*dot2>0) continue; // both (centers of) bodies are on the same side of the plane=> this interaction has to be disregarded
 		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
-		// otherwise, reverse its contribution
+		// otherwise, reverse its contribution. So that we return finally
+		// Sum [ ( normal(plane) dot normal(interaction= from 1 to 2) ) "nsi->force" ]
 		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
 	}
 	return ret;
