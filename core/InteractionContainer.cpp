@@ -49,7 +49,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	int linIx=I->second->linIx; 
 	b1->intrs.erase(I);
 	// iid is not the last element; we have to move last one to its place
-	if (linIx<currSize-1) {
+	if (linIx<(int)currSize-1) {
 		linIntrs[linIx]=linIntrs[currSize-1];
 		linIntrs[linIx]->linIx=linIx; // update the back-reference inside the interaction
 	}
@@ -65,7 +65,9 @@ const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::i
 	assert(bodies);
 	if (id1>id2) swap(id1,id2);
 	assert(id1<bodies->size() && id2<bodies->size());
+	if(id1>=(Body::id_t)bodies->size()) { empty=shared_ptr<Interaction>(); return empty; }
 	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1);
+	if(!b1) { empty=shared_ptr<Interaction>(); return empty; }
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	if (I!=b1->intrs.end()) return I->second;
 	else { empty=shared_ptr<Interaction>(); return empty; }
