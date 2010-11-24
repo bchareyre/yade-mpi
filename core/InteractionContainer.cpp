@@ -64,9 +64,8 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
 	if (id1>id2) swap(id1,id2);
-	assert(id1<bodies->size() && id2<bodies->size());
 	if(id1>=(Body::id_t)bodies->size()) { empty=shared_ptr<Interaction>(); return empty; }
-	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1);
+	const shared_ptr<Body>& b1((*bodies)[id1]);
 	if(!b1) { empty=shared_ptr<Interaction>(); return empty; }
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	if (I!=b1->intrs.end()) return I->second;
