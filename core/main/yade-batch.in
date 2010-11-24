@@ -18,10 +18,10 @@ import yade, yade.utils, yade.config, yade.remote
 
 
 class JobInfo():
-	def __init__(self,num,id,command,hrefCommand,log,nCores,script,table,lineNo):
-		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
+	def __init__(self,num,id,command,hrefCommand,log,nCores,script,table,lineNo,affinity):
+		self.started,self.finished,self.duration,self.durationSec,self.exitStatus=None,None,None,None,None # duration is a string, durationSec is a number
 		self.command=command; self.hrefCommand=hrefCommand; self.num=num; self.log=log; self.id=id; self.nCores=nCores; self.cores=set(); self.infoSocket=None
-		self.script=script; self.table=table; self.lineNo=lineNo
+		self.script=script; self.table=table; self.lineNo=lineNo; self.affinity=affinity
 		self.hasXmlrpc=False
 		self.status='PENDING'
 		self.threadNum=None
@@ -39,20 +39,23 @@ finished: %s
 """%(self.id,self.exitStatus,'OK' if self.exitStatus==0 else 'FAILED',self.duration,self.command,time.asctime(time.localtime(self.started)),time.asctime(time.localtime(self.finished))));
 		log.close()
 	def ensureXmlrpc(self):
+		'Attempt to establish xmlrpc connection to the job (if it does not exist yet). If the connection could not be established, as magic line was not found in the log, return False.'
 		if not self.hasXmlrpc:
 			for l in open(self.log,'r'):
 				if not l.startswith('XMLRPC info provider on'): continue
 				url=l[:-1].split()[4]
 				self.xmlrpcConn=xmlrpclib.ServerProxy(url,allow_none=True)
 				self.hasXmlrpc=True
+				return True
+			if not self.hasXmlrpc: return False # catches the case where the magic line is not in the log yet
 	def getInfoDict(self):
 		if self.status!='RUNNING': return None
-		self.ensureXmlrpc()
+		if not self.ensureXmlrpc(): return None
 		return self.xmlrpcConn.basicInfo()
 	def updatePlots(self):
 		global opts
 		if self.status!='RUNNING': return
-		self.ensureXmlrpc()
+		if not self.ensureXmlrpc(): return
 		if time.time()-self.plotsLastUpdate<opts.plotTimeout: return
 		self.plotsLastUpdate=time.time()
 		img=self.xmlrpcConn.plot()
@@ -122,7 +125,9 @@ def globalHtmlStats():
 		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s.</p>'%('red' if failed else 'lime',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
 	ret+='<p>Pid %d</p>'%(os.getpid())
 	allCores,busyCores=set(range(0,maxJobs)),set().union(*(j.cores for j in jobs if j.status=='RUNNING'))
-	ret+='<p>%d cores available, %d used + %d free. ([%s] = [%s] + [%s])</p>'%(maxJobs,nUsedCores,maxJobs-nUsedCores,','.join([str(c) for c in allCores]),','.join([str(c) for c in busyCores]),','.join([str(c) for s in (allCores-busyCores)]))
+	ret+='<p>%d cores available, %d used + %d free.</p>'%(maxJobs,nUsedCores,maxJobs-nUsedCores)
+	# show busy and free cores; gives nonsense if not all jobs have CPU affinity set
+	# '([%s] = [%s] + [%s])'%(','.join([str(c) for c in allCores]),','.join([str(c) for c in busyCores]),','.join([str(c) for s in (allCores-busyCores)]))
 	ret+='<h3>Jobs</h3>'
 	nFailed=len([j for j in jobs if j.status=='DONE' and j.exitStatus!=0])
 	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:lime">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
@@ -233,11 +238,12 @@ def runJob(job):
 		job.command=coresReplace(job.command)
 		job.hrefCommand=coresReplace(job.hrefCommand)
 	else:
-		job.command=job.command.replace('[threadspec]','--threads=%d'%job.nThreads); job.hrefCommand=job.hrefCommand.replace('[threadspec]','--threads=%d'%job.nThreads)
+		job.command=job.command.replace('[threadspec]','--threads=%d'%job.nCores); job.hrefCommand=job.hrefCommand.replace('[threadspec]','--threads=%d'%job.nCores)
 	job.exitStatus=os.system(job.command)
 	if job.exitStatus!=0 and len([l for l in open(job.log) if l.startswith('Yade: normal exit.')])>0: job.exitStatus=0
 	job.finished=time.time()
 	dt=job.finished-job.started;
+	job.durationSec=dt
 	job.duration=t2hhmmss(dt)
 	strStatus='done   ' if job.exitStatus==0 else 'FAILED '
 	job.status='DONE'
@@ -266,8 +272,8 @@ def runJobs(jobs,numCores):
 				freeCores=set(range(0,numCores))-set().union(*(j.cores for j in jobs if j.status=='RUNNING'))
 				#print 'freeCores:',freeCores,'numFreeCores:',numFreeCores,'overloaded',overloaded
 				if not overloaded:
-					#assert(len(freeCores)<=numFreeCores)
-					j.cores=list(freeCores)[0:j.nCores] # take required number of free cores
+					# only set cores if CPU affinity is desired; otherwise, just numer of cores is used
+					if j.affinity: j.cores=list(freeCores)[0:j.nCores] # take required number of free cores
 				# if overloaded, do not assign cores directly
 				thread.start_new_thread(runJob,(j,))
 				break
@@ -285,21 +291,25 @@ maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
 
 parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
-parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=maxOmpThreads)
-parser.add_option('--force-threads',action='store_true',dest='forceThreads')
+parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to allocate all available cores (%d) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=maxOmpThreads)
+parser.add_option('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see -j), even if !THREADS colums specifies more.')
 parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
 parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
-parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%executable,default=executable,metavar='FILE')
+parser.add_option('--cpu-affinity',dest='affinity',action='store_true',help='Bind each job to specific CPU cores; cores are assigned in a quasi-random order, depending on availability at the moment the jobs is started. Each job can override this setting by setting AFFINE column.')
+parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s). Jobs can override with !EXEC column.'%executable,default=executable,metavar='FILE')
 parser.add_option('--rebuild',dest='rebuild',help='Run executable(s) with --rebuild prior to running any jobs.',default=False,action='store_true')
-parser.add_option('--debug',dest='debug',action='store_true',help='Run the executable with --debug.',default=False)
+parser.add_option('--debug',dest='debug',action='store_true',help='Run the executable with --debug. Can be overriddenn per-job with !DEBUG column.',default=False)
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
 parser.add_option('--generate-manpage',help='Generate man page documenting this program and exit',dest='manpage',metavar='FILE')
 parser.add_option('--plot-update',type='int',dest='plotAlwaysUpdateTime',help='Interval (in seconds) at which job plots will be updated even if not requested via HTTP. Non-positive values will make the plots not being updated and saved unless requested via HTTP (see --plot-timeout for controlling maximum age of those).  Plots are saved at exit under the same name as the log file, with the .log extension removed. (default: 60 seconds)',metavar='TIME',default=60)
 parser.add_option('--plot-timeout',type='int',dest='plotTimeout',help='Maximum age (in seconds) of plots served over HTTP; they will be updated if they are older. (default: 10 seconds)',metavar='TIME',default=10)
+parser.add_option('--timing',type='int',dest='timing',default=0,metavar='COUNT',help='Repeat each job COUNT times, and output a simple table with average/variance/minimum/maximum job duration; used for measuring how various parameters affect execution time. Jobs can override the global value with the !COUNT column.')
+parser.add_option('--timing-output',type='str',metavar='FILE',dest='timingOut',default=None,help='With --timing, save measured durations to FILE, instead of writing to standard output.')
+#parser.add_option('--serial',action='store_true',dest='serial',default=False,help='Run all jobs serially, even if there are free cores
 opts,args=parser.parse_args()
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
 
@@ -323,7 +333,7 @@ table,simul=args[0:2]
 if not logFormat: logFormat=(simul[:-3] if simul[-3:]=='.py' else simul)+".@.log"
 if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log string must contain at least one of `%', `@'")
 
-print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d jobs at a time."%(executable,simul,nice,logFormat,maxJobs)
+print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', using max %d cores."%(executable,simul,nice,logFormat,maxJobs)
 
 reader=yade.utils.TableParamReader(table)
 params=reader.paramDict()
@@ -353,11 +363,18 @@ for i,l in enumerate(useLines):
 	logFile=logFile.replace('@',params[l]['description'])
 	envVars=[]
 	nCores=opts.defaultThreads
+	jobExecutable=executable
+	jobAffinity=opts.affinity
+	jobDebug=opts.debug
+	jobCount=opts.timing
 	for col in params[l].keys():
 		if col[0]!='!': continue
-		if col=='!OMP_NUM_THREADS':
-			nCores=int(params[l][col]); maxCpu=getNumCores()
-		elif col=='!EXEC': executable=params[l][col]
+		val=params[l][col]
+		if col=='!OMP_NUM_THREADS' or col=='!THREADS': nCores=int(val)
+		elif col=='!EXEC': jobExecutable=val
+		elif col=='!AFFINITY': jobAffinity=eval(val)
+		elif col=='!DEBUG': jobDebug=eval(val)
+		elif col=='!COUNT': jobCount=eval(val)
 		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if nCores>maxJobs:
 		if opts.forceThreads:
@@ -367,14 +384,19 @@ for i,l in enumerate(useLines):
 			logging.warning('WARNING: job #%d will use %d cores but only %d are available'%(i,nCores,maxJobs))
 		if 'openmp' not in yade.config.features and nCores>1:
 			logging.warning('Job #%d will be uselessly run with %d threads (compiled without OpenMP support).'%(i,nCores))
-	executables.add(executable)
+	executables.add(jobExecutable)
 	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
-	env='PARAM_TABLE=<a href="jobs/%d/table">%s:%d</a> DISPLAY= %s '%(i,table,l,' '.join(envVars))
-	cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(executable,' --debug' if opts.debug else '','--nice=%s'%nice if nice!=None else '',i,simul)
-	log='> <a href="jobs/%d/log">%s</a> 2>&1'%(i,pipes.quote(logFile))
-	hrefCmd=env+cmd+log
-	fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
-	jobs.append(JobInfo(i,params[l]['description'],fullCmd,hrefCmd,logFile,nCores,script=simul,table=table,lineNo=l))
+	for j in range(0,opts.timing if opts.timing>0 else 1):
+		jobNum=len(jobs)
+		logFileNumbered=logFile+('.%d'%j if opts.timing>0 else '')
+		env='PARAM_TABLE=<a href="jobs/%d/table">%s:%d</a> DISPLAY= %s '%(jobNum,table,l,' '.join(envVars))
+		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,' --debug' if jobDebug else '','--nice=%s'%nice if nice!=None else '',i,simul)
+		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFileNumbered))
+		hrefCmd=env+cmd+log
+		fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
+		desc=params[l]['description']
+		if opts.timing>0: desc+='[%d]'%j
+		jobs.append(JobInfo(jobNum,desc,fullCmd,hrefCmd,logFileNumbered,nCores,script=simul,table=table,lineNo=l,affinity=jobAffinity))
 
 print "Master process pid",os.getpid()
 
@@ -415,6 +437,23 @@ if plots: print 'Plot files:',' '.join(plots)
 
 # for easy grepping in logfiles:
 print 'Log files:',' '.join([j.log for j in jobs])
+
+# write timing table
+if opts.timing>0:
+	if opts.timingOut: out=open(opts.timingOut)
+	else: out=sys.stdout
+	# write header
+	out.write('## timing data, written '+time.asctime()+' with arguments\n##    '+' '.join(sys.argv)+'\n##\n')
+	paramNames=params[params.keys()[0]].keys(); paramNames.sort()
+	out.write('## line\tcount\tavg\trelDev\tvar\tmin\tmax\t|\t'+'\t'.join(paramNames)+'\n')
+	import math
+	for i,l in enumerate(useLines):
+		jobTimes=[j.durationSec for j in jobs if j.lineNo==l]
+		tSum=sum(jobTimes); tAvg=tSum/len(jobTimes)
+		tMin,tMax=min(jobTimes),max(jobTimes)
+		tVar=sum((t-tAvg)**2 for t in jobTimes)/len(tSum)
+		tRelDev=math.sqrt(tVar)/tAvg
+		out.write('%d\t%d\t%g\t%g\t%g\t%g\t%g\t|\t'%(l,len(jobTimes),tAvg,tRelDev,tVar,tMin,tMax)+'\t'.join([params[l][p] for p in paramNames])+'\n')
 
 if not gnuplotOut:
 	print 'Bye.'

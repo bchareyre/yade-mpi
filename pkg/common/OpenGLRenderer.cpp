@@ -88,13 +88,16 @@ void OpenGLRenderer::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
 	bool scaleRotations=(rotScale!=1.0);
 	bool scaleDisplacements=(dispScale!=Vector3r::Ones());
+	int subDom; Body::id_t localId;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->state) continue;
 		size_t id=b->getId();
+		boost::tie(subDom,localId)=scene->bodies->subDomId2domNumLocalId(b->subDomId);
 		const Vector3r& pos=b->state->pos; const Vector3r& refPos=b->state->refPos;
 		const Quaternionr& ori=b->state->ori; const Quaternionr& refOri=b->state->refOri;
 		Vector3r cellPos=(!scene->isPeriodic ? pos : scene->cell->wrapShearedPt(pos)); // inside the cell if periodic, same as pos otherwise
-		bodyDisp[id].isDisplayed=!pointClipped(cellPos);	
+		bodyDisp[id].isDisplayed=!pointClipped(cellPos);
+		if(subDomMask!=0 && (((1<<subDom) & subDomMask)==0)) bodyDisp[id].isDisplayed=false; 
 		// if no scaling and no periodic, return quickly
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling

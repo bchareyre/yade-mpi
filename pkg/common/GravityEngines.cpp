@@ -15,7 +15,7 @@
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravityEngine));
 
 void GravityEngine::action(){
-	const bool trackEnergy(scene->trackEnergy);
+	const bool trackEnergy(unlikely(scene->trackEnergy));
 	const Real dt(scene->dt);
 	YADE_PARALLEL_FOREACH_BODY(const shared_ptr<Body>& b, scene->bodies){
 		// skip clumps, only apply forces on their constituents

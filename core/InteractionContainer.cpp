@@ -63,9 +63,13 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 
 const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
-	if (id1>id2) swap(id1,id2);
-	assert(id1<(Body::id_t)bodies->size() && id2<(Body::id_t)bodies->size());
-	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1);
+	if (id1>id2) swap(id1,id2); 
+	// those checks could be perhaps asserts, but pyInteractionContainer has no access to the body container...
+	if(unlikely(id2>=(Body::id_t)bodies->size())){ empty=shared_ptr<Interaction>(); return empty; }
+	//assert(id2<(Body::id_t)bodies->size()); // id2 is bigger
+	const shared_ptr<Body>& b1((*bodies)[id1]);
+	// assert(b1);
+	if(unlikely(!b1)) { empty=shared_ptr<Interaction>(); return empty; }
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	if (I!=b1->intrs.end()) return I->second;
 	else { empty=shared_ptr<Interaction>(); return empty; }

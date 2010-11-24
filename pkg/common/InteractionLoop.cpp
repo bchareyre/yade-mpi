@@ -58,7 +58,7 @@ void InteractionLoop::action(){
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
-	YADE_PARALLEL_FOREACH_BODY(const shared_ptr<Body>& b, scene->bodies){ if(!b) continue; FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){ const shared_ptr<Interaction>& I(mapItem.second);
+	YADE_PARALLEL_FOREACH_BODY(const shared_ptr<Body>& b, scene->bodies){ if(unlikely(!b)) continue; FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){ const shared_ptr<Interaction>& I(mapItem.second);
 		if(unlikely(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter)) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;

@@ -14,7 +14,7 @@ print 'unimportant',table.unimportant
 #print O.tags['defaultParams']
 import time
 #time.sleep(5)
-O.engines=[PyRunner(command='time.sleep(.1)',iterPeriod=1)]
+O.engines=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
 O.run(1000,True)
 print 'finished'
 import sys

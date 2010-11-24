@@ -12,6 +12,7 @@
 #endif
 
 #include<yade/core/Interaction.hpp>
+#include<yade/core/BodyContainer.hpp>
 
 #include<boost/foreach.hpp>
 #ifndef FOREACH
