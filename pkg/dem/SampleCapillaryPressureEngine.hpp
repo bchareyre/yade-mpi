@@ -26,15 +26,15 @@ class SampleCapillaryPressureEngine : public TriaxialStressController
 		std::string Phase1End;
 		//! is this the beginning of the simulation, after reading the scene?
 		bool firstRun;
-		
+
 		shared_ptr<Law2_ScGeom_CapillaryPhys_Capillarity>  capillaryCohesiveLaw;
 		//Law2_ScGeom_CapillaryPhys_Capillarity* capillaryCohesiveLaw; // which one is right?
-		
+
 		virtual ~SampleCapillaryPressureEngine();
 		void updateParameters();
 		virtual void action();
-		
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(SampleCapillaryPressureEngine,TriaxialStressController,"Rk: this engine has to be tested withthe new formalism. It produces the isotropic compaction of an assembly and allows to controlled the capillary pressure inside (uses Law2_ScGeom_CapillaryPhys_Capillarity).",
+
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(SampleCapillaryPressureEngine,TriaxialStressController,"It produces the isotropic compaction of an assembly and allows to controlled the capillary pressure inside (uses Law2_ScGeom_CapillaryPhys_Capillarity).",
 		((Real,Pressure,0,,"Value of the capillary pressure Uc=Ugas-Uliquid (see Law2_ScGeom_CapillaryPhys_Capillarity). [Pa]"))
 		((bool,pressureVariationActivated,1,,"Is the capillary pressure varying?"))
 		((bool,fusionDetection,1,,"Is the detection of menisci overlapping activated?"))

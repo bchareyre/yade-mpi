@@ -1,9 +1,9 @@
 #pragma once
+#include<yade/pkg/common/Dispatching.hpp>
 #include<yade/core/Shape.hpp>
 #include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/core/Scene.hpp>
 #ifdef YADE_OPENGL
@@ -13,28 +13,31 @@
 
 class Cylinder: public Sphere{
 	public:
-		Cylinder(Real _radius, Real _length): length(_length) { /*segment=Vector3r(0,0,1)*_length;*/ radius=_radius; createIndex(); }
+// 		Cylinder(Real _radius, Real _length): length(_length) { /*segment=Vector3r(0,0,1)*_length;*/ radius=_radius; createIndex(); }
 		virtual ~Cylinder ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Cylinder,Sphere,"Geometry of a cylinder, as Minkowski sum of line and sphere.",
 // 		((Real,radius,NaN,,"Radius [m]"))
 		((Real,length,NaN,,"Length [m]"))
 		((Vector3r,segment,Vector3r::Zero(),,"Length vector")),
 		createIndex();
+
 		/*ctor*/
+		segment=Vector3r(0,0,1)*length;
 	);
 	REGISTER_CLASS_INDEX(Cylinder,Sphere);
 };
+REGISTER_SERIALIZABLE(Cylinder);
 
 class ChainedCylinder: public Cylinder{
 	public:
-		ChainedCylinder(Real _radius, Real _length): Cylinder(_radius,_length){}
+// 		ChainedCylinder(Real _radius, Real _length);/*: Cylinder(_radius,_length){}*/
 		virtual ~ChainedCylinder ();
-		 
+
 		//Keep pointers or copies of connected states?
 // 		ChainedState st1, st2;
-		
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ChainedCylinder,Cylinder,"Geometry of a deformable chained cylinder, using geometry :yref:`MinkCylinder`.",
+
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ChainedCylinder,Cylinder,"Geometry of a deformable chained cylinder, using geometry :yref:`Cylinder`.",
   		((Real,initLength,0,,"tensile-free length, used as reference for tensile strain"))
   		((Quaternionr,chainedOrientation,Quaternionr::Identity(),,"Deviation of node1 orientation from node-to-node vector"))
 		,createIndex();/*ctor*/
@@ -43,6 +46,7 @@ class ChainedCylinder: public Cylinder{
 	);
 	REGISTER_CLASS_INDEX(ChainedCylinder,Cylinder);
 };
+REGISTER_SERIALIZABLE(ChainedCylinder);
 
 class CylScGeom: public ScGeom{
 	public:
@@ -57,6 +61,7 @@ class CylScGeom: public ScGeom{
 	);
 	REGISTER_CLASS_INDEX(CylScGeom,ScGeom);
 };
+REGISTER_SERIALIZABLE(CylScGeom);
 
 
 class ChainedState: public State{
@@ -87,12 +92,14 @@ class ChainedState: public State{
 		.def_readwrite("currentChain",&ChainedState::currentChain,"Current active chain (where newly created chained bodies will be appended).")
 		.def("addToChain",&ChainedState::addToChain,(python::arg("bodyId")),"Add body to current active chain")
 	);
+	REGISTER_CLASS_INDEX(ChainedState,State);
 };
-
+REGISTER_SERIALIZABLE(ChainedState);
 
 
 class Ig2_Sphere_ChainedCylinder_CylScGeom: public IGeomFunctor{
 	public:
+// 		virtual ~Ig2_Sphere_ChainedCylinder_CylScGeom ();
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 	#ifdef YADE_DEVIRT_FUNCTORS
@@ -105,9 +112,11 @@ class Ig2_Sphere_ChainedCylinder_CylScGeom: public IGeomFunctor{
 	FUNCTOR2D(Sphere,ChainedCylinder);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,ChainedCylinder);
 };
+REGISTER_SERIALIZABLE(Ig2_Sphere_ChainedCylinder_CylScGeom);
 
 class Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D: public IGeomFunctor{
 	public:
+// 		virtual ~Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D ()  {};
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 	#ifdef YADE_DEVIRT_FUNCTORS
@@ -121,7 +130,7 @@ class Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D: public IGeomFunctor{
 	// needed for the dispatcher, even if it is symmetric
 	DEFINE_FUNCTOR_ORDER_2D(ChainedCylinder,ChainedCylinder);
 };
-
+REGISTER_SERIALIZABLE(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D);
 
 
 #ifdef YADE_OPENGL
@@ -184,6 +193,7 @@ class Bo1_Cylinder_Aabb : public BoundFunctor
 		((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"Relative enlargement of the bounding box; deactivated if negative.\n\n.. note::\n\tThis attribute is used to create distant interaction, but is only meaningful with an :yref:`IGeomFunctor` which will not simply discard such interactions: :yref:`Ig2_Cylinder_Cylinder_Dem3DofGeom::distFactor` / :yref:`Ig2_Cylinder_Cylinder_ScGeom::interactionDetectionFactor` should have the same value as :yref:`aabbEnlargeFactor<Bo1_Cylinder_Aabb::aabbEnlargeFactor>`."))
 	);
 };
+REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
 
 class Bo1_ChainedCylinder_Aabb : public BoundFunctor
 {
@@ -194,6 +204,7 @@ class Bo1_ChainedCylinder_Aabb : public BoundFunctor
 		((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"Relative enlargement of the bounding box; deactivated if negative.\n\n.. note::\n\tThis attribute is used to create distant interaction, but is only meaningful with an :yref:`IGeomFunctor` which will not simply discard such interactions: :yref:`Ig2_Cylinder_Cylinder_Dem3DofGeom::distFactor` / :yref:`Ig2_Cylinder_Cylinder_ScGeom::interactionDetectionFactor` should have the same value as :yref:`aabbEnlargeFactor<Bo1_Cylinder_Aabb::aabbEnlargeFactor>`."))
 	);
 };
+REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
 
 // Keep this : Cylinders and ChainedCylinders will have different centers maybe.
 // class Bo1_ChainedCylinder_Aabb : public Bo1_Cylinder_Aabb
@@ -206,14 +217,6 @@ class Bo1_ChainedCylinder_Aabb : public BoundFunctor
 // 	);
 // };
 
-REGISTER_SERIALIZABLE(Bo1_Cylinder_Aabb);
-REGISTER_SERIALIZABLE(Bo1_ChainedCylinder_Aabb);
-REGISTER_SERIALIZABLE(Cylinder);
-REGISTER_SERIALIZABLE(ChainedCylinder);
-REGISTER_SERIALIZABLE(ChainedState);
-REGISTER_SERIALIZABLE(CylScGeom);
-REGISTER_SERIALIZABLE(Ig2_Sphere_ChainedCylinder_CylScGeom);
-REGISTER_SERIALIZABLE(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D);
 #ifdef YADE_OPENGL
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
 REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);

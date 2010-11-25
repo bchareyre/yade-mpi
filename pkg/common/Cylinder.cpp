@@ -9,10 +9,11 @@ Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}
 ChainedState::~ChainedState(){}
 CylScGeom::~CylScGeom(){}
+// Ig2_Sphere_ChainedCylinder_CylScGeom::~Ig2_Sphere_ChainedCylinder_CylScGeom() {}
+// Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::~Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D() {}
 
 
-YADE_PLUGIN(
-	(Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D)
+YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D)
 	#ifdef YADE_OPENGL
 		(Gl1_Cylinder)(Gl1_ChainedCylinder)
 	#endif
@@ -64,7 +65,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	Real dist = direction.dot(branch);
 // 	if ((dist<-interactionDetectionFactor*cylinder->radius) && !c->isReal()) return (false);//position _before_ start of cylinder
 	if ((dist<-interactionDetectionFactor*cylinder->radius) && isNew) return (false);//position _before_ start of cylinder
-		
+
 	//Check sphere-cylinder distance
 	Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
 	branch = projectedP-sphereSt->pos;
@@ -74,7 +75,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	shared_ptr<CylScGeom> scm;
 	if(!isNew) scm=YADE_PTR_CAST<CylScGeom>(c->geom);
 	else { scm=shared_ptr<CylScGeom>(new CylScGeom()); c->geom=scm; }
-	
+
 	scm->radius1=sphere->radius;
 	scm->radius2=cylinder->radius;
 	scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
@@ -160,9 +161,9 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 	const ChainedState& bchain2 = revert? *pChain1 : *pChain2;
 	if (bchain2.rank-bchain1.rank != 1) {/*cerr<<"Mutual contacts in same chain between not adjacent elements, not handled*/ return false;}
 	if (pChain2->chainNumber!=pChain1->chainNumber) {cerr<<"PROBLEM0124"<<endl; return false;}
-	
+
 	ChainedCylinder *bs1=static_cast<ChainedCylinder*>(revert? cm2.get():cm1.get());
-	
+
 	shared_ptr<ScGeom6D> scm;
 	bool isNew = !c->geom;
 	if(!isNew) scm=YADE_PTR_CAST<ScGeom6D>(c->geom);
@@ -176,8 +177,8 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 	scm->contactPoint=bchain2.pos;
 	//bs1->segment used for fast BBs and projections + display
 	bs1->segment= bchain2.pos-bchain1.pos;
-#ifdef YADE_OPENGL 
-	//bs1->length and s1->chainedOrientation used for display only, 
+#ifdef YADE_OPENGL
+	//bs1->length and s1->chainedOrientation used for display only,
 	bs1->length=length;
 	bs1->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),bchain1.ori.conjugate()*segt);
 #endif
@@ -301,10 +302,10 @@ void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quate
 //    gluDeleteQuadric(quadObj);
 //    glPopMatrix();
 // //    GLERROR;
-// 	
+//
 // // 	glEndList();}
 // // 	glCallList(glCylinderList);
-// 
+//
 // }
 
 //!##################	BOUNDS FUNCTOR   #####################
