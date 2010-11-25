@@ -25,128 +25,119 @@ FlowEngine::~FlowEngine()
 {
 }
 
-
 void FlowEngine::action()
 {
+	if (!isActivated) return;
 	if (!flow) {
 		flow = shared_ptr<FlowSolver> (new FlowSolver);
 		first=true;
 		cerr <<"first = true"<<endl;
-		Update_Triangulation=false;/*IS=0.f;*/
+		Update_Triangulation=false;
 		eps_vol_max=0.f;
 		Eps_Vol_Cumulative=0.f;
 		ReTrg=1;
 		retriangulationLastIter=0;
 	}
-	if (!isActivated) return;
-	else
+	if (!triaxialCompressionEngine)
 	{
-		timingDeltas->start();
-
-		if (!triaxialCompressionEngine)
-		{
-			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
-			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
-			for (;itFirst!=itLast; ++itFirst) {
-				if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {
-					cout << "stress controller engine found - FlowEngine" << endl;
-					triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}}
-			if (!triaxialCompressionEngine) cout << "stress controller engine NOT found" << endl;
-		}
-
-		currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
-		currentStrain = triaxialCompressionEngine->strain[1];
-		current_state = triaxialCompressionEngine->currentState;
-
-// 		if ( current_state==3 )
-		{
-			if (first) Build_Triangulation(P_zero);
-			timingDeltas->checkpoint("Triangulating");
-
-			eps_vol_max=0.f;
-			UpdateVolumes ( );
-			Eps_Vol_Cumulative += eps_vol_max;
-			if ((Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000) && retriangulationLastIter>10) {
-				Update_Triangulation = true;
-				Eps_Vol_Cumulative=0;
-				retriangulationLastIter=0;
-				ReTrg++;
-			} else  retriangulationLastIter++;
-			timingDeltas->checkpoint("Update_Volumes");
-
-			if (!first) {
-				///Compute flow and and forces here
-				flow->GaussSeidel();
-				timingDeltas->checkpoint("Gauss-Seidel");
-				if (save_mgpost) flow->MGPost();
-				if (!CachedForces) flow->ComputeFacetForces();
-				else flow->ComputeFacetForcesWithCache();
-				timingDeltas->checkpoint("Compute_Forces");
-
-				///End Compute flow and forces
-				//int number_of_particles = flow->num_particles;
-				CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
-				Vector3r f;
-				int id;
-				//IS = 0.f;
-				//std::ofstream Istab ("Stability.txt", std::ios::app);
-				for (CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++)
-				{
-					id = V_it->info().id();
-					for (int y=0;y<3;y++) f[y] = (V_it->info().forces)[y];
-					scene->forces.addForce(id, f);
-					//scene->forces.sync();
-					//IS += (scene->forces.getForce(id).norm())/number_of_particles;
-				}
-				timingDeltas->checkpoint("Applying Forces");
-			}
-			//cout << "STABILITY INDEX - IS = " << IS << endl;
-			//Istab << scene->time << " " << IS << endl;
-
-			Real time = scene->time;
-			int j = scene->iter;
-
-			if (consolidation) {
-				char file [50];
-				mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-				string consol = "./Consol/"+flow->key+"%d_Consol";
-				const char* keyconsol = consol.c_str();
-				sprintf(file, keyconsol, j);
-				char *g = file;
-				timingDeltas->checkpoint("Writing cons_files");
-				MaxPressure = flow->PressureProfile(g, time, intervals);
-
-				std::ofstream max_p("pressures.txt", std::ios::app);
-				max_p << j << " " << time << " " << MaxPressure << endl;
-
-				std::ofstream settle("settle.txt", std::ios::app);
-				settle << j << " " << time << " " << currentStrain << endl;
-			}
-// 			if ( scene->iter % PermuteInterval == 0 )
-// 			{ Update_Triangulation = true; }
-
-			if (Update_Triangulation && !first) {
-				Build_Triangulation();
-				Update_Triangulation = false;
-			}
-			first=false;
-//			flow->Average_Grain_Velocity();
-			if (save_vtk) flow->save_vtk_file();
-
-			if (slice_pressures)
-			{
-				char slifile [30];
-				mkdir("./Slices", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-				string slice = "./Slices/Slice_"+flow->key+"_%d";
-				const char* keyslice = slice.c_str();
-				sprintf(slifile, keyslice, j);
-				char *f = "slifile";
-				flow->SliceField(f);
-			}
-// 				int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
-// 				flow->vtk_average_cell_velocity(flow->T[flow->currentTes].Triangulation(), id_sphere, numero);
-		}
+		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
+		for (;itFirst!=itLast; ++itFirst) {
+			if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {
+				cout << "stress controller engine found - FlowEngine" << endl;
+				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}}
+		if (!triaxialCompressionEngine) cout << "stress controller engine NOT found" << endl;
 	}
+	currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
+	currentStrain = triaxialCompressionEngine->strain[1];
+
+// 	current_state = triaxialCompressionEngine->currentState;
+// 	if (current_state == 3){
+
+	timingDeltas->start();
+	
+	if (first) Build_Triangulation(P_zero);
+	timingDeltas->checkpoint("Triangulating");
+
+	if (!first) {
+		eps_vol_max=0.f;
+		UpdateVolumes ( );
+		Eps_Vol_Cumulative += eps_vol_max;
+		if ((Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000) && retriangulationLastIter>10) {
+			Update_Triangulation = true;
+			Eps_Vol_Cumulative=0;
+			retriangulationLastIter=0;
+			ReTrg++;
+		} else  retriangulationLastIter++;
+		timingDeltas->checkpoint("Update_Volumes");
+
+		///Compute flow and and forces here
+		flow->GaussSeidel();
+		timingDeltas->checkpoint("Gauss-Seidel");
+		if (save_mgpost) flow->MGPost();
+		if (!CachedForces) flow->ComputeFacetForces();
+		else flow->ComputeFacetForcesWithCache();
+		timingDeltas->checkpoint("Compute_Forces");
+
+		///End Compute flow and forces
+		CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
+		Vector3r f;
+		int id;
+		for (CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++)
+		{
+			id = V_it->info().id();
+			for (int y=0;y<3;y++) f[y] = (V_it->info().forces)[y];
+			scene->forces.addForce(id, f);
+		}
+		timingDeltas->checkpoint("Applying Forces");
+
+		Real time = scene->time;
+		int j = scene->iter;
+
+		if (consolidation) {
+			char file [50];
+			mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			string consol = "./Consol/"+flow->key+"%d_Consol";
+			const char* keyconsol = consol.c_str();
+			sprintf(file, keyconsol, j);
+			char *g = file;
+			timingDeltas->checkpoint("Writing cons_files");
+			MaxPressure = flow->PressureProfile(g, time, intervals);
+
+			std::ofstream max_p("pressures.txt", std::ios::app);
+			max_p << j << " " << time << " " << MaxPressure << endl;
+
+			std::ofstream settle("settle.txt", std::ios::app);
+			settle << j << " " << time << " " << currentStrain << endl;
+		}
+		
+		if (slice_pressures){
+			char slifile [30];
+			mkdir("./Slices", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			string slice = "./Slices/Slice_"+flow->key+"_%d";
+			const char* keyslice = slice.c_str();
+			sprintf(slifile, keyslice, j);
+			char *f = "slifile";
+			flow->SliceField(f);
+		}
+		
+		if (save_vtk) flow->save_vtk_file();
+	}
+// 	if ( scene->iter % PermuteInterval == 0 )
+// 	{ Update_Triangulation = true; }
+
+	if (Update_Triangulation && !first) {
+		Build_Triangulation();
+		Update_Triangulation = false;
+	}
+
+	flow->Average_Cell_Velocity();
+// 	flow->Average_Grain_Velocity();
+// 	int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
+// 	flow->vtk_average_cell_velocity(flow->T[flow->currentTes].Triangulation(), id_sphere, numero);
+
+	first=false;
+// }
 }
 
 void FlowEngine::BoundaryConditions()
@@ -195,13 +186,15 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	Triangulate ( );
 	if (Debug) cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
-
+	
 	flow->Define_fictious_cells();
 	flow->DisplayStatistics ();
 
 	flow->meanK_LIMIT = meanK_correction;
 	flow->meanK_STAT = meanK_opt;
 	flow->Compute_Permeability ( );
+	
+	porosity = flow->V_porale_porosity/flow->V_totale_porosity;
 
 	if (first)
 	{
@@ -236,21 +229,19 @@ void FlowEngine::Build_Triangulation (double P_zero)
 void FlowEngine::AddBoundary ()
 {
 	shared_ptr<Sphere> sph ( new Sphere );
-
 	int Sph_Index = sph->getClassIndexStatic();
-	int contator = 0;
 
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
 	{
 		if ( !b ) continue;
 		if ( b->shape->getClassIndex() ==  Sph_Index )
 		{
-		  Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
+			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
 			//const Body::id_t& id = b->getId();
-			Real rad = s->radius;
-			Real x = b->state->pos[0];
-			Real y = b->state->pos[1];
-			Real z = b->state->pos[2];
+			Real& rad = s->radius;
+			Real& x = b->state->pos[0];
+			Real& y = b->state->pos[1];
+			Real& z = b->state->pos[2];
 
 			flow->x_min = min ( flow->x_min, x-rad);
 			flow->x_max = max ( flow->x_max, x+rad);
@@ -258,14 +249,46 @@ void FlowEngine::AddBoundary ()
 			flow->y_max = max ( flow->y_max, y+rad);
 			flow->z_min = min ( flow->z_min, z-rad);
 			flow->z_max = max ( flow->z_max, z+rad);
-
-			contator+=1;
 		}
 	}
+	
+	id_offset = flow->T[flow->currentTes].max_id+1;
+	
+	flow->id_offset = id_offset;
+	
 	flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
 	flow->Vtotale = (flow->x_max-flow->x_min) * (flow->y_max-flow->y_min) * (flow->z_max-flow->z_min);
+	
+	flow->y_min_id=triaxialCompressionEngine->wall_bottom_id;
+	flow->y_max_id=triaxialCompressionEngine->wall_top_id;
+	flow->x_max_id=triaxialCompressionEngine->wall_right_id;
+	flow->x_min_id=triaxialCompressionEngine->wall_left_id;
+	flow->z_min_id=triaxialCompressionEngine->wall_back_id;
+	flow->z_max_id=triaxialCompressionEngine->wall_front_id;
+	
+	flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
+	flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
+	flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
+	flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
+	flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
+	flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;	
+	
+	//FIXME: Id's order in boundsIds is done according to the enumerotation of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
+	flow->boundsIds[0]= &flow->y_min_id;
+        flow->boundsIds[1]= &flow->y_max_id;
+        flow->boundsIds[2]= &flow->x_min_id;
+        flow->boundsIds[3]= &flow->x_max_id;
+        flow->boundsIds[4]= &flow->z_max_id;
+        flow->boundsIds[5]= &flow->z_min_id;
+	
+	wall_thickness = triaxialCompressionEngine->thickness;
+	
+	flow->Corner_min = CGT::Point(flow->x_min, flow->y_min, flow->z_min);
+	flow->Corner_max = CGT::Point(flow->x_max, flow->y_max, flow->z_max);
+	
 
-	if (flow->DEBUG_OUT) {cout << "Section area = " << flow->SectionArea << endl;
+	if (Debug) {
+	cout << "Section area = " << flow->SectionArea << endl;
 	cout << "Vtotale = " << flow->Vtotale << endl;
 // 	cout << "Rmoy " << Rmoy << endl;
 	cout << "x_min = " << flow->x_min << endl;
@@ -273,37 +296,22 @@ void FlowEngine::AddBoundary ()
 	cout << "y_max = " << flow->y_max << endl;
 	cout << "y_min = " << flow->y_min << endl;
 	cout << "z_min = " << flow->z_min << endl;
-	cout << "z_max = " << flow->z_max << endl;}
+	cout << "z_max = " << flow->z_max << endl;
+	cout << endl << "Adding Boundary------" << endl;}
+	
+	double center[3];
+	
+	for (int i=0; i<6; i++) 
+	{
+	  CGT::Vecteur Normal (triaxialCompressionEngine->normal[i].x(), triaxialCompressionEngine->normal[i].y(), triaxialCompressionEngine->normal[i].z());
+	  if (flow->boundary(*flow->boundsIds[i]).useMaxMin) flow->AddBoundingPlane (true, Normal, *flow->boundsIds[i]);
+	  else {
+            const shared_ptr<Body>& wll = Body::byId ( *flow->boundsIds[i] , scene );
+            for ( int h=0;h<3;h++ ){center[h] = wll->state->pos[h];}
+            flow->AddBoundingPlane (center, wall_thickness, Normal,*flow->boundsIds[i]);}}
+            
+// 	flow->AddBoundingPlanes(true);
 
-	if (Debug) cout << "Adding Boundary------" << endl;
-
-// 	shared_ptr<Box> bx ( new Box );
-// 	int Bx_Index = bx->getClassIndexStatic();
-//
-// 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
-// 	{
-// 		if ( !b ) continue;
-// 		if ( b->shape->getClassIndex() == Bx_Index )
-// 		{
-// 			Box* w = YADE_CAST<Box*> ( b->shape.get() );
-// // 			const Body::id_t& id = b->getId();
-// 			Real center [3], Extent[3];
-// 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
-// 			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
-// 		}
-// 	}
-	id_offset = flow->T[flow->currentTes].max_id+1;
-
-	flow->id_offset = id_offset;
-
-	flow->y_min_id=triaxialCompressionEngine->wall_bottom_id;
-	flow->y_max_id=triaxialCompressionEngine->wall_top_id;
-	flow->x_max_id=triaxialCompressionEngine->wall_right_id;
-	flow->x_min_id=triaxialCompressionEngine->wall_left_id;
-	flow->z_min_id=triaxialCompressionEngine->wall_back_id;
-	flow->z_max_id=triaxialCompressionEngine->wall_front_id;
-
-	flow->AddBoundingPlanes(true);
 }
 
 void FlowEngine::Triangulate ()
@@ -354,7 +362,6 @@ void FlowEngine::Initialize_volumes ()
 void FlowEngine::UpdateVolumes ()
 {
 	if (Debug) cout << "Updating volumes.............." << endl;
-	Real deltaT = scene->dt;
 	Real invDeltaT = 1/scene->dt;
 	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 	double newVol=0; double dVol;
@@ -424,10 +431,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0};
 	Real B[3]={0, 0, 0}, BS[3]={0, 0, 0}, BT[3]={0, 0, 0};
 	Real C[3]={0, 0, 0}, CS[3]={0, 0, 0}, CT[3]={0, 0, 0};
-
-	//Real A[3], AS[3], AT[3];
-	//Real B[3], BS[3], BT[3];
-	//Real C[3], CS[3], CT[3];
+	
 	int b[2];
 
 	Real Wall_point[2][3];
@@ -476,8 +480,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 {
 	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0}, AW[3]={0, 0, 0};
-//Real A[3], AS[3], AT[3], AW[3];
-// 	CGT::Boundary b[3];
+
 	int b[3];
 	Real Wall_point[3][3];
 	int j=0;

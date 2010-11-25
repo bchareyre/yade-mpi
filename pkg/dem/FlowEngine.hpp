@@ -73,6 +73,7 @@ class FlowEngine : public PartialEngine
 					((int,PermuteInterval,100000,,"Pore space re-triangulation period"))
 					((double, eps_vol_max, 0,,"Maximal absolute volumetric strain computed at each iteration"))
 					((double, EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
+					((double, porosity, 0,,"Porosity computed at each retriangulation"))
 					((bool,compute_K,true,,"Activates permeability measure within a granular sample"))
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
@@ -83,7 +84,7 @@ class FlowEngine : public PartialEngine
 					((double, currentStress, 0,, "Current value of axial stress"))
 					((double, currentStrain, 0,, "Current value of axial strain"))
 					((int, intervals, 30,, "Number of layers for pressure measurements"))
-					((int, useSolver, 1,, "Solver to use"))
+					((int, useSolver, 0,, "Solver to use"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))
@@ -98,6 +99,12 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
 					((double, Sinus_Pressure, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied"))
 					((int, id_sphere, 0,, "Average velocity will be computed for all cells incident to that sphere"))
+					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
+					((bool, TOP_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
+					((bool, RIGHT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
+					((bool, LEFT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
+					((bool, FRONT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
+					((bool, BACK_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					,timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
 		DECLARE_LOGGER;
 };

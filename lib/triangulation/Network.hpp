@@ -28,6 +28,7 @@ struct Boundary
 	int coordinate;
 	bool flowCondition;//flowCondition=0, pressure is imposed // flowCondition=1, flow is imposed
 	Real value;
+	bool useMaxMin;
 };
 
 class Network
@@ -45,7 +46,7 @@ class Network
 		int* boundsIds [6];
 		Point Corner_min;
 		Point Corner_max;
-		Real Vsolid_tot, Vtotalissimo, Vporale, Ssolid_tot;
+		Real Vsolid_tot, Vtotalissimo, Vporale, Ssolid_tot, V_porale_porosity, V_totale_porosity;
 		Boundary boundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		short id_offset;
@@ -57,11 +58,14 @@ class Network
 // 		bool facet_detected;
 		
 // 		void DisplayStatistics();
-		void AddBoundingPlanes(bool yade);
+// 		void AddBoundingPlanes(bool yade);
 		void AddBoundingPlanes();
+		void AddBoundingPlane (bool yade, Vecteur Normal, int id_wall);
+		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall );
+// 		void AddBoundingPlanes ( Real center[3], Real Extents[3], int id );
 		void Define_fictious_cells( );
 		int Detect_facet_fictious_vertices (Cell_handle& cell, int& j);
-		double Volume_Pore (Cell_handle cell);
+// 		double Volume_Pore (Cell_handle cell);
 		double Volume_Pore_VoronoiFraction ( Cell_handle& cell, int& j);
 		double volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
 		double volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface);

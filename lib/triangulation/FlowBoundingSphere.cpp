@@ -180,13 +180,11 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         //GenerateVoxelFile(); ///*GENERATION OF A VOXEL FILE *///
 
         /** INITIALIZATION OF VOLUMES AND PRESSURES **/
-	Real totV=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		cell->info().volume() = Volume_Pore(cell); totV+=cell->info().volume();
+		cell->info().volume() = ( std::abs ( ( CGT::Tetraedre ( cell->vertex(0)->point(),cell->vertex(1)->point(),cell->vertex(2)->point(),cell->vertex(3)->point()).volume() ) ) );
                 cell->info().dv() = 0;
         }
-        if(DEBUG_OUT) cerr << "TOTAL VOID VOLUME: "<<totV<<endl;
 
         clock.top("initializing delta_volumes");
 
@@ -196,7 +194,9 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         Compute_Permeability();
         clock.top("Compute_Permeability");
         /** END PERMEABILITY CALCULATION**/
-
+	
+	if(DEBUG_OUT) cerr << "TOTAL VOID VOLUME: " << Vporale <<endl;
+	
         /** STATISTICS **/
         DisplayStatistics();
         clock.top("DisplayStatistics");
@@ -627,7 +627,9 @@ void FlowBoundingSphere::ApplySinusoidalPressure(RTriangulation& Tri, double Pre
 	    if(!Tri.is_infinite(*it)){
 	      Point& p1 = (*it)->info();
 	      Cell_handle& cell = *it;
-	      if (p1.x()>(alpha*(x_max-x_min)) && p1.x()<((alpha+step)*(x_max-x_min))){cell->info().p() = (Pressure/2)*(1+cos(alpha*M_PI));}
+	      if (p1.x()<0) cell->info().p() = Pressure;
+	      else if (p1.x()>x_max) cell->info().p() = 0.f;
+	      else if (p1.x()>(alpha*(x_max-x_min)) && p1.x()<((alpha+step)*(x_max-x_min))) cell->info().p() = (Pressure/2)*(1+cos(alpha*M_PI));
 	  }
 	  }
 	}
@@ -688,12 +690,11 @@ void FlowBoundingSphere::Compute_Permeability()
 	int NEG=0, POS=0, pass=0;
 
 	bool ref = Tri.finite_cells_begin()->info().isvisited;
-
 	Vecteur n;
 //         std::ofstream oFile( "Radii",std::ios::out);
 // 	std::ofstream fFile( "Radii_Fictious",std::ios::out);
 //         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
-	Real meanK=0, STDEV=0;
+	Real meanK=0, STDEV=0, meanRadius=0, meanDistance=0;
 	Real infiniteK=1e10;
 
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
@@ -741,7 +742,8 @@ void FlowBoundingSphere::Compute_Permeability()
 				(cell->info().k_norm())[j]= k*k_factor;
 //     (cell->info().facetSurf())[j]= k*n;
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
-
+				meanDistance += distance;
+				meanRadius += radius;
 				meanK += (cell->info().k_norm())[j];
 
 // 				if (!meanK_LIMIT) kFile << ( cell->info().k_norm() )[j] << endl;
@@ -752,11 +754,15 @@ void FlowBoundingSphere::Compute_Permeability()
 		cell->info().isvisited = !ref;
 	}
 	meanK /= pass;
+	meanRadius /= pass;
+	meanDistance /= pass;
 	double maxKdivKmean=MAXK_DIV_KMEAN;
 	if (DEBUG_OUT) {
 		cout << "PassCompK = " << pass << endl;
 		cout << "meanK = " << meanK << endl;
 		cout << "maxKdivKmean = " << maxKdivKmean << endl;
+		cout << "meanTubesRadius = " << meanRadius << endl;
+		cout << "meanDistance = " << meanDistance << endl;
 	}
 	ref = Tri.finite_cells_begin()->info().isvisited;
 	pass=0;

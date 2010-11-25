@@ -158,6 +158,7 @@ class FlowBoundingSphere : public Network
 // 		double volume_double_fictious_pore (Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point& PV1, Point& PV2, Vecteur& facetSurface);
 
 // 		double PoreVolume (RTriangulation& Tri, Cell_handle cell);
+// 		void Slice_Average_Cell_Velocity();
 		int Average_Cell_Velocity(int id_sphere, RTriangulation& Tri);
 		void Average_Cell_Velocity();
 		void Average_Grain_Velocity();
