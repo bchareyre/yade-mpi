@@ -84,7 +84,8 @@ bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 
 
 void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool force){
-	find(id1,id2)->reset(); IdsForce v={id1,id2,force};
+	const shared_ptr<Interaction>& I=find(id1,id2); if(!I) return;
+	I->reset(); IdsForce v={id1,id2,force};
 	#ifdef YADE_OPENMP
 		threadsPendingErase[omp_get_thread_num()].push_back(v);
 	#else
