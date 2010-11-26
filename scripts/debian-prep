@@ -46,16 +46,16 @@ for f1,f2 in [
 
 # rename a current folder and create orig.tar.gz
 curName = os.path.basename(os.path.abspath(''))
-newName = 'yade-%s_%s' % (VERSION,DISTRIBUTION)
+newName = 'yade-%s_%s1' % (VERSION,DISTRIBUTION)
 os.rename (('../'+curName), '../'+newName)
 shutil.rmtree('.bzr')
-os.system(('tar -czf ../yade-%s_%s.orig.tar.gz ../'+os.path.basename(os.path.abspath(''))+'/')%(VERSION,DISTRIBUTION))
+os.system(('tar -czf ../yade-%s_%s1.orig.tar.gz ../'+os.path.basename(os.path.abspath(''))+'/')%(VERSION,DISTRIBUTION))
 
 
 # write debian/changelog
 try:
 	open('debian/changelog','w').write(
-	'''yade-%s (%s) %s; urgency=low
+	'''yade-%s (%s1) %s; urgency=low
 
   * Automatic debian changelog entry for yade-%s
 
