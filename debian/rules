@@ -104,7 +104,7 @@ binary-arch: build install check
 #	dh_installman -p yade${_VERSION}-dbg yade${_VERSION}-dbg.1 yade${_VERSION}-dbg-batch.1
 	dh_link
 	dh_strip --exclude=yade${_VERSION}-dbg   # don't strip the debug package
-	dh_compress --all --exclude=/usr/share/doc # don't compress documentation and examples
+	#dh_compress --all --exclude=/usr/share/doc # don't compress documentation and examples
 	dh_fixperms
 #	dh_perl
 	dh_makeshlibs
@@ -113,6 +113,7 @@ binary-arch: build install check
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+	dh_installmenu
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
