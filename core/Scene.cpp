@@ -77,20 +77,20 @@ void Scene::moveToNextTimeStep(){
 		engines=_nextEngines;
 		_nextEngines.clear();
 	}
-	if(!subStepping && subStep<0){
+	if(likely(!subStepping && subStep<0)){
 		/* set substep to 0 during the loop, so that engines/nextEngines handler know whether we are inside the loop currently */
 		subStep=0;
 		// ** 1. ** prologue
 		if(isPeriodic) cell->integrateAndUpdate(dt);
 		//forces.reset(); // uncomment if ForceResetter is removed
-		bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
+		const bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 		TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
 		// ** 2. ** engines
 		FOREACH(const shared_ptr<Engine>& e, engines){
 			e->scene=this;
-			if(e->dead || !e->isActivated()) continue;
+			if(unlikely(e->dead || !e->isActivated())) continue;
 			e->action();
-			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
+			if(unlikely(TimingInfo_enabled)) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
 		// ** 3. ** epilogue
 		iter++;

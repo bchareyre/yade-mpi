@@ -14,7 +14,7 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	Body::id_t id1=i->getId1(), id2=i->getId2();
 	if (id1>id2) swap(id1,id2); 
-	assert(bodies->size()>id1); assert(bodies->size()>id2); // the bodies must exist already
+	assert((Body::id_t)bodies->size()>id1); assert((Body::id_t)bodies->size()>id2); // the bodies must exist already
 	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
 	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
 	//assert(linIntrs.size()==currSize);
@@ -40,7 +40,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
-	assert(id1<bodies->size() && id2<bodies->size()); // (possibly) existing ids
+	assert(id1<(Body::id_t)bodies->size() && id2<(Body::id_t)bodies->size()); // (possibly) existing ids
 	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1); // get the body; check it is not deleted
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	// this used to return false
@@ -63,10 +63,12 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 
 const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
-	if (id1>id2) swap(id1,id2);
-	if(id1>=(Body::id_t)bodies->size()) { empty=shared_ptr<Interaction>(); return empty; }
+	if (id1>id2) swap(id1,id2); 
+	// those checks could be perhaps asserts, but pyInteractionContainer has no access to the body container...
+	if(unlikely(id2>=(Body::id_t)bodies->size())){ empty=shared_ptr<Interaction>(); return empty; }
+	//assert(id2<(Body::id_t)bodies->size()); // id2 is bigger
 	const shared_ptr<Body>& b1((*bodies)[id1]);
-	if(!b1) { empty=shared_ptr<Interaction>(); return empty; }
+	if(unlikely(!b1)) { empty=shared_ptr<Interaction>(); return empty; }
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	if (I!=b1->intrs.end()) return I->second;
 	else { empty=shared_ptr<Interaction>(); return empty; }
@@ -84,7 +86,7 @@ bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 
 
 void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool force){
-	const shared_ptr<Interaction>& I=find(id1,id2); if(!I) return;
+	const shared_ptr<Interaction> I=find(id1,id2); if(unlikely(!I)) return;
 	I->reset(); IdsForce v={id1,id2,force};
 	#ifdef YADE_OPENMP
 		threadsPendingErase[omp_get_thread_num()].push_back(v);

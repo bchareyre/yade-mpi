@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from yade import pack,ymport,export
+from yade import pack,ymport,export,log
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -84,6 +84,7 @@ O.bodies.append(pack.regularHexa(pack.inSphere((-15,5,-5),1.5),radius=rad*2.0,ga
 O.bodies.append(utils.facetBox((-15,5,-5),(2,2,2),wallMask=15,**kwMeshes))
 vibrationRotationPlate = O.bodies.append(utils.facetBox((-15,5,-5),(2,2,2),wallMask=16,**kwBoxes))
 
+O.bodies.append(utils.wall((0,0,-10),axis=2))
 
 
 try:
@@ -92,13 +93,16 @@ try:
 	qt.View()
 except ImportError: pass
 
+log.setLevel('SubdomainOptimizer',log.TRACE)
+
 O.engines=[
+	SubdomainOptimizer(colorize=True,initRun=True,iterPeriod=100),
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()],label='collider'),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
 	NewtonIntegrator(damping=.1,exactAsphericalRot=True),
@@ -119,3 +123,4 @@ O.timingEnabled=True
 #from yade import timing
 #timing.stats()
 #quit()
+collider.watch1=3029

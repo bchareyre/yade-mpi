@@ -23,6 +23,7 @@ else:
 import optparse
 par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog=os.path.basename(sys.argv[0]),version='%s (%s; %s)'%(version,','.join(features),buildsAvailable),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s, %s)."%(version,','.join(features),buildsAvailable))
 par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
+par.add_option('--cores',help='Set number of OpenMP threads (as --threads) and in addition set affinity of threads to the cores given.',dest='cores',type='string')
 par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
 par.add_option('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
@@ -93,9 +94,18 @@ if opts.test:
 # do this early, to have debug messages in the boot code (plugin registration etc)
 if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
 
-# this must be done before loading yade libs ("import yade" below)
-# has no effeect after libgomp initializes
-if opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
+# OpenMP env variables must be se before loading yade libs ("import yade" below)
+# changes have no effeect after libgomp initializes
+if opts.cores:
+	if opts.threads: print 'WARNING: --threads ignored, since --cores specified.'
+	try:
+		cores=[int(i) for i in opts.cores.split(',')]
+	except ValueError:
+		raise ValueError('Invalid --cores specification %s, should be a comma-separated list of non-negative integers'%opts.cores)
+	opts.nthreads=len(cores)
+	os.environ['GOMP_CPU_AFFINITY']=' '.join([str(cores[0])]+[str(c) for c in cores])
+	os.environ['OMP_NUM_THREADS']=str(len(cores))
+elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 elif int('$defThreads')>0:
 	os.environ['OMP_NUM_THREADS']='$defThreads'
 

@@ -58,15 +58,22 @@ void InteractionLoop::action(){
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
-	#ifdef YADE_OPENMP
-		const long size=scene->interactions->size();
-		#pragma omp parallel for schedule(guided)
-		for(long i=0; i<size; i++){
-			const shared_ptr<Interaction>& I=(*scene->interactions)[i];
+	#ifdef YADE_SUBDOMAINS
+		YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){ if(unlikely(!b)) continue; FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){
+			const shared_ptr<Interaction>& I(mapItem.second);
 	#else
-		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		#ifdef YADE_OPENMP
+			const long size=scene->interactions->size();
+			#pragma omp parallel for schedule(guided)
+			for(long i=0; i<size; i++){
+				const shared_ptr<Interaction>& I=(*scene->interactions)[i];
+		#else
+			FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		#endif
 	#endif
-		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
+		// keep the following newline, my (edx) preprocessor outputs garbage code otherwise!
+
+		if(unlikely(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter)) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
 		}
@@ -77,13 +84,13 @@ void InteractionLoop::action(){
 		if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
 
 		// we know there is no geometry functor already, take the short path
-		if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
+		if(unlikely(!I->functorCache.geomExists)) { assert(!I->isReal()); continue; }
 		// no interaction geometry for either of bodies; no interaction possible
-		if(!b1_->shape || !b2_->shape) { assert(!I->isReal()); continue; }
+		if(unlikely(!b1_->shape || !b2_->shape)) { assert(!I->isReal()); continue; }
 
 		bool swap=false;
 		// IGeomDispatcher
-		if(!I->functorCache.geom || !I->functorCache.phys){
+		if(unlikely(!I->functorCache.geom || !I->functorCache.phys)){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
 			#ifdef YADE_DEVIRT_FUNCTORS
 				if(I->functorCache.geom){ I->functorCache.geomPtr=I->functorCache.geom->getStaticFuncPtr(); /* cerr<<"["<<I->functorCache.geomPtr<<"]"; */ }
@@ -97,7 +104,7 @@ void InteractionLoop::action(){
 		// arguments for the geom functor are in the reverse order (dispatcher would normally call goReverse).
 		// we don't remember the fact that is reverse, so we swap bodies within the interaction
 		// and can call go in all cases
-		if(swap){I->swapOrder(); }
+		if(unlikely(swap)){I->swapOrder(); }
 		// body pointers must be updated, in case we swapped
 		const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
@@ -122,32 +129,32 @@ void InteractionLoop::action(){
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			#endif
 		}
-		if(!geomCreated){
+		if(unlikely(!geomCreated)){
 			if(wasReal) LOG_WARN("IGeomFunctor returned false on existing interaction!");
 			if(wasReal) scene->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
 			continue; // in any case don't care about this one anymore
 		}
 
 		// IPhysDispatcher
-		if(!I->functorCache.phys){
+		if(unlikely(!I->functorCache.phys)){
 			I->functorCache.phys=physDispatcher->getFunctor2D(b1->material,b2->material,swap);
 			assert(!swap); // InteractionPhysicsEngineUnits are symmetric
 		}
 		//assert(I->functorCache.phys);
-		if(!I->functorCache.phys){
+		if(unlikely(!I->functorCache.phys)){
 			throw std::runtime_error("Undefined or ambiguous IPhys dispatch for types "+b1->material->getClassName()+" and "+b2->material->getClassName()+".");
 		}
 		I->functorCache.phys->go(b1->material,b2->material,I);
 		assert(I->phys);
 
-		if(!wasReal) I->iterMadeReal=scene->iter; // mark the interaction as created right now
+		if(unlikely(!wasReal)) I->iterMadeReal=scene->iter; // mark the interaction as created right now
 
 		// LawDispatcher
 		// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction
 		// would not have geom and phys yet.
-		if(!I->functorCache.constLaw){
+		if(unlikely(!I->functorCache.constLaw)){
 			I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->geom,I->phys,swap);
-			if(!I->functorCache.constLaw){
+			if(unlikely(!I->functorCache.constLaw)){
 				LOG_FATAL("None of given Law2 functors can handle interaction #"<<I->getId1()<<"+"<<I->getId2()<<", types geom:"<<I->geom->getClassName()<<"="<<I->geom->getClassIndex()<<" and phys:"<<I->phys->getClassName()<<"="<<I->phys->getClassIndex()<<" (LawDispatcher::getFunctor2D returned empty functor)");
 				//abort();
 				exit(1);
@@ -158,11 +165,15 @@ void InteractionLoop::action(){
 		I->functorCache.constLaw->go(I->geom,I->phys,I.get());
 
 		// process callbacks for this interaction
-		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check
+		if(unlikely(!I->isReal())) continue; // it is possible that Law2_ functor called requestErase, hence this check
 		for(size_t i=0; i<callbacksSize; i++){
 			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}
-	}
+	#ifdef YADE_SUBDOMAINS
+		} } YADE_PARALLEL_FOREACH_BODY_END();
+	#else
+		}
+	#endif
 	// process eraseAfterLoop
 	#ifdef YADE_OPENMP
 		FOREACH(list<idPair>& l, eraseAfterLoopIds){

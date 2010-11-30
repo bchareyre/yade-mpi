@@ -26,7 +26,7 @@ class Bound: public Serializable, public Indexable{
 		((Vector3r,min,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::readonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
 		((Vector3r,max,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::readonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
 		,
-		/*deprec*/ ((diffuseColor,color,"For consistency with Shape.color")),
+		/*deprec*/,
 		/* init */,
 		/* ctor*/,
 		/*py*/

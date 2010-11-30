@@ -18,7 +18,7 @@ try:
 	import dl
 except ImportError:
 	import DLFCN as dl
-if not eval('${mono}'):
+if True: # not eval('${mono}'):
 	# see file:///usr/share/doc/python2.6/html/library/sys.html#sys.setdlopenflags
 	# and various web posts on the topic, e.g.
 	# * http://gcc.gnu.org/faq.html#dso

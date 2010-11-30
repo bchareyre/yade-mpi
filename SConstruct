@@ -91,9 +91,8 @@ opts.AddVariables(
 	BoolVariable('debug', 'Enable debugging information',0),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
 	('optimize','Turn on optimizations (-1, 0 or 1); negative value sets optimization based on debugging: not optimize with debugging and vice versa.',-1,None,int),
-	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','gl2ps','devirt-functors','qt4','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','gl2ps','devirt-functors','qt4','never_use_this_one','subdomains']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -110,7 +109,6 @@ opts.AddVariables(
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
-	BoolVariable('mono','[experimental] Build only one shared library and make all other files (python objects, for instance) only be symlinks.',0),
 	('execCheck','Name of the main script that should be installed; if the current one differs, an error is raised (do not use directly, only intended for --rebuild',None),
 	('defThreads','Default number of OpenMP threads to run with, unless overridden with -j. Keep unset (negative) to default to using all cores.',-1),
 	#('SHLINK','Linker for shared objects','g++'),
@@ -353,7 +351,7 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		env.Append(CXXFLAGS='-frounding-math') # required by cgal, otherwise we get assertion failure at startup
 		if not ok: featureNotOK('cgal')
-	if not env['mono']: env.Append(LIBS='yade-support')
+	env.Append(LIBS='yade-support')
 
 	env.Append(CPPDEFINES=['YADE_'+f.upper().replace('-','_') for f in env['features']])
 
@@ -437,9 +435,8 @@ if 'clang' in env['CXX']:
 
 ### LINKER
 ## libs for all plugins
-if not env['mono']:
-	env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
-	env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin'])
+env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
+env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin'])
 
 if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
 
@@ -530,7 +527,7 @@ env.Append(BUILDERS = {'Combine': env.Builder(action = SCons.Action.Action(combi
 
 import yadeSCons
 allPlugs=yadeSCons.scanAllPlugins(None,feats=env['features'])
-buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['chunkSize'],env['hotPlugins'].split(','))
+buildPlugs=yadeSCons.getWantedPlugins(allPlugs,[],env['features'],env['chunkSize'],env['hotPlugins'].split(','))
 def linkPlugins(plugins):
 	"""Given list of plugins we need to link to, return list of real libraries that we should link to."""
 	ret=set()
@@ -543,13 +540,8 @@ def linkPlugins(plugins):
 env['linkPlugins']=linkPlugins
 env['buildPlugs']=buildPlugs
 
-if env['mono']:
-	env['topLevelDir']=os.path.abspath(os.getcwd())
-	env.SConscript('SConscript-mono',variant_dir=buildDir,duplicate=0)
-
-else:
-	# read top-level SConscript file. It is used only so that variant_dir is set. This file reads all necessary SConscripts
-	env.SConscript(dirs=['.'],variant_dir=buildDir,duplicate=0)
+# read top-level SConscript file. It is used only so that variant_dir is set. This file reads all necessary SConscripts
+env.SConscript(dirs=['.'],variant_dir=buildDir,duplicate=0)
 
 #################################################################################
 ## remove plugins that are in the target dir but will not be installed now

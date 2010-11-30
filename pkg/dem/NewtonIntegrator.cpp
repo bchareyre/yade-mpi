@@ -18,14 +18,14 @@ void NewtonIntegrator::cundallDamp(const Real& dt, const Vector3r& N, const Vect
 	for(int i=0; i<3; i++) A[i]*= 1 - damping*Mathr::Sign ( N[i]*(V[i] + (Real) 0.5 *dt*A[i]) );
 }
 void NewtonIntegrator::blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v) {
-	if(blockedDOFs==State::DOF_NONE) return;
+	if(likely(blockedDOFs==State::DOF_NONE)) return;
 	if(blockedDOFs==State::DOF_ALL) { v=Vector3r::Zero(); return; }
 	if((blockedDOFs & State::DOF_X)!=0) v[0]=0;
 	if((blockedDOFs & State::DOF_Y)!=0) v[1]=0;
 	if((blockedDOFs & State::DOF_Z)!=0) v[2]=0;
 }
 void NewtonIntegrator::blockRotateDOFs(unsigned blockedDOFs, Vector3r& v) {
-	if(blockedDOFs==State::DOF_NONE) return;
+	if(likely(blockedDOFs==State::DOF_NONE)) return;
 	if(blockedDOFs==State::DOF_ALL) { v=Vector3r::Zero(); return; }
 	if((blockedDOFs & State::DOF_RX)!=0) v[0]=0;
 	if((blockedDOFs & State::DOF_RY)!=0) v[1]=0;
@@ -91,22 +91,15 @@ void NewtonIntegrator::action()
 	const bool trackEnergy(scene->trackEnergy);
 	const bool isPeriodic(scene->isPeriodic);
 
-
 	#ifdef YADE_OPENMP
 		FOREACH(Real& thrMaxVSq, threadMaxVelocitySq) { thrMaxVSq=0; }
-		const BodyContainer& bodies=*(scene->bodies.get());
-		const long size=(long)bodies.size();
-		#pragma omp parallel for schedule(static)
-		for(long _id=0; _id<size; _id++){
-			const shared_ptr<Body>& b(bodies[_id]);
-	#else
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 	#endif
-			if(!b) continue;
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
+			if(unlikely(!b)) continue;
 			State* state=b->state.get();
 			const Body::id_t& id=b->getId();
 			// clump members are non-dynamic; we only get their velocities here
-			if (!b->isDynamic() || b->isClumpMember()){
+			if(unlikely(!b->isDynamic() || b->isClumpMember())){
 				saveMaximaVelocity(scene,id,state);
 				continue;
 			}
@@ -121,7 +114,7 @@ void NewtonIntegrator::action()
 			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel):state->vel;
 
 			// track energy -- numerical damping and kinetic energy
-			if(trackEnergy){
+			if(unlikely(trackEnergy)){
 				assert(b->isStandalone() || b->isClump());
 				// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
 				if(damping!=0.){
@@ -140,14 +133,14 @@ void NewtonIntegrator::action()
 				scene->energy->add(Ek,"kinetic",kinEnergyIx,/*non-incremental*/true);
 			}
 
-			if (b->isStandalone()){
+			if (likely(b->isStandalone())){
 				// translate equation
 				state->accel=f/state->mass; 
 				cundallDamp(dt,f,fluctVel,state->accel);
 				leapfrogTranslate(scene,state,id,dt);
 				// rotate equation
 				// exactAsphericalRot is disabled or the body is spherical
-				if (!exactAsphericalRot || !b->isAspherical()){
+				if (likely(!exactAsphericalRot || !b->isAspherical())){
 					state->angAccel=m.cwise()/state->inertia;
 					cundallDamp(dt,m,state->angVel,state->angAccel);
 					leapfrogSphericalRotate(scene,state,id,dt);
@@ -202,7 +195,7 @@ void NewtonIntegrator::action()
 				cerr<<"<"<<b->id<<",cb="<<callbacks[i]<<",scene="<<callbacks[i]->scene<<">"; // <<",force="<<callbacks[i]->scene->forces.getForce(b->id)<<">";
 				if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),b.get());
 			}
-	}
+	} YADE_PARALLEL_FOREACH_BODY_END();
 	#ifdef YADE_OPENMP
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif

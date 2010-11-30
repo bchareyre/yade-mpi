@@ -8,30 +8,22 @@
 
 #include<yade/pkg/common/GravityEngines.hpp>
 #include<yade/pkg/common/PeriodicEngines.hpp>
+#include<yade/core/BodyContainer.hpp>
 #include<yade/core/Scene.hpp>
 #include<boost/regex.hpp>
-//#include<stdio.h>
 
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravityEngine));
 
 void GravityEngine::action(){
-	const bool trackEnergy(scene->trackEnergy);
+	const bool trackEnergy(unlikely(scene->trackEnergy));
 	const Real dt(scene->dt);
-	#ifdef YADE_OPENMP
-		const BodyContainer& bodies=*(scene->bodies.get());
-		const long size=(long)bodies.size();
-		#pragma omp parallel for schedule(static)
-		for(long i=0; i<size; i++){
-			const shared_ptr<Body>& b(bodies[i]);
-	#else
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-	#endif
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 		// skip clumps, only apply forces on their constituents
 		if(!b || b->isClump()) continue;
 		scene->forces.addForce(b->getId(),gravity*b->state->mass);
 		// work done by gravity is "negative", since the energy appears in the system from outside
 		if(trackEnergy) scene->energy->add(-gravity.dot(b->state->vel)*b->state->mass*dt,"gravWork",fieldWorkIx,/*non-incremental*/false);
-	}
+	} YADE_PARALLEL_FOREACH_BODY_END();
 }
 
 void CentralGravityEngine::action(){

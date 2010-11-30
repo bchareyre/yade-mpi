@@ -199,6 +199,7 @@ class pyInteractionContainer{
 			//if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
 			//if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
 			if(id12.size()==2){
+				//if(max(id12[0],id12[1])>
 				shared_ptr<Interaction> i=proxee->find(id12[0],id12[1]);
 				if(i) return i; else { PyErr_SetString(PyExc_IndexError,"No such interaction"); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>(); }
 			}

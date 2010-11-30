@@ -1,3 +1,13 @@
+# cmake build file for yade
+# the way to build yade
+# 1. gather all source files in chunks (using COMBINE_SOURCES) that will be compiled together
+#    (otherwise each source file would be compiled separately, which is too slow)
+#    Unlike in scons compilations, also python modules are gathered in chunks.
+# 2. create yade-all library that is compiled from all the chunks
+# 3. Create symlinks pointing to yade-all for all python modules we want to create
+#    (this will have to be 
+#
+#
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
@@ -40,6 +50,9 @@ endif()
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 set(CMAKE_INSTALL_PREFIX /usr/local)
+SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade-${SUFFIX})
+SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 
 #"OPENMP" 
 FOREACH(FEAT "OPENGL" "VTK" "LOG4CXX" "GTS" "CGAL")
@@ -104,24 +117,47 @@ IF(${OPENGL_FOUND})
 ENDIF()
 
 # the last number is "chunkSize"
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/core "${SRC_CORE}" 100)
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pkg "${SRC_PKG}" 15)
+COMBINE_SOURCES(${CMAKE_BINARY_DIR}/core "${SRC_CORE}" 1000)
+COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pkg "${SRC_PKG}" 100)
 COMBINE_SOURCES(${CMAKE_BINARY_DIR}/lib "${SRC_LIB}" 100)
 FILE(GLOB SRC_CORE_COMBINED "${CMAKE_BINARY_DIR}/core.*.cpp")
 FILE(GLOB SRC_PKG_COMBINED  "${CMAKE_BINARY_DIR}/pkg.*.cpp")
 FILE(GLOB SRC_LIB_COMBINED  "${CMAKE_BINARY_DIR}/lib.*.cpp")
 
-add_library(core SHARED ${SRC_CORE_COMBINED})
-add_library(pkg SHARED ${SRC_PKG_COMBINED})
-add_library(support SHARED ${SRC_LIB_COMBINED})
-target_link_libraries(core support)
-target_link_libraries(pkg core)
+#add_library(core SHARED ${SRC_CORE_COMBINED})
+#add_library(pkg SHARED ${SRC_PKG_COMBINED})
+#add_library(support SHARED ${SRC_LIB_COMBINED})
+#target_link_libraries(core support)
+#target_link_libraries(pkg core)
+SET(SRC_PYMODULES py/WeightedAverage2d.cpp;py/_eudoxos.cpp;py/log.cpp;py/_utils.cpp;py/wrapper/customConverters.cpp)
 
-# python modules
-# we compile gts separately, but all are linked to a single library, which links to pkg
-# that makes it significantly smaller, faster to build and easier to link
+SET(SRC_PACK ${CMAKE_SOURCE_DIR}/py/pack/_packPredicates.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packObb.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpheres.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/TetraMesh.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/CellPartition.cpp)
+IF(${CGAL_FOUND})
+	SET(SRC_PACK ${SRC_PACK};${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePackingTriangulation.cpp)
+ENDIF()
+
+COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyPack "${SRC_PACK}" 100)
+SET(SRC_PACK_COMBINED "${CMAKE_BINARY_DIR}/pyPack.0.cpp")
+#add_library(pyPack STATIC ${CMAKE_BINARY_DIR}/pyPack.0.cpp)
+#add_library(pyWrapper STATIC py/wrapper/yadeWrapper.cpp)
+
+COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyModules "${SRC_PYMODULES}" 100)
+FILE(GLOB SRC_PYMODULES_COMBINED "${CMAKE_BINARY_DIR}/pyModules.*.cpp")
+#add_library(pyModules SHARED ${SRC_PYMODULES_COMBINED})
+#target_link_libraries(pyModules pyWrapper pyPack pyEigen _gts)
+
+# will be different for debugging builds!
+SET(YADE_LIBDIR lib/yade${YADE_SUFFIX})
+
+SET(SRC_PYGTS "py/3rd-party/pygts-0.3.1/cleanup.c;py/3rd-party/pygts-0.3.1/edge.c;py/3rd-party/pygts-0.3.1/face.c;py/3rd-party/pygts-0.3.1/object.c;py/3rd-party/pygts-0.3.1/point.c;py/3rd-party/pygts-0.3.1/pygts.c;py/3rd-party/pygts-0.3.1/segment.c;py/3rd-party/pygts-0.3.1/surface.c;py/3rd-party/pygts-0.3.1/triangle.c;py/3rd-party/pygts-0.3.1/vertex.c")
+
+
+SET(YADE_ALL_SRCS ${SRC_CORE_COMBINED};${SRC_PKG_COMBINED};${SRC_LIB_COMBINED};${SRC_PYMODULES_COMBINED};${SRC_PACK_COMBINED};${SRC_PYGTS};py/mathWrap/miniEigen.cpp)
+
+python_add_module(yade-all "${YADE_ALL_SRCS}")
+
 IF(${GTS_FOUND})
-	add_library(_gts STATIC py/3rd-party/pygts-0.3.1/cleanup.c;py/3rd-party/pygts-0.3.1/edge.c;py/3rd-party/pygts-0.3.1/face.c;py/3rd-party/pygts-0.3.1/object.c;py/3rd-party/pygts-0.3.1/point.c;py/3rd-party/pygts-0.3.1/pygts.c;py/3rd-party/pygts-0.3.1/segment.c;py/3rd-party/pygts-0.3.1/surface.c;py/3rd-party/pygts-0.3.1/triangle.c;py/3rd-party/pygts-0.3.1/vertex.c)
+	#add_library(_gts STATIC py/3rd-party/pygts-0.3.1/cleanup.c;py/3rd-party/pygts-0.3.1/edge.c;py/3rd-party/pygts-0.3.1/face.c;py/3rd-party/pygts-0.3.1/object.c;py/3rd-party/pygts-0.3.1/point.c;py/3rd-party/pygts-0.3.1/pygts.c;py/3rd-party/pygts-0.3.1/segment.c;py/3rd-party/pygts-0.3.1/surface.c;py/3rd-party/pygts-0.3.1/triangle.c;py/3rd-party/pygts-0.3.1/vertex.c)
 	include_directories(${GTS_INCLUDE_DIRS})
 	add_definitions(-DPYGTS_HAS_NUMPY)
 	# see http://www.mail-archive.com/cmake@cmake.org/msg24812.html
@@ -129,39 +165,40 @@ IF(${GTS_FOUND})
 	#	PROPERTIES COMPILE_FLAGS "-Wno-all"
 	#	COMPILE_DEFINES -DPYGTS_HAS_NUMPY )
 	FOREACH(_libname ${GTS_LIBRARIES})
-		target_link_libraries(_gts ${_libname})
+		target_link_libraries(yade-all ${_libname})
 	ENDFOREACH()
 ENDIF()
 
-add_library(pyEigen STATIC py/mathWrap/miniEigen.cpp)
+## add_library(pyEigen STATIC py/mathWrap/miniEigen.cpp)
 
-SET(SRC_PYMODULES py/WeightedAverage2d.cpp;py/_eudoxos.cpp;py/log.cpp;py/_utils.cpp;py/wrapper/customConverters.cpp)
 
-SET(SRC_PADDER ${CMAKE_SOURCE_DIR}/py/pack/_packPredicates.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packObb.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpheres.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/TetraMesh.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/CellPartition.cpp)
-IF(${CGAL_FOUND})
-	SET(SRC_PADDER ${SRC_PADDER};${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePackingTriangulation.cpp)
+SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packSpherePadder;yade/_packObb;yade/_utils;yade/WeightedAverage2d)
+IF(${QT4_FOUND})
+	SET(PY_COMPILED_MODULES ${PY_COMPILED_MODULES};yade/qt/_GLViewer)
 ENDIF()
 
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyPadder "${SRC_PADDER}" 100)
-add_library(pyPadder STATIC ${CMAKE_BINARY_DIR}/pyPadder.0.cpp)
 
-add_library(pyWrapper STATIC py/wrapper/yadeWrapper.cpp)
+install(TARGETS yade-all DESTINATION ${YADE_LIB_PATH})
 
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyModules "${SRC_PYMODULES}" 100)
-FILE(GLOB SRC_PYMODULES_COMBINED "${CMAKE_BINARY_DIR}/pyModules.*.cpp")
-add_library(pyModules SHARED ${SRC_PYMODULES_COMBINED})
-target_link_libraries(pyModules pyWrapper pyPadder pyEigen _gts)
+FOREACH(_mod ${PY_COMPILED_MODULES})
+	install(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E create_symlink ${YADE_LIB_PATH}/libyade-all.so ${YADE_PY_PATH}/${_mod}.so)")
+ENDFOREACH()
 
-# will be different for debugging builds!
-SET(YADE_LIBDIR lib/yade${YADE_SUFFIX})
 
-#INSTALL(TARGETS pyEigen _gts 
-#	LIBRARY DESTINATION ${YADE_LIBDIR}/py
-#)
-INSTALL(TARGETS pyModules
-	LIBRARY DESTINATION ${YADE_LIBDIR}/py/yade
+# install our python scripts, keeping the hierarchy under py/
+install(DIRECTORY py/ DESTINATION ${YADE_PY_PATH}
+	FILES_MATCHING PATTERN "*.py"
+	PATTERN "3rd-party" EXCLUDE
 )
-INSTALL(TARGETS core support pkg
-	LIBRARY DESTINATION ${YADE_LIBDIR}/
-)
+
+# install 3rd party python files
+install(FILES py/3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/gts)
+install(FILES py/3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/gts)
+install(FILES py/3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH})
+
+# install the files that need to be pre-processed (FIXME: this will need to define all variables, and call them the same as they are in scons -- for compatibility)
+configure_file(core/main/yade-batch.in ${YADE_EXEC_PATH}/yade-batch-${SUFFIX})
+configure_file(core/main/main.py.in ${YADE_EXEC_PATH}/yade-${SUFFIX})
+configure_file(py/config.py.in ${YADE_PY_PATH}/yade/config.py)
+
 

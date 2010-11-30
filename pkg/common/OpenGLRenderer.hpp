@@ -101,6 +101,9 @@ class OpenGLRenderer : public Serializable
 		((bool,intrWire,false,,"If rendering interactions, use only wires to represent them."))
 		((bool,intrGeom,false,,"Render :yref:`Interaction::geom` objects."))
 		((bool,intrPhys,false,,"Render :yref:`Interaction::phys` objects"))
+		#ifdef YADE_SUBDOMAINS
+			((int,subDomMask,0,,"If non-zero, render shape only of particles that are inside respective domains - -they are counted from the left, i.e. 5 (binary 101) will show subdomains 1 and 3. If zero, render everything."))
+		#endif
 		((int,mask,((void)"draw everything",~0),,"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
 		((Body::id_t,selId,Body::ID_NONE,,"Id of particle that was selected by the user."))
 		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::Zero(),Quaternionr::Identity())),,"Position and orientation of clipping planes"))
@@ -108,22 +111,6 @@ class OpenGLRenderer : public Serializable
 		((vector<shared_ptr<GlExtraDrawer> >,extraDrawers,,,"Additional rendering components (:yref:`GlExtraDrawer`)."))
 		((bool,intrAllWire,false,,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
 		/*deprec*/
-			((Light_position,lightPos,))
-			((Background_color,bgColor,))
-			((Body_wire,wire,))
-			((Show_DOF,dof,))
-			((Show_ID,id,))
-			((Body_bounding_volume,bound,))
-			((Body_interacting_geom,shape,))
-			((Interaction_wire,intrWire,))
-			((Interaction_geometry,intrGeom,))
-			((Interaction_physics,intrPhys,))
-			((Draw_mask,mask,))
-			((displacementScale,dispScale,))
-			((rotationScale,rotScale,))
-			((scaleDisplacements,id,"! This option is no longer necessary, set dispScale to value different from (1,1,1) to have scaling applied."))
-			((scaleRotations,id,"! This option is no longer necessary, set rotScale to value different from 1.0 to have scaling applied."))
-			((selectBodyLimit,_nothing,"There is no longer a limit on selecting particles; the routine is called only with shift-click and has no performance impact otherwise."))
 		,
 		/*init*/,
 		/*ctor*/,

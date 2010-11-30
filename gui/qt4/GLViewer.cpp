@@ -140,6 +140,8 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_1,"Make the manipulated clipping plane parallel with plane #1 (2,...)");
 	setKeyDescription(Qt::Key_1 & Qt::ALT,"Add/remove plane #1 (2,...) to/from the bound group");
 	setKeyDescription(Qt::Key_0,"Clear the bound group");
+	setKeyDescription(Qt::Key_7 & Qt::ALT,"Save view configuration #0 (<b>7</b> and <b>8</b> for #1, #2)");
+	setKeyDescription(Qt::Key_7,"Load view configuration #0 (<b>7</b> and <b>8</b> for #1, #2)");
 	setKeyDescription(Qt::Key_Space,"Activate/deactivate the manipulated clipping plane");
 
 	centerScene();
@@ -206,7 +208,7 @@ void GLViewer::useDisplayParameters(size_t n){
 		yade::ObjectIO::load<typeof(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
 	}
 	else { LOG_WARN("OpenGLRenderer configuration not found in display parameters, skipped.");}
-	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val);}
+	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val); displayMessage("Loaded view configuration #"+lexical_cast<string>(n)); }
 	else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
 }
 
@@ -219,6 +221,7 @@ void GLViewer::saveDisplayParameters(size_t n){
 	yade::ObjectIO::save<typeof(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
 	dp->setValue("OpenGLRenderer",oglre.str());
 	dp->setValue("GLViewer",GLViewer::getState());
+	displayMessage("Saved view configuration ot #"+lexical_cast<string>(n));
 }
 
 string GLViewer::getState(){
