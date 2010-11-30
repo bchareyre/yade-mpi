@@ -68,8 +68,8 @@ O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',orientation=oriBody,**kwM
 oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
 O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,-5.9),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
 
-# spheresToFile saves coordinates and radii of all spheres of the simulation into the text file
-print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
+# spheresToFile saves coordinates and radii of all spheres of the simulation into the text file, works but disabled. Please, uncomment it, if you need
+#print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
 
 # spheresFromFile function imports coordinates and radiuses of all spheres of the simulation into the text file
 O.bodies.append(ymport.text('regular-sphere-pack-FromFile',shift=Vector3(6.0,6.0,-2.9),scale=0.7,color=(1,1,1),**kw))

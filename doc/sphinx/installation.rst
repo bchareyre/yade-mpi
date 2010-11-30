@@ -65,6 +65,7 @@ Most of the list above is very likely already packaged for your distribution. In
 	libqglviewer-qt4-dev
 
 command line (cut&paste to the terminal under root privileges) for Fedora (not good tested yet!)::
+
 	yum install scons qt3-devel freeglut-devel boost-devel boost-date-time \
 	boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
 	log4cxx log4cxx-devel python-devel boost-python ipython python-matplotlib \
