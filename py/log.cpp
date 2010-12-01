@@ -6,11 +6,17 @@ using namespace boost;
 enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 
 #ifdef YADE_LOG4CXX
+
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.log");
+
 	#include<log4cxx/logmanager.h>
 
 	void logSetLevel(std::string loggerName,int level){
 		std::string fullName(loggerName.empty()?"yade":("yade."+loggerName));
-		if(!log4cxx::LogManager::exists(fullName)) throw std::invalid_argument("No logger named `"+fullName+"'");
+		if(!log4cxx::LogManager::exists(fullName)){
+			LOG_WARN("No logger named "<<loggerName<<", ifnoring level setting.");			
+			// throw std::invalid_argument("No logger named `"+fullName+"'");
+		} 
 		log4cxx::LevelPtr l;
 		switch(level){
 			#ifdef LOG4CXX_TRACE

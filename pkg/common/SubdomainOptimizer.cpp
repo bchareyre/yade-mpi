@@ -79,7 +79,12 @@ void SubdomainOptimizer::adjustSplitPlanes(){
 		assert(sp.aboveSplit>=0);
 		int dist=sp.aboveSplit-(sp.axNth*1./sp.axCount)*nParticles; // by how many particles to shift to get in the median position
 		// concentration correction, sp.dist is the previous distance value
-		if(sp.dist>50) sp.concentration*=1.0*(sp.dist-dist)/sp.dist; // 1.0 could be replaced by some inertia parameter that would prevent adjust to fluctuations too fast
+		if(sp.dist>50){
+			// 1.0 could be replaced by some inertia parameter that would prevent adjust to fluctuations too fast
+			Real factor=1.0*(sp.dist-dist)/sp.dist;
+			// prevent concentration from droping too fast (to zero, for instance); the .3 is tunable, again
+			sp.concentration*=max(.3,factor);
+		}
 		sp.lim+=dist/sp.concentration;
 		LOG_DEBUG("SplitPlane shifted by "<<dist/sp.concentration<<" to "<<(sp.ax==0?"x":(sp.ax==1?"y":"z"))<<"="<<sp.lim<<", being "<<dist<<" off ideal (nParticles="<<nParticles<<", aboveSplit="<<sp.aboveSplit<<"), concentration "<<sp.concentration);
 		sp.dist=dist;

@@ -40,8 +40,9 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
-	assert(id1<(Body::id_t)bodies->size() && id2<(Body::id_t)bodies->size()); // (possibly) existing ids
-	const shared_ptr<Body>& b1((*bodies)[id1]); assert(b1); // get the body; check it is not deleted
+	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
+	const shared_ptr<Body>& b1((*bodies)[id1]);
+	if(unlikely(!b1)) return false;  // body vanished
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	// this used to return false
 	if(I==b1->intrs.end()) throw std::logic_error(("InteractionContainer::erase: attempt to delete non-existent interaction ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2)).c_str());
@@ -66,7 +67,6 @@ const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::i
 	if (id1>id2) swap(id1,id2); 
 	// those checks could be perhaps asserts, but pyInteractionContainer has no access to the body container...
 	if(unlikely(id2>=(Body::id_t)bodies->size())){ empty=shared_ptr<Interaction>(); return empty; }
-	//assert(id2<(Body::id_t)bodies->size()); // id2 is bigger
 	const shared_ptr<Body>& b1((*bodies)[id1]);
 	if(unlikely(!b1)) { empty=shared_ptr<Interaction>(); return empty; }
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));

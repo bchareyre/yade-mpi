@@ -310,6 +310,7 @@ class SerializableEditor(QFrame):
 		logging.error("Unable to guess python type from cxx type '%s'"%cxxT)
 		return None
 	def mkAttrEntries(self):
+		if self.ser==None: return
 		try:
 			d=self.ser.dict()
 		except TypeError:
@@ -411,7 +412,7 @@ def makeSerializableLabel(ser,href=False,addr=True,boldHref=True,num=-1,count=-1
 		import re
 		ss=unicode(ser); m=re.match(u'<(.*) instance at (0x.*)>',ss)
 		if m: ret+=m.group(2)
-		else: logging.warning(u"Serializable converted to str ('%s') does not contain 'instance at 0x…'")
+		else: logging.warning(u"Serializable converted to str ('%s') does not contain 'instance at 0x…'"%ss)
 	return ret
 
 class SeqSerializableComboBox(QFrame):

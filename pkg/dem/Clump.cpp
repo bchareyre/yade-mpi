@@ -9,6 +9,14 @@
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
 
+python::dict Clump::members_get(){
+	python::dict ret;
+	FOREACH(MemberMap::value_type& b, members){
+		ret[b.first]=python::make_tuple(b.second.position,b.second.orientation);
+	}
+	return ret;
+}
+
 void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBody){
 	Body::id_t subId=subBody->getId();
 	if(subBody->clumpId!=Body::ID_NONE) throw std::invalid_argument(("Body #"+lexical_cast<string>(subId)+" is already in clump #"+lexical_cast<string>(subBody->clumpId)).c_str());

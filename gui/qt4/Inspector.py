@@ -50,11 +50,11 @@ class CellInspector(QWidget):
 	
 
 def makeBodyLabel(b):
-	ret=str(b.id)+' '
+	ret=unicode(b.id)+u' '
 	if not b.shape: ret+=u'⬚'
 	else:
-		typeMap={'Sphere':u'⚫','Facet':u'△','Wall':u'┃','Box':u'⎕','Cylinder':u'⌭','ChainedCylinder':u'☡'}
-		ret+=typeMap.get(b.shape.__class__.__name__,'﹖')
+		typeMap={'Sphere':u'⚫','Facet':u'△','Wall':u'┃','Box':u'⎕','Cylinder':u'⌭','ChainedCylinder':u'☡','Clump':u'☍'}
+		ret+=typeMap.get(b.shape.__class__.__name__,u'﹖')
 	if not b.dynamic: ret+=u'⚓'
 	elif b.state.blockedDOFs!=[]: ret+=u'⎈'
 	return ret

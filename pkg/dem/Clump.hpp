@@ -71,11 +71,14 @@ class Clump: public Shape {
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Matrix3r& T);
 		//! Recalculate body's inertia tensor in rotated coordinates.
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
+
+		python::dict members_get();
 	
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Clump,Shape,"Rigid aggregate of bodies",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Clump,Shape,"Rigid aggregate of bodies",
 		((MemberMap,members,,Attr::hidden,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)"))
 		// ((vector<int>,ids,,Attr::readonly,"Ids of constituent particles (only informative; direct modifications will have no effect)."))
 		,/*ctor*/ createIndex();
+		,/*py*/ .add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")
 	);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Clump,Shape);
