@@ -363,7 +363,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 
 def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
-	or PeriIsoCompressor (periodic). The priodicity depens on whether	the spheresInCell parameter is given.
+	or PeriIsoCompressor (periodic). The periodicity depens on whether	the spheresInCell parameter is given.
 
 	*O.switchScene()* magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
 	This function therefore should never run in parallel with some code accessing your simulation.
