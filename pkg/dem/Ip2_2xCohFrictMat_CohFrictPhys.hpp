@@ -22,6 +22,9 @@ class Ip2_2xCohFrictMat_CohFrictPhys : public IPhysFunctor
 		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`.",
 		((bool,setCohesionNow,false,,"If true, assign cohesion to all existing contacts in current time-step. The flag is turned false automatically, so that assignment is done in the current timestep only."))
 		((bool,setCohesionOnNewContacts,false,,"If true, assign cohesion at all new contacts. If false, only existing contacts can be cohesive (also see :yref:`Ip2_2xCohFrictMat_CohFrictPhys::setCohesionNow`), and new contacts are only frictional."))
+		((Real,alphaKr,0.0,,"Dimensionless coefficient used for the rolling stiffness."))
+		((Real,alphaKtw,0.0,,"Dimensionless coefficient used for the twist stiffness."))
+		((Real,etaRoll,-1.,,"Dimensionless coefficient used to calculate the plastic rolling moment (if negative, plasticity will not be applied)."))
 		,
 		cohesionDefinitionIteration = -1; 
 		);

@@ -93,11 +93,20 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 				Quaternionr q_twist_delta(q_twist_creeped * q_twist.conjugate());
 				currentContactGeometry->twistCreep = currentContactGeometry->twistCreep * q_twist_delta;
 			}
-			currentContactPhysics->moment_twist = (currentContactGeometry->getTwist()*currentContactPhysics->kr)*currentContactGeometry->normal;
+			currentContactPhysics->moment_twist = (currentContactGeometry->getTwist()*currentContactPhysics->ktw)*currentContactGeometry->normal;
 			currentContactPhysics->moment_bending = currentContactGeometry->getBending() * currentContactPhysics->kr;
+			
+			// limit rolling moment to the plastic value, if required
+			Real RollMax = currentContactPhysics->maxRollPl*currentContactPhysics->normalForce.norm();
+			if (RollMax>0.){ // apply plasticity
+				Real scalarRoll = currentContactPhysics->moment_bending.norm();		
+				Real ratio = RollMax/scalarRoll;
+				currentContactPhysics->moment_bending *= ratio;		
+			}
+			
 			Vector3r moment = currentContactPhysics->moment_twist + currentContactPhysics->moment_bending;
 			scene->forces.addTorque(id1,-moment);
-			scene->forces.addTorque(id2, moment);
+			scene->forces.addTorque(id2, moment);			
 		}
 		/// Moment law END       ///
 	}

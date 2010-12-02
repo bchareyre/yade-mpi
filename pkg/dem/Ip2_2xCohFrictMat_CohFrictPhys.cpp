@@ -39,6 +39,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			Real Vb 	= sdec2->poisson;
 			Real Da 	= geom->radius1;
 			Real Db 	= geom->radius2;
+			Real Dmean  = (Da+Db)/2.; // mean radius
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
@@ -50,7 +51,9 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			// Jean-Patrick Plassiard, Noura Belhaine, Frederic
 			// Victor Donze, "Calibration procedure for spherical
 			// discrete elements using a local moemnt law".
-			Real Kr = Da*Db*Ks*2.0; // just like "2.0" above - it's an arbitrary parameter
+			Real Kr = pow(Dmean,2)*Ks*alphaKr;
+			Real Ktw = pow(Dmean,2)*Ks*alphaKtw;
+			
 			contactPhysics->frictionAngle			= std::min(fa,fb);
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 
@@ -63,7 +66,11 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			}
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
+			
 			contactPhysics->kr = Kr;
+			contactPhysics->ktw = Ktw;
+			contactPhysics->maxRollPl = etaRoll*Dmean;
+			
 			contactPhysics->momentRotationLaw=(sdec1->momentRotationLaw && sdec2->momentRotationLaw);
 			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 

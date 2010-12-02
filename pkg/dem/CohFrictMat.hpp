@@ -20,7 +20,6 @@ class CohFrictMat : public FrictMat
 
 /// Serialization
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictMat,FrictMat,"",
-		((bool,isBroken,true,,""))
 		((bool,isCohesive,true,,""))
 		((Real,normalCohesion,10000000,,""))
 		((Real,shearCohesion,10000000,,""))

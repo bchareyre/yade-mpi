@@ -22,6 +22,8 @@ class CohFrictPhys : public FrictPhys
 		((bool,cohesionBroken,true,,"is cohesion active? will be set false when a fragile contact is broken"))
 		((bool,fragile,true,,"do cohesion disapear when contact strength is exceeded?"))
 		((Real,kr,0,,"rotational stiffness [N.m/rad]"))
+		((Real,ktw,0,,"twist stiffness [N.m/rad]"))
+		((Real,maxRollPl,0.0,,"Coefficient to determine the maximum plastic rolling moment."))
 		((Real,normalAdhesion,0,,"tensile strength"))
 		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::always_use_moment_law`)"))
 		((Real,unp,0,,"plastic normal displacement, only used for tensile behaviour and if :yref:`CohFrictPhys::fragile`=false."))
