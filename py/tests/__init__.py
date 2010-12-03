@@ -4,8 +4,7 @@
 import unittest,inspect
 
 # add any new test suites to the list here, so that they are picked up by testAll
-allTests=['wrapper','omega','pbc','clump']
-#allTests=['wrapper','omega','pbc','clump','cohesive-chain'] #Cohesive chain disabled because of instability. Anton.`
+allTests=['wrapper','omega','pbc','clump','cohesive-chain']
 
 # all yade modules (ugly...)
 import yade.eudoxos,yade.export,yade.linterpolation,yade.log,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport
