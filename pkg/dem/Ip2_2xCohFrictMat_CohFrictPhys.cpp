@@ -28,7 +28,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=scene->iter) {
 		cohesionDefinitionIteration = -1;
 		setCohesionNow = 0;}
-		
+
 	if (geom) {
 		if (!interaction->phys) {
 			interaction->phys = shared_ptr<CohFrictPhys>(new CohFrictPhys());
@@ -47,13 +47,18 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			Real Ks;
 			if (Va && Vb) Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 			else Ks=0;
-				
+
 			// Jean-Patrick Plassiard, Noura Belhaine, Frederic
 			// Victor Donze, "Calibration procedure for spherical
 			// discrete elements using a local moemnt law".
-			Real Kr = pow(Dmean,2)*Ks*alphaKr;
-			Real Ktw = pow(Dmean,2)*Ks*alphaKtw;
-			
+			if (!useMeanRad){
+				contactPhysics->kr = Da*Db*Ks*alphaKr;
+				contactPhysics->ktw = Da*Db*Ks*alphaKtw;
+			} else {
+			// Chiara Modese's variant
+				contactPhysics->kr = pow(Dmean,2)*Ks*alphaKr;
+				contactPhysics->ktw = pow(Dmean,2)*Ks*alphaKtw;}
+
 			contactPhysics->frictionAngle			= std::min(fa,fb);
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 
@@ -66,14 +71,10 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			}
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
-			
-			contactPhysics->kr = Kr;
-			contactPhysics->ktw = Ktw;
+
 			contactPhysics->maxRollPl = etaRoll*Dmean;
-			
 			contactPhysics->momentRotationLaw=(sdec1->momentRotationLaw && sdec2->momentRotationLaw);
 			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
-
 		}
 		else {// !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
 			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->phys.get());
