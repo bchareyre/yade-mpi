@@ -123,14 +123,16 @@ void NewtonIntegrator::action()
 					if(!b->isAspherical()) scene->energy->add(state->angVel.cwise().abs().dot(m.cwise().abs())*damping*dt,"nonviscDamp",nonviscDampIx,false);
 				}
 				// kinetic energy
-				Real Ek=.5*state->mass*fluctVel.squaredNorm();
+				Real Etrans=.5*state->mass*fluctVel.squaredNorm();
+				Real Erot;
 				// rotational terms
 				if(b->isAspherical()){
 					Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 					Matrix3r T(state->ori);
-					Ek+=.5*b->state->angVel.transpose().dot((T.transpose()*mI*T)*b->state->angVel);
-				} else { Ek+=state->angVel.dot(state->inertia.cwise()*state->angVel); }
-				scene->energy->add(Ek,"kinetic",kinEnergyIx,/*non-incremental*/true);
+					Erot=.5*b->state->angVel.transpose().dot((T.transpose()*mI*T)*b->state->angVel);
+				} else { Erot=state->angVel.dot(state->inertia.cwise()*state->angVel); }
+				if(!kinSplit) scene->energy->add(Etrans+Erot,"kinetic",kinEnergyIx,/*non-incremental*/true);
+				else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
 			}
 
 			if (likely(b->isStandalone())){

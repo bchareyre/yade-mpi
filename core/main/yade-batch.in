@@ -4,7 +4,7 @@
 # vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil
+import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, random
 
 #socket.setdefaulttimeout(10) 
 
@@ -267,7 +267,9 @@ def runJobs(jobs,numCores):
 		#print pending,'pending;',running,'running;',done,'done;',numFreeCores,'free;',minRequire,'min'
 		overloaded=False
 		if minRequire>numFreeCores and running==0: overloaded=True # a job wants more cores than the total we have
-		for j in [j for j in jobs if j.status=='PENDING']:
+		pendingJobs=[j for j in jobs if j.status=='PENDING']
+		if opts.randomize: random.shuffle(pendingJobs)
+		for j in pendingJobs:
 			if j.nCores<=numFreeCores or overloaded:
 				freeCores=set(range(0,numCores))-set().union(*(j.cores for j in jobs if j.status=='RUNNING'))
 				#print 'freeCores:',freeCores,'numFreeCores:',numFreeCores,'overloaded',overloaded
@@ -309,6 +311,7 @@ parser.add_option('--plot-update',type='int',dest='plotAlwaysUpdateTime',help='I
 parser.add_option('--plot-timeout',type='int',dest='plotTimeout',help='Maximum age (in seconds) of plots served over HTTP; they will be updated if they are older. (default: 10 seconds)',metavar='TIME',default=10)
 parser.add_option('--timing',type='int',dest='timing',default=0,metavar='COUNT',help='Repeat each job COUNT times, and output a simple table with average/variance/minimum/maximum job duration; used for measuring how various parameters affect execution time. Jobs can override the global value with the !COUNT column.')
 parser.add_option('--timing-output',type='str',metavar='FILE',dest='timingOut',default=None,help='With --timing, save measured durations to FILE, instead of writing to standard output.')
+parser.add_option('--randomize',action='store_true',dest='randomize',help='Randomize job order (within constraints given by assigned cores).')
 #parser.add_option('--serial',action='store_true',dest='serial',default=False,help='Run all jobs serially, even if there are free cores
 opts,args=parser.parse_args()
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog

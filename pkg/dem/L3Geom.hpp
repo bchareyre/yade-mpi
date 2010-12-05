@@ -7,6 +7,9 @@
 #include<yade/pkg/common/Dispatching.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
+#ifdef YADE_OPENGL
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
+#endif
 
 struct L3Geom: public GenericSpheresContact{
 	const Real& uN;
@@ -31,6 +34,7 @@ struct L3Geom: public GenericSpheresContact{
 			* We need to extract local axes, and that is easier to be done from Matrix3r (columns)
 		*/
 		((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
+		((Vector3r,F,Vector3r::Zero(),,"Applied force in local coordinates [debugging only, will be removed]"))
 		,
 		/*init*/
 		((uN,u[0])) ((uT,Vector2r::Map(&u[1])))
@@ -44,11 +48,20 @@ struct L3Geom: public GenericSpheresContact{
 };
 REGISTER_SERIALIZABLE(L3Geom);
 
+#ifdef YADE_OPENGL
+struct Gl1_L3Geom: public GlIGeomFunctor{
+	FUNCTOR1D(L3Geom);
+	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
+	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L3Geom,GlIGeomFunctor,"Render :yref:`L3Geom` geometry.",
+	);
+};
+REGISTER_SERIALIZABLE(Gl1_L3Geom);
+#endif
 
 struct L6Geom: public L3Geom{
 	virtual ~L6Geom();
 	Vector3r relPhi() const{ return phi-phi0; }
-	YADE_CLASS_BASE_DOC_ATTRS(L6Geom,L3Geom,"Geoemtric of contact in local coordinates with 6 degrees of freedom. [experimental]",
+	YADE_CLASS_BASE_DOC_ATTRS(L6Geom,L3Geom,"Geometric of contact in local coordinates with 6 degrees of freedom. [experimental]",
 		((Vector3r,phi,Vector3r::Zero(),,"Rotation components, in local coordinates. |yupdate|"))
 		((Vector3r,phi0,Vector3r::Zero(),,"Zero rotation, should be always subtracted from *phi* to get the value. See :yref:`L3Geom.u0`."))
 	);
@@ -69,8 +82,19 @@ struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{
 	);
 	FUNCTOR2D(Sphere,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L3Geom_Inc);
+
+struct Ig2_Wall_Sphere_L3Geom_Inc: public Ig2_Sphere_Sphere_L3Geom_Inc{
+	virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+	//virtual bool genericGo(bool is6Dof, const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+	YADE_CLASS_BASE_DOC(Ig2_Wall_Sphere_L3Geom_Inc,Ig2_Sphere_Sphere_L3Geom_Inc,"Incrementally compute :yref:`L3Geom` for contact between :yref:`Wall` and :yref:`Sphere`. Uses attributes of :yref:`Ig2_Sphere_Sphere_L3Geom_Inc`.");
+	FUNCTOR2D(Wall,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Wall,Sphere);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ig2_Wall_Sphere_L3Geom_Inc);
 
 
 struct Ig2_Sphere_Sphere_L6Geom_Inc: public Ig2_Sphere_Sphere_L3Geom_Inc{
@@ -88,6 +112,8 @@ struct Law2_L3Geom_FrictPhys_ElPerfPl: public LawFunctor{
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_L3Geom_FrictPhys_ElPerfPl,LawFunctor,"Basic law for testing :yref:`L3Geom`; it bears no cohesion (unless *noBreak* is ``True``), and plastic slip obeys the Mohr-Coulomb criterion (unless *noSlip* is ``True``).",
 		((bool,noBreak,false,,"Do not break contacts when particles separate."))
 		((bool,noSlip,false,,"No plastic slipping."))
+		((int,plastDissipIx,-1,(Attr::noSave|Attr::hidden),"Index of plastically dissipated energy"))
+		((int,elastPotentialIx,-1,(Attr::hidden|Attr::noSave),"Index for elastic potential energy (with O.trackEnergy)"))
 	);
 };
 REGISTER_SERIALIZABLE(Law2_L3Geom_FrictPhys_ElPerfPl);
@@ -100,3 +126,4 @@ struct Law2_L6Geom_FrictPhys_Linear: public Law2_L3Geom_FrictPhys_ElPerfPl{
 	);
 };
 REGISTER_SERIALIZABLE(Law2_L6Geom_FrictPhys_Linear);
+

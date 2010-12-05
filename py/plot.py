@@ -86,7 +86,7 @@ def addDataColumns(dd):
 	numSamples=len(data[data.keys()[0]]) if len(data)>0 else 0
 	for d in dd:
 		if d in data.keys(): continue
-		d[d]=[nan for i in range(numSamples)]
+		data[d]=[nan for i in range(numSamples)]
 
 def addData(*d_in,**kw):
 	"""Add data from arguments name1=value1,name2=value2 to yade.plot.data.
@@ -177,8 +177,10 @@ def createPlots(subPlots=False):
 		# create y1 lines
 		for d in plots_p_y1:
 			line,=pylab.plot(data[pStrip],data[d[0]],d[1])
-			scatterPt=([0],[0]) if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
-			scatter=pylab.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
+			# use (0,0) if there are no data yet
+			scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
+			# if current value is NaN, use zero instead
+			scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
 			currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 		# create the legend
 		l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))

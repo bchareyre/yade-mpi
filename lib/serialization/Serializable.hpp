@@ -251,17 +251,12 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 #define REGISTER_ATTRIBUTES(baseClass,attrs) _REGISTER_ATTRIBUTES_DEPREC(_SOME_CLASS,baseClass,BOOST_PP_SEQ_FOR_EACH(_ATTR_NAME_ADD_DUMMY_FIELDS,~,attrs),)
 
 
-#if 0
-namespace{
-	void pySetAttr(const std::string& key, const boost::python::object& /* value */){ PyErr_SetString(PyExc_AttributeError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
-	boost::python::list pyKeys(){ return boost::python::list();}
-	boost::python::dict pyDict() { return boost::python::dict(); }
-};
-#endif
-
 class Serializable: public Factorable {
 	public:
 		template <class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ };
+		// lovely cast members like in eigen :-)
+		template <class DerivedT> const DerivedT& cast() const { return *static_cast<DerivedT*>(this); }
+		template <class DerivedT> DerivedT& cast(){ return *static_cast<DerivedT*>(this); }
 	
 		Serializable() {};
 		virtual ~Serializable() {};

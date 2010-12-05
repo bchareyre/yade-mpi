@@ -122,7 +122,6 @@ class pyBodyContainer{
 		shared_ptr<Body> clumpBody=shared_ptr<Body>(new Body());
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
 		clumpBody->shape=clump;
-		clumpBody->setDynamic(true);
 		clumpBody->setBounded(false);
 		proxee->insert(clumpBody);
 		// add clump members to the clump

@@ -145,6 +145,8 @@ class ControllerClass(QWidget,Ui_Controller):
 		O.save(f)
 	def reloadSlot(self):
 		self.deactivateControls()
+		from yade import plot
+		plot.splitData()
 		O.reload()
 	def dtFixedSlot(self):
 		O.dt=O.dt

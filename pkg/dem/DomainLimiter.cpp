@@ -56,7 +56,10 @@ void LawTester::action(){
 	const shared_ptr<Interaction> Inew=scene->interactions->find(ids[0],ids[1]);
 	string strIds("##"+lexical_cast<string>(ids[0])+"+"+lexical_cast<string>(ids[1]));
 	// interaction not found at initialization
-	if(!I && (!Inew || !Inew->isReal())) throw std::runtime_error("LawTester: interaction "+strIds+" does not exist"+(Inew?" (to be honest, it does exist, but it is not real).":"."));
+	if(!I && (!Inew || !Inew->isReal())){
+		LOG_WARN("Interaction "<<strIds<<" does not exist (yet?), no-op."); return;
+		//throw std::runtime_error("LawTester: interaction "+strIds+" does not exist"+(Inew?" (to be honest, it does exist, but it is not real).":"."));
+	}
 	// interaction was deleted meanwhile
 	if(I && (!Inew || !Inew->isReal())) throw std::runtime_error("LawTester: interaction "+strIds+" was deleted"+(Inew?" (is not real anymore).":"."));
 	// different interaction object
@@ -120,7 +123,7 @@ void LawTester::action(){
 		trsf.col(0)=axX; trsf.col(1)=axY; trsf.col(2)=axZ;
 	} else {
 		trsf=l3Geom->trsf;
-		axX=trsf.col(0); axY=trsf.col(1); axZ=trsf.col(2);
+		axX=trsf.row(0); axY=trsf.row(1); axZ=trsf.row(2);
 		ptGeom=l3Geom->u;
 		if(l6Geom) rotGeom=l6Geom->phi;
 	}
@@ -151,11 +154,13 @@ void LawTester::action(){
 	for(int i=0; i<2; i++){
 		int sign=(i==0?-1:1);
 		Real weight=(i==0?1-idWeight:idWeight);
+		// FIXME: this should not use refR1, but real CP-particle distance!
 		Real radius=(i==0?gsc->refR1:gsc->refR2);
+		Real relRad=radius/refLength;
 		// signed and weighted displacement/rotation to be applied on this sphere (reversed for #0)
 		// some rotations must cancel the sign, by multiplying by sign again
 		Vector3r ddU=sign*dU*weight;
-		Vector3r ddPhi=sign*dPhi*weight;
+		Vector3r ddPhi=sign*dPhi*(1-relRad); /* angles must distribute to both, otherwise it would induce shear; FIXME: combination of shear and bending must make sure they are properly orthogonal! (rotWeight=?) */
 		vel[i]=angVel[i]=Vector3r::Zero();
 
 		// normal displacement
@@ -227,10 +232,10 @@ void GlExtra_LawTester::render(){
 	// switch to local coordinates
 	glTranslatev(tester->contPt);
 	#if EIGEN_MAJOR_VERSION<20              //Eigen3 definition, while it is not realized
- 		glMultMatrixd(Eigen::Transform3d(tester->trsf).data());
-        #else
- 		glMultMatrixd(Eigen::Affine3d(tester->trsf).data());
-        #endif
+ 		glMultMatrixd(Eigen::Transform3d(tester->trsf.transpose()).data());
+	#else
+ 		glMultMatrixd(Eigen::Affine3d(tester->trsf.transpose()).data());
+	#endif
 
 
 	glDisable(GL_LIGHTING); 

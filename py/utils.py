@@ -794,7 +794,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		# !something cols are skipped, those are env vars we don't treat at all (they are contained in description, though)
 		for col in vv.keys():
 			if col=='description' or col[0]=='!': continue
-			if col not in kw.keys() and (not unknownOk): raise NameError("Parameter `%s' has no default value assigned"%names[i])
+			if col not in kw.keys() and (not unknownOk): raise NameError("Parameter `%s' has no default value assigned"%col)
 			if vv[col]=='*': vv[col]=kw[col] # use default value for * in the table
 			elif col in kw.keys(): kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
 			#print 'ASSIGN',col,vv[col]

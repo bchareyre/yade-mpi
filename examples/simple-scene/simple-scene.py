@@ -23,21 +23,20 @@ o.engines=[
 		Bo1_Sphere_Aabb(),
 		Bo1_Box_Aabb(),
 	]),
-	## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
-	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
-	## Note that there is no EngineUnit for box-box collision. They are not implemented.
-	IGeomDispatcher([
-		Ig2_Sphere_Sphere_ScGeom(),
-		Ig2_Box_Sphere_ScGeom()
-	]),
-	## Create physical information about the interaction.
-	## This may consist in deriving contact rigidity from elastic moduli of each body, for example.
-	## The purpose is that the contact may be "solved" without reference to related bodies,
-	## only with the information contained in contact geometry and physics.
-	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
-	## "Solver" of the contact, also called (consitutive) law.
-	## Based on the information in interaction physics and geometry, it applies corresponding forces on bodies in interaction.
-	ElasticContactLaw(),
+	InteractionLoop(
+		## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
+		## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
+		## Note that there is no EngineUnit for box-box collision. They are not implemented.
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
+		## Create physical information about the interaction.
+		## This may consist in deriving contact rigidity from elastic moduli of each body, for example.
+		## The purpose is that the contact may be "solved" without reference to related bodies,
+		## only with the information contained in contact geometry and physics.
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		## "Solver" of the contact, also called (consitutive) law.
+		## Based on the information in interaction physics and geometry, it applies corresponding forces on bodies in interaction.
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
+	),
 	## Apply gravity: all bodies will have gravity applied on them.
 	## Note the engine parameter 'gravity', a vector that gives the acceleration.
 	GravityEngine(gravity=[0,0,-9.81]),
@@ -47,20 +46,6 @@ o.engines=[
 	#
 	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
 	NewtonIntegrator(damping=0.1)
-	#
-#	PhysicalActionDamper([
-#		CundallNonViscousForceDamping(damping=0.2),
-#		CundallNonViscousMomentumDamping(damping=0.2)
-#	]),
-#	## Now we have forces and momenta acting on bodies. Newton's law calculates acceleration that corresponds to them.
-#	PhysicalActionApplier([
-#		NewtonsForceLaw(),
-#		NewtonsMomentumLaw(),
-#	]),
-#	## Acceleration results in velocity change. Integrating the velocity over dt, position of the body will change.
-#	StateMetaEngine([LeapFrogPositionIntegrator()]),
-#	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
-#	StateMetaEngine([LeapFrogOrientationIntegrator()])
 ]
 
 
@@ -74,31 +59,8 @@ from yade import utils
 ## * extents: half-size of the box. [.5,.5,.5] is unit cube
 ## * center: position of the center of the box
 ## * dynamic: it is not dynamic, i.e. will not move during simulation, even if forces are applied to it
-## * color: for the 3d display; specified  within unit cube in the RGB space; [1,0,0] is, therefore, red
-## * young: Young's modulus
-## * poisson: Poissons's ratio
 
 o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],dynamic=False))
-
-## The above command could be actully written without the util.box function like this:
-## (will not be executed, since the condition is never True)
-if False:
-	# Create empty body object
-	b=Body()
-	# set the isDynamic body attribute
-	b.dynamic=False
-	# Assign geometrical model (shape) to the body: a box of given size
-	b.shape=Box(extents=[.5,.5,.5],color=[1,0,0])
-	# physical parameters:
-	# store mass to a temporary
-	mass=8*.5*.5*.5*2400
-	# * se3 (position & orientation) as 3 position coordinates, then 3 direction axis coordinates and rotation angle
-	b.phys=BodyMacroParameters(se3=[0,0,0,1,0,0,0],mass=mass,inertia=[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],young=30e9,poisson=.3)
-	# other information about Aabb will be updated during simulation by the collider
-	b.bound=Aabb(color=[0,1,0])
-	# add the body to the simulation
-	o.bodies.append(b)
-
 
 ## The sphere
 ##

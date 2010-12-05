@@ -51,7 +51,7 @@ class Body: public Serializable{
 		// inline accessors
 		// logic: http://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit-in-c
 		bool isDynamic() const {return flags & FLAG_DYNAMIC; }
-		void setDynamic(bool d){ if(d) flags|=FLAG_DYNAMIC; else flags&=~(FLAG_DYNAMIC); }
+		void setDynamic(bool d){ if(d){ flags|=FLAG_DYNAMIC; if(state) state->blockedDOFs=State::DOF_NONE; } else { flags&=~(FLAG_DYNAMIC); if(state){ state->blockedDOFs=State::DOF_ALL; state->vel=state->angVel=Vector3r::Zero(); } }}
 		bool isBounded() const {return flags & FLAG_BOUNDED; }
 		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
 		bool isAspherical() const {return flags & FLAG_ASPHERICAL; }

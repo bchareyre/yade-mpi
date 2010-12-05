@@ -272,7 +272,6 @@ shared_ptr<FrictMat> Shop::defaultGranularMat(){
 /*! Create body - sphere. */
 shared_ptr<Body> Shop::sphere(Vector3r center, Real radius, shared_ptr<Material> mat){
 	shared_ptr<Body> body(new Body);
-	body->setDynamic(true);
 	body->material=mat ? mat : static_pointer_cast<Material>(defaultGranularMat());
 	body->state->pos=center;
 	body->state->mass=4.0/3.0*Mathr::PI*radius*radius*radius*body->material->density;
@@ -285,7 +284,6 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius, shared_ptr<Material>
 /*! Create body - box. */
 shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents, shared_ptr<Material> mat){
 	shared_ptr<Body> body(new Body);
-	body->setDynamic(true);
 	body->material=mat ? mat : static_pointer_cast<Material>(defaultGranularMat());
 	body->state->pos=center;
 	Real mass=8.0*extents[0]*extents[1]*extents[2]*body->material->density;
@@ -299,7 +297,6 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents, shared_ptr<Materia
 /*! Create body - tetrahedron. */
 shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 	shared_ptr<Body> body(new Body);
-	body->setDynamic(true);
 	body->material=mat ? mat : static_pointer_cast<Material>(defaultGranularMat());
 	Vector3r centroid=(v_global[0]+v_global[1]+v_global[2]+v_global[3])*.25;
 	Vector3r v[4]; for(int i=0; i<4; i++) v[i]=v_global[i]-centroid;
