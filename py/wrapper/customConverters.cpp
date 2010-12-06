@@ -148,7 +148,7 @@ struct custom_ptrMatchMaker_from_float{
 		void* storage=((converter::rvalue_from_python_storage<shared_ptr<MatchMaker> >*)(data))->storage.bytes;
 		new (storage) shared_ptr<MatchMaker>(new MatchMaker); // allocate the object at given address
 		shared_ptr<MatchMaker>* mm=(shared_ptr<MatchMaker>*)(storage); // convert that address to our type
-		(*mm)->fallback="val"; (*mm)->val=PyFloat_AsDouble(obj_ptr); (*mm)->postLoad(**mm);
+		(*mm)->algo="val"; (*mm)->val=PyFloat_AsDouble(obj_ptr); (*mm)->postLoad(**mm);
 		data->convertible=storage;
 	}
 };

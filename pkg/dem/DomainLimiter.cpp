@@ -82,8 +82,6 @@ void LawTester::action(){
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
 	scene->forces.sync();
-	//if(state1->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id1); state1->blockedDOFs=State::DOF_RXRYRZ;}
-	//if(state2->blockedDOFs!=State::DOF_RXRYRZ) { LOG_INFO("Blocking rotational DOFs for #"<<id2); state2->blockedDOFs=State::DOF_RXRYRZ;}
 	if(state1->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id1); state1->blockedDOFs=State::DOF_ALL;}
 	if(state2->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id2); state2->blockedDOFs=State::DOF_ALL;}
 

@@ -52,7 +52,7 @@ class LawTester: public PartialEngine{
 		((Real,refLength,0,(Attr::readonly),"Reference contact length, for rendering only."))
 		((Vector3r,contPt,Vector3r::Zero(),,"Contact point (for rendering only)"))
 		((Real,idWeight,1,,"Float ∈〈0,1〉 determining on which particle are displacements applied (0 for id1, 1 for id2); intermediate values will apply respective part to each of them."))
-		((Real,rotWeight,1,,"Float ∈〈0,1〉 determining whether shear displacement is applied as rotation or displacement on arc (0 is displacemetn-only, 1 is rotation-only)."))
+		((Real,rotWeight,1,,"Float ∈〈0,1〉 determining whether shear displacement is applied as rotation or displacement on arc (0 is displacement-only, 1 is rotation-only). Not effective when mutual rotation is specified."))
 		// reset force components along individual axes, instead of blocking DOFs which have no specific direction (for the force control)
 	);
 };
