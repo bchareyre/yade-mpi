@@ -15,12 +15,12 @@ from yade import *
 from math import *
 
 class TestCohesiveChain(unittest.TestCase):
-	# prefix test names with PBC: 
+	# prefix test names with PBC:
 	def setUp(self):
 		O.reset();
 		young=1.0e3
 		poisson=5
-		density=2.60e3 
+		density=2.60e3
 		frictionAngle=radians(30)
 		O.materials.append(CohFrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle,normalCohesion=1e13,shearCohesion=1e13,momentRotationLaw=True))
 		O.dt=1e-3
@@ -44,7 +44,7 @@ class TestCohesiveChain(unittest.TestCase):
 			omeg=95.0/float(Ne); hy=0.05; hz=0.07;
 			px=float(i)*(omeg/60.0); py=sin(float(i)*omeg)*hy; pz=cos(float(i)*omeg)*hz;
 			px2=float(i+1.)*(omeg/60.0); py2=sin(float(i+1.)*omeg)*hy; pz2=cos(float(i+1.)*omeg)*hz;
-			O.bodies.append(utils.chainedCylinder(begin=Vector3(pz,py,px), radius=0.005,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5)))		
+			utils.chainedCylinder(begin=Vector3(pz,py,px), radius=0.005,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5))
 		O.bodies[Ne-1].state.blockedDOFs=['x','y','z','rx','ry','rz']
 	def testMotion(self):
 		"CohesiveChain: velocity/positions tested in transient dynamics and equilibrium state"
@@ -60,4 +60,3 @@ class TestCohesiveChain(unittest.TestCase):
 		self.assertTrue(abs(tv1-v1)<abs(tolerance*tv1) and abs(tp1-p1)<abs(tolerance*tp1))
 		self.assertTrue(abs(tp2-p2)<abs(tolerance*tp2))
 		#self.assertTrue(abs(tv2-v2)<abs(tolerance*tv2) and abs(tp2-p2)<abs(tolerance*tp2)) #velocity comparison disabled, see comment above
-		

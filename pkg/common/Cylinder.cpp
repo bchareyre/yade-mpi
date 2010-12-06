@@ -4,6 +4,7 @@
 	#include<yade/lib/opengl/OpenGLWrapper.hpp>
 #endif
 #include<yade/pkg/common/Aabb.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 
 Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}
@@ -13,7 +14,7 @@ CylScGeom::~CylScGeom(){}
 // Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::~Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D() {}
 
 
-YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D)
+YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D)(Law2_CylScGeom_FrictPhys_CundallStrack)
 	#ifdef YADE_OPENGL
 		(Gl1_Cylinder)(Gl1_ChainedCylinder)
 	#endif
@@ -45,32 +46,36 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	ChainedCylinder *cylinder=YADE_CAST<ChainedCylinder*>(cm2.get());
 	Sphere *sphere=YADE_CAST<Sphere*>(cm1.get());
 	assert(sphereSt && cylinderSt && cylinder && sphere);
-	if (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1)) {cerr << "last cylinder - ignored"<<endl; return false;}
-
-// 	int i1=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
-// 	cerr << "i1 : "<<i1<< " i2: "<<cylinderSt->rank<<" pos: "<<Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene)->state->pos<< " - "<<cylinderSt->pos<<endl;
+	bool isLast = (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1));
+	bool isNew = !c->geom;
+// 	if (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1)) {cerr << "last cylinder - ignored"<<endl; return false;}
 
 	//FIXME : definition of segment in next line breaks periodicity
-	Vector3r segment = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene)->state->pos-cylinderSt->pos;
-	Vector3r branch = sphereSt->pos-cylinderSt->pos-shift2;
-	bool isNew = !c->geom;
-
-	//Check position of projection on cylinder axis
-// 	if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && !c->isReal())) return (false);//position _after_ end of cylinder
-	if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && isNew)) return (false);//position _after_ end of cylinder
-// 	if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && c->isReal())) cerr<<"pb1"<<endl;
-
-	Real length = segment.norm();
-	Vector3r direction = segment/length;
-	Real dist = direction.dot(branch);
-// 	if ((dist<-interactionDetectionFactor*cylinder->radius) && !c->isReal()) return (false);//position _before_ start of cylinder
-	if ((dist<-interactionDetectionFactor*cylinder->radius) && isNew) return (false);//position _before_ start of cylinder
+// 	cerr << cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]<<endl;
+// 	cerr<<Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene)->state->pos<<endl;
+	shared_ptr<Body> cylinderNext;
+	Vector3r segment, branch, direction;
+	Real length, dist;
+	if (!isLast) {
+		cylinderNext = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene);
+		segment = cylinderNext->state->pos-cylinderSt->pos;
+		branch = sphereSt->pos-cylinderSt->pos-shift2;
+		if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && isNew)) return false;//position _after_ end of cylinder
+		length = segment.norm();
+		direction = segment/length;
+		dist = direction.dot(branch);
+		if ((dist<-interactionDetectionFactor*cylinder->radius) && isNew) return false;
+	} else {//handle the last node with length=0
+		segment = Vector3r(0,0,0);
+		branch = sphereSt->pos-cylinderSt->pos-shift2;
+		length = 0;
+		direction = Vector3r(0,1,0);
+		dist = 0;}
 
 	//Check sphere-cylinder distance
 	Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
 	branch = projectedP-sphereSt->pos;
-// 	if ((branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) && !c->isReal()) return (false);
-	if ((branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) && isNew) return (false);
+	if ((branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) && isNew) return false;
 
 	shared_ptr<CylScGeom> scm;
 	if(!isNew) scm=YADE_PTR_CAST<CylScGeom>(c->geom);
@@ -78,47 +83,39 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 
 	scm->radius1=sphere->radius;
 	scm->radius2=cylinder->radius;
-	scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+	if (!isLast) scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
 	scm->start=cylinderSt->pos+shift2; scm->end=scm->start+segment;
 
 	//FIXME : there should be other checks without distanceFactor?
-	if (dist<0.0) {//We have sphere-node contact
+	if (dist<=0) {//We have sphere-node contact
 		Vector3r normal=(cylinderSt->pos+shift2)-sphereSt->pos;
 		Real norm=normal.norm();
+		normal /=norm;
+		scm->relPos=0;
 		scm->onNode=true; scm->relPos=0;
 		scm->penetrationDepth=sphere->radius+cylinder->radius-norm;
 		scm->contactPoint=sphereSt->pos+(sphere->radius-0.5*scm->penetrationDepth)*normal;
-		scm->precompute(state1,state2,scene,c,normal/norm,isNew,shift2,true);//use sphere-sphere precompute (a node is a sphere)
+		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);//use sphere-sphere precompute (a node is a sphere)
 	} else {//we have sphere-cylinder contact
-		scm->onNode=false; scm->relPos=dist/length;
+		scm->onNode=false;
+		scm->relPos=dist/length;
 		Real norm=branch.norm();
 		Vector3r normal=branch/norm;
 		scm->penetrationDepth= sphere->radius+cylinder->radius-norm;
+
+		// define a virtual sphere at the projected center
+		scm->fictiousState.pos = projectedP;
+		scm->fictiousState.vel = (1-scm->relPos)*cylinderSt->vel + scm->relPos*cylinderNext->state->vel;
+		scm->fictiousState.angVel =
+			((1-scm->relPos)*cylinderSt->angVel + scm->relPos*cylinderNext->state->angVel).dot(direction)*direction //twist part : interpolated
+			+ segment.cross(cylinderNext->state->vel - cylinderSt->vel);// non-twist part : defined from nodes velocities
+
 		if (dist>length) {
 			scm->penetrationDepth=sphere->radius+cylinder->radius-(cylinderSt->pos+segment-sphereSt->pos).norm();
 			//FIXME : handle contact jump on next element
 		}
-		scm->contactPoint = sphereSt->pos+scm->normal*(sphere->radius-0.5*scm->penetrationDepth);
-
-		//FIXME : replace the block below with smart use of shift2=shift2 + cylinder_spin.cross(branch) - doesn't compile currently
-
-		//precompute stuff manually (sphere-sphere precompute doesn't apply here if we want to avoid ratcheting
-		/*
-		if(!isNew) {
-			scm->orthonormal_axis = scm->normal.cross(normal);
-			Real angle = scene->dt*0.5*scm->normal.dot(sphereSt->angVel + cylinderSt->angVel);
-			scm->twist_axis = angle*normal;}
-		else scm->twist_axis=scm->orthonormal_axis=Vector3r::Zero();
-		//Update contact normal
-		scm->normal=normal;
-		Vector3r c1x =  sphere->radius*normal;
-		Vector3r c2x = -cylinder->radius*normal;
-		Vector3r relativeVelocity = (cylinderSt->vel+cylinderSt->angVel.cross(c2x)) - (sphereSt->vel+sphereSt->angVel.cross(c1x));
-		//keep the shear part only
-		relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
-		scm->shearInc = relativeVelocity*scene->dt;
-		*/
-
+		scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
+		scm->precompute(state1,scm->fictiousState,scene,c,branch/norm,isNew,shift2,false);//use sphere-sphere precompute (with a virtual sphere)
 	}
 	return true;
 }
@@ -359,3 +356,61 @@ void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>
 	}
 }
 
+void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+	int id1 = contact->getId1(), id2 = contact->getId2();
+
+	CylScGeom*    geom= static_cast<CylScGeom*>(ig.get());
+	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
+	if(geom->penetrationDepth <0){
+		if (neverErase) {
+			phys->shearForce = Vector3r::Zero();
+			phys->normalForce = Vector3r::Zero();}
+		else 	scene->interactions->requestErase(id1,id2);
+		return;}
+	Real& un=geom->penetrationDepth;
+	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
+
+	Vector3r& shearForce = geom->rotate(phys->shearForce);
+	const Vector3r& shearDisp = geom->shearIncrement();
+	shearForce -= phys->ks*shearDisp;
+	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
+
+	if (likely(!scene->trackEnergy)){//Update force but don't compute energy terms (see below))
+		// PFC3d SlipModel, is using friction angle. CoulombCriterion
+		if( shearForce.squaredNorm() > maxFs ){
+			Real ratio = sqrt(maxFs) / shearForce.norm();
+			shearForce *= ratio;}
+	} else {
+		//almost the same with additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
+		if(shearForce.squaredNorm() > maxFs){
+			Real ratio = sqrt(maxFs) / shearForce.norm();
+			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
+			//define the plastic work input and increment the total plastic energy dissipated
+			shearForce *= ratio;
+			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
+		}
+		// compute elastic energy as well
+		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
+	}
+	if (!scene->isPeriodic) {
+		Vector3r force = -phys->normalForce-shearForce;
+		scene->forces.addForce(id1,force);
+		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+		//FIXME : include moment due to axis-contact distance in forces on node
+		Vector3r twist = (geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force);
+		scene->forces.addForce(id2,(geom->relPos-1)*force);
+		scene->forces.addTorque(id2,(1-geom->relPos)*twist);
+		if (geom->relPos) { //else we are on node (or on last node - and id3 is junk)
+			scene->forces.addForce(geom->id3,(-geom->relPos)*force);
+			scene->forces.addTorque(geom->id3,geom->relPos*twist);}
+	}
+// 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
+	else {//FIXME : periodicity not implemented here :
+		Vector3r force = -phys->normalForce-shearForce;
+		scene->forces.addForce(id1,force);
+		scene->forces.addForce(id2,-force);
+		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+	}
+}

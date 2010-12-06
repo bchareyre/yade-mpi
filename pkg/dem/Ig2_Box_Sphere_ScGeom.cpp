@@ -41,18 +41,18 @@ bool Ig2_Box_Sphere_ScGeom::go(
 
 	Box* obb = static_cast<Box*>(cm1.get());
 	Sphere* s = static_cast<Sphere*>(cm2.get());
-	
+
 	Vector3r extents = obb->extents;
 
 	// FIXME: do we need rotation matrix? Can't quaternion do just fine?
-	Matrix3r boxAxisT=se31.orientation.toRotationMatrix(); 
+	Matrix3r boxAxisT=se31.orientation.toRotationMatrix();
 	Matrix3r boxAxis = boxAxisT.transpose();
-	
+
 	Vector3r relPos21 = se32.position-se31.position; // relative position of centroids
-	
+
 	// cOnBox_boxLocal is the sphere centroid (in box-local coordinates), but projected onto box if it is outside.
 	// _boxLocal means that ROTATION is local and origin is in box's origin
-	Vector3r cOnBox_boxLocal=boxAxis*relPos21; 
+	Vector3r cOnBox_boxLocal=boxAxis*relPos21;
 
 	if (cOnBox_boxLocal[0]<-extents[0]){cOnBox_boxLocal[0]=-extents[0]; inside=false; }
 	if (cOnBox_boxLocal[0]> extents[0]){cOnBox_boxLocal[0]= extents[0]; inside=false; }
@@ -60,7 +60,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 	if (cOnBox_boxLocal[1]> extents[1]){cOnBox_boxLocal[1]= extents[1]; inside=false; }
 	if (cOnBox_boxLocal[2]<-extents[2]){cOnBox_boxLocal[2]=-extents[2]; inside=false; }
 	if (cOnBox_boxLocal[2]> extents[2]){cOnBox_boxLocal[2]= extents[2]; inside=false; }
-	
+
 	shared_ptr<ScGeom> scm;
 	if (inside){
 		// sphere center inside box. find largest `cOnBox_boxLocal' value:
@@ -68,14 +68,14 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		// where cOnBox_boxLocal is minimal (i.e. where sphere center is closest perpendicularly to the box)
 		Real minCBoxDist=extents[0]-fabs(cOnBox_boxLocal[0]); int minCBoxDist_index=0;
 		for (int i=1; i<3; i++){Real tt=extents[i]-fabs(cOnBox_boxLocal[i]); if (tt<minCBoxDist){minCBoxDist=tt; minCBoxDist_index=i;}}
-		
+
 		// contact normal aligned with box edge along largest `cOnBox_boxLocal' value
 		Vector3r normal_boxLocal = Vector3r(0,0,0);
 		normal_boxLocal[minCBoxDist_index]=(cOnBox_boxLocal[minCBoxDist_index]>0)?1.0:-1.0;
-		
+
 		normal = boxAxisT*normal_boxLocal;
 		normal.normalize();
-		
+
 		// se32 is sphere's se3
 		/*
 		 *
@@ -99,7 +99,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		bool isNew=!c->geom;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
 		else scm = YADE_PTR_CAST<ScGeom>(c->geom);
-			
+
 		// contact point is in the middle of overlapping volumes
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
 		scm->contactPoint = 0.5*(pt1+pt2);
@@ -127,10 +127,10 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		 *      /        | cOnBox_sphere
 		 *      |        ×        |
 		 *      \           c ≡ se32->position
-		 *       \               /              
+		 *       \               /
 		 *         ~           /
 		 *           ^~~ ~ ~~^
-		 *                 
+		 *
 		 */
 
 		pt1=cOnBox_box+se31.position;
@@ -138,10 +138,10 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		cOnBox_sphere.normalize(); // we want only direction in the following
 
 		pt2=se32.position+cOnBox_sphere*s->radius;
-		
+
 		bool isNew=!c->geom;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
-		else scm = YADE_PTR_CAST<ScGeom>(c->geom);	
+		else scm = YADE_PTR_CAST<ScGeom>(c->geom);
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->penetrationDepth = depth;
 		scm->radius1 = s->radius;
@@ -172,7 +172,7 @@ YADE_PLUGIN((Ig2_Box_Sphere_ScGeom));
 
 #ifdef YADE_DEVIRT_FUNCTORS
 bool Ig2_Box_Sphere_ScGeom6D::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Box_Sphere_ScGeom6D::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_Box_Sphere_ScGeom::goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+bool Ig2_Box_Sphere_ScGeom6D::goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 #else
 bool Ig2_Box_Sphere_ScGeom6D::go(
 		const shared_ptr<Shape>& cm1,

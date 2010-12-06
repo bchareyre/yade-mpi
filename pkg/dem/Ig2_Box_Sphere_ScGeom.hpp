@@ -64,7 +64,7 @@ class Ig2_Box_Sphere_ScGeom6D : public Ig2_Box_Sphere_ScGeom
 					const shared_ptr<Interaction>& c);
 
 	#ifdef YADE_DEVIRT_FUNCTORS
-		void* getStaticFuncPtr(){ return (void*)&Ig2_Box_Sphere_ScGeom::goStatic; }
+		void* getStaticFuncPtr(){ return (void*)&Ig2_Box_Sphere_ScGeom6D::goStatic; }
 		static bool goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 	#endif
 

@@ -57,10 +57,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 			phys->normalForce = Vector3r::Zero();}
 		else 	scene->interactions->requestErase(id1,id2);
 		return;}
-	State* de1 = Body::byId(id1,scene)->state.get();
-	State* de2 = Body::byId(id2,scene)->state.get();
 	Real& un=geom->penetrationDepth;
-	TRVAR3(geom->penetrationDepth,de1->se3.position,de2->se3.position);
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
 
 	Vector3r& shearForce = geom->rotate(phys->shearForce);
@@ -87,8 +84,10 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 		// compute elastic energy as well
 		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
 	}
-	if (!scene->isPeriodic)
-		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
+	if (!scene->isPeriodic && !sphericalBodies) {
+		State* de1 = Body::byId(id1,scene)->state.get();
+		State* de2 = Body::byId(id2,scene)->state.get();
+		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);}
 	else {//we need to use correct branches in the periodic case, the following apply for spheres only
 		Vector3r force = -phys->normalForce-shearForce;
 		scene->forces.addForce(id1,force);
