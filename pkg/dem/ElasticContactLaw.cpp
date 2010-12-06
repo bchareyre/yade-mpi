@@ -14,7 +14,7 @@
 
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_Dem3DofGeom_FrictPhys_CundallStrack)(ElasticContactLaw));
 
-#if 0
+#if 1
 Real Law2_ScGeom_FrictPhys_CundallStrack::getPlasticDissipation() {return (Real) plasticDissipation;}
 void Law2_ScGeom_FrictPhys_CundallStrack::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
 Real Law2_ScGeom_FrictPhys_CundallStrack::elasticEnergy()
@@ -39,7 +39,7 @@ void ElasticContactLaw::action()
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (LawDispatcher does that already)
-			if(!dynamic_cast<ScGeom*>(I->geom.get()) || !dynamic_cast<FrictPhys*>(I->phys.get())) continue;	
+			if(!dynamic_cast<ScGeom*>(I->geom.get()) || !dynamic_cast<FrictPhys*>(I->phys.get())) continue;
 		#endif
 			functor->go(I->geom, I->phys, I.get());
 	}
@@ -68,7 +68,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	shearForce -= phys->ks*shearDisp;
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-	if (likely(!scene->trackEnergy)){//Update force but don't compute energy terms (see below))
+	if (likely(!scene->trackEnergy  && !traceEnergy)){//Update force but don't compute energy terms (see below))
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = sqrt(maxFs) / shearForce.norm();
@@ -81,7 +81,8 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 			//define the plastic work input and increment the total plastic energy dissipated
 			shearForce *= ratio;
 			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
-			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
+			if (traceEnergy) plasticDissipation += dissip;
+			else if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
 		}
 		// compute elastic energy as well
 		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);

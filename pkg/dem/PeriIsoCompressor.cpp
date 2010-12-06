@@ -1,5 +1,5 @@
 
-// 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
+// 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #include<yade/pkg/dem/PeriIsoCompressor.hpp>
 #include<yade/pkg/dem/Shop.hpp>
@@ -29,7 +29,7 @@ void PeriIsoCompressor::action(){
 			if(!b || !b->bound) continue;
 			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->bound->max[i]-b->bound->min[i]);
 		}
-		
+
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
 	const long& step=scene->iter;
@@ -99,9 +99,9 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	//"Natural" strain, correct for large deformations, only used for comparison with goals
 	for (int i=0;i<3;i++) strain[i]=log(scene->cell->trsf(i,i));
 	//stress tensor and stiffness
-	
+
 	//Compute volume of the deformed cell
-	// NOTE : needs refSize, could be generalized to arbitrary initial shapes using trsf*refHsize 
+	// NOTE : needs refSize, could be generalized to arbitrary initial shapes using trsf*refHsize
 	// → initial cell size is always box, and will be. The cell repeats  periodically, initial shape doesn't (shouldn't, at least) dinfluence interactions at all/
 	// → this is one more place where Hsize would make things shorter : volume=Hsize.Determinant; The full code relies on the fact that initial Hsize is a box. You didn't modify the equation btw, result is the same as in r1936, which was (with spaces...)
 	//trsf*Matrix3r ( scene->cell->refSize[0],0,0, 0,scene->cell->refSize[1],0,0,0,scene->cell->refSize[2] ) ).Determinant()
@@ -122,8 +122,9 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
 		//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
-		//    Vector3r branch=(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
-		Vector3r branch= gsc->normal* ( gsc->refR1+gsc->refR2 );
+
+		Vector3r branch=(-Body::byId(I->getId1())->state->pos + Body::byId(I->getId2())->state->pos + scene->cell->Hsize*I->cellDist.cast<Real>());
+// 		Vector3r branch= gsc->normal* ( gsc->refR1+gsc->refR2 );
 		#if 0
 			// remove this block later
 			// tensorial product f*branch (hand-write the tensor product to prevent matrix instanciation inside the loop by makeTensorProduct)
@@ -195,18 +196,18 @@ void PeriTriaxController::action()
 				strain_rate+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
 				//if ((scene->iter%5000)==0){cerr << axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate<<endl;}
 				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate );}
-			
+
 		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
 			strain_rate = (exp ( goal[axis]-strain[axis] ) -1)/scene->dt;
 			LOG_TRACE ( axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<strain_rate*scene->dt);
-		}		
+		}
 		// steady evolution with fluctuations; see TriaxialStressController
 		if (!dynCell) strain_rate=(1-growDamping)*strain_rate+.8*prevGrow[axis];
 		// limit maximum strain rate
 		if (abs(strain_rate)>maxStrainRate[axis]) strain_rate = Mathr::Sign(strain_rate)*maxStrainRate[axis];
 		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
-		
+
 		//if ((scene->iter%5000)==0){cerr<< axis <<": velGrad="<<strain_rate<<", maxCellsize"<<-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt<<endl;}
 		strain_rate=max(strain_rate,-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt);
 		//if ((scene->iter%5000)==0){cerr <<"velGrad="<<strain_rate<<endl<<endl;}
@@ -230,7 +231,7 @@ void PeriTriaxController::action()
 		}
 	}
 	// update stress and strain
-	if (!dynCell) for ( int axis=0; axis<3; axis++ ){		
+	if (!dynCell) for ( int axis=0; axis<3; axis++ ){
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
 		//don't modify stress if dynCell, testing only stiff[axis]>0 would not allow switching the control mode in simulations,
@@ -243,7 +244,7 @@ void PeriTriaxController::action()
 	externalWork+=dW;
 	if(scene->trackEnergy) scene->energy->add(dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
 	prevGrow = strainRate;
-	
+
 	if(allOk){
 		if(doUpdate || currUnbalanced<0){
 			currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
@@ -302,7 +303,7 @@ void Peri3dController::action(){
 		// PATH_OP_OP(0,j,k) = path[0]->operator[](j).operator(k) is k-th element of j-th Vector2r of xxPath
 		#define PATH_OP_OP(pi,op1i,op2i) paths[pi]->operator[](op1i).operator()(op2i)
 
-		for (int i=0; i<6; i++) { 
+		for (int i=0; i<6; i++) {
 			for (int j=1; j<pathSizes[i]; j++) {
 				// check if the user defined time axis is monothonically increasing
 				{ if ( PATH_OP_OP(i,j-1,0) >= PATH_OP_OP(i,j,0) ) {
@@ -321,12 +322,12 @@ void Peri3dController::action(){
 
 		// set weather the simulation is "stress based" (all stress components prescribed or all prescribed strains equal zero)
 		if (lenPe == 0) { stressBasedSimulation = true; }
-		else { 
+		else {
 			stressBasedSimulation = true;
 			for (int i=0; i<lenPe; i++) { stressBasedSimulation = stressBasedSimulation && PATH_OP_OP(pe(i),1,1)<1e9; }
 		}
 	}
-	
+
 	// increase the pathCounter by one if we cross to the next part of path
 	for (int i=0; i<6; i++) {
 		if (progress >= PATH_OP_OP(i,pathsCounter[i],0)) { pathsCounter[i]++; }
@@ -412,7 +413,7 @@ void Peri3dController::action(){
 			}
 		}
 	}
-	
+
 	// correction coefficient ix strainRate.maxabs() > maxStrainRate
 	Real srCorr = (strainRate.cwise().abs().maxCoeff() > maxStrainRate)? (maxStrainRate/strainRate.cwise().abs().maxCoeff()):1.;
 	strainRate *= srCorr;
@@ -421,12 +422,12 @@ void Peri3dController::action(){
 	const Matrix3r& trsf=scene->cell->trsf;
 	// compute rotational and nonrotational (strain in local coordinates) part of trsf
 	Matrix_computeUnitaryPositive(trsf,&rot,&nonrot);
-	 
+
 	// prescribed velocity gradient (strain tensor rate) in global coordinates
-	epsilonRate = voigt_toSymmTensor(strainRate,/*strain=*/true); 
+	epsilonRate = voigt_toSymmTensor(strainRate,/*strain=*/true);
 	/* transformation of prescribed strain rate (computed by predictor) into local cell coordinates,
 	   multiplying by time to obtain strain increment and adding it to nonrot (current strain in local coordinates)*/
-	nonrot += rot.transpose()*(epsilonRate*dt)*rot; 
+	nonrot += rot.transpose()*(epsilonRate*dt)*rot;
 	Matrix3r& velGrad=scene->cell->velGrad;
 	// compute new trsf as rot*nonrot, substract actual trsf (= trsf increment), divide by dt (=trsf rate = velGrad
 	//trsf = rot*nonrot;
@@ -508,7 +509,7 @@ void Peri3dController::action(){
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
 	const Real& dt=scene->dt;
-	/ * 
+	/ *
 	sigma = K * eps
 
 	decompose the stiffness matrix depending on what is prescribed
