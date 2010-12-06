@@ -22,28 +22,28 @@ r1,r2=.1,.2
 pt1=Vector3(0,0,0)
 # random orientation of the interaction
 normal=Vector3(random.random()-.5,random.random()-.5,random.random()-.5)
-#normal=Vector3(1,0,0)
+normal=Vector3.UnitX
 O.bodies.append([
 	utils.sphere(pt1,r1,wire=True,color=(.7,.7,.7)),
 	utils.sphere(pt1+.999999*(r1+r2)*normal.normalized(),r2,wire=True,color=(0,0,0))
 ])
 
 O.engines=[
+	PyRunner(iterPeriod=1,command='addPlotData()'),
 	ForceResetter(),
 	#PyRunner(iterPeriod=1,command='import time; time.sleep(.005)'),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
 		#[Ig2_Sphere_Sphere_ScGeom()],	[Ip2_FrictMat_FrictMat_FrictPhys()], [Law2_ScGeom_FrictPhys_CundallStrack()] # ScGeom
-		[Ig2_Sphere_Sphere_L3Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True,noSlip=False)] # L3Geom
-		#[Ig2_Sphere_Sphere_L6Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)] # L6Geom
+		#[Ig2_Sphere_Sphere_L3Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True,noSlip=False)] # L3Geom
+		[Ig2_Sphere_Sphere_L6Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)] # L6Geom
 	),
-	#LawTester(ids=[0,1],path=[(0,0,0)]*7+[(-1e-5,0,0),(-1e-5,.1,.1)],rotPath=[(0,.2,0),(0,0,0),(0,0,.2),(0,0,0),(.2,0,0),(-.2,0,0),(0,0,0)],pathSteps=[10],doneHook='tester.dead=True; O.pause();',label='tester',rotWeight=0),
-	LawTester(ids=[0,1],path=[
-		(-1e-5,0,0),(-.1,0,0),(-.1,.1,0),(-1e-5,.1,0), # towards, shear, back to intial normal distance
-		(-.02,.1,.1),(-.02,-.1,.1),(-.02,-.1,-.1),(-.02,.1,-.1),(-.02,.1,.1), # go in square in the shear plane without changing normal deformation
-		(-1e-4,0,0) # back to the origin, but keep some overlap to not delete the interaction
-		],pathSteps=[100],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=.2,idWeight=.2),
-	PyRunner(iterPeriod=1,command='addPlotData()'),
+	LawTester(ids=[0,1],path=[(0,0,0)]*7+[(-1e-5,0,0),(-1e-5,.1,.1)],rotPath=[(0,.2,0),(0,0,0),(0,0,.2),(0,0,0),(.2,0,0),(-.2,0,0),(0,0,0)],pathSteps=[10],doneHook='tester.dead=True; O.pause();',label='tester',rotWeight=0),
+	#LawTester(ids=[0,1],path=[
+	#	(-1e-5,0,0),(-.1,0,0),(-.1,.1,0),(-1e-5,.1,0), # towards, shear, back to intial normal distance
+	#	(-.02,.1,.1),(-.02,-.1,.1),(-.02,-.1,-.1),(-.02,.1,-.1),(-.02,.1,.1), # go in square in the shear plane without changing normal deformation
+	#	(-1e-4,0,0) # back to the origin, but keep some overlap to not delete the interaction
+	#	],pathSteps=[100],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=.2,idWeight=.2),
 	NewtonIntegrator(),
 ]
 

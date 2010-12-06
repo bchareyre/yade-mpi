@@ -9,7 +9,7 @@
 	#include<GL/glu.h>
 #endif
 
-YADE_PLUGIN((L3Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Ig2_Wall_Sphere_L3Geom_Inc)(Ig2_Sphere_Sphere_L6Geom_Inc)(Law2_L3Geom_FrictPhys_ElPerfPl)(Law2_L6Geom_FrictPhys_Linear)
+YADE_PLUGIN((L3Geom)(L6Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Ig2_Wall_Sphere_L3Geom_Inc)(Ig2_Sphere_Sphere_L6Geom_Inc)(Law2_L3Geom_FrictPhys_ElPerfPl)(Law2_L6Geom_FrictPhys_Linear)
 	#ifdef YADE_OPENGL
 		(Gl1_L3Geom)
 	#endif
@@ -74,11 +74,12 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::genericGo(bool is6Dof, const shared_ptr<Shape
 		g.refR1=r1; g.refR2=r1;
 		g.normal=normal; const Vector3r& locX(g.normal);
 		// initial local y-axis orientation, in the xz or xy plane, depending on which component is larger to avoid singularities
-		Vector3r locY=g.normal.cross(g.normal[1]>g.normal[2]?Vector3r::UnitY():Vector3r::UnitZ());
-		Vector3r locZ=g.normal.cross(locY);
+		Vector3r locY=normal.cross(normal[1]<normal[2]?Vector3r::UnitY():Vector3r::UnitZ());
+		Vector3r locZ=normal.cross(locY);
 		g.trsf.row(0)=locX; g.trsf.row(1)=locY; g.trsf.row(2)=locZ;
 		g.u=Vector3r(uN,0,0); // zero shear displacement
 		// L6Geom::phi is initialized to Vector3r::Zero() automatically
+		//cerr<<"Init trsf=\n"<<g.trsf<<endl<<"locX="<<locX<<", locY="<<locY<<", locZ="<<locZ<<endl;
 		return true;
 	}
 	
@@ -141,7 +142,7 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::genericGo(bool is6Dof, const shared_ptr<Shape
 	// if requested via approxMask, just use prevTrsf
 
 	Quaternionr midTrsf=(approxMask|APPROX_NO_MID_TRSF) ? Quaternionr(prevTrsf) : Quaternionr(prevTrsf).slerp(.5,Quaternionr(currTrsf));
-	// cerr<<"prevTrsf=\n"<<prevTrsf<<", currTrsf=\n"<<currTrsf<<", midTrsf=\n"<<Matrix3r(midTrsf)<<endl;
+	//cerr<<"prevTrsf=\n"<<prevTrsf<<", currTrsf=\n"<<currTrsf<<", midTrsf=\n"<<Matrix3r(midTrsf)<<endl;
 	
 	// updates of geom here
 

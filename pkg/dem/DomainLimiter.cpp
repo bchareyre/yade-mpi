@@ -118,12 +118,16 @@ void LawTester::action(){
 		}
 		// update the transformation
 		// the matrix is orthonormal, since axX, axY are normalized and and axZ is their corss-product
-		trsf.col(0)=axX; trsf.col(1)=axY; trsf.col(2)=axZ;
+		trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
 	} else {
 		trsf=l3Geom->trsf;
 		axX=trsf.row(0); axY=trsf.row(1); axZ=trsf.row(2);
 		ptGeom=l3Geom->u;
-		if(l6Geom) rotGeom=l6Geom->phi;
+		if(l6Geom){
+			rotGeom=l6Geom->phi;
+			// perform allshearing by translation, as it does not induce bending
+			if(rotWeight!=0){ LOG_INFO("LawTester.rotWeight set to 0 (was"<<rotWeight<<"), since rotational DoFs are in use."); rotWeight=0; }
+		}
 	}
 	trsfQ=Quaternionr(trsf);
 	contPt=gsc->contactPoint;
@@ -187,8 +191,8 @@ void LawTester::action(){
 		// and the compensation is always in the -εx sense (-sign → +1 for #0, -1 for #1)
 		vel[i]+=-sign*axX*radius*((1-cos(arcAngleY))+(1-cos(arcAngleZ)))/scene->dt;
 
-		// rotation
-		angVel[i]+=trsf*ddPhi;
+		// rotation, convert from local to global
+		angVel[i]+=trsf.transpose()*ddPhi;
 
 		LOG_DEBUG("vel="<<vel[i]<<", angVel="<<angVel[i]<<", rotY,rotZ="<<rotY<<","<<rotZ<<", arcAngle="<<arcAngleY<<","<<arcAngleZ<<", sign="<<sign<<", weight="<<weight);
 
