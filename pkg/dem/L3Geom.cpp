@@ -162,13 +162,6 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::genericGo(bool is6Dof, const shared_ptr<Shape
 		// the difference is transformed to local coord using the midTrsf transformation
 		// perhaps not consistent when spheres have different radii (depends how bending moment is computed)
 		I->geom->cast<L6Geom>().phi+=midTrsf*(scene->dt*(state2.angVel-state1.angVel));
-		#if 0
-			Vector3r u2=state2.vel+state2.angVel.cross(c2x)
-			Vector3r u1=state1.vel+state1.angVel.cross(c1x);
-			Vector3r rigidRot=relPos.cross(state2.vel-state1.vel); // rigid rotation of the interaction
-			// symmetric part of the mutual rotation is bending
-			g->cast<L6Geom>().phi+=midTrsf*(scene->dt*(2*(u1+u2)/2.-rigidRot)/dist);
-		#endif
 	}
 	return true;
 };
@@ -255,11 +248,11 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 }
 
 void Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
-	L6Geom* geom=static_cast<L6Geom*>(ig.get()); FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
+	L6Geom& geom=ig->cast<L6Geom>(); FrictPhys& phys=ip->cast<FrictPhys>();
 
 	// simple linear relationships
-	Vector3r localF=geom->relU().cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
-	Vector3r localT=charLen*(geom->relPhi().cwise()*Vector3r(phys->kn,phys->ks,phys->ks));
+	Vector3r localF=geom.relU().cwise()*Vector3r(phys.kn,phys.ks,phys.ks);
+	Vector3r localT=charLen*(geom.relPhi().cwise()*Vector3r(phys.kn,phys.ks,phys.ks));
 
 	geom->applyLocalForceTorque(localF,localT,I,scene,phys);
 }

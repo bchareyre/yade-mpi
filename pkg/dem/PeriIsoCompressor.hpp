@@ -74,8 +74,6 @@ class PeriTriaxController: public BoundaryController{
 };
 REGISTER_SERIALIZABLE(PeriTriaxController);
 
-//my old version...
-#include<Eigen/SVD>
 class Peri3dController: public BoundaryController{
 	public:
 		Vector6r stressOld, stressGoal, strainGoal;

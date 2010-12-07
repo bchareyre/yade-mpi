@@ -1,6 +1,21 @@
 vim:syntax=changelog
 
-2009-04-20 Václav Šmilauer <eudoxos@arcig.cz> revision around bzr2150
+2010-12-01 Václav Šmilauer <eu@doxos.eu> revision around bzr bzr2540
+	
+	* RELEASE 0.6:
+		 - https://launchpad.net/yade/trunk/0.60
+
+	* major changes since 0.5:
+		- use boost::serialization (faster, more reliable), use eigen instead of Wm3 (better supported, more flexible)
+		- qt4-based interface with on-the-fly inspection and editing of all internal variables
+		-  support compilation with clang++
+		- live plots
+		- periodic boundary conditions are much better tested now
+		- batch web interface substantially enhanced (including plots, logs, ...)
+		- extended attribute flags (readonly, noSave, hidden, ...)
+		- added --rebuild, --debug and --test options
+
+2010-04-20 Václav Šmilauer <eudoxos@arcig.cz> revision around bzr2150
 
 	* RELEASE: 0.5
 		- https://launchpad.net/yade/+milestone/0.5
