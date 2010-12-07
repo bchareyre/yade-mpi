@@ -48,16 +48,6 @@ struct L3Geom: public GenericSpheresContact{
 };
 REGISTER_SERIALIZABLE(L3Geom);
 
-#ifdef YADE_OPENGL
-struct Gl1_L3Geom: public GlIGeomFunctor{
-	FUNCTOR1D(L3Geom);
-	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
-	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L3Geom,GlIGeomFunctor,"Render :yref:`L3Geom` geometry.",
-	);
-};
-REGISTER_SERIALIZABLE(Gl1_L3Geom);
-#endif
-
 struct L6Geom: public L3Geom{
 	virtual ~L6Geom();
 	Vector3r relPhi() const{ return phi-phi0; }
@@ -67,6 +57,28 @@ struct L6Geom: public L3Geom{
 	);
 };
 REGISTER_SERIALIZABLE(L6Geom);
+
+#ifdef YADE_OPENGL
+struct Gl1_L3Geom: public GlIGeomFunctor{
+	FUNCTOR1D(L3Geom);
+	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
+	void draw(const shared_ptr<IGeom>&, bool isL6Geom=false, const Real& phiScale=0);
+	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L3Geom,GlIGeomFunctor,"Render :yref:`L3Geom` geometry.",
+		((bool,axesLabels,true,,"Whether to display labels for local axes (x,y,z)"))
+		((Real,uScale,1.,,"Scale local displacements (:yref:`u<L3Geom.u>` - :yref:`u0<L3Geom.u0>`); 1 means the true scale, 0 disables drawing local displacements; negative values are permissible."))
+	);
+};
+REGISTER_SERIALIZABLE(Gl1_L3Geom);
+
+struct Gl1_L6Geom: public Gl1_L3Geom{
+	FUNCTOR1D(L6Geom);
+	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
+	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L6Geom,Gl1_L3Geom,"Render :yref:`L6Geom` geometry.",
+		((Real,phiScale,1.,,"Scale local rotations (:yref:`phi<L3Geom.phi>` - :yref:`phi0<L3Geom.phi0>`). The default scale is to draw $\\pi$ rotation with length equal to minimum radius."))
+	);
+};
+REGISTER_SERIALIZABLE(Gl1_L6Geom);
+#endif
 
 
 struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{

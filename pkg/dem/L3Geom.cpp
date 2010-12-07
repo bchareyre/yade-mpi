@@ -11,7 +11,7 @@
 
 YADE_PLUGIN((L3Geom)(L6Geom)(Ig2_Sphere_Sphere_L3Geom_Inc)(Ig2_Wall_Sphere_L3Geom_Inc)(Ig2_Sphere_Sphere_L6Geom_Inc)(Law2_L3Geom_FrictPhys_ElPerfPl)(Law2_L6Geom_FrictPhys_Linear)
 	#ifdef YADE_OPENGL
-		(Gl1_L3Geom)
+		(Gl1_L3Geom)(Gl1_L6Geom)
 	#endif
 );
 
@@ -265,8 +265,14 @@ void Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& 
 }
 
 #ifdef YADE_OPENGL
+bool Gl1_L3Geom::axesLabels;
+Real Gl1_L3Geom::uScale;
+Real Gl1_L6Geom::phiScale;
 
-void Gl1_L3Geom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool){
+void Gl1_L3Geom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool){ draw(ig); }
+void Gl1_L6Geom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool){ draw(ig,true,phiScale); }
+
+void Gl1_L3Geom::draw(const shared_ptr<IGeom>& ig, bool isL6Geom, const Real& phiScale){
 	const L3Geom& g(ig->cast<L3Geom>());
 	glTranslatev(g.contactPoint);
 	#if EIGEN_MAJOR_VERSION<30
@@ -274,15 +280,16 @@ void Gl1_L3Geom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&,
 	#else
  		glMultMatrixd(Eigen::Affine3d(g.trsf.transpose()).data());
 	#endif
-	Real rMin=min(g.refR1,g.refR2);
+	Real rMin=g.refR1<=0?g.refR2:(g.refR2<=0?g.refR1:min(g.refR1,g.refR2));
 	glLineWidth(2.);
 	for(int i=0; i<3; i++){
 		Vector3r pt=Vector3r::Zero(); pt[i]=.5*rMin; Vector3r color=.3*Vector3r::Ones(); color[i]=1;
 		GLUtils::GLDrawLine(Vector3r::Zero(),pt,color);
-		GLUtils::GLDrawText(string(i==0?"x":(i==1?"y":"z")),pt,color);
+		if(axesLabels) GLUtils::GLDrawText(string(i==0?"x":(i==1?"y":"z")),pt,color);
 	}
-	glLineWidth(8.);
-	GLUtils::GLDrawLine(Vector3r::Zero(),g.relU(),Vector3r(0,1,0));
+	glLineWidth(4.);
+	if(uScale!=0) GLUtils::GLDrawLine(Vector3r::Zero(),uScale*g.relU(),Vector3r(0,1,.5));
+	if(isL6Geom && phiScale>0) GLUtils::GLDrawLine(Vector3r::Zero(),ig->cast<L6Geom>().relPhi()/Mathr::PI*rMin*phiScale,Vector3r(.8,0,1));
 	glLineWidth(1.);
 };
 
