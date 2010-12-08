@@ -98,10 +98,12 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			
 			// limit rolling moment to the plastic value, if required
 			Real RollMax = currentContactPhysics->maxRollPl*currentContactPhysics->normalForce.norm();
-			if (RollMax>0.){ // apply plasticity
+			if (RollMax>0.){ // do we want to apply plasticity?
 				Real scalarRoll = currentContactPhysics->moment_bending.norm();		
-				Real ratio = RollMax/scalarRoll;
-				currentContactPhysics->moment_bending *= ratio;		
+				if (scalarRoll>RollMax){ // fix maximum rolling moment
+					Real ratio = RollMax/scalarRoll;
+					currentContactPhysics->moment_bending *= ratio;		
+				}	
 			}
 			
 			Vector3r moment = currentContactPhysics->moment_twist + currentContactPhysics->moment_bending;
