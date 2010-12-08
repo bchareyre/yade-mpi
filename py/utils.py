@@ -731,7 +731,7 @@ if __name__=="__main__":
 def runningInBatch():
 	'Tell whether we are running inside the batch or separately.'
 	import os
-	return os.environ.has_key('PARAM_TABLE')
+	return 'YADE_BATCH' in os.environ
 
 def waitIfBatch():
 	'Block the simulation if running inside a batch. Typically used at the end of script so that it does not finish prematurely in batch mode (the execution would be ended in such a case).'
@@ -778,11 +778,11 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	# dictParams is what eventually ends up in yade.params.table (default+specified values)
 	dictDefaults,dictParams,dictAssign={},{},{}
 	import os, __builtin__,re,math
-	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
-		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
+	if not tableFileLine and ('YADE_BATCH' not in os.environ or os.environ['YADE_BATCH']==''):
+		if not noTableOk: raise EnvironmentError("YADE_BATCH is not defined in the environment")
 		O.tags['line']='l!'
 	else:
-		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
+		if not tableFileLine: tableFileLine=os.environ['YADE_BATCH']
 		env=tableFileLine.split(':')
 		tableFile,tableLine=env[0],int(env[1])
 		allTab=TableParamReader(tableFile).paramDict()

@@ -123,7 +123,9 @@ def globalHtmlStats():
 		lastFinished=max([j.finished for j in jobs])
 		# FIXME: do not report sum of runnign time of all jobs, only the real timespan
 		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s.</p>'%('red' if failed else 'lime',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
-	ret+='<p>Pid %d</p>'%(os.getpid())
+	ret+='<p>Pid %d'%(os.getpid())
+	if opts.globalLog: ret+=', log <a href="/log">%s</a>'%(opts.globalLog)
+	ret+='</p>'
 	allCores,busyCores=set(range(0,maxJobs)),set().union(*(j.cores for j in jobs if j.status=='RUNNING'))
 	ret+='<p>%d cores available, %d used + %d free.</p>'%(maxJobs,nUsedCores,maxJobs-nUsedCores)
 	# show busy and free cores; gives nonsense if not all jobs have CPU affinity set
@@ -145,6 +147,9 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 					import base64
 					self.__class__.favicon=base64.b64decode(yade.remote.b64favicon)
 				self.sendHttp(self.__class__.favicon,contentType='image/vnd.microsoft.icon')
+				return
+			elif self.path=='/log' and opts.globalLog:
+				self.sendTextFile(opts.globalLog,refresh=5)
 				return
 			jobMatch=re.match('/jobs/([0-9]+)/(.*)',self.path)
 			if not jobMatch:
@@ -172,6 +177,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 			elif rest=='script':
 				self.sendPygmentizedFile(job.script,linenostep=5)
 			elif rest=='table':
+				if not job.table: return
 				self.sendPygmentizedFile(job.table,hl_lines=[job.lineNo],linenostep=1)
 			else: self.send_error(404,self.path)
 		return
@@ -186,7 +192,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 	def sendTextFile(self,fileName,**headers):
 		if not os.path.exists(fileName): self.send_error(404); return
 		import codecs
-		f=codecs.open(f,encoding='utf-8')
+		f=codecs.open(fileName,encoding='utf-8')
 		self.sendHttp(f.read(),contentType='text/plain;charset=utf-8;',**headers)
 	def sendFile(self,fileName,contentType,**headers):
 		if not os.path.exists(fileName): self.send_error(404); return
@@ -291,9 +297,9 @@ def getNumCores():
 numCores=getNumCores()
 maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
 
-parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.')
+parser=optparse.OptionParser(usage='%prog [options] [TABLE] SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
-parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to allocate all available cores (%d) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=maxOmpThreads)
+parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to allocate all available cores (%d, which might be further limited with --jobs) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=-1)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see -j), even if !THREADS colums specifies more.')
 parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
 parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
@@ -328,36 +334,45 @@ if globalLog:
 	sys.stderr=open(globalLog,"w")
 	sys.stdout=sys.stderr
 
-if len(args)!=2:
-	#print "Exactly two non-option arguments must be specified -- parameter table and script to be run.\n"
+if len(args) not in (1,2):
 	parser.print_help()
 	sys.exit(1)
-table,simul=args[0:2]
+elif len(args)==2:
+	table,simul=args[0:2]
+else:
+	assert(len(args)==1);
+	table=None; simul=args[0]
+
 if not logFormat: logFormat=(simul[:-3] if simul[-3:]=='.py' else simul)+".@.log"
 if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log string must contain at least one of `%', `@'")
 
 print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', using max %d cores."%(executable,simul,nice,logFormat,maxJobs)
 
-reader=yade.utils.TableParamReader(table)
-params=reader.paramDict()
-availableLines=params.keys()
+if table:
+	reader=yade.utils.TableParamReader(table)
+	params=reader.paramDict()
+	availableLines=params.keys()
 
-print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
+	print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
 
-if lineList:
-	useLines=[]
-	def numRange2List(s):
-		ret=[]
-		for l in s.split(','):
-			if "-" in l: ret+=range(*[int(s) for s in l.split('-')]); ret+=[ret[-1]+1]
-			else: ret+=[int(l)]
-		return ret
-	useLines0=numRange2List(lineList)
-	for l in useLines0:
-		if l not in availableLines: logging.warn('Skipping unavailable line %d that was requested from the command line.'%l)
-		else: useLines+=[l]
-else: useLines=availableLines
-print "Will use lines ",', '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.'
+	if lineList:
+		useLines=[]
+		def numRange2List(s):
+			ret=[]
+			for l in s.split(','):
+				if "-" in l: ret+=range(*[int(s) for s in l.split('-')]); ret+=[ret[-1]+1]
+				else: ret+=[int(l)]
+			return ret
+		useLines0=numRange2List(lineList)
+		for l in useLines0:
+			if l not in availableLines: logging.warn('Skipping unavailable line %d that was requested from the command line.'%l)
+			else: useLines+=[l]
+	else: useLines=availableLines
+	print "Will use lines ",', '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.'
+else:
+	print "Running stand-alone simulation in batch mode."
+	useLines=[-1]
+	params={-1:{'description':'default'}}
 
 jobs=[]
 executables=set()
@@ -365,7 +380,7 @@ for i,l in enumerate(useLines):
 	logFile=logFormat.replace('%',str(l))
 	logFile=logFile.replace('@',params[l]['description'])
 	envVars=[]
-	nCores=opts.defaultThreads
+	nCores=opts.defaultThreads if opts.defaultThreads>0 else opts.maxJobs
 	jobExecutable=executable
 	jobAffinity=opts.affinity
 	jobDebug=opts.debug
@@ -392,7 +407,9 @@ for i,l in enumerate(useLines):
 	for j in range(0,opts.timing if opts.timing>0 else 1):
 		jobNum=len(jobs)
 		logFileNumbered=logFile+('.%d'%j if opts.timing>0 else '')
-		env='PARAM_TABLE=<a href="jobs/%d/table">%s:%d</a> DISPLAY= %s '%(jobNum,table,l,' '.join(envVars))
+		env='YADE_BATCH='
+		if table: env='<a href="jobs/%d/table">%s:%d</a>'%(jobNum,table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
+		env+=' DISPLAY= %s '%(' '.join(envVars))
 		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,' --debug' if jobDebug else '','--nice=%s'%nice if nice!=None else '',i,simul)
 		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFileNumbered))
 		hrefCmd=env+cmd+log

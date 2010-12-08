@@ -189,6 +189,5 @@ def addPlotData():
 	yade.plot.addData(t=O.time,i=O.iter,eps=strainer.strain[axis],eps_=strainer.strain[axis],sigma=strainer.stress[axis]+isoPrestress,eps1=strainer.strain[ax1],eps2=strainer.strain[ax2],sig1=strainer.stress[ax1],sig2=strainer.stress[ax2],relResid=updater.avgRelResidual)
 
 initTest()
-# sleep forever if run by yade-multi, exit is called from stopIfDamaged
-if os.environ.has_key('PARAM_TABLE'): time.sleep(1e12)
+utils.waitIfBatch()
 

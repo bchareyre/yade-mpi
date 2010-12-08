@@ -199,8 +199,8 @@ def createPlots(subPlots=False):
 			pylab.twinx()
 			for d in plots_p_y2:
 				line,=pylab.plot(data[pStrip],data[d[0]],d[1])
-				scatterPt=([0],[0]) if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
-				scatter=pylab.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
+				scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
+				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
 				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 			# legend
 			l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')

@@ -179,10 +179,6 @@ def addPlotData():
 		})
 plot.plot()
 O.run()
+initTest()
 utils.waitIfBatch()
-#initTest()
-# sleep forever if run by yade-multi, exit is called from stopIfDamaged
-#if os.environ.has_key('PARAM_TABLE'): time.sleep(1e12)
-
-
 
