@@ -43,10 +43,9 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			Real fb 	= sdec2->frictionAngle;
 			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 
-			// harmonic average of alphas and etaRoll parameters
+			// harmonic average of alphas parameters
 			Real AlphaKr = 2.0*sdec1->alphaKr*sdec2->alphaKr/(sdec1->alphaKr+sdec2->alphaKr);
 			Real AlphaKtw = 2.0*sdec1->alphaKtw*sdec2->alphaKtw/(sdec1->alphaKtw+sdec2->alphaKtw);
-			Real EtaRoll = 2.0*sdec1->etaRoll*sdec2->etaRoll/(sdec1->etaRoll+sdec2->etaRoll);
 
 			Real Ks;
 			if (Va && Vb) Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
@@ -71,7 +70,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
 
-			contactPhysics->maxRollPl = EtaRoll*min(Da,Db);
+			contactPhysics->maxRollPl = min(sdec1->etaRoll*Da,sdec2->etaRoll*Db);
 			contactPhysics->momentRotationLaw=(sdec1->momentRotationLaw && sdec2->momentRotationLaw);
 			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 		}
