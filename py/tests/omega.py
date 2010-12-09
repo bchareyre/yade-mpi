@@ -99,8 +99,8 @@ class TestIO(unittest.TestCase):
 			O.reset()
 			try:
 				O.miscParams=[eval(c)()]
-				O.saveTmp()
-				O.loadTmp()
+				O.saveTmp(quiet=True)
+				O.loadTmp(quiet=True)
 			except (RuntimeError,ValueError):
 				failed.add(c)
 		failed=list(failed); failed.sort()

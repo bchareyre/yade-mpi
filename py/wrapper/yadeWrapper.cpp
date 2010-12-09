@@ -55,6 +55,7 @@
 
 using namespace boost;
 using namespace std;
+namespace py = boost::python;
 
 #include<yade/lib/serialization/ObjectIO.hpp>
 
@@ -368,16 +369,15 @@ class pyOmega{
 	}
 	bool isRunning(){ return OMEGA.isRunning(); }
 	python::object get_filename(){ string f=OMEGA.sceneFile; if(f.size()>0) return python::object(f); return python::object();}
-	void load(std::string fileName) {
+	void load(std::string fileName,bool quiet=false) {
 		Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; 
-		OMEGA.loadSimulation(fileName);
+		OMEGA.loadSimulation(fileName,quiet);
 		OMEGA.createSimulationLoop();
 		mapLabeledEntitiesToVariables();
-		LOG_DEBUG("LOAD!");
 	}
 	void reload(){	load(OMEGA.sceneFile);}
-	void saveTmp(string mark=""){ save(":memory:"+mark);}
-	void loadTmp(string mark=""){ load(":memory:"+mark);}
+	void saveTmp(string mark="", bool quiet=false){ save(":memory:"+mark,quiet);}
+	void loadTmp(string mark="", bool quiet=false){ load(":memory:"+mark,quiet);}
 	python::list lsTmp(){ python::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
 	void tmpToFile(string mark, string filename){
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
@@ -399,11 +399,10 @@ class pyOmega{
 	void switchScene(){ std::swap(OMEGA.scene,OMEGA.sceneAnother); }
 	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
 
-	void save(std::string fileName){
+	void save(std::string fileName,bool quiet=false){
 		assertScene();
-		OMEGA.saveSimulation(fileName);
+		OMEGA.saveSimulation(fileName,quiet);
 		// OMEGA.sceneFile=fileName; // done in Omega::saveSimulation;
-		LOG_DEBUG("SAVE!");
 	}
 	
 	python::list miscParams_get(){
@@ -531,11 +530,11 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\n* assigning negative value enables dynamic Δt (by looking for a :yref:`TimeStepper` in :yref:`O.engine<Omega.engines>`) and sets positive timestep ``O.dt=|Δt|`` (will be used until the timestepper is run and updates it)\n* assigning positive value sets Δt to that value and disables dynamic Δt (via :yref:`TimeStepper`, if there is one).\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
 		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
 		.add_property("dynDtAvailable",&pyOmega::dynDtAvailable_get,"Whether a :yref:`TimeStepper` is amongst :yref:`O.engines<Omega.engines>`, activated or not.")
-		.def("load",&pyOmega::load,"Load simulation from file.")
+		.def("load",&pyOmega::load,(py::arg("file"),py::arg("quiet")=false),"Load simulation from file.")
 		.def("reload",&pyOmega::reload,"Reload current simulation")
-		.def("save",&pyOmega::save,"Save current simulation to file (should be .xml or .xml.bz2)")
-		.def("loadTmp",&pyOmega::loadTmp,(python::args("mark")=""),"Load simulation previously stored in memory by saveTmp. *mark* optionally distinguishes multiple saved simulations")
-		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
+		.def("save",&pyOmega::save,(py::arg("file"),py::arg("quiet")=false),"Save current simulation to file (should be .xml or .xml.bz2)")
+		.def("loadTmp",&pyOmega::loadTmp,(py::arg("mark")="",py::arg("quiet")=false),"Load simulation previously stored in memory by saveTmp. *mark* optionally distinguishes multiple saved simulations")
+		.def("saveTmp",&pyOmega::saveTmp,(py::arg("mark")="",py::arg("quiet")=false),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
 		.def("lsTmp",&pyOmega::lsTmp,"Return list of all memory-saved simulations.")
 		.def("tmpToFile",&pyOmega::tmpToFile,(python::arg("fileName"),python::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
 		.def("tmpToString",&pyOmega::tmpToString,(python::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")

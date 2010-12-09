@@ -104,6 +104,10 @@ static Real Vector2r_dot(const Vector2r& self, const Vector2r& v){ return self.d
 static Real Vector2i_dot(const Vector2i& self, const Vector2i& v){ return self.dot(v); }
 static Vector3r Vector3r_cross(const Vector3r& self, const Vector3r& v){ return self.cross(v); }
 static Vector3i Vector3i_cross(const Vector3i& self, const Vector3i& v){ return self.cross(v); }
+static Vector3r Vector6r_head(const Vector6r& self){ return self.start<3>(); }
+static Vector3r Vector6r_tail(const Vector6r& self){ return self.end<3>(); }
+static Vector3i Vector6i_head(const Vector6i& self){ return self.start<3>(); }
+static Vector3i Vector6i_tail(const Vector6i& self){ return self.end<3>(); }
 static bool Quaternionr__eq__(const Quaternionr& q1, const Quaternionr& q2){ return q1==q2; }
 static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ return q1!=q2; }
 #include<Eigen/SVD>
@@ -262,6 +266,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		// methods
 		//.def("dot",&Vector6r_dot).def("cross",&Vector6r_cross)
 		.def("norm",&Vector6r::norm).def("squaredNorm",&Vector6r::squaredNorm).def("normalize",&Vector6r::normalize).def("normalized",&Vector6r::normalized)
+		.def("head",&Vector6r_head).def("tail",&Vector6r_tail)
 		// operators
 		.def("__neg__",&Vector6r__neg__) // -v
 		.def("__add__",&Vector6r__add__Vector6r).def("__iadd__",&Vector6r__iadd__Vector6r) // +, +=
@@ -289,6 +294,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		// methods
 		//.def("dot",&Vector6i_dot).def("cross",&Vector6i_cross)
 		.def("norm",&Vector6i::norm).def("squaredNorm",&Vector6i::squaredNorm).def("normalize",&Vector6i::normalize).def("normalized",&Vector6i::normalized)
+		.def("head",&Vector6i_head).def("tail",&Vector6i_tail)
 		// operators
 		.def("__neg__",&Vector6i__neg__) // -v
 		.def("__add__",&Vector6i__add__Vector6i).def("__iadd__",&Vector6i__iadd__Vector6i) // +, +=

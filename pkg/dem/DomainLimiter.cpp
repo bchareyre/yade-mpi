@@ -32,15 +32,17 @@ CREATE_LOGGER(LawTester);
 void LawTester::postLoad(LawTester&){
 	if(ids.size()==0) return; // uninitialized object, don't do nothing at all
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
-	if(path.empty() && rotPath.empty()) throw invalid_argument("LawTester.{path,rotPath}: at least one point must be given.");
+	if(disPath.empty() && rotPath.empty()) throw invalid_argument("LawTester.{disPath,rotPath}: at least one point must be given.");
 	if(pathSteps.empty()) throw invalid_argument("LawTester.pathSteps: at least one value must be given.");
-	size_t pathSize=max(path.size(),rotPath.size());
+	size_t pathSize=max(disPath.size(),rotPath.size());
 	// update path points
-	_pathU.clear(); _pathU.push_back(Vector3r::Zero());
-	_pathR.clear(); _pathR.push_back(Vector3r::Zero());
+	_path.clear(); _path.push_back(Vector6r::Zero());
 	for(size_t i=0; i<pathSize; i++) {
-		_pathU.push_back(i<path.size()?path[i]:(path.empty()?Vector3r::Zero():*(path.rbegin())));
-		_pathR.push_back(i<rotPath.size()?rotPath[i]:(rotPath.empty()?Vector3r::Zero():*(rotPath.rbegin())));
+		Vector6r pt;
+		pt.start<3>()=Vector3r(i<disPath.size()?disPath[i]:(disPath.empty()?Vector3r::Zero():*(disPath.rbegin())));
+		pt.end<3>()=Vector3r(i<rotPath.size()?rotPath[i]:(rotPath.empty()?Vector3r::Zero():*(rotPath.rbegin())));
+		_path.push_back(pt);
+
 	}
 	// update time points from distances, repeat last distance if shorter than path
 	_pathT.clear(); _pathT.push_back(0);
@@ -94,7 +96,8 @@ void LawTester::action(){
 		return;
 	}
 	/* initialize or update local axes and trsf */
-	rotGeom=Vector3r(NaN,NaN,NaN); // this is meaningful only with l6geom
+	//DEL rotGeom=Vector3r(NaN,NaN,NaN); // this is meaningful only with l6geom
+	uGeom.end<3>()=Vector3r(NaN,NaN,NaN);
 	if(!l3Geom){
 		axX=gsc->normal; /* just in case */ axX.normalize();
 		if(doInit){ // initialization of the new interaction
@@ -108,7 +111,8 @@ void LawTester::action(){
 				scGeom->rotate(axY); scGeom->rotate(axZ);
 				scGeom->rotate(shearTot);
 				shearTot+=scGeom->shearIncrement();
-				ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
+				//DEL ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ)); 
+				uGeom.start<3>()=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
 			}
 			else{ // d3dGeom
 				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
@@ -122,30 +126,33 @@ void LawTester::action(){
 	} else {
 		trsf=l3Geom->trsf;
 		axX=trsf.row(0); axY=trsf.row(1); axZ=trsf.row(2);
-		ptGeom=l3Geom->u;
+		//DEL ptGeom=l3Geom->u;
+		uGeom.start<3>()=l3Geom->u;
 		if(l6Geom){
-			rotGeom=l6Geom->phi;
+			//rotGeom=l6Geom->phi;
+			uGeom.end<3>()=l6Geom->phi;
 			// perform allshearing by translation, as it does not induce bending
 			if(rotWeight!=0){ LOG_INFO("LawTester.rotWeight set to 0 (was"<<rotWeight<<"), since rotational DoFs are in use."); rotWeight=0; }
 		}
 	}
-	trsfQ=Quaternionr(trsf);
 	contPt=gsc->contactPoint;
 	refLength=gsc->refR1+gsc->refR2;
 	renderLength=.5*refLength;
 	
 	// here we go ahead, finally
-	Vector3r u=linearInterpolate<Vector3r,int>(step,_pathT,_pathU,_interpPos);
-	Vector3r phi=linearInterpolate<Vector3r,int>(step,_pathT,_pathR,_interpPosRot);
-	Vector3r dU=u-uPrev; uPrev=u;
-	Vector3r dPhi=phi-phiPrev; phiPrev=phi;
+	Vector6r uu=linearInterpolate<Vector6r,int>(step,_pathT,_path,_interpPos);
+	Vector6r dUU=uu-uuPrev; uuPrev=uu;
+	Vector3r dU(dUU.start<3>()), dPhi(dUU.end<3>());
+	//Vector3r dU=u-uPrev.start<3>(); uPrev.start<3>()=u;
+	//Vector3r dPhi=phi-uPrev.end<3>(); uPrev.end<3>()=phi;
 	if(displIsRel){
 		LOG_DEBUG("Relative displacement diff is "<<dU<<" (will be normalized by "<<gsc->refR1+gsc->refR2<<")");
 		dU*=refLength;
 	}
 	LOG_DEBUG("Absolute diff is: displacement "<<dU<<", rotation "<<dPhi);
-	ptOurs+=dU;
-	rotOurs+=dPhi;
+	//DEL ptOurs+=dU; rotOurs+=dPhi;
+	uTest=uTestNext; // the value that was next in the previous step is the current one now
+	uTestNext.start<3>()+=dU; uTestNext.end<3>()+=dPhi;
 
 	// reset velocities where displacement is controlled
 	//for(int i=0; i<3; i++){ if(forceControl[i]==0){ state1.vel[i]=0; state2.vel[i]=0; }
@@ -156,13 +163,13 @@ void LawTester::action(){
 	for(int i=0; i<2; i++){
 		int sign=(i==0?-1:1);
 		Real weight=(i==0?1-idWeight:idWeight);
-		// FIXME: this should not use refR1, but real CP-particle distance!
+		// FIXME: this should not use refR1, but real CP-particle distance perhaps?
 		Real radius=(i==0?gsc->refR1:gsc->refR2);
 		Real relRad=radius/refLength;
 		// signed and weighted displacement/rotation to be applied on this sphere (reversed for #0)
 		// some rotations must cancel the sign, by multiplying by sign again
 		Vector3r ddU=sign*dU*weight;
-		Vector3r ddPhi=sign*dPhi*(1-relRad); /* angles must distribute to both, otherwise it would induce shear; FIXME: combination of shear and bending must make sure they are properly orthogonal! (rotWeight=?) */
+		Vector3r ddPhi=sign*dPhi*(1-relRad); /* angles must distribute to both, otherwise it would induce shear; combination of shear and bending must make sure they are properly orthogonal!  */
 		vel[i]=angVel[i]=Vector3r::Zero();
 
 		// normal displacement
@@ -254,10 +261,10 @@ void GlExtra_LawTester::render(){
 	}
 
 	// put the origin to the initial (no-shear) point, so that the current point appears at the contact point
-	glTranslatev(Vector3r(0,tester->ptOurs[1],tester->ptOurs[2]));
+	glTranslatev(Vector3r(0,tester->uTestNext[1],tester->uTestNext[2]));
 
 
-	const int t(tester->step); const vector<int>& TT(tester->_pathT); const vector<Vector3r>& VV(tester->_pathU);
+	const int t(tester->step); const vector<int>& TT(tester->_pathT); const vector<Vector6r>& VV(tester->_path);
 	size_t numSegments=TT.size();
 	const Vector3r colorBefore=Vector3r(.7,1,.7), colorAfter=Vector3r(1,.7,.7);
 
@@ -267,19 +274,19 @@ void GlExtra_LawTester::render(){
 
 	// find maximum displacement, draw axes in the shear plane
 	Real displMax=0;
-	FOREACH(const Vector3r& v, VV) displMax=max(v.squaredNorm(),displMax);
+	FOREACH(const Vector6r& v, VV) displMax=max(v.start<3>().squaredNorm(),displMax);
 	displMax=1.2*scale*sqrt(displMax);
 
 	glLineWidth(1.);
 	GLUtils::GLDrawLine(Vector3r(0,-displMax,0),Vector3r(0,displMax,0),Vector3r(.5,0,0));
 	GLUtils::GLDrawLine(Vector3r(0,0,-displMax),Vector3r(0,0,displMax),Vector3r(.5,0,0));
 
-	// draw path
+	// draw displacement path
 	glLineWidth(4.);
 	for(size_t segment=0; segment<numSegments-1; segment++){
 		// different colors before and after the current point
 		Real t0=TT[segment],t1=TT[segment+1];
-		const Vector3r &from=-VV[segment]*scale, &to=-VV[segment+1]*scale;
+		const Vector3r &from=-VV[segment].start<3>()*scale, &to=-VV[segment+1].start<3>()*scale;
 		// current segment
 		if(t>t0 && t<t1){
 			Real norm=(t-t0)/(t1-t0);

@@ -214,12 +214,12 @@ void Omega::loadPlugins(vector<string> pluginFiles){
 	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
 }
 
-void Omega::loadSimulation(const string& f){
+void Omega::loadSimulation(const string& f, bool quiet){
 	bool isMem=algorithm::starts_with(f,":memory:");
 	if(!isMem && !filesystem::exists(f)) throw runtime_error("Simulation file to load doesn't exist: "+f);
 	if(isMem && memSavedSimulations.count(f)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+f);
 	
-	LOG_INFO("Loading file "+f);
+	if(!quiet) LOG_INFO("Loading file "+f);
 	{
 		stop(); // stop current simulation if running
 		resetScene();
@@ -234,16 +234,16 @@ void Omega::loadSimulation(const string& f){
 	if(scene->getClassName()!="Scene") throw logic_error("Wrong file format (scene is not a Scene!?) in "+f);
 	sceneFile=f;
 	timeInit();
-	LOG_DEBUG("Simulation loaded");
+	if(!quiet) LOG_DEBUG("Simulation loaded");
 }
 
 
 
-void Omega::saveSimulation(const string& f){
+void Omega::saveSimulation(const string& f, bool quiet){
 	if(f.size()==0) throw runtime_error("f of file to save has zero length.");
-	LOG_INFO("Saving file " << f);
+	if(!quiet) LOG_INFO("Saving file " << f);
 	if(algorithm::starts_with(f,":memory:")){
-		if(memSavedSimulations.count(f)>0) LOG_INFO("Overwriting in-memory saved simulation "<<f);
+		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
 		ostringstream oss;
 		yade::ObjectIO::save<typeof(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
 		memSavedSimulations[f]=oss.str();

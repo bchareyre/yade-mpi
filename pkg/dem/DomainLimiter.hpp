@@ -19,41 +19,45 @@ class LawTester: public PartialEngine{
 		void init();
 		virtual void action();
 		void postLoad(LawTester&);
+		void warnDeprec(const string& s1, const string& s2){ if(!warnedDeprecPtRot){ warnedDeprecPtRot=true; LOG_WARN("LawTester."<<s1<<" is deprecated, use LawTester."<<s2<<" instead.");} }
+		Vector3r get_ptOurs(){ warnDeprec("ptOurs","uTest.head()"); return uTest.start<3>(); } Vector3r get_ptGeom(){ warnDeprec("ptGeom","uGeom.head()"); return uGeom.start<3>(); }
+		Vector3r get_rotOurs(){ warnDeprec("rotOurs","uTest.tail()"); return uTest.end<3>(); }  Vector3r get_rotGeom(){ warnDeprec("rotGeom","uGeom.tail()"); return uGeom.end<3>(); }
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of normal and shear displacements. See :ysrc:`scripts/test/law-test.py`. ",
-		((vector<Vector3r>,path,,Attr::triggerPostLoad,"Loading path, where each Vector3 contains desired normal displacement and two components of the shear displacement (in local coordinate system, which is being tracked automatically. If shorter than :yref:`rotPath<LawTester.rotPath>`, the last value is repeated."))
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of local normal and shear displacements and rotations (using either :yref:`disPpath<LawTester.disPath>` and :yref:`rotPath<LawTester.rotPath>` [or :yref:`path<LawTester.path>` in the future]). Supported :yref:`IGeom` types are :yref:`ScGeom`, :yref:`L3Geom` and :yref:`L6Geom`. \n\nSee :ysrc:`scripts/test/law-test.py` for an example.",
+		((vector<Vector3r>,disPath,,Attr::triggerPostLoad,"Loading path, where each Vector3 contains desired normal displacement and two components of the shear displacement (in local coordinate system, which is being tracked automatically. If shorter than :yref:`rotPath<LawTester.rotPath>`, the last value is repeated."))
 		((vector<Vector3r>,rotPath,,Attr::triggerPostLoad,"Rotational components of the loading path, where each item contains torsion and two bending rotations in local coordinates. If shorter than :yref:`path<LawTester.path>`, the last value is repeated."))
 		((vector<string>,hooks,,,"Python commands to be run when the corresponding point in path is reached, before doing other things in that particular step. See also :yref:`doneHook<LawTester.doneHook>`. "))
-		((Vector3r,ptOurs,Vector3r::Zero(),,"Current displacement, computed by ourselves from applied increments; should correspond to ptGeom."))
-		((Vector3r,ptGeom,Vector3r::Zero(),,"Current displacement, as computed by the geometry functor"))
-		((Vector3r,shearTot,Vector3r::Zero(),,"Current displacement in global coordinates."))
-		((Vector3r,rotOurs,Vector3r::Zero(),,"Current rotation, computed by ourselves from applied increments; should correspond to rotGeom."))
-		((Vector3r,rotGeom,Vector3r::Zero(),,"Current rotation, as computed by the geometry functor"))
-		((Vector3r,rotTot,Vector3r::Zero(),,"Current rotation in global coordinates."))
-		((bool,displIsRel,true,,"Whether displacement values in *path* are normalized by reference contact length (r1+r2 for 2 spheres)."))
+		((Vector6r,uGeom,Vector6r::Zero(),,"Current generalized displacements (3 displacements, 3 rotations), as stored in the interation itself. They should corredpond to :yref:`uTest<LawTester.uTest>`, otherwise a bug is indicated."))
+		((Vector6r,uTest,Vector6r::Zero(),,"Current generalized displacements (3 displacements, 3 rotations), as they should be according to this :yref:`LawTester`. Should correspond to :yref:`uGeom<LawTester.uGeom>`."))
+		((Vector6r,uTestNext,Vector6r::Zero(),Attr::hidden,"The value of uTest in the next step; since uTest is computed before uGeom is updated (in the next time step), uTest and uGeom would be always shifted by one timestep."))
+		((bool,warnedDeprecPtRot,false,Attr::hidden,"Flag to say that the user was already warned about using deprecated ptOurg/ptGeom/rotOurs/rotGeom."))
+		((Vector3r,shearTot,Vector3r::Zero(),Attr::hidden,"Current displacement in global coordinates; only used internally with ScGeom."))
+		((bool,displIsRel,true,,"Whether displacement values in *disPath* are normalized by reference contact length (r1+r2 for 2 spheres)."))
 		((Vector3i,forceControl,Vector3i::Zero(),,"Select which components of path (non-zero value) have force (stress) rather than displacement (strain) meaning."))
 		((vector<int>,pathSteps,((void)"(constant step)",vector<int>(1,1)),Attr::triggerPostLoad,"Step number for corresponding values in :yref:`path<LawTester.path>`; if shorter than path, distance between last 2 values is used for the rest."))
 		((vector<int>,_pathT,,(Attr::readonly|Attr::noSave),"Time value corresponding to points on path, computed from *pathSteps*. Length is always the same as path."))
-		((vector<Vector3r>,_pathU,,(Attr::readonly|Attr::noSave),"Displacement path values, computed from *path* by appending zero initial value (and possibly repeating the last value to match the length of rotation path."))
-		((vector<Vector3r>,_pathR,,(Attr::readonly|Attr::noSave),"Rotation path values, computed from *path* by appending zero initial value (and possibly repeating the last value to match the length of displacement path)."))
+		((vector<Vector6r>,_path,,(Attr::readonly|Attr::noSave),"Generalized displacement path values, computed from *disPath* and *rotPath* by appending zero initial value, and possibly repeating the last value to make lengths of *disPath* and *rotPath* match."))
 		((shared_ptr<Interaction>,I,,(Attr::hidden),"Interaction object being tracked."))
-		((Vector3r,axX,,,"Local x-axis in global coordinates (normal of the contact) |yupdate|"))
-		((Vector3r,axY,,,"Local y-axis in global coordinates; perpendicular to axX; initialized arbitrarily, but tracked to be consistent. |yupdate|"))
-		((Vector3r,axZ,,Attr::noSave,"Local z-axis in global coordinates; computed from axX and axY. |yupdate|"))
-		((Matrix3r,trsf,,Attr::noSave,"Transformation matrix for the local coordinate system. |yupdate|"))
-		((size_t,_interpPos,0,(Attr::readonly|Attr::hidden),"State cookie for the interpolation routine (displacements)."))
-		((size_t,_interpPosRot,0,(Attr::readonly|Attr::hidden),"State cookie for the interpolation routine (rotations)."))
-		((Vector3r,uPrev,Vector3r::Zero(),(Attr::readonly),"Displacement value reached in the previous step."))
-		((Vector3r,phiPrev,Vector3r::Zero(),(Attr::readonly),"Rotation value reached in the previous step."))
-		((Quaternionr,trsfQ,,Attr::noSave,"Transformation quaterion for the local coordinate system. |yupdate|"))
+
+		// axX, axY, axZ could be replaced by references to rows in trsf; perhaps do that in the future (in such a case, trsf would not be noSave)
+		((Vector3r,axX,,Attr::hidden,"Local x-axis in global coordinates (normal of the contact) |yupdate|"))
+		((Vector3r,axY,,Attr::hidden,"Local y-axis in global coordinates; perpendicular to axX; initialized arbitrarily, but tracked to be consistent. |yupdate|"))
+		((Vector3r,axZ,,(Attr::hidden|Attr::noSave),"Local z-axis in global coordinates; computed from axX and axY. |yupdate|"))
+		((Matrix3r,trsf,,(Attr::noSave|Attr::readonly),"Transformation matrix for the local coordinate system. |yupdate|"))
+		((size_t,_interpPos,0,(Attr::readonly|Attr::hidden),"State cookie for the interpolation routine."))
+		((Vector6r,uuPrev,Vector6r::Zero(),(Attr::readonly),"Generalized displacement values reached in the previous step, for knowing which increment to apply in the current step."))
 		((int,step,0,,"Step number in which this engine is active; determines position in path, using pathSteps."))
 		((string,doneHook,,,"Python command (as string) to run when end of the path is achieved. If empty, the engine will be set :yref:`dead<Engine.dead>`."))
 		((Real,renderLength,0,,"Characteristic length for the purposes of rendering, set equal to the smaller radius."))
 		((Real,refLength,0,(Attr::readonly),"Reference contact length, for rendering only."))
-		((Vector3r,contPt,Vector3r::Zero(),,"Contact point (for rendering only)"))
+		((Vector3r,contPt,Vector3r::Zero(),Attr::hidden,"Contact point (for rendering only)"))
 		((Real,idWeight,1,,"Float ∈〈0,1〉 determining on which particle are displacements applied (0 for id1, 1 for id2); intermediate values will apply respective part to each of them."))
 		((Real,rotWeight,1,,"Float ∈〈0,1〉 determining whether shear displacement is applied as rotation or displacement on arc (0 is displacement-only, 1 is rotation-only). Not effective when mutual rotation is specified."))
 		// reset force components along individual axes, instead of blocking DOFs which have no specific direction (for the force control)
+		, /* deprec */ ((path,disPath,"LawTester.path will be used for generalized displacement (6-component) loading path in the future."))
+		, /* init */
+		, /* ctor */
+		, /* py */ .add_property("ptOurs",&LawTester::get_ptOurs) .add_property("ptGeom",&LawTester::get_ptGeom) .add_property("rotOurs",&LawTester::get_rotOurs) .add_property("rotGeom",&LawTester::get_rotGeom)
 	);
 };
 REGISTER_SERIALIZABLE(LawTester);

@@ -105,8 +105,8 @@ class Omega: public Singleton<Omega>{
 		void stop(); // resets the simulationLoop
 		bool isRunning();
 		std::string sceneFile; // updated at load/save automatically
-		void loadSimulation(const string& name);
-		void saveSimulation(const string& name);
+		void loadSimulation(const string& name, bool quiet=false);
+		void saveSimulation(const string& name, bool quiet=false);
 
 		void resetScene();
 		const shared_ptr<Scene>& getScene();
