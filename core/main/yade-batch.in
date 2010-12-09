@@ -408,7 +408,7 @@ for i,l in enumerate(useLines):
 		jobNum=len(jobs)
 		logFileNumbered=logFile+('.%d'%j if opts.timing>0 else '')
 		env='YADE_BATCH='
-		if table: env='<a href="jobs/%d/table">%s:%d</a>'%(jobNum,table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
+		if table: env+='<a href="jobs/%d/table">%s:%d</a>'%(jobNum,table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		env+=' DISPLAY= %s '%(' '.join(envVars))
 		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,' --debug' if jobDebug else '','--nice=%s'%nice if nice!=None else '',i,simul)
 		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFileNumbered))
