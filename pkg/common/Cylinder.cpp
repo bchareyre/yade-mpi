@@ -65,6 +65,12 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 		direction = segment/length;
 		dist = direction.dot(branch);
 		if ((dist<-interactionDetectionFactor*cylinder->radius) && isNew) return false;
+		if (cylinderSt->rank>0){//make sure there is no contact with the previous element in the chain, or consider it a duplicate and continue
+			const shared_ptr<Body> cylinderPrev = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene);
+			Vector3r branchP = sphereSt->pos-cylinderPrev->state->pos;
+			Vector3r segmentP = cylinderSt->pos - cylinderPrev->state->pos;
+			if (segmentP.dot(branchP)<segmentP.dot(segmentP)) return false;//will give false on existing interaction, as expected
+		}
 	} else {//handle the last node with length=0
 		segment = Vector3r(0,0,0);
 		branch = sphereSt->pos-cylinderSt->pos-shift2;

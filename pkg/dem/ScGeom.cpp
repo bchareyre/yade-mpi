@@ -37,37 +37,30 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene
 }
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shift2, const Vector3r& shiftVel, bool avoidGranularRatcheting){
-	Vector3r& x = contactPoint;
-	Vector3r c1x, c2x;
 	if(avoidGranularRatcheting){
 		//FIXME : put the long comment on the wiki and keep only a small abstract and link here.
-		/* B.C. Comment : The following definition of c1x and c2x is to avoid "granular ratcheting". This phenomenon has been introduced to me by S. McNamara in a seminar held in Paris, 2004 (GDR MiDi). The concept is also mentionned in many McNamara, Hermann, Lüding, and co-workers papers (see online : "Discrete element methods for the micro-mechanical investigation of granular ratcheting", R. García-Rojo, S. McNamara, H. J. Herrmann, Proceedings ECCOMAS 2004, @ http://www.ica1.uni-stuttgart.de/publications/2004/GMH04/), where it refers to an accumulation of strain in cyclic loadings.
-
-	        Unfortunately, published papers tend to focus on the "good" ratcheting, i.e. irreversible deformations due to the intrinsic nature of frictional granular materials, while the talk of McNamara in Paris clearly mentioned a possible "bad" ratcheting, purely linked with the formulation of the contact laws in what he called "molecular dynamics" (i.e. Cundall's model, as opposed to "contact dynamics" from Moreau and Jean).
-
-		Giving a short explanation :
-		The bad ratcheting is best understood considering this small elastic cycle at a contact between two grains : assuming b1 is fixed, impose this displacement to b2 :
+		/* B.C. Comment :
+		Giving a short explanation of what we want to avoid :
+		Numerical ratcheting is best understood considering a small elastic cycle at a contact between two grains : assuming b1 is fixed, impose this displacement to b2 :
 		1. translation "dx" in the normal direction
 		2. rotation "a"
 		3. translation "-dx" (back to initial position)
 		4. rotation "-a" (back to initial orientation)
 
-		If the branch vector used to define the relative shear in rotation*branch is not constant (typically if it is defined from the vector center->contactPoint like in the "else" below), then the shear displacement at the end of this cycle is not null : rotations a and -a are multiplied by branches of different lengths.
-		It results in a finite contact force at the end of the cycle even though the positions and orientations are unchanged, in total contradiction with the elastic nature of the problem. It could also be seen as an inconsistent energy creation or loss. It is BAD! And given the fact that DEM simulations tend to generate oscillations around equilibrium (damped mass-spring), it can have a significant impact on the evolution of the packings, resulting for instance in slow creep in iterations under constant load.
-		The solution to avoid that is quite simple : use a constant branch vector, like here radius_i*normal.
+		This problem has been analyzed in details by McNamara and co-workers. One will find interesting discussions in e.g. DOI 10.1103/PhysRevE.77.031304, even though solution it suggests is not fully applied here (equations of motion are not incorporating alpha, in contradiction with what is suggested by McNamara).
 		 */
-		// FIXME: For sphere-facet contact this will give an erroneous value of relative velocity...
-		c1x =   radius1*normal;
-		c2x =  -radius2*normal;
+		// For sphere-facet contact this will give an erroneous value of relative velocity...
+		Real alpha = (radius1+radius2)/(radius1+radius2-penetrationDepth);
+		Vector3r relativeVelocity = (rbp2->vel-rbp1->vel)*alpha + rbp2->angVel.cross(-radius2*normal) - rbp1->angVel.cross(radius1*normal);
+		relativeVelocity+=alpha*shiftVel;
+		return relativeVelocity;
 	} else {
-		// FIXME: It is correct for sphere-sphere and sphere-facet contact
-		c1x = (x - rbp1->pos);
-		c2x = (x - rbp2->pos + shift2);
-	}
-	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
-	//update relative velocity for interactions across periods
-	relativeVelocity+=shiftVel;
-	return relativeVelocity;
+		// It is correct for sphere-sphere and sphere-facet contact
+		Vector3r c1x = (contactPoint - rbp1->pos);
+		Vector3r c2x = (contactPoint - rbp2->pos + shift2);
+		Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
+		relativeVelocity+=shiftVel;
+		return relativeVelocity;}
 }
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
@@ -90,10 +83,8 @@ void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool is
 	if (isNew) {
 		initRotations(rbp1,rbp2);
 	} else {
-#ifdef YADE_SCGEOM_DEBUG
- 		rbp1.ori.normalize(); rbp2.ori.normalize(); initialOrientation2.normalize(); initialOrientation1.normalize();
-#endif
 		Quaternionr delta((rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate())));
+		delta.normalize();
 		if (creep) delta = delta * twistCreep;
 		AngleAxisr aa(delta); // axis of rotation - this is the Moment direction UNIT vector; // angle represents the power of resistant ELASTIC moment
 		//Eigen::AngleAxisr(q) returns nan's when q close to identity, next tline fixes the pb.
@@ -123,10 +114,10 @@ void ScGeom6D::initRotations(const State& state1, const State& state2)
 {
 	initialOrientation1	= state1.ori;
 	initialOrientation2	= state2.ori;
-	initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),normal);
-	currentContactOrientation = initialContactOrientation;
-	orientationToContact1   = initialOrientation1.conjugate() * initialContactOrientation;
-	orientationToContact2	= initialOrientation2.conjugate() * initialContactOrientation;
+// 	initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),normal);
+// 	currentContactOrientation = initialContactOrientation;
+// 	orientationToContact1   = initialOrientation1.conjugate() * initialContactOrientation;
+// 	orientationToContact2	= initialOrientation2.conjugate() * initialContactOrientation;
 	twist=0;
 	bending=Vector3r::Zero();
 	twistCreep=Quaternionr(1.0,0.0,0.0,0.0);
