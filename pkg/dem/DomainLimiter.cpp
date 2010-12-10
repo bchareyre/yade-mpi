@@ -114,7 +114,7 @@ void LawTester::action(){
 				scGeom->rotate(shearTot);
 				shearTot+=scGeom->shearIncrement();
 				uGeom.start<3>()=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
-				if(scGeom6d) uGeom.end<3>()=Vector3r(scGeom6d->getTwist(),scGeom6d->getBending().dot(axY),scGeom6d->getBending().dot(axZ));
+				if(scGeom6d) uGeom.end<3>()=-1.*Vector3r(scGeom6d->getTwist(),scGeom6d->getBending().dot(axY),scGeom6d->getBending().dot(axZ));
 			}
 			else{ // d3dGeom
 				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
@@ -132,7 +132,7 @@ void LawTester::action(){
 		if(l6Geom) uGeom.end<3>()=l6Geom->phi;
 	}
 	// perform all shearing by translation, as it does not induce bending
-	if(hasRot && rotWeight!=0){ LOG_INFO("LawTester.rotWeight set to 0 (was"<<rotWeight<<"), since rotational DoFs are in use."); rotWeight=0; }
+	if(hasRot && rotWeight!=0){ LOG_INFO("LawTester.rotWeight set to 0 (was "<<rotWeight<<"), since rotational DoFs are in use."); rotWeight=0; }
 	contPt=gsc->contactPoint;
 	refLength=gsc->refR1+gsc->refR2;
 	renderLength=.5*refLength;
