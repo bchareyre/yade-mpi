@@ -20,7 +20,7 @@ class TestPBC(unittest.TestCase):
 		O.reset(); O.periodic=True;
 		O.cell.refSize=Vector3(2.5,2.5,3)
 		self.cellDist=Vector3i(0,0,10) # how many cells away we go
-		self.relDist=Vector3(0,.999,0) # rel position of the 2nd ball within the cell
+		self.relDist=Vector3(0,.999999999999999999,0) # rel position of the 2nd ball within the cell
 		self.initVel=Vector3(0,0,5)
 		O.bodies.append(utils.sphere((1,1,1),.5))
 		self.initPos=Vector3([O.bodies[0].state.pos[i]+self.relDist[i]+self.cellDist[i]*O.cell.refSize[i] for i in (0,1,2)])
