@@ -12,26 +12,18 @@ YADE_PLUGIN((WireMat)(WireState)(WirePhys)(Ip2_WireMat_WireMat_WirePhys)(Law2_Sc
 CREATE_LOGGER(WireMat);
 
 void WireMat::postLoad(WireMat&){
-	if(StrainStressValues.size() < 2)
-		throw invalid_argument("WireMat.StrainStressValues: at least two points must be given.");
-	if(StrainStressValues[0](0) == 0. && StrainStressValues[0](1) == 0.)
-		throw invalid_argument("WireMat.StrainStressValues: Definition must start with values greather then zero (strain>0,stress>0)");
+
+	//BUG: ????? postLoad is called twice,
+	LOG_TRACE( "WireMat::postLoad - update material parameters" );
+
+	if(strainStressValues.empty()) return; // uninitialized object, don't do nothing at all
+	if(strainStressValues.size() < 2)
+		throw invalid_argument("WireMat.strainStressValues: at least two points must be given.");
+	if(strainStressValues[0](0) == 0. && strainStressValues[0](1) == 0.)
+		throw invalid_argument("WireMat.strainStressValues: Definition must start with values greather then zero (strain>0,stress>0)");
 	// compute cross-sectin area
-	As = pow(diameter*0.5,2)*Mathr::PI;
+	as = pow(diameter*0.5,2)*Mathr::PI;
 
-	// debug printout
-// 	Vector2r vbegin = *StrainStressValues.begin();
-// // 	Vector2r vbegin = StrainStressValues.front();
-// 	std::cerr << vbegin(0) << endl;
-// 	std::cerr << vbegin(1) << endl;
-// 	std::cerr << endl;
-// 
-// 	Real v0 = (*(StrainStressValues.begin()))(0);
-// 	Real v1 = (*StrainStressValues.begin())(1);
-// 	std::cerr << v0 << endl;
-// 	std::cerr << v1 << endl;
-
-	//BUG ????? postLoad is called twice,
 }
 
 
@@ -39,6 +31,9 @@ void WireMat::postLoad(WireMat&){
 CREATE_LOGGER(Law2_ScGeom_WirePhys_WirePM);
 
 void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+
+	LOG_TRACE( "Law2_ScGeom_WirePhys_WirePM::go - contact law" );
+
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	WirePhys* phys = static_cast<WirePhys*>(ip.get());
 	const int &id1 = contact->getId1();
@@ -49,8 +44,8 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	Real displN = geom->penetrationDepth; // NOTE: ScGeom->penetrationDepth>0 when spheres interpenetrate, and therefore, for wire always negative
 
 	/* get reference to values since values are updated for unloading */
-	vector<Vector2r> &DFValues = phys->DisplForceValues;
-	vector<Real> &kValues = phys->StiffnessValues;
+	vector<Vector2r> &DFValues = phys->displForceValues;
+	vector<Real> &kValues = phys->stiffnessValues;
 
 	Real D = displN - phys->initD; // interparticular distance is computed depending on the equilibrium distance
 
@@ -73,7 +68,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	/* compute normal force Fn */
 	Real Fn = 0.;
 	if ( D > DFValues[0](0) )
-		Fn = kValues[0] * (D-phys->Dplast);
+		Fn = kValues[0] * (D-phys->plastD);
 	else {
 		bool isDone = false;
 		unsigned int i = 0;
@@ -81,7 +76,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 			i++;
 			if ( D > DFValues[i](0) ) {
 				Fn = DFValues[i-1](1) + (D-DFValues[i-1](0))*kValues[i];
-				phys->Dplast = D - Fn/kValues[0];
+				phys->plastD = D - Fn/kValues[0];
 				isDone = true;
 				// update values for unloading
 				DFValues[0](0) = D;
@@ -119,6 +114,8 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	/* avoid any updates if interactions which already exist */
 	if(interaction->phys) return; 
 	
+	LOG_TRACE( "Ip2_WireMat_WireMat_WirePhys::go - create interaction physics" );
+	
 	ScGeom* geom=dynamic_cast<ScGeom*>(interaction->geom.get());
 	assert(geom);
 
@@ -136,8 +133,8 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	
 	/* ckeck properties of interaction */
 	if ( mat1->id == mat2->id ) { // interaction of two bodies of the same material
-		crossSection = mat1->As;
-		SSValues = mat1->StrainStressValues;
+		crossSection = mat1->as;
+		SSValues = mat1->strainStressValues;
 		if ( (mat1->isDoubleTwist) && (abs(interaction->getId1()-interaction->getId2())==1) ) // bodies which id differs by 1 are double twisted
 			contactPhysics->isDoubleTwist = true;
 		else
@@ -146,21 +143,23 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	else { // interaction of two bodies of two different materials, take weaker material and no double-twist
 		contactPhysics->isDoubleTwist = false;
 		if ( mat1->diameter <= mat2->diameter){
-			crossSection = mat1->As;
-			SSValues = mat1->StrainStressValues;
+			crossSection = mat1->as;
+			SSValues = mat1->strainStressValues;
 		}
 		else {
-			crossSection = mat2->As;
-			SSValues = mat2->StrainStressValues;
+			crossSection = mat2->as;
+			SSValues = mat2->strainStressValues;
 		}
 	}
+	
+	if(SSValues.empty()) throw std::invalid_argument("WireMat.strainStressValue is empty!");
 	
 	Real R1 = geom->radius1;
 	Real R2 = geom->radius2;
 	
 	Real l0 = R1 + R2 - contactPhysics->initD; // initial lenght of the wire (can be single or double twisted)
 
-	/* compute displscement-force values (tension negative since ScGem is used!) */
+	/* compute thresholddisplscement-force values (tension negative since ScGem is used!) */
 	vector<Vector2r> DFValues;
 	for ( vector<Vector2r>::iterator it = SSValues.begin(); it != SSValues.end(); it++ ) {
 		Vector2r values = Vector2r::Zero();
@@ -188,18 +187,18 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	}
 	
 	/* store displscement-force values in physics */
-	contactPhysics->DisplForceValues = DFValues;
+	contactPhysics->displForceValues = DFValues;
 
 	/* compute stiffness-values of wire */
 	contactPhysics->kn = k;
 	kValues.push_back(k);
-	for( unsigned int i = 1 ; i < DFValues.size()-1; i++ ) {
+	for( unsigned int i = 1 ; i < DFValues.size(); i++ ) {
 		Real deltau = -DFValues[i](0) + DFValues[i-1](0);
 		Real deltaF = -DFValues[i](1) + DFValues[i-1](1);
 		k = deltaF/deltau;
 		kValues.push_back(k);
 	}
-	contactPhysics->StiffnessValues = kValues;
+	contactPhysics->stiffnessValues = kValues;
 
 	/* set particles as linked */
 	if ( (scene->iter < linkThresholdIteration))

@@ -44,11 +44,11 @@ class WireMat: public ElastMat {
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,ElastMat,"Material for use with the Wire classes",
 		((Real,diameter,0.0027,," (Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
-		((vector<Vector2r>,StrainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
+		((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
 		((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
 		((Real,lambdaEps,0.4,,"Parameter between 0 and 1 to reduce the failure strain of the double-twisted wire (as used by [Bertrand2008]_). [-]"))
-		((Real,lambdak,0.21,,"Parameter between 0 and 1 to compute the elastic stiffness of the double-twisted wire (as used by [Bertrand2008]_): $\\k^D=2(\\lambda_k k_h + (1-\\lambda_k)k^S). [-]"))
-		((Real,As,0,Attr::readonly,"Cross-section area of a single wire used for the computation of the limit normal contact forces. [m²]"))
+		((Real,lambdak,0.21,,"Parameter between 0 and 1 to compute the elastic stiffness of the double-twisted wire (as used by [Bertrand2008]_): $\\k^D=2(\\lambda_k k_h + (1-\\lambda_k)k^S)$. [-]"))
+		((Real,as,0,Attr::readonly,"Cross-section area of a single wire used for the computation of the limit normal contact forces. [m²]"))
 		,
 		createIndex();
 	);
@@ -65,9 +65,9 @@ class WirePhys: public NormPhys {
 			((Real,initD,0,,"Equilibrium distance for particles. Computed as the initial inter-particular distance when particle are linked."))
 			((bool,isLinked,false,,"If true particles are linked and will interact. Interactions are linked automatically by the definition of the corresponding interaction radius. The value is false if the wire breaks (no more interaction)."))
 			((bool,isDoubleTwist,false,,"If true the properties of the interaction will be defined as a double-twisted wire."))
-			((vector<Vector2r>,DisplForceValues,,(Attr::readonly|Attr::noSave),"Defines the values for force-displacement curve."))
-			((vector<Real>,StiffnessValues,,(Attr::readonly|Attr::noSave),"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
-			((Real,Dplast,0,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero (see [Bertrand2005]_).\n\n.."))
+			((vector<Vector2r>,displForceValues,,(Attr::readonly|Attr::noSave),"Defines the values for force-displacement curve."))
+			((vector<Real>,stiffnessValues,,(Attr::readonly|Attr::noSave),"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
+			((Real,plastD,0,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero (see [Bertrand2005]_).\n\n.."))
 			,
 			createIndex();
 			,
@@ -85,7 +85,7 @@ class Ip2_WireMat_WireMat_WirePhys: public IPhysFunctor{
 		FUNCTOR2D(WireMat,WireMat);
 		DECLARE_LOGGER;
 		
-		YADE_CLASS_BASE_DOC_ATTRS(Ip2_WireMat_WireMat_WirePhys,IPhysFunctor,"Converts 2 :yref:`path<WireMat.path>` instances to :yref:`path<WirePhys.path>` with corresponding parameters.",
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_WireMat_WireMat_WirePhys,IPhysFunctor,"Converts 2 :yref:`WireMat` instances to :yref:`WirePhys` with corresponding parameters.",
 			((int,linkThresholdIteration,1,,"Iteration to create the link."))
 		);
 };
