@@ -35,16 +35,10 @@ else:
 	sp.save("cloud4cylinders")
 
 O.bodies.append([utils.sphere(center,rad,material='spheremat') for center,rad in sp])
-
-#Ns=1
-#O.bodies.append(utils.sphere(Vector3(0.,0.4,0.0),0.1,material='spheremat'))
-
-#O.materials.append(FrictMat(young=150e6,poisson=.4,frictionAngle=.2,density=2600,label='wallmat'))#this one crash
 walls=utils.aabbWalls((Vector3(-0.3,-0.15,-1),Vector3(+0.3,+1.0,+1)),thickness=.1,material='walllmat')
 wallIds=O.bodies.append(walls)
 
 O.initializers=[
-	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_ChainedCylinder_Aabb(),Bo1_Box_Aabb()])
 ]
 
@@ -56,20 +50,15 @@ O.engines=[
 		Bo1_Box_Aabb()
 	]),
 	InteractionLoop(
-		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(), Ig2_Sphere_ChainedCylinder_CylScGeom(), Ig2_Sphere_Sphere_ScGeom6D(),Ig2_Box_Sphere_ScGeom6D()],
-		#[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D()],
-		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=False,label='ipf'),Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_ScGeom6D_CohFrictPhys_CohesionMoment(label='law'),Law2_ScGeom_FrictPhys_CundallStrack(),Law2_CylScGeom_FrictPhys_CundallStrack()]
+		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(), Ig2_Sphere_ChainedCylinder_CylScGeom(), Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=False,label='ipf'),Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom6D_CohFrictPhys_CohesionMoment(label='law'),Law2_ScGeom_FrictPhys_CundallStrack(),Law2_CylScGeom_FrictPhys_CundallStrack()]
 	),
 	## Apply gravity
 	GravityEngine(gravity=[1,-9.81,0],label='gravity'),
 	## Motion equation
-	NewtonIntegrator(damping=0.10,label='newton'),
-	PyRunner(iterPeriod=500,command='history()'),
-	#PyRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
+	NewtonIntegrator(damping=0.20,label='newton'),
 ]
 
-#Generate a spiral
+#Assemble cylinders in sinusoidal shapes
 O.materials.append(CohFrictMat(young=young,poisson=poisson,density=3.0*density,frictionAngle=frictionAngle3,normalCohesion=1e40,shearCohesion=1e40,momentRotationLaw=True,label='cylindermat'))
 Ne=30
 dy=0.03
@@ -97,24 +86,3 @@ def outp(id=1):
 			print i.phys.shearForce
 			print i.phys.normalForce
 			return  i
-#from yade import qt
-#qt.View()
-#qt.Controller()
-yade.qt.View();
-
-
- #plot some results
-#from math import *
-from yade import plot
-plot.plots={'t':('pos1',None,'vel1')}
-def history():
-  	plot.addData(pos1=O.bodies[6+Ns].state.pos[1], # potential elastic energy
-		     vel1=O.bodies[6+Ns].state.vel[1],
-		     t=O.time)
-
-O.run(1,True)
-#ipf.setCohesiononNewContacts=False
-#yade.qt.Renderer().bound=True
-#plot.plot()
-#O.bodies[0].state.angVel=Vector3(0.05,0,0)
-
