@@ -37,7 +37,3 @@ class InteractionLoop: public GlobalEngine {
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InteractionLoop);
-
-// old name, issue warning when used in external code
-__attribute__((deprecated)) typedef InteractionLoop InteractionDispatchers;
-

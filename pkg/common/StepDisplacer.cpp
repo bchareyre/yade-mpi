@@ -6,12 +6,6 @@ CREATE_LOGGER(StepDisplacer);
 YADE_PLUGIN((StepDisplacer));
 
 void StepDisplacer::action(){
-	if(!isnan(deltaSe3.position[0])){
-		LOG_WARN("Using StepDisplacer::deltaSe3 is deprecated, use StepDisplacer.mov and StepDisplacer.rot instead (setting automatically now).");
-		mov=deltaSe3.position;
-		rot=deltaSe3.orientation;
-		deltaSe3.position=Vector3r(NaN,NaN,NaN); // to detect next manual change of deltaSe3
-	}
 	FOREACH(Body::id_t id, ids){
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(setVelocities){

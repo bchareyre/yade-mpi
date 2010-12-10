@@ -21,8 +21,6 @@ REGISTER_SERIALIZABLE(GlExtraDrawer);
 class OpenGLRenderer : public Serializable
 {
 	public:
-		int _nothing; // remove later, only target for deprecated selectBodyLimit
-
 		static const int numClipPlanes=3;
 
 		bool pointClipped(const Vector3r& p);

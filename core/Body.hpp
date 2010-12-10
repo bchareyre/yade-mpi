@@ -31,7 +31,7 @@ class Body: public Serializable{
 		typedef std::map<Body::id_t, shared_ptr<Interaction> > MapId2IntrT;
 
 		// bits for Body::flags
-		enum { FLAG_DYNAMIC=1, FLAG_BOUNDED=2, FLAG_ASPHERICAL=4 }; /* add powers of 2 as needed */
+		enum { FLAG_BOUNDED=1, FLAG_ASPHERICAL=2 }; /* add powers of 2 as needed */
 		//! symbolic constant for body that doesn't exist.
 		static const Body::id_t ID_NONE;
 		//! get Body pointer given its id. 
@@ -50,8 +50,8 @@ class Body: public Serializable{
 		//! Whether this body has all DOFs blocked
 		// inline accessors
 		// logic: http://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit-in-c
-		bool isDynamic() const {return flags & FLAG_DYNAMIC; }
-		void setDynamic(bool d){ if(d){ flags|=FLAG_DYNAMIC; if(state) state->blockedDOFs=State::DOF_NONE; } else { flags&=~(FLAG_DYNAMIC); if(state){ state->blockedDOFs=State::DOF_ALL; state->vel=state->angVel=Vector3r::Zero(); } }}
+		bool isDynamic() const { assert(state); return state->blockedDOFs!=State::DOF_ALL; }
+		void setDynamic(bool d){ assert(state); if(d){ state->blockedDOFs=State::DOF_NONE; } else { state->blockedDOFs=State::DOF_ALL; state->vel=state->angVel=Vector3r::Zero(); } }
 		bool isBounded() const {return flags & FLAG_BOUNDED; }
 		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
 		bool isAspherical() const {return flags & FLAG_ASPHERICAL; }
@@ -74,7 +74,7 @@ class Body: public Serializable{
 		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
 		((int,groupMask,1,,"Bitmask for determining interactions."))
-		((int,flags,FLAG_DYNAMIC|FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
+		((int,flags,FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
 		#ifdef YADE_SUBDOMAINS
 			((Body::id_t,subDomId,Body::ID_NONE,(Attr::noSave|Attr::readonly),"Subdomain number and position within the subdomain encoded in one single number; holds back-reference to BodyContainer::subDomains location, so that erasing a body knows where to go. See BodyContainer for details."))
 		#endif
@@ -89,7 +89,6 @@ class Body: public Serializable{
 		/* py */
 		//
 		.def_readwrite("mat",&Body::material,"Shorthand for :yref:`Body::material`")
-		.add_property("isDynamic",&Body::isDynamic,&Body::setDynamic,"Deprecated synonym for :yref:`Body::dynamic` |ydeprecated|")
 		.add_property("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether this body will be moved by forces. (In c++, use ``Body::isDynamic``/``Body::setDynamic``) :ydefault:`true`")
 		.add_property("bounded",&Body::isBounded,&Body::setBounded,"Whether this body should have :yref:`Body.bound` created. Note that bodies without a :yref:`bound <Body.bound>` do not participate in collision detection. (In c++, use ``Body::isBounded``/``Body::setBounded``) :ydefault:`true`")
 		.add_property("aspherical",&Body::isAspherical,&Body::setAspherical,"Whether this body has different inertia along principal axes; :yref:`NewtonIntegrator` makes use of this flag to call rotation integration routine for aspherical bodies, which is more expensive. :ydefault:`false`")
