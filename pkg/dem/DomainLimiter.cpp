@@ -77,6 +77,8 @@ void LawTester::action(){
 	Dem3DofGeom* d3dGeom=dynamic_cast<Dem3DofGeom*>(I->geom.get());
 	L3Geom* l3Geom=dynamic_cast<L3Geom*>(I->geom.get());
 	L6Geom* l6Geom=dynamic_cast<L6Geom*>(I->geom.get());
+	ScGeom6D* scGeom6d=dynamic_cast<ScGeom6D*>(I->geom.get());
+	bool hasRot=(l6Geom || scGeom6d);
 	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
 	if(!scGeom && !d3dGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom (or L6Geom).");
@@ -96,45 +98,41 @@ void LawTester::action(){
 		return;
 	}
 	/* initialize or update local axes and trsf */
-	//DEL rotGeom=Vector3r(NaN,NaN,NaN); // this is meaningful only with l6geom
 	uGeom.end<3>()=Vector3r(NaN,NaN,NaN);
-	if(!l3Geom){
+	if(!l3Geom){ // IGeom's that don't have local axes
 		axX=gsc->normal; /* just in case */ axX.normalize();
-		if(doInit){ // initialization of the new interaction
+		if(doInit){ // initialization of the new interaction -- define local axes
 			// take vector in the y or z direction, depending on its length; arbitrary, but one of them is sure to be non-zero
 			axY=axX.cross(axX[1]>axX[2]?Vector3r::UnitY():Vector3r::UnitZ());
 			axY.normalize();
 			axZ=axX.cross(axY);
 			LOG_DEBUG("Initial axes x="<<axX<<", y="<<axY<<", z="<<axZ);
+			if(scGeom6d) uGeom.end<3>()=Vector3r::Zero();
 		} else { // udpate of an existing interaction
 			if(scGeom){
 				scGeom->rotate(axY); scGeom->rotate(axZ);
 				scGeom->rotate(shearTot);
 				shearTot+=scGeom->shearIncrement();
-				//DEL ptGeom=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ)); 
 				uGeom.start<3>()=Vector3r(-scGeom->penetrationDepth,shearTot.dot(axY),shearTot.dot(axZ));
+				if(scGeom6d) uGeom.end<3>()=Vector3r(scGeom6d->getTwist(),scGeom6d->getBending().dot(axY),scGeom6d->getBending().dot(axZ));
 			}
 			else{ // d3dGeom
 				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
 				// essentially copies code from ScGeom, which is not very nice indeed; oh well…
-				Vector3r vRel=(state2->vel+state2->angVel.cross(-gsc->refR2*gsc->normal))-(state1->vel+state1->angVel.cross(gsc->refR1*gsc->normal));
+				// Vector3r vRel=(state2->vel+state2->angVel.cross(-gsc->refR2*gsc->normal))-(state1->vel+state1->angVel.cross(gsc->refR1*gsc->normal));
 			}
 		}
 		// update the transformation
-		// the matrix is orthonormal, since axX, axY are normalized and and axZ is their corss-product
+		// the matrix is orthonormal, since axX, axY are normalized and and axZ is their cross-product
 		trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
 	} else {
 		trsf=l3Geom->trsf;
 		axX=trsf.row(0); axY=trsf.row(1); axZ=trsf.row(2);
-		//DEL ptGeom=l3Geom->u;
 		uGeom.start<3>()=l3Geom->u;
-		if(l6Geom){
-			//rotGeom=l6Geom->phi;
-			uGeom.end<3>()=l6Geom->phi;
-			// perform allshearing by translation, as it does not induce bending
-			if(rotWeight!=0){ LOG_INFO("LawTester.rotWeight set to 0 (was"<<rotWeight<<"), since rotational DoFs are in use."); rotWeight=0; }
-		}
+		if(l6Geom) uGeom.end<3>()=l6Geom->phi;
 	}
+	// perform all shearing by translation, as it does not induce bending
+	if(hasRot && rotWeight!=0){ LOG_INFO("LawTester.rotWeight set to 0 (was"<<rotWeight<<"), since rotational DoFs are in use."); rotWeight=0; }
 	contPt=gsc->contactPoint;
 	refLength=gsc->refR1+gsc->refR2;
 	renderLength=.5*refLength;
@@ -150,7 +148,6 @@ void LawTester::action(){
 		dU*=refLength;
 	}
 	LOG_DEBUG("Absolute diff is: displacement "<<dU<<", rotation "<<dPhi);
-	//DEL ptOurs+=dU; rotOurs+=dPhi;
 	uTest=uTestNext; // the value that was next in the previous step is the current one now
 	uTestNext.start<3>()+=dU; uTestNext.end<3>()+=dPhi;
 
