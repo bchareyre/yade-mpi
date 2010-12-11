@@ -104,9 +104,11 @@ bool Ig2_Sphere_Sphere_L3Geom_Inc::genericGo(bool is6Dof, const shared_ptr<Shape
 	// noRatch: take radius or current distance as the branch vector; see discussion in ScGeom::precompute (avoidGranularRatcheting)
 	Vector3r c1x=(noRatch ? ( r1*normal).eval() : (contPt-state1.pos).eval());
 	Vector3r c2x=(noRatch ? (-r2*normal).eval() : (contPt-state2.pos+shift2).eval());
+	//Vector3r state2velCorrected=state2.vel+(scene->isPeriodic?scene->cell->intrShiftVel(I->cellDist):Vector3r::Zero()); // velocity of the second particle, corrected with meanfield velocity if necessary
+	//cerr<<"correction "<<(scene->isPeriodic?scene->cell->intrShiftVel(I->cellDist):Vector3r::Zero())<<endl;
 	Vector3r relShearVel=(state2.vel+state2.angVel.cross(c2x))-(state1.vel+state1.angVel.cross(c1x));
 	// account for relative velocity of particles in different cell periods
-	if(scene->isPeriodic) relShearVel+=scene->cell->velGrad*scene->cell->Hsize*I->cellDist.cast<Real>();
+	if(scene->isPeriodic) relShearVel+=scene->cell->intrShiftVel(I->cellDist);
 	// separate the tangential component (this is likely to be not stricly necessary, since u[0] is set directly later)
 	relShearVel-=avgNormal.dot(relShearVel)*avgNormal;
 	Vector3r relShearDu=relShearVel*scene->dt;
@@ -202,7 +204,8 @@ bool Ig2_Wall_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_pt
 
 	Vector3r c1x=contPt-state1.pos; // is not aligned with normal; Wall could rotate in a plate-like manner
 	Vector3r c2x=(noRatch ? (-radius*normal).eval() : (contPt-state2.pos+shift2).eval());
-	Vector3r relShearVel=(state2.vel+state2.angVel.cross(c2x))-(state1.vel+state1.angVel.cross(c1x));
+	Vector3r state2velCorrected=state2.vel+(scene->isPeriodic?scene->cell->intrShiftVel(I->cellDist):Vector3r::Zero()); // velocity of the second particle, corrected with meanfield velocity if necessary
+	Vector3r relShearVel=(state2velCorrected+state2.angVel.cross(c2x))-(state1.vel+state1.angVel.cross(c1x));
 	// perhaps not necessary, see in Ig2_Sphere_Sphere_L3Geom_Inc
 	relShearVel-=normal.dot(relShearVel)*normal;
 	Vector3r relShearDu=relShearVel*scene->dt;

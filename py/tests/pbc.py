@@ -6,7 +6,7 @@ Various computations affected by the periodic boundary conditions.
 '''
 
 import unittest
-import random
+import random,math
 from yade.wrapper import *
 from miniEigen import *
 from yade._customConverters import *
@@ -32,20 +32,20 @@ class TestPBC(unittest.TestCase):
 		O.cell.homoDeform=3
 		O.dt=0 # do not change positions with dt=0 in NewtonIntegrator, but still update velocities from velGrad
 	def testHomotheticResizeVel(self):
-		"PBC: (homoDeform==3) homothetic cell deformation adjusts particle velocity"
+		"PBC: homothetic cell deformation adjusts particle velocity (homoDeform==3)"
 		O.dt=1e-5
 		O.step()
 		s1=O.bodies[1].state
 		self.assertAlmostEqual(s1.vel[2],self.initVel[2]+self.initPos[2]*O.cell.velGrad[2,2])
 	def testHomotheticResizePos(self):
-		"PBC: (homoDeform==1) homothetic cell deformation adjusts particle position"
+		"PBC: homothetic cell deformation adjusts particle position (homoDeform==1)"
 		O.cell.homoDeform=1
 		O.step()
 		s1=O.bodies[1].state
 		self.assertAlmostEqual(s1.vel[2],self.initVel[2])
 		self.assertAlmostEqual(s1.pos[2],self.initPos[2]+self.initPos[2]*O.cell.velGrad[2,2]*O.dt)
 	def testScGeomIncidentVelocity(self):
-		"PBC: (homoDeform==3) ScGeom computes incident velocity correctly"
+		"PBC: ScGeom computes incident velocity correctly (homoDeform==3)"
 		O.step()
 		O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 		i=utils.createInteraction(0,1)
@@ -53,7 +53,7 @@ class TestPBC(unittest.TestCase):
 		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=False))
 		self.assertAlmostEqual(self.relDist[1],1-i.geom.penetrationDepth)
 	def testScGeomIncidentVelocity_homoPos(self):
-		"PBC: (homoDeform==1) ScGeom computes incident velocity correctly"
+		"PBC: ScGeom computes incident velocity correctly (homoDeform==1)"
 		O.cell.homoDeform=1
 		O.step()
 		O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
@@ -61,8 +61,23 @@ class TestPBC(unittest.TestCase):
 		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=True))
 		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=False))
 		self.assertAlmostEqual(self.relDist[1],1-i.geom.penetrationDepth)
+	def testL3GeomIncidentVelocity(self):
+		"PBC: L3Geom computes incident velocity correctly (homoDeform==3)"
+		O.step()
+		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
+		i=utils.createInteraction(0,1) 
+		O.dt=1e-10; O.step() # tiny timestep, to not move the normal too much
+		self.assertAlmostEqual(self.initVel.norm(),(i.geom.u/O.dt).norm())
+	def testL3GeomIncidentVelocity_homoPos(self):
+		"PBC: L3Geom computes incident velocity correctly (homoDeform==1)"
+		O.cell.homoDeform=1; O.step()
+		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
+		i=utils.createInteraction(0,1) 
+		O.dt=1e-10; O.step()
+		self.assertAlmostEqual(self.initVel.norm(),(i.geom.u/O.dt).norm())
+		#self.assertAlmostEqual(self.relDist[1],1-i.geom.penetrationDepth)
 	def testKineticEnergy(self):
-		"PBC: (homoDeform==3) utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient"
+		"PBC: utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient (homoDeform==3)"
 		O.step() # updates velocity with homotheticCellResize
 		# ½(mv²+ωIω)
 		# #0 is still, no need to add it; #1 has zero angular velocity
@@ -70,7 +85,7 @@ class TestPBC(unittest.TestCase):
 		Ek=.5*O.bodies[1].state.mass*self.initVel.squaredNorm()
 		self.assertAlmostEqual(Ek,utils.kineticEnergy())
 	def testKineticEnergy_homoPos(self):
-		"PBC: (homoDeform==1) utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient"
+		"PBC: utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient (homoDeform==1)"
 		O.cell.homoDeform=1; O.step()
 		self.assertAlmostEqual(.5*O.bodies[1].state.mass*self.initVel.squaredNorm(),utils.kineticEnergy())
 
