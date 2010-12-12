@@ -180,3 +180,35 @@ If this functor is called for :yref:`L6Geom`, local rotation is updated as
 .. note: TODO: ``distFactor`` is not yet implemented as described above; some formulas mix values at different times, should be checked carefully.
 
 '''
+
+wrapper.LawTester.__doc__='''Prescribe and apply deformations of an interaction in terms of local mutual displacements and rotations. The loading path is specified either using :yref:`path<LawTester.path>` (as sequence of 6-vectors containing generalized displacements $u_x$, $u_y$, $u_z$, $\phi_x$, $\phi_y$, $\phi_z$) or :yref:`disPath<LawTester.disPath>` ($u_x$, $u_y$, $u_z$) and :yref:`rotPath<LawTester.rotPath>` ($\phi_x$, $\phi_y$, $\phi_z$). Time function with time values (step numbers) corresponding to points on loading path is given by :yref:`pathSteps<LawTester.pathSteps>`. Loading values are linearly interpolated between given loading path points, and starting zero-value (the initial configuration) is assumed for both :yref:`path<LawTester.path>` and :yref:`pathSteps<LawTester.pathSteps>`. :yref:`hooks<LawTester.hooks>` can specify python code to run when respective point on the path is reached; when the path is finished, :yref:`doneHook<LawTester.doneHook>` will be run.
+
+
+LawTester should be placed between :yref:`InteractionLoop` and :yref:`NewtonIntegrator` in the simulation loop, since it controls motion via setting linear/angular velocities on particles; those velocities are integrated by :yref:`NewtonIntegrator` to yield an actual position change, which in turn causes :yref:`IGeom` to be updated (and :yref:`contact law<LawFunctor>` applied) when :yref:`InteractionLoop` is executed. Constitutive law generating forces on particles will not affect prescribed particle motion, since both particles have all :yref:`DoFs blocked<State.blockedDOFs>` when first used with LawTester.
+
+LawTester uses, as much as possible, :yref:`IGeom` to provide useful data (such as local coordinate system), but is able to compute those independently if absent in the respective :yref:`IGeom`:
+
+
+=================== ===== ==================================
+:yref:`IGeom`       #DoFs LawTester support level
+=================== ===== ==================================
+:yref:`L3Geom`      3     full
+:yref:`L6Geom`      6     full
+:yref:`ScGeom`      3     emulate local coordinate system
+:yref:`ScGeom6D`    6     emulate local coordinate system
+:yref:`Dem3DofGeom` 3     *not supported*
+=================== ===== ==================================
+
+Depending on :yref:`IGeom`, 3 ($u_x$, $u_y$, $u_z$) or 6 ($u_x$, $u_y$, $u_z$, $\phi_x$, $\phi_y$, $\phi_z$) degrees of freedom (DoFs) are controlled with LawTester, by prescribing linear and angular velocities of both particles in contact. All DoFs controlled with LawTester are orthogonal (fully decoupled) and are controlled independently.
+
+When 3 DoFs are controlled, :yref:`rotWeight<LawTester.rotWeight>` controls whether local shear is applied by moving particle on arc around the other one, or by rotating without changing position; although such rotation induces mutual rotation on the interaction, it is ignored with :yref:`IGeom` with only 3 DoFs. When 6 DoFs are controlled, only arc-displacement is applied for shear, since otherwise mutual rotation would occur. 
+
+:yref:`idWeight<LawTester.idWeight>` distributes prescribed motion between both particles (resulting local deformation is the same if ``id1`` is moved towards ``id2`` or ``id2`` towards ``id1``). This is true only for $u_x$, $u_y$, $u_z$, $\phi_x$ however ; bending rotations $\phi_y$, $\phi_z$ are nevertheless always distributed regardless of ``idWeight`` to both spheres in inverse proportion to their radii, so that there is no shear induced.
+
+LawTester knows current contact deformation from 2 sources: from its own internal data (which are used for prescribing the displacement at every step), which can be accessed in :yref:`uTest<LawTester.uTest>`, and from :yref:`IGeom` itself (depending on which data it provides), which is stored in :yref:`uGeom<LawTester.uGeom>`. These two values should be identical (disregarding numerical percision), and it is a way to test whether :yref:`IGeom` and related functors compute what they are supposed to compute.
+
+LawTester-operated interactions can be rendered with :yref:`GlExtra_LawTester` renderer.
+
+See :ysrc:`scripts/test/law-test.py` for an example.
+
+'''

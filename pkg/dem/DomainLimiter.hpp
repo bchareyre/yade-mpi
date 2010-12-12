@@ -51,13 +51,13 @@ class LawTester: public PartialEngine{
 		((Real,renderLength,0,,"Characteristic length for the purposes of rendering, set equal to the smaller radius."))
 		((Real,refLength,0,(Attr::readonly),"Reference contact length, for rendering only."))
 		((Vector3r,contPt,Vector3r::Zero(),Attr::hidden,"Contact point (for rendering only)"))
-		((Real,idWeight,1,,"Float ∈〈0,1〉 determining on which particle are displacements applied (0 for id1, 1 for id2); intermediate values will apply respective part to each of them."))
+		((Real,idWeight,1,,"Float, usually ∈〈0,1〉, determining on how are displacements distributed between particles (0 for id1, 1 for id2); intermediate values will apply respective part to each of them. This parameter is ignored with 6-DoFs :yref:`IGeom`."))
 		((Real,rotWeight,1,,"Float ∈〈0,1〉 determining whether shear displacement is applied as rotation or displacement on arc (0 is displacement-only, 1 is rotation-only). Not effective when mutual rotation is specified."))
 		// reset force components along individual axes, instead of blocking DOFs which have no specific direction (for the force control)
 		, /* deprec */ ((path,disPath,"LawTester.path will be used for generalized displacement (6-component) loading path in the future."))
 		, /* init */
 		, /* ctor */
-		, /* py */ .add_property("ptOurs",&LawTester::get_ptOurs) .add_property("ptGeom",&LawTester::get_ptGeom) .add_property("rotOurs",&LawTester::get_rotOurs) .add_property("rotGeom",&LawTester::get_rotGeom)
+		, /* py */ .add_property("ptOurs",&LawTester::get_ptOurs,"first 3 components of uTest |ydeprecated|") .add_property("ptGeom",&LawTester::get_ptGeom,"first 3 components of uGeom |ydeprecated|") .add_property("rotOurs",&LawTester::get_rotOurs,"last 3 components of uTest |ydeprecated|") .add_property("rotGeom",&LawTester::get_rotGeom,"last 3 components of uGeom |ydeprecated|")
 	);
 };
 REGISTER_SERIALIZABLE(LawTester);
