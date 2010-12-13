@@ -48,7 +48,6 @@ There are other classes, which are not strictly necessary:
 
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
 
@@ -200,6 +199,7 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
+#if 0
 class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
@@ -210,7 +210,7 @@ class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
-		
+#endif	
 
 
 

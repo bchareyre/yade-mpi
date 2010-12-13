@@ -4,7 +4,7 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
-YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(Gl1_CpmPhys)
 	#endif	
@@ -235,7 +235,7 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 #endif
 }
 
-
+#if 0
 CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
@@ -303,7 +303,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 	applyForceAtContactPoint(BC->normalForce+BC->shearForce,geom->contactPoint,I->getId1(),pos1,I->getId2(),pos2);
 }
-
+#endif
 
 #ifdef YADE_OPENGL
 	/********************** Gl1_CpmPhys ****************************/

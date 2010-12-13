@@ -28,65 +28,6 @@ _proxiedClasses=set()
 # if old class name is used, the new object is constructed and a warning is issued about old name being used
 # keep chronologically ordered, oldest first; script/rename-class.py appends at the end
 _deprecated={
-	'CpmPhysDamageColorizer':'CpmStateUpdater', # renamed 10.10.2009
-	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere', # renamed 15.11.2009
-	'PeriodicInsertionSortCollider':'InsertionSortCollider',	# integrated 25.11.2009
-	'BoundingVolumeMetaEngine':'BoundDispatcher', # Tue Dec  1 14:28:29 2009, vaclav@flux  ## was BoundingVolumeDispatcher, generating double warning
-	'BoundingVolumeEngineUnit':'BoundFunctor', # Tue Dec  1 14:39:53 2009, vaclav@flux ## was BoundingVolumeFunctor, generating double warning
-	'InteractionGeometryMetaEngine':'InteractionGeometryDispatcher', # Tue Dec  1 14:40:36 2009, vaclav@flux
-	'InteractionPhysicsMetaEngine':'InteractionPhysicsDispatcher', # Tue Dec  1 14:40:53 2009, vaclav@flux
-	'InteractionPhysicsEngineUnit':'InteractionPhysicsFunctor', # Tue Dec  1 14:41:19 2009, vaclav@flux
-	'InteractionGeometryEngineUnit':'InteractionGeometryFunctor', # Tue Dec  1 14:41:56 2009, vaclav@flux
-	'BoundingVolume':'Bound', # Fri Dec  4 23:44:14 2009, vaclav@flux
-	'BoundingVolumeDispatcher':'BoundDispatcher', # Fri Dec  4 23:44:27 2009, vaclav@flux
-	'BoundingVolumeFunctor':'BoundFunctor', # Fri Dec  4 23:44:34 2009, vaclav@flux
-	'InteractingGeometry':'Shape', # Fri Dec  4 23:48:13 2009, vaclav@flux
-	'ConstitutiveLaw':'LawFunctor', # Fri Dec  4 23:57:51 2009, vaclav@flux
-	'ConstitutiveLawDispatcher':'LawDispatcher', # Fri Dec  4 23:57:59 2009, vaclav@flux
-	'ef2_Sphere_Sphere_Dem3DofGeom':'Ig2_Sphere_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:03 2009, vaclav@flux
-	'ef2_Facet_Sphere_Dem3DofGeom':'Ig2_Facet_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:13 2009, vaclav@flux
-	'ef2_Wall_Sphere_Dem3DofGeom':'Ig2_Wall_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:22 2009, vaclav@flux
-	'NewtonsDampedLaw':'NewtonIntegrator', # Wed Dec  9 17:44:15 2009, vaclav@flux
-	'StandAloneEngine':'GlobalEngine', # Wed Dec  9 17:46:12 2009, vaclav@flux
-	'DeusExMachina':'PartialEngine', # Wed Dec  9 17:53:06 2009, vaclav@flux
-	## 'Sphere':'SphereModel', # 11/12/2009, vaclav@flux   ### comment out to prevent loop, since InteractingSphere was renamed to Sphere later
-	## 'Facet':'FacetModel', # Fri Dec 11 15:27:41 2009, vaclav@flux   ### dtto
-	## 'Box':'BoxModel', # Fri Dec 11 15:39:44 2009, vaclav@flux       ### dtto
-	'GLDrawSphere':'GLDrawSphereModel', # Fri Dec 11 15:43:31 2009, vaclav@flux
-	'GLDrawBox':'GLDrawBoxModel', # Fri Dec 11 15:43:50 2009, vaclav@flux
-	'GLDrawFacet':'GLDrawFacetModel', # Fri Dec 11 15:44:04 2009, vaclav@flux
-	'GLDrawInteractingGeometryFunctor':'GlShapeFunctor', # Fri Dec 11 16:08:16 2009, vaclav@flux
-	'GLDrawGeometricalModelFunctor':'GlGeometricalModelFunctor', # Fri Dec 11 16:08:40 2009, vaclav@flux
-	'GLDrawBoundingVolumeFunctor':'GlBoundFunctor', # Fri Dec 11 16:09:16 2009, vaclav@flux
-	'GLDrawInteractionGeometryFunctor':'GlInteractionGeometryFunctor', # Fri Dec 11 16:09:48 2009, vaclav@flux
-	'GLDrawInteractionPhysicsFunctor':'GlInteractionPhysicsFunctor', # Fri Dec 11 16:10:02 2009, vaclav@flux
-	'GLDrawStateFunctor':'GlStateFunctor', # Fri Dec 11 16:10:29 2009, vaclav@flux
-	'GLDrawInteractingSphere':'Gl1_Sphere', # Fri Dec 11 16:20:51 2009, vaclav@flux
-	'GLDrawInteractingFacet':'Gl1_Facet', # Fri Dec 11 16:21:06 2009, vaclav@flux
-	'GLDrawInteractingBox':'Gl1_Box', # Fri Dec 11 16:21:17 2009, vaclav@flux
-	'TetraDraw':'Gl1_Tetra', # Fri Dec 11 16:22:18 2009, vaclav@flux
-	'MetaInteractingGeometry':'SceneShape', # Fri Dec 11 16:56:06 2009, vaclav@flux
-	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:00:00 2009, vaclav@flux
-	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:10:17 2009, vaclav@flux
-	'SpheresContactGeometry':'ScGeom', # Sun Dec 13 20:59:09 2009, vaclav@flux
-	'InteractingSphere2InteractingSphere4SpheresContactGeometry':'Ig2_Sphere_Sphere_ScGeom', # Sun Dec 13 21:02:31 2009, vaclav@flux
-	'InteractingFacet2InteractingSphere4SpheresContactGeometry':'Ig2_Facet_Sphere_ScGeom', # Sun Dec 13 21:02:57 2009, vaclav@flux
-	'InteractingBox2InteractingSphere4SpheresContactGeometry':'Ig2_Box_Sphere_ScGeom', # Sun Dec 13 21:03:10 2009, vaclav@flux
-	'InteractingSphere':'Sphere', # Sun Dec 13 21:13:40 2009, vaclav@flux
-	'InteractingFacet':'Facet', # Sun Dec 13 21:15:07 2009, vaclav@flux
-	'InteractingBox':'Box', # Sun Dec 13 21:15:16 2009, vaclav@flux
-	'MetaInteractingGeometry2AABB':'DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely', # Mon Dec 14 09:33:20 2009, vaclav@flux
-	'InteractingSphere2AABB':'Bo1_Sphere_Aabb', # Thu Dec 17 08:59:29 2009, vaclav@falx
-	'InteractingFacet2AABB':'Bo1_Facet_Aabb', # Thu Dec 17 08:59:56 2009, vaclav@falx
-	'InteractingBox2AABB':'Bo1_Box_Aabb', # Thu Dec 17 09:00:14 2009, vaclav@falx
-	'Wall2AABB':'Bo1_Wall_Aabb', # Thu Dec 17 09:01:07 2009, vaclav@falx
-	'AABB':'Aabb', # Thu Dec 17 09:01:35 2009, vaclav@falx
-	'GLDrawAABB':'Gl1_Aabb', # Thu Dec 17 09:07:58 2009, vaclav@falx
-	'GLDraw_Dem3DofGeom_SphereSphere':'Gl1_Dem3DofGeom_SphereSphere', # Fri Dec 18 23:01:39 2009, vaclav@flux
-	'BexContainer':'ForceContainer', # Fri Dec 25 11:43:44 2009, vaclav@flux
-	'BexResetter':'ForceResetter', # Fri Dec 25 11:44:01 2009, vaclav@flux
-	'PhysicalActionContainerResetter':'ForceResetter', # Fri Dec 25 11:45:32 2009, vaclav@flux
-	'PhysicalActionContainerReseter':'ForceResetter', # Fri Dec 25 11:45:51 2009, vaclav@flux
 	'GranularMat':'FrictMat', # Sun Jan 10 09:26:45 2010, vaclav@flux
 	'SimpleElasticRelationships':'Ip2_FrictMat_FrictMat_NormShearPhys', # Sun Jan 10 09:28:17 2010, vaclav@flux
 	'NormalInteraction':'NormPhys', # Sun Jan 10 09:28:56 2010, vaclav@flux

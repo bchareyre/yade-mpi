@@ -28,18 +28,11 @@ unsigned int ChainedState::currentChain=0;
 
 
 //!Sphere-cylinder or cylinder-cylinder not implemented yet, see Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D and test/chained-cylinder-spring.py
-#ifdef YADE_DEVIRT_FUNCTORS
-bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_ChainedCylinder_CylScGeom::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_Sphere_ChainedCylinder_CylScGeom::goStatic(IGeomFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
-	const Ig2_Sphere_ChainedCylinder_CylScGeom* self=static_cast<Ig2_Sphere_ChainedCylinder_CylScGeom*>(_self);
-	const Real& interactionDetectionFactor=self->interactionDetectionFactor;
-#else
 bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 							const shared_ptr<Shape>& cm2,
 							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
 							const shared_ptr<Interaction>& c)
 {
-#endif
 // 	cerr<<"Ig2_Sphere_ChainedCylinder_CylScGeom::go"<<endl;
 	const State* sphereSt=YADE_CAST<const State*>(&state1);
 	const ChainedState* cylinderSt=YADE_CAST<const ChainedState*>(&state2);
@@ -141,18 +134,11 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::goReverse(	const shared_ptr<Shape>& c
 }
 
 
-#ifdef YADE_DEVIRT_FUNCTORS
-bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw runtime_error("Do not call Ig2_Sphere_ChainedCylinder_CylScGeom::go, use getStaticFunctorPtr and call that function instead."); }
-bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::goStatic(IGeomFunctor* _self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
-	const Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D* self=static_cast<Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D*>(_self);
-	const Real& interactionDetectionFactor=self->interactionDetectionFactor;
-#else
 bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& cm1,
 							const shared_ptr<Shape>& cm2,
 							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
 							const shared_ptr<Interaction>& c)
 {
-#endif
 	const ChainedState *pChain1, *pChain2;
 	pChain1=YADE_CAST<const ChainedState*>(&state1);
 	pChain2=YADE_CAST<const ChainedState*>(&state2);

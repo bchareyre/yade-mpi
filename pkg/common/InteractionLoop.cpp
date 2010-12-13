@@ -92,14 +92,9 @@ void InteractionLoop::action(){
 		// IGeomDispatcher
 		if(unlikely(!I->functorCache.geom || !I->functorCache.phys)){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
-			#ifdef YADE_DEVIRT_FUNCTORS
-				if(I->functorCache.geom){ I->functorCache.geomPtr=I->functorCache.geom->getStaticFuncPtr(); /* cerr<<"["<<I->functorCache.geomPtr<<"]"; */ }
-				else
-			#else
-				if(!I->functorCache.geom)
-			#endif
-					// returns NULL ptr if no functor exists; remember that and shortcut
-					{I->functorCache.geomExists=false; continue; }
+			// returns NULL ptr if no functor exists; remember that and shortcut
+			if(!I->functorCache.geom) {I->functorCache.geomExists=false; continue; }
+					
 		}
 		// arguments for the geom functor are in the reverse order (dispatcher would normally call goReverse).
 		// we don't remember the fact that is reverse, so we swap bodies within the interaction
@@ -113,21 +108,11 @@ void InteractionLoop::action(){
 		bool wasReal=I->isReal();
 		bool geomCreated;
 		if(!scene->isPeriodic){
-			#ifdef YADE_DEVIRT_FUNCTORS
-				geomCreated=(*((IGeomFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
-			#else
-				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
-			#endif
+			geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 		} else { // handle periodicity
 			Vector3r shift2=cellHsize*I->cellDist.cast<Real>();
 			// in sheared cell, apply shear on the mutual position as well
-			//shift2=scene->cell->shearPt(shift2);
-			#ifdef YADE_DEVIRT_FUNCTORS
-				// cast back from void* first
-				geomCreated=(*((IGeomFunctor::StaticFuncPtr)I->functorCache.geomPtr))(I->functorCache.geom.get(),b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
-			#else
-				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
-			#endif
+			geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 		}
 		if(unlikely(!geomCreated)){
 			if(wasReal) LOG_WARN("IGeomFunctor returned false on existing interaction!");

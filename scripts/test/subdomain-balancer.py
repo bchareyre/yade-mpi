@@ -1,5 +1,5 @@
 from yade import pack,log,timing,utils
-log.setLevel("SubdomainOptimizer",log.INFO)
+log.setLevel("SubdomainBalancer",log.INFO)
 #log.setLevel("BodyContainer",log.TRACE)
 utils.readParamsFromTable(noTableOk=True,num=12000)
 import yade.params.table
@@ -11,7 +11,7 @@ O.bodies.append(utils.wall((0,0,0),axis=1))
 #O.bodies.append(utils.wall((0,0,0),axis=0))
 #O.bodies.append(utils.wall((0,2,0),axis=1))
 #O.bodies.append(utils.wall((2,0,0),axis=0))
-O.engines=([SubdomainOptimizer(axesOrder='xyz',colorize=True)] if 'SubdomainOptimizer' in dir() else [])+[
+O.engines=([SubdomainBalancer(axesOrder='xyz',colorize=True)] if 'SubdomainBalancer' in dir() else [])+[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()],sweepLength=.05*.05),
 	InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),

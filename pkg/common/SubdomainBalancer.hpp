@@ -7,7 +7,7 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/pkg/common/PeriodicEngines.hpp>
 
-class SubdomainOptimizer: public PeriodicEngine{
+class SubdomainBalancer: public PeriodicEngine{
 	struct SplitPlane{
 		int ax;   // axis number
 		Real lim; // limit coordinate on axis ax 
@@ -28,7 +28,7 @@ class SubdomainOptimizer: public PeriodicEngine{
 	void adjustSplitPlanes();
 public:
 	virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SubdomainOptimizer,PeriodicEngine,"Assigns :yref:`bodies <Omega.bodies>` to spatially-defined subdomains, which increase performance with OpenMP builds -- each OpenMP thread is responsible for processing one subdomain (if the respective loop is parallelized). Using subdomains is not mandatory, though without them, OpenMP-enabled builds are not parallelized.\n\nIn the first run, subdomains are created by finding planes splitting the simulation domain the desired number of subdomains (2…8). Later, due to particle motion, particles within one subdomain might not be spatially close, and subdomains assignments should be renewed; the interval at which this engine should be run terefore depends on the nature of simulation.\n\n.. note:: Constructor changes default values of :yref:`initRun <PeriodicEngine::initRun>` to ``True`` and :yref:`iterPeriod <PeriodicEngine.iterPeriod>` to 500, to make it suitable for running without setting further arguments.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SubdomainBalancer,PeriodicEngine,"Assigns :yref:`bodies <Omega.bodies>` to spatially-defined subdomains, which increase performance with OpenMP builds -- each OpenMP thread is responsible for processing one subdomain (if the respective loop is parallelized). Using subdomains is not mandatory, though without them, OpenMP-enabled builds are not parallelized.\n\nIn the first run, subdomains are created by finding planes splitting the simulation domain the desired number of subdomains (2…8). Later, due to particle motion, particles within one subdomain might not be spatially close, and subdomains assignments should be renewed; the interval at which this engine should be run terefore depends on the nature of simulation.\n\n.. note:: Constructor changes default values of :yref:`initRun <PeriodicEngine::initRun>` to ``True`` and :yref:`iterPeriod <PeriodicEngine.iterPeriod>` to 500, to make it suitable for running without setting further arguments.",
 		((bool,colorize,true,,"Change :yref:`colors <Shape.color>` of particles to show subdomain assignment visually."))
 		((string,axesOrder,"",,"Order of axes that determine intial splitting planes orientation; if not set, they are determined from total extents of the simulation (from the longest to the shortest one). Must be combination of *x*, *y*, *z*."))
 		// ((string,div,"",,"Initial division string; "))
@@ -37,6 +37,6 @@ public:
 	);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(SubdomainOptimizer);
+REGISTER_SERIALIZABLE(SubdomainBalancer);
 
 #endif /* YADE_SUBDOMAINS */

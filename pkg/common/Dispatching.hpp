@@ -34,12 +34,6 @@ class IGeomFunctor: public Functor2D<
 	/*argument types*/ TYPELIST_7(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&) 
 >{
 	public: virtual ~IGeomFunctor();
-	#ifdef YADE_DEVIRT_FUNCTORS
-		// type of the pointer to devirtualized functor (static method taking the functor instance as the first argument)
-		typedef bool(*StaticFuncPtr)(IGeomFunctor*, const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&);
-		// return devirtualized functor (static method); must be overridden in derived classes
-		virtual void* getStaticFuncPtr(){ throw runtime_error(("IGeomFunctor::getStaticFuncPtr() not overridden in class "+getClassName()+".").c_str()); }
-	#endif
 	YADE_CLASS_BASE_DOC(IGeomFunctor,Functor,"Functor for creating/updating :yref:`Interaction::geom` objects.");
 };
 REGISTER_SERIALIZABLE(IGeomFunctor);

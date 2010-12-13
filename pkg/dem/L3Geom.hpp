@@ -88,7 +88,7 @@ struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{
 	enum { APPROX_NO_RENORM_TRSF=1, APPROX_NO_MID_TRSF=2, APPROX_NO_MID_NORMAL=4, APPROX_NO_RENORM_MID_NORMAL=8 };
 
 	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom_Inc,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/_extraDocs.py",
-		((bool,noRatch,true,,"See :yref:`ScGeom.avoidGranularRatcheting`."))
+		((bool,noRatch,true,,"See :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting`."))
 		((Real,distFactor,1,,"Create interaction if spheres are not futher than distFactor*(r1+r2)."))
 		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n"
 		"== ===============================================================\n"

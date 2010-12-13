@@ -68,9 +68,6 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 	Vector3r shift2=scene->cell->Hsize*cellDist.cast<Real>();
 	updateScenePtr();
 	if(force){
-		#ifdef YADE_DEVIRT_FUNCTORS
-			throw logic_error("IGeomDispatcher::explicitAction not supported with the devirt-functors feature (yet)");
-		#endif
 		assert(b1->shape && b2->shape);
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
 		I->cellDist=cellDist;
