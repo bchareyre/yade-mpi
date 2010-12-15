@@ -97,6 +97,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 					scm=YADE_PTR_CAST<CylScGeom>(c->geom);
 // 					scm->duplicate = intr;
 					scm->isDuplicate = true;
+					scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
 					isNew = false;
 					return true;}
 			} else scm->isDuplicate=true;
@@ -114,6 +115,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 				c->phys = intr->phys;
 				scm=YADE_PTR_CAST<CylScGeom>(c->geom);
 // 				scm->duplicate = intr;
+				scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
 				scm->isDuplicate = true;
 				isNew = false;
 				return true;
