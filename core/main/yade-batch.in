@@ -297,11 +297,11 @@ def getNumCores():
 numCores=getNumCores()
 maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
 
-parser=optparse.OptionParser(usage='%prog [options] [TABLE] SIMULATION.py',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.')
+parser=optparse.OptionParser(usage='%prog [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
 parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to allocate all available cores (%d, which might be further limited with --jobs) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=-1)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see -j), even if !THREADS colums specifies more.')
-parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
+parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a $, % or @, which will be replaced by script name, line number or by description column respectively (default: $.@.log)',metavar='FORMAT',default='$.@.log')
 parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
@@ -331,22 +331,22 @@ if opts.manpage:
 	sys.exit(0)
 
 if globalLog:
+	print 'Redirecting all output to',globalLog
 	sys.stderr=open(globalLog,"w")
 	sys.stdout=sys.stderr
 
-if len(args) not in (1,2):
+if len([1 for a in args if re.match('.*\.py(/[0-9]+)?',a)])==len(args) and len(args)!=0:
+	# if all args end in .py, they are simulations that we will run
+	table=None; scripts=args
+elif len(args)==2:
+	table,scripts=args[0],[args[1]]
+elif len(args)==1:
+	table,scripts=args[0],[]
+else:
 	parser.print_help()
 	sys.exit(1)
-elif len(args)==2:
-	table,simul=args[0:2]
-else:
-	assert(len(args)==1);
-	table=None; simul=args[0]
 
-if not logFormat: logFormat=(simul[:-3] if simul[-3:]=='.py' else simul)+".@.log"
-if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log string must contain at least one of `%', `@'")
-
-print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', using max %d cores."%(executable,simul,nice,logFormat,maxJobs)
+print "Will run simulation(s) %s using `%s', nice value %d, using max %d cores."%(scripts,executable,nice,maxJobs)
 
 if table:
 	reader=yade.utils.TableParamReader(table)
@@ -370,15 +370,23 @@ if table:
 	else: useLines=availableLines
 	print "Will use lines ",', '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.'
 else:
-	print "Running stand-alone simulation in batch mode."
-	useLines=[-1]
-	params={-1:{'description':'default'}}
-
+	print "Running %d stand-alone simulation(s) in batch mode."%(len(scripts))
+	useLines=[]
+	params={}
+	for i,s in enumerate(scripts):
+		fakeLineNo=-i-1
+		useLines.append(fakeLineNo)
+		params[fakeLineNo]={'description':'default','!SCRIPT':s}
+		# fix script and set threads if script.py/num
+		m=re.match('(.*)(/[0-9]+)$',s)
+		if m:
+			params[fakeLineNo]['!SCRIPT']=m.group(1)
+			params[fakeLineNo]['!THREADS']=int(m.group(2)[1:])
 jobs=[]
 executables=set()
+logFiles=[]
 for i,l in enumerate(useLines):
-	logFile=logFormat.replace('%',str(l))
-	logFile=logFile.replace('@',params[l]['description'])
+	script=scripts[0] if len(scripts)>0 else None
 	envVars=[]
 	nCores=opts.defaultThreads if opts.defaultThreads>0 else opts.maxJobs
 	jobExecutable=executable
@@ -390,10 +398,14 @@ for i,l in enumerate(useLines):
 		val=params[l][col]
 		if col=='!OMP_NUM_THREADS' or col=='!THREADS': nCores=int(val)
 		elif col=='!EXEC': jobExecutable=val
+		elif col=='!SCRIPT': script=val
 		elif col=='!AFFINITY': jobAffinity=eval(val)
 		elif col=='!DEBUG': jobDebug=eval(val)
 		elif col=='!COUNT': jobCount=eval(val)
 		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
+	if not script:
+		raise ValueError('When only batch table is given without script to run, it must contain !SCRIPT column with simulation to be run.')
+	logFile=logFormat.replace('$',script).replace('%',str(l)).replace('@',params[l]['description'])
 	if nCores>maxJobs:
 		if opts.forceThreads:
 			logging.info('Forcing job #%d to use only %d cores (max available) instead of %d requested'%(i,maxJobs,nCores))
@@ -406,17 +418,24 @@ for i,l in enumerate(useLines):
 	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
 	for j in range(0,opts.timing if opts.timing>0 else 1):
 		jobNum=len(jobs)
-		logFileNumbered=logFile+('.%d'%j if opts.timing>0 else '')
+		logFile2=logFile+('.%d'%j if opts.timing>0 else '')
+		# append numbers to log file if it already exists, to prevent overwriting
+		if logFile2 in logFiles:
+			i=0;
+			while logFile2+'.%d'%i in logFiles: i+=1
+			logFile2+='.%d'%i
+		logFiles.append(logFile2)
 		env='YADE_BATCH='
 		if table: env+='<a href="jobs/%d/table">%s:%d</a>'%(jobNum,table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		env+=' DISPLAY= %s '%(' '.join(envVars))
-		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,' --debug' if jobDebug else '','--nice=%s'%nice if nice!=None else '',i,simul)
-		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFileNumbered))
+		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,' --debug' if jobDebug else '','--nice=%s'%nice if nice!=None else '',i,script)
+		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFile2))
 		hrefCmd=env+cmd+log
 		fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
 		desc=params[l]['description']
+		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
-		jobs.append(JobInfo(jobNum,desc,fullCmd,hrefCmd,logFileNumbered,nCores,script=simul,table=table,lineNo=l,affinity=jobAffinity))
+		jobs.append(JobInfo(jobNum,desc,fullCmd,hrefCmd,logFile2,nCores,script=script,table=table,lineNo=l,affinity=jobAffinity))
 
 print "Master process pid",os.getpid()
 

@@ -3,6 +3,10 @@
 #include<yade/lib/serialization/Serializable.hpp>
 #include<yade/lib/multimethods/Indexable.hpp>
 #include<yade/core/Dispatcher.hpp>
+
+// delete later and remove relevant code, to not support old State.blockedDOFs=['x','y','rz'] syntax anymore
+#define YADE_DEPREC_DOF_LIST
+
 /*! State (internal & spatial variables) of a body.
 
 For now, I put position, orientation, velocity and angular velocity here,
@@ -40,10 +44,14 @@ class State: public Serializable, public Indexable{
 		static unsigned axisDOF(int axis, bool rotationalDOF=false){return 1<<(axis+(rotationalDOF?3:0));}		
 		//! set DOFs according to two Vector3r arguments (blocked is when disp[i]==1.0 or rot[i]==1.0)
 		void setDOFfromVector3r(Vector3r disp,Vector3r rot=Vector3r::Zero());
-		//! Getter of blockedDOFs for list of strings (e.g. DOF_X | DOR_RX | DOF_RZ → ['x','rx','rz'])
-		std::vector<std::string> blockedDOFs_vec_get() const;
-		//! Setter of blockedDOFs from list of strings (['x','rx','rz'] → DOF_X | DOR_RX | DOF_RZ)
-		void blockedDOFs_vec_set(const std::vector<std::string>& dofs);
+		//! Getter of blockedDOFs for list of strings (e.g. DOF_X | DOR_RX | DOF_RZ → 'xXZ')
+		std::string blockedDOFs_vec_get() const;
+		//! Setter of blockedDOFs from string ('xXZ' → DOF_X | DOR_RX | DOF_RZ)
+		#ifdef YADE_DEPREC_DOF_LIST
+			void blockedDOFs_vec_set(const python::object&);
+		#else
+			void blockedDOFs_vec_set(const std::string& dofs);
+		#endif
 
 		//! Return displacement (current-reference position)
 		Vector3r displ() const {return pos-refPos;}
@@ -78,11 +86,12 @@ class State: public Serializable, public Indexable{
 		/* ctor */,
 		/*py*/
 		YADE_PY_TOPINDEXABLE(State)
-		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always constant (equal to zero, or to an user-defined value), regardless of applied force/torque. List of any combination of 'x','y','z','rx','ry','rz'.")
+		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always constant (equal to zero, or to an user-defined value), regardless of applied force/torque. String that may contain 'xyzXYZ' (translations and rotations).")
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
 		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.") 
 	);
 	REGISTER_INDEX_COUNTER(State);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(State);
