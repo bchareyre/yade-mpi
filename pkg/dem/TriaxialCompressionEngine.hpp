@@ -13,9 +13,10 @@
 #include<yade/pkg/dem/TriaxialStressController.hpp>
 #include<string>
 
-/** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial test with constant lateral stress and constant axial strain rate.
+/** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial test with constant lateral stress and constant axial strain rate. The algorithms used have been developed initialy for simulations reported in [Chareyre2002a] and [Chareyre2005]. They have been ported to Yade in a second step and used in e.g. [Kozicki2008],[Scholtes2009b],[Jerier2010b].
  *
- * The engine is a state machine with the following states; transitions my be automatic, see below.
+ * The engine is a state machine with the following states; transitions may be automatic, see below.
+ The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b].
  *
  * 1. STATE_ISO_COMPACTION: isotropic compaction (compression) until
  *    the prescribed mean pressue sigmaIsoCompaction is reached and the packing is stable.
@@ -29,7 +30,7 @@
  * 	top and bottom walls load the packing in their axis (by straining), until the value of epsilonMax
  * 	(deformation along the loading axis) is reached. At this point, the simulation is stopped.
  * 4. STATE_FIXED_POROSITY_COMPACTION: isotropic compaction (compression) until
- *    a chosen porosity value (parameter:fixedPorosity). The six walls move with a chosen translation speed 
+ *    a chosen porosity value (parameter:fixedPorosity). The six walls move with a chosen translation speed
  *    (parameter StrainRate).
  * 5. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
  *
@@ -37,8 +38,8 @@
  * Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is
  *   done automatically if autoCompressionActivation=true;
  * Both autoUnload and autoCompressionActivation are true by default.
- * 
- * NOTE: This engine handles many different manipulations, including some save/reload with attributes modified manually in between. Please don't modify the algorithms, even if they look strange (especially test sequences) without notifying me and getting explicit approval. A typical situation is somebody generates a sample with !autoCompressionActivation and run : he wants a saved simulation at the end. He then reload the saved state, modify some parameters, set autoCompressionActivation=true, and run. He should get the compression test 
+ *
+ * NOTE: This engine handles many different manipulations, including some save/reload with attributes modified manually in between. Please don't modify the algorithms, even if they look strange (especially test sequences) without notifying me and getting explicit approval. A typical situation is somebody generates a sample with !autoCompressionActivation and run : he wants a saved simulation at the end. He then reload the saved state, modify some parameters, set autoCompressionActivation=true, and run. He should get the compression test done.
  *
  */
 
@@ -46,16 +47,16 @@ class TriaxialCompressionEngine : public TriaxialStressController
 {
 	private :
 		std::string Phase1End;//used to name output files based on current state
-				
+
 	public :
 		//TriaxialCompressionEngine();
 		virtual ~TriaxialCompressionEngine();
-		
+
 		// FIXME: current serializer doesn't handle named enum types, this is workaround.
 		#define stateNum int
 		// should be "enum stateNum {...}" once this is fixed
 		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING,  STATE_FIXED_POROSITY_COMPACTION, STATE_LIMBO};
-		
+
 		void doStateTransition(stateNum nextState);
 		#define _STATE_CASE(ST) case ST: return #ST
 		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_FIXED_POROSITY_COMPACTION);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
@@ -68,13 +69,13 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		//! is this the beginning of the simulation, after reading the scene?
 		bool firstRun;
 		int FinalIterationPhase1, Iteration/*, testEquilibriumInterval*/;//FIXME : what is that?
-		
+
 		virtual void action();
 		void updateParameters();
-		
+
 		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)
 		void setContactProperties(Real frictionDegree);
-		
+
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(
 		TriaxialCompressionEngine,TriaxialStressController,
 		"The engine is a state machine with the following states; transitions my be automatic, see below.\n\n"
@@ -84,7 +85,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		"#. STATE_FIXED_POROSITY_COMPACTION: isotropic compaction (compression) until a chosen porosity value (parameter:fixedPorosity). The six walls move with a chosen translation speed (parameter StrainRate).\n"
 		"#.  STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.\n\n"
 		"Transition from COMPACTION to UNLOADING is done automatically if autoUnload==true;\n\n Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is done automatically if autoCompressionActivation=true; Both autoUnload and autoCompressionActivation are true by default.\n\n"
-		"\n\n.. note::\n\t This engine handles many different manipulations, including some save/reload with attributes modified manually in between. Please don't modify the algorithms, even if they look strange (especially test sequences) without notifying me and getting explicit approval. A typical situation is somebody generates a sample with !autoCompressionActivation and run : he wants a saved simulation at the end. He then reload the saved state, modify some parameters, set autoCompressionActivation=true, and run. He should get the compression test done."
+		"\n\n.. note::\n\t Most of the algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
 		((Real,strainRate,0,,"target strain rate (./s)"))
 		((Real,currentStrainRate,0,,"current strain rate - converging to :yref:`TriaxialCompressionEngine::strainRate` (./s)"))
