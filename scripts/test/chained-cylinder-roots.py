@@ -13,26 +13,24 @@ density=1e3
 frictionAngle1=radians(15)
 frictionAngle2=radians(15)
 frictionAngle3=radians(15)
-O.dt=5e-5
+O.dt=5e-4
 
 O.materials.append(FrictMat(young=4000000.0,poisson=0.5,frictionAngle=frictionAngle1,density=1600,label='spheremat'))
-O.materials.append(CohFrictMat(young=1.0e6,poisson=0.2,density=2.60e3,frictionAngle=frictionAngle2,label='walllmat'))
+O.materials.append(FrictMat(young=1.0e6,poisson=0.2,density=2.60e3,frictionAngle=frictionAngle2,label='walllmat'))
 
-Ns=10
+Ns=90
 sp=pack.SpherePack()
 
 #cohesive spheres crash because sphere-cylnder functor geneteragets ScGeom3D
 #O.materials.append(CohFrictMat(young=1.0e5,poisson=0.03,density=2.60e2,frictionAngle=frictionAngle,label='spheremat'))
 
-if os.path.exists("cloud4cylinders"):
+if os.path.exists("cloud4cylinders"+`Ns`):
  	print "loading spheres from file"
-	sp.load("cloud4cylinders")
-	Ns=0
-	for x in sp: Ns=Ns+1 #is there another way?
+	sp.load("cloud4cylinders"+`Ns`)
 else:
  	print "generating spheres"
- 	Ns=sp.makeCloud(Vector3(-0.3,0.2,-1.0),Vector3(+0.3,+0.5,+1.0),-1,.2,Ns,False,0.9)
-	sp.save("cloud4cylinders")
+ 	Ns=sp.makeCloud(Vector3(-0.3,0.2,-1.0),Vector3(+0.3,+0.5,+1.0),-1,.2,Ns,False,0.8)
+	sp.save("cloud4cylinders"+`Ns`)
 
 O.bodies.append([utils.sphere(center,rad,material='spheremat') for center,rad in sp])
 walls=utils.aabbWalls((Vector3(-0.3,-0.15,-1),Vector3(+0.3,+1.0,+1)),thickness=.1,material='walllmat')
@@ -55,7 +53,7 @@ O.engines=[
 	## Apply gravity
 	GravityEngine(gravity=[1,-9.81,0],label='gravity'),
 	## Motion equation
-	NewtonIntegrator(damping=0.20,label='newton'),
+	NewtonIntegrator(damping=0.05,label='newton'),
 ]
 
 #Assemble cylinders in sinusoidal shapes
@@ -80,9 +78,4 @@ for j in range(-Nc, Nc+1):
 			b.state.blockedDOFs=['x','y','z','rx','ry','rz']
 	ChainedState.currentChain=ChainedState.currentChain+1
 
-def outp(id=1):
-	for i in O.interactions:
-		if i.id1 == 1:
-			print i.phys.shearForce
-			print i.phys.normalForce
-			return  i
+O.saveTmp()

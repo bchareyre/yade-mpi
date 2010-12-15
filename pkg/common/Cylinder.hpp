@@ -52,10 +52,13 @@ class CylScGeom: public ScGeom{
 	public:
 		/// Emulate a sphere whose position is the projection of sphere's center on cylinder sphere, and with motion linearly interpolated between nodes
 		State fictiousState;
+// 		shared_ptr<Interaction> duplicate;
 
 		virtual ~CylScGeom ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CylScGeom,ScGeom,"Geometry of a cylinder-sphere contact.",
 		((bool,onNode,false,,"contact on node?"))
+		((int,isDuplicate,0,,"this flag is turned true (1) automaticaly if the contact is shared between two chained cylinders. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
+		((int,trueInt,-1,,"Defines the body id of the cylinder where the contact is real, when :yref:`CylScGeom::isDuplicate`>0."))
 		((Vector3r,start,Vector3r::Zero(),,"position of 1st node |yupdate|"))
 		((Vector3r,end,Vector3r::Zero(),,"position of 2nd node |yupdate|"))
 		((Body::id_t,id3,0,,"id of next chained cylinder |yupdate|"))
@@ -73,6 +76,7 @@ class ChainedState: public State{
 		static unsigned int currentChain;
 		vector<Body::id_t> barContacts;
 		vector<Body::id_t> nodeContacts;
+// 		shared_ptr<ChainedState> statePrev;
 
 		virtual ~ChainedState ();
 		void addToChain(Body::id_t bodyId) {
@@ -80,13 +84,17 @@ class ChainedState: public State{
 			chainNumber=currentChain;
  			rank=chains[currentChain].size();
  			chains[currentChain].push_back(bodyId);
-			bId=bodyId;}
+			bId=bodyId;
+// 			if (rank>0) statePrev = Body::byId(chains[chainNumber][rank-1],scene)->state;
+		}
 
  		void postLoad (ChainedState&){
 			if (bId<0) return;//state has not been chained yet
  			if (chains.size()<=currentChain) chains.resize(currentChain+1);
-			if (chains[currentChain].size()<=rank) chains.resize(rank+1);
-			chains[currentChain][rank]=bId;}
+			if (chains[currentChain].size()<=rank) chains[currentChain].resize(rank+1);
+			chains[currentChain][rank]=bId;
+// 			if (rank>0) statePrev = Body::byId(chains[chainNumber][rank-1],scene)->state;
+		}
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ChainedState,State,"State of a chained bodies, containing information on connectivity in order to track contacts jumping over contiguous elements. Chains are 1D lists from which id of chained bodies are retrieved via :yref:rank<ChainedState::rank>` and :yref:chainNumber<ChainedState::chainNumber>`.",
  		((unsigned int,rank,0,,"rank in the chain"))

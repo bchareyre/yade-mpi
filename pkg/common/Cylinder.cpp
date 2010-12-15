@@ -5,6 +5,7 @@
 #endif
 #include<yade/pkg/common/Aabb.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
+#include "../../lib/base/Math.hpp"
 
 Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}
@@ -12,7 +13,6 @@ ChainedState::~ChainedState(){}
 CylScGeom::~CylScGeom(){}
 // Ig2_Sphere_ChainedCylinder_CylScGeom::~Ig2_Sphere_ChainedCylinder_CylScGeom() {}
 // Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::~Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D() {}
-
 
 YADE_PLUGIN((Cylinder)(ChainedCylinder)(ChainedState)(CylScGeom)(Ig2_Sphere_ChainedCylinder_CylScGeom)(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D)(Law2_CylScGeom_FrictPhys_CundallStrack)
 	#ifdef YADE_OPENGL
@@ -33,7 +33,6 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
 							const shared_ptr<Interaction>& c)
 {
-// 	cerr<<"Ig2_Sphere_ChainedCylinder_CylScGeom::go"<<endl;
 	const State* sphereSt=YADE_CAST<const State*>(&state1);
 	const ChainedState* cylinderSt=YADE_CAST<const ChainedState*>(&state2);
 	ChainedCylinder *cylinder=YADE_CAST<ChainedCylinder*>(cm2.get());
@@ -41,48 +40,94 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	assert(sphereSt && cylinderSt && cylinder && sphere);
 	bool isLast = (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1));
 	bool isNew = !c->geom;
-// 	if (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1)) {cerr << "last cylinder - ignored"<<endl; return false;}
+
+	shared_ptr<const ChainedState> statePrev;
+	if (cylinderSt->rank>0)
+		statePrev = YADE_PTR_CAST<const ChainedState> (Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene)->state);
+
+	shared_ptr<CylScGeom> scm;
+	if (!isNew) {scm=YADE_PTR_CAST<CylScGeom>(c->geom);}
 
 	//FIXME : definition of segment in next line breaks periodicity
-// 	cerr << cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]<<endl;
-// 	cerr<<Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene)->state->pos<<endl;
 	shared_ptr<Body> cylinderNext;
 	Vector3r segment, branch, direction;
 	Real length, dist;
+	branch = sphereSt->pos-cylinderSt->pos-shift2;
 	if (!isLast) {
 		cylinderNext = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene);
 		segment = cylinderNext->state->pos-cylinderSt->pos;
-		branch = sphereSt->pos-cylinderSt->pos-shift2;
-		if ((segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/) && isNew)) return false;//position _after_ end of cylinder
+		if (segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/)) {//position _after_ end of cylinder
+			//FIXME : scm->penetrationDepth=-1 is defined to workaround interactions never being erased when scm->isDuplicate=2 on the true interaction.
+			if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
 		length = segment.norm();
 		direction = segment/length;
 		dist = direction.dot(branch);
-		if ((dist<-interactionDetectionFactor*cylinder->radius) && isNew) return false;
-		if (cylinderSt->rank>0){//make sure there is no contact with the previous element in the chain, or consider it a duplicate and continue
-			const shared_ptr<Body> cylinderPrev = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene);
-			Vector3r branchP = sphereSt->pos-cylinderPrev->state->pos;
-			Vector3r segmentP = cylinderSt->pos - cylinderPrev->state->pos;
-			if (segmentP.dot(branchP)<segmentP.dot(segmentP)) return false;//will give false on existing interaction, as expected
-		}
+		if (dist<-interactionDetectionFactor*cylinder->radius &&
+			branch.squaredNorm() > pow(interactionDetectionFactor*(sphere->radius+cylinder->radius),2)) {
+				if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
 	} else {//handle the last node with length=0
 		segment = Vector3r(0,0,0);
-		branch = sphereSt->pos-cylinderSt->pos-shift2;
 		length = 0;
 		direction = Vector3r(0,1,0);
-		dist = 0;}
+		dist = 0;
+		if (branch.squaredNorm() > interactionDetectionFactor*(sphere->radius+cylinder->radius)) {
+			if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
+	}
 
 	//Check sphere-cylinder distance
 	Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
 	branch = projectedP-sphereSt->pos;
-	if ((branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) && isNew) return false;
+	if (branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) {
+		if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
 
-	shared_ptr<CylScGeom> scm;
-	if(!isNew) scm=YADE_PTR_CAST<CylScGeom>(c->geom);
-	else { scm=shared_ptr<CylScGeom>(new CylScGeom()); c->geom=scm; }
+	if (!isNew) scm->isDuplicate = false;//reset here at each step, and recompute below
+
+	//make sure there is no contact with the previous element in the chain, else consider this one a duplicate and get data from the other contact. two interactions will share the same geometry and physics.
+	if (cylinderSt->rank>0 && dist<=0) {
+		Vector3r branchP = sphereSt->pos - statePrev->pos;
+		Vector3r segmentP = cylinderSt->pos - statePrev->pos;
+		if (segmentP.dot(branchP)<segmentP.dot(segmentP)) {
+			if (isNew) {
+				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1]);
+				assert(intr);//we know there is a contact, so there should be at least a virtual interaction created by collider
+				if (!intr->geom || !intr->phys) return false;
+				else {
+					c->geom = intr->geom;
+					c->phys = intr->phys;
+					scm=YADE_PTR_CAST<CylScGeom>(c->geom);
+// 					scm->duplicate = intr;
+					scm->isDuplicate = true;
+					isNew = false;
+					return true;}
+			} else scm->isDuplicate=true;
+			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
+		}
+	}
+	//similarly, make sure there is no contact with the next element in the chain
+	else if (!isLast && dist>length) {
+		if ( (cylinderNext->state->pos-sphereSt->pos).squaredNorm() <  pow(sphere->radius+cylinder->radius,2)) {
+			if (isNew) {
+				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]);
+				assert(intr);
+				if (!intr->geom || !intr->phys) return false;
+				c->geom = intr->geom;
+				c->phys = intr->phys;
+				scm=YADE_PTR_CAST<CylScGeom>(c->geom);
+// 				scm->duplicate = intr;
+				scm->isDuplicate = true;
+				isNew = false;
+				return true;
+			} else scm->isDuplicate=true;
+			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+		}
+	}
+
+	//We didn't find any special case, do normal geometry definition
+	if (isNew) { scm=shared_ptr<CylScGeom>(new CylScGeom()); c->geom=scm;}
 
 	scm->radius1=sphere->radius;
 	scm->radius2=cylinder->radius;
-	if (!isLast) scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+	if (!isLast && !scm->id3) scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
 	scm->start=cylinderSt->pos+shift2; scm->end=scm->start+segment;
 
 	//FIXME : there should be other checks without distanceFactor?
@@ -167,7 +212,6 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 	//bs1->segment used for fast BBs and projections + display
 	bs1->segment= bchain2.pos-bchain1.pos;
 #ifdef YADE_OPENGL
-	//bs1->length and s1->chainedOrientation used for display only,
 	bs1->length=length;
 	bs1->chainedOrientation.setFromTwoVectors(Vector3r::UnitZ(),bchain1.ori.conjugate()*segt);
 #endif
@@ -236,18 +280,11 @@ void Gl1_ChainedCylinder::go(const shared_ptr<Shape>& cm, const shared_ptr<State
 
 void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift) const
 {
-//    GLERROR;
-/*	if (glCylinderList<0) {
-		glCylinderList = glGenLists(1);
-		glNewList(glCylinderList,GL_COMPILE);*/
    glPushMatrix();
    GLUquadricObj *quadObj = gluNewQuadric();
    gluQuadricDrawStyle(quadObj, (GLenum) (wire ? GLU_SILHOUETTE : GLU_FILL));
    gluQuadricNormals(quadObj, (GLenum) GLU_SMOOTH);
    gluQuadricOrientation(quadObj, (GLenum) GLU_OUTSIDE);
-//     glTranslatef(0.0,0.0,-length*0.5);
-   //scaling needs to adapt spheres or they will be elipsoids. They actually seem to disappear when commented glList code is uncommented, the cylinders are displayed correclty.
-//    glScalef(1,length,1);
    AngleAxisr aa(shift);
    glRotatef(aa.angle()*180.0/Mathr::PI,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
    gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
@@ -259,43 +296,8 @@ void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quate
 //    gluDisk(quadObj,0.0,radius,glutSlices,_loops);
    gluDeleteQuadric(quadObj);
    glPopMatrix();
-//    GLERROR;
-
-// 	glEndList();}
-// 	glCallList(glCylinderList);
-
 }
 
-// void Gl1_Cylinder::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift) const
-// {
-// //    GLERROR;
-// /*	if (glCylinderList<0) {
-// 		glCylinderList = glGenLists(1);
-// 		glNewList(glCylinderList,GL_COMPILE);*/
-//    glPushMatrix();
-//    GLUquadricObj *quadObj = gluNewQuadric();
-//    gluQuadricDrawStyle(quadObj, (GLenum) (wire ? GLU_SILHOUETTE : GLU_FILL));
-//    gluQuadricNormals(quadObj, (GLenum) GLU_SMOOTH);
-//    gluQuadricOrientation(quadObj, (GLenum) GLU_OUTSIDE);
-// //     glTranslatef(0.0,0.0,-length*0.5);
-//    //scaling needs to adapt spheres or they will be elipsoids. They actually seem to disappear when commented glList code is uncommented, the cylinders are displayed correclty.
-// //    glScalef(1,length,1);
-//    gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
-//    gluQuadricOrientation(quadObj, (GLenum) GLU_INSIDE);
-//    glutSolidSphere(radius,glutSlices,glutStacks);
-//    glTranslatef(0.0,0.0,length);
-//    AngleAxisr aa(shift);
-//    glRotatef(aa.angle(),aa.axis()[0],aa.axis()[1],aa.axis()[2]);
-//    glutSolidSphere(radius,glutSlices,glutStacks);
-// //    gluDisk(quadObj,0.0,radius,glutSlices,_loops);
-//    gluDeleteQuadric(quadObj);
-//    glPopMatrix();
-// //    GLERROR;
-//
-// // 	glEndList();}
-// // 	glCallList(glCylinderList);
-//
-// }
 
 //!##################	BOUNDS FUNCTOR   #####################
 
@@ -315,22 +317,7 @@ void Bo1_Cylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, c
 		}
 		return;
 	}
-	// adjust box size along axes so that cylinder doesn't stick out of the box even if sheared (i.e. parallelepiped)
-// 	if(scene->cell->hasShear()) {
-// 		Vector3r refHalfSize(minkSize);
-// 		const Vector3r& cos=scene->cell->getCos();
-// 		for(int i=0; i<3; i++){
-// 			//cerr<<"cos["<<i<<"]"<<cos[i]<<" ";
-// 			int i1=(i+1)%3,i2=(i+2)%3;
-// 			minkSize[i1]+=.5*refHalfSize[i1]*(1/cos[i]-1);
-// 			minkSize[i2]+=.5*refHalfSize[i2]*(1/cos[i]-1);
-// 		}
-// 	}
-// 	//cerr<<" || "<<halfSize<<endl;
-// 	aabb->min = scene->cell->unshearPt(se3.position)-minkSize;
-// 	aabb->max = scene->cell->unshearPt(se3.position)+minkSize;
 }
-
 
 void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
 	Cylinder* cylinder = static_cast<Cylinder*>(cm.get());
@@ -351,7 +338,7 @@ void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>
 void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
-	CylScGeom*    geom= static_cast<CylScGeom*>(ig.get());
+	CylScGeom* geom= static_cast<CylScGeom*>(ig.get());
 	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
 	if(geom->penetrationDepth <0){
 		if (neverErase) {
@@ -359,6 +346,13 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 			phys->normalForce = Vector3r::Zero();}
 		else 	scene->interactions->requestErase(id1,id2);
 		return;}
+	if (geom->isDuplicate) {
+		if (id2!=geom->trueInt) {
+// 			cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
+			if (geom->isDuplicate==2) scene->interactions->requestErase(id1,id2);
+// 			cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
+			return;}
+	}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
 

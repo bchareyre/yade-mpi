@@ -38,7 +38,6 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shift2, const Vector3r& shiftVel, bool avoidGranularRatcheting){
 	if(avoidGranularRatcheting){
-		//FIXME : put the long comment on the wiki and keep only a small abstract and link here.
 		/* B.C. Comment :
 		Giving a short explanation of what we want to avoid :
 		Numerical ratcheting is best understood considering a small elastic cycle at a contact between two grains : assuming b1 is fixed, impose this displacement to b2 :
