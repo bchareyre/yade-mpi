@@ -68,13 +68,14 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 	imp = STLImporter()
 	facets=imp.ymport(file)
 	for b in facets:
-		b.dynamic=dynamic
 		b.shape.color=color if color else utils.randomColor()
 		b.shape.wire=wire
 		b.shape.highlight=highlight
 		pos,ori=b.state.pos,b.state.ori
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material)
 		b.state.pos,b.state.ori=pos,ori
+		b.aspherical=False # FIXME: is it  reasonably for a facets?
+		b.dynamic=dynamic
 	return facets
 
 def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):

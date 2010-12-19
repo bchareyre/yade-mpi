@@ -285,7 +285,8 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
-	b.aspherical=True
+	#b.aspherical=True
+	b.aspherical=False # FIXME: is it reasonably for a facets?
 	b.mask=mask
 	return b
 

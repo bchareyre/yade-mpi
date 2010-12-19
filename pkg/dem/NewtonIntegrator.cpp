@@ -258,7 +258,7 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
 	Vector3r angVel_b_half = l_b_half.cwise()/state->inertia; // local angular velocity at time n+1/2
-	blockRotateDOFs( state->blockedDOFs, angVel_b_half );
+	//blockRotateDOFs( state->blockedDOFs, angVel_b_half ); // FIXME: angVel_b_half is the local velocity, but blockedDOFs need for the _global_ velocity.
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
 	state->ori=state->ori+dt*dotQ_half; // Q at time n+1
 	state->angVel=state->ori*angVel_b_half; // global angular velocity at time n+1/2

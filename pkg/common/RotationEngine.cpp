@@ -61,13 +61,13 @@ void RotationEngine::action(){
 		b->state->angVel=rotationAxis*angularVelocity;
 		if(rotateAroundZero){
 			const Vector3r l=b->state->pos-zeroPoint;
-			if (!b->isDynamic())	b->state->pos=q*l+zeroPoint; 
+			//if (!b->isDynamic())	b->state->pos=q*l+zeroPoint; 
 			b->state->vel=b->state->angVel.cross(l);
 		}
-		if (!b->isDynamic())	{
-			b->state->ori=q*b->state->ori;
-			b->state->ori.normalize();
-		}
+		//if (!b->isDynamic())	{
+			//b->state->ori=q*b->state->ori;
+			//b->state->ori.normalize();
+		//}
 	}
 }
 
