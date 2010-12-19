@@ -25,6 +25,7 @@ class NozzleFactory: public GlobalEngine {
 		((int,maxParticles,100,,"The number of particles at which to stop generating new ones (regardless of massFlowRate"))
 		((int,numParticles,0,,"Cummulative number of particles produces so far |yupdate|"))
 		((int,maxAttempt,5000 ,,"Maximum number of attempts to position a new sphere randomly."))
+		((bool,silent,false ,,"If true no complain about excessing maxAttempt but disable factory (by set massFlowRate=0)."))
 	);
 };
 REGISTER_SERIALIZABLE(NozzleFactory);

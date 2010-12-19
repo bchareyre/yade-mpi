@@ -31,6 +31,8 @@ void NozzleFactory::action(){
 	goalMass+=massFlowRate*scene->dt; // totalMass that we want to attain in the current step
 
 	normal.normalize();
+	const Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r::UnitZ(),normal));
+
 	LOG_TRACE("totalMass="<<totalMass<<", goalMass="<<goalMass);
 
 	while(totalMass<goalMass && (maxParticles<0 || numParticles<maxParticles)){
@@ -41,11 +43,10 @@ void NozzleFactory::action(){
 		// until there is no overlap, pick a random position for the new particle
 		int attempt;
 		for(attempt=0; attempt<maxAttempt; attempt++){
-			//TODO: update c (position on the circle in space)
-			//Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the nozzle
+			Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the nozzle
+			c = center+q*Vector3r(cos(angle)*rr,sin(angle)*rr,0)
 			// this version places center in a box around the nozzle center (its size 1.15=2/sqrt(3) diagonal, which is not very exact
-			c=center+Vector3r((randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius);
-			
+			//c=center+Vector3r((randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius);
 			LOG_TRACE("Center "<<c);
 			Bound b; b.min=c-Vector3r(r,r,r); b.max=c+Vector3r(r,r,r);
 			vector<Body::id_t> collidingParticles=collider->probeBoundingVolume(b);
@@ -55,7 +56,8 @@ void NozzleFactory::action(){
 			#endif
 		}
 		if(attempt==maxAttempt) {
-			LOG_WARN("Unable to place new sphere after "<<maxAttempt<<" attempts, giving up.");
+			if (silent) {massFlowRate=0;} 
+			else {LOG_WARN("Unable to place new sphere after "<<maxAttempt<<" attempts, giving up.");}
 			return;
 		}
 		// pick random initial velocity (normal with some variation)

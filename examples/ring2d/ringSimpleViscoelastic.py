@@ -67,7 +67,7 @@ o.engines=[
 	NewtonIntegrator(damping=0),
 	## Apply kinematics to walls
     ## angularVelocity = 0.73 rad/sec = 7 rpm
-	RotationEngine(subscribedBodies=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
+	RotationEngine(ids=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
 
 ]
 
@@ -78,7 +78,7 @@ o.engines=[
 
 for b in o.bodies:
 	if b.shape.name=='Sphere':
-		b.state.blockedDOFs=['z']
+		b.state.blockedDOFs=['z','rx','ry']
 
 
 O.dt=0.02*tc

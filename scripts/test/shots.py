@@ -19,7 +19,8 @@ O.engines=[
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_MindlinPhys(
 			# define restitution coefficients between different pairs of material ids, see the functor's documentation for details
-			en=MatchMaker(fallback='zero',matches=((steelId,shotsId,.4),(shotsId,shotsId,1)))
+			#en=MatchMaker(fallback='zero',matches=((steelId,shotsId,.4),(shotsId,shotsId,1)))
+			en=MatchMaker(matches=((steelId,shotsId,.4),(shotsId,shotsId,1)))
 		)],
 		[Law2_ScGeom_MindlinPhys_Mindlin(label='contactLaw')]
 	),
