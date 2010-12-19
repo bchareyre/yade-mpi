@@ -99,7 +99,7 @@ void NewtonIntegrator::action()
 			State* state=b->state.get();
 			const Body::id_t& id=b->getId();
 			// clump members are non-dynamic; we only get their velocities here
-			if(unlikely(!b->isDynamic() || b->isClumpMember())){
+			if(unlikely(b->isClumpMember())){
 				saveMaximaVelocity(scene,id,state);
 				continue;
 			}

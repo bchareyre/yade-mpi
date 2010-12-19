@@ -91,10 +91,10 @@ try:
 	qt.View()
 except ImportError: pass
 
-log.setLevel('SubdomainOptimizer',log.TRACE)
+log.setLevel('SubdomainBalancer',log.TRACE)
 
 O.engines=[
-	SubdomainOptimizer(colorize=True,initRun=True,iterPeriod=100),
+	SubdomainBalancer(colorize=True,initRun=True,iterPeriod=100),
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()],label='collider'),
 	InteractionLoop(

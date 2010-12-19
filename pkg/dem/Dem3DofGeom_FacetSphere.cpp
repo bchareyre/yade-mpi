@@ -38,15 +38,6 @@ Real Dem3DofGeom_FacetSphere::slipToDisplacementTMax(Real displacementTMax){
 	return (displacementTMax/scale)*(1-scale);
 }
 
-Vector3r Dem3DofGeom_FacetSphere::scaleDisplacementT(Real multiplier){
-	assert(multiplier>=0 && multiplier<=1);
-	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Vector3r diff=.5*(multiplier-1)*(p2-p1);
-	setTgPlanePts(p1-diff,p2+diff);
-	return diff*2.0;
-}
-
-
 CREATE_LOGGER(Ig2_Facet_Sphere_Dem3DofGeom);
 bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	Facet* facet=static_cast<Facet*>(cm1.get());

@@ -38,7 +38,7 @@ O.engines=[
 		#[Ig2_Sphere_Sphere_L3Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True,noSlip=False)] # L3Geom
 		[Ig2_Sphere_Sphere_L6Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)] # L6Geom
 	),
-	LawTester(ids=[0,1],path=[(0,0,0)]*7+[(-1e-5,0,0),(-1e-5,.1,.1)],rotPath=[(0,.2,0),(0,0,0),(0,0,.2),(0,0,0),(.2,0,0),(-.2,0,0),(0,0,0)],pathSteps=[10],doneHook='tester.dead=True; O.pause();',label='tester',rotWeight=0),
+	LawTester(ids=[0,1],disPath=[(0,0,0)]*7+[(-1e-5,0,0),(-1e-5,.1,.1)],rotPath=[(0,.2,0),(0,0,0),(0,0,.2),(0,0,0),(.2,0,0),(-.2,0,0),(0,0,0)],pathSteps=[10],doneHook='tester.dead=True; O.pause();',label='tester',rotWeight=0),
 	#LawTester(ids=[0,1],path=[
 	#	(-1e-5,0,0),(-.1,0,0),(-.1,.1,0),(-1e-5,.1,0), # towards, shear, back to intial normal distance
 	#	(-.02,.1,.1),(-.02,-.1,.1),(-.02,-.1,-.1),(-.02,.1,-.1),(-.02,.1,.1), # go in square in the shear plane without changing normal deformation
@@ -50,10 +50,10 @@ O.engines=[
 def addPlotData():
 	i=O.interactions[0,1]
 	plot.addData(
-		un=tester.ptOurs[0],us1=tester.ptOurs[1],us2=tester.ptOurs[2],
-		ung=tester.ptGeom[0],us1g=tester.ptGeom[1],us2g=tester.ptGeom[2],
-		phiX=tester.rotOurs[0],phiY=tester.rotOurs[1],phiZ=tester.rotOurs[2],
-		phiXg=tester.rotGeom[0],phiYg=tester.rotGeom[1],phiZg=tester.rotGeom[2],
+		un=tester.uTest[0],us1=tester.uTest[1],us2=tester.uTest[2],
+		ung=tester.uGeom[0],us1g=tester.uGeom[1],us2g=tester.uGeom[2],
+		phiX=tester.uTest[3],phiY=tester.uTest[4],phiZ=tester.uTest[5],
+		phiXg=tester.uGeom[3],phiYg=tester.uGeom[4],phiZg=tester.uGeom[5],
 		i=O.iter,Fs=i.phys.shearForce.norm(),Fn=i.phys.normalForce.norm(),Tx=O.forces.t(0)[0],Tyz=sqrt(O.forces.t(0)[1]**2+O.forces.t(0)[2]**2)
 	)
 plot.plots={'us1':('us2',),'Fn':('Fs',),'i':('un','us1','us2'),' i':('Fs','Fn','Tx','Tyz'),'  i':('ung','us1g','us2g'),'i  ':('phiX','phiXg','phiY','phiYg','phiZ','phiZg')}  #'ung','us1g','us2g'

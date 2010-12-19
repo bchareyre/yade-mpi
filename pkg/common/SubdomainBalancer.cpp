@@ -1,15 +1,15 @@
 // © 2010 Václav Šmilauer <eu@doxos.eu>
 #ifdef YADE_SUBDOMAINS
 
-#include<yade/pkg/common/SubdomainOptimizer.hpp>
+#include<yade/pkg/common/SubdomainBalancer.hpp>
 #include<yade/pkg/dem/Clump.hpp>
 
-YADE_PLUGIN((SubdomainOptimizer));
-CREATE_LOGGER(SubdomainOptimizer);
+YADE_PLUGIN((SubdomainBalancer));
+CREATE_LOGGER(SubdomainBalancer);
 
 #ifdef YADE_OPENMP
 
-void SubdomainOptimizer::updateSceneBbox(){
+void SubdomainBalancer::updateSceneBbox(){
 	Real inf=std::numeric_limits<Real>::infinity();
 	mn=Vector3r(inf,inf,inf); mx=Vector3r(-inf,-inf,-inf);
 	nParticles=0;
@@ -17,7 +17,7 @@ void SubdomainOptimizer::updateSceneBbox(){
 	else { mn=Vector3r::Zero(); mx=scene->cell->getSize(); }
 }
 
-void SubdomainOptimizer::initializeSplitPlanes(){
+void SubdomainBalancer::initializeSplitPlanes(){
 	// split planes for subdomains...
 	int nSubdom(scene->bodies->maxSubdomains);
 	assert(nSubdom>1); // the case ==1 should have been caught in ::action already
@@ -30,7 +30,7 @@ void SubdomainOptimizer::initializeSplitPlanes(){
 		case 7: div="aaaaaa"; break;
 		case 8: div="abc"; break;
 		default:
-			throw std::runtime_error(("SubdomainOptimizer: unsupported number of subdomains ("+lexical_cast<string>(nSubdom)+"), currently only 1…8 is possible.").c_str());
+			throw std::runtime_error(("SubdomainBalancer: unsupported number of subdomains ("+lexical_cast<string>(nSubdom)+"), currently only 1…8 is possible.").c_str());
 	}
 	Vector3r axesExtents(mx-mn);
 	string axesBySizeStr;
@@ -43,7 +43,7 @@ void SubdomainOptimizer::initializeSplitPlanes(){
 		for(size_t i=0; i<3; i++){ axesBySizeStr.push_back(axesBySize[i]==0 ? 'x' : (axesBySize[i]==1 ? 'y' : 'z')); }
 	} else {
 		if(axesOrder.size()!=3 || axesOrder.find('x')==string::npos || axesOrder.find('y')==string::npos || axesOrder.find('z')==string::npos){
-			throw std::invalid_argument(("SubdomainOptimizer: axesOrder must be a combination of 'x', 'y', 'z' characters (not '"+axesOrder+"')").c_str());
+			throw std::invalid_argument(("SubdomainBalancer: axesOrder must be a combination of 'x', 'y', 'z' characters (not '"+axesOrder+"')").c_str());
 		}
 		axesBySizeStr=axesOrder;
 	}
@@ -73,7 +73,7 @@ void SubdomainOptimizer::initializeSplitPlanes(){
 	LOG_INFO("Established "<<nSubdom<<" subdomains, with split specification "<<div<<"="<<divXYZ<<".");
 }
 
-void SubdomainOptimizer::adjustSplitPlanes(){
+void SubdomainBalancer::adjustSplitPlanes(){
 	assert(nParticles>0);
 	FOREACH(SplitPlane& sp, splits){
 		assert(sp.aboveSplit>=0);
@@ -92,7 +92,7 @@ void SubdomainOptimizer::adjustSplitPlanes(){
 	}
 }
 
-void SubdomainOptimizer::action(){
+void SubdomainBalancer::action(){
 	// check before we run that we are not useless
 	const int nSubdom(scene->bodies->maxSubdomains);
 	if(nSubdom==1){
@@ -156,7 +156,7 @@ void SubdomainOptimizer::action(){
 }
 
 #else
-void SubdomainOptimizer::action(){
+void SubdomainBalancer::action(){
 	LOG_INFO("Compiled without OpenMP support, no subdomains will be created; killing myself.");
 	dead=true;
 }

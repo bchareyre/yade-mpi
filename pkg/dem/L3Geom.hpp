@@ -87,10 +87,18 @@ struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{
 
 	enum { APPROX_NO_RENORM_TRSF=1, APPROX_NO_MID_TRSF=2, APPROX_NO_MID_NORMAL=4, APPROX_NO_RENORM_MID_NORMAL=8 };
 
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom_Inc,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres.\n\n.. note:: The initial value of *u[0]* (normal displacement) might be non-zero, with or without *distFactor*, since it is given purely by sphere's geometry. If you want to set \"equilibrium distance\", do it in the contact law as explained in :yref:`L3Geom.u0`.",
-		((bool,noRatch,true,,"See :yref:`ScGeom.avoidGranularRatcheting`."))
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom_Inc,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/_extraDocs.py",
+		((bool,noRatch,true,,"See :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting`."))
 		((Real,distFactor,1,,"Create interaction if spheres are not futher than distFactor*(r1+r2)."))
-		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n1: do not renormalize transformation matrix at every step\n2: use previous transformation to transform velocities (which are known at mid-steps), instead of mid-step transformation computed as quaternion slerp at t=0.5.\n4: do not take average (mid-step) normal when computing relative shear displacement, use previous value instead\n8: do not re-normalize average (mid-step) normal, if used.…\nBy default, the mask is zero and neither of these approximations is used."))
+		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n"
+		"== ===============================================================\n"
+		"1  do not renormalize transformation matrix at every step\n"
+		"2  use previous transformation to transform velocities (which are known at mid-steps), instead of mid-step transformation computed as quaternion slerp at t=0.5.\n"
+		"4  do not take average (mid-step) normal when computing relative shear displacement, use previous value instead\n"
+		"8  do not re-normalize average (mid-step) normal, if used.…\n"
+		"== ===============================================================\n\n"
+		"By default, the mask is zero, wherefore none of these approximations is used.\n"
+		))
 	);
 	FUNCTOR2D(Sphere,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);

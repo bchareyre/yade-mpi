@@ -9,7 +9,7 @@ sp.toSimulation()
 O.bodies.append(utils.wall(position=0,axis=2))
 
 O.engines=[
-	SubdomainOptimizer(),
+	SubdomainBalancer(),
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
 	InteractionLoop(

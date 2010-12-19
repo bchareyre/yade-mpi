@@ -33,11 +33,6 @@ class Ig2_Box_Sphere_ScGeom : public IGeomFunctor
 					const bool& force,
 					const shared_ptr<Interaction>& c);
 
-	#ifdef YADE_DEVIRT_FUNCTORS
-		void* getStaticFuncPtr(){ return (void*)&Ig2_Box_Sphere_ScGeom::goStatic; }
-		static bool goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-	#endif
-
 	YADE_CLASS_BASE_DOC(Ig2_Box_Sphere_ScGeom,IGeomFunctor,"Create an interaction geometry :yref:`ScGeom` from :yref:`Box` and :yref:`Sphere`")
 	FUNCTOR2D(Box,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
@@ -62,11 +57,6 @@ class Ig2_Box_Sphere_ScGeom6D : public Ig2_Box_Sphere_ScGeom
 					const Vector3r& shift2,
 					const bool& force,
 					const shared_ptr<Interaction>& c);
-
-	#ifdef YADE_DEVIRT_FUNCTORS
-		void* getStaticFuncPtr(){ return (void*)&Ig2_Box_Sphere_ScGeom6D::goStatic; }
-		static bool goStatic(IGeomFunctor* self, const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-	#endif
 
 	YADE_CLASS_BASE_DOC(Ig2_Box_Sphere_ScGeom6D,Ig2_Box_Sphere_ScGeom,"Create an interaction geometry :yref:`ScGeom6D` from :yref:`Box` and :yref:`Sphere`")
 	FUNCTOR2D(Box,Sphere);

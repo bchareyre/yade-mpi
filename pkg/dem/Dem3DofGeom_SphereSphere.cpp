@@ -78,17 +78,6 @@ Real Dem3DofGeom_SphereSphere::slipToDisplacementTMax(Real displacementTMax){
 	return 2*diff.norm();
 }
 
-/*! As above : perform slip of the projected contact points. Here, we directly give the multiplier applied on the distance for faster results.
- * The plastic displacement (vector) is returned.
- */
-Vector3r Dem3DofGeom_SphereSphere::scaleDisplacementT(Real multiplier){
-	assert(multiplier>=0 && multiplier<=1);
-	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Vector3r diff=.5*(multiplier-1)*(p2-p1);
-	setTgPlanePts(p1-diff,p2+diff);
-	return diff*2.0;
-}
-
 
 /* Move contact point on both spheres in such way that their relative position (displacementT) is the same;
  * this should be done regularly to ensure that the angle doesn't go over π, since then quaternion would

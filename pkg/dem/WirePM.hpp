@@ -47,7 +47,7 @@ class WireMat: public ElastMat {
 		((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
 		((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
 		((Real,lambdaEps,0.4,,"Parameter between 0 and 1 to reduce the failure strain of the double-twisted wire (as used by [Bertrand2008]_). [-]"))
-		((Real,lambdak,0.21,,"Parameter between 0 and 1 to compute the elastic stiffness of the double-twisted wire (as used by [Bertrand2008]_): $\\k^D=2(\\lambda_k k_h + (1-\\lambda_k)k^S)$. [-]"))
+		((Real,lambdak,0.21,,"Parameter between 0 and 1 to compute the elastic stiffness of the double-twisted wire (as used by [Bertrand2008]_): $k^D=2(\\lambda_k k_h + (1-\\lambda_k)k^S)$. [-]"))
 		((Real,as,0,Attr::readonly,"Cross-section area of a single wire used for the computation of the limit normal contact forces. [m²]"))
 		,
 		createIndex();

@@ -90,9 +90,10 @@ void LawTester::action(){
 	if(state2->blockedDOFs!=State::DOF_ALL) { LOG_INFO("Blocking all DOFs for #"<<id2); state2->blockedDOFs=State::DOF_ALL;}
 
 
-	if(step>*(_pathT.rbegin())){
+	if(step-1>*(_pathT.rbegin())){
 		LOG_INFO("Last step done, setting zero velocities on #"<<id1<<", #"<<id2<<".");
 		state1->vel=state1->angVel=state2->vel=state2->angVel=Vector3r::Zero();
+		uTest=uTestNext;
 		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; }
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 		return;
@@ -166,7 +167,10 @@ void LawTester::action(){
 		// signed and weighted displacement/rotation to be applied on this sphere (reversed for #0)
 		// some rotations must cancel the sign, by multiplying by sign again
 		Vector3r ddU=sign*dU*weight;
-		Vector3r ddPhi=sign*dPhi*(1-relRad); /* angles must distribute to both, otherwise it would induce shear; combination of shear and bending must make sure they are properly orthogonal!  */
+
+		// twist can be still distributed with idWeight (!)
+		Vector3r ddPhi=sign*dPhi*(1-relRad); /* shear angles must distribute to both, otherwise it would induce shear */
+		ddPhi[0]=sign*dPhi[0]*idWeight; // twist can be still distributed with idWeight
 		vel[i]=angVel[i]=Vector3r::Zero();
 
 		// normal displacement
