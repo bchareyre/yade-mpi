@@ -22,7 +22,6 @@ void TranslationEngine::action(){
 		assert(id<(Body::id_t)scene->bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
-		if (!b->isDynamic())	b->state->pos+=dt*velocity*translationAxis;
 		b->state->vel=velocity*translationAxis;
 	}
 }
@@ -38,7 +37,6 @@ void HarmonicMotionEngine::action(){
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
 		b->state->vel=velocity;
-		if (!b->isDynamic())	b->state->pos+=dt*velocity;
 	}
 }
 
