@@ -39,14 +39,16 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shift2, const Vector3r& shiftVel, bool avoidGranularRatcheting){
 	if(avoidGranularRatcheting){
 		/* B.C. Comment :
-		Giving a short explanation of what we want to avoid :
+		Short explanation of what we want to avoid :
 		Numerical ratcheting is best understood considering a small elastic cycle at a contact between two grains : assuming b1 is fixed, impose this displacement to b2 :
 		1. translation "dx" in the normal direction
 		2. rotation "a"
 		3. translation "-dx" (back to initial position)
 		4. rotation "-a" (back to initial orientation)
-
-		This problem has been analyzed in details by McNamara and co-workers. One will find interesting discussions in e.g. DOI 10.1103/PhysRevE.77.031304, even though solution it suggests is not fully applied here (equations of motion are not incorporating alpha, in contradiction with what is suggested by McNamara).
+		If the branch vector used to define the relative shear in rotation×branch is not constant (typically if it is defined from the vector center→contactPoint), then the shear displacement at the end of this cycle is not zero: rotations *a* and *-a* are multiplied by branches of different lengths.
+		It results in a finite contact force at the end of the cycle even though the positions and orientations are unchanged, in total contradiction with the elastic nature of the problem. It could also be seen as an *inconsistent energy creation or loss*. Given that DEM simulations tend to generate oscillations around equilibrium (damped mass-spring), it can have a significant impact on the evolution of the packings, resulting for instance in slow creep in iterations under constant load.
+		The solution adopted here to avoid ratcheting is as proposed by McNamara and co-workers.
+		They analyzed the ratcheting problem in detail - even though they comment on the basis of a cycle that differs from the one shown above. One will find interesting discussions in e.g. DOI 10.1103/PhysRevE.77.031304, even though solution it suggests is not fully applied here (equations of motion are not incorporating alpha, in contradiction with what is suggested by McNamara et al.).
 		 */
 		// For sphere-facet contact this will give an erroneous value of relative velocity...
 		Real alpha = (radius1+radius2)/(radius1+radius2-penetrationDepth);
