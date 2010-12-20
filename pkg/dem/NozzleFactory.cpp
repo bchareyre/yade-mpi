@@ -44,7 +44,7 @@ void NozzleFactory::action(){
 		int attempt;
 		for(attempt=0; attempt<maxAttempt; attempt++){
 			Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the nozzle
-			c = center+q*Vector3r(cos(angle)*rr,sin(angle)*rr,0)
+			c = center+q*Vector3r(cos(angle)*rr,sin(angle)*rr,0);
 			// this version places center in a box around the nozzle center (its size 1.15=2/sqrt(3) diagonal, which is not very exact
 			//c=center+Vector3r((randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius);
 			LOG_TRACE("Center "<<c);
