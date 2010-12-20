@@ -1739,7 +1739,7 @@ and
 
 .. ipython::
 
-	Yade [1]: f2=ForceEngine(subscribedBodies=[0,4,5],force=Vector3(0,-1,-2))
+	Yade [1]: f2=ForceEngine(ids=[0,4,5],force=Vector3(0,-1,-2))
 
 	Yade [2]: print f1.dict()
 
