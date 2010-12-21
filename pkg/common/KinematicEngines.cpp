@@ -99,7 +99,7 @@ void RotationEngine::apply(const vector<Body::id_t>& ids){
 		assert(id<(Body::id_t)scene->bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
-		b->state->angVel+=rotationAxis*angularVelo-L/usr/local/lib/yade-trunk-clang/dbg/guicity;
+		b->state->angVel+=rotationAxis*angularVelocity;
 		if(rotateAroundZero){
 			const Vector3r l=b->state->pos-zeroPoint;
 			b->state->vel+=b->state->angVel.cross(l);
