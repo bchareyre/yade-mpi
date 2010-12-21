@@ -67,15 +67,17 @@ def getBodyIdFromLabel(label):
 		return -1
 
 class BodyInspector(QWidget):
-	def __init__(self,bodyId=0,parent=None,bodyLinkCallback=None,intrLinkCallback=None):
+	def __init__(self,bodyId=-1,parent=None,bodyLinkCallback=None,intrLinkCallback=None):
 		QWidget.__init__(self,parent)
+		v=yade.qt.views()
 		self.bodyId=bodyId
-		self.idGlSync=-1
+		if bodyId<0 and len(v)>0 and v[0].selection>0: self.bodyId=v[0].selection
+		self.idGlSync=self.bodyId
 		self.bodyLinkCallback,self.intrLinkCallback=bodyLinkCallback,intrLinkCallback
 		self.bodyIdBox=QSpinBox(self)
 		self.bodyIdBox.setMinimum(0)
 		self.bodyIdBox.setMaximum(100000000)
-		self.bodyIdBox.setValue(0)
+		self.bodyIdBox.setValue(self.bodyId)
 		self.intrWithCombo=QComboBox(self);
 		self.gotoBodyButton=QPushButton(u'→ #',self)
 		self.gotoIntrButton=QPushButton(u'→ #+#',self)
@@ -166,6 +168,7 @@ class BodyInspector(QWidget):
 		# no body shown yet, try to get the first one...
 		if self.bodyId<0 and len(O.bodies)>0:
 			try:
+				print 'SET ZERO'
 				b=O.bodies[0]; self.bodyIdBox.setValue(0)
 			except IndexError: pass
 		v=yade.qt.views()

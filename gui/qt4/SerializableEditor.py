@@ -15,14 +15,15 @@ import yade.qt
 seqSerializableShowType=True # show type headings in serializable sequences (takes vertical space, but makes the type hyperlinked)
 
 
-def makeWrapperHref(text,className,attr=None):
+def makeWrapperHref(text,className,attr=None,static=False):
 	"""Create clickable HTML hyperlink to a Yade class or its attribute.
 	
 	:param className: name of the class to link to.
 	:param attr: attribute to link to. If given, must exist directly in given *className*; if not given or empty, link to the class itself is created and *attr* is ignored.
 	:return: HTML with the hyperref.
 	"""
-	return '<a href="%s#yade.wrapper.%s%s">%s</a>'%(yade.qt.sphinxDocWrapperPage,className,(('.'+attr) if attr else ''),text)
+	if not static: return '<a href="%s#yade.wrapper.%s%s">%s</a>'%(yade.qt.sphinxDocWrapperPage,className,(('.'+attr) if attr else ''),text)
+	else:          return '<a href="%s#ystaticattr-%s.%s">%s</a>'%(yade.qt.sphinxDocWrapperPage,className,attr,text)
 
 def serializableHref(ser,attr=None,text=None):
 	"""Return HTML href to a *ser* optionally to the attribute *attr*.
@@ -48,7 +49,7 @@ def serializableHref(ser,attr=None,text=None):
 	else:
 		klass=ser.__class__
 		if not text: text=klass.__name__
-	return makeWrapperHref(text,klass.__name__,attr)
+	return makeWrapperHref(text,klass.__name__,attr,static=(attr and getattr(klass,attr)==getattr(ser,attr)))
 
 class AttrEditor():
 	"""Abstract base class handing some aspects common to all attribute editors.
@@ -346,8 +347,7 @@ class SerializableEditor(QFrame):
 			t=None
 			doc=getattr(self.ser.__class__,attr).__doc__;
 			if '|yhidden|' in doc: continue
-			if attr in self.ignoredAttrs or attr=='blockedDOFs': # HACK here
-				continue
+			if attr in self.ignoredAttrs: continue
 			if isinstance(val,list):
 				t=self.getListTypeFromDocstring(attr)
 				if not t and len(val)==0: t=(val[0].__class__,) # 1-tuple is list of the contained type
@@ -364,10 +364,28 @@ class SerializableEditor(QFrame):
 		doc=(getattr(self.ser.__class__,attr).__doc__ if attr else self.ser.__class__.__doc__)
 		if not doc: return ''
 		doc=re.sub(':y(attrtype|default|attrflags):`[^`]*`','',doc)
+		statAttr=re.compile('^.. ystaticattr::.*$',re.MULTILINE|re.DOTALL)
+		doc=re.sub(statAttr,'',doc) # static classes have their proper docs at the beginning, discard static memeber docs
+		# static: attribute of the type is the same object as attribute of the instance
+		# in that case, get docstring from the class documentation by parsing it
+		if attr and getattr(self.ser.__class__,attr)==getattr(self.ser,attr): doc=self.getStaticAttrDocstring(attr)
 		doc=re.sub(':yref:`([^`]*)`','\\1',doc)
 		import textwrap
 		wrapper=textwrap.TextWrapper(replace_whitespace=False)
 		return wrapper.fill(textwrap.dedent(doc))
+	def getStaticAttrDocstring(self,attr):
+		ret=''; c=self.ser.__class__
+		while hasattr(c,attr) and hasattr(c.__base__,attr): c=c.__base__
+		start='.. ystaticattr:: %s.%s('%(c.__name__,attr)
+		if start in c.__doc__:
+			ll=c.__doc__.split('\n')
+			for i in range(len(ll)):
+				if ll[i].startswith(start): break
+			for i in range(i+1,len(ll)):
+				if len(ll[i])>0 and ll[i][0] not in ' \t': break
+				ret+=ll[i]
+			return ret
+		else: return '[no documentation found]'
 	def mkWidget(self,entry):
 		if not entry.T: return None
 		# single fundamental object
@@ -407,8 +425,6 @@ class SerializableEditor(QFrame):
 		grid.setVerticalSpacing(0)
 		grid.setLabelAlignment(Qt.AlignRight)
 		if self.showType:
-			#lab=QLabel(makeSerializableLabel(self.ser,addr=True,href=True))
-			#lab.setToolTip(('<b>'+self.path+'</b><br>' if self.path else '')+self.getDocstring())
 			lab=SerQLabel(self,makeSerializableLabel(self.ser,addr=True,href=True),tooltip=self.getDocstring(),path=self.path)
 			lab.setFrameShape(QFrame.Box); lab.setFrameShadow(QFrame.Sunken); lab.setLineWidth(2); lab.setAlignment(Qt.AlignHCenter); lab.linkActivated.connect(yade.qt.openUrl)
 			grid.setWidget(0,QFormLayout.SpanningRole,lab)
@@ -416,8 +432,6 @@ class SerializableEditor(QFrame):
 			entry.widget=self.mkWidget(entry)
 			objPath=(self.path+'.'+entry.name) if self.path else None
 			label=SerQLabel(self,serializableHref(self.ser,entry.name),tooltip=self.getDocstring(entry.name),path=objPath)
-			#label=SerAttrQLabel(self,serializableHref(self.ser,entry.name),tooltip=('<b>'+self.path+'.'+entry.name+'</b><br>' if self.path else '')+self.getDocstring(entry.name),
-			#label=QLabel(self); label.setText(); label.setToolTip(; label.linkActivated.connect(yade.qt.openUrl)
 			grid.addRow(label,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
 		self.setLayout(grid)
 		self.refreshEvent()

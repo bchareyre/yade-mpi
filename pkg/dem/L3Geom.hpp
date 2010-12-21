@@ -74,7 +74,7 @@ struct Gl1_L6Geom: public Gl1_L3Geom{
 	FUNCTOR1D(L6Geom);
 	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L6Geom,Gl1_L3Geom,"Render :yref:`L6Geom` geometry.",
-		((Real,phiScale,1.,,"Scale local rotations (:yref:`phi<L3Geom.phi>` - :yref:`phi0<L3Geom.phi0>`). The default scale is to draw $\\pi$ rotation with length equal to minimum radius."))
+		((Real,phiScale,1.,,"Scale local rotations (:yref:`phi<L6Geom.phi>` - :yref:`phi0<L6Geom.phi0>`). The default scale is to draw $\\pi$ rotation with length equal to minimum radius."))
 	);
 };
 REGISTER_SERIALIZABLE(Gl1_L6Geom);
