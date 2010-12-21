@@ -171,7 +171,7 @@ void NewtonIntegrator::action()
 						if(b->isDynamic()){
 							handleClumpMemberAccel(scene,memberId,memberState,state);
 							handleClumpMemberTorque(scene,memberId,memberState,state,M);}
-						//FIXME : we are saving max velocity of previous timestep here
+						//FIXME : we are saving max velocity of previous timestep here, and actually it's already saved above
 						saveMaximaVelocity(scene,memberId,memberState);
 					}
 					// motion
@@ -189,7 +189,7 @@ void NewtonIntegrator::action()
 						if(b->isDynamic()){
 							handleClumpMemberAccel(scene,memberId,memberState,state);
 							handleClumpMemberAngAccel(scene,memberId,memberState,state);}
-						//FIXME : we are saving max velocity of previous timestep here
+						//FIXME : we are saving max velocity of previous timestep here, and actually it's already saved above
 						saveMaximaVelocity(scene,memberId,memberState);
 					}
 					// motion
