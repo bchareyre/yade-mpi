@@ -60,7 +60,7 @@ Real elasticEnergyDensityInAABB(python::tuple Aabb){
  * to particles subject to axial compaction to speed up the process. */
 void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirection, Real timeToAxis, Real subtractDist=0., Real perturbation=0.1){
 	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getScene()->bodies)){
-		if(!b->isDynamic()) continue;
+		if(b->state->blockedDOFs==State::DOF_ALL) continue;
 		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;
 		const Vector3r x2=axisPoint+axisDirection;

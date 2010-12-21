@@ -250,7 +250,6 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	"""Return ready-made wall body.
 
-	:Parameters:
 	:param float-or-Vector3 position: center of the wall. If float, it is the position along given axis, the other 2 components being zero
 	:param ∈{0,1,2} axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
 	:param ∈{-1,0,1} sense: sense in which to interact (0: both, -1: negative, +1: positive; see :yref:`Wall`)
@@ -295,20 +294,12 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
 
-
-	:Parameters:
-			`center`: Vector3
-				center of the created box
-			`extents`: (eX,eY,eZ)
-				lengths of the box sides
-			`orientation`: quaternion
-				orientation of the box
-			`wallMask`: bitmask
-				determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls;
-			`**kw`: (unused keyword arguments)
-				passed to utils.facet
-
-	:Returns: list of facets forming the box.
+	:param Vector3 center: center of the box
+	:param Vector3 extents: lengths of the box sides
+	:param Quaternion orientation: orientation of the box
+	:param bitmask wallMask: determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls
+	:param **kw: (unused keyword arguments) passed to :yref:`yade.utils.facet`
+	:returns: list of facets forming the box
 	"""
 
 

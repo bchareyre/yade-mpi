@@ -99,7 +99,7 @@ void NewtonIntegrator::action()
 			State* state=b->state.get();
 			const Body::id_t& id=b->getId();
 			// clump members are non-dynamic; we only get their velocities here
-			if(unlikely(/*!b->isDynamic() ||*/ b->isClumpMember())){
+			if(unlikely(b->isClumpMember())){
 				saveMaximaVelocity(scene,id,state);
 				continue;
 			}
@@ -135,18 +135,20 @@ void NewtonIntegrator::action()
 				else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
 			}
 
-			if (likely(b->isStandalone())){
+			if(likely(b->isStandalone())){
 				// translate equation
-				if(b->isDynamic()){
+				if(b->state->blockedDOFs!=State::DOF_ALL){
 					state->accel=f/state->mass;
-					cundallDamp(dt,f,fluctVel,state->accel);}
+					cundallDamp(dt,f,fluctVel,state->accel);
+				}
 				leapfrogTranslate(scene,state,id,dt);
 				// rotate equation
 				// exactAsphericalRot is disabled or the body is spherical
-				if (likely(!exactAsphericalRot || !b->isAspherical() || !b->isDynamic())){
-					if(b->isDynamic()) {
+				if(likely(!exactAsphericalRot || !b->isAspherical())){
+					if(b->state->blockedDOFs!=State::DOF_ALL) {
 						state->angAccel=m.cwise()/state->inertia;
-						cundallDamp(dt,m,state->angVel,state->angAccel);}
+						cundallDamp(dt,m,state->angVel,state->angAccel);
+					}
 					leapfrogSphericalRotate(scene,state,id,dt);
 				} else { // exactAsphericalRot enabled & aspherical body
 					// no damping in this case
@@ -175,10 +177,11 @@ void NewtonIntegrator::action()
 					leapfrogTranslate(scene,state,id,dt);
 					leapfrogAsphericalRotate(scene,state,id,dt,M);
 				} else { // exactAsphericalRot disabled or clump is spherical
-					if(b->isDynamic()){
+					if(b->state->blockedDOFs!=State::DOF_ALL){
 						Vector3r dAngAccel=M.cwise()/state->inertia;
 						cundallDamp(dt,M,state->angVel,dAngAccel);
-						state->angAccel+=dAngAccel;}
+						state->angAccel+=dAngAccel;
+					}
 					FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());

@@ -90,12 +90,12 @@ void GLViewer::closeEvent(QCloseEvent *e){
 
 GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGLWidget* shareWidget): QGLViewer(/*parent*/(QWidget*)NULL,shareWidget), renderer(_renderer), viewId(_viewId) {
 	isMoving=false;
-	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
+	drawGrid=0;
 	drawScale=true;
 	timeDispMask=TIME_REAL|TIME_VIRT|TIME_ITER;
 	cut_plane = 0;
 	cut_plane_delta = -2;
-	grid_subdivision = false;
+	gridSubdivide = false;
 	resize(550,550);
 
 	if(viewId==0) setWindowTitle("Primary view");
@@ -117,10 +117,10 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
 	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
-	setKeyDescription(Qt::Key_G,"Toggle grid");
-	setKeyDescription(Qt::Key_X,"Toggle YZ grid (or: align manipulated clip plane normal with +X)");
-	setKeyDescription(Qt::Key_Y,"Toggle XZ grid (or: align manipulated clip plane normal with +Y)");
-	setKeyDescription(Qt::Key_Z,"Toggle XY grid (or: align manipulated clip plane normal with +Z)");
+	setKeyDescription(Qt::Key_G,"Set grid visibility; g turns on and cycles, G off");
+	setKeyDescription(Qt::Key_X,"Make +x pointing upwards (or: align manipulated clip plane normal with +X)");
+	setKeyDescription(Qt::Key_Y,"Make +y pointing upwards (or: align manipulated clip plane normal with +Y)");
+	setKeyDescription(Qt::Key_Z,"Make +z pointing upwards (or: align manipulated clip plane normal with +Z)");
 	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
 	setKeyDescription(Qt::Key_S & Qt::ALT,   "Save QGLViewer state to /tmp/qglviewerState.xml");
 	setKeyDescription(Qt::Key_T,"Switch orthographic / perspective camera");
@@ -296,8 +296,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	}
 	else if(e->key()==Qt::Key_D &&(e->modifiers() & Qt::AltModifier)){ Body::id_t id; if((id=Omega::instance().getScene()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->setDynamic(!b->isDynamic()); LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic()?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
-	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
-	else if (e->key()==Qt::Key_M && selectedName() >= 0){
+	else if(e->key()==Qt::Key_G) { if(e->modifiers() & Qt::ShiftModifier){ drawGrid=0; return; } else drawGrid++; if(drawGrid>=8) drawGrid=0; }
+	else if (e->key()==Qt::Key_M && selectedName() >= 0){ 
 		if(!(isMoving=!isMoving)){displayMessage("Moving done."); mouseMovesCamera();}
 		else{ displayMessage("Moving selected object"); mouseMovesManipulatedFrame();}
 	}
@@ -322,14 +322,21 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	}
 	else if(e->key()==Qt::Key_X || e->key()==Qt::Key_Y || e->key()==Qt::Key_Z){
 		int axisIdx=(e->key()==Qt::Key_X?0:(e->key()==Qt::Key_Y?1:2));
-		if(manipulatedClipPlane<0){ drawGridXYZ[axisIdx]=!drawGridXYZ[axisIdx]; }
-		else{ // align clipping plane with world axis
+		if(manipulatedClipPlane<0){
+			qglviewer::Vec up(0,0,0), vDir(0,0,0);
+			bool alt=(e->modifiers() && Qt::ShiftModifier);
+			up[axisIdx]=1; vDir[(axisIdx+(alt?2:1))%3]=alt?1:-1;
+			camera()->setViewDirection(vDir);
+			camera()->setUpVector(up);
+			centerMedianQuartile();
+		}
+		else{ // align clipping normal plane with world axis
 			// x: (0,1,0),pi/2; y: (0,0,1),pi/2; z: (1,0,0),0
-			qglviewer::Vec axis(0,0,0); axis[(axisIdx+1)%3]=1;
-			manipulatedFrame()->setOrientation(qglviewer::Quaternion(axis,axisIdx==2?0:Mathr::PI/2));
+			qglviewer::Vec axis(0,0,0); axis[(axisIdx+1)%3]=1; Real angle=axisIdx==2?0:Mathr::PI/2;
+			manipulatedFrame()->setOrientation(qglviewer::Quaternion(axis,angle));
 		}
 	}
-	else if(e->key()==Qt::Key_Period) grid_subdivision = !grid_subdivision;
+	else if(e->key()==Qt::Key_Period) gridSubdivide = !gridSubdivide;
 #ifdef YADE_GL2PS
 	else if(e->key()==Qt::Key_V){
 		for(int i=0; ;i++){
@@ -339,11 +346,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		LOG_INFO("Will save snapshot to "<<nextFrameSnapshotFilename);
 	}
 #endif
-
-//////////////////////////////////////////////
-// FIXME that all should be in some nice GUI
-// 
-// Cutting plane
+#if 0
 	else if( e->key()==Qt::Key_Plus ){
 			cut_plane = std::min(1.0, cut_plane + std::pow(10.0,(double)cut_plane_delta));
 			static_cast<YadeCamera*>(camera())->setCuttingDistance(cut_plane);
@@ -359,10 +362,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			cut_plane_delta = std::min(1+cut_plane_delta,-1);
 			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+lexical_cast<std::string>(cut_plane_delta));
 	}
+#endif
 
-// FIXME END
-//////////////////////////////////////////////
-//
 	else if(e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space) QGLViewer::keyPressEvent(e);
 	updateGL();
 }
@@ -391,7 +392,7 @@ void GLViewer::centerMedianQuartile(){
 	if(scene->isPeriodic){ centerPeriodic(); return; }
 	long nBodies=scene->bodies->size();
 	if(nBodies<4) {
-		LOG_INFO("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
+		LOG_DEBUG("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
 		return centerScene();
 	}
 	std::vector<Real> coords[3];
@@ -587,13 +588,13 @@ void GLViewer::postDraw(){
 	nSegments *= 2; // there's an error in QGLViewer::drawGrid(), so we need to mitigate it by '* 2'
 	// XYZ grids
 	glLineWidth(.5);
-	if(drawGridXYZ[0]) {glColor3f(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
-	if(drawGridXYZ[1]) {glColor3f(0.3,0.6,0.3); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
-	if(drawGridXYZ[2]) {glColor3f(0.3,0.3,0.6); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
-	if(grid_subdivision){
-	if(drawGridXYZ[0]) {glColor3f(0.4,0.1,0.1); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
-	if(drawGridXYZ[1]) {glColor3f(0.1,0.4,0.1); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
-	if(drawGridXYZ[2]) {glColor3f(0.1,0.1,0.4); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
+	if(drawGrid & 1) {glColor3f(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
+	if(drawGrid & 2) {glColor3f(0.3,0.6,0.3); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
+	if(drawGrid & 4) {glColor3f(0.3,0.3,0.6); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
+	if(gridSubdivide){
+		if(drawGrid & 1) {glColor3f(0.4,0.1,0.1); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
+		if(drawGrid & 2) {glColor3f(0.1,0.4,0.1); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
+		if(drawGrid & 4) {glColor3f(0.1,0.1,0.4); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
 	}
 	
 	// scale
@@ -680,11 +681,11 @@ void GLViewer::postDraw(){
 			QGLViewer::drawText(x,y,oss.str().c_str());
 			y-=lineHt;
 		}
-		if(drawGridXYZ[0] || drawGridXYZ[1] || drawGridXYZ[2]){
+		if(drawGrid){
 			glColor3v(Vector3r(1,1,0));
 			ostringstream oss;
 			oss<<"grid: "<<setprecision(4)<<gridStep;
-			if(grid_subdivision) oss<<" (minor "<<setprecision(4)<<gridStep*.1<<")";
+			if(gridSubdivide) oss<<" (minor "<<setprecision(3)<<gridStep*.1<<")";
 			QGLViewer::drawText(x,y,oss.str().c_str());
 			y-=lineHt;
 		}
@@ -770,8 +771,8 @@ void GLViewer::wheelEvent(QWheelEvent* event){
 
 // cut&paste from QGLViewer::domElement documentation
 QDomElement GLViewer::domElement(const QString& name, QDomDocument& document) const{
-	QDomElement de=document.createElement("gridXYZ");
-	string val; if(drawGridXYZ[0])val+="x"; if(drawGridXYZ[1])val+="y"; if(drawGridXYZ[2])val+="z";
+	QDomElement de=document.createElement("grid");
+	string val; if(drawGrid & 1) val+="x"; if(drawGrid & 2)val+="y"; if(drawGrid & 4)val+="z";
 	de.setAttribute("normals",val.c_str());
 	QDomElement de2=document.createElement("timeDisplay"); de2.setAttribute("mask",timeDispMask);
 	QDomElement res=QGLViewer::domElement(name,document);
@@ -787,8 +788,8 @@ void GLViewer::initFromDOMElement(const QDomElement& element){
 	while (!child.isNull()){
 		if (child.tagName()=="gridXYZ" && child.hasAttribute("normals")){
 			string val=child.attribute("normals").toLower().toStdString();
-			drawGridXYZ[0]=false; drawGridXYZ[1]=false; drawGridXYZ[2]=false;
-			if(val.find("x")!=string::npos)drawGridXYZ[0]=true; if(val.find("y")!=string::npos)drawGridXYZ[1]=true; if(val.find("z")!=string::npos)drawGridXYZ[2]=true;
+			drawGrid=0;
+			if(val.find("x")!=string::npos) drawGrid+=1; if(val.find("y")!=string::npos)drawGrid+=2; if(val.find("z")!=string::npos)drawGrid+=4;
 		}
 		if(child.tagName()=="timeDisplay" && child.hasAttribute("mask")) timeDispMask=atoi(child.attribute("mask").toAscii());
 		child = child.nextSibling().toElement();

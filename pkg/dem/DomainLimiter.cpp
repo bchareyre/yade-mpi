@@ -24,7 +24,7 @@ void DomainLimiter::action(){
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/L3Geom.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/pkg/common/LinearInterpolate.hpp>
+#include<yade/lib/smoothing/LinearInterpolate.hpp>
 #include<yade/lib/pyutil/gil.hpp>
 
 CREATE_LOGGER(LawTester);

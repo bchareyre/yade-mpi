@@ -70,7 +70,7 @@ class GLViewer : public QGLViewer
 		bool			wasDynamic;
 		float			cut_plane;
 		int			cut_plane_delta;
-		bool			grid_subdivision;
+		bool			gridSubdivide;
 		int manipulatedClipPlane;
 		set<int> boundClipPlanes;
 		shared_ptr<qglviewer::LocalConstraint> xyPlaneConstraint;
@@ -83,8 +83,8 @@ class GLViewer : public QGLViewer
 		const int viewId;
 
 		void centerMedianQuartile();
-		bool 			drawGridXYZ[3];
-		bool 			drawScale;
+		int 	drawGrid;
+		bool 	drawScale;
 		int timeDispMask;
 		enum{TIME_REAL=1,TIME_VIRT=2,TIME_ITER=4};
 

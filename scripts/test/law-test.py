@@ -31,7 +31,7 @@ O.bodies.append([
 O.engines=[
 	PyRunner(iterPeriod=1,command='addPlotData()'),
 	ForceResetter(),
-	#PyRunner(iterPeriod=1,command='import time; time.sleep(.005)'),
+	PyRunner(iterPeriod=1,command='import time; time.sleep(.05)'),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
 		#[Ig2_Sphere_Sphere_ScGeom()],	[Ip2_FrictMat_FrictMat_FrictPhys()], [Law2_ScGeom_FrictPhys_CundallStrack()] # ScGeom

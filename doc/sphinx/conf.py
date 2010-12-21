@@ -24,6 +24,7 @@
 import sys
 from docutils import nodes
 from sphinx import addnodes
+from sphinx.roles import XRefRole
 import docutils
 import re
 
@@ -73,6 +74,12 @@ moduleMap={
 	'yade._packObb':'yade.pack'
 }
 
+class YadeXRefRole(XRefRole):
+	#def process_link
+	def process_link(self, env, refnode, has_explicit_title, title, target):
+		print 'TARGET:','yade.wrapper.'+target
+		return '[['+title+']]','yade.wrapper.'+target
+
 def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 	"""Create hyperlink to yade target. Targets starting with literal 'yade.' are absolute, but the leading 'yade.' will be stripped from the link text. Absolute tergets are supposed to live in page named yade.[module].html, anchored at #yade.[module2].[rest of target], where [module2] is identical to [module], unless mapped over by moduleMap.
 	
@@ -97,10 +104,9 @@ def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 		uri=(('%%yade.wrapper#yade.wrapper.%s'%target) if writer=='latex' else 'yade.wrapper.html#yade.wrapper.%s'%target)
 		#print writer,uri
 	if 0:
-		refnode=addnodes.pending_xref(rawtext,reftype=role,refexplicit=explicitText)
-		refnode.line=lineno
-		refnode['reftarget']=target
-		refnode+=nodes.literal(rawtext,text,classes=['ref',role])
+		refnode=addnodes.pending_xref(rawtext,reftype=role,refexplicit=explicitText,reftarget=target)
+		#refnode.line=lineno
+		#refnode+=nodes.literal(rawtext,text,classes=['ref',role])
 		return [refnode],[]
 		#ret.rawtext,reftype=role,
 	else:
@@ -119,6 +125,7 @@ def yattrflags_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 	return [],[]
 
 from docutils.parsers.rst import roles
+def yaderef_role_2(type,rawtext,text,lineno,inliner,options={},content=[]): return YadeXRefRole()('yref',rawtext,text,lineno,inliner,options,content)
 roles.register_canonical_role('yref', yaderef_role)
 roles.register_canonical_role('ysrc', yadesrc_role)
 roles.register_canonical_role('ydefault', ydefault_role)
@@ -373,6 +380,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.pngmath',
 	 'sphinx.ext.graphviz',
+	 'sphinx.ext.viewcode',
 	 'sphinx.ext.inheritance_diagram',
 	#'matplotlib.sphinxext.mathmpl',
     'ipython_directive',

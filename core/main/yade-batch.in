@@ -140,6 +140,7 @@ import socket,re
 class HttpStatsServer(BaseHTTPRequestHandler):
 	favicon=None # binary favicon, created when first requested
 	def do_GET(self):
+		refreshTime=30
 		if not self.path or self.path=='/': self.sendGlobal()
 		else:
 			if self.path=='/favicon.ico':
@@ -149,7 +150,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 				self.sendHttp(self.__class__.favicon,contentType='image/vnd.microsoft.icon')
 				return
 			elif self.path=='/log' and opts.globalLog:
-				self.sendTextFile(opts.globalLog,refresh=5)
+				self.sendTextFile(opts.globalLog,refresh=refreshTime)
 				return
 			jobMatch=re.match('/jobs/([0-9]+)/(.*)',self.path)
 			if not jobMatch:
@@ -161,19 +162,19 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 			rest=jobMatch.group(2)
 			if rest=='plots':
 				job.updatePlots() # internally checks for last update time
-				self.sendFile(job.plotsFile,contentType=yade.remote.plotImgMimetype,refresh=(0 if job.status=='DONE' else 5))
+				self.sendFile(job.plotsFile,contentType=yade.remote.plotImgMimetype,refresh=(0 if job.status=='DONE' else refreshTime))
 			elif rest=='log':
 				if not os.path.exists(job.log):
 					self.send_error(404,self.path); return
 				## once we authenticate properly, send the whole file
-				## self.sendTextFile(jobs[jobId].log,refresh=5)
+				## self.sendTextFile(jobs[jobId].log,refresh=refreshTime)
 				## now we have to filter away the cookie
 				cookieRemoved=False; data=''
 				for l in open(job.log):
 					if not cookieRemoved and l.startswith('TCP python prompt on'):
 						ii=l.find('auth cookie `'); l=l[:ii+13]+'******'+l[ii+19:]; cookieRemoved=True
 					data+=l
-				self.sendHttp(data,contentType='text/plain;charset=utf-8;',refresh=(0 if job.status=='DONE' else 5))
+				self.sendHttp(data,contentType='text/plain;charset=utf-8;',refresh=(0 if job.status=='DONE' else refreshTime))
 			elif rest=='script':
 				self.sendPygmentizedFile(job.script,linenostep=5)
 			elif rest=='table':
@@ -188,7 +189,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		html+='<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>cores</th><th>plots</th><th>command</th></tr>\n'
 		for j in jobs: html+=j.htmlStats()+'\n'
 		html+='</TABLE></BODY></HTML>'
-		self.sendHttp(html,contentType='text/html',refresh=5) # refresh sent as header
+		self.sendHttp(html,contentType='text/html',refresh=refreshTime) # refresh sent as header
 	def sendTextFile(self,fileName,**headers):
 		if not os.path.exists(fileName): self.send_error(404); return
 		import codecs
@@ -313,8 +314,8 @@ parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
 parser.add_option('--generate-manpage',help='Generate man page documenting this program and exit',dest='manpage',metavar='FILE')
-parser.add_option('--plot-update',type='int',dest='plotAlwaysUpdateTime',help='Interval (in seconds) at which job plots will be updated even if not requested via HTTP. Non-positive values will make the plots not being updated and saved unless requested via HTTP (see --plot-timeout for controlling maximum age of those).  Plots are saved at exit under the same name as the log file, with the .log extension removed. (default: 60 seconds)',metavar='TIME',default=60)
-parser.add_option('--plot-timeout',type='int',dest='plotTimeout',help='Maximum age (in seconds) of plots served over HTTP; they will be updated if they are older. (default: 10 seconds)',metavar='TIME',default=10)
+parser.add_option('--plot-update',type='int',dest='plotAlwaysUpdateTime',help='Interval (in seconds) at which job plots will be updated even if not requested via HTTP. Non-positive values will make the plots not being updated and saved unless requested via HTTP (see --plot-timeout for controlling maximum age of those).  Plots are saved at exit under the same name as the log file, with the .log extension removed. (default: 120 seconds)',metavar='TIME',default=120)
+parser.add_option('--plot-timeout',type='int',dest='plotTimeout',help='Maximum age (in seconds) of plots served over HTTP; they will be updated if they are older. (default: 30 seconds)',metavar='TIME',default=30)
 parser.add_option('--timing',type='int',dest='timing',default=0,metavar='COUNT',help='Repeat each job COUNT times, and output a simple table with average/variance/minimum/maximum job duration; used for measuring how various parameters affect execution time. Jobs can override the global value with the !COUNT column.')
 parser.add_option('--timing-output',type='str',metavar='FILE',dest='timingOut',default=None,help='With --timing, save measured durations to FILE, instead of writing to standard output.')
 parser.add_option('--randomize',action='store_true',dest='randomize',help='Randomize job order (within constraints given by assigned cores).')

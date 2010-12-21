@@ -436,7 +436,7 @@ void CpmStateUpdater::update(Scene* _scene){
 			}
 		}
 		else { state->normDmg=0; state->normEpsPl=0;}
-		B->shape->color=Vector3r(state->normDmg,1-state->normDmg,B->isDynamic()?0:1);
+		B->shape->color=Vector3r(state->normDmg,1-state->normDmg,B->state->blockedDOFs==State::DOF_ALL?0:1);
 		nAvgRelResidual+=0.5*state->numBrokenCohesive; // add half or broken interactions, other body has the other half
 	}
 	avgRelResidual/=nAvgRelResidual;

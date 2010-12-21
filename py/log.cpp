@@ -14,7 +14,7 @@ enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 	void logSetLevel(std::string loggerName,int level){
 		std::string fullName(loggerName.empty()?"yade":("yade."+loggerName));
 		if(!log4cxx::LogManager::exists(fullName)){
-			LOG_WARN("No logger named "<<loggerName<<", ifnoring level setting.");			
+			LOG_WARN("No logger named "<<loggerName<<", ignoring level setting.");			
 			// throw std::invalid_argument("No logger named `"+fullName+"'");
 		} 
 		log4cxx::LevelPtr l;

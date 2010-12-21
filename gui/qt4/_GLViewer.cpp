@@ -39,8 +39,8 @@ class pyGLViewer{
 		#define GLV if((OpenGLManager::self->views.size()<=viewNo) || !(OpenGLManager::self->views[viewNo])) throw runtime_error("No view #"+lexical_cast<string>(viewNo)); GLViewer* glv=OpenGLManager::self->views[viewNo].get();
 		pyGLViewer(size_t _viewNo=0): viewNo(_viewNo){}
 		void close(){ GLV; QCloseEvent* e(new QCloseEvent); QApplication::postEvent(glv,e); }
-		py::tuple get_grid(){GLV; return py::make_tuple(glv->drawGridXYZ[0],glv->drawGridXYZ[1],glv->drawGridXYZ[2]);}
-		void set_grid(py::tuple t){GLV; for(int i=0;i<3;i++)glv->drawGridXYZ[i]=py::extract<bool>(t[i])();}
+		py::tuple get_grid(){GLV; return py::make_tuple(bool(glv->drawGrid & 1),bool(glv->drawGrid & 2),bool(glv->drawGrid & 4));}
+		void set_grid(py::tuple t){GLV; glv->drawGrid=0; for(int i=0;i<3;i++) if(py::extract<bool>(t[i])()) glv->drawGrid+=1<<i;}
 		#define VEC_GET_SET(property,getter,setter) Vector3r get_##property(){GLV; qglviewer::Vec v=getter(); return Vector3r(v[0],v[1],v[2]); } void set_##property(const Vector3r& t){GLV;  setter(qglviewer::Vec(t[0],t[1],t[2]));}
 		VEC_GET_SET(upVector,glv->camera()->upVector,glv->camera()->setUpVector);
 		VEC_GET_SET(lookAt,glv->camera()->position()+glv->camera()->viewDirection,glv->camera()->lookAt);
