@@ -135,28 +135,31 @@ void NewtonIntegrator::action()
 				else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
 			}
 
-			if(likely(b->isStandalone())){
+			if (likely(b->isStandalone())){
 				// translate equation
-				state->accel=computeAccel(f,state->mass,state->blockedDOFs);
-				cundallDamp(dt,f,fluctVel,state->accel);
+				if(b->isDynamic()){
+					state->accel=computeAccel(f,state->mass,state->blockedDOFs);
+					cundallDamp(dt,f,fluctVel,state->accel);}
 				leapfrogTranslate(scene,state,id,dt);
 				// rotate equation
 				// exactAsphericalRot is disabled or the body is spherical
-				if(likely(!exactAsphericalRot || !b->isAspherical() || b->state->inertia.minCoeff()==0)){
-					state->angAccel=computeAngAccel(m,state->inertia,state->blockedDOFs);
-					cundallDamp(dt,m,state->angVel,state->angAccel);
+				if (likely(!exactAsphericalRot || !b->isAspherical() || !b->isDynamic())){
+					if(b->isDynamic()) {
+						state->angAccel=computeAngAccel(m,state->inertia,state->blockedDOFs);
+						cundallDamp(dt,m,state->angVel,state->angAccel);}
 					leapfrogSphericalRotate(scene,state,id,dt);
 				} else { // exactAsphericalRot enabled & aspherical body
 					// no damping in this case
 					leapfrogAsphericalRotate(scene,state,id,dt,m);
 				}
 			} else if (b->isClump()){
-				// reset acceleration of the clump itself; computed from accels on constituents
-				state->accel=state->angAccel=Vector3r::Zero();
-				// clump mass forces
-				Vector3r dLinAccel=computeAccel(f,state->mass,state->blockedDOFs);
-				cundallDamp(dt,f,fluctVel,dLinAccel);
-				state->accel+=dLinAccel;
+				if(b->isDynamic()){
+					// reset acceleration of the clump itself; computed from accels on constituents
+					state->accel=state->angAccel=Vector3r::Zero();
+					// clump mass forces
+					Vector3r dLinAccel=computeAccel(f,state->mass,state->blockedDOFs);
+					cundallDamp(dt,f,fluctVel,dLinAccel);
+					state->accel+=dLinAccel;}
 				Vector3r M(m);
 				// sum force on clump memebrs
 				// exactAsphericalRot enabled and clump is aspherical
@@ -165,23 +168,28 @@ void NewtonIntegrator::action()
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
 						State* memberState=member->state.get();
-						handleClumpMemberAccel(scene,memberId,memberState,state);
-						handleClumpMemberTorque(scene,memberId,memberState,state,M);
+						if(b->isDynamic()){
+							handleClumpMemberAccel(scene,memberId,memberState,state);
+							handleClumpMemberTorque(scene,memberId,memberState,state,M);}
+						//FIXME : we are saving max velocity of previous timestep here
 						saveMaximaVelocity(scene,memberId,memberState);
 					}
 					// motion
 					leapfrogTranslate(scene,state,id,dt);
 					leapfrogAsphericalRotate(scene,state,id,dt,M);
 				} else { // exactAsphericalRot disabled or clump is spherical
-					Vector3r dAngAccel=computeAngAccel(M,state->inertia,state->blockedDOFs);
-					cundallDamp(dt,M,state->angVel,dAngAccel);
-					state->angAccel+=dAngAccel;
+					if(b->isDynamic()){
+						Vector3r dAngAccel=computeAngAccel(M,state->inertia,state->blockedDOFs);
+						cundallDamp(dt,M,state->angVel,dAngAccel);
+						state->angAccel+=dAngAccel;}
 					FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
 						State* memberState=member->state.get();
-						handleClumpMemberAccel(scene,memberId,memberState,state);
-						handleClumpMemberAngAccel(scene,memberId,memberState,state);
+						if(b->isDynamic()){
+							handleClumpMemberAccel(scene,memberId,memberState,state);
+							handleClumpMemberAngAccel(scene,memberId,memberState,state);}
+						//FIXME : we are saving max velocity of previous timestep here
 						saveMaximaVelocity(scene,memberId,memberState);
 					}
 					// motion
@@ -220,12 +228,13 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 	} else if (homoDeform==Cell::HOMO_POS){
 		state->pos+=scene->cell->velGrad*state->pos*dt;
 	}
-	state->vel+=dt*state->accel;
-	state->pos+=state->vel*dt;
+	if(state->blockedDOFs!=State::DOF_ALL) state->vel+=dt*state->accel;
+	state->pos += state->vel*dt;
 }
 
-inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state, const Body::id_t& id, const Real& dt ){
-	state->angVel+=dt*state->angAccel;
+inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state, const Body::id_t& id, const Real& dt )
+{
+	if(state->blockedDOFs!=State::DOF_ALL) state->angVel+=dt*state->angAccel;
 	Vector3r axis = state->angVel;
 
 	if (axis!=Vector3r::Zero()) {							//If we have an angular velocity, we make a rotation
@@ -233,7 +242,6 @@ inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state
 		Quaternionr q(AngleAxisr(angle*dt,axis));
 		state->ori = q*state->ori;
 	}
-
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
 		Vector3r r(scene->forces.getRot(id));
 		Real norm=r.norm(); r/=norm;
