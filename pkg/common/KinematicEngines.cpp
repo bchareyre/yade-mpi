@@ -1,4 +1,5 @@
 
+#include<yade/core/Scene.hpp>
 #include<yade/pkg/common/KinematicEngines.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/lib/smoothing/LinearInterpolate.hpp>

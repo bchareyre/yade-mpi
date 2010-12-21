@@ -43,6 +43,10 @@ labels={}
 xylabels={}
 "Dictionary of 2-tuples specifying (xlabel,ylabel) for respective plots; if either of them is None, the default auto-generated title is used."
 
+legendPosition='upper left'
+"Placement of the legend on the plot"
+legendPositionSecondary='upper right'
+"Placement of the scondary legend on the plot"
 
 live=True if yade.runtime.hasDisplay else False
 "Enable/disable live plot updating. Disabled by default for now, since it has a few rough edges."
@@ -183,7 +187,7 @@ def createPlots(subPlots=False):
 			scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
 			currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 		# create the legend
-		l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
+		l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=(legendPosition if len(plots_p_y2)>0 else 'best'))
 		if hasattr(l,'draggable'): l.draggable(True)
 		pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y1])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
 		pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
@@ -203,7 +207,7 @@ def createPlots(subPlots=False):
 				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
 				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 			# legend
-			l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
+			l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc=legendPositionSecondary)
 			if hasattr(l,'draggable'): l.draggable(True)
 			pylab.rcParams['lines.color']=origLinesColor
 			pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y2])) if p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2] else xylabels[p][2])
