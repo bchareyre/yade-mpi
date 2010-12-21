@@ -260,6 +260,22 @@ class Se3FakeType: pass
 _fundamentalEditorMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Quaternion:AttrEditor_Quaternion,Vector2:AttrEditor_Vector2,Vector3:AttrEditor_Vector3,Vector6:AttrEditor_Vector6,Matrix3:AttrEditor_Matrix3,Vector6i:AttrEditor_Vector6i,Vector3i:AttrEditor_Vector3i,Vector2i:AttrEditor_Vector2i,Se3FakeType:AttrEditor_Se3}
 _fundamentalInitValues={bool:True,str:'',int:0,float:0.0,Quaternion:Quaternion.Identity,Vector3:Vector3.Zero,Matrix3:Matrix3.Zero,Vector6:Vector6.Zero,Vector6i:Vector6i.Zero,Vector3i:Vector3i.Zero,Vector2i:Vector2i.Zero,Vector2:Vector2.Zero,Se3FakeType:(Vector3.Zero,Quaternion.Identity)}
 
+class SerQLabel(QLabel):
+	def __init__(self,parent,label,tooltip,path):
+		QLabel.__init__(self,parent)
+		self.path=path
+		self.setText(label)
+		if tooltip or path: self.setToolTip(('<b>'+path+'</b><br>' if self.path else '')+(tooltip if tooltip else ''))
+		self.linkActivated.connect(yade.qt.openUrl)
+	def mousePressEvent(self,event):
+		if event.button()!=Qt.MiddleButton:
+			event.ignore(); return
+		# middle button clicked, paste pasteText to clipboard
+		cb=QApplication.clipboard()
+		cb.setText(self.path,mode=QClipboard.Clipboard)
+		cb.setText(self.path,mode=QClipboard.Selection) # X11 global selection buffer
+		event.accept()
+
 class SerializableEditor(QFrame):
 	"Class displaying and modifying serializable attributes of a yade object."
 	import collections
@@ -273,7 +289,7 @@ class SerializableEditor(QFrame):
 		"Construct window, *ser* is the object we want to show."
 		QtGui.QFrame.__init__(self,parent)
 		self.ser=ser
-		self.path=(ser.label if hasattr(ser,'label') else path)
+		self.path=(ser.label if (hasattr(ser,'label') and ser.label) else path)
 		self.showType=showType
 		self.hot=False
 		self.entries=[]
@@ -391,13 +407,17 @@ class SerializableEditor(QFrame):
 		grid.setVerticalSpacing(0)
 		grid.setLabelAlignment(Qt.AlignRight)
 		if self.showType:
-			lab=QLabel(makeSerializableLabel(self.ser,addr=True,href=True))
+			#lab=QLabel(makeSerializableLabel(self.ser,addr=True,href=True))
+			#lab.setToolTip(('<b>'+self.path+'</b><br>' if self.path else '')+self.getDocstring())
+			lab=SerQLabel(self,makeSerializableLabel(self.ser,addr=True,href=True),tooltip=self.getDocstring(),path=self.path)
 			lab.setFrameShape(QFrame.Box); lab.setFrameShadow(QFrame.Sunken); lab.setLineWidth(2); lab.setAlignment(Qt.AlignHCenter); lab.linkActivated.connect(yade.qt.openUrl)
-			lab.setToolTip(('<b>'+self.path+'</b><br>' if self.path else '')+self.getDocstring())
 			grid.setWidget(0,QFormLayout.SpanningRole,lab)
 		for entry in self.entries:
 			entry.widget=self.mkWidget(entry)
-			label=QLabel(self); label.setText(serializableHref(self.ser,entry.name)); label.setToolTip(('<b>'+self.path+'.'+entry.name+'</b><br>' if self.path else '')+self.getDocstring(entry.name)); label.linkActivated.connect(yade.qt.openUrl)
+			objPath=(self.path+'.'+entry.name) if self.path else None
+			label=SerQLabel(self,serializableHref(self.ser,entry.name),tooltip=self.getDocstring(entry.name),path=objPath)
+			#label=SerAttrQLabel(self,serializableHref(self.ser,entry.name),tooltip=('<b>'+self.path+'.'+entry.name+'</b><br>' if self.path else '')+self.getDocstring(entry.name),
+			#label=QLabel(self); label.setText(); label.setToolTip(; label.linkActivated.connect(yade.qt.openUrl)
 			grid.addRow(label,entry.widget if entry.widget else QLabel('<i>unhandled type</i>'))
 		self.setLayout(grid)
 		self.refreshEvent()
@@ -452,6 +472,7 @@ class SeqSerializableComboBox(QFrame):
 		self.refreshTimer=QTimer(self)
 		self.refreshTimer.timeout.connect(self.refreshEvent)
 		self.refreshTimer.start(1000) # 1s should be enough
+		#print 'SeqSerializable path is',self.path
 	def comboIndexSlot(self,ix): # different seq item selected
 		currSeq=self.getter();
 		if len(currSeq)==0: ix=-1
@@ -461,7 +482,7 @@ class SeqSerializableComboBox(QFrame):
 		self.combo.setEnabled(ix>=0)
 		if ix>=0:
 			ser=currSeq[ix]
-			self.seqEdit=SerializableEditor(ser,parent=self,showType=seqSerializableShowType,path=(self.path+'['+str(ix)+']' if self.path else None))
+			self.seqEdit=SerializableEditor(ser,parent=self,showType=seqSerializableShowType,path=(self.path+'['+str(ix)+']') if self.path else None)
 			self.scroll.setWidget(self.seqEdit)
 			if self.shrink:
 				self.sizeHint=lambda: QSize(100,1000)

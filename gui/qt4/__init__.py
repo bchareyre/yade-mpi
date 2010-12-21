@@ -130,7 +130,8 @@ class ControllerClass(QWidget,Ui_Controller):
 				v=View(); v.center()
 	def displayComboSlot(self,dispStr):
 		ser=(self.renderer if dispStr=='OpenGLRenderer' else eval(str(dispStr)+'()'))
-		se=SerializableEditor(ser,parent=self.displayArea,ignoredAttrs=set(['label']),showType=True)
+		path='yade.qt.Renderer()' if dispStr=='OpenGLRenderer' else dispStr
+		se=SerializableEditor(ser,parent=self.displayArea,ignoredAttrs=set(['label']),showType=True,path=path)
 		self.displayArea.setWidget(se)
 	def loadSlot(self):
 		f=QFileDialog.getOpenFileName(self,'Load simulation','','Yade simulations (*.xml *.xml.bz2 *.xml.gz *.yade *.yade.gz *.yade.bz2);; *.*')

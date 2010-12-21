@@ -56,7 +56,7 @@ def makeBodyLabel(b):
 		typeMap={'Sphere':u'⚫','Facet':u'△','Wall':u'┃','Box':u'⎕','Cylinder':u'⌭','ChainedCylinder':u'☡','Clump':u'☍'}
 		ret+=typeMap.get(b.shape.__class__.__name__,u'﹖')
 	if not b.dynamic: ret+=u'⚓'
-	elif b.state.blockedDOFs!=[]: ret+=u'⎈'
+	elif b.state.blockedDOFs: ret+=u'⎈'
 	return ret
 
 def getBodyIdFromLabel(label):

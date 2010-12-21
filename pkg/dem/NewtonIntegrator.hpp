@@ -32,8 +32,11 @@ class NewtonIntegrator : public GlobalEngine{
 	inline void leapfrogSphericalRotate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt); // leap-frog rotate of spherical body
 	inline void leapfrogAsphericalRotate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
-	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
-	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
+
+	// compute linear and angular acceleration, respecting State::blockedDOFs
+	Vector3r computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs);
+	Vector3r computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs);
+
 	// whether the cell has changed from the previous step
 	bool cellChanged;
 	int homoDeform; // updated from scene at every call; -1 for aperiodic simulations, otherwise equal to scene->cell->homoDeform

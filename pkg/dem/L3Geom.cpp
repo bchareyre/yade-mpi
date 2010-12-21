@@ -241,7 +241,6 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 			Vector3r u0slip=(1-ratio)*Vector3r(/*no slip in the normal sense*/0,geom->relU()[1],geom->relU()[2]);
 			geom->u0+=u0slip; // increment plastic displacement
 			Fs*=ratio; // decrement shear force value;
-			//cerr<<"SLIP: Fs="<<Fs<<", ratio="<<ratio<<", u0slip="<<u0slip<<", localF="<<localF<<endl;
 			if(unlikely(scene->trackEnergy)){ Real dissip=Fs.norm()*u0slip.norm(); if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false); }
 		}
 	}
