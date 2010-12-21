@@ -31,7 +31,6 @@ env.Install('$LIBDIR/lib',[
 			'FrontEnd.cpp',
 			'Interaction.cpp',
 			'InteractionContainer.cpp',
-			'GroupRelationData.cpp',
 			'Material.cpp',
 			'Scene.cpp',
 			'Dispatcher.cpp',

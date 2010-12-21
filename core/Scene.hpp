@@ -57,9 +57,6 @@ class Scene: public Serializable{
 		void postLoad(Scene&);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Scene,Serializable,"Object comprising the whole simulation.",
-		#ifdef YADE_GROUP_RELATION_DATA
-			((shared_ptr<GroupRelationData>,grpRelationData,,Attr::hidden,"Assigns float value to all possible combinations of body group that interact."))
-		#endif
 		((Real,dt,1e-8,,"Current timestep for integration."))
 		((long,iter,0,Attr::readonly,"Current iteration (computational step) number"))
 		((bool,subStepping,false,,"Whether we currently advance by one engine in every step (rather than by single run through all engines)."))
