@@ -23,19 +23,20 @@ class VelocityBins;
 
 class NewtonIntegrator : public GlobalEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A);
-	inline void handleClumpMemberAccel(Scene* ncb, const Body::id_t& memberId, State* memberState, State* clumpState);
-	inline void handleClumpMemberAngAccel(Scene* ncb, const Body::id_t& memberId, State* memberState, State* clumpState);
-	inline void handleClumpMemberTorque(Scene* ncb, const Body::id_t& memberId, State* memberState, State* clumpState, Vector3r& M);
-	inline void saveMaximaVelocity(Scene* ncb, const Body::id_t& id, State* state);
+	inline void saveMaximaVelocity(const Body::id_t& id, State* state);
 	bool haveBins;
-	inline void leapfrogTranslate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt); // leap-frog translate
-	inline void leapfrogSphericalRotate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt); // leap-frog rotate of spherical body
-	inline void leapfrogAsphericalRotate(Scene* ncb, State* state, const Body::id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
+	inline void leapfrogTranslate(State*, const Body::id_t& id, const Real& dt); // leap-frog translate
+	inline void leapfrogSphericalRotate(State*, const Body::id_t& id, const Real& dt); // leap-frog rotate of spherical body
+	inline void leapfrogAsphericalRotate(State*, const Body::id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 
 	// compute linear and angular acceleration, respecting State::blockedDOFs
 	Vector3r computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs);
 	Vector3r computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs);
+	// compute contribution of clump member
+	Vector3r clumpMemberAccel(const Body::id_t&, const State* clumpState, const State* memberState);
+	Vector3r clumpMemberAngAccel(const Body::id_t&, const State* clumpState, const State* memberState);
+	Vector3r clumpMemberTorque(const Body::id_t&, const State* clumpState, const State* memberState);
 
 	// whether the cell has changed from the previous step
 	bool cellChanged;

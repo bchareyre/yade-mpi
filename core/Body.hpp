@@ -62,6 +62,8 @@ class Body: public Serializable{
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
 		virtual void userForcedDisplacementRedrawHook(){return;}
 
+		python::list py_intrs();
+
 		Body::id_t getId() const {return id;};
 
 		int getGroupMask() {return groupMask; };
@@ -95,7 +97,8 @@ class Body: public Serializable{
 		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")
-		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise.");
+		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise.")
+		.def("intrs",&Body::py_intrs,"Return all interactions in which this body participates.")
 	);
 };
 REGISTER_SERIALIZABLE(Body);
