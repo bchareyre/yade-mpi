@@ -37,17 +37,15 @@ def saveVars(mark='',loadNow=True,**kw):
 
 		>>> utils.loadVars('mark')
 
-	and they will be defined in the yade.params.\ *mark* module
-
-	m*==True, variables will be loaded immediately after saving. That effectively makes *\*\*kw* available in builtin namespace.
+	and they will be defined in the yade.params.\ *mark* module. The *loadNow* parameter calls :yref:`yade.utils.loadVars` after saving automatically.
 	"""
 	import cPickle
 	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
 	if loadNow: loadVars(mark)
 
 def loadVars(mark=None):
-	"""Load variables from saveVars, which are saved inside the simulation.
-	If mark==None, all save variables are loaded. Otherwise only those with
+	"""Load variables from :yref:`yade.utils.saveVars`, which are saved inside the simulation.
+	If ``mark==None``, all save variables are loaded. Otherwise only those with
 	the mark passed."""
 	import cPickle, types, sys, warnings
 	def loadOne(d,mark=None):
@@ -97,12 +95,6 @@ def typedEngine(name):
 	True
 	"""
 	return [e for e in Omega().engines if e.__class__.__name__==name][0]
-
-def downCast(obj,newClassName):
-	"""Cast given object to class deriving from the same yade root class and copy all parameters from given object.
-	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
-	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
-
 
 def defaultMaterial():
 	"""Return default material, when creating bodies with :yref:`yade.utils.sphere` and friends, material is unspecified and there is no shared material defined yet. By default, this function returns::
@@ -263,14 +255,13 @@ def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	else: pos2=position
 	b.state.pos=b.state.refPos=pos2
 	b.dynamic=False
-	b.aspherical=True # never used, since the wall is not dynamic
+	b.aspherical=False # wall never moves dynamically
 	b.mask=mask
 	return b
 
 def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1):
 	"""Create facet with given parameters.
 
-	:Parameters:
 	:param [Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
 	:param bool wire: if ``True``, facets are shown as skeleton; otherwise facets are filled
 	:param bool noBound: set :yref:`Body.bounded`
@@ -284,8 +275,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
-	#b.aspherical=True
-	b.aspherical=False # FIXME: is it reasonably for a facets?
+	b.aspherical=False # mass and inertia are 0 anyway; fell free to change to ``True`` if needed
 	b.mask=mask
 	return b
 
@@ -474,7 +464,9 @@ def avgNumInteractions(cutoff=0.,skipFree=False):
 	.. math:: Z_m=\frac{2C-N_1}{N-N_0-N_1}
 
 	:param cutoff: cut some relative part of the sample's bounding box away.
-	:param skipFree: 	"""
+	:param skipFree: see above.
+	
+"""
 	if cutoff==0 and not skipFree: return 2*O.interactions.countReal()*1./len(O.bodies)
 	else:
 		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
@@ -582,15 +574,10 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 
 #. Find the bodies that are on the negative/positive boundary, to which the straining condition should be applied.
 
-:parameters:
-	`filename`:
-		if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
-	`areaSection`:
-		number of section that will be used to estimate cross-section
-	`axis`:
-		if given, force strained axis, rather than computing it from predominant length
-
-:return: dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
+:param filename: if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
+:param float areaSection: number of section that will be used to estimate cross-section
+:param ∈{0,1,2} axis: if given, force strained axis, rather than computing it from predominant length
+:return: dictionary with keys ``negIds``, ``posIds``, ``axis``, ``area``.
 
 .. warning::
 	The function :yref:`yade.utils.approxSectionArea` uses convex hull algorithm to find the area, but the implementation is reported to be *buggy* (bot works in some cases). Always check this number, or fix the convex hull algorithm (it is documented in the source, see :ysrc:`py/_utils.cpp`).
@@ -729,7 +716,7 @@ def waitIfBatch():
 	'Block the simulation if running inside a batch. Typically used at the end of script so that it does not finish prematurely in batch mode (the execution would be ended in such a case).'
 	if runningInBatch(): O.wait()
 
-def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw):
+def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 	"""
 	Read parameters from a file and assign them to __builtin__ variables.
 
@@ -742,29 +729,21 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		val2  val2  … # 2nd
 		…
 
-	Assigned tags:
+	Assigned tags (the ``description`` column is synthesized if absent,see :yref:`yade.utils.TableParamReader`); 
 
-	* *description* column is assigned to Omega().tags['description']; this column is synthesized if absent (see :yref:`yade.utils.TableParamReader`);
-	* ``Omega().tags['params']="name1=val1,name2=val2,…"``
-	* ``Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"``
-	* ``Omega().tags['d.id']=O.tags['id']+'.'+O.tags['description']``
-	* ``Omega().tags['id.d']=O.tags['description']+'.'+O.tags['id']``
+		O.tags['description']=…                                      # assigns the description column; might be synthesized
+		O.tags['params']="name1=val1,name2=val2,…"                   # all explicitly assigned parameters
+		O.tags['defaultParams']="unassignedName1=defaultValue1,…"    # parameters that were left at their defaults
+		O.tags['d.id']=O.tags['id']+'.'+O.tags['description']
+		O.tags['id.d']=O.tags['description']+'.'+O.tags['id']
 
 	All parameters (default as well as settable) are saved using :yref:`yade.utils.saveVars`\ ``('table')``.
 
-	:parameters:
-		`tableFile`:
-			text file (with one value per blank-separated columns)
-		`tableLine`:
-			number of line where to get the values from.
-		`noTableOk`: bool
-			do not raise exception if the file cannot be open; use default values
-		`unknownOk`: bool
-			do not raise exception if unknown column name is found in the file; assign it as well
-
-	:return:
-		number of assigned parameters.
-
+	:param tableFile: text file (with one value per blank-separated columns)
+	:param int tableLine: number of line where to get the values from
+	:param bool noTableOk: if False, raise exception if the file cannot be open; use default values otherwise
+	:param bool unknownOk: do not raise exception if unknown column name is found in the file, and assign it as well
+	:return: number of assigned parameters
 	"""
 	tagsParams=[]
 	# dictParams is what eventually ends up in yade.params.table (default+specified values)

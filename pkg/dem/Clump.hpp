@@ -60,7 +60,9 @@ class Clump: public Shape {
 		static void del(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
 		//! Recalculate physical properties of Clump.
 		static void updateProperties(const shared_ptr<Body>& clump, bool intersecting);
-		//! Calculate positions and orientations of members based on my own Se3.
+		//! Calculate positions and orientations of members based on relative Se3
+		static void moveMember(const shared_ptr<State>& clumpState, const shared_ptr<State>& subState, const Se3r& relSe3);
+		//! Loop around moveMember
 		static void moveMembers(const shared_ptr<Body>& clump, Scene* scene);
 		//! update member positions after clump being moved by mouse (in case simulation is paused and engines will not do that).
 		void userForcedDisplacementRedrawHook(){ throw runtime_error("Clump::userForcedDisplacementRedrawHook not yet implemented (with Clump as subclass of Shape).");}

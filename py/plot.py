@@ -12,7 +12,7 @@ __all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset'
 # safe to import even if Tk will not be used
 import mtTkinter as Tkinter
 
-import matplotlib,os,time,math
+import matplotlib,os,time,math,itertools
 
 # running in batch
 #
@@ -43,10 +43,8 @@ labels={}
 xylabels={}
 "Dictionary of 2-tuples specifying (xlabel,ylabel) for respective plots; if either of them is None, the default auto-generated title is used."
 
-legendPosition='upper left'
-"Placement of the legend on the plot"
-legendPositionSecondary='upper right'
-"Placement of the scondary legend on the plot"
+legendLoc=('upper left','upper right')
+"Location of the y1 and y2 legends on the plot, if y2 is active."
 
 live=True if yade.runtime.hasDisplay else False
 "Enable/disable live plot updating. Disabled by default for now, since it has a few rough edges."
@@ -142,13 +140,13 @@ class LineRef:
 		except IndexError: x,y=0,0
 		# this could be written in a nicer way, very likely
 		pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
-		self.scatter.set_offsets(pt)
+		if self.scatter: self.scatter.set_offsets(pt)
 
 currLineRefs=[]
 liveTimeStamp=0 # timestamp when live update was started, so that the old thread knows to stop if that changes
 nan=float('nan')
 
-def createPlots(subPlots=False):
+def createPlots(subPlots=True):
 	global currLineRefs
 	figs=set([l.line.get_axes().get_figure() for l in currLineRefs]) # get all current figures
 	for f in figs: pylab.close(f) # close those
@@ -171,27 +169,55 @@ def createPlots(subPlots=False):
 				y1=False; continue
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
-			if d[0] not in data.keys(): missing.add(d[0])
+			if d[0] not in data.keys() and not callable(d[0]): missing.add(d[0])
 		if missing:
 			if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
 				for m in missing: data[m]=[]
 			else:
 				print 'Missing columns in plot.data, adding NaN: ',','.join(list(missing))
 				addDataColumns(missing)
-		# create y1 lines
-		for d in plots_p_y1:
-			line,=pylab.plot(data[pStrip],data[d[0]],d[1])
-			# use (0,0) if there are no data yet
-			scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
-			# if current value is NaN, use zero instead
-			scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
-			currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
-		# create the legend
-		l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y1],loc=(legendPosition if len(plots_p_y2)>0 else 'best'))
-		if hasattr(l,'draggable'): l.draggable(True)
-		pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y1])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
-		pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
-		if scientific: pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
+		def createLines(pStrip,ySpecs,isY1=True,y2Exists=False):
+			'''Create data lines from specifications; this code is common for y1 and y2 axes;
+			it handles y-data specified as callables, which might create additional lines when updated with liveUpdate.
+			'''
+			# save the original specifications; they will be smuggled into the axes object
+			# the live updated will run yNameFuncs to see if there are new lines to be added
+			# and will add them if necessary
+			yNameFuncs=set([d[0] for d in ySpecs if callable(d[0])])
+			yNames=set()
+			ySpecs2=[]
+			for ys in ySpecs:
+				if not callable(ys[0]): ySpecs2.append(ys)
+				# ys[0]() must return list of strings, which are added to ySpecs2; line specifier is synthesized by tuplifyYAxis and cannot be specified by the user
+				else: ySpecs2+=[(ret,ys[1]) for ret in ys[0]()]
+			if len(ySpecs2)==0:
+				print 'yade.plot: creating fake plot, since there are no y-data yet'
+				line,=pylab.plot([nan],[nan])
+				currLineRefs.append(LineRef(line,None,[nan],[nan]))
+			for d in ySpecs2:
+				yNames.add(d)
+				line,=pylab.plot(data[pStrip],data[d[0]],d[1],label=xlateLabel(d[0]))
+				# use (0,0) if there are no data yet
+				scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
+				# if current value is NaN, use zero instead
+				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
+				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
+			labelLoc=(legendLoc[0 if isY1 else 1] if y2Exists>0 else 'best')
+			l=pylab.legend(loc=labelLoc)
+			if hasattr(l,'draggable'): l.draggable(True)
+			if isY1:
+				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
+				pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
+				## should be done for y2 as well, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, present in versions .99--1.0.5, and possibly beyond)
+				if scientific: pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
+			else:
+				pylab.rcParams['lines.color']=origLinesColor
+				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if (p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2]) else xylabels[p][2])
+			# if there are callable ySpecs, save them inside the axes object, so that the live updater can use those
+			if yNameFuncs:
+				axes=line.get_axes()
+				axes.yadeYNames,axes.yadeYFuncs,axes.yadeXName,axes.yadeLabelLoc=yNames,yNameFuncs,pStrip,labelLoc # prepend yade to avoid clashes
+		createLines(pStrip,plots_p_y1,isY1=True,y2Exists=len(plots_p_y2)>0)
 		if axesWd>0:
 			pylab.axhline(linewidth=axesWd,color='k')
 			pylab.axvline(linewidth=axesWd,color='k')
@@ -199,21 +225,8 @@ def createPlots(subPlots=False):
 		if len(plots_p_y2)>0:
 			# try to move in the color palette a little further (magenta is 5th): r,g,b,c,m,y,k
 			origLinesColor=pylab.rcParams['lines.color']; pylab.rcParams['lines.color']='m'
-			# create the y2 axis
-			pylab.twinx()
-			for d in plots_p_y2:
-				line,=pylab.plot(data[pStrip],data[d[0]],d[1])
-				scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
-				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
-				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
-			# legend
-			l=pylab.legend([xlateLabel(_p[0]) for _p in plots_p_y2],loc=legendPositionSecondary)
-			if hasattr(l,'draggable'): l.draggable(True)
-			pylab.rcParams['lines.color']=origLinesColor
-			pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in plots_p_y2])) if p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2] else xylabels[p][2])
-			## should be repeated for y2 axis, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, it seems)
-			# if scientific: pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
-
+			pylab.twinx() # create the y2 axis
+			createLines(pStrip,plots_p_y2,isY1=False,y2Exists=True)
 		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
 
 
@@ -228,6 +241,26 @@ def liveUpdate(timestamp):
 			l.update()
 			figs.add(l.line.get_figure())
 			axes.add(l.line.get_axes())
+		# find callables in y specifiers, create new lines if necessary
+		for ax in axes:
+			if not hasattr(ax,'yadeYFuncs') or not ax.yadeYFuncs: continue # not defined of empty
+			yy=set();
+			for f in ax.yadeYFuncs: yy.update(f())
+			#print 'callables y names:',yy
+			news=yy-ax.yadeYNames
+			if not news: continue
+			for new in news:
+				print 'yade.plot: creating new line for',new
+				if not new in data.keys(): data[new]=[] # create data entry if necessary
+				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
+				scatterPt=(0 if len(data[ax.yadeXName])==0 and not math.isnan(data[ax.yadeXName]) else data[ax.yadeXName][current]),(0 if len(data[new])==0 and not math.isnan(data[new][current]) else data[new][current])
+				scatter=ax.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
+				currLineRefs.append(LineRef(line,scatter,data[ax.yadeXName],data[new]))
+				ax.yadeYNames.add(new)
+				ax.set_ylabel(ax.get_ylabel()+(', ' if ax.get_ylabel() else '')+xlateLabel(new))
+			# it is possible that the legend has not yet been created
+			l=ax.legend(loc=ax.yadeLabelLoc)
+			if hasattr(l,'draggable'): l.draggable(True)
 		if autozoom:
 			for ax in axes:
 				try:

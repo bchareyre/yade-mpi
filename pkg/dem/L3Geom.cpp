@@ -179,7 +179,7 @@ bool Ig2_Wall_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_pt
 	// wall interacting from both sides: normal depends on sphere's position
 	assert(sense==-1 || sense==0 || sense==1);
 	if(sense==0) normal[ax]=dist>0?1.:-1.;
-	else normal[ax]=sense==1?1.:-1;
+	else normal[ax]=(sense==1?1.:-1);
 	Real uN=normal[ax]*dist-radius; // takes in account sense, radius and distance
 
 	if(!I->geom){
@@ -196,7 +196,7 @@ bool Ig2_Wall_Sphere_L3Geom_Inc::go(const shared_ptr<Shape>& s1, const shared_pt
 		return true;
 	}
 	L3Geom& g=I->geom->cast<L3Geom>();
-	if(g.normal!=normal) throw std::logic_error(("Ig2_Wall_Sphere_L3Geom_Inc: normal changed in Wall+Sphere ##"+lexical_cast<string>(I->getId1())+"+"+lexical_cast<string>(I->getId2())+" (Wall.sense≠0?)").c_str());
+	if(g.normal!=normal) throw std::logic_error(("Ig2_Wall_Sphere_L3Geom_Inc: normal changed in Wall+Sphere ##"+lexical_cast<string>(I->getId1())+"+"+lexical_cast<string>(I->getId2())+" (with Wall.sense=0, a particle might cross the Wall plane, if Δt is too high)").c_str());
 	Vector3r normTwistVec=normal*scene->dt*.5*normal.dot(state1.angVel+state2.angVel);
 
 	/* TODO: below is a lot of code common with Sphere+Sphere; identify, factor out in a separate func */
@@ -230,7 +230,7 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 	Vector3r& localF(geom->F);
 	localF=geom->relU().cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
 	// break if necessary
-	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I->getId1(),I->getId2()); }
+	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I->getId1(),I->getId2()); return; }
 
 	if(!noSlip){
 		// plastic slip, if necessary; non-zero elastic limit only for compression

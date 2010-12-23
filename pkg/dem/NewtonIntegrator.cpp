@@ -170,10 +170,10 @@ void NewtonIntegrator::action()
 				// rotation
 				if(aspherical) leapfrogAsphericalRotate(state,id,dt,M);
 				else leapfrogSphericalRotate(state,id,dt);
-				Clump::moveMembers(b,scene);
-				// save max velocity for all members of the clump
-				FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
+				// move individual members of the clump, save maxima velocity (for collider stride)
+				FOREACH(Clump::MemberMap::value_type mm, b->shape->cast<Clump>().members){
 					const shared_ptr<Body>& member=Body::byId(mm.first,scene); assert(member->isClumpMember());
+					Clump::moveMember(b->state,member->state,mm.second);
 					saveMaximaVelocity(mm.first,member->state.get());
 				}
 			}
