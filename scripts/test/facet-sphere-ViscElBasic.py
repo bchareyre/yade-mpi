@@ -22,7 +22,7 @@ sphIds=O.bodies.append([
 	utils.sphere( (0.9,0,0.1),0.1, material=sphereMat,color=(0,1,0))
 	])
 
-O.bodies[sphIds[1]].state.blockedDOFs=['rx','ry','rz']
+O.bodies[sphIds[1]].state.blockedDOFs='XYZ'
 
 ## Timestep 
 O.dt=.1*tc

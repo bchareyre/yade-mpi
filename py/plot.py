@@ -202,20 +202,23 @@ def createPlots(subPlots=True):
 				# if current value is NaN, use zero instead
 				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
 				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
+			axes=line.get_axes()
 			labelLoc=(legendLoc[0 if isY1 else 1] if y2Exists>0 else 'best')
 			l=pylab.legend(loc=labelLoc)
 			if hasattr(l,'draggable'): l.draggable(True)
+			if scientific:
+				pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
+				# fixes scientific exponent placement for y2: https://sourceforge.net/mailarchive/forum.php?thread_name=20101223174750.GD28779%40ykcyc&forum_name=matplotlib-users
+				if not isY1: axes.yaxis.set_offset_position('right')
 			if isY1:
 				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
 				pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
 				## should be done for y2 as well, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, present in versions .99--1.0.5, and possibly beyond)
-				if scientific: pylab.ticklabel_format(style='sci',scilimits=(0,0),axis='both')
 			else:
 				pylab.rcParams['lines.color']=origLinesColor
 				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if (p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2]) else xylabels[p][2])
 			# if there are callable ySpecs, save them inside the axes object, so that the live updater can use those
 			if yNameFuncs:
-				axes=line.get_axes()
 				axes.yadeYNames,axes.yadeYFuncs,axes.yadeXName,axes.yadeLabelLoc=yNames,yNameFuncs,pStrip,labelLoc # prepend yade to avoid clashes
 		createLines(pStrip,plots_p_y1,isY1=True,y2Exists=len(plots_p_y2)>0)
 		if axesWd>0:

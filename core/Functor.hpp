@@ -45,9 +45,11 @@ class Functor1D: public Functor,
 {
 	public:
 		typedef _DispatchType1 DispatchType1; typedef _ReturnType ReturnType; typedef _ArgumentTypes ArgumentTypes; 
-		#define FUNCTOR1D(type1) public: std::string get1DFunctorType1(void){return string(#type1);}
+		#define FUNCTOR1D(type1) public: std::string get1DFunctorType1(void){return string(#type1);} // bool checkArgTypes(const shared_ptr<DispatchType1>& arg1){ return dynamic_pointer_cast<type1>(arg1); }
 		virtual std::string get1DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
 		virtual vector<string> getFunctorTypes(void){vector<string> ret; ret.push_back(get1DFunctorType1()); return ret;};
+		// check that the object can be correctly cast to the derived class handled by the functor (will be used if ever utils.createInteraction can be called with list of functors only)
+		// virtual bool checkArgTypes(const shared_ptr<DispatchType1>& arg1){ throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
 	REGISTER_CLASS_AND_BASE(Functor1D,Functor FunctorWrapper);
 	/* do not REGISTER_ATTRIBUTES here, since we are template; derived classes should call REGISTER_ATTRIBUTES(Functor,(their)(own)(attributes)), bypassing Functor1D */
 };
@@ -65,10 +67,12 @@ class Functor2D:	public Functor,
 {
 	public:
 		typedef _DispatchType1 DispatchType1; typedef _DispatchType2 DispatchType2; typedef _ReturnType ReturnType; typedef _ArgumentTypes ArgumentTypes; 
-		#define FUNCTOR2D(type1,type2) public: std::string get2DFunctorType1(void){return string(#type1);}; std::string get2DFunctorType2(void){return string(#type2);};
+		#define FUNCTOR2D(type1,type2) public: std::string get2DFunctorType1(void){return string(#type1);}; std::string get2DFunctorType2(void){return string(#type2);}; // bool checkArgTypes(const shared_ptr<DispatchType1>& arg1, const shared_ptr<DispatchType2>& arg2){ return dynamic_pointer_cast<type1>(arg1) && dynamic_pointer_cast<type2>(arg2); }
 		virtual std::string get2DFunctorType1(void){throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
 		virtual std::string get2DFunctorType2(void){throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
 		virtual vector<string> getFunctorTypes(){vector<string> ret; ret.push_back(get2DFunctorType1()); ret.push_back(get2DFunctorType2()); return ret;};
+		// check that objects can be correctly cast to derived classes handled by the functor (see comment in Functor1D:: checkArgTypes)
+		// virtual bool checkArgTypes(const shared_ptr<DispatchType1>&, const shared_ptr<DispatchType2>&){ throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?"); }
 	REGISTER_CLASS_AND_BASE(Functor2D,Functor FunctorWrapper);
 	/* do not REGISTER_ATTRIBUTES here, since we are template; derived classes should call REGISTER_ATTRIBUTES(Functor,(their)(own)(attributes)), bypassing Functor2D */
 };

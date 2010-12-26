@@ -170,7 +170,7 @@ void LawTester::action(){
 
 		// twist can be still distributed with idWeight (!)
 		Vector3r ddPhi=sign*dPhi*(1-relRad); /* shear angles must distribute to both, otherwise it would induce shear */
-		ddPhi[0]=sign*dPhi[0]*idWeight; // twist can be still distributed with idWeight
+		ddPhi[0]=sign*dPhi[0]*weight; // twist can be still distributed with idWeight
 		vel[i]=angVel[i]=Vector3r::Zero();
 
 		// normal displacement

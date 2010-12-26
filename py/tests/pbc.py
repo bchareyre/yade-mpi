@@ -64,14 +64,14 @@ class TestPBC(unittest.TestCase):
 	def testL3GeomIncidentVelocity(self):
 		"PBC: L3Geom computes incident velocity correctly (homoDeform==3)"
 		O.step()
-		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
+		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
 		i=utils.createInteraction(0,1) 
 		O.dt=1e-10; O.step() # tiny timestep, to not move the normal too much
 		self.assertAlmostEqual(self.initVel.norm(),(i.geom.u/O.dt).norm())
 	def testL3GeomIncidentVelocity_homoPos(self):
 		"PBC: L3Geom computes incident velocity correctly (homoDeform==1)"
 		O.cell.homoDeform=1; O.step()
-		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
+		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
 		i=utils.createInteraction(0,1) 
 		O.dt=1e-10; O.step()
 		self.assertAlmostEqual(self.initVel.norm(),(i.geom.u/O.dt).norm())

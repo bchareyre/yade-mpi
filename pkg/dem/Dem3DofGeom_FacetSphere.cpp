@@ -55,7 +55,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			Vector3r normal=facet->nf;
 			Real planeDist=normal.dot(cogLine);
 			if(planeDist<0){normal*=-1; planeDist*=-1; }
-			if(planeDist>sphereRadius && !c->isReal()) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
+			if(planeDist>sphereRadius && !c->isReal() && !force) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
 			Vector3r planarPt=cogLine-planeDist*normal; // project sphere center to the facet plane
 			Real normDotPt[3];
 			Vector3r contactPt(Vector3r::Zero());

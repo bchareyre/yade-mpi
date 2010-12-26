@@ -16,7 +16,7 @@ O.bodies.append(utils.wall(position=0,axis=2,sense=1))
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
-	InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc(approxMask=0),Ig2_Wall_Sphere_L3Geom_Inc(approxMask=0)],[Ip2_FrictMat_FrictMat_FrictPhys(frictAngle=table.frictAngle)],[Law2_L3Geom_FrictPhys_ElPerfPl(noSlip=False,noBreak=False)]) if table.useL3Geom else InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys(frictAngle=table.frictAngle)],[Law2_ScGeom_FrictPhys_CundallStrack()]),
+	InteractionLoop([Ig2_Sphere_Sphere_L3Geom(approxMask=0),Ig2_Wall_Sphere_L3Geom(approxMask=0)],[Ip2_FrictMat_FrictMat_FrictPhys(frictAngle=table.frictAngle)],[Law2_L3Geom_FrictPhys_ElPerfPl(noSlip=False,noBreak=False)]) if table.useL3Geom else InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys(frictAngle=table.frictAngle)],[Law2_ScGeom_FrictPhys_CundallStrack()]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=table.nonviscDamp,kinSplit=True),
 	PyRunner(iterPeriod=1,command='addPlotData()'),

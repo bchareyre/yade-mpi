@@ -4,9 +4,5 @@
     <file>XYZ.png</file>
     <file>YZX.png</file>
     <file>ZXY.png</file>
-    <file>pause.png</file>
-    <file>reload.png</file>
-    <file>step.png</file>
-    <file>play.png</file>
   </qresource>
 </RCC>

@@ -115,34 +115,43 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 
 	setKeyDescription(Qt::Key_A,"Toggle visibility of global axes.");
 	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
-	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
+	setKeyDescription(Qt::Key_C & Qt::AltModifier,"Set scene center to median body position (same as space)");
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
-	setKeyDescription(Qt::Key_G,"Set grid visibility; g turns on and cycles, G off");
-	setKeyDescription(Qt::Key_X,"Make +x pointing upwards (or: align manipulated clip plane normal with +X)");
-	setKeyDescription(Qt::Key_Y,"Make +y pointing upwards (or: align manipulated clip plane normal with +Y)");
-	setKeyDescription(Qt::Key_Z,"Make +z pointing upwards (or: align manipulated clip plane normal with +Z)");
+	setKeyDescription(Qt::Key_G,"Toggle grid visibility; g turns on and cycles");
+	setKeyDescription(Qt::Key_G & Qt::ShiftModifier ,"Hide grid.");
+	setKeyDescription(Qt::Key_X,"Show the xz [shift: xy] (up-right) plane (clip plane: align normal with +x)");
+	setKeyDescription(Qt::Key_Y,"Show the yx [shift: yz] (up-right) plane (clip plane: align normal with +y)");
+	setKeyDescription(Qt::Key_Z,"Show the zy [shift: zx] (up-right) plane (clip plane: align normal with +z)");
 	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
-	setKeyDescription(Qt::Key_S & Qt::ALT,   "Save QGLViewer state to /tmp/qglviewerState.xml");
+	setKeyDescription(Qt::Key_S & Qt::AltModifier,"Save QGLViewer state to /tmp/qglviewerState.xml");
 	setKeyDescription(Qt::Key_T,"Switch orthographic / perspective camera");
 	setKeyDescription(Qt::Key_O,"Set narrower field of view");
 	setKeyDescription(Qt::Key_P,"Set wider field of view");
 	setKeyDescription(Qt::Key_R,"Revolve around scene center");
 	setKeyDescription(Qt::Key_V,"Save PDF of the current view to /tmp/yade-snapshot-0001.pdf (whichever number is available first). (Must be compiled with the gl2ps feature.)");
+#if 0
 	setKeyDescription(Qt::Key_Plus,    "Cut plane increase");
 	setKeyDescription(Qt::Key_Minus,   "Cut plane decrease");
 	setKeyDescription(Qt::Key_Slash,   "Cut plane step decrease");
 	setKeyDescription(Qt::Key_Asterisk,"Cut plane step increase");
-	// unset default shortcuts
+#endif
  	setPathKey(-Qt::Key_F1);
  	setPathKey(-Qt::Key_F2);
 	setKeyDescription(Qt::Key_Escape,"Manipulate scene (default)");
-	setKeyDescription(Qt::Key_F1,"Manipulate clipping plane #1 (2,...)");
-	setKeyDescription(Qt::Key_1,"Make the manipulated clipping plane parallel with plane #1 (2,...)");
-	setKeyDescription(Qt::Key_1 & Qt::ALT,"Add/remove plane #1 (2,...) to/from the bound group");
+	setKeyDescription(Qt::Key_F1,"Manipulate clipping plane #1");
+	setKeyDescription(Qt::Key_F2,"Manipulate clipping plane #2");
+	setKeyDescription(Qt::Key_F3,"Manipulate clipping plane #3");
+	setKeyDescription(Qt::Key_1,"Make the manipulated clipping plane parallel with plane #1");
+	setKeyDescription(Qt::Key_2,"Make the manipulated clipping plane parallel with plane #2");
+	setKeyDescription(Qt::Key_2,"Make the manipulated clipping plane parallel with plane #3");
+	setKeyDescription(Qt::Key_1 & Qt::AltModifier,"Add/remove plane #1 to/from the bound group");
+	setKeyDescription(Qt::Key_2 & Qt::AltModifier,"Add/remove plane #2 to/from the bound group");
+	setKeyDescription(Qt::Key_3 & Qt::AltModifier,"Add/remove plane #3 to/from the bound group");
 	setKeyDescription(Qt::Key_0,"Clear the bound group");
-	setKeyDescription(Qt::Key_7 & Qt::ALT,"Save view configuration #0 (<b>7</b> and <b>8</b> for #1, #2)");
-	setKeyDescription(Qt::Key_7,"Load view configuration #0 (<b>7</b> and <b>8</b> for #1, #2)");
-	setKeyDescription(Qt::Key_Space,"Activate/deactivate the manipulated clipping plane");
+	setKeyDescription(Qt::Key_7,"Load [Alt: save] view configuration #0");
+	setKeyDescription(Qt::Key_8,"Load [Alt: save] view configuration #1");
+	setKeyDescription(Qt::Key_9,"Load [Alt: save] view configuration #2");
+	setKeyDescription(Qt::Key_Space,"Center scene (same as Alt-C); clip plane: activate/deactivate");
 
 	centerScene();
 
@@ -259,6 +268,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	}
 	else if(e->key()==Qt::Key_Space){
 		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; }
+		else{ centerMedianQuartile(); }
 	}
 	/* function keys */
 	else if(e->key()==Qt::Key_F1 || e->key()==Qt::Key_F2 || e->key()==Qt::Key_F3 /* || ... */ ){

@@ -54,7 +54,7 @@ o.engines=[
 ]
 
 for b in o.bodies:
-    if isinstance(b.shape,Sphere): b.state.blockedDOFs=['z'] # blocked movement along Z
+    if isinstance(b.shape,Sphere): b.state.blockedDOFs='z' # blocked movement along Z
 
 o.dt=0.02*utils.PWaveTimeStep()
 

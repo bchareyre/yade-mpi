@@ -32,24 +32,8 @@ namespace py = boost::python;
  */
 
 class Shop{
-	private:
+	public:
 		DECLARE_LOGGER;
-	public:
-		/*! map of <attribute name,value>. */
-		static map<string,boost::any> defaults;
-		/*! fills Shop::defaults with values. Called automatically. */ 
-		static void init();
-		/*! Calls Shop::init if Shop::defaults is empty (when setting or getting a default). */
-		static void ensureInit(){if(defaults.size()==0) init();}
-	public:
-		static bool hasDefault(const string& key){return defaults.find(key)!=defaults.end();}
-		/*! Retrieve default value from the map. User is responsible for casting it to the right type. */
-		template <typename valType> static valType getDefault(const string& key);
-		//template <typename valType> static valType getDefault(string key){ensureInit(); return boost::any_cast<valType>(defaults[key]);}
-		/*! Set the default value. Overrides existing value or creates new entry. Integer types are always cast to long (be careful when retrieving them). */
-		template <typename valType> static void setDefault(string key, const valType value){
-			ensureInit(); //cerr<<"Shop: Setting `"<<key<<"'="<<value<<" (type `"<<typeid(valType).name()<<"')."<<endl;
-			defaults[key]=boost::any(value);}
 
 		//! create default sphere, along with its bound etc. 
 		static shared_ptr<Body> sphere(Vector3r center, Real radius, shared_ptr<Material> mat);
@@ -63,11 +47,6 @@ class Shop{
 
 		//! Return vector of pairs (center,radius) loaded from a file with numbers inside
 		static vector<pair<Vector3r,Real> > loadSpheresFromFile(string fname,Vector3r& minXYZ, Vector3r& maxXYZ);
-		
-		struct sphereGeomStruct{ double C0, C1, C2, r; };
-		static sphereGeomStruct smallSdecXyzData[];
-		//! Return vector of pairs (center,radius) with values from small.sdec.xyz (hardwired in the code, doesn't need that file actually)
-		static vector<pair<Vector3r,Real> > loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vector3r& maxXYZ);
 		
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);

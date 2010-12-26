@@ -35,8 +35,8 @@ O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
 		#[Ig2_Sphere_Sphere_ScGeom()],	[Ip2_FrictMat_FrictMat_FrictPhys()], [Law2_ScGeom_FrictPhys_CundallStrack()] # ScGeom
-		#[Ig2_Sphere_Sphere_L3Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True,noSlip=False)] # L3Geom
-		[Ig2_Sphere_Sphere_L6Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)] # L6Geom
+		#[Ig2_Sphere_Sphere_L3Geom(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True,noSlip=False)] # L3Geom
+		[Ig2_Sphere_Sphere_L6Geom(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)] # L6Geom
 	),
 	LawTester(ids=[0,1],disPath=[(0,0,0)]*7+[(-1e-5,0,0),(-1e-5,.1,.1)],rotPath=[(0,.2,0),(0,0,0),(0,0,.2),(0,0,0),(.2,0,0),(-.2,0,0),(0,0,0)],pathSteps=[10],doneHook='tester.dead=True; O.pause();',label='tester',rotWeight=0),
 	#LawTester(ids=[0,1],path=[

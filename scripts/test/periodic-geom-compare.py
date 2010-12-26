@@ -23,9 +23,9 @@ if geom=='sc':
 elif geom=='d3d':
 	loop=InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()])
 elif geom=='l3':
-	loop=InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl()])
+	loop=InteractionLoop([Ig2_Sphere_Sphere_L3Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl()])
 elif geom=='l3a':
-	loop=InteractionLoop([Ig2_Sphere_Sphere_L3Geom_Inc(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl()])
+	loop=InteractionLoop([Ig2_Sphere_Sphere_L3Geom(approxMask=63)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl()])
 else: raise ValueError('geom must be one of sc, d3d, l3, l3a (not %s)'%geom)
 
 

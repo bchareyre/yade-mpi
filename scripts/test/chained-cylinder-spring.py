@@ -46,7 +46,7 @@ def outp(id=1):
 			print i.phys.normalForce
 			return  i
 
-O.bodies[Ne-1].state.blockedDOFs=['x','y','z','rx','ry','rz']
+O.bodies[Ne-1].state.blockedDOFs='xyzXYZ'
 yade.qt.View();
 
 

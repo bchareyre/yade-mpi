@@ -92,6 +92,9 @@ _deprecated={
 	'SpiralInteractionLocator2d':'HelixInteractionLocator2d', # Sat Oct 30 05:53:04 2010, vaclav@flux
 	'Law2_ScGeom_CohFrictPhys_CohesionMoment':'Law2_ScGeom6D_CohFrictPhys_CohesionMoment', # Fri Nov 12 18:45:23 2010, bchareyre@dt-rv020
 	'Ig2_ChainedCylinder_ChainedCylinder_ScGeom':'Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D', # Fri Nov 12 18:47:44 2010, bchareyre@dt-rv020
+	'Ig2_Sphere_Sphere_L3Geom_Inc':'Ig2_Sphere_Sphere_L3Geom', # Sun Dec 26 11:11:05 2010, vaclav@flux
+	'Ig2_Wall_Sphere_L3Geom_Inc':'Ig2_Wall_Sphere_L3Geom', # Sun Dec 26 11:11:30 2010, vaclav@flux
+	'Ig2_Sphere_Sphere_L6Geom_Inc':'Ig2_Sphere_Sphere_L6Geom', # Sun Dec 26 11:11:53 2010, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -45,7 +45,7 @@ class TestCohesiveChain(unittest.TestCase):
 			px=float(i)*(omeg/60.0); py=sin(float(i)*omeg)*hy; pz=cos(float(i)*omeg)*hz;
 			px2=float(i+1.)*(omeg/60.0); py2=sin(float(i+1.)*omeg)*hy; pz2=cos(float(i+1.)*omeg)*hz;
 			utils.chainedCylinder(begin=Vector3(pz,py,px), radius=0.005,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5))
-		O.bodies[Ne-1].state.blockedDOFs=['x','y','z','rx','ry','rz']
+		O.bodies[Ne-1].state.blockedDOFs='xyzXYZ'
 	def testMotion(self):
 		"CohesiveChain: velocity/positions tested in transient dynamics and equilibrium state"
 		#target values

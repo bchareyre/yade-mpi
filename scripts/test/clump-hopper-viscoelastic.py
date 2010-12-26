@@ -54,8 +54,8 @@ for k,l in itertools.product(arange(0,10),arange(0,10)):
 		s=O.bodies[id]
 		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
 		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
-	#O.bodies[clpId].state.blockedDOFs=['rx','ry','rz']
-	#O.bodies[clpId].state.blockedDOFs=['x','y']
+	#O.bodies[clpId].state.blockedDOFs='XYZ'
+	#O.bodies[clpId].state.blockedDOFs='xy'
 
 # ... and spheres
 spheresColor=(0.4, 0.4, 0.4)
@@ -65,8 +65,8 @@ for k,l in itertools.product(arange(0,9),arange(0,9)):
 		s=O.bodies[id]
 		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
 		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
-		#s.state.blockedDOFs=['rx','ry','rz']
-		#s.state.blockedDOFs=['x','y']
+		#s.state.blockedDOFs='XYZ'
+		#s.state.blockedDOFs='xy'
 
 # Create engines
 O.engines=[

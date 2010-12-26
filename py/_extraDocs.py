@@ -109,11 +109,11 @@ Examples :ysrc:`scripts/test/peri3dController_example1` and :ysrc:`scripts/test/
 '''
 
 
-wrapper.Ig2_Sphere_Sphere_L3Geom_Inc.__doc__=r'''Functor for computing incrementally configuration of 2 :yref:`Spheres<Sphere>` stored in :yref:`L3Geom`; the configuration is positioned in global space by local origin $\vec{c}$ (contact point) and rotation matrix $\mat{T}$ (orthonormal transformation matrix), and its degrees of freedom are local displacement $\vec{u}$ (in one normal and two shear directions); with :yref:`Ig2_Sphere_Sphere_L6Geom_Inc` and :yref:`L6Geom`, there is additionally $\vec{\phi}$. The first row of $\mat{T}$, i.e. local $x$-axis, is the contact normal noted $\vec{n}$ for brevity. Additionally, quasi-constant values of $\vec{u}_0$ (and $\vec{\phi}_0$) are stored as shifted origins of $\vec{u}$ (and $\vec{\phi}$); therefore, current value of displacement is always $\curr{\vec{u}}-\vec{u}_0$.
+wrapper.Ig2_Sphere_Sphere_L3Geom.__doc__=r'''Functor for computing incrementally configuration of 2 :yref:`Spheres<Sphere>` stored in :yref:`L3Geom`; the configuration is positioned in global space by local origin $\vec{c}$ (contact point) and rotation matrix $\mat{T}$ (orthonormal transformation matrix), and its degrees of freedom are local displacement $\vec{u}$ (in one normal and two shear directions); with :yref:`Ig2_Sphere_Sphere_L6Geom` and :yref:`L6Geom`, there is additionally $\vec{\phi}$. The first row of $\mat{T}$, i.e. local $x$-axis, is the contact normal noted $\vec{n}$ for brevity. Additionally, quasi-constant values of $\vec{u}_0$ (and $\vec{\phi}_0$) are stored as shifted origins of $\vec{u}$ (and $\vec{\phi}$); therefore, current value of displacement is always $\curr{\vec{u}}-\vec{u}_0$.
 
 Suppose two spheres with radii $r_i$, positions $\vec{x}_i$, velocities $\vec{v}_i$, angular velocities $\vec{\omega}_i$.
 
-When there is not yet contact, it will be created if $u_N=|\curr{\vec{x}}_2-\curr{\vec{x}}_1|-|f_d|(r_1+r2)<0$, where $f_d$ is :yref:`distFactor<Ig2_Sphere_Sphere_L3Geom_Inc.distFactor>` (sometimes also called ``interaction radius''). If $f_d>0$, then $\vec{u}_{0x}$ will be initalized to $u_N$, otherwise to 0. In another words, contact will be created if spheres enlarged by $|f_d|$ touch, and the ``equilibrium distance'' (where $\vec{u}_x-\vec{u}-{0x}$ is zero) will be set to the current distance if $f_d$ is positive, and to the geometrically-touching distance if negative.
+When there is not yet contact, it will be created if $u_N=|\curr{\vec{x}}_2-\curr{\vec{x}}_1|-|f_d|(r_1+r2)<0$, where $f_d$ is :yref:`distFactor<Ig2_Sphere_Sphere_L3Geom.distFactor>` (sometimes also called ``interaction radius''). If $f_d>0$, then $\vec{u}_{0x}$ will be initalized to $u_N$, otherwise to 0. In another words, contact will be created if spheres enlarged by $|f_d|$ touch, and the ``equilibrium distance'' (where $\vec{u}_x-\vec{u}-{0x}$ is zero) will be set to the current distance if $f_d$ is positive, and to the geometrically-touching distance if negative.
 
 Local axes (rows of $\mat{T}$) are initially defined as follows:
 
@@ -129,13 +129,13 @@ Since velocities are known at previous midstep ($t-\Dt/2$), we consider mid-step
 
 .. math:: \pprev{\vec{n}}=\frac{\prev{\vec{n}}+\curr{\vec{n}}}{2}.
 
-For the sake of numerical stability, $\pprev{\vec{n}}$ is re-normalized after being computed, unless prohibited by :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom_Inc.approxMask>`. If :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom_Inc.approxMask>` has the appropriate bit set, the mid-normal is not compute, and we simply use $\pprev{\vec{n}}\approx\prev{\vec{n}}$.
+For the sake of numerical stability, $\pprev{\vec{n}}$ is re-normalized after being computed, unless prohibited by :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom.approxMask>`. If :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom.approxMask>` has the appropriate bit set, the mid-normal is not compute, and we simply use $\pprev{\vec{n}}\approx\prev{\vec{n}}$.
 
 Rigid rotation parallel with the normal is
 
 .. math:: \pprev{\vec{o}_t}=\pprev{\vec{n}}\left(\pprev{\vec{n}}\cdot\frac{\pprev{\vec{\omega}}_1+\pprev{\vec{\omega}}_2}{2}\right)\Dt.
 
-*Branch vectors* $\vec{b}_1$, $\vec{b}_2$ (connecting $\curr{\vec{x}}_1$, $\curr{\vec{x}}_2$ with $\curr{\vec{c}}$ are computed depending on :yref:`noRatch<Ig2_Sphere_Sphere_L3Geom_Inc.noRatch>` (see :yref:`here<Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting>`).
+*Branch vectors* $\vec{b}_1$, $\vec{b}_2$ (connecting $\curr{\vec{x}}_1$, $\curr{\vec{x}}_2$ with $\curr{\vec{c}}$ are computed depending on :yref:`noRatch<Ig2_Sphere_Sphere_L3Geom.noRatch>` (see :yref:`here<Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting>`).
 
 .. math::
 	:nowrap:
@@ -159,11 +159,11 @@ where the increments have the meaning of relative shear, rigid rotation normal t
 
 .. math:: \curr{\mat{T}}=\begin{pmatrix} \curr{\vec{n}_x} & \curr{\vec{n}_y} & \curr{\vec{n}_z} \\ \multicolumn{3}{c}{\prev{\mat{T}_{1,\bullet}}-\prev{\mat{T}_{1,\bullet}}\times\pprev{\vec{o}_r}-\prev{\mat{T}_{1,\bullet}}\times\pprev{\vec{o}_t}} \\ \multicolumn{3}{c}{\prev{\mat{T}_{2,\bullet}}-\prev{\mat{T}_{2,\bullet}}\times\pprev{\vec{o}_r}-\prev{\mat{T}_{,\bullet}}\times\pprev{\vec{o}_t}} \end{pmatrix}
 
-This matrix is re-normalized (unless prevented by :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom_Inc.approxMask>`) and mid-step transformation is computed using quaternion spherical interpolation as
+This matrix is re-normalized (unless prevented by :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom.approxMask>`) and mid-step transformation is computed using quaternion spherical interpolation as
 
 .. math:: \pprev{\mat{T}}=\mathrm{Slerp}\,\left(\prev{\mat{T}};\curr{\mat{T}};t=1/2\right).
 
-Depending on :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom_Inc.approxMask>`, this computation can be avoided by approximating $\pprev{\mat{T}}=\prev{\mat{T}}$.
+Depending on :yref:`approxMask<Ig2_Sphere_Sphere_L3Geom.approxMask>`, this computation can be avoided by approximating $\pprev{\mat{T}}=\prev{\mat{T}}$.
 
 Finally, current displacement is evaluated as 
 

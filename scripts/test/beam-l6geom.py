@@ -9,14 +9,14 @@ O.bodies.append([utils.sphere((0,y,0),rad,wire=True) for y in numpy.arange(0,2*n
 # the lateral arm
 O.bodies.append([utils.sphere((x,(num-1)*2*rad,0),rad,wire=True) for x in numpy.arange(dist,1+num/2,dist)])
 # support sphere
-O.bodies[0].state.blockedDOFs=['x','y','z','rx','ry','rz']
+O.bodies[0].state.blockedDOFs='xyzXYZ'
 # small dt to see in realtime how it swings; real critical is higher, but much less than p-wave
 O.dt=.01*utils.PWaveTimeStep() 
 
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
-	InteractionLoop([Ig2_Sphere_Sphere_L6Geom_Inc()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)]),
+	InteractionLoop([Ig2_Sphere_Sphere_L6Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=0.1),
 ]

@@ -11,6 +11,23 @@
 	#include<yade/pkg/common/GLDrawFunctors.hpp>
 #endif
 
+/*
+
+L3Geom Ig2 functor cooperation:
+
+1. functors define genericGo function, which take ``bool is6Dof`` as the first arg; they are called from functors returning both L3Geom and L6Geom (this only applies to sphere+sphere now, since Ig2_{Facet,Wall}_Sphere_L6Geom has not been written yet for lack of interest, though would be trivial)
+2. genericGo function computes several parameter specific to shape types; then it calls (if L3GEOM_SPHERESLIKE is defined) handleSpheresLikeContact which contains the common code, given all data necessary.
+
+Note that:
+
+(a) although L3GEOM_SPHERESLIKE is enabled by default, its performance impact has not been measured yet (the compiler should be smart enough, since it is just factoring out common code).
+(b) L3Geom only contains contPt and normal, which supposes (in L3Geom::applyLocalForce) that particles' centroids and the contact point are colinear; while this is true for spheres and mostly OK for facets&walls (since they are non-dynamic), it might be adjusted in the future -- L3Geom_Something deriving from L3Geom will be created, and exact branch vectors contained in it will be gotten via virtual method from L3Geom::applyLocalForce. This would be controlled via some approxMask (in the Law2 functor perhaps) so that it is only optional
+(c) Ig2_Facet_Sphere_L3Geom is only enabled with L3GEOM_SPHERESLIKE
+
+*/
+
+#define L3GEOM_SPHERESLIKE
+
 struct L3Geom: public GenericSpheresContact{
 	const Real& uN;
 	const Vector2r& uT; 
@@ -29,9 +46,9 @@ struct L3Geom: public GenericSpheresContact{
 		((Vector3r,u,Vector3r::Zero(),,"Displacement components, in local coordinates. |yupdate|"))
 		((Vector3r,u0,Vector3r::Zero(),,"Zero displacement value; u0 should be always subtracted from the *geometrical* displacement *u* computed by appropriate :yref:`IGeomFunctor`, resulting in *u*. This value can be changed for instance\n\n#. by :yref:`IGeomFunctor`, e.g. to take in account large shear displacement value unrepresentable by underlying geomeric algorithm based on quaternions)\n#. by :yref:`LawFunctor`, to account for normal equilibrium position different from zero geometric overlap (set once, just after the interaction is created)\n#. by :yref:`LawFunctor` to account for plastic slip.\n\n.. note:: Never set an absolute value of *u0*, only increment, since both :yref:`IGeomFunctor` and :yref:`LawFunctor` use it. If you need to keep track of plastic deformation, store it in :yref:`IPhys` isntead (this might be changed: have *u0* for :yref:`LawFunctor` exclusively, and a separate value stored (when that is needed) inside classes deriving from :yref:`L3Geom`."))
 		/* Is it better to store trsf as Matrix3 or Quaternion?
-			* Quaternions are much easier to re-normalize, which we should do to avoid numerical drift.
-			* Multiplication of vector with quaternion is internally done by converting to matrix first, anyway
-			* We need to extract local axes, and that is easier to be done from Matrix3r (columns)
+		* Quaternions are much easier to re-normalize, which we should do to avoid numerical drift.
+		* Multiplication of vector with quaternion is internally done by converting to matrix first, anyway
+		* We need to extract local axes, and that is easier to be done from Matrix3r (columns)
 		*/
 		((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
 		((Vector3r,F,Vector3r::Zero(),,"Applied force in local coordinates [debugging only, will be removed]"))
@@ -81,13 +98,20 @@ REGISTER_SERIALIZABLE(Gl1_L6Geom);
 #endif
 
 
-struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{
+
+struct Ig2_Sphere_Sphere_L3Geom: public IGeomFunctor{
 		virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
 		virtual bool genericGo(bool is6Dof, const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+		#ifdef L3GEOM_SPHERESLIKE
+			// common code for {sphere,facet,wall}+sphere contacts
+			// facet&wall will get separated if L3Geom subclass with exact branch vector is created
+			void handleSpheresLikeContact(const shared_ptr<Interaction>& I, const State& state1, const State& state2, const Vector3r& shift2, bool is6Dof, const Vector3r& normal, const Vector3r& contPt, Real uN, Real r1, Real r2);
+		#endif
+
 
 	enum { APPROX_NO_RENORM_TRSF=1, APPROX_NO_MID_TRSF=2, APPROX_NO_MID_NORMAL=4, APPROX_NO_RENORM_MID_NORMAL=8 };
 
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom_Inc,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/_extraDocs.py",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/_extraDocs.py",
 		((bool,noRatch,true,,"See :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting`."))
 		((Real,distFactor,1,,"Create interaction if spheres are not futher than distFactor*(r1+r2)."))
 		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n"
@@ -104,26 +128,38 @@ struct Ig2_Sphere_Sphere_L3Geom_Inc: public IGeomFunctor{
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L3Geom_Inc);
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L3Geom);
 
-struct Ig2_Wall_Sphere_L3Geom_Inc: public Ig2_Sphere_Sphere_L3Geom_Inc{
+struct Ig2_Wall_Sphere_L3Geom: public Ig2_Sphere_Sphere_L3Geom{
 	virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
 	//virtual bool genericGo(bool is6Dof, const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
-	YADE_CLASS_BASE_DOC(Ig2_Wall_Sphere_L3Geom_Inc,Ig2_Sphere_Sphere_L3Geom_Inc,"Incrementally compute :yref:`L3Geom` for contact between :yref:`Wall` and :yref:`Sphere`. Uses attributes of :yref:`Ig2_Sphere_Sphere_L3Geom_Inc`.");
+	YADE_CLASS_BASE_DOC(Ig2_Wall_Sphere_L3Geom,Ig2_Sphere_Sphere_L3Geom,"Incrementally compute :yref:`L3Geom` for contact between :yref:`Wall` and :yref:`Sphere`. Uses attributes of :yref:`Ig2_Sphere_Sphere_L3Geom`.");
 	FUNCTOR2D(Wall,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Wall,Sphere);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(Ig2_Wall_Sphere_L3Geom_Inc);
+REGISTER_SERIALIZABLE(Ig2_Wall_Sphere_L3Geom);
 
-
-struct Ig2_Sphere_Sphere_L6Geom_Inc: public Ig2_Sphere_Sphere_L3Geom_Inc{
+#ifdef L3GEOM_SPHERESLIKE
+struct Ig2_Facet_Sphere_L3Geom: public Ig2_Sphere_Sphere_L3Geom{
+	// get point on segment A..B closest to P; algo: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
+	static Vector3r getClosestSegmentPt(const Vector3r& P, const Vector3r& A, const Vector3r& B){ Vector3r BA=B-A; Real u=(P.dot(BA)-A.dot(BA))/(BA.squaredNorm()); return A+min(1.,max(0.,u))*BA; }
 	virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
-	YADE_CLASS_BASE_DOC(Ig2_Sphere_Sphere_L6Geom_Inc,Ig2_Sphere_Sphere_L3Geom_Inc,"Incrementally compute :yref:`L6Geom` for contact of 2 spheres.");
+	YADE_CLASS_BASE_DOC(Ig2_Facet_Sphere_L3Geom,Ig2_Sphere_Sphere_L3Geom,"Incrementally compute :yref:`L3Geom` for contact between :yref:`Facet` and :yref:`Sphere`. Uses attributes of :yref:`Ig2_Sphere_Sphere_L3Geom`.");
+	FUNCTOR2D(Facet,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ig2_Facet_Sphere_L3Geom);
+#endif
+
+struct Ig2_Sphere_Sphere_L6Geom: public Ig2_Sphere_Sphere_L3Geom{
+	virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
+	YADE_CLASS_BASE_DOC(Ig2_Sphere_Sphere_L6Geom,Ig2_Sphere_Sphere_L3Geom,"Incrementally compute :yref:`L6Geom` for contact of 2 spheres.");
 	FUNCTOR2D(Sphere,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 };
-REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L6Geom_Inc);
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L6Geom);
 
 
 struct Law2_L3Geom_FrictPhys_ElPerfPl: public LawFunctor{
