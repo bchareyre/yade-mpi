@@ -99,7 +99,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 
 	// remove all potential interactions
 	scene->interactions->eraseNonReal();
-	// adjust Interaction::cellDist for real interactions; 
+	// adjust Interaction::cellDist for real interactions;
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 		Body::id_t id1=i->getId1(),id2=i->getId2();
 		// this must be the same for both old and new interaction: cell2-cell1+cellDist
@@ -194,7 +194,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
 		}
-		else { E+=state->angVel.dot(state->inertia.cwise()*state->angVel);}
+		else { E+=0.5*state->angVel.dot(state->inertia.cwise()*state->angVel);}
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}
@@ -341,7 +341,7 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 }
 /* Project 3d point into 2d using spiral projection along given axis;
  * the returned tuple is
- * 	
+ *
  *  (height relative to the spiral, distance from axis, theta )
  *
  * dH_dTheta is the inclination of the spiral (height increase per radian),
@@ -450,10 +450,10 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 		if(!phys) continue;
 		if(!geom) continue;
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
-		
+
 		Real minRad=(geom->refR1<=0?geom->refR2:(geom->refR2<=0?geom->refR1:min(geom->refR1,geom->refR2)));
 		Real crossSection=Mathr::PI*pow(minRad,2);
-		
+
 		Vector3r normalStress=((1./crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
 		Vector3r shearStress;
 		for(int i=0; i<3; i++){
@@ -461,10 +461,10 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 			shearStress[i]=geom->normal[ix1]*phys->shearForce[ix1]+geom->normal[ix2]*phys->shearForce[ix2];
 			shearStress[i]/=crossSection;
 		}
-		
+
 		bodyStates[id1].normStress+=normalStress;
 		bodyStates[id2].normStress+=normalStress;
-		
+
 		bodyStates[id1].shearStress+=shearStress;
 		bodyStates[id2].shearStress+=shearStress;
 	}
@@ -528,14 +528,14 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 
 		/*Real fT0=fT[0]; Real fT1=fT[1]; Real fT2=fT[2];
 		Real n0=n[0]; Real n1=n[1]; Real n2=n[2];
-		
+
 		Real s00 = l*(n0*n0*fN + fT0*n0);
 		Real s01 = l*(n0*n1*fN + .5*(fT0*n1 + fT1*n0));
 		Real s02 = l*(n0*n2*fN + .5*(fT0*n2 + fT2*n0));
 		Real s11 = l*(n1*n1*fN + fT1*n1);
 		Real s12 = l*(n1*n2*fN + .5*(fT1*n2 + fT2*n1));
 		Real s22 = l*(n2*n2*fN + fT2*n2);
-		
+
 		stress(0,0) += s00;
 		stress(0,1) += s01;
 		stress(1,0) += s01;

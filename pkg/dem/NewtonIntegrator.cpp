@@ -130,7 +130,7 @@ void NewtonIntegrator::action()
 					Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 					Matrix3r T(state->ori);
 					Erot=.5*b->state->angVel.transpose().dot((T.transpose()*mI*T)*b->state->angVel);
-				} else { Erot=state->angVel.dot(state->inertia.cwise()*state->angVel); }
+				} else { Erot=0.5*state->angVel.dot(state->inertia.cwise()*state->angVel); }
 				if(!kinSplit) scene->energy->add(Etrans+Erot,"kinetic",kinEnergyIx,/*non-incremental*/true);
 				else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
 			}
@@ -146,7 +146,7 @@ void NewtonIntegrator::action()
 					leapfrogSphericalRotate(state,id,dt);
 				} else { // exactAsphericalRot enabled & aspherical body
 					// damp the torque
-					Vector3r mm(m); cundallDamp(0,m,state->angVel,mm); 
+					Vector3r mm(m); cundallDamp(0,m,state->angVel,mm);
 					leapfrogAsphericalRotate(state,id,dt,mm);
 				}
 			} else if (b->isClump()){
