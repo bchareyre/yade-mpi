@@ -63,7 +63,7 @@ class OpenGLRenderer : public Serializable
 		vector<string>
 			// stateFunctorNames,
 			boundFunctorNames,
-			shapeFunctorNames, 
+			shapeFunctorNames,
 			geomFunctorNames,
 			physFunctorNames;
 
@@ -71,13 +71,13 @@ class OpenGLRenderer : public Serializable
 
 	public :
 		// updated after every call to render
-		shared_ptr<Scene> scene; 
+		shared_ptr<Scene> scene;
 
 		void init();
 		void initgl();
 		void render(const shared_ptr<Scene>& scene, Body::id_t selection=Body::id_t(-1));
 		void pyRender(){render(Omega::instance().getScene());}
-	
+
 		void renderDOF_ID();
 		void renderIPhys();
 		void renderIGeom();
@@ -90,8 +90,13 @@ class OpenGLRenderer : public Serializable
 		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),,"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
 		((Real,rotScale,((void)"disable scaling",1.),,"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))
 		((Vector3r,lightPos,Vector3r(75,130,0),,"Position of OpenGL light source in the scene."))
+		((Vector3r,light2Pos,Vector3r(-130,75,30),,"Position of secondary OpenGL light source in the scene."))
+		((Vector3r,lightColor,Vector3r(0.8,0.8,0.8),,"Per-color intensity of primary light (RGB)."))
+		((Vector3r,light2Color,Vector3r(0.5,0.5,0.1),,"Per-color intensity of secondary light (RGB)."))
 		((Vector3r,bgColor,Vector3r(.2,.2,.2),,"Color of the backgroud canvas (RGB)"))
 		((bool,wire,false,,"Render all bodies with wire only (faster)"))
+		((bool,light1,true,,"Turn light 1 on."))
+		((bool,light2,true,,"Turn light 2 on."))
 		((bool,dof,false,,"Show which degrees of freedom are blocked for each body"))
 		((bool,id,false,,"Show body id's"))
 		((bool,bound,false,,"Render body :yref:`Bound`"))

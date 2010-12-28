@@ -98,7 +98,7 @@ void OpenGLRenderer::setBodiesDispInfo(){
 		#ifdef YADE_SUBDOMAINS
 			int subDom; Body::id_t localId;
 			boost::tie(subDom,localId)=scene->bodies->subDomId2domNumLocalId(b->subDomId);
-			if(subDomMask!=0 && (((1<<subDom) & subDomMask)==0)) bodyDisp[id].isDisplayed=false; 
+			if(subDomMask!=0 && (((1<<subDom) & subDomMask)==0)) bodyDisp[id].isDisplayed=false;
 		#endif
 		// if no scaling and no periodic, return quickly
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
@@ -130,10 +130,11 @@ void OpenGLRenderer::drawPeriodicCell(){
 }
 
 void OpenGLRenderer::resetSpecularEmission(){
-	const GLfloat specular[4]={.3,.3,.3,1};
+	const GLfloat specular[4]={.3,.03,.03,0.1};
 	const GLfloat emission[4]={0,0,0,0};
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular);
 	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
+	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 0);
 }
 
 void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection){
@@ -158,7 +159,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 	Real now=TimingInfo::getNow(/*even if timing is disabled*/true)*1e-9;
 	highlightEmission0[0]=highlightEmission0[1]=highlightEmission0[2]=.8*normSquare(now,1);
 	highlightEmission1[0]=highlightEmission1[1]=highlightEmission0[2]=.5*normSaw(now,2);
-		
+
 	// clipping
 	assert(clipPlaneNormals.size()==(size_t)numClipPlanes);
 	for(size_t i=0;i<(size_t)numClipPlanes; i++){
@@ -170,26 +171,42 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 		if(clipPlaneActive[i]) clipPlaneNormals[i]=clipPlaneSe3[i].orientation*Vector3r(0,0,1);
 		/* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */
 	}
-
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispInfo();
 
-	// set light source
-	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
-	const GLfloat ambientColor[4]={0.5,0.5,0.5,1.0};	
-	//const GLfloat specularColor[4]={0.5,0.5,0.5,1.0};	
 	glClearColor(bgColor[0],bgColor[1],bgColor[2],1.0);
-	glLightfv(GL_LIGHT0, GL_POSITION,pos);
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
+
+	// set light sources
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1); // important: do lighting calculations on both sides of polygons
-	//glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
-	glEnable(GL_LIGHT0);
+
+	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
+	const GLfloat ambientColor[4]={0.2,0.2,0.2,1.0};
+	const GLfloat specularColor[4]={1,1,1,1.f};
+	const GLfloat diffuseLight[4] = { lightColor[0], lightColor[1], lightColor[2], 1.0f };
+	glLightfv(GL_LIGHT0, GL_POSITION,pos);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	if (light1) glEnable(GL_LIGHT0); else glDisable(GL_LIGHT0);
+
+	const GLfloat pos2[4]	= {light2Pos[0],light2Pos[1],light2Pos[2],1.0};
+	const GLfloat ambientColor2[4]={0.0,0.0,0.0,1.0};
+	const GLfloat specularColor2[4]={1,1,0.6,1.f};
+	const GLfloat diffuseLight2[4] = { light2Color[0], light2Color[1], light2Color[2], 1.0f };
+	glLightfv(GL_LIGHT1, GL_POSITION,pos2);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specularColor2);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientColor2);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight2);
+	if (light2) glEnable(GL_LIGHT1); else glDisable(GL_LIGHT1);
+
 	glEnable(GL_LIGHTING);
 
 	glEnable(GL_CULL_FACE);
 	// http://www.sjbaker.org/steve/omniv/opengl_lighting.html
-	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
+	//Shared material settings
+	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 40);
 
 	resetSpecularEmission();
 
@@ -203,7 +220,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 	if (intrPhys) renderIPhys();
 
 	FOREACH(const shared_ptr<GlExtraDrawer> d, extraDrawers){
-		if(d->dead) continue; 
+		if(d->dead) continue;
 		glPushMatrix();
 			d->scene=scene.get();
 			d->render();
@@ -228,9 +245,9 @@ void OpenGLRenderer::renderAllInteractionsWire(){
 	}
 }
 
-void OpenGLRenderer::renderDOF_ID(){	
-	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
-	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
+void OpenGLRenderer::renderDOF_ID(){
+	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};
+	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
 	FOREACH(const shared_ptr<Body> b, *scene->bodies){
 		if(!b) continue;
 		if(b->shape && ((b->getGroupMask() & mask) || b->getGroupMask()==0)){
@@ -254,7 +271,7 @@ void OpenGLRenderer::renderDOF_ID(){
 	}
 }
 
-void OpenGLRenderer::renderIGeom(){	
+void OpenGLRenderer::renderIGeom(){
 	geomDispatcher.scene=scene.get(); geomDispatcher.updateScenePtr();
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
@@ -268,7 +285,7 @@ void OpenGLRenderer::renderIGeom(){
 }
 
 
-void OpenGLRenderer::renderIPhys(){	
+void OpenGLRenderer::renderIPhys(){
 	physDispatcher.scene=scene.get(); physDispatcher.updateScenePtr();
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
@@ -283,7 +300,7 @@ void OpenGLRenderer::renderIPhys(){
 	}
 }
 
-void OpenGLRenderer::renderBound(){	
+void OpenGLRenderer::renderBound(){
 	boundDispatcher.scene=scene.get(); boundDispatcher.updateScenePtr();
 
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -332,7 +349,7 @@ void OpenGLRenderer::renderShape(){
 		bool highlight=(b->id==selId || (b->clumpId>=0 && b->clumpId==selId) || b->shape->highlight);
 
 		glPushMatrix();
-			AngleAxisr aa(ori);	
+			AngleAxisr aa(ori);
 			glTranslatef(pos[0],pos[1],pos[2]);
 			glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 			if(highlight){
