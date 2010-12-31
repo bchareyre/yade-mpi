@@ -1,4 +1,4 @@
-// 2010 © Chiara Modenese <c.modenese@gmail.com> 
+// 2010 © Chiara Modenese <c.modenese@gmail.com>
 
 
 #include"HertzMindlin.hpp"
@@ -35,7 +35,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	FrictMat* mat1 = YADE_CAST<FrictMat*>(b1.get());
 	FrictMat* mat2 = YADE_CAST<FrictMat*>(b2.get());
 
-	
+
 	/* from interaction physics */
 	Real Ea = mat1->young;
 	Real Eb = mat2->young;
@@ -46,10 +46,10 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 
 
 	/* from interaction geometry */
-	ScGeom* scg = YADE_CAST<ScGeom*>(interaction->geom.get());		
-	Real Da = scg->radius1; 
-	Real Db = scg->radius2; 
-	Vector3r normal=scg->normal; 
+	ScGeom* scg = YADE_CAST<ScGeom*>(interaction->geom.get());
+	Real Da = scg->radius1;
+	Real Db = scg->radius2;
+	Vector3r normal=scg->normal;
 
 
 	/* calculate stiffness coefficients */
@@ -66,7 +66,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	Real Adhesion = 4.*Mathr::PI*R*gamma; // calculate adhesion force as predicted by DMT theory
 
 	/* pass values calculated from above to MindlinPhys */
-	mindlinPhys->tangensOfFrictionAngle = std::tan(frictionAngle); 
+	mindlinPhys->tangensOfFrictionAngle = std::tan(frictionAngle);
 	mindlinPhys->prevNormal = scg->normal;
 	mindlinPhys->kno = Kno; // this is just a coeff
 	mindlinPhys->kso = Kso; // this is just a coeff
@@ -124,7 +124,7 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Body::id_t id1(contact->getId1()), id2(contact->getId2());
 	ScGeom* geom = static_cast<ScGeom*>(ig.get());
-	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
+	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());
 	const Real uN=geom->penetrationDepth;
 	if (uN<0) {scene->interactions->requestErase(id1,id2); return;}
 	// normal force
@@ -137,7 +137,7 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, share
 	// contact radius
 	Real R=geom->radius1*geom->radius2/(geom->radius1+geom->radius2);
 	phys->radius=pow(Fn*pow(R,3/2.)/phys->kno,1/3.);
-	
+
 	// shear force: transform, but keep the old value for now
 	geom->rotate(phys->usTotal);
 	Vector3r usOld=phys->usTotal;
@@ -153,7 +153,7 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, share
 	if(Fs.squaredNorm()>maxFs2) Fs*=sqrt(maxFs2)/Fs.norm();
 #endif
 	// apply forces
-	Vector3r f=-phys->normalForce-phys->shearForce; 
+	Vector3r f=-phys->normalForce-phys->shearForce;
 	scene->forces.addForce(id1,f);
 	scene->forces.addForce(id2,-f);
 	scene->forces.addTorque(id1,(geom->radius1-.5*geom->penetrationDepth)*geom->normal.cross(f));
@@ -163,23 +163,23 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, share
 void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Body::id_t id1(contact->getId1()), id2(contact->getId2());
 	ScGeom* geom = static_cast<ScGeom*>(ig.get());
-	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
+	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());
 	const Real uN=geom->penetrationDepth;
 	if (uN<0) {scene->interactions->requestErase(id1,id2); return;}
 	// normal force
 	Real Fn=phys->kno*pow(uN,3/2.);
 	phys->normalForce=Fn*geom->normal;
 	//phys->kn=3./2.*phys->kno*std::pow(uN,0.5); // update stiffness, not needed
-	
+
 	// shear force
 	Vector3r& Fs=geom->rotate(phys->shearForce);
 	Real ks= nonLin>0 ? phys->kso*std::pow(uN,0.5) : phys->kso;
 	Vector3r shearIncrement;
 	if(nonLin>1){
-		State *de1=Body::byId(id1,scene)->state.get(), *de2=Body::byId(id2,scene)->state.get();	
+		State *de1=Body::byId(id1,scene)->state.get(), *de2=Body::byId(id2,scene)->state.get();
 		Vector3r shift2=scene->isPeriodic ? Vector3r(scene->cell->Hsize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
 		Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
-		Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shift2, shiftVel, /*preventGranularRatcheting*/ nonLin>2 );	
+		Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shift2, shiftVel, /*preventGranularRatcheting*/ nonLin>2 );
 		Vector3r incidentVn = geom->normal.dot(incidentV)*geom->normal; // contact normal velocity
 		Vector3r incidentVs = incidentV-incidentVn; // contact shear velocity
 		shearIncrement=incidentVs*scene->dt;
@@ -190,7 +190,7 @@ void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	if(Fs.squaredNorm()>maxFs2) Fs*=sqrt(maxFs2)/Fs.norm();
 
 	// apply forces
-	Vector3r f=-phys->normalForce-phys->shearForce; /* should be a reference returned by geom->rotate */ assert(phys->shearForce==Fs); 
+	Vector3r f=-phys->normalForce-phys->shearForce; /* should be a reference returned by geom->rotate */ assert(phys->shearForce==Fs);
 	scene->forces.addForce(id1,f);
 	scene->forces.addForce(id2,-f);
 	scene->forces.addTorque(id1,(geom->radius1-.5*geom->penetrationDepth)*geom->normal.cross(f));
@@ -203,15 +203,15 @@ CREATE_LOGGER(Law2_ScGeom_MindlinPhys_Mindlin);
 
 void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	const Real& dt = scene->dt; // get time step
-	
+
 	Body::id_t id1 = contact->getId1(); // get id body 1
  	Body::id_t id2 = contact->getId2(); // get id body 2
 
 	State* de1 = Body::byId(id1,scene)->state.get();
-	State* de2 = Body::byId(id2,scene)->state.get();	
+	State* de2 = Body::byId(id2,scene)->state.get();
 
 	ScGeom* scg = static_cast<ScGeom*>(ig.get());
-	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());	
+	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());
 
 	const shared_ptr<Body>& b1=Body::byId(id1,scene); // not sure here (I need it because I want to know if the body isDynamic or not)
 	const shared_ptr<Body>& b2=Body::byId(id2,scene); // not sure here
@@ -224,10 +224,10 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/****************/
 	/* NORMAL FORCE */
 	/****************/
-	
-	Real uN = scg->penetrationDepth; // get overlapping  
+
+	Real uN = scg->penetrationDepth; // get overlapping
 	if (uN<0) {scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
-	/* Hertz-Mindlin's formulation (PFC) 
+	/* Hertz-Mindlin's formulation (PFC)
 	Note that the normal stiffness here is a secant value (so as it is cannot be used in the GSTS)
 	In the first place we get the normal force and then we store kn to be passed to the GSTS */
 	Real Fn = phys->kno*std::pow(uN,1.5); // normal Force (scalar)
@@ -245,20 +245,20 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/*******************************/
 	/* TANGENTIAL NORMAL STIFFNESS */
 	/*******************************/
-	
+
 	phys->kn = 3./2.*phys->kno*std::pow(uN,0.5); // here we store the value of kn to compute the time step
-	
+
 	/******************************/
 	/* TANGENTIAL SHEAR STIFFNESS */
 	/******************************/
-	
+
 	phys->ks = phys->kso*std::pow(uN,0.5); // get tangential stiffness (this is a tangent value, so we can pass it to the GSTS)
 
 	/************************/
 	/* DAMPING COEFFICIENTS */
 	/************************/
-	
-	// Inclusion of local damping if requested 
+
+	// Inclusion of local damping if requested
 	if (useDamping){
 		Real mbar = (!b1->isDynamic() && b2->isDynamic()) ? de2->mass : ((!b2->isDynamic() && b1->isDynamic()) ? de1->mass : (de1->mass*de2->mass / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
 		//Real mbar = de1->mass*de2->mass / (de1->mass + de2->mass); // equivalent mass
@@ -273,7 +273,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/***************/
 	/* SHEAR FORCE */
 	/***************/
-	
+
 	Vector3r& shearElastic = phys->shearElastic; // reference for shearElastic force
 	// Define shift to handle periodicity
 	Vector3r shift2   = scene->isPeriodic ? Vector3r(                      scene->cell->Hsize *contact->cellDist.cast<Real>()) : Vector3r::Zero();
@@ -283,7 +283,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	Vector3r prev_FsElastic = shearElastic; // save shear force at previous time step
 	// 2. Get incident velocity, get shear and normal components
 	// FIXME: Concerning the possibility to avoid granular ratcheting, it is not clear how this works in the case of HM. See the thread http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01947.html
-	Vector3r incidentV = scg->getIncidentVel(de1, de2, dt, shift2, shiftVel, preventGranularRatcheting);	
+	Vector3r incidentV = scg->getIncidentVel(de1, de2, dt, shift2, shiftVel, preventGranularRatcheting);
 	Vector3r incidentVn = scg->normal.dot(incidentV)*scg->normal; // contact normal velocity
 	Vector3r incidentVs = incidentV - incidentVn; // contact shear velocity
 	// 3. Get shear force (incrementally)
@@ -293,9 +293,9 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/**************************************/
 	/* VISCOUS DAMPING (Normal direction) */
 	/**************************************/
-	
+
 	// normal force must be updated here before we apply the Mohr-Coulomb criterion
-	if (useDamping){ // get normal viscous component 
+	if (useDamping){ // get normal viscous component
 		phys->normalViscous = cn*incidentVn;
 		// add normal viscous component if damping is included
 		phys->normalForce -= phys->normalViscous;
@@ -305,7 +305,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/*************************************/
 	/* SHEAR DISPLACEMENT (elastic only) */
 	/*************************************/
-	
+
 	Vector3r& us_elastic = phys->usElastic;
 	us_elastic = scg->rotate(us_elastic); // rotate vector
 	Vector3r prevUs_el = us_elastic; // store previous elastic shear displacement (already rotated)
@@ -314,7 +314,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/****************************************/
 	/* SHEAR DISPLACEMENT (elastic+plastic) */
 	/****************************************/
-	
+
 	Vector3r& us_total = phys->usTotal;
 	us_total = scg->rotate(us_total); // rotate vector
 	Vector3r prevUs_tot = us_total; // store previous total shear displacement (already rotated)
@@ -322,11 +322,11 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 
 
 	bool noShearDamp = false; // bool to decide whether we need to account for shear damping dissipation or not
-	
+
 	/********************/
 	/* MOHR-COULOMB law */
 	/********************/
-	
+
 	phys->shearViscous=Vector3r::Zero(); // reset so that during sliding, the previous values is not there
 	if (!includeAdhesion) {
 		Real maxFs = Fn*phys->tangensOfFrictionAngle;
@@ -357,7 +357,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/************************/
 	/* SHEAR ELASTIC ENERGY */
 	/************************/
-	
+
 	// NOTE: shear elastic energy calculation must come after the MC criterion, otherwise displacements and forces are not updated
 	if (calcEnergy) {
 		shearEnergy += (us_elastic-prevUs_el).dot((shearElastic+prev_FsElastic)/2.); // NOTE: no additional energy if we perform sliding since us_elastic and prevUs_el will hold the same value (in fact us_elastic is only keeping the elastic part). We work out the area of the trapezium.
@@ -366,7 +366,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/**************************************************/
 	/* VISCOUS DAMPING (energy term, shear direction) */
 	/**************************************************/
-	
+
 	if (useDamping){ // get normal viscous component (the shear one is calculated inside Mohr-Coulomb criterion, see above)
 		if (calcEnergy) {if (!noShearDamp) {shearDampDissip += phys->shearViscous.dot(incidentVs*dt);}} // calc energy dissipation due to viscous linear damping
 	}
@@ -374,7 +374,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/****************/
 	/* APPLY FORCES */
 	/****************/
-	
+
 	if (!scene->isPeriodic)
 		applyForceAtContactPoint(-phys->normalForce - phys->shearForce, scg->contactPoint , id1, de1->se3.position, id2, de2->se3.position);
 	else { // in scg we do not wrap particles positions, hence "applyForceAtContactPoint" cannot be used
@@ -392,19 +392,19 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 #if 0
 void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact, Scene* ncb){
 	const Real& dt = scene->dt; // get time step
-	
+
 	int id1 = contact->getId1(); // get id body 1
   	int id2 = contact->getId2(); // get id body 2
 
 	State* de1 = Body::byId(id1,ncb)->state.get();
-	State* de2 = Body::byId(id2,ncb)->state.get();	
+	State* de2 = Body::byId(id2,ncb)->state.get();
 
 	ScGeom* scg = static_cast<ScGeom*>(ig.get());
-	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());	
+	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());
 
 
 	/*** NORMAL FORCE ****/
-	Real uN = scg->penetrationDepth; // get overlapping  
+	Real uN = scg->penetrationDepth; // get overlapping
 	if (uN<0) {ncb->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
 	/*** Hertz-Mindlin's formulation (PFC) ***/
 	phys->kn = phys->kno*sqrt(uN); // normal stiffness
@@ -418,13 +418,13 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	Vector3r shiftVel = scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
 	Vector3r shearDisp = scg->rotateAndGetShear(trialFs,phys->prevNormal,de1,de2,dt,shiftVel,preventGranularRatcheting);
 	trialFs -= phys->ks*shearDisp;
-  	
- 
+
+
 	/*** MOHR-COULOMB LAW ***/
 	Real maxFs = phys->normalForce.squaredNorm();
 	if (trialFs.squaredNorm() > maxFs)
 	{Real ratio = sqrt(maxFs)/trialFs.norm(); trialFs *= ratio;}
-	
+
 
 	/*** APPLY FORCES ***/
 	if (!scene->isPeriodic)

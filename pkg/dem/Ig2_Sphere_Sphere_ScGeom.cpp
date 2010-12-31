@@ -9,10 +9,7 @@
 #include<yade/lib/base/Math.hpp>
 #include<yade/core/Omega.hpp>
 
-bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
-							const shared_ptr<Shape>& cm2,
-							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
-							const shared_ptr<Interaction>& c)
+bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
 {
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	const Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
@@ -50,10 +47,7 @@ bool Ig2_Sphere_Sphere_ScGeom::goReverse(	const shared_ptr<Shape>& cm1,
 
 YADE_PLUGIN((Ig2_Sphere_Sphere_ScGeom));
 
-bool Ig2_Sphere_Sphere_ScGeom6D::go(	const shared_ptr<Shape>& cm1,
-							const shared_ptr<Shape>& cm2,
-							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
-							const shared_ptr<Interaction>& c)
+bool Ig2_Sphere_Sphere_ScGeom6D::go( const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
 {
 	bool isNew = !c->geom;
 	if (Ig2_Sphere_Sphere_ScGeom::go(cm1,cm2,state1,state2,shift2,force,c)){//the 3 DOFS from ScGeom are updated here
@@ -67,13 +61,7 @@ bool Ig2_Sphere_Sphere_ScGeom6D::go(	const shared_ptr<Shape>& cm1,
 	else return false;
 }
 
-bool Ig2_Sphere_Sphere_ScGeom6D::goReverse(	const shared_ptr<Shape>& cm1,
-								const shared_ptr<Shape>& cm2,
-								const State& state1,
-								const State& state2,
-								const Vector3r& shift2,
-								const bool& force,
-								const shared_ptr<Interaction>& c)
+bool Ig2_Sphere_Sphere_ScGeom6D::goReverse( const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
 {
 	return go(cm1,cm2,state2,state1,-shift2,force,c);
 }

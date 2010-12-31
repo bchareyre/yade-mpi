@@ -10,9 +10,11 @@ class Ig2_Sphere_Sphere_ScGeom: public IGeomFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of two :yref:`Spheres<Sphere>`.",
+
+		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_ScGeom,IGeomFunctor,
+		"Create/update a :yref:`ScGeom` instance representing the geometry of a contact point between two :yref:`Spheres<Sphere>`s.",
 		((Real,interactionDetectionFactor,1,,"Enlarge both radii by this factor (if >1), to permit creation of distant interactions.\n\nInteractionGeometry will be computed when interactionDetectionFactor*(rad1+rad2) > distance.\n\n.. note::\n\t This parameter is functionally coupled with :yref:`Bo1_Sphere_Aabb::aabbEnlargeFactor`, which will create larger bounding boxes and should be of the same value."))
-		((bool,avoidGranularRatcheting,true,,"Define relative velocity so that ratcheting is avoided. It applies for sphere-sphere contacts. It could eventualy also apply for sphere-emulating interactions (i.e. convertible into the ScGeom type), but it would need to define the virtual sphere's motion correctly, which is not the case currently. Therefore, avoid=false is recommended for sphere vs. non-sphere interactions, at the price of possible ratcheting.\n\n"
+		((bool,avoidGranularRatcheting,true,,"Define relative velocity so that ratcheting is avoided. It applies for sphere-sphere contacts. It eventualy also apply for sphere-emulating interactions (i.e. convertible into the ScGeom type), if the virtual sphere's motion is defined correctly (see e.g. :yref:`Ig2_Sphere_ChainedCylinder_CylScGeom`.\n\n"
 		"Short explanation of what we want to avoid :\n\n"
 		"Numerical ratcheting is best understood considering a small elastic cycle at a contact between two grains : assuming b1 is fixed, impose this displacement to b2 :\n\n"
   		"#. translation *dx* in the normal direction\n"
@@ -34,7 +36,8 @@ class Ig2_Sphere_Sphere_ScGeom6D: public Ig2_Sphere_Sphere_ScGeom{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_ScGeom6D,Ig2_Sphere_Sphere_ScGeom,"Create/update a :yref:`ScGeom6D` instance representing intersection of two :yref:`Spheres<Sphere>`.",
+
+		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_ScGeom6D,Ig2_Sphere_Sphere_ScGeom,"Create/update a :yref:`ScGeom6D` instance representing the geometry of a contact point between two :yref:`Spheres<Sphere>`s, including relative rotations.",
 		((bool,updateRotations,true,,"Precompute relative rotations. Turning this false can speed up simulations when rotations are not needed in constitutive laws (e.g. when spheres are compressed without cohesion and moment in early stage of a triaxial test), but is not foolproof. Change this value only if you know what you are doing."))
 		((bool,creep,false,,"Substract rotational creep from relative rotation. The rotational creep :yref:`ScGeom6D::twistCreep` is a quaternion and has to be updated inside a constitutive law, see for instance :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`."
 		))

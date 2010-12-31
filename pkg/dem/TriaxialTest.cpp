@@ -33,9 +33,7 @@
 
 #include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
-#include<yade/pkg/dem/Dem3DofGeom_SphereSphere.hpp>
-#include<yade/pkg/dem/Dem3DofGeom_FacetSphere.hpp>
-#include<yade/pkg/dem/Dem3DofGeom_WallSphere.hpp>
+#include<yade/pkg/dem/Ig2_Facet_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg/common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg/common/Bo1_Box_Aabb.hpp>
@@ -66,12 +64,9 @@ TriaxialTest::~TriaxialTest () {}
 bool TriaxialTest::generate(string& message)
 {
 	message="";
-
-	if(biaxial2dTest && (8.0*(upperCorner[2]-lowerCorner[2]))>(upperCorner[0]-lowerCorner[0]))
-	{
+	if(biaxial2dTest && (8.0*(upperCorner[2]-lowerCorner[2]))>(upperCorner[0]-lowerCorner[0])){
 		message="Biaxial test can be generated only if Z size is more than 8 times smaller than X size";
-		return false;
-	}
+		return false;}
 	if(facetWalls&&wallWalls){ LOG_WARN("Turning TriaxialTest::facetWalls off, since wallWalls were selected as well."); }
 
 	shared_ptr<Body> body;
@@ -96,7 +91,6 @@ bool TriaxialTest::generate(string& message)
 			upperCorner=lowerCorner+dimensions;
 			num=sphere_pack.makeCloud(lowerCorner,upperCorner,radiusMean,radiusStdDev,numberOfGrains);
 		}
-
 		message+="Generated a sample with " + lexical_cast<string>(num) + " spheres inside box of dimensions: ("
 			+ lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + ","
 			+ lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + ","
@@ -112,98 +106,75 @@ bool TriaxialTest::generate(string& message)
 
 	if(thickness<0) thickness=radiusMean;
 	if(facetWalls || wallWalls) thickness=0;
-
+	if(!facetWalls && !wallWalls){
 	// bottom box
-	 	Vector3r center		= Vector3r(
-	 						(lowerCorner[0]+upperCorner[0])/2,
-	 						lowerCorner[1]-thickness/2.0,
-	 						(lowerCorner[2]+upperCorner[2])/2);
-	 	Vector3r halfSize	= Vector3r(
-	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-							thickness/2.0,
-	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-
+	 	Vector3r center		= Vector3r((lowerCorner[0]+upperCorner[0])/2,
+	 					lowerCorner[1]-thickness/2.0,
+	 					(lowerCorner[2]+upperCorner[2])/2);
+	 	Vector3r halfSize	= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+						thickness/2.0,
+	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			scene->bodies->insert(body);
-			triaxialcompressionEngine->wall_bottom_id = body->getId();
-			//triaxialStateRecorder->wall_bottom_id = body->getId();
-			}
-		//forcerec->id = body->getId();
+			triaxialcompressionEngine->wall_bottom_id = body->getId();}
 	// top box
-	 	center			= Vector3r(	(lowerCorner[0]+upperCorner[0])/2,
-	 						upperCorner[1]+thickness/2.0,
-	 						(lowerCorner[2]+upperCorner[2])/2);
-	 	halfSize		= Vector3r(	wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						thickness/2.0,
-	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 	center			= Vector3r((lowerCorner[0]+upperCorner[0])/2,
+	 					upperCorner[1]+thickness/2.0,
+	 					(lowerCorner[2]+upperCorner[2])/2);
+	 	halfSize		= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 					thickness/2.0,
+	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
 			scene->bodies->insert(body);
-			triaxialcompressionEngine->wall_top_id = body->getId();
-			//triaxialStateRecorder->wall_top_id = body->getId();
-			}
+			triaxialcompressionEngine->wall_top_id = body->getId();}
 	// box 1
-	 	center			= Vector3r(
-	 						lowerCorner[0]-thickness/2.0,
-	 						(lowerCorner[1]+upperCorner[1])/2,
-	 						(lowerCorner[2]+upperCorner[2])/2);
-		halfSize		= Vector3r(
-							thickness/2.0,
-	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 	center			= Vector3r(lowerCorner[0]-thickness/2.0,
+	 					(lowerCorner[1]+upperCorner[1])/2,
+	 					(lowerCorner[2]+upperCorner[2])/2);
+		halfSize		= Vector3r(thickness/2.0,
+	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
 			scene->bodies->insert(body);
-			triaxialcompressionEngine->wall_left_id = body->getId();
-			//triaxialStateRecorder->wall_left_id = body->getId();
-			}
+			triaxialcompressionEngine->wall_left_id = body->getId();}
 	// box 2
-	 	center			= Vector3r(
-	 						upperCorner[0]+thickness/2.0,
-	 						(lowerCorner[1]+upperCorner[1])/2,
-							(lowerCorner[2]+upperCorner[2])/2);
-	 	halfSize		= Vector3r(
-	 						thickness/2.0,
-	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 	center			= Vector3r(upperCorner[0]+thickness/2.0,
+	 					(lowerCorner[1]+upperCorner[1])/2,
+						(lowerCorner[2]+upperCorner[2])/2);
+	 	halfSize		= Vector3r(thickness/2.0,
+	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
 
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
 			scene->bodies->insert(body);
-			triaxialcompressionEngine->wall_right_id = body->getId();
-			//triaxialStateRecorder->wall_right_id = body->getId();
-			}
+			triaxialcompressionEngine->wall_right_id = body->getId();}
 	// box 3
-	 	center			= Vector3r(
-	 						(lowerCorner[0]+upperCorner[0])/2,
-	 						(lowerCorner[1]+upperCorner[1])/2,
-	 						lowerCorner[2]-thickness/2.0);
-	 	halfSize		= Vector3r(
-	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						thickness/2.0);
+	 	center			= Vector3r((lowerCorner[0]+upperCorner[0])/2,
+	 					(lowerCorner[1]+upperCorner[1])/2,
+	 					lowerCorner[2]-thickness/2.0);
+	 	halfSize		= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 					thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
 			scene->bodies->insert(body);
-			triaxialcompressionEngine->wall_back_id = body->getId();
-			//triaxialStateRecorder->wall_back_id = body->getId();
-			}
+			triaxialcompressionEngine->wall_back_id = body->getId();}
 	// box 4
-	 	center			= Vector3r(
-	 						(lowerCorner[0]+upperCorner[0])/2,
-	 						(lowerCorner[1]+upperCorner[1])/2,
-	 						upperCorner[2]+thickness/2.0);
-	 	halfSize		= Vector3r(
-	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						thickness/2.0);
+	 	center			= Vector3r((lowerCorner[0]+upperCorner[0])/2,
+	 					(lowerCorner[1]+upperCorner[1])/2,
+	 					upperCorner[2]+thickness/2.0);
+	 	halfSize		= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 					thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {
 			scene->bodies->insert(body);
-			triaxialcompressionEngine->wall_front_id = body->getId();
-			//triaxialStateRecorder->wall_front_id = body->getId();
-			}
+			triaxialcompressionEngine->wall_front_id = body->getId();}
+	}
 	size_t imax=sphere_pack.pack.size();
 	for(size_t i=0; i<imax; i++){
 		const SpherePack::Sph& sp(sphere_pack.pack[i]);
@@ -221,26 +192,24 @@ bool TriaxialTest::generate(string& message)
 	return true;
 }
 
-
 void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
-
-	body->setDynamic(dynamic);
-	body->state->mass		= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
-	body->state->inertia		= Vector3r( 	2.0/5.0*body->state->mass*radius*radius,
-							2.0/5.0*body->state->mass*radius*radius,
-							2.0/5.0*body->state->mass*radius*radius);
+	body->state->blockedDOFs=State::DOF_NONE;
+	body->state->mass	= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
+	body->state->inertia	= Vector3r(2.0/5.0*body->state->mass*radius*radius,
+				2.0/5.0*body->state->mass*radius*radius,
+				2.0/5.0*body->state->mass*radius*radius);
 	body->state->pos=position;
 	shared_ptr<FrictMat> mat(new FrictMat);
-	mat->young			= sphereYoungModulus;
-	mat->poisson			= sphereKsDivKn;
-	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
+	mat->young		= sphereYoungModulus;
+	mat->poisson		= sphereKsDivKn;
+	mat->frictionAngle	= compactionFrictionDeg * Mathr::PI/180.0;
 	aabb->color		= Vector3r(0,1,0);
-	iSphere->radius			= radius;
-	//iSphere->color		= Vector3r(0.4,0.1,0.1);
+	iSphere->radius		= radius;
+	//iSphere->color	= Vector3r(0.4,0.1,0.1);
 	iSphere->color           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	body->shape	= iSphere;
 	body->bound	= aabb;
@@ -251,21 +220,21 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body); body->groupMask=2;
-	body->setDynamic(false);
+	body->state->blockedDOFs=State::DOF_ALL;
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->color		= Vector3r(1,0,0);
 	body->bound		= aabb;
 	body->state->pos=position;
 	shared_ptr<FrictMat> mat(new FrictMat);
-	mat->young			= sphereYoungModulus;
+	mat->young		= sphereYoungModulus;
 	mat->poisson		= sphereKsDivKn;
-	mat->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
+	mat->frictionAngle	= boxFrictionDeg * Mathr::PI/180.0;
 	body->material=mat;
 	if(!facetWalls && !wallWalls){
 		shared_ptr<Box> iBox(new Box);
-		iBox->extents			= extents;
-		iBox->wire			= wire;
-		iBox->color		= Vector3r(1,1,1);
+		iBox->extents	= extents;
+		iBox->wire	= wire;
+		iBox->color	= Vector3r(1,1,1);
 		body->shape	= iBox;
 	}
 	// guess the orientation
@@ -293,24 +262,21 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
-	if(!facetWalls && !wallWalls){
+// 	if(!facetWalls && !wallWalls){
 		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+		interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_ScGeom);
 		interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
-	} else {
-		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_Dem3DofGeom);
-		interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_Dem3DofGeom);
-		interactionGeometryDispatcher->add(new Ig2_Wall_Sphere_Dem3DofGeom);
-	}
-
-
+// 	} else {
+// 		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_Dem3DofGeom);
+// 		interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_Dem3DofGeom);
+// 		interactionGeometryDispatcher->add(new Ig2_Wall_Sphere_Dem3DofGeom);
+// 	}
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	shared_ptr<IPhysFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(ss);
 
-
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
-
 
 	globalStiffnessTimeStepper=shared_ptr<GlobalStiffnessTimeStepper>(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
@@ -344,47 +310,32 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 		triaxialStateRecorder-> file 		= WallStressRecordFile + Key;
 		triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 	}
-	#if 0
-	// moving walls to regulate the stress applied, but no loading
-	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
-	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
-	triaxialstressController-> sigma_iso = sigma_iso;
-	triaxialstressController-> max_vel = 0.0001;
-	triaxialstressController-> thickness = thickness;
-	triaxialstressController->wall_bottom_activated = false;
-	triaxialstressController->wall_top_activated = false;
-		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	#endif
 	scene->engines.clear();
 	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	scene->engines.push_back(collider);
-// 	if(fast){ // The old code was doing the same slower, still here in case we want to make comparisons again
-		collider->sweepLength=.05*radiusMean;
-		collider->nBins=5; collider->binCoeff=2; /* gives a 2^5=32× difference between the lower and higher bin sweep lengths */
-		collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
-		collider->boundDispatcher->add(new Bo1_Box_Aabb);
-		collider->boundDispatcher->add(new Bo1_Facet_Aabb);
-		collider->boundDispatcher->add(new Bo1_Wall_Aabb);
+	collider->sweepLength=.05*radiusMean;
+	collider->nBins=5; collider->binCoeff=2; /* gives a 2^5=32× difference between the lower and higher bin sweep lengths */
+	collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
+	collider->boundDispatcher->add(new Bo1_Box_Aabb);
+	collider->boundDispatcher->add(new Bo1_Facet_Aabb);
+	collider->boundDispatcher->add(new Bo1_Wall_Aabb);
 
-		shared_ptr<InteractionLoop> ids(new InteractionLoop);
-			ids->geomDispatcher=interactionGeometryDispatcher;
-			ids->physDispatcher=interactionPhysicsDispatcher;
-			ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
-			if(!facetWalls && !wallWalls){
-				shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> see(new Law2_ScGeom_FrictPhys_CundallStrack);
-				ids->lawDispatcher->add(see);
-			} else {
-				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_CundallStrack>(new Law2_Dem3DofGeom_FrictPhys_CundallStrack));
-			}
-		scene->engines.push_back(ids);
+	shared_ptr<InteractionLoop> ids(new InteractionLoop);
+	ids->geomDispatcher=interactionGeometryDispatcher;
+	ids->physDispatcher=interactionPhysicsDispatcher;
+	ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
+// 	if(!facetWalls && !wallWalls){
+		shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> see(new Law2_ScGeom_FrictPhys_CundallStrack);
+		ids->lawDispatcher->add(see);
+// 	} else ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_CundallStrack>(new Law2_Dem3DofGeom_FrictPhys_CundallStrack));
+	scene->engines.push_back(ids);
 	scene->engines.push_back(globalStiffnessTimeStepper);
 	scene->engines.push_back(triaxialcompressionEngine);
 	if(recordIntervalIter>0 && !noFiles) scene->engines.push_back(triaxialStateRecorder);
 
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
-	newton->damping=dampingMomentum;
+	newton->damping=dampingForce;
 	scene->engines.push_back(newton);
 }
 

@@ -9,7 +9,7 @@
 #include "CohesiveTriaxialTest.hpp"
 
 #include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg/dem/Ip2_2xCohFrictMat_CohFrictPhys.hpp>
+#include<yade/pkg/dem/Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp>
 #include<yade/pkg/dem/CohFrictMat.hpp>
 #include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
@@ -59,25 +59,18 @@ typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
 string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
-
-CohesiveTriaxialTest::~CohesiveTriaxialTest ()
-{
-
-}
-
-
-
+CohesiveTriaxialTest::~CohesiveTriaxialTest (){}
 
 bool CohesiveTriaxialTest::generate(std::string& message)
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
-	
+
 	scene = shared_ptr<Scene>(new Scene);
 	createActors(scene);
 	positionRootBody(scene);
 
 	shared_ptr<Body> body;
-	
+
 	if(boxWalls)
 	{
 	// bottom box
@@ -89,7 +82,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 							thickness/2.0,
 	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	
+
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			scene->bodies->insert(body);
@@ -99,7 +92,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 //			forcerec->endId   = body->getId();
 			}
 		//forcerec->id = body->getId();
-	
+
 	// top box
 	 	center			= Vector3r(
 	 						(lowerCorner[0]+upperCorner[0])/2,
@@ -109,7 +102,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 	 						thickness/2.0,
 	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	
+
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
 			scene->bodies->insert(body);
@@ -117,7 +110,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 			//triaxialStateRecorder->wall_top_id = body->getId();
 			}
 	// box 1
-	
+
 	 	center			= Vector3r(
 	 						lowerCorner[0]-thickness/2.0,
 	 						(lowerCorner[1]+upperCorner[1])/2,
@@ -141,7 +134,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						thickness/2.0,
 	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	 	
+
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
 			scene->bodies->insert(body);
@@ -163,7 +156,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 			triaxialcompressionEngine->wall_back_id = body->getId();
 			//triaxialStateRecorder->wall_back_id = body->getId();
 			}
-	
+
 	// box 4
 	 	center			= Vector3r(
 	 						(lowerCorner[0]+upperCorner[0])/2,
@@ -179,23 +172,23 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 			triaxialcompressionEngine->wall_front_id = body->getId();
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
-			 
+
 	}
-	
+
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
 	else message=GenerateCloud_cohesive(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
-	
+
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
-			
+
 	for (;it!=it_end; ++it)
 	{
 		cerr << "sphere (" << it->first << " " << it->second << endl;
 		createSphere(body,it->first,it->second,true);
 		scene->bodies->insert(body);
 	}
-	
+
 	return true;
 
 }
@@ -207,16 +200,13 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
-	
+
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
 	q.normalize();
-	
-	body->setDynamic(dynamic);
-	
+	body->state->blockedDOFs=State::DOF_NONE;
 	body->state->angVel		= Vector3r(0,0,0);
 	body->state->vel		= Vector3r(0,0,0);
 	body->state->mass		= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
-	
 	body->state->inertia		= Vector3r( 	2.0/5.0*body->state->mass*radius*radius,
 							2.0/5.0*body->state->mass*radius*radius,
    							2.0/5.0*body->state->mass*radius*radius);
@@ -227,20 +217,20 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	physics->shearCohesion = shearCohesion;
 	physics->normalCohesion = normalCohesion;
 	physics->momentRotationLaw = 1;
-	
+
 	if((!dynamic) && (!boxWalls))
 	{
 		physics->young			= boxYoungModulus;
 		physics->poisson		= boxKsDivKn;
 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 	}
-	
+
 	aabb->color		= Vector3r(0,1,0);
-	
+
 	iSphere->radius			= radius;
 	iSphere->color		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	iSphere->wire			= false;
-	
+
 	body->shape	= iSphere;
 	body->bound		= aabb;
 	body->material	= physics;
@@ -254,13 +244,11 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	shared_ptr<Aabb> aabb(new Aabb);
 
 	shared_ptr<Box> iBox(new Box);
-	
-	body->setDynamic(false);
-	
+	body->state->blockedDOFs=State::DOF_ALL;
 	body->state->angVel		= Vector3r(0,0,0);
 	body->state->vel		= Vector3r(0,0,0);
-	body->state->mass			= 0; 
-	//physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
+	body->state->mass			= 0;
+	//physics->mass			= extents[0]*extents[1]*extents[2]*density*2;
 	body->state->inertia		= Vector3r(
 						body->state->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
 						, body->state->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
@@ -276,9 +264,9 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	physics->shearCohesion = 0;
 	physics->normalCohesion = 0;
 	physics->momentRotationLaw = 0;
-	
+
 	aabb->color		= Vector3r(1,0,0);
-	
+
 	iBox->extents			= extents;
 	iBox->color		= Vector3r(1,1,1);
 	iBox->wire			= wire;
@@ -291,27 +279,27 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 
 void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
-	
+
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
 	shared_ptr<IGeomFunctor> s1(new Ig2_Sphere_Sphere_ScGeom6D);
 	interactionGeometryDispatcher->add(s1);
 	shared_ptr<IGeomFunctor> s2(new Ig2_Box_Sphere_ScGeom6D);
 	interactionGeometryDispatcher->add(s2);
 
-	shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> cohesiveFrictionalRelationships = shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> (new Ip2_2xCohFrictMat_CohFrictPhys);
+	shared_ptr<Ip2_CohFrictMat_CohFrictMat_CohFrictPhys> cohesiveFrictionalRelationships = shared_ptr<Ip2_CohFrictMat_CohFrictMat_CohFrictPhys> (new Ip2_CohFrictMat_CohFrictMat_CohFrictPhys);
 	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
-		
+
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
 	collider->boundDispatcher->add(new Bo1_Box_Aabb);
 
-	
+
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
 
-	
+
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
@@ -329,15 +317,15 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
 	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
-	triaxialcompressionEngine->maxMultiplier = maxMultiplier;	
-	
+	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
+
 	// recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
 	TriaxialStateRecorder);
 	triaxialStateRecorder-> file 	= WallStressRecordFile;
 	triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 	//triaxialStateRecorder-> thickness 		= thickness;
-	
+
 	scene->engines.clear();
 	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	scene->engines.push_back(collider);
@@ -354,7 +342,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& scene)
 
 
 void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& scene)
-{	
+{
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->color		= Vector3r(0,0,1);
 }
@@ -373,12 +361,12 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 	sphere_list.clear();
 	long tries = 1000; //nb of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
-		
+
 	Real mean_radius = std::pow(dimensions.x()*dimensions.y()*dimensions.z()*(1-porosity)/(3.1416*1.3333*number),0.333333);
         //cerr << mean_radius;
 
 	std::cerr << "generating aggregates ... ";
-	
+
 	long t, i;
 	for (i=0; i<number; ++i) {
 		BasicSphere s;
@@ -394,15 +382,15 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 			{
 				sphere_list.push_back(s);
 				break;
-			}			
+			}
 		}
 		if (t==tries) return "More than " + lexical_cast<string>(tries) +
 					" tries while generating sphere number " +
 					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
 	}
-	return "Generated a sample with " + lexical_cast<string>(number) + "spheres inside box of dimensions: (" 
-			+ lexical_cast<string>(dimensions[0]) + "," 
-			+ lexical_cast<string>(dimensions[1]) + "," 
+	return "Generated a sample with " + lexical_cast<string>(number) + "spheres inside box of dimensions: ("
+			+ lexical_cast<string>(dimensions[0]) + ","
+			+ lexical_cast<string>(dimensions[1]) + ","
 			+ lexical_cast<string>(dimensions[2]) + ").";
 }
 

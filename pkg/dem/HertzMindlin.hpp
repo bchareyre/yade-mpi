@@ -1,5 +1,5 @@
-// 2010 © Chiara Modenese <c.modenese@gmail.com> 
-// 
+// 2010 © Chiara Modenese <c.modenese@gmail.com>
+//
 /*
 === HIGH LEVEL OVERVIEW OF Mindlin ===
 
@@ -24,10 +24,10 @@ Mindlin is a set of classes to include the Hertz-Mindlin formulation for the con
 
 
 /******************** MindlinPhys *********************************/
-class MindlinPhys: public FrictPhys{
+class MindlinPhys: public FrictPhysTransitory{
 	public:
 	virtual ~MindlinPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MindlinPhys,FrictPhys,"Representation of an interaction of the Hertz-Mindlin type.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MindlinPhys,FrictPhysTransitory,"Representation of an interaction of the Hertz-Mindlin type.",
 			((Real,kno,0.0,,"Constant value in the formulation of the normal stiffness"))
 			((Real,kso,0.0,,"Constant value in the formulation of the tangential stiffness"))
 			((Vector3r,normalViscous,Vector3r::Zero(),,"Normal viscous component"))
@@ -50,7 +50,7 @@ class MindlinPhys: public FrictPhys{
 			//((Real,shearDampDissip,0.0,,"Energy dissipation due to sliding"))
 			,
 			createIndex());
-	REGISTER_CLASS_INDEX(MindlinPhys,FrictPhys);
+	REGISTER_CLASS_INDEX(MindlinPhys,FrictPhysTransitory);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(MindlinPhys);
@@ -96,7 +96,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_HertzWithLinearShear);
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 		// just for the deprecation warning, can be removed later
-		Real _beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys; 
+		Real _beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys;
 		bool _nothing;
 	public:
 

@@ -161,7 +161,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 			//FIXME : handle contact jump on next element
 		}
 		scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
-		scm->precompute(state1,scm->fictiousState,scene,c,branch/norm,isNew,shift2,false);//use sphere-sphere precompute (with a virtual sphere)
+		scm->precompute(state1,scm->fictiousState,scene,c,branch/norm,isNew,shift2,true);//use sphere-sphere precompute (with a virtual sphere)
 	}
 	return true;
 }

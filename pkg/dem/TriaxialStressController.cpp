@@ -5,7 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
- 
+
 #include"TriaxialStressController.hpp"
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/Box.hpp>
@@ -47,7 +47,7 @@ void TriaxialStressController::updateStiffness ()
 void TriaxialStressController::controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel)
 {
 	scene->forces.sync();
-	Real translation=normal[wall].dot(getForce(scene,wall_id[wall])-resultantForce); 
+	Real translation=normal[wall].dot(getForce(scene,wall_id[wall])-resultantForce);
 	const bool log=false;
 	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<getForce(scene,wall_id[wall])<<", resultantForce="<<resultantForce<<", translation="<<translation);
 	if (translation!=0)
@@ -61,7 +61,8 @@ void TriaxialStressController::controlExternalStress(int wall, Vector3r resultan
 	   else translation = wall_max_vel * Mathr::Sign(translation)*scene->dt;
 	}
 	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
-	p->se3.position += previousTranslation[wall];
+	//Don't update position since Newton is doing that starting from bzr2612
+// 	p->se3.position += previousTranslation[wall];
 	externalWork += previousTranslation[wall].dot(getForce(scene,wall_id[wall]));
 	// this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
 	p->vel=previousTranslation[wall]/scene->dt;
@@ -71,14 +72,14 @@ void TriaxialStressController::controlExternalStress(int wall, Vector3r resultan
 void TriaxialStressController::action()
 {
 	// sync thread storage of ForceContainer
-	scene->forces.sync();	
+	scene->forces.sync();
 	if (first) {// sync boundaries ids in the table
 		wall_id[0] = wall_bottom_id;
  		wall_id[1] = wall_top_id;
  		wall_id[2] = wall_left_id;
  		wall_id[3] = wall_right_id;
  		wall_id[4] = wall_front_id;
- 		wall_id[5] = wall_back_id;}	
+ 		wall_id[5] = wall_back_id;}
 
 	if(thickness<0) thickness=2.0*YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,scene)->shape)->extents.y();
 	State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
@@ -90,7 +91,7 @@ void TriaxialStressController::action()
 	height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
 	width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
 	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
-	
+
 	boxVolume = height * width * depth;
 	if (first) {
 		BodyContainer::iterator bi = scene->bodies->begin();
@@ -100,14 +101,12 @@ void TriaxialStressController::action()
 		{
 			if((*bi)->isClump()) continue;
 			const shared_ptr<Body>& b = *bi;
-			if ( b->isDynamic() || b->isClumpMember() )
-			{
-				const shared_ptr<Sphere>& sphere =
-						YADE_PTR_CAST<Sphere> ( b->shape );
+			if ( b->isDynamic() || b->isClumpMember() ) {
+				const shared_ptr<Sphere>& sphere = YADE_PTR_CAST<Sphere> ( b->shape );
 				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		}
-		max_vel1=3 * width /(height+width+depth)*max_vel;				
+		max_vel1=3 * width /(height+width+depth)*max_vel;
 		max_vel2=3 * height /(height+width+depth)*max_vel;
 		max_vel3 =3 * depth /(height+width+depth)*max_vel;
 		first = false;
@@ -118,7 +117,7 @@ void TriaxialStressController::action()
 	if (isAxisymetric){
 		sigma1=sigma2=sigma3=sigma_iso;
 	}
-	
+
 	porosity = ( boxVolume - spheresVolume ) /boxVolume;
 	position_top = p_top->se3.position.y();
 	position_bottom = p_bottom->se3.position.y();
@@ -126,12 +125,12 @@ void TriaxialStressController::action()
 	position_left = p_left->se3.position.x();
 	position_front = p_front->se3.position.z();
 	position_back = p_back->se3.position.z();
-	
+
 	// must be done _after_ height, width, depth have been calculated
 	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
 	if (scene->iter % stiffnessUpdateInterval == 0 || scene->iter<100) updateStiffness();
 	bool isARadiusControlIteration = (scene->iter % radiusControlInterval == 0);
-	
+
 	if (scene->iter % computeStressStrainInterval == 0 ||
 		 (internalCompaction && isARadiusControlIteration) )
 		computeStressStrain();
@@ -139,18 +138,24 @@ void TriaxialStressController::action()
 	if (!internalCompaction) {
 		Vector3r wallForce (0, sigma2*width*depth, 0);
 		if (wall_bottom_activated) controlExternalStress(wall_bottom, -wallForce, p_bottom, max_vel2);
+		else p_bottom->vel=Vector3r::Zero();
 		if (wall_top_activated) controlExternalStress(wall_top, wallForce, p_top, max_vel2);
-		
+		else p_top->vel=Vector3r::Zero();
 		wallForce = Vector3r(sigma1*height*depth, 0, 0);
 		if (wall_left_activated) controlExternalStress(wall_left, -wallForce, p_left, max_vel1);
+		else p_left->vel=Vector3r::Zero();
 		if (wall_right_activated) controlExternalStress(wall_right, wallForce, p_right, max_vel1);
-		
+		else p_right->vel=Vector3r::Zero();
+
 		wallForce = Vector3r(0, 0, sigma3*height*width);
 		if (wall_back_activated) controlExternalStress(wall_back, -wallForce, p_back, max_vel3);
+		else p_back->vel=Vector3r::Zero();
 		if (wall_front_activated) controlExternalStress(wall_front, wallForce, p_front, max_vel3);
+		else p_front->vel=Vector3r::Zero();
 	}
 	else //if internal compaction
 	{
+		p_bottom->vel=Vector3r::Zero(); p_top->vel=Vector3r::Zero(); p_left->vel=Vector3r::Zero(); p_right->vel=Vector3r::Zero(); p_back->vel=Vector3r::Zero(); p_front->vel=Vector3r::Zero();
 		if (isARadiusControlIteration) {
 			//Real s = computeStressStrain(scene);
 			if (sigma_iso<=meanStress) maxMultiplier = finalMaxMultiplier;
@@ -176,11 +181,11 @@ void TriaxialStressController::computeStressStrain()
 	State* p_right=Body::byId(wall_right_id,scene)->state.get();
 	State* p_front=Body::byId(wall_front_id,scene)->state.get();
 	State* p_back=Body::byId(wall_back_id,scene)->state.get();
-	
+
  	height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
  	width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
  	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
-	
+
 	meanStress = 0;
 	if (height0 == 0) height0 = height;
 	if (width0 == 0) width0 = width;
@@ -189,7 +194,7 @@ void TriaxialStressController::computeStressStrain()
 	strain[1] = log(height0/height);
 	strain[2] = log(depth0/depth);
 	volumetricStrain=strain[0]+strain[1]+strain[2];
-	
+
 	Real invXSurface = 1.f/(height*depth);
 	Real invYSurface = 1.f/(width*depth);
 	Real invZSurface = 1.f/(width*height);
@@ -253,15 +258,12 @@ Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
 		if ((*ii)->isReal()) {
 			const shared_ptr<Interaction>& contact = *ii;
 			Real f = (static_cast<FrictPhys*> ((contact->phys.get()))->normalForce+static_cast<FrictPhys*>(contact->phys.get())->shearForce).squaredNorm();
-			if (f!=0)
-			{
+			if (f!=0) {
 			MeanForce += sqrt(f);
-			++nForce;
-			}
+			++nForce;}
 		}
 	}
 	if (nForce!=0) MeanForce /= nForce;
-
 
 	if (!maxUnbalanced) {
 		//compute mean Unbalanced Force

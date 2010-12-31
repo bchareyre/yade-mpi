@@ -12,15 +12,8 @@
 class FrictPhys: public NormShearPhys
 {
 	public :
-		// kn,ks,normal inherited from NormShearPhys
-		Real frictionAngle 			// angle of friction, according to Coulumb criterion
-				//Those two attributes were removed. If you need them, copy those two lines in your class inheriting from FrictPhys
-// 				,equilibriumDistance		// equilibrium distance
-// 				,initialEquilibriumDistance	// initial equilibrium distance
-				;	
 		virtual ~FrictPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"Interaction with friction",
-		((Vector3r,prevNormal,Vector3r::Zero(),,"unit normal of the contact plane in previous step"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"The simple linear elastip-plastic interaction with friction angle, like in the traditional [CundallStrack1979]_",
 		((Real,tangensOfFrictionAngle,NaN,,"tan of angle of friction")),
 		createIndex()
 	);
@@ -28,3 +21,15 @@ class FrictPhys: public NormShearPhys
 };
 REGISTER_SERIALIZABLE(FrictPhys);
 
+class FrictPhysTransitory: public FrictPhys
+{
+	public :
+	Real frictionAngle;
+	virtual ~FrictPhysTransitory();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhysTransitory,FrictPhys,"Temporary version of :yref:`FrictPhys` for compatibility with e.g. :yref:`Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity`",
+		((Vector3r,prevNormal,Vector3r::Zero(),,"unit normal of the contact plane in previous step")),
+		createIndex()
+	);
+	REGISTER_CLASS_INDEX(FrictPhysTransitory,FrictPhys);
+};
+REGISTER_SERIALIZABLE(FrictPhysTransitory);

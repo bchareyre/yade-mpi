@@ -1,6 +1,6 @@
 // 2009 © Sergei Dorofeenko <sega@users.berlios.de>
 // This file contains a set of classes for modelling of viscoelastic
-// particles. 
+// particles.
 
 #pragma once
 
@@ -9,10 +9,10 @@
 #include<yade/pkg/common/Dispatching.hpp>
 
 /* Simple viscoelastic model */
- 
+
 /// Material
 /// Note: Shop::getViscoelasticFromSpheresInteraction can get kn,cn,ks,cs from a analytical solution of a pair spheres interaction problem.
-class ViscElMat : public Material {	
+class ViscElMat : public Material {
 	public:
 		virtual ~ViscElMat();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
@@ -28,10 +28,10 @@ class ViscElMat : public Material {
 REGISTER_SERIALIZABLE(ViscElMat);
 
 /// Interaction physics
-class ViscElPhys : public FrictPhys {
+class ViscElPhys : public FrictPhysTransitory {
 	public:
 		virtual ~ViscElPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhysTransitory,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant")),
 		createIndex();

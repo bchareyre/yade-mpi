@@ -115,10 +115,6 @@ void ScGeom6D::initRotations(const State& state1, const State& state2)
 {
 	initialOrientation1	= state1.ori;
 	initialOrientation2	= state2.ori;
-// 	initialContactOrientation.setFromTwoVectors(Vector3r(1.0,0.0,0.0),normal);
-// 	currentContactOrientation = initialContactOrientation;
-// 	orientationToContact1   = initialOrientation1.conjugate() * initialContactOrientation;
-// 	orientationToContact2	= initialOrientation2.conjugate() * initialContactOrientation;
 	twist=0;
 	bending=Vector3r::Zero();
 	twistCreep=Quaternionr(1.0,0.0,0.0,0.0);

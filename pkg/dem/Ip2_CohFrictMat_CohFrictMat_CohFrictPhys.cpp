@@ -6,14 +6,14 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"Ip2_2xCohFrictMat_CohFrictPhys.hpp"
+#include"Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp"
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/CohFrictPhys.hpp>
 #include<yade/pkg/dem/CohFrictMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // CohFrictMat
+void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // CohFrictMat
                                         , const shared_ptr<Material>& b2 // CohFrictMat
                                         , const shared_ptr<Interaction>& interaction)
 {
@@ -22,9 +22,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 	ScGeom6D* geom = YADE_CAST<ScGeom6D*>(interaction->geom.get());
 
 	//Create cohesive interractions only once
-	if (setCohesionNow && cohesionDefinitionIteration==-1) {
-		cohesionDefinitionIteration=scene->iter;
-	}
+	if (setCohesionNow && cohesionDefinitionIteration==-1) cohesionDefinitionIteration=scene->iter;
 	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=scene->iter) {
 		cohesionDefinitionIteration = -1;
 		setCohesionNow = 0;}
@@ -56,9 +54,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			// discrete elements using a local moemnt law".
 			contactPhysics->kr = Da*Db*Ks*AlphaKr;
 			contactPhysics->ktw = Da*Db*Ks*AlphaKtw;
-
-			contactPhysics->frictionAngle			= std::min(fa,fb);
-			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
+			contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
 
 			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive)
 			{
@@ -86,7 +82,7 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 		}
 	}
 };
-YADE_PLUGIN((Ip2_2xCohFrictMat_CohFrictPhys));
+YADE_PLUGIN((Ip2_CohFrictMat_CohFrictMat_CohFrictPhys));
 
 
 

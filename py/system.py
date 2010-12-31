@@ -92,6 +92,7 @@ _deprecated={
 	'SpiralInteractionLocator2d':'HelixInteractionLocator2d', # Sat Oct 30 05:53:04 2010, vaclav@flux
 	'Law2_ScGeom_CohFrictPhys_CohesionMoment':'Law2_ScGeom6D_CohFrictPhys_CohesionMoment', # Fri Nov 12 18:45:23 2010, bchareyre@dt-rv020
 	'Ig2_ChainedCylinder_ChainedCylinder_ScGeom':'Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D', # Fri Nov 12 18:47:44 2010, bchareyre@dt-rv020
+	'Ip2_2xCohFrictMat_CohFrictPhys':'Ip2_CohFrictMat_CohFrictMat_CohFrictPhys', # Tue Dec 21 16:11:28 2010, bchareyre@dt-rv020
 	'Ig2_Sphere_Sphere_L3Geom_Inc':'Ig2_Sphere_Sphere_L3Geom', # Sun Dec 26 11:11:05 2010, vaclav@flux
 	'Ig2_Wall_Sphere_L3Geom_Inc':'Ig2_Wall_Sphere_L3Geom', # Sun Dec 26 11:11:30 2010, vaclav@flux
 	'Ig2_Sphere_Sphere_L6Geom_Inc':'Ig2_Sphere_Sphere_L6Geom', # Sun Dec 26 11:11:53 2010, vaclav@flux
@@ -130,11 +131,11 @@ def updateScripts(scripts):
 			os.rename(s,s+'~')
 			out=open(s,'w'); out.write(txt2); out.close()
 			print "%s: %d subtitution%s made, backup in %s~"%(s,xlator.count,'s' if xlator.count>1 else '',s)
-				
+
 
 def cxxCtorsDict(proxyNamespace=__builtins__):
 	"""Return dictionary of class constructors for yade's c++ types, which should be used to update a namespace.
-	
+
 	Root classes are those that are directly wrapped by boost::python. These are only put to the dict.
 
 	Derived classes (from these root classes) are faked by creating a callable which invokes appropriate root class constructor with the derived class parameter and passes remaining arguments to it.

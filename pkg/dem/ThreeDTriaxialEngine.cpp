@@ -19,25 +19,24 @@
 #include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 
-class Ip2_2xCohFrictMat_CohFrictPhys;
+class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys;
 
 CREATE_LOGGER(ThreeDTriaxialEngine);
 YADE_PLUGIN((ThreeDTriaxialEngine));
 
 ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
-{	
+{
 }
-
 
 void ThreeDTriaxialEngine::action()
 {
-  
+
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
 
 		if (updateFrictionAngle) setContactProperties(frictionAngleDegree);
-		
+
 		height0 = height; depth0 = depth; width0 = width;
 
 		if (stressControl_1){
@@ -59,14 +58,14 @@ void ThreeDTriaxialEngine::action()
 		}
 
 		//internalCompaction=false;  //is needed to avoid a control for internal compaction by the TriaxialStressController engine
-		
+
 		isAxisymetric=false; //is needed to avoid a stress control according the parameter sigma_iso (but according to sigma1, sigma2 and sigma3)
-	
+
 		firstRun=false;
 
 	}
 
-	
+
 	const Real& dt = scene->dt;
 
 	if(!stressControl_1)  // control in strain if wanted
@@ -84,7 +83,7 @@ void ThreeDTriaxialEngine::action()
 		max_vel1 = 0.5*currentStrainRate1*width;
 	}
 
-	
+
 	if(!stressControl_2)  // control in strain if wanted
 	{
 		if ( currentStrainRate2 != strainRate2 ) currentStrainRate2 += ( strainRate2-currentStrainRate2 ) *0.0003;
@@ -116,7 +115,7 @@ void ThreeDTriaxialEngine::action()
 		if ( currentStrainRate3 != strainRate3 ) currentStrainRate3 += ( strainRate3-currentStrainRate3 ) *0.0003;
 		max_vel3 = 0.5*currentStrainRate3*depth;
 	}
-	
+
 	TriaxialStressController::action(); // this function is called to perform the external stress control or the internal compaction
 
 }
@@ -129,7 +128,7 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 		if (b->isDynamic())
 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
-				
+
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
 		if (!ii->isReal()) continue;
 		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId1())]->material);
@@ -138,10 +137,8 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->phys.get());
 		Real fa = sdec1->frictionAngle;
 		Real fb = sdec2->frictionAngle;
-		contactPhysics->frictionAngle			= std::min(fa,fb);
-		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
+		contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
 	}
-  
-} 
+}
 
 

@@ -73,33 +73,33 @@ class TriaxialStressController : public BoundaryController
 		///! Getter for stress in python
 		Vector3r getStress(int boundId);
 
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
-		TriaxialStressController,BoundaryController,"An engine maintaining constant stresses on some boundaries of a parallepipedic packing. See also :yref:`TriaxialCompressionEngine`"
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
+		"An engine maintaining constant stresses on some boundaries of a parallepipedic packing. See also :yref:`TriaxialCompressionEngine`"
 		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
    		((unsigned int,stiffnessUpdateInterval,10,,"target strain rate (./s)"))
    		((unsigned int,radiusControlInterval,10,,""))
 		((unsigned int,computeStressStrainInterval,10,,""))
 		((Real,wallDamping,0.25,,"wallDamping coefficient - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
-		((Real,thickness,-1,,""))
+		((Real,thickness,-1,,"thickness of boxes (needed by some functions)"))
 		((int,wall_bottom_id,0,,"id of boundary ; coordinate 1-"))
 		((int,wall_top_id,0,,"id of boundary ; coordinate 1+"))
 		((int,wall_left_id,0,,"id of boundary ; coordinate 0-"))
 		((int,wall_right_id,0,,"id of boundary ; coordinate 0+"))
 		((int,wall_front_id,0,,"id of boundary ; coordinate 2+"))
 		((int,wall_back_id,0,,"id of boundary ; coordinate 2-"))
-		((bool,wall_bottom_activated,true,,""))
-		((bool,wall_top_activated,true,,""))
-		((bool,wall_left_activated,true,,""))
-		((bool,wall_right_activated,true,,""))
-		((bool,wall_front_activated,true,,""))
-		((bool,wall_back_activated,true,,""))
-		((Real,height,0,,""))
-		((Real,width,0,,""))
-		((Real,depth,0,,""))
-		((Real,height0,0,,""))
-		((Real,width0,0,,""))
-		((Real,depth0,0,,""))
+		((bool,wall_bottom_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((bool,wall_top_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((bool,wall_left_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((bool,wall_right_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((bool,wall_front_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((bool,wall_back_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((Real,height,0,Attr::readonly,"size of the box (1-axis) |yupdate|"))
+		((Real,width,0,Attr::readonly,"size of the box (0-axis) |yupdate|"))
+		((Real,depth,0,Attr::readonly,"size of the box (2-axis) |yupdate|"))
+		((Real,height0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::height`"))
+		((Real,width0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::width`"))
+		((Real,depth0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::depth`"))
 		((Real,sigma_iso,0,,"prescribed confining stress (see :yref:`TriaxialStressController::isAxisymetric`)"))
 		((Real,sigma1,0,,"prescribed stress on axis 1 (see :yref:`TriaxialStressController::isAxisymetric`)"))
 		((Real,sigma2,0,,"prescribed stress on axis 2 (see :yref:`TriaxialStressController::isAxisymetric`)"))
@@ -108,12 +108,12 @@ class TriaxialStressController : public BoundaryController
 		((Real,maxMultiplier,1.001,,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))
 		((Real,max_vel,0.001,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))
-		((Real,previousStress,0,,""))
-		((Real,previousMultiplier,1,,""))
+		((Real,previousStress,0,Attr::readonly,"|yupdate|"))
+		((Real,previousMultiplier,1,Attr::readonly,"|yupdate|"))
 		((bool,internalCompaction,true,,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
-		((Real,meanStress,0,,"Mean stress in the packing."))
-		((Real,volumetricStrain,0,,"Volumetric strain (see :yref:`TriaxialStressController::strain`)."))
-		((Real,externalWork,0,,"Energy provided by boundaries."))
+		((Real,meanStress,0,Attr::readonly,"Mean stress in the packing. |yupdate|"))
+		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`).|yupdate|"))
+		((Real,externalWork,0,Attr::readonly,"Energy provided by boundaries.|yupdate|"))
  		,
 		/* extra initializers */
 		,

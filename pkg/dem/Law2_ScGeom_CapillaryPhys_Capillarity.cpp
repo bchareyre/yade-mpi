@@ -30,13 +30,13 @@ using namespace std;
 
 // Law2_ScGeom_CapillaryPhys_Capillarity::Law2_ScGeom_CapillaryPhys_Capillarity() : GlobalEngine()
 // {
-// 
+//
 //         CapillaryPressure=0;
 //         fusionDetection = false;
 //         binaryFusion = true;
-// 
+//
 // 		  // capillary setup moved to postLoad
-// 
+//
 // }
 
 void Law2_ScGeom_CapillaryPhys_Capillarity::postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&){
@@ -105,8 +105,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         const shared_ptr<Interaction>& interaction = *ii;
                         unsigned int id1 = interaction->getId1();
                         unsigned int id2 = interaction->getId2();
-			
-			
+
+
                         /// interaction geometry search (this test is to compute capillarity only between spheres (probably a better way to do that)
 			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!
                         int geometryIndex2 = (*bodies)[id2]->shape->getClassIndex();
@@ -114,7 +114,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         if (!(geometryIndex1 == geometryIndex2)) continue;
 
                         /// definition of interacting objects (not necessarily in contact)
-	
+
 			Body* b1 = (*bodies)[id1].get();
 			Body* b2 = (*bodies)[id2].get();
 
@@ -128,8 +128,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 
                         /// Interacting Grains:
                         // If you want to define a ratio between YADE sphere size and real sphere size (Rk: OK if no gravity is accounted for)
-                        Real alpha=1; 
-			
+                        Real alpha=1;
+
                         Real R1 = 0;
                         R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->radius1 ) ;
                         Real R2 = 0;
@@ -148,8 +148,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         }
 
 			Real Dinterpol = D/R2;
-			
-			//currentContactPhysics->meniscus=true; /// a way to create menisci everywhere	
+
+			//currentContactPhysics->meniscus=true; /// a way to create menisci everywhere
 
                         /// Suction (Capillary pressure):
 
@@ -159,7 +159,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         /// Capillary solution finder:
                         //cerr << "solution finder " << endl;
 
-                        if ((Pinterpol>=0) && (currentContactPhysics->meniscus==true)) 
+                        if ((Pinterpol>=0) && (currentContactPhysics->meniscus==true))
 			{	//cerr << "Pinterpol = "<< Pinterpol << endl;
                                 MeniscusParameters
                                 solution(capillary->Interpolate(R1,R2,Dinterpol, Pinterpol, currentContactPhysics->currentIndexes));
@@ -176,8 +176,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                                 Real Vinterpol = solution.V;
                                 currentContactPhysics->Vmeniscus = Vinterpol*(R2*R2*R2)/(alpha*alpha*alpha);
 
-                                if (currentContactPhysics->Vmeniscus != 0) { 
-					currentContactPhysics->meniscus = true; 
+                                if (currentContactPhysics->Vmeniscus != 0) {
+					currentContactPhysics->meniscus = true;
 					//cerr <<"currentContactPhysics->meniscus = true;"<<endl;
                                 } else {
 					if (fusionDetection) bodiesMenisciiList.remove((*ii));
@@ -189,30 +189,26 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                                 /// wetting angles
                                 currentContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
                                 currentContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
-
-                                currentContactPhysics->prevNormal = currentContactGeometry->normal;
-
-                        } else if (fusionDetection)
-                                bodiesMenisciiList.remove((*ii));//If the interaction is not real, it should not be in the list
-		} else if (fusionDetection)
-			bodiesMenisciiList.remove((*ii));//
+                        }
+                        else if (fusionDetection) bodiesMenisciiList.remove((*ii));//If the interaction is not real, it should not be in the list
+		} else if (fusionDetection) bodiesMenisciiList.remove((*ii));//
         }
 
         if (fusionDetection) checkFusion();
 
-        for(ii= scene->interactions->begin(); ii!=iiEnd ; ++ii ) 
+        for(ii= scene->interactions->begin(); ii!=iiEnd ; ++ii )
 	{	//cerr << "interaction " << ii << endl;
-                if ((*ii)->isReal()) 
+                if ((*ii)->isReal())
 		{
                         CapillaryPhys* currentContactPhysics	=	static_cast<CapillaryPhys*>((*ii)->phys.get());
-                        if (currentContactPhysics->meniscus) 
+                        if (currentContactPhysics->meniscus)
 			{
-                                if (fusionDetection) 
+                                if (fusionDetection)
 				{//version with effect of fusion
                                         //BINARY VERSION : if fusionNumber!=0 then no capillary force
                                         if (binaryFusion)
 					{
-						if (currentContactPhysics->fusionNumber !=0) 
+						if (currentContactPhysics->fusionNumber !=0)
 						{	//cerr << "fusion" << endl;
                                                         currentContactPhysics->Fcap = Vector3r::Zero();
                                                         continue;
@@ -225,13 +221,10 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			scene->forces.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
 			scene->forces.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
 			//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
-			
+
                         }
 		}
         }
-
-        //if (fusionDetection) bodiesMenisciiList.display();
-        //cerr << "end of capillarylaw" << endl;
 }
 
 capillarylaw::capillarylaw()
@@ -249,7 +242,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
         for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryPhys*>((*ii)->phys.get())->fusionNumber=0;
-	
+
 	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
 	Real angle1, angle2;
 
@@ -264,7 +257,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 				//if (*firstMeniscus)->isReal();
 				CapillaryPhys* interactionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->phys.get());
 				currentMeniscus = firstMeniscus; ++currentMeniscus;
-				
+
 				if (i == (*firstMeniscus)->getId1()) angle1=interactionPhysics1->Delta1;//get angle of meniscus1 on body i
 				else angle1=interactionPhysics1->Delta2;
 
@@ -276,36 +269,36 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 
 					if (angle1==0 || angle2==0) cerr << "THIS SHOULD NOT HAPPEN!!"<< endl;
 
-					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;	
-					
+					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;
+
 					Vector3r normalFirstMeniscus = YADE_CAST<ScGeom*>((*firstMeniscus)->geom.get())->normal;
 					Vector3r normalCurrentMeniscus = YADE_CAST<ScGeom*>((*currentMeniscus)->geom.get())->normal;
-					
+
 					//if (i != (*firstMeniscus)->getId1()) normalFirstMeniscus = -normalFirstMeniscus;
 					//if (i != (*currentMeniscus)->getId1()) normalCurrentMeniscus = -normalCurrentMeniscus;
 					// normal is always from id1 to id2
-					
+
 					Real normalDot = 0;
 					if ((*firstMeniscus)->getId1() ==  (*currentMeniscus)->getId1() ||  (*firstMeniscus)->getId2()  == (*currentMeniscus)->getId2()) normalDot = normalFirstMeniscus.dot(normalCurrentMeniscus);
 					else
 					normalDot = - (normalFirstMeniscus.dot(normalCurrentMeniscus));
-					
+
 					//cerr << "normalDot ="<< normalDot << endl;
-					
+
 					Real normalAngle = 0;
 					if (normalDot >= 0 ) normalAngle = Mathr::FastInvCos0(normalDot);
 					else normalAngle = ((Mathr::PI) - Mathr::FastInvCos0(-(normalDot)));
-					
+
 					//cerr << "sumMeniscAngle= " << (angle1+angle2)<< "| normalAngle" << normalAngle*Mathr::RAD_TO_DEG << endl;
 
 					if ((angle1+angle2)*Mathr::DEG_TO_RAD > normalAngle)
 
 					//if ((angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(normalFirstMeniscus.Dot(normalCurrentMeniscus)))
-					
+
 // 					if (//check here if wet angles are overlaping (check with squares is faster since SquaredLength of cross product gives squared sinus)
 // 					(angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(static_cast<ScGeom*>((*firstMeniscus)->geom.get())->normal
 // 					.Dot(
-// 					static_cast<ScGeom*>((*currentMeniscus)->geom.get())->normal))) 
+// 					static_cast<ScGeom*>((*currentMeniscus)->geom.get())->normal)))
 					{
 						++(interactionPhysics1->fusionNumber); ++(interactionPhysics2->fusionNumber);//count +1 if 2 meniscii are overlaping
 					};
@@ -438,7 +431,7 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
 }
 
 TableauD::TableauD()
-{} 
+{}
 
 TableauD::TableauD(ifstream& file)
 {
@@ -466,12 +459,12 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
 {	//cerr << "interpolate3" << endl;
         MeniscusParameters result;
         int dataSize = data.size();
-        
+
         if (index < dataSize && index>0)
         {
         	if (data[index][1] >= P && data[index-1][1] < P)
         	{
-        		//compteur1+=1;	
+        		//compteur1+=1;
         		Real Pinf=data[index-1][1];
                         Real Finf=data[index-1][3];
                         Real Vinf=data[index-1][2];
@@ -489,10 +482,10 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
                         result.delta1 = Delta1inf+((Delta1sup-Delta1inf)/(Psup-Pinf))*(P-Pinf);
                         result.delta2 = Delta2inf+((Delta2sup-Delta2inf)/(Psup-Pinf))*(P-Pinf);
                         return result;
-        		
+
         	}
         }
-	//compteur2+=1;	
+	//compteur2+=1;
         for (int k=1; k < dataSize; ++k) 	// Length(data) ??
 
         {	//cerr << "k = " << k << endl;
@@ -564,7 +557,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
 	//cerr << "preparing bodiesInteractionsList" << endl;
 	interactionsOnBody.clear();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	
+
 	Body::id_t MaxId = -1;
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
@@ -577,7 +570,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
 	{
 		interactionsOnBody[i].clear();
 	}
-	
+
         InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
@@ -585,7 +578,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
                 	if (static_cast<CapillaryPhys*>((*ii)->phys.get())->meniscus) insert(*ii);
                 }
         }
-                	
+
 	return initialized=true;
 }
 
@@ -593,14 +586,14 @@ bool BodiesMenisciiList::insert(const shared_ptr< Interaction >& interaction)
 {
 	interactionsOnBody[interaction->getId1()].push_back(interaction);
 	interactionsOnBody[interaction->getId2()].push_back(interaction);
-	return true;	
+	return true;
 }
 
 
 bool BodiesMenisciiList::remove(const shared_ptr< Interaction >& interaction)
 {
 	interactionsOnBody[interaction->getId1()].remove(interaction);
-	interactionsOnBody[interaction->getId2()].remove(interaction);	
+	interactionsOnBody[interaction->getId2()].remove(interaction);
 	return true;
 }
 

@@ -54,7 +54,7 @@ class CohesiveTriaxialTest : public FileGenerator
 		~CohesiveTriaxialTest ();
 		virtual bool generate(std::string& message);
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
-		CohesiveTriaxialTest,FileGenerator,"This preprocessor is a variant of TriaxialTest using the cohesive-frictional contact law with moments. It sets up a scene for cohesive triaxial tests. See full documentation at http://yade-dem.org/wiki/TriaxialTest.\n\n Cohesion is initially 0 by default. The suggested usage is to define cohesion values in a second step, after isotropic compaction : define shear and normal cohesions in :yref:`Ip2_2xCohFrictMat_CohFrictPhys`, then turn :yref:`Ip2_2xCohFrictMat_CohFrictPhys`::setCohesionNow true to assign them at each contact at next iteration."
+		CohesiveTriaxialTest,FileGenerator,"This preprocessor is a variant of TriaxialTest using the cohesive-frictional contact law with moments. It sets up a scene for cohesive triaxial tests. See full documentation at http://yade-dem.org/wiki/TriaxialTest.\n\n Cohesion is initially 0 by default. The suggested usage is to define cohesion values in a second step, after isotropic compaction : define shear and normal cohesions in :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys`, then turn :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys`::setCohesionNow true to assign them at each contact at next iteration."
 		,
    		((Vector3r,lowerCorner,Vector3r(0,0,0),,"Lower corner of the box."))
 		((Vector3r,upperCorner,Vector3r(1,1,1),,"Upper corner of the box."))

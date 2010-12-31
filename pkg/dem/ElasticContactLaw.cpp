@@ -12,7 +12,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_Dem3DofGeom_FrictPhys_CundallStrack)(ElasticContactLaw));
+YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(ElasticContactLaw)(Law2_Dem3DofGeom_FrictPhys_CundallStrack));
 
 #if 1
 Real Law2_ScGeom_FrictPhys_CundallStrack::getPlasticDissipation() {return (Real) plasticDissipation;}
@@ -97,7 +97,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	}
 }
 
-// same as elasticContactLaw, but using Dem3DofGeom
+//Same as elasticContactLaw, but using Dem3DofGeom (not maintained)
 void Law2_Dem3DofGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());

@@ -47,9 +47,9 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 	Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
 // 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
 	Real un = currentContactGeometry->penetrationDepth; // >0 for real penetration
-	
+
 // 	cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << currentContactPhysics->previousun << " et previousFn =" << currentContactPhysics->previousFn << endl;
-	
+
 	if(un >= currentContactPhysics->unMax)	// case of virgin load : on the "principal line" (limit state of the (un,Fn) space)
 	{
 		Fn = currentContactPhysics->knLower*un;
@@ -79,7 +79,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 	// actualisation :
 	currentContactPhysics->previousFn = Fn;
 	currentContactPhysics->previousun = un;
-	
+
 // 	*** End of computation of normal force *** //
 
 
@@ -120,12 +120,12 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
                 // 		q.fromAngleAxis(angle,axis);
                 // 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
 
-		
+
                 Vector3r x				= currentContactGeometry->contactPoint;
                 Vector3r c1x				= (x - de1->se3.position);
                 Vector3r c2x				= (x - de2->se3.position);
-                /// The following definition of c1x and c2x is to avoid "granular ratcheting" 
-		///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
+                /// The following definition of c1x and c2x is to avoid "granular ratcheting"
+		///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN,
 		///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
 		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors, or discussions on yade mailing lists)
                 Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
@@ -140,7 +140,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
                 Real maxFs = 0;
                 Real Fs = currentContactPhysics->shearForce.norm();
                 maxFs = std::max((Real) 0,Fn*currentContactPhysics->tangensOfFrictionAngle);
-                
+
                 if ( Fs  > maxFs )
                 {
 			maxFs = max((Real) 0, Fn * currentContactPhysics->tangensOfFrictionAngle);

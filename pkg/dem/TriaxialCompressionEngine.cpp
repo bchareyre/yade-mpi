@@ -18,24 +18,23 @@
 #include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 
-class Ip2_2xCohFrictMat_CohFrictPhys;
+class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys;
 
 CREATE_LOGGER(TriaxialCompressionEngine);
 YADE_PLUGIN((TriaxialCompressionEngine));
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
-{	
+{
 }
 
 void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
-
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
 		previousSigmaIso=sigma_iso;
 	}
 	else if(nextState==STATE_TRIAX_LOADING){
 		sigma_iso=sigmaLateralConfinement;
-		previousSigmaIso=sigma_iso;		
+		previousSigmaIso=sigma_iso;
 		internalCompaction = false;
 		if (frictionAngleDegree>0) setContactProperties(frictionAngleDegree);
 		height0 = height; depth0 = depth; width0 = width;
@@ -53,7 +52,7 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		if (frictionAngleDegree>0) setContactProperties(frictionAngleDegree);
 		if(!firstRun && !noFiles) saveSimulation=true;
 		Phase1End = "Compacted";
-	}	
+	}
 	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING) && nextState==STATE_LIMBO) {
 	//urrentState==STATE_DIE_COMPACTION
 		internalCompaction = false;
@@ -66,12 +65,12 @@ void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 		// Please keep this saving process intact, I'm tired of running 3 days simulations and getting nothing at the end!
 		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::action
 	}
-	else if( nextState==STATE_FIXED_POROSITY_COMPACTION){		
+	else if( nextState==STATE_FIXED_POROSITY_COMPACTION){
 		internalCompaction = false;
 		wall_bottom_activated=false; wall_top_activated=false;
 		wall_front_activated=false; wall_back_activated=false;
 		wall_right_activated=false; wall_left_activated=false;
-	}	
+	}
 	else { LOG_ERROR("Undefined transition from "<<stateName(currentState)<<" to "<<stateName(nextState)<<"! (ignored)"); return; }
 
 	LOG_INFO("State transition from "<<stateName(currentState)<<" to "<<stateName(nextState)<<" done.");
@@ -87,20 +86,15 @@ void TriaxialCompressionEngine::updateParameters ()
 	{
 		if (UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && fixedPoroCompaction==false )
 		{
-			// only go to UNLOADING if it is needed (hard float comparison... :-| )
+			// only go to UNLOADING if it is needed
 			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
 				doStateTransition (STATE_ISO_UNLOADING );
 				computeStressStrain (); // update stress and strain
 			}
-			// Preserve transition from LIMBO to something, I need that! (BC)
 			else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && autoCompressionActivation){
 				doStateTransition (STATE_TRIAX_LOADING );
 				computeStressStrain (); // update stress and strain
 			}
-			// stop simulation if unloaded and compression is not activate automatically
-// 			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
-// 				Omega::instance().pause();
-// 			}
 		}
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
@@ -109,7 +103,6 @@ void TriaxialCompressionEngine::updateParameters ()
 		}
 	}
 }
-
 
 void TriaxialCompressionEngine::action()
 {
@@ -130,7 +123,7 @@ void TriaxialCompressionEngine::action()
 		updateParameters ();
 		maxStress = max(maxStress,stress[wall_top][1]);
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
-	}	
+	}
 	if ( saveSimulation )
 	{
 		if(!noFiles){
@@ -146,12 +139,13 @@ void TriaxialCompressionEngine::action()
 		}
 		saveSimulation = false;
 	}
+	TriaxialStressController::action();
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
-	{		
+	{
 // 		Omega::instance().pause();
 		return;
 	}
-	TriaxialStressController::action();
+
 
 	if ( currentState==STATE_TRIAX_LOADING )
 	{
@@ -161,7 +155,7 @@ void TriaxialCompressionEngine::action()
 		}
 		if (scene->iter % 100 == 0) LOG_DEBUG("Compression active.");
 		const Real& dt = scene->dt;
-		 
+
 		if (abs(epsilonMax) > abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003;
 			/* Move top and bottom wall according to strain rate */
@@ -169,16 +163,11 @@ void TriaxialCompressionEngine::action()
 			p_bottom->pos += 0.5*currentStrainRate*height*translationAxis*dt;
 			State* p_top=Body::byId(wall_top_id,scene)->state.get();
 			p_top->pos -= 0.5*currentStrainRate*height*translationAxis*dt;
-		} else {
-// 			Omega::instance().pause();
 		}
 	}
 	if ( currentState==STATE_FIXED_POROSITY_COMPACTION )
 	{
-		if ( scene->iter % 100 == 0 )
-		{
-			LOG_INFO ("Compression started");
-		}		
+		if ( scene->iter % 100 == 0 ) LOG_INFO ("Compression started");
 		const Real& dt = scene->dt;
 		State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
 		State* p_top=Body::byId(wall_top_id,scene)->state.get();
@@ -195,7 +184,7 @@ void TriaxialCompressionEngine::action()
 		p_left->pos += 0.5*strainRate*width*translationAxisx*dt;
 		p_right->pos -= 0.5*strainRate*width*translationAxisx*dt;
 	}
- 
+
 }
 
 void TriaxialCompressionEngine::setContactProperties(Real frictionDegree)
@@ -213,10 +202,9 @@ void TriaxialCompressionEngine::setContactProperties(Real frictionDegree)
 		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId2())]->material);
 		//FIXME - why dynamic_cast fails here?
 		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->phys.get());
-		Real fa = sdec1->frictionAngle;
-		Real fb = sdec2->frictionAngle;
-		contactPhysics->frictionAngle			= std::min(fa,fb);
-		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
+		const Real& fa = sdec1->frictionAngle;
+		const Real& fb = sdec2->frictionAngle;
+		contactPhysics->tangensOfFrictionAngle = std::tan(std::min(fa,fb));
 	}
-} 
+}
 
