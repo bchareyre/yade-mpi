@@ -165,7 +165,7 @@ import yadeSCons
 if not env.has_key('realVersion') or not env['realVersion']: env['realVersion']=yadeSCons.getRealVersion() or 'unknown' # unknown if nothing returned
 if not env.has_key('version'): env['version']=env['realVersion']
 
-env['SUFFIX']='-'+env['version']+env['variant']
+env['SUFFIX']=('-'+env['version'] if len(env['version'])>0 else '')+env['variant']
 env['SUFFIX_DBG']=env['SUFFIX']+('' if not env['debug'] else '/dbg')
 env['LIBDIR']='$PREFIX/lib/yade$SUFFIX_DBG'
 print "Yade version is `%s' (%s), installed files will be suffixed with `%s'."%(env['version'],env['realVersion'],env['SUFFIX'])

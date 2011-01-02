@@ -46,10 +46,10 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 
 
 	/* from interaction geometry */
-	ScGeom* scg = YADE_CAST<ScGeom*>(interaction->geom.get());
-	Real Da = scg->radius1;
-	Real Db = scg->radius2;
-	Vector3r normal=scg->normal;
+	GenericSpheresContact* scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());		
+	Real Da = scg->refR1; 
+	Real Db = scg->refR2; 
+	Vector3r normal=scg->normal; 
 
 
 	/* calculate stiffness coefficients */

@@ -44,6 +44,10 @@ class MindlinPhys: public FrictPhysTransitory{
 			((Real,betan,0.0,,"Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
 			((Real,betas,0.0,,"Fraction of the viscous damping coefficient (shear direction) equal to $\\frac{c_{s}}{C_{s,crit}}$."))
 
+			// temporary
+			((Vector3r,prevU,Vector3r::Zero(),,"Previous local displacement; only used with :yref:`Law2_L3Geom_FrictPhys_HertzMindlin`."))
+			((Vector2r,Fs,Vector2r::Zero(),,"Shear force in local axes (computed incrementally)"))
+
 			//((Real,shearEnergy,0.0,,"Shear elastic potential energy"))
 			//((Real,frictionDissipation,0.0,,"Energy dissipation due to sliding"))
 			//((Real,normDampDissip,0.0,,"Energy dissipation due to sliding"))

@@ -269,7 +269,7 @@ class SerQLabel(QLabel):
 		if tooltip or path: self.setToolTip(('<b>'+path+'</b><br>' if self.path else '')+(tooltip if tooltip else ''))
 		self.linkActivated.connect(yade.qt.openUrl)
 	def mousePressEvent(self,event):
-		if event.button()!=Qt.MiddleButton:
+		if event.button()!=Qt.MidButton:
 			event.ignore(); return
 		# middle button clicked, paste pasteText to clipboard
 		cb=QApplication.clipboard()

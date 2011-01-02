@@ -179,6 +179,12 @@ void PeriTriaxController::action()
 	bool doUpdate((scene->iter%globUpdate)==0);
 	if(doUpdate || min(stiff[0],min(stiff[1],stiff[2])) <=0 || dynCell){ strainStressStiffUpdate(); }
 
+	// set mass to be sum of masses, if not set by the user
+	if(dynCell && isnan(mass)){
+		mass=0; FOREACH(const shared_ptr<Body>& b, *scene->bodies){ if(b && b->state) mass+=b->state->mass; }
+		LOG_INFO("Setting cell mass to "<<mass<<" automatically.");
+	}
+
 	bool allOk=true;
 	// apply condition along each axis separately (stress or strain)
 	assert(scene->dt>0.);
@@ -242,7 +248,7 @@ void PeriTriaxController::action()
 	//Update energy input
 	Real dW=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->Hsize.determinant();
 	externalWork+=dW;
-	if(scene->trackEnergy) scene->energy->add(dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
+	if(scene->trackEnergy) scene->energy->add(-dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
 	prevGrow = strainRate;
 
 	if(allOk){

@@ -194,6 +194,8 @@ def createPlots(subPlots=True):
 				print 'yade.plot: creating fake plot, since there are no y-data yet'
 				line,=pylab.plot([nan],[nan])
 				currLineRefs.append(LineRef(line,None,[nan],[nan]))
+			# set different color series for y1 and y2 so that they are recognizable
+			pylab.rcParams['axes.color_cycle']='b,g,r,c,m,y,k' if not isY1 else 'm,y,k,b,g,r,c'
 			for d in ySpecs2:
 				yNames.add(d)
 				line,=pylab.plot(data[pStrip],data[d[0]],d[1],label=xlateLabel(d[0]))
@@ -215,7 +217,6 @@ def createPlots(subPlots=True):
 				pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
 				## should be done for y2 as well, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, present in versions .99--1.0.5, and possibly beyond)
 			else:
-				pylab.rcParams['lines.color']=origLinesColor
 				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if (p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2]) else xylabels[p][2])
 			# if there are callable ySpecs, save them inside the axes object, so that the live updater can use those
 			if yNameFuncs:
@@ -226,8 +227,6 @@ def createPlots(subPlots=True):
 			pylab.axvline(linewidth=axesWd,color='k')
 		# create y2 lines, if any
 		if len(plots_p_y2)>0:
-			# try to move in the color palette a little further (magenta is 5th): r,g,b,c,m,y,k
-			origLinesColor=pylab.rcParams['lines.color']; pylab.rcParams['lines.color']='m'
 			pylab.twinx() # create the y2 axis
 			createLines(pStrip,plots_p_y2,isY1=False,y2Exists=True)
 		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
@@ -239,11 +238,12 @@ def liveUpdate(timestamp):
 	liveTimeStamp=timestamp
 	while True:
 		if not live or liveTimeStamp!=timestamp: return
-		figs,axes=set(),set()
+		figs,axes,linesData=set(),set(),set()
 		for l in currLineRefs:
 			l.update()
 			figs.add(l.line.get_figure())
 			axes.add(l.line.get_axes())
+			linesData.add(id(l.ydata))
 		# find callables in y specifiers, create new lines if necessary
 		for ax in axes:
 			if not hasattr(ax,'yadeYFuncs') or not ax.yadeYFuncs: continue # not defined of empty
@@ -253,13 +253,14 @@ def liveUpdate(timestamp):
 			news=yy-ax.yadeYNames
 			if not news: continue
 			for new in news:
+				ax.yadeYNames.add(new)
+				if new in data.keys() and id(data[new]) in linesData: continue # do not add when reloaded and the old lines are already there
 				print 'yade.plot: creating new line for',new
 				if not new in data.keys(): data[new]=[] # create data entry if necessary
 				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
 				scatterPt=(0 if len(data[ax.yadeXName])==0 and not math.isnan(data[ax.yadeXName]) else data[ax.yadeXName][current]),(0 if len(data[new])==0 and not math.isnan(data[new][current]) else data[new][current])
 				scatter=ax.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
 				currLineRefs.append(LineRef(line,scatter,data[ax.yadeXName],data[new]))
-				ax.yadeYNames.add(new)
 				ax.set_ylabel(ax.get_ylabel()+(', ' if ax.get_ylabel() else '')+xlateLabel(new))
 			# it is possible that the legend has not yet been created
 			l=ax.legend(loc=ax.yadeLabelLoc)
@@ -277,7 +278,7 @@ def liveUpdate(timestamp):
 		time.sleep(liveInterval)
 	
 
-def plot(noShow=False,subPlots=False):
+def plot(noShow=False,subPlots=True):
 	"""Do the actual plot, which is either shown on screen (and nothing is returned: if *noShow* is ``False``) or, if *noShow* is ``True``, returned as matplotlib's Figure object or list of them.
 	
 	You can use 
