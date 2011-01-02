@@ -139,8 +139,10 @@ class LineRef:
 			x,y=[self.xdata[current]],[self.ydata[current]]
 		except IndexError: x,y=0,0
 		# this could be written in a nicer way, very likely
-		pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
-		if self.scatter: self.scatter.set_offsets(pt)
+		try:
+			pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
+			if self.scatter: self.scatter.set_offsets(pt)
+		except TypeError: pass # this happens at i386 with empty data, saying TypeError: buffer is too small for requested array
 
 currLineRefs=[]
 liveTimeStamp=0 # timestamp when live update was started, so that the old thread knows to stop if that changes
