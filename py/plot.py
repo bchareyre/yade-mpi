@@ -195,7 +195,7 @@ def createPlots(subPlots=True):
 				line,=pylab.plot([nan],[nan])
 				currLineRefs.append(LineRef(line,None,[nan],[nan]))
 			# set different color series for y1 and y2 so that they are recognizable
-			pylab.rcParams['axes.color_cycle']='b,g,r,c,m,y,k' if not isY1 else 'm,y,k,b,g,r,c'
+			if pylab.rcParams.has_key('axes.color_cycle'): pylab.rcParams['axes.color_cycle']='b,g,r,c,m,y,k' if not isY1 else 'm,y,k,b,g,r,c'
 			for d in ySpecs2:
 				yNames.add(d)
 				line,=pylab.plot(data[pStrip],data[d[0]],d[1],label=xlateLabel(d[0]))
