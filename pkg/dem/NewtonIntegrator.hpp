@@ -23,6 +23,7 @@ class VelocityBins;
 
 class NewtonIntegrator : public GlobalEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A);
+	inline void blockDOFs(State* state, const bool& rotational);
 	inline void saveMaximaVelocity(const Body::id_t& id, State* state);
 	bool haveBins;
 	inline void leapfrogTranslate(State*, const Body::id_t& id, const Real& dt); // leap-frog translate
@@ -49,7 +50,7 @@ class NewtonIntegrator : public GlobalEngine{
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
-		virtual void action();		
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))
 		((Real,maxVelocitySq,NaN,,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
