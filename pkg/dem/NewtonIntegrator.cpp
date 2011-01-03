@@ -136,13 +136,17 @@ void NewtonIntegrator::action()
 			}
 
 			if (likely(b->isStandalone())){
-				state->accel=computeAccel(f,state->mass,state->blockedDOFs);
-				cundallDamp(dt,f,fluctVel,state->accel);
+				if (state->blockedDOFs!=State::DOF_ALL) {
+					state->accel=computeAccel(f,state->mass,state->blockedDOFs);
+					cundallDamp(dt,f,fluctVel,state->accel);
+					state->vel+=dt*state->accel;}
 				leapfrogTranslate(state,id,dt);
-				// exactAsphericalRot is disabled or the body is spherical
-				if (likely(!exactAsphericalRot || !b->isAspherical() || b->state->inertia.minCoeff()<=0.)){
-					state->angAccel=computeAngAccel(m,state->inertia,state->blockedDOFs);
-					cundallDamp(dt,m,state->angVel,state->angAccel);
+				// exactAsphericalRot is disabled, or the body is spherical, or it is aspherical with all DOF's blocked. Note (BC) : do we need the last test?
+				if (likely(!exactAsphericalRot || !b->isAspherical() || state->blockedDOFs==State::DOF_ALL || state->inertia.minCoeff()<=0.)){
+					if (state->blockedDOFs!=State::DOF_ALL) {
+						state->angAccel=computeAngAccel(m,state->inertia,state->blockedDOFs);
+						cundallDamp(dt,m,state->angVel,state->angAccel);
+						state->angVel+=dt*state->angAccel;}
 					leapfrogSphericalRotate(state,id,dt);
 				} else { // exactAsphericalRot enabled & aspherical body
 					// damp the torque
@@ -153,9 +157,9 @@ void NewtonIntegrator::action()
 				// aspherical if allowed, if the body is aspherical, has no zero inertia term (->NaN) and has at least one rotational DOF unblocked
 				const bool aspherical=(exactAsphericalRot && b->isAspherical() && b->state->inertia.maxCoeff()>0 && ((state->blockedDOFs&State::DOF_RXRYRZ)!=State::DOF_RXRYRZ));
 				Vector3r M(m); // torque on the clump itself, aspherical only
-				state->accel=computeAccel(f,state->mass,state->blockedDOFs); cundallDamp(dt,f,fluctVel,state->accel);
-				if(!aspherical){ state->angAccel=computeAngAccel(M,state->inertia,state->blockedDOFs); cundallDamp(dt,m,state->angVel,state->angAccel); }
 				if(state->blockedDOFs!=State::DOF_ALL){ // if the clump has all DoFs blocked, forces on members would be computed uselessly
+					state->accel=computeAccel(f,state->mass,state->blockedDOFs); cundallDamp(dt,f,fluctVel,state->accel);
+					if(!aspherical){ state->angAccel=computeAngAccel(M,state->inertia,state->blockedDOFs); cundallDamp(dt,m,state->angVel,state->angAccel); }
 					FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
@@ -164,11 +168,13 @@ void NewtonIntegrator::action()
 						if(aspherical) M+=clumpMemberTorque(memberId,memberState,state);
 						else state->angAccel+=clumpMemberAngAccel(memberId,memberState,state);
 					}
+					state->vel+=dt*state->accel;
+					state->angVel+=dt*state->angAccel;
 				}
 				// translation
 				leapfrogTranslate(state,id,dt);
-				// rotation
-				if(aspherical) leapfrogAsphericalRotate(state,id,dt,M);
+				// rotation (asphericalRotate will not keep velocity constant if State::DOF_ALL, so we skip it in this special case)
+				if(aspherical && state->blockedDOFs!=State::DOF_ALL) leapfrogAsphericalRotate(state,id,dt,M);
 				else leapfrogSphericalRotate(state,id,dt);
 				// move individual members of the clump, save maxima velocity (for collider stride)
 				FOREACH(Clump::MemberMap::value_type mm, b->shape->cast<Clump>().members){
@@ -206,16 +212,13 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 	} else if (homoDeform==Cell::HOMO_POS){
 		state->pos+=scene->cell->velGrad*state->pos*dt;
 	}
-	state->vel+=dt*state->accel;
 	state->pos+=state->vel*dt;
 }
 
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
 {
-	state->angVel+=dt*state->angAccel;
 	Vector3r axis = state->angVel;
-
-	if (axis!=Vector3r::Zero()) {							//If we have an angular velocity, we make a rotation
+	if (axis!=Vector3r::Zero()) {//If we have an angular velocity, we make a rotation
 		Real angle=axis.norm(); axis/=angle;
 		Quaternionr q(AngleAxisr(angle*dt,axis));
 		state->ori = q*state->ori;
