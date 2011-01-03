@@ -158,8 +158,6 @@ void NewtonIntegrator::action()
 				const bool aspherical=(exactAsphericalRot && b->isAspherical() && b->state->inertia.maxCoeff()>0 && ((state->blockedDOFs&State::DOF_RXRYRZ)!=State::DOF_RXRYRZ));
 				Vector3r M(m); // torque on the clump itself, aspherical only
 				if(state->blockedDOFs!=State::DOF_ALL){ // if the clump has all DoFs blocked, forces on members would be computed uselessly
-					state->accel=computeAccel(f,state->mass,state->blockedDOFs); cundallDamp(dt,f,fluctVel,state->accel);
-					if(!aspherical){ state->angAccel=computeAngAccel(M,state->inertia,state->blockedDOFs); cundallDamp(dt,m,state->angVel,state->angAccel); }
 					FOREACH(Clump::MemberMap::value_type mm, static_cast<Clump*>(b->shape.get())->members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember());
@@ -168,8 +166,12 @@ void NewtonIntegrator::action()
 						if(aspherical) M+=clumpMemberTorque(memberId,memberState,state);
 						else state->angAccel+=clumpMemberAngAccel(memberId,memberState,state);
 					}
+					state->accel=computeAccel(f,state->mass,state->blockedDOFs); cundallDamp(dt,f,fluctVel,state->accel);
+					if(!aspherical){
+						state->angAccel+=computeAngAccel(M,state->inertia,state->blockedDOFs);
+						cundallDamp(dt,m,state->angVel,state->angAccel);
+						state->angVel+=dt*state->angAccel;}
 					state->vel+=dt*state->accel;
-					state->angVel+=dt*state->angAccel;
 				}
 				// translation
 				leapfrogTranslate(state,id,dt);
