@@ -1,14 +1,52 @@
-This package was debianized by Vaclav Smilauer <eudoxos@arcig.cz> on
-Thu,  8 Mar 2007 11:44:19 +0100.
+This work was packaged for Debian by:
 
-It was downloaded from svn://svn.berlios.de/yade/branches/scons-layout
+    Vaclav Smilauer <eudoxos@arcig.cz> on Thu,  8 Mar 2007 11:44:19 +0100
 
-Upstream Author: Yade developers <yade-dev@lists.berliios.de>
+It was downloaded from:
 
-Copyright: 2004-2007 Yade develpers
+    https://launchpad.net/yade/+download
 
-License: GNU GPLv2 (/usr/share/common-licenses/GPL-2)
+Upstream Author(s):
 
-The Debian packaging is (C) 2007, Vaclav Smilauer <eudoxos@arcig.cz> and
-is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+    Václav Šmilauer <eudoxos@arcig.cz>
+    Olivier Galizzi <olivier.galizzi@imag.fr>
+    Janek Kozicki <janek@kozicki.pl>
+    Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+    Anton Gladky <gladky.anton@gmail.com>
+    Sergei Dorofeenko <dorofeenko@icp.ac.ru>
+    Jerome Duriez <duriez@geo.hmg.inpg.fr>
+    Vincent Richefeu <richefeu@gmail.com>
+    Chiara Modenese <c.modenese@gmail.com>
+    Boon Chiaweng <booncw@hotmail.com>
+    Emanuele Catalano <catalano@hmg.inpg.fr>
+    Luc Scholtes <lscholtes63@gmail.com>
+    Jan Stránský <_honzik@centrum.cz>
+    Luc Sibille <luc.sibille@univ-nantes.fr>
+    Feng Chen <fchen3@utk.edu>
 
+Copyright:
+
+    Copyright (C) 2004-2011 <yade-dev@lists.launchpad.net>
+
+License:
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License with
+    the Debian GNU/Linux distribution in file /usr/share/common-licenses/GPL;
+    if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+    Suite 330, Boston, MA  02111-1307  USA
+    
+    On Debian systems, the complete text of the GNU General Public License, 
+    version 2, can be found in /usr/share/common-licenses/GPL-2.
+
+The Debian packaging is:
+
+    Copyright (C) 2011 Anton Gladky <gladky.anton@gmail.com>

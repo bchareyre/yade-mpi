@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Václav Šmilauer <eudoxos@arcig.cz>
 Build-Depends: debhelper (>= 5), scons, freeglut3-dev, libboost-dev (>=1.35), libboost-date-time-dev (>=1.35), libboost-filesystem-dev (>=1.35), libboost-thread-dev (>=1.35), libboost-regex-dev (>=1.35), libboost-python-dev (>=1.35), libboost-iostreams-dev (>=1.35), libboost-program-options-dev, libboost-serialization-dev, libloki-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libgts-dev, python-numpy, g++(>>4.0), libvtk5-dev, libgl1-mesa-dev, gdb, ipython, python-matplotlib, python-tk, libeigen2-dev, libqglviewer-qt4-dev @', binutils-gold' if DISTRIBUTION not in ('hardy','intrepid','jaunty','lenny') else ''@ @', texlive-latex-recommended, texlive-latex-extra, lmodern, texlive-pictures, texlive-xetex, python-sphinx (>=0.99), python-bibtex, graphviz, dvipng' if DISTRIBUTION not in ('hardy','intrepid','jaunty','lenny') else ''@, python-xlib, python-qt4, pyqt4-dev-tools, clang
-Standards-Version: 3.7.2
+Standards-Version: 3.9.1
 
 Package: yade@_VERSION@
 Architecture: any
@@ -36,7 +36,7 @@ Description: Platform for discrete element modeling.
 Package: yade@_VERSION@-doc
 Architecture: all
 Recommends: yade@_VERSION@ | yade@_VERSION@-dbg
-Depends: 
+Depends: ${misc:Depends}
 Description: Platform for discrete element modeling.
  Yet Another Dynamic Engine.
  Extensible open-source framework for discrete numerical models, 
@@ -50,7 +50,7 @@ Description: Platform for discrete element modeling.
 
 Package: yade@SNAPSHOT@
 Architecture: all
-Depends: yade@_VERSION@
+Depends: yade@_VERSION@, ${misc:Depends}
 Description: Platform for discrete element modeling.
  Yet Another Dynamic Engine.
  Extensible open-source framework for discrete numerical models, 
@@ -65,7 +65,7 @@ Description: Platform for discrete element modeling.
 
 Package: yade@SNAPSHOT@-dbg
 Architecture: all
-Depends: yade@_VERSION@-dbg
+Depends: yade@_VERSION@-dbg, yade@_VERSION@, ${misc:Depends}
 Description: Platform for discrete element modeling.
  Yet Another Dynamic Engine.
  Extensible open-source framework for discrete numerical models, 
@@ -80,7 +80,7 @@ Description: Platform for discrete element modeling.
 
 Package: yade@SNAPSHOT@-doc
 Architecture: all
-Depends: yade@_VERSION@-doc
+Depends: yade@_VERSION@-doc, ${misc:Depends}
 Description: Platform for discrete element modeling.
  Yet Another Dynamic Engine.
  Extensible open-source framework for discrete numerical models, 
