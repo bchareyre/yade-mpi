@@ -231,7 +231,9 @@ BOOST_PYTHON_MODULE(_customConverters){
 		VECTOR_SEQ_CONV(shared_ptr<IPhysFunctor>);
 		VECTOR_SEQ_CONV(shared_ptr<LawFunctor>);
 		VECTOR_SEQ_CONV(shared_ptr<IntrCallback>);
-		VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
+		#ifdef YADE_BODY_CALLBACK
+			VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
+		#endif
 		VECTOR_SEQ_CONV(shared_ptr<SpherePack>);
 		VECTOR_SEQ_CONV(shared_ptr<KinematicEngine>);
 		#ifdef YADE_OPENGL

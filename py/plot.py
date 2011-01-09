@@ -260,7 +260,7 @@ def liveUpdate(timestamp):
 				print 'yade.plot: creating new line for',new
 				if not new in data.keys(): data[new]=[] # create data entry if necessary
 				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
-				scatterPt=(0 if len(data[ax.yadeXName])==0 and not math.isnan(data[ax.yadeXName]) else data[ax.yadeXName][current]),(0 if len(data[new])==0 and not math.isnan(data[new][current]) else data[new][current])
+				scatterPt=(0 if len(data[ax.yadeXName])==0 or math.isnan(data[ax.yadeXName][current]) else data[ax.yadeXName][current]),(0 if len(data[new])==0 or math.isnan(data[new][current]) else data[new][current])
 				scatter=ax.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
 				currLineRefs.append(LineRef(line,scatter,data[ax.yadeXName],data[new]))
 				ax.set_ylabel(ax.get_ylabel()+(', ' if ax.get_ylabel() else '')+xlateLabel(new))
@@ -402,6 +402,8 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		fPlot.write("set datafile missing 'nan'\n")
 		if title: fPlot.write("set title '%s'\n"%title)
 		y1=True; plots_y1,plots_y2=[],[]
+		# replace callable data specifiers by the rults, it that particular data exists
+		plots_p=sum([([(pp,'') for pp in p[0]() if pp in data.keys()] if callable(p[0]) else [(p[0],p[1])] ) for p in plots_p],[])
 		for d in plots_p:
 			if d[0]=='|||' or d[0]==None:
 				y1=False; continue

@@ -27,16 +27,6 @@ class RpmState: public State {
 };
 REGISTER_SERIALIZABLE(RpmState);
 
-class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
-	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
-		FUNCTOR2D(Dem3DofGeom,RpmPhys);
-		
-	YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_RockPMPhys_Rpm,LawFunctor,"Constitutive law for the Rpm model");
-	DECLARE_LOGGER;	
-};
-REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
-
 /** This class holds information associated with each body */
 class RpmMat: public FrictMat {
 		public:
@@ -90,3 +80,15 @@ class RpmPhys: public NormShearPhys {
 	REGISTER_CLASS_INDEX(RpmPhys,NormShearPhys);
 };
 REGISTER_SERIALIZABLE(RpmPhys);
+
+class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
+	public:
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		FUNCTOR2D(Dem3DofGeom,RpmPhys);
+		
+	YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_RockPMPhys_Rpm,LawFunctor,"Constitutive law for the Rpm model");
+	DECLARE_LOGGER;	
+};
+REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
+
+

@@ -12,6 +12,7 @@
 #include<yade/core/Interaction.hpp>
 
 #include<yade/pkg/common/Aabb.hpp>
+#include<yade/pkg/dem/Clump.hpp>
 #include<yade/pkg/common/InsertionSortCollider.hpp>
 
 #include<yade/pkg/common/Box.hpp>
@@ -156,12 +157,17 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b || !b->isDynamic()) continue;
-		currF=rb->forces.getForce(b->id).norm(); maxF=max(currF,maxF); sumF+=currF; nb++;
+		if(!b || b->isClumpMember() || !b->isDynamic()) continue;
+		if(!b->isClump()){ currF=rb->forces.getForce(b->id).norm(); }
+		else { // for clump, sum forces from members on the clump itself
+			Vector3r f(rb->forces.getForce(b->id)),m(Vector3r::Zero());
+			b->shape->cast<Clump>().addForceTorqueFromMembers(b->state.get(),rb,f,m);
+			currF=f.norm();
+		}
+		maxF=max(currF,maxF); sumF+=currF; nb++;
 	}
 	Real meanF=sumF/nb;
 	// get max force on contacts
-	// Real maxContactF=0; 										//It gave a warning. Anton Gladky.
 	sumF=0; nb=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
@@ -293,7 +299,7 @@ Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume){
 }
 
 
-vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& minXYZ, Vector3r& maxXYZ){
+vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
 	if(!boost::filesystem::exists(fname)) {
 		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");
 	}
@@ -307,19 +313,16 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& m
 	while(std::getline(sphereFile, line, '\n')){
 		lineNo++;
 		boost::tokenizer<boost::char_separator<char> > toks(line,boost::char_separator<char>(" \t"));
-		int i=0;
-		FOREACH(const string& s, toks){
-			if(i<3) C[i]=lexical_cast<Real>(s);
-			if(i==3) r=lexical_cast<Real>(s);
-			i++;
+		vector<string> tokens; FOREACH(const string& s, toks) tokens.push_back(s);
+		if(tokens.empty()) continue;
+		if(tokens[0]=="##PERIODIC::"){
+			if(tokens.size()!=4) throw std::invalid_argument(("Spheres file "+fname+":"+lexical_cast<string>(lineNo)+" contains ##PERIODIC::, but the line is malformed.").c_str());
+			if(cellSize){ *cellSize=Vector3r(lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]),lexical_cast<Real>(tokens[3])); }
+			continue;
 		}
-		if(i==0) continue; // empty line, skipped (can be the last one)
-		// Wenjie's format: 5 per line are boxes, which should be skipped
-		if(i==5) continue;
-		if((i!=4) and (i!=6)) {
-			LOG_ERROR("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(i)+" columns instead of 0,4,5 or 6.");
-			LOG_ERROR("The result may be garbage!");
-		}
+		if(tokens.size()!=4) throw std::invalid_argument(("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(tokens.size())+" columns (must be 4).").c_str());
+		C=Vector3r(lexical_cast<Real>(tokens[0]),lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]));
+		r=lexical_cast<Real>(tokens[3]);
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
 		spheres.push_back(pair<Vector3r,Real>(C,r));
 	}

@@ -5,6 +5,7 @@
 #pragma once
 
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 
 class Ig2_Sphere_Sphere_ScGeom: public IGeomFunctor{
 	public:

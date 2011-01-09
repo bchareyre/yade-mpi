@@ -9,6 +9,7 @@
 #pragma once
 
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/CohFrictMat.hpp>
 
 class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys : public IPhysFunctor
 {

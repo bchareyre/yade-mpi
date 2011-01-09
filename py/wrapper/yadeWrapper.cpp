@@ -421,6 +421,7 @@ class pyOmega{
 		}
 	}
 
+
 	vector<shared_ptr<Engine> > engines_get(void){assertScene(); Scene* scene=OMEGA.getScene().get(); return scene->_nextEngines.empty()?scene->engines:scene->_nextEngines;}
 	void engines_set(const vector<shared_ptr<Engine> >& egs){
 		assertScene(); Scene* scene=OMEGA.getScene().get();

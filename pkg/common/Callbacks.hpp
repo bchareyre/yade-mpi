@@ -24,13 +24,15 @@ class IntrCallback: public Serializable{
 };
 REGISTER_SERIALIZABLE(IntrCallback);
 
-class BodyCallback: public Serializable{
-	public:
-	virtual ~BodyCallback(); // vtable
-	typedef void(*FuncPtr)(BodyCallback*,Body*);
-	// set at every step, before stepInit() is called
-	Scene* scene;
-	virtual FuncPtr stepInit(){ throw std::runtime_error("Called BodyCallback::stepInit() of the base class?"); }
-	YADE_CLASS_BASE_DOC(BodyCallback,Serializable,"Abstract callback object which will be called for every :yref:`Body` after being processed by :yref:`NewtonIntegrator`. See :yref:`IntrCallback` for details.");
-};
-REGISTER_SERIALIZABLE(BodyCallback);
+#ifdef YADE_BODY_CALLBACKS
+	class BodyCallback: public Serializable{
+		public:
+		virtual ~BodyCallback(); // vtable
+		typedef void(*FuncPtr)(BodyCallback*,Body*);
+		// set at every step, before stepInit() is called
+		Scene* scene;
+		virtual FuncPtr stepInit(){ throw std::runtime_error("Called BodyCallback::stepInit() of the base class?"); }
+		YADE_CLASS_BASE_DOC(BodyCallback,Serializable,"Abstract callback object which will be called for every :yref:`Body` after being processed by :yref:`NewtonIntegrator`. See :yref:`IntrCallback` for details.");
+	};
+	REGISTER_SERIALIZABLE(BodyCallback);
+#endif

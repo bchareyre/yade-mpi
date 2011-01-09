@@ -9,6 +9,7 @@
 #pragma once
 
 #include<yade/pkg/common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/Facet.hpp>
 
 class Gl1_Facet : public GlShapeFunctor
 {	

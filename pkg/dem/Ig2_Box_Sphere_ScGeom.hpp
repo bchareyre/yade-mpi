@@ -11,7 +11,10 @@
 *************************************************************************/
 
 #pragma once
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
+
 
 class Ig2_Box_Sphere_ScGeom : public IGeomFunctor
 {

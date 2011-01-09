@@ -32,7 +32,6 @@ class TestEngines(unittest.TestCase):
 		# when substepping is turned off in the middle of the loop, the next step finishes the loop
 		O.subStepping=False
 		O.step(); self.assert_(O.subStep==-1)
-		print 'substep is',O.subStep
 		# subStep==0 inside the loop without substepping
 		O.engines=[PyRunner(initRun=True,iterPeriod=1,command='if O.subStep!=0: raise RuntimeError("O.subStep!=0 inside the loop with O.subStepping==False!")')]
 		O.step()

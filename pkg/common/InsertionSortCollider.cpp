@@ -102,7 +102,7 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		if(nBins<=0){
 			if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
 			fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*scene->dt;
-			if(fastestBodyMaxDist>=sweepLength) return true;
+			if(fastestBodyMaxDist>=verletDist) return true;
 		}
 		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
@@ -160,32 +160,44 @@ void InsertionSortCollider::action(){
 		// update bounds via boundDispatcher
 		boundDispatcher->scene=scene;
 		boundDispatcher->action();
+
+		if(verletDist<0){
+			Real minR=std::numeric_limits<Real>::infinity();
+			FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+				if(!b || !b->shape) continue;
+				Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
+				if(!s) continue;
+				minR=min(s->radius,minR);
+			}
+			// if no spheres, disable stride
+			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
+		}
 		
 
 		// STRIDE
-			if(sweepLength>0){
+			if(verletDist>0){
 				// get NewtonIntegrator, to ask for the maximum velocity value
 				if(!newton){
 					FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
-					if(!newton){ throw runtime_error("InsertionSortCollider.sweepLength>0, but unable to locate NewtonIntegrator within O.engines."); }
+					if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 				}
 			}
 	ISC_CHECKPOINT("init");
 
 		// STRIDE
 			// get us ready for strides, if they were deactivated
-			if(!strideActive && sweepLength>0 && newton->maxVelocitySq>=0){ // maxVelocitySq is a really computed value
+			if(!strideActive && verletDist>0 && newton->maxVelocitySq>=0){ // maxVelocitySq is a really computed value
 				strideActive=true;
 			}
 			if(strideActive){
-				assert(sweepLength>0);
+				assert(verletDist>0);
 				if(nBins<=0){
 					// reset bins, in case they were active but are not anymore
 					if(newton->velocityBins) newton->velocityBins=shared_ptr<VelocityBins>(); if(boundDispatcher->velocityBins) boundDispatcher->velocityBins=shared_ptr<VelocityBins>();
 					assert(strideActive); assert(newton->maxVelocitySq>=0); assert(sweepFactor>1.);
 					Real sweepVelocity=sqrt(newton->maxVelocitySq)*sweepFactor; int stride=-1;
 					if(sweepVelocity>0) {
-						stride=max(1,int((sweepLength/sweepVelocity)/scene->dt));
+						stride=max(1,int((verletDist/sweepVelocity)/scene->dt));
 						boundDispatcher->sweepDist=scene->dt*(stride-1)*sweepVelocity;
 					} else { // no motion
 						boundDispatcher->sweepDist=0; // nothing moves, no need to make bboxes larger
@@ -199,7 +211,7 @@ void InsertionSortCollider::action(){
 					newton->velocityBins->nBins=nBins; newton->velocityBins->binCoeff=binCoeff; newton->velocityBins->binOverlap=binOverlap; newton->velocityBins->maxRefRelStep=maxRefRelStep; newton->velocityBins->histInterval=histInterval;  
 					boundDispatcher->sweepDist=0; // not used with bins at all
 					// re-bin bodies
-					newton->velocityBins->setBins(scene,newton->maxVelocitySq,sweepLength);
+					newton->velocityBins->setBins(scene,newton->maxVelocitySq,verletDist);
 				}
 			} else { /* !strideActive */
 				boundDispatcher->sweepDist=0;

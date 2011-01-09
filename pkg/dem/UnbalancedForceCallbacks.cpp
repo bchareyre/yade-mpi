@@ -4,7 +4,11 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((SumIntrForcesCb)(SumBodyForcesCb));
+YADE_PLUGIN((SumIntrForcesCb)
+#ifdef YADE_BODY_CALLBACK
+	(SumBodyForcesCb)
+#endif
+);
 
 IntrCallback::FuncPtr SumIntrForcesCb::stepInit(){
 	// if(scene->iter%100 != 0) return NULL;
@@ -27,19 +31,21 @@ void SumIntrForcesCb::go(IntrCallback* _self, Interaction* i){
 	//cerr<<"[cb#"<<i->getId1()<<"+"<<i->getId2()<<"]";
 }
 
-BodyCallback::FuncPtr SumBodyForcesCb::stepInit(){
-	cerr<<"{"<<(Real)force<<","<<(int)numBodies<<",this="<<this<<",scene="<<scene<<",forces="<<&(scene->forces)<<"}";
-	force.reset(); numBodies.reset(); // reset accumulators
-	return &SumBodyForcesCb::go;
-}
-void SumBodyForcesCb::go(BodyCallback* _self, Body* b){
-	if(b->state->blockedDOFs==State::DOF_ALL) return;
-	SumBodyForcesCb* self=static_cast<SumBodyForcesCb*>(_self);
-#ifdef YADE_OPENMP
-	cerr<<"["<<omp_get_thread_num()<<",#"<<b->id<<",scene="<<self->scene<<"]";
+#ifdef YADE_BODY_CALLBACK
+	BodyCallback::FuncPtr SumBodyForcesCb::stepInit(){
+		cerr<<"{"<<(Real)force<<","<<(int)numBodies<<",this="<<this<<",scene="<<scene<<",forces="<<&(scene->forces)<<"}";
+		force.reset(); numBodies.reset(); // reset accumulators
+		return &SumBodyForcesCb::go;
+	}
+	void SumBodyForcesCb::go(BodyCallback* _self, Body* b){
+		if(b->state->blockedDOFs==State::DOF_ALL) return;
+		SumBodyForcesCb* self=static_cast<SumBodyForcesCb*>(_self);
+	#ifdef YADE_OPENMP
+		cerr<<"["<<omp_get_thread_num()<<",#"<<b->id<<",scene="<<self->scene<<"]";
+	#endif
+		cerr<<"[force="<<self->scene->forces.getForce(b->id)<<"]";
+		self->numBodies+=1;
+		//self->scene->forces.sync();
+		self->force+=self->scene->forces.getForce(b->id).norm();
+	}
 #endif
-	cerr<<"[force="<<self->scene->forces.getForce(b->id)<<"]";
-	self->numBodies+=1;
-	//self->scene->forces.sync();
-	self->force+=self->scene->forces.getForce(b->id).norm();
-}

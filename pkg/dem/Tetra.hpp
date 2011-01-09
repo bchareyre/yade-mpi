@@ -47,7 +47,7 @@ class TTetraGeom: public IGeom{
 			((Vector3r,normal,,,"Normal of the interaction, directed in the sense of least inertia of the overlap volume")),
 			createIndex();
 		);
-		FUNCTOR2D(Tetra,Tetra);
+		//FUNCTOR2D(Tetra,Tetra);
 		REGISTER_CLASS_INDEX(TTetraGeom,IGeom);
 };
 REGISTER_SERIALIZABLE(TTetraGeom);

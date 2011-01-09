@@ -46,7 +46,7 @@ class Shop{
 		static shared_ptr<FrictMat> defaultGranularMat();
 
 		//! Return vector of pairs (center,radius) loaded from a file with numbers inside
-		static vector<pair<Vector3r,Real> > loadSpheresFromFile(string fname,Vector3r& minXYZ, Vector3r& maxXYZ);
+		static vector<pair<Vector3r,Real> > loadSpheresFromFile(const string& fname,Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize=NULL);
 		
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);

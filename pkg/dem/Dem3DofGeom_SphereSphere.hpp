@@ -1,5 +1,6 @@
 #pragma once
 #include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 
 class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 	public:

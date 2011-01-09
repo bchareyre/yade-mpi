@@ -4,6 +4,7 @@
 #include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/core/Scene.hpp>
 #ifdef YADE_OPENGL

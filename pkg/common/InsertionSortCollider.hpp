@@ -112,7 +112,7 @@ class InsertionSortCollider: public Collider{
 		// we need this to find out about current maxVelocitySq
 		shared_ptr<NewtonIntegrator> newton;
 		// if False, no type of striding is used
-		// if True, then either sweepLength XOR nBins is set
+		// if True, then either verletDist XOR nBins is set
 		bool strideActive;
 	struct VecBounds{
 		// axis set in the ctor
@@ -176,7 +176,7 @@ class InsertionSortCollider: public Collider{
 	vector<Body::id_t> probeBoundingVolume(const Bound&);
 
 	virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InsertionSortCollider,Collider,"\
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(InsertionSortCollider,Collider,"\
 		Collider with O(n log(n)) complexity, using :yref:`Aabb` for bounds.\
 		\n\n\
 		At the initial step, Bodies' bounds (along sortAxis) are first std::sort'ed along one axis (sortAxis), then collided. The initial sort has :math:`O(n^2)` complexity, see `Colliders' performance <https://yade-dem.org/index.php/Colliders_performace>`_ for some information (There are scripts in examples/collider-perf for measurements). \
@@ -193,21 +193,23 @@ class InsertionSortCollider: public Collider{
 		\n\n \
 		**Stride** can be used to avoid running collider at every step by enlarging the particle's bounds, tracking their velocities and only re-run if they might have gone out of that bounds (see `Verlet list <http://en.wikipedia.org/wiki/Verlet_list>`_ for brief description and background) . This requires cooperation from :yref:`NewtonIntegrator` as well as :yref:`BoundDispatcher`, which will be found among engines automatically (exception is thrown if they are not found).\
 		\n\n \
-		If you wish to use strides, set ``sweepLength`` (length by which bounds will be enlarged in all directions) to some value, e.g. 0.05 × typical particle radius. This parameter expresses the tradeoff between many potential interactions (running collider rarely, but with longer exact interaction resolution phase) and few potential interactions (running collider more frequently, but with less exact resolutions of interactions); it depends mainly on packing density and particle radius distribution.\
+		If you wish to use strides, set ``verletDist`` (length by which bounds will be enlarged in all directions) to some value, e.g. 0.05 × typical particle radius. This parameter expresses the tradeoff between many potential interactions (running collider rarely, but with longer exact interaction resolution phase) and few potential interactions (running collider more frequently, but with less exact resolutions of interactions); it depends mainly on packing density and particle radius distribution.\
 		\n\n \
-		If you additionally set ``nBins`` to >=1, not all particles will have their bound enlarged by ``sweepLength``; instead, they will be put to bins (in the statistical sense) based on magnitude of their velocity; ``sweepLength`` will only be used for particles in the fastest bin, whereas only proportionally smaller length will be used for slower particles; The coefficient between bin's velocities is given by ``binCoeff``.\
+		If you additionally set ``nBins`` to >=1, not all particles will have their bound enlarged by ``verletDist``; instead, they will be put to bins (in the statistical sense) based on magnitude of their velocity; ``verletDist`` will only be used for particles in the fastest bin, whereas only proportionally smaller length will be used for slower particles; The coefficient between bin's velocities is given by ``binCoeff``.\
 	",
 		((int,sortAxis,0,,"Axis for the initial contact detection."))
 		((bool,sortThenCollide,false,,"Separate sorting and colliding phase; it is MUCH slower, but all interactions are processed at every step; this effectively makes the collider non-persistent, not remembering last state. (The default behavior relies on the fact that inversions during insertion sort are overlaps of bounding boxes that just started/ceased to exist, and only processes those; this makes the collider much more efficient.)"))
-		((Real,sweepLength,((void)"Stride deactivated",-1),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if negative."))
-		((Real,sweepFactor,1.05,,"Overestimation factor for the sweep velocity; must be >=1.0. Has no influence on sweepLength, only on the computed stride. [DEPRECATED, is used only when bins are not used]."))
-		((Real,fastestBodyMaxDist,-1,,"Maximum displacement of the fastest body since last run; if >= sweepLength, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
-		((int,nBins,0,,"Number of velocity bins for striding. If <=0, bin-less strigin is used (this is however DEPRECATED)."))
-		((Real,binCoeff,5,,"Coefficient of bins for velocities, i.e. if ``binCoeff==5``, successive bins have 5 × smaller velocity peak than the previous one. (Passed to VelocityBins)"))
+		((Real,verletDist,((void)"Automatically initialized",-.05),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be |verletDist| × minimum spherical particle radius; if there are no spherical particles, it will be disabled."))
+		((Real,sweepFactor,1.05,,"Overestimation factor for the sweep velocity; must be >=1.0. Has no influence on verletDist, only on the computed stride. [DEPRECATED, is used only when bins are not used]."))
+		((Real,fastestBodyMaxDist,-1,,"Maximum displacement of the fastest body since last run; if >= verletDist, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
+		((int,nBins,5,,"Number of velocity bins for striding. If <=0, bin-less strigin is used (this is however DEPRECATED)."))
+		((Real,binCoeff,2,,"Coefficient of bins for velocities, i.e. if ``binCoeff==5``, successive bins have 5 × smaller velocity peak than the previous one. (Passed to VelocityBins)"))
 		((Real,binOverlap,0.8,,"Relative bins hysteresis, to avoid moving body back and forth if its velocity is around the border value. (Passed to VelocityBins)"))
 		((Real,maxRefRelStep,.3,,"(Passed to VelocityBins)"))
 		((int,histInterval,100,,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins."))
 		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
+		, /*deprec*/ ((sweepLength,verletDist,"conform to usual DEM terminology"))
+		, /* init */
 		,
 		/* ctor */
 			#ifdef ISC_TIMING

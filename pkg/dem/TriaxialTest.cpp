@@ -314,7 +314,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	scene->engines.push_back(collider);
-	collider->sweepLength=.05*radiusMean;
+	collider->verletDist=.05*radiusMean;
 	collider->nBins=5; collider->binCoeff=2; /* gives a 2^5=32× difference between the lower and higher bin sweep lengths */
 	collider->boundDispatcher->add(new Bo1_Sphere_Aabb);
 	collider->boundDispatcher->add(new Bo1_Box_Aabb);

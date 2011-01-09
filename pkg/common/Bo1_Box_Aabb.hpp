@@ -11,7 +11,7 @@
 
 #include<yade/pkg/common/Dispatching.hpp>
 
-
+class Box;
 class Bo1_Box_Aabb : public BoundFunctor{
 	public:
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);

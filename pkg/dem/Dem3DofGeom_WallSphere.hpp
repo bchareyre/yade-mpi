@@ -2,6 +2,8 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 // for static roll/unroll functions in Dem3DofGeom_SphereSphere
 #include<yade/pkg/dem/Dem3DofGeom_SphereSphere.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Wall.hpp>
 
 class Dem3DofGeom_WallSphere: public Dem3DofGeom{
 

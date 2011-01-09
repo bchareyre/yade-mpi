@@ -13,6 +13,7 @@ class SumIntrForcesCb: public IntrCallback{
 };
 REGISTER_SERIALIZABLE(SumIntrForcesCb);
 
+#ifdef YADE_BODY_CALLBACK
 class SumBodyForcesCb: public BodyCallback{
 	Scene* scene;
 	public:
@@ -23,3 +24,4 @@ class SumBodyForcesCb: public BodyCallback{
 	YADE_CLASS_BASE_DOC(SumBodyForcesCb,BodyCallback,"Callback summing magnitudes of resultant forces over :yref:`dynamic<Body::dynamic>` bodies.");
 };
 REGISTER_SERIALIZABLE(SumBodyForcesCb);
+#endif

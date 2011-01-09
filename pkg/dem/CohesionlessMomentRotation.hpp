@@ -8,6 +8,38 @@
 #include<set>
 #include<boost/tuple/tuple.hpp>
 
+class MomentPhys: public NormShearPhys {
+	public:
+		virtual ~MomentPhys();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MomentPhys,NormShearPhys,"Physical interaction properties for use with :yref:`Law2_SCG_MomentPhys_CohesionlessMomentRotation`, created by :yref:`Ip2_MomentMat_MomentMat_MomentPhys`.",
+		((Real,frictionAngle,0,,"Friction angle [rad]"))
+		((Real,tanFrictionAngle,0,,"Tangent of friction angle"))
+		((Real,Eta,0,,"??"))
+		((Quaternionr,initialOrientation1,Quaternionr::Identity(),,"??"))
+		((Quaternionr,initialOrientation2,Quaternionr::Identity(),,"??"))
+		((Vector3r,prevNormal,Vector3r::Zero(),,"Normal in the previous step."))
+		((Real,kr,0,,"rolling stiffness"))
+		((Vector3r,moment_twist,Vector3r::Zero(),,"??"))
+		((Vector3r,moment_bending,Vector3r::Zero(),,"??"))
+		((Real,cumulativeRotation,0,,"??"))
+		((Vector3r,shear,Vector3r::Zero(),,"??")),
+		createIndex();
+	);
+	REGISTER_CLASS_INDEX(MomentPhys,NormShearPhys);
+};
+REGISTER_SERIALIZABLE(MomentPhys);
+
+/** This class holds information associated with each body */
+class MomentMat: public FrictMat {
+	public:
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MomentMat,FrictMat,"Material for constitutive law of (Plassiard & al., 2009); see :yref:`Law2_SCG_MomentPhys_CohesionlessMomentRotation` for details.\n\nUsers can input eta (constant for plastic moment) to Spheres and Boxes. For more complicated cases, users can modify TriaxialStressController to use different eta values during isotropic compaction.",
+		((Real,eta,0,,"(has to be stored in this class and not by ContactLaw, because users may want to change its values before/after isotropic compaction.)")),
+		createIndex();
+	);
+	REGISTER_CLASS_INDEX(MomentMat,FrictMat);
+};
+REGISTER_SERIALIZABLE(MomentMat);
+
 
 class Law2_SCG_MomentPhys_CohesionlessMomentRotation: public LawFunctor{
 	public:
@@ -40,35 +72,4 @@ class Ip2_MomentMat_MomentMat_MomentPhys: public IPhysFunctor{
 REGISTER_SERIALIZABLE(Ip2_MomentMat_MomentMat_MomentPhys);
 
 
-class MomentPhys: public NormShearPhys {
-	public:
-		virtual ~MomentPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MomentPhys,NormShearPhys,"Physical interaction properties for use with :yref:`Law2_SCG_MomentPhys_CohesionlessMomentRotation`, created by :yref:`Ip2_MomentMat_MomentMat_MomentPhys`.",
-		((Real,frictionAngle,0,,"Friction angle [rad]"))
-		((Real,tanFrictionAngle,0,,"Tangent of friction angle"))
-		((Real,Eta,0,,"??"))
-		((Quaternionr,initialOrientation1,Quaternionr::Identity(),,"??"))
-		((Quaternionr,initialOrientation2,Quaternionr::Identity(),,"??"))
-		((Vector3r,prevNormal,Vector3r::Zero(),,"Normal in the previous step."))
-		((Real,kr,0,,"rolling stiffness"))
-		((Vector3r,moment_twist,Vector3r::Zero(),,"??"))
-		((Vector3r,moment_bending,Vector3r::Zero(),,"??"))
-		((Real,cumulativeRotation,0,,"??"))
-		((Vector3r,shear,Vector3r::Zero(),,"??")),
-		createIndex();
-	);
-	REGISTER_CLASS_INDEX(MomentPhys,NormShearPhys);
-};
-REGISTER_SERIALIZABLE(MomentPhys);
-
-/** This class holds information associated with each body */
-class MomentMat: public FrictMat {
-	public:
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MomentMat,FrictMat,"Material for constitutive law of (Plassiard & al., 2009); see :yref:`Law2_SCG_MomentPhys_CohesionlessMomentRotation` for details.\n\nUsers can input eta (constant for plastic moment) to Spheres and Boxes. For more complicated cases, users can modify TriaxialStressController to use different eta values during isotropic compaction.",
-		((Real,eta,0,,"(has to be stored in this class and not by ContactLaw, because users may want to change its values before/after isotropic compaction.)")),
-		createIndex();
-	);
-	REGISTER_CLASS_INDEX(MomentMat,FrictMat);
-};
-REGISTER_SERIALIZABLE(MomentMat);
 

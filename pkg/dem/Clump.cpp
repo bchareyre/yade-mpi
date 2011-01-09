@@ -6,6 +6,10 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
 
+// to save maxima velocity, when moving clump members
+#include<yade/pkg/dem/NewtonIntegrator.hpp>
+
+
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
 
@@ -38,26 +42,29 @@ void Clump::del(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 	LOG_DEBUG("Removed body #"<<subBody->id<<" from clump #"<<clumpBody->id);
 }
 
-void Clump::moveMembers(const shared_ptr<Body>& clumpBody, Scene* scene){
+void Clump::moveMembers(const shared_ptr<Body>& clumpBody, Scene* scene, NewtonIntegrator* newton){
 	const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clumpBody->shape);
 	const shared_ptr<State>& clumpState=clumpBody->state;
 	FOREACH(MemberMap::value_type& B, clump->members){
 		// B.first is Body::id_t, B.second is local Se3r of that body in the clump
-		Clump::moveMember(clumpState, Body::byId(B.first,scene)->state, B.second);
+		const shared_ptr<State>& subState=Body::byId(B.first,scene)->state; const Vector3r& subPos(B.second.position); const Quaternionr& subOri(B.second.orientation);
+		// position update
+		subState->pos=clumpState->pos+clumpState->ori*subPos;
+		subState->ori=clumpState->ori*subOri;
+		// velocity update
+		subState->vel=clumpState->vel+clumpState->angVel.cross(subState->pos-clumpState->pos);
+		subState->angVel=clumpState->angVel;
+		if(likely(newton)) newton->saveMaximaVelocity(B.first,subState.get());
 	}
 }
 
-void Clump::moveMember(const shared_ptr<State>& clumpState, const shared_ptr<State>& subState, const Se3r& relSe3){
-	const Vector3r& subPos(relSe3.position); const Quaternionr& subOri(relSe3.orientation);
-	//LOG_TRACE("Old #"<<I->first<<"position: "<<subRBP->se3.position);
-	// position update
-	subState->pos=clumpState->pos+clumpState->ori*subPos;
-	subState->ori=clumpState->ori*subOri;
-	// velocity update
-	subState->vel=clumpState->vel+clumpState->angVel.cross(subState->pos-clumpState->pos);
-	subState->angVel=clumpState->angVel;
-	//LOG_TRACE("New #"<<I->first<<"position: "<<subRBP->se3.position);
-	//LOG_TRACE("Clump #"<<getId()<<" moved #"<<I->first<<".");
+void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vector3r& F, Vector3r& T){
+	FOREACH(const MemberMap::value_type& mm, members){
+		const Body::id_t& memberId=mm.first; const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember()); State* memberState=member->state.get();
+		const Vector3r& f=scene->forces.getForce(memberId); const Vector3r& t=scene->forces.getTorque(memberId);
+		F+=f;
+		T+=t+(memberState->pos-clumpState->pos).cross(f);
+	}
 }
 
 /*! Clump's se3 will be updated (origin at centroid and axes coincident with principal inertia axes) and subSe3 modified in such a way that members positions in world coordinates will not change.

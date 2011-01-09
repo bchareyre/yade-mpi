@@ -4,6 +4,9 @@
 #include<yade/core/IPhys.hpp>
 #include<yade/core/Shape.hpp>
 #include<yade/core/State.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/common/Wall.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
@@ -96,8 +99,6 @@ struct Gl1_L6Geom: public Gl1_L3Geom{
 };
 REGISTER_SERIALIZABLE(Gl1_L6Geom);
 #endif
-
-
 
 struct Ig2_Sphere_Sphere_L3Geom: public IGeomFunctor{
 		virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);

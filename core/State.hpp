@@ -7,19 +7,6 @@
 // delete later and remove relevant code, to not support old State.blockedDOFs=['x','y','rz'] syntax anymore
 #define YADE_DEPREC_DOF_LIST
 
-/*! State (internal & spatial variables) of a body.
-
-For now, I put position, orientation, velocity and angular velocity here,
-since (AFAIK) we have no bodies that lack them. If in the future
-someone needs bodies without orientation, then orientation and angular
-velocity can be pushed to a derived class (and the rest of code adapted
-to that).
-
-All state variables are initialized to zeros.
-
-Historical note: this used to be part of the PhysicalParameters class.
-The other data are now in the Material class.
-*/
 class State: public Serializable, public Indexable{
 	public:
 		/// linear motion (references to inside se3)
@@ -29,7 +16,6 @@ class State: public Serializable, public Indexable{
 
 		//! mutex for updating the parameters from within the interaction loop (only used rarely)
 		boost::mutex updateMutex;
-
 		
 		// bits for blockedDOFs
 		enum {DOF_NONE=0,DOF_X=1,DOF_Y=2,DOF_Z=4,DOF_RX=8,DOF_RY=16,DOF_RZ=32};
@@ -64,17 +50,11 @@ class State: public Serializable, public Indexable{
 		Quaternionr ori_get() const {return ori; }
 		void ori_set(const Quaternionr& o){ori=o;}
 
-
-
-	//State(): se3(Vector3r::Zero(),Quaternionr::Identity()),pos(se3.position),vel(Vector3r::Zero()),accel(Vector3r::Zero()),mass(0.),ori(se3.orientation),angVel(Vector3r::Zero()),angAccel(Vector3r::Zero()),angMom(Vector3r::Zero()),inertia(Vector3r::Zero()),refPos(Vector3r::Zero()),refOri(Quaternionr::Identity()),blockedDOFs(DOF_NONE){}
-
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
 		((Se3r,se3,Se3r(Vector3r::Zero(),Quaternionr::Identity()),,"Position and orientation as one object."))
 		((Vector3r,vel,Vector3r::Zero(),,"Current linear velocity."))
-		((Vector3r,accel,Vector3r::Zero(),,"Current acceleration."))
 		((Real,mass,0,,"Mass of this body"))
 		((Vector3r,angVel,Vector3r::Zero(),,"Current angular velocity"))
-		((Vector3r,angAccel,Vector3r::Zero(),,"Current angular acceleration"))
 		((Vector3r,angMom,Vector3r::Zero(),,"Current angular momentum"))
 		((Vector3r,inertia,Vector3r::Zero(),,"Inertia of associated body, in local coordinate system."))
 		((Vector3r,refPos,Vector3r::Zero(),,"Reference position"))
@@ -89,7 +69,9 @@ class State: public Serializable, public Indexable{
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always constant (equal to zero, or to an user-defined value), regardless of applied force/torque. String that may contain 'xyzXYZ' (translations and rotations).")
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
-		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.") 
+		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.")
+		.def("displ",&State::displ,"Displacement from :yref:`reference position<State.refPos>` (:yref:`pos<State.pos>` - :yref:`refPos<State.refPos>`")
+		.def("rot",&State::displ,"Rotation from :yref:`reference orientation<State.refPos>` (as rotation vector)")
 	);
 	REGISTER_INDEX_COUNTER(State);
 	DECLARE_LOGGER;

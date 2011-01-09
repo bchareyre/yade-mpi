@@ -52,6 +52,8 @@
  
  */
 
+class NewtonIntegrator;
+
 class Clump: public Shape {
 	public:
 		typedef std::map<Body::id_t,Se3r> MemberMap;
@@ -60,12 +62,14 @@ class Clump: public Shape {
 		static void del(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
 		//! Recalculate physical properties of Clump.
 		static void updateProperties(const shared_ptr<Body>& clump, bool intersecting);
-		//! Calculate positions and orientations of members based on relative Se3
-		static void moveMember(const shared_ptr<State>& clumpState, const shared_ptr<State>& subState, const Se3r& relSe3);
-		//! Loop around moveMember
-		static void moveMembers(const shared_ptr<Body>& clump, Scene* scene);
+		//! Calculate positions and orientations of members based on relative Se3; newton pointer (if non-NULL) calls NewtonIntegrator::saveMaximaVelocity
+		static void moveMembers(const shared_ptr<Body>& clump, Scene* scene, NewtonIntegrator* newton=NULL);
 		//! update member positions after clump being moved by mouse (in case simulation is paused and engines will not do that).
 		void userForcedDisplacementRedrawHook(){ throw runtime_error("Clump::userForcedDisplacementRedrawHook not yet implemented (with Clump as subclass of Shape).");}
+
+		//! get force and torque on the clump itself, from forces/torques on members; does not include force on clump itself
+		void addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vector3r& F, Vector3r& T);
+
 
 		//! Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
 		static Matrix3r inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off);

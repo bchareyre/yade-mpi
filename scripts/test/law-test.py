@@ -29,7 +29,6 @@ O.bodies.append([
 ])
 
 O.engines=[
-	PyRunner(iterPeriod=1,command='addPlotData()'),
 	ForceResetter(),
 	PyRunner(iterPeriod=1,command='import time; time.sleep(.05)'),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
@@ -45,6 +44,7 @@ O.engines=[
 	#	(-1e-4,0,0) # back to the origin, but keep some overlap to not delete the interaction
 	#	],pathSteps=[100],doneHook='tester.dead=True; O.pause()',label='tester',rotWeight=.2,idWeight=.2),
 	NewtonIntegrator(),
+	PyRunner(iterPeriod=1,command='addPlotData()'),
 ]
 
 def addPlotData():
