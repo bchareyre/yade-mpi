@@ -7,6 +7,7 @@
 #include<yade/pkg/common/Dispatching.hpp>
 #include<yade/pkg/common/VelocityBins.hpp>
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 
 #include<algorithm>
 #include<vector>

@@ -9,6 +9,7 @@
 #pragma once
 
 #include<yade/pkg/common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/Aabb.hpp>
 
 class Gl1_Aabb: public GlBoundFunctor{
 	public:

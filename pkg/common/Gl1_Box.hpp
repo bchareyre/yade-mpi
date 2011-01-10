@@ -9,6 +9,7 @@
 #pragma once
 
 #include<yade/pkg/common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/Box.hpp>
 
 class Gl1_Box : public GlShapeFunctor{
 	public :

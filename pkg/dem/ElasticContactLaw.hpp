@@ -9,10 +9,12 @@
 
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
-
-#include <set>
-#include <boost/tuple/tuple.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/lib/base/openmp-accu.hpp>
+
+#include<set>
+#include<boost/tuple/tuple.hpp>
 
 class Law2_ScGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:

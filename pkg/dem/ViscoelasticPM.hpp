@@ -7,6 +7,7 @@
 #include<yade/core/Material.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 
 /* Simple viscoelastic model */
 

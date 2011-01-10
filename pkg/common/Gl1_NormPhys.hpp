@@ -3,6 +3,7 @@
 #include<yade/lib/opengl/OpenGLWrapper.hpp>
 #include<yade/lib/opengl/GLUtils.hpp>
 #include<yade/pkg/common/GLDrawFunctors.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
 #include<GL/glu.h>
 
 

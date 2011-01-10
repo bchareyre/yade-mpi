@@ -9,6 +9,7 @@
 #pragma once
 
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 
 class Ip2_FrictMat_FrictMat_CapillaryPhys : public IPhysFunctor
 {
