@@ -6,9 +6,6 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
 
-// to save maxima velocity, when moving clump members
-#include<yade/pkg/dem/NewtonIntegrator.hpp>
-
 
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
@@ -40,22 +37,6 @@ void Clump::del(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 	if(clump->members.erase(subBody->id)!=1) throw std::invalid_argument(("Body #"+lexical_cast<string>(subBody->id)+" not part of clump #"+lexical_cast<string>(clumpBody->id)+"; not removing.").c_str());
 	subBody->clumpId=Body::ID_NONE;
 	LOG_DEBUG("Removed body #"<<subBody->id<<" from clump #"<<clumpBody->id);
-}
-
-void Clump::moveMembers(const shared_ptr<Body>& clumpBody, Scene* scene, NewtonIntegrator* newton){
-	const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clumpBody->shape);
-	const shared_ptr<State>& clumpState=clumpBody->state;
-	FOREACH(MemberMap::value_type& B, clump->members){
-		// B.first is Body::id_t, B.second is local Se3r of that body in the clump
-		const shared_ptr<State>& subState=Body::byId(B.first,scene)->state; const Vector3r& subPos(B.second.position); const Quaternionr& subOri(B.second.orientation);
-		// position update
-		subState->pos=clumpState->pos+clumpState->ori*subPos;
-		subState->ori=clumpState->ori*subOri;
-		// velocity update
-		subState->vel=clumpState->vel+clumpState->angVel.cross(subState->pos-clumpState->pos);
-		subState->angVel=clumpState->angVel;
-		if(likely(newton)) newton->saveMaximaVelocity(B.first,subState.get());
-	}
 }
 
 void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vector3r& F, Vector3r& T){
