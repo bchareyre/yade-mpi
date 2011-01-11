@@ -29,6 +29,7 @@ bool OpenGLRenderer::initDone=false;
 const int OpenGLRenderer::numClipPlanes;
 OpenGLRenderer::~OpenGLRenderer(){}
 
+
 void OpenGLRenderer::init(){
 	typedef std::pair<string,DynlibDescriptor> strDldPair; // necessary as FOREACH, being macro, cannot have the "," inside the argument (preprocessor does not parse templates)
 	FOREACH(const strDldPair& item, Omega::instance().getDynlibsDescriptor()){
@@ -130,11 +131,11 @@ void OpenGLRenderer::drawPeriodicCell(){
 }
 
 void OpenGLRenderer::resetSpecularEmission(){
-	const GLfloat specular[4]={.3,.03,.03,0.1};
-	const GLfloat emission[4]={0,0,0,0};
-	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular);
-	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission);
-	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 0);
+	glMateriali(GL_FRONT, GL_SHININESS, 80);
+	const GLfloat glutMatSpecular[4]={0.3,0.3,0.3,0.5};
+	const GLfloat glutMatEmit[4]={0.2,0.2,0.2,1.0};
+	glMaterialfv(GL_FRONT,GL_SPECULAR,glutMatSpecular);
+	glMaterialfv(GL_FRONT,GL_EMISSION,glutMatEmit);
 }
 
 void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection){
@@ -203,17 +204,16 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 
 	glEnable(GL_CULL_FACE);
 	// http://www.sjbaker.org/steve/omniv/opengl_lighting.html
-	glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+	glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	//Shared material settings
-	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 40);
-
 	resetSpecularEmission();
 
 	drawPeriodicCell();
 
 	if (dof || id) renderDOF_ID();
 	if (bound) renderBound();
+
 	if (shape) renderShape();
 	if (intrAllWire) renderAllInteractionsWire();
 	if (intrGeom) renderIGeom();
@@ -379,7 +379,7 @@ void OpenGLRenderer::renderShape(){
 		}
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
-		if(b->bound && scene->isPeriodic){
+		if(b->bound && scene->isPeriodic && displayGhosts){
 			const Vector3r& cellSize(scene->cell->getSize());
 			pos=scene->cell->unshearPt(pos); // remove the shear component
 			// traverse all periodic cells around the body, to see if any of them touches

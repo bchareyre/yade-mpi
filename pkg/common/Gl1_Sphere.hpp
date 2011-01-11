@@ -17,17 +17,20 @@ class Gl1_Sphere : public GlShapeFunctor{
 	private:
 		// for stripes
 		static vector<Vector3r> vertices, faces;
-		static int glSphereList;
+		static int glStripedSphereList;
 		static int glGlutSphereList;
 		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
 // 		void drawSphere(const Vector3r& color);
-		void initGlLists();
+		//Generate GlList for GLUT sphere
+		void initGlutGlList();
+		//Generate GlList for sliced spheres
+		void initStripedGlList();
 		//for regenerating glutSphere list if needed
 		static Real prevQuality;
 	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Sphere,GlShapeFunctor,"Renders :yref:`Sphere` object",
-		((Real,quality,1.0,,"Change discretization level of spheres. quality>1  for better image quality, at the price of more cpu/gpu usage, 0<quality<1 for faster rendering. This unique factor mutiplies :yref:`Gl1_Sphere::glutSlices` and :yref:`Gl1_Sphere::glutStacks`"))
+		((Real,quality,1.0,,"Change discretization level of spheres. quality>1  for better image quality, at the price of more cpu/gpu usage, 0<quality<1 for faster rendering. If mono-color sphres are displayed (:yref:`Gl1_Sphere::stripes=False), quality mutiplies :yref:`Gl1_Sphere::glutSlices` and :yref:`Gl1_Sphere::glutStacks`. If striped spheres are displayed (:yref:`Gl1_Sphere::stripes=True), only integer increments are meaningfull : quality=1 and quality=1.9 will give the same result, quality=2 will give finer result."))
 		((bool,wire,false,,"Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``."))
 		((bool,stripes,false,,"In non-wire rendering, show stripes clearly showing particle rotation."))
 		((bool,localSpecView,true,,"Compute specular light in local eye coordinate system."))
