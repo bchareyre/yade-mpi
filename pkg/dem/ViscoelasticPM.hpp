@@ -29,10 +29,10 @@ class ViscElMat : public Material {
 REGISTER_SERIALIZABLE(ViscElMat);
 
 /// Interaction physics
-class ViscElPhys : public FrictPhysTransitory {
+class ViscElPhys : public FrictPhys{
 	public:
 		virtual ~ViscElPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhysTransitory,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant")),
 		createIndex();

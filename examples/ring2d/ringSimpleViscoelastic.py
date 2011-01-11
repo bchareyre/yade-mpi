@@ -71,15 +71,9 @@ o.engines=[
 
 ]
 
-# FIXME: why this not worked properly?
-#for b in O.bodies:
-    #if isinstance(b.shape.name,Sphere):
-		 #b.state.blockedDOFs=['z']
-
-for b in o.bodies:
-	if b.shape.name=='Sphere':
-		b.state.blockedDOFs='zXY'\
-
+for b in O.bodies:
+	if isinstance(b.shape,Sphere):
+		 b.state.blockedDOFs='zXY'
 
 O.dt=0.02*tc
 

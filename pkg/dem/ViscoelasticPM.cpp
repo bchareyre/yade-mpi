@@ -32,7 +32,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	phys->cs = (cs1?1/cs1:0) + (cs2?1/cs2:0); phys->cs = phys->cs?1/phys->cs:0;
 	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
-	phys->prevNormal = Vector3r(0,0,0);
+	//phys->prevNormal = Vector3r(0,0,0);
 	interaction->phys = shared_ptr<ViscElPhys>(phys);
 }
 
@@ -56,16 +56,15 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
 
 	Vector3r& shearForce = phys.shearForce;
-
 	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
-
 	const Real& dt = scene->dt;
-
-	Vector3r axis = phys.prevNormal.cross(geom.normal);
-	shearForce -= shearForce.cross(axis);
-	const Real angle = dt*0.5*geom.normal.dot(de1.angVel + de2.angVel);
-	axis = angle*geom.normal;
-	shearForce -= shearForce.cross(axis);
+	//Vector3r axis = phys.prevNormal.cross(geom.normal);
+	//shearForce -= shearForce.cross(axis);
+	//const Real angle = dt*0.5*geom.normal.dot(de1.angVel + de2.angVel);
+	//axis = angle*geom.normal;
+	//shearForce -= shearForce.cross(axis);
+	shearForce = geom.rotate(shearForce);
+	
 
 	// Handle periodicity.
 	const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
@@ -85,7 +84,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
-	phys.prevNormal = geom.normal;
+	//phys.prevNormal = geom.normal;
 
 	const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
 	if( shearForce.squaredNorm() > maxFs )

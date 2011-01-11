@@ -63,7 +63,7 @@ def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
 	
 	return textExt(fileName=fileName,format='x_y_z_r',shift=shift,scale=scale,**kw)
 	
-def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1):
+def stl(file, dynamic=None,fixed=True,wire=True,color=None,highlight=False,noBound=False,material=-1):
 	""" Import geometry from stl file, return list of created facets."""
 	imp = STLImporter()
 	facets=imp.ymport(file)
@@ -72,10 +72,11 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 		b.shape.wire=wire
 		b.shape.highlight=highlight
 		pos,ori=b.state.pos,b.state.ori
-		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material)
-		b.state.pos,b.state.ori=pos,ori
-		b.aspherical=False # FIXME: is it  reasonably for a facets?
-		b.dynamic=dynamic
+		utils._commonBodySetup(b,0,Vector3(0,0,0),material=material,pos=pos,noBound=noBound,dynamic=dynamic,fixed=fixed)
+		#b.state.pos,b.state.ori=pos,ori
+		b.state.ori=ori
+		b.aspherical=False 
+		#b.dynamic=dynamic
 	return facets
 
 def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
