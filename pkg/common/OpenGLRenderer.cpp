@@ -379,7 +379,7 @@ void OpenGLRenderer::renderShape(){
 		}
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
-		if(b->bound && scene->isPeriodic && displayGhosts){
+		if(b->bound && scene->isPeriodic && ghosts){
 			const Vector3r& cellSize(scene->cell->getSize());
 			pos=scene->cell->unshearPt(pos); // remove the shear component
 			// traverse all periodic cells around the body, to see if any of them touches

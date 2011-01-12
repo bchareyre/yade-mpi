@@ -30,6 +30,7 @@ class SnapshotEngine: public PeriodicEngine{
 		((vector<string>,snapshots,,,"Files that have been created so far"))
 		((int,msecSleep,0,,"number of msec to sleep after snapshot (to prevent 3d hw problems) [ms]"))
 		((Real,deadTimeout,3,,"Timeout for 3d operations (opening new view, saving snapshot); after timing out, throw exception (or only report error if *ignoreErrors*) and make myself :yref:`dead<Engine.dead>`. [s]"))
+		((string,plot,,,"Name of field in :yref:`yade.plot.imgData` to which taken snapshots will be appended automatically."))
 	);
 	DECLARE_LOGGER;
 };

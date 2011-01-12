@@ -6,11 +6,18 @@ Module containing utility functions for plotting inside yade. See :ysrc:`scripts
 """
 
 ## all exported names
-__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverse','addData','saveGnuplot','saveDataTxt']
+__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverse','addData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
 # safe to import even if Tk will not be used
 import mtTkinter as Tkinter
+
+try:
+	import Image
+except:
+	raise ImportError("PIL (python-imaging package) must be installed to use yade.plot")
+
+
 
 import matplotlib,os,time,math,itertools
 
@@ -36,8 +43,10 @@ import pylab
 
 data={}
 "Global dictionary containing all data values, common for all plots, in the form {'name':[value,...],...}. Data should be added using plot.addData function. All [value,...] columns have the same length, they are padded with NaN if unspecified."
+imgData={}
+"Dictionary containing lists of strings, which have the meaning of images corresponding to respective :yref:`yade.plot.data` rows. See :yref:`yade.plot.plots` on how to plot images."
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
-"dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')"
+"dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification'). If ``(yspec,...)`` is ``None``, then the plot has meaning of image, which will be taken from respective field of :yref:`yade.plot.imgData`."
 labels={}
 "Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
 xylabels={}
@@ -58,11 +67,14 @@ axesWd=0
 "Linewidth (in points) to make *x* and *y* axes better visible; not activated if non-positive."
 current=-1
 "Point that is being tracked with a scatter point. -1 is for the last point, set to *nan* to disable."
+#take3dSnapshots=False
+#"If true, take snapshot of the 3d view using :yref:`yade.qt.SnapshotEngine` every time :yref:`yade.plot.addData` is called"
+#snapshotEngine=None
 
 def reset():
 	"Reset all plot-related variables (data, plots, labels)"
 	global data, plots, labels # plotLines
-	data={}; plots={}; # plotLines={};
+	data={}; plots={}; imgData={} # plotLines={};
 	pylab.close('all')
 
 def resetData():
@@ -101,15 +113,45 @@ def addData(*d_in,**kw):
 	import numpy
 	if len(data)>0: numSamples=len(data[data.keys()[0]])
 	else: numSamples=0
-	#reduceData(numSamples)
+	# align with imgData, if there is more of them than data
+	if len(imgData)>0 and numSamples==0: numSamples=max(numSamples,len(imgData[imgData.keys()[0]]))
 	d=(d_in[0] if len(d_in)>0 else {})
 	d.update(**kw)
 	for name in d:
-		if not name in data.keys():
-			data[name]=[nan for i in range(numSamples)] #numpy.array([nan for i in range(numSamples)])
+		if not name in data.keys(): data[name]=[]
 	for name in data:
-		if name in d: data[name].append(d[name]) #numpy.append(data[name],[d[name]],1)
-		else: data[name].append(nan)
+		data[name]+=(numSamples-len(data[name]))*[nan]
+		data[name].append(d[name] if name in d else nan)
+	#print [(k,len(data[k])) for k in data.keys()]
+	#numpy.array([nan for i in range(numSamples)])
+	#numpy.append(data[name],[d[name]],1)
+
+def addImgData(**kw):
+	for k in kw:
+		if k not in imgData: imgData[k]=[]
+	# align imgData with data
+	if len(data.keys())>0 and len(imgData.keys())>0:
+		nData,nImgData=len(data[data.keys()[0]]),len(imgData[imgData.keys()[0]])
+		#if nImgData>nData-1: raise RuntimeError("imgData is already the same length as data?")
+		if nImgData<nData-1: # repeat last value
+			for k in imgData.keys():
+				lastValue=imgData[k][-1] if len(imgData[k])>0 else None
+				imgData[k]+=(nData-len(imgData[k])-1)*[lastValue]
+		elif nData<nImgData:
+			for k in data.keys():
+				lastValue=data[k][-1] if len(data[k])>0 else nan
+				data[k]+=(nImgData-nData)*[lastValue]   # add one more, because we will append to imgData below
+	# add values from kw
+	newLen=(len(imgData[imgData.keys()[0]]) if imgData else 0)+1 # current length plus 1
+	for k in kw:
+		if k in imgData and len(imgData[k])>0: imgData[k]+=(newLen-len(imgData[k])-1)*[imgData[k][-1]]+[kw[k]] # repeat last element as necessary
+		else: imgData[k]=(newLen-1)*[None]+[kw[k]]  # repeat None if no previous value
+	# align values which were not in kw by repeating the last value
+	for k in imgData:
+		if len(imgData[k])<newLen: imgData[k]+=(newLen-len(imgData[k]))*[imgData[k][-1]]
+	assert(len(set([len(i) for i in imgData.values()]))<=1)  # no data or all having the same value
+
+
 
 # not public functions
 def addPointTypeSpecifier(o):
@@ -129,26 +171,36 @@ def xlateLabel(l):
 class LineRef:
 	"""Holds reference to plot line and to original data arrays (which change during the simulation),
 	and updates the actual line using those data upon request."""
-	def __init__(self,line,scatter,xdata,ydata):
-		self.line,self.scatter,self.xdata,self.ydata=line,scatter,xdata,ydata
+	def __init__(self,line,scatter,xdata,ydata,dataName=None):
+		self.line,self.scatter,self.xdata,self.ydata,self.dataName=line,scatter,xdata,ydata,dataName
 	def update(self):
-		import numpy
-		self.line.set_xdata(self.xdata)
-		self.line.set_ydata(self.ydata)
-		try:
-			x,y=[self.xdata[current]],[self.ydata[current]]
-		except IndexError: x,y=0,0
-		# this could be written in a nicer way, very likely
-		try:
-			pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
-			if self.scatter: self.scatter.set_offsets(pt)
-		except TypeError: pass # this happens at i386 with empty data, saying TypeError: buffer is too small for requested array
+		if isinstance(self.line,matplotlib.image.AxesImage):
+			# image name
+			try:
+				if len(self.xdata)==0 and self.dataName: self.xdata=imgData[self.dataName]  # empty list reference an empty singleton, not the list we want; adjust here
+				if self.xdata[current]==None: img=Image.new('RGBA',(1,1),(0,0,0,0))
+				else: img=Image.open(self.xdata[current])
+				self.line.set_data(img)
+			except IndexError: pass
+		else:
+			# regular data
+			import numpy
+			self.line.set_xdata(self.xdata)
+			self.line.set_ydata(self.ydata)
+			try:
+				x,y=[self.xdata[current]],[self.ydata[current]]
+			except IndexError: x,y=0,0
+			# this could be written in a nicer way, very likely
+			try:
+				pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
+				if self.scatter: self.scatter.set_offsets(pt)
+			except TypeError: pass # this happens at i386 with empty data, saying TypeError: buffer is too small for requested array
 
 currLineRefs=[]
 liveTimeStamp=0 # timestamp when live update was started, so that the old thread knows to stop if that changes
 nan=float('nan')
 
-def createPlots(subPlots=True):
+def createPlots(subPlots=True,scatterSize=20,wider=False):
 	global currLineRefs
 	figs=set([l.line.get_axes().get_figure() for l in currLineRefs]) # get all current figures
 	for f in figs: pylab.close(f) # close those
@@ -157,11 +209,20 @@ def createPlots(subPlots=True):
 	if subPlots:
 		# compute number of rows and colums for plots we have
 		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
-		#print 'subplot',subCols,subRows
+		if wider: subRows,subCols=subCols,subRows
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip()
 		if not subPlots: pylab.figure()
 		else: pylab.subplot(subRows,subCols,nPlot)
+		if plots[p]==None: # image plot
+			if not pStrip in imgData.keys(): imgData[pStrip]=[]
+			# fake (empty) image if no data yet
+			if len(imgData[pStrip])==0 or imgData[pStrip][-1]==None: img=Image.new('RGBA',(1,1),(0,0,0,0))
+			else: img=Image.open(imgData[pStrip][-1])
+			img=pylab.imshow(img,origin='lower')
+			currLineRefs.append(LineRef(img,None,imgData[pStrip],None,pStrip))
+			pylab.gca().set_axis_off()
+			continue
 		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		plots_p_y1,plots_p_y2=[],[]; y1=True
 		missing=set() # missing data columns
@@ -204,7 +265,7 @@ def createPlots(subPlots=True):
 				# use (0,0) if there are no data yet
 				scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
 				# if current value is NaN, use zero instead
-				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,color=line.get_color())
+				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,s=scatterSize,color=line.get_color())
 				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
 			axes=line.get_axes()
 			labelLoc=(legendLoc[0 if isY1 else 1] if y2Exists>0 else 'best')
@@ -258,7 +319,8 @@ def liveUpdate(timestamp):
 				ax.yadeYNames.add(new)
 				if new in data.keys() and id(data[new]) in linesData: continue # do not add when reloaded and the old lines are already there
 				print 'yade.plot: creating new line for',new
-				if not new in data.keys(): data[new]=[] # create data entry if necessary
+				if not new in data.keys(): data[new]=len(data[ax.yadeXName])*[nan] # create data entry if necessary
+				#print 'data',len(data[ax.yadeXName]),len(data[new]),data[ax.yadeXName],data[new]
 				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
 				scatterPt=(0 if len(data[ax.yadeXName])==0 or math.isnan(data[ax.yadeXName][current]) else data[ax.yadeXName][current]),(0 if len(data[new])==0 or math.isnan(data[new][current]) else data[new][current])
 				scatter=ax.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
@@ -279,6 +341,64 @@ def liveUpdate(timestamp):
 			except RuntimeError: pass # happens here too
 		time.sleep(liveInterval)
 	
+def savePlotSequence(fileBase,stride=1,imgRatio=(5,7),title=None,titleFrames=20,lastFrames=30):
+	'''Save sequence of plots, each plot corresponding to one line in history. It is especially meant to be used for :yref:`yade.utils.makeVideo`.
+
+	:param stride: only consider every stride-th line of history (default creates one frame per each line)
+	:param title: Create title frame, where lines of title are separated with newlines (``\\n``) and optional subtitle is separated from title by double newline. 
+	:param int titleFrames: Create this number of frames with title (by repeating its filename), determines how long the title will stand in the movie.
+	:param int lastFrames: Repeat the last frame this number of times, so that the movie does not end abruptly.
+	:return: List of filenames with consecutive frames.
+	'''
+	createPlots(subPlots=True,scatterSize=60,wider=True)
+	sqrtFigs=math.sqrt(len(plots))
+	pylab.gcf().set_size_inches(8*sqrtFigs,5*sqrtFigs) # better readable
+	pylab.subplots_adjust(left=.05,right=.95,bottom=.05,top=.95) # make it more compact
+	if len(plots)==1 and plots[plots.keys()[0]]==None: # only pure snapshot is there
+		pylab.gcf().set_size_inches(5,5)
+		pylab.subplots_adjust(left=0,right=1,bottom=0,top=1)
+	#if not data.keys(): raise ValueError("plot.data is empty.")
+	pltLen=max(len(data[data.keys()[0]]) if data else 0,len(imgData[imgData.keys()[0]]) if imgData else 0)
+	if pltLen==0: raise ValueError("Both plot.data and plot.imgData are empty.")
+	global current, currLineRefs
+	ret=[]
+	print 'Saving %d plot frames, it can take a while...'%(pltLen)
+	for i,n in enumerate(range(0,pltLen,stride)):
+		current=n
+		for l in currLineRefs: l.update()
+		out=fileBase+'-%03d.png'%i
+		pylab.gcf().savefig(out)
+		ret.append(out)
+	if len(ret)==0: raise RuntimeError("No images created?!")
+	if title:
+		titleImgName=fileBase+'-title.png'
+		createTitleFrame(titleImgName,Image.open(ret[-1]).size,title)
+		ret=titleFrames*[titleImgName]+ret
+	if lastFrames>1: ret+=(lastFrames-1)*[ret[-1]]
+	return ret
+
+def createTitleFrame(out,size,title):
+	'create figure with title and save to file; a figure object must be opened to get the right size'
+	pylab.clf(); fig=pylab.gcf()
+	#insize=fig.get_size_inches(); size=insize[1]*fig.get_dpi(),insize[0]*fig.get_dpi()  # this gives wrong dimensions...
+	#fig.set_facecolor('blue'); fig.patch.set_color('blue'); fig.patch.set_facecolor('blue'); fig.patch.set_alpha(None)
+	title,subtitle=title.split('\n\n')
+	lines=[(t,True) for t in title.split('\n')]+([(t,False) for t in subtitle.split('\n')] if subtitle else [])
+	nLines=len(lines); fontSizes=size[1]/10.,size[1]/16.
+	import matplotlib.mathtext
+	def writeLine(text,vertPos,fontsize):
+		rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=fontsize,dpi=fig.get_dpi(),color='blue')
+		textsize=rgba.shape[1],rgba.shape[0]
+		if textsize[0]>size[0]:
+			rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=fontsize*size[0]/textsize[0],dpi=fig.get_dpi(),color='blue')
+			textsize=rgba.shape[1],rgba.shape[0]
+		fig.figimage(rgba.astype(float)/255.,xo=(size[0]-textsize[0])/2.,yo=vertPos-depth)
+	ht=size[1]; y0=ht-2*fontSizes[0]; yStep=(ht-2.5*fontSizes[0])/len(lines)
+	for i,(l,isTitle) in enumerate(lines):
+		writeLine(l,y0-i*yStep,fontSizes[0 if isTitle else 1])
+	fig.savefig(out)
+	
+
 
 def plot(noShow=False,subPlots=True):
 	"""Do the actual plot, which is either shown on screen (and nothing is returned: if *noShow* is ``False``) or, if *noShow* is ``True``, returned as matplotlib's Figure object or list of them.
@@ -298,13 +418,17 @@ def plot(noShow=False,subPlots=True):
 	"""
 	createPlots(subPlots=subPlots)
 	global currLineRefs
+	figs=set([l.line.get_axes().get_figure() for l in currLineRefs])
+	if not hasattr(list(figs)[0],'show') and not noShow:
+		import warnings
+		warnings.warn('plot.plot not showing figure (matplotlib using headless backend?)')
+		noShow=True
 	if not noShow:
 		if not yade.runtime.hasDisplay: return # would error out with some backends, such as Agg used in batches
 		if live:
 			import thread
 			thread.start_new_thread(liveUpdate,(time.time(),))
 		# pylab.show() # this blocks for some reason; call show on figures directly
-		figs=set([l.line.get_axes().get_figure() for l in currLineRefs])
 		for f in figs:
 			f.show()
 			# should have fixed https://bugs.launchpad.net/yade/+bug/606220, but does not work apparently
@@ -394,6 +518,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 	i=0
 	for p in plots:
 		pStrip=p.strip()
+		if plots[pStrip]==None: continue  ## this plot is image plot, which is not applicable to gnuplot
 		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))

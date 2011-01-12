@@ -104,7 +104,7 @@ class OpenGLRenderer : public Serializable
 		((bool,intrWire,false,,"If rendering interactions, use only wires to represent them."))
 		((bool,intrGeom,false,,"Render :yref:`Interaction::geom` objects."))
 		((bool,intrPhys,false,,"Render :yref:`Interaction::phys` objects"))
-		((bool,displayGhosts,true,,"Render objects crossing periodic cell edges by cloning them in multiple places (periodic simulations only)."))
+		((bool,ghosts,true,,"Render objects crossing periodic cell edges by cloning them in multiple places (periodic simulations only)."))
 		#ifdef YADE_SUBDOMAINS
 			((int,subDomMask,0,,"If non-zero, render shape only of particles that are inside respective domains - -they are counted from the left, i.e. 5 (binary 101) will show subdomains 1 and 3. If zero, render everything."))
 		#endif

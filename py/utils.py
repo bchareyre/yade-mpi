@@ -519,27 +519,29 @@ def encodeVideoFromFrames(*args,**kw):
 	_deprecatedUtilsFunction('utils.encodeVideoFromFrames','utils.makeVideo')
 	return makeVideo(*args,**kw)
 
-def makeVideo(frameSpec,out,renameNotOverwrite=True,fps=24,bps=2400):
+def makeVideo(frameSpec,out,renameNotOverwrite=True,fps=24,kbps=6000,bps=None):
 	"""Create a video from external image files using `mencoder <http://www.mplayerhq.hu>`__. Two-pass encoding using the default mencoder codec (mpeg4) is performed, running multi-threaded with number of threads equal to number of OpenMP threads allocated for Yade.
 
 	:param frameSpec: wildcard | sequence of filenames. If list or tuple, filenames to be encoded in given order; otherwise wildcard understood by mencoder's mf:// URI option (shell wildcards such as ``/tmp/snap-*.png`` or and printf-style pattern like ``/tmp/snap-%05d.png``)
 	:param str out: file to save video into
 	:param bool renameNotOverwrite: if True, existing same-named video file will have -*number* appended; will be overwritten otherwise.
 	:param int fps: Frames per second (``-mf fps=…``)
-	:param int bps: Bitrate (``-lavcopts vbitrate=…``)
+	:param int kbps: Bitrate (``-lavcopts vbitrate=…``) in kb/s
 	"""
-	import os,os.path,subprocess
+	import os,os.path,subprocess,warnings
+	if bps!=None:
+		warnings.warn('plot.makeVideo: bps is deprecated, use kbps instead (the significance is the same, but the name is more precise)',stacklevel=2,category=DeprecationWarning)
+		kbps=bps
 	if renameNotOverwrite and os.path.exists(out):
 		i=0
 		while(os.path.exists(out+"~%d"%i)): i+=1
 		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
 	if isinstance(frameSpec,list) or isinstance(frameSpec,tuple): frameSpec=','.join(frameSpec)
 	for passNo in (1,2):
-		cmd=['mencoder','mf://%s'%frameSpec,'-mf','fps=%d'%int(fps),'-ovc','lavc','-lavcopts','vbitrate=%d:vpass=%d:threads=%d:%s'%(int(bps),passNo,O.numThreads,'turbo' if passNo==1 else ''),'-o',('/dev/null' if passNo==1 else out)]
+		cmd=['mencoder','mf://%s'%frameSpec,'-mf','fps=%d'%int(fps),'-ovc','lavc','-lavcopts','vbitrate=%d:vpass=%d:threads=%d:%s'%(int(kbps),passNo,O.numThreads,'turbo' if passNo==1 else ''),'-o',('/dev/null' if passNo==1 else out)]
 		print 'Pass %d:'%passNo,' '.join(cmd)
 		ret=subprocess.call(cmd)
 		if ret!=0: raise RuntimeError("Error when running mencoder.")
-
 
 def replaceCollider(colliderEngine):
 	"""Replaces collider (Collider) engine with the engine supplied. Raises error if no collider is in engines."""

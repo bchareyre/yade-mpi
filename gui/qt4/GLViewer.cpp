@@ -24,6 +24,8 @@
 #include<iomanip>
 #include<boost/algorithm/string/case_conv.hpp>
 #include<yade/lib/serialization/ObjectIO.hpp>
+#include<yade/lib/pyutil/gil.hpp>
+
 
 #include<QtGui/qevent.h>
 
@@ -69,6 +71,7 @@ void SnapshotEngine::action(){
 	}
 	snapshots.push_back(fss.str());
 	usleep((long)(msecSleep*1000));
+	if(!plot.empty()){ pyRunString("import yade.plot; yade.plot.addImgData("+plot+"='"+fss.str()+"')"); }
 }
 
 
