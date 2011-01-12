@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from yade import pack,ymport,export,log
+from yade import pack,ymport,export,log,geom
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -46,25 +46,29 @@ for part in [
 	]: O.bodies.appendClumped(part)
 
 
-# Example of utils.facetBox usage 
+# Example of geom.facetBox usage 
 oriBody = Quaternion(Vector3(0,0,1),(3.14159/3))
-O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
+O.bodies.append(geom.facetBox((12,0,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
 oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
-O.bodies.append(utils.facetBox((0,12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
+O.bodies.append(geom.facetBox((0,12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
 oriBody = Quaternion(Vector3(0,0,1),(3.14159))
-O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
+O.bodies.append(geom.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-# Example of utils.facetCylinder usage, RotationEngine example see below
+# Example of geom.facetCylinder usage, RotationEngine example see below
 oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
-rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,oriBody,wallMask=4,segmentsNumber=10,**kwBoxes))
+rotateIDs=O.bodies.append(geom.facetCylinder((6.0,6.0,-4.0),2.0,4.0,oriBody,wallMask=4,segmentsNumber=10,**kwBoxes))
 
 oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
 O.bodies.append(ymport.gmsh('cone.mesh',orientation=oriBody,**kwMeshes))#generates facets from the mesh file
 
 oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
-O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,-5.9),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
+O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,0.0),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
+
+#facetBunker Demonstration
+#Demonstration of HarmonicMotionEngine
+vibrationPlate = O.bodies.append(geom.facetBunker((-7.0,-7.0,-3.0),dBunker=5.0,dOutput=3.0,hBunker=11.0,hOutput=1.5,hPipe=0.8,wallMask=5,segmentsNumber=20,**kwMeshes))
 
 # spheresToFile saves coordinates and radii of all spheres of the simulation into the text file, works but disabled. Please, uncomment it, if you need
 #print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
@@ -72,18 +76,12 @@ O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,-5.9),
 # spheresFromFile function imports coordinates and radii of all spheres of the simulation into the text file
 O.bodies.append(ymport.text('foo.spheres',shift=Vector3(6.0,6.0,-2.9),scale=0.7,color=(1,1,1),**kw))
 
-#Demonstration of HarmonicMotionEngine
-O.bodies.append(pack.regularHexa(pack.inSphere((-10,5,-5),1.5),radius=rad*2.0,gap=rad/3.0,color=(0.2,0.5,0.9),material=0))
-O.bodies.append(utils.facetBox((-10,5,-5),(2,2,2),wallMask=15,**kwMeshes))
-vibrationPlate = O.bodies.append(utils.facetBox((-10,5,-5),(2,2,2),wallMask=16,**kwBoxes))
-
 #Demonstration of HarmonicRotationEngine
 O.bodies.append(pack.regularHexa(pack.inSphere((-15,5,-5),1.5),radius=rad*2.0,gap=rad/3.0,color=(0.5,0.5,0.1),material=0))
-O.bodies.append(utils.facetBox((-15,5,-5),(2,2,2),wallMask=15,**kwMeshes))
-vibrationRotationPlate = O.bodies.append(utils.facetBox((-15,5,-5),(2,2,2),wallMask=16,**kwBoxes))
+O.bodies.append(geom.facetBox((-15,5,-5),(2,2,2),wallMask=15,**kwMeshes))
+vibrationRotationPlate = O.bodies.append(geom.facetBox((-15,5,-5),(2,2,2),wallMask=16,**kwBoxes))
 
 O.bodies.append(utils.wall((0,0,-10),axis=2))
-
 
 try:
 	from yade import qt
@@ -91,7 +89,7 @@ try:
 	qt.View()
 except ImportError: pass
 
-log.setLevel('SubdomainBalancer',log.TRACE)
+#log.setLevel('SubdomainBalancer',log.TRACE)
 
 O.engines=[
 	#SubdomainBalancer(colorize=True,initRun=True,iterPeriod=100),

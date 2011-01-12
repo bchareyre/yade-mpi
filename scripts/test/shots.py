@@ -10,7 +10,7 @@ shotsId,steelId=O.materials.append([
 # shotsId,steelId=O.materials.index('shots'),O.materials.index('steel')
 #
 
-O.bodies.append(utils.facetBox(center=(0,0,0),extents=(30e-3,30e-3,0),wallMask=32,wire=False,material='steel',color=(0,1,.3)))
+O.bodies.append(geom.facetBox(center=(0,0,0),extents=(30e-3,30e-3,0),wallMask=32,wire=False,material='steel',color=(0,1,.3)))
 
 O.engines=[
 	ForceResetter(),

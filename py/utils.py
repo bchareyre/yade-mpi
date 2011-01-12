@@ -9,7 +9,7 @@
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
 
-import math,random
+import math,random,doctest,geom
 from yade import *
 from yade.wrapper import *
 from miniEigen import *
@@ -17,7 +17,7 @@ try: # use psyco if available
 	import psyco
 	psyco.full()
 except ImportError: pass
-import doctest
+
 
 # c++ implementations for performance reasons
 from yade._utils import *
@@ -270,120 +270,21 @@ def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
 	b.shape=Facet(color=color if color else randomColor(),wire=wire,highlight=highlight,vertices=vertices)
-	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound,pos=center,dynamic=dynamic,fixed=fixed)
+	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound,pos=center,fixed=fixed)
 	b.aspherical=False # mass and inertia are 0 anyway; fell free to change to ``True`` if needed
 	b.mask=mask
 	return b
+	
+def facetBox(*args,**kw):
+	"|ydeprecated|"
+	_deprecatedUtilsFunction('facetBox','geom.facetBox')
+	return geom.facetBox(*args,**kw)
 
-def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
-	"""
-	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
-	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
-
-	:param Vector3 center: center of the box
-	:param Vector3 extents: lengths of the box sides
-	:param Quaternion orientation: orientation of the box
-	:param bitmask wallMask: determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls
-	:param **kw: (unused keyword arguments) passed to :yref:`yade.utils.facet`
-	:returns: list of facets forming the box
-	"""
-
-
-	#Defense from zero dimensions
-	if (wallMask>63):
-		print "wallMask must be 63 or less"
-		wallMask=63
-	if (extents[0]==0):
-		wallMask=1
-	elif (extents[1]==0):
-		wallMask=4
-	elif (extents[2]==0):
-		wallMask=16
-	if (((extents[0]==0) and (extents[1]==0)) or ((extents[0]==0) and (extents[2]==0)) or ((extents[1]==0) and (extents[2]==0))):
-		raise RuntimeError("Please, specify at least 2 none-zero dimensions in extents!");
-	# ___________________________
-
-	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
-	def doWall(a,b,c,d):
-		return [facet((a,b,c),**kw),facet((a,c,d),**kw)]
-	ret=[]
-
-	A=orientation*Vector3(mn[0],mn[1],mn[2])+center
-	B=orientation*Vector3(mx[0],mn[1],mn[2])+center
-	C=orientation*Vector3(mx[0],mx[1],mn[2])+center
-	D=orientation*Vector3(mn[0],mx[1],mn[2])+center
-	E=orientation*Vector3(mn[0],mn[1],mx[2])+center
-	F=orientation*Vector3(mx[0],mn[1],mx[2])+center
-	G=orientation*Vector3(mx[0],mx[1],mx[2])+center
-	H=orientation*Vector3(mn[0],mx[1],mx[2])+center
-	if wallMask&1:  ret+=doWall(A,D,H,E)
-	if wallMask&2:  ret+=doWall(B,F,G,C)
-	if wallMask&4:  ret+=doWall(A,E,F,B)
-	if wallMask&8:  ret+=doWall(D,C,G,H)
-	if wallMask&16: ret+=doWall(A,B,C,D)
-	if wallMask&32: ret+=doWall(E,H,G,F)
-	return ret
-
-def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,**kw):
-	"""
-	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
-	Return List of facets forming the cylinder;
-
-	:param Vector3 center: center of the created cylinder
-	:param float radius:  cylinder radius
-	:param float height: cylinder height
-	:param Quaternion orientation: orientation of the cylinder; the reference orientation has axis along the $+x$ axis.
-	:param int segmentsNumber: number of edges on the cylinder surface (>=5)
-	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
-	:param (θmin,Θmax) angleRange: allows to create only part of cylinder by specifying range of angles; if ``None``, (0,2*pi) is assumed.
-	:param bool closeGap: close range skipped in angleRange with triangular facets at cylinder bases.
-	:param **kw: (unused keyword arguments) passed to utils.facet;
-	"""
-
-	# check zero dimentions
-	if (segmentsNumber<3): raise RuntimeError("The segmentsNumber should be at least 3");
-	if (height<=0): raise RuntimeError("The height should have the positive value");
-	if (radius<=0): raise RuntimeError("The radius should have the positive value");
-
-	import numpy
-	if angleRange==None: angleRange=(0,2*math.pi)
-	if isinstance(angleRange,float):
-		print u'WARNING: utils.facetCylinder,angleRange should be (Θmin,Θmax), not just Θmax (one number), update your code.'
-		angleRange=(0,angleRange)
-	anglesInRad = numpy.linspace(angleRange[0], angleRange[1], segmentsNumber+1, endpoint=True)
-	P1=[]; P2=[]
-	P1.append(Vector3(0,0,-height/2))
-	P2.append(Vector3(0,0,+height/2))
-
-	for i in anglesInRad:
-		X=radius*math.cos(i)
-		Y=radius*math.sin(i)
-		P1.append(Vector3(X,Y,-height/2))
-		P2.append(Vector3(X,Y,+height/2))
-	for i in range(0,len(P1)):
-		P1[i]=orientation*P1[i]+center
-		P2[i]=orientation*P2[i]+center
-
-	ret=[]
-	for i in range(2,len(P1)):
-		if wallMask&2:
-			ret.append(facet((P1[0],P1[i],P1[i-1]),**kw))
-		if wallMask&1:
-			ret.append(facet((P2[0],P2[i-1],P2[i]),**kw))
-		if wallMask&4:
-			ret.append(facet((P1[i],P2[i],P2[i-1]),**kw))
-			ret.append(facet((P2[i-1],P1[i-1],P1[i]),**kw))
-	if closeGap and (angleRange[0]%(2*math.pi))!=(angleRange[1]%(2*math.pi)): # some part is skipped
-		pts=[(radius*math.cos(angleRange[i]),radius*math.sin(angleRange[i])) for i in (0,1)]
-		for Z in -height/2,height/2:
-			#print (pts[0][0],pts[0][1],Z),(pts[1][0],pts[1][1],Z),(0,0,Z)
-			pp=[(pts[0][0],pts[0][1],Z),(pts[1][0],pts[1][1],Z),(0,0,Z)]
-			pp=[orientation*p+center for p in pp]
-			ret.append(facet(pp,**kw))
-
-	return ret
-
-
+def facetCylinder(*args,**kw):
+	"|ydeprecated|"
+	_deprecatedUtilsFunction('facetCylinder','geom.facetCylinder')
+	return geom.facetCylinder(*args,**kw)
+	
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""Return 6 boxes that will wrap existing packing as walls from all sides;
 	extrema are extremal points of the Aabb of the packing (will be calculated if not specified)

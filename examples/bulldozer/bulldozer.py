@@ -33,12 +33,12 @@ KnifeIDs=[]
 KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False))
 
 
-KnifeIDs+=O.bodies.append(utils.facetBox((-lengthKnife/2-radiusKnife,lengthKnife/2,-radiusKnife+buldozerHeight/2),(lengthKnife/2,lengthKnife/2,buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
+KnifeIDs+=O.bodies.append(geom.facetBox((-lengthKnife/2-radiusKnife,lengthKnife/2,-radiusKnife+buldozerHeight/2),(lengthKnife/2,lengthKnife/2,buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
 
-KnifeIDs+=O.bodies.append(utils.facetBox((-lengthKnife/2-radiusKnife-lengthKnife/4.,lengthKnife/2,-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
+KnifeIDs+=O.bodies.append(geom.facetBox((-lengthKnife/2-radiusKnife-lengthKnife/4.,lengthKnife/2,-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
 
 
-O.bodies.append(utils.facetBox((0,lengthKnife/2,radiusKnife),(lengthKnife*4,lengthKnife*4,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
+O.bodies.append(geom.facetBox((0,lengthKnife/2,radiusKnife),(lengthKnife*4,lengthKnife*4,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
 
 
 
