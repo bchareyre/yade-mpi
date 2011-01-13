@@ -62,7 +62,7 @@ class TestEngines(unittest.TestCase):
 	def testKinematicEngines(self):
 		'Engines: test kinematic engines'
 		tolerance = 1e-5
-		rotIndex=5.0
+		rotIndex=1.0
 		angVelTemp = pi/rotIndex
 		O.reset()
 		id_fixed_transl = O.bodies.append(utils.sphere((0.0,0.0,0.0),1.0,fixed=True))
@@ -81,10 +81,15 @@ class TestEngines(unittest.TestCase):
 		O.dt = 1.0
 		for i in range(0,25):
 			O.step()
-			self.assertTrue((O.bodies[id_fixed_transl].state.pos[0] / O.iter - 1.0) < tolerance)									#Check translation of fixed bodies
-			self.assertTrue((O.bodies[id_nonfixed_transl].state.pos[0] / O.iter - 1.0) < tolerance)								#Check translation of nonfixed bodies
-			self.assertTrue((O.bodies[id_fixed_rot].state.pos[0]-10.0*sin(pi/angVelTemp*O.iter))<tolerance)		#Check rotation of fixed bodies
-			self.assertTrue((O.bodies[id_nonfixed_rot].state.pos[2] - 10*cos(pi/angVelTemp*O.iter))<tolerance)		#Check rotation of nonfixed bodies
+			self.assertTrue(abs(O.bodies[id_fixed_transl].state.pos[0] - O.iter) < tolerance)									#Check translation of fixed bodies
+			self.assertTrue(abs(O.bodies[id_nonfixed_transl].state.pos[0] - O.iter) < tolerance)								#Check translation of nonfixed bodies
+			self.assertTrue(abs(O.bodies[id_fixed_rot].state.pos[0]-10.0*sin(pi/angVelTemp*O.iter))<tolerance)		#Check rotation of fixed bodies X
+			self.assertTrue(abs(O.bodies[id_fixed_rot].state.pos[2]-10.0*cos(pi/angVelTemp*O.iter))<tolerance)		#Check rotation of fixed bodies Y
+			self.assertTrue(abs(O.bodies[id_fixed_rot].state.ori.toAxisAngle()[1]-Quaternion(Vector3(0.0,1.0,0.0),pi/angVelTemp*O.iter).toAxisAngle()[1])<tolerance)		#Check rotation of fixed bodies, angle
+			
+			self.assertTrue(abs(O.bodies[id_nonfixed_rot].state.pos[0] - 10*sin(pi/angVelTemp*O.iter))<tolerance)		#Check rotation of nonfixed bodies X
+			self.assertTrue(abs(O.bodies[id_nonfixed_rot].state.pos[2] - 10*cos(pi/angVelTemp*O.iter))<tolerance)		#Check rotation of nonfixed bodies Y
+			self.assertTrue(abs(O.bodies[id_nonfixed_rot].state.ori.toAxisAngle()[1]-Quaternion(Vector3(0.0,1.0,0.0),pi/angVelTemp*O.iter).toAxisAngle()[1])<tolerance)		#Check rotation of nonfixed bodies, angle
 
 
 class TestIO(unittest.TestCase):
