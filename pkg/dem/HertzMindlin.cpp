@@ -70,6 +70,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 
 	/* pass values calculated from above to MindlinPhys */
 	mindlinPhys->tangensOfFrictionAngle = std::tan(frictionAngle); 
+	//mindlinPhys->prevNormal = scg->normal; // used to compute relative rotation
 	mindlinPhys->kno = Kno; // this is just a coeff
 	mindlinPhys->kso = Kso; // this is just a coeff
 	mindlinPhys->adhesionForce = Adhesion;
@@ -112,7 +113,7 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 	Real normEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		ScGeom6D* scg = dynamic_cast<ScGeom6D*>(I->geom.get());
+		ScGeom* scg = dynamic_cast<ScGeom*>(I->geom.get());
 		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->phys.get());
 		if (phys) {
 			if (includeAdhesion) {normEnergy += (std::pow(scg->penetrationDepth,5./2.)*2./5.*phys->kno - phys->adhesionForce*scg->penetrationDepth);}
@@ -128,7 +129,7 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::adhesionEnergy()
 	Real adhesionEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		ScGeom6D* scg = dynamic_cast<ScGeom6D*>(I->geom.get());
+		ScGeom* scg = dynamic_cast<ScGeom*>(I->geom.get());
 		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->phys.get());
 		if (phys && includeAdhesion) {
 			Real R=scg->radius1*scg->radius2/(scg->radius1+scg->radius2);
@@ -230,7 +231,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	State* de1 = Body::byId(id1,scene)->state.get();
 	State* de2 = Body::byId(id2,scene)->state.get();	
 
-	ScGeom6D* scg = static_cast<ScGeom6D*>(ig.get());
+	ScGeom* scg = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());	
 
 	const shared_ptr<Body>& b1=Body::byId(id1,scene); 
@@ -412,19 +413,63 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/********************************************/
 	/* MOMENT CONTACT LAW (only bending moment) */
 	/********************************************/
-	
 	if (includeMoment){
-		phys->moment_bending = scg->getBending()*phys->kr;
+		// new code to compute relative particle rotation (similar to the way the shear is computed)
+		Vector3r relAngVel = (b2->state->angVel-b1->state->angVel);
+		relAngVel = relAngVel - scg->normal.dot(relAngVel)*scg->normal; // keep only the bending part 
+		Vector3r relRot = relAngVel*dt; // relative rotation due to rolling behaviour	
+		// incremental formulation for the bending moment (as for the shear part)
+		Vector3r& momentBend = phys->momentBend;
+		momentBend = scg->rotate(momentBend); // rotate moment vector (updated)
+		momentBend = momentBend-phys->kr*relRot; // add incremental rolling to the rolling vector FIXME: is the sign correct?
+
+#if 0
+	// code to compute the relative particle rotation
+	if (includeMoment){
+		Real rMean = (scg->radius1+scg->radius2)/2.;
+		// sliding motion
+		Vector3r duS1 = scg->radius1*(phys->prevNormal-scg->normal);
+		Vector3r duS2 = scg->radius2*(scg->normal-phys->prevNormal);
+		// rolling motion
+		Vector3r duR1 = scg->radius1*dt*b1->state->angVel.cross(scg->normal);
+		Vector3r duR2 = -scg->radius2*dt*b2->state->angVel.cross(scg->normal);
+		// relative position of the old contact point with respect to the new one
+		Vector3r relPosC1 = duS1+duR1;
+		Vector3r relPosC2 = duS2+duR2;
+		
+		Vector3r duR = (relPosC1+relPosC2)/2.; // incremental displacement vector (same radius is temporarily assumed)
+
+		// check wheter rolling will be present, if not do nothing
+		Vector3r x=scg->normal.cross(duR);
+		Vector3r normdThetaR(Vector3r::Zero()); // initialize 
+		if(x.squaredNorm()==0) { /* no rolling */ }
+		else {
+				Vector3r normdThetaR = x/x.norm(); // moment unit vector
+				phys->dThetaR = duR.norm()/rMean*normdThetaR;} // incremental rolling
+		
+		// incremental formulation for the bending moment (as for the shear part)
+		Vector3r& momentBend = phys->momentBend;
+		momentBend = scg->rotate(momentBend); // rotate moment vector
+		momentBend = momentBend+phys->kr*phys->dThetaR; // add incremental rolling to the rolling vector FIXME: is the sign correct?
+#endif
+
+		// check plasticity condition
 		Real MomentMax = phys->maxBendPl*phys->normalForce.norm();
-		Real scalarMoment = phys->moment_bending.norm();
-		if(scalarMoment > MomentMax) 
-		{
-		  Real ratio = MomentMax/scalarMoment; // to fix the moment to its yielding value
-		  phys->moment_bending *= ratio;
+		Real scalarMoment = phys->momentBend.norm();
+		if (MomentMax>0){
+			if(scalarMoment > MomentMax) 
+			{
+			    Real ratio = MomentMax/scalarMoment; // to fix the moment to its yielding value
+			    phys->momentBend *= ratio;
+			 }
 		}
-		scene->forces.addTorque(id1,-phys->moment_bending);
-		scene->forces.addTorque(id2, phys->moment_bending);
+		// apply moments
+		scene->forces.addTorque(id1,-phys->momentBend); 
+		scene->forces.addTorque(id2,phys->momentBend);
 	}
+
+	// update variables
+	//phys->prevNormal = scg->normal;
 }
 
 
