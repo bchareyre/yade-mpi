@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from yade import pack,ymport,export,log,geom
+import math
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -47,23 +48,25 @@ for part in [
 
 
 # Example of geom.facetBox usage 
-oriBody = Quaternion(Vector3(0,0,1),(3.14159/3))
+oriBody = Quaternion(Vector3(0,0,1),(math.pi/3))
 O.bodies.append(geom.facetBox((12,0,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
 O.bodies.append(geom.facetBox((0,12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-oriBody = Quaternion(Vector3(0,0,1),(3.14159))
+oriBody = Quaternion(Vector3(0,0,1),(math.pi))
 O.bodies.append(geom.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-# Example of geom.facetCylinder usage, RotationEngine example see below
-oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
-rotateIDs=O.bodies.append(geom.facetCylinder((6.0,6.0,-4.0),2.0,4.0,oriBody,wallMask=4,segmentsNumber=10,**kwBoxes))
+# Example of geom.facetCylinder, facetHelix and RotationEngine usage example
+oriBody = Quaternion(Vector3(1,0,0),(math.pi/2.0))
+rotateIDs=O.bodies.append(geom.facetHelix((-7.0,-6.0,-5.0),radiusOuter=2.0,radiusInner=0.1,pitch=2.0,orientation=oriBody,segmentsNumber=50,angleRange=[math.pi*8.0,0],**kwBoxes))
+O.bodies.append(geom.facetCylinder((-7.0,-12.0,-5.0),radius=2.0,height=7.0,orientation=oriBody,segmentsNumber=10,wallMask=4,**kwMeshes))
+O.bodies.append(geom.facetCylinder((-7.0,-7.0,-5.0),radius=2.0,height=4.0,segmentsNumber=10,wallMask=4,angleRange=[-math.pi*0.2,math.pi*1.2],**kwMeshes))
 
-oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
 O.bodies.append(ymport.gmsh('cone.mesh',orientation=oriBody,**kwMeshes))#generates facets from the mesh file
 
-oriBody = Quaternion(Vector3(0,0,1),(3.14159/2))
+oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
 O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,0.0),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
 
 #facetBunker Demonstration
@@ -104,10 +107,10 @@ O.engines=[
 	NewtonIntegrator(damping=.1,exactAsphericalRot=True),
 	RotationEngine(
 		ids=rotateIDs,
-		angularVelocity=10.0,
-		rotationAxis=[0,0,1],
+		angularVelocity=100.0,
+		rotationAxis=[0,-1,0],
 		rotateAroundZero=1,
-		zeroPoint=[6.0,6.0,0.0]),
+		zeroPoint=[-7.0,-6.0,-5.0]),
 	HarmonicMotionEngine(A=[0,0,0.5], f=[0,0,20.0], fi = [0.0,0.0,pi], ids = vibrationPlate),
 	HarmonicRotationEngine(A=0.2, f=20.0, fi = pi, rotationAxis=[1.0,0.0,0.0], rotateAroundZero = True, zeroPoint = [-15.0,3.0,-7.0], ids = vibrationRotationPlate) 
 ]

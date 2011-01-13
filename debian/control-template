@@ -7,7 +7,7 @@ Standards-Version: 3.9.1
 
 Package: yade@_VERSION@
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk, python-qt4, python-xlib, mencoder, gnuplot
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, python-tk, python-qt4, python-xlib, mencoder, gnuplot, python-imaging
 Description: Platform for discrete element modeling.
  Yet Another Dynamic Engine.
  Extensible open-source framework for discrete numerical models, 
