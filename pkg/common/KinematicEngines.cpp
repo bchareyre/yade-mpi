@@ -103,7 +103,9 @@ void RotationEngine::apply(const vector<Body::id_t>& ids){
 		b->state->angVel+=rotationAxis*angularVelocity;
 		if(rotateAroundZero){
 			const Vector3r l=b->state->pos-zeroPoint;
-			b->state->vel+=b->state->angVel.cross(l);
+			Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
+			Vector3r newPos=q*l+zeroPoint;
+			b->state->vel+=Vector3r(newPos-b->state->pos)/scene->dt;
 		}
 	}
 }
