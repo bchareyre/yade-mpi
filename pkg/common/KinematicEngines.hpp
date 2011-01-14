@@ -62,14 +62,10 @@ struct RotationEngine: public KinematicEngine{
 };
 REGISTER_SERIALIZABLE(RotationEngine);
 
-struct HelixEngine:public KinematicEngine{
+struct HelixEngine:public RotationEngine{
 	virtual void apply(const vector<Body::id_t>& ids);
-	void postLoad(HelixEngine&){ axis.normalize(); }
-	YADE_CLASS_BASE_DOC_ATTRS(HelixEngine,KinematicEngine,"Engine applying both rotation and translation, along the same axis, whence the name HelixEngine",
-		((Real,angularVelocity,0,,"Angular velocity [rad/s]"))
+	YADE_CLASS_BASE_DOC_ATTRS(HelixEngine,RotationEngine,"Engine applying both rotation and translation, along the same axis, whence the name HelixEngine",
 		((Real,linearVelocity,0,,"Linear velocity [m/s]"))
-		((Vector3r,axis,Vector3r::UnitX(),Attr::triggerPostLoad,"Axis of translation and rotation; will be normalized by the engine."))
-		((Vector3r,axisPt,Vector3r::Zero(),,"A point on the axis, to position it in space properly."))
 		((Real,angleTurned,0,,"How much have we turned so far. |yupdate| [rad]"))
 	);
 };

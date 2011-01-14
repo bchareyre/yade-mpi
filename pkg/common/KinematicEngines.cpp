@@ -74,16 +74,16 @@ void InterpolatingHelixEngine::apply(const vector<Body::id_t>& ids){
 
 void HelixEngine::apply(const vector<Body::id_t>& ids){
 	const Real& dt=scene->dt;
-	Quaternionr q(AngleAxisr(angularVelocity*dt,axis));
 	angleTurned+=angularVelocity*dt;
 	shared_ptr<BodyContainer> bodies = scene->bodies;
 	FOREACH(Body::id_t id,ids){
 		assert(id<(Body::id_t)bodies->size());
 		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
-		b->state->vel+=linearVelocity*axis+angularVelocity*axis.cross(b->state->pos-axisPt);
-		b->state->angVel+=angularVelocity*axis;
+		b->state->vel+=linearVelocity*rotationAxis;
 	}
+	rotateAroundZero=true;
+	RotationEngine::apply(ids);
 }
 
 
