@@ -88,7 +88,6 @@ void HelixEngine::apply(const vector<Body::id_t>& ids){
 
 
 void RotationEngine::apply(const vector<Body::id_t>& ids){
-	Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
 	#ifdef YADE_OPENMP
 	const long size=ids.size();
 	#pragma omp parallel for schedule(static)
