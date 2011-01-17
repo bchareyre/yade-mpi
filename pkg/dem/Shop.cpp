@@ -586,7 +586,6 @@ void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 		//Sum f_i*l_j/V for each contact of each particle
 		bStresses[I->getId1()]-=(3.0/(4.0*Mathr::PI*pow(geom->refR1,3)))*f*((geom->contactPoint-Body::byId(I->getId1(),scene)->state->pos).transpose());
 		bStresses[I->getId2()]+=(3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*f*((geom->contactPoint-Body::byId(I->getId2(),scene)->state->pos).transpose());
-		totStress+=f*((Body::byId(I->getId1(),scene)->state->pos - Body::byId(I->getId2(),scene)->state->pos).transpose());
 	}
 }
 
