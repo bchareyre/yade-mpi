@@ -445,31 +445,50 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	bodyStates.resize(scene->bodies->size());
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		Vector3r normalStress,shearStress;
 		if(!I->isReal()) continue;
-		const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->phys.get());
+		
+		//NormShearPhys + Dem3DofGeom
+		const NormShearPhys* physNSP = YADE_CAST<NormShearPhys*>(I->phys.get());
 		//Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
 		// FIXME: slower, but does not crash
-		Dem3DofGeom* geom=dynamic_cast<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
-		if(!phys) continue;
-		if(!geom) continue;
+		Dem3DofGeom* geomDDG=dynamic_cast<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
+		
+		//FrictPhys + ScGeom
+		const FrictPhys* physFP = YADE_CAST<FrictPhys*>(I->phys.get());
+		ScGeom* geomScG=dynamic_cast<ScGeom*>(I->geom.get());
+		
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
+		
+		if(((physNSP) and (geomDDG)) or ((physFP) and (geomScG))){
+			if ((physNSP) and (geomDDG)) {
+				Real minRad=(geomDDG->refR1<=0?geomDDG->refR2:(geomDDG->refR2<=0?geomDDG->refR1:min(geomDDG->refR1,geomDDG->refR2)));
+				Real crossSection=Mathr::PI*pow(minRad,2);
+		
+				normalStress=((1./crossSection)*geomDDG->normal.dot(physNSP->normalForce))*geomDDG->normal;
+				for(int i=0; i<3; i++){
+					int ix1=(i+1)%3,ix2=(i+2)%3;
+					shearStress[i]=geomDDG->normal[ix1]*physNSP->shearForce[ix1]+geomDDG->normal[ix2]*physNSP->shearForce[ix2];
+					shearStress[i]/=crossSection;
+				}
+			}	else if ((physFP) and (geomScG)) {
+				Real minRad=(geomScG->radius1<=0?geomScG->radius2:(geomScG->radius2<=0?geomScG->radius1:min(geomScG->radius1,geomScG->radius2)));
+				Real crossSection=Mathr::PI*pow(minRad,2);
+				
+				normalStress=((1./crossSection)*geomScG->normal.dot(physFP->normalForce))*geomScG->normal;
+				for(int i=0; i<3; i++){
+					int ix1=(i+1)%3,ix2=(i+2)%3;
+					shearStress[i]=geomScG->normal[ix1]*physFP->shearForce[ix1]+geomScG->normal[ix2]*physFP->shearForce[ix2];
+					shearStress[i]/=crossSection;
+				}
+			}
+			
+			bodyStates[id1].normStress+=normalStress;
+			bodyStates[id2].normStress+=normalStress;
 
-		Real minRad=(geom->refR1<=0?geom->refR2:(geom->refR2<=0?geom->refR1:min(geom->refR1,geom->refR2)));
-		Real crossSection=Mathr::PI*pow(minRad,2);
-
-		Vector3r normalStress=((1./crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
-		Vector3r shearStress;
-		for(int i=0; i<3; i++){
-			int ix1=(i+1)%3,ix2=(i+2)%3;
-			shearStress[i]=geom->normal[ix1]*phys->shearForce[ix1]+geom->normal[ix2]*phys->shearForce[ix2];
-			shearStress[i]/=crossSection;
+			bodyStates[id1].shearStress+=shearStress;
+			bodyStates[id2].shearStress+=shearStress;
 		}
-
-		bodyStates[id1].normStress+=normalStress;
-		bodyStates[id2].normStress+=normalStress;
-
-		bodyStates[id1].shearStress+=shearStress;
-		bodyStates[id2].shearStress+=shearStress;
 	}
 }
 
