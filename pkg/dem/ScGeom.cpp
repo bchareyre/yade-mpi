@@ -79,6 +79,17 @@ Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranular
 		avoidGranularRatcheting);
 }
 
+Vector3r ScGeom::getRelAngVel(const State* rbp1, const State* rbp2, Real dt){
+  	Vector3r relAngVel = (rbp2->angVel-rbp1->angVel);
+	return relAngVel;
+}
+
+Vector3r ScGeom::getRelAngVel_py(shared_ptr<Interaction> i){
+	if(i->geom.get()!=this) throw invalid_argument("ScGeom object is not the same as Interaction.geom.");
+	Scene* scene=Omega::instance().getScene().get();
+	return getRelAngVel(Body::byId(i->getId1(),scene)->state.get(),Body::byId(i->getId2(),scene)->state.get(),scene->dt);
+}
+
 //!Precompute relative rotations (and precompute ScGeom3D)
 void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool isNew, bool creep){
 	if (isNew) {

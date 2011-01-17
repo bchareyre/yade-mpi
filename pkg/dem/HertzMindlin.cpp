@@ -415,7 +415,9 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/********************************************/
 	if (includeMoment){
 		// new code to compute relative particle rotation (similar to the way the shear is computed)
-		Vector3r relAngVel = (b2->state->angVel-b1->state->angVel);
+		// use scg function to compute relAngVel
+		Vector3r relAngVel = scg->getRelAngVel(de1,de2,dt);
+		//Vector3r relAngVel = (b2->state->angVel-b1->state->angVel);
 		relAngVel = relAngVel - scg->normal.dot(relAngVel)*scg->normal; // keep only the bending part 
 		Vector3r relRot = relAngVel*dt; // relative rotation due to rolling behaviour	
 		// incremental formulation for the bending moment (as for the shear part)

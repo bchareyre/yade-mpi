@@ -43,9 +43,12 @@ class ScGeom: public GenericSpheresContact {
 		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shiftVel, const Vector3r& shift2, bool avoidGranularRatcheting=true);
 		// Implement another version of getIncidentVel which does not handle periodicity.
 		Vector3r getIncidentVel(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting=true);
-
+		// Add function to get the relative angular velocity (useful to determine bending moment at the contact level)
+		Vector3r getRelAngVel(const State* rbp1, const State* rbp2, Real dt);
+		
 		// convenience version to be called from python
 		Vector3r getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranularRatcheting);
+		Vector3r getRelAngVel_py(shared_ptr<Interaction> i);
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ScGeom,GenericSpheresContact,"Class representing :yref:`geometry<IGeom>` of a contact point between two :yref:`bodies<Body>`s. It is more general than sphere-sphere contact : even though it is primarily focused on spheres interactions (reason for the 'Sc' namming), it is also used for representing contacts of a :yref:`Sphere` with a non-spherical bodies (:yref:`Facet`, :yref:`Plane`,  :yref:`Box`, :yref:`ChainedCylinder`), or between non-spherical bodies. The contact has 3 DOFs (normal and 2×shear) and uses incremental algorithm for updating shear.\n\nWe use symbols $\\vec{x}$, $\\vec{v}$, $\\vec{\\omega}$ respectively for position, linear and angular velocities (all in global coordinates) and $r$ for particles radii; subscripted with 1 or 2 to distinguish 2 spheres in contact. Then we compute unit contact normal\n\n.. math::\n\n\t\\vec{n}=\\frac{\\vec{x}_2-\\vec{x}_1}{||\\vec{x}_2-\\vec{x}_1||}\n\nRelative velocity of spheres is then\n\n.. math::\n\n\t\\vec{v}_{12}=(\\vec{v}_2+\\vec{\\omega}_2\\times(-r_2\\vec{n}))-(\\vec{v}_1+\\vec{\\omega}_1\\times(r_1\\vec{n}))\n\nand its shear component\n\n.. math::\n\n\t\\Delta\\vec{v}_{12}^s=\\vec{v}_{12}-(\\vec{n}\\cdot\\vec{v}_{12})\\vec{n}.\n\nTangential displacement increment over last step then reads\n\n.. math::\n\n\t\\vec{x}_{12}^s=\\Delta t \\vec{v}_{12}^s.",
 		((Real,penetrationDepth,NaN,(Attr::noSave|Attr::readonly),"Penetration distance of spheres (positive if overlapping)"))
@@ -54,6 +57,7 @@ class ScGeom: public GenericSpheresContact {
 		/* extra initializers */ ((radius1,GenericSpheresContact::refR1)) ((radius2,GenericSpheresContact::refR2)),
 		/* ctor */ createIndex(); twist_axis=orthonormal_axis=Vector3r::Zero();,
 		/* py */ .def("incidentVel",&ScGeom::getIncidentVel_py,(python::arg("i"),python::arg("avoidGranularRatcheting")=true),"Return incident velocity of the interaction.")
+		.def("relAngVel",&ScGeom::getRelAngVel_py,(python::arg("i")),"Return relative angular velocity of the interaction.")
 	);
 	REGISTER_CLASS_INDEX(ScGeom,GenericSpheresContact);
 };
