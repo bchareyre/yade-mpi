@@ -58,8 +58,8 @@ class Cell: public Serializable{
 		void fillGlShearTrsfMatrix(double m[16]);
 	public:
 
-	//! "integrate" velGrad, update cached values used by public getter. If initH, Hsize is defined on the basis of refSize and trsf (only used if refSize is modified); else it is incremented the same way as for trsf.
-	void integrateAndUpdate(Real dt, bool initH=false);
+	//! "integrate" velGrad, update cached values used by public getter.
+	void integrateAndUpdate(Real dt);
 	/*! Return point inside periodic cell, even if shear is applied */
 	Vector3r wrapShearedPt(const Vector3r& pt) const { return shearPt(wrapPt(unshearPt(pt))); }
 	/*! Return point inside periodic cell, even if shear is applied; store cell coordinates in period. */

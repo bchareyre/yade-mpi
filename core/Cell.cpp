@@ -1,7 +1,7 @@
 
 #include<yade/core/Cell.hpp>
 
-void Cell::integrateAndUpdate(Real dt, bool initH){
+void Cell::integrateAndUpdate(Real dt){
 	//incremental displacement gradient
 	_trsfInc=dt*velGrad;
 	// total transformation; M = (Id+G).M = F.M
@@ -15,6 +15,7 @@ void Cell::integrateAndUpdate(Real dt, bool initH){
 		Vector3r base(Hsize.col(i));
 		_size[i]=base.norm(); base/=_size[i]; //base is normalized now
 		Hnorm(0,i)=base[0]; Hnorm(1,i)=base[1]; Hnorm(2,i)=base[2];};
+	// skew cosines
 	for(int i=0; i<3; i++){
 		int i1=(i+1)%3, i2=(i+2)%3;
 		// sin between axes is cos of skew
