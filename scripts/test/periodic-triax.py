@@ -5,7 +5,7 @@ from yade import *
 from yade import pack,log,qt
 log.setLevel('PeriTriaxController',log.TRACE)
 O.periodic=True
-O.cell.refSize=Vector3(.1,.1,.1)
+O.cell.setRefSize(Vector3(.1,.1,.1))
 #O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
 sp=pack.SpherePack()
 radius=5e-3

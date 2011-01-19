@@ -29,7 +29,7 @@ class Cell: public Serializable{
 	const Matrix3r& getShearTrsf() const { return _shearTrsf; }
 	//! inverse of getShearTrsfMatrix().
 	const Matrix3r& getUnshearTrsf() const {return _unshearTrsf;}
-	//! transformation increment matrix applying arbitrary field (remove if not used in NewtonIntegrator!)
+	//! transformation increment matrix applying arbitrary field (remove if not used in NewtonIntegrator! )
 	// const Matrix3r& getTrsfInc() const { return _trsfInc; }
 	
 	/*! return pointer to column-major OpenGL 4x4 matrix applying pure shear. This matrix is suitable as argument for glMultMatrixd.
@@ -58,8 +58,8 @@ class Cell: public Serializable{
 		void fillGlShearTrsfMatrix(double m[16]);
 	public:
 
-	//! "integrate" velGrad, update cached values used by public getter
-	void integrateAndUpdate(Real dt);
+	//! "integrate" velGrad, update cached values used by public getter. If initH, Hsize is defined on the basis of refSize and trsf (only used if refSize is modified); else it is incremented the same way as for trsf.
+	void integrateAndUpdate(Real dt, bool initH=false);
 	/*! Return point inside periodic cell, even if shear is applied */
 	Vector3r wrapShearedPt(const Vector3r& pt) const { return shearPt(wrapPt(unshearPt(pt))); }
 	/*! Return point inside periodic cell, even if shear is applied; store cell coordinates in period. */
@@ -70,20 +70,16 @@ class Cell: public Serializable{
 	Vector3r shearPt(const Vector3r& pt) const { return _shearTrsf*pt; }
 	/*! Wrap point to inside the periodic cell; don't compute number of periods wrapped */
 	Vector3r wrapPt(const Vector3r& pt) const {
-		Vector3r ret; for(int i=0;i<3;i++) ret[i]=wrapNum(pt[i],_size[i]); return ret;
-	}
+		Vector3r ret; for(int i=0;i<3;i++) ret[i]=wrapNum(pt[i],_size[i]); return ret;}
 	/*! Wrap point to inside the periodic cell; period will contain by how many cells it was wrapped. */
 	Vector3r wrapPt(const Vector3r& pt, Vector3i& period) const {
-		Vector3r ret; for(int i=0; i<3; i++){ ret[i]=wrapNum(pt[i],_size[i],period[i]); } return ret;
-	}
+		Vector3r ret; for(int i=0; i<3; i++){ ret[i]=wrapNum(pt[i],_size[i],period[i]); } return ret;}
 	/*! Wrap number to interval 0…sz */
 	static Real wrapNum(const Real& x, const Real& sz) {
-		Real norm=x/sz; return (norm-floor(norm))*sz;
-	}
+		Real norm=x/sz; return (norm-floor(norm))*sz;}
 	/*! Wrap number to interval 0…sz; store how many intervals were wrapped in period */
 	static Real wrapNum(const Real& x, const Real& sz, int& period) {
-		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
-	}
+		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;}
 
 	// relative position and velocity for interaction accross multiple cells
 	Vector3r intrShiftPos(const Vector3i& cellDist) const { return Hsize*cellDist.cast<Real>(); }
@@ -92,12 +88,12 @@ class Cell: public Serializable{
 	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-velGrad*pos); return vel; }
 
 	Vector3r getRefSize() const { return refSize; }
-	void setRefSize(const Vector3r& s){ refSize=s; integrateAndUpdate(0); }
+	void setRefSize(const Vector3r& s){refSize=s; Hsize=Matrix3r::Zero(); Hsize.diagonal()=refSize; Hsize=trsf*Hsize; integrateAndUpdate(0);}
+	void setInitHsize(const Matrix3r& m){Hsize=m; for (int k=0;k<3;k++) refSize[k]=Hsize.col(k).norm(); integrateAndUpdate(0);}
 	Matrix3r getTrsf() const { return trsf; }
-	void setTrsf(const Matrix3r& m){ trsf=m; integrateAndUpdate(0); }
+	void setTrsf(const Matrix3r& m){ Hsize=m*invTrsf*Hsize; trsf=m; integrateAndUpdate(0); }
 	// return current cell volume
-	Real getVolume() const { return Hsize.determinant(); }
-
+	Real getVolume() const {return Hsize.determinant();}
 	void postLoad(Cell&){ integrateAndUpdate(0); }
 
 	// to resolve overloads
@@ -107,8 +103,9 @@ class Cell: public Serializable{
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
-		((Vector3r,refSize,Vector3r(1,1,1),Attr::triggerPostLoad,"Reference size of the cell."))
-		((Matrix3r,trsf,Matrix3r::Identity(),Attr::triggerPostLoad,"Current transformation matrix of the cell."))
+		((Vector3r,refSize,Vector3r(1,1,1),Attr::readonly,"Reference size of the cell. Change the value with :yref:`Cell::setRefSize`"))
+		((Matrix3r,trsf,Matrix3r::Identity(),Attr::readonly,"Current transformation matrix of the cell. Change the value with :yref:`Cell::setTrsf`"))
+		((Matrix3r,invTrsf,Matrix3r::Identity(),Attr::readonly,"Inverse of current transformation matrix of the cell."))
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in NewtonIntegrator."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
 		((Matrix3r,Hsize,Matrix3r::Zero(),Attr::readonly,"The current cell size (one column per box edge), computed from *refSize* and *trsf* |yupdate|"))
@@ -122,8 +119,11 @@ class Cell: public Serializable{
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
 		.def("shearPt",&Cell::shearPt,"Apply shear (cell skew+rot) on the point")
 		.def("wrapPt",&Cell::wrapPt_py,"Wrap point inside the reference cell, assuming the cell has no skew+rot.")
+		.def("setTrsf",&Cell::setTrsf,"Set transformation (will update Hsize as if it was initialy an axis-aligned cuboïd).")
+		.def("setRefSize",&Cell::setRefSize,"Set reference size of the cell (will update Hsize as if the cell was initialy an axis-aligned cuboïd).")
+		.def("setInitHsize",&Cell::setInitHsize,"Define reference base vectors of the undeformed period. The shape is arbitrary: a non-rectangular parallepiped can be defined as the reference configuration, and will correspond to trsf=0.")
 		.def_readonly("shearTrsf",&Cell::_shearTrsf,"Current skew+rot transformation (no resize)")
-		.def_readonly("unshearTrsf",&Cell::_shearTrsf,"Inverse of the current skew+rot transformation (no resize)")
+		.def_readonly("unshearTrsf",&Cell::_unshearTrsf,"Inverse of the current skew+rot transformation (no resize)")
 	);
 };
 REGISTER_SERIALIZABLE(Cell);

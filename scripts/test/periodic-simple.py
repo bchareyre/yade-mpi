@@ -24,7 +24,7 @@ O.bodies.append(utils.sphere([0,2,5.5],2))
 O.bodies.appendClumped([utils.sphere([0,4,8],.8),utils.sphere([0,5,7],.6)])
 # sets up the periodic cell
 O.periodic=True
-O.cell.refSize=Vector3(10,10,10)
+O.cell.setRefSize(Vector3(10,10,10))
 # normally handled in by the simulation... but we want to have the rendering right before start
 O.cell.postProcessAttributes()
 O.dt=.1*utils.PWaveTimeStep()

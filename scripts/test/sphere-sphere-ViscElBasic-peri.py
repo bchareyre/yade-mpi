@@ -36,7 +36,7 @@ O.engines=[
 ]
 
 O.periodic=True
-O.cell.refSize=Vector3(1,1,1)
+O.cell.setRefSize(Vector3(1,1,1))
 
 O.dt=.01*tc
 

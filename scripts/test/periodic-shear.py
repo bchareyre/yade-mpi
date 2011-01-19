@@ -1,5 +1,5 @@
 O.periodic=True
-O.cell.refSize=Vector3(.55,.55,.55)
+O.cell.setRefSize(Vector3(.55,.55,.55))
 O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
 O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
 O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
@@ -26,7 +26,7 @@ def doCellFlip():
 #	O.cellShear=Vector3(.2*sin(g),.2*cos(pi*g),.2*sin(2*g)+.2*cos(3*g))
 #	time.sleep(0.001)
 #	g+=1e-3
-O.cell.trsf=Matrix3(1,0,0, 0,1,.5, 0,0,1)
+O.cell.setTrsf(Matrix3(1,0,0, 0,1,.5, 0,0,1))
 O.dt=2e-2*utils.PWaveTimeStep()
 O.step()
 O.saveTmp()

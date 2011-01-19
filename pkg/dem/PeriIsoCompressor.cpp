@@ -75,7 +75,7 @@ void PeriIsoCompressor::action(){
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
 	assert(scene->dt>0);
-	for(int axis=0; axis<3; axis++){ scene->cell->velGrad(axis,axis)=cellGrow[axis]/(scene->dt*scene->cell->refSize[axis]); }
+	for(int axis=0; axis<3; axis++){ scene->cell->velGrad(axis,axis)=cellGrow[axis]/(scene->dt*scene->cell->getSize()[axis]); }
 	// scene->cell->refSize+=cellGrow;
 
 	// handle state transitions
@@ -95,18 +95,11 @@ void PeriIsoCompressor::action(){
 }
 
 void PeriTriaxController::strainStressStiffUpdate(){
-	// update strain first
-	//"Natural" strain, correct for large deformations, only used for comparison with goals
+	//"Natural" strain, still correct for large deformations, used for comparison with goals
 	for (int i=0;i<3;i++) strain[i]=log(scene->cell->trsf(i,i));
-	//stress tensor and stiffness
 
 	//Compute volume of the deformed cell
-	// NOTE : needs refSize, could be generalized to arbitrary initial shapes using trsf*refHsize
-	// → initial cell size is always box, and will be. The cell repeats  periodically, initial shape doesn't (shouldn't, at least) dinfluence interactions at all/
-	// → this is one more place where Hsize would make things shorter : volume=Hsize.Determinant; The full code relies on the fact that initial Hsize is a box. You didn't modify the equation btw, result is the same as in r1936, which was (with spaces...)
-	//trsf*Matrix3r ( scene->cell->refSize[0],0,0, 0,scene->cell->refSize[1],0,0,0,scene->cell->refSize[2] ) ).Determinant()
-	//remark : the volume of a parallelepiped u1,u2,u3 is always det(u1,u2,u3)
-	Real volume=scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
+	Real volume=scene->cell->Hsize.determinant();
 
 	//Compute sum(fi*lj) and stiffness
 	stressTensor = Matrix3r::Zero();
@@ -121,25 +114,13 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->geom.get() );
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
-		//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
-
-		Vector3r branch=(-Body::byId(I->getId1())->state->pos + Body::byId(I->getId2())->state->pos + scene->cell->Hsize*I->cellDist.cast<Real>());
-// 		Vector3r branch= gsc->normal* ( gsc->refR1+gsc->refR2 );
-		#if 0
-			// remove this block later
-			// tensorial product f*branch (hand-write the tensor product to prevent matrix instanciation inside the loop by makeTensorProduct)
-			//stressTensor(0,0)+=f[0]*branch[0]; stressTensor(1,0)+=f[1]*branch[0]; stressTensor(2,0)+=f[2]*branch[0];
-			//stressTensor(0,1)+=f[0]*branch[1]; stressTensor(1,1)+=f[1]*branch[1]; stressTensor(2,1)+=f[2]*branch[1];
-			//stressTensor(0,2)+=f[0]*branch[2]; stressTensor(1,2)+=f[1]*branch[2]; stressTensor(2,2)+=f[2]*branch[2];
-		#endif
+		Vector3r branch=Body::byId(I->getId2(),scene)->state->pos + scene->cell->Hsize*I->cellDist.cast<Real>() -Body::byId(I->getId1(),scene)->state->pos;
 		stressTensor+=f*branch.transpose();
-		if( !dynCell )
-		{
+		if( !dynCell ){
 			for ( int i=0; i<3; i++ ) sumStiff[i]+=abs ( gsc->normal[i] ) *nsi->kn+ ( 1-abs ( gsc->normal[i] ) ) *nsi->ks;
-			n++;
-		}
+			n++;}
 	}
-	// Compute stressTensor=sum(fi*lj)/Volume (Love equation)
+	// Divide by volume as in stressTensor=sum(fi*lj)/Volume (Love equation)
 	stressTensor /= volume;
 	for(int axis=0; axis<3; axis++) stress[axis]=stressTensor(axis,axis);
 	LOG_DEBUG ( "stressTensor : "<<endl
@@ -164,27 +145,23 @@ void PeriTriaxController::action()
 	//FIXME : this is wrong I think (almost sure, B.)
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
-	const Vector3r& refSize=scene->cell->refSize;
+	const Vector3r& refSize=scene->cell->getSize();
 	if (maxBodySpan[0]<=0){
 		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 			if(!b || !b->bound) continue;
-			for(int i=0; i<3; i++) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);
-		}
+			for(int i=0; i<3; i++) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);}
 	}
 	// check current size
 	if(2.1*maxBodySpan[0]>cellSize[0] || 2.1*maxBodySpan[1]>cellSize[1] || 2.1*maxBodySpan[2]>cellSize[2]){
 		LOG_DEBUG("cellSize="<<cellSize<<", maxBodySpan="<<maxBodySpan);
-		throw runtime_error("Minimum cell size is smaller than 2.1*maxBodySpan (periodic collider requirement)");
-	}
+		throw runtime_error("Minimum cell size is smaller than 2.1*maxBodySpan (periodic collider requirement)");}
 	bool doUpdate((scene->iter%globUpdate)==0);
 	if(doUpdate || min(stiff[0],min(stiff[1],stiff[2])) <=0 || dynCell){ strainStressStiffUpdate(); }
 
 	// set mass to be sum of masses, if not set by the user
 	if(dynCell && isnan(mass)){
 		mass=0; FOREACH(const shared_ptr<Body>& b, *scene->bodies){ if(b && b->state) mass+=b->state->mass; }
-		LOG_INFO("Setting cell mass to "<<mass<<" automatically.");
-	}
-
+		LOG_INFO("Setting cell mass to "<<mass<<" automatically.");}
 	bool allOk=true;
 	// apply condition along each axis separately (stress or strain)
 	assert(scene->dt>0.);
@@ -213,11 +190,7 @@ void PeriTriaxController::action()
 		// limit maximum strain rate
 		if (abs(strain_rate)>maxStrainRate[axis]) strain_rate = Mathr::Sign(strain_rate)*maxStrainRate[axis];
 		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
-
-		//if ((scene->iter%5000)==0){cerr<< axis <<": velGrad="<<strain_rate<<", maxCellsize"<<-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt<<endl;}
 		strain_rate=max(strain_rate,-(cellSize[axis]-2.1*maxBodySpan[axis])/scene->dt);
-		//if ((scene->iter%5000)==0){cerr <<"velGrad="<<strain_rate<<endl<<endl;}
-
 
 		// crude way of predicting stress, for steps when it is not computed from intrs
 		if(doUpdate) LOG_DEBUG(axis<<": cellGrow="<<strain_rate*scene->dt<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);
@@ -232,8 +205,7 @@ void PeriTriaxController::action()
 			// since strain is prescribed exactly, tolerances need just to accomodate rounding issues
 			if((goal[axis]!=0 && abs((curr-goal[axis])/goal[axis])>1e-6) || abs(curr-goal[axis])>1e-6){
 				allOk=false;
-				if(doUpdate) LOG_DEBUG("Strain not OK; "<<abs(curr-goal[axis])<<">1e-6");
-			}
+				if(doUpdate) LOG_DEBUG("Strain not OK; "<<abs(curr-goal[axis])<<">1e-6");}
 		}
 	}
 	// update stress and strain
@@ -254,7 +226,7 @@ void PeriTriaxController::action()
 	if(allOk){
 		if(doUpdate || currUnbalanced<0){
 			currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
-			LOG_DEBUG("Stress/strain="<<(stressMask&1?stress[0]:strain[0])<<","<<(stressMask&2?stress[1]:strain[1])<<","<<(stressMask&4?stress[2]:strain[2])<<", goal="<<goal<<", unbalanced="<<currUnbalanced );}
+			LOG_DEBUG("Stress/strain="<< (stressMask&1?stress[0]:strain[0]) <<"," <<(stressMask&2?stress[1]:strain[1])<<"," <<(stressMask&4?stress[2]:strain[2]) <<", goal="<<goal<<", unbalanced="<<currUnbalanced );}
 		if(currUnbalanced<maxUnbalanced){
 			// LOG_INFO("Goal reached, packing stable.");
 			if (!doneHook.empty()){
@@ -264,9 +236,6 @@ void PeriTriaxController::action()
 		}
 	}
 }
-
-
-
 
 CREATE_LOGGER(Peri3dController);
 void Peri3dController::action(){

@@ -82,7 +82,7 @@ import numpy
 avgRadius=numpy.average([r for c,r in sp])
 O.bodies.append([utils.sphere(c,r,color=utils.randomColor()) for c,r in sp])
 O.periodic=True
-O.cell.refSize=sp.cellSize
+O.cell.setRefSize(sp.cellSize)
 axis=2
 ax1=(axis+1)%3
 ax2=(axis+2)%3

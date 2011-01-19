@@ -531,9 +531,10 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
-	Real volume;
-	if (smallStrains){volume = scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];}
-	else volume = scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
+// 	if (smallStrains){volume = scene->getVolume()cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];}
+// 	else volume = scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
+	// Using the function provided by Cell (BC)
+	Real volume = scene->cell->getVolume();
 	Matrix3r stress = Matrix3r::Zero();
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;

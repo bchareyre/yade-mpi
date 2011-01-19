@@ -18,7 +18,7 @@ class TestPBC(unittest.TestCase):
 	# prefix test names with PBC: 
 	def setUp(self):
 		O.reset(); O.periodic=True;
-		O.cell.refSize=Vector3(2.5,2.5,3)
+		O.cell.setRefSize(Vector3(2.5,2.5,3))
 		self.cellDist=Vector3i(0,0,10) # how many cells away we go
 		self.relDist=Vector3(0,.999999999999999999,0) # rel position of the 2nd ball within the cell
 		self.initVel=Vector3(0,0,5)
