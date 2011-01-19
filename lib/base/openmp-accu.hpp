@@ -28,8 +28,8 @@ class OpenMPArrayAccumulator{
 	size_t nCL; // current number of allocated cache lines
 	int nCL_for_N(size_t n){ return n/perCL+(n%perCL==0 ? 0 : 1); } // return number of cache lines to allocate for given number of elements
 	public:
-		OpenMPArrayAccumulator()        : CLS(sysconf(_SC_LEVEL1_DCACHE_LINESIZE)), nThreads(omp_get_max_threads()), perCL(CLS/sizeof(T)), chunks(nThreads,NULL), sz(0), nCL(0) { }
-		OpenMPArrayAccumulator(size_t n): CLS(sysconf(_SC_LEVEL1_DCACHE_LINESIZE)), nThreads(omp_get_max_threads()), perCL(CLS/sizeof(T)), chunks(nThreads,NULL), sz(0), nCL(0) { resize(n); }
+		OpenMPArrayAccumulator()        : CLS(sysconf(_SC_LEVEL1_DCACHE_LINESIZE)>0 ? sysconf(_SC_LEVEL1_DCACHE_LINESIZE) : 64), nThreads(omp_get_max_threads()), perCL(CLS/sizeof(T)), chunks(nThreads,NULL), sz(0), nCL(0) { }
+		OpenMPArrayAccumulator(size_t n): CLS(sysconf(_SC_LEVEL1_DCACHE_LINESIZE)>0 ? sysconf(_SC_LEVEL1_DCACHE_LINESIZE) : 64), nThreads(omp_get_max_threads()), perCL(CLS/sizeof(T)), chunks(nThreads,NULL), sz(0), nCL(0) { resize(n); }
 		// change number of elements
 		void resize(size_t n){
 			if(n==sz) return; // nothing to do
