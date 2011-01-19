@@ -34,6 +34,7 @@ par.add_option('--generate-manpage',help="Generate man page documenting this pro
 par.add_option('--rebuild',help="Re-run build in the source directory, then run the updated yade with the same command line except --rebuild. The build profile for this build (${profile}) and its stored parameters will be used.",dest='rebuild',action='store_true')
 par.add_option('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
 par.add_option('--debug',help='Run the debug build, if available.',dest='debug',action='store_true')
+par.add_option('--checks',help='Run a series of user-defined check tests as described in ${sourceRoot}/scripts/test/checks/README',dest='checks',action='store_true')
 par.add_option('--no-gdb',help='Do not show backtrace when yade crashes (only effective with --debug).',dest='noGdb',action='store_true',)
 par.disable_interspersed_args()
 
@@ -89,7 +90,6 @@ if opts.test:
 		print 20*'*'+' SOME TESTS FAILED '+20*'*'
 		sys.exit(1)
 
-
 # c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
 # do this early, to have debug messages in the boot code (plugin registration etc)
 if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
@@ -143,6 +143,11 @@ yade.runtime.opts=opts
 
 from yade import *
 from math import *
+
+# Run the check tests listed in scripts/test/checks/checkList.py
+if opts.checks:
+	checksPath='${sourceRoot}'+'/scripts/test/checks' # replaced at install-time
+	execfile(checksPath+'/checkList.py')
 
 def userSession(qt4=False):
 	# prepare nice namespace for users
@@ -243,5 +248,6 @@ elif gui=='qt4':
 	import yade.qt # this yade.qt is different from the one that comes with qt3
 	qapp=QtGui.QApplication(sys.argv)
 	userSession(qt4=True)
+
 O.exitNoBacktrace()
 
