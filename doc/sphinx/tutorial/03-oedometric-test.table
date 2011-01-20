@@ -1,0 +1,4 @@
+rMean rRelFuzz maxLoad
+.05 .1 1e6
+.05 .2 1e6
+.05 .3 1e6 

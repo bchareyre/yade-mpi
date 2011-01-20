@@ -385,6 +385,7 @@ extensions = [
 	#'matplotlib.sphinxext.mathmpl',
     'ipython_directive',
     'ipython_console_highlighting',
+	 'youtube'
     ]
 
 # the sidebar extension

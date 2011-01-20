@@ -23,6 +23,8 @@ See older `tentative contents <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc
 
   introduction.rst
 
+  tutorial.rst
+
   formulation.rst
 
   user.rst
