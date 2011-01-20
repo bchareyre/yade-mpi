@@ -6,8 +6,8 @@ from yade import pack,log
 #log.setLevel('PeriTriaxController',log.DEBUG)
 #log.setLevel('Shop',log.TRACE)
 O.periodic=True
-O.cell.setRefSize(Vector3(.1,.1,.1))
-O.cell.setTrsf(Matrix3().Identity);
+O.cell.refSize=(.1,.1,.1)
+O.cell.trsf=Matrix3().Identity;
 
 sp=pack.SpherePack()
 radius=5e-3

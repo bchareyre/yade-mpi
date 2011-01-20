@@ -1,5 +1,5 @@
 O.periodic=True
-O.cell.setRefSize(Vector3(20,20,10))
+O.cell.refSize=(20,20,10)
 from yade import pack,log,timing
 O.materials.append(FrictMat(young=30e9,density=2400))
 p=pack.SpherePack()

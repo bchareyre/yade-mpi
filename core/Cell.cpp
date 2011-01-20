@@ -9,6 +9,7 @@ void Cell::integrateAndUpdate(Real dt){
 	invTrsf=trsf.inverse();
 	// Hsize contains colums with updated base vectors
 	Hsize+=_trsfInc*Hsize;
+	if(Hsize.determinant()==0){ throw runtime_error("Cell is degenerate (zero volume)."); }
 	// lengths of transformed cell vectors, skew cosines
 	Matrix3r Hnorm; // normalized transformed base vectors
 	for(int i=0; i<3; i++){

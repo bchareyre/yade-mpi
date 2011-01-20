@@ -14,8 +14,6 @@ from math import *
 from yade import system
 from yade import *
 
-
-
 allClasses=system.childClasses('Serializable')
 
 class TestObjectInstantiation(unittest.TestCase):
@@ -65,6 +63,36 @@ class TestObjectInstantiation(unittest.TestCase):
 		# accessing invalid attributes raises AttributeError
 		self.assertRaises(AttributeError,lambda: Sphere(attributeThatDoesntExist=42))
 		self.assertRaises(AttributeError,lambda: Sphere().attributeThatDoesntExist)
+	##
+	## attribute flags
+	##
+	def testTriggerPostLoad(self):
+		'Core: Attr::triggerPostLoad'
+		# TranslationEngine normalizes translationAxis automatically
+		# anything else could be tested
+		te=TranslationEngine();
+		te.translationAxis=(0,2,0)
+		self.assert_(te.translationAxis==(0,1,0))
+	def testHidden(self):
+		'Core: Attr::hidden'
+		# hidden attributes are not wrapped in python at all
+		self.assert_(not hasattr(Interaction(),'iterLastSeen'))
+	def testNoSave(self):
+		'Core: Attr::noSave'
+		# update bound of the particle
+		O.bodies.append(utils.sphere((0,0,0),1))
+		O.engines=[InsertionSortCollider([Bo1_Sphere_Aabb()]),NewtonIntegrator()]
+		O.step()
+		O.saveTmp()
+		mn0=Vector3(O.bodies[0].bound.min)
+		O.reload()
+		mn1=Vector3(O.bodies[0].bound.min)
+		# check that the minimum is not saved
+		self.assert_(not isnan(mn0[0]))
+		self.assert_(isnan(mn1[0]))
+	def _testReadonly(self):
+		'Core: Attr::readonly'
+		self.assertRaises(AttributeError,lambda: setattr(Body(),'id',3))
 	
 class TestEigenWrapper(unittest.TestCase):
 	def assertSeqAlmostEqual(self,v1,v2):

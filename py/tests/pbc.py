@@ -18,7 +18,7 @@ class TestPBC(unittest.TestCase):
 	# prefix test names with PBC: 
 	def setUp(self):
 		O.reset(); O.periodic=True;
-		O.cell.setRefSize(Vector3(2.5,2.5,3))
+		O.cell.refSize=(2.5,2.5,3)
 		self.cellDist=Vector3i(0,0,10) # how many cells away we go
 		self.relDist=Vector3(0,.999999999999999999,0) # rel position of the 2nd ball within the cell
 		self.initVel=Vector3(0,0,5)
@@ -31,6 +31,10 @@ class TestPBC(unittest.TestCase):
 		O.cell.velGrad=Matrix3(0,0,0, 0,0,0, 0,0,-1)
 		O.cell.homoDeform=3
 		O.dt=0 # do not change positions with dt=0 in NewtonIntegrator, but still update velocities from velGrad
+	def testRefSize(self):
+		"PBC: Hsize reflects changes of refSize"
+		O.cell.refSize=(2.55,11,45)
+		self.assert_(O.cell.Hsize==Matrix3(2.55,0,0, 0,11,0, 0,0,45));
 	def testHomotheticResizeVel(self):
 		"PBC: homothetic cell deformation adjusts particle velocity (homoDeform==3)"
 		O.dt=1e-5

@@ -19,7 +19,7 @@ for i in xrange(250):
 cubeSize=20
 # absolute positioning of the cell is not important
 O.periodic=True
-O.cell.setRefSize(Vector3(cubeSize,cubeSize,cubeSize))
+O.cell.refSize=(cubeSize,cubeSize,cubeSize)
 O.dt=utils.PWaveTimeStep()
 O.saveTmp()
 from yade import qt

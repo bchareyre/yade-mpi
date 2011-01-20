@@ -90,8 +90,8 @@ Periodic properties are transferred to the simulation correctly:
 	assert(isinstance(rot,Matrix3))
 	if self.cellSize!=Vector3.Zero:
 		O.periodic=True
-		O.cell.setTrsf(rot)
-		O.cell.setRefSize(self.cellSize)
+		O.cell.trsf=rot
+		O.cell.refSize=self.cellSize
 	if not self.hasClumps():
 		return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
 	else:
@@ -427,12 +427,12 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		# x1,y1,z1 already computed above
 		sp=SpherePack()
 		O.periodic=True
-		O.cell.setRefSize(Vector3(x1,y1,z1))
+		O.cell.refSize=(x1,y1,z1)
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.cell.refSize
 		#print x1,y1,z1,radius,rRelFuzz
 		O.materials.append(FrictMat(young=3e10,density=2400))
 		num=sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,spheresInCell,True)
-		O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=5,sweepLength=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
+		O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=5,verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
 		O.materials.append(FrictMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 		O.dt=utils.PWaveTimeStep()
@@ -478,9 +478,9 @@ def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None):
 	O.switchScene(); O.resetThisScene()
 	sp=SpherePack()
 	O.periodic=True
-	O.cell.setRefSize(Vector3(initSize))
+	O.cell.refSize=initSize
 	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True)
-	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=2,sweepLength=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
+	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=2,verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 	O.dt=utils.PWaveTimeStep()

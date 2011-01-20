@@ -27,6 +27,7 @@
 #include<unistd.h>
 #include<time.h>
 
+namespace py=boost::python;
 
 YADE_PLUGIN((Scene));
 CREATE_LOGGER(Scene);
@@ -49,6 +50,7 @@ void Scene::fillDefaultTags(){
 	tags.push_back("id="+id);
 	tags.push_back("d.id="+id);
 	tags.push_back("id.d="+id);
+	// tags.push_back("revision="+py::extract<string>(py::import("yade.config").attr("revision"))());;
 }
 
 

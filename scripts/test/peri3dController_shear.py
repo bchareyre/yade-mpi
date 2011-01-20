@@ -55,6 +55,7 @@ bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
 
 renderer=qt.Renderer()
 renderer.intrPhys,renderer.shape=True,False
+Gl1_CpmPhys.dmgLabel=False
 qt.View()
 O.run()
 #plot.plot()
