@@ -2,9 +2,6 @@
 # encoding: utf-8
 from yade import utils, ymport, qt, plot
 
-from yade import log
-log.setLevel('Law2_ScGeom_WirePhys_WirePM',log.TRACE)	# must compile with debug option to get logs 
-
 ## definition of some colors for colored text output in terminal
 BLUE = '\033[94m'
 GREEN = '\033[92m'
@@ -13,10 +10,7 @@ RED = '\033[91m'
 BLACK = '\033[0m'
 
 #### short description of script
-print BLUE+'''
-Simple test for two particles to test the contact law for the WireMat
-by unsing the '''+RED+'''StepDisplacer'''+BLUE+''' with loading and unloading.
-'''+BLACK
+print BLUE+'Simple test for two particles to test contact law with '+RED+'StepDisplacer'+BLUE+'.'+BLACK
 
 #### define parameters for the net
 # mesh opening size
@@ -41,7 +35,7 @@ netMat = O.materials.append(WireMat(young=young,poisson=poisson,density=density,
 
 
 #### create boddies, default: dynamic=True
-O.bodies.append( utils.sphere([0,0,0], radius, wire=False, color=[1,0,0], highlight=False, material=netMat) )
+O.bodies.append( utils.sphere([0,0,0], radius, wire=False, color=[1,0,0], highlight=False, material=netMat, fixed=True) )
 O.bodies.append( utils.sphere([0,a,0], radius, wire=False, color=[0,1,0], highlight=False, material=netMat) )
 
 FixedSphere=O.bodies[0]
@@ -50,18 +44,21 @@ MovingSphere=O.bodies[1]
 FixedSphere.dynamic=False
 MovingSphere.dynamic=False
 
+
+#### define addPlotData
 def addPlotData():
 	if O.iter < 1:
 		plot.addData( Fn=0., un=0. )
-		plot.saveGnuplot('net-2part-displ-unloading')
+		#plot.saveGnuplot('net-2part-displ')
 	else:
 		try:
 			i=O.interactions[FixedSphere.id,MovingSphere.id]
 			plot.addData( Fn=i.phys.normalForce.norm(), un=(O.bodies[1].state.pos[1]-O.bodies[0].state.pos[1])-a )
-			plot.saveGnuplot('net-2part-displ-unloading')
+			#plot.saveGnuplot('net-2part-displ')
 		except:
 			print "No interaction!"
 			O.pause()
+
 
 #### define simulation to create link
 interactionRadius=2.
@@ -74,63 +71,31 @@ O.engines = [
 	[Ip2_WireMat_WireMat_WirePhys(linkThresholdIteration=1,label='interactionPhys')],
 	[Law2_ScGeom_WirePhys_WirePM(linkThresholdIteration=1,label='interactionLaw')]
 	),
+	NewtonIntegrator(damping=0.),
 	PyRunner(initRun=True,iterPeriod=1,command='addPlotData()')
 ]
 
 
 #### plot some results
 plot.plots={'un':('Fn',)}
-plot.plot()
+plot.plot(noShow=False, subPlots=False)
 
 
 #### create link (no time step needed since loading is involved in this step)
-O.step() # create cohesive link (cohesiveTresholdIteration=1)
+O.step() # create link (cohesiveTresholdIteration=1)
 
 
 #### initializes now the interaction detection factor
 aabb.aabbEnlargeFactor=-1.
 Ig2ssGeom.interactionDetectionFactor=-1.
 
-## time step definition
+
+#### time step definition
 ## no time step definition is required since setVelocities=False in StepDisplacer
 
 
 #### define simulation loading
 O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines
-
-print 'Loading (press enter)'
-raw_input()
-O.run(100,True)
-
-#### define simulation unloading
-O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,-1.3e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
-
-print 'Unloading (press enter)'
-raw_input()
-O.run(50,True)
-
-#### define simulation reloading
-O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1.6e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
-
-print 'Reloading (press enter)'
-raw_input()
-O.run(500,True)
-
-
-#### define simulation unloading
-O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,-1.45e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
-
-print 'Reunloading (press enter)'
-raw_input()
-O.run(10,True)
-
-
-#### define simulation reloading
-O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1.6e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
-
-print 'Reloading (press enter)'
-raw_input()
-O.run(500,True)
 
 
 #### to see it

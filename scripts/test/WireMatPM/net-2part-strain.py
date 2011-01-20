@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 # encoding: utf-8
-from yade import utils, ymport, qt, plot
+from yade import utils, ymport, qt
+
+#### logging
+from yade import log
+log.setLevel('Law2_ScGeom_WirePhys_WirePM',log.TRACE)	# must compile with debug option to get logs 
+#log.setLevel('Law2_ScGeom_WirePhys_WirePM',log.DEBUG)
+#log.setLevel('',log.WARN)
 
 ## definition of some colors for colored text output in terminal
 BLUE = '\033[94m'
@@ -10,7 +16,7 @@ RED = '\033[91m'
 BLACK = '\033[0m'
 
 #### short description of script
-print BLUE+'Simple test for two particles to test contact law with '+RED+'StepDisplacer'+BLUE+'.'+BLACK
+print BLUE+'Simple test for two particles to test contact law with '+RED+'UniaxialStrainer'+BLUE+'.'+BLACK
 
 #### define parameters for the net
 # mesh opening size
@@ -41,26 +47,18 @@ O.bodies.append( utils.sphere([0,a,0], radius, wire=False, color=[0,1,0], highli
 FixedSphere=O.bodies[0]
 MovingSphere=O.bodies[1]
 
-FixedSphere.dynamic=False
-MovingSphere.dynamic=False
+FixedSphere.dynamic=True
+MovingSphere.dynamic=True
 
 
-#### define addPlotData
-def addPlotData():
-	if O.iter < 1:
-		plot.addData( Fn=0., un=0. )
-		plot.saveGnuplot('net-2part-displ')
-	else:
-		try:
-			i=O.interactions[FixedSphere.id,MovingSphere.id]
-			plot.addData( Fn=i.phys.normalForce.norm(), un=(O.bodies[1].state.pos[1]-O.bodies[0].state.pos[1])-a )
-			plot.saveGnuplot('net-2part-displ')
-		except:
-			print "No interaction!"
-			O.pause()
+#### initialize values for UniaxialStrainer
+bb = utils.uniaxialTestFeatures(axis=1)
+negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
+strainRateTension = 1./a
+setSpeeds = True
 
 
-#### define simulation to create cohesive link
+#### define simulation to create link
 interactionRadius=2.
 O.engines = [
 	ForceResetter(),
@@ -71,13 +69,8 @@ O.engines = [
 	[Ip2_WireMat_WireMat_WirePhys(linkThresholdIteration=1,label='interactionPhys')],
 	[Law2_ScGeom_WirePhys_WirePM(linkThresholdIteration=1,label='interactionLaw')]
 	),
-	PyRunner(initRun=True,iterPeriod=1,command='addPlotData()')
+	NewtonIntegrator(damping=0.)
 ]
-
-
-#### plot some results
-plot.plots={'un':('Fn',)}
-plot.plot()
 
 
 #### create link (no time step needed since loading is involved in this step)
@@ -88,13 +81,30 @@ O.step() # create cohesive link (cohesiveTresholdIteration=1)
 aabb.aabbEnlargeFactor=-1.
 Ig2ssGeom.interactionDetectionFactor=-1.
 
+## time step definition
+O.dt = 1e-5
+## critical time step proposed by Bertrand
+#O.dt = 0.2*sqrt(particleMass/(2.*O.interactions[0,1].phys.kn))
 
-#### time step definition
-## no time step definition is required since setVelocities=False in StepDisplacer
+#### plot some results
+from math import *
+from yade import plot
+
+plot.plots={'un':('Fn',)}
+plot.plot(noShow=False, subPlots=False)
+
+def addPlotData():
+	try:
+		i=O.interactions[FixedSphere.id,MovingSphere.id]
+		plot.addData( Fn=i.phys.normalForce.norm(), un=(O.bodies[1].state.pos[1]-O.bodies[0].state.pos[1])-a )
+		#plot.saveGnuplot('net-2part-strain')
+	except:
+		print "No interaction!"
+		O.pause()
 
 
-#### define simulation loading
-O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines
+#### define simulation
+O.engines += [UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=1,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=True,blockRotations=True,setSpeeds=setSpeeds,label='strainer')] + [PyRunner(initRun=True,iterPeriod=1,command='addPlotData()')]
 
 
 #### to see it
