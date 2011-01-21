@@ -217,6 +217,52 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 	return py::make_tuple(edges,cumm);
 }
 
+/* possible enhacement: proportions parameter, so that the domain is not cube, but box with sides having given proportions */
+long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic, Real cloudPorosity){
+	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
+	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
+	
+	int dim=radii.size()+1;
+	if(passing.size()!=radii.size()) throw std::invalid_argument("SpherePack.particleSD2: radii and passing must have the same length.");
+	MatrixXr M=MatrixXr::Zero(dim,dim);
+	VectorXr rhs=VectorXr::Zero(dim);
+	/*
+	
+	We know percentages for each fraction (Δpi) and their radii (ri), and want to find
+	the number of sphere for each fraction Ni and total solid volume Vs. For each fraction,
+	we know that the volume is equal to Ni*(4/3*πri³), which must be equal to Vs*Δpi (Δpi is
+	relative solid volume of the i-th fraction).
+
+	The last equation says that total number of particles (sum of fractions) is equal to N,
+	which is the total number of particles requested by the user.
+
+	   N1     N2     N3    Vs       rhs
+
+	4/3πr₁³   0      0     -Δp₁   | 0
+	  0     4/3πr₂³  0     -Δp₂   | 0
+	  0       0    4/3πr₃³ -Δp₃   | 0
+     1       1      1      0     | N
+
+	*/
+	for(int i=0; i<dim-1; i++){
+		M(i,i)=(4/3.)*Mathr::PI*pow(radii[i],3);
+		M(i,dim-1)=-(passing[i]-(i>0?passing[i-1]:0))/100.;
+		M(dim-1,i)=1;
+	}
+	rhs[dim-1]=numSph;
+	// NumsVs=M^-1*rhs: number of spheres and volume of solids
+	VectorXr NumsVs(dim); NumsVs=M.inverse()*rhs;
+	Real Vs=NumsVs[dim-1]; // total volume of solids
+	Real Vtot=Vs/(1-cloudPorosity); // total volume of cell containing the packing
+	Vector3r cellSize=pow(Vtot,1/3.)*Vector3r().Ones(); // for now, assume always cubic sample
+	Real rMean=pow(Vs/(numSph*(4/3.)*Mathr::PI),1/3.); // make rMean such that particleSD will compute the right Vs (called a bit confusingly Vtot anyway) inversely
+	// cerr<<"Vs="<<Vs<<", Vtot="<<Vtot<<", rMean="<<rMean<<endl;
+	// cerr<<"cellSize="<<cellSize<<", rMean="<<rMean<<", numSph="<<numSph<<endl;
+	return particleSD(Vector3r::Zero(),cellSize,rMean,periodic,"",numSph,radii,passing,false);
+};
+
+// TODO: header, python wrapper, default params
+
 // New code to include the psd giving few points of it
 long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount){
 	vector<Real> numbers;
@@ -229,12 +275,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 			Real volS=4./3.*Mathr::PI*pow(radii[i],3.);
 			if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
 			else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
-			
-			cout<<"numbers["<<i<<"] = "<<numbers[i]<<endl;
-			cout<<"radii["<<i<<"] = "<<radii[i]<<endl;
-			cout<<"vol tot = "<<Vtot<<endl;
-			cout<<"v_sphere = "<<volS<<endl;
-			cout<<"passing["<<i<<"] = "<<passing[i]<<endl;
+			cout<<"fraction #"<<i<<" ("<<passing[i]<<"%, r="<<radii[i]<<"): "<<numbers[i]<<" spheres, fraction/cloud volumes "<<volS<<"/"<<Vtot<<endl;
 		}
 	} else {
 		FOREACH(Real p, passing) numbers.push_back(p);
@@ -267,7 +308,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 				if(!overlap) { pack.push_back(Sph(c,r)); break; }
 			}
 			if (t==maxTry) {
-				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<numbers[ii]<<" with radius"<<radii[ii]);
+				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
 				return i;
 			}
 		}

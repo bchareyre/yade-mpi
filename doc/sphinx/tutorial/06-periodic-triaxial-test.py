@@ -35,12 +35,8 @@ if 0:
 	sp.makeCloud((0,0,0),(2,2,2),rMean=.1,rRelFuzz=.3,periodic=True)
 elif 0:
 	## per-fraction distribution
-	## rMean & numSph needed by the algorithm (name is useless but required)
 	## passing: cummulative percentage
-	sp.particleSD((0,0,0),(2,2,2),
-		rMean=.12,name='',
-		radii=[.09,.1,.2],passing=[40,80,100],periodic=True,numSph=300
-	)
+	sp.particleSD2(radii=[.09,.1,.2],passing=[40,80,100],periodic=True,numSph=1000)
 else:
 	## create packing from clumps
 	# configuration of one clump
@@ -70,7 +66,7 @@ O.engines=[
 		# call this function when goal is reached and the packing is stable
 		doneHook='compactionFinished()'
 	),
-	PyRunner(command='addPlotData()',iterPeriod=200),
+	PyRunner(command='addPlotData()',iterPeriod=100),
 ]
 O.dt=.5*utils.PWaveTimeStep()
 
@@ -89,7 +85,6 @@ O.trackEnergy=True
 plot.plots={'i':('unbalanced',),'i ':('sxx','syy','szz'),' i':('exx','eyy','ezz'),
 	# energy plot
 	' i ':(O.energy.keys,None,'Etot'),
-	'snapshot':None
 }
 # show the plot
 plot.plot()
