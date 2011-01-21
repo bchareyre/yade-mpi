@@ -65,7 +65,7 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 		//throw logic_error("IGeomDispatcher::explicitAction does not support periodic boundary conditions (O.periodic==True)");
 		for(int i=0; i<3; i++) cellDist[i]=-(int)((b2->state->pos[i]-b1->state->pos[i])/scene->cell->getSize()[i]+.5);
 	}
-	Vector3r shift2=scene->cell->Hsize*cellDist.cast<Real>();
+	Vector3r shift2=scene->cell->hSize*cellDist.cast<Real>();
 	updateScenePtr();
 	if(force){
 		assert(b1->shape && b2->shape);
@@ -99,7 +99,7 @@ void IGeomDispatcher::action(){
 
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	const bool isPeriodic(scene->isPeriodic);
-	Matrix3r cellHsize; if(isPeriodic) cellHsize=scene->cell->Hsize;
+	Matrix3r cellHsize; if(isPeriodic) cellHsize=scene->cell->hSize;
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
