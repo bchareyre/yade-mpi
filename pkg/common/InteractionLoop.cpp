@@ -53,7 +53,7 @@ void InteractionLoop::action(){
 	size_t callbacksSize=callbacks.size();
 
 	// cache transformed cell size
-	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->Hsize;
+	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->hSize;
 
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)

@@ -196,8 +196,8 @@ void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	Vector3r shearIncrement;
 	if(nonLin>1){
 		State *de1=Body::byId(id1,scene)->state.get(), *de2=Body::byId(id2,scene)->state.get();	
-		Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->Hsize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
-		Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->Hsize*contact->cellDist.cast<Real>()): Vector3r::Zero();
+		Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
+		Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*contact->cellDist.cast<Real>()): Vector3r::Zero();
 		
 		
 		Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shift2, shiftVel, /*preventGranularRatcheting*/ nonLin>2 );	

@@ -577,7 +577,7 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	bStresses.resize(scene->bodies->size());
-	for (int k=0;k<scene->bodies->size();k++) bStresses[k]=Matrix3r::Zero();
+	for (unsigned int k=0;k<scene->bodies->size();k++) bStresses[k]=Matrix3r::Zero();
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
@@ -589,7 +589,7 @@ void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 		if (!scene->isPeriodic)
 			bStresses[I->getId2()]+=(3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*f*((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos)).transpose());
 		else
-			bStresses[I->getId2()]+=(3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*f* ((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos + (scene->cell->Hsize*I->cellDist.cast<Real>()))).transpose());
+			bStresses[I->getId2()]+=(3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*f* ((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos + (scene->cell->hSize*I->cellDist.cast<Real>()))).transpose());
 	}
 }
 

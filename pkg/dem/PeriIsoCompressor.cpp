@@ -99,7 +99,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	for (int i=0;i<3;i++) strain[i]=log(scene->cell->trsf(i,i));
 
 	//Compute volume of the deformed cell
-	Real volume=scene->cell->Hsize.determinant();
+	Real volume=scene->cell->hSize.determinant();
 
 	//Compute sum(fi*lj) and stiffness
 	stressTensor = Matrix3r::Zero();
@@ -114,7 +114,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->geom.get() );
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
-		Vector3r branch=Body::byId(I->getId2(),scene)->state->pos + scene->cell->Hsize*I->cellDist.cast<Real>() -Body::byId(I->getId1(),scene)->state->pos;
+		Vector3r branch=Body::byId(I->getId2(),scene)->state->pos + scene->cell->hSize*I->cellDist.cast<Real>() -Body::byId(I->getId1(),scene)->state->pos;
 		stressTensor+=f*branch.transpose();
 		if( !dynCell ){
 			for ( int i=0; i<3; i++ ) sumStiff[i]+=abs ( gsc->normal[i] ) *nsi->kn+ ( 1-abs ( gsc->normal[i] ) ) *nsi->ks;
@@ -218,7 +218,7 @@ void PeriTriaxController::action()
 	}
  	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
 	//Update energy input
-	Real dW=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->Hsize.determinant();
+	Real dW=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->hSize.determinant();
 	externalWork+=dW;
 	if(scene->trackEnergy) scene->energy->add(-dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
 	prevGrow = strainRate;

@@ -7,13 +7,13 @@ void Cell::integrateAndUpdate(Real dt){
 	// total transformation; M = (Id+G).M = F.M
 	trsf+=_trsfInc*trsf;
 	invTrsf=trsf.inverse();
-	// Hsize contains colums with updated base vectors
-	Hsize+=_trsfInc*Hsize;
-	if(Hsize.determinant()==0){ throw runtime_error("Cell is degenerate (zero volume)."); }
+	// hSize contains colums with updated base vectors
+	hSize+=_trsfInc*hSize;
+	if(hSize.determinant()==0){ throw runtime_error("Cell is degenerate (zero volume)."); }
 	// lengths of transformed cell vectors, skew cosines
 	Matrix3r Hnorm; // normalized transformed base vectors
 	for(int i=0; i<3; i++){
-		Vector3r base(Hsize.col(i));
+		Vector3r base(hSize.col(i));
 		_size[i]=base.norm(); base/=_size[i]; //base is normalized now
 		Hnorm(0,i)=base[0]; Hnorm(1,i)=base[1]; Hnorm(2,i)=base[2];};
 	// skew cosines
@@ -27,7 +27,7 @@ void Cell::integrateAndUpdate(Real dt){
 	// pure unshear transformation
 	_unshearTrsf=_shearTrsf.inverse();
 	// some parts can branch depending on presence/absence of shear
-	_hasShear=(Hsize(0,1)!=0 || Hsize(0,2)!=0 || Hsize(1,0)!=0 || Hsize(1,2)!=0 || Hsize(2,0)!=0 || Hsize(2,1)!=0);
+	_hasShear=(hSize(0,1)!=0 || hSize(0,2)!=0 || hSize(1,0)!=0 || hSize(1,2)!=0 || hSize(2,0)!=0 || hSize(2,1)!=0);
 	// OpenGL shear matrix (used frequently)
 	fillGlShearTrsfMatrix(_glShearTrsfMatrix);
 

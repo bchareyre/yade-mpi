@@ -82,23 +82,23 @@ class Cell: public Serializable{
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;}
 
 	// relative position and velocity for interaction accross multiple cells
-	Vector3r intrShiftPos(const Vector3i& cellDist) const { return Hsize*cellDist.cast<Real>(); }
-	Vector3r intrShiftVel(const Vector3i& cellDist) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return velGrad*Hsize*cellDist.cast<Real>(); return Vector3r::Zero(); }
+	Vector3r intrShiftPos(const Vector3i& cellDist) const { return hSize*cellDist.cast<Real>(); }
+	Vector3r intrShiftVel(const Vector3i& cellDist) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return velGrad*hSize*cellDist.cast<Real>(); return Vector3r::Zero(); }
 	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
 	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-velGrad*pos); return vel; }
 
 	Vector3r getRefSize() const { return refSize; }
-	// change length of initial cell vectors (scale current Hsize by the ratio)
-	// should be identical to: { refSize=s; Hsize=invTrsf*Hsize; for(int i=0;i<3;i++) Hsize.col(i)=Hsize.col(i).normalized()*refSize[i]; /* transform back*/ Hsize=trsf*Hsize; integrateAndUpdate(0); }
-	void setRefSize(const Vector3r& s){ for(int i=0;i<3;i++) Hsize.col(i)*=s[i]/refSize[i]; refSize=s; integrateAndUpdate(0); } 
-	Matrix3r getHsize() const { return Hsize; }
-	void setHsize(const Matrix3r& m){ Hsize=m; for(int k=0;k<3;k++) refSize[k]=Hsize.col(k).norm(); integrateAndUpdate(0);}
-	Matrix3r getHsize0() const { return invTrsf*Hsize; }
+	// change length of initial cell vectors (scale current hSize by the ratio)
+	// should be identical to: { refSize=s; hSize=invTrsf*hSize; for(int i=0;i<3;i++) hSize.col(i)=hSize.col(i).normalized()*refSize[i]; /* transform back*/ hSize=trsf*hSize; integrateAndUpdate(0); }
+	void setRefSize(const Vector3r& s){ for(int i=0;i<3;i++) hSize.col(i)*=s[i]/refSize[i]; refSize=s; integrateAndUpdate(0); } 
+	Matrix3r getHSize() const { return hSize; }
+	void setHSize(const Matrix3r& m){ hSize=m; for(int k=0;k<3;k++) refSize[k]=hSize.col(k).norm(); integrateAndUpdate(0);}
+	Matrix3r getHSize0() const { return invTrsf*hSize; }
 	Matrix3r getTrsf() const { return trsf; }
-	void setTrsf(const Matrix3r& m){ Hsize=m*invTrsf*Hsize; trsf=m; integrateAndUpdate(0); }
+	void setTrsf(const Matrix3r& m){ hSize=m*invTrsf*hSize; trsf=m; integrateAndUpdate(0); }
 
 	// return current cell volume
-	Real getVolume() const {return Hsize.determinant();}
+	Real getVolume() const {return hSize.determinant();}
 	void postLoad(Cell&){ integrateAndUpdate(0); }
 
 	// to resolve overloads
@@ -106,25 +106,26 @@ class Cell: public Serializable{
 	Vector3r wrapPt_py(const Vector3r& pt) const { return wrapPt(pt);}
 
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
-	
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		/* overridden below to be modified by getters/setters because of intended side-effects */
 		((Vector3r,refSize,Vector3r(1,1,1),,"[overridden]"))
 		((Matrix3r,trsf,Matrix3r::Identity(),,"[overridden]"))
-		((Matrix3r,Hsize,Matrix3r::Identity(),,"[overridden]"))
+		((Matrix3r,hSize,Matrix3r::Identity(),,"[overridden]"))
 		/* normal attributes */
 		((Matrix3r,invTrsf,Matrix3r::Identity(),Attr::readonly,"Inverse of current transformation matrix of the cell."))
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in :yref:`NewtonIntegrator`."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
 		((int,homoDeform,3,Attr::triggerPostLoad,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions or velocities of particles. The values have the following meaning: 0: no homothetic deformation, 1: set absolute particle positions directly (when ``velGrad`` is non-zero), but without changing their velocity, 2: adjust particle velocity (only when ``velGrad`` changed) with Δv_i=Δ ∇v x_i. 3: as 2, but include a 2nd order term in addition -- the derivative of 1 (convective term in the velocity update).")),
+		/*deprec*/ ((Hsize,hSize,"conform to usual DEM terminology")),
+		/*init*/,
 		/*ctor*/ integrateAndUpdate(0),
 		/*py*/
 		// override some attributes above
-		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. columns of :yref:`Hsize<Cell.Hsize>`). Modifying this value will scale cell vectors such to have desired length.")
-		.add_property("Hsize",&Cell::getHsize,&Cell::setHsize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations).")
+		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. columns of :yref:`hSize<Cell.hSize>`). Modifying this value will scale cell vectors such to have desired length.")
+		.add_property("hSize",&Cell::getHSize,&Cell::setHSize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations).")
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell.")
 		// useful properties
-		.add_property("Hsize0",&Cell::getHsize0,"Initial value of Hsize, before applying transformation (computed as :yref:`invTrsf<Cell.invTrsf>` × :yref:`Hsize<Cell.Hsize>`.")
+		.add_property("hSize0",&Cell::getHSize0,"Initial value of hSize, before applying transformation (computed as :yref:`invTrsf<Cell.invTrsf>` × :yref:`hSize<Cell.hSize>`.")
 		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// debugging only
