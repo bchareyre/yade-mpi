@@ -100,7 +100,7 @@ opts.AddVariables(
 	('chunkSize','Maximum files to compile in one translation unit when building plugins. (unlimited if <= 0, per-file linkage is used if 1)',7,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
-	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2:/usr/include/vtk'), # hardy has vtk-5.0
+	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/vtk-5.6:/usr/include/eigen2:/usr/include/vtk'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
 	('libstdcxx','Specify libstdc++ location by hand (opened dynamically at startup), usually not needed',None),
 	('QT4CXX','Specify a different compiler for files including qt4; this is necessary for older qt version (<=4.7) which don\'t compile with clang',None),
