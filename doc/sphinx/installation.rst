@@ -62,7 +62,7 @@ Most of the list above is very likely already packaged for your distribution. In
 	python-matplotlib libsqlite3-dev python-numeric python-tk gnuplot doxygen \
 	libgts-dev python-pygraphviz libvtk5-dev python-scientific bzr libeigen2-dev \
 	binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
-	libqglviewer-qt4-dev python-imaging
+	libqglviewer-qt4-dev python-imaging libjs-jquery
 
 command line (cut&paste to the terminal under root privileges) for Fedora (not good tested yet!)::
 
@@ -71,7 +71,7 @@ command line (cut&paste to the terminal under root privileges) for Fedora (not g
 	log4cxx log4cxx-devel python-devel boost-python ipython python-matplotlib \
 	sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
 	graphviz-python vtk-devel ScientificPython bzr eigen2-devel libQGLViewer-devel \
-	loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging
+	loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging 
 
 
 Compilation
