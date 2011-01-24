@@ -35,7 +35,7 @@ install: build
 	# remove the profile, if existing, to have clean config
 	rm -f scons.profile-deb
 	# the last argument specified that we only want files in lib installed -- common files (the executable) are already in the optimized package
-	NO_SCONS_GET_RECENT= scons profile=deb buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=5 jobs=1 features=vtk,gts,opengl,qt4 PREFIX=debian/yade${_VERSION}-dbg/usr variant='' optimize=0 march= debug=1 debian/yade${_VERSION}-dbg/usr/lib
+	NO_SCONS_GET_RECENT= scons profile=deb buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=5 jobs=1 features=openmp,vtk,gts,opengl,qt4 PREFIX=debian/yade${_VERSION}-dbg/usr variant='' optimize=0 march= debug=1 debian/yade${_VERSION}-dbg/usr/lib
 	#optimized build
 	NO_SCONS_GET_RECENT= scons profile=deb PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
 	cd doc/sphinx; PYTHONPATH=. YADE_PREFIX=../../debian/yade${_VERSION}/usr/ ../../debian/yade${_VERSION}/usr/bin/yade${_VERSION} yadeSphinx.py; cd _build/latex; xelatex Yade.tex; xelatex Yade.tex; xelatex Yade.tex; cd ../..;
