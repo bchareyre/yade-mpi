@@ -11,12 +11,12 @@
 #include<yade/pkg/dem/FrictPhys.hpp>
 
 
-class NormalInelasticityPhys : public FrictPhysTransitory
+class NormalInelasticityPhys : public FrictPhys
 {
 	public :
 		virtual ~NormalInelasticityPhys();
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormalInelasticityPhys,FrictPhysTransitory,
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormalInelasticityPhys,FrictPhys,
 				"Physics (of interaction) for using :yref:`Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity` : with inelastic unloadings",
 				((Real,unMax,0.0,,"the maximum value of penetration depth of the history of this interaction"))
 				((Real,previousun,0.0,,"the value of this un at the last time step"))
@@ -30,7 +30,7 @@ class NormalInelasticityPhys : public FrictPhysTransitory
 				,
 				createIndex();
 				);
-	REGISTER_CLASS_INDEX(NormalInelasticityPhys,FrictPhysTransitory);
+	REGISTER_CLASS_INDEX(NormalInelasticityPhys,FrictPhys);
 };
 
 REGISTER_SERIALIZABLE(NormalInelasticityPhys);

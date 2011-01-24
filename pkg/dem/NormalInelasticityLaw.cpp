@@ -18,17 +18,12 @@ YADE_PLUGIN((Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity));
 
 void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>& iG, shared_ptr<IPhys>& iP, Interaction* contact)
 {
-
-	const Real& dt = scene->dt;
-
 	int id1 = contact->getId1();
 	int id2 = contact->getId2();
 // 	cout << "contact entre " << id1 << " et " << id2;
 
-	State* de1 = Body::byId(id1,scene)->state.get();
-	State* de2 = Body::byId(id2,scene)->state.get();
 	NormalInelasticMat* Mat1 = static_cast<NormalInelasticMat*>(Body::byId(id1,scene)->material.get());
-	ScGeom6D* currentContactGeometry		= YADE_CAST<ScGeom6D*>(iG.get());
+	ScGeom6D* geom		= YADE_CAST<ScGeom6D*>(iG.get());
 	NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (iP.get());
 
 	Vector3r& shearForce 			= currentContactPhysics->shearForce;
@@ -44,9 +39,9 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 
 //	********	Computation of normal Force : depends of the history			*******	 //
 
-	Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
+	Real Fn; // Fn's value, computed by different means
 // 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
-	Real un = currentContactGeometry->penetrationDepth; // >0 for real penetration
+	Real un = geom->penetrationDepth; // >0 for real penetration
 
 // 	cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << currentContactPhysics->previousun << " et previousFn =" << currentContactPhysics->previousFn << endl;
 
@@ -73,7 +68,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 // 			cout << "j'ai corrige pour ne pas etre negatif" << endl;
 		}
 	}
-	currentContactPhysics->normalForce	= Fn*currentContactGeometry->normal;
+	currentContactPhysics->normalForce	= Fn*geom->normal;
 // 	cout << "Fn appliquee " << Fn << endl << endl;
 
 	// actualisation :
@@ -94,48 +89,10 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
         }
         else
         {
-                Vector3r axis;
-                Real angle;
-
-//                 Here is the code with approximated rotations
-
-		axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-		shearForce 	       -= shearForce.cross(axis);
-		angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angVel+de2->angVel);
-		axis 			= angle*currentContactGeometry->normal;
-		shearForce 	       -= shearForce.cross(axis);
-
-//                 Here is the code with exact rotationns
-
-                // 		Quaternionr q;
-                //
-                // 		axis					= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-                // 		angle					= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
-                // 		q.fromAngleAxis(angle,axis);
-                //
-                // 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
-                //
-                // 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angVel+de2->angVel);
-                // 		axis					= currentContactGeometry->normal;
-                // 		q.fromAngleAxis(angle,axis);
-                // 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
-
-
-                Vector3r x				= currentContactGeometry->contactPoint;
-                Vector3r c1x				= (x - de1->se3.position);
-                Vector3r c2x				= (x - de2->se3.position);
-                /// The following definition of c1x and c2x is to avoid "granular ratcheting"
-		///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN,
-		///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
-		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors, or discussions on yade mailing lists)
-                Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
-                Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
-                Vector3r relativeVelocity		= (de2->vel+de2->angVel.cross(_c2x_)) - (de1->vel+de1->angVel.cross(_c1x_));
-                Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
-                Vector3r shearDisplacement		= shearVelocity*dt;
-
-
-		shearForce -= currentContactPhysics->ks*shearDisplacement;
+		// Correction of previous shear force to take into account the change in normal:
+		shearForce = 	geom->rotate(currentContactPhysics->shearForce);
+		// Update of shear force corresponding to shear displacement increment:
+		shearForce -= currentContactPhysics->ks * geom->shearIncrement();
 
                 Real maxFs = 0;
                 Real Fs = currentContactPhysics->shearForce.norm();
@@ -156,8 +113,8 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
                 Vector3r f	= currentContactPhysics->normalForce + shearForce;
 		scene->forces.addForce (id1,-f);
 		scene->forces.addForce (id2, f);
-		scene->forces.addTorque(id1,-c1x.cross(f));
-		scene->forces.addTorque(id2, c2x.cross(f));
+		scene->forces.addTorque(id1,-(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(f));
+		scene->forces.addTorque(id2, -(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(f));
 // 	*** End of computation of tangential force *** //
 
 
@@ -165,8 +122,8 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 
 		if(momentRotationLaw)
 		{
-			currentContactPhysics->moment_twist = (currentContactGeometry->getTwist()*currentContactPhysics->kr)*currentContactGeometry->normal ;
-			currentContactPhysics->moment_bending = currentContactGeometry->getBending() * currentContactPhysics->kr;
+			currentContactPhysics->moment_twist = (geom->getTwist()*currentContactPhysics->kr)*geom->normal ;
+			currentContactPhysics->moment_bending = geom->getBending() * currentContactPhysics->kr;
 
 			moment = currentContactPhysics->moment_twist + currentContactPhysics->moment_bending;
 
@@ -184,8 +141,6 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 			scene->forces.addTorque(id2, moment);
 		}
 //	********	Moment law END				*******	 //
-
-                currentContactPhysics->prevNormal = currentContactGeometry->normal;
     }
 }
 

@@ -44,30 +44,26 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 			Real Eb 	= sdec2->young;
 			Real Va 	= sdec1->poisson;
 			Real Vb 	= sdec2->poisson;
-			Real Da 	= geom->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
-			Real Db 	= geom->radius2; // FIXME - as above
+			Real Ra 	= geom->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
+			Real Rb 	= geom->radius2; // FIXME - as above
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 
-			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
+			Real Kn = 2.0*Ea*Ra*Eb*Rb/(Ea*Ra+Eb*Rb);//harmonic average of two stiffnesses
 			
-			Real Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
+			Real Ks = 2.0*Ea*Ra*Va*Eb*Rb*Vb/(Ea*Ra*Va+Eb*Rb*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 
-			// Jean-Patrick Plassiard, Noura Belhaine, Frederic
-// 			Victor Donze, "Calibration procedure for spherical
-			// discrete elements using a local moemnt law".
-			Real Kr = betaR*std::pow((Da+Db)/2.0,2)*Ks;
-
-			contactPhysics->frictionAngle			= std::min(fa,fb); // FIXME - this is actually a waste of memory space
-			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
-			contactPhysics->forMaxMoment		= 1.0*(Da+Db)/2.0;	// 1.0 corresponding to ethaR which I don't know exactly where to define as a parameter...
+			// Jean-Patrick Plassiard, Noura Belheine, Frederic Victor Donze, "A Spherical Discrete Element Model: calibration procedure and incremental response", DOI: 10.1007/s10035-009-0130-x
+			
+			Real Kr = betaR*std::pow((Ra+Rb)/2.0,2)*Ks;
+			
+			contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
+			contactPhysics->forMaxMoment		= 1.0*(Ra+Rb)/2.0;	// 1.0 corresponding to ethaR which I don't know exactly where to define as a parameter...
 
 			// Lot of suppress here around (>) r2276. Normally not bad but ? See Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.cpp to re-find the initial §...
-			
-			contactPhysics->prevNormal 			= geom->normal;
-			
+						
 			contactPhysics->knLower = Kn;
-			contactPhysics->kn = Kn;			
+			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
 			contactPhysics->kr = Kr;
 		}
