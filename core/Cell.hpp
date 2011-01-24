@@ -96,6 +96,7 @@ class Cell: public Serializable{
 	Matrix3r getHSize0() const { return invTrsf*hSize; }
 	Matrix3r getTrsf() const { return trsf; }
 	void setTrsf(const Matrix3r& m){ hSize=m*invTrsf*hSize; trsf=m; integrateAndUpdate(0); }
+	void resetTrsf(){ trsf=invTrsf=Matrix3r::Identity(); } 
 
 	// return current cell volume
 	Real getVolume() const {return hSize.determinant();}
@@ -116,7 +117,7 @@ class Cell: public Serializable{
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in :yref:`NewtonIntegrator`."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
 		((int,homoDeform,3,Attr::triggerPostLoad,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions or velocities of particles. The values have the following meaning: 0: no homothetic deformation, 1: set absolute particle positions directly (when ``velGrad`` is non-zero), but without changing their velocity, 2: adjust particle velocity (only when ``velGrad`` changed) with Δv_i=Δ ∇v x_i. 3: as 2, but include a 2nd order term in addition -- the derivative of 1 (convective term in the velocity update).")),
-		/*deprec*/ ((Hsize,hSize,"conform to usual DEM terminology")),
+		/*deprec*/ ((Hsize,hSize,"conform to Yade's names convention.")),
 		/*init*/,
 		/*ctor*/ integrateAndUpdate(0),
 		/*py*/
@@ -125,9 +126,11 @@ class Cell: public Serializable{
 		.add_property("hSize",&Cell::getHSize,&Cell::setHSize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations).")
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell.")
 		// useful properties
-		.add_property("hSize0",&Cell::getHSize0,"Initial value of hSize, before applying transformation (computed as :yref:`invTrsf<Cell.invTrsf>` × :yref:`hSize<Cell.hSize>`.")
-		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")
+		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell.trsf>` (computed as :yref:`invTrsf<Cell.invTrsf>` × :yref:`hSize<Cell.hSize>`.")
+		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
+		// setting trsf value without the side effects
+		.def("resetTrsf",&Cell::resetTrsf,"Set :yref:`trsf<Cell.trsf>`=Identity without the side effects of direct assignment. There is no impact on :yref:`Cell.hSize`.")
 		// debugging only
 		.def("wrap",&Cell::wrapShearedPt_py,"Transform an arbitrary point into a point in the reference cell")
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
