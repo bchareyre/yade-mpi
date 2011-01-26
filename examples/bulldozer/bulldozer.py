@@ -6,7 +6,7 @@ from numpy import linspace
 from numpy import arange
 import gts
 import itertools
-from yade import pack
+from yade import geom,pack
 
 
 ###Initial Data

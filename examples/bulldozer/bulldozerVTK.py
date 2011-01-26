@@ -6,7 +6,7 @@ from numpy import linspace
 from numpy import arange
 import gts
 import itertools
-from yade import pack
+from yade import geom,pack
 
 
 ###Initial Data
@@ -27,7 +27,7 @@ en = 0.3
 es = 0.3
 
 ## Materials
-params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
+params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 
@@ -57,10 +57,6 @@ colorsph2.normalize();
 colorSph=colorsph1
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
 	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph,material=sphereMat))
-	for id in ids_spheres[1]:
-		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
-		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:
@@ -77,9 +73,9 @@ O.engines=[
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.8]),
-	TranslationEngine(translationAxis=[1,0,0],velocity=2,subscribedBodies=KnifeIDs), # Buldozer motion
+	TranslationEngine(translationAxis=[1,0,0],velocity=2,ids=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=0),
-	VTKRecorder(iterPeriod=1000,fileName='/tmp/bulldozer-',recorders=['spheres','facets'])
+	#VTKRecorder(iterPeriod=1000,fileName='/tmp/bulldozer-',recorders=['spheres','facets'])
 ]
 
 O.saveTmp()

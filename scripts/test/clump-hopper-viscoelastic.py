@@ -15,7 +15,7 @@ frictionAngle=radians(35)#
 density=2700
 # facets material
 params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
-facetMat=O.materials.append(ViscElMat(density=0,frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 # default spheres material
 dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle, **params)) 
 
@@ -66,7 +66,7 @@ O.engines=[
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0,exactAsphericalRot=False),
+	NewtonIntegrator(damping=0),
 	#VTKRecorder(virtPeriod=0.01,fileName='/tmp/',recorders=['spheres','velocity','facets'])
 ]
 
