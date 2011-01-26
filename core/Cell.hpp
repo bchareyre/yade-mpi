@@ -92,7 +92,7 @@ class Cell: public Serializable{
 	// should be identical to: { refSize=s; hSize=invTrsf*hSize; for(int i=0;i<3;i++) hSize.col(i)=hSize.col(i).normalized()*refSize[i]; /* transform back*/ hSize=trsf*hSize; integrateAndUpdate(0); }
 	void setRefSize(const Vector3r& s){ for(int i=0;i<3;i++) hSize.col(i)*=s[i]/refSize[i]; refSize=s; integrateAndUpdate(0); } 
 	Matrix3r getHSize() const { return hSize; }
-	void setHSize(const Matrix3r& m){ hSize=m; for(int k=0;k<3;k++) refSize[k]=hSize.col(k).norm(); integrateAndUpdate(0);}
+	void setHSize(const Matrix3r& m){ hSize=m; integrateAndUpdate(0);}
 	Matrix3r getHSize0() const { return invTrsf*hSize; }
 	Matrix3r getTrsf() const { return trsf; }
 	void setTrsf(const Matrix3r& m){ hSize=m*invTrsf*hSize; trsf=m; integrateAndUpdate(0); }
