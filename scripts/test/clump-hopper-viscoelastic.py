@@ -14,10 +14,10 @@ es=.3  # tangential restitution coefficient
 frictionAngle=radians(35)# 
 density=2700
 # facets material
-params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+facetMat=O.materials.append(ViscElMat(density=0,frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 # default spheres material
-dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle)) 
+dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle, **params)) 
 
 O.dt=.1*tc # time step
 
@@ -50,39 +50,27 @@ tblIds=O.bodies.append(pack.gtsSurface2Facets(table.faces(),material=facetMat,co
 clumpColor=(0.0, 0.5, 0.5)
 for k,l in itertools.product(arange(0,10),arange(0,10)):
 	clpId,sphId=O.bodies.appendClumped([utils.sphere(Vector3(x0t+Rs*(k*4+2),y0t+Rs*(l*4+2),i*Rs*2+zt),Rs,color=clumpColor,material=dfltSpheresMat) for i in xrange(4)])
-	for id in sphId:
-		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
-		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
-	#O.bodies[clpId].state.blockedDOFs='XYZ'
-	#O.bodies[clpId].state.blockedDOFs='xy'
 
 # ... and spheres
-spheresColor=(0.4, 0.4, 0.4)
-for k,l in itertools.product(arange(0,9),arange(0,9)):
-	sphAloneId=O.bodies.append( [utils.sphere( Vector3(x0t+Rs*(k*4+4),y0t+Rs*(l*4+4),i*Rs*2.3+zt),Rs,color=spheresColor,material=dfltSpheresMat) for i in xrange(4) ] )
-	for id in sphAloneId:
-		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
-		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
-		#s.state.blockedDOFs='XYZ'
-		#s.state.blockedDOFs='xy'
+#spheresColor=(0.4, 0.4, 0.4)
+#for k,l in itertools.product(arange(0,9),arange(0,9)):
+	#sphAloneId=O.bodies.append( [utils.sphere( Vector3(x0t+Rs*(k*4+4),y0t+Rs*(l*4+4),i*Rs*2.3+zt),Rs,color=spheresColor,material=dfltSpheresMat) for i in xrange(4) ] )
 
 # Create engines
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],nBins=5,sweepLength=.1*Rs),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0,exactAsphericalRot=True),
+	NewtonIntegrator(damping=0,exactAsphericalRot=False),
 	#VTKRecorder(virtPeriod=0.01,fileName='/tmp/',recorders=['spheres','velocity','facets'])
 ]
 
-renderer = qt.Renderer()
+from yade import qt
 qt.View()
 O.saveTmp()
 

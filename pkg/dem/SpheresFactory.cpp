@@ -1,13 +1,16 @@
 
-#include<yade/pkg/dem/NozzleFactory.hpp>
+#include<yade/pkg/dem/SpheresFactory.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 
 
-YADE_PLUGIN((NozzleFactory)(DragForceApplier));
-CREATE_LOGGER(NozzleFactory);
+//YADE_PLUGIN((SpheresFactory)(DragForceApplier));
+YADE_PLUGIN((SpheresFactory)(CircularFactory)(QuadroFactory)(DragForceApplier));
+CREATE_LOGGER(SpheresFactory);
+CREATE_LOGGER(CircularFactory);
+CREATE_LOGGER(QuadroFactory);
 
 void DragForceApplier::action(){
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -19,19 +22,24 @@ void DragForceApplier::action(){
 	}
 }
 
-void NozzleFactory::action(){
-	// initialize random number generator with time seed
-	static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
-	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > randomUnit(randGen, boost::uniform_real<Real>(0,1));
+// initialize random number generator with time seed
+static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
+static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > randomUnit(randGen, boost::uniform_real<Real>(0,1));
+
+void SpheresFactory::pickRandomPosition(Vector3r&,Real){
+	LOG_FATAL("Engine "<<getClassName()<<" calling virtual method SpheresFactory::pickRandomPosition(). Please submit bug report at http://bugs.launchpad.net/yade.");
+	throw std::logic_error("SpheresFactory::pickRandomPosition() called.");
+}
+
+void SpheresFactory::action(){
 
 	if(!collider){
 		FOREACH(const shared_ptr<Engine>& e, scene->engines){ collider=dynamic_pointer_cast<Collider>(e); if(collider) break; }
-		if(!collider) throw runtime_error("NozzleFactory: No Collider instance found in engines (needed for collision detection).");
+		if(!collider) throw runtime_error("SpheresFactory: No Collider instance found in engines (needed for collision detection).");
 	}
 	goalMass+=massFlowRate*scene->dt; // totalMass that we want to attain in the current step
 
 	normal.normalize();
-	const Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r::UnitZ(),normal));
 
 	LOG_TRACE("totalMass="<<totalMass<<", goalMass="<<goalMass);
 
@@ -43,10 +51,7 @@ void NozzleFactory::action(){
 		// until there is no overlap, pick a random position for the new particle
 		int attempt;
 		for(attempt=0; attempt<maxAttempt; attempt++){
-			Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the nozzle
-			c = center+q*Vector3r(cos(angle)*rr,sin(angle)*rr,0);
-			// this version places center in a box around the nozzle center (its size 1.15=2/sqrt(3) diagonal, which is not very exact
-			//c=center+Vector3r((randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius,(randomUnit()-.5)*1.15*radius);
+			pickRandomPosition(c,r);
 			LOG_TRACE("Center "<<c);
 			Bound b; b.min=c-Vector3r(r,r,r); b.max=c+Vector3r(r,r,r);
 			vector<Body::id_t> collidingParticles=collider->probeBoundingVolume(b);
@@ -56,7 +61,7 @@ void NozzleFactory::action(){
 			#endif
 		}
 		if(attempt==maxAttempt) {
-			if (silent) {massFlowRate=0;} 
+			if (silent) {massFlowRate=0;goalMass=0;LOG_INFO("Unable to place new sphere after "<<maxAttempt<<" attempts, SpheresFactory disabled.");} 
 			else {LOG_WARN("Unable to place new sphere after "<<maxAttempt<<" attempts, giving up.");}
 			return;
 		}
@@ -67,7 +72,7 @@ void NozzleFactory::action(){
 
 		// create particle
 		int mId=(materialId>=0 ? materialId : scene->materials.size()+materialId);
-		if(mId<0 || (size_t) mId>=scene->materials.size()) throw std::invalid_argument(("NozzleFactory: invalid material id "+lexical_cast<string>(materialId)).c_str());
+		if(mId<0 || (size_t) mId>=scene->materials.size()) throw std::invalid_argument(("SpheresFactory: invalid material id "+lexical_cast<string>(materialId)).c_str());
 		const shared_ptr<Material>& material=scene->materials[mId];
 		shared_ptr<Body> b(new Body);
 		shared_ptr<Sphere> sphere(new Sphere); 
@@ -92,3 +97,15 @@ void NozzleFactory::action(){
 	} 
 	//std::cout<<"mass flow rate: "<<totalMass<<endl;totalMass =0.0;
 };
+
+void CircularFactory::pickRandomPosition(Vector3r& c, Real r){
+	const Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r::UnitZ(),normal));
+	Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the nozzle
+	Real l=(randomUnit()-0.5)*length;
+	c = center+q*Vector3r(cos(angle)*rr,sin(angle)*rr,0)+normal*l;
+}
+
+void QuadroFactory::pickRandomPosition(Vector3r& c, Real r){
+	const Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r::UnitZ(),normal));
+	c=center+q*Vector3r((randomUnit()-.5)*2*(extents[0]-r),(randomUnit()-.5)*2*(extents[1]-r),(randomUnit()-.5)*2*(extents[2]-r));
+}

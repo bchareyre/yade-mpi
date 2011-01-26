@@ -1,5 +1,5 @@
 
-from yade import utils,log
+from yade import geom,utils,log
 
 shotsId,steelId=O.materials.append([
 	FrictMat(young=50e9,density=6000,poisson=.2,label='shots'),
@@ -24,10 +24,11 @@ O.engines=[
 		)],
 		[Law2_ScGeom_MindlinPhys_Mindlin(label='contactLaw')]
 	),
-	# not used now
-	#GravityEngine(gravity=(0,0,0)), DragForceApplier(density=1,...)
 	NewtonIntegrator(damping=0),
-	NozzleFactory(maxParticles=10000,radius=8e-3,center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
+	## CircularFactory: disk if length=0 or cylinder if length>0
+	CircularFactory(maxParticles=10000,radius=8e-3,length=16e-3,center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
+	## QuadroFactory: a line, plane or cuboid  
+	#QuadroFactory(maxParticles=10000,extents=(8e-3,8e-3,8e-3),center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
 	DomainLimiter(lo=(-30e-3,-30e-3,0),hi=(30e-3,30e-3,60e-3),iterPeriod=200),
 	#VTKRecorder(recorders=['spheres','facets','velocity'],fileName='/tmp/nozzle-',iterPeriod=500),
 
@@ -38,7 +39,7 @@ O.engines=[
 # we cannot use utils.PWaveTimeStep directly, since there are no spheres generated yet
 O.dt=utils.SpherePWaveTimeStep(factory.rMin,O.materials[factory.materialId].density,O.materials[factory.materialId].young)
 O.saveTmp()
-O.timingEnabled=True
+#O.timingEnabled=True
 from yade import timing
 try:
 	from yade import qt

@@ -261,7 +261,7 @@ def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Id
 		radiusBottom = radiusTop
 	# check zero dimentions
 	if (segmentsNumber<3): raise RuntimeError("The segmentsNumber should be at least 3");
-	if (height<=0): raise RuntimeError("The height should have the positive value");
+	if (height<0): raise RuntimeError("The height should have the positive value");
 	if angleRange==None: angleRange=(0,2*math.pi)
 	if (abs(angleRange[1]-angleRange[0])>2.0*math.pi): raise RuntimeError("The |angleRange| cannot be larger 2.0*math.pi");
 	
