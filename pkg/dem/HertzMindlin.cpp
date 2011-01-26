@@ -76,6 +76,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	mindlinPhys->adhesionForce = Adhesion;
 	
 	mindlinPhys->kr = krot;
+	mindlinPhys->ktw = ktwist;
 	mindlinPhys->maxBendPl = eta*Rmean; // does this make sense? why do we take Rmean?
 
 	/* compute viscous coefficients */
@@ -411,19 +412,28 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	}
 	
 	/********************************************/
-	/* MOMENT CONTACT LAW (only bending moment) */
+	/* MOMENT CONTACT LAW */
 	/********************************************/
 	if (includeMoment){
+		// *** Bending ***//
 		// new code to compute relative particle rotation (similar to the way the shear is computed)
 		// use scg function to compute relAngVel
 		Vector3r relAngVel = scg->getRelAngVel(de1,de2,dt);
 		//Vector3r relAngVel = (b2->state->angVel-b1->state->angVel);
-		relAngVel = relAngVel - scg->normal.dot(relAngVel)*scg->normal; // keep only the bending part 
-		Vector3r relRot = relAngVel*dt; // relative rotation due to rolling behaviour	
+		Vector3r relAngVelBend = relAngVel - scg->normal.dot(relAngVel)*scg->normal; // keep only the bending part 
+		Vector3r relRot = relAngVelBend*dt; // relative rotation due to rolling behaviour	
 		// incremental formulation for the bending moment (as for the shear part)
 		Vector3r& momentBend = phys->momentBend;
 		momentBend = scg->rotate(momentBend); // rotate moment vector (updated)
-		momentBend = momentBend-phys->kr*relRot; // add incremental rolling to the rolling vector FIXME: is the sign correct?
+		momentBend = momentBend-phys->kr*relRot; // add incremental rolling to the rolling vector
+		// ----------------------------------------------------------------------------------------
+		// *** Torsion ***//
+		Vector3r relAngVelTwist = scg->normal.dot(relAngVel)*scg->normal;
+		Vector3r relRotTwist = relAngVelTwist*dt; // component of relative rotation along n
+		// incremental formulation for the torsional moment
+		Vector3r& momentTwist = phys->momentTwist;
+		momentTwist = scg->rotate(momentTwist); // rotate moment vector (updated)
+		momentTwist = momentTwist-phys->ktw*relRotTwist;
 
 #if 0
 	// code to compute the relative particle rotation
@@ -455,7 +465,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 		momentBend = momentBend+phys->kr*phys->dThetaR; // add incremental rolling to the rolling vector FIXME: is the sign correct?
 #endif
 
-		// check plasticity condition
+		// check plasticity condition (only bending part for the moment)
 		Real MomentMax = phys->maxBendPl*phys->normalForce.norm();
 		Real scalarMoment = phys->momentBend.norm();
 		if (MomentMax>0){
@@ -466,8 +476,9 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 			 }
 		}
 		// apply moments
-		scene->forces.addTorque(id1,-phys->momentBend); 
-		scene->forces.addTorque(id2,phys->momentBend);
+		Vector3r moment = phys->momentTwist+phys->momentBend;
+		scene->forces.addTorque(id1,-moment); 
+		scene->forces.addTorque(id2,moment);
 	}
 
 	// update variables

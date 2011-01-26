@@ -32,6 +32,7 @@ class MindlinPhys: public FrictPhys{
 			((Real,kno,0.0,,"Constant value in the formulation of the normal stiffness"))
 			((Real,kso,0.0,,"Constant value in the formulation of the tangential stiffness"))
 			((Real,kr,0.0,,"Rotational stiffness"))
+			((Real,ktw,0.0,,"Rotational stiffness"))
 			((Real,maxBendPl,0.0,,"Coefficient to determine the maximum plastic moment to apply at the contact"))
 			
 			((Vector3r,normalViscous,Vector3r::Zero(),,"Normal viscous component"))
@@ -42,6 +43,7 @@ class MindlinPhys: public FrictPhys{
 
 			//((Vector3r,prevNormal,Vector3r::Zero(),,"Save previous contact normal to compute relative rotation"))
 			((Vector3r,momentBend,Vector3r::Zero(),,"Artificial bending moment to provide rolling resistance in order to account for some degree of interlocking between particles"))
+			((Vector3r,momentTwist,Vector3r::Zero(),,"Artificial twisting moment (no plastic condition can be applied at the moment)"))
 			//((Vector3r,dThetaR,Vector3r::Zero(),,"Incremental rolling vector"))
 
 			((Real,radius,NaN,,"Contact radius (only computed with :yref:`Law2_ScGeom_MindlinPhys_Mindlin::calcEnergy`)"))
@@ -78,6 +80,7 @@ class Ip2_FrictMat_FrictMat_MindlinPhys: public IPhysFunctor{
 			((Real,gamma,0.0,,"Surface energy parameter [J/m^2] per each unit contact surface, to derive DMT formulation from HM"))
 			((Real,eta,0.0,,"Coefficient to determine the plastic bending moment"))
 			((Real,krot,0.0,,"Rotational stiffness for moment contact law"))
+			((Real,ktwist,0.0,,"Torsional stiffness for moment contact law"))
 			((shared_ptr<MatchMaker>,en,,,"Normal coefficient of restitution $e_n$."))
 			((shared_ptr<MatchMaker>,es,,,"Shear coefficient of restitution $e_s$."))
 			((shared_ptr<MatchMaker>,betan,,,"Normal viscous damping coefficient $\\beta_n$."))

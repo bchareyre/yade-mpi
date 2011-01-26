@@ -83,29 +83,61 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 		}
 		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 
-		/// Moment law        ///
+		/// Moment law  ///
 		if (currentContactPhysics->momentRotationLaw && (!currentContactPhysics->cohesionBroken || always_use_moment_law)) {
-			if (twist_creep) {
-				Real viscosity_twist = creep_viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
-				Real angle_twist_creeped = currentContactGeometry->getTwist() * (1 - dt/viscosity_twist);
-				Quaternionr q_twist(AngleAxisr(currentContactGeometry->getTwist(),currentContactGeometry->normal));
-				Quaternionr q_twist_creeped(AngleAxisr(angle_twist_creeped,currentContactGeometry->normal));
-				Quaternionr q_twist_delta(q_twist_creeped * q_twist.conjugate());
-				currentContactGeometry->twistCreep = currentContactGeometry->twistCreep * q_twist_delta;
+			if (!useIncrementalForm){
+				if (twist_creep) {
+					Real viscosity_twist = creep_viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
+					Real angle_twist_creeped = currentContactGeometry->getTwist() * (1 - dt/viscosity_twist);
+					Quaternionr q_twist(AngleAxisr(currentContactGeometry->getTwist(),currentContactGeometry->normal));
+					Quaternionr q_twist_creeped(AngleAxisr(angle_twist_creeped,currentContactGeometry->normal));
+					Quaternionr q_twist_delta(q_twist_creeped * q_twist.conjugate());
+					currentContactGeometry->twistCreep = currentContactGeometry->twistCreep * q_twist_delta;
+				}
+				currentContactPhysics->moment_twist = (currentContactGeometry->getTwist()*currentContactPhysics->ktw)*currentContactGeometry->normal;
+				currentContactPhysics->moment_bending = currentContactGeometry->getBending() * currentContactPhysics->kr;
+			}	
+			else{ // Use incremental formulation to compute moment_twis and moment_bending (no twist_creep is applied)
+				if (twist_creep) throw std::invalid_argument("Law2_ScGeom6D_CohFrictPhys_CohesionMoment: no twis creep is included if the incremental form for the rotations is used.");
+				Vector3r relAngVel = currentContactGeometry->getRelAngVel(de1,de2,dt);
+				// *** Bending ***//
+				Vector3r relAngVelBend = relAngVel - currentContactGeometry->normal.dot(relAngVel)*currentContactGeometry->normal; // keep only the bending part 
+				Vector3r relRotBend = relAngVelBend*dt; // relative rotation due to rolling behaviour	
+				// incremental formulation for the bending moment (as for the shear part)
+				Vector3r& momentBend = currentContactPhysics->moment_bending;
+				momentBend = currentContactGeometry->rotate(momentBend); // rotate moment vector (updated)
+				momentBend = momentBend-currentContactPhysics->kr*relRotBend;
+				// ----------------------------------------------------------------------------------------
+				// *** Torsion ***//
+				Vector3r relAngVelTwist = currentContactGeometry->normal.dot(relAngVel)*currentContactGeometry->normal;
+				Vector3r relRotTwist = relAngVelTwist*dt; // component of relative rotation along n  FIXME: sign?
+				// incremental formulation for the torsional moment
+				Vector3r& momentTwist = currentContactPhysics->moment_twist;
+				momentTwist = currentContactGeometry->rotate(momentTwist); // rotate moment vector (updated)
+				momentTwist = momentTwist-currentContactPhysics->ktw*relRotTwist; // FIXME: sign?
 			}
-			currentContactPhysics->moment_twist = (currentContactGeometry->getTwist()*currentContactPhysics->ktw)*currentContactGeometry->normal;
-			currentContactPhysics->moment_bending = currentContactGeometry->getBending() * currentContactPhysics->kr;
-			
+			/// Plasticity ///
 			// limit rolling moment to the plastic value, if required
 			Real RollMax = currentContactPhysics->maxRollPl*currentContactPhysics->normalForce.norm();
 			if (RollMax>0.){ // do we want to apply plasticity?
+				LOG_WARN("If :yref:`CohesiveFrictionalContactLaw::useIncrementalForm` is false, then plasticity would not be applied correctly (the total formulation would not reproduce irreversibility).");
 				Real scalarRoll = currentContactPhysics->moment_bending.norm();		
 				if (scalarRoll>RollMax){ // fix maximum rolling moment
 					Real ratio = RollMax/scalarRoll;
-					currentContactPhysics->moment_bending *= ratio;		
+					currentContactPhysics->moment_bending *= ratio;	
 				}	
 			}
-			
+			// limit twisting moment to the plastic value, if required
+			Real TwistMax = currentContactPhysics->maxTwistMoment.norm();
+			if (TwistMax>0.){ // do we want to apply plasticity?
+				LOG_WARN("If :yref:`CohesiveFrictionalContactLaw::useIncrementalForm` is false, then plasticity would not be applied correctly (the total formulation would not reproduce irreversibility).");
+				Real scalarTwist= currentContactPhysics->moment_twist.norm();		
+				if (scalarTwist>TwistMax){ // fix maximum rolling moment
+					Real ratio = TwistMax/scalarTwist;
+					currentContactPhysics->moment_twist *= ratio;	
+				}	
+			}
+			// Apply moments now
 			Vector3r moment = currentContactPhysics->moment_twist + currentContactPhysics->moment_bending;
 			scene->forces.addTorque(id1,-moment);
 			scene->forces.addTorque(id2, moment);			

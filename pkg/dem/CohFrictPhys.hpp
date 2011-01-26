@@ -24,6 +24,7 @@ class CohFrictPhys : public FrictPhys
 		((Real,kr,0,,"rotational stiffness [N.m/rad]"))
 		((Real,ktw,0,,"twist stiffness [N.m/rad]"))
 		((Real,maxRollPl,0.0,,"Coefficient to determine the maximum plastic rolling moment."))
+		((Vector3r,maxTwistMoment,Vector3r::Zero(),,"Maximum elastic value for the twisting moment (if zero, plasticity will not be applied). In CohFrictMat a parameter should be added to decide what value should be attributed to this threshold value."))
 		((Real,normalAdhesion,0,,"tensile strength"))
 		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::always_use_moment_law`)"))
 		((Real,unp,0,,"plastic normal displacement, only used for tensile behaviour and if :yref:`CohFrictPhys::fragile`=false."))

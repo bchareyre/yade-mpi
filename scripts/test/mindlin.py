@@ -12,7 +12,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_MindlinPhys()],
 		[Law2_ScGeom_MindlinPhys_Mindlin()]
 	),
-	GravityEngine(gravity=(-100,0,0)),
+	GravityEngine(gravity=(10,0,0)),
 	NewtonIntegrator(damping=0.0),
 	###
 	### NOTE this extra engine:
@@ -28,8 +28,8 @@ O.materials.append(mat)
 
 ## create two spheres (one will be fixed) and append them
 from yade import utils
-s0=utils.sphere([0,0,0],1,color=[0,1,0],dynamic=False,wire=True,material='Friction')
-s1=utils.sphere([2,0,0],1,color=[0,2,0],dynamic=True,wire=True,material='Friction')
+s0=utils.sphere([0,0,0],1,color=[0,1,0],fixed=False,wire=True,material='Friction')
+s1=utils.sphere([2,0,0],1,color=[0,2,0],fixed=True,wire=True,material='Friction')
 O.bodies.append(s0)
 O.bodies.append(s1)
 
@@ -59,8 +59,7 @@ def myAddPlotData():
 	## store some numbers under some labels
 	plot.addData(fn=i.phys.normalForce[0],step=O.iter,un=2*s0.shape.radius-s1.state.pos[0]+s0.state.pos[0],kn=i.phys.kn)	
 
-O.run(250,True);
-print "Now calling plot.plot() to show the figure."
+O.run(100,True); plot.plot()
 
 ## We will have:
 ## 1) data in graphs (if you call plot.plot())
