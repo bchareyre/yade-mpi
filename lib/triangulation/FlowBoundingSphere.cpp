@@ -299,13 +299,7 @@ Tesselation& FlowBoundingSphere::LoadPositions(int argc, char *argv[ ], char *en
 }
 
 void FlowBoundingSphere::Average_Cell_Velocity()
-{
-	double ranchx = (x_max - x_min)/3;
-	double ranchy = (y_max - y_min)/3;
-	double ranchz = (z_max - z_min)/3;
-  
-	bool yes = false;
-	
+{  
         RTriangulation& Tri = T[currentTes].Triangulation();
         Point pos_av_facet;
         int num_cells = 0;
@@ -363,8 +357,7 @@ void FlowBoundingSphere::Average_Fluid_Velocity()
 	
 	for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
 	  VelocityVolumes[V_it->info().id()]=CGAL::NULL_VECTOR;
-	  Volumes[V_it->info().id()]=0.f;
-	  correction[V_it->info().id()]=false;}
+	  Volumes[V_it->info().id()]=0.f;}
 	
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )

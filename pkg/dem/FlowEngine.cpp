@@ -129,7 +129,7 @@ void FlowEngine::action()
 		Update_Triangulation = false;
 	}
 
-	if (velocity_profile) /*flow->FluidVelocityProfile();*/flow->Average_Grain_Velocity();
+	if (velocity_profile) /*flow->FluidVelocityProfile();*/flow->Average_Fluid_Velocity();
 	if (liquefaction) bottom_seabed_pressure=flow->Measure_bottom_Pore_Pressure();
 
 	first=false;
