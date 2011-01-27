@@ -29,7 +29,7 @@ class FlowEngine : public PartialEngine
 		Vector3r gravity;
 		int current_state;
 		Real wall_thickness;
-		bool Update_Triangulation;
+// 		bool Update_Triangulation;
 		bool currentTes;
 		int id_offset;
 	//	double IS;
@@ -59,22 +59,25 @@ class FlowEngine : public PartialEngine
 					((bool,save_mplot,false,,"Enable/disable mplot files creation"))
 					((bool, save_mgpost, false,,"Enable/disable mgpost file creation"))
 					((bool, slice_pressures, false, ,"Enable/Disable slice pressure measurement"))
+					((bool, velocity_profile, false, ,"Enable/Disable slice velocity measurement"))
 					((bool, consolidation,false,,"Enable/Disable storing consolidation files"))
 					((bool, slip_boundary, true,, "Controls friction condition on lateral walls"))
 					((bool, blocked_grains, false,, "Grains will/won't be moved by forces"))
 					((bool,WaveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
-					((bool, TimeBC, false,,"Activate evolution in time of pressure B.C."))
+					((double, Sinus_Amplitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied"))
+					((double, Sinus_Average, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
 					((bool, CachedForces, true,,"Des/Activate the cached forces calculation"))
 					((bool, Debug, false,,"Activate debug messages"))
 // 					((bool,currentTes,false,,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,,"Initial internal pressure for oedometer test"))
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
 					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
+					((bool, Update_Triangulation, 0,,"If true the medium is retriangulated"))
 					((int,PermuteInterval,100000,,"Pore space re-triangulation period"))
 					((double, eps_vol_max, 0,,"Maximal absolute volumetric strain computed at each iteration"))
 					((double, EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
 					((double, porosity, 0,,"Porosity computed at each retriangulation"))
-					((bool,compute_K,true,,"Activates permeability measure within a granular sample"))
+					((bool,compute_K,false,,"Activates permeability measure within a granular sample"))
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
 					((double,permeability_factor,1.0,,"a permability multiplicator"))
@@ -85,6 +88,8 @@ class FlowEngine : public PartialEngine
 					((double, currentStrain, 0,, "Current value of axial strain"))
 					((int, intervals, 30,, "Number of layers for pressure measurements"))
 					((int, useSolver, 0,, "Solver to use"))
+					((bool, liquefaction, false,,"Compute bottom_seabed_pressure if true, see below"))
+					((double, bottom_seabed_pressure,0,,"Fluid pressure measured at the bottom of the seabed on the symmetry axe"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))
@@ -97,7 +102,6 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_BACK_Boundary,  0,,"Pressure imposed on back boundary"))
 					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
-					((double, Sinus_Pressure, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied"))
 					((int, id_sphere, 0,, "Average velocity will be computed for all cells incident to that sphere"))
 					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, TOP_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))

@@ -51,9 +51,6 @@ void FlowEngine::action()
 	currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
 	currentStrain = triaxialCompressionEngine->strain[1];
 
-// 	current_state = triaxialCompressionEngine->currentState;
-// 	if (current_state == 3){
-
 	timingDeltas->start();
 	
 	if (first) Build_Triangulation(P_zero);
@@ -62,6 +59,7 @@ void FlowEngine::action()
 	if (!first) {
 		eps_vol_max=0.f;
 		UpdateVolumes ( );
+		
 		Eps_Vol_Cumulative += eps_vol_max;
 		if ((Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000) && retriangulationLastIter>10) {
 			Update_Triangulation = true;
@@ -121,7 +119,7 @@ void FlowEngine::action()
 			flow->SliceField(f);
 		}
 		
-		if (save_vtk) flow->save_vtk_file();
+		if (save_vtk) {flow->save_vtk_file();}
 	}
 // 	if ( scene->iter % PermuteInterval == 0 )
 // 	{ Update_Triangulation = true; }
@@ -131,10 +129,8 @@ void FlowEngine::action()
 		Update_Triangulation = false;
 	}
 
-	flow->Average_Cell_Velocity();
-// 	flow->Average_Grain_Velocity();
-// 	int numero = flow->Average_Cell_Velocity(id_sphere, flow->T[flow->currentTes].Triangulation());
-// 	flow->vtk_average_cell_velocity(flow->T[flow->currentTes].Triangulation(), id_sphere, numero);
+	if (velocity_profile) /*flow->FluidVelocityProfile();*/flow->Average_Grain_Velocity();
+	if (liquefaction) bottom_seabed_pressure=flow->Measure_bottom_Pore_Pressure();
 
 	first=false;
 // }
@@ -203,8 +199,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
-  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15);
-		else if (TimeBC) flow->ApplySinusoidalPressure_Space_Time(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15, scene->time, scene->dt);
+  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
 	}
@@ -218,8 +213,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		flow->Initialize_pressures(P_zero);// FIXME : why, if we are going to interpolate after that?
 		flow->TOLERANCE=Tolerance;//So it can be changed at run time
 		flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
- 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15);
-		else if (TimeBC) flow->ApplySinusoidalPressure_Space_Time(flow->T[flow->currentTes].Triangulation(), Sinus_Pressure, 15, scene->time, scene->dt);
+ 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
 	}
@@ -389,8 +383,42 @@ void FlowEngine::UpdateVolumes ()
 	}
 }
 
-Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
+Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
 {
+	Real V[3][3];
+	int b=0;
+	int w=0;
+
+	Real Wall_coordinate=0;
+
+	for ( int y=0;y<4;y++ )
+	{
+		if ( ! ( cell->vertex ( y )->info().isFictious ) )
+		{
+			const shared_ptr<Body>& sph = Body::byId
+			                              ( cell->vertex ( y )->info().id(), scene );
+			for ( int g=0;g<3;g++ ) V[w][g]=sph->state->pos[g];
+			w++;
+		}
+		else
+		{
+			b = cell->vertex ( y )->info().id()-flow->id_offset;
+			const shared_ptr<Body>& wll = Body::byId ( b , scene );
+			if (!flow->boundaries[b].useMaxMin) Wall_coordinate = wll->state->pos[flow->boundaries[b].coordinate]+(flow->boundaries[b].normal[flow->boundaries[b].coordinate])*wall_thickness/2;
+			else Wall_coordinate = flow->boundaries[b].p[flow->boundaries[b].coordinate];
+		}
+	}
+
+	double v1[3], v2[3];
+
+	for ( int g=0;g<3;g++ ) { v1[g]=V[0][g]-V[1][g]; v2[g]=V[0][g]-V[2][g];}
+
+	Real Volume = ( CGAL::cross_product ( CGT::Vecteur ( v1[0],v1[1],v1[2] ),
+	                                      CGT::Vecteur ( v2[0],v2[1],v2[2] ) ) *
+	                flow->boundaries[b].normal ) * ( 0.33333333333* ( V[0][flow->boundaries[b].coordinate]+ V[1][flow->boundaries[b].coordinate]+ V[2][flow->boundaries[b].coordinate] ) - Wall_coordinate );
+
+	return abs ( Volume );
+	/*
 	Real V[3][3];
 	int b=0;
 	int w=0;
@@ -411,7 +439,7 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 			b = cell->vertex ( y )->info().id()-flow->id_offset;
 			const shared_ptr<Body>& wll = Body::byId ( b , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[i] = flow->boundaries[b].p[i];
-	Wall_point[flow->boundaries[b].coordinate] = wll->state->pos[flow->boundaries[b].coordinate]+(flow->boundaries[b].normal[flow->boundaries[b].coordinate])*wall_thickness;
+	Wall_point[flow->boundaries[b].coordinate] = wll->state->pos[flow->boundaries[b].coordinate]+(flow->boundaries[b].normal[flow->boundaries[b].coordinate])*wall_thickness/2;
 		}
 	}
 
@@ -423,29 +451,28 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 	                                      CGT::Vecteur ( v2[0],v2[1],v2[2] ) ) *
 	                flow->boundaries[b].normal ) * ( 0.33333333333* ( V[0][flow->boundaries[b].coordinate]+ V[1][flow->boundaries[b].coordinate]+ V[2][flow->boundaries[b].coordinate] ) - Wall_point[flow->boundaries[b].coordinate] );
 
-	return abs ( Volume );
+	return abs ( Volume );*/
 }
 
 Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 {
-	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0};
+  	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0};
 	Real B[3]={0, 0, 0}, BS[3]={0, 0, 0}, BT[3]={0, 0, 0};
 	Real C[3]={0, 0, 0}, CS[3]={0, 0, 0}, CT[3]={0, 0, 0};
 	
 	int b[2];
-
-	Real Wall_point[2][3];
-
+	Real Wall_coordinate[2];
 	int j=0;
 	bool first_sph=true;
+	
 	for ( int g=0;g<4;g++ )
 	{
 		if ( cell->vertex ( g )->info().isFictious )
 		{
 			b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
-			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
-			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate] +(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness;
+			if (!flow->boundaries[b[j]].useMaxMin) Wall_coordinate[j] = wll->state->pos[flow->boundaries[b[j]].coordinate] +(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness/2;
+			else Wall_coordinate[j] = flow->boundaries[b[j]].p[flow->boundaries[b[j]].coordinate];
 			j++;
 		}
 		else if ( first_sph )
@@ -461,9 +488,9 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 			for ( int k=0;k<3;k++ ) { B[k]=BS[k]=BT[k]=sph2->state->pos[k]; }
 		}
 	}
-
-	AS[flow->boundaries[b[0]].coordinate]=BS[flow->boundaries[b[0]].coordinate] = Wall_point[0][flow->boundaries[b[0]].coordinate];
-	AT[flow->boundaries[b[1]].coordinate]=BT[flow->boundaries[b[1]].coordinate] = Wall_point[1][flow->boundaries[b[1]].coordinate];
+	
+	AS[flow->boundaries[b[0]].coordinate]=BS[flow->boundaries[b[0]].coordinate] = Wall_coordinate[0];
+	AT[flow->boundaries[b[1]].coordinate]=BT[flow->boundaries[b[1]].coordinate] = Wall_coordinate[1];
 
 	for ( int h=0;h<3;h++ ) {C[h]= ( A[h]+B[h] ) /2; CS[h]= ( AS[h]+BS[h] ) /2; CT[h]= ( AT[h]+BT[h] ) /2;}
 
@@ -475,6 +502,54 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 	Real Volume = ( CGAL::cross_product ( v1,v2 ) *flow->boundaries[b[0]].normal ) *h;
 
 	return abs ( Volume );
+  
+// 	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0};
+// 	Real B[3]={0, 0, 0}, BS[3]={0, 0, 0}, BT[3]={0, 0, 0};
+// 	Real C[3]={0, 0, 0}, CS[3]={0, 0, 0}, CT[3]={0, 0, 0};
+// 	
+// 	int b[2];
+// 
+// 	Real Wall_point[2][3];
+// 	
+// 	int j=0;
+// 	bool first_sph=true;
+// 	for ( int g=0;g<4;g++ )
+// 	{
+// 		if ( cell->vertex ( g )->info().isFictious )
+// 		{
+// 			b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
+// 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
+// 			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
+// 			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate] +(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness/2;
+// 			j++;
+// 		}
+// 		else if ( first_sph )
+// 		{
+// 			const shared_ptr<Body>& sph1 = Body::byId
+// 			                               ( cell->vertex ( g )->info().id(), scene );
+// 			for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=sph1->state->pos[k]; first_sph=false;}
+// 		}
+// 		else
+// 		{
+// 			const shared_ptr<Body>& sph2 = Body::byId
+// 			                               ( cell->vertex ( g )->info().id(), scene );
+// 			for ( int k=0;k<3;k++ ) { B[k]=BS[k]=BT[k]=sph2->state->pos[k]; }
+// 		}
+// 	}
+// 
+// 	AS[flow->boundaries[b[0]].coordinate]=BS[flow->boundaries[b[0]].coordinate] = Wall_point[0][flow->boundaries[b[0]].coordinate];
+// 	AT[flow->boundaries[b[1]].coordinate]=BT[flow->boundaries[b[1]].coordinate] = Wall_point[1][flow->boundaries[b[1]].coordinate];
+// 
+// 	for ( int h=0;h<3;h++ ) {C[h]= ( A[h]+B[h] ) /2; CS[h]= ( AS[h]+BS[h] ) /2; CT[h]= ( AT[h]+BT[h] ) /2;}
+// 
+// 	CGT::Vecteur v1 ( AT[0]-BT[0],AT[1]-BT[1],AT[2]-BT[2] );
+// 	CGT::Vecteur v2 ( C[0]-CT[0],C[1]-CT[1],C[2]-CT[2] );
+// 
+// 	Real h = C[flow->boundaries[b[0]].coordinate]- CS[flow->boundaries[b[0]].coordinate];
+// 
+// 	Real Volume = ( CGAL::cross_product ( v1,v2 ) *flow->boundaries[b[0]].normal ) *h;
+// 
+// 	return abs ( Volume );
 }
 
 Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
@@ -482,40 +557,79 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0}, AW[3]={0, 0, 0};
 
 	int b[3];
-	Real Wall_point[3][3];
+	Real Wall_coordinate[3];
 	int j=0;
-
+	
 	for ( int g=0;g<4;g++ )
 	{
 		if ( cell->vertex ( g )->info().isFictious )
 		{
-			b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
-			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
-			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
-			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate]+(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness;
-			j++;
+		  b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
+		  const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
+		  if (!flow->boundaries[b[j]].useMaxMin) Wall_coordinate[j] = wll->state->pos[flow->boundaries[b[j]].coordinate] + (flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness/2;
+		  else Wall_coordinate[j] = flow->boundaries[b[j]].p[flow->boundaries[b[j]].coordinate];
+		  j++;
 		}
 		else
 		{
-			const shared_ptr<Body>& sph = Body::byId
-			                              ( cell->vertex ( g )->info().id(), scene );
-			for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=AW[k]=sph->state->pos[k];}
+		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
+		  for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=AW[k]=sph->state->pos[k];}
 		}
 	}
-
-	AS[flow->boundaries[b[0]].coordinate]= AT[flow->boundaries[b[0]].coordinate]= AW[flow->boundaries[b[0]].coordinate]= Wall_point[0][flow->boundaries[b[0]].coordinate];
-	AT[flow->boundaries[b[1]].coordinate]= Wall_point[1][flow->boundaries[b[1]].coordinate];
-	AW[flow->boundaries[b[2]].coordinate]= Wall_point[2][flow->boundaries[b[2]].coordinate];
-
+	
+	AS[flow->boundaries[b[0]].coordinate]= AT[flow->boundaries[b[0]].coordinate]= AW[flow->boundaries[b[0]].coordinate]= Wall_coordinate[0];
+	AT[flow->boundaries[b[1]].coordinate]= Wall_coordinate[1];
+	AW[flow->boundaries[b[2]].coordinate]= Wall_coordinate[2];
+	
 	CGT::Vecteur v1 ( AS[0]-AT[0],AS[1]-AT[1],AS[2]-AT[2] );
 	CGT::Vecteur v2 ( AS[0]-AW[0],AS[1]-AW[1],AS[2]-AW[2] );
 
 	CGT::Vecteur h ( AT[0] - A[0], AT[1] - A[1], AT[2] - A[2] );
 
 	Real Volume = ( CGAL::cross_product ( v1,v2 ) ) * h;
-
+	
 	return abs ( Volume );
 }
+
+// 	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0}, AW[3]={0, 0, 0};
+// 
+// 	int b[3];
+// 	Real Wall_point[3][3];
+// 	int j=0;
+
+// 	for ( int g=0;g<4;g++ )
+// 	{
+// 		if ( cell->vertex ( g )->info().isFictious )
+// 		{
+// 			b[j] = cell->vertex ( g )->info().id()-flow->id_offset;
+// 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
+// 			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
+// 			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate]+(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness/2;
+// 			j++;
+// // 			cout << "id_wall = " << cell->vertex ( g )->info().id() << " Position = " << endl;
+// 		}
+// 		else
+// 		{
+// 			const shared_ptr<Body>& sph = Body::byId
+// 			                              ( cell->vertex ( g )->info().id(), scene );
+// 			for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=AW[k]=sph->state->pos[k];}
+// 			
+// 		}
+// 	}
+// 
+// 	AS[flow->boundaries[b[0]].coordinate]= AT[flow->boundaries[b[0]].coordinate]= AW[flow->boundaries[b[0]].coordinate]= Wall_point[0][flow->boundaries[b[0]].coordinate];
+// 	AT[flow->boundaries[b[1]].coordinate]= Wall_point[1][flow->boundaries[b[1]].coordinate];
+// 	AW[flow->boundaries[b[2]].coordinate]= Wall_point[2][flow->boundaries[b[2]].coordinate];
+// 
+// 	CGT::Vecteur v1 ( AS[0]-AT[0],AS[1]-AT[1],AS[2]-AT[2] );
+// 	CGT::Vecteur v2 ( AS[0]-AW[0],AS[1]-AW[1],AS[2]-AW[2] );
+// 
+// 	CGT::Vecteur h ( AT[0] - A[0], AT[1] - A[1], AT[2] - A[2] );
+// 
+// 	Real Volume = ( CGAL::cross_product ( v1,v2 ) ) * h;
+// 	
+// 	return abs ( Volume );
+// }
 
 Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
 {
