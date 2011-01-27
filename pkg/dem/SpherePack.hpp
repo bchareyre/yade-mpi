@@ -35,7 +35,7 @@ class SpherePack{
 	struct ClumpInfo{ int clumpId; Vector3r center; Real rad; int minId, maxId; };
 
 public:
-	enum {RDIST_RMEAN, RDIST_POROSITY, RDIST_PSD};
+	enum {RDIST_RMEAN, RDIST_NUM, RDIST_PSD};
 	struct Sph{
 		Vector3r c; Real r; int clumpId;
 		Sph(const Vector3r& _c, Real _r, int _clumpId=-1): c(_c), r(_r), clumpId(_clumpId) {};
@@ -48,7 +48,8 @@ public:
 	std::vector<Sph> pack;
 	Vector3r cellSize;
 	Real psdScaleExponent;
-	SpherePack(): cellSize(Vector3r::Zero()), psdScaleExponent(2.5){};
+	Real appliedPsdScaling;//a scaling factor that can be applied on size distribution
+	SpherePack(): cellSize(Vector3r::Zero()), psdScaleExponent(2.5), appliedPsdScaling(1.){};
 	SpherePack(const python::list& l):cellSize(Vector3r::Zero()){ fromList(l); }
 	// add single sphere
 	void add(const Vector3r& c, Real r){ pack.push_back(Sph(c,r)); }

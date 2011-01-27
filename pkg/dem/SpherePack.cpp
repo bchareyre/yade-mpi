@@ -85,18 +85,18 @@ void SpherePack::fromSimulation() {
 long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass){
 	static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
-	vector<Real> psdRadii; // hold psdSizes as volume if distributeMass is in use, as plain radii (rather than diameters) if not
+	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution
+	Vector3r size=mx-mn; Real volume=size.x()*size.y()*size.z();
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
+	if(porosity<=0) {LOG_WARN("porosity must be >0, changing it for you. It will be ineffective if num<=0."); porosity=0.5;}
+	//If rMean is not defined, then in will be defined in RDIST_NUM
 	if(rMean>0) mode=RDIST_RMEAN;
-	if(porosity>0){
-		err=(mode>=0); mode=RDIST_POROSITY;
-		if(num<0) throw invalid_argument("SpherePack.makeCloud: when specifying porosity, num must be given as well.");
-		Vector3r dimensions=mx-mn; Real volume=dimensions.x()*dimensions.y()*dimensions.z();
+	else if(num>0 && psdSizes.size()==0) {
+		mode=RDIST_NUM;
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
-		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);
-	}
+		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);}
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
 		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+lexical_cast<string>(psdSizes.size())+"!="+lexical_cast<string>(psdCumm.size())).c_str());
@@ -105,36 +105,51 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		psdRadii.reserve(psdSizes.size());
 		for(size_t i=0; i<psdSizes.size(); i++) {
 			psdRadii.push_back(/* radius, not diameter */ .5*psdSizes[i]);
-			if(distributeMass) psdCumm2.push_back(1-pow(1-psdCumm[i],psdScaleExponent)); // 5/2. is an approximate (fractal) dimension, empirically determined
+			if(distributeMass) {
+				//psdCumm2 is first obtained by integrating the number of particles over the volumic PSD (dN/dSize = totV*(dPassing/dSize)*1/(4/3πr³)). I suspect similar reasoning behind pow3Interp, since the expressions are a bit similar. The total cumulated number will be the number of spheres in volume*(1-porosity), it is used to decide if the PSD will be scaled down. psdCumm2 is normalized below in order to fit in [0,1]. (B.C.)
+				if (i==0) psdCumm2.push_back(0);
+				else psdCumm2.push_back(psdCumm2[i-1] + 3.0*volume*(1-porosity)/Mathr::PI*(psdCumm[i]-psdCumm[i-1])/(psdSizes[i]-psdSizes[i-1])*(pow(psdSizes[i-1],-2)-pow(psdSizes[i],-2)));
+			}
 			LOG_DEBUG(i<<". "<<psdRadii[i]<<", cdf="<<psdCumm[i]<<", cdf2="<<(distributeMass?lexical_cast<string>(psdCumm2[i]):string("--")));
 			// check monotonicity
 			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
 		}
+		if(distributeMass) {
+			if (num>0) {
+				//if target number will not fit in (1-poro)*volume, scale down particles size
+				if (psdCumm2[psdSizes.size()-1]<num){
+					appliedPsdScaling=pow(psdCumm2[psdSizes.size()-1]/num,1./3.);
+					for(size_t i=0; i<psdSizes.size(); i++) psdRadii[i]*=appliedPsdScaling;}
+			}
+			//Normalize psdCumm2 so it's between 0 and 1
+			for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
+		}
 	}
-	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: exactly one of rMean, porosity, psdSizes & psdCumm arguments must be specified.");
+	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
 	const int maxTry=1000;
-	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
 	Real r=0;
 	for(int i=0; (i<num) || (num<0); i++) {
-		// determine radius of the next sphere we will attempt to place in space
+		Real norm, rand;
+		//Determine radius of the next sphere we will attempt to place in space. If (num>0), generate radii the deterministic way, in decreasing order, else radii are stochastic since we don't know what the final number will be
+		if (num>0) rand = ((Real)num-(Real)i+0.5)/((Real)num+1.);
+		else rand = rnd();
 		int t;
 		switch(mode){
 			case RDIST_RMEAN:
-			case RDIST_POROSITY: 
-				if(distributeMass) r=pow3Interp(rnd(),rMean*(1-rRelFuzz),rMean*(1+rRelFuzz));
-				else r=rMean*(2*(rnd()-.5)*rRelFuzz+1); // uniform distribution in rMean*(1±rRelFuzz)
+				//FIXME : r is never defined, it will be zero at first iteration, but it will have values in the next ones. Some magic?
+			case RDIST_NUM:
+				if(distributeMass) r=pow3Interp(rand,rMean*(1-rRelFuzz),rMean*(1+rRelFuzz));
+				else r=rMean*(2*(rand-.5)*rRelFuzz+1); // uniform distribution in rMean*(1±rRelFuzz)
 				break;
 			case RDIST_PSD:
 				if(distributeMass){
-					Real norm;
-					int piece=psdGetPiece(rnd(),psdCumm2,norm);
+					int piece=psdGetPiece(rand,psdCumm2,norm);
 					r=pow3Interp(norm,psdRadii[piece],psdRadii[piece+1]);
 				} else {
-					Real norm; int piece=psdGetPiece(rnd(),psdCumm,norm);
-					r=psdRadii[piece]+norm*(psdRadii[piece+1]-psdRadii[piece]);
-				}
+					int piece=psdGetPiece(rand,psdCumm,norm);
+					r=psdRadii[piece]+norm*(psdRadii[piece+1]-psdRadii[piece]);}
 		}
 		// try to put the sphere into a free spot
 		for(t=0; t<maxTry; ++t){
@@ -154,10 +169,17 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			if(!overlap) { pack.push_back(Sph(c,r)); break; }
 		}
 		if (t==maxTry) {
-			if(num>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num);
-			return i;
-		}
+			if(num>0) {
+				if (mode!=RDIST_RMEAN) {
+					Real nextPoro = porosity+(1-porosity)/10.;
+					if (mode==RDIST_PSD) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
+					pack.clear();
+					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass);}
+				else LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<".");
+			}
+			return i;}
 	}
+	if (appliedPsdScaling<1) LOG_WARN("The size distribution has been scaled down by a factor pack.appliedPsdScaling="<<appliedPsdScaling);
 	return pack.size();
 }
 
