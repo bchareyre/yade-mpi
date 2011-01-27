@@ -551,7 +551,7 @@ Ip2 functors
 
 #. :yref:`Material` combinations within the simulation. In most cases, ``Ip2`` functors handle 2 instances of the same :yref:`Material` class (such as :yref:`Ip2_FrictMat_FrictMat_FrictPhys` for 2 bodies with :yref:`FrictMat`) 
 
-#. :yref:`IPhys` accepted by the constitutive law (``Law2`` functor), which is the second part of the ``Law2`` functor's name (e.g. :yref:`Law2_ScGeom_FrictPhys_Basic` accepts :yref:`FrictPhys`)
+#. :yref:`IPhys` accepted by the constitutive law (``Law2`` functor), which is the second part of the ``Law2`` functor's name (e.g. :yref:`Law2_ScGeom_FrictPhys_CundallStrack` accepts :yref:`FrictPhys`)
 
 .. note:: Unlike with ``Bo1`` and ``Ig2`` functors, unhandled combination of :yref:`Materials<Material>` is an error condition signaled by an exception.
 
@@ -571,18 +571,18 @@ Let us give several example of the chain of created and accepted types.
 
 Basic DEM model
 ^^^^^^^^^^^^^^^^
-Suppose we want to use the :yref:`Law2_ScGeom_FrictPhys_Basic` constitutive law. We see that 
+Suppose we want to use the :yref:`Law2_ScGeom_FrictPhys_CundallStrack` constitutive law. We see that
 
-#. the ``Ig2`` functors most create :yref:`ScGeom`. Since we have :yref:`spheres<Sphere>` and :yref:`walls<Wall>` in the simulation, we will need functors accepting :yref:`Sphere` + :yref:`Sphere` and :yref:`Wall` + :yref:`Sphere` combinations. We don't want interactions between walls themselves (as a matter of fact, there is no such functor anyway). That gives us :yref:`Ig2_Sphere_Sphere_ScGeom` and ``Ig2_Wall_Sphere_ScGeom`` (as a matter of facet, there is no such functor now, although it is `planned <https://blueprints.launchpad.net/yade/+spec/walls-spheres-contact-geometry>`_)
+#. the ``Ig2`` functors must create :yref:`ScGeom`. If we have for instance :yref:`spheres<Sphere>` and :yref:`boxes<Box>` in the simulation, we will need functors accepting :yref:`Sphere` + :yref:`Sphere` and :yref:`Box` + :yref:`Sphere` combinations. We don't want interactions between boxes themselves (as a matter of fact, there is no such functor anyway). That gives us :yref:`Ig2_Sphere_Sphere_ScGeom` and :yref:`Ig2_Box_Sphere_ScGeom`.
 
 #. the ``Ip2`` functors should create :yref:`FrictPhys`. Looking at :yref:`InteractionPhysicsFunctors<IPhysFunctor>`, there is only :yref:`Ip2_FrictMat_FrictMat_FrictPhys`. That obliges us to use :yref:`FrictMat` for particles.
 
 The result will be therefore::
 
    InteractionLoop(
-      [Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
+      [Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
       [Ip2_FrictMat_FrictMat_FrictPhys()],
-      [Law2_ScGeom_FrictPhys_Basic()]
+      [Law2_ScGeom_FrictPhys_CundallStrack()]
    )
 
 Concrete model
