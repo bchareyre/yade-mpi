@@ -110,7 +110,7 @@ opts.AddVariables(
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
 	('execCheck','Name of the main script that should be installed; if the current one differs, an error is raised (do not use directly, only intended for --rebuild',None),
-	('defThreads','Default number of OpenMP threads to run with, unless overridden with -j. Keep unset (negative) to default to using all cores.',-1),
+	('defThreads','No longer used, specify -j each time yade is run (defaults to 1 now)',-1),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),

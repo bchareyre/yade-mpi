@@ -22,7 +22,7 @@ else:
 # handle command-line options first
 import optparse
 par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog=os.path.basename(sys.argv[0]),version='%s (%s; %s)'%(version,','.join(features),buildsAvailable),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s, %s)."%(version,','.join(features),buildsAvailable))
-par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
+par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
 par.add_option('--cores',help='Set number of OpenMP threads (as --threads) and in addition set affinity of threads to the cores given.',dest='cores',type='string')
 par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
@@ -94,6 +94,9 @@ if opts.test:
 # do this early, to have debug messages in the boot code (plugin registration etc)
 if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
 
+if not 'openmp' in features and (opts.cores or (opts.threads and opts.threads>1)):
+	print 'WARNING: compiled without OpenMP, -j/--threads/--cores have no effect.'
+
 # OpenMP env variables must be se before loading yade libs ("import yade" below)
 # changes have no effeect after libgomp initializes
 if opts.cores:
@@ -106,8 +109,7 @@ if opts.cores:
 	os.environ['GOMP_CPU_AFFINITY']=' '.join([str(cores[0])]+[str(c) for c in cores])
 	os.environ['OMP_NUM_THREADS']=str(len(cores))
 elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
-elif int('$defThreads')>0:
-	os.environ['OMP_NUM_THREADS']='$defThreads'
+else: os.environ['OMP_NUM_THREADS']='1'
 
 sys.stderr.write('Welcome to Yade '+version+'%s\n'%(' (debug build)' if opts.debug else ''))
 

@@ -299,7 +299,7 @@ maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
 
 parser=optparse.OptionParser(usage='%prog [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]',description='%prog runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.')
 parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
-parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to allocate all available cores (%d, which might be further limited with --jobs) for each job when built with OpenMP, otherwise to 1."%maxOmpThreads,metavar='NUM',default=-1)
+parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to 1.",metavar='NUM',default=1)
 parser.add_option('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see -j), even if !THREADS colums specifies more.')
 parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a $, % or @, which will be replaced by script name, line number or by description column respectively (default: $.@.log)',metavar='FORMAT',default='$.@.log')
 parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to \-\-log); if not specified (default), stdout/stderr are used',metavar='FILE')
@@ -389,7 +389,7 @@ logFiles=[]
 for i,l in enumerate(useLines):
 	script=scripts[0] if len(scripts)>0 else None
 	envVars=[]
-	nCores=opts.defaultThreads if opts.defaultThreads>0 else opts.maxJobs
+	nCores=opts.defaultThreads
 	jobExecutable=executable
 	jobAffinity=opts.affinity
 	jobDebug=opts.debug
