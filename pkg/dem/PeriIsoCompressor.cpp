@@ -76,7 +76,6 @@ void PeriIsoCompressor::action(){
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
 	assert(scene->dt>0);
 	for(int axis=0; axis<3; axis++){ scene->cell->velGrad(axis,axis)=cellGrow[axis]/(scene->dt*scene->cell->getSize()[axis]); }
-	// scene->cell->refSize+=cellGrow;
 
 	// handle state transitions
 	if(allStressesOK){
@@ -145,7 +144,7 @@ void PeriTriaxController::action()
 	//FIXME : this is wrong I think (almost sure, B.)
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
-	const Vector3r& refSize=scene->cell->getSize();
+	const Vector3r& refSize(scene->cell->getRefSize());
 	if (maxBodySpan[0]<=0){
 		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 			if(!b || !b->bound) continue;

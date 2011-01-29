@@ -6,7 +6,7 @@ void Cell::integrateAndUpdate(Real dt){
 	_trsfInc=dt*velGrad;
 	// total transformation; M = (Id+G).M = F.M
 	trsf+=_trsfInc*trsf;
-	invTrsf=trsf.inverse();
+	_invTrsf=trsf.inverse();
 	// hSize contains colums with updated base vectors
 	hSize+=_trsfInc*hSize;
 	if(hSize.determinant()==0){ throw runtime_error("Cell is degenerate (zero volume)."); }

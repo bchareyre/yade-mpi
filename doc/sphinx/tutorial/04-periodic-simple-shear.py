@@ -126,3 +126,5 @@ Gl1_Sphere.stripes=True
 
 # open the plot on the screen
 plot.plot()
+
+O.saveTmp()

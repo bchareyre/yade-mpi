@@ -62,8 +62,7 @@ void OpenGLRenderer::init(){
 void OpenGLRenderer::setBodiesRefSe3(){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
-	scene->cell->refSize=scene->cell->getSize();
-	// scene->cell->refShear=scene->cell->shear;
+	scene->cell->refHSize=scene->cell->hSize;
 }
 
 
@@ -121,12 +120,16 @@ void OpenGLRenderer::drawPeriodicCell(){
 	if(!scene->isPeriodic) return;
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
-		Vector3r size=scene->cell->getSize();
-		if(dispScale!=Vector3r::Ones()) size+=dispScale.cwise()*Vector3r(size-scene->cell->refSize);
-		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
-		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
-		glScalev(size);
-		glutWireCube(1);
+		// Vector3r size=scene->cell->getSize();
+		const Matrix3r& hSize=scene->cell->hSize;
+		if(dispScale!=Vector3r::Ones()){
+			const Matrix3r& refHSize(scene->cell->refHSize);
+			Matrix3r scaledHSize;
+			for(int i=0; i<3; i++) scaledHSize.col(i)=refHSize.col(i)+dispScale.cwise()*Vector3r(hSize.col(i)-refHSize.col(i));
+			GLUtils::Parallelepiped(scaledHSize.col(0),scaledHSize.col(1),scaledHSize.col(2));
+		} else {
+			GLUtils::Parallelepiped(hSize.col(0),hSize.col(1),hSize.col(2));
+		}
 	glPopMatrix();
 }
 
@@ -276,10 +279,12 @@ void OpenGLRenderer::renderIGeom(){
 	{
 		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-			if(!I->geom) continue;
+			if(!I->geom) continue; // avoid refcount manipulations if the interaction is not real anyway
+			shared_ptr<IGeom> ig(I->geom); // keep reference so that ig does not disappear suddenly while being rendered
+			if(!ig) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			if(!(bodyDisp[I->getId1()].isDisplayed||bodyDisp[I->getId2()].isDisplayed)) continue;
-			glPushMatrix(); geomDispatcher(I->geom,I,b1,b2,intrWire); glPopMatrix();
+			glPushMatrix(); geomDispatcher(ig,I,b1,b2,intrWire); glPopMatrix();
 		}
 	}
 }

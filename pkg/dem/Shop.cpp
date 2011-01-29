@@ -577,7 +577,7 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	bStresses.resize(scene->bodies->size());
-	for (unsigned int k=0;k<scene->bodies->size();k++) bStresses[k]=Matrix3r::Zero();
+	for (size_t k=0;k<scene->bodies->size();k++) bStresses[k]=Matrix3r::Zero();
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());

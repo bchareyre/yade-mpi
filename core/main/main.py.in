@@ -149,10 +149,15 @@ if opts.checks:
 	checksPath='${sourceRoot}'+'/scripts/test/checks' # replaced at install-time
 	execfile(checksPath+'/checkList.py')
 
-def userSession(qt4=False):
+def userSession(qt4=False,qapp=None):
 	# prepare nice namespace for users
-	import yade
+	import yade, yade.runtime
 	import sys
+	# start non-blocking qt4 app here; need to ask on the mailing list on how to make it functional
+	## with ipython 0.11, start the even loop early (impossible with 0.10, which is thread-based)
+	#if qt4 and yade.runtime.ipython_version==11:
+	#	import IPython
+	#	IPython.appstart_qt4(qapp)
 	if len(sys.argv)>0:
 		arg0=sys.argv[0]
 		if qt4: yade.qt.Controller();
@@ -171,47 +176,45 @@ def userSession(qt4=False):
 					traceback.print_exc()
 					if yade.runtime.opts.exitAfter: sys.exit(1)
 				if yade.runtime.opts.exitAfter: sys.exit(0)
-			#if qt4:
-			#	class RunScriptThread(QThread):
-			#		def __init__(self,script): QThread.__init__(self); self.script=script
-			#		def run(self): runScript(self.script)
-			#	worker=RunScriptThread(arg0)
-			#	worker.start()
-			#	print 'worker started'
-			#else:
 			runScript(arg0)
 	if yade.runtime.opts.exitAfter: sys.exit(0)
+	# common ipython configuration
+	banner='[[ ^L clears screen, ^U kills line. '+', '.join((['F12 controller','F11 3d view','F10 both','F9 generator'] if (qt4) else [])+['F8 plot'])+'. ]]'
+	ipconfig=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py
+		prompt_in1='Yade [\#]: ',
+		prompt_in2='     .\D.: ',
+		prompt_out=" ->  [\#]: ",
+		separate_in='',separate_out='',separate_out2='',
+		#execfile=[prefix+'/lib/yade'+suffix+'/py/yade/ipython.py'],
+		readline_parse_and_bind=[
+			'tab: complete',
+			# only with the gui; the escape codes might not work on non-linux terminals.
+			]
+			+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if (qt4) else []) #F12,F11,F10,F9
+			+['"\e[19~": "\C-Uimport yade.plot; yade.plot.plot();\C-M"', #F8
+				'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
+		]
+	)
+	
 	# show python console
-	if 1:
+	# handle both ipython 0.10 and 0.11 (incompatible API)
+	if yade.runtime.ipython_version==10:
 		from IPython.Shell import IPShellEmbed
-		ipshell=IPShellEmbed(
-			#exit_msg='Bye.',
-			banner='[[ ^L clears screen, ^U kills line. '+
-				', '.join((['F12 controller','F11 3d view','F10 both','F9 generator'] if (qt4) else [])+['F8 plot'])+'. ]]',
-			rc_override=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py
-				prompt_in1='Yade [\#]: ',
-				prompt_in2='     .\D.: ',
-				prompt_out=" ->  [\#]: ",
-				separate_in='0',
-				separate_out='0',
-				separate_out2='0',
-				#execfile=[prefix+'/lib/yade'+suffix+'/py/yade/ipython.py'],
-				readline_parse_and_bind=[
-					'tab: complete',
-					# only with the gui
-					# the escape codes might not work on non-linux terminals.
-					]
-					+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"','"\e[23~": "\C-Uyade.qt.View();\C-M"','"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"','"\e[20~": "\C-Uyade.qt.Generator();\C-M"'] if (qt4) else []) #F12,F11,F10,F9
-					+['"\e[19~": "\C-Uimport yade.plot; yade.plot.plot();\C-M"', #F8
-					'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
-					]
-			)
-		)
+		ipshell=IPShellEmbed(banner=banner,rc_override=ipconfig)
 		ipshell()
 		# save history -- a workaround for atexit handlers not being run (why?)
 		# http://lists.ipython.scipy.org/pipermail/ipython-user/2008-September/005839.html
 		import IPython.ipapi
 		IPython.ipapi.get().IP.atexit_operations()
+	elif yade.runtime.ipython_version==11:
+		from IPython.core.embed import InteractiveShellEmbed
+		# use the dict to set attributes
+		for k in ipconfig: setattr(InteractiveShellEmbed,k,ipconfig[k])
+		InteractiveShellEmbed.banner1=banner # called banner1 here, not banner anymore
+		ipshell=InteractiveShellEmbed()
+		ipshell()
+		# similar to the workaround, as for 0.10 (perhaps not needed?)
+		ipshell.atexit_operations()
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
@@ -247,7 +250,7 @@ elif gui=='qt4':
 	from PyQt4.QtCore import *
 	import yade.qt # this yade.qt is different from the one that comes with qt3
 	qapp=QtGui.QApplication(sys.argv)
-	userSession(qt4=True)
+	userSession(qt4=True,qapp=qapp)
 
 O.exitNoBacktrace()
 

@@ -484,8 +484,16 @@ def savePylab(baseName,timestamp=False,title=None):
 	if timestamp: baseName+=_mkTimestamp()
 	baseNameNoPath=baseName.split('/')[-1]
 	saveDataTxt(fileName=baseName+'.data.bz2')
+	if len(plots)==0: raise RuntimeError("No plots to save, only data saved.")
 	py=file(baseName+'.py','w')
-	py.write('#!/usr/bin/env python\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\n')
+	py.write('#!/usr/bin/env python\n# encoding: utf-8\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\nimport pylab, numpy\n')
+	py.write("data=numpy.genfromtxt('%s.data.bz2',dtype=None,names=True)\n"%baseName)
+	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
+	for nPlot,p in enumerate(plots.keys()):
+		pStrip=p.strip()
+		if plots[p]==None: continue # image plots, which is not exported
+		if len(plots)==1: py.write('pylab.figure()\n')
+		else: py.write('pylab.subplot(%d,%d,%d)\n'%(subRows,subCols,nPlots))
 
 def _mkTimestamp():
 	import time

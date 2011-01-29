@@ -47,8 +47,7 @@ env.Install('$LIBDIR/lib',[
 		LIBS=env['LIBS']+[
 			'yade-support',
 			'rt', # realtime lib, for clock_gettime 
-			]+
-			(['yade-opengl'] if 'opengl' in env['features'] else [])
+			]
 			,
 	)
 ])

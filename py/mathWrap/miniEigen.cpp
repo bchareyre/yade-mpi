@@ -66,7 +66,6 @@ struct Vector3i_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vect
 struct Vector2r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector2r& x){ return bp::make_tuple(x[0],x[1]);} };
 struct Vector2i_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Vector2i& x){ return bp::make_tuple(x[0],x[1]);} };
 
-#undef IDX_CHECK
 
 /* template to define custom converter from sequence/list or approriate length and type, to eigen's Vector
    - length is stored in VT::RowsAtCompileTime
@@ -88,6 +87,8 @@ static Matrix3r* Matrix3r_fromElements(Real m00, Real m01, Real m02, Real m10, R
 static Vector6r* Vector6r_fromElements(Real v0, Real v1, Real v2, Real v3, Real v4, Real v5){ Vector6r* v(new Vector6r); (*v)<<v0,v1,v2,v3,v4,v5; return v; }
 static Vector6i* Vector6i_fromElements(int v0, int v1, int v2, int v3, int v4, int v5){ Vector6i* v(new Vector6i); (*v)<<v0,v1,v2,v3,v4,v5; return v; }
 static Vector3r Matrix3r_diagonal(const Matrix3r& m){ return Vector3r(m.diagonal()); }
+static Vector3r Matrix3r_row(const Matrix3r& m, int ix){ IDX_CHECK(ix,3); return Vector3r(m.row(ix)); }
+static Vector3r Matrix3r_col(const Matrix3r& m, int ix){ IDX_CHECK(ix,3); return Vector3r(m.col(ix)); }
 static Vector6r Matrix3r_toVoigt(const Matrix3r& m, bool strain=false){ return tensor_toVoigt(m,strain); }
 static Matrix3r Vector6r_toSymmTensor(const Vector6r& v, bool strain=false){ return voigt_toSymmTensor(v,strain); }
 static Quaternionr Quaternionr_setFromTwoVectors(Quaternionr& q, const Vector3r& u, const Vector3r& v){ return q.setFromTwoVectors(u,v); }
@@ -112,6 +113,9 @@ static bool Quaternionr__eq__(const Quaternionr& q1, const Quaternionr& q2){ ret
 static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ return q1!=q2; }
 #include<Eigen/SVD>
 static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
+
+
+#undef IDX_CHECK
 
 
 #define EIG_WRAP_METH1(klass,meth) static klass klass##_##meth(const klass& self){ return self.meth(); }
@@ -205,6 +209,8 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("transpose",&Matrix3r_transpose)
 		.def("polarDecomposition",&Matrix3r_polarDecomposition)
 		.def("diagonal",&Matrix3r_diagonal)
+		.def("row",&Matrix3r_row)
+		.def("col",&Matrix3r_col)
 
 		//
 		.def("__neg__",&Matrix3r__neg__)

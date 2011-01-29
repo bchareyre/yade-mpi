@@ -39,6 +39,12 @@ void InteractionLoop::action(){
 	geomDispatcher->scene=physDispatcher->scene=lawDispatcher->scene=scene;
 	// ask dispatchers to update Scene* of their functors
 	geomDispatcher->updateScenePtr(); physDispatcher->updateScenePtr(); lawDispatcher->updateScenePtr();
+
+	// call Ig2Functor::preStep
+	FOREACH(const shared_ptr<IGeomFunctor>& ig2, geomDispatcher->functors) ig2->preStep();
+	// call LawFunctor::preStep
+	FOREACH(const shared_ptr<LawFunctor>& law2, lawDispatcher->functors) law2->preStep();
+
 	/*
 		initialize callbacks; they return pointer (used only in this timestep) to the function to be called
 		returning NULL deactivates the callback in this timestep
@@ -58,6 +64,8 @@ void InteractionLoop::action(){
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
+
+
 	#ifdef YADE_SUBDOMAINS
 		YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){ if(unlikely(!b)) continue; FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){
 			const shared_ptr<Interaction>& I(mapItem.second);

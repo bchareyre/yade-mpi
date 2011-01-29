@@ -111,8 +111,8 @@ void NewtonIntegrator::action()
 			#ifdef YADE_DEBUG
 				if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
 				if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
-				if(state->mass<=0 && (state->blockedDOFs & State::DOF_XYZ != State::DOF_XYZ)) throw runtime_error(("NewtonIntegrator: #"+lexical_cast<string>(id)+" has some linear accelerations enabled, but State::mass is non-positive."));
-				if(state->inertia.minCoeff()<=0 && (state->blockedDOFs & State::DOF_RXRYRZ != State::DOF_RXRYRZ)) throw runtime_error(("NewtonIntegrator: #"+lexical_cast<string>(id)+" has some angular accelerations enabled, but State::inertia contains non-positive terms."));
+				if(state->mass<=0 && ((state->blockedDOFs & State::DOF_XYZ) != State::DOF_XYZ)) throw runtime_error(("NewtonIntegrator: #"+lexical_cast<string>(id)+" has some linear accelerations enabled, but State::mass is non-positive."));
+				if(state->inertia.minCoeff()<=0 && ((state->blockedDOFs & State::DOF_RXRYRZ) != State::DOF_RXRYRZ)) throw runtime_error(("NewtonIntegrator: #"+lexical_cast<string>(id)+" has some angular accelerations enabled, but State::inertia contains non-positive terms."));
 			#endif
 
 			// fluctuation velocity does not contain meanfield velocity in periodic boundaries

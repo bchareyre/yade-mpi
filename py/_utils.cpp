@@ -65,9 +65,13 @@ py::tuple coordsAndDisplacements(int axis,py::tuple Aabb=py::tuple()){
 }
 
 void setRefSe3(){
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	Scene* scene=Omega::instance().getScene().get();
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		b->state->refPos=b->state->pos;
 		b->state->refOri=b->state->ori;
+	}
+	if(scene->isPeriodic){
+		scene->cell->refHSize=scene->cell->hSize;
 	}
 }
 

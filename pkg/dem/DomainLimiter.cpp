@@ -127,7 +127,7 @@ void LawTester::action(){
 		// the matrix is orthonormal, since axX, axY are normalized and and axZ is their cross-product
 		trsf.row(0)=axX; trsf.row(1)=axY; trsf.row(2)=axZ;
 	} else {
-		trsf=l3Geom->trsf;
+		trsf=Matrix3r(l3Geom->trsf);
 		axX=trsf.row(0); axY=trsf.row(1); axZ=trsf.row(2);
 		uGeom.start<3>()=l3Geom->u;
 		if(l6Geom) uGeom.end<3>()=l6Geom->phi;

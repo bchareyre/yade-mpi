@@ -53,7 +53,12 @@ struct L3Geom: public GenericSpheresContact{
 		* Multiplication of vector with quaternion is internally done by converting to matrix first, anyway
 		* We need to extract local axes, and that is easier to be done from Matrix3r (columns)
 		*/
-		((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
+		//#define L3_TRSF_QUATERNION
+		#ifdef L3_TRSF_QUATERNION
+			((Quaternionr,trsf,Quaternionr::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
+		#else
+			((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
+		#endif
 		((Vector3r,F,Vector3r::Zero(),,"Applied force in local coordinates [debugging only, will be removed]"))
 		,
 		/*init*/
@@ -71,27 +76,33 @@ REGISTER_SERIALIZABLE(L3Geom);
 struct L6Geom: public L3Geom{
 	virtual ~L6Geom();
 	Vector3r relPhi() const{ return phi-phi0; }
-	YADE_CLASS_BASE_DOC_ATTRS(L6Geom,L3Geom,"Geometric of contact in local coordinates with 6 degrees of freedom. [experimental]",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(L6Geom,L3Geom,"Geometric of contact in local coordinates with 6 degrees of freedom. [experimental]",
 		((Vector3r,phi,Vector3r::Zero(),,"Rotation components, in local coordinates. |yupdate|"))
 		((Vector3r,phi0,Vector3r::Zero(),,"Zero rotation, should be always subtracted from *phi* to get the value. See :yref:`L3Geom.u0`."))
+		,
+		/* ctor */ createIndex();
 	);
+	REGISTER_CLASS_INDEX(L6Geom,L3Geom);
 };
 REGISTER_SERIALIZABLE(L6Geom);
 
 #ifdef YADE_OPENGL
 struct Gl1_L3Geom: public GlIGeomFunctor{
-	FUNCTOR1D(L3Geom);
+	RENDERS(L3Geom);
 	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
 	void draw(const shared_ptr<IGeom>&, bool isL6Geom=false, const Real& phiScale=0);
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L3Geom,GlIGeomFunctor,"Render :yref:`L3Geom` geometry.",
-		((bool,axesLabels,true,,"Whether to display labels for local axes (x,y,z)"))
+		((bool,axesLabels,false,,"Whether to display labels for local axes (x,y,z)"))
+		((Real,axesScale,1.,,"Scale local axes, their reference length being half of the minimum radius."))
+		((Real,axesWd,1.,,"Width of axes lines, in pixels; not drawn if non-positive"))
+		((Real,uPhiWd,2.,,"Width of lines for drawing displacements (and rotations for :yref:`L6Geom`); not drawn if non-positive."))
 		((Real,uScale,1.,,"Scale local displacements (:yref:`u<L3Geom.u>` - :yref:`u0<L3Geom.u0>`); 1 means the true scale, 0 disables drawing local displacements; negative values are permissible."))
 	);
 };
 REGISTER_SERIALIZABLE(Gl1_L3Geom);
 
 struct Gl1_L6Geom: public Gl1_L3Geom{
-	FUNCTOR1D(L6Geom);
+	RENDERS(L6Geom);
 	void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_L6Geom,Gl1_L3Geom,"Render :yref:`L6Geom` geometry.",
 		((Real,phiScale,1.,,"Scale local rotations (:yref:`phi<L6Geom.phi>` - :yref:`phi0<L6Geom.phi0>`). The default scale is to draw $\\pi$ rotation with length equal to minimum radius."))
@@ -103,24 +114,23 @@ REGISTER_SERIALIZABLE(Gl1_L6Geom);
 struct Ig2_Sphere_Sphere_L3Geom: public IGeomFunctor{
 		virtual bool go(const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
 		virtual bool genericGo(bool is6Dof, const shared_ptr<Shape>& s1, const shared_ptr<Shape>& s2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& I);
-		#ifdef L3GEOM_SPHERESLIKE
-			// common code for {sphere,facet,wall}+sphere contacts
-			// facet&wall will get separated if L3Geom subclass with exact branch vector is created
-			void handleSpheresLikeContact(const shared_ptr<Interaction>& I, const State& state1, const State& state2, const Vector3r& shift2, bool is6Dof, const Vector3r& normal, const Vector3r& contPt, Real uN, Real r1, Real r2);
-		#endif
+		// common code for {sphere,facet,wall}+sphere contacts
+		// facet&wall will get separated if L3Geom subclass with exact branch vector is created
+		void handleSpheresLikeContact(const shared_ptr<Interaction>& I, const State& state1, const State& state2, const Vector3r& shift2, bool is6Dof, const Vector3r& normal, const Vector3r& contPt, Real uN, Real r1, Real r2);
+		virtual void preStep(){ scene->setLocalCoords(true); }
 
 
-	enum { APPROX_NO_RENORM_TRSF=1, APPROX_NO_MID_TRSF=2, APPROX_NO_MID_NORMAL=4, APPROX_NO_RENORM_MID_NORMAL=8 };
+	enum { APPROX_NO_MID_TRSF=1, APPROX_NO_MID_NORMAL=2, APPROX_NO_RENORM_MID_NORMAL=4 };
 
 	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/_extraDocs.py",
 		((bool,noRatch,true,,"See :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting`."))
-		((Real,distFactor,1,,"Create interaction if spheres are not futher than distFactor*(r1+r2)."))
+		((Real,distFactor,1,,"Create interaction if spheres are not futher than |distFactor|*(r1+r2). If negative, zero normal deformation will be set to be the initial value (otherwise, the geometrical distance is the 'zero' one)."))
+		((int,trsfRenorm,100,,"How often to renormalize :yref:`trsf<L3Geom.trsf>`; if non-positive, never renormalized (simulation might be unstable)"))
 		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n"
 		"== ===============================================================\n"
-		"1  do not renormalize transformation matrix at every step\n"
-		"2  use previous transformation to transform velocities (which are known at mid-steps), instead of mid-step transformation computed as quaternion slerp at t=0.5.\n"
-		"4  do not take average (mid-step) normal when computing relative shear displacement, use previous value instead\n"
-		"8  do not re-normalize average (mid-step) normal, if used.…\n"
+		"1  use previous transformation to transform velocities (which are known at mid-steps), instead of mid-step transformation computed as quaternion slerp at t=0.5.\n"
+		"2  do not take average (mid-step) normal when computing relative shear displacement, use previous value instead\n"
+		"4  do not re-normalize average (mid-step) normal, if used.…\n"
 		"== ===============================================================\n\n"
 		"By default, the mask is zero, wherefore none of these approximations is used.\n"
 		))

@@ -16,7 +16,7 @@ O.dt=.01*utils.PWaveTimeStep()
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
-	InteractionLoop([Ig2_Sphere_Sphere_L6Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)]),
+	InteractionLoop([Ig2_Sphere_Sphere_L6Geom(distFactor=-1)],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L6Geom_FrictPhys_Linear(charLen=1)]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=0.1),
 ]

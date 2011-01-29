@@ -1,19 +1,13 @@
 # vim: set filetype=python :
 Import('*')
 linkPlugins=env['linkPlugins']
-import os.path 
 
-# will switch according to scons configuration to one or another
-def yadeStaticOrSharedLib(*args,**kw):
-	return env.Install('$LIBDIR/lib',env.SharedLibrary(*args,**kw))
-
-if 'opengl' in env['features']:
-	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','GLU']),
-
-yadeStaticOrSharedLib('yade-support',[
+env.Install('$LIBDIR/lib',env.SharedLibrary('yade-support',[
 	env.Combine('yade-support.cpp',['base/Math.cpp']+
 		['factory/ClassFactory.cpp','factory/DynLibManager.cpp','multimethods/Indexable.cpp','serialization/Serializable.cpp','pyutil/gil.cpp']
 		# compile TesselationWrapper only if cgal is enabled
-		+(Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/Timer.cpp triangulation/basicVTKwritter.cpp triangulation/FlowBoundingSphere.cpp triangulation/Network.cpp triangulation/Deformation.cpp triangulation/Empilement.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TriaxialState.cpp') if 'cgal' in env['features'] else [])),
-	],LIBS=['dl','m']+[],CXXFLAGS=env['CXXFLAGS']+['-fPIC']
-)
+		+(Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/Timer.cpp triangulation/basicVTKwritter.cpp triangulation/FlowBoundingSphere.cpp triangulation/Network.cpp triangulation/Deformation.cpp triangulation/Empilement.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TriaxialState.cpp') if 'cgal' in env['features'] else [])
+		+(['opengl/GLUtils.cpp'] if 'opengl' in env['features'] else [])
+		),
+	],LIBS=['dl','m']+(['glut','GL','GLU'] if 'opengl' in env['features'] else []),CXXFLAGS=env['CXXFLAGS']+['-fPIC']
+))

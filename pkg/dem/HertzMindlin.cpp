@@ -49,7 +49,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 
 	/* from interaction geometry */
 	GenericSpheresContact* scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());		
-	Real Da = scg->refR1; 
+	Real Da = scg->refR1>0 ? scg->refR1 : scg->refR2; 
 	Real Db = scg->refR2; 
 	Vector3r normal=scg->normal; 
 

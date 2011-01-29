@@ -174,9 +174,8 @@ class ControllerClass(QWidget,Ui_Controller):
 		else:
 			if len(vv)>0: vv[0].close()
 	def setReferenceSlot(self):
-		for b in O.bodies:
-			b.state.refPos=b.state.pos
-			b.state.refOri=b.state.ori
+		# sets reference periodic cell as well
+		utils.setRefSe3()
 	def centerSlot(self):
 		for v in views(): v.center()
 	def setViewAxes(self,dir,up):

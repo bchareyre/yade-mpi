@@ -23,14 +23,10 @@ if not os.path.exists('horse.coarse.gts'):
 
 surf=gts.read(open('horse.coarse.gts'))
 
-O.materials.append(FrictMat(young=30e9,density=2000))
-
-print 'surface closed',surf.is_closed(),'volume',surf.volume()
-
 if surf.is_closed():
 	pred=pack.inGtsSurface(surf)
 	aabb=pred.aabb()
-	dim0=aabb[1][0]-aabb[0][0]; radius=dim0/30. # get some characteristic dimension, use it for radius
+	dim0=aabb[1][0]-aabb[0][0]; radius=dim0/40. # get some characteristic dimension, use it for radius
 	O.bodies.append(pack.regularHexa(pred,radius=radius,gap=radius/4.))
 	surf.translate(0,0,-(aabb[1][2]-aabb[0][2])) # move surface down so that facets are underneath the falling spheres
 O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
@@ -39,18 +35,23 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='collider'),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_L3Geom(),Ig2_Facet_Sphere_L3Geom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
+		[Law2_L3Geom_FrictPhys_ElPerfPl()],
 	),
-	GravityEngine(gravity=[0,0,-1e4]),
+	GravityEngine(gravity=[0,0,-5000]),
 	NewtonIntegrator(damping=.1),
-	PyRunner(iterPeriod=10000,command='timing.stats(); O.pause();')
+	PyRunner(iterPeriod=1000,command='timing.stats(); O.pause();'),
+	PyRunner(iterPeriod=10,command='addPlotData()')
 ]
-collider.sweepLength,collider.nBins,collider.binCoeff=.1*dim0/30.5,10,2
-O.dt=1.5*utils.PWaveTimeStep()
+O.dt=.7*utils.PWaveTimeStep()
 O.saveTmp()
 O.timingEnabled=True
+O.trackEnergy=True
+from yade import plot
+plot.plots={'i':('total',O.energy.keys,)}
+def addPlotData(): plot.addData(i=O.iter,total=O.energy.total(),**O.energy)
+plot.plot()
 
 from yade import timing
 from yade import qt

@@ -34,6 +34,8 @@ class IGeomFunctor: public Functor2D<
 	/*argument types*/ TYPELIST_7(const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r&, const bool&, const shared_ptr<Interaction>&) 
 >{
 	public: virtual ~IGeomFunctor();
+	// called before every step once, from InteractionLoop (used to set Scene::flags & Scene::LOCAL_COORDS) 
+	virtual void preStep(){};
 	YADE_CLASS_BASE_DOC(IGeomFunctor,Functor,"Functor for creating/updating :yref:`Interaction::geom` objects.");
 };
 REGISTER_SERIALIZABLE(IGeomFunctor);
@@ -56,6 +58,8 @@ class LawFunctor: public Functor2D<
 	/*argument types*/ TYPELIST_3(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*)
 >{
 	public: virtual ~LawFunctor();
+	// called before every step once, from InteractionLoop (used to set Scene::flags & Scene::COMPRESSION_NEGATIVE) 
+	virtual void preStep(){};
 	/*! Convenience functions to get forces/torques quickly. */
 	void addForce (const Body::id_t id, const Vector3r& f,Scene* rb){rb->forces.addForce (id,f);}
 	void addTorque(const Body::id_t id, const Vector3r& t,Scene* rb){rb->forces.addTorque(id,t);}
