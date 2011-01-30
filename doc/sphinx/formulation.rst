@@ -837,25 +837,18 @@ Periodic boundary conditions
 ============================
 While most DEM simulations happen in $R^3$ space, it is frequently useful to avoid boundary effects by using periodic space instead. In order to satisfy periodicity conditions, periodic space is created by repetition of parallelepiped-shaped cell. In Yade, periodic space is implemented in the :yref:`Cell` class. The geometry of the cell in the reference coordinates system is defined by three edges of the parallepiped. The corresponding base vectors are stored in the columns of matrix :yref:`Cell.hSize`.
 
-The initial :yref:`Cell.hSize` can be explicitely defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial undeformed period.
+The initial :yref:`Cell.hSize` can be explicitely defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial undeformed period. If the base vectors are axis-aligned, defining the sizes of the cell along each axis can be more conveninent than defining the full hSize matrix; in that case one can simply define the vector :yref:`Cell.sizes`, reprensenting the lenghts of base vectors.
 
-The deformation of the period over time is defined via a matrix representing the gradient of an homogeneous velocity field $\nabla \vec{v}$ (:yref:`Cell.velGrad`). This gradient represents arbitrary combinations of rotations and stretches. It can be imposed externaly or updated by periodic engines in order to reach target strain values or to maintain some prescribed stress.
+The deformation of the cell over time is defined via a matrix representing the gradient of an homogeneous velocity field $\nabla \vec{v}$ (:yref:`Cell.velGrad`). This gradient represents arbitrary combinations of rotations and stretches. It can be imposed externaly or updated by engines (see :yref:`PeriTriaxController` or :yref:`Peri3dController`) in order to reach target strain values or to maintain some prescribed stress.
 The velocity gradient is integrated automatically over time, and the cumulated transformation is reflected in the transformation matrix $\mat{F}$ (:yref:`Cell.trsf`). :yref:`Cell.hSize` will also be updated. The  update reads (it is similar for hSize), with $I$ the identity matrix:
 
 .. math:: \next{\mat{F}}=(I+\nabla \vec{v} \Dt)\curr{\mat{F}}.
 
-There is an alternative way to define the initial period geometry, using:
+$\mat{F}$ can be set back to identity at any point in simulations in order to define the current state as reference for strains definition. It is done with the function :yref:`Cell.resetTrsf`.
 
-* \ the reference size $\vec{s}$ (:yref:`Cell.refSize`), defining the dimensions or a rectangular parallelepiped with corners $(0,0,0)$ and $\vec{s}$;
-* \ the transformation matrix $\mat{F}$ (:yref:`Cell.trsf`).
+The cell's geometry should not be modified during a simulation, be it via hSize or size. The velocity gradient :yref:`Cell.velGrad` is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).
 
-For instance, if :yref:`Cell.refSize` is set equal to the unit vector and if :yref:`Cell.trsf` is defined as a rotation matrix, the initial period will be an inclined cube. This method and the previous one (direct assignement of hSize) are not exactly equivalent: assigning hSize keeps the transformation :yref:`Cell.trsf` unaffected, hence the simulation will start with a null deformation (:yref:`Cell.trsf` =I); inversely, if the period geometry is defined using :yref:`Cell.trsf`$=m$, then the initial value will be $m$.
-
-It is believed that the first method is generally more convenient, since it will let  :yref:`Cell.trsf` reflect only the transformation produced during the simulation, independently of the initial period geometry.
-
-In all cases, the period geometry should not be modified during a simulation, be it via hSize, trsf, or refSize. The velocity gradient :yref:`Cell.velGrad` is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).
-
-Along with the automatic integration of cell transformation, there is an option to homothetically displace all particles so that $\nabla \vec{v}$ is applied over the whole simulation (enabled via :yref:`Cell.homoDeform`). This avoids all boundary effects coming from change of the transformation.
+Along with the automatic integration of cell transformation, there is an option to homothetically displace all particles so that $\nabla \vec{v}$ is applied over the whole simulation (enabled via :yref:`Cell.homoDeform`). This avoids all boundary effects coming from change of the velocity gradient.
 
 Collision detection in periodic cell
 ------------------------------------
