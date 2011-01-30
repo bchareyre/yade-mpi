@@ -839,7 +839,7 @@ While most DEM simulations happen in $R^3$ space, it is frequently useful to avo
 
 The initial :yref:`Cell.hSize` can be explicitely defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial undeformed period. If the base vectors are axis-aligned, defining the sizes of the cell along each axis can be more conveninent than defining the full hSize matrix; in that case one can simply define the vector :yref:`Cell.size`, reprensenting the lenghts of base vectors. The cell's geometry should generally not be modified via hSize or size during a simulation. The velocity gradient :yref:`Cell.velGrad` described below is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).
 
-Deformations tracking
+Deformations handling
 ---------------------
 The deformation of the cell over time is defined via a matrix representing the gradient of an homogeneous velocity field $\nabla \vec{v}$ (:yref:`Cell.velGrad`). This gradient represents arbitrary combinations of rotations and stretches. It can be imposed externaly or updated by :yref:`boundary controllers <BoundaryController>` (see :yref:`PeriTriaxController` or :yref:`Peri3dController`) in order to reach target strain values or to maintain some prescribed stress.
 The velocity gradient is integrated automatically over time, and the cumulated transformation is reflected in the transformation matrix $\mat{F}$ (:yref:`Cell.trsf`). :yref:`Cell.hSize` will also be updated. The  update reads (it is similar for hSize), with $I$ the identity matrix:
