@@ -1,6 +1,8 @@
 
 #include<yade/core/Cell.hpp>
 
+CREATE_LOGGER(Cell);
+
 void Cell::integrateAndUpdate(Real dt){
 	//incremental displacement gradient
 	_trsfInc=dt*velGrad;

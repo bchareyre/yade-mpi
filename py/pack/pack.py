@@ -73,14 +73,19 @@ Add generated packing to the simulation, rotated by 45° along +z
 	>>> sp.toSimulation(rot=Quaternion((0,0,1),pi/4),color=(0,0,1))
 	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-Periodic properties are transferred to the simulation correctly:
+Periodic properties are transferred to the simulation correctly, including rotation:
 
 	>>> O.periodic
 	True
 	>>> O.cell.refSize
 	Vector3(5,5,5)
+	>>> O.cell.hSize
+	Matrix3(3.53553,-3.53553,0, 3.53553,3.53553,0, 0,0,5)
+
+The current state (even if rotated) is taken as mechanically undeformed, i.e. with identity transformation:
+
 	>>> O.cell.trsf
-	Matrix3(0.707107,-0.707107,0, 0.707107,0.707107,0, 0,0,1)
+	Matrix3(1,0,0, 0,1,0, 0,0,1)
 
 :param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
 :param **kw: passed to :yref:`yade.utils.sphere`
@@ -90,8 +95,8 @@ Periodic properties are transferred to the simulation correctly:
 	assert(isinstance(rot,Matrix3))
 	if self.cellSize!=Vector3.Zero:
 		O.periodic=True
-		O.cell.trsf=rot
-		O.cell.refSize=self.cellSize
+		O.cell.hSize=rot*Matrix3(self.cellSize[0],0,0, 0,self.cellSize[0],0, 0,0,self.cellSize[1])
+		O.cell.trsf=Matrix3.Identity
 	if not self.hasClumps():
 		return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
 	else:

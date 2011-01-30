@@ -144,7 +144,7 @@ void PeriTriaxController::action()
 	//FIXME : this is wrong I think (almost sure, B.)
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
-	const Vector3r& refSize(scene->cell->getRefSize());
+	const Vector3r refSize=scene->cell->getRefSize();
 	if (maxBodySpan[0]<=0){
 		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 			if(!b || !b->bound) continue;

@@ -91,7 +91,6 @@ plot.plot()
 
 def compactionFinished():
 	# set the current cell configuration to be the reference one
-	O.cell.refSize=O.cell.size
 	O.cell.trsf=Matrix3.Identity
 	# change control type: keep constant confinement in x,y, 20% compression in z
 	triax.goal=(sigmaIso,sigmaIso,-.3)

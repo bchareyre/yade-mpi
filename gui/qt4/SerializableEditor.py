@@ -14,6 +14,15 @@ import yade.qt
 
 seqSerializableShowType=True # show type headings in serializable sequences (takes vertical space, but makes the type hyperlinked)
 
+# BUG: cursor is moved to the beginnign of the input field even if it has focus
+#
+# checking for focus seems to return True always and cursor is never moved
+#
+# the 'True or' part effectively disables the condition (so that the cursor is moved always), but it might be fixed in the future somehow
+#
+# if True or w.hasFocus(): w.home(False)
+#
+#
 
 def makeWrapperHref(text,className,attr=None,static=False):
 	"""Create clickable HTML hyperlink to a Yade class or its attribute.
@@ -108,7 +117,9 @@ class AttrEditor_Float(AttrEditor,QLineEdit):
 		self.textEdited.connect(self.isHot)
 		self.selectionChanged.connect(self.isHot)
 		self.editingFinished.connect(self.update)
-	def refresh(self): self.setText(str(self.getter())); self.home(False)
+	def refresh(self):
+		self.setText(str(self.getter()));
+		if True or not self.hasFocus(): self.home(False)
 	def update(self):
 		try: self.trySetter(float(self.text()))
 		except ValueError: self.refresh()
@@ -130,7 +141,8 @@ class AttrEditor_Quaternion(AttrEditor,QFrame):
 	def refresh(self):
 		val=self.getter(); axis,angle=val.toAxisAngle()
 		for i in (0,1,2,4):
-			w=self.grid.itemAt(i).widget(); w.setText(str(axis[i] if i<3 else angle)); w.home(False)
+			w=self.grid.itemAt(i).widget(); w.setText(str(axis[i] if i<3 else angle));
+			if True or not w.hasFocus(): w.home(False)
 	def update(self):
 		try:
 			x=[float((self.grid.itemAt(i).widget().text())) for i in (0,1,2,4)]
@@ -157,9 +169,11 @@ class AttrEditor_Se3(AttrEditor,QFrame):
 	def refresh(self):
 		pos,ori=self.getter(); axis,angle=ori.toAxisAngle()
 		for i in (0,1,2,4):
-			w=self.grid.itemAtPosition(1,i).widget(); w.setText(str(axis[i] if i<3 else angle)); w.home(False)
+			w=self.grid.itemAtPosition(1,i).widget(); w.setText(str(axis[i] if i<3 else angle));
+			if True or not w.hasFocus(): w.home(False)
 		for i in (0,1,2):
-			w=self.grid.itemAtPosition(0,i).widget(); w.setText(str(pos[i])); w.home(False)
+			w=self.grid.itemAtPosition(0,i).widget(); w.setText(str(pos[i]));
+			if True or not w.hasFocus(): w.home(False)
 	def update(self):
 		try:
 			q=[float((self.grid.itemAtPosition(1,i).widget().text())) for i in (0,1,2,4)]
@@ -190,7 +204,7 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
 			w=self.grid.itemAtPosition(row,col).widget()
 			w.setText(str(val[self.idxConverter(row,col)]))
-			w.home(False) # make the left-most part visible, if the text is wider than the widget
+			if True or not w.hasFocus: w.home(False) # make the left-most part visible, if the text is wider than the widget
 	def update(self):
 		try:
 			val=self.getter()
