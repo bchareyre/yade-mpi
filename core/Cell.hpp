@@ -17,6 +17,8 @@ The transformation has normal part and rotation/shear part. the shearPt, unshear
 #include<yade/lib/serialization/Serializable.hpp>
 #include<yade/lib/base/Math.hpp>
 
+#define CELL_BACKW_COMPAT
+
 class Cell: public Serializable{
 	public:
 	//! Get current size
@@ -92,16 +94,13 @@ class Cell: public Serializable{
 	Vector3r intrShiftVel(const Vector3i& cellDist) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return velGrad*hSize*cellDist.cast<Real>(); return Vector3r::Zero(); }
 	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
 	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-velGrad*pos); return vel; }
-
-
-	
-
 	// get/set mechanically undeformed shape; setting resets trsf to identity
 	Matrix3r getHSize() const { return hSize; }
-	void setHSize(const Matrix3r& m){ hSize=refHSize=m; trsf=Matrix3r::Identity(); postLoad(*this); }	
+	void setHSize(const Matrix3r& m){ hSize=refHSize=m; trsf=Matrix3r::Identity(); postLoad(*this); }
 	// set current transformation; has no influence on current configuration (hSize); sets display refHSize as side-effect
 	Matrix3r getTrsf() const { return trsf; }
 	void setTrsf(const Matrix3r& m){ refHSize=hSize; trsf=m; postLoad(*this); }
+#ifdef CELL_BACKW_COMPAT
 	// get undeformed shape
 	Matrix3r getHSize0() const { return _invTrsf*hSize; }
 	// edge lengths of the undeformed shape
@@ -116,7 +115,7 @@ class Cell: public Serializable{
 	// set box shape of the cell
 	void setBox(const Vector3r& size){ setHSize(size.asDiagonal()); postLoad(*this); }
 	void setBox3(const Real& s0, const Real& s1, const Real& s2){ setBox(Vector3r(s0,s1,s2)); }
-
+#endif
 	// return current cell volume
 	Real getVolume() const {return hSize.determinant();}
 	void postLoad(Cell&){ integrateAndUpdate(0); }
@@ -141,15 +140,16 @@ class Cell: public Serializable{
 		/*py*/
 		// override some attributes above
 		.add_property("hSize",&Cell::getHSize,&Cell::setHSize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations). Setting *hSize* directly results in :yref:`trsf<Cell.trsf>` being set to identity.")
+#ifdef CELL_BACKW_COMPAT
 		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. column norms of :yref:`hSize<Cell.hSize>`).\n\n.. note:: Modifying this value is deprecated, use :yref:`setBox<Cell.setBox>` instead.\n\n")
-		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell with regards to the initial configuration.")
-		// useful properties
 		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell.trsf>` (computed as :yref:`invTrsf<Cell.invTrsf>` × :yref:`hSize<Cell.hSize>`.")
-		.add_property("sizes",&Cell::getSize_copy,&Cell::setSize,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
-		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
-		// functions
 		.def("setBox",&Cell::setBox,"Set :yref:`Cell` shape to be rectangular, with dimensions along axes specified by given argument. Shorthand for assigning diagonal matrix with respective entries to :yref:`hSize<Cell.hSize>`.")
 		.def("setBox",&Cell::setBox3,"Set :yref:`Cell` shape to be rectangular, with dimensions along $x$, $y$, $z$ specified by arguments. Shorthand for assigning diagonal matrix with the respective entries to :yref:`hSize<Cell.hSize>`.")
+#endif
+		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell with regards to the initial configuration.")
+		// useful properties		
+		.add_property("size",&Cell::getSize_copy,&Cell::setSize,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
+		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// debugging only
 		.def("wrap",&Cell::wrapShearedPt_py,"Transform an arbitrary point into a point in the reference cell")
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
