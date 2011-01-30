@@ -145,7 +145,7 @@ class Cell: public Serializable{
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell with regards to the initial configuration.")
 		// useful properties
 		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell.trsf>` (computed as :yref:`invTrsf<Cell.invTrsf>` × :yref:`hSize<Cell.hSize>`.")
-		.add_property("size",&Cell::getSize_copy,&Cell::setSize,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
+		.add_property("sizes",&Cell::getSize_copy,&Cell::setSize,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// functions
 		.def("setBox",&Cell::setBox,"Set :yref:`Cell` shape to be rectangular, with dimensions along axes specified by given argument. Shorthand for assigning diagonal matrix with respective entries to :yref:`hSize<Cell.hSize>`.")
