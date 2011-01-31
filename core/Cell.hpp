@@ -100,20 +100,14 @@ class Cell: public Serializable{
 	Matrix3r getTrsf() const { return trsf; }
 	void setTrsf(const Matrix3r& m){ trsf=m; postLoad(*this); }
 #ifdef CELL_BACKW_COMPAT
-	// get undeformed shape
-	Matrix3r getHSize0() const { return _invTrsf*hSize; }
-	// edge lengths of the undeformed shape
-	Vector3r getRefSize() const { Matrix3r h=getHSize0(); return Vector3r(h.col(0).norm(),h.col(1).norm(),h.col(2).norm()); }
+	Vector3r getRefSize() const { Matrix3r h=_invTrsf*hSize; return Vector3r(h.col(0).norm(),h.col(1).norm(),h.col(2).norm()); }
 	// temporary, will be removed in favor of more descriptive setBox(...)
 	void setRefSize(const Vector3r& s){
 		// if refSize is set to the current size and the cell is a box (used in older scripts), say it is not necessary
 		if(s==_size && hSize==hSize.diagonal().asDiagonal()){ LOG_WARN("Setting O.cell.refSize=O.cell.size is useless, O.trsf=Matrix3.Identity is enough now."); }
 		else {LOG_WARN("Setting Cell.refSize is deprecated, use O.cell.size=... instead.");}
 		setSize(s); postLoad(*this);
-	} 
-	// set box shape of the cell
-	void setBox(const Vector3r& size){ setHSize(size.asDiagonal()); postLoad(*this); }
-	void setBox3(const Real& s0, const Real& s1, const Real& s2){ setBox(Vector3r(s0,s1,s2)); }
+	}
 #endif
 	// return current cell volume
 	Real getVolume() const {return hSize.determinant();}
@@ -137,13 +131,13 @@ class Cell: public Serializable{
 		/*init*/ ,
 		/*ctor*/ _invTrsf=Matrix3r::Identity(); integrateAndUpdate(0),
 		/*py*/
-		// override some attributes above
-		.add_property("hSize",&Cell::getHSize,&Cell::setHSize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations). Setting *hSize* directly results in :yref:`trsf<Cell.trsf>` being set to identity.")
 #ifdef CELL_BACKW_COMPAT
+		// for backward compat only. Don't use refSize in new scripts or new code. 
 		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. column norms of :yref:`hSize<Cell.hSize>`).\n\n.. note:: Modifying this value is deprecated, use :yref:`size<Cell.size>` instead.\n\n")
 #endif
+		// useful properties
+		.add_property("hSize",&Cell::getHSize,&Cell::setHSize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations). Setting *hSize* directly results in :yref:`trsf<Cell.trsf>` being set to identity.")
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell with regards to the initial configuration.")
-		// useful properties		
 		.add_property("size",&Cell::getSize_copy,&Cell::setSize,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// debugging only
