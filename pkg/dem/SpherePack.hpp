@@ -63,15 +63,15 @@ public:
 	void fromSimulation();
 
 	// random generation; if num<0, insert as many spheres as possible; if porosity>0, recompute meanRadius (porosity>0.65 recommended) and try generating this porosity with num spheres.
-	long makeCloud(Vector3r min, Vector3r max, Real rMean=-1, Real rFuzz=0, int num=-1, bool periodic=false, Real porosity=-1, const vector<Real>& psdSizes=vector<Real>(), const vector<Real>& psdCumm=vector<Real>(), bool distributeMass=false);
+	long makeCloud(Vector3r min, Vector3r max, Real rMean=-1, Real rFuzz=0, int num=-1, bool periodic=false, Real porosity=-1, const vector<Real>& psdSizes=vector<Real>(), const vector<Real>& psdCumm=vector<Real>(), bool distributeMass=false, int seed=0);
 	// return number of piece for x in piecewise function defined by cumm with non-decreasing elements ∈(0,1)
 	// norm holds normalized coordinate withing the piece
 	int psdGetPiece(Real x, const vector<Real>& cumm, Real& norm);
 
 	// function to generate the packing based on a given psd
-	long particleSD(Vector3r min, Vector3r max, Real rMean, bool periodic=false, string name="", int numSph=400, const vector<Real>& radii=vector<Real>(), const vector<Real>& passing=vector<Real>(),bool passingIsNotPercentageButCount=false);
+	long particleSD(Vector3r min, Vector3r max, Real rMean, bool periodic=false, string name="", int numSph=400, const vector<Real>& radii=vector<Real>(), const vector<Real>& passing=vector<Real>(),bool passingIsNotPercentageButCount=false, int seed=0);
 
-	long particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic=false, Real cloudPorosity=.8);
+	long particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic=false, Real cloudPorosity=.8, int seed=0);
 
 
 	// interpolate a variable with power distribution (exponent -3) between two margin values, given uniformly distributed x∈(0,1)

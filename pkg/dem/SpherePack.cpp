@@ -82,8 +82,8 @@ void SpherePack::fromSimulation() {
 	if(scene->isPeriodic) { cellSize=scene->cell->getSize(); }
 }
 
-long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass){
-	static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
+long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass, int seed){
+	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution
@@ -240,7 +240,7 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 }
 
 /* possible enhacement: proportions parameter, so that the domain is not cube, but box with sides having given proportions */
-long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic, Real cloudPorosity){
+long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic, Real cloudPorosity, int seed){
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
 	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
 	
@@ -286,7 +286,7 @@ long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& pass
 // TODO: header, python wrapper, default params
 
 // New code to include the psd giving few points of it
-long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount){
+long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
 	vector<Real> numbers;
 	if(!passingIsNotPercentageButCount){
 		Real Vtot=numSph*4./3.*Mathr::PI*pow(rMean,3.); // total volume of the packing (computed with rMean)
@@ -303,7 +303,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 		FOREACH(Real p, passing) numbers.push_back(p);
 	}
 
-	static boost::minstd_rand randGen(TimingInfo::getNow(true));
+	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
 
 	const int maxTry=1000;
