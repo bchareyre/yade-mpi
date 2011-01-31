@@ -2,13 +2,12 @@
 
 /*! Periodic cell parameters and routines. Usually instantiated as Scene::cell.
 
-The Cell has reference box configuration (*refSize*) which is transformed (using *trsf*) to the current parallelepiped configuration. Using notation from http://en.wikipedia.org/wiki/Finite_strain_theory:
+The Cell has current box configuration represented by the parallelepiped's base vectors (*hSize*). Lengths of the base vectors can be accessed via *size*.
 
-* Vector3r *refSize* is undeformed cell size (box)
-* Matrix3r *trsf* is "deformation gradient tensor" F (written as matrix) 
-* Matrix3r *velGrad* is …
+* Matrix3r *trsf* is "deformation gradient tensor" F (http://en.wikipedia.org/wiki/Finite_strain_theory) 
+* Matrix3r *velGrad* is "velocity gradient tensor" (http://www.cs.otago.ac.nz/postgrads/alexis/FluidMech/node7.html)
 
-The transformation has normal part and rotation/shear part. the shearPt, unshearPt, getShearTrsf etc functions refer to both shear and rotation.
+The transformation is splitted between "normal" part and "rotation/shear" part for contact detection algorithms. The shearPt, unshearPt, getShearTrsf etc functions refer to both shear and rotation. This decomposition is frame-dependant and does not correspond to the rotation/stretch decomposition of mechanics (with stretch further decomposed into isotropic and deviatoric). Therefore, using the shearPt family in equations of mechanics is not recommended.
 
 */
 
