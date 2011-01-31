@@ -83,9 +83,9 @@ class TestObjectInstantiation(unittest.TestCase):
 		O.bodies.append(utils.sphere((0,0,0),1))
 		O.engines=[InsertionSortCollider([Bo1_Sphere_Aabb()]),NewtonIntegrator()]
 		O.step()
-		O.saveTmp()
+		O.saveTmp(quiet=True)
 		mn0=Vector3(O.bodies[0].bound.min)
-		O.reload()
+		O.reload(quiet=True)
 		mn1=Vector3(O.bodies[0].bound.min)
 		# check that the minimum is not saved
 		self.assert_(not isnan(mn0[0]))

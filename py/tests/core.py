@@ -147,7 +147,7 @@ class TestMaterials(unittest.TestCase):
 		self.assert_(O.bodies[0].mat.young==O.bodies[1].mat.young)
 	def testSharedAfterReload(self):
 		"Material: shared_ptr's are preserved when saving/loading"
-		O.saveTmp(); O.loadTmp()
+		O.saveTmp(quiet=True); O.loadTmp(quiet=True)
 		O.bodies[0].mat.young=9087438484
 		self.assert_(O.bodies[0].mat.young==O.bodies[1].mat.young)
 	def testLen(self):

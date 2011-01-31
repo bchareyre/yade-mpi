@@ -18,7 +18,7 @@ class TestPBC(unittest.TestCase):
 	# prefix test names with PBC: 
 	def setUp(self):
 		O.reset(); O.periodic=True;
-		O.cell.refSize=(2.5,2.5,3)
+		O.cell.setBox(2.5,2.5,3)
 		self.cellDist=Vector3i(0,0,10) # how many cells away we go
 		self.relDist=Vector3(0,.999999999999999999,0) # rel position of the 2nd ball within the cell
 		self.initVel=Vector3(0,0,5)
@@ -27,13 +27,35 @@ class TestPBC(unittest.TestCase):
 		O.bodies.append(utils.sphere(self.initPos,.5))
 		#print O.bodies[1].state.pos
 		O.bodies[1].state.vel=self.initVel
-		O.engines=[NewtonIntegrator()]
+		O.engines=[NewtonIntegrator(warnNoForceReset=False)]
 		O.cell.velGrad=Matrix3(0,0,0, 0,0,0, 0,0,-1)
 		O.cell.homoDeform=3
 		O.dt=0 # do not change positions with dt=0 in NewtonIntegrator, but still update velocities from velGrad
-	def testRefSize(self):
-		"PBC: hSize reflects changes of refSize"
-		O.cell.refSize=(2.55,11,45)
+	def testVelGrad(self):
+		'PBC: velGrad changes hSize but not hSize0, accumulates in trsf'
+		O.dt=1e-3
+		hSize,trsf=O.cell.hSize,Matrix3.Identity
+		hSize0=hSize
+		for i in range(0,10):
+			O.step(); hSize+=O.dt*O.cell.velGrad*hSize; trsf+=O.dt*O.cell.velGrad*trsf
+		for i in range(0,len(O.cell.hSize)):
+			self.assertAlmostEqual(hSize[i],O.cell.hSize[i])
+			self.assertAlmostEqual(trsf[i],O.cell.trsf[i])
+			# ?? should work
+			#self.assertAlmostEqual(hSize0[i],O.cell.hSize0[i])
+	def testTrsfChange(self):
+		'PBC: chaing trsf changes hSize0, but does not modify hSize'
+		O.dt=1e-2
+		O.step()
+		O.cell.trsf=Matrix3.Identity
+		for i in range(0,len(O.cell.hSize)):
+			self.assertAlmostEqual(O.cell.hSize0[i],O.cell.hSize[i])
+	def testDegenerate(self):
+		"PBC: degenerate cell raises exception"
+		self.assertRaises(RuntimeError,lambda: setattr(O.cell,'hSize',Matrix3(1,0,0, 0,0,0, 0,0,1)))
+	def testSetBox(self):
+		"PBC: setBox modifies hSize correctly"
+		O.cell.setBox(2.55,11,45)
 		self.assert_(O.cell.hSize==Matrix3(2.55,0,0, 0,11,0, 0,0,45));
 	def testHomotheticResizeVel(self):
 		"PBC: homothetic cell deformation adjusts particle velocity (homoDeform==3)"

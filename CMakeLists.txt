@@ -131,10 +131,10 @@ FILE(GLOB SRC_LIB_COMBINED  "${CMAKE_BINARY_DIR}/lib.*.cpp")
 #target_link_libraries(pkg core)
 SET(SRC_PYMODULES py/WeightedAverage2d.cpp;py/_eudoxos.cpp;py/log.cpp;py/_utils.cpp;py/wrapper/customConverters.cpp)
 
-SET(SRC_PACK ${CMAKE_SOURCE_DIR}/py/pack/_packPredicates.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packObb.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpheres.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/TetraMesh.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/CellPartition.cpp)
-IF(${CGAL_FOUND})
-	SET(SRC_PACK ${SRC_PACK};${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePackingTriangulation.cpp)
-ENDIF()
+SET(SRC_PACK ${CMAKE_SOURCE_DIR}/py/pack/_packPredicates.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packObb.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpheres.cpp) # ;${CMAKE_SOURCE_DIR}/py/pack/_packSpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/TetraMesh.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/CellPartition.cpp
+#IF(${CGAL_FOUND})
+#	SET(SRC_PACK ${SRC_PACK};${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePackingTriangulation.cpp)
+#ENDIF()
 
 COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyPack "${SRC_PACK}" 100)
 SET(SRC_PACK_COMBINED "${CMAKE_BINARY_DIR}/pyPack.0.cpp")
@@ -172,7 +172,7 @@ ENDIF()
 ## add_library(pyEigen STATIC py/mathWrap/miniEigen.cpp)
 
 
-SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packSpherePadder;yade/_packObb;yade/_utils;yade/WeightedAverage2d)
+SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packObb;yade/_utils;yade/WeightedAverage2d) # ;yade/_packSpherePadder
 IF(${QT4_FOUND})
 	SET(PY_COMPILED_MODULES ${PY_COMPILED_MODULES};yade/qt/_GLViewer)
 ENDIF()

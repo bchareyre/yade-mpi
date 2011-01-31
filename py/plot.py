@@ -6,7 +6,7 @@ Module containing utility functions for plotting inside yade. See :ysrc:`scripts
 """
 
 ## all exported names
-__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverse','addData','saveGnuplot','saveDataTxt','savePlotSequence']
+__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
 # safe to import even if Tk will not be used
@@ -34,6 +34,8 @@ import matplotlib,os,time,math,itertools
 #
 import yade.runtime
 if not yade.runtime.hasDisplay: matplotlib.use('Agg')
+
+from miniEigen import *
 
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKAgg')
@@ -67,9 +69,10 @@ axesWd=0
 "Linewidth (in points) to make *x* and *y* axes better visible; not activated if non-positive."
 current=-1
 "Point that is being tracked with a scatter point. -1 is for the last point, set to *nan* to disable."
-#take3dSnapshots=False
-#"If true, take snapshot of the 3d view using :yref:`yade.qt.SnapshotEngine` every time :yref:`yade.plot.addData` is called"
-#snapshotEngine=None
+
+componentSeparator='_'
+componentSuffixes={Vector2:{0:'x',1:'y'},Vector3:{0:'x',1:'y',2:'z'},Matrix3:{(0,0):'xx',(1,1):'yy',(2,2):'zz',(0,1):'xy',(0,2):'xz',(1,2):'yz',(1,0):'yz',(2,0):'zx',(2,1):'zy'}}
+# if a type with entry in componentSuffixes is given in addData, columns for individual components are synthesized using indices and suffixes given for each type, e.g. foo=Vector3r(1,2,3) will result in columns foox=1,fooy=2,fooz=3
 
 def reset():
 	"Reset all plot-related variables (data, plots, labels)"
@@ -106,10 +109,36 @@ def addData(*d_in,**kw):
 	"""Add data from arguments name1=value1,name2=value2 to yade.plot.data.
 	(the old {'name1':value1,'name2':value2} is deprecated, but still supported)
 
-	New data will be left-padded with nan's, unspecified data will be nan.
+	New data will be padded with nan's, unspecified data will be nan (nan's don't appear in graphs).
 	This way, equal length of all data is assured so that they can be plotted one against any other.
 
-	Nan's don't appear in graphs."""
+	>>> from yade import plot
+	>>> from pprint import pprint
+	>>> plot.resetData()
+	>>> plot.addData(a=1)
+	>>> plot.addData(b=2)
+	>>> plot.addData(a=3,b=4)
+	>>> pprint(plot.data)
+	{'a': [1, nan, 3], 'b': [nan, 2, 4]}
+
+	Some sequence types can be given to addData; they will be saved in synthesized columns for individual components.
+
+	>>> plot.resetData()
+	>>> plot.addData(c=Vector3(5,6,7),d=Matrix3(8,9,10, 11,12,13, 14,15,16))
+	>>> pprint(plot.data)
+ 	{'c_x': [5.0],
+	 'c_y': [6.0],
+	 'c_z': [7.0],
+	 'd_xx': [8.0],
+	 'd_xy': [9.0],
+	 'd_xz': [10.0],
+	 'd_yy': [12.0],
+	 'd_yz': [11.0],
+	 'd_zx': [14.0],
+	 'd_zy': [15.0],
+	 'd_zz': [16.0]}
+
+	"""
 	import numpy
 	if len(data)>0: numSamples=len(data[data.keys()[0]])
 	else: numSamples=0
@@ -117,6 +146,16 @@ def addData(*d_in,**kw):
 	if len(imgData)>0 and numSamples==0: numSamples=max(numSamples,len(imgData[imgData.keys()[0]]))
 	d=(d_in[0] if len(d_in)>0 else {})
 	d.update(**kw)
+	# handle types composed of multiple values (vectors, matrices)
+	dNames=d.keys()[:] # make copy, since dict cannot change size if iterated over directly
+	for name in dNames:
+		if type(d[name]) in componentSuffixes:
+			val=d[name]
+			suffixes=componentSuffixes[type(d[name])]
+			for ix in suffixes: d[name+componentSeparator+suffixes[ix]]=d[name][ix]
+			del d[name]
+		elif hasattr(d[name],'__len__'):
+			raise ValueError('plot.addData given unhandled sequence type (is a '+type(d[name]).__name__+', must be number or '+'/'.join([k.__name__ for k in componentSuffixes])+')')
 	for name in d:
 		if not name in data.keys(): data[name]=[]
 	for name in data:
@@ -219,6 +258,7 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 			# fake (empty) image if no data yet
 			if len(imgData[pStrip])==0 or imgData[pStrip][-1]==None: img=Image.new('RGBA',(1,1),(0,0,0,0))
 			else: img=Image.open(imgData[pStrip][-1])
+
 			img=pylab.imshow(img,origin='lower')
 			currLineRefs.append(LineRef(img,None,imgData[pStrip],None,pStrip))
 			pylab.gca().set_axis_off()
@@ -406,6 +446,7 @@ def plot(noShow=False,subPlots=True):
 	You can use 
 	
 		>>> from yade import plot
+		>>> plot.resetData()
 		>>> plot.plots={'foo':('bar',)}
 		>>> plot.plot(noShow=True).savefig('someFile.pdf')
 		>>> import os

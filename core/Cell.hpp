@@ -7,7 +7,7 @@ The Cell has current box configuration represented by the parallelepiped's base 
 * Matrix3r *trsf* is "deformation gradient tensor" F (http://en.wikipedia.org/wiki/Finite_strain_theory) 
 * Matrix3r *velGrad* is "velocity gradient tensor" (http://www.cs.otago.ac.nz/postgrads/alexis/FluidMech/node7.html)
 
-The transformation is splitted between "normal" part and "rotation/shear" part for contact detection algorithms. The shearPt, unshearPt, getShearTrsf etc functions refer to both shear and rotation. This decomposition is frame-dependant and does not correspond to the rotation/stretch decomposition of mechanics (with stretch further decomposed into isotropic and deviatoric). Therefore, using the shearPt family in equations of mechanics is not recommended.
+The transformation is split between "normal" part and "rotation/shear" part for contact detection algorithms. The shearPt, unshearPt, getShearTrsf etc functions refer to both shear and rotation. This decomposition is frame-dependant and does not correspond to the rotation/stretch decomposition of mechanics (with stretch further decomposed into isotropic and deviatoric). Therefore, using the shearPt family in equations of mechanics is not recommended.
 
 */
 
@@ -16,14 +16,10 @@ The transformation is splitted between "normal" part and "rotation/shear" part f
 #include<yade/lib/serialization/Serializable.hpp>
 #include<yade/lib/base/Math.hpp>
 
-#define CELL_BACKW_COMPAT
-
 class Cell: public Serializable{
 	public:
-	//! Get current size
+	//! Get current size (refSize × normal strain)
 	const Vector3r& getSize() const { return _size; }
-	
-	void setSize(const Vector3r& s){for (int k=0;k<3;k++) hSize.col(k)*=s[k]/hSize.col(k).norm(); refHSize=hSize;  postLoad(*this);}
 	//! Return copy of the current size (used only by the python wrapper)
 	Vector3r getSize_copy() const { return _size; }
 	//! return vector of consines of skew angle in yz, xz, xy planes between respective transformed base vectors
@@ -93,22 +89,28 @@ class Cell: public Serializable{
 	Vector3r intrShiftVel(const Vector3i& cellDist) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return velGrad*hSize*cellDist.cast<Real>(); return Vector3r::Zero(); }
 	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
 	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-velGrad*pos); return vel; }
+
 	// get/set mechanically undeformed shape; setting resets trsf to identity
 	Matrix3r getHSize() const { return hSize; }
 	void setHSize(const Matrix3r& m){ hSize=refHSize=m; trsf=Matrix3r::Identity(); postLoad(*this); }
 	// set current transformation; has no influence on current configuration (hSize); sets display refHSize as side-effect
 	Matrix3r getTrsf() const { return trsf; }
-	void setTrsf(const Matrix3r& m){ trsf=m; postLoad(*this); }
-#ifdef CELL_BACKW_COMPAT
-	Vector3r getRefSize() const { Matrix3r h=_invTrsf*hSize; return Vector3r(h.col(0).norm(),h.col(1).norm(),h.col(2).norm()); }
+	void setTrsf(const Matrix3r& m){ refHSize=hSize; trsf=m; postLoad(*this); }
+	// get undeformed shape
+	Matrix3r getHSize0() const { return _invTrsf*hSize; }
+	// edge lengths of the undeformed shape
+	Vector3r getRefSize() const { Matrix3r h=getHSize0(); return Vector3r(h.col(0).norm(),h.col(1).norm(),h.col(2).norm()); }
 	// temporary, will be removed in favor of more descriptive setBox(...)
 	void setRefSize(const Vector3r& s){
 		// if refSize is set to the current size and the cell is a box (used in older scripts), say it is not necessary
 		if(s==_size && hSize==hSize.diagonal().asDiagonal()){ LOG_WARN("Setting O.cell.refSize=O.cell.size is useless, O.trsf=Matrix3.Identity is enough now."); }
-		else {LOG_WARN("Setting Cell.refSize is deprecated, use O.cell.size=... instead.");}
-		setSize(s); postLoad(*this);
-	}
-#endif
+		else {LOG_WARN("Setting Cell.refSize is deprecated, use Cell.setBox(...) instead.");}
+		setBox(s); postLoad(*this);
+	} 
+	// set box shape of the cell
+	void setBox(const Vector3r& size){ setHSize(size.asDiagonal()); postLoad(*this); }
+	void setBox3(const Real& s0, const Real& s1, const Real& s2){ setBox(Vector3r(s0,s1,s2)); }
+
 	// return current cell volume
 	Real getVolume() const {return hSize.determinant();}
 	void postLoad(Cell&){ integrateAndUpdate(0); }
@@ -121,7 +123,7 @@ class Cell: public Serializable{
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		/* overridden below to be modified by getters/setters because of intended side-effects */
 		((Matrix3r,trsf,Matrix3r::Identity(),,"[overridden]")) //"Current transformation matrix of the cell, which defines how far is the current cell geometry (:yref:`hSize<Cell.hSize>`) from the reference configuration. Changing trsf will not change :yref:`hSize<Cell.hSize>`, it serves only as accumulator for transformations applied via :yref:`velGrad<Cell.velGrad>`."))
-		((Matrix3r,refHSize,Matrix3r::Identity(),,"Reference cell configuration, only used with :yref:`OpenGLRenderer.dispScale`. Updated automatically when :yref:`hSize<Cell.hSize>` or :yref:`hSize<Cell.size>` are assigned directly; also modified by :yref:`yade.utils.setRefSe3` (called e.g. by the :gui:`Reference` button in the UI)."))
+		((Matrix3r,refHSize,Matrix3r::Identity(),,"Reference cell configuration, only used with :yref:`OpenGLRenderer.dispScale`. Updated automatically when :yref:`hSize<Cell.hSize>` or :yref:`trsf<Cell.trsf>` is assigned directly; also modified by :yref:`yade.utils.setRefSe3` (called e.g. by the :gui:`Reference` button in the UI)."))
 		((Matrix3r,hSize,Matrix3r::Identity(),,"[overridden below]"))
 		/* normal attributes */
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in :yref:`NewtonIntegrator`. Values of :yref:`velGrad<Cell.velGrad>` accumulate in :yref:`trsf<Cell.trsf>` at every step."))
@@ -131,15 +133,17 @@ class Cell: public Serializable{
 		/*init*/ ,
 		/*ctor*/ _invTrsf=Matrix3r::Identity(); integrateAndUpdate(0),
 		/*py*/
-#ifdef CELL_BACKW_COMPAT
-		// for backward compat only. Don't use refSize in new scripts or new code. 
-		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. column norms of :yref:`hSize<Cell.hSize>`).\n\n.. note:: Modifying this value is deprecated, use :yref:`size<Cell.size>` instead.\n\n")
-#endif
-		// useful properties
+		// override some attributes above
 		.add_property("hSize",&Cell::getHSize,&Cell::setHSize,"Base cell vectors (columns of the matrix), updated at every step from :yref:`velGrad<Cell.velGrad>` (:yref:`trsf<Cell.trsf>` accumulates applied :yref:`velGrad<Cell.velGrad>` transformations). Setting *hSize* directly results in :yref:`trsf<Cell.trsf>` being set to identity.")
+		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. column norms of :yref:`hSize<Cell.hSize>`).\n\n.. note:: Modifying this value is deprecated, use :yref:`setBox<Cell.setBox>` instead.\n\n")
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell with regards to the initial configuration.")
-		.add_property("size",&Cell::getSize_copy,&Cell::setSize,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
+		// useful properties
+		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell.trsf>` (computed as :yref:`trsf<Cell.trsf>`⁻¹ × :yref:`hSize<Cell.hSize>`.")
+		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
+		// functions
+		.def("setBox",&Cell::setBox,"Set :yref:`Cell` shape to be rectangular, with dimensions along axes specified by given argument. Shorthand for assigning diagonal matrix with respective entries to :yref:`hSize<Cell.hSize>`.")
+		.def("setBox",&Cell::setBox3,"Set :yref:`Cell` shape to be rectangular, with dimensions along $x$, $y$, $z$ specified by arguments. Shorthand for assigning diagonal matrix with the respective entries to :yref:`hSize<Cell.hSize>`.")
 		// debugging only
 		.def("wrap",&Cell::wrapShearedPt_py,"Transform an arbitrary point into a point in the reference cell")
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")

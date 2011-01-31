@@ -375,7 +375,7 @@ class pyOmega{
 		OMEGA.createSimulationLoop();
 		mapLabeledEntitiesToVariables();
 	}
-	void reload(){	load(OMEGA.sceneFile);}
+	void reload(bool quiet=false){	load(OMEGA.sceneFile,quiet);}
 	void saveTmp(string mark="", bool quiet=false){ save(":memory:"+mark,quiet);}
 	void loadTmp(string mark="", bool quiet=false){ load(":memory:"+mark,quiet);}
 	python::list lsTmp(){ python::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
@@ -532,7 +532,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
 		.add_property("dynDtAvailable",&pyOmega::dynDtAvailable_get,"Whether a :yref:`TimeStepper` is amongst :yref:`O.engines<Omega.engines>`, activated or not.")
 		.def("load",&pyOmega::load,(py::arg("file"),py::arg("quiet")=false),"Load simulation from file.")
-		.def("reload",&pyOmega::reload,"Reload current simulation")
+		.def("reload",&pyOmega::reload,(py::arg("quiet")=false),"Reload current simulation")
 		.def("save",&pyOmega::save,(py::arg("file"),py::arg("quiet")=false),"Save current simulation to file (should be .xml or .xml.bz2)")
 		.def("loadTmp",&pyOmega::loadTmp,(py::arg("mark")="",py::arg("quiet")=false),"Load simulation previously stored in memory by saveTmp. *mark* optionally distinguishes multiple saved simulations")
 		.def("saveTmp",&pyOmega::saveTmp,(py::arg("mark")="",py::arg("quiet")=false),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
