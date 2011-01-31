@@ -20,16 +20,3 @@ class FrictPhys: public NormShearPhys
 	REGISTER_CLASS_INDEX(FrictPhys,NormShearPhys);
 };
 REGISTER_SERIALIZABLE(FrictPhys);
-
-class FrictPhysTransitory: public FrictPhys
-{
-	public :
-	Real frictionAngle;
-	virtual ~FrictPhysTransitory();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhysTransitory,FrictPhys,"Temporary version of :yref:`FrictPhys` for compatibility with e.g. :yref:`Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity`",
-		((Vector3r,prevNormal,Vector3r::Zero(),,"unit normal of the contact plane in previous step")),
-		createIndex()
-	);
-	REGISTER_CLASS_INDEX(FrictPhysTransitory,FrictPhys);
-};
-REGISTER_SERIALIZABLE(FrictPhysTransitory);
