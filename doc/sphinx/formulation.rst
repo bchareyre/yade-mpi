@@ -835,21 +835,22 @@ Let us note at this place that not only $\Dtcr$ assuring numerical stability of 
 
 Periodic boundary conditions
 ============================
-While most DEM simulations happen in $R^3$ space, it is frequently useful to avoid boundary effects by using periodic space instead. In order to satisfy periodicity conditions, periodic space is created by repetition of parallelepiped-shaped cell. In Yade, periodic space is implemented in the :yref:`Cell` class. The geometry of the cell in the reference coordinates system is defined by three edges of the parallepiped. The corresponding base vectors are stored in the columns of matrix :yref:`Cell.hSize`.
+While most DEM simulations happen in $R^3$ space, it is frequently useful to avoid boundary effects by using periodic space instead. In order to satisfy periodicity conditions, periodic space is created by repetition of parallelepiped-shaped cell. In Yade, periodic space is implemented in the :yref:`Cell` class. The geometry of the cell in the reference coordinates system is defined by three edges of the parallepiped. The corresponding base vectors are stored in the columns of matrix $\mat{H}$ (:yref:`Cell.hSize`).
 
-The initial :yref:`Cell.hSize` can be explicitely defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial undeformed period. If the base vectors are axis-aligned, defining the sizes of the cell along each axis can be more conveninent than defining the full hSize matrix; in that case one can simply define the vector :yref:`Cell.size`, reprensenting the lenghts of base vectors. The cell's geometry should generally not be modified via hSize or size during a simulation. The velocity gradient :yref:`Cell.velGrad` described below is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).
+The initial $\mat{H}$ can be explicitely defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial cell.
+If the base vectors are axis-aligned, defining only their sizes can be more convenient than defining the full $\mat{H}$ matrix; in that case it is enough to define the norms of columns in $\mat{H}$ (see :yref:`Cell.size`).
+
+After the definition of the initial cell's geometry, $\mat{H}$ should generally not be modified by direct assignment. Instead, its deformation rate will be defined via the velocity gradient :yref:`Cell.velGrad` described below. It is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).
 
 Deformations handling
 ---------------------
 The deformation of the cell over time is defined via a matrix representing the gradient of an homogeneous velocity field $\nabla \vec{v}$ (:yref:`Cell.velGrad`). This gradient represents arbitrary combinations of rotations and stretches. It can be imposed externaly or updated by :yref:`boundary controllers <BoundaryController>` (see :yref:`PeriTriaxController` or :yref:`Peri3dController`) in order to reach target strain values or to maintain some prescribed stress.
-The velocity gradient is integrated automatically over time, and the cumulated transformation is reflected in the transformation matrix $\mat{F}$ (:yref:`Cell.trsf`). :yref:`Cell.hSize` will also be updated. The  update reads (it is similar for hSize), with $I$ the identity matrix:
+
+The velocity gradient is integrated automatically over time, and the cumulated transformation is reflected in the transformation matrix $\mat{F}$ (:yref:`Cell.trsf`) and the current shape of the cell $\mat{H}$. The per-step transformation update reads (it is similar for $\mat{H}$), with $I$ the identity matrix:
 
 .. math:: \next{\mat{F}}=(I+\nabla \vec{v} \Dt)\curr{\mat{F}}.
 
-$\mat{F}$ can be set back to identity at any point in simulations, in order to define the current state as reference for strains definition in boundary controllers.
-
-Changing the value of $\mat{F}$ will also initialize the cell deformation that is displayed graphically if :yref:`OpenGLRenderer.dispScale` is used.
-Therefore, the identity matrix is not the only meaningfull value that can be assigned to it. Suppose, for instance, that one wants to display cumulated displacements after a series of loading steps. If each loading step is resetting the deformations (:yref:`Cell.trsf`=Id), the graphical display will show by default the cell deformation corresponding to the last step. It would not be consistent if the reference bodies positions were defined in the first step (see :yref:`OpenGLRenderer::setBodiesRefSe3()`). However, if the per-step transformations $\mat{F}_1$, $\mat{F}_2$,... $\mat{F}_n$,... have been recorded, defining $\mat{F}=\mat{F}_n\times ...\times \mat{F}_2\times \mat{F}_1$ will let the cumulated cell deformation be displayed consistently with bodies displacements. Similarly, $\mat{F}=\mat{F}_n\times \mat{F}_{n-1}$ would display the cumulated deformations of the last two steps.
+$\mat{F}$ can be set back to identity at any point in simulations, in order to define the current state as reference for strains definition in boundary controllers. It will have no effect on $\mat{H}$.
 
 Along with the automatic integration of cell transformation, there is an option to homothetically displace all particles so that $\nabla \vec{v}$ is applied over the whole simulation (enabled via :yref:`Cell.homoDeform`). This avoids all boundary effects coming from change of the velocity gradient.
 
