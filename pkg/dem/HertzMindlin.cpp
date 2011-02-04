@@ -239,7 +239,8 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	const shared_ptr<Body>& b2=Body::byId(id2,scene); 
 
 	bool useDamping=(phys->betan!=0. || phys->betas!=0. || phys->alpha!=0.);
-	if(phys->alpha==0. && !LinDamp) throw std::invalid_argument("Law2_ScGeom_MindlinPhys_Mindlin: viscous contact damping for non-linear elastic law is specified, specify en and es in Ip2.");
+	bool LinDamp=true;
+	if (phys->alpha!=0.) {LinDamp=false;} // use non linear damping
 
 	// tangential and normal stiffness coefficients, recomputed from betan,betas at every step
 	Real cn=0, cs=0;

@@ -113,4 +113,7 @@ class Shop{
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
 		static py::tuple normalShearStressTensors(bool compressionPositive=false);
+		
+		//! Function to compute fabric tensor of periodic cell
+		static py::tuple fabricTensor(bool splitTensor=false);
 };

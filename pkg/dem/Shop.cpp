@@ -527,6 +527,70 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 	return py::make_tuple(sigN,sigT);
 }
 
+/* Return the fabric tensor as according to [Satake1982]. */
+py::tuple Shop::fabricTensor(bool splitTensor){
+	Scene* scene=Omega::instance().getScene().get();
+	if (!scene->isPeriodic){ throw runtime_error("Can't compute fabric tensor of periodic cell in aperiodic simulation."); }
+	Matrix3r fabric(Matrix3r::Zero()); 
+	int count=0; 
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		const Vector3r& n=geom->normal;
+		for(int i=0; i<3; i++) for(int j=i; j<3; j++){
+			fabric(i,j)+=n[i]*n[j];
+		}
+		count++;
+	}
+	// fill terms under the diagonal
+	fabric(1,0)=fabric(0,1); fabric(2,0)=fabric(0,2); fabric(2,1)=fabric(1,2);
+	fabric/=count;
+	
+	// calculate average contact force
+	Real Fmean(0);
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
+		Vector3r Fcontact=phys->shearForce+phys->normalForce;
+		Real f=Fcontact.norm();
+		Fmean+=f;
+	}
+	Fmean/=count; 
+	
+	// evaluate two different parts of the fabric tensor 
+	// make distinction between strong and weak network of contact forces
+	Matrix3r fabricStrong(Matrix3r::Zero()), fabricWeak(Matrix3r::Zero()); 
+	int nStrong(0), nWeak(0);
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
+		Vector3r Fcontact=phys->shearForce+phys->normalForce;
+		Real f=Fcontact.norm();
+		const Vector3r& n=geom->normal;
+		if (f>Fmean){
+			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
+				fabricStrong(i,j)+=n[i]*n[j];
+			}
+			nStrong++;
+		}
+		else{
+			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
+				fabricWeak(i,j)+=n[i]*n[j];
+			}
+			nWeak++;
+		}
+	}
+	// fill terms under the diagonal
+	fabricStrong(1,0)=fabricStrong(0,1); fabricStrong(2,0)=fabricStrong(0,2); fabricStrong(2,1)=fabricStrong(1,2);
+	fabricWeak(1,0)=fabricWeak(0,1); fabricWeak(2,0)=fabricWeak(0,2); fabricWeak(2,1)=fabricWeak(1,2);
+	fabricStrong/=nStrong;
+	fabricWeak/=nWeak;
+	
+	if (!splitTensor){return py::make_tuple(fabric);}
+	else{return py::make_tuple(fabricStrong,fabricWeak);}
+}
 
 Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 	Scene* scene=Omega::instance().getScene().get();
