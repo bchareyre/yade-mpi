@@ -42,6 +42,10 @@
 
 #include<yade/pkg/dem/Tetra.hpp>
 
+#ifdef YADE_OPENGL
+	#include<yade/pkg/common/Gl1_NormPhys.hpp>
+#endif
+
 #include<boost/foreach.hpp>
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
@@ -528,6 +532,7 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 }
 
 /* Return the fabric tensor as according to [Satake1982]. */
+/* as side-effect, set Gl1_NormShear::strongWeakThresholdForce */
 py::tuple Shop::fabricTensor(bool splitTensor){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute fabric tensor of periodic cell in aperiodic simulation."); }
@@ -557,6 +562,10 @@ py::tuple Shop::fabricTensor(bool splitTensor){
 		Fmean+=f;
 	}
 	Fmean/=count; 
+
+	#ifdef YADE_OPENGL
+		Gl1_NormPhys::maxWeakFn=Fmean;
+	#endif
 	
 	// evaluate two different parts of the fabric tensor 
 	// make distinction between strong and weak network of contact forces

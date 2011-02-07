@@ -1,12 +1,12 @@
 # encoding: utf-8
 # 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 """
-Module containing utility functions for plotting inside yade. See :ysrc:`scripts/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
+Module containing utility functions for plotting inside yade. See :ysrc:`examples/simple-scene/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
 
 """
 
 ## all exported names
-__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','saveGnuplot','saveDataTxt','savePlotSequence']
+__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
 # safe to import even if Tk will not be used
@@ -105,6 +105,93 @@ def addDataColumns(dd):
 		if d in data.keys(): continue
 		data[d]=[nan for i in range(numSamples)]
 
+def addAutoData():
+	"""Add data by evaluating contents of :yref:`yade.plot.plots`. Expressions rasing exceptions will be handled gracefully, but warning is printed for each.
+	
+	>>> from yade import plot
+	>>> from pprint import pprint
+	>>> O.reset()
+	>>> plot.resetData()
+	>>> plot.plots={'O.iter':('O.time',None,'numParticles=len(O.bodies)')}
+	>>> plot.addAutoData()
+	>>> pprint(plot.data)
+	{'O.iter': [0], 'O.time': [0.0], 'numParticles': [0]}
+
+	Note that each item in :yref:`yade.plot.plots` can be
+
+	* an expression to be evaluated (using the ``eval`` builtin);
+	* ``name=expression`` string, where ``name`` will appear as label in plots, and expression will be evaluated each time;
+	* a dictionary-like object -- current keys are labels of plots and current values are added to :yref:`yade.plot.data`. The contents of the dictionary can change over time, in which case new lines will be created as necessary.
+
+	A simple simulation with plot can be written in the following way; note how the energy plot is specified.
+
+	>>> from yade import plot, utils
+	>>> plot.plots={'i=O.iter':(O.energy,None,'total energy=O.energy.total()')}
+	>>> # we create a simple simulation with one ball falling down
+	>>> plot.resetData()
+	>>> O.bodies.append(utils.sphere((0,0,0),1))
+	0
+	>>> O.dt=utils.PWaveTimeStep()
+	>>> O.engines=[
+	...    ForceResetter(),
+	...    GravityEngine(gravity=(0,0,-10)),
+	...    NewtonIntegrator(damping=.4,kinSplit=True),
+	...    # get data required by plots at every step
+	...    PyRunner(command='yade.plot.addAutoData()',iterPeriod=1,initRun=True)
+	... ]
+	>>> O.trackEnergy=True
+	>>> O.run(2,True)
+	>>> pprint(plot.data)   #doctest: +ELLIPSIS
+	{'gravWork': [0.0, -25.13274...],
+	 'i': [0, 1],
+	 'kinRot': [0.0, 0.0],
+	 'kinTrans': [0.0, 7.5398...],
+	 'nonviscDamp': [0.0, 10.0530...],
+	 'total energy': [0.0, -7.5398...]}
+
+	.. plot::
+	
+		from yade import *
+		from yade import plot,utils
+		O.reset()
+		O.engines=[ForceResetter(),GravityEngine(gravity=(0,0,-10)),NewtonIntegrator(damping=.4,kinSplit=True),PyRunner(command='yade.plot.addAutoData()',iterPeriod=1,initRun=True)]
+		O.bodies.append(utils.sphere((0,0,0),1)); O.dt=utils.PWaveTimeStep()
+		plot.resetData()
+		plot.plots={'i=O.iter':(O.energy,None,'total energy=O.energy.total()')}
+		O.trackEnergy=True
+		O.run(50,True)
+		import pylab; pylab.grid(True)
+		plot.legendLoc=('lower left','upper right')
+		plot.plot(noShow=True)
+
+
+	"""
+	def colDictUpdate(col,dic):
+		'update *dic* with the value from col, which is a "expr" or "name=expr" string; all exceptions from  ``eval`` are caught and warning is printed without adding any data.'
+		name,expr=col.split('=',1) if '=' in col else (col,col)
+		try:
+			val=eval(expr)
+			dic.update({name:val})
+		except:
+			print 'WARN: ignoring exception raised while evaluating auto-column `'+expr+"'%s."%('' if name==expr else ' ('+name+')')
+	cols={}
+	for p in plots:
+		pp=plots[p]
+		colDictUpdate(p.strip(),cols)
+		for y in tuplifyYAxis(plots[p]):
+			# imgplot specifier
+			if y==None: continue
+			yy=addPointTypeSpecifier(y,noSplit=True)[0]
+			# dict-like object
+			if hasattr(yy,'keys'): cols.update(dict(yy))
+			# callable returning list sequence of expressions to evaluate
+			#elif callable(yy):
+			#	for yyy in yy(): colDictUpdate(yyy,cols)
+			# plain value
+			else: colDictUpdate(yy,cols)
+	addData(cols)
+
+
 def addData(*d_in,**kw):
 	"""Add data from arguments name1=value1,name2=value2 to yade.plot.data.
 	(the old {'name1':value1,'name2':value2} is deprecated, but still supported)
@@ -193,10 +280,12 @@ def addImgData(**kw):
 
 
 # not public functions
-def addPointTypeSpecifier(o):
-	"""Add point type specifier to simple variable name"""
-	if type(o) in [tuple,list]: return o
-	else: return (o,'')
+def addPointTypeSpecifier(o,noSplit=False):
+	"""Add point type specifier to simple variable name; optionally take only the part before '=' from the first item."""
+	if type(o) in [tuple,list]:
+		if noSplit or not type(o[0])==str: return o
+		else: return list(o[0].split('=',1)[0],o[1:])
+	else: return (o if (noSplit or not type(o)==str) else (o.split('=',1)[0]),'')
 def tuplifyYAxis(pp):
 	"""convert one variable to a 1-tuple"""
 	if type(pp) in [tuple,list]: return pp
@@ -250,7 +339,7 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
 		if wider: subRows,subCols=subCols,subRows
 	for nPlot,p in enumerate(plots.keys()):
-		pStrip=p.strip()
+		pStrip=p.strip().split('=',1)[0]
 		if not subPlots: pylab.figure()
 		else: pylab.subplot(subRows,subCols,nPlot)
 		if plots[p]==None: # image plot
@@ -258,7 +347,6 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 			# fake (empty) image if no data yet
 			if len(imgData[pStrip])==0 or imgData[pStrip][-1]==None: img=Image.new('RGBA',(1,1),(0,0,0,0))
 			else: img=Image.open(imgData[pStrip][-1])
-
 			img=pylab.imshow(img,origin='lower')
 			currLineRefs.append(LineRef(img,None,imgData[pStrip],None,pStrip))
 			pylab.gca().set_axis_off()
@@ -268,11 +356,11 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 		missing=set() # missing data columns
 		if pStrip not in data.keys(): missing.add(pStrip)
 		for d in plots_p:
-			if d[0]=='|||' or d[0]==None:
+			if d[0]==None:
 				y1=False; continue
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
-			if d[0] not in data.keys() and not callable(d[0]): missing.add(d[0])
+			if d[0] not in data.keys() and not callable(d[0]) and not hasattr(d[0],'keys'): missing.add(d[0])
 		if missing:
 			if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
 				for m in missing: data[m]=[]
@@ -286,13 +374,14 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 			# save the original specifications; they will be smuggled into the axes object
 			# the live updated will run yNameFuncs to see if there are new lines to be added
 			# and will add them if necessary
-			yNameFuncs=set([d[0] for d in ySpecs if callable(d[0])])
+			yNameFuncs=set([d[0] for d in ySpecs if callable(d[0])]) | set([d[0].keys for d in ySpecs if hasattr(d[0],'keys')])
 			yNames=set()
 			ySpecs2=[]
 			for ys in ySpecs:
-				if not callable(ys[0]): ySpecs2.append(ys)
 				# ys[0]() must return list of strings, which are added to ySpecs2; line specifier is synthesized by tuplifyYAxis and cannot be specified by the user
-				else: ySpecs2+=[(ret,ys[1]) for ret in ys[0]()]
+				if callable(ys[0]): ySpecs2+=[(ret,ys[1]) for ret in ys[0]()]
+				elif hasattr(ys[0],'keys'): ySpecs2+=[(yy,'') for yy in ys[0].keys()]
+				else: ySpecs2.append(ys)
 			if len(ySpecs2)==0:
 				print 'yade.plot: creating fake plot, since there are no y-data yet'
 				line,=pylab.plot([nan],[nan])
@@ -321,7 +410,7 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 				## should be done for y2 as well, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, present in versions .99--1.0.5, and possibly beyond)
 			else:
 				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if (p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2]) else xylabels[p][2])
-			# if there are callable ySpecs, save them inside the axes object, so that the live updater can use those
+			# if there are callable/dict ySpecs, save them inside the axes object, so that the live updater can use those
 			if yNameFuncs:
 				axes.yadeYNames,axes.yadeYFuncs,axes.yadeXName,axes.yadeLabelLoc=yNames,yNameFuncs,pStrip,labelLoc # prepend yade to avoid clashes
 		createLines(pStrip,plots_p_y1,isY1=True,y2Exists=len(plots_p_y2)>0)
@@ -351,7 +440,10 @@ def liveUpdate(timestamp):
 		for ax in axes:
 			if not hasattr(ax,'yadeYFuncs') or not ax.yadeYFuncs: continue # not defined of empty
 			yy=set();
-			for f in ax.yadeYFuncs: yy.update(f())
+			for f in ax.yadeYFuncs:
+				if callable(f): yy.update(f())
+				elif hasattr(f,'keys'): yy.update(f.keys())
+				else: raise ValueError("Internal error: ax.yadeYFuncs items must be callables or dictrionary-like objects and nothing else.")
 			#print 'callables y names:',yy
 			news=yy-ax.yadeYNames
 			if not news: continue
@@ -491,11 +583,12 @@ def saveDataTxt(fileName,vars=None):
 	"""Save plot data into a (optionally compressed) text file. The first line contains a comment (starting with ``#``) giving variable name for each of the columns. This format is suitable for being loaded for further processing (outside yade) with ``numpy.genfromtxt`` function, which recognizes those variable names (creating numpy array with named entries) and handles decompression transparently.
 
 	>>> from yade import plot
+	>>> from pprint import pprint
 	>>> plot.reset()
 	>>> plot.addData(a=1,b=11,c=21,d=31)  # add some data here
 	>>> plot.addData(a=2,b=12,c=22,d=32)
-	>>> plot.data=={'a':[1,2],'b':[11,12],'c':[21,22],'d':[31, 32]} # cannot check output directly, since dict ordering is random and doctest would fail
-	True
+	>>> pprint(plot.data)
+	{'a': [1, 2], 'b': [11, 12], 'c': [21, 22], 'd': [31, 32]}
 	>>> plot.saveDataTxt('/tmp/dataFile.txt.bz2',vars=('a','b','c'))
 	>>> import numpy
 	>>> d=numpy.genfromtxt('/tmp/dataFile.txt.bz2',dtype=None,names=True)
@@ -520,6 +613,7 @@ def saveDataTxt(fileName,vars=None):
 
 
 def savePylab(baseName,timestamp=False,title=None):
+	'''This function is not finished, do not use it.'''
 	import time
 	if len(data.keys())==0: raise RuntimeError("No data for plotting were saved.")
 	if timestamp: baseName+=_mkTimestamp()
@@ -531,7 +625,7 @@ def savePylab(baseName,timestamp=False,title=None):
 	py.write("data=numpy.genfromtxt('%s.data.bz2',dtype=None,names=True)\n"%baseName)
 	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
 	for nPlot,p in enumerate(plots.keys()):
-		pStrip=p.strip()
+		pStrip=p.strip().split('=',1)[0]
 		if plots[p]==None: continue # image plots, which is not exported
 		if len(plots)==1: py.write('pylab.figure()\n')
 		else: py.write('pylab.subplot(%d,%d,%d)\n'%(subRows,subCols,nPlots))
@@ -566,8 +660,8 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 	if not extension: extension=term
 	i=0
 	for p in plots:
-		pStrip=p.strip()
-		if plots[pStrip]==None: continue  ## this plot is image plot, which is not applicable to gnuplot
+		pStrip=p.strip().split('=',1)[0]
+		if plots[p]==None: continue  ## this plot is image plot, which is not applicable to gnuplot
 		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
@@ -576,10 +670,16 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		fPlot.write("set datafile missing 'nan'\n")
 		if title: fPlot.write("set title '%s'\n"%title)
 		y1=True; plots_y1,plots_y2=[],[]
-		# replace callable data specifiers by the rults, it that particular data exists
-		plots_p=sum([([(pp,'') for pp in p[0]() if pp in data.keys()] if callable(p[0]) else [(p[0],p[1])] ) for p in plots_p],[])
+		# replace callable/dict-like data specifiers by the results, it that particular data exists
+		plots_p2=[]
+		for pp in plots_p:
+			if callable(pp[0]): plots_p2+=[(ppp,'') for ppp in pp[0]() if ppp in data.keys()]
+			elif hasattr(pp[0],'keys'): plots_p2+=[(name,val) for name,val in pp[0].items() if name in data.keys()]
+			else: plots_p2.append((pp[0],pp[1]))
+		plots_p=plots_p2
+		#plots_p=sum([([(pp,'') for pp in p[0]() if pp in data.keys()] if callable(p[0]) else [(p[0],p[1])] ) for p in plots_p],[])
 		for d in plots_p:
-			if d[0]=='|||' or d[0]==None:
+			if d[0]==None:
 				y1=False; continue
 			if y1: plots_y1.append(d)
 			else: plots_y2.append(d)

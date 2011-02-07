@@ -382,10 +382,13 @@ extensions = [
 	 'sphinx.ext.graphviz',
 	 'sphinx.ext.viewcode',
 	 'sphinx.ext.inheritance_diagram',
+	 'matplotlib.sphinxext.plot_directive',
+	 'matplotlib.sphinxext.only_directives',
 	#'matplotlib.sphinxext.mathmpl',
     'ipython_directive',
     'ipython_console_highlighting',
-	 'youtube'
+	 'youtube',
+	 'sphinx.ext.todo',
     ]
 
 # the sidebar extension

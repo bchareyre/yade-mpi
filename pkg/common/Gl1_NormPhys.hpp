@@ -18,6 +18,10 @@ class Gl1_NormPhys: public GlIPhysFunctor{
 		((Real,maxRadius,-1,,"Cylinder radius corresponding to the maximum normal force. If negative, auto-updated :yref:`refRadius<Gl1_NormPhys.refRadius>` will be used instead."))
 		((int,slices,6,,"Number of sphere slices; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))
 		((int,stacks,1,,"Number of sphere stacks; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))
+		// strong/weak fabric attributes
+		((Real,maxWeakFn,NaN,,"Value that divides contacts by their normal force into the ``weak fabric'' and ``strong fabric''. This value is set as side-effect by :yref:`utils.fabricTensor`."))
+		((int,weakFilter,0,,"If non-zero, only display contacts belonging to the ``weak'' (-1) or ``strong'' (+1) fabric."))
+		((Real,weakScale,1.,,"If :yref:`maxWeakFn<Gl1_NormPhys.maxWeakFn>` is set, scale radius of the weak fabric by this amount (usually smaller than 1). If zero, 1 pixel line is displayed. Colors are not affected by this value."))
 	);
 	RENDERS(NormPhys);
 };

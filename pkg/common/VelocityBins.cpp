@@ -30,7 +30,7 @@ void VelocityBins::setBins(Scene* scene, Real currMaxVelSq, Real refSweepLength)
 		if(binOverlap>=1 || binOverlap<=0){ LOG_ERROR("binOverlap set to 0.8 (was "<<binOverlap<<", not in range (0…1) )"); binOverlap=0.8;}
 		// number of bins changed
 		if(nBins!=bins.size()){
-			LOG_INFO("New number of bins: "<<nBins);
+			LOG_DEBUG("New number of bins: "<<nBins);
 			bins.resize(nBins);	
 		}
 		// number of bodies changed

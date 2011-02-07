@@ -46,6 +46,7 @@ class EnergyTracker: public Serializable{
 	Real total(){ Real ret=0; size_t sz=energies.size(); for(size_t id=0; id<sz; id++) ret+=energies.get(id); return ret; }
 
 	py::list keys_py(){ py::list ret; FOREACH(pairStringInt p, names) ret.append(p.first); return ret; }
+	py::list items_py(){ py::list ret; FOREACH(pairStringInt p, names) ret.append(py::make_tuple(p.first,energies.get(p.second))); return ret; }
 	void resetResettables(){ size_t sz=energies.size(); for(size_t id=0; id<sz; id++){ if(resetStep[id]) energies.reset(id); } }
 
 	typedef std::map<std::string,int> mapStringInt;
@@ -61,6 +62,7 @@ class EnergyTracker: public Serializable{
 			.def("__setitem__",&EnergyTracker::setItem_py,"Set energy value for given name (will create a non-resettable item, if it does not exist yet).")
 			.def("clear",&EnergyTracker::clear,"Clear all stored values.")
 			.def("keys",&EnergyTracker::keys_py,"Return defined energies.")
+			.def("items",&EnergyTracker::items_py,"Return contents as list of (name,value) tuples.")
 			.def("total",&EnergyTracker::total,"Return sum of all energies.")
 	)
 };

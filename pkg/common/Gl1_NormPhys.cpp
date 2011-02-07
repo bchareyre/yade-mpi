@@ -16,6 +16,10 @@ int Gl1_NormPhys::signFilter;
 int Gl1_NormPhys::slices;
 int Gl1_NormPhys::stacks;
 
+Real Gl1_NormPhys::maxWeakFn;
+int Gl1_NormPhys::weakFilter;
+Real Gl1_NormPhys::weakScale;
+
 void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 	if(!gluQuadric){ gluQuadric=gluNewQuadric(); if(!gluQuadric) throw runtime_error("Gl1_NormPhys::go unable to allocate new GLUquadric object (out of memory?)."); }
 	NormPhys* np=static_cast<NormPhys*>(ip.get());
@@ -25,7 +29,18 @@ void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>
 	Real fnNorm=np->normalForce.dot(geom->normal);
 	if((signFilter>0 && fnNorm<0) || (signFilter<0 && fnNorm>0)) return;
 	int fnSign=fnNorm>0?1:-1;
-	fnNorm=abs(fnNorm); 
+	fnNorm=abs(fnNorm);
+	Real radiusScale=1.;
+	// weak/strong fabric, only used if maxWeakFn is set
+	if(!isnan(maxWeakFn)){
+		if(fnNorm*fnSign<maxWeakFn){ // weak fabric
+			if(weakFilter>0) return;
+			radiusScale=weakScale;
+		} else { // strong fabric
+			if(weakFilter<0) return;
+		}
+	}
+
 	maxFn=max(fnNorm,maxFn);
 	Real realMaxRadius;
 	if(maxRadius<0){
@@ -34,7 +49,7 @@ void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>
 		realMaxRadius=refRadius;
 	}
 	else realMaxRadius=maxRadius;
-	Real radius=realMaxRadius*(fnNorm/maxFn); // use logarithmic scale here?
+	Real radius=radiusScale*realMaxRadius*(fnNorm/maxFn); // use logarithmic scale here?
 	Vector3r color=Shop::scalarOnColorScale(fnNorm*fnSign,-maxFn,maxFn);
 	# if 0
 		// get endpoints from body positions
@@ -52,7 +67,6 @@ void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>
 		// get endpoints from geom
 		// max(r,0) handles r<0 which is the case for "radius" of the facet in Dem3DofGeom_FacetSphere
 		Vector3r cp=scene->isPeriodic? scene->cell->wrapShearedPt(geom->contactPoint) : geom->contactPoint;
-		//if(i->getId1()==0) cerr<<(scene->isPeriodic?"p":".");
 		Vector3r p1=cp-max(geom->refR1,0.)*geom->normal;
 		Vector3r relPos=/*p2*/(cp+max(geom->refR2,0.)*geom->normal)-p1;
 		Real dist=max(geom->refR1,0.)+max(geom->refR2,0.);
