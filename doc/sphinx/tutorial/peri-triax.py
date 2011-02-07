@@ -5,7 +5,7 @@ sp.makeCloud((0,0,0),(1,1,1),rMean=rMean,periodic=True)
 sp.toSimulation()
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb()],sweepLength=.05*rMean),
+	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*rMean),
 	InteractionLoop([Ig2_Sphere_Sphere_L3Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl()]),
 	NewtonIntegrator(damping=.6),
 	PeriTriaxController(goal=(-1e6,-1e6,-.1),stressMask=0b011,maxUnbalanced=.2,doneHook='goalReached()',label='triax',maxStrainRate=(.1,.1,.1),dynCell=True),
@@ -21,7 +21,7 @@ def addPlotData():
 		i=O.iter,unbalanced=utils.unbalancedForce(),
 		totalEnergy=O.energy.total(),**O.energy       # plot all energies
 	)
-plot.plots={'i':('unbalanced',None,'kinetic'),' i':('ex','ey','ez',None,'sx','sy','sz'),'i ':(O.energy.keys,None,('totalEnergy','bo'))}
+plot.plots={'i':(('unbalanced','go'),None,'kinetic'),' i':('ex','ey','ez',None,'sx','sy','sz'),'i ':(O.energy.keys,None,('totalEnergy','bo'))}
 plot.plot()
 O.saveTmp()
 O.run()

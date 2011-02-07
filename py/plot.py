@@ -284,7 +284,7 @@ def addPointTypeSpecifier(o,noSplit=False):
 	"""Add point type specifier to simple variable name; optionally take only the part before '=' from the first item."""
 	if type(o) in [tuple,list]:
 		if noSplit or not type(o[0])==str: return o
-		else: return list(o[0].split('=',1)[0],o[1:])
+		else: return (o[0].split('=',1)[0],)+tuple(o[1:])
 	else: return (o if (noSplit or not type(o)==str) else (o.split('=',1)[0]),'')
 def tuplifyYAxis(pp):
 	"""convert one variable to a 1-tuple"""
