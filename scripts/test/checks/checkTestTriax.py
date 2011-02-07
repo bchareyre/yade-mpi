@@ -6,6 +6,7 @@
 # Positions and reference results are in dataTriax folder.
 from yade import pack,log,utils,export,plot
 import math,os,sys
+log.setLevel('TriaxialCompressionEngine',log.ERROR)
 
 tolerance=0.01
 interactive=False
