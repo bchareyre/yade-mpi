@@ -115,5 +115,5 @@ class Shop{
 		static py::tuple normalShearStressTensors(bool compressionPositive=false);
 		
 		//! Function to compute fabric tensor of periodic cell
-		static py::tuple fabricTensor(bool splitTensor=false, bool compressionPositive=true, Real thresholdForce=NaN);
+		static py::tuple fabricTensor(bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN);
 };

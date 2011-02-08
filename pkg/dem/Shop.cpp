@@ -533,7 +533,7 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 
 /* Return the fabric tensor as according to [Satake1982]. */
 /* as side-effect, set Gl1_NormShear::strongWeakThresholdForce */
-py::tuple Shop::fabricTensor(bool splitTensor, bool compressionPositive, Real thresholdForce){
+py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdForce){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute fabric tensor of periodic cell in aperiodic simulation."); }
 	
@@ -561,7 +561,7 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool compressionPositive, Real th
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		const Vector3r& n=geom->normal;
-		Real f=(compressionPositive?-1:1)*phys->normalForce.dot(n);  // FIXME: is it right to consider the sign here?
+		Real f=(revertSign?-1:1)*phys->normalForce.dot(n);  
 		//Real f=phys->normalForce.norm();
 		Fmean+=f;
 	}
@@ -582,13 +582,10 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool compressionPositive, Real th
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		const Vector3r& n=geom->normal;
-		Real  f=(compressionPositive?-1:1)*phys->normalForce.dot(n); 
-		//Real f=phys->normalForce.norm();
-		// FIXME: is it right to check only the normal force against Fmean?
-		// what if we have adhesive contacts?
+		Real  f=(revertSign?-1:1)*phys->normalForce.dot(n); 
 		// slipt the tensor according to the mean contact force or a threshold value if this is given
 		Real Fsplit=(!isnan(thresholdForce))?thresholdForce:Fmean;
-		if (f>Fsplit){ // forces are compared with their sign
+		if (revertSign?(f<Fsplit):(f>Fsplit)){ // reminder: forces are compared with their sign
 			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
 				fabricStrong(i,j)+=n[i]*n[j];
 			}
@@ -615,8 +612,8 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool compressionPositive, Real th
 		fabricTot=(1-q)*fabricWeak+q*fabricStrong;
 	}
 	
-	// return fabric tensor or alternatively the two distinct contributions according to strong and weak subnetworks
-	if (!splitTensor){return py::make_tuple(fabric);} // return fabricTot for the 
+	// returns fabric tensor or alternatively the two distinct contributions according to strong and weak subnetworks (or, if thresholdForce is specified, the distinction is made according to that value and not the mean one)
+	if (!splitTensor){return py::make_tuple(fabric);} 
 	else{return py::make_tuple(fabricStrong,fabricWeak);}
 }
 

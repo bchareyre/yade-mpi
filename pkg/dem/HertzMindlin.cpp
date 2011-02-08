@@ -108,6 +108,20 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::contactsAdhesive() // It is returning some
 	return contactsAdhesive;
 }
 
+/* Function which returns the ratio between the number of sliding contacts to the total number at a given time */
+Real Law2_ScGeom_MindlinPhys_Mindlin::ratioSlidingContacts()
+{
+	Real ratio(0); int count(0);
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		MindlinPhys* phys = dynamic_cast<MindlinPhys*>(I->phys.get());
+		if (phys->isSliding) {ratio+=1;}
+		count++;
+	}  
+	ratio/=count;
+	return ratio;
+}
+
 /* Function to get the NORMAL elastic potential energy of the system */
 Real Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy()
 {
@@ -358,6 +372,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	if (!includeAdhesion) {
 		Real maxFs = Fn*phys->tangensOfFrictionAngle;
 		if (shearElastic.squaredNorm() > maxFs*maxFs){
+			phys->isSliding=true;
 			noShearDamp = true; // no damping is added in the shear direction, hence no need to account for shear damping dissipation
 			Real ratio = maxFs/shearElastic.norm();
 			shearElastic *= ratio; phys->shearForce = shearElastic; /*store only elastic shear displacement*/ us_elastic*= ratio;
@@ -368,9 +383,10 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 			phys->shearForce = shearElastic - phys->shearViscous;}
 		else if (!useDamping) {phys->shearForce = shearElastic;} // update the shear force at the elastic value if no damping is present and if we passed MC
 	}
-	else { // Mohr-Coulomb formulation adpated due to the presence of adhesion (see Thornton, 1991). FIXME: is this correct?
+	else { // Mohr-Coulomb formulation adpated due to the presence of adhesion (see Thornton, 1991).
 		Real maxFs = phys->tangensOfFrictionAngle*(phys->adhesionForce+Fn); // adhesionForce already included in normalForce (above)
 		if (shearElastic.squaredNorm() > maxFs*maxFs){
+			phys->isSliding=true;
 			noShearDamp = true; // no damping is added in the shear direction, hence no need to account for shear damping dissipation
 			Real ratio = maxFs/shearElastic.norm(); shearElastic *= ratio; phys->shearForce = shearElastic; /*store only elastic shear displacement*/ us_elastic *= ratio;
 			if (calcEnergy) {frictionDissipation += (us_total-prevUs_tot).dot(shearElastic);} // calculate energy dissipation due to sliding behavior

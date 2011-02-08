@@ -51,6 +51,7 @@ class MindlinPhys: public FrictPhys{
 			//((Real,gamma,0.0,"Surface energy parameter [J/m^2] per each unit contact surface, to derive DMT formulation from HM"))
 			((Real,adhesionForce,0.0,,"Force of adhesion as predicted by DMT"))
 			((bool,isAdhesive,false,,"bool to identify if the contact is adhesive, that is to say if the contact force is attractive"))
+			((bool,isSliding,false,,"check if the contact is sliding (useful to calculate the ratio of sliding contacts)"))
 
 			// Contact damping coefficients as for linear elastic contact law
 			((Real,betan,0.0,,"Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
@@ -129,6 +130,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 		Real getnormDampDissip();
 		Real getshearDampDissip();
 		Real contactsAdhesive();
+		Real ratioSlidingContacts();
 
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
@@ -151,6 +153,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 			, /* ctor */
 			, /* py */
 			.def("contactsAdhesive",&Law2_ScGeom_MindlinPhys_Mindlin::contactsAdhesive,"Compute total number of adhesive contacts.")
+			.def("ratioSlidingContacts",&Law2_ScGeom_MindlinPhys_Mindlin::ratioSlidingContacts,"Return the ratio between the number of contacts sliding to the total number at a given time.")
 			.def("normElastEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy,"Compute normal elastic potential energy. It handles the DMT formulation if :yref:`Law2_ScGeom_MindlinPhys_Mindlin::includeAdhesion` is set to true.")	
 	);
 	DECLARE_LOGGER;
