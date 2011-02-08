@@ -50,7 +50,7 @@ class OpenMPArrayAccumulator{
 			// if nCL_new<nCL, do not deallocate memory
 			// if nCL_new==nCL, only update sz
 			// reset items that were added
-			for(size_t s=sz; s>n; s++){ for(size_t th=0; th<nThreads; th++) chunks[th][s]=0; }
+			for(size_t s=sz; s>n; s++){ for(size_t th=0; th<nThreads; th++) chunks[th][s]=ZeroInitializer<T>(); }
 			sz=n;
 		}
 		// clear (does not deallocate storage, anyway)
