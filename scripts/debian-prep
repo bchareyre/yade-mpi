@@ -2,6 +2,8 @@
 # encoding: utf-8
 import sys,os.path,re,shutil,time
 DISTRIBUTION=sys.argv[1] if len(sys.argv)>1 else 'unstable'
+
+shutil.copytree('scripts/debian','./debian')
 if os.path.exists('RELEASE'):
 	VERSION=file('RELEASE').readline().strip()
 	UPDATE=(file('UPDATE').readline().strip() if os.path.exists('UPDATE') else '')
