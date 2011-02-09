@@ -29,7 +29,6 @@ void PeriIsoCompressor::action(){
 			if(!b || !b->bound) continue;
 			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->bound->max[i]-b->bound->min[i]);
 		}
-
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
 	const long& step=scene->iter;
@@ -175,7 +174,6 @@ void PeriTriaxController::action()
 				assert( mass>0 );//user set
 				Real dampFactor = 1 - growDamping*Mathr::Sign ( strain_rate * ( goal[axis]-stress[axis] ) );
 				strain_rate+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
-				//if ((scene->iter%5000)==0){cerr << axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate<<endl;}
 				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<strain_rate );}
 
 		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory

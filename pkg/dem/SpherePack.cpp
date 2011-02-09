@@ -90,7 +90,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	Vector3r size=mx-mn; Real volume=size.x()*size.y()*size.z();
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
-	if(porosity<=0) {LOG_WARN("porosity must be >0, changing it for you. It will be ineffective if num<=0."); porosity=0.5;}
+	if(porosity<=0) {LOG_WARN("porosity must be >0, changing it for you. It will be ineffective if rMean>0."); porosity=0.5;}
 	//If rMean is not defined, then in will be defined in RDIST_NUM
 	if(rMean>0) mode=RDIST_RMEAN;
 	else if(num>0 && psdSizes.size()==0) {
