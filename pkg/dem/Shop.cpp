@@ -500,7 +500,9 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 The formulation follows the [Thornton2000]_ article
 "Numerical simulations of deviatoric shear deformation of granular media", eq (3) and (4)
  */
-py::tuple Shop::normalShearStressTensors(bool compressionPositive){
+py::tuple Shop::normalShearStressTensors(bool compressionPositive, bool splitNormalTensor, Real thresholdForce){
+  
+	//*** Stress tensor split into shear and normal contribution ***/
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
 	Matrix3r sigN(Matrix3r::Zero()),sigT(Matrix3r::Zero());
@@ -528,17 +530,48 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive){
 	// fill terms under the diagonal
 	sigN(1,0)=sigN(0,1); sigN(2,0)=sigN(0,2); sigN(2,1)=sigN(1,2);
 	sigT(1,0)=sigT(0,1); sigT(2,0)=sigT(0,2); sigT(2,1)=sigT(1,2);
-	return py::make_tuple(sigN,sigT);
+	
+	// *** Normal stress tensor split into two parts according to subnetworks of strong and weak forces (or other distinction if a threshold value for the force is assigned) ***/
+	Real Fmean(0); Matrix3r f, fs, fw;
+	/// FIXME: this does not compute Fmean as it should?
+	fabricTensor(Fmean,f,fs,fw,false,compressionPositive,NaN);
+	Matrix3r sigNStrong(Matrix3r::Zero()), sigNWeak(Matrix3r::Zero());
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
+		const Vector3r& n=geom->normal;
+		Real N=(compressionPositive?-1:1)*phys->normalForce.dot(n);
+		// Real R=(Body::byId(I->getId2(),scene)->state->pos+cellHsize*I->cellDist.cast<Real>()-Body::byId(I->getId1(),scene)->state->pos).norm();
+		Real R=.5*(geom->refR1+geom->refR2);
+		Real Fsplit=(!isnan(thresholdForce))?thresholdForce:Fmean;
+		if (compressionPositive?(N<Fsplit):(N>Fsplit)){
+			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
+				sigNStrong(i,j)+=R*N*n[i]*n[j];}
+		}
+		else{
+			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
+				sigNWeak(i,j)+=R*N*n[i]*n[j];}
+		}
+	}
+	sigNStrong*=2/vol; sigNWeak*=2/vol;
+	// fill terms under the diagonal
+	sigNStrong(1,0)=sigNStrong(0,1); sigNStrong(2,0)=sigNStrong(0,2); sigNStrong(2,1)=sigNStrong(1,2);
+	sigNWeak(1,0)=sigNWeak(0,1); sigNWeak(2,0)=sigNWeak(0,2); sigNWeak(2,1)=sigNWeak(1,2);
+	
+	/// tensile forces are taken as positive!
+	if (splitNormalTensor){return py::make_tuple(sigNStrong,sigNWeak);} // return strong-weak or tensile-compressive parts of the stress tensor (only normal part)
+	return py::make_tuple(sigN,sigT); // return normal and shear components
 }
 
 /* Return the fabric tensor as according to [Satake1982]. */
 /* as side-effect, set Gl1_NormShear::strongWeakThresholdForce */
-py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdForce){
+void Shop::fabricTensor(Real& Fmean, Matrix3r fabric, Matrix3r fabricStrong, Matrix3r fabricWeak, bool splitTensor, bool revertSign, Real thresholdForce){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute fabric tensor of periodic cell in aperiodic simulation."); }
 	
 	// *** Fabric tensor ***/
-	Matrix3r fabric(Matrix3r::Zero()); 
+	fabric=Matrix3r::Zero(); 
 	int count=0; // number of interactions
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
@@ -555,7 +588,7 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdFo
 	
 	// *** Average contact force ***/
 	// calculate average contact force
-	Real Fmean(0);
+	Fmean=0; // initialize
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
@@ -574,7 +607,8 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdFo
 	// *** Weak and strong fabric tensors ***/
 	// evaluate two different parts of the fabric tensor 
 	// make distinction between strong and weak network of contact forces
-	Matrix3r fabricStrong(Matrix3r::Zero()), fabricWeak(Matrix3r::Zero()); 
+	fabricStrong=Matrix3r::Zero(); 
+	fabricWeak=Matrix3r::Zero(); 
 	int nStrong(0), nWeak(0); // number of strong and weak contacts respectively
 	if (!splitTensor & !isnan(thresholdForce)) {LOG_WARN("The bool splitTensor should be set to True if you specified a threshold value for the contact force, otherwise the function will return only the fabric tensor and not the two separate contributions.");}
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -611,7 +645,11 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdFo
 		q=nStrong*1./count; 
 		fabricTot=(1-q)*fabricWeak+q*fabricStrong;
 	}
-	
+}
+
+py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdForce){
+	Real Fmean; Matrix3r fabric, fabricStrong, fabricWeak;
+	fabricTensor(Fmean,fabric,fabricStrong,fabricWeak,splitTensor,revertSign,thresholdForce);
 	// returns fabric tensor or alternatively the two distinct contributions according to strong and weak subnetworks (or, if thresholdForce is specified, the distinction is made according to that value and not the mean one)
 	if (!splitTensor){return py::make_tuple(fabric);} 
 	else{return py::make_tuple(fabricStrong,fabricWeak);}

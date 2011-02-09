@@ -112,8 +112,9 @@ class Shop{
 		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
-		static py::tuple normalShearStressTensors(bool compressionPositive=false);
+		static py::tuple normalShearStressTensors(bool compressionPositive=false, bool splitNormalTensor=false, Real thresholdForce=NaN);
 		
 		//! Function to compute fabric tensor of periodic cell
+		static void fabricTensor(Real& Fmean, Matrix3r fabric, Matrix3r fabricStrong, Matrix3r fabricWeak, bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN);
 		static py::tuple fabricTensor(bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN);
 };
