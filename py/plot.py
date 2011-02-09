@@ -141,7 +141,10 @@ def addAutoData():
 	... ]
 	>>> O.trackEnergy=True
 	>>> O.run(2,True)
-	>>> pprint(plot.data)   #doctest: +ELLIPSIS
+	"""
+	'''
+	#The test is disabled due to https://bugs.launchpad.net/yade/+bug/715739
+	 pprint(plot.data)   #doctest: +ELLIPSIS
 	{'gravWork': [0.0, -25.13274...],
 	 'i': [0, 1],
 	 'kinRot': [0.0, 0.0],
@@ -150,7 +153,8 @@ def addAutoData():
 	 'total energy': [0.0, -7.5398...]}
 
 	.. plot::
-	
+	'''
+	"""
 		from yade import *
 		from yade import plot,utils
 		O.reset()
