@@ -566,7 +566,7 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive, bool splitNor
 
 /* Return the fabric tensor as according to [Satake1982]. */
 /* as side-effect, set Gl1_NormShear::strongWeakThresholdForce */
-void Shop::fabricTensor(Real& Fmean, Matrix3r fabric, Matrix3r fabricStrong, Matrix3r fabricWeak, bool splitTensor, bool revertSign, Real thresholdForce){
+void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, Matrix3r& fabricWeak, bool splitTensor, bool revertSign, Real thresholdForce){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute fabric tensor of periodic cell in aperiodic simulation."); }
 	
