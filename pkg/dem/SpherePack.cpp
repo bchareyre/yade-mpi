@@ -82,12 +82,18 @@ void SpherePack::fromSimulation() {
 	if(scene->isPeriodic) { cellSize=scene->cell->getSize(); }
 }
 
-long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass, int seed){
+long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass, int seed, Matrix3r hSize){
 	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
-	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution
-	Vector3r size=mx-mn; Real volume=size.x()*size.y()*size.z();
+	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution	
+	Vector3r size;
+	bool hSizeFound =(hSize!=Matrix3r::Zero());//is hSize passed to the function?
+	if (!hSizeFound) {size=mx-mn; hSize=size.asDiagonal();}
+	if (hSizeFound && !periodic) throw invalid_argument("hSize can be defined only for periodic cells.");
+	Matrix3r invHsize =hSize.inverse();
+	Real volume=hSize.determinant();
+	if (!volume) throw invalid_argument("The box defined as null volume. Define at least maxCorner of the box, or hSize if periodic.");
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
 	if(porosity<=0) {LOG_WARN("porosity must be >0, changing it for you. It will be ineffective if rMean>0."); porosity=0.5;}
@@ -155,14 +161,22 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		for(t=0; t<maxTry; ++t){
 			Vector3r c;
 			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
-			else { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
+			else { 	for(int axis=0; axis<3; axis++) c[axis]=rnd();//coordinates in [0,1]
+				c=mn+hSize*c;}//coordinates in reference frame (inside the base cell)
 			size_t packSize=pack.size(); bool overlap=false;
-			if(!periodic){
-				for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
-			} else {
+			if(!periodic) for(size_t j=0;j<packSize;j++) {if(pow(pack[j].r+r,2)>=(pack[j].c-c).squaredNorm()) {overlap=true; break;}}
+			else {
 				for(size_t j=0; j<packSize; j++){
-					Vector3r dr;
-					for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+					Vector3r dr=Vector3r::Zero();
+					if (!hSizeFound) {//The box is axis-aligned, use the wrap methods
+						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+					} else {//not aligned, find closest neighbor in a cube of size 1, then transform distance to cartesian coordinates
+						Vector3r c1c2=invHsize*(pack[j].c-c);
+						for(int axis=0; axis<3; axis++){
+							if (abs(c1c2[axis])<abs(c1c2[axis] - Mathr::Sign(c1c2[axis]))) dr[axis]=c1c2[axis];
+							else dr[axis] = c1c2[axis] - Mathr::Sign(c1c2[axis]);}
+						dr=hSize*dr;//now in cartesian coordinates
+					}
 					if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 				}
 			}
@@ -172,9 +186,9 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			if(num>0) {
 				if (mode!=RDIST_RMEAN) {
 					Real nextPoro = porosity+(1-porosity)/10.;
-					if (mode==RDIST_PSD) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
+					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
 					pack.clear();
-					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass);}
+					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass,seed,hSize);}
 				else LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<".");
 			}
 			return i;}
