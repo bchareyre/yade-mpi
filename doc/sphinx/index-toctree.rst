@@ -19,23 +19,25 @@ See older `tentative contents <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc
 .. toctree::
   :maxdepth: 2
 
-  installation.rst
-
   introduction.rst
 
   tutorial.rst
 
-  formulation.rst
-
   user.rst
 
   prog.rst
+
+  installation.rst
+
+  formulation.rst
 
   yade.wrapper.rst
 
   modules.rst
 
   external.rst
+
+  citing.rst
 
   publications.rst
 

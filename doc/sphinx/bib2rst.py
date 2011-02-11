@@ -54,6 +54,11 @@ def formatRest(db):
 			if i.has_key('publisher'): line+=' %s.'%i['publisher']
 		elif type=='inproceedings':
 			line+='%s (%s), **%s**. In *%s*.'%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
+		elif type=='incollection':
+		 	line+='%s (%s), **%s**. In *%s* '%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
+			if i.has_key('editor'): line+='( %s'%i['editor']+', ed.),'
+			if i.has_key('publisher'): line+=' %s'%i['publisher']+' ,'
+			if i.has_key('edition'): line+=' %s ed.'%i['edition']
 		elif type=='phdthesis':
 			line+='%s (%s), **%s**. PhD thesis at *%s*.'%(author,i['year'],i['title'],i['school'])
 		elif type=='mastersthesis':

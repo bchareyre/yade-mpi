@@ -203,7 +203,7 @@ import sphinx,sys,shutil
 sys.path.append('.') # for bib2rst
 
 genReferences()
-for bib in ('references','yade-articles','yade-theses','yade-conferences'):
+for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
 	shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
 global writer

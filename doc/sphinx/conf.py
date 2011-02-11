@@ -630,6 +630,93 @@ htmlhelp_basename = 'Yadedoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
+my_maketitle=r'''
+\begin{titlepage}
+
+\begin{flushright}
+\hrule{}
+
+% Upper part of the page
+\begin{flushright}
+\includegraphics[width=0.15\textwidth]{yade-logo.png}\par
+\end{flushright}
+\vspace{20 mm}
+\text{\sffamily\bfseries\Huge Yade Documentation}\\
+\vspace{5 mm}
+\textit{\sffamily\huge Release '''\
++yade.config.revision\
++r'''}\\
+\vspace{40 mm}
+\textit{\sffamily\LARGE Editor}\\
+\text{\sffamily\bfseries\LARGE Václav Šmilauer}\\
+\vspace{30 mm}
+\textit{\sffamily\LARGE Authors}\\
+%\begin{tabular}{>{\raggedleft}p{110mm}@{}} %replace "\\" by "," for the table form
+\text{\sffamily\bfseries\Large Václav Šmilauer}\\
+\text{\sffamily\bfseries\Large Emanuele Catalano}\\
+\text{\sffamily\bfseries\Large Bruno Chareyre}\\
+\text{\sffamily\bfseries\Large Sergei Dorofenko}\\
+\text{\sffamily\bfseries\Large Jerome Duriez}\\
+\text{\sffamily\bfseries\Large Anton Gladky}\\
+\text{\sffamily\bfseries\Large Janek Kozicki}\\
+\text{\sffamily\bfseries\Large Chiara Modenese}\\
+\text{\sffamily\bfseries\Large Luc Scholtès}\\
+\text{\sffamily\bfseries\Large Luc Sibille}\\
+\text{\sffamily\bfseries\Large Jan Stránský}\\
+\text{\sffamily\bfseries\Large Klaus Thoeni}
+%\end{tabular}
+\vspace{20 mm}
+\hrule{}
+
+\vfill
+% Bottom of the page
+{\large \today}
+\end{flushright}
+
+\end{titlepage}
+
+\text{\sffamily\bfseries\LARGE Authors}\\
+\\
+\text{\sffamily\bfseries\Large Václav Šmilauer}\\
+\text{\sffamily\Large CVUT Prague - lab. 3SR Grenoble University }\\
+\\
+\text{\sffamily\bfseries\Large Emanuele Catalano}\\
+\text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
+\\
+\text{\sffamily\bfseries\Large Bruno Chareyre}\\
+\text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
+\\
+\text{\sffamily\bfseries\Large Sergei Dorofenko}\\
+\text{\sffamily\Large IPCP RAS, Chernogolovka}\\
+\\
+\text{\sffamily\bfseries\Large Jerome Duriez}\\
+\text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
+\\
+\text{\sffamily\bfseries\Large Anton Gladky}\\
+\text{\sffamily\Large TU Bergakademie Freiberg}\\
+\\
+\text{\sffamily\bfseries\Large Janek Kozicki}\\
+\text{\sffamily\Large Gdansk University of Technology - lab. 3SR Grenoble University }\\
+\\
+\text{\sffamily\bfseries\Large Chiara Modenese}\\
+\text{\sffamily\Large University of Oxford}\\
+\\
+\text{\sffamily\bfseries\Large Luc Scholtès}\\
+\text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
+\\
+\text{\sffamily\bfseries\Large Luc Sibille}\\
+\text{\sffamily\Large University of Nantes, lab. GeM}\\
+\\
+\text{\sffamily\bfseries\Large Jan Stránský}\\
+\text{\sffamily\Large CVUT Prague}\\
+\\
+\text{\sffamily\bfseries\Large Klaus Thoeni}
+\text{\sffamily\Large University of Newcastle (Australia)}\\
+
+\text{\sffamily\bfseries\large Citing this document}\\
+In order to let users cite Yade consistently in publications, we provide a list of bibliographic references for the different parts of the documentation. This way of acknowledging Yade is also a way to make developments and documentation of Yade more attractive for researchers, who are evaluated on the basis of citations of their work by others. We therefore kindly ask users to cite Yade as accurately as possible in their papers, as explained in http://yade-dem/doc/citing.html.
+
+'''
 
 latex_elements=dict(
 	papersize='a4paper',
@@ -643,7 +730,8 @@ latex_elements=dict(
 	preamble=my_latex_preamble,
 	footer='',
 	inputenc='',
-	fontenc=''
+	fontenc='',
+	maketitle=my_maketitle,
 )
 
 # The paper size ('letter' or 'a4').
@@ -657,11 +745,13 @@ latex_elements=dict(
 latex_documents = [
   ('index-toctree', 'Yade.tex', u'Yade Documentation',
    u'Václav Šmilauer', 'manual'),
+   ('index-toctree_manuals', 'YadeManuals.tex', u'Yade Tutorial and Manuals',
+   u'Václav Šmilauer', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = 'fig/yade-logo.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.

@@ -1,23 +1,28 @@
 Publications on Yade
 =====================
-
 This page should be a relatively complete list of publications on Yade itself or done with Yade. If you publish something, do not hesitate to add it on the list. If PDF is freely available, add url for direct fulltext downlad. If not, consider uploading fulltext in PDF, either to `Yade wiki <https://www.yade-dem.org/wiki/>`_ or to other website, if legally permitted.
 
-.. note:: This file is generated from :ysrc:`doc/yade-articles.bib`, :ysrc:`doc/yade-conferences.bib` and :ysrc:`doc/yade-theses.bib`.
+The last section gives the references that we recommend to use for citing Yade in publications, as explained in the `"Acknowledging Yade" <citing.html>`_ section.
+
+.. note:: This file is generated from :ysrc:`doc/yade-articles.bib`, :ysrc:`doc/yade-conferences.bib`, :ysrc:`doc/yade-theses.bib` and :ysrc:`doc/yade-docref.bib`.
 
 Journal articles
 -----------------
-
 @bib2rst.bib2rst('../yade-articles.bib')@
 
 
 Master and PhD theses
 -----------------------
-
 @bib2rst.bib2rst('../yade-theses.bib')@
 
 
 Conference materials
 ---------------------
-
 @bib2rst.bib2rst('../yade-conferences.bib')@
+
+
+Citing Yade
+---------------------
+Corresponding bibtex entries `here <wiki/Yadebibtex>`_. See also `"Acknowledging Yade" <citing.html>`_.
+
+@bib2rst.bib2rst('../yade-docref.bib')@

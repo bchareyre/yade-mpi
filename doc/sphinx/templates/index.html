@@ -3,9 +3,12 @@
 {% block body %}
   <h1>Welcome to Yade</h1>
   <p>
-	Yade is an extensible open-source framework for discrete numerical models, focused on Discrete Element Method. The computation parts are written in c++ using flexible object model, allowing independent implementation of new alogrithms and interfaces. Python is used for rapid and concise scene construction, simulation control, postprocessing and debugging.
+	Yade NOT is an extensible open-source framework for discrete numerical models, focused on Discrete Element Method. The computation parts are written in c++ using flexible object model, allowing independent implementation of new alogrithms and interfaces. Python is used for rapid and concise scene construction, simulation control, postprocessing and debugging.
   <p>
    Yade is located at <a href="https://www.yade-dem.org">www.yade-dem.org</a>, which contains <a href="https://www.yade-dem.org/sphinx/">this documentation</a> and <a href="https://www.yade-dem.org/wiki/">wiki</a>. Development is kindly hosted at <a href="http://www.launchpad.net/yade">launchpad</a>; it is used for <a href="http://code.launchpad.net/yade">source code</a>, <a href="http://bugs.launchpad.net/yade">bug tracking</a>, <a href="http://blueprints.launchpad.net/yade">planning</a>, <a href="https://launchpad.net/~yade-users/+archive/ppa">package downloads</a> and more.
+  </p>
+  <p>
+   Please make sure you read the <a href="{{ pathto("citing") }}">"Acknowledging Yade"</a> section if you plan to cite Yade in publications.
   </p>
   <p>
    This documentation decribes Yade version {{ release }} / {{ version }}.
@@ -51,6 +54,8 @@
            <span class="linkdescr">search the documentation</span></p>
         <p class="biglink"><a class="biglink" href="{{ pathto("index-toctree") }}">Full contents</a><br/>
            <span class="linkdescr">with all the details</span></p>
+        <p class="biglink"><a class="biglink" href="{{ pathto("citing") }}">Acknowledging Yade</a><br/>
+           <span class="linkdescr">How to cite Yade in publications</span></p>
       </td>
     </tr>
   </table>
