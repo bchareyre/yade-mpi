@@ -1,16 +1,16 @@
 Name:           yade-0.60
-Version:        1.0  
+Version:        0.60  
 Release:        1%{?dist}
 Summary:        Platform for discrete element modeling
 
 Group:          Applications/Engineering
 License:        GPLv2
 URL:            https://launchpad.net/yade
-Source0:        http://launchpad.net/yade/trunk/0.60/+download/yade-0.60.tar.bz2
+Source0:        http://launchpad.net/yade/trunk/0.60/+download/yade-0.60.1.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  scons, freeglut-devel, boost-devel >= 1.35, boost-date-time >= 1.35, boost-filesystem >= 1.35, boost-thread >= 1.35, boost-regex >= 1.35, fakeroot, gcc, gcc-c++ > 4.0, boost-iostreams >= 1.35, log4cxx, log4cxx-devel, python-devel, boost-python >= 1.35, ipython, python-matplotlib, sqlite-devel, python-numeric, graphviz-python, vtk-devel, ScientificPython, bzr, eigen2-devel, libQGLViewer-devel, loki-lib-devel, python-xlib, PyQt4, PyQt4-devel, ScientificPython-tk, gnuplot, doxygen, gts-devel
-Requires:       ScientificPython, python-numeric, ipython, python-matplotlib, ScientificPython-tk, PyQt4, python-xlib, gnuplot
+Requires:       ScientificPython, python-numeric, ipython, ScientificPython-tk, PyQt4, gnuplot
 
 %description 
 Platform for discrete element modeling.
@@ -26,23 +26,25 @@ simulation control, postprocessing and debugging.
 
 %prep
 %setup -q
-
-
+ 
 %build
 
-
 %install
-rm -rf $RPM_BUILD_ROOT
-scons profile=rpm PREFIX=$RPM_BUILD_ROOT/usr buildPrefix=buildRPM version=%{version} brief=0 chunkSize=5 jobs=1 features=vtk,gts,opengl,openmp,qt4 optimize=1 debug=0 
+rm -f scons.profile-rpm
+rm -rf %{buildroot}/*
+scons profile=rpm PREFIX=%{buildroot}/usr buildPrefix=%{_builddir} brief=0 chunkSize=5 jobs=1 features=vtk,gts,opengl,openmp,qt4 optimize=1 debug=0 variant=''
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
+rm -rf %{_builddir}/*
 
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
-%{_libdir}/*
+%{_libdir}/%{name}/*
 
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %changelog
