@@ -1,0 +1,53 @@
+=== modified file 'SConstruct'
+--- SConstruct	2011-02-02 13:41:00 +0000
++++ SConstruct	2011-02-12 21:12:28 +0000
+@@ -480,12 +480,12 @@
+ ## libs for all plugins
+ if not env['mono']:
+ 	env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
+-	env.Append(LINKFLAGS=['-rdynamic','-Wl,-z,origin'])
++	env.Append(LINKFLAGS=['-rdynamic'])
+ 
+ if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
+ 
+ # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
+-env.Append(RPATH=runtimeLibDirs)
++#env.Append(RPATH=runtimeLibDirs)
+ # find already compiled but not yet installed libraries for linking
+ env.Append(LIBPATH=instLibDirs) # this is if we link to libs that are installed, which is the case now
+ 
+
+=== modified file 'core/main/main.py.in'
+--- core/main/main.py.in	2011-01-22 21:30:51 +0000
++++ core/main/main.py.in	2011-02-12 21:11:07 +0000
+@@ -11,6 +11,16 @@
+ ## find available builds
+ nonDebugLibDir=prefix+'/lib/yade'+suffix
+ debugLibDir=nonDebugLibDir+'/dbg'
++
++try:
++	os.environ["LD_LIBRARY_PATH"] 
++except KeyError:
++	#UGLY!!! Need to change it.
++	os.environ["LD_LIBRARY_PATH"] = nonDebugLibDir  + "/lib:" + nonDebugLibDir  + "/plugins:" + nonDebugLibDir  + "/py:" + nonDebugLibDir  + "/py/gts:" + nonDebugLibDir  + "/py/yade/:" + nonDebugLibDir  + "/py/yade/qt" + debugLibDir  + "/lib:" + debugLibDir  + "/plugins:" + debugLibDir  + "/py:" + debugLibDir  + "/py/gts:" + debugLibDir  + "/py/yade/:" + debugLibDir  + "/py/yade/qt"
++	os.execve(sys.argv[0], sys.argv, os.environ)
++
++
++
+ hasDebug,hasNonDebug=os.path.exists(debugLibDir+'/py/yade/__init__.py'),os.path.exists(nonDebugLibDir+'/py/yade/__init__.py')
+ if hasDebug and hasNonDebug: buildsAvailable='both non-debug and debug build'
+ elif hasDebug and not hasNonDebug: buildsAvailable='debug build only'
+
+=== modified file 'gui/SConscript'
+--- gui/SConscript	2010-10-12 12:28:40 +0000
++++ gui/SConscript	2011-02-12 21:11:07 +0000
+@@ -11,7 +11,7 @@
+ 		env.File('qt4/SerializableEditor.py'),
+ 		env.File('qt4/Inspector.py'),
+ 		env.File('qt4/__init__.py'),
+-		env.SharedLibrary('_GLViewer',['qt4/GLViewer.cpp','qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['PeriodicEngines']),RPATH=env['RPATH']+[env.Literal('\\$$ORIGIN/../../../gui')],CXX=env['QT4CXX'] if haveQt4Cxx else env['CXX'],CXXFLAGS=[f for f in env['CXXFLAGS'] if not f.startswith('-Q')] if haveQt4Cxx else env['CXXFLAGS'])
++		env.SharedLibrary('_GLViewer',['qt4/GLViewer.cpp','qt4/_GLViewer.cpp','qt4/OpenGLManager.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[env['QGLVIEWER_LIB']]+linkPlugins(['PeriodicEngines']),CXX=env['QT4CXX'] if haveQt4Cxx else env['CXX'],CXXFLAGS=[f for f in env['CXXFLAGS'] if not f.startswith('-Q')] if haveQt4Cxx else env['CXXFLAGS'])
+ 	])
+ 	env.Command('qt4/img_rc.py','qt4/img.qrc','pyrcc4 -o $buildDir/gui/qt4/img_rc.py gui/qt4/img.qrc')
+ 	env.Command('qt4/ui_controller.py','qt4/controller.ui','pyuic4 -o $buildDir/gui/qt4/ui_controller.py gui/qt4/controller.ui')
+
