@@ -678,7 +678,7 @@ my_maketitle=r'''
 \text{\sffamily\bfseries\LARGE Authors}\\
 \\
 \text{\sffamily\bfseries\Large Václav Šmilauer}\\
-\text{\sffamily\Large CVUT Prague - lab. 3SR Grenoble University }\\
+\text{\sffamily\Large University of Innsbruck}\\
 \\
 \text{\sffamily\bfseries\Large Emanuele Catalano}\\
 \text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
