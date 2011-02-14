@@ -655,7 +655,7 @@ my_maketitle=r'''
 \text{\sffamily\bfseries\Large Václav Šmilauer}\\
 \text{\sffamily\bfseries\Large Emanuele Catalano}\\
 \text{\sffamily\bfseries\Large Bruno Chareyre}\\
-\text{\sffamily\bfseries\Large Sergei Dorofenko}\\
+\text{\sffamily\bfseries\Large Sergei Dorofeenko}\\
 \text{\sffamily\bfseries\Large Jerome Duriez}\\
 \text{\sffamily\bfseries\Large Anton Gladky}\\
 \text{\sffamily\bfseries\Large Janek Kozicki}\\
@@ -686,7 +686,7 @@ my_maketitle=r'''
 \text{\sffamily\bfseries\Large Bruno Chareyre}\\
 \text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
 \\
-\text{\sffamily\bfseries\Large Sergei Dorofenko}\\
+\text{\sffamily\bfseries\Large Sergei Dorofeenko}\\
 \text{\sffamily\Large IPCP RAS, Chernogolovka}\\
 \\
 \text{\sffamily\bfseries\Large Jerome Duriez}\\
