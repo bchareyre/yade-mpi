@@ -64,11 +64,11 @@ compiler
 boost
 	`boost <http://www.boost.org>`__ is a large collection of peer-reviewed c++ libraries. Yade currently uses thread, date_time, filesystem, iostreams, regex, serialization, program_options, foreach, python; typically the whole boost bundle will be installed. If you need functionality from other modules, you can make presence of that module mandatory. Only be careful about relying on very new features; due to range of systems yade is or might be used on, it is better to be moderately conservative (read: roughly 3 years backwards compatibility).
 python
-	`python <http://www.python.org`__ is the scripting language used by yade. Besides [boost::python]_, yade further requires
+	`python <http://www.python.org>`__ is the scripting language used by yade. Besides [boost::python]_, yade further requires
 
 	* `ipython <http://www.ipython.org>`__ (terminal interaction)
 	* `matplotlib <http://matplotlib.sf.net>`__ (plotting)
-	* `numpy <http://www.numpy.org`__ (matlab-like numerical functionality and accessing numpy arrays from ``c``/``c++`` efficiently)
+	* `numpy <http://www.numpy.org>`__ (matlab-like numerical functionality and accessing numpy arrays from ``c``/``c++`` efficiently)
 
 .. _optional-libraries:
 Optional libraries (features)
