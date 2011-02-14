@@ -13,7 +13,7 @@ Citing chapters of Yade Documentation
 The first edition of Yade documentation is seen as a collection with three volumes (or "chapters"), also provided as `bibtex entries <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_:
 
 * The reference documentation includes details on equations and algorithms found at the highest levels of Yade. Citation of, namely, contact laws, boundary conditions controllers, pre- and post-processing modules, is using `(pdf version) <https://yade-dem.org/w/images/9/98/YadeRefDoc.pdf>`_:
-	V. Šmilauer, E. Catalano, B. Chareyre, S. Dorofenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtès, L. Sibille, J. Stránský, and K. Thoeni, “Yade Reference Documentation,” in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
+	V. Šmilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtès, L. Sibille, J. Stránský, and K. Thoeni, “Yade Reference Documentation,” in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
 
 * Software design, user's and programmer's manuals are in `(pdf version) <https://yade-dem.org/w/images/0/09/YadeManuals.pdf>`_:
 	V. Šmilauer, A. Gladky, J. Kozicki, C. Modenese, and J. Stránský, “Yade Using and Programming,” in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
