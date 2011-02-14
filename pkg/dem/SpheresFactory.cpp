@@ -7,10 +7,10 @@
 
 
 //YADE_PLUGIN((SpheresFactory)(DragForceApplier));
-YADE_PLUGIN((SpheresFactory)(CircularFactory)(QuadroFactory)(DragForceApplier));
+YADE_PLUGIN((SpheresFactory)(CircularFactory)(BoxFactory)(DragForceApplier));
 CREATE_LOGGER(SpheresFactory);
 CREATE_LOGGER(CircularFactory);
-CREATE_LOGGER(QuadroFactory);
+CREATE_LOGGER(BoxFactory);
 
 void DragForceApplier::action(){
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -27,7 +27,7 @@ static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if t
 static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > randomUnit(randGen, boost::uniform_real<Real>(0,1));
 
 void SpheresFactory::pickRandomPosition(Vector3r&,Real){
-	LOG_FATAL("Engine "<<getClassName()<<" calling virtual method SpheresFactory::pickRandomPosition(). Please submit bug report at http://bugs.launchpad.net/yade.");
+	LOG_FATAL("Engine "<<getClassName()<<" calling virtual method SpheresFactory::pickRandomPosition(), but had to call derived class. This could occur if you use SpheresFactory directly instead derived engines. If not, please submit bug report at http://bugs.launchpad.net/yade.");
 	throw std::logic_error("SpheresFactory::pickRandomPosition() called.");
 }
 
@@ -61,7 +61,7 @@ void SpheresFactory::action(){
 			#endif
 		}
 		if(attempt==maxAttempt) {
-			if (silent) {massFlowRate=0;goalMass=0;LOG_INFO("Unable to place new sphere after "<<maxAttempt<<" attempts, SpheresFactory disabled.");} 
+			if (silent) {massFlowRate=0; goalMass=totalMass; LOG_INFO("Unable to place new sphere after "<<maxAttempt<<" attempts, SpheresFactory disabled.");} 
 			else {LOG_WARN("Unable to place new sphere after "<<maxAttempt<<" attempts, giving up.");}
 			return;
 		}
@@ -84,6 +84,7 @@ void SpheresFactory::action(){
 		Real vol=(4/3.)*Mathr::PI*pow(r,3);
 		state->mass=vol*material->density;
 		state->inertia=(2./5.)*vol*r*r*material->density*Vector3r::Ones();
+		state->blockedDOFs_vec_set(blockedDOFs);
 
 		b->shape=sphere; 
 		b->state=state; 
@@ -100,12 +101,13 @@ void SpheresFactory::action(){
 
 void CircularFactory::pickRandomPosition(Vector3r& c, Real r){
 	const Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r::UnitZ(),normal));
-	Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the nozzle
+	Real angle=randomUnit()*2*Mathr::PI, rr=randomUnit()*(radius-r); // random polar coordinate inside the circle
 	Real l=(randomUnit()-0.5)*length;
 	c = center+q*Vector3r(cos(angle)*rr,sin(angle)*rr,0)+normal*l;
 }
 
-void QuadroFactory::pickRandomPosition(Vector3r& c, Real r){
+void BoxFactory::pickRandomPosition(Vector3r& c, Real r){
 	const Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r::UnitZ(),normal));
-	c=center+q*Vector3r((randomUnit()-.5)*2*(extents[0]-r),(randomUnit()-.5)*2*(extents[1]-r),(randomUnit()-.5)*2*(extents[2]-r));
+	//c=center+q*Vector3r((randomUnit()-.5)*2*(extents[0]-r),(randomUnit()-.5)*2*(extents[1]-r),(randomUnit()-.5)*2*(extents[2]-r));
+	c=center+q*Vector3r((randomUnit()-.5)*2*(extents[0]),(randomUnit()-.5)*2*(extents[1]),(randomUnit()-.5)*2*(extents[2]));
 }

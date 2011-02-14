@@ -242,10 +242,10 @@ Real sumFacetNormalForces(vector<Body::id_t> ids, int axis=-1){
 	Real ret=0;
 	FOREACH(const Body::id_t id, ids){
 		Facet* f=YADE_CAST<Facet*>(Body::byId(id,rb)->shape.get());
-		if(axis<0) ret+=rb->forces.getForce(id).dot(f->nf);
+		if(axis<0) ret+=rb->forces.getForce(id).dot(f->normal);
 		else {
 			Vector3r ff=rb->forces.getForce(id); ff[axis]=0;
-			ret+=ff.dot(f->nf);
+			ret+=ff.dot(f->normal);
 		}
 	}
 	return ret;

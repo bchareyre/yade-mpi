@@ -5,7 +5,7 @@
 #include<yade/core/Dispatcher.hpp>
 
 // delete later and remove relevant code, to not support old State.blockedDOFs=['x','y','rz'] syntax anymore
-#define YADE_DEPREC_DOF_LIST
+//#define YADE_DEPREC_DOF_LIST
 
 class State: public Serializable, public Indexable{
 	public:

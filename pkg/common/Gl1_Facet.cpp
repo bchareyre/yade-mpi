@@ -34,7 +34,7 @@ void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool w
 		glBegin(GL_LINES);
 			glColor3(0.0,0.0,1.0); 
 			glVertex3(0.0,0.0,0.0);
-			glVertex3v(facet->nf);
+			glVertex3v(facet->normal);
 		glEnd();
 		// normal of edges
 		glColor3(0.0,0.0,1.0); 

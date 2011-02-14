@@ -18,7 +18,7 @@ class SpheresFactory: public GlobalEngine {
 		((Real,rMax,NaN,,"Maximum radius of generated spheres (uniform distribution)"))
 		((Real,vMin,NaN,,"Minimum velocity norm of generated spheres (uniform distribution)"))
 		((Real,vMax,NaN,,"Maximum velocity norm of generated spheres (uniform distribution)"))
-		((Real,vAngle,NaN,,"Maximum angle by which the initial sphere velocity deviates from the nozzle normal."))
+		((Real,vAngle,NaN,,"Maximum angle by which the initial sphere velocity deviates from the normal."))
 		((Vector3r,normal,Vector3r(NaN,NaN,NaN),,"Spitting direction (and orientation of the region's geometry)."))
 		((int,materialId,-1,,"Shared material id to use for newly created spheres (can be negative to count from the end)"))
 		((Real,totalMass,0,,"Mass of spheres that was produced so far. |yupdate|"))
@@ -27,6 +27,7 @@ class SpheresFactory: public GlobalEngine {
 		((int,numParticles,0,,"Cummulative number of particles produces so far |yupdate|"))
 		((int,maxAttempt,5000 ,,"Maximum number of attempts to position a new sphere randomly."))
 		((bool,silent,false ,,"If true no complain about excessing maxAttempt but disable the factory (by set massFlowRate=0)."))
+		((std::string,blockedDOFs,"" ,,"Blocked degress of freedom"))
 	);
 };
 REGISTER_SERIALIZABLE(SpheresFactory);
@@ -45,18 +46,18 @@ class CircularFactory: public SpheresFactory {
 };
 REGISTER_SERIALIZABLE(CircularFactory);
 
-class QuadroFactory: public SpheresFactory {
+class BoxFactory: public SpheresFactory {
 	protected:
 		virtual void pickRandomPosition(Vector3r&, Real);
 	public:
-		virtual ~QuadroFactory(){};
+		virtual ~BoxFactory(){};
 		DECLARE_LOGGER;
-		YADE_CLASS_BASE_DOC_ATTRS(QuadroFactory,SpheresFactory,"Quadro geometry of the SpheresFactory region, given by extents and center",
+		YADE_CLASS_BASE_DOC_ATTRS(BoxFactory,SpheresFactory,"Box geometry of the SpheresFactory region, given by extents and center",
 		((Vector3r,extents,Vector3r(NaN,NaN,NaN),,"Extents of the region"))
 		((Vector3r,center,Vector3r(NaN,NaN,NaN),,"Center of the region"))
 	);
 };
-REGISTER_SERIALIZABLE(QuadroFactory);
+REGISTER_SERIALIZABLE(BoxFactory);
 
 class DragForceApplier: public GlobalEngine{
 	public: virtual void action();

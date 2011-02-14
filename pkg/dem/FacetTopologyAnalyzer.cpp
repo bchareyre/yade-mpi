@@ -124,7 +124,7 @@ void FacetTopologyAnalyzer::action(){
 				(!invNormals && (ti->vertices[(ei+1)%3]==tj->vertices[ej]) && (ti->vertices[ ei     ]==tj->vertices[(ej+1)%3]) ));
 			// angle between normals
 			const shared_ptr<Body>& b1=Body::byId(ti->id,scene); const shared_ptr<Body>& b2=Body::byId(tj->id,scene);
-			Vector3r n1g=b1->state->ori*f1->nf, n2g=b2->state->ori*f2->nf;
+			Vector3r n1g=b1->state->ori*f1->normal, n2g=b2->state->ori*f2->normal;
 			//TRVAR2(n1g,n2g);
 			Vector3r contEdge1g=b1->state->ori*(f1->vertices[(ei+1)%3]-f1->vertices[ei]); // vector of the edge of contact in global coords
 			Quaternionr q12; q12.setFromTwoVectors(n1g,(invNormals?-1.:1.)*n2g); AngleAxisr aa12(q12); Real halfAngle=.5*aa12.angle();

@@ -257,7 +257,7 @@ bool Ig2_Facet_Sphere_L3Geom::go(const shared_ptr<Shape>& s1, const shared_ptr<S
 	Real radius=s2->cast<Sphere>().radius;
 	// begin facet-local coordinates
 		Vector3r cogLine=state1.ori.conjugate()*(state2.pos+shift2-state1.pos); // connect centers of gravity
-		Vector3r normal=facet.nf; // trial contact normal
+		Vector3r normal=facet.normal; // trial contact normal
 		Real planeDist=normal.dot(cogLine);
 		if(abs(planeDist)>radius && !I->isReal() && !force) return false; // sphere too far
 		if(planeDist<0){normal*=-1; planeDist*=-1; }

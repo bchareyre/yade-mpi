@@ -52,7 +52,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		// begin facet-local coordinates
 			Vector3r cogLine=state1.ori.conjugate()*(state2.pos+shift2-state1.pos); // connect centers of gravity
 			//TRVAR4(state1.pos,state1.ori,state2.pos,cogLine);
-			Vector3r normal=facet->nf;
+			Vector3r normal=facet->normal;
 			Real planeDist=normal.dot(cogLine);
 			if(planeDist<0){normal*=-1; planeDist*=-1; }
 			if(planeDist>sphereRadius && !c->isReal() && !force) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
@@ -84,7 +84,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		/* This code was mostly copied from InteractingFacet2InteractinSphere4SpheresContactGeometry */
 		// begin facet-local coordinates 
 			Vector3r contactLine=state1.ori.Conjugate()*(state2.pos+shift2-state1.pos);
-			Vector3r normal=facet->nf;
+			Vector3r normal=facet->normal;
 			Real L=normal.Dot(contactLine); // height/depth of sphere's center from facet's plane
 			if(L<0){normal*=-1; L*=-1;}
 			if(L>sphereRadius && !c->isReal()) return false; // sphere too far away from the plane
@@ -121,10 +121,10 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 				#ifdef FACET_TOPO
 					if(noVertexContact && facet->edgeAdjIds[edgeMax]!=Body::ID_NONE){
 						// find angle between our normal and the facet's normal (still local coords)
-						Quaternionr q; q.Align(facet->nf,normal); AngleAxisr aa(q);
+						Quaternionr q; q.Align(facet->normal,normal); AngleAxisr aa(q);
 						assert(aa.angle()>=0 && aa.angle()<=Mathr::PI);
 						if(edgeNormals[edgeMax].Dot(aa.axis())<0) aa.angle()*=-1.;
-						bool negFace=normal.Dot(facet->nf)<0; // contact in on the negative facet's face
+						bool negFace=normal.Dot(facet->normal)<0; // contact in on the negative facet's face
 						Real halfAngle=(negFace?-1.:1.)*facet->edgeAdjHalfAngle[edgeMax]; 
 						if(halfAngle<0 && aa.angle()>halfAngle) return false; // on concave boundary, and if in the other facet's sector, no contact
 						// otherwise the contact will be created
@@ -161,7 +161,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		// contact as soon as it was created.
 		// fs->refLength=…
 		fs->cp1pt=contactPt; // facet-local intial contact point
-		fs->localFacetNormal=facet->nf;
+		fs->localFacetNormal=facet->normal;
 		fs->cp2rel.setFromTwoVectors(Vector3r::UnitX(),state2.ori.conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		fs->cp2rel.normalize();
 	}

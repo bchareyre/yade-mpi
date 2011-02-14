@@ -26,9 +26,9 @@ O.engines=[
 	),
 	NewtonIntegrator(damping=0),
 	## CircularFactory: disk if length=0 or cylinder if length>0
-	CircularFactory(maxParticles=10000,radius=8e-3,length=16e-3,center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
-	## QuadroFactory: a line, plane or cuboid  
-	#QuadroFactory(maxParticles=10000,extents=(8e-3,8e-3,8e-3),center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
+	#CircularFactory(maxParticles=10000,radius=8e-3,length=16e-3,center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
+	## BoxFactory: a line, plane or cuboid  
+	BoxFactory(maxParticles=10000,extents=(8e-3,8e-3,8e-3),center=(0,-15e-3,15e-3),rMin=0.28e-3,rMax=0.29e-3,vMin=100,vMax=100,vAngle=0,massFlowRate=100./60,normal=(0,1.5,-1),label='factory',materialId=shotsId),
 	DomainLimiter(lo=(-30e-3,-30e-3,0),hi=(30e-3,30e-3,60e-3),iterPeriod=200),
 	#VTKRecorder(recorders=['spheres','facets','velocity'],fileName='/tmp/nozzle-',iterPeriod=500),
 

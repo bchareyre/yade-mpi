@@ -38,7 +38,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
 	NewtonIntegrator(damping=0),
-	RotationEngine(subscribedBodies=[facetId],rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.1)
+	RotationEngine(ids=[facetId],rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.1)
 ]
 
 from yade import qt

@@ -40,7 +40,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	// BEGIN everything in facet-local coordinates
 	//
 
-	Vector3r normal = facet->nf;
+	Vector3r normal = facet->normal;
 	Real L = normal.dot(cl);
 	if (L<0) {normal=-normal; L=-L; }
 
