@@ -61,8 +61,8 @@
 #	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
 #	define LOG_TRACE(msg) // _POOR_MANS_LOG("TRACE",msg)
 #	define LOG_DEBUG(msg) // _POOR_MANS_LOG("DEBUG",msg)
-#	define LOG_INFO(msg) _POOR_MANS_LOG("INFO ",msg)
-#	define LOG_WARN(msg) _POOR_MANS_LOG("WARN ",msg)
+#	define LOG_INFO(msg) // _POOR_MANS_LOG("INFO ",msg)
+#	define LOG_WARN(msg) // _POOR_MANS_LOG("WARN ",msg)
 #	define LOG_ERROR(msg) _POOR_MANS_LOG("ERROR",msg)
 #	define LOG_FATAL(msg) _POOR_MANS_LOG("FATAL",msg)
 
