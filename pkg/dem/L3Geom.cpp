@@ -97,7 +97,7 @@ void Ig2_Sphere_Sphere_L3Geom::handleSpheresLikeContact(const shared_ptr<Interac
 		// g.trsf.setFromTwoVectors(Vector3r::UnitX(),g.normal); // quaternion just from the X-axis; does not seem to work for some reason?!
 		const Vector3r& locX(g.normal);
 		// initial local y-axis orientation, in the xz or xy plane, depending on which component is larger to avoid singularities
-		Vector3r locY=normal.cross(normal[1]<normal[2]?Vector3r::UnitY():Vector3r::UnitZ()); locY-=locX*locY.dot(locX); locY.normalize();
+		Vector3r locY=normal.cross(abs(normal[1])<abs(normal[2])?Vector3r::UnitY():Vector3r::UnitZ()); locY-=locX*locY.dot(locX); locY.normalize();
 		Vector3r locZ=normal.cross(locY);
 		#ifdef L3_TRSF_QUATERNION
 			Matrix3r trsf; trsf.row(0)=locX; trsf.row(1)=locY; trsf.row(2)=locZ;

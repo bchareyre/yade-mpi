@@ -30,7 +30,7 @@ O.engines=[
 	# call the checkUnbalanced function (defined below) every 2 seconds
 	PyRunner(command='checkUnbalanced()',realPeriod=2),
 	# call the addPlotData function every 200 steps
-	PyRunner(command='addPlotData()',iterPeriod=200)
+	PyRunner(command='addPlotData()',iterPeriod=100)
 ]
 O.dt=.5*utils.PWaveTimeStep()
 

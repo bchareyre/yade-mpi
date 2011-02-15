@@ -14,7 +14,7 @@ from yade import qt,plot
 
 simulations=[
 	('01-bouncing-sphere.py',u'Bouncing sphere',100000),
-	('02-gravity-deposition.py',u'Gravity deposition',200),
+	('02-gravity-deposition.py',u'Gravity deposition',100),
 	('03-oedometric-test.py',u'Oedometric test',500),
 	('04-periodic-simple-shear.py',u'Simple shear\nwith\nperiodic boundary',100),
 	('06-periodic-triaxial-test.py',u'Periodic triaxal test\nwith clumps',200)

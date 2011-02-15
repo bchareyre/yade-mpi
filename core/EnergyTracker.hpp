@@ -43,11 +43,12 @@ class EnergyTracker: public Serializable{
 		int id=-1; set(val,name,id);
 	}
 	void clear(){ energies.clear(); names.clear(); resetStep.clear();}
-	Real total(){ Real ret=0; size_t sz=energies.size(); for(size_t id=0; id<sz; id++) ret+=energies.get(id); return ret; }
-
-	py::list keys_py(){ py::list ret; FOREACH(pairStringInt p, names) ret.append(p.first); return ret; }
-	py::list items_py(){ py::list ret; FOREACH(pairStringInt p, names) ret.append(py::make_tuple(p.first,energies.get(p.second))); return ret; }
 	void resetResettables(){ size_t sz=energies.size(); for(size_t id=0; id<sz; id++){ if(resetStep[id]) energies.reset(id); } }
+
+	Real total() const;
+	py::list keys_py() const;
+	py::list items_py() const;
+	py::dict perThreadData() const;
 
 	typedef std::map<std::string,int> mapStringInt;
 	typedef std::pair<std::string,int> pairStringInt;
@@ -64,6 +65,7 @@ class EnergyTracker: public Serializable{
 			.def("keys",&EnergyTracker::keys_py,"Return defined energies.")
 			.def("items",&EnergyTracker::items_py,"Return contents as list of (name,value) tuples.")
 			.def("total",&EnergyTracker::total,"Return sum of all energies.")
+			.add_property("_perThreadData",&EnergyTracker::perThreadData,"Contents as dictionary, where each value is tuple of individual threads' values (for debugging)")
 	)
 };
 REGISTER_SERIALIZABLE(EnergyTracker);

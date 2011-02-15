@@ -37,7 +37,6 @@ class OpenMPArrayAccumulator{
 			if(nCL_new>nCL){
 				for(size_t th=0; th<nThreads; th++){
 					void* oldChunk=(void*)chunks[th];
-					// FIXME: currently we allocate 4× the memory necessary, otherwise there is crash when accessing past its half -- why?? (http://www.abclinuxu.cz/poradna/programovani/show/318324)
 					int succ=posix_memalign((void**)(&chunks[th]),/*alignment*/CLS,/*size*/ nCL_new*CLS);
 					if(succ!=0) throw std::runtime_error("OpenMPArrayAccumulator: posix_memalign failed to allocate memory.");
 					if(oldChunk){ // initialized to NULL initially, that must not be copied and freed
@@ -50,7 +49,7 @@ class OpenMPArrayAccumulator{
 			// if nCL_new<nCL, do not deallocate memory
 			// if nCL_new==nCL, only update sz
 			// reset items that were added
-			for(size_t s=sz; s>n; s++){ for(size_t th=0; th<nThreads; th++) chunks[th][s]=ZeroInitializer<T>(); }
+			for(size_t s=sz; s<n; s++){ for(size_t th=0; th<nThreads; th++) chunks[th][s]=ZeroInitializer<T>(); }
 			sz=n;
 		}
 		// clear (does not deallocate storage, anyway)
@@ -67,6 +66,8 @@ class OpenMPArrayAccumulator{
 		void reset(size_t ix){ set(ix,ZeroInitializer<T>()); }
 		// fill all memory with zeros; the caller is responsible for assuring that such value is meaningful when converted to T
 		// void memsetZero(){ for(size_t th=0; th<nThreads; th++) memset(&chunks[th],0,CLS*nCL); }
+		// get all stored data, organized first by index, then by threads; only used for debugging
+		std::vector<std::vector<T> > getPerThreadData() const { std::vector<std::vector<T> > ret; for(size_t ix=0; ix<sz; ix++){ std::vector<T> vi; for(size_t th=0; th<nThreads; th++) vi.push_back(chunks[th][ix]); ret.push_back(vi); } return ret; }
 };
 
 /* Class accumulating results of type T in parallel sections. Summary value (over all threads) can be read or reset in non-parallel sections only.
@@ -107,6 +108,8 @@ class OpenMPAccumulator{
 	// .def_readonly("myAccu",&OpenMPAccumulator::get,"documentation")
 	T get() const { T ret(ZeroInitializer<T>()); for(int i=0; i<nThreads; i++) ret+=*(T*)(data+i*eSize); return ret; }
 	void set(const T& value){ reset(); /* set value for the 0th thread */ *(T*)(data)=value; }
+	// only useful for debugging
+	std::vector<T> getPerThreadData() const { std::vector<T> ret; for(int i=0; i<nThreads; i++) ret.push_back(*(T*)(data+i*eSize)); return ret; }
 };
 #else 
 template<typename T>
@@ -123,6 +126,7 @@ class OpenMPArrayAccumulator{
 		void add (size_t ix, const T& diff){ data[ix]+=diff; }
 		void set(size_t ix, const T& val){ data[ix]=val; }
 		void reset(size_t ix){ data[ix]=ZeroInitializer<T>(); }
+		std::vector<std::vector<T> > getPerThreadData() const { std::vector<std::vector<T> > ret; for(size_t ix=0; ix<data.size(); ix++){ std::vector<T> vi; vi.push_back(data[ix]); ret.push_back(vi); } return ret; }
 };
 
 // single-threaded version of the accumulator above
@@ -135,6 +139,8 @@ public:
 	void reset(){ data=ZeroInitializer<T>(); }
 	T get() const { return data; }
 	void set(const T& val){ data=val; }
+	// debugging only
+	std::vector<T> getPerThreadData() const { std::vector<T> ret; ret.push_back(data); return ret; }
 };
 #endif
 

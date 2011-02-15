@@ -104,7 +104,7 @@ void LawTester::action(){
 		axX=gsc->normal; /* just in case */ axX.normalize();
 		if(doInit){ // initialization of the new interaction -- define local axes
 			// take vector in the y or z direction, depending on its length; arbitrary, but one of them is sure to be non-zero
-			axY=axX.cross(axX[1]>axX[2]?Vector3r::UnitY():Vector3r::UnitZ());
+			axY=axX.cross(abs(axX[1])<abs(axX[2])?Vector3r::UnitY():Vector3r::UnitZ());
 			axY.normalize();
 			axZ=axX.cross(axY);
 			LOG_DEBUG("Initial axes x="<<axX<<", y="<<axY<<", z="<<axZ);

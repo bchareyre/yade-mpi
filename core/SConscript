@@ -26,6 +26,7 @@ env.Install('$LIBDIR/lib',[
 			'Bound.cpp',
 			'Cell.cpp',
 			'PartialEngine.cpp',
+			'EnergyTracker.cpp',
 			'Engine.cpp',
 			'FileGenerator.cpp',
 			'FrontEnd.cpp',

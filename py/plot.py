@@ -69,6 +69,11 @@ axesWd=0
 "Linewidth (in points) to make *x* and *y* axes better visible; not activated if non-positive."
 current=-1
 "Point that is being tracked with a scatter point. -1 is for the last point, set to *nan* to disable."
+afterCurrentAlpha=.2
+"Color alpha value for part of lines after :yref:`yade.plot.current`, between 0 (invisible) to 1 (full color)"
+scatterMarkerKw=dict(verts=[(0.,0.),(-30.,10.),(-25,0),(-30.,-10.)],marker=None)
+"Parameters for the current position marker"
+
 
 componentSeparator='_'
 componentSuffixes={Vector2:{0:'x',1:'y'},Vector3:{0:'x',1:'y',2:'z'},Matrix3:{(0,0):'xx',(1,1):'yy',(2,2):'zz',(0,1):'xy',(0,2):'xz',(1,2):'yz',(1,0):'yz',(2,0):'zx',(2,1):'zy'}}
@@ -141,10 +146,7 @@ def addAutoData():
 	... ]
 	>>> O.trackEnergy=True
 	>>> O.run(2,True)
-	"""
-	'''
-	#The test is disabled due to https://bugs.launchpad.net/yade/+bug/715739
-	 pprint(plot.data)   #doctest: +ELLIPSIS
+	>>> pprint(plot.data)   #doctest: +ELLIPSIS
 	{'gravWork': [0.0, -25.13274...],
 	 'i': [0, 1],
 	 'kinRot': [0.0, 0.0],
@@ -153,8 +155,6 @@ def addAutoData():
 	 'total energy': [0.0, -7.5398...]}
 
 	.. plot::
-	'''
-	"""
 		from yade import *
 		from yade import plot,utils
 		O.reset()
@@ -303,8 +303,8 @@ def xlateLabel(l):
 class LineRef:
 	"""Holds reference to plot line and to original data arrays (which change during the simulation),
 	and updates the actual line using those data upon request."""
-	def __init__(self,line,scatter,xdata,ydata,dataName=None):
-		self.line,self.scatter,self.xdata,self.ydata,self.dataName=line,scatter,xdata,ydata,dataName
+	def __init__(self,line,scatter,line2,xdata,ydata,dataName=None):
+		self.line,self.scatter,self.line2,self.xdata,self.ydata,self.dataName=line,scatter,line2,xdata,ydata,dataName
 	def update(self):
 		if isinstance(self.line,matplotlib.image.AxesImage):
 			# image name
@@ -317,22 +317,49 @@ class LineRef:
 		else:
 			# regular data
 			import numpy
-			self.line.set_xdata(self.xdata)
-			self.line.set_ydata(self.ydata)
+			# current==-1 avoids copy slicing data in the else part
+			if current==None or current==-1 or afterCurrentAlpha==1:
+				self.line.set_xdata(self.xdata); self.line.set_ydata(self.ydata)
+				self.line2.set_xdata([]); self.line2.set_ydata([])
+			else:
+				try: # try if we can extend the first part by one so that lines are connected
+					self.xdata[:current+1]; preCurrEnd=current+1
+				except IndexError: preCurrEnd=current
+				preCurrEnd=current+(1 if len(self.xdata)>current else 0)
+				self.line.set_xdata(self.xdata[:preCurrEnd]); self.line.set_ydata(self.ydata[:preCurrEnd])
+				self.line2.set_xdata(self.xdata[current:]); self.line2.set_ydata(self.ydata[current:])
 			try:
-				x,y=[self.xdata[current]],[self.ydata[current]]
+				x,y=self.xdata[current],self.ydata[current]
 			except IndexError: x,y=0,0
 			# this could be written in a nicer way, very likely
 			try:
-				pt=numpy.ndarray((2,),buffer=numpy.array([x,y]))
-				if self.scatter: self.scatter.set_offsets(pt)
+				pt=numpy.ndarray((2,),buffer=numpy.array([float(x),float(y)]))
+				if self.scatter:
+					self.scatter.set_offsets(pt)
+					# change rotation of the marker (possibly incorrect)
+					try:
+						dx,dy=self.xdata[current]-self.xdata[current-1],self.ydata[current]-self.ydata[current-1]
+						# smoothing from last n values, if possible
+						# FIXME: does not show arrow at all if less than window values
+						#try:
+						#	window=10
+						#	dx,dy=[numpy.average(numpy.diff(dta[current-window:current])) for dta in self.xdata,self.ydata]
+						#except IndexError: pass
+						# there must be an easier way to find on-screen derivative angle, ask on the matplotlib mailing list
+						axes=self.line.get_axes()
+						p=axes.patch; xx,yy=p.get_verts()[:,0],p.get_verts()[:,1]; size=max(xx)-min(xx),max(yy)-min(yy)
+						aspect=(size[1]/size[0])*(1./axes.get_data_ratio())
+						angle=math.atan(aspect*dy/dx)
+						if dx<0: angle-=math.pi
+						self.scatter.set_transform(matplotlib.transforms.Affine2D().rotate(angle))
+					except IndexError: pass
 			except TypeError: pass # this happens at i386 with empty data, saying TypeError: buffer is too small for requested array
 
 currLineRefs=[]
 liveTimeStamp=0 # timestamp when live update was started, so that the old thread knows to stop if that changes
 nan=float('nan')
 
-def createPlots(subPlots=True,scatterSize=20,wider=False):
+def createPlots(subPlots=True,scatterSize=60,wider=False):
 	global currLineRefs
 	figs=set([l.line.get_axes().get_figure() for l in currLineRefs]) # get all current figures
 	for f in figs: pylab.close(f) # close those
@@ -352,7 +379,7 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 			if len(imgData[pStrip])==0 or imgData[pStrip][-1]==None: img=Image.new('RGBA',(1,1),(0,0,0,0))
 			else: img=Image.open(imgData[pStrip][-1])
 			img=pylab.imshow(img,origin='lower')
-			currLineRefs.append(LineRef(img,None,imgData[pStrip],None,pStrip))
+			currLineRefs.append(LineRef(img,None,None,imgData[pStrip],None,pStrip))
 			pylab.gca().set_axis_off()
 			continue
 		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
@@ -389,17 +416,19 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 			if len(ySpecs2)==0:
 				print 'yade.plot: creating fake plot, since there are no y-data yet'
 				line,=pylab.plot([nan],[nan])
-				currLineRefs.append(LineRef(line,None,[nan],[nan]))
+				line2,=pylab.plot([nan],[nan])
+				currLineRefs.append(LineRef(line,None,line2,[nan],[nan]))
 			# set different color series for y1 and y2 so that they are recognizable
 			if pylab.rcParams.has_key('axes.color_cycle'): pylab.rcParams['axes.color_cycle']='b,g,r,c,m,y,k' if not isY1 else 'm,y,k,b,g,r,c'
 			for d in ySpecs2:
 				yNames.add(d)
 				line,=pylab.plot(data[pStrip],data[d[0]],d[1],label=xlateLabel(d[0]))
+				line2,=pylab.plot([],[],d[1],color=line.get_color(),alpha=afterCurrentAlpha)
 				# use (0,0) if there are no data yet
 				scatterPt=[0,0] if len(data[pStrip])==0 else (data[pStrip][current],data[d[0]][current])
 				# if current value is NaN, use zero instead
-				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,s=scatterSize,color=line.get_color())
-				currLineRefs.append(LineRef(line,scatter,data[pStrip],data[d[0]]))
+				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,s=scatterSize,color=line.get_color(),**scatterMarkerKw)
+				currLineRefs.append(LineRef(line,scatter,line2,data[pStrip],data[d[0]]))
 			axes=line.get_axes()
 			labelLoc=(legendLoc[0 if isY1 else 1] if y2Exists>0 else 'best')
 			l=pylab.legend(loc=labelLoc)
@@ -411,7 +440,6 @@ def createPlots(subPlots=True,scatterSize=20,wider=False):
 			if isY1:
 				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if p not in xylabels or not xylabels[p][1] else xylabels[p][1])
 				pylab.xlabel(xlateLabel(pStrip) if (p not in xylabels or not xylabels[p][0]) else xylabels[p][0])
-				## should be done for y2 as well, but in that case the 10^.. label goes to y1 axis (bug in matplotlib, present in versions .99--1.0.5, and possibly beyond)
 			else:
 				pylab.ylabel((', '.join([xlateLabel(_p[0]) for _p in ySpecs2])) if (p not in xylabels or len(xylabels[p])<3 or not xylabels[p][2]) else xylabels[p][2])
 			# if there are callable/dict ySpecs, save them inside the axes object, so that the live updater can use those
@@ -447,7 +475,7 @@ def liveUpdate(timestamp):
 			for f in ax.yadeYFuncs:
 				if callable(f): yy.update(f())
 				elif hasattr(f,'keys'): yy.update(f.keys())
-				else: raise ValueError("Internal error: ax.yadeYFuncs items must be callables or dictrionary-like objects and nothing else.")
+				else: raise ValueError("Internal error: ax.yadeYFuncs items must be callables or dictionary-like objects and nothing else.")
 			#print 'callables y names:',yy
 			news=yy-ax.yadeYNames
 			if not news: continue
@@ -458,9 +486,10 @@ def liveUpdate(timestamp):
 				if not new in data.keys(): data[new]=len(data[ax.yadeXName])*[nan] # create data entry if necessary
 				#print 'data',len(data[ax.yadeXName]),len(data[new]),data[ax.yadeXName],data[new]
 				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
+				line2,=ax.plot([],[],color=line.get_color(),alpha=afterCurrentAlpha)
 				scatterPt=(0 if len(data[ax.yadeXName])==0 or math.isnan(data[ax.yadeXName][current]) else data[ax.yadeXName][current]),(0 if len(data[new])==0 or math.isnan(data[new][current]) else data[new][current])
-				scatter=ax.scatter(scatterPt[0],scatterPt[1],color=line.get_color())
-				currLineRefs.append(LineRef(line,scatter,data[ax.yadeXName],data[new]))
+				scatter=ax.scatter(scatterPt[0],scatterPt[1],s=60,color=line.get_color(),**scatterMarkerKw)
+				currLineRefs.append(LineRef(line,scatter,line2,data[ax.yadeXName],data[new]))
 				ax.set_ylabel(ax.get_ylabel()+(', ' if ax.get_ylabel() else '')+xlateLabel(new))
 			# it is possible that the legend has not yet been created
 			l=ax.legend(loc=ax.yadeLabelLoc)

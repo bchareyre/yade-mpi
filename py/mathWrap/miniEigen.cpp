@@ -200,6 +200,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 
 	bp::class_<Matrix3r>("Matrix3","3x3 float matrix.\n\nSupported operations (``m`` is a Matrix3, ``f`` if a float/int, ``v`` is a Vector3): ``-m``, ``m+m``, ``m+=m``, ``m-m``, ``m-=m``, ``m*f``, ``f*m``, ``m*=f``, ``m/f``, ``m/=f``, ``m*m``, ``m*=m``, ``m*v``, ``v*m``, ``m==m``, ``m!=m``.",bp::init<>())
 		.def(bp::init<Matrix3r const &>((bp::arg("m"))))
+		.def(bp::init<Quaternionr const &>((bp::arg("q"))))
 		.def("__init__",bp::make_constructor(&Matrix3r_fromElements,bp::default_call_policies(),(bp::arg("m00"),bp::arg("m01"),bp::arg("m02"),bp::arg("m10"),bp::arg("m11"),bp::arg("m12"),bp::arg("m20"),bp::arg("m21"),bp::arg("m22"))))
 		.def_pickle(Matrix3r_pickle())
 		//
@@ -238,6 +239,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("__init__",bp::make_constructor(&Quaternionr_fromAxisAngle,bp::default_call_policies(),(bp::arg("axis"),bp::arg("angle"))))
 		.def("__init__",bp::make_constructor(&Quaternionr_fromAngleAxis,bp::default_call_policies(),(bp::arg("angle"),bp::arg("axis"))))
 		.def(bp::init<Real,Real,Real,Real>((bp::arg("w"),bp::arg("x"),bp::arg("y"),bp::arg("z")),"Initialize from coefficients.\n\n.. note:: The order of coefficients is *w*, *x*, *y*, *z*. The [] operator numbers them differently, 0…4 for *x* *y* *z* *w*!"))
+		.def(bp::init<Matrix3r>((bp::arg("rotMatrix")))) //,"Initialize from given rotation matrix.")
 		.def(bp::init<Quaternionr>((bp::arg("other"))))
 		.def_pickle(Quaternionr_pickle())
 		// properties
