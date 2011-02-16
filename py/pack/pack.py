@@ -13,7 +13,7 @@ For examples, see
 * :ysrc:`scripts/test/pack-cloud.py`
 * :ysrc:`scripts/test/pack-predicates.py`
 * :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`
-
+* :ysrc:`examples/WireMatPM/wirepackings.py`
 """
 
 import itertools,warnings
@@ -499,3 +499,93 @@ def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None):
 	O.switchScene()
 	return ret
 
+def hexaNet( radius, cornerCoord=[0,0,0], xLength=1., yLength=0.5, mos=0.08, a=0.04, b=0.04, startAtCorner=True, isSymmetric=False, **kw ):
+	"""Definition of the particles for a hexagonal wire net in the x-y-plane for the WireMatPM.
+
+	:param radius: radius of the particle
+	:param cornerCoord: coordinates of the lower left corner of the net
+	:param xLenght: net length in x-direction
+	:param yLenght: net length in y-direction
+	:param mos: mesh opening size
+	:param a: length of double-twist 
+	:param b: height of single wire section
+	:param startAtCorner: if true the generation starts with a double-twist at the lower left corner
+	:param isSymmetric: defines if the net is symmetric with respect to the y-axis
+
+	:return: set of spheres which defines the net (net) and exact dimensions of the net (lx,ly).
+	
+	note::
+	This packing works for the WireMatPM only. The particles at the corner are always generated first.
+
+	"""
+	# check input dimension
+	if(xLength<mos): raise ValueError("xLength must be greather than mos!");
+	if(yLength<2*a+b): raise ValueError("yLength must be greather than 2*a+b!");
+	xstart = cornerCoord[0]
+	ystart = cornerCoord[1]
+	z = cornerCoord[2]
+	ab = a+b
+	# number of double twisted sections in y-direction and real length ly
+	ny = int( (yLength-a)/ab ) + 1
+	ly = ny*a+(ny-1)*b
+	jump=0
+	# number of sections in x-direction and real length lx
+	if isSymmetric:
+		nx = int( xLength/mos ) + 1
+		lx = (nx-1)*mos
+		if not startAtCorner:
+			nx+=-1
+	else:
+		nx = int( (xLength-0.5*mos)/mos ) + 1
+		lx = (nx-1)*mos+0.5*mos
+	net = []
+	# generate corner particles
+	if startAtCorner:
+		if (ny%2==0): # if ny even no symmetry in y-direction
+			net+=[utils.sphere((xstart,ystart+ly,z),radius=radius,**kw)] # upper left corner
+			if isSymmetric:
+				net+=[utils.sphere((xstart+lx,ystart+ly,z),radius=radius,**kw)] # upper right corner
+			else:
+				net+=[utils.sphere((xstart+lx,ystart,z),radius=radius,**kw)] # lower right corner
+		else: # if ny odd symmetry in y-direction
+			if not isSymmetric:
+				net+=[utils.sphere((xstart+lx,ystart,z),radius=radius,**kw)] # lower right corner
+				net+=[utils.sphere((xstart+lx,ystart+ly,z),radius=radius,**kw)] # upper right corner
+		jump=1
+	else: # do not start at corner
+		if (ny%2==0): # if ny even no symmetry in y-direction
+			net+=[utils.sphere((xstart,ystart,z),radius=radius,**kw)] # lower left corner
+			if isSymmetric:
+				net+=[utils.sphere((xstart+lx,ystart,z),radius=radius,**kw)] # lower right corner
+			else:
+				net+=[utils.sphere((xstart+lx,ystart+ly,z),radius=radius,**kw)] # upper right corner
+		else: # if ny odd symmetry in y-direction
+			net+=[utils.sphere((xstart,ystart,z),radius=radius,**kw)] # lower left corner
+			net+=[utils.sphere((xstart,ystart+ly,z),radius=radius,**kw)] # upper left corner
+			if isSymmetric:
+				net+=[utils.sphere((xstart+lx,ystart,z),radius=radius,**kw)] # lower right corner
+				net+=[utils.sphere((xstart+lx,ystart+ly,z),radius=radius,**kw)] # upper right corner
+		xstart+=0.5*mos
+	# generate other particles
+	if isSymmetric:
+		for i in range(ny):
+			y = ystart + i*ab
+			for j in range(nx):
+				x = xstart + j*mos
+				# add two particles of one vertical section (double-twist)
+				net+=[utils.sphere((x,y,z),radius=radius,**kw)]
+				net+=[utils.sphere((x,y+a,z),radius=radius,**kw)]
+			# set values for next section
+			xstart = xstart - 0.5*mos*pow(-1,i+jump)
+			nx = int(nx + 1*pow(-1,i+jump))
+	else:
+		for i in range(ny):
+			y = ystart + i*ab
+			for j in range(nx):
+				x = xstart + j*mos
+				# add two particles of one vertical section (double-twist)
+				net+=[utils.sphere((x,y,z),radius=radius,**kw)]
+				net+=[utils.sphere((x,y+a,z),radius=radius,**kw)]
+			# set values for next section
+			xstart = xstart - 0.5*mos*pow(-1,i+jump)
+	return [net,lx,ly]
