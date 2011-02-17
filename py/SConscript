@@ -27,6 +27,7 @@ env.Install('$LIBDIR/py/yade',[
 	env.File('utils.py'),
 	env.File('ymport.py'),
 	env.File('geom.py'),
+	env.File('shop.py'),
 	env.File('export.py'),
 	env.File('eudoxos.py'),
 	env.File('plot.py'),

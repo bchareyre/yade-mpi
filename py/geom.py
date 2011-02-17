@@ -144,25 +144,24 @@ def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Qua
 	"""
 	Create arbitrarily-aligned bunker, composed of facets, with given center, radii, heights and orientation.
 	Return List of facets forming the bunker;
-	
-	   dBunker
-	______________
-	|            |
-	|            |
-	|            | hBunker
-	|            |
-	|            |
-	|            |
-	|____________|
-	\            /
-	 \          /
-	  \        /   hOutput
-	   \      /
-	    \____/
-	    |    |
-	    |____|     hPipe
-	    dOutput
-	
+	::
+		   dBunker
+		______________
+		|            |
+		|            |
+		|            | hBunker
+		|            |
+		|            |
+		|            |
+		|____________|
+		\            /
+		 \          /
+		  \        /   hOutput
+		   \      /
+		    \____/
+		    |    |
+		    |____|     hPipe
+		    dOutput
 	
 	:param Vector3 center: center of the created bunker
 	:param float dBunker: bunker diameter, top

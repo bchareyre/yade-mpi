@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from yade import pack,ymport,export,log,geom
+from yade import pack,ymport,export,log,geom,shop
 import math
 
 """ This script demonstrates how to use 2 components of creating packings:
@@ -66,12 +66,20 @@ O.bodies.append(geom.facetCylinder((-7.0,-7.0,-5.0),radius=2.0,height=4.0,segmen
 oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
 O.bodies.append(ymport.gmsh('cone.mesh',orientation=oriBody,**kwMeshes))#generates facets from the mesh file
 
+SpheresID=[]
 oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
-O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,0.0),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
+SpheresID+=O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,0.0),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
+
+#Demonstration of spheresPackDimensions function. The "Edge" particles are colored with blue color
+geometryParameters = shop.spheresPackDimensions(SpheresID)
+for v in [geometryParameters['minId'],geometryParameters['maxId']]:
+	for i in v:
+		O.bodies[int(i)].shape.color = Vector3(0,0,1)
+
 
 #facetBunker Demonstration
 #Demonstration of HarmonicMotionEngine
-vibrationPlate = O.bodies.append(geom.facetBunker((-7.0,-7.0,-3.0),dBunker=5.0,dOutput=3.0,hBunker=11.0,hOutput=1.5,hPipe=0.8,wallMask=5,segmentsNumber=20,**kwMeshes))
+vibrationPlate = O.bodies.append(geom.facetBunker((-7.0,-7.0,-3.0),dBunker=geometryParameters['extends'][0]*1.1,dOutput=3.0,hBunker=11.0,hOutput=1.5,hPipe=0.8,wallMask=5,segmentsNumber=20,**kwMeshes))
 
 # spheresToFile saves coordinates and radii of all spheres of the simulation into the text file, works but disabled. Please, uncomment it, if you need
 #print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
