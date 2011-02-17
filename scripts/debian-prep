@@ -3,7 +3,7 @@
 import sys,os.path,re,shutil,time
 DISTRIBUTION=sys.argv[1] if len(sys.argv)>1 else 'unstable'
 
-shutil.copytree('scripts/debian','./debian')
+
 if os.path.exists('RELEASE'):
 	VERSION=file('RELEASE').readline().strip()
 	UPDATE=(file('UPDATE').readline().strip() if os.path.exists('UPDATE') else '')
@@ -28,6 +28,16 @@ print 'version %s%s%s, priority %d'%(VERSION,SNAPSHOT,('%s%s'%(VERSION,UPDATE) i
 open('VERSION','w').write(VERSION+'\n')
 _VERSION='-'+VERSION #used in templates
 
+
+# rename a current folder and create orig.tar.gz
+curName = os.path.basename(os.path.abspath(''))
+newName = 'yade-%s' % (VERSION)
+os.rename (('../'+curName), '../'+newName)
+shutil.rmtree('.bzr')
+os.system(('tar -czf ../yade-%s_%s.orig.tar.gz ../'+os.path.basename(os.path.abspath(''))+'/')%(VERSION,VERSION))
+shutil.copytree('scripts/debian','./debian')
+
+
 # control files
 def copyReplace(f1,f2):
 	"Copy file f1 to f2, evaluating all occurences of @...@ with eval(); they should expand to a string and can contain arbitrary python expressions."
@@ -51,23 +61,15 @@ os.system('cp debian/yade32x32.xpm debian/yade-%s_32x32.xpm'%VERSION)
 
 # package is yade-0.50, but with UPDATE .1, it is version 0.50.1
 
-# rename a current folder and create orig.tar.gz
-curName = os.path.basename(os.path.abspath(''))
-newName = 'yade-%s_%s1' % (VERSION,DISTRIBUTION)
-os.rename (('../'+curName), '../'+newName)
-shutil.rmtree('.bzr')
-os.system(('tar -czf ../yade-%s_%s1.orig.tar.gz ../'+os.path.basename(os.path.abspath(''))+'/')%(VERSION,DISTRIBUTION))
-
-
 # write debian/changelog
 try:
 	open('debian/changelog','w').write(
-	'''yade-%s (%s1) %s; urgency=low
+	'''yade-%s (%s-1) %s; urgency=low
 
   * Automatic debian changelog entry for yade-%s
 
  -- %s <%s>  %s
-'''%(VERSION,DISTRIBUTION,DISTRIBUTION,VERSION,os.environ['DEBFULLNAME'],os.environ['DEBEMAIL'],time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
+'''%(VERSION,VERSION,DISTRIBUTION,VERSION,os.environ['DEBFULLNAME'],os.environ['DEBEMAIL'],time.strftime("%a, %d %b %Y %H:%M:%S +0000",time.gmtime())))
 except KeyError:
 	print "Please, set DEBEMAIL and DEBFULLNAME as described here http://www.debian.org/doc/maint-guide/ch-first.en.html"
 
