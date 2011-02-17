@@ -73,7 +73,7 @@ FlowBoundingSphere::FlowBoundingSphere()
 	fictious_vertex = 0;
 	SectionArea = 0, Height=0, Vtotale=0;
 	vtk_infinite_vertices=0, vtk_infinite_cells=0;
-
+	VISCOSITY = 1;
 	tess_based_force = true;
 	for (int i=0;i<6;i++) boundsIds[i] = 0;
 	minPermLength=-1;
@@ -304,6 +304,7 @@ void FlowBoundingSphere::Average_Cell_Velocity()
         Point pos_av_facet;
         int num_cells = 0;
         double facet_flow_rate = 0;
+	double volume_facet_translation = 0;
         std::ofstream oFile ( "Average_Cells_Velocity",std::ios::app );
 	Real tVel=0; Real tVol=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -311,6 +312,7 @@ void FlowBoundingSphere::Average_Cell_Velocity()
 		cell->info().av_vel() =CGAL::NULL_VECTOR;
                 num_cells++;
                 for ( int i=0; i<4; i++ ) {
+		  volume_facet_translation = 0;
 		  if (!Tri.is_infinite(cell->neighbor(i))){
                         Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
                         Real area = sqrt ( Surfk.squared_length() );
@@ -320,7 +322,8 @@ void FlowBoundingSphere::Average_Cell_Velocity()
                         pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
 // 		pos_av_facet=CGAL::ORIGIN + ((cell->vertex(facetVertices[i][0])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][1])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][2])->point() - CGAL::ORIGIN))*0.3333333333;
 			facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p());
-                        cell->info().av_vel() = cell->info().av_vel() + facet_flow_rate* ( pos_av_facet-CGAL::ORIGIN );
+			for (int y=0;y<3;y++) volume_facet_translation += (cell->info().facetVelocity())[i][y]*cell->info().facetSurfaces[i][y];
+                        cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate - volume_facet_translation) * ( pos_av_facet-CGAL::ORIGIN );
 		  }}
  		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
                 cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
@@ -387,24 +390,31 @@ void FlowBoundingSphere::Average_Fluid_Velocity()
 	  }}
 }
 
-double FlowBoundingSphere::Measure_bottom_Pore_Pressure()
+void FlowBoundingSphere::Measure_Pore_Pressure(double Wall_up_y, double Wall_down_y)
 {  
 	RTriangulation& Tri = T[currentTes].Triangulation();
         Cell_handle permeameter;
-
-        int intervals = 40;
-        double Rz = (z_max-z_min) /intervals;
+	std::ofstream capture ("Pressure_profile", std::ios::app);
+        int intervals = 5;
+	int captures = 6;
+        double Rz = (z_max-z_min)/intervals;
+	double Ry = (Wall_up_y-Wall_down_y)/captures;
 
 	double X=(x_max+x_min)/2;
-	double Y=y_min;
+	double Y = 0;
 	double pressure = 0.f;
 	int cell=0;
-        for (double Z=min(z_min,z_max); Z<=max(z_min,z_max); Z=Z+abs(Rz)) {
+// 	for (double Y=min(y_min,y_max); Y<=max(y_min,y_max); Y=Y+abs(Ry)) {cell=0; pressure=0.f;
+// 	for (double Y=Wall_down_y;Y<=Wall_up_y;Y+=Ry) {cell=0; pressure=0.f;
+	for (int i=0; i<captures; i++){
+        for (double Z=min(z_min,z_max); Z<=max(z_min,z_max); Z+=abs(Rz)) {
 		permeameter = Tri.locate(Point(X, Y, Z));
 		pressure+=permeameter->info().p();
 		cell++;
         }
-        return pressure/cell;
+        Y += Ry;
+        capture  << pressure/cell << endl;}
+	
 }
 
 void FlowBoundingSphere::ComputeFacetForces()
@@ -644,7 +654,7 @@ void FlowBoundingSphere::Compute_Permeability()
 
 	Cell_handle neighbour_cell;
 
-	double k=0, distance = 0, radius = 0, viscosity = 1;
+	double k=0, distance = 0, radius = 0, viscosity = VISCOSITY;
 	int NEG=0, POS=0, pass=0;
 
 	bool ref = Tri.finite_cells_begin()->info().isvisited;
@@ -1083,7 +1093,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         cout << "celle comunicanti in alto = " << cellQ1 << endl;}
 
         double density = 1;
-        double viscosity = 0.001;
+        double viscosity = VISCOSITY;
         double gravity = 9.80665;
         double Vdarcy = Q1/Section;
 //      double GradP = abs(P_Inf-P_Sup) /DeltaY;

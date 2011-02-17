@@ -68,7 +68,7 @@ class FlowBoundingSphere : public Network
 		bool tess_based_force; //allow the force computation method to be chosen from FlowEngine
 		Real minPermLength; //min branch length for Poiseuille
 
-		double P_SUP, P_INF, P_INS;
+		double P_SUP, P_INF, P_INS, VISCOSITY;
 
 		Tesselation& Compute_Action ( );
 		Tesselation& Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
@@ -112,7 +112,7 @@ class FlowBoundingSphere : public Network
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
-		double Measure_bottom_Pore_Pressure();
+		void Measure_Pore_Pressure(double Wall_up_y, double Wall_down_y);
 		
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)

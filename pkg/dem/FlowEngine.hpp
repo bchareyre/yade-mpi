@@ -33,6 +33,7 @@ class FlowEngine : public PartialEngine
 		bool currentTes;
 		int id_offset;
 	//	double IS;
+		double wall_up_y, wall_down_y;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
 		void Triangulate ();
@@ -81,6 +82,7 @@ class FlowEngine : public PartialEngine
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
 					((double,permeability_factor,1.0,,"a permability multiplicator"))
+					((double,viscosity,1.0,,"viscosity of fluid"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
 					((double, MaxPressure, 0,, "Maximal value of water pressure within the sample"))
@@ -89,7 +91,7 @@ class FlowEngine : public PartialEngine
 					((int, intervals, 30,, "Number of layers for pressure measurements"))
 					((int, useSolver, 0,, "Solver to use"))
 					((bool, liquefaction, false,,"Compute bottom_seabed_pressure if true, see below"))
-					((double, bottom_seabed_pressure,0,,"Fluid pressure measured at the bottom of the seabed on the symmetry axe"))
+// 					((double, bottom_seabed_pressure,0,,"Fluid pressure measured at the bottom of the seabed on the symmetry axe"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))

@@ -52,20 +52,15 @@ class Network
 		short id_offset;
 		int vtk_infinite_vertices, vtk_infinite_cells, num_particles;
 		
-// 		int F1, F2, Re1, Re2; //values between 0..3, refers to one cell's fictious(F)/real(Re) vertices
-// 		int facetRe1, facetRe2, facetRe3, facetF1, facetF2; //indices relative to the facet
 		int fictious_vertex;
-// 		bool facet_detected;
-		
-// 		void DisplayStatistics();
-// 		void AddBoundingPlanes(bool yade);
+
 		void AddBoundingPlanes();
 		void AddBoundingPlane (bool yade, Vecteur Normal, int id_wall);
 		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall );
-// 		void AddBoundingPlanes ( Real center[3], Real Extents[3], int id );
+
 		void Define_fictious_cells( );
 		int Detect_facet_fictious_vertices (Cell_handle& cell, int& j);
-// 		double Volume_Pore (Cell_handle cell);
+
 		double Volume_Pore_VoronoiFraction ( Cell_handle& cell, int& j);
 		double volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
 		double volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface);
