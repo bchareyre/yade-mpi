@@ -90,7 +90,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	Vector3r size;
 	bool hSizeFound =(hSize!=Matrix3r::Zero());//is hSize passed to the function?
 	if (!hSizeFound) {size=mx-mn; hSize=size.asDiagonal();}
-	if (hSizeFound && !periodic) throw invalid_argument("hSize can be defined only for periodic cells.");
+	if (hSizeFound && !periodic) LOG_WARN("hSize can be defined only for periodic cells.");
 	Matrix3r invHsize =hSize.inverse();
 	Real volume=hSize.determinant();
 	if (!volume) throw invalid_argument("The box defined as null volume. Define at least maxCorner of the box, or hSize if periodic.");
@@ -188,7 +188,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 					Real nextPoro = porosity+(1-porosity)/10.;
 					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
 					pack.clear();
-					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass,seed,hSize);}
+					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass,seed,hSizeFound?hSize:Matrix3r::Zero());}
 				else LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<".");
 			}
 			return i;}
