@@ -19,7 +19,7 @@ void BoundDispatcher::action()
 	updateScenePtr();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	const long numBodies=(long)bodies->size();
-	bool haveBins=(bool)velocityBins;
+	const long haveBins=((bool)velocityBins)?velocityBins->bodyBins.size():0;
 	if(sweepDist!=0 && haveBins){ LOG_FATAL("Only one of sweepDist or velocityBins can used!"); abort(); }
 	//#pragma omp parallel for
 	for(int id=0; id<numBodies; id++){
@@ -43,7 +43,7 @@ void BoundDispatcher::action()
 		}
 		if(haveBins){
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
-			Real sweep=velocityBins->bins[velocityBins->bodyBins[b->getId()]].maxDist;
+			Real sweep=(b->getId()<haveBins)?velocityBins->bins[velocityBins->bodyBins[b->getId()]].maxDist:0;
 			aabb->min-=Vector3r(sweep,sweep,sweep);
 			aabb->max+=Vector3r(sweep,sweep,sweep);
 		}
