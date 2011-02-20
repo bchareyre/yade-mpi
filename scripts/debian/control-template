@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Homepage: https://launchpad.net/yade
 Maintainer: Anton Gladky <gladky.anton@gmail.com>
-Build-Depends: debhelper (>= 5), scons, freeglut3-dev, libboost-dev (>=1.35), libboost-date-time-dev (>=1.35), libboost-filesystem-dev (>=1.35), libboost-thread-dev (>=1.35), libboost-regex-dev (>=1.35), libboost-python-dev (>=1.35), libboost-iostreams-dev (>=1.35), libboost-program-options-dev, python-support, libboost-serialization-dev, libloki-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libgts-dev, python-numpy, g++(>>4.0), libvtk5-dev, libgl1-mesa-dev, gdb, python-matplotlib, python-tk, libeigen2-dev, libqglviewer-qt4-dev , binutils-gold , texlive-latex-recommended, texlive-latex-extra, lmodern, texlive-pictures, texlive-xetex, python-sphinx (>=0.99), python-bibtex, graphviz, dvipng, python-xlib, python-qt4, pyqt4-dev-tools, clang, libjs-jquery
+Build-Depends: debhelper (>= 5), scons, freeglut3-dev, libboost-dev (>=1.35), libboost-date-time-dev (>=1.35), libboost-filesystem-dev (>=1.35), libboost-thread-dev (>=1.35), libboost-regex-dev (>=1.35), libboost-python-dev (>=1.35), libboost-iostreams-dev (>=1.35), libboost-program-options-dev, python-support, libboost-serialization-dev, libloki-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libgts-dev, python-numpy, g++(>>4.0), libvtk5-dev, libgl1-mesa-dev, gdb, python-matplotlib, python-tk, libeigen2-dev, libqglviewer-qt4-dev , binutils-gold , texlive-latex-recommended, texlive-latex-extra, lmodern, texlive-pictures, texlive-xetex, python-sphinx (>=1.069), python-bibtex, graphviz, dvipng, python-xlib, python-qt4, pyqt4-dev-tools, clang, libjs-jquery
 Standards-Version: 3.9.1
 
 Package: yade@_VERSION@
