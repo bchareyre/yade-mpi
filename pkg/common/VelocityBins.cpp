@@ -12,7 +12,7 @@ CREATE_LOGGER(VelocityBins);
 bool VelocityBins::checkSize_incrementDists_shouldCollide(const Scene* scene){
 	// number of particles increased, recollision necessary
 	// smaller number of particles is handled in setBins
-	if(bodyBins.size()>scene->bodies->size()) { bodyBins.resize(scene->bodies->size(),/* put new particles to the slowest bin*/ bins.size()-1); return true; }
+	if(bodyBins.size()<scene->bodies->size()) { bodyBins.resize(scene->bodies->size(),/* put new particles to the slowest bin*/ bins.size()-1); return true; }
 	int i=0;
 	const Real& dt=scene->dt;
 	FOREACH(Bin& bin, bins){
