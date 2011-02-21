@@ -9,12 +9,18 @@ Packages
 
 Packages are (as of now) provided for several Ubuntu versions from `Yade package archive <https://launchpad.net/~yade-users/+archive/ppa>`_. Different version of Yade can be installed alongisde each other. The ``yade`` vitual package always depends on the latest stable package, while ``yade-snapshot`` will pull the latest snapshot package. To install quickly, run the following::
 
-	sudo add-apt-repository ppa:yade-users/ppa 
+	sudo add-apt-repository ppa:yade-pkg/stable       # for stable releases 
 	sudo add-apt-repository ppa:yade-users/external   # optional (updates of other packages)
 	sudo apt-get update
 	sudo apt-get install yade
 
 More detailed instructions are available at the `archive page <https://launchpad.net/~yade-users/+archive/ppa>`_
+
+For latest builds from trunk, add the following PPA::
+	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest releases 
+	sudo apt-get update
+	sudo apt-get install yade-bzr...
+
 
 Source code
 ------------
