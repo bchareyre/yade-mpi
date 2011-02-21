@@ -17,10 +17,10 @@ Packages are (as of now) provided for several Ubuntu versions from `Yade package
 More detailed instructions are available at the `archive page <https://launchpad.net/~yade-users/+archive/ppa>`_
 
 For latest builds from trunk, add the following PPA::
+
 	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest releases 
 	sudo apt-get update
 	sudo apt-get install yade-bzr...
-
 
 Source code
 ------------
