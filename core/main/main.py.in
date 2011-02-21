@@ -23,7 +23,7 @@ else:
 import optparse
 par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog=os.path.basename(sys.argv[0]),version='%s (%s; %s)'%(version,','.join(features),buildsAvailable),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s, %s)."%(version,','.join(features),buildsAvailable))
 par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
-par.add_option('--cores',help='Set number of OpenMP threads (as --threads) and in addition set affinity of threads to the cores given.',dest='cores',type='string')
+par.add_option('--cores',help='Set number of OpenMP threads (as \-\-threads) and in addition set affinity of threads to the cores given.',dest='cores',type='string')
 par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
 par.add_option('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')

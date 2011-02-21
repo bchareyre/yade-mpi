@@ -58,7 +58,7 @@ class CylScGeom: public ScGeom{
 		virtual ~CylScGeom ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CylScGeom,ScGeom,"Geometry of a cylinder-sphere contact.",
 		((bool,onNode,false,,"contact on node?"))
-		((int,isDuplicate,0,,"this flag is turned true (1) automaticaly if the contact is shared between two chained cylinders. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
+		((int,isDuplicate,0,,"this flag is turned true (1) automatically if the contact is shared between two chained cylinders. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
 		((int,trueInt,-1,,"Defines the body id of the cylinder where the contact is real, when :yref:`CylScGeom::isDuplicate`>0."))
 		((Vector3r,start,Vector3r::Zero(),,"position of 1st node |yupdate|"))
 		((Vector3r,end,Vector3r::Zero(),,"position of 2nd node |yupdate|"))

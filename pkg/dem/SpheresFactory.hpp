@@ -12,7 +12,7 @@ class SpheresFactory: public GlobalEngine {
 	public:
 		virtual void action();
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(SpheresFactory,GlobalEngine,"Engine for spitting spheres based on mass flow rate, particle size distribution etc. Initial velocity of particles is given by *vMin*, *vMax*, the *massFlowRate* determines how many particles to generate at each step. When *goalMass* is attained or positive *maxParticles* is reached, the engine does not produce particles anymore. Geometry of the region should be defined in a derived engine by overriden SpheresFactory::pickRandomPosition(). \n\nA sample script for this engine is in :ysrc:`scripts/spheresFactory.py`.",
+	YADE_CLASS_BASE_DOC_ATTRS(SpheresFactory,GlobalEngine,"Engine for spitting spheres based on mass flow rate, particle size distribution etc. Initial velocity of particles is given by *vMin*, *vMax*, the *massFlowRate* determines how many particles to generate at each step. When *goalMass* is attained or positive *maxParticles* is reached, the engine does not produce particles anymore. Geometry of the region should be defined in a derived engine by overridden SpheresFactory::pickRandomPosition(). \n\nA sample script for this engine is in :ysrc:`scripts/spheresFactory.py`.",
 		((Real,massFlowRate,NaN,,"Mass flow rate [kg/s]"))
 		((Real,rMin,NaN,,"Minimum radius of generated spheres (uniform distribution)"))
 		((Real,rMax,NaN,,"Maximum radius of generated spheres (uniform distribution)"))
