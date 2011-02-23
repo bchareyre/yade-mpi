@@ -6,13 +6,13 @@ Creating packings and filling volumes defined by boundary representation or cons
 
 For examples, see
 
-* :ysrc:`scripts/test/gts-horse.py`
 * :ysrc:`scripts/test/gts-operators.py`
 * :ysrc:`scripts/test/gts-random-pack-obb.py`
 * :ysrc:`scripts/test/gts-random-pack.py`
 * :ysrc:`scripts/test/pack-cloud.py`
 * :ysrc:`scripts/test/pack-predicates.py`
-* :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`
+* :ysrc:`examples/packs/packs.py`
+* :ysrc:`examples/gts-horse/gts-horse.py`
 * :ysrc:`examples/WireMatPM/wirepackings.py`
 """
 

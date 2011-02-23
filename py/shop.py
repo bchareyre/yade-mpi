@@ -10,7 +10,7 @@ import utils,math,numpy
 
 #spheresPackDimensions==================================================
 def spheresPackDimensions(idSpheres):
-	"""The function accepts the list of spheres idSpheres, and calculates max and min dimensions.
+	"""The function accepts the list of spheres id's or list of bodies, and calculates max and min dimensions.
 
 	:param list idSpheres: list of spheres
 	
@@ -34,9 +34,16 @@ def spheresPackDimensions(idSpheres):
 	
 		
 	for i in idSpheres:
-		spherePosition=O.bodies[i].state.pos
+		
 		try:
-			sphereRadius=O.bodies[i].shape.radius	#skip non-spheres
+			b = O.bodies[i]			#We have received a list of ID's
+		except TypeError: 
+			b = i								#We have recevied a list of bodies
+		
+		spherePosition=b.state.pos
+		
+		try:
+			sphereRadius=b.shape.radius	#skip non-spheres
 		except AttributeError: continue
 		
 		sphereRadiusVec3 = Vector3(sphereRadius,sphereRadius,sphereRadius)
@@ -47,10 +54,10 @@ def spheresPackDimensions(idSpheres):
 		for dim in range(0,3):
 			if ((sphereMax[dim]>max[dim]) or (counter==0)): 
 				max[dim]=sphereMax[dim]
-				maxId[dim] = i
+				maxId[dim] = b.id
 			if ((sphereMin[dim]<min[dim]) or (counter==0)): 
 				min[dim]=sphereMin[dim]
-				minId[dim] = i
+				minId[dim] = b.id
 		counter += 1
 	
 	center = (max-min)/2.0+min
