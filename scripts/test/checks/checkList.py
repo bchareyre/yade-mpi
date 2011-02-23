@@ -5,8 +5,10 @@ import math,os,sys
 #List your scripts here
 for script in ["checkTestDummy","checkTestTriax"]:
 	try:
+	 	print "###################################"
 		print "running: ",script
 		execfile(checksPath+"/"+script+".py")
+		print "___________________________________"
 	except:
 		print script," failure"
 	#this "else" is redundant with scriipt output, not needed
