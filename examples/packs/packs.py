@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from yade import pack,ymport,export,log,geom,shop
+from yade import pack,ymport,export,log,geom,bodiesHandling
 import math
 
 """ This script demonstrates how to use 2 components of creating packings:
@@ -71,10 +71,19 @@ oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
 SpheresID+=O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,0.0),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
 
 #Demonstration of spheresPackDimensions function. The "Edge" particles are colored with blue color
-geometryParameters = shop.spheresPackDimensions(SpheresID)
+geometryParameters = bodiesHandling.spheresPackDimensions(SpheresID)
 for v in [geometryParameters['minId'],geometryParameters['maxId']]:
 	for i in v:
 		O.bodies[int(i)].shape.color = Vector3(0,0,1)
+
+#Example of bodiesHandling.spheresModify()
+hat=O.bodies.append(pack.regularOrtho(pack.inCylinder((0,0,6),(0,0,7),20*rad),radius=0.2,gap=0,color=(1,0,0))) # hat
+oriBody = Quaternion(Vector3(0,1,0),(math.pi/8))
+hat_upper=O.bodies.append(bodiesHandling.spheresModify(hat,shift=(0.0,0.0,1.4),scale=0.7,orientation=oriBody,copy=True))		#Duplicate the "heart", shifting, scaling and rotating it
+
+#change the color of upper part of the hat
+for hatTmp in hat_upper:
+	O.bodies[hatTmp].shape.color=(0.9,0.5,0.59)
 
 
 #facetBunker Demonstration
