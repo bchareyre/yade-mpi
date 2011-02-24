@@ -13,6 +13,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}
 
 BuildRequires:  scons, freeglut-devel, boost-devel >= 1.35, boost-date-time >= 1.35, boost-filesystem >= 1.35, boost-thread >= 1.35, boost-regex >= 1.35, fakeroot, gcc, gcc-c++ > 4.0, boost-iostreams >= 1.35, log4cxx, log4cxx-devel, python-devel, boost-python >= 1.35, ipython, python-matplotlib, sqlite-devel, python-numeric, graphviz-python, vtk-devel, ScientificPython, bzr, eigen2-devel, libQGLViewer-devel, loki-lib-devel, python-xlib, PyQt4, PyQt4-devel, ScientificPython-tk, gnuplot, doxygen, gts-devel, texlive-xetex, texlive-latex
 Requires:       ScientificPython, python-numeric, ipython, ScientificPython-tk, PyQt4, gnuplot
+Requires(post): info
+Requires(preun): info
 
 %description 
 Platform for discrete element modeling.
@@ -65,12 +67,12 @@ YADE_PREFIX=%{buildroot}/usr %{buildroot}/usr/bin/%{name}-batch --generate-manpa
 cd ../..;
 
 mkdir -p %{buildroot}%{_docdir}/%{name}
-mkdir -p %{buildroot}%{_mandir}
+mkdir -p %{buildroot}%{_mandir}/man1
 mv %_builddir/%{name}-%{version}/doc/sphinx/_build/html %{buildroot}%{_docdir}/%{name}
 mv %_builddir/%{name}-%{version}/doc/sphinx/_build/latex/Yade.pdf %{buildroot}%{_docdir}/%{name}
 mv %_builddir/%{name}-%{version}/examples %{buildroot}%{_docdir}/%{name}
-mv %_builddir/%{name}-%{version}/doc/sphinx/_build/latex/yade-%{version}.1 %{buildroot}%{_mandir}
-mv %_builddir/%{name}-%{version}/doc/sphinx/_build/latex/yade-%{version}-batch.1 %{buildroot}%{_mandir}
+mv %_builddir/%{name}-%{version}/doc/sphinx/_build/latex/yade-%{version}.1 %{buildroot}%{_mandir}/man1/
+mv %_builddir/%{name}-%{version}/doc/sphinx/_build/latex/yade-%{version}-batch.1 %{buildroot}%{_mandir}/man1/
 
 %clean
 rm -rf %{buildroot}
@@ -84,8 +86,7 @@ rm -rf %{_builddir}/*
 %{_libdir}/%{name}/lib/*
 %{_libdir}/%{name}/plugins/*
 %{_libdir}/%{name}/py/*
-%{_mandir}/yade-%{version}.1
-%{_mandir}/yade-%{version}-batch.1
+%doc %{_mandir}/*
 
 %files dbg
 %defattr(-,root,root,-)
@@ -94,10 +95,12 @@ rm -rf %{_builddir}/*
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/%{name}/*
+%doc %{_docdir}/%{name}/*
 
 %check
 YADE_PREFIX=%{buildroot}/usr %{buildroot}/usr/bin/%{name} --test
 YADE_PREFIX=%{buildroot}/usr %{buildroot}/usr/bin/%{name} --debug --test
 
 %changelog
+* Wed Feb 23 2011 Anton Gladky <gladky.anton@gmail.com> 0.60-1
+- Initial packaging
