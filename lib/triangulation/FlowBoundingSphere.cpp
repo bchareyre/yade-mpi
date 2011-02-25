@@ -194,7 +194,7 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         Compute_Permeability();
         clock.top("Compute_Permeability");
         /** END PERMEABILITY CALCULATION**/
-	
+
 	if(DEBUG_OUT) cerr << "TOTAL VOID VOLUME: " << Vporale <<endl;
 	if(DEBUG_OUT) cerr << "Porosity = " << V_porale_porosity / V_totale_porosity << endl;
 
@@ -639,6 +639,7 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
         /*CALCULATION OF VORONOI CENTRES*/
 //        if ( !NewTes.Computed() ) NewTes.Compute();
         for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
+		if (new_cell->info().Pcondition) continue;
                 old_cell = Tri.locate((Point) new_cell->info());
                 new_cell->info().p() = old_cell->info().p();
         }
@@ -874,12 +875,10 @@ double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j)
 	//         if (DEBUG_OUT) std::cerr << "total facet surface "<< cell->info().facetSurfaces[j] << " with solid sectors : " << cell->info().facetSphereCrossSections[j][0] << " " << cell->info().facetSphereCrossSections[j][1] << " " << cell->info().facetSphereCrossSections[j][2] << " difference "<<sqrt(cell->info().facetSurfaces[j].squared_length())-cell->info().facetSphereCrossSections[j][0]-cell->info().facetSphereCrossSections[j][2]-cell->info().facetSphereCrossSections[j][1]<<endl;
 // cerr << "test14" << endl;
 	//handle symmetry (tested ok)
-	if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0)
-	{
+	if (SLIP_ON_LATERALS && fictious_vertex>0) {
 		//! Include a multiplier so that permeability will be K/2 or K/4 in symmetry conditions
 		Real mult= fictious_vertex==1 ? multSym1 : multSym2;
-		return Vpore/Ssolid*mult;
-	}
+		return Vpore/Ssolid*mult;}
 // 	cerr << "test15" << endl;
 	return Vpore/Ssolid;
 }
@@ -904,6 +903,12 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
 			{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;}
                 }
         }
+        for (int n=0; n<imposedP.size();n++) {
+		Cell_handle cell=Tri.locate(imposedP[n].first);
+// 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
+// 		assert(cell);
+		cell->info().p()=imposedP[n].second;
+		cell->info().Pcondition=true;}
 }
 
 void FlowBoundingSphere::GaussSeidel()

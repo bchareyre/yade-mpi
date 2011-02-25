@@ -43,6 +43,7 @@ class FlowBoundingSphere : public Network
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
+		vector<pair<Point,Real> > imposedP;
 
 		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
 
