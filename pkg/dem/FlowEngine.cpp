@@ -19,6 +19,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+int dd=0;
+
 CREATE_LOGGER (FlowEngine);
 
 FlowEngine::~FlowEngine()
@@ -54,7 +56,7 @@ void FlowEngine::action()
 	currentStrain = triaxialCompressionEngine->strain[1];
 
 	timingDeltas->start();
-	
+
 	if (first) Build_Triangulation(P_zero);
 	timingDeltas->checkpoint("Triangulating");
 
@@ -110,7 +112,7 @@ void FlowEngine::action()
 			std::ofstream settle("settle.txt", std::ios::app);
 			settle << j << " " << time << " " << currentStrain << endl;
 		}
-		
+
 		if (slice_pressures){
 			char slifile [30];
 			mkdir("./Slices", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -120,23 +122,20 @@ void FlowEngine::action()
 			char *f = "slifile";
 			flow->SliceField(f);
 		}
-		
-		if (save_vtk) {flow->save_vtk_file();}
+		if (save_vtk &&dd++>50) {flow->save_vtk_file(); dd=0;}
 	}
 // 	if ( scene->iter % PermuteInterval == 0 )
 // 	{ Update_Triangulation = true; }
 
 	if (Update_Triangulation && !first) {
 		Build_Triangulation();
-		Update_Triangulation = false;
-	}
-
+		Update_Triangulation = false;}
+		
 	if (velocity_profile) /*flow->FluidVelocityProfile();*/flow->Average_Fluid_Velocity();
 	if (first && liquefaction){
 	  wall_up_y = flow->y_max;
 	  wall_down_y = flow->y_min;}
 	if (liquefaction) flow->Measure_Pore_Pressure(wall_up_y, wall_down_y);
-
 	first=false;
 // }
 }
@@ -156,6 +155,24 @@ void FlowEngine::BoundaryConditions()
 	flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
 	flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
 	flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
+}
+
+
+void FlowEngine::imposePressure(Vector3r pos, Real p)
+{
+	flow->imposedP.push_back( pair<CGT::Point,Real>(CGT::Point(pos[0],pos[1],pos[2]),p) );
+}
+
+void FlowEngine::clearImposedPressure() { flow->imposedP.clear();}
+
+Real FlowEngine::getFlux(int cond) {
+	if (cond>=flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
+	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+	double flux=0;
+	CGT::Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
+	for (int ngb=0;ngb<4;ngb++) {
+		if (!cell->neighbor(ngb)->info().Pcondition) flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
+	return flux;
 }
 
 
@@ -188,14 +205,14 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	Triangulate ( );
 	if (Debug) cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
-	
+
 	flow->Define_fictious_cells();
 	flow->DisplayStatistics ();
 
 	flow->meanK_LIMIT = meanK_correction;
 	flow->meanK_STAT = meanK_opt;
 	flow->Compute_Permeability ( );
-	
+
 	porosity = flow->V_porale_porosity/flow->V_totale_porosity;
 
 	if (first)
@@ -251,28 +268,28 @@ void FlowEngine::AddBoundary ()
 			flow->z_max = max ( flow->z_max, z+rad);
 		}
 	}
-	
+
 	id_offset = flow->T[flow->currentTes].max_id+1;
-	
+
 	flow->id_offset = id_offset;
-	
+
 	flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
 	flow->Vtotale = (flow->x_max-flow->x_min) * (flow->y_max-flow->y_min) * (flow->z_max-flow->z_min);
-	
+
 	flow->y_min_id=triaxialCompressionEngine->wall_bottom_id;
 	flow->y_max_id=triaxialCompressionEngine->wall_top_id;
 	flow->x_max_id=triaxialCompressionEngine->wall_right_id;
 	flow->x_min_id=triaxialCompressionEngine->wall_left_id;
 	flow->z_min_id=triaxialCompressionEngine->wall_back_id;
 	flow->z_max_id=triaxialCompressionEngine->wall_front_id;
-	
+
 	flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
 	flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
 	flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
 	flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
 	flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
-	flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;	
-	
+	flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;
+
 	//FIXME: Id's order in boundsIds is done according to the enumerotation of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
 	flow->boundsIds[0]= &flow->y_min_id;
         flow->boundsIds[1]= &flow->y_max_id;
@@ -280,12 +297,12 @@ void FlowEngine::AddBoundary ()
         flow->boundsIds[3]= &flow->x_max_id;
         flow->boundsIds[4]= &flow->z_max_id;
         flow->boundsIds[5]= &flow->z_min_id;
-	
+
 	wall_thickness = triaxialCompressionEngine->thickness;
-	
+
 	flow->Corner_min = CGT::Point(flow->x_min, flow->y_min, flow->z_min);
 	flow->Corner_max = CGT::Point(flow->x_max, flow->y_max, flow->z_max);
-	
+
 
 	if (Debug) {
 	cout << "Section area = " << flow->SectionArea << endl;
@@ -298,10 +315,10 @@ void FlowEngine::AddBoundary ()
 	cout << "z_min = " << flow->z_min << endl;
 	cout << "z_max = " << flow->z_max << endl;
 	cout << endl << "Adding Boundary------" << endl;}
-	
+
 	double center[3];
-	
-	for (int i=0; i<6; i++) 
+
+	for (int i=0; i<6; i++)
 	{
 	  CGT::Vecteur Normal (triaxialCompressionEngine->normal[i].x(), triaxialCompressionEngine->normal[i].y(), triaxialCompressionEngine->normal[i].z());
 	  if (flow->boundary(*flow->boundsIds[i]).useMaxMin) flow->AddBoundingPlane (true, Normal, *flow->boundsIds[i]);
@@ -309,7 +326,7 @@ void FlowEngine::AddBoundary ()
             const shared_ptr<Body>& wll = Body::byId ( *flow->boundsIds[i] , scene );
             for ( int h=0;h<3;h++ ){center[h] = wll->state->pos[h];}
             flow->AddBoundingPlane (center, wall_thickness, Normal,*flow->boundsIds[i]);}}
-            
+
 // 	flow->AddBoundingPlanes(true);
 
 }
@@ -451,7 +468,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
   	Real A[3]={0, 0, 0}, AS[3]={0, 0, 0}, AT[3]={0, 0, 0};
 	Real B[3]={0, 0, 0}, BS[3]={0, 0, 0}, BT[3]={0, 0, 0};
 	Real C[3]={0, 0, 0}, CS[3]={0, 0, 0}, CT[3]={0, 0, 0};
-	
+
 	int b[2];
 	Real Wall_coordinate[2];
 	int j=0;

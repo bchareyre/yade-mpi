@@ -48,12 +48,15 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell (CGT::Cell_handle cell);
 		void Oedometer_Boundary_Conditions();
 		void BoundaryConditions();
+		void imposePressure(Vector3r pos, Real p);
+		void clearImposedPressure();
+		Real getFlux(int cond);
 
 		virtual ~FlowEngine();
 
 		virtual void action();
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
@@ -111,7 +114,13 @@ class FlowEngine : public PartialEngine
 					((bool, LEFT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, FRONT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, BACK_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
-					,timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
+					,,
+					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+					,
+					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'.")
+					.def("clearImposedPressure",&FlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
+					.def("getFlux",&FlowEngine::getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+					)
 		DECLARE_LOGGER;
 };
 
