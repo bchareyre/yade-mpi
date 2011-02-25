@@ -51,6 +51,7 @@ class FlowEngine : public PartialEngine
 		void imposePressure(Vector3r pos, Real p);
 		void clearImposedPressure();
 		Real getFlux(int cond);
+		void saveVtk() {flow->save_vtk_file();}
 
 		virtual ~FlowEngine();
 
@@ -120,6 +121,7 @@ class FlowEngine : public PartialEngine
 					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'.")
 					.def("clearImposedPressure",&FlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("getFlux",&FlowEngine::getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					)
 		DECLARE_LOGGER;
 };

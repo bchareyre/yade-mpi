@@ -19,8 +19,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-int dd=0;
-
 CREATE_LOGGER (FlowEngine);
 
 FlowEngine::~FlowEngine()
@@ -122,7 +120,7 @@ void FlowEngine::action()
 			char *f = "slifile";
 			flow->SliceField(f);
 		}
-		if (save_vtk &&dd++>50) {flow->save_vtk_file(); dd=0;}
+		if (save_vtk) {flow->save_vtk_file();}
 	}
 // 	if ( scene->iter % PermuteInterval == 0 )
 // 	{ Update_Triangulation = true; }
