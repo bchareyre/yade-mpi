@@ -3,7 +3,7 @@
 # laptop.
 
 O.bodies.append(
-	geom.facetBox(center=(0,0,.1),extents=(.5,.5,.1),wallMask=31,color=(0,0,1))+
+	utils.facetBox(center=(0,0,.1),extents=(.5,.5,.1),wallMask=31,color=(0,0,1))+
 	[utils.sphere((0,0,.1),.04,color=(1,1,1))]
 )
 

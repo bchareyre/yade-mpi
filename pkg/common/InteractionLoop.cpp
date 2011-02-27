@@ -35,9 +35,11 @@ void InteractionLoop::action(){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;
 	}
+	/*
 	if(scene->interactions->dirty){
 		throw std::logic_error("InteractionContainer::dirty is true; the collider should re-initialize in such case and clear the dirty flag.");
 	}
+	*/
 	// update Scene* of the dispatchers
 	geomDispatcher->scene=physDispatcher->scene=lawDispatcher->scene=scene;
 	// ask dispatchers to update Scene* of their functors
