@@ -22,6 +22,8 @@ struct GLViewInfo{
 	Real sceneRadius;
 };
 
+class OpenGLRenderer;
+
 #define GL_FUNCTOR(Klass,typelist,renderedType) class Klass: public Functor1D<renderedType,void,typelist>{public:\
 	virtual ~Klass(){};\
 	virtual string renders() const { throw std::runtime_error(#Klass ": unregistered gldraw class.\n"); };\

@@ -2,9 +2,11 @@
 
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Gl1_NormPhys.hpp>
+#include<yade/pkg/common/OpenGLRenderer.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
+
 
 YADE_PLUGIN((Gl1_NormPhys));
 
@@ -68,8 +70,15 @@ void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>
 		// max(r,0) handles r<0 which is the case for "radius" of the facet in Dem3DofGeom_FacetSphere
 		Vector3r cp=scene->isPeriodic? scene->cell->wrapShearedPt(geom->contactPoint) : geom->contactPoint;
 		Vector3r p1=cp-max(geom->refR1,0.)*geom->normal;
-		Vector3r relPos=/*p2*/(cp+max(geom->refR2,0.)*geom->normal)-p1;
-		Real dist=max(geom->refR1,0.)+max(geom->refR2,0.);
+		Vector3r p2=cp+max(geom->refR2,0.)*geom->normal;
+		const Vector3r& dispScale=scene->renderer ? scene->renderer->dispScale : Vector3r::Ones(); 
+		if(dispScale!=Vector3r::Ones()){
+			// move p1 and p2 by the same amounts as particles themselves would be moved
+			p1+=dispScale.cwise()*Vector3r(b1->state->pos-b1->state->refPos);
+			p2+=dispScale.cwise()*Vector3r(b2->state->pos-b2->state->refPos);
+		}
+		Vector3r relPos=p2-p1;
+		Real dist=relPos.norm(); //max(geom->refR1,0.)+max(geom->refR2,0.);
 	#endif
 
 

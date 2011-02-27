@@ -515,13 +515,16 @@ void GLViewer::draw()
 			}
 			renderer->clipPlaneSe3[manipulatedClipPlane]=newSe3;
 		}
-		renderer->render(Omega::instance().getScene(), selectedName());
+		const shared_ptr<Scene>& scene=Omega::instance().getScene();
+		scene->renderer=renderer;
+		renderer->render(scene, selectedName());
 	}
 }
 
 void GLViewer::drawWithNames(){
 	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
 	const shared_ptr<Scene> scene(Omega::instance().getScene());
+	scene->renderer=renderer;
 	renderer->scene=scene;
 	renderer->renderShape();
 }

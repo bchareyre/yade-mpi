@@ -60,8 +60,10 @@ class InteractionContainer: public Serializable{
 		// used only during serialization/deserialization
 		vector<shared_ptr<Interaction> > interaction;
 	public:
+		// flag for notifying the collider that persistent data should be invalidated
+		bool dirty;
 		// required by the class factory... :-|
-		InteractionContainer(): currSize(0),serializeSorted(false),iterColliderLastRun(-1){
+		InteractionContainer(): currSize(0),dirty(false),serializeSorted(false),iterColliderLastRun(-1){
 			bodies=NULL;
 			#ifdef YADE_OPENMP
 				threadsPendingErase.resize(omp_get_max_threads());
@@ -159,7 +161,7 @@ class InteractionContainer: public Serializable{
 	void postSave(InteractionContainer&);
 
 
-	REGISTER_ATTRIBUTES(Serializable,(interaction)(serializeSorted));
+	REGISTER_ATTRIBUTES(Serializable,(interaction)(serializeSorted)(dirty));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
 REGISTER_SERIALIZABLE(InteractionContainer);

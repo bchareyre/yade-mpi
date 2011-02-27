@@ -33,6 +33,7 @@ void InteractionContainer::clear(){
 	linIntrs.clear(); // clear the linear container
 	pendingErase.clear();
 	currSize=0;
+	dirty=true;
 }
 
 

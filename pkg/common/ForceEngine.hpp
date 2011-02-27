@@ -38,4 +38,13 @@ class InterpolatingDirectedForceEngine: public ForceEngine{
 };
 REGISTER_SERIALIZABLE(InterpolatingDirectedForceEngine);
 
-
+struct RadialForceEngine: public PartialEngine{
+	virtual void action();
+	virtual void postLoad(RadialForceEngine&);
+	YADE_CLASS_BASE_DOC_ATTRS(RadialForceEngine,PartialEngine,"Apply force of given magnitude directed away from spatial axis.",
+		((Vector3r,axisPt,Vector3r::Zero(),,"Point on axis"))
+		((Vector3r,axisDir,Vector3r::UnitX(),Attr::triggerPostLoad,"Axis direction (normalized automatically)"))
+		((Real,fNorm,0,,"Applied force magnitude"))
+	);
+};
+REGISTER_SERIALIZABLE(RadialForceEngine);

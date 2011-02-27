@@ -26,6 +26,9 @@
 
 
 class Bound;
+#ifdef YADE_OPENGL
+	class OpenGLRenderer;
+#endif
 
 class Scene: public Serializable{
 	public:
@@ -53,6 +56,10 @@ class Scene: public Serializable{
 		bool timeStepperActivate(bool activate);
 
 		shared_ptr<Engine> engineByName(const string& s);
+
+		#ifdef YADE_OPENGL
+			shared_ptr<OpenGLRenderer> renderer;
+		#endif
 
 		void postLoad(Scene&);
 

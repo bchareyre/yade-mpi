@@ -50,7 +50,7 @@ using namespace std;
 namespace yade{
 	namespace Attr{
 		// keep in sync with py/wrapper/yadeWrapper.cpp !
-		enum flags { noSave=1, readonly=2, triggerPostLoad=4, hidden=8, noResize=16, };
+		enum flags { noSave=1, readonly=2, triggerPostLoad=4, hidden=8, noResize=16 };
 	};
 };
 using namespace yade;

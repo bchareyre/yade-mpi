@@ -106,6 +106,7 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 			if(fastestBodyMaxDist>=verletDist) return true;
 		}
 		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
+		if(scene->interactions->dirty) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
 		scene->interactions->erasePending(*this,scene);
@@ -161,6 +162,12 @@ void InsertionSortCollider::action(){
 		// update bounds via boundDispatcher
 		boundDispatcher->scene=scene;
 		boundDispatcher->action();
+
+		// if interactions are dirty, force reinitialization
+		if(scene->interactions->dirty){
+			doInitSort=true;
+			scene->interactions->dirty=false;
+		}
 
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();

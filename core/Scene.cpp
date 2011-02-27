@@ -74,10 +74,14 @@ void Scene::moveToNextTimeStep(){
 		checkStateTypes();
 		forces.resize(bodies->size()); // optimization, not necessary
 	}
-	// substepping or not, update engines from _nextEngines, if defined
-	if(!_nextEngines.empty() && subStep<0){
+	// substepping or not, update engines from _nextEngines, if defined, at the beginning of step
+	// subStep can be 0, which happens if simulations is saved in the middle of step (without substepping)
+	// this assumes that prologue will not set _nextEngines, which is safe hopefully
+	if(!_nextEngines.empty() && (subStep<0 || (subStep<=0 && !subStepping))){
 		engines=_nextEngines;
 		_nextEngines.clear();
+		// hopefully this will not break in some margin cases (subStepping with setting _nextEngines and such)
+		subStep=-1;
 	}
 	if(likely(!subStepping && subStep<0)){
 		/* set substep to 0 during the loop, so that engines/nextEngines handler know whether we are inside the loop currently */

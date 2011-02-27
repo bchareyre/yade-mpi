@@ -33,9 +33,9 @@ try:
 	rr=qt.Renderer()
 	rr.intrGeom=True
 	Gl1_L6Geom.phiScale=30; Gl1_L3Geom.uScale=20
-	O.engines=O.engines+[
-		qt.SnapshotEngine(fileBase=O.tmpFilename(),label='snapper',iterPeriod=300,deadTimeout=20),
-		PyRunner(iterPeriod=330000,command='utils.makeVideo(snapper.snapshots,out="beam-l6geom.avi"); snapper.dead=True; O.pause()')
-	]
+	#O.engines=O.engines+[
+	#	qt.SnapshotEngine(fileBase=O.tmpFilename(),label='snapper',iterPeriod=300,deadTimeout=20),
+	#	PyRunner(iterPeriod=330000,command='utils.makeVideo(snapper.snapshots,out="beam-l6geom.avi"); snapper.dead=True; O.pause()')
+	#]
 except ImportError: pass
 O.run()
