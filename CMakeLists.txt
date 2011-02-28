@@ -27,8 +27,13 @@ find_package(VTK COMPONENTS Common REQUIRED)
 
 add_definitions(-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast)
 
+IF (NOT LIB_EIGEN_PATH)
+ SET(LIB_EIGEN_PATH "/usr/include/eigen2")
+ MESSAGE("Headers of eigen library will be included from  ${CHUNKSIZE}, if you want to override it use -DLIB_EIGEN_PATH option.")
+ENDIF (NOT LIB_EIGEN_PATH)
+
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(/usr/include/eigen2)
+INCLUDE_DIRECTORIES(${LIB_EIGEN_PATH})
 INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 
