@@ -58,6 +58,9 @@ class Shop{
 
 		//! Estimate timestep based on P-wave propagation speed
 		static Real PWaveTimeStep(const shared_ptr<Scene> rb=shared_ptr<Scene>());
+		
+		//! Estimate timestep based on Rayleigh-wave propagation speed
+		static Real RayleighWaveTimeStep(const shared_ptr<Scene> rb=shared_ptr<Scene>());
 
 		//! return 2d coordinates of a 3d point within plane defined by rotation axis and inclination of spiral, wrapped to the 0th period
 		static boost::tuple<Real, Real, Real> spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0);

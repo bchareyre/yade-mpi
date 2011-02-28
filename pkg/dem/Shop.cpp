@@ -346,6 +346,26 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 	}
 	return dt;
 }
+
+/* Detremination of time step as according to Rayleigh wave speed of force propagation (see Thornton 2000, ref. MillerPursey_1955) */
+Real Shop::RayleighWaveTimeStep(const shared_ptr<Scene> _rb){
+	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
+	Real dt=std::numeric_limits<Real>::infinity();
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		if(!b || !b->material || !b->shape) continue;
+		
+		shared_ptr<ElastMat> ebp=dynamic_pointer_cast<ElastMat>(b->material);
+		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape);
+		if(!ebp || !s) continue;
+		
+		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
+		Real ShearModulus=ebp->young/(2.*(1+ebp->poisson));
+		Real lambda=0.1631*ebp->poisson+0.876605;
+		dt=min(dt,Mathr::PI*s->radius/lambda*sqrt(density/ShearModulus));
+	}
+	return dt;
+}
+
 /* Project 3d point into 2d using spiral projection along given axis;
  * the returned tuple is
  *
@@ -428,9 +448,9 @@ void Shop::getViscoelasticFromSpheresInteraction( Real tc, Real en, Real es, sha
  */
 Vector3r Shop::scalarOnColorScale(Real x, Real xmin, Real xmax){
 	Real xnorm=min((Real)1.,max((x-xmin)/(xmax-xmin),(Real)0.));
-	if(xnorm<.25) return Vector3r(0,4.*xnorm,1);
+	if(xnorm<.25) return Vector3r(0,.4*xnorm,1);
 	if(xnorm<.5)  return Vector3r(0,1,1.-4.*(xnorm-.25));
-	if(xnorm<.75) return Vector3r(4.*(xnorm-.5),1.,0);
+	if(xnorm<.75) return Vector3r(4*(xnorm-.5),1.,0);
 	return Vector3r(1,1-4*(xnorm-.75),0);
 }
 
@@ -533,7 +553,6 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive, bool splitNor
 	
 	// *** Normal stress tensor split into two parts according to subnetworks of strong and weak forces (or other distinction if a threshold value for the force is assigned) ***/
 	Real Fmean(0); Matrix3r f, fs, fw;
-	/// FIXME: this does not compute Fmean as it should?
 	fabricTensor(Fmean,f,fs,fw,false,compressionPositive,NaN);
 	Matrix3r sigNStrong(Matrix3r::Zero()), sigNWeak(Matrix3r::Zero());
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
