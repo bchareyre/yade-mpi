@@ -29,7 +29,7 @@ add_definitions(-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast)
 
 IF (NOT LIB_EIGEN_PATH)
  SET(LIB_EIGEN_PATH "/usr/include/eigen2")
- MESSAGE("Headers of eigen library will be included from  ${CHUNKSIZE}, if you want to override it use -DLIB_EIGEN_PATH option.")
+ MESSAGE("Headers of eigen library will be included from  ${LIB_EIGEN_PATH}, if you want to override it use -DLIB_EIGEN_PATH option.")
 ENDIF (NOT LIB_EIGEN_PATH)
 
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
