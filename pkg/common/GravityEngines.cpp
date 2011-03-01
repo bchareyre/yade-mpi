@@ -20,6 +20,7 @@ void GravityEngine::action(){
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 		// skip clumps, only apply forces on their constituents
 		if(!b || b->isClump()) continue;
+		if(mask!=0 && (b->groupMask & mask)==0) continue;
 		scene->forces.addForce(b->getId(),gravity*b->state->mass);
 		// work done by gravity is "negative", since the energy appears in the system from outside
 		if(trackEnergy) scene->energy->add(-gravity.dot(b->state->vel)*b->state->mass*dt,"gravWork",fieldWorkIx,/*non-incremental*/false);
@@ -30,6 +31,7 @@ void CentralGravityEngine::action(){
 	const Vector3r& centralPos=Body::byId(centralBody)->state->pos;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || b->isClump() || b->getId()==centralBody) continue; // skip clumps and central body
+		if(mask!=0 && (b->groupMask & mask)==0) continue;
 		Real F=accel*b->state->mass;
 		Vector3r toCenter=centralPos-b->state->pos; toCenter.normalize();
 		scene->forces.addForce(b->getId(),F*toCenter);
@@ -40,6 +42,7 @@ void CentralGravityEngine::action(){
 void AxialGravityEngine::action(){
 	FOREACH(const shared_ptr<Body>&b, *scene->bodies){
 		if(!b || b->isClump()) continue;
+		if(mask!=0 && (b->groupMask & mask)==0) continue;
 		/* http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html */
 		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;

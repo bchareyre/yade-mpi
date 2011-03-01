@@ -12,6 +12,7 @@ class GravityEngine: public FieldApplier{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GravityEngine,FieldApplier,"Engine applying constant acceleration to all bodies.",
 		((Vector3r,gravity,Vector3r::Zero(),,"Acceleration [kgms⁻²]"))
 		((int,gravPotIx,-1,(Attr::noSave|Attr::hidden),"Index for gravPot energy"))
+		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be affected by this engine. If 0, all bodies will be affected."))
 		,/*ctor*/,/*py*/
 	);
 };
@@ -29,6 +30,7 @@ class CentralGravityEngine: public FieldApplier {
 		((Body::id_t,centralBody,Body::ID_NONE,,"The :yref:`body<Body>` towards which all other bodies are attracted."))
 		((Real,accel,0,,"Acceleration magnitude [kgms⁻²]"))
 		((bool,reciprocal,false,,"If true, acceleration will be applied on the central body as well."))
+		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be affected by this engine. If 0, all bodies will be affected."))
 		,,
 	);
 };
@@ -44,6 +46,7 @@ class AxialGravityEngine: public FieldApplier {
 		((Vector3r,axisPoint,Vector3r::Zero(),,"Point through which the axis is passing."))
 		((Vector3r,axisDirection,Vector3r::UnitX(),,"direction of the gravity axis (will be normalized automatically)"))
 		((Real,acceleration,0,,"Acceleration magnitude [kgms⁻²]"))
+		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be affected by this engine. If 0, all bodies will be affected."))
 	);
 };
 REGISTER_SERIALIZABLE(AxialGravityEngine);
