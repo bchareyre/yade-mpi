@@ -435,6 +435,17 @@ py::tuple Shop__normalShearStressTensors(bool compressionPositive=false, bool sp
 
 py::tuple Shop__getStressLWForEachBody(bool revertSign=false){return Shop::getStressLWForEachBody(revertSign);}
 
+Real shiftBodies(py::list ids, const Vector3r& shift){
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	size_t len=py::len(ids);
+	for(size_t i=0; i<len; i++){
+		const Body* b=(*rb->bodies)[py::extract<int>(ids[i])].get();
+		if(!b) continue;
+		b->state->pos+=shift;
+	}
+	return 1;
+}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -481,4 +492,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("fabricTensor",Shop__fabricTensor,(py::args("splitTensor")=false,py::args("revertSign")=false,py::args("thresholdForce")=NaN),"Compute the fabric tensor of the periodic cell. The original paper can be found in [Satake1982]_.\n\n:param bool splitTensor: split the fabric tensor into two parts related to the strong and weak contact forces respectively.\n\n:param bool revertSign: it must be set to true if the contact law's convention takes compressive forces as positive.\n\n:param Real thresholdForce: if the fabric tensor is split into two parts, a threshold value can be specified otherwise the mean contact force is considered by default. It is worth to note that this value has a sign and the user needs to set it according to the convention adopted for the contact law. To note that this value could be set to zero if one wanted to make distinction between compressive and tensile forces.");
 	py::def("bodyStressTensors",Shop__getStressLWForEachBody,(py::args("revertSign")=false),"Compute and return a table with per-particle stress tensors. Each tensor represents the average stress in one particle, obtained from the contour integral of applied load as detailed below. This definition is considering each sphere as a continuum. It can be considered exact in the context of spheres at static equilibrium, interacting at contact points with negligible volume changes of the solid phase (this last assumption is not restricting possible deformations and volume changes at the packing scale).\n\nProof:\n\nFirst, we remark the identity:  $\\sigma_{ij}=\\delta_{ij}\\sigma_{ij}=x_{i,j}\\sigma_{ij}=(x_{i}\\sigma_{ij})_{,j}-x_{i}\\sigma_{ij,j}$.\n\nAt equilibrium, the divergence of stress is null: $\\sigma_{ij,j}=\\vec{0}$. Consequently, after divergence theorem: $\\frac{1}{V}\\int_V \\sigma_{ij}dV = \\frac{1}{V}\\int_V (x_{i}\\sigma_{ij})_{,j}dV = \\frac{1}{V}\\int_{\\partial V}x_i.\\sigma_{ij}.\\vec{n_j}.dS = \\frac{1}{V}\\sum_kx_i^k.f_j^k$.\n\nThe last equality is implicitely based on the representation of external loads as Dirac distributions whose zeros are the so-called *contact points*: 0-sized surfaces on which the *contact forces* are applied, located at $x_i$ in the deformed configuration.\n\nA weighted average of per-body stresses will give the average stress inside the solid phase. There is a simple relation between the stress inside the solid phase and the stress in an equivalent continuum in the absence of fluid pressure. For porosity $n$, the relation reads: $\\sigma_{ij}^{equ.}=(1-n)\\sigma_{ij}^{solid}$.\n\n:param bool revertSign: invert the sign of returned tensors components.");
 	py::def("maxOverlapRatio",maxOverlapRatio,"Return maximum overlap ration in interactions (with :yref:`ScGeom`) of two :yref:`spheres<Sphere>`. The ratio is computed as $\\frac{u_N}{2(r_1 r_2)/r_1+r_2}$, where $u_N$ is the current overlap distance and $r_1$, $r_2$ are radii of the two spheres in contact.");
+	py::def("shiftBodies",shiftBodies,(py::arg("ids"),py::arg("shift")),"Shifts bodies listed in ids without updating their velocities.");
 }
