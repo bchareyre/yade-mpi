@@ -17,7 +17,7 @@ void ForceRecorder::action(){
 
 CREATE_LOGGER(TorqueRecorder);
 void TorqueRecorder::action(){
-	totalTorque=Vector3r::Zero();
+	totalTorque=0;
 	Vector3r tmpAxis = rotationAxis.normalized();
 	
 	FOREACH(Body::id_t id, ids){
@@ -27,10 +27,10 @@ void TorqueRecorder::action(){
 		Vector3r tmpPos = b->state->pos;
 		Vector3r radiusVector = tmpAxis.cross(tmpAxis.cross(tmpPos - zeroPoint));
 		
-		totalTorque+=scene->forces.getTorque(id)+radiusVector.cross(scene->forces.getForce(id));
+		totalTorque+=tmpAxis.dot(scene->forces.getTorque(id)+radiusVector.cross(scene->forces.getForce(id)));
 	};
 	
 	//Save data to a file
-	out<<scene->iter<<" "<<totalTorque[0]<<" "<<totalTorque[1]<<" "<<totalTorque[2]<<" "<<totalTorque.norm()<<"\n";
+	out<<scene->iter<<" "<<totalTorque<<"\n";
 	out.close();
 }

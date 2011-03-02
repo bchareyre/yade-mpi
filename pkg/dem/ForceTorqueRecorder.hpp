@@ -23,7 +23,7 @@ class TorqueRecorder: public Recorder {
 		((std::vector<int>,ids,,,"List of bodies whose state will be measured"))
 		((Vector3r,rotationAxis,Vector3r::UnitX(),,"Rotation axis"))
 		((Vector3r,zeroPoint,Vector3r::Zero(),,"Point of rotation center"))
-		((Vector3r,totalTorque,Vector3r::Zero(),,"Resultant torque, returning by the function.")),
+		((Real,totalTorque,0,,"Resultant torque, returning by the function.")),
 		initRun=true;
 	);
 	DECLARE_LOGGER;
