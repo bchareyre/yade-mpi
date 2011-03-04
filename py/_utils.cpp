@@ -202,7 +202,7 @@ void highlightNone(){
  * is position relative to axisPt; moment from moment is m; such moment per body is
  * projected onto axis.
  */
-Real sumTorques(py::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
+Real sumTorques(py::list ids, const Vector3r& axis, const Vector3r& axisPt){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	rb->forces.sync();
 	Real ret=0;
@@ -222,7 +222,7 @@ Real sumTorques(py::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
  * @param direction direction in which forces are summed
  *
  */
-Real sumForces(py::tuple ids, const Vector3r& direction){
+Real sumForces(py::list ids, const Vector3r& direction){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	rb->forces.sync();
 	Real ret=0;
