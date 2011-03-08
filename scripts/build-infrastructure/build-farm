@@ -8,7 +8,7 @@ revNo = 0
 
 parser = argparse.ArgumentParser(description='Build packages for different distributions')
 parser.add_argument('--buildpath', metavar=os.path.normpath(sys.path[0]), default = os.path.normpath(sys.path[0]) , help ='path, where all files for building will be stored ) [default: current directory]')
-parser.add_argument('--distributions', metavar="lucid maverick", default = "lucid maverick" , help ='distributions for building [default: lucid maverick]')
+parser.add_argument('--distributions', metavar="lucid maverick natty sid", default = "lucid maverick natty sid" , help ='distributions for building [default: lucid maverick]')
 parser.add_argument('--architectures', metavar="i386 amd64", default = "i386 amd64" , help ='architectures to building [default: i386 amd64]')
 args = parser.parse_args()
 
@@ -16,13 +16,14 @@ defaultPath = args.buildpath
 distributionsNames = args.distributions.split()
 distributionsArch = args.architectures.split()
 
-# Check, whether base files for building exist	
+# Check, whether base files for building exist
+
 for distrName in distributionsNames:
 	for archName in distributionsArch:
 		distr_plus_arch = distrName+'_'+archName
 		if not(os.path.exists('/var/cache/pbuilder/'+distr_plus_arch+'.tgz')):
 			os.system('sudo pbuilder --create --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --distribution '+distrName+' --architecture '+archName+' --components "main universe" --debootstrapopts --variant=buildd')
-		os.system('sudo pbuilder --update --override-config --components "main universe" --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --distribution '+distrName+' --othermirror "deb http://ppa.launchpad.net/yade-users/external/ubuntu '+distrName+' main |" --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz')
+		os.system('sudo pbuilder --update --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz')
 
 #Update to the latest revision or checkout
 if os.path.exists(defaultPath+'/cleanBzr'):
@@ -53,12 +54,11 @@ for distrName in distributionsNames:
 	os.chdir('yade')
 	os.system('scripts/debian-prep ' + distrName)
 	os.chdir('..')
-	os.rename('yade', 'yade-'+VERSION+'-'+VERSION)
-	os.system('dpkg-source -b -I yade-'+VERSION+'-'+VERSION)
+	os.system('dpkg-source -b -I yade-'+VERSION)
 	dscFile = glob.glob('*.dsc')[0]
 	for archName in distributionsArch:
 		os.mkdir(archName)
-		os.system('sudo pbuilder --build --distribution '+distrName+' --architecture '+archName+' --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+'  --aptcache /var/cache/pbuilder/aptcache_'+archName+'/ --debbuildopts "-j1" '+dscFile)
+		os.system('sudo pbuilder --build --basetgz /var/cache/pbuilder/'+distr_plus_arch+'.tgz  --buildresult '+defaultPath+'/'+distrName+'/'+archName+' '+dscFile)
 	os.chdir('..')
 
 
