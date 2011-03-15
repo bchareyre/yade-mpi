@@ -50,9 +50,6 @@ curForce = utils.sumForces(ids=floorId,direction=Vector3(0,0,1))*(-1)
 print ("Precalculated weight %f" % sphMass)
 print ("Obtained weight %f" % curForce)
 
-if (((sphMass-curForce)/curForce)<tolerance):
-	print "checkWeight test is success"
-else:
-	print "checkWeight test is failed!"
-	RuntimeError()
+if (((sphMass-curForce)/curForce)>tolerance):
+	resultStatus += 1
 

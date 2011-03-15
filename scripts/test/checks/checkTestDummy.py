@@ -3,5 +3,5 @@
 # A dummy test, just to give an example, and detect possible path problems
 from yade import pack,log,utils,export,plot
 import math,os,sys
-print 'checkTest mechanism success'
+print 'checkTest mechanism'
 

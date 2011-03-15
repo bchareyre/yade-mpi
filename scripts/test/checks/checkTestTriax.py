@@ -26,7 +26,5 @@ if abs((O.engines[4].stress(3)[0]-50058.7)/50058.7)>tolerance :
 	print "Triaxial checkTest: difference on peak stress"
 	errors+=1
 
-if errors==0:
-	print "checkTestTriax success"
-else:
-	RuntimeError("Some tests are failed!")
+if (errors):
+	resultStatus +=1	#Test is failed

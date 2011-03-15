@@ -94,7 +94,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 			dev-python/matplotlib dev-db/sqlite dev-python/numpy dev-lang/tk \
 			sci-visualization/gnuplot app-doc/doxygen sci-libs/gts dev-python/pygraphviz \
 			sci-libs/vtk dev-python/scientificpython dev-vcs/bzr dev-vcs/bzrtools dev-cpp/eigen \
-			sys-devel/binutils dev-python/python-xlib dev-python/PyQt4 dev-python/imaging \
+			sys-devel/binutils dev-python/python-xlib x11-libs/qt-gui dev-python/PyQt4 dev-python/imaging \
 			dev-python/sphinx dev-python/imaging dev-python/python-bibtex
 		
 		
