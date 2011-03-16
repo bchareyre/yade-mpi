@@ -493,6 +493,57 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
+def voxelPorosityTriaxial(triax,resolution=200,offset=0):
+	"""
+	Calculate the porosity of a sample, given the TriaxialCompressionEngine.
+
+	A function :yref:`yade.utils.voxelPorosity` is invoked, with the volume of a box enclosed by TriaxialCompressionEngine walls.
+	The additional parameter offset allows using a smaller volume inside the box, where each side of the volume is at offset distance
+	from the walls. By this way it is possible to find a more precise porosity of the sample, since at walls' contact the porosity is usually reduced.
+	
+	A recommended value of offset is bigger or equal to the average radius of spheres inside.
+	
+	The value of resolution depends on size of spheres used. It can be calibrated by invoking voxelPorosityTriaxial with offset=0 and
+	comparing the result with TriaxialCompressionEngine.porosity. After calibration, the offset can be set to radius, or a bigger value, to get
+	the result.
+	
+	:param triax: the TriaxialCompressionEngine handle
+	:param offset: offset distance
+	:param resolution: voxel grid resolution
+	:return: the porosity of the sample inside given volume
+
+	Example invocation:
+		>>> O.engines[5].porosity
+		0.3901808
+		>>> utils.voxelPorosityTriaxial(O.engines[5],200,0)
+		0.3908145
+		>>> utils.voxelPorosityTriaxial(O.engines[5],800,0)
+		0.3902078
+		>>> utils.voxelPorosityTriaxial(O.engines[5],200,avg_radius)
+		0.3604238
+		>>> utils.voxelPorosityTriaxial(O.engines[5],800,avg_radius)
+		0.3604175
+	
+	"""
+	p_bottom	= O.bodies[triax.wall_bottom_id].state.se3[0]
+	p_top		= O.bodies[triax.wall_top_id   ].state.se3[0]
+	p_left		= O.bodies[triax.wall_left_id  ].state.se3[0]
+	p_right		= O.bodies[triax.wall_right_id ].state.se3[0]
+	p_front		= O.bodies[triax.wall_front_id ].state.se3[0]
+	p_back		= O.bodies[triax.wall_back_id  ].state.se3[0]
+	th              = (triax.thickness)*0.5+offset
+	x_0             = p_left  [0] + th
+	x_1             = p_right [0] - th
+	y_0             = p_bottom[1] + th
+	y_1             = p_top   [1] - th
+	z_0             = p_back  [2] + th
+	z_1             = p_front [2] - th
+	a=Vector3(x_0,y_0,z_0)
+	b=Vector3(x_1,y_1,z_1)
+	return voxelPorosity(resolution,a,b)
+
+
+
 def NormalRestitution2DampingRate(en):
 	r"""Compute the normal damping rate as a function of the normal coefficient of restitution $e_n$. For $e_n\in\langle0,1\rangle$ damping rate equals
 

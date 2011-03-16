@@ -302,6 +302,71 @@ Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume){
 	return (V-Vs)/V;
 }
 
+Real Shop::getVoxelPorosity(const shared_ptr<Scene>& _scene, int _resolution, Vector3r _start,Vector3r _end){
+	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
+	if(_start==_end) throw std::invalid_argument("utils.voxelPorosity: cannot calculate porosity when start==end of the volume box.");
+	if(_resolution<50)     throw std::invalid_argument("utils.voxelPorosity: it doesn't make sense to calculate porosity with voxel resolution below 50.");
+
+	// prepare the gird, it eats a lot of memory.
+	// I am not optimizing for using bits. A single byte for each cell is used.
+	std::vector<std::vector<std::vector<unsigned char> > > grid;
+	int S(_resolution);
+	grid.resize(S);
+	for(int i=0 ; i<S ; ++i) {
+		grid[i].resize(S);
+		for(int j=0 ; j<S ; ++j) {
+			grid[i][j].resize(S,0);
+		}
+	}
+
+	Vector3r start(_start), size(_end - _start);
+	
+	FOREACH(shared_ptr<Body> bi, *scene->bodies){
+		if((bi)->isClump()) continue;
+		const shared_ptr<Body>& b = bi;
+		if ( b->isDynamic() || b->isClumpMember() ) {
+			const shared_ptr<Sphere>& sphere = YADE_PTR_CAST<Sphere> ( b->shape );
+			Real r       = sphere->radius;
+			Real rr      = r*r;
+			Vector3r pos = b->state->se3.position;
+			// we got sphere with radius r, at position pos.
+			// and a box of size S, scaled to 'size'
+			// mark cells that are iniside a sphere
+			int ii(0),II(S),jj(0),JJ(S),kk(0),KK(S);
+			// make sure to loop only in AABB of that sphere. No need to waste cycles outside of it.
+			ii = std::max((int)((Real)(pos[0]-start[0]-r)*(Real)(S)/(Real)(size[0]))-1,0); II = std::min(ii+(int)((Real)(2.0*r)*(Real)(S)/(Real)(size[0]))+3,S);
+			jj = std::max((int)((Real)(pos[1]-start[1]-r)*(Real)(S)/(Real)(size[1]))-1,0); JJ = std::min(jj+(int)((Real)(2.0*r)*(Real)(S)/(Real)(size[1]))+3,S);
+			kk = std::max((int)((Real)(pos[2]-start[2]-r)*(Real)(S)/(Real)(size[2]))-1,0); KK = std::min(kk+(int)((Real)(2.0*r)*(Real)(S)/(Real)(size[2]))+3,S);
+			for(int i=ii ; i<II ; ++i) {
+			for(int j=jj ; j<JJ ; ++j) {
+			for(int k=kk ; k<KK ; ++k) {
+				Vector3r a(i,j,k);
+				a = a/(Real)(S);
+				Vector3r b( a[0]*size[0] , a[1]*size[1] , a[2]*size[2] );
+				b = b+start;
+				Vector3r c(0,0,0);
+				c = pos-b;
+				Real x = c[0];
+				Real y = c[1];
+				Real z = c[2];
+				if(x*x+y*y+z*z < rr)
+					grid[i][j][k]=1;
+			}}}
+		}
+	}
+
+	Real Vv=0;
+	for(int i=0 ; i<S ; ++i ) {
+		for(int j=0 ; j<S ; ++j ) {
+			for(int k=0 ; k<S ; ++k ) {
+				if(grid[i][j][k]==1)
+					Vv += 1.0;
+			}
+		}
+	}
+
+	return ( std::pow(S,3) - Vv ) / std::pow(S,3);
+};
 
 vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
 	if(!boost::filesystem::exists(fname)) {

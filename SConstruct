@@ -193,7 +193,7 @@ if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' i
 		print cmd; os.system(cmd)
 		sys.argv.remove('tags')
 	if 'doc' in sys.argv:
-		raise RuntimeError("'doc' argument not supported by scons now")
+		raise RuntimeError("'doc' argument not supported by scons now. See doc/README")
 	#	cmd="cd doc; doxygen Doxyfile"
 	#	print cmd; os.system(cmd)
 	#	sys.argv.remove('doc')
