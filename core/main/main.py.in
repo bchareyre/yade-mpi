@@ -35,6 +35,7 @@ par.add_option('--rebuild',help="Re-run build in the source directory, then run 
 par.add_option('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
 par.add_option('--debug',help='Run the debug build, if available.',dest='debug',action='store_true')
 par.add_option('--checks',help='Run a series of user-defined check tests as described in ${sourceRoot}/scripts/test/checks/README',dest='checks',action='store_true')
+par.add_option('--performance',help='Starts a test to measure the productivity',dest='performance',action='store_true')
 par.add_option('--no-gdb',help='Do not show backtrace when yade crashes (only effective with \-\-debug).',dest='noGdb',action='store_true',)
 par.disable_interspersed_args()
 
@@ -150,6 +151,11 @@ from math import *
 if opts.checks:
 	checksPath='${sourceRoot}'+'/scripts/test/checks' # replaced at install-time
 	execfile(checksPath+'/checkList.py')
+
+# Run performance check test
+if opts.performance:
+	checksPath='${sourceRoot}'+'/scripts/test/performance'
+	execfile(checksPath+'/checkPerf.py')
 
 def userSession(qt4=False,qapp=None):
 	# prepare nice namespace for users
