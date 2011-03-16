@@ -508,8 +508,8 @@ def voxelPorosityTriaxial(triax,resolution=200,offset=0):
 	the result.
 	
 	:param triax: the TriaxialCompressionEngine handle
-	:param offset: offset distance
 	:param resolution: voxel grid resolution
+	:param offset: offset distance
 	:return: the porosity of the sample inside given volume
 
 	Example invocation:
