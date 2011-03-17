@@ -72,7 +72,6 @@ void Scene::moveToNextTimeStep(){
 	if(runInternalConsistencyChecks){
 		runInternalConsistencyChecks=false;
 		checkStateTypes();
-		forces.resize(bodies->size()); // optimization, not necessary
 	}
 	// substepping or not, update engines from _nextEngines, if defined, at the beginning of step
 	// subStep can be 0, which happens if simulations is saved in the middle of step (without substepping)
