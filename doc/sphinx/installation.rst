@@ -124,7 +124,9 @@ Most of the list above is very likely already packaged for your distribution. Th
 			mkdir /etc/portage -p;\
 			echo "media-libs/gd fontconfig jpeg png truetype" >>/etc/portage/package.use
 			
+		* Some additional commands, which can be usefull::
 			
+			ln -s /usr/lib/python2.6/site-packages/numpy/core/include/numpy/ /usr/include/
 
 Compilation
 ^^^^^^^^^^^

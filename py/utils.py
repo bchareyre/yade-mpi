@@ -512,18 +512,18 @@ def voxelPorosityTriaxial(triax,resolution=200,offset=0):
 	:param offset: offset distance
 	:return: the porosity of the sample inside given volume
 
-	Example invocation:
-		>>> from yade import utils
-		>>> O.reset()
-		>>> rAvg=0.03
-		>>> TriaxialTest(numberOfGrains=200,radiusMean=rAvg).load()
-		>>> O.dt=-1
-		>>> O.run(1000)
-		>>> O.engines[4].porosity
+	Example invocation::
+	
+		from yade import utils
+		rAvg=0.03
+		TriaxialTest(numberOfGrains=200,radiusMean=rAvg).load()
+		O.dt=-1
+		O.run(1000)
+		O.engines[4].porosity
 		0.44007807740143889
-		>>> utils.voxelPorosityTriaxial(O.engines[4],200,0)
+		utils.voxelPorosityTriaxial(O.engines[4],200,0)
 		0.44055412500000002
-		>>> utils.voxelPorosityTriaxial(O.engines[4],200,rAvg)
+		utils.voxelPorosityTriaxial(O.engines[4],200,rAvg)
 		0.36798199999999998
 	"""
 	p_bottom	= O.bodies[triax.wall_bottom_id].state.se3[0]
