@@ -105,7 +105,8 @@ class Cell: public Serializable{
 	// temporary, will be removed in favor of more descriptive setBox(...)
 	void setRefSize(const Vector3r& s){
 		// if refSize is set to the current size and the cell is a box (used in older scripts), say it is not necessary
-		if(s==_size && hSize==hSize.diagonal().asDiagonal()){ LOG_WARN("Setting O.cell.refSize=O.cell.size is useless, O.trsf=Matrix3.Identity is enough now."); }
+		Matrix3r hSizeEigen3=hSize.diagonal().asDiagonal();		//Eigen3 support
+		if(s==_size && hSize==hSizeEigen3){ LOG_WARN("Setting O.cell.refSize=O.cell.size is useless, O.trsf=Matrix3.Identity is enough now."); }
 		else {LOG_WARN("Setting Cell.refSize is deprecated, use Cell.setBox(...) instead.");}
 		setBox(s); postLoad(*this);
 	} 
