@@ -544,6 +544,38 @@ def voxelPorosityTriaxial(triax,resolution=200,offset=0):
 	return voxelPorosity(resolution,a,b)
 
 
+def trackPerfomance(updateTime=5):
+	"""
+	Track perfomance of a simulation. (Experimental)
+	Will create new thread to produce some plots.
+	Useful for track perfomance of long run simulations (in bath mode for example).
+	"""
+
+	def __track_perfomance(updateTime):
+		pid=os.getpid()
+		threadsCpu={}
+		lastTime,lastIter=-1,-1
+		while 1:
+			time.sleep(updateTime)
+			if not O.running: 
+				lastTime,lastIter=-1,-1
+				continue
+			if lastTime==-1: 
+				lastTime=time.time();lastIter=O.iter
+				plot.plots.update({'Iteration':('Perfomance',None,'Bodies','Interactions')})
+				continue
+			curTime=time.time();curIter=O.iter
+			perf=(curIter-lastIter)/(curTime-lastTime)
+			out=subprocess.Popen(['top','-bH','-n1', ''.join(['-p',str(pid)])],stdout=subprocess.PIPE).communicate()[0].splitlines()
+			for s in out[7:-1]:
+				w=s.split()
+				threadsCpu[w[0]]=float(w[8])
+			plot.addData(Iteration=curIter,Iter=curIter,Perfomance=perf,Bodies=len(O.bodies),Interactions=len(O.interactions),**threadsCpu)
+			plot.plots.update({'Iter':threadsCpu.keys()})
+			lastTime=time.time();lastIter=O.iter
+
+	thread.start_new_thread(__track_perfomance,(updateTime))
+
 
 def NormalRestitution2DampingRate(en):
 	r"""Compute the normal damping rate as a function of the normal coefficient of restitution $e_n$. For $e_n\in\langle0,1\rangle$ damping rate equals
