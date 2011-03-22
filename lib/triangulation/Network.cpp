@@ -93,7 +93,8 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
 		/**Vpore**/ return Vtot - (Vsolid1 + Vsolid2);
     }; break;
     case (1) : {return volume_single_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetRe1]), cell->vertex(facetVertices[j][facetRe2]), p1,p2, cell->info().facetSurfaces[j]);}; break;
-    case (2) : {return volume_double_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;}
+    case (2) : {return volume_double_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;
+    default : return 0;}
 }
 
 double Network::volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)

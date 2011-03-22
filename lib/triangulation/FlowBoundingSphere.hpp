@@ -96,6 +96,8 @@ class FlowBoundingSphere : public Network
 		double dotProduct ( Vecteur x, Vecteur y );
 		double Compute_EffectiveRadius(Cell_handle cell, int j);
 		double Compute_EquivalentRadius(Cell_handle cell, int j);
+		//return the list of constriction values
+		vector<double> getConstrictions();
 
 		void GenerateVoxelFile ( );
 

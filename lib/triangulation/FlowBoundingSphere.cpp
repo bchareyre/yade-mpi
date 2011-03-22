@@ -210,7 +210,7 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         clock.top("GaussSeidel");
 
         /** END GAUSS SEIDEL */
-        char* file ("Permeability");
+        char* file ="Permeability";
         ks = Permeameter(boundary(y_min_id).value, boundary(y_max_id).value, SectionArea, Height, file);
 // 	K_sigma << K_opt_factor << " " << ks << " "<< Iterations << endl;
         clock.top("Permeameter");
@@ -807,6 +807,15 @@ void FlowBoundingSphere::Compute_Permeability()
 		if (!RAVERAGE) cout << "------Hydraulic Radius is used for permeability computation------" << endl << endl;
 		else cout << "------Average Radius is used for permeability computation------" << endl << endl;
 		cout << "-----Computed_Permeability-----" << endl;}
+}
+
+vector<double> FlowBoundingSphere::getConstrictions()
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	vector<double> constrictions;
+	for (Finite_facets_iterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++)
+		constrictions.push_back(Compute_EffectiveRadius(f_it->first, f_it->second));
+	return constrictions;
 }
 
 double FlowBoundingSphere::Compute_EffectiveRadius(Cell_handle cell, int j)

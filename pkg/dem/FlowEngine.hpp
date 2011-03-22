@@ -52,6 +52,9 @@ class FlowEngine : public PartialEngine
 		void clearImposedPressure();
 		Real getFlux(int cond);
 		void saveVtk() {flow->save_vtk_file();}
+		python::list getConstrictions() {
+			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
+			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
 
 		virtual ~FlowEngine();
 
@@ -60,7 +63,7 @@ class FlowEngine : public PartialEngine
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
-					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
+// 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
 					((bool,save_mplot,false,,"Enable/disable mplot files creation"))
 					((bool, save_mgpost, false,,"Enable/disable mgpost file creation"))
 					((bool, slice_pressures, false, ,"Enable/Disable slice pressure measurement"))
@@ -121,6 +124,7 @@ class FlowEngine : public PartialEngine
 					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'.")
 					.def("clearImposedPressure",&FlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("getFlux",&FlowEngine::getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					)
 		DECLARE_LOGGER;

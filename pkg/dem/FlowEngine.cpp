@@ -120,7 +120,7 @@ void FlowEngine::action()
 			char *f = "slifile";
 			flow->SliceField(f);
 		}
-		if (save_vtk) {flow->save_vtk_file();}
+// 		if (save_vtk) {flow->save_vtk_file();}
 	}
 // 	if ( scene->iter % PermuteInterval == 0 )
 // 	{ Update_Triangulation = true; }
