@@ -40,7 +40,9 @@ If you want to install from source, you can install either a release (numbered v
 
 		bzr checkout lp:yade
 
-   will download the whole code repository of ``trunk``. Check out `Quick Bazaar tutorial <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`_ wiki page for more. For those behind firewall, `daily snapshot <http://beta.arcig.cz/~eudoxos/yade/yade-trunk-latest.tar.bz2>`_ of the repository (as compressed archive) is provided.
+  will download the whole code repository of ``trunk``. Check out `Quick Bazaar tutorial <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`_ wiki page for more. 
+   
+  For those behind firewall, you can download `any revision  <https://www.yade-dem.org/source/>`_ of the repository as compressed archive.
 
 Release and trunk sources are compiled in the same way.
 
