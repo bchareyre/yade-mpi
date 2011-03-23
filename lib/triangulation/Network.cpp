@@ -481,7 +481,7 @@ void Network::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal
 	  
 	  Tes.insert((center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
 		     (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
-		     (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]), 
+		     (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
 		     FAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
 	  
  	  Point P (center[0],center[1],center[2]);
@@ -492,7 +492,7 @@ void Network::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal
           boundaries[id_wall-id_offset].flowCondition = 1;
           boundaries[id_wall-id_offset].value = 0;
 	  
-	  if(DEBUG_OUT) cout << "A boundary -center/thick- has been created. ID = " << id_wall << " position = " << center[0]+Normal[0]*thickness/2 + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << center[1]+Normal[0]*thickness/2 + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " <<  center[2]+Normal[0]*thickness/2 + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]) << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
+	  if(DEBUG_OUT) cout << "A boundary -center/thick- has been created. ID = " << id_wall << " position = " << (center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " <<  (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]) << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
 }
 
 void Network::Define_fictious_cells()

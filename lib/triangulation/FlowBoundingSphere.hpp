@@ -37,6 +37,7 @@ class FlowBoundingSphere : public Network
  		FlowBoundingSphere();
 
 		bool SLIP_ON_LATERALS;
+		bool areaR2Permeability;
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
@@ -53,6 +54,8 @@ class FlowBoundingSphere : public Network
 
 		bool RAVERAGE;
 		int walls_id[6];
+		
+		int id_Sphere;
 
 		void mplot ( char *filename);
 		void Localize();
@@ -116,7 +119,7 @@ class FlowBoundingSphere : public Network
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
 		void Measure_Pore_Pressure(double Wall_up_y, double Wall_down_y);
-		
+		vector<Real> Average_Fluid_Velocity_On_Sphere(int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)
 

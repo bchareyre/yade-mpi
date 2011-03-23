@@ -21,6 +21,12 @@
 
 CREATE_LOGGER (FlowEngine);
 
+BOOST_PYTHON_MODULE(_vtkFile){
+        python::scope().attr("__doc__")="SaveVTKFile";
+        YADE_SET_DOCSTRING_OPTS;
+        python::class_<FlowEngine>("FlowEngine","Create file for parallel visualization" )
+                .def("saveVtk",&FlowEngine::saveVtk,"Save VTK File, each dd iterations");}
+
 FlowEngine::~FlowEngine()
 {
 }
@@ -87,6 +93,14 @@ void FlowEngine::action()
 		{
 			id = V_it->info().id();
 			for (int y=0;y<3;y++) f[y] = (V_it->info().forces)[y];
+			if (id==id_sphere)
+			  id_force = f;
+// 			  CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+// 			  for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
+// 			    for (int j=0;j<4;j++){
+// 			      if (cell->vertex(j)->info().id() == id_sphere){
+// 				cout << endl << "Cell 
+			    
 			scene->forces.addForce(id, f);
 		}
 		timingDeltas->checkpoint("Applying Forces");
@@ -135,6 +149,8 @@ void FlowEngine::action()
 	  wall_down_y = flow->y_min;}
 	if (liquefaction) flow->Measure_Pore_Pressure(wall_up_y, wall_down_y);
 	first=false;
+	
+// 	if(id_sphere>=0) flow->Average_Fluid_Velocity_On_Sphere(id_sphere);
 // }
 }
 
@@ -194,6 +210,8 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->DEBUG_OUT = Debug;
 	flow->useSolver = useSolver;
 	flow->VISCOSITY = viscosity;
+	
+	flow->id_Sphere=id_sphere;
 
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
