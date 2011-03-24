@@ -338,15 +338,15 @@ void Gl1_L3Geom::draw(const shared_ptr<IGeom>& ig, bool isL6Geom, const Real& ph
 	const L3Geom& g(ig->cast<L3Geom>());
 	glTranslatev(g.contactPoint);
 	#ifdef L3_TRSF_QUATERNION
-		#if EIGEN_MAJOR_VERSION<30
+		#if EIGEN_WORLD_VERSION==2
  			glMultMatrixd(Eigen::Transform3d(Matrix3r(g.trsf).transpose()).data());
-		#else
+		#elif EIGEN_WORLD_VERSION==3
  			glMultMatrixd(Eigen::Affine3d(Matrix3r(g.trsf).transpose()).data());
 		#endif
 	#else
-		#if EIGEN_MAJOR_VERSION<30
+		#if EIGEN_WORLD_VERSION==2
  			glMultMatrixd(Eigen::Transform3d(g.trsf.transpose()).data());
-		#else
+		#elif EIGEN_WORLD_VERSION==3
  			glMultMatrixd(Eigen::Affine3d(g.trsf.transpose()).data());
 		#endif
 	#endif
