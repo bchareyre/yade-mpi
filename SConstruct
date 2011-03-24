@@ -100,7 +100,7 @@ opts.AddVariables(
 	('chunkSize','Maximum files to compile in one translation unit when building plugins. (unlimited if <= 0, per-file linkage is used if 1)',7,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
-	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/vtk-5.6:/usr/include/eigen2:/usr/include/vtk'), # hardy has vtk-5.0
+	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/vtk-5.6:/usr/include/vtk'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
 	('libstdcxx','Specify libstdc++ location by hand (opened dynamically at startup), usually not needed',None),
 	('QT4CXX','Specify a different compiler for files including qt4; this is necessary for older qt version (<=4.7) which don\'t compile with clang',None),
@@ -121,6 +121,14 @@ opts.Update(env)
 if str(env['features'])=='all':
 	print 'ERROR: using "features=all" is illegal, since it breaks feature detection at runtime (SCons limitation). Write out all features separated by commas instead. Sorry.'
 	Exit(1)
+
+#Check, is there eigen3 directory, if not - use eigen2
+if os.path.exists('/usr/include/eigen3'):
+	print "Eigen 3 math library will be used"
+	env.Append(CPPPATH=":/usr/include/eigen3")
+else:
+	print "Eigen 2 math library will be used"
+	env.Append(CPPPATH=":/usr/include/eigen2")
 
 if saveProfile: opts.Save(optsFile,env)
 # fix expansion in python substitution by assigning the right value if not specified
