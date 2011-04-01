@@ -82,6 +82,7 @@ FlowBoundingSphere::FlowBoundingSphere()
 	TOLERANCE = 1e-06;
 	RELAX = 1.9;
 	ks=0;
+	V_darcy_Donia=0;
 	distance_correction = true;
 	meanK_LIMIT = true;
 	meanK_STAT = false; K_opt_factor=0;
@@ -328,8 +329,8 @@ void FlowBoundingSphere::Average_Cell_Velocity()
                         cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate - volume_facet_translation) * ( pos_av_facet-CGAL::ORIGIN );
 		  }}
  		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
-                cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
-        }
+		cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
+	}
 }
 
 bool FlowBoundingSphere::isOnSolid  (double X, double Y, double Z)
@@ -685,6 +686,9 @@ void FlowBoundingSphere::Compute_Permeability()
 	Cell_handle neighbour_cell;
 
 	double k=0, distance = 0, radius = 0, viscosity = VISCOSITY;
+	double  m3=0, m1=0, m2=0, d=0, h=0;
+	int surfneg=0;
+	Real S0=0;
 	int NEG=0, POS=0, pass=0;
 
 	bool ref = Tri.finite_cells_begin()->info().isvisited;
@@ -694,7 +698,7 @@ void FlowBoundingSphere::Compute_Permeability()
 //         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
 	Real meanK=0, STDEV=0, meanRadius=0, meanDistance=0;
 	Real infiniteK=1e10;
-int count_k_neg=0;
+
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		Point& p1 = cell->info();
 		for (int j=0; j<4; j++) {
@@ -709,6 +713,7 @@ int count_k_neg=0;
 				Sphere& v0 = W[0]->point();
 				Sphere& v1 = W[1]->point();
 				Sphere& v2 = W[2]->point();
+				Sphere& t0=v0, t1=v1, t2=v2;
 #ifdef USE_FAST_MATH
 				//FIXME : code not compiling,, do the same as in "else"
 				assert((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point())>=0 && (W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point())<=1);
@@ -734,16 +739,46 @@ int count_k_neg=0;
 
 				if (distance!=0) {
 					if (minPermLength>0 && distance_correction) distance=max(minPermLength,distance);
+					Real fluidArea=0;
+					const Vecteur& Surfk = cell->info().facetSurfaces[j];
+					Real area = sqrt(Surfk.squared_length());
+					const Vecteur& crossSections = cell->info().facetSphereCrossSections[j];
 					if (areaR2Permeability){
-						const Vecteur& Surfk = cell->info().facetSurfaces[j];
-						Real area = sqrt(Surfk.squared_length());
-						const Vecteur& crossSections = cell->info().facetSphereCrossSections[j];
-						Real fluidArea=area-crossSections[0]-crossSections[1]-crossSections[2];
-						if (fluidArea<0) fluidArea = -fluidArea;
-						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
+					  //if (cell->info().fictious()==0 && neighbour_cell->info().fictious()==0){
+
+ 						m1=sqrt((cross_product((v0-v1),v2-v1)).squared_length()/(v2-v1).squared_length());
+ 						m2=sqrt((cross_product((v0-v1),v2-v0)).squared_length()/(v2-v0).squared_length());
+ 						m3=sqrt((cross_product((v0-v2),v1-v0)).squared_length()/(v1-v0).squared_length());
+
+						if (m1<sqrt(v0.weight()))
+						  {
+						  d=2*sqrt((v0.weight()-m1*m1));
+						  h=sqrt(v0.weight())-m1;
+						  S0=0.25*M_PI*(d*d+4*h*h);}
+						  						  
+						if (m2<sqrt(v1.weight()))
+						  {
+						  d=2*sqrt((v1.weight()-m2*m2));
+						  h=sqrt(v1.weight())-m2;
+						  S0=0.25*M_PI*(d*d+4*h*h);}
+// 						  
+						 if (m3<sqrt(v2.weight()))
+						   {
+						   d=2*sqrt((v2.weight()-m3*m3));
+						   h=sqrt(v2.weight())-m3;
+						   S0=0.25*M_PI*(d*d+4*h*h);}
+						   
+// 						if (S0>0) cout<<"S0= "<<S0<<endl;
 						
-					}
-					else k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
+                       // }			
+						fluidArea=area-crossSections[0]-crossSections[1]-crossSections[2]+S0;
+						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);}
+						
+						else k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
+						
+				if (k<0) {surfneg+=1;
+				cout<<"__ k<0 __"<<k<<" "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<endl;}
+					     
 				} else  k = infiniteK;//Will be corrected in the next loop
 
 				(cell->info().k_norm())[j]= k*k_factor;
@@ -760,6 +795,7 @@ int count_k_neg=0;
 		}
 		cell->info().isvisited = !ref;
 	}
+	cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
@@ -844,8 +880,8 @@ int count_k_neg=0;
 
 		if (!RAVERAGE) cout << "------Hydraulic Radius is used for permeability computation------" << endl << endl;
 		else cout << "------Average Radius is used for permeability computation------" << endl << endl;
-		cout << "-----Computed_Permeability-----" << endl;
-	cout << "Negative Permeabilities = " << count_k_neg << endl; }
+		cout << "-----Computed_Permeability-----" << endl;}
+// 	cout << "Negative Permeabilities = " << count_k_neg << endl; 
 }
 
 vector<double> FlowBoundingSphere::getConstrictions()
@@ -1082,7 +1118,7 @@ void FlowBoundingSphere::GaussSeidel()
 	#ifdef GS_OPEN_MP
 	} while (j<1500);
 	#else
-	} while ((dp_max/p_max) > tolerance && j<4000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
+	} while ((dp_max/p_max) > tolerance /*&& j<4000*/ /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 	#endif
 	}
 
@@ -1161,6 +1197,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         double viscosity = VISCOSITY;
         double gravity = 9.80665;
         double Vdarcy = Q1/Section;
+	V_darcy_Donia=Vdarcy;
 //      double GradP = abs(P_Inf-P_Sup) /DeltaY;
 	double DeltaP = abs(P_Inf-P_Sup);
 //      double GradH = GradP/ (density*gravity);
