@@ -14,6 +14,7 @@
 #include<yade/core/State.hpp>
 #include<assert.h>
 #include<yade/core/Scene.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 CREATE_LOGGER(TriaxialStressController);
 YADE_PLUGIN((TriaxialStressController));
@@ -244,53 +245,6 @@ void TriaxialStressController::controlInternalStress ( Real multiplier )
 /*!
     \fn TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
  */
-Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
-{
-	scene->forces.sync();
-	//compute the mean contact force
-	Real MeanForce = 0.f;
-	long nForce = 0;
-	shared_ptr<BodyContainer>& bodies = scene->bodies;
-
-	InteractionContainer::iterator ii    = scene->interactions->begin();
-	InteractionContainer::iterator iiEnd = scene->interactions->end();
-	for(  ; ii!=iiEnd ; ++ii ) {
-		if ((*ii)->isReal()) {
-			const shared_ptr<Interaction>& contact = *ii;
-			Real f = (static_cast<FrictPhys*> ((contact->phys.get()))->normalForce+static_cast<FrictPhys*>(contact->phys.get())->shearForce).squaredNorm();
-			if (f!=0) {
-			MeanForce += sqrt(f);
-			++nForce;}
-		}
-	}
-	if (nForce!=0) MeanForce /= nForce;
-
-	if (!maxUnbalanced) {
-		//compute mean Unbalanced Force
-		Real MeanUnbalanced=0;
-		long nBodies = 0;
-		BodyContainer::iterator bi    = bodies->begin();
-		BodyContainer::iterator biEnd = bodies->end();
-		Real f;
-		for(  ; bi!=biEnd ; ++bi ) {
-			if ((*bi)->isDynamic()) {
-				f=getForce(scene,(*bi)->getId()).norm();
-				MeanUnbalanced += f;
-				if (f!=0) ++nBodies;
-			}
-		}
-		if (nBodies != 0 && MeanForce != 0) MeanUnbalanced = MeanUnbalanced/nBodies/MeanForce;
-		return  MeanUnbalanced;
-	} else {
-		//compute max Unbalanced Force
-		Real MaxUnbalanced=0;
-		BodyContainer::iterator bi    = bodies->begin();
-		BodyContainer::iterator biEnd = bodies->end();
-		for(  ; bi!=biEnd ; ++bi ) if ((*bi)->isDynamic())
-				MaxUnbalanced = std::max(getForce(scene,(*bi)->getId()).norm(),MaxUnbalanced);
-		if (MeanForce != 0) MaxUnbalanced = MaxUnbalanced/MeanForce;
-		return MaxUnbalanced;
-	}
-}
+Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced) {return Shop::unbalancedForce(maxUnbalanced,scene);}
 
 

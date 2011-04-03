@@ -162,8 +162,8 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || b->isClumpMember() || !b->isDynamic()) continue;
-		if(!b->isClump()){ currF=rb->forces.getForce(b->id).norm(); }
-		else { // for clump, sum forces from members on the clump itself
+		currF=rb->forces.getForce(b->id).norm();
+		if(b->isClump() && currF==0){ // this should not happen unless the function is called by an engine whose position in the loop is before Newton (with the exception of bodies which really have null force), because clumps forces are updated in Newton. Typical triaxial loops are using such ordering unfortunately (triaxEngine before Newton). So, here we make sure that they will get correct unbalance. In the future, it is better for optimality to check unbalancedF inside scripts at the end of loops, so that this "if" is never active.
 			Vector3r f(rb->forces.getForce(b->id)),m(Vector3r::Zero());
 			b->shape->cast<Clump>().addForceTorqueFromMembers(b->state.get(),rb,f,m);
 			currF=f.norm();

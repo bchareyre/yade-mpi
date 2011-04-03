@@ -107,7 +107,21 @@ void NewtonIntegrator::action()
 			if(unlikely(!b || b->isClumpMember())) continue;
 
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
-			Vector3r f=scene->forces.getForce(id), m=scene->forces.getTorque(id);
+			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();
+			// clumps forces
+			if(b->isClump()) {
+				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
+				#ifdef YADE_OPENMP
+				//it is safe here, since onky one thread will read/write
+				scene->forces.getTorqueUnsynced(id)+=m;
+				scene->forces.getForceUnsynced(id)+=f;
+				#else
+				scene->forces.addTorque(id,m);
+				scene->forces.addForce(id, f);
+				#endif
+			}
+			//in most cases, the initial force on clumps will zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
+			f=scene->forces.getForce(id); m=scene->forces.getTorque(id);
 			#ifdef YADE_DEBUG
 				if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
 				if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
@@ -119,6 +133,8 @@ void NewtonIntegrator::action()
 			// in aperiodic boundaries, it is equal to absolute velocity
 			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel):state->vel;
 
+
+
 			// numerical damping & kinetic energy
 			if(unlikely(trackEnergy)) updateEnergy(b,state,fluctVel,f,m);
 
@@ -127,8 +143,6 @@ void NewtonIntegrator::action()
 
 			// for particles not totally blocked, compute accelerations; otherwise, the computations would be useless
 			if (state->blockedDOFs!=State::DOF_ALL) {
-				// forces
-				if(b->isClump()) b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
 				// linear acceleration
 				Vector3r linAccel=computeAccel(f,state->mass,state->blockedDOFs);
 				cundallDamp2nd(dt,f,fluctVel,linAccel);

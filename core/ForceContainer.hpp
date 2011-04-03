@@ -66,13 +66,7 @@ class ForceContainer{
 
 		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
 
-		#if 0
-			/*! Function to allow friend classes to get force even if not synced.
-			* Dangerous! The caller must know what it is doing! (i.e. don't read after write
-			* for a particular body id. */
-			const Vector3r& getForceUnsynced (Body::id_t id){ensureSize(id); return _force[id];}
-			const Vector3r& getTorqueUnsynced(Body::id_t id){ensureSize(id); return _force[id];}
-		#endif
+		
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
@@ -84,7 +78,6 @@ class ForceContainer{
 				sizeOfThreads.push_back(0);
 			}
 		}
-
 		const Vector3r& getForce(Body::id_t id)         { ensureSynced(); return ((size_t)id<size)?_force[id]:_zero; }
 		void  addForce(Body::id_t id, const Vector3r& f){ ensureSize(id,omp_get_thread_num()); synced=false;   _forceData[omp_get_thread_num()][id]+=f;}
 		const Vector3r& getTorque(Body::id_t id)        { ensureSynced(); return ((size_t)id<size)?_torque[id]:_zero; }
@@ -93,6 +86,13 @@ class ForceContainer{
 		void  addMove(Body::id_t id, const Vector3r& m) { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
 		const Vector3r& getRot(Body::id_t id)           { ensureSynced(); return ((size_t)id<size)?_rot[id]:_zero; }
 		void  addRot(Body::id_t id, const Vector3r& r)  { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
+		
+		/*! Function to allow friend classes to get force even if not synced. Used for clumps by NewtonIntegrator.
+		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
+		* for a particular body id. */
+		Vector3r& getForceUnsynced (Body::id_t id){return ((size_t)id<size)?_force[id]:_zero;}
+		Vector3r& getTorqueUnsynced(Body::id_t id){return ((size_t)id<size)?_torque[id]:_zero;}
+		
 		/* To be benchmarked: sum thread data in getForce/getTorque upon request for each body individually instead of by the sync() function globally */
 		// this function is used from python so that running simulation is not slowed down by sync'ing on occasions
 		// since Vector3r writes are not atomic, it might (rarely) return wrong value, if the computation is running meanwhile
