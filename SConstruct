@@ -122,6 +122,19 @@ if str(env['features'])=='all':
 	print 'ERROR: using "features=all" is illegal, since it breaks feature detection at runtime (SCons limitation). Write out all features separated by commas instead. Sorry.'
 	Exit(1)
 
+#Clean eigen directories
+if env.has_key('CPPPATH'):
+	cpppathes=colonSplit(env['CPPPATH'])
+	env['CPPPATH'] = ''
+	z=0
+	for i in cpppathes:
+		if (i[:-1] <> '/usr/include/eigen'):
+			if (z==0):
+				env.Append(CPPPATH=i)
+			else:
+				env.Append(CPPPATH=":"+i)
+			z+=1
+
 #Check, is there eigen3 directory, if not - use eigen2
 if os.path.exists('/usr/include/eigen3'):
 	print "Eigen 3 math library will be used"
