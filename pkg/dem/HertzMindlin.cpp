@@ -369,6 +369,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/********************/
 	
 	phys->shearViscous=Vector3r::Zero(); // reset so that during sliding, the previous values is not there
+	Fn = phys->normalForce.norm();
 	if (!includeAdhesion) {
 		Real maxFs = Fn*phys->tangensOfFrictionAngle;
 		if (shearElastic.squaredNorm() > maxFs*maxFs){
