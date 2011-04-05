@@ -45,7 +45,6 @@ class FlowBoundingSphere : public Network
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		vector<pair<Point,Real> > imposedP;
-		double V_darcy_Donia;
 		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
 
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
@@ -54,9 +53,6 @@ class FlowBoundingSphere : public Network
 
 		bool RAVERAGE;
 		int walls_id[6];
-		
-		int id_Sphere;
-
 		void mplot ( char *filename);
 		void Localize();
 

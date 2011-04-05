@@ -93,8 +93,8 @@ void FlowEngine::action()
 		{
 			id = V_it->info().id();
 			for (int y=0;y<3;y++) f[y] = (V_it->info().forces)[y];
-			if (id==id_sphere)
-			  id_force = f;
+// 			if (id==id_sphere)
+// 			  id_force = f;
 // 			  CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 // 			  for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
 // 			    for (int j=0;j<4;j++){
@@ -210,8 +210,6 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->DEBUG_OUT = Debug;
 	flow->useSolver = useSolver;
 	flow->VISCOSITY = viscosity;
-	
-	flow->id_Sphere=id_sphere;
 
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
@@ -233,28 +231,30 @@ void FlowEngine::Build_Triangulation (double P_zero)
 
 	if (first)
 	{
+		flow->TOLERANCE=Tolerance;
+		flow->RELAX=Relax;
 		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		if (compute_K) {K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures( P_zero );
   		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
-		flow->TOLERANCE=Tolerance;
-		flow->RELAX=Relax;
+		
+
 	}
 	else
 	{
+		flow->TOLERANCE=Tolerance;
+		flow->RELAX=Relax;
 		if (Debug && compute_K) cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
 		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		if (compute_K) {K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		BoundaryConditions();
 		flow->Initialize_pressures(P_zero);// FIXME : why, if we are going to interpolate after that?
-		flow->TOLERANCE=Tolerance;//So it can be changed at run time
 		flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
-		flow->TOLERANCE=Tolerance;
-		flow->RELAX=Relax;
+
 	}
 	Initialize_volumes();
 }

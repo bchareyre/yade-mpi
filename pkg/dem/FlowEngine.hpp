@@ -113,7 +113,6 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_BACK_Boundary,  0,,"Pressure imposed on back boundary"))
 					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
-					((int, id_sphere, 0,, "Average velocity will be computed for all cells incident to that sphere"))
 					((Vector3r, id_force, 0,, "Fluid force acting on sphere with id=flow.id_sphere"))
 					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, TOP_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
