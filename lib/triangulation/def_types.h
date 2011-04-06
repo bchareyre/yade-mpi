@@ -58,6 +58,8 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
+	//Ratio between fluid surface and facet surface 
+	std::vector<Real> facetFluidSurfacesRatio;
 	std::vector<Vecteur> facetVelocities;
 	// Reflects the geometrical property of the cell, so that the force by cell fluid on grain "i" is pressure*unitForceVectors[i]
 	std::vector<Vecteur> unitForceVectors;
@@ -75,6 +77,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		module_permeability.resize(4, 0);
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
+		facetFluidSurfacesRatio.resize(4);
 		facetSphereCrossSections.resize(4);
 		facetVelocities.resize(4);
 		unitForceVectors.resize(4);

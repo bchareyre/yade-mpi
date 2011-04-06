@@ -90,7 +90,7 @@ FlowBoundingSphere::FlowBoundingSphere()
 	RAVERAGE = false; /** use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 	OUTPUT_BOUDARIES_RADII = false;
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
-	areaR2Permeability=false;
+	areaR2Permeability=true;
 }
 
 void FlowBoundingSphere::ResetNetwork() {noCache=true;}
@@ -453,6 +453,7 @@ void FlowBoundingSphere::ComputeFacetForces()
 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
 		v->info().forces=nullVect;
 	}
+	cout <<"WARNING: this non-cached version is using wrong fluid facet areas. Use the cached version instead"<<endl;
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
@@ -536,8 +537,7 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 					Real area = sqrt(Surfk.squared_length());
 					Vecteur facetNormal = Surfk/area;
 					const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
-					Real fluidSurfRatio = (area-crossSections[j][0]-crossSections[j][1]-crossSections[j][2])/area;
-					Vecteur fluidSurfk = cell->info().facetSurfaces[j]*fluidSurfRatio;
+					Vecteur fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
 					/// handle fictious vertex since we can get the projected surface easily here
 					if (cell->vertex(j)->info().isFictious) {
 						Real projSurf=abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
@@ -568,21 +568,21 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
 	noCache=false;//cache should always be defined after execution of this function
-// 	if (DEBUG_OUT) {
-// 		cout << "Facet cached scheme" <<endl;
-// 		Vecteur TotalForce = nullVect;
-// 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
-// 		{
-// 			if (!v->info().isFictious) {
-// 				TotalForce = TotalForce + v->info().forces;
+	if (DEBUG_OUT) {
+		cout << "Facet cached scheme" <<endl;
+		Vecteur TotalForce = nullVect;
+		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
+		{
+			if (!v->info().isFictious) {
+				TotalForce = TotalForce + v->info().forces;
 // 				if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-// 			} else {
-// 				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+			} else {
+				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
 // 				if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-// 			}
-// 		}
-// 		cout << "TotalForce = "<< TotalForce << endl;
-// 	}
+			}
+		}
+		cout << "TotalForce = "<< TotalForce << endl;
+	}
 }
 
 void FlowBoundingSphere::ComputeTetrahedralForces()
@@ -674,6 +674,26 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 	Tes.Clear();
 }
 
+Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2, const Real& crossSection)
+{
+	//If crosSection is 0, we just hit a big fictious sphere. return
+	return 0;
+	//else continue:
+	//First, check that v0 projection fall between v1 and v2...
+	Real dist=(v0-v1)*(v2-v1);
+	if (dist<0) return 0;
+	Real v1v2=(v2-v1).squared_length();
+	if (dist>v1v2) return 0;
+	//... then, check distance
+	Real m=(cross_product(v0-v1,v2-v1)).squared_length()/v1v2;
+	if (m<v0.weight()) {
+		Real d=2*sqrt((v0.weight()-m));
+// 		h=sqrt(v0.weight())-sqrt(m);
+// 		Real S0=0.25*M_PI*(d*d+4*h*h);
+		return crossSection-m*d;//this is S0, we use crossSection to avoid computing an "asin"
+	} else return 0;
+}
+
 void FlowBoundingSphere::Compute_Permeability()
 {
 	if (DEBUG_OUT)  cout << "----Computing_Permeability------" << endl;
@@ -731,7 +751,8 @@ void FlowBoundingSphere::Compute_Permeability()
 				if (radius==0) {
 					cout << "INS-INS PROBLEM!!!!!!!" << endl;
 				}
-				Real h,d;
+// 				Real h,d;
+				int test=0;
 				if (distance!=0) {
 					if (minPermLength>0 && distance_correction) distance=max(minPermLength,distance);
 					Real fluidArea=0;
@@ -739,35 +760,44 @@ void FlowBoundingSphere::Compute_Permeability()
 					Real area = sqrt(Surfk.squared_length());
 					const Vecteur& crossSections = cell->info().facetSphereCrossSections[j];
 					if (areaR2Permeability){
- 						Real m1=sqrt((cross_product((v0-v1),v2-v1)).squared_length()/(v2-v1).squared_length());
+//  						Real m1=sqrt((cross_product((v0-v1),v2-v1)).squared_length()/(v2-v1).squared_length());
 						Real S0=0;
-						if (m1<sqrt(v0.weight())) {
-							d=2*sqrt((v0.weight()-m1*m1));
-							h=sqrt(v0.weight())-m1;
-							S0=0.25*M_PI*(d*d+4*h*h);}
-						else {
-							Real m2=sqrt((cross_product((v0-v1),v2-v0)).squared_length()/(v2-v0).squared_length());
-							if (m2<sqrt(v1.weight())) {
-								d=2*sqrt((v1.weight()-m2*m2));
-								h=sqrt(v1.weight())-m2;
-								S0=0.25*M_PI*(d*d+4*h*h);}
-							else {
-								Real m3=sqrt((cross_product((v0-v2),v1-v0)).squared_length()/(v1-v0).squared_length());
- 								if (m3<sqrt(v2.weight())) {
-									d=2*sqrt((v2.weight()-m3*m3));
-									h=sqrt(v2.weight())-m3;
-									S0=0.25*M_PI*(d*d+4*h*h);}
-							}
-						}
+						S0=checkSphereFacetOverlap(v0,v1,v2,crossSections[0]);
+						if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0,crossSections[1]);
+						if (S0==0) S0=checkSphereFacetOverlap(v2,v0,v1,crossSections[2]);
+// 						if (m1<sqrt(v0.weight()) && (v0-v1)*(v2-v1)) {
+// 						 	test=1;
+// 							d=2*sqrt((v0.weight()-m1*m1));
+// 							h=sqrt(v0.weight())-m1;
+// 							S0=0.25*M_PI*(d*d+4*h*h);}
+// 						else {
+// 							Real m2=sqrt((cross_product((v0-v1),v2-v0)).squared_length()/(v2-v0).squared_length());
+// 							if (m2<sqrt(v1.weight())) {
+// 							 test=2;
+// 								d=2*sqrt((v1.weight()-m2*m2));
+// 								h=sqrt(v1.weight())-m2;
+// 								S0=0.25*M_PI*(d*d+4*h*h);}
+// 							else {
+// 							 test=3;
+// 								Real m3=sqrt((cross_product((v0-v2),v1-v0)).squared_length()/(v1-v0).squared_length());
+//  								if (m3<sqrt(v2.weight())) {
+// 									d=2*sqrt((v2.weight()-m3*m3));
+// 									h=sqrt(v2.weight())-m3;
+// 									S0=0.25*M_PI*(d*d+4*h*h);}
+// 							}
+// 						}
 						fluidArea=area-crossSections[0]-crossSections[1]-crossSections[2]+S0;
+						cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
 						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);}
 						
-					else k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
+					else {
+					 cout << "WARNING! if !areaR2Permeability, facetFluidSurfacesRatio will not be defined correctly. Don't use that."<<endl;
+					 k = (M_PI * pow(radius,4)) / (8*viscosity*distance);}
 
 				if (k<0) {surfneg+=1;
-				cout<<"__ k<0 __"<<k<<" "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<endl;}
+				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
-				} else  k = infiniteK;//Will be corrected in the next loop
+				} else  {cout <<"infinite K!"<<endl; k = infiniteK;}//Will be corrected in the next loop
 
 				(cell->info().k_norm())[j]= k*k_factor;
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
@@ -915,15 +945,8 @@ double FlowBoundingSphere::Compute_EffectiveRadius(Cell_handle cell, int j)
 
 double FlowBoundingSphere::Compute_EquivalentRadius(Cell_handle cell, int j)
 {
-	const Vecteur& Surfk = cell->info().facetSurfaces[j];
-	//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
-	//The ratio void surface / facet surface
-	Real area = sqrt(Surfk.squared_length());
-	Vecteur facetNormal = Surfk/area;
-	const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
-	Real fluidSurf = (area-crossSections[j][0]-crossSections[j][1]-crossSections[j][2]);
-	double r_equiv = sqrt(fluidSurf/M_PI);
-	return r_equiv;
+	Real fluidSurf = sqrt(cell->info().facetSurfaces[j].squared_length())*cell->info().facetFluidSurfacesRatio[j];
+	return sqrt(fluidSurf/M_PI);
 }
 
 double FlowBoundingSphere::Compute_HydraulicRadius(Cell_handle cell, int j)
@@ -970,7 +993,7 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
 			{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;}
                 }
         }
-        for (int n=0; n<imposedP.size();n++) {
+        for (unsigned int n=0; n<imposedP.size();n++) {
 		Cell_handle cell=Tri.locate(imposedP[n].first);
 // 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
 // 		assert(cell);

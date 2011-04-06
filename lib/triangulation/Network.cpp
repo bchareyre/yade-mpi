@@ -28,7 +28,7 @@ int F1=0, F2=0, Re1=0, Re2=0;
 int fictious_vertex, real_vertex;
 bool facet_detected = false;
 
-const double FAR = 500;
+const double FAR = 5000;
 
 using namespace std;
 // using namespace boost;
@@ -79,7 +79,7 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
                 if (cell->info().facetSurfaces[j]*(p2-p1) > 0) cell->info().facetSurfaces[j] = -1.0*cell->info().facetSurfaces[j];
                 Real Vtot = abs(ONE_THIRD*cell->info().facetSurfaces[j]*(p1-p2));
 		Vtotalissimo += Vtot;
-
+		
                 double Vsolid1=0, Vsolid2=0;
                 for (int i=0;i<3;i++) {
                 Vsolid1 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
@@ -112,7 +112,7 @@ double Network::volume_single_fictious_pore(const Vertex_handle& SV1, const Vert
         Point AA(A[0],A[1],A[2]);
         Point BB(B[0],B[1],B[2]);
         facetSurface = surface_single_fictious_facet(SV1,SV2,SV3);
-        if (facetSurface*(PV2-PV1) > 0) facetSurface = -1.0*facetSurface;
+	if (facetSurface*(PV2-PV1) > 0) facetSurface = -1.0*facetSurface;
         Real Vtot=ONE_THIRD*abs(facetSurface*(PV1-PV2));
 	Vtotalissimo += Vtot;
 	
