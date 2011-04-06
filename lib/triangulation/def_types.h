@@ -54,13 +54,12 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	int fict;
  	Real VolumeVariation;
 	double pression; //stockage d'une valeur de pression pour chaque cellule
-	Vecteur Average_Cell_Velocity; //average velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
+	Vecteur Average_Cell_Velocity; //average relative (fluid - facet translation) velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
 
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
 	//Ratio between fluid surface and facet surface 
 	std::vector<Real> facetFluidSurfacesRatio;
-	std::vector<Vecteur> facetVelocities;
 	// Reflects the geometrical property of the cell, so that the force by cell fluid on grain "i" is pressure*unitForceVectors[i]
 	std::vector<Vecteur> unitForceVectors;
 	// Store the area of triangle-sphere intersections for each facet (used in forces definition)
@@ -79,7 +78,6 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		facetSurfaces.resize(4);
 		facetFluidSurfacesRatio.resize(4);
 		facetSphereCrossSections.resize(4);
-		facetVelocities.resize(4);
 		unitForceVectors.resize(4);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		RayHydr.resize(4, 0);
@@ -119,7 +117,6 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 
 	inline std::vector<double>& k_norm (void) {return module_permeability;}
 	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
-	inline std::vector< Vecteur >& facetVelocity (void) {return facetVelocities;}
 	inline std::vector<Vecteur>& force (void) {return cell_force;}
 	inline std::vector<double>& Rh (void) {return RayHydr;}
 

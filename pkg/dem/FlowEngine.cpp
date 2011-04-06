@@ -21,12 +21,6 @@
 
 CREATE_LOGGER (FlowEngine);
 
-BOOST_PYTHON_MODULE(_vtkFile){
-        python::scope().attr("__doc__")="SaveVTKFile";
-        YADE_SET_DOCSTRING_OPTS;
-        python::class_<FlowEngine>("FlowEngine","Create file for parallel visualization" )
-                .def("saveVtk",&FlowEngine::saveVtk,"Save VTK File, each dd iterations");}
-
 FlowEngine::~FlowEngine()
 {
 }
@@ -210,6 +204,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->DEBUG_OUT = Debug;
 	flow->useSolver = useSolver;
 	flow->VISCOSITY = viscosity;
+	flow->areaR2Permeability=areaR2Permeability;
 
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
@@ -392,6 +387,64 @@ void FlowEngine::Initialize_volumes ()
 	if (Debug) cout << "Volumes initialised." << endl;
 }
 
+void FlowEngine::Average_real_cell_velocity()
+{
+    flow->Average_Relative_Cell_Velocity();
+    Vector3r Vel (0,0,0);
+    //AVERAGE CELL VELOCITY
+    CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+      switch ( cell->info().fictious()) {
+	case ( 3 ):
+	  for ( int g=0;g<4;g++ )
+	  {
+		if ( !cell->vertex ( g )->info().isFictious ) {
+		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
+		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
+	  }
+	  break;
+	case ( 2 ):
+	  for ( int g=0;g<4;g++ )
+	  {
+	    if ( !cell->vertex ( g )->info().isFictious ) {
+		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
+		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
+	  }
+	  break;
+	case ( 1 ):
+	  for ( int g=0;g<4;g++ )
+	  {
+	    if ( !cell->vertex ( g )->info().isFictious ) {
+		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
+		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
+	  }
+	  break;
+	case ( 0 ) :
+	   for ( int g=0;g<4;g++ )
+	  {
+	       	  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
+		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
+	  }
+	  break;
+      
+    
+      CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+      CGT::Point pos_av_facet;
+      double volume_facet_translation = 0;
+      CGT::Vecteur Vel_av (Vel[0], Vel[1], Vel[2]);
+      for ( int i=0; i<4; i++ ) {
+	      volume_facet_translation = 0;
+	      if (!Tri.is_infinite(cell->neighbor(i))){
+		    CGT::Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+		    Real area = sqrt ( Surfk.squared_length() );
+		    Surfk = Surfk/area;
+		    CGT::Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+		    pos_av_facet = (CGT::Point) cell->info() + ( branch*Surfk ) *Surfk;
+		    volume_facet_translation += Vel_av*cell->info().facetSurfaces[i];
+		    cell->info().av_vel() = cell->info().av_vel() - volume_facet_translation/cell->info().volume() * ( pos_av_facet-CGAL::ORIGIN );}}
+    }
+}
+
 void FlowEngine::UpdateVolumes ()
 {
 	if (Debug) cout << "Updating volumes.............." << endl;
@@ -429,10 +482,6 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
 	int w=0;
 
 	Real Wall_coordinate=0;
-	
-	Vector3r Vel[3];
-	int id = 0;
-	double Vel_x=0, Vel_y=0, Vel_z=0;
 
 	for ( int y=0;y<4;y++ )
 	{
@@ -441,7 +490,6 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
 			const shared_ptr<Body>& sph = Body::byId
 			                              ( cell->vertex ( y )->info().id(), scene );
 			for ( int g=0;g<3;g++ ) V[w][g]=sph->state->pos[g];
-			Vel[w] = sph->state->pos;
 			w++;
 		}
 		else
@@ -450,23 +498,8 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
 			const shared_ptr<Body>& wll = Body::byId ( b , scene );
 			if (!flow->boundaries[b].useMaxMin) Wall_coordinate = wll->state->pos[flow->boundaries[b].coordinate]+(flow->boundaries[b].normal[flow->boundaries[b].coordinate])*wall_thickness/2;
 			else Wall_coordinate = flow->boundaries[b].p[flow->boundaries[b].coordinate];
-			id = y;
 		}
 	}
-	
-	for ( int y=0;y<4;y++ ){
-	  for ( int j=0;j<3;j++ ){
-	    if (cell->vertex(j)->info().isFictious){
-	      Vel_x += 0.33333333333*(Vel[facetVertices[y][j]][0]);
-	      Vel_y += 0.33333333333*(Vel[facetVertices[y][j]][1]);
-	      Vel_z += 0.33333333333*(Vel[facetVertices[y][j]][2]);}
-	    else for (int j2=0;j2<3;j2++){
-	      if (!cell->vertex(j2)->info().isFictious){
-		Vel_x += 0.5*(Vel[facetVertices[y][j]][0]);
-		Vel_y += 0.5*(Vel[facetVertices[y][j]][1]);
-		Vel_z += 0.5*(Vel[facetVertices[y][j]][2]);}}}
-	      CGT::Vecteur Vel_facet ( Vel_x, Vel_y, Vel_z );
-	      (cell->info().facetVelocity())[y] = Vel_facet*1;}
 
 	double v1[3], v2[3];
 
@@ -490,10 +523,6 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 	int j=0;
 	bool first_sph=true;
 	
-	Vector3r Vel[2];
-	vector<int> id;
-	id.resize(2);
-	
 	for ( int g=0;g<4;g++ )
 	{
 		if ( cell->vertex ( g )->info().isFictious )
@@ -509,23 +538,14 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 			const shared_ptr<Body>& sph1 = Body::byId
 			                               ( cell->vertex ( g )->info().id(), scene );
 			for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=sph1->state->pos[k]; first_sph=false;}
-			Vel[0] = sph1->state->vel; id[0]=g;
 		}
 		else
 		{
 			const shared_ptr<Body>& sph2 = Body::byId
 			                               ( cell->vertex ( g )->info().id(), scene );
 			for ( int k=0;k<3;k++ ) { B[k]=BS[k]=BT[k]=sph2->state->pos[k]; }
-			Vel[1] = sph2->state->vel; id[1]=g;
 		}
 	}
-	
-	for (int y=0;y<4;y++){
-	  if ( y == id[0] ) {CGT::Vecteur Vel_facet (Vel[0][0], Vel[0][1], Vel[0][2]); (cell->info().facetVelocity())[y] = Vel_facet*1;}
-	  else if ( y == id[1] ) {CGT::Vecteur Vel_facet (Vel[1][0], Vel[1][1], Vel[1][2]); (cell->info().facetVelocity())[y] = Vel_facet*1;}
-	  else { CGT::Vecteur Vel_facet (0.5*(Vel[0][0]+Vel[0][1]+Vel[0][2]),0.5*(Vel[1][0]+Vel[1][1]+Vel[1][2]),0.5*(Vel[2][0]+Vel[2][1]+Vel[2][2]));
-	    (cell->info().facetVelocity())[y] =  Vel_facet*1;}}
-	
 	
 	AS[flow->boundaries[b[0]].coordinate]=BS[flow->boundaries[b[0]].coordinate] = Wall_coordinate[0];
 	AT[flow->boundaries[b[1]].coordinate]=BT[flow->boundaries[b[1]].coordinate] = Wall_coordinate[1];
@@ -550,8 +570,6 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 	Real Wall_coordinate[3];
 	int j=0;
 	
-	Vector3r Vel;
-	
 	for ( int g=0;g<4;g++ )
 	{
 		if ( cell->vertex ( g )->info().isFictious )
@@ -566,12 +584,8 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 		{
 		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
 		  for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=AW[k]=sph->state->pos[k];}
-		  Vel = sph->state->vel;
 		}
 	}
-	
-	CGT::Vecteur Vel_facet (Vel[0], Vel[1], Vel[2]);
-	for (int y=0;y<4;y++) (cell->info().facetVelocity())[y] = Vel_facet*1;
 	
 	AS[flow->boundaries[b[0]].coordinate]= AT[flow->boundaries[b[0]].coordinate]= AW[flow->boundaries[b[0]].coordinate]= Wall_coordinate[0];
 	AT[flow->boundaries[b[1]].coordinate]= Wall_coordinate[1];
@@ -590,24 +604,6 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
 {
 	Vector3r A[4];
-	Vector3r Vel[4];
-	
-	double Vel_x=0, Vel_y=0, Vel_z=0;
-
-	for ( int y=0;y<4;y++ )
-	{
-		const shared_ptr<Body>& sph = Body::byId(cell->vertex ( y )->info().id(), scene);
-		A[y]=sph->state->pos;
-		Vel[y]=sph->state->vel;
-	}
-	
-	for ( int y=0;y<4;y++ ){
-	  for ( int j=0;j<3;j++ ){
-	    Vel_x += 0.33333333333*(Vel[facetVertices[y][j]][0]);
-	    Vel_y += 0.33333333333*(Vel[facetVertices[y][j]][1]);
-	    Vel_z += 0.33333333333*(Vel[facetVertices[y][j]][2]);}
-	    CGT::Vecteur Vel_facet ( Vel_x, Vel_y, Vel_z );
-	    (cell->info().facetVelocity())[y] = Vel_facet*1; }
 
 	CGT::Point p1 ( ( A[0] ) [0], ( A[0] ) [1], ( A[0] ) [2] );
 	CGT::Point p2 ( ( A[1] ) [0], ( A[1] ) [1], ( A[1] ) [2] );

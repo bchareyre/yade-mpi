@@ -110,7 +110,7 @@ class FlowBoundingSphere : public Network
 		void ComsolField();
 
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
-		void Average_Cell_Velocity();
+		void Average_Relative_Cell_Velocity();
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);

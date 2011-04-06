@@ -299,7 +299,7 @@ Tesselation& FlowBoundingSphere::LoadPositions(int argc, char *argv[ ], char *en
   return Tes;
 }
 
-void FlowBoundingSphere::Average_Cell_Velocity()
+void FlowBoundingSphere::Average_Relative_Cell_Velocity()
 {  
         RTriangulation& Tri = T[currentTes].Triangulation();
         Point pos_av_facet;
@@ -323,8 +323,7 @@ void FlowBoundingSphere::Average_Cell_Velocity()
                         pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
 // 		pos_av_facet=CGAL::ORIGIN + ((cell->vertex(facetVertices[i][0])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][1])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][2])->point() - CGAL::ORIGIN))*0.3333333333;
 			facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p());
-			for (int y=0;y<3;y++) volume_facet_translation += (cell->info().facetVelocity())[i][y]*cell->info().facetSurfaces[i][y];
-                        cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate - volume_facet_translation) * ( pos_av_facet-CGAL::ORIGIN );
+                        cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
 		  }}
  		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
 		cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
@@ -347,7 +346,7 @@ bool FlowBoundingSphere::isOnSolid  (double X, double Y, double Z)
 
 void FlowBoundingSphere::Average_Fluid_Velocity()
 {
-	Average_Cell_Velocity();
+	Average_Relative_Cell_Velocity();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int num_vertex = 0;
 	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
@@ -393,7 +392,7 @@ void FlowBoundingSphere::Average_Fluid_Velocity()
 
 vector<Real> FlowBoundingSphere::Average_Fluid_Velocity_On_Sphere(int Id_sph)
 {
-	Average_Cell_Velocity();
+	Average_Relative_Cell_Velocity();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	
 	Real Volumes; CGT::Vecteur VelocityVolumes;
@@ -1526,7 +1525,7 @@ void FlowBoundingSphere::SliceField(char *filename)
 void FlowBoundingSphere::ComsolField()
 {
 	//Compute av. velocity first, because in the following permeabilities will be overwritten with "junk" (in fact velocities from comsol)
-	Average_Cell_Velocity();
+	Average_Relative_Cell_Velocity();
 
   	RTriangulation& Tri = T[currentTes].Triangulation();
         Cell_handle c;

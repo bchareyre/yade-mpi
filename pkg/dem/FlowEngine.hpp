@@ -51,6 +51,7 @@ class FlowEngine : public PartialEngine
 		void BoundaryConditions();
 		void imposePressure(Vector3r pos, Real p);
 		void clearImposedPressure();
+		void Average_real_cell_velocity();
 		Real getFlux(int cond);
 		void saveVtk() {flow->save_vtk_file();}
 		vector<Real> AvFlVelOnSph(int id_sph) {flow->Average_Fluid_Velocity_On_Sphere(id_sph);}
@@ -100,6 +101,7 @@ class FlowEngine : public PartialEngine
 					((int, intervals, 30,, "Number of layers for computation average fluid pressure profiles to build consolidation curves"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso"))
 					((bool, liquefaction, false,,"Measure fluid pressure along the heigth of the sample"))
+					((double, V_d, 0,,"darcy velocity of fluid in sample"))
 // 					((double, bottom_seabed_pressure,0,,"Fluid pressure measured at the bottom of the seabed on the symmetry axe"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
@@ -120,6 +122,7 @@ class FlowEngine : public PartialEngine
 					((bool, LEFT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, FRONT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, BACK_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
+					((bool, areaR2Permeability, 1,,"Use corrected formula for permeabilities calculation in flowboundingsphere (areaR2permeability variable)"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					,
