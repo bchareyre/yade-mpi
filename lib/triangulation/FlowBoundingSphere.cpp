@@ -673,10 +673,11 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 	Tes.Clear();
 }
 
-Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2, const Real& crossSection)
+Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2)
 {
 	//If crosSection is 0, we just hit a big fictious sphere. return
-	return 0;
+// 	return 0;
+	
 	//else continue:
 	//First, check that v0 projection fall between v1 and v2...
 	Real dist=(v0-v1)*(v2-v1);
@@ -689,9 +690,12 @@ Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v
 		Real d=2*sqrt((v0.weight()-m));
 // 		h=sqrt(v0.weight())-sqrt(m);
 // 		Real S0=0.25*M_PI*(d*d+4*h*h);
-		return crossSection-m*d;//this is S0, we use crossSection to avoid computing an "asin"
+		Real teta=2*acos(sqrt(m/v0.weight()));
+		return 0.5*(teta*v0.weight()-d*sqrt(m));//this is S0, we use crossSection to avoid computing an "asin"
+// 		return crossSection-m*d;
 	} else return 0;
 }
+
 
 void FlowBoundingSphere::Compute_Permeability()
 {
@@ -761,30 +765,9 @@ void FlowBoundingSphere::Compute_Permeability()
 					if (areaR2Permeability){
 //  						Real m1=sqrt((cross_product((v0-v1),v2-v1)).squared_length()/(v2-v1).squared_length());
 						Real S0=0;
-						S0=checkSphereFacetOverlap(v0,v1,v2,crossSections[0]);
-						if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0,crossSections[1]);
-						if (S0==0) S0=checkSphereFacetOverlap(v2,v0,v1,crossSections[2]);
-// 						if (m1<sqrt(v0.weight()) && (v0-v1)*(v2-v1)) {
-// 						 	test=1;
-// 							d=2*sqrt((v0.weight()-m1*m1));
-// 							h=sqrt(v0.weight())-m1;
-// 							S0=0.25*M_PI*(d*d+4*h*h);}
-// 						else {
-// 							Real m2=sqrt((cross_product((v0-v1),v2-v0)).squared_length()/(v2-v0).squared_length());
-// 							if (m2<sqrt(v1.weight())) {
-// 							 test=2;
-// 								d=2*sqrt((v1.weight()-m2*m2));
-// 								h=sqrt(v1.weight())-m2;
-// 								S0=0.25*M_PI*(d*d+4*h*h);}
-// 							else {
-// 							 test=3;
-// 								Real m3=sqrt((cross_product((v0-v2),v1-v0)).squared_length()/(v1-v0).squared_length());
-//  								if (m3<sqrt(v2.weight())) {
-// 									d=2*sqrt((v2.weight()-m3*m3));
-// 									h=sqrt(v2.weight())-m3;
-// 									S0=0.25*M_PI*(d*d+4*h*h);}
-// 							}
-// 						}
+						S0=checkSphereFacetOverlap(v0,v1,v2);
+						if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0);
+						if (S0==0) S0=checkSphereFacetOverlap(v2,v0,v1);
 						fluidArea=area-crossSections[0]-crossSections[1]-crossSections[2]+S0;
 						cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
 						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);}
