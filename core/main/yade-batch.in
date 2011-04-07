@@ -71,7 +71,7 @@ finished: %s
 		ret='<tr>'
 		ret+='<td>%s</td>'%self.id
 		if self.status=='PENDING': ret+='<td bgcolor="grey">(pending)</td>'
-		elif self.status=='RUNNING': ret+='<td bgcolor="yellow">%s</td>'%t2hhmmss(time.time()-self.started)
+		elif self.status=='RUNNING': ret+='<td bgcolor="yellow">%s<br><hr><br><a href="/jobs/%d/askforstop">Stop</a></td>'%(t2hhmmss(time.time()-self.started),self.num)
 		elif self.status=='DONE': ret+='<td bgcolor="%s">%s</td>'%('lime' if self.exitStatus==0 else 'red',self.duration)
 		info=self.getInfoDict()
 		self.updatePlots() # checks for last update time
@@ -103,6 +103,13 @@ finished: %s
 		ret+='<td>%s</td>'%self.hrefCommand
 		ret+='</tr>'
 		return ret
+				
+	def stopJob(self):
+		if self.status!='RUNNING': return None
+		if not self.ensureXmlrpc(): return None
+		self.xmlrpcConn.stop()
+		return ("The job #%s is stopped<br><a href=\"./../../\">Return back to statistic page</a>"%(self.num))
+	
 def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 
 def totalRunningTime():
@@ -179,6 +186,11 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 			elif rest=='table':
 				if not job.table: return
 				self.sendPygmentizedFile(job.table,hl_lines=[job.lineNo],linenostep=1)
+			elif rest=='stop':
+				self.sendHttp(job.stopJob(),contentType='text/html',refresh=(0 if job.status=='DONE' else opts.refresh))
+			elif rest=='askforstop':
+				self.sendHttp('Are you sure, you want to stop job #%d?<br><a href="/jobs/%d/stop"><font color="red">Stop</font></a></td><br><a href="./../../"><font color="green" size="+2"><b>Cancel</b><green></a></td>'%(job.num,job.num),contentType='text/html',refresh=(0 if job.status=='DONE' else opts.refresh))
+				
 			else: self.send_error(404,self.path)
 		return
 	def log_request(self,req): pass

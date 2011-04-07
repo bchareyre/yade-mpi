@@ -45,7 +45,9 @@ class InfoProvider:
 			import traceback
 			traceback.print_exc()
 			return None
-		
+	def stop(self):
+		O.pause()
+		return True
 
 class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 	"""Class emulating python command-line over a socket connection.
