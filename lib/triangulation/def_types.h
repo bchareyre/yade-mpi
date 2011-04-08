@@ -49,6 +49,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 #ifdef FLOW_ENGINE
 	//For vector storage of all cells
 	unsigned int index;
+	int volumeSign;
 	bool Pcondition;
 	Real t;
 	int fict;
@@ -85,6 +86,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		inv_sum_k=0;
 		isFictious=false; Pcondition = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
 		index=0;
+		volumeSign=0;
 	}	
 
 	double inv_sum_k;

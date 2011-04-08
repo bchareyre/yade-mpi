@@ -21,6 +21,10 @@
 
 CREATE_LOGGER (FlowEngine);
 
+
+CGT::Vecteur makeCgVect (const Vector3r& yv) {return CGT::Vecteur(yv[0],yv[1],yv[2]);} 
+CGT::Point makeCgPoint (const Vector3r& yv) {return CGT::Point(yv[0],yv[1],yv[2]);}
+
 FlowEngine::~FlowEngine()
 {
 }
@@ -63,7 +67,7 @@ void FlowEngine::action()
 		UpdateVolumes ( );
 		
 		Eps_Vol_Cumulative += eps_vol_max;
-		if ((Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000) && retriangulationLastIter>10) {
+		if ((Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000) && retriangulationLastIter>100) {
 			Update_Triangulation = true;
 			Eps_Vol_Cumulative=0;
 			retriangulationLastIter=0;
@@ -467,10 +471,10 @@ void FlowEngine::UpdateVolumes ()
 				newVol = Volume_cell ( cell );
 				break;
 		}
-		dVol=newVol - cell->info().volume();
+		dVol=cell->info().volumeSign*(newVol - cell->info().volume());
 		eps_vol_max = max(eps_vol_max, abs(dVol/newVol));
-		cell->info().dv() = dVol*invDeltaT;
-		cell->info().volume() = newVol;
+		cell->info().dv() = (!cell->info().Pcondition)?dVol*invDeltaT:0;
+// 		cell->info().volume() = newVol;
 // 		if (Debug) cerr<<"v/dv : "<<cell->info().volume()<<" "<<cell->info().dv()<<" ("<<cell->info().fictious()<<")"<<endl;
 	}
 }
@@ -480,7 +484,7 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
 	Real V[3][3];
 	int b=0;
 	int w=0;
-
+	cell->info().volumeSign=1;
 	Real Wall_coordinate=0;
 
 	for ( int y=0;y<4;y++ )
@@ -518,6 +522,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 	Real B[3]={0, 0, 0}, BS[3]={0, 0, 0}, BT[3]={0, 0, 0};
 	Real C[3]={0, 0, 0}, CS[3]={0, 0, 0}, CT[3]={0, 0, 0};
 
+	cell->info().volumeSign=1;
 	int b[2];
 	Real Wall_coordinate[2];
 	int j=0;
@@ -569,6 +574,7 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 	int b[3];
 	Real Wall_coordinate[3];
 	int j=0;
+	cell->info().volumeSign=1;
 	
 	for ( int g=0;g<4;g++ )
 	{
@@ -601,184 +607,19 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 	return abs ( Volume );
 }
 
-Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
+Real FlowEngine::Volume_cell(CGT::Cell_handle cell)
 {
-	Vector3r A[4];
+	Real volume = CGT::Tetraedre(makeCgPoint(Body::byId(cell->vertex(0)->info().id(), scene)->state->pos),
+				     makeCgPoint(Body::byId(cell->vertex(1)->info().id(), scene)->state->pos),
+				     makeCgPoint(Body::byId(cell->vertex(2)->info().id(), scene)->state->pos),
+				     makeCgPoint(Body::byId(cell->vertex(3)->info().id(), scene)->state->pos))
+				     .volume();
 
-        for ( int y=0;y<4;y++ )
-        {
-                const shared_ptr<Body>& sph = Body::byId( cell->vertex ( y )->info().id(), scene );
-                A[y]=sph->state->pos;
-        }	
-
-	CGT::Point p1 ( ( A[0] ) [0], ( A[0] ) [1], ( A[0] ) [2] );
-	CGT::Point p2 ( ( A[1] ) [0], ( A[1] ) [1], ( A[1] ) [2] );
-	CGT::Point p3 ( ( A[2] ) [0], ( A[2] ) [1], ( A[2] ) [2] );
-	CGT::Point p4 ( ( A[3] ) [0], ( A[3] ) [1], ( A[3] ) [2] );
-
-	Real Volume = ( std::abs ( ( CGT::Tetraedre ( p1,p2,p3,p4 ).volume() ) ) );
-
-	return abs ( Volume );
+	if (!(cell->info().volumeSign)) cell->info().volumeSign=(volume>0)?1:-1;
+	return volume;
 }
 
 YADE_PLUGIN ((FlowEngine));
 #endif //FLOW_ENGINE
 
 #endif /* YADE_CGAL */
-
-// YADE_REQUIRE_FEATURE(PHYSPAR);
-
-// 		if ( !cell->info().isFictious )
-// 		{
-// // 			for ( int i=0; i<4; i++ )
-// // 			{
-// // 				for ( int j=0; j<3;j++ ) id [j] = cell->vertex ( facetVertices[i][j] )->info().id();
-// // 				for ( int m=0; m<3;m++ )
-// // 				{
-// // 					const shared_ptr<Body>& b = Body::byId ( id[m], scene );
-// //
-// // 					dx[m] = b->state->vel[0];
-// // 					dy[m] = b->state->vel[1];
-// // 					dz[m] = b->state->vel[2];
-// //
-// // 					( v[m] ) [0] = b->state->pos[0];
-// // 					( v[m] ) [1] = b->state->pos[1];
-// // 					( v[m] ) [2] = b->state->pos[2];
-// //
-// // 				}
-// //
-// // 				CGT::Vecteur v1 ( ( v[1] ) [0]- ( v[0] ) [0], ( v[1] ) [1]- ( v[0] ) [1], ( v[1] ) [2]- ( v[0] ) [2] );
-// // 				CGT::Vecteur v2 ( ( v[2] ) [0]- ( v[1] ) [0], ( v[2] ) [1]- ( v[1] ) [1], ( v[2] ) [2]- ( v[1] ) [2] );
-// //
-// //
-// // 				CGT::Vecteur V = 0.33333333333*CGT::Vecteur ( dx[0]+dx[1]+dx[2], dy[0]+dy[1]+dy[2], dz[0]+dz[1]+dz[2] );
-// // 				CGT::Vecteur S = CGAL::cross_product ( v1,v2 ) /2.f;
-// //
-// // 				CGT::Somme ( grad_u, V, S );
-// // 			}
-// // 			cell->info().dv() = grad_u.Trace();
-// 		}
-// 		else
-// 		{
-
-// 			if ( triple_fictious )
-// 			{
-// 				double deltaT = 1;
-// 				cell->info().dv() = (Volume_cell_double_fictious(cell,scene)-cell->info().volume())/deltaT;
-// 				cell->info().volume() = Volume_cell_double_fictious(cell,scene);
-/*
-int id_real_local=0,id_real_global=0,V_fict=0;
-double pos[3], surface=0;
-for ( int g=0;g<4;g++ )
-{
-	if ( !cell->vertex ( g )->info().isFictious )
-	{
-		id_real_local=g;
-		id_real_global=cell->vertex ( g )->info().id();
-	}
-}
-const shared_ptr<Body>& sph = Body::byId ( id_real_global, scene );
-for ( int i=0;i<3;i++ ) pos[i]=sph->state->pos[i];
-for ( int j=0;j<4;j++ )
-{
-	if ( cell->vertex ( j )->info().isFictious )
-	{
-		CGT::Boundary b = flow->boundaries[cell->vertex ( j )->info().id() ];
-		const shared_ptr<Body>& wall = Body::byId
-				( cell->vertex ( j )->info().id(), scene );
-
-		surface = flow->surface_external_triple_fictious ( pos, cell, b );
-
-		Real Vs = sph->state->vel[b.coordinate];
-		Real Vw = wall->state->vel[b.coordinate];
-		Real Vrel = Vs - Vw;
-
-		cell->info().dv() += Vrel*surface;
-	}
-}*/
-// 			}
-// 			if ( double_fictious )
-// 			{
-// 				double deltaT = 1;
-// 				cell->info().dv() = (Volume_cell_double_fictious(cell,scene)-cell->info().volume())/deltaT;
-// 				cell->info().volume() = Volume_cell_double_fictious(cell,scene);
-// 				double A[3], AS[3], AT[3];
-// 				double B[3], BS[3], BT[3];
-// 				bool first=true, first_boundary=true;
-// 				Vector3r Vel_A, Vel_B, Vel_W1, Vel_W2;
-//
-// 				CGT::Boundary b1, b2;
-//
-// 				for ( int g=0;g<4;g++ )
-// 				{
-// 					if ( !cell->vertex ( g )->info().isFictious && first )
-// 					{
-// 						const shared_ptr<Body>& sph1 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id(), scene );
-// 						for ( int y=0;y<3;y++ )
-// 							{A[y] = sph1->state->pos[y]; AS[y]=A[y]; AT[y]=A[y];}
-// 						Vel_A = sph1->state->vel;
-//
-// 						first = false;
-// 					}
-// 					else if ( !cell->vertex ( g )->info().isFictious )
-// 					{
-// 						const shared_ptr<Body>& sph2 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id(), scene );
-// 						for ( int y=0;y<3;y++ )
-// 							{B[y] = ( cell->vertex ( g )->point() ) [y]; BS[y]=B[y]; BT[y]=B[y];}
-//
-// 						Vel_B = sph2->state->vel;
-// 					}
-// 					else if ( first_boundary )
-// 					{
-// 						b1 = flow->boundaries[cell->vertex ( g )->info().id() ];
-// 						const shared_ptr<Body>& wll1 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id() , scene );
-//
-// 						Vel_W1=wll1->state->vel;
-// 						first_boundary=false;
-// 					}
-// 					else
-// 					{
-// 						b2 = flow->boundaries[cell->vertex ( g )->info().id() ];
-// 						const shared_ptr<Body>& wll2 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id() , scene );
-//
-// 						Vel_W2=wll2->state->vel;
-// 					}
-// 				}
-//
-// 				AS[b1.coordinate]=BS[b1.coordinate]=b1.p[b1.coordinate];
-// 				AT[b2.coordinate]=BT[b2.coordinate]=b2.p[b2.coordinate];
-//
-// 				double Vmoy[3];
-//
-// 				for ( int y=0;y<3;y++ ) Vmoy[y]= ( Vel_A[y]+2*Vel_W1[y] ) /3;
-// 				CGT::Vecteur Surface = ( CGAL::cross_product ( CGT::Vecteur ( A[0]-AS[0],A[1]-AS[1],A[2]-AS[2] ),
-// 				                         CGT::Vecteur ( AS[0]-BS[0],AS[1]-BS[1],AS[2]-BS[2] ) ) ) /2;
-// 				cell->info().dv() += CGT::Vecteur ( Vmoy[0],Vmoy[1],Vmoy[2] ) *Surface;
-//
-// 				for ( int y=0;y<3;y++ ) Vmoy[y]= ( Vel_A[y]+Vel_B[y]+Vel_W1[y] ) /3;
-// 				Surface = ( CGAL::cross_product ( CGT::Vecteur ( A[0]-B[0],A[1]-B[1],A[2]-B[2] ),
-// 				                                 CGT::Vecteur ( B[0]-BS[0],B[1]-BS[1],B[2]-BS[2] ) ) ) /2;
-// 				cell->info().dv() += CGT::Vecteur ( Vmoy[0],Vmoy[1],Vmoy[2] ) *Surface;
-//
-// 				for ( int y=0;y<3;y++ ) Vmoy[y]= ( Vel_A[y]+Vel_W1[y]+Vel_W2[y] ) /3;
-// 				Surface = ( CGAL::cross_product ( CGT::Vecteur ( A[0]-AS[0],A[1]-AS[1],A[2]-AS[2] ),
-// 				                                 CGT::Vecteur ( A[0]-AT[0],A[1]-AT[1],A[2]-AT[2] ) ) ) /2;
-// 				cell->info().dv() += CGT::Vecteur ( Vmoy[0],Vmoy[1],Vmoy[2] ) *Surface;
-//
-// 				for ( int y=0;y<3;y++ ) Vmoy[y]= ( Vel_B[y]+Vel_W1[y]+Vel_W2[y] ) /3;
-// 				Surface = ( CGAL::cross_product ( CGT::Vecteur ( B[0]-BS[0],B[1]-BS[1],B[2]-BS[2] ),
-// 				                                 CGT:: Vecteur ( B[0]-BT[0],B[1]-BT[1],B[2]-BT[2] ) ) ) /2;
-// 				cell->info().dv() += CGT::Vecteur ( Vmoy[0],Vmoy[1],Vmoy[2] ) *Surface;
-// 			}
-// 			if ( single_fictious )
-// 			{
-// 				double deltaT = 1;
-// 				cell->info().dv() = (Volume_cell_single_fictious(cell,scene)-cell->info().volume())/deltaT;
-// 				cell->info().volume() = Volume_cell_single_fictious(cell,scene);
-// 			}
-// 		}
-
