@@ -605,6 +605,12 @@ Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
 {
 	Vector3r A[4];
 
+        for ( int y=0;y<4;y++ )
+        {
+                const shared_ptr<Body>& sph = Body::byId( cell->vertex ( y )->info().id(), scene );
+                A[y]=sph->state->pos;
+        }	
+
 	CGT::Point p1 ( ( A[0] ) [0], ( A[0] ) [1], ( A[0] ) [2] );
 	CGT::Point p2 ( ( A[1] ) [0], ( A[1] ) [1], ( A[1] ) [2] );
 	CGT::Point p3 ( ( A[2] ) [0], ( A[2] ) [1], ( A[2] ) [2] );
