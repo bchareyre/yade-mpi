@@ -2,12 +2,17 @@
 # -*- coding: utf-8 -*-
 
 ############################################
-##### interresting parameters          #####
+##### interesting parameters          #####
 ############################################
 # Cundall non-viscous damping
+# try zero damping and watch total energy...
 damping = 0.2
 # initial angular velocity
 angVel = 3.0
+# use two spheres?
+two_spheres = True
+# sphere rotating more?
+rotate_in_two_directions = True
 
 ############################################
 ##### material                         #####
@@ -51,8 +56,12 @@ O.engines=[
 from yade import utils
 O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],material='granular_material'))
 O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],material='granular_material'))
+if(two_spheres):
+	O.bodies.append(utils.sphere([0,0,4],1,color=[0,1,0],material='granular_material'))
 O.dt=.002*utils.PWaveTimeStep()
 O.bodies[1].state.angVel[1]=angVel
+if(rotate_in_two_directions):
+	O.bodies[1].state.angVel[2]=angVel
 
 ############################################
 ##### now the part pertaining to plots #####
@@ -87,18 +96,37 @@ plot.plots={'t':('normal_Work',
 ## if a datum is not specified (but exists), it will be NaN and will not be plotted
 def myAddPlotData():
 	sph=O.bodies[1]
-	h=sph.state.pos[2]
-	V=sph.state.vel.norm()
-	w=sph.state.angVel.norm()
-	m=sph.state.mass
-	I=sph.state.inertia[0]
 	normal_Work	  = law.normElastEnergyForce()
 	shear_Work	  = law.shearElastEnergyForce()
-	E_kin_translation = m*V**2.0/2.0
-	E_kin_rotation    = I*w**2.0/2.0
-	E_pot		  = m*g*h
-	total		  = normal_Work + E_kin_translation + E_kin_rotation + E_pot
-	total_plus_damp	  = total + (O.energy.items()[3][1] if (damping!=0) else 0.0)
+	E_kin_translation = 0
+	E_kin_rotation    = 0
+	E_pot		  = 0
+
+	if(two_spheres):## for more bodies we better use the energy tracker, because it's tracking all bodies
+		assert(O.energy.items()[2][0]=='kinTrans')
+		assert(O.energy.items()[1][0]=='kinRot')
+		assert(O.energy.items()[0][0]=='gravWork')	
+		E_kin_translation = O.energy.items()[2][1] # hmmm ... can I read O.energy.items() by names 'kinTrans' instead of by index numbers?
+		E_kin_rotation    = O.energy.items()[1][1]
+		E_pot		  = O.energy.items()[0][1] 
+
+	else: ## for one sphere we can just calculate, and it will be correct
+		h=sph.state.pos[2]
+		V=sph.state.vel.norm()
+		w=sph.state.angVel.norm()
+		m=sph.state.mass
+		I=sph.state.inertia[0]
+		E_kin_translation = m*V**2.0/2.0
+		E_kin_rotation    = I*w**2.0/2.0
+		E_pot		  = m*g*h
+
+	total = normal_Work + shear_Work + E_kin_translation + E_kin_rotation + E_pot
+	total_plus_damp	  = 0
+	if(damping!=0):
+		assert(O.energy.items()[3][0]=='nonviscDamp')	
+		total_plus_damp	  = total + O.energy.items()[3][1]
+	else:	
+		total_plus_damp	  = total
 	plot.addData(
 		t=O.time,
 		normal_Work	  = normal_Work	 ,
@@ -108,10 +136,6 @@ def myAddPlotData():
 		E_pot		  = E_pot		 ,
 		total		  = total		 ,
 		total_plus_damp	  = total_plus_damp	 ,
-
-		#E_pot_		  = O.energy.items()[0][1], ## for now, skip energy tracker, it's duplicate
-		#E_kin_r	  = O.energy.items()[1][1],
-		#E_kin_tr	  = O.energy.items()[2][1],
 	)
 
 print "Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live."
@@ -121,5 +145,5 @@ plot.plot(subPlots=True)
 #qt.View()
 O.run(int(2./O.dt));
 #plot.saveGnuplot('/tmp/a')
-## you can also access the data in plot.data['i'], plot.data['t'] etc, under the labels they were saved.
+## you can also access the data in plot.data['t'], etc, under the labels they were saved.
 
