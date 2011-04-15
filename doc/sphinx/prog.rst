@@ -1731,7 +1731,7 @@ Wrapped classes define special constructor taking keyword arguments correspondin
 
 	Yade [1]: f1=ForceEngine()
 
-	Yade [2]: f1.subscribedBodies=[0,4,5]
+	Yade [2]: f1.ids=[0,4,5]
 
 	Yade [2]: f1.force=Vector3(0,-1,-2)
 

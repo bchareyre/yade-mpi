@@ -24,10 +24,10 @@ walls = O.bodies.append(ymport.stl('ring.stl',material=facetMat))
 
 def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylinderOrigin,cylinderSlope):
 	spheresCount=0
-	for h in xrange(0,cylinderHeight/sphereRadius/2):
-			for r in xrange(1,cylinderRadius/sphereRadius/2):
+	for h in xrange(0,int(cylinderHeight/sphereRadius/2)):
+			for r in xrange(1,int(cylinderRadius/sphereRadius/2)):
 				dfi = asin(0.5/r)*2
-				for a in xrange(0,6.28/dfi):
+				for a in xrange(0,int(6.28/dfi)):
 					x = cylinderOrigin[0]+2*r*sphereRadius*cos(dfi*a)
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius

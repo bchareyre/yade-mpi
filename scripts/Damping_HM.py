@@ -37,7 +37,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_MindlinPhys(label='damping')],
 		[Law2_ScGeom_MindlinPhys_Mindlin(label='contactLaw')]
 	),
-	ForceEngine(force=(-20,0,0),subscribedBodies=[1],label='force'),	
+	ForceEngine(force=(-20,0,0),ids=[1],label='force'),	
 	NewtonIntegrator(damping=0.0),
 	PyRunner(iterPeriod=1,command='myAddPlotData()'),
 ]

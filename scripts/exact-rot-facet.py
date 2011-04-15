@@ -14,7 +14,7 @@ O.engines=[
 	]),
 	IPhysDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(),
-	RotationEngine(subscribedBodies=[1],rotationAxis=[1,0,0],angularVelocity=.01),
+	RotationEngine(ids=[1],rotationAxis=[1,0,0],angularVelocity=.01),
 	NewtonIntegrator(damping=0.2)
 ]
 from yade import utils

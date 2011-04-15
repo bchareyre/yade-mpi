@@ -667,7 +667,7 @@ Engines deriving from :yref:`FieldApplier` acting on all particles. The one most
 Partial engines
 ---------------
 
-Engines deriving from :yref:`PartialEngine` define the :yref:`subscribedBodies<PartialEngine.subscribedBodies>` attribute determining bodies which will be affected. Several of them warrant explicit mention here:
+Engines deriving from :yref:`PartialEngine` define the :yref:`ids<PartialEngine.subscribedBodies>` attribute determining bodies which will be affected. Several of them warrant explicit mention here:
 
 * :yref:`TranslationEngine` and :yref:`RotationEngine` for applying constant speed linear and rotational motion on subscribers. 
 * :yref:`ForceEngine` and :yref:`TorqueEngine` applying given values of force/torque on subscribed bodies at every step.
