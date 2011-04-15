@@ -63,9 +63,24 @@ from yade import plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)
 ## 2. i as function of t on left y-axis ('|||' makes the separation) and z_sph, v_sph (as green circles connected with line) and z_sph_half again as function of t
-plot.plots={'t':('normal_Work','shear_Work','E_kin_translation','E_kin_rotation',
-	#'E_kin_r','E_kin_tr','E_pot_',  ## those are from energy tracker
-	'E_pot','total','total_plus_damp')}
+
+plot.labels={'t':'time [s]', 
+	'normal_Work':'Normal work: W=kx^2/2', 
+	'shear_Work':'Shear work: W=kx^2/2',
+	'E_kin_translation':'Translation energy: E_kin=m*V^2/2',
+	'E_kin_rotation':'Rotation energy: E_kin=I*$\omega$^2/2',
+	'E_pot':'Gravitational potential: E_pot=m*g*h',
+	'total':'total',
+	'total_plus_damp':'total + daping'}
+
+plot.plots={'t':('normal_Work',
+		'shear_Work',
+		'E_kin_translation',
+		'E_kin_rotation',
+		#'E_kin_r','E_kin_tr','E_pot_',  ## those are from energy tracker
+		'E_pot',
+		'total',
+		'total_plus_damp')}
 
 ## this function is called by plotDataCollector
 ## it should add data with the labels that we will plot
@@ -98,6 +113,7 @@ def myAddPlotData():
 		#E_kin_r	  = O.energy.items()[1][1],
 		#E_kin_tr	  = O.energy.items()[2][1],
 	)
+
 print "Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live."
 plot.liveInterval=2
 plot.plot(subPlots=True)
