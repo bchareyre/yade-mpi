@@ -10,9 +10,9 @@ damping = 0.2
 # initial angular velocity
 angVel = 3.0
 # use two spheres?
-two_spheres = True
+two_spheres = False
 # sphere rotating more?
-rotate_in_two_directions = True
+rotate_in_two_directions = False
 
 ############################################
 ##### material                         #####
@@ -103,12 +103,9 @@ def myAddPlotData():
 	E_pot		  = 0
 
 	if(two_spheres):## for more bodies we better use the energy tracker, because it's tracking all bodies
-		assert(O.energy.items()[2][0]=='kinTrans')
-		assert(O.energy.items()[1][0]=='kinRot')
-		assert(O.energy.items()[0][0]=='gravWork')	
-		E_kin_translation = O.energy.items()[2][1] # hmmm ... can I read O.energy.items() by names 'kinTrans' instead of by index numbers?
-		E_kin_rotation    = O.energy.items()[1][1]
-		E_pot		  = O.energy.items()[0][1] 
+		E_kin_translation = dict(O.energy.items())['kinTrans']
+		E_kin_rotation    = dict(O.energy.items())['kinRot']
+		E_pot		  = dict(O.energy.items())['gravWork'] 
 
 	else: ## for one sphere we can just calculate, and it will be correct
 		h=sph.state.pos[2]
@@ -123,8 +120,7 @@ def myAddPlotData():
 	total = normal_Work + shear_Work + E_kin_translation + E_kin_rotation + E_pot
 	total_plus_damp	  = 0
 	if(damping!=0):
-		assert(O.energy.items()[3][0]=='nonviscDamp')	
-		total_plus_damp	  = total + O.energy.items()[3][1]
+		total_plus_damp	  = total + dict(O.energy.items())['nonviscDamp']
 	else:	
 		total_plus_damp	  = total
 	plot.addData(
