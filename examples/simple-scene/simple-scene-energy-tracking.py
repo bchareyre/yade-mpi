@@ -80,13 +80,12 @@ plot.labels={'t':'time [s]',
 	'E_kin_rotation':'Rotation energy: E_kin=I*$\omega$^2/2',
 	'E_pot':'Gravitational potential: E_pot=m*g*h',
 	'total':'total',
-	'total_plus_damp':'total + daping'}
+	'total_plus_damp':'total + damping'}
 
 plot.plots={'t':('normal_Work',
 		'shear_Work',
 		'E_kin_translation',
 		'E_kin_rotation',
-		#'E_kin_r','E_kin_tr','E_pot_',  ## those are from energy tracker
 		'E_pot',
 		'total',
 		'total_plus_damp')}
@@ -95,9 +94,8 @@ plot.plots={'t':('normal_Work',
 ## it should add data with the labels that we will plot
 ## if a datum is not specified (but exists), it will be NaN and will not be plotted
 def myAddPlotData():
-	sph=O.bodies[1]
-	normal_Work	  = law.normElastEnergyForce()
-	shear_Work	  = law.shearElastEnergyForce()
+	normal_Work	  = law.normElastEnergy()
+	shear_Work	  = law.shearElastEnergy()
 	E_kin_translation = 0
 	E_kin_rotation    = 0
 	E_pot		  = 0
@@ -108,6 +106,7 @@ def myAddPlotData():
 		E_pot		  = dict(O.energy.items())['gravWork'] 
 
 	else: ## for one sphere we can just calculate, and it will be correct
+		sph=O.bodies[1]
 		h=sph.state.pos[2]
 		V=sph.state.vel.norm()
 		w=sph.state.angVel.norm()

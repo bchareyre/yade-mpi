@@ -18,6 +18,33 @@ CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 
 Vector3r translation_vect_ ( 0.10,0,0 );
 
+Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::normElastEnergy()
+{
+	Real normEnergy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());
+		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
+		if (phys) {
+			normEnergy += 0.5*(phys->normalForce.squaredNorm()/phys->kn);
+		}
+	}
+	return normEnergy;
+}
+Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::shearElastEnergy()
+{
+	Real shearEnergy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());
+		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
+		if (phys) {
+			shearEnergy += 0.5*(phys->shearForce.squaredNorm()/phys->ks);
+		}
+	}
+	return shearEnergy;
+}
+
 void CohesiveFrictionalContactLaw::action()
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom6D_CohFrictPhys_CohesionMoment>(new Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
