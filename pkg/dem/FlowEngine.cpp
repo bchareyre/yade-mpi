@@ -473,8 +473,9 @@ void FlowEngine::UpdateVolumes ()
 		}
 		dVol=cell->info().volumeSign*(newVol - cell->info().volume());
 		eps_vol_max = max(eps_vol_max, abs(dVol/newVol));
+
 		cell->info().dv() = (!cell->info().Pcondition)?dVol*invDeltaT:0;
-// 		cell->info().volume() = newVol;
+		cell->info().volume() = newVol;
 // 		if (Debug) cerr<<"v/dv : "<<cell->info().volume()<<" "<<cell->info().dv()<<" ("<<cell->info().fictious()<<")"<<endl;
 	}
 }
