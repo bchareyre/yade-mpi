@@ -68,6 +68,7 @@ class WirePhys: public NormPhys {
 			((vector<Vector2r>,displForceValues,,(Attr::readonly|Attr::noSave),"Defines the values for force-displacement curve."))
 			((vector<Real>,stiffnessValues,,(Attr::readonly|Attr::noSave),"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
 			((Real,plastD,0,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero (see [Bertrand2005]_).\n\n.."))
+			((Real,limitNormalFactor,0.,,"This value indicates on how far from failing the wire is, e.g. actual normal displacement divided by admissible normal displacement multiplied by actual normal force divided by admissible normal force."))
 			,
 			createIndex();
 			,

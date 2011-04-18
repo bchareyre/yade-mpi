@@ -28,6 +28,7 @@
 #include<yade/pkg/common/Facet.hpp>
 #include<yade/pkg/dem/ConcretePM.hpp>
 #include<yade/pkg/dem/RockPM.hpp>
+#include<yade/pkg/dem/WirePM.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
 
@@ -257,7 +258,8 @@ void VTKRecorder::action(){
 				intrForceN->InsertNextValue(fn);
 				intrAbsForceT->InsertNextTupleValue(fs);
 				if(recActive[REC_WPM]) {
-					wpmLimitNormalFactor->InsertNextValue(phys->limitNormalFactor);
+					const WirePhys* wirephys = YADE_CAST<WirePhys*>(I->phys.get());
+					wpmLimitNormalFactor->InsertNextValue(wirephys->limitNormalFactor);
 				}
 			}
 		}
