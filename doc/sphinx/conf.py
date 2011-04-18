@@ -711,7 +711,7 @@ my_maketitle=r'''
 \text{\sffamily\Large CVUT Prague}\\
 \\
 \text{\sffamily\bfseries\Large Klaus Thoeni}
-\text{\sffamily\Large University of Newcastle (Australia)}\\
+\text{\sffamily\Large The University of Newcastle (Australia)}\\
 
 \text{\sffamily\bfseries\large Citing this document}\\
 In order to let users cite Yade consistently in publications, we provide a list of bibliographic references for the different parts of the documentation. This way of acknowledging Yade is also a way to make developments and documentation of Yade more attractive for researchers, who are evaluated on the basis of citations of their work by others. We therefore kindly ask users to cite Yade as accurately as possible in their papers, as explained in http://yade-dem/doc/citing.html.

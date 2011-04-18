@@ -36,13 +36,13 @@ class WireState: public State {
 REGISTER_SERIALIZABLE(WireState);
 
 /** This class holds information associated with each body */
-class WireMat: public ElastMat {
+class WireMat: public FrictMat {
 	public:
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new WireState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<WireState*>(s); }
 		void postLoad(WireMat&);
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,ElastMat,"Material for use with the Wire classes",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,FrictMat,"Material for use with the Wire classes",
 		((Real,diameter,0.0027,," (Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
 		((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
 		((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
@@ -52,7 +52,7 @@ class WireMat: public ElastMat {
 		,
 		createIndex();
 	);
-	REGISTER_CLASS_INDEX(WireMat,ElastMat);
+	REGISTER_CLASS_INDEX(WireMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(WireMat);
 

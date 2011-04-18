@@ -9,7 +9,8 @@ class NormPhys:public IPhys {
 		virtual ~NormPhys();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormPhys,IPhys,"Abstract class for interactions that have normal stiffness.",
 		((Real,kn,NaN,,"Normal stiffness"))
-		((Vector3r,normalForce,Vector3r::Zero(),,"Normal force after previous step (in global coordinates).")),
+		((Vector3r,normalForce,Vector3r::Zero(),,"Normal force after previous step (in global coordinates)."))
+		((Real,limitNormalFactor,NaN,,"This value indicates on how far from failing the normal interaction is if failure is considered, e.g. actual normal displacement divided by admissible normal displacement multiplied by actual normal force divided by admissible normal force (currently just used in the :yref:`wire particle model<Law2_ScGeom_WirePhys_WirePM>`).")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(NormPhys,IPhys);

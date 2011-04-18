@@ -55,17 +55,22 @@ void VTKRecorder::action(){
 		else if((rec=="colors") || (rec=="color"))recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else if(rec=="rpm") recActive[REC_RPM]=true;
+		else if(rec=="wpm") recActive[REC_WPM]=true;
 		else if(rec=="intr") recActive[REC_INTR]=true;
 		else if((rec=="ids") || (rec=="id")) recActive[REC_ID]=true;
 		else if(rec=="mask") recActive[REC_MASK]=true;
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
 		else if(rec=="stress") recActive[REC_STRESS]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, color, stress, cpm, rpm, intr, id, clumpId, materialId). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, color, stress, cpm, rpm, wpm, intr, id, clumpId, materialId). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
 
+	// wpm needs interactions
+	if(recActive[REC_WPM]) recActive[REC_INTR]=true;
+
+	
 	// spheres
 	vtkSmartPointer<vtkPoints> spheresPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> spheresCells = vtkSmartPointer<vtkCellArray>::New();
@@ -180,6 +185,11 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> rpmSpecDiam = vtkSmartPointer<vtkFloatArray>::New();
 	rpmSpecDiam->SetNumberOfComponents(1);
 	rpmSpecDiam->SetName("rpmSpecDiam");
+	
+	// extras for WireMatPM
+	vtkSmartPointer<vtkFloatArray> wpmLimitNormalFactor = vtkSmartPointer<vtkFloatArray>::New();
+	wpmLimitNormalFactor->SetNumberOfComponents(1);
+	wpmLimitNormalFactor->SetName("wpmLimitNormalFactor");
 
 	if(recActive[REC_INTR]){
 		// holds information about cell distance between spatial and displayed position of each particle
@@ -246,6 +256,9 @@ void VTKRecorder::action(){
 			for(int i=0; i<numAddValues; i++){
 				intrForceN->InsertNextValue(fn);
 				intrAbsForceT->InsertNextTupleValue(fs);
+				if(recActive[REC_WPM]) {
+					wpmLimitNormalFactor->InsertNextValue(phys->limitNormalFactor);
+				}
 			}
 		}
 	}
@@ -428,6 +441,9 @@ void VTKRecorder::action(){
 		intrPd->SetLines(intrCells);
 		intrPd->GetCellData()->AddArray(intrForceN);
 		intrPd->GetCellData()->AddArray(intrAbsForceT);
+		if (recActive[REC_WPM]){
+			intrPd->GetCellData()->AddArray(wpmLimitNormalFactor);
+		}
 		#ifdef YADE_VTK_MULTIBLOCK
 			if(!multiblock)
 		#endif

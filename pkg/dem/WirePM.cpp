@@ -91,7 +91,13 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	if (Fn > 0.) Fn = 0.;
 	
 	phys->normalForce = Fn*geom->normal; // NOTE: normal is position2-position1 - It is directed from particle1 to particle2
-	        
+
+	/* compute a limit value to check how far the interaction is from failing */
+	Real limitNormalFactor = 0.;
+	if (Fn < 0.) limitNormalFactor = fabs(D/(DFValues.back()(0)));
+	limitNormalFactor *= fabs(Fn/(DFValues.back()(1)));
+	phys->limitNormalFactor = limitNormalFactor;
+
 	State* st1 = Body::byId(id1,scene)->state.get();
 	State* st2 = Body::byId(id2,scene)->state.get();
 	
