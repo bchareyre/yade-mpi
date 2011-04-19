@@ -20,9 +20,9 @@ poisson = 0.3
 
 
 #### material definition
-netMat = O.materials.append( WireMat( young=young,poisson=poisson,density=density,isDoubleTwist=True,diameter=d,strainStressValues=strainStressValues,lambdaEps=0.4,lambdak=0.66) )
+netMat = O.materials.append( WireMat( young=young,poisson=poisson,frictionAngle=radians(30),density=density,isDoubleTwist=True,diameter=d,strainStressValues=strainStressValues,lambdaEps=0.4,lambdak=0.66) )
 
-wireMat = O.materials.append( WireMat( young=young,poisson=poisson,density=density,isDoubleTwist=False,diameter=3.4/1000,strainStressValues=strainStressValues ) )
+wireMat = O.materials.append( WireMat( young=young,poisson=poisson,frictionAngle=radians(30),density=density,isDoubleTwist=False,diameter=3.4/1000,strainStressValues=strainStressValues ) )
 
 
 #### get net packing

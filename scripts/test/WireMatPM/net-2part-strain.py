@@ -37,7 +37,7 @@ poisson = 0.3
 
 
 #### material definition
-netMat = O.materials.append(WireMat(young=young,poisson=poisson,density=density,isDoubleTwist=False,diameter=d,strainStressValues=strainStressValues,lambdaEps=0.4,lambdak=0.21))
+netMat = O.materials.append(WireMat(young=young,poisson=poisson,frictionAngle=radians(30),density=density,isDoubleTwist=False,diameter=d,strainStressValues=strainStressValues,lambdaEps=0.4,lambdak=0.21))
 
 
 #### create boddies, default: dynamic=True
