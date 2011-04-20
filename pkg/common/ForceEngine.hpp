@@ -48,3 +48,13 @@ struct RadialForceEngine: public PartialEngine{
 	);
 };
 REGISTER_SERIALIZABLE(RadialForceEngine);
+
+class DragEngine: public PartialEngine{
+	public:
+		virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(DragEngine,PartialEngine,"Apply `drag force <http://en.wikipedia.org/wiki/Drag_equation>`__ on some particles at each step, decelerating them proportionally to their linear velocities. The applied force reads\n\n.. math:: F_{d}=-\\frac{\\vec{v}}{|\\vec{v}|}\\frac{1}{2}\\rho|\\vec{v}|^2 C_d A\n\nwhere $\\rho$ is the medium density (:yref:`density<DragEngine.Rho>`), $v$ is particle's velocity,  $A$ is particle projected area (disc), $C_d$ is the drag coefficient (0.47 for :yref:`Sphere`), \n\n.. note:: Drag force is only applied to spherical particles, listed in ids.",
+		((Real,Rho,1.225,,"Density of the medium (fluid or air), by default - the density of the air."))
+		((Real,Cd,0.47,,"Drag coefficient <http://en.wikipedia.org/wiki/Drag_coefficient>`_."))
+	);
+};
+REGISTER_SERIALIZABLE(DragEngine);

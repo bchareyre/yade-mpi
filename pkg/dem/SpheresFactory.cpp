@@ -6,21 +6,11 @@
 #include <boost/random/variate_generator.hpp>
 
 
-//YADE_PLUGIN((SpheresFactory)(DragForceApplier));
-YADE_PLUGIN((SpheresFactory)(CircularFactory)(BoxFactory)(DragForceApplier));
+
+YADE_PLUGIN((SpheresFactory)(CircularFactory)(BoxFactory));
 CREATE_LOGGER(SpheresFactory);
 CREATE_LOGGER(CircularFactory);
 CREATE_LOGGER(BoxFactory);
-
-void DragForceApplier::action(){
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b) continue;
-		Sphere* sphere=dynamic_cast<Sphere*>(b->shape.get());
-		if(!sphere) continue;
-		Vector3r dragForce=-b->state->vel.normalized()*(1/2.)*density*b->state->vel.squaredNorm()*.47*Mathr::PI*pow(sphere->radius,2);
-		scene->forces.addForce(b->id,dragForce);
-	}
-}
 
 // initialize random number generator with time seed
 static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));

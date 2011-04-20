@@ -4,17 +4,18 @@
 
 #include"ForceEngine.hpp"
 #include<yade/core/Scene.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include<yade/lib/smoothing/LinearInterpolate.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
 #include<yade/core/IGeom.hpp>
 #include<yade/core/IPhys.hpp>
 
-YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine)(RadialForceEngine));
+YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine)(RadialForceEngine)(DragEngine));
 
 void ForceEngine::action(){
 	FOREACH(Body::id_t id, ids){
-		assert(scene->bodies->exists(id));
+		if (!(scene->bodies->exists(id))) continue;
 		scene->forces.addForce(id,force);
 	}
 }
@@ -30,10 +31,29 @@ void RadialForceEngine::postLoad(RadialForceEngine&){ axisDir.normalize(); }
 
 void RadialForceEngine::action(){
 	FOREACH(Body::id_t id, ids){
-		assert(scene->bodies->exists(id));
+		if (!(scene->bodies->exists(id))) continue;
 		const Vector3r& pos=Body::byId(id,scene)->state->pos;
 		Vector3r radial=(pos - (axisPt+axisDir * /* t */ ((pos-axisPt).dot(axisDir)))).normalized();
 		if(radial.squaredNorm()==0) continue;
 		scene->forces.addForce(id,fNorm*radial);
+	}
+}
+
+void DragEngine::action(){
+	FOREACH(Body::id_t id, ids){
+		Body* b=Body::byId(id,scene).get();
+		if (!b) continue;
+		if (!(scene->bodies->exists(id))) continue;
+		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+		if (sphere){
+			Real A = sphere->radius*sphere->radius*Mathr::PI;	//Crossection of the sphere
+			Vector3r velSphTemp = b->state->vel;
+			Vector3r dragForce = Vector3r::Zero();
+			
+			if (velSphTemp != Vector3r::Zero()) {
+				dragForce = -0.5*Rho*A*Cd*velSphTemp.squaredNorm()*velSphTemp.normalized();
+			}
+			scene->forces.addForce(id,dragForce);
+		}
 	}
 }
