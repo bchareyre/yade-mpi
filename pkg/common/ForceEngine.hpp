@@ -58,3 +58,12 @@ class DragEngine: public PartialEngine{
 	);
 };
 REGISTER_SERIALIZABLE(DragEngine);
+
+class LinearDragEngine: public PartialEngine{
+	public:
+		virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(LinearDragEngine,PartialEngine,"Apply `viscous resistance or linear drag <http://en.wikipedia.org/wiki/Drag_%28physics%29#Very_low_Reynolds_numbers_.E2.80.94_Stokes.27_drag>`__ on some particles at each step, decelerating them proportionally to their linear velocities. The applied force reads\n\n.. math:: F_{d}=-b{\\vec{v}} \n\nwhere $b$ is the linear drag, $\\vec{v}$ is particle's velocity. \n\n.. math:: b=6\\pi\\nu r \n\nwhere $\\nu$ is the medium viscosity, $r$ is the `Stokes radius <http://en.wikipedia.org/wiki/Stokes_radius>`__ of the particle (but in this case we accept it equal to sphere radius for simplification), \n\n.. note:: linear drag is only applied to spherical particles, listed in ids.",
+		((Real,nu,0.001,,"Viscosity of the medium."))
+	);
+};
+REGISTER_SERIALIZABLE(LinearDragEngine);

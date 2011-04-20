@@ -11,7 +11,7 @@
 #include<yade/core/IGeom.hpp>
 #include<yade/core/IPhys.hpp>
 
-YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine)(RadialForceEngine)(DragEngine));
+YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine)(RadialForceEngine)(DragEngine)(LinearDragEngine));
 
 void ForceEngine::action(){
 	FOREACH(Body::id_t id, ids){
@@ -52,6 +52,26 @@ void DragEngine::action(){
 			
 			if (velSphTemp != Vector3r::Zero()) {
 				dragForce = -0.5*Rho*A*Cd*velSphTemp.squaredNorm()*velSphTemp.normalized();
+			}
+			scene->forces.addForce(id,dragForce);
+		}
+	}
+}
+
+void LinearDragEngine::action(){
+	FOREACH(Body::id_t id, ids){
+		Body* b=Body::byId(id,scene).get();
+		if (!b) continue;
+		if (!(scene->bodies->exists(id))) continue;
+		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+		if (sphere){
+			Vector3r velSphTemp = b->state->vel;
+			Vector3r dragForce = Vector3r::Zero();
+			
+			Real b = 6*Mathr::PI*nu*sphere->radius;
+			
+			if (velSphTemp != Vector3r::Zero()) {
+				dragForce = -b*velSphTemp;
 			}
 			scene->forces.addForce(id,dragForce);
 		}
