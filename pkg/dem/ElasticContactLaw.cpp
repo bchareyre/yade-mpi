@@ -71,7 +71,8 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 			Real ratio = sqrt(maxFs) / shearForce.norm();
 			shearForce *= ratio;}
 	} else {
-		//almost the same with additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
+		//almost the same with additional Vector3r instatinated for energy tracing, 
+		//duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
 		if(shearForce.squaredNorm() > maxFs){
 			Real ratio = sqrt(maxFs) / shearForce.norm();
 			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip

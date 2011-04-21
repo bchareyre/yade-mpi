@@ -16,14 +16,11 @@
 YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom6D_CohFrictPhys_CohesionMoment));
 CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 
-Vector3r translation_vect_ ( 0.10,0,0 );
-
 Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::normElastEnergy()
 {
 	Real normEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		//ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());  //Commented due to warning
 		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
 		if (phys) {
 			normEnergy += 0.5*(phys->normalForce.squaredNorm()/phys->kn);
@@ -36,7 +33,6 @@ Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::shearElastEnergy()
 	Real shearEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		//ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());  //Commented due to warning
 		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
 		if (phys) {
 			shearEnergy += 0.5*(phys->shearForce.squaredNorm()/phys->ks);
@@ -105,7 +101,10 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 				maxFs = max((Real) 0, Fn*currentContactPhysics->tangensOfFrictionAngle);
 			}
 			maxFs = maxFs / Fs;
+			Vector3r trialForce=shearForce;
 			shearForce *= maxFs;
+			Real dissip=((1/currentContactPhysics->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
 			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
 		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position);

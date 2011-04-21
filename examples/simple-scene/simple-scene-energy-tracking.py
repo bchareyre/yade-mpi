@@ -10,9 +10,9 @@ damping = 0.2
 # initial angular velocity
 angVel = 3.0
 # use two spheres?
-two_spheres = False
+two_spheres =True
 # sphere rotating more?
-rotate_in_two_directions = False
+rotate_in_two_directions = True
 
 ############################################
 ##### material                         #####
@@ -79,16 +79,20 @@ plot.labels={'t':'time [s]',
 	'E_kin_translation':'Translation energy: E_kin=m*V^2/2',
 	'E_kin_rotation':'Rotation energy: E_kin=I*$\omega$^2/2',
 	'E_pot':'Gravitational potential: E_pot=m*g*h',
+	'E_plastic':'Plastic dissipation on shearing: E_pl=F*$\Delta$F/k',
 	'total':'total',
 	'total_plus_damp':'total + damping'}
 
-plot.plots={'t':('normal_Work',
-		'shear_Work',
-		'E_kin_translation',
-		'E_kin_rotation',
-		'E_pot',
-		'total',
-		'total_plus_damp')}
+plot.plots={'t':(
+		('normal_Work','b-'),
+		('shear_Work','r-'),
+		('E_kin_translation','b-.'),
+		('E_kin_rotation','r-.'),
+		('E_plastic','c-'),
+		('E_pot','y-'),
+		('total','k:'),
+		('total_plus_damp','k-')
+		)}
 
 ## this function is called by plotDataCollector
 ## it should add data with the labels that we will plot
@@ -99,11 +103,13 @@ def myAddPlotData():
 	E_kin_translation = 0
 	E_kin_rotation    = 0
 	E_pot		  = 0
+	E_plastic	  = 0
+	E_tracker	  = dict(O.energy.items())
 
 	if(two_spheres):## for more bodies we better use the energy tracker, because it's tracking all bodies
-		E_kin_translation = dict(O.energy.items())['kinTrans']
-		E_kin_rotation    = dict(O.energy.items())['kinRot']
-		E_pot		  = dict(O.energy.items())['gravWork'] 
+		E_kin_translation = E_tracker['kinTrans']
+		E_kin_rotation    = E_tracker['kinRot']
+		E_pot		  = E_tracker['gravWork'] 
 
 	else: ## for one sphere we can just calculate, and it will be correct
 		sph=O.bodies[1]
@@ -116,10 +122,13 @@ def myAddPlotData():
 		E_kin_rotation    = I*w**2.0/2.0
 		E_pot		  = m*g*h
 
-	total = normal_Work + shear_Work + E_kin_translation + E_kin_rotation + E_pot
+	if('plastDissip' in E_tracker):
+		E_plastic	  = E_tracker['plastDissip']
+
+	total = normal_Work + shear_Work + E_plastic + E_kin_translation + E_kin_rotation + E_pot
 	total_plus_damp	  = 0
 	if(damping!=0):
-		total_plus_damp	  = total + dict(O.energy.items())['nonviscDamp']
+		total_plus_damp	  = total + E_tracker['nonviscDamp']
 	else:	
 		total_plus_damp	  = total
 	plot.addData(
@@ -129,6 +138,7 @@ def myAddPlotData():
 		E_kin_translation = E_kin_translation,
 		E_kin_rotation    = E_kin_rotation   ,
 		E_pot		  = E_pot		 ,
+		E_plastic	  = E_plastic ,
 		total		  = total		 ,
 		total_plus_damp	  = total_plus_damp	 ,
 	)
