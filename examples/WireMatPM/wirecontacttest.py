@@ -6,7 +6,7 @@ from yade import utils, plot, pack, qt
 d = 2.7/1000.
 # particle radius
 radius = d*4.
-# define piecewise lineare stress-strain curve [Pa]
+# define piecewise linear stress-strain curve [Pa]
 strainStressValues=[(0.0019230769,2.5e8),(0.0192,3.2195e8),(0.05,3.8292e8),(0.15,5.1219e8),(0.25,5.5854e8),(0.3,5.6585e8),(0.35,5.6585e8)]
 
 # elastic material properties
@@ -36,7 +36,7 @@ cornerCoord=[0,0,0]
 Lx = 2.
 Ly = 2.
 # properties of particles
-kw = {'color':[1,1,0],'wire':True,'highlight':False,'fixed':False,'material':netMat}
+kw = {'color':[0,1,0],'wire':True,'highlight':False,'fixed':False,'material':netMat}
 
 
 ##### create packing for net
@@ -57,7 +57,7 @@ for id in posIds:
 
 
 #### define engines to create link
-interactionRadius=2.8
+interactionRadius=2.8	# value has to be adjusted according to the particle size of the net and the mesh opening size of the net (check always if links are created)
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=interactionRadius,label='aabb')]), 
@@ -115,8 +115,8 @@ for id in movingIds:
 	O.bodies[id].state.blockedDOFs='xyzXYZ'
 
 
-#### import block as a sphere
-bloc=O.bodies.append(utils.sphere([1.0,1.0,0.65],radius=0.15,wire=False,highlight=False,color=[1,0,0],material=blocMat))
+#### import block as a sphere after net has been created
+bloc=O.bodies.append(utils.sphere([1.0,1.0,0.65],radius=0.15,wire=False,highlight=False,color=[1,1,0],material=blocMat))
 
 
 #### plot some results
@@ -148,6 +148,6 @@ O.engines=[
 
 #### time step definition for simulation
 ## critical time step proposed by Bertrand
-kn = 16115042 # stiffness of single wire from code
+kn = 16115042 # stiffness of single wire from code, has to be changed if you change the stress-strain curve for the wire
 O.dt = 0.2*sqrt(particleMass/(2.*kn))
 
