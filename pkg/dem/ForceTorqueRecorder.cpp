@@ -6,7 +6,7 @@ CREATE_LOGGER(ForceRecorder);
 void ForceRecorder::action(){
 	totalForce=Vector3r::Zero();
 	FOREACH(Body::id_t id, ids){
-		assert(scene->bodies->exists(id)); 
+		if (!(scene->bodies->exists(id))) continue; 
 		totalForce+=scene->forces.getForce(id);
 	};
 	
@@ -21,7 +21,7 @@ void TorqueRecorder::action(){
 	Vector3r tmpAxis = rotationAxis.normalized();
 	
 	FOREACH(Body::id_t id, ids){
-		assert(scene->bodies->exists(id)); 
+		if (!(scene->bodies->exists(id))) continue;
 		Body* b=Body::byId(id,scene).get();
 		
 		Vector3r tmpPos = b->state->pos;

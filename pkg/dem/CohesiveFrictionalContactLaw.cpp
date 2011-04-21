@@ -23,7 +23,7 @@ Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::normElastEnergy()
 	Real normEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());
+		//ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());  //Commented due to warning
 		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
 		if (phys) {
 			normEnergy += 0.5*(phys->normalForce.squaredNorm()/phys->kn);
@@ -36,7 +36,7 @@ Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::shearElastEnergy()
 	Real shearEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());
+		//ScGeom6D* scg = YADE_CAST<ScGeom6D*>(I->geom.get());  //Commented due to warning
 		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
 		if (phys) {
 			shearEnergy += 0.5*(phys->shearForce.squaredNorm()/phys->ks);
