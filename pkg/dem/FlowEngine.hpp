@@ -20,6 +20,8 @@ class TesselationWrapper;
 #define FlowSolver CGT::FlowBoundingSphere
 #endif
 
+
+
 class FlowEngine : public PartialEngine
 {
 	private:
@@ -58,6 +60,7 @@ class FlowEngine : public PartialEngine
 		python::list getConstrictions() {
 			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
+		Vector3r fluidForce(int id_sph) {const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 
 		virtual ~FlowEngine();
 
@@ -91,7 +94,7 @@ class FlowEngine : public PartialEngine
 					((bool,compute_K,false,,"Activates permeability measure within a granular sample"))
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
-					((double,permeability_factor,1.0,,"a permability multiplicator"))
+					((double,permeability_factor,0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of fluid"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
@@ -115,6 +118,12 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_BACK_Boundary,  0,,"Pressure imposed on back boundary"))
 					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
+					((int, wallTopId,3,,"Id of top boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+					((int, wallBottomId,2,,"Id of bottom boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+					((int, wallFrontId,5,,"Id of front boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+					((int, wallBackId,4,,"Id of back boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+					((int, wallLeftId,0,,"Id of left boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+					((int, wallRightId,1,,"Id of right boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((Vector3r, id_force, 0,, "Fluid force acting on sphere with id=flow.id_sphere"))
 					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, TOP_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
@@ -132,6 +141,7 @@ class FlowEngine : public PartialEngine
 					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
+					.def("fluidForce",&FlowEngine::fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					)
 		DECLARE_LOGGER;
 };

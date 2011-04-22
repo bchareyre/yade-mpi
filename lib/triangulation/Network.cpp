@@ -419,13 +419,13 @@ void Network::AddBoundingPlanes()
 	Tesselation& Tes = T[currentTes];
 	
 	//FIXME: Id's order in boundsIds is done according to the enumerotation of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
-	y_min_id = Tes.Max_id() + 1;
+	y_min_id = Tes.Max_id() + 2;
         boundsIds[0]=&y_min_id;
-        y_max_id = Tes.Max_id() + 2;
+        y_max_id = Tes.Max_id() + 3;
         boundsIds[1]=&y_max_id;
-        x_min_id = Tes.Max_id() + 3;
+        x_min_id = Tes.Max_id() + 0;
         boundsIds[2]=&x_min_id;
-        x_max_id = Tes.Max_id() + 4;
+        x_max_id = Tes.Max_id() + 1;
         boundsIds[3]=&x_max_id;
         z_min_id = Tes.Max_id() + 5;
         boundsIds[4]=&z_max_id;

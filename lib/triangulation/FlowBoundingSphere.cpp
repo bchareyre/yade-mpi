@@ -44,8 +44,9 @@ namespace CGT
 typedef vector<double> VectorR;
 
 //! Use this factor, or minLength, to reduce max permeability values (see usage below))
-const double MAXK_DIV_KMEAN = 1;
-const double minLength = 0.20;//percentage of mean rad
+const double MAXK_DIV_KMEAN = 2;
+const double MINK_DIV_KMEAN = 0.05;
+const double minLength = 0.02;//percentage of mean rad
 
 //! Factors including the effect of 1/2 symmetry in hydraulic radii
 const Real multSym1 = 1/pow(2,0.25);
@@ -518,8 +519,13 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect(0,0,0);
+	static vector<Vecteur> oldForces;
+	if (oldForces.size()<=Tri.number_of_vertices()) oldForces.resize(Tri.number_of_vertices()+1);
 	//reset forces
-	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+		if (noCache) {oldForces[v->info().id()]=nullVect; v->info().forces=nullVect;}
+		else {oldForces[v->info().id()]=v->info().forces; v->info().forces=nullVect;}
+	}
 
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
@@ -567,6 +573,7 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
 	noCache=false;//cache should always be defined after execution of this function
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces = 0*oldForces[v->info().id()]+1*v->info().forces;
 	if (DEBUG_OUT) {
 		cout << "Facet cached scheme" <<endl;
 		Vecteur TotalForce = nullVect;
@@ -768,7 +775,8 @@ void FlowBoundingSphere::Compute_Permeability()
 						S0=checkSphereFacetOverlap(v0,v1,v2);
 						if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0);
 						if (S0==0) S0=checkSphereFacetOverlap(v2,v0,v1);
-						fluidArea=area-crossSections[0]-crossSections[1]-crossSections[2]+S0;
+						//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
+						fluidArea=abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
 						cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
 						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);}
 						
@@ -790,7 +798,7 @@ void FlowBoundingSphere::Compute_Permeability()
 		}
 		cell->info().isvisited = !ref;
 	}
-	cout<<"surfneg est "<<surfneg<<endl;
+// 	cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
@@ -809,8 +817,9 @@ void FlowBoundingSphere::Compute_Permeability()
 			neighbour_cell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
 				pass++;
-				(cell->info().k_norm())[j] = min((cell->info().k_norm())[j], maxKdivKmean*meanK);
+				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*meanK ,min((cell->info().k_norm())[j], maxKdivKmean*meanK));
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
+// 				cout<<(cell->info().k_norm())[j]<<endl;
 // 				kFile << (cell->info().k_norm())[j] << endl;
 			}
 		}cell->info().isvisited = !ref;
