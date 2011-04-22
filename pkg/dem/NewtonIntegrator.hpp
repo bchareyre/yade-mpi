@@ -38,6 +38,8 @@ class NewtonIntegrator : public GlobalEngine{
 
 	// whether the cell has changed from the previous step
 	bool cellChanged;
+	// wether a body has been selected in Qt view
+	bool bodySelected;
 	int homoDeform; // updated from scene at every call; -1 for aperiodic simulations, otherwise equal to scene->cell->homoDeform
 	Matrix3r dVelGrad; // dtto
 

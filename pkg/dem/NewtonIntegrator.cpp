@@ -70,6 +70,7 @@ void NewtonIntegrator::saveMaximaVelocity(const Body::id_t& id, State* state){
 void NewtonIntegrator::action()
 {
 	scene->forces.sync();
+	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
 	const Real& dt=scene->dt;
 	homoDeform=(scene->isPeriodic ? scene->cell->homoDeform : -1); // -1 for aperiodic simulations
@@ -166,7 +167,7 @@ void NewtonIntegrator::action()
 			saveMaximaVelocity(id,state);
 			// move individual members of the clump, save maxima velocity (for collider stride)
 			if(b->isClump()) Clump::moveMembers(b,scene,this);
-
+			
 			#ifdef YADE_BODY_CALLBACK
 				// process callbacks
 				for(size_t i=0; i<callbacksSize; i++){
@@ -197,7 +198,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 	} else if (homoDeform==Cell::HOMO_POS){
 		state->pos+=scene->cell->velGrad*state->pos*dt;
 	}
-	state->pos+=state->vel*dt;
+	if (!bodySelected || scene->selectedBody!=id) state->pos+=state->vel*dt;
 }
 
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
