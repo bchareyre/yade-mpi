@@ -91,7 +91,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((Real,currentStrainRate,0,,"current strain rate - converging to :yref:`TriaxialCompressionEngine::strainRate` (./s)"))
 		((Real,UnbalancedForce,1,,"mean resultant forces divided by mean contact force"))
 		((Real,StabilityCriterion,0.001,,"tolerance in terms of :yref:`TriaxialCompressionEngine::UnbalancedForce` to consider the packing is stable"))
-		((Vector3r,translationAxis,TriaxialStressController::normal[wall_bottom_id],,"compression axis"))
+		((Vector3r,translationAxis,TriaxialStressController::normal[wall_bottom],,"compression axis"))
 		((bool,autoCompressionActivation,true,,"Auto-switch from isotropic compaction (or unloading state if sigmaLateralConfinement<sigmaIsoCompaction) to deviatoric loading"))
 		((bool,autoUnload,true,,"Auto-switch from isotropic compaction to unloading"))
 		((bool,autoStopSimulation,true,,"Stop the simulation when the sample reach STATE_LIMBO, or keep running"))

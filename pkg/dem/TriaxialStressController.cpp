@@ -75,12 +75,12 @@ void TriaxialStressController::action()
 	// sync thread storage of ForceContainer
 	scene->forces.sync();
 	if (first) {// sync boundaries ids in the table
-		wall_id[0] = wall_bottom_id;
- 		wall_id[1] = wall_top_id;
- 		wall_id[2] = wall_left_id;
- 		wall_id[3] = wall_right_id;
- 		wall_id[4] = wall_front_id;
- 		wall_id[5] = wall_back_id;}
+		wall_id[wall_bottom] = wall_bottom_id;
+ 		wall_id[wall_top] = wall_top_id;
+ 		wall_id[wall_left] = wall_left_id;
+ 		wall_id[wall_right] = wall_right_id;
+ 		wall_id[wall_front] = wall_front_id;
+ 		wall_id[wall_back] = wall_back_id;}
 
 	if(thickness<0) thickness=2.0*YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,scene)->shape)->extents.y();
 	State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();

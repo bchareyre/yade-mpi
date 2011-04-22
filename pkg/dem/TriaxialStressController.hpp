@@ -28,7 +28,7 @@ class TriaxialStressController : public BoundaryController
 		inline const Vector3r getForce(Scene* rb, Body::id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of action */ }
 	public :
 		//! internal index values for retrieving walls
-		enum { wall_bottom=0, wall_top, wall_left, wall_right, wall_front, wall_back };
+		enum {wall_left=0, wall_right, wall_bottom, wall_top, wall_back, wall_front};
 		//! real index values of walls in the Scene
 		int wall_id [6];
 		//! Stores the value of the translation at the previous time step, stiffness, and normal
@@ -82,12 +82,12 @@ class TriaxialStressController : public BoundaryController
 		((unsigned int,computeStressStrainInterval,10,,""))
 		((Real,wallDamping,0.25,,"wallDamping coefficient - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
 		((Real,thickness,-1,,"thickness of boxes (needed by some functions)"))
-		((int,wall_bottom_id,0,,"id of boundary ; coordinate 1-"))
-		((int,wall_top_id,0,,"id of boundary ; coordinate 1+"))
-		((int,wall_left_id,0,,"id of boundary ; coordinate 0-"))
-		((int,wall_right_id,0,,"id of boundary ; coordinate 0+"))
-		((int,wall_front_id,0,,"id of boundary ; coordinate 2+"))
-		((int,wall_back_id,0,,"id of boundary ; coordinate 2-"))
+		((int,wall_bottom_id,2,,"id of boundary ; coordinate 1- (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+		((int,wall_top_id,3,,"id of boundary ; coordinate 1+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+		((int,wall_left_id,0,,"id of boundary ; coordinate 0- (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+		((int,wall_right_id,1,,"id of boundary ; coordinate 0+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+		((int,wall_front_id,5,,"id of boundary ; coordinate 2+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
+		((int,wall_back_id,4,,"id of boundary ; coordinate 2- (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 		((bool,wall_bottom_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
 		((bool,wall_top_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
 		((bool,wall_left_activated,true,,"if true, the engine is keeping stress constant on this boundary."))

@@ -45,19 +45,7 @@ class TriaxialTest : public FileGenerator
 	private	:
 		Vector3r	 gravity;
 		Vector3r	 spheresColor;
-		bool		 wall_top
-				,wall_bottom
-				,wall_1
-				,wall_2
-				,wall_3
-				,wall_4
-				,wall_top_wire
-				,wall_bottom_wire
-				,wall_1_wire
-				,wall_2_wire
-				,wall_3_wire
-				,wall_4_wire
-				,spheresRandomColor;
+		bool		spheresRandomColor;
 	
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
@@ -123,18 +111,6 @@ class TriaxialTest : public FileGenerator
 		/* init */
 		,
 		/* constructor */
-		wall_top 		= true;
-		wall_bottom 		= true;
-		wall_1			= true;
-		wall_2			= true;
-		wall_3			= true;
-		wall_4			= true;
-		wall_top_wire 		= true;
-		wall_bottom_wire	= true;
-		wall_1_wire		= true;
-		wall_2_wire		= true;
-		wall_3_wire		= true;
-		wall_4_wire		= true;
 		spheresColor		= Vector3r(0.8,0.3,0.3);
 		spheresRandomColor	= false;
 		WallStressRecordFile = "./WallStresses"+Key;	
