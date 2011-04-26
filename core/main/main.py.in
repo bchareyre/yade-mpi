@@ -149,7 +149,7 @@ from math import *
 
 # Run the check tests listed in scripts/test/checks/checkList.py
 if opts.checks:
-	checksPath='${sourceRoot}'+'/scripts/test/checks' # replaced at install-time
+	checksPath=libDir+'/py/yade/tests/checks'
 	execfile(checksPath+'/checkList.py')
 
 # Run performance check test
