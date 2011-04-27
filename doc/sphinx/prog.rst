@@ -226,14 +226,14 @@ The buildbot activity and logs can be `browsed online <https://yade-dem.org/buil
 Regression tests
 ----------------
 Yade contains two types of regression tests, some are unit tests while others are testing more complex simulations. Altough both types can be considered regression tests, the usage is that we name the first simply "regression tests", while the latest are called "check tests".
-Both series of tests can ran at yade startup by passing the options "test" or "check" ::
+Both series of tests can be ran at yade startup by passing the options "test" or "check" ::
 
 	yade --test
 	yade --check
 
 Unit regression tests
 ^^^^^^^^^^^^^^^^^^^^^
-Unit regression tests are testing well the output of individual functors and engines in well defined conditions. They are defined in the folder :ysrc:`py/tests/`.
+Unit regression tests are testing the output of individual functors and engines in well defined conditions. They are defined in the folder :ysrc:`py/tests/`.
 The purpose of unit testing is to make sure that the behaviour of the most important classes remains correct during code development. Since they test classes one by one, unit tests can't detect
 
 Check tests
