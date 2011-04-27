@@ -234,7 +234,7 @@ Both series of tests can be ran at yade startup by passing the options "test" or
 Unit regression tests
 ^^^^^^^^^^^^^^^^^^^^^
 Unit regression tests are testing the output of individual functors and engines in well defined conditions. They are defined in the folder :ysrc:`py/tests/`.
-The purpose of unit testing is to make sure that the behaviour of the most important classes remains correct during code development. Since they test classes one by one, unit tests can't detect
+The purpose of unit testing is to make sure that the behaviour of the most important classes remains correct during code development. Since they test classes one by one, unit tests can't detect problems coming from the interaction between different engines in a typical simulation. That is why check tests have been introduced. 
 
 Check tests
 ^^^^^^^^^^^
