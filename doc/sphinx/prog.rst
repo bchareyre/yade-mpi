@@ -217,7 +217,7 @@ The versioning software used is `Bazaar <http://www.bazaar-vcs.org>`__, for wich
 Build robot
 -----------
 A build robot hosted at `3SR lab. <http://www.3s-r.hmg.inpg.fr/3sr/?lang=en>`__ is tracking souce code changes.
-Each time a change in the source code is commited to the main development branch via bazaar. The "buildbot" downloads and compiles the new version, and start a series of tests.
+Each time a change in the source code is commited to the main development branch via bazaar, the "buildbot" downloads and compiles the new version, and start a series of tests.
 
 If a compilation error has been introduced, it will be notified to the yade-dev mailing list and to the commiter, thus helping to fix problems quickly.
 If the compilation is successfull, the buildbot starts unit regression tests and "check tests" (see below) and report the results. If all tests are passed, a new version of the documentation is generated and uploaded to the website in `html <https://www.yade-dem.org/doc/>`__ and `pdf <https://yade-dem.org/doc/Yade.pdf>`__ format. As a consequence, those two links always point to the documentation (the one you are reading now) of the last successfull build, and the delay between commits and documentation updates are very short (minutes).
