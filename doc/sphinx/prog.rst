@@ -212,7 +212,7 @@ Hosting and versioning
 ----------------------
 The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__, which is used for source code, bug tracking, planning, package downloads and more. Our repository `can be http-browsed <http://bazaar.launchpad.net/~vcs-imports/yade/trunk/files>`__.
 
-The versioning software used is `Bazaar <http://www.bazaar-vcs.org>`__, for wich a short tutorial can be found in a `Yade's wiki pages <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`__. Bazaar is a distributed revision control system. It is available packaged for all major linux distributions.
+The versioning software used is `Bazaar <http://www.bazaar-vcs.org>`__, for which a short tutorial can be found in a `Yade's wiki pages <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`__. Bazaar is a distributed revision control system. It is available packaged for all major linux distributions.
 
 Build robot
 -----------
