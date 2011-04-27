@@ -56,7 +56,7 @@ class FlowEngine : public PartialEngine
 		void Average_real_cell_velocity();
 		Real getFlux(int cond);
 		void saveVtk() {flow->save_vtk_file();}
-		vector<Real> AvFlVelOnSph(int id_sph) {flow->Average_Fluid_Velocity_On_Sphere(id_sph);}
+		vector<Real> AvFlVelOnSph(int id_sph) {return flow->Average_Fluid_Velocity_On_Sphere(id_sph);}
 		python::list getConstrictions() {
 			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}

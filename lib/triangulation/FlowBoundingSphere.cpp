@@ -784,7 +784,7 @@ void FlowBoundingSphere::Compute_Permeability()
 					 cout << "WARNING! if !areaR2Permeability, facetFluidSurfacesRatio will not be defined correctly. Don't use that."<<endl;
 					 k = (M_PI * pow(radius,4)) / (8*viscosity*distance);}
 
-				if (k<0) {surfneg+=1;
+				if (k<0 && DEBUG_OUT) {surfneg+=1;
 				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
 				} else  {cout <<"infinite K!"<<endl; k = infiniteK;}//Will be corrected in the next loop
@@ -798,7 +798,7 @@ void FlowBoundingSphere::Compute_Permeability()
 		}
 		cell->info().isvisited = !ref;
 	}
-// 	cout<<"surfneg est "<<surfneg<<endl;
+	if (DEBUG_OUT) cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;

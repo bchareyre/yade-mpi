@@ -60,9 +60,9 @@ void FlowEngine::action()
 
 	if (first) Build_Triangulation(P_zero);
 	timingDeltas->checkpoint("Triangulating");
+	UpdateVolumes ( );
 	if (!first) {
 		eps_vol_max=0.f;
-		UpdateVolumes ( );
 		Eps_Vol_Cumulative += eps_vol_max;
 		if ((Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>10000) && retriangulationLastIter>10) {
 			Update_Triangulation = true;
@@ -177,7 +177,7 @@ void FlowEngine::imposePressure(Vector3r pos, Real p)
 void FlowEngine::clearImposedPressure() { flow->imposedP.clear();}
 
 Real FlowEngine::getFlux(int cond) {
-	if (cond>=flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
+	if (cond>=(int)flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
 	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
 	double flux=0;
 	CGT::Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
@@ -252,7 +252,6 @@ void FlowEngine::Build_Triangulation (double P_zero)
 		flow->Initialize_pressures(P_zero);// FIXME : why, if we are going to interpolate after that?
 		flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
-
 	}
 	Initialize_volumes();
 }
