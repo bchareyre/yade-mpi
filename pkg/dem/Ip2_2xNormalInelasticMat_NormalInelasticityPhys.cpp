@@ -14,14 +14,7 @@
 #include<yade/core/Scene.hpp>
 
 
-//
-//
-//
-/// Big WHAT THE ....? this code below is duplicated THREE times due to some weird IFs !
-/// need to FIXME that.
-/// but from all my testing it works currently. / janek
-//
-//
+
 
 void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>& b1 // NormalInelasticMat
 					, const shared_ptr<Material>& b2 // NormalInelasticMat
@@ -44,8 +37,8 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 			Real Eb 	= sdec2->young;
 			Real Va 	= sdec1->poisson;
 			Real Vb 	= sdec2->poisson;
-			Real Ra 	= geom->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
-			Real Rb 	= geom->radius2; // FIXME - as above
+			Real Ra 	= geom->radius1; 
+			Real Rb 	= geom->radius2;
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 
@@ -60,8 +53,7 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 			contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
 			contactPhysics->forMaxMoment		= 1.0*(Ra+Rb)/2.0;	// 1.0 corresponding to ethaR which I don't know exactly where to define as a parameter...
 
-			// Lot of suppress here around (>) r2276. Normally not bad but ? See Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.cpp to re-find the initial §...
-						
+			// Lot of suppress here around (>) r2276. Normally not bad but ? 
 			contactPhysics->knLower = Kn;
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;

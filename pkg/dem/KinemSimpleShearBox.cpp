@@ -73,8 +73,8 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 	leftbox->state->vel = Vector3r(dX/(2.0 * dt),dY/(2.0 * dt),0);
 	rightbox->state->vel = Vector3r(dX/(2.0 * dt),dY/(2.0*dt),0);
 
-//	Then computation of the angle of the rotation to be done :
 	computeAlpha();
+//	Then computation of the angle of the rotation,dalpha, to be done :
 	if (alpha == Mathr::PI/2.0)	// Case of the very beginning
 	{
 		dalpha = - atan( dX / (Ysup_mod -Ylat_mod) );
@@ -87,7 +87,7 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 
 	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 
-// On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
+// Rotation is applied : orientation and angular velocity of plates are modified.
 	leftbox->state->ori	= qcorr*leftbox->state->ori;
 	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
@@ -98,14 +98,14 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 
 void KinemSimpleShearBox::stopMovement()
 {
-	// annulation de la vitesse de la plaque du haut
+	// upper plate's speed is zeroed
 	topbox->state->vel		=  Vector3r(0,0,0);
 
-	// de la plaque gauche
+	// same for left box
 	leftbox->state->vel		=  Vector3r(0,0,0);
 	leftbox->state->angVel		=  Vector3r(0,0,0);
 
-	// de la plaque droite
+	// and for rightbox
 	rightbox->state->vel		=  Vector3r(0,0,0);
 	rightbox->state->angVel		=  Vector3r(0,0,0);
 }
@@ -193,10 +193,6 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 // 	cout << "Je veux atteindre a cet it fDesired = "<< fDesired << endl;
 // 	cout << "Alors que f0 =  = "<< f0 << endl;
 // 	cout << "Car terme correctif = " << KnC * 1.0e9 * Scontact * (hCurrent-y0)<< endl;
-
-// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : => INUTILE maintenant ?
-// 	if( fSup.y() > fDesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
-// 		stiffness *= coeff_dech;
 
 	if( (stiffness==0) )
 	{

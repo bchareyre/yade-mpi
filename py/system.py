@@ -38,13 +38,7 @@ _deprecated={
 	'Law2_Dem3Dof_Elastic_Elastic':'Law2_Dem3Dof_FrictPhys_Basic', # Sun Jan 10 10:00:25 2010, vaclav@flux
 	'Law2_Dem3Dof_FrictPhys_Basic':'Law2_Dem3DofGeom_FrictPhys_Basic', # Sun Jan 10 10:01:27 2010, vaclav@flux
 	'Ip2_FrictMat_FrictMat_NormShearPhys':'Ip2_FrictMat_FrictMat_FrictPhys', # Sun Jan 10 10:07:40 2010, vaclav@flux
-	'ContactLaw1':'RockJointLaw', # Tue Feb  2 14:53:49 2010, jduriez@c1solimara-l
-	'ContactLaw1':'RockJointLaw', # Tue Feb  2 14:54:40 2010, jduriez@c1solimara-l
-	'ContactLaw1Interaction':'RockJointPhys', # Tue Feb  2 14:55:34 2010, jduriez@c1solimara-l
-	'CL1Relationships':'RockJointLawRelationships', # Tue Feb  2 14:58:02 2010, jduriez@c1solimara-l
 	'GLDrawCpmPhys':'Gl1_CpmPhys', # Sat Feb  6 14:46:08 2010, vaclav@flux
-	'RockJointLaw':'NormalInelasticityLaw', # Mon Feb  8 11:17:00 2010, jduriez@c1solimara-l
-	'RockJointPhys':'NormalInelasticityPhys', # Mon Feb  8 11:17:35 2010, jduriez@c1solimara-l
 	'RockJointLawRelationships':'Ip2_2xCohFrictMat_NormalInelasticityPhys', # Mon Feb  8 11:17:59 2010, jduriez@c1solimara-l
 	'TetraBang':'TTetraGeom', # Tue Feb  9 10:21:24 2010, vaclav@flux
 	'TetraMold':'Tetra', # Tue Feb  9 10:22:15 2010, vaclav@flux
@@ -52,12 +46,7 @@ _deprecated={
 	'Tetra2TetraBang':'Ig2_Tetra_Tetra_TTetraGeom', # Tue Feb  9 10:23:19 2010, vaclav@flux
 	'TetraLaw':'TetraVolumetricLaw', # Tue Feb  9 10:24:10 2010, vaclav@flux
 	'DirecResearchEngine':'Disp2DPropLoadEngine', # Wed Mar 10 12:23:42 2010, jduriez@c1solimara-l
-	'CinemCNCEngine':'KinemCNLEngine', # Wed Mar 10 12:33:36 2010, jduriez@c1solimara-l
-	'CinemKNCEngine':'KinemCNSEngine', # Wed Mar 10 12:34:01 2010, jduriez@c1solimara-l
-	'CinemDNCEngine':'KinemCNDEngine', # Wed Mar 10 12:34:27 2010, jduriez@c1solimara-l
-	'CinemDTCEngine':'KinemCTDEngine', # Wed Mar 10 12:34:37 2010, jduriez@c1solimara-l
 	'Ip2_BMP_BMP_CSPhys':'Ip2_2xFrictMat_CSPhys', # Wed Mar 10 15:08:56 2010, eudoxos@frigo
-	'CinemDTCEngine':'KinemCTDEngine', # Tue Mar 16 13:54:21 2010, jduriez@c1solimara-l
 	'NormalInelasticityLaw':'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity', # Wed Mar 17 15:50:59 2010, jduriez@c1solimara-l
 	'CapillaryCohesiveLaw':'CapillaryLaw', # Tue Mar 30 14:11:36 2010, sch50p@fluent-ph
 	'SimpleElasticRelationshipsWater':'Ip2_Frictmat_FrictMat_CapillaryLawPhys', # Tue Mar 30 14:20:36 2010, sch50p@fluent-ph
@@ -70,7 +59,6 @@ _deprecated={
 	'Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys':'Ip2_ViscElMat_ViscElMat_ViscElPhys', # Fri Apr  9 19:28:48 2010, vaclav@flux
 	'MomentEngine':'TorqueEngine', # Sun May  2 16:09:34 2010, vaclav@flux
 	'JumpChangeSe3':'StepDisplacer', # Sun May  2 16:14:21 2010, vaclav@flux
-	'ContactLaw1':'SomeBetterName', # Fri Jun  4 15:35:38 2010, jduriez@c1solimara-l
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:36:41 2010, jduriez@c1solimara-l
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:01 2010, jduriez@c1solimara-l
 	'Ip2_2xCohFrictMat_NormalInelasticityPhys':'Ip2_2xNormalInelasticMat_NormalInelasticityPhys', # Fri Jun  4 15:37:16 2010, jduriez@c1solimara-l

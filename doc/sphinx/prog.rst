@@ -401,7 +401,7 @@ In your docstring, the ``Author2008`` article can be cited by ``[Author2008]_``;
 
 will be rendered as
 
-	According to [Allen1989]_, the intergration scheme …
+	According to [Allen1989]_, the integration scheme …
 
 Separate class/function documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1574,8 +1574,8 @@ During each computation step, there are typically 3 phases pertaining to forces:
 
 This scenario leads to special design, which allows fast parallel write access:
 
-* each thread has its own storage (zeroed upon request), and only write to its own storage; this avoids concurrency issues. Each thread identifies itself by the omp_get_thread_num() function provided by the OpenMP runtime.
-* before reading absolute values, the container must be synchronized, i.e. values from all threads are summed up and stored separately. This is a relatively slow operation and we provide ForceContainer::syncCount that you might check to find cummulative number of synchronizations and compare it agains number of steps. Ideally, ForceContainer is only synchronized once at each step.
+* each thread has its own storage (zeroed upon request), and only writes to its own storage; this avoids concurrency issues. Each thread identifies itself by the omp_get_thread_num() function provided by the OpenMP runtime.
+* before reading absolute values, the container must be synchronized, i.e. values from all threads are summed up and stored separately. This is a relatively slow operation and we provide ForceContainer::syncCount that you might check to find cummulative number of synchronizations and compare it against number of steps. Ideally, ForceContainer is only synchronized once at each step.
 * the container is resized whenever an element outside the current range is read/written to (the read returns zero in that case); this avoids the necessity of tracking number of bodies, but also is potential danger (such as ``scene->forces.getForce(1000000000)``, which will probably exhaust your RAM). Unlike c++, Python does check given id against number of bodies.
 
 
@@ -1645,9 +1645,9 @@ During each step in the simulation, the following operations are performed on in
 	.. note::
 		If there is no functor suitable to handle given combination of :yref:`shapes<Shape>`, the interaction will be left in potential state, without raising any error.
 
-#. For real interactions (already existing or jsut created in last step), :yref:`InteractionLoop` (via :yref:`IPhysDispatcher`) calls appropriate :yref:`IPhysFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`IPhys` instance. It is an error if no suitable functor is found, and an exception will be thrown.
+#. For real interactions (already existing or just created in last step), :yref:`InteractionLoop` (via :yref:`IPhysDispatcher`) calls appropriate :yref:`IPhysFunctor` based on :yref:`Material` combination of both bodies. The functor *must* update (or create, if it doesn't exist yet) associated :yref:`IPhys` instance. It is an error if no suitable functor is found, and an exception will be thrown.
 
-#. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combintation of :yref:`IGeom` and :yref:`IPhys` of the interaction. Again, it is an error if no functor capable of handling it is found.
+#. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combination of :yref:`IGeom` and :yref:`IPhys` of the interaction. Again, it is an error if no functor capable of handling it is found.
 
 #. :yref:`LawDispatcher` can decide that an interaction should be removed (such as if bodies get too far apart for non-cohesive laws; or in case of complete damage for damage models). This is done by calling
 
@@ -1748,13 +1748,13 @@ Running simulation consists in looping over :yref:`Engines<Engine>` and calling 
 #. Call ``Engine::action()``
 #. If :yref:`O.timingEnabled<Omega.timingEnabled>`, increment :yref:`Engine::execTime` by the difference from the last time reading (either after the previous engine was run, or immediately before the loop started, if this engine comes first). Increment :yref:`Engine::execCount` by 1.
 
-After engines are processed, :yref:`virtual time<Omega.time>` is incremented by :yref:`timestep<Omega.dt>` and :yref:`iteraction number<Omega.iter>` is incremented by 1.
+After engines are processed, :yref:`virtual time<Omega.time>` is incremented by :yref:`timestep<Omega.dt>` and :yref:`iteration number<Omega.iter>` is incremented by 1.
 
 
 Background execution
 ^^^^^^^^^^^^^^^^^^^^^
 
-The engine loop is (normally) executed in background thread (handled by :ysrc:`SimulationFlow<core/SimulationFlow.hpp>` class), leaving forground thread free to manage user interaction or running python script. The background thread is managed by :yref:`O.run()<Omega.run>` and :yref:`O.pause()<Omega.pause>` commands. Foreground thread can be blocked until the loop finishes using :yref:`O.wait()<Omega.wait>`.
+The engine loop is (normally) executed in background thread (handled by :ysrc:`SimulationFlow<core/SimulationFlow.hpp>` class), leaving foreground thread free to manage user interaction or running python script. The background thread is managed by :yref:`O.run()<Omega.run>` and :yref:`O.pause()<Omega.pause>` commands. Foreground thread can be blocked until the loop finishes using :yref:`O.wait()<Omega.wait>`.
 
 Single iteration can be run without spawning additional thread using :yref:`O.step()<Omega.step>`.
 
