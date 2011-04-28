@@ -367,7 +367,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/********************/
 	/* MOHR-COULOMB law */
 	/********************/
-	
+	phys->isSliding=false;
 	phys->shearViscous=Vector3r::Zero(); // reset so that during sliding, the previous values is not there
 	Fn = phys->normalForce.norm();
 	if (!includeAdhesion) {

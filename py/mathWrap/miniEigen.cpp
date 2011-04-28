@@ -113,7 +113,7 @@ static bool Quaternionr__eq__(const Quaternionr& q1, const Quaternionr& q2){ ret
 static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ return q1!=q2; }
 #include<Eigen/SVD>
 static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
-
+static bp::tuple Matrix3r_eigenDecomposition(const Matrix3r& self){ Matrix3r rot,diag; matrixEigenDecomposition(self,rot,diag); return bp::make_tuple(rot,Vector3r(diag.diagonal())); }
 
 #undef IDX_CHECK
 
@@ -209,6 +209,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("inverse",&Matrix3r_inverse)
 		.def("transpose",&Matrix3r_transpose)
 		.def("polarDecomposition",&Matrix3r_polarDecomposition)
+		.def("eigenDecomposition",&Matrix3r_eigenDecomposition)
 		.def("diagonal",&Matrix3r_diagonal)
 		.def("row",&Matrix3r_row)
 		.def("col",&Matrix3r_col)
