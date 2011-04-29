@@ -1319,11 +1319,11 @@ There are multiple ways to produce a video of simulation:
       	SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',viewNo=0,label='snapshooter')
       ]
 
-   which will save numbered files like ``/tmp/bulldozer-0000.png``. These files can be processed externally (with `mencoder <http://www.mplayerhq.hu>`_ and similar tools) or directly with the :yref:`yade.utils.encodeVideoFromFrames`::
+   which will save numbered files like ``/tmp/bulldozer-0000.png``. These files can be processed externally (with `mencoder <http://www.mplayerhq.hu>`_ and similar tools) or directly with the :yref:`yade.utils.makeVideo`::
 
-      utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)
+      utils.makeVideo(frameSpec,out,renameNotOverwrite=True,fps=24,kbps=6000,bps=None)
    
-   The video is encoded in the `Theora <http://www.theora.org>`_ format stored in an ogg container.
+   The video is encoded using the default mencoder codec (mpeg4).
 
 #. Specialized post-processing tools, notably `Paraview <http://www.paraview.org>`_. This is described in more detail in the following section.
 
