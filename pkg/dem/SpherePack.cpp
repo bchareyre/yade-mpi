@@ -299,7 +299,7 @@ long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& pass
 
 // TODO: header, python wrapper, default params
 
-// New code to include the psd giving few points of it
+// Discrete particle size distribution
 long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
 	vector<Real> numbers;
 	if(!passingIsNotPercentageButCount){
@@ -338,6 +338,59 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 					for(size_t j=0; j<packSize; j++){
 						Vector3r dr;
 						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
+					}
+				}
+				if(!overlap) { pack.push_back(Sph(c,r)); break; }
+			}
+			if (t==maxTry) {
+				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
+				return i;
+			}
+		}
+	}
+	return pack.size();
+}
+
+// 2d function
+long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
+	vector<Real> numbers;
+	if(!passingIsNotPercentageButCount){
+		Real Vtot=numSph*4./3.*Mathr::PI*pow(rMean,3.); // total volume of the packing (computed with rMean)
+		
+		// calculate number of spheres necessary per each radius to match the wanted psd
+		// passing has to contain increasing values
+		for (size_t i=0; i<radii.size(); i++){
+			Real volS=4./3.*Mathr::PI*pow(radii[i],3.);
+			if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
+			else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
+			cout<<"fraction #"<<i<<" ("<<passing[i]<<"%, r="<<radii[i]<<"): "<<numbers[i]<<" spheres, fraction/cloud volumes "<<volS<<"/"<<Vtot<<endl;
+		}
+	} else {
+		FOREACH(Real p, passing) numbers.push_back(p);
+	}
+
+	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(true));
+	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
+
+	const int maxTry=1000;
+	Vector2r size=mx-mn; 
+	//if(periodic)(cellSize=size); in this case, it must be defined in py script as cell needs the third dimension
+	for (int ii=(int)radii.size()-1; ii>=0; ii--){
+		Real r=radii[ii]; // select radius
+		for(int i=0; i<numbers[ii]; i++) { // place as many spheres as required by the psd for the selected radius into the free spot
+			int t;
+			for(t=0; t<maxTry; ++t){
+				Vector3r c;
+				if(!periodic) { for(int axis=0; axis<2; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
+				else { for(int axis=0; axis<2; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
+				size_t packSize=pack.size(); bool overlap=false;
+				if(!periodic){
+					for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
+				} else {
+					for(size_t j=0; j<packSize; j++){
+						Vector3r dr;
+						for(int axis=0; axis<2; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
 						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 					}
 				}
