@@ -53,6 +53,11 @@ class FlowBoundingSphere : public Network
 
 		bool RAVERAGE;
 		int walls_id[6];
+		vector <double> Edge_Surfaces;
+		vector <pair<int,int> > Edge_ids;
+		vector <Real> Edge_HydRad;
+		vector <Vector3r> Edge_normal;
+		
 		void mplot ( char *filename);
 		void Localize();
 
@@ -99,6 +104,9 @@ class FlowBoundingSphere : public Network
 		vector<double> getConstrictions();
 
 		void GenerateVoxelFile ( );
+		
+		void ComputeEdgesSurfaces();
+// 		Real ComputeVFacetArea(Finite_edges_iterator ed_it);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 

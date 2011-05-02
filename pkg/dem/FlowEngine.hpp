@@ -94,7 +94,7 @@ class FlowEngine : public PartialEngine
 					((bool,compute_K,false,,"Activates permeability measure within a granular sample"))
 					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
 					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
-					((double,permeability_factor,0,,"permability multiplier"))
+					((double,permeability_factor,0.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of fluid"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
@@ -132,6 +132,7 @@ class FlowEngine : public PartialEngine
 					((bool, FRONT_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, BACK_Boundary_MaxMin, 1,,"If true bounding sphere is added as function fo max/min sphere coord, if false as function of yade wall position"))
 					((bool, areaR2Permeability, 1,,"Use corrected formula for permeabilities calculation in flowboundingsphere (areaR2permeability variable)"))
+					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					,

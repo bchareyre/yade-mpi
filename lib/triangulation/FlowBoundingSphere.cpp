@@ -695,8 +695,6 @@ Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v
 	Real m=(cross_product(v0-v1,v2-v1)).squared_length()/v1v2;
 	if (m<v0.weight()) {
 		Real d=2*sqrt((v0.weight()-m));
-// 		h=sqrt(v0.weight())-sqrt(m);
-// 		Real S0=0.25*M_PI*(d*d+4*h*h);
 		Real teta=2*acos(sqrt(m/v0.weight()));
 		return 0.5*(teta*v0.weight()-d*sqrt(m));//this is S0, we use crossSection to avoid computing an "asin"
 // 		return crossSection-m*d;
@@ -1268,6 +1266,8 @@ void FlowBoundingSphere::DisplayStatistics()
 
 void FlowBoundingSphere::save_vtk_file()
 {
+	ComputeEdgesSurfaces();
+	
 	RTriangulation& Tri = T[currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[80];
@@ -1568,6 +1568,34 @@ void FlowBoundingSphere::ComsolField()
 		kk++;
 	}
 	cerr << "meanCmsVel "<<meanCmsVel/totCmsPoints<<" mean diff "<<diff/kk<<endl;
+}
+
+void FlowBoundingSphere::ComputeEdgesSurfaces()
+{
+  RTriangulation& Tri = T[currentTes].Triangulation();
+ 
+  Finite_edges_iterator ed_it;
+  for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
+  {
+    Real Rh;
+    if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
+    int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
+    int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
+    double area = T[currentTes].ComputeVFacetArea(ed_it);
+    Edge_Surfaces.push_back(area);
+    Edge_ids.push_back(pair<int,int>(id1,id2));
+    double radius1 = sqrt((ed_it->first)->vertex(ed_it->second)->point().weight());
+    double radius2 = sqrt((ed_it->first)->vertex(ed_it->third)->point().weight());
+    Vecteur x = (ed_it->first)->vertex(ed_it->third)->point().point()- (ed_it->first)->vertex(ed_it->second)->point().point();
+    Vecteur n = x / sqrt(x.squared_length());
+    Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
+    double d = x*n - radius1 - radius2;
+    if (radius1<radius2)  Rh = d + 0.45 * radius1;
+    else  Rh = d + 0.45 * radius2;
+    Edge_HydRad. push_back(Rh);
+    cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
+    
+  }
 }
 
 } //namespace CGT

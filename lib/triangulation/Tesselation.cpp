@@ -12,9 +12,10 @@ Tesselation::Tesselation ( void )
 //  std::cout << "Tesselation(void)" << std::endl;
 	Tri = new RTriangulation;
 	Tes = Tri;
-	computed = false;
+	computed=false;
 	max_id = -1;
 	TotalFiniteVoronoiVolume=0;
+	area=0;
 	TotalInternalVoronoiPorosity=0;
 	TotalInternalVoronoiVolume=0;
 	redirected = false;
@@ -349,6 +350,31 @@ long Tesselation::New_liste_edges ( Real** Coordonnes )
 Segment Tesselation::Dual ( Finite_facets_iterator &f_it )
 {
 	return Segment ( f_it->first->info(), ( f_it->first->neighbor ( f_it->second ) )->info() );
+}
+
+double Tesselation::ComputeVFacetArea ( Finite_edges_iterator ed_it )
+{
+	Cell_circulator cell0 = Tri->incident_cells ( *ed_it );
+	Cell_circulator cell2 = cell0;
+
+	if ( Tri->is_infinite ( cell2 ) )
+	{
+		++cell2;
+		while ( Tri->is_infinite ( cell2 ) && cell2!=cell0 ) ++cell2;
+		if ( cell2==cell0 ) return 0;
+	}
+	cell0=cell2++;
+	Cell_circulator cell1=cell2++;
+	Real area = 0;
+	
+	while ( cell2!=cell0 )
+	{
+	  	area+= sqrt(std::abs (( Triangle ( cell0->info(), cell1->info(), cell2->info() ) ).squared_area())) ;
+		++cell1; 
+		++cell2;
+	}
+	
+	return area;
 }
 
 void Tesselation::AssignPartialVolume ( Finite_edges_iterator& ed_it )

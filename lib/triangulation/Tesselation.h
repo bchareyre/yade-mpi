@@ -36,6 +36,7 @@ private:
 	bool computed;
 public:
 	Real TotalFiniteVoronoiVolume;
+	Real area; 
 	Real TotalInternalVoronoiVolume;
 	Real TotalInternalVoronoiPorosity;
 	Vector_Vertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
@@ -71,6 +72,8 @@ public:
 	static Segment  Dual	(Finite_facets_iterator &facet);	//G�n�re le segment dual d'une facette finie
 	static Real	Volume	(Finite_cells_iterator cell);
 	inline void 	AssignPartialVolume	(Finite_edges_iterator& ed_it);
+// 	inline void 	ComputeVFacetArea	(Finite_edges_iterator& ed_it);
+	double ComputeVFacetArea (Finite_edges_iterator ed_it);
 	void		ResetVCellVolumes	(void);
 	void		ComputeVolumes		(void);//Compute volume each voronoi cell
 	void		ComputePorosity		(void);//Compute volume and porosity of each voronoi cell
@@ -95,7 +98,6 @@ public:
 															//du graph de Voronoi
 	long New_liste_short_edges2	( Real** Coordonnes );
 	long New_liste_adjacent_edges ( Vertex_handle vertex0, Real** Coordonnes );
-	
 };
 
 
