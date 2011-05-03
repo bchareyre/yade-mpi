@@ -39,9 +39,8 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 
 //	********	Computation of normal Force : depends of the history			*******	 //
 
-	Real Fn; // Fn's value, computed by different means
 // 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
-	Real un = geom->penetrationDepth; // >0 for real penetration
+	un = geom->penetrationDepth; // >0 for real penetration
 
 // 	cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << currentContactPhysics->previousun << " et previousFn =" << currentContactPhysics->previousFn << endl;
 
@@ -94,8 +93,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 		// Update of shear force corresponding to shear displacement increment:
 		shearForce -= currentContactPhysics->ks * geom->shearIncrement();
 
-                Real maxFs = 0;
-                Real Fs = currentContactPhysics->shearForce.norm();
+                Fs = currentContactPhysics->shearForce.norm();
                 maxFs = std::max((Real) 0,Fn*currentContactPhysics->tangensOfFrictionAngle);
 
                 if ( Fs  > maxFs )
@@ -110,7 +108,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
                 }
 
 
-                Vector3r f	= currentContactPhysics->normalForce + shearForce;
+                f	= currentContactPhysics->normalForce + shearForce;
 		scene->forces.addForce (id1,-f);
 		scene->forces.addForce (id2, f);
 		scene->forces.addTorque(id1,-(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(f));
@@ -131,10 +129,9 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 			if (!momentAlwaysElastic)
 			{
 				Real normeMomentMax = currentContactPhysics->forMaxMoment * std::fabs(Fn);
-				Real normeMoment = moment.norm();
-				if(normeMoment>normeMomentMax)
+				if(moment.norm()>normeMomentMax)
 					{
-					moment *= normeMomentMax/normeMoment;
+					moment *= normeMomentMax/moment.norm();
 					}
 			}
 			scene->forces.addTorque(id1,-moment);

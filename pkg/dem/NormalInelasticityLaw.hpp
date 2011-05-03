@@ -19,7 +19,13 @@
 class Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 {
 	private :
-		Vector3r moment; // contact torque of the interaction
+		Vector3r moment // contact torque of the interaction
+			,f// contact force
+			;
+		Real Fn	 // value of normal force in the interaction
+		    ,Fs // shear force
+		    ,maxFs; // maximum value of shear force according to Coulomb-like criterion
+		Real un;	 // value of interpenetration in the interaction
 	public :
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 
@@ -27,11 +33,16 @@ class Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : public LawFuncto
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity,
 				LawFunctor,
-				"Contact law used to simulate granulate filler in rock joints [Duriez2009a]_, [Duriez2010]_. It includes possibility of cohesion, moment transfer and inelastic compression behaviour (to reproduce the normal inelasticity observed for rock joints, for the latter).\n\n The moment transfer relation corresponds to the adaptation of the work of Plassiard & Belheine (see in [DeghmReport2006]_ for example), which was realized by J. Kozicki, and is now coded in :yref:`ScGeom6D`.\n\n As others :yref:`LawFunctor`, it uses pre-computed data of the interactions (rigidities, friction angles -with their tan()-, orientations of the interactions); this work is done here in :yref:`Ip2_2xNormalInelasticMat_NormalInelasticityPhys`.\n\n To use this you should also use :yref:`NormalInelasticMat` as material type of the bodies.\n\n The effects of this law are illustrated in scripts/normalInelasticityTest.py",
+				"Contact law used to simulate granulate filler in rock joints [Duriez2009a]_, [Duriez2011]_. It includes possibility of cohesion, moment transfer and inelastic compression behaviour (to reproduce the normal inelasticity observed for rock joints, for the latter).\n\n The moment transfer relation corresponds to the adaptation of the work of Plassiard & Belheine (see in [DeghmReport2006]_ for example), which was realized by J. Kozicki, and is now coded in :yref:`ScGeom6D`.\n\n As others :yref:`LawFunctor`, it uses pre-computed data of the interactions (rigidities, friction angles -with their tan()-, orientations of the interactions); this work is done here in :yref:`Ip2_2xNormalInelasticMat_NormalInelasticityPhys`.\n\n To use this you should also use :yref:`NormalInelasticMat` as material type of the bodies.\n\n The effects of this law are illustrated in scripts/normalInelasticityTest.py",
 				((bool,momentRotationLaw,true,,"boolean, true=> computation of a torque (against relative rotation) exchanged between particles"))
 				((bool,momentAlwaysElastic,false,,"boolean, true=> the torque (computed only if momentRotationLaw !!) is not limited by a plastic threshold"))
 				,
 				moment=Vector3r::Zero();
+				f=Vector3r::Zero();
+				Fn=0.0;
+				Fs=0.0;
+				maxFs=0.0;
+				un=0.0;
 				);
 	
 };

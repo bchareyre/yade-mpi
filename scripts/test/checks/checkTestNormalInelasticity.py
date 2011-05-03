@@ -84,10 +84,12 @@ dF=fRef-f
 dT=tRef-t
 
 tolerance=0.01
-if (dF.norm()>tolerance or dT.norm()>tolerance):
-  print "Regression concerning normalInelasticity-test. We compare loads acting on one sphere, moving with respect to another. At the end of the script (after some relative movements) we have a difference, compared to reference values, of"
-  print "- force (the norm) equal to ", dF.norm()
-  print "- torque (the norm) equal to ", dT.norm()
+if ( (dF.norm()/fRef.norm())>tolerance or (dT.norm()/tRef.norm())>tolerance):
+  print "Regression concerning normalInelasticity-test. We compare loads acting on one sphere, moving with respect to another. At the end of the script (after some relative movements) we have a relative difference, compared to reference values, of"
+  print "- force (the norm) equal to ", dF.norm()/fRef.norm()
+  print "- torque (the norm) equal to ", dT.norm()/tRef.norm()
   print "Whereas tolerance is ", tolerance
+  print "Indeed here, we have f=",f
+  print "And t=",t
   resultStatus +=1
 
