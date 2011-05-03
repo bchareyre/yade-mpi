@@ -78,7 +78,7 @@ public:
 	void		ComputeVolumes		(void);//Compute volume each voronoi cell
 	void		ComputePorosity		(void);//Compute volume and porosity of each voronoi cell
 	inline Real&	Volume (unsigned int id) { return vertexHandles[id]->info().v(); }
-	inline Vertex_handle&	vertex (unsigned int id) { return vertexHandles[id]; }
+	inline const Vertex_handle&	vertex (unsigned int id) const { return vertexHandles[id]; }
 
 	
 	Finite_cells_iterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}

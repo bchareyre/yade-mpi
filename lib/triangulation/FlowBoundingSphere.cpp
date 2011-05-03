@@ -213,7 +213,7 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         clock.top("GaussSeidel");
 
         /** END GAUSS SEIDEL */
-        char* file ="Permeability";
+        const char* file ="Permeability";
         ks = Permeameter(boundary(y_min_id).value, boundary(y_max_id).value, SectionArea, Height, file);
 // 	K_sigma << K_opt_factor << " " << ks << " "<< Iterations << endl;
         clock.top("Permeameter");
@@ -222,7 +222,7 @@ Tesselation& FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *e
         clock.top("Compute_Forces");
 
         /** VISUALISATION FILES **/
-        //  save_vtk_file ( );
+        //  saveVtk ( );
         //   PressureProfile ( );
         MGPost();
 
@@ -392,7 +392,7 @@ void FlowBoundingSphere::Average_Fluid_Velocity()
 	  }}
 }
 
-vector<Real> FlowBoundingSphere::Average_Fluid_Velocity_On_Sphere(int Id_sph)
+vector<Real> FlowBoundingSphere::Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph)
 {
 	Average_Relative_Cell_Velocity();
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -408,7 +408,7 @@ vector<Real> FlowBoundingSphere::Average_Fluid_Velocity_On_Sphere(int Id_sph)
 	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )
 	{
 	  if (cell->info().fictious()==0){
-	    for (int i=0;i<4;i++){
+	    for (unsigned int i=0;i<4;i++){
 	      if (cell->vertex(i)->info().id()==Id_sph){
 		VelocityVolumes = VelocityVolumes + cell->info().av_vel()*cell->info().volume();
 		Volumes = Volumes + cell->info().volume();}}}}
@@ -1119,7 +1119,7 @@ void FlowBoundingSphere::GaussSeidel()
 //                  		if (j % 10 == 0) {
 //                         cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
 //                         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;}
-//                         //     save_vtk_file ( Tri );
+//                         //     saveVtk ( Tri );
 //                  }
 // 	if (DEBUG_OUT) {cout << "pmax " << p_max << "; pmoy : " << p_moy << endl; cout << "iteration " << j <<"; erreur : " << dp_max/p_max << " tolerance " << tolerance<<endl;}
 	#ifdef GS_OPEN_MP
@@ -1156,7 +1156,7 @@ void FlowBoundingSphere::GaussSeidel()
 
 
 
-double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Section, double DeltaY, char *file)
+double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Section, double DeltaY, const char *file)
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
   std::ofstream kFile(file, std::ios::out);
@@ -1171,7 +1171,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
   Tesselation::VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[y_max_id],cells_it);
   for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
   {
-    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {/*if (!cell->neighbor(j2)->info().Pcondition)*/{
       if ((cell->neighbor(j2)->info().p()!=cell->neighbor(j2)->info().p()) && Tri.is_infinite(cell->neighbor(j2))) cout << "oooooooooooooooh" << endl;
     Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
     cellQ1+=1;
@@ -1183,7 +1183,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
   Tesselation::VCell_iterator cell_down_end = Tri.incident_cells(T[currentTes].vertexHandles[y_min_id],cells_it);
   for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cell_down_end; it++)
   {
-    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {if (!cell->neighbor(j2)->info().Pcondition){
+    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {/*if (!cell->neighbor(j2)->info().Pcondition)*/{
       if ((cell->neighbor(j2)->info().p()!=cell->neighbor(j2)->info().p()) && Tri.is_infinite(cell->neighbor(j2))) cout << "oooooooooooooooh2" << endl;
     Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
     cellQ2+=1;
@@ -1275,7 +1275,7 @@ void FlowBoundingSphere::DisplayStatistics()
 	num_particles = real;
 }
 
-void FlowBoundingSphere::save_vtk_file()
+void FlowBoundingSphere::saveVtk()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
         static unsigned int number = 0;
@@ -1499,7 +1499,7 @@ bool FlowBoundingSphere::isInsideSphere(double& x, double& y, double& z)
         return false;
 }
 
-void FlowBoundingSphere::SliceField(char *filename)
+void FlowBoundingSphere::SliceField(const char *filename)
 {
         /** Pressure field along one cutting plane **/
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -1589,7 +1589,7 @@ void FlowBoundingSphere::ComsolField()
 void FlowBoundingSphere::ComputeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
- 
+  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();
   Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {

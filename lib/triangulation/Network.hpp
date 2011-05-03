@@ -25,6 +25,7 @@ struct Boundary
 {
 	Point p;
 	Vecteur normal;
+	Vector3r velocity;
 	int coordinate;
 	bool flowCondition;//flowCondition=0, pressure is imposed // flowCondition=1, flow is imposed
 	Real value;

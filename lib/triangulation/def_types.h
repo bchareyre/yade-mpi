@@ -13,7 +13,6 @@
 #include <CGAL/number_utils.h>
 
 #include <boost/static_assert.hpp>
-
 // #include<yade/lib/base/Math.hpp> // typedef for Real
 
 namespace CGT{

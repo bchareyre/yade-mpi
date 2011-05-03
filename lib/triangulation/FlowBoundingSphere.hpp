@@ -22,11 +22,7 @@
 #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
-
-
 using namespace std;
-
-
 
 namespace CGT{
 
@@ -58,6 +54,7 @@ class FlowBoundingSphere : public Network
 		vector <pair<int,int> > Edge_ids;
 		vector <Real> Edge_HydRad;
 		vector <Vector3r> Edge_normal;
+		vector <Vector3r> viscousShearForces;
 		
 		void mplot ( char *filename);
 		void Localize();
@@ -87,13 +84,13 @@ class FlowBoundingSphere : public Network
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForces();
 		void ComputeFacetForcesWithCache();
-		void save_vtk_file ( );
+		void saveVtk ( );
 		void MGPost ( );
 #ifdef XVIEW
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
 #endif
-		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
+		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, const char *file );
 		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key);
 		double Compute_HydraulicRadius (Cell_handle cell, int j );
 		double PressureProfile ( char *filename, Real& time, int& intervals );
@@ -116,7 +113,7 @@ class FlowBoundingSphere : public Network
 
 		bool isInsideSphere ( double& x, double& y, double& z );
 
-		void SliceField (char *filename);
+		void SliceField (const char *filename);
 		void ComsolField();
 
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
@@ -125,7 +122,7 @@ class FlowBoundingSphere : public Network
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
 		void Measure_Pore_Pressure(double Wall_up_y, double Wall_down_y);
-		vector<Real> Average_Fluid_Velocity_On_Sphere(int Id_sph);
+		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)
 
