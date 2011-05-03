@@ -46,6 +46,7 @@ class FlowBoundingSphere : public Network
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		vector<pair<Point,Real> > imposedP;
 		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
+		bool permeability_map;
 
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
@@ -106,6 +107,7 @@ class FlowBoundingSphere : public Network
 		void GenerateVoxelFile ( );
 		
 		void ComputeEdgesSurfaces();
+		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
 // 		Real ComputeVFacetArea(Finite_edges_iterator ed_it);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );

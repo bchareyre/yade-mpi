@@ -92,6 +92,7 @@ FlowBoundingSphere::FlowBoundingSphere()
 	OUTPUT_BOUDARIES_RADII = false;
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 	areaR2Permeability=true;
+	permeability_map = false;
 }
 
 void FlowBoundingSphere::ResetNetwork() {noCache=true;}
@@ -723,6 +724,8 @@ void FlowBoundingSphere::Compute_Permeability()
 	Real meanK=0, STDEV=0, meanRadius=0, meanDistance=0;
 	Real infiniteK=1e10;
 
+	double volume_sub_pore = 0.f;
+
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		Point& p1 = cell->info();
 		for (int j=0; j<4; j++) {
@@ -760,10 +763,10 @@ void FlowBoundingSphere::Compute_Permeability()
 					cout << "INS-INS PROBLEM!!!!!!!" << endl;
 				}
 // 				Real h,d;
+				Real fluidArea=0;
 				int test=0;
 				if (distance!=0) {
 					if (minPermLength>0 && distance_correction) distance=max(minPermLength,distance);
-					Real fluidArea=0;
 					const Vecteur& Surfk = cell->info().facetSurfaces[j];
 					Real area = sqrt(Surfk.squared_length());
 					const Vecteur& crossSections = cell->info().facetSphereCrossSections[j];
@@ -792,9 +795,17 @@ void FlowBoundingSphere::Compute_Permeability()
 				meanDistance += distance;
 				meanRadius += radius;
 				meanK += (cell->info().k_norm())[j];
+				
+				if(permeability_map){
+				  Cell_handle c = cell;
+				  cell->info().s = cell->info().s + k*distance/fluidArea*Volume_Pore_VoronoiFraction (c,j);
+				  volume_sub_pore += Volume_Pore_VoronoiFraction (c,j);}
+				
 			}
 		}
 		cell->info().isvisited = !ref;
+		cell->info().s = cell->info().s/volume_sub_pore;
+		volume_sub_pore = 0.f;
 	}
 	if (DEBUG_OUT) cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
@@ -1266,8 +1277,6 @@ void FlowBoundingSphere::DisplayStatistics()
 
 void FlowBoundingSphere::save_vtk_file()
 {
-	ComputeEdgesSurfaces();
-	
 	RTriangulation& Tri = T[currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[80];
@@ -1300,11 +1309,18 @@ void FlowBoundingSphere::save_vtk_file()
 // 	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[0],(v->info().forces)[1],(v->info().forces)[2]);}
 // 	vtkfile.end_data();
 
+	if (permeability_map){
+	vtkfile.begin_data("Permeability",CELL_DATA,SCALARS,FLOAT);
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		if (!cell->info().fictious()){vtkfile.write_data(cell->info().s);}
+	}
+	vtkfile.end_data();}
+	else{
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		if (!cell->info().fictious()){vtkfile.write_data(cell->info().p());}
 	}
-	vtkfile.end_data();
+	vtkfile.end_data();}
 
 // 	vtkfile.begin_data("Velocity",POINT_DATA,VECTORS,FLOAT);
 // 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
@@ -1593,10 +1609,18 @@ void FlowBoundingSphere::ComputeEdgesSurfaces()
     if (radius1<radius2)  Rh = d + 0.45 * radius1;
     else  Rh = d + 0.45 * radius2;
     Edge_HydRad. push_back(Rh);
-    cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
+    if (DEBUG_OUT) cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
     
   }
 }
+
+Vector3r FlowBoundingSphere::ComputeViscousForce(Vector3r deltaV, int edge_id)
+{
+    Vector3r tau = deltaV*VISCOSITY/Edge_HydRad[edge_id];
+    return tau * Edge_Surfaces[edge_id];
+}
+
+
 
 } //namespace CGT
 

@@ -54,6 +54,7 @@ class FlowEngine : public PartialEngine
 		void imposePressure(Vector3r pos, Real p);
 		void clearImposedPressure();
 		void Average_real_cell_velocity();
+		void ApplyViscousForces();
 		Real getFlux(int cond);
 		void saveVtk() {flow->save_vtk_file();}
 		vector<Real> AvFlVelOnSph(int id_sph) {return flow->Average_Fluid_Velocity_On_Sphere(id_sph);}
@@ -70,6 +71,7 @@ class FlowEngine : public PartialEngine
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
 // 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
+					((bool,permeability_map,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
 					((bool,save_mplot,false,,"Enable/disable mplot files creation"))
 					((bool, save_mgpost, false,,"Enable/disable mgpost file creation"))
 					((bool, slice_pressures, false, ,"Enable/Disable slice pressure measurement"))

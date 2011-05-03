@@ -87,6 +87,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 		isFictious=false; Pcondition = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
 		index=0;
 		volumeSign=0;
+		s=0;
 	}	
 
 	double inv_sum_k;

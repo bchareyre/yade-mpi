@@ -80,61 +80,16 @@ void FlowEngine::action()
 		else flow->ComputeFacetForcesWithCache();
 		timingDeltas->checkpoint("Compute_Forces");
 		
-		if (viscousShear){
 		///Application of vicscous forces
-		int length_ids = flow -> Edge_ids.size();
-		cout <<"length_ids est "<<length_ids<< endl;
-		vector <Vector3r> Edge_force;
-		for (int i=0;i<length_ids;i++)
-		{
-// 		  cout <<"length_ids est "<<length_ids<< endl;
-		  cout<<"Application of vicscous forces"<<endl;
-		  
-		  const shared_ptr<Body>& sph1 = Body::byId( flow->Edge_ids[i].first, scene );
-		  const shared_ptr<Body>& sph2 = Body::byId( flow->Edge_ids[i].second, scene );
-		  Vector3r deltaV = (sph2->state->vel - sph1->state->vel) - (flow->Edge_normal[i].dot(sph2->state->vel - sph1->state->vel))*flow->Edge_normal[i];
-		  Vector3r tau = deltaV*viscosity/flow->Edge_HydRad[i];
-		  Vector3r visc_f = tau * flow->Edge_Surfaces[i];
-		  cout<<"la force visqueuse entre "<<flow->Edge_ids[i].first<<" et "<<flow->Edge_ids[i].second<<"est "<<visc_f<< endl;
-		  Edge_force.push_back(visc_f);
-	
-		///Compute total force
-      
-		 
-		  int id1 = flow->Edge_ids[i].first;
-		  int id2 = flow->Edge_ids[i].second;
-// 		  
-		  scene->forces.addForce(id1,Edge_force[i]);
-		  scene->forces.addForce(id2,-Edge_force[i]);
-		  
-		  scene->forces.sync();
-		  Vector3r F1=scene->forces.getForce(id1);
-		  Vector3r F2=scene->forces.getForce(id2);
-		  cout<<"la force totale sur "<<id1<<" est "<<F1<< "et la force totale sur "<<id2<<" est "<<F2;
 		
-		  cout<<"END: Application of vicscous forces"<<endl;
-		  
-		}
-		}
+		if (viscousShear) ApplyViscousForces();
 
-		///End Compute flow and forces
 		CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
-		Vector3r f;
-		int id;
 		for (CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++)
 		{
-			id = V_it->info().id();
-			for (int y=0;y<3;y++) f[y] = (V_it->info().forces)[y];
-// 			if (id==id_sphere)
-// 			  id_force = f;
-// 			  CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-// 			  for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
-// 			    for (int j=0;j<4;j++){
-// 			      if (cell->vertex(j)->info().id() == id_sphere){
-// 				cout << endl << "Cell 
-			    
-			scene->forces.addForce(id, f);
+			scene->forces.addForce(V_it->info().id(), Vector3r ((V_it->info().forces)[0],V_it->info().forces[1],V_it->info().forces[2]));
 		}
+		///End Compute flow and forces
 		timingDeltas->checkpoint("Applying Forces");
 
 		Real time = scene->time;
@@ -260,6 +215,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 
 	flow->meanK_LIMIT = meanK_correction;
 	flow->meanK_STAT = meanK_opt;
+	flow->permeability_map = permeability_map;
 	flow->Compute_Permeability ( );
 
 	porosity = flow->V_porale_porosity/flow->V_totale_porosity;
@@ -634,6 +590,29 @@ Real FlowEngine::Volume_cell(CGT::Cell_handle cell)
 
 	if (!(cell->info().volumeSign)) cell->info().volumeSign=(volume>0)?1:-1;
 	return volume;
+}
+
+void FlowEngine::ApplyViscousForces()
+{
+  flow->ComputeEdgesSurfaces();
+  if (Debug) cout << "Application of viscous forces" << endl;
+  if (Debug) cout << "Number of edges = " << flow->Edge_ids.size() << endl;
+  vector <Vector3r> Edge_force;
+  Edge_force.resize(flow->Edge_ids.size());
+  for (int i=0; i<(int)flow->Edge_ids.size(); i++)
+  {
+    const shared_ptr<Body>& sph1 = Body::byId( flow->Edge_ids[i].first, scene );
+    const shared_ptr<Body>& sph2 = Body::byId( flow->Edge_ids[i].second, scene );
+    Vector3r deltaV = (sph2->state->vel - sph1->state->vel) - (flow->Edge_normal[i].dot(sph2->state->vel - sph1->state->vel))*flow->Edge_normal[i];
+    Vector3r visc_f = flow->ComputeViscousForce(deltaV, i);
+    if (Debug) cout << "la force visqueuse entre " << flow->Edge_ids[i].first << " et " << flow->Edge_ids[i].second << "est " << visc_f << endl;
+    Edge_force.push_back(visc_f);
+    scene->forces.addForce(flow->Edge_ids[i].first,Edge_force[i]);
+    scene->forces.addForce(flow->Edge_ids[i].second,-Edge_force[i]);
+    scene->forces.sync();
+    if (Debug) cout<<"la force totale sur "<< flow->Edge_ids[i].first <<" est " << scene->forces.getForce(flow->Edge_ids[i].first) << "et la force totale sur "<< flow->Edge_ids[i].second <<" est " << scene->forces.getForce(flow->Edge_ids[i].second);
+    if (Debug) cout<<"END: Application of vicscous forces"<<endl;
+  }
 }
 
 YADE_PLUGIN ((FlowEngine));
