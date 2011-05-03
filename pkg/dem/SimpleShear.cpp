@@ -21,12 +21,13 @@
 #include<yade/pkg/common/InsertionSortCollider.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/InteractionLoop.hpp>
 
 #include<yade/pkg/common/ForceResetter.hpp>
 
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/GravityEngines.hpp>
-#include<yade/pkg/dem/KinemCNDEngine.hpp>
+#include<yade/pkg/dem/KinemCTDEngine.hpp>
 
 #include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
@@ -43,6 +44,7 @@
 using namespace std;
 
 YADE_PLUGIN((SimpleShear))
+CREATE_LOGGER(SimpleShear);
 
 SimpleShear::~SimpleShear ()
 {
@@ -76,6 +78,7 @@ bool SimpleShear::generate(std::string& message)
 	shared_ptr<Body> w4; // The upper one
 	createBox(w4,Vector3r(length/2.0,height+thickness/2.0,0),Vector3r(length/2.0,thickness/2.0,width/2.0));
 	YADE_PTR_CAST<FrictMat> (w4->material)->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
+	scene->bodies->insert(w4);
 
 // To close the front and the back of the box 
 	shared_ptr<Body> w5;	// behind
@@ -92,10 +95,11 @@ bool SimpleShear::generate(std::string& message)
 	vector<BasicSphere> sphere_list;
 
 // to use the TriaxialTest method :
-// 	GenerateCloud(sphere_list,Vector3r(0,0,-width/2.0),Vector3r(length,height,width/2.0),nBilles,0.3,porosite);
+	string out=GenerateCloud(sphere_list,Vector3r(0,0,-width/2.0),Vector3r(length,height,width/2.0),1000,0.3,0.7);// generates a sample of 1000 spheres, with a required porosity of 0.7
+	LOG_INFO(out);
 
 // to use a text file :
-	std::pair<string,bool> res=ImportCloud(sphere_list,filename);
+// 	std::pair<string,bool> res=ImportCloud(sphere_list,filename);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -107,8 +111,7 @@ bool SimpleShear::generate(std::string& message)
 		scene->bodies->insert(body);
 	}
 	
-	message =res.first;
-	return res.second;
+	return true;
 }
 
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
@@ -158,6 +161,7 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
+	iBox->wire = true;
 
 	body->setDynamic(false);
 	
@@ -210,19 +214,28 @@ void SimpleShear::createActors(shared_ptr<Scene>& scene)
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt=1e-5;
 
+	shared_ptr<KinemCTDEngine> kinemEngine (new KinemCTDEngine);
+	kinemEngine->compSpeed = 10.0;
+	kinemEngine->targetSigma=1000.0;
 
+
+	shared_ptr<InteractionLoop> ids(new InteractionLoop);
+	ids->geomDispatcher=interactionGeometryDispatcher;
+	ids->physDispatcher=interactionPhysicsDispatcher;
+	ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
+	shared_ptr<Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity> ldc(new Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity);
+	ids->lawDispatcher->add(ldc);
 
 
 	scene->engines.clear();
 	scene->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	scene->engines.push_back(globalStiffnessTimeStepper);
 	scene->engines.push_back(collider);	
-	scene->engines.push_back(interactionGeometryDispatcher);
-	scene->engines.push_back(interactionPhysicsDispatcher);
-// 	scene->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity));
+	scene->engines.push_back(ids);
 	if(gravApplied)
 		scene->engines.push_back(gravityCondition);
 	scene->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
+	scene->engines.push_back(kinemEngine);
 }
 
 

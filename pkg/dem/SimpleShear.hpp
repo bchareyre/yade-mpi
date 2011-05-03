@@ -33,7 +33,7 @@ class SimpleShear : public FileGenerator
 		bool generate(std::string& message);
 
 
-	YADE_CLASS_BASE_DOC_ATTRS(SimpleShear,FileGenerator,"Preprocessor for creating a numerical model of a simple shear box.\n\n\t- Boxes (6) constitute the different sides of the box itself\n \t- Spheres are contained in the box. The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.\n \n \t Thanks to the Engines (in pkg/common/Engine/PartialEngine) KinemCNDEngine, KinemCNSEngine and KinemCNLEngine, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples.\n \n \tNB about micro-parameters : their values correspond to those used in [Duriez2009a]_.",
+	YADE_CLASS_BASE_DOC_ATTRS(SimpleShear,FileGenerator,"Preprocessor for creating a numerical model of a simple shear box.\n\n\t- Boxes (6) constitute the different sides of the box itself\n \t- Spheres are contained in the box. The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.\n \n \t Thanks to the Engines (in pkg/del) :yref:`KinemCNDEngine`, :yref:`KinemCNSEngine` and :yref:`KinemCNLEngine`, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples.\n \n \tNB about micro-parameters : their values correspond to those used in [Duriez2009a]_ and [Duriez2011]_.",
 				  ((string,filename,"../porosite0_44.txt",,"file with the list of spheres centers and radii"))
 				  ((Vector3r,gravity,Vector3r(0,-9.81,0),,"vector corresponding to used gravity [$m/s^2$]"))
 				  ((Real,thickness,0.001,,"thickness of the boxes constituting the shear box [$m$]"))
@@ -49,6 +49,7 @@ class SimpleShear : public FileGenerator
 				  ((bool,gravApplied,false,,"depending on this, :yref:`GravityEngine` is added or not to the scene to take into account the weight of particles"))
 				  ((int,timeStepUpdateInterval,50,,"value of :yref:`TimeStepper::timeStepUpdateInterval` for the :yref:`TimeStepper` used here"))
 				  );
+	DECLARE_LOGGER;
 };
 
 REGISTER_SERIALIZABLE(SimpleShear);

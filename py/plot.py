@@ -566,7 +566,7 @@ def createTitleFrame(out,size,title):
 
 
 def plot(noShow=False,subPlots=True):
-	"""Do the actual plot, which is either shown on screen (and nothing is returned: if *noShow* is ``False``) or, if *noShow* is ``True``, returned as matplotlib's Figure object or list of them.
+	"""Do the actual plot, which is either shown on screen (and nothing is returned: if *noShow* is ``False`` - note that your yade compilation should present qt4 feature so that figures can be displayed) or, if *noShow* is ``True``, returned as matplotlib's Figure object or list of them.
 	
 	You can use 
 	

@@ -67,7 +67,7 @@ O.engines=[
 		[Ip2_2xNormalInelasticMat_NormalInelasticityPhys()],
 		[Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity()]
 	),
-	NewtonIntegrator(damping=.2)
+	NewtonIntegrator(damping=.1)
 	,PyRunner(iterPeriod=50,command='defData()')
 	]
 

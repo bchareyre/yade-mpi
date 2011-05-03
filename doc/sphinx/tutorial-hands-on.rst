@@ -480,7 +480,7 @@ For experimenting with a single simulations, it is handy to save it to memory; t
 
    #. define particles as in the previous exercise (cloud of spheres inside a box open from the top)
    #. define a simple simulation loop, as the one given above
-   #. set $\Dt$ equal to the critial P-Wave $\Dt$
+   #. set $\Dt$ equal to the critical P-Wave $\Dt$
    #. save the initial simulation state to memory
 
 #. Run the previously-defined simulation multiple times, while changing the value of timestep (use the :guilabel:`⟳` button to reload the initial configuration).

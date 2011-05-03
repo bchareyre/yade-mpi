@@ -1412,7 +1412,7 @@ It is possible that you encounter crash of Yade, i.e. Yade terminates with error
 without further explanation. Frequent causes of such conditions are
 
 * program error in Yade itself;
-* fatal condition in you particular simulation (such as impossible dispatch);
+* fatal condition in your particular simulation (such as impossible dispatch);
 * problem with graphics card driver.
 
 Try to reproduce the error (run the same script) with debug-enabled version of Yade. Debugger will be automatically launched at crash, showing backtrace of the code (in this case, we triggered crash by hand)::

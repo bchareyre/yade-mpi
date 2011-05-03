@@ -17,7 +17,7 @@ from yade.params.table import *
 
 # create box with free top, and ceate loose packing inside the box
 from yade import pack, plot
-O.bodies.append(utils.facetBox((.5,.5,.5),(.5,.5,.5),wallMask=31))
+O.bodies.append(utils.geom.facetBox((.5,.5,.5),(.5,.5,.5),wallMask=31))
 sp=pack.SpherePack()
 sp.makeCloud((0,0,0),(1,1,1),rMean=rMean,rRelFuzz=rRelFuzz)
 sp.toSimulation()

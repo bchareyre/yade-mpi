@@ -6,7 +6,7 @@
 from yade import pack, plot
 
 # create rectangular box from facets
-O.bodies.append(utils.facetBox((.5,.5,.5),(.5,.5,.5),wallMask=31))
+O.bodies.append(utils.geom.facetBox((.5,.5,.5),(.5,.5,.5),wallMask=31))
 
 # create empty sphere packing
 # sphere packing is not equivalent to particles in simulation, it contains only the pure geometry
