@@ -26,7 +26,6 @@ O.engines=[
 	PyRunner(iterPeriod=1,command='letMove()')
 	]
 
-
 #Def of the python commands which will impose required displacements to the moving sphere
 def letMove():#Load for the first 10 iterations, unload for the 7 following iterations, then reload
    if mode=='normal':
