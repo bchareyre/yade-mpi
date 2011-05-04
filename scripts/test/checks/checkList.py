@@ -12,13 +12,11 @@ for script in scriptsToRun:
 			execfile(checksPath+"/"+script)
 			if (resultStatus):
 				print "Status: FAILURE!!!"
-				break
 			else:
 				print "Status: success"
 			print "___________________________________"
 		except:
 			print script," failure"
-			break
 		O.reset()
 		
 if (resultStatus):
