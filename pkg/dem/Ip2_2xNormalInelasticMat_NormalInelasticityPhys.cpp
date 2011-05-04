@@ -53,7 +53,7 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 			contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
 			contactPhysics->forMaxMoment		= 1.0*(Ra+Rb)/2.0;	// 1.0 corresponding to ethaR which I don't know exactly where to define as a parameter...
 
-			// Lot of suppress here around (>) r2276. Normally not bad but ? 
+			// Lot of suppress here around (>) r2276.
 			contactPhysics->knLower = Kn;
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;

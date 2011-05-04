@@ -7,6 +7,8 @@
 
 #Different graphs illustrate the effects of the different loadings. The run is paused at each plot window (so that there is time to observe them). Push on "Return", while being in the Yade terminal, to go ahead.
 
+# Comment/decomment around l.18-19 and l.38 to execute the script with Law2_ScGeom_FrictPhys_CundallStrack, to see the difference
+
 #No crash warranty with r2676 and r2849
 
 
@@ -33,6 +35,10 @@ O.engines=[
 			      [Ip2_2xNormalInelasticMat_NormalInelasticityPhys(betaR=0.24)],
 			      [Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity()]
 			      ),
+	#InteractionLoop(
+			      #[Ig2_Sphere_Sphere_ScGeom()],
+			      #[Ip2_FrictMat_FrictMat_FrictPhys()],
+			      #[Law2_ScGeom_FrictPhys_CundallStrack()]),
 	PyRunner(iterPeriod=1,command='letMove()')
 	]
 
@@ -80,42 +86,48 @@ print 'End of normal loading'
 # define of the plots to be made : un(step), and Fn(un)
 plot.plots={'step':('unTrue','torque',),'unPerso':('normFn',),'unTrue':('normFnBis',)}
 plot.plot(noShow=False, subPlots=False)
-print 'Type Return to go ahead'
+print 'Plotting curve. Type Return to go ahead'
 print ''
 raw_input()
-#NB : these different unTrue and unPerso illustrate the definition of penetrationDepth really used in the code (computed in Ig2_Sphere_Sphere_ScGeom) which is slightly different from R1 + R2 - Distance (see for example this "shift2"). According to the really used penetrationDepth, Fn evolves as it should
+#-- Comments (r2851) --#
+# - different unTrue and unPerso illustrate the definition of penetrationDepth really used in the code (computed in Ig2_Sphere_Sphere_ScGeom6D) which is slightly different from R1 + R2 - Distance (because of this "shift2" in Distance computation). According to the really used penetrationDepth, Fn evolves as it should
+# - value of virgin slope is 4e9 N/m (r2851) corresponding indeed to input "young" (as it should be the case here with used radii)
+# - and unload-reload slope is correctly multiplied by three
 
-#O.saveTmp('EndComp')
-#O.save('FinN_I_Test.xml')
 
 
 # ------ Test of the law in the tangential direction, still with python function ------ #
 
 print 'Beginning of tangential loading'
 mode='tangential'
-O.run(1000)
+O.run(1000,True)
 print 'End of tangential loading'
+tOn0woLTM=O.forces.t(0)
+tOn1woLTM=O.forces.t(1)
+
+
 plot.plots={'step':('gamma','torque',),'gamma':('fx',)}
 plot.plot()
-print 'Type Return to go ahead'
+print 'Plotting curve. Type Return to go ahead'
 raw_input()
 plot.plots={'normFn':('fx',)}
 plot.plot()
-print 'Type Return to go ahead'
+print 'Plotting another curve. Type Return to go ahead'
 raw_input()
 #pylab.show() #to pause on the plot window. Effective only first time
 
 print ''
 
 #-- Comments (r2528) --#
-#	- evolution of Fx with gamma normal (flat at the beginning because of the order of engines)
-#	- un decreases indeed during this shear, but maybe a zoom on the curves is needed to see it.
-#	- We can observe that the force state of the sample decreases a line with a slope equal to tan(~34.5°)=tan(~0.602 rad). Why not strict equality ? Because of the measure of the slope or because something else ? To see...
-#	- during this phase O.forces.t(0).norm() / O.forces.f(0)[0] seems to increase between 0.502 and 0.507 (according to r=[T[i]/F[i] for i in range(50,T.__len__()-20) ])
-#		Please note, to explain this, that Fx = O.forces.f(0)[0] is more and more different from Ft, from which we can expect Ft = Torque /Radius
+# - evolution of Fx with gamma normal (flat at the beginning because of the order of engines)
+# - waited value of initial slope of fx(gamma) equal to 1.6 e8 N/m confirmed by what can be measured (r2851)
+# - un decreases indeed during this shear, but maybe a zoom on the curves is needed to see it.
+# - We can observe that the force state of the sample decreases a line with a slope equal to tan(~34.5°)=tan(~0.602 rad). Why not strict equality ? Because of the measure of the slope or because something else ? To see...
+# - during this phase O.forces.t(0).norm() / O.forces.f(0)[0] seems to increase between 0.502 and 0.507 (according to r=[T[i]/F[i] for i in range(50,T.__len__()-20) ])
+#	Please note, to explain this, that Fx = O.forces.f(0)[0] is more and more different from Ft, from which we can expect Ft = Torque /Radius
 
 ## ------ Test of the law for the moment, using blockedDOF_s and NewtonIntegrator ------ #
-#O.loadTmp('EndComp')
+
 
 print 'Beginning of rotationnal loading'
 ##To use blockedDOF_s, the body has to be dynamic....
@@ -133,14 +145,18 @@ def printInfo():
   print upperSphere.state.ori
   print i.geom.penetrationDepth
   
-O.run(8000,True)
+O.run(4000,True)
 print 'End of rotationnal loading'
+
+tOn0withLTMonly=O.forces.t(0)- tOn0woLTM
+tOn1withLTMonly=O.forces.t(1)- tOn1woLTM
+
+
 
 plot.plots={'step':('torque',)}
 plot.plot()
 print 'Type Return to go ahead'
 
-#-- Comments : TO DO
-
-
+#-- Comments : (r2851)
+# - threshold of increment of torque corresponding to relative rotation corresponds to the threshold value which is expected : 1.0 (here) * Fn ~ 5.4e5 Nm
 

@@ -19,7 +19,7 @@
 class Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : public LawFunctor
 {
 	private :
-		Vector3r moment // contact torque of the interaction
+		Vector3r moment // the part of the contact torque of the interaction due to relative rotations (a first part is due to contact forces)
 			,f// contact force
 			;
 		Real Fn	 // value of normal force in the interaction

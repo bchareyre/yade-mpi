@@ -47,7 +47,7 @@ class PeriodicEngine:  public GlobalEngine {
 		overrides also Engine::isActivated, it should also take in account return value from PeriodicEngine::isActivated, \
 		since otherwise the periodicity will not be functional. \n\n\
 		\
-		Example with PyRunner, which derives from PeriodicEngine; likely to be encountered in python scripts):: \n\n\
+		Example with :yref`PyRunner`, which derives from PeriodicEngine; likely to be encountered in python scripts:: \n\n\
 		\
 			PyRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\n\n\
 		\

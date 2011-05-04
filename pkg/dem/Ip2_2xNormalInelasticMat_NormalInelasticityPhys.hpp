@@ -28,7 +28,7 @@ class Ip2_2xNormalInelasticMat_NormalInelasticityPhys : public IPhysFunctor
 	FUNCTOR2D(NormalInelasticMat,NormalInelasticMat);
 	YADE_CLASS_BASE_DOC_ATTRS(Ip2_2xNormalInelasticMat_NormalInelasticityPhys,
 				  IPhysFunctor,
-				  "The RelationShips for using Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity\n\n In these RelationShips all the attributes of the interactions (which are of NormalInelasticityPhys type) are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<IPhysFunctor>`, most of the attributes are computed only once, when the interaction is new.",
+				  "The RelationShips for using :yref:`Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity`\n\n In these RelationShips all the attributes of the interactions (which are of NormalInelasticityPhys type) are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<IPhysFunctor>`, most of the attributes are computed only once, when the interaction is new.",
 				  ((Real,betaR,0.12,,"Parameter for computing the torque-stifness : T-stifness = betaR * Rmoy^2"))
 				  );
 };

@@ -36,6 +36,7 @@ def letMove():#Load for the first 10 iterations, unload for the 7 following iter
 	vImposed=[1,0,0]
    upperSphere.state.vel=vImposed
    upperSphere.state.pos=upperSphere.state.pos+upperSphere.state.vel*O.dt
+   
 
 
 
@@ -50,8 +51,13 @@ O.run(40,True)
 # ------ Test of the law in the tangential direction, still with python function ------ #
 
 mode='tangential'
-O.run(1000)
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='testInterac()')]
+def testInterac():
+  i=O.interactions[1,0]
+  if (not(i.isReal)):
+    print "!!! L'interaction n est plus reelle !!!! It", O.iter
 
+O.run(1000,True)
 
 ## ------ Test of the law for the moment, using blockedDOF_s and NewtonIntegrator ------ #
 
@@ -65,15 +71,15 @@ O.engines=O.engines[:3]+[NewtonIntegrator()]
 
 
   
-O.run(8000,True)
+O.run(4000,True)
 
 
 
 
-# Reference value of force acting on upperSphere, (r2849)
-fRef=Vector3(-519943.97434309247,760000.00000497897,0)
-# Reference value of torque acting on upperSphere, (r2849)
-tRef=Vector3(0,0,-1279894.5796705084)
+# Reference value of force acting on upperSphere, (r2851)
+fRef=Vector3(-312380.72434640542,461541.17554873932,0)
+# Reference value of torque acting on upperSphere, (r2851)
+tRef=Vector3(0,0,-774632.12686359778)
 
 #Actual values:
 f=O.forces.f(1)
@@ -88,7 +94,12 @@ if ( (dF.norm()/fRef.norm())>tolerance or (dT.norm()/tRef.norm())>tolerance):
   print "- force (the norm) equal to ", dF.norm()/fRef.norm()
   print "- torque (the norm) equal to ", dT.norm()/tRef.norm()
   print "Whereas tolerance is ", tolerance
+  
+  print " "
   print "Indeed here, we have f=",f
   print "And t=",t
+  print "Because O.forces.f(1) = ", O.forces.f(1)
+  print "Is interaction real ?" ,O.interactions[1,0].isReal
+  
   resultStatus +=1
 
