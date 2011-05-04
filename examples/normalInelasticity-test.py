@@ -7,9 +7,9 @@
 
 #Different graphs illustrate the effects of the different loadings. The run is paused at each plot window (so that there is time to observe them). Push on "Return", while being in the Yade terminal, to go ahead.
 
-# Comment/decomment around l.18-19 and l.38 to execute the script with Law2_ScGeom_FrictPhys_CundallStrack, to see the difference
+# Comment/uncomment around l.18-19 and l.38 to execute the script with Law2_ScGeom_FrictPhys_CundallStrack, to see the difference
 
-#No crash warranty with r2676 and r2849
+#No crash warranty with r2676 and r2852 +/-2
 
 
 from yade import plot

@@ -41,13 +41,13 @@ class PeriodicEngine:  public GlobalEngine {
 		start counting period (realLast etc interal variables) from that point, but without actually running, and will run \
 		only once a period has elapsed since the initial run. \n\n\
 		\
-		This class should be used directly; rather, derive your own engine which you want to be run periodically. \n\n\
+		This class should not be used directly; rather, derive your own engine which you want to be run periodically. \n\n\
 		\
 		Derived engines should override Engine::action(), which will be called periodically. If the derived Engine \
 		overrides also Engine::isActivated, it should also take in account return value from PeriodicEngine::isActivated, \
 		since otherwise the periodicity will not be functional. \n\n\
 		\
-		Example with :yref`PyRunner`, which derives from PeriodicEngine; likely to be encountered in python scripts:: \n\n\
+		Example with :yref:`PyRunner`, which derives from PeriodicEngine; likely to be encountered in python scripts:: \n\n\
 		\
 			PyRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\n\n\
 		\
