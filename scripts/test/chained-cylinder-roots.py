@@ -75,7 +75,7 @@ for j in range(-Nc, Nc+1):
 		if (i == Ne-1): #close the chain with a node of size 0
 			print "closing chain"
 			b=utils.chainedCylinder(begin=Vector3(pz2,py2,px2), radius=0.02,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5),material='cylindermat')
-			b.state.blockedDOFs=['x','y','z','rx','ry','rz']
+			b.state.blockedDOFs='xyzXYZ'
 	ChainedState.currentChain=ChainedState.currentChain+1
 
 O.saveTmp()
