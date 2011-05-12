@@ -17,7 +17,7 @@ YADE_PLUGIN((KinemCNSEngine));
 void KinemCNSEngine::action()
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;
-	KinemSimpleShearBox::setBoxes_Dt();
+	KinemSimpleShearBox::getBoxes_Dt();
 	
 	if(gamma<=gammalim)
 	{

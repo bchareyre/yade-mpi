@@ -14,7 +14,7 @@ YADE_PLUGIN((KinemCNDEngine));
 
 void KinemCNDEngine::action()
 {
-	KinemSimpleShearBox::setBoxes_Dt();
+	KinemSimpleShearBox::getBoxes_Dt();
 
 	if( ((shearSpeed > 0) && (gamma<=gammalim)) || ((shearSpeed < 0) /*&& (gamma>=gammalim)*/ ) )
 	{

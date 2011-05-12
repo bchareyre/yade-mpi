@@ -95,8 +95,8 @@ bool SimpleShear::generate(std::string& message)
 	vector<BasicSphere> sphere_list;
 
 // to use the TriaxialTest method :
-	string out=GenerateCloud(sphere_list,Vector3r(0,0,-width/2.0),Vector3r(length,height,width/2.0),1000,0.3,0.7);// generates a sample of 1000 spheres, with a required porosity of 0.7
-	LOG_INFO(out);
+	string out=GenerateCloud(sphere_list,Vector3r(0,0,-width/2.0),Vector3r(length,height,width/2.0),1000,0.3,0.7);// tries to generate a sample of 1000 spheres, with a required porosity of 0.7
+	cout << out << endl;
 
 // to use a text file :
 // 	std::pair<string,bool> res=ImportCloud(sphere_list,filename);
@@ -195,8 +195,8 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 void SimpleShear::createActors(shared_ptr<Scene>& scene)
 {
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
-	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
-	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
+	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom6D);
+	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom6D);
 
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	shared_ptr<IPhysFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
@@ -270,12 +270,16 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowe
 			}
 		}
 		if (t==tries) 
-		{cerr << "on a atteint le t=tries" << endl;
-		return "More than " + lexical_cast<string>(tries) +	" tries while generating sphere number " +
+		{
+		string str1="Generated a sample with " + lexical_cast<string>(i) + " spheres inside box of dimensions: (" 
+			+ lexical_cast<string>(dimensions[0]) + "," 
+			+ lexical_cast<string>(dimensions[1]) + "," 
+			+ lexical_cast<string>(dimensions[2]) + ").\n";
+		return str1 + "More than " + lexical_cast<string>(tries) +	" tries while generating sphere number " +
 					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
 		}
 	}
-	return "Generated a sample with " + lexical_cast<string>(number) + "spheres inside box of dimensions: (" 
+	return "Generated a sample with " + lexical_cast<string>(number) + " spheres inside box of dimensions: (" 
 			+ lexical_cast<string>(dimensions[0]) + "," 
 			+ lexical_cast<string>(dimensions[1]) + "," 
 			+ lexical_cast<string>(dimensions[2]) + ").";

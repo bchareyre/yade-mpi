@@ -21,7 +21,7 @@ class KinemSimpleShearBox : public BoundaryController
 
 	protected :
 		Real Scontact // computed by computeScontact()
-		     ,dt // value of the time step, set in setBoxes_Dt
+		     ,dt // value of the time step, obtained in getBoxes_Dt
 		     ,stiffness	// the normal stifness on the sample acting below the upper plate. Computed by computeStiffness
 		     ,dalpha	// the increment over alpha, due to vertical displacement of upper box
 		      ,deltaH	// the vertical increment of displacement to allow on the upper plate on this time step to verify either the constant normal stress or the constant normal stifness. Computed here by computeDY(..)
@@ -40,7 +40,7 @@ class KinemSimpleShearBox : public BoundaryController
 			,letMove(Real dgamma,Real dH) //dgamma and dH being computed by different ways in the different Kinem... Engines
 			,computeStiffness() // computes the stiffness of the contact sample - upper side. Useful for CNL and CNS loads
 			,computeDY(Real KnC) // computes vertical displacement to perform to obey to the stiffness of the shear wanted : KnC. Useful for CNL (for which KnC = 0) and CNS loads
-			,setBoxes_Dt()
+			,getBoxes_Dt()
 			;
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemSimpleShearBox,BoundaryController,

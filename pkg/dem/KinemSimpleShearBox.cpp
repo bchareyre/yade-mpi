@@ -50,7 +50,7 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 	if(LOG)	cout << "It : " << scene->iter << endl;
 // 	computeDu();
 
-// 	const Real& dt = scene->dt; // dt defini par setBoxes_Dt
+// 	const Real& dt = scene->dt; // dt value obtained by getBoxes_Dt
 
 	Real Ysup = topbox->state->pos.y();
 	Real Ylat = leftbox->state->pos.y();
@@ -143,7 +143,7 @@ void KinemSimpleShearBox::computeStiffness()
 
 }
 
-void KinemSimpleShearBox::setBoxes_Dt()
+void KinemSimpleShearBox::getBoxes_Dt()
 {
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);

@@ -14,7 +14,7 @@ YADE_PLUGIN((KinemCNLEngine));
 void KinemCNLEngine::action()
 {
 	if(LOG)	cout << "debut applyCondi du CNCEngine !!" << endl;
-	KinemSimpleShearBox::setBoxes_Dt();
+	KinemSimpleShearBox::getBoxes_Dt();
 	
 	if(LOG)	cout << "gamma = " << lexical_cast<string>(gamma) << "  et gammalim = " << lexical_cast<string>(gammalim) << endl;
 	if(gamma<=gammalim)

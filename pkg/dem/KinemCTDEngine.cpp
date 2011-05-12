@@ -17,7 +17,7 @@ KinemCTDEngine::~KinemCTDEngine()
 
 void KinemCTDEngine::action()
 {
-	KinemSimpleShearBox::setBoxes_Dt();
+	KinemSimpleShearBox::getBoxes_Dt();
 
 
 	scene->forces.sync();
