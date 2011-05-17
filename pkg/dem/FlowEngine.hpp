@@ -51,11 +51,12 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell (CGT::Cell_handle cell);
 		void Oedometer_Boundary_Conditions();
 		void BoundaryConditions();
-		void imposePressure(Vector3r pos, Real p);
+		unsigned int imposePressure(Vector3r pos, Real p);
+		void setImposedPressure(unsigned int cond, Real p);
 		void clearImposedPressure();
 		void Average_real_cell_velocity();
 		void ApplyViscousForces();
-		Real getFlux(int cond);
+		Real getFlux(unsigned int cond);
 		void saveVtk() {flow->saveVtk();}
 		vector<Real> AvFlVelOnSph(unsigned int id_sph) {return flow->Average_Fluid_Velocity_On_Sphere(id_sph);}
 		python::list getConstrictions() {
@@ -141,7 +142,8 @@ class FlowEngine : public PartialEngine
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					,
-					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'.")
+					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
+					.def("setImposedPressure",&FlowEngine::setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point of index cond.")
 					.def("clearImposedPressure",&FlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("getFlux",&FlowEngine::getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
 					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")

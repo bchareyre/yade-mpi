@@ -173,17 +173,26 @@ void FlowEngine::BoundaryConditions()
 }
 
 
-void FlowEngine::imposePressure(Vector3r pos, Real p)
+unsigned int FlowEngine::imposePressure(Vector3r pos, Real p)
 {
 	flow->imposedP.push_back( pair<CGT::Point,Real>(CGT::Point(pos[0],pos[1],pos[2]),p) );
+	//force immediate update of boundary conditions
+	Update_Triangulation=true;
+	return flow->imposedP.size();
+}
+
+void FlowEngine::setImposedPressure(unsigned int cond, Real p)
+{
+	if (cond>=flow->imposedP.size()) LOG_ERROR("Setting p with cond higher than imposedP size.");
+	flow->imposedP[cond].second=p;
 	//force immediate update of boundary conditions
 	Update_Triangulation=true;
 }
 
 void FlowEngine::clearImposedPressure() { flow->imposedP.clear();}
 
-Real FlowEngine::getFlux(int cond) {
-	if (cond>=(int)flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
+Real FlowEngine::getFlux(unsigned int cond) {
+	if (cond>=flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
 	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
 	double flux=0;
 	CGT::Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
