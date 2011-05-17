@@ -7,17 +7,17 @@ mn,mx=Vector3(0,0,0),Vector3(10,10,10)
 
 # makeCloud parameters "documented" only by the argument names in the c++ signature now:
 # http://beta.arcig.cz/~eudoxos/yade/epydoc/yade._packSpheres.SpherePack-class.html#makeCloud
-## box between mn and mx, avg radius .5 ± ½(.5*.2), 10k spheres (will be less, obviously), not periodic
-sp.makeCloud(mn,mx,.5,.2,10000,False)
+## box between mn and mx, avg radius ± ½(20%), 2k spheres
+sp.makeCloud(minCorner=mn,maxCorner=mx,rRelFuzz=.2,num=2000)
 
 ## create material #0, which will be used as default
-O.materials.append(FrictMat(young=150e6,poisson=.4,frictionAngle=.4,density=2600))
-O.materials.append(FrictMat(young=150e6,poisson=.4,frictionAngle=.2,density=2600,label='frictionless'))
+O.materials.append(FrictMat(young=15e6,poisson=.4,frictionAngle=.4,density=2600,label='spheres'))
+O.materials.append(FrictMat(young=15e6,poisson=.4,frictionAngle=.2,density=2600,label='frictionless'))
 
 
 ## copy spheres from the packing into the scene
 ## use default material, don't care about that for now
-O.bodies.append([utils.sphere(center,rad) for center,rad in sp])
+O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
 ## create walls around the packing
 walls=utils.aabbWalls(thickness=.1,material='frictionless')
 wallIds=O.bodies.append(walls)
@@ -38,22 +38,25 @@ triax=TriaxialCompressionEngine(
 	sigmaIsoCompaction=50e3,
 	sigmaLateralConfinement=50e3,
 	max_vel=10,
+	strainRate=0.05
 )
+
+O.dt=.5*utils.PWaveTimeStep() # initial timestep, to not explode right away
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()],nBins=5,sweepLength=.05),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()],nBins=5,verletDist=.05),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GlobalStiffnessTimeStepper(),
+	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=100,timestepSafetyCoefficient=0.8, defaultDt=O.dt),
 	triax,
 	# you can add TriaxialStateRecorder and such here…
 	NewtonIntegrator(damping=.4)
 ]
 
-O.dt=.5*utils.PWaveTimeStep() # initial timestep, to not explode right away
+
 
 O.saveTmp()
