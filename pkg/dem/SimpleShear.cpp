@@ -119,7 +119,6 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 	body = shared_ptr<Body>(new Body); body->groupMask=1;
 	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
-// 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	body->state->pos		=position;
@@ -138,18 +137,10 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 
 	aabb->color		= Vector3r(0,1,0);
 
-
-/*	gSphere->radius			= radius;
-	// de quoi avoir des bandes (huit en largeur) de couleur differentes :
-	gSphere->color		= ((int)(Mathr::Floor(8*position.X()/length)))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
-	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;*/
-	
 	iSphere->radius			= radius;
-	iSphere->color		= Vector3r(0.8,0.3,0.3);
+	iSphere->color		= ((int)(floor(8*position.x()/length)))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);// so that we have eight different colour bands
 
 	body->shape			= iSphere;
-// 	body->geometricalModel		= gSphere;
 	body->bound			= aabb;
 }
 
@@ -212,11 +203,11 @@ void SimpleShear::createActors(shared_ptr<Scene>& scene)
 
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-	globalStiffnessTimeStepper->defaultDt=1e-5;
+	globalStiffnessTimeStepper->defaultDt=3e-6;
 
 	shared_ptr<KinemCTDEngine> kinemEngine (new KinemCTDEngine);
 	kinemEngine->compSpeed = 10.0;
-	kinemEngine->targetSigma=1000.0;
+	kinemEngine->targetSigma=2000.0;
 
 
 	shared_ptr<InteractionLoop> ids(new InteractionLoop);
