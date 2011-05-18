@@ -178,7 +178,7 @@ unsigned int FlowEngine::imposePressure(Vector3r pos, Real p)
 	flow->imposedP.push_back( pair<CGT::Point,Real>(CGT::Point(pos[0],pos[1],pos[2]),p) );
 	//force immediate update of boundary conditions
 	Update_Triangulation=true;
-	return flow->imposedP.size();
+	return flow->imposedP.size()-1;
 }
 
 void FlowEngine::setImposedPressure(unsigned int cond, Real p)
