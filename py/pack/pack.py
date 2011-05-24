@@ -506,7 +506,7 @@ def hexaNet( radius, cornerCoord=[0,0,0], xLength=1., yLength=0.5, mos=0.08, a=0
 	:param cornerCoord: coordinates of the lower left corner of the net
 	:param xLenght: net length in x-direction
 	:param yLenght: net length in y-direction
-	:param mos: mesh opening size
+	:param mos: mesh opening size (horizontal distance between the double twists)
 	:param a: length of double-twist 
 	:param b: height of single wire section
 	:param startAtCorner: if true the generation starts with a double-twist at the lower left corner
@@ -515,7 +515,7 @@ def hexaNet( radius, cornerCoord=[0,0,0], xLength=1., yLength=0.5, mos=0.08, a=0
 	:return: set of spheres which defines the net (net) and exact dimensions of the net (lx,ly).
 	
 	note::
-	This packing works for the WireMatPM only. The particles at the corner are always generated first.
+	This packing works for the WireMatPM only. The particles at the corner are always generated first. For examples on how to use this packing see examples/WireMatPM. In order to create the proper interactions for the net the interaction radius has to be adapted in the simulation.
 
 	"""
 	# check input dimension

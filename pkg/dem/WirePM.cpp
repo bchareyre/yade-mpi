@@ -21,7 +21,7 @@ void WireMat::postLoad(WireMat&){
 		throw invalid_argument("WireMat.strainStressValues: at least two points must be given.");
 	if(strainStressValues[0](0) == 0. && strainStressValues[0](1) == 0.)
 		throw invalid_argument("WireMat.strainStressValues: Definition must start with values greather then zero (strain>0,stress>0)");
-	// compute cross-sectin area
+	// compute cross-section area
 	as = pow(diameter*0.5,2)*Mathr::PI;
 
 }
@@ -41,7 +41,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	Body* b1 = Body::byId(id1,scene).get();
 	Body* b2 = Body::byId(id2,scene).get();
 	
-	Real displN = geom->penetrationDepth; // NOTE: ScGeom->penetrationDepth>0 when spheres interpenetrate, and therefore, for wire always negative
+	Real displN = geom->penetrationDepth; // NOTE: ScGeom -> penetrationDepth>0 when spheres interpenetrate, and therefore, for wire always negative
 
 	/* get reference to values since values are updated for unloading */
 	vector<Vector2r> &DFValues = phys->displForceValues;
@@ -137,7 +137,7 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	Real crossSection;
 	vector<Vector2r> SSValues;
 	
-	/* ckeck properties of interaction */
+	/* check properties of interaction */
 	if ( mat1->id == mat2->id ) { // interaction of two bodies of the same material
 		crossSection = mat1->as;
 		SSValues = mat1->strainStressValues;
@@ -163,9 +163,9 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	Real R1 = geom->radius1;
 	Real R2 = geom->radius2;
 	
-	Real l0 = R1 + R2 - contactPhysics->initD; // initial lenght of the wire (can be single or double twisted)
+	Real l0 = R1 + R2 - contactPhysics->initD; // initial length of the wire (can be single or double twisted)
 
-	/* compute thresholddisplscement-force values (tension negative since ScGem is used!) */
+	/* compute threshold displacement-force values (tension negative since ScGem is used!) */
 	vector<Vector2r> DFValues;
 	for ( vector<Vector2r>::iterator it = SSValues.begin(); it != SSValues.end(); it++ ) {
 		Vector2r values = Vector2r::Zero();
@@ -178,10 +178,12 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	vector<Real> kValues;
 	Real k = DFValues[0](1) / DFValues[0](0);
 
-	/* update values if the interaction is double twiseted */
+	/* update values if the interaction is double twisted */
 	if ( contactPhysics->isDoubleTwist ) {
 		Real alpha = atan( l0 / (3.*Mathr::PI*mat1->diameter) );
 		Real kh = k * ( l0*mat1->diameter/crossSection ) / ( 48.*cos(alpha) * ( 41./9.*(1.+mat1->poisson) + 17./4.*pow(tan(alpha),2) ) );
+// 		std::cerr << kn << endl;;
+// 		std::cerr << kh << endl;;
 		k = 2. * ( mat1->lambdak*kh + (1-mat1->lambdak)*k );
 		Real F = k * DFValues[0](0);
 		Real mappingF = F/DFValues[0](1);
@@ -192,7 +194,7 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 		}
 	}
 	
-	/* store displscement-force values in physics */
+	/* store displacement-force values in physics */
 	contactPhysics->displForceValues = DFValues;
 
 	/* compute stiffness-values of wire */
