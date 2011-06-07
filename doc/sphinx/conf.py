@@ -416,6 +416,10 @@ my_latex_preamble=r'''
 \usepackage{underscore}
 \usepackage[all]{xy}
 
+% Metadata of the pdf output
+\hypersetup{pdftitle={Yade Documentation}}
+\hypersetup{pdfauthor={V. Smilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtes, L. Sibille, J. Stransky, K. Thoeni}}
+
 % symbols
 \let\mat\boldsymbol % matrix
 \let\vec\boldsymbol % vector
@@ -646,25 +650,10 @@ my_maketitle=r'''
 \textit{\sffamily\huge Release '''\
 +yade.config.revision\
 +r'''}\\
-\vspace{40 mm}
-\textit{\sffamily\LARGE Editor}\\
-\text{\sffamily\bfseries\LARGE Václav Šmilauer}\\
-\vspace{30 mm}
-\textit{\sffamily\LARGE Authors}\\
-%\begin{tabular}{>{\raggedleft}p{110mm}@{}} %replace "\\" by "," for the table form
-\text{\sffamily\bfseries\Large Václav Šmilauer}\\
-\text{\sffamily\bfseries\Large Emanuele Catalano}\\
-\text{\sffamily\bfseries\Large Bruno Chareyre}\\
-\text{\sffamily\bfseries\Large Sergei Dorofeenko}\\
-\text{\sffamily\bfseries\Large Jerome Duriez}\\
-\text{\sffamily\bfseries\Large Anton Gladky}\\
-\text{\sffamily\bfseries\Large Janek Kozicki}\\
-\text{\sffamily\bfseries\Large Chiara Modenese}\\
-\text{\sffamily\bfseries\Large Luc Scholtès}\\
-\text{\sffamily\bfseries\Large Luc Sibille}\\
-\text{\sffamily\bfseries\Large Jan Stránský}\\
-\text{\sffamily\bfseries\Large Klaus Thoeni}
-%\end{tabular}
+\vspace{70 mm}
+\begin{sffamily}\bfseries\Large
+Václav Šmilauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome Duriez, Anton Gladky, Janek Kozicki, Chiara Modenese, Luc Scholtès, Luc Sibille, Jan Stránský, Klaus Thoeni
+\end{sffamily}
 \vspace{20 mm}
 \hrule{}
 
