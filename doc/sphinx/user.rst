@@ -6,54 +6,109 @@ User's manual
 Scene construction
 *******************
 
-Triangulated surfaces
-=====================
+Adding particles
+================
 
-Yade integrates with the the `GNU Triangulated Surface library <http://gts.sourceforge.net>`_, exposed in python via the 3rd party :yref:`external:gts` module. GTS provides variety of functions for surface manipulation (coarsening, tesselation, simplification, import), to be found in its documentation.
+The :yref:`BodyContainer` holds :yref:`Body` objects in the simulation; it is accessible as ``O.bodies``.
 
-GTS surfaces are geometrical objects, which can be inserted into simulation as set of particles whose :yref:`Body.shape` is of type :yref:`Facet` -- single triangulation elements. :yref:`pack.gtsSurface2Facets` can be used to convert GTS surface triangulation into list of :yref:`bodies<Body>` ready to be inserted into simulation via ``O.bodies.append``.
+Creating Body objects
+----------------------
 
-Facet particles are created by default as non-:yref:`Body.dynamic` (they have zero inertial mass). That means that  they are fixed in space and will not move if subject to forces. You can however
+:yref:`Body` objects are only rarely constructed by hand by their components (:yref:`Shape`, :yref:`Bound`, :yref:`State`, :yref:`Material`); instead, convenience functions :yref:`yade.utils.sphere`, :yref:`yade.utils.facet` and :yref:`yade.utils.wall` are used to create them. Using these functions also ensures better future compatibility, if internals of :yref:`Body` change in some way. These functions receive geometry of the particle and several other characteristics. See their documentation for details. If the same :yref:`Material` is used for several (or many) bodies, it can be shared by adding it in ``O.materials``, as explained below.
 
-* prescribe arbitrary movement to facets using a :yref:`PartialEngine` (such as :yref:`TranslationEngine` or :yref:`RotationEngine`);
-* assign explicitly :yref:`mass<State.mass>` and :yref:`inertia<State.inertia>` to that particle;
-* make that particle part of a clump and assign :yref:`mass<State.mass>` and :yref:`inertia<State.inertia>` of the clump itself (described below).
+Defining materials
+------------------
 
-.. note::
-	Facets can only (currently) interact with :yref:`spheres<Sphere>`, not with other facets, even if they are *dynamic*. Collision of 2 :yref:`facets<Facet>` will not create interaction, therefore no forces on facets.
+The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined shared materials for bodies. It only supports addition, and will typically hold only a few instance (though there is no limit).
 
-Import
--------
+``label`` given to each material is optional, but can be passed to :yref:`yade.utils.sphere` and other functions forconstructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`yade.utils.sphere` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
 
-Yade currently offers 3 formats for importing triangulated surfaces from external files, in the :yref:`yade.ymport` module:
+If no :yref:`Material` is specified when calling :yref:`yade.utils.sphere`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created using :yref:`yade.utils.defaultMaterial`; this should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
 
-:yref:`yade.ymport.gts`
-	text file in native GTS format.
-:yref:`yade.ymport.stl`
-	STereoLitography format, in either text or binary form; exported from `Blender <http://www.blender.org>`_, but from many CAD systems as well.
-:yref:`yade.ymport.gmsh`.
-	text file in native format for `GMSH <http://www.geuz.org/gmsh/>`_, popular open-source meshing program.
+.. ipython::
 
-If you need to manipulate surfaces before creating list of facets, you can study the :ysrc:`py/ymport.py` file where the import functions are defined. They are rather simple in most cases.
+	@suppress
+	Yade [0]: O.reset()
 
-Parametric construction
-------------------------
+	Yade [1]: len(O.materials)
 
-The :yref:`external:gts` module provides convenient way of creating surface by vertices, edges and triangles.
+	Yade [2]: idConcrete=O.materials.append(FrictMat(young=30e9,poisson=.2,frictionAngle=.6,label="concrete"))
 
-Frequently, though, the surface can be conveniently described as surface between polylines in space. For instance, cylinder is surface between two polygons (closed polylines). The :yref:`yade.pack.sweptPolylines2gtsSurface` offers the functionality of connecting several polylines with triangulation.
+	Yade [3]: O.materials[idConcrete]
 
-.. note::
-	The implementation of :yref:`yade.pack.sweptPolylines2gtsSurface` is rather simplistic: all polylines must be of the same length, and they are connected with triangles between points following their indices within each polyline (not by distance). On the other hand, points can be co-incident, if the ``threshold`` parameter is positive: degenerate triangles with vertices closer that ``threshold`` are automatically eliminated.
+	# uses the last defined material
 
-Manipulating lists efficiently (in terms of code length) requires being familiar with `list comprehensions <http://docs.python.org/tutorial/datastructures.html#list-comprehensions>`_ in python.
+	Yade [3]: O.bodies.append(utils.sphere(center=(0,0,0),radius=1))
 
-..
-	FIXME
-	some example here
+	# material given by id
 
-Another examples can be found in :ysrc:`examples/mill.py` (fully parametrized) or :ysrc:`examples/funnel.py` (with hardcoded numbers).
+	Yade [4]: O.bodies.append(utils.sphere((0,0,2),1,material=idConcrete))
 
+	# material given by label
+
+	Yade [5]: O.bodies.append(utils.sphere((0,2,0),1,material="concrete"))
+
+	Yade [3]: idSteel=O.materials.append(FrictMat(young=210e9,poisson=.25,frictionAngle=.8,label="steel"))
+
+	Yade [7]: len(O.materials)
+
+	# implicitly uses "steel" material, as it is the last one now
+
+	Yade [6]: O.bodies.append(utils.facet([(1,0,0),(0,1,0),(-1,-1,0)]))
+
+Adding multiple particles
+-------------------------
+
+As shown above, bodies are added one by one or several at the same time using the ``append`` method:
+
+.. ipython::
+
+	@suppress
+	Yade [0]: O.reset()
+
+	Yade [1]: O.bodies.append(utils.sphere((0,0,0),1))
+
+	Yade [2]: O.bodies.append(utils.sphere((0,0,2),1))
+
+	# this is the same, but in one function call
+
+	Yade [3]: O.bodies.append([
+	     ...:    utils.sphere((0,0,0),1),
+		  ...:    utils.sphere((0,0,2),1)
+		  ...: ])
+
+Many functions introduced in next sections return list of bodies which can be readily added to the simulation, including
+
+* packing generators, such as :yref:`yade.pack.randomDensePack`, :yref:`yade.pack.regularHexa`
+* surface function :yref:`yade.pack.gtsSurface2Facets`
+* import functions :yref:`yade.ymport.gmsh`, :yref:`yade.ymport.stl`, …
+
+As those functions use :yref:`yade.utils.sphere` and :yref:`yade.utils.facet` internally, they accept additional argument passed to those function. In particular, material for each body is selected following the rules above (last one if not specified, by label, by index, etc.).
+
+
+Clumping particles together
+----------------------------
+
+In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation); a special function :yref:`BodyContainer.appendClumped` is designed for this task; for instance, we might add 2 spheres tied together:
+
+.. ipython::
+
+	@suppress
+	Yade [0]: O.reset()
+
+	Yade [1]: O.bodies.appendClumped([
+	     ...:    utils.sphere([0,0,0],1),
+		  ...:    utils.sphere([0,0,2],1)
+		  ...: ])
+
+	Yade [2]: len(O.bodies)
+
+	Yade [3]: O.bodies[1].isClumpMember, O.bodies[2].clumpId
+
+	Yade [2]: O.bodies[2].isClump, O.bodies[2].clumpId
+	
+
+:yref:`appendClumped<BodyContainer.appendClumped>` returns a tuple of ``(clumpId,[memberId1,memberId2])``: clump is internally represented by a special :yref:`Body`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`).
 
 Sphere packings
 ===============
@@ -227,7 +282,7 @@ Geometric algorithms compute packing without performing dynamic simulation; amon
 
 their chief disadvantage is that radius distribution cannot be prescribed exactly, save in specific cases (regular packings); sphere radii are given by the algorithm, which already makes the system determined. If exact radius distribution is important for your problem, consider dynamic algorithms instead.
 
-Regular 
+Regular
 """""""""
 Yade defines packing generators for spheres with constant radii, which can be used with volume predicates as described above. They are dense orthogonal packing (:yref:`yade.pack.regularOrtho`) and dense hexagonal packing (:yref:`yade.pack.regularHexa`). The latter creates so-called "hexagonal close packing", which achieves maximum density (http://en.wikipedia.org/wiki/Close-packing_of_spheres).
 
@@ -240,7 +295,7 @@ Random geometric algorithms do not integrate at all with volume predicates descr
 :yref:`yade._packSpherePadder.SpherePadder`
 	constructs dense sphere packing based on pre-computed tetrahedron mesh; it is documented in :yref:`yade._packSpherePadder.SpherePadder` documentation; sample script is in :ysrc:`scripts/test/SpherePadder.py`. :yref:`yade._packSpherePadder.SpherePadder` does not return :yref:`Body` list as other algorithms, but a :yref:`yade._packSpheres.SpherePack` object; it can be iterated over, adding spheres to the simulation, as shown in its documentation.
 GenGeo
-	is library (python module) for packing generation developed with `ESyS-Particle <http://www.launchpad.net/esys-particle>`_. It creates packing by random insertion of spheres with given radius range. Inserted spheres touch each other exactly and, more importantly, they also touch the boundary, if in its neighbourhood. Boundary is represented as special object of the GenGeo library (Sphere, cylinder, box, convex polyhedron, …). Therefore, GenGeo cannot be used with volume represented by yade predicates as explained above.	
+	is library (python module) for packing generation developed with `ESyS-Particle <http://www.launchpad.net/esys-particle>`_. It creates packing by random insertion of spheres with given radius range. Inserted spheres touch each other exactly and, more importantly, they also touch the boundary, if in its neighbourhood. Boundary is represented as special object of the GenGeo library (Sphere, cylinder, box, convex polyhedron, …). Therefore, GenGeo cannot be used with volume represented by yade predicates as explained above.
 
 	Packings generated by this module can be imported directly via :yref:`yade.ymport.gengeo`, or from saved file via :yref:`yade.ymport.gengeoFile`. There is an example script :ysrc:`scripts/test/genCylLSM.py`. Full documentation for GenGeo can be found at `ESyS documentation website <http://esys.esscc.uq.edu.au/docs.html>`_.
 
@@ -264,110 +319,53 @@ If you need to obtain full periodic packing (rather than packing clipped by pred
 
 In case of specific needs, you can create packing yourself, "by hand". For instance, packing boundary can be constructed from :yref:`facets<Facet>`, letting randomly positioned spheres in space fall down under gravity.
 
+Triangulated surfaces
+=====================
 
-Adding particles
-================
+Yade integrates with the the `GNU Triangulated Surface library <http://gts.sourceforge.net>`_, exposed in python via the 3rd party :yref:`external:gts` module. GTS provides variety of functions for surface manipulation (coarsening, tesselation, simplification, import), to be found in its documentation.
 
-The :yref:`BodyContainer` holds :yref:`Body` objects in the simulation; it is accessible as ``O.bodies``.
+GTS surfaces are geometrical objects, which can be inserted into simulation as set of particles whose :yref:`Body.shape` is of type :yref:`Facet` -- single triangulation elements. :yref:`pack.gtsSurface2Facets` can be used to convert GTS surface triangulation into list of :yref:`bodies<Body>` ready to be inserted into simulation via ``O.bodies.append``.
 
-Creating Body objects
-----------------------
+Facet particles are created by default as non-:yref:`Body.dynamic` (they have zero inertial mass). That means that  they are fixed in space and will not move if subject to forces. You can however
 
-:yref:`Body` objects are only rarely constructed by hand by their components (:yref:`Shape`, :yref:`Bound`, :yref:`State`, :yref:`Material`); instead, convenience functions :yref:`yade.utils.sphere`, :yref:`yade.utils.facet` and :yref:`yade.utils.wall` are used to create them. Using these functions also ensures better future compatibility, if internals of :yref:`Body` change in some way. These functions receive geometry of the particle and several other characteristics. See their documentation for details. If the same :yref:`Material` is used for several (or many) bodies, it can be shared by adding it in ``O.materials``, as explained below.
+* prescribe arbitrary movement to facets using a :yref:`PartialEngine` (such as :yref:`TranslationEngine` or :yref:`RotationEngine`);
+* assign explicitly :yref:`mass<State.mass>` and :yref:`inertia<State.inertia>` to that particle;
+* make that particle part of a clump and assign :yref:`mass<State.mass>` and :yref:`inertia<State.inertia>` of the clump itself (described below).
 
-Defining materials
-------------------
+.. note::
+	Facets can only (currently) interact with :yref:`spheres<Sphere>`, not with other facets, even if they are *dynamic*. Collision of 2 :yref:`facets<Facet>` will not create interaction, therefore no forces on facets.
 
-The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined shared materials for bodies. It only supports addition, and will typically hold only a few instance (though there is no limit).
+Import
+-------
 
-``label`` given to each material is optional, but can be passed to :yref:`yade.utils.sphere` and other functions forconstructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`yade.utils.sphere` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
+Yade currently offers 3 formats for importing triangulated surfaces from external files, in the :yref:`yade.ymport` module:
 
-If no :yref:`Material` is specified when calling :yref:`yade.utils.sphere`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created using :yref:`yade.utils.defaultMaterial`; this should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
+:yref:`yade.ymport.gts`
+	text file in native GTS format.
+:yref:`yade.ymport.stl`
+	STereoLitography format, in either text or binary form; exported from `Blender <http://www.blender.org>`_, but from many CAD systems as well.
+:yref:`yade.ymport.gmsh`.
+	text file in native format for `GMSH <http://www.geuz.org/gmsh/>`_, popular open-source meshing program.
 
-.. ipython::
+If you need to manipulate surfaces before creating list of facets, you can study the :ysrc:`py/ymport.py` file where the import functions are defined. They are rather simple in most cases.
 
-	@suppress
-	Yade [0]: O.reset()
+Parametric construction
+------------------------
 
-	Yade [1]: len(O.materials)
+The :yref:`external:gts` module provides convenient way of creating surface by vertices, edges and triangles.
 
-	Yade [2]: idConcrete=O.materials.append(FrictMat(young=30e9,poisson=.2,frictionAngle=.6,label="concrete"))
+Frequently, though, the surface can be conveniently described as surface between polylines in space. For instance, cylinder is surface between two polygons (closed polylines). The :yref:`yade.pack.sweptPolylines2gtsSurface` offers the functionality of connecting several polylines with triangulation.
 
-	Yade [3]: O.materials[idConcrete]
+.. note::
+	The implementation of :yref:`yade.pack.sweptPolylines2gtsSurface` is rather simplistic: all polylines must be of the same length, and they are connected with triangles between points following their indices within each polyline (not by distance). On the other hand, points can be co-incident, if the ``threshold`` parameter is positive: degenerate triangles with vertices closer that ``threshold`` are automatically eliminated.
 
-	# uses the last defined material
+Manipulating lists efficiently (in terms of code length) requires being familiar with `list comprehensions <http://docs.python.org/tutorial/datastructures.html#list-comprehensions>`_ in python.
 
-	Yade [3]: O.bodies.append(utils.sphere(center=(0,0,0),radius=1))
+..
+	FIXME
+	some example here
 
-	# material given by id
-
-	Yade [4]: O.bodies.append(utils.sphere((0,0,2),1,material=idConcrete))
-
-	# material given by label
-
-	Yade [5]: O.bodies.append(utils.sphere((0,2,0),1,material="concrete"))
-
-	Yade [3]: idSteel=O.materials.append(FrictMat(young=210e9,poisson=.25,frictionAngle=.8,label="steel"))
-
-	Yade [7]: len(O.materials)
-
-	# implicitly uses "steel" material, as it is the last one now
-
-	Yade [6]: O.bodies.append(utils.facet([(1,0,0),(0,1,0),(-1,-1,0)]))
-
-Adding multiple particles
--------------------------
-
-As shown above, bodies are added one by one or several at the same time using the ``append`` method:
-
-.. ipython::
-
-	@suppress
-	Yade [0]: O.reset()
-
-	Yade [1]: O.bodies.append(utils.sphere((0,0,0),1))
-
-	Yade [2]: O.bodies.append(utils.sphere((0,0,2),1))
-
-	# this is the same, but in one function call
-
-	Yade [3]: O.bodies.append([
-	     ...:    utils.sphere((0,0,0),1),
-		  ...:    utils.sphere((0,0,2),1)
-		  ...: ])
-
-Many functions introduced in preceding sections return list of bodies which can be readily added to the simulation, including
-
-* packing generators, such as :yref:`yade.pack.randomDensePack`, :yref:`yade.pack.regularHexa`
-* surface function :yref:`yade.pack.gtsSurface2Facets`
-* import functions :yref:`yade.ymport.gmsh`, :yref:`yade.ymport.stl`, …
-
-As those functions use :yref:`yade.utils.sphere` and :yref:`yade.utils.facet` internally, they accept additional argument passed to those function. In particular, material for each body is selected following the rules above (last one if not specified, by label, by index, etc.).
-
-
-Clumping particles together
-----------------------------
-
-In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation); a special function :yref:`BodyContainer.appendClumped` is designed for this task; for instance, we might add 2 spheres tied together:
-
-.. ipython::
-
-	@suppress
-	Yade [0]: O.reset()
-
-	Yade [1]: O.bodies.appendClumped([
-	     ...:    utils.sphere([0,0,0],1),
-		  ...:    utils.sphere([0,0,2],1)
-		  ...: ])
-
-	Yade [2]: len(O.bodies)
-
-	Yade [3]: O.bodies[1].isClumpMember, O.bodies[2].clumpId
-
-	Yade [2]: O.bodies[2].isClump, O.bodies[2].clumpId
-	
-
-:yref:`appendClumped<BodyContainer.appendClumped>` returns a tuple of ``(clumpId,[memberId1,memberId2])``: clump is internally represented by a special :yref:`Body`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`).
+Another examples can be found in :ysrc:`examples/mill.py` (fully parametrized) or :ysrc:`examples/funnel.py` (with hardcoded numbers).
 
 .. _creating-interactions:
 
@@ -431,7 +429,7 @@ Individual interactions on demand
 It is possible to create an interaction between a pair of particles independently of collision detection using :yref:`yade.utils.createInteraction`. This function looks for and uses matching ``Ig2`` and ``Ip2`` functors. Interaction will be created regardless of distance between given particles (by passing a special parameter to the ``Ig2`` functor to force creation of the interaction even without any geometrical contact). Appropriate constitutive law should be used to avoid deletion of the interaction at the next simulation step.
 
 .. ipython::
-	
+
 	@suppress
 	Yade [1]: O.reset()
 
@@ -558,7 +556,7 @@ Ip2 functors
 Law2 functor(s)
 ^^^^^^^^^^^^^^^^
 
-``Law2`` functor was the ultimate criterion for the choice of ``Ig2`` and ``Ig2`` functors; there are no restrictions on its choice in itself, as it only applies forces without creating new objects.
+``Law2`` functor was the ultimate criterion for the choice of ``Ig2`` and ``Ip2`` functors; there are no restrictions on its choice in itself, as it only applies forces without creating new objects.
 
 In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :yref:`IGeom` and :yref:`IPhys` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :yref:`Shapes<Shape>` and :yref:`Materials<Material>`).
 
