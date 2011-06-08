@@ -981,8 +981,8 @@ The DEM computation using an explicit integration scheme demands a relatively hi
   
   where $p$ is packing porosity, roughly $\frac{1}{2}$ for dense irregular packings of spheres of similar radius.
 
-  The dependency is not strictly linear (which would be the best case), as some algorithms do not scale linearly; a case in point is the sweep and prune collision detection algorithm introduced in :ref:`sect-sweep-and-prune`_, with scaling roughly $\bigO{N \log N}$.
-	
+  The dependency is not strictly linear (which would be the best case), as some algorithms do not scale linearly; a case in point is the sweep and prune collision detection algorithm introduced in sect.~\ref{sect-sweep-and-prune}, with scaling roughly $\bigO{N \log N}$.
+
   The number of interactions scales with $N$, as long as packing characteristics are the same.
 * the number of computational cores $\numCPU$; in the ideal case, the dependency would be inverse-linear were all algorithms parallelized (in Yade, collision detection is not).
 
