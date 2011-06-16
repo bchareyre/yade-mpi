@@ -38,24 +38,26 @@ def spheresPackDimensions(idSpheres):
 		else:
 			raise TypeError("Unknow type of data, should be list of int's or bodies's")
 		
-		spherePosition=b.state.pos
-		try:
-			sphereRadius=b.shape.radius	#skip non-spheres
-		except AttributeError: continue
-		
-		sphereRadiusVec3 = Vector3(sphereRadius,sphereRadius,sphereRadius)
-		
-		sphereMax = spherePosition + sphereRadiusVec3
-		sphereMin = spherePosition - sphereRadiusVec3
-		
-		for dim in range(0,3):
-			if ((sphereMax[dim]>max[dim]) or (counter==0)): 
-				max[dim]=sphereMax[dim]
-				maxId[dim] = b.id
-			if ((sphereMin[dim]<min[dim]) or (counter==0)): 
-				min[dim]=sphereMin[dim]
-				minId[dim] = b.id
-		counter += 1
+		if (b):
+			spherePosition=b.state.pos	#skip non-existent spheres
+			
+			try:
+				sphereRadius=b.shape.radius	#skip non-spheres
+			except AttributeError: continue
+			
+			sphereRadiusVec3 = Vector3(sphereRadius,sphereRadius,sphereRadius)
+			
+			sphereMax = spherePosition + sphereRadiusVec3
+			sphereMin = spherePosition - sphereRadiusVec3
+			
+			for dim in range(0,3):
+				if ((sphereMax[dim]>max[dim]) or (counter==0)): 
+					max[dim]=sphereMax[dim]
+					maxId[dim] = b.id
+				if ((sphereMin[dim]<min[dim]) or (counter==0)): 
+					min[dim]=sphereMin[dim]
+					minId[dim] = b.id
+			counter += 1
 	
 	center = (max-min)/2.0+min
 	extends = max-min
