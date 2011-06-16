@@ -9,24 +9,32 @@ YADE_PLUGIN((KinematicEngine)(CombinedKinematicEngine)(TranslationEngine)(Harmon
 CREATE_LOGGER(KinematicEngine);
 
 void KinematicEngine::action(){
-	FOREACH(Body::id_t id,ids){
-		assert(id<(Body::id_t)scene->bodies->size());
-		Body* b=Body::byId(id,scene).get();
-		if(b) b->state->vel=b->state->angVel=Vector3r::Zero();
+	if (ids.size()>0) {
+		FOREACH(Body::id_t id,ids){
+			assert(id<(Body::id_t)scene->bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(b) b->state->vel=b->state->angVel=Vector3r::Zero();
+		}
+		apply(ids);
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
 	}
-	apply(ids);
 }
 
 void CombinedKinematicEngine::action(){
-	// reset first
-	FOREACH(Body::id_t id,ids){
-		assert(id<(Body::id_t)scene->bodies->size());
-		Body* b=Body::byId(id,scene).get();
-		if(b) b->state->vel=b->state->angVel=Vector3r::Zero();
-	}
-	// apply one engine after another
-	FOREACH(const shared_ptr<KinematicEngine>& e, comb){
-		e->scene=scene; e->apply(ids);
+	if (ids.size()>0) {
+		// reset first
+		FOREACH(Body::id_t id,ids){
+			assert(id<(Body::id_t)scene->bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(b) b->state->vel=b->state->angVel=Vector3r::Zero();
+		}
+		// apply one engine after another
+		FOREACH(const shared_ptr<KinematicEngine>& e, comb){
+			e->scene=scene; e->apply(ids);
+		}
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
 	}
 }
 
@@ -38,29 +46,37 @@ const shared_ptr<CombinedKinematicEngine> CombinedKinematicEngine::fromTwo(const
 
 
 void TranslationEngine::apply(const vector<Body::id_t>& ids){
-	#ifdef YADE_OPENMP
-	const long size=ids.size();
-	#pragma omp parallel for schedule(static)
-	for(long i=0; i<size; i++){
-		const Body::id_t& id=ids[i];
-	#else
-	FOREACH(Body::id_t id,ids){
-	#endif
-		assert(id<(Body::id_t)scene->bodies->size());
-		Body* b=Body::byId(id,scene).get();
-		if(!b) continue;
-		b->state->vel+=velocity*translationAxis;
+	if (ids.size()>0) {
+		#ifdef YADE_OPENMP
+		const long size=ids.size();
+		#pragma omp parallel for schedule(static)
+		for(long i=0; i<size; i++){
+			const Body::id_t& id=ids[i];
+		#else
+		FOREACH(Body::id_t id,ids){
+		#endif
+			assert(id<(Body::id_t)scene->bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(!b) continue;
+			b->state->vel+=velocity*translationAxis;
+		}
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
 	}
 }
 
 void HarmonicMotionEngine::apply(const vector<Body::id_t>& ids){
-	Vector3r w = f*2.0*Mathr::PI; 										 								//Angular frequency
-	Vector3r velocity = ((((w*scene->time + fi).cwise().sin())*(-1.0)).cwise()*A).cwise()*w;	//Linear velocity at current time
-	FOREACH(Body::id_t id,ids){
-		assert(id<(Body::id_t)scene->bodies->size());
-		Body* b=Body::byId(id,scene).get();
-		if(!b) continue;
-		b->state->vel+=velocity;
+	if (ids.size()>0) {
+		Vector3r w = f*2.0*Mathr::PI; 										 								//Angular frequency
+		Vector3r velocity = ((((w*scene->time + fi).cwise().sin())*(-1.0)).cwise()*A).cwise()*w;	//Linear velocity at current time
+		FOREACH(Body::id_t id,ids){
+			assert(id<(Body::id_t)scene->bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(!b) continue;
+			b->state->vel+=velocity;
+		}
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
 	}
 }
 
@@ -73,39 +89,47 @@ void InterpolatingHelixEngine::apply(const vector<Body::id_t>& ids){
 }
 
 void HelixEngine::apply(const vector<Body::id_t>& ids){
-	const Real& dt=scene->dt;
-	angleTurned+=angularVelocity*dt;
-	shared_ptr<BodyContainer> bodies = scene->bodies;
-	FOREACH(Body::id_t id,ids){
-		assert(id<(Body::id_t)bodies->size());
-		Body* b=Body::byId(id,scene).get();
-		if(!b) continue;
-		b->state->vel+=linearVelocity*rotationAxis;
+	if (ids.size()>0) {
+		const Real& dt=scene->dt;
+		angleTurned+=angularVelocity*dt;
+		shared_ptr<BodyContainer> bodies = scene->bodies;
+		FOREACH(Body::id_t id,ids){
+			assert(id<(Body::id_t)bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(!b) continue;
+			b->state->vel+=linearVelocity*rotationAxis;
+		}
+		rotateAroundZero=true;
+		RotationEngine::apply(ids);
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
 	}
-	rotateAroundZero=true;
-	RotationEngine::apply(ids);
 }
 
 
 void RotationEngine::apply(const vector<Body::id_t>& ids){
-	#ifdef YADE_OPENMP
-	const long size=ids.size();
-	#pragma omp parallel for schedule(static)
-	for(long i=0; i<size; i++){
-		const Body::id_t& id=ids[i];
-	#else
-	FOREACH(Body::id_t id,ids){
-	#endif
-		assert(id<(Body::id_t)scene->bodies->size());
-		Body* b=Body::byId(id,scene).get();
-		if(!b) continue;
-		b->state->angVel+=rotationAxis*angularVelocity;
-		if(rotateAroundZero){
-			const Vector3r l=b->state->pos-zeroPoint;
-			Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
-			Vector3r newPos=q*l+zeroPoint;
-			b->state->vel+=Vector3r(newPos-b->state->pos)/scene->dt;
+	if (ids.size()>0) {
+		#ifdef YADE_OPENMP
+		const long size=ids.size();
+		#pragma omp parallel for schedule(static)
+		for(long i=0; i<size; i++){
+			const Body::id_t& id=ids[i];
+		#else
+		FOREACH(Body::id_t id,ids){
+		#endif
+			assert(id<(Body::id_t)scene->bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(!b) continue;
+			b->state->angVel+=rotationAxis*angularVelocity;
+			if(rotateAroundZero){
+				const Vector3r l=b->state->pos-zeroPoint;
+				Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
+				Vector3r newPos=q*l+zeroPoint;
+				b->state->vel+=Vector3r(newPos-b->state->pos)/scene->dt;
+			}
 		}
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
 	}
 }
 
