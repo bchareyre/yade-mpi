@@ -29,7 +29,9 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 void InteractionContainer::clear(){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
-	FOREACH(const shared_ptr<Body>& b, *bodies) b->intrs.clear(); // delete interactions from bodies
+	FOREACH(const shared_ptr<Body>& b, *bodies) {
+		if (b) b->intrs.clear(); // delete interactions from bodies
+	}
 	linIntrs.clear(); // clear the linear container
 	pendingErase.clear();
 	currSize=0;
