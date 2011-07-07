@@ -87,8 +87,12 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
 
 		Vsolid_tot += Vsolid1 + Vsolid2;
 		Vporale += Vtot - (Vsolid1 + Vsolid2);
-		V_porale_porosity += Vtot - (Vsolid1 + Vsolid2);
-		V_totale_porosity += Vtot;
+		
+		bool border=false;
+		for (int i=0;i<4;i++){
+		  if (cell->neighbor(i)->info().fictious()!=0) border=true;}
+		if (!border) {V_porale_porosity += Vtot - (Vsolid1 + Vsolid2);
+		    V_totale_porosity += Vtot;}
 
 		/**Vpore**/ return Vtot - (Vsolid1 + Vsolid2);
     }; break;

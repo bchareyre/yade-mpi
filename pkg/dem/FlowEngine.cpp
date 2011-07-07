@@ -104,11 +104,14 @@ void FlowEngine::action()
 			char file [50];
 			mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			string consol = "./Consol/"+flow->key+"%d_Consol";
+// 			const char* file = ;
 			const char* keyconsol = consol.c_str();
+			
 			sprintf(file, keyconsol, j);
 			char *g = file;
 			timingDeltas->checkpoint("Writing cons_files");
-			MaxPressure = flow->PressureProfile(g, time, intervals);
+// 			MaxPressure = flow->PressureProfile(consol.c_str(), time, intervals);
+			MaxPressure = flow->PressureProfile( g, time, intervals);
 
 			std::ofstream max_p("pressures.txt", std::ios::app);
 			max_p << j << " " << time << " " << MaxPressure << endl;
@@ -137,10 +140,7 @@ void FlowEngine::action()
 		Update_Triangulation = false;}
 		
 	if (velocity_profile) /*flow->FluidVelocityProfile();*/flow->Average_Fluid_Velocity();
-	if (first && liquefaction){
-	  wall_up_y = flow->y_max;
-	  wall_down_y = flow->y_min;}
-	if (liquefaction) flow->Measure_Pore_Pressure(wall_up_y, wall_down_y);
+	
 	first=false;
 	timingDeltas->checkpoint("Ending");
 	
@@ -189,6 +189,22 @@ void FlowEngine::setImposedPressure(unsigned int cond, Real p)
 	Update_Triangulation=true;
 }
 
+void FlowEngine::imposeFlux(Vector3r pos, Real flux)
+{
+	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+	double flux_base=0.f;
+	double perm_base=0.f;
+	CGT::Cell_handle cell = Tri.locate(CGT::Point(pos[0],pos[1],pos[2]));
+	for (int ngb=0;ngb<4;ngb++) {
+		if (!cell->neighbor(ngb)->info().Pcondition) {
+		  flux_base += cell->info().k_norm()[ngb]*(cell->neighbor(ngb)->info().p());
+		  perm_base += cell->info().k_norm()[ngb];}}
+	
+	flow->imposedP.push_back( pair<CGT::Point,Real>(CGT::Point(pos[0],pos[1],pos[2]),(flux_base-flux)/perm_base));
+	//force immediate update of boundary conditions
+	Update_Triangulation=true;
+}
+
 void FlowEngine::clearImposedPressure() { flow->imposedP.clear();}
 
 Real FlowEngine::getFlux(unsigned int cond) {
@@ -197,7 +213,7 @@ Real FlowEngine::getFlux(unsigned int cond) {
 	double flux=0;
 	CGT::Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
 	for (int ngb=0;ngb<4;ngb++) {
-		if (!cell->neighbor(ngb)->info().Pcondition) flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
+		/*if (!cell->neighbor(ngb)->info().Pcondition) */flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
 	return flux;
 }
 
@@ -243,32 +259,18 @@ void FlowEngine::Build_Triangulation (double P_zero)
 
 	porosity = flow->V_porale_porosity/flow->V_totale_porosity;
 
-	if (first)
-	{
-		flow->TOLERANCE=Tolerance;
-		flow->RELAX=Relax;
-		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
-		BoundaryConditions();
-		flow->Initialize_pressures( P_zero );
-  		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
-		
-
-	}
-	else
-	{
-		flow->TOLERANCE=Tolerance;
-		flow->RELAX=Relax;
-		if (Debug && compute_K) cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
-		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
-		BoundaryConditions();
-		flow->Initialize_pressures(P_zero);// FIXME : why, if we are going to interpolate after that?
-		flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
- 		if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
-	}
+	flow->TOLERANCE=Tolerance;flow->RELAX=Relax;
+	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
+	
+	if (compute_K) {K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+	
+	BoundaryConditions();
+	flow->Initialize_pressures(P_zero);
+	
+	if (!first) flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
+	if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
+	
 	Initialize_volumes();
 	if (viscousShear) flow->ComputeEdgesSurfaces();
 }
@@ -485,12 +487,14 @@ void FlowEngine::UpdateVolumes ()
 	if (Debug) cout << "Updating volumes.............." << endl;
 	Real invDeltaT = 1/scene->dt;
 	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	
 	double newVol, dVol;
 	eps_vol_max=0;
 	Real totVol=0; Real totDVol=0; Real totVol0=0; Real totVol1=0; Real totVol2=0; Real totVol3=0;
+	
 	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
 		switch ( cell->info().fictious()) {
-			case ( 3 ): newVol= Volume_cell_triple_fictious ( cell ); totVol3+=newVol; break;
+			case ( 3 ) : newVol = Volume_cell_triple_fictious ( cell ); totVol3+=newVol; break;
 			case ( 2 ) : newVol = Volume_cell_double_fictious ( cell ); totVol2+=newVol; break;
 			case ( 1 ) : newVol = Volume_cell_single_fictious ( cell ); totVol1+=newVol; break;
 			case ( 0 ) : newVol = Volume_cell ( cell ); totVol0+=newVol; break;
@@ -502,6 +506,7 @@ void FlowEngine::UpdateVolumes ()
 		eps_vol_max = max(eps_vol_max, abs(dVol/newVol));
 
 		cell->info().dv() = (!cell->info().Pcondition)?dVol*invDeltaT:0;
+// 		cell->info().dv() = dVol*invDeltaT;
 		cell->info().volume() = newVol;
 // 		if (Debug) cerr<<"v/dv : "<<cell->info().volume()<<" "<<cell->info().dv()<<" ("<<cell->info().fictious()<<")"<<endl;
 	}

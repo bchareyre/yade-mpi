@@ -51,6 +51,7 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell (CGT::Cell_handle cell);
 		void Oedometer_Boundary_Conditions();
 		void BoundaryConditions();
+		void imposeFlux(Vector3r pos, Real flux);
 		unsigned int imposePressure(Vector3r pos, Real p);
 		void setImposedPressure(unsigned int cond, Real p);
 		void clearImposedPressure();
@@ -65,6 +66,7 @@ class FlowEngine : public PartialEngine
 		Vector3r fluidForce(unsigned int id_sph) {const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		Vector3r fluidShearForce(unsigned int id_sph) {return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
+		void PressureProfile(double wallUpY, double wallDownY) {return flow->Measure_Pore_Pressure(wallUpY,wallDownY);}
 
 		virtual ~FlowEngine();
 
@@ -108,7 +110,7 @@ class FlowEngine : public PartialEngine
 					((double, currentStrain, 0,, "Current value of axial strain"))
 					((int, intervals, 30,, "Number of layers for computation average fluid pressure profiles to build consolidation curves"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso"))
-					((bool, liquefaction, false,,"Measure fluid pressure along the heigth of the sample"))
+// 					((bool, liquefaction, false,,"Measure fluid pressure along the heigth of the sample"))
 					((double, V_d, 0,,"darcy velocity of fluid in sample"))
 // 					((double, bottom_seabed_pressure,0,,"Fluid pressure measured at the bottom of the seabed on the symmetry axe"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
@@ -142,6 +144,7 @@ class FlowEngine : public PartialEngine
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					,
+					.def("imposeFlux",&FlowEngine::imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 					.def("setImposedPressure",&FlowEngine::setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point of index cond.")
 					.def("clearImposedPressure",&FlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
@@ -152,6 +155,7 @@ class FlowEngine : public PartialEngine
 					.def("fluidForce",&FlowEngine::fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("fluidShearForce",&FlowEngine::fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
+					.def("PressureProfile",&FlowEngine::PressureProfile,"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					)
 		DECLARE_LOGGER;
 };

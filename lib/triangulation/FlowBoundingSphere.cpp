@@ -499,20 +499,20 @@ void FlowBoundingSphere::ComputeFacetForces()
 			}
 		cell->info().isvisited=!ref;
 	}
-// 	if (DEBUG_OUT) {
-// 		cout << "Facet scheme" <<endl;
-// 		Vecteur TotalForce = nullVect;
-// 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-// 			if (!v->info().isFictious) {
-// 				TotalForce = TotalForce + v->info().forces;
-// 				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-// 			} else {
-// 				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-// 				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-// 			}
-// 		}
-// 		cout << "TotalForce = "<< TotalForce << endl;
-// 	}
+	if (DEBUG_OUT) {
+		cout << "Facet scheme" <<endl;
+		Vecteur TotalForce = nullVect;
+		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+			if (!v->info().isFictious) {
+				TotalForce = TotalForce + v->info().forces;
+				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+			} else {
+				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+			}
+		}
+		cout << "TotalForce = "<< TotalForce << endl;
+	}
 }
 
 void FlowBoundingSphere::ComputeFacetForcesWithCache()
@@ -582,10 +582,10 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 		{
 			if (!v->info().isFictious) {
 				TotalForce = TotalForce + v->info().forces;
-// 				if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+				if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
 			} else {
 				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-// 				if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+				if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
 			}
 		}
 		cout << "TotalForce = "<< TotalForce << endl;
@@ -677,6 +677,7 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 		if (new_cell->info().Pcondition) continue;
                 old_cell = Tri.locate((Point) new_cell->info());
                 new_cell->info().p() = old_cell->info().p();
+// 		new_cell->info().dv() = old_cell->info().dv();
         }
 	Tes.Clear();
 }
@@ -804,8 +805,8 @@ void FlowBoundingSphere::Compute_Permeability()
 			}
 		}
 		cell->info().isvisited = !ref;
-		cell->info().s = cell->info().s/volume_sub_pore;
-		volume_sub_pore = 0.f;
+		if(permeability_map){cell->info().s = cell->info().s/volume_sub_pore;
+		volume_sub_pore = 0.f;}
 	}
 	if (DEBUG_OUT) cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
@@ -826,7 +827,8 @@ void FlowBoundingSphere::Compute_Permeability()
 			neighbour_cell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
 				pass++;
-				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*meanK ,min((cell->info().k_norm())[j], maxKdivKmean*meanK));
+				(cell->info().k_norm())[j] = min((cell->info().k_norm())[j], maxKdivKmean*meanK);
+// 				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*meanK ,min((cell->info().k_norm())[j], maxKdivKmean*meanK));
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
 // 				cout<<(cell->info().k_norm())[j]<<endl;
 // 				kFile << (cell->info().k_norm())[j] << endl;
@@ -1171,26 +1173,28 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
   Tesselation::VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[y_max_id],cells_it);
   for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
   {
-    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {/*if (!cell->neighbor(j2)->info().Pcondition)*/{
-      if ((cell->neighbor(j2)->info().p()!=cell->neighbor(j2)->info().p()) && Tri.is_infinite(cell->neighbor(j2))) cout << "oooooooooooooooh" << endl;
-    Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
-    cellQ1+=1;
-    p_out_max = std::max(cell->neighbor(j2)->info().p(), p_out_max);
-    p_out_min = std::min(cell->neighbor(j2)->info().p(), p_out_min);
-    p_out_moy += cell->neighbor(j2)->info().p();}
-  }}}
+    Cell_handle& cell = *it;
+    for (int j2=0; j2<4; j2++) {
+      if (!cell->neighbor(j2)->info().Pcondition){
+	Q1 = Q1 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
+	cellQ1+=1;
+	p_out_max = std::max(cell->neighbor(j2)->info().p(), p_out_max);
+	p_out_min = std::min(cell->neighbor(j2)->info().p(), p_out_min);
+	p_out_moy += cell->neighbor(j2)->info().p();}
+  }}
 
   Tesselation::VCell_iterator cell_down_end = Tri.incident_cells(T[currentTes].vertexHandles[y_min_id],cells_it);
   for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cell_down_end; it++)
   {
-    Cell_handle& cell = *it;{for (int j2=0; j2<4; j2++) {/*if (!cell->neighbor(j2)->info().Pcondition)*/{
-      if ((cell->neighbor(j2)->info().p()!=cell->neighbor(j2)->info().p()) && Tri.is_infinite(cell->neighbor(j2))) cout << "oooooooooooooooh2" << endl;
-    Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
-    cellQ2+=1;
-    p_in_max = std::max(cell->neighbor(j2)->info().p(), p_in_max);
-    p_in_min = std::min(cell->neighbor(j2)->info().p(), p_in_min);
-    p_in_moy += cell->neighbor(j2)->info().p();}
-  }}}
+    Cell_handle& cell = *it;
+    for (int j2=0; j2<4; j2++){
+      if (!cell->neighbor(j2)->info().Pcondition){
+	Q2 = Q2 + (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->info().p()-cell->neighbor(j2)->info().p());
+	cellQ2+=1;
+	p_in_max = std::max(cell->neighbor(j2)->info().p(), p_in_max);
+	p_in_min = std::min(cell->neighbor(j2)->info().p(), p_in_min);
+	p_in_moy += cell->neighbor(j2)->info().p();}
+  }}
 
 	if (DEBUG_OUT){
 	cout << "the maximum superior pressure is = " << p_out_max << " the min is = " << p_out_min << endl;
@@ -1201,8 +1205,8 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         cout << "celle comunicanti in alto = " << cellQ1 << endl;}
 
         double density = 1;
-        double viscosity = VISCOSITY;
-        double gravity = 9.80665;
+        double viscosity = 1.0;
+        double gravity = 1;
         double Vdarcy = Q1/Section;
 	double DeltaP = abs(P_Inf-P_Sup);
 	double DeltaH = DeltaP/ (density*gravity);
@@ -1422,11 +1426,42 @@ void FlowBoundingSphere::GenerateVoxelFile( )
         }
 }
 
+// double FlowBoundingSphere::PressureProfile(const char *filename, Real& time, int& intervals)
+// {
+// 	RTriangulation& Tri = T[currentTes].Triangulation();
+// 	vector<double> Pressures;
+// 
+// 	/** CONSOLIDATION CURVES **/
+//         Cell_handle permeameter;
+//         int n=0, k=0;
+//         vector<double> P_ave;
+//         std::ofstream consFile(filename, std::ios::out);
+// 
+//         double Rx = (x_max-x_min) /intervals;
+//         double Ry = (y_max-y_min) /intervals;
+//         double Rz = (z_max-z_min) /intervals;
+// 
+// 	for (double Y=y_min; Y<=y_max+Ry/10; Y=Y+Ry) {
+//                 P_ave.push_back(0);
+// 		for (double X=x_min; X<=x_max+Ry/10; X=X+Rx) {
+// 			for (double Z=z_min; Z<=z_max+Ry/10; Z=Z+Rz) {
+//                                 P_ave[k]+=Tri.locate(Point(X, Y, Z))->info().p();
+// 				n++;
+//                         }
+//                 }
+//                 P_ave[k]/= (n);
+//                 consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
+//                 if (k==intervals/2) Pressures.push_back(P_ave[k]);
+//                 n=0; k++;
+// 	}
+// 	return P_ave[intervals/2];
+// }
+
 double FlowBoundingSphere::PressureProfile(char *filename, Real& time, int& intervals)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> Pressures;
-
+	
 	/** CONSOLIDATION CURVES **/
         Cell_handle permeameter;
         int n=0, k=0;
@@ -1619,8 +1654,6 @@ Vector3r FlowBoundingSphere::ComputeViscousForce(Vector3r deltaV, int edge_id)
     Vector3r tau = deltaV*VISCOSITY/Edge_HydRad[edge_id];
     return tau * Edge_Surfaces[edge_id];
 }
-
-
 
 } //namespace CGT
 
