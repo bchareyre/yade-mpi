@@ -48,7 +48,7 @@ Typically, you will not type Yade commands by hand, but use *scripts*, python pr
 
 Saving such script as ``hello.py``, it can be given as argument to yade::
 
-	\$ yade script.py
+	\$ yade hello.py
 	Welcome to Yade bzr1986
 	TCP python prompt on localhost:9001, auth cookie `askcsu'
 	TCP info provider on localhost:21000

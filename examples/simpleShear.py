@@ -33,17 +33,17 @@ rMean = pow( ((1-porosity) * length * height * width) / (nSpheres * 4.0/3.0 * pi
 #Definition of bodies constituing the numerical model : six boxes corresponding to sids of the simple shear box, containing a particle samples
 pred=inAlignedBox((0,0,-0.02),(0.1,0.02,0.02))
 
-leftBox = utils.box( center=(-thickness/2.0,(height)/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,dynamic=False,wire=True)
+leftBox = utils.box( center=(-thickness/2.0,(height)/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,fixed=True,wire=True)
 
-lowBox = utils.box( center=(length/2.0,-thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,dynamic=False,wire=True)
+lowBox = utils.box( center=(length/2.0,-thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,fixed=True,wire=True)
 
-rightBox = utils.box( center=(length+thickness/2.0,height/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,dynamic=False,wire=True)
+rightBox = utils.box( center=(length+thickness/2.0,height/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,fixed=True,wire=True)
 
-upBox = utils.box( center=(length/2.0,height+thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,dynamic=False,wire=True)
+upBox = utils.box( center=(length/2.0,height+thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,fixed=True,wire=True)
 
-behindBox = utils.box( center=(length/2.0,height/2.0,-width/2.0-thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), dynamic=False,wire=True)
+behindBox = utils.box( center=(length/2.0,height/2.0,-width/2.0-thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), fixed=True,wire=True)
 
-inFrontBox = utils.box( center=(length/2.0,height/2.0,width/2.0+thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), dynamic=False,wire=True)
+inFrontBox = utils.box( center=(length/2.0,height/2.0,width/2.0+thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), fixed=True,wire=True)
 
 O.bodies.append([leftBox,lowBox,rightBox,upBox,behindBox,inFrontBox])
 
@@ -63,7 +63,7 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
+		[Ig2_Sphere_Sphere_ScGeom6D(),Ig2_Box_Sphere_ScGeom6D()],
 		[Ip2_2xNormalInelasticMat_NormalInelasticityPhys()],
 		[Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity()]
 	),
@@ -89,40 +89,56 @@ qt.View()
 
 
 #---- Compression ----
-O.engines = O.engines+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=(),targetSigma=4000.0,LOG=False)]
+O.engines = O.engines+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=(),targetSigma=40000.0,LOG=False)]
 #from yade import log
 #log.setLevel("KinemCTDEngine",log.TRACE)
 #log.setLevel('',log.TRACE)
 O.dt=.4*utils.PWaveTimeStep()
-O.run(34000,True)
+print ''
+print 'Be patient, running in progress'
+O.run(14000,True)
 plot.plots={'step':('fy',)}
 plot.plot()
+print 'Plotting curve. Type Return to go ahead'
+print ''
 raw_input()
 plot.plots={'u':('fy',)}
 plot.plot()
+print 'Plotting curve. Type Return to go ahead'
+print ''
 raw_input()
-O.save('FinComp.xml')
+#O.save('FinComp.xml')
 
 
 #---- Shear at constant normal displacement ----
-nCycShear = 40000
-O.engines=O.engines[:6]+[KinemCNDEngine(shearSpeed=(length/7.0)/(nCycShear*O.dt),gamma_save=(),temoin_save=(),gammalim=length/7.0,LOG=False)]
+nCycShear = 20000
+
+O.engines=O.engines[:5]+[KinemCNDEngine(shearSpeed=(length/7.0)/(nCycShear*O.dt),gamma_save=(),temoin_save=(),gammalim=length/7.0,LOG=False)]
+
+print 'Be patient, running in progress'
 O.run(int(1.15*nCycShear),True)
 plot.plots={'step':('gamma',)}
 plot.plot()
+print 'Plotting curve. Type Return to go ahead'
+print ''
 raw_input()
 plot.plots={'gamma':('fx','fy',)}
 plot.plot()
+print 'Plotting curve. Type Return to go ahead'
+print ''
 raw_input()
 
 
 #---- A re-compression, from this initial sheared state ----
-O.engines=O.engines[:6]+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=(),targetSigma=10000.0,LOG=False)]
+O.engines=O.engines[:5]+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=(),targetSigma=80000.0,LOG=False)]
 O.run(10000,True)
+print 'Be patient, running in progress'
 plot.plots={'u':('fx','fy',)}
 plot.plot()
+print 'Plotting curve. Type Return to go ahead'
+print ''
 raw_input()
-
+print 'End of script'
 
 ##---- Shear at constant normal load/stress ----
 #nCycShear = 20000
