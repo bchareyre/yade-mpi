@@ -85,5 +85,5 @@ def warningMessageVel(inVel, y_vel, y_pos_vel):
 
 O.dt=0.02*tc
 O.saveTmp('init');
-O.run(3000000)
+O.run(500000)
 
