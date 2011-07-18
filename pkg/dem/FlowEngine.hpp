@@ -32,10 +32,8 @@ class FlowEngine : public PartialEngine
 		Vector3r gravity;
 		int current_state;
 		Real wall_thickness;
-// 		bool Update_Triangulation;
 		bool currentTes;
 		int id_offset;
-	//	double IS;
 		double wall_up_y, wall_down_y;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
@@ -89,7 +87,6 @@ class FlowEngine : public PartialEngine
 					((double, Sinus_Average, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
 					((bool, CachedForces, true,,"Des/Activate the cached forces calculation"))
 					((bool, Debug, false,,"Activate debug messages"))
-// 					((bool,currentTes,false,,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,,"Initial internal pressure for oedometer test"))
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
 					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
@@ -110,9 +107,7 @@ class FlowEngine : public PartialEngine
 					((double, currentStrain, 0,, "Current value of axial strain"))
 					((int, intervals, 30,, "Number of layers for computation average fluid pressure profiles to build consolidation curves"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso"))
-// 					((bool, liquefaction, false,,"Measure fluid pressure along the heigth of the sample"))
 					((double, V_d, 0,,"darcy velocity of fluid in sample"))
-// 					((double, bottom_seabed_pressure,0,,"Fluid pressure measured at the bottom of the seabed on the symmetry axe"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))
@@ -146,7 +141,7 @@ class FlowEngine : public PartialEngine
 					,
 					.def("imposeFlux",&FlowEngine::imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
-					.def("setImposedPressure",&FlowEngine::setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point of index cond.")
+					.def("setImposedPressure",&FlowEngine::setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 					.def("clearImposedPressure",&FlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("getFlux",&FlowEngine::getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
 					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")

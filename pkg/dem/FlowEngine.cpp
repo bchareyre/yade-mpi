@@ -100,23 +100,19 @@ void FlowEngine::action()
 		Real time = scene->time;
 		int j = scene->iter;
 
+		//FIXME: please Ema, put this in a separate function with python wrapper, so we keep action() code simple and usage easier
 		if (consolidation) {
-			char file [50];
 			mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-			string consol = "./Consol/"+flow->key+"%d_Consol";
-// 			const char* file = ;
-			const char* keyconsol = consol.c_str();
-			
-			sprintf(file, keyconsol, j);
-			char *g = file;
+			stringstream sstr; sstr<<"./Consol/"<<flow->key<<j<<"_Consol";
+			string consol = sstr.str();
 			timingDeltas->checkpoint("Writing cons_files");
-// 			MaxPressure = flow->PressureProfile(consol.c_str(), time, intervals);
-			MaxPressure = flow->PressureProfile( g, time, intervals);
-
-			std::ofstream max_p("pressures.txt", std::ios::app);
+			MaxPressure = flow->PressureProfile(consol.c_str(), time, intervals);
+			static bool consolidationFilesOpened=false;
+			if(!consolidationFilesOpened){
+				std::ofstream max_p("pressures.txt", std::ios::app);
+				std::ofstream settle("settle.txt", std::ios::app);
+				consolidationFilesOpened=True;}
 			max_p << j << " " << time << " " << MaxPressure << endl;
-
-			std::ofstream settle("settle.txt", std::ios::app);
 			settle << j << " " << time << " " << currentStrain << endl;
 		}
 
@@ -213,8 +209,8 @@ Real FlowEngine::getFlux(unsigned int cond) {
 	double flux=0;
 	CGT::Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
 	for (int ngb=0;ngb<4;ngb++) {
-		/*if (!cell->neighbor(ngb)->info().Pcondition) */flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
-	return flux;
+		/*if (!cell->neighbor(ngb)->info().Pcondition)*/ flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
+	return flux+cell->info().dv();
 }
 
 
@@ -431,54 +427,25 @@ void FlowEngine::Average_real_cell_velocity()
     //AVERAGE CELL VELOCITY
     CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-      switch ( cell->info().fictious()) {
-	case ( 3 ):
-	  for ( int g=0;g<4;g++ )
-	  {
-		if ( !cell->vertex ( g )->info().isFictious ) {
-		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
-		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
-	  }
-	  break;
-	case ( 2 ):
-	  for ( int g=0;g<4;g++ )
-	  {
+	  for ( int g=0;g<4;g++ ) {
 	    if ( !cell->vertex ( g )->info().isFictious ) {
 		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
 		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
-	  }
-	  break;
-	case ( 1 ):
-	  for ( int g=0;g<4;g++ )
-	  {
-	    if ( !cell->vertex ( g )->info().isFictious ) {
-		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
-		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
-	  }
-	  break;
-	case ( 0 ) :
-	   for ( int g=0;g<4;g++ )
-	  {
-	       	  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
-		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
-	  }
-	  break;
-      
-    
-      CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
-      CGT::Point pos_av_facet;
-      double volume_facet_translation = 0;
-      CGT::Vecteur Vel_av (Vel[0], Vel[1], Vel[2]);
-      for ( int i=0; i<4; i++ ) {
-	      volume_facet_translation = 0;
-	      if (!Tri.is_infinite(cell->neighbor(i))){
-		    CGT::Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
-		    Real area = sqrt ( Surfk.squared_length() );
-		    Surfk = Surfk/area;
-		    CGT::Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
-		    pos_av_facet = (CGT::Point) cell->info() + ( branch*Surfk ) *Surfk;
-		    volume_facet_translation += Vel_av*cell->info().facetSurfaces[i];
-		    cell->info().av_vel() = cell->info().av_vel() - volume_facet_translation/cell->info().volume() * ( pos_av_facet-CGAL::ORIGIN );}}
+	}
+	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+	CGT::Point pos_av_facet;
+	double volume_facet_translation = 0;
+	CGT::Vecteur Vel_av (Vel[0], Vel[1], Vel[2]);
+	for ( int i=0; i<4; i++ ) {
+		volume_facet_translation = 0;
+		if (!Tri.is_infinite(cell->neighbor(i))){
+		CGT::Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+		Real area = sqrt ( Surfk.squared_length() );
+		Surfk = Surfk/area;
+		CGT::Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+		pos_av_facet = (CGT::Point) cell->info() + ( branch*Surfk ) *Surfk;
+		volume_facet_translation += Vel_av*cell->info().facetSurfaces[i];
+		cell->info().av_vel() = cell->info().av_vel() - volume_facet_translation/cell->info().volume() * ( pos_av_facet-CGAL::ORIGIN );}}
     }
 }
 
@@ -504,11 +471,8 @@ void FlowEngine::UpdateVolumes ()
 		dVol=cell->info().volumeSign*(newVol - cell->info().volume());
 		totDVol+=dVol;
 		eps_vol_max = max(eps_vol_max, abs(dVol/newVol));
-
-		cell->info().dv() = (!cell->info().Pcondition)?dVol*invDeltaT:0;
-// 		cell->info().dv() = dVol*invDeltaT;
+		cell->info().dv() = dVol*invDeltaT;
 		cell->info().volume() = newVol;
-// 		if (Debug) cerr<<"v/dv : "<<cell->info().volume()<<" "<<cell->info().dv()<<" ("<<cell->info().fictious()<<")"<<endl;
 	}
 	if (Debug) cout << "Updated volumes, total =" <<totVol<<", dVol="<<totDVol<<endl;
 }

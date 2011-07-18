@@ -488,13 +488,6 @@ void FlowBoundingSphere::ComputeFacetForces()
 					if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
 						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces +  facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y];
 					}
-					///TEST BEGING
-					//Conclusion, we can't easily get ordered vertices from mirror facet...
-// 				for (int y=0; y<3;y++) {
-// 					int id1 = cell->vertex(facetVertices[j][y])->info().id();
-// 					int id2 = neighbour_cell->vertex(facetVertices[Tri.mirror_index(cell,j)][y])->info().id();
-// 					cerr <<"id1/id2 : "<<id1<<" "<<id2<<endl;}
-					///TEST END
 				}
 			}
 		cell->info().isvisited=!ref;
@@ -1426,38 +1419,7 @@ void FlowBoundingSphere::GenerateVoxelFile( )
         }
 }
 
-// double FlowBoundingSphere::PressureProfile(const char *filename, Real& time, int& intervals)
-// {
-// 	RTriangulation& Tri = T[currentTes].Triangulation();
-// 	vector<double> Pressures;
-// 
-// 	/** CONSOLIDATION CURVES **/
-//         Cell_handle permeameter;
-//         int n=0, k=0;
-//         vector<double> P_ave;
-//         std::ofstream consFile(filename, std::ios::out);
-// 
-//         double Rx = (x_max-x_min) /intervals;
-//         double Ry = (y_max-y_min) /intervals;
-//         double Rz = (z_max-z_min) /intervals;
-// 
-// 	for (double Y=y_min; Y<=y_max+Ry/10; Y=Y+Ry) {
-//                 P_ave.push_back(0);
-// 		for (double X=x_min; X<=x_max+Ry/10; X=X+Rx) {
-// 			for (double Z=z_min; Z<=z_max+Ry/10; Z=Z+Rz) {
-//                                 P_ave[k]+=Tri.locate(Point(X, Y, Z))->info().p();
-// 				n++;
-//                         }
-//                 }
-//                 P_ave[k]/= (n);
-//                 consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
-//                 if (k==intervals/2) Pressures.push_back(P_ave[k]);
-//                 n=0; k++;
-// 	}
-// 	return P_ave[intervals/2];
-// }
-
-double FlowBoundingSphere::PressureProfile(char *filename, Real& time, int& intervals)
+double FlowBoundingSphere::PressureProfile(const char *filename, Real& time, int& intervals)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> Pressures;
