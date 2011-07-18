@@ -289,6 +289,18 @@ Real Shop::getSpheresVolume(const shared_ptr<Scene>& _scene){
 	return vol;
 }
 
+Real Shop::getSpheresMass(const shared_ptr<Scene>& _scene){
+	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
+	Real mass=0;
+	FOREACH(shared_ptr<Body> b, *scene->bodies){
+		if (!b || !b->isDynamic()) continue;
+		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
+		if(!s) continue;
+		mass += b->state->mass;
+	}
+	return mass;
+}
+
 Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume){
 	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
 	Real V;

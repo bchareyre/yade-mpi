@@ -53,6 +53,10 @@ class Shop{
 
 		//! Compute the total volume of spheres
 		static Real getSpheresVolume(const shared_ptr<Scene>& rb=shared_ptr<Scene>());
+		
+		//! Compute the total mass of spheres
+		static Real getSpheresMass(const shared_ptr<Scene>& rb=shared_ptr<Scene>());
+		
 		//! Compute porosity; volume must be given for aperiodic simulations
 		static Real getPorosity(const shared_ptr<Scene>& rb=shared_ptr<Scene>(),Real volume=-1);
 
