@@ -82,6 +82,7 @@ void SpheresFactory::action(){
 		if (mask>0) {b->groupMask=mask;}
 		// insert particle in the simulation
 		scene->bodies->insert(b);
+		ids.push_back(b->getId());
 		// increment total mass we've spit out
 		totalMass+=state->mass;
 		numParticles++;
