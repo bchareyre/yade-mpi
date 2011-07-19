@@ -79,6 +79,7 @@ void SpheresFactory::action(){
 		b->shape=sphere; 
 		b->state=state; 
 		b->material=material;
+		if (mask>0) {b->groupMask=mask;}
 		// insert particle in the simulation
 		scene->bodies->insert(b);
 		// increment total mass we've spit out

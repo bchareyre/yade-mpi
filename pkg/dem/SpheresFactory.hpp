@@ -21,6 +21,7 @@ class SpheresFactory: public GlobalEngine {
 		((Real,vAngle,NaN,,"Maximum angle by which the initial sphere velocity deviates from the normal."))
 		((Vector3r,normal,Vector3r(NaN,NaN,NaN),,"Spitting direction (and orientation of the region's geometry)."))
 		((int,materialId,-1,,"Shared material id to use for newly created spheres (can be negative to count from the end)"))
+		((int,mask,-1,,"groupMask to apply for newly created spheres "))
 		((Real,totalMass,0,,"Mass of spheres that was produced so far. |yupdate|"))
 		((Real,goalMass,0,,"Total mass that should be attained at the end of the current step. |yupdate|"))
 		((int,maxParticles,100,,"The number of particles at which to stop generating new ones (regardless of massFlowRate"))
