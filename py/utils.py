@@ -9,7 +9,7 @@
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
 
-import math,random,doctest,geom
+import math,random,doctest,geom,numpy
 from yade import *
 from yade.wrapper import *
 from miniEigen import *
@@ -527,18 +527,18 @@ def voxelPorosityTriaxial(triax,resolution=200,offset=0):
 		0.36798199999999998
 	"""
 	p_bottom	= O.bodies[triax.wall_bottom_id].state.se3[0]
-	p_top		= O.bodies[triax.wall_top_id   ].state.se3[0]
-	p_left		= O.bodies[triax.wall_left_id  ].state.se3[0]
+	p_top		= O.bodies[triax.wall_top_id	 ].state.se3[0]
+	p_left		= O.bodies[triax.wall_left_id	].state.se3[0]
 	p_right		= O.bodies[triax.wall_right_id ].state.se3[0]
 	p_front		= O.bodies[triax.wall_front_id ].state.se3[0]
-	p_back		= O.bodies[triax.wall_back_id  ].state.se3[0]
-	th              = (triax.thickness)*0.5+offset
-	x_0             = p_left  [0] + th
-	x_1             = p_right [0] - th
-	y_0             = p_bottom[1] + th
-	y_1             = p_top   [1] - th
-	z_0             = p_back  [2] + th
-	z_1             = p_front [2] - th
+	p_back		= O.bodies[triax.wall_back_id	].state.se3[0]
+	th							= (triax.thickness)*0.5+offset
+	x_0						 = p_left	[0] + th
+	x_1						 = p_right [0] - th
+	y_0						 = p_bottom[1] + th
+	y_1						 = p_top	 [1] - th
+	z_0						 = p_back	[2] + th
+	z_1						 = p_front [2] - th
 	a=Vector3(x_0,y_0,z_0)
 	b=Vector3(x_1,y_1,z_1)
 	return voxelPorosity(resolution,a,b)
@@ -607,10 +607,10 @@ def _deprecatedUtilsFunction(old,new):
 # example of _deprecatedUtilsFunction usage:
 #
 # def import_mesh_geometry(*args,**kw):
-#    "|ydeprecated|"
-#    _deprecatedUtilsFunction('import_mesh_geometry','yade.import.gmsh')
-#    import yade.ymport
-#    return yade.ymport.stl(*args,**kw)
+#		"|ydeprecated|"
+#		_deprecatedUtilsFunction('import_mesh_geometry','yade.import.gmsh')
+#		import yade.ymport
+#		return yade.ymport.stl(*args,**kw)
 
 
 class TableParamReader():
@@ -678,7 +678,7 @@ This class is used by :yref:`yade.utils.readParamsFromTable`.
 if __name__=="__main__":
 	tryTable="""head1 important2! !OMP_NUM_THREADS! abcd
 	1 1.1 1.2 1.3
-	'a' 'b' 'c' 'd'  ### comment
+	'a' 'b' 'c' 'd'	### comment
 
 	# empty line
 	1 = = g
@@ -708,15 +708,15 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 		# commented lines allowed anywhere
 		name1 name2 … # first non-blank line are column headings
 					# empty line is OK, with or without comment
-		val1  val2  … # 1st parameter set
-		val2  val2  … # 2nd
+		val1	val2	… # 1st parameter set
+		val2	val2	… # 2nd
 		…
 
 	Assigned tags (the ``description`` column is synthesized if absent,see :yref:`yade.utils.TableParamReader`); 
 
-		O.tags['description']=…                                      # assigns the description column; might be synthesized
-		O.tags['params']="name1=val1,name2=val2,…"                   # all explicitly assigned parameters
-		O.tags['defaultParams']="unassignedName1=defaultValue1,…"    # parameters that were left at their defaults
+		O.tags['description']=…																			# assigns the description column; might be synthesized
+		O.tags['params']="name1=val1,name2=val2,…"									 # all explicitly assigned parameters
+		O.tags['defaultParams']="unassignedName1=defaultValue1,…"		# parameters that were left at their defaults
 		O.tags['d.id']=O.tags['id']+'.'+O.tags['description']
 		O.tags['id.d']=O.tags['description']+'.'+O.tags['id']
 
@@ -765,4 +765,62 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 	dictParams.update(dictDefaults)
 	saveVars('table',loadNow=True,**dictParams)
 	return len(tagsParams)
+	
+def psd(bins=5, result="number", mask=-1):
+	"""Calculates particle size distribution.
+	
+	:param int bins: number of bins
+	:param string result: how will be PSD calculated ("number", "mass", "volume")
+	:param int mask: :yref:`Body.mask` for the body
+	:return:
+		* binsSizes: list of bin's sizes
+		* binsProc: how much material (in procents) are in the bin, cumulative
+		* binsSumCum: how much material (in units) are in the bin, cumulative
+		binsSizes, binsProc, binsSumCum
+	"""
+	maxD = 0.0
+	minD = 0.0
+	for b in O.bodies:
+		if (isinstance(b.shape,Sphere) and ((mask<0) or (b.mask==mask))):
+			if ((2*b.shape.radius)	> maxD) : maxD = 2*b.shape.radius
+			if (((2*b.shape.radius)	< minD) or (minD==0.0)): minD = 2*b.shape.radius
 
+	binsSizes = numpy.linspace(minD, maxD, bins+1)
+	
+	deltaBinD = (maxD-minD)/bins
+	binsMass = numpy.zeros(bins)
+	binsNumbers = numpy.zeros(bins)
+	binsVolumes = numpy.zeros(bins)
+	
+		
+	for b in O.bodies:
+		if (isinstance(b.shape,Sphere) and ((mask<0) or (b.mask==mask))):
+			d=2*b.shape.radius
+			
+			basketId = int(math.floor( (d-minD) / deltaBinD ) )
+			if (d == maxD): basketId = bins-1												 #If the diametr equals the maximal diameter, put the particle into the last bin
+			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses in the bin 
+			binsVolumes[basketId] = binsVolumes[basketId] + 4.0/3.0*math.pi*math.pow(b.shape.radius, 3)					 #Put volumes in the bin 
+			binsNumbers[basketId] = binsNumbers[basketId] + 1				 #Put numbers in the bin 
+			
+	binsProc = numpy.zeros(bins+1)
+	binsSumCum = numpy.zeros(bins+1)
+	
+	i=1
+	for size in binsSizes[:-1]:
+		if (result=="number"):
+			binsSumCum[i]+=binsSumCum[i-1]+binsNumbers[i-1]
+		elif (result=="mass"):
+			binsSumCum[i]+=binsSumCum[i-1]+binsMass[i-1]
+		elif (result=="volume"):
+			binsSumCum[i]+=binsSumCum[i-1]+binsVolumes[i-1]
+		i+=1
+	
+	
+	if (binsSumCum[len(binsSumCum)-1] > 0):
+		i=0
+		for l in binsSumCum:
+			binsProc[i] = binsSumCum[i]/binsSumCum[len(binsSumCum)-1]
+			i+=1
+ 
+	return binsSizes, binsProc, binsSumCum
