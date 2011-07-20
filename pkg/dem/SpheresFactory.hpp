@@ -9,6 +9,9 @@ class SpheresFactory: public GlobalEngine {
 	protected:
 		// Pick random position of a sphere. Should be override in derived engine.
 		virtual void pickRandomPosition(Vector3r&/*picked position*/, Real/*sphere's radius*/);
+		vector<Real> PSDCurMean;  //Current value of material in each bin
+		vector<Real> PSDCurProc;  //Current value of material in each bin, in procents
+		vector<Real> PSDNeedProc; //Need value of procent in each bin
 	public:
 		virtual void action();
 	DECLARE_LOGGER;
@@ -30,6 +33,9 @@ class SpheresFactory: public GlobalEngine {
 		((int,maxAttempt,5000 ,,"Maximum number of attempts to position a new sphere randomly."))
 		((bool,silent,false ,,"If true no complain about excessing maxAttempt but disable the factory (by set massFlowRate=0)."))
 		((std::string,blockedDOFs,"" ,,"Blocked degress of freedom"))
+		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells [m]"))
+		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
+		((std::string,PSDcalculate,"mass",,"How the PSD will be calculated: mass, number or volume of particles"))
 	);
 };
 REGISTER_SERIALIZABLE(SpheresFactory);

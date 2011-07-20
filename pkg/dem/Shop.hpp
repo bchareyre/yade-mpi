@@ -52,10 +52,10 @@ class Shop{
 		static void saveSpheresToFile(string fileName);
 
 		//! Compute the total volume of spheres
-		static Real getSpheresVolume(const shared_ptr<Scene>& rb=shared_ptr<Scene>());
+		static Real getSpheresVolume(const shared_ptr<Scene>& rb=shared_ptr<Scene>(), int mask=-1);
 		
 		//! Compute the total mass of spheres
-		static Real getSpheresMass(const shared_ptr<Scene>& rb=shared_ptr<Scene>());
+		static Real getSpheresMass(const shared_ptr<Scene>& rb=shared_ptr<Scene>(), int mask=-1);
 		
 		//! Compute porosity; volume must be given for aperiodic simulations
 		static Real getPorosity(const shared_ptr<Scene>& rb=shared_ptr<Scene>(),Real volume=-1);
