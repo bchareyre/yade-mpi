@@ -6,7 +6,7 @@
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
-
+CREATE_LOGGER(InteractionContainer);
 // begin internal functions
 
 bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
@@ -45,10 +45,14 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	if (id1>id2) swap(id1,id2);
 	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
 	const shared_ptr<Body>& b1((*bodies)[id1]);
-	if(unlikely(!b1)) return false;  // body vanished
+  const shared_ptr<Body>& b2((*bodies)[id2]);
+	if((!b1) or (!b2)) return false;  // bodies are vanished
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	// this used to return false
-	if(I==b1->intrs.end()) throw std::logic_error(("InteractionContainer::erase: attempt to delete non-existent interaction ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2)).c_str());
+	if(I==b1->intrs.end()) {
+		LOG_ERROR("InteractionContainer::erase: attempt to delete non-existent interaction ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2));
+		return false;
+	}
 	// erase from body and then from linIntrs as well
 	int linIx=I->second->linIx; 
 	b1->intrs.erase(I);

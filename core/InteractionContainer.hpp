@@ -163,5 +163,6 @@ class InteractionContainer: public Serializable{
 
 	REGISTER_ATTRIBUTES(Serializable,(interaction)(serializeSorted)(dirty));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InteractionContainer);
