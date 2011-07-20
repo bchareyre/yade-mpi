@@ -12,10 +12,11 @@ class SpheresFactory: public GlobalEngine {
 		vector<Real> PSDCurMean;  //Current value of material in each bin
 		vector<Real> PSDCurProc;  //Current value of material in each bin, in procents
 		vector<Real> PSDNeedProc; //Need value of procent in each bin
+		bool PSDuse;        //PSD or not
 	public:
 		virtual void action();
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(SpheresFactory,GlobalEngine,"Engine for spitting spheres based on mass flow rate, particle size distribution etc. Initial velocity of particles is given by *vMin*, *vMax*, the *massFlowRate* determines how many particles to generate at each step. When *goalMass* is attained or positive *maxParticles* is reached, the engine does not produce particles anymore. Geometry of the region should be defined in a derived engine by overridden SpheresFactory::pickRandomPosition(). \n\nA sample script for this engine is in :ysrc:`scripts/spheresFactory.py`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SpheresFactory,GlobalEngine,"Engine for spitting spheres based on mass flow rate, particle size distribution etc. Initial velocity of particles is given by *vMin*, *vMax*, the *massFlowRate* determines how many particles to generate at each step. When *goalMass* is attained or positive *maxParticles* is reached, the engine does not produce particles anymore. Geometry of the region should be defined in a derived engine by overridden SpheresFactory::pickRandomPosition(). \n\nA sample script for this engine is in :ysrc:`scripts/spheresFactory.py`.",
 		((Real,massFlowRate,NaN,,"Mass flow rate [kg/s]"))
 		((Real,rMin,NaN,,"Minimum radius of generated spheres (uniform distribution)"))
 		((Real,rMax,NaN,,"Maximum radius of generated spheres (uniform distribution)"))
@@ -27,15 +28,17 @@ class SpheresFactory: public GlobalEngine {
 		((int,mask,-1,,"groupMask to apply for newly created spheres "))
 		((vector<int>,ids,,,"ids of created bodies"))
 		((Real,totalMass,0,,"Mass of spheres that was produced so far. |yupdate|"))
+		((Real,totalVolume,0,,"Volume of spheres that was produced so far. |yupdate|"))
 		((Real,goalMass,0,,"Total mass that should be attained at the end of the current step. |yupdate|"))
 		((int,maxParticles,100,,"The number of particles at which to stop generating new ones (regardless of massFlowRate"))
 		((int,numParticles,0,,"Cummulative number of particles produces so far |yupdate|"))
 		((int,maxAttempt,5000 ,,"Maximum number of attempts to position a new sphere randomly."))
 		((bool,silent,false ,,"If true no complain about excessing maxAttempt but disable the factory (by set massFlowRate=0)."))
 		((std::string,blockedDOFs,"" ,,"Blocked degress of freedom"))
-		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells [m]"))
+		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells, Diameter [m]"))
 		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
-		((std::string,PSDcalculate,"mass",,"How the PSD will be calculated: mass, number or volume of particles"))
+		((std::string,PSDcalculate,"mass",,"How the PSD will be calculated: mass, number or volume of particles")),
+		;
 	);
 };
 REGISTER_SERIALIZABLE(SpheresFactory);

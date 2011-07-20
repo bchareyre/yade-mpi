@@ -785,6 +785,8 @@ def psd(bins=5, result="number", mask=-1):
 			if ((2*b.shape.radius)	> maxD) : maxD = 2*b.shape.radius
 			if (((2*b.shape.radius)	< minD) or (minD==0.0)): minD = 2*b.shape.radius
 
+	if (minD==maxD): return false       #All particles are having the same size
+  
 	binsSizes = numpy.linspace(minD, maxD, bins+1)
 	
 	deltaBinD = (maxD-minD)/bins

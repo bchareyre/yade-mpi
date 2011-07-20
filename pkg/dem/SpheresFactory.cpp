@@ -28,14 +28,49 @@ void SpheresFactory::action(){
 		if(!collider) throw runtime_error("SpheresFactory: No Collider instance found in engines (needed for collision detection).");
 	}
 	goalMass+=massFlowRate*scene->dt; // totalMass that we want to attain in the current step
-
+	if ((PSDcum.size()>0) and (!PSDuse)) {			//Defined, that we will use PSD
+		if (PSDcum.size() != PSDsizes.size()) {
+			LOG_ERROR("PSDcum and PSDsizes should have an equal number of elements.");
+			throw std::logic_error("PSDcum and PSDsizes should have an equal number of elements.");
+		}
+		PSDuse = true;
+		
+		//Prepare main vectors
+		for (unsigned int i=0; i<PSDcum.size(); i++) {
+			if (i==0) {
+				PSDNeedProc.push_back(PSDcum[i]);
+			} else {
+				PSDNeedProc.push_back(PSDcum[i]-PSDcum[i-1]);
+			}
+			PSDCurMean.push_back(0);
+			PSDCurProc.push_back(0);
+		}
+	}
+		
 	normal.normalize();
 
 	LOG_TRACE("totalMass="<<totalMass<<", goalMass="<<goalMass);
 
 	while(totalMass<goalMass && (maxParticles<0 || numParticles<maxParticles)){
-		// pick random radius (later: based on the particle size distribution)
-		Real r=rMin+randomUnit()*(rMax-rMin);
+		Real r=0.0;
+		
+		Real maxdiff=0.0;		//This and next variable are for PSD-distribution
+		int maxdiffID=0;
+		
+		if (PSDuse) {
+			//find in what "bin" we have maximal difference between required number of material and current:
+			for (unsigned int k=0; k<PSDcum.size(); k++) {
+				if ((maxdiff < (PSDNeedProc[k]-PSDCurProc[k]))) {
+					maxdiff = PSDNeedProc[k]-PSDCurProc[k];
+					maxdiffID = k;
+				}
+			}
+			r=PSDsizes[maxdiffID]/2.0;
+		} else {
+			// pick random radius
+			r=rMin+randomUnit()*(rMax-rMin);
+		}
+		
 		LOG_TRACE("Radius "<<r);
 		Vector3r c=Vector3r::Zero();
 		// until there is no overlap, pick a random position for the new particle
@@ -83,9 +118,21 @@ void SpheresFactory::action(){
 		// insert particle in the simulation
 		scene->bodies->insert(b);
 		ids.push_back(b->getId());
-		// increment total mass we've spit out
+		// increment total mass, volume and numparticles we've spit out
 		totalMass+=state->mass;
+		totalVolume+= vol;
 		numParticles++;
+		
+		if (PSDuse) {		//Add newly created "material" into the bin
+			Real summMaterial = 0.0;
+			if (PSDcalculate=="mass") { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+state->mass; summMaterial = totalMass;}
+			else if (PSDcalculate=="volume") { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+vol; summMaterial = totalVolume;}
+			else if (PSDcalculate=="number") { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+1; summMaterial = numParticles;}
+			
+			for (unsigned int k=0; k<PSDcum.size(); k++) {			//Update  relationships in bins
+				PSDCurProc[k] = PSDCurMean[k]/summMaterial;
+			}
+		}	
 		
 	} 
 	//std::cout<<"mass flow rate: "<<totalMass<<endl;totalMass =0.0;
