@@ -38,7 +38,7 @@ class SpheresFactory: public GlobalEngine {
 		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells, Diameter [m]"))
 		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
 		((std::string,PSDcalculate,"mass",,"How the PSD will be calculated: mass, number or volume of particles")),
-		;
+		PSDuse=false;
 	);
 };
 REGISTER_SERIALIZABLE(SpheresFactory);
