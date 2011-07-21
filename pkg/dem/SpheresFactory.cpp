@@ -125,9 +125,8 @@ void SpheresFactory::action(){
 		
 		if (PSDuse) {		//Add newly created "material" into the bin
 			Real summMaterial = 0.0;
-			if (PSDcalculate=="mass") { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+state->mass; summMaterial = totalMass;}
-			else if (PSDcalculate=="volume") { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+vol; summMaterial = totalVolume;}
-			else if (PSDcalculate=="number") { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+1; summMaterial = numParticles;}
+			if (PSDcalculateMass) { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+state->mass; summMaterial = totalMass;}
+			else { PSDCurMean[maxdiffID]=PSDCurMean[maxdiffID]+1; summMaterial = numParticles;}
 			
 			for (unsigned int k=0; k<PSDcum.size(); k++) {			//Update  relationships in bins
 				PSDCurProc[k] = PSDCurMean[k]/summMaterial;

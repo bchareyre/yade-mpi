@@ -37,7 +37,7 @@ class SpheresFactory: public GlobalEngine {
 		((std::string,blockedDOFs,"" ,,"Blocked degress of freedom"))
 		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells, Diameter [m]"))
 		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
-		((std::string,PSDcalculate,"mass",,"How the PSD will be calculated: mass, number or volume of particles")),
+		((bool,PSDcalculateMass,true,,"PSD-Input is in mass (true), otherwise the number of particles will be considered.")),
 		PSDuse=false;
 	);
 };
