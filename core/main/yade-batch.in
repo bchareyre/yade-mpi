@@ -419,6 +419,10 @@ for i,l in enumerate(useLines):
 	if not script:
 		raise ValueError('When only batch table is given without script to run, it must contain !SCRIPT column with simulation to be run.')
 	logFile=logFormat.replace('$',script).replace('%',str(l)).replace('@',params[l]['description'])
+	
+	if (len(logFile)>230):                              #For very long files, to prevent system errors. 
+		logFile = logFile[0:230]+'_'+str(l)+logFile[-4:]  #l is added to prevent name duplications.
+	
 	if nCores>maxJobs:
 		if opts.forceThreads:
 			logging.info('Forcing job #%d to use only %d cores (max available) instead of %d requested'%(i,maxJobs,nCores))
