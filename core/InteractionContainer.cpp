@@ -46,7 +46,9 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
 	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
 	const shared_ptr<Body>& b1((*bodies)[id1]);
   const shared_ptr<Body>& b2((*bodies)[id2]);
-	if((!b1) or (!b2)) return false;  // bodies are vanished
+	if((!b1) or (!b2)) return false;  // Bodies are vanished. Initially (before r2893) only b1 was checked on existence. 
+                                    // But, it seems, that b2 also needs to be checked. The logic of the algorithm
+                                    // should be investigated. Bug-link https://bugs.launchpad.net/yade/+bug/813925
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	// this used to return false
 	if(I==b1->intrs.end()) {
