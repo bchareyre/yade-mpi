@@ -766,11 +766,11 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 	saveVars('table',loadNow=True,**dictParams)
 	return len(tagsParams)
 	
-def psd(bins=5, result="number", mask=-1):
+def psd(bins=5, mass=True, mask=-1):
 	"""Calculates particle size distribution.
 	
 	:param int bins: number of bins
-	:param string result: how will be PSD calculated ("number", "mass", "volume")
+	:param bool mass: if true, the mass-PSD will be calculated
 	:param int mask: :yref:`Body.mask` for the body
 	:return:
 		* binsSizes: list of bin's sizes
@@ -792,7 +792,6 @@ def psd(bins=5, result="number", mask=-1):
 	deltaBinD = (maxD-minD)/bins
 	binsMass = numpy.zeros(bins)
 	binsNumbers = numpy.zeros(bins)
-	binsVolumes = numpy.zeros(bins)
 	
 		
 	for b in O.bodies:
@@ -801,28 +800,21 @@ def psd(bins=5, result="number", mask=-1):
 			
 			basketId = int(math.floor( (d-minD) / deltaBinD ) )
 			if (d == maxD): basketId = bins-1												 #If the diametr equals the maximal diameter, put the particle into the last bin
-			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses in the bin 
-			binsVolumes[basketId] = binsVolumes[basketId] + 4.0/3.0*math.pi*math.pow(b.shape.radius, 3)					 #Put volumes in the bin 
-			binsNumbers[basketId] = binsNumbers[basketId] + 1				 #Put numbers in the bin 
+			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses into the bin 
+			binsNumbers[basketId] = binsNumbers[basketId] + 1					#Put numbers into the bin 
 			
 	binsProc = numpy.zeros(bins+1)
 	binsSumCum = numpy.zeros(bins+1)
 	
 	i=1
 	for size in binsSizes[:-1]:
-		if (result=="number"):
-			binsSumCum[i]+=binsSumCum[i-1]+binsNumbers[i-1]
-		elif (result=="mass"):
-			binsSumCum[i]+=binsSumCum[i-1]+binsMass[i-1]
-		elif (result=="volume"):
-			binsSumCum[i]+=binsSumCum[i-1]+binsVolumes[i-1]
+		if (mass): binsSumCum[i]+=binsSumCum[i-1]+binsMass[i-1]		#Calculate mass
+		else: binsSumCum[i]+=binsSumCum[i-1]+binsNumbers[i-1]			#Calculate number of particles
 		i+=1
-	
 	
 	if (binsSumCum[len(binsSumCum)-1] > 0):
 		i=0
 		for l in binsSumCum:
 			binsProc[i] = binsSumCum[i]/binsSumCum[len(binsSumCum)-1]
 			i+=1
- 
 	return binsSizes, binsProc, binsSumCum
