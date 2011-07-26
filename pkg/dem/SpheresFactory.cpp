@@ -27,7 +27,9 @@ void SpheresFactory::action(){
 		FOREACH(const shared_ptr<Engine>& e, scene->engines){ collider=dynamic_pointer_cast<Collider>(e); if(collider) break; }
 		if(!collider) throw runtime_error("SpheresFactory: No Collider instance found in engines (needed for collision detection).");
 	}
+	
 	goalMass+=massFlowRate*scene->dt; // totalMass that we want to attain in the current step
+	
 	if ((PSDcum.size()>0) and (!PSDuse)) {			//Defined, that we will use PSD
 		
 		if ((PSDcum.size() != PSDsizes.size()) and (exactDiam)) {								//The number of elements in both arrays should be the same
@@ -37,6 +39,31 @@ void SpheresFactory::action(){
 			LOG_ERROR("PSDsizes should have a number of elements on 1 more, than PSDcum, if exactDiam=False");
 			throw std::logic_error("PSDsizes should have a number of elements on 1 more, than PSDcum, if exactDiam=False");
 		}
+		
+		//Check the correctness of inputted data PSDcum
+		for (unsigned int i=1; i<PSDcum.size(); i++) {
+			if (PSDcum[i]<PSDcum[i-1] or PSDcum[i-1]<=0) {
+				LOG_ERROR("PSDcum should have an ascending positive series of numbers (for example: 0.1, 0.3, 0.5, 1.0)");
+				throw std::logic_error("PSDcum should have an ascending positive series of numbers (for example: 0.1, 0.3, 0.5, 1.0)");
+			}
+		}
+		//Check the correctness of inputted data PSDsizes
+		for (unsigned int i=1; i<PSDsizes.size(); i++) {
+			if (PSDsizes[i]<PSDsizes[i-1] or PSDsizes[i-1]<=0) {
+				LOG_ERROR("PSDsizes should have an ascending positive series of numbers (for example: 15, 20, 50, 80)");
+				throw std::logic_error("PSDsizes should have an ascending positive series of numbers (for example: 15, 20, 50, 80)");
+			}
+		}
+		
+		//Make normalization of PSDcum
+		if (PSDcum[PSDcum.size()]!=1.0) {
+			Real k;
+			k = 1.0/PSDcum[PSDcum.size()-1];
+			for (unsigned int i=1; i<PSDcum.size(); i++) {
+				PSDcum[i] = PSDcum[i]*k;
+			}
+		}
+		
 		PSDuse = true;
 		
 		//Prepare main vectors
@@ -97,8 +124,11 @@ void SpheresFactory::action(){
 			#endif
 		}
 		if(attempt==maxAttempt) {
-			if (silent) {massFlowRate=0; goalMass=totalMass; LOG_INFO("Unable to place new sphere after "<<maxAttempt<<" attempts, SpheresFactory disabled.");} 
-			else {LOG_WARN("Unable to place new sphere after "<<maxAttempt<<" attempts, giving up.");}
+			if (silent) {LOG_INFO("Unable to place new sphere after "<<maxAttempt<<" attempts!");} 
+			else {LOG_WARN("Unable to place new sphere after "<<maxAttempt<<" attempts!");}
+			if (stopIfFailed) {
+				massFlowRate=0; goalMass=totalMass;
+			}
 			return;
 		}
 		// pick random initial velocity (normal with some variation)

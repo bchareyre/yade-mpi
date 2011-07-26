@@ -129,8 +129,22 @@ O.engines=[
 		rotateAroundZero=1,
 		zeroPoint=[-7.0,-6.0,-5.0]),
 	HarmonicMotionEngine(A=[0,0,0.5], f=[0,0,20.0], fi = [0.0,0.0,pi], ids = vibrationPlate),
-	HarmonicRotationEngine(A=0.2, f=20.0, fi = pi, rotationAxis=[1.0,0.0,0.0], rotateAroundZero = True, zeroPoint = [-15.0,3.0,-7.0], ids = vibrationRotationPlate) 
+	HarmonicRotationEngine(A=0.2, f=20.0, fi = pi, rotationAxis=[1.0,0.0,0.0], rotateAroundZero = True, zeroPoint = [-15.0,3.0,-7.0], ids = vibrationRotationPlate),
+	BoxFactory(maxParticles=300, extents=(1.0,1.0,1.0),center=(0.0,12.0,0.0),vMin=200.0,vMax=250.0,
+		PSDsizes=(0.1, 0.2, 0.3, 0.5, 0.7), PSDcum=(0.1, 0.5, 0.8, 1.0), PSDcalculateMass=True, exactDiam=False,
+		vAngle=math.pi/3.0,massFlowRate=50000.0,normal=(0.0,0.0,1.0),label='factory',mask=7,silent=True,stopIfFailed=False)
 ]
+'''
+Boxfactory is an example of usage SpheresFactory. Produces PSD-dispersion:
+
+Size:       Mass, %      Cumulative   Cum. mass
+                         mass,% 
+0.5-0.7     20%          100%         1.0
+0.3-0.5     30%          80%          0.8
+0.2-0.3     40%          50%          0.5
+0.1-0.2     10%          10%          0.1
+'''
+
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
 O.dt=utils.PWaveTimeStep()
 O.saveTmp()

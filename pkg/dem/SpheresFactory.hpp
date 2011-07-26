@@ -38,6 +38,7 @@ class SpheresFactory: public GlobalEngine {
 		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells, Diameter [m]"))
 		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
 		((bool,PSDcalculateMass,true,,"PSD-Input is in mass (true), otherwise the number of particles will be considered."))
+    ((bool,stopIfFailed,true,,"If true, the SpheresFactory stops (sets massFlowRate=0), when maximal number of attempts to insert particle exceed."))
     ((bool,exactDiam,true,,"If true, the particles only with the defined in PSDsizes diameters will be created. Otherwise the diameter will be randomly chosen in the range [PSDsizes[i-1]:PSDsizes[i]], in this case the length of PSDsizes should be  more on 1, than the length of PSDcum.")),
 		PSDuse=false;
 	);
