@@ -37,7 +37,8 @@ class SpheresFactory: public GlobalEngine {
 		((std::string,blockedDOFs,"" ,,"Blocked degress of freedom"))
 		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells, Diameter [m]"))
 		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
-		((bool,PSDcalculateMass,true,,"PSD-Input is in mass (true), otherwise the number of particles will be considered.")),
+		((bool,PSDcalculateMass,true,,"PSD-Input is in mass (true), otherwise the number of particles will be considered."))
+    ((bool,exactDiam,true,,"If true, the particles only with the defined in PSDsizes diameters will be created. Otherwise the diameter will be randomly chosen in the range [PSDsizes[i-1]:PSDsizes[i]], in this case the length of PSDsizes should be  more on 1, than the length of PSDcum.")),
 		PSDuse=false;
 	);
 };

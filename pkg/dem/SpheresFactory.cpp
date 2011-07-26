@@ -29,9 +29,13 @@ void SpheresFactory::action(){
 	}
 	goalMass+=massFlowRate*scene->dt; // totalMass that we want to attain in the current step
 	if ((PSDcum.size()>0) and (!PSDuse)) {			//Defined, that we will use PSD
-		if (PSDcum.size() != PSDsizes.size()) {
-			LOG_ERROR("PSDcum and PSDsizes should have an equal number of elements.");
-			throw std::logic_error("PSDcum and PSDsizes should have an equal number of elements.");
+		
+		if ((PSDcum.size() != PSDsizes.size()) and (exactDiam)) {								//The number of elements in both arrays should be the same
+			LOG_ERROR("PSDcum and PSDsizes should have an equal number of elements, if exactDiam=True.");
+			throw std::logic_error("PSDcum and PSDsizes should have an equal number of elements, if exactDiam=True.");
+		} else if ((PSDcum.size() != (PSDsizes.size()-1)) and (not(exactDiam))) {//The number of elements in PSDsizes should be on 1 more, than in PSDcum
+			LOG_ERROR("PSDsizes should have a number of elements on 1 more, than PSDcum, if exactDiam=False");
+			throw std::logic_error("PSDsizes should have a number of elements on 1 more, than PSDcum, if exactDiam=False");
 		}
 		PSDuse = true;
 		
@@ -65,7 +69,14 @@ void SpheresFactory::action(){
 					maxdiffID = k;
 				}
 			}
-			r=PSDsizes[maxdiffID]/2.0;
+			
+			if (exactDiam) {							//Choose the exact diameter
+				r=PSDsizes[maxdiffID]/2.0;
+			} else {											//Choose the diameter from the range
+				Real rMinE = PSDsizes[maxdiffID]/2.0;
+				Real rMaxE = PSDsizes[maxdiffID+1]/2.0;
+				r=rMinE+randomUnit()*(rMaxE-rMinE);
+			}
 		} else {
 			// pick random radius
 			r=rMin+randomUnit()*(rMax-rMin);
