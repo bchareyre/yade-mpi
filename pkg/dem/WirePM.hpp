@@ -43,7 +43,7 @@ class WireMat: public FrictMat {
 		void postLoad(WireMat&);
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,FrictMat,"Material for use with the Wire classes",
-		((Real,diameter,0.0027,," (Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
+		((Real,diameter,0.0027,,"Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
 		((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
 		((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
 		((Real,lambdaEps,0.4,,"Parameter between 0 and 1 to reduce the failure strain of the double-twisted wire (as used by [Bertrand2008]_). [-]"))
@@ -65,8 +65,8 @@ class WirePhys: public NormPhys {
 			((Real,initD,0,,"Equilibrium distance for particles. Computed as the initial inter-particular distance when particle are linked."))
 			((bool,isLinked,false,,"If true particles are linked and will interact. Interactions are linked automatically by the definition of the corresponding interaction radius. The value is false if the wire breaks (no more interaction)."))
 			((bool,isDoubleTwist,false,,"If true the properties of the interaction will be defined as a double-twisted wire."))
-			((vector<Vector2r>,displForceValues,,(Attr::readonly|Attr::noSave),"Defines the values for force-displacement curve."))
-			((vector<Real>,stiffnessValues,,(Attr::readonly|Attr::noSave),"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
+			((vector<Vector2r>,displForceValues,,Attr::readonly,"Defines the values for force-displacement curve."))
+			((vector<Real>,stiffnessValues,,Attr::readonly,"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
 			((Real,plastD,0,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero (see [Bertrand2005]_).\n\n.."))
 			((Real,limitNormalFactor,0.,,"This value indicates on how far from failing the wire is, e.g. actual normal displacement divided by admissible normal displacement multiplied by actual normal force divided by admissible normal force."))
 			,

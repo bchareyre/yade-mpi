@@ -519,8 +519,8 @@ def hexaNet( radius, cornerCoord=[0,0,0], xLength=1., yLength=0.5, mos=0.08, a=0
 
 	"""
 	# check input dimension
-	if(xLength<mos): raise ValueError("xLength must be greather than mos!");
-	if(yLength<2*a+b): raise ValueError("yLength must be greather than 2*a+b!");
+	if(xLength<mos): raise ValueError("xLength must be greater than mos!");
+	if(yLength<2*a+b): raise ValueError("yLength must be greater than 2*a+b!");
 	xstart = cornerCoord[0]
 	ystart = cornerCoord[1]
 	z = cornerCoord[2]
