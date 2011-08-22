@@ -25,16 +25,13 @@ class TesselationWrapper;
 class FlowEngine : public PartialEngine
 {
 	private:
-		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<FlowSolver> flow;
 		int retriangulationLastIter;
 	public :
-		Vector3r gravity;
-		int current_state;
-		Real wall_thickness;
+		enum {wall_left=0, wall_right, wall_bottom, wall_top, wall_back, wall_front};
+		Vector3r normal [6];
 		bool currentTes;
 		int id_offset;
-		double wall_up_y, wall_down_y;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
 		void Triangulate ();
@@ -87,6 +84,7 @@ class FlowEngine : public PartialEngine
 					((double, Sinus_Average, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
 					((bool, CachedForces, true,,"Des/Activate the cached forces calculation"))
 					((bool, Debug, false,,"Activate debug messages"))
+					((double, wall_thickness,0.001,,"Walls thickness"))
 					((double,P_zero,0,,"Initial internal pressure for oedometer test"))
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
 					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
@@ -138,6 +136,12 @@ class FlowEngine : public PartialEngine
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+					normal[wall_bottom].y()=1;
+					normal[wall_top].y()=-1;
+					normal[wall_left].x()=1;
+					normal[wall_right].x()=-1;
+					normal[wall_front].z()=-1;
+					normal[wall_back].z()=1;
 					,
 					.def("imposeFlux",&FlowEngine::imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 					.def("imposePressure",&FlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")

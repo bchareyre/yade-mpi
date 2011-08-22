@@ -43,18 +43,6 @@ void FlowEngine::action()
 		ReTrg=1;
 		retriangulationLastIter=0;
 	}
-	if (!triaxialCompressionEngine)
-	{
-		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
-		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
-		for (;itFirst!=itLast; ++itFirst) {
-			if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {
-// 				cout << "stress controller engine found - FlowEngine" << endl;
-				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}}
-		if (!triaxialCompressionEngine) cout << "stress controller engine NOT found" << endl;
-	}
-	currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
-	currentStrain = triaxialCompressionEngine->strain[1];
 
 	timingDeltas->start();
 
@@ -71,8 +59,6 @@ void FlowEngine::action()
 			ReTrg++;
 		} else  retriangulationLastIter++;
 		timingDeltas->checkpoint("Update_Volumes");
-		///Update boundary conditions
-		BoundaryConditions();
 
 		///Compute flow and and forces here
 		flow->GaussSeidel();
@@ -229,7 +215,6 @@ void FlowEngine::Build_Triangulation (double P_zero)
 
 	flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
 	flow->SLIP_ON_LATERALS=slip_boundary;
-	flow->key = triaxialCompressionEngine->Key;
 	flow->k_factor = permeability_factor;
 	flow->DEBUG_OUT = Debug;
 	flow->useSolver = useSolver;
@@ -304,22 +289,13 @@ void FlowEngine::AddBoundary ()
 	flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
 	flow->Vtotale = (flow->x_max-flow->x_min) * (flow->y_max-flow->y_min) * (flow->z_max-flow->z_min);
 
-	if (triaxialCompressionEngine) {
-		flow->y_min_id=triaxialCompressionEngine->wall_bottom_id;
-		flow->y_max_id=triaxialCompressionEngine->wall_top_id;
-		flow->x_max_id=triaxialCompressionEngine->wall_right_id;
-		flow->x_min_id=triaxialCompressionEngine->wall_left_id;
-		flow->z_min_id=triaxialCompressionEngine->wall_back_id;
-		flow->z_max_id=triaxialCompressionEngine->wall_front_id;
-	} else {
-		flow->y_min_id=wallBottomId;
-		flow->y_max_id=wallTopId;
-		flow->x_max_id=wallRightId;
-		flow->x_min_id=wallLeftId;
-		flow->z_min_id=wallBackId;
-		flow->z_max_id=wallFrontId;
-	}
-	
+	flow->y_min_id=wallBottomId;
+	flow->y_max_id=wallTopId;
+	flow->x_max_id=wallRightId;
+	flow->x_min_id=wallLeftId;
+	flow->z_min_id=wallBackId;
+	flow->z_max_id=wallFrontId;
+
 	flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
 	flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
 	flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
@@ -335,8 +311,6 @@ void FlowEngine::AddBoundary ()
         flow->boundsIds[3]= &flow->y_max_id;
         flow->boundsIds[4]= &flow->z_min_id;
         flow->boundsIds[5]= &flow->z_max_id;
-
-	wall_thickness = triaxialCompressionEngine->thickness;
 
 	flow->Corner_min = CGT::Point(flow->x_min, flow->y_min, flow->z_min);
 	flow->Corner_max = CGT::Point(flow->x_max, flow->y_max, flow->z_max);
@@ -360,7 +334,7 @@ void FlowEngine::AddBoundary ()
 
 	for (int i=0; i<6; i++)
 	{
-	  CGT::Vecteur Normal (triaxialCompressionEngine->normal[i].x(), triaxialCompressionEngine->normal[i].y(), triaxialCompressionEngine->normal[i].z());
+	  CGT::Vecteur Normal (normal[i].x(), normal[i].y(), normal[i].z());
 	  if (flow->boundary(*flow->boundsIds[i]).useMaxMin) flow->AddBoundingPlane (true, Normal, *flow->boundsIds[i]);
 	  else {
             const shared_ptr<Body>& wll = Body::byId ( *flow->boundsIds[i] , scene );

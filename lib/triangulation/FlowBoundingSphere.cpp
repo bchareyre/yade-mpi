@@ -308,7 +308,6 @@ void FlowBoundingSphere::Average_Relative_Cell_Velocity()
         int num_cells = 0;
         double facet_flow_rate = 0;
 	double volume_facet_translation = 0;
-        std::ofstream oFile ( "Average_Cells_Velocity",std::ios::app );
 	Real tVel=0; Real tVol=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
@@ -493,19 +492,18 @@ void FlowBoundingSphere::ComputeFacetForces()
 		cell->info().isvisited=!ref;
 	}
 	if (DEBUG_OUT) {
-		cout << "Facet scheme" <<endl;
+//		cout << "Facet scheme" <<endl;
 		Vecteur TotalForce = nullVect;
 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
 			if (!v->info().isFictious) {
 				TotalForce = TotalForce + v->info().forces;
-				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+//				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
 			} else {
 				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+//				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
 			}
 		}
-		cout << "TotalForce = "<< TotalForce << endl;
-	}
+		cout << "TotalForce = "<< TotalForce << endl;}
 }
 
 void FlowBoundingSphere::ComputeFacetForcesWithCache()
@@ -569,20 +567,19 @@ void FlowBoundingSphere::ComputeFacetForcesWithCache()
 	noCache=false;//cache should always be defined after execution of this function
 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces = 0*oldForces[v->info().id()]+1*v->info().forces;
 	if (DEBUG_OUT) {
-		cout << "Facet cached scheme" <<endl;
+// 		cout << "Facet cached scheme" <<endl;
 		Vecteur TotalForce = nullVect;
 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
 		{
 			if (!v->info().isFictious) {
 				TotalForce = TotalForce + v->info().forces;
-				if (DEBUG_OUT) cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
 			} else {
 				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-				if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
 			}
 		}
-		cout << "TotalForce = "<< TotalForce << endl;
-	}
+		cout << "TotalForce = "<< TotalForce << endl;}
 }
 
 void FlowBoundingSphere::ComputeTetrahedralForces()
@@ -622,17 +619,17 @@ void FlowBoundingSphere::ComputeTetrahedralForces()
                         }
                 cell->info().isvisited=!ref;
         }
-	if (DEBUG_OUT) cout << "tetrahedral scheme" <<endl;
-	Vecteur TotalForce = nullVect;
-	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-		if (!v->info().isFictious) {
-			TotalForce = TotalForce + v->info().forces;
-		} else {
-			if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-		}
-	}
-	cout << "TotalForce = "<< TotalForce << endl;
+//	if (DEBUG_OUT) cout << "tetrahedral scheme" <<endl;
+//	Vecteur TotalForce = nullVect;
+//	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+//		if (!v->info().isFictious) {
+//			TotalForce = TotalForce + v->info().forces;
+//		} else {
+//			if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+//			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+//		}
+//	}
+// 	if (DEBUG_OUT) cout << "TotalForce = "<< TotalForce << endl;
 }
 
 void FlowBoundingSphere::ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals)
@@ -1198,7 +1195,7 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         cout << "celle comunicanti in alto = " << cellQ1 << endl;}
 
         double density = 1;
-        double viscosity = 1.0;
+        double viscosity = VISCOSITY;
         double gravity = 1;
         double Vdarcy = Q1/Section;
 	double DeltaP = abs(P_Inf-P_Sup);
@@ -1227,8 +1224,8 @@ double FlowBoundingSphere::Permeameter(double P_Inf, double P_Sup, double Sectio
         kFile << "The permeability of the sample is = " << k << " m^2" <<endl;
         kFile << "The Darcy permeability of the sample is = " << k/9.869233e-13 << " darcys" << endl;
 
-	cout << endl << "The hydraulic conductivity of the sample is = " << Ks << " m/s" << endl << endl;
-	return Ks;
+	cout << endl << "The hydraulic conductivity of the sample is = " << k << " m^2" << endl << endl;
+	return k;
 }
 
 void FlowBoundingSphere::DisplayStatistics()
