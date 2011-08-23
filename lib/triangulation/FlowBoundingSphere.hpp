@@ -63,6 +63,7 @@ class FlowBoundingSphere : public Network
 		virtual void GaussSeidel ( );
 		virtual void ResetNetwork();
 
+		double MeasurePorePressure (double X, double Y, double Z);
 		void Fictious_cells ( );
 
 		double k_factor; //permeability moltiplicator
@@ -93,7 +94,7 @@ class FlowBoundingSphere : public Network
 		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, const char *file );
 		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key);
 		double Compute_HydraulicRadius (Cell_handle cell, int j );
-		double PressureProfile (const char *filename, Real& time, int& intervals );
+// 		double PressureProfile (const char *filename, Real& time, int& intervals );
 
 		double dotProduct ( Vecteur x, Vecteur y );
 		double Compute_EffectiveRadius(Cell_handle cell, int j);
@@ -120,7 +121,7 @@ class FlowBoundingSphere : public Network
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
-		void Measure_Pore_Pressure(double Wall_up_y, double Wall_down_y);
+		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
 		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)

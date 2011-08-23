@@ -416,7 +416,14 @@ vector<Real> FlowBoundingSphere::Average_Fluid_Velocity_On_Sphere(unsigned int I
 	return result;
 }
 
-void FlowBoundingSphere::Measure_Pore_Pressure(double Wall_up_y, double Wall_down_y)
+double FlowBoundingSphere::MeasurePorePressure (double X, double Y, double Z)
+{
+  RTriangulation& Tri = T[currentTes].Triangulation();
+  Cell_handle cell = Tri.locate(Point(X,Y,Z));
+  return cell->info().p();
+}
+
+void FlowBoundingSphere::MeasurePressureProfile(double Wall_up_y, double Wall_down_y)
 {  
 	RTriangulation& Tri = T[currentTes].Triangulation();
         Cell_handle permeameter;
@@ -1414,37 +1421,6 @@ void FlowBoundingSphere::GenerateVoxelFile( )
                         voxelfile << endl;
                 }
         }
-}
-
-double FlowBoundingSphere::PressureProfile(const char *filename, Real& time, int& intervals)
-{
-	RTriangulation& Tri = T[currentTes].Triangulation();
-	vector<double> Pressures;
-	
-	/** CONSOLIDATION CURVES **/
-        Cell_handle permeameter;
-        int n=0, k=0;
-        vector<double> P_ave;
-        std::ofstream consFile(filename, std::ios::out);
-
-        double Rx = (x_max-x_min) /intervals;
-        double Ry = (y_max-y_min) /intervals;
-        double Rz = (z_max-z_min) /intervals;
-
-	for (double Y=y_min; Y<=y_max+Ry/10; Y=Y+Ry) {
-                P_ave.push_back(0);
-		for (double X=x_min; X<=x_max+Ry/10; X=X+Rx) {
-			for (double Z=z_min; Z<=z_max+Ry/10; Z=Z+Rz) {
-                                P_ave[k]+=Tri.locate(Point(X, Y, Z))->info().p();
-				n++;
-                        }
-                }
-                P_ave[k]/= (n);
-                consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
-                if (k==intervals/2) Pressures.push_back(P_ave[k]);
-                n=0; k++;
-	}
-	return P_ave[intervals/2];
 }
 
 void FlowBoundingSphere::mplot (char *filename)

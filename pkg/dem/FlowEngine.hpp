@@ -61,7 +61,8 @@ class FlowEngine : public PartialEngine
 		Vector3r fluidForce(unsigned int id_sph) {const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		Vector3r fluidShearForce(unsigned int id_sph) {return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
-		void PressureProfile(double wallUpY, double wallDownY) {return flow->Measure_Pore_Pressure(wallUpY,wallDownY);}
+		void PressureProfile(double wallUpY, double wallDownY) {return flow->MeasurePressureProfile(wallUpY,wallDownY);}
+		double MeasurePressure(double posX, double posY, double posZ){return flow->MeasurePorePressure(posX, posY, posZ);}
 
 		virtual ~FlowEngine();
 
@@ -72,13 +73,11 @@ class FlowEngine : public PartialEngine
 					((bool,first,true,,"Controls the initialization/update phases"))
 // 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
 					((bool,permeability_map,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
-					((bool,save_mplot,false,,"Enable/disable mplot files creation"))
 					((bool, save_mgpost, false,,"Enable/disable mgpost file creation"))
 					((bool, slice_pressures, false, ,"Enable/Disable slice pressure measurement"))
 					((bool, velocity_profile, false, ,"Enable/Disable slice velocity measurement"))
 					((bool, consolidation,false,,"Enable/Disable storing consolidation files"))
 					((bool, slip_boundary, true,, "Controls friction condition on lateral walls"))
-					((bool, blocked_grains, false,, "Grains will/won't be moved by forces"))
 					((bool,WaveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
 					((double, Sinus_Amplitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied"))
 					((double, Sinus_Average, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
@@ -100,11 +99,8 @@ class FlowEngine : public PartialEngine
 					((double,viscosity,1.0,,"viscosity of fluid"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
-					((double, MaxPressure, 0,, "Maximal value of water pressure within the sample - Case of consolidation test"))
-					((double, currentStress, 0,, "Current value of axial stress"))
-					((double, currentStrain, 0,, "Current value of axial strain"))
-					((int, intervals, 30,, "Number of layers for computation average fluid pressure profiles to build consolidation curves"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso"))
+// 					((std::string,key,"",,"A string appended at the output files, use it to name simulations."))
 					((double, V_d, 0,,"darcy velocity of fluid in sample"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
@@ -154,7 +150,8 @@ class FlowEngine : public PartialEngine
 					.def("fluidForce",&FlowEngine::fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("fluidShearForce",&FlowEngine::fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
-					.def("PressureProfile",&FlowEngine::PressureProfile,"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+					.def("MeasurePressure",&FlowEngine::MeasurePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					)
 		DECLARE_LOGGER;
 };

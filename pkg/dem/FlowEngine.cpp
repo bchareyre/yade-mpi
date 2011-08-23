@@ -82,37 +82,6 @@ void FlowEngine::action()
 		}
 		///End Compute flow and forces
 		timingDeltas->checkpoint("Applying Forces");
-
-		Real time = scene->time;
-		int j = scene->iter;
-
-		//FIXME: please Ema, put this in a separate function with python wrapper, so we keep action() code simple and usage easier
-		if (consolidation) {
-			mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-			stringstream sstr; sstr<<"./Consol/"<<flow->key<<j<<"_Consol";
-			string consol = sstr.str();
-			timingDeltas->checkpoint("Writing cons_files");
-			MaxPressure = flow->PressureProfile(consol.c_str(), time, intervals);
-			static bool consolidationFilesOpened=false;
-			if(!consolidationFilesOpened){
-				std::ofstream max_p("pressures.txt", std::ios::app);
-				std::ofstream settle("settle.txt", std::ios::app);
-				consolidationFilesOpened=True;}
-			max_p << j << " " << time << " " << MaxPressure << endl;
-			settle << j << " " << time << " " << currentStrain << endl;
-		}
-
-		if (slice_pressures){
-			char slifile [30];
-			mkdir("./Slices", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-			string slice = "./Slices/Slice_"+flow->key+"_%d";
-			const char* keyslice = slice.c_str();
-			sprintf(slifile, keyslice, j);
-			const char *f = "slifile";
-			flow->SliceField(f);
-		}
-// 		if (save_vtk) {flow->save_vtk_file();}
-		timingDeltas->checkpoint("Writing files");
 	}
 // 	if ( scene->iter % PermuteInterval == 0 )
 // 	{ Update_Triangulation = true; }
@@ -220,6 +189,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->useSolver = useSolver;
 	flow->VISCOSITY = viscosity;
 	flow->areaR2Permeability=areaR2Permeability;
+// 	flow->key = key;
 
 	flow->T[flow->currentTes].Clear();
 	flow->T[flow->currentTes].max_id=-1;
