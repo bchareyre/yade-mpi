@@ -94,7 +94,6 @@ class FlowBoundingSphere : public Network
 		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, const char *file );
 		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key);
 		double Compute_HydraulicRadius (Cell_handle cell, int j );
-// 		double PressureProfile (const char *filename, Real& time, int& intervals );
 
 		double dotProduct ( Vecteur x, Vecteur y );
 		double Compute_EffectiveRadius(Cell_handle cell, int j);

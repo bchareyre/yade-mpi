@@ -132,6 +132,7 @@ class FlowEngine : public PartialEngine
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
 					normal[wall_bottom].y()=1;
 					normal[wall_top].y()=-1;
 					normal[wall_left].x()=1;
