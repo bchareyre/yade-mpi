@@ -90,7 +90,7 @@ opts.AddVariables(
 	('variant','Build variant, will be suffixed to all files, along with version.','' if profile=='default' else '-'+profile,None,lambda x:x),
 	BoolVariable('debug', 'Enable debugging information',0),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
-	('optimize','Turn on optimizations (-1, 0 or 1); negative value sets optimization based on debugging: not optimize with debugging and vice versa.',-1,None,int),
+	('optimize','Turn on optimizations (-1, 0 or 1); with negative value (-1) optimization is based on debugging: not optimize with debugging (debug=True <=> optimize=False) and vice versa. With positive values optimization is performed (case of 1) or not (0) independent of debugging',-1,None,int),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk,qt4',names=['opengl','log4cxx','cgal','openmp','gts','vtk','gl2ps','qt4','sphere-padder','never_use_this_one','subdomains']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),

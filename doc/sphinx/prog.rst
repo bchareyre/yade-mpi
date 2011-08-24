@@ -32,7 +32,7 @@ There is a number of configuration parameters; you can list all of them by ``sco
 	 where to create ``build-\$SUFFIX`` directory 
 ``debug`` [*False* (0)]
 	add debugging symbols to output, enable stack traces on crash
-``optimize`` [*True* (1)]
+``optimize`` [-1, which means that the opposite of ``debug`` value is used]
 	optimize binaries (``#define NDEBUG``; assertions eliminated; ``YADE_CAST`` and ``YADE_PTR_CAST`` are static casts rather than dynamic; LOG_TRACE and LOG_DEBUG are eliminated)
 ``CPPPATH`` [``/usr/include/vtk-5.2:/usr/include/vtk-5.4``]
 	additional colon-separated paths for preprocessor (for atypical header locations). Required by some libraries, such as VTK (reflected by the default)
