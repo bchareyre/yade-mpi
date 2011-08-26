@@ -36,12 +36,20 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 		currentContactPhysics->unMax=0.0;
 		}
 
+	un = geom->penetrationDepth; // >0 for real penetration
+
+// Check if there is a real overlap or not. The Ig2... seems to let exist interactions with negative un (= no overlap). Such interactions seem then to have to be deleted here.
+        if (   un < 0      )
+        {
+		 scene->interactions->requestErase(contact->getId1(),contact->getId2());// this, among other things, resets the interaction : geometry and physics variables (as forces, ...) are reset to defaut values
+		 return;
+        }
+
+
 
 //	********	Computation of normal Force : depends of the history			*******	 //
 
 // 	cout << " Dans Law2 valeur de kn : " << currentContactPhysics->kn << endl;
-	un = geom->penetrationDepth; // >0 for real penetration
-
 // 	cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << currentContactPhysics->previousun << " et previousFn =" << currentContactPhysics->previousFn << endl;
 
 	if(un >= currentContactPhysics->unMax)	// case of virgin load : on the "principal line" (limit state of the (un,Fn) space)
@@ -125,7 +133,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 
 			moment = currentContactPhysics->moment_twist + currentContactPhysics->moment_bending;
 
-// 	Limitation by plastic threshold
+// 	Limitation by plastic threshold of this part of the moment caused by relative twist and bending
 			if (!momentAlwaysElastic)
 			{
 				Real normeMomentMax = currentContactPhysics->forMaxMoment * std::fabs(Fn);

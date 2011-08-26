@@ -44,7 +44,7 @@ void Ip2_2xNormalInelasticMat_NormalInelasticityPhys::go(	  const shared_ptr<Mat
 
 			Real Kn = 2.0*Ea*Ra*Eb*Rb/(Ea*Ra+Eb*Rb);//harmonic average of two stiffnesses
 			
-			Real Ks = 2.0*Ea*Ra*Va*Eb*Rb*Vb/(Ea*Ra*Va+Eb*Rb*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
+			Real Ks = 2.0*Ea*Ra*Va*Eb*Rb*Vb/(Ea*Ra*Va+Eb*Rb*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 
 			// Jean-Patrick Plassiard, Noura Belheine, Frederic Victor Donze, "A Spherical Discrete Element Model: calibration procedure and incremental response", DOI: 10.1007/s10035-009-0130-x
 			
