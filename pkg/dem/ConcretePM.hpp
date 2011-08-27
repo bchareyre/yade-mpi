@@ -51,6 +51,7 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 
 namespace py=boost::python;
 
@@ -65,8 +66,9 @@ class CpmState: public State {
 		((Real,normDmg,0,,"Average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)"))
 		((Real,epsPlBroken,0,,"Plastic strain on contacts already deleted (bogus values)"))
 		((Real,normEpsPl,0,,"Sum of plastic strains normalized by number of contacts (bogus values)"))
-		((Vector3r,sigma,Vector3r::Zero(),,"Normal stresses on the particle"))
-		((Vector3r,tau,Vector3r::Zero(),,"Shear stresses on the particle.")),
+		//((Vector3r,sigma,Vector3r::Zero(),,"Normal stresses on the particle"))
+		//((Vector3r,tau,Vector3r::Zero(),,"Shear stresses on the particle."))
+		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor on the particle.")),
 		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(CpmState,State);
@@ -85,6 +87,8 @@ class CpmMat: public FrictMat {
 		((bool,neverDamage,false,,"If true, no damage will occur (for testing only)."))
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
 		((Real,relDuctility,NaN,,"Relative ductility, for damage evolution law peak right-tangent. [-]"))
+		((Real,crackOpening,NaN,,"Crack opening when the crack is fully broken in tension. [m]"))
+		((int,damLaw,1,,"Law for gamage evolution in uniaxial tension. 0 for linear stress-strain softening branch, 1 for exponential damage evolution law"))
 		((Real,dmgTau,((void)"deactivated if negative",-1),,"Characteristic time for normal viscosity. [s]"))
 		((Real,dmgRateExp,0,,"Exponent for normal viscosity function. [-]"))
 		((Real,plTau,((void)"deactivated if negative",-1),,"Characteristic time for visco-plasticity. [s]"))
@@ -122,7 +126,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,undamagedCohesion,NaN,,"virgin material cohesion [Pa]"))
 			((Real,crossSection,NaN,,"equivalent cross-section associated with this contact [m²]"))
 			((Real,epsCrackOnset,NaN,,"strain at which the material starts to behave non-linearly"))
-			((Real,epsFracture,NaN,,"strain where the damage-evolution law tangent from the top (epsCrackOnset) touches the axis; since the softening law is exponential, this doesn't mean that the contact is fully damaged at this point, that happens only asymptotically"))
+			((Real,crackOpening,NaN,,"Crack opening when the crack is fully broken in tension. [m]"))
 			((Real,dmgTau,-1,,"characteristic time for damage (if non-positive, the law without rate-dependence is used)"))
 			((Real,dmgRateExp,0,,"exponent in the rate-dependent damage evolution"))
 			((Real,dmgStrain,0,,"damage strain (at previous or current step)"))
@@ -133,6 +137,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,kappaD,0,,"Up to now maximum normal strain (semi-norm), non-decreasing in time."))
 			((Real,epsNPl,0,,"normal plastic strain (initially zero)"))
 			((bool,neverDamage,false,,"the damage evolution function will always return virgin state"))
+			((int,damLaw,-1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential"))
 			((Real,epsTrans,0,,"Transversal strain (perpendicular to the contact axis)"))
 			((Real,epsPlSum,0,,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than zero."))
@@ -175,9 +180,14 @@ REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/*! Damage evolution law */
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
-		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+		switch (damLaw) {
+			case 0: // linear
+				return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
+			case 1: // exponential
+				return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+		}
 	}
 	//! return |sigmaT| at plastic surface for given sigmaN etc; not used by the law itself
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle);
@@ -193,7 +203,7 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
-		.def("funcG",&Law2_Dem3DofGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage).")
+		.def("funcG",&Law2_Dem3DofGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
 		.def("yieldSigmaTMagnitude",&Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;
@@ -237,7 +247,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 #endif
 
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::Zero()), tau(Vector3r::Zero()) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Matrix3r stress; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), stress(Matrix3r::Zero()) {} };
 	public:
 		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);

@@ -25,23 +25,31 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 
 	// check unassigned values
 	assert(!isnan(mat1->G_over_E));
+	assert(!isnan(mat2->G_over_E));
 	if(!mat1->neverDamage) {
 		assert(!isnan(mat1->sigmaT));
 		assert(!isnan(mat1->epsCrackOnset));
-		assert(!isnan(mat1->relDuctility));
+		assert(!isnan(mat1->crackOpening));
 		assert(!isnan(mat1->G_over_E));
 	}
+	if(!mat2->neverDamage) {
+		assert(!isnan(mat2->sigmaT));
+		assert(!isnan(mat2->epsCrackOnset));
+		assert(!isnan(mat2->crackOpening));
+		assert(!isnan(mat2->G_over_E));
+	}
 
+	cpmPhys->damLaw = mat1->damLaw;
 	// bodies sharing the same material; no averages necessary
 	if(mat1->id>=0 && mat1->id==mat2->id) {
 		cpmPhys->E=mat1->young;
 		cpmPhys->G=mat1->young*mat1->G_over_E;
 		cpmPhys->tanFrictionAngle=tan(mat1->frictionAngle);
 		cpmPhys->undamagedCohesion=mat1->sigmaT;
-		cpmPhys->epsFracture=mat1->relDuctility*mat1->epsCrackOnset;
 		cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->iter<cohesiveThresholdIter);
 		#define _CPATTR(a) cpmPhys->a=mat1->a
 			_CPATTR(epsCrackOnset);
+			_CPATTR(crackOpening);
 			_CPATTR(neverDamage);
 			_CPATTR(dmgTau);
 			_CPATTR(dmgRateExp);
@@ -56,7 +64,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 			cpmPhys->G=.5*(mat1->G_over_E+mat2->G_over_E)*.5*(mat1->young+mat2->young);
 			cpmPhys->tanFrictionAngle=tan(.5*(mat1->frictionAngle+mat2->frictionAngle));
 			cpmPhys->undamagedCohesion=.5*(mat1->sigmaT+mat2->sigmaT);
-			cpmPhys->epsFracture=.5*(mat1->relDuctility+mat2->relDuctility)*.5*(mat1->epsCrackOnset+mat2->epsCrackOnset);
+			_AVGATTR(crackOpening);
 			cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->iter<cohesiveThresholdIter);
 			_AVGATTR(epsCrackOnset);
 			cpmPhys->neverDamage=(mat1->neverDamage || mat2->neverDamage);
@@ -67,6 +75,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 			_AVGATTR(isoPrestress);
 		#undef _AVGATTR
 	}
+
 	// NOTE: some params are not assigned until in Law2_Dem3DofGeom_CpmPhys_Cpm, since they need geometry as well; those are:
 	// 	crossSection, kn, ks
 }
@@ -152,11 +161,37 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 
 	// shorthands
 		Real& epsN(BC->epsN);
-		Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
-	 const bool& isCohesive(BC->isCohesive);
+		Vector3r& epsT(BC->epsT);
+		Real& kappaD(BC->kappaD);
+		Real& epsPlSum(BC->epsPlSum);
+		const Real& E(BC->E);
+		const Real& undamagedCohesion(BC->undamagedCohesion);
+		const Real& tanFrictionAngle(BC->tanFrictionAngle);
+		const Real& G(BC->G);
+		const Real& crossSection(BC->crossSection);
+		const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold);
+		const Real& epsCrackOnset(BC->epsCrackOnset);
+		Real& relResidualStrength(BC->relResidualStrength);
+		const Real& crackOpening(BC->crackOpening);
+		const int& damLaw(BC->damLaw);
+		const bool& neverDamage(BC->neverDamage);
+		Real& omega(BC->omega);
+		Real& sigmaN(BC->sigmaN);
+		Vector3r& sigmaT(BC->sigmaT);
+		Real& Fn(BC->Fn);
+		Vector3r& Fs(BC->Fs); // for python access
+		const bool& isCohesive(BC->isCohesive);
 
 	#ifdef CPM_MATERIAL_MODEL
-		Real& epsNPl(BC->epsNPl); const Real& dt=scene->dt; const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau);const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType); const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
+		Real& epsNPl(BC->epsNPl);
+		const Real& dt=scene->dt;
+		const Real& dmgTau(BC->dmgTau);
+		const Real& plTau(BC->plTau);
+		const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed);
+		const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
+		const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift);
+		const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft);
+		const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
 	#endif
 
 	epsN=contGeom->strainN(); epsT=contGeom->strainT();
@@ -189,7 +224,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		epsN+=BC->isoPrestress/E;
 		// very simplified version of the constitutive law
 		kappaD=max(max(0.,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
-		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
+		Real epsFracture = crackOpening/contGeom->refLength;
+		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
 		sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
 		sigmaT=G*epsT; // trial stress
 		Real yieldSigmaT=max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); // Mohr-Coulomb law with damage
@@ -203,7 +239,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	#endif
 	sigmaN-=BC->isoPrestress;
 
-	NNAN(kappaD); NNAN(epsCrackOnset); NNAN(epsFracture); NNAN(omega);
+	NNAN(kappaD); NNAN(epsCrackOnset); NNAN(crackOpening); NNAN(omega);
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
 
 	// handle broken contacts
@@ -399,18 +435,18 @@ void CpmStateUpdater::update(Scene* _scene){
 		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->phys);
 		if(!phys) continue;
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
-		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
+
+		Matrix3r stress = Matrix3r::Zero();
+		const Vector3r& n= geom->normal;
+		const Real& Fn = phys->Fn;
+		const Vector3r& Fs = phys->Fs;
+		//stress[i,j] += geom->refLength*(Fn*n[i]*n[j]+0.5*(Fs[i]*n[j]+Fs[j]*n[i]));
+		//stress += geom->refLength*(Fn*outer(n,n)+.5*(outer(Fs,n)+outer(n,Fs)));
+		stress += geom->refLength*(Fn*n*n.transpose()+.5*(Fs*n.transpose()+n*Fs.transpose()));
 		
-		Vector3r normalStress=((1./phys->crossSection)*geom->normal.dot(phys->normalForce))*geom->normal;
-		bodyStats[id1].sigma+=normalStress; bodyStats[id2].sigma+=normalStress;
-		Vector3r shearStress;
-		for(int i=0; i<3; i++){
-			int ix1=(i+1)%3,ix2=(i+2)%3;
-			shearStress[i]=geom->normal[ix1]*phys->shearForce[ix1]+geom->normal[ix2]*phys->shearForce[ix2];
-			shearStress[i]/=phys->crossSection;
-		}
-		bodyStats[id1].tau+=shearStress;
-		bodyStats[id2].tau+=shearStress;
+		bodyStats[id1].stress += stress;
+		bodyStats[id2].stress += stress;
 		bodyStats[id1].nLinks++; bodyStats[id2].nLinks++;
 		
 		if(!phys->isCohesive) continue;
@@ -422,13 +458,13 @@ void CpmStateUpdater::update(Scene* _scene){
 		nAvgRelResidual+=1;
 	}
 	FOREACH(shared_ptr<Body> B, *scene->bodies){
-		if (!B) continue;
+		//if (!B) continue;
 		const Body::id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
 		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
 		if(!state) continue;
-		state->sigma=bodyStats[id].sigma;
-		state->tau=bodyStats[id].tau;
+		//state->sigma=bodyStats[id].sigma;
+		//state->tau=bodyStats[id].tau;
 		int cohLinksWhenever=bodyStats[id].nCohLinks+state->numBrokenCohesive;
 		if(cohLinksWhenever>0){
 			state->normDmg=(bodyStats[id].dmgSum+state->numBrokenCohesive)/cohLinksWhenever;

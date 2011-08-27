@@ -166,15 +166,9 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
 	cpmDamage->SetNumberOfComponents(1);
 	cpmDamage->SetName("cpmDamage");
-	vtkSmartPointer<vtkFloatArray> cpmSigma = vtkSmartPointer<vtkFloatArray>::New();
-	cpmSigma->SetNumberOfComponents(3);
-	cpmSigma->SetName("cpmSigma");
-	vtkSmartPointer<vtkFloatArray> cpmSigmaM = vtkSmartPointer<vtkFloatArray>::New();
-	cpmSigmaM->SetNumberOfComponents(1);
-	cpmSigmaM->SetName("cpmSigmaM");
-	vtkSmartPointer<vtkFloatArray> cpmTau = vtkSmartPointer<vtkFloatArray>::New();
-	cpmTau->SetNumberOfComponents(3);
-	cpmTau->SetName("cpmTau");
+	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
+	cpmStress->SetNumberOfComponents(9);
+	cpmStress->SetName("cpmStress");
 	
 	// extras for RPM
 	vtkSmartPointer<vtkFloatArray> rpmSpecNum = vtkSmartPointer<vtkFloatArray>::New();
@@ -312,13 +306,10 @@ void VTKRecorder::action(){
 				
 				if (recActive[REC_CPM]){
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
-					const Vector3r& ss=YADE_PTR_CAST<CpmState>(b->state)->sigma;
-					const Vector3r& tt=YADE_PTR_CAST<CpmState>(b->state)->tau;
-					float s[3]={ss[0],ss[1],ss[2]};
-					float t[3]={tt[0],tt[1],tt[2]};
-					cpmSigma->InsertNextTupleValue(s);
-					cpmSigmaM->InsertNextValue((ss[0]+ss[1]+ss[2])/3.);
-					cpmTau->InsertNextTupleValue(t);
+					const Matrix3r& ss=YADE_PTR_CAST<CpmState>(b->state)->stress;
+					//float s[3]={ss[0],ss[1],ss[2]};
+					float s[9]={ss[0,0],ss[0,1],ss[0,2],ss[1,0],ss[1,1],ss[1,2],ss[2,0],ss[2,1],ss[2,2]};
+					cpmStress->InsertNextTupleValue(s);
 				}
 				if (recActive[REC_RPM]){
 					rpmSpecNum->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenNumber);
@@ -388,9 +379,7 @@ void VTKRecorder::action(){
 		}
 		if (recActive[REC_CPM]){
 			spheresUg->GetPointData()->AddArray(cpmDamage);
-			spheresUg->GetPointData()->AddArray(cpmSigma);
-			spheresUg->GetPointData()->AddArray(cpmSigmaM);
-			spheresUg->GetPointData()->AddArray(cpmTau);
+			spheresUg->GetPointData()->AddArray(cpmStress);
 		}
 		if (recActive[REC_RPM]){
 			spheresUg->GetPointData()->AddArray(rpmSpecNum);

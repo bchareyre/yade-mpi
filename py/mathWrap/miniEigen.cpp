@@ -100,6 +100,7 @@ static bp::tuple Quaternionr_toAxisAngle(const Quaternionr& self){ AngleAxisr aa
 static bp::tuple Quaternionr_toAngleAxis(const Quaternionr& self){ AngleAxisr aa(self); return bp::make_tuple(aa.angle(),aa.axis());}
 
 static Real Vector3r_dot(const Vector3r& self, const Vector3r& v){ return self.dot(v); }
+static Matrix3r Vector3r_outer(const Vector3r& self, const Vector3r& v){ return self*v.transpose(); }
 static Real Vector3i_dot(const Vector3i& self, const Vector3i& v){ return self.dot(v); }
 static Real Vector2r_dot(const Vector2r& self, const Vector2r& v){ return self.dot(v); }
 static Real Vector2i_dot(const Vector2i& self, const Vector2i& v){ return self.dot(v); }
@@ -326,6 +327,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.add_static_property("UnitX",&Vector3r_UnitX).add_static_property("UnitY",&Vector3r_UnitY).add_static_property("UnitZ",&Vector3r_UnitZ)
 		// methods
 		.def("dot",&Vector3r_dot).def("cross",&Vector3r_cross)
+		.def("outer",&Vector3r_outer)
 		.def("norm",&Vector3r::norm).def("squaredNorm",&Vector3r::squaredNorm).def("normalize",&Vector3r::normalize).def("normalized",&Vector3r::normalized)
 		// operators
 		.def("__neg__",&Vector3r__neg__) // -v

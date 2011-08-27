@@ -1,8 +1,9 @@
 """
-Export geometry to various formats.
+Export (not only) geometry to various formats.
 """
 # encoding: utf-8
 from yade.wrapper import *
+from yade import *
 
 class VTKWriter:
 	"""
@@ -179,3 +180,129 @@ def text(filename, consider=lambda id: True):
 	"""
 	return (textExt(filename=filename, format='x_y_z_r',consider=consider))
 
+
+
+
+
+class VTKExporter:
+	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reasin, you are not able to use VTKRecorder). Export of spheres and facets is supported.
+
+	USAGE:
+	create object vtkExporter = VTKExporter('baseFileName'),
+	add to engines PyRunner with command='vtkWriter.exportSomething(params)'
+	"""
+	def __init__(self,baseName,startSnap=0):
+		self.spheresSnapCount = startSnap
+		self.facetsSnapCount = startSnap
+		self.baseName = baseName
+
+	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None):
+		"""
+		exports spheres (positions and radius) and defined properties.
+:parameters:
+	`ids`: list | "all"
+		if "all", then export all spheres, otherwise only spheres from integer list
+	`what`: [tuple(2)]
+		what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
+	`comment`: string
+		comment to add to vtk file
+	`numLabel`: int
+		number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		"""
+		allIds = False
+		if ids=='all':
+			ids=xrange(len(O.bodies))
+			allIds = True
+		bodies = []
+		for i in ids:
+			b = O.bodies[i]
+			if b.shape.__class__.__name__!="Sphere":
+				if not allIds: print "Warning: body %d is not Sphere"%(i)
+				continue
+			bodies.append(b)
+		n = len(bodies)
+		outFile = open(self.baseName+'-spheres-%04d'%self.spheresSnapCount+'.vtk', 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,n))
+		for b in bodies:
+			pos = b.state.pos
+			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
+		outFile.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
+		for b in bodies:
+			outFile.write("%g\n"%(b.shape.radius))
+		for name,command in what:
+			test = eval(command)
+			if isinstance(test,Matrix3):
+				outFile.write("\nTENSORS %s double\n"%(name))
+				for b in bodies:
+					t = eval(command)
+					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+			if isinstance(test,Vector3):
+				outFile.write("\nVECTORS %s double\n"%(name))
+				for b in bodies:
+					v = eval(command)
+					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+			else:
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
+				for b in bodies:
+					outFile.write("%g\n"%(eval(command)))
+		outFile.close()
+		self.spheresSnapCount += 1
+
+	def exportFacets(self,ids='all',what=[],comment="comment",numLabel=None):
+		"""
+		exports facets (positions) and defined properties.
+:parameters:
+	`ids`: list | "all"
+		if "all", then export all spheres, otherwise only spheres from integer list
+	`what`: [tuple(2)]
+		see exportSpheres
+	`comment`: string
+		comment to add to vtk file
+	`numLabel`: int
+		number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		"""
+		allIds = False
+		if ids=='all':
+			ids=xrange(len(O.bodies))
+			allIds = True
+		bodies = []
+		for i in ids:
+			b = O.bodies[i]
+			if b.shape.__class__.__name__!="Facet":
+				if not allIds: print "Warning: body %d is not Facet"%(i)
+				continue
+			bodies.append(b)
+		n = len(bodies)
+		outFile = open(self.baseName+'-facets-%04d'%self.facetsSnapCount+'.vtk', 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,3*n))
+		for b in bodies:
+			pt1 = b.state.pos + b.shape.vertices[0]
+			pt2 = b.state.pos + b.shape.vertices[1]
+			pt3 = b.state.pos + b.shape.vertices[2]
+			outFile.write("%g %g %g\n"%(pt1[0],pt1[1],pt1[2]))
+			outFile.write("%g %g %g\n"%(pt2[0],pt2[1],pt2[2]))
+			outFile.write("%g %g %g\n"%(pt3[0],pt3[1],pt3[2]))
+		outFile.write("\nPOLYGONS %d %d\n"%(n,4*n))
+		i = 0
+		for b in bodies:
+			outFile.write("3 %d %d %d\n"%(i,i+1,i+2))
+			i += 3
+		if what:
+			outFile.write("\nCELL_DATA %d"%(n))
+		for name,command in what:
+			test = eval(command)
+			if isinstance(test,Matrix3):
+				outFile.write("\nTENSORS %s double\n"%(name))
+				for b in bodies:
+					t = eval(command)
+					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+			if isinstance(test,Vector3):
+				outFile.write("\nVECTORS %s double\n"%(name))
+				for b in bodies:
+					v = eval(command)
+					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+			else:
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"(name))
+				for b in bodies:
+					outFile.write("%g\n"%(eval(command)))
+		outFile.close()
