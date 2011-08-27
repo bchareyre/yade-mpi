@@ -248,7 +248,9 @@ class UNVReader:
 	# class used in ymport.unv function
 	# reads and evaluate given unv file and extracts all triangles
 	# can be extended to read tetrahedrons as well
-	def __init__(self,fileName,shift,scale):
+	def __init__(self,fileName,shift=(0,0,0),scale=1.0):
+		self.shift = shift
+		self.scale = scale
 		self.unvFile = open(fileName,'r')
 		self.flag = 0
 		self.line = self.unvFile.readline()
@@ -277,14 +279,20 @@ class UNVReader:
 		#elif self.flag == 4: self.evalGroup()
 	def evalVertices(self):
 		self.readLine()
-		self.vertices.append(Vector3(float(self.lineSplit[0]),float(self.lineSplit[1]),float(self.lineSplit[2])))
+		self.vertices.append((
+			self.shift[0]+self.scale*float(self.lineSplit[0]),
+			self.shift[1]+self.scale*float(self.lineSplit[1]),
+			self.shift[2]+self.scale*float(self.lineSplit[2])))
 	def evalEdge(self):
 		if self.lineSplit[1]=='41': self.flag = 3; self.evalFacet()
 		else: self.readLine(); self.readLine()
 	def evalFacet(self):
 		if self.lineSplit[1]=='41': # triangle
 			self.readLine()
-			self.verticesTris.append([self.vertices[int(self.lineSplit[0])-1],self.vertices[int(self.lineSplit[1])-1],self.vertices[int(self.lineSplit[2])-1]])
+			self.verticesTris.append([
+				self.vertices[int(self.lineSplit[0])-1],
+				self.vertices[int(self.lineSplit[1])-1],
+				self.vertices[int(self.lineSplit[2])-1]])
 		else: # is not triangle
 			self.readLine()
 			self.flag = 4
