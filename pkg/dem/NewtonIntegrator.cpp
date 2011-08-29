@@ -190,7 +190,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 		//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
 		//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
-		if (homoDeform==Cell::HOMO_VEL_2ND) state->vel+=scene->cell->prevVelGrad*state->vel*dt;
+		if (homoDeform==Cell::HOMO_VEL_2ND) state->vel+=prevVelGrad*state->vel*dt;
 
 		//In all cases, reflect macroscopic (periodic cell) acceleration in the velocity. This is the dominant term in the update in most cases
 		Vector3r dVel=dVelGrad*state->pos;
