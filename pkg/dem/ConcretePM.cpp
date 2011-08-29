@@ -29,13 +29,13 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	if(!mat1->neverDamage) {
 		assert(!isnan(mat1->sigmaT));
 		assert(!isnan(mat1->epsCrackOnset));
-		assert(!isnan(mat1->crackOpening));
+		assert(!isnan(mat1->crackOpening) || !isnan(mat1->relDuctility));
 		assert(!isnan(mat1->G_over_E));
 	}
 	if(!mat2->neverDamage) {
 		assert(!isnan(mat2->sigmaT));
 		assert(!isnan(mat2->epsCrackOnset));
-		assert(!isnan(mat2->crackOpening));
+		assert(!isnan(mat2->crackOpening) || !isnan(mat2->relDuctility));
 		assert(!isnan(mat2->G_over_E));
 	}
 
@@ -50,6 +50,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 		#define _CPATTR(a) cpmPhys->a=mat1->a
 			_CPATTR(epsCrackOnset);
 			_CPATTR(crackOpening);
+			_CPATTR(relDuctility);
 			_CPATTR(neverDamage);
 			_CPATTR(dmgTau);
 			_CPATTR(dmgRateExp);
@@ -64,9 +65,10 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 			cpmPhys->G=.5*(mat1->G_over_E+mat2->G_over_E)*.5*(mat1->young+mat2->young);
 			cpmPhys->tanFrictionAngle=tan(.5*(mat1->frictionAngle+mat2->frictionAngle));
 			cpmPhys->undamagedCohesion=.5*(mat1->sigmaT+mat2->sigmaT);
-			_AVGATTR(crackOpening);
 			cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->iter<cohesiveThresholdIter);
 			_AVGATTR(epsCrackOnset);
+			_AVGATTR(crackOpening);
+			_AVGATTR(relDuctility);
 			cpmPhys->neverDamage=(mat1->neverDamage || mat2->neverDamage);
 			_AVGATTR(dmgTau);
 			_AVGATTR(dmgRateExp);
@@ -173,6 +175,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		const Real& epsCrackOnset(BC->epsCrackOnset);
 		Real& relResidualStrength(BC->relResidualStrength);
 		const Real& crackOpening(BC->crackOpening);
+		const Real& epsF(BC->epsCrackOnset*BC->relDuctility);
 		const int& damLaw(BC->damLaw);
 		const bool& neverDamage(BC->neverDamage);
 		Real& omega(BC->omega);
@@ -224,7 +227,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		epsN+=BC->isoPrestress/E;
 		// very simplified version of the constitutive law
 		kappaD=max(max(0.,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
-		Real epsFracture = crackOpening/contGeom->refLength;
+		//Real epsFracture = crackOpening/contGeom->refLength;
+		Real epsFracture = isnan(epsF)? crackOpening/contGeom->refLength : epsF;
 		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
 		sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
 		sigmaT=G*epsT; // trial stress
@@ -437,33 +441,32 @@ void CpmStateUpdater::update(Scene* _scene){
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
 
-		Matrix3r stress = Matrix3r::Zero();
+		Matrix3r stressTimesV = Matrix3r::Zero();
 		const Vector3r& n= geom->normal;
 		const Real& Fn = phys->Fn;
 		const Vector3r& Fs = phys->Fs;
-		//stress[i,j] += geom->refLength*(Fn*n[i]*n[j]+0.5*(Fs[i]*n[j]+Fs[j]*n[i]));
-		//stress += geom->refLength*(Fn*outer(n,n)+.5*(outer(Fs,n)+outer(n,Fs)));
-		stress += geom->refLength*(Fn*n*n.transpose()+.5*(Fs*n.transpose()+n*Fs.transpose()));
+		//stressTimesV[i,j] += geom->refLength*(Fn*n[i]*n[j]+0.5*(Fs[i]*n[j]+Fs[j]*n[i]));
+		//stressTimesV += geom->refLength*(Fn*outer(n,n)+.5*(outer(Fs,n)+outer(n,Fs)));
+		stressTimesV += geom->refLength*(Fn*n*n.transpose()+.5*(Fs*n.transpose()+n*Fs.transpose()));
 		
-		bodyStats[id1].stress += stress;
-		bodyStats[id2].stress += stress;
+		bodyStats[id1].stressTimesV += stressTimesV;
+		bodyStats[id2].stressTimesV += stressTimesV;
 		bodyStats[id1].nLinks++; bodyStats[id2].nLinks++;
 		
 		if(!phys->isCohesive) continue;
 		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-phys->relResidualStrength); bodyStats[id1].epsPlSum+=phys->epsPlSum;
 		bodyStats[id2].nCohLinks++; bodyStats[id2].dmgSum+=(1-phys->relResidualStrength); bodyStats[id2].epsPlSum+=phys->epsPlSum;
 		maxOmega=max(maxOmega,phys->omega);
-
 		avgRelResidual+=phys->relResidualStrength;
 		nAvgRelResidual+=1;
 	}
 	FOREACH(shared_ptr<Body> B, *scene->bodies){
-		//if (!B) continue;
+		if (!B) continue;
 		const Body::id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
 		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
 		if(!state) continue;
-		//state->sigma=bodyStats[id].sigma;
+		state->stressTimesV=bodyStats[id].stressTimesV;
 		//state->tau=bodyStats[id].tau;
 		int cohLinksWhenever=bodyStats[id].nCohLinks+state->numBrokenCohesive;
 		if(cohLinksWhenever>0){

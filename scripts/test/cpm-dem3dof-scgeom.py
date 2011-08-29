@@ -13,7 +13,7 @@ r1,r2=1e-3,1e-3
 dist=r1+r2
 offset=Vector3(0,0,2*dist)
 p1,p2=Vector3(0,0,0),Vector3(dist,0,0)
-O.materials.append(CpmMat(young=30e9,poisson=.2,frictionAngle=atan(.8),sigmaT=3e6,relDuctility=5,epsCrackOnset=1e-4,G_over_E=.2,neverDamage=False,plTau=-1,plRateExp=0,dmgTau=-1,dmgRateExp=0))
+O.materials.append(CpmMat(young=30e9,poisson=.2,frictionAngle=atan(.8),sigmaT=3e6,crackOpening=1e-6,epsCrackOnset=1e-4,G_over_E=.2,neverDamage=False,plTau=-1,plRateExp=0,dmgTau=-1,dmgRateExp=0))
 # first 2 spheres used for Dem3DofGeom
 # the other 2 used for ScGeom (#3 is dynamic, since ScGeom needs that)
 O.bodies.append([utils.sphere(p1,r1,dynamic=False),utils.sphere(p2,r2,dynamic=False)])

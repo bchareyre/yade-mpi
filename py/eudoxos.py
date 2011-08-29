@@ -127,7 +127,7 @@ def oofemTextExport(fName):
 	The format is line-oriented as follows::
 
 		E G                                                 # elastic material parameters
-		epsCrackOnset relDuctility xiShear transStrainCoeff # tensile parameters; epsFr=epsCrackOnset*relDuctility
+		epsCrackOnset crackOpening xiShear transStrainCoeff # tensile parameters; epsFr=crackOpening/len
 		cohesionT tanPhi                                    # shear parameters
 		number_of_spheres number_of_links
 		id x y z r boundary                                 # spheres; boundary: -1 negative, 0 none, 1 positive

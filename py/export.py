@@ -216,6 +216,7 @@ class VTKExporter:
 		bodies = []
 		for i in ids:
 			b = O.bodies[i]
+			if not b: continue
 			if b.shape.__class__.__name__!="Sphere":
 				if not allIds: print "Warning: body %d is not Sphere"%(i)
 				continue
@@ -268,6 +269,7 @@ class VTKExporter:
 		bodies = []
 		for i in ids:
 			b = O.bodies[i]
+			if not b: continue
 			if b.shape.__class__.__name__!="Facet":
 				if not allIds: print "Warning: body %d is not Facet"%(i)
 				continue
@@ -306,3 +308,4 @@ class VTKExporter:
 				for b in bodies:
 					outFile.write("%g\n"%(eval(command)))
 		outFile.close()
+		self.facetsSnapCount += 1

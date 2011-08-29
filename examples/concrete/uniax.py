@@ -47,7 +47,7 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	sigmaT=3.5e6,
 	frictionAngle=atan(0.8),
 	epsCrackOnset=1e-4,
-	relDuctility=30,
+	crackOpening=1e-6,
 
 	intRadius=1.5,
 	dtSafety=.8,
@@ -76,7 +76,7 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
+concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,crackOpening=crackOpening,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
 
 spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
 #spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')

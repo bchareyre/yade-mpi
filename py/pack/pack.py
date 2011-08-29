@@ -368,7 +368,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 
 
 
-def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None):
+def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None,returnSpherePack=None):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The periodicity depens on whether	the spheresInCell parameter is given.
 
@@ -392,6 +392,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		computed first; it can reduce substantially number of spheres for the triaxial compression (like 10× depending on
 		how much asymmetric the body is), see scripts/test/gts-triax-pack-obb.py.
 	:param memoDbg: show packigns that are considered and reasons why they are rejected/accepted
+	:param returnSpherePack: see :yref:`filterSpherePack`
 
 	:return: SpherePack object with spheres, filtered by the predicate.
 	"""
@@ -426,7 +427,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 			if orientation:
 				sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
 				sp.rotate(*orientation.toAxisAngle())
-			return filterSpherePack(predicate,sp,material=material)
+			return filterSpherePack(predicate,sp,material=material,returnSpherePack=returnSpherePack)
 		else: print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
 		sys.stdout.flush()
 	O.switchScene(); O.resetThisScene() ### !!
@@ -465,7 +466,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 	if orientation:
 		sp.cellSize=(0,0,0); # reset periodicity to avoid warning when rotating periodic packing
 		sp.rotate(*orientation.toAxisAngle())
-	return filterSpherePack(predicate,sp,material=material,color=color)
+	return filterSpherePack(predicate,sp,material=material,color=color,returnSpherePack=returnSpherePack)
 
 def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None):
 	"""Generate periodic dense packing.

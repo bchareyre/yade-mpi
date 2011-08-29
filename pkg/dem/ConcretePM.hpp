@@ -68,7 +68,7 @@ class CpmState: public State {
 		((Real,normEpsPl,0,,"Sum of plastic strains normalized by number of contacts (bogus values)"))
 		//((Vector3r,sigma,Vector3r::Zero(),,"Normal stresses on the particle"))
 		//((Vector3r,tau,Vector3r::Zero(),,"Shear stresses on the particle."))
-		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor on the particle.")),
+		((Matrix3r,stressTimesV,Matrix3r::Zero(),,"Stress tensor on the particle (multiplied by volume surrounded it). To get actual stress, divide this matrix with the volume (for dense packing something like (4/3.*pi*r*r*r/0.62)")),
 		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(CpmState,State);
@@ -86,8 +86,8 @@ class CpmMat: public FrictMat {
 		((Real,sigmaT,NaN,,"Initial cohesion [Pa]"))
 		((bool,neverDamage,false,,"If true, no damage will occur (for testing only)."))
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
-		((Real,relDuctility,NaN,,"Relative ductility, for damage evolution law peak right-tangent. [-]"))
 		((Real,crackOpening,NaN,,"Crack opening when the crack is fully broken in tension. [m]"))
+		((Real,relDuctility,NaN,,"Deprecated"))
 		((int,damLaw,1,,"Law for gamage evolution in uniaxial tension. 0 for linear stress-strain softening branch, 1 for exponential damage evolution law"))
 		((Real,dmgTau,((void)"deactivated if negative",-1),,"Characteristic time for normal viscosity. [s]"))
 		((Real,dmgRateExp,0,,"Exponent for normal viscosity function. [-]"))
@@ -127,6 +127,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,crossSection,NaN,,"equivalent cross-section associated with this contact [m²]"))
 			((Real,epsCrackOnset,NaN,,"strain at which the material starts to behave non-linearly"))
 			((Real,crackOpening,NaN,,"Crack opening when the crack is fully broken in tension. [m]"))
+			((Real,relDuctility,NaN,,"Deprecated"))
 			((Real,dmgTau,-1,,"characteristic time for damage (if non-positive, the law without rate-dependence is used)"))
 			((Real,dmgRateExp,0,,"exponent in the rate-dependent damage evolution"))
 			((Real,dmgStrain,0,,"damage strain (at previous or current step)"))
@@ -247,7 +248,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 #endif
 
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Matrix3r stress; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), stress(Matrix3r::Zero()) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Matrix3r stressTimesV; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), stressTimesV(Matrix3r::Zero()) {} };
 	public:
 		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);

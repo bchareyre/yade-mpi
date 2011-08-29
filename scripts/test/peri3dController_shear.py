@@ -8,7 +8,7 @@
 from yade import pack,plot,qt
 
 # define material
-O.materials.append(CpmMat(young=25e9,G_over_E=.2,sigmaT=3e6,epsCrackOnset=1e-4,relDuctility=30))
+O.materials.append(CpmMat(young=25e9,G_over_E=.2,sigmaT=3e6,epsCrackOnset=1e-4,crackOpening=1e-6))
 
 # create periodic assembly of particles
 initSize=1.2
