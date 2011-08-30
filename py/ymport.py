@@ -244,62 +244,10 @@ def gengeo(mntable,shift=Vector3.Zero,scale=1.0,**kw):
 	return ret
 
 
-class UNVReader:
-	# class used in ymport.unv function
-	# reads and evaluate given unv file and extracts all triangles
-	# can be extended to read tetrahedrons as well
-	def __init__(self,fileName,shift=(0,0,0),scale=1.0):
-		self.shift = shift
-		self.scale = scale
-		self.unvFile = open(fileName,'r')
-		self.flag = 0
-		self.line = self.unvFile.readline()
-		self.lineSplit = self.line.split()
-		self.vertices = []
-		self.verticesTris = []
-		self.read()
-	def readLine(self):
-		self.line = self.unvFile.readline()
-		self.lineSplit = self.line.split()
-	def read(self):
-		while self.line:
-			self.evalLine()
-			self.line = self.unvFile.readline()
-		self.unvFile.close()
-	def evalLine(self):
-		self.lineSplit = self.line.split()
-		if len(self.lineSplit) <= 1: # eval special unv format
-			if   self.lineSplit[0] == '-1': pass
-			elif self.lineSplit[0] == '2411': self.flag = 1; # nodes
-			elif self.lineSplit[0] == '2412': self.flag = 2; # edges (lines)
-			else: self.flag = 4; # volume elements or other, not interesting for us
-		elif self.flag == 1: self.evalVertices()
-		elif self.flag == 2: self.evalEdge()
-		elif self.flag == 3: self.evalFacet()
-		#elif self.flag == 4: self.evalGroup()
-	def evalVertices(self):
-		self.readLine()
-		self.vertices.append((
-			self.shift[0]+self.scale*float(self.lineSplit[0]),
-			self.shift[1]+self.scale*float(self.lineSplit[1]),
-			self.shift[2]+self.scale*float(self.lineSplit[2])))
-	def evalEdge(self):
-		if self.lineSplit[1]=='41': self.flag = 3; self.evalFacet()
-		else: self.readLine(); self.readLine()
-	def evalFacet(self):
-		if self.lineSplit[1]=='41': # triangle
-			self.readLine()
-			self.verticesTris.append([
-				self.vertices[int(self.lineSplit[0])-1],
-				self.vertices[int(self.lineSplit[1])-1],
-				self.vertices[int(self.lineSplit[2])-1]])
-		else: # is not triangle
-			self.readLine()
-			self.flag = 4
-			# can be added function to handle tetrahedrons
 
 def unv(fileName,shift=(0,0,0),scale=1.0,**kw):
 	""" Import geometry from unv file, return list of created facets.
+
 	:Parameters:
 		`fileName`: string
 			name of unv file
@@ -310,10 +258,65 @@ def unv(fileName,shift=(0,0,0),scale=1.0,**kw):
 		`**kw`: (unused keyword arguments)
 				is passed to :yref:`yade.utils.facet`
 	
-	unv files are mainly used for FEM analyses (are used by OOFEM and Abakus TODO), but triangular elements can be imported as facets.
-	These files cen be created e.g. with open-source free software Salome (salome-platform.org TODO)
+	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>` and `Abakus <http://www.simulia.com/products/abaqus_fea.html>`), but triangular elements can be imported as facets.
+	These files cen be created e.g. with open-source free software `Salome <salome-platform.org>`.
 	
 	Example: :ysrc:`scripts/test/unvRead.py`."""
+
+	class UNVReader:
+		# class used in ymport.unv function
+		# reads and evaluate given unv file and extracts all triangles
+		# can be extended to read tetrahedrons as well
+		def __init__(self,fileName,shift=(0,0,0),scale=1.0):
+			self.shift = shift
+			self.scale = scale
+			self.unvFile = open(fileName,'r')
+			self.flag = 0
+			self.line = self.unvFile.readline()
+			self.lineSplit = self.line.split()
+			self.vertices = []
+			self.verticesTris = []
+			self.read()
+		def readLine(self):
+			self.line = self.unvFile.readline()
+			self.lineSplit = self.line.split()
+		def read(self):
+			while self.line:
+				self.evalLine()
+				self.line = self.unvFile.readline()
+			self.unvFile.close()
+		def evalLine(self):
+			self.lineSplit = self.line.split()
+			if len(self.lineSplit) <= 1: # eval special unv format
+				if   self.lineSplit[0] == '-1': pass
+				elif self.lineSplit[0] == '2411': self.flag = 1; # nodes
+				elif self.lineSplit[0] == '2412': self.flag = 2; # edges (lines)
+				else: self.flag = 4; # volume elements or other, not interesting for us
+			elif self.flag == 1: self.evalVertices()
+			elif self.flag == 2: self.evalEdge()
+			elif self.flag == 3: self.evalFacet()
+			#elif self.flag == 4: self.evalGroup()
+		def evalVertices(self):
+			self.readLine()
+			self.vertices.append((
+				self.shift[0]+self.scale*float(self.lineSplit[0]),
+				self.shift[1]+self.scale*float(self.lineSplit[1]),
+				self.shift[2]+self.scale*float(self.lineSplit[2])))
+		def evalEdge(self):
+			if self.lineSplit[1]=='41': self.flag = 3; self.evalFacet()
+			else: self.readLine(); self.readLine()
+		def evalFacet(self):
+			if self.lineSplit[1]=='41': # triangle
+				self.readLine()
+				self.verticesTris.append([
+					self.vertices[int(self.lineSplit[0])-1],
+					self.vertices[int(self.lineSplit[1])-1],
+					self.vertices[int(self.lineSplit[2])-1]])
+			else: # is not triangle
+				self.readLine()
+				self.flag = 4
+				# can be added function to handle tetrahedrons
+
 	unvReader = UNVReader(fileName,shift,scale,**kw)
 	return [utils.facet(tri,**kw) for tri in unvReader.verticesTris]
 

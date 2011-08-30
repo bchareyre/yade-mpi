@@ -159,6 +159,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		BC->crossSection=Mathr::PI*pow(minRad,2);
 		BC->kn=BC->crossSection*BC->E/contGeom->refLength;
 		BC->ks=BC->crossSection*BC->G/contGeom->refLength;
+		BC->epsFracture = isnan(BC->crackOpening)? BC->epsCrackOnset*BC->relDuctility : BC->crackOpening/contGeom->refLength;
 	}
 
 	// shorthands
@@ -175,7 +176,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		const Real& epsCrackOnset(BC->epsCrackOnset);
 		Real& relResidualStrength(BC->relResidualStrength);
 		const Real& crackOpening(BC->crackOpening);
-		const Real& epsF(BC->epsCrackOnset*BC->relDuctility);
+		const Real& relDuctility(BC->relDuctility);
+		const Real& epsFracture(BC->epsFracture);
 		const int& damLaw(BC->damLaw);
 		const bool& neverDamage(BC->neverDamage);
 		Real& omega(BC->omega);
@@ -228,7 +230,6 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		// very simplified version of the constitutive law
 		kappaD=max(max(0.,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
 		//Real epsFracture = crackOpening/contGeom->refLength;
-		Real epsFracture = isnan(epsF)? crackOpening/contGeom->refLength : epsF;
 		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
 		sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
 		sigmaT=G*epsT; // trial stress
@@ -243,7 +244,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	#endif
 	sigmaN-=BC->isoPrestress;
 
-	NNAN(kappaD); NNAN(epsCrackOnset); NNAN(crackOpening); NNAN(omega);
+	NNAN(kappaD); NNAN(epsFracture); NNAN(omega);
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
 
 	// handle broken contacts

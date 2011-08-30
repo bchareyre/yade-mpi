@@ -185,7 +185,7 @@ def text(filename, consider=lambda id: True):
 
 
 class VTKExporter:
-	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reasin, you are not able to use VTKRecorder). Export of spheres and facets is supported.
+	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reason, you are not able to use VTKRecorder). Export of spheres and facets is supported.
 
 	USAGE:
 	create object vtkExporter = VTKExporter('baseFileName'),
@@ -199,8 +199,9 @@ class VTKExporter:
 	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None):
 		"""
 		exports spheres (positions and radius) and defined properties.
-:parameters:
-	`ids`: list | "all"
+
+	:parameters:
+	`ids`: [int] | "all"
 		if "all", then export all spheres, otherwise only spheres from integer list
 	`what`: [tuple(2)]
 		what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
@@ -252,6 +253,7 @@ class VTKExporter:
 	def exportFacets(self,ids='all',what=[],comment="comment",numLabel=None):
 		"""
 		exports facets (positions) and defined properties.
+
 :parameters:
 	`ids`: list | "all"
 		if "all", then export all spheres, otherwise only spheres from integer list
@@ -278,9 +280,12 @@ class VTKExporter:
 		outFile = open(self.baseName+'-facets-%04d'%self.facetsSnapCount+'.vtk', 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,3*n))
 		for b in bodies:
-			pt1 = b.state.pos + b.shape.vertices[0]
-			pt2 = b.state.pos + b.shape.vertices[1]
-			pt3 = b.state.pos + b.shape.vertices[2]
+			p = b.state.pos
+			o = b.state.ori
+			s = b.shape
+			pt1 = p + o*s.vertices[0]
+			pt2 = p + o*s.vertices[1]
+			pt3 = p + o*s.vertices[2]
 			outFile.write("%g %g %g\n"%(pt1[0],pt1[1],pt1[2]))
 			outFile.write("%g %g %g\n"%(pt2[0],pt2[1],pt2[2]))
 			outFile.write("%g %g %g\n"%(pt3[0],pt3[1],pt3[2]))
