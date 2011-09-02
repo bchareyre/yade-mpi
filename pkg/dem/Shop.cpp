@@ -193,7 +193,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 		Real E=0;
 		if(scene->isPeriodic){
 			/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
-			E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos,state->vel).squaredNorm();
+			E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos,state->vel,scene->cell->velGrad).squaredNorm();
 		} else {
 			E=.5*(state->mass*state->vel.squaredNorm());
 		}

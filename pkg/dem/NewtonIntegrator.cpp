@@ -132,7 +132,7 @@ void NewtonIntegrator::action()
 
 			// fluctuation velocity does not contain meanfield velocity in periodic boundaries
 			// in aperiodic boundaries, it is equal to absolute velocity
-			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel):state->vel;
+			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,prevVelGrad):state->vel;
 
 
 

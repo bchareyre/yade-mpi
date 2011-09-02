@@ -89,7 +89,7 @@ class Cell: public Serializable{
 	Vector3r intrShiftPos(const Vector3i& cellDist) const { return hSize*cellDist.cast<Real>(); }
 	Vector3r intrShiftVel(const Vector3i& cellDist) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return velGrad*hSize*cellDist.cast<Real>(); return Vector3r::Zero(); }
 	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
-	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-velGrad*pos); return vel; }
+	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel, const Matrix3r& prevVelGrad) const { if(homoDeform==HOMO_VEL || homoDeform==HOMO_VEL_2ND) return (vel-prevVelGrad*pos); return vel; }
 
 	// get/set current shape; setting resets trsf to identity
 	Matrix3r getHSize() const { return hSize; }
