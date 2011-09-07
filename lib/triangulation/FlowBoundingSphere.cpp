@@ -450,6 +450,24 @@ void FlowBoundingSphere::MeasurePressureProfile(double Wall_up_y, double Wall_do
 	
 }
 
+double FlowBoundingSphere::MeasureAveragedPressure(double Y)
+{
+  RTriangulation& Tri = T[currentTes].Triangulation();
+  double P_ave = 0.f;
+  int n = 0;
+  double Ry = (y_max-y_min)/30;
+  double Rx = (x_max-x_min)/30;
+  double Rz = (z_max-z_min)/30;
+  for (double X=x_min; X<=x_max+Ry/10; X=X+Rx) {
+	for (double Z=z_min; Z<=z_max+Ry/10; Z=Z+Rz) {
+	  P_ave+=Tri.locate(Point(X, Y, Z))->info().p();
+	  n++;
+	}
+  }
+  P_ave/=n;
+  return P_ave;
+}
+
 void FlowBoundingSphere::ComputeFacetForces()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -1442,7 +1460,7 @@ void FlowBoundingSphere::mplot (char *filename)
 	}
 }
 
-double FlowBoundingSphere::Sample_Permeability(double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key)
+double FlowBoundingSphere::Sample_Permeability(double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max/*, string key*/)
 {
         double Section = (x_Max-x_Min) * (z_Max-z_Min);
         double DeltaY = y_Max-y_Min;
@@ -1454,8 +1472,7 @@ double FlowBoundingSphere::Sample_Permeability(double& x_Min,double& x_Max ,doub
         Initialize_pressures( P_zero );
 	GaussSeidel();
 
-        char *kk;
-        kk = (char*) key.c_str();
+	const char *kk = "Permeability";
         return Permeameter(boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
 }
 

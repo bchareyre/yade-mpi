@@ -92,7 +92,7 @@ class FlowBoundingSphere : public Network
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
 #endif
 		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, const char *file );
-		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max, string key);
+		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max);
 		double Compute_HydraulicRadius (Cell_handle cell, int j );
 
 		double dotProduct ( Vecteur x, Vecteur y );
@@ -121,6 +121,7 @@ class FlowBoundingSphere : public Network
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
 		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
+		double MeasureAveragedPressure(double Y);
 		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)

@@ -63,6 +63,7 @@ class FlowEngine : public PartialEngine
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
 		void PressureProfile(double wallUpY, double wallDownY) {return flow->MeasurePressureProfile(wallUpY,wallDownY);}
 		double MeasurePressure(double posX, double posY, double posZ){return flow->MeasurePorePressure(posX, posY, posZ);}
+		double MeasureAveragedPressure(double posY){return flow->MeasureAveragedPressure(posY);}
 
 		virtual ~FlowEngine();
 
@@ -153,6 +154,7 @@ class FlowEngine : public PartialEngine
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
 					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("MeasurePressure",&FlowEngine::MeasurePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
 					)
 		DECLARE_LOGGER;
 };
