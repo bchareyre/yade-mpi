@@ -1,0 +1,4 @@
+The material in this folder was used for the numerical sessions of Alert's "Olek Zinkiewicz" course on discrete mechanics, Grenoble, 2011. They show basic simulation of triaxial tests (session 1) and advanced boundary conditions for stress-strain probing (session 2).
+Authors: Nejib Hada, Luc Sibille, Bruno Chareyre.
+Yade's version should be bzr2830 or later, although some earlier versions could work as well.
+ 

@@ -1,0 +1,4 @@
+!OMP_NUM_THREADS description num_spheres compFricDegree
+1 sim1 500 4
+1 sim2 500 8
+1 sim3 500 16
