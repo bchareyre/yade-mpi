@@ -73,7 +73,7 @@ void NewtonIntegrator::action()
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
 	const Real& dt=scene->dt;
-	homoDeform=(scene->isPeriodic ? scene->cell->homoDeform : -1); // -1 for aperiodic simulations
+
 	dVelGrad=scene->cell->velGrad-prevVelGrad;
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
@@ -121,8 +121,8 @@ void NewtonIntegrator::action()
 				scene->forces.addForce(id, f);
 				#endif
 			}
-			//in most cases, the initial force on clumps will zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
-			f=scene->forces.getForce(id); m=scene->forces.getTorque(id);
+			//in most cases, the initial force on clumps will be zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
+			f=scene->forces.getForce(id)+gravity; m=scene->forces.getTorque(id);
 			#ifdef YADE_DEBUG
 				if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
 				if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
@@ -148,7 +148,7 @@ void NewtonIntegrator::action()
 				Vector3r linAccel=computeAccel(f,state->mass,state->blockedDOFs);
 				cundallDamp2nd(dt,f,fluctVel,linAccel);
 				//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt*pos+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
-				if (homoDeform==Cell::HOMO_VEL_2ND) linAccel+=prevVelGrad*state->vel;
+				linAccel+=prevVelGrad*state->vel;
 				//finally update velocity
 				state->vel+=dt*linAccel;
 				// angular acceleration
@@ -188,16 +188,12 @@ void NewtonIntegrator::action()
 
 void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, const Real& dt){
 	if (scene->forces.getMoveRotUsed()) state->pos+=scene->forces.getMove(id);
-	if (homoDeform==Cell::HOMO_VEL || homoDeform==Cell::HOMO_VEL_2ND) {
-		// update velocity reflecting changes in the macroscopic velocity field, making the problem homothetic.
-		//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
-		//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
+	// update velocity reflecting changes in the macroscopic velocity field, making the problem homothetic.
+	//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
+	//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//Reflect mean-field (periodic cell) acceleration in the velocity
-		Vector3r dVel=dVelGrad*state->pos;
-		state->vel+=dVel;
-	} else if (homoDeform==Cell::HOMO_POS){
-		state->pos+=scene->cell->velGrad*state->pos*dt;
-	}
+	Vector3r dVel=dVelGrad*state->pos;
+	state->vel+=dVel;
 	if (!bodySelected || scene->selectedBody!=id) state->pos+=state->vel*dt;
 }
 

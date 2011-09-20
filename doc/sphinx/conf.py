@@ -648,9 +648,6 @@ my_maketitle=r'''
 \vspace{20 mm}
 \text{\sffamily\bfseries\Huge Yade Documentation}\\
 \vspace{5 mm}
-\textit{\sffamily\huge Release '''\
-+yade.config.revision\
-+r'''}\\
 \vspace{70 mm}
 \begin{sffamily}\bfseries\Large
 Václav Šmilauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome Duriez, Anton Gladky, Janek Kozicki, Chiara Modenese, Luc Scholtès, Luc Sibille, Jan Stránský, Klaus Thoeni
@@ -660,7 +657,9 @@ Václav Šmilauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome 
 
 \vfill
 % Bottom of the page
-{\large \today}
+\textit{\Large Release '''\
++yade.config.revision\
++r''', \today}
 \end{flushright}
 
 \end{titlepage}

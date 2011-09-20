@@ -40,8 +40,7 @@ class NewtonIntegrator : public GlobalEngine{
 	bool cellChanged;
 	// wether a body has been selected in Qt view
 	bool bodySelected;
-	int homoDeform; // updated from scene at every call; -1 for aperiodic simulations, otherwise equal to scene->cell->homoDeform
-	Matrix3r dVelGrad; // dtto
+	Matrix3r dVelGrad;
 
 	public:
 		// function to save maximum velocity, for the verlet-distance optimization
@@ -54,6 +53,7 @@ class NewtonIntegrator : public GlobalEngine{
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))
+		((Vector3r,gravity,Vector3r::Zero(),,"Gravitational acceleration (effectifely replaces GravityEngine)."))
 		((Real,maxVelocitySq,NaN,,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulation from [Allen1989]_, pg. 89."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track acceleration. |yupdate|"))
