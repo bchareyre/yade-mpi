@@ -108,7 +108,7 @@ void NewtonIntegrator::action()
 			if(unlikely(!b || b->isClumpMember())) continue;
 
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
-			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();
+			Vector3r f=gravity, m=Vector3r::Zero();
 			// clumps forces
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
@@ -122,7 +122,7 @@ void NewtonIntegrator::action()
 				#endif
 			}
 			//in most cases, the initial force on clumps will be zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
-			f=scene->forces.getForce(id)+gravity; m=scene->forces.getTorque(id);
+			f=scene->forces.getForce(id); m=scene->forces.getTorque(id);
 			#ifdef YADE_DEBUG
 				if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+lexical_cast<string>(id)+".").c_str());
 				if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+lexical_cast<string>(id)+".").c_str());
