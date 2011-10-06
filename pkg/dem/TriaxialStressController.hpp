@@ -130,7 +130,7 @@ class TriaxialStressController : public BoundaryController
 		normal[wall_back].z()=1;
 		porosity=1;
 		,
-		.def_readonly("strain",&TriaxialStressController::strain,"Current strain (logarithmic).")
+		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
  		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
 		.def_readonly("spheresVolume",&TriaxialStressController::spheresVolume,"Total volume pf spheres.")
