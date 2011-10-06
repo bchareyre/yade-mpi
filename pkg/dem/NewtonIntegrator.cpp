@@ -108,7 +108,7 @@ void NewtonIntegrator::action()
 			if(unlikely(!b || b->isClumpMember())) continue;
 
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
-			Vector3r f=gravity, m=Vector3r::Zero();
+			Vector3r f=gravity*state->mass, m=Vector3r::Zero();
 			// clumps forces
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
@@ -118,7 +118,7 @@ void NewtonIntegrator::action()
 				scene->forces.getForceUnsynced(id)+=f;
 				#else
 				scene->forces.addTorque(id,m);
-				scene->forces.addForce(id, f);
+				scene->forces.addForce(id,f);
 				#endif
 			}
 			//in most cases, the initial force on clumps will be zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
