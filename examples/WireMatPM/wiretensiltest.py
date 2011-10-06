@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from yade import utils, pack, plot
+from yade import plot
 
 #### short description of script
 print 'This script shows a tensile test of a net by using the UniaxialStrainer'
@@ -27,14 +27,14 @@ wireMat = O.materials.append( WireMat( young=young,poisson=poisson,frictionAngle
 
 #### get net packing
 kw = {'color':[1,1,0],'wire':True,'highlight':False,'fixed':False,'material':netMat}
-[netpack,lx,ly] = pack.hexaNet( radius=radius, cornerCoord=[0,0,0], xLength=1.0, yLength=0.55, mos=0.08, a=0.04, b=0.04, startAtCorner=False, isSymmetric=True, **kw )
+[netpack,lx,ly] = hexaNet( radius=radius, cornerCoord=[0,0,0], xLength=1.0, yLength=0.55, mos=0.08, a=0.04, b=0.04, startAtCorner=False, isSymmetric=True, **kw )
 O.bodies.append(netpack)
 print 'Real net length in x-direction [m]: ', lx
 print 'Real net length in y-direction [m]: ', ly
 
 
 #### get bodies for single wire at the boundary in y-direction and change properties
-bb = utils.uniaxialTestFeatures(axis=0)
+bb = uniaxialTestFeatures(axis=0)
 negIds,posIds=bb['negIds'],bb['posIds']
 
 for id in negIds:
@@ -59,28 +59,28 @@ O.engines=[
 ]
 
 #### define additional vertical interactions at the boundary
-utils.createInteraction(negIds[0],negIds[2])
-utils.createInteraction(negIds[3],negIds[4])
-utils.createInteraction(negIds[5],negIds[6])
-utils.createInteraction(negIds[7],negIds[1])
-utils.createInteraction(posIds[0],posIds[2])
-utils.createInteraction(posIds[3],posIds[4])
-utils.createInteraction(posIds[5],posIds[6])
-utils.createInteraction(posIds[7],posIds[1])
+createInteraction(negIds[0],negIds[2])
+createInteraction(negIds[3],negIds[4])
+createInteraction(negIds[5],negIds[6])
+createInteraction(negIds[7],negIds[1])
+createInteraction(posIds[0],posIds[2])
+createInteraction(posIds[3],posIds[4])
+createInteraction(posIds[5],posIds[6])
+createInteraction(posIds[7],posIds[1])
 
 #### time step definition for first time step to create links
 O.step()
 
 
 #### initialize values for UniaxialStrainer
-bb = utils.uniaxialTestFeatures(axis=1)
+bb = uniaxialTestFeatures(axis=1)
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
 strainRateTension = 0.1
 setSpeeds = True
 
 
 ##### delete horizontal interactions for corner particles
-bb = utils.uniaxialTestFeatures(axis=1)
+bb = uniaxialTestFeatures(axis=1)
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
 
 

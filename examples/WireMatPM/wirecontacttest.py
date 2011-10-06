@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from yade import utils, plot, pack, qt
+from yade import plot, qt
 
 #### define parameters for the net
 # wire diameter
@@ -40,12 +40,12 @@ kw = {'color':[0,1,0],'wire':True,'highlight':False,'fixed':False,'material':net
 
 
 ##### create packing for net
-[netpack,lx,ly] = pack.hexaNet( radius=radius, cornerCoord=cornerCoord, xLength=Lx, yLength=Ly, mos=mos, a=a, b=b, startAtCorner=True, isSymmetric=False, **kw )
+[netpack,lx,ly] = hexaNet( radius=radius, cornerCoord=cornerCoord, xLength=Lx, yLength=Ly, mos=mos, a=a, b=b, startAtCorner=True, isSymmetric=False, **kw )
 O.bodies.append(netpack)
 
 
 #### get bodies for single wire at the boundary in y-direction and change properties
-bb = utils.uniaxialTestFeatures(axis=0)
+bb = uniaxialTestFeatures(axis=0)
 negIds,posIds=bb['negIds'],bb['posIds']
 
 for id in negIds:
@@ -72,11 +72,11 @@ O.engines=[
 
 #### define additional vertical interactions at the boundary for boundary wire
 for i in range(24)[1::2]: # odd - start at second item and take every second item
-	utils.createInteraction(negIds[i],negIds[i+1])
+	createInteraction(negIds[i],negIds[i+1])
 del posIds[1]
 posIds.append(1)
 for i in range(25)[::2]: # even  - start at the beginning at take every second item
-	utils.createInteraction(posIds[i],posIds[i+1])
+	createInteraction(posIds[i],posIds[i+1])
 
 
 #### time step definition for first time step to create links
@@ -84,7 +84,7 @@ O.step()
 
 
 ##### delete horizontal interactions for corner particles
-bb = utils.uniaxialTestFeatures(axis=1)
+bb = uniaxialTestFeatures(axis=1)
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
 
 
@@ -116,15 +116,16 @@ for id in movingIds:
 
 
 #### import block as a sphere after net has been created
-bloc=O.bodies.append(utils.sphere([1.0,1.0,0.65],radius=0.15,wire=False,highlight=False,color=[1,1,0],material=blocMat))
+bloc=O.bodies.append(sphere([1.0,1.0,0.65],radius=0.15,wire=False,highlight=False,color=[1,1,0],material=blocMat))
 
 
 #### plot some results
-plot.plots={'t':['vz']}
+plot.plots={'t':['vz',None,('f_unbal','g--')]}
+#plot.liveInterval=2.
 plot.plot(noShow=False, subPlots=False)
 
 def addPlotData():
-	plot.addData(t=O.time, vz=-O.bodies[bloc].state.vel[2])
+	plot.addData(t=O.time, vz=-O.bodies[bloc].state.vel[2], f_unbal=unbalancedForce(useMaxForce=False) )
 
 
 #### define engines for simulation
@@ -142,7 +143,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=[0,0,-9.81],label='gravity'),
 	NewtonIntegrator(damping=0.2),
-	PyRunner(initRun=True,iterPeriod=1000,command='addPlotData()'),
+	PyRunner(initRun=True,iterPeriod=100,command='addPlotData()'),
 ]
 
 
@@ -151,3 +152,4 @@ O.engines=[
 kn = 16115042 # stiffness of single wire from code, has to be changed if you change the stress-strain curve for the wire
 O.dt = 0.2*sqrt(particleMass/(2.*kn))
 
+O.run(200000)
