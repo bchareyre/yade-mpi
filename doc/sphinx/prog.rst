@@ -686,18 +686,15 @@ The macro :ref:`YADE_CLASS_BASE_DOC` introduced above is (behind the scenes) als
 
 	Yade [3]: s.radius=4.           ## write access
 
-	Yade [4]: s.keys()              ## show all available keys
+	Yade [4]: s.dict().keys()              ## show all available keys
 
-	Yade [5]: for k in s.keys(): print s[k]  ## iterate over keys, print their values
+	Yade [5]: for k in s.dict().keys(): print s.dict()[k]  ## iterate over keys, print their values
 	   ...:
 
-	Yade [5]: s.has_key('radius')            ## same as: 'radius' in s.keys()
+	Yade [5]: s.dict()['radius']             ## same as: 'radius' in s.keys()
 
 	Yade [6]: s.dict()                       ## show dictionary of both attributes and values
 
-	## only very rarely needed; calls Serializable::postProcessAttributes(bool deserializing):
-
-	Yade [7]: s.postProcessAttributes(False) 
 
 .. _YADE_CLASS_BASE_DOC:
 
@@ -1797,7 +1794,7 @@ Read-only property ``name`` wraps c++ method ``getClassName()`` returning class 
 
 	Yade [1]: s=Sphere()
 
-	Yade [2]: s.name, s.__class__.__name__
+	Yade [2]: s.__class__.__name__
 
 
 Subclassing c++ types in python
