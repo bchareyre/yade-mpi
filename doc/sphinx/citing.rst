@@ -8,11 +8,15 @@ In order to let users cite Yade consistently in publications, we provide a list 
 
 If new developments are presented and explained in self-contained papers (at the end of a PhD, typically), we will be glad to include them in the documentation and to reference them in the list below. Any other substantial improvement is welcome and can be discussed in the `yade-dev <https://www.yade-dem.org/wiki/Contact>`_ mailing list.
 
-Citing Yade Documentation
-^^^^^^^^^^^^^^^^^^^^^^^^^
-The first edition of Yade documentation is seen as a collection with the three volumes (or "chapters") listed below, also provided as `bibtex entries <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_. Please cite the chapter that is the most relevant in your case. For instance, a paper using one of the documented contact laws will cite the reference documentation [yade:reference]_; if programing concepts are discussed, Yade's manual [yade:manual]_ will be cited; the theoretical background [yade:background]_ can be used as the refence for contact detection, time-step determination, or periodic boundary conditions.
+Citing the Yade Project as a whole (the lazy citation method)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If it is not possible to choose the right chapter (but please try), you may cite the documentation [yade:doc]_ as a whole:
 
-If it is not possible to choose the right chapter (but please try), you may cite the documentation [yade:doc]_ as a whole.
+	V. Šmilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtès, L. Sibille, J. Stránský, and K. Thoeni, Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
+
+Citing chapters of Yade Documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The first edition of Yade documentation is seen as a collection with the three volumes (or "chapters") listed below, also provided as `bibtex entries <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_. Please cite the chapter that is the most relevant in your case. For instance, a paper using one of the documented contact laws will cite the reference documentation [yade:reference]_; if programing concepts are discussed, Yade's manual [yade:manual]_ will be cited; the theoretical background [yade:background]_ can be used as the refence for contact detection, time-step determination, or periodic boundary conditions.
 
 * The reference documentation includes details on equations and algorithms found at the highest levels of Yade (contact laws, boundary conditions controllers, pre- and post-processing modules,...) `(pdf version) <https://yade-dem.org/w/images/9/98/YadeRefDoc.pdf>`_:
 	V. Šmilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtès, L. Sibille, J. Stránský, and K. Thoeni, “Yade Reference Documentation,” in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
@@ -23,14 +27,5 @@ If it is not possible to choose the right chapter (but please try), you may cite
 * Fundamentals of the DEM as implemented in Yade are explained in `(pdf version) <https://yade-dem.org/w/images/e/e0/YadeFormulation.pdf>`_:
 	V. Šmilauer and B. Chareyre, “Yade Dem Formulation”, in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/formulation.html.
 
-* The documentation as a whole:
-	V. Šmilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtès, L. Sibille, J. Stránský, and K. Thoeni, Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
-
-
-Citing the Yade Project as a whole
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-It is not recommended to use the reference below in scientific publications, since it doesn't point to a specific document and it doesn't define any authorship. It can be usefull sometimes, however, to point to the Yade project in a document. In that case, you can use the reference below.
-
-“Yade: Open source discrete element method.” http://yade-dem.org.
 
 
