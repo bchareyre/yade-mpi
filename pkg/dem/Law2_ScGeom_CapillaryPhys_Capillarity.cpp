@@ -105,7 +105,11 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         const shared_ptr<Interaction>& interaction = *ii;
                         unsigned int id1 = interaction->getId1();
                         unsigned int id2 = interaction->getId2();
-
+                        
+                        Body* b1 = (*bodies)[id1].get();
+                        Body* b2 = (*bodies)[id2].get();
+                        
+                        if (b1 and b2) {
 
                         /// interaction geometry search (this test is to compute capillarity only between spheres (probably a better way to do that)
 			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!
@@ -115,8 +119,6 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 
                         /// definition of interacting objects (not necessarily in contact)
 
-			Body* b1 = (*bodies)[id1].get();
-			Body* b2 = (*bodies)[id2].get();
 
                         ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->geom.get());
                         CapillaryPhys* currentContactPhysics = static_cast<CapillaryPhys*>(interaction->phys.get());
@@ -191,6 +193,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                                 currentContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
                         }
                         else if (fusionDetection) bodiesMenisciiList.remove((*ii));//If the interaction is not real, it should not be in the list
+          }
 		} else if (fusionDetection) bodiesMenisciiList.remove((*ii));//
         }
 
