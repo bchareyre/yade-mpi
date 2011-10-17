@@ -15,7 +15,7 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 	:param list idSpheres: list of spheres
 	:param int mask: :yref:`Body.mask` for the checked bodies
 	
-	:return: dictionary with keys ``min`` (minimal dimension, Vector3), ``max`` (maximal dimension, Vector3), ``minId`` (minimal dimension sphere Id, Vector3), ``maxId`` (maximal dimension sphere Id, Vector3), ``center`` (central point of bounding box, Vector3), ``extends`` (sizes of bounding box, Vector3)
+	:return: dictionary with keys ``min`` (minimal dimension, Vector3), ``max`` (maximal dimension, Vector3), ``minId`` (minimal dimension sphere Id, Vector3), ``maxId`` (maximal dimension sphere Id, Vector3), ``center`` (central point of bounding box, Vector3), ``extends`` (sizes of bounding box, Vector3), ``volume`` (volume of spheres, Real), ``mass`` (mass of spheres, Real), ``number`` (number of spheres, int), 
 	
 	"""
 	idSpheresIter=[]
@@ -44,6 +44,8 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 	maxId = Vector3.Zero
 	
 	counter = 0
+	volume = 0.0
+	mass = 0.0
 	
 		
 	for i in idSpheresIter:
@@ -76,12 +78,15 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 				if ((sphereMin[dim]<min[dim]) or (counter==0)): 
 					min[dim]=sphereMin[dim]
 					minId[dim] = b.id
+			volume += 4.0/3.0*math.pi*sphereRadius*sphereRadius*sphereRadius
+			mass += b.state.mass
 			counter += 1
 	
 	center = (max-min)/2.0+min
 	extends = max-min
 	
-	dimensions = {'max':max,'min':min,'maxId':maxId,'minId':minId,'center':center, 'extends':extends}
+	dimensions = {'max':max,'min':min,'maxId':maxId,'minId':minId,'center':center,
+		'extends':extends, 'volume':volume, 'mass':mass, 'number':counter}
 	return dimensions
 
 #spheresPackDimensions==================================================
