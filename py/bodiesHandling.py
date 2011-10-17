@@ -20,10 +20,10 @@ def spheresPackDimensions(idSpheres=[0],mask=-1):
 	"""
 	idSpheresIter=[]
 	
-	if (len(idSpheres)<2):
+	if (len(idSpheres)<1):
 		#check mask
 		ifSpherMask=[]
-		if (mask>-1):
+		if (mask>-1):   #The case, when only the mask was given, without list of ids
 			for i in O.bodies:
 				if ((i.mask&mask)<>0):
 					ifSpherMask.append(i.id)
@@ -84,9 +84,11 @@ def spheresPackDimensions(idSpheres=[0],mask=-1):
 	return dimensions
 
 #spheresPackDimensions==================================================
-def spheresModify(idSpheres,shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,copy=False):
+def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,copy=False):
 	"""The function accepts the list of spheres id's or list of bodies and modifies them: rotating, scaling, shifting.
 	if copy=True copies bodies and modifies them.
+	Also the mask can be given. If idSpheres not empty, the function affects only bodies, where the mask passes.
+	If idSpheres is empty, the function search for bodies, where the mask passes.
 	
 	:Parameters:
 	`shift`: Vector3
@@ -95,12 +97,33 @@ def spheresModify(idSpheres,shift=Vector3.Zero,scale=1.0,orientation=Quaternion.
 		factor scales given spheres.
 	`orientation`: quaternion
 		orientation of spheres
+	`mask`: int
+		:yref:`Body.mask` for the checked bodies
 	:Returns: list of bodies if copy=True, and Boolean value if copy=False
 	"""
-	dims = spheresPackDimensions(idSpheres)
+	
+	idSpheresIter=[]
+	
+	if (len(idSpheres)==0):
+		#check mask
+		ifSpherMask=[]
+		if (mask>-1):   #The case, when only the mask was given, without list of ids
+			for i in O.bodies:
+				if ((i.mask&mask)<>0):
+					ifSpherMask.append(i.id)
+			if (len(ifSpherMask)==0):
+				raise RuntimeWarning("No bodies to modify with given mask")
+			else:
+				idSpheresIter=ifSpherMask
+		else:
+			raise RuntimeWarning("No bodies to modify")
+	else:
+		idSpheresIter=idSpheres
+	
+	dims = spheresPackDimensions(idSpheresIter)
 	
 	ret=[]
-	for i in idSpheres:
+	for i in idSpheresIter:
 		if (type(i).__name__=='int'):
 			b = O.bodies[i]			#We have received a list of ID's
 		elif (type(i).__name__=='Body'):
@@ -111,6 +134,8 @@ def spheresModify(idSpheres,shift=Vector3.Zero,scale=1.0,orientation=Quaternion.
 		try:
 			sphereRadius=b.shape.radius	#skip non-spheres
 		except AttributeError: continue
+		
+		if (mask>-1) and ((mask&b.mask)==0): continue			#skip bodies with wrong mask
 		
 		if (copy): b=sphereDuplicate(b)
 		
