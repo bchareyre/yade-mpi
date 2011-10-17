@@ -780,8 +780,9 @@ def psd(bins=5, mass=True, mask=-1):
 	"""
 	maxD = 0.0
 	minD = 0.0
+	
 	for b in O.bodies:
-		if (isinstance(b.shape,Sphere) and ((mask<0) or (b.mask==mask))):
+		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)<>0))):
 			if ((2*b.shape.radius)	> maxD) : maxD = 2*b.shape.radius
 			if (((2*b.shape.radius)	< minD) or (minD==0.0)): minD = 2*b.shape.radius
 
@@ -795,7 +796,7 @@ def psd(bins=5, mass=True, mask=-1):
 	
 		
 	for b in O.bodies:
-		if (isinstance(b.shape,Sphere) and ((mask<0) or (b.mask==mask))):
+		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)<>0))):
 			d=2*b.shape.radius
 			
 			basketId = int(math.floor( (d-minD) / deltaBinD ) )

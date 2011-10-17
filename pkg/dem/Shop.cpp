@@ -283,7 +283,7 @@ Real Shop::getSpheresVolume(const shared_ptr<Scene>& _scene, int mask){
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b || !b->isDynamic()) continue;
 		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
-		if((!s) or ((mask>0) and (mask!=b->groupMask))) continue;
+		if((!s) or ((mask>0) and ((b->groupMask & mask)==0))) continue;
 		vol += (4/3.)*Mathr::PI*pow(s->radius,3);
 	}
 	return vol;
@@ -295,7 +295,7 @@ Real Shop::getSpheresMass(const shared_ptr<Scene>& _scene, int mask){
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b || !b->isDynamic()) continue;
 		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
-		if((!s) or ((mask>0) and (mask!=b->groupMask))) continue;
+		if((!s) or ((mask>0) and ((b->groupMask & mask)==0))) continue;
 		mass += b->state->mass;
 	}
 	return mass;
