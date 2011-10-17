@@ -9,17 +9,33 @@ from miniEigen import *
 import utils,math,numpy
 
 #spheresPackDimensions==================================================
-def spheresPackDimensions(idSpheres):
+def spheresPackDimensions(idSpheres=[0],mask=-1):
 	"""The function accepts the list of spheres id's or list of bodies and calculates max and min dimensions, geometrical center.
 
 	:param list idSpheres: list of spheres
+	:param int mask: :yref:`Body.mask` for the checked bodies
 	
 	:return: dictionary with keys ``min`` (minimal dimension, Vector3), ``max`` (maximal dimension, Vector3), ``minId`` (minimal dimension sphere Id, Vector3), ``maxId`` (maximal dimension sphere Id, Vector3), ``center`` (central point of bounding box, Vector3), ``extends`` (sizes of bounding box, Vector3)
 	
 	"""
+	idSpheresIter=[]
 	
 	if (len(idSpheres)<2):
-		raise RuntimeError("Only a list of particles with length > 1 can be analyzed")
+		#check mask
+		ifSpherMask=[]
+		if (mask>-1):
+			for i in O.bodies:
+				if ((i.mask&mask)<>0):
+					ifSpherMask+=i.id
+			if (len(ifSpherMask)<2):
+				raise RuntimeWarning("Not enough bodies to analyze with given mask")
+			else:
+				idSpheresIter=ifSpherMask
+		else:
+			raise RuntimeWarning("Only a list of particles with length > 1 can be analyzed")
+	else:
+		idSpheresIter=idSpheres
+	
 	
 	min = Vector3.Zero
 	max = Vector3.Zero
@@ -44,6 +60,9 @@ def spheresPackDimensions(idSpheres):
 			try:
 				sphereRadius=b.shape.radius	#skip non-spheres
 			except AttributeError: continue
+			
+			if (mask>-1) and ((mask&b.mask)==0): continue			#skip bodies with wrong mask
+			
 			
 			sphereRadiusVec3 = Vector3(sphereRadius,sphereRadius,sphereRadius)
 			
