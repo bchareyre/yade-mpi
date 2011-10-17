@@ -121,7 +121,7 @@ class VTKWriter:
 		outFile.close()
 		self.snapCount+=1
 
-def textExt(filename, format='x_y_z_r',consider=lambda id: True, comment=''):
+def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	"""Save sphere coordinates and other parameters into a text file in specific format.
 	Non-spherical bodies are silently skipped.
 	Users can add here their own specific format, giving meaningful names.
@@ -136,8 +136,8 @@ def textExt(filename, format='x_y_z_r',consider=lambda id: True, comment=''):
 	`comment`:
 		the text, which will be added as a comment at the top of file. 
 		If you want to create several lines of text, please use `\n#` for next lines.
-	`consider`:
-		anonymous function(optional)
+	`mask`:
+		export only spheres with the corresponding mask
 :return: number of spheres which were written.
 	"""
 	O=Omega()
@@ -154,11 +154,13 @@ def textExt(filename, format='x_y_z_r',consider=lambda id: True, comment=''):
 		out.write('# ' + comment + '\n')
 	for b in O.bodies:
 		try:
-			if (isinstance(b.shape,Sphere) and consider(b.id)):
+			if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
 				if (format=='x_y_z_r'):
 					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
 				elif (format=='x_y_z_r_matId'):
 					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				elif (format=='id_x_y_z_r_matId'):
+					out.write('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				else:
 					raise RuntimeError("Please, specify a correct format output!");
 				count+=1
@@ -167,18 +169,18 @@ def textExt(filename, format='x_y_z_r',consider=lambda id: True, comment=''):
 	out.close()
 	return count
 	
-def text(filename, consider=lambda id: True):
+def text(filename,mask=-1):
 	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
 	Non-spherical bodies are silently skipped.
 	Example added to examples/regular-sphere-pack/regular-sphere-pack.py
 :parameters:
 	`filename`: string
 		the name of the file, where sphere coordinates will be exported.
-	`consider`:
-		anonymous function(optional)
+	`mask`:
+		export only spheres with the corresponding mask
 :return: number of spheres which were written.
 	"""
-	return (textExt(filename=filename, format='x_y_z_r',consider=consider))
+	return (textExt(filename=filename, format='x_y_z_r',mask=mask))
 
 
 
