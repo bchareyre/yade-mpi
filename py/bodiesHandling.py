@@ -26,7 +26,7 @@ def spheresPackDimensions(idSpheres=[0],mask=-1):
 		if (mask>-1):
 			for i in O.bodies:
 				if ((i.mask&mask)<>0):
-					ifSpherMask+=i.id
+					ifSpherMask.append(i.id)
 			if (len(ifSpherMask)<2):
 				raise RuntimeWarning("Not enough bodies to analyze with given mask")
 			else:
@@ -35,7 +35,6 @@ def spheresPackDimensions(idSpheres=[0],mask=-1):
 			raise RuntimeWarning("Only a list of particles with length > 1 can be analyzed")
 	else:
 		idSpheresIter=idSpheres
-	
 	
 	min = Vector3.Zero
 	max = Vector3.Zero
@@ -46,7 +45,7 @@ def spheresPackDimensions(idSpheres=[0],mask=-1):
 	counter = 0
 	
 		
-	for i in idSpheres:
+	for i in idSpheresIter:
 		if (type(i).__name__=='int'):
 			b = O.bodies[i]			#We have received a list of ID's
 		elif (type(i).__name__=='Body'):
