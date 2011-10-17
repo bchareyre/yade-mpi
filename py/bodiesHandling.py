@@ -9,7 +9,7 @@ from miniEigen import *
 import utils,math,numpy
 
 #spheresPackDimensions==================================================
-def spheresPackDimensions(idSpheres=[0],mask=-1):
+def spheresPackDimensions(idSpheres=[],mask=-1):
 	"""The function accepts the list of spheres id's or list of bodies and calculates max and min dimensions, geometrical center.
 
 	:param list idSpheres: list of spheres
@@ -35,6 +35,7 @@ def spheresPackDimensions(idSpheres=[0],mask=-1):
 			raise RuntimeWarning("Only a list of particles with length > 1 can be analyzed")
 	else:
 		idSpheresIter=idSpheres
+	
 	
 	min = Vector3.Zero
 	max = Vector3.Zero
