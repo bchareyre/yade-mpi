@@ -119,7 +119,15 @@ bool BodyContainer::erase(Body::id_t id){
 			assert(body[id]->subDomId==Body::ID_NONE); // subDomId should never be defined for OpenMP-less builds
 		#endif 
 	#endif /* YADE_SUBDOMAINS */
+	
+	const shared_ptr<Scene>& scene=Omega::instance().getScene();
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+		if((i->getId1()==id or i->getId2()==id)) {
+			scene->interactions->requestErase(i->getId1(),i->getId2());
+		}
+	}
 	body[id]=shared_ptr<Body>();
+	
 	return true;
 }
 
