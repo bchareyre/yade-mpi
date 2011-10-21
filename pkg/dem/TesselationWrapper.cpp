@@ -170,7 +170,7 @@ void TesselationWrapper::insertSceneSpheres(bool reset)
 // 	clock.top("Triangulation");
 }
 
-double TesselationWrapper::Volume(unsigned int id) {return Tes->Volume(id);}
+double TesselationWrapper::Volume(unsigned int id) {return (Tes->Max_id() > id) ? Tes->Volume(id) : 0;}
 
 bool TesselationWrapper::insert(double x, double y, double z, double rad, unsigned int id)
 {
