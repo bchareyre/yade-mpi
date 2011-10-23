@@ -1,5 +1,14 @@
 vim:syntax=changelog
 
+2011-10-23 Anton Gladky <gladky.anton@gmail.com> revision around bzr2942
+	
+	* RELEASE 0.70.0, Bug-fix release.
+		
+	* some changes since 0.6
+		- Added HarmonicMotionEngine, WirePM 
+		- Added check-tests to detect regressions
+		- A lot of fixes in the code and documentation.
+
 2010-12-01 Václav Šmilauer <eu@doxos.eu> revision around bzr bzr2540
 	
 	* RELEASE 0.6:
