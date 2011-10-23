@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation with VTK recorder
+### vtk-files are saved in /tmp directory with names buldozer-*.vtk
 from yade import utils
 from numpy import linspace
 from numpy import arange
@@ -75,7 +76,7 @@ O.engines=[
 	GravityEngine(gravity=[0,0,-9.8]),
 	TranslationEngine(translationAxis=[1,0,0],velocity=2,ids=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=0),
-	#VTKRecorder(iterPeriod=1000,fileName='/tmp/bulldozer-',recorders=['spheres','facets'])
+	VTKRecorder(iterPeriod=1000,fileName='/tmp/bulldozer-',recorders=['spheres','facets'])
 ]
 
 O.saveTmp()
