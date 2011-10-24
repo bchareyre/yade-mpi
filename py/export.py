@@ -1,9 +1,57 @@
+#!/usr/bin/python
+# encoding: utf-8
 """
 Export (not only) geometry to various formats.
 """
-# encoding: utf-8
+
 from yade.wrapper import *
 from yade import *
+
+#textExt===============================================================
+def textExt(filename, format='x_y_z_r', comment='',mask=-1):
+	"""
+	Save sphere coordinates and other parameters into a text file in specific format.
+	Non-spherical bodies are silently skipped.
+	Users can add here their own specific format, giving meaningful names.
+	The first file row will contain the format name.
+	Be sure to add the same format specification in ymport.textExt.
+	
+	:param string filename: the name of the file, where sphere coordinates will be exported.
+	:param string format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	:param string comment: the text, which will be added as a comment at the top of file. 
+		If you want to create several lines of text, please use `\n#` for next lines.
+	:param int mask`: export only spheres with the corresponding mask
+		export only spheres with the corresponding mask
+	Return number of spheres which were written.
+	"""
+	O=Omega()
+	
+	try:
+		out=open(filename,'w')
+	except:
+		raise RuntimeError("Problem to write into the file")
+	
+	count=0
+	
+	out.write('#format ' + format + '\n')
+	if (comment):
+		out.write('# ' + comment + '\n')
+	for b in O.bodies:
+		try:
+			if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
+				if (format=='x_y_z_r'):
+					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
+				elif (format=='x_y_z_r_matId'):
+					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				elif (format=='id_x_y_z_r_matId'):
+					out.write('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				else:
+					raise RuntimeError("Please, specify a correct format output!");
+				count+=1
+		except AttributeError:
+			pass
+	out.close()
+	return count
 
 class VTKWriter:
 	"""
@@ -120,65 +168,17 @@ class VTKWriter:
 		doc.writexml(outFile, newl='\n')
 		outFile.close()
 		self.snapCount+=1
-
-def textExt(filename, format='x_y_z_r', comment='',mask=-1):
-	"""Save sphere coordinates and other parameters into a text file in specific format.
-	Non-spherical bodies are silently skipped.
-	Users can add here their own specific format, giving meaningful names.
-	The first file row will contain the format name.
-	Be sure to add the same format specification in ymport.textExt.
-	
-	:parameters:
-	`filename`: string
-		the name of the file, where sphere coordinates will be exported.
-	`format`:
-		the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
-	`comment`:
-		the text, which will be added as a comment at the top of file. 
-		If you want to create several lines of text, please use `\n#` for next lines.
-	`mask`:
-		export only spheres with the corresponding mask
-:return: number of spheres which were written.
-	"""
-	O=Omega()
-	
-	try:
-		out=open(filename,'w')
-	except:
-		raise RuntimeError("Problem to write into the file")
-	
-	count=0
-	
-	out.write('#format ' + format + '\n')
-	if (comment):
-		out.write('# ' + comment + '\n')
-	for b in O.bodies:
-		try:
-			if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
-				if (format=='x_y_z_r'):
-					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
-				elif (format=='x_y_z_r_matId'):
-					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
-				elif (format=='id_x_y_z_r_matId'):
-					out.write('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
-				else:
-					raise RuntimeError("Please, specify a correct format output!");
-				count+=1
-		except AttributeError:
-			pass
-	out.close()
-	return count
-	
+		
 def text(filename,mask=-1):
 	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
 	Non-spherical bodies are silently skipped.
 	Example added to examples/regular-sphere-pack/regular-sphere-pack.py
-:parameters:
+	:parameters:
 	`filename`: string
 		the name of the file, where sphere coordinates will be exported.
 	`mask`:
 		export only spheres with the corresponding mask
-:return: number of spheres which were written.
+	:return: number of spheres which were written.
 	"""
 	return (textExt(filename=filename, format='x_y_z_r',mask=mask))
 
@@ -256,14 +256,14 @@ class VTKExporter:
 		"""
 		exports facets (positions) and defined properties.
 
-:parameters:
-	`ids`: list | "all"
+		:parameters:
+		`ids`: list | "all"
 		if "all", then export all spheres, otherwise only spheres from integer list
-	`what`: [tuple(2)]
+		`what`: [tuple(2)]
 		see exportSpheres
-	`comment`: string
+		`comment`: string
 		comment to add to vtk file
-	`numLabel`: int
+		`numLabel`: int
 		number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		"""
 		allIds = False
