@@ -36,10 +36,13 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 		if (format=='x_y_z_r'):
 			pos = Vector3(float(data[0]),float(data[1]),float(data[2]))
 			ret.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
-			
 		elif (format=='x_y_z_r_matId'):
 			pos = Vector3(float(data[0]),float(data[1]),float(data[2]))
 			ret.append(utils.sphere(shift+scale*pos,scale*float(data[3]),material=int(data[4]),**kw))
+		
+		elif (format=='id_x_y_z_r_matId'):
+			pos = Vector3(float(data[1]),float(data[2]),float(data[3]))
+			ret.append(utils.sphere(shift+scale*pos,scale*float(data[4]),material=int(data[5]),**kw))
 			
 		else:
 			raise RuntimeError("Please, specify a correct format output!");
