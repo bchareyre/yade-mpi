@@ -87,13 +87,14 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution	
+	bool is2D = false;// Are we generating spheres alligned on a plane?
 	Vector3r size;
 	bool hSizeFound =(hSize!=Matrix3r::Zero());//is hSize passed to the function?
 	if (!hSizeFound) {size=mx-mn; hSize=size.asDiagonal();}
 	if (hSizeFound && !periodic) LOG_WARN("hSize can be defined only for periodic cells.");
 	Matrix3r invHsize =hSize.inverse();
 	Real volume=hSize.determinant();
-	if (!volume) throw invalid_argument("The box defined as null volume. Define at least maxCorner of the box, or hSize if periodic.");
+	if (!volume) LOG_WARN("The volume of the box is null, we will assume that the packing is 2D. If it is not what you want then you defined wrong input values; check that min and max corners are defined correctly.");
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
 	if(porosity<=0) {LOG_WARN("porosity must be >0, changing it for you. It will be ineffective if rMean>0."); porosity=0.5;}
@@ -102,7 +103,16 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	else if(num>0 && psdSizes.size()==0) {
 		mode=RDIST_NUM;
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
-		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);}
+		if (volume) rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);
+		else //The volume is null, we will generate a 2D packing with the following rMean
+		{
+			is2D=true;
+			size=mx-mn;
+			Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
+			if (!area) throw invalid_argument("The box defined as null volume AND null surface. Define at least maxCorner of the box, or hSize if periodic.");
+			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);
+		}
+	}
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
 		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+lexical_cast<string>(psdSizes.size())+"!="+lexical_cast<string>(psdCumm.size())).c_str());
@@ -134,7 +144,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
 	const int maxTry=1000;
-	if(periodic)(cellSize=size);
+// 	if(periodic)(cellSize=size);
 	Real r=0;
 	for(int i=0; (i<num) || (num<0); i++) {
 		Real norm, rand;
@@ -160,7 +170,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		// try to put the sphere into a free spot
 		for(t=0; t<maxTry; ++t){
 			Vector3r c;
-			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
+			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+(size[axis]?(size[axis]-2*r)*rnd()+r:0);}//we handle 2D with the special case size[axis]==0
 			else { 	for(int axis=0; axis<3; axis++) c[axis]=rnd();//coordinates in [0,1]
 				c=mn+hSize*c;}//coordinates in reference frame (inside the base cell)
 			size_t packSize=pack.size(); bool overlap=false;
