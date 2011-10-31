@@ -87,7 +87,6 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution	
-	bool is2D = false;// Are we generating spheres alligned on a plane?
 	Vector3r size;
 	bool hSizeFound =(hSize!=Matrix3r::Zero());//is hSize passed to the function?
 	if (!hSizeFound) {size=mx-mn; hSize=size.asDiagonal();}
@@ -104,14 +103,11 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		mode=RDIST_NUM;
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
 		if (volume) rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);
-		else //The volume is null, we will generate a 2D packing with the following rMean
-		{
-			is2D=true;
+		else {//The volume is null, we will generate a 2D packing with the following rMean
 			size=mx-mn;
 			Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
 			if (!area) throw invalid_argument("The box defined as null volume AND null surface. Define at least maxCorner of the box, or hSize if periodic.");
-			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);
-		}
+			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);	}
 	}
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
