@@ -5,7 +5,7 @@ Export (not only) geometry to various formats.
 """
 
 from yade.wrapper import *
-from yade import *
+from yade import utils
 
 #textExt===============================================================
 def textExt(filename, format='x_y_z_r', comment='',mask=-1):
