@@ -140,7 +140,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
 	const int maxTry=1000;
-// 	if(periodic)(cellSize=size);
+	if(periodic)(cellSize=size);
 	Real r=0;
 	for(int i=0; (i<num) || (num<0); i++) {
 		Real norm, rand;
