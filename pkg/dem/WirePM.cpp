@@ -1,4 +1,4 @@
-/* Klaus Thoeni 2010  */
+/* Klaus Thoeni 2010 */
 
 #include"WirePM.hpp"
 #include<yade/core/Scene.hpp>
@@ -110,6 +110,9 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 		scene->forces.addForce(id1,-f);
 		scene->forces.addForce(id2,f);
 	}
+	
+	/* set shear force to zero */
+	phys->shearForce = Vector3r::Zero();;
 
 }
 
@@ -182,7 +185,6 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	if ( contactPhysics->isDoubleTwist ) {
 		Real alpha = atan( l0 / (3.*Mathr::PI*mat1->diameter) );
 		Real kh = k * ( l0*mat1->diameter/crossSection ) / ( 48.*cos(alpha) * ( 41./9.*(1.+mat1->poisson) + 17./4.*pow(tan(alpha),2) ) );
-		//TRVAR2( kn, kh ); //Commented due to an error during debug-build: "yade/pkg/dem/WirePM.cpp:185:3: error: 'kn' was not declared in this scope"
 		k = 2. * ( mat1->lambdak*kh + (1-mat1->lambdak)*k );
 		Real F = k * DFValues[0](0);
 		Real mappingF = F/DFValues[0](1);

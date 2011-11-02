@@ -57,11 +57,12 @@ class WireMat: public FrictMat {
 REGISTER_SERIALIZABLE(WireMat);
 
 /** This class holds information associated with each interaction */
-class WirePhys: public NormPhys {
+// NOTE: even if WirePhys has no shear force it is derived from NormShearPhys since all implemented functions work properly for NormShearPhys only
+class WirePhys: public NormShearPhys {
 	public:
 		virtual ~WirePhys();
 	
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(WirePhys,NormPhys,"Representation of a single interaction of the WirePM type, storage for relevant parameters",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(WirePhys,NormShearPhys,"Representation of a single interaction of the WirePM type, storage for relevant parameters",
 			((Real,initD,0,,"Equilibrium distance for particles. Computed as the initial inter-particular distance when particle are linked."))
 			((bool,isLinked,false,,"If true particles are linked and will interact. Interactions are linked automatically by the definition of the corresponding interaction radius. The value is false if the wire breaks (no more interaction)."))
 			((bool,isDoubleTwist,false,,"If true the properties of the interaction will be defined as a double-twisted wire."))
