@@ -89,10 +89,12 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution	
 	Vector3r size;
 	bool hSizeFound =(hSize!=Matrix3r::Zero());//is hSize passed to the function?
-	if (!hSizeFound) {size=mx-mn; hSize=size.asDiagonal();}
+	size=mx-mn;
+	if (!hSizeFound) {hSize=size.asDiagonal();}
 	if (hSizeFound && !periodic) LOG_WARN("hSize can be defined only for periodic cells.");
 	Matrix3r invHsize =hSize.inverse();
 	Real volume=hSize.determinant();
+	Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
 	if (!volume) LOG_WARN("The volume of the box is null, we will assume that the packing is 2D. If it is not what you want then you defined wrong input values; check that min and max corners are defined correctly.");
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
@@ -104,10 +106,8 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
 		if (volume) rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);
 		else {//The volume is null, we will generate a 2D packing with the following rMean
-			size=mx-mn;
-			Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
 			if (!area) throw invalid_argument("The box defined as null volume AND null surface. Define at least maxCorner of the box, or hSize if periodic.");
-			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);	}
+			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);}
 	}
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
@@ -120,22 +120,31 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			if(distributeMass) {
 				//psdCumm2 is first obtained by integrating the number of particles over the volumic PSD (dN/dSize = totV*(dPassing/dSize)*1/(4/3πr³)). I suspect similar reasoning behind pow3Interp, since the expressions are a bit similar. The total cumulated number will be the number of spheres in volume*(1-porosity), it is used to decide if the PSD will be scaled down. psdCumm2 is normalized below in order to fit in [0,1]. (B.C.)
 				if (i==0) psdCumm2.push_back(0);
-				else psdCumm2.push_back(psdCumm2[i-1] + 3.0*volume*(1-porosity)/Mathr::PI*(psdCumm[i]-psdCumm[i-1])/(psdSizes[i]-psdSizes[i-1])*(pow(psdSizes[i-1],-2)-pow(psdSizes[i],-2)));
+				else psdCumm2.push_back(psdCumm2[i-1] + 3.0* (volume?volume:(area*psdSizes[psdSizes.size()-1])) *(1-porosity)/Mathr::PI*(psdCumm[i]-psdCumm[i-1])/(psdSizes[i]-psdSizes[i-1])*(pow(psdSizes[i-1],-2)-pow(psdSizes[i],-2)));
 			}
 			LOG_DEBUG(i<<". "<<psdRadii[i]<<", cdf="<<psdCumm[i]<<", cdf2="<<(distributeMass?lexical_cast<string>(psdCumm2[i]):string("--")));
 			// check monotonicity
 			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
 		}
-		if(distributeMass) {
-			if (num>0) {
+		// check the consistency between sizes, num, and poro. If not consistent, scale the sizes down
+		if (num>1){
+			appliedPsdScaling=1;
+			if(distributeMass) {
 				//if target number will not fit in (1-poro)*volume, scale down particles size
-				if (psdCumm2[psdSizes.size()-1]<num){
-					appliedPsdScaling=pow(psdCumm2[psdSizes.size()-1]/num,1./3.);
-					for(size_t i=0; i<psdSizes.size(); i++) psdRadii[i]*=appliedPsdScaling;}
+				if (psdCumm2[psdSizes.size()-1]<num) appliedPsdScaling=pow(psdCumm2[psdSizes.size()-1]/num,1./3.);
+				//Normalize psdCumm2 so it's between 0 and 1
+				for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
+			} else {
+				//if target number will not fit in (1-poro)*volume, scale down particles size
+				double totVol=0;
+				for(size_t i=1; i<psdSizes.size(); i++) totVol+= 4/3*Mathr::PI*(psdCumm[i]-psdCumm[i-1])*num*
+					pow(0.5*(psdSizes[i]+psdSizes[i-1]),3)*(1+pow(0.5*(psdSizes[i]-psdSizes[i-1]),2));
+				Real volumeRatio = totVol/((1-porosity)*(volume?volume:(area*psdSizes[psdSizes.size()-1])));
+				if (volumeRatio>1) appliedPsdScaling=pow(volumeRatio,-1./3.);
 			}
-			//Normalize psdCumm2 so it's between 0 and 1
-			for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
+			if (appliedPsdScaling<1) for(size_t i=0; i<psdSizes.size(); i++) psdRadii[i]*=appliedPsdScaling;
 		}
+		
 	}
 	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
@@ -175,7 +184,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 				for(size_t j=0; j<packSize; j++){
 					Vector3r dr=Vector3r::Zero();
 					if (!hSizeFound) {//The box is axis-aligned, use the wrap methods
-						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+						for(int axis=0; axis<3; axis++) dr[axis]=size[axis]? min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis])) : 0;
 					} else {//not aligned, find closest neighbor in a cube of size 1, then transform distance to cartesian coordinates
 						Vector3r c1c2=invHsize*(pack[j].c-c);
 						for(int axis=0; axis<3; axis++){
