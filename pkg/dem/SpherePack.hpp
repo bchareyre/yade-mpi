@@ -47,9 +47,9 @@ public:
 	};
 	std::vector<Sph> pack;
 	Vector3r cellSize;
-	Real psdScaleExponent;
 	Real appliedPsdScaling;//a scaling factor that can be applied on size distribution
-	SpherePack(): cellSize(Vector3r::Zero()), psdScaleExponent(2.5), appliedPsdScaling(1.){};
+	bool isPeriodic;
+	SpherePack(): cellSize(Vector3r::Zero()), appliedPsdScaling(1.), isPeriodic(0) {};
 	SpherePack(const python::list& l):cellSize(Vector3r::Zero()){ fromList(l); }
 	// add single sphere
 	void add(const Vector3r& c, Real r){ pack.push_back(Sph(c,r)); }

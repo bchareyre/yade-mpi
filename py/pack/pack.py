@@ -75,7 +75,7 @@ Add generated packing to the simulation, rotated by 45° along +z
 	>>> sp.toSimulation(rot=Quaternion((0,0,1),pi/4),color=(0,0,1))
 	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-Periodic properties are transferred to the simulation correctly, including rotation:
+Periodic properties are transferred to the simulation correctly, including rotation (this could be avoided by explicitely passing "hSize=O.cell.hSize" as an argument):
 
 	>>> O.periodic
 	True
@@ -95,9 +95,9 @@ The current state (even if rotated) is taken as mechanically undeformed, i.e. wi
 """
 	if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
 	assert(isinstance(rot,Matrix3))
+	if self.isPeriodic: O.periodic=True
 	if self.cellSize!=Vector3.Zero:
-		O.periodic=True
-		O.cell.hSize=rot*Matrix3(self.cellSize[0],0,0, 0,self.cellSize[0],0, 0,0,self.cellSize[1])
+		O.cell.hSize=rot*Matrix3(self.cellSize[0],0,0, 0,self.cellSize[1],0, 0,0,self.cellSize[2])
 		O.cell.trsf=Matrix3.Identity
 	if not self.hasClumps():
 		return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
