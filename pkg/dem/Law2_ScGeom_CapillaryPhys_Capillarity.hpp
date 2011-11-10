@@ -98,6 +98,7 @@ class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 	((Real,CapillaryPressure,0.,,"Value of the capillary pressure Uc defines as Uc=Ugas-Uliquid"))
 	((bool,fusionDetection,false,,"If true potential menisci overlaps are checked"))
 	((bool,binaryFusion,true,,"If true, capillary forces are set to zero as soon as, at least, 1 overlap (menisci fusion) is detected"))
+	((bool,hertzOn,false,,"Has to be true, if hertz model is set by user (Ip2_FrictMat_FrictMat_MindlinCapillaryPhys)"))
 	 );
 };
 
