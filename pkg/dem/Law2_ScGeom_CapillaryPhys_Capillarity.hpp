@@ -102,15 +102,13 @@ class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 	 );
 };
 
-
 class TableauD
 {
 	public:
 		Real D;
 		std::vector<std::vector<Real> > data;
 		MeniscusParameters Interpolate3(Real P, int& index);
-		
-  		TableauD();
+		TableauD();
   		TableauD(std::ifstream& file);
   		~TableauD();
 };
@@ -124,10 +122,8 @@ class Tableau
 	public: 
 		Real R;
 		std::vector<TableauD> full_data;
-		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2);
-		
-		std::ifstream& operator<< (std::ifstream& file);
-		
+		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2);		
+		std::ifstream& operator<< (std::ifstream& file);		
 		Tableau();
     		Tableau(const char* filename);
     		~Tableau();
@@ -138,8 +134,7 @@ class capillarylaw
 	public:
 		capillarylaw();
 		std::vector<Tableau> data_complete;
-		MeniscusParameters Interpolate(Real R1, Real R2, Real D, Real P, int* index);
-		
+		MeniscusParameters Interpolate(Real R1, Real R2, Real D, Real P, int* index);		
 		void fill (const char* filename);
 };
 
