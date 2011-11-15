@@ -19,7 +19,7 @@ class MindlinCapillaryPhys : public MindlinPhys
 		
 		virtual ~MindlinCapillaryPhys();
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MindlinCapillaryPhys,MindlinPhys,"Physics (of interaction) for Law2_ScGeom_CapillaryPhys_Capillarity.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(MindlinCapillaryPhys,MindlinPhys,"Adds capillary physics to Mindlin's interaction physics.",
 				((bool,meniscus,false,,"Presence of a meniscus if true"))
 				((Real,CapillaryPressure,0.,,"Value of the capillary pressure Uc defines as Ugas-Uliquid"))
 				((Real,Vmeniscus,0.,,"Volume of the menicus"))

@@ -99,8 +99,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         //CapillaryPhys* currentContactPhysics = static_cast<CapillaryPhys*>(interaction->phys.get());//obsolete
 			
 			/// contact physics depends on the contact law, that is used (either linear model or hertz model)			
-			CapillaryPhys* cundallContactPhysics;
-			MindlinCapillaryPhys* mindlinContactPhysics;
+			CapillaryPhys* cundallContactPhysics=NULL;
+			MindlinCapillaryPhys* mindlinContactPhysics=NULL;
 			if (!hertzOn) cundallContactPhysics = static_cast<CapillaryPhys*>(interaction->phys.get());//use CapillaryPhys for linear model
 			else mindlinContactPhysics = static_cast<MindlinCapillaryPhys*>(interaction->phys.get());//use MindlinCapillaryPhys for hertz model
 
@@ -184,8 +184,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	{
 		if ((*ii)->isReal())
 		{
-			CapillaryPhys* cundallContactPhysics;
-			MindlinCapillaryPhys* mindlinContactPhysics;
+			CapillaryPhys* cundallContactPhysics=NULL;
+			MindlinCapillaryPhys* mindlinContactPhysics=NULL;
 			if (!hertzOn) cundallContactPhysics = static_cast<CapillaryPhys*>((*ii)->phys.get());//use CapillaryPhys for linear model
 			else mindlinContactPhysics = static_cast<MindlinCapillaryPhys*>((*ii)->phys.get());//use MindlinCapillaryPhys for hertz model
 			
