@@ -263,6 +263,7 @@ def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Id
 	if (height<0): raise RuntimeError("The height should have the positive value");
 	if angleRange==None: angleRange=(0,2*math.pi)
 	if (abs(angleRange[1]-angleRange[0])>2.0*math.pi): raise RuntimeError("The |angleRange| cannot be larger 2.0*math.pi");
+	if (angleRange[1]<angleRange[0]): raise RuntimeError("angleRange[1] should be larger or equal angleRange[1]");
 	
 	if isinstance(angleRange,float):
 		print u'WARNING: geom.facetCylinder,angleRange should be (Θmin,Θmax), not just Θmax (one number), update your code.'
@@ -298,16 +299,71 @@ def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Id
 			if (radiusTop!=0):
 				ret.append(utils.facet((PBottom[i-1],PTop[i-1],PTop[i]),**kw))
 				
-	if closeGap and (angleRange[0]%(2*math.pi))!=(angleRange[1]%(2*math.pi)and(abs(angleRange[1]-angleRange[0])>math.pi)): # some part is skipped
-		if (wallMask&1)and(radiusTop!=0):
+	if (closeGap):
+		if (wallMask&1)and(radiusTop!=0)and(abs(((angleRange[1]-angleRange[0])) > math.pi)):
 			pts=[(radiusTop*math.cos(angleRange[i]),radiusTop*math.sin(angleRange[i])) for i in (0,1)]
-			pp=[(pts[0][0],pts[0][1],+height/2.0),(pts[1][0],pts[1][1],+height/2.0),(0,0,+height/2.0)]
+			pp=[(pts[0][0],pts[0][1],+height/2.0), (pts[1][0],pts[1][1],+height/2.0), (0,0,+height/2.0)]
 			pp=[orientation*p+center for p in pp]
 			ret.append(utils.facet(pp,**kw))
 			
-		if (wallMask&2)and(radiusBottom!=0):
+		if (wallMask&2)and(radiusBottom!=0)and(abs(((angleRange[1]-angleRange[0])) > math.pi)):
 			pts=[(radiusBottom*math.cos(angleRange[i]),radiusBottom*math.sin(angleRange[i])) for i in (0,1)]
-			pp=[(pts[0][0],pts[0][1],-height/2.0),(pts[1][0],pts[1][1],-height/2.0),(0,0,-height/2.0)]
+			pp=[(0,0,-height/2.0), (pts[1][0],pts[1][1],-height/2.0), (pts[0][0],pts[0][1],-height/2.0)]
 			pp=[orientation*p+center for p in pp]
 			ret.append(utils.facet(pp,**kw))
+		
+		if (wallMask&4):
+			ptsBottom=[(radiusBottom*math.cos(angleRange[i]),radiusBottom*math.sin(angleRange[i])) for i in (0,1)]
+			ptsTop=[(radiusTop*math.cos(angleRange[i]),radiusTop*math.sin(angleRange[i])) for i in (0,1)]
+			
+			if (abs(((angleRange[1]-angleRange[0])) >= math.pi)):
+				if (radiusBottom!=0)and(radiusTop!=0):	#Cylinder
+					pp=[(ptsBottom[0][0],ptsBottom[0][1],-height/2.0),(ptsBottom[1][0],ptsBottom[1][1],-height/2.0),(ptsTop[0][0],ptsTop[0][1],height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+					
+					pp=[(ptsBottom[1][0],ptsBottom[1][1],-height/2.0), (ptsTop[1][0],ptsTop[1][1],height/2.0), (ptsTop[0][0],ptsTop[0][1],height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+				elif (radiusBottom==0)and(radiusTop!=0):	#ConeTop
+					pp=[(ptsTop[1][0],ptsTop[1][1],height/2.0), (ptsTop[0][0],ptsTop[0][1],height/2.0), (0,0,-height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+				elif (radiusTop==0)and(radiusBottom!=0):	#ConeBottom
+					pp=[(0,0,height/2.0),(ptsBottom[0][0],ptsBottom[0][1],-height/2.0),(ptsBottom[1][0],ptsBottom[1][1],-height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+			else:
+				if (radiusBottom!=0)and(radiusTop!=0):	#Cylinder
+					pp=[(ptsBottom[0][0],ptsBottom[0][1],-height/2.0),(0,0,-height/2.0),(ptsTop[0][0],ptsTop[0][1],height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+					
+					pp=[(0,0,-height/2.0), (0,0,height/2.0), (ptsTop[0][0],ptsTop[0][1],height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+					
+					pp=[(0,0,-height/2.0),(ptsBottom[1][0],ptsBottom[1][1],-height/2.0),(0,0,height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+					
+					pp=[(ptsBottom[1][0],ptsBottom[1][1],-height/2.0), (ptsTop[1][0],ptsTop[1][1],height/2.0), (0,0,height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+				elif (radiusBottom==0)and(radiusTop!=0):	#ConeTop
+					pp=[(0,0,height/2.0), (ptsTop[0][0],ptsTop[0][1],height/2.0), (0,0,-height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+					
+					pp=[(ptsTop[1][0],ptsTop[1][1],height/2.0), (0,0,height/2.0), (0,0,-height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+				elif (radiusTop==0)and(radiusBottom!=0):	#ConeBottom
+					pp=[(0,0,height/2.0),(ptsBottom[0][0],ptsBottom[0][1],-height/2.0),(0,0,-height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
+					
+					pp=[(0,0,height/2.0),(0,0,-height/2.0),(ptsBottom[1][0],ptsBottom[1][1],-height/2.0)]
+					pp=[orientation*p+center for p in pp]
+					ret.append(utils.facet(pp,**kw))
 	return ret
