@@ -64,13 +64,19 @@ class BodyContainer: public Serializable{
 		class smart_iterator : public ContainerT::iterator {
 			public:
 			ContainerT::iterator end;
-			smart_iterator& operator++() {do {ContainerT::iterator::operator++();} while (!(this->operator*()) && end!=(*this)); return *this;}
+			smart_iterator& operator++() {
+				ContainerT::iterator::operator++();
+				while (!(this->operator*()) && end!=(*this)){
+					ContainerT::iterator::operator++();}
+				return *this;}
 			smart_iterator operator++(int) {smart_iterator temp(*this); operator++(); return temp;}
 			smart_iterator& operator=(const ContainerT::iterator& rhs) {ContainerT::iterator::operator=(rhs); return *this;}
 		};
 
-		typedef smart_iterator iterator;
-		typedef const smart_iterator const_iterator;
+		typedef ContainerT::iterator iterator;
+		typedef ContainerT::const_iterator const_iterator;
+// 		typedef smart_iterator iterator;
+// 		typedef const smart_iterator const_iterator;
 
 		BodyContainer();
 		virtual ~BodyContainer();
@@ -79,10 +85,15 @@ class BodyContainer: public Serializable{
 	
 		// mimick some STL api
 		void clear();
-		iterator begin() { iterator temp; temp=(body.begin()); temp.end=(body.end()); return temp;}
-		iterator end() { iterator temp; temp= body.end(); return temp;}
-		const_iterator begin() const { return begin();}
-		const_iterator end() const { return end();}
+		iterator begin() { return body.begin(); }
+		iterator end() { return body.end(); }
+		const_iterator begin() const { return body.begin(); }
+		const_iterator end() const { return body.end(); }
+// 		//with smart iterators
+// 		iterator begin() { iterator temp; temp=(body.begin()); temp.end=(body.end()); return temp;}
+// 		iterator end() { iterator temp; temp= body.end(); return temp;}
+// 		const_iterator begin() const { return begin();}
+// 		const_iterator end() const { return end();}
 
 		size_t size() const { return body.size(); }
 		shared_ptr<Body>& operator[](unsigned int id){ return body[id];}
