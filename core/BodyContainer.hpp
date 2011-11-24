@@ -32,7 +32,7 @@ class InteractionContainer;
 	#endif
 #else
 	#if YADE_OPENMP
-		#define YADE_PARALLEL_FOREACH_BODY_BEGIN(b_,bodies) const Body::id_t _sz(bodies->size()); _Pragma("omp parallel for") for(Body::id_t _id=0; _id<_sz; _id++){ b_((*bodies)[_id]);
+		#define YADE_PARALLEL_FOREACH_BODY_BEGIN(b_,bodies) const Body::id_t _sz(bodies->size()); _Pragma("omp parallel for") for(Body::id_t _id=0; _id<_sz; _id++){ if(unlikely(!(*bodies)[_id]))  continue; b_((*bodies)[_id]);
 		#define YADE_PARALLEL_FOREACH_BODY_END() }
 	#else
 		#define YADE_PARALLEL_FOREACH_BODY_BEGIN(b,bodies) FOREACH(b,*(bodies)){
@@ -43,6 +43,7 @@ class InteractionContainer;
 /*
 Container of bodies implemented as flat std::vector. It handles body removal and
 intelligently reallocates free ids for newly added ones.
+The nested iterators and the specialized FOREACH_BODY macros above will silently skip null body pointers which may exist after removal. The null pointers can still be accessed via the [] operator. 
 
 Any alternative implementation should use the same API.
 */
@@ -66,17 +67,20 @@ class BodyContainer: public Serializable{
 			ContainerT::iterator end;
 			smart_iterator& operator++() {
 				ContainerT::iterator::operator++();
-				while (!(this->operator*()) && end!=(*this)){
-					ContainerT::iterator::operator++();}
+				while (!(this->operator*()) && end!=(*this)) ContainerT::iterator::operator++();
 				return *this;}
 			smart_iterator operator++(int) {smart_iterator temp(*this); operator++(); return temp;}
 			smart_iterator& operator=(const ContainerT::iterator& rhs) {ContainerT::iterator::operator=(rhs); return *this;}
+			smart_iterator& operator=(const smart_iterator& rhs) {ContainerT::iterator::operator=(rhs); end=rhs.end; return *this;}
+			smart_iterator() {}
+			smart_iterator(const ContainerT::iterator& source) {(*this)=source;}
+			smart_iterator(const smart_iterator& source) {(*this)=source; end=source.end;}
 		};
 
-		typedef ContainerT::iterator iterator;
-		typedef ContainerT::const_iterator const_iterator;
-// 		typedef smart_iterator iterator;
-// 		typedef const smart_iterator const_iterator;
+// 		typedef ContainerT::iterator iterator;
+// 		typedef ContainerT::const_iterator const_iterator;
+		typedef smart_iterator iterator;
+		typedef const smart_iterator const_iterator;
 
 		BodyContainer();
 		virtual ~BodyContainer();
@@ -85,15 +89,18 @@ class BodyContainer: public Serializable{
 	
 		// mimick some STL api
 		void clear();
-		iterator begin() { return body.begin(); }
-		iterator end() { return body.end(); }
-		const_iterator begin() const { return body.begin(); }
-		const_iterator end() const { return body.end(); }
+		// by using simple vector<>::iterator's, we can hit null bodies 
+// 		iterator begin() { return body.begin(); }
+// 		iterator end() { return body.end(); }
+// 		const_iterator begin() const { return body.begin(); }
+// 		const_iterator end() const { return body.end(); }
 // 		//with smart iterators
-// 		iterator begin() { iterator temp; temp=(body.begin()); temp.end=(body.end()); return temp;}
-// 		iterator end() { iterator temp; temp= body.end(); return temp;}
-// 		const_iterator begin() const { return begin();}
-// 		const_iterator end() const { return end();}
+		iterator begin() {
+			iterator temp(body.begin()); temp.end=body.end();
+			return (body.begin()==body.end() || *temp)?temp:++temp;}
+		iterator end() { iterator temp(body.end()); temp.end=body.end(); return temp;}
+		const_iterator begin() const { return begin();}
+		const_iterator end() const { return end();}
 
 		size_t size() const { return body.size(); }
 		shared_ptr<Body>& operator[](unsigned int id){ return body[id];}
