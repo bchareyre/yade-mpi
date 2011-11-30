@@ -171,7 +171,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 		maxF=max(currF,maxF); sumF+=currF; nb++;
 	}
 	Real meanF=sumF/nb;
-	// get max force on contacts
+	// get mean force on interactions
 	sumF=0; nb=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;

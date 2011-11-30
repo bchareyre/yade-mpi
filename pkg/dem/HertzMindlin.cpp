@@ -161,7 +161,7 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, share
 	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
 	const Real uN=geom->penetrationDepth;
 	if (uN<0) {
-		if (neverErase) phys->shearForce = phys->normalForce = Vector3r::Zero();
+		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return;}
 		else {scene->interactions->requestErase(id1,id2); return;}
 	}
 	// normal force
@@ -203,7 +203,7 @@ void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
 	const Real uN=geom->penetrationDepth;
 	if (uN<0) {
-		if (neverErase) phys->shearForce = phys->normalForce = Vector3r::Zero();
+		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return;}
 		else {scene->interactions->requestErase(id1,id2); return;}
 	}
 	
@@ -272,7 +272,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	
 	Real uN = scg->penetrationDepth; // get overlapping 
 	if (uN<0) {
-		if (neverErase) phys->shearForce = phys->normalForce = Vector3r::Zero();
+		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return;}
 		else {scene->interactions->requestErase(id1,id2); return;}
 	}
 	/* Hertz-Mindlin's formulation (PFC) 
