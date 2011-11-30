@@ -73,14 +73,19 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                 if (!bodiesMenisciiList.initialized) bodiesMenisciiList.prepare(scene);
                 //bodiesMenisciiList.display();
         }
-
-        InteractionContainer::iterator ii    = scene->interactions->begin();
+ 
+ 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
-
+	bool hertzInitialized = false;
         for(  ; ii!=iiEnd ; ++ii ) {
-		
                 if ((*ii)->isReal()) {
                         const shared_ptr<Interaction>& interaction = *ii;
+			if (!hertzInitialized) {//NOTE: We are assuming that only one type is used in one simulation here
+				if (CapillaryPhys::getClassIndexStatic()==interaction->phys->getClassIndex()) hertzOn=false;
+				else if (MindlinCapillaryPhys::getClassIndexStatic()==interaction->phys->getClassIndex()) hertzOn=true;
+				else LOG_ERROR("The capillary law is not implemented for interactions using"<<interaction->phys->getClassName());}
+			hertzInitialized = true;
+
                         unsigned int id1 = interaction->getId1();
                         unsigned int id2 = interaction->getId2();
                         
@@ -120,7 +125,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
                         /// intergranular distance
                         Real D = alpha*((b2->state->pos-b1->state->pos).norm()-(currentContactGeometry->radius1+ currentContactGeometry->radius2)); // scGeom->penetrationDepth could probably be used here?
 
-                        if ((currentContactGeometry->penetrationDepth>=0)||(D<=0)) { //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
+                        if ((currentContactGeometry->penetrationDepth>=0)|| D<=0 || createDistantMeniscii) { //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
                                 D=0; // defines Fcap when spheres interpenetrate //FIXME : D<0 leads to wrong interpolation has D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
                                 if (!hertzOn){
 					if (fusionDetection && !cundallContactPhysics->meniscus) bodiesMenisciiList.insert((*ii));
@@ -162,7 +167,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					}
 					if (!Vinterpol){
 						if (fusionDetection) bodiesMenisciiList.remove((*ii));
-						scene->interactions->requestErase(id1,id2);
+						if (D>0) scene->interactions->requestErase(id1,id2);
 					}
 		
 					/// wetting angles

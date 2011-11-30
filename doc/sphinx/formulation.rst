@@ -694,7 +694,7 @@ for a single oscillator.
 General mass-spring system
 """"""""""""""""""""""""""
 				
-In a general mass-spring system, the highest frequency occurs if two connected masses $m_i$, $m_j$ are in opposite motion; let us suppose they have equal velocities (which is conservative) and they are connected by a spring with stiffness $K_{i}$: displacement $\Delta x_i$ of $m_i$ will be accompained by $\Delta x_j=-\Delta x_i$ of $m_j$, giving $\Delta F_i=-K_{i}(\Delta x_i-(-\Delta x_i))=-2K_{i}\Delta x_i$. That results in apparent stiffness $K_{i}^{(2)}=2K_{i}$, giving maximum angular frequency of the whole system
+In a general mass-spring system, the highest frequency occurs if two connected masses $m_i$, $m_j$ are in opposite motion; let us suppose they have equal velocities (which is conservative) and they are connected by a spring with stiffness $K_{i}$: displacement $\Delta x_i$ of $m_i$ will be accompained by $\Delta x_j=-\Delta x_i$ of $m_j$, giving $\Delta F_i=-K_{i}(\Delta x_i-(-\Delta x_i))=-2K_{i}\Delta x_i$. That results in apparent stiffness $K_{i}^{(2)}=2K_{i}$, giving maximum eigenfrequency of the whole system
 
 .. math:: \omega_{\rm max}=\max_i\sqrt{K_i^{(2)}/m_i}.
 			
@@ -705,7 +705,7 @@ The overall critical timestep is then
 
 	\Dtcr=\frac{2}{\omega_{\rm max}}=\min_i\, 2\sqrt{\frac{m_i}{K_i^{(2)}}}=\min_i\, 2\sqrt{\frac{m_i}{2K_i}}=\min_i \sqrt{2}\sqrt{\frac{m_i}{K_i}}.
 
-This equation can be used for all 6 degrees of freedom (DOF) in translation and rotation, by considering generalized mass and stiffness matrices $M$ and $K$, and replacing fractions $\frac{m_i}{K_i}$ by eigen values of $K.M^{-1}$. The critical timestep is then associated to the eigen mode with highest frequency : 
+This equation can be used for all 6 degrees of freedom (DOF) in translation and rotation, by considering generalized mass and stiffness matrices $M$ and $K$, and replacing fractions $\frac{m_i}{K_i}$ by eigen values of $M.K^{-1}$. The critical timestep is then associated to the eigen mode with highest frequency :
 
 .. math::
 	:label: eq-dtcr-axes
