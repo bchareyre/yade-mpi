@@ -72,7 +72,7 @@ void InteractionLoop::action(){
 
 
 	#ifdef YADE_SUBDOMAINS
-		YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){ if(unlikely(!b)) continue; FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){
+		YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){ FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){
 			const shared_ptr<Interaction>& I(mapItem.second);
 	#else
 		#ifdef YADE_OPENMP

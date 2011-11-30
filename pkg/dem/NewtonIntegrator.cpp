@@ -105,7 +105,7 @@ void NewtonIntegrator::action()
 	#endif
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 			// clump members are handled inside clumps
-			if(unlikely(!b || b->isClumpMember())) continue;
+			if(unlikely(b->isClumpMember())) continue;
 
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
 			Vector3r f=gravity*state->mass, m=Vector3r::Zero();
