@@ -48,10 +48,6 @@ void CapillaryStressRecorder::action()
 	Real sig11_cap=0, sig22_cap=0, sig33_cap=0, sig12_cap=0, sig13_cap=0,
 	sig23_cap=0, Vwater = 0, CapillaryPressure = 0;
 	int j = 0;
-	
-// 	// should be written like this with scene declared previously or in the action(Scene* scene):
-// 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
-// 		if(!i->isReal()) continue;
 		
 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
@@ -112,25 +108,16 @@ void CapillaryStressRecorder::action()
 
 	/// Solid volume
 	Real Vs = 0, Rbody = 0, SR = 0;
-	
-	// should be written like this:
-// 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-// 	if(!b) continue;
-//	if(dynamic_cast<Sphere>(b->shape->get())){
-	  
+
 	BodyContainer::iterator bi = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for ( ; bi!=biEnd; ++bi) {
 	  
 	  shared_ptr<Body> b = *bi;
+	  if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic()) continue;
 	  Sphere* sphere = static_cast<Sphere*>(b->shape.get());
-	  
-// 	  // related to OLD CODE with SphereClassIndex!
-// 	  int geometryIndex = b->shape->getClassIndex();
-// 	  if ( geometryIndex == SpheresClassIndex ) {
 
-	  if (sphere) { // should be enough to distinguish spheres from walls (boxes) -> to be verified!
-	  
+	  if (sphere) {	  
 	    Rbody = sphere->radius;
 	    SR+=Rbody;
 	    Vs += 1.333*Mathr::PI*(Rbody*Rbody*Rbody);
@@ -138,7 +125,6 @@ void CapillaryStressRecorder::action()
 	}
 	
 	Real Vv = V - Vs;
-	
 	Real Sr = 100*Vwater/Vv;
 	if (Sr>100) Sr=100;
 	Real w = 100*Vwater/V;
