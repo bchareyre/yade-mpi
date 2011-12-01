@@ -159,7 +159,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		BC->crossSection=Mathr::PI*pow(minRad,2);
 		BC->kn=BC->crossSection*BC->E/contGeom->refLength;
 		BC->ks=BC->crossSection*BC->G/contGeom->refLength;
-		BC->epsFracture = isnan(BC->crackOpening)? BC->epsCrackOnset*BC->relDuctility : BC->crackOpening/contGeom->refLength;
+		BC->epsFracture = isnan(BC->crackOpening)? BC->epsCrackOnset*BC->relDuctility : BC->crackOpening/(2*minRad);//*contGeom->refLength;
 	}
 
 	// shorthands
@@ -175,8 +175,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold);
 		const Real& epsCrackOnset(BC->epsCrackOnset);
 		Real& relResidualStrength(BC->relResidualStrength);
-		const Real& crackOpening(BC->crackOpening);
-		const Real& relDuctility(BC->relDuctility);
+		//const Real& crackOpening(BC->crackOpening);
+		//const Real& relDuctility(BC->relDuctility);
 		const Real& epsFracture(BC->epsFracture);
 		const int& damLaw(BC->damLaw);
 		const bool& neverDamage(BC->neverDamage);
@@ -442,16 +442,15 @@ void CpmStateUpdater::update(Scene* _scene){
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
 
-		Matrix3r stressTimesV = Matrix3r::Zero();
 		const Vector3r& n= geom->normal;
 		const Real& Fn = phys->Fn;
 		const Vector3r& Fs = phys->Fs;
-		//stressTimesV[i,j] += geom->refLength*(Fn*n[i]*n[j]+0.5*(Fs[i]*n[j]+Fs[j]*n[i]));
-		//stressTimesV += geom->refLength*(Fn*outer(n,n)+.5*(outer(Fs,n)+outer(n,Fs)));
-		stressTimesV += geom->refLength*(Fn*n*n.transpose()+.5*(Fs*n.transpose()+n*Fs.transpose()));
+		//stress[i,j] += geom->refLength*(Fn*n[i]*n[j]+0.5*(Fs[i]*n[j]+Fs[j]*n[i]));
+		//stress += geom->refLength*(Fn*outer(n,n)+.5*(outer(Fs,n)+outer(n,Fs)));
+		Matrix3r stress = geom->refLength*(Fn*n*n.transpose()+.5*(Fs*n.transpose()+n*Fs.transpose()));
 		
-		bodyStats[id1].stressTimesV += stressTimesV;
-		bodyStats[id2].stressTimesV += stressTimesV;
+		bodyStats[id1].stress += stress;
+		bodyStats[id2].stress += stress;
 		bodyStats[id1].nLinks++; bodyStats[id2].nLinks++;
 		
 		if(!phys->isCohesive) continue;
@@ -467,8 +466,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		// add damaged contacts that have already been deleted
 		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
 		if(!state) continue;
-		state->stressTimesV=bodyStats[id].stressTimesV;
-		//state->tau=bodyStats[id].tau;
+		state->stress=bodyStats[id].stress;
 		int cohLinksWhenever=bodyStats[id].nCohLinks+state->numBrokenCohesive;
 		if(cohLinksWhenever>0){
 			state->normDmg=(bodyStats[id].dmgSum+state->numBrokenCohesive)/cohLinksWhenever;
@@ -480,6 +478,10 @@ void CpmStateUpdater::update(Scene* _scene){
 		else { state->normDmg=0; state->normEpsPl=0;}
 		B->shape->color=Vector3r(state->normDmg,1-state->normDmg,B->state->blockedDOFs==State::DOF_ALL?0:1);
 		nAvgRelResidual+=0.5*state->numBrokenCohesive; // add half or broken interactions, other body has the other half
+		Sphere* sphere=dynamic_cast<Sphere*>(B->shape.get());
+		if(!sphere) continue;
+		Real& r = sphere->radius;
+		state->stress=bodyStats[id].stress/(4/3.*Mathr::PI*r*r*r)*.5;
 	}
 	avgRelResidual/=nAvgRelResidual;
 }

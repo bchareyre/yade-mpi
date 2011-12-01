@@ -302,7 +302,7 @@ def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
 			if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 		return ret
 
-def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim):
+def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim,noPrint=False):
 	if not memoizeDb: return
 	import cPickle,sqlite3,time,os
 	if os.path.exists(memoizeDb):
@@ -317,16 +317,16 @@ def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim):
 	c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,rRelFuzz,packDim[0],packDim[1],packDim[2],len(sp),time.time(),wantPeri,packBlob,))
 	c.close()
 	conn.commit()
-	print "Packing saved to the database",memoizeDb
+	if not noPrint: print "Packing saved to the database",memoizeDb
 
-def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fillPeriodic,spheresInCell,memoDbg=False):
+def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fillPeriodic,spheresInCell,memoDbg=False,noPrint=False):
 	"""Return suitable SpherePack read from *memoizeDb* if found, None otherwise.
 		
 		:param fillPeriodic: whether to fill fullDim by repeating periodic packing
 		:param wantPeri: only consider periodic packings
 	"""
 	import os,os.path,sqlite3,time,cPickle,sys
-	if memoDbg:
+	if memoDbg and not noPrint:
 		def memoDbgMsg(s): print s
 	else:
 		def memoDbgMsg(s): pass
@@ -352,7 +352,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 		else:
 			if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): memoDbgMsg("REJECT: not large enough"); continue # not large enough
 		memoDbgMsg("ACCEPTED");
-		print "Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
+		if not noPrint: print "Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
 		c.execute('select pack from packings where timestamp=?',(timestamp,))
 		sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
 		sp.scale(scale);
@@ -435,7 +435,8 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		# x1,y1,z1 already computed above
 		sp=SpherePack()
 		O.periodic=True
-		O.cell.refSize=(x1,y1,z1)
+		#O.cell.refSize=(x1,y1,z1)
+		O.cell.setBox((x1,y1,z1))
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.cell.refSize
 		#print x1,y1,z1,radius,rRelFuzz
 		O.materials.append(FrictMat(young=3e10,density=2400))
@@ -468,7 +469,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		sp.rotate(*orientation.toAxisAngle())
 	return filterSpherePack(predicate,sp,material=material,color=color,returnSpherePack=returnSpherePack)
 
-def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None):
+def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False):
 	"""Generate periodic dense packing.
 
 	A cell of initSize is stuffed with as many spheres as possible, then we run periodic compression with PeriIsoCompressor, just like with
@@ -481,12 +482,13 @@ def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None):
 	:return: SpherePack object, which also contains periodicity information.
 	"""
 	from math import pi
-	sp=_getMemoizedPacking(memoizeDb,radius,rRelFuzz,initSize[0],initSize[1],initSize[2],fullDim=Vector3(0,0,0),wantPeri=True,fillPeriodic=False,spheresInCell=-1,memoDbg=True)
+	sp=_getMemoizedPacking(memoizeDb,radius,rRelFuzz,initSize[0],initSize[1],initSize[2],fullDim=Vector3(0,0,0),wantPeri=True,fillPeriodic=False,spheresInCell=-1,memoDbg=True,noPrint=noPrint)
 	if sp: return sp
 	O.switchScene(); O.resetThisScene()
 	sp=SpherePack()
 	O.periodic=True
-	O.cell.refSize=initSize
+	#O.cell.refSize=initSize
+	O.cell.setBox(initSize)
 	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True)
 	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=2,verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
@@ -496,7 +498,7 @@ def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None):
 	O.run(); O.wait()
 	ret=SpherePack()
 	ret.fromSimulation()
-	_memoizePacking(memoizeDb,ret,radius,rRelFuzz,wantPeri=True,fullDim=Vector3(0,0,0)) # fullDim unused
+	_memoizePacking(memoizeDb,ret,radius,rRelFuzz,wantPeri=True,fullDim=Vector3(0,0,0),noPrint=noPrint) # fullDim unused
 	O.switchScene()
 	return ret
 
