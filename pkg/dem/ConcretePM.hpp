@@ -48,6 +48,7 @@ There are other classes, which are not strictly necessary:
 
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
