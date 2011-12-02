@@ -6,23 +6,23 @@ The last section gives the references that we recommend to use for citing Yade i
 
 .. note:: This file is generated from :ysrc:`doc/yade-articles.bib`, :ysrc:`doc/yade-conferences.bib`, :ysrc:`doc/yade-theses.bib` and :ysrc:`doc/yade-docref.bib`.
 
+Citing Yade
+---------------------
+Corresponding bibtex entries `here <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_. Pdf versions are available for each of them. See also `"Acknowledging Yade" <citing.html>`_.
+
+@bib2rst.bib2rst('../yade-docref.bib')@
+
 Journal articles
 -----------------
 @bib2rst.bib2rst('../yade-articles.bib')@
 
+Conference materials
+---------------------
+@bib2rst.bib2rst('../yade-conferences.bib')@
 
 Master and PhD theses
 -----------------------
 @bib2rst.bib2rst('../yade-theses.bib')@
 
 
-Conference materials
----------------------
-@bib2rst.bib2rst('../yade-conferences.bib')@
 
-
-Citing Yade
----------------------
-Corresponding bibtex entries `here <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_. Pdf versions are available for each of them. See also `"Acknowledging Yade" <citing.html>`_.
-
-@bib2rst.bib2rst('../yade-docref.bib')@
