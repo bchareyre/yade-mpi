@@ -421,6 +421,10 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));
 	}
+	if (dt==std::numeric_limits<Real>::infinity()) {
+		dt = 1.0;
+		LOG_WARN("PWaveTimeStep has not found any suitable spherical body to calculate dt. dt is set to 1.0");
+	}
 	return dt;
 }
 
