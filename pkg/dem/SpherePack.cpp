@@ -129,16 +129,13 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			// check monotonicity
 			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
 		}
-		//Normalize psdCumm2 so it's between 0 and 1
-		if(distributeMass) for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
-		
 		// check the consistency between sizes, num, and poro if all three are imposed. If target number will not fit in (1-poro)*volume, scale down particles sizes
 		if (num>1){
 			appliedPsdScaling=1;
 			if(distributeMass) {
 				if (psdCumm2[psdSizes.size()-1]<num) appliedPsdScaling=pow(psdCumm2[psdSizes.size()-1]/num,1./3.);
 				//Normalize psdCumm2 so it's between 0 and 1
-				for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
+// 				for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
 			} else {
 				double totVol=0;
 				for(size_t i=1; i<psdSizes.size(); i++) totVol+= 4/3*Mathr::PI*(psdCumm[i]-psdCumm[i-1])*num*
@@ -147,7 +144,9 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 				if (volumeRatio>1) appliedPsdScaling=pow(volumeRatio,-1./3.);
 			}
 			if (appliedPsdScaling<1) for(size_t i=0; i<psdSizes.size(); i++) psdRadii[i]*=appliedPsdScaling;
-		}		
+		}
+		//Normalize psdCumm2 so it's between 0 and 1
+		if(distributeMass) for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
 	}
 	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
