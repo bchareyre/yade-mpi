@@ -81,8 +81,13 @@ void SpheresFactory::action(){
 	normal.normalize();
 
 	LOG_TRACE("totalMass="<<totalMass<<", goalMass="<<goalMass);
-
-	while(totalMass<goalMass && (maxParticles<0 || numParticles<maxParticles)){
+	
+	if (maxMass>0 && maxParticles>0) {
+		LOG_WARN("Both maxMass and maxParticles cannot be > 0; Setting maxMass=-1)");
+		maxMass = -1;
+	}
+	
+	while(totalMass<goalMass && (maxParticles<0 || numParticles<maxParticles) && (maxMass<0 || totalMass<maxMass)){
 		Real r=0.0;
 		
 		Real maxdiff=0.0;		//This and next variable are for PSD-distribution
