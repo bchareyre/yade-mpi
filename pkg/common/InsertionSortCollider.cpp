@@ -442,8 +442,8 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 	for(int axis=0; axis<3; axis++){
 		Real dim=scene->cell->getSize()[axis];
 		// LOG_DEBUG("dim["<<axis<<"]="<<dim);
-		// too big bodies in interaction
-		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
+		// too big bodies
+		if (!allowBiggerThanPeriod){ assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);}
 		// find body of which minimum when taken as period start will make the gap smaller
 		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
 		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
@@ -456,19 +456,24 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		}
 		#endif
 		int pmn1,pmx1,pmn2,pmx2;
-		Real mn1=cellWrap(minima[3*id1+axis],wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
-		Real mn2=cellWrap(minima[3*id2+axis],wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
+		Real mn1=cellWrap(m1,wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
+		Real mn2=cellWrap(m2,wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
 		#ifdef PISC_DEBUG
 			if(watchIds(id1,id2)){
 				TRVAR4(mn1,mx1,mn2,mx2);
 				TRVAR4(pmn1,pmx1,pmn2,pmx2);
 			}
 		#endif
-		if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
+		if (allowBiggerThanPeriod &&  ((pmn1!=pmx1) || (pmn2!=pmx2)) ){
+			// If both bodies are bigger, we don't handle the interaction, return
+			if(unlikely((pmn1!=pmx1) && (pmn2!=pmx2))) return false;
+			// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
+			else {periods[axis]=(pmn1==pmx1)? pmn1 : -pmn2; return true;}
+		} else if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
 			Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
 			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<")");
 			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
-		}
+		}		
 		periods[axis]=(int)(pmn1-pmn2);
 		if(!(mn1<=mx2 && mx1 >= mn2)) return false;
 	}

@@ -132,7 +132,8 @@ def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highligh
 
 	:param Vector3 center: center
 	:param float radius: radius
-	:param Vector3-or-None: body's color, as normalized RGB; random color will be assigned if ``None`.
+	:param float dynamic: deprecated, see "fixed"
+	:param float fixed: generate the body with all DOFs blocked?
 	:param material:
 		specify :yref:`Body.material`; different types are accepted:
 			* int: O.materials[material] will be used; as a special case, if material==-1 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
@@ -140,7 +141,10 @@ def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highligh
 			* :yref:`Material` instance: this instance will be used
 			* callable: will be called without arguments; returned Material value will be used (Material factory object, if you like)
 	:param int mask: :yref:`Body.mask` for the body
-
+	:param wire: display as wire sphere?
+	:param highlight: highlight this body in the viewer?
+	:param Vector3-or-None: body's color, as normalized RGB; random color will be assigned if ``None`.
+	
 	:return:
 		A Body instance with desired characteristics.
 
