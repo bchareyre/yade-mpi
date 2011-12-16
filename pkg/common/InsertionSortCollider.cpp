@@ -465,8 +465,8 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 			}
 		#endif
 		if (allowBiggerThanPeriod &&  ((pmn1!=pmx1) || (pmn2!=pmx2)) ){
-			// If both bodies are bigger, we don't handle the interaction, return
-			if(unlikely((pmn1!=pmx1) && (pmn2!=pmx2))) return false;
+			// If both bodies are bigger, we place them in the (0,0,0) period
+			if(unlikely((pmn1!=pmx1) && (pmn2!=pmx2))) {periods[axis]=0; return true;}
 			// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
 			else {periods[axis]=(pmn1==pmx1)? pmn1 : -pmn2; return true;}
 		} else if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
