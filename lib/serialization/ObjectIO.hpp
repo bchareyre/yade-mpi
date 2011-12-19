@@ -9,8 +9,15 @@
 #include<boost/iostreams/filter/gzip.hpp>
 #include<boost/iostreams/device/file.hpp>
 #include<boost/algorithm/string.hpp>
-// local copy
-#include<boost/math/nonfinite_num_facets.hpp>
+
+#if BOOST_VERSION>=104700
+	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
+#else
+	#include<boost/math/nonfinite_num_facets.hpp>
+#endif
+
+
+
 
 namespace yade{
 /* Utility template functions for (de)serializing objects using boost::serialization from/to streams or files.

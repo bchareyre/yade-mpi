@@ -47,8 +47,11 @@
 // #include<yade/pkg/dem/Shop.hpp>
 #include<yade/pkg/dem/Clump.hpp>
 
-// local copy
-#include<boost/math/nonfinite_num_facets.hpp>
+#if BOOST_VERSION>=104700
+	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
+#else
+	#include<boost/math/nonfinite_num_facets.hpp>
+#endif
 
 #include<locale>
 #include<boost/archive/codecvt_null.hpp>
