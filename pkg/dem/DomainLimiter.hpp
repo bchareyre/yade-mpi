@@ -1,6 +1,7 @@
 
 #include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/core/PartialEngine.hpp>
+#include<yade/pkg/common/Sphere.hpp>
 
 class DomainLimiter: public PeriodicEngine{
 	public:
@@ -9,6 +10,9 @@ class DomainLimiter: public PeriodicEngine{
 		((Vector3r,lo,Vector3r(0,0,0),,"Lower corner of the domain."))
 		((Vector3r,hi,Vector3r(0,0,0),,"Upper corner of the domain."))
 		((long,nDeleted,0,Attr::readonly,"Cummulative number of particles deleted."))
+		((Real,mDeleted,0,,"Mass of deleted particles."))
+		((Real,vDeleted,0,,"Volume of deleted particles."))
+		((int,mask,-1,,"If mask is defined, only particles with corresponding groupMask will be deleted."))
 	);
 };
 REGISTER_SERIALIZABLE(DomainLimiter);

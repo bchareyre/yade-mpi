@@ -26,6 +26,7 @@ class SpheresFactory: public GlobalEngine {
 		((Vector3r,normal,Vector3r(NaN,NaN,NaN),,"Spitting direction (and orientation of the region's geometry)."))
 		((int,materialId,-1,,"Shared material id to use for newly created spheres (can be negative to count from the end)"))
 		((int,mask,-1,,"groupMask to apply for newly created spheres "))
+		((Vector3r,color,Vector3r(-1,-1,-1),,"Use the color for newly created particles, if specified"))
 		((vector<int>,ids,,,"ids of created bodies"))
 		((Real,totalMass,0,,"Mass of spheres that was produced so far. |yupdate|"))
 		((Real,totalVolume,0,,"Volume of spheres that was produced so far. |yupdate|"))
@@ -39,8 +40,8 @@ class SpheresFactory: public GlobalEngine {
 		((vector<Real>,PSDsizes,,,"PSD-dispersion, sizes of cells, Diameter [m]"))
 		((vector<Real>,PSDcum,,,"PSD-dispersion, cumulative procent meanings [-]"))
 		((bool,PSDcalculateMass,true,,"PSD-Input is in mass (true), otherwise the number of particles will be considered."))
-    ((bool,stopIfFailed,true,,"If true, the SpheresFactory stops (sets massFlowRate=0), when maximal number of attempts to insert particle exceed."))
-    ((bool,exactDiam,true,,"If true, the particles only with the defined in PSDsizes diameters will be created. Otherwise the diameter will be randomly chosen in the range [PSDsizes[i-1]:PSDsizes[i]], in this case the length of PSDsizes should be  more on 1, than the length of PSDcum.")),
+		((bool,stopIfFailed,true,,"If true, the SpheresFactory stops (sets massFlowRate=0), when maximal number of attempts to insert particle exceed."))
+		((bool,exactDiam,true,,"If true, the particles only with the defined in PSDsizes diameters will be created. Otherwise the diameter will be randomly chosen in the range [PSDsizes[i-1]:PSDsizes[i]], in this case the length of PSDsizes should be  more on 1, than the length of PSDcum.")),
 		PSDuse=false;
 	);
 };

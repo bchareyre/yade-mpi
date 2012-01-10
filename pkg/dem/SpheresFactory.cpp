@@ -150,6 +150,9 @@ void SpheresFactory::action(){
 		shared_ptr<State> state(material->newAssocState());
 		sphere->radius=r;  
 		state->pos=state->refPos=c; 
+		if (color[0]>=0 and color[1]>=0 and color[2]>=0){
+			sphere->color = color;
+		}
 
 		state->vel=initVel; 
 		Real vol=(4/3.)*Mathr::PI*pow(r,3);

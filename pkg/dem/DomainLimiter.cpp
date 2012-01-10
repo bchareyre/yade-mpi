@@ -10,13 +10,20 @@ YADE_PLUGIN((DomainLimiter)(LawTester)
 void DomainLimiter::action(){
 	std::list<Body::id_t> out;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b) continue;
-		const Vector3r& p(b->state->pos);
-		if(p[0]<lo[0] || p[0]>hi[0] || p[1]<lo[1] || p[1]>hi[1] || p[2]<lo[2] || p[2]>hi[2]) out.push_back(b->id);
+		if((!b) or ((mask>0) and ((b->groupMask & mask)==0))) continue;
+		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get()); 
+		if (sphere){ //Delete only spheres
+			const Vector3r& p(b->state->pos);
+			if(p[0]<lo[0] || p[0]>hi[0] || p[1]<lo[1] || p[1]>hi[1] || p[2]<lo[2] || p[2]>hi[2]) {
+				out.push_back(b->id);
+				nDeleted++;
+				mDeleted+=b->state->mass;
+				Real r = sphere->radius; vDeleted+=(4/3.)*Mathr::PI*pow(r,3);
+			}
+		}
 	}
 	FOREACH(Body::id_t id, out){
 		scene->bodies->erase(id);
-		nDeleted++;
 	}
 }
 
