@@ -11,10 +11,14 @@ struct basicVTKwritter
 {
 	std::ofstream file;
 	unsigned int nbVertices, nbCells;
-
-	basicVTKwritter(unsigned int nV, unsigned int nC) : nbVertices(nV),nbCells(nC) { }
+	bool hasPointData;
+	bool hasCellData;
+	
+	
+	basicVTKwritter(unsigned int nV, unsigned int nC) : nbVertices(nV),nbCells(nC),hasPointData(false),hasCellData(false) {}
 	
 	bool open(const char * filename, const char * comment);
+	bool close();
 	
 	void begin_vertices();
 	void write_point(float x, float y, float z);

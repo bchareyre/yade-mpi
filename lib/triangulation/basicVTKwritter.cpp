@@ -20,6 +20,11 @@ bool basicVTKwritter::open(const char * filename, const char * comment)
   return true;
 }
 
+bool basicVTKwritter::close()
+{
+  file.close(); return true;
+}
+
 void basicVTKwritter::begin_vertices()
 {
   file << "POINTS " << nbVertices << " float" << endl;
@@ -60,8 +65,8 @@ void basicVTKwritter::begin_data(const char * dataname, DataPosition pos, DataNa
 {
 switch(pos)
 {
-  case POINT_DATA : file << "POINT_DATA " << nbVertices << endl; break;
-  case CELL_DATA  : file << "CELL_DATA " << nbCells << endl; break;
+  case POINT_DATA : if (!hasPointData) {file << "POINT_DATA " << nbVertices << endl; hasPointData=true;} break;
+  case CELL_DATA  : if (!hasCellData) {file << "CELL_DATA " << nbCells << endl; hasCellData=true;} break;
 }
 
   switch (name)
@@ -77,11 +82,12 @@ switch (type)
   case FLOAT : file << " float"; break;
 }
 
-  if (name == SCALARS) file << " 1" << endl;
-  else                file << endl;
+  if (name == SCALARS) {
+	  file << " 1" << endl;
+	  file << "LOOKUP_TABLE default" << endl;}
+  else file << endl;
+}  
   
-  file << "LOOKUP_TABLE default" << endl;
-}
 
 
 void basicVTKwritter::write_data(float value)

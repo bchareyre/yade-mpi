@@ -48,6 +48,7 @@ class KinematicLocalisationAnalyser
 		bool DistribsToFile (const char* output_file_name);
 		///Write the averaged deformation on each grain in a file (vertices and cells lists included in the file), no need to call ComputeParticlesDeformation()
 		bool DefToFile (const char* output_file_name = "deformations");
+		bool DefToFile (const char* state_file1, const char* state_file0, const char* output_file_name="deformation.vtk", bool usebz2=false);
 		///Save/Load states using bz2 compression
 		bool bz2;
 		ofstream& ContactDistributionToFile ( ofstream& output_file );

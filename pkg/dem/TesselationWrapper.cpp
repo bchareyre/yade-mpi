@@ -117,21 +117,13 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	//cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
 }
 
-
-// is this a joke?? #include<limits> std::numeric_limits<double>::infinity();
-//__attribute__((unused)) static double inf = 1e10;
-double pminx=0;
+/*double pminx=0;
 double pminy=0;
 double pminz=0;
 double pmaxx=0;
 double pmaxy=0;
-double pmaxz=0;
+double pmaxz=0;*/
 double thickness = 0;
-
-//  Finite_edges_iterator facet_it; //an edge in a triangulation is a facet in corresponding tesselation, remember...
-//That explain the name.
-
-
 
 TesselationWrapper::~TesselationWrapper() { if (Tes) delete Tes;}
 
@@ -170,7 +162,7 @@ void TesselationWrapper::insertSceneSpheres(bool reset)
 // 	clock.top("Triangulation");
 }
 
-double TesselationWrapper::Volume(unsigned int id) {return (Tes->Max_id() > id) ? Tes->Volume(id) : 0;}
+double TesselationWrapper::Volume(unsigned int id) {return (Tes->Max_id() > id) ? Tes->Volume(id) : -1;}
 
 bool TesselationWrapper::insert(double x, double y, double z, double rad, unsigned int id)
 {
@@ -319,13 +311,31 @@ void  TesselationWrapper::RemoveBoundingPlanes(void)
 
 void TesselationWrapper::setState (bool state){ mma.setState(state ? 2 : 1);}
 
+void TesselationWrapper::loadState (string filename, bool stateNumber, bool bz2){
+	CGT::TriaxialState& TS = stateNumber? *(mma.analyser->TS1) :*( mma.analyser->TS0);
+	TS.from_file(filename.c_str(),bz2);
+}
+
+void TesselationWrapper::saveState (string filename, bool stateNumber, bool bz2){
+	CGT::TriaxialState& TS = stateNumber? *(mma.analyser->TS1) :*( mma.analyser->TS0);
+	TS.to_file(filename.c_str(),bz2);
+}
+
+void TesselationWrapper::defToVtkWithInput (string inputFile1, string inputFile2, string outputFile, bool bz2){
+	mma.analyser->DefToFile(inputFile1.c_str(),inputFile2.c_str(),outputFile.c_str(),bz2);
+}
+
+void TesselationWrapper::defToVtk (string outputFile){
+	mma.analyser->DefToFile(outputFile.c_str());
+}
+
 python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 {
 		Scene* scene=Omega::instance().getScene().get();
 		delete Tes;
 		CGT::TriaxialState* ts;
 		if (deformation){//use the final state to compute volumes
-			mma.analyser->ComputeParticlesDeformation();
+			const vector<CGT::Tenseur3>& def = mma.analyser->ComputeParticlesDeformation();
 			Tes = &mma.analyser->TS1->tesselation();
 			ts = mma.analyser->TS1;
 			}
@@ -335,7 +345,8 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 		Pmin=ts->box.base; Pmax=ts->box.sommet;
 		//if (!scene->isPeriodic) AddBoundingPlanes();
 		ComputeVolumes();
-		int bodiesDim = scene->bodies->size();
+		int bodiesDim = Tes->Max_id() + 1; //=scene->bodies->size();
+		cerr<<"bodiesDim="<<bodiesDim<<endl;
 		int dim1[]={bodiesDim};
 		int dim2[]={bodiesDim,9};
 		/// This is the code that needs numpy include
