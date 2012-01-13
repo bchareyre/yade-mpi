@@ -318,6 +318,7 @@ void TesselationWrapper::defToVtkFromPositions (string inputFile1, string inputF
 	size_t imax=sp1.pack.size();
 	if (imax!=sp2.pack.size()) LOG_ERROR("The files have different numbers of spheres");
 	shared_ptr<Body> body;
+	scene->bodies->clear();
 	for(size_t i=0; i<imax; i++){
 		const SpherePack::Sph& sp(sp1.pack[i]);
 		LOG_DEBUG("sphere (" << sp.c << " " << sp.r << ")");
