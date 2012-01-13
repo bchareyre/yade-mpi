@@ -129,7 +129,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			Real rad = s->radius;
 
 			TS.grains[Idg].sphere = CGT::Sphere(CGT::Point(pos[0],pos[1],pos[2]),rad);
-//    TS.grains[Idg].translation = trans;
+			//    TS.grains[Idg].translation = trans;
 			AngleAxisr aa((*bi)->state->ori);
 			Vector3r rotVec=aa.axis()*aa.angle();
 			TS.grains[Idg].rotation = CGT::Vecteur(rotVec[0],rotVec[1],rotVec[2]);
@@ -218,7 +218,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 		TS.prof = triaxialCompressionEngine->depth;//find_parameter("prof=", Statefile);
 		TS.porom = 0/*analyser->ComputeMacroPorosity() crasher?*/;//find_parameter("porom=", Statefile);
 		TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
-	}
+	} else TS.wszzh=TS.wsxxd=TS.wsyyfa=TS.eps3=TS.eps1=TS.eps2=TS.haut=TS.larg=TS.prof=TS.porom=TS.ratio_f=0;
 	if (filename!=NULL) TS.to_file(filename);
 	return TS;
 }

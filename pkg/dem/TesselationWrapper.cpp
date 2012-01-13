@@ -13,7 +13,8 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
-#include <yade/lib/triangulation/Timer.h>
+#include<yade/lib/triangulation/Timer.h>
+#include<yade/pkg/dem/SpherePack.hpp>
 
 YADE_PLUGIN((TesselationWrapper));
 CREATE_LOGGER(TesselationWrapper);
@@ -296,8 +297,43 @@ void TesselationWrapper::saveState (string filename, bool stateNumber, bool bz2)
 	TS.to_file(filename.c_str(),bz2);
 }
 
-void TesselationWrapper::defToVtkWithInput (string inputFile1, string inputFile2, string outputFile, bool bz2){
+void TesselationWrapper::defToVtkFromStates (string inputFile1, string inputFile2, string outputFile, bool bz2){
 	mma.analyser->DefToFile(inputFile1.c_str(),inputFile2.c_str(),outputFile.c_str(),bz2);
+}
+
+void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
+{
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
+	shared_ptr<Sphere> iSphere(new Sphere);
+	body->state->blockedDOFs=State::DOF_NONE;
+	body->state->pos=position;
+	iSphere->radius		= radius;
+	body->shape	= iSphere;
+}
+
+void TesselationWrapper::defToVtkFromPositions (string inputFile1, string inputFile2, string outputFile, bool bz2){
+	SpherePack sp1, sp2;
+	sp1.fromFile(inputFile1);
+	sp2.fromFile(inputFile2);
+	size_t imax=sp1.pack.size();
+	if (imax!=sp2.pack.size()) LOG_ERROR("The files have different numbers of spheres");
+	shared_ptr<Body> body;
+	for(size_t i=0; i<imax; i++){
+		const SpherePack::Sph& sp(sp1.pack[i]);
+		LOG_DEBUG("sphere (" << sp.c << " " << sp.r << ")");
+		createSphere(body,sp.c,sp.r,false,true);
+		scene->bodies->insert(body);
+	}
+	mma.setState(1);
+	scene->bodies->clear();
+	for(size_t i=0; i<imax; i++){
+		const SpherePack::Sph& sp(sp2.pack[i]);
+		LOG_DEBUG("sphere (" << sp.c << " " << sp.r << ")");
+		createSphere(body,sp.c,sp.r,false,true);
+		scene->bodies->insert(body);
+	}
+	mma.setState(2);	
+	mma.analyser->DefToFile(outputFile.c_str());
 }
 
 void TesselationWrapper::defToVtk (string outputFile){

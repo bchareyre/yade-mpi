@@ -85,7 +85,8 @@ public:
 	void loadState (string fileName, bool stateNumber=0, bool bz2=false);
 	void saveState (string fileName, bool stateNumber=0, bool bz2=false);
 	/// read two state files and write per-particle deformation to a vtk file. The second variant uses existing states.
- 	void defToVtkWithInput (string inputFile1, string inputFile2, string outputFile="def.vtk", bool bz2=false);
+ 	void defToVtkFromStates (string inputFile1, string inputFile2, string outputFile="def.vtk", bool bz2=false);
+	void defToVtkFromPositions (string inputFile1, string inputFile2, string outputFile="def.vtk", bool bz2=false);
 	void defToVtk (string outputFile="def.vtk");
 
 	/// return python array containing voronoi volumes, per-particle porosity, and optionaly per-particle deformation, if states 0 and 1 have been assigned
@@ -111,12 +112,13 @@ public:
 	mma.analyser->SetConsecutive(false);
 	,/*py*/
 	.def("triangulate",&TesselationWrapper::insertSceneSpheres,(python::arg("reset")=true),"triangulate spheres of the packing")
- 	.def("setState",&TesselationWrapper::setState,(python::arg("state")=0),"Make the current state the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get only volmumes and porosity.")
+ 	.def("setState",&TesselationWrapper::setState,(python::arg("state")=0),"Make the current state of the simulation the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get  volmumes and porosity.")
  	.def("loadState",&TesselationWrapper::loadState,(python::arg("stateNumber")=0),"Load a file with positions to define state 0 or 1.")
  	.def("saveState",&TesselationWrapper::saveState,(python::arg("outputFile")="state",python::arg("bz2")=true),"Save a file with positions, can be later reloaded in order to define state 0 or 1.")
  	.def("volume",&TesselationWrapper::Volume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
  	.def("defToVtk",&TesselationWrapper::defToVtk,(python::arg("outputFile")="def.vtk"),"Write local deformations in vtk format from states 0 and 1.")
- 	.def("defToVtkWithInput",&TesselationWrapper::defToVtkWithInput,(python::arg("input1")="state1",python::arg("input2")="state2",python::arg("outputFile")="def.vtk",python::arg("bz2")=false),"Write local deformations in vtk format from position input files.")
+ 	.def("defToVtkFromStates",&TesselationWrapper::defToVtkFromStates,(python::arg("input1")="state1",python::arg("input2")="state2",python::arg("outputFile")="def.vtk",python::arg("bz2")=false),"Write local deformations in vtk format from state files (since the file format is very special, consider using defToVtkFromPositions instead).")
+ 	.def("defToVtkFromPositions",&TesselationWrapper::defToVtkFromPositions,(python::arg("input1")="pos1",python::arg("input2")="pos2",python::arg("outputFile")="def.vtk",python::arg("bz2")=false),"Write local deformations in vtk format from state files (since the file format is very special, consider using defToVtkFromPositions instead).")
  	.def("computeVolumes",&TesselationWrapper::ComputeVolumes,"Compute volumes of all Voronoi's cells.")
 	.def("getVolPoroDef",&TesselationWrapper::getVolPoroDef,(python::arg("deformation")=false),"Return a table with per-sphere computed quantities. Include deformations on the increment defined by states 0 and 1 if deformation=True (make sure to define states 0 and 1 consistently).")
 	);
