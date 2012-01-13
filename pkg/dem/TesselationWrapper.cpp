@@ -117,12 +117,6 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	//cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
 }
 
-/*double pminx=0;
-double pminy=0;
-double pminz=0;
-double pmaxx=0;
-double pmaxy=0;
-double pmaxz=0;*/
 double thickness = 0;
 
 TesselationWrapper::~TesselationWrapper() { if (Tes) delete Tes;}
@@ -167,12 +161,7 @@ double TesselationWrapper::Volume(unsigned int id) {return (Tes->Max_id() > id) 
 bool TesselationWrapper::insert(double x, double y, double z, double rad, unsigned int id)
 {
 	using namespace std;
-	Pmin = CGT::Point(min(Pmin.x(), x-rad),
-					  min(Pmin.y(), y-rad),
-					  min(Pmin.z(), z-rad));
-	Pmax = CGT::Point(max(Pmax.x(), x+rad),
-					  max(Pmax.y(), y+rad),
-					  max(Pmax.z(), z+rad));
+	checkMinMax(x,y,z,rad);
 	mean_radius += rad;
 	++n_spheres;
 	return (Tes->insert(x,y,z,rad,id)!=NULL);
@@ -181,29 +170,15 @@ bool TesselationWrapper::insert(double x, double y, double z, double rad, unsign
 void TesselationWrapper::checkMinMax(double x, double y, double z, double rad)
 {
 	using namespace std;
-	Pmin = CGT::Point(min(Pmin.x(), x-rad),
-					  min(Pmin.y(), y-rad),
-					  min(Pmin.z(), z-rad));
-	Pmax = CGT::Point(max(Pmax.x(), x+rad),
-					  max(Pmax.y(), y+rad),
-					  max(Pmax.z(), z+rad));
-	mean_radius += rad;
-	++n_spheres;
+	Pmin = CGT::Point(min(Pmin.x(), x-rad), min(Pmin.y(), y-rad),  min(Pmin.z(), z-rad));
+	Pmax = CGT::Point(max(Pmax.x(), x+rad),  max(Pmax.y(), y+rad),  max(Pmax.z(), z+rad));
 }
 
 
 bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned int id)
 {
 	using namespace std;
-
-	Pmin = CGT::Point(min(Pmin.x(), x-rad),
-					  min(Pmin.y(), y-rad),
-					  min(Pmin.z(), z-rad));
-	Pmax = CGT::Point(max(Pmax.x(), x+rad),
-					  max(Pmax.y(), y+rad),
-					  max(Pmax.z(), z+rad));
-	mean_radius += rad;
-
+	checkMinMax(x,y,z,rad);
 	if (Tes->move(x,y,z,rad,id)!=NULL)
 		return true;
 	else {

@@ -113,7 +113,7 @@ class KinematicLocalisationAnalyser
 		Real v_solid_total;//solid volume in the box
 		Real v_total;//volume of the box
 		Real v_total_g;//summed volumes of extended grain cells
-		long n_persistent, n_new, n_lost, n_real_cells, n_real_vertices;
+		long n_persistent, n_new, n_lost, n_real_cells, n_real_vertices, n_fictious_vertices;
 
 
 

@@ -108,6 +108,7 @@ public:
 	facet_end = Tes->Triangulation().finite_edges_end();
 	facet_it = Tes->Triangulation().finite_edges_begin();
 	inf=1e10;
+	mma.analyser->SetConsecutive(false);
 	,/*py*/
 	.def("triangulate",&TesselationWrapper::insertSceneSpheres,(python::arg("reset")=true),"triangulate spheres of the packing")
  	.def("setState",&TesselationWrapper::setState,(python::arg("state")=0),"Make the current state the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get only volmumes and porosity.")

@@ -23,7 +23,6 @@ namespace CGT
 {
 
 int n_debug = 0;
-//Usefull fonction to convert int to string (define it elsewhere)
 std::string _itoa(int i)
 {
 	std::ostringstream buffer;
@@ -95,23 +94,17 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_na
 	file_number_1 = n1;
 	file_number_0 = n0;
 	base_file_name = string(base_name);
-
 	consecutive = ((n1-n0)==1);
 	bz2 = usebz2;
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
 	TS1 = new(TriaxialState);
 	TS0 = new(TriaxialState);
-
-// char buffer [50];
 	std::ostringstream file_name1, file_name0;
 	file_name1 << (string)(base_file_name) << n1;
 	file_name0 << (string)(base_file_name) << n0;
-	//cout << "file names : " << file_name0.str().c_str() << ", " << file_name1.str().c_str() << endl;
-	
 	TS1->from_file(file_name1.str().c_str(), bz2);
 	TS0->from_file(file_name0.str().c_str(), bz2);
-
 	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
@@ -122,14 +115,10 @@ void KinematicLocalisationAnalyser::SetBaseFileName(string name)
 	base_file_name = name;
 }
 
-
 bool KinematicLocalisationAnalyser::SetFileNumbers(int n0, int n1)
 {
-	//TriaxialState* TS3;
-	//string file_name;
 	bool bf0 = false;
 	bool bf1 = false;
-// char buffer [50];
 	if (file_number_0 != n0) {
 		if (file_number_1 != n0) {
 			//file_name = base_file_name + n0;
@@ -155,7 +144,6 @@ bool KinematicLocalisationAnalyser::SetFileNumbers(int n0, int n1)
 	return (bf0 && bf1);
 }
 
-
 void KinematicLocalisationAnalyser::SetConsecutive(bool t)
 {
 	consecutive = t;
@@ -166,7 +154,6 @@ void KinematicLocalisationAnalyser::SetNO_ZERO_ID(bool t)
 	TS0->NO_ZERO_ID = t;
 	TS1->NO_ZERO_ID = t;
 }
-
 
 void KinematicLocalisationAnalyser::SwitchStates(void)
 {
@@ -213,22 +200,22 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 
 	vtk.begin_vertices();
 	RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin();
+	bool beginWithFictious = V_it->info().isFictious;
 	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) if (!V_it->info().isFictious) vtk.file <<  V_it->point().point() << endl;
 	vtk.end_vertices();
 
 	vtk.begin_cells();
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
-	//FIXME : Preconditions : scene has 6 boxes with ids 0-5, and bodies are listed in ascending ids order
+	//FIXME : Preconditions : the fictious bounds are first in the list
 	for (; cell != Tri.finite_cells_end(); ++cell) {
 		if (!cell->info().isFictious) vtk.write_cell(
-			cell->vertex(0)->info().id()-6,
-			cell->vertex(1)->info().id()-6,
-			cell->vertex(2)->info().id()-6,
-			cell->vertex(3)->info().id()-6
+			cell->vertex(0)->info().id()- (beginWithFictious?n_fictious_vertices:0),
+			cell->vertex(1)->info().id()- (beginWithFictious?n_fictious_vertices:0),
+			cell->vertex(2)->info().id()- (beginWithFictious?n_fictious_vertices:0),
+			cell->vertex(3)->info().id()- (beginWithFictious?n_fictious_vertices:0)
 		);
 	}
 	vtk.end_cells();
-
 	vtk.begin_data("Strain_matrix", POINT_DATA, TENSORS, FLOAT);
 	V_it = Tri.finite_vertices_begin();
 	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) {
@@ -237,7 +224,6 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 			vtk.file << ParticleDeformation[V_it->info().id()] << endl;}
 	}
 	vtk.end_data();
-
 	vtk.begin_data("Strain_deviator", POINT_DATA, SCALARS, FLOAT);
 	V_it = Tri.finite_vertices_begin();
 	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) {
@@ -248,44 +234,7 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 			//vtk.write_data((float) epsilon.Deviatoric()(1,1)-epsilon.Deviatoric()(0,0));}
 	}
 	vtk.end_data();
-
 	return true;
-
-	/*
-	ofstream output_file(output_file_name);
-	if (!output_file.is_open()) {
-	 cerr << "Error opening files";
-	 return false;
-	}
-	ComputeParticlesDeformation();
-
-	Tesselation& Tes = TS1->tesselation();
-	RTriangulation& Tri = Tes.Triangulation();
-
-	output_file << Tri.number_of_vertices()<<endl;
-	for (RTriangulation::Finite_vertices_iterator  V_it =
-	   Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++)
-	 output_file<<V_it->info().id()<<" "<<V_it->point()<<endl;
-
-	output_file << Tri.number_of_finite_cells()<<endl;
-	Finite_cells_iterator cell = Tri.finite_cells_begin();
-	Finite_cells_iterator cell0 = Tri.finite_cells_end();
-	for (; cell != cell0; cell++) {
-	 for (unsigned int index=0; index<4; index++) output_file << cell->vertex(index)->info().id()<<" " ;
-	 output_file<<endl;
-	}
-
-	for (RTriangulation::Finite_vertices_iterator  V_it =
-	   Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
-	 Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie symetrique
-	 double dev = (double) epsilon.Deviatoric().Norme();
-	 output_file<<V_it->info().id()<<endl<<ParticleDeformation[V_it->info().id()]<<dev<<endl;
-
-	}
-	*/
-	return 1;
-
-
 }
 
 bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
@@ -293,8 +242,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 	ofstream output_file(output_file_name);
 	if (!output_file.is_open()) {
 		cerr << "Error opening files";
-		return false;
-	}
+		return false;}
 
 	output_file << "sym_grad_u_total_g (wrong averaged strain):"<< endl << Tenseur_sym3(grad_u_total_g) << endl;
 	output_file << "Total volume = " << v_total << ", grad_u = " << endl << grad_u_total << endl << "sym_grad_u (true average strain): " << endl << Tenseur_sym3(grad_u_total) << endl;
@@ -354,8 +302,6 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 		}
 	}
 	NormalDisplacementDistributionToFile(edges, output_file);
-
-
 	output_file.close();
 	return true;
 }
@@ -368,8 +314,7 @@ long KinematicLocalisationAnalyser::Filtered_contacts(TriaxialState& state)
 		if (state.inside((*cit)->grain1->sphere.point()) && state.inside((*cit)->grain2->sphere.point()))
 			nc1 += 2;
 		else if (state.inside((*cit)->grain1->sphere.point()) || state.inside((*cit)->grain2->sphere.point()))
-			++nc1;
-	}
+			++nc1;}
 	return nc1;
 }
 
@@ -465,8 +410,7 @@ Tenseur_sym3 KinematicLocalisationAnalyser::Contact_fabric(TriaxialState&
 				   state.inside((*cit)->grain2->sphere.point())) {
 			v = (*cit)->normal;
 			for (int i=1; i<4; i++) for (int j=3; j>=i; j--)
-					Tens(i,j) += v[i-1]*v[j-1];
-		}
+					Tens(i,j) += v[i-1]*v[j-1];}
 	}
 	Tens /= Filtered_contacts(state);
 	return Tens;
@@ -566,7 +510,6 @@ NormalDisplacementDistributionToFile(vector<Edge_iterator>& edges, ofstream& out
 	}
 	output_file << endl;
 	return output_file;
-
 }
 
 ofstream& KinematicLocalisationAnalyser::
@@ -624,11 +567,9 @@ ContactDistributionToFile(ofstream& output_file)
 		output_file << row[i].first << " " << row[i].second << endl;
 		cerr << row[i].first << " " << row[i].second << endl;
 	}
-
 	output_file << endl;
 	return output_file;
 }
-
 
 
 ofstream& KinematicLocalisationAnalyser::
@@ -689,7 +630,6 @@ AllNeighborDistributionToFile(ofstream& output_file)
 		output_file << row[i].first << " " << row[i].second << endl;
 		cerr << row[i].first << " " << row[i].second << endl;
 	}
-
 	output_file << endl;
 	return output_file;
 }
@@ -703,12 +643,6 @@ SetForceIncrements(void)    //WARNING : This function will modify the contact li
 //  Real DZ = 1.0/sphere_discretisation;
 	long Nc0 = TS0->contacts.size();
 	long Nc1 = TS1->contacts.size();
-
-//  long nv1=0;
-//  long nv2=0;
-//  long nv3=0;
-//  long ng1=0;
-//  long ng2=0;
 	n_persistent = 0; n_new = 0; n_lost = 0;
 	long lost_in_state0 = 0;
 
@@ -766,56 +700,7 @@ SetForceIncrements(void)    //WARNING : This function will modify the contact li
 			++n_new;
 		}
 	}
-	/*
-	RGrid1D table;
-
-	for ( Edge_iterator ed_it = T.edges_begin(); ed_it != T.edges_end(); ed_it++ )
-	{
-	 if ( !T.is_infinite ( *ed_it ) )
-	 {
-	  s = T.segment ( *ed_it );
-	  if ( ( *TS1 ).inside ( s.source() ) && ( *TS1 ).inside ( s.target() ) )
-	  {
-	   v = s.to_vector();
-	   row[ ( int ) ( abs ( v.z() /sqrt ( s.squared_length() ) ) /DZ ) ].second += 2;
-	   nv1 += 2;
-	  }
-	  else
-	  {
-	   if ( ( *TS1 ).inside ( s.source() ) || ( *TS1 ).inside ( s.target() ) )
-	   {
-	    v = s.to_vector();
-	    row[ ( int ) ( abs ( v.z() /sqrt ( s.squared_length() ) ) /DZ ) ].second += 1;
-	    ++nv1;
-	   }
-	   else ++nv2;
-	  }
-	 }
-	 else ++nv3;
-	}
-
-	Real normalize = 1.0/ ( ng1*4*DZ*3.141592653 );
-	for ( int i = 0; i < sphere_discretisation; ++i ) row[i].second *= normalize;
-
-	output_file << "#Neighbors distribution" << endl << "(filter dist. = " << ( *TS1 ).filter_distance
-	  << ", "<< nv1 << " neighbors + " << nv2 << " excluded + "
-	  << nv3 << " infinite, for "<< ng1 <<"/"<< ( ng1+ng2 ) << " grains)" << endl;
-	output_file << "max_nz number_of_neighbors" << endl;
-	cerr << "#Neighbors distribution" << endl << "(filter dist. = " << ( *TS1 ).filter_distance
-	  << ", "<< nv1 << " neighbors + " << nv2 << " excluded + "
-	  << nv3 << " infinite, for "<< ng1 <<"/"<< ( ng1+ng2 ) << " grains)" << endl;
-	cerr << "mean_nz number_of_neighbors" << endl;
-	for ( int i = 0; i < sphere_discretisation; ++i )
-	{
-	 output_file << row[i].first << " " << row[i].second << endl;
-	 cerr << row[i].first << " " << row[i].second << endl;
-	}
-
-	output_file << endl;
-	return output_file;*/
 }
-
-
 
 void KinematicLocalisationAnalyser::SetDisplacementIncrements(void)
 {
@@ -835,7 +720,6 @@ Vecteur KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, i
 {
 	Vecteur v(0.f, 0.f, 0.f);
 	int id;// ident. de la particule
-
 	Vecteur fixedPoint = 0.5*((TS0->box.base-CGAL::ORIGIN)+(TS0->box.sommet-CGAL::ORIGIN));
 	for (int i=0; i<4; i++) {
 		//  char msg [256];
@@ -848,23 +732,13 @@ Vecteur KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, i
 				meanFieldDisp[1]*Delta_epsilon(1,1),
 				meanFieldDisp[2]*Delta_epsilon(2,2));
 			} else meanFieldDisp=Vecteur(0,0,0);
-			if (consecutive)
-				v = v + TS1->grain(id).translation-meanFieldDisp;
-			else  {
-				v = v + (TS1->grain(id).sphere.point() - TS0->grain(id).sphere.point()-meanFieldDisp);
-				
-			}
-
-			//for tests with affine displacement field
-			//if ((TS1->grain(id).sphere.point().y()+TS1->grain(id).sphere.point().z())>0.035)//a discontinuity
-			//v = v + Vecteur(0, 0.01*TS1->grain(id).sphere.point().x(), 0);
+			if (consecutive) v = v + TS1->grain(id).translation-meanFieldDisp;
+			else  v = v + (TS1->grain(id).sphere.point() - TS0->grain(id).sphere.point()-meanFieldDisp);
 		}
 	}
-	v = v*0.333333333333333333333333;
+	v = v*0.333333333333;
 	return v;
 }
-
-
 
 void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet, Vecteur &V, Tenseur3& T)
 {
@@ -875,10 +749,9 @@ void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet
 	Somme(T, V, S);
 }
 
-
 void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell,
 		Tenseur3& T, bool vol_divide)// Calcule le gradient de d�p.
-{	
+{
 	T.reset();
 	Vecteur v;
 	for (int facet=0; facet<4; facet++) {
@@ -910,12 +783,12 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 		ParticleDeformation.resize(Tes.Max_id() + 1);
 	}
 	//reset volumes and tensors of each particle
-	n_real_vertices = 0;
+	n_real_vertices = 0; n_fictious_vertices=0;
 	for (RTriangulation::Finite_vertices_iterator  V_it=Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
 		//cerr << V_it->info().id() << endl;
 		V_it->info().v() =0;//WARNING : this will erase previous values if some have been computed
 		ParticleDeformation[V_it->info().id()]=NULL_TENSEUR3;
-		if (!V_it->info().isFictious) ++n_real_vertices;
+		if (!V_it->info().isFictious) ++n_real_vertices; else ++n_fictious_vertices;
 	}
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
 	Finite_cells_iterator cell0 = Tri.finite_cells_end();

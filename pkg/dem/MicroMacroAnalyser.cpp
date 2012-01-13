@@ -113,11 +113,14 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	BodyContainer::iterator bi = biBegin;
 	Ng = 0;
 	vector<Body::id_t> fictiousVtx;
+	bool fictiousFirst=false;
 	for (; bi!=biEnd ; ++bi) {
 		const Body::id_t Idg = (*bi)->getId();
 		TS.grains[Idg].id = Idg;
 		if (!(*bi)->isDynamic()) {
-			TS.grains[Idg].isSphere = false; fictiousVtx.push_back(Idg);}
+			if (!nonSphereAsFictious) continue;
+			TS.grains[Idg].isSphere = false; fictiousVtx.push_back(Idg);
+			if (bi==biBegin) fictiousFirst=true;}
 		else {//then it is a sphere (not a wall)
 			++Ng;
 			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
@@ -141,9 +144,11 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	}
 	TS.mean_radius /= Ng;//rayon moyen
 	LOG_INFO(" loaded : " << Ng << " grains with mean radius = " << TS.mean_radius);
-	if (fictiousVtx.size()>=6){//boxes found, simulate them with big spheres
+	Real FAR = 1e4;
+	if (fictiousVtx.size()==0) {
+		TS.grains.resize(Ng+6); for (int fv=Ng;fv<Ng+6;fv++) {fictiousVtx.push_back(fv); TS.grains[fv].id = fv; TS.grains[fv].isSphere = false;}}
+	if (fictiousVtx.size()==6){ 
 		CGT::Point& Pmin = TS.box.base; CGT::Point& Pmax = TS.box.sommet;
-		Real FAR = 1e4;
 		TS.grains[fictiousVtx[0]].sphere = CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.x()-Pmin.x()));
 		TS.grains[fictiousVtx[1]].sphere = CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.x()-Pmin.x()));
 		TS.grains[fictiousVtx[2]].sphere =
@@ -154,7 +159,8 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 		CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y())),FAR*(Pmax.y()-Pmin.y()));
 		TS.grains[fictiousVtx[5]].sphere =
 		CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y())),FAR*(Pmax.y()-Pmin.y()));
-	}
+	} else LOG_INFO(" the number of fictious vertices should be 0 or 6 usually");
+	
 	InteractionContainer::iterator ii    = scene->interactions->begin();
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
 	for (; ii!=iiEnd ; ++ii) {
@@ -198,7 +204,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 				LOG_DEBUG("stress controller engine found");
 				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}
 		}
-		if (!triaxialCompressionEngine) LOG_ERROR("stress controller engine not found");}
+		if (!triaxialCompressionEngine) LOG_INFO("stress controller engine not found");}
 
 	if (triaxialCompressionEngine) {
 		TS.wszzh = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];

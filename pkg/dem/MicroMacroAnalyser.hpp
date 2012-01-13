@@ -53,6 +53,7 @@ class MicroMacroAnalyser : public GlobalEngine
 		((int,interval,100,,"Number of timesteps between analyzed states."))
 		((bool,compDeformation,false,,"Is the engine just saving states or also computing and outputing deformations for each increment?"))
 		((bool,compIncrt,false,,"Should increments of force and displacements be defined on [n,n+1]? If not, states will be saved with only positions and forces (no displacements)."))
+		((bool,nonSphereAsFictious,true,,"bodies that are not spheres will be used to defines bounds (else just skipped)."))
 		,/*init*/
   		,/*ctor*/
 		analyser = shared_ptr<CGT::KinematicLocalisationAnalyser> (new CGT::KinematicLocalisationAnalyser);
