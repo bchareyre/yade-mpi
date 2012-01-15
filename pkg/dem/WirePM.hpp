@@ -1,4 +1,10 @@
-/* Klaus Thoeni 2010 */
+/*************************************************************************
+*  Copyright (C) 2010 by Klaus Thoeni                                    *
+*  klaus.thoeni@newcastle.edu.au                                         *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 /**
 === OVERVIEW OF WirePM ===
@@ -21,7 +27,7 @@ Remarks:
 
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
 
 /** This class holds information associated with each body state*/
@@ -41,7 +47,6 @@ class WireMat: public FrictMat {
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new WireState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<WireState*>(s); }
 		void postLoad(WireMat&);
-	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,FrictMat,"Material for use with the Wire classes",
 		((Real,diameter,0.0027,,"Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
 		((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
@@ -52,30 +57,31 @@ class WireMat: public FrictMat {
 		,
 		createIndex();
 	);
+	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(WireMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(WireMat);
 
 /** This class holds information associated with each interaction */
-// NOTE: even if WirePhys has no shear force it is derived from NormShearPhys since all implemented functions work properly for NormShearPhys only
-class WirePhys: public NormShearPhys {
+// NOTE: even if WirePhys has no shear force it is derived from FrictPhys since all implemented functions (e.g. unbalancedForce) work properly for FrictPhys only
+class WirePhys: public FrictPhys {
 	public:
 		virtual ~WirePhys();
 	
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(WirePhys,NormShearPhys,"Representation of a single interaction of the WirePM type, storage for relevant parameters",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(WirePhys,FrictPhys,"Representation of a single interaction of the WirePM type, storage for relevant parameters",
 			((Real,initD,0,,"Equilibrium distance for particles. Computed as the initial inter-particular distance when particle are linked."))
 			((bool,isLinked,false,,"If true particles are linked and will interact. Interactions are linked automatically by the definition of the corresponding interaction radius. The value is false if the wire breaks (no more interaction)."))
 			((bool,isDoubleTwist,false,,"If true the properties of the interaction will be defined as a double-twisted wire."))
 			((vector<Vector2r>,displForceValues,,Attr::readonly,"Defines the values for force-displacement curve."))
 			((vector<Real>,stiffnessValues,,Attr::readonly,"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
 			((Real,plastD,0,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero (see [Bertrand2005]_).\n\n.."))
-			((Real,limitNormalFactor,0.,,"This value indicates on how far from failing the wire is, e.g. actual normal displacement divided by admissible normal displacement multiplied by actual normal force divided by admissible normal force."))
+			((Real,limitFactor,0.,Attr::readonly,"This value indicates on how far from failing the wire is, e.g. actual normal displacement divided by admissible normal displacement multiplied by actual normal force divided by admissible normal force."))
 			,
 			createIndex();
 			,
 		);
 	DECLARE_LOGGER;
-	REGISTER_CLASS_INDEX(WirePhys,NormShearPhys);
+	REGISTER_CLASS_INDEX(WirePhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(WirePhys);
 
@@ -85,11 +91,11 @@ class Ip2_WireMat_WireMat_WirePhys: public IPhysFunctor{
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		
 		FUNCTOR2D(WireMat,WireMat);
-		DECLARE_LOGGER;
 		
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_WireMat_WireMat_WirePhys,IPhysFunctor,"Converts 2 :yref:`WireMat` instances to :yref:`WirePhys` with corresponding parameters.",
 			((int,linkThresholdIteration,1,,"Iteration to create the link."))
 		);
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_WireMat_WireMat_WirePhys);
 

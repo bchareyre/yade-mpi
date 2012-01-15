@@ -182,9 +182,12 @@ void VTKRecorder::action(){
 	rpmSpecDiam->SetName("rpmSpecDiam");
 	
 	// extras for WireMatPM
-	vtkSmartPointer<vtkFloatArray> wpmLimitNormalFactor = vtkSmartPointer<vtkFloatArray>::New();
-	wpmLimitNormalFactor->SetNumberOfComponents(1);
-	wpmLimitNormalFactor->SetName("wpmLimitNormalFactor");
+	vtkSmartPointer<vtkFloatArray> wpmNormalForce = vtkSmartPointer<vtkFloatArray>::New();
+	wpmNormalForce->SetNumberOfComponents(1);
+	wpmNormalForce->SetName("wpmNormalForce");
+	vtkSmartPointer<vtkFloatArray> wpmLimitFactor = vtkSmartPointer<vtkFloatArray>::New();
+	wpmLimitFactor->SetNumberOfComponents(1);
+	wpmLimitFactor->SetName("wpmLimitFactor");
 
 	if(recActive[REC_INTR]){
 		// holds information about cell distance between spatial and displayed position of each particle
@@ -249,11 +252,22 @@ void VTKRecorder::action(){
 			float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
 			// add the value once for each interaction object that we created (might be 2 for the periodic boundary)
 			for(int i=0; i<numAddValues; i++){
-				intrForceN->InsertNextValue(fn);
 				intrAbsForceT->InsertNextTupleValue(fs);
 				if(recActive[REC_WPM]) {
-					const WirePhys* wirephys = YADE_CAST<WirePhys*>(I->phys.get());
-					wpmLimitNormalFactor->InsertNextValue(wirephys->limitNormalFactor);
+					const WirePhys* wirephys = dynamic_cast<WirePhys*>(I->phys.get());
+					if (wirephys!=NULL && wirephys->isLinked) {
+						wpmLimitFactor->InsertNextValue(wirephys->limitFactor);
+						wpmNormalForce->InsertNextValue(fn);
+						intrForceN->InsertNextValue(NaN);
+					}
+					else {
+						intrForceN->InsertNextValue(fn);
+						wpmNormalForce->InsertNextValue(NaN);
+						wpmLimitFactor->InsertNextValue(NaN);
+					}
+				}
+				else {
+					intrForceN->InsertNextValue(fn);
 				}
 			}
 		}
@@ -433,7 +447,8 @@ void VTKRecorder::action(){
 		intrPd->GetCellData()->AddArray(intrForceN);
 		intrPd->GetCellData()->AddArray(intrAbsForceT);
 		if (recActive[REC_WPM]){
-			intrPd->GetCellData()->AddArray(wpmLimitNormalFactor);
+			intrPd->GetCellData()->AddArray(wpmNormalForce);
+			intrPd->GetCellData()->AddArray(wpmLimitFactor);
 		}
 		#ifdef YADE_VTK_MULTIBLOCK
 			if(!multiblock)

@@ -1,4 +1,10 @@
-/* Klaus Thoeni 2010 */
+/*************************************************************************
+*  Copyright (C) 2010 by Klaus Thoeni                                    *
+*  klaus.thoeni@newcastle.edu.au                                         *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
 #include"WirePM.hpp"
 #include<yade/core/Scene.hpp>
@@ -15,14 +21,15 @@ void WireMat::postLoad(WireMat&){
 
 	//BUG: ????? postLoad is called twice,
 	LOG_TRACE( "WireMat::postLoad - update material parameters" );
+	
+	// compute cross-section area
+	as = pow(diameter*0.5,2)*Mathr::PI;
 
 	if(strainStressValues.empty()) return; // uninitialized object, don't do nothing at all
 	if(strainStressValues.size() < 2)
 		throw invalid_argument("WireMat.strainStressValues: at least two points must be given.");
 	if(strainStressValues[0](0) == 0. && strainStressValues[0](1) == 0.)
 		throw invalid_argument("WireMat.strainStressValues: Definition must start with values greather then zero (strain>0,stress>0)");
-	// compute cross-section area
-	as = pow(diameter*0.5,2)*Mathr::PI;
 
 }
 
@@ -43,7 +50,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	
 	Real displN = geom->penetrationDepth; // NOTE: ScGeom -> penetrationDepth>0 when spheres interpenetrate, and therefore, for wire always negative
 
-	/* get reference to values since values are updated for unloading */
+	/* get reference to values since values are updated/changed in order to take unloading into account */
 	vector<Vector2r> &DFValues = phys->displForceValues;
 	vector<Real> &kValues = phys->stiffnessValues;
 
@@ -93,10 +100,9 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	phys->normalForce = Fn*geom->normal; // NOTE: normal is position2-position1 - It is directed from particle1 to particle2
 
 	/* compute a limit value to check how far the interaction is from failing */
-	Real limitNormalFactor = 0.;
-	if (Fn < 0.) limitNormalFactor = fabs(D/(DFValues.back()(0)));
-	limitNormalFactor *= fabs(Fn/(DFValues.back()(1)));
-	phys->limitNormalFactor = limitNormalFactor;
+	Real limitFactor = 0.;
+	if (Fn < 0.) limitFactor = fabs(D/(DFValues.back()(0)));
+	phys->limitFactor = limitFactor;
 
 	State* st1 = Body::byId(id1,scene)->state.get();
 	State* st2 = Body::byId(id2,scene)->state.get();
@@ -116,6 +122,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 
 }
 
+/********************** Ip2_WireMat_WireMat_WirePhys ****************************/
 CREATE_LOGGER(Ip2_WireMat_WireMat_WirePhys);
 
 void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
