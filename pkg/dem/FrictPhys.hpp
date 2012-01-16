@@ -13,7 +13,7 @@ class FrictPhys: public NormShearPhys
 {
 	public :
 		virtual ~FrictPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"The simple linear elasto-plastic interaction with friction angle, like in the traditional [CundallStrack1979]_",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"The simple linear elastic-plastic interaction with friction angle, like in the traditional [CundallStrack1979]_",
 		((Real,tangensOfFrictionAngle,NaN,,"tan of angle of friction")),
 		createIndex()
 	);
