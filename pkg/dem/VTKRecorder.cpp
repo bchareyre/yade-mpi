@@ -43,6 +43,7 @@ void VTKRecorder::action(){
 			recActive[REC_VELOCITY]=true;
 			recActive[REC_FACETS]=true;
 			recActive[REC_COLORS]=true;
+			recActive[REC_MASS]=true;
 			recActive[REC_INTR]=true;
 			recActive[REC_ID]=true;
 			recActive[REC_MASK]=true;
@@ -53,6 +54,7 @@ void VTKRecorder::action(){
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="velocity") recActive[REC_VELOCITY]=true;
 		else if(rec=="facets") recActive[REC_FACETS]=true;
+		else if(rec=="mass") recActive[REC_MASS]=true;
 		else if((rec=="colors") || (rec=="color"))recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else if(rec=="rpm") recActive[REC_RPM]=true;
@@ -79,6 +81,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
 	radii->SetNumberOfComponents(1);
 	radii->SetName("radii");
+	
+	vtkSmartPointer<vtkFloatArray> spheresMass = vtkSmartPointer<vtkFloatArray>::New();
+	spheresMass->SetNumberOfComponents(1);
+	spheresMass->SetName("mass");
 	
 	vtkSmartPointer<vtkFloatArray> spheresId = vtkSmartPointer<vtkFloatArray>::New();
 	spheresId->SetNumberOfComponents(1);
@@ -291,6 +297,7 @@ void VTKRecorder::action(){
 				radii->InsertNextValue(sphere->radius);
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(b->groupMask);
+				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
 				if (recActive[REC_CLUMPID]) clumpId->InsertNextValue(b->clumpId);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = sphere->color;
@@ -378,6 +385,7 @@ void VTKRecorder::action(){
 		spheresUg->GetPointData()->AddArray(radii);
 		if (recActive[REC_ID]) spheresUg->GetPointData()->AddArray(spheresId);
 		if (recActive[REC_MASK]) spheresUg->GetPointData()->AddArray(spheresMask);
+		if (recActive[REC_MASS]) spheresUg->GetPointData()->AddArray(spheresMass);
 		if (recActive[REC_CLUMPID]) spheresUg->GetPointData()->AddArray(clumpId);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
 		if (recActive[REC_VELOCITY]){
