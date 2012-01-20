@@ -9,26 +9,30 @@
 #ifndef _FLOWBOUNDINGSPHERE_H
 #define _FLOWBOUNDINGSPHERE_H
 
-#include "Operations.h"
+#include "Network.hpp"
 #include "Timer.h"
-#include "Tesselation.h"
 #include "basicVTKwritter.hpp"
 #include "Timer.h"
-#include "stdafx.h"
-#include "Empilement.h"
-#include "Network.hpp"
 
 #ifdef XVIEW
 #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
 using namespace std;
+namespace CGT {
 
-namespace CGT{
-
-class FlowBoundingSphere : public Network
+template<class Tesselation>
+class FlowBoundingSphere : public Network<Tesselation>
 {
 	public:
+		typedef Network<Tesselation>		_N;
+		DECLARE_TESSELATION_TYPES(Network<Tesselation>)
+		
+		//painfull, but we need that for templates inheritance...
+		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::fictious_vertex;
+		//same for functions
+		using _N::Define_fictious_cells; using _N::AddBoundingPlanes; using _N::boundary;
+		
 		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
 
@@ -108,8 +112,6 @@ class FlowBoundingSphere : public Network
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 
-		void Build_Tessalation ( RTriangulation& Tri );
-
 		bool isInsideSphere ( double& x, double& y, double& z );
 
 		void SliceField (const char *filename);
@@ -133,6 +135,8 @@ class FlowBoundingSphere : public Network
 #include "FlowBoundingSphereLinSolv.hpp"
 #endif
 
+/// _____ Template Implementation ____
+#include "FlowBoundingSphere.ipp"
 
 #endif //FLOW_ENGINE
 

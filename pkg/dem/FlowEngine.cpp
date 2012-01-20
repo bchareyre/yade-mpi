@@ -46,9 +46,9 @@ void FlowEngine::action()
 
 	timingDeltas->start();
 
-	if (first) Build_Triangulation(P_zero);
+	if (first) Build_Triangulation(P_zero,flow);
 	timingDeltas->checkpoint("Triangulating");
-	UpdateVolumes ( );
+	UpdateVolumes (flow);
 	if (!first) {
 // 		eps_vol_max=0.f;//huh? in that case Eps_Vol_Cumulative will always be zero
 		Eps_Vol_Cumulative += eps_vol_max;
@@ -70,10 +70,10 @@ void FlowEngine::action()
 		
 		///Application of vicscous forces
 		scene->forces.sync();
-		if (viscousShear) ApplyViscousForces();
+		if (viscousShear) ApplyViscousForces(flow);
 
-		CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
-		for (CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++)
+		Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
+		for (Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++)
 		{
 			if (!viscousShear)
 				scene->forces.addForce(V_it->info().id(), Vector3r ((V_it->info().forces)[0],V_it->info().forces[1],V_it->info().forces[2]));
@@ -87,7 +87,7 @@ void FlowEngine::action()
 // 	{ Update_Triangulation = true; }
 
 	if (Update_Triangulation && !first) {
-		Build_Triangulation();
+		Build_Triangulation(flow);
 		Update_Triangulation = false;}
 		
 	if (velocity_profile) /*flow->FluidVelocityProfile();*/flow->Average_Fluid_Velocity();
@@ -142,10 +142,10 @@ void FlowEngine::setImposedPressure(unsigned int cond, Real p)
 
 void FlowEngine::imposeFlux(Vector3r pos, Real flux)
 {
-	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+	RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
 	double flux_base=0.f;
 	double perm_base=0.f;
-	CGT::Cell_handle cell = Tri.locate(CGT::Point(pos[0],pos[1],pos[2]));
+	Cell_handle cell = Tri.locate(CGT::Point(pos[0],pos[1],pos[2]));
 	for (int ngb=0;ngb<4;ngb++) {
 		if (!cell->neighbor(ngb)->info().Pcondition) {
 		  flux_base += cell->info().k_norm()[ngb]*(cell->neighbor(ngb)->info().p());
@@ -160,21 +160,21 @@ void FlowEngine::clearImposedPressure() { flow->imposedP.clear();}
 
 Real FlowEngine::getFlux(unsigned int cond) {
 	if (cond>=flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
-	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+	RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
 	double flux=0;
-	CGT::Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
+	Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
 	for (int ngb=0;ngb<4;ngb++) {
 		/*if (!cell->neighbor(ngb)->info().Pcondition)*/ flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
 	return flux+cell->info().dv();
 }
 
-
-void FlowEngine::Build_Triangulation ()
+template<class Solver>
+void FlowEngine::Build_Triangulation (Solver& flow)
 {
-	Build_Triangulation (0.f);
+	Build_Triangulation (0.f,flow);
 }
-
-void FlowEngine::Build_Triangulation (double P_zero)
+template<class Solver>
+void FlowEngine::Build_Triangulation (double P_zero, Solver& flow)
 {
 	flow->ResetNetwork();
 	if (first) flow->currentTes=0;
@@ -196,7 +196,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
 	AddBoundary ( );
-	Triangulate ( );
+	Triangulate (flow);
 	if (Debug) cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
 
@@ -211,10 +211,10 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	porosity = flow->V_porale_porosity/flow->V_totale_porosity;
 
 	flow->TOLERANCE=Tolerance;flow->RELAX=Relax;
-	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
+	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
 	
-	if (compute_K) {K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max );}
+	if (compute_K) {BoundaryConditions(); K = flow->Sample_Permeability ( flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max );}
 	
 	BoundaryConditions();
 	flow->Initialize_pressures(P_zero);
@@ -222,7 +222,7 @@ void FlowEngine::Build_Triangulation (double P_zero)
 	if (!first) flow->Interpolate (flow->T[!flow->currentTes], flow->T[flow->currentTes]);
 	if (WaveAction) flow->ApplySinusoidalPressure(flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30);
 	
-	Initialize_volumes();
+	Initialize_volumes(flow);
 	if (viscousShear) flow->ComputeEdgesSurfaces();
 }
 
@@ -314,8 +314,8 @@ void FlowEngine::AddBoundary ()
 // 	flow->AddBoundingPlanes(true);
 
 }
-
-void FlowEngine::Triangulate ()
+template<class Solver>
+void FlowEngine::Triangulate (Solver& flow)
 {
 ///Using Tesselation wrapper (faster)
 // 	TesselationWrapper TW;
@@ -342,15 +342,15 @@ void FlowEngine::Triangulate ()
 	}
 	flow->viscousShearForces.resize(flow->T[flow->currentTes].max_id+1);
 }
-
-void FlowEngine::Initialize_volumes ()
+template<class Solver>
+void FlowEngine::Initialize_volumes (Solver& flow)
 {
-	CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
+	Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
 	CGT::Vecteur Zero(0,0,0);
-	for (CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++) V_it->info().forces=Zero;
+	for (Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++) V_it->info().forces=Zero;
 	
-	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
@@ -369,14 +369,14 @@ void FlowEngine::Average_real_cell_velocity()
     flow->Average_Relative_Cell_Velocity();
     Vector3r Vel (0,0,0);
     //AVERAGE CELL VELOCITY
-    CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
 	  for ( int g=0;g<4;g++ ) {
 	    if ( !cell->vertex ( g )->info().isFictious ) {
 		  const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
 		  for (int i=0;i<3;i++) Vel[i] = Vel[i] + sph->state->vel[i]/4;}
 	}
-	CGT::RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+	RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
 	CGT::Point pos_av_facet;
 	double volume_facet_translation = 0;
 	CGT::Vecteur Vel_av (Vel[0], Vel[1], Vel[2]);
@@ -392,18 +392,18 @@ void FlowEngine::Average_real_cell_velocity()
 		cell->info().av_vel() = cell->info().av_vel() - volume_facet_translation/cell->info().volume() * ( pos_av_facet-CGAL::ORIGIN );}}
     }
 }
-
-void FlowEngine::UpdateVolumes ()
+template<class Solver>
+void FlowEngine::UpdateVolumes (Solver& flow)
 {
 	if (Debug) cout << "Updating volumes.............." << endl;
 	Real invDeltaT = 1/scene->dt;
-	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 	
 	double newVol, dVol;
 	eps_vol_max=0;
 	Real totVol=0; Real totDVol=0; Real totVol0=0; Real totVol1=0; Real totVol2=0; Real totVol3=0;
 	
-	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
 		switch ( cell->info().fictious()) {
 			case ( 3 ) : newVol = Volume_cell_triple_fictious ( cell ); totVol3+=newVol; break;
 			case ( 2 ) : newVol = Volume_cell_double_fictious ( cell ); totVol2+=newVol; break;
@@ -420,8 +420,8 @@ void FlowEngine::UpdateVolumes ()
 	}
 	if (Debug) cout << "Updated volumes, total =" <<totVol<<", dVol="<<totDVol<<endl;
 }
-
-Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
+template<class Cellhandle>
+Real FlowEngine::Volume_cell_single_fictious (Cellhandle cell)
 {
 	Vector3r V[3];
 	int b=0;
@@ -449,8 +449,8 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell )
 
 	return abs ( Volume );
 }
-
-Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
+template<class Cellhandle>
+Real FlowEngine::Volume_cell_double_fictious ( Cellhandle cell)
 {
 	Vector3r A=Vector3r::Zero(), AS=Vector3r::Zero(),B=Vector3r::Zero(), BS=Vector3r::Zero();
 
@@ -487,8 +487,8 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 	Real Vol2=0.5*((AS-BS).cross(A-BS))[coord[1]]*(0.333333333*(B[coord[1]]+2*A[coord[1]])-Wall_coordinate[1]);
 	return abs ( Vol1+Vol2 );
 }
-
-Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
+template<class Cellhandle>
+Real FlowEngine::Volume_cell_triple_fictious ( Cellhandle cell)
 {
 	Vector3r A;
 
@@ -518,8 +518,8 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 	Real Volume = (A[coord[0]]-Wall_coordinate[0])*(A[coord[1]]-Wall_coordinate[1])*(A[coord[2]]-Wall_coordinate[2]);
 	return abs ( Volume );
 }
-
-Real FlowEngine::Volume_cell(CGT::Cell_handle cell)
+template<class Cellhandle>
+Real FlowEngine::Volume_cell(Cellhandle cell)
 {
 	Real volume = CGT::Tetraedre(makeCgPoint(Body::byId(cell->vertex(0)->info().id(), scene)->state->pos),
 				     makeCgPoint(Body::byId(cell->vertex(1)->info().id(), scene)->state->pos),
@@ -530,15 +530,15 @@ Real FlowEngine::Volume_cell(CGT::Cell_handle cell)
 	if (!(cell->info().volumeSign)) cell->info().volumeSign=(volume>0)?1:-1;
 	return volume;
 }
-
-void FlowEngine::ApplyViscousForces()
+template<class Solver>
+void FlowEngine::ApplyViscousForces(Solver& flow)
 {
 //   flow->ComputeEdgesSurfaces(); //only done in buildTriangulation
   if (Debug) cout << "Application of viscous forces" << endl;
   if (Debug) cout << "Number of edges = " << flow->Edge_ids.size() << endl;
   for (unsigned int k=0; k<flow->viscousShearForces.size(); k++) flow->viscousShearForces[k]=Vector3r::Zero();
 
-  const CGT::Tesselation& Tes = flow->T[flow->currentTes];
+  const Tesselation& Tes = flow->T[flow->currentTes];
   for (int i=0; i<(int)flow->Edge_ids.size(); i++)
   {
     int hasFictious= Tes.vertex(flow->Edge_ids[i].first)->info().isFictious +  Tes.vertex(flow->Edge_ids[i].second)->info().isFictious;

@@ -36,8 +36,15 @@
 
 class TesselationWrapper : public GlobalEngine{
 public:
-
-	CGT::Tesselation* Tes;
+	typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes> Tesselation;
+	typedef Tesselation::RTriangulation						RTriangulation;
+	typedef Tesselation::Vertex_Info						Vertex_Info;
+	typedef Tesselation::Cell_Info							Cell_Info;
+	typedef RTriangulation::Finite_edges_iterator					Finite_edges_iterator;
+	
+	
+	
+	Tesselation* Tes;
 	double mean_radius, inf;
 	bool rad_divided;
 	bool bounded;
@@ -95,15 +102,15 @@ public:
 
 public:
 	/// edge iterators are used for returning tesselation "facets", i.e. spheres with a common branch in the triangulation, convert CGAL::edge to int pair (b1->id, b2->id)
-	CGT::Finite_edges_iterator facet_begin;
-	CGT::Finite_edges_iterator facet_end;
-	CGT::Finite_edges_iterator facet_it;
+	Finite_edges_iterator facet_begin;
+	Finite_edges_iterator facet_end;
+	Finite_edges_iterator facet_it;
 	MicroMacroAnalyser mma;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere. Example script :\n\n tt=TriaxialTest()\n\ntt.generate('test.xml')\n\nO.load('test.xml')\n\nO.run(100)\n\nTW=TesselationWrapper()\n\nTW.triangulate() //compute regular Delaunay triangulation, don't construct tesselation\n\nTW.computeVolumes() //will silently tesselate the packing\n\nTW.volume(10) //get volume associated to sphere of id 10",
 	((unsigned int,n_spheres,0,,"|ycomp|"))
 	,/*ctor*/
-  	Tes = new CGT::Tesselation;
+  	Tes = new Tesselation;
 	clear();
 	facet_begin = Tes->Triangulation().finite_edges_begin();
 	facet_end = Tes->Triangulation().finite_edges_end();

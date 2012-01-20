@@ -15,15 +15,23 @@
 class Flow;
 class TesselationWrapper;
 #ifdef LINSOLV
-#define FlowSolver CGT::FlowBoundingSphereLinSolv
+#define _FlowSolver CGT::FlowBoundingSphereLinSolv<FlowTesselation>
 #else
-#define FlowSolver CGT::FlowBoundingSphere
+#define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
 #endif
-
 
 
 class FlowEngine : public PartialEngine
 {
+	public :
+	typedef _FlowSolver							FlowSolver;
+	typedef FlowTesselation							Tesselation;
+	typedef FlowSolver::RTriangulation					RTriangulation;
+	typedef FlowSolver::Finite_vertices_iterator                    	Finite_vertices_iterator;
+	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
+	typedef FlowSolver::Cell_handle						Cell_handle;
+	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
+	
 	private:
 		shared_ptr<FlowSolver> flow;
 		int retriangulationLastIter;
@@ -34,16 +42,25 @@ class FlowEngine : public PartialEngine
 		int id_offset;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
-		void Triangulate ();
+		template<class Solver>
+		void Triangulate (Solver& flow);
 		void AddBoundary ();
-		void Build_Triangulation (double P_zero );
-		void Build_Triangulation ();
-		void UpdateVolumes ();
-		void Initialize_volumes ();
-		Real Volume_cell_single_fictious (CGT::Cell_handle cell);
-		Real Volume_cell_double_fictious (CGT::Cell_handle cell);
-		Real Volume_cell_triple_fictious (CGT::Cell_handle cell);
-		Real Volume_cell (CGT::Cell_handle cell);
+		template<class Solver>
+		void Build_Triangulation (double P_zero, Solver& flow);
+		template<class Solver>
+		void Build_Triangulation (Solver& flow);
+		template<class Solver>
+		void UpdateVolumes (Solver& flow);
+		template<class Solver>
+		void Initialize_volumes (Solver& flow);
+		template<class Cellhandle>
+		Real Volume_cell_single_fictious (Cellhandle cell);
+		template<class Cellhandle>
+		Real Volume_cell_double_fictious (Cellhandle cell);
+		template<class Cellhandle>
+		Real Volume_cell_triple_fictious (Cellhandle cell);
+		template<class Cellhandle>
+		Real Volume_cell (Cellhandle cell);
 		void Oedometer_Boundary_Conditions();
 		void BoundaryConditions();
 		void imposeFlux(Vector3r pos, Real flux);
@@ -51,7 +68,8 @@ class FlowEngine : public PartialEngine
 		void setImposedPressure(unsigned int cond, Real p);
 		void clearImposedPressure();
 		void Average_real_cell_velocity();
-		void ApplyViscousForces();
+		template<class Solver>
+		void ApplyViscousForces(Solver& flow);
 		Real getFlux(unsigned int cond);
 		void saveVtk() {flow->saveVtk();}
 		vector<Real> AvFlVelOnSph(unsigned int id_sph) {return flow->Average_Fluid_Velocity_On_Sphere(id_sph);}
@@ -59,11 +77,16 @@ class FlowEngine : public PartialEngine
 			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
 		Vector3r fluidForce(unsigned int id_sph) {const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-		Vector3r fluidShearForce(unsigned int id_sph) {return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
+		template<class Solver>
+		Vector3r fluidShearForce(unsigned int id_sph, Solver& f) {return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
 		void PressureProfile(double wallUpY, double wallDownY) {return flow->MeasurePressureProfile(wallUpY,wallDownY);}
 		double MeasurePressure(double posX, double posY, double posZ){return flow->MeasurePorePressure(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return flow->MeasureAveragedPressure(posY);}
+		
+		//Instanciation of templates for python binding
+		Vector3r _fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,flow);}
+
 
 		virtual ~FlowEngine();
 
@@ -150,7 +173,7 @@ class FlowEngine : public PartialEngine
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
-					.def("fluidShearForce",&FlowEngine::fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
+					.def("fluidShearForce",&FlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
 					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("MeasurePressure",&FlowEngine::MeasurePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")

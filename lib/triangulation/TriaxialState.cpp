@@ -6,6 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/// The info types that will be used and the namespace in which the types will be defined (a unique namespace with different info types would give name conflicts)
+
 #include "TriaxialState.h"
 #include <math.h>
 #include<boost/iostreams/filtering_stream.hpp>
@@ -107,7 +109,7 @@ TriaxialState::Grain& TriaxialState::grain (unsigned int id)
 	return grains[id];
 }
 
-Tesselation& TriaxialState::Tesselate (void)
+TriaxialState::Tesselation& TriaxialState::Tesselate (void)
 {
 	if (!tesselated)
 	{
@@ -127,7 +129,7 @@ Tesselation& TriaxialState::Tesselate (void)
 	return Tes;
 }
 
-Tesselation& TriaxialState::tesselation (void)
+TriaxialState::Tesselation& TriaxialState::tesselation (void)
 {
 	return Tesselate();
 }

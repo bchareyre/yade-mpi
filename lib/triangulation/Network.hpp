@@ -8,18 +8,13 @@
 
 #ifndef _NETWORK_H
 #define _NETWORK_H
+#endif
 
-#include "Operations.h"
-#include "Timer.h"
 #include "Tesselation.h"
-#include "basicVTKwritter.hpp"
 #include "Timer.h"
-#include "stdafx.h"
-#include "Empilement.h"
+#include "basicVTKwritter.hpp"
 
-
-
-namespace CGT{
+namespace CGT {
 
 struct Boundary
 {
@@ -32,9 +27,13 @@ struct Boundary
 	bool useMaxMin;
 };
 
+
+template<class Tesselation>
 class Network
 {
 	public:
+		DECLARE_TESSELATION_TYPES(Tesselation) //see Tesselation.h
+		
 		virtual ~Network();
 		Network();
 		
@@ -67,8 +66,6 @@ class Network
 		double volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface);
 		double spherical_triangle_volume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3);
 		
-		Vecteur surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3);
-		
 		double fast_spherical_triangle_area(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1);
 		Real fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3);
 		double volume_double_fictious_pore(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1);
@@ -77,13 +74,15 @@ class Network
 		double spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
 		
 		Vecteur surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3);
-// 		Vecteur surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3);
+		Vecteur surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3);
 		double surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3);
 		double surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3);
 };
 
 } //namespaceCGT
 
-#endif
+#include "Network.ipp"
+
+
 
 #endif //FLOW_ENGINE

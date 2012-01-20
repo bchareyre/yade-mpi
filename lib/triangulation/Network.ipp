@@ -1,9 +1,7 @@
 
 #ifdef FLOW_ENGINE
 
-#include "def_types.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
-#include <CGAL/Width_3.h>
 #include <iostream>
 #include <fstream>
 #include <new>
@@ -13,15 +11,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "Network.hpp"
-
 
 #define FAST
 
-const double ONE_THIRD = 1.0/3.0;
-const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
-const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
-const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
+
 
 int facetF1=0, facetF2=0, facetRe1=0, facetRe2=0, facetRe3=0;
 int F1=0, F2=0, Re1=0, Re2=0;
@@ -34,11 +27,19 @@ using namespace std;
 // using namespace boost;
 namespace CGT {
 
-Network::~Network(){}
+const double ONE_THIRD = 1.0/3.0;
+const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
+const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
+const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
 
-Network::Network(){}
+template<class Tesselation>
+Network<Tesselation>::~Network(){}
 
-int Network::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
+template<class Tesselation>
+Network<Tesselation>::Network(){}
+
+template<class Tesselation>
+int Network<Tesselation>::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
 {
 	fictious_vertex = 0;
 	int real_vertex=0;
@@ -61,7 +62,8 @@ int Network::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
 	return fictious_vertex;
 }
 
-double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
+template<class Tesselation>
+double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
 {
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
@@ -101,7 +103,8 @@ double Network::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
     default : return 0;}
 }
 
-double Network::volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
+template<class Tesselation>
+double Network<Tesselation>::volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
 {
         double A [3], B[3];
 
@@ -134,7 +137,8 @@ double Network::volume_single_fictious_pore(const Vertex_handle& SV1, const Vert
         return (Vtot - (Vsolid1 + Vsolid2));
 }
 
-double Network::volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface)
+template<class Tesselation>
+double Network<Tesselation>::volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface)
 {
         double A [3], B[3];
 
@@ -161,14 +165,16 @@ double Network::volume_double_fictious_pore(const Vertex_handle& SV1, const Vert
         return (Vtot - Vsolid1 - Vsolid2);
 }
 
-double Network::spherical_triangle_volume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3)
+template<class Tesselation>
+double Network<Tesselation>::spherical_triangle_volume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3)
 {
         double rayon = sqrt(ST1.weight());
         if (rayon == 0.0) return 0.0;
         return ((ONE_THIRD * rayon) * (fast_spherical_triangle_area(ST1, PT1, PT2, PT3))) ;
 }
 
-double Network::fast_spherical_triangle_area(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1)
+template<class Tesselation>
+double Network<Tesselation>::fast_spherical_triangle_area(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1)
 {
         using namespace CGAL;
 #ifndef FAST
@@ -179,7 +185,8 @@ double Network::fast_spherical_triangle_area(const Sphere& STA1, const Point& ST
         return rayon2 * fast_solid_angle(STA1,STA2,STA3,PTA1);
 }
 
-double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
+template<class Tesselation>
+double Network<Tesselation>::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
 {
  double rayon = STA1.weight();
  if ( rayon == 0.0 ) return 0.0;
@@ -210,7 +217,8 @@ double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3,
  return  aire_triangle_spherique;
 }
 
-Real Network::fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3)
+template<class Tesselation>
+Real Network<Tesselation>::fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3)
 {
         //! This function needs to be fast because it is used heavily. Avoid using vector operations which require constructing vectors (~50% of cpu time in the non-fast version), and compute angle using the 3x faster formula of Oosterom and StrackeeVan Oosterom, A; Strackee, J (1983). "The Solid Angle of a Plane Triangle". IEEE Trans. Biom. Eng. BME-30 (2): 125-126. (or check http://en.wikipedia.org/wiki/Solid_angle)
         using namespace CGAL;
@@ -245,7 +253,8 @@ Real Network::fast_solid_angle(const Point& STA1, const Point& PTA1, const Point
         return abs(2*atan(ratio));
 }
 
-double Network::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS)
+template<class Tesselation>
+double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS)
 {
   if (!facet_detected) fictious_vertex=Detect_facet_fictious_vertices(cell,j);
 
@@ -351,7 +360,8 @@ double Network::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERAL
 
 }
 
-Vecteur Network::surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3)
+template<class Tesselation>
+Vecteur Network<Tesselation>::surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3)
 {
         //This function is correct only with axis-aligned boundaries
         const Boundary &bi1 = boundary(fSV1->info().id());
@@ -363,7 +373,8 @@ Vecteur Network::surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle
         return area*Vecteur(surf[0],surf[1],surf[2]);
 }
 
-Vecteur Network::surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3)
+template<class Tesselation>
+Vecteur Network<Tesselation>::surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3)
 {
         //This function is correct only with axis-aligned boundaries
         const Boundary &bi1 =  boundary(fSV1->info().id());
@@ -373,7 +384,8 @@ Vecteur Network::surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle
         return CGAL::cross_product(mean_height,SV3->point()-SV2->point());
 }
 
-double Network::surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3)
+template<class Tesselation>
+double Network<Tesselation>::surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3)
 {
         double A [3], B [3];
 
@@ -399,7 +411,8 @@ double Network::surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_ha
         return total_surface - solid_surface;
 }
 
-double Network::surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3)
+template<class Tesselation>
+double Network<Tesselation>::surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3)
 {
         double Area;
 
@@ -418,7 +431,8 @@ double Network::surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3)
         return Area;
 }
 
-void Network::AddBoundingPlanes()
+template<class Tesselation>
+void Network<Tesselation>::AddBoundingPlanes()
 {
 	Tesselation& Tes = T[currentTes];
 	
@@ -451,7 +465,8 @@ void Network::AddBoundingPlanes()
 // 	AddBoundingPlanes(true);
 }
 
-void Network::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall)
+template<class Tesselation>
+void Network<Tesselation>::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall)
 {
 	  Tesselation& Tes = T[currentTes];
 	  
@@ -477,7 +492,8 @@ void Network::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall)
 	  if(DEBUG_OUT) cout << "A boundary -max/min-has been created. ID = " << id_wall << " position = " << 0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << 0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " << 0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2])  << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
 }
 
-void Network::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall )
+template<class Tesselation>
+void Network<Tesselation>::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall )
 {
 	  Tesselation& Tes = T[currentTes];
 	  
@@ -499,7 +515,8 @@ void Network::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal
 	  if(DEBUG_OUT) cout << "A boundary -center/thick- has been created. ID = " << id_wall << " position = " << (center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " <<  (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]) << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
 }
 
-void Network::Define_fictious_cells()
+template<class Tesselation>
+void Network<Tesselation>::Define_fictious_cells()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 
@@ -509,11 +526,11 @@ void Network::Define_fictious_cells()
 
 	for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
-                Tesselation::Vector_Cell tmp_cells;
+                Vector_Cell tmp_cells;
                 tmp_cells.resize(10000);
-                Tesselation::VCell_iterator cells_it = tmp_cells.begin();
-                Tesselation::VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
-                for (Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+                VCell_iterator cells_it = tmp_cells.begin();
+                VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+                for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
 		{
 		  Cell_handle& cell = *it;
 		  (cell->info().fictious())+=1;
@@ -522,6 +539,7 @@ void Network::Define_fictious_cells()
 	
 	if(DEBUG_OUT) cout << "Fictious cell defined" << endl;
 }
+
 
 // double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
 // {

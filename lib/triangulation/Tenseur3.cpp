@@ -1,20 +1,9 @@
-// Tenseur3.cpp : d�finit le point d'entr�e pour l'application console.
-//
 
-#include "stdafx.h"
 #include "Tenseur3.h"
 #include "def_types.h" //pour d�finition de la classe "Vecteur"
 
 using namespace std;
 namespace CGT {
-
-
-//const Tenseur3 NULL_TENSEUR3 = Tenseur3(0,0,0,0,0,0,0,0,0);
-
-
-
-
-// Classe m�re "Tens" dont d�rive toutes les classes tenseur
 
 Real Tens::Norme2(void)
 {
@@ -24,10 +13,6 @@ Real Tens::Norme2(void)
 			N+= pow(operator ()(i,j), 2);
     return N;
 }
-
-
-// D�finition d'op�rations compl�mentaires sur vecteurs et matrices
-
 
 Vecteur operator* (Tens& tens, Vecteur& vect)
 {
@@ -44,18 +29,9 @@ Vecteur& NormalizedVecteur (Vecteur& vect)
 	return vect;
 }
 
-
-///////////		 Classe Tenseur3		////////////
-
 Tenseur3::Tenseur3(bool init)
 {
-	if (init)
-	{
-		for (int i=0; i<3; i++)
-		{
-			for (int j=0; j<3; j++) T[i][j] = 0;
-		}
-	}
+	if (init) for (int i=0; i<3; i++) for (int j=0; j<3; j++) T[i][j] = 0;
 }
 
 Tenseur3::~Tenseur3(void)
@@ -64,10 +40,7 @@ Tenseur3::~Tenseur3(void)
 
 Tenseur3::Tenseur3(const Tenseur3& source)
 {
-	for (int i=0; i<3; i++)
-	{
-		for (int j=0; j<3; j++) T[i][j] = source.T[i][j];
-	}
+	for (int i=0; i<3; i++) for (int j=0; j<3; j++) T[i][j] = source.T[i][j];
 }
 
 Tenseur3::Tenseur3(Real a11, Real a12, Real a13,
@@ -88,25 +61,15 @@ Tenseur3::Tenseur3(Real a11, Real a12, Real a13,
 
 Tenseur3 &Tenseur3::operator=(const Tenseur3& source)
 {
-	if (&source != this)
-	{
-		for (int i=0; i<3; i++)
-		{
-			for (int j=0; j<3; j++) T[i][j] = source.T[i][j];
-		}
-	}
+	if (&source != this) for (int i=0; i<3; i++) for (int j=0; j<3; j++) T[i][j] = source.T[i][j];
 	return *this;
 }
 
 Tenseur3 &Tenseur3::operator/=(Real d)
 {	
-	if (d!=0)
-	{
+	if (d!=0) {
 		d = 1.0/d;
-		for (int i=0; i<3; i++)
-		{
-			for (int j=0; j<3; j++) T[i][j] *= d;
-		}
+		for (int i=0; i<3; i++) for (int j=0; j<3; j++) T[i][j] *= d;
 	}
 	return *this;
 }
@@ -114,10 +77,7 @@ Tenseur3 &Tenseur3::operator/=(Real d)
 
 Tenseur3 & Tenseur3::operator +=(const Tenseur3 & source)
 {
-	for (int i=0; i<3; i++)
-		{
-			for (int j=0; j<3; j++) T[i][j] += source.T[i][j];
-		}
+	for (int i=0; i<3; i++) for (int j=0; j<3; j++) T[i][j] += source.T[i][j];
 	return *this;
 }
 
@@ -273,19 +233,6 @@ Real Tenseur_anti3::operator() (int i, int j) const
 	}
 }
 
-//Real &Tenseur_anti3::operator() (int i, int j) //Supprim�e car pb. pour retourner une r�f�rence vers -T[i+j]
-//{	
-//	if (i==j) return T[i-1];
-//	else 
-//	{
-//		if (i<j) return T[i+j];
-//		else return T[i+j];
-//	}
-//}
-
-
-
-
 void Tenseur_produit (Vecteur &v1, Vecteur &v2, Tenseur3 &result)
 {
 	result(1,1) = v1.x()*v2.x();
@@ -359,51 +306,5 @@ operator<<(std::ostream& os, const Tenseur_anti3& T)
 	}	
 	return os;
 }
-
-// std::ofstream&
-// operator<<(std::ofstream& os, Tenseur3& T)
-//   
-// {
-// 	for (int j=1 ; j<4; j++)
-// 	{
-// 		for (int i=1; i<4; i++)
-// 		{
-// 			os << T(j,i) << " ";
-// 		}
-// 		os  << endl;
-// 	}	
-// 	return os;
-// }
-// 
-// std::ofstream&
-// operator<<(std::ofstream& os, Tenseur_sym3& T)
-//   
-// {
-// 	for (int j=1 ; j<4; j++)
-// 	{
-// 		for (int i=1; i<4; i++)
-// 		{
-// 			os << T(j,i) << " ";
-// 		}
-// 		os  << endl;
-// 	}	
-// 	return os;
-// }
-// 
-// std::ofstream&
-// operator<<(std::ofstream& os, Tenseur_anti3& T)
-//   
-// {
-// 	for (int j=1 ; j<4; j++)
-// 	{
-// 		for (int i=1; i<4; i++)
-// 		{
-// 			os << (Real) T(j,i) << (string) " ";
-// 		}
-// 		os  << endl;
-// 	}	
-// 	return os;
-// }
-
 
 } // namespace CGT

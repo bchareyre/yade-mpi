@@ -1,16 +1,11 @@
 #ifndef TENSEUR3_H
 #define TENSEUR3_H
 
-
-#include "def_types.h" //pour d�finition de la classe "Vecteur"
+#include "def_types.h" 
 #include <iostream>
 #include <fstream>
 
 namespace CGT {
-
-//using namespace std;
-
-//class Vecteur;// Classe externe
 
 #define NORMALIZE(vecteur) ((vecteur) = (vecteur)*(1.0/sqrt(pow((vecteur)[0],2)+pow((vecteur)[1],2)+pow((vecteur)[2],2))))
 
@@ -30,11 +25,6 @@ std::ostream& operator<< ( std::ostream& os,const Tenseur3& T );
 std::ostream& operator<< ( std::ostream& os,const Tenseur_sym3& T );
 std::ostream& operator<< ( std::ostream& os,const Tenseur_anti3& T );
 
-//  std::ofstream& operator<<(std::ofstream& os, Tenseur3& T);
-//  std::ofstream& operator<<(std::ofstream& os, Tenseur_sym3& T);
-//  std::ofstream& operator<<(std::ofstream& os, Tenseur_anti3& T);
-
-// Classe m�re "Tens" dont d�rive toutes les classes tenseur
 class Tens
 {
 	public:

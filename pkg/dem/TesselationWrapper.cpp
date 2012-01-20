@@ -21,9 +21,9 @@ CREATE_LOGGER(TesselationWrapper);
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
-struct RTraits_for_spatial_sort : public CGT::RTriangulation::Geom_traits {
+struct RTraits_for_spatial_sort : public CGT::SimpleTriangulationTypes::RTriangulation::Geom_traits {
 	//typedef typename _Triangulation::Geom_traits Gt;
-	typedef CGT::RTriangulation::Geom_traits Gt;
+	typedef CGT::SimpleTriangulationTypes::RTriangulation::Geom_traits Gt;
 	typedef std::pair<const CGT::Sphere*,Body::id_t> Point_3;
 
 	struct Less_x_3 {
@@ -54,8 +54,9 @@ struct RTraits_for_spatial_sort : public CGT::RTriangulation::Geom_traits {
 void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, TesselationWrapper &TW, bool reset=true)
 {
 	if (reset) TW.clear();
-	CGT::Tesselation& Tes = *(TW.Tes);
-	CGT::RTriangulation& T = Tes.Triangulation();
+	typedef SimpleTesselation::RTriangulation RTriangulation; 
+	SimpleTesselation& Tes = *(TW.Tes);
+	RTriangulation& T = Tes.Triangulation();
 	std::vector<CGT::Sphere> spheres;
 	std::vector<std::pair<const CGT::Sphere*,Body::id_t> > pointsPtrs;
 	spheres.reserve(bodies->size());
@@ -94,17 +95,17 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	std::random_shuffle(pointsPtrs.begin(), pointsPtrs.end());
 	spatial_sort(pointsPtrs.begin(),pointsPtrs.end(), RTraits_for_spatial_sort()/*, CGT::RTriangulation::Weighted_point*/);
 
-	CGT::RTriangulation::Cell_handle hint;
+	RTriangulation::Cell_handle hint;
 
 	TW.n_spheres = 0;
 	for (std::vector<std::pair<const CGT::Sphere*,Body::id_t> >::const_iterator
 			p = pointsPtrs.begin();p != pointsPtrs.end(); ++p) {
-		CGT::RTriangulation::Locate_type lt;
-		CGT::RTriangulation::Cell_handle c;
+		RTriangulation::Locate_type lt;
+		RTriangulation::Cell_handle c;
 		int li, lj;
 		c = T.locate(* (p->first), lt, li, lj, hint);
-		CGT::RTriangulation::Vertex_handle v = T.insert(*(p->first),lt,c,li,lj);
-		if (v==CGT::RTriangulation::Vertex_handle())
+		RTriangulation::Vertex_handle v = T.insert(*(p->first),lt,c,li,lj);
+		if (v==RTriangulation::Vertex_handle())
 			hint=c;
 		else {
 			v->info() = (const unsigned int) p->second;
@@ -343,17 +344,16 @@ void TesselationWrapper::defToVtk (string outputFile){
 
 python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 {
-		Scene* scene=Omega::instance().getScene().get();
 		delete Tes;
 		CGT::TriaxialState* ts;
 		if (deformation){//use the final state to compute volumes
-			const vector<CGT::Tenseur3>& def = mma.analyser->ComputeParticlesDeformation();
+			/*const vector<CGT::Tenseur3>& def =*/ mma.analyser->ComputeParticlesDeformation();
 			Tes = &mma.analyser->TS1->tesselation();
 			ts = mma.analyser->TS1;
 			}
 		else {	Tes = &mma.analyser->TS0->tesselation();//no reason to use the final state if we don't want to compute deformations, keep using the initial
 			ts = mma.analyser->TS0;}
-		CGT::RTriangulation& Tri = Tes->Triangulation();
+		RTriangulation& Tri = Tes->Triangulation();
 		Pmin=ts->box.base; Pmax=ts->box.sommet;
 		//if (!scene->isPeriodic) AddBoundingPlanes();
 		ComputeVolumes();
@@ -367,7 +367,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		numpy_boost<double,1> poro(dim1);
  		numpy_boost<double,2> def(dim2);
  		//FOREACH(const shared_ptr<Body>& b, *scene->bodies){
- 		for (CGT::RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
+ 		for (RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
  			//id[]=V_it->info().id()
  			//if(!b) continue;
  			const Body::id_t id = V_it->info().id();

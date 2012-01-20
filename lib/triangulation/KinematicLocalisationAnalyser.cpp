@@ -7,12 +7,12 @@
 *************************************************************************/
 
 //This class computes statistics of micro-variables assuming axi-symetry
+// #define		VERTEX_INFO_TYPE	Vertex_Info;
+// #define		CELL_INFO_TYPE		Cell_Info;
 
-
-
-#include "Tesselation.h"
-#include "KinematicLocalisationAnalyser.hpp"
-#include "TriaxialState.h"
+#include "KinematicLocalisationAnalyser.hpp" //This one first, because it defines the info types
+// #include "Tesselation.h"
+// #include "TriaxialState.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -162,7 +162,7 @@ void KinematicLocalisationAnalyser::SwitchStates(void)
 	TS1 = TStemp;
 }
 
-vector<Edge_iterator>& KinematicLocalisationAnalyser::Oriented_Filtered_edges(Real Nymin, Real Nymax, vector<Edge_iterator>& filteredList)
+vector<KinematicLocalisationAnalyser::Edge_iterator>& KinematicLocalisationAnalyser::Oriented_Filtered_edges(Real Nymin, Real Nymax, vector<Edge_iterator>& filteredList)
 {
 	RTriangulation& T = TS1->tesselation().Triangulation();
 	filteredList.clear();

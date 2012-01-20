@@ -11,25 +11,32 @@
  */
 
 #pragma once
+
 #include "TriaxialState.h"
 #include "Tenseur3.h"
-//class TriaxialState;
 
 namespace CGT {
-
 #define SPHERE_DISCRETISATION 20; //number of "teta" intervals on the unit sphere
 #define LINEAR_DISCRETISATION 200; //number of intervals on segments like [UNmin,UNmax]
 	
-// l_vertices : definition de l'ordre de parcours des sommets
-// pour la facette k, les indices des 3 sommets sont dans la colonne k
+// l_vertices : defines vertices for each facet
+// for facet k, the vertices indices are in column k
 const int l_vertices [4][3] = { {1, 2, 3}, {0, 3, 2}, {3, 0, 1}, {2, 1, 0} };
+
+
 
 class KinematicLocalisationAnalyser
 {
 	public:
-		typedef vector< pair<Real,Real> > RGrid1D;
-		typedef vector<vector <Real> >  RGrid2D;
-		typedef vector<vector<vector<Real> > > RGrid3D;
+		typedef TriaxialState::Tesselation 			Tesselation;
+		typedef TriaxialState::RTriangulation			RTriangulation;
+		typedef RTriangulation::Vertex_handle                   Vertex_handle;
+		typedef RTriangulation::Finite_cells_iterator		Finite_cells_iterator;
+		typedef RTriangulation::Cell_handle			Cell_handle;
+		typedef RTriangulation::Edge_iterator			Edge_iterator;
+		typedef vector< pair<Real,Real> > 			RGrid1D;
+		typedef vector<vector <Real> >  			RGrid2D;
+		typedef vector<vector<vector<Real> > > 			RGrid3D;
 
 		KinematicLocalisationAnalyser();
 		KinematicLocalisationAnalyser ( const char* state_file1, bool usebz2 = true );
@@ -81,10 +88,8 @@ class KinematicLocalisationAnalyser
 		///Compute porisity from cumulated spheres volumes and positions of boxes
 		Real ComputeMacroPorosity (void );
 
-
 		Vecteur Deplacement ( Cell_handle cell );  //donne le d�placement d'un sommet de voronoi
-		Vecteur Deplacement ( Finite_cells_iterator cell, int facet ); //mean displacement on a facet
-		
+		Vecteur Deplacement ( Finite_cells_iterator cell, int facet ); //mean displacement on a facet		
 
 		// Calcul du tenseur d'orientation des voisins
 		//Tenseur_sym3 Orientation_voisins (Tesselation& Tes);
@@ -93,7 +98,6 @@ class KinematicLocalisationAnalyser
 		vector<Edge_iterator>& Oriented_Filtered_edges (Real Nymin, Real Nymax, vector<Edge_iterator>& filteredList);
 		
 		vector<pair<Real,Real> >& NormalDisplacementDistribution ( vector<Edge_iterator>& edges, vector<pair<Real,Real> >& row );
-		//vector<pair<Real,Real> > NormalDisplacementDistribution(TriaxialState& state, TriaxialState& state0);
 
 		//member data
 		int sphere_discretisation;
@@ -106,16 +110,12 @@ class KinematicLocalisationAnalyser
 	private:
 
 		int file_number_1, file_number_0;
-		//Characteristic size of particles
 		string base_file_name;   //Base name of state-files, complete name is (base_name+state_number).
-		bool consecutive; //Are the two triax states consecutive? if "false" displacements are re-computed
-		//from the two source files; if "true" one file is enough.
+		bool consecutive; //Are the two triax states consecutive? if "false" displacements are re-computed from the two source files; if "true" one file is enough.
 		Real v_solid_total;//solid volume in the box
 		Real v_total;//volume of the box
 		Real v_total_g;//summed volumes of extended grain cells
 		long n_persistent, n_new, n_lost, n_real_cells, n_real_vertices, n_fictious_vertices;
-
-
 
 };
 

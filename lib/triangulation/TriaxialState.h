@@ -12,6 +12,7 @@
 #ifndef TRIAXIALSTATE_H
 #define TRIAXIALSTATE_H
 
+
 #include "Tesselation.h"
 #include <vector>
 #include<boost/iostreams/filtering_stream.hpp>
@@ -21,20 +22,24 @@
  * 
  */
 
-namespace CGT{
+namespace CGT {
 using namespace std;
+
+
 
 class TriaxialState
 {
 public:
 	
+	typedef _Tesselation<SimpleTriangulationTypes> 			Tesselation;
+	typedef Tesselation::RTriangulation				RTriangulation;
 	class Contact;
 	class Grain;
 	typedef struct {Point base; Point sommet;}			Box;
-	typedef vector<Contact*>							VectorContact;
-	typedef vector<Grain>								VectorGrain;
-	typedef VectorContact::iterator						ContactIterator;
-	typedef VectorGrain::iterator						GrainIterator;
+	typedef vector<Contact*>					VectorContact;
+	typedef vector<Grain>						VectorGrain;
+	typedef VectorContact::iterator					ContactIterator;
+	typedef VectorGrain::iterator					GrainIterator;
 
 	class Grain {	public :
 					int id;
@@ -59,7 +64,6 @@ public:
 					Vecteur old_fs;
 					Real frictional_work;
 					bool visited;
-					
 					Status status;
 					Contact(void) {visited=false; status=PERSISTENT;}
 				};
