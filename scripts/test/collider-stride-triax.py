@@ -16,11 +16,6 @@ newton=utils.typedEngine('NewtonIntegrator')
 if 1:
 	# length by which bboxes will be made larger
 	collider.sweepLength=.2*O.bodies[100].shape.radius
-	# if this is enabled, bboxes will be enlarged based on velocity bin for each body
-	if 1:
-		collider.nBins=3
-		collider.binCoeff=10
-		log.setLevel('VelocityBins',log.DEBUG)
 
 O.step() # filter out initialization
 O.timingEnabled=True
