@@ -39,34 +39,33 @@ void InteractionContainer::clear(){
 }
 
 
-bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2){
+bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
 	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
 	const shared_ptr<Body>& b1((*bodies)[id1]);
-  const shared_ptr<Body>& b2((*bodies)[id2]);
-	if((!b1) or (!b2)) return false;  // Bodies are vanished. Initially (before r2893) only b1 was checked on existence. 
-                                    // But, it seems, that b2 also needs to be checked. The logic of the algorithm
-                                    // should be investigated. Bug-link https://bugs.launchpad.net/yade/+bug/813925
-	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
-	// this used to return false
-	if(I==b1->intrs.end()) {
-		LOG_ERROR("InteractionContainer::erase: attempt to delete non-existent interaction ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2));
-		return false;
+	int linIx=-1;
+	if(unlikely(!b1)) linIx=linPos;
+	else {
+		Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
+		if(I==b1->intrs.end()) linIx=linPos;
+		else {
+			linIx=I->second->linIx;
+			assert(linIx==linPos);
+			//erase from body, we also erase from linIntrs below
+			b1->intrs.erase(I);}
 	}
-	// erase from body and then from linIntrs as well
-	int linIx=I->second->linIx; 
-	b1->intrs.erase(I);
+	if(linIx<0) {
+		LOG_ERROR("InteractionContainer::erase: attempt to delete interaction with a deleted body (the definition of linPos in the call to erase() should fix the problem) for  ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2));
+		return false;}
 	// iid is not the last element; we have to move last one to its place
 	if (linIx<(int)currSize-1) {
 		linIntrs[linIx]=linIntrs[currSize-1];
 		linIntrs[linIx]->linIx=linIx; // update the back-reference inside the interaction
 	}
-	//assert(linIntrs.size()==currSize);
 	// in either case, last element can be removed now
 	linIntrs.resize(--currSize); // currSize updated
-	//assert(linIntrs.size()==currSize);
 	return true;
 }
 
@@ -102,6 +101,14 @@ void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool for
 	#else
 		pendingErase.push_back(v);
 	#endif
+}
+
+void InteractionContainer::requestErase(const shared_ptr<Interaction>& I){
+	I->reset();
+}
+
+void InteractionContainer::requestErase(Interaction* I){
+	I->reset();
 }
 
 void InteractionContainer::clearPendingErase(){

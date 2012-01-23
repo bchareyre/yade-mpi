@@ -58,7 +58,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 
 	/* check whether the particles are linked or not */
 	if ( !phys->isLinked ) { // destroy the interaction before calculation
-		scene->interactions->requestErase(contact->getId1(),contact->getId2());
+		scene->interactions->requestErase(contact);
 		return;
 	}
 	if ( (phys->isLinked) && (D < DFValues.back()(0)) ) { // spheres are linked but failure because of reaching maximal admissible displacement 
@@ -68,7 +68,7 @@ void Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 		WireState* st2=dynamic_cast<WireState*>(b2->state.get());
 		st1->numBrokenLinks+=1;
 		st2->numBrokenLinks+=1;
-		scene->interactions->requestErase(contact->getId1(),contact->getId2());
+		scene->interactions->requestErase(contact);
 		return;
 	}
 	

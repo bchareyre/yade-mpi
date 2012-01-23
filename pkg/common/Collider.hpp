@@ -22,7 +22,7 @@ class Collider: public GlobalEngine {
 		 *
 		 * Concrete collider implementations should call this function if
 		 * the bodies are in potential interaction geometrically. */
-		bool mayCollide(const Body*, const Body*);
+		static bool mayCollide(const Body*, const Body*);
 		/*! Invalidate all persistent data (if the collider has any), forcing reinitialization at next run.
 		The default implementation does nothing, colliders should override it if it is applicable.
 

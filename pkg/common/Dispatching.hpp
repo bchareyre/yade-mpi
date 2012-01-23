@@ -11,8 +11,6 @@
 #include<yade/core/Dispatcher.hpp>
 #include<yade/pkg/common/Aabb.hpp>
 
-class VelocityBins;
-
 /********
 	functors
 *********************/
@@ -83,12 +81,14 @@ class BoundDispatcher: public Dispatcher1D<
 	public:
 		virtual void action();
 		virtual bool isActivated(){ return activated; }
-		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
 	YADE_DISPATCHER1D_FUNCTOR_DOC_ATTRS_CTOR_PY(BoundDispatcher,BoundFunctor,/*optional doc*/,
 		/*additional attrs*/
 		((bool,activated,true,,"Whether the engine is activated (only should be changed by the collider)"))
 		((Real,sweepDist,0,,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider)."))
+		((Real,minSweepDistFactor,0.2,,"Minimal distance by which enlarge all bounding boxes; superseeds computed value of sweepDist when lower that (minSweepDistFactor x sweepDist). Updated by the collider. |yupdate|."))
+		((Real,updatingDispFactor,-1,,"see :yref:`InsertionSortCollider::updatingDispFactor` |yupdate|"))
+		((Real,targetInterv,-1,,"see :yref:`InsertionSortCollider::targetInterv` |yupdate|"))
 		,/*ctor*/,/*py*/
 	);
 };

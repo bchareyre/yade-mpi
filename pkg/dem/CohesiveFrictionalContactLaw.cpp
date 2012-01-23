@@ -69,13 +69,13 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 
 	if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) {
 		// BREAK due to tension
-		scene->interactions->requestErase(contact->getId1(),contact->getId2());
+		scene->interactions->requestErase(contact); return;
 	} else {
 		if ((-Fn)> currentContactPhysics->normalAdhesion) {//normal plasticity
 			Fn=-currentContactPhysics->normalAdhesion;
 			currentContactPhysics->unp = un+currentContactPhysics->normalAdhesion/currentContactPhysics->kn;
 			if (currentContactPhysics->unpMax && currentContactPhysics->unp<currentContactPhysics->unpMax)
-				scene->interactions->requestErase(contact->getId1(),contact->getId2());
+				scene->interactions->requestErase(contact); return;
 		}
 		currentContactPhysics->normalForce = Fn*currentContactGeometry->normal;
 		State* de1 = Body::byId(id1,scene)->state.get();

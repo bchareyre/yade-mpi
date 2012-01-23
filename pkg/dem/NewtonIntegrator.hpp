@@ -19,12 +19,10 @@
 
  */
 class State;
-class VelocityBins;
 
 class NewtonIntegrator : public GlobalEngine{
 	inline void cundallDamp1st(Vector3r& force, const Vector3r& vel);
 	inline void cundallDamp2nd(const Real& dt, const Vector3r& force, const Vector3r& vel, Vector3r& accel);
-	bool haveBins;
 	inline void leapfrogTranslate(State*, const Body::id_t& id, const Real& dt); // leap-frog translate
 	inline void leapfrogSphericalRotate(State*, const Body::id_t& id, const Real& dt); // leap-frog rotate of spherical body
 	inline void leapfrogAsphericalRotate(State*, const Body::id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
@@ -38,18 +36,19 @@ class NewtonIntegrator : public GlobalEngine{
 
 	// whether the cell has changed from the previous step
 	bool cellChanged;
+
 	// wether a body has been selected in Qt view
 	bool bodySelected;
 	Matrix3r dVelGrad;
 
 	public:
+		Real updatingDispFactor;//(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated.
 		// function to save maximum velocity, for the verlet-distance optimization
 		void saveMaximaVelocity(const Body::id_t& id, State* state);
+		void saveMaximaDisplacement(const shared_ptr<Body>& b);
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
-		/// velocity bins (not used if not created)
-		shared_ptr<VelocityBins> velocityBins;
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))

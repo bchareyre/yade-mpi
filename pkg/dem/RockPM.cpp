@@ -67,7 +67,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 			 * Destruction.
 			 **/
 			if (displN>(phys->lengthMaxTension)) {
-				scene->interactions->requestErase(contact->getId1(),contact->getId2());
+				scene->interactions->requestErase(contact);
 				return; 
 			} else {
 			/**If the distance 
@@ -82,7 +82,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 			/**
 			 * Delete interactions
 			 */ 
-			scene->interactions->requestErase(contact->getId1(),contact->getId2());
+			scene->interactions->requestErase(contact);
 			return;
 		}
 	}

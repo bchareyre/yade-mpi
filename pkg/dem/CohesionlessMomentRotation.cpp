@@ -30,7 +30,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<IGeom>& ig, s
 
 	/*NormalForce */
 	Real displN=geom->penetrationDepth;  //get penetrationDepth from SCG
-	if (displN<0){scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;}  //! NOTE: the sign for penetrationdepth is different from SCG and Dem3DofGeom
+	if (displN<0){scene->interactions->requestErase(contact); return;}  //! NOTE: the sign for penetrationdepth is different from SCG and Dem3DofGeom
 	Real Fn =phys->kn*displN;   //scalar force
 	phys->normalForce= Fn*geom->normal; //vector force NOTE: normal is position2-position1.  Therefore it is directed from particle1 to particle2
 	

@@ -1,6 +1,4 @@
 #include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/VelocityBins.hpp>
-
 
 YADE_PLUGIN((BoundFunctor)(IGeomFunctor)(IPhysFunctor)(LawFunctor)(BoundDispatcher)(IGeomDispatcher)(IPhysDispatcher)(LawDispatcher));
 BoundFunctor::~BoundFunctor(){};
@@ -19,33 +17,37 @@ void BoundDispatcher::action()
 	updateScenePtr();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	const long numBodies=(long)bodies->size();
-	bool haveBins=(bool)velocityBins;
-	if(sweepDist!=0 && haveBins){ LOG_FATAL("Only one of sweepDist or velocityBins can used!"); abort(); }
 	//#pragma omp parallel for
 	for(int id=0; id<numBodies; id++){
 		if(!bodies->exists(id)) continue; // don't delete this check  - Janek
 		const shared_ptr<Body>& b=(*bodies)[id];
 		shared_ptr<Shape>& shape=b->shape;
 		if(!shape || !b->isBounded()) continue;
+		if(b->bound) {
+			Real& sweepLength = b->bound->sweepLength;
+			if (targetInterv>=0) {
+				Vector3r disp = b->state->pos-b->bound->refPos;
+				Real dist = max(abs(disp[0]),max(abs(disp[1]),abs(disp[2])));
+				Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
+				newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
+				sweepLength=max(minSweepDistFactor*sweepDist,min(newLength,sweepDist));
+			} else sweepLength=sweepDist;
+		} 
 		#ifdef BV_FUNCTOR_CACHE
-			if(!shape->boundFunctor){ shape->boundFunctor=this->getFunctor1D(shape); if(!shape->boundFunctor) continue; }
-			// LOG_DEBUG("shape->boundFunctor.get()=="<<shape->boundFunctor.get()<<" for "<<b->shape->getClassName()<<", #"<<id);
-			//if(!shape->boundFunctor) throw runtime_error("boundFunctor not found for #"+lexical_cast<string>(id)); assert(shape->boundFunctor);
-			shape->boundFunctor->go(shape,b->bound,b->state->se3,b.get());
+		if(!shape->boundFunctor){ shape->boundFunctor=this->getFunctor1D(shape); if(!shape->boundFunctor) continue; }
+		shape->boundFunctor->go(shape,b->bound,b->state->se3,b.get());
 		#else
-			operator()(shape,b->bound,b->state->se3,b.get());
+		operator()(shape,b->bound,b->state->se3,b.get());
 		#endif
 		if(!b->bound) continue; // the functor did not create new bound
+		
 		if(sweepDist>0){
+			b->bound->refPos=b->state->pos;
+			b->bound->lastUpdateIter=scene->iter;
+			const Real& sweepLength = b->bound->sweepLength;
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
-			aabb->min-=Vector3r(sweepDist,sweepDist,sweepDist);
-			aabb->max+=Vector3r(sweepDist,sweepDist,sweepDist);
-		}
-		if(haveBins){
-			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
-			Real sweep=velocityBins->bins[velocityBins->bodyBins[b->getId()]].maxDist;
-			aabb->min-=Vector3r(sweep,sweep,sweep);
-			aabb->max+=Vector3r(sweep,sweep,sweep);
+			aabb->min-=Vector3r(sweepLength,sweepLength,sweepLength);
+			aabb->max+=Vector3r(sweepLength,sweepLength,sweepLength);
 		}
 	}
 	scene->updateBound();
@@ -110,13 +112,13 @@ void IGeomDispatcher::action(){
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 	#endif
 			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
-				scene->interactions->requestErase(I->getId1(),I->getId2());
+				scene->interactions->requestErase(I);
 				continue;
 			}
 			const shared_ptr<Body>& b1=(*bodies)[I->getId1()];
 			const shared_ptr<Body>& b2=(*bodies)[I->getId2()];
 
-			if(!b1 || !b2){ LOG_DEBUG("Body #"<<(b1?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
+			if(!b1 || !b2){ LOG_DEBUG("Body #"<<(b1?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I); continue; }
 
 			bool wasReal=I->isReal();
 			if (!b1->shape || !b2->shape) { assert(!wasReal); continue; } // some bodies do not have shape
@@ -128,7 +130,7 @@ void IGeomDispatcher::action(){
 				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, /*force*/ false, I);
 			}
 			// reset && erase interaction that existed but now has no geometry anymore
-			if(wasReal && !geomCreated){ scene->interactions->requestErase(I->getId1(),I->getId2()); }
+			if(wasReal && !geomCreated){ scene->interactions->requestErase(I); }
 	}
 }
 

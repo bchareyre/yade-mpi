@@ -31,7 +31,7 @@ void InteractionLoop::action(){
 	#ifdef IDISP_TIMING
 		timingDeltas->start();
 	#endif
-	if(scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
+	if(eraseIntsInLoop && scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;
 	}
@@ -94,7 +94,7 @@ void InteractionLoop::action(){
 		const shared_ptr<Body>& b1_=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
 
-		if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
+		if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I); continue; }
 
 		// we know there is no geometry functor already, take the short path
 		if(unlikely(!I->functorCache.geomExists)) { assert(!I->isReal()); continue; }
@@ -103,7 +103,7 @@ void InteractionLoop::action(){
 
 		bool swap=false;
 		// IGeomDispatcher
-		if(unlikely(!I->functorCache.geom || !I->functorCache.phys)){
+		if(unlikely(!I->functorCache.geom)){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
 			// returns NULL ptr if no functor exists; remember that and shortcut
 			if(!I->functorCache.geom) {I->functorCache.geomExists=false; continue; }
@@ -112,10 +112,10 @@ void InteractionLoop::action(){
 		// arguments for the geom functor are in the reverse order (dispatcher would normally call goReverse).
 		// we don't remember the fact that is reverse, so we swap bodies within the interaction
 		// and can call go in all cases
-		if(unlikely(swap)){I->swapOrder(); }
+		if(unlikely(swap)){I->swapOrder();}
 		// body pointers must be updated, in case we swapped
-		const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
-		const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
+		const shared_ptr<Body>& b1=swap?b2_:b1_;
+		const shared_ptr<Body>& b2=swap?b1_:b2_;
 
 		assert(I->functorCache.geom);
 		bool wasReal=I->isReal();
@@ -127,9 +127,9 @@ void InteractionLoop::action(){
 			// in sheared cell, apply shear on the mutual position as well
 			geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 		}
-		if(unlikely(!geomCreated)){
+		if(!geomCreated){
 			if(wasReal) LOG_WARN("IGeomFunctor returned false on existing interaction!");
-			if(wasReal) scene->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
+			if(wasReal) scene->interactions->requestErase(I); // fully created interaction without geometry is reset and perhaps erased in the next step
 			continue; // in any case don't care about this one anymore
 		}
 

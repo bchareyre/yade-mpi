@@ -89,7 +89,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 //	********	Tangential force				*******	 //
         if (   un < 0      )
         { // BREAK due to tension
-		 scene->interactions->requestErase(contact->getId1(),contact->getId2());
+		 scene->interactions->requestErase(contact); return;
 		 // probably not useful anymore
                 currentContactPhysics->normalForce = Vector3r::Zero();
                 currentContactPhysics->shearForce = Vector3r::Zero();

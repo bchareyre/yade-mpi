@@ -57,7 +57,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	const int id2 = I->getId2();
 	
 	if (geom.penetrationDepth<0) {
-		scene->interactions->requestErase(id1,id2);
+ 		scene->interactions->requestErase(I);
 		return;
 	}
 

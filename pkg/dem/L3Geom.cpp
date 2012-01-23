@@ -293,7 +293,7 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 	Vector3r& localF(geom->F);
 	localF=geom->relU().cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
 	// break if necessary
-	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I->getId1(),I->getId2()); return; }
+	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I); return; }
 
 	if(!noSlip){
 		// plastic slip, if necessary; non-zero elastic limit only for compression

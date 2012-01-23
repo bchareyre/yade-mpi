@@ -18,7 +18,7 @@ void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPh
 	
 	/*NormalForce */
 	Real displN=geom->displacementN();
-	if (displN>0){scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;}
+	if (displN>0){scene->interactions->requestErase(contact); return;}
 	phys->normalForce=phys->kn*displN*geom->normal;
 
 	/*ShearForce*/

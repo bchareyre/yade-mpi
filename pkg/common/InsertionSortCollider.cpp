@@ -5,7 +5,6 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/VelocityBins.hpp>
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
@@ -18,44 +17,32 @@ using namespace std;
 YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
 
-// return true if bodies bb overlap in all 3 dimensions
-bool InsertionSortCollider::spatialOverlap(Body::id_t id1, Body::id_t id2) const {
-	assert(!periodic);
-	return
-		(minima[3*id1+0]<=maxima[3*id2+0]) && (maxima[3*id1+0]>=minima[3*id2+0]) &&
-		(minima[3*id1+1]<=maxima[3*id2+1]) && (maxima[3*id1+1]>=minima[3*id2+1]) &&
-		(minima[3*id1+2]<=maxima[3*id2+2]) && (maxima[3*id1+2]>=minima[3*id2+2]);
-}
 
-// called by the insertion sort if 2 bodies swapped their bounds
+// called by the insertion sort if 2 bodies swapped their bounds in such a way that a new overlap may appear
 void InsertionSortCollider::handleBoundInversion(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(!periodic);
 	assert(id1!=id2);
-	// do bboxes overlap in all 3 dimensions?
-	bool overlap=spatialOverlap(id1,id2);
-	// existing interaction?
-	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
-	bool hasInter=(bool)I;
-	// interaction doesn't exist and shouldn't, or it exists and should
-	if(likely(!overlap && !hasInter)) return;
-	if(overlap && hasInter){  return; }
-	// create interaction if not yet existing
-	if(overlap && !hasInter){ // second condition only for readability
-		if(!Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get())) return;
-		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
-		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
-		interactions->insert(newI);
-		return;
-	}
-	if(!overlap && hasInter){ if(!I->isReal()) interactions->erase(id1,id2); return; }
-	assert(false); // unreachable
+	///fast
+	if (spatialOverlap(id1,id2) && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()) && !interactions->found(id1,id2))
+		interactions->insert(shared_ptr<Interaction>(new Interaction(id1,id2)));
+	
+	///slow
+// 	//existing interaction?
+// 	if (interactions->found(id1,id2)) {
+// 		//if existing interaction is virtual and bounds don't overlap, remove it
+// 		if (!interactions->find(id1,id2)->isReal() && !spatialOverlap(id1,id2)){ interactions->erase(id1,id2); return;}} 
+// 	//if it doesn't exist and bounds overlap, create a virtual interaction
+// 	else if (spatialOverlap(id1,id2) && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()))
+// 		interactions->insert(shared_ptr<Interaction>(new Interaction(id1,id2)));
 }
 
 void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 	assert(!periodic);
 	assert(v.size==(long)v.vec.size());
-	for(long i=0; i<v.size; i++){
+	for(long i=1; i<v.size; i++){
 		const Bounds viInit=v[i]; long j=i-1; /* cache hasBB; otherwise 1% overall performance hit */ const bool viInitBB=viInit.flags.hasBB;
+		const bool isMin=viInit.flags.isMin; 
+
 		while(j>=0 && v[j]>viInit){
 			v[j+1]=v[j];
 			#ifdef PISC_DEBUG
@@ -65,7 +52,11 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 			// no collisions without bounding boxes
 			// also, do not collide body with itself; it sometimes happens for facets aligned perpendicular to an axis, for reasons that are not very clear
 			// see https://bugs.launchpad.net/yade/+bug/669095
-			if(likely(doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id))) handleBoundInversion(viInit.id,v[j].id,interactions,scene);
+			// skip bounds with same isMin flags, since inversion doesn't imply anything in that case  
+			if(isMin && !v[j].flags.isMin && likely(doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id))) {
+				/*if (isMin)*/ handleBoundInversion(viInit.id,v[j].id,interactions,scene);
+// 				else handleBoundSplit(viInit.id,v[j].id,interactions,scene);
+			}
 			j--;
 		}
 		v[j+1]=viInit;
@@ -92,24 +83,20 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 	}
 	return ret;
 }
-
 // STRIDE
 	bool InsertionSortCollider::isActivated(){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
 		if(!strideActive) return true;
-		if(!newton || (nBins>=1 && !newton->velocityBins)) return true;
-		if(nBins>=1 && newton->velocityBins->checkSize_incrementDists_shouldCollide(scene)) return true;
-		if(nBins<=0){
-			if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
-			fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*scene->dt;
-			if(fastestBodyMaxDist>=verletDist) return true;
-		}
+		if(!newton) return true;
+		if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
+		fastestBodyMaxDist=newton->maxVelocitySq;
+		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) return true;
 		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
 		if(scene->interactions->dirty) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
-		scene->interactions->erasePending(*this,scene);
+// 		scene->interactions->erasePending(*this,scene);
 		return false;
 	}
 
@@ -127,8 +114,6 @@ void InsertionSortCollider::action(){
 		for(int i=0; i<3; i++) BB[i].vec.clear();
 		periodic=scene->isPeriodic;
 	}
-
-
 	// pre-conditions
 		// adjust storage size
 		bool doInitSort=false;
@@ -159,16 +144,6 @@ void InsertionSortCollider::action(){
 		// compatibility block, can be removed later
 		findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
 
-		// update bounds via boundDispatcher
-		boundDispatcher->scene=scene;
-		boundDispatcher->action();
-
-		// if interactions are dirty, force reinitialization
-		if(scene->interactions->dirty){
-			doInitSort=true;
-			scene->interactions->dirty=false;
-		}
-
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();
 			FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -181,15 +156,28 @@ void InsertionSortCollider::action(){
 			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
 		}
 		
+		// update bounds via boundDispatcher
+		boundDispatcher->scene=scene;
+		boundDispatcher->sweepDist=verletDist;
+		boundDispatcher->minSweepDistFactor=minSweepDistFactor;
+		boundDispatcher->targetInterv=targetInterv;
+		boundDispatcher->updatingDispFactor=updatingDispFactor;
+		boundDispatcher->action();
 
+		// if interactions are dirty, force reinitialization
+		if(scene->interactions->dirty){
+			doInitSort=true;
+			scene->interactions->dirty=false;
+		}
+		
 		// STRIDE
-			if(verletDist>0){
-				// get NewtonIntegrator, to ask for the maximum velocity value
-				if(!newton){
-					FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
-					if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
-				}
+		if(verletDist>0){
+			// get NewtonIntegrator, to ask for the maximum velocity value
+			if(!newton){
+				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+				if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 			}
+		}
 	ISC_CHECKPOINT("init");
 
 		// STRIDE
@@ -199,28 +187,8 @@ void InsertionSortCollider::action(){
 			}
 			if(strideActive){
 				assert(verletDist>0);
-				if(nBins<=0){
-					// reset bins, in case they were active but are not anymore
-					if(newton->velocityBins) newton->velocityBins=shared_ptr<VelocityBins>(); if(boundDispatcher->velocityBins) boundDispatcher->velocityBins=shared_ptr<VelocityBins>();
-					assert(strideActive); assert(newton->maxVelocitySq>=0); assert(sweepFactor>1.);
-					Real sweepVelocity=sqrt(newton->maxVelocitySq)*sweepFactor; int stride=-1;
-					if(sweepVelocity>0) {
-						stride=max(1,int((verletDist/sweepVelocity)/scene->dt));
-						boundDispatcher->sweepDist=scene->dt*(stride-1)*sweepVelocity;
-					} else { // no motion
-						boundDispatcher->sweepDist=0; // nothing moves, no need to make bboxes larger
-					}
-					LOG_DEBUG(scene->time<<"s: stride ≈"<<stride<<"; maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
-					fastestBodyMaxDist=0; // reset
-				} else { // nBins>=1
-					if(!newton->velocityBins){ newton->velocityBins=shared_ptr<VelocityBins>(new VelocityBins(nBins,newton->maxVelocitySq,binCoeff,binOverlap)); }
-					if(!boundDispatcher->velocityBins) boundDispatcher->velocityBins=newton->velocityBins;
-					// update things:
-					newton->velocityBins->nBins=nBins; newton->velocityBins->binCoeff=binCoeff; newton->velocityBins->binOverlap=binOverlap; newton->velocityBins->maxRefRelStep=maxRefRelStep; newton->velocityBins->histInterval=histInterval;  
-					boundDispatcher->sweepDist=0; // not used with bins at all
-					// re-bin bodies
-					newton->velocityBins->setBins(scene,newton->maxVelocitySq,verletDist);
-				}
+				assert(strideActive); assert(newton->maxVelocitySq>=0);
+					newton->updatingDispFactor=updatingDispFactor;
 			} else { /* !strideActive */
 				boundDispatcher->sweepDist=0;
 			}
@@ -237,7 +205,9 @@ void InsertionSortCollider::action(){
 					const shared_ptr<Bound>& bv=b->bound;
 					// coordinate is min/max if has bounding volume, otherwise both are the position. Add periodic shift so that we are inside the cell
 					// watch out for the parentheses around ?: within ?: (there was unwanted conversion of the Reals to bools!)
+					
 					BBj[i].coord=((BBj[i].flags.hasBB=((bool)bv)) ? (BBj[i].flags.isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
+					
 				} else { BBj[i].flags.hasBB=false; /* for vanished body, keep the coordinate as-is, to minimize inversions. */ }
 				// if initializing periodic, shift coords & record the period into BBj[i].period
 				if(doInitSort && periodic) {
@@ -259,7 +229,9 @@ void InsertionSortCollider::action(){
 	ISC_CHECKPOINT("copy");
 
 	// process interactions that the constitutive law asked to be erased
-	interactions->erasePending(*this,scene);
+// 	interactions->erasePending(*this,scene);
+	interactions->conditionalyEraseNonReal(*this,scene);
+	
 	ISC_CHECKPOINT("erase");
 
 	// sort
@@ -349,6 +321,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 		// vi is the copy that will travel down the list, while other elts go up
 		// if will be placed in the list only at the end, to avoid extra copying
 		int j=i_1; Bounds vi=v[i];  const bool viHasBB=vi.flags.hasBB;
+		const bool isMin=v[i].flags.isMin; 
 		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
 			long j1=v.norm(j+1);
 			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
@@ -364,7 +337,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 			// inversions close the the split need special care
 			if(unlikely(j==loIdx && vi.coord<0)) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 			else if(unlikely(j1==loIdx)) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
-			if(likely(doCollide && viHasBB && v[j].flags.hasBB)){
+			if(isMin && !v[j].flags.isMin && likely(doCollide && viHasBB && v[j].flags.hasBB)){
 				// see https://bugs.launchpad.net/yade/+bug/669095 and similar problem in aperiodic insertionSort
 				#if 0
 				if(vi.id==vNew.id){
@@ -383,43 +356,54 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 // called by the insertion sort if 2 bodies swapped their bounds
 void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(periodic);
-	// do bboxes overlap in all 3 dimensions?
+	
+	///fast
 	Vector3i periods;
 	bool overlap=spatialOverlapPeri(id1,id2,scene,periods);
-	// existing interaction?
-	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
-	bool hasInter=(bool)I;
-	#ifdef PISC_DEBUG
-		if(watchIds(id1,id2)) LOG_DEBUG("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
-	#endif
-	// interaction doesn't exist and shouldn't, or it exists and should
-	if(likely(!overlap && !hasInter)) return;
-	if(overlap && hasInter){  return; }
-	// create interaction if not yet existing
-	if(overlap && !hasInter){ // second condition only for readability
-		#ifdef PISC_DEBUG
-			if(watchIds(id1,id2)) LOG_DEBUG("Attemtping collision of #"<<id1<<"+#"<<id2);
-		#endif
-		if(!Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get())) return;
-		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
+	if (overlap && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()) && !interactions->found(id1,id2)){
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
 		newI->cellDist=periods;
-		#ifdef PISC_DEBUG
-			if(watchIds(id1,id2)) LOG_DEBUG("Created intr #"<<id1<<"+#"<<id2<<", periods="<<periods);
-		#endif
 		interactions->insert(newI);
-		return;
 	}
-	if(!overlap && hasInter){
-		if(!I->isReal()) {
-			interactions->erase(id1,id2);
-			#ifdef PISC_DEBUG
-				if(watchIds(id1,id2)) LOG_DEBUG("Erased intr #"<<id1<<"+#"<<id2);
-			#endif
-		}
-		return;
-	}
-	assert(false); // unreachable
+	
+	///Slow
+	// do bboxes overlap in all 3 dimensions?
+// 	Vector3i periods;
+// 	bool overlap=spatialOverlapPeri(id1,id2,scene,periods);
+// 	// existing interaction?
+// 	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
+// 	bool hasInter=(bool)I;
+// 	#ifdef PISC_DEBUG
+// 		if(watchIds(id1,id2)) LOG_DEBUG("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
+// 	#endif
+// 	// interaction doesn't exist and shouldn't, or it exists and should
+// 	if(likely(!overlap && !hasInter)) return;
+// 	if(overlap && hasInter){  return; }
+// 	// create interaction if not yet existing
+// 	if(overlap && !hasInter){ // second condition only for readability
+// 		#ifdef PISC_DEBUG
+// 			if(watchIds(id1,id2)) LOG_DEBUG("Attemtping collision of #"<<id1<<"+#"<<id2);
+// 		#endif
+// 		if(!Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get())) return;
+// 		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
+// 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
+// 		newI->cellDist=periods;
+// 		#ifdef PISC_DEBUG
+// 			if(watchIds(id1,id2)) LOG_DEBUG("Created intr #"<<id1<<"+#"<<id2<<", periods="<<periods);
+// 		#endif
+// 		interactions->insert(newI);
+// 		return;
+// 	}
+// 	if(!overlap && hasInter){
+// 		if(!I->isReal()) {
+// 			interactions->erase(id1,id2);
+// 			#ifdef PISC_DEBUG
+// 				if(watchIds(id1,id2)) LOG_DEBUG("Erased intr #"<<id1<<"+#"<<id2);
+// 			#endif
+// 		}
+// 		return;
+// 	}
+// 	assert(false); // unreachable
 }
 
 /* Performance hint

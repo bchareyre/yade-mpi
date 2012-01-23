@@ -80,8 +80,12 @@ class InteractionContainer: public Serializable{
 		// insertion/deletion
 		bool insert(Body::id_t id1,Body::id_t id2);
 		bool insert(const shared_ptr<Interaction>& i);
-		bool erase(Body::id_t id1,Body::id_t id2);
+		//3rd parameter is used to remove I from linIntrs (in conditionalyEraseNonReal()) when body b1 has been removed
+		bool erase(Body::id_t id1,Body::id_t id2,int linPos=-1);
 		const shared_ptr<Interaction>& find(Body::id_t id1,Body::id_t id2);
+// 		bool found(Body::id_t id1,Body::id_t id2);
+		inline bool found(const Body::id_t& id1,const Body::id_t& id2){
+			assert(bodies); return (id1>id2)?(*bodies)[id2]->intrs.count(id1):(*bodies)[id1]->intrs.count(id2);}
 		// index access
 		shared_ptr<Interaction>& operator[](size_t id){return linIntrs[id];}
 		const shared_ptr<Interaction>& operator[](size_t id) const { return linIntrs[id];}
@@ -99,6 +103,8 @@ class InteractionContainer: public Serializable{
 		long iterColliderLastRun;
 		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state) and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
 		void requestErase(Body::id_t id1, Body::id_t id2, bool force=false);
+		void requestErase(const shared_ptr<Interaction>& I);
+		void requestErase(Interaction* I);
 		/*! List of pairs of interactions that will be (maybe) erased by the collider; if force==true, they will be deleted unconditionally.
 			
 			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you).
@@ -152,6 +158,17 @@ class InteractionContainer: public Serializable{
 				}
 			#endif
 			return ret;
+		}
+		/*! Traverse all interactions and erase them if they are not real and the (T*)->shouldBeErased(id1,id2) return true, or if body(id1) has been deleted
+			Class using this interface (which is presumably a collider) must define the
+				bool shouldBeErased(Body::id_t, Body::id_t) const
+		*/
+		template<class T> void conditionalyEraseNonReal(const T& t, Scene* rb){
+			// beware iterators here, since erase is invalidating them. We need to iterate carefully, and keep in mind that erasing one interaction is moving the last one to the current position.
+		 	for (size_t linPos=0; linPos<currSize;){
+				const shared_ptr<Interaction>& i=linIntrs[linPos];
+				if(!i->isReal() && t.shouldBeErased(i->getId1(),i->getId2(),rb)) erase(i->getId1(),i->getId2(),linPos);
+				else linPos++;}
 		}
 
 	// we must call Scene's ctor (and from Scene::postLoad), since we depend on the existing BodyContainer at that point.

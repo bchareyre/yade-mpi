@@ -23,6 +23,7 @@ class InteractionLoop: public GlobalEngine {
 			((shared_ptr<IPhysDispatcher>,physDispatcher,new IPhysDispatcher,Attr::readonly,":yref:`IPhysDispatcher` object used for dispatch."))
 			((shared_ptr<LawDispatcher>,lawDispatcher,new LawDispatcher,Attr::readonly,":yref:`LawDispatcher` object used for dispatch."))
 			((vector<shared_ptr<IntrCallback> >,callbacks,,,":yref:`Callbacks<IntrCallback>` which will be called for every :yref:`Interaction`, if activated."))
+			((bool, eraseIntsInLoop, false,,"Defines if the interaction loop should erase pending interactions, else the collider takes care of that alone (depends on what collider is used)."))
 			,
 			/*ctor*/ alreadyWarnedNoCollider=false;
 				#ifdef IDISP_TIMING

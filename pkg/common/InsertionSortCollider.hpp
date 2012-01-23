@@ -152,12 +152,21 @@ class InsertionSortCollider: public Collider{
 	*/
 	void insertionSort(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
 	void handleBoundInversion(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
-	bool spatialOverlap(Body::id_t,Body::id_t) const;
+// 	bool spatialOverlap(Body::id_t,Body::id_t) const;
 
 	// periodic variants
 	void insertionSortPeri(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
 	void handleBoundInversionPeri(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
+	void handleBoundSplit(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
+	
 	bool spatialOverlapPeri(Body::id_t,Body::id_t,Scene*,Vector3i&) const;
+	inline bool spatialOverlap(const Body::id_t& id1, const Body::id_t& id2) const {
+	assert(!periodic);
+	return	(minima[3*id1+0]<=maxima[3*id2+0]) && (maxima[3*id1+0]>=minima[3*id2+0]) &&
+		(minima[3*id1+1]<=maxima[3*id2+1]) && (maxima[3*id1+1]>=minima[3*id2+1]) &&
+		(minima[3*id1+2]<=maxima[3*id2+2]) && (maxima[3*id1+2]>=minima[3*id2+2]);
+	}
+	
 	static Real cellWrap(const Real, const Real, const Real, int&);
 	static Real cellWrapRel(const Real, const Real, const Real);
 
@@ -198,18 +207,23 @@ class InsertionSortCollider: public Collider{
 		If you additionally set ``nBins`` to >=1, not all particles will have their bound enlarged by ``verletDist``; instead, they will be put to bins (in the statistical sense) based on magnitude of their velocity; ``verletDist`` will only be used for particles in the fastest bin, whereas only proportionally smaller length will be used for slower particles; The coefficient between bin's velocities is given by ``binCoeff``.\
 	",
 		((int,sortAxis,0,,"Axis for the initial contact detection."))
-		((bool,sortThenCollide,false,,"Separate sorting and colliding phase; it is MUCH slower, but all interactions are processed at every step; this effectively makes the collider non-persistent, not remembering last state. (The default behavior relies on the fact that inversions during insertion sort are overlaps of bounding boxes that just started/ceased to exist, and only processes those; this makes the collider much more efficient.)"))
 		((bool,allowBiggerThanPeriod,false,,"If true, tests on bodies sizes will be disabled, and the simulation will run normaly even if bodies larger than period are found. It can be usefull when the periodic problem include e.g. a floor modelized with wall/box/facet.\nBe sure you know what you are doing if you touch this flag. The result is undefined if one large body moves out of the (0,0,0) period."))
-		((Real,verletDist,((void)"Automatically initialized",-.05),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be |verletDist| × minimum spherical particle radius; if there are no spherical particles, it will be disabled."))
-		((Real,sweepFactor,1.05,,"Overestimation factor for the sweep velocity; must be >=1.0. Has no influence on verletDist, only on the computed stride. [DEPRECATED, is used only when bins are not used]."))
-		((Real,fastestBodyMaxDist,-1,,"Maximum displacement of the fastest body since last run; if >= verletDist, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
-		((int,nBins,5,,"Number of velocity bins for striding. If <=0, bin-less strigin is used (this is however DEPRECATED)."))
-		((Real,binCoeff,2,,"Coefficient of bins for velocities, i.e. if ``binCoeff==5``, successive bins have 5 × smaller velocity peak than the previous one. (Passed to VelocityBins)"))
-		((Real,binOverlap,0.8,,"Relative bins hysteresis, to avoid moving body back and forth if its velocity is around the border value. (Passed to VelocityBins)"))
-		((Real,maxRefRelStep,.3,,"(Passed to VelocityBins)"))
-		((int,histInterval,100,,"How often to show velocity bins graphically, if debug logging is enabled for VelocityBins."))
+		((bool,sortThenCollide,false,,"Separate sorting and colliding phase; it is MUCH slower, but all interactions are processed at every step; this effectively makes the collider non-persistent, not remembering last state. (The default behavior relies on the fact that inversions during insertion sort are overlaps of bounding boxes that just started/ceased to exist, and only processes those; this makes the collider much more efficient.)"))
+		((int,targetInterv,30,,"(experimental) Target number of iterations between bound update, used to define a smaller sweep distance for slower grains if >0, else always use 1*verletDist. Usefull in simulations with strong velocity contrasts between slow bodies and fast bodies."))
+		((Real,updatingDispFactor,-1,,"(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated."))
+		((Real,verletDist,((void)"Automatically initialized",-.5),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be |verletDist| × minimum spherical particle radius; if there are no spherical particles, it will be disabled. The actual length added to one bound can be only a fraction of verletDist when :yref:`InsertionSortCollider::targetInterv` is >0."))
+		((Real,minSweepDistFactor,0.2,,"Minimal distance by which enlarge all bounding boxes; superseeds computed value of verletDist when lower that (minSweepDistFactor x verletDist)."))
+		((Real,fastestBodyMaxDist,-1,,"Normalized maximum displacement of the fastest body since last run; if >= 1, we could get out of bboxes and will trigger full run. |yupdate|"))
 		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
-		, /*deprec*/ ((sweepLength,verletDist,"conform to usual DEM terminology"))
+		((Real,useless,,,"for compatibility of scripts defining the old collider's attributes - see deprecated attributes")) 
+		, /*deprec*/
+		((sweepLength,verletDist,"conform to usual DEM terminology"))
+		((nBins,useless,"DEPRECATED - remove this useless attribute from scripts"))
+		((binCoeff,useless,"DEPRECATED - remove this useless attribute from scripts"))
+		((binOverlap,useless,"DEPRECATED - remove this useless attribute from scripts"))
+		((maxRefRelStep,useless,"DEPRECATED - remove this useless attribute from scripts"))
+		((histInterval,useless,"DEPRECATED - remove this useless attribute from scripts"))
+		((sweepFactor,useless,"DEPRECATED - remove this useless attribute from scripts"))
 		, /* init */
 		,
 		/* ctor */

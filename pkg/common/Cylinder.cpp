@@ -346,12 +346,12 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(id1,id2);
+		else 	scene->interactions->requestErase(contact);
 		return;}
 	if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
 // 			cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) scene->interactions->requestErase(id1,id2);
+			if (geom->isDuplicate==2) scene->interactions->requestErase(contact);
 // 			cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
 			return;}
 	}

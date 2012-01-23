@@ -28,7 +28,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared
 
 	/* Determination of interaction */
 	if (D < 0){ //spheres do not touch 
-	  if (!phys->isCohesive){ scene->interactions->requestErase(contact->getId1(),contact->getId2()); return; } // destroy the interaction before calculation
+	  if (!phys->isCohesive){ scene->interactions->requestErase(contact); return; } // destroy the interaction before calculation
 	  if ((phys->isCohesive) && (abs(D) > (Dtensile + Dsoftening))) { // spheres are bonded and the interacting distance is greater than the one allowed ny the defined cohesion
 	    phys->isCohesive=false; 
 	    // update body state with the number of broken bonds
@@ -42,7 +42,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared
 	    //{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive+=1; }
 	    //{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive+=1; }
 	    // end of update
-	    scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+	    scene->interactions->requestErase(contact); return;
 	  }
 	}	  
 	

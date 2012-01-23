@@ -55,7 +55,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 		if (unlikely(neverErase)) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(id1,id2);
+		else 	scene->interactions->requestErase(contact);
 		return;}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
@@ -103,7 +103,7 @@ void Law2_Dem3DofGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
 	Real displN=geom->displacementN();
-	if(displN>0){ scene->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
+	if(displN>0){ scene->interactions->requestErase(contact); return; }
 	phys->normalForce=phys->kn*displN*geom->normal;
 	Real maxFsSq=phys->normalForce.squaredNorm()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();

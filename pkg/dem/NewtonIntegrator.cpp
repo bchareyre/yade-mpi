@@ -9,7 +9,6 @@
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/dem/Clump.hpp>
-#include<yade/pkg/common/VelocityBins.hpp>
 #include<yade/lib/base/Math.hpp>
 
 YADE_PLUGIN((NewtonIntegrator));
@@ -59,11 +58,26 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 }
 
 void NewtonIntegrator::saveMaximaVelocity(const Body::id_t& id, State* state){
-	if(haveBins) velocityBins->binVelSqUse(id,VelocityBins::getBodyVelSq(state));
 	#ifdef YADE_OPENMP
 		Real& thrMaxVSq=threadMaxVelocitySq[omp_get_thread_num()]; thrMaxVSq=max(thrMaxVSq,state->vel.squaredNorm());
 	#else
 		maxVelocitySq=max(maxVelocitySq,state->vel.squaredNorm());
+	#endif
+}
+
+
+void NewtonIntegrator::saveMaximaDisplacement(const shared_ptr<Body>& b){
+	if (!b->bound) return;//clumps for instance, have no bounds, hence not saved
+	Vector3r disp=b->state->pos-b->bound->refPos;
+	Real maxDisp=max(abs(disp[0]),max(abs(disp[1]),abs(disp[2])));
+	if (!maxDisp || maxDisp<b->bound->sweepLength) {/*b->bound->isBounding = (updatingDispFactor>0 && (updatingDispFactor*maxDisp)<b->bound->sweepLength);*/
+	maxDisp=0.5;//not 0, else it will be seen as "not updated" by the collider, but less than 1 means no colliding
+	}
+	else {/*b->bound->isBounding = false;*/ maxDisp=2;/*2 is more than 1, enough to trigger collider*/}
+	#ifdef YADE_OPENMP
+		Real& thrMaxVSq=threadMaxVelocitySq[omp_get_thread_num()]; thrMaxVSq=max(thrMaxVSq,maxDisp);
+	#else
+		maxVelocitySq=max(maxVelocitySq,maxDisp);
 	#endif
 }
 
@@ -81,9 +95,6 @@ void NewtonIntegrator::action()
 	// FIXME: will not work for pure shear transformation, which does not change Cell::getSize()
 	if(scene->isPeriodic && ((prevCellSize!=scene->cell->getSize())) && /* initial value */!isnan(prevCellSize[0]) ){ cellChanged=true; maxVelocitySq=(prevCellSize-scene->cell->getSize()).squaredNorm()/pow(dt,2); }
 	else { maxVelocitySq=0; cellChanged=false; }
-
-	haveBins=(bool)velocityBins;
-	if(haveBins) velocityBins->binVelSqInitialize(maxVelocitySq);
 
 	#ifdef YADE_BODY_CALLBACK
 		// setup callbacks
@@ -166,8 +177,7 @@ void NewtonIntegrator::action()
 			leapfrogTranslate(state,id,dt);
 			if(!useAspherical) leapfrogSphericalRotate(state,id,dt);
 			else leapfrogAsphericalRotate(state,id,dt,m);
-
-			saveMaximaVelocity(id,state);
+			saveMaximaDisplacement(b);
 			// move individual members of the clump, save maxima velocity (for collider stride)
 			if(b->isClump()) Clump::moveMembers(b,scene,this);
 			
@@ -182,7 +192,6 @@ void NewtonIntegrator::action()
 	#ifdef YADE_OPENMP
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
-	if(haveBins) velocityBins->binVelSqFinalize();
 	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize(); prevVelGrad=scene->cell->velGrad; }
 }
 

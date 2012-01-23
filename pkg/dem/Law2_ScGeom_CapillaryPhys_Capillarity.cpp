@@ -158,7 +158,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					}
 					if (!Vinterpol) {
 						if (fusionDetection) bodiesMenisciiList.remove((*ii));
-						if (D>0) scene->interactions->requestErase(id1,id2);
+						if (D>0) scene->interactions->requestErase(interaction);
 					}
 					/// wetting angles
 					if (!hertzOn) {
