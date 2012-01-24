@@ -39,7 +39,7 @@ Vector3r NewtonIntegrator::computeAngAccel(const Vector3r& torque, const Vector3
 void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* state, const Vector3r& fluctVel, const Vector3r& f, const Vector3r& m){
 	assert(b->isStandalone() || b->isClump());
 	// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
-	if(damping!=0.){
+	if(damping!=0. && state->isDamped){
 		scene->energy->add(fluctVel.cwise().abs().dot(f.cwise().abs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
 		// when the aspherical integrator is used, torque is damped instead of ang acceleration; this code is only approximate
 		scene->energy->add(state->angVel.cwise().abs().dot(m.cwise().abs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,false);
@@ -157,7 +157,7 @@ void NewtonIntegrator::action()
 			if (state->blockedDOFs!=State::DOF_ALL) {
 				// linear acceleration
 				Vector3r linAccel=computeAccel(f,state->mass,state->blockedDOFs);
-				cundallDamp2nd(dt,f,fluctVel,linAccel);
+				if(state->isDamped) cundallDamp2nd(dt,f,fluctVel,linAccel);
 				//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt*pos+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
 				linAccel+=prevVelGrad*state->vel;
 				//finally update velocity
@@ -165,11 +165,11 @@ void NewtonIntegrator::action()
 				// angular acceleration
 				if(!useAspherical){ // uses angular velocity
 					Vector3r angAccel=computeAngAccel(m,state->inertia,state->blockedDOFs);
-					cundallDamp2nd(dt,m,state->angVel,angAccel);
+					if(state->isDamped) cundallDamp2nd(dt,m,state->angVel,angAccel);
 					state->angVel+=dt*angAccel;
 				} else { // uses torque
 					for(int i=0; i<3; i++) if(state->blockedDOFs & State::axisDOF(i,true)) m[i]=0; // block DOFs here
-					cundallDamp1st(m,state->angVel);
+					if(state->isDamped) cundallDamp1st(m,state->angVel);
 				}
 			}
 

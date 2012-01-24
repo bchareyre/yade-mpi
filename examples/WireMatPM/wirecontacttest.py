@@ -117,6 +117,7 @@ for id in movingIds:
 
 #### import block as a sphere after net has been created
 bloc=O.bodies.append(sphere([1.0,1.0,0.65],radius=0.15,wire=False,highlight=False,color=[1,1,0],material=blocMat))
+O.bodies[bloc].state.isDamped=False	# switch damping off since free fall under gravity
 
 
 #### plot some results
