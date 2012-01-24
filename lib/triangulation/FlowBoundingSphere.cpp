@@ -8,6 +8,11 @@
 
 #include "FlowBoundingSphere.hpp"
 
+namespace CGT {
+Vecteur PeriodicCellInfo::gradP;
+Vecteur PeriodicCellInfo::hSize[3];
+}
+
 //Forcing instanciation of the template to avoid linkage problems 
 typedef CGT::FlowBoundingSphere<FlowTesselation> FlowBoundingSphere;
 FlowBoundingSphere ex;

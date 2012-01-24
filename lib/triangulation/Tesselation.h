@@ -133,12 +133,15 @@ public:
 template<class Tesselation>
 class PeriodicTesselation : public Tesselation
 {
-	///Insert a sphere, which can be a duplicate one from the base period if duplicateOfId>=0
-	typedef typename Tesselation::Vertex_handle Vertex_handle;
+	public:
+	DECLARE_TESSELATION_TYPES(Tesselation)
+	using Tesselation::Tri;
 	using Tesselation::vertexHandles;
 	using Tesselation::max_id;
-	
-	Vertex_handle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false, bool duplicateOfId=false);
+	using Tesselation::redirected;
+		
+	///Insert a sphere, which can be a duplicate one from the base period if duplicateOfId>=0
+	Vertex_handle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false, int duplicateOfId=-1);
 	///Fill a vector with vertexHandles[i] = handle of vertex with id=i for fast access, contains only spheres from the base period
 	bool redirect (void);
 };
@@ -148,5 +151,8 @@ class PeriodicTesselation : public Tesselation
 #include "Tesselation.ipp"
 
 //Explicit instanciation
-typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes>	SimpleTesselation;
-typedef CGT::_Tesselation<CGT::FlowTriangulationTypes>		FlowTesselation;
+typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes>		SimpleTesselation;
+typedef CGT::_Tesselation<CGT::FlowTriangulationTypes>			FlowTesselation;
+typedef CGT::PeriodicTesselation<CGT::_Tesselation<CGT::PeriFlowTriangulationTypes> >	PeriFlowTesselation;
+
+

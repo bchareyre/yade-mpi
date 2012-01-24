@@ -785,7 +785,7 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 				if (k<0 && DEBUG_OUT) {surfneg+=1;
 				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
-				} else  {cout <<"infinite K!"<<endl; k = infiniteK;}//Will be corrected in the next loop
+				} else  {cout <<"infinite K1!"<<endl; k = infiniteK;}//Will be corrected in the next loop
 
 				(cell->info().k_norm())[j]= k*k_factor;
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;

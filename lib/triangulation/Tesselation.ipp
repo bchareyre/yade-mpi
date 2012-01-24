@@ -517,20 +517,46 @@ bool _Tesselation<TT>::is_internal ( Finite_facets_iterator &facet )
 	
 
 template<class Tesselation>
-typename Tesselation::Vertex_handle PeriodicTesselation<Tesselation>::insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious, bool duplicateOfId)
+typename Tesselation::Vertex_handle PeriodicTesselation<Tesselation>::insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious, int duplicateOfId)
 {
 	Vertex_handle Vh;
-	Vh = Tesselation::Tri->insert(Sphere(Point(x,y,z),pow(rad,2)));
+	Vh = Tri->insert(Sphere(Point(x,y,z),pow(rad,2)));
 	if ( Vh!=NULL )
 	{
 		Vh->info() = id;
 		Vh->info().isFictious = isFictious;
-		if (!duplicateOfId) {
+		if (duplicateOfId<0) {
 			vertexHandles[id] = Vh;
-			max_id = std::max ( max_id, (int) id );}
+			max_id = std::max ( max_id, (int) id );
+			Vh->info().isGhost=0;
+		} else Vh->info().isGhost=1;
 	}
 	else cout << id <<  " : Vh==NULL!!" << endl;
 	return Vh;
+}
+
+template<class Tesselation>
+bool PeriodicTesselation<Tesselation>::redirect ( void )
+{
+	if ( !redirected )
+	{
+		//Set size of the redirection vector
+		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
+		//cout << "!redirected" << endl;
+		max_id = 0;
+		Finite_vertices_iterator vertices_end = Tri->finite_vertices_end ();
+		for ( Finite_vertices_iterator V_it = Tri->finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
+		{
+			if (V_it->info().isGhost) continue;
+			vertexHandles[V_it->info().id()]= V_it;
+			max_id = max(max_id, (int) V_it->info().id());
+			//if ( ! ( V_it->info().isFictious ) ) vertexHandles[V_it->info().id() ]= V_it;
+			//std::cout<< "Cell " << V_it->info().id() << ": v=" << V_it->info().v() << std::endl;
+		}
+		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
+		redirected = true;
+	} else return false;
+	return true;
 }
 
 } //namespace CGT

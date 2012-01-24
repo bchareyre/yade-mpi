@@ -157,6 +157,39 @@ public:
 	inline Real& vol_cells (void) {return volume_incident_cells;}
 };
 
+class PeriodicCellInfo : public FlowCellInfo
+{	
+	public:
+	static Vecteur gradP;
+	int period[3];
+	static Vecteur hSize[3];
+	int ghost;
+	Real* _pression;
+	bool isGhost;
+	PeriodicCellInfo (void)
+	{
+		_pression=&pression;
+	}
+	~PeriodicCellInfo (void) {}
+	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
+	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
+	
+	inline const double shiftedP (void) {return isGhost? (*_pression)+(hSize[0]*gradP)*period[0] + (hSize[1]*gradP)*period[1] +(hSize[2]*gradP)*period[2] :(*_pression) ;}
+// 	inline const double p (void) {return shiftedP();}
+	inline double setP (Real p) {pression=p;}
+};
+
+class PeriodicVertexInfo : public FlowVertexInfo {
+	public:
+	PeriodicVertexInfo& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
+	PeriodicVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
+	PeriodicVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
+	bool isGhost;
+	int period[3];
+	inline const Vecteur ghostShift (void) {return isGhost? (period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2]) : CGAL::NULL_VECTOR;}
+};
+
+
 } // namespace CGT
 
 #endif

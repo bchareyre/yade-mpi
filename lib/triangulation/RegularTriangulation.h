@@ -47,6 +47,7 @@ typedef typename RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
 typedef CGAL::To_double<double>							W_TO_DOUBLE; // foncteur Weight to Real 
 typedef TriangulationTypes<SimpleVertexInfo,SimpleCellInfo>			SimpleTriangulationTypes;
 typedef TriangulationTypes<FlowVertexInfo,FlowCellInfo>				FlowTriangulationTypes;
+typedef TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo>			PeriFlowTriangulationTypes;
 
 } // namespace CGT
 
