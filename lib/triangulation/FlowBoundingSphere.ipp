@@ -537,7 +537,7 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache()
 					const Vecteur& Surfk = cell->info().facetSurfaces[j];
 					//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
 					//The ratio void surface / facet surface
-					Real area = sqrt(Surfk.squared_length());
+					Real area = sqrt(Surfk.squared_length()); if (area<=0) cerr <<"AREA <= 0!!"<<endl;
 					Vecteur facetNormal = Surfk/area;
 					const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
 					Vecteur fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
@@ -993,6 +993,11 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
         }
         for (unsigned int n=0; n<imposedP.size();n++) {
 		Cell_handle cell=Tri.locate(imposedP[n].first);
+		IPCells.push_back(cell);
+		//check redundancy
+		for (unsigned int kk=0;kk<IPCells.size();kk++){
+			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
+			else if  (cell->info().Pcondition) cerr<<"Imposed pressure fall in a boundary condition."<<endl;}
 // 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
 // 		assert(cell);
 		cell->info().p()=imposedP[n].second;

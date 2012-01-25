@@ -78,6 +78,7 @@ double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int
                 Vertex_handle& SV3 = W[2];
 
                 cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point()-SV3->point(),SV2->point()-SV3->point());
+		if (cell->info().facetSurfaces[j][0]==0 && cell->info().facetSurfaces[j][1]==0 && cell->info().facetSurfaces[j][2]==0) cerr<<"NULL FACET SURF"<<endl;
                 if (cell->info().facetSurfaces[j]*(p2-p1) > 0) cell->info().facetSurfaces[j] = -1.0*cell->info().facetSurfaces[j];
                 Real Vtot = abs(ONE_THIRD*cell->info().facetSurfaces[j]*(p1-p2));
 		Vtotalissimo += Vtot;
@@ -353,7 +354,9 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
 
     Ssolid = Ssolid1+Ssolid1n+Ssolid2+Ssolid2n+Ssolid3+Ssolid3n;
 
-    cell->info().solidSurfaces[j][3]=1.0/Ssolid;
+    if (Ssolid)
+	cell->info().solidSurfaces[j][3]=1.0/Ssolid;
+    else cell->info().solidSurfaces[j][3]=0;
     Ssolid_tot += Ssolid;
 
     return Ssolid;

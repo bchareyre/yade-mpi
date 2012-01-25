@@ -138,7 +138,7 @@ void PeriodicFlow::Compute_Permeability()
 // 	std::ofstream fFile( "Radii_Fictious",std::ios::out);
 //         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
 	Real meanK=0, STDEV=0, meanRadius=0, meanDistance=0;
-	Real infiniteK=1e10;
+	Real infiniteK=1e3;
 
 	double volume_sub_pore = 0.f;
 
@@ -207,7 +207,9 @@ void PeriodicFlow::Compute_Permeability()
 					cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
 					} 
-					else  {cout <<"infinite K2!"<<endl; k = infiniteK;}//Will be corrected in the next loop
+					else  {
+						cout <<"infinite K2!"<<endl; k = infiniteK;
+					}//Will be corrected in the next loop
 
 					(cell->info().k_norm())[j]= k*k_factor;
 					(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
