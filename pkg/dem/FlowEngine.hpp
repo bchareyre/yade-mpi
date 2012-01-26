@@ -33,7 +33,7 @@ class FlowEngine : public PartialEngine
 	typedef FlowSolver::Cell_handle						Cell_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
 	
-	private:
+	protected:
 		shared_ptr<FlowSolver> solver;
 
 	public :
@@ -263,7 +263,11 @@ class PeriodicFlowEngine : public FlowEngine
 			((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
 			,,
 			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
+// 			FlowEngine::solver=shared_ptr<FlowSolver>;
 			solver = shared_ptr<FlowSolver> (new FlowSolver);
+			Update_Triangulation=false;
+			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
+			ReTrg=1;
 			,
 			.def("MeanVelocity",&PeriodicFlowEngine::MeanVelocity,"measure the mean velocity in the period")
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")

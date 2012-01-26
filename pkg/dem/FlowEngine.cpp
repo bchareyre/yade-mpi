@@ -37,17 +37,6 @@ const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 void FlowEngine::action()
 {
 	if (!isActivated) return;
-	if (!solver) {
-		solver = shared_ptr<FlowSolver> (new FlowSolver);
-		first=true;
-		cerr <<"first = true"<<endl;
-		Update_Triangulation=false;
-		eps_vol_max=0.f;
-		Eps_Vol_Cumulative=0.f;
-		ReTrg=1;
-		retriangulationLastIter=0;
-	}
-
 	timingDeltas->start();
 
 	if (first) Build_Triangulation(P_zero,solver);
@@ -87,8 +76,8 @@ void FlowEngine::action()
 		///End Compute flow and forces
 		timingDeltas->checkpoint("Applying Forces");
 	}
-// 	if ( scene->iter % PermuteInterval == 0 )
-// 	{ Update_Triangulation = true; }
+	if ( scene->iter % PermuteInterval == 0 )
+	{ Update_Triangulation = true; }
 
 	if (Update_Triangulation && !first) {
 		Build_Triangulation(solver);
@@ -106,26 +95,36 @@ void FlowEngine::action()
 template<class Solver>
 void FlowEngine::BoundaryConditions(Solver& flow)
 {
-	flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
-	flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
-	flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
-	flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
-	flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
-	flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
-
-	flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
-	flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
-	flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
-	flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
-	flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
-	flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
-	
-	flow->boundary ( flow->y_min_id ).velocity = Vector3r::Zero();
-	flow->boundary ( flow->y_max_id ).velocity = topBoundaryVelocity;
-	flow->boundary ( flow->x_max_id ).velocity = Vector3r::Zero();
-	flow->boundary ( flow->x_min_id ).velocity = Vector3r::Zero();
-	flow->boundary ( flow->z_max_id ).velocity = Vector3r::Zero();
-	flow->boundary ( flow->z_min_id ).velocity = Vector3r::Zero();
+    if (flow->y_min_id>=0) {
+        flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
+        flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
+        flow->boundary ( flow->y_min_id ).velocity = Vector3r::Zero();
+    }
+    if (flow->y_max_id>=0) {
+        flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
+        flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
+        flow->boundary ( flow->y_max_id ).velocity = topBoundaryVelocity;
+    }
+    if (flow->x_max_id>=0) {
+        flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
+        flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
+        flow->boundary ( flow->x_max_id ).velocity = Vector3r::Zero();
+    }
+    if (flow->x_min_id>=0) {
+        flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
+        flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
+        flow->boundary ( flow->x_min_id ).velocity = Vector3r::Zero();
+    }
+    if (flow->z_max_id>=0) {
+        flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
+        flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
+        flow->boundary ( flow->z_max_id ).velocity = Vector3r::Zero();
+    }
+    if (flow->z_min_id>=0) {
+        flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
+        flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
+        flow->boundary ( flow->z_min_id ).velocity = Vector3r::Zero();
+    }
 }
 
 template<class Solver>
@@ -153,13 +152,14 @@ void FlowEngine::imposeFlux(Vector3r pos, Real flux,Solver& flow)
 	Update_Triangulation=true;
 }
 template<class Solver>
-void FlowEngine::clearImposedPressure(Solver& flow) { flow->imposedP.clear();}
+void FlowEngine::clearImposedPressure(Solver& flow) { flow->imposedP.clear(); flow->IPCells.clear();}
+
 template<class Solver>
 Real FlowEngine::getFlux(unsigned int cond,Solver& flow) {
 	if (cond>=flow->imposedP.size()) LOG_ERROR("Getting flux with cond higher than imposedP size.");
 	RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
 	double flux=0;
-	Cell_handle cell= Tri.locate(flow->imposedP[cond].first);
+	Cell_handle& cell= flow->IPCells[cond];
 	for (int ngb=0;ngb<4;ngb++) {
 		/*if (!cell->neighbor(ngb)->info().Pcondition)*/ flux+= cell->info().k_norm()[ngb]*(cell->info().p()-cell->neighbor(ngb)->info().p());}
 	return flux+cell->info().dv();
@@ -265,12 +265,12 @@ void FlowEngine::AddBoundary (Solver& flow)
 	flow->z_min_id=wallBackId;
 	flow->z_max_id=wallFrontId;
 
-	flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
-	flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
-	flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
-	flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
-	flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
-	flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;
+	if (flow->y_min_id>=0) flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
+	if (flow->y_max_id>=0) flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
+	if (flow->x_max_id>=0) flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
+	if (flow->x_min_id>=0) flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
+	if (flow->z_max_id>=0) flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
+	if (flow->z_min_id>=0) flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;
 
 	//FIXME: Id's order in boundsIds is done according to the enumeration of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
 	flow->boundsIds[0]= &flow->x_min_id;
@@ -592,17 +592,6 @@ void PeriodicFlowEngine:: action()
 	CGT::PeriodicCellInfo::hSize[1] = makeCgVect(scene->cell->hSize.col(1));
 	CGT::PeriodicCellInfo::hSize[2] = makeCgVect(scene->cell->hSize.col(2));
 	if (!isActivated) return;
-	if (!solver) {
-		solver = shared_ptr<CGT::PeriodicFlow> (new CGT::PeriodicFlow);
-		first=true;
-		cerr <<"first = true"<<endl;
-		Update_Triangulation=false;
-		eps_vol_max=0.f;
-		Eps_Vol_Cumulative=0.f;
-		ReTrg=1;
-		retriangulationLastIter=0;
-	}
-
 // 	timingDeltas->start();
 
 	if (first) Build_Triangulation(P_zero);
@@ -644,7 +633,7 @@ void PeriodicFlowEngine:: action()
 // 	{ Update_Triangulation = true; }
 
 	if (Update_Triangulation && !first) {
-		Build_Triangulation(0);
+		Build_Triangulation(P_zero);
 		Update_Triangulation = false;}
 		
 // 	if (velocity_profile) /*flow->FluidVelocityProfile();*/solver->Average_Fluid_Velocity();
@@ -676,10 +665,6 @@ void PeriodicFlowEngine::Triangulate()
 		Real y = wpos[1];
 		Real z = wpos[2];
 		solver->T[solver->currentTes].insert(x, y, z, rad, id);
-#ifdef XVIEW
-		Vue1.SetSpheresColor(0.8,0.6,0.6,1);
-		Vue1.Dessine_Sphere(x,y,z, rad, 15);
-#endif
 		const Vector3r& cellSize(scene->cell->getSize());
 		wpos=scene->cell->unshearPt(wpos);
 		// traverse all periodic cells around the body, to see if any of them touches
@@ -697,23 +682,16 @@ void PeriodicFlowEngine::Triangulate()
 						Vector3r pt=scene->cell->shearPt(pos2);
 						Vertex_handle vh=solver->T[solver->currentTes].insert(pt[0],pt[1],pt[2],rad,id,false,id);
 						for (int k=0;k<3;k++) vh->info().period[k]=i[k];    
-#ifdef XVIEW
-                            Vue1.SetSpheresColor(0.1,0.5,0.8,1);
-                            Vue1.Dessine_Sphere(pt[0],pt[1],pt[2], rad, 15);
-#endif
 					}
 				}
-		cerr <<"number of vtx"<< solver->T[solver -> currentTes].Triangulation().number_of_vertices()<<endl;
-		// Define the ghost cells
-		Finite_cells_iterator cellend=solver->T[solver->currentTes].Triangulation().finite_cells_end();
-		for (Finite_cells_iterator cell=solver -> T[solver -> currentTes].Triangulation().finite_cells_begin(); cell!=cellend; cell++)
-			locateCell(cell);
-		solver -> viscousShearForces.resize(solver -> T[solver -> currentTes].max_id+1);
-#ifdef XVIEW
-    Vue1.Affiche();
-#endif
+// 		cerr <<"number of vtx"<< solver->T[solver -> currentTes].Triangulation().number_of_vertices()<<endl;
 	}
-     }
+    }
+	// Define the ghost cells
+	Finite_cells_iterator cellend=solver->T[solver->currentTes].Triangulation().finite_cells_end();
+	for (Finite_cells_iterator cell=solver -> T[solver -> currentTes].Triangulation().finite_cells_begin(); cell!=cellend; cell++)
+		locateCell(cell);
+	solver -> viscousShearForces.resize(solver -> T[solver -> currentTes].max_id+1);
 }
 
 
@@ -901,6 +879,7 @@ void PeriodicFlowEngine::Build_Triangulation (double P_zero)
 	solver->x_min = 1000.0, solver->x_max = -10000.0, solver->y_min = 1000.0, solver->y_max = -10000.0, solver->z_min = 1000.0, solver->z_max = -10000.0;
 
 	AddBoundary (solver);
+	if (Debug) cout << endl << "Added boundaries------" << endl << endl;
 	Triangulate ();
 	if (Debug) cout << endl << "Tesselating------" << endl << endl;
 	solver->T[solver->currentTes].Compute();
