@@ -68,15 +68,19 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 	vector<Body::id_t> ret;
 	for( vector<Bounds>::iterator 
 			it=BB[0].vec.begin(),et=BB[0].vec.end(); it < et; ++it)
-	{
+	{		
 		if (it->coord > bv.max[0]) break;
 		if (!it->flags.isMin || !it->flags.hasBB) continue;
 		int offset = 3*it->id;
-		if (!(maxima[offset] < bv.min[0] ||
-				minima[offset+1] > bv.max[1] ||
-				maxima[offset+1] < bv.min[1] ||
-				minima[offset+2] > bv.max[2] ||
-				maxima[offset+2] < bv.min[2] )) 
+		const shared_ptr<Body>& b=Body::byId(it->id,scene);
+		if(unlikely(!b)) continue;
+		const Real& sweepLength = b->bound->sweepLength;		
+		if (!(maxima[offset]-sweepLength < bv.min[0] ||
+			minima[offset]+sweepLength > bv.min[0] ||
+			minima[offset+1]+sweepLength > bv.max[1] ||
+			maxima[offset+1]-sweepLength < bv.min[1] ||
+			minima[offset+2]+sweepLength > bv.max[2] ||
+			maxima[offset+2]-sweepLength < bv.min[2] )) 
 		{
 			ret.push_back(it->id);
 		}
