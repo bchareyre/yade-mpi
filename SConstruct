@@ -115,6 +115,7 @@ opts.AddVariables(
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
 	BoolVariable('brief',"Don't show commands being run, only what files are being compiled/linked/installed",True),
+	BoolVariable('eigen2',"Force to use eigen2, if even eigen3 persists in the system.",False),
 )
 opts.Update(env)
 
@@ -136,12 +137,14 @@ if env.has_key('CPPPATH'):
 			z+=1
 
 #Check, is there eigen3 directory, if not - use eigen2
-if os.path.exists('/usr/include/eigen3'):
+if os.path.exists('/usr/include/eigen3') and not (env['eigen2']):
 	print "Eigen 3 math library will be used"
 	env.Append(CPPPATH=":/usr/include/eigen3")
-else:
+elif os.path.exists('/usr/include/eigen2') and (env['eigen2']):
 	print "Eigen 2 math library will be used"
 	env.Append(CPPPATH=":/usr/include/eigen2")
+else:
+	raise RuntimeError("None of mathematical libraries (eigen2 or eigen3) can be used.")
 
 if saveProfile: opts.Save(optsFile,env)
 # fix expansion in python substitution by assigning the right value if not specified
