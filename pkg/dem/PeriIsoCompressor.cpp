@@ -228,7 +228,7 @@ void PeriTriaxController::action()
 			if (!doneHook.empty()){
 				LOG_DEBUG ( "Running doneHook: "<<doneHook );
 				pyRunString(doneHook);}
-			else { Omega::instance().pause(); }
+// 			else { Omega::instance().pause(); }
 		}
 	}
 }

@@ -25,15 +25,6 @@ void InsertionSortCollider::handleBoundInversion(Body::id_t id1, Body::id_t id2,
 	///fast
 	if (spatialOverlap(id1,id2) && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()) && !interactions->found(id1,id2))
 		interactions->insert(shared_ptr<Interaction>(new Interaction(id1,id2)));
-	
-	///slow
-// 	//existing interaction?
-// 	if (interactions->found(id1,id2)) {
-// 		//if existing interaction is virtual and bounds don't overlap, remove it
-// 		if (!interactions->find(id1,id2)->isReal() && !spatialOverlap(id1,id2)){ interactions->erase(id1,id2); return;}} 
-// 	//if it doesn't exist and bounds overlap, create a virtual interaction
-// 	else if (spatialOverlap(id1,id2) && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()))
-// 		interactions->insert(shared_ptr<Interaction>(new Interaction(id1,id2)));
 }
 
 void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
@@ -74,13 +65,14 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		int offset = 3*it->id;
 		const shared_ptr<Body>& b=Body::byId(it->id,scene);
 		if(unlikely(!b)) continue;
-		const Real& sweepLength = b->bound->sweepLength;		
-		if (!(maxima[offset]-sweepLength < bv.min[0] ||
-			minima[offset]+sweepLength > bv.min[0] ||
-			minima[offset+1]+sweepLength > bv.max[1] ||
-			maxima[offset+1]-sweepLength < bv.min[1] ||
-			minima[offset+2]+sweepLength > bv.max[2] ||
-			maxima[offset+2]-sweepLength < bv.min[2] )) 
+		const Real& sweepLength = b->bound->sweepLength;
+		Vector3r disp = b->state->pos - b->bound->refPos;
+		if (!(maxima[offset]-sweepLength+disp[0] < bv.min[0] ||
+			minima[offset]+sweepLength+disp[0] > bv.max[0] ||
+			minima[offset+1]+sweepLength+disp[1] > bv.max[1] ||
+			maxima[offset+1]-sweepLength+disp[1] < bv.min[1] ||
+			minima[offset+2]+sweepLength+disp[2] > bv.max[2] ||
+			maxima[offset+2]-sweepLength+disp[2] < bv.min[2] )) 
 		{
 			ret.push_back(it->id);
 		}
@@ -98,9 +90,6 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) return true;
 		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
 		if(scene->interactions->dirty) return true;
-		// we wouldn't run in this step; in that case, just delete pending interactions
-		// this is done in ::action normally, but it would make the call counters not reflect the stride
-// 		scene->interactions->erasePending(*this,scene);
 		return false;
 	}
 
@@ -156,6 +145,7 @@ void InsertionSortCollider::action(){
 				if(!s) continue;
 				minR=min(s->radius,minR);
 			}
+			if (isinf(minR)) LOG_ERROR("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive verletDist in your script.");
 			// if no spheres, disable stride
 			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
 		}

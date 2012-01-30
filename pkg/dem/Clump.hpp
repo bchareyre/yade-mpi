@@ -70,14 +70,15 @@ class Clump: public Shape {
 			const shared_ptr<State>& clumpState=clumpBody->state;
 			FOREACH(MemberMap::value_type& B, clump->members){
 				// B.first is Body::id_t, B.second is local Se3r of that body in the clump
-				const shared_ptr<State>& subState=Body::byId(B.first,scene)->state; const Vector3r& subPos(B.second.position); const Quaternionr& subOri(B.second.orientation);
+				const shared_ptr<Body>& b = Body::byId(B.first,scene);
+				const shared_ptr<State>& subState=b->state; const Vector3r& subPos(B.second.position); const Quaternionr& subOri(B.second.orientation);
 				// position update
 				subState->pos=clumpState->pos+clumpState->ori*subPos;
 				subState->ori=clumpState->ori*subOri;
 				// velocity update
 				subState->vel=clumpState->vel+clumpState->angVel.cross(subState->pos-clumpState->pos);
 				subState->angVel=clumpState->angVel;
-				if(likely(integrator)) integrator->saveMaximaVelocity(B.first,subState.get());
+				if(likely(integrator)) integrator->saveMaximaDisplacement(b);
 			}
 		}
 

@@ -13,8 +13,10 @@ class GravityEngine: public FieldApplier{
 		((Vector3r,gravity,Vector3r::Zero(),,"Acceleration [kgms⁻²]"))
 		((int,gravPotIx,-1,(Attr::noSave|Attr::hidden),"Index for gravPot energy"))
 		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be affected by this engine. If 0, all bodies will be affected."))
+		((bool,warnOnce,true,,"For deprecation warning once."))
 		,/*ctor*/,/*py*/
 	);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(GravityEngine);
 

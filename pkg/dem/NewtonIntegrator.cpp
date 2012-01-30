@@ -19,14 +19,14 @@ void NewtonIntegrator::cundallDamp1st(Vector3r& force, const Vector3r& vel){
 	for(int i=0; i<3; i++) force[i]*=1-damping*Mathr::Sign(force[i]*vel[i]);
 }
 // 2nd order numerical damping
-void NewtonIntegrator::cundallDamp2nd(const Real& dt, const Vector3r& force, const Vector3r& vel, Vector3r& accel){
-	for(int i=0; i<3; i++) accel[i]*= 1 - damping*Mathr::Sign ( force[i]*(vel[i] + 0.5*dt*accel[i]) );
+void NewtonIntegrator::cundallDamp2nd(const Real& dt, const Vector3r& vel, Vector3r& accel){
+	for(int i=0; i<3; i++) accel[i]*= 1 - damping*Mathr::Sign ( accel[i]*(vel[i] + 0.5*dt*accel[i]) );
 }
 
 Vector3r NewtonIntegrator::computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs){
-	if(likely(blockedDOFs==0)) return force/mass;
+	if(likely(blockedDOFs==0)) return (force/mass + gravity);
 	Vector3r ret(Vector3r::Zero());
-	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,false))) ret[i]+=force[i]/mass;
+	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,false))) ret[i]+=force[i]/mass+gravity[i];
 	return ret;
 }
 Vector3r NewtonIntegrator::computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs){
@@ -119,7 +119,7 @@ void NewtonIntegrator::action()
 			if(unlikely(b->isClumpMember())) continue;
 
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
-			Vector3r f=gravity*state->mass, m=Vector3r::Zero();
+			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();
 			// clumps forces
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
@@ -145,19 +145,17 @@ void NewtonIntegrator::action()
 			// in aperiodic boundaries, it is equal to absolute velocity
 			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,prevVelGrad):state->vel;
 
-
-
 			// numerical damping & kinetic energy
 			if(unlikely(trackEnergy)) updateEnergy(b,state,fluctVel,f,m);
 
 			// whether to use aspherical rotation integration for this body; for no accelerations, spherical integrator is "exact" (and faster)
-			bool useAspherical=(b->isAspherical() && exactAsphericalRot && state->blockedDOFs!=State::DOF_ALL);
+			bool useAspherical=(exactAsphericalRot && b->isAspherical() && state->blockedDOFs!=State::DOF_ALL);
 
 			// for particles not totally blocked, compute accelerations; otherwise, the computations would be useless
 			if (state->blockedDOFs!=State::DOF_ALL) {
 				// linear acceleration
 				Vector3r linAccel=computeAccel(f,state->mass,state->blockedDOFs);
-				if(state->isDamped) cundallDamp2nd(dt,f,fluctVel,linAccel);
+				if(state->isDamped) cundallDamp2nd(dt,fluctVel,linAccel);
 				//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt*pos+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
 				linAccel+=prevVelGrad*state->vel;
 				//finally update velocity
@@ -165,7 +163,7 @@ void NewtonIntegrator::action()
 				// angular acceleration
 				if(!useAspherical){ // uses angular velocity
 					Vector3r angAccel=computeAngAccel(m,state->inertia,state->blockedDOFs);
-					if(state->isDamped) cundallDamp2nd(dt,m,state->angVel,angAccel);
+					if(state->isDamped) cundallDamp2nd(dt,state->angVel,angAccel);
 					state->angVel+=dt*angAccel;
 				} else { // uses torque
 					for(int i=0; i<3; i++) if(state->blockedDOFs & State::axisDOF(i,true)) m[i]=0; // block DOFs here
@@ -201,8 +199,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 	//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
 	//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//Reflect mean-field (periodic cell) acceleration in the velocity
-	Vector3r dVel=dVelGrad*state->pos;
-	state->vel+=dVel;
+	if(scene->isPeriodic) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
 	if (!bodySelected || scene->selectedBody!=id) state->pos+=state->vel*dt;
 }
 
