@@ -81,8 +81,24 @@ void NewtonIntegrator::saveMaximaDisplacement(const shared_ptr<Body>& b){
 	#endif
 }
 
+#ifdef YADE_OPENMP
+void NewtonIntegrator::ensureSync()
+{
+	if (syncEnsured) return;	
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
+		if(b->isClump()) continue;
+		scene->forces.addForce(b->getId(),Vector3r(0,0,0));
+	} YADE_PARALLEL_FOREACH_BODY_END();
+	syncEnsured=true;
+}
+#endif
+
 void NewtonIntegrator::action()
 {
+	#ifdef YADE_OPENMP
+	//prevent https://bugs.launchpad.net/yade/+bug/923929
+	ensureSync();
+	#endif
 	scene->forces.sync();
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
@@ -157,7 +173,7 @@ void NewtonIntegrator::action()
 				Vector3r linAccel=computeAccel(f,state->mass,state->blockedDOFs);
 				if(state->isDamped) cundallDamp2nd(dt,fluctVel,linAccel);
 				//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt*pos+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
-				linAccel+=prevVelGrad*state->vel;
+				if (isPeriodic) linAccel+=prevVelGrad*state->vel;
 				//finally update velocity
 				state->vel+=dt*linAccel;
 				// angular acceleration
@@ -222,11 +238,11 @@ void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& i
 
 void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& id, const Real& dt, const Vector3r& M){
 	Matrix3r A=state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
-	const Vector3r l_n = state->angMom + dt/2 * M; // global angular momentum at time n
+	const Vector3r l_n = state->angMom + dt/2. * M; // global angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
 	const Vector3r angVel_b_n = l_b_n.cwise()/state->inertia; // local angular velocity at time n
 	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
-	const Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
+	const Quaternionr Q_half = state->ori + dt/2. * dotQ_n; // Q at time n+1/2
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
 	Vector3r angVel_b_half = l_b_half.cwise()/state->inertia; // local angular velocity at time n+1/2

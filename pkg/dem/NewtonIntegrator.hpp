@@ -33,7 +33,9 @@ class NewtonIntegrator : public GlobalEngine{
 	Vector3r computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs);
 
 	void updateEnergy(const shared_ptr<Body>&b, const State* state, const Vector3r& fluctVel, const Vector3r& f, const Vector3r& m);
-
+	#ifdef YADE_OPENMP
+	void ensureSync(); bool syncEnsured;
+	#endif
 	// whether the cell has changed from the previous step
 	bool cellChanged;
 
@@ -70,7 +72,7 @@ class NewtonIntegrator : public GlobalEngine{
 		,
 		/*ctor*/
 			#ifdef YADE_OPENMP
-				threadMaxVelocitySq.resize(omp_get_max_threads());
+				threadMaxVelocitySq.resize(omp_get_max_threads()); syncEnsured=false;
 			#endif
 	);
 	DECLARE_LOGGER;

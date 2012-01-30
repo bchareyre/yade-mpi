@@ -64,7 +64,7 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		if (!it->flags.isMin || !it->flags.hasBB) continue;
 		int offset = 3*it->id;
 		const shared_ptr<Body>& b=Body::byId(it->id,scene);
-		if(unlikely(!b)) continue;
+		if(unlikely(!b || !b->bound)) continue;
 		const Real& sweepLength = b->bound->sweepLength;
 		Vector3r disp = b->state->pos - b->bound->refPos;
 		if (!(maxima[offset]-sweepLength+disp[0] < bv.min[0] ||

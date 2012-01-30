@@ -28,9 +28,11 @@ void BoundDispatcher::action()
 			if (targetInterv>=0) {
 				Vector3r disp = b->state->pos-b->bound->refPos;
 				Real dist = max(abs(disp[0]),max(abs(disp[1]),abs(disp[2])));
-				Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
-				newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
-				sweepLength=max(minSweepDistFactor*sweepDist,min(newLength,sweepDist));
+				if (dist){
+					Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
+					newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
+					sweepLength=max(minSweepDistFactor*sweepDist,min(newLength,sweepDist));}
+				else sweepLength=0;
 			} else sweepLength=sweepDist;
 		} 
 		#ifdef BV_FUNCTOR_CACHE
@@ -40,11 +42,10 @@ void BoundDispatcher::action()
 		operator()(shape,b->bound,b->state->se3,b.get());
 		#endif
 		if(!b->bound) continue; // the functor did not create new bound
-		
-		if(sweepDist>0){
-			b->bound->refPos=b->state->pos;
-			b->bound->lastUpdateIter=scene->iter;
-			const Real& sweepLength = b->bound->sweepLength;
+		b->bound->refPos=b->state->pos;
+		b->bound->lastUpdateIter=scene->iter;
+		const Real& sweepLength = b->bound->sweepLength;
+		if(sweepLength>0){			
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
 			aabb->min-=Vector3r(sweepLength,sweepLength,sweepLength);
 			aabb->max+=Vector3r(sweepLength,sweepLength,sweepLength);
