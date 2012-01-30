@@ -140,7 +140,7 @@ if env.has_key('CPPPATH'):
 if os.path.exists('/usr/include/eigen3') and not (env['eigen2']):
 	print "Eigen 3 math library will be used"
 	env.Append(CPPPATH=":/usr/include/eigen3")
-elif os.path.exists('/usr/include/eigen2') and (env['eigen2']):
+elif os.path.exists('/usr/include/eigen2'):
 	print "Eigen 2 math library will be used"
 	env.Append(CPPPATH=":/usr/include/eigen2")
 else:
