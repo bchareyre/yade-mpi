@@ -27,6 +27,9 @@ void Quaternionr_set_item(Quaternionr & self, int idx, Real value){ IDX_CHECK(id
 void Matrix3r_set_item(Matrix3r & self, bp::tuple _idx, Real value){ int idx[2]; int mx[2]={3,3}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); self(idx[0],idx[1])=value; }
 void Matrix3r_set_item_linear(Matrix3r & self, int idx, Real value){ IDX_CHECK(idx,9); self(idx/3,idx%3)=value; }
 
+void Matrix6r_set_item(Matrix6r & self, bp::tuple _idx, Real value){ int idx[2]; int mx[2]={6,6}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); self(idx[0],idx[1])=value; }
+void Matrix6r_set_item_linear(Matrix6r & self, int idx, Real value){ IDX_CHECK(idx,36); self(idx/6,idx%6)=value; }
+
 Real Vector6r_get_item(const Vector6r & self, int idx){ IDX_CHECK(idx,6); return self[idx]; }
 int  Vector6i_get_item(const Vector6r & self, int idx){ IDX_CHECK(idx,6); return self[idx]; }
 Real Vector3r_get_item(const Vector3r & self, int idx){ IDX_CHECK(idx,3); return self[idx]; }
@@ -37,6 +40,8 @@ int  Vector2i_get_item(const Vector2i & self, int idx){ IDX_CHECK(idx,2); return
 Real Quaternionr_get_item(const Quaternionr & self, int idx){ IDX_CHECK(idx,4); if(idx==0) return self.x(); if(idx==1) return self.y(); if(idx==2) return self.z(); return self.w(); }
 Real Matrix3r_get_item(Matrix3r & self, bp::tuple _idx){ int idx[2]; int mx[2]={3,3}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); return self(idx[0],idx[1]); }
 Real Matrix3r_get_item_linear(Matrix3r & self, int idx){ IDX_CHECK(idx,9); return self(idx/3,idx%3); }
+Real Matrix6r_get_item(Matrix6r & self, bp::tuple _idx){ int idx[2]; int mx[2]={6,6}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); return self(idx[0],idx[1]); }
+Real Matrix6r_get_item_linear(Matrix6r & self, int idx){ IDX_CHECK(idx,36); return self(idx/6,idx%6); }
 
 std::string Vector6r_str(const Vector6r & self){ return std::string("Vector6(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+","+boost::lexical_cast<std::string>(self[2])+", "+boost::lexical_cast<std::string>(self[3])+","+boost::lexical_cast<std::string>(self[4])+","+boost::lexical_cast<std::string>(self[5])+")";}
 std::string Vector6i_str(const Vector6i & self){ return std::string("Vector6i(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+","+boost::lexical_cast<std::string>(self[2])+", "+boost::lexical_cast<std::string>(self[3])+","+boost::lexical_cast<std::string>(self[4])+","+boost::lexical_cast<std::string>(self[5])+")";}
@@ -46,6 +51,7 @@ std::string Vector2r_str(const Vector2r & self){ return std::string("Vector2(")+
 std::string Vector2i_str(const Vector2i & self){ return std::string("Vector2i(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+")";}
 std::string Quaternionr_str(const Quaternionr & self){ AngleAxisr aa(self); return std::string("Quaternion((")+boost::lexical_cast<std::string>(aa.axis()[0])+","+boost::lexical_cast<std::string>(aa.axis()[1])+","+boost::lexical_cast<std::string>(aa.axis()[2])+"),"+boost::lexical_cast<std::string>(aa.angle())+")";}
 std::string Matrix3r_str(const Matrix3r & self){ std::ostringstream oss; oss<<"Matrix3("; for(int i=0; i<3; i++) for(int j=0; j<3; j++) oss<<self(i,j)<<((i==2 && j==2)?")":",")<<((i<2 && j==2)?" ":""); return oss.str(); }
+std::string Matrix6r_str(const Matrix6r & self){ std::ostringstream oss; oss<<"Matrix6("; for(int i=0; i<6; i++) for(int j=0; j<6; j++) oss<<self(i,j)<<((i==5 && j==5)?")":",")<<((i<5 && j==5)?" ":""); return oss.str(); }
 
 int Vector6r_len(){return 6;}
 int Vector6i_len(){return 6;}
@@ -55,6 +61,7 @@ int Vector2r_len(){return 2;}
 int Vector2i_len(){return 2;}
 int Quaternionr_len(){return 4;}
 int Matrix3r_len(){return 9;}
+int Matrix6r_len(){return 36;}
 
 // pickling support
 struct Matrix3r_pickle: bp::pickle_suite{static bp::tuple getinitargs(const Matrix3r& x){ return bp::make_tuple(x(0,0),x(0,1),x(0,2),x(1,0),x(1,1),x(1,2),x(2,0),x(2,1),x(2,2));} };
@@ -91,6 +98,9 @@ static Vector3r Matrix3r_row(const Matrix3r& m, int ix){ IDX_CHECK(ix,3); return
 static Vector3r Matrix3r_col(const Matrix3r& m, int ix){ IDX_CHECK(ix,3); return Vector3r(m.col(ix)); }
 static Vector6r Matrix3r_toVoigt(const Matrix3r& m, bool strain=false){ return tensor_toVoigt(m,strain); }
 static Matrix3r Vector6r_toSymmTensor(const Vector6r& v, bool strain=false){ return voigt_toSymmTensor(v,strain); }
+static Vector6r Matrix6r_diagonal(const Matrix6r& m){ return Vector6r(m.diagonal()); }
+static Vector6r Matrix6r_row(const Matrix6r& m, int ix){ IDX_CHECK(ix,6); return Vector6r(m.row(ix)); }
+static Vector6r Matrix6r_col(const Matrix6r& m, int ix){ IDX_CHECK(ix,6); return Vector6r(m.col(ix)); }
 static Quaternionr Quaternionr_setFromTwoVectors(Quaternionr& q, const Vector3r& u, const Vector3r& v){ return q.setFromTwoVectors(u,v); }
 static Vector3r Quaternionr_Rotate(Quaternionr& q, const Vector3r& u){ return q*u; }
 // supposed to return raw pointer (or auto_ptr), boost::python takes care of the lifetime management
@@ -115,6 +125,8 @@ static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ re
 #include<Eigen/SVD>
 static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
 static bp::tuple Matrix3r_eigenDecomposition(const Matrix3r& self){ Matrix3r rot,diag; matrixEigenDecomposition(self,rot,diag); return bp::make_tuple(rot,Vector3r(diag.diagonal())); }
+static bp::tuple Matrix6r_polarDecomposition(const Matrix6r& self){ Matrix6r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
+static bp::tuple Matrix6r_eigenDecomposition(const Matrix6r& self){ Matrix6r rot,diag; matrixEigenDecomposition(self,rot,diag); return bp::make_tuple(rot,Vector6r(diag.diagonal())); }
 
 #undef IDX_CHECK
 
@@ -123,9 +135,13 @@ static bp::tuple Matrix3r_eigenDecomposition(const Matrix3r& self){ Matrix3r rot
 #define EIG_WRAP_METH0(klass,meth) static klass klass##_##meth(){ return klass().meth(); }
 EIG_WRAP_METH1(Matrix3r,transpose);
 EIG_WRAP_METH1(Matrix3r,inverse);
+EIG_WRAP_METH1(Matrix6r,transpose);
+EIG_WRAP_METH1(Matrix6r,inverse);
 
 EIG_WRAP_METH0(Matrix3r,Zero);
 EIG_WRAP_METH0(Matrix3r,Identity);
+EIG_WRAP_METH0(Matrix6r,Zero);
+EIG_WRAP_METH0(Matrix6r,Identity);
 EIG_WRAP_METH0(Vector6r,Zero); EIG_WRAP_METH0(Vector6r,Ones);
 EIG_WRAP_METH0(Vector6i,Zero); EIG_WRAP_METH0(Vector6i,Ones);
 EIG_WRAP_METH0(Vector3r,Zero); EIG_WRAP_METH0(Vector3r,UnitX); EIG_WRAP_METH0(Vector3r,UnitY); EIG_WRAP_METH0(Vector3r,UnitZ); EIG_WRAP_METH0(Vector3r,Ones);
@@ -148,6 +164,16 @@ EIG_OP2(Matrix3r,__mul__,*,Vector3r) EIG_OP2(Matrix3r,__rmul__,*,Vector3r)
 EIG_OP2(Matrix3r,__mul__,*,Matrix3r) EIG_OP2_INPLACE(Matrix3r,__imul__,*=,Matrix3r)
 EIG_OP2(Matrix3r,__div__,/,Real) EIG_OP2_INPLACE(Matrix3r,__idiv__,/=,Real)
 EIG_OP2(Matrix3r,__div__,/,int) EIG_OP2_INPLACE(Matrix3r,__idiv__,/=,int)
+
+EIG_OP1(Matrix6r,__neg__,-)
+EIG_OP2(Matrix6r,__add__,+,Matrix6r) EIG_OP2_INPLACE(Matrix6r,__iadd__,+=,Matrix6r)
+EIG_OP2(Matrix6r,__sub__,-,Matrix6r) EIG_OP2_INPLACE(Matrix6r,__isub__,-=,Matrix6r)
+EIG_OP2(Matrix6r,__mul__,*,Real) EIG_OP2(Matrix6r,__rmul__,*,Real) EIG_OP2_INPLACE(Matrix6r,__imul__,*=,Real)
+EIG_OP2(Matrix6r,__mul__,*,int) EIG_OP2(Matrix6r,__rmul__,*,int) EIG_OP2_INPLACE(Matrix6r,__imul__,*=,int)
+EIG_OP2(Matrix6r,__mul__,*,Vector6r) EIG_OP2(Matrix6r,__rmul__,*,Vector6r)
+EIG_OP2(Matrix6r,__mul__,*,Matrix6r) EIG_OP2_INPLACE(Matrix6r,__imul__,*=,Matrix6r)
+EIG_OP2(Matrix6r,__div__,/,Real) EIG_OP2_INPLACE(Matrix6r,__idiv__,/=,Real)
+EIG_OP2(Matrix6r,__div__,/,int) EIG_OP2_INPLACE(Matrix6r,__idiv__,/=,int)
 
 EIG_OP1(Vector6r,__neg__,-);
 EIG_OP2(Vector6r,__add__,+,Vector6r); EIG_OP2_INPLACE(Vector6r,__iadd__,+=,Vector6r)
@@ -235,7 +261,39 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.add_static_property("Zero",&Matrix3r_Zero)
 		// specials
 		.def("toVoigt",&Matrix3r_toVoigt,(bp::arg("strain")=false),"Convert 2nd order tensor to 6-vector (Voigt notation), symmetrizing the tensor;	if *strain* is ``True``, multiply non-diagonal compoennts by 2.")
-		
+
+	;
+	bp::class_<Matrix6r>("Matrix6","6x6 float matrix.\n\nSupported operations (``m`` is a Matrix6, ``f`` if a float/int, ``v`` is a Vector6): ``-m``, ``m+m``, ``m+=m``, ``m-m``, ``m-=m``, ``m*f``, ``f*m``, ``m*=f``, ``m/f``, ``m/=f``, ``m*m``, ``m*=m``, ``m*v``, ``v*m``, ``m==m``, ``m!=m``.",bp::init<>())
+		.def(bp::init<Matrix6r const &>((bp::arg("m"))))
+		//
+		.def("determinant",&Matrix6r::determinant)
+		.def("trace",&Matrix6r::trace)
+		.def("inverse",&Matrix6r_inverse)
+		.def("transpose",&Matrix6r_transpose)
+		.def("diagonal",&Matrix6r_diagonal)
+		.def("row",&Matrix6r_row)
+		.def("col",&Matrix6r_col)
+		.def("polarDecomposition",&Matrix6r_polarDecomposition)
+		.def("eigenDecomposition",&Matrix6r_eigenDecomposition)
+		//
+		.def("__neg__",&Matrix6r__neg__)
+		.def("__add__",&Matrix6r__add__Matrix6r).def("__iadd__",&Matrix6r__iadd__Matrix6r)
+		.def("__sub__",&Matrix6r__sub__Matrix6r).def("__isub__",&Matrix6r__isub__Matrix6r)
+		.def("__mul__",&Matrix6r__mul__Real).def("__rmul__",&Matrix6r__rmul__Real).def("__imul__",&Matrix6r__imul__Real)
+		.def("__mul__",&Matrix6r__mul__int).def("__rmul__",&Matrix6r__rmul__int).def("__imul__",&Matrix6r__imul__int)
+		.def("__mul__",&Matrix6r__mul__Vector6r).def("__rmul__",&Matrix6r__rmul__Vector6r)
+		.def("__mul__",&Matrix6r__mul__Matrix6r).def("__imul__",&Matrix6r__imul__Matrix6r)
+		.def("__div__",&Matrix6r__div__Real).def("__idiv__",&Matrix6r__idiv__Real)
+		.def("__div__",&Matrix6r__div__int).def("__idiv__",&Matrix6r__idiv__int)
+		.def(bp::self == bp::self)
+		.def(bp::self != bp::self)
+		//
+ 		.def("__len__",&::Matrix6r_len).staticmethod("__len__").def("__setitem__",&::Matrix6r_set_item).def("__getitem__",&::Matrix6r_get_item).def("__str__",&::Matrix6r_str).def("__repr__",&::Matrix6r_str)
+		/* extras for matrices */
+		.def("__setitem__",&::Matrix6r_set_item_linear).def("__getitem__",&::Matrix6r_get_item_linear)
+		.add_static_property("Identity",&Matrix6r_Identity)
+		.add_static_property("Zero",&Matrix6r_Zero)
+		// specials
 	;
 	bp::class_<Quaternionr>("Quaternion","Quaternion representing rotation.\n\nSupported operations (``q`` is a Quaternion, ``v`` is a Vector3): ``q*q`` (rotation composition), ``q*=q``, ``q*v`` (rotating ``v`` by ``q``), ``q==q``, ``q!=q``.",bp::init<>())
 		.def("__init__",bp::make_constructor(&Quaternionr_fromAxisAngle,bp::default_call_policies(),(bp::arg("axis"),bp::arg("angle"))))
@@ -266,7 +324,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("__setitem__",&Quaternionr_set_item).def("__getitem__",&Quaternionr_get_item)
 		.def("__str__",&Quaternionr_str).def("__repr__",&Quaternionr_str)
 	;
-	bp::class_<Vector6r>("Vector6","6-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector6): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list,tuple, …) of 6 floats.",bp::init<>())
+	bp::class_<Vector6r>("Vector6","6-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector6, ``m`` is Matrix6): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``, ``v*m``, ``m*v``.\n\nImplicit conversion from sequence (list,tuple, …) of 6 floats.",bp::init<>())
 		.def(bp::init<Vector6r>((bp::arg("other"))))
 		.def("__init__",bp::make_constructor(&Vector6r_fromElements,bp::default_call_policies(),(bp::arg("v0"),bp::arg("v1"),bp::arg("v2"),bp::arg("v3"),bp::arg("v4"),bp::arg("v5"))))
 		.def_pickle(Vector6r_pickle())

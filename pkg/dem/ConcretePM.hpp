@@ -67,7 +67,8 @@ class CpmState: public State {
 		((Real,normDmg,0,,"Average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)"))
 		((Real,epsPlBroken,0,,"Plastic strain on contacts already deleted (bogus values)"))
 		((Real,normEpsPl,0,,"Sum of plastic strains normalized by number of contacts (bogus values)"))
-		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor of the spherical particle (under assumption that particle volume = pi*r*r*r*4/3.). To get actual stress, multiply this value by packing fraction (for random dense packing something like 0.63)")),
+		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor of the spherical particle (under assumption that particle volume = pi*r*r*r*4/3.). To get actual stress, multiply this value by packing fraction (for random dense packing something like 0.63)"))
+		((Matrix3r,damageTensor,Matrix3r::Zero(),,"Damage tensor computed with microplane theory averaging. state.damageTensor.trace() = state.normDmg")),
 		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(CpmState,State);
@@ -247,8 +248,9 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 	REGISTER_SERIALIZABLE(Gl1_CpmPhys);
 #endif
 
+
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Matrix3r stress; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), stress(Matrix3r::Zero()) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Matrix3r stress; Matrix3r dmgRhs; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), stress(Matrix3r::Zero()), dmgRhs(Matrix3r::Zero()) {} };
 	public:
 		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);

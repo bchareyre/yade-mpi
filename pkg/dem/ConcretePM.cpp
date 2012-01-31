@@ -459,7 +459,15 @@ void CpmStateUpdater::update(Scene* _scene){
 		maxOmega=max(maxOmega,phys->omega);
 		avgRelResidual+=phys->relResidualStrength;
 		nAvgRelResidual+=1;
+		for (int i=0; i<3; i++) {
+			for (int j=0; j<3; j++) {
+				bodyStats[id1].dmgRhs += n*n.transpose()*(1-phys->relResidualStrength);
+				bodyStats[id2].dmgRhs += n*n.transpose()*(1-phys->relResidualStrength);
+			}
+		}
 	}
+	Matrix3r m3i; m3i<<0.4,-0.1,-0.1, -0.1,0.4,-0.1, -0.1,-0.1,0.4; // inversion of Matrix3r(3,1,1, 1,3,1, 1,1,3)
+	Vector3r temp;
 	FOREACH(shared_ptr<Body> B, *scene->bodies){
 		if (!B) continue;
 		const Body::id_t& id=B->getId();
@@ -474,8 +482,16 @@ void CpmStateUpdater::update(Scene* _scene){
 			if(state->normDmg>1){
 				LOG_WARN("#"<<id<<" normDmg="<<state->normDmg<<" nCohLinks="<<bodyStats[id].nCohLinks<<", numBrokenCohesive="<<state->numBrokenCohesive<<", dmgSum="<<bodyStats[id].dmgSum<<", numAllCohLinks"<<cohLinksWhenever);
 			}
+			Matrix3r& dmgRhs = bodyStats[id].dmgRhs;
+			dmgRhs *= 15./cohLinksWhenever;
+			temp = m3i*dmgRhs.diagonal();
+			Matrix3r& damageTensor = state->damageTensor;
+			for (int i=0; i<3; i++) { damageTensor(i,i) = temp(i); }
+			damageTensor(0,1) = damageTensor(1,0) = dmgRhs(0,1);
+			damageTensor(1,2) = damageTensor(2,1) = dmgRhs(1,2);
+			damageTensor(2,0) = damageTensor(0,2) = dmgRhs(2,0);
 		}
-		else { state->normDmg=0; state->normEpsPl=0;}
+		else { state->normDmg=0; state->normEpsPl=0; state->damageTensor = Matrix3r::Zero(); }
 		B->shape->color=Vector3r(state->normDmg,1-state->normDmg,B->state->blockedDOFs==State::DOF_ALL?0:1);
 		nAvgRelResidual+=0.5*state->numBrokenCohesive; // add half or broken interactions, other body has the other half
 		Sphere* sphere=dynamic_cast<Sphere*>(B->shape.get());

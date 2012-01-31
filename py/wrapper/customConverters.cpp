@@ -221,6 +221,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 		VECTOR_SEQ_CONV(Vector6r);
 		VECTOR_SEQ_CONV(Vector6i);
 		VECTOR_SEQ_CONV(Matrix3r);
+		VECTOR_SEQ_CONV(Matrix6r);
 		VECTOR_SEQ_CONV(std::string);
 		VECTOR_SEQ_CONV(shared_ptr<Body>);
 		VECTOR_SEQ_CONV(shared_ptr<Engine>);

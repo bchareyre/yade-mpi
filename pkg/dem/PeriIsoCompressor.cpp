@@ -407,7 +407,7 @@ void Peri3dController::action(){
 	progress += srCorr/nSteps;
 
 	if (progress >= 1. || strain.cwise().abs().maxCoeff() > maxStrain) {
-		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; }
+		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; Omega::instance().pause(); }
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 	}
 }
