@@ -15,6 +15,10 @@ class SpheresFactory: public GlobalEngine {
 		bool PSDuse;        //PSD or not
 	public:
 		virtual void action();
+		struct SpherCoord{
+			Vector3r c; Real r;
+			SpherCoord(const Vector3r& _c, Real _r){ c=_c; r=_r;}
+		};
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SpheresFactory,GlobalEngine,"Engine for spitting spheres based on mass flow rate, particle size distribution etc. Initial velocity of particles is given by *vMin*, *vMax*, the *massFlowRate* determines how many particles to generate at each step. When *goalMass* is attained or positive *maxParticles* is reached, the engine does not produce particles anymore. Geometry of the region should be defined in a derived engine by overridden SpheresFactory::pickRandomPosition(). \n\nA sample script for this engine is in :ysrc:`scripts/spheresFactory.py`.",
 		((Real,massFlowRate,NaN,,"Mass flow rate [kg/s]"))

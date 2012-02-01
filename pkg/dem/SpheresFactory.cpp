@@ -87,6 +87,8 @@ void SpheresFactory::action(){
 		maxMass = -1;
 	}
 	
+	vector< SpherCoord > justCreatedBodies;
+	
 	while(totalMass<goalMass && (maxParticles<0 || numParticles<maxParticles) && (maxMass<0 || totalMass<maxMass)){
 		Real r=0.0;
 		
@@ -122,8 +124,19 @@ void SpheresFactory::action(){
 			pickRandomPosition(c,r);
 			LOG_TRACE("Center "<<c);
 			Bound b; b.min=c-Vector3r(r,r,r); b.max=c+Vector3r(r,r,r);
-			vector<Body::id_t> collidingParticles=collider->probeBoundingVolume(b);
-			if(collidingParticles.size()==0) break;
+			vector<Body::id_t> collidingParticles=collider->probeBoundingVolume(b);   //Check, whether newly created sphere collides with existing bodies
+			
+			bool collideWithNewBodies = false;
+			if (justCreatedBodies.size()>0) {			//Check, whether newly created sphere collides with bodies from this scope
+				for (unsigned int ii = 0; ii < justCreatedBodies.size(); ii++) {
+					if ((justCreatedBodies.at(ii).c-c).norm() < (justCreatedBodies.at(ii).r+r)) {	//Bodies intersect
+						collideWithNewBodies = true;
+						break;
+					}
+				}
+			}
+			
+			if(collidingParticles.size()==0 and not(collideWithNewBodies)) break;
 			#ifdef YADE_DEBUG
 				FOREACH(const Body::id_t& id, collidingParticles) LOG_TRACE(scene->iter<<":"<<attempt<<": collision with #" <<id);
 			#endif
@@ -171,6 +184,8 @@ void SpheresFactory::action(){
 		totalMass+=state->mass;
 		totalVolume+= vol;
 		numParticles++;
+		
+		justCreatedBodies.push_back(SpherCoord(c, r));
 		
 		if (PSDuse) {		//Add newly created "material" into the bin
 			Real summMaterial = 0.0;
