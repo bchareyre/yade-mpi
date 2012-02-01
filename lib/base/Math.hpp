@@ -161,7 +161,7 @@ void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT*
 
 template<typename MatrixT>
 void matrixEigenDecomposition(const MatrixT& m, MatrixT& mRot, MatrixT& mDiag){
-	assert(mRot); assert(mDiag);
+	//assert(mRot); assert(mDiag);
 	Eigen::SelfAdjointEigenSolver<MatrixT> a(m); mRot=a.eigenvectors(); mDiag=a.eigenvalues().asDiagonal();
 }
 

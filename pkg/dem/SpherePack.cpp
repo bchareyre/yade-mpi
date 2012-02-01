@@ -79,7 +79,10 @@ void SpherePack::fromSimulation() {
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius,(b->isClumpMember()?b->clumpId:-1)));
 	}
-	if(scene->isPeriodic) { cellSize=scene->cell->getSize(); }
+	if(scene->isPeriodic) {
+		cellSize=scene->cell->getSize();
+		isPeriodic = true;
+	}
 }
 
 long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic, Real porosity, const vector<Real>& psdSizes, const vector<Real>& psdCumm, bool distributeMass, int seed, Matrix3r hSize){

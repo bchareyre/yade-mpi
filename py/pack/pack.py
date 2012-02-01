@@ -357,6 +357,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 		sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
 		sp.scale(scale);
 		if isPeri and wantPeri:
+			sp.isPeriodic = True
 			sp.cellSize=(X,Y,Z);
 			if fillPeriodic: sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]));
 		#sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
