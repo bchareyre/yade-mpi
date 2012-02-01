@@ -398,16 +398,17 @@ void PeriodicFlow::GaussSeidel()
                 dp -= cell->info().p();
                 dp_max = std::max(dp_max, std::abs(dp));
                 p_max = std::max(p_max, std::abs(cell->info().shiftedP()));
-                sum_p += std::abs(cell->info().shiftedP());
+                sum_p += cell->info().shiftedP();
                 sum_dp += std::abs(dp);
             }
         }
         p_moy = sum_p/cell2;
         dp_moy = sum_dp/cell2;
 	j++;
-	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<endl;
+	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
+	if (j>=40000) cerr<<"GS not converged after 40k iterations, break"<<endl;
 
-    } while ((dp_max/p_max) > tolerance && j<4000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
+    } while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 
     int cel=0;
     double Pav=0;

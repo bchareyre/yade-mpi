@@ -44,7 +44,10 @@ class FlowBoundingSphere : public Network<Tesselation>
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
+		//Handling imposed pressures on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
+		vector<Cell_handle> IPCells;
+		
 		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
 		bool permeability_map;
 
