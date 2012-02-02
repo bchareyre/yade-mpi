@@ -1,4 +1,3 @@
-# The purpose of this file is twofold: 
 # 1. it tells python that yade (this directory) is package of python modules
 #	see http://http://www.python.org/doc/2.1.3/tut/node8.html#SECTION008400000000000000000
 #
@@ -76,4 +75,8 @@ import _extraDocs
 # import a few "important" modules along with *
 import utils # some others?
 __all__+=['utils',]+dir(miniEigen)+dir(wrapper)
+# make O and wrapper.Omega part of __builtin__ (equvialent to global)
+import __builtin__
+__builtin__.__dict__['O'] = O
+__builtin__.__dict__['Omega'] = wrapper.Omega
 

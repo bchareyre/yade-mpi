@@ -175,7 +175,6 @@ def userSession(qt4=False,qapp=None):
 		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
 			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
 			sys.stderr.write("Running simulation "+arg0+'\n')
-			O=yade.wrapper.Omega(); O.load(arg0); O.run()
 		if arg0.endswith('.py'):
 			def runScript(script):
 				sys.stderr.write("Running script "+arg0+'\n')
