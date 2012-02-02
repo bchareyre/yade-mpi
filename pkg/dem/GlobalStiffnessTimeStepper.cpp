@@ -12,6 +12,7 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
+#include<yade/pkg/dem/Clump.hpp>
 
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN((GlobalStiffnessTimeStepper));
@@ -20,16 +21,23 @@ GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper() {}
 
 void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, Scene * ncb)
 {
-	const State* sdec=body->state.get();
-	
+	const State* sdec=body->state.get();	
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
+	
+	if(body->isClump()) {// if clump, we sum stifnesses of all members
+		const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(body->shape);
+		FOREACH(Clump::MemberMap::value_type& B, clump->members){
+			const shared_ptr<Body>& b = Body::byId(B.first,scene);
+			stiffness+=stiffnesses[b->getId()];
+			Rstiffness+=Rstiffnesses[b->getId()];
+		}
+	}
 	
 	if(!sdec || stiffness==Vector3r::Zero())
 		return; // not possible to compute!
 	
-	Real dtx, dty, dtz;	
-
+	Real dtx, dty, dtz;
 	Real dt = max( max (stiffness.x(), stiffness.y()), stiffness.z() );
 	if (dt!=0) {
 		dt = sdec->mass/dt;  computedSomething = true;}//dt = squared eigenperiod of translational motion 
@@ -37,12 +45,10 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	
 	if (Rstiffness.x()!=0) {
 		dtx = sdec->inertia.x()/Rstiffness.x();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
-	else dtx = Mathr::MAX_REAL;
-	
+	else dtx = Mathr::MAX_REAL;	
 	if (Rstiffness.y()!=0) {
 		dty = sdec->inertia.y()/Rstiffness.y();  computedSomething = true;}
 	else dty = Mathr::MAX_REAL;
-
 	if (Rstiffness.z()!=0) {
 		dtz = sdec->inertia.z()/Rstiffness.z();  computedSomething = true;}
 	else dtz = Mathr::MAX_REAL;
@@ -69,21 +75,16 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 // 	shared_ptr<InteractionContainer>& interactions = ncb->interactions;
 
 	newDt = Mathr::MAX_REAL;
+	computedSomething=false;
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
-	for(  ; bi!=biEnd ; ++bi )
-	{
-// 		if (!*bi)  continue;
+	for(  ; bi!=biEnd ; ++bi ){
 		shared_ptr<Body> b = *bi;
-		if (b->isDynamic()) findTimeStepFromBody(b, ncb);
-	}
-		
-	if(computedSomething)
-	{
-		previousDt = min ( min(newDt , defaultDt), 1.5*previousDt );// at maximum, dt will be multiplied by 1.5 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations 
+		if (b->isDynamic() && !b->isClumpMember()) findTimeStepFromBody(b, ncb);}
+	if(computedSomething){
+		previousDt = min ( min(newDt , maxDt), 1.05*previousDt );// at maximum, dt will be multiplied by 1.05 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations 
 		scene->dt=previousDt;
-		computedOnce = true;	
-	}
+		computedOnce = true;}
 	else if (!computedOnce) scene->dt=defaultDt;
 	LOG_INFO("computed timestep " << newDt <<
 			(scene->dt==newDt ? string(", appplied") :
