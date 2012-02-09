@@ -70,7 +70,7 @@ void ThreeDTriaxialEngine::action()
 
 	if(!stressControl_1)  // control in strain if wanted
 	{
-		if ( currentStrainRate1 != strainRate1 ) currentStrainRate1 += ( strainRate1-currentStrainRate1 ) *0.0003;
+		if ( currentStrainRate1 != strainRate1 ) currentStrainRate1 += ( strainRate1-currentStrainRate1 ) *(1-strainDamping);
 
 		State* p_left=Body::byId(wall_left_id,scene)->state.get();
 		p_left->pos += 0.5*currentStrainRate1*width*translationAxisx*dt;
@@ -79,14 +79,14 @@ void ThreeDTriaxialEngine::action()
 
 	} else {
 
-		if ( currentStrainRate1 != strainRate1 ) currentStrainRate1 += ( strainRate1-currentStrainRate1 ) *0.0003;
+		if ( currentStrainRate1 != strainRate1 ) currentStrainRate1 += ( strainRate1-currentStrainRate1 ) *(1-strainDamping);
 		max_vel1 = 0.5*currentStrainRate1*width;
 	}
 
 
 	if(!stressControl_2)  // control in strain if wanted
 	{
-		if ( currentStrainRate2 != strainRate2 ) currentStrainRate2 += ( strainRate2-currentStrainRate2 ) *0.0003;
+		if ( currentStrainRate2 != strainRate2 ) currentStrainRate2 += ( strainRate2-currentStrainRate2 ) *(1-strainDamping);
 
 		State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
 		p_bottom->pos += 0.5*currentStrainRate2*height*translationAxisy*dt;
@@ -95,14 +95,14 @@ void ThreeDTriaxialEngine::action()
 
 	} else {
 
-		if ( currentStrainRate2 != strainRate2 ) currentStrainRate2 += ( strainRate2-currentStrainRate2 ) *0.0003;
+		if ( currentStrainRate2 != strainRate2 ) currentStrainRate2 += ( strainRate2-currentStrainRate2 ) *(1-strainDamping);
 		max_vel2 = 0.5*currentStrainRate2*height;
 	}
 
 
 	if(!stressControl_3)  // control in strain if wanted
 	{
-		if ( currentStrainRate3 != strainRate3 ) currentStrainRate3 += ( strainRate3-currentStrainRate3 ) *0.0003;
+		if ( currentStrainRate3 != strainRate3 ) currentStrainRate3 += ( strainRate3-currentStrainRate3 ) *(1-strainDamping);
 
 
 		State* p_back=Body::byId(wall_back_id,scene)->state.get();
@@ -112,7 +112,7 @@ void ThreeDTriaxialEngine::action()
 
 	} else {
 
-		if ( currentStrainRate3 != strainRate3 ) currentStrainRate3 += ( strainRate3-currentStrainRate3 ) *0.0003;
+		if ( currentStrainRate3 != strainRate3 ) currentStrainRate3 += ( strainRate3-currentStrainRate3 ) *(1-strainDamping);
 		max_vel3 = 0.5*currentStrainRate3*depth;
 	}
 

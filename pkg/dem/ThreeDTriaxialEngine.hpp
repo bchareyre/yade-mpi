@@ -64,6 +64,7 @@ class ThreeDTriaxialEngine : public TriaxialStressController
 		((bool, stressControl_1,true,,"Switch to choose a stress or a strain control in directions 1"))
 		((bool, stressControl_2,true,,"Switch to choose a stress or a strain control in directions 2"))
 		((bool, stressControl_3,true,,"Switch to choose a stress or a strain control in directions 3"))
+		((Real, strainDamping,0.9997,,"factor used for smoothing changes in effective strain rate. If target rate is TR, then (1-damping)*(TR-currentRate) will be added at each iteration. With damping=0, rate=target all the time. With damping=1, it doesn't change."))
 		((std::string,Key,"",,"A string appended at the end of all files, use it to name simulations."))
 		,
 		translationAxisy=Vector3r(0,1,0);
