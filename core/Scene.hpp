@@ -70,6 +70,7 @@ class Scene: public Serializable{
 		void setLocalCoords(bool d){ if(d) flags|=LOCAL_COORDS; else flags&=~(LOCAL_COORDS); }
 		bool compressionNegative() const { return flags & COMPRESSION_NEGATIVE; }
 		void setCompressionNegative(bool d){ if(d) flags|=COMPRESSION_NEGATIVE; else flags&=~(COMPRESSION_NEGATIVE); }
+		boost::posix_time::ptime prevTime; //Time value on the previous step
 
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Scene,Serializable,"Object comprising the whole simulation.",
@@ -78,6 +79,7 @@ class Scene: public Serializable{
 		((bool,subStepping,false,,"Whether we currently advance by one engine in every step (rather than by single run through all engines)."))
 		((int,subStep,-1,Attr::readonly,"Number of sub-step; not to be changed directly. -1 means to run loop prologue (cell integration), 0…n-1 runs respective engines (n is number of engines), n runs epilogue (increment step number and time."))
 		((Real,time,0,Attr::readonly,"Simulation time (virtual time) [s]"))
+		((Real,speed,0,Attr::readonly,"Current calculation speed [iter/s]"))
 		((long,stopAtIter,0,,"Iteration after which to stop the simulation."))
 		#if 0
 			// not yet implemented

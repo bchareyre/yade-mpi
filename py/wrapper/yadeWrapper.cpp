@@ -334,6 +334,7 @@ class pyOmega{
 
 	double time(){return OMEGA.getScene()->time;}
 	double realTime(){ return OMEGA.getRealTime(); }
+	double speed(){ return OMEGA.getScene()->speed; }
 	double dt_get(){return OMEGA.getScene()->dt;}
 	void dt_set(double dt){
 		Scene* scene=OMEGA.getScene().get();
@@ -535,6 +536,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
 		.add_property("time",&pyOmega::time,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
+		.add_property("speed",&pyOmega::speed,"Return current calculation speed [iter/sec].")
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\n* assigning negative value enables dynamic Δt (by looking for a :yref:`TimeStepper` in :yref:`O.engine<Omega.engines>`) and sets positive timestep ``O.dt=|Δt|`` (will be used until the timestepper is run and updates it)\n* assigning positive value sets Δt to that value and disables dynamic Δt (via :yref:`TimeStepper`, if there is one).\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
 		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
 		.add_property("dynDtAvailable",&pyOmega::dynDtAvailable_get,"Whether a :yref:`TimeStepper` is amongst :yref:`O.engines<Omega.engines>`, activated or not.")
