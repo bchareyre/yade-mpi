@@ -48,8 +48,28 @@ SINGLETON_SELF(Omega);
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
-const shared_ptr<Scene>& Omega::getScene(){return scene;}
-void Omega::resetScene(){ RenderMutexLock lock; scene = shared_ptr<Scene>(new Scene);}
+const shared_ptr<Scene>& Omega::getScene(){return scenes.at(currentSceneNb);}
+void Omega::resetCurrentScene(){ RenderMutexLock lock; scenes.at(currentSceneNb) = shared_ptr<Scene>(new Scene);}
+void Omega::resetScene(){ resetCurrentScene(); }//RenderMutexLock lock; scene = shared_ptr<Scene>(new Scene);}
+void Omega::resetAllScenes(){
+	RenderMutexLock lock;
+	scenes.resize(1);
+	scenes[0] = shared_ptr<Scene>(new Scene);
+	currentSceneNb=0;
+}
+int Omega::addScene(){
+	scenes.push_back(shared_ptr<Scene>(new Scene));
+	return scenes.size()-1;
+}
+void Omega::switchToScene(unsigned int i) {
+	if (i<0 || i>=scenes.size()) {
+		LOG_ERROR("Scene "<<i<<" has not been created yet, no switch.");
+		return;
+	}
+	currentSceneNb=i;
+}
+
+
 
 Real Omega::getRealTime(){ return (microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
 time_duration Omega::getRealTime_duration(){return microsec_clock::local_time()-startupLocalTime;}
@@ -79,7 +99,8 @@ void Omega::reset(){
 
 void Omega::init(){
 	sceneFile="";
-	resetScene();
+	//resetScene();
+	resetAllScenes();
 	sceneAnother=shared_ptr<Scene>(new Scene);
 	timeInit();
 	createSimulationLoop();
@@ -220,6 +241,9 @@ void Omega::loadSimulation(const string& f, bool quiet){
 	if(isMem && memSavedSimulations.count(f)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+f);
 	
 	if(!quiet) LOG_INFO("Loading file "+f);
+	//shared_ptr<Scene> scene = getScene();
+	shared_ptr<Scene>& scene = scenes[currentSceneNb];
+	//shared_ptr<Scene>& scene = getScene();
 	{
 		stop(); // stop current simulation if running
 		resetScene();
@@ -242,6 +266,9 @@ void Omega::loadSimulation(const string& f, bool quiet){
 void Omega::saveSimulation(const string& f, bool quiet){
 	if(f.size()==0) throw runtime_error("f of file to save has zero length.");
 	if(!quiet) LOG_INFO("Saving file " << f);
+	//shared_ptr<Scene> scene = getScene();
+	shared_ptr<Scene>& scene = scenes[currentSceneNb];
+	//shared_ptr<Scene>& scene = getScene();
 	if(algorithm::starts_with(f,":memory:")){
 		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
 		ostringstream oss;

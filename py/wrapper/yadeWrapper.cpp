@@ -397,10 +397,14 @@ class pyOmega{
 	}
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
-	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetScene(); OMEGA.createSimulationLoop();}
+	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
+	void resetCurrentScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
 	void resetTime(){ OMEGA.getScene()->iter=0; OMEGA.getScene()->time=0; OMEGA.timeInit(); }
-	void switchScene(){ std::swap(OMEGA.scene,OMEGA.sceneAnother); }
+	void switchScene(){ std::swap(OMEGA.scenes[OMEGA.currentSceneNb],OMEGA.sceneAnother); }
+	void resetAllScenes(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetAllScenes(); OMEGA.createSimulationLoop();}
 	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
+	int addScene(){return OMEGA.addScene();}
+	void switchToScene(int i){OMEGA.switchToScene(i);}
 
 	void save(std::string fileName,bool quiet=false){
 		assertScene();
@@ -548,8 +552,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
 		.add_property("running",&pyOmega::isRunning,"Whether background thread is currently running a simulation.")
 		.add_property("filename",&pyOmega::get_filename,"Filename under which the current simulation was saved (None if never saved).")
-		.def("reset",&pyOmega::reset,"Reset simulations completely (including another scene!).")
+		.def("reset",&pyOmega::reset,"Reset simulations completely (including another scenes!).")
 		.def("resetThisScene",&pyOmega::resetThisScene,"Reset current scene.")
+		.def("resetCurrentScene",&pyOmega::resetCurrentScene,"Reset current scene.")
+		.def("resetAllScenes",&pyOmega::resetAllScenes,"Reset all scenes.")
+		.def("addScene",&pyOmega::addScene,"Add new scene to Omega, returns its number")
+		.def("switchToScene",&pyOmega::switchToScene,"Switch to defined scene. Default scene has number 0, other scenes have to be created by addScene method.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example::\n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider.nBins=5 ## collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")

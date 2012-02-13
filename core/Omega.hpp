@@ -63,7 +63,8 @@ class Omega: public Singleton<Omega>{
 	map<string,DynlibDescriptor> dynlibs; // FIXME : should store that in ClassFactory ?
 	void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 	
-	shared_ptr<Scene> scene;
+	vector<shared_ptr<Scene> > scenes;
+	unsigned int currentSceneNb;
 	shared_ptr<Scene> sceneAnother; // used for temporarily running different simulation, in Omega().switchscene()
 
 	ptime startupLocalTime;
@@ -109,7 +110,11 @@ class Omega: public Singleton<Omega>{
 		void saveSimulation(const string& name, bool quiet=false);
 
 		void resetScene();
+		void resetCurrentScene();
+		void resetAllScenes();
 		const shared_ptr<Scene>& getScene();
+		int addScene();
+		void switchToScene(int i);
 		//! Return unique temporary filename. May be deleted by the user; if not, will be deleted at shutdown.
 		string tmpFilename();
 		Real getRealTime();
