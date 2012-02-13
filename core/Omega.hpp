@@ -64,7 +64,7 @@ class Omega: public Singleton<Omega>{
 	void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 	
 	vector<shared_ptr<Scene> > scenes;
-	unsigned int currentSceneNb;
+	int currentSceneNb;
 	shared_ptr<Scene> sceneAnother; // used for temporarily running different simulation, in Omega().switchscene()
 
 	ptime startupLocalTime;

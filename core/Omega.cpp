@@ -61,8 +61,8 @@ int Omega::addScene(){
 	scenes.push_back(shared_ptr<Scene>(new Scene));
 	return scenes.size()-1;
 }
-void Omega::switchToScene(unsigned int i) {
-	if (i<0 || i>=scenes.size()) {
+void Omega::switchToScene(int i) {
+	if (i<0 || i>=int(scenes.size())) {
 		LOG_ERROR("Scene "<<i<<" has not been created yet, no switch.");
 		return;
 	}
