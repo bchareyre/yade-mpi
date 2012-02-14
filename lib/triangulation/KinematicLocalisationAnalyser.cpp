@@ -34,7 +34,7 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser()
 {
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
-	consecutive = true;
+	consecutive = false;
 	bz2=true;
 	TS1=new TriaxialState;
 	TS0=new TriaxialState;
@@ -51,7 +51,7 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* state_f
 {
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
-	consecutive = true;
+	consecutive = false;
 	bz2=true;
 	TS1 = new(TriaxialState);
 	TS0 = NULL;
