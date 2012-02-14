@@ -11,13 +11,15 @@
 namespace CGT {
 Vecteur PeriodicCellInfo::gradP;
 Vecteur PeriodicCellInfo::hSize[3];
+Vecteur PeriodicCellInfo::deltaP;
 }
+
 
 //Forcing instanciation of the template to avoid linkage problems 
 typedef CGT::FlowBoundingSphere<FlowTesselation> FlowBoundingSphere;
 FlowBoundingSphere ex;
 #ifdef LINSOLV
-typedef CGT::FlowBoundingSphereLinSolv<FlowTesselation> FlowBoundingSphereLinSolv;
+typedef CGT::FlowBoundingSphereLinSolv<FlowBoundingSphere> FlowBoundingSphereLinSolv;
 FlowBoundingSphereLinSolv exls;
 #endif
 

@@ -83,6 +83,10 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 			}
 	}
 	//use cached values
+	//First define products that will be used below for all cells:
+	Real pDeltas [3];
+	for (unsigned int k=0; k<3;k++) pDeltas[k]=PeriodicCellInfo::hSize[k]*PeriodicCellInfo::gradP;
+	//Then compute the forces
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
 		if (cell->info().isGhost) continue;
 		for (int yy=0;yy<4;yy++) {
@@ -91,7 +95,7 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 // 			cerr <<"p="<<cell->info().p()<<" shifted="<<cell->info().shiftedP()<<endl;
 			//the pressure translated to a ghost cell adjacent to the non-ghost vertex
 			//FIXME: the hsize[k]*gradP products could be computed only once for all cells and facets
-			if (vhi.isGhost) unshiftedP -= (PeriodicCellInfo::hSize[0]*PeriodicCellInfo::gradP)*vhi.period[0] + (PeriodicCellInfo::hSize[1]*PeriodicCellInfo::gradP)*vhi.period[1] +(PeriodicCellInfo::hSize[2]*PeriodicCellInfo::gradP)*vhi.period[2];
+			if (vhi.isGhost) unshiftedP -= pDeltas[0]*vhi.period[0] + pDeltas[1]*vhi.period[1] +pDeltas[2]*vhi.period[2];
 			vhi.forces = vhi.forces + cell->info().unitForceVectors[yy]*unshiftedP;
 // 			cerr <<"unshifted="<<unshiftedP<<endl;
 		}
@@ -348,10 +352,17 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
 				{(*it)->info().setP(bi.value);(*it)->info().Pcondition=true;}
 		}
         }
+        IPCells.clear();
         for (unsigned int n=0; n<imposedP.size();n++) {
 		Cell_handle cell=Tri.locate(imposedP[n].first);
+		
+		//check redundancy
+		for (unsigned int kk=0;kk<IPCells.size();kk++){
+			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
+			else if  (cell->info().Pcondition) cerr<<"Imposed pressure fall in a boundary condition."<<endl;}
 // 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
 // 		assert(cell);
+		IPCells.push_back(cell);
 		cell->info().setP(imposedP[n].second);
 		cell->info().Pcondition=true;}
 }
@@ -406,7 +417,7 @@ void PeriodicFlow::GaussSeidel()
         dp_moy = sum_dp/cell2;
 	j++;
 	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
-	if (j>=40000) cerr<<"GS not converged after 40k iterations, break"<<endl;
+	if (j>=40000) cerr<<"\r GS not converged after 40k iterations, break";
 
     } while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 
@@ -476,9 +487,9 @@ void PeriodicFlow::Average_Relative_Cell_Velocity()
         int num_cells = 0;
         double facet_flow_rate = 0;
 	double volume_facet_translation = 0;
-	Real tVel=0; Real tVol=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+		if (cell->info().isGhost) continue;
 		cell->info().av_vel() =CGAL::NULL_VECTOR;
                 num_cells++;
                 for ( int i=0; i<4; i++ ) {
@@ -490,12 +501,10 @@ void PeriodicFlow::Average_Relative_Cell_Velocity()
 //                         Vecteur facetNormal = Surfk/area;
                         Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
                         pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
-// 		pos_av_facet=CGAL::ORIGIN + ((cell->vertex(facetVertices[i][0])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][1])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][2])->point() - CGAL::ORIGIN))*0.3333333333;
 			facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
-                        cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
+			cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
 		  }}
- 		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
-		cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
+		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
 	}
 }
 
@@ -504,7 +513,7 @@ void PeriodicFlow::Average_Relative_Cell_Velocity()
 
 #endif //FLOW_ENGINE
 
-/*
+
 #ifdef LINSOLV
-#include "FlowBoundingSphereLinSolv.cpp"
-#endif*/
+#include "PeriodicFlowLinSolv.ipp"
+#endif

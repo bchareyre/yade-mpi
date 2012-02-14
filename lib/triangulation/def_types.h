@@ -71,6 +71,7 @@ public:
 	inline Real& f (void) {return s;}
 	inline Real& v (void) {return vol;}
 	inline const unsigned int& id (void) const {return i;}
+	SimpleVertexInfo (void) {isFictious=false; s=0; i=0;}
 };
 
 
@@ -163,20 +164,24 @@ class PeriodicCellInfo : public FlowCellInfo
 	static Vecteur gradP;
 	int period[3];
 	static Vecteur hSize[3];
+	static Vecteur deltaP;
 	int ghost;
 	Real* _pression;
 	bool isGhost;
 	PeriodicCellInfo (void)
 	{
 		_pression=&pression;
+		period[0]=period[1]=period[2]=0;
+		isGhost=false;
 	}
 	~PeriodicCellInfo (void) {}
 	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
 	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
 	
-	inline const double shiftedP (void) {return isGhost? (*_pression)+(hSize[0]*gradP)*period[0] + (hSize[1]*gradP)*period[1] +(hSize[2]*gradP)*period[2] :(*_pression) ;}
+	inline const double shiftedP (void) const {return isGhost? (*_pression)+pShift() :(*_pression) ;}
+	inline const double pShift (void) const {return deltaP[0]*period[0] + deltaP[1]*period[1] +deltaP[2]*period[2];}
 // 	inline const double p (void) {return shiftedP();}
-	inline double setP (Real p) {pression=p;}
+	inline void setP (const Real& p) {pression=p;}
 };
 
 class PeriodicVertexInfo : public FlowVertexInfo {

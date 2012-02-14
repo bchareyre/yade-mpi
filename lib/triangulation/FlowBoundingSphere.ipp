@@ -981,16 +981,21 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
 
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
+		boundingCells[bound].clear();
+		if (id<0) continue;
                 Boundary& bi = boundary(id);
                 if (!bi.flowCondition) {
                         Vector_Cell tmp_cells;
                         tmp_cells.resize(10000);
                         VCell_iterator cells_it = tmp_cells.begin();
                         VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
-                        for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
-			{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;}
+                        for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++){
+				(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
+				boundingCells[bound].push_back(*it);
+			}
                 }
         }
+        IPCells.clear();
         for (unsigned int n=0; n<imposedP.size();n++) {
 		Cell_handle cell=Tri.locate(imposedP[n].first);
 		IPCells.push_back(cell);
@@ -1003,6 +1008,31 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
 		cell->info().p()=imposedP[n].second;
 		cell->info().Pcondition=true;}
 }
+
+template <class Tesselation> 
+void FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
+{
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+
+        for (int bound=0; bound<6;bound++) {
+                int& id = *boundsIds[bound];
+		if (id<0) continue;
+                Boundary& bi = boundary(id);
+                if (!bi.flowCondition) {
+                        for (VCell_iterator it = boundingCells[bound].begin(); it != boundingCells[bound].end(); it++){
+				(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
+			}
+                }
+        }
+        for (unsigned int n=0; n<imposedP.size();n++) {
+		IPCells[n]->info().p()=imposedP[n].second;
+		IPCells[n]->info().Pcondition=true;}
+}
+
+
+
+
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::GaussSeidel()
 {

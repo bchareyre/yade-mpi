@@ -402,49 +402,50 @@ void _Tesselation<TT>::AssignPartialVolume ( Finite_edges_iterator& ed_it )
 	}
 	cell0=cell2++;
 	Cell_circulator cell1=cell2++;
-	//std::cout << "edge : " << ed_it->first->vertex ( ed_it->second )->info().id() << "-" << ed_it->first->vertex ( ed_it->third )->info().id() << std::endl;
+// 	std::cout << "edge : " << ed_it->first->vertex ( ed_it->second )->info().id() << "-" << ed_it->first->vertex ( ed_it->third )->info().id() << std::endl;
 	bool isFictious1 = ( ed_it->first )->vertex ( ed_it->second )->info().isFictious;
 	bool isFictious2 = ( ed_it->first )->vertex ( ed_it->third )->info().isFictious;
+// 	cout<<"fictious "<<isFictious1<<" "<<isFictious2<<endl;
 	Real r;
 
-	//cout << "cell0 : " <<  cell0->vertex(0)->info().id() << " "
-	//   <<  cell0->vertex(1)->info().id() << " "
-	//   <<  cell0->vertex(2)->info().id() << " "
-	//   <<  cell0->vertex(3)->info().id() << "(center : " << (Point) cell0->info() << ")" <<   endl;
+// 	cout << "cell0 : " <<  cell0->vertex(0)->info().id() << " "
+// 	  <<  cell0->vertex(1)->info().id() << " "
+// 	  <<  cell0->vertex(2)->info().id() << " "
+// 	  <<  cell0->vertex(3)->info().id() << "(center : " << (Point) cell0->info() << ")" <<   endl;
 
 	while ( cell2!=cell0 )
 	{
 		if ( !Tri->is_infinite ( cell1 )  && !Tri->is_infinite ( cell2 ) )
 		{
-			// cout << "cell1 : " <<  cell1->vertex(0)->info().id() << " "
-			//   <<  cell1->vertex(1)->info().id() << " "
-			//   <<  cell1->vertex(2)->info().id() << " "
-			//   <<  cell1->vertex(3)->info().id() << "(center : " << (Point) cell1->info() << ")" << endl;
-			// cout << "cell2 : " <<  cell2->vertex(0)->info().id() << " "
-			//   <<  cell2->vertex(1)->info().id() << " "
-			//   <<  cell2->vertex(2)->info().id() << " "
-			//   <<  cell2->vertex(3)->info().id() << "(center : " << (Point) cell2->info() << ")" << endl;
+// 			cout << "cell1 : " <<  cell1->vertex(0)->info().id() << " "
+// 			  <<  cell1->vertex(1)->info().id() << " "
+// 			  <<  cell1->vertex(2)->info().id() << " "
+// 			  <<  cell1->vertex(3)->info().id() << "(center : " << (Point) cell1->info() << ")" << endl;
+// 			cout << "cell2 : " <<  cell2->vertex(0)->info().id() << " "
+// 			  <<  cell2->vertex(1)->info().id() << " "
+// 			  <<  cell2->vertex(2)->info().id() << " "
+// 			  <<  cell2->vertex(3)->info().id() << "(center : " << (Point) cell2->info() << ")" << endl;
 
-			//std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->second )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
+// 			std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->second )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
 			if ( !isFictious1 )
 			{
 				r = std::abs ( ( Tetraedre ( ed_it->first->vertex ( ed_it->second )->point(), cell0->info(), cell1->info(), cell2->info() ) ).volume() );
-				//std::cout << "assigned1=" << r << " on " << ed_it->first->vertex ( ed_it->second )->info().id() << std::endl;
+// 				std::cout << "assigned1=" << r << " on " << ed_it->first->vertex ( ed_it->second )->info().id() << std::endl;
 				( ed_it->first )->vertex ( ed_it->second )->info().v() += r;
 				TotalFiniteVoronoiVolume+=r;
 			}
-			//std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->third )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
+// 			std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->third )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
 			if ( !isFictious2 )
 			{
 				r = std::abs ( ( Tetraedre ( ed_it->first->vertex ( ed_it->third )->point(), cell0->info(),  cell1->info(), cell2->info() ) ).volume() );
-				//std::cout << "assigned2=" << r << " on " << ed_it->first->vertex ( ed_it->third )->info().id() << std::endl;
+// 				std::cout << "assigned2=" << r << " on " << ed_it->first->vertex ( ed_it->third )->info().id() << std::endl;
 				ed_it->first->vertex ( ed_it->third )->info().v() +=r;
 				TotalFiniteVoronoiVolume+=r;
 			}
 		}
 		++cell1; ++cell2;
 	}
-	//std::cout << "fin AssignPartialVolume" << std::endl;
+// 	std::cout << "fin AssignPartialVolume,total " << TotalFiniteVoronoiVolume<< std::endl;
 }
 
 template<class TT>

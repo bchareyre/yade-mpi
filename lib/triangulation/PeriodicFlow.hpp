@@ -14,7 +14,6 @@
 // #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 // #endif
 
-// using namespace std;
 
 namespace CGT{
 
@@ -41,9 +40,9 @@ namespace CGT{
 	};
 }
 
-// #ifdef LINSOLV
-// #include "FlowBoundingSphereLinSolv.hpp"
-// #endif
+#ifdef LINSOLV
+#include "PeriodicFlowLinSolv.hpp"
+#endif
 
 
 #endif //FLOW_ENGINE

@@ -115,6 +115,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			if (!area) throw invalid_argument("The box defined has null volume AND null surface. Define at least maxCorner of the box, or hSize if periodic.");
 			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);}
 	}
+	// transform sizes and cummulated fractions values in something convenient for the generation process
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
 		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+lexical_cast<string>(psdSizes.size())+"!="+lexical_cast<string>(psdCumm.size())).c_str());
@@ -137,8 +138,6 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			appliedPsdScaling=1;
 			if(distributeMass) {
 				if (psdCumm2[psdSizes.size()-1]<num) appliedPsdScaling=pow(psdCumm2[psdSizes.size()-1]/num,1./3.);
-				//Normalize psdCumm2 so it's between 0 and 1
-// 				for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
 			} else {
 				double totVol=0;
 				for(size_t i=1; i<psdSizes.size(); i++) totVol+= 4/3*Mathr::PI*(psdCumm[i]-psdCumm[i-1])*num*
@@ -158,13 +157,13 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	Real r=0;
 	for(int i=0; (i<num) || (num<0); i++) {
 		Real norm, rand;
-		//Determine radius of the next sphere we will attempt to place in space. If (num>0), generate radii the deterministic way, in decreasing order, else radii are stochastic since we don't know what the final number will be
+		//Determine radius of the next sphere that will be placed in space. If (num>0), generate radii the deterministic way, in decreasing order, else radii are stochastic since we don't know what the final number will be
 		if (num>0) rand = ((Real)num-(Real)i+0.5)/((Real)num+1.);
 		else rand = rnd();
 		int t;
 		switch(mode){
 			case RDIST_RMEAN:
-				//FIXME : r is never defined, it will be zero at first iteration, but it will have values in the next ones. Some magic?
+			//FIXME : r is never defined, it will be zero at first iteration, but it will have values in the next ones. Some magic?
 			case RDIST_NUM:
 				if(distributeMass) r=pow3Interp(rand,rMean*(1-rRelFuzz),rMean*(1+rRelFuzz));
 				else r=rMean*(2*(rand-.5)*rRelFuzz+1); // uniform distribution in rMean*(1±rRelFuzz)
@@ -205,6 +204,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		if (t==maxTry) {
 			if(num>0) {
 				if (mode!=RDIST_RMEAN) {
+					//if rMean is not imposed, then we call makeCloud recursively, scaling the PSD down until the target num is obtained
 					Real nextPoro = porosity+(1-porosity)/10.;
 					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
 					pack.clear();

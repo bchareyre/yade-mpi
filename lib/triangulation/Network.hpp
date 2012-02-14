@@ -44,6 +44,7 @@ class Network
 		int nOfSpheres;
 		int x_min_id, x_max_id, y_min_id, y_max_id, z_min_id, z_max_id;
 		int* boundsIds [6];
+		vector<Cell_handle> boundingCells [6];
 		Point Corner_min;
 		Point Corner_max;
 		Real Vsolid_tot, Vtotalissimo, Vporale, Ssolid_tot, V_porale_porosity, V_totale_porosity;

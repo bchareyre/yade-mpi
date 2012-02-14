@@ -16,7 +16,7 @@
 class Flow;
 class TesselationWrapper;
 #ifdef LINSOLV
-#define _FlowSolver CGT::FlowBoundingSphereLinSolv<FlowTesselation>
+#define _FlowSolver CGT::FlowBoundingSphereLinSolv<CGT::FlowBoundingSphere<FlowTesselation> >
 #else
 #define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
 #endif
@@ -95,7 +95,7 @@ class FlowEngine : public PartialEngine
 		
 		//Instanciation of templates for python binding
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
-		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,solver);}
+		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
@@ -211,21 +211,17 @@ unsigned int FlowEngine::imposePressure(Vector3r pos, Real p,Solver& flow)
 
 REGISTER_SERIALIZABLE(FlowEngine);
 
-// #ifdef LINSOLV
-// #define _PeriFlowSolver CGT::FlowBoundingSphereLinSolv<FlowTesselation>
-// #else
-// #define _PeriFlowSolver CGT::FlowBoundingSphere<PeriodicFlowTesselation>
-// #endif
+#ifdef LINSOLV
+#define _PeriFlowSolver CGT::PeriodicFlowLinSolv
+#else
+#define _PeriFlowSolver CGT::PeriodicFlow
+#endif
 
 class PeriodicFlowEngine : public FlowEngine
 {
-	private:
-// 		shared_ptr<FlowSolver> flow;
-// 		int retriangulationLastIter;
-		
 	public :
 		public :
-		typedef CGT::PeriodicFlow						FlowSolver;
+		typedef _PeriFlowSolver							FlowSolver;
 		typedef PeriFlowTesselation						Tesselation;
 		typedef FlowSolver::RTriangulation					RTriangulation;
 		typedef FlowSolver::Finite_vertices_iterator                    	Finite_vertices_iterator;
@@ -243,7 +239,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void UpdateVolumes ();
 		Real Volume_cell (Cell_handle cell);
 		void ApplyViscousForces();
-		void locateCell(Cell_handle baseCell);
+		void locateCell(Cell_handle baseCell, unsigned int& index);
 		Vector3r MeanVelocity();
 		
 		virtual ~PeriodicFlowEngine();
@@ -252,7 +248,7 @@ class PeriodicFlowEngine : public FlowEngine
 		
 		//Instanciation of templates for python binding
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
-// 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,solver);}
+		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}	
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
