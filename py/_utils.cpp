@@ -435,7 +435,7 @@ Matrix3r Shop__stressTensorOfPeriodicCell(bool smallStrains=false){return Shop::
 py::tuple Shop__fabricTensor(bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN){return Shop::fabricTensor(splitTensor,revertSign,thresholdForce);}
 py::tuple Shop__normalShearStressTensors(bool compressionPositive=false, bool splitNormalTensor=false, Real thresholdForce=NaN){return Shop::normalShearStressTensors(compressionPositive,splitNormalTensor,thresholdForce);}
 
-py::tuple Shop__getStressLWForEachBody(bool revertSign=false){return Shop::getStressLWForEachBody(revertSign);}
+py::list Shop__getStressLWForEachBody(bool revertSign=false){return Shop::getStressLWForEachBody(revertSign);}
 
 Real shiftBodies(py::list ids, const Vector3r& shift){
 	shared_ptr<Scene> rb=Omega::instance().getScene();

@@ -820,8 +820,11 @@ void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 	}
 }
 
-py::tuple Shop::getStressLWForEachBody(bool revertSign){
+py::list Shop::getStressLWForEachBody(bool revertSign){
+	py::list ret;
 	vector<Matrix3r> bStresses;
 	getStressLWForEachBody(bStresses,revertSign);
-	return py::make_tuple(bStresses);
+	FOREACH(const Matrix3r& m, bStresses) ret.append(m);
+	return ret;
+// 	return py::make_tuple(bStresses);
 }
