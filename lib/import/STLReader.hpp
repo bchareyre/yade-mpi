@@ -74,7 +74,7 @@ bool STLReader::open(const char* filename, OutV vertices, OutE edges, OutF facet
     fseek(fp, 0, SEEK_END);
     int file_size = ftell(fp);
     int facenum;
-	 int res;
+    size_t res;
     /* Check for binary or ASCII file */
     fseek(fp, STL_LABEL_SIZE, SEEK_SET);
     res=fread(&facenum, sizeof(int), 1, fp);
@@ -109,7 +109,7 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
     
     vector<Vrtx> vcs;
     set<pair<int,int> > egs;
-	 int ret;
+    size_t ret;
 
     /* Read a single facet from an ASCII .STL file */
     while(!feof(fp))

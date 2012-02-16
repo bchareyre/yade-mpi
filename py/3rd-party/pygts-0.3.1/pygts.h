@@ -32,11 +32,11 @@
 #define PYGTS_DEBUG 1
 #endif /* PYGTS_DEBUG */
 
+#include <Python.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include <Python.h>
 #include <structmember.h>
 
 /* Defined for arrayobject.h which is only included where needed */

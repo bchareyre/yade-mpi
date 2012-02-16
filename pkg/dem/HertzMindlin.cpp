@@ -51,7 +51,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	GenericSpheresContact* scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());		
 	Real Da = scg->refR1>0 ? scg->refR1 : scg->refR2; 
 	Real Db = scg->refR2; 
-	Vector3r normal=scg->normal; 
+	//Vector3r normal=scg->normal;        //The variable set but not used
 
 
 	/* calculate stiffness coefficients */
@@ -177,7 +177,7 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, share
 	
 	// shear force: transform, but keep the old value for now
 	geom->rotate(phys->usTotal);
-	Vector3r usOld=phys->usTotal;
+	//Vector3r usOld=phys->usTotal;     //The variable set but not used
 	Vector3r dUs=geom->shearIncrement();
 	phys->usTotal-=dUs;
 

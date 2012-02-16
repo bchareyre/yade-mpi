@@ -46,7 +46,7 @@ void Ip2_FrictMat_FrictMat_MindlinCapillaryPhys::go( const shared_ptr<Material>&
 	GenericSpheresContact* scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());		
 	Real Da = scg->refR1>0 ? scg->refR1 : scg->refR2; 
 	Real Db = scg->refR2; 
-	Vector3r normal=scg->normal; 
+	//Vector3r normal=scg->normal;  //The variable set but not used
 
 	/* calculate stiffness coefficients */
 	Real Ga = Ea/(2*(1+Va));

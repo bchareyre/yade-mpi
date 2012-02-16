@@ -190,6 +190,8 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 			case 1: // exponential
 				return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 		}
+		LOG_ERROR("End of void function!");
+		return 0;
 	}
 	//! return |sigmaT| at plastic surface for given sigmaN etc; not used by the law itself
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle);
