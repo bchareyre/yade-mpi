@@ -11,8 +11,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonIntegrator(damping=.2),
+	NewtonIntegrator(damping=.2,gravity=(0,0,-9.81)),
 	###
 	### NOTE this extra engine:
 	###

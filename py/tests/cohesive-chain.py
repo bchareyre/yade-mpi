@@ -34,9 +34,8 @@ class TestCohesiveChain(unittest.TestCase):
 			[Ip2_CohFrictMat_CohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True)],
 			[Law2_ScGeom6D_CohFrictPhys_CohesionMoment()]),
 		## Apply gravity
-		GravityEngine(gravity=[0,-9.81,0]),
 		## Motion equation
-		NewtonIntegrator(damping=0.15)
+		NewtonIntegrator(damping=0.15,gravity=[0,-9.81,0])
 		]
 		#Generate a spiral
 		Ne=10

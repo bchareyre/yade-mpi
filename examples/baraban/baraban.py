@@ -47,9 +47,8 @@ O.engines=[
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	## Apply gravity
-	GravityEngine(gravity=[0,-9.81,0]),
 	## Cundall damping must been disabled!
-	NewtonIntegrator(damping=0),
+	NewtonIntegrator(damping=0,gravity=[0,-9.81,0]),
 ## Saving results
 	#VTKRecorder(virtPeriod=0.04,fileName='/tmp/stlimp-',recorders=['spheres','facets']),
 	## Apply kinematics to walls

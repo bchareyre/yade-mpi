@@ -24,8 +24,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]
 	),
-	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonIntegrator(),
+	NewtonIntegrator(gravity=(0,0,-9.81)),
 	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/p1-')
 ]
 O.dt=utils.PWaveTimeStep()

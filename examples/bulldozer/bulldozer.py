@@ -69,9 +69,8 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_L3Geom_FrictPhys_ElPerfPl()],
 	),
-	GravityEngine(gravity=(0,0,-9.8)),
 	TranslationEngine(translationAxis=[1,0,0],velocity=5,ids=KnifeIDs), # Buldozer motion
-	NewtonIntegrator(damping=.3),
+	NewtonIntegrator(damping=.3,gravity=(0,0,-9.8)),
 	#qt.SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',label='snapshooter'),
 ]
 

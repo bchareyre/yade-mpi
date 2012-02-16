@@ -120,8 +120,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
-	GravityEngine(gravity=(1e-2,1e-2,-1000)),
-	NewtonIntegrator(damping=.1,exactAsphericalRot=True),
+	NewtonIntegrator(damping=.1,exactAsphericalRot=True,gravity=(1e-2,1e-2,-1000)),
 	RotationEngine(
 		ids=rotateIDs,
 		angularVelocity=100.0,

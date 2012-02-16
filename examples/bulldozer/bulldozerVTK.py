@@ -73,9 +73,8 @@ O.engines=[
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
-	GravityEngine(gravity=[0,0,-9.8]),
 	TranslationEngine(translationAxis=[1,0,0],velocity=2,ids=KnifeIDs), # Buldozer motion
-	NewtonIntegrator(damping=0),
+	NewtonIntegrator(damping=0,gravity=[0,0,-9.8]),
 	VTKRecorder(iterPeriod=1000,fileName='/tmp/bulldozer-',recorders=['spheres','facets'])
 ]
 

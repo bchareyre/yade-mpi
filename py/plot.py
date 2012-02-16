@@ -139,7 +139,7 @@ def addAutoData():
 	>>> O.dt=utils.PWaveTimeStep()
 	>>> O.engines=[
 	...    ForceResetter(),
-	...    GravityEngine(gravity=(0,0,-10)),
+	...    GravityEngine(gravity=(0,0,-10),warnOnce=False),
 	...    NewtonIntegrator(damping=.4,kinSplit=True),
 	...    # get data required by plots at every step
 	...    PyRunner(command='yade.plot.addAutoData()',iterPeriod=1,initRun=True)
@@ -158,7 +158,7 @@ def addAutoData():
 		from yade import *
 		from yade import plot,utils
 		O.reset()
-		O.engines=[ForceResetter(),GravityEngine(gravity=(0,0,-10)),NewtonIntegrator(damping=.4,kinSplit=True),PyRunner(command='yade.plot.addAutoData()',iterPeriod=1,initRun=True)]
+		O.engines=[ForceResetter(),GravityEngine(gravity=(0,0,-10),warnOnce=False),NewtonIntegrator(damping=.4,kinSplit=True),PyRunner(command='yade.plot.addAutoData()',iterPeriod=1,initRun=True)]
 		O.bodies.append(utils.sphere((0,0,0),1)); O.dt=utils.PWaveTimeStep()
 		plot.resetData()
 		plot.plots={'i=O.iter':(O.energy,None,'total energy=O.energy.total()')}

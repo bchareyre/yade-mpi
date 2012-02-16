@@ -39,8 +39,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_L3Geom_FrictPhys_ElPerfPl()],
 	),
-	GravityEngine(gravity=[0,0,-5000]),
-	NewtonIntegrator(damping=.1),
+	NewtonIntegrator(damping=.1,gravity=[0,0,-5000]),
 	PyRunner(iterPeriod=1000,command='timing.stats(); O.pause();'),
 	PyRunner(iterPeriod=10,command='addPlotData()')
 ]

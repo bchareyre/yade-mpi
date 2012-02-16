@@ -57,9 +57,8 @@ O.engines=[
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	## Apply gravity
-	GravityEngine(gravity=[0,-9.81,0]),
 	## Motion equation
-	NewtonIntegrator(damping=0.3),
+	NewtonIntegrator(damping=0.3,gravity=[0,-9.81,0]),
 	## Apply kinematics to rod
 	TranslationEngine(ids=rod,translationAxis=[0,-1,0],velocity=0.075),
 	## Save force on rod

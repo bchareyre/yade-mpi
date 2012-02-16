@@ -47,9 +47,8 @@ O.engines=[
 		[Ip2_2xCohFrictMat_CohFrictPhys()],
 		[law]
 	),
-	GravityEngine(gravity=(0,0,-g)),
 	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=50),
-	NewtonIntegrator(damping=damping,kinSplit=True),
+	NewtonIntegrator(damping=damping,kinSplit=True,gravity=(0,0,-g)),
 	PyRunner(iterPeriod=20,command='myAddPlotData()')
 ]
 

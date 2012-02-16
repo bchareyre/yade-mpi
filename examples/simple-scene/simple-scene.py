@@ -39,13 +39,12 @@ o.engines=[
 	),
 	## Apply gravity: all bodies will have gravity applied on them.
 	## Note the engine parameter 'gravity', a vector that gives the acceleration.
-	GravityEngine(gravity=[0,0,-9.81]),
 	## Forces acting on bodies are damped to artificially increase energy dissipation in simulation.
 	## (In this model, the restitution coefficient of interaction is 1, which is not realistic.)
 	## This MetaEngine acts on all PhysicalActions and selects the right EngineUnit base on type of the PhysicalAction.
 	#
 	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
-	NewtonIntegrator(damping=0.1)
+	NewtonIntegrator(damping=0.1,gravity=[0,0,-9.81])
 ]
 
 

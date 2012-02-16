@@ -48,9 +48,8 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
-	GravityEngine(gravity=(0,0,-1e3)), # gravity artificially high, to make it faster going ;-)
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(0,1,1),angularVelocity=30*(2*pi/60),ids=cylIds,label='rotor'),
-	NewtonIntegrator(damping=.3),
+	NewtonIntegrator(damping=.3,gravity=(0,0,-1e3)), # gravity artificially high, to make it faster going ;-)
 ]
 O.dt=utils.PWaveTimeStep()
 O.stopAtIter=int(2*pi/(rotor.angularVelocity*O.dt))

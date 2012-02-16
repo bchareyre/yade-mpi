@@ -22,7 +22,7 @@ class TestLoop(unittest.TestCase):
 	def setUp(self): O.reset()
 	def testSubstepping(self):
 		'Loop: substepping'
-		O.engines=[ForceResetter(),PyRunner(initRun=True,iterPeriod=1,command='pass'),GravityEngine()]
+		O.engines=[ForceResetter(),PyRunner(initRun=True,iterPeriod=1,command='pass')]
 		# value outside the loop
 		self.assert_(O.subStep==-1)
 		# O.subStep is meaningful when substepping

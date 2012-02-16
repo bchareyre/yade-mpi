@@ -142,8 +142,7 @@ O.engines=[
 	[Ip2_WireMat_WireMat_WirePhys(label='wire_wire'),Ip2_FrictMat_FrictMat_FrictPhys(label='block_wire')],
 	[Law2_ScGeom_WirePhys_WirePM(label='Law_1'),Law2_ScGeom_FrictPhys_CundallStrack(label='Law_2')]
 	),
-	GravityEngine(gravity=[0,0,-9.81],label='gravity'),
-	NewtonIntegrator(damping=0.2),
+	NewtonIntegrator(damping=0.2,gravity=[0,0,-9.81],label='NewtonGravity'),
 	PyRunner(initRun=True,iterPeriod=100,command='addPlotData()'),
 ]
 

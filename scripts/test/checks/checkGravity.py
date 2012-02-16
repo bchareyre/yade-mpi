@@ -44,8 +44,7 @@ o.engines=[
     [Ip2_ViscElMat_ViscElMat_ViscElPhys()],
     [Law2_ScGeom_ViscElPhys_Basic()],
   ),
-  GravityEngine(gravity=[0,g,0]),
-  NewtonIntegrator(damping=0),
+  NewtonIntegrator(damping=0,gravity=[0,g,0]),
   PyRunner(command='checkPos()',iterPeriod=10000),
 ]
 

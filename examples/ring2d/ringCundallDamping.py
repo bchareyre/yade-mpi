@@ -44,10 +44,8 @@ O.engines=[
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
 	## Apply gravity
-	GravityEngine(gravity=[0,-9.81,0]),
-
 	## NOTE: Non zero Cundall damping affected a dynamic simulation!
-	NewtonIntegrator(damping=0.3),
+	NewtonIntegrator(damping=0.3,gravity=[0,-9.81,0]),
 
 	## Apply kinematics to walls
    ## angularVelocity = 0.73 rad/sec = 7 rpm

@@ -62,9 +62,8 @@ o.engines=[
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	## Apply gravity
-	GravityEngine(gravity=[0,-9.81,0]),
 	## Cundall damping must been disabled!
-	NewtonIntegrator(damping=0),
+	NewtonIntegrator(damping=0,gravity=[0,-9.81,0]),
 	## Apply kinematics to walls
     ## angularVelocity = 0.73 rad/sec = 7 rpm
 	RotationEngine(ids=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
