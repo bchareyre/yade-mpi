@@ -54,6 +54,8 @@ class Scene: public Serializable{
 		bool timeStepperActive();
 		// (de)activate TimeStepper; returns whether the operation was successful (i.e. whether a TimeStepper was found)
 		bool timeStepperActivate(bool activate);
+		Eigen::Matrix<Real,10,1> SpeedElements; //Array for saving speed-values for last 10 iterations
+
 
 		shared_ptr<Engine> engineByName(const string& s);
 
@@ -71,7 +73,6 @@ class Scene: public Serializable{
 		bool compressionNegative() const { return flags & COMPRESSION_NEGATIVE; }
 		void setCompressionNegative(bool d){ if(d) flags|=COMPRESSION_NEGATIVE; else flags&=~(COMPRESSION_NEGATIVE); }
 		boost::posix_time::ptime prevTime; //Time value on the previous step
-
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Scene,Serializable,"Object comprising the whole simulation.",
 		((Real,dt,1e-8,,"Current timestep for integration."))
@@ -105,11 +106,11 @@ class Scene: public Serializable{
 		((shared_ptr<Cell>,cell,new Cell,Attr::hidden,"Information on periodicity; only should be used if Scene::isPeriodic."))
 		((vector<shared_ptr<Serializable> >,miscParams,,Attr::hidden,"Store for arbitrary Serializable objects; will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)"))
 		((vector<shared_ptr<DisplayParameters> >,dispParams,,Attr::hidden,"'hash maps' of display parameters (since yade::serialization had no support for maps, emulate it via vector of strings in format key=value)"))
-
 		,
 		/*ctor*/
 			fillDefaultTags();
 			interactions->postLoad__calledFromScene(bodies);
+			SpeedElements.Zero();
 		,
 		/* py */
 		.add_property("localCoords",&Scene::usesLocalCoords,"Whether local coordianate system is used on interactions (set by :yref:`Ig2Functor`.")

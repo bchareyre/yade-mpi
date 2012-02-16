@@ -104,7 +104,10 @@ void Scene::moveToNextTimeStep(){
 			boost::posix_time::ptime timeNow = boost::posix_time::microsec_clock::local_time();
 			boost::posix_time::time_duration duration = timeNow - prevTime;
 			long dif = duration.total_microseconds();
-			speed = 1000000.0 / dif;
+			
+			SpeedElements(iter%10,0)=1000000.0 / dif;
+			speed = SpeedElements.mean();
+			
 			prevTime = timeNow;
 		}
 		
