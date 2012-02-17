@@ -98,15 +98,20 @@ void Scene::moveToNextTimeStep(){
 			if(unlikely(TimingInfo_enabled)) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
 		// ** 3. ** epilogue
+				// Calculation speed
 		if (iter==0) {				//For the first time
 			prevTime = boost::posix_time::microsec_clock::local_time();
 		} else {
 			boost::posix_time::ptime timeNow = boost::posix_time::microsec_clock::local_time();
 			boost::posix_time::time_duration duration = timeNow - prevTime;
 			long dif = duration.total_microseconds();
+			SpeedElements(iter%nSpeedIter,0)=1000000.0 / dif;
 			
-			SpeedElements(iter%10,0)=1000000.0 / dif;
-			speed = SpeedElements.mean();
+			#if EIGEN_WORLD_VERSION==2
+				speed = SpeedElements.sum()/nSpeedIter;
+			#elif EIGEN_WORLD_VERSION==3
+				speed = SpeedElements.mean();
+			#endif
 			
 			prevTime = timeNow;
 		}

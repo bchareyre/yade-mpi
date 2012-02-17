@@ -54,7 +54,8 @@ class Scene: public Serializable{
 		bool timeStepperActive();
 		// (de)activate TimeStepper; returns whether the operation was successful (i.e. whether a TimeStepper was found)
 		bool timeStepperActivate(bool activate);
-		Eigen::Matrix<Real,10,1> SpeedElements; //Array for saving speed-values for last 10 iterations
+		static const int nSpeedIter = 10;       //Number of iterations, which are taking into account for speed calculation
+		Eigen::Matrix<Real,nSpeedIter,1> SpeedElements; //Array for saving speed-values for last "nSpeedIter"-iterations
 
 
 		shared_ptr<Engine> engineByName(const string& s);
