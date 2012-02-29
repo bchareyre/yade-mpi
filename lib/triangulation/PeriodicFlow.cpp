@@ -95,7 +95,7 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 // 			cerr <<"p="<<cell->info().p()<<" shifted="<<cell->info().shiftedP()<<endl;
 			//the pressure translated to a ghost cell adjacent to the non-ghost vertex
 			//FIXME: the hsize[k]*gradP products could be computed only once for all cells and facets
-			if (vhi.isGhost) unshiftedP -= pDeltas[0]*vhi.period[0] + pDeltas[1]*vhi.period[1] +pDeltas[2]*vhi.period[2];
+			/*if (vhi.isGhost) */unshiftedP -= pDeltas[0]*vhi.period[0] + pDeltas[1]*vhi.period[1] +pDeltas[2]*vhi.period[2];
 			vhi.forces = vhi.forces + cell->info().unitForceVectors[yy]*unshiftedP;
 // 			cerr <<"unshifted="<<unshiftedP<<endl;
 		}
@@ -326,7 +326,7 @@ void PeriodicFlow::Compute_Permeability()
 
 		if (!RAVERAGE) cout << "------Hydraulic Radius is used for permeability computation------" << endl << endl;
 		else cout << "------Average Radius is used for permeability computation------" << endl << endl;
-		cout << "-----Computed_Permeability-----" << endl;
+		cout << "-----Computed_Permeability Periodic-----" << endl;
 	}
 // 	cout << "Negative Permeabilities = " << count_k_neg << endl; 
 }
@@ -349,7 +349,8 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
 			VCell_iterator cells_it = tmp_cells.begin();
 			VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
 			for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
-				{(*it)->info().setP(bi.value);(*it)->info().Pcondition=true;}
+				{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
+				boundingCells[bound].push_back(*it);}
 		}
         }
         IPCells.clear();
@@ -363,7 +364,7 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
 // 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
 // 		assert(cell);
 		IPCells.push_back(cell);
-		cell->info().setP(imposedP[n].second);
+		cell->info().p()=imposedP[n].second;
 		cell->info().Pcondition=true;}
 }
 

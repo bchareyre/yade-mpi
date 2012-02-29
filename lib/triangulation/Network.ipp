@@ -529,6 +529,7 @@ void Network<Tesselation>::Define_fictious_cells()
 
 	for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
+                if (id<0) continue;
                 Vector_Cell tmp_cells;
                 tmp_cells.resize(10000);
                 VCell_iterator cells_it = tmp_cells.begin();
