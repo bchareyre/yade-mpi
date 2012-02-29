@@ -442,18 +442,25 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 				TRVAR4(pmn1,pmx1,pmn2,pmx2);
 			}
 		#endif
-		if (allowBiggerThanPeriod &&  ((pmn1!=pmx1) || (pmn2!=pmx2)) ){
-			// If both bodies are bigger, we place them in the (0,0,0) period
-			if(unlikely((pmn1!=pmx1) && (pmn2!=pmx2))) {periods[axis]=0; return true;}
-			// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
-			else {periods[axis]=(pmn1==pmx1)? pmn1 : -pmn2; return true;}
-		} else if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
-			Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
-			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<", see flag allowBiggerThanPeriod)");
-			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
+		if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
+			if (allowBiggerThanPeriod) {
+				// If both bodies are bigger, we place them in the (0,0,0) period
+				if(unlikely((pmn1!=pmx1) && (pmn2!=pmx2))) {periods[axis]=0;}
+				// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
+				else {
+					//FIXME: not sure what to do here...
+// 					periods[axis]=(pmn1==pmx1)? pmn1 : -pmn2;
+					periods[axis]=0;
+// 					return true;
+				}
+			} else {
+				Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
+				LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<", see flag allowBiggerThanPeriod)");
+				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
 		}		
-		periods[axis]=(int)(pmn1-pmn2);
-		if(!(mn1<=mx2 && mx1 >= mn2)) return false;
+		else {
+			periods[axis]=(int)(pmn1-pmn2);
+			if(!(mn1<=mx2 && mx1 >= mn2)) return false;}
 	}
 	#ifdef PISC_DEBUG
 		if(watchIds(id1,id2)) LOG_DEBUG("Overlap #"<<id1<<"+#"<<id2<<", periods "<<periods);
