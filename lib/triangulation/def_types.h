@@ -191,7 +191,7 @@ class PeriodicVertexInfo : public FlowVertexInfo {
 	PeriodicVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
 	bool isGhost;
 	int period[3];
-	inline const Vecteur ghostShift (void) {return isGhost? (period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2]) : CGAL::NULL_VECTOR;}
+	inline const Vecteur ghostShift (void) {return period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2];}
 };
 
 

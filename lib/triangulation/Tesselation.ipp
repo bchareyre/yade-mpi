@@ -521,6 +521,7 @@ template<class Tesselation>
 typename Tesselation::Vertex_handle PeriodicTesselation<Tesselation>::insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious, int duplicateOfId)
 {
 	Vertex_handle Vh;
+	if (!Tri) cerr<<"!Tri!"<<endl;
 	Vh = Tri->insert(Sphere(Point(x,y,z),pow(rad,2)));
 	if ( Vh!=NULL )
 	{

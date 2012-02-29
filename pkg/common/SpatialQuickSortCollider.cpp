@@ -41,7 +41,7 @@ void SpatialQuickSortCollider::action()
 	shared_ptr<Body> b;
 	int i=0;
 	FOREACH(const shared_ptr<Body>& b, *bodies){
-		if(!b || !b->bound) continue;
+		if(!b->bound) continue;
 	   
 	   min = b->bound->min;
 	   max = b->bound->max;

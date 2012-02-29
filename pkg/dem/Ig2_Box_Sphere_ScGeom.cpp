@@ -36,7 +36,7 @@ bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Sh
 	Matrix3r boxAxisT=se31.orientation.toRotationMatrix();
 	Matrix3r boxAxis = boxAxisT.transpose();
 
-	Vector3r relPos21 = se32.position-se31.position; // relative position of centroids
+	Vector3r relPos21 = se32.position+shift2-se31.position; // relative position of centroids
 
 	// cOnBox_boxLocal is the sphere centroid (in box-local coordinates), but projected onto box if it is outside.
 	// _boxLocal means that ROTATION is local and origin is in box's origin
@@ -125,7 +125,7 @@ bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Sh
 
 		cOnBox_sphere.normalize(); // we want only direction in the following
 
-		pt2=se32.position+cOnBox_sphere*s->radius;
+		pt2=se32.position+shift2+cOnBox_sphere*s->radius;
 
 		bool isNew=!c->geom;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
