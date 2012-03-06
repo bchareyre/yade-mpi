@@ -284,7 +284,7 @@ Tesselation& FlowBoundingSphere<Tesselation>::LoadPositions(int argc, char *argv
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::Average_Relative_Cell_Velocity()
 {  
-        RTriangulation& Tri = T[currentTes].Triangulation();
+        RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Point pos_av_facet;
         int num_cells = 0;
         double facet_flow_rate = 0;
@@ -329,7 +329,7 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::Average_Fluid_Velocity()
 {
 	Average_Relative_Cell_Velocity();
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	int num_vertex = 0;
 	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
 	for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
@@ -375,7 +375,7 @@ template <class Tesselation>
 vector<Real> FlowBoundingSphere<Tesselation>::Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph)
 {
 	Average_Relative_Cell_Velocity();
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	
 	Real Volumes; CGT::Vecteur VelocityVolumes;
 	vector<Real> result;
@@ -399,14 +399,14 @@ vector<Real> FlowBoundingSphere<Tesselation>::Average_Fluid_Velocity_On_Sphere(u
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::MeasurePorePressure (double X, double Y, double Z)
 {
-  RTriangulation& Tri = T[currentTes].Triangulation();
+  RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
   Cell_handle cell = Tri.locate(Point(X,Y,Z));
   return cell->info().p();
 }
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, double Wall_down_y)
 {  
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Cell_handle permeameter;
 	std::ofstream capture ("Pressure_profile", std::ios::app);
         int intervals = 5;
@@ -977,7 +977,7 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
-		cell->info().p() = P_zero;cell->info().dv()=0;}
+		cell->info().p() = P_zero; cell->info().dv()=0;}
 
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
@@ -1277,18 +1277,24 @@ void FlowBoundingSphere<Tesselation>::DisplayStatistics()
         cout << "There are " << Inside << " cells INSIDE." << endl;
         cout << "There are " << Fictious << " cells FICTIOUS." << endl;}
 
-	vtk_infinite_vertices = fict;
-	vtk_infinite_cells = Fictious;
 	num_particles = real;
 }
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::saveVtk()
 {
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[80];
 	mkdir("./VTK", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         sprintf(filename,"./VTK/out_%d.vtk", number++);
+
+	//count fictious vertices and cells
+	vtk_infinite_vertices=vtk_infinite_cells=0;
+ 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
+		if (cell->info().fictious()) vtk_infinite_cells+=1;
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
+                if (v->info().isFictious) vtk_infinite_vertices+=1;
 
         basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-vtk_infinite_vertices, (unsigned int) Tri.number_of_finite_cells()-vtk_infinite_cells);
 
@@ -1332,7 +1338,7 @@ void FlowBoundingSphere<Tesselation>::saveVtk()
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::MGPost()
 {
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Point P;
 
         ofstream file("mgp.out.001");
@@ -1416,7 +1422,7 @@ void FlowBoundingSphere<Tesselation>::GenerateVoxelFile( )
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::mplot (char *filename)
 {
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	std::ofstream plot (filename, std::ios::out);
 	Cell_handle permeameter;
 	int intervals = 30;
@@ -1464,7 +1470,7 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::SliceField(const char *filename)
 {
         /** Pressure field along one cutting plane **/
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Cell_handle permeameter;
 
         std::ofstream consFile(filename,std::ios::out);
@@ -1497,7 +1503,7 @@ void FlowBoundingSphere<Tesselation>::ComsolField()
 	//Compute av. velocity first, because in the following permeabilities will be overwritten with "junk" (in fact velocities from comsol)
 	Average_Relative_Cell_Velocity();
 
-  	RTriangulation& Tri = T[currentTes].Triangulation();
+  	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Cell_handle c;
   	ifstream loadFile("vx_grid_03_07_ns.txt");
 	ifstream loadFileY("vy_grid_03_07_ns.txt");

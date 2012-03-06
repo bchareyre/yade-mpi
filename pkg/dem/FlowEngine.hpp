@@ -239,7 +239,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void UpdateVolumes ();
 		Real Volume_cell (Cell_handle cell);
 		Real Volume_cell_single_fictious (Cell_handle cell);
-		void ApplyViscousForces();
+// 		void ApplyViscousForces();
 		inline void locateCell(Cell_handle baseCell, unsigned int& index, unsigned int count=0);
 		Vector3r MeanVelocity();
 		

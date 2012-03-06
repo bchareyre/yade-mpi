@@ -337,7 +337,7 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
-		cell->info().setP(0); P_zero;cell->info().dv()=0;}
+		cell->info().setP(P_zero); cell->info().dv()=0;}
 
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
