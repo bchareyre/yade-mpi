@@ -158,15 +158,18 @@ Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
 Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	rb->forces.sync();
+	shared_ptr<NewtonIntegrator> newton;
+	Vector3r gravity = Vector3r::Zero();
+	FOREACH(shared_ptr<Engine>& e, rb->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) {gravity=newton->gravity; break;} }
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || b->isClumpMember() || !b->isDynamic()) continue;
-		currF=rb->forces.getForce(b->id).norm();
+		currF=(rb->forces.getForce(b->id)+b->state->mass*gravity).norm();
 		if(b->isClump() && currF==0){ // this should not happen unless the function is called by an engine whose position in the loop is before Newton (with the exception of bodies which really have null force), because clumps forces are updated in Newton. Typical triaxial loops are using such ordering unfortunately (triaxEngine before Newton). So, here we make sure that they will get correct unbalance. In the future, it is better for optimality to check unbalancedF inside scripts at the end of loops, so that this "if" is never active.
 			Vector3r f(rb->forces.getForce(b->id)),m(Vector3r::Zero());
 			b->shape->cast<Clump>().addForceTorqueFromMembers(b->state.get(),rb,f,m);
-			currF=f.norm();
+			currF=(f+b->state->mass*gravity).norm();
 		}
 		maxF=max(currF,maxF); sumF+=currF; nb++;
 	}
