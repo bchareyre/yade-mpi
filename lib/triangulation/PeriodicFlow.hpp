@@ -37,6 +37,7 @@ namespace CGT{
 		void GaussSeidel();
 		void DisplayStatistics();
 		void Average_Relative_Cell_Velocity();
+		void ComputeEdgesSurfaces();
 	};
 }
 

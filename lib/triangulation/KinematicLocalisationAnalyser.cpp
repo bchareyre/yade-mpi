@@ -188,6 +188,7 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* state_file1, const cha
 	TS1->from_file(state_file1,/*use bz2?*/ bz2);
 	TS0->from_file(state_file0,/*use bz2?*/ bz2);
 	DefToFile(output_file_name);
+	return 0;
 }
 
 bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)

@@ -21,10 +21,11 @@
 using namespace std;
 namespace CGT {
 
-template<class Tesselation>
-class FlowBoundingSphere : public Network<Tesselation>
+template<class _Tesselation>
+class FlowBoundingSphere : public Network<_Tesselation>
 {
 	public:
+		typedef _Tesselation			Tesselation;
 		typedef Network<Tesselation>		_N;
 		DECLARE_TESSELATION_TYPES(Network<Tesselation>)
 		

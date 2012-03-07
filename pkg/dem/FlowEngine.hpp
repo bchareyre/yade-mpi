@@ -99,7 +99,7 @@ class FlowEngine : public PartialEngine
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
-		Real 		_getFlux(unsigned int cond) {getFlux(cond,solver);}
+		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
 
 		virtual ~FlowEngine();
 
@@ -238,10 +238,10 @@ class PeriodicFlowEngine : public FlowEngine
 		void Initialize_volumes ();
 		void UpdateVolumes ();
 		Real Volume_cell (Cell_handle cell);
+
 		Real Volume_cell_single_fictious (Cell_handle cell);
-// 		void ApplyViscousForces();
 		inline void locateCell(Cell_handle baseCell, unsigned int& index, unsigned int count=0);
-		Vector3r MeanVelocity();
+		Vector3r meanVelocity();
 		
 		virtual ~PeriodicFlowEngine();
 
@@ -266,7 +266,7 @@ class PeriodicFlowEngine : public FlowEngine
 			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 			ReTrg=1;
 			,
-			.def("MeanVelocity",&PeriodicFlowEngine::MeanVelocity,"measure the mean velocity in the period")
+			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 // 			.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")

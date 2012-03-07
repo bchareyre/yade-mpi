@@ -28,6 +28,7 @@
 //   #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
 #endif
 
+
 namespace CGT {
 
 void PeriodicFlow::ComputeFacetForcesWithCache()
@@ -52,7 +53,6 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 			if (cell->info().isGhost) continue;
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
-// 				if (cell->neighbor(j)->info().isGhost == true) continue;
 				neighbour_cell = cell->neighbor(j);
 				const Vecteur& Surfk = cell->info().facetSurfaces[j];
 				//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
@@ -508,7 +508,37 @@ void PeriodicFlow::Average_Relative_Cell_Velocity()
 		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
 	}
 }
-
+void  PeriodicFlow::ComputeEdgesSurfaces()
+{
+  RTriangulation& Tri = T[currentTes].Triangulation();
+  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();
+  Finite_edges_iterator ed_it;
+  for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
+  {
+    Real Rh;
+    if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
+    else if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isGhost)) continue;
+    else if (((ed_it->first)->vertex(ed_it->second)->info().isGhost) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
+    else if (((ed_it->first)->vertex(ed_it->second)->info().isGhost) && ((ed_it->first)->vertex(ed_it->third)->info().isGhost)) continue;
+    int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
+    int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
+    double area = T[currentTes].ComputeVFacetArea(ed_it);
+    Edge_Surfaces.push_back(area);
+    Edge_ids.push_back(pair<int,int>(id1,id2));
+    double radius1 = sqrt((ed_it->first)->vertex(ed_it->second)->point().weight());
+    double radius2 = sqrt((ed_it->first)->vertex(ed_it->third)->point().weight());
+    Vecteur x = (ed_it->first)->vertex(ed_it->third)->point().point() - (ed_it->first)->vertex(ed_it->second)->point().point();
+    Vecteur n = x / sqrt(x.squared_length());
+    Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
+    double d = x*n - radius1 - radius2;
+    if (radius1<radius2)  Rh = d + 0.45 * radius1;
+    else  Rh = d + 0.45 * radius2;
+    Edge_HydRad.push_back(Rh);
+//     if (DEBUG_OUT) cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
+    
+  }
+  if (DEBUG_OUT)cout << "size of Edge_ids "<< Edge_ids.size()<< ", size of area "<< Edge_Surfaces.size() << ", size of Rh "<< Edge_HydRad.size()<< ", size of normal "<<Edge_normal.size() << endl;
+}
 
 } //namespace CGT
 
