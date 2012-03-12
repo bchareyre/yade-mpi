@@ -35,7 +35,7 @@ O.materials.append(CohFrictMat(
 ############################################
 ##### calculation loop                 #####
 ############################################
-law=Law2_ScGeom_CohFrictPhys_CohesionMoment(always_use_moment_law=False)
+law=Law2_ScGeom6D_CohFrictPhys_CohesionMoment(always_use_moment_law=False)
 g=9.81
 
 O.trackEnergy=True
@@ -44,7 +44,7 @@ O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom6D(),Ig2_Box_Sphere_ScGeom6D()],	
-		[Ip2_2xCohFrictMat_CohFrictPhys()],
+		[Ip2_CohFrictMat_CohFrictMat_CohFrictPhys()],
 		[law]
 	),
 	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=50),
@@ -53,7 +53,7 @@ O.engines=[
 ]
 
 from yade import utils
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],material='granular_material'))
+O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0],material='granular_material'))
 O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],material='granular_material'))
 if(two_spheres):
 	O.bodies.append(utils.sphere([0,0,4],1,color=[0,1,0],material='granular_material'))
@@ -71,6 +71,7 @@ from yade import plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)
 ## 2. i as function of t on left y-axis ('|||' makes the separation) and z_sph, v_sph (as green circles connected with line) and z_sph_half again as function of t
+
 
 plot.labels={'t':'time [s]', 
 	'normal_Work':'Normal work: W=kx^2/2', 
@@ -108,7 +109,7 @@ def myAddPlotData():
 	if(two_spheres):## for more bodies we better use the energy tracker, because it's tracking all bodies
 		E_kin_translation = E_tracker['kinTrans']
 		E_kin_rotation    = E_tracker['kinRot']
-		E_pot		  = E_tracker['gravWork'] 
+		#E_pot             = E_tracker['gravWork'] 	#will cause a python crash!!!
 
 	else: ## for one sphere we can just calculate, and it will be correct
 		sph=O.bodies[1]
@@ -144,7 +145,7 @@ def myAddPlotData():
 
 print "Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live."
 plot.liveInterval=2
-plot.plot(subPlots=True)
+plot.plot(subPlots=False)
 #from yade import qt
 #qt.View()
 O.run(int(2./O.dt));

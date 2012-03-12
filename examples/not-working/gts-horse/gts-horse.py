@@ -5,6 +5,12 @@
 which can further be either filled with packing (if used as predicate) or converted
 to facets representing the surface."""
 
+""" THIS SCRIPT IS NOT WORKING!
+ERROR MESSAGE:
+
+FATAL yade.Facet /home/me/YADE/yade/pkg/common/Facet.cpp:26 postLoad: Facet has coincident vertices 1 (0 0 0) and 2 (0 0 0)!
+"""
+
 from yade import pack
 import gts, os.path
 
@@ -50,7 +56,7 @@ O.trackEnergy=True
 from yade import plot
 plot.plots={'i':('total',O.energy.keys,)}
 def addPlotData(): plot.addData(i=O.iter,total=O.energy.total(),**O.energy)
-plot.plot()
+plot.plot(subPlots=False)
 
 from yade import timing
 from yade import qt

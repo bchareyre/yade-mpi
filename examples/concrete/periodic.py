@@ -33,28 +33,27 @@ is 1000 for tension and 100 for compression.
 
 
 # default parameters or from table
-utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
-	young=24e9,
-	poisson=.2,
-	G_over_E=.20,
+#utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
+young=24e9
+poisson=.2
+G_over_E=.20
+sigmaT=3.5e6
+frictionAngle=atan(0.8)
+epsCrackOnset=1e-4
+crackOpening=1e-6
 
-	sigmaT=3.5e6,
-	frictionAngle=atan(0.8),
-	epsCrackOnset=1e-4,
-	crackOpening=1e-6,
+intRadius=1.5
+dtSafety=.4
+damping=0.2
+strainRateTension=10
+strainRateCompression=50
+# 1=tension, 2=compression (ANDed; 3=both)
+doModes=3
+biaxial=True
 
-	intRadius=1.5,
-	dtSafety=.4,
-	damping=0.2,
-	strainRateTension=10,
-	strainRateCompression=50,
-	# 1=tension, 2=compression (ANDed; 3=both)
-	doModes=3,
-	biaxial=True,
-
-	# isotropic confinement (should be negative)
-	isoPrestress=0,
-)
+# isotropic confinement (should be negative)
+isoPrestress=0
+#)
 
 if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description']
 
@@ -62,16 +61,15 @@ packingFile='periCube.pickle'
 # got periodic packing? Memoization not (yet) supported, so just generate it if there is not the right file
 # Save and reuse next time.
 if not os.path.exists(packingFile):
-	sp=pack.randomPeriPack(radius=.05e-3,rRelFuzz=0.,initSize=Vector3().ONE*1.5e-3)
-	dd=dict(cell=(sp.cellSize[0],sp.cellSize[1],sp.cellSize[2]),spheres=sp.toList_pointsAsTuples())
+	sp=pack.randomPeriPack(radius=.05e-3,rRelFuzz=0.,initSize=Vector3(1.5e-3,1.5e-3,1.5e-3))
+	dd=dict(cell=(sp.cellSize[0],sp.cellSize[1],sp.cellSize[2]),spheres=sp.toList())
 	import cPickle as pickle
 	pickle.dump(dd,open(packingFile,'w'))
-
 #
 # load the packing (again);
 #
 import cPickle as pickle
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,crackOpening=crackOpening,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
+concreteId=O.materials.append(CpmMat(young=young, frictionAngle=frictionAngle, poisson=poisson, density=4800, sigmaT=sigmaT, crackOpening=crackOpening, epsCrackOnset=epsCrackOnset, G_over_E=G_over_E, isoPrestress=isoPrestress))
 sphDict=pickle.load(open(packingFile))
 from yade import pack
 sp=pack.SpherePack()
@@ -82,6 +80,7 @@ import numpy
 avgRadius=numpy.average([r for c,r in sp])
 O.bodies.append([utils.sphere(c,r,color=utils.randomColor()) for c,r in sp])
 O.periodic=True
+#O.cell.setBox=sp.cellSize	#doesnt work correctly, periodic cell is too big!!!!
 O.cell.refSize=sp.cellSize
 axis=2
 ax1=(axis+1)%3
@@ -94,7 +93,8 @@ import yade.plot as yp
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),],sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
+	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
+	#,sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
@@ -106,7 +106,7 @@ O.engines=[
 	#UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	#
 	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),label='strainer',reversedForces=False,globUpdate=2),
-	PyRunner(virtPeriod=1e-5/strainRateTension,realLim=2,command='addPlotData()',label='plotDataCollector'),
+	PyRunner(virtPeriod=1e-5/strainRateTension,command='addPlotData()',label='plotDataCollector'),
 	PyRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]

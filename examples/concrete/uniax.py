@@ -123,7 +123,7 @@ def initTest():
 		O.wait();
 		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
-	else: plot.plot()
+	else: plot.plot(subPlots=False)
 	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
 	try:
 		from yade import qt
@@ -177,7 +177,7 @@ def addPlotData():
 		'sigma.50':utils.forcesOnCoordPlane(coord_50,axis)[axis]/area_50+isoPrestress,
 		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,
 		})
-plot.plot()
+plot.plot(subPlots=False)
 O.run()
 initTest()
 utils.waitIfBatch()

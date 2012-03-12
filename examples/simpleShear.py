@@ -98,12 +98,12 @@ print ''
 print 'Be patient, running in progress (the shear box is being compressed)'
 O.run(14000,True)
 plot.plots={'step':('fy',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting curve (fy = normal force). Type Return to go ahead'
 print ''
 raw_input()
 plot.plots={'u':('fy',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting curve (u = normal displacement). Type Return to go ahead'
 print ''
 raw_input()
@@ -118,12 +118,12 @@ O.engines=O.engines[:5]+[KinemCNDEngine(shearSpeed=(length/7.0)/(nCycShear*O.dt)
 print 'Be patient, running in progress (the shear box is being sheared)'
 O.run(int(1.15*nCycShear),True)
 plot.plots={'step':('gamma',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting curve (gamma = tangential displacement). Type Return to go ahead'
 print ''
 raw_input()
 plot.plots={'gamma':('fx','fy',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting curve (fx = tangential force). Type Return to go ahead'
 print ''
 raw_input()
@@ -134,7 +134,7 @@ O.engines=O.engines[:5]+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=
 print 'Be patient, running in progress (the sample is being again compressed, from this sheared state)'
 O.run(10000,True)
 plot.plots={'u':('fx','fy',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting curve. Type Return to go ahead'
 print ''
 raw_input()

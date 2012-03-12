@@ -30,13 +30,13 @@ pylab.suptitle('smooth damage')
 # show color scale
 pylab.colorbar(map,orientation='horizontal')
 
-# shear stress
-pylab.figure()
-post2d.plot(post2d.data(lambda b: b.state.sigma,flattener))
-pylab.suptitle('sigma')
-pylab.figure()
-post2d.plot(post2d.data(lambda b: b.state.tau,flattener,stDev=2e-3))
-pylab.suptitle('smooth tau (in grid)')
+# shear stress		NOT WORKING (AttributeError: 'CpmState' object has no attribute 'tau' and no 'sigma'):
+#pylab.figure()
+#post2d.plot(post2d.data(lambda b: b.state.sigma,flattener))
+#pylab.suptitle('sigma')
+#pylab.figure()
+#post2d.plot(post2d.data(lambda b: b.state.tau,flattener,stDev=2e-3))
+#pylab.suptitle('smooth tau (in grid)')
 
 # raw velocity (vector field) plot
 pylab.figure(); post2d.plot(post2d.data(extractVelocity,flattener))

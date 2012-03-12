@@ -20,7 +20,7 @@ O.engines=[
 	PyRunner(iterPeriod=20,command='myAddPlotData()')
 ]
 from yade import utils
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0]))
+O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0]))
 O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
 O.dt=.002*utils.PWaveTimeStep()
 

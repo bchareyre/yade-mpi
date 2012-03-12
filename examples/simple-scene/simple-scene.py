@@ -59,7 +59,7 @@ from yade import utils
 ## * center: position of the center of the box
 ## * dynamic: it is not dynamic, i.e. will not move during simulation, even if forces are applied to it
 
-o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],dynamic=False))
+o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],fixed=True))
 
 ## The sphere
 ##

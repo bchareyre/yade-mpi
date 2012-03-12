@@ -26,12 +26,12 @@ for i in xrange(nbSpheres[0]):
 			y = -j*sphereRadius*2.2-0.01
 			z = (k*2 - nbSpheres[2])*sphereRadius*1.1+sphereRadius*random.uniform(-0.1,0.1)
 			r = random.uniform(sphereRadius,sphereRadius*0.9)
-			dynamic = True
+			fixed = False
 			color=[0.51,0.52,0.4]
 			if (i==0 or i==nbSpheres[0]-1 or j==nbSpheres[1]-1 or k==0 or k==nbSpheres[2]-1):
-				dynamic = False
+				fixed = True
 				color=[0.21,0.22,0.1]
-			O.bodies.append(utils.sphere([x,y,z],r,color=color,dynamic=dynamic))
+			O.bodies.append(utils.sphere([x,y,z],r,color=color,fixed=fixed))
 print "done\n"
 
 ## Estimate time step

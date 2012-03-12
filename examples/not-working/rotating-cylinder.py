@@ -4,6 +4,19 @@
 """The script demonstrates rotating cylinder, created with GTS-help (http://gts.sourceforge.net/).
 Inside the cylinder there is a "cloud" of spheres."""
 
+""" THIS SCRIPT IS NOT WORKING!
+ERROR MESSAGE:
+
+Running script rotating-cylinder.py
+Traceback (most recent call last): 
+  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript execfile(script,globals()) 
+  File "rotating-cylinder.py", line 36, in <module>
+    cylIds=O.bodies.append(pack.gtsSurface2Facets(cyl.faces()))
+  File "/home/me/YADE/YADE3041/lib/yade-bzr3041/py/yade/pack.py", line 179, in gtsSurface2Facets
+    return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf.faces()]
+AttributeError: 'tuple' object has no attribute 'faces'  
+"""
+
 cylHt,cylRd=1,.2
 nSpheres=2e4
 
