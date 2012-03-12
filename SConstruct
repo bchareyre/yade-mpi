@@ -606,9 +606,9 @@ if os.path.exists(combinedFiles) and combinedFilesMd5!=md5.md5(open(combinedFile
 #################################################################################
 #### Check Tests
 env.Install('$LIBDIR/py/yade/tests/checks',[
-	env.File(env.Glob('scripts/test/checks/*.*'))
+	env.File(env.Glob('examples/test/checks/*.*'))
 ])
 
 env.Install('$LIBDIR/py/yade/tests/checks/data',[
-	env.File(env.Glob('scripts/test/checks/data/*'))
+	env.File(env.Glob('examples/test/checks/data/*'))
 ])
