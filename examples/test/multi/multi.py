@@ -17,12 +17,11 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys(),],
 		[Law2_ScGeom_FrictPhys_CundallStrack(),]
 	),
-	GravityEngine(gravity=(0,0,gravity)), ## here we use the 'gravity' parameter
 	PyRunner(iterPeriod=100,command='myAddPlotData()',label='plotDataCollector'),
-	NewtonIntegrator(damping=0.4)
+	NewtonIntegrator(damping=0.4,gravity=(0,0,gravity))## here we use the 'gravity' parameter
 ]
 O.bodies.append([
-	utils.box([0,50,0],extents=[1,50,1],dynamic=False,color=[1,0,0]),
+	utils.box([0,50,0],extents=[1,50,1],fixed=True,color=[1,0,0]),
 	utils.sphere([0,0,10],1,color=[0,1,0])
 ])
 
@@ -41,5 +40,6 @@ O.run(20000,True)
 # write some results to a common file
 # (we rely on the fact that 2 processes will not write results at exactly the same time)
 # 'a' means to open for appending
-file('multi.out','a').write('%s %g %g %g %g\n'%(O.tags['description'],gravity,density,initialSpeed,O.bodies[1].state.pos[1]))
+#file('multi.out','a').write('%s %g %g %g %g\n'%(O.tags['description'],gravity,density,initialSpeed,O.bodies[1].state.pos[1]))
+file('multi.out','a').write('%g %g %g %g\n'%(gravity,density,initialSpeed,O.bodies[1].state.pos[1]))
 print 'gnuplot',plot.saveGnuplot(O.tags['id'])

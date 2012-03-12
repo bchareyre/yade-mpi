@@ -19,8 +19,8 @@ O.engines=[
 ]
 from yade import utils
 scale=.1
-O.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],dynamic=False,color=[1,0,0]))
-O.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],wire=True,dynamic=False))
+O.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],fixed=True,color=[1,0,0]))
+O.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],wire=True,fixed=True))
 
 O.dt=.4*utils.PWaveTimeStep()
 from yade import qt

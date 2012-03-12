@@ -17,57 +17,65 @@
 sign=-1
 #
 
+## PhysicalParameters 
+Young = 7e6
+Poisson = 0.2
+Density=2700
+
+# Append a material
+mat=O.materials.append(FrictMat(young=Young,poisson=Poisson,density=Density,frictionAngle=26))
+
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionLoop(
-		[ef2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
-	GravityEngine(gravity=(0,0,-10),label='gravitator'),
-	NewtonIntegrator(damping=.3),
+	NewtonIntegrator(damping=.3,gravity=(0,0,-10),label='integrator'),
 	PyRunner(iterPeriod=4000,command='setGravity()'),
 	]
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
-	utils.sphere([0,0,sign*.49999],radius=.5,young=1e3,wire=True,density=1),
+	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0],material=mat),
+	utils.sphere([0,0,sign*.49999],radius=.5,wire=True,material=mat),
 ])
 O.timingEnabled=True
 O.saveTmp()
 O.dt=1e-4
 
+
 print '** virgin dispatch matrix:'
-O.engines[3].lawDispatcher.dump()
+O.engines[2].lawDispatcher.dispMatrix()
 print '** class indices'
-for c in 'Dem3DofGeom','Dem3DofGeom_FacetSphere','Dem3DofGeom_SphereSphere':
-	print eval(c)().classIndex,c
+#for c in 'Dem3DofGeom','Dem3DofGeom_FacetSphere','Dem3DofGeom_SphereSphere':
+#	print eval(c)().classIndex,c
 O.run(1000,True)
 print '** used dispatch matrix'
-O.engines[3].lawDispatcher.dump()
+O.engines[2].lawDispatcher.dispMatrix()
 
 
 def setGravity():
-	gz=gravitator["gravity"][2]
-	gravitator["gravity"]=[0,0,1.05*gz]
+	gz=integrator.gravity[2]
+	integrator.gravity=[0,0,1.05*gz]
 	if abs(gz)>=2500:
 		print "Gravity reset & slow down"
 		O.dt=1e-6;
-		gravitator["gravity"]=[0,0,0]
+		integrator.gravity=[0,0,0]
 	if abs(gz)>0: print gz
 
 try:
 	from yade import qt
 	renderer=qt.Renderer()
-	renderer['Interaction_geometry']=True
+	renderer.intrGeom=True
 	qt.Controller()
 except ImportError: pass
 
-if 0:
-	from yade import timing
-	O.run(100000,True)
-	timing.stats()
-	timing.reset()
-	O.loadTmp()
-	O.run(100000,True)
-	timing.stats()
+
+from yade import timing
+O.run(100000,True)
+timing.stats()
+timing.reset()
+O.loadTmp()
+O.run(100000,True)
+timing.stats()

@@ -21,11 +21,11 @@ frictionAngle=26 # [°]
 
 # Append geometry and material
 O.materials.append(FrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle))
-O.bodies.append(utils.box(center=center,extents=extents,dynamic=False,wire=True)) # body id=0
-O.bodies.append(utils.sphere(p2,r2,dynamic=True,wire=True)) # body id=1
+O.bodies.append(utils.box(center=center,extents=extents,fixed=True,wire=True)) # body id=0
+O.bodies.append(utils.sphere(p2,r2,fixed=True,wire=True)) # body id=1
 m_sphere=O.bodies[1].state.mass
 O.bodies[0].state.mass=m_sphere # set the mass of the box the same as the mass of the sphere
-O.bodies[1].state.blockedDOFs=['rx','ry','rz'] # block particles rotations
+O.bodies[1].state.blockedDOFs='XYZ' # block particles rotations
 
 #__________________________________________________________________
 # list of engines
@@ -44,9 +44,9 @@ O.engines=[
 
 #__________________________________________________________________
 # define contact damping coefficients
-contactLaw.betan=0.5 # normal direction
-contactLaw.betas=0.0 # shear direction
-contactLaw.useDamping=True
+damping.betan=0.5 # normal direction
+damping.betas=0.0 # shear direction
+damping.useDamping=True
 
 #__________________________________________________________________
 # time step
@@ -78,10 +78,10 @@ def myAddPlotData():
 O.run(1000,True)
 
 # Now test the shear direction, having previously obtained a constant normal overlapping 
-contactLaw.betas=0.5
+damping.betas=0.5
 force.force=(-20,5,0) # assign a force also in the shear direction
 O.run(1000,True)
-plot.plot()
+plot.plot(subPlots=False)
 
 # NOTE about the results:
 # In the graphs, you will see the behaviour both of the normal and shear force. As expected from the damped solution, their values oscillate around the equilibrium position, which is eventually reached after few iterations. 
