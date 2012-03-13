@@ -34,7 +34,7 @@ par.add_option('--generate-manpage',help="Generate man page documenting this pro
 par.add_option('--rebuild',help="Re-run build in the source directory, then run the updated yade with the same command line except \-\-rebuild. The build profile for this build (${profile}) and its stored parameters will be used.",dest='rebuild',action='store_true')
 par.add_option('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
 par.add_option('--debug',help='Run the debug build, if available.',dest='debug',action='store_true')
-par.add_option('--checks',help='Run a series of user-defined check tests as described in ${sourceRoot}/examples/test/checks/README',dest='checks',action='store_true')
+par.add_option('--checks',help='Run a series of user-defined check tests as described in ${sourceRoot}/scripts/checks-and-tests/checks/README',dest='checks',action='store_true')
 par.add_option('--performance',help='Starts a test to measure the productivity',dest='performance',action='store_true')
 par.add_option('--no-gdb',help='Do not show backtrace when yade crashes (only effective with \-\-debug).',dest='noGdb',action='store_true',)
 par.disable_interspersed_args()
@@ -150,14 +150,14 @@ from utils import *
 from yade import pack
 from pack import *
 
-# Run the check tests listed in examples/test/checks/checkList.py
+# Run the check tests listed in scripts/checks-and-tests/checks/checkList.py
 if opts.checks:
 	checksPath=libDir+'/py/yade/tests/checks'
 	execfile(checksPath+'/checkList.py')
 
 # Run performance check test
 if opts.performance:
-	checksPath='${sourceRoot}'+'/examples/test/performance'
+	checksPath='${sourceRoot}'+'/scripts/checks-and-tests/performance'
 	execfile(checksPath+'/checkPerf.py')
 
 def userSession(qt4=False,qapp=None):

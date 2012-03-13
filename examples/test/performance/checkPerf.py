@@ -72,8 +72,7 @@ for z in range(numberTests):
 				[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 				[Law2_ScGeom_ViscElPhys_Basic()],
 			),
-			GravityEngine(gravity=[0,0,-9.81]),
-			NewtonIntegrator(damping=0),
+			NewtonIntegrator(damping=0,gravity=[0,0,-9.81]),
 		]
 		
 		print "number of bodies %d"%len(O.bodies)
