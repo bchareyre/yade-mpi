@@ -51,7 +51,7 @@ O.engines=[
 	PyRunner(command='plotAddData()',iterPeriod=1),
 ]
 O.step()
-bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
+#bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
 
 renderer=qt.Renderer()
 renderer.intrPhys,renderer.shape=True,False

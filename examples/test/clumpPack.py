@@ -17,8 +17,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GravityEngine(gravity=(0,0,-100)),
-	NewtonIntegrator(damping=.4)
+	NewtonIntegrator(damping=.4,gravity=(0,0,-100))
 ]
 O.dt=.7*utils.PWaveTimeStep()
 O.saveTmp()

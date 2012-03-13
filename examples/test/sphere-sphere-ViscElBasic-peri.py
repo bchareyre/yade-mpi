@@ -36,7 +36,7 @@ O.engines=[
 ]
 
 O.periodic=True
-O.cell.refSize=(1,1,1)
+O.cell.setBox(1,1,1)
 
 O.dt=.01*tc
 

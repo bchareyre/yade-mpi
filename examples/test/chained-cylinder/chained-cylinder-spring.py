@@ -20,13 +20,11 @@ O.engines=[
 	]),
 	InteractionLoop(
 		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(),Ig2_Sphere_ChainedCylinder_CylScGeom()],
-		[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True)],
+		[Ip2_CohFrictMat_CohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=True)],
 		[Law2_ScGeom6D_CohFrictPhys_CohesionMoment(label='law')]
 	),
-	## Apply gravity
-	GravityEngine(gravity=[0,-9.81,0]),
 	## Motion equation
-	NewtonIntegrator(damping=0.15),
+	NewtonIntegrator(damping=0.15,gravity=[0,-9.81,0]),
 	PyRunner(iterPeriod=500,command='history()'),
 	#PyRunner(iterPeriod=5000,command='if O.iter<21000 : yade.qt.center()')
 ]
@@ -60,7 +58,7 @@ def history():
 		     t=O.time)
 
 #yade.qt.Renderer().bound=True
-plot.plot()
+plot.plot(subPlots=False)
 O.saveTmp()
 #O.bodies[0].state.angVel=Vector3(0.05,0,0)
 

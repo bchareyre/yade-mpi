@@ -11,13 +11,12 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
-	GravityEngine(gravity=[0,0,-10]),
-	NewtonIntegrator(damping=0.01),
+	NewtonIntegrator(damping=0.01,gravity=[0,0,-10]),
 	]
 
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0]),
-	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False)
+	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0]),
+	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True)
 ])
 
 import random

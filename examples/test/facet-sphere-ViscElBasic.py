@@ -36,8 +36,7 @@ O.engines=[
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
-	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0),
+	NewtonIntegrator(damping=0,gravity=[0,0,-9.81]),
 	RotationEngine(ids=[facetId],rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.1)
 ]
 

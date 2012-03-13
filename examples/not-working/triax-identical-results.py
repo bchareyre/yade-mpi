@@ -5,6 +5,20 @@
 #
 # Compare output files with diff to see if the are 100% identical
 #
+
+""" THIS SCRIPT IS NOT WORKING!
+ERROR MESSAGE:
+
+Running script triax-identical-results.py                                                                                            
+Using new initial configuration in triax-identical-results-in.spheres                                                                
+Traceback (most recent call last):                                                                                                   
+  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
+    execfile(script,globals())                                                                                                       
+  File "triax-identical-results.py", line 20, in <module>                                                                            
+    utils.spheresToFile(inSph)                                                                                                       
+AttributeError: 'module' object has no attribute 'spheresToFile' 
+"""
+
 from os.path import exists
 sph='triax-identical-results'
 i=0; outSph=''

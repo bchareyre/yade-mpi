@@ -48,12 +48,12 @@ O.engines=[
 		Bo1_Box_Aabb()
 	]),
 	InteractionLoop(
-		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(), Ig2_Sphere_ChainedCylinder_CylScGeom(), Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],[Ip2_2xCohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=False,label='ipf'),Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom6D_CohFrictPhys_CohesionMoment(label='law'),Law2_ScGeom_FrictPhys_CundallStrack(),Law2_CylScGeom_FrictPhys_CundallStrack()]
+		[Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D(), Ig2_Sphere_ChainedCylinder_CylScGeom(), Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],			
+		[Ip2_CohFrictMat_CohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=False,label='ipf'),Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_ScGeom6D_CohFrictPhys_CohesionMoment(label='law'),Law2_ScGeom_FrictPhys_CundallStrack(),Law2_CylScGeom_FrictPhys_CundallStrack()]
 	),
-	## Apply gravity
-	GravityEngine(gravity=[1,-9.81,0],label='gravity'),
 	## Motion equation
-	NewtonIntegrator(damping=0.05,label='newton'),
+	NewtonIntegrator(damping=0.05,label='newton',gravity=[1,-9.81,0]),
 ]
 
 #Assemble cylinders in sinusoidal shapes

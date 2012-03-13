@@ -9,11 +9,10 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=.2,exactAsphericalRot=True)
+	NewtonIntegrator(damping=.2,exactAsphericalRot=True,gravity=[0,0,-9.81])
 ]
 # support
-O.bodies.append(utils.box([0,0,-1.5],[3,3,.2],dynamic=False))
+O.bodies.append(utils.box([0,0,-1.5],[3,3,.2],fixed=True))
 # stand-alone sphere
 O.bodies.append(utils.sphere([0,0,0],.5))
 # clumps
