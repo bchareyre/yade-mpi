@@ -17,6 +17,7 @@ class CapillaryPhys : public FrictPhys
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryPhys,FrictPhys,"Physics (of interaction) for Law2_ScGeom_CapillaryPhys_Capillarity.",
 				 ((bool,meniscus,false,,"Presence of a meniscus if true"))
+				 ((bool,isBroken,false,,"If true, capillary force is zero and liquid bridge is inactive."))
 				 ((Real,CapillaryPressure,0.,,"Value of the capillary pressure Uc defines as Ugas-Uliquid"))
 				 ((Real,Vmeniscus,0.,,"Volume of the menicus"))
 				 ((Real,Delta1,0.,,"Defines the surface area wetted by the meniscus on the smallest grains of radius R1 (R1<R2)"))
