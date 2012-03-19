@@ -1,12 +1,30 @@
 
 def getRealVersion():
-	"Attempts to get yade version from RELEASE file if it exists or from bzr/svn, or from VERSION"
+	"Attempts to get yade version from RELEASE file if it exists or from bzr/svn/git, or from VERSION"
 	import os.path,re,os
 	if os.path.exists('RELEASE'):
 		return file('RELEASE').readline().strip()
 	if os.path.exists('.bzr'):
 		for l in os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines():
 			return 'bzr'+l[:-1]
+	elif os.path.exists('.git'):
+		try:
+			import git
+			repo = git.Repo(".git/")
+			head = repo.commits('master')[0]
+			rev = str(head)[:7]
+			dateP = head.authored_date
+			versionN = "%04d-%02d-%02d.git_%s" % (dateP.tm_year, dateP.tm_mon, dateP.tm_mday, rev)
+			return versionN
+		except ImportError:
+			print "\
+=====================\n\
+Package python-git is not installed.\nUnable to identify last git-version.\n\
+On Debian-based systems it can be installed using the following command:\n\
+sudo apt-get install python-git\n\
+====================="
+			return None
+
 	if os.path.exists('VERSION'):
 		return file('VERSION').readline().strip()
 	return None

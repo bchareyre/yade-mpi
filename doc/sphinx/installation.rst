@@ -76,7 +76,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot doxygen \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific bzr bzrtools libeigen2-dev \
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
-		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx
+		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git
 
 	* **Fedora**::
 
