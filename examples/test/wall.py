@@ -2,7 +2,7 @@
 Show basic wall functionality (infinite axis-aligned planes).
 """
 from yade import utils
-O.materials.append(FrictMat(young=30e9,density=1000,poisson=.2,frictionAngle=.5)
+O.materials.append(FrictMat(young=30e9,density=1000,poisson=.2,frictionAngle=.5))
 O.bodies.append([
 	utils.wall(1,axis=2,sense=-1),
 	utils.wall(-5,axis=0,sense=1),
@@ -26,8 +26,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
-	GravityEngine(gravity=[1e2,1e2,1e2]),
-	NewtonIntegrator(damping=0.01),
+	NewtonIntegrator(damping=0.01,gravity=[1e2,1e2,1e2]),
 	]
 
 O.dt=utils.PWaveTimeStep()

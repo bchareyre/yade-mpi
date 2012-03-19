@@ -14,7 +14,7 @@ O.bodies.append(geom.facetBox(center=(0,0,0),extents=(30e-3,30e-3,0),wallMask=32
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],sweepLength=.05*.29e-3),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],verletDist=.05*.29e-3),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_MindlinPhys(

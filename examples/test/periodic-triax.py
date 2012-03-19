@@ -18,7 +18,7 @@ O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=5,verletDist=.05*radius),
+	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

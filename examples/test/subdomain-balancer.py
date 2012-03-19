@@ -13,10 +13,9 @@ O.bodies.append(utils.wall((0,0,0),axis=1))
 #O.bodies.append(utils.wall((2,0,0),axis=0))
 O.engines=([SubdomainBalancer(axesOrder='xyz',colorize=True)] if 'SubdomainBalancer' in dir() else [])+[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()],sweepLength=.05*.05),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()],verletDist=.05*.05),
 	InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),
-	GravityEngine(gravity=(0,0,-10)),
-	NewtonIntegrator(),
+	NewtonIntegrator(gravity=(0,0,-10)),
 	#PyRunner(iterPeriod=5000,command='O.pause(); timing.stats();')
 ]
 O.dt=utils.PWaveTimeStep()

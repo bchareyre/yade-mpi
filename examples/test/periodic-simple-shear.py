@@ -5,17 +5,17 @@ from yade import *
 from yade import pack,log,qt
 log.setLevel('PeriTriaxController',log.TRACE)
 O.periodic=True
-O.cell.refSize=(.1,.1,.1)
+O.cell.setBox(.1,.1,.1)
 #O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
 sp=pack.SpherePack()
 radius=5e-3
-num=sp.makeCloud(Vector3.Zero,O.cell.refSize,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
+num=sp.makeCloud((0,0,0),(.1,.1,.1),radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
 O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=5,sweepLength=.05*radius),
+	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

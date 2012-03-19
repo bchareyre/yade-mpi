@@ -36,7 +36,7 @@ O.engines=[
 ]
 
 O.bodies.append([
-	utils.sphere([0,0,0],1,dynamic=False,color=[1,0,0]),
+	utils.sphere([0,0,0],1,fixed=True,color=[1,0,0]),
 	utils.sphere([0,0,2],1,color=[0,1,0])
 ])
 

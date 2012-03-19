@@ -14,12 +14,11 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
 	),
-	GravityEngine(gravity=[0,0,-10]),
-	NewtonIntegrator(damping=0.01),
+	NewtonIntegrator(damping=0.01,gravity=[0,0,-10]),
 	]
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
-	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False,young=1e3)
+	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0]),
+	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True)
 ])
 
 #Gl1_Facet(normals=True)
@@ -27,7 +26,8 @@ O.bodies.append([
 import random,sys
 
 def addRandomSphere():
-	return O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),velocity=[random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1)]))
+	return O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05)))
+	O.bodies[len(O.bodies)-1].state.vel=[random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1)]
 
 for i in range(0,100): addRandomSphere()
 

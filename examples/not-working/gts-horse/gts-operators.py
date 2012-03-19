@@ -11,6 +11,23 @@ Note that GTS only moves references to surfaces around, therefore e.g. translati
 surface that is part of the union will move also the part of the united surface.
 Therefore, we use the copy() method for deep copy here.
 """
+
+""" THIS SCRIPT IS NOT WORKING!
+ERROR MESSAGE:
+
+Running script gts-operators.py                                                                                                      
+776   FATAL yade.Facet /home/me/YADE/yade/pkg/common/Facet.cpp:26 postLoad: Facet has coincident vertices 2 (-0 -0 -0) and 0 (-0 -0 -0)!
+...
+...
+847   FATAL yade.Facet /home/me/YADE/yade/pkg/common/Facet.cpp:26 postLoad: Facet has coincident vertices 1 (-3.46945e-17 0 0) and 2 (-3.46945e-17 0 0)!                                                                                                                  
+Traceback (most recent call last):                                                                                                   
+  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
+    execfile(script,globals())                                                                                                       
+  File "gts-operators.py", line 21, in <module>                                                                                      
+    s12=gts.Surface(); s12.copy(s1.union(s2)); s12.translate(0,0,.1)                                                                 
+RuntimeError: Surface is self-intersecting 
+"""
+
 from yade import pack,qt
 import gts
 

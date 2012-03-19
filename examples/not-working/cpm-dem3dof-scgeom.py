@@ -3,6 +3,18 @@ from yade import plot
 # setup 2 interactions on 2 otherwise identical couples of spheres
 # one is handled by Law2_Dem3DofGeom_CpmPhys_Cpm and the other by Law2_ScGeom_CpmPhys_Cpm
 
+""" THIS SCRIPT IS NOT WORKING!
+ERROR MESSAGE:
+
+Running script cpm-dem3dof-scgeom.py                                                                                                 
+Traceback (most recent call last):                                                                                                   
+  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
+    execfile(script,globals())                                                                                                       
+  File "cpm-dem3dof-scgeom.py", line 29, in <module>                                                                                 
+    InteractionLoop([],[],[Law2_ScGeom_CpmPhys_Cpm(),Law2_Dem3DofGeom_CpmPhys_Cpm(yieldSurfType=0)]),                                
+NameError: name 'Law2_ScGeom_CpmPhys_Cpm' is not defined 
+"""
+
 # move the second sphere tangentially or rotate it, pick [0] or [1]
 mode=['mov','rot'][1]
 # number of steps to do (some influence on the incremental computation)
@@ -16,8 +28,8 @@ p1,p2=Vector3(0,0,0),Vector3(dist,0,0)
 O.materials.append(CpmMat(young=30e9,poisson=.2,frictionAngle=atan(.8),sigmaT=3e6,crackOpening=1e-6,epsCrackOnset=1e-4,G_over_E=.2,neverDamage=False,plTau=-1,plRateExp=0,dmgTau=-1,dmgRateExp=0))
 # first 2 spheres used for Dem3DofGeom
 # the other 2 used for ScGeom (#3 is dynamic, since ScGeom needs that)
-O.bodies.append([utils.sphere(p1,r1,dynamic=False),utils.sphere(p2,r2,dynamic=False)])
-O.bodies.append([utils.sphere(p1+offset,r1,dynamic=False),utils.sphere(p2+offset,r2,dynamic=True)])
+O.bodies.append([utils.sphere(p1,r1,fixed=True),utils.sphere(p2,r2,fixed=True)])
+O.bodies.append([utils.sphere(p1+offset,r1,fixed=True),utils.sphere(p2+offset,r2,fixed=True)])
 
 
 O.engines=[IGeomDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),IPhysDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]

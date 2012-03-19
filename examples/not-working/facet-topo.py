@@ -1,3 +1,15 @@
+""" THIS SCRIPT IS NOT WORKING!
+ERROR MESSAGE:
+
+Running script facet-topo.py                                                                                                         
+Traceback (most recent call last):                                                                                                   
+  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
+    execfile(script,globals())                                                                                                       
+  File "facet-topo.py", line 14, in <module>                                                                                         
+    O.step();                                                                                                                        
+RuntimeError: FACET_TOPO was not enabled in Facet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.
+"""
+
 import yade.log
 yade.log.setLevel('FacetTopologyAnalyzer',yade.log.TRACE)
 

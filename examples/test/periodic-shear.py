@@ -1,9 +1,9 @@
 O.periodic=True
-O.cell.refSize=(.55,.55,.55)
+O.cell.setBox(.55,.55,.55)
 O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
-O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
-O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
-O.bodies.append(utils.sphere([.3,0,0],.1,dynamic=False))
+O.bodies.append(utils.sphere([.3,.1,.4],.05,fixed=False))
+O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,fixed=True))
+O.bodies.append(utils.sphere([.3,0,0],.1,fixed=True))
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='isc'),
@@ -12,8 +12,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]
 	),
-	GravityEngine(gravity=(0,0,-10)),
-	NewtonIntegrator(),
+	NewtonIntegrator(gravity=(0,0,-10)),
 	#PyRunner(command='doCellFlip()',realPeriod=5)
 ]
 

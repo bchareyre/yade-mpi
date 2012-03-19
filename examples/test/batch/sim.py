@@ -7,7 +7,7 @@ utils.readParamsFromTable(unknownOk=True,
 	notInTable='notInTable'
 )
 from yade.params import table
-print O.tags['description']
+#print O.tags['description']
 print 'important',table.important
 print 'unimportant',table.unimportant
 #print O.tags['params']

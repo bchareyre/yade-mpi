@@ -12,8 +12,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_MindlinPhys()],
 		[Law2_ScGeom_MindlinPhys_Mindlin()]
 	),
-	GravityEngine(gravity=(10,0,0)),
-	NewtonIntegrator(damping=0.0),
+	NewtonIntegrator(damping=0.0,gravity=(10,0,0)),
 	###
 	### NOTE this extra engine:
 	###
@@ -55,11 +54,12 @@ plot.plots={'un':('fn')}
 ## if a datum is not specified (but exists), it will be NaN and will not be plotted
 
 def myAddPlotData():
-	i=O.interactions[0,1]
-	## store some numbers under some labels
-	plot.addData(fn=i.phys.normalForce[0],step=O.iter,un=2*s0.shape.radius-s1.state.pos[0]+s0.state.pos[0],kn=i.phys.kn)	
+	if O.interactions[0,1].isReal:
+		i=O.interactions[0,1]
+		## store some numbers under some labels
+		plot.addData(fn=i.phys.normalForce[0],step=O.iter,un=2*s0.shape.radius-s1.state.pos[0]+s0.state.pos[0],kn=i.phys.kn)	
 
-O.run(100,True); plot.plot()
+O.run(100,True); plot.plot(subPlots=False)
 
 ## We will have:
 ## 1) data in graphs (if you call plot.plot())

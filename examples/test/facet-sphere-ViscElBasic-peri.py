@@ -26,9 +26,7 @@ for i in range(0,n):
 		])
 
 # Spheres
-sphId=O.bodies.append([
-	utils.sphere( (0.5,0.5,0.2), 0.1, material=sphereMat),
-	])
+sphId=O.bodies.append([utils.sphere((0.5,0.5,0.2), 0.1, material=sphereMat)])
 O.bodies[sphId[-1]].state.vel=(0.5,0,0)
 
 ## Engines 
@@ -40,8 +38,7 @@ O.engines=[
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
-	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0),
+	NewtonIntegrator(damping=0,gravity=[0,0,-9.81]),
 ]
 
 O.periodic=True

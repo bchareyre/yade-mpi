@@ -1,5 +1,5 @@
 # constructors, constants as static objects
-x,y,z,one=Vector3.UnitX,Vector3.UnitY,Vector3.UnitZ,Vector3.One
+x,y,z,one=Vector3.UnitX,Vector3.UnitY,Vector3.UnitZ,Vector3(1,1,1)
 x2=Vector3(x)
 # conversions to sequence types
 list(x2)
@@ -21,7 +21,7 @@ q1*x==y # almost, due to rounding
 # rotation composition
 q1*q1*x 
 # inverse rotation
-q1.Conjugate()
+q1.conjugate()
 # convert to axis-angle representation
 axis,angle=q1.toAxisAngle()
 

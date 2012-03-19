@@ -59,7 +59,7 @@ O.engines=[
 ]
 
 O.step()
-bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
+#bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
 
 O.run(); #O.wait()
-plot.plot()
+plot.plot(subPlots=False)

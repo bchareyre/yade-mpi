@@ -15,7 +15,7 @@ newton=utils.typedEngine('NewtonIntegrator')
 # use striding; say "if 0:" to disable striding and compare to regular runs
 if 1:
 	# length by which bboxes will be made larger
-	collider.sweepLength=.2*O.bodies[100].shape.radius
+	collider.verletDist=.2*O.bodies[100].shape.radius
 
 O.step() # filter out initialization
 O.timingEnabled=True

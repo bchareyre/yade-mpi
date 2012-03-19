@@ -76,4 +76,4 @@ O.engines=[
 	PyRunner(command='plotAddData()',iterPeriod=1),
 ]
 O.run();O.wait()
-plot.plot()
+plot.plot(subPlots=False)

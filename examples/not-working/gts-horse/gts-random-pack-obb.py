@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+""" CAUTION:
+Running this script can take very long!
+"""
+
 from numpy import arange
 from yade import pack
 import pylab

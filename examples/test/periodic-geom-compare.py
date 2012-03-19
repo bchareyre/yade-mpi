@@ -6,7 +6,7 @@ from yade import pack,log
 #log.setLevel('PeriTriaxController',log.DEBUG)
 #log.setLevel('Shop',log.TRACE)
 O.periodic=True
-O.cell.refSize=(.1,.1,.1)
+O.cell.setBox(.1,.1,.1)
 O.cell.trsf=Matrix3().Identity;
 
 sp=pack.SpherePack()
@@ -31,7 +31,7 @@ else: raise ValueError('geom must be one of sc, d3d, l3, l3a (not %s)'%geom)
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=5,sweepLength=.05*radius),
+	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),
 	loop,
 	NewtonIntegrator(damping=.6),
 ]
