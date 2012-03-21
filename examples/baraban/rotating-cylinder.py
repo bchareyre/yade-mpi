@@ -1,22 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""The script demonstrates rotating cylinder, created with GTS-help (http://gts.sourceforge.net/).
-Inside the cylinder there is a "cloud" of spheres."""
-
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-Running script rotating-cylinder.py
-Traceback (most recent call last): 
-  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript execfile(script,globals()) 
-  File "rotating-cylinder.py", line 36, in <module>
-    cylIds=O.bodies.append(pack.gtsSurface2Facets(cyl.faces()))
-  File "/home/me/YADE/YADE3041/lib/yade-bzr3041/py/yade/pack.py", line 179, in gtsSurface2Facets
-    return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf.faces()]
-AttributeError: 'tuple' object has no attribute 'faces'  
-"""
-
 cylHt,cylRd=1,.2
 nSpheres=2e4
 
@@ -46,7 +30,7 @@ from yade import pack,timing
 cyl=unitCylinder(); sq=unitSquare(); sq.translate(0,0,-1); cyl.copy(sq)
 cyl.scale(cylRd,cylRd,.5*cylHt); cyl.rotate(1,0,0,-pi/4) # 45° anti-colckwise in the yz plane
 # calling gtsSurface2Facets with just "cyl" (without constructing the faces tuple) ignores 2 faces that were copy'd before; bug in pygts?
-cylIds=O.bodies.append(pack.gtsSurface2Facets(cyl.faces()))
+cylIds=O.bodies.append(pack.gtsSurface2Facets(cyl))
 sp=pack.SpherePack(); wd=cylRd*sqrt(2); rMean=(.2*wd*wd*cylHt/(nSpheres*(4/3.)*pi))**(1/3.)
 print 'Generating cloud…'
 sp.makeCloud((-wd/2,-wd/2,-.5*cylHt),(wd/2,wd/2,.5*cylHt),rMean,0,int(nSpheres),False)
@@ -55,7 +39,7 @@ O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),],nBins=5,sweepLength=.1*rMean),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],

@@ -31,7 +31,7 @@ density=2700
 params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 # default spheres material
-dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle)) 
+dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params)) 
 
 O.dt=.01*tc # time step
 
@@ -39,17 +39,13 @@ Rs=0.1 # particle radius
 
 # Create geometry
 plnSurf = pack.sweptPolylines2gtsSurface([[Vector3(-.5,0,0),Vector3(.5,0,0),Vector3(.5, 0, -.5),Vector3(-.5, 0, -.5)]],capStart=True,capEnd=True)
-plnIds=O.bodies.append(pack.gtsSurface2Facets(plnSurf.faces(),material=facetMat,color=(0,1,0)))
+plnIds=O.bodies.append(pack.gtsSurface2Facets(plnSurf,material=facetMat,color=(0,1,0)))
 
 plnSurf1 = pack.sweptPolylines2gtsSurface([[Vector3(-.5,-.5,-.5),Vector3(.5,-.5,-.5),Vector3(.5, 1.5, -.5),Vector3(-.5, 1.5, -.5)]],capStart=True,capEnd=True)
-plnIds1=O.bodies.append(pack.gtsSurface2Facets(plnSurf1.faces(),material=facetMat,color=(0,1,0)))
+plnIds1=O.bodies.append(pack.gtsSurface2Facets(plnSurf1,material=facetMat,color=(0,1,0)))
 
 # Create clumps
 clpId,sphId=O.bodies.appendClumped([utils.sphere(Vector3(0,Rs*2*i,Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
-for id in sphId:
-	s=O.bodies[id]
-	p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-	s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 
 # Create engines
 O.engines=[
@@ -60,8 +56,7 @@ O.engines=[
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
-	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0,exactAsphericalRot=True),
+	NewtonIntegrator(damping=0, gravity=[0,0,-9.81]),
 ]
 
 
@@ -81,7 +76,7 @@ else:
 
 print '\nshape:'
 if clump.shape:
-	print k.shape.dict()
+	print clump.shape.dict()
 else:
 	print 'no shape'
 

@@ -1,19 +1,5 @@
 # -*- coding: utf-8
 
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-Running script clump-hopper-viscoelastic.py                                                                                          
-Traceback (most recent call last):                                                                                                   
-  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
-    execfile(script,globals())                                                                                                       
-  File "clump-hopper-viscoelastic.py", line 35, in <module>                                                                          
-    lftIds=O.bodies.append(pack.gtsSurface2Facets(left.faces(),material=facetMat,color=(0,1,0)))                                     
-  File "/home/me/YADE/YADE3041/lib/yade-bzr3041/py/yade/pack.py", line 179, in gtsSurface2Facets                                     
-    return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf.faces()]                                        
-AttributeError: 'tuple' object has no attribute 'faces'  
-"""
-
 from yade import utils,pack,export,qt
 import gts,os,random,itertools
 from numpy import *
@@ -33,7 +19,7 @@ facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # *
 # default spheres material
 dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle, **params)) 
 
-O.dt=.1*tc # time step
+O.dt=.05*tc # time step
 
 Rs=0.05 # particle radius
 
@@ -46,19 +32,19 @@ zt=z0+h; x0t=x0-at/2.; y0t=y0-at/2.; x1t=x0+at/2.; y1t=y0+at/2.
 zl=z0-hl;x0l=x0-al/2.; y0l=y0-al/2.; x1l=x0+al/2.; y1l=y0+al/2.
 
 left = pack.sweptPolylines2gtsSurface([[Vector3(x0b,y0b,zb),Vector3(x0t,y0t,zt),Vector3(x0t,y1t,zt),Vector3(x0b,y1b,zb)]],capStart=True,capEnd=True)
-lftIds=O.bodies.append(pack.gtsSurface2Facets(left.faces(),material=facetMat,color=(0,1,0)))
+lftIds=O.bodies.append(pack.gtsSurface2Facets(left,material=facetMat,color=(0,1,0)))
 
 right = pack.sweptPolylines2gtsSurface([[Vector3(x1b,y0b,zb),Vector3(x1t,y0t,zt),Vector3(x1t,y1t,zt),Vector3(x1b,y1b,zb)]],capStart=True,capEnd=True)
-rgtIds=O.bodies.append(pack.gtsSurface2Facets(right.faces(),material=facetMat,color=(0,1,0)))
+rgtIds=O.bodies.append(pack.gtsSurface2Facets(right,material=facetMat,color=(0,1,0)))
 
 near = pack.sweptPolylines2gtsSurface([[Vector3(x0b,y0b,zb),Vector3(x0t,y0t,zt),Vector3(x1t,y0t,zt),Vector3(x1b,y0b,zb)]],capStart=True,capEnd=True)
-nearIds=O.bodies.append(pack.gtsSurface2Facets(near.faces(),material=facetMat,color=(0,1,0)))
+nearIds=O.bodies.append(pack.gtsSurface2Facets(near,material=facetMat,color=(0,1,0)))
 
 far = pack.sweptPolylines2gtsSurface([[Vector3(x0b,y1b,zb),Vector3(x0t,y1t,zt),Vector3(x1t,y1t,zt),Vector3(x1b,y1b,zb)]],capStart=True,capEnd=True)
-farIds=O.bodies.append(pack.gtsSurface2Facets(far.faces(),material=facetMat,color=(0,1,0)))
+farIds=O.bodies.append(pack.gtsSurface2Facets(far,material=facetMat,color=(0,1,0)))
 
 table = pack.sweptPolylines2gtsSurface([[Vector3(x0l,y0l,zl),Vector3(x0l,y1l,zl),Vector3(x1l,y1l,zl),Vector3(x1l,y0l,zl)]],capStart=True,capEnd=True)
-tblIds=O.bodies.append(pack.gtsSurface2Facets(table.faces(),material=facetMat,color=(0,1,0)))
+tblIds=O.bodies.append(pack.gtsSurface2Facets(table,material=facetMat,color=(0,1,0)))
 
 # Create clumps...
 clumpColor=(0.0, 0.5, 0.5)
@@ -66,9 +52,9 @@ for k,l in itertools.product(arange(0,10),arange(0,10)):
 	clpId,sphId=O.bodies.appendClumped([utils.sphere(Vector3(x0t+Rs*(k*4+2),y0t+Rs*(l*4+2),i*Rs*2+zt),Rs,color=clumpColor,material=dfltSpheresMat) for i in xrange(4)])
 
 # ... and spheres
-#spheresColor=(0.4, 0.4, 0.4)
-#for k,l in itertools.product(arange(0,9),arange(0,9)):
-	#sphAloneId=O.bodies.append( [utils.sphere( Vector3(x0t+Rs*(k*4+4),y0t+Rs*(l*4+4),i*Rs*2.3+zt),Rs,color=spheresColor,material=dfltSpheresMat) for i in xrange(4) ] )
+spheresColor=(0.4, 0.4, 0.4)
+for k,l in itertools.product(arange(0,9),arange(0,9)):
+	sphAloneId=O.bodies.append( [utils.sphere( Vector3(x0t+Rs*(k*4+4),y0t+Rs*(l*4+4),i*Rs*2.3+zt),Rs,color=spheresColor,material=dfltSpheresMat) for i in xrange(4) ] )
 
 # Create engines
 O.engines=[
@@ -79,8 +65,7 @@ O.engines=[
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
-	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0),
+	NewtonIntegrator(damping=0, gravity=[0,0,-9.81]),
 	#VTKRecorder(virtPeriod=0.01,fileName='/tmp/',recorders=['spheres','velocity','facets'])
 ]
 

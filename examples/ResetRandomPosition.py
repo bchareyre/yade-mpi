@@ -32,7 +32,7 @@ params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
 # facets material
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) 
 # default spheres material
-dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle))
+dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params))
 
 O.dt=.2*tc # time step
 
@@ -42,19 +42,15 @@ nSpheres=1000# number of particles
 
 # Create geometry
 pln=Plane( (-.5, -.5, 0), (.5, -.5, -.05), (.5, .5, 0), (-.5, .5, -.05) ); 
-plnIds=O.bodies.append(pack.gtsSurface2Facets(pln.faces(),material=facetMat,color=(0,1,0)))
+plnIds=O.bodies.append(pack.gtsSurface2Facets(pln,material=facetMat,color=(0,1,0)))
 
 fct=Plane( (-.25, -.25, .5), (.25, -.25, .5), (.25, .25, .5), (-.25, .25, .5) ); 
-fctIds=O.bodies.append(pack.gtsSurface2Facets(fct.faces(),material=facetMat,color=(1,0,0),noBound=True))
+fctIds=O.bodies.append(pack.gtsSurface2Facets(fct,material=facetMat,color=(1,0,0),noBound=True))
 
 # Create spheres
 sp=pack.SpherePack(); 
 sp.makeCloud(Vector3(-.5, -.5, 0),Vector3(.5, .5, .2), Rs, Rf, int(nSpheres), False)
 spheres=O.bodies.append([utils.sphere(s[0],s[1],color=(0.929,0.412,0.412),material=dfltSpheresMat) for s in sp])
-for id in spheres:
-	s=O.bodies[id]
-	p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-	s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 
 # Create engines
 O.engines=[
@@ -65,14 +61,13 @@ O.engines=[
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
-	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonIntegrator(damping=0),
-	ResetRandomPosition(factoryFacets=fctIds,velocity=(0,0,-2),virtPeriod=0.01,ids=spheres,point=(0,0,-.5),normal=(0,0,1),maxAttempts=100),
+	NewtonIntegrator(damping=0,gravity=[0,0,-9.81]),
+	ResetRandomPosition(virtPeriod=0.01,factoryFacets=fctIds,velocity=(0,0,-2),subscribedBodies=spheres,point=(0,0,-.5),normal=(0,0,1),maxAttempts=100),
 ]
 
-#renderer = qt.Renderer()
-#qt.View()
-#O.saveTmp()
-#O.run()
+renderer = qt.Renderer()
+qt.View()
+O.saveTmp()
+O.run()
 
 
