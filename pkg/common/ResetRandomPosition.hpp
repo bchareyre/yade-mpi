@@ -45,7 +45,7 @@ private:
 		randomSymmetricUnit;
 
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ResetRandomPosition,GlobalEngine,"Creates spheres during simulation, placing them at random positions. Every time called, one new sphere will be created and inserted in the simulation.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ResetRandomPosition,PeriodicEngine,"Creates spheres during simulation, placing them at random positions. Every time called, one new sphere will be created and inserted in the simulation.",
 		((vector<Body::id_t>,factoryFacets,,,"The geometry of the section where spheres will be placed; they will be placed on facets or in volume between them depending on *volumeSection* flag."))
 		((std::vector<int>,subscribedBodies,,,"Affected bodies."))
 		((Vector3r,point,Vector3r::Zero(),,"??"))
