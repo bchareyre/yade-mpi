@@ -14,7 +14,7 @@ def getRealVersion():
 			head = repo.commits('master')[0]
 			rev = str(head)[:7]
 			dateP = head.authored_date
-			versionN = "%04d-%02d-%02d.git_%s" % (dateP.tm_year, dateP.tm_mon, dateP.tm_mday, rev)
+			versionN = "%04d-%02d-%02d.git-%s" % (dateP.tm_year, dateP.tm_mon, dateP.tm_mday, rev)
 			return versionN
 		except ImportError:
 			print "\
