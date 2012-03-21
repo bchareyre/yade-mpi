@@ -12,7 +12,10 @@ FATAL yade.Facet /home/me/YADE/yade/pkg/common/Facet.cpp:26 postLoad: Facet has 
 """
 
 from yade import pack
-import gts, os.path
+import gts, os.path, locale
+
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')   #gts is locale-dependend.  If, for example, german locale is used, gts.read()-function does not import floats normally
+
 
 # coarsen the original horse if we have it
 # do nothing if we have the coarsened horse already
