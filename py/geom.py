@@ -179,7 +179,7 @@ def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Qua
 	# check zero dimentions
 	if (dBunker<=0): raise RuntimeError("The diameter dBunker should have the positive value");
 	if (dOutput<=0): raise RuntimeError("The diameter dOutput should have the positive value");
-	if (hBunker<=0): raise RuntimeError("The height hBunker should have the positive value");
+	if (hBunker<0): raise RuntimeError("The height hBunker should have the positive or or zero");
 	if (hOutput<=0): raise RuntimeError("The height hOutput should have the positive value");
 	if (hPipe<0): raise RuntimeError("The height hPipe should have the positive value or zero");
 	
@@ -191,8 +191,9 @@ def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Qua
 	centerOutput = Vector3(0.0,0.0,hPipe+hOutput/2.0)
 	ret+=facetCone(center=centerOutput,radiusTop=dBunker/2.0,radiusBottom=dOutput/2.0,height=hOutput,segmentsNumber=segmentsNumber,wallMask=wallMask&4,angleRange=angleRange,closeGap=closeGap,**kw)
 	
-	centerBunker = Vector3(0.0,0.0,hPipe+hOutput+hBunker/2.0)
-	ret+=facetCylinder(center=centerBunker,radius=dBunker/2.0,height=hBunker,segmentsNumber=segmentsNumber,wallMask=wallMask&5,angleRange=angleRange,closeGap=closeGap,**kw)
+	if (hBunker>0):
+		centerBunker = Vector3(0.0,0.0,hPipe+hOutput+hBunker/2.0)
+		ret+=facetCylinder(center=centerBunker,radius=dBunker/2.0,height=hBunker,segmentsNumber=segmentsNumber,wallMask=wallMask&5,angleRange=angleRange,closeGap=closeGap,**kw)
 	
 	for i in ret:
 		i.state.pos=orientation*(i.state.pos)+Vector3(center)
