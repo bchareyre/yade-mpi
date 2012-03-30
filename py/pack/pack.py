@@ -53,7 +53,7 @@ except ImportError: pass
 # extend _packSphere.SpherePack c++ class by this method
 ##
 def SpherePack_toSimulation(self,rot=Matrix3.Identity,**kw):
-	ur"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
+	"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
 this method also appropriately sets periodic cell information of the simulation.
 
 	>>> from yade import pack; from math import *
