@@ -63,7 +63,12 @@ Body::id_t BodyContainer::insert(shared_ptr<Body>& b){
 Body::id_t BodyContainer::insert(shared_ptr<Body>& b, Body::id_t id){
 	assert(id>=0);
 	if((size_t)id>=body.size()) body.resize(id+1);
+	
+	const shared_ptr<Scene>& scene=Omega::instance().getScene(); 
+	b->iterBorn=scene->iter;
+	b->timeBorn=scene->time;
 	b->id=id;
+	
 	body[id]=b;
 	#ifdef YADE_SUBDOMAINS
 		setBodySubdomain(b,0); // add it to subdomain #0; only effective if subdomains are set up
