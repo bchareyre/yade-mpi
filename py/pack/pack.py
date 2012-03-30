@@ -96,7 +96,7 @@ The current state (even if rotated) is taken as mechanically undeformed, i.e. wi
 	if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
 	assert(isinstance(rot,Matrix3))
 	if self.isPeriodic: O.periodic=True
-	if self.cellSize!=Vector3.Zero:
+	if self.cellSize!=Vector3.Zero and self.isPeriodic:
 		O.cell.hSize=rot*Matrix3(self.cellSize[0],0,0, 0,self.cellSize[1],0, 0,0,self.cellSize[2])
 		O.cell.trsf=Matrix3.Identity
 	if not self.hasClumps():
