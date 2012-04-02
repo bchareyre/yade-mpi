@@ -71,6 +71,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 
 		sudo apt-get install scons freeglut3-dev libloki-dev \
 		libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
+		libboost-program-options-dev \
 		libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
 		libboost-iostreams-dev liblog4cxx10-dev python-dev libboost-python-dev ipython \
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot doxygen \
