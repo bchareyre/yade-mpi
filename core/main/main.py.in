@@ -223,8 +223,6 @@ def userSession(qt4=False,qapp=None):
 		InteractiveShellEmbed.banner1=banner+'\n'  # called banner1 here, not banner anymore
 		ipshell=InteractiveShellEmbed()
 		ipshell()
-		# similar to the workaround, as for 0.10 (perhaps not needed?)
-		ipshell.atexit_operations()
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
@@ -262,6 +260,6 @@ elif gui=='qt4':
 	qapp=QtGui.QApplication(sys.argv)
 	userSession(qt4=True,qapp=qapp)
 
-if yade.runtime.ipython_version==10:
+if yade.runtime.ipython_version>=10:
 	O.exitNoBacktrace()
 
