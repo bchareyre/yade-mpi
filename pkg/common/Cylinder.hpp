@@ -10,7 +10,10 @@
 #ifdef YADE_OPENGL
 	#include<yade/pkg/common/GLDrawFunctors.hpp>
 #endif
-
+#include<yade/pkg/dem/CohFrictPhys.hpp>
+#include<yade/pkg/dem/CohFrictMat.hpp>
+#include<yade/pkg/dem/Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp>
+#include<yade/pkg/common/CylScGeom6D.hpp>
 
 class Cylinder: public Sphere{
 	public:
@@ -48,28 +51,6 @@ class ChainedCylinder: public Cylinder{
 	REGISTER_CLASS_INDEX(ChainedCylinder,Cylinder);
 };
 REGISTER_SERIALIZABLE(ChainedCylinder);
-
-class CylScGeom: public ScGeom{
-	public:
-		/// Emulate a sphere whose position is the projection of sphere's center on cylinder sphere, and with motion linearly interpolated between nodes
-		State fictiousState;
-// 		shared_ptr<Interaction> duplicate;
-
-		virtual ~CylScGeom ();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CylScGeom,ScGeom,"Geometry of a cylinder-sphere contact.",
-		((bool,onNode,false,,"contact on node?"))
-		((int,isDuplicate,0,,"this flag is turned true (1) automatically if the contact is shared between two chained cylinders. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
-		((int,trueInt,-1,,"Defines the body id of the cylinder where the contact is real, when :yref:`CylScGeom::isDuplicate`>0."))
-		((Vector3r,start,Vector3r::Zero(),,"position of 1st node |yupdate|"))
-		((Vector3r,end,Vector3r::Zero(),,"position of 2nd node |yupdate|"))
-		((Body::id_t,id3,0,,"id of next chained cylinder |yupdate|"))
-		((Real,relPos,0,,"position of the contact on the cylinder (0: node-, 1:node+) |yupdate|")),
-		createIndex(); /*ctor*/
-	);
-	REGISTER_CLASS_INDEX(CylScGeom,ScGeom);
-};
-REGISTER_SERIALIZABLE(CylScGeom);
-
 
 class ChainedState: public State{
 	public:
@@ -129,6 +110,22 @@ class Ig2_Sphere_ChainedCylinder_CylScGeom: public IGeomFunctor{
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,ChainedCylinder);
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_ChainedCylinder_CylScGeom);
+
+class Ig2_Sphere_ChainedCylinder_CylScGeom6D: public Ig2_Sphere_ChainedCylinder_CylScGeom {
+public:
+    virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+    virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+
+    YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_ChainedCylinder_CylScGeom6D,Ig2_Sphere_ChainedCylinder_CylScGeom,"Create/update a :yref:`ScGeom6D` instance representing the geometry of a contact point between two :yref:`Spheres<Sphere>`s, including relative rotations.",
+                              ((bool,updateRotations,false,,"Precompute relative rotations. Turning this false can speed up simulations when rotations are not needed in constitutive laws (e.g. when spheres are compressed without cohesion and moment in early stage of a triaxial test), but is not foolproof. Change this value only if you know what you are doing."))
+                              ((bool,creep,false,,"Substract rotational creep from relative rotation. The rotational creep :yref:`ScGeom6D::twistCreep` is a quaternion and has to be updated inside a constitutive law, see for instance :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`."
+                               ))
+                             );
+    FUNCTOR2D(Sphere,ChainedCylinder);
+    // needed for the dispatcher, even if it is symmetric
+    DEFINE_FUNCTOR_ORDER_2D(Sphere,ChainedCylinder);
+};
+REGISTER_SERIALIZABLE(Ig2_Sphere_ChainedCylinder_CylScGeom6D);
 
 class Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D: public IGeomFunctor{
 	public:
@@ -240,6 +237,32 @@ class Law2_CylScGeom_FrictPhys_CundallStrack: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_CylScGeom_FrictPhys_CundallStrack);
 
+class Law2_CylScGeom6D_CohFrictPhys_CohesionMoment: public LawFunctor {
+public:
+    //OpenMPAccumulator<Real> plasticDissipation;
+    virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+    //Real elasticEnergy ();
+    //Real getPlasticDissipation();
+    //void initPlasticDissipation(Real initVal=0);
+    YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_CylScGeom6D_CohFrictPhys_CohesionMoment,LawFunctor,"Law for linear compression, and Mohr-Coulomb plasticity surface without cohesion.\nThis law implements the classical linear elastic-plastic law from [CundallStrack1979]_ (see also [Pfc3dManual30]_). The normal force is (with the convention of positive tensile forces) $F_n=\\min(k_n u_n, 0)$. The shear force is $F_s=k_s u_s$, the plasticity condition defines the maximum value of the shear force : $F_s^{\\max}=F_n\\tan(\\phi)$, with $\\phi$ the friction angle.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_CundallStrack`, which uses :yref:`Dem3DofGeom` (sphere-box interactions are not implemented for the latest).\n\n.. note::\n This law is well tested in the context of triaxial simulation, and has been used for a number of published results (see e.g. [Scholtes2009b]_ and other papers from the same authors). It is generalised by :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`, which adds cohesion and moments at contact.",
+                                      ((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
+                                      ((bool,traceEnergy,false,Attr::hidden,"Define the total energy dissipated in plastic slips at all contacts."))
+                                      ((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
+                                      ((int,elastPotentialIx,-1,(Attr::hidden|Attr::noSave),"Index for elastic potential energy (with O.trackEnergy)"))
+                                      ((bool,always_use_moment_law,false,,"If true, use bending/twisting moments at all contacts. If false, compute moments only for cohesive contacts."))
+                                      ((bool,shear_creep,false,,"activate creep on the shear force, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
+                                      ((bool,twist_creep,false,,"activate creep on the twisting moment, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
+                                      ((bool,useIncrementalForm,false,,"use the incremental formulation to compute bending and twisting moments. Creep on the twisting moment is not included in such a case."))
+                                      ((Real,creep_viscosity,1,,"creep viscosity [Pa.s/m]. probably should be moved to Ip2_CohFrictMat_CohFrictMat_CohFrictPhys..."))
+                                      ,,
+                                     );
+    FUNCTOR2D(CylScGeom6D,CohFrictPhys);
+    DECLARE_LOGGER;
+private:
+    Real currentContactPhysics;
+
+};
+REGISTER_SERIALIZABLE(Law2_CylScGeom6D_CohFrictPhys_CohesionMoment);
 
 // Keep this : Cylinders and ChainedCylinders will have different centers maybe.
 // class Bo1_ChainedCylinder_Aabb : public Bo1_Cylinder_Aabb
