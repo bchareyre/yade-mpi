@@ -260,6 +260,4 @@ elif gui=='qt4':
 	qapp=QtGui.QApplication(sys.argv)
 	userSession(qt4=True,qapp=qapp)
 
-if yade.runtime.ipython_version>=10:
-	O.exitNoBacktrace()
-
+O.exitNoBacktrace()
