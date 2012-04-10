@@ -251,26 +251,26 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 				currentMeniscus = firstMeniscus; ++currentMeniscus;
 				if (!hertzOn)
 				{
-					CapillaryPhys* cundallInteractionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->phys.get());
+					cundallInteractionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->phys.get());
 					if (i == (*firstMeniscus)->getId1()) angle1=cundallInteractionPhysics1->Delta1;//get angle of meniscus1 on body i
 					else angle1=cundallInteractionPhysics1->Delta2;
 				}
 				else
 				{
-					MindlinCapillaryPhys* mindlinInteractionPhysics1 = YADE_CAST<MindlinCapillaryPhys*>((*firstMeniscus)->phys.get());
+					mindlinInteractionPhysics1 = YADE_CAST<MindlinCapillaryPhys*>((*firstMeniscus)->phys.get());
 					if (i == (*firstMeniscus)->getId1()) angle1=mindlinInteractionPhysics1->Delta1;//get angle of meniscus1 on body i
 					else angle1=mindlinInteractionPhysics1->Delta2;
 				}
 				for ( ;currentMeniscus!= lastMeniscus; ++currentMeniscus) {//... CHECK FUSION WITH ALL OTHER MENISCII ON THE BODY
 					if (!hertzOn)
 					{
-						CapillaryPhys* cundallInteractionPhysics2 = YADE_CAST<CapillaryPhys*>((*currentMeniscus)->phys.get());
+						cundallInteractionPhysics2 = YADE_CAST<CapillaryPhys*>((*currentMeniscus)->phys.get());
 						if (i == (*currentMeniscus)->getId1()) angle2=cundallInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
 						else angle2=cundallInteractionPhysics2->Delta2;
 					}
 					else
 					{
-						MindlinCapillaryPhys* mindlinInteractionPhysics2 = YADE_CAST<MindlinCapillaryPhys*>((*currentMeniscus)->phys.get());
+						mindlinInteractionPhysics2 = YADE_CAST<MindlinCapillaryPhys*>((*currentMeniscus)->phys.get());
 						if (i == (*currentMeniscus)->getId1()) angle2=mindlinInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
 						else angle2=mindlinInteractionPhysics2->Delta2;
 					}
