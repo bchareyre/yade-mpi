@@ -63,6 +63,46 @@ Yade will run the script and then drop to the command-line again. [#f2]_ If you 
 
 There is more command-line options than just ``-x``, run ``yade -h`` to see all of them.
 
+	Options:
+	  --version             show program's version number and exit
+	  -h, --help            show this help message and exit
+	  -j THREADS, --threads=THREADS
+	                        Number of OpenMP threads to run; defaults to 1.
+	                        Equivalent to setting OMP_NUM_THREADS environment
+	                        variable.
+	  --cores=CORES         Set number of OpenMP threads (as \-\-threads) and in
+	                        addition set affinity of threads to the cores given.
+	  --update              Update deprecated class names in given script(s) using
+	                        text search & replace. Changed files will be backed up
+	                        with ~ suffix. Exit when done without running any
+	                        simulation.
+	  --nice=NICE           Increase nice level (i.e. decrease priority) by given
+	                        number.
+	  -x                    Exit when the script finishes
+	  -v                    Increase logging verbosity; first occurence sets
+	                        default logging level to info, second to debug, third
+	                        to trace. (Since this build doesn't use log4cxx, this
+	                        option will only have effect if repeated twice (\-vv),
+	                        equivalent to setting YADE_DEBUG environment variable)
+	  -n                    Run without graphical interface (equivalent to
+	                        unsetting the DISPLAY environment variable)
+	  --generate-manpage=FILE
+	                        Generate man page documenting this program and exit
+	  --rebuild             Re-run build in the source directory, then run the
+	                        updated yade with the same command line except
+	                        \-\-rebuild. The build profile for this build (deb)
+	                        and its stored parameters will be used.
+	  --test                Run regression test suite and exit; the exists status
+	                        is 0 if all tests pass, 1 if a test fails and 2 for an
+	                        unspecified exception.
+	  --debug               Run the debug build, if available.
+	  --checks              Run a series of user-defined check tests as described
+	                        in /build/buildd/yade-
+	                        daily-1+3021+27~lucid1/scripts/test/checks/README
+	  --performance         Starts a test to measure the productivity
+	  --no-gdb              Do not show backtrace when yade crashes (only
+	                        effective with \-\-debug).
+
 .. rubric:: Footnotes
 
 .. [#f1] The executable name can carry a suffix, such as version number (``yade-0.20``), depending on compilation options. Packaged versions on Debian systems always provide the plain ``yade`` alias, by default pointing to latest stable version (or latest snapshot, if no stable version is installed). You can use ``update-alternatives`` to change this.
