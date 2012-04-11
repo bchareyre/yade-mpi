@@ -358,7 +358,10 @@ sys.path.append(os.path.abspath('.'))
 import yade.config
 
 if 1:
-	import ipython_directive as id
+	if yade.runtime.ipython_version<12:
+		import ipython_directive as id
+	else:
+		import ipython_directive012 as id
 	id.rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxout=re.compile(r'(?:Out| ->  )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxcont=re.compile(r'(?:   +)\.\.+:\s?(.*)\s*')
@@ -366,7 +369,8 @@ if 1:
 	id.fmtout =' ->  [%d]: '  # for some reason, out and cont must have the trailing space
 	id.fmtcont='     .\D.: '
 	id.rc_override=dict(prompt_in1="Yade [\#]:",prompt_in2="     .\D.:",prompt_out=r" ->  [\#]: ")
-	id.reconfig_shell()
+	if yade.runtime.ipython_version<12:
+		id.reconfig_shell()
 
 	import ipython_console_highlighting as ich
 	ich.IPythonConsoleLexer.input_prompt = re.compile("(Yade \[[0-9]+\]: )")
@@ -375,21 +379,25 @@ if 1:
 
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.coverage',
-    'sphinx.ext.pngmath',
-	 'sphinx.ext.graphviz',
-	 'sphinx.ext.viewcode',
-	 'sphinx.ext.inheritance_diagram',
-	 'matplotlib.sphinxext.plot_directive',
-	 'matplotlib.sphinxext.only_directives',
-	#'matplotlib.sphinxext.mathmpl',
-    'ipython_directive',
-    'ipython_console_highlighting',
-	 'youtube',
-	 'sphinx.ext.todo',
-    ]
+		'sphinx.ext.autodoc',
+		'sphinx.ext.autosummary',
+		'sphinx.ext.coverage',
+		'sphinx.ext.pngmath',
+		'sphinx.ext.graphviz',
+		'sphinx.ext.viewcode',
+		'sphinx.ext.inheritance_diagram',
+		'matplotlib.sphinxext.plot_directive',
+		'matplotlib.sphinxext.only_directives',
+		#'matplotlib.sphinxext.mathmpl',
+		'ipython_directive012',
+		'ipython_console_highlighting',
+		'youtube',
+		'sphinx.ext.todo',
+		]
+if yade.runtime.ipython_version<12:
+	extensions.append('ipython_directive')
+else:
+	extensions.append('ipython_directive012')
 
 # the sidebar extension
 if False:
