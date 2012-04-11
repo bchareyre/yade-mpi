@@ -109,7 +109,6 @@ class FlowEngine : public PartialEngine
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
-// 					((bool, compressible,false, ,"if true, compressible flow"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
 					((Real, dt, 0,,"timestep [s]"))
 // 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
