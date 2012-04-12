@@ -144,11 +144,10 @@ if 'log4cxx' in yade.config.features and opts.verbosity:
 sys.argv=yade.runtime.argv=args
 yade.runtime.opts=opts
 
-from yade import *
+from yade import utils, pack
+from yade.utils import *
+from yade.pack import *
 from math import *
-from utils import *
-from yade import pack
-from pack import *
 
 # Run the check tests listed in scripts/checks-and-tests/checks/checkList.py
 if opts.checks:
@@ -162,7 +161,7 @@ if opts.performance:
 
 def userSession(qt4=False,qapp=None):
 	# prepare nice namespace for users
-	import yade, yade.runtime
+	import yade.runtime
 	import sys
 	# start non-blocking qt4 app here; need to ask on the mailing list on how to make it functional
 	## with ipython 0.11, start the even loop early (impossible with 0.10, which is thread-based)
