@@ -215,19 +215,23 @@ def userSession(qt4=False,qapp=None):
 		# http://lists.ipython.scipy.org/pipermail/ipython-user/2008-September/005839.html
 		import IPython.ipapi
 		IPython.ipapi.get().IP.atexit_operations()
-	elif yade.runtime.ipython_version>=11:
+	elif yade.runtime.ipython_version==11:
 		from IPython.frontend.terminal.embed import InteractiveShellEmbed
 		# use the dict to set attributes
 		for k in ipconfig: setattr(InteractiveShellEmbed,k,ipconfig[k])
 		InteractiveShellEmbed.banner1=banner+'\n'  # called banner1 here, not banner anymore
-		if yade.runtime.ipython_version>=12:
-			from IPython.config.loader import Config
-			cfg = Config()
-			prompt_config = cfg.PromptManager
-			prompt_config.in_template = ipconfig['prompt_in1']
-			prompt_config.in2_template = ipconfig['prompt_in2']
-			prompt_config.out_template = ipconfig['prompt_out']
-			InteractiveShellEmbed.config=cfg
+		ipshell=InteractiveShellEmbed()
+		ipshell()
+	elif yade.runtime.ipython_version>=12:
+		from IPython.frontend.terminal.embed import InteractiveShellEmbed
+		from IPython.config.loader import Config
+		cfg = Config()
+		prompt_config = cfg.PromptManager
+		prompt_config.in_template = ipconfig['prompt_in1']
+		prompt_config.in2_template = ipconfig['prompt_in2']
+		prompt_config.out_template = ipconfig['prompt_out']
+		InteractiveShellEmbed.config=cfg
+		InteractiveShellEmbed.banner1=banner+'\n'
 		ipshell=InteractiveShellEmbed()
 		ipshell()
 
