@@ -22,7 +22,7 @@ O.engines=[
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	#We compress the packing isotropicaly first
-	PeriTriaxController( dynCell=True,mass=0.2,maxUnbalanced=0.01, relStressTol=0.01,goal=(-1e4,-1e4,-1e4), stressMask=7,globUpdate=5, maxStrainRate=(1.,1.,1.), doneHook='triaxDone()', reversedForces=True ,label='triax'),
+	PeriTriaxController( dynCell=True,mass=0.2,maxUnbalanced=0.01, relStressTol=0.01,goal=(-1e4,-1e4,-1e4), stressMask=7,globUpdate=5, maxStrainRate=(1.,1.,1.), doneHook='triaxDone()', label='triax'),
 	NewtonIntegrator(damping=.2),
 	#PyRunner(iterPeriod=500,command='print "strain: ",triax.strain," stress: ",triax.stress')
 ]

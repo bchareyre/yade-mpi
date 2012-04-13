@@ -1,5 +1,6 @@
 # coding: utf-8
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+# 2011 ©Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 "Test and demonstrate use of PeriTriaxController."
 from yade import *
 from yade import pack,log,qt
@@ -17,9 +18,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	PeriTriaxController(dynCell=True,mass=0.2,maxUnbalanced=0.01,relStressTol=0.02,goal=[-1e4,-1e4,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
 	NewtonIntegrator(damping=.2),
