@@ -3,8 +3,8 @@
 # 2011 ©Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 "Test and demonstrate use of PeriTriaxController."
 from yade import *
-from yade import pack,log,qt
-log.setLevel('PeriTriaxController',log.TRACE)
+from yade import pack,qt
+
 O.periodic=True
 O.cell.setBox(.1,.1,.1)
 #O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)

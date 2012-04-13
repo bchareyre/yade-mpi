@@ -23,9 +23,6 @@ stopIter=2000
 nSteps=100
 
 # quiet annoying messages
-import yade.log
-yade.log.setLevel('Omega',yade.log.WARN)
-yade.log.setLevel('TriaxialCompressionEngine',yade.log.WARN)
 
 if O.numThreads>1:
 	print "WARNING: You should run single-threaded with OMP_NUM_THREADS=1; interaction order will be probably different otherwise!"

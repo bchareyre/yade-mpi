@@ -358,7 +358,10 @@ sys.path.append(os.path.abspath('.'))
 import yade.config
 
 if 1:
-	import ipython_directive as id
+	if yade.runtime.ipython_version<12:
+		import ipython_directive as id
+	else:
+		import ipython_directive012 as id
 	id.rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxout=re.compile(r'(?:Out| ->  )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxcont=re.compile(r'(?:   +)\.\.+:\s?(.*)\s*')
@@ -366,7 +369,8 @@ if 1:
 	id.fmtout =' ->  [%d]: '  # for some reason, out and cont must have the trailing space
 	id.fmtcont='     .\D.: '
 	id.rc_override=dict(prompt_in1="Yade [\#]:",prompt_in2="     .\D.:",prompt_out=r" ->  [\#]: ")
-	id.reconfig_shell()
+	if yade.runtime.ipython_version<12:
+		id.reconfig_shell()
 
 	import ipython_console_highlighting as ich
 	ich.IPythonConsoleLexer.input_prompt = re.compile("(Yade \[[0-9]+\]: )")
@@ -375,21 +379,24 @@ if 1:
 
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.coverage',
-    'sphinx.ext.pngmath',
-	 'sphinx.ext.graphviz',
-	 'sphinx.ext.viewcode',
-	 'sphinx.ext.inheritance_diagram',
-	 'matplotlib.sphinxext.plot_directive',
-	 'matplotlib.sphinxext.only_directives',
-	#'matplotlib.sphinxext.mathmpl',
-    'ipython_directive',
-    'ipython_console_highlighting',
-	 'youtube',
-	 'sphinx.ext.todo',
-    ]
+		'sphinx.ext.autodoc',
+		'sphinx.ext.autosummary',
+		'sphinx.ext.coverage',
+		'sphinx.ext.pngmath',
+		'sphinx.ext.graphviz',
+		'sphinx.ext.viewcode',
+		'sphinx.ext.inheritance_diagram',
+		'matplotlib.sphinxext.plot_directive',
+		'matplotlib.sphinxext.only_directives',
+		#'matplotlib.sphinxext.mathmpl',
+		'ipython_console_highlighting',
+		'youtube',
+		'sphinx.ext.todo',
+		]
+if yade.runtime.ipython_version<12:
+	extensions.append('ipython_directive')
+else:
+	extensions.append('ipython_directive012')
 
 # the sidebar extension
 if False:
@@ -650,7 +657,7 @@ my_maketitle=r'''
 \vspace{5 mm}
 \vspace{70 mm}
 \begin{sffamily}\bfseries\Large
-Václav Šmilauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome Duriez, Anton Gladky, Janek Kozicki, Chiara Modenese, Luc Scholtès, Luc Sibille, Jan Stránský, Klaus Thoeni
+V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome Duriez, Anton Gladky, Janek Kozicki, Chiara Modenese, Luc Scholt\`{e}s, Luc Sibille, Jan Str\'{a}nsk\'{y}, Klaus Thoeni
 \end{sffamily}
 \vspace{20 mm}
 \hrule{}
@@ -666,7 +673,7 @@ Václav Šmilauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome 
 
 \text{\sffamily\bfseries\LARGE Authors}\\
 \\
-\text{\sffamily\bfseries\Large Václav Šmilauer}\\
+\text{\sffamily\bfseries\Large V\'{a}clav \v{S}milauer}\\
 \text{\sffamily\Large University of Innsbruck}\\
 \\
 \text{\sffamily\bfseries\Large Emanuele Catalano}\\
@@ -690,13 +697,13 @@ Václav Šmilauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, Jerome 
 \text{\sffamily\bfseries\Large Chiara Modenese}\\
 \text{\sffamily\Large University of Oxford}\\
 \\
-\text{\sffamily\bfseries\Large Luc Scholtès}\\
+\text{\sffamily\bfseries\Large Luc Scholt\`{e}s}\\
 \text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
 \\
 \text{\sffamily\bfseries\Large Luc Sibille}\\
 \text{\sffamily\Large University of Nantes, lab. GeM}\\
 \\
-\text{\sffamily\bfseries\Large Jan Stránský}\\
+\text{\sffamily\bfseries\Large Jan Str\'{a}nsk\'{y}}\\
 \text{\sffamily\Large CVUT Prague}\\
 \\
 \text{\sffamily\bfseries\Large Klaus Thoeni}

@@ -8,7 +8,6 @@ env.Install('$LIBDIR/py/yade',[
 	env.SharedLibrary('_eudoxos',['_eudoxos.cpp'],SHLIBPREFIX='',CXXFLAGS=env['CXXFLAGS']+([] if not os.path.exists('../../brefcom-mm.hh') else ['-include','../brefcom-mm.hh']),LIBS=env['LIBS']+[
 		linkPlugins(['Shop','ConcretePM']),
 		]),
-	env.SharedLibrary('log',['log.cpp'],SHLIBPREFIX=''),
 	env.SharedLibrary('_utils',['_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
 		linkPlugins(['Shop','ConcretePM','Facet']),
 		]),

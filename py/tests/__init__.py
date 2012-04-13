@@ -7,8 +7,8 @@ import unittest,inspect
 allTests=['wrapper','core','pbc','clump','cohesive-chain']
 
 # all yade modules (ugly...)
-import yade.eudoxos,yade.export,yade.linterpolation,yade.log,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom
-allModules=(yade.eudoxos,yade.export,yade.linterpolation,yade.log,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom)
+import yade.eudoxos,yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom
+allModules=(yade.eudoxos,yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom)
 try:
 	import yade.qt
 	allModules+=(yade.qt,)

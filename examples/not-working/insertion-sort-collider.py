@@ -31,8 +31,7 @@ else:
 	O.bodies.append(utils.sphere([0,0,.6],.5),material=mat)
 O.dt=1e-4
 O.saveTmp('init')
-import yade.log
-#yade.log.setLevel("InsertionSortCollider",yade.log.TRACE);
+
 # compare 2 colliders:
 if 1:
 	O.timingEnabled=True

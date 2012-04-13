@@ -73,7 +73,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 		libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
 		libboost-program-options-dev \
 		libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
-		libboost-iostreams-dev liblog4cxx10-dev python-dev libboost-python-dev ipython \
+		libboost-iostreams-dev python-dev libboost-python-dev ipython \
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot doxygen \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific bzr bzrtools libeigen2-dev \
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
@@ -84,7 +84,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 
 		yum install scons qt3-devel freeglut-devel boost-devel boost-date-time \
 		boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
-		log4cxx log4cxx-devel python-devel boost-python ipython python-matplotlib \
+		python-devel boost-python ipython python-matplotlib \
 		sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
 		graphviz-python vtk-devel ScientificPython bzr bzrtools eigen2-devel libQGLViewer-devel \
 		loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging python-sphinx python-bibtex
@@ -102,21 +102,6 @@ Most of the list above is very likely already packaged for your distribution. Th
 			dev-python/sphinx dev-python/imaging dev-python/python-bibtex
 		
 		
-		* *masked by* problem solution. 
-			For example, if you have got a problem with installing ``log4cxx``:
-			
-				!!! All ebuilds that could satisfy "dev-libs/log4cxx" have been masked.
-				!!! One of the following masked packages is required to complete your request:
-				- dev-libs/log4cxx-0.10.0 (masked by: ~x86 keyword)
-			
-			You should unmask ``log4cxx``, doing the following::
-			
-				mkdir /etc/portage -p;\
-				echo "=dev-libs/log4cxx-0.10.0 ~x86" >> /etc/portage/package.keywords;\
-				emerge dev-libs/log4cxx
-			
-			Other packages with similar warnings can be fixed by this way as well.
-			
 		* ``libqglviewer`` is not in official Gentoo repository yet. But it can be installed from `Gentoo Portage Overlay <http://gpo.zugaina.org>`_::
 			
 			emerge -va layman; emerge subversion; layman -f -a sunrise;\

@@ -27,8 +27,6 @@ par.add_option('--cores',help='Set number of OpenMP threads (as \-\-threads) and
 par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
 par.add_option('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
-par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.'+
-	('' if 'log4cxx' in features else " (Since this build doesn't use log4cxx, this option will only have effect if repeated twice (\-vv), equivalent to setting YADE_DEBUG environment variable)"),action='count',dest='verbosity')
 par.add_option('-n',help="Run without graphical interface (equivalent to unsetting the DISPLAY environment variable)",dest='nogui',action='store_true')
 par.add_option('--generate-manpage',help="Generate man page documenting this program and exit",dest='manpage',metavar='FILE')
 par.add_option('--rebuild',help="Re-run build in the source directory, then run the updated yade with the same command line except \-\-rebuild. The build profile for this build (${profile}) and its stored parameters will be used.",dest='rebuild',action='store_true')
@@ -91,10 +89,6 @@ if opts.test:
 		print 20*'*'+' SOME TESTS FAILED '+20*'*'
 		sys.exit(1)
 
-# c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
-# do this early, to have debug messages in the boot code (plugin registration etc)
-if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
-
 if not 'openmp' in features and (opts.cores or (opts.threads and opts.threads>1)):
 	print 'WARNING: compiled without OpenMP, -j/--threads/--cores have no effect.'
 
@@ -119,7 +113,6 @@ import yade
 # other parts we will need soon
 import yade.config
 import yade.wrapper
-import yade.log
 import yade.system
 import yade.runtime
 
@@ -137,18 +130,15 @@ if opts.nice:
 	os.nice(opts.nice)
 if yade.config.debug and opts.noGdb:
 	yade.wrapper.Omega().disableGdb()
-if 'log4cxx' in yade.config.features and opts.verbosity:
-	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,2)])
 
 # modify sys.argv in-place so that it can be handled by userSession
 sys.argv=yade.runtime.argv=args
 yade.runtime.opts=opts
 
-from yade import *
+from yade import utils, pack
+from yade.utils import *
+from yade.pack import *
 from math import *
-from utils import *
-from yade import pack
-from pack import *
 
 # Run the check tests listed in scripts/checks-and-tests/checks/checkList.py
 if opts.checks:
@@ -162,7 +152,7 @@ if opts.performance:
 
 def userSession(qt4=False,qapp=None):
 	# prepare nice namespace for users
-	import yade, yade.runtime
+	import yade.runtime
 	import sys
 	# start non-blocking qt4 app here; need to ask on the mailing list on how to make it functional
 	## with ipython 0.11, start the even loop early (impossible with 0.10, which is thread-based)
@@ -216,11 +206,23 @@ def userSession(qt4=False,qapp=None):
 		# http://lists.ipython.scipy.org/pipermail/ipython-user/2008-September/005839.html
 		import IPython.ipapi
 		IPython.ipapi.get().IP.atexit_operations()
-	elif yade.runtime.ipython_version>=11:
+	elif yade.runtime.ipython_version==11:
 		from IPython.frontend.terminal.embed import InteractiveShellEmbed
 		# use the dict to set attributes
 		for k in ipconfig: setattr(InteractiveShellEmbed,k,ipconfig[k])
 		InteractiveShellEmbed.banner1=banner+'\n'  # called banner1 here, not banner anymore
+		ipshell=InteractiveShellEmbed()
+		ipshell()
+	elif yade.runtime.ipython_version>=12:
+		from IPython.frontend.terminal.embed import InteractiveShellEmbed
+		from IPython.config.loader import Config
+		cfg = Config()
+		prompt_config = cfg.PromptManager
+		prompt_config.in_template = ipconfig['prompt_in1']
+		prompt_config.in2_template = ipconfig['prompt_in2']
+		prompt_config.out_template = ipconfig['prompt_out']
+		InteractiveShellEmbed.config=cfg
+		InteractiveShellEmbed.banner1=banner+'\n'
 		ipshell=InteractiveShellEmbed()
 		ipshell()
 

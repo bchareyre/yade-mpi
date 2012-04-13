@@ -7,10 +7,6 @@
 #include<QApplication>
 #include<QCloseEvent>
 
-#ifdef YADE_LOG4CXX
-log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.qt4");
-#endif
-
 namespace py=boost::python;
 
 

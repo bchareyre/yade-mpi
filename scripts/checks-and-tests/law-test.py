@@ -12,9 +12,9 @@
 # The sphere couple is oriented randomly, but the result should always be the same.
 #
 from yade import utils,plot
-import random, yade.log
+import random
 random.seed()
-#yade.log.setLevel('LawTester',yade.log.TRACE)
+
 
 # sphere's radii
 r1,r2=.1,.2

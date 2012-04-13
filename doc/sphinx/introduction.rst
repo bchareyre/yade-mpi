@@ -79,11 +79,6 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	  --nice=NICE           Increase nice level (i.e. decrease priority) by given
 	                        number.
 	  -x                    Exit when the script finishes
-	  -v                    Increase logging verbosity; first occurence sets
-	                        default logging level to info, second to debug, third
-	                        to trace. (Since this build doesn't use log4cxx, this
-	                        option will only have effect if repeated twice (\-vv),
-	                        equivalent to setting YADE_DEBUG environment variable)
 	  -n                    Run without graphical interface (equivalent to
 	                        unsetting the DISPLAY environment variable)
 	  --generate-manpage=FILE

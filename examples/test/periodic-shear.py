@@ -39,7 +39,4 @@ rrr.intrAllWire,rrr.bound=True,True
 #v.axes=True
 #v.grid=(True,True,True)
 
-from yade import log
-#log.setLevel('Shop',log.TRACE)
-#log.setLevel('InsertionSortCollider',log.TRACE)
 

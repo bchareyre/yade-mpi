@@ -19,9 +19,6 @@
 
 namespace py = boost::python;
 using namespace std;
-#ifdef YADE_LOG4CXX
-	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.eudoxos");
-#endif
 
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
 	#include"../../brefcom-mm.hh"

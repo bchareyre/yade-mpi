@@ -2,11 +2,6 @@
 # encoding: utf-8
 from yade import utils, ymport, qt
 
-#### logging
-from yade import log
-log.setLevel('Law2_ScGeom_WirePhys_WirePM',log.TRACE)	# must compile with debug option to get logs 
-#log.setLevel('Law2_ScGeom_WirePhys_WirePM',log.DEBUG)
-#log.setLevel('',log.WARN)
 
 ## definition of some colors for colored text output in terminal
 BLUE = '\033[94m'

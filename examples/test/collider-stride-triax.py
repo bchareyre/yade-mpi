@@ -1,13 +1,11 @@
 """ Playground for tuning collider strides depending on maximum velocity. """
 
-from yade import timing,log
+from yade import timing
 import os.path
 loadFrom='/tmp/triax.xml'
 #if not os.path.exists(loadFrom):
 TriaxialTest(numberOfGrains=2000,noFiles=True).generate(loadFrom)
 O.load(loadFrom)
-log.setLevel('TriaxialCompressionEngine',log.WARN) # shut up
-log.setLevel('InsertionSortCollider',log.DEBUG)
 
 collider=utils.typedEngine('InsertionSortCollider')
 newton=utils.typedEngine('NewtonIntegrator')

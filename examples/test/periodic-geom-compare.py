@@ -2,9 +2,7 @@
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 "Test and demonstrate use of PeriTriaxController."
 from yade import *
-from yade import pack,log
-#log.setLevel('PeriTriaxController',log.DEBUG)
-#log.setLevel('Shop',log.TRACE)
+from yade import pack
 O.periodic=True
 O.cell.setBox(.1,.1,.1)
 O.cell.trsf=Matrix3().Identity;

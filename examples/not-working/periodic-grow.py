@@ -23,8 +23,7 @@ Traceback (most recent call last):
 RuntimeError: std::exception  
 """
 
-from yade import log,timing
-log.setLevel("InsertionSortCollider",log.TRACE)
+from yade import timing
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),

@@ -151,16 +151,6 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 	return proxyNamespace
 
 
-def setExitHandlers():
-	"""Set exit handler to avoid gdb run if log4cxx crashes at exit."""
-	# avoid backtrace at regular exit, even if we crash
-	if 'log4cxx' in config.features:
-		__builtins__['quit']=wrapper.Omega().exitNoBacktrace
-		sys.exit=wrapper.Omega().exitNoBacktrace
-	# this seems to be not needed anymore:
-	#sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
-
-
 # consistency check
 # if there are no serializables, then plugins were not loaded yet, probably
 if(len(_allSerializables)==0):

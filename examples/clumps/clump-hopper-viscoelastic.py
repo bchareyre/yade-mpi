@@ -3,9 +3,6 @@
 from yade import utils,pack,export,qt
 import gts,os,random,itertools
 from numpy import *
-import yade.log 
-
-#yade.log.setLevel('NewtonIntegrator',yade.log.TRACE)
 
 # Parameters
 tc=0.001# collision time 

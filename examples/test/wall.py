@@ -33,9 +33,6 @@ O.dt=utils.PWaveTimeStep()
 O.save('/tmp/a.xml')
 O.saveTmp()
 
-from yade import log
-log.setLevel('Ig2_Wall_Sphere_Dem3DofGeom',log.TRACE)
-
 O.run()
 #O.bodies.append([
 #	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
