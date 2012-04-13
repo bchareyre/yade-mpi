@@ -45,6 +45,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
+		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
+		
 		//Handling imposed pressures on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
 		vector<Cell_handle> IPCells;
@@ -80,7 +82,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		Real minPermLength; //min branch length for Poiseuille
 
 		double P_SUP, P_INF, P_INS, VISCOSITY;
-		bool compressible;
 		double fluidBulkModulus;
 		
 		Tesselation& Compute_Action ( );

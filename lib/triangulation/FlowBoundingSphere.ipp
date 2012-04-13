@@ -72,7 +72,6 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	SectionArea = 0, Height=0, Vtotale=0;
 	vtk_infinite_vertices=0, vtk_infinite_cells=0;
 	VISCOSITY = 1;
-	compressible = false;
 	fluidBulkModulus = 0;
 	tess_based_force = true;
 	for (int i=0;i<6;i++) boundsIds[i] = 0;
@@ -85,6 +84,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	meanK_LIMIT = true;
 	meanK_STAT = false; K_opt_factor=0;
 	noCache=true;
+	pressureChanged=false;
 	computeAllCells=true;//might be turned false IF the code is reorganized (we can make a separate function to compute unitForceVectors outside Compute_Permeability) AND it really matters for CPU time
 	DEBUG_OUT = false;
 	RAVERAGE = false; /** use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
@@ -400,16 +400,16 @@ vector<Real> FlowBoundingSphere<Tesselation>::Average_Fluid_Velocity_On_Sphere(u
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::MeasurePorePressure (double X, double Y, double Z)
 {
-//   RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation(); // produit erreur segmentation si appele a la premiere iteration
-  RTriangulation& Tri = T[currentTes].Triangulation();
-  Cell_handle cell = Tri.locate(Point(X,Y,Z));
-  return cell->info().p();
+	if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+	Cell_handle cell = Tri.locate(Point(X,Y,Z));
+	return cell->info().p();
 }
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, double Wall_down_y)
 {  
-//   	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation(); // produit erreur segmentation si appele a la premiere iteration
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	if (noCache && T[!currentTes].Max_id()<=0) return;//the engine never solved anything
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Cell_handle permeameter;
 	std::ofstream capture ("Pressure_profile", std::ios::app);
         int intervals = 5;
@@ -421,8 +421,6 @@ void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, d
 	double Y = 0;
 	double pressure = 0.f;
 	int cell=0;
-// 	for (double Y=min(y_min,y_max); Y<=max(y_min,y_max); Y=Y+abs(Ry)) {cell=0; pressure=0.f;
-// 	for (double Y=Wall_down_y;Y<=Wall_up_y;Y+=Ry) {cell=0; pressure=0.f;
 	for (int i=0; i<captures; i++){
         for (double Z=min(z_min,z_max); Z<=max(z_min,z_max); Z+=abs(Rz)) {
 		permeameter = Tri.locate(Point(X, Y, Z));
@@ -1031,9 +1029,8 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 {
-        RTriangulation& Tri = T[currentTes].Triangulation();
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
-
+//         RTriangulation& Tri = T[currentTes].Triangulation();
+//         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		if (id<0) continue;
@@ -1047,6 +1044,7 @@ void FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
         for (unsigned int n=0; n<imposedP.size();n++) {
 		IPCells[n]->info().p()=imposedP[n].second;
 		IPCells[n]->info().Pcondition=true;}
+	pressureChanged=false;
 }
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
@@ -1054,7 +1052,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 
 // 	std::ofstream iter("Gauss_Iterations", std::ios::app);
 // 	std::ofstream p_av("P_moyenne", std::ios::app);
-
+	if (pressureChanged) reApplyBoundaryConditions();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int j = 0;
 	double m, n, dp_max, p_max, sum_p, p_moy, dp_moy, dp, sum_dp;
@@ -1064,6 +1062,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 	double tolerance = TOLERANCE;
 	double relax = RELAX;
 	const int num_threads=1;
+	bool compressible= fluidBulkModulus>0;
 #ifdef GS_OPEN_MP
 	omp_set_num_threads(num_threads);
 #endif

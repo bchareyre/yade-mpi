@@ -68,6 +68,8 @@ class FlowEngine : public PartialEngine
 		template<class Solver>
 		void BoundaryConditions(Solver& flow);
 		template<class Solver>
+		void updateBCs(Solver& flow);
+		template<class Solver>
 		void imposeFlux(Vector3r pos, Real flux,Solver& flow);
 		template<class Solver>
 		unsigned int imposePressure(Vector3r pos, Real p,Solver& flow);
@@ -100,6 +102,7 @@ class FlowEngine : public PartialEngine
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
+		void 		_updateBCs() {updateBCs(solver);}
 		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
 
 		virtual ~FlowEngine();
@@ -196,6 +199,7 @@ class FlowEngine : public PartialEngine
 					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
 					.def("MeasureTotalAveragedPressure",&FlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume")
+					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 					)
 		DECLARE_LOGGER;
 };
