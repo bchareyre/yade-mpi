@@ -46,8 +46,8 @@ class PeriTriaxController: public BoundaryController{
 	public:
 		virtual void action();
 		void strainStressStiffUpdate();
-	YADE_CLASS_BASE_DOC_ATTRS(PeriTriaxController,BoundaryController,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
-		((bool,reversedForces,false,,"For some constitutive laws (practicaly all laws based on ScGeom), normalForce and shearForce on interactions are in the reverse sense and this flag must be true (mandatory). see `bugreport <https://bugs.launchpad.net/yade/+bug/493102>`_"))
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(PeriTriaxController,BoundaryController,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
+		((bool,useDem3Dof,false,,"For some constitutive laws (practicaly all laws based on Dem3Dof), normalForce and shearForce on interactions are in the reverse sense and this flag must be true. See this `message <https://lists.launchpad.net/yade-dev/msg07455.html>`_."))
 		((bool,dynCell,false,,"Imposed stress can be controlled using the packing stiffness or by applying the laws of dynamic (dynCell=true). Don't forget to assign a :yref:`mass<PeriTriaxController.mass>` to the cell."))
 		((Vector3r,goal,Vector3r::Zero(),,"Desired stress or strain values (depending on stressMask), strains defined as ``strain(i)=log(Fii)``.\n\n.. warning:: Strains are relative to the :yref:`O.cell.refSize<Cell.refSize>` (reference cell size), not the current one (e.g. at the moment when the new strain value is set)."))
 		((int,stressMask,((void)"all strains",0),,"mask determining strain/stress (0/1) meaning for goal components"))
@@ -69,6 +69,9 @@ class PeriTriaxController: public BoundaryController{
 		((Real,mass,NaN,,"mass of the cell (user set); if not set and :yref:`dynCell<PeriTriaxController.dynCell>` is used, it will be computed as sum of masses of all particles."))
 		((Real,externalWork,0,,"Work input from boundary controller."))
 		((int,velGradWorkIx,-1,(Attr::hidden|Attr::noSave),"Index for work done by velocity gradient, if tracking energy"))
+		,//Deprecated
+		((reversedForces,useDem3Dof,"no need to reverse force any more, unless you are using Dem3Dof laws - in that case set the flag true. See this `message <https://lists.launchpad.net/yade-dev/msg07455.html>`_."))
+		,,,
 	);
 	DECLARE_LOGGER;
 };

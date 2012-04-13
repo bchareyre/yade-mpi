@@ -111,7 +111,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
 		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->geom.get() );
 		//Contact force
-		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );
+		Vector3r f= ( useDem3Dof?1.:-1. ) * ( nsi->normalForce+nsi->shearForce );
 		Vector3r branch=Body::byId(I->getId2(),scene)->state->pos + scene->cell->hSize*I->cellDist.cast<Real>() -Body::byId(I->getId1(),scene)->state->pos;
 		stressTensor+=f*branch.transpose();
 		if( !dynCell ){
