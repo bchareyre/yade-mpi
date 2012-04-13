@@ -389,7 +389,6 @@ extensions = [
 		'matplotlib.sphinxext.plot_directive',
 		'matplotlib.sphinxext.only_directives',
 		#'matplotlib.sphinxext.mathmpl',
-		'ipython_directive012',
 		'ipython_console_highlighting',
 		'youtube',
 		'sphinx.ext.todo',
