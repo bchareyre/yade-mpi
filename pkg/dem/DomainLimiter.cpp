@@ -222,7 +222,7 @@ void LawTester::action(){
 	int nPathT=_pathT.size();
 	for(int i=1; i<nPathT; i++){
 		// i-th point on _pathT is (i-1)th on path; run corresponding hook, if it exists
-		if(step==_pathT[i] && hooks.size()>(i-1) && !hooks[i-1].empty()) pyRunString(hooks[i-1]);
+		if(step==_pathT[i] && ((int) hooks.size())>(i-1) && !hooks[i-1].empty()) pyRunString(hooks[i-1]);
 	}
 	step++;
 }
