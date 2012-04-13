@@ -92,7 +92,7 @@ opts.AddVariables(
 	BoolVariable('gprof','Enable profiling information for gprof',0),
 	('optimize','Turn on optimizations (-1, 0 or 1); with negative value (-1) optimization is based on debugging: not optimize with debugging (debug=True <=> optimize=False) and vice versa. With positive values optimization is performed (case of 1) or not (0) independent of debugging',-1,None,int),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk,qt4',names=['opengl','log4cxx','cgal','openmp','gts','vtk','gl2ps','qt4','sphere-padder','never_use_this_one','subdomains']),
+	ListVariable('features','Optional features that are turned on','opengl,gts,openmp,vtk,qt4',names=['opengl','log4cxx','cgal','openmp','gts','vtk','gl2ps','qt4','sphere-padder','never_use_this_one','subdomains']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -366,8 +366,7 @@ if not env.GetOption('clean'):
 		env.Append(CPPDEFINES='PYGTS_HAS_NUMPY')
 		if not ok: featureNotOK('gts')
 	if 'log4cxx' in env['features']:
-		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
-		if not ok: featureNotOK('log4cxx')
+		print "log4cxx support was removed. Please, do not use this feature."
 	if 'gl2ps' in env['features']:
 		ok=conf.CheckLibWithHeader('gl2ps','gl2ps.h','c','gl2psEndPage();',autoadd=1)
 		if not ok: featureNotOK('gl2ps')

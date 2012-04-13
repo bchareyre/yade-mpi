@@ -10,8 +10,6 @@ Traceback (most recent call last):
 RuntimeError: FACET_TOPO was not enabled in Facet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.
 """
 
-import yade.log
-yade.log.setLevel('FacetTopologyAnalyzer',yade.log.TRACE)
 
 # Note: FacetTopologyAnalyzer is normally run as an initializer;
 # it is only for testing sake that it is in O.engines here.

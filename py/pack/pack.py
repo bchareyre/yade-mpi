@@ -459,7 +459,6 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 			upperCorner=fullDim,
 			## no need to touch any the following
 			noFiles=True,lowerCorner=[0,0,0],sigmaIsoCompaction=1e7,sigmaLateralConfinement=1e3,StabilityCriterion=.05,strainRate=.2,thickness=-1,maxWallVelocity=.1,wallOversizeFactor=1.5,autoUnload=True,autoCompressionActivation=False).load()
-		log.setLevel('TriaxialCompressionEngine',log.WARN)
 		O.run(); O.wait()
 		sp=SpherePack(); sp.fromSimulation()
 	O.switchScene() ### !!

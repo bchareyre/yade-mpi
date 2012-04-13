@@ -64,10 +64,6 @@ namespace py = boost::python;
 
 #include<yade/extra/boost_python_len.hpp>
 
-#ifdef YADE_LOG4CXX
-	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
-#endif
-
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
 However, it will not skip removed bodies automatically, hence this iterator which does just that.

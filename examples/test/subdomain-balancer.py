@@ -1,6 +1,4 @@
-from yade import pack,log,timing,utils
-log.setLevel("SubdomainBalancer",log.INFO)
-#log.setLevel("BodyContainer",log.TRACE)
+from yade import pack,timing,utils
 utils.readParamsFromTable(noTableOk=True,num=12000)
 import yade.params.table
 sp=pack.SpherePack()

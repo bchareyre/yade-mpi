@@ -90,9 +90,7 @@ qt.View()
 
 #---- Compression ----
 O.engines = O.engines+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=(),targetSigma=40000.0,LOG=False)]
-#from yade import log
-#log.setLevel("KinemCTDEngine",log.TRACE)
-#log.setLevel('',log.TRACE)
+
 O.dt=.4*utils.PWaveTimeStep()
 print ''
 print 'Be patient, running in progress (the shear box is being compressed)'

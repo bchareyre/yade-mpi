@@ -3,9 +3,8 @@ A few spheres falling down in gravity field and one moving accross.
 Includes a clump.
 """
 
-from yade import log,timing
+from yade import timing
 
-#log.setLevel("InsertionSortCollider",log.DEBUG)
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()],label='collider'),

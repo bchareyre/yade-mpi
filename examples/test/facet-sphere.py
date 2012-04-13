@@ -29,8 +29,6 @@ O.dt=utils.PWaveTimeStep()
 O.run()
 O.saveTmp('init')
 
-from yade import log
-#log.setLevel("Ig2_Facet_Sphere_Dem3DofGeom",log.TRACE)
 if 0:
 	from yade import qt
 	renderer=qt.Renderer()

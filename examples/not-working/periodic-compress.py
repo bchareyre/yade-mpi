@@ -25,7 +25,7 @@ p.makeCloud(Vector3(0,0,0),Vector3(20,20,10),1,.5,700,True)
 for sph in p:
 	O.bodies.append(utils.sphere(sph[0],sph[1]))
 
-log.setLevel("PeriIsoCompressor",log.DEBUG)
+
 O.timingEnabled=True
 O.engines=[
 	ForceResetter(),

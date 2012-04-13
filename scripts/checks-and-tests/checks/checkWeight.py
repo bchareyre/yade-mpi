@@ -3,7 +3,7 @@
 # Several spheres falling down into the box.
 # Their weight is measured and compares with real mass particles
 
-from yade import utils,pack,log,export,geom
+from yade import utils,pack,export,geom
 
 tc=0.001
 en=.003

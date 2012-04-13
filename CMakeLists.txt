@@ -75,7 +75,7 @@ SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 
 #"OPENMP" 
-FOREACH(FEAT "OPENGL" "VTK" "LOG4CXX" "GTS" "CGAL")
+FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
 	if("${FEAT}_FOUND")
 		add_definitions(-DYADE_${FEAT})
 		message("Feature ${FEAT} enabled")

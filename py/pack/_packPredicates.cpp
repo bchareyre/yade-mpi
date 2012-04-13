@@ -7,9 +7,6 @@
 
 namespace py=boost::python;
 using namespace std;
-#ifdef YADE_LOG4CXX
-	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.pack.predicates");
-#endif
 
 /*
 This file contains various predicates that say whether a given point is within the solid,

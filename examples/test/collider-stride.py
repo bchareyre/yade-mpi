@@ -22,7 +22,7 @@ O.engines=[
 	NewtonIntegrator(damping=0,gravity=[0,0,-100])
 ]
 
-from yade import timing,qt,log
+from yade import timing,qt
 try:
 	renderer=qt.Renderer()
 	#renderer['Body_bounding_volume']=True
@@ -30,6 +30,5 @@ try:
 except ImportError: pass
 
 O.timingEnabled=True
-#log.setLevel('InsertionSortCollider',log.DEBUG)
 O.saveTmp()
 O.step()

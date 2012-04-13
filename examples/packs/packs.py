@@ -109,8 +109,6 @@ try:
 	qt.View()
 except ImportError: pass
 
-#log.setLevel('SubdomainBalancer',log.TRACE)
-
 O.engines=[
 	#SubdomainBalancer(colorize=True,initRun=True,iterPeriod=100),
 	ForceResetter(),

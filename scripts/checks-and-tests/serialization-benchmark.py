@@ -2,8 +2,6 @@ import time
 # change this line to load your reference simulation
 O.load2('ref.boost.bin.gz')
 base='~sim~'
-from yade import log
-log.setLevel('Omega',log.WARN)
 
 # http://blogmag.net/blog/read/38/Print_human_readable_file_size
 def sizeof_fmt(num):

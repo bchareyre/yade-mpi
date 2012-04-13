@@ -87,8 +87,6 @@ ax1=(axis+1)%3
 ax2=(axis+2)%3
 O.dt=dtSafety*utils.PWaveTimeStep()
 
-import yade.log
-#yade.log.setLevel('PeriTriaxController',yade.log.TRACE)
 import yade.plot as yp
 
 O.engines=[

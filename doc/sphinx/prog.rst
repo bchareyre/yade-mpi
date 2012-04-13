@@ -48,7 +48,7 @@ There is a number of configuration parameters; you can list all of them by ``sco
 	only show brief notices about what is being done rather than full command-lines during compilation
 ``linkStrategy`` [monolithic]
 	whether to link all plugins in one shared library (``monolithic``) or in one file per plugin (``per-class``); the first option is faster for overall builds, while the latter one makes recompilation of only part of Yade faster; granularity of monolithic build can be changed with the ``chunkSize`` parameter, which determines how many files are compiled at once.
-``features`` [log4cxx,opengl,gts,openmp]
+``features`` [opengl,gts,openmp]
 	optional comma-separated features to build with (details below; each defines macro ``YADE_\$FEATURE``; available as lowercased list ``yade.config.features`` at runtime
 
 
@@ -76,8 +76,6 @@ Optional libraries (features)
 
 The `features` parameter controls optional functionality. Each enabled feature defines preprocessor macro `YADE_FEATURE` (name uppercased) to enable selective exclude/include of parts of code. Code of which compilation depends on a particular features should use ``#ifdef YADE_FEATURE`` constructs to exclude dependent parts.
 
-log4cxx (YADE_LOG4CXX)
-	Enable flexible logging system (`log4cxx <http://log4cxx.apache.org>`__), which permits to assign logging levels on per-class basis; doesn't change API, only redefines `LOG_INFO` and other macros accordingly; see :ref:`log4cxx` for details.
 opengl (YADE_OPENGL)
 	Enable 3d rendering as well as the Qt3-based graphical user interface (in addition to python console).
 vtk (YADE_VTK)
@@ -90,9 +88,6 @@ cgal (YADE_CGAL)
 	Enable functionality provided by Computation Geometry Algorithms Library (`cgal <http://www.cgal.org>`__); triangulation code in :yref:`MicroMacroAnalyser` and :yref:`PersistentTriangulationCollider` ses its routines.
 other
 	There might be more features added in the future. Always refer to ``scons -h`` output for possible values.
-
-.. warning:: 
-	Due to a long-standing `bug <http://issues.apache.org/jira/browse/LOGCXX-322>`_ in log4cxx, using log4cxx will make yade crash at every exit. We work-around this partially by disabling the crash handler for regular exits, but process exit status will still be non-zero. The batch system (:ref:`yade-multi`) detects successful runs by looking at magic line "Yade: normal exit." in the process' standard output.
 
 
 Before compilation, SCons will check for presence of libraries required by their respective features [#features]_. Failure will occur if a respective library isn't found. To find out what went wrong, you can inspect ``../build-\$SUFFIX/config.log`` file; it contains exact commands and their output for all performed checks.

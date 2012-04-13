@@ -1,5 +1,4 @@
-from yade import log,utils,pack,timing
-#log.setLevel('FlatGridCollider',log.TRACE)
+from yade import utils,pack,timing
 #O.bodies.append([	utils.sphere((0.2,0,0),.5,fixed=True), utils.sphere((0.2,0.0,1.01),.5), ])
 O.bodies.append(pack.regularHexa(pack.inAlignedBox((0,0,0),(10,10,1)),radius=.5,gap=0,fixed=True))
 O.bodies.append(pack.regularOrtho(pack.inAlignedBox((3,3,3),(7,7,4)),radius=.05,gap=0))
