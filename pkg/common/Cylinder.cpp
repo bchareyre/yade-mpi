@@ -28,9 +28,9 @@ unsigned int ChainedState::currentChain=0;
 
 //!Sphere-cylinder or cylinder-cylinder not implemented yet, see Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D and test/chained-cylinder-spring.py
 bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
-							const shared_ptr<Shape>& cm2,
-							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
-							const shared_ptr<Interaction>& c)
+						const shared_ptr<Shape>& cm2,
+						const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
+						const shared_ptr<Interaction>& c)
 {
 	const State* sphereSt=YADE_CAST<const State*>(&state1);
 	const ChainedState* cylinderSt=YADE_CAST<const ChainedState*>(&state2);
@@ -39,88 +39,114 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	assert(sphereSt && cylinderSt && cylinder && sphere);
 	bool isLast = (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1));
 	bool isNew = !c->geom;
-
-	shared_ptr<const ChainedState> statePrev;
-	if (cylinderSt->rank>0)
-		statePrev = YADE_PTR_CAST<const ChainedState> (Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene)->state);
-
 	shared_ptr<CylScGeom> scm;
 	if (!isNew) {scm=YADE_PTR_CAST<CylScGeom>(c->geom);}
-
+	
+	bool betweenTwoCylinders = false;//defines whether the sphere's center is moving between two cylinders who have an angle>180°
+	Vector3r segment, branch, direction;//informations about the current cylinder
+	Real length, dist;
+	shared_ptr<const ChainedState> statePrev;
+	Vector3r segmentPrev=Vector3r(0,0,0),directionPrev=Vector3r(0,0,0),branchPrev=Vector3r(0,0,0);
+	Real lengthPrev=0,distPrev=0;
+	if (cylinderSt->rank>0){//informations about the previous cylinder
+		statePrev = YADE_PTR_CAST<const ChainedState> (Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene)->state);
+		segmentPrev = cylinderSt->pos-statePrev->pos;
+		lengthPrev = segmentPrev.norm();
+		directionPrev = segmentPrev/lengthPrev;
+		branchPrev = sphereSt->pos-statePrev->pos;
+		distPrev = directionPrev.dot(branchPrev);
+	}
 	//FIXME : definition of segment in next line breaks periodicity
 	shared_ptr<Body> cylinderNext;
-	Vector3r segment, branch, direction;
-	Real length, dist;
 	branch = sphereSt->pos-cylinderSt->pos-shift2;
-	if (!isLast) {
-		cylinderNext = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene);
-		segment = cylinderNext->state->pos-cylinderSt->pos;
-		if (segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/)) {//position _after_ end of cylinder
-			//FIXME : scm->penetrationDepth=-1 is defined to workaround interactions never being erased when scm->isDuplicate=2 on the true interaction.
-			if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
-		length = segment.norm();
-		direction = segment/length;
-		dist = direction.dot(branch);
-		if (dist<-interactionDetectionFactor*cylinder->radius &&
-			branch.squaredNorm() > pow(interactionDetectionFactor*(sphere->radius+cylinder->radius),2)) {
-				if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
-	} else {//handle the last node with length=0
+	if (isLast){//handle the last node with length=0
 		segment = Vector3r(0,0,0);
 		length = 0;
 		direction = Vector3r(0,1,0);
-		dist = 0;
-		if (branch.squaredNorm() > interactionDetectionFactor*(sphere->radius+cylinder->radius)) {
-			if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
+		dist = directionPrev.dot(branch);
+		if (dist<0) {
+			if (isNew) return false;
+			else if (scm->isDuplicate) {
+				 scm->isDuplicate=2;
+				 scm->penetrationDepth=-1;
+				 return true;
+			}
+		}
+	}
+	else {
+		cylinderNext = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene);
+		segment = cylinderNext->state->pos-cylinderSt->pos;
+		length = segment.norm();
+		direction = segment/length;
+		dist = direction.dot(branch);
+		if(cylinderSt->rank>0){
+			if(distPrev>lengthPrev && dist<0){//the sphere is touching two cylinder who have an angle>180°
+				betweenTwoCylinders = true;
+			}
+		}
+		if (!betweenTwoCylinders && (cylinderSt->rank>0 or dist>0)) {			
+			if ( segment.dot(branch) >= segment.dot(segment) or dist<0) {//position after or before the cylinder
+			//FIXME : scm->penetrationDepth=-1 is defined to workaround interactions never being erased when scm->isDuplicate=2 on the true interaction.
+				if (isNew) return false;
+				else if (scm->isDuplicate) {
+					scm->isDuplicate=2;
+					scm->penetrationDepth=-1;
+					return true;
+				}
+			}
+		}
 	}
 
 	//Check sphere-cylinder distance
 	Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
 	branch = projectedP-sphereSt->pos;
-	if (branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) {
-		if (isNew) return false; else if (scm->isDuplicate) {scm->isDuplicate=2; scm->penetrationDepth=-1; return true;}}
-
-	if (!isNew) scm->isDuplicate = false;//reset here at each step, and recompute below
-
-	//make sure there is no contact with the previous element in the chain, else consider this one a duplicate and get data from the other contact. two interactions will share the same geometry and physics.
-	if (cylinderSt->rank>0 && dist<=0) {
-		Vector3r branchP = sphereSt->pos - statePrev->pos;
-		Vector3r segmentP = cylinderSt->pos - statePrev->pos;
-		if (segmentP.dot(branchP)<segmentP.dot(segmentP)) {
-			if (isNew) {
-				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1]);
-				assert(intr);//we know there is a contact, so there should be at least a virtual interaction created by collider
-				if (!intr->geom || !intr->phys) return false;
-				else {
-					c->geom = intr->geom;
-					c->phys = intr->phys;
-					scm=YADE_PTR_CAST<CylScGeom>(c->geom);
-// 					scm->duplicate = intr;
-					scm->isDuplicate = true;
-					scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
-					isNew = false;
-					return true;}
-			} else scm->isDuplicate=true;
-			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
+	if(isLast || (cylinderSt->rank==0 && dist<0)){branch = cylinderSt->pos - sphereSt->pos;}
+	if (branch.norm() > sphere->radius+cylinder->radius) {
+		if (isNew) return false;
+		else if (scm->isDuplicate){
+			scm->isDuplicate=2;
+			scm->penetrationDepth=-1;
+			return true;
 		}
 	}
+	
+	if (!isNew) scm->isDuplicate = false;//reset here at each step, and recompute below
+	//if there is a contact with the previous element in the chain, consider this one a duplicate and push data to the new contact. Two interactions will share the same geometry and physics during a timestep.
+	if (!betweenTwoCylinders && cylinderSt->rank>0 && dist<0) {
+		if (!isNew) {
+			cout<<"New contact with the previous element"<<endl;
+			const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1]);
+			if(!intr) {cout<<"Skipping contact because collider didn't found the previous cylinder"<<endl;return false;}
+			//we know there is a contact, so there should be at least a virtual interaction created by collider
+			cout<<intr->id1<<"  "<<intr->id2<<endl;
+			intr->geom = c->geom;
+			intr->phys = c->phys;
+			scm=YADE_PTR_CAST<CylScGeom>(c->geom);
+			scm->isDuplicate = 2;
+			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
+			isNew = false;
+			return true;
+		} else scm->isDuplicate=true;
+		scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
+	}
 	//similarly, make sure there is no contact with the next element in the chain
-	else if (!isLast && dist>length) {
-		if ( (cylinderNext->state->pos-sphereSt->pos).squaredNorm() <  pow(sphere->radius+cylinder->radius,2)) {
-			if (isNew) {
-				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]);
-				assert(intr);
-				if (!intr->geom || !intr->phys) return false;
-				c->geom = intr->geom;
-				c->phys = intr->phys;
-				scm=YADE_PTR_CAST<CylScGeom>(c->geom);
-// 				scm->duplicate = intr;
-				scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
-				scm->isDuplicate = true;
-				isNew = false;
-				return true;
-			} else scm->isDuplicate=true;
+	//else if (!isLast && dist>length) {
+	if (!betweenTwoCylinders && !isLast && dist>=length) {
+		if (!isNew) {
+			cerr<<"New contact with the next element"<<endl;
+			const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]);
+			if(!intr) {cout<<"Skipping contact because collider didn't found the next cylinder."<<endl;return false;}
+			cout<<intr->id1<<"  "<<intr->id2<<endl;
+			cout<<"Switch params"<<endl;
+			intr->geom = c->geom;
+			intr->phys = c->phys;
+			scm=YADE_PTR_CAST<CylScGeom>(c->geom);
+			scm->isDuplicate = 2;
 			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
-		}
+			isNew = false;
+			return true;
+		} else scm->isDuplicate=true;
+		scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
 	}
 
 	//We didn't find any special case, do normal geometry definition
@@ -132,7 +158,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom::go(	const shared_ptr<Shape>& cm1,
 	scm->start=cylinderSt->pos+shift2; scm->end=scm->start+segment;
 
 	//FIXME : there should be other checks without distanceFactor?
-	if (dist<=0) {//We have sphere-node contact
+	if (dist<=0 || isLast) {//We have sphere-node contact
 		Vector3r normal=(cylinderSt->pos+shift2)-sphereSt->pos;
 		Real norm=normal.norm();
 		normal /=norm;
@@ -184,170 +210,165 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom6D::go(	const shared_ptr<Shape>& cm1,
         const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
         const shared_ptr<Interaction>& c)
 {
-    const State* sphereSt=YADE_CAST<const State*>(&state1);
-    const ChainedState* cylinderSt=YADE_CAST<const ChainedState*>(&state2);
-    ChainedCylinder *cylinder=YADE_CAST<ChainedCylinder*>(cm2.get());
-    Sphere *sphere=YADE_CAST<Sphere*>(cm1.get());
-    assert(sphereSt && cylinderSt && cylinder && sphere);
-    bool isLast = (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1));
-    bool isNew = !c->geom;
+	const State* sphereSt=YADE_CAST<const State*>(&state1);
+	const ChainedState* cylinderSt=YADE_CAST<const ChainedState*>(&state2);
+	ChainedCylinder *cylinder=YADE_CAST<ChainedCylinder*>(cm2.get());
+	Sphere *sphere=YADE_CAST<Sphere*>(cm1.get());
+	assert(sphereSt && cylinderSt && cylinder && sphere);
+	bool isLast = (cylinderSt->chains[cylinderSt->chainNumber].size()==(cylinderSt->rank+1));
+	bool isNew = !c->geom;
+	shared_ptr<CylScGeom6D> scm;
+	if (!isNew) {scm=YADE_PTR_CAST<CylScGeom6D>(c->geom);}
+	
+	bool betweenTwoCylinders = false;//defines whether the sphere's center is moving between two cylinders who have an angle>180°
+	Vector3r segment, branch, direction;//informations about the current cylinder
+	Real length, dist;
+	shared_ptr<const ChainedState> statePrev;
+	Vector3r segmentPrev=Vector3r(0,0,0),directionPrev=Vector3r(0,0,0),branchPrev=Vector3r(0,0,0);
+	Real lengthPrev=0,distPrev=0;
+	if (cylinderSt->rank>0){//informations about the previous cylinder
+		statePrev = YADE_PTR_CAST<const ChainedState> (Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene)->state);
+		segmentPrev = cylinderSt->pos-statePrev->pos;
+		lengthPrev = segmentPrev.norm();
+		directionPrev = segmentPrev/lengthPrev;
+		branchPrev = sphereSt->pos-statePrev->pos;
+		distPrev = directionPrev.dot(branchPrev);
+	}
+	//FIXME : definition of segment in next line breaks periodicity
+	shared_ptr<Body> cylinderNext;
+	branch = sphereSt->pos-cylinderSt->pos-shift2;
+	if (isLast){//handle the last node with length=0
+		segment = Vector3r(0,0,0);
+		length = 0;
+		direction = Vector3r(0,1,0);
+		dist = directionPrev.dot(branch);
+		if (dist<0) {
+			if (isNew) return false;
+			else if (scm->isDuplicate) {
+				 scm->isDuplicate=2;
+				 scm->penetrationDepth=-1;
+				 return true;
+			}
+		}
+	}
+	else {
+		cylinderNext = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene);
+		segment = cylinderNext->state->pos-cylinderSt->pos;
+		length = segment.norm();
+		direction = segment/length;
+		dist = direction.dot(branch);
+		if(cylinderSt->rank>0){
+			if(distPrev>lengthPrev && dist<0){//the sphere is touching two cylinder who have an angle>180°
+				betweenTwoCylinders = true;
+			}
+		}
+		if (!betweenTwoCylinders && (cylinderSt->rank>0 or dist>0)) {			
+			if ( segment.dot(branch) >= segment.dot(segment) or dist<0) {//position after or before the cylinder
+			//FIXME : scm->penetrationDepth=-1 is defined to workaround interactions never being erased when scm->isDuplicate=2 on the true interaction.
+				if (isNew) return false;
+				else if (scm->isDuplicate) {
+					scm->isDuplicate=2;
+					scm->penetrationDepth=-1;
+					return true;
+				}
+			}
+		}
+	}
 
-    shared_ptr<const ChainedState> statePrev;
-    if (cylinderSt->rank>0)
-        statePrev = YADE_PTR_CAST<const ChainedState> (Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1],scene)->state);
+	//Check sphere-cylinder distance
+	Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
+	branch = projectedP-sphereSt->pos;
+	if(isLast || (cylinderSt->rank==0 && dist<0)){branch = cylinderSt->pos - sphereSt->pos;}
+	if (branch.norm() > sphere->radius+cylinder->radius) {
+		if (isNew) return false;
+		else if (scm->isDuplicate){
+			scm->isDuplicate=2;
+			scm->penetrationDepth=-1;
+			return true;
+		}
+	}
+	
+	if (!isNew) scm->isDuplicate = false;//reset here at each step, and recompute below
+	//if there is a contact with the previous element in the chain, consider this one a duplicate and push data to the new contact. Two interactions will share the same geometry and physics during a timestep.
+	if (!betweenTwoCylinders && cylinderSt->rank>0 && dist<0) {
+		if (!isNew) {
+			cout<<"New contact with the previous element"<<endl;
+			const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1]);
+			if(!intr) {cout<<"Skipping contact because collider didn't found the previous cylinder"<<endl;return false;}
+			//we know there is a contact, so there should be at least a virtual interaction created by collider
+			cout<<intr->id1<<"  "<<intr->id2<<endl;
+			intr->geom = c->geom;
+			intr->phys = c->phys;
+			scm=YADE_PTR_CAST<CylScGeom6D>(c->geom);
+			scm->isDuplicate = 2;
+			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
+			isNew = false;
+			return true;
+		} else scm->isDuplicate=true;
+		scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
+	}
+	//similarly, make sure there is no contact with the next element in the chain
+	//else if (!isLast && dist>length) {
+	if (!betweenTwoCylinders && !isLast && dist>=length) {
+		if (!isNew) {
+			cerr<<"New contact with the next element"<<endl;
+			const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]);
+			if(!intr) {cout<<"Skipping contact because collider didn't found the next cylinder."<<endl;return false;}
+			cout<<intr->id1<<"  "<<intr->id2<<endl;
+			cout<<"Switch params"<<endl;
+			intr->geom = c->geom;
+			intr->phys = c->phys;
+			scm=YADE_PTR_CAST<CylScGeom6D>(c->geom);
+			scm->isDuplicate = 2;
+			scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+			isNew = false;
+			return true;
+		} else scm->isDuplicate=true;
+		scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+	}
 
-    shared_ptr<CylScGeom6D> scm;
-    if (!isNew) {
-        scm=YADE_PTR_CAST<CylScGeom6D>(c->geom);
-    }
+	//We didn't find any special case, do normal geometry definition
+	if (isNew) { scm=shared_ptr<CylScGeom6D>(new CylScGeom6D()); c->geom=scm;}
 
-    //FIXME : definition of segment in next line breaks periodicity
-    shared_ptr<Body> cylinderNext;
-    Vector3r segment, branch, direction;
-    Real length, dist;
-    branch = sphereSt->pos-cylinderSt->pos-shift2;
-    if (!isLast) {
-        cylinderNext = Body::byId(cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1],scene);
-        segment = cylinderNext->state->pos-cylinderSt->pos;
-        if (segment.dot(branch)>(segment.dot(segment)/*+interactionDetectionFactor*cylinder->radius*/)) {//position _after_ end of cylinder
-            //FIXME : scm->penetrationDepth=-1 is defined to workaround interactions never being erased when scm->isDuplicate=2 on the true interaction.
-            if (isNew) return false;
-            else if (scm->isDuplicate) {
-                scm->isDuplicate=2;
-                scm->penetrationDepth=-1;
-                return true;
-            }
-        }
-        length = segment.norm();
-        direction = segment/length;
-        dist = direction.dot(branch);
-        if (dist<-interactionDetectionFactor*cylinder->radius &&
-                branch.squaredNorm() > pow(interactionDetectionFactor*(sphere->radius+cylinder->radius),2)) {
-            if (isNew) return false;
-            else if (scm->isDuplicate) {
-                scm->isDuplicate=2;
-                scm->penetrationDepth=-1;
-                return true;
-            }
-        }
-    } else {//handle the last node with length=0
-        segment = Vector3r(0,0,0);
-        length = 0;
-        direction = Vector3r(0,1,0);
-        dist = 0;
-        if (branch.squaredNorm() > interactionDetectionFactor*(sphere->radius+cylinder->radius)) {
-            if (isNew) return false;
-            else if (scm->isDuplicate) {
-                scm->isDuplicate=2;
-                scm->penetrationDepth=-1;
-                return true;
-            }
-        }
-    }
+	scm->radius1=sphere->radius;
+	scm->radius2=cylinder->radius;
+	if (!isLast && !scm->id3) scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
+	scm->start=cylinderSt->pos+shift2; scm->end=scm->start+segment;
 
-    //Check sphere-cylinder distance
-    Vector3r projectedP = cylinderSt->pos+shift2 + direction*dist;
-    branch = projectedP-sphereSt->pos;
-    if (branch.squaredNorm()>(pow(sphere->radius+cylinder->radius,2))) {
-        if (isNew) return false;
-        else if (scm->isDuplicate) {
-            scm->isDuplicate=2;
-            scm->penetrationDepth=-1;
-            return true;
-        }
-    }
+	//FIXME : there should be other checks without distanceFactor?
+	if (dist<=0 || isLast) {//We have sphere-node contact
+		Vector3r normal=(cylinderSt->pos+shift2)-sphereSt->pos;
+		Real norm=normal.norm();
+		normal /=norm;
+		scm->relPos=0;
+		scm->onNode=true; scm->relPos=0;
+		scm->penetrationDepth=sphere->radius+cylinder->radius-norm;
+		scm->contactPoint=sphereSt->pos+(sphere->radius-0.5*scm->penetrationDepth)*normal;
+		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);//use sphere-sphere precompute (a node is a sphere)
+	} else {//we have sphere-cylinder contact
+		scm->onNode=false;
+		scm->relPos=dist/length;
+		Real norm=branch.norm();
+		Vector3r normal=branch/norm;
+		scm->penetrationDepth= sphere->radius+cylinder->radius-norm;
 
-    if (!isNew) scm->isDuplicate = false;//reset here at each step, and recompute below
+		// define a virtual sphere at the projected center
+		scm->fictiousState.pos = projectedP;
+		scm->fictiousState.vel = (1-scm->relPos)*cylinderSt->vel + scm->relPos*cylinderNext->state->vel;
+		scm->fictiousState.angVel =
+			((1-scm->relPos)*cylinderSt->angVel + scm->relPos*cylinderNext->state->angVel).dot(direction)*direction //twist part : interpolated
+			+ segment.cross(cylinderNext->state->vel - cylinderSt->vel);// non-twist part : defined from nodes velocities
 
-    //make sure there is no contact with the previous element in the chain, else consider this one a duplicate and get data from the other contact. two interactions will share the same geometry and physics.
-    if (cylinderSt->rank>0 && dist<=0) {
-        Vector3r branchP = sphereSt->pos - statePrev->pos;
-        Vector3r segmentP = cylinderSt->pos - statePrev->pos;
-        if (segmentP.dot(branchP)<segmentP.dot(segmentP)) {
-            if (isNew) {
-                const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1]);
-                assert(intr);//we know there is a contact, so there should be at least a virtual interaction created by collider
-                if (!intr->geom || !intr->phys) return false;
-                else {
-                    c->geom = intr->geom;
-                    c->phys = intr->phys;
-                    scm=YADE_PTR_CAST<CylScGeom6D>(c->geom);
-// 					scm->duplicate = intr;
-                    scm->isDuplicate = true;
-                    scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
-                    isNew = false;
-                    return true;
-                }
-            } else scm->isDuplicate=true;
-            scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank-1];
-        }
-    }
-    //similarly, make sure there is no contact with the next element in the chain
-    else if (!isLast && dist>length) {
-        if ( (cylinderNext->state->pos-sphereSt->pos).squaredNorm() <  pow(sphere->radius+cylinder->radius,2)) {
-            if (isNew) {
-                const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1]);
-                assert(intr);
-                if (!intr->geom || !intr->phys) return false;
-                c->geom = intr->geom;
-                c->phys = intr->phys;
-                scm=YADE_PTR_CAST<CylScGeom6D>(c->geom);
-// 				scm->duplicate = intr;
-                scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
-                scm->isDuplicate = true;
-                isNew = false;
-                return true;
-            } else scm->isDuplicate=true;
-            scm->trueInt = cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
-        }
-    }
-
-    //We didn't find any special case, do normal geometry definition
-    if (isNew) {
-        scm=shared_ptr<CylScGeom6D>(new CylScGeom6D());
-        c->geom=scm;
-    }
-
-    scm->radius1=sphere->radius;
-    scm->radius2=cylinder->radius;
-    if (!isLast && !scm->id3) scm->id3=cylinderSt->chains[cylinderSt->chainNumber][cylinderSt->rank+1];
-    scm->start=cylinderSt->pos+shift2;
-    scm->end=scm->start+segment;
-
-    //FIXME : there should be other checks without distanceFactor?
-    if (dist<=0) {//We have sphere-node contact
-        Vector3r normal=(cylinderSt->pos+shift2)-sphereSt->pos;
-        Real norm=normal.norm();
-        normal /=norm;
-        scm->relPos=0;
-        scm->onNode=true;
-        scm->relPos=0;
-        scm->penetrationDepth=sphere->radius+cylinder->radius-norm;
-        scm->contactPoint=sphereSt->pos+(sphere->radius-0.5*scm->penetrationDepth)*normal;
-        scm->precompute(state1,state2,scene,c,normal,isNew,shift2,true);//use sphere-sphere precompute (a node is a sphere)
-    } else {//we have sphere-cylinder contact
-        scm->onNode=false;
-        scm->relPos=dist/length;
-        Real norm=branch.norm();
-        Vector3r normal=branch/norm;
-        scm->penetrationDepth= sphere->radius+cylinder->radius-norm;
-
-        // define a virtual sphere at the projected center
-        scm->fictiousState.pos = projectedP;
-        scm->fictiousState.vel = (1-scm->relPos)*cylinderSt->vel + scm->relPos*cylinderNext->state->vel;
-        scm->fictiousState.angVel =
-            ((1-scm->relPos)*cylinderSt->angVel + scm->relPos*cylinderNext->state->angVel).dot(direction)*direction //twist part : interpolated
-            + segment.cross(cylinderNext->state->vel - cylinderSt->vel);// non-twist part : defined from nodes velocities
-
-        if (dist>length) {
-            scm->penetrationDepth=sphere->radius+cylinder->radius-(cylinderSt->pos+segment-sphereSt->pos).norm();
-            //FIXME : handle contact jump on next element
-        }
-        scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
-        scm->precompute(state1,scm->fictiousState,scene,c,branch/norm,isNew,shift2,true);//use sphere-sphere precompute (with a virtual sphere)
-    }
-    return true;
+		if (dist>length) {
+			scm->penetrationDepth=sphere->radius+cylinder->radius-(cylinderSt->pos+segment-sphereSt->pos).norm();
+			//FIXME : handle contact jump on next element
+		}
+		scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
+		scm->precompute(state1,scm->fictiousState,scene,c,branch/norm,isNew,shift2,true);//use sphere-sphere precompute (with a virtual sphere)
+	}
+	return true;
 }
+
 
 
 bool Ig2_Sphere_ChainedCylinder_CylScGeom6D::goReverse( const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
@@ -524,10 +545,9 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 		return;}
 	if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
-// 			cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) scene->interactions->requestErase(contact);
-// 			cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
-			return;}
+			cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
+			if (geom->isDuplicate==2) {cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;scene->interactions->requestErase(contact);}
+		return;}
 	}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
@@ -589,11 +609,12 @@ void Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
     if (contact->isFresh(scene)) shearForce   = Vector3r::Zero(); 			//contact nouveau => force tengentielle = 0,0,0
     Real un     = geom->penetrationDepth;				//un : interpenetration
     Real Fn    = currentContactPhysics->kn*(un-currentContactPhysics->unp);		//Fn : force normale
-    if (geom->isDuplicate && id2!=geom->trueInt) {
-//		cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-		scene->interactions->requestErase(contact);
+    if (geom->isDuplicate) {
+		if (id2!=geom->trueInt) {
+ 			cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
+			if (geom->isDuplicate==2) {cerr<<"erase duplicate coh "<<id1<<" "<<id2<<endl;scene->interactions->requestErase(contact);}
 		return;}
-    if (geom->isDuplicate==2){ scene->interactions->requestErase(contact);cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;return;}
+	}
 
     if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) {
         // BREAK due to tension
