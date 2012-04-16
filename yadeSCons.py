@@ -11,11 +11,19 @@ def getRealVersion():
 		try:
 			import git
 			repo = git.Repo(".git/")
-			head = repo.commits('master')[0]
-			rev = str(head)[:7]
-			dateP = head.authored_date
-			versionN = "%04d-%02d-%02d.git-%s" % (dateP.tm_year, dateP.tm_mon, dateP.tm_mday, rev)
-			return versionN
+			try:
+				head = repo.commits('master')[0]
+				rev = str(head)[:7]
+				dateP = head.authored_date
+				versionN = "%04d-%02d-%02d.git-%s" % (dateP.tm_year, dateP.tm_mon, dateP.tm_mday, rev)
+				return versionN
+			except AttributeError:
+				import datetime
+				head = repo.commit('master')
+				dateT = head.authored_date
+				dateP = datetime.date.fromtimestamp(dateT)
+				versionN = "%04d-%02d-%02d.git-%s" % (dateP.year, dateP.month, dateP.day, head.name_rev[:7])
+				return versionN
 		except ImportError:
 			print "\
 =====================\n\
