@@ -234,6 +234,7 @@ bool Ig2_Sphere_ChainedCylinder_CylScGeom6D::go(	const shared_ptr<Shape>& cm1,
 		branchPrev = sphereSt->pos-statePrev->pos;
 		distPrev = directionPrev.dot(branchPrev);
 	}
+	
 	//FIXME : definition of segment in next line breaks periodicity
 	shared_ptr<Body> cylinderNext;
 	branch = sphereSt->pos-cylinderSt->pos-shift2;
