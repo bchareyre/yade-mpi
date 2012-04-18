@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from yade import pack,log
+from yade import pack
 from utils import *
 ############################################
 ###   DEFINING VARIABLES AND MATERIALS   ###
