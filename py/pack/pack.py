@@ -397,8 +397,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 
 	:return: SpherePack object with spheres, filtered by the predicate.
 	"""
-	import sqlite3, os.path, cPickle, time, sys, _packPredicates
-	from yade import log
+	import sqlite3, os.path, cPickle, time, sys, _packPredicates, numpy
 	from math import pi
 	wantPeri=(spheresInCell>0)
 	if 'inGtsSurface' in dir(_packPredicates) and type(predicate)==inGtsSurface and useOBB:
@@ -459,7 +458,9 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 			upperCorner=fullDim,
 			## no need to touch any the following
 			noFiles=True,lowerCorner=[0,0,0],sigmaIsoCompaction=1e7,sigmaLateralConfinement=1e3,StabilityCriterion=.05,strainRate=.2,thickness=-1,maxWallVelocity=.1,wallOversizeFactor=1.5,autoUnload=True,autoCompressionActivation=False).load()
-		O.run(); O.wait()
+		while ( numpy.isnan(utils.unbalancedForce()) or utils.unbalancedForce()>0.01 ) :
+			O.run(10,True)
+		O.wait()
 		sp=SpherePack(); sp.fromSimulation()
 	O.switchScene() ### !!
 	_memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim)
