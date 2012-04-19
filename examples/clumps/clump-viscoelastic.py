@@ -1,19 +1,5 @@
 # -*- coding: utf-8
 
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-Running script clump-viscoelastic.py                                                                                                 
-Traceback (most recent call last):                                                                                                   
-  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
-    execfile(script,globals())                                                                                                       
-  File "clump-viscoelastic.py", line 28, in <module>                                                                                 
-    plnIds=O.bodies.append(pack.gtsSurface2Facets(plnSurf.faces(),material=facetMat,color=(0,1,0)))                                  
-  File "/home/me/YADE/YADE3041/lib/yade-bzr3041/py/yade/pack.py", line 179, in gtsSurface2Facets                                     
-    return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf.faces()]                                        
-AttributeError: 'tuple' object has no attribute 'faces'  
-"""
-
 from yade import utils,pack,export,qt
 import gts,os,random,itertools
 from numpy import *

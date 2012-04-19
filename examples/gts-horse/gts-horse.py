@@ -1,15 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # © 2009 Václav Šmilauer <eudoxos@arcig.cz>
-"""Script showing how to use GTS to import arbitrary triangulated surface,
-which can further be either filled with packing (if used as predicate) or converted
-to facets representing the surface."""
-
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-FATAL yade.Facet /home/me/YADE/yade/pkg/common/Facet.cpp:26 postLoad: Facet has coincident vertices 1 (0 0 0) and 2 (0 0 0)!
-"""
 
 from yade import pack
 import gts, os.path, locale

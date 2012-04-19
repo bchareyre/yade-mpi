@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from yade import pack,ymport,export,log,geom,bodiesHandling
+from yade import pack,ymport,export,geom,bodiesHandling
 import math
 
 """ This script demonstrates how to use 2 components of creating packings:
