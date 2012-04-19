@@ -1015,13 +1015,11 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
         IPCells.clear();
         for (unsigned int n=0; n<imposedP.size();n++) {
 		Cell_handle cell=Tri.locate(imposedP[n].first);
-		IPCells.push_back(cell);
 		//check redundancy
 		for (unsigned int kk=0;kk<IPCells.size();kk++){
 			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
 			else if  (cell->info().Pcondition) cerr<<"Imposed pressure fall in a boundary condition."<<endl;}
-// 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
-// 		assert(cell);
+		IPCells.push_back(cell);
 		cell->info().p()=imposedP[n].second;
 		cell->info().Pcondition=true;}
 }
@@ -1031,6 +1029,7 @@ void FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 {
 //         RTriangulation& Tri = T[currentTes].Triangulation();
 //         Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	if (!pressureChanged) return;
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		if (id<0) continue;
@@ -1052,7 +1051,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 
 // 	std::ofstream iter("Gauss_Iterations", std::ios::app);
 // 	std::ofstream p_av("P_moyenne", std::ios::app);
-	if (pressureChanged) reApplyBoundaryConditions();
+	reApplyBoundaryConditions();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int j = 0;
 	double m, n, dp_max, p_max, sum_p, p_moy, dp_moy, dp, sum_dp;

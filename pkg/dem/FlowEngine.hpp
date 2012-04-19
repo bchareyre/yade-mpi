@@ -254,6 +254,8 @@ class PeriodicFlowEngine : public FlowEngine
 		virtual ~PeriodicFlowEngine();
 
 		virtual void action();
+		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
+		void preparePShifts();
 		
 		//Instanciation of templates for python binding
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}

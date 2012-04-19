@@ -157,7 +157,7 @@ void FlowEngine::clearImposedPressure ( Solver& flow ) { flow->imposedP.clear();
 template<class Solver>
 Real FlowEngine::getFlux ( unsigned int cond,Solver& flow )
 {
-        if ( cond>=flow->imposedP.size() ) LOG_ERROR ( "Getting flux with cond higher than imposedP size." );
+        if ( cond>=flow->imposedP.size() ) {LOG_ERROR ( "Getting flux with cond higher than imposedP size." ); return 0;}
         double flux=0;
         Cell_handle& cell= flow->IPCells[cond];
         for ( int ngb=0;ngb<4;ngb++ ) {
@@ -582,21 +582,12 @@ YADE_PLUGIN ( ( FlowEngine ) );
 //___________________ PERIODIC VERSION _________________________
 //______________________________________________________________
 
-PeriodicFlowEngine::~PeriodicFlowEngine()
-{
-}
+PeriodicFlowEngine::~PeriodicFlowEngine(){}
 
 void PeriodicFlowEngine:: action()
 {
         if ( !isActivated ) return;
-        CGT::PeriodicCellInfo::gradP = makeCgVect ( gradP );
-        CGT::PeriodicCellInfo::hSize[0] = makeCgVect ( scene->cell->hSize.col ( 0 ) );
-        CGT::PeriodicCellInfo::hSize[1] = makeCgVect ( scene->cell->hSize.col ( 1 ) );
-        CGT::PeriodicCellInfo::hSize[2] = makeCgVect ( scene->cell->hSize.col ( 2 ) );
-        CGT::PeriodicCellInfo::deltaP=CGT::Vecteur (
-                                              CGT::PeriodicCellInfo::hSize[0]*CGT::PeriodicCellInfo::gradP,
-                                              CGT::PeriodicCellInfo::hSize[1]*CGT::PeriodicCellInfo::gradP,
-                                              CGT::PeriodicCellInfo::hSize[2]*CGT::PeriodicCellInfo::gradP );
+	preparePShifts();
 // 	timingDeltas->start();
 
         if ( first ) {Build_Triangulation ( P_zero ); Update_Triangulation = false;}
@@ -897,6 +888,18 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero )
         if ( WaveAction ) solver->ApplySinusoidalPressure ( solver->T[solver->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
         Initialize_volumes();
         if ( viscousShear ) solver->ComputeEdgesSurfaces();
+}
+
+void PeriodicFlowEngine::preparePShifts()
+{
+	CGT::PeriodicCellInfo::gradP = makeCgVect ( gradP );
+        CGT::PeriodicCellInfo::hSize[0] = makeCgVect ( scene->cell->hSize.col ( 0 ) );
+        CGT::PeriodicCellInfo::hSize[1] = makeCgVect ( scene->cell->hSize.col ( 1 ) );
+        CGT::PeriodicCellInfo::hSize[2] = makeCgVect ( scene->cell->hSize.col ( 2 ) );
+        CGT::PeriodicCellInfo::deltaP=CGT::Vecteur (
+                                              CGT::PeriodicCellInfo::hSize[0]*CGT::PeriodicCellInfo::gradP,
+                                              CGT::PeriodicCellInfo::hSize[1]*CGT::PeriodicCellInfo::gradP,
+                                              CGT::PeriodicCellInfo::hSize[2]*CGT::PeriodicCellInfo::gradP );
 }
 
 YADE_PLUGIN ( ( PeriodicFlowEngine ) );

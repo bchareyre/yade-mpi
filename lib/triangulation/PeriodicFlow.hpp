@@ -34,7 +34,7 @@ namespace CGT{
 		void ComputeFacetForcesWithCache();
 		void Compute_Permeability();
 		void Initialize_pressures( double P_zero );
-		void GaussSeidel();
+		void GaussSeidel(Real dt=0);
 		void DisplayStatistics();
 		void Average_Relative_Cell_Velocity();
 		void ComputeEdgesSurfaces();

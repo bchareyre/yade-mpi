@@ -368,7 +368,7 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
 		cell->info().Pcondition=true;}
 }
 
-void PeriodicFlow::GaussSeidel()
+void PeriodicFlow::GaussSeidel(Real dt)
 {
     RTriangulation& Tri = T[currentTes].Triangulation();
     int j = 0;
