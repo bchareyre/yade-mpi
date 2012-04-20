@@ -275,6 +275,10 @@ class PeriodicFlowEngine : public FlowEngine
 			Update_Triangulation=false;
 			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 			ReTrg=1;
+			first=true;
+			for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
+			normal[wall_bottom].y()=normal[wall_left].x()=normal[wall_back].z()=1;
+			normal[wall_top].y()=normal[wall_right].x()=normal[wall_front].z()=-1;
 			,
 			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")

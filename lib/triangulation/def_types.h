@@ -123,6 +123,7 @@ class FlowCellInfo : public SimpleCellInfo {
 		VolumeVariation=0;
 		pression=0;
 		invVoidV=0;
+		fict=0;
 	}	
 
 	double inv_sum_k;

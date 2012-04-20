@@ -45,6 +45,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool meanK_LIMIT, meanK_STAT, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
+		bool computedOnce;//flag for checking if current triangulation has been computed at least once
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
 		
 		//Handling imposed pressures on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point

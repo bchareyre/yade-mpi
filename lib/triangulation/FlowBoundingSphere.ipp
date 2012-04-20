@@ -92,6 +92,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 	areaR2Permeability=true;
 	permeability_map = false;
+	computedOnce=false;
 }
 
 template <class Tesselation> 
@@ -692,7 +693,7 @@ void FlowBoundingSphere<Tesselation>::Interpolate(Tesselation& Tes, Tesselation&
                 new_cell->info().p() = old_cell->info().p();
 // 		new_cell->info().dv() = old_cell->info().dv();
         }
-	Tes.Clear();
+// 	Tes.Clear();//Avoid segfault when getting pressure in scripts just after interpolation
 }
 
 Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2)
@@ -1187,13 +1188,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
         if (DEBUG_OUT) {cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;}
 // 	iter << j << " " << dp_max/p_max << endl;
-	int cel=0;
-	double Pav=0;
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		cel++;
-		Pav+=cell->info().p();
-	}
-	Pav/=cel;
+	computedOnce=true;
 }
 
 
