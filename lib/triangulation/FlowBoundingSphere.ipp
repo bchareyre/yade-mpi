@@ -1026,18 +1026,18 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
 }
 
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
+bool FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 {
 //         RTriangulation& Tri = T[currentTes].Triangulation();
 //         Finite_cells_iterator cell_end = Tri.finite_cells_end();
-	if (!pressureChanged) return;
+	if (!pressureChanged) return false;
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		if (id<0) continue;
                 Boundary& bi = boundary(id);
                 if (!bi.flowCondition) {
                         for (VCell_iterator it = boundingCells[bound].begin(); it != boundingCells[bound].end(); it++){
-				(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
+			(*it)->info().p() = bi.value; (*it)->info().Pcondition=true;
 			}
                 }
         }
@@ -1045,6 +1045,7 @@ void FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 		IPCells[n]->info().p()=imposedP[n].second;
 		IPCells[n]->info().Pcondition=true;}
 	pressureChanged=false;
+	return true;
 }
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)

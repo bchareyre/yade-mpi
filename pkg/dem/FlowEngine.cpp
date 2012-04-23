@@ -43,7 +43,7 @@ void FlowEngine::action()
         UpdateVolumes ( solver );
 
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( ( Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000 ) && retriangulationLastIter>10 ) {
+        if ( ( Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>PermuteInterval ) && retriangulationLastIter>10 ) {
                 Update_Triangulation = true;
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;
@@ -131,7 +131,10 @@ void FlowEngine::setImposedPressure ( unsigned int cond, Real p,Solver& flow )
 }
 
 template<class Solver>
-void FlowEngine::updateBCs ( Solver& flow ) { flow->pressureChanged=true; }
+void FlowEngine::updateBCs ( Solver& flow ) {
+	flow->pressureChanged=true;
+	if (flow->T[flow->currentTes].max_id>0) BoundaryConditions(flow);//the test avoids crash at iteration 0, when the packing is not bounded yet
+}
 
 template<class Solver>
 void FlowEngine::imposeFlux ( Vector3r pos, Real flux,Solver& flow )
@@ -594,7 +597,7 @@ void PeriodicFlowEngine:: action()
 // 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes ( );
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( ( Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>1000 ) && retriangulationLastIter>10 ) {
+        if ( ( Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>PermuteInterval ) && retriangulationLastIter>10 ) {
                 Update_Triangulation = true;
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;

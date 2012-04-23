@@ -90,7 +90,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void SpheresFileCreator ();
 		void DisplayStatistics();
 		void Initialize_pressures ( double P_zero );
-		void reApplyBoundaryConditions ();
+		bool reApplyBoundaryConditions ();
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
 		/// Define forces spliting drag and buoyancy terms
