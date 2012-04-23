@@ -19,6 +19,7 @@ bool Interaction::isFresh(Scene* rb){ return iterMadeReal==rb->iter;}
 void Interaction::init(){
 	iterMadeReal=-1;
 	functorCache.geomExists=true;
+	isActive=true;
 }
 
 void Interaction::reset(){

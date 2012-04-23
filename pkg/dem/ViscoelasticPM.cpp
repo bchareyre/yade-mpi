@@ -111,11 +111,13 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		// Then no slip occurs we consider friction damping + viscous damping.
 		shearForceVisc = phys.cs*shearVelocity; 
 	}
-
-	const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
-	addForce (id1,-f,scene);
-	addForce (id2, f,scene);
-	addTorque(id1,-c1x.cross(f),scene);
-	addTorque(id2, c2x.cross(f),scene);
+  
+	if (I->isActive) {
+		const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
+		addForce (id1,-f,scene);
+		addForce (id2, f,scene);
+		addTorque(id1,-c1x.cross(f),scene);
+		addTorque(id2, c2x.cross(f),scene);
+  }
 }
 
