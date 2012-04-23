@@ -384,12 +384,17 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
 
 void PeriodicFlow::GaussSeidel(Real dt)
 {
+    cerr << "GaussSeidel" << endl;
     RTriangulation& Tri = T[currentTes].Triangulation();
     int j = 0;
     double m, n, dp_max, p_max, sum_p, p_moy, dp_moy, dp, sum_dp;
+    double compFlowFactor=0;
+    vector<Real> previousP;
+    previousP.resize(Tri.number_of_finite_cells());
     double tolerance = TOLERANCE;
     double relax = RELAX;
     const int num_threads=1;
+    bool compressible= fluidBulkModulus>0;
 
     vector<Real> t_sum_p, t_dp_max, t_sum_dp, t_p_max;
     t_sum_dp.resize(num_threads);
@@ -397,6 +402,7 @@ void PeriodicFlow::GaussSeidel(Real dt)
     t_p_max.resize(num_threads);
     t_sum_p.resize(num_threads);
     Finite_cells_iterator cell_end = Tri.finite_cells_end();
+    cerr << "Do" << endl;
     do {
         int cell2=0;
         dp_max = 0;
@@ -405,37 +411,55 @@ void PeriodicFlow::GaussSeidel(Real dt)
         dp_moy=0;
         sum_p=0;
         sum_dp=0;
+        int bb=-1;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+            bb++;
             if ( !cell->info().Pcondition && !cell->info().isGhost) {
-                cell2++;
-                m=0, n=0;
-                for (int j2=0; j2<4; j2++) {
-                    if (!Tri.is_infinite(cell->neighbor(j2))) {
-                        m += (cell->info().k_norm())[j2] * cell->neighbor(j2)->info().shiftedP();
-                        if ( isinf(m) && j<10 ) cout << "(cell->info().k_norm())[j2] = " << (cell->info().k_norm())[j2] << " cell->neighbor(j2)->info().shiftedP() = " << cell->neighbor(j2)->info().shiftedP() << endl;
-                        if (j==0) n += (cell->info().k_norm())[j2];
-                    }
-                }
-                dp = cell->info().p();
-                if (n!=0 || j!=0) {
-                    if (j==0) cell->info().inv_sum_k=1/n;
-                    cell->info().setP((- (cell->info().dv() - m) * cell->info().inv_sum_k - cell->info().shiftedP()) * relax + cell->info().shiftedP());
-                }
-                dp -= cell->info().p();
-                dp_max = std::max(dp_max, std::abs(dp));
-                p_max = std::max(p_max, std::abs(cell->info().shiftedP()));
-                sum_p += cell->info().shiftedP();
-                sum_dp += std::abs(dp);
+		cell2++;
+		if (compressible && j==0) previousP[bb]=cell->info().p(); // info.p() or info.shiftedP() ???
+		m=0, n=0;
+		for (int j2=0; j2<4; j2++) {
+		  if (!Tri.is_infinite(cell->neighbor(j2))) {
+// 			m += (cell->info().k_norm())[j2] * cell->neighbor(j2)->info().shiftedP();
+// 			if ( isinf(m) && j<10 ) cout << "(cell->info().k_norm())[j2] = " << (cell->info().k_norm())[j2] << " cell->neighbor(j2)->info().shiftedP() = " << cell->neighbor(j2)->info().shiftedP() << endl;
+// 			if (j==0) n += (cell->info().k_norm())[j2];
+			if ( compressible ) {
+				compFlowFactor = fluidBulkModulus*dt*cell->info().invVoidVolume();
+				m += compFlowFactor*(cell->info().k_norm())[j2]*cell->neighbor(j2)->info().shiftedP();
+				if (j==0) n +=compFlowFactor*(cell->info().k_norm())[j2];
+			} else {
+				m += (cell->info().k_norm())[j2]*cell->neighbor(j2)->info().shiftedP();
+				if ( isinf(m) && j<10 ) cout << "(cell->info().k_norm())[j2] = " << (cell->info().k_norm())[j2] << " cell->neighbor(j2)->info().shiftedP() = " << cell->neighbor(j2)->info().shiftedP() << endl;
+				if (j==0) n += (cell->info().k_norm())[j2];
+			} 
+		  }
+		}
+		dp = cell->info().p();
+		if (n!=0 || j!=0) {
+// 			if (j==0) cell->info().inv_sum_k=1/n;
+// 			cell->info().setP((- (cell->info().dv() - m) * cell->info().inv_sum_k - cell->info().shiftedP()) * relax + cell->info().shiftedP());
+			if (j==0) { if (compressible) cell->info().inv_sum_k=1/(1+n); else cell->info().inv_sum_k=1/n; }
+			if ( compressible ) { 
+				cell->info().setP((((previousP[bb]-((fluidBulkModulus*dt*cell->info().invVoidVolume())*(cell->info().dv())))+m)*cell->info().inv_sum_k-cell->info().shiftedP())*relax+cell->info().shiftedP());
+			} else {
+				cell->info().setP((-(cell->info().dv()-m)*cell->info().inv_sum_k-cell->info().p())*relax+cell->info().shiftedP());
+			}
+		}
+		dp -= cell->info().p();
+		dp_max = std::max(dp_max, std::abs(dp));
+		p_max = std::max(p_max, std::abs(cell->info().shiftedP()));
+		sum_p += cell->info().shiftedP();
+		sum_dp += std::abs(dp);
             }
         }
         p_moy = sum_p/cell2;
         dp_moy = sum_dp/cell2;
 	j++;
-	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
-	if (j>=40000) cerr<<"\r GS not converged after 40k iterations, break";
+// 	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
+// 	if (j>=40000) cerr<<"\r GS not converged after 40k iterations, break";
 
     } while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
-
+    cerr << "end Do" << endl;
     int cel=0;
     double Pav=0;
     for (Finite_cells_iterator cell = Tri.finite_cells_begin();
