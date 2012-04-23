@@ -215,7 +215,7 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         BoundaryConditions ( flow );
         flow->Initialize_pressures ( P_zero );
 
-        if ( !first && useSolver==0 ) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
+        if ( !first && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
         if ( WaveAction ) flow->ApplySinusoidalPressure ( flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
 
         Initialize_volumes ( flow );

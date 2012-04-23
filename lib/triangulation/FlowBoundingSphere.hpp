@@ -73,7 +73,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		virtual void GaussSeidel (Real dt=0);
 		virtual void ResetNetwork();
 
-		double MeasurePorePressure (double X, double Y, double Z);
 		void Fictious_cells ( );
 
 		double k_factor; //permeability moltiplicator
@@ -130,6 +129,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
+		double MeasurePorePressure (double X, double Y, double Z);
 		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
 		double MeasureAveragedPressure(double Y);
 		double MeasureTotalAveragedPressure();
