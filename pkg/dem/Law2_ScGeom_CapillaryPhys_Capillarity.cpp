@@ -252,27 +252,39 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 				if (!hertzOn)
 				{
 					cundallInteractionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->phys.get());
-					if (i == (*firstMeniscus)->getId1()) angle1=cundallInteractionPhysics1->Delta1;//get angle of meniscus1 on body i
-					else angle1=cundallInteractionPhysics1->Delta2;
+					if (!cundallInteractionPhysics1->isBroken)
+					{
+						if (i == (*firstMeniscus)->getId1()) angle1=cundallInteractionPhysics1->Delta1;//get angle of meniscus1 on body i
+						else angle1=cundallInteractionPhysics1->Delta2;
+					}
 				}
 				else
 				{
 					mindlinInteractionPhysics1 = YADE_CAST<MindlinCapillaryPhys*>((*firstMeniscus)->phys.get());
-					if (i == (*firstMeniscus)->getId1()) angle1=mindlinInteractionPhysics1->Delta1;//get angle of meniscus1 on body i
-					else angle1=mindlinInteractionPhysics1->Delta2;
+					if (!mindlinInteractionPhysics1->isBroken)
+					{
+						if (i == (*firstMeniscus)->getId1()) angle1=mindlinInteractionPhysics1->Delta1;//get angle of meniscus1 on body i
+						else angle1=mindlinInteractionPhysics1->Delta2;
+					}
 				}
 				for ( ;currentMeniscus!= lastMeniscus; ++currentMeniscus) {//... CHECK FUSION WITH ALL OTHER MENISCII ON THE BODY
 					if (!hertzOn)
 					{
 						cundallInteractionPhysics2 = YADE_CAST<CapillaryPhys*>((*currentMeniscus)->phys.get());
-						if (i == (*currentMeniscus)->getId1()) angle2=cundallInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
-						else angle2=cundallInteractionPhysics2->Delta2;
+						if (!cundallInteractionPhysics2->isBroken)
+						{
+							if (i == (*currentMeniscus)->getId1()) angle2=cundallInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
+							else angle2=cundallInteractionPhysics2->Delta2;
+						}
 					}
 					else
 					{
 						mindlinInteractionPhysics2 = YADE_CAST<MindlinCapillaryPhys*>((*currentMeniscus)->phys.get());
-						if (i == (*currentMeniscus)->getId1()) angle2=mindlinInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
-						else angle2=mindlinInteractionPhysics2->Delta2;
+						if (!mindlinInteractionPhysics2->isBroken)
+						{
+							if (i == (*currentMeniscus)->getId1()) angle2=mindlinInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
+							else angle2=mindlinInteractionPhysics2->Delta2;
+						}
 					}
 					if (angle1==0 || angle2==0) cerr << "THIS SHOULD NOT HAPPEN!!"<< endl;
 
