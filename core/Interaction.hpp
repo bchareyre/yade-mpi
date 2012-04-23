@@ -60,7 +60,7 @@ class Interaction: public Serializable{
 		/* ctor */ init(),
 		/*py*/
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
-		.add_property("isActive",&Interaction::isActive,"True if this interaction is active. Otherwise the forces from this interaction will not be taken into account. True by default.")
+		.def_readwrite("isActive",&Interaction::isActive,"True if this interaction is active. Otherwise the forces from this interaction will not be taken into account. True by default.")
 	);
 };
 
