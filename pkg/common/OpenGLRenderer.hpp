@@ -105,9 +105,6 @@ class OpenGLRenderer : public Serializable
 		((bool,intrGeom,false,,"Render :yref:`Interaction::geom` objects."))
 		((bool,intrPhys,false,,"Render :yref:`Interaction::phys` objects"))
 		((bool,ghosts,true,,"Render objects crossing periodic cell edges by cloning them in multiple places (periodic simulations only)."))
-		#ifdef YADE_SUBDOMAINS
-			((int,subDomMask,0,,"If non-zero, render shape only of particles that are inside respective domains - -they are counted from the left, i.e. 5 (binary 101) will show subdomains 1 and 3. If zero, render everything."))
-		#endif
 		((int,mask,((void)"draw everything",~0),,"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
 		((Body::id_t,selId,Body::ID_NONE,,"Id of particle that was selected by the user."))
 		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::Zero(),Quaternionr::Identity())),,"Position and orientation of clipping planes"))
