@@ -74,10 +74,9 @@ bool STLReader::open(const char* filename, OutV vertices, OutE edges, OutF facet
     fseek(fp, 0, SEEK_END);
     int file_size = ftell(fp);
     int facenum;
-    size_t res;
     /* Check for binary or ASCII file */
     fseek(fp, STL_LABEL_SIZE, SEEK_SET);
-    res=fread(&facenum, sizeof(int), 1, fp);
+    size_t res=fread(&facenum, sizeof(int), 1, fp);
     int expected_file_size=STL_LABEL_SIZE + 4 + (sizeof(short)+4*sizeof(float) )*facenum ;
     if(file_size ==  expected_file_size) binary = true;
     unsigned char tmpbuf[128];
@@ -174,9 +173,8 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
     }
 
     int facenum;
-	 int res;
     fseek(fp, STL_LABEL_SIZE, SEEK_SET);
-    res=fread(&facenum, sizeof(int), 1, fp);
+    int res=fread(&facenum, sizeof(int), 1, fp);
     
     vector<Vrtx> vcs;
     set<pair<int,int> > egs;
