@@ -136,7 +136,7 @@ class TestEigenWrapper(unittest.TestCase):
 		# comparison
 		self.assert_(m1==Matrix3().Identity)
 		# rotation matrix from quaternion
-		m1=Matrix3(Quaternion(Vector3(0,0,1),pi/2).toRotationMatrix())
+		m1=Quaternion(Vector3(0,0,1),pi/2).toRotationMatrix()
 		# multiplication with vectors
 		self.assertSeqAlmostEqual(m1*Vector3().UnitX,Vector3().UnitY)
 		# determinant
