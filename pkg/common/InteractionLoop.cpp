@@ -71,19 +71,15 @@ void InteractionLoop::action(){
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
 
 
-	#ifdef YADE_SUBDOMAINS
-		YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){ FOREACH(const Body::MapId2IntrT::value_type& mapItem, b->intrs){
-			const shared_ptr<Interaction>& I(mapItem.second);
-	#else
-		#ifdef YADE_OPENMP
-			const long size=scene->interactions->size();
-			#pragma omp parallel for schedule(guided)
-			for(long i=0; i<size; i++){
-				const shared_ptr<Interaction>& I=(*scene->interactions)[i];
-		#else
-			FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-		#endif
-	#endif
+
+  #ifdef YADE_OPENMP
+    const long size=scene->interactions->size();
+    #pragma omp parallel for schedule(guided)
+    for(long i=0; i<size; i++){
+      const shared_ptr<Interaction>& I=(*scene->interactions)[i];
+  #else
+    FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+  #endif
 		// keep the following newline, my (edx) preprocessor outputs garbage code otherwise!
 
 		if(unlikely(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter)) {
@@ -167,11 +163,8 @@ void InteractionLoop::action(){
 		for(size_t i=0; i<callbacksSize; i++){
 			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}
-	#ifdef YADE_SUBDOMAINS
-		} } YADE_PARALLEL_FOREACH_BODY_END();
-	#else
-		}
-	#endif
+	}
+	
 	// process eraseAfterLoop
 	#ifdef YADE_OPENMP
 		FOREACH(list<idPair>& l, eraseAfterLoopIds){

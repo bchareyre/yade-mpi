@@ -95,11 +95,6 @@ void OpenGLRenderer::setBodiesDispInfo(){
 		const Quaternionr& ori=b->state->ori; const Quaternionr& refOri=b->state->refOri;
 		Vector3r cellPos=(!scene->isPeriodic ? pos : scene->cell->wrapShearedPt(pos)); // inside the cell if periodic, same as pos otherwise
 		bodyDisp[id].isDisplayed=!pointClipped(cellPos);
-		#ifdef YADE_SUBDOMAINS
-			int subDom; Body::id_t localId;
-			boost::tie(subDom,localId)=scene->bodies->subDomId2domNumLocalId(b->subDomId);
-			if(subDomMask!=0 && (((1<<subDom) & subDomMask)==0)) bodyDisp[id].isDisplayed=false;
-		#endif
 		// if no scaling and no periodic, return quickly
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling

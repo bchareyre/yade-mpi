@@ -77,9 +77,6 @@ class Body: public Serializable{
 
 		((int,groupMask,1,,"Bitmask for determining interactions."))
 		((int,flags,FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
-		#ifdef YADE_SUBDOMAINS
-			((Body::id_t,subDomId,Body::ID_NONE,(Attr::noSave|Attr::readonly),"Subdomain number and position within the subdomain encoded in one single number; holds back-reference to BodyContainer::subDomains location, so that erasing a body knows where to go. See BodyContainer for details."))
-		#endif
 
 		((shared_ptr<Material>,material,,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,,"Physical :yref:`state<State>`."))

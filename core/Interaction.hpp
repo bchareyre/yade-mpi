@@ -19,6 +19,7 @@ class Interaction: public Serializable{
 		bool isReal() const {return (bool)geom && (bool)phys;}
 		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
 		bool isFresh(Scene* rb);
+		bool isActive;
 
 		Interaction(Body::id_t newId1,Body::id_t newId2);
 
@@ -59,6 +60,7 @@ class Interaction: public Serializable{
 		/* ctor */ init(),
 		/*py*/
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
+		.def_readwrite("isActive",&Interaction::isActive,"True if this interaction is active. Otherwise the forces from this interaction will not be taken into account. True by default.")
 	);
 };
 

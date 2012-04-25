@@ -654,7 +654,7 @@ void Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
             if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();//Vector3r::Zero()
         }
         //cout<<shearForce<<endl;
-        Vector3r force = -currentContactPhysics->normalForce-shearForce;
+        //Vector3r force = -currentContactPhysics->normalForce-shearForce;      //The variable not used anywere
 
         applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
     }

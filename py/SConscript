@@ -19,7 +19,7 @@ env.Install('$LIBDIR/py/yade',[
 		linkPlugins(['Shop','SpherePack']),
 		])
 	# include SpherePadder only optionally
-	]+([env.SharedLibrary('_packSpherePadder',env.Combine('packSpherePadder.cpp',['pack/_packSpherePadder.cpp','pack/SpherePadder/SpherePadder.cpp','pack/SpherePadder/TetraMesh.cpp','pack/SpherePadder/CellPartition.cpp']+(['pack/SpherePadder/SpherePackingTriangulation.cpp'] if 'cgal' in env['features'] else [])),SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['SpherePack'])) if 'sphere-padder' in env['features'] else []])+[
+	]+([env.SharedLibrary('_packSpherePadder',env.Combine('packSpherePadder.cpp',['pack/_packSpherePadder.cpp','pack/SpherePadder/SpherePadder.cpp','pack/SpherePadder/TetraMesh.cpp','pack/SpherePadder/CellPartition.cpp']+(['pack/SpherePadder/SpherePackingTriangulation.cpp'] if 'cgal' in env['features'] else [])),SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['SpherePack']))])+[
 	env.SharedLibrary('_packObb',['pack/_packObb.cpp'],SHLIBPREFIX=''),
 	env.AlwaysBuild(env.ScanReplace('__init__.py.in')),
 	env.AlwaysBuild(env.ScanReplace('config.py.in')),

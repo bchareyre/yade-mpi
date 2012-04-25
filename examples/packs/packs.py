@@ -57,6 +57,16 @@ O.bodies.append(geom.facetBox((0,12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 oriBody = Quaternion(Vector3(0,0,1),(math.pi))
 O.bodies.append(geom.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
+# Example of geom.facetParallelepiped usage 
+oriBody = Quaternion(Vector3(0,0,1),(math.pi/3))
+O.bodies.append(geom.facetParallelepiped(center=Vector3(12,0,-6+2.7),extents=Vector3(1,0.7,0.9),height=0.5, orientation=oriBody,**kwBoxes))
+
+oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
+O.bodies.append(geom.facetParallelepiped(center=Vector3(0,12,-6+2.7),extents=Vector3(1,0.7,0.9),height=0.5, orientation=oriBody,**kwBoxes))
+
+oriBody = Quaternion(Vector3(0,0,1),(math.pi))
+O.bodies.append(geom.facetParallelepiped(center=Vector3(-12,-12,-6+2.7),extents=Vector3(1,0.7,0.9),height=0.5, orientation=oriBody,**kwBoxes))
+
 # Example of geom.facetCylinder, facetHelix and RotationEngine usage example
 oriBody = Quaternion(Vector3(1,0,0),(math.pi/2.0))
 rotateIDs=O.bodies.append(geom.facetHelix((-7.0,-6.0,-5.0),radiusOuter=2.0,radiusInner=0.1,pitch=2.0,orientation=oriBody,segmentsNumber=50,angleRange=[math.pi*8.0,0],**kwBoxes))
