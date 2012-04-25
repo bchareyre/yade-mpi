@@ -10,6 +10,7 @@
 #ifndef _Def_types
 #define _Def_types
 
+
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Cartesian.h>
 #include <CGAL/Regular_triangulation_3.h>
@@ -123,7 +124,7 @@ class FlowCellInfo : public SimpleCellInfo {
 		VolumeVariation=0;
 		pression=0;
 		invVoidV=0;
-		fict=0;
+ 		fict=0;
 	}	
 
 	double inv_sum_k;
@@ -174,12 +175,10 @@ class PeriodicCellInfo : public FlowCellInfo
 	int ghost;
 	Real* _pression;
 	bool isGhost;
-	PeriodicCellInfo (void)
-	{
+ 	PeriodicCellInfo (void){
 		_pression=&pression;
 		period[0]=period[1]=period[2]=0;
-		isGhost=false;
-	}
+		isGhost=false;}
 	~PeriodicCellInfo (void) {}
 	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
 	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
@@ -197,7 +196,10 @@ class PeriodicVertexInfo : public FlowVertexInfo {
 	PeriodicVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
 	bool isGhost;
 	int period[3];
-	inline const Vecteur ghostShift (void) {return isGhost? (period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2]) : CGAL::NULL_VECTOR;}
+	//FIXME: the name is misleading, even non-ghost can be out of the period and therefore they need to be shifted as well
+	inline const Vecteur ghostShift (void) {
+		return period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2];}
+	PeriodicVertexInfo (void) {isFictious=false; s=0; i=0; period[0]=period[1]=period[2]=0; isGhost=false;}
 };
 
 
