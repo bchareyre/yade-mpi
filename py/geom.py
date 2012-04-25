@@ -21,7 +21,27 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	:param **kw: (unused keyword arguments) passed to :yref:`yade.utils.facet`
 	:returns: list of facets forming the box
 	"""
+	
+	return facetParallelepiped(center=center, extents=extents, height=extents[2], orientation=orientation, wallMask=wallMask, **kw)
 
+#facetParallelepiped===============================================================
+def facetParallelepiped(center,extents,height,orientation=Quaternion.Identity,wallMask=63,**kw):
+	"""
+	Create arbitrarily-aligned Parallelepiped composed of facets, with given center, extents, height  and orientation.
+	If any of the parallelepiped dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the parallelepiped.
+
+	:param Vector3 center: center of the parallelepiped
+	:param Vector3 extents: lengths of the parallelepiped sides
+	:param Real height: height of the parallelepiped (along axis z)
+	:param Quaternion orientation: orientation of the parallelepiped
+	:param bitmask wallMask: determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls
+	:param **kw: (unused keyword arguments) passed to :yref:`yade.utils.facet`
+	:returns: list of facets forming the parallelepiped
+	"""
+	
+	if (height<=0): raise RuntimeError("The height should have the positive value");
+	if (height>extents[2]): raise RuntimeError("The height should be smaller or equal as extents[2]");
+	
 	#Defense from zero dimensions
 	if (wallMask>63):
 		print "wallMask must be 63 or less"
@@ -35,20 +55,27 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	if (((extents[0]==0) and (extents[1]==0)) or ((extents[0]==0) and (extents[2]==0)) or ((extents[1]==0) and (extents[2]==0))):
 		raise RuntimeError("Please, specify at least 2 none-zero dimensions in extents!");
 	# ___________________________
-
+	
+	#inclination angle
+	beta = math.asin(height/extents[2])
+	dx = math.cos(beta)*extents[2]
+	
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
 		return [utils.facet((a,b,c),**kw),utils.facet((a,c,d),**kw)]
 	ret=[]
-
+	
+	mn[2] = -height
+	mx[2] = +height
+	
 	A=orientation*Vector3(mn[0],mn[1],mn[2])+center
 	B=orientation*Vector3(mx[0],mn[1],mn[2])+center
 	C=orientation*Vector3(mx[0],mx[1],mn[2])+center
 	D=orientation*Vector3(mn[0],mx[1],mn[2])+center
-	E=orientation*Vector3(mn[0],mn[1],mx[2])+center
-	F=orientation*Vector3(mx[0],mn[1],mx[2])+center
-	G=orientation*Vector3(mx[0],mx[1],mx[2])+center
-	H=orientation*Vector3(mn[0],mx[1],mx[2])+center
+	E=orientation*Vector3(mn[0]+dx,mn[1],mx[2])+center
+	F=orientation*Vector3(mx[0]+dx,mn[1],mx[2])+center
+	G=orientation*Vector3(mx[0]+dx,mx[1],mx[2])+center
+	H=orientation*Vector3(mn[0]+dx,mx[1],mx[2])+center
 	if wallMask&1:  ret+=doWall(A,D,H,E)
 	if wallMask&2:  ret+=doWall(B,F,G,C)
 	if wallMask&4:  ret+=doWall(A,E,F,B)
@@ -56,7 +83,7 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	if wallMask&16: ret+=doWall(A,B,C,D)
 	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
-	
+
 #facetCylinder==========================================================
 def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,**kw):
 	"""
