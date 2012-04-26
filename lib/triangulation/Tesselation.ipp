@@ -8,6 +8,9 @@
 
 using namespace std;
 
+//FIXME: handle that a better way
+#define MAX_ID 200000
+
 namespace CGT {
 
 template<class TT>
@@ -24,7 +27,7 @@ _Tesselation<TT>::_Tesselation ( void )
 	TotalInternalVoronoiVolume=0;
 	redirected = false;
 	//FIXME : find a better way to avoid segfault when insert() is used before resizing this vector
-	vertexHandles.resize(1000000);
+	vertexHandles.resize(MAX_ID+1,NULL);
 }
 template<class TT>
 _Tesselation<TT>::_Tesselation ( RTriangulation &T ) : Tri ( &T ), Tes ( &T ), computed ( false )
@@ -42,9 +45,10 @@ template<class TT>
 void _Tesselation<TT>::Clear ( void )
 {
 	Tri->clear();
-	max_id=0;
 	redirected = false;
 	vertexHandles.clear();
+	vertexHandles.resize(MAX_ID+1,NULL);
+	max_id=0;
 }
 template<class TT>
 typename _Tesselation<TT>::Vertex_handle _Tesselation<TT>::insert ( Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious )
@@ -55,6 +59,7 @@ typename _Tesselation<TT>::Vertex_handle _Tesselation<TT>::insert ( Real x, Real
 	{
 		Vh->info() = id;
 		Vh->info().isFictious = isFictious;
+		assert (vertexHandles.size()>id);
 		vertexHandles[id] = Vh;
 		/*if ( !isFictious ) */max_id = std::max ( max_id, (int) id );
 	}
@@ -84,7 +89,7 @@ bool _Tesselation<TT>::redirect ( void )
 	if ( !redirected )
 	{
 		//Set size of the redirection vector
-		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
+		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1,NULL );
 		//cout << "!redirected" << endl;
 		max_id = 0;
 		Finite_vertices_iterator vertices_end = Tri->finite_vertices_end ();
@@ -149,7 +154,7 @@ Point _Tesselation<TT>::Dual ( const Cell_handle &cell )
 template<class TT>
 void _Tesselation<TT>::Compute ()
 {
-	redirect();
+	if (!redirected) redirect();
 	Finite_cells_iterator cell_end = Tri->finite_cells_end();
 	for ( Finite_cells_iterator cell = Tri->finite_cells_begin(); cell != cell_end; cell++ )
 	{
@@ -528,6 +533,7 @@ typename Tesselation::Vertex_handle PeriodicTesselation<Tesselation>::insert(Rea
 		Vh->info() = id;
 		Vh->info().isFictious = isFictious;
 		if (duplicateOfId<0) {
+			assert (vertexHandles.size()>id);
 			vertexHandles[id] = Vh;
 			max_id = std::max ( max_id, (int) id );
 			Vh->info().isGhost=0;
@@ -543,8 +549,8 @@ bool PeriodicTesselation<Tesselation>::redirect ( void )
 	if ( !redirected )
 	{
 		//Set size of the redirection vector
-		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
-		//cout << "!redirected" << endl;
+		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1,NULL );
+		cout << "!redirected" << endl;
 		max_id = 0;
 		Finite_vertices_iterator vertices_end = Tri->finite_vertices_end ();
 		for ( Finite_vertices_iterator V_it = Tri->finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
@@ -556,7 +562,7 @@ bool PeriodicTesselation<Tesselation>::redirect ( void )
 			//std::cout<< "Cell " << V_it->info().id() << ": v=" << V_it->info().v() << std::endl;
 		}
 		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
-		redirected = true;
+		bool redirected = true;
 	} else return false;
 	return true;
 }

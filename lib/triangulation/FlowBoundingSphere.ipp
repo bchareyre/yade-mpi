@@ -693,7 +693,7 @@ void FlowBoundingSphere<Tesselation>::Interpolate(Tesselation& Tes, Tesselation&
                 new_cell->info().p() = old_cell->info().p();
 // 		new_cell->info().dv() = old_cell->info().dv();
         }
-// 	Tes.Clear();//Avoid segfault when getting pressure in scripts just after interpolation
+//  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
 }
 
 Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2)
@@ -1023,13 +1023,12 @@ void FlowBoundingSphere<Tesselation>::Initialize_pressures( double P_zero )
 		IPCells.push_back(cell);
 		cell->info().p()=imposedP[n].second;
 		cell->info().Pcondition=true;}
+	pressureChanged=false;
 }
 
 template <class Tesselation> 
 bool FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 {
-//         RTriangulation& Tri = T[currentTes].Triangulation();
-//         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	if (!pressureChanged) return false;
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
@@ -1047,12 +1046,10 @@ bool FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 	pressureChanged=false;
 	return true;
 }
+
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 {
-
-// 	std::ofstream iter("Gauss_Iterations", std::ios::app);
-// 	std::ofstream p_av("P_moyenne", std::ios::app);
 	reApplyBoundaryConditions();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int j = 0;
@@ -1063,7 +1060,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 	double tolerance = TOLERANCE;
 	double relax = RELAX;
 	const int num_threads=1;
-	bool compressible= fluidBulkModulus>0;
+	bool compressible= (fluidBulkModulus>0);
 #ifdef GS_OPEN_MP
 	omp_set_num_threads(num_threads);
 #endif

@@ -131,12 +131,6 @@ void FlowEngine::setImposedPressure ( unsigned int cond, Real p,Solver& flow )
 }
 
 template<class Solver>
-void FlowEngine::updateBCs ( Solver& flow ) {
-	flow->pressureChanged=true;
-	if (flow->T[flow->currentTes].max_id>0) BoundaryConditions(flow);//the test avoids crash at iteration 0, when the packing is not bounded yet
-}
-
-template<class Solver>
 void FlowEngine::imposeFlux ( Vector3r pos, Real flux,Solver& flow )
 {
         typename Solver::RTriangulation& Tri = flow.T[flow.currentTes].Triangulation();
@@ -179,7 +173,7 @@ template<class Solver>
 void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 {
         flow->ResetNetwork();
-        if ( first ) flow->currentTes=0;
+	if ( first ) flow->currentTes=0;
         else {
                 flow->currentTes=!flow->currentTes;
                 if ( Debug ) cout << "--------RETRIANGULATION-----------" << endl;
@@ -336,6 +330,7 @@ void FlowEngine::Triangulate ( Solver& flow )
                         flow->T[flow->currentTes].insert ( x, y, z, rad, id );
                 }
         }
+        flow->T[flow->currentTes].redirected=true;//By inserting one-by-one, we already redirected
         flow->viscousShearForces.resize ( flow->T[flow->currentTes].max_id+1 );
 }
 template<class Solver>
@@ -615,15 +610,16 @@ void PeriodicFlowEngine:: action()
         scene->forces.sync();
         if ( viscousShear ) ApplyViscousForces(*solver);
 
-        Finite_vertices_iterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
-        for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
-                if ( !viscousShear )
-                        scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) );
+	const Tesselation& Tes = solver->T[solver->currentTes];
+
+	for (int id=0; id<=Tes.max_id; id++){
+		assert (Tes.vertexHandles[id] != NULL);
+		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
+		if (!viscousShear)
+                        scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) );
                 else
-                        if (V_it->info().isGhost) continue;
-                        else
-                                scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id() ] );
-        }
+			scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()] );
+	}
         ///End Compute flow and forces
 // 		timingDeltas->checkpoint("Applying Forces");
 
@@ -641,6 +637,8 @@ void PeriodicFlowEngine::Triangulate()
 {
         shared_ptr<Sphere> sph ( new Sphere );
         int Sph_Index = sph->getClassIndexStatic();
+        Tesselation& Tes = solver->T[solver->currentTes];
+	
         FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
                 if ( !b || b->shape->getClassIndex() != Sph_Index ) continue;
                 Vector3r wpos;
@@ -653,8 +651,9 @@ void PeriodicFlowEngine::Triangulate()
                 Real x = wpos[0];
                 Real y = wpos[1];
                 Real z = wpos[2];
-                Vertex_handle vh0=solver->T[solver->currentTes].insert ( x, y, z, rad, id );
-                // FIXME: it can be out of the period!
+                Vertex_handle vh0=Tes.insert ( x, y, z, rad, id );
+		if (vh0==NULL) LOG_ERROR("Vh NULL in PeriodicFlowEngine::Triangulate(), check input data");
+
                 for ( int k=0;k<3;k++ ) vh0->info().period[k]=-period[k];
                 const Vector3r& cellSize ( scene->cell->getSize() );
 //                 wpos=scene->cell->unshearPt ( wpos );
@@ -674,10 +673,13 @@ void PeriodicFlowEngine::Triangulate()
                                                 //Vector3r pt=scene->cell->shearPt ( pos2 );
                                                 //without shear:
                                                 const Vector3r& pt= pos2;
-                                                Vertex_handle vh=solver->T[solver->currentTes].insert ( pt[0],pt[1],pt[2],rad,id,false,id );
+                                                Vertex_handle vh=Tes.insert ( pt[0],pt[1],pt[2],rad,id,false,id );
                                                 for ( int k=0;k<3;k++ ) vh->info().period[k]=i[k]-period[k];}}
+		//re-assign the original vertex pointer since duplicates may have overwrite it
+		Tes.vertexHandles[id]=vh0;
         }
-        solver -> viscousShearForces.resize ( solver -> T[solver -> currentTes].max_id+1 );
+        Tes.redirected=true;//By inserting one-by-one, we already redirected
+        solver -> viscousShearForces.resize ( Tes.max_id+1 );
 }
 
 
@@ -732,6 +734,7 @@ void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index,
 	if (baseCell->info().fictious()==0)
 		for ( int k=0;k<4;k++ ) center+= 0.25*makeVector3r (baseCell->vertex(k)->point());
 	else {
+		
 		Real boundPos=0; int coord=0;
 		for ( int k=0;k<4;k++ ) {
 			if ( !baseCell->vertex ( k )->info().isFictious ) center+= 0.3333333333*makeVector3r ( baseCell->vertex ( k )->point() );
@@ -836,7 +839,7 @@ void PeriodicFlowEngine::Initialize_volumes ()
 // 			case ( 3 ) : cell->info().volume() = Volume_cell_triple_fictious ( cell ); break;
 			default:  cell->info().volume() = 0; break;
 		}
-		if (solver->fluidBulkModulus>0) { cell->info().invVoidVolume() = 1 / (cell->info().volume() - solver->volumeSolidPore(cell) ); }
+		if (solver->fluidBulkModulus>0) { cell->info().invVoidVolume() = 1 / (abs(cell->info().volume()) - solver->volumeSolidPore(cell) ); }
 	}
         if ( Debug ) cout << "Volumes initialised." << endl;
 }

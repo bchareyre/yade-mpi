@@ -96,28 +96,24 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 			//the pressure translated to a ghost cell adjacent to the non-ghost vertex
 			//FIXME: the hsize[k]*gradP products could be computed only once for all cells and facets
 			/*if (vhi.isGhost) */unshiftedP -= pDeltas[0]*vhi.period[0] + pDeltas[1]*vhi.period[1] +pDeltas[2]*vhi.period[2];
-			vhi.forces = vhi.forces + cell->info().unitForceVectors[yy]*unshiftedP;
-// 			cerr <<"unshifted="<<unshiftedP<<endl;
+			T[currentTes].vertexHandles[vhi.id()]->info().forces=T[currentTes].vertexHandles[vhi.id()]->info().forces + cell->info().unitForceVectors[yy]*unshiftedP;
+// 			vhi.forces = vhi.forces + cell->info().unitForceVectors[yy]*unshiftedP;
 		}
-// 		cerr<<"cellules:"<<endl;
-// 		cerr<<cell->info().x()<<", "<<cell->info().y()<<", "<<cell->info().z()<<", "<<cell->info().p()<<endl;
 	}
 	noCache=false;//cache should always be defined after execution of this function
-// 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces = 0*oldForces[v->info().id()]+1*v->info().forces;
 	if (DEBUG_OUT) {
 // 		cout << "Facet cached scheme" <<endl;
 		Vecteur TotalForce = nullVect;
-		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
+		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); v++)
 		{
-			if (!v->info().isFictious){
+			if (!v->info().isFictious /*&& !v->info().isGhost*/ ){
 				TotalForce = TotalForce + v->info().forces;
-// 				cerr<< v->info().forces<< endl;
+// 				cerr<< "real_id = " << v->info().id() << " force = "<< v->info().forces<< " ghost:"<< v->info().isGhost <<endl;
 			}
-			
 // 				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-			else {
+			else /*if (!v->info().isGhost)*/{
 				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-// 				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << " ghost:"<< v->info().isGhost<< endl;
 			}
 		}
 		cout << "TotalForce = "<< TotalForce << endl;}
@@ -366,6 +362,7 @@ void PeriodicFlow::Initialize_pressures( double P_zero )
 		IPCells.push_back(cell);
 		cell->info().p()=imposedP[n].second;
 		cell->info().Pcondition=true;}
+	pressureChanged=false;
 }
 
 void PeriodicFlow::GaussSeidel(Real dt)
