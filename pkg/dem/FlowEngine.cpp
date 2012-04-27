@@ -211,7 +211,7 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 
         BoundaryConditions ( flow );
         flow->Initialize_pressures ( P_zero );
-
+	
         if ( !first && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
         if ( WaveAction ) flow->ApplySinusoidalPressure ( flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
 
@@ -889,8 +889,8 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero )
                 locateCell ( cell,index );
         solver->DisplayStatistics ();
         //FIXME: check interpolate() for the periodic case, at least use the mean pressure from previous step.
-// 	if (!first && useSolver==0) solver->Interpolate (solver->T[!solver->currentTes], solver->T[solver->currentTes]);
-
+	if ( !first && (useSolver==0 || fluidBulkModulus>0)) solver->Interpolate ( solver->T[!solver->currentTes], solver->T[solver->currentTes] );
+	
         if ( WaveAction ) solver->ApplySinusoidalPressure ( solver->T[solver->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
         Initialize_volumes();
         if ( viscousShear ) solver->ComputeEdgesSurfaces();

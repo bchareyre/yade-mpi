@@ -30,7 +30,7 @@ namespace CGT{
 		
 // 		using PeriodicFlowBoundingSphere::Tri;
 			
-
+		void Interpolate(Tesselation& Tes, Tesselation& NewTes);
 		void ComputeFacetForcesWithCache();
 		void Compute_Permeability();
 		void Initialize_pressures( double P_zero );

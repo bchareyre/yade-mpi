@@ -31,6 +31,23 @@
 
 namespace CGT {
 
+void PeriodicFlow::Interpolate(Tesselation& Tes, Tesselation& NewTes)
+{
+        Cell_handle old_cell;
+        RTriangulation& NewTri = NewTes.Triangulation();
+        RTriangulation& Tri = Tes.Triangulation();
+        Finite_cells_iterator cell_end = NewTri.finite_cells_end();
+        for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
+		if (new_cell->info().Pcondition || new_cell->info().isGhost) continue;
+                old_cell = Tri.locate((Point) new_cell->info());
+                new_cell->info().p() = old_cell->info().shiftedP();
+// 		new_cell->info().dv() = old_cell->info().dv();
+        }
+//  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
+}
+	
+
+
 void PeriodicFlow::ComputeFacetForcesWithCache()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
