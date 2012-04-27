@@ -153,28 +153,19 @@ Optimization with Verlet distances
 
 As noted above, [Verlet1967]_ explored the possibility of running the collision detection only sparsely by enlarging predicates $\tilde P_i$.
 				
-In Yade, this is achieved by enlarging :yref:`Aabb` of particles by fixed relative length in all dimensions $\Delta L$ (:yref:`InsertionSortCollider.sweepLength`). Suppose the collider run last time at step $m$ and the current step is $n$. :yref:`NewtonIntegrator` tracks maximum distance traversed by particles (via maximum velocity magnitudes $\curr{v_{\rm max}}=\max |\curr{\dot{u}_i}|$ in each step, with the initial cummulative distance $L_{\rm max}=0$,
+In Yade, this is achieved by enlarging :yref:`Aabb` of particles by fixed relative length (or Verlet's distance) in all dimensions $\Delta L$ (:yref:`InsertionSortCollider.sweepLength`). Suppose the collider run last time at step $m$ and the current step is $n$. :yref:`NewtonIntegrator` tracks the cummulated distance traversed by each particle between $m$ and $n$ by comparing the current position with the reference position from time $n$  (:yref:`Bound::refPos`),
 
-.. math:: \curr{L_{\rm max}}&=\prev{L_{\rm max}}+\curr{v_{\rm max}}\curr{\Dt}
+.. math:: L_{\rm mn}&=|X^n - X^m|
   :label: eq-verlet-l0
 
-triggering the collider re-run as soon as
+triggering the collider re-run as soon as one particle gives:
 
-.. math:: \curr{L_{\rm max}}&>\Delta L.
+.. math::  L_{\rm mn}&>\Delta L.
   :label: eq-verlet-trigger
 
-The disadvantage of this approach is that even one fast particle determines $\curr{v_{\rm max}}$.
+:yref:`InsertionSortCollider.targetInterv` is used to adjust $\Delta L$ independently for each particle. Larger $\Delta L$ will be assigned to the fastest ones, so that all particles would ideally reach the edge of their bounds after this "target" number of iterations. Results of using Verlet distance depend highly on the nature of simulation and choice of :yref:`InsertionSortCollider.targetInterv`. Adjusting the sizes independently for each particle is especially efficient if some parts of a problem have high-speed particles will others are not moving. If it is not the case, no significant gain should be expected as compared to targetInterv=0 (assigning the same $\Delta L$ to all particles).
 
-A solution is to track maxima per particle groups. The possibility of tracking each particle separately (that is what `ESyS-Particle <http://www.launchpad.net/esys-particle>`_ does) seemed to us too fine-grained. Instead, we assign particles to $b_n$ (:yref:`InsertionSortCollider.nBins`) *velocity bins* based on their current velocity magnitude. The bins' limit values are geometrical with the coefficient $b_c>1$ (:yref:`InsertionSortCollider.binCoeff`), the maximum velocity being the current global velocity maximum $\curr{v_{\rm max}}$ (with some constraints on its change rate, to avoid large oscillations); for bin $i\in\{0,\dots,b_n\}$ and particle $j$:
-
-.. math:: \curr{v_{\rm max}} b_c^{-(i+1)}\leq |\curr{\dot{u}_j}| < v_{\rm max} b_c^{-i}.
-
-(note that in this case, superscripts of $b_c$ mean exponentiation). Equations :eq:`eq-verlet-l0`--:eq:`eq-verlet-trigger` are used for each bin separately; however, when :eq:`eq-verlet-trigger` is satisfied, full collider re-run is necessary and all bins' distances are reset.
-
-Particles in high-speed oscillatory motion could be put into a slow bin if they happen to be at the point where their instantaneous speed is low, causing the necessity of early collider re-run. This is avoided by allowing particles to only go slower by one bin rather than several at once.
-
-Results of using Verlet distance depend highly on the nature of simulation and choice of parameters :yref:`InsertionSortCollider.nBins` and :yref:`InsertionSortColldier.binCoeff`. The binning algorithm was specifically designed for simulating local fracture of larger concrete specimen; in that way, only particles in the fracturing zone, with greater velocities, had the :yref:`Aabb`'s enlarged, without affecting quasi-still particles outside of this zone. In such cases, up to 50% overall computation time savings were observed, collider being run every ≈100 steps in average.
-
+The number of particles and the number of available threads is also to be considered for choosing an appropriate Verlet's distance. A larger distance will result in less time spent in the collider (which runs single-threaded) and more time in computing interactions (multi-threaded). Typically, large $\Delta L$ will be used for large simulations with more than $10^5$ particles on multi-core computers. On the other hand simulations with less than $10^4$ particles on single processor will probably benefit from smaller $\Delta L$. Users benchmarks may be found on Yade's wiki (see e.g. `<https://yade-dem.org/wiki/Colliders_performace>`_).
 
 Creating interaction between particles
 ================================================
