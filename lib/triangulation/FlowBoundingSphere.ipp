@@ -1108,8 +1108,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 			if ( !cell->info().Pcondition ) {
 		                cell2++;
 		#endif
-				if (compressible && j==0) previousP[bb]=cell->info().p();
-				
+				if (compressible && j==0) { previousP[bb]=cell->info().p(); }
 				m=0, n=0;
                                 for (int j2=0; j2<4; j2++) {
 				  
@@ -1127,12 +1126,10 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 							if (j==0) n += (cell->info().k_norm())[j2];
 						}  
 					}
-                                }
-                                dp = cell->info().p();
-                                if (n!=0 || j!=0) {
-
+				}
+				dp = cell->info().p();
+				if (n!=0 || j!=0) {
 					if (j==0) { if (compressible) cell->info().inv_sum_k=1/(1+n); else cell->info().inv_sum_k=1/n; }
-					
 					if ( compressible ) {
 					/// COMPRESSIBLE cell->info().p() = ( (previousP - compFlowFactor*cell->info().dv()) + m ) / n ;
 						cell->info().p() = ( ((previousP[bb] - ((fluidBulkModulus*dt*cell->info().invVoidVolume())*(cell->info().dv()))) + m) * cell->info().inv_sum_k - cell->info().p()) * relax + cell->info().p();
@@ -1140,7 +1137,6 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 					/// INCOMPRESSIBLE cell->info().p() =   - ( cell->info().dv() - m ) / ( n ) = ( -cell.info().dv() + m ) / n ;
 						cell->info().p() = (- (cell->info().dv() - m) * cell->info().inv_sum_k - cell->info().p()) * relax + cell->info().p();
 					}
-					
 					#ifdef GS_OPEN_MP
 // 					double r = sqrt(sqrt(sqrt(cell->info().p())/(1+sqrt(cell->info().p()))));
 // 					if (j % 100 == 0) cout<<"cell->info().p() "<<cell->info().p()<<" vs. "<< (- (cell->info().dv() - m) / (n) - cell->info().p())* relax<<endl;
