@@ -237,8 +237,9 @@ void SpherePadder::pad_5 ()
 		<< "  Number near tetra vextexes = " << n5 << endl
 		<< "  Number cancelled           = " << nzero);
   
-  LOG_INFO("Time used (pad5) = " << ((float)(stop_time - start_time) / 1000000.0) << " s");
-  
+  if (start_time and stop_time) {
+    LOG_INFO("Time used (pad5) = " << ((float)(stop_time - start_time) / 1000000.0) << " s");
+  }
 }
 
 
