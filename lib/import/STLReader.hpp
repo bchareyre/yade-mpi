@@ -68,7 +68,7 @@ bool STLReader::open(const char* filename, OutV vertices, OutE edges, OutF facet
     bool binary=false;
     fp = fopen(filename, "r");
     if(fp == NULL) 
-	return false;
+    return false;
       
     /* Find size of file */
     fseek(fp, 0, SEEK_END);
@@ -81,13 +81,16 @@ bool STLReader::open(const char* filename, OutV vertices, OutE edges, OutF facet
     if(file_size ==  expected_file_size) binary = true;
     unsigned char tmpbuf[128];
     res=fread(tmpbuf,sizeof(tmpbuf),1,fp);
-    for(size_t i = 0; i < sizeof(tmpbuf); i++)
+    if (res) 
       {
-	if(tmpbuf[i] > 127)
-		{
-		  binary=true;
-		  break;
-		}
+      for(size_t i = 0; i < sizeof(tmpbuf); i++)
+        {
+        if(tmpbuf[i] > 127)
+          {
+            binary=true;
+            break;
+          }
+        }
       }
     // Now we know if the stl file is ascii or binary.
     fclose(fp);
@@ -122,7 +125,7 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
 	ret=fscanf(fp, "%*s %f %f %f\n", &v[2][0],  &v[2][1],  &v[2][2]);
 	ret=fscanf(fp, "%*s"); // end loop
 	ret=fscanf(fp, "%*s"); // end facet
-	if(feof(fp)) break;
+	if(ret < 0 || feof(fp)) break;
 
 	int vid[3];
 	for(int i=0;i<3;++i)
@@ -178,40 +181,44 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
     
     vector<Vrtx> vcs;
     set<pair<int,int> > egs;
-
+    
+    if (res)
+    {
     // For each triangle read the normal, the three coords and a short set to zero
     for(int i=0;i<facenum;++i)
-    {
-      short attr;
-      float n[3];
-      Vrtx v[3];
-      res=fread(&n,3*sizeof(float),1,fp);
-      res=fread(&v,sizeof(Vrtx),3,fp);
-      res=fread(&attr,sizeof(short),1,fp);
-
-      //FIXME: Убрать дублирование кода с open_ascii
-      int vid[3];
-	for(int i=0;i<3;++i)
-	{
-	    (normals++) = n[i];
-	    bool is_different=true;
-	    IsDifferent isd(tolerance);
-	    int j=0;
-	    for(int ej=vcs.size(); j<ej; ++j) 
-		if ( !(is_different = isd(v[i],vcs[j])) ) break;
-	    if (is_different) 
-	    {
-		vid[i] = vcs.size();
-		vcs.push_back(v[i]);
-	    }
-	    else
-		vid[i] = j;
-	    (facets++) = vid[i];
-	}
-	egs.insert(minmax(vid[0], vid[1]));
-	egs.insert(minmax(vid[1], vid[2]));
-	egs.insert(minmax(vid[2], vid[0]));
+      {
+        short attr;
+        float n[3];
+        Vrtx v[3];
+        res=fread(&n,3*sizeof(float),1,fp);
+        res=fread(&v,sizeof(Vrtx),3,fp);
+        res=fread(&attr,sizeof(short),1,fp);
+  
+        //FIXME: Убрать дублирование кода с open_ascii
+        int vid[3];
+        for(int i=0;i<3;++i)
+          {
+            (normals++) = n[i];
+            bool is_different=true;
+            IsDifferent isd(tolerance);
+            int j=0;
+            for(int ej=vcs.size(); j<ej; ++j) 
+            if ( !(is_different = isd(v[i],vcs[j])) ) break;
+            if (is_different) 
+              {
+              vid[i] = vcs.size();
+              vcs.push_back(v[i]);
+              }
+              else
+              vid[i] = j;
+              (facets++) = vid[i];
+          }
+          egs.insert(minmax(vid[0], vid[1]));
+          egs.insert(minmax(vid[1], vid[2]));
+          egs.insert(minmax(vid[2], vid[0]));
+          }
     }
+    
     fclose(fp);
     
     for(vector<Vrtx>::iterator it=vcs.begin(),end=vcs.end(); it!=end; ++it)
