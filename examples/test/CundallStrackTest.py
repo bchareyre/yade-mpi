@@ -1,4 +1,3 @@
-#!/usr/local/bin/yade-trunk -x
 # -*- coding: utf-8 -*-
 
 

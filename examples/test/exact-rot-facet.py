@@ -1,4 +1,3 @@
-#!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 ##
 ## TODO: verify that the code for facet & hasShear is physically correct!

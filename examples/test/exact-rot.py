@@ -1,4 +1,3 @@
-#!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 from math import *
 O.engines=[
