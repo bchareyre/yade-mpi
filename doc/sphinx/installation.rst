@@ -27,7 +27,7 @@ More detailed instructions are available at the corresponding pages of ppa`s (li
 Source code
 ------------
 
-Installation from source code is reasonable, when you want to add or modify constitutive laws, engines or functions... Installing the latest trunk version allows to use newly added features, which are not yet available in packaged versions. 
+Installation from source code is reasonable, when you want to add or modify constitutive laws, engines or functions... Installing the latest trunk version allows one to use newly added features, which are not yet available in packaged versions. 
 
 Download
 ^^^^^^^^^^
@@ -113,7 +113,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 			mkdir /etc/portage -p;\
 			echo "media-libs/gd fontconfig jpeg png truetype" >>/etc/portage/package.use
 			
-		* Some additional commands, which can be usefull::
+		* Some additional commands, which can be useful::
 			
 			ln -s /usr/lib/python2.6/site-packages/numpy/core/include/numpy/ /usr/include/
 

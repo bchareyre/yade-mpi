@@ -373,7 +373,7 @@ if not env.GetOption('clean'):
 	if 'cgal' in env['features']:
 		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		env.Append(CXXFLAGS='-frounding-math') # required by cgal, otherwise we get assertion failure at startup
-		env.Append(LIBS=['gmpxx','gmp']) #need to be linked explicitely in ubuntu 11.04 (why not in 10.04?)
+		env.Append(LIBS=['gmpxx','gmp']) #need to be linked explicitly in ubuntu 11.04 (why not in 10.04?)
 		if not ok: featureNotOK('cgal')
 	env.Append(LIBS='yade-support')
 

@@ -75,7 +75,7 @@ Add generated packing to the simulation, rotated by 45° along +z
 	>>> sp.toSimulation(rot=Quaternion((0,0,1),pi/4),color=(0,0,1))
 	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-Periodic properties are transferred to the simulation correctly, including rotation (this could be avoided by explicitely passing "hSize=O.cell.hSize" as an argument):
+Periodic properties are transferred to the simulation correctly, including rotation (this could be avoided by explicitly passing "hSize=O.cell.hSize" as an argument):
 
 	>>> O.periodic
 	True

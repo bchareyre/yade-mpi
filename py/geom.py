@@ -96,7 +96,7 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	:param Quaternion orientation: orientation of the cylinder; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the cylinder surface (>=5)
 	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
-	:param (θmin,Θmax) angleRange: allows to create only part of bunker by specifying range of angles; if ``None``, (0,2*pi) is assumed.
+	:param (θmin,Θmax) angleRange: allows one to create only part of bunker by specifying range of angles; if ``None``, (0,2*pi) is assumed.
 	:param bool closeGap: close range skipped in angleRange with triangular facets at cylinder bases.
 	:param **kw: (unused keyword arguments) passed to utils.facet;
 	"""
@@ -119,7 +119,7 @@ def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identi
 	:param Quaternion orientation: orientation of the cone; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the cone surface (>=5)
 	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
-	:param (θmin,Θmax) angleRange: allows to create only part of cone by specifying range of angles; if ``None``, (0,2*pi) is assumed.
+	:param (θmin,Θmax) angleRange: allows one to create only part of cone by specifying range of angles; if ``None``, (0,2*pi) is assumed.
 	:param bool closeGap: close range skipped in angleRange with triangular facets at cylinder bases.
 	:param **kw: (unused keyword arguments) passed to utils.facet;
 	"""
@@ -139,7 +139,7 @@ def facetPolygon(center,radiusOuter,orientation=Quaternion.Identity,segmentsNumb
 	:param float radiusInner: inner height (can be 0)
 	:param Quaternion orientation: orientation of the polygon; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the polygon surface (>=3)
-	:param (θmin,Θmax) angleRange: allows to create only part of polygon by specifying range of angles; if ``None``, (0,2*pi) is assumed.
+	:param (θmin,Θmax) angleRange: allows one to create only part of polygon by specifying range of angles; if ``None``, (0,2*pi) is assumed.
 	:param **kw: (unused keyword arguments) passed to utils.facet;
 	"""
 	# check zero dimentions
@@ -199,7 +199,7 @@ def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Qua
 	:param Quaternion orientation: orientation of the bunker; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the bunker surface (>=5)
 	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
-	:param (θmin,Θmax) angleRange: allows to create only part of bunker by specifying range of angles; if ``None``, (0,2*pi) is assumed.
+	:param (θmin,Θmax) angleRange: allows one to create only part of bunker by specifying range of angles; if ``None``, (0,2*pi) is assumed.
 	:param bool closeGap: close range skipped in angleRange with triangular facets at cylinder bases.
 	:param **kw: (unused keyword arguments) passed to utils.facet;
 	"""
