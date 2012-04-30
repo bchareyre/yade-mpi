@@ -235,7 +235,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 	}
 
 	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
-	Real angle1 = NULL; Real angle2 = NULL;
+	Real angle1 = -1.0; Real angle2 = -1.0;
 	
 	for ( int i=0; i< bodiesMenisciiList.size(); ++i )// i is the index (or id) of the body being tested
 	{
