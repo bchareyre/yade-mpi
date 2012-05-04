@@ -22,13 +22,13 @@ include(FindPkgConfig)
 include(FeatureSummary)
 
 find_package(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization)
-find_package(Qt4 COMPONENTS QtCore QtGgui QtOpenGL)
+find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
 find_package(VTK COMPONENTS Common REQUIRED) 
 
 add_definitions(-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast)
 
 IF (NOT LIB_EIGEN_PATH)
- SET(LIB_EIGEN_PATH "/usr/include/eigen2")
+ SET(LIB_EIGEN_PATH "/usr/include/eigen3")
  MESSAGE("Headers of eigen library will be included from  ${LIB_EIGEN_PATH}, if you want to override it use -DLIB_EIGEN_PATH option.")
 ENDIF (NOT LIB_EIGEN_PATH)
 
@@ -67,7 +67,7 @@ IF (NOT INSTALL_PREFIX)
 ELSE (NOT INSTALL_PREFIX)
 	SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
 	MESSAGE("Yade will be installed to ${CMAKE_INSTALL_PREFIX}")
-ENDIF (NOT CMAKE_INSTALL_PREFIX)
+ENDIF (NOT INSTALL_PREFIX)
 
 
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade-${SUFFIX})
@@ -75,14 +75,14 @@ SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 
 #"OPENMP" 
+
 FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
 	if("${FEAT}_FOUND")
 		add_definitions(-DYADE_${FEAT})
 		message("Feature ${FEAT} enabled")
 	endif()
 ENDFOREACH()
-PRINT_ENABLED_FEATURES()
-PRINT_DISABLED_FEATURES()
+
 
 # this is only a temporary hack, headers should be installed in the build-dir directly
 # perhaps there is a proper way, have to ask
@@ -149,7 +149,7 @@ FILE(GLOB SRC_LIB_COMBINED  "${CMAKE_BINARY_DIR}/lib.*.cpp")
 #add_library(support SHARED ${SRC_LIB_COMBINED})
 #target_link_libraries(core support)
 #target_link_libraries(pkg core)
-SET(SRC_PYMODULES py/WeightedAverage2d.cpp;py/_eudoxos.cpp;py/log.cpp;py/_utils.cpp;py/wrapper/customConverters.cpp)
+SET(SRC_PYMODULES py/WeightedAverage2d.cpp;py/_eudoxos.cpp;py/_utils.cpp;py/wrapper/customConverters.cpp)
 
 SET(SRC_PACK ${CMAKE_SOURCE_DIR}/py/pack/_packPredicates.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packObb.cpp;${CMAKE_SOURCE_DIR}/py/pack/_packSpheres.cpp) # ;${CMAKE_SOURCE_DIR}/py/pack/_packSpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/SpherePadder.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/TetraMesh.cpp;${CMAKE_SOURCE_DIR}/py/pack/SpherePadder/CellPartition.cpp
 #IF(${CGAL_FOUND})
