@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include <yade/lib/base/Logging.hpp>
 #include "SimulationFlow.hpp"
 #include "Scene.hpp"
 #include "Omega.hpp"

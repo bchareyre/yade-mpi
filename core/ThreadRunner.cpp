@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include <yade/lib/base/Logging.hpp>
 #include "ThreadRunner.hpp"
 #include "ThreadWorker.hpp"
 
@@ -28,7 +29,7 @@ void ThreadRunner::run()
 			if(m_thread_worker->shouldTerminate()){ stop(); return; }
 		}
 	} catch (std::exception& e){
-		LOG_FATAL("Exception occured: "<<endl<<e.what());
+		LOG_FATAL("Exception occured: "<<std::endl<<e.what());
 		workerException=std::exception(e); workerThrew=true;
 		stop(); return;
 	}

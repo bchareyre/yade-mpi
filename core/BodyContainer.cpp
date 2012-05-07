@@ -1,7 +1,8 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/core/BodyContainer.hpp>
-#include<yade/core/Body.hpp>
+#include "Scene.hpp"
+#include "Body.hpp"
+#include "BodyContainer.hpp"
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
