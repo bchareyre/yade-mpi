@@ -9,7 +9,7 @@ class InteractionLoop: public GlobalEngine {
 	typedef std::pair<Body::id_t, Body::id_t> idPair;
 	// store interactions that should be deleted after loop in action, not later
 	#ifdef YADE_OPENMP
-		vector<list<idPair> > eraseAfterLoopIds;
+		std::vector<std::list<idPair> > eraseAfterLoopIds;
 		void eraseAfterLoop(Body::id_t id1,Body::id_t id2){ eraseAfterLoopIds[omp_get_thread_num()].push_back(idPair(id1,id2)); }
 	#else
 		list<idPair> eraseAfterLoopIds;
