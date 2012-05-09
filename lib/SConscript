@@ -9,6 +9,6 @@ env.Install('$LIBDIR/lib',env.SharedLibrary('yade-support',[
 		+(Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Timer.cpp triangulation/basicVTKwritter.cpp triangulation/FlowBoundingSphere.cpp triangulation/PeriodicFlow.cpp triangulation/Tenseur3.cpp triangulation/TriaxialState.cpp') if 'cgal' in env['features'] else [])
 		+(['opengl/GLUtils.cpp'] if 'opengl' in env['features'] else [])
 		),
- 		],LIBS=['dl','m']+[l for l in env['LIBS'] if l!='yade-support']+(['glut','GL','GLU'] if 'opengl' in env['features'] else []),LINKFLAGS=env['LINKFLAGS']+['-pthread','-Wl','-Bsymbolic-function','-ansi'],CXXFLAGS=env['CXXFLAGS']+['-pthread','-fPIC','-frounding-math','-ansi']
+ 		],LIBS=['dl','m']+[l for l in env['LIBS'] if l!='yade-support']+(['glut','GL','GLU'] if 'opengl' in env['features'] else []),LINKFLAGS=env['LINKFLAGS']+['-pthread','-Bsymbolic-function','-ansi'],CXXFLAGS=env['CXXFLAGS']+['-pthread','-fPIC','-frounding-math','-ansi']
 ))
 
