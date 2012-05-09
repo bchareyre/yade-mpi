@@ -20,11 +20,6 @@ IF (NOT CHUNKSIZE)
  MESSAGE("Maximum files to compile in one translation unit ${CHUNKSIZE}, if you want to override it use -DCHUNKSIZE option.")
 ENDIF (NOT CHUNKSIZE)
 
-SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade-${SUFFIX})
-SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
-SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
-
-
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -fopenmp")
 
 INCLUDE(FindPythonLibs)
@@ -59,13 +54,6 @@ ELSE ()
   ENDIF ()
 ENDIF()
 
-
-IF (NOT SUFFIX)
-  SET (SUFFIX ${VERSION})
-ENDIF (NOT SUFFIX)
-
-MESSAGE (STATUS "Suffix is set to " ${SUFFIX})
-
 ADD_DEFINITIONS(-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_OPENMP)
 
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
@@ -92,6 +80,16 @@ ELSE (NOT INSTALL_PREFIX)
 	MESSAGE("Yade will be installed to ${CMAKE_INSTALL_PREFIX}")
 ENDIF (NOT INSTALL_PREFIX)
 
+IF (NOT SUFFIX)
+  SET (SUFFIX ${VERSION})
+ENDIF (NOT SUFFIX)
+
+IF (NOT runtimePREFIX)
+  SET (runtimePREFIX ${CMAKE_INSTALL_PREFIX})
+ENDIF (NOT runtimePREFIX)
+
+MESSAGE (STATUS "Suffix is set to " ${SUFFIX})
+MESSAGE (STATUS "runtimePREFIX is set to " ${runtimePREFIX})
 
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade-${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
