@@ -261,8 +261,8 @@ def unv(fileName,shift=(0,0,0),scale=1.0,**kw):
 		`**kw`: (unused keyword arguments)
 				is passed to :yref:`yade.utils.facet`
 	
-	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>` and `Abakus <http://www.simulia.com/products/abaqus_fea.html>`), but triangular elements can be imported as facets.
-	These files cen be created e.g. with open-source free software `Salome <salome-platform.org>`.
+	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>`_ and `Abakus <http://www.simulia.com/products/abaqus_fea.html>`_), but triangular elements can be imported as facets.
+	These files cen be created e.g. with open-source free software `Salome <http://salome-platform.org>`_.
 	
 	Example: :ysrc:`scripts/test/unvRead.py`."""
 

@@ -124,6 +124,20 @@ class Cell: public Serializable{
 	Vector3r wrapShearedPt_py(const Vector3r& pt) const { return wrapShearedPt(pt);}
 	Vector3r wrapPt_py(const Vector3r& pt) const { return wrapPt(pt);}
 
+	// strain measures
+	Matrix3r giveDefGrad() { return trsf; }
+	Matrix3r giveSmallStrain() { return .5*(trsf+trsf.transpose()) - Matrix3r::Identity(); }
+	Matrix3r giveRCauchyGreenDef() { return trsf.transpose()*trsf; }
+	Matrix3r giveLCauchyGreenDef() { return trsf*trsf.transpose(); }
+	Matrix3r giveLagrangianStrain() { return .5*(giveRCauchyGreenDef()-Matrix3r::Identity()); }
+	Matrix3r giveEulerianAlmansiStrain() { return .5*(Matrix3r::Identity()-giveLCauchyGreenDef().inverse()); }
+	void computePolarDecOfDefGrad(Matrix3r& R, Matrix3r& U) { Matrix_computeUnitaryPositive(trsf,&R,&U); }
+	boost::python::tuple givePolarDecOfDefGrad(){ Matrix3r R,U; computePolarDecOfDefGrad(R,U); return boost::python::make_tuple(R,U); }
+	Matrix3r giveRotation() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return R; }
+	Matrix3r giveLeftStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return U; }
+	Matrix3r giveRightStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return trsf*R.transpose(); }
+		
+
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		/* overridden below to be modified by getters/setters because of intended side-effects */
@@ -156,6 +170,16 @@ class Cell: public Serializable{
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
 		.def("shearPt",&Cell::shearPt,"Apply shear (cell skew+rot) on the point")
 		.def("wrapPt",&Cell::wrapPt_py,"Wrap point inside the reference cell, assuming the cell has no skew+rot.")
+		.def("giveDefGrad",&Cell::giveDefGrad,"Returns deformation gradient tensor (F) of the cell deformation (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("giveSmallStrain",&Cell::giveSmallStrain,"Returns small strain tensor ($\\boldsymbol{\\varepsilon}=\\frac{1}{2}(\\boldsymbol{F}+\\boldsymbol{F}^T)-\\boldsymbol{I}$) of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("giveRCauchyGreenDef",&Cell::giveRCauchyGreenDef,"Returns right Cauchy-Green deformation tensor ($\\boldsymbol{C}=\\boldsymbol{F}^T\\boldsymbol{F}$) of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("giveLCauchyGreenDef",&Cell::giveLCauchyGreenDef,"Returns left Cauchy-Green deformation tensor ($\\boldsymbol{C}=\\boldsymbol{F}\\boldsymbol{F}^T$) of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("giveLagrangianStrain",&Cell::giveLagrangianStrain,"Returns Lagrangian strain tensor ($\\boldsymbol{E}=\\frac{1}{2}(\\boldsymbol{F}^T\\boldsymbol{F}-\\boldsymbol{I}=\\frac{1}{2}(\\boldsymbol{U}^2-\\boldsymbol{I}$) of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("giveEulerianAlmansiStrain",&Cell::giveEulerianAlmansiStrain,"Returns Eulerian-Almansi strain tensor ($\\boldsymbol{e}=\\frac{1}{2}(\\boldsymbol{I}-(\\boldsymbol{F}\\boldsymbol{F}^T)^{-1})$) of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("givePolarDecOfDefGrad",&Cell::givePolarDecOfDefGrad,"Returns orthogonal matrix R and positive semi-definite matrix U as polar decomposition of deformation gradient F of the cell ( ($\\boldsymbol{F}=\\boldsymbol{RU}$)")
+		.def("giveRotation",&Cell::giveRotation,"Returns rotation of the cell (orthogonal matrix R from polar decomposition)")
+		.def("giveLeftStretch",&Cell::giveLeftStretch,"Returns left (spatial) stretch tensor of the cell (matrix U from polar decomposition F=RU)")
+		.def("giveRightStretch",&Cell::giveRightStretch,"Returns right (material) stretch tensor of the cell (matrix V from polar decomposition F=VR)")
 		.def_readonly("shearTrsf",&Cell::_shearTrsf,"Current skew+rot transformation (no resize)")
 		.def_readonly("unshearTrsf",&Cell::_unshearTrsf,"Inverse of the current skew+rot transformation (no resize)")
 		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell.trsf>` (computed as :yref:`trsf<Cell.trsf>`⁻¹ × :yref:`hSize<Cell.hSize>`.")

@@ -191,7 +191,7 @@ class VTKExporter:
 
 	USAGE:
 	create object vtkExporter = VTKExporter('baseFileName'),
-	add to engines PyRunner with command='vtkWriter.exportSomething(params)'
+	add to engines PyRunner with command='vtkExporter.exportSomething(params)'
 	"""
 	def __init__(self,baseName,startSnap=0):
 		self.spheresSnapCount = startSnap
