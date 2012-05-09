@@ -20,10 +20,6 @@ IF (NOT CHUNKSIZE)
  MESSAGE("Maximum files to compile in one translation unit ${CHUNKSIZE}, if you want to override it use -DCHUNKSIZE option.")
 ENDIF (NOT CHUNKSIZE)
 
-IF (NOT SUFFIX)
-  SET(SUFFIX version)
-ENDIF ()
-
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade-${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
@@ -41,6 +37,7 @@ INCLUDE(FindVTK)
 INCLUDE(FindPkgConfig)
 INCLUDE(FeatureSummary)
 INCLUDE(CombineSources)
+INCLUDE(GetVersion)
 
 
 FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization)
@@ -61,6 +58,13 @@ ELSE ()
     MESSAGE(FATAL_ERROR "None Eigen2 or Eigen3 were found!")
   ENDIF ()
 ENDIF()
+
+
+IF (NOT SUFFIX)
+  SET (SUFFIX ${VERSION})
+ENDIF (NOT SUFFIX)
+
+MESSAGE (STATUS "Suffix is set to " ${SUFFIX})
 
 ADD_DEFINITIONS(-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_OPENMP)
 
