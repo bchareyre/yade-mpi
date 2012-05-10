@@ -74,18 +74,23 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
 	bool hertzInitialized = false;
 	for (; ii!=iiEnd ; ++ii) {
-		const shared_ptr<Interaction>& interaction = *ii;
-		if (!hertzInitialized) {//NOTE: We are assuming that only one type is used in one simulation here
-			if (CapillaryPhys::getClassIndexStatic()==interaction->phys->getClassIndex()) hertzOn=false;
-			else if (MindlinCapillaryPhys::getClassIndexStatic()==interaction->phys->getClassIndex()) hertzOn=true;
-			else LOG_ERROR("The capillary law is not implemented for interactions using"<<interaction->phys->getClassName());
-		}
-		hertzInitialized = true;
-		CapillaryPhys* cundallContactPhysics=NULL;
-		MindlinCapillaryPhys* mindlinContactPhysics=NULL;
 
 		/// interaction is real
 		if ((*ii)->isReal()) {
+			const shared_ptr<Interaction>& interaction = *ii;
+			if (!hertzInitialized) {//NOTE: We are assuming that only one type is used in one simulation here
+				if (CapillaryPhys::getClassIndexStatic()==interaction->phys->getClassIndex()) hertzOn=false;
+				else if (MindlinCapillaryPhys::getClassIndexStatic()==interaction->phys->getClassIndex()) hertzOn=true;
+				else LOG_ERROR("The capillary law is not implemented for interactions using"<<interaction->phys->getClassName());
+			}
+			hertzInitialized = true;
+			CapillaryPhys* cundallContactPhysics=NULL;
+			MindlinCapillaryPhys* mindlinContactPhysics=NULL;
+
+			/// contact physics depends on the contact law, that is used (either linear model or hertz model)
+			if (!hertzOn) cundallContactPhysics = static_cast<CapillaryPhys*>(interaction->phys.get());//use CapillaryPhys for linear model
+			else mindlinContactPhysics = static_cast<MindlinCapillaryPhys*>(interaction->phys.get());//use MindlinCapillaryPhys for hertz model
+			
 			unsigned int id1 = interaction->getId1();
 			unsigned int id2 = interaction->getId2();
 			Body* b1 = (*bodies)[id1].get();
@@ -98,10 +103,6 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 
 			/// definition of interacting objects (not necessarily in contact)
 			ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->geom.get());
-
-			/// contact physics depends on the contact law, that is used (either linear model or hertz model)
-			if (!hertzOn) cundallContactPhysics = static_cast<CapillaryPhys*>(interaction->phys.get());//use CapillaryPhys for linear model
-			else mindlinContactPhysics = static_cast<MindlinCapillaryPhys*>(interaction->phys.get());//use MindlinCapillaryPhys for hertz model
 
 			/// Capillary components definition:
 			Real liquidTension = 0.073; 	// superficial water tension N/m (0.073 is water tension at 20 Celsius degrees)
@@ -171,8 +172,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					mindlinContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
 				}
 			}
-		///interaction is not real	//If the interaction is not real or broken, it should not be in the list
-		} else if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove((*ii));
+		///interaction is not real	//If the interaction is not real, it should not be in the list
+		} else if (fusionDetection) bodiesMenisciiList.remove((*ii));
 	}
 	if (fusionDetection) checkFusion();
 
