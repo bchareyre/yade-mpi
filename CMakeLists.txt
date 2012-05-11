@@ -190,7 +190,11 @@ FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
 ENDFOREACH()
 #====================================
 
-configure_file(core/main/yade-batch.in ${YADE_EXEC_PATH}/yade-batch-${SUFFIX})
-configure_file(core/main/main.py.in ${YADE_EXEC_PATH}/yade-${SUFFIX})
-configure_file(py/config.py.in ${YADE_PY_PATH}/yade/config.py)
+CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}")
+CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade-${SUFFIX}")
+CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
+
+INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
+INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
+INSTALL(FILES "${CMAKE_BINARY_DIR}/config.py" DESTINATION ${YADE_PY_PATH}/yade/)
 
