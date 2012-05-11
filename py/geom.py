@@ -39,7 +39,7 @@ def facetParallelepiped(center,extents,height,orientation=Quaternion.Identity,wa
 	:returns: list of facets forming the parallelepiped
 	"""
 	
-	if (height<=0): raise RuntimeError("The height should have the positive value");
+	if (height<0): raise RuntimeError("The height should have the positive value");
 	if (height>extents[2]): raise RuntimeError("The height should be smaller or equal as extents[2]");
 	
 	#Defense from zero dimensions
@@ -50,15 +50,17 @@ def facetParallelepiped(center,extents,height,orientation=Quaternion.Identity,wa
 		wallMask=1
 	elif (extents[1]==0):
 		wallMask=4
-	elif (extents[2]==0):
+	elif (extents[2]==0 or height==0):
 		wallMask=16
 	if (((extents[0]==0) and (extents[1]==0)) or ((extents[0]==0) and (extents[2]==0)) or ((extents[1]==0) and (extents[2]==0))):
 		raise RuntimeError("Please, specify at least 2 none-zero dimensions in extents!");
 	# ___________________________
 	
 	#inclination angle
-	beta = math.asin(height/extents[2])
-	dx = math.cos(beta)*extents[2]
+	beta = 0; dx = 0
+	if (height>0):
+		beta = math.asin(height/extents[2])
+		dx = math.cos(beta)*extents[2]
 	
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
