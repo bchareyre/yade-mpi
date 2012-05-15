@@ -165,6 +165,10 @@ IF(${QGLVIEWER_FOUND})
   INCLUDE_DIRECTORIES(${QGLVIEWER_INCLUDE_DIR})
   ADD_LIBRARY(_GLViewer SHARED gui/qt4/GLViewer.cpp;gui/qt4/_GLViewer.cpp;gui/qt4/OpenGLManager.cpp)
   SET_TARGET_PROPERTIES(_GLViewer PROPERTIES PREFIX "")
+  INSTALL(TARGETS _GLViewer DESTINATION ${YADE_PY_PATH}/yade/qt)
+
+  FILE(GLOB filesPYQT "${CMAKE_CURRENT_SOURCE_DIR}/gui/qt4/*.py")
+  INSTALL(FILES ${filesPYQT} DESTINATION ${YADE_PY_PATH}/yade/qt)
 ENDIF(${QGLVIEWER_FOUND})
 
 ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
@@ -213,7 +217,4 @@ INSTALL(FILES ${filesPYChecks} DESTINATION ${YADE_PY_PATH}/yade/tests/checks)
 FILE(GLOB filesPYChecksData "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/data/*")
 INSTALL(FILES ${filesPYChecksData} DESTINATION ${YADE_PY_PATH}/yade/tests/checks/data)
 
-
-FILE(GLOB filesPYQT "${CMAKE_CURRENT_SOURCE_DIR}/gui/qt4/*.py")
-INSTALL(FILES ${filesPYQT} DESTINATION ${YADE_PY_PATH}/yade/qt)
 
