@@ -33,7 +33,7 @@ namespace CGT{
 		void Interpolate(Tesselation& Tes, Tesselation& NewTes);
 		void ComputeFacetForcesWithCache();
 		void Compute_Permeability();
-		void Initialize_pressures( double P_zero );
+// 		void Initialize_pressures( double P_zero );
 		void GaussSeidel(Real dt=0);
 		void DisplayStatistics();
 		void Average_Relative_Cell_Velocity();

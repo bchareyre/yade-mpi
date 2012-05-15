@@ -1,24 +1,6 @@
 #ifdef FLOW_ENGINE
-/*#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
-#include <CGAL/Width_3.h>
-#include <iostream>
-#include <fstream>
-#include <new>
-#include <utility>
-#include "vector"
-#include <assert.h>
-#include <sys/stat.h>
-#include <sys/types.h>*/
-// #include "Network.hpp"
-// #include <omp.h>
 
-// #define XVIEW
 #include"PeriodicFlow.hpp"
-// #include<yade/core/Cell.hpp>
-
-#ifdef XVIEW
-// #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
-#endif
 
 #define FAST
 #define TESS_BASED_FORCES
@@ -41,7 +23,6 @@ void PeriodicFlow::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 		if (new_cell->info().Pcondition || new_cell->info().isGhost) continue;
                 old_cell = Tri.locate((Point) new_cell->info());
                 new_cell->info().p() = old_cell->info().shiftedP();
-// 		new_cell->info().dv() = old_cell->info().dv();
         }
 //  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
 }
@@ -109,17 +90,13 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 		for (int yy=0;yy<4;yy++) {
 			Vertex_Info& vhi = cell->vertex(yy)->info();
 			Real unshiftedP = cell->info().p();
-// 			cerr <<"p="<<cell->info().p()<<" shifted="<<cell->info().shiftedP()<<endl;
 			//the pressure translated to a ghost cell adjacent to the non-ghost vertex
-			//FIXME: the hsize[k]*gradP products could be computed only once for all cells and facets
-			/*if (vhi.isGhost) */unshiftedP -= pDeltas[0]*vhi.period[0] + pDeltas[1]*vhi.period[1] +pDeltas[2]*vhi.period[2];
+			unshiftedP -= pDeltas[0]*vhi.period[0] + pDeltas[1]*vhi.period[1] +pDeltas[2]*vhi.period[2];
 			T[currentTes].vertexHandles[vhi.id()]->info().forces=T[currentTes].vertexHandles[vhi.id()]->info().forces + cell->info().unitForceVectors[yy]*unshiftedP;
-// 			vhi.forces = vhi.forces + cell->info().unitForceVectors[yy]*unshiftedP;
 		}
 	}
 	noCache=false;//cache should always be defined after execution of this function
 	if (DEBUG_OUT) {
-// 		cout << "Facet cached scheme" <<endl;
 		Vecteur TotalForce = nullVect;
 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); v++)
 		{
@@ -138,7 +115,7 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 
 void PeriodicFlow::Compute_Permeability()
 {
-	if (DEBUG_OUT)  cout << "----Computing_Permeability------" << endl;
+	if (DEBUG_OUT)  cout << "----Computing_Permeability (Periodic)------" << endl;
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Vsolid_tot = 0, Vtotalissimo = 0, Vporale = 0, Ssolid_tot = 0, V_totale_porosity=0, V_porale_porosity=0;
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -204,7 +181,7 @@ void PeriodicFlow::Compute_Permeability()
 						const Vecteur& Surfk = cell->info().facetSurfaces[j];
 						Real area = sqrt(Surfk.squared_length());
 						const Vecteur& crossSections = cell->info().facetSphereCrossSections[j];
-						if (areaR2Permeability){
+// 						if (areaR2Permeability){
 //  							Real m1=sqrt((cross_product((v0-v1),v2-v1)).squared_length()/(v2-v1).squared_length());
 							Real S0=0;
 							S0=checkSphereFacetOverlap(v0,v1,v2);
@@ -214,25 +191,23 @@ void PeriodicFlow::Compute_Permeability()
 							fluidArea=abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
 							cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
 							k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
-						}
-						else {
-						cout << "WARNING! if !areaR2Permeability, facetFluidSurfacesRatio will not be defined correctly. Don't use that."<<endl;
-						k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
-						}
+// 						} else {
+// 						cout << "WARNING! if !areaR2Permeability, facetFluidSurfacesRatio will not be defined correctly. Don't use that."<<endl;
+// 						k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
+// 						}
+						meanDistance += distance;
+						meanRadius += radius;
+						meanK += k*k_factor;
 
 					if (k<0 && DEBUG_OUT) {surfneg+=1;
 					cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
-					} 
-					else  {
+					} else  {
 						cout <<"infinite K2!"<<endl; k = infiniteK;
 					}//Will be corrected in the next loop
-
 					(cell->info().k_norm())[j]= k*k_factor;
 					(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
-					meanDistance += distance;
-					meanRadius += radius;
-					meanK += (cell->info().k_norm())[j];
+
 				
 					if(permeability_map){
 						Cell_handle c = cell;
@@ -250,26 +225,30 @@ void PeriodicFlow::Compute_Permeability()
 		else cell->info().isvisited = !ref;
 	} 
 	
+	
 	if (DEBUG_OUT) cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
-	double maxKdivKmean=MAXK_DIV_KMEAN;
+	Real globalRh=meanDistance*Vporale/(Ssolid_tot*8.*viscosity);
+// 	double maxKdivKmean=MAXK_DIV_KMEAN;
 	if (DEBUG_OUT) {
 		cout << "PassCompK = " << pass << endl;
 		cout << "meanK = " << meanK << endl;
-		cout << "maxKdivKmean = " << maxKdivKmean << endl;
+		cout << "maxKdivKmean*globalRh = " << MAXK_DIV_KMEAN*globalRh << endl;
+		cout << "minKdivKmean*globalRh = " << MINK_DIV_KMEAN*globalRh << endl;
 		cout << "meanTubesRadius = " << meanRadius << endl;
 		cout << "meanDistance = " << meanDistance << endl;
 	}
 	ref = Tri.finite_cells_begin()->info().isvisited;
 	pass=0;
+	
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		for (int j=0; j<4; j++) {
 			neighbour_cell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
 				pass++;
-				(cell->info().k_norm())[j] = min((cell->info().k_norm())[j], maxKdivKmean*meanK);
+				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*globalRh, min((cell->info().k_norm())[j], MAXK_DIV_KMEAN*globalRh));
 // 				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*meanK ,min((cell->info().k_norm())[j], maxKdivKmean*meanK));
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
 // 				cout<<(cell->info().k_norm())[j]<<endl;
@@ -323,17 +302,18 @@ void PeriodicFlow::Compute_Permeability()
 		if (DEBUG_OUT) cout << "PassKopt = " << pass << endl;
 	}
 
-	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
-	Real Vgrains = 0;
-	int grains=0;
 
-	for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
-		if (!V_it->info().isFictious && !V_it->info().isGhost) {
-			grains +=1;
-			Vgrains += 1.33333333 * M_PI * pow(V_it->point().weight(),1.5);
-		}
-	}
 	if (DEBUG_OUT) {
+		Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
+		Real Vgrains = 0;
+		int grains=0;
+
+		for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
+			if (!V_it->info().isFictious && !V_it->info().isGhost) {
+				grains +=1;
+				Vgrains += 1.33333333 * M_PI * pow(V_it->point().weight(),1.5);
+			}
+		}
 		cout<<grains<<"grains - " <<"Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << (Vtotale-Vgrains) << endl;
 		cout << "Vtotalissimo = " << Vtotalissimo/2 << " Vsolid_tot = " << Vsolid_tot/2 << " Vporale2 = " << Vporale/2  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
 
@@ -344,43 +324,44 @@ void PeriodicFlow::Compute_Permeability()
 // 	cout << "Negative Permeabilities = " << count_k_neg << endl; 
 }
 
-void PeriodicFlow::Initialize_pressures( double P_zero )
-{
-        RTriangulation& Tri = T[currentTes].Triangulation();
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+// void PeriodicFlow::Initialize_pressures( double P_zero )
+// {
+//         RTriangulation& Tri = T[currentTes].Triangulation();
+//         Finite_cells_iterator cell_end = Tri.finite_cells_end();
+// 
+//         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
+// 		cell->info().setP(P_zero); cell->info().dv()=0;}
+// 
+//         for (int bound=0; bound<6;bound++) {
+//                 int& id = *boundsIds[bound];
+// 		if (id<0) continue;
+// 		Boundary& bi = boundary(id);
+// 		if (!bi.flowCondition) {
+// 			Vector_Cell tmp_cells;
+// 			tmp_cells.resize(10000);
+// 			VCell_iterator cells_it = tmp_cells.begin();
+// 			VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+// 			for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+// 				{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
+// 				boundingCells[bound].push_back(*it);}
+// 		}
+//         }
+//         IPCells.clear();
+//         for (unsigned int n=0; n<imposedP.size();n++) {
+// 		Cell_handle cell=Tri.locate(imposedP[n].first);
+// 		
+// 		//check redundancy
+// 		for (unsigned int kk=0;kk<IPCells.size();kk++){
+// 			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
+// 			else if  (cell->info().Pcondition) cerr<<"Imposed pressure fall in a boundary condition."<<endl;}
+// // 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
+// // 		assert(cell);
+// 		IPCells.push_back(cell);
+// 		cell->info().p()=imposedP[n].second;
+// 		cell->info().Pcondition=true;}
+// 	pressureChanged=false;
+// }
 
-        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
-		cell->info().setP(P_zero); cell->info().dv()=0;}
-
-        for (int bound=0; bound<6;bound++) {
-                int& id = *boundsIds[bound];
-		if (id<0) continue;
-		Boundary& bi = boundary(id);
-		if (!bi.flowCondition) {
-			Vector_Cell tmp_cells;
-			tmp_cells.resize(10000);
-			VCell_iterator cells_it = tmp_cells.begin();
-			VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
-			for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
-				{(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
-				boundingCells[bound].push_back(*it);}
-		}
-        }
-        IPCells.clear();
-        for (unsigned int n=0; n<imposedP.size();n++) {
-		Cell_handle cell=Tri.locate(imposedP[n].first);
-		
-		//check redundancy
-		for (unsigned int kk=0;kk<IPCells.size();kk++){
-			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
-			else if  (cell->info().Pcondition) cerr<<"Imposed pressure fall in a boundary condition."<<endl;}
-// 		cerr<<"cell found : "<<cell->vertex(0)->point()<<" "<<cell->vertex(1)->point()<<" "<<cell->vertex(2)->point()<<" "<<cell->vertex(3)->point()<<endl;
-// 		assert(cell);
-		IPCells.push_back(cell);
-		cell->info().p()=imposedP[n].second;
-		cell->info().Pcondition=true;}
-	pressureChanged=false;
-}
 
 void PeriodicFlow::GaussSeidel(Real dt)
 {
@@ -439,8 +420,8 @@ void PeriodicFlow::GaussSeidel(Real dt)
 			}
 		}
 		dp -= cell->info().p();
-		dp_max = std::max(dp_max, std::abs(dp));
-		p_max = std::max(p_max, std::abs(cell->info().shiftedP()));
+		dp_max = max(dp_max, std::abs(dp));
+		p_max = max(p_max, std::abs(cell->info().shiftedP()));
 		sum_p += cell->info().shiftedP();
 		sum_dp += std::abs(dp);
             }

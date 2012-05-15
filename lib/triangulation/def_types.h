@@ -10,7 +10,6 @@
 #ifndef _Def_types
 #define _Def_types
 
-
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Cartesian.h>
 #include <CGAL/Regular_triangulation_3.h>
@@ -21,6 +20,7 @@
 #include <CGAL/circulator.h>
 #include <CGAL/number_utils.h>
 #include <boost/static_assert.hpp>
+
 
 namespace CGT {
 //Robust kernel
@@ -54,6 +54,8 @@ class SimpleCellInfo : public Point {
 	inline Real y (void) {return Point::y();}
 	inline Real z (void) {return Point::z();}
 	inline Real& f (void) {return s;}
+	//virtual function that will be defined for all classes, allowing shared function (e.g. for display of periodic and non-periodic with the unique function saveVTK)
+	virtual bool isReal (void) {return !isFictious;}
 };
 
 class SimpleVertexInfo : public Vecteur {
@@ -73,8 +75,9 @@ public:
 	inline Real& v (void) {return vol;}
 	inline const unsigned int& id (void) const {return i;}
 	SimpleVertexInfo (void) {isFictious=false; s=0; i=0;}
+	//virtual function that will be defined for all classes, allowing shared function (e.g. for display)
+	virtual bool isReal (void) {return !isFictious;}
 };
-
 
 class FlowCellInfo : public SimpleCellInfo {
 
@@ -140,10 +143,12 @@ class FlowCellInfo : public SimpleCellInfo {
 	FlowCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
 	
 	inline Real& volume (void) {return t;}
+	inline const Real& invVoidVolume (void) const {return invVoidV;}
 	inline Real& invVoidVolume (void) {return invVoidV;}
 	inline Real& dv (void) {return VolumeVariation;}
 	inline int& fictious (void) {return fict;}
 	inline double& p (void) {return pression;}
+	inline const std::vector<double>& k_norm (void) const {return module_permeability;}
 	inline std::vector<double>& k_norm (void) {return module_permeability;}
 	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
 	inline std::vector<Vecteur>& force (void) {return cell_force;}
@@ -187,6 +192,7 @@ class PeriodicCellInfo : public FlowCellInfo
 	inline const double pShift (void) const {return deltaP[0]*period[0] + deltaP[1]*period[1] +deltaP[2]*period[2];}
 // 	inline const double p (void) {return shiftedP();}
 	inline void setP (const Real& p) {pression=p;}
+	virtual bool isReal (void) {return !(isFictious || isGhost);}
 };
 
 class PeriodicVertexInfo : public FlowVertexInfo {
@@ -200,6 +206,7 @@ class PeriodicVertexInfo : public FlowVertexInfo {
 	inline const Vecteur ghostShift (void) {
 		return period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2];}
 	PeriodicVertexInfo (void) {isFictious=false; s=0; i=0; period[0]=period[1]=period[2]=0; isGhost=false;}
+	virtual bool isReal (void) {return !(isFictious || isGhost);}
 };
 
 

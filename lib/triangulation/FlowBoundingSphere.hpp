@@ -48,9 +48,11 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
 		
-		//Handling imposed pressures on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
+		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
 		vector<Cell_handle> IPCells;
+		vector<pair<Point,Real> > imposedF;
+		vector<Cell_handle> IFCells;
 		
 		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
 		bool permeability_map;
