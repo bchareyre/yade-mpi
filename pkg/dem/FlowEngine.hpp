@@ -6,11 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #pragma once
-
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
-#include<yade/lib/triangulation/FlowBoundingSphere.hpp>
 #include<yade/pkg/dem/TesselationWrapper.hpp>
+#include<yade/lib/triangulation/FlowBoundingSphere.hpp>
 #include<yade/lib/triangulation/PeriodicFlow.hpp>
 
 class Flow;
@@ -36,6 +35,8 @@ class FlowEngine : public PartialEngine
 	
 	protected:
 		shared_ptr<FlowSolver> solver;
+		shared_ptr<FlowSolver> backgroundSolver;
+		volatile bool backgroundCompleted;
 
 	public :
 		int retriangulationLastIter;
@@ -61,11 +62,11 @@ class FlowEngine : public PartialEngine
 		TPL unsigned int imposePressure(Vector3r pos, Real p,Solver& flow);
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
+		TPL void clearImposedFlux(Solver& flow);
 		TPL void ApplyViscousForces(Solver& flow);
 		TPL Real getFlux(unsigned int cond,Solver& flow);
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-			
 		TPL Vector3r fluidShearForce(unsigned int id_sph, Solver& flow) {
 			return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
 			
@@ -97,12 +98,14 @@ class FlowEngine : public PartialEngine
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
+		void 		_clearImposedFlux() {clearImposedFlux(solver);}
 		void 		_updateBCs() {updateBCs(solver);}
 		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
 
 		virtual ~FlowEngine();
 
 		virtual void action();
+		virtual void backgroundAction();
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,,"Activates Flow Engine"))
@@ -159,7 +162,6 @@ class FlowEngine : public PartialEngine
 					((int, wallBackId,4,,"Id of back boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((int, wallLeftId,0,,"Id of left boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((int, wallRightId,1,,"Id of right boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((Vector3r, id_force, 0,, "Fluid force acting on sphere with id=flow.id_sphere"))
 					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
 					((bool, TOP_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
 					((bool, RIGHT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
@@ -168,6 +170,7 @@ class FlowEngine : public PartialEngine
 					((bool, BACK_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
 					((bool, areaR2Permeability, 1,,"Use corrected formula for permeabilities calculation in flowboundingsphere (areaR2permeability variable)"))
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
+					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
@@ -178,11 +181,13 @@ class FlowEngine : public PartialEngine
 					Update_Triangulation=false;
 					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 					ReTrg=1;
+					backgroundCompleted=true;
 					,
 					.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 					.def("imposePressure",&FlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 					.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 					.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
+					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
 					.def("getFlux",&FlowEngine::_getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
 					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
@@ -253,6 +258,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void preparePShifts();
 		
 		//(re)instanciation of templates and others, for python binding
+		void saveVtk() {solver->saveVtk();}
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
 // 		void 		saveVtk() {solver->saveVtk();} // FIXME: need to adapt vtk recorder to periodic case
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
@@ -280,7 +286,7 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 			.def("fluidShearForce",&PeriodicFlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
-// 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
+			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
