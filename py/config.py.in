@@ -10,6 +10,7 @@ suffix='${SUFFIX}'
 debug=bool(${debug})
 libDir=os.path.abspath(prefix+'/lib/yade$SUFFIX'+('/dbg' if debug else ''))
 confDir=os.environ['HOME']+'/.yade$SUFFIX'
+libstdcxx='${libstdcxx}'
 features='${features}'.split(',')
 revision='${realVersion}'
 version='${version}'

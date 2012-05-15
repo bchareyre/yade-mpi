@@ -102,6 +102,7 @@ opts.AddVariables(
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.0:/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/vtk-5.6:/usr/include/vtk-5.8:/usr/include/vtk'), # hardy has vtk-5.0
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
+	('libstdcxx','Specify libstdc++ location by hand (opened dynamically at startup), usually not needed',None),
 	('QT4CXX','Specify a different compiler for files including qt4; this is necessary for older qt version (<=4.7) which don\'t compile with clang',None),
 	('QT4DIR','Directory where Qt4 is installed','/usr/share/qt4'),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
@@ -239,6 +240,21 @@ def CheckCXX(context):
 	context.Result(ret)
 	return ret
 
+def CheckLibStdCxx(context):
+	context.Message('Finding libstdc++ library... ')
+	if context.env.has_key('libstdcxx') and context.env['libstdcxx']:
+		l=context.env['libstdcxx']
+		context.Result(l+' (specified by the user)')
+		return l
+	ret=os.popen(context.env['CXX']+' -print-file-name=libstdc++.so.6').readlines()[0][:-1]
+	if ret[0]!='/':
+		context.Result('Relative path "%s" was given by compiler %s, must specify libstdcxx=.. explicitly.'%(ret,context.env['CXX']))
+		Exit(1)
+	ret=os.path.abspath(ret) # removes .. in the path returned by g++
+	context.env['libstdcxx']=ret
+	context.Result(ret)
+	return ret
+
 def CheckPython(context):
 	"Checks for functional python/c API. Sets variables if OK and returns true; otherwise returns false."
 	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH'],'LINKFLAGS':context.env['LINKFLAGS']}
@@ -298,7 +314,7 @@ def CheckPythonModules(context):
 	
 
 if not env.GetOption('clean'):
-	conf=env.Configure(custom_tests={'CheckCXX':CheckCXX,'CheckBoost':CheckBoost,'CheckPython':CheckPython,'CheckPythonModules':CheckPythonModules}, # 'CheckQt':CheckQt
+	conf=env.Configure(custom_tests={'CheckLibStdCxx':CheckLibStdCxx,'CheckCXX':CheckCXX,'CheckBoost':CheckBoost,'CheckPython':CheckPython,'CheckPythonModules':CheckPythonModules}, # 'CheckQt':CheckQt
 		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log'
 	)
 	ok=True
@@ -306,6 +322,7 @@ if not env.GetOption('clean'):
 	if not ok:
 			print "\nYour compiler is broken, no point in continuing. See `%s' for what went wrong and use the CXX/CXXFLAGS parameters to change your compiler."%(buildDir+'/config.log')
 			Exit(1)
+	conf.CheckLibStdCxx()
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);',autoadd=1)
 	ok&=(conf.CheckPython() and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 	ok&=conf.CheckPythonModules()
