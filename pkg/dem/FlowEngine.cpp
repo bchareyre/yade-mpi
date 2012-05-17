@@ -872,7 +872,7 @@ void PeriodicFlowEngine::Initialize_volumes ()
 			default:  cell->info().volume() = 0; break;
 		}
 		//FIXME: the void volume is negative sometimes, hence crashing...
-		if (solver->fluidBulkModulus>0) { cell->info().invVoidVolume() = 1. / (max(0.000001,abs(cell->info().volume()) - solver->volumeSolidPore(cell)) ); }
+		if (solver->fluidBulkModulus>0) { cell->info().invVoidVolume() = 1. / (max(0.1*cell->info().volume(),abs(cell->info().volume()) - solver->volumeSolidPore(cell)) ); }
 	}
         if ( Debug ) cout << "Volumes initialised." << endl;
 }
