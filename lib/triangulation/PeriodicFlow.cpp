@@ -21,7 +21,20 @@ void PeriodicFlow::Interpolate(Tesselation& Tes, Tesselation& NewTes)
         Finite_cells_iterator cell_end = NewTri.finite_cells_end();
         for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
 		if (new_cell->info().Pcondition || new_cell->info().isGhost) continue;
-                old_cell = Tri.locate((Point) new_cell->info());
+		Vecteur center ( 0,0,0 );
+		if (new_cell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(new_cell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+		else {
+			Real boundPos=0; int coord=0;
+			for ( int k=0;k<4;k++ ) {
+				if (!new_cell->vertex (k)->info().isFictious) center= center+0.3333333333*(Tes.vertex(new_cell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+				else {
+					coord=boundary (new_cell->vertex(k)->info().id()).coordinate;
+					boundPos=boundary (new_cell->vertex(k)->info().id()).p[coord];
+				}
+			}
+			center=Vecteur(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
+		}
+                old_cell = Tri.locate(Point(center[0],center[1],center[2]));
                 new_cell->info().p() = old_cell->info().shiftedP();
         }
 //  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
