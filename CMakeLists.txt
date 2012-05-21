@@ -35,7 +35,7 @@ INCLUDE(GetVersion)
 INCLUDE(FindOpenGL)
 
 
-FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization)
+FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
 FIND_PACKAGE(VTK COMPONENTS Common REQUIRED) 
 FIND_PACKAGE(OpenMP REQUIRED) 
 FIND_PACKAGE(Eigen3)
@@ -110,11 +110,10 @@ FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
 ENDFOREACH()
 
 
-#==============================GUI=============================
-
-SET(GUI_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/gui")
-ADD_SUBDIRECTORY(${GUI_INCLUDE_DIR})
-#==============================GUI=============================
+#===========================================================
+ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/gui")
+ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/py")
+#===========================================================
 
 # this is only a temporary hack, headers should be installed in the build-dir directly
 # perhaps there is a proper way, have to ask
@@ -134,19 +133,6 @@ IF(CGAL_FOUND)
   FILE(GLOB SRC_LIB "${SRC_LIB}; triangulation/*.cpp")
 ENDIF ()
 
-FILE(GLOB SRC_PYMODULES_TEMP "py/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES_TEMP}")
-FILE(GLOB SRC_PYMODULES_TEMP "py/mathWrap/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
-FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "py/wrapper/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
-FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "py/pack/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES};py/pack/_packObb.cpp;py/pack/_packPredicates.cpp;py/pack/_packSpheres.cpp;py/pack/SpherePadder/CellPartition.cpp;py/pack/SpherePadder/TetraMesh.cpp;")
-#py/pack/_packSpherePadder.cpp;py/pack/SpherePadder/SpherePadder.cpp;py/pack/SpherePadder/SpherePackingTriangulation.cpp;
-
-FILE(GLOB SRC_PYGTS "py/3rd-party/pygts-0.3.1/*.c")
-
-SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packObb;yade/_utils;yade/WeightedAverage2d) # ;yade/_packSpherePadder
 
 COMBINE_SOURCES(${CMAKE_BINARY_DIR}/core "${SRC_CORE}" 1000)
 FILE(GLOB SRC_CORE_COMBINED "${CMAKE_BINARY_DIR}/core.*.cpp")
@@ -157,14 +143,10 @@ FILE(GLOB SRC_PKG_COMBINED "${CMAKE_BINARY_DIR}/pkg.*.cpp")
 COMBINE_SOURCES(${CMAKE_BINARY_DIR}/lib "${SRC_LIB}" ${CHUNKSIZE})
 FILE(GLOB SRC_LIB_COMBINED "${CMAKE_BINARY_DIR}/lib.*.cpp")
 
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyModules "${SRC_PYMODULES}" 1000)
-FILE(GLOB SRC_PYMODULES_COMBINED "${CMAKE_BINARY_DIR}/pyModules.*.cpp")
-
-
 ADD_LIBRARY(core SHARED ${SRC_CORE_COMBINED})
 ADD_LIBRARY(plugins SHARED ${SRC_PKG_COMBINED})
 ADD_LIBRARY(support SHARED ${SRC_LIB_COMBINED})
-ADD_LIBRARY(pyModules SHARED ${SRC_PYMODULES_COMBINED})
+
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
@@ -180,22 +162,11 @@ INSTALL(TARGETS boot DESTINATION ${YADE_LIB_PATH}/py)
 ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
 SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
 
-ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
-SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_gts gts)
 
 INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH}/lib)
 INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH}/lib)
 INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS pyModules DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
 INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
-
-
-INSTALL(FILES py/3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-INSTALL(FILES py/3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-INSTALL(FILES py/3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH}/py)
-
 
 #====================================
 #Back compatibility with scons
@@ -212,17 +183,11 @@ ENDFOREACH()
 
 CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}")
 CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade-${SUFFIX}")
-CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
-CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/config.py" DESTINATION ${YADE_PY_PATH}/yade/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/__init__.py" DESTINATION ${YADE_PY_PATH}/yade/)
-FILE(GLOB filesPY "${CMAKE_CURRENT_SOURCE_DIR}/py/*.py")
-INSTALL(FILES ${filesPY} DESTINATION ${YADE_PY_PATH}/yade)
-FILE(GLOB filesPYTests "${CMAKE_CURRENT_SOURCE_DIR}/py/tests/*.py")
-INSTALL(FILES ${filesPYTests} DESTINATION ${YADE_PY_PATH}/yade/tests)
 FILE(GLOB filesPYChecks "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/*.py")
 INSTALL(FILES ${filesPYChecks} DESTINATION ${YADE_PY_PATH}/yade/tests/checks)
 FILE(GLOB filesPYChecksData "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/data/*")
