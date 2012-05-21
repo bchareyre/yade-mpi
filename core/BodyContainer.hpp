@@ -35,6 +35,8 @@ class BodyContainer: public Serializable{
 	private:
 		typedef std::vector<shared_ptr<Body> > ContainerT;
 		ContainerT body;
+		Body::id_t lowestFree;
+		Body::id_t findFreeId();
 	public:
 		friend class InteractionContainer;  // accesses the body vector directly
 		

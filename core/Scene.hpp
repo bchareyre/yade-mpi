@@ -90,6 +90,7 @@ class Scene: public Serializable{
 		#endif
 		((bool,isPeriodic,false,Attr::readonly,"Whether periodic boundary conditions are active."))
 		((bool,trackEnergy,false,Attr::readonly,"Whether energies are being traced."))
+		((bool,doSort,false,Attr::readonly,"Used, when new body is added to the scene."))
 		((bool,runInternalConsistencyChecks,true,Attr::hidden,"Run internal consistency check, right before the very first simulation step."))
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 		((int,flags,0,Attr::readonly,"Various flags of the scene; 1 (Scene::LOCAL_COORDS): use local coordinate system rather than global one for per-interaction quantities (set automatically from the functor)."))

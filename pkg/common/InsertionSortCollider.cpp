@@ -90,6 +90,7 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) return true;
 		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
 		if(scene->interactions->dirty) return true;
+		if(scene->doSort) { scene->doSort=false; return true; }
 		return false;
 	}
 
