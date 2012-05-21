@@ -123,7 +123,7 @@ ENDIF ()
 
 
 FILE(GLOB SRC_CORE "core/*.cpp")
-FILE(GLOB_RECURSE SRC_PKG  "pkg/common/*.cpp")
+FILE(GLOB_RECURSE SRC_PKG  "pkg/*.cpp")
 FILE(GLOB SRC_LIB  "lib/*.cpp")
 
 SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/factory/ClassFactory.cpp;lib/factory/DynLibManager.cpp;lib/multimethods/Indexable.cpp;lib/serialization/Serializable.cpp;lib/pyutil/gil.cpp;core/main/pyboot.cpp")
@@ -153,6 +153,7 @@ LINK_DIRECTORIES(${PYTHON_LIBRARIES})
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 TARGET_LINK_LIBRARIES(core support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+TARGET_LINK_LIBRARIES(plugins support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 TARGET_LINK_LIBRARIES(boot core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 INSTALL(TARGETS boot DESTINATION ${YADE_LIB_PATH}/py)
