@@ -25,7 +25,6 @@ SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -fPIC -g -O2 -fstack-protector --
 INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
 INCLUDE(FindOpenMP)
-INCLUDE(FindOpenGL)
 INCLUDE(FindQt4)
 INCLUDE(FindBoost)
 INCLUDE(FindVTK)
@@ -33,15 +32,16 @@ INCLUDE(FindPkgConfig)
 INCLUDE(FeatureSummary)
 INCLUDE(CombineSources)
 INCLUDE(GetVersion)
+INCLUDE(FindOpenGL)
 
 
 FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization)
-FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
 FIND_PACKAGE(VTK COMPONENTS Common REQUIRED) 
 FIND_PACKAGE(OpenMP REQUIRED) 
 FIND_PACKAGE(Eigen3)
 FIND_PACKAGE(glib2 REQUIRED)
 FIND_PACKAGE(QGLVIEWER)
+
 
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
@@ -97,7 +97,7 @@ SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 
 
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 SET(CMAKE_INSTALL_RPATH "${YADE_LIB_PATH}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -108,6 +108,13 @@ FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
 		message("Feature ${FEAT} enabled")
 	ENDIF()
 ENDFOREACH()
+
+
+#==============================GUI=============================
+
+SET(GUI_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/gui")
+ADD_SUBDIRECTORY(${GUI_INCLUDE_DIR})
+#==============================GUI=============================
 
 # this is only a temporary hack, headers should be installed in the build-dir directly
 # perhaps there is a proper way, have to ask
@@ -138,10 +145,6 @@ SET (SRC_PYMODULES "${SRC_PYMODULES};py/pack/_packObb.cpp;py/pack/_packPredicate
 #py/pack/_packSpherePadder.cpp;py/pack/SpherePadder/SpherePadder.cpp;py/pack/SpherePadder/SpherePackingTriangulation.cpp;
 
 FILE(GLOB SRC_PYGTS "py/3rd-party/pygts-0.3.1/*.c")
-
-IF(${OPENGL_FOUND})
-	SET(SRC_LIB "${SRC_LIB};lib/opengl/GLUtils.cpp")
-ENDIF()
 
 SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packObb;yade/_utils;yade/WeightedAverage2d) # ;yade/_packSpherePadder
 
@@ -177,21 +180,9 @@ INSTALL(TARGETS boot DESTINATION ${YADE_LIB_PATH}/py)
 ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
 SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
 
-IF(${QGLVIEWER_FOUND})
-  INCLUDE_DIRECTORIES(${QT_INCLUDES})
-  INCLUDE_DIRECTORIES(${QGLVIEWER_INCLUDE_DIR})
-  ADD_LIBRARY(_GLViewer SHARED gui/qt4/GLViewer.cpp;gui/qt4/_GLViewer.cpp;gui/qt4/OpenGLManager.cpp)
-  SET_TARGET_PROPERTIES(_GLViewer PROPERTIES PREFIX "")
-  INSTALL(TARGETS _GLViewer DESTINATION ${YADE_PY_PATH}/yade/qt)
-
-  FILE(GLOB filesPYQT "${CMAKE_CURRENT_SOURCE_DIR}/gui/qt4/*.py")
-  INSTALL(FILES ${filesPYQT} DESTINATION ${YADE_PY_PATH}/yade/qt)
-ENDIF(${QGLVIEWER_FOUND})
-
 ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
 SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(_gts gts)
-
 
 INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH}/lib)
 INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH}/lib)
