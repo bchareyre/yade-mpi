@@ -1,39 +1,78 @@
-FILE(GLOB SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES_TEMP}")
-FILE(GLOB SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/mathWrap/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
-FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
-FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/pack/*.cpp")
-SET (SRC_PYMODULES "${SRC_PYMODULES};${CMAKE_CURRENT_SOURCE_DIR}/pack/_packObb.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/_packSpheres.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/SpherePadder/CellPartition.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/SpherePadder/TetraMesh.cpp;")
+#FILE(GLOB SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+#SET (SRC_PYMODULES "${SRC_PYMODULES_TEMP}")
+#FILE(GLOB SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/mathWrap/*.cpp")
+#SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
+#FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/*.cpp")
+#SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
+#FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/pack/*.cpp")
+#SET (SRC_PYMODULES "${SRC_PYMODULES};${CMAKE_CURRENT_SOURCE_DIR}/pack/_packObb.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/_packSpheres.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/SpherePadder/CellPartition.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/SpherePadder/TetraMesh.cpp;")
 #py/pack/_packSpherePadder.cpp;py/pack/SpherePadder/SpherePadder.cpp;py/pack/SpherePadder/SpherePackingTriangulation.cpp;
 
+#SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packObb;yade/_utils;yade/WeightedAverage2d) # ;yade/_packSpherePadder
+
+#COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyModules "${SRC_PYMODULES}" 1000)
+#FILE(GLOB SRC_PYMODULES_COMBINED "${CMAKE_BINARY_DIR}/pyModules.*.cpp")
+
+#ADD_LIBRARY(pyModules SHARED ${SRC_PYMODULES_COMBINED})
+#INSTALL(TARGETS pyModules DESTINATION ${YADE_LIB_PATH}/lib)
+
+#==================pyModules=========================================
+ADD_LIBRARY(WeightedAverage2d SHARED "${CMAKE_CURRENT_SOURCE_DIR}/WeightedAverage2d.cpp")
+SET_TARGET_PROPERTIES(WeightedAverage2d PROPERTIES PREFIX "")
+INSTALL(TARGETS WeightedAverage2d DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(_eudoxos SHARED "${CMAKE_CURRENT_SOURCE_DIR}/_eudoxos.cpp")
+SET_TARGET_PROPERTIES(_eudoxos PROPERTIES PREFIX "")
+INSTALL(TARGETS _eudoxos DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(_utils SHARED "${CMAKE_CURRENT_SOURCE_DIR}/_utils.cpp")
+SET_TARGET_PROPERTIES(_utils PROPERTIES PREFIX "")
+INSTALL(TARGETS _utils DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(_packPredicates SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp")
+SET_TARGET_PROPERTIES(_packPredicates PROPERTIES PREFIX "")
+INSTALL(TARGETS _packPredicates DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(_packSpheres SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packSpheres.cpp")
+SET_TARGET_PROPERTIES(_packSpheres PROPERTIES PREFIX "")
+INSTALL(TARGETS _packSpheres DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(_packObb SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packObb.cpp")
+SET_TARGET_PROPERTIES(_packObb PROPERTIES PREFIX "")
+INSTALL(TARGETS _packObb DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(wrapper SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/yadeWrapper.cpp")
+SET_TARGET_PROPERTIES(wrapper PROPERTIES PREFIX "")
+INSTALL(TARGETS wrapper DESTINATION "${YADE_PY_PATH}/yade/")
+
+ADD_LIBRARY(_customConverters SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/customConverters.cpp")
+SET_TARGET_PROPERTIES(_customConverters PROPERTIES PREFIX "")
+INSTALL(TARGETS _customConverters DESTINATION "${YADE_PY_PATH}/yade/")
+
+
+
+#==================pyModules=========================================
+
+#==================pygts=========================================
 FILE(GLOB SRC_PYGTS "${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/pygts-0.3.1/*.c")
-
-SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packObb;yade/_utils;yade/WeightedAverage2d) # ;yade/_packSpherePadder
-
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyModules "${SRC_PYMODULES}" 1000)
-FILE(GLOB SRC_PYMODULES_COMBINED "${CMAKE_BINARY_DIR}/pyModules.*.cpp")
-
-ADD_LIBRARY(pyModules SHARED ${SRC_PYMODULES_COMBINED})
 ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
-
 SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(_gts gts)
+INSTALL(FILES 3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
+INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
+INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
+#==================pygts=========================================
 
 
 CONFIGURE_FILE(config.py.in "${CMAKE_BINARY_DIR}/config.py")
 CONFIGURE_FILE(__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
-INSTALL(FILES 3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-INSTALL(FILES 3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH}/py)
-
 FILE(GLOB filesPY "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
 INSTALL(FILES ${filesPY} DESTINATION ${YADE_PY_PATH}/yade)
+INSTALL(FILES 3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH}/py)
 FILE(GLOB filesPYTests "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py")
 INSTALL(FILES ${filesPYTests} DESTINATION ${YADE_PY_PATH}/yade/tests)
-INSTALL(TARGETS pyModules DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
+
+
 
 
