@@ -1,21 +1,3 @@
-#FILE(GLOB SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-#SET (SRC_PYMODULES "${SRC_PYMODULES_TEMP}")
-#FILE(GLOB SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/mathWrap/*.cpp")
-#SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
-#FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/*.cpp")
-#SET (SRC_PYMODULES "${SRC_PYMODULES};${SRC_PYMODULES_TEMP}")
-#FILE(GLOB_RECURSE SRC_PYMODULES_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/pack/*.cpp")
-#SET (SRC_PYMODULES "${SRC_PYMODULES};${CMAKE_CURRENT_SOURCE_DIR}/pack/_packObb.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/_packSpheres.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/SpherePadder/CellPartition.cpp;${CMAKE_CURRENT_SOURCE_DIR}/pack/SpherePadder/TetraMesh.cpp;")
-#py/pack/_packSpherePadder.cpp;py/pack/SpherePadder/SpherePadder.cpp;py/pack/SpherePadder/SpherePackingTriangulation.cpp;
-
-#SET(PY_COMPILED_MODULES mathWrap;gts/_gts;yade/boot;yade/log;yade/wrapper;yade/_customConverters;yade/_eudoxos;yade/_packPredicates;yade/_packSpheres;yade/_packObb;yade/_utils;yade/WeightedAverage2d) # ;yade/_packSpherePadder
-
-#COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pyModules "${SRC_PYMODULES}" 1000)
-#FILE(GLOB SRC_PYMODULES_COMBINED "${CMAKE_BINARY_DIR}/pyModules.*.cpp")
-
-#ADD_LIBRARY(pyModules SHARED ${SRC_PYMODULES_COMBINED})
-#INSTALL(TARGETS pyModules DESTINATION ${YADE_LIB_PATH}/lib)
-
 #==================pyModules=========================================
 ADD_LIBRARY(WeightedAverage2d SHARED "${CMAKE_CURRENT_SOURCE_DIR}/WeightedAverage2d.cpp")
 SET_TARGET_PROPERTIES(WeightedAverage2d PROPERTIES PREFIX "")
@@ -43,6 +25,7 @@ INSTALL(TARGETS _packObb DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(wrapper SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/yadeWrapper.cpp")
 SET_TARGET_PROPERTIES(wrapper PROPERTIES PREFIX "")
+TARGET_LINK_LIBRARIES(wrapper plugins support)
 INSTALL(TARGETS wrapper DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_customConverters SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/customConverters.cpp")
