@@ -127,6 +127,38 @@ class TestBodies(unittest.TestCase):
 			if O.bodies[id]: O.bodies.erase(id);removed+=1
 		for b in O.bodies: counted+=1
 		self.assert_(counted==self.count-removed)
+	def testErasedAndNewlyCreatedSphere(self):
+		"Bodies: The bug is described in LP:1001194. If the new body was created after deletion of previous, it has no bounding box"
+		O.reset()
+		id1 = O.bodies.append(utils.sphere([0.0, 0.0, 0.0],0.5))
+		id2 = O.bodies.append(utils.sphere([0.0, 2.0, 0.0],0.5))
+		O.engines=[
+			ForceResetter(),
+			InsertionSortCollider([Bo1_Sphere_Aabb()]),
+			InteractionLoop(
+				[Ig2_Sphere_Sphere_L3Geom()],
+				[Ip2_FrictMat_FrictMat_FrictPhys()],
+				[Law2_L3Geom_FrictPhys_ElPerfPl()]
+			),
+			NewtonIntegrator(damping=0.1,gravity=(0,0,-9.81))
+		]
+		O.dt=.5e-4*utils.PWaveTimeStep()
+		#Before first step the bodies should not have bounds
+		self.assert_(O.bodies[id1].bound==None and O.bodies[id2].bound==None)
+		O.run(1, True)
+		#After first step the bodies should have bounds
+		self.assert_(O.bodies[id1].bound!=None and O.bodies[id2].bound!=None)
+		#Add 3rd body
+		id3 = O.bodies.append(utils.sphere([0.0, 4.0, 0.0],0.5))
+		O.run(1, True)
+		self.assert_(O.bodies[id1].bound!=None and O.bodies[id2].bound!=None and O.bodies[id3].bound!=None)
+		#Remove 3rd body
+		O.bodies.erase(id3)
+		O.run(1, True)
+		#Add 4th body
+		id4 = O.bodies.append(utils.sphere([0.0, 6.0, 0.0],0.5))
+		O.run(1, True)
+		self.assert_(O.bodies[id1].bound!=None and O.bodies[id2].bound!=None and O.bodies[id4].bound!=None)
 		
 class TestMaterials(unittest.TestCase):
 	def setUp(self):
