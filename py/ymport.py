@@ -195,7 +195,7 @@ def gengeoFile(fileName="file.geo",shift=Vector3.Zero,scale=1.0,orientation=Quat
 	with given [Rmin:Rmax] with null stress inside the specimen.
 	Can be useful for Mining Rock simulation.
 	
-	Example: :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
+	Example: :ysrc:`examples/packs/packs.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
 	
 	* https://answers.launchpad.net/esys-particle/+faq/877
 	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
@@ -216,6 +216,8 @@ def gengeoFile(fileName="file.geo",shift=Vector3.Zero,scale=1.0,orientation=Quat
 
 def gengeo(mntable,shift=Vector3.Zero,scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo library and creates spheres.
+	Since 2012 the package is available in Debian/Ubuntu and known as python-demgengeo
+	http://packages.qa.debian.org/p/python-demgengeo.html
 
 	:Parameters:
 		`mntable`: mntable
@@ -231,7 +233,7 @@ def gengeo(mntable,shift=Vector3.Zero,scale=1.0,**kw):
 	with given [Rmin:Rmax] with null stress inside the specimen.
 	Can be useful for Mining Rock simulation.
 	
-	Example: :ysrc:`examples/regular-sphere-pack/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
+	Example: :ysrc:`examples/packs/packs.py`, usage of LSMGenGeo library in :ysrc:`examples/test/genCylLSM.py`.
 	
 	* https://answers.launchpad.net/esys-particle/+faq/877
 	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
