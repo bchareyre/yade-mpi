@@ -174,7 +174,9 @@ def gmsh(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quaternio
 	return ret
 
 def gengeoFile(fileName="file.geo",shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,**kw):
-	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
+	""" Imports geometry from LSMGenGeo .geo file and creates spheres. 
+	Since 2012 the package is available in Debian/Ubuntu and known as python-demgengeo
+	http://packages.qa.debian.org/p/python-demgengeo.html
 	
 	:Parameters:
 		`filename`: string
