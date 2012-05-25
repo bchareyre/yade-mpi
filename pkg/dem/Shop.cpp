@@ -758,6 +758,19 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdFo
 	else{return py::make_tuple(fabricStrong,fabricWeak);}
 }
 
+Matrix3r Shop::getStress(Real volume){
+	Scene* scene=Omega::instance().getScene().get();
+	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():1;
+	Matrix3r stressTensor = Matrix3r::Zero();
+	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
+		if (!I->isReal()) continue;
+		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
+		Vector3r branch=Body::byId(I->getId1(),scene)->state->pos -Body::byId(I->getId2(),scene)->state->pos;
+		if (scene->isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
+		stressTensor+= (nsi->normalForce+nsi->shearForce)*branch.transpose();}
+	return stressTensor/volume;
+}
+
 Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
@@ -831,3 +844,4 @@ py::list Shop::getStressLWForEachBody(bool revertSign){
 	return ret;
 // 	return py::make_tuple(bStresses);
 }
+

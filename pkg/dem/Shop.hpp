@@ -117,8 +117,10 @@ class Shop{
 		//! Define the exact average stress in each particle from contour integral ("LW" stands for Love-Weber, since this is what the contour integral gives).
 		static void getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign=false);
 		static py::list getStressLWForEachBody(bool revertSign);
-
-		//! Function to compute overall ("macroscopic") stress of periodic cell
+		
+		//! Function to compute overall ("macroscopic")
+		static Matrix3r getStress(Real volume=0);
+		//! This version is restricted to periodic BCs and Dem3Dof
 		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
