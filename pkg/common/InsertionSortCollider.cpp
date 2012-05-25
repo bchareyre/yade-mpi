@@ -211,8 +211,8 @@ void InsertionSortCollider::action(){
 			}	
 		}
 	// for each body, copy its minima and maxima, for quick checks of overlaps later
+	BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
 	for(Body::id_t id=0; id<nBodies; id++){
-		BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(likely(b)){
 			const shared_ptr<Bound>& bv=b->bound;
