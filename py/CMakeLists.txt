@@ -51,10 +51,6 @@ INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts
 INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
 #==================pygts=========================================
 
-
-CONFIGURE_FILE(config.py.in "${CMAKE_BINARY_DIR}/config.py")
-CONFIGURE_FILE(__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
-
 FILE(GLOB filesPY "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
 SET(filesPY "${filesPY};${CMAKE_CURRENT_SOURCE_DIR}/pack/pack.py")
 INSTALL(FILES ${filesPY} DESTINATION ${YADE_PY_PATH}/yade)

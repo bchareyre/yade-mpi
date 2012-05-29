@@ -165,10 +165,8 @@ TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBR
 
 INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
 
-
 ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
 SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
-
 
 INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH}/lib)
 INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH}/lib)
@@ -178,6 +176,7 @@ INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
 #====================================
 #Back compatibility with scons
 SET (realVersion ${VERSION})
+SET (version ${VERSION})
 SET (pyExecutable ${PYTHON_EXECUTABLE})
 SET (profile "default")
 SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -190,6 +189,8 @@ ENDFOREACH()
 
 CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}")
 CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade-${SUFFIX}")
+CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
+CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
