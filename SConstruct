@@ -607,3 +607,7 @@ env.Install('$LIBDIR/py/yade/tests/checks',[
 env.Install('$LIBDIR/py/yade/tests/checks/data',[
 	env.File(env.Glob('scripts/checks-and-tests/checks/data/*'))
 ])
+
+env.Install('$LIBDIR/py/yade/tests/checks/performance',[
+	env.File(env.Glob('examples/test/performance/*'))
+])

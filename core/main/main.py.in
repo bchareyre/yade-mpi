@@ -147,7 +147,7 @@ if opts.checks:
 
 # Run performance check test
 if opts.performance:
-	checksPath='${sourceRoot}'+'/scripts/checks-and-tests/performance'
+	checksPath=libDir+'/py/yade/tests/checks/performance'
 	execfile(checksPath+'/checkPerf.py')
 
 def userSession(qt4=False,qapp=None):

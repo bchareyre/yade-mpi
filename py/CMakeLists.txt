@@ -57,6 +57,8 @@ INSTALL(FILES ${filesPY} DESTINATION ${YADE_PY_PATH}/yade)
 INSTALL(FILES 3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH}/py)
 FILE(GLOB filesPYTests "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py")
 INSTALL(FILES ${filesPYTests} DESTINATION ${YADE_PY_PATH}/yade/tests)
+FILE(GLOB filesPYPerf "${CMAKE_CURRENT_SOURCE_DIR}/examples/test/performance/*")
+INSTALL(FILES ${filesPYPerf} DESTINATION ${YADE_PY_PATH}/yade/tests/performance)
 
 
 
