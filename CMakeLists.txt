@@ -41,7 +41,9 @@ FIND_PACKAGE(OpenMP REQUIRED)
 FIND_PACKAGE(Eigen3)
 FIND_PACKAGE(glib2 REQUIRED)
 FIND_PACKAGE(QGLVIEWER)
+PKG_SEARCH_MODULE(GTS gts)
 
+#===========================================================
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
@@ -53,15 +55,16 @@ ELSE ()
     MESSAGE(FATAL_ERROR "None Eigen2 or Eigen3 were found!")
   ENDIF ()
 ENDIF()
+#===========================================================
 
 ADD_DEFINITIONS(-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_OPENMP)
-
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 INCLUDE_DIRECTORIES(${GLIB2_INCLUDE_DIRS})
 
+#===========================================================
 
 FIND_PATH(CGAL_INCLUDE_DIR CGAL/Exact_predicates_inexact_constructions_kernel.h REQUIRED)
 FIND_LIBRARY(CGAL_FOUND CGAL)
@@ -70,7 +73,7 @@ IF(${CGAL_FOUND})
 	INCLUDE_DIRECTORIES(${CGAL_INCLUDE_DIR})
 ENDIF()
 
-PKG_SEARCH_MODULE(GTS gts)
+#===========================================================
 
 IF (NOT INSTALL_PREFIX)
  SET(CMAKE_INSTALL_PREFIX "/usr/local")
@@ -90,6 +93,7 @@ ENDIF (NOT runtimePREFIX)
 
 MESSAGE (STATUS "Suffix is set to " ${SUFFIX})
 MESSAGE (STATUS "runtimePREFIX is set to " ${runtimePREFIX})
+#===========================================================
 
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
@@ -101,12 +105,15 @@ SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 SET(CMAKE_INSTALL_RPATH "${YADE_LIB_PATH}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+#===========================================================
 FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
 	IF("${FEAT}_FOUND")
 		add_definitions(-DYADE_${FEAT})
 		message("Feature ${FEAT} enabled")
 	ENDIF()
 ENDFOREACH()
+
+#===========================================================
 
 INCLUDE_DIRECTORIES( ${VTK_INCLUDE_DIRS} )
 LINK_DIRECTORIES( ${VTK_LIBRARY_DIRS} )
@@ -121,7 +128,7 @@ ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/py")
 IF(NOT EXISTS "${CMAKE_BINARY_DIR}/yade")
   EXECUTE_PROCESS(COMMAND ln -s ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}/yade)
 ENDIF ()
-
+#===========================================================
 
 FILE(GLOB SRC_CORE "core/*.cpp")
 FILE(GLOB_RECURSE SRC_PKG  "pkg/*.cpp")
@@ -132,6 +139,7 @@ SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/factory/ClassFactory.cpp;lib/facto
 IF(CGAL_FOUND)
   FILE(GLOB SRC_LIB "${SRC_LIB}; triangulation/*.cpp")
 ENDIF(CGAL_FOUND)
+#===========================================================
 
 IF(QGLVIEWER_FOUND)
   FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
@@ -141,6 +149,7 @@ IF(QGLVIEWER_FOUND)
   SET(SRC_LIB "${SRC_LIB};lib/opengl/GLUtils.cpp")
 ENDIF(QGLVIEWER_FOUND)
 
+#===========================================================
 COMBINE_SOURCES(${CMAKE_BINARY_DIR}/core "${SRC_CORE}" 1000)
 FILE(GLOB SRC_CORE_COMBINED "${CMAKE_BINARY_DIR}/core.*.cpp")
 
@@ -150,6 +159,7 @@ FILE(GLOB SRC_PKG_COMBINED "${CMAKE_BINARY_DIR}/pkg.*.cpp")
 COMBINE_SOURCES(${CMAKE_BINARY_DIR}/lib "${SRC_LIB}" ${CHUNKSIZE})
 FILE(GLOB SRC_LIB_COMBINED "${CMAKE_BINARY_DIR}/lib.*.cpp")
 
+#===========================================================
 ADD_LIBRARY(core SHARED ${SRC_CORE_COMBINED})
 ADD_LIBRARY(plugins SHARED ${SRC_PKG_COMBINED})
 ADD_LIBRARY(support SHARED ${SRC_LIB_COMBINED})
@@ -162,16 +172,8 @@ TARGET_LINK_LIBRARIES(support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${GUI_LIBS}
 TARGET_LINK_LIBRARIES(core support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 TARGET_LINK_LIBRARIES(plugins support core _GLViewer miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${GUI_LIBS} vtkHybrid)
 TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-
-INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
-
 ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
 SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
-
-INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
 
 #====================================
 #Back compatibility with scons
@@ -192,6 +194,8 @@ CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade-${SUFFIX}")
 CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
 CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
+#===========================================================
+
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/config.py" DESTINATION ${YADE_PY_PATH}/yade/)
@@ -201,4 +205,9 @@ INSTALL(FILES ${filesPYChecks} DESTINATION ${YADE_PY_PATH}/yade/tests/checks)
 FILE(GLOB filesPYChecksData "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/data/*")
 INSTALL(FILES ${filesPYChecksData} DESTINATION ${YADE_PY_PATH}/yade/tests/checks/data)
 
-
+INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
+INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH}/lib)
+INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH}/lib)
+INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH}/lib)
+INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
+#===========================================================
