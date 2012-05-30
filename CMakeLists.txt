@@ -12,7 +12,7 @@ project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
-set(CMAKE_VERBOSE_MAKEFILE 1)
+#set(CMAKE_VERBOSE_MAKEFILE 1)
 set(CMAKE_BUILD_TYPE Release)
 
 IF (NOT CHUNKSIZE)
@@ -145,8 +145,9 @@ IF(QGLVIEWER_FOUND)
   FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
   FIND_PACKAGE(OpenGL REQUIRED)
   FIND_PACKAGE(GLUT REQUIRED)
-  SET(GUI_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY})
+  SET(GUI_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${QGLVIEWER_LIBRARIES})
   SET(SRC_LIB "${SRC_LIB};lib/opengl/GLUtils.cpp")
+  SET (features "${features},qt4")
 ENDIF(QGLVIEWER_FOUND)
 
 #===========================================================
@@ -182,11 +183,6 @@ SET (version ${VERSION})
 SET (pyExecutable ${PYTHON_EXECUTABLE})
 SET (profile "default")
 SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")
-FOREACH(FEAT "OPENGL" "GTS" "CGAL")
-	IF("${FEAT}_FOUND")
-		SET (features "${features}${FEAT},")
-	ENDIF()
-ENDFOREACH()
 #====================================
 
 CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade${SUFFIX}-batch")
