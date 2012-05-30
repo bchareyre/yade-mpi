@@ -84,7 +84,7 @@ ELSE (NOT INSTALL_PREFIX)
 ENDIF (NOT INSTALL_PREFIX)
 
 IF (NOT SUFFIX)
-  SET (SUFFIX ${VERSION})
+  SET (SUFFIX "-${VERSION}")
 ENDIF (NOT SUFFIX)
 
 IF (NOT runtimePREFIX)
@@ -106,7 +106,7 @@ SET(CMAKE_INSTALL_RPATH "${YADE_LIB_PATH}/lib")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #===========================================================
-FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
+FOREACH(FEAT "OPENGL" "GTS" "CGAL")
 	IF("${FEAT}_FOUND")
 		add_definitions(-DYADE_${FEAT})
 		message("Feature ${FEAT} enabled")
@@ -182,22 +182,22 @@ SET (version ${VERSION})
 SET (pyExecutable ${PYTHON_EXECUTABLE})
 SET (profile "default")
 SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")
-FOREACH(FEAT "OPENGL" "VTK" "GTS" "CGAL")
+FOREACH(FEAT "OPENGL" "GTS" "CGAL")
 	IF("${FEAT}_FOUND")
 		SET (features "${features}${FEAT},")
 	ENDIF()
 ENDFOREACH()
 #====================================
 
-CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}")
-CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade-${SUFFIX}")
+CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade${SUFFIX}-batch")
+CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade${SUFFIX}")
 CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
 CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
 #===========================================================
 
-INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-batch-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
-INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade-${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
+INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade${SUFFIX}-batch" DESTINATION ${YADE_EXEC_PATH}/)
+INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/config.py" DESTINATION ${YADE_PY_PATH}/yade/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/__init__.py" DESTINATION ${YADE_PY_PATH}/yade/)
 FILE(GLOB filesPYChecks "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/*.py")
