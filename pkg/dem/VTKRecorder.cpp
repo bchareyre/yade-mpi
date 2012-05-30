@@ -1,5 +1,3 @@
-#ifdef YADE_VTK
-
 #include"VTKRecorder.hpp"
 
 // avoid warnings in VTK code (does not work?!)
@@ -487,6 +485,3 @@ void VTKRecorder::action(){
 		}
 	#endif
 }
-
-
-#endif /* YADE_VTK */
