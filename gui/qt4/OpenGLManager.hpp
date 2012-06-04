@@ -1,6 +1,9 @@
 #pragma once
 //#include
+
+#ifndef Q_MOC_RUN 
 #include"GLViewer.hpp"
+#endif 
 
 #include<QObject>
 #include<boost/thread/mutex.hpp>

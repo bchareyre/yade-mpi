@@ -3,15 +3,16 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
+
+#ifndef Q_MOC_RUN 
 #include<yade/pkg/common/OpenGLRenderer.hpp>
+#include<yade/pkg/common/PeriodicEngines.hpp>
+#endif 
 
 #include<QGLViewer/qglviewer.h>
 #include<QGLViewer/constraint.h>
-
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<set>
-
-#include<yade/pkg/common/PeriodicEngines.hpp>
 
 /*****************************************************************************
 *********************************** SnapshotEngine ***************************
