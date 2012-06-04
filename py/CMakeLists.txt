@@ -40,13 +40,15 @@ INSTALL(TARGETS _customConverters DESTINATION "${YADE_PY_PATH}/yade/")
 #==================pyModules=========================================
 
 #==================pygts=========================================
-FILE(GLOB SRC_PYGTS "${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/pygts-0.3.1/*.c")
-ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
-SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_gts gts)
-INSTALL(FILES 3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
+IF(ENABLE_GTS)
+  FILE(GLOB SRC_PYGTS "${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/pygts-0.3.1/*.c")
+  ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
+  SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
+  TARGET_LINK_LIBRARIES(_gts gts)
+  INSTALL(FILES 3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
+  INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
+  INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
+ENDIF(ENABLE_GTS)
 #==================pygts=========================================
 
 FILE(GLOB filesPY "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
