@@ -146,7 +146,7 @@ void PeriTriaxController::action()
 	if (maxBodySpan[0]<=0){
 		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 			if(!b || !b->bound) continue;
-			for(int i=0; i<3; i++) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);}
+			for(int i=0; i<3; i++) if ((b->bound->max[i]-b->bound->min[i])<cellSize[i]) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);}
 	}
 	// check current size
 	if(2.1*maxBodySpan[0]>cellSize[0] || 2.1*maxBodySpan[1]>cellSize[1] || 2.1*maxBodySpan[2]>cellSize[2]){
