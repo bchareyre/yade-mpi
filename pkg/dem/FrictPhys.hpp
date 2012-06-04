@@ -20,3 +20,15 @@ class FrictPhys: public NormShearPhys
 	REGISTER_CLASS_INDEX(FrictPhys,NormShearPhys);
 };
 REGISTER_SERIALIZABLE(FrictPhys);
+
+class ViscoFrictPhys: public FrictPhys
+{
+	public :
+	virtual ~ViscoFrictPhys();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscoFrictPhys,FrictPhys,"Temporary version of :yref:`FrictPhys` for compatibility with e.g. :yref:`Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity`",
+		((Vector3r,creepedShear,Vector3r(0,0,0),(Attr::readonly),"Creeped force (parallel)")),
+		createIndex()
+	);
+	REGISTER_CLASS_INDEX(ViscoFrictPhys,FrictPhys);
+};
+REGISTER_SERIALIZABLE(ViscoFrictPhys);

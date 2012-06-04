@@ -39,6 +39,20 @@ class Law2_ScGeom_FrictPhys_CundallStrack: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_FrictPhys_CundallStrack);
 
+class Law2_ScGeom_ViscoFrictPhys_CundallStrack: public Law2_ScGeom_FrictPhys_CundallStrack{
+	public:
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ViscoFrictPhys_CundallStrack,Law2_ScGeom_FrictPhys_CundallStrack,"Law for linear compression, and Mohr-Coulomb plasticity surface without cohesion.\nThis law implements the classical linear elastic-plastic law from [CundallStrack1979]_ (see also [Pfc3dManual30]_). The normal force is (with the convention of positive tensile forces) $F_n=\\min(k_n u_n, 0)$. The shear force is $F_s=k_s u_s$, the plasticity condition defines the maximum value of the shear force : $F_s^{\\max}=F_n\\tan(\\phi)$, with $\\phi$ the friction angle.\n\nThis law is well tested in the context of triaxial simulation, and has been used for a number of published results (see e.g. [Scholtes2009b]_ and other papers from the same authors). It is generalised by :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`, which adds cohesion and moments at contact.",
+		((bool,shearCreep,false,," "))
+		((Real,viscosity,1,," "))
+		((Real,creepStiffness,1,," "))
+		,,
+	);
+	FUNCTOR2D(ScGeom,ViscoFrictPhys);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom_ViscoFrictPhys_CundallStrack);
+
 class ElasticContactLaw : public GlobalEngine{
 		shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> functor;
 	public :

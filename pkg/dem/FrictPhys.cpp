@@ -1,3 +1,4 @@
 #include "FrictPhys.hpp"
 FrictPhys::~FrictPhys(){}
-YADE_PLUGIN((FrictPhys));
+ViscoFrictPhys::~ViscoFrictPhys(){}
+YADE_PLUGIN((FrictPhys)(ViscoFrictPhys));
