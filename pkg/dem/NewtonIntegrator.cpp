@@ -103,7 +103,7 @@ void NewtonIntegrator::action()
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
 	const Real& dt=scene->dt;
-
+	homoDeform=scene->cell->homoDeform;
 	dVelGrad=scene->cell->velGrad-prevVelGrad;
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
@@ -173,7 +173,7 @@ void NewtonIntegrator::action()
 				Vector3r linAccel=computeAccel(f,state->mass,state->blockedDOFs);
 				if(state->isDamped) cundallDamp2nd(dt,fluctVel,linAccel);
 				//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt*pos+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
-				if (isPeriodic) linAccel+=prevVelGrad*state->vel;
+				if (isPeriodic && homoDeform) linAccel+=prevVelGrad*state->vel;
 				//finally update velocity
 				state->vel+=dt*linAccel;
 				// angular acceleration
@@ -185,7 +185,8 @@ void NewtonIntegrator::action()
 					for(int i=0; i<3; i++) if(state->blockedDOFs & State::axisDOF(i,true)) m[i]=0; // block DOFs here
 					if(state->isDamped) cundallDamp1st(m,state->angVel);
 				}
-			}
+			// reflect macro-deformation even for non-dynamic bodies
+			} else if (isPeriodic && homoDeform) state->vel+=dt*prevVelGrad*state->vel;
 
 			// update positions from velocities (or torque, for the aspherical integrator)
 			leapfrogTranslate(state,id,dt);
@@ -215,7 +216,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 	//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
 	//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//Reflect mean-field (periodic cell) acceleration in the velocity
-	if(scene->isPeriodic) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
+	if(scene->isPeriodic && homoDeform) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
 	if (!bodySelected || scene->selectedBody!=id) state->pos+=state->vel*dt;
 }
 

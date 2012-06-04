@@ -38,6 +38,7 @@ class NewtonIntegrator : public GlobalEngine{
 	#endif
 	// whether the cell has changed from the previous step
 	bool cellChanged;
+	bool homoDeform;
 
 	// wether a body has been selected in Qt view
 	bool bodySelected;
