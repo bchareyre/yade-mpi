@@ -147,10 +147,9 @@ class Cell: public Serializable{
 		/* normal attributes */
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in :yref:`NewtonIntegrator`. Values of :yref:`velGrad<Cell.velGrad>` accumulate in :yref:`trsf<Cell.trsf>` at every step."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
-		((int,homoDeformOld,3,,"[DEPRECATED: homoDeform=3 is the only option left, kept here for compatibility] Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions or velocities of particles. The values have the following meaning: 0: no homothetic deformation, 1: set absolute particle positions directly (when ``velGrad`` is non-zero), but without changing their velocity, 2: adjust particle velocity (only when ``velGrad`` changed) with Δv_i=Δ ∇v x_i. 3: as 2, but include a 2nd order term in addition -- the derivative of 1 (convective term in the velocity update).")),
+		((bool,homoDeform,true,,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions and velocities of bodies. The velocity change is obtained by deriving the expression v=∇v.x, where ∇v is the macroscopic velocity gradient, giving in an incremental form: Δv=Δ ∇v x + ∇v Δx. As a result, velocities are modified as soon as ``velGrad`` changes, according to the first term: Δv(t)=Δ ∇v x(t), while the 2nd term reflects a convective term: Δv'= ∇v v(t-dt/2).")),
 		/*deprec*/
-		((Hsize,hSize,"conform to Yade's names convention."))
-		((homoDeform,homoDeformOld,"[DEPRECATED: homoDeform=3 is the only option left, kept here for compatibility]")),
+		((Hsize,hSize,"conform to Yade's names convention.")),
 		/*init*/ ,
 		/*ctor*/ _invTrsf=Matrix3r::Identity(); integrateAndUpdate(0),
 		/*py*/
