@@ -7,14 +7,15 @@
 #include<boost/serialization/split_free.hpp>
 #include<boost/lexical_cast.hpp>
 #include<string>
+#include<vector>
+#include<cstdlib>
+#include<unistd.h>
+#include<stdexcept>
+#include<iostream>
+
 
 #ifdef YADE_OPENMP
 #include"omp.h"
-#include<cstdlib>
-#include<unistd.h>
-#include<vector>
-#include<stdexcept>
-#include<iostream>
 
 // O(1) access container which stores data in contiguous chunks of memory
 // each chunk belonging to one thread
