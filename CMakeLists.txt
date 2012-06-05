@@ -36,8 +36,9 @@ FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex
 FIND_PACKAGE(Eigen3)
 
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
-SET(LINKLIBS "-lrt")
+SET(LINKLIBS "")
 SET(CONFIGURED_FEATS "")
+SET(CMAKE_LD_FLAGS  "${CMAKE_LD_FLAGS} -lrt")
 
 
 OPTION(ENABLE_VTK "Enable VTK" ${DEFAULT})
