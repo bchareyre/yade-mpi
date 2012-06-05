@@ -92,7 +92,7 @@ opts.AddVariables(
 	BoolVariable('gprof','Enable profiling information for gprof',0),
 	('optimize','Turn on optimizations (-1, 0 or 1); with negative value (-1) optimization is based on debugging: not optimize with debugging (debug=True <=> optimize=False) and vice versa. With positive values optimization is performed (case of 1) or not (0) independent of debugging',-1,None,int),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','opengl,gts,openmp,vtk,qt4',names=['opengl','cgal','openmp','gts','gl2ps','qt4','vtk']),
+	ListVariable('features','Optional features that are turned on','opengl,gts,openmp,vtk,qt4',names=['opengl','cgal','openmp','gts','vtk','gl2ps','qt4']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',2,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -357,12 +357,10 @@ if not env.GetOption('clean'):
 			elif conf.CheckLibWithHeader(['libQGLViewer'],'QGLViewer/qglviewer.h','c++','QGLViewer();',autoadd=1):
 				env['QGLVIEWER_LIB']='libQGLViewer'
 			else: featureNotOK('qt4','Building with Qt4 implies the QGLViewer library installed (package libqglviewer-qt4-dev package in debian/ubuntu, libQGLViewer in RPM-based distributions)')
-	
-	#vtk is mandatory
-	ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
-	env.Append(LIBS=['vtkHybrid','vtkFiltering','vtkRendering','vtkIO','vtkexoIIc','vtkParallel','vtkGraphics','vtkverdict','vtkImaging','vtkftgl','vtkDICOMParser','vtkmetaio'])
-	if not ok: featureNotOK('vtk',note="Installer can`t find vtk-library. Be sure you have it installed (usually, libvtk5-dev package). Or you might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
-	
+	if 'vtk' in env['features']:
+		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
+		env.Append(LIBS=['vtkHybrid','vtkFiltering','vtkRendering','vtkIO','vtkexoIIc','vtkParallel','vtkGraphics','vtkverdict','vtkImaging','vtkftgl','vtkDICOMParser','vtkmetaio'])
+		if not ok: featureNotOK('vtk',note="Installer can`t find vtk-library. Be sure you have it installed (usually, libvtk5-dev package). Or you might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
 	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config gts --cflags --libs');
 		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)

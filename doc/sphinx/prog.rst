@@ -78,6 +78,8 @@ The `features` parameter controls optional functionality. Each enabled feature d
 
 opengl (YADE_OPENGL)
 	Enable 3d rendering as well as the Qt3-based graphical user interface (in addition to python console).
+vtk (YADE_VTK)
+	Enable functionality using Visualization Toolkit (`vtk <http://www.vtk.org>`__; e.g. :yref:`VTKRecorder` exporting to files readable with ParaView).
 openmp (YADE_OPENMP)
 	Enable parallelization using OpenMP, non-intrusive shared-memory parallelization framework; it is only supported for ``g++`` > 4.0. Parallel computation leads to significant performance increase and should be enabled unless you have a special reason for not doing so (e.g. single-core machine). See :ref:`upyade-parallel` for details.
 gts (YADE_GTS)

@@ -8,13 +8,14 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 
-
-#pragma GCC diagnostic ignored "-Wdeprecated"
-  #include<vtkPointLocator.h>
-  #include<vtkIdList.h>
-  #include<vtkUnstructuredGrid.h>
-  #include<vtkPoints.h>
-#pragma GCC diagnostic warning "-Wdeprecated"
+#ifdef YADE_VTK
+	#pragma GCC diagnostic ignored "-Wdeprecated"
+		#include<vtkPointLocator.h>
+		#include<vtkIdList.h>
+		#include<vtkUnstructuredGrid.h>
+		#include<vtkPoints.h>
+	#pragma GCC diagnostic warning "-Wdeprecated"
+#endif
 
 namespace py = boost::python;
 using namespace std;
