@@ -12,8 +12,6 @@ project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
-set(CMAKE_VERBOSE_MAKEFILE 1)
-set(CMAKE_BUILD_TYPE Release)
 
 IF (NOT CHUNKSIZE)
  SET(CHUNKSIZE 5)
@@ -164,7 +162,15 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
+IF (DEBUG)
+  SET(CMAKE_VERBOSE_MAKEFILE 1)
+  SET(CMAKE_BUILD_TYPE Debug)
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -ggdb2")
+ELSE (DEBUG)
+  SET(CMAKE_BUILD_TYPE Release)
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
+ENDIF (DEBUG)
+
 
 #===========================================================
 
@@ -285,5 +291,10 @@ INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
 MESSAGE(STATUS "===========================================================")
 MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
 MESSAGE(STATUS "Chunksize: ${CHUNKSIZE}")
+IF (DEBUG)
+  MESSAGE(STATUS "Debug build")
+ELSE (DEBUG)
+  MESSAGE(STATUS "Optimized build")
+ENDIF (DEBUG)
 MESSAGE(STATUS "===========================================================")
 #===========================================================
