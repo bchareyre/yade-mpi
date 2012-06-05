@@ -1,22 +1,7 @@
-# cmake build file for yade
-# the way to build yade
-# 1. gather all source files in chunks (using COMBINE_SOURCES) that will be compiled together
-#    (otherwise each source file would be compiled separately, which is too slow)
-#    Unlike in scons compilations, also python modules are gathered in chunks.
-# 2. create yade-all library that is compiled from all the chunks
-# 3. Create symlinks pointing to yade-all for all python modules we want to create
-#    (this will have to be 
-#
-#
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
-
-IF (NOT CHUNKSIZE)
- SET(CHUNKSIZE 5)
- MESSAGE("Maximum files to compile in one translation unit ${CHUNKSIZE}, if you want to override it use -DCHUNKSIZE option.")
-ENDIF (NOT CHUNKSIZE)
 
 INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
@@ -25,7 +10,6 @@ INCLUDE(FindQt4)
 INCLUDE(FindBoost)
 INCLUDE(FindVTK)
 INCLUDE(FindPkgConfig)
-INCLUDE(CombineSources)
 INCLUDE(GetVersion)
 INCLUDE(FindOpenGL)
 INCLUDE(FindGTS)
@@ -223,19 +207,10 @@ FILE(GLOB SRC_LIB  "lib/*.cpp")
 
 SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/factory/ClassFactory.cpp;lib/factory/DynLibManager.cpp;lib/multimethods/Indexable.cpp;lib/serialization/Serializable.cpp;lib/pyutil/gil.cpp;core/main/pyboot.cpp;${GUI_SRC_LIB};${CGAL_SRC_LIB}")
 
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/core "${SRC_CORE}" 1000)
-FILE(GLOB SRC_CORE_COMBINED "${CMAKE_BINARY_DIR}/core.*.cpp")
-
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pkg "${SRC_PKG}" ${CHUNKSIZE})
-FILE(GLOB SRC_PKG_COMBINED "${CMAKE_BINARY_DIR}/pkg.*.cpp")
-
-COMBINE_SOURCES(${CMAKE_BINARY_DIR}/lib "${SRC_LIB}" ${CHUNKSIZE})
-FILE(GLOB SRC_LIB_COMBINED "${CMAKE_BINARY_DIR}/lib.*.cpp")
-
 #===========================================================
-ADD_LIBRARY(core SHARED ${SRC_CORE_COMBINED})
-ADD_LIBRARY(plugins SHARED ${SRC_PKG_COMBINED})
-ADD_LIBRARY(support SHARED ${SRC_LIB_COMBINED})
+ADD_LIBRARY(core SHARED ${SRC_CORE})
+ADD_LIBRARY(plugins SHARED ${SRC_PKG})
+ADD_LIBRARY(support SHARED ${SRC_LIB})
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
@@ -289,7 +264,6 @@ INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
 #===========================================================
 MESSAGE(STATUS "===========================================================")
 MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
-MESSAGE(STATUS "Chunksize: ${CHUNKSIZE}")
 IF (DEBUG)
   MESSAGE(STATUS "Debug build")
 ELSE (DEBUG)
