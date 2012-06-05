@@ -41,7 +41,11 @@ try:
 except ImportError: pass
 
 # make c++ predicates available in this module
-from _packPredicates import * ## imported in randomDensePack as well
+noPredicate = False
+try:
+	from _packPredicates import * ## imported in randomDensePack as well
+except ImportError: pass; noPredicate = True
+
 # import SpherePack
 from _packSpheres import *
 from _packObb import *
@@ -52,122 +56,123 @@ except ImportError: pass
 ##
 # extend _packSphere.SpherePack c++ class by this method
 ##
-def SpherePack_toSimulation(self,rot=Matrix3.Identity,**kw):
-	"""Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
-this method also appropriately sets periodic cell information of the simulation.
-
-	>>> from yade import pack; from math import *
-	>>> sp=pack.SpherePack()
-
-Create random periodic packing with 20 spheres:
-
-	>>> sp.makeCloud((0,0,0),(5,5,5),rMean=.5,rRelFuzz=.5,periodic=True,num=20)
-	20
-
-Virgin simulation is aperiodic:
-
-	>>> O.reset()
-	>>> O.periodic
-	False
-
-Add generated packing to the simulation, rotated by 45° along +z
-
-	>>> sp.toSimulation(rot=Quaternion((0,0,1),pi/4),color=(0,0,1))
-	[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-
-Periodic properties are transferred to the simulation correctly, including rotation (this could be avoided by explicitly passing "hSize=O.cell.hSize" as an argument):
-
-	>>> O.periodic
-	True
-	>>> O.cell.refSize
-	Vector3(5,5,5)
-	>>> O.cell.hSize
-	Matrix3(3.53553,-3.53553,0, 3.53553,3.53553,0, 0,0,5)
-
-The current state (even if rotated) is taken as mechanically undeformed, i.e. with identity transformation:
-
-	>>> O.cell.trsf
-	Matrix3(1,0,0, 0,1,0, 0,0,1)
-
-:param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
-:param **kw: passed to :yref:`yade.utils.sphere`
-:return: list of body ids added (like :yref:`O.bodies.append<BodyContainer.append>`)
-"""
-	if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
-	assert(isinstance(rot,Matrix3))
-	if self.isPeriodic: O.periodic=True
-	if self.cellSize!=Vector3.Zero and self.isPeriodic:
-		O.cell.hSize=rot*Matrix3(self.cellSize[0],0,0, 0,self.cellSize[1],0, 0,0,self.cellSize[2])
-		O.cell.trsf=Matrix3.Identity
-	if not self.hasClumps():
-		return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
-	else:
-		standalone,clumps=self.getClumps()
-		ids=O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self]) # append all spheres first
-		clumpIds=[]
-		userColor='color' in kw
-		for clump in clumps:
-			clumpIds.append(O.bodies.clump(clump)) # clump spheres with given ids together, creating the clump object as well
-			# make all spheres within one clump a single color, unless color was specified by the user
-			if not userColor:
-				for i in clump[1:]: O.bodies[i].shape.color=O.bodies[clump[0]].shape.color
-		return ids+clumpIds
-
-SpherePack.toSimulation=SpherePack_toSimulation
-
-
-class inGtsSurface_py(Predicate):
-	"""This class was re-implemented in c++, but should stay here to serve as reference for implementing
-	Predicates in pure python code. C++ allows us to play dirty tricks in GTS which are not accessible
-	through pygts itself; the performance penalty of pygts comes from fact that if constructs and destructs
-	bb tree for the surface at every invocation of gts.Point().is_inside(). That is cached in the c++ code,
-	provided that the surface is not manipulated with during lifetime of the object (user's responsibility).
-
-	---
-	
-	Predicate for GTS surfaces. Constructed using an already existing surfaces, which must be closed.
-
-		import gts
-		surf=gts.read(open('horse.gts'))
-		inGtsSurface(surf)
-
-	.. note::
-		Padding is optionally supported by testing 6 points along the axes in the pad distance. This
-		must be enabled in the ctor by saying doSlowPad=True. If it is not enabled and pad is not zero,
-		warning is issued.
-	"""
-	def __init__(self,surf,noPad=False):
-		# call base class ctor; necessary for virtual methods to work as expected.
-		# see comments in _packPredicates.cpp for struct PredicateWrap.
-		super(inGtsSurface,self).__init__()
-		if not surf.is_closed(): raise RuntimeError("Surface for inGtsSurface predicate must be closed.")
-		self.surf=surf
-		self.noPad=noPad
-		inf=float('inf')
-		mn,mx=[inf,inf,inf],[-inf,-inf,-inf]
-		for v in surf.vertices():
-			c=v.coords()
-			mn,mx=[min(mn[i],c[i]) for i in 0,1,2],[max(mx[i],c[i]) for i in 0,1,2]
-		self.mn,self.mx=tuple(mn),tuple(mx)
-		import gts
-	def aabb(self): return self.mn,self.mx
-	def __call__(self,_pt,pad=0.):
-		p=gts.Point(*_pt)
-		if self.noPad:
-			if pad!=0: warnings.warn("Padding disabled in ctor, using 0 instead.")
-			return p.is_inside(self.surf)
-		pp=[gts.Point(_pt[0]-pad,_pt[1],_pt[2]),gts.Point(_pt[0]+pad,_pt[1],_pt[2]),gts.Point(_pt[0],_pt[1]-pad,_pt[2]),gts.Point(_pt[0],_pt[1]+pad,_pt[2]),gts.Point(_pt[0],_pt[1],_pt[2]-pad),gts.Point(_pt[0],_pt[1],_pt[2]+pad)]
-		return p.is_inside(self.surf) and pp[0].is_inside(self.surf) and pp[1].is_inside(self.surf) and pp[2].is_inside(self.surf) and pp[3].is_inside(self.surf) and pp[4].is_inside(self.surf) and pp[5].is_inside(self.surf)
-
-class inSpace(Predicate):
-	"""Predicate returning True for any points, with infinite bounding box."""
-	def __init__(self, _center=Vector3().Zero): self._center=_center
-	def aabb(self):
-		inf=float('inf'); return Vector3(-inf,-inf,-inf),Vector3(inf,inf,inf)
-	def center(self): return self._center
-	def dim(self):
-		inf=float('inf'); return Vector3(inf,inf,inf)
-	def __call__(self,pt,pad): return True
+if not (noPredicate):
+  def SpherePack_toSimulation(self,rot=Matrix3.Identity,**kw):
+    """Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
+  this method also appropriately sets periodic cell information of the simulation.
+  
+    >>> from yade import pack; from math import *
+    >>> sp=pack.SpherePack()
+  
+  Create random periodic packing with 20 spheres:
+  
+    >>> sp.makeCloud((0,0,0),(5,5,5),rMean=.5,rRelFuzz=.5,periodic=True,num=20)
+    20
+  
+  Virgin simulation is aperiodic:
+  
+    >>> O.reset()
+    >>> O.periodic
+    False
+  
+  Add generated packing to the simulation, rotated by 45° along +z
+  
+    >>> sp.toSimulation(rot=Quaternion((0,0,1),pi/4),color=(0,0,1))
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+  
+  Periodic properties are transferred to the simulation correctly, including rotation (this could be avoided by explicitly passing "hSize=O.cell.hSize" as an argument):
+  
+    >>> O.periodic
+    True
+    >>> O.cell.refSize
+    Vector3(5,5,5)
+    >>> O.cell.hSize
+    Matrix3(3.53553,-3.53553,0, 3.53553,3.53553,0, 0,0,5)
+  
+  The current state (even if rotated) is taken as mechanically undeformed, i.e. with identity transformation:
+  
+    >>> O.cell.trsf
+    Matrix3(1,0,0, 0,1,0, 0,0,1)
+  
+  :param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
+  :param **kw: passed to :yref:`yade.utils.sphere`
+  :return: list of body ids added (like :yref:`O.bodies.append<BodyContainer.append>`)
+  """
+    if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
+    assert(isinstance(rot,Matrix3))
+    if self.isPeriodic: O.periodic=True
+    if self.cellSize!=Vector3.Zero and self.isPeriodic:
+      O.cell.hSize=rot*Matrix3(self.cellSize[0],0,0, 0,self.cellSize[1],0, 0,0,self.cellSize[2])
+      O.cell.trsf=Matrix3.Identity
+    if not self.hasClumps():
+      return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
+    else:
+      standalone,clumps=self.getClumps()
+      ids=O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self]) # append all spheres first
+      clumpIds=[]
+      userColor='color' in kw
+      for clump in clumps:
+        clumpIds.append(O.bodies.clump(clump)) # clump spheres with given ids together, creating the clump object as well
+        # make all spheres within one clump a single color, unless color was specified by the user
+        if not userColor:
+          for i in clump[1:]: O.bodies[i].shape.color=O.bodies[clump[0]].shape.color
+      return ids+clumpIds
+  
+  SpherePack.toSimulation=SpherePack_toSimulation
+  
+  
+  class inGtsSurface_py(Predicate):
+    """This class was re-implemented in c++, but should stay here to serve as reference for implementing
+    Predicates in pure python code. C++ allows us to play dirty tricks in GTS which are not accessible
+    through pygts itself; the performance penalty of pygts comes from fact that if constructs and destructs
+    bb tree for the surface at every invocation of gts.Point().is_inside(). That is cached in the c++ code,
+    provided that the surface is not manipulated with during lifetime of the object (user's responsibility).
+  
+    ---
+    
+    Predicate for GTS surfaces. Constructed using an already existing surfaces, which must be closed.
+  
+      import gts
+      surf=gts.read(open('horse.gts'))
+      inGtsSurface(surf)
+  
+    .. note::
+      Padding is optionally supported by testing 6 points along the axes in the pad distance. This
+      must be enabled in the ctor by saying doSlowPad=True. If it is not enabled and pad is not zero,
+      warning is issued.
+    """
+    def __init__(self,surf,noPad=False):
+      # call base class ctor; necessary for virtual methods to work as expected.
+      # see comments in _packPredicates.cpp for struct PredicateWrap.
+      super(inGtsSurface,self).__init__()
+      if not surf.is_closed(): raise RuntimeError("Surface for inGtsSurface predicate must be closed.")
+      self.surf=surf
+      self.noPad=noPad
+      inf=float('inf')
+      mn,mx=[inf,inf,inf],[-inf,-inf,-inf]
+      for v in surf.vertices():
+        c=v.coords()
+        mn,mx=[min(mn[i],c[i]) for i in 0,1,2],[max(mx[i],c[i]) for i in 0,1,2]
+      self.mn,self.mx=tuple(mn),tuple(mx)
+      import gts
+    def aabb(self): return self.mn,self.mx
+    def __call__(self,_pt,pad=0.):
+      p=gts.Point(*_pt)
+      if self.noPad:
+        if pad!=0: warnings.warn("Padding disabled in ctor, using 0 instead.")
+        return p.is_inside(self.surf)
+      pp=[gts.Point(_pt[0]-pad,_pt[1],_pt[2]),gts.Point(_pt[0]+pad,_pt[1],_pt[2]),gts.Point(_pt[0],_pt[1]-pad,_pt[2]),gts.Point(_pt[0],_pt[1]+pad,_pt[2]),gts.Point(_pt[0],_pt[1],_pt[2]-pad),gts.Point(_pt[0],_pt[1],_pt[2]+pad)]
+      return p.is_inside(self.surf) and pp[0].is_inside(self.surf) and pp[1].is_inside(self.surf) and pp[2].is_inside(self.surf) and pp[3].is_inside(self.surf) and pp[4].is_inside(self.surf) and pp[5].is_inside(self.surf)
+  
+  class inSpace(Predicate):
+    """Predicate returning True for any points, with infinite bounding box."""
+    def __init__(self, _center=Vector3().Zero): self._center=_center
+    def aabb(self):
+      inf=float('inf'); return Vector3(-inf,-inf,-inf),Vector3(inf,inf,inf)
+    def center(self): return self._center
+    def dim(self):
+      inf=float('inf'); return Vector3(inf,inf,inf)
+    def __call__(self,pt,pad): return True
 
 #####
 ## surface construction and manipulation

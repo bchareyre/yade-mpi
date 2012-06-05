@@ -36,7 +36,7 @@ FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex
 FIND_PACKAGE(Eigen3)
 
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
-SET(LINKLIBS "")
+SET(LINKLIBS "-lrt")
 SET(CONFIGURED_FEATS "")
 
 
