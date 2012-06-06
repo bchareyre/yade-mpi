@@ -188,6 +188,10 @@ IF (NOT SUFFIX)
   SET (SUFFIX "-${VERSION}")
 ENDIF (NOT SUFFIX)
 
+IF(NOSUFFIX)   #For packaging
+  SET (SUFFIX "")
+ENDIF(NOSUFFIX)   #For packaging
+
 IF (NOT runtimePREFIX)
   SET (runtimePREFIX ${CMAKE_INSTALL_PREFIX})
 ENDIF (NOT runtimePREFIX)
@@ -260,15 +264,15 @@ SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")
 SET (libstdcxx "/usr/lib/libstdc++.so.6")     #This is a hack, which is not needed for modern systems. Should be deleted.
 #====================================
 
-CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/yade${SUFFIX}-batch")
-CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/yade${SUFFIX}")
+CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-batch")
+CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}")
 CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
 CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
 #===========================================================
 
-INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade${SUFFIX}-batch" DESTINATION ${YADE_EXEC_PATH}/)
-INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/yade${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
+INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-batch" DESTINATION ${YADE_EXEC_PATH}/)
+INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/config.py" DESTINATION ${YADE_PY_PATH}/yade/)
 INSTALL(FILES "${CMAKE_BINARY_DIR}/__init__.py" DESTINATION ${YADE_PY_PATH}/yade/)
 FILE(GLOB filesPYChecks "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/*.py")
