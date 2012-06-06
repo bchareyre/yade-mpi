@@ -29,8 +29,15 @@ else: sys.setdlopenflags(dl.RTLD_NOW)
 # important: initialize c++ by importing libstdc++ directly
 # see http://www.abclinuxu.cz/poradna/programovani/show/286322
 # https://bugs.launchpad.net/bugs/490744
+# 
+# This is already fixed in systems, newer, than Ubuntu 10.04. anyway for 
+# back-compatibility we will keep it.
+
 libstdcxx='${libstdcxx}' # substituted by scons
-ctypes.cdll.LoadLibrary(libstdcxx)
+try:
+  ctypes.cdll.LoadLibrary(libstdcxx)
+except: pass
+
 #
 
 # now ready for c++ imports
