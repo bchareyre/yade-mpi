@@ -13,12 +13,16 @@ SET_TARGET_PROPERTIES(_utils PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(_utils plugins support core)
 INSTALL(TARGETS _utils DESTINATION "${YADE_PY_PATH}/yade/")
 
+
+ADD_LIBRARY(_packPredicates SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp")
+SET_TARGET_PROPERTIES(_packPredicates PROPERTIES PREFIX "")
+TARGET_LINK_LIBRARIES(_packPredicates plugins support core)
 IF(ENABLE_GTS)
-  ADD_LIBRARY(_packPredicates SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp")
-  SET_TARGET_PROPERTIES(_packPredicates PROPERTIES PREFIX "")
-  TARGET_LINK_LIBRARIES(_packPredicates plugins support core _gts)
-  INSTALL(TARGETS _packPredicates DESTINATION "${YADE_PY_PATH}/yade/")
+  TARGET_LINK_LIBRARIES(_packPredicates _gts)
 ENDIF(ENABLE_GTS)
+
+
+INSTALL(TARGETS _packPredicates DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_packSpheres SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packSpheres.cpp")
 SET_TARGET_PROPERTIES(_packSpheres PROPERTIES PREFIX "")
