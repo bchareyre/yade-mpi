@@ -208,7 +208,7 @@ SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH "${YADE_LIB_PATH}/lib;${YADE_PY_PATH}/yade/;${YADE_PY_PATH}/yade/qt;${YADE_PY_PATH}/gts;${YADE_PY_PATH}")
+SET(CMAKE_INSTALL_RPATH "${YADE_LIB_PATH};${YADE_PY_PATH}/yade/;${YADE_PY_PATH}/yade/qt;${YADE_PY_PATH}/gts")
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 #===========================================================
@@ -282,10 +282,10 @@ FILE(GLOB filesPYChecksData "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-test
 INSTALL(FILES ${filesPYChecksData} DESTINATION ${YADE_PY_PATH}/yade/tests/checks/data)
 
 INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
-INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH}/lib)
-INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH}/py)
+INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH})
+INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH})
+INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH})
+INSTALL(TARGETS miniEigen DESTINATION ${YADE_LIB_PATH})
 #===========================================================
 MESSAGE(STATUS "===========================================================")
 MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
