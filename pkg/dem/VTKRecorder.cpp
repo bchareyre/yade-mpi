@@ -248,7 +248,7 @@ void VTKRecorder::action(){
 				Vector3r ptB(p02+scene->cell->hSize*(wrapCellDist[I->getId1()]-I->cellDist).cast<Real>());
 				vtkIdType idPtA=intrBodyPos->InsertNextPoint(ptA[0],ptA[1],ptA[2]), idPtB=intrBodyPos->InsertNextPoint(ptB[0],ptB[1],ptB[2]);
 				vtkSmartPointer<vtkLine> line1B(vtkSmartPointer<vtkLine>::New()); line1B->GetPointIds()->SetId(0,I->getId1()); line1B->GetPointIds()->SetId(1,idPtB);
-				vtkSmartPointer<vtkLine> lineA2(vtkSmartPointer<vtkLine>::New()); lineA2->GetPointIds()->SetId(0,idPtA); line1B->GetPointIds()->SetId(1,I->getId2());
+				vtkSmartPointer<vtkLine> lineA2(vtkSmartPointer<vtkLine>::New()); lineA2->GetPointIds()->SetId(0,idPtA); lineA2->GetPointIds()->SetId(1,I->getId2());
 				numAddValues=2;
 			}
 			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->phys.get());
