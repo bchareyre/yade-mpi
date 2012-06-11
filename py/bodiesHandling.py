@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # encoding: utf-8
 """
 Miscellaneous functions, which are useful for handling bodies.

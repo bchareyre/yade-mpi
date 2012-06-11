@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # encoding: utf-8
 """
 Creates geometry objects from facets.

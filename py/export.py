@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # encoding: utf-8
 """
 Export (not only) geometry to various formats.
