@@ -111,6 +111,10 @@ void InsertionSortCollider::action(){
 	// pre-conditions
 		// adjust storage size
 		bool doInitSort=false;
+		if (doSort) {
+			doInitSort=true;
+			doSort=false;
+		}
 		if(BB[0].size!=2*nBodies){
 			long BBsize=BB[0].size;
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");

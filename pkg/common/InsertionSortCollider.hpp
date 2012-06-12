@@ -216,6 +216,7 @@ class InsertionSortCollider: public Collider{
 		((Real,fastestBodyMaxDist,-1,,"Normalized maximum displacement of the fastest body since last run; if >= 1, we could get out of bboxes and will trigger full run. |yupdate|"))
 		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
 		((Real,useless,,,"for compatibility of scripts defining the old collider's attributes - see deprecated attributes")) 
+		((bool,doSort,false,,"Do forced resorting of interactions."))
 		, /*deprec*/
 		((sweepLength,verletDist,"conform to usual DEM terminology"))
 		((nBins,useless,"DEPRECATED - remove this useless attribute from scripts"))
