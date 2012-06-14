@@ -254,6 +254,7 @@ ENDIF(ENABLE_GUI)
 TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
 SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
+TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 #====================================
 #Back compatibility with scons
