@@ -125,18 +125,21 @@ class Cell: public Serializable{
 	Vector3r wrapPt_py(const Vector3r& pt) const { return wrapPt(pt);}
 
 	// strain measures
-	Matrix3r giveDefGrad() { return trsf; }
-	Matrix3r giveSmallStrain() { return .5*(trsf+trsf.transpose()) - Matrix3r::Identity(); }
-	Matrix3r giveRCauchyGreenDef() { return trsf.transpose()*trsf; }
-	Matrix3r giveLCauchyGreenDef() { return trsf*trsf.transpose(); }
-	Matrix3r giveLagrangianStrain() { return .5*(giveRCauchyGreenDef()-Matrix3r::Identity()); }
-	Matrix3r giveEulerianAlmansiStrain() { return .5*(Matrix3r::Identity()-giveLCauchyGreenDef().inverse()); }
+	Matrix3r getDefGrad() { return trsf; }
+	Matrix3r getSmallStrain() { return .5*(trsf+trsf.transpose()) - Matrix3r::Identity(); }
+	Matrix3r getRCauchyGreenDef() { return trsf.transpose()*trsf; }
+	Matrix3r getLCauchyGreenDef() { return trsf*trsf.transpose(); }
+	Matrix3r getLagrangianStrain() { return .5*(getRCauchyGreenDef()-Matrix3r::Identity()); }
+	Matrix3r getEulerianAlmansiStrain() { return .5*(Matrix3r::Identity()-getLCauchyGreenDef().inverse()); }
 	void computePolarDecOfDefGrad(Matrix3r& R, Matrix3r& U) { Matrix_computeUnitaryPositive(trsf,&R,&U); }
-	boost::python::tuple givePolarDecOfDefGrad(){ Matrix3r R,U; computePolarDecOfDefGrad(R,U); return boost::python::make_tuple(R,U); }
-	Matrix3r giveRotation() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return R; }
-	Matrix3r giveLeftStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return U; }
-	Matrix3r giveRightStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return trsf*R.transpose(); }
-		
+	boost::python::tuple getPolarDecOfDefGrad(){ Matrix3r R,U; computePolarDecOfDefGrad(R,U); return boost::python::make_tuple(R,U); }
+	Matrix3r getRotation() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return R; }
+	Matrix3r getLeftStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return U; }
+	Matrix3r getRightStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return trsf*R.transpose(); }
+
+	// stress measures
+	Matrix3r getStress() { return Shop::getStress(); }
+	Matrix3r getCauchyStress() { Matrix3r s=getStress(); return .5*(s+s.transpose()); }
 
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
@@ -169,16 +172,16 @@ class Cell: public Serializable{
 		.def("unshearPt",&Cell::unshearPt,"Apply inverse shear on the point (removes skew+rot of the cell)")
 		.def("shearPt",&Cell::shearPt,"Apply shear (cell skew+rot) on the point")
 		.def("wrapPt",&Cell::wrapPt_py,"Wrap point inside the reference cell, assuming the cell has no skew+rot.")
-		.def("giveDefGrad",&Cell::giveDefGrad,"Returns deformation gradient tensor $\\mat{F}$ of the cell deformation (http://en.wikipedia.org/wiki/Finite_strain_theory)")
-		.def("giveSmallStrain",&Cell::giveSmallStrain,"Returns small strain tensor $\\mat{\\varepsilon}=\\frac{1}{2}(\\mat{F}+\\mat{F}^T)-\\mat{I}$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
-		.def("giveRCauchyGreenDef",&Cell::giveRCauchyGreenDef,"Returns right Cauchy-Green deformation tensor $\\mat{C}=\\mat{F}^T\\mat{F}$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
-		.def("giveLCauchyGreenDef",&Cell::giveLCauchyGreenDef,"Returns left Cauchy-Green deformation tensor $\\mat{b}=\\mat{F}\\mat{F}^T$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
-		.def("giveLagrangianStrain",&Cell::giveLagrangianStrain,"Returns Lagrangian strain tensor $\\mat{E}=\\frac{1}{2}(\\mat{C}-\\mat{I})=\\frac{1}{2}(\\mat{F}^T\\mat{F}-\\mat{I})=\\frac{1}{2}(\\mat{U}^2-\\mat{I})$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
-		.def("giveEulerianAlmansiStrain",&Cell::giveEulerianAlmansiStrain,"Returns Eulerian-Almansi strain tensor $\\mat{e}=\\frac{1}{2}(\\mat{I}-\\mat{b}^{-1})=\\frac{1}{2}(\\mat{I}-(\\mat{F}\\mat{F}^T)^{-1})$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
-		.def("givePolarDecOfDefGrad",&Cell::givePolarDecOfDefGrad,"Returns orthogonal matrix $\\mat{R}$ and symmetric positive semi-definite matrix $\\mat{U}$ as polar decomposition of deformation gradient $\\mat{F}$ of the cell ( $\\mat{F}=\\mat{RU}$ )")
-		.def("giveRotation",&Cell::giveRotation,"Returns rotation of the cell (orthogonal matrix $\\mat{R}$ from polar decomposition $\\mat{F}=\\mat{RU}$ )")
-		.def("giveLeftStretch",&Cell::giveLeftStretch,"Returns left (spatial) stretch tensor of the cell (matrix $\\mat{U}$ from polar decomposition $\\mat{F}=\\mat{RU}$ )")
-		.def("giveRightStretch",&Cell::giveRightStretch,"Returns right (material) stretch tensor of the cell (matrix $\\mat{V}$ from polar decomposition $\\mat{F}=\\mat{RU}=\\mat{VR}\\ \\rightarrow\\ \\mat{V}=\\mat{FR}^T$ )")
+		.def("getDefGrad",&Cell::getDefGrad,"Returns deformation gradient tensor $\\mat{F}$ of the cell deformation (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("getSmallStrain",&Cell::getSmallStrain,"Returns small strain tensor $\\mat{\\varepsilon}=\\frac{1}{2}(\\mat{F}+\\mat{F}^T)-\\mat{I}$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("getRCauchyGreenDef",&Cell::getRCauchyGreenDef,"Returns right Cauchy-Green deformation tensor $\\mat{C}=\\mat{F}^T\\mat{F}$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("getLCauchyGreenDef",&Cell::getLCauchyGreenDef,"Returns left Cauchy-Green deformation tensor $\\mat{b}=\\mat{F}\\mat{F}^T$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("getLagrangianStrain",&Cell::getLagrangianStrain,"Returns Lagrangian strain tensor $\\mat{E}=\\frac{1}{2}(\\mat{C}-\\mat{I})=\\frac{1}{2}(\\mat{F}^T\\mat{F}-\\mat{I})=\\frac{1}{2}(\\mat{U}^2-\\mat{I})$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("getEulerianAlmansiStrain",&Cell::getEulerianAlmansiStrain,"Returns Eulerian-Almansi strain tensor $\\mat{e}=\\frac{1}{2}(\\mat{I}-\\mat{b}^{-1})=\\frac{1}{2}(\\mat{I}-(\\mat{F}\\mat{F}^T)^{-1})$ of the cell (http://en.wikipedia.org/wiki/Finite_strain_theory)")
+		.def("getPolarDecOfDefGrad",&Cell::getPolarDecOfDefGrad,"Returns orthogonal matrix $\\mat{R}$ and symmetric positive semi-definite matrix $\\mat{U}$ as polar decomposition of deformation gradient $\\mat{F}$ of the cell ( $\\mat{F}=\\mat{RU}$ )")
+		.def("getRotation",&Cell::getRotation,"Returns rotation of the cell (orthogonal matrix $\\mat{R}$ from polar decomposition $\\mat{F}=\\mat{RU}$ )")
+		.def("getLeftStretch",&Cell::getLeftStretch,"Returns left (spatial) stretch tensor of the cell (matrix $\\mat{U}$ from polar decomposition $\\mat{F}=\\mat{RU}$ )")
+		.def("getRightStretch",&Cell::getRightStretch,"Returns right (material) stretch tensor of the cell (matrix $\\mat{V}$ from polar decomposition $\\mat{F}=\\mat{RU}=\\mat{VR}\\ \\rightarrow\\ \\mat{V}=\\mat{FR}^T$ )")
 		.def_readonly("shearTrsf",&Cell::_shearTrsf,"Current skew+rot transformation (no resize)")
 		.def_readonly("unshearTrsf",&Cell::_unshearTrsf,"Inverse of the current skew+rot transformation (no resize)")
 		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell.trsf>` (computed as :yref:`trsf<Cell.trsf>`⁻¹ × :yref:`hSize<Cell.hSize>`.")
