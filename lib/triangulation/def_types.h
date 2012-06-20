@@ -5,6 +5,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include <yade/lib/base/Math.hpp>
+
 //Define basic types from CGAL templates
 
 #ifndef _Def_types
