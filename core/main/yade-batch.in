@@ -10,7 +10,11 @@ import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, ran
 
 ## replaced by scons automatically
 prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
-libDir=prefix+'/lib/yade'+suffix # run the batch always in non-debug mode (the spawned processes do honor debuggin flag, however)
+
+libPATH='${LIBPATH}'
+if not(libPATH): libPATH='lib'
+
+libDir=prefix+'/'+libPATH+'/yade'+suffix # run the batch always in non-debug mode (the spawned processes do honor debuggin flag, however)
 sys.path.append(os.path.join(libDir,'py'))
 executable=os.path.join(prefix,'bin','yade'+suffix)
 ## we just need this ...
