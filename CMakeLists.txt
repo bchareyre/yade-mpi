@@ -215,15 +215,20 @@ IF(NOSUFFIX)   #For packaging
   SET (SUFFIX "")
 ENDIF(NOSUFFIX)   #For packaging
 
+IF(NOT LIBPATH)   #For packaging
+  SET (LIBPATH "lib")
+ENDIF(NOT LIBPATH)   #For packaging
+
 IF (NOT runtimePREFIX)
   SET (runtimePREFIX ${CMAKE_INSTALL_PREFIX})
 ENDIF (NOT runtimePREFIX)
 
 MESSAGE (STATUS "Suffix is set to " ${SUFFIX})
+MESSAGE (STATUS "LIBPATH is set to " ${LIBPATH})
 MESSAGE (STATUS "runtimePREFIX is set to " ${runtimePREFIX})
 #===========================================================
 
-SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/lib/yade${SUFFIX})
+SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/${LIBPATH}/yade${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 
