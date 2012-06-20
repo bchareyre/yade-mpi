@@ -79,7 +79,7 @@ Most of the list above is very likely already packaged for your distribution. Th
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf \
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev
+		libxmu-dev libxi-dev libgmp3-dev libcgal-dev
 
 	* **Fedora**::
 
