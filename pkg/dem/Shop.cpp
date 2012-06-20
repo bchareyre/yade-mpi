@@ -762,15 +762,18 @@ Matrix3r Shop::getStress(Real volume){
 	Scene* scene=Omega::instance().getScene().get();
 	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():1;
 	Matrix3r stressTensor = Matrix3r::Zero();
+	const bool isPeriodic = scene->isPeriodic;
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if (!I->isReal()) continue;
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
 		Vector3r branch=Body::byId(I->getId1(),scene)->state->pos -Body::byId(I->getId2(),scene)->state->pos;
-		if (scene->isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
-		stressTensor+= (nsi->normalForce+nsi->shearForce)*branch.transpose();}
+		if (isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
+		stressTensor += (nsi->normalForce+nsi->shearForce)*branch.transpose();
+	}
 	return stressTensor/volume;
 }
 
+/*
 Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 	Scene* scene=Omega::instance().getScene().get();
 	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
@@ -791,31 +794,11 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 		Real fN=phys->normalForce.dot(n);
 
 		stress += l*(fN*n*n.transpose() + .5*(fT*n.transpose() + n*fT.transpose()));
-
-		/*Real fT0=fT[0]; Real fT1=fT[1]; Real fT2=fT[2];
-		Real n0=n[0]; Real n1=n[1]; Real n2=n[2];
-
-		Real s00 = l*(n0*n0*fN + fT0*n0);
-		Real s01 = l*(n0*n1*fN + .5*(fT0*n1 + fT1*n0));
-		Real s02 = l*(n0*n2*fN + .5*(fT0*n2 + fT2*n0));
-		Real s11 = l*(n1*n1*fN + fT1*n1);
-		Real s12 = l*(n1*n2*fN + .5*(fT1*n2 + fT2*n1));
-		Real s22 = l*(n2*n2*fN + fT2*n2);
-
-		stress(0,0) += s00;
-		stress(0,1) += s01;
-		stress(1,0) += s01;
-		stress(0,2) += s02;
-		stress(2,0) += s02;
-		stress(1,1) += s11;
-		stress(1,2) += s12;
-		stress(2,1) += s12;
-		stress(2,2) += s22;
-		*/
 	}
 	stress/=volume;
 	return stress;
 }
+*/
 
 void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();

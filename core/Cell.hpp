@@ -16,6 +16,8 @@ The transformation is split between "normal" part and "rotation/shear" part for 
 #include<yade/lib/serialization/Serializable.hpp>
 #include<yade/lib/base/Math.hpp>
 
+#include<yade/pkg/dem/Shop.hpp>
+
 class Cell: public Serializable{
 	public:
 	//! Get/set sizes of cell base vectors

@@ -15,6 +15,7 @@
 
 #include<boost/function.hpp>
 
+
 class Scene;
 class Body;
 class SimpleViscoelasticBodyParameters;
@@ -118,8 +119,9 @@ class Shop{
 		static void getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign=false);
 		static py::list getStressLWForEachBody(bool revertSign);
 		
-		//! Function to compute overall ("macroscopic")
+		//! Function to compute overall ("macroscopic") stress.
 		static Matrix3r getStress(Real volume=0);
+		static Matrix3r stressTensorOfPeriodicCell() { LOG_WARN("Shop::stressTensorOfPeriodicCelli is DEPRECATED: use getStress instead"); return Shop::getStress(); }
 		//! This version is restricted to periodic BCs and Dem3Dof
 		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors

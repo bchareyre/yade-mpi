@@ -343,7 +343,8 @@ void Peri3dController::action(){
 
 	// Update - update values from previous step to current step
 	stressOld = stress; // stresssOld = stress at previous step
-	sigma = Shop::stressTensorOfPeriodicCell(/*smallStrains=*/true); // current stress tensor
+	//sigma = Shop::stressTensorOfPeriodicCell(/*smallStrains=*/true); // current stress tensor
+	sigma = Shop::getStress(); // current stress tensor
 	stress = tensor_toVoigt(sigma); // current stress vector
 	stressIdeal += stressRate*dt; // stress that would be obtained if the predictor would be perfect
 	strain += strainRate*dt; // current strain vector
