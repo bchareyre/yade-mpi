@@ -9,8 +9,8 @@ prefix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.envir
 suffix='${SUFFIX}'
 debug=bool(${debug})
 
-libPATH='${LIBPATH}'
-if not(libPATH): libPATH='lib'
+libPATH='${LIBPATHINST}'
+if (libPATH == '${LIBPATHINST}'): libPATH='lib'
 
 libDir=os.path.abspath(prefix+'/'+libPATH+'/yade${SUFFIX}'+('/dbg' if debug else ''))
 confDir=os.environ['HOME']+'/.yade${SUFFIX}'

@@ -8,8 +8,8 @@ prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else o
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
 features,version='${features}'.split(','),'${realVersion}'
 
-libPATH='${LIBPATH}'
-if not(libPATH): libPATH='lib'
+libPATH='${LIBPATHINST}'
+if (libPATH == '${LIBPATHINST}'): libPATH='lib'
 
 ## find available builds
 nonDebugLibDir=prefix+'/'+libPATH+'/yade'+suffix
