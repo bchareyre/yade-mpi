@@ -206,7 +206,7 @@ ELSE (NOT INSTALL_PREFIX)
 ENDIF (NOT INSTALL_PREFIX)
 
 IF (NOT SUFFIX)
-  SET (SUFFIX "-${VERSION}")
+  SET (SUFFIX "-${YADE_VERSION}")
 ENDIF (NOT SUFFIX)
 
 IF(NOSUFFIX)   #For packaging
@@ -283,8 +283,8 @@ TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 #====================================
 #Back compatibility with scons
-SET (realVersion ${VERSION})
-SET (version ${VERSION})
+SET (realVersion ${YADE_VERSION})
+SET (version ${YADE_VERSION})
 SET (pyExecutable ${PYTHON_EXECUTABLE})
 SET (profile "default")
 SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")

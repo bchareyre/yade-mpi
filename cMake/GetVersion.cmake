@@ -1,14 +1,13 @@
 # Define version or set it from git
 
-
-IF (NOT VERSION)
+IF (NOT YADE_VERSION)
   IF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/RELEASE )
     #Release file is found
     exec_program(
       "less"
       ${CMAKE_CURRENT_SOURCE_DIR}
       ARGS "RELEASE"
-      OUTPUT_VARIABLE VERSION 
+      OUTPUT_VARIABLE YADE_VERSION 
     )
   ELSEIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git/config)
     #Use git for version defining
@@ -38,7 +37,7 @@ IF (NOT VERSION)
       ARGS "-c13-22"
       OUTPUT_VARIABLE VERSION_DATE
     )
-    SET(VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
+    SET(YADE_VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
     
     #git log -n1 --pretty=format:"%ai_%h"
   ELSEIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.bzr/branch/last-revision)
@@ -67,11 +66,11 @@ IF (NOT VERSION)
       ARGS "-c1-10"
       OUTPUT_VARIABLE VERSION_DATE
     )
-    SET(VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
+    SET(YADE_VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
   ELSE (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git/config )
-    SET (VERSION "Unknown")
+    SET (YADE_VERSION "Unknown")
   ENDIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/RELEASE )
-ENDIF (NOT VERSION)
+ENDIF (NOT YADE_VERSION)
 
 
-MESSAGE (STATUS "Version is set to " ${VERSION})
+MESSAGE (STATUS "Version is set to " ${YADE_VERSION})
