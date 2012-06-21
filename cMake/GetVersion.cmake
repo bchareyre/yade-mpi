@@ -38,7 +38,7 @@ IF (NOT VERSION)
       ARGS "-c13-22"
       OUTPUT_VARIABLE VERSION_DATE
     )
-    SET(VERSION "${VERSION_DATE}_git-${VERSION_GIT}")
+    SET(VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
     
     #git log -n1 --pretty=format:"%ai_%h"
   ELSEIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.bzr/branch/last-revision)
@@ -67,7 +67,7 @@ IF (NOT VERSION)
       ARGS "-c1-10"
       OUTPUT_VARIABLE VERSION_DATE
     )
-    SET(VERSION "${VERSION_DATE}_git-${VERSION_GIT}")
+    SET(VERSION "${VERSION_DATE}.git-${VERSION_GIT}")
   ELSE (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git/config )
     SET (VERSION "Unknown")
   ENDIF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/RELEASE )
