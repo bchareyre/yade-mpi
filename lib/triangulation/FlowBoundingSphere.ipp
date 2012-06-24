@@ -1481,9 +1481,7 @@ double FlowBoundingSphere<Tesselation>::Sample_Permeability(double& x_Min,double
         boundary(y_min_id).value=0;
         boundary(y_max_id).value=1;
 	double P_zero = abs((boundary(y_min_id).value-boundary(y_max_id).value)/2);
-	cerr<<"Initialize_pressures"<<endl;
-        Initialize_pressures( P_zero );
-	cerr<<"GaussSeidel"<<endl;
+	Initialize_pressures( P_zero );
 	GaussSeidel();
 	const char *kk = "Permeability";
         return Permeameter(boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
