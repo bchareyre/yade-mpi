@@ -72,7 +72,7 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 		}
 		else {// !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
 			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->phys.get());
-			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive)
+			if ((setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) || contactPhysics->initCohesion)
 			{
 				contactPhysics->cohesionBroken = false;
 				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(geom->radius2, geom->radius1),2);

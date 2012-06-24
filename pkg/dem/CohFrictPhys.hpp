@@ -30,6 +30,7 @@ class CohFrictPhys : public FrictPhys
 		((Real,unp,0,,"plastic normal displacement, only used for tensile behaviour and if :yref:`CohFrictPhys::fragile`=false."))
 		((Real,unpMax,0,,"maximum value of plastic normal displacement, after that the interaction breaks even if :yref:`CohFrictPhys::fragile`=false. The default value (0) means no maximum."))
 		((bool,momentRotationLaw,false,,"use bending/twisting moment at contacts. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
+		((bool,initCohesion,false,,"Initialize the cohesive behaviour with current state as equilibrium state (same as :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow` but acting on only one interaction)"))
 		((Real,creep_viscosity,-1,,"creep viscosity [Pa.s/m]."))
 		// internal attributes
 		((Vector3r,moment_twist,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Twist moment"))
