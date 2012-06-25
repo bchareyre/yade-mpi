@@ -103,16 +103,18 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			maxFs = maxFs / Fs;
 			Vector3r trialForce=shearForce;
 			shearForce *= maxFs;
-			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
-			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
+			if (unlikely(scene->trackEnergy)){
+				Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+				if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);}
 			if (Fn<0)  phys->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
 		//Apply the force
-		Vector3r force = -phys->normalForce-shearForce;
-		scene->forces.addForce(id1,force);
-		scene->forces.addForce(id2,-force);
-		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position + (scene->isPeriodic ? scene->cell->intrShiftPos(contact->cellDist): Vector3r::Zero()));
+// 		Vector3r force = -phys->normalForce-shearForce;
+// 		scene->forces.addForce(id1,force);
+// 		scene->forces.addForce(id2,-force);
+// 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+// 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 
 		/// Moment law  ///
 		if (phys->momentRotationLaw && (!phys->cohesionBroken || always_use_moment_law)) {
