@@ -15,23 +15,15 @@ INCLUDE(FindGTS)
 INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
 
-
-IF(NOT Boost_NO_SYSTEM_PATHS)
-  MESSAGE("Use system boost installation")
-  INCLUDE(FindBoost)
-  FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
-ELSE(NOT Boost_NO_SYSTEM_PATHS)
-  MESSAGE("Use custom boost installation (e.g. version 1.46.1)")
-  FIND_PACKAGE(Boost 1.46.1 COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
-  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
-ENDIF(NOT Boost_NO_SYSTEM_PATHS)
-
+#===========================================================
+# Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
+INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
 MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
-
 
 FIND_PACKAGE(Eigen3)
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
