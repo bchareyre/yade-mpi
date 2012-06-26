@@ -93,23 +93,26 @@ Yade relies on a number of external software to run; its installation is checked
 * `libQGLViewer <http://www.libqglviewer.com>`_
 * `python <http://www.python.org>`_, `numpy <http://numpy.scipy.org>`_, `ipython <http://ipython.scipy.org>`_
 * `matplotlib <http://matplotlib.sf.net>`_
-* `eigen2 <http://eigen.tuxfamily.org>`_ algebra library
+* `eigen3 <http://eigen.tuxfamily.org>`_ algebra library
 * `gdb <http://www.gnu.org/software/gdb>`_ debugger
 * `sqlite3 <http://www.sqlite.org>`_ database engine
 * `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 
-Most of the list above is very likely already packaged for your distribution. The following commands have to be executed in command line of corresponding distributions. Just copy&paste to the terminal. To perform commands you should have root privileges
+Most of the list above is very likely already packaged for your distribution. 
+The following commands have to be executed in command line of corresponding 
+distributions. Just copy&paste to the terminal. To perform commands you 
+should have root privileges
 
 	* **Ubuntu**, **Debian** and their derivatives::
 
-		sudo apt-get install scons freeglut3-dev libloki-dev \
+		sudo apt-get install cmake git freeglut3-dev libloki-dev \
 		libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
 		libboost-program-options-dev \
 		libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
 		libboost-iostreams-dev python-dev libboost-python-dev ipython \
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot doxygen \
-		libgts-dev python-pygraphviz libvtk5-dev python-scientific bzr bzrtools libeigen2-dev \
+		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf \
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
@@ -155,22 +158,53 @@ Most of the list above is very likely already packaged for your distribution. Th
 Compilation
 ^^^^^^^^^^^
 
-Inside the directory where you downloaded the sources (ex "yade" if you use bazaar), install Yade to your home directory (without root priviledges)::
+You should create separate build-place-folder, where Yade will be
+configured and where the source code will be compiled.
+Then inside this build-directory you should start cmake to configure
+the following compilation process::
 
-	scons PREFIX=/home/username/YADE
+	cmake -DINSTALL_PREFIX=/path/to/installfolder /path/to/sources
 
-If you have a machine that you are the only user on, you can instead change permission on ``/usr/local`` and install subsequently without specifying the ``PREFIX``::
+Additional options can be configured in the same line with the following 
+syntax::
 
-	sudo chown user: /usr/local    # replace "user" with your login name
-	scons
+	cmake -DOPTION1=VALUE1 -DOPTION2=VALUE2
+	
+The following options are available:
+	
+	* INSTALL_PREFIX: absolute path to install Yade (/usr/local by default)
+    * LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
+    * DEBUG: compile in debug-mode (OFF by default)
+    * CMAKE_VERBOSE_MAKEFILE: output additional information during 
+      compiling (OFF by default)
+    * SUFFIX: suffix, added after binary-names (version number by default)
+    * NOSUFFIX: do not add a suffix after binary-name (OFF by default)
+    * YADE_VERSION: explicitely set version number (is defined from 
+      git-directory by default)
+    * ENABLE_GUI: enable GUI option (ON by default)
+    * ENABLE_CGAL: enable CGAL option (ON by default)
+    * ENABLE_VTK: enable VTK-export option (ON by default)
+    * ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
+    * ENABLE_GTS: enable GTS-option (ON by default)
+    * ENABLE_GL2PS: enable GL2PS-option (ON by default)
+    * runtimePREFIX: used for packaging, when install directory is not 
+      the same is runtime directory (/usr/local by default)
 
-There is a number of options for compilation you can change; run ``scons -h`` to see them (see also :ref:`scons-parameters` in the *Programmer's manual*)
+For using an extended parameterss of cmake, please, follow the corresponding
+documentation on cmake-webpage. 
 
-The compilation process can take a long time, be patient.
+After the compilation configured without errors and you will see all wished 
+options enabled, start the standard compilation process::
 
-Decreasing RAM usage during compilation
-"""""""""""""""""""""""""""""""""""""""""
+    make 
+    
+Installing performs with the following command::
 
-Yade demands a large amount of memory for compilation (due to extensive template use). If you have less than 2GB of RAM, it will be, you might encounter difficulties such as the computer being apparently stalled, compilation taking very long time (hours) or erroring out. This command will minimize RAM usage, but the compilation will take longer -- only one file will be compiled simultaneously and files will be "chunked" together one by one::
+    make install
 
-	scons jobs=1 chunkSize=1
+The compilation process can take a long time, be patient. An additional
+parameter on many cores systems ``-j`` can be added to decrease compilation time
+and split the compilation on many cores. For example, on 4-core machines
+it would be reasonable to set the parameter ``-j4``. Note, the YADE requires
+approximately 2GB/core for compilation, otherwise the swap-file will be used
+and the compilation time dramatically increases.
