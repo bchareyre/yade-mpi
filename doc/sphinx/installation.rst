@@ -54,11 +54,23 @@ available in packaged versions.
 Download
 ^^^^^^^^^^
 
-If you want to install from source, you can install either a release (numbered version, which is frozen) or the current developement version (updated by the developers frequently). You should download the development version (called ``trunk``) if you want to modify the source code, as you might encounter problems that will be fixed by the developers. Release version will not be modified (except for updates due to critical and easy-to-fix bugs), but they are in a more stabilized state that trunk generally.
+If you want to install from source, you can install either a release 
+(numbered version, which is frozen) or the current developement version 
+(updated by the developers frequently). You should download the development 
+version (called ``trunk``) if you want to modify the source code, as you 
+might encounter problems that will be fixed by the developers. Release 
+version will not be modified (except for updates due to critical and 
+easy-to-fix bugs), but they are in a more stabilized state that trunk 
+generally.
 
-#. Releases can be downloaded from the `download page <https://launchpad.net/yade/+download>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
+#. Releases can be downloaded from the `download 
+page <https://launchpad.net/yade/+download>`_, as compressed archive. 
+Uncompressing the archive gives you a directory with the sources.
 
-#. developement version (trunk) can be obtained from the `code repository <https://code.launchpad.net/yade/>`_ at Launchpad. We use `Bazaar <http://www.bazaar-vcs.org>`_ (the ``bzr`` command) for code management (install the ``bzr`` package in your distribution)::
+#. developement version (trunk) can be obtained from the `code 
+repository <https://github.com/yade/>`_ at github.
+We use `GIT <http://www.bazaar-vcs.org>`_ (the ``git`` command) for code 
+management (install the ``git`` package in your distribution)::
 
 		bzr checkout lp:yade
 
