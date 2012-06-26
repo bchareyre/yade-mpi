@@ -2,12 +2,27 @@
 Installation
 ###############
 
-Yade can be installed from packages (precompiled binaries) or source code. The choice depends on what you need: if you don't plan to modify Yade itself, package installation is easier. In the contrary case, you must download and install source code.
+Yade can be installed from packages (precompiled binaries) or source code. 
+The choice depends on what you need: if you don't plan to modify Yade itself, 
+package installation is easier. In the contrary case, you must download and 
+install source code.
+
+Since 2011 Yade persists in Ubuntu and Debian main repositories.
+There are only stable releases are placed.
+Please, consider installing them::
+
+	sudo apt-get install yade
 
 Packages
 ----------
 
-Packages are (as of now) provided for several Ubuntu versions from ``Yade package archive`` for `stable <https://launchpad.net/~yade-pkg/+archive/stable>`_ and `snapshot <https://launchpad.net/~yade-pkg/+archive/snapshots>`_ releases. Different version of Yade can be installed alongside each other. The ``yade`` virtual package always depends on the latest stable package, while ``yade-snapshot`` will pull the latest snapshot package. To install quickly, run the following:
+Packages from Launchpad PPA service (package personal archive) are 
+provided for all currently supported Ubuntu versions for 
+`stable <https://launchpad.net/~yade-pkg/+archive/stable>`_ and 
+`daily <https://launchpad.net/~yade-pkg/+archive/snapshots>`_ releases.
+``yade-daily`` is a automatically daily (if there were some commtis during
+the previous days) geenrated package, which includes all the newly added 
+features. To install version from PPA, run the following:
 
 * For stable releases::
 
@@ -18,16 +33,23 @@ Packages are (as of now) provided for several Ubuntu versions from ``Yade packag
 
 * For latest builds from trunk::
 
-	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest releases 
+	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest ddaily (mostly) releases 
 	sudo apt-get update
-	sudo apt-get install yade-bzr...
+	sudo apt-get install yade-daily
 
-More detailed instructions are available at the corresponding pages of ppa`s (links above).
+After you added whether stable or snapshot PPAs, you will get automatically
+the updates of the package, when they arrive the PPA.
+
+More detailed instructions are available at the corresponding pages of 
+ppa`s (links above).
 
 Source code
 ------------
 
-Installation from source code is reasonable, when you want to add or modify constitutive laws, engines or functions... Installing the latest trunk version allows one to use newly added features, which are not yet available in packaged versions. 
+Installation from source code is reasonable, when you want to add or 
+modify constitutive laws, engines or functions... Installing the latest 
+trunk version allows one to use newly added features, which are not yet 
+available in packaged versions. 
 
 Download
 ^^^^^^^^^^
