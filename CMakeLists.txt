@@ -1,3 +1,20 @@
+# The YADE has the following parameters to configure:
+#  INSTALL_PREFIX: absolute path to install Yade (/usr/local by default)
+#  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
+#  DEBUG: compile in debug-mode (OFF by default)
+#  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
+#  SUFFIX: suffix, added after binary-names (version number by default)
+#  NOSUFFIX: do not add a suffix after binary-name (OFF by default)
+#  YADE_VERSION: explicitely set version number (is defined from git-directory by default)
+#  ENABLE_GUI: enable GUI option (ON by default)
+#  ENABLE_CGAL: enable CGAL option (ON by default)
+#  ENABLE_VTK: enable VTK-export option (ON by default)
+#  ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
+#  ENABLE_GTS: enable GTS-option (ON by default)
+#  ENABLE_GL2PS: enable GL2PS-option (ON by default)
+#  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
+
+
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
