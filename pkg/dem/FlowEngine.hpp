@@ -69,7 +69,7 @@ class FlowEngine : public PartialEngine
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		TPL Vector3r fluidShearForce(unsigned int id_sph, Solver& flow) {
 			return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
-			
+		
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -89,10 +89,16 @@ class FlowEngine : public PartialEngine
 		void PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 		double MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
+	  
+		template<class Solver>
+		Matrix3r viscousStress (Solver& flow) {return flow->viscousBulkStress;}
+				
 		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+
 		
 		//Instanciation of templates for python binding
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
+
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
@@ -101,7 +107,8 @@ class FlowEngine : public PartialEngine
 		void 		_clearImposedFlux() {clearImposedFlux(solver);}
 		void 		_updateBCs() {updateBCs(solver);}
 		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
-
+		Matrix3r 	_viscousStress() {return viscousStress (solver);}
+		
 		virtual ~FlowEngine();
 
 		virtual void action();
@@ -194,12 +201,18 @@ class FlowEngine : public PartialEngine
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("fluidShearForce",&FlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
+
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
 					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
+
+					.def("viscousStress",&FlowEngine::_viscousStress,"Return the bulk viscous stress ")
+					
 					.def("MeasureTotalAveragedPressure",&FlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume")
+
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
+
 					)
 		DECLARE_LOGGER;
 };
@@ -260,13 +273,19 @@ class PeriodicFlowEngine : public FlowEngine
 		//(re)instanciation of templates and others, for python binding
 		void saveVtk() {solver->saveVtk();}
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
+
 // 		void 		saveVtk() {solver->saveVtk();} // FIXME: need to adapt vtk recorder to periodic case
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
+
+		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}	
+		Matrix3r 	_viscousStress() {return viscousStress (solver);}
+			
 		void 		_updateBCs() {updateBCs(solver);}
-		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}
 		double 		MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
-		
+		double 		MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
+
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 // 		Real 		_getFlux(unsigned int cond) {getFlux(cond,solver);}
@@ -285,11 +304,18 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 			.def("fluidShearForce",&PeriodicFlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
+
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
+			.def("viscousStress",&PeriodicFlowEngine::_viscousStress,"Return the bulk viscous stress ")
+			
 			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+			.def("MeasureTotalAveragedPressure",&PeriodicFlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume") 
+			.def("PressureProfile",&PeriodicFlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
+			
 // 			.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 // 			.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 // 			.def("getFlux",&FlowEngine::_getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")

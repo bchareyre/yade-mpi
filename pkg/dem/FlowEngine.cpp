@@ -57,6 +57,7 @@ void FlowEngine::action()
 
 
         ///Compute flow and and forces here
+
 	solver->GaussSeidel(scene->dt);
         timingDeltas->checkpoint ( "Gauss-Seidel (includes matrix construct and factorization in single-thread mode)" );
         if ( save_mgpost ) solver->MGPost();
@@ -565,16 +566,19 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
         if ( Debug ) cout << "Application of viscous forces" << endl;
         if ( Debug ) cout << "Number of edges = " << flow.Edge_ids.size() << endl;
         for ( unsigned int k=0; k<flow.viscousShearForces.size(); k++ ) flow.viscousShearForces[k]=Vector3r::Zero();
+	flow.viscousBulkStress = Matrix3r::Zero();
 
+	
 	typedef typename Solver::Tesselation Tesselation;
         const Tesselation& Tes = flow.T[flow.currentTes];
+
         for ( int i=0; i< ( int ) flow.Edge_ids.size(); i++ ) {
                 int hasFictious= Tes.vertex ( flow.Edge_ids[i].first )->info().isFictious +  Tes.vertex ( flow.Edge_ids[i].second )->info().isFictious;
                 const shared_ptr<Body>& sph1 = Body::byId ( flow.Edge_ids[i].first, scene );
                 const shared_ptr<Body>& sph2 = Body::byId ( flow.Edge_ids[i].second, scene );
                 Sphere* s1=YADE_CAST<Sphere*> ( sph1->shape.get() );
                 Sphere* s2=YADE_CAST<Sphere*> ( sph2->shape.get() );
-                Vector3r x = sph1->state->pos - sph2->state->pos;
+                Vector3r x = sph2->state->pos - sph1->state->pos;
                 Vector3r n = x / sqrt(makeCgVect(x).squared_length());
                 Vector3r deltaV;
                 if ( !hasFictious )
@@ -582,7 +586,7 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                 else {
                         if ( hasFictious==1 ) {//for the fictious sphere, use velocity of the boundary, not of the body
                                 Vector3r v1 = ( Tes.vertex ( flow.Edge_ids[i].first )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].first ).velocity:sph1->state->vel + sph1->state->angVel.cross(s1->radius * n);
-                                Vector3r v2 = ( Tes.vertex ( flow.Edge_ids[i].second )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].second ).velocity:sph2->state->vel + sph2->state->angVel.cross(s2->radius * n);
+                                Vector3r v2 = ( Tes.vertex ( flow.Edge_ids[i].second )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].second ).velocity:sph2->state->vel + sph2->state->angVel.cross(s2->radius * (-n));
                                 deltaV = v2-v1;
                         } else {//both fictious, ignore
                                 deltaV = Vector3r::Zero();
@@ -590,17 +594,25 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                 }
                 deltaV = deltaV - ( flow.Edge_normal[i].dot ( deltaV ) ) *flow.Edge_normal[i];
                 Vector3r visc_f = flow.ComputeViscousForce ( deltaV, i );
+				
 //                 if ( Debug ) cout << "la force visqueuse entre " << flow->Edge_ids[i].first << " et " << flow->Edge_ids[i].second << "est " << visc_f << endl;
+
 ///    //(1) directement sur le body Yade...
 //     scene->forces.addForce(flow->Edge_ids[i].first,visc_f);
 //     scene->forces.addForce(flow->Edge_ids[i].second,-visc_f);
+
 ///   //(2) ou dans CGAL? On a le choix (on pourrait même avoir info->viscousF pour faire la différence entre les deux types de forces... mais ça prend un peu plus de mémoire et de temps de calcul)
 //     Tes.vertex(flow->Edge_ids[i].first)->info().forces=Tes.vertex(flow->Edge_ids[i].first)->info().forces+makeCgVect(visc_f);
 //     Tes.vertex(flow->Edge_ids[i].second)->info().forces=Tes.vertex(flow->Edge_ids[i].second)->info().forces+makeCgVect(visc_f);
+
 /// //(3) ou dans un vecteur séparé (rapide)
-                flow.viscousShearForces[flow.Edge_ids[i].first]+=visc_f;
-                flow.viscousShearForces[flow.Edge_ids[i].second]-=visc_f;
-        }
+		flow.viscousShearForces[flow.Edge_ids[i].first]+=visc_f;
+		flow.viscousShearForces[flow.Edge_ids[i].second]-=visc_f;
+		
+/// Calculer la contrainte visqueuse de cisaillement totale appliquée sur tout l'échantillon 
+		flow.viscousBulkStress+=flow.viscousShearForces[flow.Edge_ids[i].second] * x.transpose();
+		
+	}
         if(Debug) cout<<"number of viscousShearForce"<<flow.viscousShearForces.size()<<endl;
 }
 
@@ -632,6 +644,7 @@ void PeriodicFlowEngine:: action()
 		timingDeltas->checkpoint("Update_Volumes");
 
 	///Compute flow and and forces here
+
 	solver->GaussSeidel(scene->dt);
 	timingDeltas->checkpoint("Gauss-Seidel");
 	solver->ComputeFacetForcesWithCache();

@@ -68,7 +68,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Real> Edge_HydRad;
 		vector <Vector3r> Edge_normal;
 		vector <Vector3r> viscousShearForces;
-	
+		Matrix3r viscousBulkStress;
 		void mplot ( char *filename);
 		void Localize();
 		void Compute_Permeability();
