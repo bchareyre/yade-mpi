@@ -63,20 +63,18 @@ version will not be modified (except for updates due to critical and
 easy-to-fix bugs), but they are in a more stabilized state that trunk 
 generally.
 
-#. Releases can be downloaded from the `download 
-page <https://launchpad.net/yade/+download>`_, as compressed archive. 
-Uncompressing the archive gives you a directory with the sources.
+#. Releases can be downloaded from the `download page <https://launchpad.net/yade/+download>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
+#. developement version (trunk) can be obtained from the `code repository <https://github.com/yade/>`_ at github.
 
-#. developement version (trunk) can be obtained from the `code 
-repository <https://github.com/yade/>`_ at github.
-We use `GIT <http://www.bazaar-vcs.org>`_ (the ``git`` command) for code 
+We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
 management (install the ``git`` package in your distribution)::
 
-		bzr checkout lp:yade
+		git clone git://github.com/yade/trunk.git
 
-  will download the whole code repository of ``trunk``. Check out `Quick Bazaar tutorial <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`_ wiki page for more. 
+will download the whole code repository of ``trunk``. Check out `Yade on github
+<https://www.yade-dem.org/wiki/Yade_on_github>`_ wiki page for more.
    
-  For those behind firewall, you can download `any revision  <https://www.yade-dem.org/source/>`_ of the repository as compressed archive.
+For those behind firewall, you can download `any revision  <https://www.yade-dem.org/source/>`_ of the repository as compressed archive.
 
 Release and trunk sources are compiled in the same way.
 
@@ -85,10 +83,10 @@ Prerequisities
 
 Yade relies on a number of external software to run; its installation is checked before the compilation starts. 
 
-* `scons <http://www.scons.org>`_ build system
+* `cmake <http://www.cmake.org/>`_ build system
 * `gcc <http://www.gcc.gnu.org>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
 * `boost <http://www.boost.org/>`_ 1.35 or later
-* `qt3 <http://www.qt.nokia.com>`_ library
+* `qt4 <http://www.qt.nokia.com>`_ library
 * `freeglut3 <http://freeglut.sourceforge.net>`_
 * `libQGLViewer <http://www.libqglviewer.com>`_
 * `python <http://www.python.org>`_, `numpy <http://numpy.scipy.org>`_, `ipython <http://ipython.scipy.org>`_
@@ -158,10 +156,9 @@ should have root privileges
 Compilation
 ^^^^^^^^^^^
 
-You should create separate build-place-folder, where Yade will be
-configured and where the source code will be compiled.
-Then inside this build-directory you should start cmake to configure
-the following compilation process::
+You should create a separate build-place-folder, where Yade will be configured 
+and where the source code will be compiled. Then inside this build-directory you
+should start cmake to configure the compilation process::
 
 	cmake -DINSTALL_PREFIX=/path/to/installfolder /path/to/sources
 
@@ -173,38 +170,35 @@ syntax::
 The following options are available:
 	
 	* INSTALL_PREFIX: absolute path to install Yade (/usr/local by default)
-    * LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
-    * DEBUG: compile in debug-mode (OFF by default)
-    * CMAKE_VERBOSE_MAKEFILE: output additional information during 
-      compiling (OFF by default)
-    * SUFFIX: suffix, added after binary-names (version number by default)
-    * NOSUFFIX: do not add a suffix after binary-name (OFF by default)
-    * YADE_VERSION: explicitely set version number (is defined from 
-      git-directory by default)
-    * ENABLE_GUI: enable GUI option (ON by default)
-    * ENABLE_CGAL: enable CGAL option (ON by default)
-    * ENABLE_VTK: enable VTK-export option (ON by default)
-    * ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
-    * ENABLE_GTS: enable GTS-option (ON by default)
-    * ENABLE_GL2PS: enable GL2PS-option (ON by default)
-    * runtimePREFIX: used for packaging, when install directory is not 
-      the same is runtime directory (/usr/local by default)
+	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
+	* DEBUG: compile in debug-mode (OFF by default)
+	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
+	* SUFFIX: suffix, added after binary-names (version number by default)
+	* NOSUFFIX: do not add a suffix after binary-name (OFF by default)
+	* YADE_VERSION: explicitely set version number (is defined from git-directory by default)
+	* ENABLE_GUI: enable GUI option (ON by default)
+	* ENABLE_CGAL: enable CGAL option (ON by default)
+	* ENABLE_VTK: enable VTK-export option (ON by default)
+	* ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
+	* ENABLE_GTS: enable GTS-option (ON by default)
+	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
+	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 
-For using an extended parameterss of cmake, please, follow the corresponding
+For using an extended parameters of cmake, please, follow the corresponding
 documentation on cmake-webpage. 
 
-After the compilation configured without errors and you will see all wished 
-options enabled, start the standard compilation process::
+If the compilation is finished without errors, you will see all enabled 
+and disabled options. Then start the standard the compilation process::
 
-    make 
-    
+	make
+
 Installing performs with the following command::
 
-    make install
+	make install
 
 The compilation process can take a long time, be patient. An additional
 parameter on many cores systems ``-j`` can be added to decrease compilation time
 and split the compilation on many cores. For example, on 4-core machines
-it would be reasonable to set the parameter ``-j4``. Note, the YADE requires
+it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
 approximately 2GB/core for compilation, otherwise the swap-file will be used
-and the compilation time dramatically increases.
+and a compilation time dramatically increases.
