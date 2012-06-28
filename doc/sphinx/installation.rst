@@ -118,7 +118,7 @@ should have root privileges
 
 	* **Fedora**::
 
-		yum install scons qt3-devel freeglut-devel boost-devel boost-date-time \
+		yum install cmake qt3-devel freeglut-devel boost-devel boost-date-time \
 		boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
 		python-devel boost-python ipython python-matplotlib \
 		sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
