@@ -257,15 +257,9 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 {
 
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
-// 	if(!facetWalls && !wallWalls){
-		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
-		interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_ScGeom);
-		interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
-// 	} else {
-// 		interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_Dem3DofGeom);
-// 		interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_Dem3DofGeom);
-// 		interactionGeometryDispatcher->add(new Ig2_Wall_Sphere_Dem3DofGeom);
-// 	}
+	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+	interactionGeometryDispatcher->add(new Ig2_Facet_Sphere_ScGeom);
+	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
 	shared_ptr<IPhysFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(ss);
@@ -319,10 +313,8 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	ids->geomDispatcher=interactionGeometryDispatcher;
 	ids->physDispatcher=interactionPhysicsDispatcher;
 	ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
-// 	if(!facetWalls && !wallWalls){
-		shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> see(new Law2_ScGeom_FrictPhys_CundallStrack);
-		ids->lawDispatcher->add(see);
-// 	} else ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_CundallStrack>(new Law2_Dem3DofGeom_FrictPhys_CundallStrack));
+	shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> see(new Law2_ScGeom_FrictPhys_CundallStrack);
+	ids->lawDispatcher->add(see);
 	scene->engines.push_back(ids);
 	scene->engines.push_back(globalStiffnessTimeStepper);
 	scene->engines.push_back(triaxialcompressionEngine);

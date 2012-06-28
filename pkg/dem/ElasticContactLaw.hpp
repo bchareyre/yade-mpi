@@ -63,14 +63,5 @@ class ElasticContactLaw : public GlobalEngine{
 };
 REGISTER_SERIALIZABLE(ElasticContactLaw);
 
-class Law2_Dem3DofGeom_FrictPhys_CundallStrack: public LawFunctor{
-	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
-		FUNCTOR2D(Dem3DofGeom,FrictPhys);
-		YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_FrictPhys_CundallStrack,LawFunctor,"Constitutive law for linear compression, no tension, and linear plasticity surface.\n\nNo longer maintained and linking to known bugs; :consider using yref:`Law2_ScGeom_FrictPhys_CundallStrack`.");
-};
-REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_FrictPhys_CundallStrack);
-
-
 
 
