@@ -125,33 +125,6 @@ should have root privileges
 		graphviz-python vtk-devel ScientificPython bzr bzrtools eigen2-devel libQGLViewer-devel \
 		loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging python-sphinx python-bibtex
 
-	* **Gentoo** (not good tested yet)
-		* Command to install all main dependencies::
-		
-			emerge dev-util/scons media-libs/freeglut media-libs/gd sys-libs/lib-compat-loki \
-			dev-util/boost-build dev-libs/boost sys-apps/fakeroot app-arch/dpkg \
-			sys-devel/gcc dev-libs/log4cxx dev-lang/python dev-python/ipython \
-			dev-python/matplotlib dev-db/sqlite dev-python/numpy dev-lang/tk \
-			sci-visualization/gnuplot app-doc/doxygen sci-libs/gts dev-python/pygraphviz \
-			sci-libs/vtk dev-python/scientificpython dev-vcs/bzr dev-vcs/bzrtools dev-cpp/eigen \
-			sys-devel/binutils dev-python/python-xlib x11-libs/qt-gui dev-python/PyQt4 dev-python/imaging \
-			dev-python/sphinx dev-python/imaging dev-python/python-bibtex
-		
-		
-		* ``libqglviewer`` is not in official Gentoo repository yet. But it can be installed from `Gentoo Portage Overlay <http://gpo.zugaina.org>`_::
-			
-			emerge -va layman; emerge subversion; layman -f -a sunrise;\
-			echo "source /usr/portage/local/layman/make.conf" >> /etc/make.conf \
-			layman -s sunrise; layman -S; emerge x11-libs/libqglviewer
-		
-		* Probably ``media-libs/gd`` will require the following commands::
-			
-			mkdir /etc/portage -p;\
-			echo "media-libs/gd fontconfig jpeg png truetype" >>/etc/portage/package.use
-			
-		* Some additional commands, which can be useful::
-			
-			ln -s /usr/lib/python2.6/site-packages/numpy/core/include/numpy/ /usr/include/
 
 Compilation
 ^^^^^^^^^^^
