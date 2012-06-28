@@ -7,9 +7,9 @@ O.engines=[
 	FlatGridCollider(step=.2,aabbMin=(0,0,0),aabbMax=(10,10,5),verletDist=0.005),
 	# InsertionSortCollider([Bo1_Sphere_Aabb()],sweepLength=0.005),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	NewtonIntegrator(damping=0.4,gravity=[0,0,-10]),
 ]

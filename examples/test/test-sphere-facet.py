@@ -29,9 +29,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InteractionLoop(
-		[Ig2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	NewtonIntegrator(damping=.3,gravity=(0,0,-10),label='integrator'),
 	PyRunner(iterPeriod=4000,command='setGravity()'),
@@ -48,8 +48,6 @@ O.dt=1e-4
 print '** virgin dispatch matrix:'
 O.engines[2].lawDispatcher.dispMatrix()
 print '** class indices'
-#for c in 'Dem3DofGeom','Dem3DofGeom_FacetSphere','Dem3DofGeom_SphereSphere':
-#	print eval(c)().classIndex,c
 O.run(1000,True)
 print '** used dispatch matrix'
 O.engines[2].lawDispatcher.dispMatrix()

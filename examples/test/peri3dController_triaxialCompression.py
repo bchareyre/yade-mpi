@@ -8,6 +8,8 @@
 # in this case there is almost no difference, but in script peri3dController_shear,
 # the cell rotation has significant effect)
 
+#FIXME: Law2_Dem3DofGeom_FrictPhys_CundallStrack replaced by Law2_ScGeom_FrictPhys_CundallStrack because the first is removed, but Peri3DEngine is broken by this change due to sign inversion in stress. A 'useDem3dof' flag like in PeriTriaxController is needed.
+
 from yade import pack,plot,qt
 
 # define material
@@ -39,8 +41,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom()],
-		[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),
+		[Ig2_Sphere_Sphere_ScGeom()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),
 	NewtonIntegrator(),
 	Peri3dController(	goal=(-1e7,-1e7,-1e7, 0,0,0), # Vector6 of prescribed final values
 							stressMask=0b000111,
@@ -59,8 +61,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom()],
-		[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()]),
+		[Ig2_Sphere_Sphere_ScGeom()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),
 	NewtonIntegrator(),
 	Peri3dController(	goal=(-1e7,-1e7,-4e-1, 0,0,0), # Vector6 of prescribed final values
 							stressMask=0b000011,

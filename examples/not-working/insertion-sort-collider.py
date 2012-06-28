@@ -1,20 +1,12 @@
 
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-Running script insertion-sort-collider.py                                                                                            
-Traceback (most recent call last):                                                                                                   
-  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
-    execfile(script,globals())                                                                                                       
-  File "insertion-sort-collider.py", line 28, in <module>                                                                            
-    for collider in InsertionSortCollider(),PersistentTriangulationCollider(haveDistantTransient=True):                              
-NameError: name 'PersistentTriangulationCollider' is not defined
+""" NOTE
+Needs yade compiled with CGAL feature
 """
 
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),Bo1_Facet_Aabb()]),
-	InteractionLoop([Ig2_Facet_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],),
+	InteractionLoop([Ig2_Facet_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()],),
 	NewtonIntegrator(damping=0.01,gravity=[0,0,-10]),
 ]
 mat=O.materials.append(FrictMat(young=1e3,poisson=.2,density=1000,frictionAngle=20))
