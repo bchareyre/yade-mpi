@@ -239,21 +239,23 @@ class PeriodicFlowEngine : public FlowEngine
 		typedef RTriangulation::Vertex_handle					Vertex_handle;
 		
 		shared_ptr<FlowSolver> solver;
+		shared_ptr<FlowSolver> backgroundSolver;
 		
-		void Triangulate ();
+		void Triangulate (shared_ptr<FlowSolver>& flow);
 // 		void AddBoundary ();
-		void Build_Triangulation (Real pzero);
-		void Initialize_volumes ();
-		void UpdateVolumes ();
+		void Build_Triangulation (Real pzero, shared_ptr<FlowSolver>& flow);
+		void Initialize_volumes (shared_ptr<FlowSolver>&  flow);
+		void UpdateVolumes (shared_ptr<FlowSolver>&  flow);
 		Real Volume_cell (Cell_handle cell);
 
 		Real Volume_cell_single_fictious (Cell_handle cell);
-		inline void locateCell(Cell_handle baseCell, unsigned int& index, unsigned int count=0);
+		inline void locateCell(Cell_handle baseCell, unsigned int& index, shared_ptr<FlowSolver>& flow, unsigned int count=0);
 		Vector3r meanVelocity();
 		
 		virtual ~PeriodicFlowEngine();
 
 		virtual void action();
+		void backgroundAction();
 		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
 		void preparePShifts();
 		

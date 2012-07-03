@@ -15,28 +15,32 @@
 #define FAST
 
 
-
-int facetF1=0, facetF2=0, facetRe1=0, facetRe2=0, facetRe3=0;
-int F1=0, F2=0, Re1=0, Re2=0;
-int fictious_vertex, real_vertex;
-bool facet_detected = false;
-
-const double FAR = 5000;
-
 using namespace std;
 // using namespace boost;
 namespace CGT {
 
-const double ONE_THIRD = 1.0/3.0;
-const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
-const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
-const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
+//	template<class Tesselation> const double Network<Tesselation>::FAR = 5000;
+//	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
+//	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
+//	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
+//	template<class Tesselation> const int Network<Tesselation>::permut4 [4][4]  = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
+
+	template<class Tesselation> const double Network<Tesselation>::FAR = 5000;
+	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
+	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
+	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
+	template<class Tesselation> const int Network<Tesselation>::permut4 [4][4]  = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
 
 template<class Tesselation>
 Network<Tesselation>::~Network(){}
 
 template<class Tesselation>
-Network<Tesselation>::Network(){}
+Network<Tesselation>::Network(){
+	facetF1=facetF2=facetRe1=facetRe2=facetRe3=0;
+	F1=F2=Re1=Re2=0;
+	facet_detected = false;
+
+}
 
 template<class Tesselation>
 int Network<Tesselation>::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)

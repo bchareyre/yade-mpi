@@ -695,7 +695,8 @@ void FlowBoundingSphere<Tesselation>::Interpolate(Tesselation& Tes, Tesselation&
 //  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
 }
 
-Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2)
+template <class Tesselation> 
+Real FlowBoundingSphere<Tesselation>::checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2)
 {
 	//First, check that v0 projection fall between v1 and v2...
 	Real dist=(v0-v1)*(v2-v1);

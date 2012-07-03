@@ -79,6 +79,16 @@ class Network
 		Vecteur surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3);
 		double surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3);
 		double surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3);
+
+		int facetF1, facetF2, facetRe1, facetRe2, facetRe3;
+		int F1, F2, Re1, Re2;
+		int real_vertex;
+		bool facet_detected;
+		static const double FAR;
+		static const double ONE_THIRD;
+		static const int facetVertices [4][3];
+		static const int permut3 [3][3];
+		static const int permut4 [4][4];
 };
 
 } //namespaceCGT
