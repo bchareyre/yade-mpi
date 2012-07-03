@@ -82,7 +82,7 @@ void FlowEngine::action()
 	if (multithread) {
 		bool hasNewSolver=false;
 		if (!first && backgroundCompleted) {
-			cerr<<"switch flow solver"<<endl;
+			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			hasNewSolver=true;
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
@@ -91,14 +91,14 @@ void FlowEngine::action()
 			//Copy imposed pressures/flow from the old solver
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
-			cerr<<"switched"<<endl;
+			if (Debug) cerr<<"switched"<<endl;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
-			cerr<<"backgrounded"<<endl;
+			if (Debug) cerr<<"backgrounded"<<endl;
 			Initialize_volumes(solver);
-			cerr<<"volumes initialized"<<endl;
+			if (Debug) cerr<<"volumes initialized"<<endl;
 		}
-		else if (!first) cerr<<"still computing solver in the background"<<endl;
+		else if (!first && Debug) cerr<<"still computing solver in the background"<<endl;
 	} else {
 	        if (Update_Triangulation && !first) {
                 	Build_Triangulation (P_zero, solver);
@@ -203,7 +203,7 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 	if (first) flow->currentTes=0;
         else {
                 flow->currentTes=!flow->currentTes;
-                if ( Debug ) cout << "--------RETRIANGULATION-----------" << endl;
+                if (Debug) cout << "--------RETRIANGULATION-----------" << endl;
         }
 
         flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
