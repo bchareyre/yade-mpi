@@ -290,7 +290,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void 		_updateBCs() {updateBCs(solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}
 		double 		MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
-		int		_getCell(double posX, double posY, double posZ) {return getCell(posX,posY,posZ,solver);}
+		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
 		
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
@@ -315,7 +315,7 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-			.def("getCell",&PeriodicFlowEngine::_getCell,(python::arg("X"),python::arg("Y"),python::arg("Z")),"get id of the cell containing (X,Y,Z).")
+			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing (X,Y,Z).")
 			.def("getConstrictionsFull",&PeriodicFlowEngine::getConstrictionsFull,"Get the list of constrictions (inscribed circle) for all finite facets.")
 // 			.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 // 			.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
