@@ -350,6 +350,7 @@ void FlowEngine::Triangulate ( Solver& flow )
                 if ( b->shape->getClassIndex() ==  Sph_Index ) {
                         Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
                         const Body::id_t& id = b->getId();
+			if (id==ignoredBody) continue;
                         Real rad = s->radius;
                         Real x = b->state->pos[0];
                         Real y = b->state->pos[1];
@@ -700,10 +701,11 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
         Tesselation& Tes = flow->T[flow->currentTes];
 	
         FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if ( !b || b->shape->getClassIndex() != Sph_Index ) continue;
+                if ( !b || b->shape->getClassIndex() != Sph_Index) continue;
                 Vector3r wpos;
                 Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
                 const Body::id_t& id = b->getId();
+		if (id==ignoredBody) continue;
                 Real rad = s->radius;
                 Vector3i period;
                 // FIXME: use "sheared" variant if the cell is sheared

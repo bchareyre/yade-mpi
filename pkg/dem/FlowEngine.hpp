@@ -88,11 +88,16 @@ class FlowEngine : public PartialEngine
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
 		void PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 		double MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
+		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
 		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
-		
+
+		void emulateAction(){
+			scene = Omega::instance().getScene().get();
+			action();}
+
 		//Instanciation of templates for python binding
-		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
+				Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
@@ -101,7 +106,8 @@ class FlowEngine : public PartialEngine
 		void 		_clearImposedFlux() {clearImposedFlux(solver);}
 		void 		_updateBCs() {updateBCs(solver);}
 		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
-
+		int		_getCell(double posX, double posY, double posZ) {return getCell(posX,posY,posZ,solver);}
+		
 		virtual ~FlowEngine();
 
 		virtual void action();
@@ -156,6 +162,7 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
 					((Vector3r, topBoundaryVelocity, Vector3r::Zero(),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
+					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
 					((int, wallTopId,3,,"Id of top boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((int, wallBottomId,2,,"Id of bottom boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((int, wallFrontId,5,,"Id of front boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
@@ -200,6 +207,8 @@ class FlowEngine : public PartialEngine
 					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
 					.def("MeasureTotalAveragedPressure",&FlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume")
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
+					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
+					.def("getCell",&FlowEngine::_getCell,(python::arg("X"),python::arg("Y"),python::arg("Z")),"get id of the cell containing (X,Y,Z).")
 					)
 		DECLARE_LOGGER;
 };
@@ -251,6 +260,19 @@ class PeriodicFlowEngine : public FlowEngine
 		Real Volume_cell_single_fictious (Cell_handle cell);
 		inline void locateCell(Cell_handle baseCell, unsigned int& index, shared_ptr<FlowSolver>& flow, unsigned int count=0);
 		Vector3r meanVelocity();
+
+		python::list getConstrictionsFull() {
+			vector<Constriction> csd=solver->getConstrictionsFull(); python::list pycsd;
+			for (unsigned int k=0;k<csd.size();k++) {
+				python::list cons;
+				cons.append(csd[k].first.first);
+				cons.append(csd[k].first.second);
+				cons.append(csd[k].second[0]);
+				cons.append(csd[k].second[1]);
+				cons.append(csd[k].second[2]);
+				cons.append(csd[k].second[3]);
+				pycsd.append(cons);}
+			return pycsd;}
 		
 		virtual ~PeriodicFlowEngine();
 
@@ -268,6 +290,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void 		_updateBCs() {updateBCs(solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}
 		double 		MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
+		int		_getCell(double posX, double posY, double posZ) {return getCell(posX,posY,posZ,solver);}
 		
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
@@ -292,6 +315,8 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
+			.def("getCell",&PeriodicFlowEngine::_getCell,(python::arg("X"),python::arg("Y"),python::arg("Z")),"get id of the cell containing (X,Y,Z).")
+			.def("getConstrictionsFull",&PeriodicFlowEngine::getConstrictionsFull,"Get the list of constrictions (inscribed circle) for all finite facets.")
 // 			.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 // 			.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 // 			.def("getFlux",&FlowEngine::_getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")

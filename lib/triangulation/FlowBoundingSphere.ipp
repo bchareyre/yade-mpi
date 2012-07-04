@@ -406,6 +406,16 @@ double FlowBoundingSphere<Tesselation>::MeasurePorePressure (double X, double Y,
 	Cell_handle cell = Tri.locate(Point(X,Y,Z));
 	return cell->info().p();
 }
+
+template <class Tesselation>
+double FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
+{
+	if (noCache) {cerr<<"Triangulation does not exist. Waht did you do?!"<<endl; return -1;}
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+	Cell_handle cell = Tri.locate(Point(X,Y,Z));
+	return cell->info().index;
+}
+
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, double Wall_down_y)
 {  
@@ -921,6 +931,26 @@ vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 		constrictions.push_back(Compute_EffectiveRadius(f_it->first, f_it->second));
 	return constrictions;
 }
+
+template <class Tesselation>
+vector<Constriction> FlowBoundingSphere<Tesselation>::getConstrictionsFull()
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	vector<Constriction> constrictions;
+	for (Finite_facets_iterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
+		vector<double> rn;
+		const Vecteur& normal = f_it->first->info().facetSurfaces[f_it->second];
+		if (!normal[0] && !normal[1] && !normal[2]) continue;
+		rn.push_back(Compute_EffectiveRadius(f_it->first, f_it->second));
+		rn.push_back(normal[0]);
+		rn.push_back(normal[1]);
+		rn.push_back(normal[2]);
+		Constriction cons (pair<int,int>(f_it->first->info().index,f_it->first->neighbor(f_it->second)->info().index),rn);
+		constrictions.push_back(cons);
+	}
+	return constrictions;
+}
+
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::Compute_EffectiveRadius(Cell_handle cell, int j)
 {

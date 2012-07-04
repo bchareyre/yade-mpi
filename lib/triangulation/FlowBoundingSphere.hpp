@@ -18,6 +18,8 @@
 #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
+typedef pair<pair<int,int>, vector<double> > Constriction;
+
 using namespace std;
 namespace CGT {
 
@@ -33,7 +35,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::fictious_vertex; using _N::boundingCells; using _N::facetVertices;
 		//same for functions
 		using _N::Define_fictious_cells; using _N::AddBoundingPlanes; using _N::boundary;
-		
+
 		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
 
@@ -114,6 +116,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double Compute_EquivalentRadius(Cell_handle cell, int j);
 		//return the list of constriction values
 		vector<double> getConstrictions();
+		vector<Constriction> getConstrictionsFull();
 
 		void GenerateVoxelFile ( );
 		
@@ -136,6 +139,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
 		double MeasureAveragedPressure(double Y);
 		double MeasureTotalAveragedPressure();
+		double getCell (double X,double Y,double Z);
 		
 		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
 		//Solver?
