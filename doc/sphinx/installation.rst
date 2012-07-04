@@ -156,6 +156,7 @@ The following options are available:
 	* ENABLE_GTS: enable GTS-option (ON by default)
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
+	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
 For using an extended parameters of cmake, please, follow the corresponding
 documentation on cmake-webpage. 
