@@ -1,4 +1,4 @@
-# this module is populated at initialization from the c++ part of PythonUI
+1# this module is populated at initialization from the c++ part of PythonUI
 """Runtime variables, populated at yade startup."""
 # default value
 hasDisplay=False 
@@ -11,9 +11,6 @@ try: # attempt to get numerical version
 except ValueError:
 	print 'WARN: unable to extract IPython version from %s, defaulting to 10'%(IPython.__version__)
 	ipython_version=10
-if ipython_version not in (10,11,12,13): # versions that we are able to handle, round up or down correspondingly
-	newipver=10 if ipython_version<10 else 13
-	print 'WARN: unhandled IPython version 0.%d, assuming 0.%d instead.'%(ipython_version,newipver)
+if (ipython_version < 10): #set version 10 for very old systems
+	newipver=10
 	ipython_version=newipver
-
-
