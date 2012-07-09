@@ -47,9 +47,7 @@ namespace CGT
 typedef vector<double> VectorR;
 
 //! Use this factor, or minLength, to reduce max permeability values (see usage below))
-const double MAXK_DIV_KMEAN = 20;
-const double MINK_DIV_KMEAN = 0.05;
-const double minLength = 0.02;//percentage of mean rad
+const double minLength = 0.01;//percentage of mean rad
 
 //! Factors including the effect of 1/2 symmetry in hydraulic radii
 const Real multSym1 = 1/pow(2,0.25);
@@ -81,8 +79,8 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	RELAX = 1.9;
 	ks=0;
 	distance_correction = true;
-	meanK_LIMIT = true;
-	meanK_STAT = true; K_opt_factor=0;
+	clampKValues = true;
+	meanKStat = true; K_opt_factor=0;
 	noCache=true;
 	pressureChanged=false;
 	computeAllCells=true;//might be turned false IF the code is reorganized (we can make a separate function to compute unitForceVectors outside Compute_Permeability) AND it really matters for CPU time
@@ -93,6 +91,8 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	areaR2Permeability=true;
 	permeability_map = false;
 	computedOnce=false;
+	minKdivKmean=0.0001;
+	maxKdivKmean=100.;
 }
 
 template <class Tesselation> 
@@ -540,7 +540,7 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForces()
 		cout << "TotalForce = "<< TotalForce << endl;}
 }
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache()
+void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -557,7 +557,7 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache()
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	if (noCache) {for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			//reset cache
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
@@ -594,12 +594,14 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache()
 						}
 					}
 				}
+			}
+		noCache=false;//cache should always be defined after execution of this function
+		if (onlyCache) return;
 		}
 	else //use cached values
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
-	noCache=false;//cache should always be defined after execution of this function
-	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces = 0*oldForces[v->info().id()]+1*v->info().forces;
+// 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces = 0*oldForces[v->info().id()]+1*v->info().forces;
 	if (DEBUG_OUT) {
 // 		cout << "Facet cached scheme" <<endl;
 		Vecteur TotalForce = nullVect;
@@ -747,7 +749,9 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 
 	double volume_sub_pore = 0.f;
 
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		Cell_handle& cell = *cell_it;
 		Point& p1 = cell->info();
 		for (int j=0; j<4; j++) {
 			neighbour_cell = cell->neighbor(j);
@@ -833,30 +837,33 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
-	double maxKdivKmean=MAXK_DIV_KMEAN;
+	Real globalK=k_factor*meanDistance*Vporale/(Ssolid_tot*8.*viscosity);//An approximate value of macroscopic permeability, for clamping local values below
 	if (DEBUG_OUT) {
 		cout << "PassCompK = " << pass << endl;
 		cout << "meanK = " << meanK << endl;
-		cout << "maxKdivKmean = " << MAXK_DIV_KMEAN << endl;
-		cout << "minKdivKmean = " << MINK_DIV_KMEAN << endl;
+		cout << "globalK = " << globalK << endl;
+		cout << "maxKdivKmean*globalK = " << maxKdivKmean*globalK << endl;
+		cout << "minKdivKmean*globalK = " << minKdivKmean*globalK << endl;
 		cout << "meanTubesRadius = " << meanRadius << endl;
 		cout << "meanDistance = " << meanDistance << endl;
 	}
 	ref = Tri.finite_cells_begin()->info().isvisited;
 	pass=0;
-	Real globalRh=meanDistance*Vporale/(Ssolid_tot*8.*viscosity);
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+
+	if (clampKValues) for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		Cell_handle& cell = *cell_it;
 		for (int j=0; j<4; j++) {
 			neighbour_cell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
 				pass++;
 // 				(cell->info().k_norm())[j] = min((cell->info().k_norm())[j], maxKdivKmean*meanK);
-				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*globalRh ,min((cell->info().k_norm())[j], maxKdivKmean*globalRh));
+				(cell->info().k_norm())[j] = max(minKdivKmean*globalK ,min((cell->info().k_norm())[j], maxKdivKmean*globalK));
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
 // 				cout<<(cell->info().k_norm())[j]<<endl;
 // 				kFile << (cell->info().k_norm())[j] << endl;
 			}
-		}cell->info().isvisited = !ref;
+		}/*cell->info().isvisited = !ref;*/
 
 	}
 	if (DEBUG_OUT) cout << "PassKcorrect = " << pass << endl;
@@ -864,7 +871,7 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 	if (DEBUG_OUT) cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
 
 // A loop to compute the standard deviation of the local K distribution, and use it to include/exclude K values higher then (meanK +/- K_opt_factor*STDEV)
-	if (meanK_STAT)
+	if (meanKStat)
 	{
 		std::ofstream k_opt_file("k_stdev.txt" ,std::ios::out);
 		ref = Tri.finite_cells_begin()->info().isvisited;

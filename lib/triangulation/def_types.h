@@ -176,6 +176,9 @@ class PeriodicCellInfo : public FlowCellInfo
 {	
 	public:
 	static Vecteur gradP;
+	//for real cell, baseIndex is the rank of the cell in cellHandles. For ghost cells, it is the baseIndex of the corresponding real cell.
+	//Unlike ordinary index, baseIndex is also indexing cells with imposed pressures
+	int baseIndex;
 	int period[3];
 	static Vecteur hSize[3];
 	static Vecteur deltaP;
@@ -185,7 +188,8 @@ class PeriodicCellInfo : public FlowCellInfo
  	PeriodicCellInfo (void){
 		_pression=&pression;
 		period[0]=period[1]=period[2]=0;
-		isGhost=false;}
+		isGhost=false;
+		baseIndex=-1;}
 	~PeriodicCellInfo (void) {}
 	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
 	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }

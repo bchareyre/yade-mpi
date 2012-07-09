@@ -19,13 +19,13 @@ using namespace std;
 // using namespace boost;
 namespace CGT {
 
-//	template<class Tesselation> const double Network<Tesselation>::FAR = 5000;
+//	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
 //	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
 //	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 //	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
 //	template<class Tesselation> const int Network<Tesselation>::permut4 [4][4]  = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
 
-	template<class Tesselation> const double Network<Tesselation>::FAR = 5000;
+	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
 	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
 	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
@@ -109,7 +109,7 @@ double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int
 }
 
 template<class Tesselation>
-double Network<Tesselation>::volumeSolidPore (Finite_cells_iterator& cell)
+double Network<Tesselation>::volumeSolidPore (const Cell_handle& cell)
 {
   double Vsolid=0;
   for (int i=0;i<4;i++) {

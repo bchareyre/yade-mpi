@@ -44,7 +44,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
-		bool meanK_LIMIT, meanK_STAT, distance_correction;
+		bool clampKValues, meanKStat, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
@@ -61,6 +61,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
+		double minKdivKmean;
+		double maxKdivKmean;
 		int Iterations;
 
 		bool RAVERAGE;
@@ -99,7 +101,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void ComputeTetrahedralForces();
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForces();
-		void ComputeFacetForcesWithCache();
+		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk ( );
 		void MGPost ( );
 #ifdef XVIEW

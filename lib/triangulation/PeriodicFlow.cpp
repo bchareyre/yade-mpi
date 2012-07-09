@@ -42,7 +42,7 @@ void PeriodicFlow::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 	
 
 
-void PeriodicFlow::ComputeFacetForcesWithCache()
+void PeriodicFlow::ComputeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -59,9 +59,8 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-			//reset cache
-			if (cell->info().isGhost) continue;
+	if (noCache) for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+		Cell_handle& cell = *cell_it;
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
 				neighbour_cell = cell->neighbor(j);
@@ -89,17 +88,18 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 						//add to cached value
 						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
 					}
-					
 				}
 			}
 	}
+	noCache=false;//cache should always be defined after execution of this function
+	if (onlyCache) return;
 	//use cached values
 	//First define products that will be used below for all cells:
 	Real pDeltas [3];
 	for (unsigned int k=0; k<3;k++) pDeltas[k]=PeriodicCellInfo::hSize[k]*PeriodicCellInfo::gradP;
 	//Then compute the forces
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
-		if (cell->info().isGhost) continue;
+	for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+		const Cell_handle& cell = *cell_it;
 		for (int yy=0;yy<4;yy++) {
 			Vertex_Info& vhi = cell->vertex(yy)->info();
 			Real unshiftedP = cell->info().p();
@@ -108,7 +108,6 @@ void PeriodicFlow::ComputeFacetForcesWithCache()
 			T[currentTes].vertexHandles[vhi.id()]->info().forces=T[currentTes].vertexHandles[vhi.id()]->info().forces + cell->info().unitForceVectors[yy]*unshiftedP;
 		}
 	}
-	noCache=false;//cache should always be defined after execution of this function
 	if (DEBUG_OUT) {
 		Vecteur TotalForce = nullVect;
 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); v++)
@@ -131,15 +130,13 @@ void PeriodicFlow::Compute_Permeability()
 	if (DEBUG_OUT)  cout << "----Computing_Permeability (Periodic)------" << endl;
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Vsolid_tot = 0, Vtotalissimo = 0, Vporale = 0, Ssolid_tot = 0, V_totale_porosity=0, V_porale_porosity=0;
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
-
 	Cell_handle neighbour_cell;
 
 	double k=0, distance = 0, radius = 0, viscosity = VISCOSITY;
 	int surfneg=0;
 	int NEG=0, POS=0, pass=0;
 
-	bool ref = Tri.finite_cells_begin()->info().isvisited;
+
 // 	Vecteur n;
 //         std::ofstream oFile( "Radii",std::ios::out);
 // 	std::ofstream fFile( "Radii_Fictious",std::ios::out);
@@ -148,14 +145,14 @@ void PeriodicFlow::Compute_Permeability()
 	Real infiniteK=1e3;
 
 	double volume_sub_pore = 0.f;
-
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++){
-		if (cell->info().isGhost==false){
+	Vector_Cell& cellHandles= T[currentTes].cellHandles;
+	for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+			Cell_handle& cell = *cell_it;
 			Point& p1 = cell->info();
 			for (int j=0; j<4; j++){
-				neighbour_cell = cell->neighbor(j); 
+				neighbour_cell = cell->neighbor(j);
 				Point& p2 = neighbour_cell->info();
-				if (!Tri.is_infinite(neighbour_cell) && (neighbour_cell->info().isvisited==ref || computeAllCells)) {
+				if (!Tri.is_infinite(neighbour_cell) /*&& (neighbour_cell->info().isvisited==ref || computeAllCells)*/) {
 					//Compute and store the area of sphere-facet intersections for later use
 					Vertex_handle W [3];
 					for (int kk=0; kk<3; kk++) {
@@ -178,7 +175,6 @@ void PeriodicFlow::Compute_Permeability()
 					pass+=1;
 					Vecteur l = p1 - p2;
 					distance = sqrt(l.squared_length());
-// 					n = distance ? l/distance : ;
 					if (!RAVERAGE) radius = 2* Compute_HydraulicRadius(cell, j);
 					else radius = (Compute_EffectiveRadius(cell, j)+Compute_EquivalentRadius(cell,j))*0.5;
 					if (radius<0) NEG++;
@@ -186,7 +182,6 @@ void PeriodicFlow::Compute_Permeability()
 					if (radius==0) {
 						cout << "INS-INS PROBLEM!!!!!!!" << endl;
 					}
-// 					Real h,d;
 					Real fluidArea=0;
 					int test=0;
 					if (distance!=0) {
@@ -216,12 +211,18 @@ void PeriodicFlow::Compute_Permeability()
 					cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
 					} else  {
-						cout <<"infinite K2!"<<endl; k = infiniteK;
+						cout <<"infinite K2! surfaces will be missing (FIXME)"<<endl; k = infiniteK;
 					}//Will be corrected in the next loop
 					(cell->info().k_norm())[j]= k*k_factor;
-					(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
-
-				
+					if (!neighbour_cell->info().isGhost) (neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= (cell->info().k_norm())[j];
+					//The following block is correct but very usefull, since all values are clamped below with MIN and MAX, skip for now
+// 					else {//find the real neighbor connected to our cell through periodicity
+// 						Cell_handle true_neighbour_cell = cellHandles[neighbour_cell->info().baseIndex];
+// 						for (int ii=0;ii<4;ii++)
+// 							if (true_neighbour_cell->neighbor(ii)->info().index == cell->info().index){
+// 								(true_neighbour_cell->info().k_norm())[ii]=(cell->info().k_norm())[j]; break;
+// 							}
+// 					}
 					if(permeability_map){
 						Cell_handle c = cell;
 						cell->info().s = cell->info().s + k*distance/fluidArea*Volume_Pore_VoronoiFraction (c,j);
@@ -229,13 +230,13 @@ void PeriodicFlow::Compute_Permeability()
 					}
 				}
 			}
-			cell->info().isvisited = !ref;
+// 			cell->info().isvisited = !ref;
 			if(permeability_map){
 				cell->info().s = cell->info().s/volume_sub_pore;
 				volume_sub_pore = 0.f;
 			}
-		}
-		else cell->info().isvisited = !ref;
+// 		}
+// 		else cell->info().isvisited = !ref;
 	} 
 	
 	
@@ -243,52 +244,62 @@ void PeriodicFlow::Compute_Permeability()
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
-	Real globalRh=meanDistance*Vporale/(Ssolid_tot*8.*viscosity);
-// 	double maxKdivKmean=MAXK_DIV_KMEAN;
+	Real globalK=k_factor*meanDistance*Vporale/(Ssolid_tot*8.*viscosity);//An approximate value of macroscopic permeability, for clamping local values below
 	if (DEBUG_OUT) {
 		cout << "PassCompK = " << pass << endl;
 		cout << "meanK = " << meanK << endl;
-		cout << "maxKdivKmean*globalRh = " << MAXK_DIV_KMEAN*globalRh << endl;
-		cout << "minKdivKmean*globalRh = " << MINK_DIV_KMEAN*globalRh << endl;
+		cout << "globalK = " << globalK << endl;
+		cout << "maxKdivKmean*globalK = " << maxKdivKmean*globalK << endl;
+		cout << "minKdivKmean*globalK = " << minKdivKmean*globalK << endl;
 		cout << "meanTubesRadius = " << meanRadius << endl;
 		cout << "meanDistance = " << meanDistance << endl;
 	}
-	ref = Tri.finite_cells_begin()->info().isvisited;
 	pass=0;
-	
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	if (clampKValues) for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+		Cell_handle& cell = *cell_it;
 		for (int j=0; j<4; j++) {
 			neighbour_cell = cell->neighbor(j);
-			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
+			if (!Tri.is_infinite(neighbour_cell) /*&& neighbour_cell->info().isvisited==ref*/) {
 				pass++;
-				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*globalRh, min((cell->info().k_norm())[j], MAXK_DIV_KMEAN*globalRh));
+				(cell->info().k_norm())[j] = max(minKdivKmean*globalK, min((cell->info().k_norm())[j], maxKdivKmean*globalK));
 // 				(cell->info().k_norm())[j] = max(MINK_DIV_KMEAN*meanK ,min((cell->info().k_norm())[j], maxKdivKmean*meanK));
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
+				if (!neighbour_cell->info().isGhost) (neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= (cell->info().k_norm())[j];
+					else {//find the real neighbor connected to our cell through periodicity, as we want exactly the same permeability without rounding errors
+						Cell_handle& true_neighbour_cell = cellHandles[neighbour_cell->info().baseIndex];
+						for (int ii=0;ii<4;ii++)
+							if (true_neighbour_cell->neighbor(ii)->info().index == cell->info().index){
+								(true_neighbour_cell->info().k_norm())[ii]=(cell->info().k_norm())[j]; break;
+							}
+					}
+
+				
 // 				cout<<(cell->info().k_norm())[j]<<endl;
 // 				kFile << (cell->info().k_norm())[j] << endl;
 			}
 		}
-		cell->info().isvisited = !ref;
+// 		cell->info().isvisited = !ref;
 	}
 	if (DEBUG_OUT) cout << "PassKcorrect = " << pass << endl;
 
 	if (DEBUG_OUT) cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
 
 // A loop to compute the standard deviation of the local K distribution, and use it to include/exclude K values higher then (meanK +/- K_opt_factor*STDEV)
-	if (meanK_STAT)
+	if (meanKStat)
 	{
 		std::ofstream k_opt_file("k_stdev.txt" ,std::ios::out);
-		ref = Tri.finite_cells_begin()->info().isvisited;
+// 		ref = Tri.finite_cells_begin()->info().isvisited;
 		pass=0;
+		Finite_cells_iterator cell_end = Tri.finite_cells_end();
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			for (int j=0; j<4; j++) {
 				neighbour_cell = cell->neighbor(j);
-				if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
+				if (!Tri.is_infinite(neighbour_cell) /*&& neighbour_cell->info().isvisited==ref*/) {
 					pass++;
 					STDEV += pow(((cell->info().k_norm())[j]-meanK),2);
 				}
 			}
-			cell->info().isvisited = !ref;
+// 			cell->info().isvisited = !ref;
 		}
 		STDEV = sqrt(STDEV/pass);
 		if (DEBUG_OUT) cout << "PassSTDEV = " << pass << endl;
@@ -296,12 +307,12 @@ void PeriodicFlow::Compute_Permeability()
 		double k_min = 0, k_max = meanK + K_opt_factor*STDEV;
 		cout << "Kmoy = " << meanK << " Standard Deviation = " << STDEV << endl;
 		cout << "kmin = " << k_min << " kmax = " << k_max << endl;
-		ref = Tri.finite_cells_begin()->info().isvisited;
+// 		ref = Tri.finite_cells_begin()->info().isvisited;
 		pass=0;
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			for (int j=0; j<4; j++) {
 				neighbour_cell = cell->neighbor(j);
-				if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
+				if (!Tri.is_infinite(neighbour_cell) /*&& neighbour_cell->info().isvisited==ref*/) {
 					pass+=1;
 					if ((cell->info().k_norm())[j]>k_max) {
 						(cell->info().k_norm())[j]=k_max;
@@ -310,7 +321,7 @@ void PeriodicFlow::Compute_Permeability()
 					k_opt_file << K_opt_factor << " " << (cell->info().k_norm())[j] << endl;
 				}
 			}
-			cell->info().isvisited=!ref;
+// 			cell->info().isvisited=!ref;
 		}
 		if (DEBUG_OUT) cout << "PassKopt = " << pass << endl;
 	}
