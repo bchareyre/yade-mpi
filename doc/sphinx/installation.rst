@@ -29,11 +29,11 @@ features. To install version from PPA, run the following:
 	sudo add-apt-repository ppa:yade-pkg/stable       # for stable releases 
 	sudo add-apt-repository ppa:yade-users/external   # optional (updates of other packages)
 	sudo apt-get update
-	sudo apt-get install yade
+	sudo apt-get install yade-stable
 
 * For latest builds from trunk::
 
-	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest ddaily (mostly) releases 
+	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest daily (mostly) releases 
 	sudo apt-get update
 	sudo apt-get install yade-daily
 
@@ -42,6 +42,16 @@ the updates of the package, when they arrive the PPA.
 
 More detailed instructions are available at the corresponding pages of 
 ppa`s (links above).
+
+Ubuntu versions (starting from 11.10, Oneiric) and Debian (starting from Wheezy) 
+are having already yade in their main archives. To install the program, run the following::
+
+	sudo apt-get install yade
+
+To check, what versions of yade are in specific Distributions, check the links
+for `Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ and 
+`Debian <http://packages.qa.debian.org/y/yade.html>`_.
+
 
 Source code
 ------------
