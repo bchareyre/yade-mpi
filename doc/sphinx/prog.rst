@@ -5,110 +5,25 @@ Programmer's manual
 Build system
 =============
 
-Yade uses `scons <http://www.scons.org>`__ build system for managing the build process. It takes care of configuration, compilation and installation. SCons is written in python and its build scripts are in python, too. SCons complete documentation can be found in its manual page.
+Yade uses `cmake <http://www.cmake.org/>`__ the cross-platform, open-source build 
+system for managing the build process. It takes care of configuration, compilation 
+and installation. CMake is used to control the software compilation process using 
+simple platform and compiler independent configuration files. CMake generates 
+native makefiles and workspaces that can be used in the compiler environment of 
+your choice.
 
-
-.. _scons-parameters:
-Pre-build configuration
------------------------
-
-We use ``\$`` to denote build variable in strings in this section; in SCons script, they can be used either by writing ``\$variable`` in strings passed to SCons functions, or obtained as attribute of the ``Environment`` instance ``env``, i.e. ``env['variable']``; we use the formed in running text here.
-
-In order to allow parallel installation of multiple yade versions, the installation location follows the pattern ``\$PREFIX/lib/yade\$SUFFIX`` for libraries and ``\$PREFIX/bin/yade\$SUFFIX`` for executables (in the following, we will refer only to the first one). ``\$SUFFIX`` takes the form ``-\$version\$variant``, which further allows multiple different builds of the same version (typically, optimized and debug builds). For instance, the default debug build of version 0.5 would be  installed in ``/usr/local/lib/yade-0.5-dbg/``, the executable being ``/usr/local/bin/yade-0.5-dbg``.
-
-The build process takes place outside the source tree, in directory reffered to as ``\$buildDir`` within those scripts. By default, this directory is ``../build-\$SUFFIX``.
-
-Each build depends on a number of configuration parameters, which are stored in mutually independent *profiles*. They are selected according to the ``profile`` argument to scons (by default, the last profile used, stored in ``scons.current-profile``). Each profile remembers its non-default variables in ``scons.profile-\$profile``.
-
-There is a number of configuration parameters; you can list all of them by ``scons -h``. The following table summarizes only a few that are the most used.
-
-``PREFIX`` [default: ``/usr/local``]
-	installation prefix (``PREFIX`` preprocessor macro; ``yade.config.prefix`` in python
-``version`` [bzr revision (e.g. bzr1899)]
-	first part of suffix (``SUFFIX`` preprocessor macro; ``yade.config.suffix`` in python)]
-``variant`` [*(empty)*]
-	second part of suffix
-``buildPrefix`` [``..``]
-	 where to create ``build-\$SUFFIX`` directory 
-``debug`` [*False* (0)]
-	add debugging symbols to output, enable stack traces on crash
-``optimize`` [-1, which means that the opposite of ``debug`` value is used]
-	optimize binaries (``#define NDEBUG``; assertions eliminated; ``YADE_CAST`` and ``YADE_PTR_CAST`` are static casts rather than dynamic; LOG_TRACE and LOG_DEBUG are eliminated)
-``CPPPATH`` [``/usr/include/vtk-5.2:/usr/include/vtk-5.4``]
-	additional colon-separated paths for preprocessor (for atypical header locations). Required by some libraries, such as VTK (reflected by the default)
-``LIBPATH`` [*(empty)*]
-	additional colon-separated paths for linker
-``CXX`` [g++]
-	compiler executable
-``CXXFLAGS`` [*(empty)*]
-	additional compiler flags (may are added automatically)
-``jobs`` [4]
-	number of concurrent compilations to run 
-``brief`` [*True* (1)]
-	only show brief notices about what is being done rather than full command-lines during compilation
-``linkStrategy`` [monolithic]
-	whether to link all plugins in one shared library (``monolithic``) or in one file per plugin (``per-class``); the first option is faster for overall builds, while the latter one makes recompilation of only part of Yade faster; granularity of monolithic build can be changed with the ``chunkSize`` parameter, which determines how many files are compiled at once.
-``features`` [opengl,gts,openmp]
-	optional comma-separated features to build with (details below; each defines macro ``YADE_\$FEATURE``; available as lowercased list ``yade.config.features`` at runtime
-
-
-Library detection
-^^^^^^^^^^^^^^^^^^
-When the ``scons`` command is run, it first checks for presence of all required libraries. Some of them are *essential*, other are *optional* and will be required only if features that need them are enabled.
-
-Essentials
-"""""""""""""
-
-compiler
-	Obviously c++ compiler is necessary. Yade relies on several extensions of ``g++`` from the `gcc <http://gcc.gnu.org`__ suite and cannot (probably) be built with other compilers.
-boost
-	`boost <http://www.boost.org>`__ is a large collection of peer-reviewed c++ libraries. Yade currently uses thread, date_time, filesystem, iostreams, regex, serialization, program_options, foreach, python; typically the whole boost bundle will be installed. If you need functionality from other modules, you can make presence of that module mandatory. Only be careful about relying on very new features; due to range of systems yade is or might be used on, it is better to be moderately conservative (read: roughly 3 years backwards compatibility).
-python
-	`python <http://www.python.org>`__ is the scripting language used by yade. Besides [boost::python]_, yade further requires
-
-	* `ipython <http://www.ipython.org>`__ (terminal interaction)
-	* `matplotlib <http://matplotlib.sf.net>`__ (plotting)
-	* `numpy <http://www.numpy.org>`__ (matlab-like numerical functionality and accessing numpy arrays from ``c``/``c++`` efficiently)
-
-.. _optional-libraries:
-Optional libraries (features)
-""""""""""""""""""""""""""""""
-
-The `features` parameter controls optional functionality. Each enabled feature defines preprocessor macro `YADE_FEATURE` (name uppercased) to enable selective exclude/include of parts of code. Code of which compilation depends on a particular features should use ``#ifdef YADE_FEATURE`` constructs to exclude dependent parts.
-
-opengl (YADE_OPENGL)
-	Enable 3d rendering as well as the Qt3-based graphical user interface (in addition to python console).
-vtk (YADE_VTK)
-	Enable functionality using Visualization Toolkit (`vtk <http://www.vtk.org>`__; e.g. :yref:`VTKRecorder` exporting to files readable with ParaView).
-openmp (YADE_OPENMP)
-	Enable parallelization using OpenMP, non-intrusive shared-memory parallelization framework; it is only supported for ``g++`` > 4.0. Parallel computation leads to significant performance increase and should be enabled unless you have a special reason for not doing so (e.g. single-core machine). See :ref:`upyade-parallel` for details.
-gts (YADE_GTS)
-	Enable functionality provided by GNU Triangulated Surface library (`gts <http://gts.sf.net>`__) and build PyGTS, its python interface; used for surface import and construction.
-cgal (YADE_CGAL)
-	Enable functionality provided by Computation Geometry Algorithms Library (`cgal <http://www.cgal.org>`__); triangulation code in :yref:`MicroMacroAnalyser` and :yref:`PersistentTriangulationCollider` ses its routines.
-other
-	There might be more features added in the future. Always refer to ``scons -h`` output for possible values.
-
-
-Before compilation, SCons will check for presence of libraries required by their respective features [#features]_. Failure will occur if a respective library isn't found. To find out what went wrong, you can inspect ``../build-\$SUFFIX/config.log`` file; it contains exact commands and their output for all performed checks.
-
-.. [#features] Library checks are defined inside the ``SConstruct`` file and you can add your own, should you need it.
-
-.. note::
-	Features are not auto-detected on purpose; otherwise problem with library detection might build Yade without expected features, causing specifically problems for automatized builds.
 
 Building
 -------------
 
-Yade source tree has the following structure (omiting ``debian``, ``doc``, ``examples`` and ``scripts`` which don't participate in the build process); we shall call each top-level component *module*::
+Yade source tree has the following structure (omiting, ``doc``, 
+``examples`` and ``scripts`` which don't participate in the build process); 
+we shall call each top-level component *module*::
 
-	attic/        ## code that is not currently functional and might be removed unless resurrected
-	   lattice/      ## lattice and lattice-like models
-	   snow/         ## snow model (is really a DEM)
 	core/         ## core simulation building blocks
 	extra/        ## miscillanea
 	gui/          ## user interfaces
-	   qt3/          ## graphical user interface based on qt3 and OpenGL
+	   qt4/          ## graphical user interface based on qt3 and OpenGL
 	   py/           ## python console interface (phased out)
 	lib/          ## support libraries, not specific to simulations
 	pkg/          ## simulation-specific files
@@ -116,17 +31,13 @@ Yade source tree has the following structure (omiting ``debian``, ``doc``, ``exa
 	   dem/          ## classes for Discrete Element Method
 	py/           ## python modules
 
-Each directory on the top of this hierarchy (except ``pkg``, which is treated specially -- see below) contains file ``SConscript``, determining what files to compile, how to link them together and where should they be installed. Within these script, a scons variable ``env`` (build ``Environment``) contains all the configuration parameters, which are used to influence the build process; they can be either obtained with the ``[]`` operator, but scons also replaces ``\$var`` strings automatically in arguments to its functions::
-
-	if 'opengl' in env['features']:
-		env.Install('\$PREFIX/lib/yade\$SUFFIX/',[
-			# ...
-		])
-
 
 Header installation
 ^^^^^^^^^^^^^^^^^^^^
-To allow flexibility in source layout, SCons will copy (symlink) all headers into flattened structure within the build directory. First 2 components of the original directory are joind by dash, deeper levels are discarded (in case of ``core`` and ``extra``, only 1 level is used). The following table makes gives a few examples:
+To allow flexibility in source layout, CMAKE will copy (symlink) all headers into 
+flattened structure within the build directory. First 2 components of the original 
+directory are joind by dash, deeper levels are discarded (in case of ``core`` and 
+``extra``, only 1 level is used). The following table makes gives a few examples:
 
 ============================================================= =========================
 Original header location											     Included as     
@@ -140,28 +51,25 @@ Original header location											     Included as
 
 It is advised to use ``#include<yade/module/Class.hpp>`` style of inclusion rather than ``#include"Class.hpp`` even if you are in the same directory.
 
-What files to compile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-``SConscript`` files in ``lib``, ``core``, ``gui``, ``py`` and ``extra`` explicitly determine what files will be built.
 
 Automatic compilation
 """"""""""""""""""""""
-In the ``pkg/`` directory, situation is different. In order to maximally ease addition of modules to yade, all ``*.cpp`` files are *automatically scanned* by SCons and considered for compilation. Each file may contain multiple lines that declare features that are necessary for this file to be compiled::
+In the ``pkg/`` directory, situation is different. In order to maximally ease 
+addition of modules to yade, all ``*.cpp`` files are *automatically scanned* by 
+CMAKE and considered for compilation. Each file may contain multiple lines that 
+declare features that are necessary for this file to be compiled::
 
 	YADE_REQUIRE_FEATURE(vtk);
 	YADE_REQUIRE_FEATURE(gts);
 
-This file will be compiled only if *both* ``vtk`` and ``gts`` features are enabled. Depending on current feature set, only selection of plugins will be compiled.
+This file will be compiled only if *both* ``vtk`` and ``gts`` features are enabled. 
+Depending on current feature set, only selection of plugins will be compiled.
 
 It is possible to disable compilation of a file by requiring any non-existent feature, such as::
 
 	YADE_REQUIRE_FEATURE(temporarily disabled 345uiysdijkn);
 
 The ``YADE_REQUIRE_FEATURE`` macro expands to nothing during actual compilation.
-
-.. note::
-	The source scanner was written by hand and is not official part of SCons. It is fairly primitive and in particular, it doesn't interpret c preprocessor macros, except for a simple non-nested feature-checks like ``#ifdef YADE_*``/``#ifndef YADE_*`` #endif.
-
 
 .. _linking:
 
@@ -174,48 +82,53 @@ module      resulting shared library           dependencies
 =========== ================================== ==============================================
 lib         ``libyade-support.so``             can depend on external libraries, may **not** depend on any other part of Yade.
 core        ``libcore.so``                     ``yade-support``; *may* depend on external libraries.
-pkg         ``libplugins.so`` for monolithic   ``core``, ``yade-support``; may **not** depend on external libraries explcitly (only implicitly, by adding the library to global linker flags in ``SConstruct``)
-            builds, ``libClass.so`` for
-            per-class (per-plugin) builds.
-extra 		(undefined)				    			  (arbitrary)
+pkg         ``libplugins.so``                  ``core``, ``yade-support``
+
 gui         ``libQtGUI.so``,                   ``lib``, ``core``, ``pkg``
             ``libPythonUI.so``
 py          (many files)                       ``lib``, ``core``, ``pkg``, external
 =========== ================================== ==============================================
 
-Because ``pkg`` plugins might be linked differently depending on the ``linkStrategy`` option, ``SConscript`` files that need to explicitly declare the dependency should use provided ``linkPlugins`` function which returns libraries in which given plugins will be defined::
-
-	env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],
-		SHLIBPREFIX='',
-		LIBS=env['LIBS']+[linkPlugins(['Shop','SpherePack']),]
-	),
-
-.. note:: ``env['LIBS']`` are libraries that all files are linked to and they should always be part of the ``LIBS`` parameter.
-
-Since plugins in ``pkg`` are not declared in any ``SConscript`` file, other plugins they depend on are again found *automatically* by scannig their ``#include`` directives for the pattern ``#include<yade/module/Plugin.hpp>``. Again, this works well in normal circumastances, but is not necessarily robust.
-
-See scons manpage for meaning of parameters passed to build functions, such as ``SHLIBPREFIX``.
 
 Development tools
 =================
 
 Integrated Development Environment and other tools
 ---------------------------------------------------
-A frequently used IDE is Kdevelop. We recommend using this software for navigating in the sources, compiling and debugging. Other useful tools for debugging and profiling are Valgrind and KCachegrind. A series a wiki pages are dedicated to these tools in the `development section <https://yade-dem.org/wiki/Yade#Development>`__ of the wiki.
+A frequently used IDE is Kdevelop. We recommend using this software for navigating 
+in the sources, compiling and debugging. Other useful tools for debugging and 
+profiling are Valgrind and KCachegrind. A series a wiki pages are dedicated to 
+these tools in the `development section <https://yade-dem.org/wiki/Yade#Development>`__ of the wiki.
 
 Hosting and versioning
 ----------------------
-The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__, which is used for source code, bug tracking, planning, package downloads and more. Our repository `can be http-browsed <http://bazaar.launchpad.net/~vcs-imports/yade/trunk/files>`__.
+The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__, 
+which is used for source code, bug tracking, planning, package downloads and more. 
 
-The versioning software used is `Bazaar <http://www.bazaar-vcs.org>`__, for which a short tutorial can be found in a `Yade's wiki pages <https://yade-dem.org/wiki/Quick_Bazaar_tutorial>`__. Bazaar is a distributed revision control system. It is available packaged for all major linux distributions.
+The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
+tutorial can be found in a `Yade's wiki pages <https://www.yade-dem.org/wiki/Yade_on_github>`__. 
+GIT is a distributed revision control system. It is available packaged for all major linux distributions.
+
+The source code is hosted on `GitHub <https://github.com/yade/>`__ , which is periodically
+imported to Launchpad for building PPA-packages.
+The repository `can be http-browsed <https://github.com/yade/trunk>`__.
 
 Build robot
 -----------
-A build robot hosted at `3SR lab. <http://www.3s-r.hmg.inpg.fr/3sr/?lang=en>`__ is tracking souce code changes.
-Each time a change in the source code is commited to the main development branch via bazaar, the "buildbot" downloads and compiles the new version, and start a series of tests.
+A build robot hosted at `3SR lab. <http://www.3s-r.hmg.inpg.fr/3sr/?lang=en>`__ 
+is tracking souce code changes.
+Each time a change in the source code is commited to the main development branch via GIT, 
+the "buildbot" downloads and compiles the new version, and start a series of tests.
 
-If a compilation error has been introduced, it will be notified to the yade-dev mailing list and to the commiter, thus helping to fix problems quickly.
-If the compilation is successfull, the buildbot starts unit regression tests and "check tests" (see below) and report the results. If all tests are passed, a new version of the documentation is generated and uploaded to the website in `html <https://www.yade-dem.org/doc/>`__ and `pdf <https://yade-dem.org/doc/Yade.pdf>`__ format. As a consequence, those two links always point to the documentation (the one you are reading now) of the last successfull build, and the delay between commits and documentation updates are very short (minutes).
+If a compilation error has been introduced, it will be notified to the yade-dev 
+mailing list and to the commiter, thus helping to fix problems quickly.
+If the compilation is successfull, the buildbot starts unit regression tests and 
+"check tests" (see below) and report the results. If all tests are passed, a new 
+version of the documentation is generated and uploaded to the website in 
+`html <https://www.yade-dem.org/doc/>`__ and `pdf <https://yade-dem.org/doc/Yade.pdf>`__ 
+formats. As a consequence, those two links always point to the documentation 
+(the one you are reading now) of the last successfull build, and the delay between 
+commits and documentation updates are very short (minutes).
 The buildbot activity and logs can be `browsed online <https://yade-dem.org/buildbot/>`__.
 
 Regression tests

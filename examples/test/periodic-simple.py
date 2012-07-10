@@ -9,9 +9,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()],label='collider'),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	TranslationEngine(translationAxis=(1,0,0),velocity=10,ids=[0]),
 	NewtonIntegrator(damping=.4,gravity=[0,0,-10])

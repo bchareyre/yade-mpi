@@ -1,3 +1,21 @@
+# The YADE has the following parameters to configure:
+#  INSTALL_PREFIX: absolute path to install Yade (/usr/local by default)
+#  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
+#  DEBUG: compile in debug-mode (OFF by default)
+#  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
+#  SUFFIX: suffix, added after binary-names (version number by default)
+#  NOSUFFIX: do not add a suffix after binary-name (OFF by default)
+#  YADE_VERSION: explicitely set version number (is defined from git-directory by default)
+#  ENABLE_GUI: enable GUI option (ON by default)
+#  ENABLE_CGAL: enable CGAL option (ON by default)
+#  ENABLE_VTK: enable VTK-export option (ON by default)
+#  ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
+#  ENABLE_GTS: enable GTS-option (ON by default)
+#  ENABLE_GL2PS: enable GL2PS-option (ON by default)
+#  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
+#  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
+
+
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
@@ -15,23 +33,15 @@ INCLUDE(FindGTS)
 INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
 
-
-IF(NOT Boost_NO_SYSTEM_PATHS)
-  MESSAGE("Use system boost installation")
-  INCLUDE(FindBoost)
-  FIND_PACKAGE(Boost COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
-ELSE(NOT Boost_NO_SYSTEM_PATHS)
-  MESSAGE("Use custom boost installation (e.g. version 1.46.1)")
-  FIND_PACKAGE(Boost 1.46.1 COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
-  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
-ENDIF(NOT Boost_NO_SYSTEM_PATHS)
-
+#===========================================================
+# Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
+INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
 MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
-
 
 FIND_PACKAGE(Eigen3)
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
@@ -45,6 +55,8 @@ OPTION(ENABLE_GTS "Enable GTS" ${DEFAULT})
 OPTION(ENABLE_GUI "Enable GUI" ${DEFAULT})
 OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
+OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" OFF)
+
 #===========================================================
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
@@ -163,6 +175,21 @@ ELSE(ENABLE_CGAL)
   SET(DISABLED_FEATS "${DISABLED_FEATS} CGAL")
 ENDIF(ENABLE_CGAL)
 #===========================================================
+IF(ENABLE_LINSOLV)
+  INCLUDE(FindCholmod)
+  FIND_PACKAGE(Cholmod)
+  IF(CHOLMOD_FOUND)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CGAL_DEFINITIONS} -DLINSOLV -DFLOW_ENGINE")
+    SET(LINKLIBS  "${LINKLIBS};${CHOLMOD_LIBRARIES};${AMD_LIBRARY};${CAMD_LIBRARY};${COLAMD_LIBRARY};${CCOLAMD_LIBRARY};libmetis.so;libopenblas.a;")
+    MESSAGE(STATUS "Found CHOLMOD")
+    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} cholmod")
+  ELSE(CHOLMOD_FOUND)
+    MESSAGE(STATUS "CHOLMOD NOT found, LINSOLV disabled")
+    SET(DISABLED_FEATS "${DISABLED_FEATS} cholmod")
+    SET(ENABLE_LINSOLV OFF)
+  ENDIF(CHOLMOD_FOUND)
+ENDIF(ENABLE_LINSOLV)
+#===========================================================
 IF(ENABLE_GL2PS)
   FIND_PACKAGE(GL2PS)
   IF(GL2PS_FOUND)
@@ -257,9 +284,27 @@ FILE(GLOB SRC_LIB  "lib/*.cpp")
 SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/factory/ClassFactory.cpp;lib/factory/DynLibManager.cpp;lib/multimethods/Indexable.cpp;lib/serialization/Serializable.cpp;lib/pyutil/gil.cpp;core/main/pyboot.cpp;${GUI_SRC_LIB};${CGAL_SRC_LIB}")
 
 #===========================================================
-ADD_LIBRARY(core SHARED ${SRC_CORE})
-ADD_LIBRARY(plugins SHARED ${SRC_PKG})
-ADD_LIBRARY(support SHARED ${SRC_LIB})
+
+IF (CHUNKSIZE)
+  INCLUDE(CombineSources)
+  
+  COMBINE_SOURCES(${CMAKE_BINARY_DIR}/core "${SRC_CORE}" ${CHUNKSIZE})
+  FILE(GLOB SRC_CORE_COMBINED "${CMAKE_BINARY_DIR}/core.*.cpp")
+  ADD_LIBRARY(core SHARED ${SRC_CORE_COMBINED})
+  
+  COMBINE_SOURCES(${CMAKE_BINARY_DIR}/pkg "${SRC_PKG}" ${CHUNKSIZE})
+  FILE(GLOB SRC_PKG_COMBINED "${CMAKE_BINARY_DIR}/pkg.*.cpp")
+  ADD_LIBRARY(plugins SHARED ${SRC_PKG_COMBINED})
+  
+  COMBINE_SOURCES(${CMAKE_BINARY_DIR}/lib "${SRC_LIB}" ${CHUNKSIZE})
+  FILE(GLOB SRC_LIB_COMBINED "${CMAKE_BINARY_DIR}/lib.*.cpp")
+  ADD_LIBRARY(support SHARED ${SRC_LIB_COMBINED})
+ELSE (CHUNKSIZE)
+  ADD_LIBRARY(core SHARED ${SRC_CORE})
+  ADD_LIBRARY(plugins SHARED ${SRC_PKG})
+  ADD_LIBRARY(support SHARED ${SRC_LIB})
+ENDIF (CHUNKSIZE)
+#===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
@@ -321,5 +366,8 @@ IF (DEBUG)
 ELSE (DEBUG)
   MESSAGE(STATUS "Optimized build")
 ENDIF (DEBUG)
+IF (CHUNKSIZE)
+  MESSAGE(STATUS "CHUNKSIZE ist set to " ${CHUNKSIZE})
+ENDIF (CHUNKSIZE)
 MESSAGE(STATUS "===========================================================")
 #===========================================================

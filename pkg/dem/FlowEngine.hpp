@@ -32,11 +32,17 @@ class FlowEngine : public PartialEngine
 	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
 	typedef FlowSolver::Cell_handle						Cell_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
+
+
 	
 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
 		volatile bool backgroundCompleted;
+		Cell cachedCell;
+		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool exists; posData(){exists=0;}};
+		vector<posData> positionBuffer;
+		void setPositionsBuffer();
 
 	public :
 		int retriangulationLastIter;
@@ -87,15 +93,22 @@ class FlowEngine : public PartialEngine
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
 		void PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
-		double MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
+		double MeasurePorePressure(Vector3r pos){return solver->MeasurePorePressure(pos[0], pos[1], pos[2]);}
+		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
 	  
 		template<class Solver>
 		Matrix3r viscousStress (Solver& flow) {return flow->viscousBulkStress;}
 				
 		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver==3) flow->exportMatrix(filename.c_str());
+			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver==3) flow->exportTriplets(filename.c_str());
+			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
 
-		
+		void emulateAction(){
+			scene = Omega::instance().getScene().get();
+			action();}
 		//Instanciation of templates for python binding
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
 
@@ -108,13 +121,16 @@ class FlowEngine : public PartialEngine
 		void 		_updateBCs() {updateBCs(solver);}
 		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
 		Matrix3r 	_viscousStress() {return viscousStress (solver);}
+		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
+		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
 		
 		virtual ~FlowEngine();
 
 		virtual void action();
 		virtual void backgroundAction();
-
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
+		
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
@@ -141,13 +157,15 @@ class FlowEngine : public PartialEngine
 					((double, EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
 					((double, porosity, 0,,"Porosity computed at each retriangulation"))
 					((bool,compute_K,false,,"Activates permeability measure within a granular sample"))
-					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
-					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
+					((bool,meanKStat,false,,"Local permeabilities' correction through an optimized threshold"))
+					((bool,clampKValues,true,,"If true, clamp local permeabilities between min/max*globalK threshold. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
+					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
+					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
 					((double,permeability_factor,0.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of fluid"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
-					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso"))
+					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
 // 					((std::string,key,"",,"A string appended at the output files, use it to name simulations."))
 					((double, V_d, 0,,"darcy velocity of fluid in sample"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
@@ -163,6 +181,7 @@ class FlowEngine : public PartialEngine
 					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
 					((Vector3r, topBoundaryVelocity, Vector3r::Zero(),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
+					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
 					((int, wallTopId,3,,"Id of top boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((int, wallBottomId,2,,"Id of bottom boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 					((int, wallFrontId,5,,"Id of front boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
@@ -178,6 +197,11 @@ class FlowEngine : public PartialEngine
 					((bool, areaR2Permeability, 1,,"Use corrected formula for permeabilities calculation in flowboundingsphere (areaR2permeability variable)"))
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
 					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
+					((Real, allDeprecs, 0,,"transitory variable: point removed attributes to this so that older scripts won't crash."))
+					,
+					/*deprec*/
+					((meanK_opt,clampKValues,"the name changed"))
+					((meanK_correction,allDeprecs,"the name changed"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
@@ -204,7 +228,7 @@ class FlowEngine : public PartialEngine
 
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
 					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
-					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
 
 					.def("viscousStress",&FlowEngine::_viscousStress,"Return the bulk viscous stress ")
@@ -212,7 +236,10 @@ class FlowEngine : public PartialEngine
 					.def("MeasureTotalAveragedPressure",&FlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume")
 
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-
+					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
+					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
+					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
 					)
 		DECLARE_LOGGER;
 };
@@ -252,21 +279,36 @@ class PeriodicFlowEngine : public FlowEngine
 		typedef RTriangulation::Vertex_handle					Vertex_handle;
 		
 		shared_ptr<FlowSolver> solver;
+		shared_ptr<FlowSolver> backgroundSolver;
 		
-		void Triangulate ();
+		void Triangulate (shared_ptr<FlowSolver>& flow);
 // 		void AddBoundary ();
-		void Build_Triangulation (Real pzero);
-		void Initialize_volumes ();
-		void UpdateVolumes ();
+		void Build_Triangulation (Real pzero, shared_ptr<FlowSolver>& flow);
+		void Initialize_volumes (shared_ptr<FlowSolver>&  flow);
+		void UpdateVolumes (shared_ptr<FlowSolver>&  flow);
 		Real Volume_cell (Cell_handle cell);
 
 		Real Volume_cell_single_fictious (Cell_handle cell);
-		inline void locateCell(Cell_handle baseCell, unsigned int& index, unsigned int count=0);
+		inline void locateCell(Cell_handle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count=0);
 		Vector3r meanVelocity();
+
+		python::list getConstrictionsFull() {
+			vector<Constriction> csd=solver->getConstrictionsFull(); python::list pycsd;
+			for (unsigned int k=0;k<csd.size();k++) {
+				python::list cons;
+				cons.append(csd[k].first.first);
+				cons.append(csd[k].first.second);
+				cons.append(csd[k].second[0]);
+				cons.append(csd[k].second[1]);
+				cons.append(csd[k].second[2]);
+				cons.append(csd[k].second[3]);
+				pycsd.append(cons);}
+			return pycsd;}
 		
 		virtual ~PeriodicFlowEngine();
 
 		virtual void action();
+		void backgroundAction();
 		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
 		void preparePShifts();
 		
@@ -286,6 +328,10 @@ class PeriodicFlowEngine : public FlowEngine
 		double 		MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
 		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 
+		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
+		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 // 		Real 		_getFlux(unsigned int cond) {getFlux(cond,solver);}
@@ -316,9 +362,10 @@ class PeriodicFlowEngine : public FlowEngine
 
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 			
-// 			.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
-// 			.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
-// 			.def("getFlux",&FlowEngine::_getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing 'pos'.")
+			.def("getConstrictionsFull",&PeriodicFlowEngine::getConstrictionsFull,"Get the list of constrictions (inscribed circle) for all finite facets.")
+			.def("exportMatrix",&PeriodicFlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
+			.def("exportTriplets",&PeriodicFlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
 		)
 		DECLARE_LOGGER;
 

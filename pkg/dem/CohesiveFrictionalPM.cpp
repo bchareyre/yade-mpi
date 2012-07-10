@@ -17,7 +17,8 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared
 	const int &id2 = contact->getId2();
 	Body* b1 = Body::byId(id1,scene).get();
 	Body* b2 = Body::byId(id2,scene).get();
-	
+
+	//FIXME changing the sign convention here will break a couple algorithms, including periodicity (Bruno)
 	Real displN = geom->penetrationDepth; // NOTE: the sign for penetrationdepth is different from ScGeom and Dem3DofGeom: geom->penetrationDepth>0 when spheres interpenetrate
 	Real Dtensile=phys->FnMax/phys->kn;
 	Real Dsoftening = phys->strengthSoftening*Dtensile; 

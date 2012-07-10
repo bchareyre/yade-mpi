@@ -18,6 +18,8 @@
 #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
+typedef pair<pair<int,int>, vector<double> > Constriction;
+
 using namespace std;
 namespace CGT {
 
@@ -30,10 +32,10 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		DECLARE_TESSELATION_TYPES(Network<Tesselation>)
 		
 		//painfull, but we need that for templates inheritance...
-		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::fictious_vertex; using _N::boundingCells;
+		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::fictious_vertex; using _N::boundingCells; using _N::facetVertices;
 		//same for functions
 		using _N::Define_fictious_cells; using _N::AddBoundingPlanes; using _N::boundary;
-		
+
 		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
 
@@ -42,7 +44,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
-		bool meanK_LIMIT, meanK_STAT, distance_correction;
+		bool clampKValues, meanKStat, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
@@ -59,6 +61,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
+		double minKdivKmean;
+		double maxKdivKmean;
 		int Iterations;
 
 		bool RAVERAGE;
@@ -97,7 +101,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void ComputeTetrahedralForces();
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForces();
-		void ComputeFacetForcesWithCache();
+		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk ( );
 		void MGPost ( );
 #ifdef XVIEW
@@ -107,12 +111,14 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, const char *file );
 		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max);
 		double Compute_HydraulicRadius (Cell_handle cell, int j );
+		Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2);
 
 		double dotProduct ( Vecteur x, Vecteur y );
 		double Compute_EffectiveRadius(Cell_handle cell, int j);
 		double Compute_EquivalentRadius(Cell_handle cell, int j);
 		//return the list of constriction values
 		vector<double> getConstrictions();
+		vector<Constriction> getConstrictionsFull();
 
 		void GenerateVoxelFile ( );
 		
@@ -135,10 +141,11 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
 		double MeasureAveragedPressure(double Y);
 		double MeasureTotalAveragedPressure();
+		double getCell (double X,double Y,double Z);
 		
 		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
 		//Solver?
-		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO)
+		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO, 3:CHOLMOD)
 };
 
 } //namespace CGT

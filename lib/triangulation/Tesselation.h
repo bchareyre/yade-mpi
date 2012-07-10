@@ -76,6 +76,7 @@ public:
 	Real TotalInternalVoronoiVolume;
 	Real TotalInternalVoronoiPorosity;
 	Vector_Vertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
+	Vector_Cell cellHandles;//for speedup of global loops, iterating on this vector is faster than cellIterator++
 	bool redirected;//is vertexHandles filled with current vertex pointers? 	
 
 public:

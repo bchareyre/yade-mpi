@@ -63,7 +63,7 @@ typename _Tesselation<TT>::Vertex_handle _Tesselation<TT>::insert ( Real x, Real
 		vertexHandles[id] = Vh;
 		/*if ( !isFictious ) */max_id = std::max ( max_id, (int) id );
 	}
-	else cout << id <<  " : Vh==NULL!!" << endl;
+	else cout << id <<  " : Vh==NULL!!"<< " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
 	return Vh;
 }
 template<class TT>
@@ -539,7 +539,7 @@ typename Tesselation::Vertex_handle PeriodicTesselation<Tesselation>::insert(Rea
 			Vh->info().isGhost=0;
 		} else Vh->info().isGhost=1;
 	}
-	else cout << id <<  " : Vh==NULL!!" << endl;
+	else cerr << " : Vh==NULL!!" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad<<" fictious="<<isFictious<< endl;
 	return Vh;
 }
 

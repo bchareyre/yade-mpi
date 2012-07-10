@@ -119,13 +119,19 @@ class pyBodyContainer{
 	}
 	Body::id_t clump(vector<Body::id_t> ids){
 		// create and add clump itself
+		Scene* scene(Omega::instance().getScene().get());
 		shared_ptr<Body> clumpBody=shared_ptr<Body>(new Body());
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
 		clumpBody->shape=clump;
 		clumpBody->setBounded(false);
 		proxee->insert(clumpBody);
 		// add clump members to the clump
-		Scene* scene(Omega::instance().getScene().get());
+		FOREACH(Body::id_t id, ids) {
+			if (Body::byId(id,scene)->isClumpMember()){	//Check, whether the body is clumpMember
+				Clump::del(Body::byId(Body::byId(id,scene)->clumpId,scene),Body::byId(id,scene)); //If so, remove it from there
+			}
+		};
+		
 		FOREACH(Body::id_t id, ids) Clump::add(clumpBody,Body::byId(id,scene));
 		Clump::updateProperties(clumpBody,/*intersecting*/ false);
 		return clumpBody->getId();

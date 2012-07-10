@@ -12,7 +12,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_ScGeom_ViscoFrictPhys_CundallStrack)(ElasticContactLaw)(Law2_Dem3DofGeom_FrictPhys_CundallStrack));
+YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_ScGeom_ViscoFrictPhys_CundallStrack)(ElasticContactLaw));
 
 #if 1
 Real Law2_ScGeom_FrictPhys_CundallStrack::getPlasticDissipation() {return (Real) plasticDissipation;}
@@ -108,18 +108,3 @@ void Law2_ScGeom_ViscoFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_
 			phys->shearForce -= phys->ks*((phys->shearForce-phys->creepedShear)*dt/viscosity);}
 	Law2_ScGeom_FrictPhys_CundallStrack::go(ig,ip,contact);
 }
-
-//Same as elasticContactLaw, but using Dem3DofGeom (not maintained)
-void Law2_Dem3DofGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
-	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
-	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
-	Real displN=geom->displacementN();
-	if(displN>0){ scene->interactions->requestErase(contact); return; }
-	phys->normalForce=phys->kn*displN*geom->normal;
-	Real maxFsSq=phys->normalForce.squaredNorm()*pow(phys->tangensOfFrictionAngle,2);
-	Vector3r trialFs=phys->ks*geom->displacementT();
-	if(trialFs.squaredNorm()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)/phys->ks); trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
-	phys->shearForce=trialFs;
-	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position);
-}
-

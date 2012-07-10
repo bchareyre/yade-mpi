@@ -9,7 +9,7 @@ O.bodies.append([
 	utils.wall(1,axis=1),
 	utils.wall((1,0,0),0),
 	utils.sphere([0,0,0],.5),
-	utils.sphere([-5,-4,-3],.5)
+	utils.sphere([-4,-4,-3],.5)
 ])
 Gl1_Wall(div=10)
 
@@ -22,9 +22,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Wall_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3DofGeom_FrictPhys_CundallStrack()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	NewtonIntegrator(damping=0.01,gravity=[1e2,1e2,1e2]),
 	]
