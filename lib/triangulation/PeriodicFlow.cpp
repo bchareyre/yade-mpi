@@ -380,7 +380,7 @@ void PeriodicFlow::GaussSeidel(Real dt)
 {
     RTriangulation& Tri = T[currentTes].Triangulation();
     int j = 0;
-    double m, n, dp_max, p_max, sum_p, p_moy, dp_moy, dp, sum_dp;
+    double m, n, dp_max, p_max, sum_p, dp, sum_dp;
     double compFlowFactor=0;
     vector<Real> previousP;
     previousP.resize(Tri.number_of_finite_cells());
@@ -399,8 +399,6 @@ void PeriodicFlow::GaussSeidel(Real dt)
         int cell2=0;
         dp_max = 0;
         p_max = 0;
-        p_moy=0;
-        dp_moy=0;
         sum_p=0;
         sum_dp=0;
         int bb=-1;
@@ -439,21 +437,12 @@ void PeriodicFlow::GaussSeidel(Real dt)
 		sum_dp += std::abs(dp);
             }
         }
-        p_moy = sum_p/cell2;
-        dp_moy = sum_dp/cell2;
-	j++;
+        j++;
 
 // 	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
 	if (j>=40000) cerr<<"\r GS not converged after 40k iterations, break";
 
     } while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
-
-
-// 	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
-// 	if (j>=40000) cerr<<"\r GS not converged after 40k iterations, break";
-
-     while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/); //while (j<2); //
-//     cerr << "j" << j << endl;
 
     int cel=0;
     double Pav=0;
@@ -520,24 +509,21 @@ void PeriodicFlow::Average_Relative_Cell_Velocity()
         Point pos_av_facet;
         int num_cells = 0;
         double facet_flow_rate = 0;
-	double volume_facet_translation = 0;
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
 		if (cell->info().isGhost) continue;
 		cell->info().av_vel() =CGAL::NULL_VECTOR;
                 num_cells++;
-                for ( int i=0; i<4; i++ ) {
-		  volume_facet_translation = 0;
-		  if (!Tri.is_infinite(cell->neighbor(i))){
-                        Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
-                        Real area = sqrt ( Surfk.squared_length() );
-			Surfk = Surfk/area;
+                for ( int i=0; i<4; i++ )
+			if (!Tri.is_infinite(cell->neighbor(i))){
+				Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+				Real area = sqrt ( Surfk.squared_length() );
+				Surfk = Surfk/area;
 //                         Vecteur facetNormal = Surfk/area;
-                        Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
-                        pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
-			facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
-			cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
-		  }}
+                        	Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+                        	pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
+				cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );}
 		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
 	}
 }

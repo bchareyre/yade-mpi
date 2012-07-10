@@ -180,7 +180,7 @@ bool TriaxialState::from_file(const char* filename, bool bz2)
 	Statefile >> Ng;
 	//Real x, y, z, rad; //coordonn�es/rayon
 	//Real tx, ty, tz;
-	Point pos;
+	Point pos(CGAL::ORIGIN);
 	mean_radius=0;
 	Vecteur trans, rot;
 	Real rad; //coordonn�es/rayon

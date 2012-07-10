@@ -290,25 +290,20 @@ void FlowBoundingSphere<Tesselation>::Average_Relative_Cell_Velocity()
         Point pos_av_facet;
         int num_cells = 0;
         double facet_flow_rate = 0;
-	double volume_facet_translation = 0;
 	Real tVel=0; Real tVol=0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
 		cell->info().av_vel() =CGAL::NULL_VECTOR;
                 num_cells++;
-                for ( int i=0; i<4; i++ ) {
-		  volume_facet_translation = 0;
-		  if (!Tri.is_infinite(cell->neighbor(i))){
-                        Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
-                        Real area = sqrt ( Surfk.squared_length() );
-			Surfk = Surfk/area;
-//                         Vecteur facetNormal = Surfk/area;
-                        Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
-                        pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
-// 		pos_av_facet=CGAL::ORIGIN + ((cell->vertex(facetVertices[i][0])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][1])->point() - CGAL::ORIGIN) + (cell->vertex(facetVertices[i][2])->point() - CGAL::ORIGIN))*0.3333333333;
-			facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p());
-                        cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
-		  }}
+                for ( int i=0; i<4; i++ )
+			if (!Tri.is_infinite(cell->neighbor(i))){
+				Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+				Real area = sqrt ( Surfk.squared_length() );
+				Surfk = Surfk/area;
+				Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+				pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p());
+                        	cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );}
  		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
 		cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
 	}
@@ -1086,7 +1081,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 	reApplyBoundaryConditions();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int j = 0;
-	double m, n, dp_max, p_max, sum_p, p_moy, dp_moy, dp, sum_dp;
+	double m, n, dp_max, p_max, sum_p, p_moy, dp, sum_dp;
 	double compFlowFactor=0;
 	vector<Real> previousP;
 	previousP.resize(Tri.number_of_finite_cells());
@@ -1120,7 +1115,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 // 	#pragma omp parallel shared(t_sum_dp, t_dp_max, sum_p, sum_dp,cells_its, j, Tri, relax)
 	{
         do {
-                int cell2=0; dp_max = 0;p_max = 0;p_moy=0;dp_moy=0;sum_p=0;sum_dp=0;
+                int cell2=0; dp_max = 0;p_max = 0;p_moy=0;sum_p=0;sum_dp=0;
 		#ifdef GS_OPEN_MP
 		cell2=num_cells;
 		for (int ii=0;ii<num_threads;ii++) t_p_max[ii] =0;
@@ -1196,8 +1191,7 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 //                 cerr<< p_max<< " "<<dp_max<<" "<<sum_p<<" "<<sum_dp<<endl;
                 #endif
 		p_moy = sum_p/cell2;
-                dp_moy = sum_dp/cell2;
-
+ 
 		#ifdef GS_OPEN_MP
 		#pragma omp master
 		#endif

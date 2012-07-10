@@ -113,14 +113,12 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	BodyContainer::iterator bi = biBegin;
 	Ng = 0;
 	vector<Body::id_t> fictiousVtx;
-	bool fictiousFirst=false;
 	for (; bi!=biEnd ; ++bi) {
 		const Body::id_t Idg = (*bi)->getId();
 		TS.grains[Idg].id = Idg;
 		if (!(*bi)->isDynamic()) {
 			if (!nonSphereAsFictious) continue;
-			TS.grains[Idg].isSphere = false; fictiousVtx.push_back(Idg);
-			if (bi==biBegin) fictiousFirst=true;}
+			TS.grains[Idg].isSphere = false; fictiousVtx.push_back(Idg);}
 		else {//then it is a sphere (not a wall)
 			++Ng;
 			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());

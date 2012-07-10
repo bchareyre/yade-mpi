@@ -85,11 +85,9 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Applying Forces" );
 
 	if (multithread) {
-		bool hasNewSolver=false;
 		if (!first && backgroundCompleted) {
 			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
-			hasNewSolver=true;
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
 			solver=backgroundSolver;
 			backgroundSolver = shared_ptr<FlowSolver> (new FlowSolver);
@@ -482,11 +480,6 @@ Real FlowEngine::Volume_cell_single_fictious ( Cellhandle cell )
                         else Wall_coordinate = solver->boundary ( b ).p[solver->boundary ( b ).coordinate];
                 }
         }
-
-        double v1[3], v2[3];
-
-        for ( int g=0;g<3;g++ ) { v1[g]=V[0][g]-V[1][g]; v2[g]=V[0][g]-V[2][g];}
-
         Real Volume = 0.5* ( ( V[0]-V[1] ).cross ( V[0]-V[2] ) ) [solver->boundary ( b ).coordinate] * ( 0.33333333333* ( V[0][solver->boundary ( b ).coordinate]+ V[1][solver->boundary ( b ).coordinate]+ V[2][solver->boundary ( b ).coordinate] ) - Wall_coordinate );
 
         return abs ( Volume );
@@ -698,10 +691,8 @@ void PeriodicFlowEngine:: action()
         ///End Compute flow and forces
 		timingDeltas->checkpoint("Applying Forces");
 	if (multithread) {
-		bool hasNewSolver=false;
 		if (!first && backgroundCompleted) {
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
-			hasNewSolver=true;
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
 			solver=backgroundSolver;
 			backgroundSolver = shared_ptr<FlowSolver> (new FlowSolver);
@@ -828,8 +819,6 @@ Real PeriodicFlowEngine::Volume_cell_single_fictious ( Cell_handle cell )
                         else Wall_coordinate = solver->boundary ( b ).p[solver->boundary ( b ).coordinate];
                 }
         }
-        double v1[3], v2[3];
-        for ( int g=0;g<3;g++ ) { v1[g]=V[0][g]-V[1][g]; v2[g]=V[0][g]-V[2][g];}
         Real Volume = 0.5* ( ( V[0]-V[1] ).cross ( V[0]-V[2] ) ) [solver->boundary ( b ).coordinate] * ( 0.33333333333* ( V[0][solver->boundary ( b ).coordinate]+ V[1][solver->boundary ( b ).coordinate]+ V[2][solver->boundary ( b ).coordinate] ) - Wall_coordinate );
         return abs ( Volume );
 }
