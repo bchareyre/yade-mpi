@@ -419,7 +419,7 @@ void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, d
 	double Ry = (Wall_up_y-Wall_down_y)/captures;
 
 	double X=(x_max+x_min)/2;
-	double Y = 0;
+	double Y = Wall_down_y;
 	double pressure = 0.f;
 	int cell=0;
 	for (int i=0; i<captures; i++){
