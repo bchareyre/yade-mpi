@@ -41,7 +41,7 @@ void FlowEngine::action()
         if ( !isActivated ) return;
         timingDeltas->start();
 
-        if (first) {setPositionsBuffer(); Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
+        if (first) {Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
 
         timingDeltas->checkpoint ( "Triangulating" );
         UpdateVolumes ( solver );
@@ -74,8 +74,12 @@ void FlowEngine::action()
         for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
                 if ( !viscousShear )
                         scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) );
-                else
-                        scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id() ] );
+                else{
+			if (!lubrication)
+				scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id()]);
+			else
+				scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id()]+solver-> normLubForce[V_it->info().id()]);
+		}
         }
         ///End Compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
@@ -93,8 +97,6 @@ void FlowEngine::action()
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
 			if (Debug) cerr<<"switched"<<endl;
-			setPositionsBuffer();
-			backgroundCompleted=false;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
 			if (Debug) cerr<<"backgrounded"<<endl;
@@ -104,7 +106,6 @@ void FlowEngine::action()
 		else if (!first && Debug) cerr<<"still computing solver in the background"<<endl;
 	} else {
 	        if (Update_Triangulation && !first) {
-			setPositionsBuffer();
                 	Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver); 
                		Update_Triangulation = false;}
@@ -116,12 +117,13 @@ void FlowEngine::action()
 
 void FlowEngine::backgroundAction()
 {
+	backgroundCompleted=false;
 	if (useSolver<1) {LOG_ERROR("background calculations not available for Gauss-Seidel"); return;}
         Build_Triangulation ( P_zero,backgroundSolver );
 	//FIXME: GS is computing too much, we need only matrix factorization in fact
 	backgroundSolver->GaussSeidel(scene->dt);
 	//FIXME(2): and here we need only cached variables, not forces
-	backgroundSolver->ComputeFacetForcesWithCache(/*onlyCache?*/ true);
+	backgroundSolver->ComputeFacetForcesWithCache();
 // 	boost::this_thread::sleep(boost::posix_time::seconds(10));
  	backgroundCompleted = true;
 }
@@ -218,10 +220,8 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         flow->areaR2Permeability=areaR2Permeability;
         flow->TOLERANCE=Tolerance;
         flow->RELAX=Relax;
-        flow->clampKValues = clampKValues;
-	flow->maxKdivKmean = maxKdivKmean;
-	flow->minKdivKmean = minKdivKmean;
-        flow->meanKStat = meanKStat;
+        flow->meanK_LIMIT = meanK_correction;
+        flow->meanK_STAT = meanK_opt;
         flow->permeability_map = permeability_map;
         flow->fluidBulkModulus = fluidBulkModulus;
         flow->T[flow->currentTes].Clear();
@@ -234,12 +234,6 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         flow->T[flow->currentTes].Compute();
 
         flow->Define_fictious_cells();
-	// For faster loops on cells define this vector
-	flow->T[flow->currentTes].cellHandles.clear();
-	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
-		flow->T[flow->currentTes].cellHandles.push_back(cell);
-	if ( Debug ) cout << "cellHandles is now defined" << endl << endl;
         flow->DisplayStatistics ();
         flow->Compute_Permeability ( );
 
@@ -254,36 +248,25 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         if ( WaveAction ) flow->ApplySinusoidalPressure ( flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
 
         if ( viscousShear ) flow->ComputeEdgesSurfaces();
-}
-
-void FlowEngine::setPositionsBuffer()
-{
-	positionBuffer.clear();
-	positionBuffer.resize(scene->bodies->size());
-	shared_ptr<Sphere> sph ( new Sphere );
-        const int Sph_Index = sph->getClassIndexStatic();
-	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if (!b || (unlikely(ignoredBody>=0) && ignoredBody==b->getId())) continue;
-                posData& dat = positionBuffer[b->getId()];
-		dat.id=b->getId();
-		dat.pos=b->state->pos;
-		dat.isSphere= (b->shape->getClassIndex() ==  Sph_Index);
-		if (dat.isSphere) dat.radius = YADE_CAST<Sphere*>(b->shape.get())->radius;
-		dat.exists=true;
-	}
+	if ( lubrication ) flow->ComputeEdgesSurfaces();
 }
 
 template<class Solver>
 void FlowEngine::AddBoundary ( Solver& flow )
 {
-        solver->x_min = Mathr::MAX_REAL, solver->x_max = -Mathr::MAX_REAL, solver->y_min = Mathr::MAX_REAL, solver->y_max = -Mathr::MAX_REAL, solver->z_min = Mathr::MAX_REAL, solver->z_max = -Mathr::MAX_REAL;
-        FOREACH ( const posData& b, positionBuffer ) {
-                if ( !b.exists ) continue;
-                if ( b.isSphere ) {
-                        const Real& rad = b.radius;
-                        const Real& x = b.pos[0];
-                        const Real& y = b.pos[1];
-                        const Real& z = b.pos[2];
+        shared_ptr<Sphere> sph ( new Sphere );
+        int Sph_Index = sph->getClassIndexStatic();
+
+        solver->x_min = 1000.0, solver->x_max = -10000.0, solver->y_min = 1000.0, solver->y_max = -10000.0, solver->z_min = 1000.0, solver->z_max = -10000.0;
+        FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
+                if ( !b ) continue;
+                if ( b->shape->getClassIndex() ==  Sph_Index ) {
+                        Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
+                        //const Body::id_t& id = b->getId();
+                        Real& rad = s->radius;
+                        Real& x = b->state->pos[0];
+                        Real& y = b->state->pos[1];
+                        Real& z = b->state->pos[2];
                         flow->x_min = min ( flow->x_min, x-rad );
                         flow->x_max = max ( flow->x_max, x+rad );
                         flow->y_min = min ( flow->y_min, y-rad );
@@ -292,11 +275,14 @@ void FlowEngine::AddBoundary ( Solver& flow )
                         flow->z_max = max ( flow->z_max, z+rad );
                 }
         }
-	//FIXME id_offset must be set correctly, not the case here (always 0), then we need walls first or it will fail
+
         id_offset = flow->T[flow->currentTes].max_id+1;
+
         flow->id_offset = id_offset;
+
         flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
         flow->Vtotale = ( flow->x_max-flow->x_min ) * ( flow->y_max-flow->y_min ) * ( flow->z_max-flow->z_min );
+
         flow->y_min_id=wallBottomId;
         flow->y_max_id=wallTopId;
         flow->x_max_id=wallRightId;
@@ -325,6 +311,7 @@ void FlowEngine::AddBoundary ( Solver& flow )
         if ( Debug ) {
                 cout << "Section area = " << flow->SectionArea << endl;
                 cout << "Vtotale = " << flow->Vtotale << endl;
+// 	cout << "Rmoy " << Rmoy << endl;
                 cout << "x_min = " << flow->x_min << endl;
                 cout << "x_max = " << flow->x_max << endl;
                 cout << "y_max = " << flow->y_max << endl;
@@ -333,19 +320,23 @@ void FlowEngine::AddBoundary ( Solver& flow )
                 cout << "z_max = " << flow->z_max << endl;
                 cout << endl << "Adding Boundary------" << endl;
         }
+
         //assign BCs types and values
         BoundaryConditions ( flow );
 
         double center[3];
+
         for ( int i=0; i<6; i++ ) {
                 if ( *flow->boundsIds[i]<0 ) continue;
                 CGT::Vecteur Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
                 if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->AddBoundingPlane ( true, Normal, *flow->boundsIds[i] );
                 else {
-			for ( int h=0;h<3;h++ ) center[h] = positionBuffer[*flow->boundsIds[i]].pos[h];
+                        const shared_ptr<Body>& wll = Body::byId ( *flow->boundsIds[i] , scene );
+                        for ( int h=0;h<3;h++ ) {center[h] = wll->state->pos[h];}
                         flow->AddBoundingPlane ( center, wall_thickness, Normal,*flow->boundsIds[i] );
                 }
         }
+// 	flow->AddBoundingPlanes(true);
 }
 
 template<class Solver>
@@ -358,14 +349,26 @@ void FlowEngine::Triangulate ( Solver& flow )
 // 	TW.insertSceneSpheres();//TW is now really inserting in FlowEngine, using the faster insert(begin,end)
 // 	TW.Tes = NULL;//otherwise, Tes would be deleted by ~TesselationWrapper() at the end of the function.
 ///Using one-by-one insertion
-       FOREACH ( const posData& b, positionBuffer ) {
-                if ( !b.exists ) continue;
-                if ( b.isSphere ) {
-			if (b.id==ignoredBody) continue;
-                        flow->T[flow->currentTes].insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );}
+        shared_ptr<Sphere> sph ( new Sphere );
+        int Sph_Index = sph->getClassIndexStatic();
+        FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
+                if ( !b ) continue;
+                if ( b->shape->getClassIndex() ==  Sph_Index ) {
+                        Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
+                        const Body::id_t& id = b->getId();
+			if (id==ignoredBody) continue;
+                        Real rad = s->radius;
+                        Real x = b->state->pos[0];
+                        Real y = b->state->pos[1];
+                        Real z = b->state->pos[2];
+                        flow->T[flow->currentTes].insert ( x, y, z, rad, id );
+                }
         }
         flow->T[flow->currentTes].redirected=true;//By inserting one-by-one, we already redirected
         flow->viscousShearForces.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->viscousBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->normLubForce.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->lubBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
 }
 template<class Solver>
 void FlowEngine::Initialize_volumes ( Solver& flow )
@@ -378,8 +381,9 @@ void FlowEngine::Initialize_volumes ( Solver& flow )
 	Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
 	CGT::Vecteur Zero(0,0,0);
 	for (Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++) V_it->info().forces=Zero;
-
-	FOREACH(Cell_handle& cell, flow->T[flow->currentTes].cellHandles)
+	
+	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
@@ -431,12 +435,13 @@ void FlowEngine::UpdateVolumes ( Solver& flow )
 {
         if ( Debug ) cout << "Updating volumes.............." << endl;
         Real invDeltaT = 1/scene->dt;
+        Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 
         double newVol, dVol;
         eps_vol_max=0;
         Real totVol=0; Real totDVol=0; Real totVol0=0; Real totVol1=0; Real totVol2=0; Real totVol3=0;
 
-	FOREACH(Cell_handle& cell, flow->T[flow->currentTes].cellHandles){
+        for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
                 switch ( cell->info().fictious() ) {
                 case ( 3 ) : newVol = Volume_cell_triple_fictious ( cell ); totVol3+=newVol; break;
                 case ( 2 ) : newVol = Volume_cell_double_fictious ( cell ); totVol2+=newVol; break;
@@ -553,12 +558,12 @@ Real FlowEngine::Volume_cell_triple_fictious ( Cellhandle cell )
 template<class Cellhandle>
 Real FlowEngine::Volume_cell ( Cellhandle cell )
 {
-	static const Real inv6 = 1/6.;
-	const Vector3r& p0 = Body::byId ( cell->vertex ( 0 )->info().id(), scene )->state->pos;
-	const Vector3r& p1 = Body::byId ( cell->vertex ( 1 )->info().id(), scene )->state->pos;
-	const Vector3r& p2 = Body::byId ( cell->vertex ( 2 )->info().id(), scene )->state->pos;
-	const Vector3r& p3 = Body::byId ( cell->vertex ( 3 )->info().id(), scene )->state->pos;
-	Real volume = inv6 * ((p0-p1).cross(p0-p2)).dot(p0-p3);
+        Real volume = CGT::Tetraedre ( makeCgPoint ( Body::byId ( cell->vertex ( 0 )->info().id(), scene )->state->pos ),
+                                       makeCgPoint ( Body::byId ( cell->vertex ( 1 )->info().id(), scene )->state->pos ),
+                                       makeCgPoint ( Body::byId ( cell->vertex ( 2 )->info().id(), scene )->state->pos ),
+                                       makeCgPoint ( Body::byId ( cell->vertex ( 3 )->info().id(), scene )->state->pos ) )
+                      .volume();
+
         if ( ! ( cell->info().volumeSign ) ) cell->info().volumeSign= ( volume>0 ) ?1:-1;
         return volume;
 }
@@ -569,8 +574,9 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
         if ( Debug ) cout << "Application of viscous forces" << endl;
         if ( Debug ) cout << "Number of edges = " << flow.Edge_ids.size() << endl;
         for ( unsigned int k=0; k<flow.viscousShearForces.size(); k++ ) flow.viscousShearForces[k]=Vector3r::Zero();
-	flow.viscousBulkStress = Matrix3r::Zero();
-
+	for ( unsigned int k=0; k<flow.viscousBodyStress.size(); k++) flow.viscousBodyStress[k]=Matrix3r::Zero();
+	for ( unsigned int k=0; k<flow.normLubForce.size(); k++ ) flow.normLubForce[k]=Vector3r::Zero();
+	for ( unsigned int k=0; k<flow.lubBodyStress.size(); k++) flow.lubBodyStress[k]=Matrix3r::Zero();
 	
 	typedef typename Solver::Tesselation Tesselation;
         const Tesselation& Tes = flow.T[flow.currentTes];
@@ -583,7 +589,10 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                 Sphere* s2=YADE_CAST<Sphere*> ( sph2->shape.get() );
                 Vector3r x = sph2->state->pos - sph1->state->pos;
                 Vector3r n = x / sqrt(makeCgVect(x).squared_length());
-                Vector3r deltaV;
+                Vector3r deltaV; Vector3r deltaNormV;
+		Real meanRad = (s1->radius + s2->radius)/2.;
+
+		Vector3r visc_f;
                 if ( !hasFictious )
                         deltaV = (sph2->state->vel + sph2->state->angVel.cross(s2->radius * n)) - (sph1->state->vel+ sph1->state->angVel.cross(s1->radius * n));
                 else {
@@ -596,7 +605,10 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                         }
                 }
                 deltaV = deltaV - ( flow.Edge_normal[i].dot ( deltaV ) ) *flow.Edge_normal[i];
-                Vector3r visc_f = flow.ComputeViscousForce ( deltaV, i );
+		if (bruleForce)
+			visc_f = flow.ComputeViscousLubricationBruleForce (deltaV,meanRad,i);
+		else
+			visc_f = flow.ComputeViscousForce ( deltaV, i );
 				
 //                 if ( Debug ) cout << "la force visqueuse entre " << flow->Edge_ids[i].first << " et " << flow->Edge_ids[i].second << "est " << visc_f << endl;
 
@@ -612,12 +624,24 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 		flow.viscousShearForces[flow.Edge_ids[i].first]+=visc_f;
 		flow.viscousShearForces[flow.Edge_ids[i].second]-=visc_f;
 		
-/// Calculer la contrainte visqueuse de cisaillement totale appliquée sur tout l'échantillon 
-		flow.viscousBulkStress+=flow.viscousShearForces[flow.Edge_ids[i].second] * x.transpose();
+/// Compute the viscous shear stress on each particle
+		flow.viscousBodyStress[flow.Edge_ids[i].first] += visc_f * flow.Edge_force_point[i].transpose();
+		flow.viscousBodyStress[flow.Edge_ids[i].second] -= visc_f * (x-flow.Edge_force_point[i]).transpose();
+		if (lubrication){
+/// Compute the normal lubrication force applied on each particle
+			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
+			Vector3r lub_f = flow.ComputeNormalLubricationForce (deltaNormV, meanRad, i);
+			flow.normLubForce[flow.Edge_ids[i].first]+=lub_f;
+			flow.normLubForce[flow.Edge_ids[i].second]-=lub_f;
 		
+/// Compute the normal lubrication stress on each particle
+			flow.lubBodyStress[flow.Edge_ids[i].first] += lub_f * flow.Edge_force_point[i].transpose();
+			flow.lubBodyStress[flow.Edge_ids[i].second] -= lub_f *  (x-flow.Edge_force_point[i]).transpose();
+		}
 	}
         if(Debug) cout<<"number of viscousShearForce"<<flow.viscousShearForces.size()<<endl;
 }
+
 
 YADE_PLUGIN ( ( FlowEngine ) );
 
@@ -631,11 +655,9 @@ PeriodicFlowEngine::~PeriodicFlowEngine(){}
 void PeriodicFlowEngine:: action()
 {
         if ( !isActivated ) return;
-	timingDeltas->start();
 	preparePShifts();
-	if (first) {
-		setPositionsBuffer(); cachedCell= Cell(*(scene->cell));
-		Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
+	timingDeltas->start();
+	if (first) {Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
 //         if ( first ) {Build_Triangulation ( P_zero ); Update_Triangulation = false; Initialize_volumes();}
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
@@ -653,24 +675,28 @@ void PeriodicFlowEngine:: action()
 	solver->GaussSeidel(scene->dt);
 	timingDeltas->checkpoint("Gauss-Seidel");
 	solver->ComputeFacetForcesWithCache();
-	timingDeltas->checkpoint("Compute_Pressure_Forces");
+	timingDeltas->checkpoint("Compute_Forces");
 
-        ///Compute vicscous forces
+        ///Application of vicscous forces
         scene->forces.sync();
         if ( viscousShear ) ApplyViscousForces(*solver);
-	timingDeltas->checkpoint("Compute_Viscous_Forces");
-	
+
 	const Tesselation& Tes = solver->T[solver->currentTes];
+
 	for (int id=0; id<=Tes.max_id; id++){
 		assert (Tes.vertexHandles[id] != NULL);
 		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
 		if (!viscousShear)
                         scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) );
-                else
-			scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()] );
+                else{
+			if (!lubrication)
+			  scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()]);
+			else
+				scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()]+solver->normLubForce[v_info.id()] );
+		}
 	}
         ///End Compute flow and forces
-	timingDeltas->checkpoint("Applying Forces");
+		timingDeltas->checkpoint("Applying Forces");
 	if (multithread) {
 		bool hasNewSolver=false;
 		if (!first && backgroundCompleted) {
@@ -682,9 +708,6 @@ void PeriodicFlowEngine:: action()
 			//Copy imposed pressures/flow from the old solver
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
-			setPositionsBuffer();
-			cachedCell= Cell(*(scene->cell));
-			backgroundCompleted=false;
 			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			Initialize_volumes(solver);
@@ -692,8 +715,6 @@ void PeriodicFlowEngine:: action()
 		else if (Debug && !first) cerr<<"still computing solver in the background"<<endl;
 	} else {
 	        if (Update_Triangulation && !first) {
-			cachedCell= Cell(*(scene->cell));
-			setPositionsBuffer();
                 	Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
                		Update_Triangulation = false;}
@@ -706,37 +727,41 @@ void PeriodicFlowEngine:: action()
 
 void PeriodicFlowEngine::backgroundAction()
 {
+	backgroundCompleted=false;
 	if (useSolver<1) {LOG_ERROR("background calculations not available for Gauss-Seidel"); return;}
         Build_Triangulation (P_zero,backgroundSolver);
 	//FIXME: GS is computing too much, we need only matrix factorization in fact
 	backgroundSolver->GaussSeidel(scene->dt);
-	backgroundSolver->ComputeFacetForcesWithCache(/*onlyCache?*/ true);
+	//FIXME(2): and here we need only cached variables, not forces
+	backgroundSolver->ComputeFacetForcesWithCache();
 // 	boost::this_thread::sleep(boost::posix_time::seconds(10));
 	backgroundCompleted = true;
 }
 
 void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
 {
-//         shared_ptr<Sphere> sph ( new Sphere );
-//         int Sph_Index = sph->getClassIndexStatic();
+        shared_ptr<Sphere> sph ( new Sphere );
+        int Sph_Index = sph->getClassIndexStatic();
         Tesselation& Tes = flow->T[flow->currentTes];
-
-	FOREACH ( const posData& b, positionBuffer ) {
-                if ( !b.exists || !b.isSphere || b.id==ignoredBody) continue;
-                Vector3i period; Vector3r wpos;
-		// FIXME: use "sheared" variant if the cell is sheared
-		wpos=cachedCell.wrapPt ( b.pos,period );
-		const Body::id_t& id = b.id;
-		const Real& rad = b.radius;
-                const Real& x = wpos[0];
-                const Real& y = wpos[1];
-                const Real& z = wpos[2];
+	
+        FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
+                if ( !b || b->shape->getClassIndex() != Sph_Index) continue;
+                Vector3r wpos;
+                Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
+                const Body::id_t& id = b->getId();
+		if (id==ignoredBody) continue;
+                Real rad = s->radius;
+                Vector3i period;
+                // FIXME: use "sheared" variant if the cell is sheared
+                wpos=scene->cell->wrapPt ( b->state->pos,period );
+                Real x = wpos[0];
+                Real y = wpos[1];
+                Real z = wpos[2];
                 Vertex_handle vh0=Tes.insert ( x, y, z, rad, id );
-//                 Vertex_handle vh0=Tes.insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
 		if (vh0==NULL) LOG_ERROR("Vh NULL in PeriodicFlowEngine::Triangulate(), check input data");
-		for ( int k=0;k<3;k++ ) vh0->info().period[k]=-period[k];
-                const Vector3r cellSize ( cachedCell.getSize() );
-		//FIXME: if hasShear, comment in
+
+                for ( int k=0;k<3;k++ ) vh0->info().period[k]=-period[k];
+                const Vector3r& cellSize ( scene->cell->getSize() );
 //                 wpos=scene->cell->unshearPt ( wpos );
                 // traverse all periodic cells around the body, to see if any of them touches
                 Vector3r halfSize= ( rad+duplicateThreshold ) *Vector3r ( 1,1,1 );
@@ -760,18 +785,25 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
 		Tes.vertexHandles[id]=vh0;
         }
         Tes.redirected=true;//By inserting one-by-one, we already redirected
+
         flow -> viscousShearForces.resize ( Tes.max_id+1 );
+	flow -> viscousBodyStress.resize ( Tes.max_id+1 );
+	flow -> normLubForce.resize ( Tes.max_id+1 );
+	flow -> lubBodyStress.resize ( Tes.max_id+1 );
+
+//         flow -> viscousShearForces.resize ( Tes.max_id+1 );
+
 }
 
 
 Real PeriodicFlowEngine::Volume_cell ( Cell_handle cell )
 {
-	static const Real inv6 = 1/6.;
-	const Vector3r p0 = Body::byId (cell->vertex(0)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(0)->info().ghostShift());
-	const Vector3r p1 = Body::byId (cell->vertex(1)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(1)->info().ghostShift());
-	const Vector3r p2 = Body::byId (cell->vertex(2)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(2)->info().ghostShift());
-	const Vector3r p3 = Body::byId (cell->vertex(3)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(3)->info().ghostShift());
-	Real volume = inv6*((p0-p1).cross(p0-p2)).dot(p0-p3);
+        Real volume = CGT::Tetraedre (
+		makeCgPoint ( Body::byId ( cell->vertex ( 0 )->info().id(), scene )->state->pos ) + cell->vertex ( 0 )->info().ghostShift(),
+		makeCgPoint ( Body::byId ( cell->vertex ( 1 )->info().id(), scene )->state->pos ) + cell->vertex ( 1 )->info().ghostShift(),
+		makeCgPoint ( Body::byId ( cell->vertex ( 2 )->info().id(), scene )->state->pos ) + cell->vertex ( 2 )->info().ghostShift(),
+		makeCgPoint ( Body::byId ( cell->vertex ( 3 )->info().id(), scene )->state->pos ) + cell->vertex ( 3 )->info().ghostShift() )
+		.volume();
         if ( ! ( cell->info().volumeSign ) ) cell->info().volumeSign= ( volume>0 ) ?1:-1;
         return volume;
 }
@@ -803,7 +835,7 @@ Real PeriodicFlowEngine::Volume_cell_single_fictious ( Cell_handle cell )
 }
 
 
-void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count)
+void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index, shared_ptr<FlowSolver>& flow, unsigned int count)
 {
         if (count>10) LOG_ERROR("More than 10 attempts to locate a cell, duplicateThreshold may be too small, resulting in periodicity inconsistencies.");
 	PeriFlowTesselation::Cell_Info& base_info = baseCell->info();
@@ -826,7 +858,7 @@ void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index,
 		}
 		center[coord]=boundPos;
 	}
-	Vector3r wdCenter= cachedCell.wrapPt ( center,period );
+	Vector3r wdCenter= scene->cell->wrapPt ( center,period );
 	if ( period[0]!=0 || period[1]!=0 || period[2]!=0 ) {
 		if ( baseCell->info().index>0 ) {
 			cout<<"indexed cell is found ghost!"<<base_info.index <<endl;
@@ -841,19 +873,16 @@ void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index,
 		base_info.period[1]=period[1];
 		base_info.period[2]=period[2];
 		//call recursively, since the returned cell could be also a ghost (especially if baseCell is a non-periodic type from the external contour
-		locateCell ( ch,index,baseIndex,flow,++count );
+		locateCell ( ch,index,flow,++count );
 		if ( ch==baseCell ) cerr<<"WTF!!"<<endl;
 		base_info.isGhost=true;
 		base_info._pression=& ( ch->info().p() );
 		base_info.index=ch->info().index;
-		base_info.baseIndex=ch->info().baseIndex;
 		base_info.Pcondition=ch->info().Pcondition;
 	} else {
 		base_info.isGhost=false;
 		//index is 1-based, if it is zero it is not initialized, we define it here
-		if (  base_info.baseIndex<0 ){
-			base_info.baseIndex=++baseIndex;
-			if (!base_info.Pcondition) base_info.index=++index;}
+		if ( !base_info.Pcondition && base_info.index==0 ) base_info.index=++index;
 	}
 }
 
@@ -876,6 +905,8 @@ void PeriodicFlowEngine::UpdateVolumes (shared_ptr<FlowSolver>& flow)
 {
         if ( Debug ) cout << "Updating volumes.............." << endl;
         Real invDeltaT = 1/scene->dt;
+        Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+
         double newVol, dVol;
         eps_vol_max=0;
         Real totVol=0;
@@ -883,7 +914,8 @@ void PeriodicFlowEngine::UpdateVolumes (shared_ptr<FlowSolver>& flow)
         Real totVol0=0;
         Real totVol1=0;
 
-	FOREACH(Cell_handle& cell, flow->T[flow->currentTes].cellHandles){
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+                if ( cell->info().isGhost ) continue;
                 switch ( cell->info().fictious() ) {
                 case ( 1 ) :
                         newVol = Volume_cell_single_fictious ( cell );
@@ -907,14 +939,15 @@ void PeriodicFlowEngine::UpdateVolumes (shared_ptr<FlowSolver>& flow)
         if ( Debug ) cout << "Updated volumes, total =" <<totVol<<", dVol="<<totDVol<<" "<< totVol0<<" "<< totVol1<<endl;
 }
 
-
 void PeriodicFlowEngine::Initialize_volumes (shared_ptr<FlowSolver>& flow)
 {
         Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
         CGT::Vecteur Zero ( 0,0,0 );
         for ( Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++ ) V_it->info().forces=Zero;
 
-	FOREACH(Cell_handle& cell, flow->T[flow->currentTes].cellHandles){
+        Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+        for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+                if ( cell->info().isGhost ) continue;
 		switch ( cell->info().fictious() )
 		{
 			case ( 0 ) : cell->info().volume() = Volume_cell ( cell ); break;
@@ -955,31 +988,22 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero, shared_ptr<FlowSol
         flow->T[flow->currentTes].Compute();
         flow->Define_fictious_cells();
 	
-        flow->clampKValues = clampKValues;
-	flow->maxKdivKmean = maxKdivKmean;
-	flow->minKdivKmean = minKdivKmean;
-        flow->meanKStat = meanKStat;
+        flow->meanK_LIMIT = meanK_correction;
+        flow->meanK_STAT = meanK_opt;
         flow->permeability_map = permeability_map;
 
-        //FIXME: this is already done in addBoundary(?)
+ 	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+        for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {cell->info().dv() = 0; cell->info().p() = P_zero;}
         BoundaryConditions ( flow );
 	if ( Debug ) cout << endl << "BoundaryConditions------" << endl << endl;
         flow->Initialize_pressures ( P_zero );
 	if ( Debug ) cout << endl << "Initialize_pressures------" << endl << endl;
         // Define the ghost cells and add indexes to the cells inside the period (the ones that will contain the pressure unknowns)
         //This must be done after boundary conditions and initialize pressure, else the indexes are not good (not accounting imposedP): FIXME
+        Finite_cells_iterator cellend=flow->T[flow->currentTes].Triangulation().finite_cells_end();
         unsigned int index=0;
-	int baseIndex=-1;
-        FlowSolver::Tesselation& Tes = flow->T[flow->currentTes];
-	Tes.cellHandles.resize(Tes.Triangulation().number_of_finite_cells());
-	const Finite_cells_iterator cellend=Tes.Triangulation().finite_cells_end();
-        for ( Finite_cells_iterator cell=Tes.Triangulation().finite_cells_begin(); cell!=cellend; cell++ ){
-                locateCell ( cell,index,baseIndex,flow );
-		//Fill this vector than can be later used to speedup loops
-		if (!cell->info().isGhost) Tes.cellHandles[cell->info().baseIndex]=cell;
-	}
-	Tes.cellHandles.resize(baseIndex+1);
-
+        for ( Finite_cells_iterator cell=flow -> T[flow -> currentTes].Triangulation().finite_cells_begin(); cell!=cellend; cell++ )
+                locateCell ( cell,index,flow );
 	if ( Debug ) cout << endl << "locateCell------" << endl << endl;
         flow->Compute_Permeability ( );
         porosity = flow->V_porale_porosity/flow->V_totale_porosity;
@@ -987,11 +1011,12 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero, shared_ptr<FlowSol
 	
         flow->DisplayStatistics ();
         //FIXME: check interpolate() for the periodic case, at least use the mean pressure from previous step.
-	if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], Tes );
+	if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 // 	if ( !first && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 	
-        if ( WaveAction ) flow->ApplySinusoidalPressure ( Tes.Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
+        if ( WaveAction ) flow->ApplySinusoidalPressure ( flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
         if ( viscousShear ) flow->ComputeEdgesSurfaces();
+	if ( lubrication ) flow->ComputeEdgesSurfaces();
 	if ( Debug ) cout << endl << "end buildTri------" << endl << endl;
 }
 
@@ -1006,8 +1031,6 @@ void PeriodicFlowEngine::preparePShifts()
                                               CGT::PeriodicCellInfo::hSize[1]*CGT::PeriodicCellInfo::gradP,
                                               CGT::PeriodicCellInfo::hSize[2]*CGT::PeriodicCellInfo::gradP );
 }
-
-
 
 YADE_PLUGIN ( ( PeriodicFlowEngine ) );
 
