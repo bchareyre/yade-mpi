@@ -44,7 +44,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
-		bool meanK_LIMIT, meanK_STAT, distance_correction;
+		bool clampKValues, meanKStat, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
@@ -61,21 +61,18 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
 		double K_opt_factor;
+		double minKdivKmean;
+		double maxKdivKmean;
 		int Iterations;
 
 		bool RAVERAGE;
 		int walls_id[6];
 		vector <double> Edge_Surfaces;
 		vector <pair<int,int> > Edge_ids;
-		vector <Vector3r> Edge_force_point;
-		vector <Real> Edge_dist;
 		vector <Real> Edge_HydRad;
 		vector <Vector3r> Edge_normal;
 		vector <Vector3r> viscousShearForces;
-		vector <Vector3r> normLubForce;
-
-		vector <Matrix3r> viscousBodyStress;
-		vector <Matrix3r> lubBodyStress;
+		Matrix3r viscousBulkStress;
 		void mplot ( char *filename);
 		void Localize();
 		void Compute_Permeability();
@@ -104,7 +101,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void ComputeTetrahedralForces();
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForces();
-		void ComputeFacetForcesWithCache();
+		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk ( );
 		void MGPost ( );
 #ifdef XVIEW
@@ -127,8 +124,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		
 		void ComputeEdgesSurfaces();
 		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
-		Vector3r ComputeNormalLubricationForce(Vector3r deltaNormV, Real meanRad, int edge_id);
-		Vector3r ComputeViscousLubricationBruleForce(Vector3r deltaV,Real meanRad,int edge_id);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 

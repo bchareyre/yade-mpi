@@ -33,11 +33,17 @@ class FlowEngine : public PartialEngine
 	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
 	typedef FlowSolver::Cell_handle						Cell_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
+
+
 	
 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
 		volatile bool backgroundCompleted;
+		Cell cachedCell;
+		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool exists; posData(){exists=0;}};
+		vector<posData> positionBuffer;
+		void setPositionsBuffer();
 
 	public :
 		int retriangulationLastIter;
@@ -71,12 +77,7 @@ class FlowEngine : public PartialEngine
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		TPL Vector3r fluidShearForce(unsigned int id_sph, Solver& flow) {
 			return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
-		TPL Vector3r normLubF(unsigned int id_sph, Solver& flow) {
-			return (flow->normLubForce.size()>id_sph)?flow->normLubForce[id_sph]:Vector3r::Zero();}
-		TPL Matrix3r bodyShearStress(unsigned int id_sph, Solver& flow) {
-			return (flow->viscousBodyStress.size()>id_sph)?flow->viscousBodyStress[id_sph]:Matrix3r::Zero();}
-		TPL Matrix3r lubBodyS(unsigned int id_sph, Solver& flow) {
-			return (flow->lubBodyStress.size()>id_sph)?flow->lubBodyStress[id_sph]:Matrix3r::Zero();}
+		
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -94,22 +95,24 @@ class FlowEngine : public PartialEngine
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
 		void PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
-		double MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
+		double MeasurePorePressure(Vector3r pos){return solver->MeasurePorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
+	  
+		template<class Solver>
+		Matrix3r viscousStress (Solver& flow) {return flow->viscousBulkStress;}
 				
 		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver==3) flow->exportMatrix(filename.c_str());
+			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver==3) flow->exportTriplets(filename.c_str());
+			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
 
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
-
 		//Instanciation of templates for python binding
-
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
-		Vector3r 	_normLubF(unsigned int id_sph) {return normLubF(id_sph,solver);}
-		Matrix3r 	_bodyShearStress(unsigned int id_sph) {return bodyShearStress(id_sph,solver);}
-		Matrix3r 	_lubBodyS(unsigned int id_sph) {return lubBodyS(id_sph,solver);}
 
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
@@ -119,10 +122,11 @@ class FlowEngine : public PartialEngine
 		void 		_clearImposedFlux() {clearImposedFlux(solver);}
 		void 		_updateBCs() {updateBCs(solver);}
 		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
-
-		int		_getCell(double posX, double posY, double posZ) {return getCell(posX,posY,posZ,solver);}
+		Matrix3r 	_viscousStress() {return viscousStress (solver);}
+		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
+		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
 		
-
 		virtual ~FlowEngine();
 
 		virtual void action();
@@ -155,13 +159,15 @@ class FlowEngine : public PartialEngine
 					((double, EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
 					((double, porosity, 0,,"Porosity computed at each retriangulation"))
 					((bool,compute_K,false,,"Activates permeability measure within a granular sample"))
-					((bool,meanK_correction,true,,"Local permeabilities' correction through meanK threshold"))
-					((bool,meanK_opt,false,,"Local permeabilities' correction through an optimized threshold"))
+					((bool,meanKStat,false,,"Local permeabilities' correction through an optimized threshold"))
+					((bool,clampKValues,true,,"If true, clamp local permeabilities between min/max*globalK threshold. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
+					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
+					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
 					((double,permeability_factor,0.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of fluid"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
-					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso"))
+					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
 // 					((std::string,key,"",,"A string appended at the output files, use it to name simulations."))
 					((double, V_d, 0,,"darcy velocity of fluid in sample"))
 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
@@ -192,11 +198,7 @@ class FlowEngine : public PartialEngine
 					((bool, BACK_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
 					((bool, areaR2Permeability, 1,,"Use corrected formula for permeabilities calculation in flowboundingsphere (areaR2permeability variable)"))
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
-					((bool, bruleForce, false,,"Compute viscous shear terms as developped by Brule"))
-
-					((bool, lubrication, false,,"Compute normal lubrication force"))
 					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
-
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
@@ -229,21 +231,21 @@ class FlowEngine : public PartialEngine
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("fluidShearForce",&FlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
-					.def("normLubF",&FlowEngine::_normLubF,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
-					.def("bodyShearStress",&FlowEngine::_bodyShearStress,(python::arg("Id_sph")),"Return the viscous shear stress on sphere Id_sph.")
-					.def("lubBodyS",&FlowEngine::_lubBodyS,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
 					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
-					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
+
+					.def("viscousStress",&FlowEngine::_viscousStress,"Return the bulk viscous stress ")
+					
 					.def("MeasureTotalAveragedPressure",&FlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume")
 
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-
 					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
-					.def("getCell",&FlowEngine::_getCell,(python::arg("X"),python::arg("Y"),python::arg("Z")),"get id of the cell containing (X,Y,Z).")
-
+					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
+					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
 					)
 		DECLARE_LOGGER;
 };
@@ -293,7 +295,7 @@ class PeriodicFlowEngine : public FlowEngine
 		Real Volume_cell (Cell_handle cell);
 
 		Real Volume_cell_single_fictious (Cell_handle cell);
-		inline void locateCell(Cell_handle baseCell, unsigned int& index, shared_ptr<FlowSolver>& flow, unsigned int count=0);
+		inline void locateCell(Cell_handle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count=0);
 		Vector3r meanVelocity();
 
 		python::list getConstrictionsFull() {
@@ -319,26 +321,23 @@ class PeriodicFlowEngine : public FlowEngine
 		//(re)instanciation of templates and others, for python binding
 		void saveVtk() {solver->saveVtk();}
 		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
-		Vector3r 	_normLubF(unsigned int id_sph) {return normLubF(id_sph,solver);}
-		Matrix3r 	_bodyShearStress(unsigned int id_sph) {return bodyShearStress(id_sph,solver);}
-		Matrix3r 	_lubBodyS(unsigned int id_sph) {return lubBodyS(id_sph,solver);}
 
 // 		void 		saveVtk() {solver->saveVtk();} // FIXME: need to adapt vtk recorder to periodic case
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}	
+		Matrix3r 	_viscousStress() {return viscousStress (solver);}
 			
 		void 		_updateBCs() {updateBCs(solver);}
 		double 		MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
-
 		double 		MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
 		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
-
+		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
+		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
 		
-
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 // 		Real 		_getFlux(unsigned int cond) {getFlux(cond,solver);}
@@ -357,26 +356,22 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 			.def("fluidShearForce",&PeriodicFlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
-			.def("normLubF",&PeriodicFlowEngine::_normLubF,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
-			.def("bodyShearStress",&PeriodicFlowEngine::_bodyShearStress,(python::arg("Id_sph")),"Return the viscous shear stress on sphere Id_sph.")
-			.def("lubBodyS",&PeriodicFlowEngine::_lubBodyS,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
+			.def("viscousStress",&PeriodicFlowEngine::_viscousStress,"Return the bulk viscous stress ")
 			
 			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 			.def("MeasureTotalAveragedPressure",&PeriodicFlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume") 
 			.def("PressureProfile",&PeriodicFlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-
-			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing (X,Y,Z).")
+			
+			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing 'pos'.")
 			.def("getConstrictionsFull",&PeriodicFlowEngine::getConstrictionsFull,"Get the list of constrictions (inscribed circle) for all finite facets.")
-
-// 			.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
-// 			.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
-// 			.def("getFlux",&FlowEngine::_getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+			.def("exportMatrix",&PeriodicFlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
+			.def("exportTriplets",&PeriodicFlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
 		)
 		DECLARE_LOGGER;
 

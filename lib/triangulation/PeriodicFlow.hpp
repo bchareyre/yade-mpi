@@ -21,25 +21,13 @@ namespace CGT{
 	class PeriodicFlow : public PeriodicFlowBoundingSphere
 	{
 		public:
-// 		typedef PeriFlowTesselation 				Tesselation;
-// 		typedef Tesselation::RTriangulation			RTriangulation;
-// 		typedef RTriangulation::Vertex_handle                   Vertex_handle;
-// 		typedef RTriangulation::Finite_cells_iterator		Finite_cells_iterator;
-// 		typedef RTriangulation::Cell_handle			Cell_handle;
-// 		typedef RTriangulation::Edge_iterator			Edge_iterator;
-		
-// 		using PeriodicFlowBoundingSphere::Tri;
-			
 		void Interpolate(Tesselation& Tes, Tesselation& NewTes);
-		void ComputeFacetForcesWithCache();
+		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void Compute_Permeability();
-// 		void Initialize_pressures( double P_zero );
 		void GaussSeidel(Real dt=0);
 		void DisplayStatistics();
 		void Average_Relative_Cell_Velocity();
 		void ComputeEdgesSurfaces();
-// 		double MeasureTotalAveragedPressure();
-// 		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
 	};
 }
 
