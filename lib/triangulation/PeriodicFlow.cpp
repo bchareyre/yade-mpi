@@ -448,7 +448,6 @@ void PeriodicFlow::GaussSeidel(Real dt)
 		sum_dp += std::abs(dp);
             }
         }
-<<<<<<< HEAD
         j++;
 
 // 	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
@@ -456,16 +455,6 @@ void PeriodicFlow::GaussSeidel(Real dt)
 
     } while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 
-=======
-        p_moy = sum_p/cell2;
-        dp_moy = sum_dp/cell2;
-	j++;
-// 	if (j%100==0) cerr <<"j="<<j<<" p_moy="<<p_moy<<" dp="<< dp_moy<<" p_max="<<p_max<<" dp_max="<<dp_max<<endl;
-// 	if (j>=40000) cerr<<"\r GS not converged after 40k iterations, break";
-
-    } while ((dp_max/p_max) > tolerance && j<40000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/); //while (j<2); //
-//     cerr << "j" << j << endl;
->>>>>>> afa59f1... Add the normal and tangential lubrication force
     int cel=0;
     double Pav=0;
     for (Finite_cells_iterator cell = Tri.finite_cells_begin();
