@@ -195,25 +195,18 @@ Real FlowEngine::getFlux ( unsigned int cond,Solver& flow )
 }
 
 template<class Solver>
-void FlowEngine::Build_Triangulation ( Solver& flow )
+void FlowEngine::initSolver ( Solver& flow )
 {
-        Build_Triangulation ( 0.f,flow );
-}
-template<class Solver>
-void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
-{
-        flow->ResetNetwork();
-	if (first) flow->currentTes=0;
-        else {
-                flow->currentTes=!flow->currentTes;
-                if (Debug) cout << "--------RETRIANGULATION-----------" << endl;
-        }
-
-        flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
+       	flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
         flow->SLIP_ON_LATERALS=slip_boundary;
         flow->k_factor = permeability_factor;
         flow->DEBUG_OUT = Debug;
         flow->useSolver = useSolver;
+	#ifdef EIGENSPARSE_LIB
+	flow->numSolveThreads = numSolveThreads;
+	flow->numFactorizeThreads = numFactorizeThreads;
+	#endif
+	flow->meanKStat = meanKStat;
         flow->VISCOSITY = viscosity;
         flow->areaR2Permeability=areaR2Permeability;
         flow->TOLERANCE=Tolerance;
@@ -225,6 +218,25 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         flow->T[flow->currentTes].Clear();
         flow->T[flow->currentTes].max_id=-1;
         flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
+}
+
+template<class Solver>
+void FlowEngine::Build_Triangulation ( Solver& flow )
+{
+        Build_Triangulation ( 0.f,flow );
+}
+
+template<class Solver>
+void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
+{
+        flow->ResetNetwork();
+	if (first) flow->currentTes=0;
+        else {
+                flow->currentTes=!flow->currentTes;
+                if (Debug) cout << "--------RETRIANGULATION-----------" << endl;
+        }
+
+	initSolver(flow);
 
         AddBoundary ( flow );
         Triangulate ( flow );
@@ -232,6 +244,11 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         flow->T[flow->currentTes].Compute();
 
         flow->Define_fictious_cells();
+	// For faster loops on cells define this vector
+	flow->T[flow->currentTes].cellHandles.clear();
+	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+		flow->T[flow->currentTes].cellHandles.push_back(cell);
         flow->DisplayStatistics ();
         flow->Compute_Permeability ( );
 
@@ -252,19 +269,14 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 template<class Solver>
 void FlowEngine::AddBoundary ( Solver& flow )
 {
-        shared_ptr<Sphere> sph ( new Sphere );
-        int Sph_Index = sph->getClassIndexStatic();
-
-        solver->x_min = 1000.0, solver->x_max = -10000.0, solver->y_min = 1000.0, solver->y_max = -10000.0, solver->z_min = 1000.0, solver->z_max = -10000.0;
-        FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if ( !b ) continue;
-                if ( b->shape->getClassIndex() ==  Sph_Index ) {
-                        Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
-                        //const Body::id_t& id = b->getId();
-                        Real& rad = s->radius;
-                        Real& x = b->state->pos[0];
-                        Real& y = b->state->pos[1];
-                        Real& z = b->state->pos[2];
+        flow->x_min = Mathr::MAX_REAL, flow->x_max = -Mathr::MAX_REAL, flow->y_min = Mathr::MAX_REAL, flow->y_max = -Mathr::MAX_REAL, flow->z_min = Mathr::MAX_REAL, flow->z_max = -Mathr::MAX_REAL;
+        FOREACH ( const posData& b, positionBuffer ) {
+                if ( !b.exists ) continue;
+                if ( b.isSphere ) {
+                        const Real& rad = b.radius;
+                        const Real& x = b.pos[0];
+                        const Real& y = b.pos[1];
+                        const Real& z = b.pos[2];
                         flow->x_min = min ( flow->x_min, x-rad );
                         flow->x_max = max ( flow->x_max, x+rad );
                         flow->y_min = min ( flow->y_min, y-rad );
@@ -957,29 +969,14 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero, shared_ptr<FlowSol
         if (first) flow->currentTes=0;
         else {
                 flow->currentTes=!flow->currentTes;
-                if ( Debug ) cout << "--------RETRIANGULATION-----------" << endl;
-        }
-
-        flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
-        flow->SLIP_ON_LATERALS=slip_boundary;
-        flow->k_factor = permeability_factor;
-        flow->DEBUG_OUT = Debug;
-        flow->useSolver = useSolver;
-        flow->VISCOSITY = viscosity;
-        flow->areaR2Permeability=areaR2Permeability;
-        flow->fluidBulkModulus = fluidBulkModulus;
-        flow->T[flow->currentTes].Clear();
-        flow->T[flow->currentTes].max_id=-1;
+                if ( Debug ) cout << "--------RETRIANGULATION-----------" << endl;}
+        initSolver(flow);
         AddBoundary ( flow );
         if ( Debug ) cout << endl << "Added boundaries------" << endl << endl;
         Triangulate (flow);
         if ( Debug ) cout << endl << "Tesselating------" << endl << endl;
         flow->T[flow->currentTes].Compute();
         flow->Define_fictious_cells();
-	
-        flow->meanK_LIMIT = meanK_correction;
-        flow->meanK_STAT = meanK_opt;
-        flow->permeability_map = permeability_map;
 
  	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
         for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {cell->info().dv() = 0; cell->info().p() = P_zero;}
@@ -1021,7 +1018,8 @@ void PeriodicFlowEngine::preparePShifts()
                                               CGT::PeriodicCellInfo::hSize[2]*CGT::PeriodicCellInfo::gradP );
 }
 
-YADE_PLUGIN ( ( PeriodicFlowEngine ) );
+
+YADE_PLUGIN((PeriodicFlowEngine));
 
 #endif //FLOW_ENGINE
 

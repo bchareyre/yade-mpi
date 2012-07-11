@@ -22,6 +22,7 @@ class TesselationWrapper;
 
 #define TPL template<class Solver>
 
+
 class FlowEngine : public PartialEngine
 {
 	public :
@@ -46,6 +47,7 @@ class FlowEngine : public PartialEngine
 		int id_offset;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
+		TPL void initSolver (Solver& flow);
 		TPL void Triangulate (Solver& flow);
 		TPL void AddBoundary (Solver& flow);
 		TPL void Build_Triangulation (double P_zero, Solver& flow);
@@ -126,7 +128,7 @@ class FlowEngine : public PartialEngine
 		virtual void action();
 		virtual void backgroundAction();
 
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media.\n\n.. note::\n\t Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`FlowEngine::multithread`=True with  multithread :yref:`FlowEngine::numSolveThreads`=:yref:`FlowEngine::numFactorizeThreads`=4 means that openblas will mobilize 8 processors at some point, if the system doesn't have so many procs. it will hurt performance.",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
@@ -194,6 +196,16 @@ class FlowEngine : public PartialEngine
 
 					((bool, lubrication, false,,"Compute normal lubrication force"))
 					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
+
+					#ifdef EIGENSPARSE_LIB
+					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
+					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
+					#endif
+					((Real, allDeprecs, 0,,"transitory variable: point removed attributes to this so that older scripts won't crash."))
+					,
+					/*deprec*/
+					((meanK_opt,clampKValues,"the name changed"))
+					((meanK_correction,allDeprecs,"the name changed"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
