@@ -1619,7 +1619,7 @@ template <class Tesselation>
 void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
-  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();
+  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();Edge_dist.clear();Edge_force_point.clear();
   Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {
@@ -1635,7 +1635,11 @@ void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
     Vecteur x = (ed_it->first)->vertex(ed_it->third)->point().point()- (ed_it->first)->vertex(ed_it->second)->point().point();
     Vecteur n = x / sqrt(x.squared_length());
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
+    double dist = sqrt(x.squared_length())/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*sqrt(x.squared_length()));
+    Vecteur f_int = dist * n;
+    Edge_force_point.push_back(Vector3r(f_int[0],f_int[1],f_int[2]));
     double d = x*n - radius1 - radius2;
+    Edge_dist.push_back(d);
     if (radius1<radius2)  Rh = d + 0.45 * radius1;
     else  Rh = d + 0.45 * radius2;
     Edge_HydRad.push_back(Rh);
@@ -1648,6 +1652,20 @@ Vector3r FlowBoundingSphere<Tesselation>::ComputeViscousForce(Vector3r deltaV, i
 {
     Vector3r tau = deltaV*VISCOSITY/Edge_HydRad[edge_id];
     return tau * Edge_Surfaces[edge_id];
+}
+
+template <class Tesselation> 
+Vector3r FlowBoundingSphere<Tesselation>::ComputeShearLubricationForce(Vector3r deltaV,Real meanRad,int edge_id)
+{
+    Vector3r viscLubF = 0.5*Mathr::PI * VISCOSITY * (-2*meanRad + log(1/Edge_dist[edge_id])) * deltaV;
+    return viscLubF;
+}
+
+template <class Tesselation> 
+Vector3r FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(Vector3r deltaNormV, Real meanRad, int edge_id)
+{
+    Vector3r normLubF = (1.5*Mathr::PI*pow(meanRad,2)* VISCOSITY* deltaNormV )/Edge_dist[edge_id];
+    return normLubF;
 }
 
 } //namespace CGT

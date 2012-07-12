@@ -541,8 +541,8 @@ void PeriodicFlow::Average_Relative_Cell_Velocity()
 void  PeriodicFlow::ComputeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
-  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();
-  Finite_edges_iterator ed_it;
+  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear(); Edge_force_point.clear();
+  Finite_edges_iterator ed_it;Edge_dist.clear();
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {
     Real Rh;
@@ -560,7 +560,11 @@ void  PeriodicFlow::ComputeEdgesSurfaces()
     Vecteur x = (ed_it->first)->vertex(ed_it->third)->point().point() - (ed_it->first)->vertex(ed_it->second)->point().point();
     Vecteur n = x / sqrt(x.squared_length());
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
+    double dist = sqrt(x.squared_length())/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*sqrt(x.squared_length()));
+    Vecteur f_int = dist * n;
+    Edge_force_point.push_back(Vector3r(f_int[0],f_int[1],f_int[2]));
     double d = x*n - radius1 - radius2;
+    Edge_dist.push_back(d);
     if (radius1<radius2)  Rh = d + 0.45 * radius1;
     else  Rh = d + 0.45 * radius2;
     Edge_HydRad.push_back(Rh);

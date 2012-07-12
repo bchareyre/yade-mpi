@@ -69,10 +69,15 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		int walls_id[6];
 		vector <double> Edge_Surfaces;
 		vector <pair<int,int> > Edge_ids;
+		vector <Vector3r> Edge_force_point;
+		vector <Real> Edge_dist;
 		vector <Real> Edge_HydRad;
 		vector <Vector3r> Edge_normal;
 		vector <Vector3r> viscousShearForces;
-		Matrix3r viscousBulkStress;
+		vector <Vector3r> normLubForce;
+		vector <Matrix3r> viscousBodyStress;
+		vector <Matrix3r> lubBodyStress;
+		
 		void mplot ( char *filename);
 		void Localize();
 		void Compute_Permeability();
@@ -124,6 +129,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		
 		void ComputeEdgesSurfaces();
 		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
+		Vector3r ComputeNormalLubricationForce(Vector3r deltaNormV, Real meanRad, int edge_id);
+		Vector3r ComputeShearLubricationForce(Vector3r deltaV,Real meanRad,int edge_id);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 

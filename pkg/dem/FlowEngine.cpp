@@ -74,8 +74,12 @@ void FlowEngine::action()
         for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
                 if ( !viscousShear )
                         scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) );
-                else
-                        scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id() ] );
+                else{
+			if (!normalLubrication)
+				scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id()]);
+			else
+				scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id()]+solver-> normLubForce[V_it->info().id()]);
+		}
         }
         ///End Compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
@@ -263,6 +267,7 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         if ( WaveAction ) flow->ApplySinusoidalPressure ( flow->T[flow->currentTes].Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
 
         if ( viscousShear ) flow->ComputeEdgesSurfaces();
+	if ( normalLubrication ) flow->ComputeEdgesSurfaces();
 }
 
 void FlowEngine::setPositionsBuffer()
@@ -375,6 +380,9 @@ void FlowEngine::Triangulate ( Solver& flow )
         }
         flow->T[flow->currentTes].redirected=true;//By inserting one-by-one, we already redirected
         flow->viscousShearForces.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->viscousBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->normLubForce.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->lubBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
 }
 template<class Solver>
 void FlowEngine::Initialize_volumes ( Solver& flow )
@@ -573,9 +581,10 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
         if ( Debug ) cout << "Application of viscous forces" << endl;
         if ( Debug ) cout << "Number of edges = " << flow.Edge_ids.size() << endl;
         for ( unsigned int k=0; k<flow.viscousShearForces.size(); k++ ) flow.viscousShearForces[k]=Vector3r::Zero();
-	flow.viscousBulkStress = Matrix3r::Zero();
+	for ( unsigned int k=0; k<flow.viscousBodyStress.size(); k++) flow.viscousBodyStress[k]=Matrix3r::Zero();
+	for ( unsigned int k=0; k<flow.normLubForce.size(); k++ ) flow.normLubForce[k]=Vector3r::Zero();
+	for ( unsigned int k=0; k<flow.lubBodyStress.size(); k++) flow.lubBodyStress[k]=Matrix3r::Zero();
 
-	
 	typedef typename Solver::Tesselation Tesselation;
         const Tesselation& Tes = flow.T[flow.currentTes];
 
@@ -587,7 +596,10 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                 Sphere* s2=YADE_CAST<Sphere*> ( sph2->shape.get() );
                 Vector3r x = sph2->state->pos - sph1->state->pos;
                 Vector3r n = x / sqrt(makeCgVect(x).squared_length());
-                Vector3r deltaV;
+		Vector3r deltaV; Vector3r deltaNormV;
+		Real meanRad = (s1->radius + s2->radius)/2.;
+
+		Vector3r visc_f;
                 if ( !hasFictious )
                         deltaV = (sph2->state->vel + sph2->state->angVel.cross(s2->radius * n)) - (sph1->state->vel+ sph1->state->angVel.cross(s1->radius * n));
                 else {
@@ -600,7 +612,10 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                         }
                 }
                 deltaV = deltaV - ( flow.Edge_normal[i].dot ( deltaV ) ) *flow.Edge_normal[i];
-                Vector3r visc_f = flow.ComputeViscousForce ( deltaV, i );
+		if (shearLubrication)
+			visc_f = flow.ComputeShearLubricationForce (deltaV,meanRad,i);
+		else
+			visc_f = flow.ComputeViscousForce ( deltaV, i );
 				
 //                 if ( Debug ) cout << "la force visqueuse entre " << flow->Edge_ids[i].first << " et " << flow->Edge_ids[i].second << "est " << visc_f << endl;
 
@@ -616,8 +631,22 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 		flow.viscousShearForces[flow.Edge_ids[i].first]+=visc_f;
 		flow.viscousShearForces[flow.Edge_ids[i].second]-=visc_f;
 		
-/// Calculer la contrainte visqueuse de cisaillement totale appliquée sur tout l'échantillon 
-		flow.viscousBulkStress+=flow.viscousShearForces[flow.Edge_ids[i].second] * x.transpose();
+/// Compute the viscous shear stress on each particle
+		flow.viscousBodyStress[flow.Edge_ids[i].first] += visc_f * flow.Edge_force_point[i].transpose();
+		flow.viscousBodyStress[flow.Edge_ids[i].second] -= visc_f * (x-flow.Edge_force_point[i]).transpose();
+		
+		
+/// Compute the normal lubrication force applied on each particle
+		if (normalLubrication){
+			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
+			Vector3r lub_f = flow.ComputeNormalLubricationForce (deltaNormV, meanRad, i);
+			flow.normLubForce[flow.Edge_ids[i].first]+=lub_f;
+			flow.normLubForce[flow.Edge_ids[i].second]-=lub_f;
+		
+/// Compute the normal lubrication stress on each particle
+			flow.lubBodyStress[flow.Edge_ids[i].first] += lub_f * flow.Edge_force_point[i].transpose();
+			flow.lubBodyStress[flow.Edge_ids[i].second] -= lub_f *(x-flow.Edge_force_point[i]).transpose();
+		}
 		
 	}
         if(Debug) cout<<"number of viscousShearForce"<<flow.viscousShearForces.size()<<endl;
@@ -670,8 +699,12 @@ void PeriodicFlowEngine:: action()
 		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
 		if (!viscousShear)
                         scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) );
-                else
-			scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()] );
+                else{
+			if (!normalLubrication)
+			  scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()]);
+			else
+				scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()]+solver->normLubForce[v_info.id()] );
+		}
 	}
         ///End Compute flow and forces
 	timingDeltas->checkpoint("Applying Forces");
@@ -763,6 +796,9 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
         }
         Tes.redirected=true;//By inserting one-by-one, we already redirected
         flow -> viscousShearForces.resize ( Tes.max_id+1 );
+	flow -> viscousBodyStress.resize ( Tes.max_id+1 );
+	flow -> normLubForce.resize ( Tes.max_id+1 );
+	flow -> lubBodyStress.resize ( Tes.max_id+1 );
 }
 
 
@@ -975,6 +1011,7 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero, shared_ptr<FlowSol
 	
         if ( WaveAction ) flow->ApplySinusoidalPressure ( Tes.Triangulation(), Sinus_Amplitude, Sinus_Average, 30 );
         if ( viscousShear ) flow->ComputeEdgesSurfaces();
+	if ( normalLubrication ) flow->ComputeEdgesSurfaces();
 	if ( Debug ) cout << endl << "end buildTri------" << endl << endl;
 }
 
