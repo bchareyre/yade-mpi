@@ -5,8 +5,6 @@ sp=pack.SpherePack()
 ## corners of the initial packing
 mn,mx=Vector3(0,0,0),Vector3(10,10,10)
 
-# makeCloud parameters "documented" only by the argument names in the c++ signature now:
-# http://beta.arcig.cz/~eudoxos/yade/epydoc/yade._packSpheres.SpherePack-class.html#makeCloud
 ## box between mn and mx, avg radius ± ½(20%), 2k spheres
 sp.makeCloud(minCorner=mn,maxCorner=mx,rRelFuzz=.2,num=2000)
 
