@@ -26,7 +26,7 @@ Starting yade
 Yade is being run primarily from terminal; the name of command is ``yade``. [#f1]_ (In case you did not install from package, you might need to give specific path to the command [#fcmd]_ )::
 
 	\$ yade
-	Welcome to Yade bzr1984
+	Welcome to Yade
 	TCP python prompt on localhost:9001, auth cookie `sdksuy'
 	TCP info provider on localhost:21000
 	[[ ^L clears screen, ^U kills line. F12 controller, F11 3d view, F10 both, F9 generator, F8 plot. ]]
@@ -34,7 +34,6 @@ Yade is being run primarily from terminal; the name of command is ``yade``. [#f1
 
 These initial lines give you some information about
 
-* version (``bzr1984``); always state this version you use if you seek help in the community or report bug;
 * some information for :ref:`remoteaccess`, which you are unlikely to need now;
 * basic help for the command-line that just appeared (``Yade [1]:``).
 
@@ -49,7 +48,7 @@ Typically, you will not type Yade commands by hand, but use *scripts*, python pr
 Saving such script as ``hello.py``, it can be given as argument to yade::
 
 	\$ yade hello.py
-	Welcome to Yade bzr1986
+	Welcome to Yade
 	TCP python prompt on localhost:9001, auth cookie `askcsu'
 	TCP info provider on localhost:21000
 	Running script hello.py                                           ## the script is being run

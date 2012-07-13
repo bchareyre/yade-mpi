@@ -58,7 +58,7 @@ def yaderef_role(role,rawtext,text,lineno,inliner,options={},content=[]):
 	return [mkYrefNode(id,txt,rawtext,role,explicitText,lineno,options)],[]
 
 def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
-	"Handle the :ysrc:`` role, making hyperlink to bzr repository webpage with that path. Supports :ysrc:`Link text<file/name>` syntax, like usual hyperlinking roles. If target ends with ``/``, it is assumed to be a directory."
+	"Handle the :ysrc:`` role, making hyperlink to git repository webpage with that path. Supports :ysrc:`Link text<file/name>` syntax, like usual hyperlinking roles. If target ends with ``/``, it is assumed to be a directory."
 	id=rawtext.split(':',2)[2][1:-1]
 	txt=id
 	m=re.match('(.*)\s*<(.*)>\s*',id)

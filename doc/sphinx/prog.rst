@@ -331,14 +331,6 @@ Some c++ might have long or content-rich documentation, which is rather inconven
 
 .. note:: Boost::python embeds function signatures in the docstring (before the one provided by the user). Therefore,  before creating separate documentation of your function, have a look at its ``__doc__`` attribute and copy the first line (and the blank lie afterwards) in the separate docstring. The first line is then used to create the function signature (arguments and return value).
 
-Local documentation
-^^^^^^^^^^^^^^^^^^^
-
-.. note:: At some future point, this documentation will be integrated into yade's sources. This section should be updated accordingly in that case.
-
-To generate Yade's documentation locally, get a copy of the `ydoc branch <https://launchpad.net/~eudoxos/+junk/ydoc/>`_ via bzr, then follow instructions in the `README <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc/annotate/head%3A/README>`_ file.
-
-
 
 Internal c++ documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

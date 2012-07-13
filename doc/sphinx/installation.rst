@@ -132,7 +132,7 @@ should have root privileges
 		boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
 		python-devel boost-python ipython python-matplotlib \
 		sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
-		graphviz-python vtk-devel ScientificPython bzr bzrtools eigen2-devel libQGLViewer-devel \
+		graphviz-python vtk-devel ScientificPython eigen2-devel libQGLViewer-devel \
 		loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging python-sphinx python-bibtex
 
 
