@@ -7,12 +7,6 @@ The choice depends on what you need: if you don't plan to modify Yade itself,
 package installation is easier. In the contrary case, you must download and 
 install source code.
 
-Since 2011 Yade persists in Ubuntu and Debian main repositories.
-There are only stable releases are placed.
-Please, consider installing them::
-
-	sudo apt-get install yade
-
 Packages
 ----------
 
@@ -43,12 +37,13 @@ the updates of the package, when they arrive the PPA.
 More detailed instructions are available at the corresponding pages of 
 ppa`s (links above).
 
-Ubuntu versions (starting from 11.10, Oneiric) and Debian (starting from Wheezy) 
-are having already yade in their main archives. To install the program, run the following::
+Since 2011 all Ubuntu versions (starting from 11.10, Oneiric) and Debian (starting from Wheezy) 
+are having already Yade in their main repositories. There are only stable releases are placed.
+To install the program, run the following::
 
 	sudo apt-get install yade
 
-To check, what versions of yade are in specific Distributions, check the links
+To check, what version of Yade is in specific Distribution, check the links
 for `Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ and 
 `Debian <http://packages.qa.debian.org/y/yade.html>`_.
 
