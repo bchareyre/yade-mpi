@@ -180,6 +180,8 @@ Installing performs with the following command::
 
 	make install
 
+The "install" command will in fact also recompile if source files have been modified. Hence there is no absolute need to type the two commands separately.
+
 The compilation process can take a long time, be patient. An additional
 parameter on many cores systems ``-j`` can be added to decrease compilation time
 and split the compilation on many cores. For example, on 4-core machines

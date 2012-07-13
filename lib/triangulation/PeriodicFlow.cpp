@@ -16,10 +16,12 @@ namespace CGT {
 void PeriodicFlow::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
         Cell_handle old_cell;
-        RTriangulation& NewTri = NewTes.Triangulation();
+//         RTriangulation& NewTri = NewTes.Triangulation();
         RTriangulation& Tri = Tes.Triangulation();
-        Finite_cells_iterator cell_end = NewTri.finite_cells_end();
-        for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
+//         Finite_cells_iterator cell_end = NewTri.finite_cells_end();
+	for (Vector_Cell::iterator cell_it=NewTes.cellHandles.begin(); cell_it!=NewTes.cellHandles.end(); cell_it++){
+		Cell_handle& new_cell = *cell_it;
+//         for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
 		if (new_cell->info().Pcondition || new_cell->info().isGhost) continue;
 		Vecteur center ( 0,0,0 );
 		if (new_cell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(new_cell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
@@ -54,15 +56,26 @@ void PeriodicFlow::ComputeFacetForcesWithCache(bool onlyCache)
 		if (noCache) {oldForces[v->info().id()]=nullVect; v->info().forces=nullVect;}
 		else {oldForces[v->info().id()]=v->info().forces; v->info().forces=nullVect;}
 	}
-
+// 	#ifdef EIGENSPARSE_LIB
+// 	typedef Eigen::Triplet<double> ETriplet;
+// 	std::vector<ETriplet> tripletList;//The list of non-zero components in Eigen sparse matrix
+// 	std::vector<ETriplet> shiftsList;//The list of non-zero components in Eigen sparse matrix
+// 	std::vector<ETriplet> FRHSList;//The list of non-zero components in Eigen sparse matrix
+// 	unsigned int nPCells=0;
+// 	#endif
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
+	
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-	if (noCache) for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+	if (noCache) {
+		for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
 		Cell_handle& cell = *cell_it;
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
+// 				#ifdef EIGENSPARSE_LIB
+// 				if (!cell->info().Pcondition) ++nPCells;
+// 				#endif
 				neighbour_cell = cell->neighbor(j);
 				const Vecteur& Surfk = cell->info().facetSurfaces[j];
 				//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
@@ -90,9 +103,57 @@ void PeriodicFlow::ComputeFacetForcesWithCache(bool onlyCache)
 					}
 				}
 			}
+// 			#ifdef EIGENSPARSE_LIB //Problem:
+// 			for (int jj=0; jj<4; jj++) if (!Tri.is_infinite(cell->neighbor(jj))) {
+// 					for (unsigned int dim=0; dim<3; dim++) {
+// 						if (!cell->info().Pcondition) {
+// 							tripletList.push_back(ETriplet(
+// 							3*cell->vertex(jj)->info().id()+dim,
+// 							cell->info().index-1,
+// 							cell->info().unitForceVectors[jj][dim]));
+// 
+// 							if (cell->vertex(jj)->info().period[dim])
+// 								shiftsList.push_back(ETriplet(
+// 								3*cell->vertex(jj)->info().id()+dim,
+// 								0,
+// 								cell->vertex(jj)->info().period[dim]));
+// 						} else {
+// 							FRHSList.push_back(ETriplet(
+// 							3*cell->vertex(jj)->info().id()+dim,
+// 							0,
+// 							cell->info().unitForceVectors[jj][dim]*cell->info().p()));
+// 						}
+// 					}
+// 			}
+// 			#endif
 	}
+
+// 	#ifdef EIGENSPARSE_LIB
+// 	cerr<<"set triplets"<<endl;
+// 	FIntegral.resize(Tri.number_of_vertices()*3,nPCells);
+// 	PshiftsInts.resize(Tri.number_of_vertices()*3,3);
+// 	FRHS.resize(Tri.number_of_vertices()*3,1);
+// 
+// 	FIntegral.setFromTriplets(tripletList.begin(),tripletList.end());
+// 	PshiftsInts.setFromTriplets(shiftsList.begin(),shiftsList.end());
+// 	FRHS.setFromTriplets(FRHSList.begin(),FRHSList.end());
+// 
+// 	Vector3r pDelts;
+// 	for (unsigned int k=0; k<3;k++) pDelts(k) = PeriodicCellInfo::hSize[k]*PeriodicCellInfo::gradP;
+// 	Eigen::MatrixXd p(nPCells,1);
+// 	for (Vector_Cell::iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++)
+// 	{
+// 		if (!(*cell_it)->info().Pcondition) p[(*cell_it)->info().index-1]=(*cell_it)->info().p();
+// 	}
+// 	forces.resize(Tri.number_of_vertices()*3);
+// 	cerr<<"compute and display forces"<<endl;
+// 	forces = FIntegral * p;
+// 	for (int jj=0;jj<30;jj++) cerr <<"force: "<<forces(3*jj)<<" "<<forces(3*jj+1)<<" "<<forces(3*jj+2)<<endl;
+// 	#endif
 	noCache=false;//cache should always be defined after execution of this function
 	if (onlyCache) return;
+	}// end if(noCache)
+	
 	//use cached values
 	//First define products that will be used below for all cells:
 	Real pDeltas [3];

@@ -112,7 +112,7 @@ public:
 	Finite_edges_iterator facet_it;
 	MicroMacroAnalyser mma;
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere. Example script :\n\n tt=TriaxialTest()\n\ntt.generate('test.xml')\n\nO.load('test.xml')\n\nO.run(100)\n\nTW=TesselationWrapper()\n\nTW.triangulate() //compute regular Delaunay triangulation, don't construct tesselation\n\nTW.computeVolumes() //will silently tesselate the packing\n\nTW.volume(10) //get volume associated to sphere of id 10",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities: currently volume, porosity and local deformation for each sphere. The calculation of microstrain is using a definition similar to the one of  [Calvetti1997]_ or [Bagi2006]_\n\nSee example usage in script example/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",
 	((unsigned int,n_spheres,0,,"|ycomp|"))
 	,/*ctor*/
   	Tes = new Tesselation;
