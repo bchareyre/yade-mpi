@@ -242,8 +242,6 @@ As much as it is meaningful, you should also
 * provide a simple python script demonstrating the new functionality in ``scripts/test``.
 
 
-Historically, Yade was using Doxygen for in-source documentation. This documentation is still available (by running ``scons doc``), but was rarely written and used by programmers, and had all the disadvantages of auto-generated documentation. Then, as Python became ubiquitous in yade, python was documented using epydoc generator. Finally, hand-written documentation (this one) started to be written using `Sphinx <http://sphinx.pocoo.org>`__, which was developed originally for documenting Python itself. Disadvantages of the original scatter were different syntaxes, impossibility for cross-linking, non-interactivity and frequently not being up-to-date.
-
 .. _sphinxdocumentation:
 
 Sphinx documentation
