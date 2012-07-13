@@ -69,17 +69,15 @@ void FlowEngine::action()
 	timingDeltas->checkpoint ( "forces.sync()" );
 	if ( viscousShear ) ApplyViscousForces ( *solver );
 	timingDeltas->checkpoint ( "viscous forces" );
-	
+	Vector3r Force;
         Finite_vertices_iterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
         for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
-                if ( !viscousShear )
-                        scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) );
-                else{
-			if (!normalLubrication)
-				scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id()]);
-			else
-				scene->forces.addForce ( V_it->info().id(), Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] ) +solver->viscousShearForces[V_it->info().id()]+solver-> normLubForce[V_it->info().id()]);
-		}
+		Force = Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] );
+                if (viscousShear)
+			Force = Force + solver->viscousShearForces[V_it->info().id()];
+		if (normalLubrication)
+			Force = Force + solver-> normLubForce[V_it->info().id()];
+		scene->forces.addForce ( V_it->info().id(), Force);
         }
         ///End Compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
@@ -692,19 +690,17 @@ void PeriodicFlowEngine:: action()
         scene->forces.sync();
         if ( viscousShear ) ApplyViscousForces(*solver);
 	timingDeltas->checkpoint("Compute_Viscous_Forces");
-	
+	Vector3r Force;
 	const Tesselation& Tes = solver->T[solver->currentTes];
 	for (int id=0; id<=Tes.max_id; id++){
 		assert (Tes.vertexHandles[id] != NULL);
 		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
-		if (!viscousShear)
-                        scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) );
-                else{
-			if (!normalLubrication)
-			  scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()]);
-			else
-				scene->forces.addForce ( v_info.id(), Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] ) +solver->viscousShearForces[v_info.id()]+solver->normLubForce[v_info.id()] );
-		}
+		Force = Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] );
+                if (viscousShear)
+			Force = Force +solver->viscousShearForces[v_info.id()];
+		if (normalLubrication)
+			Force = Force +solver->normLubForce[v_info.id()];
+		scene->forces.addForce ( v_info.id(), Force);
 	}
         ///End Compute flow and forces
 	timingDeltas->checkpoint("Applying Forces");

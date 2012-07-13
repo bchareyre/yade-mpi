@@ -75,13 +75,13 @@ class FlowEngine : public PartialEngine
 		TPL Real getFlux(unsigned int cond,Solver& flow);
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-		TPL Vector3r fluidShearForce(unsigned int id_sph, Solver& flow) {
+		TPL Vector3r shearLubForce(unsigned int id_sph, Solver& flow) {
 			return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
-		TPL Vector3r normLubF(unsigned int id_sph, Solver& flow) {
+		TPL Vector3r normalLubForce(unsigned int id_sph, Solver& flow) {
 			return (flow->normLubForce.size()>id_sph)?flow->normLubForce[id_sph]:Vector3r::Zero();}
-		TPL Matrix3r bodyShearStress(unsigned int id_sph, Solver& flow) {
+		TPL Matrix3r bodyShearLubStress(unsigned int id_sph, Solver& flow) {
 			return (flow->viscousBodyStress.size()>id_sph)?flow->viscousBodyStress[id_sph]:Matrix3r::Zero();}
-		TPL Matrix3r lubBodyS(unsigned int id_sph, Solver& flow) {
+		TPL Matrix3r bodyNormalLubStress(unsigned int id_sph, Solver& flow) {
 			return (flow->lubBodyStress.size()>id_sph)?flow->lubBodyStress[id_sph]:Matrix3r::Zero();}
 		
 		template<class Cellhandle>
@@ -114,10 +114,10 @@ class FlowEngine : public PartialEngine
 			scene = Omega::instance().getScene().get();
 			action();}
 		//Instanciation of templates for python binding
-		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
-		Vector3r 	_normLubF(unsigned int id_sph) {return normLubF(id_sph,solver);}
-		Matrix3r 	_bodyShearStress(unsigned int id_sph) {return bodyShearStress(id_sph,solver);}
-		Matrix3r 	_lubBodyS(unsigned int id_sph) {return lubBodyS(id_sph,solver);}
+		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
+		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
+		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
+		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
@@ -236,10 +236,10 @@ class FlowEngine : public PartialEngine
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
-					.def("fluidShearForce",&FlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
-					.def("normLubF",&FlowEngine::_normLubF,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
-					.def("bodyShearStress",&FlowEngine::_bodyShearStress,(python::arg("Id_sph")),"Return the viscous shear stress on sphere Id_sph.")
-					.def("lubBodyS",&FlowEngine::_lubBodyS,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
+					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
+					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
+					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
+					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
 					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
@@ -325,10 +325,10 @@ class PeriodicFlowEngine : public FlowEngine
 		
 		//(re)instanciation of templates and others, for python binding
 		void saveVtk() {solver->saveVtk();}
-		Vector3r 	_fluidShearForce(unsigned int id_sph) {return fluidShearForce(id_sph,solver);}
-		Vector3r 	_normLubF(unsigned int id_sph) {return normLubF(id_sph,solver);}
-		Matrix3r 	_bodyShearStress(unsigned int id_sph) {return bodyShearStress(id_sph,solver);}
-		Matrix3r 	_lubBodyS(unsigned int id_sph) {return lubBodyS(id_sph,solver);}
+		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
+		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
+		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
+		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
 
 // 		void 		saveVtk() {solver->saveVtk();} // FIXME: need to adapt vtk recorder to periodic case
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
@@ -362,10 +362,10 @@ class PeriodicFlowEngine : public FlowEngine
 			,
 			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
-			.def("fluidShearForce",&PeriodicFlowEngine::_fluidShearForce,(python::arg("Id_sph")),"Return the viscous shear force on sphere Id_sph.")
-			.def("normLubF",&PeriodicFlowEngine::_normLubF,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
-			.def("bodyShearStress",&PeriodicFlowEngine::_bodyShearStress,(python::arg("Id_sph")),"Return the viscous shear stress on sphere Id_sph.")
-			.def("lubBodyS",&PeriodicFlowEngine::_lubBodyS,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
+			.def("shearLubForce",&PeriodicFlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
+			.def("normalLubForce",&PeriodicFlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
+			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
+			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
