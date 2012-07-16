@@ -84,6 +84,7 @@ class Body: public Serializable{
 		((shared_ptr<Bound>,bound,,,":yref:`Bound`, approximating volume for the purposes of collision detection."))
 		((MapId2IntrT,intrs,,Attr::hidden,"Map from otherId to Interaction with otherId, managed by InteractionContainer. NOTE: (currently) does not contain all interactions with this body (only those where otherId>id), since performance issues with such data duplication have not yet been investigated."))
 		((int,clumpId,Body::ID_NONE,Attr::readonly,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\nNot meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead."))
+		((long,chainId,-1,,"Id of chain to which the body belongs."))
 		((long,iterBorn,-1,,"Step number at which the body was added to simulation."))
 		((Real,timeBorn,-1,,"Time at which the body was added to simulation.")),
 		/* ctor */,
@@ -99,6 +100,7 @@ class Body: public Serializable{
 		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise.")
 		.add_property("iterBorn",&Body::iterBorn,"Returns step number at which the body was added to simulation.")
 		.add_property("timeBorn",&Body::timeBorn,"Returns time at which the body was added to simulation.")
+		.add_property("chainId",&Body::chainId,"Returns Id of chain to which the body belongs.")
 		.def("intrs",&Body::py_intrs,"Return all interactions in which this body participates.")
 	);
 };
