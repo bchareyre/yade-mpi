@@ -170,7 +170,14 @@ void InteractionContainer::preLoad(InteractionContainer&){ interaction.clear(); 
 void InteractionContainer::postLoad__calledFromScene(const shared_ptr<BodyContainer>& bb){
 	bodies=&bb->body; // update the internal pointer
 	clear();
-	FOREACH(const shared_ptr<Interaction>& I, interaction){ insert(I); }
+	FOREACH(const shared_ptr<Interaction>& I, interaction){ 
+		Body::id_t id1=I->getId1(), id2=I->getId2();
+		if (!(*bodies)[id1] || !(*bodies)[id2]) {
+			return;
+		} else {
+			insert(I);
+		}
+	}
 	interaction.clear();
 }
 
