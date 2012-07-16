@@ -20,5 +20,6 @@ void SimulationFlow::singleAction()
 	if(scene->subStepping) { LOG_INFO("Sub-stepping disabled when running simulation continuously."); scene->subStepping=false; }
 	scene->moveToNextTimeStep();
 	if(scene->stopAtIter>0 && scene->iter==scene->stopAtIter) setTerminate(true);
+	if(scene->stopAtTime>0 && scene->time==scene->stopAtTime) setTerminate(true);
 };
 

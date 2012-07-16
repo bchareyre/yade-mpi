@@ -83,11 +83,7 @@ class Scene: public Serializable{
 		((Real,time,0,Attr::readonly,"Simulation time (virtual time) [s]"))
 		((Real,speed,0,Attr::readonly,"Current calculation speed [iter/s]"))
 		((long,stopAtIter,0,,"Iteration after which to stop the simulation."))
-		#if 0
-			// not yet implemented
-			((Real,stopAtTime,0,,"Time at which to stop the simulation"))
-			((Real,stopAtRealTime,0,,"Time at which to stop the simulation"))
-		#endif
+		((Real,stopAtTime,0,,"Time after which to stop the simulation"))
 		((bool,isPeriodic,false,Attr::readonly,"Whether periodic boundary conditions are active."))
 		((bool,trackEnergy,false,Attr::readonly,"Whether energies are being traced."))
 		((bool,doSort,false,Attr::readonly,"Used, when new body is added to the scene."))
