@@ -261,7 +261,7 @@ def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	b.mask=mask
 	return b
 
-def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1):
+def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
 	"""Create facet with given parameters.
 
 	:param [Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
@@ -277,6 +277,7 @@ def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound,pos=center,fixed=fixed)
 	b.aspherical=False # mass and inertia are 0 anyway; fell free to change to ``True`` if needed
 	b.mask=mask
+	b.chain=chain
 	return b
 	
 def facetBox(*args,**kw):
