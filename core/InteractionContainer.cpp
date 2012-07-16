@@ -2,6 +2,7 @@
 // 2009,2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #include "InteractionContainer.hpp"
+#include "Scene.hpp"
 
 #ifdef YADE_OPENMP
 	#include<omp.h>
@@ -17,11 +18,15 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	assert((Body::id_t)bodies->size()>id1); assert((Body::id_t)bodies->size()>id2); // the bodies must exist already
 	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
 	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
-	//assert(linIntrs.size()==currSize);
+	
 	linIntrs.resize(++currSize); // currSize updated
-	//assert(linIntrs.size()==currSize);
 	linIntrs[currSize-1]=i; // assign last element
 	i->linIx=currSize-1; // store the index back-reference in the interaction (so that it knows how to erase/move itself)
+	
+	const shared_ptr<Scene>& scene=Omega::instance().getScene(); 
+	i->iterBorn=scene->iter;
+	i->timeBorn=scene->time;
+	
 	return true;
 }
 

@@ -49,13 +49,15 @@ class Interaction: public Serializable{
 			
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
 		((Body::id_t,id1,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
-		((Body::id_t,id2,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
+		((Body::id_t,id2,0,Attr::readonly,":yref:`Id<Body::id>` of the second body in this interaction."))
 		((long,iterMadeReal,-1,,"Step number at which the interaction was fully (in the sense of geom and phys) created. (Should be touched only by :yref:`IPhysDispatcher` and :yref:`InteractionLoop`, therefore they are made friends of Interaction"))
 		((long,iterLastSeen,-1,(Attr::noSave|Attr::hidden),"At which step this interaction was last detected by the collider. InteractionLoop will remove it if InteractionContainer::iterColliderLastRun==scene->iter, InteractionContainer::iterColliderLastRun is positive (some colliders manage interaction deletion themselves, such as :yref:`InsertionSortCollider`) and iterLastSeen<scene->iter."))
 		((shared_ptr<IGeom>,geom,,,"Geometry part of the interaction."))
 		((shared_ptr<IPhys>,phys,,,"Physical (material) part of the interaction."))
 		((Vector3i,cellDist,Vector3i(0,0,0),,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have thepriod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)"))
 		((int,linIx,-1,(Attr::noSave|Attr::hidden),"Index in the linear interaction container. For internal use by InteractionContainer only."))
+		((long,iterBorn,-1,,"Step number at which the interaction was added to simulation."))
+		((Real,timeBorn,-1,,"Time at which the interaction was added to simulation."))
 		,
 		/* ctor */ init(),
 		/*py*/
