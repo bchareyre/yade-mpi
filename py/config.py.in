@@ -21,7 +21,7 @@ sourceRoot='${sourceRoot}'
 
 # project metadata
 metadata=dict(
-	short_desc='open-source platform for dynamic computations%s'%(' (debugging version)' if debug else ''),
+	short_desc='open-source platform for dynamic computations',
 	long_desc='Extensible open-source framework for discrete numerical models, focused on Discrete Element Method. The computation parts are written in c++ using flexible object model, allowing independent implementation of new alogrithms and interfaces. Python is used for rapid and concise scene construction, simulation control, postprocessing and debugging.\n\n\n\nSee http://www.yade-dem.org/ for documentation and http://www.launchpad.net/yade for the project itself.\n\nThis is version %s with features %s.'%(version,','.join(features)),
 	author='Yade Developers Team',
 	website='http://www.yade-dem.org',

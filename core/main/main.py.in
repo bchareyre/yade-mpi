@@ -12,19 +12,14 @@ libPATH='${LIBRARY_OUTPUT_PATH}'
 if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
 
 ## find available builds
-nonDebugLibDir=prefix+'/'+libPATH+'/yade'+suffix
-debugLibDir=nonDebugLibDir+'/dbg'
-hasDebug,hasNonDebug=os.path.exists(debugLibDir+'/py/yade/__init__.py'),os.path.exists(nonDebugLibDir+'/py/yade/__init__.py')
-if hasDebug and hasNonDebug: buildsAvailable='both non-debug and debug build'
-elif hasDebug and not hasNonDebug: buildsAvailable='debug build only'
-elif not hasDebug and hasNonDebug: buildsAvailable='non-debug build only'
-else:
-	raise RuntimeError('Neither non-debug nor debug build found! ('+nonDebugLibDir+'/py/yade/__init__.py, '+debugLibDir+'/py/yade/__init__.py)')
+libDir=prefix+'/'+libPATH+'/yade'+suffix
+if not (os.path.exists(libDir+'/py/yade/__init__.py')):
+	raise RuntimeError('Libraries are not found! ('+libDir+'/py/yade/__init__.py, /py/yade/__init__.py)')
 
 
 # handle command-line options first
 import optparse
-par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog=os.path.basename(sys.argv[0]),version='%s (%s; %s)'%(version,','.join(features),buildsAvailable),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s, %s)."%(version,','.join(features),buildsAvailable))
+par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog=os.path.basename(sys.argv[0]),version='%s (%s)'%(version,','.join(features)),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s)."%(version,','.join(features)))
 par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
 par.add_option('--cores',help='Set number of OpenMP threads (as \-\-threads) and in addition set affinity of threads to the cores given.',dest='cores',type='string')
 par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
@@ -35,32 +30,9 @@ par.add_option('--generate-manpage',help="Generate man page documenting this pro
 par.add_option('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
 par.add_option('--checks',help='Run a series of user-defined check tests as described in ${sourceRoot}/scripts/checks-and-tests/checks/README',dest='checks',action='store_true')
 par.add_option('--performance',help='Starts a test to measure the productivity',dest='performance',action='store_true')
-par.add_option('--no-gdb',help='Do not show backtrace when yade crashes (only effective with \-\-debug).',dest='noGdb',action='store_true',)
 par.disable_interspersed_args()
 
 opts,args=par.parse_args()
-
-# re-build yade so that the binary is up-to-date
-if opts.rebuild:
-	import subprocess
-	# rebuild
-	sourceRoot,profile='${sourceRoot}','${profile}' # replaced at install-time
-	cmd=['scons','-Q','-C',sourceRoot,'profile=%s!'%profile,'debug=%d'%(1 if opts.debug else 0),'execCheck=%s'%(prefix+'/bin/yade'+suffix)]
-	print 'Rebuilding yade using',' '.join(cmd)
-	if subprocess.call(cmd): raise RuntimeError('Error rebuilding Yade (--rebuild).')
-	# run ourselves
-	argv=[v for v in sys.argv if v!='--rebuild']
-	print 'Running yade using',' '.join(argv)
-	sys.exit(subprocess.call(argv))
-
-if opts.debug:
-	if not hasDebug:
-		raise RuntimeError('Debug build not available (run without --debug, or try --debug --rebuild)')
-	libDir=debugLibDir
-else:
-	if not hasNonDebug:
-		print 'WARNING: non-debug build not available, running with --debug instead (try --rebuild to get the non-debug build).'
-	libDir=nonDebugLibDir
 
 ## remove later
 ## python2.5 relative module imports workaround
@@ -107,7 +79,7 @@ if opts.cores:
 elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
 
-sys.stderr.write('Welcome to Yade '+version+'%s\n'%(' (debug build)' if opts.debug else ''))
+sys.stderr.write('Welcome to Yade '+version+'%s\n')
 
 # initialization and c++ plugins import
 import yade
@@ -129,7 +101,6 @@ if opts.manpage:
 	sys.exit(0)
 if opts.nice:
 	os.nice(opts.nice)
-if yade.config.debug and opts.noGdb:
 	yade.wrapper.Omega().disableGdb()
 
 # modify sys.argv in-place so that it can be handled by userSession
