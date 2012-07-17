@@ -57,7 +57,6 @@ class Interaction: public Serializable{
 		((Vector3i,cellDist,Vector3i(0,0,0),,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have thepriod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)"))
 		((int,linIx,-1,(Attr::noSave|Attr::hidden),"Index in the linear interaction container. For internal use by InteractionContainer only."))
 		((long,iterBorn,-1,,"Step number at which the interaction was added to simulation."))
-		((Real,timeBorn,-1,,"Time at which the interaction was added to simulation."))
 		,
 		/* ctor */ init(),
 		/*py*/

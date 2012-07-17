@@ -25,7 +25,6 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	
 	const shared_ptr<Scene>& scene=Omega::instance().getScene(); 
 	i->iterBorn=scene->iter;
-	i->timeBorn=scene->time;
 	
 	return true;
 }
