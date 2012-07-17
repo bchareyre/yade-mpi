@@ -82,14 +82,9 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	                        unsetting the DISPLAY environment variable)
 	  --generate-manpage=FILE
 	                        Generate man page documenting this program and exit
-	  --rebuild             Re-run build in the source directory, then run the
-	                        updated yade with the same command line except
-	                        \-\-rebuild. The build profile for this build (deb)
-	                        and its stored parameters will be used.
 	  --test                Run regression test suite and exit; the exists status
 	                        is 0 if all tests pass, 1 if a test fails and 2 for an
 	                        unspecified exception.
-	  --debug               Run the debug build, if available.
 	  --checks              Run a series of user-defined check tests as described
 	                        in /build/buildd/yade-
 	                        daily-1+3021+27~lucid1/scripts/test/checks/README

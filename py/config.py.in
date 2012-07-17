@@ -7,12 +7,11 @@ Template file is processed by scons to create the actual configuration at build-
 import os,datetime,os.path
 prefix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX']
 suffix='${SUFFIX}'
-debug=bool(${debug})
 
 libPATH='${LIBRARY_OUTPUT_PATH}'
 if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
 
-libDir=os.path.abspath(prefix+'/'+libPATH+'/yade${SUFFIX}'+('/dbg' if debug else ''))
+libDir=os.path.abspath(prefix+'/'+libPATH+'/yade${SUFFIX}')
 confDir=os.environ['HOME']+'/.yade${SUFFIX}'
 libstdcxx='${libstdcxx}'
 features='${features}'.split(',')
