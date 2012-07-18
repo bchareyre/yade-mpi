@@ -828,3 +828,11 @@ py::list Shop::getStressLWForEachBody(bool revertSign){
 // 	return py::make_tuple(bStresses);
 }
 
+void Shop::calm(const shared_ptr<Scene>& _scene, int mask){
+	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
+	FOREACH(shared_ptr<Body> b, *scene->bodies){
+		b->state->vel=Vector3r::Zero();
+		b->state->angVel=Vector3r::Zero();
+		b->state->angMom=Vector3r::Zero();
+	}
+}

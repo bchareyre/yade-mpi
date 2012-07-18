@@ -444,6 +444,8 @@ Real shiftBodies(py::list ids, const Vector3r& shift){
 	return 1;
 }
 
+void Shop__calm(int mask=-1){ return Shop::calm(Omega::instance().getScene(), mask=mask);}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -495,4 +497,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("getStress",Shop::getStress,(py::args("volume")=0),"Compute and return Love-Weber stress tensor:\n\n $\\sigma_{ij}=\\frac{1}{V}\\sum l_i f_j^k$, where the sum is over all interactions, with $l$ the branch vector (joining centers of the bodies) and $f$ is the contact force. $V$ can be passed to the function. If it is not, it will be equal to one in non-periodic cases, or equal to the volume of the cell in periodic cases.");
 	py::def("maxOverlapRatio",maxOverlapRatio,"Return maximum overlap ration in interactions (with :yref:`ScGeom`) of two :yref:`spheres<Sphere>`. The ratio is computed as $\\frac{u_N}{2(r_1 r_2)/r_1+r_2}$, where $u_N$ is the current overlap distance and $r_1$, $r_2$ are radii of the two spheres in contact.");
 	py::def("shiftBodies",shiftBodies,(py::arg("ids"),py::arg("shift")),"Shifts bodies listed in ids without updating their velocities.");
+	py::def("calm",Shop__calm,(py::arg("mask")=-1),"Set translational and rotational velocities of all bodies to zero.");
 }

@@ -131,4 +131,7 @@ class Shop{
 		//! Function to compute fabric tensor of periodic cell
 		static void fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, Matrix3r& fabricWeak, bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN);
 		static py::tuple fabricTensor(bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN);
+		
+		//! Function to set translational and rotational velocities of all bodies to zero
+		static void calm(const shared_ptr<Scene>& rb=shared_ptr<Scene>(), int mask=-1);
 };
