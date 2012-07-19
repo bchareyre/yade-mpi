@@ -26,6 +26,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/dem/ConcretePM.hpp>
 #include<yade/pkg/dem/RockPM.hpp>
 #include<yade/pkg/dem/WirePM.hpp>
@@ -42,6 +43,7 @@ void VTKRecorder::action(){
 			recActive[REC_SPHERES]=true;
 			recActive[REC_VELOCITY]=true;
 			recActive[REC_FACETS]=true;
+			recActive[REC_BOXES]=true;
 			recActive[REC_COLORS]=true;
 			recActive[REC_MASS]=true;
 			recActive[REC_INTR]=true;
@@ -54,6 +56,7 @@ void VTKRecorder::action(){
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="velocity") recActive[REC_VELOCITY]=true;
 		else if(rec=="facets") recActive[REC_FACETS]=true;
+		else if(rec=="boxes") recActive[REC_BOXES]=true;
 		else if(rec=="mass") recActive[REC_MASS]=true;
 		else if((rec=="colors") || (rec=="color"))recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
@@ -69,11 +72,11 @@ void VTKRecorder::action(){
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
-
+	
 	// wpm needs interactions
 	if(recActive[REC_WPM]) recActive[REC_INTR]=true;
-
 	
+
 	// spheres
 	vtkSmartPointer<vtkPoints> spheresPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> spheresCells = vtkSmartPointer<vtkCellArray>::New();
@@ -121,7 +124,7 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> spheresNormalStressVec = vtkSmartPointer<vtkFloatArray>::New();
 	spheresNormalStressVec->SetNumberOfComponents(3);
 	spheresNormalStressVec->SetName("normalStress");
-
+	
 	vtkSmartPointer<vtkFloatArray> spheresShearStressVec = vtkSmartPointer<vtkFloatArray>::New();
 	spheresShearStressVec->SetNumberOfComponents(3);
 	spheresShearStressVec->SetName("shearStress");
@@ -133,7 +136,7 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> spheresMaterialId = vtkSmartPointer<vtkFloatArray>::New();
 	spheresMaterialId->SetNumberOfComponents(1);
 	spheresMaterialId->SetName("materialId");
-	
+
 	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
@@ -157,6 +160,29 @@ void VTKRecorder::action(){
 	facetsMask->SetNumberOfComponents(1);
 	facetsMask->SetName("mask");
 
+	// boxes
+	vtkSmartPointer<vtkPoints> boxesPos = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkCellArray> boxesCells = vtkSmartPointer<vtkCellArray>::New();
+	vtkSmartPointer<vtkFloatArray> boxesColors = vtkSmartPointer<vtkFloatArray>::New();
+	boxesColors->SetNumberOfComponents(3);
+	boxesColors->SetName("color");
+	
+	vtkSmartPointer<vtkFloatArray> boxesForceVec = vtkSmartPointer<vtkFloatArray>::New();
+	boxesForceVec->SetNumberOfComponents(3);
+	boxesForceVec->SetName("stressVec");
+	
+	vtkSmartPointer<vtkFloatArray> boxesForceLen = vtkSmartPointer<vtkFloatArray>::New();
+	boxesForceLen->SetNumberOfComponents(1);
+	boxesForceLen->SetName("stressLen");
+	
+	vtkSmartPointer<vtkFloatArray> boxesMaterialId = vtkSmartPointer<vtkFloatArray>::New();
+	boxesMaterialId->SetNumberOfComponents(1);
+	boxesMaterialId->SetName("materialId");
+	
+	vtkSmartPointer<vtkFloatArray> boxesMask = vtkSmartPointer<vtkFloatArray>::New();
+	boxesMask->SetNumberOfComponents(1);
+	boxesMask->SetName("mask");
+
 	// interactions
 	vtkSmartPointer<vtkPoints> intrBodyPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> intrCells = vtkSmartPointer<vtkCellArray>::New();
@@ -175,7 +201,7 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
 	cpmStress->SetNumberOfComponents(9);
 	cpmStress->SetName("cpmStress");
-	
+
 	// extras for RPM
 	vtkSmartPointer<vtkFloatArray> rpmSpecNum = vtkSmartPointer<vtkFloatArray>::New();
 	rpmSpecNum->SetNumberOfComponents(1);
@@ -372,6 +398,40 @@ void VTKRecorder::action(){
 				continue;
 			}
 		}
+		if (recActive[REC_BOXES]){
+			const Box* box = dynamic_cast<Box*>(b->shape.get()); 
+			if (box){
+				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
+				Vector3r ext(box->extents);
+				//vtkSmartPointer<vtk???> ??? = vtkSmartPointer<vtk???>::New();
+				vtkIdType numPoints=boxesPos->GetNumberOfPoints();
+				int count = 0;
+				for (int i=-1;i<2;i+=2){
+					for (int j=-1;j<2;j+=2){
+						for (int k=-1;k<2;k+=2){
+							boxesPos->InsertNextPoint(pos[0]+i*ext[0], pos[1]+j*ext[1], pos[2]+k*ext[2]);
+							//rectangle->GetPointIds()->SetId(count,numPoints+count);
+							count += 1;
+						}
+					}
+				}
+				//boxesCells->InsertNextCell(???);
+				if (recActive[REC_COLORS]){
+					const Vector3r& color = box->color;
+					float c[3] = {color[0],color[1],color[2]};
+					boxesColors->InsertNextTupleValue(c);
+				}
+				if(recActive[REC_STRESS]){
+					const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
+					float s[3] = { stress[0],stress[1],stress[2] };
+					boxesForceVec->InsertNextTupleValue(s);
+					boxesForceLen->InsertNextValue(stress.norm());
+				}
+				if (recActive[REC_MATERIALID]) boxesMaterialId->InsertNextValue(b->material->id);
+				if (recActive[REC_MASK]) boxesMask->InsertNextValue(b->groupMask);
+				continue;
+			}
+		}
 	}
 
 	
@@ -445,6 +505,30 @@ void VTKRecorder::action(){
 			string fn=fileName+"facets."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			writer->SetInput(facetsUg);
+			writer->Write();	
+		}
+	}
+	vtkSmartPointer<vtkUnstructuredGrid> boxesUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+	if (recActive[REC_BOXES]){
+		boxesUg->SetPoints(boxesPos);
+		//boxesUg->SetCells(???, boxesCells);
+		if (recActive[REC_COLORS]) boxesUg->GetCellData()->AddArray(boxesColors);
+		if (recActive[REC_STRESS]){
+			boxesUg->GetCellData()->AddArray(boxesForceVec);
+			boxesUg->GetCellData()->AddArray(boxesForceLen);
+		}
+		if (recActive[REC_MATERIALID]) boxesUg->GetCellData()->AddArray(boxesMaterialId);
+		if (recActive[REC_MASK]) boxesUg->GetCellData()->AddArray(boxesMask);
+		#ifdef YADE_VTK_MULTIBLOCK
+			if(!multiblock)
+		#endif
+			{
+			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			if(compress) writer->SetCompressor(compressor);
+			if(ascii) writer->SetDataModeToAscii();
+			string fn=fileName+"boxes."+lexical_cast<string>(scene->iter)+".vtu";
+			writer->SetFileName(fn.c_str());
+			writer->SetInput(boxesUg);
 			writer->Write();	
 		}
 	}
