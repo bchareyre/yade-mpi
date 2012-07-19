@@ -17,6 +17,7 @@
 	#include<vtkZLibDataCompressor.h>
 	#include<vtkTriangle.h>
 	#include<vtkLine.h>
+	#include<vtkQuadraticQuad.h>
 	#ifdef YADE_VTK_MULTIBLOCK
 		#include<vtkXMLMultiBlockDataWriter.h>
 		#include<vtkMultiBlockDataSet.h>
@@ -68,7 +69,7 @@ void VTKRecorder::action(){
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
 		else if(rec=="stress") recActive[REC_STRESS]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, color, stress, cpm, rpm, wpm, intr, id, clumpId, materialId). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, rpm, wpm, intr, id, clumpId, materialId). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -212,7 +213,7 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> rpmSpecDiam = vtkSmartPointer<vtkFloatArray>::New();
 	rpmSpecDiam->SetNumberOfComponents(1);
 	rpmSpecDiam->SetName("rpmSpecDiam");
-	
+
 	// extras for WireMatPM
 	vtkSmartPointer<vtkFloatArray> wpmNormalForce = vtkSmartPointer<vtkFloatArray>::New();
 	wpmNormalForce->SetNumberOfComponents(1);
@@ -403,19 +404,19 @@ void VTKRecorder::action(){
 			if (box){
 				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
 				Vector3r ext(box->extents);
-				//vtkSmartPointer<vtk???> ??? = vtkSmartPointer<vtk???>::New();
+				vtkSmartPointer<vtkQuadraticQuad> quadQuad = vtkSmartPointer<vtkQuadraticQuad>::New();
 				vtkIdType numPoints=boxesPos->GetNumberOfPoints();
-				int count = 0;
-				for (int i=-1;i<2;i+=2){
-					for (int j=-1;j<2;j+=2){
-						for (int k=-1;k<2;k+=2){
+				int count = 0;//FIXME: output gives curios triangles, but no "box"
+				for (signed int i=-1;i<2;i+=2){
+					for (signed int j=-1;j<2;j+=2){
+						for (signed int k=-1;k<2;k+=2){
 							boxesPos->InsertNextPoint(pos[0]+i*ext[0], pos[1]+j*ext[1], pos[2]+k*ext[2]);
-							//rectangle->GetPointIds()->SetId(count,numPoints+count);
 							count += 1;
+							quadQuad->GetPointIds()->SetId(count,numPoints+count);
 						}
 					}
 				}
-				//boxesCells->InsertNextCell(???);
+				boxesCells->InsertNextCell(quadQuad);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = box->color;
 					float c[3] = {color[0],color[1],color[2]};
@@ -511,7 +512,7 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkUnstructuredGrid> boxesUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 	if (recActive[REC_BOXES]){
 		boxesUg->SetPoints(boxesPos);
-		//boxesUg->SetCells(???, boxesCells);
+		boxesUg->SetCells(VTK_QUADRATIC_QUAD, boxesCells);
 		if (recActive[REC_COLORS]) boxesUg->GetCellData()->AddArray(boxesColors);
 		if (recActive[REC_STRESS]){
 			boxesUg->GetCellData()->AddArray(boxesForceVec);
