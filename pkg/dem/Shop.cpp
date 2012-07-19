@@ -831,6 +831,9 @@ py::list Shop::getStressLWForEachBody(bool revertSign){
 void Shop::calm(const shared_ptr<Scene>& _scene, int mask){
 	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
+		if (!b || !b->isDynamic()) continue;
+		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
+		if((!s) or ((mask>0) and ((b->groupMask & mask)==0))) continue;
 		b->state->vel=Vector3r::Zero();
 		b->state->angVel=Vector3r::Zero();
 		b->state->angMom=Vector3r::Zero();
