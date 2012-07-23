@@ -133,7 +133,7 @@ public:
  	.def("defToVtkFromPositions",&TesselationWrapper::defToVtkFromPositions,(python::arg("input1")="pos1",python::arg("input2")="pos2",python::arg("outputFile")="def.vtk",python::arg("bz2")=false),"Write local deformations in vtk format from positions files (one sphere per line, with x,y,z,rad separated by spaces).")
  	.def("computeVolumes",&TesselationWrapper::ComputeVolumes,"Compute volumes of all Voronoi's cells.")
 	.def("getVolPoroDef",&TesselationWrapper::getVolPoroDef,(python::arg("deformation")=false),"Return a table with per-sphere computed quantities. Include deformations on the increment defined by states 0 and 1 if deformation=True (make sure to define states 0 and 1 consistently).")
-	.def("ComputeDeformations",&TesselationWrapper::computeDeformations,"Compute per-particle deformation. Get it with :yref:`TesselationWrapper.deformation`(id,i,j).")
+	.def("ComputeDeformations",&TesselationWrapper::computeDeformations,"Compute per-particle deformation. Get it with :yref:`TesselationWrapper::deformation`(id,i,j).")
 	.def("deformation",&TesselationWrapper::deformation,(python::arg("id"),python::arg("i"),python::arg("j")),"Get particle deformation")
 	);
 	DECLARE_LOGGER;
