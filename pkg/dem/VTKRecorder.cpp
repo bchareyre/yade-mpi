@@ -17,7 +17,7 @@
 	#include<vtkZLibDataCompressor.h>
 	#include<vtkTriangle.h>
 	#include<vtkLine.h>
-	#include<vtkQuadraticQuad.h>
+	#include<vtkQuad.h>
 	#ifdef YADE_VTK_MULTIBLOCK
 		#include<vtkXMLMultiBlockDataWriter.h>
 		#include<vtkMultiBlockDataSet.h>
@@ -404,32 +404,51 @@ void VTKRecorder::action(){
 			if (box){
 				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
 				Vector3r ext(box->extents);
-				vtkSmartPointer<vtkQuadraticQuad> quadQuad = vtkSmartPointer<vtkQuadraticQuad>::New();
-				vtkIdType numPoints=boxesPos->GetNumberOfPoints();
-				int count = 0;//FIXME: output gives curios triangles, but no "box"
-				for (signed int i=-1;i<2;i+=2){
-					for (signed int j=-1;j<2;j+=2){
-						for (signed int k=-1;k<2;k+=2){
-							boxesPos->InsertNextPoint(pos[0]+i*ext[0], pos[1]+j*ext[1], pos[2]+k*ext[2]);
-							count += 1;
-							quadQuad->GetPointIds()->SetId(count,numPoints+count);
-						}
+				vtkSmartPointer<vtkQuad> boxes = vtkSmartPointer<vtkQuad>::New();
+				
+				Vector3r A = Vector3r(pos[0]-ext[0], pos[1]-ext[1], pos[2]-ext[2]);
+				Vector3r B = Vector3r(pos[0]-ext[0], pos[1]+ext[1], pos[2]-ext[2]);
+				Vector3r C = Vector3r(pos[0]+ext[0], pos[1]+ext[1], pos[2]-ext[2]);
+				Vector3r D = Vector3r(pos[0]+ext[0], pos[1]-ext[1], pos[2]-ext[2]);
+				
+				Vector3r E = Vector3r(pos[0]-ext[0], pos[1]-ext[1], pos[2]+ext[2]);
+				Vector3r F = Vector3r(pos[0]-ext[0], pos[1]+ext[1], pos[2]+ext[2]);
+				Vector3r G = Vector3r(pos[0]+ext[0], pos[1]+ext[1], pos[2]+ext[2]);
+				Vector3r H = Vector3r(pos[0]+ext[0], pos[1]-ext[1], pos[2]+ext[2]);
+				
+				addWallVTK(boxes, boxesPos, A, B, C, D);
+				boxesCells->InsertNextCell(boxes);
+				
+				addWallVTK(boxes, boxesPos, E, H, G, F);
+				boxesCells->InsertNextCell(boxes);
+				
+				addWallVTK(boxes, boxesPos, A, E, F, B);
+				boxesCells->InsertNextCell(boxes);
+				
+				addWallVTK(boxes, boxesPos, G, H, D, C);
+				boxesCells->InsertNextCell(boxes);
+				
+				addWallVTK(boxes, boxesPos, F, G, C, B);
+				boxesCells->InsertNextCell(boxes);
+				
+				addWallVTK(boxes, boxesPos, D, H, E, A);
+				boxesCells->InsertNextCell(boxes);
+				
+				for(int i=0; i<6; i++){
+					if (recActive[REC_COLORS]){
+						const Vector3r& color = box->color;
+						float c[3] = {color[0],color[1],color[2]};
+						boxesColors->InsertNextTupleValue(c);
 					}
+					if(recActive[REC_STRESS]){
+						const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
+						float s[3] = { stress[0],stress[1],stress[2] };
+						boxesForceVec->InsertNextTupleValue(s);
+						boxesForceLen->InsertNextValue(stress.norm());
+					}
+					if (recActive[REC_MATERIALID]) boxesMaterialId->InsertNextValue(b->material->id);
+					if (recActive[REC_MASK]) boxesMask->InsertNextValue(b->groupMask);
 				}
-				boxesCells->InsertNextCell(quadQuad);
-				if (recActive[REC_COLORS]){
-					const Vector3r& color = box->color;
-					float c[3] = {color[0],color[1],color[2]};
-					boxesColors->InsertNextTupleValue(c);
-				}
-				if(recActive[REC_STRESS]){
-					const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
-					float s[3] = { stress[0],stress[1],stress[2] };
-					boxesForceVec->InsertNextTupleValue(s);
-					boxesForceLen->InsertNextValue(stress.norm());
-				}
-				if (recActive[REC_MATERIALID]) boxesMaterialId->InsertNextValue(b->material->id);
-				if (recActive[REC_MASK]) boxesMask->InsertNextValue(b->groupMask);
 				continue;
 			}
 		}
@@ -512,7 +531,7 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkUnstructuredGrid> boxesUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 	if (recActive[REC_BOXES]){
 		boxesUg->SetPoints(boxesPos);
-		boxesUg->SetCells(VTK_QUADRATIC_QUAD, boxesCells);
+		boxesUg->SetCells(VTK_QUAD, boxesCells);
 		if (recActive[REC_COLORS]) boxesUg->GetCellData()->AddArray(boxesColors);
 		if (recActive[REC_STRESS]){
 			boxesUg->GetCellData()->AddArray(boxesForceVec);
@@ -571,7 +590,23 @@ void VTKRecorder::action(){
 			writer->Write();	
 		}
 	#endif
-}
+};
 
+void VTKRecorder::addWallVTK (vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<vtkPoints>& boxesPos, Vector3r& W1, Vector3r& W2, Vector3r& W3, Vector3r& W4) {
+	//Function for exporting walls of boxes
+	vtkIdType nbPoints=boxesPos->GetNumberOfPoints();
+	
+	boxesPos->InsertNextPoint(W1[0], W1[1], W1[2]);
+	boxes->GetPointIds()->SetId(0,nbPoints+0);
+	
+	boxesPos->InsertNextPoint(W2[0], W2[1], W2[2]);
+	boxes->GetPointIds()->SetId(1,nbPoints+1);
+	
+	boxesPos->InsertNextPoint(W3[0], W3[1], W3[2]);
+	boxes->GetPointIds()->SetId(2,nbPoints+2);
+	
+	boxesPos->InsertNextPoint(W4[0], W4[1], W4[2]);
+	boxes->GetPointIds()->SetId(3,nbPoints+3);
+};
 
 #endif /* YADE_VTK */
