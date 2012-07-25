@@ -147,7 +147,7 @@ syntax::
 	
 The following options are available:
 	
-	* INSTALL_PREFIX: absolute path to install Yade (/usr/local by default)
+	* INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 	* DEBUG: compile in debug-mode (OFF by default)
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)

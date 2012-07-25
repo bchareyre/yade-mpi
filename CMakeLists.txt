@@ -1,5 +1,5 @@
 # The YADE has the following parameters to configure:
-#  INSTALL_PREFIX: absolute path to install Yade (/usr/local by default)
+#  INSTALL_PREFIX: path, where Yade will be installed (/usr/local by default)
 #  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 #  DEBUG: compile in debug-mode (OFF by default)
 #  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
@@ -228,7 +228,7 @@ IF (NOT INSTALL_PREFIX)
  SET(CMAKE_INSTALL_PREFIX "/usr/local")
  MESSAGE("Yade will be installed to default path ${CMAKE_INSTALL_PREFIX}, if you want to override it use -DINSTALL_PREFIX option.")
 ELSE (NOT INSTALL_PREFIX)
-	SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
+	GET_FILENAME_COMPONENT(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} ABSOLUTE)
 	MESSAGE("Yade will be installed to ${CMAKE_INSTALL_PREFIX}")
 ENDIF (NOT INSTALL_PREFIX)
 
