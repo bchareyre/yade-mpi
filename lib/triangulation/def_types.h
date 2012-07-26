@@ -120,9 +120,11 @@ class FlowCellInfo : public SimpleCellInfo {
 		unitForceVectors.resize(4);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		RayHydr.resize(4, 0);
-		isInside = false;
+// 		isInside = false;
 		inv_sum_k=0;
-		isFictious=false; Pcondition = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
+		isFictious=false; Pcondition = false; isGhost = false;
+// 		isInferior = false; isSuperior = false; isLateral = false; isExternal=false;
+		isvisited = false;
 		index=0;
 		volumeSign=0;
 		s=0;
@@ -131,14 +133,14 @@ class FlowCellInfo : public SimpleCellInfo {
 		invVoidV=0;
  		fict=0;
 	}	
-
+	bool isGhost;
 	double inv_sum_k;
-	bool isInside;
-	bool isInferior;
-	bool isSuperior;
-	bool isLateral;
+// 	bool isInside;
+// 	bool isInferior;
+// 	bool isSuperior;
+// 	bool isLateral;
 	bool isvisited;
-	bool isExternal;
+// 	bool isExternal;
 	
 	FlowCellInfo& operator= (const std::vector<double> &v) { for (int i=0; i<4;i++) module_permeability[i]= v[i]; return *this; }
 	FlowCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
@@ -150,6 +152,8 @@ class FlowCellInfo : public SimpleCellInfo {
 	inline Real& dv (void) {return VolumeVariation;}
 	inline int& fictious (void) {return fict;}
 	inline double& p (void) {return pression;}
+	//For compatibility with the periodic case
+	inline const double shiftedP (void) const {return pression;}
 	inline const std::vector<double>& k_norm (void) const {return module_permeability;}
 	inline std::vector<double>& k_norm (void) {return module_permeability;}
 	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
@@ -184,8 +188,7 @@ class PeriodicCellInfo : public FlowCellInfo
 	static Vecteur deltaP;
 	int ghost;
 	Real* _pression;
-	bool isGhost;
- 	PeriodicCellInfo (void){
+	PeriodicCellInfo (void){
 		_pression=&pression;
 		period[0]=period[1]=period[2]=0;
 		isGhost=false;

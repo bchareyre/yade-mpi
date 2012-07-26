@@ -182,11 +182,11 @@ template<class Solver>
 void FlowEngine::clearImposedFlux ( Solver& flow ) { flow->imposedF.clear(); flow->IFCells.clear();}
 
 template<class Solver>
-Real FlowEngine::getFlux ( unsigned int cond,Solver& flow )
+Real FlowEngine::getCellFlux ( unsigned int cond, const shared_ptr<Solver>& flow )
 {
-        if ( cond>=flow->imposedP.size() ) {LOG_ERROR ( "Getting flux with cond higher than imposedP size." ); return 0;}
+	if ( cond>=flow->imposedP.size() ) {LOG_ERROR ( "Getting flux with cond higher than imposedP size." ); return 0;}
         double flux=0;
-        Cell_handle& cell= flow->IPCells[cond];
+        typename Solver::Cell_handle& cell= flow->IPCells[cond];
         for ( int ngb=0;ngb<4;ngb++ ) {
                 /*if (!cell->neighbor(ngb)->info().Pcondition)*/
                 flux+= cell->info().k_norm() [ngb]* ( cell->info().p()-cell->neighbor ( ngb )->info().p() );
@@ -896,6 +896,8 @@ Vector3r PeriodicFlowEngine::meanVelocity()
         Real volume=0;
         Finite_cells_iterator cell_end = solver->T[solver->currentTes].Triangulation().finite_cells_end();
         for ( Finite_cells_iterator cell = solver->T[solver->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+		//We could also define velocity using cell's center
+//                 if ( !cell->info().isReal() ) continue;
                 if ( cell->info().isGhost ) continue;
                 for ( int i=0;i<3;i++ )
                         meanVel[i]=meanVel[i]+ ( ( cell->info().av_vel() ) [i] * abs ( cell->info().volume() ) );

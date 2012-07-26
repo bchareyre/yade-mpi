@@ -26,8 +26,8 @@ namespace CGT{
 		void Compute_Permeability();
 		void GaussSeidel(Real dt=0);
 		void DisplayStatistics();
-		void Average_Relative_Cell_Velocity();
 		void ComputeEdgesSurfaces();
+		double boundaryFlux(unsigned int boundaryId);
 		#ifdef EIGENSPARSE_LIB
 		//Eigen's sparse matrix for forces computation
 // 		Eigen::SparseMatrix<double> FIntegral;

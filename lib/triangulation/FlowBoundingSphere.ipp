@@ -283,31 +283,39 @@ Tesselation& FlowBoundingSphere<Tesselation>::LoadPositions(int argc, char *argv
 
   return Tes;
 }
-template <class Tesselation> 
+
+template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::Average_Relative_Cell_Velocity()
-{  
-        RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+{
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Point pos_av_facet;
         int num_cells = 0;
         double facet_flow_rate = 0;
-	Real tVel=0; Real tVol=0;
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+		if (cell->info().isGhost) continue;
 		cell->info().av_vel() =CGAL::NULL_VECTOR;
                 num_cells++;
-                for ( int i=0; i<4; i++ )
-			if (!Tri.is_infinite(cell->neighbor(i))){
+		Real tot_flow_rate = 0;//used to acount for influxes in elements where pressure is imposed
+                for ( int i=0; i<4; i++ ) if (!Tri.is_infinite(cell->neighbor(i))){
 				Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
 				Real area = sqrt ( Surfk.squared_length() );
 				Surfk = Surfk/area;
-				Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
-				pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
-				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p());
-                        	cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );}
- 		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
-		cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
+                        	Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+                        	pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
+				tot_flow_rate += facet_flow_rate;
+				cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
+		}
+		//This is the influx term
+		if (cell->info().Pcondition) cell->info().av_vel() = cell->info().av_vel() - (tot_flow_rate)*((Point) cell->info()-CGAL::ORIGIN );
+		//now divide by volume
+		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
 	}
 }
+
+
+
 template <class Tesselation> 
 bool FlowBoundingSphere<Tesselation>::isOnSolid  (double X, double Y, double Z)
 {
@@ -1216,6 +1224,26 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 	computedOnce=true;
 }
 
+template <class Tesselation>
+double FlowBoundingSphere<Tesselation>::boundaryFlux(unsigned int boundaryId)
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	double Q1=0;
+
+	Vector_Cell tmp_cells;
+	tmp_cells.resize(10000);
+	VCell_iterator cells_it = tmp_cells.begin();
+
+	VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[boundaryId],cells_it);
+	for (VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
+	{
+		const Cell_handle& cell = *it;
+		if (cell->info().isGhost) continue;
+		for (int j2=0; j2<4; j2++)
+			Q1 += (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
+	}
+	return Q1;
+}
 
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::Permeameter(double P_Inf, double P_Sup, double Section, double DeltaY, const char *file)
@@ -1397,6 +1425,16 @@ void FlowBoundingSphere<Tesselation>::saveVtk()
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
 		if (isDrawable){vtkfile.write_data(cell->info().p());}
+	}
+	vtkfile.end_data();}
+
+
+	if (1){
+	Average_Relative_Cell_Velocity();
+	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(cell->info().av_vel()[0],cell->info().av_vel()[1],cell->info().av_vel()[2]);}
 	}
 	vtkfile.end_data();}
 }

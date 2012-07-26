@@ -575,30 +575,27 @@ void PeriodicFlow::DisplayStatistics()
 	num_particles = real;
 }
 
-void PeriodicFlow::Average_Relative_Cell_Velocity()
-{  
-        RTriangulation& Tri = T[currentTes].Triangulation();
-        Point pos_av_facet;
-        int num_cells = 0;
-        double facet_flow_rate = 0;
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
-        for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+double PeriodicFlow::boundaryFlux(unsigned int boundaryId)
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	double Q1=0;
+
+	Vector_Cell tmp_cells;
+	tmp_cells.resize(10000);
+	VCell_iterator cells_it = tmp_cells.begin();
+
+	VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[boundaryId],cells_it);
+	for (VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
+	{
+		const Cell_handle& cell = *it;
 		if (cell->info().isGhost) continue;
-		cell->info().av_vel() =CGAL::NULL_VECTOR;
-                num_cells++;
-                for ( int i=0; i<4; i++ )
-			if (!Tri.is_infinite(cell->neighbor(i))){
-				Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
-				Real area = sqrt ( Surfk.squared_length() );
-				Surfk = Surfk/area;
-//                         Vecteur facetNormal = Surfk/area;
-                        	Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
-                        	pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
-				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
-				cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );}
-		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
+		Q1 -= cell->info().dv();
+		for (int j2=0; j2<4; j2++)
+			Q1 += (cell->info().k_norm())[j2]* (cell->neighbor(j2)->info().shiftedP()-cell->info().shiftedP());
 	}
+	return Q1;
 }
+
 void  PeriodicFlow::ComputeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();

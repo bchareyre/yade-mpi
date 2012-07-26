@@ -552,6 +552,7 @@ void Network<Tesselation>::Define_fictious_cells()
 		{
 		  Cell_handle& cell = *it;
 		  (cell->info().fictious())+=1;
+		  cell->info().isFictious=true;
 		}
 	}
 	

@@ -140,7 +140,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void ComsolField();
 
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
-		void Average_Relative_Cell_Velocity();
+		virtual void Average_Relative_Cell_Velocity();
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
@@ -149,6 +149,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double MeasureAveragedPressure(double Y);
 		double MeasureTotalAveragedPressure();
 		double getCell (double X,double Y,double Z);
+		double boundaryFlux(unsigned int boundaryId);
 		
 		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
 		//Solver?
