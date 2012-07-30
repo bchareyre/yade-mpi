@@ -195,7 +195,7 @@ def gengeoFile(fileName="file.geo",shift=Vector3.Zero,scale=1.0,orientation=Quat
 	with given [Rmin:Rmax] with null stress inside the specimen.
 	Can be useful for Mining Rock simulation.
 	
-	Example: :ysrc:`examples/packs/packs.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
+	Example: :ysrc:`examples/packs/packs.py`, usage of LSMGenGeo library in :ysrc:`examples/test/genCylLSM.py`.
 	
 	* https://answers.launchpad.net/esys-particle/+faq/877
 	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
@@ -265,10 +265,10 @@ def unv(fileName,shift=(0,0,0),scale=1.0,**kw):
 		`**kw`: (unused keyword arguments)
 				is passed to :yref:`yade.utils.facet`
 	
-	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>`_ and `Abakus <http://www.simulia.com/products/abaqus_fea.html>`_), but triangular elements can be imported as facets.
+	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>`_ and `Abaqus <http://www.simulia.com/products/abaqus_fea.html>`_), but triangular elements can be imported as facets.
 	These files cen be created e.g. with open-source free software `Salome <http://salome-platform.org>`_.
 	
-	Example: :ysrc:`scripts/test/unvRead.py`."""
+	Example: :ysrc:`examples/test/unvRead.py`."""
 
 	class UNVReader:
 		# class used in ymport.unv function

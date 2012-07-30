@@ -497,7 +497,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		Sphere* sphere=dynamic_cast<Sphere*>(B->shape.get());
 		if(!sphere) continue;
 		Real& r = sphere->radius;
-		state->stress=bodyStats[id].stress/(4/3.*Mathr::PI*r*r*r)*.5;
+		state->stress=bodyStats[id].stress/(4/3.*Mathr::PI*r*r*r/.62)*.5;
 	}
 	avgRelResidual/=nAvgRelResidual;
 }

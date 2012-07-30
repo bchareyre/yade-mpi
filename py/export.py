@@ -8,20 +8,16 @@ from yade import utils,Matrix3,Vector3
 
 #textExt===============================================================
 def textExt(filename, format='x_y_z_r', comment='',mask=-1):
-	"""
-	Save sphere coordinates and other parameters into a text file in specific format.
-	Non-spherical bodies are silently skipped.
-	Users can add here their own specific format, giving meaningful names.
-	The first file row will contain the format name.
-	Be sure to add the same format specification in ymport.textExt.
+	"""Save sphere coordinates and other parameters into a text file in specific format. Non-spherical bodies are silently skipped. Users can add here their own specific format, giving meaningful names. The first file row will contain the format name. Be sure to add the same format specification in ymport.textExt.
 	
 	:param string filename: the name of the file, where sphere coordinates will be exported.
-	:param string format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	:param string format: the name of output format. Supported 'x_y_z_r'(default), 'x_y_z_r_matId'
 	:param string comment: the text, which will be added as a comment at the top of file. 
 		If you want to create several lines of text, please use `\n#` for next lines.
-	:param int mask`: export only spheres with the corresponding mask
+	:param int mask: export only spheres with the corresponding mask
 		export only spheres with the corresponding mask
-	Return number of spheres which were written.
+	:return: number of spheres which were written.
+	:rtype: int
 	"""
 	O=Omega()
 	
@@ -169,15 +165,12 @@ class VTKWriter:
 		self.snapCount+=1
 		
 def text(filename,mask=-1):
-	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
-	Non-spherical bodies are silently skipped.
-	Example added to examples/regular-sphere-pack/regular-sphere-pack.py
-	:parameters:
-	`filename`: string
-		the name of the file, where sphere coordinates will be exported.
-	`mask`:
-		export only spheres with the corresponding mask
+	"""Save sphere coordinates into a text file; the format of the line is: x y z r. Non-spherical bodies are silently skipped. Example added to examples/regular-sphere-pack/regular-sphere-pack.py
+
+	:param string filename: the name of the file, where sphere coordinates will be exported.
+	:param int mask: export only spheres with the corresponding mask
 	:return: number of spheres which were written.
+	:rtype: int
 	"""
 	return (textExt(filename=filename, format='x_y_z_r',mask=mask))
 
@@ -191,6 +184,9 @@ class VTKExporter:
 	USAGE:
 	create object vtkExporter = VTKExporter('baseFileName'),
 	add to engines PyRunner with command='vtkExporter.exportSomething(params)'
+
+	:param string baseName: name of the exported files. The files would be named baseName-spheres-snapNb.vtk or baseName-facets-snapNb.vtk
+	:param int=0 startSnap: the numbering of files will start form startSnap
 	"""
 	def __init__(self,baseName,startSnap=0):
 		self.spheresSnapCount = startSnap
@@ -198,18 +194,14 @@ class VTKExporter:
 		self.baseName = baseName
 
 	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None):
-		"""
-		exports spheres (positions and radius) and defined properties.
+		"""exports spheres (positions and radius) and defined properties.
 
-	:parameters:
-	`ids`: [int] | "all"
-		if "all", then export all spheres, otherwise only spheres from integer list
-	`what`: [tuple(2)]
-		what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
-	`comment`: string
-		comment to add to vtk file
-	`numLabel`: int
-		number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		:param ids: if dd "all", then export all spheres, otherwise only spheres from integer list
+		:type ids: [int] | "all"
+		:param what: what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
+		:type what: [tuple(2)]
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		"""
 		allIds = False
 		if ids=='all':
@@ -239,15 +231,17 @@ class VTKExporter:
 				for b in bodies:
 					t = eval(command)
 					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
-			if isinstance(test,Vector3):
+			elif isinstance(test,Vector3):
 				outFile.write("\nVECTORS %s double\n"%(name))
 				for b in bodies:
 					v = eval(command)
 					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
-			else:
+			elif isinstance(test,(int,float)):
 				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
 				for b in bodies:
 					outFile.write("%g\n"%(eval(command)))
+			else:
+				print 'WARNING: export.VTKExporter.exportSpheres: wrong `what` parameter, vtk output might be corrupted'
 		outFile.close()
 		self.spheresSnapCount += 1
 
