@@ -9,13 +9,11 @@ from yade import utils,Matrix3,Vector3
 #textExt===============================================================
 def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	"""Save sphere coordinates and other parameters into a text file in specific format. Non-spherical bodies are silently skipped. Users can add here their own specific format, giving meaningful names. The first file row will contain the format name. Be sure to add the same format specification in ymport.textExt.
-	
+
 	:param string filename: the name of the file, where sphere coordinates will be exported.
 	:param string format: the name of output format. Supported 'x_y_z_r'(default), 'x_y_z_r_matId'
-	:param string comment: the text, which will be added as a comment at the top of file. 
-		If you want to create several lines of text, please use `\n#` for next lines.
-	:param int mask: export only spheres with the corresponding mask
-		export only spheres with the corresponding mask
+	:param string comment: the text, which will be added as a comment at the top of file. If you want to create several lines of text, please use '\\\\n#' for next lines.
+	:param int mask: export only spheres with the corresponding mask export only spheres with the corresponding mask
 	:return: number of spheres which were written.
 	:rtype: int
 	"""
