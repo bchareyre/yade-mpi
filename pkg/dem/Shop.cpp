@@ -12,7 +12,7 @@
 #include<yade/core/Interaction.hpp>
 
 #include<yade/pkg/common/Aabb.hpp>
-#include<yade/pkg/dem/Clump.hpp>
+#include<yade/core/Clump.hpp>
 #include<yade/pkg/common/InsertionSortCollider.hpp>
 
 #include<yade/pkg/common/Box.hpp>

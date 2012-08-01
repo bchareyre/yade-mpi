@@ -8,7 +8,7 @@
 
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/Clump.hpp>
+#include<yade/core/Clump.hpp>
 #include<yade/lib/base/Math.hpp>
 
 YADE_PLUGIN((NewtonIntegrator));
