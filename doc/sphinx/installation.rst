@@ -175,7 +175,8 @@ Installing performs with the following command::
 
 	make install
 
-The "install" command will in fact also recompile if source files have been modified. Hence there is no absolute need to type the two commands separately.
+The "install" command will in fact also recompile if source files have been modified. 
+Hence there is no absolute need to type the two commands separately.
 
 The compilation process can take a long time, be patient. An additional
 parameter on many cores systems ``-j`` can be added to decrease compilation time
@@ -183,3 +184,7 @@ and split the compilation on many cores. For example, on 4-core machines
 it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
 approximately 2GB/core for compilation, otherwise the swap-file will be used
 and a compilation time dramatically increases.
+
+For building the documentation you should at first execute the command "make install"
+and then "make doc" to build it. The generated files will be stored in your current
+build directory/doc/sphinx/_build.

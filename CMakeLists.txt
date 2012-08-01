@@ -256,6 +256,7 @@ MESSAGE (STATUS "runtimePREFIX is set to " ${runtimePREFIX})
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/${LIBRARY_OUTPUT_PATH}/yade${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
+SET(YADE_DOC_PATH ${CMAKE_INSTALL_PREFIX}/share/doc/yade${SUFFIX})
 
 
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -371,3 +372,22 @@ IF (CHUNKSIZE)
 ENDIF (CHUNKSIZE)
 MESSAGE(STATUS "===========================================================")
 #===========================================================
+#Building doc
+ADD_CUSTOM_TARGET(doc)
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc)
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx)
+ADD_CUSTOM_COMMAND( 
+                  TARGET doc PRE_BUILD
+                  COMMAND rm -rf ${CMAKE_BINARY_DIR}/doc/sphinx/_build
+                  COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/doc/* ${CMAKE_BINARY_DIR}/doc
+                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} yadeSphinx.py
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
+                  )
+ADD_CUSTOM_COMMAND( 
+                  TARGET doc POST_BUILD
+                  COMMAND xelatex Yade.tex
+                  COMMAND xelatex Yade.tex
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
+                  )
