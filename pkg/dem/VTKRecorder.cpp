@@ -282,7 +282,7 @@ void VTKRecorder::action(){
 			const GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());
 			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
 			float fn=phys->normalForce.dot(geom->normal); 
-			float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
+			float fs[3]={ (float) abs(phys->shearForce[0]), (float) abs(phys->shearForce[1]), (float) abs(phys->shearForce[2])};
 			// add the value once for each interaction object that we created (might be 2 for the periodic boundary)
 			for(int i=0; i<numAddValues; i++){
 				intrAbsForceT->InsertNextTupleValue(fs);
@@ -328,25 +328,25 @@ void VTKRecorder::action(){
 				if (recActive[REC_CLUMPID]) clumpId->InsertNextValue(b->clumpId);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = sphere->color;
-					float c[3] = {color[0],color[1],color[2]};
+					float c[3] = { (float) color[0], (float) color[1], (float) color[2]};
 					spheresColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_VELOCITY]){
 					const Vector3r& vel = b->state->vel;
-					float v[3] = { vel[0],vel[1],vel[2] };
+					float v[3] = { (float) vel[0], (float) vel[1], (float) vel[2] };
 					spheresLinVelVec->InsertNextTupleValue(v);
 					spheresLinVelLen->InsertNextValue(vel.norm());
 					
 					const Vector3r& angVel = b->state->angVel;
-					float av[3] = { angVel[0],angVel[1],angVel[2] };
+					float av[3] = { (float) angVel[0], (float) angVel[1], (float) angVel[2] };
 					spheresAngVelVec->InsertNextTupleValue(av);
 					spheresAngVelLen->InsertNextValue(angVel.norm());
 				}
 				if(recActive[REC_STRESS]){
 					const Vector3r& stress = bodyStates[b->getId()].normStress;
 					const Vector3r& shear = bodyStates[b->getId()].shearStress;
-					float n[3] = { stress[0],stress[1],stress[2] };
-					float s[3] = { shear [0],shear [1],shear [2] };
+					float n[3] = { (float)  stress[0], (float) stress[1], (float) stress[2] };
+					float s[3] = { (float)  shear [0], (float) shear [1], (float) shear [2] };
 					spheresNormalStressVec->InsertNextTupleValue(n);
 					spheresShearStressVec->InsertNextTupleValue(s);
 					spheresNormalStressNorm->InsertNextValue(stress.norm());
@@ -356,7 +356,7 @@ void VTKRecorder::action(){
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
 					const Matrix3r& ss=YADE_PTR_CAST<CpmState>(b->state)->stress;
 					//float s[3]={ss[0],ss[1],ss[2]};
-					float s[9]={ss[0,0],ss[0,1],ss[0,2],ss[1,0],ss[1,1],ss[1,2],ss[2,0],ss[2,1],ss[2,2]};
+					float s[9]={ (float) ss[0,0], (float) ss[0,1], (float) ss[0,2], (float) ss[1,0], (float) ss[1,1], (float) ss[1,2], (float) ss[2,0], (float) ss[2,1], (float) ss[2,2]};
 					cpmStress->InsertNextTupleValue(s);
 				}
 				if (recActive[REC_RPM]){
@@ -385,12 +385,12 @@ void VTKRecorder::action(){
 				facetsCells->InsertNextCell(tri);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = facet->color;
-					float c[3] = {color[0],color[1],color[2]};
+					float c[3] = { (float) color[0], (float) color[1], (float) color[2]};
 					facetsColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_STRESS]){
 					const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
-					float s[3] = { stress[0],stress[1],stress[2] };
+					float s[3] = { (float) stress[0], (float) stress[1], (float) stress[2] };
 					facetsForceVec->InsertNextTupleValue(s);
 					facetsForceLen->InsertNextValue(stress.norm());
 				}
@@ -437,12 +437,12 @@ void VTKRecorder::action(){
 				for(int i=0; i<6; i++){
 					if (recActive[REC_COLORS]){
 						const Vector3r& color = box->color;
-						float c[3] = {color[0],color[1],color[2]};
+						float c[3] = { (float) color[0], (float) color[1], (float) color[2]};
 						boxesColors->InsertNextTupleValue(c);
 					}
 					if(recActive[REC_STRESS]){
 						const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
-						float s[3] = { stress[0],stress[1],stress[2] };
+						float s[3] = { (float) stress[0], (float) stress[1], (float) stress[2] };
 						boxesForceVec->InsertNextTupleValue(s);
 						boxesForceLen->InsertNextValue(stress.norm());
 					}
