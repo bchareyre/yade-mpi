@@ -66,7 +66,7 @@ class RpmPhys: public NormShearPhys {
 		 
 		virtual ~RpmPhys();
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(RpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_CpmPhys_Cpm, that includes damage effects and chages of parameters inside CpmPhys",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(RpmPhys,NormShearPhys,"Representation of a single interaction of the Rpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_RockPMPhys_Rpm, that includes damage effects and chages of parameters inside RpmPhys",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,crossSection,0,,"equivalent cross-section associated with this contact [m²]"))
 			((Real,G,NaN,,"shear modulus [Pa]"))

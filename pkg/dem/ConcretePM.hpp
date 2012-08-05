@@ -17,7 +17,7 @@ mechanical behavior of concrete. Several classes are needed for Cpm.
 3. CpmPhys (Cpm (interaction)Physics) holds various parameters as well as internal
    variables of the contact that can change as result of plasticity, damage, viscosity.
 
-4. Law2_Dem3Dof_CpmPhys_Cpm is constitutive law that takes geometry of the interaction
+4. Law2_Dem3DofGeom_CpmPhys_Cpm is constitutive law that takes geometry of the interaction
 	(Dem3Dof, which can be either Dem3Dof_SphereSphere or Dem3Dof_FacetSphere) and
 	CpmPhys, computing forces on both bodies and updating contact variables.
 
@@ -52,9 +52,15 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg/common/PeriodicEngines.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 
 namespace py=boost::python;
+
+/*********************************************************************************
+*
+* C P M   S T A T E
+*
+*********************************************************************************/
 
 /* Cpm state information about each body.
 None of that is used for computation (at least not now), only for post-processing.
@@ -67,7 +73,7 @@ class CpmState: public State {
 		((Real,normDmg,0,,"Average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)"))
 		((Real,epsPlBroken,0,,"Plastic strain on contacts already deleted (bogus values)"))
 		((Real,normEpsPl,0,,"Sum of plastic strains normalized by number of contacts (bogus values)"))
-		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor of the spherical particle (under assumption that particle volume = pi*r*r*r*4/3.). To get actual stress, multiply this value by packing fraction (for random dense packing something like 0.63)"))
+		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor of the spherical particle (under assumption that particle volume = pi*r*r*r*4/3.) for packing fraction 0.62"))
 		((Matrix3r,damageTensor,Matrix3r::Zero(),,"Damage tensor computed with microplane theory averaging. state.damageTensor.trace() = state.normDmg")),
 		/*ctor*/ createIndex();
 	);
@@ -75,14 +81,24 @@ class CpmState: public State {
 };
 REGISTER_SERIALIZABLE(CpmState);
 
+
+
+
+
+
+
+/*********************************************************************************
+*
+* C P M   M A T
+*
+*********************************************************************************/
 /* This class holds information associated with each body */
 class CpmMat: public FrictMat {
 	public:
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\t:yref:`Density<Material::density>` is initialized to 4800 kgm⁻³automatically, which gives approximate 2800 kgm⁻³ on 0.5 density packing.\n\n.. _cpm-model::\n\n Concrete Particle Model (CPM)\n\n\n :yref:`CpmMat` is particle material, :yref:`Ip2_CpmMat_CpmMat_CpmPhys` averages two particles' materials, creating :yref:`CpmPhys`, which is then used in interaction resultion by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm`. :yref:`CpmState` is associated to :yref:`CpmMat` and keeps state defined on particles rather than interactions (such as number of completely damaged interactions).\n\nThe model is contained in externally defined macro CPM_MATERIAL_MODEL, which features damage in tension, plasticity in shear and compression and rate-dependence. For commercial reasons, rate-dependence and compression-plasticity is not present in reduced version of the model, used when CPM_MATERIAL_MODEL is not defined. The full model will be described in detail in my (Václav Šmilauer) thesis along with calibration procedures (rigidity, poisson's ratio, compressive/tensile strength ratio, fracture energy, behavior under confinement, rate-dependent behavior).\n\nEven the public model is useful enough to run simulation on concrete samples, such as :ysrc:`uniaxial tension-compression test<examples/concrete/uniax.py>`.",
-		((Real,G_over_E,NaN,,"Ratio of normal/shear stiffness at interaction level [-]"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\t:yref:`Density<Material::density>` is initialized to 4800 kgm⁻³automatically, which gives approximate 2800 kgm⁻³ on 0.5 density packing.\n\n.. _cpm-model::\n\n Concrete Particle Model (CPM)\n\n\n :yref:`CpmMat` is particle material, :yref:`Ip2_CpmMat_CpmMat_CpmPhys` averages two particles' materials, creating :yref:`CpmPhys`, which is then used in interaction resultion by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm. :yref:`CpmState` is associated to :yref:`CpmMat` and keeps state defined on particles rather than interactions (such as number of completely damaged interactions).\n\nThe model is contained in externally defined macro CPM_MATERIAL_MODEL, which features damage in tension, plasticity in shear and compression and rate-dependence. For commercial reasons, rate-dependence and compression-plasticity is not present in reduced version of the model, used when CPM_MATERIAL_MODEL is not defined. The full model will be described in detail in my (Václav Šmilauer) thesis along with calibration procedures (rigidity, poisson's ratio, compressive/tensile strength ratio, fracture energy, behavior under confinement, rate-dependent behavior).\n\nEven the public model is useful enough to run simulation on concrete samples, such as :ysrc:`uniaxial tension-compression test<examples/concrete/uniax.py>`.",
 		((Real,sigmaT,NaN,,"Initial cohesion [Pa]"))
 		((bool,neverDamage,false,,"If true, no damage will occur (for testing only)."))
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
@@ -100,6 +116,18 @@ class CpmMat: public FrictMat {
 };
 REGISTER_SERIALIZABLE(CpmMat);
 
+
+
+
+
+
+
+
+/*********************************************************************************
+*
+* C P M   P H Y S
+*
+*********************************************************************************/
 
 /*! @brief representation of a single interaction of the CPM type: storage for relevant parameters.
  *
@@ -119,12 +147,14 @@ class CpmPhys: public NormShearPhys {
 		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
 
 		virtual ~CpmPhys();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :ref:`cpm-model` for details.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :ref:`cpm-model` for details.",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,G,NaN,,"shear modulus [Pa]"))
 			((Real,tanFrictionAngle,NaN,,"tangens of internal friction angle [-]"))
 			((Real,undamagedCohesion,NaN,,"virgin material cohesion [Pa]"))
 			((Real,crossSection,NaN,,"equivalent cross-section associated with this contact [m²]"))
+			((Real,refLength,NaN,,"initial length of interaction [m]"))
+			((Real,refPD,NaN,,"initial penetration depth of interaction [m] (used with ScGeom)"))
 			((Real,epsCrackOnset,NaN,,"strain at which the material starts to behave non-linearly"))
 			((Real,crackOpening,NaN,,"Crack opening (extansion of the bond) when the bond is fully broken in tension. [m]"))
 			((Real,relDuctility,NaN,,"Relative ductility of bonds in normal direction"))
@@ -139,9 +169,9 @@ class CpmPhys: public NormShearPhys {
 			((Real,kappaD,0,,"Up to now maximum normal strain (semi-norm), non-decreasing in time."))
 			((Real,epsNPl,0,,"normal plastic strain (initially zero)"))
 			((bool,neverDamage,false,,"the damage evolution function will always return virgin state"))
-			((int,damLaw,-1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential"))
+			((int,damLaw,-1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential (default)"))
 			((Real,epsTrans,0,,"Transversal strain (perpendicular to the contact axis)"))
-			((Real,epsPlSum,0,,"cummulative shear plastic strain measure (scalar) on this contact"))
+			//((Real,epsPlSum,0,,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than zero."))
 			((Vector3r,epsT,Vector3r::Zero(),,"Total shear strain (either computed from increments with :yref:`ScGeom` or simple copied with :yref:`Dem3DofGeom`) |yupdate|"))
 			,
@@ -163,6 +193,14 @@ class CpmPhys: public NormShearPhys {
 REGISTER_SERIALIZABLE(CpmPhys);
 
 
+
+
+/*********************************************************************************
+*
+* I P 2
+*
+*********************************************************************************/
+
 /*! @brief Convert macroscopic properties to CpmPhys with corresponding parameters.
  *
  * */
@@ -179,23 +217,40 @@ REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 
 
 
+
+/*********************************************************************************
+*
+* L A W 2
+*
+*********************************************************************************/
+
+
+static Real cpm_funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
+	if (kappaD<epsCrackOnset || neverDamage) return 0;
+	switch (damLaw) {
+		case 0: // linear
+			return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
+		case 1: // exponential
+			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+	}
+	return 0;
+}
+
+static Real cpm_yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle){
+#ifdef CPM_MATERIAL_MODEL
+	return CPM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
+#else
+	//return max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle);
+	throw std::runtime_error("Full CPM model not available in this build");
+#endif
+}
+
+
 class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/*! Damage evolution law */
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
-		if(kappaD<epsCrackOnset || neverDamage) return 0;
-		switch (damLaw) {
-			case 0: // linear
-				return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
-			case 1: // exponential
-				return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
-		}
-		LOG_ERROR("End of void function!");
-		return 0;
-	}
-	//! return |sigmaT| at plastic surface for given sigmaN etc; not used by the law itself
-	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle);
-
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) { return cpm_funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw); }
+	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) { return cpm_yieldSigmaTMagnitude(sigmaN,omega,undamagedCohesion,tanFrictionAngle); }
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
@@ -214,19 +269,46 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
-#if 0
+
+
+
 class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) { return cpm_funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw); }
+	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) { return cpm_yieldSigmaTMagnitude(sigmaN,omega,undamagedCohesion,tanFrictionAngle); }
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+
 	FUNCTOR2D(ScGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"An experimental version of :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` which uses :yref:`ScGeom` instead of :yref:`Dem3DofGeom`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+		((int,yieldSurfType,2,,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
+		((Real,yieldLogSpeed,.1,,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
+		((Real,yieldEllipseShift,NaN,,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
 		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),,"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
+		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
+		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
+		/*ctor*/,
+		.def("funcG",&Law2_ScGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
+		.def("yieldSigmaTMagnitude",&Law2_ScGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
-#endif	
 
+
+
+
+
+
+
+
+
+
+
+/*********************************************************************************
+*
+* C P M   O P E N   G L
+*
+*********************************************************************************/
 
 
 #ifdef YADE_OPENGL
@@ -251,8 +333,19 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 #endif
 
 
+
+
+
+
+
+/*********************************************************************************
+*
+* C P M   S T A T E   U P D A T E R
+*
+*********************************************************************************/
+
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Matrix3r stress; Matrix3r dmgRhs; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), stress(Matrix3r::Zero()), dmgRhs(Matrix3r::Zero()) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum /*, epsPlSum*/; Matrix3r stress; Matrix3r dmgRhs; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.) /*, epsPlSum(0.)*/, stress(Matrix3r::Zero()), dmgRhs(Matrix3r::Zero()) {} };
 	public:
 		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);

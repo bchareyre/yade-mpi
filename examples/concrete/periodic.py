@@ -36,7 +36,7 @@ is 1000 for tension and 100 for compression.
 #utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 young=24e9
 poisson=.2
-G_over_E=.20
+poisson=.20
 sigmaT=3.5e6
 frictionAngle=atan(0.8)
 epsCrackOnset=1e-4
@@ -69,7 +69,7 @@ if not os.path.exists(packingFile):
 # load the packing (again);
 #
 import cPickle as pickle
-concreteId=O.materials.append(CpmMat(young=young, frictionAngle=frictionAngle, poisson=poisson, density=4800, sigmaT=sigmaT, crackOpening=crackOpening, epsCrackOnset=epsCrackOnset, G_over_E=G_over_E, isoPrestress=isoPrestress))
+concreteId=O.materials.append(CpmMat(young=young, frictionAngle=frictionAngle, poisson=poisson, density=4800, sigmaT=sigmaT, crackOpening=crackOpening, epsCrackOnset=epsCrackOnset, poisson=poisson, isoPrestress=isoPrestress))
 sphDict=pickle.load(open(packingFile))
 from yade import pack
 sp=pack.SpherePack()
