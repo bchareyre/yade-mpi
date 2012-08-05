@@ -4,7 +4,7 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
-YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(Gl1_CpmPhys)
 	#endif	
@@ -13,8 +13,18 @@ YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofG
 
 /********************** Ip2_CpmMat_CpmMat_CpmPhys ****************************/
 
-CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 
+CREATE_LOGGER(Ip2_FrictMat_CpmMat_FrictPhys);
+void Ip2_FrictMat_CpmMat_FrictPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
+	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(pp1);
+	const shared_ptr<CpmMat>& mat2 = YADE_PTR_CAST<CpmMat>(pp2);
+	Ip2_FrictMat_FrictMat_FrictPhys().go(mat1,mat2,interaction);
+}
+
+
+
+
+CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
 	// no updates of an already existing contact necessary
 	if (interaction->phys) return;

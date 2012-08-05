@@ -53,6 +53,7 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 
 namespace py=boost::python;
 
@@ -215,6 +216,17 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public IPhysFunctor{
 };
 REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 
+
+
+class Ip2_FrictMat_CpmMat_FrictPhys: public IPhysFunctor{
+	public:
+		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
+		FUNCTOR2D(FrictMat,CpmMat);
+		DECLARE_LOGGER;
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_CpmMat_FrictPhys,IPhysFunctor,"Convert :yref:`CpmMat` instance and :yref:`FrictMat` instance to :yref:`FrictPhys` with corresponding parameters (young, poisson, frictionAngle). Uses simple (arithmetic) averages if material parameters are different.",
+		);
+};
+REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 
 
 
