@@ -72,8 +72,8 @@ class CpmState: public State {
 		((int,numBrokenCohesive,0,,"Number of (cohesive) contacts that damaged completely"))
 		((int,numContacts,0,,"Number of contacts with this body"))
 		((Real,normDmg,0,,"Average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)"))
-		((Real,epsPlBroken,0,,"Plastic strain on contacts already deleted (bogus values)"))
-		((Real,normEpsPl,0,,"Sum of plastic strains normalized by number of contacts (bogus values)"))
+		//((Real,epsPlBroken,0,,"Plastic strain on contacts already deleted (bogus values)"))
+		//((Real,normEpsPl,0,,"Sum of plastic strains normalized by number of contacts (bogus values)"))
 		((Matrix3r,stress,Matrix3r::Zero(),,"Stress tensor of the spherical particle (under assumption that particle volume = pi*r*r*r*4/3.) for packing fraction 0.62"))
 		((Matrix3r,damageTensor,Matrix3r::Zero(),,"Damage tensor computed with microplane theory averaging. state.damageTensor.trace() = state.normDmg")),
 		/*ctor*/ createIndex();

@@ -290,11 +290,11 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 	/* handle broken contacts */ \
 	if (epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)) { \
 		/* if (isCohesive) { */ \
-			/* const shared_ptr<Body>& body1 = Body::byId(I->getId1(),scene), body2 = Body::byId(I->getId2(),scene); assert(body1); assert(body2); */ \
-			/* const shared_ptr<CpmState>& st1 = YADE_PTR_CAST<CpmState>(body1->state), st2 = YADE_PTR_CAST<CpmState>(body2->state); */ \
+			 const shared_ptr<Body>& body1 = Body::byId(I->getId1(),scene), body2 = Body::byId(I->getId2(),scene); assert(body1); assert(body2); \
+			 const shared_ptr<CpmState>& st1 = YADE_PTR_CAST<CpmState>(body1->state), st2 = YADE_PTR_CAST<CpmState>(body2->state); \
 			/* nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/ */ \
-			/* { boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive += 1; st1->epsPlBroken += epsPlSum; } */ \
-			/* { boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive += 1; st2->epsPlBroken += epsPlSum; } */ \
+			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive += 1; /* st1->epsPlBroken += epsPlSum; */ } \
+			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive += 1; /* st2->epsPlBroken += epsPlSum; */ } \
 		/* } */ \
 		scene->interactions->requestErase(I); \
 		return; \
@@ -527,7 +527,7 @@ void CpmStateUpdater::update(Scene* _scene){
 			damageTensor(1,2) = damageTensor(2,1) = dmgRhs(1,2);
 			damageTensor(2,0) = damageTensor(0,2) = dmgRhs(2,0);
 		}
-		else { state->normDmg = 0; state->normEpsPl=0; state->damageTensor = Matrix3r::Zero(); }
+		else { state->normDmg = 0; /*state->normEpsPl=0;*/ state->damageTensor = Matrix3r::Zero(); }
 		B->shape->color = Vector3r(state->normDmg,1-state->normDmg,B->state->blockedDOFs==State::DOF_ALL?0:1);
 		nAvgRelResidual += 0.5*state->numBrokenCohesive; // add half or broken interactions, other body has the other half
 		Sphere* sphere = dynamic_cast<Sphere*>(B->shape.get());
