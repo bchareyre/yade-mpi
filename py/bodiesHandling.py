@@ -36,8 +36,8 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 		idSpheresIter=idSpheres
 	
 	
-	min = Vector3.Zero
-	max = Vector3.Zero
+	minVal = Vector3.Zero
+	maxVal = Vector3.Zero
 	
 	minId = Vector3.Zero
 	maxId = Vector3.Zero
@@ -71,20 +71,20 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 			sphereMin = spherePosition - sphereRadiusVec3
 			
 			for dim in range(0,3):
-				if ((sphereMax[dim]>max[dim]) or (counter==0)): 
-					max[dim]=sphereMax[dim]
+				if ((sphereMax[dim]>maxVal[dim]) or (counter==0)): 
+					maxVal[dim]=sphereMax[dim]
 					maxId[dim] = b.id
-				if ((sphereMin[dim]<min[dim]) or (counter==0)): 
-					min[dim]=sphereMin[dim]
+				if ((sphereMin[dim]<minVal[dim]) or (counter==0)): 
+					minVal[dim]=sphereMin[dim]
 					minId[dim] = b.id
 			volume += 4.0/3.0*math.pi*sphereRadius*sphereRadius*sphereRadius
 			mass += b.state.mass
 			counter += 1
 	
-	center = (max-min)/2.0+min
-	extends = max-min
+	center = (maxVal-minVal)/2.0+minVal
+	extends = maxVal-minVal
 	
-	dimensions = {'max':max,'min':min,'maxId':maxId,'minId':minId,'center':center,
+	dimensions = {'max':maxVal,'min':minVal,'maxId':maxId,'minId':minId,'center':center,
 		'extends':extends, 'volume':volume, 'mass':mass, 'number':counter}
 	return dimensions
 
