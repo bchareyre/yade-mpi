@@ -88,6 +88,81 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 		'extends':extends, 'volume':volume, 'mass':mass, 'number':counter}
 	return dimensions
 
+#facetsDimensions==================================================
+def facetsDimensions(idFacets=[],mask=-1):
+	"""The function accepts the list of facet id's or list of facets and calculates max and min dimensions, geometrical center.
+
+	:param list idFacets: list of spheres
+	:param int mask: :yref:`Body.mask` for the checked bodies
+	
+	:return: dictionary with keys ``min`` (minimal dimension, Vector3), ``max`` (maximal dimension, Vector3), ``minId`` (minimal dimension facet Id, Vector3), ``maxId`` (maximal dimension facet Id, Vector3), ``center`` (central point of bounding box, Vector3), ``extends`` (sizes of bounding box, Vector3), ``number`` (number of facets, int), 
+	
+	"""
+	idFacetsIter=[]
+	
+	if (len(idFacets)<1):
+		#check mask
+		ifFacetMask=[]
+		if (mask>-1):   #The case, when only the mask was given, without list of ids
+			for i in O.bodies:
+				if ((i.mask&mask)<>0):
+					ifFacetMask.append(i.id)
+			if (len(ifFacetMask)<2):
+				raise RuntimeWarning("Not enough bodies to analyze with given mask")
+			else:
+				idFacetsIter=ifFacetMask
+		else:
+			raise RuntimeWarning("Only a list of particles with length > 1 can be analyzed")
+	else:
+		idFacetsIter=idFacets
+	
+	
+	minVal = Vector3.Zero
+	maxVal = Vector3.Zero
+	
+	minId = Vector3.Zero
+	maxId = Vector3.Zero
+	
+	counter = 0
+	
+		
+	for i in idFacetsIter:
+		if (type(i).__name__=='int'):
+			b = O.bodies[i]			#We have received a list of ID's
+		elif (type(i).__name__=='Body'):
+			b = i								#We have recevied a list of bodies
+		else:
+			raise TypeError("Unknow type of data, should be list of int's or bodies's")
+		
+		if (b):
+			p = b.state.pos
+			o = b.state.ori
+			s = b.shape
+			pt1 = p + o*s.vertices[0]
+			pt2 = p + o*s.vertices[1]
+			pt3 = p + o*s.vertices[2]
+			
+			if (mask>-1) and ((mask&b.mask)==0): continue			#skip bodies with wrong mask
+			
+			facetMax = Vector3(max(pt1[0], pt2[0], pt3[0]), max(pt1[1], pt2[1], pt3[1]), max(pt1[2], pt2[2], pt3[2]))
+			facetMin = Vector3(min(pt1[0], pt2[0], pt3[0]), min(pt1[1], pt2[1], pt3[1]), min(pt1[2], pt2[2], pt3[2]))
+			
+			for dim in range(0,3):
+				if ((facetMax[dim]>maxVal[dim]) or (counter==0)): 
+					maxVal[dim]=facetMax[dim]
+					maxId[dim] = b.id
+				if ((facetMin[dim]<minVal[dim]) or (counter==0)): 
+					minVal[dim]=facetMin[dim]
+					minId[dim] = b.id
+			counter += 1
+	
+	center = (maxVal-minVal)/2.0+minVal
+	extends = maxVal-minVal
+	
+	dimensions = {'max':maxVal,'min':minVal,'maxId':maxId,'minId':minId,'center':center,
+		'extends':extends, 'number':counter}
+	return dimensions
+
 #spheresPackDimensions==================================================
 def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,copy=False):
 	"""The function accepts the list of spheres id's or list of bodies and modifies them: rotating, scaling, shifting.
