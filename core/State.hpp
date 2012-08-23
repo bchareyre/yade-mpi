@@ -61,7 +61,7 @@ class State: public Serializable, public Indexable{
 		((Quaternionr,refOri,Quaternionr::Identity(),,"Reference orientation"))
 		((unsigned,blockedDOFs,,,"[Will be overridden]"))
 		((bool,isDamped,true,,"Damping in :yref:`Newtonintegrator` can be deactivated for individual particles by setting this variable to FALSE. E.g. damping is inappropriate for particles in free flight under gravity but it might still be applicable to other particles in the same simulation."))
-		((Real,densityScaling,1,,"|yupdate|.")),
+		((Real,densityScaling,1,,"|yupdate| see :yref:`GlobalStiffnessTimeStepper::targetDt`.")),
 		/* additional initializers */
 			((pos,se3.position))
 			((ori,se3.orientation)),
