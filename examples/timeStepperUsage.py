@@ -51,7 +51,7 @@ O.reload()
 timing.reset()
 O.dt=100000000 #or whatever
 ts.active=True
-O.run(100000,True);
+#O.run(100000,True);
 print "--------------------------------------------------"
 print "dt dynamicaly set with GlobalStiffness timesteper:"
 print "--------------------------------------------------"
@@ -61,10 +61,11 @@ timing.stats()
 O.reload()
 timing.reset()
 O.dt=100000000 #or whatever
-#We force dt=1, approx. 10e5 larger than the previous one. The inertia of bodies will adjusted automaticaly...
+#We force dt=1, approx. 10e4 larger than the previous one. The inertia of bodies will adjusted automaticaly...
 newton.densityScaling=True
-#... but not that of cell, hence we have to adjust it
-triax.mass=triax.mass*(10e4)**2
+#... but not that of cell, hence we have to adjust it and the max strain rate
+triax.mass=triax.mass*(1e4)**2
+triax.maxStrainRate=(0.001,0.001,0.001)
 O.run(1000000,True);
 print "--------------------------------------------------------------------"
 print "dt dynamicaly set with GlobalStiffness timesteper + density scaling:"
