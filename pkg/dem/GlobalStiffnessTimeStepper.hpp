@@ -42,7 +42,8 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 			((Real,maxDt,Mathr::MAX_REAL,,"if positive, used as max value of the timestep whatever the computed value"))
 			((Real,previousDt,1,,"last computed dt |yupdate|"))
 			((Real,timestepSafetyCoefficient,0.8,,"safety factor between the minimum eigen-period and the final assigned dt (less than 1))"))
-			((Real,targetDt,-1,,"if >0, then density scaling [Pfc3dManual30]_ will be applied in order to have a critical timestep equal to targetDt for all bodies. This option makes the simulation unrealistic from a dynamic point of view, but may speedup quasistatic simulations.")),
+			((bool,densityScaling,false,,"|yupdate| don't modify this value. see :yref:`NewtonIntegrator::densityScaling` and :yref:`NewtonIntegrator::densityScaling`"))
+			((Real,targetDt,1,,"if :yref:`NewtonIntegrator::densityScaling` is active, this value will be used as the simulation  timestep and the scaling will use this value of dt as the target value. The value of targetDt is arbitrary and should have no effect in the result in general. However if some bodies have imposed velocities, for instance, they will move more or less per each step depending on this value.")),
 			computedOnce=false;)
 		DECLARE_LOGGER;
 };

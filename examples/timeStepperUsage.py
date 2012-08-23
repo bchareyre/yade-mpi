@@ -15,15 +15,15 @@ O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),
+	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GlobalStiffnessTimeStepper(label='ts',timeStepUpdateInterval=1),
+	GlobalStiffnessTimeStepper(label='ts'),
 	PeriTriaxController(dynCell=True,mass=0.2,maxUnbalanced=0.001, relStressTol=0.01,goal=(-1e4,-1e4,0),stressMask=3,globUpdate=5, maxStrainRate=(10.,10.,10.),doneHook='triaxDone()',label='triax'),
-	NewtonIntegrator(damping=.2),
+	NewtonIntegrator(damping=.2,label="newton"),
 ]
 
 phase=0
@@ -61,8 +61,8 @@ timing.stats()
 O.reload()
 timing.reset()
 O.dt=100000000 #or whatever
-#We force dt approx. 10e5 larger than the previous one. The inertia of bodies will adjusted automaticaly...
-ts.targetDt=1
+#We force dt=1, approx. 10e5 larger than the previous one. The inertia of bodies will adjusted automaticaly...
+newton.densityScaling=True
 #... but not that of cell, hence we have to adjust it
 triax.mass=triax.mass*(10e4)**2
 O.run(1000000,True);

@@ -11,6 +11,8 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/pkg/common/Callbacks.hpp>
+#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
+
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
@@ -39,26 +41,29 @@ class NewtonIntegrator : public GlobalEngine{
 	// whether the cell has changed from the previous step
 	bool cellChanged;
 	bool homoDeform;
-
+	
 	// wether a body has been selected in Qt view
 	bool bodySelected;
 	Matrix3r dVelGrad;
 
 	public:
+		bool densityScaling;// internal for density scaling
 		Real updatingDispFactor;//(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated.
 		// function to save maximum velocity, for the verlet-distance optimization
 		void saveMaximaVelocity(const Body::id_t& id, State* state);
 		void saveMaximaDisplacement(const shared_ptr<Body>& b);
+		bool get_densityScaling ();
+		void set_densityScaling (bool dsc);
+
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))
 		((Vector3r,gravity,Vector3r::Zero(),,"Gravitational acceleration (effectifely replaces GravityEngine)."))
 		((Real,maxVelocitySq,NaN,,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulation from [Allen1989]_, pg. 89."))
-		((bool,densityScaling,false,,"|yupdate| true is density scaling is activated in GlobalStiffnessTimeStepper"))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track acceleration. |yupdate|"))
 		#ifdef YADE_BODY_CALLBACK
 			((vector<shared_ptr<BodyCallback> >,callbacks,,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
@@ -73,9 +78,12 @@ class NewtonIntegrator : public GlobalEngine{
 		((int,kinEnergyRotIx,-1,(Attr::hidden|Attr::noSave),"Index for rotational kinetic energy in scene->energies."))
 		,
 		/*ctor*/
+			densityScaling=false;
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads()); syncEnsured=false;
 			#endif
+		,/*py*/
+		.add_property("densityScaling",&NewtonIntegrator::get_densityScaling,&NewtonIntegrator::set_densityScaling,"if True, then density scaling [Pfc3dManual30]_ will be applied in order to have a critical timestep equal to :yref:`GlobalStiffnessTimeStepper::targetDt` for all bodies. This option makes the simulation unrealistic from a dynamic point of view, but may speedup quasistatic simulations.")
 	);
 	DECLARE_LOGGER;
 };

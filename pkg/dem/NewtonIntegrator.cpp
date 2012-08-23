@@ -10,7 +10,6 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Clump.hpp>
 #include<yade/lib/base/Math.hpp>
-#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
@@ -100,13 +99,7 @@ void NewtonIntegrator::action()
 	//prevent https://bugs.launchpad.net/yade/+bug/923929
 	ensureSync();
 	#endif
-	
-	densityScaling = false;
-	FOREACH(const shared_ptr<Engine> e, scene->engines){
-		GlobalStiffnessTimeStepper* ts=dynamic_cast<GlobalStiffnessTimeStepper*>(e.get());
-		if(ts) {densityScaling = ts->targetDt>0; break;}
-	}
-	
+
 	scene->forces.sync();
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
@@ -271,6 +264,29 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 	}
 	state->ori.normalize();
 }
+
+bool NewtonIntegrator::get_densityScaling() {
+	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
+		GlobalStiffnessTimeStepper* ts=dynamic_cast<GlobalStiffnessTimeStepper*>(e.get());
+		if (ts) {
+			if (densityScaling != ts->densityScaling) LOG_ERROR("inconsistent set of densityScaling in Newton and TimeStepper, did you change the TimeStepper's value?");
+			return ts->densityScaling;
+		}
+	} LOG_ERROR("Density scaling needs GlobalStiffnessTimeStepper present in O.engines.");
+	return 0;
+}
+
+void NewtonIntegrator::set_densityScaling(bool dsc) {
+	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
+		GlobalStiffnessTimeStepper* ts=dynamic_cast<GlobalStiffnessTimeStepper*>(e.get());
+		if (ts) {
+			ts->densityScaling=dsc;
+			densityScaling=dsc;
+			return;
+		}
+	} LOG_ERROR("Density scaling needs GlobalStiffnessTimeStepper present in O.engines. Not set.");
+}
+
 
 // http://www.euclideanspace.com/physics/kinematics/angularvelocity/QuaternionDifferentiation2.pdf
 Quaternionr NewtonIntegrator::DotQ(const Vector3r& angVel, const Quaternionr& Q){

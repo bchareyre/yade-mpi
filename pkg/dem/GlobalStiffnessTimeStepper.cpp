@@ -35,7 +35,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	}
 	
 	if(!sdec || stiffness==Vector3r::Zero()){
-		if (targetDt>0) sdec->densityScaling = max(0.95*sdec->densityScaling,0.8*pow(defaultDt/targetDt,2.0));
+		if (densityScaling) sdec->densityScaling = max(0.95*sdec->densityScaling,0.8*pow(defaultDt/targetDt,2.0));
 		return; // not possible to compute!
 	}
 	
@@ -58,7 +58,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for rotational motions
 	dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
 	//if there is a target dt, then we apply density scaling on the body
-	if (targetDt>0) {
+	if (densityScaling) {
 		Real prevSc = sdec->densityScaling;
 		sdec->densityScaling = min(1.01*sdec->densityScaling,0.8*pow(dt /targetDt,2.0));
 // 		sdec->vel*=min(pow(sdec->densityScaling/prevSc,2),1.);
@@ -79,7 +79,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 	// for some reason, this line is necessary to have correct functioning (no idea _why_)
 	// see scripts/test/compare-identical.py, run with or without active=active.
 	active=active;
-	if (defaultDt<0) defaultDt=Shop::PWaveTimeStep(Omega::instance().getScene());
+	if (defaultDt<0) defaultDt= timestepSafetyCoefficient*Shop::PWaveTimeStep(Omega::instance().getScene());
 	computeStiffnesses(ncb);
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -92,8 +92,8 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 		if (b->isDynamic() && !b->isClumpMember()) findTimeStepFromBody(b, ncb);
 		
 	}
-	if(targetDt>0) (newDt=targetDt);
-	if(computedSomething || targetDt>0){
+	if(densityScaling) (newDt=targetDt);
+	if(computedSomething || densityScaling){
 		previousDt = min ( min(newDt , maxDt), 1.05*previousDt );// at maximum, dt will be multiplied by 1.05 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations
 		scene->dt=previousDt;
 		computedOnce = true;}
