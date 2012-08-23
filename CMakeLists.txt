@@ -207,6 +207,13 @@ ELSE(ENABLE_GL2PS)
   SET(DISABLED_FEATS "${DISABLED_FEATS} GL2PS")
 ENDIF(ENABLE_GL2PS)
 #===========================================================
+IF(ENABLE_FIXBUGINTRS)
+  # This is temporar option is used for fixing https://bugs.launchpad.net/yade/+bug/850864
+  # Should be removed in a future
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CGAL_DEFINITIONS} -DFIXBUGINTRS")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} FIXBUGINTRS")
+ENDIF(ENABLE_FIXBUGINTRS)
+#===========================================================
 
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
