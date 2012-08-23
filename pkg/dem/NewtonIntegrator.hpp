@@ -58,6 +58,7 @@ class NewtonIntegrator : public GlobalEngine{
 		((Vector3r,gravity,Vector3r::Zero(),,"Gravitational acceleration (effectifely replaces GravityEngine)."))
 		((Real,maxVelocitySq,NaN,,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,true,,"Enable more exact body rotation integrator for :yref:`aspherical bodies<Body.aspherical>` *only*, using formulation from [Allen1989]_, pg. 89."))
+		((bool,densityScaling,false,,"|yupdate| true is density scaling is activated in GlobalStiffnessTimeStepper"))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),,"Store previous velocity gradient (:yref:`Cell::velGrad`) to track acceleration. |yupdate|"))
 		#ifdef YADE_BODY_CALLBACK
 			((vector<shared_ptr<BodyCallback> >,callbacks,,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))

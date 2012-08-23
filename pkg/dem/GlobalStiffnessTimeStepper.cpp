@@ -21,7 +21,7 @@ GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper() {}
 
 void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, Scene * ncb)
 {
-	const State* sdec=body->state.get();	
+	State* sdec=body->state.get();
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
 	
@@ -34,8 +34,10 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 		}
 	}
 	
-	if(!sdec || stiffness==Vector3r::Zero())
+	if(!sdec || stiffness==Vector3r::Zero()){
+		if (targetDt>0) sdec->densityScaling = max(0.95*sdec->densityScaling,0.8*pow(defaultDt/targetDt,2.0));
 		return; // not possible to compute!
+	}
 	
 	Real dtx, dty, dtz;
 	Real dt = max( max (stiffness.x(), stiffness.y()), stiffness.z() );
@@ -55,7 +57,16 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	
 	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for rotational motions
 	dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
-	newDt = std::min(dt,newDt);
+	//if there is a target dt, then we apply density scaling on the body
+	if (targetDt>0) {
+		Real prevSc = sdec->densityScaling;
+		sdec->densityScaling = min(1.01*sdec->densityScaling,0.8*pow(dt /targetDt,2.0));
+// 		sdec->vel*=min(pow(sdec->densityScaling/prevSc,2),1.);
+// 		sdec->angVel*=min(pow(sdec->densityScaling/prevSc,2),1.);
+		newDt=targetDt;
+	}
+	//else we update dt normaly
+	else {newDt = std::min(dt,newDt);}
 }
 
 bool GlobalStiffnessTimeStepper::isActivated()
@@ -67,22 +78,23 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 {
 	// for some reason, this line is necessary to have correct functioning (no idea _why_)
 	// see scripts/test/compare-identical.py, run with or without active=active.
-	// ANSW : Really strange!! I also noticed timestepper was not computing anything if I don't set active=true in python, why? since the default is true, it seems. I didn't try the compare script yet. (BC.)
 	active=active;
+	if (defaultDt<0) defaultDt=Shop::PWaveTimeStep(Omega::instance().getScene());
 	computeStiffnesses(ncb);
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-// 	shared_ptr<InteractionContainer>& interactions = ncb->interactions;
-
 	newDt = Mathr::MAX_REAL;
 	computedSomething=false;
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for(  ; bi!=biEnd ; ++bi ){
 		shared_ptr<Body> b = *bi;
-		if (b->isDynamic() && !b->isClumpMember()) findTimeStepFromBody(b, ncb);}
-	if(computedSomething){
-		previousDt = min ( min(newDt , maxDt), 1.05*previousDt );// at maximum, dt will be multiplied by 1.05 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations 
+		if (b->isDynamic() && !b->isClumpMember()) findTimeStepFromBody(b, ncb);
+		
+	}
+	if(targetDt>0) (newDt=targetDt);
+	if(computedSomething || targetDt>0){
+		previousDt = min ( min(newDt , maxDt), 1.05*previousDt );// at maximum, dt will be multiplied by 1.05 in one iterration, this is to prevent brutal switches from 0.000... to 1 in some computations
 		scene->dt=previousDt;
 		computedOnce = true;}
 	else if (!computedOnce) scene->dt=defaultDt;
