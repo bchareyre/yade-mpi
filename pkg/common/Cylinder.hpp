@@ -134,6 +134,7 @@ class Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D: public IGeomFunctor{
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 	YADE_CLASS_BASE_DOC_ATTRS(Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing connexion between :yref:`chained cylinders<ChainedCylinder>`.",
 		((Real,interactionDetectionFactor,1,,"Enlarge both radii by this factor (if >1), to permit creation of distant interactions."))
+		((bool,halfLengthContacts,true,,"If True, Cylinders nodes interact like spheres of radius 0.5*length, else one node has size length while the other has size 0. The difference is mainly the locus of rotation definition."))
 	);
 	FUNCTOR2D(ChainedCylinder,ChainedCylinder);
 	// needed for the dispatcher, even if it is symmetric

@@ -48,7 +48,7 @@ class TestCohesiveChain(unittest.TestCase):
 	def testMotion(self):
 		"CohesiveChain: velocity/positions tested in transient dynamics and equilibrium state"
 		#target values
-		tv1=-0.881733955694;tp1=-0.0504220815057;tv2=-0.0007511382705;tp2=-0.07474048423;
+		tv1=-0.790576599652;tp1=-0.0483370740415;tv2=-0.000494271551993;tp2=-0.0611987315415;
 		tolerance = 10e-3
 		O.run(100,True)
 		v1=O.bodies[0].state.vel[1];p1=O.bodies[0].state.pos[1]

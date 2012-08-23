@@ -403,10 +403,15 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 	Real length=(bchain2.pos-bchain1.pos).norm();
 	Vector3r segt =pChain2->pos-pChain1->pos;
 	if(isNew) {/*scm->normal=scm->prevNormal=segt/length;*/bs1->initLength=length;}
-	scm->radius1=revert ? 0:bs1->initLength;
-	scm->radius2=revert ? bs1->initLength:0;
+	if (!halfLengthContacts){
+		scm->radius1=revert ? 0:bs1->initLength;
+		scm->radius2=revert ? bs1->initLength:0;
+		scm->contactPoint=bchain2.pos;
+	} else {
+		scm->radius1=scm->radius2=0.5*bs1->initLength;
+		scm->contactPoint=0.5*(bchain2.pos+bchain1.pos);
+	}
 	scm->penetrationDepth=bs1->initLength-length;
-	scm->contactPoint=bchain2.pos;
 	//bs1->segment used for fast BBs and projections + display
 	bs1->segment= bchain2.pos-bchain1.pos;
 #ifdef YADE_OPENGL
