@@ -151,6 +151,7 @@ class ControllerClass(QWidget,Ui_Controller):
 		O.reload()
 	def dtFixedSlot(self):
 		O.dt=O.dt
+		O.dynDt=False
 	def dtDynSlot(self):
 		O.dt=-O.dt
 	def dtEditNoupdateSlot(self):

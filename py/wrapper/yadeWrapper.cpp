@@ -342,9 +342,10 @@ class pyOmega{
 		Scene* scene=OMEGA.getScene().get();
 		// activate timestepper, if possible (throw exception if there is none)
 		if(dt<0){ if(!scene->timeStepperActivate(true)) /* not activated*/ throw runtime_error("No TimeStepper found in O.engines."); }
-		else { scene->timeStepperActivate(false); scene->dt=dt; }
+		else { scene->dt=dt; }
 	}
 	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
+	bool dynDt_set(bool activate){if(!OMEGA.getScene()->timeStepperActivate(activate)) /* not activated*/ throw runtime_error("No TimeStepper found in O.engines."); }
 	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIter; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIter=s; }
@@ -539,8 +540,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("time",&pyOmega::time,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
 		.add_property("speed",&pyOmega::speed,"Return current calculation speed [iter/sec].")
-		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.\n\n* assigning negative value enables dynamic Δt (by looking for a :yref:`TimeStepper` in :yref:`O.engine<Omega.engines>`) and sets positive timestep ``O.dt=|Δt|`` (will be used until the timestepper is run and updates it)\n* assigning positive value sets Δt to that value and disables dynamic Δt (via :yref:`TimeStepper`, if there is one).\n\n:yref:`dynDt<Omega.dynDt>` can be used to query whether dynamic Δt is in use.")
-		.add_property("dynDt",&pyOmega::dynDt_get,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
+		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set,"Current timestep (Δt) value.")
+		.add_property("dynDt",&pyOmega::dynDt_get,&pyOmega::dynDt_set,"Whether a :yref:`TimeStepper` is used for dynamic Δt control. See :yref:`dt<Omega.dt>` on how to enable/disable :yref:`TimeStepper`.")
 		.add_property("dynDtAvailable",&pyOmega::dynDtAvailable_get,"Whether a :yref:`TimeStepper` is amongst :yref:`O.engines<Omega.engines>`, activated or not.")
 		.def("load",&pyOmega::load,(py::arg("file"),py::arg("quiet")=false),"Load simulation from file.")
 		.def("reload",&pyOmega::reload,(py::arg("quiet")=false),"Reload current simulation")
