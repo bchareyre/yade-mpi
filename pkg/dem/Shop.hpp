@@ -134,4 +134,7 @@ class Shop{
 		
 		//! Function to set translational and rotational velocities of all bodies to zero
 		static void calm(const shared_ptr<Scene>& rb=shared_ptr<Scene>(), int mask=-1);
+		
+		//! Get a list of body-ids, which contacts the given body;
+		static py::list getBodyIdsContacts(Body::id_t bodyID=-1);
 };
