@@ -10,6 +10,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Clump.hpp>
 #include<yade/lib/base/Math.hpp>
+#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
