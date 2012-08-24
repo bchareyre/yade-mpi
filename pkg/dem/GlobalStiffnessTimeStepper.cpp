@@ -35,7 +35,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	}
 	
 	if(!sdec || stiffness==Vector3r::Zero()){
-		if (densityScaling) sdec->densityScaling = max(0.95*sdec->densityScaling,0.8*pow(defaultDt/targetDt,2.0));
+		if (densityScaling) sdec->densityScaling = min(1.0001*sdec->densityScaling, timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0));
 		return; // not possible to compute!
 	}
 	
@@ -59,8 +59,8 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
 	//if there is a target dt, then we apply density scaling on the body
 	if (densityScaling) {
-		Real prevSc = sdec->densityScaling;
-		sdec->densityScaling = min(1.01*sdec->densityScaling,0.8*pow(dt /targetDt,2.0));
+// 		Real prevSc = sdec->densityScaling;
+		sdec->densityScaling = min(1.001*sdec->densityScaling,timestepSafetyCoefficient*pow(dt /targetDt,2.0));
 // 		sdec->vel*=min(pow(sdec->densityScaling/prevSc,2),1.);
 // 		sdec->angVel*=min(pow(sdec->densityScaling/prevSc,2),1.);
 		newDt=targetDt;

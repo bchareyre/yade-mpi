@@ -8,10 +8,15 @@ O.periodic=True
 O.cell.hSize=Matrix3(0.1, 0, 0,
 		     0 ,0.1, 0,
 		    0, 0, 0.1)
-		    
+
+n=1000
+
 sp=pack.SpherePack()
-num=sp.makeCloud(Vector3().Zero,O.cell.refSize,rRelFuzz=.9,num=2000,periodic=True,seed=1)
+num=sp.makeCloud(Vector3().Zero,O.cell.refSize,rRelFuzz=.5,num=n,periodic=True,seed=1)
 O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
+
+#make the problem more interesting by giving a smaller mass to one of the bodies, different stiffness present similar difficulties
+O.bodies[3].state.mass = O.bodies[n-1].state.mass*0.01
 
 O.engines=[
 	ForceResetter(),
@@ -38,7 +43,7 @@ O.saveTmp()
 
 #======   First, we won't use a timestepper at all, we fix O.dt using PWave timestep   =========#
 timing.reset()
-O.dt=0.8*utils.PWaveTimeStep() #for fair comparison, we use the same safety factor as in GS timestepper
+O.dt=0.8*utils.PWaveTimeStep() #for fair comparison, we use the same safety factor as in GS timestepper, allthough many scripts use 0.5 or even 0.1*utils.PWaveTimeStep()
 ts.active=False
 O.run(100000,True);#it will actually stop before 100k iterations as soon as the packing is stable
 print "--------------------------------"
@@ -51,7 +56,7 @@ O.reload()
 timing.reset()
 O.dt=100000000 #or whatever
 ts.active=True
-#O.run(100000,True);
+O.run(100000,True);
 print "--------------------------------------------------"
 print "dt dynamicaly set with GlobalStiffness timesteper:"
 print "--------------------------------------------------"
@@ -60,12 +65,11 @@ timing.stats()
 #======  And finaly, the timestepper with density scaling =========#
 O.reload()
 timing.reset()
-O.dt=100000000 #or whatever
-#We force dt=1, approx. 10e4 larger than the previous one. The inertia of bodies will adjusted automaticaly...
+O.dt=1000000 #or whatever
+#We force dt=1. The inertia of bodies will adjusted automaticaly...
 newton.densityScaling=True
-#... but not that of cell, hence we have to adjust it and the max strain rate
+#... but not that of cell, hence we have to adjust it or the problem becomes unstable
 triax.mass=triax.mass*(1e4)**2
-triax.maxStrainRate=(0.001,0.001,0.001)
 O.run(1000000,True);
 print "--------------------------------------------------------------------"
 print "dt dynamicaly set with GlobalStiffness timesteper + density scaling:"
@@ -73,29 +77,43 @@ print "--------------------------------------------------------------------"
 timing.stats()
 
 
-#_____ TYPICAL RESULTS ____
+#_____ TYPICAL RESULTS (n=1000)____
+
 #--------------------------------
 #Fixed dt = 0.8 * PWave timestep:
 #--------------------------------
 #Name                                                    Count                 Time            Rel. time
+#-------------------------------------------------------------------------------------------------------
+#ForceResetter                                     77246             326813us                0.24%
+#InsertionSortCollider                             23571           29447986us               21.73%
+#InteractionLoop                                   77246           65954607us               48.67%
 #"ts"                                                  0                  0us                0.00%
-#NewtonIntegrator                                  45561           32739725us               23.42%
-#TOTAL                                                            139784778us              100.00%
+#"triax"                                           77246           11876934us                8.76%
+#"newton"                                          77246           27914757us               20.60%
+#TOTAL                                                            135521099us              100.00%
 
 #--------------------------------------------------
 #dt dynamicaly set with GlobalStiffness timesteper:
 #--------------------------------------------------
 #Name                                                    Count                 Time            Rel. time
-#"ts"                                              13626            3508618us                7.44%
-#NewtonIntegrator                                  13626           10191836us               21.61%
-#TOTAL                                                             47155258us              100.00%
+#-------------------------------------------------------------------------------------------------------
+#ForceResetter                                     45666             193813us                0.23%
+#InsertionSortCollider                              6727            9456709us               11.09%
+#InteractionLoop                                   45666           44245384us               51.87%
+#"ts"                                              45666            6267682us                7.35%
+#"triax"                                           45666            8234896us                9.65%
+#"newton"                                          45666           16906118us               19.82%
+#TOTAL                                                             85304605us              100.00%
 
 #--------------------------------------------------------------------
 #dt dynamicaly set with GlobalStiffness timesteper + density scaling:
 #--------------------------------------------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#"ts"                                               8241            2413068us                8.67%
-#NewtonIntegrator                                   8241            6434085us               23.13%
-#TOTAL                                                             27818244us              100.00%    
-
+#ForceResetter                                     23936             102435us                0.25%
+#InsertionSortCollider                               305             534572us                1.29%
+#InteractionLoop                                   23936           23748011us               57.11%
+#"ts"                                              23936            3520397us                8.47%
+#"triax"                                           23936            4623106us               11.12%
+#"newton"                                          23936            9051032us               21.77%
+#TOTAL                                                             41579556us              100.00%

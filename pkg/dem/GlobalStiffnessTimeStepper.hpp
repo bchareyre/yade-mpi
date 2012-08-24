@@ -38,7 +38,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		virtual bool isActivated();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(
 			GlobalStiffnessTimeStepper,TimeStepper,"An engine assigning the time-step as a fraction of the minimum eigen-period in the problem",
-			((Real,defaultDt,-1,,"used as the initial value of the timestep (especially useful in the first steps when no contact exist). If negative, it will be defined by :yref:`utils.PWaveTimeStep`"))
+			((Real,defaultDt,-1,,"used as the initial value of the timestep (especially useful in the first steps when no contact exist). If negative, it will be defined by :yref:`utils.PWaveTimeStep` * :yref:`GlobalStiffnessTimeStepper::timestepSafetyCoefficient`"))
 			((Real,maxDt,Mathr::MAX_REAL,,"if positive, used as max value of the timestep whatever the computed value"))
 			((Real,previousDt,1,,"last computed dt |yupdate|"))
 			((Real,timestepSafetyCoefficient,0.8,,"safety factor between the minimum eigen-period and the final assigned dt (less than 1))"))
