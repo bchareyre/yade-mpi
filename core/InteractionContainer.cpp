@@ -79,8 +79,8 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 			b1->intrs.erase(I);}
 			#ifdef FIXBUGINTRS
 				if (b2) { 
-					Body::MapId2IntrT::iterator I(b2->intrs.find(id1));
-					if(not(I==b1->intrs.end())) { b2->intrs.erase(I); }
+					Body::MapId2IntrT::iterator I2(b2->intrs.find(id1));
+					if(not(I2==b2->intrs.end())) { b2->intrs.erase(I2); }
 				}
 			#endif
 	}
