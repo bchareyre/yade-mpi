@@ -65,6 +65,8 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	const shared_ptr<Body>& b1((*bodies)[id1]);
 	#ifdef FIXBUGINTRS
 		const shared_ptr<Body>& b2((*bodies)[id2]);
+		b1->checkIntrs=true;
+		b2->checkIntrs=true;
 	#endif
 	
 	int linIx=-1;
