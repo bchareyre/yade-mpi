@@ -236,37 +236,33 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 *
 *********************************************************************************/
 
-
-static Real cpm_funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
-	if (kappaD<epsCrackOnset || neverDamage) return 0;
-	switch (damLaw) {
-		case 0: // linear
-			return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
-		case 1: // exponential
-			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
-	}
-	return 0;
-}
-
-static Real cpm_yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle){
-#ifdef CPM_MATERIAL_MODEL
-	return CPM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
-#else
-	//return max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle);
-	throw std::runtime_error("Full CPM model not available in this build");
-#endif
-}
-
-
-class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
+class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/*! Damage evolution law */
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) { return cpm_funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw); }
-	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) { return cpm_yieldSigmaTMagnitude(sigmaN,omega,undamagedCohesion,tanFrictionAngle); }
-	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
+		if (kappaD<epsCrackOnset || neverDamage) return 0;
+		switch (damLaw) {
+			case 0: // linear
+				return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
+			case 1: // exponential
+				return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+		}
+		return 0;
+	}
 
-	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) {
+#ifdef CPM_MATERIAL_MODEL
+		return CPM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
+#else
+		//return max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle);
+		throw std::runtime_error("Full CPM model not available in this build");
+#endif
+	}
+
+	//void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+
+	FUNCTOR2D(GenericSpheresContact,CpmPhys);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SomeGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
 		((int,yieldSurfType,2,,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
 		((Real,yieldLogSpeed,.1,,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
 		((Real,yieldEllipseShift,NaN,,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
@@ -274,8 +270,24 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
-		.def("funcG",&Law2_Dem3DofGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
-		.def("yieldSigmaTMagnitude",&Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
+		.def("funcG",&Law2_SomeGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
+		.def("yieldSigmaTMagnitude",&Law2_SomeGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
+	);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_SomeGeom_CpmPhys_Cpm);
+
+
+
+
+class Law2_Dem3DofGeom_CpmPhys_Cpm: public Law2_SomeGeom_CpmPhys_Cpm{
+	public:
+	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+
+	FUNCTOR2D(Dem3DofGeom,CpmPhys);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+		,
+		/*ctor*/,
 	);
 	DECLARE_LOGGER;
 };
@@ -284,23 +296,14 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
 
 
-class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
+class Law2_ScGeom_CpmPhys_Cpm: public Law2_SomeGeom_CpmPhys_Cpm{
 	public:
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) { return cpm_funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw); }
-	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) { return cpm_yieldSigmaTMagnitude(sigmaN,omega,undamagedCohesion,tanFrictionAngle); }
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(ScGeom,CpmPhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
-		((int,yieldSurfType,2,,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
-		((Real,yieldLogSpeed,.1,,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
-		((Real,yieldEllipseShift,NaN,,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
-		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),,"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
-		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
-		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
+		,
 		/*ctor*/,
-		.def("funcG",&Law2_ScGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
-		.def("yieldSigmaTMagnitude",&Law2_ScGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;
 };

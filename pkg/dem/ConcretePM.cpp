@@ -4,7 +4,7 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
-YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_SomeGeom_CpmPhys_Cpm)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(Gl1_CpmPhys)
 	#endif	
@@ -167,11 +167,11 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 		const Real& dt = scene->dt;\
 		const Real& dmgTau(BC->dmgTau);\
 		const Real& plTau(BC->plTau);\
-		const Real& yieldLogSpeed(CPM_LAW2::yieldLogSpeed);\
-		const int& yieldSurfType(CPM_LAW2::yieldSurfType);\
-		const Real& yieldEllipseShift(CPM_LAW2::yieldEllipseShift);\
-		const Real& epsSoft(CPM_LAW2::epsSoft);\
-		const Real& relKnSoft(CPM_LAW2::relKnSoft);
+		const Real& yieldLogSpeed(this->yieldLogSpeed);\
+		const int& yieldSurfType(this->yieldSurfType);\
+		const Real& yieldEllipseShift(this->yieldEllipseShift);\
+		const Real& epsSoft(this->epsSoft);\
+		const Real& relKnSoft(this->relKnSoft);
 #else
 	#define CPM_MATERIAL_MODEL_A
 #endif
@@ -213,7 +213,7 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 #ifdef YADE_DEBUG
 	#define CPM_YADE_DEBUG_A \
 		if(isnan(epsN)){\
-			LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());\
+			/*LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());*/ \
 			throw runtime_error("!! epsN==NaN !!");\
 		}
 #else
@@ -256,7 +256,7 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 	const Real& tanFrictionAngle(BC->tanFrictionAngle); \
 	const Real& G(BC->G); \
 	const Real& crossSection(BC->crossSection); \
-	const Real& omegaThreshold(CPM_LAW2::omegaThreshold); \
+	const Real& omegaThreshold(this->omegaThreshold); \
 	const Real& epsCrackOnset(BC->epsCrackOnset); \
 	Real& relResidualStrength(BC->relResidualStrength); \
 	/*const Real& crackOpening(BC->crackOpening); */ \
@@ -312,7 +312,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	Dem3DofGeom* contGeom = static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC = static_cast<CpmPhys*>(_phys.get());
 	
-	#define CPM_LAW2 Law2_Dem3DofGeom_CpmPhys_Cpm
+	//#define CPM_LAW2 Law2_Dem3DofGeom_CpmPhys_Cpm
 	CPM_GO_A
 
 	epsN = contGeom->strainN();
@@ -332,7 +332,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	ScGeom* contGeom=static_cast<ScGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
-	#define CPM_LAW2 Law2_ScGeom_CpmPhys_Cpm
+	//#define CPM_LAW2 Law2_ScGeom_CpmPhys_Cpm
 	CPM_GO_A
 	
 	epsN = - (-BC->refPD + contGeom->penetrationDepth) / BC->refLength;

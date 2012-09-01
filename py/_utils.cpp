@@ -448,6 +448,15 @@ Real shiftBodies(py::list ids, const Vector3r& shift){
 
 void Shop__calm(int mask=-1){ return Shop::calm(Omega::instance().getScene(), mask=mask);}
 
+void setNewVerticesOfFacet(const shared_ptr<Body>& b, const Vector3r& v1, const Vector3r& v2, const Vector3r& v3) {
+	Vector3r center = inscribedCircleCenter(v1,v2,v3);
+	Facet* facet = YADE_CAST<Facet*>(b->shape.get());
+	facet->vertices[0] = v1 - center;
+	facet->vertices[1] = v2 - center;
+	facet->vertices[2] = v3 - center;
+	b->state->pos = center;
+}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -501,4 +510,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("maxOverlapRatio",maxOverlapRatio,"Return maximum overlap ration in interactions (with :yref:`ScGeom`) of two :yref:`spheres<Sphere>`. The ratio is computed as $\\frac{u_N}{2(r_1 r_2)/r_1+r_2}$, where $u_N$ is the current overlap distance and $r_1$, $r_2$ are radii of the two spheres in contact.");
 	py::def("shiftBodies",shiftBodies,(py::arg("ids"),py::arg("shift")),"Shifts bodies listed in ids without updating their velocities.");
 	py::def("calm",Shop__calm,(py::arg("mask")=-1),"Set translational and rotational velocities of all bodies to zero.");
+	py::def("setNewVerticesOfFacet",setNewVerticesOfFacet,(py::arg("b"),py::arg("v1"),py::arg("v2"),py::arg("v3")),"Sets new vertices (in global coordinates) to given facet.");
 }

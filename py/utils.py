@@ -279,6 +279,13 @@ def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,
 	b.mask=mask
 	b.chain=chain
 	return b
+
+#def setNewVerticesOfFacet(b,vertices):
+#	center = inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
+#	vertices = Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
+#	b.shape.vertices = vertices
+#	b.state.pos = center
+	
 	
 def facetBox(*args,**kw):
 	"|ydeprecated|"
