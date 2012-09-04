@@ -65,8 +65,8 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	const shared_ptr<Body>& b1((*bodies)[id1]);
 	#ifdef FIXBUGINTRS
 		const shared_ptr<Body>& b2((*bodies)[id2]);
-		b1->checkIntrs=true;
-		b2->checkIntrs=true;
+		if (b1) {b1->checkIntrs=true;}
+		if (b2) {b2->checkIntrs=true;}
 	#endif
 	
 	int linIx=-1;
@@ -78,13 +78,14 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 			linIx=I->second->linIx;
 			assert(linIx==linPos);
 			//erase from body, we also erase from linIntrs below
-			b1->intrs.erase(I);}
+			b1->intrs.erase(I);
 			#ifdef FIXBUGINTRS
 				if (b2) { 
 					Body::MapId2IntrT::iterator I2(b2->intrs.find(id1));
-					if(not(I2==b2->intrs.end())) { b2->intrs.erase(I2); }
+					if (not(I2==b2->intrs.end())) { b2->intrs.erase(I2); }
 				}
 			#endif
+			}
 	}
 	if(linIx<0) {
 		LOG_ERROR("InteractionContainer::erase: attempt to delete interaction with a deleted body (the definition of linPos in the call to erase() should fix the problem) for  ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2));
