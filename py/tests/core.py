@@ -14,9 +14,29 @@ from yade import *
 from math import *
 
 ## TODO tests
-class TestInteractions(unittest.TestCase): pass
 class TestForce(unittest.TestCase): pass
 class TestTags(unittest.TestCase): pass 
+
+class TestInteractions(unittest.TestCase): 
+	def setUp(self): O.reset()
+	def testEraseBodiesInInteraction(self):
+		O.reset()
+		id1 = O.bodies.append(utils.sphere([0.5,0.5,0.0+0.095],.1))
+		id2 = O.bodies.append(utils.sphere([0.5,0.5,0.0+0.250],.1))
+		O.engines=[
+			ForceResetter(),
+			InsertionSortCollider([Bo1_Sphere_Aabb()]),
+			InteractionLoop(
+				[Ig2_Sphere_Sphere_L3Geom()],
+				[Ip2_FrictMat_FrictMat_FrictPhys()],
+				[Law2_L3Geom_FrictPhys_ElPerfPl()]
+			),
+			NewtonIntegrator(damping=0.1,gravity=(0,0,-9.81))
+		]
+		O.dt=.5e-4*utils.PWaveTimeStep()
+		O.step()
+		O.bodies.erase(id1)
+		O.step()
 
 class TestLoop(unittest.TestCase):
 	def setUp(self): O.reset()
