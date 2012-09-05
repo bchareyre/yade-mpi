@@ -10,6 +10,10 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Clump.hpp>
 #include<yade/lib/base/Math.hpp>
+#ifdef FIXBUGINTRS
+	#include<yade/pkg/common/Sphere.hpp>
+	#include<yade/pkg/common/Facet.hpp>
+#endif
 
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
@@ -134,6 +138,41 @@ void NewtonIntegrator::action()
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 			// clump members are handled inside clumps
 			if(unlikely(b->isClumpMember())) continue;
+			
+			#ifdef FIXBUGINTRS
+				if (b->checkIntrs) {  //The body requires to be checked on interactions
+					std::cerr<<"The body" << b->id<<" is checked"<<std::endl;
+					if (not ((b->intrs.size()<2))) {  //The body collides with more than 1 body
+						std::cerr<<"Number of intrs " << b->intrs.size()<<std::endl;
+						const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());  
+							if (sphere){  //The body is a sphere
+								std::cerr<<"It is a sphere"<<std::endl;
+								std::vector<shared_ptr<Body> > bodyFacetsContactList;   //List of contacted facets
+								for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
+									Body::id_t bID = (*it).first;
+									shared_ptr <Body> b = Body::byId(bID,scene);
+									if (b) {
+										const Facet* facetTMP = dynamic_cast<Facet*>(b->shape.get());
+										if (facetTMP) { //If the current sphere contacts with facets, check it.
+											std::cerr<<bID<<std::endl;
+											bodyFacetsContactList.push_back(b);
+										} else {
+											std::cerr<<bID<<" is a sphere"<<std::endl;
+										}
+									}
+								}
+								
+								if (bodyFacetsContactList.size() > 1) {
+									std::cerr<<"The sphere contacts with more than 1 facet!"<<std::endl;
+								}
+								
+							}
+					}	
+					std::cerr<<std::endl;
+					b->checkIntrs = false;
+					
+				}
+			#endif
 
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
 			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();

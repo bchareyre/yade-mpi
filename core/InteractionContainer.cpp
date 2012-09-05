@@ -25,6 +25,8 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
 	#ifdef FIXBUGINTRS
 		const shared_ptr<Body>& b2=(*bodies)[id2];
+		b1->checkIntrs=true;
+		b2->checkIntrs=true;
 	#endif
 	
 	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
