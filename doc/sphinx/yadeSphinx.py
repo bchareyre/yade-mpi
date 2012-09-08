@@ -14,6 +14,7 @@ def moduleDoc(module,submodules=[]):
 	modFmt=""".. automodule:: yade.%s
 	:members:
 	:undoc-members:
+	:inherited-members:
 
 """
 	f.write(""".. _yade.%s:
@@ -33,7 +34,7 @@ yade.%s module
 #
 # don't forget to put the module in index.rst as well!
 #
-mods={'export':[],'eudoxos':['_eudoxos'],'log':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb','_packSpherePadder'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['_qt','qt._GLViewer'],'linterpolation':[]}
+mods={'export':[],'eudoxos':['_eudoxos'],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb','_packSpherePadder'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[]}
 #
 # generate documentation, in alphabetical order
 mm=mods.keys(); mm.sort()
@@ -58,7 +59,7 @@ docClasses=set()
 def autodocClass(klass):
 	global docClasses
 	docClasses.add(klass)
-	return ".. autoclass:: %s\n\t:members:\n\t:undoc-members:\n\n"%(klass) # \t:inherited-members:\n # \n\t:show-inheritance:
+	return ".. autoclass:: %s\n\t:members:\n\t:undoc-members:\n\t:inherited-members:\n\n"%(klass) # \t:inherited-members:\n # \n\t:show-inheritance:
 def autodocDerived(klass,doSections=True):
 	global docClasses
 	ret=''

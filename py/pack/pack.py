@@ -95,7 +95,7 @@ if not (noPredicate):
     Matrix3(1,0,0, 0,1,0, 0,0,1)
   
   :param Quaternion/Matrix3 rot: rotation of the packing, which will be applied on spheres and will be used to set :yref:`Cell.trsf` as well.
-  :param **kw: passed to :yref:`yade.utils.sphere`
+  :param \*\*kw: passed to :yref:`yade.utils.sphere`
   :return: list of body ids added (like :yref:`O.bodies.append<BodyContainer.append>`)
   """
     if isinstance(rot,Quaternion): rot=rot.toRotationMatrix()
@@ -179,7 +179,7 @@ if not (noPredicate):
 #####
 
 def gtsSurface2Facets(surf,**kw):
-	"""Construct facets from given GTS surface. **kw is passed to utils.facet."""
+	"""Construct facets from given GTS surface. \*\*kw is passed to utils.facet."""
 	import gts
 	return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf.faces()]
 

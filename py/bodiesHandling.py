@@ -170,16 +170,11 @@ def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=
 	Also the mask can be given. If idSpheres not empty, the function affects only bodies, where the mask passes.
 	If idSpheres is empty, the function search for bodies, where the mask passes.
 	
-	:Parameters:
-	`shift`: Vector3
-		Vector3(X,Y,Z) parameter moves spheres.
-	`scale`: float
-		factor scales given spheres.
-	`orientation`: quaternion
-		orientation of spheres
-	`mask`: int
-		:yref:`Body.mask` for the checked bodies
-	:Returns: list of bodies if copy=True, and Boolean value if copy=False
+	:param Vector3 shift: Vector3(X,Y,Z) parameter moves spheres.
+	:param float scale: factor scales given spheres.
+	:param Quaternion orientation: orientation of spheres
+	:param int mask: :yref:`Body.mask` for the checked bodies
+	:returns: list of bodies if copy=True, and Boolean value if copy=False
 	"""
 	
 	idSpheresIter=[]

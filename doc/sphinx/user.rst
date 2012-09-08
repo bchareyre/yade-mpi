@@ -1221,7 +1221,7 @@ information about job status changes is being printed, until::
 	batch.reference.log batch.hi_v.log batch.lo_v.log batch.hi_rho.log batch.hi_rho_v.log batch.hi_rh0_lo_v.log
 	Bye.
 
-.. batch-output-separate:
+.. _batch-output-separate:
 
 Separating output files from jobs
 ----------------------------------

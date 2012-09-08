@@ -92,7 +92,7 @@ class ZECollider: public Collider{
 // 		((bool,oriVerlet,true,,"Compare Verlet distance with displacement instead of velocity (only used if nBins<=0)"))
 		((int,targetInterv,30,,"(experimental) Target number of iterations between bound update, used to define a smaller sweep distance for slower grains if >0, else always use 1*verletDist. Useful in simulations with strong velocity contrasts between slow bodies and fast bodies."))
 		((Real,updatingDispFactor,-1,,"(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated."))
-		((Real,verletDist,((void)"Automatically initialized",-.15),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be |verletDist| × minimum spherical particle radius; if there are no spherical particles, it will be disabled."))
+		((Real,verletDist,((void)"Automatically initialized",-.15),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be *verletDist* × minimum spherical particle radius; if there are no spherical particles, it will be disabled."))
 		((Real,fastestBodyMaxDist,-1,,"Maximum displacement of the fastest body since last run; if >= verletDist, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
 		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
 		, /*deprec*/ ((sweepLength,verletDist,"conform to usual DEM terminology"))

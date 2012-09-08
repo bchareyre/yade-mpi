@@ -18,13 +18,13 @@ Citing chapters of Yade Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The first edition of Yade documentation is seen as a collection with the three volumes (or "chapters") listed below, also provided as `bibtex entries <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_. Please cite the chapter that is the most relevant in your case. For instance, a paper using one of the documented contact laws will cite the reference documentation [yade:reference]_; if programing concepts are discussed, Yade's manual [yade:manual]_ will be cited; the theoretical background [yade:background]_ can be used as the refence for contact detection, time-step determination, or periodic boundary conditions.
 
-* The reference documentation includes details on equations and algorithms found at the highest levels of Yade (contact laws, boundary conditions controllers, pre- and post-processing modules,...) `(pdf version) <https://yade-dem.org/w/images/9/98/YadeRefDoc.pdf>`_:
+* The reference documentation includes details on equations and algorithms found at the highest levels of Yade (contact laws, boundary conditions controllers, pre- and post-processing modules,...) `(pdf version) <https://yade-dem.org/w/images/9/98/YadeRefDoc.pdf>`__:
 	V. Šmilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtès, L. Sibille, J. Stránský, and K. Thoeni, “Yade Reference Documentation,” in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
 
-* Software design, user's and programmer's manuals are in `(pdf version) <https://yade-dem.org/w/images/0/09/YadeManuals.pdf>`_:
+* Software design, user's and programmer's manuals are in `(pdf version) <https://yade-dem.org/w/images/0/09/YadeManuals.pdf>`__:
 	V. Šmilauer, A. Gladky, J. Kozicki, C. Modenese, and J. Stránský, “Yade Using and Programming,” in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/.
 
-* Fundamentals of the DEM as implemented in Yade are explained in `(pdf version) <https://yade-dem.org/w/images/e/e0/YadeFormulation.pdf>`_:
+* Fundamentals of the DEM as implemented in Yade are explained in `(pdf version) <https://yade-dem.org/w/images/e/e0/YadeFormulation.pdf>`__:
 	V. Šmilauer and B. Chareyre, “Yade Dem Formulation”, in Yade Documentation (V. Šmilauer, ed.), The Yade Project, 1st ed., 2010. http://yade-dem.org/doc/formulation.html.
 
 

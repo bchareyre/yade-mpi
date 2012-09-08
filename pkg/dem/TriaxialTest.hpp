@@ -64,7 +64,7 @@ class TriaxialTest : public FileGenerator
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. Full documentation in py/_extraDocs.py."
 		,
-   		((Vector3r,lowerCorner,Vector3r(0,0,0),,"Lower corner of the box."))
+   	((Vector3r,lowerCorner,Vector3r(0,0,0),,"Lower corner of the box."))
 		((Vector3r,upperCorner,Vector3r(1,1,1),,"Upper corner of the box."))
 		((string,importFilename,"",,"File with positions and sizes of spheres."))
 		((string,Key,"",,"A code that is added to output filenames."))

@@ -102,7 +102,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((Real,previousSigmaIso,1,,"Previous value of inherited sigma_iso (used to detect manual changes of the confining pressure)"))
 		((Real,sigmaLateralConfinement,1,,"Prescribed confining pressure in the deviatoric loading; might be different from :yref:`TriaxialCompressionEngine::sigmaIsoCompaction`"))
 		((std::string,Key,"",,"A string appended at the end of all files, use it to name simulations."))
-		((bool,noFiles,false,,"If true, no files will be generated (*.xml, *.spheres,...)"))
+		((bool,noFiles,false,,"If true, no files will be generated (\\*.xml, \\*.spheres,...)"))
 		((Real,frictionAngleDegree,-1,,"Value of friction assigned just before the deviatoric loading"))
 		((Real,epsilonMax,0.5,,"Value of axial deformation for which the loading must stop"))
 		((Real,uniaxialEpsilonCurr,1,,"Current value of axial deformation during confined loading (is reference to strain[1])"))

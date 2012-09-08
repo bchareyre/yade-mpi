@@ -122,9 +122,9 @@ struct Ig2_Sphere_Sphere_L3Geom: public IGeomFunctor{
 
 	enum { APPROX_NO_MID_TRSF=1, APPROX_NO_MID_NORMAL=2, APPROX_NO_RENORM_MID_NORMAL=4 };
 
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/_extraDocs.py",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_L3Geom,IGeomFunctor,"Incrementally compute :yref:`L3Geom` for contact of 2 spheres. Detailed documentation in py/\\_extraDocs.py",
 		((bool,noRatch,true,,"See :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting`."))
-		((Real,distFactor,1,,"Create interaction if spheres are not futher than |distFactor|*(r1+r2). If negative, zero normal deformation will be set to be the initial value (otherwise, the geometrical distance is the 'zero' one)."))
+		((Real,distFactor,1,,"Create interaction if spheres are not futher than *distFactor* \\*(r1+r2). If negative, zero normal deformation will be set to be the initial value (otherwise, the geometrical distance is the \'\'zero'' one)."))
 		((int,trsfRenorm,100,,"How often to renormalize :yref:`trsf<L3Geom.trsf>`; if non-positive, never renormalized (simulation might be unstable)"))
 		((int,approxMask,0,,"Selectively enable geometrical approximations (bitmask); add the values for approximations to be enabled.\n\n"
 		"== ===============================================================\n"

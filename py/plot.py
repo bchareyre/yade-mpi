@@ -153,7 +153,10 @@ def addAutoData():
 	 'kinTrans': [0.0, 7.5398...],
 	 'nonviscDamp': [0.0, 10.0530...],
 	 'total energy': [0.0, -7.5398...]}
+	"""
 
+	# this part of docstring does not work with Sphinx
+	"""
 	.. plot::
 		from yade import *
 		from yade import plot,utils

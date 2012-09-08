@@ -32,25 +32,29 @@ computations on triangulated surfaces.
 
 The following geometric primitives are provided:
 
-  Point - a point in 3D space
-  Vertex - a Point in 3D space that may be used to define a Segment
-  Segment - a line defined by two Vertex end-points
-  Edge - a Segment that may be used to define the edge of a Triangle
-  Triangle - a triangle defined by three Edges
-  Face - a Triangle that may be used to define a face on a Surface
-  Surface - a surface composed of Faces
+  * Point - a point in 3D space
+  * Vertex - a Point in 3D space that may be used to define a Segment
+  * Segment - a line defined by two Vertex end-points
+  * Edge - a Segment that may be used to define the edge of a Triangle
+  * Triangle - a triangle defined by three Edges
+  * Face - a Triangle that may be used to define a face on a Surface
+  * Surface - a surface composed of Faces
 
 A tetrahedron is assembled from these primitives as follows.  First,
 create Vertices for each of the tetrahedron's points:
 
-    import gts
+  .. code-block:: python
 
+    import gts
+    
     v1 = gts.Vertex(1,1,1)
     v2 = gts.Vertex(-1,-1,1)
     v3 = gts.Vertex(-1,1,-1)
     v4 = gts.Vertex(1,-1,-1)
 
 Next, connect the four vertices to create six unique Edges:
+
+  .. code-block:: python
 
     e1 = gts.Edge(v1,v2)
     e2 = gts.Edge(v2,v3)
@@ -61,12 +65,16 @@ Next, connect the four vertices to create six unique Edges:
 
 The four triangular faces are composed using three edges each:
 
+  .. code-block:: python
+
     f1 = gts.Face(e1,e2,e3)
     f2 = gts.Face(e1,e4,e5)
     f3 = gts.Face(e2,e5,e6)
     f4 = gts.Face(e3,e4,e6)
 
 Finally, the surface is assembled from the faces:
+
+  .. code-block:: python
 
     s = gts.Surface()
     for face in [f1,f2,f3,f4]:
@@ -78,6 +86,8 @@ technically defines a void, rather than a solid.  To create a
 tetrahedron with surface normals pointing outward, use the following
 instead:
 
+  .. code-block:: python
+
     f1.revert()
     s = Surface()
     for face in [f1,f2,f3,f4]:
@@ -88,9 +98,13 @@ instead:
 Once the Surface is constructed, there are many different operations that
 can be performed.  For example, the volume can be calculated using:
 
+  .. code-block:: python
+
     s.volume()
 
 The difference between two Surfaces s1 and s2 is given by:
+
+  .. code-block:: python
 
     s3 = s2.difference(s1)
 

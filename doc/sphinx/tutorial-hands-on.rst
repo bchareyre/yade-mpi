@@ -357,7 +357,9 @@ There are functions to generate a specific arrangement of particles in the :yref
 
 	Yade [1]: sp.toSimulation()                      # create particles and add them to the simulation
 
-.. note::  :yref:`Vector3<external:miniEigen.Vector3>` is class representing 3D vector; a number of geometry operations are supported by :yref:`Vector3<external:miniEigen.Vector3>`, such as scalar product, dot product, cross product, norm, addition and more. There are other similar classes such as :yref:`Vector2<external:miniEigen.Vector2>`, :yref:`Matrix3<external:miniEigen.Matrix3>` (3×3 matrix), :yref:`Quaterion<external:miniEigen.Quaternion>`, :yref:`Vector6<external:miniEigen.Vector6>` etc. See :yref:`miniEigen<external:miniEigen>` module documentation for details.
+.. note::
+
+	:yref:`Vector3<external:miniEigen.Vector3>` is class representing 3D vector; a number of geometry operations are supported by :yref:`Vector3<external:miniEigen.Vector3>`, such as scalar product, dot product, cross product, norm, addition and more. There are other similar classes such as :yref:`Vector2<external:miniEigen.Vector2>`, :yref:`Matrix3<external:miniEigen.Matrix3>` (3×3 matrix), :yref:`Quaterion<external:miniEigen.Quaternion>`, :yref:`Vector6<external:miniEigen.Vector6>` etc. See :yref:`miniEigen<external:miniEigen>` module documentation for details.
 
 Boundaries
 """"""""""

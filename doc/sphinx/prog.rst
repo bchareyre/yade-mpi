@@ -783,12 +783,15 @@ The way of passing attributes given to ``YADE_CLASS_BASE_DOC_ATTRS`` in the ``at
 
 * ``Vector3``, ``Vector3i``, ``Vector2``, ``Vector2i``, ``Matrix3`` and ``Quaternion`` objects are passed by *reference*. For instance::
 		O.bodies[0].state.pos[0]=1.33
+
   will assign correct value to ``x`` component of position, without changing the other ones.
 * Yade classes (all that use ``shared_ptr`` when declared in python: all classes deriving from :yref:`Serializable` declared with ``YADE_CLASS_BASE_DOC_*``, and some others) are passed as *references* (technically speaking, they are passed by value of the ``shared_ptr``, but by virtue of its sharedness, they appear as references). For instance::
 		O.engines[4].damping=.3
+
   will change :yref:`damping<NewtonIntegrator.damping>` parameter on the original engine object, not on its copy.
 * All other types are passed by *value*. This includes, most importantly, sequence types declared in :ref:`customconverters`, such as ``std::vector<shared_ptr<Engine> >``. For this reason, ::
 		O.engines[4]=NewtonIntegrator()
+
   will *not* work as expected; it will replace 5th element of a *copy* of the sequence, and this change will not propagate back to c++.
 
 
@@ -914,7 +917,7 @@ If no functor is able to accept given types (first condition violated) or multip
 
 This resolution mechanism makes it possible, for instance, to have a hierarchy of :yref:`Dem3DofGeom` classes (for different combination of shapes: :yref:`Dem3DofGeom_SphereSphere`, :yref:`Dem3DofGeom_FacetSphere`, :yref:`Dem3DofGeom_WallSphere`), but only provide a :yref:`LawFunctor` accepting ``Dem3DofGeom``, rather than having different laws for each shape combination.
 
-.. note:: Performance implications of dispatch resolution are relatively low. The dispatcher lookup is only done once, and uses fast lookup matrix (1D or 2D); then, the functor found for this type(s) is cached within the ``Interaction`` (or ``Body``) instance. Thus, regular functor call costs the same as dereferencing pointer and calling virtual method. There is `blueprint <https://blueprints.launchpad.net/yade/+spec/devirtualize-functor-calls>`_ to avoid virtual function call as well.
+.. note:: Performance implications of dispatch resolution are relatively low. The dispatcher lookup is only done once, and uses fast lookup matrix (1D or 2D); then, the functor found for this type(s) is cached within the ``Interaction`` (or ``Body``) instance. Thus, regular functor call costs the same as dereferencing pointer and calling virtual method. There is `blueprint <https://blueprints.launchpad.net/yade/+spec/devirtualize-functor-calls>`__ to avoid virtual function call as well.
 
 .. note:: At the beginning, the dispatch matrix contains just entries exactly matching given functors. Only when necessary (by passing other types), appropriate entries are filled in as well.
 
@@ -1104,7 +1107,7 @@ At places which are susceptible of being accessed concurrently from multiple thr
 Logging
 --------
 
-Regardless of whether the :ref:`optional-libraries` log4cxx is used or not, yade provides logging macros. [#log4cxxup]_ If log4cxx is enabled, these macros internally operate on the local logger instance (named ``logger``, but that is hidden for the user); if log4cxx is disabled, they send their arguments to standard error output (``cerr``).
+Regardless of whether the library log4cxx is used or not, yade provides logging macros. [#log4cxxup]_ If log4cxx is enabled, these macros internally operate on the local logger instance (named ``logger``, but that is hidden for the user); if log4cxx is disabled, they send their arguments to standard error output (``cerr``).
 
 .. [#log4cxxup] Because of (seemingly?) no upstream development of log4cxx and a few problems it has, Yade will very likely move to the hypothetical ``boost::logging`` library once it exists. The logging code will not have to be changed, however, as the log4cxx logic is hidden behind these macros.
 
@@ -1416,7 +1419,7 @@ Interactions are stored in special container, and each interaction must be uniqu
 .. note::
 	As with BodyContainer, there is "abstract" class InteractionContainer, and then its concrete implementations. Currently, only InteractionVecMap implementation is used and all the other were removed. Therefore, the abstract InteractionContainer class may disappear in the future, to avoid unnecessary virtual calls. 
 
-	Further, there is a `blueprint <https://blueprints.launchpad.net/yade/+spec/intrs-inside-bodies>`_ for storing interactions inside bodies, as that would give extra advantage of quickly getting all interactions of one particular body (currently, this necessitates loop over all interactions); in that case, InteractionContainer would disappear.
+	Further, there is a `blueprint <https://blueprints.launchpad.net/yade/+spec/intrs-inside-bodies>`__ for storing interactions inside bodies, as that would give extra advantage of quickly getting all interactions of one particular body (currently, this necessitates loop over all interactions); in that case, InteractionContainer would disappear.
 
 Insert/erase
 ^^^^^^^^^^^^

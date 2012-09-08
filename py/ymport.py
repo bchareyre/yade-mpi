@@ -9,17 +9,13 @@ from yade import utils
 def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 	"""Load sphere coordinates from file in specific format, create spheres, insert them to the simulation.
 	
-	:Parameters:
-		`filename`: string
-		`format`:
-			the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
-		`shift`: [float,float,float]
-			[X,Y,Z] parameter moves the specimen.
-		`scale`: float
-			factor scales the given data.
-		`**kw`: (unused keyword arguments)
-				is passed to :yref:`yade.utils.sphere`
-	:Returns: list of spheres.
+	:param str filename: file name
+	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
+	:param float scale: factor scales the given data.
+	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.sphere`
+	:returns: list of spheres.
+
 	Lines starting with # are skipped
 	"""
 	infile = open(fileName,"r")
@@ -51,16 +47,12 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
 	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
 
-	:Parameters:
-		`filename`: string
-			file which has 4 colums [x, y, z, radius].
-		`shift`: [float,float,float]
-			[X,Y,Z] parameter moves the specimen.
-		`scale`: float
-			factor scales the given data.
-		`**kw`: (unused keyword arguments)
-				is passed to :yref:`yade.utils.sphere`
-	:Returns: list of spheres.
+	:param string filename: file which has 4 colums [x, y, z, radius].
+	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
+	:param float scale: factor scales the given data.
+	:param \*\*kw: (unused keyword arguments)	is passed to :yref:`yade.utils.sphere`
+	:returns: list of spheres.
+
 	Lines starting with # are skipped
 	"""
 	

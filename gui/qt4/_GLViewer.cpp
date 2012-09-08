@@ -113,7 +113,7 @@ BOOST_PYTHON_MODULE(_GLViewer){
 		.def("fitAABB",&pyGLViewer::fitAABB,(py::arg("mn"),py::arg("mx")),"Adjust scene bounds so that Axis-aligned bounding box given by its lower and upper corners *mn*, *mx* fits in.")
 		.def("fitSphere",&pyGLViewer::fitSphere,(py::arg("center"),py::arg("radius")),"Adjust scene bounds so that sphere given by *center* and *radius* fits in.")
 		.def("showEntireScene",&pyGLViewer::showEntireScene)
-		.def("center",&pyGLViewer::center,(py::arg("median")=true),"Center view. View is centered either so that all bodies fit inside (*median*=False), or so that 75\% of bodies fit inside (*median*=True).")
+		.def("center",&pyGLViewer::center,(py::arg("median")=true),"Center view. View is centered either so that all bodies fit inside (*median* = False), or so that 75\% of bodies fit inside (*median* = True).")
 		.def("saveState",&pyGLViewer::saveDisplayParameters,(py::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderer`.")
 		.def("loadState",&pyGLViewer::useDisplayParameters,(py::arg("slot")),"Load display parameters from slot saved previously into, identified by its number.")
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)

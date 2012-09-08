@@ -99,7 +99,9 @@ def typedEngine(name):
 def defaultMaterial():
 	"""Return default material, when creating bodies with :yref:`yade.utils.sphere` and friends, material is unspecified and there is no shared material defined yet. By default, this function returns::
 
-		FrictMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
+		.. code-block:: python
+
+		  FrictMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
 	"""
 	return FrictMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
 
@@ -128,7 +130,7 @@ def _commonBodySetup(b,volume,geomInertia,material,pos,noBound=False,resetState=
 def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
 
-	Last assigned material is used by default (*material*=-1), and utils.defaultMaterial() will be used if no material is defined at all.
+	Last assigned material is used by default (*material* = -1), and utils.defaultMaterial() will be used if no material is defined at all.
 
 	:param Vector3 center: center
 	:param float radius: radius
@@ -143,7 +145,7 @@ def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highligh
 	:param int mask: :yref:`Body.mask` for the body
 	:param wire: display as wire sphere?
 	:param highlight: highlight this body in the viewer?
-	:param Vector3-or-None: body's color, as normalized RGB; random color will be assigned if ``None`.
+	:param Vector3-or-None: body's color, as normalized RGB; random color will be assigned if ``None``.
 	
 	:return:
 		A Body instance with desired characteristics.
@@ -788,6 +790,7 @@ def psd(bins=5, mass=True, mask=-1):
 		* binsSizes: list of bin's sizes
 		* binsProc: how much material (in procents) are in the bin, cumulative
 		* binsSumCum: how much material (in units) are in the bin, cumulative
+
 		binsSizes, binsProc, binsSumCum
 	"""
 	maxD = 0.0

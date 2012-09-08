@@ -67,7 +67,7 @@ namespace py=boost::python;
 None of that is used for computation (at least not now), only for post-processing.
 */
 class CpmState: public State {
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmState,State,"State information about body use by :ref:`cpm-model`.\n\nNone of that is used for computation (at least not now), only for post-processing.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmState,State,"State information about body use by :yref:`cpm-model<CpmMat>`.\n\nNone of that is used for computation (at least not now), only for post-processing.",
 		((Real,epsVolumetric,0,,"Volumetric strain around this body (unused for now)"))
 		((int,numBrokenCohesive,0,,"Number of (cohesive) contacts that damaged completely"))
 		((int,numContacts,0,,"Number of contacts with this body"))
@@ -99,7 +99,7 @@ class CpmMat: public FrictMat {
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\t:yref:`Density<Material::density>` is initialized to 4800 kgm⁻³automatically, which gives approximate 2800 kgm⁻³ on 0.5 density packing.\n\n.. _cpm-model::\n\n Concrete Particle Model (CPM)\n\n\n :yref:`CpmMat` is particle material, :yref:`Ip2_CpmMat_CpmMat_CpmPhys` averages two particles' materials, creating :yref:`CpmPhys`, which is then used in interaction resultion by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm. :yref:`CpmState` is associated to :yref:`CpmMat` and keeps state defined on particles rather than interactions (such as number of completely damaged interactions).\n\nThe model is contained in externally defined macro CPM_MATERIAL_MODEL, which features damage in tension, plasticity in shear and compression and rate-dependence. For commercial reasons, rate-dependence and compression-plasticity is not present in reduced version of the model, used when CPM_MATERIAL_MODEL is not defined. The full model will be described in detail in my (Václav Šmilauer) thesis along with calibration procedures (rigidity, poisson's ratio, compressive/tensile strength ratio, fracture energy, behavior under confinement, rate-dependent behavior).\n\nEven the public model is useful enough to run simulation on concrete samples, such as :ysrc:`uniaxial tension-compression test<examples/concrete/uniax.py>`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\n\t:yref:`Density<Material::density>` is initialized to 4800 kgm⁻³automatically, which gives approximate 2800 kgm⁻³ on 0.5 density packing.\n\nConcrete Particle Model (CPM)\n\n\n:yref:`CpmMat` is particle material, :yref:`Ip2_CpmMat_CpmMat_CpmPhys` averages two particles' materials, creating :yref:`CpmPhys`, which is then used in interaction resultion by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`. :yref:`CpmState` is associated to :yref:`CpmMat` and keeps state defined on particles rather than interactions (such as number of completely damaged interactions).\n\nThe model is contained in externally defined macro CPM_MATERIAL_MODEL, which features damage in tension, plasticity in shear and compression and rate-dependence. For commercial reasons, rate-dependence and compression-plasticity is not present in reduced version of the model, used when CPM_MATERIAL_MODEL is not defined. The full model will be described in detail in my (Václav Šmilauer) thesis along with calibration procedures (rigidity, poisson's ratio, compressive/tensile strength ratio, fracture energy, behavior under confinement, rate-dependent behavior).\n\nEven the public model is useful enough to run simulation on concrete samples, such as :ysrc:`uniaxial tension-compression test<examples/concrete/uniax.py>`.",
 		((Real,sigmaT,NaN,,"Initial cohesion [Pa]"))
 		((bool,neverDamage,false,,"If true, no damage will occur (for testing only)."))
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
@@ -148,7 +148,7 @@ class CpmPhys: public NormShearPhys {
 		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
 
 		virtual ~CpmPhys();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :ref:`cpm-model` for details.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :yref:`cpm-model<CpmMat>` for details.",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,G,NaN,,"shear modulus [Pa]"))
 			((Real,tanFrictionAngle,NaN,,"tangens of internal friction angle [-]"))
@@ -210,7 +210,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public IPhysFunctor{
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		FUNCTOR2D(CpmMat,CpmMat);
 		DECLARE_LOGGER;
-		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,IPhysFunctor,"Convert 2 :yref:`CpmMat` instances to :yref:`CpmPhys` with corresponding parameters. Uses simple (arithmetic) averages if material are different. Simple copy of parameters is performed if the :yref:`material<CpmMat>` is shared between both particles. See :ref:`cpm-model` for detals.",
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,IPhysFunctor,"Convert 2 :yref:`CpmMat` instances to :yref:`CpmPhys` with corresponding parameters. Uses simple (arithmetic) averages if material are different. Simple copy of parameters is performed if the :yref:`material<CpmMat>` is shared between both particles. See :yref:`cpm-model<CpmMat>` for detals.",
 			((long,cohesiveThresholdIter,10,,"Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive (10 by default)."))
 		);
 };
@@ -262,7 +262,7 @@ class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 	//void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(GenericSpheresContact,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SomeGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SomeGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
 		((int,yieldSurfType,2,,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
 		((Real,yieldLogSpeed,.1,,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
 		((Real,yieldEllipseShift,NaN,,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
@@ -285,7 +285,7 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public Law2_SomeGeom_CpmPhys_Cpm{
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,Law2_SomeGeom_CpmPhys_Cpm,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
 		,
 		/*ctor*/,
 	);
@@ -301,7 +301,7 @@ class Law2_ScGeom_CpmPhys_Cpm: public Law2_SomeGeom_CpmPhys_Cpm{
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(ScGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_CpmPhys_Cpm,Law2_SomeGeom_CpmPhys_Cpm,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
 		,
 		/*ctor*/,
 	);

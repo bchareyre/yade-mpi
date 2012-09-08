@@ -22,14 +22,14 @@ Collision detection
 Generalities
 -------------
 
-Exact computation of collision configuration between two particles can be relatively expensive (for instance between :yref:`Sphere` and :yref:`Facet`). Taking a general pair of bodies $i$ and $j$ and their ``exact'' (In the sense of precision admissible by numerical implementation.) spatial predicates (called :yref:`Shape` in Yade) represented by point sets $P_i$, $P_j$ the detection generally proceeds in 2 passes:
+Exact computation of collision configuration between two particles can be relatively expensive (for instance between :yref:`Sphere` and :yref:`Facet`). Taking a general pair of bodies $i$ and $j$ and their \`\`exact`` (In the sense of precision admissible by numerical implementation.) spatial predicates (called :yref:`Shape` in Yade) represented by point sets $P_i$, $P_j$ the detection generally proceeds in 2 passes:
 
 #. fast collision detection using approximate predicate $\tilde P_i$ and $\tilde P_j$; they are pre-constructed in such a way as to abstract away individual features of $P_i$ and $P_j$ and satisfy the condition
 
    .. math:: \forall {\bf x}\in R^3: x\in P_i\Rightarrow x\in \tilde P_i
      :label: eq-bounding-predicate
 
-   (likewise for $P_j$). The approximate predicate is called ``bounding volume'' (:yref:`Bound` in Yade) since it bounds any particle's volume from outside (by virtue of the implication). It follows that $(P_i \cap  P_j)\neq\emptyset \Rightarrow (\tilde P_i \cap  \tilde P_j)\neq\emptyset$ and, by applying *modus tollens*,
+   (likewise for $P_j$). The approximate predicate is called \`\`bounding volume'' (:yref:`Bound` in Yade) since it bounds any particle's volume from outside (by virtue of the implication). It follows that $(P_i \cap  P_j)\neq\emptyset \Rightarrow (\tilde P_i \cap  \tilde P_j)\neq\emptyset$ and, by applying *modus tollens*,
 
    .. math:: \bigl(\tilde P_i \cap \tilde P_j\bigr)=\emptyset\Rightarrow\bigl( P_i \cap  P_j \bigr)=\emptyset
      :label: eq-collide-exclude
@@ -52,12 +52,13 @@ Flat algorithms
    work directly with bounding volumes without grouping them in hierarchies first; let us only mention two kinds commonly used in particle simulations:
 
 	Sweep and prune
-	   algorithm operates on axis-aligned bounding boxes, which overlap if and only if they overlap along all axes. These algorithms have roughly $\bigO{n\log n}$ complexity, where $n$ is number of particles as long as they exploit `temporal coherence <sect-temp-coherence>`_ of the simulation.
+	   algorithm operates on axis-aligned bounding boxes, which overlap if and only if they overlap along all axes. These algorithms have roughly $\bigO{n\log n}$ complexity, where $n$ is number of particles as long as they exploit :ref:`temporal coherence <sect-temp-coherence>` of the simulation.
 	
 	Grid algorithms
-	   represent continuous $R^3$ space by a finite set of regularly spaced points, leading to very fast neighbor search; they can reach the $\bigO{n}$ complexity [Munjiza1998]_ and recent research  suggests ways to overcome one of the major drawbacks of this method, which is the necessity to adjust grid cell size to the largest particle in the simulation ([Munjiza2006]_, the ``multistep'' extension).
+	   represent continuous $R^3$ space by a finite set of regularly spaced points, leading to very fast neighbor search; they can reach the $\bigO{n}$ complexity [Munjiza1998]_ and recent research  suggests ways to overcome one of the major drawbacks of this method, which is the necessity to adjust grid cell size to the largest particle in the simulation ([Munjiza2006]_, the \`\`multistep'' extension).
 
 .. _sect-temp-coherence:
+
 Temporal coherence
    expresses the fact that motion of particles in simulation is not arbitrary but governed by physical laws. This knowledge can be exploited to optimize performance.
 				
@@ -231,6 +232,7 @@ Normal strain
 -------------
 
 .. _sect-normal-strain-constants:
+
 Constants
 ^^^^^^^^^^
 
@@ -352,6 +354,7 @@ Finally, we compute
 .. math:: \curruT=\prevuT+(\Delta\uT)_1 + (\Delta\uT)_2 + (\Delta\uT)_3.
 
 .. _sect-formulation-total-shear:
+
 Total algorithm
 ^^^^^^^^^^^^^^^
 The following algorithm, aiming at stabilization of response even with large rotation speeds or $\Delta t$ approaching stability limit, was designed in [Smilauer2010b]_. (A similar algorithm based on total formulation, which covers additionally bending and torsion, was proposed in [Wang2009]_.) It is based on tracking original contact points (with zero shear) in the particle-local frame.
@@ -420,6 +423,7 @@ When using material law with plasticity in shear, it may be necessary to limit m
 This algorithm is straightforwardly modified to facet-sphere interactions. In Yade, it is implemented by :yref:`Dem3DofGeom` and related classes.
 
 .. _sect-formulation-stress-cundall:
+
 Stress evaluation (example)
 ===========================
 Once strain on a contact is computed, it can be used to compute stresses/forces acting on both spheres.
@@ -451,6 +455,7 @@ where $\vec{F}_N$ is normal force and $\vec{F}_T$ is trial shear force.  A simpl
 			\vec{F}_T^t & \hbox{otherwise.}
 		\end{cases}
 	\end{align*}
+
 Summary force $\vec{F}=\vec{F}_N+\vec{F}_T$ is then applied to both particles -- each particle accumulates forces and torques acting on it in the course of each step. Because the force computed acts at contact point $\vec{C}$, which is difference from spheres' centers, torque generated by $\vec{F}$ must also be considered.
 
 .. math:: 
@@ -640,6 +645,7 @@ where we replaced the previous mid-step velocity $\pprev{\dot{u}}$ by its on-ste
 In Yade, damping :eq:`eq-damping-yade` is implemented in the :yref:`NewtonIntegrator` engine; the damping coefficient $\lambda_d$ is :yref:`NewtonIntegrator.damping`.
 
 .. _sect-formulation-dt:
+
 Stability considerations
 ------------------------------------------------------
 ..
@@ -722,6 +728,7 @@ There is one important condition that $\omega_{\rm max}>0$: if there are no cont
 				
 
 .. _sect-dt-pwave:
+
 Estimation of $\Dtcr$ by wave propagation speed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		
@@ -885,6 +892,7 @@ When the collider detects approximate contact (on the :yref:`Aabb` level) and th
 By storing the integral offset $c$, $\Delta\vec{x}$ automatically updates as cell parameters change.
 
 .. _sect-periodic-insertion-sort:
+
 Periodic insertion sort algorithm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The extension of sweep and prune algorithm (described in :ref:`sect-sweep-and-prune`) to periodic boundary conditions is non-trivial. Its cornerstone is a periodic variant of the insertion sort algorithm, which involves keeping track of the "period" of each boundary; e.g. taking period $\langle 0,10)$, then $8_1\equiv-2_2<2_2$ (subscript indicating period). Doing so efficiently (without shuffling data in memory around as bound wraps from one period to another) requires moving period boundary rather than bounds themselves and making the comparison work transparently at the edge of the container.

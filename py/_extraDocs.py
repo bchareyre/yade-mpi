@@ -65,6 +65,7 @@ Create a scene for triaxal test.
 		Compaction is done
 			#. by moving rigid boxes or
 			#. by increasing the sizes of the particles (decided using the option :yref:`internalCompaction<TriaxialTest.internalCompaction>` ⇒ size increase).
+
 		Both algorithm needs numerical parameters to prevent instabilities. For instance, with the method (1) :yref:`maxWallVelocity<TriaxialTest.maxWallVelocity>` is the maximum wall velocity, with method (2) :yref:`finalMaxMultiplier<TriaxialTest.finalMaxMultiplier>` is the max value of the multiplier applied on sizes at each iteration (always something like 1.00001).
 
 	#. During the simulation of triaxial compression test, the wall in one direction moves with an increment of strain while the stresses in other two directions are adjusted to :yref:`sigma_iso<TriaxialStressController.sigma_iso>`. How the stresses in other directions are maintained constant to :yref:`sigma_iso<TriaxialStressController.sigma_iso>`? What is the mechanism? Where is it implemented in Yade?
@@ -81,7 +82,7 @@ Create a scene for triaxal test.
 '''
 
 wrapper.Peri3dController.__doc__=r'''
-Class for controlling independently all 6 components of "engineering" :yref:`stress<Peri3dController.stress>` and :yref:`strain<Peri3dController.strain>` of periodic :yref:``Cell`. :yref:`goal<Peri3dController.goal>` are the goal values, while :yref:`stressMask<Peri3dController.stressMask>` determines which components prescribe stress and which prescribe strain.
+Class for controlling independently all 6 components of "engineering" :yref:`stress<Peri3dController.stress>` and :yref:`strain<Peri3dController.strain>` of periodic :yref:`Cell`. :yref:`goal<Peri3dController.goal>` are the goal values, while :yref:`stressMask<Peri3dController.stressMask>` determines which components prescribe stress and which prescribe strain.
 
 If the strain is prescribed, appropeiate strain rate is directly applied. If the stress is prescribed, the strain predictor is used: from stress values in two previous steps the value of strain rate is prescribed so as the value of stress in the next step is as close as possible to the ideal one. Current algorithm is extremly simple and probably will be changed in future, but is roboust enough and mostly works fine.
 
@@ -113,7 +114,8 @@ wrapper.Ig2_Sphere_Sphere_L3Geom.__doc__=r'''Functor for computing incrementally
 
 Suppose two spheres with radii $r_i$, positions $\vec{x}_i$, velocities $\vec{v}_i$, angular velocities $\vec{\omega}_i$.
 
-When there is not yet contact, it will be created if $u_N=|\curr{\vec{x}}_2-\curr{\vec{x}}_1|-|f_d|(r_1+r2)<0$, where $f_d$ is :yref:`distFactor<Ig2_Sphere_Sphere_L3Geom.distFactor>` (sometimes also called ``interaction radius''). If $f_d>0$, then $\vec{u}_{0x}$ will be initalized to $u_N$, otherwise to 0. In another words, contact will be created if spheres enlarged by $|f_d|$ touch, and the ``equilibrium distance'' (where $\vec{u}_x-\vec{u}-{0x}$ is zero) will be set to the current distance if $f_d$ is positive, and to the geometrically-touching distance if negative.
+When there is not yet contact, it will be created if $u_N=|\curr{\vec{x}}_2-\curr{\vec{x}}_1|-|f_d|(r_1+r2)<0$, where $f_d$ is :yref:`distFactor<Ig2_Sphere_Sphere_L3Geom.distFactor>` (sometimes also called 
+\`\`interaction radius''). If $f_d>0$, then $\vec{u}_{0x}$ will be initalized to $u_N$, otherwise to 0. In another words, contact will be created if spheres enlarged by $|f_d|$ touch, and the \`\`equilibrium distance'' (where $\vec{u}_x-\vec{u}-{0x}$ is zero) will be set to the current distance if $f_d$ is positive, and to the geometrically-touching distance if negative.
 
 Local axes (rows of $\mat{T}$) are initially defined as follows:
 
@@ -121,7 +123,7 @@ Local axes (rows of $\mat{T}$) are initially defined as follows:
 * local $y$-axis positioned arbitrarily, but in a deterministic manner: aligned with the $xz$ plane (if $\vec{n}_y<\vec{n}_z$) or $xy$ plane (otherwise);
 * local $z$-axis $\vec{z}_l=\vec{x}_l\times\vec{y}_l$.
 
-If there has already been contact between the two spheres, it is updated to keep track of rigid motion of the contact (one that does not change mutual configuration of spheres) and mutual configuration changes. Rigid motion transforms local coordinate system and can be decomposed in rigid translation (affecting $\vec{c}$), and rigid rotation (affecting $\mat{T}$), which can be split in rotation $\vec{o}_r$ perpendicular to the normal and rotation $\vec{o}_t$ (``twist'') parallel with the normal:
+If there has already been contact between the two spheres, it is updated to keep track of rigid motion of the contact (one that does not change mutual configuration of spheres) and mutual configuration changes. Rigid motion transforms local coordinate system and can be decomposed in rigid translation (affecting $\vec{c}$), and rigid rotation (affecting $\mat{T}$), which can be split in rotation $\vec{o}_r$ perpendicular to the normal and rotation $\vec{o}_t$ (\`\`twist'') parallel with the normal:
 
 .. math:: \pprev{\vec{o}_r}=\prev{\vec{n}}\times\curr{\vec{n}}.
 
