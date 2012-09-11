@@ -18,6 +18,48 @@
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
 
+
+
+
+#ifdef FIXBUGINTRS
+struct sortIters{
+	shared_ptr<Interaction> I;
+	long iterBorn;
+	long chain;
+	bool active;
+	sortIters (shared_ptr<Interaction> Ir, long iterBornr, long chainr, bool activer){
+		I = Ir;
+		iterBorn = iterBornr;
+		chain = chainr;
+		active = activer;
+	}
+};
+
+bool sortIterChain(sortIters a, sortIters b ) { 
+	return a.chain < b.chain;
+}
+
+bool sortIterActive(sortIters a, sortIters b ) { 
+	if ((a.active > b.active) and (a.chain == b.chain)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool sortIterBorn(sortIters a, sortIters b ) { 
+	if ((a.iterBorn < b.iterBorn) and (a.chain == b.chain) and (a.active == b.active)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+#endif
+
+
+
+
 // 1st order numerical damping
 void NewtonIntegrator::cundallDamp1st(Vector3r& force, const Vector3r& vel){
 	for(int i=0; i<3; i++) force[i]*=1-damping*Mathr::Sign(force[i]*vel[i]);
@@ -148,6 +190,9 @@ void NewtonIntegrator::action()
 							if (sphere){  //The body is a sphere
 								std::cerr<<"It is a sphere"<<std::endl;
 								std::vector<shared_ptr<Body> > bodyFacetsContactList;   //List of contacted facets
+								
+								std::vector<sortIters> arrayItrs;
+								
 								for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
 									Body::id_t bID = (*it).first;
 									shared_ptr <Body> b = Body::byId(bID,scene);
@@ -156,21 +201,44 @@ void NewtonIntegrator::action()
 										if (facetTMP) { //If the current sphere contacts with facets, check it.
 											std::cerr<<bID<<std::endl;
 											bodyFacetsContactList.push_back(b);
+											
+											sortIters tempIter((*it).second, (*it).second->iterBorn, b->chain, (*it).second->isActive);
+											arrayItrs.push_back(tempIter);
+											
 										} else {
 											std::cerr<<bID<<" is a sphere"<<std::endl;
 										}
 									}
 								}
 								
-								if (bodyFacetsContactList.size() > 1) {
+								if (arrayItrs.size() > 1) {
+									for (unsigned int i=0; i<arrayItrs.size(); i++) {
+										sortIters& tempAr = arrayItrs[i];
+										std::cerr<<tempAr.iterBorn<<" " << tempAr.chain<<" " << tempAr.I->isActive<<"\n";
+									}
 									std::cerr<<"The sphere contacts with more than 1 facet!"<<std::endl;
+									std::sort(arrayItrs.begin(), arrayItrs.end(), sortIterChain);       //Sort on chains
+									std::sort(arrayItrs.begin(), arrayItrs.end(), sortIterActive);      //Sort on Active/Unactive contacts
+									std::sort(arrayItrs.begin(), arrayItrs.end(), sortIterBorn);        //Sort on BornIter
+									for (unsigned int i=0; i<arrayItrs.size(); i++) {
+										if (i==0) {
+											arrayItrs[i].I->isActive=true;
+										} else if (arrayItrs[i-1].chain==arrayItrs[i].chain) {
+											arrayItrs[i].I->isActive = false;
+										} else if (arrayItrs[i-1].chain!=arrayItrs[i].chain) {
+											arrayItrs[i].I->isActive = true;
+										}
+									}
+									for (unsigned int i=0; i<arrayItrs.size(); i++) {
+										sortIters& tempAr = arrayItrs[i];
+										std::cerr<<tempAr.iterBorn<<" " << tempAr.chain<<" " << tempAr.I->isActive<<"\n";
+									}
 								}
 								
 							}
 					}	
 					std::cerr<<std::endl;
 					b->checkIntrs = false;
-					
 				}
 			#endif
 
