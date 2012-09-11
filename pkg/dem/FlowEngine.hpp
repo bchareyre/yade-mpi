@@ -72,12 +72,13 @@ class FlowEngine : public PartialEngine
 		TPL void clearImposedPressure(Solver& flow);
 		TPL void clearImposedFlux(Solver& flow);
 		TPL void ApplyViscousForces(Solver& flow);
-		TPL Real getCellFlux(unsigned int cond, const shared_ptr<Solver>& flow);
-		TPL Real getBoundaryFlux(unsigned int boundary,Solver& flow) {return flow->boundaryFlux(boundary);}
+		TPL Real getFlux(unsigned int cond,Solver& flow);
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-		TPL Vector3r shearLubForce(unsigned int id_sph, Solver& flow) {
+		TPL Vector3r shearLubForce (unsigned int id_sph, Solver& flow) {
 			return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
+		TPL Vector3r shearLubTorque(unsigned int id_sph, Solver& flow) {
+			return (flow->viscousShearTorques.size()>id_sph)?flow->viscousShearTorques[id_sph]:Vector3r::Zero();}
 		TPL Vector3r normalLubForce(unsigned int id_sph, Solver& flow) {
 			return (flow->normLubForce.size()>id_sph)?flow->normLubForce[id_sph]:Vector3r::Zero();}
 		TPL Matrix3r bodyShearLubStress(unsigned int id_sph, Solver& flow) {
@@ -116,6 +117,8 @@ class FlowEngine : public PartialEngine
 			action();}
 		//Instanciation of templates for python binding
 		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
+		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
+
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
@@ -126,8 +129,7 @@ class FlowEngine : public PartialEngine
 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 		void 		_clearImposedFlux() {clearImposedFlux(solver);}
 		void 		_updateBCs() {updateBCs(solver);}
-		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
-		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
+		Real 		_getFlux(unsigned int cond) {return getFlux(cond,solver);}
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
@@ -206,6 +208,7 @@ class FlowEngine : public PartialEngine
 					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule"))
 
 					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
+					((double, eps, 0.00001,,"minimum distance between particles"))
 					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
@@ -233,14 +236,16 @@ class FlowEngine : public PartialEngine
 					.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 					.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
-					.def("getCellFlux",&FlowEngine::_getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
-					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
+					.def("getFlux",&FlowEngine::_getFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
 					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
+					.def("shearLubTorque",&FlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
+
 					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
+
 					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
@@ -329,6 +334,8 @@ class PeriodicFlowEngine : public FlowEngine
 		//(re)instanciation of templates and others, for python binding
 		void saveVtk() {solver->saveVtk();}
 		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
+		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
+
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
@@ -336,11 +343,11 @@ class PeriodicFlowEngine : public FlowEngine
 // 		void 		saveVtk() {solver->saveVtk();} // FIXME: need to adapt vtk recorder to periodic case
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
-		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}
-		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
+
+		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}	
 			
 		void 		_updateBCs() {updateBCs(solver);}
-		double 		MeasurePorePressure(Vector3r pos){return solver->MeasurePorePressure(pos[0], pos[1], pos[2]);}
+		double 		MeasurePorePressure(double posX, double posY, double posZ){return solver->MeasurePorePressure(posX, posY, posZ);}
 		double 		MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
 		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 
@@ -350,7 +357,7 @@ class PeriodicFlowEngine : public FlowEngine
 		
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
-		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
+// 		Real 		_getFlux(unsigned int cond) {getFlux(cond,solver);}
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"An engine to solve flow problem in saturated granular media",
 			((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
@@ -366,15 +373,17 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 			.def("shearLubForce",&PeriodicFlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
+			.def("shearLubTorque",&PeriodicFlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
 			.def("normalLubForce",&PeriodicFlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
+
 			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
-			.def("getBoundaryFlux",&PeriodicFlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
-			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+			
+			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("posX"),python::arg("posY"),python::arg("posZ")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 			.def("MeasureTotalAveragedPressure",&PeriodicFlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume") 
 			.def("PressureProfile",&PeriodicFlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 

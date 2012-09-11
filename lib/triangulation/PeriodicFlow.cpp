@@ -575,36 +575,42 @@ void PeriodicFlow::DisplayStatistics()
 	num_particles = real;
 }
 
-double PeriodicFlow::boundaryFlux(unsigned int boundaryId)
-{
-	RTriangulation& Tri = T[currentTes].Triangulation();
-	double Q1=0;
-
-	Vector_Cell tmp_cells;
-	tmp_cells.resize(10000);
-	VCell_iterator cells_it = tmp_cells.begin();
-
-	VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[boundaryId],cells_it);
-	for (VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
-	{
-		const Cell_handle& cell = *it;
+void PeriodicFlow::Average_Relative_Cell_Velocity()
+{  
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        Point pos_av_facet;
+        int num_cells = 0;
+        double facet_flow_rate = 0;
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+        for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
 		if (cell->info().isGhost) continue;
-		Q1 -= cell->info().dv();
-		for (int j2=0; j2<4; j2++)
-			Q1 += (cell->info().k_norm())[j2]* (cell->neighbor(j2)->info().shiftedP()-cell->info().shiftedP());
+		cell->info().av_vel() =CGAL::NULL_VECTOR;
+                num_cells++;
+                for ( int i=0; i<4; i++ )
+			if (!Tri.is_infinite(cell->neighbor(i))){
+				Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
+				Real area = sqrt ( Surfk.squared_length() );
+				Surfk = Surfk/area;
+//                         Vecteur facetNormal = Surfk/area;
+                        	Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+                        	pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
+				cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );}
+		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
 	}
-	return Q1;
 }
-
 void  PeriodicFlow::ComputeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
-  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear(); Edge_force_point.clear();
-  Finite_edges_iterator ed_it;Edge_dist.clear();
+  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();
+  Edge_force_point.clear();Edge_centerDist.clear();Edge_meanRad.clear();
+  Edge_surfaceDist.clear(); Edge_centerDistVect.clear();
+  Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {
-    Real Rh;
-    if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
+    Real Rh; 
+    int hasFictious= (ed_it->first)->vertex(ed_it->second)->info().isFictious +  (ed_it->first)->vertex(ed_it->third)->info().isFictious;
+    if (hasFictious==2) continue;
     else if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isGhost)) continue;
     else if (((ed_it->first)->vertex(ed_it->second)->info().isGhost) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
     else if (((ed_it->first)->vertex(ed_it->second)->info().isGhost) && ((ed_it->first)->vertex(ed_it->third)->info().isGhost)) continue;
@@ -615,22 +621,40 @@ void  PeriodicFlow::ComputeEdgesSurfaces()
     Edge_ids.push_back(pair<int,int>(id1,id2));
     double radius1 = sqrt((ed_it->first)->vertex(ed_it->second)->point().weight());
     double radius2 = sqrt((ed_it->first)->vertex(ed_it->third)->point().weight());
-    Vecteur x = (ed_it->first)->vertex(ed_it->third)->point().point() - (ed_it->first)->vertex(ed_it->second)->point().point();
-    Vecteur n = x / sqrt(x.squared_length());
+
+    Real surfaceDist; Real centerDist; Vecteur centerDistVect; Real meanRad; Vecteur point_force;Vecteur n;
+    if (!hasFictious){
+	centerDistVect=(ed_it->first)->vertex(ed_it->third)->point().point()- (ed_it->first)->vertex(ed_it->second)->point().point();
+	centerDist = sqrt(centerDistVect.squared_length());
+	meanRad = (radius1 + radius2)/2.;
+	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist -radius2 : centerDist -radius1;
+	n = centerDistVect / sqrt(centerDistVect.squared_length());
+	point_force = (centerDist/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*centerDist))*n;
+	Rh = (radius1<radius2)? surfaceDist + 0.45 * radius1 : surfaceDist + 0.45 * radius2;
+    }
+    else if (hasFictious == 1){
+	centerDistVect = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate])*boundary(id1).normal : ((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate])*boundary(id2).normal;
+	centerDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?abs((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate]) : abs((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate]);
+	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist -radius2 : centerDist -radius1;
+	meanRad = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? radius2:radius1;
+	point_force = centerDistVect;
+	n = centerDistVect / sqrt(centerDistVect.squared_length());
+    }
+    else {
+	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(1.,1.,1.); n=Vecteur(1.,1.,1.);
+    }
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
-    double dist = sqrt(x.squared_length())/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*sqrt(x.squared_length()));
-    Vecteur f_int = dist * n;
-    Edge_force_point.push_back(Vector3r(f_int[0],f_int[1],f_int[2]));
-    double d = x*n - radius1 - radius2;
-    Edge_dist.push_back(d);
-    if (radius1<radius2)  Rh = d + 0.45 * radius1;
-    else  Rh = d + 0.45 * radius2;
     Edge_HydRad.push_back(Rh);
-//     if (DEBUG_OUT) cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
+    Edge_surfaceDist.push_back(surfaceDist);
+    Edge_centerDistVect.push_back(Vector3r(centerDistVect[0],centerDistVect[1],centerDistVect[2]));
+    Edge_centerDist.push_back(centerDist);
+    Edge_meanRad.push_back(meanRad);
+    Edge_force_point.push_back(Vector3r(point_force[0],point_force[1],point_force[2]));
     
   }
   if (DEBUG_OUT)cout << "size of Edge_ids "<< Edge_ids.size()<< ", size of area "<< Edge_Surfaces.size() << ", size of Rh "<< Edge_HydRad.size()<< ", size of normal "<<Edge_normal.size() << endl;
 }
+
 
 } //namespace CGT
 
