@@ -103,6 +103,7 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	"""
 	# check zero dimentions
 	if (radius<=0): raise RuntimeError("The radius should have the positive value");
+	if (height<=0): wallMask = 1;
 	
 	return facetCylinderConeGenerator(center=center,radiusTop=radius,height=height,orientation=orientation,segmentsNumber=segmentsNumber,wallMask=wallMask,angleRange=angleRange,closeGap=closeGap,**kw)
 	
