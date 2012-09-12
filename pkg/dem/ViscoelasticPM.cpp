@@ -112,6 +112,16 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		shearForceVisc = phys.cs*shearVelocity; 
 	}
   
+  #ifdef FIXBUGINTRS
+	if (bodies[id1]->checkIntrs) {
+		updateInteractions(bodies[id1]);
+	}
+	
+	if (bodies[id2]->checkIntrs) {
+		updateInteractions(bodies[id2]);
+	}
+	#endif
+	
 	if (I->isActive) {
 		const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
 		addForce (id1,-f,scene);
