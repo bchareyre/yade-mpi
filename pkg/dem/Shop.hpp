@@ -138,21 +138,3 @@ class Shop{
 		//! Get a list of body-ids, which contacts the given body;
 		static py::list getBodyIdsContacts(Body::id_t bodyID=-1);
 };
-
-#ifdef FIXBUGINTRS
-void updateInteractions(shared_ptr <Body>);
-
-struct sortIters{
-	shared_ptr<Interaction> I;
-	long iterBorn;
-	long chain;
-	bool active;
-	sortIters (shared_ptr<Interaction> Ir, long iterBornr, long chainr, bool activer){
-		I = Ir;
-		iterBorn = iterBornr;
-		chain = chainr;
-		active = activer;
-	}
-};
-
-#endif

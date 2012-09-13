@@ -63,3 +63,22 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 
+
+
+#ifdef FIXBUGINTRS
+void updateInteractions(shared_ptr <Body>);
+
+struct sortIters{
+	shared_ptr<Interaction> I;
+	long iterBorn;
+	long chain;
+	bool active;
+	sortIters (shared_ptr<Interaction> Ir, long iterBornr, long chainr, bool activer){
+		I = Ir;
+		iterBorn = iterBornr;
+		chain = chainr;
+		active = activer;
+	}
+};
+
+#endif
