@@ -14,7 +14,6 @@ mechanical behavior of mining rocks.
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 
-
 class RpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(RpmState,State,"State information about Rpm body.",
 		((int,specimenNumber,0,,"The variable is used for particle size distribution analyze. Indicates, to which part of specimen belongs para of particles."))
@@ -36,8 +35,10 @@ class RpmMat: public FrictMat {
 			((int,exampleNumber,0,,"Number of the specimen. This value is equal for all particles of one specimen. [-]"))
 			((bool,initCohesive,false,,"The flag shows, whether particles of this material can be cohesive. [-]"))
 			((Real,stressCompressMax,0,,"Maximal strength for compression. The main destruction parameter. [Pa] //(Needs to be reworked)"))
-			((Real,Brittleness,0,,"One of destruction parameters. [-] //(Needs to be reworked)"))
-			((Real,G_over_E,1,,"Ratio of normal/shear stiffness at interaction level. [-]")),
+			((Real,stressStretchingMax,0,,"Maximal strength for stretching. [Pa]"))
+			((Real,stressShearMax,0,,"Maximal strength for shearing. [Pa]"))
+			((Real,G_over_E,1,,"Ratio of normal/shear stiffness at interaction level. [-]"))
+			((Real,Zeta,0,,"Damping Ratio, http://en.wikipedia.org/wiki/Damping_ratio [-]")),
 			createIndex();
 			);
 		
@@ -51,9 +52,7 @@ class Ip2_RpmMat_RpmMat_RpmPhys: public IPhysFunctor{
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		FUNCTOR2D(RpmMat,RpmMat);
 		DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS(Ip2_RpmMat_RpmMat_RpmPhys,IPhysFunctor,"Convert 2 RpmMat instances to RpmPhys with corresponding parameters.",
-		((Real,initDistance,0,,"Initial distance between spheres at the first step."))
-	);
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_RpmMat_RpmMat_RpmPhys,IPhysFunctor,"Convert 2 RpmMat instances to RpmPhys with corresponding parameters.",);
 };
 REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
 
@@ -61,21 +60,24 @@ REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
 class RpmPhys: public NormShearPhys {
 	private:
 	public:
-		Real omega, Fn, sigmaN, epsN;
-		Vector3r epsT, sigmaT, Fs;
+		Real Fn,  epsN, sigmaN, cn, cs;
+		Vector3r epsT,  Fs, sigmaT;
+		bool updatedCnFlag;
 		 
 		virtual ~RpmPhys();
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(RpmPhys,NormShearPhys,"Representation of a single interaction of the Rpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_RockPMPhys_Rpm, that includes damage effects and chages of parameters inside RpmPhys",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(RpmPhys,NormShearPhys,"Representation of a single interaction of the Rpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_RpmPhys_Rpm, that includes damage effects and chages of parameters inside RpmPhys",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,crossSection,0,,"equivalent cross-section associated with this contact [m²]"))
 			((Real,G,NaN,,"shear modulus [Pa]"))
 			((Real,tanFrictionAngle,NaN,,"tangens of internal friction angle [-]"))
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than lengthMaxTension or less than lengthMaxCompression."))
-			((Real,lengthMaxCompression,0,,"Maximal penetration of particles during compression. If it is more, the interaction is deleted [m]"))
-			((Real,lengthMaxTension,0,,"Maximal distance between particles during tension. If it is more, the interaction is deleted [m]"))
-			,
-			/*ctor*/createIndex(); epsT=Vector3r::Zero(); omega=0; Fn=0; Fs=Vector3r::Zero();
+			((Real,epsMaxCompression,0,,"Maximal relative penetration of particles during compression. If it is more, the interaction is deleted [m]"))
+			((Real,epsMaxTension,0,,"Maximal relative distance between particles during tension. If it is more, the interaction is deleted [m]"))
+			((Real,epsMaxShear,0,,"Maximal relative distance between particles in tangential direction. If it is more, the interaction is deleted [m]"))
+			((Real,Kn,0,,"Stiffness in normal direction [N/m]"))
+			((Real,Ks,0,,"Stiffness in shear direction [N/m]")),
+			/*ctor*/createIndex(); Fn=0; epsN=0; sigmaN=0; sigmaT = Vector3r::Zero(); epsT=Vector3r::Zero(); Fs=Vector3r::Zero(); cn=0; cs=0;
 		);
 	REGISTER_CLASS_INDEX(RpmPhys,NormShearPhys);
 };
