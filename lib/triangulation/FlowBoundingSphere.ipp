@@ -283,31 +283,39 @@ Tesselation& FlowBoundingSphere<Tesselation>::LoadPositions(int argc, char *argv
 
   return Tes;
 }
-template <class Tesselation> 
+
+template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::Average_Relative_Cell_Velocity()
-{  
-        RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+{
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Point pos_av_facet;
         int num_cells = 0;
         double facet_flow_rate = 0;
-	Real tVel=0; Real tVol=0;
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
         for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+		if (cell->info().isGhost) continue;
 		cell->info().av_vel() =CGAL::NULL_VECTOR;
                 num_cells++;
-                for ( int i=0; i<4; i++ )
-			if (!Tri.is_infinite(cell->neighbor(i))){
+		Real tot_flow_rate = 0;//used to acount for influxes in elements where pressure is imposed
+                for ( int i=0; i<4; i++ ) if (!Tri.is_infinite(cell->neighbor(i))){
 				Vecteur Surfk = cell->info()-cell->neighbor(i)->info();
 				Real area = sqrt ( Surfk.squared_length() );
 				Surfk = Surfk/area;
-				Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
-				pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
-				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().p() - cell->neighbor (i)->info().p());
-                        	cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );}
- 		if (cell->info().volume()){ tVel+=cell->info().av_vel()[1]; tVol+=cell->info().volume();}
-		cell->info().av_vel() = cell->info().av_vel() /cell->info().volume();
+                        	Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+                        	pos_av_facet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
+				facet_flow_rate = (cell->info().k_norm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
+				tot_flow_rate += facet_flow_rate;
+				cell->info().av_vel() = cell->info().av_vel() + (facet_flow_rate) * ( pos_av_facet-CGAL::ORIGIN );
+		}
+		//This is the influx term
+		if (cell->info().Pcondition) cell->info().av_vel() = cell->info().av_vel() - (tot_flow_rate)*((Point) cell->info()-CGAL::ORIGIN );
+		//now divide by volume
+		cell->info().av_vel() = cell->info().av_vel() /abs(cell->info().volume());
 	}
 }
+
+
+
 template <class Tesselation> 
 bool FlowBoundingSphere<Tesselation>::isOnSolid  (double X, double Y, double Z)
 {
@@ -1216,6 +1224,26 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 	computedOnce=true;
 }
 
+template <class Tesselation>
+double FlowBoundingSphere<Tesselation>::boundaryFlux(unsigned int boundaryId)
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	double Q1=0;
+
+	Vector_Cell tmp_cells;
+	tmp_cells.resize(10000);
+	VCell_iterator cells_it = tmp_cells.begin();
+
+	VCell_iterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[boundaryId],cells_it);
+	for (VCell_iterator it = tmp_cells.begin(); it != cell_up_end; it++)
+	{
+		const Cell_handle& cell = *it;
+		if (cell->info().isGhost) continue;
+		for (int j2=0; j2<4; j2++)
+			Q1 += (cell->neighbor(j2)->info().k_norm())[Tri.mirror_index(cell, j2)]* (cell->neighbor(j2)->info().p()-cell->info().p());
+	}
+	return Q1;
+}
 
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::Permeameter(double P_Inf, double P_Sup, double Section, double DeltaY, const char *file)
@@ -1397,6 +1425,16 @@ void FlowBoundingSphere<Tesselation>::saveVtk()
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
 		if (isDrawable){vtkfile.write_data(cell->info().p());}
+	}
+	vtkfile.end_data();}
+
+
+	if (1){
+	Average_Relative_Cell_Velocity();
+	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(cell->info().av_vel()[0],cell->info().av_vel()[1],cell->info().av_vel()[2]);}
 	}
 	vtkfile.end_data();}
 }
@@ -1619,15 +1657,12 @@ template <class Tesselation>
 void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
-  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();
-  Edge_force_point.clear();Edge_centerDist.clear(); Edge_meanRad.clear();
-  Edge_surfaceDist.clear(); Edge_centerDistVect.clear();
+  Edge_normal.clear(); Edge_Surfaces.clear(); Edge_ids.clear(); Edge_HydRad.clear();Edge_dist.clear();Edge_force_point.clear();
   Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {
     Real Rh;
-    int hasFictious= (ed_it->first)->vertex(ed_it->second)->info().isFictious +  (ed_it->first)->vertex(ed_it->third)->info().isFictious;
-    if (hasFictious ==2) continue;
+    if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
     int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
     int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
     double area = T[currentTes].ComputeVFacetArea(ed_it);
@@ -1635,38 +1670,19 @@ void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
     Edge_ids.push_back(pair<int,int>(id1,id2));
     double radius1 = sqrt((ed_it->first)->vertex(ed_it->second)->point().weight());
     double radius2 = sqrt((ed_it->first)->vertex(ed_it->third)->point().weight());
-
-    Real surfaceDist; Real centerDist; Vecteur centerDistVect; Real meanRad; Vecteur point_force;Vecteur n;
-    if (!hasFictious){
-	centerDistVect=(ed_it->first)->vertex(ed_it->third)->point().point()- (ed_it->first)->vertex(ed_it->second)->point().point();
-	centerDist = sqrt(centerDistVect.squared_length());
-	meanRad = (radius1 + radius2)/2.;
-	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist -radius2 : centerDist -radius1;
-	n = centerDistVect / sqrt(centerDistVect.squared_length());
-	point_force = (centerDist/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*centerDist))*n;
-	Rh = (radius1<radius2)? surfaceDist + 0.45 * radius1 : surfaceDist + 0.45 * radius2;
-    }
-    else if (hasFictious == 1){
-	centerDistVect = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate])*boundary(id1).normal : ((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate])*boundary(id2).normal;
-	centerDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?abs((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate]) : abs((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate]);
-	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist -radius2 : centerDist -radius1;
-	meanRad = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? radius2:radius1;
-	point_force = centerDistVect;
-	n = centerDistVect / sqrt(centerDistVect.squared_length());
-    }
-    else {
-	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(1.,1.,1.); n=Vecteur(1.,1.,1.);
-    }
+    Vecteur x = (ed_it->first)->vertex(ed_it->third)->point().point()- (ed_it->first)->vertex(ed_it->second)->point().point();
+    Vecteur n = x / sqrt(x.squared_length());
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
+    double dist = sqrt(x.squared_length())/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*sqrt(x.squared_length()));
+    Vecteur f_int = dist * n;
+    Edge_force_point.push_back(Vector3r(f_int[0],f_int[1],f_int[2]));
+    double d = x*n - radius1 - radius2;
+    Edge_dist.push_back(d);
+    if (radius1<radius2)  Rh = d + 0.45 * radius1;
+    else  Rh = d + 0.45 * radius2;
     Edge_HydRad.push_back(Rh);
-    Edge_surfaceDist.push_back(surfaceDist);
-    Edge_centerDistVect.push_back(Vector3r(centerDistVect[0],centerDistVect[1],centerDistVect[2]));
-    Edge_centerDist.push_back(centerDist);
-    Edge_meanRad.push_back(meanRad);
-    Edge_force_point.push_back(Vector3r(point_force[0],point_force[1],point_force[2]));
-
-	
-//     if (DEBUG_OUT) cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
+    if (DEBUG_OUT) cout<<"id1= "<<id1<<", id2= "<<id2<<", area= "<<area<<", R1= "<<radius1<<", R2= "<<radius2<<" x= "<<x<<", n= "<<n<<", Rh= "<<Rh<<endl;
+    
   }
 }
 template <class Tesselation> 
@@ -1677,16 +1693,16 @@ Vector3r FlowBoundingSphere<Tesselation>::ComputeViscousForce(Vector3r deltaV, i
 }
 
 template <class Tesselation> 
-Vector3r FlowBoundingSphere<Tesselation>::ComputeShearLubricationForce(Vector3r deltaV,int edge_id, Real eps)
+Vector3r FlowBoundingSphere<Tesselation>::ComputeShearLubricationForce(Vector3r deltaV,Real meanRad,int edge_id)
 {
-    Vector3r viscLubF = 0.5 * Mathr::PI * VISCOSITY * (-2*Edge_meanRad[edge_id] + Edge_centerDist[edge_id]*log(Edge_centerDist[edge_id]/max(Edge_surfaceDist[edge_id],eps))) * deltaV;
+    Vector3r viscLubF = 0.5*Mathr::PI * VISCOSITY * (-2*meanRad + log(1/Edge_dist[edge_id])) * deltaV;
     return viscLubF;
 }
 
 template <class Tesselation> 
-Vector3r FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(Vector3r deltaNormV, int edge_id)
+Vector3r FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(Vector3r deltaNormV, Real meanRad, int edge_id)
 {
-    Vector3r normLubF = (1.5*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV )/Edge_surfaceDist[edge_id];
+    Vector3r normLubF = (1.5*Mathr::PI*pow(meanRad,2)* VISCOSITY* deltaNormV )/Edge_dist[edge_id];
     return normLubF;
 }
 
