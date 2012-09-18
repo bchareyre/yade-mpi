@@ -189,22 +189,6 @@ void TriaxialCompressionEngine::action()
 
 void TriaxialCompressionEngine::setContactProperties(Real frictionDegree)
 {
-	scene = Omega::instance().getScene().get();
-	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
-		if(b->isClump()) continue;
-		if (b->isDynamic())
-		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
-	}
-	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
-		if (!ii->isReal()) continue;
-		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId1())]->material);
-		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId2())]->material);
-		//FIXME - why dynamic_cast fails here?
-		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->phys.get());
-		const Real& fa = sdec1->frictionAngle;
-		const Real& fb = sdec2->frictionAngle;
-		contactPhysics->tangensOfFrictionAngle = std::tan(std::min(fa,fb));
-	}
+	Shop::setContactFriction(frictionDegree);
 }
 
