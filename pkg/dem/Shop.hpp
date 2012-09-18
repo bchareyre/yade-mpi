@@ -116,8 +116,8 @@ class Shop{
 		static void getStressForEachBody(vector<Shop::bodyState>&);
 		
 		//! Define the exact average stress in each particle from contour integral ("LW" stands for Love-Weber, since this is what the contour integral gives).
-		static void getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign=false);
-		static py::list getStressLWForEachBody(bool revertSign);
+		static void getStressLWForEachBody(vector<Matrix3r>& bStresses);
+		static py::list getStressLWForEachBody();
 		
 		//! Function to compute overall ("macroscopic") stress.
 		static Matrix3r getStress(Real volume=0);
@@ -137,4 +137,7 @@ class Shop{
 		
 		//! Get a list of body-ids, which contacts the given body;
 		static py::list getBodyIdsContacts(Body::id_t bodyID=-1);
+
+		//! Set material and contact friction to the given value, non-dynamic bodies are not affected
+		static void setContactFriction(Real angleDegree);
 };

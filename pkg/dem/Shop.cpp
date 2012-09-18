@@ -799,7 +799,7 @@ Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
 }
 */
 
-void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
+void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	bStresses.resize(scene->bodies->size());
 	for (size_t k=0;k<scene->bodies->size();k++) bStresses[k]=Matrix3r::Zero();
@@ -808,7 +808,6 @@ void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		Vector3r f=phys->normalForce+phys->shearForce;
-		if (revertSign) f=-f;//revert sign for some laws, so that every interaction type can give the same result
 		//Sum f_i*l_j/V for each contact of each particle
 		bStresses[I->getId1()]-=(3.0/(4.0*Mathr::PI*pow(geom->refR1,3)))*f*((geom->contactPoint-Body::byId(I->getId1(),scene)->state->pos).transpose());
 		if (!scene->isPeriodic)
@@ -818,10 +817,10 @@ void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses, bool revertSign){
 	}
 }
 
-py::list Shop::getStressLWForEachBody(bool revertSign){
+py::list Shop::getStressLWForEachBody(){
 	py::list ret;
 	vector<Matrix3r> bStresses;
-	getStressLWForEachBody(bStresses,revertSign);
+	getStressLWForEachBody(bStresses);
 	FOREACH(const Matrix3r& m, bStresses) ret.append(m);
 	return ret;
 // 	return py::make_tuple(bStresses);
@@ -852,4 +851,24 @@ py::list Shop::getBodyIdsContacts(Body::id_t bodyID) {
 		ret.append((*it).first);
 	}
 	return ret;
+}
+
+void Shop::setContactFriction(Real angleDegree){
+	Scene* scene = Omega::instance().getScene().get();
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
+	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+		if(b->isClump()) continue;
+		if (b->isDynamic())
+		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = angleDegree * Mathr::PI/180.0;
+	}
+	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
+		if (!ii->isReal()) continue;
+		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId1())]->material);
+		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(Body::id_t) ((ii)->getId2())]->material);
+		//FIXME - why dynamic_cast fails here?
+		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->phys.get());
+		const Real& fa = sdec1->frictionAngle;
+		const Real& fb = sdec2->frictionAngle;
+		contactPhysics->tangensOfFrictionAngle = std::tan(std::min(fa,fb));
+	}
 }
