@@ -70,10 +70,14 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <double> Edge_Surfaces;
 		vector <pair<int,int> > Edge_ids;
 		vector <Vector3r> Edge_force_point;
-		vector <Real> Edge_dist;
 		vector <Real> Edge_HydRad;
 		vector <Vector3r> Edge_normal;
+		vector <Real> Edge_surfaceDist;
+		vector <Vector3r>Edge_centerDistVect;
+		vector <Real> Edge_centerDist;
+		vector <Real> Edge_meanRad;
 		vector <Vector3r> viscousShearForces;
+		vector <Vector3r> viscousShearTorques;
 		vector <Vector3r> normLubForce;
 		vector <Matrix3r> viscousBodyStress;
 		vector <Matrix3r> lubBodyStress;
@@ -129,8 +133,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		
 		void ComputeEdgesSurfaces();
 		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
-		Vector3r ComputeNormalLubricationForce(Vector3r deltaNormV, Real meanRad, int edge_id);
-		Vector3r ComputeShearLubricationForce(Vector3r deltaV,Real meanRad,int edge_id);
+		Vector3r ComputeNormalLubricationForce(Vector3r deltaNormV, int edge_id);
+		Vector3r ComputeShearLubricationForce(Vector3r deltaV,int edge_id, Real eps);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 

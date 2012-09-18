@@ -69,15 +69,17 @@ void FlowEngine::action()
 	timingDeltas->checkpoint ( "forces.sync()" );
 	if ( viscousShear ) ApplyViscousForces ( *solver );
 	timingDeltas->checkpoint ( "viscous forces" );
-	Vector3r Force;
+	Vector3r Force;Vector3r Torque;
         Finite_vertices_iterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
         for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
 		Force = Vector3r ( ( V_it->info().forces ) [0],V_it->info().forces[1],V_it->info().forces[2] );
-                if (viscousShear)
+                if (viscousShear){
 			Force = Force + solver->viscousShearForces[V_it->info().id()];
+			Torque = Torque + solver->viscousShearTorques[V_it->info().id()];}
 		if (normalLubrication)
 			Force = Force + solver-> normLubForce[V_it->info().id()];
 		scene->forces.addForce ( V_it->info().id(), Force);
+		scene->forces.addTorque ( V_it->info().id(), Torque);
         }
         ///End Compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
@@ -592,18 +594,15 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                 const shared_ptr<Body>& sph2 = Body::byId ( flow.Edge_ids[i].second, scene );
                 Sphere* s1=YADE_CAST<Sphere*> ( sph1->shape.get() );
                 Sphere* s2=YADE_CAST<Sphere*> ( sph2->shape.get() );
-                Vector3r x = sph2->state->pos - sph1->state->pos;
-                Vector3r n = x / sqrt(makeCgVect(x).squared_length());
 		Vector3r deltaV; Vector3r deltaNormV;
-		Real meanRad = (s1->radius + s2->radius)/2.;
 
 		Vector3r visc_f;
                 if ( !hasFictious )
-                        deltaV = (sph2->state->vel + sph2->state->angVel.cross(s2->radius * n)) - (sph1->state->vel+ sph1->state->angVel.cross(s1->radius * n));
+                        deltaV = (sph2->state->vel + sph2->state->angVel.cross(s2->radius * flow.Edge_normal[i])) - (sph1->state->vel+ sph1->state->angVel.cross(s1->radius * flow.Edge_normal[i]));
                 else {
                         if ( hasFictious==1 ) {//for the fictious sphere, use velocity of the boundary, not of the body
-                                Vector3r v1 = ( Tes.vertex ( flow.Edge_ids[i].first )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].first ).velocity:sph1->state->vel + sph1->state->angVel.cross(s1->radius * n);
-                                Vector3r v2 = ( Tes.vertex ( flow.Edge_ids[i].second )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].second ).velocity:sph2->state->vel + sph2->state->angVel.cross(s2->radius * (-n));
+                                Vector3r v1 = ( Tes.vertex ( flow.Edge_ids[i].first )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].first ).velocity:sph1->state->vel + sph1->state->angVel.cross(s1->radius * flow.Edge_normal[i]);
+                                Vector3r v2 = ( Tes.vertex ( flow.Edge_ids[i].second )->info().isFictious ) ? flow.boundary ( flow.Edge_ids[i].second ).velocity:sph2->state->vel + sph2->state->angVel.cross(s2->radius * (-flow.Edge_normal[i]));
                                 deltaV = v2-v1;
                         } else {//both fictious, ignore
                                 deltaV = Vector3r::Zero();
@@ -611,7 +610,7 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
                 }
                 deltaV = deltaV - ( flow.Edge_normal[i].dot ( deltaV ) ) *flow.Edge_normal[i];
 		if (shearLubrication)
-			visc_f = flow.ComputeShearLubricationForce (deltaV,meanRad,i);
+			visc_f = flow.ComputeShearLubricationForce (deltaV,i,eps);
 		else
 			visc_f = flow.ComputeViscousForce ( deltaV, i );
 				
@@ -628,22 +627,23 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 /// //(3) ou dans un vecteur séparé (rapide)
 		flow.viscousShearForces[flow.Edge_ids[i].first]+=visc_f;
 		flow.viscousShearForces[flow.Edge_ids[i].second]-=visc_f;
+		flow.viscousShearTorques[flow.Edge_ids[i].first]+=flow.Edge_force_point[i].cross(visc_f);
+		flow.viscousShearTorques[flow.Edge_ids[i].second]-=(flow.Edge_centerDistVect[i]-flow.Edge_force_point[i]).cross(visc_f);
 		
 /// Compute the viscous shear stress on each particle
 		flow.viscousBodyStress[flow.Edge_ids[i].first] += visc_f * flow.Edge_force_point[i].transpose();
-		flow.viscousBodyStress[flow.Edge_ids[i].second] -= visc_f * (x-flow.Edge_force_point[i]).transpose();
-		
+		flow.viscousBodyStress[flow.Edge_ids[i].second] -= visc_f * (flow.Edge_centerDistVect[i]-flow.Edge_force_point[i]).transpose();		
 		
 /// Compute the normal lubrication force applied on each particle
 		if (normalLubrication){
 			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
-			Vector3r lub_f = flow.ComputeNormalLubricationForce (deltaNormV, meanRad, i);
+			Vector3r lub_f = flow.ComputeNormalLubricationForce (deltaNormV, i);
 			flow.normLubForce[flow.Edge_ids[i].first]+=lub_f;
 			flow.normLubForce[flow.Edge_ids[i].second]-=lub_f;
 		
 /// Compute the normal lubrication stress on each particle
 			flow.lubBodyStress[flow.Edge_ids[i].first] += lub_f * flow.Edge_force_point[i].transpose();
-			flow.lubBodyStress[flow.Edge_ids[i].second] -= lub_f *(x-flow.Edge_force_point[i]).transpose();
+			flow.lubBodyStress[flow.Edge_ids[i].second] -= lub_f *(flow.Edge_centerDistVect[i]-flow.Edge_force_point[i]).transpose();
 		}
 		
 	}
@@ -691,16 +691,29 @@ void PeriodicFlowEngine:: action()
         if ( viscousShear ) ApplyViscousForces(*solver);
 	timingDeltas->checkpoint("Compute_Viscous_Forces");
 	Vector3r Force;
+	Vector3r Torque;
 	const Tesselation& Tes = solver->T[solver->currentTes];
 	for (int id=0; id<=Tes.max_id; id++){
 		assert (Tes.vertexHandles[id] != NULL);
 		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
 		Force = Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] );
-                if (viscousShear)
-			Force = Force +solver->viscousShearForces[v_info.id()];
-		if (normalLubrication)
-			Force = Force +solver->normLubForce[v_info.id()];
-		scene->forces.addForce ( v_info.id(), Force);
+		Torque = scene->forces.getTorque(v_info.id());
+                if (viscousShear){
+			if (v_info.isGhost) continue;
+			else {
+				Force = Force +solver->viscousShearForces[v_info.id()];
+				Torque = Torque + solver->viscousShearTorques[v_info.id()];
+			}
+		}
+		if (normalLubrication){
+			if (v_info.isGhost) continue;
+			else
+				Force = Force + solver->normLubForce[v_info.id()];}
+		if (v_info.isGhost) continue;
+		else {
+			scene->forces.addForce ( v_info.id(), Force);
+			scene->forces.addTorque ( v_info.id(), Torque);
+		}
 	}
         ///End Compute flow and forces
 	timingDeltas->checkpoint("Applying Forces");
