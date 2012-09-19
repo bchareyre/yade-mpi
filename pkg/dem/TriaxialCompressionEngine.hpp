@@ -94,7 +94,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((Vector3r,translationAxis,TriaxialStressController::normal[wall_bottom],,"compression axis"))
 		((bool,autoCompressionActivation,true,,"Auto-switch from isotropic compaction (or unloading state if sigmaLateralConfinement<sigmaIsoCompaction) to deviatoric loading"))
 		((bool,autoUnload,true,,"Auto-switch from isotropic compaction to unloading"))
-		((bool,autoStopSimulation,true,,"Stop the simulation when the sample reach STATE_LIMBO, or keep running"))
+		((bool,autoStopSimulation,false,,"Stop the simulation when the sample reach STATE_LIMBO, or keep running"))
 		((int,testEquilibriumInterval,20,,"interval of checks for transition between phases, higher than 1 saves computation time."))
 		((stateNum,currentState,1,,"There are 5 possible states in which TriaxialCompressionEngine can be. See above :yref:`yade.wrapper.TriaxialCompressionEngine` "))
 		((stateNum,previousState,1,,"Previous state (used to detect manual changes of the state in .xml)"))

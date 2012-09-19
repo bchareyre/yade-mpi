@@ -142,7 +142,7 @@ void TriaxialCompressionEngine::action()
 	TriaxialStressController::action();
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{
-// 		Omega::instance().pause();
+		Omega::instance().pause();
 		return;
 	}
 
