@@ -153,7 +153,7 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			// limit rolling moment to the plastic value, if required
 			Real RollMax = phys->maxRollPl*phys->normalForce.norm();
 			if (RollMax>0.){ // do we want to apply plasticity?
-				LOG_WARN("If :yref:`CohesiveFrictionalContactLaw::useIncrementalForm` is false, then plasticity would not be applied correctly (the total formulation would not reproduce irreversibility).");
+				if (!useIncrementalForm) LOG_WARN("If :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::useIncrementalForm` is false, then plasticity will not be applied correctly (the total formulation would not reproduce irreversibility).");
 				Real scalarRoll = phys->moment_bending.norm();
 				if (scalarRoll>RollMax){ // fix maximum rolling moment
 					Real ratio = RollMax/scalarRoll;
@@ -163,7 +163,7 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			// limit twisting moment to the plastic value, if required
 			Real TwistMax = phys->maxTwistMoment.norm();
 			if (TwistMax>0.){ // do we want to apply plasticity?
-				LOG_WARN("If :yref:`CohesiveFrictionalContactLaw::useIncrementalForm` is false, then plasticity would not be applied correctly (the total formulation would not reproduce irreversibility).");
+				if (!useIncrementalForm) LOG_WARN("If :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::useIncrementalForm` is false, then plasticity will not be applied correctly (the total formulation would not reproduce irreversibility).");
 				Real scalarTwist= phys->moment_twist.norm();
 				if (scalarTwist>TwistMax){ // fix maximum rolling moment
 					Real ratio = TwistMax/scalarTwist;
