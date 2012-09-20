@@ -244,78 +244,83 @@ def gengeo(mntable,shift=Vector3.Zero,scale=1.0,**kw):
 
 
 
-def unv(fileName,shift=(0,0,0),scale=1.0,**kw):
+def unv(fileName,shift=(0,0,0),scale=1.0,returnElementMap=False,**kw):
 	""" Import geometry from unv file, return list of created facets.
 
-	:Parameters:
-		`fileName`: string
-			name of unv file
-		`shift`: [float,float,float] | Vector3
-			[X,Y,Z] parameter moves the specimen.
-		`scale`: float
-			factor scales the given data.
-		`**kw`: (unused keyword arguments)
-				is passed to :yref:`yade.utils.facet`
+		:param string fileName: name of unv file
+		:param (float,float,float)|Vector3 shift: (X,Y,Z) parameter moves the specimen.
+		:param float scale: factor scales the given data.
+		:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.facet`
+		:param bool returnElementMap: if True, apart from facets returns also nodes (list of (x,y,z) nodes coordinates) and elements (list of (id1,id2,id3) element nodes ids). If False (default), returns only facets
 	
 	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>`_ and `Abaqus <http://www.simulia.com/products/abaqus_fea.html>`_), but triangular elements can be imported as facets.
 	These files cen be created e.g. with open-source free software `Salome <http://salome-platform.org>`_.
 	
-	Example: :ysrc:`examples/test/unvRead.py`."""
+	Example: :ysrc:`examples/test/unv-read/unvRead.py`."""
 
 	class UNVReader:
 		# class used in ymport.unv function
 		# reads and evaluate given unv file and extracts all triangles
 		# can be extended to read tetrahedrons as well
-		def __init__(self,fileName,shift=(0,0,0),scale=1.0):
+		def __init__(self,fileName,shift=(0,0,0),scale=1.0,returnElementMap=False,**kw):
 			self.shift = shift
 			self.scale = scale
 			self.unvFile = open(fileName,'r')
 			self.flag = 0
 			self.line = self.unvFile.readline()
 			self.lineSplit = self.line.split()
-			self.vertices = []
-			self.verticesTris = []
-			self.read()
+			self.nodes = []
+			self.elements = []
+			self.read(**kw)
 		def readLine(self):
 			self.line = self.unvFile.readline()
 			self.lineSplit = self.line.split()
-		def read(self):
+		def read(self,**kw):
 			while self.line:
 				self.evalLine()
 				self.line = self.unvFile.readline()
 			self.unvFile.close()
+			self.createFacets(**kw)
 		def evalLine(self):
 			self.lineSplit = self.line.split()
 			if len(self.lineSplit) <= 1: # eval special unv format
-				if   self.lineSplit[0] == '-1': pass
+				if   self.lineSplit[0] == '-1':   pass
 				elif self.lineSplit[0] == '2411': self.flag = 1; # nodes
 				elif self.lineSplit[0] == '2412': self.flag = 2; # edges (lines)
-				else: self.flag = 4; # volume elements or other, not interesting for us
-			elif self.flag == 1: self.evalVertices()
+				else: self.flag = 4; # volume elements or other, not interesting for us (at least yet)
+			elif self.flag == 1: self.evalNodes()
 			elif self.flag == 2: self.evalEdge()
 			elif self.flag == 3: self.evalFacet()
 			#elif self.flag == 4: self.evalGroup()
-		def evalVertices(self):
+		def evalNodes(self):
 			self.readLine()
-			self.vertices.append((
+			self.nodes.append((
 				self.shift[0]+self.scale*float(self.lineSplit[0]),
 				self.shift[1]+self.scale*float(self.lineSplit[1]),
 				self.shift[2]+self.scale*float(self.lineSplit[2])))
 		def evalEdge(self):
-			if self.lineSplit[1]=='41': self.flag = 3; self.evalFacet()
-			else: self.readLine(); self.readLine()
+			if self.lineSplit[1]=='41':
+				self.flag = 3
+				self.evalFacet()
+			else:
+				self.readLine()
+				self.readLine()
 		def evalFacet(self):
 			if self.lineSplit[1]=='41': # triangle
 				self.readLine()
-				self.verticesTris.append([
-					self.vertices[int(self.lineSplit[0])-1],
-					self.vertices[int(self.lineSplit[1])-1],
-					self.vertices[int(self.lineSplit[2])-1]])
+				self.elements.append((
+					int(self.lineSplit[0])-1,
+					int(self.lineSplit[1])-1,
+					int(self.lineSplit[2])-1))
 			else: # is not triangle
 				self.readLine()
 				self.flag = 4
 				# can be added function to handle tetrahedrons
-
-	unvReader = UNVReader(fileName,shift,scale,**kw)
-	return [utils.facet(tri,**kw) for tri in unvReader.verticesTris]
+		def createFacets(self,**kw):
+			self.facets = [utils.facet(tuple(self.nodes[i] for i in e),**kw) for e in self.elements]
+	#
+	unvReader = UNVReader(fileName,shift,scale,returnElementMap,**kw)
+	if returnElementMap:
+		return unvReader.facets, unvReader.nodes, unvReader.elements
+	return facets
 

@@ -183,6 +183,8 @@ class VTKExporter:
 	create object vtkExporter = VTKExporter('baseFileName'),
 	add to engines PyRunner with command='vtkExporter.exportSomething(params)'
 
+	Example: :ysrc:`examples/test/vtk-exporter/vtkExporter.py`, :ysrc:`examples/test/unv-read/unvReadVTKExport.py`.
+
 	:param string baseName: name of the exported files. The files would be named baseName-spheres-snapNb.vtk or baseName-facets-snapNb.vtk
 	:param int=0 startSnap: the numbering of files will start form startSnap
 	"""
@@ -245,17 +247,12 @@ class VTKExporter:
 
 	def exportFacets(self,ids='all',what=[],comment="comment",numLabel=None):
 		"""
-		exports facets (positions) and defined properties.
+		exports facets (positions) and defined properties. Facets are exported with multiplicated nodes
 
-		:parameters:
-		`ids`: list | "all"
-		if "all", then export all spheres, otherwise only spheres from integer list
-		`what`: [tuple(2)]
-		see exportSpheres
-		`comment`: string
-		comment to add to vtk file
-		`numLabel`: int
-		number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		:param [int]|"all" ids: if "all", then export all facets, otherwise only facets from integer list
+		:param [tuple(2)] what: see exportSpheres
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		"""
 		allIds = False
 		if ids=='all':
@@ -287,6 +284,76 @@ class VTKExporter:
 		for b in bodies:
 			outFile.write("3 %d %d %d\n"%(i,i+1,i+2))
 			i += 3
+		if what:
+			outFile.write("\nCELL_DATA %d"%(n))
+		for name,command in what:
+			test = eval(command)
+			if isinstance(test,Matrix3):
+				outFile.write("\nTENSORS %s double\n"%(name))
+				for b in bodies:
+					t = eval(command)
+					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+			if isinstance(test,Vector3):
+				outFile.write("\nVECTORS %s double\n"%(name))
+				for b in bodies:
+					v = eval(command)
+					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+			else:
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"(name))
+				for b in bodies:
+					outFile.write("%g\n"%(eval(command)))
+		outFile.close()
+		self.facetsSnapCount += 1
+
+	def exportFacetsAsMesh(self,ids='all',elements=None,what=[],comment="comment",numLabel=None):
+		"""
+		exports facets (positions) and defined properties. Facets are exported as mesh (not with multiplicated nodes). Therefore additional parameters (nodes and elements) is needed
+
+		:param [int]|"all" ids: if "all", then export all facets, otherwise only facets from integer list
+		:param [tuple(2)] what: see exportSpheres
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		:param [(float,float,float)|Vector3] nodes: list of coordinates of nodes
+		:param [(int,int,int)] elements: list of node ids of individual elements (facets)
+		"""
+		allIds = False
+		if ids=='all':
+			ids=xrange(len(O.bodies))
+			allIds = True
+		bodies = []
+		for i in ids:
+			b = O.bodies[i]
+			if not b: continue
+			if b.shape.__class__.__name__!="Facet":
+				if not allIds: print "Warning: body %d is not Facet"%(i)
+				continue
+			bodies.append(b)
+		n = len(bodies)
+		if elements is None:
+			print "ERROR: 'elements' not specified"
+			return
+		if n != len(elements):
+			print "ERROR: length of 'elements' does not match length of 'ids', no export"
+			return
+		nodes = [None for i in xrange(max(max(e) for e in elements)+1)]
+		for id,e in zip(ids,elements):
+			b = O.bodies[id]
+			p = b.state.pos
+			o = b.state.ori
+			s = b.shape
+			pt1 = p + o*s.vertices[0]
+			pt2 = p + o*s.vertices[1]
+			pt3 = p + o*s.vertices[2]
+			nodes[e[0]] = pt1
+			nodes[e[1]] = pt2
+			nodes[e[2]] = pt3
+		outFile = open(self.baseName+'-facets-%04d'%self.facetsSnapCount+'.vtk', 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,len(nodes)))
+		for n in nodes:
+			outFile.write("%g %g %g\n"%(n[0],n[1],n[2]))
+		outFile.write("\nPOLYGONS %d %d\n"%(len(elements),4*len(elements)))
+		for e in elements:
+			outFile.write("3 %d %d %d\n"%e)
 		if what:
 			outFile.write("\nCELL_DATA %d"%(n))
 		for name,command in what:
