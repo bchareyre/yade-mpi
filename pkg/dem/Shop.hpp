@@ -140,4 +140,9 @@ class Shop{
 
 		//! Set material and contact friction to the given value, non-dynamic bodies are not affected
 		static void setContactFriction(Real angleDegree);
+
+		//! Homothetic change of sizes of spheres and clumps
+		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly);
+
+
 };

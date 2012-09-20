@@ -512,4 +512,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("calm",Shop__calm,(py::arg("mask")=-1),"Set translational and rotational velocities of all bodies to zero.");
 	py::def("setNewVerticesOfFacet",setNewVerticesOfFacet,(py::arg("b"),py::arg("v1"),py::arg("v2"),py::arg("v3")),"Sets new vertices (in global coordinates) to given facet.");
 	py::def("setContactFriction",Shop::setContactFriction,py::arg("angleDegree"),"Modify the friction value inside the material classes and existing contacts The friction for non-dynamic bodies is not modified.");
+	py::def("growParticles",Shop::growParticles,(py::args("multiplier"), py::args("updateMass")=true, py::args("dynamicOnly")=true), "Change the size of spheres and sphere clumps by the multiplier. If updateMass=True, then the mass is updated. dynamicOnly=True is mandatory in many cases since in current implementation the function would crash on the non-spherical and non-dynamic bodies (e.g. facets, boxes, etc.)");
 }

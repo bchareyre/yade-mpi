@@ -872,3 +872,36 @@ void Shop::setContactFriction(Real angleDegree){
 		contactPhysics->tangensOfFrictionAngle = std::tan(std::min(fa,fb));
 	}
 }
+
+void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
+{
+	Scene* scene = Omega::instance().getScene().get();
+	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
+		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
+		if(b->isClump()) continue;
+		(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
+		if (b->isClumpMember()) // Clump volume variation with homothetic displacement from its center
+		{
+// 			const shared_ptr<Body>& c = Body::byId (b->clumpId , scene);
+			b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
+// 			b->state->pos[0] = (c->state->pos[0]) + multiplier * ((b->state->pos[0]) - (c->state->pos[0]));
+// 	     		b->state->pos[1] = (c->state->pos[1]) + multiplier * ((b->state->pos[1]) - (c->state->pos[1]));
+// 	     		b->state->pos[2] = (c->state->pos[2]) + multiplier * ((b->state->pos[2]) - (c->state->pos[2]) );
+	  	}
+	}
+
+	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
+		if (ii->isReal()) {
+			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
+			if (!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic())
+				contact->refR1 = YADE_CAST<Sphere*>((* (scene->bodies))[ii->getId1()]->shape.get())->radius;
+			if (!dynamicOnly || (*(scene->bodies))[ii->getId2()]->isDynamic())
+				contact->refR2 = YADE_CAST<Sphere*>((* (scene->bodies))[ii->getId2()]->shape.get())->radius;
+			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(ii->phys);
+			contactPhysics->kn*=multiplier; contactPhysics->ks*=multiplier;
+		}
+		
+	}
+}
+
