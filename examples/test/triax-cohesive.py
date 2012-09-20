@@ -1,4 +1,5 @@
 # encoding: utf-8
+# 2012 ©Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 # This variant of triax-basic.py shows the usage of cohesive contact laws and moments at contacts
 
 from yade import pack
@@ -16,13 +17,11 @@ O.materials.append(FrictMat(young=15e6,poisson=.4,frictionAngle=0,density=0,labe
 
 
 ## copy spheres from the packing into the scene
-## use default material, don't care about that for now
 O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
 ## create walls around the packing
 walls=utils.aabbWalls(material='frictionlessWalls')
 wallIds=O.bodies.append(walls)
 
-## hope that we got the ids right?!
 triax=TriaxialCompressionEngine(
 	wall_bottom_id=wallIds[2],
 	wall_top_id=wallIds[3],
@@ -31,9 +30,6 @@ triax=TriaxialCompressionEngine(
 	wall_back_id=wallIds[4],
 	wall_front_id=wallIds[5],
 	internalCompaction=False,
-	## define the rest of triax params here
-	## see in pkg/dem/PreProcessor/TriaxialTest.cpp:524 etc
-	## which are assigned in the c++ preprocessor actually
 	sigmaIsoCompaction=50e3,
 	sigmaLateralConfinement=50e3,
 	max_vel=10,
@@ -45,9 +41,12 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InteractionLoop(
+		#box-sphere interactions will be the simple normal-shear law, we use ScGeom for them
 		[Ig2_Sphere_Sphere_ScGeom6D(),Ig2_Box_Sphere_ScGeom()],
+		#Boxes will be frictional (FrictMat), so the sphere-box physics is FrictMat vs. CohFrictMat, the Ip type will be found via the inheritance tree (CohFrictMat is a FrictMat) and will result in FrictPhys interaction physics
+		#and will result in a FrictPhys
 		[Ip2_FrictMat_FrictMat_FrictPhys(),Ip2_CohFrictMat_CohFrictMat_CohFrictPhys(label="cohesiveIp")],
-		#Two different contact laws for sphere-box and sphere-sphere
+		#Finally, two different contact laws for sphere-box and sphere-sphere
 		[Law2_ScGeom_FrictPhys_CundallStrack(),Law2_ScGeom6D_CohFrictPhys_CohesionMoment(
 			useIncrementalForm=True, #useIncrementalForm is turned on as we want plasticity on the contact moments
 			always_use_moment_law=False,  #if we want "rolling" friction even if the contact is not cohesive (or cohesion is broken), we will have to turn this true somewhere
@@ -68,8 +67,6 @@ def history():
 		    i=O.iter)
 
 plot.plots={'i':(('e11',"bo"),('e22',"ro"),('e33',"go"),None,('s11',"bx"),('s22',"rx"),('s33',"gx"))}
-
-O.saveTmp()
 plot.plot()
 
 print "computing, be patient..."
