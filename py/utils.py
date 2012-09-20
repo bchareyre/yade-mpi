@@ -299,7 +299,7 @@ def facetCylinder(*args,**kw):
 	_deprecatedUtilsFunction('facetCylinder','geom.facetCylinder')
 	return geom.facetCylinder(*args,**kw)
 	
-def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
+def aabbWalls(extrema=None,thickness=0,oversizeFactor=1.5,**kw):
 	"""Return 6 boxes that will wrap existing packing as walls from all sides;
 	extrema are extremal points of the Aabb of the packing (will be calculated if not specified)
 	thickness is wall thickness (will be 1/10 of the X-dimension if not specified)
@@ -308,7 +308,7 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""
 	walls=[]
 	if not extrema: extrema=aabbExtrema()
-	if not thickness: thickness=(extrema[1][0]-extrema[0][0])/10.
+	#if not thickness: thickness=(extrema[1][0]-extrema[0][0])/10.
 	for axis in [0,1,2]:
 		mi,ma=extrema
 		center=[(mi[i]+ma[i])/2. for i in range(3)]
