@@ -1,14 +1,6 @@
 // © 2010 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#if 0 // broken, do not use
-// optimize as much as possible even in the debug mode (effective?)
-#if defined(__GNUG__) && __GNUC__ >= 4 && __GNUC_MINOR__ >=4
-	#pragma GCC push_options
-	#pragma GCC optimize "2"
-#endif
-#endif
-
 #ifdef QUAD_PRECISION
 	typedef long double quad;
 	typedef quad Real;
@@ -19,28 +11,20 @@
 #include<limits>
 #include<cstdlib>
 
-/*
- * use Eigen http://eigen.tuxfamily.org
- */
-// different macros for different versions of eigen:
-//  http://bitbucket.org/eigen/eigen/issue/96/eigen_dont_align-doesnt-exist-in-205-but-appears-in-web
+// disable optimization which are "unsafe":
+// eigen objects cannot be passed by-value, otherwise they will no be aligned
 
 #define EIGEN2_SUPPORT  // This makes Eigen3 migration easier
-
-// disable optimization which are "unsafe":
-//    eigen objects cannot be passed by-value, otherwise they will no be aligned
-#if 1
-	#define EIGEN_DONT_VECTORIZE
-	#define EIGEN_DONT_ALIGN
-#endif
-
+#define EIGEN_DONT_VECTORIZE
+#define EIGEN_DONT_ALIGN
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #define EIGEN_NO_DEBUG
+
 #include<Eigen/Core>
 #include<Eigen/Geometry>
-	#if EIGEN_WORLD_VERSION==2
-		#include<Eigen/Array>
-	#endif
+#if EIGEN_WORLD_VERSION==2
+	#include<Eigen/Array>
+#endif
 #include<Eigen/QR>
 #include<Eigen/LU>
 #include<Eigen/SVD>
