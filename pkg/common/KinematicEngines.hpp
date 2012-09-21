@@ -4,7 +4,7 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/lib/base/Math.hpp>
 
-class KinematicEngine;
+struct KinematicEngine;
 
 struct CombinedKinematicEngine: public PartialEngine{
 	virtual void action();
