@@ -87,9 +87,6 @@ class Body: public Serializable{
 		((long,chain,-1,,"Id of chain to which the body belongs."))
 		((long,iterBorn,-1,,"Step number at which the body was added to simulation."))
 		((Real,timeBorn,-1,,"Time at which the body was added to simulation."))
-		#ifdef FIXBUGINTRS 
-			((bool,checkIntrs,false,,"For internal use of NewtonIntegrator and InteractionContainer. If True, interactions of the body need to be checked and some of them even deactivated due to the multiple contacts on the same chain of facets."))
-		#endif
 		,
 		/* ctor */,
 		/* py */

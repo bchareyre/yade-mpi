@@ -23,16 +23,7 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	assert((Body::id_t)bodies->size()>id2); 
 	
 	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
-	#ifdef FIXBUGINTRS
-		const shared_ptr<Body>& b2=(*bodies)[id2];
-		b1->checkIntrs=true;
-		b2->checkIntrs=true;
-	#endif
-	
 	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
-	#ifdef FIXBUGINTRS
-		if(!b2->intrs.insert(Body::MapId2IntrT::value_type(id1,i)).second) return false; 
-	#endif
 	
 	linIntrs.resize(++currSize); // currSize updated
 	linIntrs[currSize-1]=i; // assign last element
@@ -65,11 +56,6 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
 	
 	const shared_ptr<Body>& b1((*bodies)[id1]);
-	#ifdef FIXBUGINTRS
-		const shared_ptr<Body>& b2((*bodies)[id2]);
-		if (b1) {b1->checkIntrs=true;}
-		if (b2) {b2->checkIntrs=true;}
-	#endif
 	
 	int linIx=-1;
 	if(unlikely(!b1)) linIx=linPos;
@@ -81,12 +67,6 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 			assert(linIx==linPos);
 			//erase from body, we also erase from linIntrs below
 			b1->intrs.erase(I);
-			#ifdef FIXBUGINTRS
-				if (b2) { 
-					Body::MapId2IntrT::iterator I2(b2->intrs.find(id1));
-					if (not(I2==b2->intrs.end())) { b2->intrs.erase(I2); }
-				}
-			#endif
 			}
 	}
 	if(linIx<0) {

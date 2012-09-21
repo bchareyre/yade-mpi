@@ -62,23 +62,3 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`.");
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
-
-
-
-#ifdef FIXBUGINTRS
-void updateInteractions(shared_ptr <Body>);
-
-struct sortIters{
-	shared_ptr<Interaction> I;
-	long iterBorn;
-	long chain;
-	bool active;
-	sortIters (shared_ptr<Interaction> Ir, long iterBornr, long chainr, bool activer){
-		I = Ir;
-		iterBorn = iterBornr;
-		chain = chainr;
-		active = activer;
-	}
-};
-
-#endif
