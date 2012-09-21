@@ -79,7 +79,7 @@ if opts.cores:
 elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
 
-sys.stderr.write('Welcome to Yade '+version+'%s\n')
+sys.stderr.write('Welcome to Yade '+version+'\n')
 
 # initialization and c++ plugins import
 import yade
