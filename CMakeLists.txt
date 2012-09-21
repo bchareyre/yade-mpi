@@ -34,6 +34,28 @@ INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
 
 #===========================================================
+IF (CMAKE_CXX_FLAGS)
+  #If flags are set, add only neccessary flags
+  IF (DEBUG)
+    SET(CMAKE_VERBOSE_MAKEFILE 1)
+    SET(CMAKE_BUILD_TYPE Debug)
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -ggdb2")
+  ELSE (DEBUG)
+    SET(CMAKE_BUILD_TYPE Release)
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -fPIC")
+  ENDIF (DEBUG)
+ELSE (CMAKE_CXX_FLAGS)
+  #If flags are not set, add all usefull flags
+  IF (DEBUG)
+    SET(CMAKE_VERBOSE_MAKEFILE 1)
+    SET(CMAKE_BUILD_TYPE Debug)
+    SET(CMAKE_CXX_FLAGS  "-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -ggdb2")
+  ELSE (DEBUG)
+    SET(CMAKE_BUILD_TYPE Release)
+    SET(CMAKE_CXX_FLAGS  "-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
+  ENDIF (DEBUG)
+ENDIF (CMAKE_CXX_FLAGS)
+#===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
@@ -210,16 +232,6 @@ ENDIF(ENABLE_GL2PS)
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
-
-IF (DEBUG)
-  SET(CMAKE_VERBOSE_MAKEFILE 1)
-  SET(CMAKE_BUILD_TYPE Debug)
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -ggdb2")
-ELSE (DEBUG)
-  SET(CMAKE_BUILD_TYPE Release)
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
-ENDIF (DEBUG)
-
 
 #===========================================================
 
