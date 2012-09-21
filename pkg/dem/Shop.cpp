@@ -881,14 +881,8 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
 		if(b->isClump()) continue;
 		(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
-		if (b->isClumpMember()) // Clump volume variation with homothetic displacement from its center
-		{
-// 			const shared_ptr<Body>& c = Body::byId (b->clumpId , scene);
-			b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
-// 			b->state->pos[0] = (c->state->pos[0]) + multiplier * ((b->state->pos[0]) - (c->state->pos[0]));
-// 	     		b->state->pos[1] = (c->state->pos[1]) + multiplier * ((b->state->pos[1]) - (c->state->pos[1]));
-// 	     		b->state->pos[2] = (c->state->pos[2]) + multiplier * ((b->state->pos[2]) - (c->state->pos[2]) );
-	  	}
+		// Clump volume variation with homothetic displacement from its center
+		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
 	}
 
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
