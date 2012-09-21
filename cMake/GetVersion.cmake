@@ -3,8 +3,9 @@
 IF (NOT YADE_VERSION)
   IF (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/RELEASE )
     #Release file is found
+    SET(READFILE cat)
     exec_program(
-      "less"
+      ${READFILE}
       ${CMAKE_CURRENT_SOURCE_DIR}
       ARGS "RELEASE"
       OUTPUT_VARIABLE YADE_VERSION 
