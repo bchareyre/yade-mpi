@@ -188,3 +188,14 @@ and a compilation time dramatically increases.
 For building the documentation you should at first execute the command "make install"
 and then "make doc" to build it. The generated files will be stored in your current
 build directory/doc/sphinx/_build.
+
+Yade can be compiled not only by GCC-compiler, but also by `CLANG <http://clang.llvm.org/>`_ 
+front-end for the LLVM compiler. For that you set the environment variables CC and CXX 
+upon detecting the C and C++ compiler to use::
+
+	export CC=/usr/bin/clang
+	export CXX=/usr/bin/clang++
+	cmake -DOPTION1=VALUE1 -DOPTION2=VALUE2
+
+Clang does not support OpenMP-parallelizing for the moment, that is why the 
+feature will be disabled.
