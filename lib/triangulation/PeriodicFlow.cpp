@@ -624,7 +624,7 @@ void  PeriodicFlow::ComputeEdgesSurfaces()
 	centerDistVect=(ed_it->first)->vertex(ed_it->third)->point().point()- (ed_it->first)->vertex(ed_it->second)->point().point();
 	centerDist = sqrt(centerDistVect.squared_length());
 	meanRad = (radius1 + radius2)/2.;
-	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist -radius2 : centerDist -radius1;
+	surfaceDist = centerDist -radius2 -radius1;
 	n = centerDistVect / sqrt(centerDistVect.squared_length());
 	point_force = (centerDist/2. + (pow(radius1,2) - pow(radius2,2)) / (2.*centerDist))*n;
 	Rh = (radius1<radius2)? surfaceDist + 0.45 * radius1 : surfaceDist + 0.45 * radius2;
@@ -636,9 +636,10 @@ void  PeriodicFlow::ComputeEdgesSurfaces()
 	meanRad = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? radius2:radius1;
 	point_force = centerDistVect;
 	n = centerDistVect / sqrt(centerDistVect.squared_length());
+	Rh = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? surfaceDist + 0.45 * radius2 : surfaceDist + 0.45 * radius1;
     }
     else {
-	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(1.,1.,1.); n=Vecteur(1.,1.,1.);
+	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(0.,0.,0.); n=Vecteur(0.,0.,0.); Rh=0.;
     }
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
     Edge_HydRad.push_back(Rh);

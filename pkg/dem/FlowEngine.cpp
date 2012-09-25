@@ -380,6 +380,7 @@ void FlowEngine::Triangulate ( Solver& flow )
         }
         flow->T[flow->currentTes].redirected=true;//By inserting one-by-one, we already redirected
         flow->viscousShearForces.resize ( flow->T[flow->currentTes].max_id+1 );
+	flow->viscousShearTorques.resize ( flow->T[flow->currentTes].max_id+1 );
 	flow->viscousBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
 	flow->normLubForce.resize ( flow->T[flow->currentTes].max_id+1 );
 	flow->lubBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
@@ -581,6 +582,7 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
         if ( Debug ) cout << "Application of viscous forces" << endl;
         if ( Debug ) cout << "Number of edges = " << flow.Edge_ids.size() << endl;
         for ( unsigned int k=0; k<flow.viscousShearForces.size(); k++ ) flow.viscousShearForces[k]=Vector3r::Zero();
+	for ( unsigned int k=0; k<flow.viscousShearTorques.size(); k++ ) flow.viscousShearTorques[k]=Vector3r::Zero();
 	for ( unsigned int k=0; k<flow.viscousBodyStress.size(); k++) flow.viscousBodyStress[k]=Matrix3r::Zero();
 	for ( unsigned int k=0; k<flow.normLubForce.size(); k++ ) flow.normLubForce[k]=Vector3r::Zero();
 	for ( unsigned int k=0; k<flow.lubBodyStress.size(); k++) flow.lubBodyStress[k]=Matrix3r::Zero();
@@ -636,8 +638,8 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 		
 /// Compute the normal lubrication force applied on each particle
 		if (normalLubrication){
-			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
-			Vector3r lub_f = flow.ComputeNormalLubricationForce (deltaNormV, i);
+			deltaNormV = (flow.Edge_normal[i].dot ( deltaV ) ) *flow.Edge_normal[i];
+			Vector3r lub_f = flow.ComputeNormalLubricationForce (deltaNormV, i,eps);
 			flow.normLubForce[flow.Edge_ids[i].first]+=lub_f;
 			flow.normLubForce[flow.Edge_ids[i].second]-=lub_f;
 		
@@ -694,6 +696,7 @@ void PeriodicFlowEngine:: action()
 	Vector3r Torque;
 	const Tesselation& Tes = solver->T[solver->currentTes];
 	for (int id=0; id<=Tes.max_id; id++){
+		scene->forces.sync();
 		assert (Tes.vertexHandles[id] != NULL);
 		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
 		Force = Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] );
@@ -805,6 +808,7 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
         }
         Tes.redirected=true;//By inserting one-by-one, we already redirected
         flow -> viscousShearForces.resize ( Tes.max_id+1 );
+	flow -> viscousShearTorques.resize ( Tes.max_id+1 );
 	flow -> viscousBodyStress.resize ( Tes.max_id+1 );
 	flow -> normLubForce.resize ( Tes.max_id+1 );
 	flow -> lubBodyStress.resize ( Tes.max_id+1 );

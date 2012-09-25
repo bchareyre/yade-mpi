@@ -133,7 +133,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		
 		void ComputeEdgesSurfaces();
 		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
-		Vector3r ComputeNormalLubricationForce(Vector3r deltaNormV, int edge_id);
+		Vector3r ComputeNormalLubricationForce(Vector3r deltaNormV, int edge_id,Real eps);
 		Vector3r ComputeShearLubricationForce(Vector3r deltaV,int edge_id, Real eps);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
