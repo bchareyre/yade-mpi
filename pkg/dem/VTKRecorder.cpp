@@ -2,27 +2,24 @@
 
 #include"VTKRecorder.hpp"
 
-// avoid warnings in VTK code (does not work?!)
-#pragma GCC diagnostic ignored "-Wdeprecated"
-	#include<vtkCellArray.h>
-	#include<vtkPoints.h>
-	#include<vtkPointData.h>
-	#include<vtkCellData.h>
-	#include<vtkSmartPointer.h>
-	#include<vtkFloatArray.h>
-	#include<vtkUnstructuredGrid.h>
-	#include<vtkPolyData.h>
-	#include<vtkXMLUnstructuredGridWriter.h>
-	#include<vtkXMLPolyDataWriter.h>
-	#include<vtkZLibDataCompressor.h>
-	#include<vtkTriangle.h>
-	#include<vtkLine.h>
-	#include<vtkQuad.h>
-	#ifdef YADE_VTK_MULTIBLOCK
-		#include<vtkXMLMultiBlockDataWriter.h>
-		#include<vtkMultiBlockDataSet.h>
-	#endif
-#pragma GCC diagnostic warning "-Wdeprecated"
+#include<vtkCellArray.h>
+#include<vtkPoints.h>
+#include<vtkPointData.h>
+#include<vtkCellData.h>
+#include<vtkSmartPointer.h>
+#include<vtkFloatArray.h>
+#include<vtkUnstructuredGrid.h>
+#include<vtkPolyData.h>
+#include<vtkXMLUnstructuredGridWriter.h>
+#include<vtkXMLPolyDataWriter.h>
+#include<vtkZLibDataCompressor.h>
+#include<vtkTriangle.h>
+#include<vtkLine.h>
+#include<vtkQuad.h>
+#ifdef YADE_VTK_MULTIBLOCK
+  #include<vtkXMLMultiBlockDataWriter.h>
+  #include<vtkMultiBlockDataSet.h>
+#endif
 
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Sphere.hpp>
