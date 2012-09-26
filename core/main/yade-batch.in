@@ -307,7 +307,13 @@ def runJobs(jobs,numCores):
 
 import sys,re,optparse,os
 def getNumCores():
-	nCpu=len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
+	nCpu=1
+	try:
+		nCpu=len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
+	except:
+		print 'WARNING: No cpuinfo available! Setting the maximal number of processors 1'
+		pass
+		
 	if os.environ.has_key("OMP_NUM_THREADS"): return min(int(os.environ['OMP_NUM_THREADS']),nCpu)
 	return nCpu
 numCores=getNumCores()
