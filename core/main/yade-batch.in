@@ -329,7 +329,6 @@ parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--cpu-affinity',dest='affinity',action='store_true',help='Bind each job to specific CPU cores; cores are assigned in a quasi-random order, depending on availability at the moment the jobs is started. Each job can override this setting by setting AFFINE column.')
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s). Jobs can override with !EXEC column.'%executable,default=executable,metavar='FILE')
-parser.add_option('--rebuild',dest='rebuild',help='Run executable(s) with \-\-rebuild prior to running any jobs.',default=False,action='store_true')
 parser.add_option('--debug',dest='debug',action='store_true',help='Run the executable with \-\-debug. Can be overriddenn per-job with !DEBUG column.',default=False)
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
@@ -465,15 +464,6 @@ for i,l in enumerate(useLines):
 		jobs.append(JobInfo(jobNum,desc,fullCmd,hrefCmd,logFile2,nCores,script=script,table=table,lineNo=l,affinity=jobAffinity))
 
 print "Master process pid",os.getpid()
-
-if opts.rebuild:
-	print "Rebuilding all active executables, since --rebuild was specified"
-	for e in executables:
-		import subprocess
-		if subprocess.call([e,'--rebuild','-x']+(['--debug'] if opts.debug else [])):
-			 raise RuntimeError('Error rebuilding %s (--rebuild).'%e)
-	print "Rebuilding done."
-		
 
 print "Job summary:"
 for job in jobs:
