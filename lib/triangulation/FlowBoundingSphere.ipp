@@ -84,7 +84,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	noCache=true;
 	pressureChanged=false;
 	computeAllCells=true;//might be turned false IF the code is reorganized (we can make a separate function to compute unitForceVectors outside Compute_Permeability) AND it really matters for CPU time
-	DEBUG_OUT = false;
+	DEBUG_OUT = true;
 	RAVERAGE = false; /** use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 	OUTPUT_BOUDARIES_RADII = false;
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
@@ -1686,15 +1686,15 @@ void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
     }
     else if (hasFictious == 1){
 	centerDistVect = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate])*boundary(id1).normal : ((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate])*boundary(id2).normal;
-	centerDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?abs((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate]) : abs((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate]);
-	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist -radius2 : centerDist -radius1;
+	centerDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?abs((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] -boundary(id1).p[boundary(id1).coordinate]) :abs((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] -boundary(id2).p[boundary(id2).coordinate]);
+	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist-radius2:centerDist-radius1;
 	meanRad = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? radius2:radius1;
 	point_force = centerDistVect;
 	n = centerDistVect / sqrt(centerDistVect.squared_length());
 	Rh = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? surfaceDist + 0.45 * radius2 : surfaceDist + 0.45 * radius1;
     }
     else {
-	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(0.,0.,0.); n=Vecteur(0.,0.,0.); Rh =0.;
+	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(1.,1.,1.); n=Vecteur(1.,1.,1.); Rh =0.;
     }
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
     Edge_HydRad.push_back(Rh);
@@ -1725,10 +1725,11 @@ Vector3r FlowBoundingSphere<Tesselation>::ComputeShearLubricationForce(Vector3r 
 template <class Tesselation> 
 Vector3r FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(Vector3r deltaNormV, int edge_id,Real eps)
 {
-    Vector3r normLubF = (1.5*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV )/max(Edge_surfaceDist[edge_id],eps);
+    Vector3r normLubF = (6*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV)/max(Edge_surfaceDist[edge_id],eps);
     return normLubF;
 }
 
 } //namespace CGT
 
 #endif //FLOW_ENGINE
+
