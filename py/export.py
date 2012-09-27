@@ -328,6 +328,7 @@ class VTKExporter:
 				if not allIds: print "Warning: body %d is not Facet"%(i)
 				continue
 			bodies.append(b)
+		ids = xrange(len(bodies))
 		n = len(bodies)
 		if elements is None:
 			print "ERROR: 'elements' not specified"
