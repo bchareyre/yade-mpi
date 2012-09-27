@@ -335,9 +335,9 @@ class VTKExporter:
 		if n != len(elements):
 			print "ERROR: length of 'elements' does not match length of 'ids', no export"
 			return
-		nodes = [None for i in xrange(max(max(e) for e in elements)+1)]
+		nodes = [Vector3.Zero for i in xrange(max(max(e) for e in elements)+1)]
 		for id,e in zip(ids,elements):
-			b = O.bodies[id]
+			b = bodies[id]
 			p = b.state.pos
 			o = b.state.ori
 			s = b.shape
@@ -349,6 +349,7 @@ class VTKExporter:
 			nodes[e[2]] = pt3
 		outFile = open(self.baseName+'-facets-%04d'%self.facetsSnapCount+'.vtk', 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,len(nodes)))
+		gg = 0
 		for n in nodes:
 			outFile.write("%g %g %g\n"%(n[0],n[1],n[2]))
 		outFile.write("\nPOLYGONS %d %d\n"%(len(elements),4*len(elements)))

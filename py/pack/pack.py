@@ -374,7 +374,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 
 
 
-def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None,returnSpherePack=None):
+def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=False,memoDbg=False,color=None,returnSpherePack=None):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The periodicity depens on whether	the spheresInCell parameter is given.
 
@@ -394,7 +394,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		is known as memoization). Fuzzy matching is used to select suitable candidate -- packing will be scaled, rRelFuzz
 		and dimensions compared. Packing that are too small are dictarded. From the remaining candidate, the one with the
 		least number spheres will be loaded and returned.
-	:param useOBB: effective only if a inGtsSurface predicate is given. If true (default), oriented bounding box will be
+	:param useOBB: effective only if a inGtsSurface predicate is given. If true (not default), oriented bounding box will be
 		computed first; it can reduce substantially number of spheres for the triaxial compression (like 10× depending on
 		how much asymmetric the body is), see scripts/test/gts-triax-pack-obb.py.
 	:param memoDbg: show packigns that are considered and reasons why they are rejected/accepted

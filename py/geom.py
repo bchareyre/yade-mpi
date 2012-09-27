@@ -106,7 +106,49 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	if (height<=0): wallMask = 1;
 	
 	return facetCylinderConeGenerator(center=center,radiusTop=radius,height=height,orientation=orientation,segmentsNumber=segmentsNumber,wallMask=wallMask,angleRange=angleRange,closeGap=closeGap,**kw)
+
+#facetSphere==========================================================
+def facetSphere(center,radius,thetaResolution=8,phiResolution=8,returnElementMap=False,**kw):
+	"""
+	Create arbitrarily-aligned sphere composed of facets, with given center, radius and orientation.
+	Return List of facets forming the sphere. Parameters inspired by ParaView sphere glyph
+
+	:param Vector3 center: center of the created sphere
+	:param float radius: sphere radius
+	:param int thetaResolution: number of facets around "equator"
+	:param int phiResolution: number of facets between "poles" + 1
+	:param bool returnElementMap: returns also tuple of nodes ((x1,y1,z1),(x2,y2,z2),...) and elements ((id01,id02,id03),(id11,id12,id13),...) if true, only facets otherwise
+	:param \*\*kw: (unused keyword arguments) passed to utils.facet;
+	"""
+	# check zero dimentions
+	if (radius<=0):          raise RuntimeError("The radius should have the positive value");
+	if (thetaResolution<3): raise RuntimeError("thetaResolution must be > 3");
+	if (phiResolution<3):   raise RuntimeError("phiResolution must be > 3");
 	
+	r,c0,c1,c2 = radius,center[0],center[1],center[2]
+	nodes = [Vector3(c0,c1,c2+radius)]
+	phis   = numpy.linspace(math.pi/(phiResolution-1),math.pi,phiResolution-2,endpoint=False)
+	thetas = numpy.linspace(0,2*math.pi,thetaResolution,endpoint=False)
+	nodes.extend((Vector3(c0+r*math.cos(theta)*math.sin(phi),c1+r*math.sin(theta)*math.sin(phi),c2+r*math.cos(phi)) for phi in phis for theta in thetas))
+	nodes.append(Vector3(c0,c1,c2-radius))
+	n = len(nodes)-1
+	
+	elements = [(0,i+1,i+2) for i in xrange(thetaResolution-1)]
+	elements.append((0,1,thetaResolution))
+	for j in xrange(0,phiResolution-3):
+		k = j*thetaResolution + 1
+		elements.extend((k+i,k+i+1,k+i+thetaResolution) for i in xrange(thetaResolution-1))
+		elements.append((k,k+thetaResolution-1,k+2*thetaResolution-1))
+		elements.extend((k+i+thetaResolution,k+i+1+thetaResolution,k+i+1) for i in xrange(thetaResolution-1))
+		elements.append((k+2*thetaResolution-1,k+thetaResolution,k))
+	elements.extend((n,n-i-1,n-i-2) for i in xrange(thetaResolution-1))
+	elements.append((n,n-1,n-thetaResolution))
+	
+	facets = [utils.facet(tuple(nodes[node] for node in elem),**kw) for elem in elements]
+	if returnElementMap:
+		return facets,nodes,elements
+	return facets
+
 
 #facetCone==============================================================
 def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,**kw):
