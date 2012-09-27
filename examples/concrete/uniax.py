@@ -42,7 +42,6 @@ is 1000 for tension and 100 for compression.
 utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	young=24e9,
 	poisson=.2,
-	poisson=.20,
 
 	sigmaT=3.5e6,
 	frictionAngle=atan(0.8),
@@ -76,7 +75,7 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,crackOpening=crackOpening,epsCrackOnset=epsCrackOnset,poisson=poisson,isoPrestress=isoPrestress))
+concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,crackOpening=crackOpening,epsCrackOnset=epsCrackOnset,isoPrestress=isoPrestress))
 
 spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
 #spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')
@@ -92,7 +91,7 @@ area_25,area_50,area_75=utils.approxSectionArea(coord_25,axis),utils.approxSecti
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),],sweepLength=.05*sphereRadius,nBins=5,binCoeff=5),
+	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),],verletDist=.05*sphereRadius),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg') if not scGeom else Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ss2sc')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
@@ -178,7 +177,7 @@ def addPlotData():
 		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,
 		})
 plot.plot(subPlots=False)
-O.run()
+#O.run()
 initTest()
 utils.waitIfBatch()
 
