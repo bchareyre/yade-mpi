@@ -638,9 +638,6 @@ void  PeriodicFlow::ComputeEdgesSurfaces()
 	n = centerDistVect / sqrt(centerDistVect.squared_length());
 	Rh = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? surfaceDist + 0.45 * radius2 : surfaceDist + 0.45 * radius1;
     }
-    else {
-	surfaceDist = 1.; centerDist = 1.; centerDistVect = Vecteur(1.,1.,1.);meanRad =0.; point_force = Vecteur(1.,1.,1.); n=Vecteur(1.,1.,1.); Rh=0.;
-    }
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
     Edge_HydRad.push_back(Rh);
     Edge_surfaceDist.push_back(surfaceDist);
