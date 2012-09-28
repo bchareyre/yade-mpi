@@ -107,11 +107,11 @@ tOn1woLTM=O.forces.t(1)
 
 
 plot.plots={'step':('gamma','torque',),'gamma':('fx',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting curve. Type Return to go ahead'
 raw_input()
 plot.plots={'normFn':('fx',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Plotting another curve. Type Return to go ahead'
 raw_input()
 #pylab.show() #to pause on the plot window. Effective only first time
@@ -152,9 +152,8 @@ tOn0withLTMonly=O.forces.t(0)- tOn0woLTM
 tOn1withLTMonly=O.forces.t(1)- tOn1woLTM
 
 
-
 plot.plots={'step':('torque',)}
-plot.plot()
+plot.plot(subPlots=False)
 print 'Type Return to go ahead'
 
 #-- Comments : (r2851)

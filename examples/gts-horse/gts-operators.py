@@ -17,6 +17,11 @@ import gts, locale
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')   #gts is locale-dependend.  If, for example, german locale is used, gts.read()-function does not import floats normally
 
+'''
+if you get "Error: unsupported locale setting"
+-> type as root: "dpkg-reconfigure locales"
+-> choose "en_US.UTF-8" (press space to choose)
+'''
 
 s1=gts.read(open('horse.coarse.gts'))
 s2=gts.Surface(); s2.copy(s1); s2.translate(0.04,0,0)

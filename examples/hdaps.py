@@ -2,14 +2,6 @@
 # With Thinkpad laptops, control the sphere's motion by tilting the
 # laptop.
 
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-Running script hdaps.py                                                                                                              
-1059  FATAL yade.ThreadRunner /home/me/YADE/yade/core/ThreadRunner.cpp:31 run: Exception occured:                                    
-HdapsGravityEngine: unable to open file /sys/devices/platform/hdaps/position 
-"""
-
 O.bodies.append(
 	geom.facetBox(center=(0,0,.1),extents=(.5,.5,.1),wallMask=31,color=(0,0,1))+
 	[utils.sphere((0,0,.1),.04,color=(1,1,1))]

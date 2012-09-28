@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from yade import pack
-from utils import *
+#from utils import *
 ############################################
 ###   DEFINING VARIABLES AND MATERIALS   ###
 ############################################
@@ -151,7 +151,7 @@ if nRead==0: yade.qt.Controller(), yade.qt.View()
 #O.saveTmp()
 
 #####################################################
-###    Exemple of how to record and plot data     ###
+###    Example of how to record and plot data     ###
 #####################################################
 
 #from yade import plot

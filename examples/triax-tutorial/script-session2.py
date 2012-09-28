@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from yade import pack
-from utils import *
+#from utils import *
 
 num_spheres=500
 ## corners of the initial packing

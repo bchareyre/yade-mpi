@@ -7,6 +7,11 @@ import gts, os.path, locale
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')   #gts is locale-dependend.  If, for example, german locale is used, gts.read()-function does not import floats normally
 
+'''
+if you get "Error: unsupported locale setting"
+-> type as root: "dpkg-reconfigure locales"
+-> choose "en_US.UTF-8" (press space to choose)
+'''
 
 # coarsen the original horse if we have it
 # do nothing if we have the coarsened horse already

@@ -3,18 +3,6 @@ from yade import plot
 # setup 2 interactions on 2 otherwise identical couples of spheres
 # one is handled by Law2_Dem3DofGeom_CpmPhys_Cpm and the other by Law2_ScGeom_CpmPhys_Cpm
 
-""" THIS SCRIPT IS NOT WORKING!
-ERROR MESSAGE:
-
-Running script cpm-dem3dof-scgeom.py                                                                                                 
-Traceback (most recent call last):                                                                                                   
-  File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
-    execfile(script,globals())                                                                                                       
-  File "cpm-dem3dof-scgeom.py", line 29, in <module>                                                                                 
-    InteractionLoop([],[],[Law2_ScGeom_CpmPhys_Cpm(),Law2_Dem3DofGeom_CpmPhys_Cpm(yieldSurfType=0)]),                                
-NameError: name 'Law2_ScGeom_CpmPhys_Cpm' is not defined 
-"""
-
 # move the second sphere tangentially or rotate it, pick [0] or [1]
 mode=['mov','rot'][1]
 # number of steps to do (some influence on the incremental computation)
@@ -25,7 +13,7 @@ r1,r2=1e-3,1e-3
 dist=r1+r2
 offset=Vector3(0,0,2*dist)
 p1,p2=Vector3(0,0,0),Vector3(dist,0,0)
-O.materials.append(CpmMat(young=30e9,poisson=.2,frictionAngle=atan(.8),sigmaT=3e6,crackOpening=1e-6,epsCrackOnset=1e-4,G_over_E=.2,neverDamage=False,plTau=-1,plRateExp=0,dmgTau=-1,dmgRateExp=0))
+O.materials.append(CpmMat(young=30e9,poisson=.2,frictionAngle=atan(.8),sigmaT=3e6,crackOpening=1e-6,epsCrackOnset=1e-4,neverDamage=False,plTau=-1,plRateExp=0,dmgTau=-1,dmgRateExp=0))#,G_over_E=.2
 # first 2 spheres used for Dem3DofGeom
 # the other 2 used for ScGeom (#3 is dynamic, since ScGeom needs that)
 O.bodies.append([utils.sphere(p1,r1,fixed=True),utils.sphere(p2,r2,fixed=True)])
@@ -38,6 +26,7 @@ O.engines=[IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom()]),IPhysDispatcher([Ip2_Cp
 i2=utils.createInteraction(2,3)
 
 O.engines=[
+	ForceResetter(),
 	InteractionLoop([],[],[Law2_ScGeom_CpmPhys_Cpm(),Law2_Dem3DofGeom_CpmPhys_Cpm(yieldSurfType=0)]),
 	StepDisplacer(ids=[1,3],setVelocities=True,label='jumper'), # displace non-dynamic #1, set velocity on #3
 	NewtonIntegrator(damping=0),
@@ -54,7 +43,7 @@ def plotData():
 			epsT=i.phys.epsT.norm() if key=='-Sc' else i.geom.strainT().norm(),
 			Ft=i.phys.shearForce.norm(),
 			epsN=i.phys.epsN,
-			epsPlSum=i.phys.epsPlSum,
+			#epsPlSum=i.phys.epsPlSum,
 			relResStr=i.phys.relResidualStrength,
 			dist=(O.bodies[i.id1].state.pos-O.bodies[i.id2].state.pos).norm(),
 			sigmaT=i.phys.sigmaT.norm()
@@ -88,10 +77,10 @@ elif mode=='rot':
 
 if 1:
 	f='/tmp/cpm-geom-'+mode+'.pdf'
-	plot.plot(noShow=True).savefig(f)
+	plot.plot(noShow=True,subPlots=False).savefig(f)
 	print 'Plot saved to '+f
 	quit()
 else:
-	plot.plot()
+	plot.plot(subPlots=False)
 
 
