@@ -693,16 +693,16 @@ void PeriodicFlowEngine:: action()
         if ( viscousShear ) ApplyViscousForces(*solver);
 	timingDeltas->checkpoint("Compute_Viscous_Forces");
 	Vector3r Force;
-	Vector3r Torque=Vector3r::Zero();
+	Vector3r Torque;
 	const Tesselation& Tes = solver->T[solver->currentTes];
 	for (int id=0; id<=Tes.max_id; id++){
 		assert (Tes.vertexHandles[id] != NULL);
 		const Tesselation::Vertex_Info& v_info = Tes.vertexHandles[id]->info();
 		Force = Vector3r ( ( v_info.forces ) [0],v_info.forces[1],v_info.forces[2] );
-		Torque = scene->forces.getTorque(v_info.id());
+// 		Torque = scene->forces.getTorque(v_info.id());
                 if (viscousShear){
 			Force = Force +solver->viscousShearForces[v_info.id()];
-			Torque = Torque + solver->viscousShearTorques[v_info.id()];
+			Torque = solver->viscousShearTorques[v_info.id()];
 		}
 		if (normalLubrication)
 			Force = Force + solver->normLubForce[v_info.id()];
