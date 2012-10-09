@@ -1,9 +1,4 @@
 #pragma once
-#include<yade/core/Interaction.hpp>
-#include<yade/core/IGeom.hpp>
-#include<yade/core/State.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
 
 

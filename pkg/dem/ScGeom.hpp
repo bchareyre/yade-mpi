@@ -66,12 +66,11 @@ REGISTER_SERIALIZABLE(ScGeom);
 class ScGeom6D: public ScGeom {
 	public:
 		virtual ~ScGeom6D();
+		bool cylCyl; //True if it is the contact geometry between two DIFFERENT chainedCylinders.
 		const Real& getTwist() const {return twist;}
 		const Vector3r& getBending() const {return bending;}
-
 		void precomputeRotations(const State& rbp1, const State& rbp2, bool isNew, bool creep=false);
 		void initRotations(const State& rbp1, const State& rbp2);
-
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ScGeom6D,ScGeom,"Class representing :yref:`geometry<IGeom>` of two :yref:`bodies<Body>` in contact. The contact has 6 DOFs (normal, 2×shear, twist, 2xbending) and uses :yref:`ScGeom` incremental algorithm for updating shear.",
 		((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),(Attr::readonly),"Orientation of body 1 one at initialisation time |yupdate|"))
 		((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),(Attr::readonly),"Orientation of body 2 one at initialisation time |yupdate|"))
@@ -86,4 +85,44 @@ class ScGeom6D: public ScGeom {
 	REGISTER_CLASS_INDEX(ScGeom6D,ScGeom);
 };
 REGISTER_SERIALIZABLE(ScGeom6D);
+
+
+class ChCylGeom6D: public ScGeom6D {
+	public:
+		virtual ~ChCylGeom6D();
+		State fictiousState1;
+		State fictiousState2;
+		Real relPos1, relPos2;
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ChCylGeom6D,ScGeom6D,"Test",
+		/*attributes*/
+		,
+		/* extra initializers */,
+		/* ctor */ createIndex();,
+		/* py */
+	);
+	REGISTER_CLASS_INDEX(ChCylGeom6D,ScGeom6D);
+};
+REGISTER_SERIALIZABLE(ChCylGeom6D);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

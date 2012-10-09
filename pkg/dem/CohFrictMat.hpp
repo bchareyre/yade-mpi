@@ -26,7 +26,9 @@ class CohFrictMat : public FrictMat
 		((Real,etaRoll,-1.,,"Dimensionless coefficient used to calculate the plastic rolling moment (if negative, plasticity will not be applied)."))	
 		((Real,normalCohesion,0,,""))
 		((Real,shearCohesion,0,,""))
-		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details.")),
+		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
+		((Real,cylCylNormalCoh,0,,"Normal cohesion between two different chained cylinders."))
+        ((Real,cylCylShearCoh,0,,"Shear cohesion between two different chained cylinders.")),
 		createIndex();
 					);
 /// Indexable

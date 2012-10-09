@@ -15,7 +15,7 @@ class CohFrictPhys : public FrictPhys
 {
 	public :
 		virtual ~CohFrictPhys();
-		void SetBreakingState ();
+		void SetBreakingState();
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictPhys,FrictPhys,"",
 		((bool,cohesionDisablesFriction,false,,"is shear strength the sum of friction and adhesion or only adhesion?"))

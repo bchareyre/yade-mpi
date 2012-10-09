@@ -7,9 +7,10 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((ScGeom)(ScGeom6D));
+YADE_PLUGIN((ScGeom)(ScGeom6D)(ChCylGeom6D));
 ScGeom::~ScGeom(){};
 ScGeom6D::~ScGeom6D(){};
+ChCylGeom6D::~ChCylGeom6D(){};
 
 Vector3r& ScGeom::rotate(Vector3r& shearForce) const {
 	// approximated rotations
