@@ -89,6 +89,16 @@ void SpheresFactory::action(){
 	
 	vector< SpherCoord > justCreatedBodies;
 	
+	// pick random initial velocity
+	Vector3r initVel;
+	if (normalVel.norm()>0) {
+		normalVel.normalize();
+		initVel = normalVel;
+	} else {
+		initVel = normal;
+	}
+	initVel*=(vMin+randomUnit()*(vMax-vMin)); // TODO: compute from vMin, vMax, vAngle, normal;
+	
 	while(totalMass<goalMass && (maxParticles<0 || numParticles<maxParticles) && (maxMass<0 || totalMass<maxMass)){
 		Real r=0.0;
 		
@@ -149,11 +159,7 @@ void SpheresFactory::action(){
 			}
 			return;
 		}
-		// pick random initial velocity (normal with some variation)
-		// preliminary version that randomizes valocity magnitude but always makes initVel exactly aligned with normal
-		Vector3r initVel=normal*(vMin+randomUnit()*(vMax-vMin)); // TODO: compute from vMin, vMax, vAngle, normal;
-		//Vector3r initVel= normal*100;
-
+		
 		// create particle
 		int mId=(materialId>=0 ? materialId : scene->materials.size()+materialId);
 		if(mId<0 || (size_t) mId>=scene->materials.size()) throw std::invalid_argument(("SpheresFactory: invalid material id "+lexical_cast<string>(materialId)).c_str());
