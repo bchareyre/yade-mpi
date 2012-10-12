@@ -245,6 +245,33 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	if (end == begin): b.state.ori = Quaternion((1,0,0),0)
 	return b
 
+def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
+	b=Body()
+	b.shape=GridNode(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
+	V=(4./3)*math.pi*radius**3
+	geomInert=(2./5.)*V*radius**2
+	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=center,dynamic=dynamic,fixed=fixed)
+	b.aspherical=False
+	b.bounded=False
+	b.mask=mask
+	return b
+
+def gridConnection(id1,id2,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
+	b=Body()
+	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
+	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
+	b.shape.node1=sph1 ; b.shape.node2=sph2
+	sph1.shape.addConnection(b) ; sph2.shape.addConnection(b)
+	segt=sph2.state.pos - sph1.state.pos
+	V=segt.norm()*math.pi*radius**2 + 4./3.*math.pi*radius**3
+	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos+segt/2.,dynamic=dynamic,fixed=fixed)
+	b.aspherical=False
+	b.mask=mask
+	i=createInteraction(id1,id2)
+	i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
+	return b
+	
+	
 def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	"""Return ready-made wall body.
 
