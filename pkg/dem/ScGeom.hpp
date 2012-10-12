@@ -66,7 +66,6 @@ REGISTER_SERIALIZABLE(ScGeom);
 class ScGeom6D: public ScGeom {
 	public:
 		virtual ~ScGeom6D();
-		bool cylCyl; //True if it is the contact geometry between two DIFFERENT chainedCylinders.
 		const Real& getTwist() const {return twist;}
 		const Vector3r& getBending() const {return bending;}
 		void precomputeRotations(const State& rbp1, const State& rbp2, bool isNew, bool creep=false);
@@ -77,6 +76,7 @@ class ScGeom6D: public ScGeom {
 		((Quaternionr,twistCreep,Quaternionr(1.0,0.0,0.0,0.0),(Attr::readonly),"Stored creep, substracted from total relative rotation for computation of elastic moment |yupdate|"))
 		((Real,twist,0,(Attr::noSave | Attr::readonly),"Elastic twist angle of the contact."))
 		((Vector3r,bending,Vector3r::Zero(),(Attr::noSave | Attr::readonly),"Bending at contact as a vector defining axis of rotation and angle (angle=norm)."))
+		((bool, cylCyl,0,(Attr::hidden),"True if the contact geometry is between two DIFFERENT chainedCylinders."))
 		,
 		/* extra initializers */,
 		/* ctor */ createIndex();,
