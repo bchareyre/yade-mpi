@@ -55,7 +55,9 @@ void FlowEngine::action()
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;
                 ReTrg++;
-        } else  retriangulationLastIter++;
+        } else  {
+		Update_Triangulation = false;
+		retriangulationLastIter++;}
 
 
         ///Compute flow and and forces here
@@ -86,10 +88,9 @@ void FlowEngine::action()
         ///End Compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
 
-	if (multithread) {
-		int waited=0;
-		while (!first && Update_Triangulation && !backgroundCompleted) { cout<<"sleeping..."<<waited++<<endl; 	boost::this_thread::sleep(boost::posix_time::microseconds(10000));}
-		if (!first && backgroundCompleted) {
+	if (multithread && !first) {
+		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<waited++<<endl; */	boost::this_thread::sleep(boost::posix_time::microseconds(10000));}
+		if (backgroundCompleted) {
 			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
@@ -101,14 +102,18 @@ void FlowEngine::action()
 			if (Debug) cerr<<"switched"<<endl;
 			setPositionsBuffer();
 			backgroundCompleted=false;
-			Update_Triangulation = false;
+			retriangulationLastIter=ellapsedIter;
+			ellapsedIter=0;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
 			if (Debug) cerr<<"backgrounded"<<endl;
 			Initialize_volumes(solver);
 			if (Debug) cerr<<"volumes initialized"<<endl;
 		}
-		else if (!first && Debug) cerr<<"still computing solver in the background"<<endl;
+		else {
+			if (Debug) cerr<<"still computing solver in the background"<<endl;
+			ellapsedIter++;
+		}
 	} else {
 	        if (Update_Triangulation && !first) {
 			setPositionsBuffer();
@@ -682,7 +687,9 @@ void PeriodicFlowEngine:: action()
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;
                 ReTrg++;
-        } else  retriangulationLastIter++;
+         } else  {
+		Update_Triangulation = false;
+		retriangulationLastIter++;}
 	timingDeltas->checkpoint("Update_Volumes");
 
 	///Compute flow and and forces here
@@ -725,12 +732,15 @@ void PeriodicFlowEngine:: action()
 			setPositionsBuffer();
 			cachedCell= Cell(*(scene->cell));
 			backgroundCompleted=false;
-			Update_Triangulation = false;
+			retriangulationLastIter=ellapsedIter;
+			ellapsedIter=0;
 			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			Initialize_volumes(solver);
 		}
-		else if (Debug && !first) cerr<<"still computing solver in the background"<<endl;
+		else if (Debug && !first) {
+			cerr<<"still computing solver in the background"<<endl;
+			ellapsedIter++;}
 	} else {
 	        if (Update_Triangulation && !first) {
 			cachedCell= Cell(*(scene->cell));

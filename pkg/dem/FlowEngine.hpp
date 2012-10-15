@@ -53,6 +53,7 @@ class FlowEngine : public PartialEngine
 		int id_offset;
 		double Eps_Vol_Cumulative;
 		int ReTrg;
+		int ellapsedIter;
 		TPL void initSolver (Solver& flow);
 		TPL void Triangulate (Solver& flow);
 		TPL void AddBoundary (Solver& flow);
@@ -231,6 +232,7 @@ class FlowEngine : public PartialEngine
 					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 					ReTrg=1;
 					backgroundCompleted=true;
+					ellapsedIter=0;
 					,
 					.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 					.def("imposePressure",&FlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
