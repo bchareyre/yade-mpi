@@ -18,6 +18,8 @@
 #include <sys/types.h>
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 
 #include "FlowEngine.hpp"
 
@@ -48,7 +50,7 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Update_Volumes" );
 	
         Eps_Vol_Cumulative += eps_vol_max;
-        if (  Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>PermuteInterval ) {
+        if ( (EpsVolPercent_RTRG>0 && Eps_Vol_Cumulative > EpsVolPercent_RTRG) || retriangulationLastIter>PermuteInterval) {
                 Update_Triangulation = true;
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;
@@ -85,6 +87,8 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Applying Forces" );
 
 	if (multithread) {
+		int waited=0;
+		while (!first && Update_Triangulation && !backgroundCompleted) { cout<<"sleeping..."<<waited++<<endl; 	boost::this_thread::sleep(boost::posix_time::microseconds(10000));}
 		if (!first && backgroundCompleted) {
 			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
@@ -97,6 +101,7 @@ void FlowEngine::action()
 			if (Debug) cerr<<"switched"<<endl;
 			setPositionsBuffer();
 			backgroundCompleted=false;
+			Update_Triangulation = false;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
 			if (Debug) cerr<<"backgrounded"<<endl;
@@ -124,7 +129,7 @@ void FlowEngine::backgroundAction()
 	backgroundSolver->GaussSeidel(scene->dt);
 	//FIXME(2): and here we need only cached variables, not forces
 	backgroundSolver->ComputeFacetForcesWithCache(/*onlyCache?*/ true);
-// 	boost::this_thread::sleep(boost::posix_time::seconds(10));
+// 	boost::this_thread::sleep(boost::posix_time::seconds(5));
  	backgroundCompleted = true;
 }
 
@@ -708,6 +713,7 @@ void PeriodicFlowEngine:: action()
         ///End Compute flow and forces
 	timingDeltas->checkpoint("Applying Forces");
 	if (multithread) {
+		while (!first && Update_Triangulation && !backgroundCompleted) { cout<<"sleeping..."<<endl; 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
 		if (!first && backgroundCompleted) {
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
@@ -719,6 +725,7 @@ void PeriodicFlowEngine:: action()
 			setPositionsBuffer();
 			cachedCell= Cell(*(scene->cell));
 			backgroundCompleted=false;
+			Update_Triangulation = false;
 			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			Initialize_volumes(solver);
