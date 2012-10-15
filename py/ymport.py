@@ -244,14 +244,14 @@ def gengeo(mntable,shift=Vector3.Zero,scale=1.0,**kw):
 
 
 
-def unv(fileName,shift=(0,0,0),scale=1.0,returnElementMap=False,**kw):
+def unv(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 	""" Import geometry from unv file, return list of created facets.
 
 		:param string fileName: name of unv file
 		:param (float,float,float)|Vector3 shift: (X,Y,Z) parameter moves the specimen.
 		:param float scale: factor scales the given data.
 		:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.facet`
-		:param bool returnElementMap: if True, apart from facets returns also nodes (list of (x,y,z) nodes coordinates) and elements (list of (id1,id2,id3) element nodes ids). If False (default), returns only facets
+		:param bool returnConnectivityTable: if True, apart from facets returns also nodes (list of (x,y,z) nodes coordinates) and elements (list of (id1,id2,id3) element nodes ids). If False (default), returns only facets
 	
 	unv files are mainly used for FEM analyses (are used by `OOFEM <http://www.oofem.org/>`_ and `Abaqus <http://www.simulia.com/products/abaqus_fea.html>`_), but triangular elements can be imported as facets.
 	These files cen be created e.g. with open-source free software `Salome <http://salome-platform.org>`_.
@@ -262,7 +262,7 @@ def unv(fileName,shift=(0,0,0),scale=1.0,returnElementMap=False,**kw):
 		# class used in ymport.unv function
 		# reads and evaluate given unv file and extracts all triangles
 		# can be extended to read tetrahedrons as well
-		def __init__(self,fileName,shift=(0,0,0),scale=1.0,returnElementMap=False,**kw):
+		def __init__(self,fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 			self.shift = shift
 			self.scale = scale
 			self.unvFile = open(fileName,'r')
@@ -319,8 +319,8 @@ def unv(fileName,shift=(0,0,0),scale=1.0,returnElementMap=False,**kw):
 		def createFacets(self,**kw):
 			self.facets = [utils.facet(tuple(self.nodes[i] for i in e),**kw) for e in self.elements]
 	#
-	unvReader = UNVReader(fileName,shift,scale,returnElementMap,**kw)
-	if returnElementMap:
+	unvReader = UNVReader(fileName,shift,scale,returnConnectivityTable,**kw)
+	if returnConnectivityTable:
 		return unvReader.facets, unvReader.nodes, unvReader.elements
 	return facets
 

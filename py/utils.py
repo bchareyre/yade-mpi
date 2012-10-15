@@ -634,7 +634,7 @@ def xMirror(half):
 	"""Mirror a sequence of 2d points around the x axis (changing sign on the y coord).
 The sequence should start up and then it will wrap from y downwards (or vice versa).
 If the last point's x coord is zero, it will not be duplicated."""
-	return list(half)+[(x,-y) for x,y in reversed(half[:-1] if half[-1][0]==0 else half)]
+	return list(half)+[(x,-y) for x,y in reversed(half[:-1] if half[-1][1]==0 else half)]
 
 #############################
 ##### deprecated functions

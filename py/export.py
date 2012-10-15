@@ -305,16 +305,16 @@ class VTKExporter:
 		outFile.close()
 		self.facetsSnapCount += 1
 
-	def exportFacetsAsMesh(self,ids='all',elements=None,what=[],comment="comment",numLabel=None):
+	def exportFacetsAsMesh(self,ids='all',connectivityTable=None,what=[],comment="comment",numLabel=None):
 		"""
-		exports facets (positions) and defined properties. Facets are exported as mesh (not with multiplicated nodes). Therefore additional parameters (nodes and elements) is needed
+		exports facets (positions) and defined properties. Facets are exported as mesh (not with multiplicated nodes). Therefore additional parameters connectivityTable is needed
 
 		:param [int]|"all" ids: if "all", then export all facets, otherwise only facets from integer list
 		:param [tuple(2)] what: see exportSpheres
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		:param [(float,float,float)|Vector3] nodes: list of coordinates of nodes
-		:param [(int,int,int)] elements: list of node ids of individual elements (facets)
+		:param [(int,int,int)] connectivityTable: list of node ids of individual elements (facets)
 		"""
 		allIds = False
 		if ids=='all':
@@ -330,14 +330,14 @@ class VTKExporter:
 			bodies.append(b)
 		ids = xrange(len(bodies))
 		n = len(bodies)
-		if elements is None:
-			print "ERROR: 'elements' not specified"
+		if connectivityTable is None:
+			print "ERROR: 'connectivityTable' not specified"
 			return
-		if n != len(elements):
-			print "ERROR: length of 'elements' does not match length of 'ids', no export"
+		if n != len(connectivityTable):
+			print "ERROR: length of 'connectivityTable' does not match length of 'ids', no export"
 			return
-		nodes = [Vector3.Zero for i in xrange(max(max(e) for e in elements)+1)]
-		for id,e in zip(ids,elements):
+		nodes = [Vector3.Zero for i in xrange(max(max(e) for e in connectivityTable)+1)]
+		for id,e in zip(ids,connectivityTable):
 			b = bodies[id]
 			p = b.state.pos
 			o = b.state.ori
@@ -353,8 +353,8 @@ class VTKExporter:
 		gg = 0
 		for n in nodes:
 			outFile.write("%g %g %g\n"%(n[0],n[1],n[2]))
-		outFile.write("\nPOLYGONS %d %d\n"%(len(elements),4*len(elements)))
-		for e in elements:
+		outFile.write("\nPOLYGONS %d %d\n"%(len(connectivityTable),4*len(connectivityTable)))
+		for e in connectivityTable:
 			outFile.write("3 %d %d %d\n"%e)
 		if what:
 			outFile.write("\nCELL_DATA %d"%(n))
