@@ -256,7 +256,7 @@ def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highli
 	b.mask=mask
 	return b
 
-def gridConnection(id1,id2,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
+def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask=1):
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
@@ -264,11 +264,12 @@ def gridConnection(id1,id2,radius,dynamic=None,fixed=False,wire=False,color=None
 	sph1.shape.addConnection(b) ; sph2.shape.addConnection(b)
 	segt=sph2.state.pos - sph1.state.pos
 	V=segt.norm()*math.pi*radius**2 + 4./3.*math.pi*radius**3
-	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos+segt/2.,dynamic=dynamic,fixed=fixed)
+	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos,dynamic=False,fixed=True)
 	b.aspherical=False
 	b.mask=mask
 	i=createInteraction(id1,id2)
 	i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
+	i.geom.connectionBody=b
 	return b
 	
 	
