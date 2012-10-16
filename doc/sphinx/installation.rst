@@ -74,7 +74,7 @@ generally.
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
 management (install the ``git`` package in your distribution)::
 
-		git clone git@github.com:username/trunk.git
+		git clone git@github.com:yade/trunk.git
 
 will download the whole code repository of ``trunk``. Check out `Yade on github
 <https://www.yade-dem.org/wiki/Yade_on_github>`_ wiki page for more.
