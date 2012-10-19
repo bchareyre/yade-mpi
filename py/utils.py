@@ -245,7 +245,7 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	if (end == begin): b.state.ori = Quaternion((1,0,0),0)
 	return b
 
-def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
+def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1):
 	b=Body()
 	b.shape=GridNode(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=(4./3)*math.pi*radius**3
@@ -253,10 +253,10 @@ def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highli
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=center,dynamic=dynamic,fixed=fixed)
 	b.aspherical=False
 	b.bounded=False
-	b.mask=mask
+	b.mask=0	#avoid contact detection with the nodes. Manual interaction will be set for them in "gridConnection" below.
 	return b
 
-def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask=1):
+def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask="none"):
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
@@ -266,10 +266,14 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	V=segt.norm()*math.pi*radius**2 + 4./3.*math.pi*radius**3
 	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos,dynamic=False,fixed=True)
 	b.aspherical=False
-	b.mask=mask
 	i=createInteraction(id1,id2)
 	i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
 	i.geom.connectionBody=b
+	if(mask=="none"):print "Error, you need to specify a valid mask number for the gridConnection"
+	else:
+		for i in O.engines:
+			if(type(i).__name__=="InsertionSortCollider"):i.avoidSelfInteractionMasks=[mask]
+	b.mask=mask
 	return b
 	
 	
