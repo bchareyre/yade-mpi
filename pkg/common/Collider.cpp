@@ -5,10 +5,11 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
 #include<yade/pkg/common/Collider.hpp>
 
 YADE_PLUGIN((Collider));
+
+vector<int> Collider::avoidSelfInteractionMasks = vector<int>() ;
 
 bool Collider::mayCollide(const Body* b1, const Body* b2){
 	return 
@@ -19,9 +20,10 @@ bool Collider::mayCollide(const Body* b1, const Body* b2){
 		 // do not collide clumps, since they are just containers, never interact
 		!b1->isClump() && !b2->isClump() &&
 		// masks must have at least 1 bit in common
-		(b1->groupMask & b2->groupMask)!=0 
+		(b1->groupMask & b2->groupMask)!=0 &&
+		//
+		!( (b1->groupMask == b2->groupMask) && ( (int) count(avoidSelfInteractionMasks.begin(), avoidSelfInteractionMasks.end(),b1->groupMask) > 0))
 	;
-
 }
 
 void Collider::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
