@@ -109,12 +109,12 @@ should have root privileges
 
 	* **Ubuntu**, **Debian** and their derivatives::
 
-		sudo apt-get install cmake git freeglut3-dev libloki-dev \
+		sudo apt-get install cmake git freeglut3-dev libloki-dev\
 		libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
 		libboost-program-options-dev \
 		libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
 		libboost-iostreams-dev python-dev libboost-python-dev ipython \
-		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot doxygen \
+		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf \
