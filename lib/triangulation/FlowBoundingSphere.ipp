@@ -493,7 +493,9 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForces()
 	cout <<"WARNING: this non-cached version is using wrong fluid facet areas. Use the cached version instead"<<endl;
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		Cell_handle& cell = *cell_it;
 		for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j)) && cell->neighbor(j)->info().isvisited==ref) {
 				neighbour_cell = cell->neighbor(j);
 				const Vecteur& Surfk = cell->info().facetSurfaces[j];
@@ -548,19 +550,16 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect(0,0,0);
-	static vector<Vecteur> oldForces;
-	if (oldForces.size()<=Tri.number_of_vertices()) oldForces.resize(Tri.number_of_vertices()+1);
 	//reset forces
-	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-		if (noCache) {oldForces[v->info().id()]=nullVect; v->info().forces=nullVect;}
-		else {oldForces[v->info().id()]=v->info().forces; v->info().forces=nullVect;}
-	}
+	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-	if (noCache) {for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	if (noCache) {for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
+// 	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		Cell_handle& cell = *cell_it;
 			//reset cache
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
@@ -1685,13 +1684,17 @@ void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
 	Rh = (radius1<radius2)? surfaceDist + 0.45 * radius1 : surfaceDist + 0.45 * radius2;
     }
     else if (hasFictious == 1){
-	centerDistVect = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] - boundary(id1).p[boundary(id1).coordinate])*boundary(id1).normal : ((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] - boundary(id2).p[boundary(id2).coordinate])*boundary(id2).normal;
-	centerDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ?abs((ed_it->first)->vertex(ed_it->third)->point().point()[boundary(id1).coordinate] -boundary(id1).p[boundary(id1).coordinate]) :abs((ed_it->first)->vertex(ed_it->second)->point().point()[boundary(id2).coordinate] -boundary(id2).p[boundary(id2).coordinate]);
-	surfaceDist = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? centerDist-radius2:centerDist-radius1;
-	meanRad = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? radius2:radius1;
+	bool v1fictious = (ed_it->first)->vertex(ed_it->second)->info().isFictious;
+	const Boundary& bnd = boundary(v1fictious? id1 : id2);
+	Vertex_handle vreal = v1fictious ? (ed_it->first)->vertex(ed_it->third) : (ed_it->first)->vertex(ed_it->second);
+	
+	centerDist = abs(vreal->point().point()[bnd.coordinate] -bnd.p[bnd.coordinate]);
+	centerDistVect = centerDist*bnd.normal;
+	meanRad = v1fictious ? radius2:radius1;
+	surfaceDist = centerDist- meanRad;
 	point_force = centerDistVect;
 	n = centerDistVect / sqrt(centerDistVect.squared_length());
-	Rh = ((ed_it->first)->vertex(ed_it->second)->info().isFictious) ? surfaceDist + 0.45 * radius2 : surfaceDist + 0.45 * radius1;
+	Rh = surfaceDist + 0.45 * meanRad;
     }
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
     Edge_HydRad.push_back(Rh);
