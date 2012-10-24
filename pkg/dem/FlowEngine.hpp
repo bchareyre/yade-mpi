@@ -42,8 +42,10 @@ class FlowEngine : public PartialEngine
 		volatile bool backgroundCompleted;
 		Cell cachedCell;
 		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool exists; posData(){exists=0;}};
-		vector<posData> positionBuffer;
-		void setPositionsBuffer();
+		vector<posData> positionBufferCurrent;//reflect last known positions before we start computations
+		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
+		//copy positions in a buffer for faster and/or parallel access
+		void setPositionsBuffer(bool current);
 
 	public :
 		int retriangulationLastIter;

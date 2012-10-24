@@ -20,7 +20,6 @@
 #include <boost/date_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-
 #include "FlowEngine.hpp"
 
 CREATE_LOGGER ( FlowEngine );
@@ -42,11 +41,12 @@ void FlowEngine::action()
 {
         if ( !isActivated ) return;
         timingDeltas->start();
-
-        if (first) {setPositionsBuffer(); Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
+	setPositionsBuffer(true);
+	timingDeltas->checkpoint ( "Position buffer" );
+        if (first) {Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
 
         timingDeltas->checkpoint ( "Triangulating" );
-        UpdateVolumes ( solver );
+	UpdateVolumes ( solver );
         timingDeltas->checkpoint ( "Update_Volumes" );
 	
         Eps_Vol_Cumulative += eps_vol_max;
@@ -89,7 +89,7 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Applying Forces" );
 
 	if (multithread && !first) {
-		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<waited++<<endl; */	boost::this_thread::sleep(boost::posix_time::microseconds(10000));}
+		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<waited++<<endl; */	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
 		if (backgroundCompleted) {
 			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
@@ -100,7 +100,7 @@ void FlowEngine::action()
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
 			if (Debug) cerr<<"switched"<<endl;
-			setPositionsBuffer();
+			setPositionsBuffer(false);//set "parallel" buffer for background calculation 
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
 			ellapsedIter=0;
@@ -116,8 +116,7 @@ void FlowEngine::action()
 		}
 	} else {
 	        if (Update_Triangulation && !first) {
-			setPositionsBuffer();
-                	Build_Triangulation (P_zero, solver);
+			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver); 
                		Update_Triangulation = false;}
         }
@@ -280,15 +279,16 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 	if ( normalLubrication ) flow->ComputeEdgesSurfaces();
 }
 
-void FlowEngine::setPositionsBuffer()
+void FlowEngine::setPositionsBuffer(bool current)
 {
-	positionBuffer.clear();
-	positionBuffer.resize(scene->bodies->size());
+	vector<posData>& buffer = current? positionBufferCurrent : positionBufferParallel;
+	buffer.clear();
+	buffer.resize(scene->bodies->size());
 	shared_ptr<Sphere> sph ( new Sphere );
         const int Sph_Index = sph->getClassIndexStatic();
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
                 if (!b || (unlikely(ignoredBody>=0) && ignoredBody==b->getId())) continue;
-                posData& dat = positionBuffer[b->getId()];
+                posData& dat = buffer[b->getId()];
 		dat.id=b->getId();
 		dat.pos=b->state->pos;
 		dat.isSphere= (b->shape->getClassIndex() ==  Sph_Index);
@@ -300,8 +300,9 @@ void FlowEngine::setPositionsBuffer()
 template<class Solver>
 void FlowEngine::AddBoundary ( Solver& flow )
 {
+	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
         solver->x_min = Mathr::MAX_REAL, solver->x_max = -Mathr::MAX_REAL, solver->y_min = Mathr::MAX_REAL, solver->y_max = -Mathr::MAX_REAL, solver->z_min = Mathr::MAX_REAL, solver->z_max = -Mathr::MAX_REAL;
-        FOREACH ( const posData& b, positionBuffer ) {
+        FOREACH ( const posData& b, buffer ) {
                 if ( !b.exists ) continue;
                 if ( b.isSphere ) {
                         const Real& rad = b.radius;
@@ -366,7 +367,7 @@ void FlowEngine::AddBoundary ( Solver& flow )
                 CGT::Vecteur Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
                 if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->AddBoundingPlane ( true, Normal, *flow->boundsIds[i] );
                 else {
-			for ( int h=0;h<3;h++ ) center[h] = positionBuffer[*flow->boundsIds[i]].pos[h];
+			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow->boundsIds[i]].pos[h];
                         flow->AddBoundingPlane ( center, wall_thickness, Normal,*flow->boundsIds[i] );
                 }
         }
@@ -382,7 +383,8 @@ void FlowEngine::Triangulate ( Solver& flow )
 // 	TW.insertSceneSpheres();//TW is now really inserting in FlowEngine, using the faster insert(begin,end)
 // 	TW.Tes = NULL;//otherwise, Tes would be deleted by ~TesselationWrapper() at the end of the function.
 ///Using one-by-one insertion
-       FOREACH ( const posData& b, positionBuffer ) {
+	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
+	FOREACH ( const posData& b, buffer ) {
                 if ( !b.exists ) continue;
                 if ( b.isSphere ) {
 			if (b.id==ignoredBody) continue;
@@ -463,13 +465,12 @@ void FlowEngine::UpdateVolumes ( Solver& flow )
         double newVol, dVol;
         eps_vol_max=0;
         Real totVol=0; Real totDVol=0; Real totVol0=0; Real totVol1=0; Real totVol2=0; Real totVol3=0;
-
 	FOREACH(Cell_handle& cell, flow->T[flow->currentTes].cellHandles){
                 switch ( cell->info().fictious() ) {
                 case ( 3 ) : newVol = Volume_cell_triple_fictious ( cell ); totVol3+=newVol; break;
                 case ( 2 ) : newVol = Volume_cell_double_fictious ( cell ); totVol2+=newVol; break;
                 case ( 1 ) : newVol = Volume_cell_single_fictious ( cell ); totVol1+=newVol; break;
-                case ( 0 ) : newVol = Volume_cell ( cell ); totVol0+=newVol; break;
+		case ( 0 ) : newVol = Volume_cell (cell ); totVol0+=newVol; break;
                 default: newVol = 0; break;
                 }
                 totVol+=newVol;
@@ -487,6 +488,8 @@ void FlowEngine::UpdateVolumes ( Solver& flow )
 template<class Cellhandle>
 Real FlowEngine::Volume_cell_single_fictious ( Cellhandle cell )
 {
+	#if 0
+	//Without buffer
         Vector3r V[3];
         int b=0;
         int w=0;
@@ -506,6 +509,28 @@ Real FlowEngine::Volume_cell_single_fictious ( Cellhandle cell )
                 }
         }
         Real Volume = 0.5* ( ( V[0]-V[1] ).cross ( V[0]-V[2] ) ) [solver->boundary ( b ).coordinate] * ( 0.33333333333* ( V[0][solver->boundary ( b ).coordinate]+ V[1][solver->boundary ( b ).coordinate]+ V[2][solver->boundary ( b ).coordinate] ) - Wall_coordinate );
+	#else
+	//With buffer
+        Vector3r V[3];
+        int b=0;
+        int w=0;
+        cell->info().volumeSign=1;
+        Real Wall_coordinate=0;
+
+        for ( int y=0;y<4;y++ ) {
+                if ( ! ( cell->vertex ( y )->info().isFictious ) ) {
+//                         const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( y )->info().id(), scene );
+                        V[w]=positionBufferCurrent[cell->vertex ( y )->info().id()].pos;
+			w++;
+                } else {
+                        b = cell->vertex ( y )->info().id();
+                        const shared_ptr<Body>& wll = Body::byId ( b , scene );
+                        if ( !solver->boundary ( b ).useMaxMin ) Wall_coordinate = wll->state->pos[solver->boundary ( b ).coordinate]+ ( solver->boundary ( b ).normal[solver->boundary ( b ).coordinate] ) *wall_thickness/2;
+                        else Wall_coordinate = solver->boundary ( b ).p[solver->boundary ( b ).coordinate];
+                }
+        }
+        Real Volume = 0.5* ( ( V[0]-V[1] ).cross ( V[0]-V[2] ) ) [solver->boundary ( b ).coordinate] * ( 0.33333333333* ( V[0][solver->boundary ( b ).coordinate]+ V[1][solver->boundary ( b ).coordinate]+ V[2][solver->boundary ( b ).coordinate] ) - Wall_coordinate );
+	#endif
 
         return abs ( Volume );
 }
@@ -525,17 +550,17 @@ Real FlowEngine::Volume_cell_double_fictious ( Cellhandle cell )
                 if ( cell->vertex ( g )->info().isFictious ) {
                         b[j] = cell->vertex ( g )->info().id();
                         coord[j]=solver->boundary ( b[j] ).coordinate;
-                        const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
-                        if ( !solver->boundary ( b[j] ).useMaxMin ) Wall_coordinate[j] = wll->state->pos[coord[j]] + ( solver->boundary ( b[j] ).normal[coord[j]] ) *wall_thickness/2;
+//                         const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
+                        if ( !solver->boundary ( b[j] ).useMaxMin ) Wall_coordinate[j] = positionBufferCurrent[b[j]].pos[coord[j]] + ( solver->boundary ( b[j] ).normal[coord[j]] ) *wall_thickness/2;
                         else Wall_coordinate[j] = solver->boundary ( b[j] ).p[coord[j]];
                         j++;
                 } else if ( first_sph ) {
-                        const shared_ptr<Body>& sph1 = Body::byId ( cell->vertex ( g )->info().id(), scene );
-                        A=AS=/*AT=*/ ( sph1->state->pos );
+//                         const shared_ptr<Body>& sph1 = Body::byId ( cell->vertex ( g )->info().id(), scene );
+                        A=AS=/*AT=*/ positionBufferCurrent[cell->vertex(g)->info().id()].pos;
                         first_sph=false;
                 } else {
-                        const shared_ptr<Body>& sph2 = Body::byId ( cell->vertex ( g )->info().id(), scene );
-                        B=BS=/*BT=*/ ( sph2->state->pos );
+//                         const shared_ptr<Body>& sph2 = Body::byId ( cell->vertex ( g )->info().id(), scene );
+                        B=BS=/*BT=*/ positionBufferCurrent[cell->vertex(g)->info().id()].pos;;
                 }
         }
         AS[coord[0]]=BS[coord[0]] = Wall_coordinate[0];
@@ -577,10 +602,18 @@ template<class Cellhandle>
 Real FlowEngine::Volume_cell ( Cellhandle cell )
 {
 	static const Real inv6 = 1/6.;
+	#if 0
+	//Without buffer
 	const Vector3r& p0 = Body::byId ( cell->vertex ( 0 )->info().id(), scene )->state->pos;
 	const Vector3r& p1 = Body::byId ( cell->vertex ( 1 )->info().id(), scene )->state->pos;
 	const Vector3r& p2 = Body::byId ( cell->vertex ( 2 )->info().id(), scene )->state->pos;
 	const Vector3r& p3 = Body::byId ( cell->vertex ( 3 )->info().id(), scene )->state->pos;
+	#else
+	const Vector3r& p0 = positionBufferCurrent[cell->vertex ( 0 )->info().id()].pos;
+	const Vector3r& p1 = positionBufferCurrent[cell->vertex ( 1 )->info().id()].pos;
+	const Vector3r& p2 = positionBufferCurrent[cell->vertex ( 2 )->info().id()].pos;
+	const Vector3r& p3 = positionBufferCurrent[cell->vertex ( 3 )->info().id()].pos;
+	#endif
 	Real volume = inv6 * ((p0-p1).cross(p0-p2)).dot(p0-p3);
         if ( ! ( cell->info().volumeSign ) ) cell->info().volumeSign= ( volume>0 ) ?1:-1;
         return volume;
@@ -675,8 +708,9 @@ void PeriodicFlowEngine:: action()
         if ( !isActivated ) return;
 	timingDeltas->start();
 	preparePShifts();
+	setPositionsBuffer(true);
 	if (first) {
-		setPositionsBuffer(); cachedCell= Cell(*(scene->cell));
+		cachedCell= Cell(*(scene->cell));
 		Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
 //         if ( first ) {Build_Triangulation ( P_zero ); Update_Triangulation = false; Initialize_volumes();}
 	timingDeltas->checkpoint("Triangulating");
@@ -729,7 +763,7 @@ void PeriodicFlowEngine:: action()
 			//Copy imposed pressures/flow from the old solver
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
-			setPositionsBuffer();
+			setPositionsBuffer(false);
 			cachedCell= Cell(*(scene->cell));
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
@@ -744,8 +778,7 @@ void PeriodicFlowEngine:: action()
 	} else {
 	        if (Update_Triangulation && !first) {
 			cachedCell= Cell(*(scene->cell));
-			setPositionsBuffer();
-                	Build_Triangulation (P_zero, solver);
+			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
                		Update_Triangulation = false;}
         }
@@ -771,8 +804,8 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
 //         shared_ptr<Sphere> sph ( new Sphere );
 //         int Sph_Index = sph->getClassIndexStatic();
         Tesselation& Tes = flow->T[flow->currentTes];
-
-	FOREACH ( const posData& b, positionBuffer ) {
+	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
+	FOREACH ( const posData& b, buffer ) {
                 if ( !b.exists || !b.isSphere || b.id==ignoredBody) continue;
                 Vector3i period; Vector3r wpos;
 		// FIXME: use "sheared" variant if the cell is sheared
