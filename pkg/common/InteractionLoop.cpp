@@ -14,8 +14,8 @@ void InteractionLoop::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
 	vecPhys vp=python::extract<vecPhys>(t[1])();
 	vecLaw vl=python::extract<vecLaw>(t[2])();
 	FOREACH(shared_ptr<IGeomFunctor> gf, vg) this->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<IPhysFunctor> pf, vp)  this->physDispatcher->add(pf);
-	FOREACH(shared_ptr<LawFunctor> cf, vl)                 this->lawDispatcher->add(cf);
+	FOREACH(shared_ptr<IPhysFunctor> pf, vp) this->physDispatcher->add(pf);
+	FOREACH(shared_ptr<LawFunctor> cf, vl) this->lawDispatcher->add(cf);
 	t=python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
 }
 
@@ -72,14 +72,14 @@ void InteractionLoop::action(){
 
 
 
-  #ifdef YADE_OPENMP
-    const long size=scene->interactions->size();
-    #pragma omp parallel for schedule(guided)
-    for(long i=0; i<size; i++){
-      const shared_ptr<Interaction>& I=(*scene->interactions)[i];
-  #else
-    FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-  #endif
+	#ifdef YADE_OPENMP
+	const long size=scene->interactions->size();
+	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? ompThreads : omp_get_max_threads())
+	for(long i=0; i<size; i++){
+		const shared_ptr<Interaction>& I=(*scene->interactions)[i];
+	#else
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+	#endif
 		// keep the following newline, my (edx) preprocessor outputs garbage code otherwise!
 
 		if(unlikely(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter)) {
