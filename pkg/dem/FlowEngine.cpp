@@ -87,10 +87,10 @@ void FlowEngine::action()
         }
         ///End Compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
-
+	int sleeping = 0;
 	if (multithread && !first) {
-		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<waited++<<endl; */	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
-		if (backgroundCompleted) {
+		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
+		if (Update_Triangulation || ellapsedIter>(0.5*PermuteInterval)) {
 			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
@@ -103,6 +103,7 @@ void FlowEngine::action()
 			setPositionsBuffer(false);//set "parallel" buffer for background calculation 
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
+			Update_Triangulation=false;
 			ellapsedIter=0;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
@@ -753,9 +754,9 @@ void PeriodicFlowEngine:: action()
 	}
         ///End Compute flow and forces
 	timingDeltas->checkpoint("Applying Forces");
-	if (multithread) {
-		while (!first && Update_Triangulation && !backgroundCompleted) { cout<<"sleeping..."<<endl; 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
-		if (!first && backgroundCompleted) {
+	if (multithread && !first) {
+		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
+		if (Update_Triangulation || ellapsedIter>(0.5*PermuteInterval)) {
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
 			solver=backgroundSolver;
