@@ -43,7 +43,13 @@ void FlowEngine::action()
         timingDeltas->start();
 	setPositionsBuffer(true);
 	timingDeltas->checkpoint ( "Position buffer" );
-        if (first) {Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
+        if (first) {
+	  if (multithread) setPositionsBuffer(false);
+	  Build_Triangulation(P_zero,solver);
+	  Initialize_volumes(solver);
+	  backgroundSolver=solver;
+	  backgroundCompleted=true;
+	}
 
         timingDeltas->checkpoint ( "Triangulating" );
 	UpdateVolumes ( solver );
@@ -89,8 +95,11 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Applying Forces" );
 	int sleeping = 0;
 	if (multithread && !first) {
-		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
-		if (Update_Triangulation || ellapsedIter>(0.5*PermuteInterval)) {
+		while (Update_Triangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 
+		  sleeping++;
+		boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
+		if (Debug && sleeping) cerr<<"sleeping..."<<sleeping<<endl;
+		if (Update_Triangulation || (ellapsedIter>(0.5*PermuteInterval) && backgroundCompleted)) {
 			if (Debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0) solver->Interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
@@ -112,13 +121,13 @@ void FlowEngine::action()
 			if (Debug) cerr<<"volumes initialized"<<endl;
 		}
 		else {
-			if (Debug) cerr<<"still computing solver in the background"<<endl;
+			if (Debug) cerr<<"still computing solver in the background, ellapsedIter="<<ellapsedIter<<endl;
 			ellapsedIter++;
 		}
 	} else {
 	        if (Update_Triangulation && !first) {
 			Build_Triangulation (P_zero, solver);
-			Initialize_volumes(solver); 
+			Initialize_volumes(solver);
                		Update_Triangulation = false;}
         }
         if ( velocity_profile ) /*flow->FluidVelocityProfile();*/solver->Average_Fluid_Velocity();
@@ -260,6 +269,7 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
         flow->Define_fictious_cells();
 	// For faster loops on cells define this vector
 	flow->T[flow->currentTes].cellHandles.clear();
+	flow->T[flow->currentTes].reserve(flow->T[flow->currentTes].Triangulation().number_of_finite_cells());
 	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 		flow->T[flow->currentTes].cellHandles.push_back(cell);
@@ -711,6 +721,7 @@ void PeriodicFlowEngine:: action()
 	preparePShifts();
 	setPositionsBuffer(true);
 	if (first) {
+		if (multithread) setPositionsBuffer(false);
 		cachedCell= Cell(*(scene->cell));
 		Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
 //         if ( first ) {Build_Triangulation ( P_zero ); Update_Triangulation = false; Initialize_volumes();}
@@ -855,11 +866,11 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
 
 Real PeriodicFlowEngine::Volume_cell ( Cell_handle cell )
 {
-	static const Real inv6 = 1/6.;
-	const Vector3r p0 = Body::byId (cell->vertex(0)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(0)->info().ghostShift());
-	const Vector3r p1 = Body::byId (cell->vertex(1)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(1)->info().ghostShift());
-	const Vector3r p2 = Body::byId (cell->vertex(2)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(2)->info().ghostShift());
-	const Vector3r p3 = Body::byId (cell->vertex(3)->info().id(),scene)->state->pos + makeVector3r(cell->vertex(3)->info().ghostShift());
+	static const Real inv6 = 1/6.;	
+	const Vector3r p0 = positionBufferCurrent[cell->vertex(0)->info().id()].pos + makeVector3r(cell->vertex(0)->info().ghostShift());
+	const Vector3r p1 = positionBufferCurrent[cell->vertex(1)->info().id()].pos + makeVector3r(cell->vertex(1)->info().ghostShift());
+	const Vector3r p2 = positionBufferCurrent[cell->vertex(2)->info().id()].pos + makeVector3r(cell->vertex(2)->info().ghostShift());
+	const Vector3r p3 = positionBufferCurrent[cell->vertex(3)->info().id()].pos + makeVector3r(cell->vertex(3)->info().ghostShift());
 	Real volume = inv6*((p0-p1).cross(p0-p2)).dot(p0-p3);
         if ( ! ( cell->info().volumeSign ) ) cell->info().volumeSign= ( volume>0 ) ?1:-1;
         return volume;
