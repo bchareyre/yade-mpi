@@ -49,9 +49,6 @@ except ImportError: pass; noPredicate = True
 # import SpherePack
 from _packSpheres import *
 from _packObb import *
-try:
-	from _packSpherePadder import *
-except ImportError: pass
 
 ##
 # extend _packSphere.SpherePack c++ class by this method

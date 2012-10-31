@@ -34,7 +34,7 @@ yade.%s module
 #
 # don't forget to put the module in index.rst as well!
 #
-mods={'export':[],'eudoxos':['_eudoxos'],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb','_packSpherePadder'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[]}
+mods={'export':[],'eudoxos':['_eudoxos'],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[]}
 #
 # generate documentation, in alphabetical order
 mm=mods.keys(); mm.sort()
