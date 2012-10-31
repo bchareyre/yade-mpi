@@ -67,6 +67,12 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		bool RAVERAGE;
 		int walls_id[6];
+		#define parallel_forces
+		#ifdef parallel_forces
+		int ompThreads;
+		vector< vector<const Vecteur*> > perVertexUnitForce;
+		vector< vector<const Real*> > perVertexPressure;
+		#endif
 		vector <double> Edge_Surfaces;
 		vector <pair<int,int> > Edge_ids;
 		vector <Vector3r> Edge_force_point;
@@ -109,7 +115,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
 		/// Define forces spliting drag and buoyancy terms
-		void ComputeFacetForces();
 		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk ( );
 		void MGPost ( );

@@ -93,6 +93,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	computedOnce=false;
 	minKdivKmean=0.0001;
 	maxKdivKmean=100.;
+	ompThreads=1;
 }
 
 template <class Tesselation> 
@@ -479,71 +480,8 @@ double FlowBoundingSphere<Tesselation>::MeasureTotalAveragedPressure()
   Ppond/=Vpond;
   return Ppond;
 }
-template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::ComputeFacetForces()
-{
-	RTriangulation& Tri = T[currentTes].Triangulation();
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
-	Vecteur nullVect(0,0,0);
-	bool ref = Tri.finite_cells_begin()->info().isvisited;
-	//reset forces
-	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-		v->info().forces=nullVect;
-	}
-	cout <<"WARNING: this non-cached version is using wrong fluid facet areas. Use the cached version instead"<<endl;
-	Cell_handle neighbour_cell;
-	Vertex_handle mirror_vertex;
-	for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
-// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		Cell_handle& cell = *cell_it;
-		for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j)) && cell->neighbor(j)->info().isvisited==ref) {
-				neighbour_cell = cell->neighbor(j);
-				const Vecteur& Surfk = cell->info().facetSurfaces[j];
-				//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
-				//The ratio void surface / facet surface
-				Real area = sqrt(Surfk.squared_length());
-				Vecteur facetNormal = Surfk/area;
-				const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
-				Real fluidSurfRatio = (area-crossSections[j][0]-crossSections[j][1]-crossSections[j][2])/area;
-				if (fluidSurfRatio<0) fluidSurfRatio=-fluidSurfRatio;
-				Vecteur fluidSurfk = cell->info().facetSurfaces[j]*fluidSurfRatio;
-				/// handle fictious vertex since we can get the projected surface easily here
-				if (cell->vertex(j)->info().isFictious) {
-					Real projSurf=abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
-					cell->vertex(j)->info().forces = cell->vertex(j)->info().forces -projSurf*boundary(cell->vertex(j)->info().id()).normal*cell->info().p();
-				}
-				/// handle the opposite fictious vertex (remember each facet is seen only once)
-				mirror_vertex = neighbour_cell->vertex(Tri.mirror_index(cell,j));
-				Vertex_Info& info = neighbour_cell->vertex(Tri.mirror_index(cell,j))->info();
-				if (info.isFictious) {
-					Real projSurf=abs(Surfk[boundary(info.id()).coordinate]);
-					info.forces = info.forces - projSurf*boundary(info.id()).normal*neighbour_cell->info().p();
-				}
-				/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
-				Vecteur Facet_Force = (neighbour_cell->info().p()-cell->info().p())*fluidSurfk*cell->info().solidSurfaces[j][3];
-				for (int y=0; y<3;y++) {
-					cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidSurfaces[j][y]/* + (cell->vertex(facetVertices[j][y])->info().isFictious ? 0 : facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y])*/;
-					if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
-						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces +  facetNormal*(neighbour_cell->info().p()-cell->info().p())*crossSections[j][y];
-					}
-				}
-			}
-		cell->info().isvisited=!ref;
-	}
-	if (DEBUG_OUT) {
-//		cout << "Facet scheme" <<endl;
-		Vecteur TotalForce = nullVect;
-		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-			if (!v->info().isFictious) {
-				TotalForce = TotalForce + v->info().forces;
-//				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-			} else {
-				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-//				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-			}
-		}
-		cout << "TotalForce = "<< TotalForce << endl;}
-}
+
+
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache)
 {
@@ -553,15 +491,25 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 
+	#ifdef parallel_forces
+	if (noCache) {
+		perVertexUnitForce.clear(); perVertexPressure.clear();
+// 		vector<const Vecteur*> exf; exf.reserve(20);
+// 		vector<const Real*> exp; exp.reserve(20);
+		perVertexUnitForce.resize(Tri.number_of_vertices());
+		perVertexPressure.resize(Tri.number_of_vertices());}
+	#endif
+
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
 	if (noCache) {for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
 // 	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		Cell_handle& cell = *cell_it;
+			Cell_handle& cell = *cell_it;
 			//reset cache
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
+
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
 					neighbour_cell = cell->neighbor(j);
 					const Vecteur& Surfk = cell->info().facetSurfaces[j];
@@ -595,28 +543,38 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 							cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
 						}
 					}
-				}
+					#ifdef parallel_forces
+					perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
+					perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
+					#endif
 			}
+		}
 		noCache=false;//cache should always be defined after execution of this function
 		if (onlyCache) return;
+	} else {//use cached values
+		#ifndef parallel_forces
+		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
+			
+		#else
+		#pragma omp parallel for num_threads(ompThreads)
+		for (int vn=0; vn<= T[currentTes].max_id; vn++) {
+			Vertex_handle& v = T[currentTes].vertexHandles[vn];
+// 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v){
+			const int& id =  v->info().id();
+			Vecteur tf (0,0,0);
+			int k=0;
+			for (vector<const Real*>::iterator c = perVertexPressure[id].begin(); c != perVertexPressure[id].end(); c++)
+				tf = tf + (*(perVertexUnitForce[id][k++]))*(**c);
+			v->info().forces = tf;
 		}
-	else //use cached values
-		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
-			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
-// 	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces = 0*oldForces[v->info().id()]+1*v->info().forces;
+		#endif
+	}
 	if (DEBUG_OUT) {
-// 		cout << "Facet cached scheme" <<endl;
 		Vecteur TotalForce = nullVect;
-		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)
-		{
-			if (!v->info().isFictious) {
-				TotalForce = TotalForce + v->info().forces;
-// 				cout << "real_id = " << v->info().id() << " force = " << v->info().forces << endl;
-			} else {
-				if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
-// 				cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-			}
-		}
+		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
+			if (!v->info().isFictious) TotalForce = TotalForce + v->info().forces;
+			else if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;	}
 		cout << "TotalForce = "<< TotalForce << endl;}
 }
 template <class Tesselation> 

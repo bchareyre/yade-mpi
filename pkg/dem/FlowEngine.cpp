@@ -50,6 +50,7 @@ void FlowEngine::action()
 	  backgroundSolver=solver;
 	  backgroundCompleted=true;
 	}
+	solver->ompThreads = ompThreads;
 
         timingDeltas->checkpoint ( "Triangulating" );
 	UpdateVolumes ( solver );
@@ -71,8 +72,7 @@ void FlowEngine::action()
 	solver->GaussSeidel(scene->dt);
         timingDeltas->checkpoint ( "Gauss-Seidel (includes matrix construct and factorization in single-thread mode)" );
         if ( save_mgpost ) solver->MGPost();
-        if ( !CachedForces ) solver->ComputeFacetForces();
-        else solver->ComputeFacetForcesWithCache();
+        solver->ComputeFacetForcesWithCache();
         timingDeltas->checkpoint ( "Compute_Forces" );
         ///Application of vicscous forces
         scene->forces.sync();
@@ -472,26 +472,34 @@ void FlowEngine::UpdateVolumes ( Solver& flow )
 {
         if ( Debug ) cout << "Updating volumes.............." << endl;
         Real invDeltaT = 1/scene->dt;
-
-        double newVol, dVol;
         eps_vol_max=0;
-        Real totVol=0; Real totDVol=0; Real totVol0=0; Real totVol1=0; Real totVol2=0; Real totVol3=0;
+        Real totVol=0; Real totDVol=0;
+	#ifdef YADE_OPENMP
+	const long size=flow->T[flow->currentTes].cellHandles.size();
+	#pragma omp parallel for num_threads(ompThreads>0 ? ompThreads : 1)
+	for(long i=0; i<size; i++){
+		Cell_handle& cell = flow->T[flow->currentTes].cellHandles[i];
+	#else
 	FOREACH(Cell_handle& cell, flow->T[flow->currentTes].cellHandles){
+	#endif
+		double newVol, dVol;
                 switch ( cell->info().fictious() ) {
-                case ( 3 ) : newVol = Volume_cell_triple_fictious ( cell ); totVol3+=newVol; break;
-                case ( 2 ) : newVol = Volume_cell_double_fictious ( cell ); totVol2+=newVol; break;
-                case ( 1 ) : newVol = Volume_cell_single_fictious ( cell ); totVol1+=newVol; break;
-		case ( 0 ) : newVol = Volume_cell (cell ); totVol0+=newVol; break;
-                default: newVol = 0; break;
-                }
-                totVol+=newVol;
+                	case ( 3 ) : newVol = Volume_cell_triple_fictious ( cell ); break;
+               		case ( 2 ) : newVol = Volume_cell_double_fictious ( cell ); break;
+                	case ( 1 ) : newVol = Volume_cell_single_fictious ( cell ); break;
+			case ( 0 ) : newVol = Volume_cell (cell ); break;
+                	default: newVol = 0; break;}
                 dVol=cell->info().volumeSign* ( newVol - cell->info().volume() );
-                totDVol+=dVol;
-                eps_vol_max = max ( eps_vol_max, abs ( dVol/newVol ) );
-                cell->info().dv() = dVol*invDeltaT;
+		cell->info().dv() = dVol*invDeltaT;
                 cell->info().volume() = newVol;
+		if (EpsVolPercent_RTRG>0) { //if the criterion is not used, then we skip these updates a save a LOT of time when Nthreads > 1
+			#pragma omp atomic
+			totVol+=newVol;
+			#pragma omp atomic
+                	totDVol+=abs(dVol);}
         }
-        for (unsigned int n=0; n<flow->imposedF.size();n++) {
+	if (EpsVolPercent_RTRG>0)  eps_vol_max = totDVol/totVol;
+	for (unsigned int n=0; n<flow->imposedF.size();n++) {
 		flow->IFCells[n]->info().dv()+=flow->imposedF[n].second;
 		flow->IFCells[n]->info().Pcondition=false;}
         if ( Debug ) cout << "Updated volumes, total =" <<totVol<<", dVol="<<totDVol<<endl;
