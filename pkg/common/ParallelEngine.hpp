@@ -15,8 +15,10 @@ class ParallelEngine: public Engine {
 		void slaves_set(const boost::python::list& slaves);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ParallelEngine,Engine,"Engine for running other Engine in parallel.",
 		((slaveContainer,slaves,,,"[will be overridden]"))
-		((int,ompThreads,2,,"The number of threads used by the parallel engine")),
-		/*ctor*/,
+		,
+		/*ctor*/
+		ompThreads=2;
+		,
 		/*py*/
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list),"Construct from (possibly nested) list of slaves.")
 		.add_property("slaves",&ParallelEngine::slaves_get,&ParallelEngine::slaves_set,"List of lists of Engines; each top-level group will be run in parallel with other groups, while Engines inside each group will be run sequentially, in given order.");
