@@ -9,23 +9,6 @@
 
 namespace py=boost::python;
 
-
-//#define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(OpenGLManager::self,new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(OpenGLManager::self->checker)) usleep(50000);} }
-//POST_SYNTH_EVENT(CONTROLLER,controller);
-//POST_SYNTH_EVENT(GENERATOR,generator);
-//#undef POST_SYNT_EVENT
-
-#if 0
-// event associated data will be deleted in the event handler
-void restoreGLViewerState_str(string str){string* s=new string(str); QApplication::postEvent(OpenGLManager::self,new 
-	QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_STR,(void*)s));}
-void restoreGLViewerState_num(int dispStateNo){
-		int* i=new int(dispStateNo);
-		QApplication::postEvent(OpenGLManager::self,new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_NUM,(void*)i));
-}
-#endif
-
-
 qglviewer::Vec tuple2vec(py::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){py::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 py::tuple vec2tuple(qglviewer::Vec v){return py::make_tuple(v[0],v[1],v[2]);};
 
@@ -86,9 +69,6 @@ BOOST_PYTHON_MODULE(_GLViewer){
 	
 	OpenGLManager* glm=new OpenGLManager(); // keep this singleton object forever
 	glm->emitStartTimer();
-
-	// HACK: register SnapshotEngine here
-	SnapshotEngine se; se.pyRegisterClass(py::scope());
 
 	py::def("View",createView,"Create a new 3d view.");
 	py::def("center",centerViews,"Center all views.");
