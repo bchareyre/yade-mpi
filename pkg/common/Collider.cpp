@@ -21,8 +21,8 @@ bool Collider::mayCollide(const Body* b1, const Body* b2){
 		!b1->isClump() && !b2->isClump() &&
 		// masks must have at least 1 bit in common
 		(b1->groupMask & b2->groupMask)!=0 &&
-		//
-		!( (b1->groupMask == b2->groupMask) && ( (int) count(avoidSelfInteractionMasks.begin(), avoidSelfInteractionMasks.end(),b1->groupMask) > 0))
+		// avoid contact between particles having the same mask inside the "avoidSelfInteractionMasks" vector.
+ 		!( (b1->groupMask == b2->groupMask) && ( (int) count(avoidSelfInteractionMasks.begin(), avoidSelfInteractionMasks.end(),b1->groupMask) > 0))
 	;
 }
 

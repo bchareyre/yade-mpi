@@ -16,7 +16,7 @@
 class GridConnection: public Sphere{
 public:
 		virtual ~GridConnection();
-		float getLength();
+		Real getLength();
 		Vector3r getSegment();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(GridConnection,Sphere,"Cylinder geometry of a connection between two :yref:`Node`.",
 		((shared_ptr<Body> , node1 , ,,))

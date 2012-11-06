@@ -22,10 +22,10 @@ void GridNode::addConnection(shared_ptr<Body> GC){
 }
 
 Vector3r GridConnection::getSegment(){
-	return node2->state->pos_get() - node1->state->pos_get();
+	return node2->state->pos - node1->state->pos;
 }
 
-float GridConnection::getLength(){
+Real GridConnection::getLength(){
 	return getSegment().norm();
 }
 
@@ -70,41 +70,169 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	//const State*    gridCoSt  = YADE_CAST<const State*>(&state2);
 	Sphere*         sphere    = YADE_CAST<Sphere*>(cm1.get());
 	GridConnection* gridCo    = YADE_CAST<GridConnection*>(cm2.get());
-	//GridNode*       gridNo1   = YADE_CAST<GridNode*>(gridCo->node1->shape.get());
-	//GridNode*       gridNo2   = YADE_CAST<GridNode*>(gridCo->node2->shape.get());
+	GridNode*       gridNo1   = YADE_CAST<GridNode*>(gridCo->node1->shape.get());
+	GridNode*       gridNo2   = YADE_CAST<GridNode*>(gridCo->node2->shape.get());
 	State*          gridNo1St = YADE_CAST<State*>(gridCo->node1->state.get());
 	State*          gridNo2St = YADE_CAST<State*>(gridCo->node2->state.get());
 	bool isNew = !c->geom;
 	shared_ptr<ScGridCoGeom> scm;
 	if (!isNew) scm = YADE_PTR_CAST<ScGridCoGeom>(c->geom);
+	else {scm = shared_ptr<ScGridCoGeom>(new ScGridCoGeom());}
 	Vector3r segt = gridCo->getSegment();
-	float len = gridCo->getLength();
+	Real len = gridCo->getLength();
 	Vector3r branch = sphereSt->pos - gridNo1St->pos;
-	float relPos = branch.dot(segt)/(len*len);
-	Vector3r fictiousPos=gridNo1St->pos+relPos*segt;
-	Vector3r branchP = fictiousPos - sphereSt->pos;
- 	float dist = branchP.norm();
+	Vector3r branchN = sphereSt->pos - gridNo2St->pos;
+	for(int i=0;i<3;i++){
+		if(abs(branch[i])<1e-14) branch[i]=0.0;
+		if(abs(branchN[i])<1e-14) branchN[i]=0.0;
+	}
+	Real relPos = branch.dot(segt)/(len*len);
+// 	cout<<branch<<"     "<<sphereSt->pos<<"     "<<gridNo1St->pos<<"     "<<relPos<<endl;
+// 	if(scm->isDuplicate==1 && scm->trueInt!=c->id2) {scm->isDuplicate=2;cout<<"Skipping contact geometry of "<<c->id1<<"-"<<c->id2<<" isDuplicate=2"<<endl;return true;}
 	
-	if(isNew){
-		if(dist > (sphere->radius + gridCo->radius)) return false;
-		else {scm=shared_ptr<ScGridCoGeom>(new ScGridCoGeom()); c->geom=scm;}
+	if(scm->isDuplicate==2 && scm->trueInt!=c->id2)return true;
+	scm->isDuplicate=0;
+	scm->trueInt=-1;
+	
+	if(relPos<=0){	// if the sphere projection is BEFORE the segment ...
+		if(gridNo1->ConnList.size()>1){//	if the node is not an extremity of the Grid (only one connection)
+			for(int unsigned i=0;i<gridNo1->ConnList.size();i++){	// ... loop on all the Connections of the same Node ...
+				GridConnection* GC = (GridConnection*)gridNo1->ConnList[i]->shape.get();
+				if(GC==gridCo)continue;//	self comparison.
+				Vector3r segtCandidate1 = GC->node1->state->pos - gridNo1St->pos; // (be sure of the direction of segtPrev to compare relPosPrev.)
+				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo1St->pos;
+				Vector3r segtPrev = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
+				for(int j=0;j<3;j++){
+					if(abs(segtPrev[j])<1e-14) segtPrev[j]=0.0;
+				}
+				Real relPosPrev = (branch.dot(segtPrev))/(segtPrev.norm()*segtPrev.norm());
+				// ... and check whether the sphere projection is before the neighbours connections too.
+				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
+// 				cout<<relPosPrev<<endl;
+				if(relPosPrev<0){ //the sphere projection is outside the current Connection AND this neighbour connection. Create the interaction only if the neighbour doesn't did it before.
+					if(intr && intr->isReal() && isNew) return false;
+					if(intr && intr->isReal() && !isNew) {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
+				}
+				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here. FIXME:follow a sliding contact.
+					if (isNew)return false;
+					//else {cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ; scm->isDuplicate=1 ; scm->trueInt=-1 ;return true;}
+				}
+			}
+		}
 	}
-	if(dist <= (sphere->radius + gridCo->radius)){
-		scm->refR1=sphere->radius;	//FIXME don't know why I have to do that ...
-		scm->refR2=gridCo->radius;
-		scm->id3=gridCo->node1->getId();
- 		scm->id4=gridCo->node2->getId();
-		scm->relPos=relPos;
-		Vector3r normal=branchP/dist;
-		scm->penetrationDepth=sphere->radius+gridCo->radius-dist;
-		scm->fictiousState.pos = gridNo1St->pos+segt*relPos;
-		scm->fictiousState.vel = (1-relPos)*gridNo1St->vel + relPos*gridNo2St->vel;
-		scm->fictiousState.angVel =
-			((1-relPos)*gridNo1St->angVel + relPos*gridNo2St->angVel).dot(segt/len)*segt/len //twist part : interpolated
-			+ segt.cross(gridNo2St->vel - gridNo1St->vel);// non-twist part : defined from nodes velocities
-		scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
-		scm->precompute(state1,scm->fictiousState,scene,c,normal,isNew,shift2,true);//use sphere-sphere precompute (with a virtual sphere)
+	
+	//Exactly the same but in the case the sphere projection is AFTER the segment.
+	else if(relPos>=1){
+		if(gridNo2->ConnList.size()>1){
+			for(int unsigned i=0;i<gridNo2->ConnList.size();i++){
+				GridConnection* GC = (GridConnection*)gridNo2->ConnList[i]->shape.get();
+				if(GC==gridCo)continue;//	self comparison.
+				Vector3r segtCandidate1 = GC->node1->state->pos - gridNo2St->pos;
+				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo2St->pos;
+				Vector3r segtNext = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
+				for(int j=0;j<3;j++){
+					if(abs(segtNext[j])<1e-14) segtNext[j]=0.0;
+				}
+				Real relPosNext = (branchN.dot(segtNext))/(segtNext.norm()*segtNext.norm());
+				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo2->ConnList[i]->getId());
+// 				cout<<relPosNext<<endl;
+				if(relPosNext<0){ //the sphere projection is outside the current Connection AND this neighbour connection. Create the interaction only if the neighbour doesn't did it before.
+					if(intr && intr->isReal() && isNew) return false;
+					if(intr && intr->isReal() && !isNew) {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
+				}
+				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
+					if (isNew)return false;
+					//else {cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ; scm->isDuplicate=1 ; scm->trueInt=-1 ; return true;}
+				}
+			}
+		}
 	}
+	
+	else if (isNew && relPos<0.5){
+		if(gridNo1->ConnList.size()>1){//	if the node is not an extremity of the Grid (only one connection)
+			for(int unsigned i=0;i<gridNo1->ConnList.size();i++){	// ... loop on all the Connections of the same Node ...
+				GridConnection* GC = (GridConnection*)gridNo1->ConnList[i]->shape.get();
+				if(GC==gridCo)continue;//	self comparison.
+				Vector3r segtCandidate1 = GC->node1->state->pos - gridNo1St->pos; // (be sure of the direction of segtPrev to compare relPosPrev.)
+				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo1St->pos;
+				Vector3r segtPrev = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
+				for(int j=0;j<3;j++){
+					if(abs(segtPrev[j])<1e-14) segtPrev[j]=0.0;
+				}
+				Real relPosPrev = (branch.dot(segtPrev))/(segtPrev.norm()*segtPrev.norm());
+				if(relPosPrev<=0){ //the sphere projection is inside the current Connection and outide this neighbour connection.
+					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
+					if( intr && intr->isReal() ){// if an ineraction exist between the sphere and the previous connection, import parameters.
+						//cout<<"Copying contact geom and phys from "<<intr->id1<<"-"<<intr->id2<<" to here ("<<c->id1<<"-"<<c->id2<<")"<<endl;
+						scm=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
+						c->geom=scm;
+						c->phys=intr->phys;
+						scm->trueInt=c->id2;
+						scm->isDuplicate=2;	//command the old contact deletion.
+						isNew=0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	else if (isNew && relPos>0.5){
+		if(gridNo2->ConnList.size()>1){
+			for(int unsigned i=0;i<gridNo2->ConnList.size();i++){
+				GridConnection* GC = (GridConnection*)gridNo2->ConnList[i]->shape.get();
+				if(GC==gridCo)continue;//	self comparison.
+				Vector3r segtCandidate1 = GC->node1->state->pos - gridNo2St->pos;
+				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo2St->pos;
+				Vector3r segtNext = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
+				for(int j=0;j<3;j++){
+					if(abs(segtNext[j])<1e-14) segtNext[j]=0.0;
+				}
+				Real relPosNext = (branchN.dot(segtNext))/(segtNext.norm()*segtNext.norm());
+				if(relPosNext<=0){ //the sphere projection is inside the current Connection and outide this neighbour connection.
+					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo2->ConnList[i]->getId());
+					if( intr && intr->isReal() ){// if an ineraction exist between the sphere and the previous connection, import parameters.
+						//cout<<"Copying contact geom and phys from "<<intr->id1<<"-"<<intr->id2<<" to here ("<<c->id1<<"-"<<c->id2<<")"<<endl;
+						scm=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
+						c->geom=scm;
+						c->phys=intr->phys;
+						scm->trueInt=c->id2;
+						scm->isDuplicate=2;	//command the old contact deletion.
+						isNew=0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	relPos=relPos<0?0:relPos;	//min value of relPos : 0
+	relPos=relPos>1?1:relPos;	//max value of relPos : 1
+	Vector3r fictiousPos=gridNo1St->pos+relPos*segt;
+	//cout<<fictiousPos<<endl;
+	Vector3r branchF = fictiousPos - sphereSt->pos;
+ 	Real dist = branchF.norm();
+
+	if(isNew && (dist > (sphere->radius + gridCo->radius))) return false;
+	//	Create the geometry :
+	if(isNew) c->geom=scm;
+	scm->radius1=sphere->radius;
+	scm->radius2=gridCo->radius;
+	scm->id3=gridCo->node1->getId();
+	scm->id4=gridCo->node2->getId();
+	scm->relPos=relPos;
+	Vector3r normal=branchF/dist;
+	scm->penetrationDepth = sphere->radius+gridCo->radius-dist;
+// 	cout<<scene->iter<<" "<<scm->penetrationDepth<<endl;
+	scm->fictiousState.pos = fictiousPos;
+	scm->contactPoint = sphereSt->pos + normal*(scm->radius1 - 0.5*scm->penetrationDepth);
+	scm->fictiousState.vel = (1-relPos)*gridNo1St->vel + relPos*gridNo2St->vel;
+	scm->fictiousState.angVel =
+		((1-relPos)*gridNo1St->angVel + relPos*gridNo2St->angVel).dot(segt/len)*segt/len //twist part : interpolated
+		+ segt.cross(gridNo2St->vel - gridNo1St->vel);// non-twist part : defined from nodes velocities
+	//scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
+	scm->precompute(state1,scm->fictiousState,scene,c,normal,isNew,shift2,true);//use sphere-sphere precompute (with a virtual sphere)
+
 	return true;
 }
 
@@ -139,8 +267,12 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 	if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) {/*cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;*/scene->interactions->requestErase(contact);}
-		return;}
+			if (geom->isDuplicate==2) {
+				//cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
+				scene->interactions->requestErase(contact);
+			}
+			return;
+		}
 	}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
@@ -176,12 +308,8 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 		Vector3r twist = (geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force);
 		scene->forces.addForce(geom->id3,(geom->relPos-1)*force);
 		scene->forces.addTorque(geom->id3,(1-geom->relPos)*twist);
-		if (geom->relPos) { //else we are on node (or on last node - and id3 is junk)
-			scene->forces.addForce(geom->id3,(geom->relPos-1)*force);
-			scene->forces.addTorque(geom->id3,(1-geom->relPos)*twist);
-			scene->forces.addForce(geom->id4,(-geom->relPos)*force);
-			scene->forces.addTorque(geom->id4,geom->relPos*twist);
-		}
+		scene->forces.addForce(geom->id4,(-geom->relPos)*force);
+		scene->forces.addTorque(geom->id4,geom->relPos*twist);
 	}
 // 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 	else {//FIXME : periodicity not implemented here :
@@ -202,12 +330,11 @@ void Bo1_GridConnection_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>&
 	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
 	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	if(!scene->isPeriodic){
-		const Vector3r& O = se3.position;
-		Vector3r O2 = se3.position+GC->getSegment();
-		aabb->min=aabb->max=O;
+		Vector3r O = YADE_CAST<State*>(GC->node1->state.get())->pos;
+		Vector3r O2 = YADE_CAST<State*>(GC->node2->state.get())->pos;
 		for (int k=0;k<3;k++){
-			aabb->min[k]=min(aabb->min[k],min(O[k],O2[k])-GC->radius);
-			aabb->max[k]=max(aabb->max[k],max(O[k],O2[k])+GC->radius);
+			aabb->min[k]=min(O[k],O2[k])-GC->radius;
+			aabb->max[k]=max(O[k],O2[k])+GC->radius;
 		}
 		return;
 	}
