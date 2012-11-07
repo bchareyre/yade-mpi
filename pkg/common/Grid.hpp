@@ -21,6 +21,8 @@ public:
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(GridConnection,Sphere,"Cylinder geometry of a connection between two :yref:`Node`.",
 		((shared_ptr<Body> , node1 , ,,))
 		((shared_ptr<Body> , node2 , ,,))
+		((bool, periodic, false,,"true if two nodes from different periods are connected"))
+		((Vector3i , cellDist , (0,0,0),,))
   		//((Quaternionr,chainedOrientation,Quaternionr::Identity(),,"Deviation of node1 orientation from node2 vector"))
 		,createIndex();/*ctor*/
 		);

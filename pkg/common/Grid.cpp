@@ -22,7 +22,10 @@ void GridNode::addConnection(shared_ptr<Body> GC){
 }
 
 Vector3r GridConnection::getSegment(){
-	return node2->state->pos - node1->state->pos;
+	if (!periodic) return node2->state->pos - node1->state->pos;
+ 	//else
+	const Scene* scene=Omega::instance().getScene().get();
+	return node2->state->pos + scene->cell->hSize*cellDist.cast<Real>() - node1->state->pos;
 }
 
 Real GridConnection::getLength(){
@@ -361,17 +364,18 @@ void Gl1_GridConnection::go(const shared_ptr<Shape>& cm, const shared_ptr<State>
 	GridConnection *GC=static_cast<GridConnection*>(cm.get());
 	Real r=GC->radius;
 	Real length=GC->getLength();
-	Vector3r segt = GC->node2->state->pos - GC->node1->state->pos;
-	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
-	
 	const shared_ptr<Interaction> intr = scene->interactions->find((int)GC->node1->getId(),(int)GC->node2->getId());
-	
+	Vector3r segt = GC->node2->state->pos - GC->node1->state->pos;
+	if (scene->isPeriodic) segt+=scene->cell->intrShiftPos(intr->cellDist);
+	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+
 	glColor3v(cm->color);
 	if(glutNormalize) glPushAttrib(GL_NORMALIZE);
 // 	glPushMatrix();
 	Quaternionr shift;
 	shift.setFromTwoVectors(Vector3r::UnitZ(),segt);
 	if(intr){drawCylinder(wire || wire2, r,length,shift);}
+// 	if (intr && scene->isPeriodic) { glTranslatef(-segt[0],-segt[1],-segt[2]); drawCylinder(wire || wire2, r,length,-shift);}
 	if(glutNormalize) glPopAttrib();
 // 	glPopMatrix();
 	return;

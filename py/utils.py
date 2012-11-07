@@ -256,7 +256,7 @@ def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highli
 	b.mask=0	#avoid contact detection with the nodes. Manual interaction will be set for them in "gridConnection" below.
 	return b
 
-def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask="none"):
+def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask="none",cellDist=None):
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
@@ -267,7 +267,14 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos,dynamic=False,fixed=True)
 	b.aspherical=False
 	i=createInteraction(id1,id2)
-	i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
+	if cellDist != None:
+		if not O.periodic:print "Error, trying to generate a periodic connection in non-periodic scene."
+		i.cellDist = cellDist
+		i.phys.unp= -(sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
+		b.shape.periodic=True
+		b.shape.cellDist=i.cellDist
+	else:
+		i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius	
 	i.geom.connectionBody=b
 	if(mask=="none"):print "Error, you need to specify a valid mask number for the gridConnection"
 	else:
