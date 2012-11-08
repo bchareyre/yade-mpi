@@ -90,10 +90,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 		if(abs(branchN[i])<1e-14) branchN[i]=0.0;
 	}
 	Real relPos = branch.dot(segt)/(len*len);
-// 	cout<<branch<<"     "<<sphereSt->pos<<"     "<<gridNo1St->pos<<"     "<<relPos<<endl;
-// 	if(scm->isDuplicate==1 && scm->trueInt!=c->id2) {scm->isDuplicate=2;cout<<"Skipping contact geometry of "<<c->id1<<"-"<<c->id2<<" isDuplicate=2"<<endl;return true;}
-	
-	if(scm->isDuplicate==2 && scm->trueInt!=c->id2)return true;
+	if(scm->isDuplicate==2 && scm->trueInt!=c->id2)return true;	//the contact will be deleted into the Law.
 	scm->isDuplicate=0;
 	scm->trueInt=-1;
 	
@@ -111,14 +108,17 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				Real relPosPrev = (branch.dot(segtPrev))/(segtPrev.norm()*segtPrev.norm());
 				// ... and check whether the sphere projection is before the neighbours connections too.
 				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
-// 				cout<<relPosPrev<<endl;
-				if(relPosPrev<0){ //the sphere projection is outside the current Connection AND this neighbour connection. Create the interaction only if the neighbour doesn't did it before.
+				if(relPosPrev<=0){ //if the sphere projection is outside both the current Connection AND this neighbouring connection, then create the interaction if the neighbour did not already do it before.
 					if(intr && intr->isReal() && isNew) return false;
 					if(intr && intr->isReal() && !isNew) {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
 				}
-				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here. FIXME:follow a sliding contact.
+				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
 					if (isNew)return false;
-					//else {cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ; scm->isDuplicate=1 ; scm->trueInt=-1 ;return true;}
+					else {
+						//cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ;
+						scm->isDuplicate=1;
+						scm->trueInt=-1;
+						return true;}
 				}
 			}
 		}
@@ -138,20 +138,22 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				}
 				Real relPosNext = (branchN.dot(segtNext))/(segtNext.norm()*segtNext.norm());
 				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo2->ConnList[i]->getId());
-// 				cout<<relPosNext<<endl;
-				if(relPosNext<0){ //the sphere projection is outside the current Connection AND this neighbour connection. Create the interaction only if the neighbour doesn't did it before.
+				if(relPosNext<=0){ //if the sphere projection is outside both the current Connection AND this neighbouring connection, then create the interaction if the neighbour did not already do it before.
 					if(intr && intr->isReal() && isNew) return false;
 					if(intr && intr->isReal() && !isNew) {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
 				}
 				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
 					if (isNew)return false;
-					//else {cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ; scm->isDuplicate=1 ; scm->trueInt=-1 ; return true;}
+					else {//cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ;
+						scm->isDuplicate=1 ;
+						scm->trueInt=-1 ;
+						return true;}
 				}
 			}
 		}
 	}
 	
-	else if (isNew && relPos<0.5){
+	else if (isNew && relPos<=0.5){
 		if(gridNo1->ConnList.size()>1){//	if the node is not an extremity of the Grid (only one connection)
 			for(int unsigned i=0;i<gridNo1->ConnList.size();i++){	// ... loop on all the Connections of the same Node ...
 				GridConnection* GC = (GridConnection*)gridNo1->ConnList[i]->shape.get();
@@ -212,11 +214,10 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	relPos=relPos<0?0:relPos;	//min value of relPos : 0
 	relPos=relPos>1?1:relPos;	//max value of relPos : 1
 	Vector3r fictiousPos=gridNo1St->pos+relPos*segt;
-	//cout<<fictiousPos<<endl;
 	Vector3r branchF = fictiousPos - sphereSt->pos;
  	Real dist = branchF.norm();
-
 	if(isNew && (dist > (sphere->radius + gridCo->radius))) return false;
+	
 	//	Create the geometry :
 	if(isNew) c->geom=scm;
 	scm->radius1=sphere->radius;
@@ -226,16 +227,13 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	scm->relPos=relPos;
 	Vector3r normal=branchF/dist;
 	scm->penetrationDepth = sphere->radius+gridCo->radius-dist;
-// 	cout<<scene->iter<<" "<<scm->penetrationDepth<<endl;
 	scm->fictiousState.pos = fictiousPos;
 	scm->contactPoint = sphereSt->pos + normal*(scm->radius1 - 0.5*scm->penetrationDepth);
 	scm->fictiousState.vel = (1-relPos)*gridNo1St->vel + relPos*gridNo2St->vel;
 	scm->fictiousState.angVel =
 		((1-relPos)*gridNo1St->angVel + relPos*gridNo2St->angVel).dot(segt/len)*segt/len //twist part : interpolated
 		+ segt.cross(gridNo2St->vel - gridNo1St->vel);// non-twist part : defined from nodes velocities
-	//scm->contactPoint = sphereSt->pos+normal*(sphere->radius-0.5*scm->penetrationDepth);
 	scm->precompute(state1,scm->fictiousState,scene,c,normal,isNew,shift2,true);//use sphere-sphere precompute (with a virtual sphere)
-
 	return true;
 }
 

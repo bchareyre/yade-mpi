@@ -276,10 +276,9 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	else:
 		i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius	
 	i.geom.connectionBody=b
-	if(mask=="none"):print "Error, you need to specify a valid mask number for the gridConnection"
-	else:
-		for i in O.engines:
-			if(type(i).__name__=="InsertionSortCollider"):i.avoidSelfInteractionMasks=[mask]
+	for i in O.engines:
+			if(type(i).__name__=="InsertionSortCollider" and i.avoidSelfInteractionMask==0):
+				print "Warning, don't forget to set InsertionSortCollider.avoidSelfInteractionMask to avoid GridConnection - GridConnection interactions."
 	b.mask=mask
 	return b
 	
