@@ -731,12 +731,12 @@ void PeriodicFlowEngine:: action()
 	if (first) {
 		if (multithread) setPositionsBuffer(false);
 		cachedCell= Cell(*(scene->cell));
-		Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver;}
+		Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver; backgroundCompleted=true;}
 //         if ( first ) {Build_Triangulation ( P_zero ); Update_Triangulation = false; Initialize_volumes();}
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>PermuteInterval ) {
+        if ( EpsVolPercent_RTRG>0 && Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>PermuteInterval ) {
                 Update_Triangulation = true;
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;
