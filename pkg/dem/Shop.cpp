@@ -853,13 +853,13 @@ py::list Shop::getBodyIdsContacts(Body::id_t bodyID) {
 	return ret;
 }
 
-void Shop::setContactFriction(Real angle){
+void Shop::setContactFriction(Real angleRad){
 	Scene* scene = Omega::instance().getScene().get();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if(b->isClump()) continue;
 		if (b->isDynamic())
-		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = angle;
+		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = angleRad;
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
 		if (!ii->isReal()) continue;
