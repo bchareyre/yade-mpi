@@ -139,7 +139,7 @@ class Shop{
 		static py::list getBodyIdsContacts(Body::id_t bodyID=-1);
 
 		//! Set material and contact friction to the given value, non-dynamic bodies are not affected
-		static void setContactFriction(Real angleDegree);
+		static void setContactFriction(Real angle);
 
 		//! Homothetic change of sizes of spheres and clumps
 		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly);
