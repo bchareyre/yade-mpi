@@ -189,6 +189,6 @@ void TriaxialCompressionEngine::action()
 
 void TriaxialCompressionEngine::setContactProperties(Real frictionDegree)
 {
-	Shop::setContactFriction(frictionDegree*180.0/Mathr::PI);
+	Shop::setContactFriction(frictionDegree*Mathr::PI/180.0);
 }
 
