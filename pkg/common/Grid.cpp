@@ -1,3 +1,10 @@
+/*************************************************************************
+*  Copyright (C) 2012 by François Kneib   francois.kneib@gmail.com       *
+*  Copyright (C) 2012 by Bruno Chareyre   bruno.chareyre@hmg.inpg.fr     *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
 #include "Grid.hpp"
 #ifdef YADE_OPENGL
 	#include<yade/lib/opengl/OpenGLWrapper.hpp>
@@ -390,10 +397,10 @@ void Gl1_GridConnection::drawCylinder(bool wire, Real radius, Real length, const
    glRotatef(aa.angle()*180.0/Mathr::PI,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
    gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
    gluQuadricOrientation(quadObj, (GLenum) GLU_INSIDE);
-   glutSolidSphere(radius,glutSlices,glutStacks);
+   //glutSolidSphere(radius,glutSlices,glutStacks);
    glTranslatef(0.0,0.0,length);
 
-   glutSolidSphere(radius,glutSlices,glutStacks);
+   //glutSolidSphere(radius,glutSlices,glutStacks);
 //    gluDisk(quadObj,0.0,radius,glutSlices,_loops);
    gluDeleteQuadric(quadObj);
    glPopMatrix();

@@ -248,8 +248,9 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1):
 	b=Body()
 	b.shape=GridNode(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
-	V=(4./3)*math.pi*radius**3
-	geomInert=(2./5.)*V*radius**2
+	#V=(4./3)*math.pi*radius**3	# will be overriden by the connection
+	V=0.
+	geomInert=(2./5.)*V*radius**2	# will be overriden by the connection
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=center,dynamic=dynamic,fixed=fixed)
 	b.aspherical=False
 	b.bounded=False
@@ -263,8 +264,15 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	b.shape.node1=sph1 ; b.shape.node2=sph2
 	sph1.shape.addConnection(b) ; sph2.shape.addConnection(b)
 	segt=sph2.state.pos - sph1.state.pos
-	V=segt.norm()*math.pi*radius**2 + 4./3.*math.pi*radius**3
+	L=segt.norm()
+	V=0.5*L*math.pi*radius**2
+	geomInert=(2./5.)*V*radius**2
 	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos,dynamic=False,fixed=True)
+	sph1.state.mass = sph1.state.mass + V*b.material.density
+	sph2.state.mass = sph2.state.mass + V*b.material.density
+	for i in [0,1,2]:
+		sph1.state.inertia[i] = sph1.state.inertia[i] + geomInert*b.material.density
+		sph2.state.inertia[i] = sph2.state.inertia[i] + geomInert*b.material.density
 	b.aspherical=False
 	i=createInteraction(id1,id2)
 	if cellDist != None:
@@ -276,6 +284,13 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	else:
 		i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius	
 	i.geom.connectionBody=b
+	I=math.pi*(2.*radius)**4/64.
+	E=sph1.material.young
+	i.phys.kn=E*math.pi*(radius**2)/L
+	i.phys.kr=2.*E*I/L
+	i.phys.ks=12.*E*I/(L**3)
+	G=E/(2.*(1+sph1.material.poisson))
+	i.phys.ktw=2.*I*G/L
 	for i in O.engines:
 			if(type(i).__name__=="InsertionSortCollider" and i.avoidSelfInteractionMask==0):
 				print "Warning, don't forget to set InsertionSortCollider.avoidSelfInteractionMask to avoid GridConnection - GridConnection interactions."
