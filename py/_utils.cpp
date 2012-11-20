@@ -457,6 +457,39 @@ void setNewVerticesOfFacet(const shared_ptr<Body>& b, const Vector3r& v1, const 
 	b->state->pos = center;
 }
 
+py::list intrsOfEachBody() {
+	py::list ret, temp;
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	size_t n = rb->bodies->size();
+	// create list of size len(O.bodies) full of zeros
+	for (int i=0; i<n; i++) {
+		ret.append(py::list());
+	}
+	// loop over all interactions and fill the list ret
+	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions) {
+		temp = py::extract<py::list>(ret[i->getId1()]);
+		temp.append( (i->isReal())? i : shared_ptr<Interaction>() );
+		//temp = py::extract<py::list>(ret[i->getId2()]);
+		//temp.append( (i->isReal())? i : NULL);
+	}
+}
+
+py::list numIntrsOfEachBody() {
+	py::list ret;
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	size_t n = rb->bodies->size();
+	// create list of size len(O.bodies) full of zeros
+	for (int i=0; i<n; i++) {
+		ret.append(0);
+	}
+	// loop over all interactions and fill the list ret
+	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions) {
+		if (!i->isReal()) continue;
+		ret[i->getId1()] += 1;
+		ret[i->getId2()] += 1;
+	}
+}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -513,4 +546,6 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("setNewVerticesOfFacet",setNewVerticesOfFacet,(py::arg("b"),py::arg("v1"),py::arg("v2"),py::arg("v3")),"Sets new vertices (in global coordinates) to given facet.");
 	py::def("setContactFriction",Shop::setContactFriction,py::arg("angleRad"),"Modify the friction angle (in radians) inside the material classes and existing contacts. The friction for non-dynamic bodies is not modified.");
 	py::def("growParticles",Shop::growParticles,(py::args("multiplier"), py::args("updateMass")=true, py::args("dynamicOnly")=true), "Change the size of spheres and sphere clumps by the multiplier. If updateMass=True, then the mass is updated. dynamicOnly=True is mandatory in many cases since in current implementation the function would crash on the non-spherical and non-dynamic bodies (e.g. facets, boxes, etc.)");
+	py::def("intrsOfEachBody",intrsOfEachBody,"returns list of lists of interactions of each body");
+	py::def("numIntrsOfEachBody",numIntrsOfEachBody,"returns list of number of interactions of each body");
 }

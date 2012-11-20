@@ -4,7 +4,7 @@
 from yade import pack, plot
 
 # create some material
-O.materials.append(CpmMat(young=25e9,frictionAngle=.7,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,crackOpening=5e-6))
+O.materials.append(CpmMat(young=25e9,frictionAngle=.7,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,relDuctility=30))
 
 # create periodic assembly of particles
 initSize=1.2
@@ -28,38 +28,44 @@ nSteps=4000
 
 O.dt=utils.PWaveTimeStep()/2
 EnlargeFactor=1.5
+EnlargeFactor=1.0
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=EnlargeFactor,label='bo1s')]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=EnlargeFactor,label='ig2ss')],
-		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_Dem3DofGeom_CpmPhys_Cpm()]),
+		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=EnlargeFactor,label='ig2ss')],
+		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_ScGeom_CpmPhys_Cpm()]),
 	NewtonIntegrator(),
-	Peri3dController(	goal=(10e-4,-3e-4,0, -5e6,3e-4,2e6), # Vector6 of prescribed final values
-							stressMask=0b101100,    # prescribed ex,ey,sz,syz,ezx,sxy;   e..strain;  s..stress
+	Peri3dController(
+							#goal=(10e-4,-3e-4,0, -5e6,3e-4,2e6), # Vector6 of prescribed final values
+							#stressMask=0b101100,    # prescribed ex,ey,sz,syz,ezx,sxy;   e..strain;  s..stress
+							goal = (-10e-4,0,0, 0,0,0),
+							stressMask = 0b000000,
 							nSteps=nSteps, 			# how many time steps the simulation will last
 							# after reaching nSteps do doneHook action
-							doneHook='print "Simulation with Peri3dController finished."; O.pause()',
+							doneHook='print "Simulation with Peri3dController finished."; pause()',
 
 							# the prescribed path (step,value of stress/strain) can be defined in absolute values
-							xxPath=[(465,5e-4),(934,-5e-4),(1134,10e-4)],
+							#xxPath=[(465,5e-4),(934,-5e-4),(1134,10e-4)],
 							# or in relative values
-							yyPath=[(2,4),(7,-2),(11,0),(14,4)],
+							#yyPath=[(2,4),(7,-2),(11,0),(14,4)],
 							# if the goal value is 0, the absolute stress/strain values are always considered (step values remain relative)
-							zzPath=[(5,-1e7),(10,0)],
+							#zzPath=[(5,-1e7),(10,0)],
 							# if ##Path is not explicitly defined, it is considered as linear function between (0,0) and (nSteps,goal)
 							# as in yzPath and xyPath
 							# the relative values are really relative (zxPath gives the same - except of the sign from goal value - result as yyPath)
-							zxPath=[(4,2),(14,-1),(22,0),(28,2)],
-							xyPath=[(1,1),(2,-1),(3,1),(4,-1),(5,1)],
+							#zxPath=[(4,2),(14,-1),(22,0),(28,2)],
+							#xyPath=[(1,1),(2,-1),(3,1),(4,-1),(5,1)],
 							# variables used in the first step
 							label='p3d'
 							),
 	PyRunner(command='plotAddData()',iterPeriod=1),
+	PyRunner(command='print p3d.stress[0], p3d.strain[0]',iterPeriod=1),
 ]
 
-O.step()
-#bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
+#O.step()
+#bo1s.aabbEnlargeFactor=ig2ss.interactionDetectionFactor=1.
 
-O.run(); #O.wait()
-plot.plot(subPlots=False)
+#O.run(1,True)
+#O.run(); #O.wait()
+#plot.plot(subPlots=False)

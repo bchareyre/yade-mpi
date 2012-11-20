@@ -401,9 +401,10 @@ void Peri3dController::action(){
 	   multiplying by time to obtain strain increment and adding it to nonrot (current strain in local coordinates)*/
 	nonrot += rot.transpose()*(epsilonRate*dt)*rot;
 	Matrix3r& velGrad=scene->cell->velGrad;
-	// compute new trsf as rot*nonrot, substract actual trsf (= trsf increment), divide by dt (=trsf rate = velGrad
-	//trsf = rot*nonrot;
-	//velGrad = (rot*nonrot - trsf)/dt;
+	// compute velGrad:
+	//   trsf = rot*nonrot
+	//   dTrsf = dt*velGrad
+	//   trsfNew = trsf + dTrsf*trsf = (I+dTrsf)*trsf = (I+dt*velGrad)*trsf   ->   velGrad
 	velGrad = ((rot*nonrot)*trsf.inverse()- Matrix3r::Identity()) / dt ;
 	progress += srCorr/nSteps;
 
