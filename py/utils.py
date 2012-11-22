@@ -290,9 +290,6 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	i.phys.ks=12.*E*I/(L**3)
 	G=E/(2.*(1+sph1.material.poisson))
 	i.phys.ktw=2.*I*G/L
-	for i in O.engines:
-			if(type(i).__name__=="InsertionSortCollider" and i.avoidSelfInteractionMask==0):
-				print "Warning, don't forget to set InsertionSortCollider.avoidSelfInteractionMask to avoid GridConnection - GridConnection interactions."
 	b.mask=mask
 	return b
 	
