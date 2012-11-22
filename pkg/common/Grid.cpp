@@ -90,8 +90,9 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	else {scm = shared_ptr<ScGridCoGeom>(new ScGridCoGeom());}
 	Vector3r segt = gridCo->getSegment();
 	Real len = gridCo->getLength();
-	Vector3r branch = sphereSt->pos - gridNo1St->pos;
-	Vector3r branchN = sphereSt->pos - gridNo2St->pos;
+	Vector3r spherePos = sphereSt->pos - shift2;
+	Vector3r branch = spherePos - gridNo1St->pos;
+	Vector3r branchN = spherePos - gridNo2St->pos;
 	for(int i=0;i<3;i++){
 		if(abs(branch[i])<1e-14) branch[i]=0.0;
 		if(abs(branchN[i])<1e-14) branchN[i]=0.0;
@@ -221,7 +222,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	relPos=relPos<0?0:relPos;	//min value of relPos : 0
 	relPos=relPos>1?1:relPos;	//max value of relPos : 1
 	Vector3r fictiousPos=gridNo1St->pos+relPos*segt;
-	Vector3r branchF = fictiousPos - sphereSt->pos;
+	Vector3r branchF = fictiousPos - spherePos;
  	Real dist = branchF.norm();
 	if(isNew && (dist > (sphere->radius + gridCo->radius))) return false;
 	
@@ -235,7 +236,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	Vector3r normal=branchF/dist;
 	scm->penetrationDepth = sphere->radius+gridCo->radius-dist;
 	scm->fictiousState.pos = fictiousPos;
-	scm->contactPoint = sphereSt->pos + normal*(scm->radius1 - 0.5*scm->penetrationDepth);
+	scm->contactPoint = spherePos + normal*(scm->radius1 - 0.5*scm->penetrationDepth);
 	scm->fictiousState.vel = (1-relPos)*gridNo1St->vel + relPos*gridNo2St->vel;
 	scm->fictiousState.angVel =
 		((1-relPos)*gridNo1St->angVel + relPos*gridNo2St->angVel).dot(segt/len)*segt/len //twist part : interpolated
@@ -308,7 +309,7 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 		// compute elastic energy as well
 		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
 	}
-	if (!scene->isPeriodic) {
+// 	if (!scene->isPeriodic) {
 		Vector3r force = -phys->normalForce-shearForce;
 		scene->forces.addForce(id1,force);
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
@@ -318,15 +319,15 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 		scene->forces.addTorque(geom->id3,(1-geom->relPos)*twist);
 		scene->forces.addForce(geom->id4,(-geom->relPos)*force);
 		scene->forces.addTorque(geom->id4,geom->relPos*twist);
-	}
-// 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
-	else {//FIXME : periodicity not implemented here :
-		Vector3r force = -phys->normalForce-shearForce;
-		scene->forces.addForce(id1,force);
-		scene->forces.addForce(id2,-force);
-		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-	}
+// 	}
+// // 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
+// 	else {//FIXME : periodicity not implemented here :
+// 		Vector3r force = -phys->normalForce-shearForce;
+// 		scene->forces.addForce(id1,force);
+// 		scene->forces.addForce(id2,-force);
+// 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+// 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+// 	}
 }
 YADE_PLUGIN((Law2_ScGridCoGeom_FrictPhys_CundallStrack));
 
@@ -337,14 +338,23 @@ void Bo1_GridConnection_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>&
 	GridConnection* GC = static_cast<GridConnection*>(cm.get());
 	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
 	Aabb* aabb=static_cast<Aabb*>(bv.get());
-	if(!scene->isPeriodic){
-		Vector3r O = YADE_CAST<State*>(GC->node1->state.get())->pos;
-		Vector3r O2 = YADE_CAST<State*>(GC->node2->state.get())->pos;
+	Vector3r O = YADE_CAST<State*>(GC->node1->state.get())->pos;
+	Vector3r O2 = YADE_CAST<State*>(GC->node2->state.get())->pos;
+ 	if(!scene->isPeriodic){
 		for (int k=0;k<3;k++){
 			aabb->min[k]=min(O[k],O2[k])-GC->radius;
 			aabb->max[k]=max(O[k],O2[k])+GC->radius;
 		}
 		return;
+ 	}
+ 	else{
+		O = scene->cell->unshearPt(O);
+		O2 = scene->cell->unshearPt(O2);
+		O2 = O2 + scene->cell->hSize*GC->cellDist.cast<Real>();
+		for (int k=0;k<3;k++){
+			aabb->min[k]=min(O[k],O2[k])-GC->radius;
+			aabb->max[k]=max(O[k],O2[k])+GC->radius;
+		}
 	}
 }
 

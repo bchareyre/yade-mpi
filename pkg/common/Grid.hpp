@@ -21,16 +21,15 @@
 //!##################	SHAPES   #####################
 
 class GridConnection: public Sphere{
-public:
+	public:
 		virtual ~GridConnection();
 		Real getLength();
 		Vector3r getSegment();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(GridConnection,Sphere,"GridConnection shape. Component of a grid designed to link two :yref:`GridNode`s. It's highly recommanded to use utils.gridConnection(...) to generate correct :yref:`GridConnection`s.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(GridConnection,Sphere,"GridConnection shape. Component of a grid designed to link two :yref:`GridNodes<GridNode>`. It's highly recommanded to use utils.gridConnection(...) to generate correct :yref:`GridConnections<GridConnection>`.",
 		((shared_ptr<Body> , node1 , ,,"First :yref:`Body` the GridConnection is connected to."))
 		((shared_ptr<Body> , node2 , ,,"Second :yref:`Body` the GridConnection is connected to."))
-		((bool, periodic, false,,"true if two nodes from different periods are connected"))
+		((bool, periodic, false,,"true if two nodes from different periods are connected."))
 		((Vector3i , cellDist , (0,0,0),,))
-  		//((Quaternionr,chainedOrientation,Quaternionr::Identity(),,"Deviation of node1 orientation from node2 vector"))
 		,createIndex();/*ctor*/
 		);
 	REGISTER_CLASS_INDEX(GridConnection,Sphere);
@@ -42,12 +41,12 @@ class GridNode: public Sphere{
 	public:
 		virtual ~GridNode();
 		void addConnection(shared_ptr<Body> GC);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GridNode,Sphere,"GridNode shape, component of a grid.\nTo create a Grid place the nodes first, they will define the spacial discretisation of it. It's highly recommanded to use utils.gridNode(...) to generate correct :yref:`GridNode`s. Note that the GridNodes should only be in an Interaction with other GridNodes. The Sphere-Grid contact is only handled by the :yref:`GridConnection`s.",
-		((vector<shared_ptr<Body> >,ConnList,,,"List of :yref:`GridConnection`s the GridNode is connected to.")),
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GridNode,Sphere,"GridNode shape, component of a grid.\nTo create a Grid, place the nodes first, they will define the spacial discretisation of it. It's highly recommanded to use utils.gridNode(...) to generate correct :yref:`GridNodes<GridNode>`. Note that the GridNodes should only be in an Interaction with other GridNodes. The Sphere-Grid contact is only handled by the :yref:`GridConnections<GridConnection>`.",
+		((vector<shared_ptr<Body> >,ConnList,,,"List of :yref:`GridConnections<GridConnection>` the GridNode is connected to.")),
 		/*ctor*/
 		createIndex();,
 		/*py*/
-		.def("addConnection",&GridNode::addConnection,(python::arg("Body")),"Add a GridConnection to the GridNode")
+		.def("addConnection",&GridNode::addConnection,(python::arg("Body")),"Add a GridConnection to the GridNode.")
 	);
 	REGISTER_CLASS_INDEX(GridNode,Sphere);
 };
@@ -62,7 +61,7 @@ class GridNodeGeom6D: public ScGeom6D {
 	public:
 		virtual ~GridNodeGeom6D();
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(GridNodeGeom6D,ScGeom6D,"Geometry of a :yref:`GridNode`-:yref:`GridNode` contact. Inherits almost everything from :yref:`ScGeom6D`.",
-		((shared_ptr<Body>, connectionBody,,,"Reference to the :yref:`GridNode` yref:`Body` who is linking the two :yref:`GridNode`s."))
+		((shared_ptr<Body>, connectionBody,,,"Reference to the :yref:`GridNode` :yref:`Body` who is linking the two :yref:`GridNodes<GridNode>`."))
 		,
 		/* extra initializers */,
 		/* ctor */ createIndex();,
@@ -78,13 +77,11 @@ public:
     /// Emulate a sphere whose position is the projection of sphere's center on cylinder sphere, and with motion linearly interpolated between nodes
     State fictiousState;
     virtual ~ScGridCoGeom ();
-    YADE_CLASS_BASE_DOC_ATTRS_CTOR(ScGridCoGeom,ScGeom,"Geometry of a cylinder-sphere contact.",
+    YADE_CLASS_BASE_DOC_ATTRS_CTOR(ScGridCoGeom,ScGeom,"Geometry of a :yref:`GridConnection`-:yref:`Sphere` contact.",
                                    ((int,isDuplicate,0,,"this flag is turned true (1) automatically if the contact is shared between two Connections. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
-                                   ((int,trueInt,-1,,"Defines the body id of the Connection where the contact is real, when :yref:`ScGridCoGeom::isDuplicate`>0."))
-                                   //((Vector3r,start,Vector3r::Zero(),,"position of 1st node |yupdate|"))
-                                   //((Vector3r,end,Vector3r::Zero(),,"position of 2nd node |yupdate|"))
-                                   ((int,id3,0,,"id of the first `GridNode` |yupdate|"))
-                                   ((int,id4,0,,"id of the second `GridNode` |yupdate|"))
+                                   ((int,trueInt,-1,,"Defines the body id of the :yref:`GridConnection` where the contact is real, when :yref:`ScGridCoGeom::isDuplicate`>0."))
+                                   ((int,id3,0,,"id of the first :yref:`GridNode`. |yupdate|"))
+                                   ((int,id4,0,,"id of the second :yref:`GridNode`. |yupdate|"))
                                    ((Real,relPos,0,,"position of the contact on the connection (0: node-, 1:node+) |yupdate|")),
                                    createIndex(); /*ctor*/
                                   );
@@ -100,7 +97,7 @@ class Ig2_GridNode_GridNode_GridNodeGeom6D: public Ig2_Sphere_Sphere_ScGeom{
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 
-		YADE_CLASS_BASE_DOC_ATTRS(Ig2_GridNode_GridNode_GridNodeGeom6D,Ig2_Sphere_Sphere_ScGeom,"Create/update a :yref:`GridNodeGeom6D` instance representing the geometry of a contact point between two :yref:`GridNode`s, including relative rotations.",
+		YADE_CLASS_BASE_DOC_ATTRS(Ig2_GridNode_GridNode_GridNodeGeom6D,Ig2_Sphere_Sphere_ScGeom,"Create/update a :yref:`GridNodeGeom6D` instance representing the geometry of a contact point between two :yref:`GridNode<GridNode>`, including relative rotations.",
 		((bool,updateRotations,true,,"Precompute relative rotations. Turning this false can speed up simulations when rotations are not needed in constitutive laws (e.g. when spheres are compressed without cohesion and moment in early stage of a triaxial test), but is not foolproof. Change this value only if you know what you are doing."))
 		((bool,creep,false,,"Substract rotational creep from relative rotation. The rotational creep :yref:`ScGeom6D::twistCreep` is a quaternion and has to be updated inside a constitutive law, see for instance :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`."
 		))
@@ -132,7 +129,7 @@ REGISTER_SERIALIZABLE(Ig2_Sphere_GridConnection_ScGridCoGeom);
 class Law2_ScGridCoGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGridCoGeom_FrictPhys_CundallStrack,LawFunctor,"Law between a frictional :yref:`GridConnection` and a frictional :yref:`Sphere`. Almost the same than :yref:`Law2_ScGeom_FrictPhys_CundallStrack`, but the force is divided and applied on the two :yref:`GridNode`s only.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGridCoGeom_FrictPhys_CundallStrack,LawFunctor,"Law between a frictional :yref:`GridConnection` and a frictional :yref:`Sphere`. Almost the same than :yref:`Law2_ScGeom_FrictPhys_CundallStrack`, but the force is divided and applied on the two :yref:`GridNodes<GridNode>` only.",
 		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((bool,traceEnergy,false,Attr::hidden,"Define the total energy dissipated in plastic slips at all contacts."))
 		((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
@@ -152,7 +149,7 @@ class Bo1_GridConnection_Aabb : public BoundFunctor
 	public :
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
 	FUNCTOR1D(GridConnection);
-	YADE_CLASS_BASE_DOC_ATTRS(Bo1_GridConnection_Aabb,BoundFunctor,"Functor creating :yref:`Aabb` from :yref:'GridConnection'.",
+	YADE_CLASS_BASE_DOC_ATTRS(Bo1_GridConnection_Aabb,BoundFunctor,"Functor creating :yref:`Aabb` from a :yref:`GridConnection`.",
 		((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"Relative enlargement of the bounding box; deactivated if negative."))
 	);
 };
