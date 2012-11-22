@@ -41,7 +41,7 @@ class SampleCapillaryPressureEngine : public TriaxialStressController
 		((bool,binaryFusion,1,,"If yes, capillary force are set to 0 when, at least, 1 overlap is detected for a meniscus. If no, capillary force is divided by the number of overlaps."))
 		((Real,PressureVariation,0,,"Variation of the capillary pressure (each iteration). [Pa]"))
 		((Real,UnbalancedForce,1,,"mean resultant forces divided by mean contact force"))
-		((Real,StabilityCriterion,0.01,,"tolerance in terms of :yref:'TriaxialCompressionEngine::UnbalancedForce' to consider the packing as stable"))
+		((Real,StabilityCriterion,0.01,,"tolerance in terms of :yref:`TriaxialCompressionEngine::UnbalancedForce` to consider the packing as stable"))
 		((Real,SigmaPrecision,0.001,,"tolerance in terms of mean stress to consider the packing as stable")),
 		Phase1=false;
 		Phase1End = "Compacted";

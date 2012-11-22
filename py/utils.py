@@ -275,9 +275,8 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 		sph2.state.inertia[i] = sph2.state.inertia[i] + geomInert*b.material.density
 	b.aspherical=False
 	i=createInteraction(id1,id2)
-	if cellDist != None:
-		if not O.periodic:print "Error, trying to generate a periodic connection in non-periodic scene."
-		i.cellDist = cellDist
+	if O.periodic:
+		if(cellDist!=None):i.cellDist=cellDist
 		i.phys.unp= -(sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
 		b.shape.periodic=True
 		b.shape.cellDist=i.cellDist

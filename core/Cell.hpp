@@ -186,7 +186,7 @@ class Cell: public Serializable{
 		.def("getRightStretch",&Cell::getRightStretch,"Returns right (material) stretch tensor of the cell (matrix $\\mat{V}$ from polar decomposition $\\mat{F}=\\mat{RU}=\\mat{VR}\\ \\rightarrow\\ \\mat{V}=\\mat{FR}^T$ )")
 		.def_readonly("shearTrsf",&Cell::_shearTrsf,"Current skew+rot transformation (no resize)")
 		.def_readonly("unshearTrsf",&Cell::_unshearTrsf,"Inverse of the current skew+rot transformation (no resize)")
-		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell::trsf>` (computed as :yref:`trsf<Cell::trsf>`⁻¹ × :yref:`hSize<Cell::hSize>`.")
+		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell::trsf>` (computed as :yref:`trsf<Cell::trsf>` ⁻¹ × :yref:`hSize<Cell::hSize>`.")
 	);
 };
 REGISTER_SERIALIZABLE(Cell);

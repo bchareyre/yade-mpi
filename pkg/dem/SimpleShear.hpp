@@ -46,7 +46,7 @@ class SimpleShear : public FileGenerator
 				  ((Real,boxYoungModulus,4.0e9,,"value of :yref:`ElastMat::young` for the boxes [$Pa$]"))
 				  ((Real,boxPoissonRatio,0.04,,"value of :yref:`ElastMat::poisson` for the spheres [-]"))
 				  ((bool,gravApplied,false,,"depending on this, :yref:`GravityEngine` is added or not to the scene to take into account the weight of particles"))
-				  ((Vector3r,gravity,Vector3r(0,-9.81,0),,"vector corresponding to used gravity (if :yref:gravApplied<SimpleShear::gravApplied>`) [$m/s^2$]"))
+				  ((Vector3r,gravity,Vector3r(0,-9.81,0),,"vector corresponding to used gravity (if :yref:`gravApplied<SimpleShear::gravApplied>`) [$m/s^2$]"))
 				  ((int,timeStepUpdateInterval,50,,"value of :yref:`TimeStepper::timeStepUpdateInterval` for the :yref:`TimeStepper` used here"))
 				  );
 	DECLARE_LOGGER;

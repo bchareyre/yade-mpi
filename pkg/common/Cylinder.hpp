@@ -75,10 +75,10 @@ class ChainedState: public State{
 // 			if (rank>0) statePrev = Body::byId(chains[chainNumber][rank-1],scene)->state;
 		}
 
-	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ChainedState,State,"State of a chained bodies, containing information on connectivity in order to track contacts jumping over contiguous elements. Chains are 1D lists from which id of chained bodies are retrieved via :yref:rank<ChainedState::rank>` and :yref:chainNumber<ChainedState::chainNumber>`.",
- 		((unsigned int,rank,0,,"rank in the chain"))
- 		((unsigned int,chainNumber,0,,"chain id"))
- 		((int,bId,-1,,"id of the body containing - for postLoad operations only"))
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ChainedState,State,"State of a chained bodies, containing information on connectivity in order to track contacts jumping over contiguous elements. Chains are 1D lists from which id of chained bodies are retrieved via :yref:`rank<ChainedState::rank>` and :yref:`chainNumber<ChainedState::chainNumber>`.",
+ 		((unsigned int,rank,0,,"rank in the chain."))
+ 		((unsigned int,chainNumber,0,,"chain id."))
+ 		((int,bId,-1,,"id of the body containing - for postLoad operations only."))
 		,
 		/* additional initializers */
 /*			((pos,se3.position))
@@ -113,7 +113,7 @@ public:
     virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
     virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 
-    YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_ChainedCylinder_CylScGeom6D,Ig2_Sphere_ChainedCylinder_CylScGeom,"Create/update a :yref:`ScGeom6D` instance representing the geometry of a contact point between two :yref:`Spheres<Sphere>`s, including relative rotations.",
+    YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_ChainedCylinder_CylScGeom6D,Ig2_Sphere_ChainedCylinder_CylScGeom,"Create/update a :yref:`ScGeom6D` instance representing the geometry of a contact point between two :yref:`Spheres<Sphere>`, including relative rotations.",
                               ((bool,updateRotations,false,,"Precompute relative rotations. Turning this false can speed up simulations when rotations are not needed in constitutive laws (e.g. when spheres are compressed without cohesion and moment in early stage of a triaxial test), but is not foolproof. Change this value only if you know what you are doing."))
                               ((bool,creep,false,,"Substract rotational creep from relative rotation. The rotational creep :yref:`ScGeom6D::twistCreep` is a quaternion and has to be updated inside a constitutive law, see for instance :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`."
                                ))
