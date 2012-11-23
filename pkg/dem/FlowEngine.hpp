@@ -343,7 +343,6 @@ class PeriodicFlowEngine : public FlowEngine
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
 
-// 		void 		saveVtk() {solver->saveVtk();} // FIXME: need to adapt vtk recorder to periodic case
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}

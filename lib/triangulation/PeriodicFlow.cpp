@@ -641,6 +641,7 @@ void  PeriodicFlow::ComputeEdgesSurfaces()
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
     Edge_HydRad.push_back(Rh);
     Edge_surfaceDist.push_back(surfaceDist);
+    edgeNormalLubF.push_back(0);
     Edge_centerDistVect.push_back(Vector3r(centerDistVect[0],centerDistVect[1],centerDistVect[2]));
     Edge_centerDist.push_back(centerDist);
     Edge_meanRad.push_back(meanRad);

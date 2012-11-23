@@ -174,6 +174,7 @@ public:
 	inline Vecteur& force (void) {return forces;}
 	inline Vecteur& vel (void) {return Grain_Velocity;}
 	inline Real& vol_cells (void) {return volume_incident_cells;}
+	inline const Vecteur ghostShift (void) {return CGAL::NULL_VECTOR;}
 };
 
 class PeriodicCellInfo : public FlowCellInfo

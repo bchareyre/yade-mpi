@@ -50,7 +50,7 @@ void FlowEngine::action()
 	  backgroundSolver=solver;
 	  backgroundCompleted=true;
 	}
-	solver->ompThreads = ompThreads;
+	solver->ompThreads = ompThreads>0? ompThreads : omp_get_max_threads();
 
         timingDeltas->checkpoint ( "Triangulating" );
 	UpdateVolumes ( solver );
@@ -121,7 +121,7 @@ void FlowEngine::action()
 			if (Debug) cerr<<"volumes initialized"<<endl;
 		}
 		else {
-			if (Debug) cerr<<"still computing solver in the background, ellapsedIter="<<ellapsedIter<<endl;
+			if (Debug && !backgroundCompleted) cerr<<"still computing solver in the background, ellapsedIter="<<ellapsedIter<<endl;
 			ellapsedIter++;
 		}
 	} else {
@@ -654,13 +654,19 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 
         for ( int i=0; i< ( int ) flow.Edge_ids.size(); i++ ) {
                 int hasFictious= Tes.vertex ( flow.Edge_ids[i].first )->info().isFictious +  Tes.vertex ( flow.Edge_ids[i].second )->info().isFictious;
-                const shared_ptr<Body>& sph1 = Body::byId ( flow.Edge_ids[i].first, scene );
+		const shared_ptr<Body>& sph1 = Body::byId ( flow.Edge_ids[i].first, scene );
                 const shared_ptr<Body>& sph2 = Body::byId ( flow.Edge_ids[i].second, scene );
                 Sphere* s1=YADE_CAST<Sphere*> ( sph1->shape.get() );
                 Sphere* s2=YADE_CAST<Sphere*> ( sph2->shape.get() );
-		Vector3r deltaV; Vector3r deltaNormV; Vector3r deltaShearV;
+		Vector3r deltaV; Real deltaNormV; Vector3r deltaShearV;
+		Vector3r normal = sph1->state->pos + makeVector3r(Tes.vertex(flow.Edge_ids[i].first)->info().ghostShift())
+			- sph2->state->pos - makeVector3r(Tes.vertex(flow.Edge_ids[i].second)->info().ghostShift());
+		Real dist = normal.norm();
+		normal*= (1./dist);
+		dist = dist - s2->radius - s1->radius;
 
 		Vector3r visc_f; Vector3r lub_f;
+		//FIXME: if periodic and velGrad!=0, then deltaV should account for velGrad, not the case currently
                 if ( !hasFictious )
                         deltaV = (sph2->state->vel + sph2->state->angVel.cross(s2->radius * flow.Edge_normal[i])) - (sph1->state->vel+ sph1->state->angVel.cross(s1->radius * flow.Edge_normal[i]));
                 else {
@@ -700,8 +706,9 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 		
 /// Compute the normal lubrication force applied on each particle
 		if (normalLubrication){
-			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
-			lub_f = flow.ComputeNormalLubricationForce (deltaNormV, i,eps);
+			deltaNormV = normal.dot(deltaV);
+// 			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
+			lub_f = flow.ComputeNormalLubricationForce (deltaNormV, dist, i,eps,100000.,scene->dt)*normal;
 			flow.normLubForce[flow.Edge_ids[i].first]+=lub_f;
 			flow.normLubForce[flow.Edge_ids[i].second]-=lub_f;
 		
@@ -736,7 +743,7 @@ void PeriodicFlowEngine:: action()
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( EpsVolPercent_RTRG>0 && Eps_Vol_Cumulative > EpsVolPercent_RTRG || retriangulationLastIter>PermuteInterval ) {
+        if ( (EpsVolPercent_RTRG>0 && Eps_Vol_Cumulative > EpsVolPercent_RTRG) || retriangulationLastIter>PermuteInterval ) {
                 Update_Triangulation = true;
                 Eps_Vol_Cumulative=0;
                 retriangulationLastIter=0;
@@ -768,7 +775,7 @@ void PeriodicFlowEngine:: action()
 			scene->forces.addTorque ( v_info.id(), solver->viscousShearTorques[v_info.id()]);
 		}
 		if (normalLubrication)
-			force = force + solver->normLubForce[v_info.id()];
+			force = force - solver->normLubForce[v_info.id()];
 		scene->forces.addForce ( v_info.id(), force);
 	}
         ///End Compute flow and forces
@@ -793,7 +800,7 @@ void PeriodicFlowEngine:: action()
 			Initialize_volumes(solver);
 		}
 		else if (Debug && !first) {
-			cerr<<"still computing solver in the background"<<endl;
+			if (Debug && !backgroundCompleted) cerr<<"still computing solver in the background"<<endl;
 			ellapsedIter++;}
 	} else {
 	        if (Update_Triangulation && !first) {
@@ -837,7 +844,7 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
                 const Real& z = wpos[2];
                 Vertex_handle vh0=Tes.insert ( x, y, z, rad, id );
 //                 Vertex_handle vh0=Tes.insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
-		if (vh0==NULL) LOG_ERROR("Vh NULL in PeriodicFlowEngine::Triangulate(), check input data");
+		if (vh0==NULL) {LOG_ERROR("Vh NULL in PeriodicFlowEngine::Triangulate(), check input data"); continue;}
 		for ( int k=0;k<3;k++ ) vh0->info().period[k]=-period[k];
                 const Vector3r cellSize ( cachedCell.getSize() );
 		//FIXME: if hasShear, comment in

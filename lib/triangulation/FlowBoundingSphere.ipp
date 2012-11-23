@@ -1656,6 +1656,7 @@ void  FlowBoundingSphere<Tesselation>::ComputeEdgesSurfaces()
     }
     Edge_normal.push_back(Vector3r(n[0],n[1],n[2]));
     Edge_HydRad.push_back(Rh);
+    edgeNormalLubF.push_back(0);
     Edge_surfaceDist.push_back(surfaceDist);
     Edge_centerDistVect.push_back(Vector3r(centerDistVect[0],centerDistVect[1],centerDistVect[2]));
     Edge_centerDist.push_back(centerDist);
@@ -1681,10 +1682,21 @@ Vector3r FlowBoundingSphere<Tesselation>::ComputeShearLubricationForce(Vector3r 
 }
 
 template <class Tesselation> 
-Vector3r FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(Vector3r deltaNormV, int edge_id,Real eps)
+Real FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt)
 {
-    Vector3r normLubF = (6*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV)/max(Edge_surfaceDist[edge_id],eps);
-    return normLubF;
+	//FIXME: here introduce elasticity
+	Real d = max(dist,0.) + eps;//account for grains roughness
+	if (stiffness>0) {
+		const Real k = stiffness*Edge_meanRad[edge_id];
+		const Real prevForce = edgeNormalLubF[edge_id] ? edgeNormalLubF[edge_id] : (6*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV)/d;
+		Real instantVisc = VISCOSITY/(d-prevForce/k);
+		Real normLubF = instantVisc*(deltaNormV + prevForce/(k*dt))/(1+instantVisc/(k*dt));
+		edgeNormalLubF[edge_id]=normLubF;
+		return normLubF;
+	} else {
+		Real normLubF = (6*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV)/d;
+		return normLubF;
+	}
 }
 
 } //namespace CGT
