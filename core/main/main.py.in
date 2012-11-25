@@ -193,6 +193,8 @@ def userSession(qt4=False,qapp=None):
 		prompt_config.in_template = ipconfig['prompt_in1']
 		prompt_config.in2_template = ipconfig['prompt_in2']
 		prompt_config.out_template = ipconfig['prompt_out']
+		import readline
+		for k in ipconfig['readline_parse_and_bind']: readline.parse_and_bind(k)
 		InteractiveShellEmbed.config=cfg
 		InteractiveShellEmbed.banner1=banner+'\n'
 		ipshell=InteractiveShellEmbed()
