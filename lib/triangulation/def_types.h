@@ -193,7 +193,8 @@ class PeriodicCellInfo : public FlowCellInfo
 		_pression=&pression;
 		period[0]=period[1]=period[2]=0;
 		isGhost=false;
-		baseIndex=-1;}
+		baseIndex=-1;
+		volumeSign=0;}
 	~PeriodicCellInfo (void) {}
 	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
 	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }

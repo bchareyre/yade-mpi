@@ -1685,11 +1685,11 @@ template <class Tesselation>
 Real FlowBoundingSphere<Tesselation>::ComputeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt)
 {
 	//FIXME: here introduce elasticity
-	Real d = max(dist,0.) + eps;//account for grains roughness
+	Real d = max(dist,0.) + eps*Edge_meanRad[edge_id];//account for grains roughness
 	if (stiffness>0) {
 		const Real k = stiffness*Edge_meanRad[edge_id];
 		const Real prevForce = edgeNormalLubF[edge_id] ? edgeNormalLubF[edge_id] : (6*Mathr::PI*pow(Edge_meanRad[edge_id],2)* VISCOSITY* deltaNormV)/d;
-		Real instantVisc = VISCOSITY/(d-prevForce/k);
+		Real instantVisc = 6*Mathr::PI*pow(Edge_meanRad[edge_id],2)*VISCOSITY/(d-prevForce/k);
 		Real normLubF = instantVisc*(deltaNormV + prevForce/(k*dt))/(1+instantVisc/(k*dt));
 		edgeNormalLubF[edge_id]=normLubF;
 		return normLubF;

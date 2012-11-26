@@ -118,6 +118,7 @@ void FlowEngine::action()
 			workerThread.detach();
 			if (Debug) cerr<<"backgrounded"<<endl;
 			Initialize_volumes(solver);
+			if (viscousShear) ApplyViscousForces(*solver);
 			if (Debug) cerr<<"volumes initialized"<<endl;
 		}
 		else {
@@ -128,6 +129,7 @@ void FlowEngine::action()
 	        if (Update_Triangulation && !first) {
 			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
+			if (viscousShear) ApplyViscousForces(*solver);
                		Update_Triangulation = false;}
         }
         if ( velocity_profile ) /*flow->FluidVelocityProfile();*/solver->Average_Fluid_Velocity();
@@ -708,7 +710,7 @@ void FlowEngine::ApplyViscousForces ( Solver& flow )
 		if (normalLubrication){
 			deltaNormV = normal.dot(deltaV);
 // 			deltaNormV = (flow.Edge_normal[i].dot (deltaV)) * flow.Edge_normal[i];
-			lub_f = flow.ComputeNormalLubricationForce (deltaNormV, dist, i,eps,100000.,scene->dt)*normal;
+			lub_f = flow.ComputeNormalLubricationForce (deltaNormV, dist, i,eps,5000.,scene->dt)*normal;
 			flow.normLubForce[flow.Edge_ids[i].first]+=lub_f;
 			flow.normLubForce[flow.Edge_ids[i].second]-=lub_f;
 		
@@ -762,7 +764,7 @@ void PeriodicFlowEngine:: action()
 
         ///Compute vicscous forces
         scene->forces.sync();
-        if ( viscousShear ) ApplyViscousForces(*solver);
+        if (viscousShear) ApplyViscousForces(*solver);
 	timingDeltas->checkpoint("Compute_Viscous_Forces");
 	Vector3r force;
 	const Tesselation& Tes = solver->T[solver->currentTes];
@@ -798,6 +800,7 @@ void PeriodicFlowEngine:: action()
 			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			Initialize_volumes(solver);
+			if (viscousShear) ApplyViscousForces(*solver);
 		}
 		else if (Debug && !first) {
 			if (Debug && !backgroundCompleted) cerr<<"still computing solver in the background"<<endl;
@@ -807,6 +810,7 @@ void PeriodicFlowEngine:: action()
 			cachedCell= Cell(*(scene->cell));
 			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
+			if (viscousShear) ApplyViscousForces(*solver);
                		Update_Triangulation = false;}
         }
 // 	if (velocity_profile) /*flow->FluidVelocityProfile();*/solver->Average_Fluid_Velocity();
