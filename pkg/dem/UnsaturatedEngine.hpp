@@ -26,6 +26,9 @@ class UnsaturatedEngine : public PartialEngine
 	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
 	typedef FlowSolver::Cell_handle						Cell_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
+	typedef RTriangulation::Vertex_handle					Vertex_handle;
+	typedef RTriangulation::Point						CGALSphere;
+	typedef CGALSphere::Point							Point;
 
 
 	

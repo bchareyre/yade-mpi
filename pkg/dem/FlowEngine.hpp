@@ -32,6 +32,7 @@ class FlowEngine : public PartialEngine
 	typedef FlowSolver::Finite_vertices_iterator                    	Finite_vertices_iterator;
 	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
 	typedef FlowSolver::Cell_handle						Cell_handle;
+	typedef FlowSolver::Vertex_handle					Vertex_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
 
 
@@ -111,11 +112,12 @@ class FlowEngine : public PartialEngine
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
 		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+		#ifdef EIGENSPARSE_LIB
 		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver==3) flow->exportMatrix(filename.c_str());
 			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
 		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver==3) flow->exportTriplets(filename.c_str());
 			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
-
+		#endif
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
@@ -135,9 +137,10 @@ class FlowEngine : public PartialEngine
 		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
 		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		#ifdef EIGENSPARSE_LIB
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
-		
+		#endif
 		virtual ~FlowEngine();
 
 		virtual void action();
@@ -261,8 +264,10 @@ class FlowEngine : public PartialEngine
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
 					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+					#ifdef EIGENSPARSE_LIB
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+					#endif
 					)
 		DECLARE_LOGGER;
 };
@@ -354,8 +359,10 @@ class PeriodicFlowEngine : public FlowEngine
 		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		#ifdef EIGENSPARSE_LIB
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		#endif
 		
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
@@ -392,8 +399,10 @@ class PeriodicFlowEngine : public FlowEngine
 			
 			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing 'pos'.")
 			.def("getConstrictionsFull",&PeriodicFlowEngine::getConstrictionsFull,"Get the list of constrictions (inscribed circle) for all finite facets.")
+			#ifdef EIGENSPARSE_LIB
 			.def("exportMatrix",&PeriodicFlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 			.def("exportTriplets",&PeriodicFlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+			#endif
 		)
 		DECLARE_LOGGER;
 
