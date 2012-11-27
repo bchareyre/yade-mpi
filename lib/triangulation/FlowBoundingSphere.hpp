@@ -76,14 +76,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Finite_edges_iterator>  Edge_list;
 		vector <double> Edge_Surfaces;
 		vector <pair<int,int> > Edge_ids;
-		vector <Vector3r> Edge_force_point;
-		vector <Real> Edge_HydRad;
-		vector <Vector3r> Edge_normal;
-		vector <Real> Edge_surfaceDist;
 		vector <Real> edgeNormalLubF;
-		vector <Vector3r>Edge_centerDistVect;
-		vector <Real> Edge_centerDist;
-		vector <Real> Edge_meanRad;
 		vector <Vector3r> viscousShearForces;
 		vector <Vector3r> viscousShearTorques;
 		vector <Vector3r> normLubForce;
@@ -138,10 +131,10 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		void GenerateVoxelFile ( );
 		
-		void ComputeEdgesSurfaces();
-		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
-		Real ComputeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt);
-		Vector3r ComputeShearLubricationForce(Vector3r deltaV,int edge_id, Real eps);
+		void computeEdgesSurfaces();
+		Vector3r computeViscousShearForce(const Vector3r& deltaV, const int& edge_id, const Real& Rh);
+		Real computeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt, const Real& meanRad);
+		Vector3r computeShearLubricationForce(const Vector3r& deltaShearV, const Real& dist, const int& edge_id, const Real& eps, const Real& centerDist, const Real& meanRad);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 

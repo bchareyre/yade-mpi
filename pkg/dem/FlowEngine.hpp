@@ -33,6 +33,7 @@ class FlowEngine : public PartialEngine
 	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
 	typedef FlowSolver::Cell_handle						Cell_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
+	typedef FlowSolver::Vertex_handle                    			Vertex_handle;
 
 
 	
@@ -74,7 +75,7 @@ class FlowEngine : public PartialEngine
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
 		TPL void clearImposedFlux(Solver& flow);
-		TPL void ApplyViscousForces(Solver& flow);
+		TPL void computeViscousForces(Solver& flow);
 		TPL Real getCellFlux(unsigned int cond, const shared_ptr<Solver>& flow);
 		TPL Real getBoundaryFlux(unsigned int boundary,Solver& flow) {return flow->boundaryFlux(boundary);}
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
@@ -176,6 +177,7 @@ class FlowEngine : public PartialEngine
 					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
 					((double,permeability_factor,0.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of fluid"))
+					((double,stiffness, 10000,,"stiffness modulus"))
 					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
 					((double, K, 0,, "Permeability of the sample"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
@@ -213,6 +215,8 @@ class FlowEngine : public PartialEngine
 					((double, eps, 0.00001,,"minimum distance between particles"))
 
 					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
+					((bool, viscousNormalBodyStress, false,,"Compute normal viscous stress applied on each body"))
+					((bool, viscousShearBodyStress, false,,"Compute shear viscous stress applied on each body"))
 					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
