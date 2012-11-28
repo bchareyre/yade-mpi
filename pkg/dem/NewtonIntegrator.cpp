@@ -87,7 +87,7 @@ void NewtonIntegrator::ensureSync()
 {
 	if (syncEnsured) return;	
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
-		if(b->isClump()) continue;
+// 		if(b->isClump()) continue;
 		scene->forces.addForce(b->getId(),Vector3r(0,0,0));
 	} YADE_PARALLEL_FOREACH_BODY_END();
 	syncEnsured=true;
@@ -141,7 +141,7 @@ void NewtonIntegrator::action()
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
 				#ifdef YADE_OPENMP
-				//it is safe here, since onky one thread will read/write
+				//it is safe here, since only one thread will read/write
 				scene->forces.getTorqueUnsynced(id)+=m;
 				scene->forces.getForceUnsynced(id)+=f;
 				#else
