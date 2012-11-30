@@ -100,7 +100,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	Matrix3r invHsize =hSize.inverse();
 	Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
 	if (!volume) {
-		if (hSizeFound || !periodic) throw invalid_argument("The box as null volume, this is not supported. One exception is for flat box defined by min-max in periodic conditions, if hSize argument defines a non-null volume (or if the hSize argument is left undefined).");
+		if (hSizeFound) throw invalid_argument("The period defined by hSize has null length in at least one direction, this is not supported. Define flat boxes via min-max and keep hSize undefined if you want a 2D packing.");
 		else LOG_WARN("The volume of the min-max box is null, we will assume that the packing is 2D. If it is not what you want then you defined wrong input values; check that min and max corners are defined correctly.");}
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
@@ -163,7 +163,8 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		int t;
 		switch(mode){
 			case RDIST_RMEAN:
-			//FIXME : r is never defined, it will be zero at first iteration, but it will have values in the next ones. Some magic?
+			//FIXME : r is never defined, it will be zero at first iteration, but it will have values in the next ones.
+			//I don't understand why it apparently works. Some magic?
 			case RDIST_NUM:
 				if(distributeMass) r=pow3Interp(rand,rMean*(1-rRelFuzz),rMean*(1+rRelFuzz));
 				else r=rMean*(2*(rand-.5)*rRelFuzz+1); // uniform distribution in rMean*(1±rRelFuzz)
