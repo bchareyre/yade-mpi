@@ -109,7 +109,7 @@ should have root privileges
 
 	* **Ubuntu**, **Debian** and their derivatives::
 
-		sudo apt-get install cmake git freeglut3-dev libloki-dev\
+		sudo apt-get install cmake git freeglut3-dev libloki-dev \
 		libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
 		libboost-program-options-dev \
 		libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
