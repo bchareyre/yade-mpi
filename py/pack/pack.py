@@ -109,7 +109,6 @@ if not (noPredicate):
       clumpIds=[]
       userColor='color' in kw
       for clump in clumps:
-        clump=[i+idsOffset for i in clump]
         clumpIds.append(O.bodies.clump([ids[i] for i in clump])) # clump spheres with given ids together, creating the clump object as well
         # make all spheres within one clump a single color, unless color was specified by the user
         if not userColor:
