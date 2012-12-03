@@ -366,18 +366,18 @@ class pyOmega{
 		LOG_DEBUG("RUN"<<((scene->stopAtIter-scene->iter)>0?string(" ("+lexical_cast<string>(scene->stopAtIter-scene->iter)+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}
-	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.pause(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
+	void pause(){OMEGA.pause(); LOG_DEBUG("PAUSE!");}
 	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getScene()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
 	void wait(){
 		if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return;
-		timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS;
+		timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ while(OMEGA.isRunning()) nanosleep(&t1,&t2); 
 		if(!OMEGA.simulationLoop->workerThrew) return;
 		LOG_ERROR("Simulation error encountered."); OMEGA.simulationLoop->workerThrew=false; throw OMEGA.simulationLoop->workerException;
 	}
 	bool isRunning(){ return OMEGA.isRunning(); }
 	python::object get_filename(){ string f=OMEGA.sceneFile; if(f.size()>0) return python::object(f); return python::object();}
 	void load(std::string fileName,bool quiet=false) {
-		Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; 
+		OMEGA.stop(); 
 		OMEGA.loadSimulation(fileName,quiet);
 		OMEGA.createSimulationLoop();
 		mapLabeledEntitiesToVariables();
@@ -400,12 +400,12 @@ class pyOmega{
 		return OMEGA.memSavedSimulations[":memory:"+mark];
 	}
 
-	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
-	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
-	void resetCurrentScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
+	void reset(){OMEGA.stop(); OMEGA.reset(); }
+	void resetThisScene(){OMEGA.stop(); OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
+	void resetCurrentScene(){OMEGA.stop(); OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
 	void resetTime(){ OMEGA.getScene()->iter=0; OMEGA.getScene()->time=0; OMEGA.timeInit(); }
 	void switchScene(){ std::swap(OMEGA.scenes[OMEGA.currentSceneNb],OMEGA.sceneAnother); }
-	void resetAllScenes(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetAllScenes(); OMEGA.createSimulationLoop();}
+	void resetAllScenes(){OMEGA.stop(); OMEGA.resetAllScenes(); OMEGA.createSimulationLoop();}
 	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
 	int addScene(){return OMEGA.addScene();}
 	void switchToScene(int i){OMEGA.switchToScene(i);}
