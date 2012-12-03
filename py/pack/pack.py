@@ -110,10 +110,10 @@ if not (noPredicate):
       userColor='color' in kw
       for clump in clumps:
         clump=[i+idsOffset for i in clump]
-        clumpIds.append(O.bodies.clump(clump)) # clump spheres with given ids together, creating the clump object as well
+        clumpIds.append(O.bodies.clump([ids[i] for i in clump])) # clump spheres with given ids together, creating the clump object as well
         # make all spheres within one clump a single color, unless color was specified by the user
         if not userColor:
-          for i in clump[1:]: O.bodies[i].shape.color=O.bodies[clump[0]].shape.color
+          for i in clump[1:]: O.bodies[ids[i]].shape.color=O.bodies[ids[clump[0]]].shape.color
       return ids+clumpIds
   
   SpherePack.toSimulation=SpherePack_toSimulation
