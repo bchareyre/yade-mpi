@@ -884,7 +884,13 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		// Clump volume variation with homothetic displacement from its center
 		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
 	}
-
+	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
+		if(b->isClump()){
+			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
+			clumpSt->updateProperties(b, 0);
+		}
+	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
 		if (ii->isReal()) {
 			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
