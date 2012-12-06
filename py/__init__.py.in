@@ -86,4 +86,16 @@ __all__+=['utils',]+dir(miniEigen)+dir(wrapper)
 import __builtin__
 __builtin__.__dict__['O'] = O
 __builtin__.__dict__['Omega'] = wrapper.Omega
+# define a default list of engine
+O.engines=[
+		ForceResetter(),
+		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()]),
+		InteractionLoop(
+			[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
+			[Ip2_FrictMat_FrictMat_FrictPhys()],	#for linear model only
+			[Law2_ScGeom_FrictPhys_CundallStrack()],	#for linear model only
+		),
+		GlobalStiffnessTimeStepper(timeStepUpdateInterval=10),
+		NewtonIntegrator()
+	]
 

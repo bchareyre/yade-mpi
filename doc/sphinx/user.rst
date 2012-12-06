@@ -492,6 +492,9 @@ must be used instead. For inserting an engine after position #2 (for example), u
 
 	O.engines=O.engines[:2]+[SomeEngine()]+O.engines[2:]
 
+.. note::
+	When Yade starts, O.engines is filled with a reasonable default list, so that it is not strictly necessary to redefine it when trying simple things. The default scene will handle spheres, boxes, and facets with (:yref:`frictional<FrictMat>`) properties correctly, and adjusts the timestep dynamically. You can find an example in simple-scene-default-engines.py.
+
 Functors choice
 ----------------
 

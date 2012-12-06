@@ -512,3 +512,5 @@ There is chain of types produced by earlier functors and accepted by later ones;
 
 	Chain of functors producing and accepting certain types. In the case shown, the ``Ig2`` functors produce :yref:`Dem3DofGeom` instances from all handled :yref:`Shape` combinations; the ``Ig2`` functor produces :yref:`FrictMat`. The constitutive law functor ``Law2`` accepts the combination of types produced. Note that the types are stated in the functor's class names.
 
+.. note::
+	When Yade starts, O.engines is filled with a reasonable default list, so that it is not strictly necessary to redefine it when trying simple things. The default scene will handle spheres, boxes, and facets with (:yref:`frictional<FrictMat>`) properties correctly, and adjusts the timestep dynamically. You can find an example in simple-scene-default-engines.py.
