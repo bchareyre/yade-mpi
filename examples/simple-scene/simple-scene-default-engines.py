@@ -7,6 +7,6 @@
 
 typedEngine("NewtonIntegrator").gravity=(0,0,-9.81)
 typedEngine("NewtonIntegrator").damping=0.1
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],fixed=True))
-O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
+O.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],fixed=True))
+O.bodies.append(sphere([0,0,2],1,color=[0,1,0]))
 O.save('/tmp/a.xml.bz2');
