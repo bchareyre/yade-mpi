@@ -1618,6 +1618,8 @@ void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
   Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {
+    int hasFictious= (ed_it->first)->vertex(ed_it->second)->info().isFictious +  (ed_it->first)->vertex(ed_it->third)->info().isFictious;
+    if (hasFictious==2) continue;
     double area = T[currentTes].ComputeVFacetArea(ed_it);
     Edge_Surfaces.push_back(area);
     int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
