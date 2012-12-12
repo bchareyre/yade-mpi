@@ -493,7 +493,7 @@ must be used instead. For inserting an engine after position #2 (for example), u
 	O.engines=O.engines[:2]+[SomeEngine()]+O.engines[2:]
 
 .. note::
-	When Yade starts, O.engines is filled with a reasonable default list, so that it is not strictly necessary to redefine it when trying simple things. The default scene will handle spheres, boxes, and facets with (:yref:`frictional<FrictMat>`) properties correctly, and adjusts the timestep dynamically. You can find an example in simple-scene-default-engines.py.
+	When Yade starts, O.engines is filled with a reasonable default list, so that it is not strictly necessary to redefine it when trying simple things. The default scene will handle spheres, boxes, and facets with :yref:`frictional<FrictMat>` properties correctly, and adjusts the timestep dynamically. You can find an example in simple-scene-default-engines.py.
 
 Functors choice
 ----------------
@@ -564,6 +564,8 @@ Law2 functor(s)
 In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :yref:`IGeom` and :yref:`IPhys` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :yref:`Shapes<Shape>` and :yref:`Materials<Material>`).
 
 .. note:: As in the case of ``Ip2`` functors, receiving a combination of :yref:`IGeom` and :yref:`IPhys` which is not handled by any ``Law2`` functor is an error.
+
+.. warning:: Many ``Law2`` exist in Yade, and new ones can appear at any time. In some cases different functors are only different implementations of the same contact law (e.g. :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_L3Geom_FrictPhys_ElPerfPl`). Also, sometimes, the peculiarity of one functor may be reproduced as a special case of a more general one. Therefore, for a given constitutive behavior, the user may have the choice between different functors. It is strongly recommended to favor the most used and most validated implementation when facing such choice. A list of available functors classified from mature to unmaintained is updated `here <https://yade-dem.org/wiki/ConstitutiveLaws`_ to guide this choice.
 
 Examples
 ^^^^^^^^
