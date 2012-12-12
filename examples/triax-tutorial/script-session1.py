@@ -56,8 +56,23 @@ wallIds=O.bodies.append(walls)
 
 ## use a SpherePack object to generate a random loose particles packing
 sp=pack.SpherePack()
-sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95)
-O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
+
+
+clumps=False #turn this true for the same example with clumps
+if clumps:
+ ## approximate mean rad of the futur dense packing for latter use
+ volume = (mx[0]-mn[0])*(mx[1]-mn[1])*(mx[2]-mn[2])
+ mean_rad = pow(0.09*volume/num_spheres,0.3333)
+ ## define a unique clump type (we could have many, see clumpCloud documentation)
+ c1=pack.SpherePack([((-0.2*mean_rad,0,0),0.5*mean_rad),((0.2*mean_rad,0,0),0.5*mean_rad)])
+ ## generate positions and input them in the simulation
+ sp.makeClumpCloud(mn,mx,[c1],periodic=False)
+ sp.toSimulation(material='spheres')
+else:
+ sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95)
+ O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
+ #or alternatively (higher level function doing exactly the same):
+ #sp.toSimulation(material='spheres')
 
 ############################
 ###   DEFINING ENGINES   ###
@@ -210,7 +225,7 @@ if nRead==0: yade.qt.Controller(), yade.qt.View()
 ##plot.plots={'e22':('s11','s22','s33',None,'ev')}
 
 ## display on the screen (doesn't work on VMware image it seems)
-plot.plot()
+#plot.plot()
 
 #####  PLAY THE SIMULATION HERE WITH "PLAY" BUTTON OR WITH THE COMMAND O.run(N)  #####
 
