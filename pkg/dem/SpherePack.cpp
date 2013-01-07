@@ -51,12 +51,12 @@ py::list SpherePack::toList() const {
 };
 
 void SpherePack::fromFile(string file) {
-	typedef pair<Vector3r,Real> pairVector3rReal;
-	vector<pairVector3rReal> ss;
+	typedef tuple<Vector3r,Real,int> tupleVector3rRealInt;
+	vector<tupleVector3rRealInt> ss;
 	Vector3r mn,mx;
 	ss=Shop::loadSpheresFromFile(file,mn,mx,&cellSize);
 	pack.clear();
-	FOREACH(const pairVector3rReal& s, ss) pack.push_back(Sph(s.first,s.second));
+	FOREACH(const tupleVector3rRealInt& s, ss) pack.push_back(Sph(get<0>(s),get<1>(s),get<2>(s)));
 }
 
 void SpherePack::toFile(const string fname) const {
@@ -64,8 +64,8 @@ void SpherePack::toFile(const string fname) const {
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 	if(cellSize!=Vector3r::Zero()){ f<<"##PERIODIC:: "<<cellSize[0]<<" "<<cellSize[1]<<" "<<cellSize[2]<<endl; }
 	FOREACH(const Sph& s, pack){
-		if(s.clumpId>=0) throw std::invalid_argument("SpherePack with clumps cannot be (currently) exported to a text file.");
-		f<<s.c[0]<<" "<<s.c[1]<<" "<<s.c[2]<<" "<<s.r<<endl;
+		//if(s.clumpId>=0) throw std::invalid_argument("SpherePack with clumps cannot be (currently) exported to a text file.");
+		f<<s.c[0]<<" "<<s.c[1]<<" "<<s.c[2]<<" "<<s.r<<" "<<s.clumpId<<endl;
 	}
 	f.close();
 };

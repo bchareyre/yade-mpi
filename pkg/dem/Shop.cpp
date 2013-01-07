@@ -382,15 +382,16 @@ Real Shop::getVoxelPorosity(const shared_ptr<Scene>& _scene, int _resolution, Ve
 	return ( std::pow(S,3) - Vv ) / std::pow(S,3);
 };
 
-vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
+vector<tuple<Vector3r,Real,int> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
 	if(!boost::filesystem::exists(fname)) {
 		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");
 	}
-	vector<pair<Vector3r,Real> > spheres;
+	vector<tuple<Vector3r,Real,int> > spheres;
 	ifstream sphereFile(fname.c_str());
 	if(!sphereFile.good()) throw std::runtime_error("File with spheres `"+fname+"' couldn't be opened.");
 	Vector3r C;
 	Real r=0;
+	int clumpId=-1;
 	string line;
 	size_t lineNo=0;
 	while(std::getline(sphereFile, line, '\n')){
@@ -403,11 +404,12 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(const string& fname, Vect
 			if(cellSize){ *cellSize=Vector3r(lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]),lexical_cast<Real>(tokens[3])); }
 			continue;
 		}
-		if(tokens.size()!=4) throw std::invalid_argument(("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(tokens.size())+" columns (must be 4).").c_str());
+		if(tokens.size()!=5 and tokens.size()!=4) throw std::invalid_argument(("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(tokens.size())+" columns (must be 4 or 5).").c_str());
 		C=Vector3r(lexical_cast<Real>(tokens[0]),lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]));
 		r=lexical_cast<Real>(tokens[3]);
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
-		spheres.push_back(pair<Vector3r,Real>(C,r));
+		if(tokens.size()==5)clumpId=lexical_cast<int>(tokens[4]);
+		spheres.push_back(tuple<Vector3r,Real,int>(C,r,clumpId));
 	}
 	return spheres;
 }
