@@ -76,7 +76,10 @@ for z in range(numberTests):
 		]
 		
 		print "number of bodies %d"%len(O.bodies)
+		# Initialize the collider else it is not possible to compare the results with different nbIter
+		O.run(1,1)
 		O.timingEnabled=True
+		timing.reset()
 		tStart=time.time()
 		
 		O.run(nbIter)
