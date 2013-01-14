@@ -462,7 +462,7 @@ py::list intrsOfEachBody() {
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	size_t n = rb->bodies->size();
 	// create list of size len(O.bodies) full of zeros
-	for (int i=0; i<n; i++) {
+	for (size_t i=0; i<n; i++) {
 		ret.append(py::list());
 	}
 	// loop over all interactions and fill the list ret
@@ -472,6 +472,7 @@ py::list intrsOfEachBody() {
 		//temp = py::extract<py::list>(ret[i->getId2()]);
 		//temp.append( (i->isReal())? i : NULL);
 	}
+	return ret;
 }
 
 py::list numIntrsOfEachBody() {
@@ -479,7 +480,7 @@ py::list numIntrsOfEachBody() {
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	size_t n = rb->bodies->size();
 	// create list of size len(O.bodies) full of zeros
-	for (int i=0; i<n; i++) {
+	for (size_t i=0; i<n; i++) {
 		ret.append(0);
 	}
 	// loop over all interactions and fill the list ret
@@ -488,6 +489,7 @@ py::list numIntrsOfEachBody() {
 		ret[i->getId1()] += 1;
 		ret[i->getId2()] += 1;
 	}
+	return ret;
 }
 
 BOOST_PYTHON_MODULE(_utils){
