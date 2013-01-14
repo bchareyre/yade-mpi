@@ -599,7 +599,15 @@ double PeriodicFlow::boundaryFlux(unsigned int boundaryId)
 void  PeriodicFlow::computeEdgesSurfaces()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
-  Edge_Surfaces.clear(); Edge_ids.clear(); 
+//first, copy interacting pairs and normal lub forces form prev. triangulation in a sorted structure for initializing the new lub. Forces
+  vector<vector<pair<unsigned int,Real> > > lubPairs;
+  lubPairs.resize(Tri.number_of_vertices()+1);
+  for (unsigned int k=0; k<edgeNormalLubF.size(); k++)
+	lubPairs[min(Edge_ids[k].first,Edge_ids[k].second)].push_back(pair<int,Real> (max(Edge_ids[k].first,Edge_ids[k].second),edgeNormalLubF[k]));
+
+  //Now we reset the containers and initialize them
+  
+  Edge_Surfaces.clear(); Edge_ids.clear(); edgeNormalLubF.clear();
   Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
   {
@@ -614,7 +622,21 @@ void  PeriodicFlow::computeEdgesSurfaces()
     double area = T[currentTes].ComputeVFacetArea(ed_it);
     Edge_Surfaces.push_back(area);
     Edge_ids.push_back(pair<int,int>(id1,id2));
-    edgeNormalLubF.push_back(0);
+
+    //For persistant edges, we must transfer the lub. force value from the older triangulation structure
+    if (id1>id2) swap(id1,id2);
+    unsigned int i=0;
+    //Look for the pair (id1,id2) in lubPairs
+    while (i<lubPairs[id1].size()) {
+		if (lubPairs[id1][i].first == id2) {
+			//it's found, we copy the lub force
+			edgeNormalLubF.push_back(lubPairs[id1][i].second);
+			break;}
+		++i;
+    }
+    // not found, we initialize with zero lub force
+    if (i==lubPairs[id1].size()) edgeNormalLubF.push_back(0);
+//     edgeNormalLubF.push_back(0);
     
   }
 }

@@ -1613,7 +1613,16 @@ void FlowBoundingSphere<Tesselation>::ComsolField()
 template <class Tesselation>
 void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
 {
+	cerr <<"FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()"<<endl;
   RTriangulation& Tri = T[currentTes].Triangulation();
+
+  //first, copy interacting pairs and normal lub forces form prev. triangulation in a sorted structure for initializing the new lub. Forces
+  vector<vector<pair<unsigned int,Real> > > lubPairs;
+  lubPairs.resize(Tri.number_of_vertices()+1);
+  for (unsigned int k=0; k<edgeNormalLubF.size(); k++)
+	lubPairs[min(Edge_ids[k].first,Edge_ids[k].second)].push_back(pair<int,Real> (max(Edge_ids[k].first,Edge_ids[k].second),edgeNormalLubF[k]));
+
+  //Now we reset the containers and initialize them
   Edge_Surfaces.clear(); Edge_ids.clear(); edgeNormalLubF.clear();
   Finite_edges_iterator ed_it;
   for ( Finite_edges_iterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
@@ -1625,9 +1634,24 @@ void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
     int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
     int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
     Edge_ids.push_back(pair<int,int>(id1,id2));
-    edgeNormalLubF.push_back(0);
+    
+    //For persistant edges, we must transfer the lub. force value from the older triangulation structure
+    if (id1>id2) swap(id1,id2);
+    unsigned int i=0;
+    //Look for the pair (id1,id2) in lubPairs
+    while (i<lubPairs[id1].size()) {
+		if (lubPairs[id1][i].first == id2) {
+			//it's found, we copy the lub force
+			edgeNormalLubF.push_back(lubPairs[id1][i].second);
+			cerr << "passing one value" <<endl;
+			break;}
+		++i;
+    }
+    // not found, we initialize with zero lub force
+    if (i==lubPairs[id1].size()) edgeNormalLubF.push_back(0);
   }
 }
+
 template <class Tesselation> 
 Vector3r FlowBoundingSphere<Tesselation>::computeViscousShearForce(const Vector3r& deltaV, const int& edge_id, const Real& Rh)
 {
@@ -1650,7 +1674,13 @@ Real FlowBoundingSphere<Tesselation>::computeNormalLubricationForce(const Real& 
 	Real d = max(dist,0.) + eps*meanRad;//account for grains roughness
 	if (stiffness>0) {
 		const Real k = stiffness*meanRad;
-		const Real prevForce = edgeNormalLubF[edge_id] ? edgeNormalLubF[edge_id] : (6*Mathr::PI*pow(meanRad,2)* VISCOSITY* deltaNormV)/d;
+		Real prevForce = edgeNormalLubF[edge_id];
+// 		Real prevForce = edgeNormalLubF[edge_id] ? edgeNormalLubF[edge_id] : (6*Mathr::PI*pow(meanRad,2)* VISCOSITY* deltaNormV)/d;
+// 		if (!edgeNormalLubF[edge_id]) for (int kk=0; kk<30; kk++) {
+// 			Real instantVisc = 6*Mathr::PI*pow(meanRad,2)*VISCOSITY/(d-prevForce/k);
+// 			prevForce = instantVisc*(deltaNormV + prevForce/(k*dt))/(1+instantVisc/(k*dt));
+// 			if ((kk==0 || kk==29) && deltaNormV!=0) cerr << "prevForce("<<kk<<") = "<< prevForce<<endl;
+// 		}
 		Real instantVisc = 6*Mathr::PI*pow(meanRad,2)*VISCOSITY/(d-prevForce/k);
 		Real normLubF = instantVisc*(deltaNormV + prevForce/(k*dt))/(1+instantVisc/(k*dt));
 		edgeNormalLubF[edge_id]=normLubF;
