@@ -797,7 +797,7 @@ void PeriodicFlowEngine:: action()
 			scene->forces.addTorque ( v_info.id(), solver->viscousShearTorques[v_info.id()]);
 		}
 		if (normalLubrication)
-			force = force - solver->normLubForce[v_info.id()];
+			force = force + solver->normLubForce[v_info.id()];
 		scene->forces.addForce ( v_info.id(), force);
 	}
         ///End Compute flow and forces
