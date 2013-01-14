@@ -1613,7 +1613,6 @@ void FlowBoundingSphere<Tesselation>::ComsolField()
 template <class Tesselation>
 void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
 {
-	cerr <<"FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()"<<endl;
   RTriangulation& Tri = T[currentTes].Triangulation();
 
   //first, copy interacting pairs and normal lub forces form prev. triangulation in a sorted structure for initializing the new lub. Forces
@@ -1643,7 +1642,6 @@ void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
 		if (lubPairs[id1][i].first == id2) {
 			//it's found, we copy the lub force
 			edgeNormalLubF.push_back(lubPairs[id1][i].second);
-			cerr << "passing one value" <<endl;
 			break;}
 		++i;
     }
