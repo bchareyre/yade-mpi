@@ -39,6 +39,7 @@
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
 
+#include<yade/pkg/common/Grid.hpp>
 
 #include<yade/pkg/dem/Tetra.hpp>
 
@@ -766,8 +767,11 @@ Matrix3r Shop::getStress(Real volume){
 	const bool isPeriodic = scene->isPeriodic;
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if (!I->isReal()) continue;
+		shared_ptr<Body> b1 = Body::byId(I->getId1(),scene);
+		shared_ptr<Body> b2 = Body::byId(I->getId2(),scene);
+		if (b1->shape->getClassIndex()==GridNode::getClassIndexStatic()) continue; //no need to check b2 because a GridNode can only be in interaction with an oher GridNode.
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
-		Vector3r branch=Body::byId(I->getId1(),scene)->state->pos -Body::byId(I->getId2(),scene)->state->pos;
+		Vector3r branch=b1->state->pos -b2->state->pos;
 		if (isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
 		stressTensor += (nsi->normalForce+nsi->shearForce)*branch.transpose();
 	}
@@ -881,7 +885,8 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
 		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
-		if(b->isClump()) continue;
+		int ci=b->shape->getClassIndex();
+		if(b->isClump() || ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
 		(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
 		// Clump volume variation with homothetic displacement from its center
 		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
