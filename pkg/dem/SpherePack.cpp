@@ -426,7 +426,7 @@ long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool period
 	return pack.size();
 }
 
-long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& _clumps, bool periodic, int num){
+long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& _clumps, bool periodic, int num, int seed){
 	// recenter given clumps and compute their margins
 	vector<SpherePack> clumps; /* vector<Vector3r> margins; */ Vector3r boxMargins(Vector3r::Zero()); Real maxR=0;
 	vector<Real> boundRad; // squared radii of bounding sphere for each clump
@@ -448,7 +448,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 	const int maxTry=200;
 	int nGen=0; // number of clumps generated
 	// random point coordinate generator, with non-zero margins if aperiodic
-	static boost::minstd_rand randGen(TimingInfo::getNow(true));
+	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	typedef boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > UniRandGen;
 	static UniRandGen rndX(randGen,boost::uniform_real<>(mn[0],mx[0]));
 	static UniRandGen rndY(randGen,boost::uniform_real<>(mn[1],mx[1]));

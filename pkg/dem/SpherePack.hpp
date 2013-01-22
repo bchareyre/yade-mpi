@@ -79,7 +79,7 @@ public:
 
 	// generate packing of clumps, selected with equal probability
 	// periodic boundary is supported
-	long makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& clumps, bool periodic=false, int num=-1);
+	long makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& clumps, bool periodic=false, int num=-1, int seed=0);
 
 	// periodic repetition
 	void cellRepeat(Vector3i count);
