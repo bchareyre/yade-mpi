@@ -719,8 +719,8 @@ void FlowEngine::computeViscousForces ( Solver& flow )
 		
 /// Compute the viscous shear stress on each particle
 			if (viscousShearBodyStress){
-				flow.viscousBodyStress[flow.Edge_ids[i].first] += visc_f * point_force.transpose();
-				flow.viscousBodyStress[flow.Edge_ids[i].second] -= visc_f * (centerDistVect-point_force).transpose();}
+				flow.viscousBodyStress[flow.Edge_ids[i].first] += visc_f * point_force.transpose()/(4/3*3.14*pow(s1->radius,3));
+				flow.viscousBodyStress[flow.Edge_ids[i].second] -= visc_f * (centerDistVect-point_force).transpose()/(4/3*3.14*pow(s2->radius,3));}
 		
 /// Compute the normal lubrication force applied on each particle
 			if (normalLubrication){
@@ -731,8 +731,8 @@ void FlowEngine::computeViscousForces ( Solver& flow )
 		
 /// Compute the normal lubrication stress on each particle
 				if (viscousNormalBodyStress){
-					flow.lubBodyStress[flow.Edge_ids[i].first] += lub_f * point_force.transpose();
-					flow.lubBodyStress[flow.Edge_ids[i].second] -= lub_f *(centerDistVect-point_force).transpose();}
+					flow.lubBodyStress[flow.Edge_ids[i].first] += lub_f * point_force.transpose()/(4/3*3.14*pow(s1->radius,3));
+					flow.lubBodyStress[flow.Edge_ids[i].second] -= lub_f *(centerDistVect-point_force).transpose()/(4/3*3.14*pow(s2->radius,3));}
 // 			if ( Debug ) cout << "la force normale entre " << flow.Edge_ids[i].first << " et " << flow.Edge_ids[i].second << "est " << lub_f << endl;
 			}
 		
