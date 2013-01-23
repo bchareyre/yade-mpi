@@ -142,6 +142,25 @@ class pyBodyContainer{
 		// clump them together (the clump fcn) and return
 		return python::make_tuple(clump(ids),ids);
 	}
+	void addToClump(Body::id_t bid, Body::id_t cid){
+		Scene* scene(Omega::instance().getScene().get());	// get scene
+		shared_ptr<Body> bp = Body::byId(bid,scene);		// get ball pointer
+		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
+		if (!(bp->isStandalone())){//check if body with bid is already clump member
+			//string err_bid = static_cast<ostringstream*>( &(ostringstream() << bid) )->str();
+			PyErr_SetString(PyExc_TypeError,("Error: Body is not a standalone body."));//"+err_bid+" 
+			python::throw_error_already_set();
+		}
+		else if (clp->isClump()){ //check if body with cid is a clump
+			Clump::add(Body::byId(cid,scene),Body::byId(bid,scene));
+			Clump::updateProperties(Body::byId(cid,scene),/*intersecting*/false);
+			}
+			else {
+				//string err_cid = static_cast<ostringstream*>( &(ostringstream() << cid) )->str();
+				PyErr_SetString(PyExc_TypeError,("Error: Body is not a clump."));//"+err_cid+" 
+				python::throw_error_already_set();
+			}
+	}
 	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
@@ -604,6 +623,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
 		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids.")
 		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns clump id.")
+		.def("addToClump",&pyBodyContainer::addToClump,"Add a sphere to an existing clump.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);
