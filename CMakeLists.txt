@@ -32,6 +32,7 @@ INCLUDE(FindOpenGL)
 INCLUDE(FindGTS)
 INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
+INCLUDE(FindNumPy)
 
 #===========================================================
 IF (CMAKE_CXX_FLAGS)
@@ -57,6 +58,7 @@ ELSE (CMAKE_CXX_FLAGS)
 ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
+
 FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
@@ -65,7 +67,11 @@ MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
+#===========================================================
+FIND_PACKAGE(NumPy REQUIRED)
 FIND_PACKAGE(Eigen3)
+#===========================================================
+
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
 SET(LINKLIBS "")
 SET(CONFIGURED_FEATS "")
