@@ -20,20 +20,7 @@ project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
-
-INCLUDE(FindPythonLibs)
-INCLUDE(FindPythonInterp)
-INCLUDE(FindOpenMP)
-INCLUDE(FindQt4)
-INCLUDE(FindVTK)
-INCLUDE(FindPkgConfig)
-INCLUDE(GetVersion)
-INCLUDE(FindOpenGL)
-INCLUDE(FindGTS)
-INCLUDE(FindGL2PS)
-INCLUDE(FindCGAL)
-INCLUDE(FindNumPy)
-
+FIND_PACKAGE(Loki REQUIRED)
 #===========================================================
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
@@ -69,6 +56,7 @@ MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
 #===========================================================
 FIND_PACKAGE(NumPy REQUIRED)
+
 FIND_PACKAGE(Eigen3)
 #===========================================================
 
