@@ -43,40 +43,96 @@ void UnsaturatedEngine::testFunction()
 //	Let us define an alias for this triangulation:
 
 	RTriangulation& triangulation = solver->T[solver->currentTes].Triangulation();
-
 	//Now, you can use "triangulation", with all the functions listed in CGAL documentation
 	//We can insert spheres (here I'm in fact stealing the code from Tesselation::insert() (see Tesselation.ipp)
+
+/*	//test Compute_EffectiveRadius function
 	unsigned int k=0;
-	Real x=0.5, y=0.5,z=0.5, rad=0.1;
+	Real x=0.0, y=0.0,z=0.0, rad=1.0;
 	Vertex_handle Vh;
 	Vh = triangulation.insert(CGALSphere(Point(x,y,z),pow(rad,2)));
 	//The vertex base includes integers, so we can assign indices to the vertex/spheres 
 	Vh->info() = k;
 	k = k+1;
-
-	// Now, let's add more spheres to make it more fun...
-	Vh = triangulation.insert(CGALSphere(Point(0,0,0.2),pow(0.05,2)));
+	Vh = triangulation.insert(CGALSphere(Point(3.464101616,0.0,0.0),pow(rad,2)));
 	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(0.9,0,0.2),pow(0.05,2)));
+	Vh = triangulation.insert(CGALSphere(Point(1.732050808,3.0,0.0),pow(rad,2)));
 	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(0.9,0.8,0.2),pow(0.05,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(1,0.9,0.8),pow(0.05,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(1,0.1,0.8),pow(0.05,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(0.2,0.0,0.8),pow(0.05,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(0.2,0.9,0.8),pow(0.05,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(0.2,0.8,0.),pow(0.05,2)));
-	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(1.732050808,1.0,3),pow(rad,2)));
+	Vh->info() = k++;		
 	cout << "triangulation.number_of_vertices()" << triangulation.number_of_vertices() << endl;
-
-	//now we can start playing with pressure (=0 for dry pore, =1 for saturated pore)
+	cout <<"triangulation.number_of_cells()" << triangulation.number_of_cells() << endl;
+	
+	//now we can start playing with pressure (=1 for dry pore, =0 for saturated pore)
 	//they all have 0 by default, we find one cell and set pressure to 1
-	Cell_handle cell = triangulation.locate(Point(0.3,0.3,0.3));
+	Cell_handle cell = triangulation.locate(Point(1.732,1.732,1.0));
 	cell->info().p()=1;
+	FlowSolver FS;
+	double inscribe_r0 = FS.Compute_EffectiveRadius(cell, 0);
+	double inscribe_r1 = FS.Compute_EffectiveRadius(cell, 1);
+	double inscribe_r2 = FS.Compute_EffectiveRadius(cell, 2);
+	double inscribe_r3 = FS.Compute_EffectiveRadius(cell, 3);	
+	cout << "the radius of inscribe circle for facet 0: inscribe_r0 = " << inscribe_r0 << endl;
+	cout << "the radius of inscribe circle for facet 1: inscribe_r1 = " << inscribe_r1 << endl;
+	cout << "the radius of inscribe circle for facet 2: inscribe_r2 = " << inscribe_r2 << endl;
+	cout << "the radius of inscribe circle for facet 3: inscribe_r3 = " << inscribe_r3 << endl;
+
+	//pass. triangulation.number_of_cells()5
+	//the radius of inscribe circle for facet 0: inscribe_r0 = 1.05548
+	//the radius of inscribe circle for facet 1: inscribe_r1 = 1.05548
+	//the radius of inscribe circle for facet 2: inscribe_r2 = 1.05548
+	//the radius of inscribe circle for facet 3: inscribe_r3 = 1
+*/	
+	//test 8 vertices  	
+	unsigned int k=0, m=0;
+	Real x=5.0, y=5.0,z=5.0, rad=1.0;
+	Vertex_handle Vh;
+	Vh = triangulation.insert(CGALSphere(Point(x,y,z),pow(rad,2)));
+	//The vertex base includes integers, so we can assign indices to the vertex/spheres 
+	Vh->info() = k;
+	k = k+1;
+	Vh = triangulation.insert(CGALSphere(Point(7.5,6.0,5.5),pow(rad,2)));
+	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(6.0,6.0,7.5),pow(rad,2)));
+	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(5.4,7.3,5.8),pow(rad,2)));
+	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(7.0,4.0,6.5),pow(rad,2)));
+	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(6.5,7.2,3.8),pow(rad,2)));
+	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(7.6,8.2,6.6),pow(rad,2)));
+	Vh->info() = k++;
+	Vh = triangulation.insert(CGALSphere(Point(3.5,6.0,7.0),pow(rad,2)));
+	Vh->info() = k++;
+	
+	cout << "triangulation.number_of_vertices()" << triangulation.number_of_vertices() << endl;
+	cout <<"triangulation.number_of_cells()" << triangulation.number_of_cells() << endl;
+	
+	//now we can start playing with pressure (=1 for dry pore, =0 for saturated pore)
+	//they all have 0 by default, we find one cell and set pressure to 1
+	Cell_handle cell = triangulation.locate(Point(6.0,6.0,6.0));
+	cell->info() = m;
+	cell->info().p()= 5; //initialised air entry pressure
+	m = m+1;	
+	
+	FlowSolver FS;
+	double surface_tension = 1; //hypothesis that's surface tension
+	
+	for(int facet = 0; facet < 4; facet ++)
+	{
+	  double pe = 2*surface_tension/FS.Compute_EffectiveRadius(cell, facet);		
+	  //pe is air entry pressure, related to facet(inscribe circle r), vertices and surface_tension, pe = (Lnw+Lns*cosθ)*σnw/An = 2*σnw/r
+	  cout << "facet: " << facet << ", air entry pressure pe =  " << pe << endl;
+	  if (cell->info().p() > pe)
+	    cell->neighbor(facet)->info().p() = cell->info().p();
+	}
+	
+	double cell_pressure;
+	cell_pressure = FS.MeasurePorePressure (6, 7, 6);
+	cout << "the pressure in cell(6,7,6) is: " << cell_pressure << endl;
+	
+
 
 	solver->noCache = false;
 
@@ -296,11 +352,6 @@ void UnsaturatedEngine::Triangulate ( Solver& flow )
                         flow->T[flow->currentTes].insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );}
         }
         flow->T[flow->currentTes].redirected=true;//By inserting one-by-one, we already redirected
-        flow->viscousShearForces.resize ( flow->T[flow->currentTes].max_id+1 );
-	flow->viscousShearTorques.resize ( flow->T[flow->currentTes].max_id+1 );
-	flow->viscousBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
-	flow->normLubForce.resize ( flow->T[flow->currentTes].max_id+1 );
-	flow->lubBodyStress.resize ( flow->T[flow->currentTes].max_id+1 );
 }
 
 template<class Solver>

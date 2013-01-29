@@ -30,7 +30,6 @@ class UnsaturatedEngine : public PartialEngine
 	typedef RTriangulation::Point						CGALSphere;
 	typedef CGALSphere::Point							Point;
 
-
 	
 	protected:
 		shared_ptr<FlowSolver> solver;
