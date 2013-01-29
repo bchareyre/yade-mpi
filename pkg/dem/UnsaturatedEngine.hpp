@@ -28,7 +28,7 @@ class UnsaturatedEngine : public PartialEngine
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
 	typedef RTriangulation::Vertex_handle					Vertex_handle;
 	typedef RTriangulation::Point						CGALSphere;
-	typedef CGALSphere::Point							Point;
+	typedef CGALSphere::Point						Point;
 
 	
 	protected:
@@ -79,6 +79,7 @@ class UnsaturatedEngine : public PartialEngine
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		void 		_buildTriangulation() {setPositionsBuffer(true); Build_Triangulation(solver);}
 
 		virtual ~UnsaturatedEngine();
 
@@ -132,6 +133,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("emulateAction",&UnsaturatedEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
 					.def("getCell",&UnsaturatedEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
+					.def("buildTriangulation",&UnsaturatedEngine::_buildTriangulation,"Triangulate spheres of the current scene.")
 					)
 		DECLARE_LOGGER;
 };

@@ -41,8 +41,20 @@ void UnsaturatedEngine::testFunction()
 // 	UnsaturatedEngine inherits from Emanuele's flow engine, so it contains many things. However, we will ignore what's in it for the moment.
 // 	The only thing interesting for us is that UnsaturatedEngine contains an object "triangulation" from CGAL library.
 //	Let us define an alias for this triangulation:
-
 	RTriangulation& triangulation = solver->T[solver->currentTes].Triangulation();
+
+	if (triangulation.number_of_vertices()==0) {
+		cout<< "triangulation is empty: building a new one" << endl;
+		//here we define the pointer to Yade's scene
+		scene = Omega::instance().getScene().get();
+		//copy sphere positions in a buffer...
+		setPositionsBuffer(true);
+		//then create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
+		Build_Triangulation(P_zero,solver);
+	}
+
+	
+	
 	//Now, you can use "triangulation", with all the functions listed in CGAL documentation
 	//We can insert spheres (here I'm in fact stealing the code from Tesselation::insert() (see Tesselation.ipp)
 
@@ -86,32 +98,32 @@ void UnsaturatedEngine::testFunction()
 	//test 8 vertices  	
 	unsigned int k=0, m=0;
 	Real x=5.0, y=5.0,z=5.0, rad=1.0;
-	Vertex_handle Vh;
-	Vh = triangulation.insert(CGALSphere(Point(x,y,z),pow(rad,2)));
-	//The vertex base includes integers, so we can assign indices to the vertex/spheres 
-	Vh->info() = k;
-	k = k+1;
-	Vh = triangulation.insert(CGALSphere(Point(7.5,6.0,5.5),pow(rad,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(6.0,6.0,7.5),pow(rad,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(5.4,7.3,5.8),pow(rad,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(7.0,4.0,6.5),pow(rad,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(6.5,7.2,3.8),pow(rad,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(7.6,8.2,6.6),pow(rad,2)));
-	Vh->info() = k++;
-	Vh = triangulation.insert(CGALSphere(Point(3.5,6.0,7.0),pow(rad,2)));
-	Vh->info() = k++;
+// 	Vertex_handle Vh;
+// 	Vh = triangulation.insert(CGALSphere(Point(x,y,z),pow(rad,2)));
+// 	//The vertex base includes integers, so we can assign indices to the vertex/spheres 
+// 	Vh->info() = k;
+// 	k = k+1;
+// 	Vh = triangulation.insert(CGALSphere(Point(7.5,6.0,5.5),pow(rad,2)));
+// 	Vh->info() = k++;
+// 	Vh = triangulation.insert(CGALSphere(Point(6.0,6.0,7.5),pow(rad,2)));
+// 	Vh->info() = k++;
+// 	Vh = triangulation.insert(CGALSphere(Point(5.4,7.3,5.8),pow(rad,2)));
+// 	Vh->info() = k++;
+// 	Vh = triangulation.insert(CGALSphere(Point(7.0,4.0,6.5),pow(rad,2)));
+// 	Vh->info() = k++;
+// 	Vh = triangulation.insert(CGALSphere(Point(6.5,7.2,3.8),pow(rad,2)));
+// 	Vh->info() = k++;
+// 	Vh = triangulation.insert(CGALSphere(Point(7.6,8.2,6.6),pow(rad,2)));
+// 	Vh->info() = k++;
+// 	Vh = triangulation.insert(CGALSphere(Point(3.5,6.0,7.0),pow(rad,2)));
+// 	Vh->info() = k++;
 	
 	cout << "triangulation.number_of_vertices()" << triangulation.number_of_vertices() << endl;
 	cout <<"triangulation.number_of_cells()" << triangulation.number_of_cells() << endl;
 	
 	//now we can start playing with pressure (=1 for dry pore, =0 for saturated pore)
 	//they all have 0 by default, we find one cell and set pressure to 1
-	Cell_handle cell = triangulation.locate(Point(6.0,6.0,6.0));
+	Cell_handle cell = triangulation.locate(Point(0.05,0.05,0.05));
 	cell->info() = m;
 	cell->info().p()= 5; //initialised air entry pressure
 	m = m+1;	
@@ -121,6 +133,8 @@ void UnsaturatedEngine::testFunction()
 	
 	for(int facet = 0; facet < 4; facet ++)
 	{
+	  //NOTE: this test is important, the infinite cells are outside the problem, we skip them
+	  if (triangulation.is_infinite(cell->neighbor(facet))) continue;
 	  double pe = 2*surface_tension/FS.Compute_EffectiveRadius(cell, facet);		
 	  //pe is air entry pressure, related to facet(inscribe circle r), vertices and surface_tension, pe = (Lnw+Lns*cosθ)*σnw/An = 2*σnw/r
 	  cout << "facet: " << facet << ", air entry pressure pe =  " << pe << endl;
@@ -129,24 +143,12 @@ void UnsaturatedEngine::testFunction()
 	}
 	
 	double cell_pressure;
-	cell_pressure = FS.MeasurePorePressure (6, 7, 6);
+	//FIXME CHao, the coordinates of measurments must be correct with respect to the simulation sizes,needs to be adapted here
+	//cell_pressure = FS.MeasurePorePressure (6, 7, 6);
 	cout << "the pressure in cell(6,7,6) is: " << cell_pressure << endl;
-	
-
 
 	solver->noCache = false;
 
-	/*
-	//This is how we could input spheres from the simulation into a triangulation, we will use it latter as fow now we only define a few spheres manually (below)
-	//here we define the pointer to Yade's scene
-	scene = Omega::instance().getScene().get();
-	//copy sphere positions in a buffer...
-	setPositionsBuffer(true);
-	//then create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
-	Build_Triangulation(P_zero,solver);
-	*/
-
-	
 }
 
 
