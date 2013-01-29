@@ -70,13 +70,14 @@ class BodiesMenisciiList
 		
 	public:
 		BodiesMenisciiList();
-		BodiesMenisciiList(Scene* body);
-		bool prepare(Scene* scene);
-		bool insert(const shared_ptr<Interaction>& interaction);
-		bool remove(const shared_ptr<Interaction>& interaction);
-		list< shared_ptr<Interaction> >& operator[] (int index);
+		BodiesMenisciiList(Scene*);
+		bool prepare(Scene*);
+		bool insert(const shared_ptr<Interaction>&);
+		bool remove(const shared_ptr<Interaction>&);
+		list< shared_ptr<Interaction> >& operator[] (int);
 		int size();
 		void display();
+		void checkLengthBuffer(const shared_ptr<Interaction>&);
 		
 		
 		bool initialized;
