@@ -1,7 +1,10 @@
 #include"ParallelEngine.hpp"
 #include<boost/python.hpp>
 using namespace boost;
-//#include<omp.h> // needed for omp_get_thread_num() (debugging)
+#ifdef YADE_OPENMP
+  #include<omp.h>
+#endif
+
 YADE_PLUGIN((ParallelEngine));
 
 //! ParallelEngine's pseudo-ctor (factory), taking nested lists of slave engines (might be moved to real ctor perhaps)
