@@ -69,6 +69,8 @@ MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
 #===========================================================
 FIND_PACKAGE(NumPy REQUIRED)
+INCLUDE_DIRECTORIES(${NUMPY_INCLUDE_DIRS})
+
 FIND_PACKAGE(Loki REQUIRED)
 FIND_PACKAGE(Eigen3)
 #===========================================================
