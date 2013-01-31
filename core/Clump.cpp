@@ -20,15 +20,29 @@ python::dict Clump::members_get(){
 
 void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBody){
 	Body::id_t subId=subBody->getId();
-	if(subBody->clumpId!=Body::ID_NONE) throw std::invalid_argument(("Body #"+lexical_cast<string>(subId)+" is already in clump #"+lexical_cast<string>(subBody->clumpId)).c_str());
 	const shared_ptr<Clump> clump=YADE_PTR_CAST<Clump>(clumpBody->shape);
 	if(clump->members.count(subId)!=0) throw std::invalid_argument(("Body #"+lexical_cast<string>(subId)+" is already part of this clump #"+lexical_cast<string>(clumpBody->id)).c_str());
-	
-	clump->members[subId]=Se3r(); // meaningful values will be put in by Clump::updateProperties
-	subBody->clumpId=clumpBody->id;
+	if(subBody->isClumpMember()) throw std::invalid_argument(("Body #"+lexical_cast<string>(subId)+" is already a clump member of #"+lexical_cast<string>(subBody->clumpId)).c_str());
+	else if(subBody->isClump()){
+		const shared_ptr<Clump> subClump=YADE_PTR_CAST<Clump>(subBody->shape);
+		FOREACH(const MemberMap::value_type& mm, subClump->members){
+			const Body::id_t& memberId=mm.first;
+			Scene* scene(Omega::instance().getScene().get());	// get scene
+			const shared_ptr<Body>& member=Body::byId(memberId,scene);
+			assert(member->isClumpMember());
+			member->clumpId=clumpBody->id;
+			clump->members[memberId]=Se3r();// meaningful values will be put in by Clump::updateProperties
+			LOG_DEBUG("Added body #"<<memberId->id<<" to clump #"<<clumpBody->id);
+		}
+		LOG_DEBUG("Clump #"<<subClump->id<<" will be erased.");// see addToClump() in yadeWrapper.cpp
+	}
+	else{	// subBody must be a standalone!
+		clump->members[subId]=Se3r();// meaningful values will be put in by Clump::updateProperties
+		subBody->clumpId=clumpBody->id;
+	}
 	clumpBody->clumpId=clumpBody->id; // just to make sure
 	clumpBody->setBounded(false); // disallow collisions with the clump itself
-	LOG_DEBUG("Added body #"<<subBody->id<<" to clump #"<<clumpBody->id);
+	if(subBody->isStandalone()){LOG_DEBUG("Added body #"<<subBody->id<<" to clump #"<<clumpBody->id);}
 }
 
 void Clump::del(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBody){
