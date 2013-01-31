@@ -214,6 +214,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=None,fixed=False,wire=False
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material,pos=center,dynamic=dynamic,fixed=fixed)
+	b.state.ori=orientation
 	b.mask=mask
 	b.aspherical=True
 	return b
