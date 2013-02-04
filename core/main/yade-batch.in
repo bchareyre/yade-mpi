@@ -435,7 +435,6 @@ for i,l in enumerate(useLines):
 	nCores=opts.defaultThreads
 	jobExecutable=executable
 	jobAffinity=opts.affinity
-	jobDebug=opts.debug
 	jobCount=opts.timing
 	for col in params[l].keys():
 		if col[0]!='!': continue
@@ -444,7 +443,6 @@ for i,l in enumerate(useLines):
 		elif col=='!EXEC': jobExecutable=val
 		elif col=='!SCRIPT': script=val
 		elif col=='!AFFINITY': jobAffinity=eval(val)
-		elif col=='!DEBUG': jobDebug=eval(val)
 		elif col=='!COUNT': jobCount=eval(val)
 		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if not script:
@@ -476,7 +474,7 @@ for i,l in enumerate(useLines):
 		env='YADE_BATCH='
 		if table: env+='<a href="jobs/%d/table">%s:%d</a>'%(jobNum,table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		env+=' DISPLAY= %s '%(' '.join(envVars))
-		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,' --debug' if jobDebug else '','--nice=%s'%nice if nice!=None else '',i,script)
+		cmd='%s%s [threadspec] %s -x <a href="jobs/%d/script">%s</a>'%(jobExecutable,'','--nice=%s'%nice if nice!=None else '',i,script)
 		log='> <a href="jobs/%d/log">%s</a> 2>&1'%(jobNum,pipes.quote(logFile2))
 		hrefCmd=env+cmd+log
 		fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
