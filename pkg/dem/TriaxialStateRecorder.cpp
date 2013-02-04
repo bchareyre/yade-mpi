@@ -31,13 +31,13 @@ void TriaxialStateRecorder::action ()
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
 		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 		for ( ;itFirst!=itLast; ++itFirst ){
-			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" || ( *itFirst )->getClassName() == "ThreeDTriaxialEngine" ){
+			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" || ( *itFirst )->getClassName() == "ThreeDTriaxialEngine" || ( *itFirst )->getClassName() == "TriaxialStressController"){
 				LOG_DEBUG ( "stress controller engine found" );
 				triaxialStressController =  YADE_PTR_CAST<TriaxialStressController> ( *itFirst );
 				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
 			}
 		}
-		if ( !triaxialStressController ) LOG_DEBUG ( "stress controller engine NOT found" );
+		if ( !triaxialStressController ) LOG_ERROR ( "stress controller engine NOT found" );
 	}
 	if ( ! ( scene->iter % triaxialStressController->computeStressStrainInterval == 0 ) )
 		triaxialStressController->computeStressStrain ();

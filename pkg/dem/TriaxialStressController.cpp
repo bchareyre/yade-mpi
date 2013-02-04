@@ -61,7 +61,7 @@ void TriaxialStressController::controlExternalStress(int wall, Vector3r resultan
 	   }
 	   else translation = wall_max_vel * Mathr::Sign(translation)*scene->dt;
 	}
-	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
+	previousTranslation[wall] = (1-stressDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
 	//Don't update position since Newton is doing that starting from bzr2612
 // 	p->se3.position += previousTranslation[wall];
 	externalWork += previousTranslation[wall].dot(getForce(scene,wall_id[wall]));
@@ -107,16 +107,18 @@ void TriaxialStressController::action()
 				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		}
-		max_vel1=3 * width /(height+width+depth)*max_vel;
-		max_vel2=3 * height /(height+width+depth)*max_vel;
-		max_vel3 =3 * depth /(height+width+depth)*max_vel;
 		first = false;
 	}
+	max_vel1=3 * width /(height+width+depth)*max_vel;
+	max_vel2=3 * height /(height+width+depth)*max_vel;
+	max_vel3 =3 * depth /(height+width+depth)*max_vel;
 
 	// NOT JUST at the first run, since sigma_iso may be changed
 	// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
 	if (isAxisymetric){
-		sigma1=sigma2=sigma3=sigma_iso;
+		if (stressMask & 1) goal1=sigma_iso;
+		if (stressMask & 2) goal2=sigma_iso;
+		if (stressMask & 3) goal3=sigma_iso;
 	}
 
 	porosity = ( boxVolume - spheresVolume ) /boxVolume;
@@ -137,22 +139,35 @@ void TriaxialStressController::action()
 		computeStressStrain();
 
 	if (!internalCompaction) {
-		Vector3r wallForce (0, sigma2*width*depth, 0);
-		if (wall_bottom_activated) controlExternalStress(wall_bottom, -wallForce, p_bottom, max_vel2);
-		else p_bottom->vel=Vector3r::Zero();
-		if (wall_top_activated) controlExternalStress(wall_top, wallForce, p_top, max_vel2);
-		else p_top->vel=Vector3r::Zero();
-		wallForce = Vector3r(sigma1*height*depth, 0, 0);
-		if (wall_left_activated) controlExternalStress(wall_left, -wallForce, p_left, max_vel1);
-		else p_left->vel=Vector3r::Zero();
-		if (wall_right_activated) controlExternalStress(wall_right, wallForce, p_right, max_vel1);
-		else p_right->vel=Vector3r::Zero();
+		Vector3r wallForce (0, goal2*width*depth, 0);
+		if (wall_bottom_activated) {
+			if (stressMask & 2)  controlExternalStress(wall_bottom, -wallForce, p_bottom, max_vel2);
+			else p_bottom->vel[1] += (-normal[wall_bottom][1]*0.5*goal2*height -p_bottom->vel[1])*(1-strainDamping);
+		} else p_bottom->vel=Vector3r::Zero();
+		if (wall_top_activated) {
+			if (stressMask & 2)  controlExternalStress(wall_top, wallForce, p_top, max_vel2);
+			else p_top->vel[1] += (-normal[wall_top][1]*0.5*goal2*height -p_top->vel[1])*(1-strainDamping);
+		} else p_top->vel=Vector3r::Zero();
+		
+		wallForce = Vector3r(goal1*height*depth, 0, 0);
+		if (wall_left_activated) {
+			if (stressMask & 1) controlExternalStress(wall_left, -wallForce, p_left, max_vel1);
+			else p_left->vel[0] += (-normal[wall_left][0]*0.5*goal1*width -p_left->vel[0])*(1-strainDamping);
+		} else p_left->vel=Vector3r::Zero();
+		if (wall_right_activated) {
+			if (stressMask & 1) controlExternalStress(wall_right, wallForce, p_right, max_vel1);
+			else p_right->vel[0] += (-normal[wall_right][0]*0.5*goal1*width -p_right->vel[0])*(1-strainDamping);
+		} else p_right->vel=Vector3r::Zero();
 
-		wallForce = Vector3r(0, 0, sigma3*height*width);
-		if (wall_back_activated) controlExternalStress(wall_back, -wallForce, p_back, max_vel3);
-		else p_back->vel=Vector3r::Zero();
-		if (wall_front_activated) controlExternalStress(wall_front, wallForce, p_front, max_vel3);
-		else p_front->vel=Vector3r::Zero();
+		wallForce = Vector3r(0, 0, goal3*height*width);
+		if (wall_back_activated) {
+			if (stressMask & 4) controlExternalStress(wall_back, -wallForce, p_back, max_vel3);
+			else p_back->vel[2] += (-normal[wall_back][2]*0.5*goal3*depth -p_back->vel[2])*(1-strainDamping);
+		} else p_back->vel=Vector3r::Zero();
+		if (wall_front_activated) {
+			if (stressMask & 4) controlExternalStress(wall_front, wallForce, p_front, max_vel3);
+			else p_front->vel[2] += (-normal[wall_front][2]*0.5*goal3*depth -p_front->vel[2])*(1-strainDamping);
+		} else p_front->vel=Vector3r::Zero();
 	}
 	else //if internal compaction
 	{

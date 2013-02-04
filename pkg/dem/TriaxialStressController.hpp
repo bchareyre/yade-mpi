@@ -73,14 +73,15 @@ class TriaxialStressController : public BoundaryController
 		///! Getter for stress in python
 		Vector3r getStress(int boundId);
 
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
-		"An engine maintaining constant stresses on some boundaries of a parallepipedic packing. See also :yref:`TriaxialCompressionEngine`"
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
+		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. sigmaIso has to be defined during growing phases."
 		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
    		((unsigned int,stiffnessUpdateInterval,10,,"target strain rate (./s)"))
    		((unsigned int,radiusControlInterval,10,,""))
 		((unsigned int,computeStressStrainInterval,10,,""))
-		((Real,wallDamping,0.25,,"wallDamping coefficient - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
+		((Real,stressDamping,0.25,,"wall damping coefficient for the stress control - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
+		((Real,strainDamping,0.99,,"coefficient used for smoother transitions in the strain rate. The rate reaches the target value like $d^n$ reaches 0, where $d$ is the damping coefficient and $n$ is the number of steps"))
 		((Real,thickness,-1,,"thickness of boxes (needed by some functions)"))
 		((int,wall_bottom_id,2,,"id of boundary ; coordinate 1- (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 		((int,wall_top_id,3,,"id of boundary ; coordinate 1+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
@@ -88,12 +89,12 @@ class TriaxialStressController : public BoundaryController
 		((int,wall_right_id,1,,"id of boundary ; coordinate 0+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 		((int,wall_front_id,5,,"id of boundary ; coordinate 2+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 		((int,wall_back_id,4,,"id of boundary ; coordinate 2- (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-		((bool,wall_bottom_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
-		((bool,wall_top_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
-		((bool,wall_left_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
-		((bool,wall_right_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
-		((bool,wall_front_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
-		((bool,wall_back_activated,true,,"if true, the engine is keeping stress constant on this boundary."))
+		((bool,wall_bottom_activated,true,,"if true, this wall moves according to the target value (stress or strain rate)."))
+		((bool,wall_top_activated,true,,"if true, this wall moves according to the target value (stress or strain rate)."))
+		((bool,wall_left_activated,true,,"if true, this wall moves according to the target value (stress or strain rate)."))
+		((bool,wall_right_activated,true,,"if true, this wall moves according to the target value (stress or strain rate)."))
+		((bool,wall_front_activated,true,,"if true, this wall moves according to the target value (stress or strain rate)."))
+		((bool,wall_back_activated,true,,"if true, this wall moves according to the target value (stress or strain rate)."))
 		((Real,height,0,Attr::readonly,"size of the box (1-axis) |yupdate|"))
 		((Real,width,0,Attr::readonly,"size of the box (0-axis) |yupdate|"))
 		((Real,depth,0,Attr::readonly,"size of the box (2-axis) |yupdate|"))
@@ -101,20 +102,27 @@ class TriaxialStressController : public BoundaryController
 		((Real,width0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::width`"))
 		((Real,depth0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::depth`"))
 		((Real,sigma_iso,0,,"prescribed confining stress (see :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,sigma1,0,,"prescribed stress on axis 1 (see :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,sigma2,0,,"prescribed stress on axis 2 (see :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,sigma3,0,,"prescribed stress on axis 3 (see :yref:`TriaxialStressController::isAxisymetric`)"))
-		((bool,isAxisymetric,true,,"if true, sigma_iso is assigned to sigma1, 2 and 3 (applies at each iteration and overrides user-set values of s1,2,3)"))
+		((Real,goal1,0,,"prescribed stress/strain rate on axis 1, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,goal2,0,,"prescribed stress/strain rate on axis 2, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,goal3,0,,"prescribed stress/strain rate on axis 3, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
+		((unsigned int,stressMask,7,,"Bitmask determining if the components of :yref:`TriaxialStressController::goal` are stress (1) or strain (0). 0 for none, 7 for all, 1 for sigma1, etc."))
+		((bool,isAxisymetric,false,,"if true, sigma_iso is assigned to sigma1, 2 and 3 (applies at each iteration and overrides user-set values of s1,2,3)"))
 		((Real,maxMultiplier,1.001,,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))
-		((Real,max_vel,0.001,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))
+		((Real,max_vel,1,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))
 		((Real,previousStress,0,Attr::readonly,"|yupdate|"))
 		((Real,previousMultiplier,1,Attr::readonly,"|yupdate|"))
 		((bool,internalCompaction,true,,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
 		((Real,meanStress,0,Attr::readonly,"Mean stress in the packing. |yupdate|"))
 		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`).|yupdate|"))
 		((Real,externalWork,0,Attr::readonly,"Energy provided by boundaries.|yupdate|"))
- 		,
+		,
+		/* deprecated */
+		((sigma1,goal1,"renamed 'goal1', it can now also be a strain depending on stressMask"))
+		((sigma2,goal2,"renamed 'goal2', it can now also be a strain depending on stressMask"))
+		((sigma3,goal3,"renamed 'goal3', it can now also be a strain depending on stressMask"))
+		((wallDamping,stressDamping,"renamed to make the distinction with strain damping"))
+		,
 		/* extra initializers */
 		,
    		/* constructor */
