@@ -1,6 +1,6 @@
 # encoding: utf-8
 # Copyright (C) 2012 by Bruno Chareyre
-# An update of the original script for Janek Kozicki
+# An update of the original script from Janek Kozicki
 
 from yade import pack
 from numpy import arange
@@ -63,8 +63,6 @@ O.engines=[
 	# you can add TriaxialStateRecorder and such here…
 	NewtonIntegrator(damping=.4)
 ]
-
-O.dt=.5*utils.PWaveTimeStep() # initial timestep, to not explode right away
 
 #yade.plot.plots={'eps':('sigma',)}
 
