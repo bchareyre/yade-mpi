@@ -203,7 +203,7 @@ def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highligh
 	b.mask=mask
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
+def box(center,extents,orientation=Quaternion(1,0,0,0),dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create box (cuboid) with given parameters.
 
 	:param Vector3 extents: half-sizes along x,y,z axes
