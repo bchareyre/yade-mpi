@@ -262,22 +262,24 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
+	i=createInteraction(id1,id2)
+	nodeMat=sph1.material
 	b.shape.node1=sph1 ; b.shape.node2=sph2
 	sph1.shape.addConnection(b) ; sph2.shape.addConnection(b)
-	segt=sph2.state.pos - sph1.state.pos
+	if(O.periodic and cellDist!=None):
+		i.cellDist=cellDist
+	segt=sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos
 	L=segt.norm()
 	V=0.5*L*math.pi*radius**2
 	geomInert=(2./5.)*V*radius**2
-	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos,dynamic=False,fixed=True)
-	sph1.state.mass = sph1.state.mass + V*b.material.density
-	sph2.state.mass = sph2.state.mass + V*b.material.density
-	for i in [0,1,2]:
-		sph1.state.inertia[i] = sph1.state.inertia[i] + geomInert*b.material.density
-		sph2.state.inertia[i] = sph2.state.inertia[i] + geomInert*b.material.density
+	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=sph1.state.pos,dynamic=False,fixed=True)
+	sph1.state.mass = sph1.state.mass + V*nodeMat.density
+	sph2.state.mass = sph2.state.mass + V*nodeMat.density
+	for k in [0,1,2]:
+		sph1.state.inertia[k] = sph1.state.inertia[k] + geomInert*nodeMat.density
+		sph2.state.inertia[k] = sph2.state.inertia[k] + geomInert*nodeMat.density
 	b.aspherical=False
-	i=createInteraction(id1,id2)
 	if O.periodic:
-		if(cellDist!=None):i.cellDist=cellDist
 		i.phys.unp= -(sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
 		b.shape.periodic=True
 		b.shape.cellDist=i.cellDist
@@ -285,11 +287,11 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 		i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius	
 	i.geom.connectionBody=b
 	I=math.pi*(2.*radius)**4/64.
-	E=sph1.material.young
+	E=nodeMat.young
 	i.phys.kn=E*math.pi*(radius**2)/L
 	i.phys.kr=2.*E*I/L
 	i.phys.ks=12.*E*I/(L**3)
-	G=E/(2.*(1+sph1.material.poisson))
+	G=E/(2.*(1+nodeMat.poisson))
 	i.phys.ktw=2.*I*G/L
 	b.mask=mask
 	return b

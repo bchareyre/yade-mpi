@@ -381,7 +381,7 @@ void Gl1_GridConnection::go(const shared_ptr<Shape>& cm, const shared_ptr<State>
 	Real length=GC->getLength();
 	const shared_ptr<Interaction> intr = scene->interactions->find((int)GC->node1->getId(),(int)GC->node2->getId());
 	Vector3r segt = GC->node2->state->pos - GC->node1->state->pos;
-	if (scene->isPeriodic) segt+=scene->cell->intrShiftPos(intr->cellDist);
+	if (scene->isPeriodic && intr) segt+=scene->cell->intrShiftPos(intr->cellDist);
 	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
 
 	glColor3v(cm->color);
@@ -396,7 +396,7 @@ void Gl1_GridConnection::go(const shared_ptr<Shape>& cm, const shared_ptr<State>
 	return;
 }
 
-void Gl1_GridConnection::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift) const
+void Gl1_GridConnection::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift)
 {
    glPushMatrix();
    GLUquadricObj *quadObj = gluNewQuadric();

@@ -161,7 +161,7 @@ class Gl1_GridConnection : public GlShapeFunctor{
 	private:
 		//static int glCylinderList;
 		//void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
-		void drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift=Quaternionr::Identity()) const;
+		void drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift=Quaternionr::Identity());
 		//void initGlLists(void);
 	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
