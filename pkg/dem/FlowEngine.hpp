@@ -90,6 +90,21 @@ class FlowEngine : public PartialEngine
 			return (flow->viscousBodyStress.size()>id_sph)?flow->viscousBodyStress[id_sph]:Matrix3r::Zero();}
 		TPL Matrix3r bodyNormalLubStress(unsigned int id_sph, Solver& flow) {
 			return (flow->lubBodyStress.size()>id_sph)?flow->lubBodyStress[id_sph]:Matrix3r::Zero();}
+		TPL python::list getConstrictions(bool all, Solver& flow) {
+			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
+			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k]!=0) || csd[k]>0) pycsd.append(csd[k]); return pycsd;}
+		TPL python::list getConstrictionsFull(bool all, Solver& flow) {
+			vector<Constriction> csd=flow->getConstrictionsFull(); python::list pycsd;
+			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k].second[0]!=0) || csd[k].second[0]>0) {
+				python::list cons;
+				cons.append(csd[k].first.first);
+				cons.append(csd[k].first.second);
+				cons.append(csd[k].second[0]);
+				cons.append(csd[k].second[1]);
+				cons.append(csd[k].second[2]);
+				cons.append(csd[k].second[3]);
+				pycsd.append(cons);}
+			return pycsd;}
 		
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
@@ -103,9 +118,7 @@ class FlowEngine : public PartialEngine
 		void Average_real_cell_velocity();
 		void saveVtk() {solver->saveVtk();}
 		vector<Real> AvFlVelOnSph(unsigned int id_sph) {return solver->Average_Fluid_Velocity_On_Sphere(id_sph);}
-		python::list getConstrictions() {
-			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
-			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
+
 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
 		void PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 		double MeasurePorePressure(Vector3r pos){return solver->MeasurePorePressure(pos[0], pos[1], pos[2]);}
@@ -138,7 +151,9 @@ class FlowEngine : public PartialEngine
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
-		
+		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
+		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
+
 		virtual ~FlowEngine();
 
 		virtual void action();
@@ -247,7 +262,8 @@ class FlowEngine : public PartialEngine
 					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
 					.def("getCellFlux",&FlowEngine::_getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
 					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
-					.def("getConstrictions",&FlowEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")
+					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
+					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
 					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
@@ -319,19 +335,6 @@ class PeriodicFlowEngine : public FlowEngine
 		inline void locateCell(Cell_handle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count=0);
 		Vector3r meanVelocity();
 
-		python::list getConstrictionsFull() {
-			vector<Constriction> csd=solver->getConstrictionsFull(); python::list pycsd;
-			for (unsigned int k=0;k<csd.size();k++) {
-				python::list cons;
-				cons.append(csd[k].first.first);
-				cons.append(csd[k].first.second);
-				cons.append(csd[k].second[0]);
-				cons.append(csd[k].second[1]);
-				cons.append(csd[k].second[2]);
-				cons.append(csd[k].second[3]);
-				pycsd.append(cons);}
-			return pycsd;}
-		
 		virtual ~PeriodicFlowEngine();
 
 		virtual void action();
@@ -364,6 +367,20 @@ class PeriodicFlowEngine : public FlowEngine
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
+		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
+		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
+
+		//commodities
+		void compTessVolumes() {
+			solver->T[solver->currentTes].Compute();
+			solver->T[solver->currentTes].ComputeVolumes();
+		}
+		Real getVolume (Body::id_t id) {
+			if (solver->T[solver->currentTes].Max_id() < 0) {
+				LOG_WARN("emulating action");
+				emulateAction();
+				compTessVolumes();}
+			return ((unsigned int) solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"An engine to solve flow problem in saturated granular media",
 			((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
@@ -395,9 +412,12 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 			
 			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing 'pos'.")
-			.def("getConstrictionsFull",&PeriodicFlowEngine::getConstrictionsFull,"Get the list of constrictions (inscribed circle) for all finite facets.")
+			.def("getConstrictions",&PeriodicFlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
+			.def("getConstrictionsFull",&PeriodicFlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 			.def("exportMatrix",&PeriodicFlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 			.def("exportTriplets",&PeriodicFlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+			.def("compTessVolumes",&PeriodicFlowEngine::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
+			.def("volume",&PeriodicFlowEngine::getVolume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
 		)
 		DECLARE_LOGGER;
 
