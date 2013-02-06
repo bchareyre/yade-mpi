@@ -1679,12 +1679,12 @@ Real FlowBoundingSphere<Tesselation>::computeNormalLubricationForce(const Real& 
 // 			prevForce = instantVisc*(deltaNormV + prevForce/(k*dt))/(1+instantVisc/(k*dt));
 // 			if ((kk==0 || kk==29) && deltaNormV!=0) cerr << "prevForce("<<kk<<") = "<< prevForce<<endl;
 // 		}
-		Real instantVisc = 6*Mathr::PI*pow(meanRad,2)*VISCOSITY/(d-prevForce/k);
+		Real instantVisc = 1.5*Mathr::PI*pow(meanRad,2)*VISCOSITY/(d-prevForce/k);
 		Real normLubF = instantVisc*(deltaNormV + prevForce/(k*dt))/(1+instantVisc/(k*dt));
 		edgeNormalLubF[edge_id]=normLubF;
 		return normLubF;
 	} else {
-		Real normLubF = (6*Mathr::PI*pow(meanRad,2)* VISCOSITY* deltaNormV)/d;
+		Real normLubF = (1.5*Mathr::PI*pow(meanRad,2)* VISCOSITY* deltaNormV)/d;
 		return normLubF;
 	}
 }
