@@ -376,11 +376,11 @@ class PeriodicFlowEngine : public FlowEngine
 			solver->T[solver->currentTes].ComputeVolumes();
 		}
 		Real getVolume (Body::id_t id) {
-			if (solver->T[solver->currentTes].Max_id() < 0) {
+			if (solver->T[solver->currentTes].Max_id() <= 0) {
 				LOG_WARN("emulating action");
 				emulateAction();
 				compTessVolumes();}
-			return ((unsigned int) solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
+			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"An engine to solve flow problem in saturated granular media",
 			((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
