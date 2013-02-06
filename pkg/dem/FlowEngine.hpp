@@ -75,7 +75,7 @@ class FlowEngine : public PartialEngine
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
 		TPL void clearImposedFlux(Solver& flow);
-		TPL void computeViscousForces(Solver& flow);
+		TPL void ComputeViscousForces(Solver& flow);
 		TPL Real getCellFlux(unsigned int cond, const shared_ptr<Solver>& flow);
 		TPL Real getBoundaryFlux(unsigned int boundary,Solver& flow) {return flow->boundaryFlux(boundary);}
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
@@ -228,6 +228,7 @@ class FlowEngine : public PartialEngine
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
 					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule"))
 					((double, eps, 0.00001,,"minimum distance between particles"))
+					((bool, pressureForce, false,,"Compute the fluid force"))
 
 					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
 					((bool, viscousNormalBodyStress, false,,"Compute normal viscous stress applied on each body"))
