@@ -76,7 +76,7 @@ public:
 	inline Real& f (void) {return s;}
 	inline Real& v (void) {return vol;}
 	inline const unsigned int& id (void) const {return i;}
-	SimpleVertexInfo (void) {isFictious=false; s=0; i=0;}
+	SimpleVertexInfo (void) {isFictious=false; s=0; i=0; vol=-1;}
 	//virtual function that will be defined for all classes, allowing shared function (e.g. for display)
 	virtual bool isReal (void) {return !isFictious;}
 };

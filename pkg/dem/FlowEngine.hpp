@@ -377,10 +377,8 @@ class PeriodicFlowEngine : public FlowEngine
 			solver->T[solver->currentTes].ComputeVolumes();
 		}
 		Real getVolume (Body::id_t id) {
-			if (solver->T[solver->currentTes].Max_id() <= 0) {
-				LOG_WARN("emulating action");
-				emulateAction();
-				compTessVolumes();}
+			if (solver->T[solver->currentTes].Max_id() <= 0) {emulateAction(); LOG_WARN("Not triangulated yet, emulating action");}
+			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes(); LOG_WARN("Computing all volumes now, as you did not request it explicitely.");}
 			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"An engine to solve flow problem in saturated granular media",
