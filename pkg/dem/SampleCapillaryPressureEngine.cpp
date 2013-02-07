@@ -1,3 +1,5 @@
+#ifdef DEPREC_CODE
+
 /*************************************************************************
 *  Copyright (C) 2006 by Luc Scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
@@ -72,3 +74,4 @@ void SampleCapillaryPressureEngine::action()
 		UnbalancedForce = ComputeUnbalancedForce(scene);
 }
 
+#endif //DEPREC CODE

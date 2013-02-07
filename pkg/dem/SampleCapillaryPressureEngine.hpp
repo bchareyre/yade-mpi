@@ -1,3 +1,4 @@
+#ifdef DEPREC_CODE
 /*************************************************************************
 *  Copyright (C) 2006 by Luc Scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
@@ -53,5 +54,5 @@ REGISTER_SERIALIZABLE(SampleCapillaryPressureEngine);
 
 #endif //  SAMPLECAPILLARYPRESSUREENGINE_HPP
 
-
+#endif //DEPREC CODE
 
