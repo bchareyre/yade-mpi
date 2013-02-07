@@ -125,10 +125,12 @@ class FlowEngine : public PartialEngine
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
 		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+		#ifdef LINSOLV
 		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver==3) flow->exportMatrix(filename.c_str());
 			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
 		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver==3) flow->exportTriplets(filename.c_str());
 			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		#endif
 
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();

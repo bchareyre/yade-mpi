@@ -184,6 +184,16 @@ ELSE(ENABLE_GUI)
   SET(DISABLED_FEATS "${DISABLED_FEATS} GUI")
 ENDIF(ENABLE_GUI)
 #===========================================================
+# This one will automaticaly enable CGAL
+IF(ENABLE_PFVFLOW)
+  IF (NOT ENABLE_CGAL)
+    MESSAGE(STATUS "PFVFLOW depends on CGAL, attempting to turn ENABLE_CGAL ON")
+    SET(ENABLE_CGAL ON)
+  ENDIF (NOT ENABLE_CGAL)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFLOW_ENGINE")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PFVflow")
+ENDIF(ENABLE_PFVFLOW)
+#===========================================================
 IF(ENABLE_CGAL)  
   INCLUDE(FindGMP)
   FIND_PACKAGE(CGAL)
@@ -221,7 +231,7 @@ IF(ENABLE_LINSOLV)
     SET(ENABLE_LINSOLV OFF)
   ENDIF(CHOLMOD_FOUND)
 ENDIF(ENABLE_LINSOLV)
-#===========================================================
+#===============================================
 IF(ENABLE_GL2PS)
   FIND_PACKAGE(GL2PS)
   IF(GL2PS_FOUND)
