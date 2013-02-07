@@ -59,7 +59,7 @@ void ThreeDTriaxialEngine::action()
 
 		//internalCompaction=false;  //is needed to avoid a control for internal compaction by the TriaxialStressController engine
 
-		isAxisymetric=false; //is needed to avoid a stress control according the parameter sigma_iso (but according to sigma1, sigma2 and sigma3)
+// 		isAxisymetric=false; //is needed to avoid a stress control according the parameter sigma_iso (but according to sigma1, sigma2 and sigma3)
 
 		firstRun=false;
 

@@ -113,14 +113,6 @@ void TriaxialStressController::action()
 	max_vel2=3 * height /(height+width+depth)*max_vel;
 	max_vel3 =3 * depth /(height+width+depth)*max_vel;
 
-	// NOT JUST at the first run, since sigma_iso may be changed
-	// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
-	if (isAxisymetric){
-		if (stressMask & 1) goal1=sigma_iso;
-		if (stressMask & 2) goal2=sigma_iso;
-		if (stressMask & 3) goal3=sigma_iso;
-	}
-
 	porosity = ( boxVolume - spheresVolume ) /boxVolume;
 	position_top = p_top->se3.position.y();
 	position_bottom = p_bottom->se3.position.y();
@@ -173,13 +165,14 @@ void TriaxialStressController::action()
 	{
 		p_bottom->vel=Vector3r::Zero(); p_top->vel=Vector3r::Zero(); p_left->vel=Vector3r::Zero(); p_right->vel=Vector3r::Zero(); p_back->vel=Vector3r::Zero(); p_front->vel=Vector3r::Zero();
 		if (isARadiusControlIteration) {
-			//Real s = computeStressStrain(scene);
-			if (sigma_iso<=meanStress) maxMultiplier = finalMaxMultiplier;
+			Real sigma_iso_ = (stressMask & 1)*goal1 + (stressMask & 2)*goal2 + (stressMask & 4)*goal3;
+			sigma_iso_ /= (stressMask & 1) + (stressMask & 2) + (stressMask & 4);
+			if (sigma_iso_<=meanStress) maxMultiplier = finalMaxMultiplier;
 			if (meanStress==0) previousMultiplier = maxMultiplier;
 			else {
 				//     		previousMultiplier = 1+0.7*(sigma_iso-s)*(previousMultiplier-1.f)/(s-previousStress); // = (Dsigma/apparentModulus)*0.7
 				//     		previousMultiplier = std::max(2-maxMultiplier, std::min(previousMultiplier, maxMultiplier));
-				previousMultiplier = 1.+(sigma_iso-meanStress)/sigma_iso*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
+				previousMultiplier = 1.+(sigma_iso_-meanStress)/sigma_iso_*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
 			}
 			previousStress = meanStress;
 			//Real apparentModulus = (s-previousStress)/(previousMultiplier-1.f);

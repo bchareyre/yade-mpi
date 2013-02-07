@@ -109,6 +109,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((Real,fixedPoroCompaction,false,,"A special type of compaction with imposed final porosity :yref:`TriaxialCompressionEngine::fixedPorosity` (WARNING : can give unrealistic results!)"))
 		((Real,fixedPorosity,0,,"Value of porosity chosen by the user"))
 		((Real,maxStress,0,,"Max value of stress during the simulation (for post-processing)"))
+		((Real,sigma_iso,0,,"prescribed confining stress (see :yref:TriaxialCompressionEngine::isAxisymetric`)"))
+		((bool,isAxisymetric,false,,"if true, sigma_iso is assigned to sigma1, 2 and 3 (applies at each iteration and overrides user-set values of s1,2,3)"))
 		,
 		translationAxisx=Vector3r(1,0,0);
 		translationAxisz=Vector3r(0,0,1);

@@ -101,12 +101,11 @@ class TriaxialStressController : public BoundaryController
 		((Real,height0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::height`"))
 		((Real,width0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::width`"))
 		((Real,depth0,0,Attr::readonly,"Reference size for strain definition. See :yref:`TriaxialStressController::depth`"))
-		((Real,sigma_iso,0,,"prescribed confining stress (see :yref:`TriaxialStressController::isAxisymetric`)"))
+		
 		((Real,goal1,0,,"prescribed stress/strain rate on axis 1, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
 		((Real,goal2,0,,"prescribed stress/strain rate on axis 2, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
 		((Real,goal3,0,,"prescribed stress/strain rate on axis 3, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
 		((unsigned int,stressMask,7,,"Bitmask determining if the components of :yref:`TriaxialStressController::goal` are stress (1) or strain (0). 0 for none, 7 for all, 1 for sigma1, etc."))
-		((bool,isAxisymetric,false,,"if true, sigma_iso is assigned to sigma1, 2 and 3 (applies at each iteration and overrides user-set values of s1,2,3)"))
 		((Real,maxMultiplier,1.001,,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))
 		((Real,max_vel,1,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))

@@ -139,6 +139,12 @@ void TriaxialCompressionEngine::action()
 		}
 		saveSimulation = false;
 	}
+	if (isAxisymetric || internalCompaction){
+		if (stressMask & 1) goal1=sigma_iso;
+		if (stressMask & 2) goal2=sigma_iso;
+		if (stressMask & 3) goal3=sigma_iso;
+	}
+	
 	TriaxialStressController::action();
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{
