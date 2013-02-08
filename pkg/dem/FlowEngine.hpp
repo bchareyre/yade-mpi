@@ -151,8 +151,10 @@ class FlowEngine : public PartialEngine
 		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
 		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		#endif
 		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
 		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
 
@@ -284,8 +286,10 @@ class FlowEngine : public PartialEngine
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
 					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+					#endif
 					)
 		DECLARE_LOGGER;
 };
@@ -364,8 +368,10 @@ class PeriodicFlowEngine : public FlowEngine
 		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
 
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		#endif
 		
 // 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
 // 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
@@ -415,8 +421,10 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing 'pos'.")
 			.def("getConstrictions",&PeriodicFlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 			.def("getConstrictionsFull",&PeriodicFlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
+			#ifdef LINSOLV
 			.def("exportMatrix",&PeriodicFlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 			.def("exportTriplets",&PeriodicFlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+			#endif
 			.def("compTessVolumes",&PeriodicFlowEngine::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
 			.def("volume",&PeriodicFlowEngine::getVolume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
 		)
