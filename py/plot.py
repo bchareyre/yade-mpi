@@ -15,7 +15,10 @@ import mtTkinter as Tkinter
 try:
 	import Image
 except:
-	raise ImportError("PIL (python-imaging package) must be installed to use yade.plot")
+  try:
+    import PIL.Image
+  except:
+    raise ImportError("PIL (python-imaging package) must be installed to use yade.plot")
 
 
 
