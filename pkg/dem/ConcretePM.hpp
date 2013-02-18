@@ -238,7 +238,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 
 class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
-	/*! Damage evolution law */
+	/* Damage evolution law */
 	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
 		if (kappaD<epsCrackOnset || neverDamage) return 0;
 		switch (damLaw) {
@@ -246,6 +246,31 @@ class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 				return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
 			case 1: // exponential
 				return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+		}
+		return 0;
+	}
+
+	/* inverse damage evolution law */
+	static Real funcGInv(const Real& omega, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
+		if (omega==0. || neverDamage) return 0;
+		switch (damLaw) {
+			case 0: // linear
+				return epsCrackOnset / (1. - omega*(1. - epsCrackOnset/epsFracture));
+			case 1: // exponential
+				// Newton's iterations
+				Real fg,dfg,decr,ret=epsCrackOnset,tol=1e-3;
+				int maxIter = 100;
+				for (int i=0; i<maxIter; i++) {
+					fg = - omega + 1. - epsCrackOnset/ret * exp(-(ret-epsCrackOnset)/epsFracture);
+					dfg = (epsCrackOnset/ret/ret - epsCrackOnset*(ret-epsCrackOnset)/ret/epsFracture/epsFracture) * exp(-(ret-epsCrackOnset)/epsFracture);
+					decr = fg/dfg;
+					ret -= decr;
+					//printf("i %d fg %e dfg %e decr %e ret %e\n",i,fg,dfg,decr,ret);
+					if (fabs(decr/epsCrackOnset) < tol) {
+						return ret;
+					}
+				}
+				return 0;
 		}
 		return 0;
 	}
@@ -271,6 +296,9 @@ class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
 		.def("funcG",&Law2_SomeGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
+		.staticmethod("funcG")
+		.def("funcGInv",&Law2_SomeGeom_CpmPhys_Cpm::funcGInv,(py::arg("omega"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Inversion of damage evolution law, evaluating the $\\kappaD$ parameter. $\\omega$ is damage, for other parameters see funcG function")
+		.staticmethod("funcGInv")
 		.def("yieldSigmaTMagnitude",&Law2_SomeGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;
