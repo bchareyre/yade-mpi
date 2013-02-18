@@ -152,12 +152,12 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 	vector<int> bins; bins.resize(maxIntr+1,0);
 	for(size_t id=0; id<bodyNumIntr.size(); id++){
 		const shared_ptr<Body>& b=Body::byId(id,rb);
-
+		if (b) {
 			if(bodyNumIntr[id]>0) bins[bodyNumIntr[id]]+=1;
 			// 0 is handled specially: add body to the 0 bin only if it is inside the bb requested (if applicable)
 			// otherwise don't do anything, since it is outside the volume of interest
 			else if((useBB && isInBB(b->state->pos,bbMin,bbMax)) || !useBB) bins[0]+=1;
-
+		}
 	}
 	py::list count,num;
 	for(size_t n=0; n<bins.size(); n++){
