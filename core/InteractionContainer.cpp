@@ -22,8 +22,11 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	assert((Body::id_t)bodies->size()>id1); // the bodies must exist already
 	assert((Body::id_t)bodies->size()>id2); 
 	
-	const shared_ptr<Body>& b1=(*bodies)[id1]; // body with the smaller id will hold the pointer
+	const shared_ptr<Body>& b1=(*bodies)[id1];
+	const shared_ptr<Body>& b2=(*bodies)[id2];
+	
 	if(!b1->intrs.insert(Body::MapId2IntrT::value_type(id2,i)).second) return false; // already exists
+	if(!b2->intrs.insert(Body::MapId2IntrT::value_type(id1,i)).second) return false; 
 	
 	linIntrs.resize(++currSize); // currSize updated
 	linIntrs[currSize-1]=i; // assign last element
@@ -56,6 +59,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
 	
 	const shared_ptr<Body>& b1((*bodies)[id1]);
+	const shared_ptr<Body>& b2((*bodies)[id2]);
 	
 	int linIx=-1;
 	if(unlikely(!b1)) linIx=linPos;
@@ -67,7 +71,13 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 			assert(linIx==linPos);
 			//erase from body, we also erase from linIntrs below
 			b1->intrs.erase(I);
+			if (b2) { 
+				Body::MapId2IntrT::iterator I2(b2->intrs.find(id1));
+				if (not(I2==b2->intrs.end())) { 
+					b2->intrs.erase(I2); 
+				}
 			}
+		}
 	}
 	if(linIx<0) {
 		LOG_ERROR("InteractionContainer::erase: attempt to delete interaction with a deleted body (the definition of linPos in the call to erase() should fix the problem) for  ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2));

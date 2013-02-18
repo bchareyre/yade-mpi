@@ -65,10 +65,8 @@ bool BodyContainer::erase(Body::id_t id){
 	}
 	
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
-	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
-		if((i->getId1()==id or i->getId2()==id)) {
-			scene->interactions->requestErase(i->getId1(),i->getId2());
-		}
+	for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
+		scene->interactions->requestErase((*it).second);
 	}
 	body[id]=shared_ptr<Body>();
 	
