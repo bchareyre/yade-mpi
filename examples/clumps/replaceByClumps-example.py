@@ -19,6 +19,11 @@ O.engines=[
 	NewtonIntegrator(damping=0.7,gravity=[0,0,-10])
 ]
 
+
+from yade import qt
+qt.Controller()
+qt.View()
+
 #create a box:
 id_box = O.bodies.append(utils.box((0,0,0),(2,2,.1),fixed=True,material=Mat))
 
@@ -68,3 +73,4 @@ if 0:
 	calmRunner.dead=True
 
 print '\nPress Play button ... '
+                

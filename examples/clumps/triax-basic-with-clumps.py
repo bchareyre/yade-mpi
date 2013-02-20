@@ -25,6 +25,11 @@ for xyz in itertools.product(arange(0,d),arange(0,d),arange(0,d)):
 walls=utils.aabbWalls(material='frictionless')
 wallIds=O.bodies.append(walls)
 
+from yade import qt
+qt.Controller()
+qt.View()
+
+
 ## hope that we got the ids right?!
 triax=TriaxialCompressionEngine(
 	wall_bottom_id=wallIds[2],
