@@ -46,12 +46,19 @@
 
 // #include<yade/pkg/dem/Shop.hpp>
 #include<yade/core/Clump.hpp>
+#include <yade/pkg/common/Sphere.hpp>
 
 #if BOOST_VERSION>=104700
 	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
 #else
 	#include<boost/math/nonfinite_num_facets.hpp>
 #endif
+
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
+
+#include<yade/core/Timing.hpp>
 
 #include<locale>
 #include<boost/archive/codecvt_null.hpp>
@@ -201,6 +208,153 @@ class pyBodyContainer{
 		else {
 			PyErr_SetString(PyExc_TypeError,("Error: Body "+lexical_cast<string>(bid)+" must be a clump member!").c_str()); 
 			python::throw_error_already_set();
+		}
+	}
+	void replaceByClumps(python::list ctList, vector<Real> amounts){
+		Real checkSum = 0.0;
+		FOREACH(Real amount, amounts) checkSum += amount;
+		if (checkSum > 1.0){
+			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
+			python::throw_error_already_set();
+		}
+		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
+		static boost::minstd_rand randGen((int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
+		typedef boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > UniRandGen;
+		static UniRandGen rndUnit(randGen,boost::uniform_real<>(-1,1));
+		
+		//get number of spherical particles and a list of all spheres:
+		int num = 0;
+		vector<shared_ptr<Body> > sphereList;
+		FOREACH(const shared_ptr<Body>& b, *proxee) {
+			if ( (b->isStandalone()) && (!(b->isAspherical())) ) {
+				num += 1;
+				sphereList.push_back(b);
+			}
+		}
+		
+		//loop over templates:
+		int numSphereList = num;
+		int numTemplates = amounts.size();
+		for (int ii = 0; ii < numTemplates; ii++) {
+			//ctList: [<ct1>,<ct2>, ...] = [<int,[double,double, ... ],[Vector3r,Vector3r, ...]>,<int,[double,double, ... ],[Vector3r,Vector3r, ...]>, ...]
+			//ct: <len(relRadList),relRadList,relPosList> = <int,[double,double, ... ],[Vector3r,Vector3r, ...]> (python objects)
+			//relRadList: [relRad1,relRad2, ...] (list of doubles)
+			//relPosList: [relPos1,relPos2, ...] (list of vectors)
+			
+			//extract attributes from python objects:
+			python::object ctTmp = ctList[ii];
+			int numCM = python::extract<int>(ctTmp.attr("numCM"))();
+			python::list relRadListTmp = python::extract<python::list>(ctTmp.attr("relRadii"))();
+			python::list relPosListTmp = python::extract<python::list>(ctTmp.attr("relPositions"))();
+			
+			//get relative radii and positions; calc. volumes; get balance point:
+			vector<Real> relRadTmp(numCM);
+			vector<Real> relVolTmp(numCM);
+			vector<Vector3r> relPosTmp(numCM);
+			Vector3r relPosTmpMean = Vector3r::Zero();
+			for (int jj = 0; jj < numCM; jj++) {
+				relRadTmp[jj] = python::extract<Real>(relRadListTmp[jj])();
+				relVolTmp[jj] = (4./3.)*Mathr::PI*pow(relRadTmp[jj],3.);
+				relPosTmp[jj] = python::extract<Vector3r>(relPosListTmp[jj])();
+				relPosTmpMean += relPosTmp[jj];
+			}
+			relPosTmpMean /= numCM;//balance point
+
+			//check for overlaps and correct volumes (-= volume of spherical caps):
+			int numConnections = 0;
+			for (int jj = numCM; jj > 0; jj--) numConnections += (jj-1);
+			vector<Real> distCMTmp(numConnections);
+			vector<Real> overlapTmp(numConnections);
+			int c = 0;//counter
+			Real distCapTmp1; Real distCapTmp2;
+			for (int jj = 0; jj < numCM; jj++) {
+				for (int kk = jj; kk < numCM; kk++) {
+					if (jj != kk) {
+						distCMTmp[c] = (relPosTmp[jj] - relPosTmp[kk]).norm(); 
+						overlapTmp[c] = (relRadTmp[jj] + relRadTmp[kk]) - distCMTmp[c];//positive if overlapping ...
+						if (overlapTmp[c] > 0.0) {
+							distCapTmp1 = (distCMTmp[c]*distCMTmp[c] - relRadTmp[kk]*relRadTmp[kk] + relRadTmp[jj]*relRadTmp[jj])/2*distCMTmp[c] - relRadTmp[jj];
+							distCapTmp2 = (distCMTmp[c]*distCMTmp[c] - relRadTmp[jj]*relRadTmp[jj] + relRadTmp[kk]*relRadTmp[kk])/2*distCMTmp[c] - relRadTmp[kk];
+							relVolTmp[jj] -= (1./3.)*Mathr::PI*distCapTmp1*distCapTmp1*(3.*relRadTmp[jj] - distCapTmp1);//correction of relative volumes
+							relVolTmp[kk] -= (1./3.)*Mathr::PI*distCapTmp2*distCapTmp2*(3.*relRadTmp[kk] - distCapTmp2);
+						}
+						c += 1;//c should never be > than numConnections!
+					}
+				}
+			}
+			
+			//get relative volume of the clump:
+			Real relVolSumTmp = 0.0;
+			for (int jj = 0; jj < numCM; jj++) relVolSumTmp += relVolTmp[jj];
+			
+			//get pointer lists of spheres, that should be replaced:
+			int numReplaceTmp = round(num*amounts[ii]);
+			vector<shared_ptr<Body> > bpListTmp(numReplaceTmp);
+			int a = 0; c = 0;//counters
+			vector<int> posTmp;
+			FOREACH (const shared_ptr<Body>& b, sphereList) {
+				if (c == a*numSphereList/numReplaceTmp) {
+					bpListTmp[a] = b;
+					a += 1;
+					posTmp.push_back(c);//remember position in sphereList
+				}
+				c += 1;
+			}
+			for (int jj = 0; jj < a; jj++) {
+				sphereList.erase(sphereList.begin()+posTmp[jj]-jj);//remove bodies from sphereList, that were already found
+				numSphereList -= 1;
+			}
+			
+			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
+			c = 0;//counter
+			FOREACH (const shared_ptr<Body>& b, bpListTmp) {
+				//get sphere, that should be replaced:
+				const Sphere* sphere = YADE_CAST<Sphere*> (b->shape.get());
+				shared_ptr<Material> matTmp = b->material;
+				
+				//get a random vector:
+				Vector3r randVec = Vector3r(rndUnit(),rndUnit(),rndUnit());
+				Quaternionr randAxisTmp = (Quaternionr) AngleAxisr(2*Mathr::PI*rndUnit(),randVec);
+				randAxisTmp.normalize();
+				
+				//set geometries in global coordinates (scaling):
+				Real scalingFactorVolume = ((4./3.)*Mathr::PI*pow(sphere->radius,3.))/relVolSumTmp;
+				Real scalingFactor1D = pow(scalingFactorVolume,1./3.);//=((vol. sphere)/(relative clump volume))^(1/3)
+				vector<Vector3r> newPosTmp(numCM);
+				vector<Real> newRadTmp(numCM);
+				vector<Body::id_t> idsTmp(numCM);
+				for (int jj = 0; jj < numCM; jj++) {
+					newPosTmp[jj] = relPosTmp[jj] - relPosTmpMean;	//shift position, to get balance point at (0,0,0)
+					newPosTmp[jj] = randAxisTmp*newPosTmp[jj];	//rotate around balance point
+					newRadTmp[jj] = relRadTmp[jj] * scalingFactor1D;	//scale radii
+					newPosTmp[jj] = newPosTmp[jj] * scalingFactor1D;	//scale position
+					newPosTmp[jj] += b->state->pos;			//translate new position to spheres center
+					
+					//create spheres:
+					shared_ptr<Body> newSphere = shared_ptr<Body>(new Body());
+					newSphere->state->blockedDOFs = State::DOF_NONE;
+					newSphere->state->mass = scalingFactorVolume*relVolTmp[jj]*matTmp->density;//vol. corrected mass for clump members
+					Real inertiaTmp = 2.0/5.0*newSphere->state->mass*newRadTmp[jj]*newRadTmp[jj];
+					newSphere->state->inertia	= Vector3r(inertiaTmp,inertiaTmp,inertiaTmp);
+					newSphere->state->pos = newPosTmp[jj];
+					newSphere->material = matTmp;
+					
+					shared_ptr<Sphere> sphereTmp = shared_ptr<Sphere>(new Sphere());
+					sphereTmp->radius = newRadTmp[jj];
+					sphereTmp->color = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+					sphereTmp->color.normalize();
+					newSphere->shape = sphereTmp;
+					
+					shared_ptr<Aabb> aabbTmp = shared_ptr<Aabb>(new Aabb());
+					aabbTmp->color = Vector3r(0,1,0);
+					newSphere->bound = aabbTmp;
+					proxee->insert(newSphere);
+					LOG_DEBUG("New body (sphere) "<<newSphere->id<<" added.");
+					idsTmp[jj] = newSphere->id;
+				}
+				clump(idsTmp);
+				erase(b->id);
+			}
 		}
 	}
 	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
@@ -667,6 +821,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns clump id.")
 		.def("addToClump",&pyBodyContainer::addToClump,"Add a body b to an existing clump c.\nIf b is a clump, then all members will be added to c and b will be deleted.\nIf b is a clump member of clump d, then all members from d will be added to c and d will be deleted.\nIf you need to add just clump member b, release this member from d first -> see :yref:`<BodyContainer.releaseFromClump>`.")
 		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release a body b from clump c. b must be a clump member of c.")
+		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a clump template (see utils.clumpTemplate).")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);

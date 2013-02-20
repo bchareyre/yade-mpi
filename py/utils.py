@@ -886,3 +886,24 @@ def psd(bins=5, mass=True, mask=-1):
 			binsProc[i] = binsSumCum[i]/binsSumCum[len(binsSumCum)-1]
 			i+=1
 	return binsSizes, binsProc, binsSumCum
+
+class clumpTemplate:
+	"""Create a clump template.
+		:param [float,float, ...] relRadii: list of relative radii
+		:param [Vector3,Vector3,Vector3, ...] relPositions: list of relative positions
+	"""
+	def __init__(self,relRadii=[],relPositions=[[],[]]):
+		if (len(relRadii) != len(relPositions)):
+			raise ValueError("Given lists must have same length! Given lists does not match clump template structure.");
+		if (len(relRadii) < 2):
+			raise ValueError("One or more of given lists for relative radii have length < 2! Given lists does not match clump template structure.");
+		for ii in range(0,len(relPositions)):
+			if len(relPositions[ii]) != 3:
+				raise ValueError("One or more of given lists for relative positions do not have length of 3! Given lists does not match clump template structure.");
+			for jj in range(ii,len(relPositions)):
+				if ii != jj:
+					if (relPositions[ii] == relPositions[jj]): 
+						raise ValueError("Two or more of given lists for relative positions are equal! Given lists does not match clump template structure.");
+		self.numCM = len(relRadii)
+		self.relRadii = relRadii
+		self.relPositions = relPositions
