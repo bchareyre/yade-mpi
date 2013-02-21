@@ -194,6 +194,7 @@ class pyBodyContainer{
 		shared_ptr<Body> bp = Body::byId(bid,scene);		// get body pointer
 		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
 		checkClump(clp);
+		//TODO: check if number of clump members > 2
 		if (bp->isClumpMember()){
 			Body::id_t bpClumpId = bp->clumpId;
 			if (cid == bpClumpId){
@@ -223,14 +224,9 @@ class pyBodyContainer{
 		static UniRandGen rndUnit(randGen,boost::uniform_real<>(-1,1));
 		
 		//get number of spherical particles and a list of all spheres:
-		int num = 0;
 		vector<shared_ptr<Body> > sphereList;
-		FOREACH(const shared_ptr<Body>& b, *proxee) {
-			if ( (b->isStandalone()) && (!(b->isAspherical())) ) {
-				num += 1;
-				sphereList.push_back(b);
-			}
-		}
+		FOREACH(const shared_ptr<Body>& b, *proxee) if (!b->isAspherical()) sphereList.push_back(b);
+		int num = sphereList.size();
 		
 		//loop over templates:
 		int numSphereList = num;
@@ -306,18 +302,16 @@ class pyBodyContainer{
 			}
 			
 			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
-			c = 0;//counter
 			FOREACH (const shared_ptr<Body>& b, bpListTmp) {
 				//get sphere, that should be replaced:
 				const Sphere* sphere = YADE_CAST<Sphere*> (b->shape.get());
 				shared_ptr<Material> matTmp = b->material;
 				
-				//get a random vector:
-				Vector3r randVec = Vector3r(rndUnit(),rndUnit(),rndUnit());
-				Quaternionr randAxisTmp = (Quaternionr) AngleAxisr(2*Mathr::PI*rndUnit(),randVec);
+				//get a random rotation quaternion:
+				Quaternionr randAxisTmp = (Quaternionr) AngleAxisr(2*Mathr::PI*rndUnit(),Vector3r(rndUnit(),rndUnit(),rndUnit()));
 				randAxisTmp.normalize();
 				
-				//set geometries in global coordinates (scaling):
+				//convert geometries in global coordinates (scaling):
 				Real scalingFactorVolume = ((4./3.)*Mathr::PI*pow(sphere->radius,3.))/relVolSumTmp;
 				Real scalingFactor1D = pow(scalingFactorVolume,1./3.);//=((vol. sphere)/(relative clump volume))^(1/3)
 				vector<Vector3r> newPosTmp(numCM);
@@ -326,8 +320,8 @@ class pyBodyContainer{
 				for (int jj = 0; jj < numCM; jj++) {
 					newPosTmp[jj] = relPosTmp[jj] - relPosTmpMean;	//shift position, to get balance point at (0,0,0)
 					newPosTmp[jj] = randAxisTmp*newPosTmp[jj];	//rotate around balance point
-					newRadTmp[jj] = relRadTmp[jj] * scalingFactor1D;	//scale radii
-					newPosTmp[jj] = newPosTmp[jj] * scalingFactor1D;	//scale position
+					newRadTmp[jj] = relRadTmp[jj] * scalingFactor1D;//scale radii
+					newPosTmp[jj] = newPosTmp[jj] * scalingFactor1D;//scale position
 					newPosTmp[jj] += b->state->pos;			//translate new position to spheres center
 					
 					//create spheres:
