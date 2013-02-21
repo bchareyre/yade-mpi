@@ -218,6 +218,10 @@ class pyBodyContainer{
 			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
 			python::throw_error_already_set();
 		}
+		if (python::len(ctList) != amounts.size()) {
+			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+lexical_cast<string>(amounts.size())+") differs from length of template list ("+lexical_cast<string>(python::len(ctList))+").").c_str()); 
+			python::throw_error_already_set();
+		}
 		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
 		static boost::minstd_rand randGen((int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 		typedef boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > UniRandGen;
