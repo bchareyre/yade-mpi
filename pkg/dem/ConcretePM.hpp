@@ -105,7 +105,7 @@ class CpmMat: public FrictMat {
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
 		((Real,crackOpening,NaN,,"Crack opening when the crack is fully broken in tension. [m]"))
 		((Real,relDuctility,NaN,,"relative ductility of bonds in normal direction"))
-		((int,damLaw,1,,"Law for gamage evolution in uniaxial tension. 0 for linear stress-strain softening branch, 1 for exponential damage evolution law"))
+		((int,damLaw,1,,"Law for damage evolution in uniaxial tension. 0 for linear stress-strain softening branch, 1 (default) for exponential damage evolution law"))
 		((Real,dmgTau,((void)"deactivated if negative",-1),,"Characteristic time for normal viscosity. [s]"))
 		((Real,dmgRateExp,0,,"Exponent for normal viscosity function. [-]"))
 		((Real,plTau,((void)"deactivated if negative",-1),,"Characteristic time for visco-plasticity. [s]"))
@@ -147,6 +147,14 @@ class CpmPhys: public NormShearPhys {
 		Real computeDmgOverstress(Real dt);
 		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
 
+		/* damage evolution law */
+		static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw);
+		static Real funcGDKappa(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw);
+		/* inverse damage evolution law */
+		static Real funcGInv(const Real& omega, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw);
+		void setDamage(Real dmg);
+		void setRelResidualStrength(Real r);
+
 		virtual ~CpmPhys();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :yref:`cpm-model<CpmMat>` for details.",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
@@ -170,7 +178,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,kappaD,0,,"Up to now maximum normal strain (semi-norm), non-decreasing in time."))
 			((Real,epsNPl,0,,"normal plastic strain (initially zero)"))
 			((bool,neverDamage,false,,"the damage evolution function will always return virgin state"))
-			((int,damLaw,-1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential (default)"))
+			((int,damLaw,1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential (default)"))
 			((Real,epsTrans,0,,"Transversal strain (perpendicular to the contact axis)"))
 			//((Real,epsPlSum,0,,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than zero."))
@@ -187,6 +195,12 @@ class CpmPhys: public NormShearPhys {
 			.def_readonly("relResidualStrength",&CpmPhys::relResidualStrength,"Relative residual strength")
 			.def_readonly("cummBetaIter",&CpmPhys::cummBetaIter,"Cummulative number of iterations inside CpmMat::solveBeta (for debugging).")
 			.def_readonly("cummBetaCount",&CpmPhys::cummBetaCount,"Cummulative number of calls of CpmMat::solveBeta (for debugging).")
+			.def("funcG",&CpmPhys::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
+			.staticmethod("funcG")
+			.def("funcGInv",&CpmPhys::funcGInv,(py::arg("omega"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Inversion of damage evolution law, evaluating the $\\kappa_D$ parameter. $\\omega$ is damage, for other parameters see funcG function")
+			.staticmethod("funcGInv")
+			.def("setDamage",&CpmPhys::setDamage,"TODO")
+			.def("setRelResidualStrength",&CpmPhys::setRelResidualStrength,"TODO")
 		);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(CpmPhys,NormShearPhys);
@@ -239,41 +253,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/* Damage evolution law */
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
-		if (kappaD<epsCrackOnset || neverDamage) return 0;
-		switch (damLaw) {
-			case 0: // linear
-				return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
-			case 1: // exponential
-				return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
-		}
-		return 0;
-	}
 
-	/* inverse damage evolution law */
-	static Real funcGInv(const Real& omega, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
-		if (omega==0. || neverDamage) return 0;
-		switch (damLaw) {
-			case 0: // linear
-				return epsCrackOnset / (1. - omega*(1. - epsCrackOnset/epsFracture));
-			case 1: // exponential
-				// Newton's iterations
-				Real fg,dfg,decr,ret=epsCrackOnset,tol=1e-3;
-				int maxIter = 100;
-				for (int i=0; i<maxIter; i++) {
-					fg = - omega + 1. - epsCrackOnset/ret * exp(-(ret-epsCrackOnset)/epsFracture);
-					dfg = (epsCrackOnset/ret/ret - epsCrackOnset*(ret-epsCrackOnset)/ret/epsFracture/epsFracture) * exp(-(ret-epsCrackOnset)/epsFracture);
-					decr = fg/dfg;
-					ret -= decr;
-					//printf("i %d fg %e dfg %e decr %e ret %e\n",i,fg,dfg,decr,ret);
-					if (fabs(decr/epsCrackOnset) < tol) {
-						return ret;
-					}
-				}
-				return 0;
-		}
-		return 0;
-	}
 
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) {
 #ifdef CPM_MATERIAL_MODEL
@@ -295,10 +275,6 @@ class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
-		.def("funcG",&Law2_SomeGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
-		.staticmethod("funcG")
-		.def("funcGInv",&Law2_SomeGeom_CpmPhys_Cpm::funcGInv,(py::arg("omega"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Inversion of damage evolution law, evaluating the $\\kappa_D$ parameter. $\\omega$ is damage, for other parameters see funcG function")
-		.staticmethod("funcGInv")
 		.def("yieldSigmaTMagnitude",&Law2_SomeGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;

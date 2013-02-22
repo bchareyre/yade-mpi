@@ -143,6 +143,85 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 	return 1.-exp(beta)*(1-sigmaTYield/sigmaTNorm);
 }
 
+Real CpmPhys::funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
+	if (kappaD<epsCrackOnset || neverDamage) return 0;
+	switch (damLaw) {
+		case 0: // linear
+			return (1.-epsCrackOnset/kappaD)/(1.-epsCrackOnset/epsFracture);
+		case 1: // exponential
+			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+	}
+	throw runtime_error("CpmPhys::funcG: wrong damLaw\n");
+}
+
+Real CpmPhys::funcGDKappa(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
+	switch (damLaw) {
+		case 0: // linear
+			return epsCrackOnset / ((1.-epsCrackOnset/epsFracture)*kappaD*kappaD);
+		case 1: // exponential
+			return epsCrackOnset/kappaD * (1./kappaD + 1./epsFracture) * exp(-(kappaD-epsCrackOnset)/epsFracture);
+	}
+	throw runtime_error("CpmPhys::funcGDKappa: wrong damLaw\n");
+}
+
+Real CpmPhys::funcGInv(const Real& omega, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage, const int& damLaw) {
+	if (omega==0. || neverDamage) return 0;
+	switch (damLaw) {
+		case 0: // linear
+			return epsCrackOnset / (1. - omega*(1. - epsCrackOnset/epsFracture));
+		case 1: // exponential
+			// Newton's iterations
+			Real fg,dfg,decr,ret=epsCrackOnset,tol=1e-3;
+			int maxIter = 100;
+			for (int i=0; i<maxIter; i++) {
+				fg = - omega + 1. - epsCrackOnset/ret * exp(-(ret-epsCrackOnset)/epsFracture);
+				//dfg = (epsCrackOnset/ret/ret - epsCrackOnset*(ret-epsCrackOnset)/ret/epsFracture/epsFracture) * exp(-(ret-epsCrackOnset)/epsFracture);
+				dfg = CpmPhys::funcGDKappa(ret,epsCrackOnset,epsFracture,neverDamage,damLaw);
+				decr = fg/dfg;
+				ret -= decr;
+				//printf("i %d fg %e dfg %e decr %e ret %e\n",i,fg,dfg,decr,ret);
+				if (fabs(decr/epsCrackOnset) < tol) {
+					return ret;
+				}
+			}
+			throw runtime_error("CpmPhys::funcGInv: no convergence\n");
+	}
+	throw runtime_error("CpmPhys::funcGInv: wrong damLaw\n");
+}
+
+void CpmPhys::setDamage(Real dmg) {
+	if (neverDamage) { return; }
+	omega = dmg;
+	kappaD = CpmPhys::funcGInv(dmg,epsCrackOnset,epsFracture,neverDamage,damLaw);
+}
+
+void CpmPhys::setRelResidualStrength(Real r) {
+	if (neverDamage) { return; }
+	if (r == 1.) {
+		relResidualStrength = r;
+		kappaD = omega = 0.;
+		return;
+	}
+	Real k = epsFracture;
+	Real g,dg,f,df,tol=1e-3,e0i=1./epsCrackOnset,decr;
+	int maxIter = 100;
+	int i;
+	for (i=0; i<maxIter; i++) {
+		g = CpmPhys::funcG(k,epsCrackOnset,epsFracture,neverDamage,damLaw);
+		dg = CpmPhys::funcGDKappa(k,epsCrackOnset,epsFracture,neverDamage,damLaw);
+		f = -r + (1-g)*k*e0i;
+		df = e0i*(1-g-k*dg);
+		decr = f/df;
+		k -= decr;
+		if (fabs(decr) < tol) {
+			kappaD = k;
+			omega = CpmPhys::funcG(k,epsCrackOnset,epsFracture,neverDamage,damLaw);
+			relResidualStrength = r;
+			return;
+		}
+	}
+	throw runtime_error("CpmPhys::setRelResidualStrength: no convergence\n");
+}
 
 
 
@@ -196,7 +275,7 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 		/* very simplified version of the constitutive law */ \
 		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */ \
 		/* Real epsFracture = crackOpening/contGeom->refLength; */ \
-		omega = isCohesive? funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */ \
+		omega = isCohesive? BC->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */ \
 		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */ \
 		sigmaT = G*epsT; /* trial stress */ \
 		Real yieldSigmaT = max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); /* Mohr-Coulomb law with damage */ \

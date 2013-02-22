@@ -470,10 +470,11 @@ py::list intrsOfEachBody() {
 	}
 	// loop over all interactions and fill the list ret
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions) {
+		if (!i->isReal()) { continue; }
 		temp = py::extract<py::list>(ret[i->getId1()]);
-		temp.append( (i->isReal())? i : shared_ptr<Interaction>() );
-		//temp = py::extract<py::list>(ret[i->getId2()]);
-		//temp.append( (i->isReal())? i : NULL);
+		temp.append( i );
+		temp = py::extract<py::list>(ret[i->getId2()]);
+		temp.append( i );
 	}
 	return ret;
 }
