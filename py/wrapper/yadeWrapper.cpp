@@ -197,8 +197,13 @@ class pyBodyContainer{
 		if (bp->isClumpMember()){
 			Body::id_t bpClumpId = bp->clumpId;
 			if (cid == bpClumpId){
-				Clump::del(clp,bp);//release bid from cid
-				Clump::updateProperties(clp,/*intersecting*/false);
+				const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clp->shape);
+				std::map<Body::id_t,Se3r>& members = clump->members;
+				if (members.size() == 2) PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" not released from clump "+lexical_cast<string>(cid)+", because number of clump members would get < 2!").c_str());
+				else {
+					Clump::del(clp,bp);//release bid from cid
+					Clump::updateProperties(clp,/*intersecting*/false);
+				}
 			}
 			else {
 				PyErr_SetString(PyExc_TypeError,("Error: Body "+lexical_cast<string>(bid)+" must be a clump member of clump "+lexical_cast<string>(cid)+".").c_str()); 
@@ -212,9 +217,19 @@ class pyBodyContainer{
 	}
 	void replaceByClumps(python::list ctList, vector<Real> amounts){
 		Real checkSum = 0.0;
-		FOREACH(Real amount, amounts) checkSum += amount;
+		FOREACH(Real amount, amounts) {
+			if (amount < 0.0) {
+				PyErr_SetString(PyExc_ValueError,("Error: One or more of given amounts are negative!")); 
+				python::throw_error_already_set();
+			}
+			else checkSum += amount;
+		}
 		if (checkSum > 1.0){
 			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
+			python::throw_error_already_set();
+		}
+		if (python::len(ctList) != (unsigned) amounts.size()) {//avoid unsigned comparison warning
+			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+lexical_cast<string>(amounts.size())+") differs from length of template list ("+lexical_cast<string>(python::len(ctList))+").").c_str()); 
 			python::throw_error_already_set();
 		}
 		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
@@ -223,14 +238,9 @@ class pyBodyContainer{
 		static UniRandGen rndUnit(randGen,boost::uniform_real<>(-1,1));
 		
 		//get number of spherical particles and a list of all spheres:
-		int num = 0;
 		vector<shared_ptr<Body> > sphereList;
-		FOREACH(const shared_ptr<Body>& b, *proxee) {
-			if ( (b->isStandalone()) && (!(b->isAspherical())) ) {
-				num += 1;
-				sphereList.push_back(b);
-			}
-		}
+		FOREACH(const shared_ptr<Body>& b, *proxee) if (!b->isAspherical()) sphereList.push_back(b);
+		int num = sphereList.size();
 		
 		//loop over templates:
 		int numSphereList = num;
@@ -306,18 +316,16 @@ class pyBodyContainer{
 			}
 			
 			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
-			c = 0;//counter
 			FOREACH (const shared_ptr<Body>& b, bpListTmp) {
 				//get sphere, that should be replaced:
 				const Sphere* sphere = YADE_CAST<Sphere*> (b->shape.get());
 				shared_ptr<Material> matTmp = b->material;
 				
-				//get a random vector:
-				Vector3r randVec = Vector3r(rndUnit(),rndUnit(),rndUnit());
-				Quaternionr randAxisTmp = (Quaternionr) AngleAxisr(2*Mathr::PI*rndUnit(),randVec);
+				//get a random rotation quaternion:
+				Quaternionr randAxisTmp = (Quaternionr) AngleAxisr(2*Mathr::PI*rndUnit(),Vector3r(rndUnit(),rndUnit(),rndUnit()));
 				randAxisTmp.normalize();
 				
-				//set geometries in global coordinates (scaling):
+				//convert geometries in global coordinates (scaling):
 				Real scalingFactorVolume = ((4./3.)*Mathr::PI*pow(sphere->radius,3.))/relVolSumTmp;
 				Real scalingFactor1D = pow(scalingFactorVolume,1./3.);//=((vol. sphere)/(relative clump volume))^(1/3)
 				vector<Vector3r> newPosTmp(numCM);
@@ -326,8 +334,8 @@ class pyBodyContainer{
 				for (int jj = 0; jj < numCM; jj++) {
 					newPosTmp[jj] = relPosTmp[jj] - relPosTmpMean;	//shift position, to get balance point at (0,0,0)
 					newPosTmp[jj] = randAxisTmp*newPosTmp[jj];	//rotate around balance point
-					newRadTmp[jj] = relRadTmp[jj] * scalingFactor1D;	//scale radii
-					newPosTmp[jj] = newPosTmp[jj] * scalingFactor1D;	//scale position
+					newRadTmp[jj] = relRadTmp[jj] * scalingFactor1D;//scale radii
+					newPosTmp[jj] = newPosTmp[jj] * scalingFactor1D;//scale position
 					newPosTmp[jj] += b->state->pos;			//translate new position to spheres center
 					
 					//create spheres:
@@ -779,7 +787,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("addScene",&pyOmega::addScene,"Add new scene to Omega, returns its number")
 		.def("switchToScene",&pyOmega::switchToScene,"Switch to defined scene. Default scene has number 0, other scenes have to be created by addScene method.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
-		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example::\n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider.nBins=5 ## collider has become a variable after assignment to O.engines automatically)")
+		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor container::\n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider.nBins=5 # collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
 		.def("_sceneObj",&pyOmega::scene_get,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
@@ -819,9 +827,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
 		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids.")
 		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns clump id.")
-		.def("addToClump",&pyBodyContainer::addToClump,"Add a body b to an existing clump c.\nIf b is a clump, then all members will be added to c and b will be deleted.\nIf b is a clump member of clump d, then all members from d will be added to c and d will be deleted.\nIf you need to add just clump member b, release this member from d first -> see :yref:`<BodyContainer.releaseFromClump>`.")
-		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release a body b from clump c. b must be a clump member of c.")
-		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a clump template (see utils.clumpTemplate).")
+		.def("addToClump",&pyBodyContainer::addToClump,"Add body b to an existing clump c. c must be clump and b may not be a clump member of c.\n\nSee /examples/clumps/addToClump-example.py for an example script.\n\nnote::\n\t- If b is a clump itself, then all members will be added to c and b will be deleted.\n\t- If b is a clump member of clump d, then all members from d will be added to c and d will be deleted.\n\t- If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
+		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release body b from clump c. b must be a clump member of c.\n\nSee /examples/clumps/releaseFromClump-example.py for an example script.\n\n.. note::\n\t- If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erase<BodyContainer.erase>`d.")
+		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts.\n\ncontainer::\n\tO.bodies.replaceByClumps([utils.clumpTemplate([1,1],[.5,.5])],[.9])#will replace 90 % of all standalone spheres by 'dyads'\n\n.. See /examples/clumps/replaceByClumps-example.py for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);
