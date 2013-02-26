@@ -30,7 +30,8 @@ ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 
 void ThreeDTriaxialEngine::action()
 {
-
+	static int warn = 0;
+	if (!warn++) LOG_WARN ("This engine is deprecated, please switch to TriaxialStressController if you expect long term support.")
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
