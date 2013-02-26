@@ -72,7 +72,7 @@ class State: public Serializable, public Indexable{
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
 		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.")
-		.def("displ",&State::displ,"Displacement from :yref:`reference position<State.refPos>` (:yref:`pos<State.pos>` - :yref:`refPos<State.refPos>`")
+		.def("displ",&State::displ,"Displacement from :yref:`reference position<State.refPos>` (:yref:`pos<State.pos>` - :yref:`refPos<State.refPos>`)")
 		.def("rot",&State::rot,"Rotation from :yref:`reference orientation<State.refPos>` (as rotation vector)")
 	);
 	REGISTER_INDEX_COUNTER(State);
