@@ -72,12 +72,16 @@ generally.
 #. developement version (trunk) can be obtained from the `code repository <https://github.com/yade/>`_ at github.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
-management (install the ``git`` package in your distribution)::
+management (install the ``git`` package in your distribution and create a GitHub account)::
 
 		git clone git@github.com:yade/trunk.git
 
 will download the whole code repository of ``trunk``. Check out `Yade on github
 <https://www.yade-dem.org/wiki/Yade_on_github>`_ wiki page for more.
+
+Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the main Yade branch)::
+
+		git clone https://github.com/yade/trunk.git
    
 For those behind firewall, you can download `any revision  <https://www.yade-dem.org/source/>`_ of the repository as compressed archive.
 
@@ -117,7 +121,7 @@ should have root privileges
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
-		gtk2-engines-pixbuf \
+		gtk2-engines-pixbuf python-argparse\
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libgmp3-dev libcgal-dev
 

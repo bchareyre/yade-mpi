@@ -5,6 +5,21 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+/* TABLE OF CONTENT, and the minimum you need to understand.
+- 2 new shapes for grids : GridNode (vertices) and GridConnection (edges)
+- 2 new contact geometries :
+    * GridNodeGeom6D to handle GridNode-GridNode contacts (the internal behaviour of the grid)
+    * ScGridCoGeom to handle Sphere-GridConnection contacts (the interaction between the grid and an external sphere)
+        Note : the Sphere-Grid contacts are always handled by the GridConnections, but the forces are applied on the related GridNodes.
+        Note : there is no contact between two GridConnections, they must be linked with GridNodes.
+- The 2 related Ig2 :
+    * Ig2_GridNode_GridNode_GridNodeGeom6D (doing almost the same than Ig2_Sphere_Sphere_ScGeom6D)
+    * Ig2_Sphere_GridConnection_ScGridCoGeom (the biggest part of the code, it handles contact detection and history when a sphere is sliding on the grid over consecutive GridConnections)
+- The Law2_ScGridCoGeom_FrictPhys_CundallStrack who handles the elastic frictional Sphere-GridConnection contact. The GridNode-GridNode law is Law2_ScGeom6D_CohFrictPhys_CohesionMoment by inheritance.
+*/
+
+
+
 #pragma once
 #include "Sphere.hpp"
 #include<yade/pkg/dem/FrictPhys.hpp>

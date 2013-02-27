@@ -232,7 +232,7 @@ class FlowEngine : public PartialEngine
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
 					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule"))
 					((double, eps, 0.00001,,"minimum distance between particles"))
-					((bool, pressureForce, false,,"Compute the fluid force"))
+					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
 
 					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
 					((bool, viscousNormalBodyStress, false,,"Compute normal viscous stress applied on each body"))
