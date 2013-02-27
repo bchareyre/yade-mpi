@@ -189,7 +189,7 @@ The algorithm commonly used in Yade computes normal interaction stiffness as sti
    
 	Series of 2 springs representing normal stiffness of contact between 2 spheres.
 				
-Let us define distance $l=l_1+l_2$, where $l_i$ are distances between contact point and sphere centers, which are initially (roughly speaking) equal to sphere radii. Change of distance between the spehre centers $\Delta l$ is distributed onto deformations of both spheres $\Delta l=\Delta l_1+\Delta l_2$ proportionally to their compliances. Displacement change $\Delta l_i$ generates force $F_i=K_i \Delta l_i$, where $K_i$ assures proportionality and has physical meaning and dimension of stiffness; $K_i$ is related to the sphere material modulus $E_i$ and some length $\tilde l_i$ proportional to $r_i$.
+Let us define distance $l=l_1+l_2$, where $l_i$ are distances between contact point and sphere centers, which are initially (roughly speaking) equal to sphere radii. Change of distance between the sphere centers $\Delta l$ is distributed onto deformations of both spheres $\Delta l=\Delta l_1+\Delta l_2$ proportionally to their compliances. Displacement change $\Delta l_i$ generates force $F_i=K_i \Delta l_i$, where $K_i$ assures proportionality and has physical meaning and dimension of stiffness; $K_i$ is related to the sphere material modulus $E_i$ and some length $\tilde l_i$ proportional to $r_i$.
 
 .. math::
 	:nowrap:
