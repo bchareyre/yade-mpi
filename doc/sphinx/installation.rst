@@ -72,12 +72,16 @@ generally.
 #. developement version (trunk) can be obtained from the `code repository <https://github.com/yade/>`_ at github.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
-management (install the ``git`` package in your distribution)::
+management (install the ``git`` package in your distribution and create a GitHub account)::
 
 		git clone git@github.com:yade/trunk.git
 
 will download the whole code repository of ``trunk``. Check out `Yade on github
 <https://www.yade-dem.org/wiki/Yade_on_github>`_ wiki page for more.
+
+Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the main Yade branch)::
+
+		git clone https://github.com/yade/trunk.git
    
 For those behind firewall, you can download `any revision  <https://www.yade-dem.org/source/>`_ of the repository as compressed archive.
 
