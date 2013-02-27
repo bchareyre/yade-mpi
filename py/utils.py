@@ -266,9 +266,11 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	nodeMat=sph1.material
 	b.shape.node1=sph1 ; b.shape.node2=sph2
 	sph1.shape.addConnection(b) ; sph2.shape.addConnection(b)
-	if(O.periodic and cellDist!=None):
-		i.cellDist=cellDist
-	segt=sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos
+	if(O.periodic):
+		if(cellDist!=None):
+			i.cellDist=cellDist
+		segt=sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos
+	else: segt=sph2.state.pos - sph1.state.pos
 	L=segt.norm()
 	V=0.5*L*math.pi*radius**2
 	geomInert=(2./5.)*V*radius**2
