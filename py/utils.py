@@ -888,9 +888,11 @@ def psd(bins=5, mass=True, mask=-1):
 	return binsSizes, binsProc, binsSumCum
 
 class clumpTemplate:
-	"""Create a clump template.
-		:param [float,float, ...] relRadii: list of relative radii
-		:param [Vector3,Vector3,Vector3, ...] relPositions: list of relative positions
+	"""Create a clump template by a list of relative radii and a list of relative positions. Both lists must have the same length.
+	
+	:param [float,float,...] relRadii: list of relative radii (minimum length = 2)
+	:param [Vector3,Vector3,...] relPositions: list of relative positions (minimum length = 2)
+	
 	"""
 	def __init__(self,relRadii=[],relPositions=[[],[]]):
 		if (len(relRadii) != len(relPositions)):
