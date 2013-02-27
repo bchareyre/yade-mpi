@@ -215,7 +215,8 @@ class pyBodyContainer{
 			python::throw_error_already_set();
 		}
 	}
-	void replaceByClumps(python::list ctList, vector<Real> amounts){
+	python::list replaceByClumps(python::list ctList, vector<Real> amounts){
+		python::list ret;
 		Real checkSum = 0.0;
 		FOREACH(Real amount, amounts) {
 			if (amount < 0.0) {
@@ -360,10 +361,12 @@ class pyBodyContainer{
 					LOG_DEBUG("New body (sphere) "<<newSphere->id<<" added.");
 					idsTmp[jj] = newSphere->id;
 				}
-				clump(idsTmp);
+				Body::id_t newClumpId = clump(idsTmp);
+				ret.append(python::make_tuple(newClumpId,idsTmp));
 				erase(b->id);
 			}
 		}
+		return ret;
 	}
 	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
@@ -829,7 +832,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns clump id.")
 		.def("addToClump",&pyBodyContainer::addToClump,"Add body b to an existing clump c. c must be clump and b may not be a clump member of c.\n\nSee **/examples/clumps/addToClump-example.py** for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
 		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release body b from clump c. b must be a clump member of c.\n\nSee **/examples/clumps/releaseFromClump-example.py** for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
-		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts. A new clump will have the same volume as the sphere, that was replaced (clump volume takes account of overlaps). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
+		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: (clump id,[associated sphere ids]). A new clump will have the same volume as the sphere, that was replaced (clump volume takes account of overlaps). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);

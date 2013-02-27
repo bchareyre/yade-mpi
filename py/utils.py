@@ -442,7 +442,6 @@ def avgNumInteractions(cutoff=0.,skipFree=False):
 		NN=N-N0-N1
 		return (CC-N1)*1./NN if NN>0 else float('nan')
 
-
 def plotNumInteractionsHistogram(cutoff=0.):
 	"Plot histogram with number of interactions per body, optionally cutting away *cutoff* relative axis-aligned box from specimen margin."
 	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
