@@ -417,12 +417,13 @@ def randomizeColors(onlyDynamic=False):
 		color=(random.random(),random.random(),random.random())
 		if b.dynamic or not onlyDynamic: b.shape.color=color
 
-def avgNumInteractions(cutoff=0.,skipFree=False,respectClumps=False):
+def avgNumInteractions(cutoff=0.,skipFree=False,considerClumps=False):
 	r"""Return average numer of interactions per particle, also known as *coordination number* $Z$. This number is defined as
 
 	.. math:: Z=2C/N
 
-	where $C$ is number of contacts and $N$ is number of particles.
+	where $C$ is number of contacts and $N$ is number of particles. When clumps are present, number of particles is the sum of standalone spheres plus the sum of clumps.
+	Clumps are considered in the calculation if cutoff != 0 or skipFree = True. If cutoff=0 (default) and skipFree=False (default) one needs to set considerClumps=True to consider clumps in the calculation.
 
 	With *skipFree*, particles not contributing to stable state of the packing are skipped, following equation (8) given in [Thornton2000]_:
 
@@ -430,9 +431,10 @@ def avgNumInteractions(cutoff=0.,skipFree=False,respectClumps=False):
 
 	:param cutoff: cut some relative part of the sample's bounding box away.
 	:param skipFree: see above.
+	:param respectClumps: also respect clumps if cutoff=0 and skipFree=False; for further explanation see above.
 	
 """
-	if cutoff==0 and not skipFree and not respectClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
+	if cutoff==0 and not skipFree and not considerClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
 	else:
 		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 		## CC is 2*C

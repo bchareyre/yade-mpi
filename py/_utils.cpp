@@ -147,23 +147,16 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
 		const Body::id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
-		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id1]+=1;
-		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id2]+=1;
-		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
-	}
-	//correct bodyNumIntr for clumps:
-	typedef std::map<Body::id_t,Se3r> MemberMap;
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies) {
-		if (b->isClump()) {
-			const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
-			std::map<Body::id_t,Se3r>& members = clump->members;
-			FOREACH(const MemberMap::value_type& mm, members){
-				const Body::id_t& memberId = mm.first;
-				bodyNumIntr[b->id] += bodyNumIntr[memberId];
-				bodyNumIntr[memberId] = 0;
-			}
-			maxIntr=max(maxIntr,bodyNumIntr[b->id]);
+		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) {
+			if (b1->isClumpMember()) bodyNumIntr[b1->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			else bodyNumIntr[id1]+=1;
 		}
+		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) {
+			if (b1->isClumpMember()) bodyNumIntr[b2->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			else bodyNumIntr[id2]+=1;
+		}
+		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
+		maxIntr=max(max(maxIntr,bodyNumIntr[b1->clumpId]),bodyNumIntr[b2->clumpId]);
 	}
 	vector<int> bins; bins.resize(maxIntr+1,0);
 	for(size_t id=0; id<bodyNumIntr.size(); id++){
