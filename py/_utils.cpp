@@ -13,8 +13,6 @@
 #include<cmath>
 #include<yade/pkg/dem/ViscoelasticPM.hpp>
 
-#include<yade/core/Clump.hpp>
-
 #include<numpy/ndarrayobject.h>
 
 using namespace std;

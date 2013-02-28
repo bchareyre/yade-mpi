@@ -431,7 +431,7 @@ def avgNumInteractions(cutoff=0.,skipFree=False,considerClumps=False):
 
 	:param cutoff: cut some relative part of the sample's bounding box away.
 	:param skipFree: see above.
-	:param respectClumps: also respect clumps if cutoff=0 and skipFree=False; for further explanation see above.
+	:param considerClumps: also consider clumps if cutoff=0 and skipFree=False; for further explanation see above.
 	
 """
 	if cutoff==0 and not skipFree and not considerClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
