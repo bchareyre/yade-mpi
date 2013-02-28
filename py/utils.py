@@ -417,7 +417,7 @@ def randomizeColors(onlyDynamic=False):
 		color=(random.random(),random.random(),random.random())
 		if b.dynamic or not onlyDynamic: b.shape.color=color
 
-def avgNumInteractions(cutoff=0.,skipFree=False):
+def avgNumInteractions(cutoff=0.,skipFree=False,respectClumps=False):
 	r"""Return average numer of interactions per particle, also known as *coordination number* $Z$. This number is defined as
 
 	.. math:: Z=2C/N
@@ -432,12 +432,12 @@ def avgNumInteractions(cutoff=0.,skipFree=False):
 	:param skipFree: see above.
 	
 """
-	if cutoff==0 and not skipFree: return 2*O.interactions.countReal()*1./len(O.bodies)
+	if cutoff==0 and not skipFree and not respectClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
 	else:
 		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 		## CC is 2*C
 		CC=sum([nums[i]*counts[i] for i in range(len(nums))]); N=sum(counts)
-		if not skipFree: return CC*1./N
+		if not skipFree: return CC*1./N if N>0 else float('nan')
 		## find bins with 0 and 1 spheres
 		N0=0 if (0 not in nums) else counts[nums.index(0)]
 		N1=0 if (1 not in nums) else counts[nums.index(1)]

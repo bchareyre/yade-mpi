@@ -13,6 +13,8 @@
 #include<cmath>
 #include<yade/pkg/dem/ViscoelasticPM.hpp>
 
+#include<yade/core/Clump.hpp>
+
 #include<numpy/ndarrayobject.h>
 
 using namespace std;
@@ -149,6 +151,20 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id2]+=1;
 		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
 	}
+	//correct bodyNumIntr for clumps:
+	typedef std::map<Body::id_t,Se3r> MemberMap;
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies) {
+		if (b->isClump()) {
+			const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
+			std::map<Body::id_t,Se3r>& members = clump->members;
+			FOREACH(const MemberMap::value_type& mm, members){
+				const Body::id_t& memberId = mm.first;
+				bodyNumIntr[b->id] += bodyNumIntr[memberId];
+				bodyNumIntr[memberId] = 0;
+			}
+			maxIntr=max(maxIntr,bodyNumIntr[b->id]);
+		}
+	}
 	vector<int> bins; bins.resize(maxIntr+1,0);
 	for(size_t id=0; id<bodyNumIntr.size(); id++){
 		const shared_ptr<Body>& b=Body::byId(id,rb);
@@ -156,7 +172,7 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 			if(bodyNumIntr[id]>0) bins[bodyNumIntr[id]]+=1;
 			// 0 is handled specially: add body to the 0 bin only if it is inside the bb requested (if applicable)
 			// otherwise don't do anything, since it is outside the volume of interest
-			else if((useBB && isInBB(b->state->pos,bbMin,bbMax)) || !useBB) bins[0]+=1;
+			else if(((useBB && isInBB(b->state->pos,bbMin,bbMax)) || !useBB) && !(b->isClumpMember())) bins[0]+=1;
 		}
 	}
 	py::list count,num;
