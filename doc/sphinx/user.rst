@@ -89,7 +89,16 @@ As those functions use :yref:`yade.utils.sphere` and :yref:`yade.utils.facet` in
 Clumping particles together
 ----------------------------
 
-In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation); a special function :yref:`BodyContainer.appendClumped` is designed for this task; for instance, we might add 2 spheres tied together:
+In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation). This we call a :yref:`clump<Clump>`. 
+A clump is internally represented by a special :yref:`body<Body>`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`). 
+Like every body a clump has a :yref:`position<State.pos>`, which is the balance point between all members. 
+A clump body itself has no :yref:`interactions<Interaction>` with other bodies. Interactions between clumps is internally represented by interactions between clump members. There are also no interactions between clump members with same clumpId. 
+
+YADE supports different ways of creating clumps:
+
+* Create clumps and spheres (clump members) directly with one command:
+
+The function :yref:`appendClumped()<BodyContainer.appendClumped>` is designed for this task. For instance, we might add 2 spheres tied together:
 
 .. ipython::
 
@@ -107,8 +116,38 @@ In some cases, you might want to create rigid aggregate of individual particles 
 
 	Yade [2]: O.bodies[2].isClump, O.bodies[2].clumpId
 	
+-> :yref:`appendClumped()<BodyContainer.appendClumped>` returns a tuple of ids ``(clumpId,[memberId1,memberId2,...])``
 
-:yref:`appendClumped<BodyContainer.appendClumped>` returns a tuple of ``(clumpId,[memberId1,memberId2])``: clump is internally represented by a special :yref:`Body`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`).
+* Use existing spheres and clump them together:
+
+For this case the function :yref:`clump()<BodyContainer.clump>` can be used. One way to do this is to create a list of bodies, that should be clumped before using the :yref:`clump()<BodyContainer.clump>` command:
+
+.. ipython::
+
+	@suppress
+	Yade [0]: O.reset()
+
+	Yade [1]: bodyList = []
+
+	Yade [2]: for ii in range(0,5):
+	     ...:    bodyList.append(O.bodies.append(utils.sphere([ii,0,1],.5)))#create a "chain" of 5 spheres
+	     ...:
+
+	Yade [3]: print bodyList
+
+	Yade [4]: idClump=O.bodies.clump(bodyList)
+	
+-> :yref:`clump()<BodyContainer.clump>` returns ``clumpId``
+
+* Another option is to replace :yref:`standalone<Body.isStandalone>` spheres from a given packing (see :yref:`SpherePack<yade._packSpheres.SpherePack>` and :yref:`makeCloud<yade._packSpheres.SpherePack.makeCloud>`) using clump templates.
+
+This is done by a function called :yref:`replaceByClumps()<BodyContainer.replaceByClumps>`. This function takes a list of :yref:`clumpTemplates()<yade.utils.clumpTemplate>` and a list of amounts and replaces spheres by clumps. The volume of a new clump will be the same as the volume of the sphere, that was replaced (clump volume takes account of overlaps).
+
+-> :yref:`replaceByClumps()<yade.wrapper.BodyContainer.replaceByClumps>` returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``
+
+It is also possible to :yref:`add<BodyContainer.addToClump>` bodies to a clump and :yref:`release<BodyContainer.releaseFromClump>` bodies from a clump. Also you can :yref:`erase<BodyContainer.erase>` the clump (clump members will get standalone spheres).
+
+.. note:: Have a look at ``examples/clumps/`` folder. There you will find some examples, that show usage of different functions for clumps.
 
 Sphere packings
 ===============
