@@ -360,10 +360,12 @@ if 1:
 	if yade.runtime.ipython_version<12:
 		import ipython_directive as id
 	else:
-		if 12<yade.runtime.ipython_version<13:
+		if 12<=yade.runtime.ipython_version<13:
 			import ipython_directive012 as id
 		else:
 			import ipython_directive013 as id
+	print "=============================================================="
+	print "yade.runtime.ipython_version=",yade.runtime.ipython_version
 	
 	id.rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxout=re.compile(r'(?:Out| ->  )\[(\d+)\]:\s?(.*)\s*')
@@ -383,12 +385,15 @@ if 1:
 
 extensions = [
 		'sphinx.ext.autodoc',
+		'sphinx.ext.doctest',
 		'sphinx.ext.autosummary',
+		'sphinx.ext.viewcode'
 		'sphinx.ext.coverage',
 		'sphinx.ext.pngmath',
 		'sphinx.ext.graphviz',
 		'sphinx.ext.viewcode',
 		'sphinx.ext.inheritance_diagram',
+		'sphinx.ext.intersphinx'
 		'matplotlib.sphinxext.plot_directive',
 		'matplotlib.sphinxext.only_directives',
 		#'matplotlib.sphinxext.mathmpl',
@@ -396,10 +401,14 @@ extensions = [
 		'youtube',
 		'sphinx.ext.todo',
 		]
+
 if yade.runtime.ipython_version<12:
 	extensions.append('ipython_directive')
 else:
-	extensions.append('ipython_directive012')
+	if 12<=yade.runtime.ipython_version<13:
+		extensions.append('ipython_directive012')
+	else:
+		extensions.append('ipython_directive013')
 
 # the sidebar extension
 if False:
