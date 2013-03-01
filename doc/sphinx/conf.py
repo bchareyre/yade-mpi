@@ -364,9 +364,7 @@ if 1:
 			import ipython_directive012 as id
 		else:
 			import ipython_directive013 as id
-	print "=============================================================="
-	print "yade.runtime.ipython_version=",yade.runtime.ipython_version
-	
+
 	id.rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxout=re.compile(r'(?:Out| ->  )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxcont=re.compile(r'(?:   +)\.\.+:\s?(.*)\s*')
@@ -385,15 +383,12 @@ if 1:
 
 extensions = [
 		'sphinx.ext.autodoc',
-		'sphinx.ext.doctest',
 		'sphinx.ext.autosummary',
-		'sphinx.ext.viewcode'
 		'sphinx.ext.coverage',
 		'sphinx.ext.pngmath',
 		'sphinx.ext.graphviz',
 		'sphinx.ext.viewcode',
 		'sphinx.ext.inheritance_diagram',
-		'sphinx.ext.intersphinx'
 		'matplotlib.sphinxext.plot_directive',
 		'matplotlib.sphinxext.only_directives',
 		#'matplotlib.sphinxext.mathmpl',
