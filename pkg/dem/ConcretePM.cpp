@@ -232,6 +232,7 @@ void CpmPhys::setRelResidualStrength(Real r) {
 
 /********************** Law2_SomeGeom_CpmPhys_Cpm ****************************/
 CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
+CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
 	#include"../../../brefcom-mm.hh"
@@ -242,10 +243,10 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
 #ifdef CPM_MATERIAL_MODEL
 	#define CPM_MATERIAL_MODEL_A \
-		Real& epsNPl(BC->epsNPl);\
+		Real& epsNPl(phys->epsNPl);\
 		const Real& dt = scene->dt;\
-		const Real& dmgTau(BC->dmgTau);\
-		const Real& plTau(BC->plTau);\
+		const Real& dmgTau(phys->dmgTau);\
+		const Real& plTau(phys->plTau);\
 		const Real& yieldLogSpeed(this->yieldLogSpeed);\
 		const int& yieldSurfType(this->yieldSurfType);\
 		const Real& yieldEllipseShift(this->yieldEllipseShift);\
@@ -260,22 +261,22 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 #ifdef CPM_MATERIAL_MODEL
 	#define CPM_MATERIAL_MODEL_B \
 		/* complicated version */ \
-		if (epsSoft >= 0) epsN += BC->isoPrestress/E; \
+		if (epsSoft >= 0) epsN += phys->isoPrestress/E; \
 		else { /* take softening into account for the prestress */ \
 			Real sigmaSoft=E*epsSoft;\
-			if (BC->isoPrestress >= sigmaSoft) epsN += BC -> isoPrestress/E; /* on the non-softened branch yet */ \
+			if (phys->isoPrestress >= sigmaSoft) epsN += phys -> isoPrestress/E; /* on the non-softened branch yet */ \
 			/* otherwise take the regular and softened branches separately (different moduli) */ \
-			else epsN += sigmaSoft/E+(BC->isoPrestress-sigmaSoft)/(E*relKnSoft);\
+			else epsN += sigmaSoft/E+(phys->isoPrestress-sigmaSoft)/(E*relKnSoft);\
 		} \
 		CPM_MATERIAL_MODEL
 #else
 	#define CPM_MATERIAL_MODEL_B \
 		/* simplified public model */ \
-		epsN += BC->isoPrestress/E; \
+		epsN += phys->isoPrestress/E; \
 		/* very simplified version of the constitutive law */ \
 		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */ \
-		/* Real epsFracture = crackOpening/contGeom->refLength; */ \
-		omega = isCohesive? BC->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */ \
+		/* Real epsFracture = crackOpening/geom->refLength; */ \
+		omega = isCohesive? phys->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */ \
 		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */ \
 		sigmaT = G*epsT; /* trial stress */ \
 		Real yieldSigmaT = max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); /* Mohr-Coulomb law with damage */ \
@@ -283,7 +284,7 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 			Real scale = yieldSigmaT/sigmaT.norm(); \
 			sigmaT *= scale; /* stress return */ \
 			epsT *= scale; \
-			/* epsPlSum += yieldSigmaT*contGeom->slipToStrainTMax(yieldSigmaT/G);*/ /* adjust strain */ \
+			/* epsPlSum += yieldSigmaT*geom->slipToStrainTMax(yieldSigmaT/G);*/ /* adjust strain */ \
 		} \
 		relResidualStrength = isCohesive? (kappaD<epsCrackOnset? 1. : (1-omega)*(kappaD)/epsCrackOnset) : 0;
 #endif
@@ -292,7 +293,7 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 #ifdef YADE_DEBUG
 	#define CPM_YADE_DEBUG_A \
 		if(isnan(epsN)){\
-			/*LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());*/ \
+			/*LOG_FATAL("refLength="<<geom->refLength<<"; pos1="<<geom->se31.position<<"; pos2="<<geom->se32.position<<"; displacementN="<<geom->displacementN());*/ \
 			throw runtime_error("!! epsN==NaN !!");\
 		}
 #else
@@ -311,44 +312,40 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 	if (I->isFresh(scene)) { \
 		Vector3r pos1 = scene->bodies->operator[](I->id1)->state->pos; \
 		Vector3r pos2 = scene->bodies->operator[](I->id2)->state->pos; \
-		if (scene->isPeriodic) { \
-			Vector3r temp = pos2 - pos1; \
-			pos1 = scene->cell->wrapShearedPt(pos1); \
-			pos2 = pos1 + temp; \
-		} \
-		Real minRad = (contGeom->refR1 <= 0? contGeom->refR2 : (contGeom->refR2 <=0? contGeom->refR1 : min(contGeom->refR1,contGeom->refR2))); \
-		BC->refLength = (pos2 - pos1).norm(); \
-		BC->crossSection = Mathr::PI*pow(minRad,2); \
-		BC->refPD = contGeom->refR1 + contGeom->refR2 - BC->refLength; \
-		BC->kn = BC->crossSection*BC->E/BC->refLength; \
-		BC->ks = BC->crossSection*BC->G/BC->refLength; \
-		BC->epsFracture = isnan(BC->crackOpening)? BC->epsCrackOnset*BC->relDuctility : BC->crackOpening/(2*minRad); /* *contGeom->refLength */; \
+		Real minRad = (geom->refR1 <= 0? geom->refR2 : (geom->refR2 <=0? geom->refR1 : min(geom->refR1,geom->refR2))); \
+		Vector3r shift2 = scene->isPeriodic? Vector3r(scene->cell->hSize*I->cellDist.cast<Real>()) : Vector3r::Zero();\
+		phys->refLength = (pos2 - pos1 + shift2).norm(); \
+		phys->crossSection = Mathr::PI*pow(minRad,2); \
+		phys->refPD = geom->refR1 + geom->refR2 - phys->refLength; \
+		phys->kn = phys->crossSection*phys->E/phys->refLength; \
+		phys->ks = phys->crossSection*phys->G/phys->refLength; \
+		phys->epsFracture = isnan(phys->crackOpening)? phys->epsCrackOnset*phys->relDuctility : phys->crackOpening/(2*minRad); /* *geom->refLength */; \
 	} \
 	\
 	/* shorthands */ \
-	Real& epsN(BC->epsN); \
-	Vector3r& epsT(BC->epsT); \
-	Real& kappaD(BC->kappaD); \
-	/* Real& epsPlSum(BC->epsPlSum); */ \
-	const Real& E(BC->E); \
-	const Real& undamagedCohesion(BC->undamagedCohesion); \
-	const Real& tanFrictionAngle(BC->tanFrictionAngle); \
-	const Real& G(BC->G); \
-	const Real& crossSection(BC->crossSection); \
+	Real& epsN(phys->epsN); \
+	Vector3r& epsT(phys->epsT); \
+	Real& kappaD(phys->kappaD); \
+	/* Real& epsPlSum(phys->epsPlSum); */ \
+	const Real& E(phys->E); \
+	const Real& undamagedCohesion(phys->undamagedCohesion); \
+	const Real& tanFrictionAngle(phys->tanFrictionAngle); \
+	const Real& G(phys->G); \
+	const Real& crossSection(phys->crossSection); \
 	const Real& omegaThreshold(this->omegaThreshold); \
-	const Real& epsCrackOnset(BC->epsCrackOnset); \
-	Real& relResidualStrength(BC->relResidualStrength); \
-	/*const Real& crackOpening(BC->crackOpening); */ \
-	/*const Real& relDuctility(BC->relDuctility); */ \
-	const Real& epsFracture(BC->epsFracture); \
-	const int& damLaw(BC->damLaw); \
-	const bool& neverDamage(BC->neverDamage); \
-	Real& omega(BC->omega); \
-	Real& sigmaN(BC->sigmaN); \
-	Vector3r& sigmaT(BC->sigmaT); \
-	Real& Fn(BC->Fn); \
-	Vector3r& Fs(BC->Fs); /* for python access */ \
-	const bool& isCohesive(BC->isCohesive); \
+	const Real& epsCrackOnset(phys->epsCrackOnset); \
+	Real& relResidualStrength(phys->relResidualStrength); \
+	/*const Real& crackOpening(phys->crackOpening); */ \
+	/*const Real& relDuctility(phys->relDuctility); */ \
+	const Real& epsFracture(phys->epsFracture); \
+	const int& damLaw(phys->damLaw); \
+	const bool& neverDamage(phys->neverDamage); \
+	Real& omega(phys->omega); \
+	Real& sigmaN(phys->sigmaN); \
+	Vector3r& sigmaT(phys->sigmaT); \
+	Real& Fn(phys->Fn); \
+	Vector3r& Fs(phys->Fs); /* for python access */ \
+	const bool& isCohesive(phys->isCohesive); \
 	\
 	CPM_MATERIAL_MODEL_A
 
@@ -361,7 +358,7 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 	/* constitutive law */ \
 	CPM_MATERIAL_MODEL_B \
 	\
-	sigmaN -= BC->isoPrestress; \
+	sigmaN -= phys->isoPrestress; \
 	\
 	NNAN(kappaD); NNAN(epsFracture); NNAN(omega); \
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection); \
@@ -379,8 +376,8 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 		return; \
 	} \
 	\
-	Fn = sigmaN*crossSection; BC->normalForce = Fn*contGeom->normal; \
-	Fs = sigmaT*crossSection; BC->shearForce = Fs;
+	Fn = sigmaN*crossSection; phys->normalForce = -Fn*geom->normal; \
+	Fs = sigmaT*crossSection; phys->shearForce = -Fs;
 
 
 
@@ -388,51 +385,50 @@ CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
-	Dem3DofGeom* contGeom = static_cast<Dem3DofGeom*>(_geom.get());
-	CpmPhys* BC = static_cast<CpmPhys*>(_phys.get());
+	Dem3DofGeom* geom = static_cast<Dem3DofGeom*>(_geom.get());
+	CpmPhys* phys = static_cast<CpmPhys*>(_phys.get());
 	
-	//#define CPM_LAW2 Law2_Dem3DofGeom_CpmPhys_Cpm
 	CPM_GO_A
 
-	epsN = contGeom->strainN();
-	epsT = contGeom->strainT();
+	epsN = geom->strainN();
+	epsT = geom->strainT();
 
 	CPM_GO_B
 
-	applyForceAtContactPoint(BC->normalForce + BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position);
+	applyForceAtContactPoint(-phys->normalForce - phys->shearForce, geom->contactPoint, I->getId1(), geom->se31.position, I->getId2(), geom->se32.position);
 }
 
 
 
 
 
-CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
-	ScGeom* contGeom=static_cast<ScGeom*>(_geom.get());
-	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
+	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
+	CpmPhys* phys=static_cast<CpmPhys*>(_phys.get());
 
-	//#define CPM_LAW2 Law2_ScGeom_CpmPhys_Cpm
 	CPM_GO_A
 	
-	epsN = - (-BC->refPD + contGeom->penetrationDepth) / BC->refLength;
-	epsT = contGeom->rotate(epsT);
-	epsT += contGeom->shearIncrement() / (BC->refLength + BC->refPD) ; 
+	epsN = - (-phys->refPD + geom->penetrationDepth) / phys->refLength;
+	epsT = geom->rotate(epsT);
+	epsT += geom->shearIncrement() / (phys->refLength + phys->refPD) ; 
 
 	CPM_GO_B
 
-	Vector3r pos1,pos2;
-	if (scene->isPeriodic) {
-		pos1 = scene->bodies->operator[](I->id1)->state->pos;
-		pos2 = scene->bodies->operator[](I->id2)->state->pos;
-		Vector3r temp = pos2 - pos1;
-		pos1 = scene->cell->wrapShearedPt(pos1);
-		pos2 = pos1 + temp;
-	} else {
-		pos1 = scene->bodies->operator[](I->id1)->state->pos;
-		pos2 = scene->bodies->operator[](I->id2)->state->pos;
-	}
+	Body::id_t id1 = I->getId1();
+ 	Body::id_t id2 = I->getId2();
 
-	applyForceAtContactPoint(BC->normalForce + BC->shearForce, contGeom->contactPoint, I->getId1(), pos1, I->getId2(), pos2);
+	State* b1 = Body::byId(id1,scene)->state.get();
+	State* b2 = Body::byId(id2,scene)->state.get();	
+
+	Vector3r f = -phys->normalForce - phys->shearForce;
+	if (!scene->isPeriodic) {
+		applyForceAtContactPoint(f, geom->contactPoint , id1, b1->se3.position, id2, b2->se3.position);
+	} else {
+		scene->forces.addForce(id1,f);
+		scene->forces.addForce(id2,-f);
+		scene->forces.addTorque(id1,(geom->radius1+.5*(phys->refPD-geom->penetrationDepth))*geom->normal.cross(f));
+		scene->forces.addTorque(id2,(geom->radius2+.5*(phys->refPD-geom->penetrationDepth))*geom->normal.cross(f));
+	}
 }
 
 
@@ -460,15 +456,15 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 
 	void Gl1_CpmPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-		const shared_ptr<CpmPhys>& BC = static_pointer_cast<CpmPhys>(ip);
+		const shared_ptr<CpmPhys>& phys = static_pointer_cast<CpmPhys>(ip);
 		const shared_ptr<GenericSpheresContact>& geom = YADE_PTR_CAST<GenericSpheresContact>(i->geom);
 		// FIXME: get the scene for periodicity; ugly!
 		Scene* scene=Omega::instance().getScene().get();
 
-		//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
-		Vector3r lineColor = Shop::scalarOnColorScale(1.-BC->relResidualStrength);
+		//Vector3r lineColor(phys->omega,1-phys->omega,0.0); /* damaged links red, undamaged green */
+		Vector3r lineColor = Shop::scalarOnColorScale(1.-phys->relResidualStrength);
 
-		if(colorStrainRatio>0) lineColor = Shop::scalarOnColorScale(BC->epsN/(BC->epsCrackOnset*colorStrainRatio));
+		if(colorStrainRatio>0) lineColor = Shop::scalarOnColorScale(phys->epsN/(phys->epsCrackOnset*colorStrainRatio));
 
 		// FIXME: should be computed by the renderer; for now, use the real values
 		//Vector3r pos1=geom->se31.position, pos2=geom->se32.position;
@@ -486,10 +482,10 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		}
 
 		if (contactLine) GLUtils::GLDrawLine(pos1,pos2,lineColor);
-		if (dmgLabel) { GLUtils::GLDrawNum(BC->omega,0.5*(pos1+pos2),lineColor); }
-		else if (epsNLabel) { GLUtils::GLDrawNum(BC->epsN,0.5*(pos1+pos2),lineColor); }
-		if (BC->omega>0 && dmgPlane) {
-			Real halfSize = sqrt(1-BC->relResidualStrength)*.5*.705*sqrt(BC->crossSection);
+		if (dmgLabel) { GLUtils::GLDrawNum(phys->omega,0.5*(pos1+pos2),lineColor); }
+		else if (epsNLabel) { GLUtils::GLDrawNum(phys->epsN,0.5*(pos1+pos2),lineColor); }
+		if (phys->omega>0 && dmgPlane) {
+			Real halfSize = sqrt(1-phys->relResidualStrength)*.5*.705*sqrt(phys->crossSection);
 			Vector3r midPt = .5*Vector3r(pos1+pos2);
 			glDisable(GL_CULL_FACE);
 			glPushMatrix();
@@ -512,10 +508,10 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		Vector3r cp = static_pointer_cast<GenericSpheresContact>(i->geom)->contactPoint;
 		if (scene->isPeriodic) {cp = scene->cell->wrapShearedPt(cp);}
 		if (epsT) {
-			Real maxShear = (BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
-			Real relShear = BC->epsT.norm()/maxShear;
-			Real scale = BC->refLength;
-			Vector3r dirShear = BC->epsT; dirShear.normalize();
+			Real maxShear = (phys->undamagedCohesion-phys->sigmaN*phys->tanFrictionAngle)/phys->G;
+			Real relShear = phys->epsT.norm()/maxShear;
+			Real scale = phys->refLength;
+			Vector3r dirShear = phys->epsT; dirShear.normalize();
 			if(epsTAxes){
 				GLUtils::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));
 				GLUtils::GLDrawLine(cp-Vector3r(0,scale,0),cp+Vector3r(0,scale,0));
@@ -524,9 +520,9 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 			GLUtils::GLDrawArrow(cp,cp+dirShear*relShear*scale,Vector3r(1.,0.,0.));
 			GLUtils::GLDrawLine(cp+dirShear*relShear*scale,cp+dirShear*scale,Vector3r(.3,.3,.3));
 
-			/* normal strain */ GLUtils::GLDrawArrow(cp,cp+geom->normal*(BC->epsN/maxShear),Vector3r(0.,1.,0.));
+			/* normal strain */ GLUtils::GLDrawArrow(cp,cp+geom->normal*(phys->epsN/maxShear),Vector3r(0.,1.,0.));
 		}
-		//if(normal) GLUtils::GLDrawArrow(cp,cp+geom->normal*.5*BC->equilibriumDist,Vector3r(0.,1.,0.));
+		//if(normal) GLUtils::GLDrawArrow(cp,cp+geom->normal*.5*phys->equilibriumDist,Vector3r(0.,1.,0.));
 	}
 #endif
 
