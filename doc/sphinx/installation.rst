@@ -121,7 +121,7 @@ should have root privileges
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
-		gtk2-engines-pixbuf python-argparse\
+		gtk2-engines-pixbuf python-argparse \
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libgmp3-dev libcgal-dev
 
