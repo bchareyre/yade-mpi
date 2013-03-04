@@ -886,9 +886,9 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 	Scene* scene = Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
-		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
 		int ci=b->shape->getClassIndex();
 		if(b->isClump() || ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
+		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
 		(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
 		// Clump volume variation with homothetic displacement from its center
 		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
@@ -901,6 +901,8 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
+		int ci=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
+		if(ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
 		if (ii->isReal()) {
 			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
 			if (!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic())
