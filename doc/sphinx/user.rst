@@ -63,7 +63,7 @@ As shown above, bodies are added one by one or several at the same time using th
 
 .. ipython::
 
-	
+	@suppress
 	Yade [0]: O.reset()
 
 	Yade [1]: O.bodies.append(utils.sphere((0,10,0),1))
