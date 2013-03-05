@@ -4,7 +4,8 @@
 
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/lib/base/Logging.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/pyutil/doc_opts.hpp>

@@ -8,7 +8,8 @@
 using namespace std; // sorry
 
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 using namespace boost;
 
 #include<boost/foreach.hpp>

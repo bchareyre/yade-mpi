@@ -13,7 +13,8 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib/triangulation/Tesselation.h>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/pkg/dem/MicroMacroAnalyser.hpp>
 
 /*! \class TesselationWrapper

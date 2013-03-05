@@ -1,6 +1,7 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>

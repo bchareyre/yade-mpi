@@ -4,7 +4,8 @@
 
 #include<yade/pkg/dem/ConcretePM.hpp>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 

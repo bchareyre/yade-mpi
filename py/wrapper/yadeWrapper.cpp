@@ -69,7 +69,8 @@ namespace py = boost::python;
 
 #include<yade/lib/serialization/ObjectIO.hpp>
 
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
