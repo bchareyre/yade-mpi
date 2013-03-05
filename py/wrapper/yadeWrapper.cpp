@@ -162,30 +162,20 @@ class pyBodyContainer{
 		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
 		checkClump(clp);
 		if (bp->isClump()){
-			if (bp == clp){
-				PyErr_SetString(PyExc_TypeError,("Error: Body "+lexical_cast<string>(bid)+" and clump "+lexical_cast<string>(cid)+" are the same bodies.").c_str()); 
-				python::throw_error_already_set();
-			}
-			else {
-				Clump::add(clp,bp);//add clump bid to clump cid
-				Clump::updateProperties(clp,/*intersecting*/false);
-				proxee->erase(bid);//erase old clump
-				return;
-			}
+			if (bp == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" and clump "+lexical_cast<string>(cid)+" are the same bodies. Body was not added.").c_str()); return;}
+			Clump::add(clp,bp);//add clump bid to clump cid
+			Clump::updateProperties(clp,/*intersecting*/false);
+			proxee->erase(bid);//erase old clump
+			return;
 		}
 		else if (bp->isClumpMember()){
 			Body::id_t bpClumpId = bp->clumpId;
 			shared_ptr<Body> bpClumpPointer = Body::byId(bpClumpId,scene);
-			if (bpClumpPointer == clp){
-				PyErr_SetString(PyExc_TypeError,("Error: Body "+lexical_cast<string>(bid)+" is already a clump member of clump "+lexical_cast<string>(cid)+".").c_str()); 
-				python::throw_error_already_set();
-			}
-			else {
-				Clump::add(clp,bpClumpPointer);//add clump bpClumpId to clump cid
-				Clump::updateProperties(clp,/*intersecting*/false);
-				proxee->erase(bpClumpId);//erase old clump
-				return;
-			}
+			if (bpClumpPointer == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is already a clump member of clump "+lexical_cast<string>(cid)+". Body was not added.").c_str()); return;} 
+			Clump::add(clp,bpClumpPointer);//add clump bpClumpId to clump cid
+			Clump::updateProperties(clp,/*intersecting*/false);
+			proxee->erase(bpClumpId);//erase old clump
+			return;
 		}
 		else {Clump::add(clp,bp); Clump::updateProperties(clp,/*intersecting*/false);}// bp must be a standalone!
 	}
@@ -199,21 +189,11 @@ class pyBodyContainer{
 			if (cid == bpClumpId){
 				const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clp->shape);
 				std::map<Body::id_t,Se3r>& members = clump->members;
-				if (members.size() == 2) PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" not released from clump "+lexical_cast<string>(cid)+", because number of clump members would get < 2!").c_str());
-				else {
-					Clump::del(clp,bp);//release bid from cid
-					Clump::updateProperties(clp,/*intersecting*/false);
-				}
-			}
-			else {
-				PyErr_SetString(PyExc_TypeError,("Error: Body "+lexical_cast<string>(bid)+" must be a clump member of clump "+lexical_cast<string>(cid)+".").c_str()); 
-				python::throw_error_already_set();
-			}
-		}
-		else {
-			PyErr_SetString(PyExc_TypeError,("Error: Body "+lexical_cast<string>(bid)+" must be a clump member!").c_str()); 
-			python::throw_error_already_set();
-		}
+				if (members.size() == 2) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" not released from clump "+lexical_cast<string>(cid)+", because number of clump members would get < 2!").c_str()); return;}
+				Clump::del(clp,bp);//release bid from cid
+				Clump::updateProperties(clp,/*intersecting*/false);
+			} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" must be a clump member of clump "+lexical_cast<string>(cid)+". Body was not released.").c_str()); return;}
+		} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is not a clump member. Body was not released.").c_str()); return;}
 	}
 	python::list replaceByClumps(python::list ctList, vector<Real> amounts){
 		python::list ret;
