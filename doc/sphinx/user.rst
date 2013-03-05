@@ -141,7 +141,7 @@ For this case the function :yref:`clump()<BodyContainer.clump>` can be used. One
 
 * Another option is to replace :yref:`standalone<Body.isStandalone>` spheres from a given packing (see :yref:`SpherePack<yade._packSpheres.SpherePack>` and :yref:`makeCloud<yade._packSpheres.SpherePack.makeCloud>`) using clump templates.
 
-This is done by a function called :yref:`replaceByClumps()<BodyContainer.replaceByClumps>`. This function takes a list of :yref:`clumpTemplates()<yade.utils.clumpTemplate>` and a list of amounts and replaces spheres by clumps. The volume of a new clump will be the same as the volume of the sphere, that was replaced (clump volume takes account of overlaps).
+This is done by a function called :yref:`replaceByClumps()<BodyContainer.replaceByClumps>`. This function takes a list of :yref:`clumpTemplates()<yade.utils.clumpTemplate>` and a list of amounts and replaces spheres by clumps. The volume of a new clump will be the same as the volume of the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps).
 
 -> :yref:`replaceByClumps()<yade.wrapper.BodyContainer.replaceByClumps>` returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``
 
