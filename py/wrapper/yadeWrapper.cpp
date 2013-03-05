@@ -244,8 +244,7 @@ class pyBodyContainer{
 		int num = sphereList.size();
 		
 		//loop over templates:
-		int numSphereList = num;
-		int numTemplates = amounts.size();
+		int numSphereList = num, numTemplates = amounts.size();
 		for (int ii = 0; ii < numTemplates; ii++) {
 			//ctList: [<ct1>,<ct2>, ...] = [<int,[double,double, ... ],[Vector3r,Vector3r, ...]>,<int,[double,double, ... ],[Vector3r,Vector3r, ...]>, ...]
 			//ct: <len(relRadList),relRadList,relPosList> = <int,[double,double, ... ],[Vector3r,Vector3r, ...]> (python objects)
@@ -259,8 +258,7 @@ class pyBodyContainer{
 			python::list relPosListTmp = python::extract<python::list>(ctTmp.attr("relPositions"))();
 			
 			//get relative radii and positions; calc. volumes; get balance point:
-			vector<Real> relRadTmp(numCM);
-			vector<Real> relVolTmp(numCM);
+			vector<Real> relRadTmp(numCM), relVolTmp(numCM);
 			vector<Vector3r> relPosTmp(numCM);
 			Vector3r relPosTmpMean = Vector3r::Zero();
 			for (int jj = 0; jj < numCM; jj++) {
@@ -272,24 +270,19 @@ class pyBodyContainer{
 			relPosTmpMean /= numCM;//balance point
 
 			//check for overlaps and correct volumes (-= volume of spherical caps):
-			int numConnections = 0;
-			for (int jj = numCM; jj > 0; jj--) numConnections += (jj-1);
-			vector<Real> distCMTmp(numConnections);
-			vector<Real> overlapTmp(numConnections);
-			int c = 0;//counter
-			Real distCapTmp1; Real distCapTmp2;
+			Real distCMTmp, overlapTmp, hCapjj, hCapkk;
 			for (int jj = 0; jj < numCM; jj++) {
 				for (int kk = jj; kk < numCM; kk++) {
 					if (jj != kk) {
-						distCMTmp[c] = (relPosTmp[jj] - relPosTmp[kk]).norm(); 
-						overlapTmp[c] = (relRadTmp[jj] + relRadTmp[kk]) - distCMTmp[c];//positive if overlapping ...
-						if (overlapTmp[c] > 0.0) {
-							distCapTmp1 = (distCMTmp[c]*distCMTmp[c] - relRadTmp[kk]*relRadTmp[kk] + relRadTmp[jj]*relRadTmp[jj])/2*distCMTmp[c] - relRadTmp[jj];
-							distCapTmp2 = (distCMTmp[c]*distCMTmp[c] - relRadTmp[jj]*relRadTmp[jj] + relRadTmp[kk]*relRadTmp[kk])/2*distCMTmp[c] - relRadTmp[kk];
-							relVolTmp[jj] -= (1./3.)*Mathr::PI*distCapTmp1*distCapTmp1*(3.*relRadTmp[jj] - distCapTmp1);//correction of relative volumes
-							relVolTmp[kk] -= (1./3.)*Mathr::PI*distCapTmp2*distCapTmp2*(3.*relRadTmp[kk] - distCapTmp2);
+						distCMTmp = (relPosTmp[jj] - relPosTmp[kk]).norm(); //distance between two spheres
+						overlapTmp = (relRadTmp[jj] + relRadTmp[kk]) - distCMTmp;//positive if overlapping ...
+						if (overlapTmp > 0.0) {//calculation of overlapping spheres, see http://mathworld.wolfram.com/Sphere-SphereIntersection.html
+							hCapjj = relRadTmp[jj] - (distCMTmp*distCMTmp - relRadTmp[kk]*relRadTmp[kk] + relRadTmp[jj]*relRadTmp[jj])/(2*distCMTmp);
+							hCapkk = relRadTmp[kk] - (distCMTmp*distCMTmp - relRadTmp[jj]*relRadTmp[jj] + relRadTmp[kk]*relRadTmp[kk])/(2*distCMTmp);
+							//calculation of spherical cap, see http://en.wikipedia.org/wiki/Spherical_cap
+							relVolTmp[jj] -= (1./3.)*Mathr::PI*hCapjj*hCapjj*(3.*relRadTmp[jj] - hCapjj);// correct relative volumes
+							relVolTmp[kk] -= (1./3.)*Mathr::PI*hCapkk*hCapkk*(3.*relRadTmp[kk] - hCapkk);
 						}
-						c += 1;//c should never be > than numConnections!
 					}
 				}
 			}
@@ -301,19 +294,17 @@ class pyBodyContainer{
 			//get pointer lists of spheres, that should be replaced:
 			int numReplaceTmp = round(num*amounts[ii]);
 			vector<shared_ptr<Body> > bpListTmp(numReplaceTmp);
-			int a = 0; c = 0;//counters
+			int a = 0, c = 0;//counters
 			vector<int> posTmp;
 			FOREACH (const shared_ptr<Body>& b, sphereList) {
 				if (c == a*numSphereList/numReplaceTmp) {
-					bpListTmp[a] = b;
-					a += 1;
+					bpListTmp[a] = b; a++;
 					posTmp.push_back(c);//remember position in sphereList
-				}
-				c += 1;
+				} c++;
 			}
 			for (int jj = 0; jj < a; jj++) {
 				sphereList.erase(sphereList.begin()+posTmp[jj]-jj);//remove bodies from sphereList, that were already found
-				numSphereList -= 1;
+				numSphereList--;
 			}
 			
 			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
