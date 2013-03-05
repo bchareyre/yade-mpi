@@ -21,12 +21,11 @@
 ##
 ## http://docutils.sourceforge.net/docs/howto/rst-roles.html
 
-import sys
+import sys, os, re
 from docutils import nodes
 from sphinx import addnodes
 from sphinx.roles import XRefRole
 import docutils
-import re
 
 #
 # needed for creating hyperlink targets.
@@ -140,11 +139,13 @@ rst_epilog = """
 .. |ystatic| replace:: *(static)*
 """
 
-
+import collections
 def customExclude(app, what, name, obj, skip, options):
 	if name=='clone':
 		if 'Serializable.clone' in str(obj): return False
 		return True
+	#escape crash on non iterable __doc__ in some qt object
+	if hasattr(obj,'__doc__') and obj.__doc__ and not isinstance(obj.__doc__, collections.Iterable): return True
 	if hasattr(obj,'__doc__') and obj.__doc__ and ('|ydeprecated|' in obj.__doc__ or '|yhidden|' in obj.__doc__): return True
 	#if re.match(r'\b(__init__|__reduce__|__repr__|__str__)\b',name): return True
 	if name.startswith('_'):
@@ -365,6 +366,13 @@ if 1:
 		else:
 			import ipython_directive013 as id
 
+	#The next four lines are for compatibility with IPython 0.13.1
+	ipython_rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
+	ipython_rgxout=re.compile(r'(?:Out| ->  )\[(\d+)\]:\s?(.*)\s*')
+	ipython_promptin ='Yade [%d]:'
+	ipython_promptout=' ->  [%d]: '
+	ipython_cont_spaces='     '
+	#For IPython <=0.12, the following lines are used
 	id.rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxout=re.compile(r'(?:Out| ->  )\[(\d+)\]:\s?(.*)\s*')
 	id.rgxcont=re.compile(r'(?:   +)\.\.+:\s?(.*)\s*')
@@ -396,6 +404,7 @@ extensions = [
 		'youtube',
 		'sphinx.ext.todo',
 		]
+
 
 if yade.runtime.ipython_version<12:
 	extensions.append('ipython_directive')

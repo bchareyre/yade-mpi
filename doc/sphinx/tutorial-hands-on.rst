@@ -250,15 +250,15 @@ Functions, conditionals
 	Yade [2]: a=3.1
 
 	Yade [3]: if a<pi: b=0           # conditional statement
-	     ...: else: b=1
-		  ...:
+	   ...: else: b=1
+	   ...:
 
 	Yade [4]: c=0 if a<1 else 1      # conditional expression
 
 	Yade [5] b,c:
 
 	Yade [1]: def square(x): return x**2    # define a new function
-	     ...:
+	   ...:
 
 	Yade [1]: square(2)                     # and call that function
 
@@ -353,7 +353,7 @@ There are functions to generate a specific arrangement of particles in the :yref
 	Yade [1]: sp.makeCloud((1,1,1),(2,2,2),rMean=.2) # put spheres with defined radius inside box given by corners (1,1,1) and (2,2,2)
 
 	Yade [1]: for c,r in sp: print c,r               # print center and radius of all particles (SpherePack is a sequence which can be iterated over)
-	     ...:
+	   ...:
 
 	Yade [1]: sp.toSimulation()                      # create particles and add them to the simulation
 
@@ -423,16 +423,16 @@ Engines define processes undertaken by particles. As we know from the theoretica
 	Yade [1]: O.reset()
 
 	Yade [1]: O.engines=[                   # newlines and indentations are not important until the brace is closed
-	     ...:    ForceResetter(),
-	     ...:    InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
-	     ...:    InteractionLoop(           # dtto for the parenthesis here
-	     ...:        [Ig2_Sphere_Sphere_L3Geom(),Ig2_Wall_Sphere_L3Geom()],
-	     ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
-	     ...:        [Law2_L3Geom_FrictPhys_ElPerfPl()]
-	     ...:    ),
-	     ...:    NewtonIntegrator(damping=.2,label='newton')      # define a name under which we can access this engine easily
-	     ...: ]
-	     ...:
+	   ...:    ForceResetter(),
+	   ...:    InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
+	   ...:    InteractionLoop(           # dtto for the parenthesis here
+	   ...:        [Ig2_Sphere_Sphere_L3Geom(),Ig2_Wall_Sphere_L3Geom()],
+	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
+	   ...:        [Law2_L3Geom_FrictPhys_ElPerfPl()]
+	   ...:    ),
+	   ...:    NewtonIntegrator(damping=.2,label='newton')      # define a name under which we can access this engine easily
+	   ...: ]
+	   ...:
 
 	Yade [1]: O.engines
 

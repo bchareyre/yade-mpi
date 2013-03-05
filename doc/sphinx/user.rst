@@ -63,19 +63,19 @@ As shown above, bodies are added one by one or several at the same time using th
 
 .. ipython::
 
-	@suppress
+	
 	Yade [0]: O.reset()
 
-	Yade [1]: O.bodies.append(utils.sphere((0,0,0),1))
+	Yade [1]: O.bodies.append(utils.sphere((0,10,0),1))
 
 	Yade [2]: O.bodies.append(utils.sphere((0,0,2),1))
 
 	# this is the same, but in one function call
 
 	Yade [3]: O.bodies.append([
-	     ...:    utils.sphere((0,0,0),1),
-		  ...:    utils.sphere((0,0,2),1)
-		  ...: ])
+	   ...:   utils.sphere((0,0,0),1),
+	   ...:   utils.sphere((0,0,2),1)
+	   ...: ])
 
 Many functions introduced in next sections return list of bodies which can be readily added to the simulation, including
 
@@ -106,9 +106,9 @@ The function :yref:`appendClumped()<BodyContainer.appendClumped>` is designed fo
 	Yade [0]: O.reset()
 
 	Yade [1]: O.bodies.appendClumped([
-	     ...:    utils.sphere([0,0,0],1),
-		  ...:    utils.sphere([0,0,2],1)
-		  ...: ])
+	   ...:    utils.sphere([0,0,0],1),
+	   ...:    utils.sphere([0,0,2],1)
+	   ...: ])
 
 	Yade [2]: len(O.bodies)
 
@@ -130,8 +130,8 @@ For this case the function :yref:`clump()<BodyContainer.clump>` can be used. One
 	Yade [1]: bodyList = []
 
 	Yade [2]: for ii in range(0,5):
-	     ...:    bodyList.append(O.bodies.append(utils.sphere([ii,0,1],.5)))#create a "chain" of 5 spheres
-	     ...:
+	   ...:    bodyList.append(O.bodies.append(utils.sphere([ii,0,1],.5)))#create a "chain" of 5 spheres
+	   ...:
 
 	Yade [3]: print bodyList
 
@@ -475,18 +475,18 @@ It is possible to create an interaction between a pair of particles independentl
 	Yade [1]: O.materials.append(FrictMat(young=3e10,poisson=.2,density=1000))
 
 	Yade [1]: O.bodies.append([
-	     ...:    utils.sphere([0,0,0],1),
-	     ...:    utils.sphere([0,0,1000],1)
-	     ...: ])
+	   ...:    utils.sphere([0,0,0],1),
+	   ...:    utils.sphere([0,0,1000],1)
+	   ...: ])
 
 	# only add InteractionLoop, no other engines are needed now
 	Yade [1]: O.engines=[
-	     ...:    InteractionLoop(
-	     ...:        [Ig2_Sphere_Sphere_Dem3DofGeom(),],
-	     ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
-	     ...:        [] # not needed now
-	     ...:    )
-	     ...: ]
+	   ...:    InteractionLoop(
+	   ...:        [Ig2_Sphere_Sphere_Dem3DofGeom(),],
+	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
+	   ...:        [] # not needed now
+	   ...:    )
+	   ...: ]
 
 	Yade [1]: i=utils.createInteraction(0,1)
 
@@ -993,9 +993,9 @@ Since :yref:`yade.plot.plots` is a dictionary, multiple entries with the same ke
 .. ipython::
 	
 	Yade [1]: plot.plots={
-	     ...:    'i':('t',),
-	     ...:    'i':('z1','v1')
-	     ...: }
+	   ...:    'i':('t',),
+	   ...:    'i':('z1','v1')
+	   ...: }
 
 	Yade [2]: plot.plots
 
@@ -1004,9 +1004,9 @@ You can, however, distinguish them by prepending/appending space to the x-axis v
 .. ipython::
 	
 	Yade [1]: plot.plots={
-	     ...:    'i':('t',),
-	     ...:    'i ':('z1','v1') # note the space in 'i '
-	     ...: }
+	   ...:    'i':('t',),
+	   ...:    'i ':('z1','v1') # note the space in 'i '
+	   ...: }
 
 	Yade [2]: plot.plots
 
