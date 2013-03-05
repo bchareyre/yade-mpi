@@ -314,24 +314,6 @@ bool pointInsidePolygon(py::tuple xy, py::object vertices){
 	return inside;
 }
 
-#if 0
-/* Compute convex hull of given points, given as python list of Vector2 */
-py::list convexHull2d(const py::list& pts){
-	size_t l=py::len(pts);
-	py::list ret;
-	std::list<Vector2r> pts2;
-	for(size_t i=0; i<l; i++){
-		pts2.push_back(py::extract<Vector2r>(pts[i]));
-		cerr<<*pts2.rbegin()<<endl;
-	}
-	ConvexHull2d ch2d(pts2);
-	vector<Vector2r> hull=ch2d();
-	FOREACH(const Vector2r& v, hull) ret.append(v);
-	cout<<pts2.size()<<" "<<hull.size()<<"@@@"<<endl;
-	return ret;
-}
-#endif 
-
 /* Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.
 
 	All spheres that touch the plane are projected as hexagons on their circumference to the plane.
@@ -520,9 +502,6 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("ptInAABB",isInBB,"Return True/False whether the point p is within box given by its min and max corners");
 	py::def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(py::args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
-	#if 0
-		py::def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
-	#endif
 	py::def("coordsAndDisplacements",coordsAndDisplacements,(python::arg("axis"),python::arg("Aabb")=python::tuple()),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered.");
 	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
 	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
