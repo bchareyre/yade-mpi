@@ -469,17 +469,21 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		// FIXME: should be computed by the renderer; for now, use the real values
 		//Vector3r pos1=geom->se31.position, pos2=geom->se32.position;
 		Vector3r pos1 = scene->bodies->operator[](i->id1)->state->pos, pos2 = scene->bodies->operator[](i->id2)->state->pos;
-		/*
-		if(scene->isPeriodic){
+		if (scene->isPeriodic) {
+			Vector3r dPos = pos2 - pos1;
 			pos1=scene->cell->wrapShearedPt(pos1);
-			pos2=pos1+(geom->se32.position-geom->se31.position);
+			Vector3r shift2 = scene->isPeriodic? Vector3r(scene->cell->hSize*i->cellDist.cast<Real>()) : Vector3r::Zero();\
+			pos2 = pos1 + dPos + shift2;
+			//phys->refLength = (pos2 - pos1 + shift2).norm();
+			//pos2=pos1+(geom->se32.position-geom->se31.position);
 		}
-		*/
+		/*
 		if (scene->isPeriodic) {
 			Vector3r temp = pos2 - pos1;
 			pos1 = scene->cell->wrapShearedPt(pos1);
 			pos2 = pos1 + temp;
 		}
+		*/
 
 		if (contactLine) GLUtils::GLDrawLine(pos1,pos2,lineColor);
 		if (dmgLabel) { GLUtils::GLDrawNum(phys->omega,0.5*(pos1+pos2),lineColor); }

@@ -4,7 +4,7 @@
 from yade import pack, plot
 
 # create some material
-O.materials.append(CpmMat(young=25e9,frictionAngle=.7,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,relDuctility=30))
+O.materials.append(CpmMat(neverDamage=True,young=25e9,frictionAngle=.7,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,relDuctility=30))
 
 # create periodic assembly of particles
 initSize=1.2
@@ -37,35 +37,31 @@ O.engines=[
 		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_ScGeom_CpmPhys_Cpm()]),
 	NewtonIntegrator(),
 	Peri3dController(
-							#goal=(10e-4,-3e-4,0, -5e6,3e-4,2e6), # Vector6 of prescribed final values
-							#stressMask=0b101100,    # prescribed ex,ey,sz,syz,ezx,sxy;   e..strain;  s..stress
-							goal = (-10e-4,0,0, 0,0,0),
-							stressMask = 0b000000,
+							goal=(20e-4,-6e-4,0, -2e6,3e-4,2e6), # Vector6 of prescribed final values (xx,yy,zz, yz,zx,xy)
+							stressMask=0b101100,    # prescribed ex,ey,sz,syz,ezx,sxy;   e..strain;  s..stress
 							nSteps=nSteps, 			# how many time steps the simulation will last
 							# after reaching nSteps do doneHook action
-							doneHook='print "Simulation with Peri3dController finished."; pause()',
+							doneHook='print "Simulation with Peri3dController finished."; O.pause()',
 
 							# the prescribed path (step,value of stress/strain) can be defined in absolute values
-							#xxPath=[(465,5e-4),(934,-5e-4),(1134,10e-4)],
+							xxPath=[(465,5e-4),(934,-5e-4),(1134,10e-4)],
 							# or in relative values
-							#yyPath=[(2,4),(7,-2),(11,0),(14,4)],
+							yyPath=[(2,4),(7,-2),(11,0),(14,4)],
 							# if the goal value is 0, the absolute stress/strain values are always considered (step values remain relative)
-							#zzPath=[(5,-1e7),(10,0)],
+							zzPath=[(5,-1e7),(10,0)],
 							# if ##Path is not explicitly defined, it is considered as linear function between (0,0) and (nSteps,goal)
 							# as in yzPath and xyPath
 							# the relative values are really relative (zxPath gives the same - except of the sign from goal value - result as yyPath)
-							#zxPath=[(4,2),(14,-1),(22,0),(28,2)],
-							#xyPath=[(1,1),(2,-1),(3,1),(4,-1),(5,1)],
+							zxPath=[(4,2),(14,-1),(22,0),(28,2)],
+							xyPath=[(1,1),(2,-1),(3,1),(4,-1),(5,1)],
 							# variables used in the first step
 							label='p3d'
 							),
 	PyRunner(command='plotAddData()',iterPeriod=1),
-	PyRunner(command='print p3d.stress[0], p3d.strain[0]',iterPeriod=1),
 ]
 
-#O.step()
-#bo1s.aabbEnlargeFactor=ig2ss.interactionDetectionFactor=1.
+O.step()
+bo1s.aabbEnlargeFactor=ig2ss.interactionDetectionFactor=1.
 
-#O.run(1,True)
-#O.run(); #O.wait()
-#plot.plot(subPlots=False)
+O.run(); #O.wait()
+plot.plot(subPlots=False)
