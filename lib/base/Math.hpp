@@ -22,9 +22,6 @@
 
 #include<Eigen/Core>
 #include<Eigen/Geometry>
-#if EIGEN_WORLD_VERSION==2
-	#include<Eigen/Array>
-#endif
 #include<Eigen/QR>
 #include<Eigen/LU>
 #include<Eigen/SVD>
