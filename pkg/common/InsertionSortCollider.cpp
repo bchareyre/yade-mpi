@@ -44,7 +44,7 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 			// also, do not collide body with itself; it sometimes happens for facets aligned perpendicular to an axis, for reasons that are not very clear
 			// see https://bugs.launchpad.net/yade/+bug/669095
 			// skip bounds with same isMin flags, since inversion doesn't imply anything in that case  
-			if(isMin && !v[j].flags.isMin && likely(doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id))) {
+			if(isMin && !v[j].flags.isMin && doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id)) {
 				/*if (isMin)*/ handleBoundInversion(viInit.id,v[j].id,interactions,scene);
 // 				else handleBoundSplit(viInit.id,v[j].id,interactions,scene);
 			}
@@ -64,7 +64,7 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		if (!it->flags.isMin || !it->flags.hasBB) continue;
 		int offset = 3*it->id;
 		const shared_ptr<Body>& b=Body::byId(it->id,scene);
-		if(unlikely(!b || !b->bound)) continue;
+		if(!b || !b->bound) continue;
 		const Real& sweepLength = b->bound->sweepLength;
 		Vector3r disp = b->state->pos - b->bound->refPos;
 		if (!(maxima[offset]-sweepLength+disp[0] < bv.min[0] ||
@@ -200,7 +200,7 @@ void InsertionSortCollider::action(){
 				VecBounds& BBj=BB[j];
 				const Body::id_t id=BBj[i].id;
 				const shared_ptr<Body>& b=Body::byId(id,scene);
-				if(likely(b)){
+				if(b){
 					const shared_ptr<Bound>& bv=b->bound;
 					// coordinate is min/max if has bounding volume, otherwise both are the position. Add periodic shift so that we are inside the cell
 					// watch out for the parentheses around ?: within ?: (there was unwanted conversion of the Reals to bools!)
@@ -218,9 +218,9 @@ void InsertionSortCollider::action(){
 	BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
 	for(Body::id_t id=0; id<nBodies; id++){
 		const shared_ptr<Body>& b=Body::byId(id,scene);
-		if(likely(b)){
+		if(b){
 			const shared_ptr<Bound>& bv=b->bound;
-			if(likely(bv)) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
+			if(bv) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
 			else{ const Vector3r& pos=b->state->pos; memcpy(&minima[3*id],&pos,3*sizeof(Real)); memcpy(&maxima[3*id],&pos,3*sizeof(Real)); }
 		} else { memset(&minima[3*id],0,3*sizeof(Real)); memset(&maxima[3*id],0,3*sizeof(Real)); }
 	}
@@ -259,7 +259,7 @@ void InsertionSortCollider::action(){
 				for(long i=0; i<2*nBodies; i++){
 					// start from the lower bound (i.e. skipping upper bounds)
 					// skip bodies without bbox, because they don't collide
-					if(unlikely(!(V[i].flags.isMin && V[i].flags.hasBB))) continue;
+					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					// go up until we meet the upper bound
 					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
@@ -273,7 +273,7 @@ void InsertionSortCollider::action(){
 				}
 			} else { // periodic case: see comments above
 				for(long i=0; i<2*nBodies; i++){
-					if(unlikely(!(V[i].flags.isMin && V[i].flags.hasBB))) continue;
+					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					long cnt=0;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
@@ -334,9 +334,9 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 			Bounds& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
 			vNew=v[j];
 			// inversions close the the split need special care
-			if(unlikely(j==loIdx && vi.coord<0)) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
-			else if(unlikely(j1==loIdx)) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
-			if(isMin && !v[j].flags.isMin && likely(doCollide && viHasBB && v[j].flags.hasBB)){
+			if(j==loIdx && vi.coord<0) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
+			if(isMin && !v[j].flags.isMin && (doCollide && viHasBB && v[j].flags.hasBB)){
 				// see https://bugs.launchpad.net/yade/+bug/669095 and similar problem in aperiodic insertionSort
 				#if 0
 				if(vi.id==vNew.id){
@@ -344,7 +344,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 					throw runtime_error(__FILE__ ": Body's boundary metting its opposite boundary.");
 				}
 				#endif
-				if(likely(vi.id!=vNew.id)) handleBoundInversionPeri(vi.id,vNew.id,interactions,scene);
+				if((vi.id!=vNew.id)) handleBoundInversionPeri(vi.id,vNew.id,interactions,scene);
 			}
 			j=v.norm(j-1);
 		}
@@ -447,10 +447,10 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 				TRVAR4(pmn1,pmx1,pmn2,pmx2);
 			}
 		#endif
-		if(unlikely((pmn1!=pmx1) || (pmn2!=pmx2))){
+		if((pmn1!=pmx1) || (pmn2!=pmx2)){
 			if (allowBiggerThanPeriod) {
 				// If both bodies are bigger, we place them in the (0,0,0) period
-				if(unlikely((pmn1!=pmx1) && (pmn2!=pmx2))) {periods[axis]=0;}
+				if((pmn1!=pmx1) && (pmn2!=pmx2)) {periods[axis]=0;}
 				// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
 				else {
 					//FIXME: not sure what to do here...

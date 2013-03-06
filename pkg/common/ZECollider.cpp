@@ -124,9 +124,9 @@ void ZECollider::action(){
 // 	boxesIdx.resize(scene->bodies.size());
 	boxes.clear();
 	FOREACH(shared_ptr<Body>& b, *scene->bodies){
-		if(likely(b)){
+		if(b){
 			shared_ptr<Bound>& bv=b->bound;
-			if(likely(bv)) {
+			if(bv) {
 				boxes.push_back(CGBox(CGBbox(bv->min[0],bv->min[1],bv->min[2],bv->max[0],bv->max[1],bv->max[2]),b));
 // 				boxesIdx[b->id]
 			}

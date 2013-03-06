@@ -162,7 +162,7 @@ void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig,
 		maxFs = maxFs / Fs;
 		Vector3r trialForce=shearForce;
 		shearForce *= maxFs;
-		if (unlikely(scene->trackEnergy)){
+		if (scene->trackEnergy){
 			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
 			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);}
 		if (Fn<0)  phys->normalForce = Vector3r::Zero();//Vector3r::Zero()

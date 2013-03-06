@@ -25,13 +25,13 @@ void NewtonIntegrator::cundallDamp2nd(const Real& dt, const Vector3r& vel, Vecto
 }
 
 Vector3r NewtonIntegrator::computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs){
-	if(likely(blockedDOFs==0)) return (force/mass + gravity);
+	if(blockedDOFs==0) return (force/mass + gravity);
 	Vector3r ret(Vector3r::Zero());
 	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,false))) ret[i]+=force[i]/mass+gravity[i];
 	return ret;
 }
 Vector3r NewtonIntegrator::computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs){
-	if(likely(blockedDOFs==0)) return torque.cwise()/inertia;
+	if(blockedDOFs==0) return torque.cwise()/inertia;
 	Vector3r ret(Vector3r::Zero());
 	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,true))) ret[i]+=torque[i]/inertia[i];
 	return ret;
@@ -134,7 +134,7 @@ void NewtonIntegrator::action()
 	#endif
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 			// clump members are handled inside clumps
-			if(unlikely(b->isClumpMember())) continue;
+			if(b->isClumpMember()) continue;
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
 			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();
 			// clumps forces
@@ -163,7 +163,7 @@ void NewtonIntegrator::action()
 			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,prevVelGrad):state->vel;
 
 			// numerical damping & kinetic energy
-			if(unlikely(trackEnergy)) updateEnergy(b,state,fluctVel,f,m);
+			if(trackEnergy) updateEnergy(b,state,fluctVel,f,m);
 
 			// whether to use aspherical rotation integration for this body; for no accelerations, spherical integrator is "exact" (and faster)
 			bool useAspherical=(exactAsphericalRot && b->isAspherical() && state->blockedDOFs!=State::DOF_ALL);

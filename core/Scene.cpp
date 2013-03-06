@@ -82,7 +82,7 @@ void Scene::moveToNextTimeStep(){
 		// hopefully this will not break in some margin cases (subStepping with setting _nextEngines and such)
 		subStep=-1;
 	}
-	if(likely(!subStepping && subStep<0)){
+	if(!subStepping && subStep<0){
 		/* set substep to 0 during the loop, so that engines/nextEngines handler know whether we are inside the loop currently */
 		subStep=0;
 		// ** 1. ** prologue
@@ -93,9 +93,9 @@ void Scene::moveToNextTimeStep(){
 		// ** 2. ** engines
 		FOREACH(const shared_ptr<Engine>& e, engines){
 			e->scene=this;
-			if(unlikely(e->dead || !e->isActivated())) continue;
+			if(e->dead || !e->isActivated()) continue;
 			e->action();
-			if(unlikely(TimingInfo_enabled)) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
+			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
 		// ** 3. ** epilogue
 				// Calculation speed

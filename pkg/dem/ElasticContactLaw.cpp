@@ -52,7 +52,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
 	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
 	if(geom->penetrationDepth <0){
-		if (unlikely(neverErase)) {
+		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
 		else 	scene->interactions->requestErase(contact);
@@ -65,7 +65,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	shearForce -= phys->ks*shearDisp;
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-	if (likely(!scene->trackEnergy  && !traceEnergy)){//Update force but don't compute energy terms (see below))
+	if (!scene->trackEnergy  && !traceEnergy){//Update force but don't compute energy terms (see below))
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = sqrt(maxFs) / shearForce.norm();

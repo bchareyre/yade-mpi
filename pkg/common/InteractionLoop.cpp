@@ -82,7 +82,7 @@ void InteractionLoop::action(){
 	#endif
 		// keep the following newline, my (edx) preprocessor outputs garbage code otherwise!
 
-		if(unlikely(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter)) {
+		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
 		}
@@ -93,13 +93,13 @@ void InteractionLoop::action(){
 		if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I); continue; }
 
 		// we know there is no geometry functor already, take the short path
-		if(unlikely(!I->functorCache.geomExists)) { assert(!I->isReal()); continue; }
+		if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
 		// no interaction geometry for either of bodies; no interaction possible
-		if(unlikely(!b1_->shape || !b2_->shape)) { assert(!I->isReal()); continue; }
+		if(!b1_->shape || !b2_->shape) { assert(!I->isReal()); continue; }
 
 		bool swap=false;
 		// IGeomDispatcher
-		if(unlikely(!I->functorCache.geom)){
+		if(!I->functorCache.geom){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
 			// returns NULL ptr if no functor exists; remember that and shortcut
 			if(!I->functorCache.geom) {I->functorCache.geomExists=false; continue; }
@@ -108,7 +108,7 @@ void InteractionLoop::action(){
 		// arguments for the geom functor are in the reverse order (dispatcher would normally call goReverse).
 		// we don't remember the fact that is reverse, so we swap bodies within the interaction
 		// and can call go in all cases
-		if(unlikely(swap)){I->swapOrder();}
+		if(swap){I->swapOrder();}
 		// body pointers must be updated, in case we swapped
 		const shared_ptr<Body>& b1=swap?b2_:b1_;
 		const shared_ptr<Body>& b2=swap?b1_:b2_;
@@ -130,25 +130,25 @@ void InteractionLoop::action(){
 		}
 
 		// IPhysDispatcher
-		if(unlikely(!I->functorCache.phys)){
+		if(!I->functorCache.phys){
 			I->functorCache.phys=physDispatcher->getFunctor2D(b1->material,b2->material,swap);
 			assert(!swap); // InteractionPhysicsEngineUnits are symmetric
 		}
 		//assert(I->functorCache.phys);
-		if(unlikely(!I->functorCache.phys)){
+		if(!I->functorCache.phys){
 			throw std::runtime_error("Undefined or ambiguous IPhys dispatch for types "+b1->material->getClassName()+" and "+b2->material->getClassName()+".");
 		}
 		I->functorCache.phys->go(b1->material,b2->material,I);
 		assert(I->phys);
 
-		if(unlikely(!wasReal)) I->iterMadeReal=scene->iter; // mark the interaction as created right now
+		if(!wasReal) I->iterMadeReal=scene->iter; // mark the interaction as created right now
 
 		// LawDispatcher
 		// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction
 		// would not have geom and phys yet.
-		if(unlikely(!I->functorCache.constLaw)){
+		if(!I->functorCache.constLaw){
 			I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->geom,I->phys,swap);
-			if(unlikely(!I->functorCache.constLaw)){
+			if(!I->functorCache.constLaw){
 				LOG_FATAL("None of given Law2 functors can handle interaction #"<<I->getId1()<<"+"<<I->getId2()<<", types geom:"<<I->geom->getClassName()<<"="<<I->geom->getClassIndex()<<" and phys:"<<I->phys->getClassName()<<"="<<I->phys->getClassIndex()<<" (LawDispatcher::getFunctor2D returned empty functor)");
 				//abort();
 				exit(1);
@@ -159,7 +159,7 @@ void InteractionLoop::action(){
 		I->functorCache.constLaw->go(I->geom,I->phys,I.get());
 
 		// process callbacks for this interaction
-		if(unlikely(!I->isReal())) continue; // it is possible that Law2_ functor called requestErase, hence this check
+		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check
 		for(size_t i=0; i<callbacksSize; i++){
 			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}

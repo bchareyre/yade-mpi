@@ -682,7 +682,7 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 	shearForce -= phys->ks*shearDisp;
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-	if (likely(!scene->trackEnergy)){//Update force but don't compute energy terms (see below))
+	if (!scene->trackEnergy){//Update force but don't compute energy terms (see below))
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = sqrt(maxFs) / shearForce.norm();

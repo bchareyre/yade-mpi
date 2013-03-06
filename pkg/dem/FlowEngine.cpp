@@ -298,7 +298,7 @@ void FlowEngine::setPositionsBuffer(bool current)
 	shared_ptr<Sphere> sph ( new Sphere );
         const int Sph_Index = sph->getClassIndexStatic();
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if (!b || (unlikely(ignoredBody>=0) && ignoredBody==b->getId())) continue;
+                if (!b || (ignoredBody>=0) && ignoredBody==b->getId()) continue;
                 posData& dat = buffer[b->getId()];
 		dat.id=b->getId();
 		dat.pos=b->state->pos;

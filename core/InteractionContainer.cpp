@@ -56,13 +56,13 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
-	if(unlikely(id2>=(Body::id_t)bodies->size())) return false; // no such interaction
+	if(id2>=(Body::id_t)bodies->size()) return false; // no such interaction
 	
 	const shared_ptr<Body>& b1((*bodies)[id1]);
 	const shared_ptr<Body>& b2((*bodies)[id2]);
 	
 	int linIx=-1;
-	if(unlikely(!b1)) linIx=linPos;
+	if(!b1) linIx=linPos;
 	else {
 		Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 		if(I==b1->intrs.end()) linIx=linPos;
@@ -97,9 +97,9 @@ const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::i
 	assert(bodies);
 	if (id1>id2) swap(id1,id2); 
 	// those checks could be perhaps asserts, but pyInteractionContainer has no access to the body container...
-	if(unlikely(id2>=(Body::id_t)bodies->size())){ empty=shared_ptr<Interaction>(); return empty; }
+	if(id2>=(Body::id_t)bodies->size()){ empty=shared_ptr<Interaction>(); return empty; }
 	const shared_ptr<Body>& b1((*bodies)[id1]);
-	if(unlikely(!b1)) { empty=shared_ptr<Interaction>(); return empty; }
+	if(!b1) { empty=shared_ptr<Interaction>(); return empty; }
 	Body::MapId2IntrT::iterator I(b1->intrs.find(id2));
 	if (I!=b1->intrs.end()) return I->second;
 	else { empty=shared_ptr<Interaction>(); return empty; }
@@ -117,7 +117,7 @@ bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 
 
 void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool force){
-	const shared_ptr<Interaction> I=find(id1,id2); if(unlikely(!I)) return;
+	const shared_ptr<Interaction> I=find(id1,id2); if(!I) return;
 	I->reset(); IdsForce v={id1,id2,force};
 	#ifdef YADE_OPENMP
 		threadsPendingErase[omp_get_thread_num()].push_back(v);
