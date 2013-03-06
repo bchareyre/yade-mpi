@@ -106,7 +106,6 @@ void TriaxialCompressionEngine::updateParameters ()
 
 void TriaxialCompressionEngine::action()
 {
-	static int warn = 0;
 	if (!warn++) LOG_WARN ("This engine is deprecated, please switch to TriaxialStressController if you expect long term support.")
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if ( firstRun )
