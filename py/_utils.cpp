@@ -151,11 +151,12 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 			else bodyNumIntr[id1]+=1;
 		}
 		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) {
-			if (b1->isClumpMember()) bodyNumIntr[b2->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			if (b2->isClumpMember()) bodyNumIntr[b2->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
 			else bodyNumIntr[id2]+=1;
 		}
 		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
-		maxIntr=max(max(maxIntr,bodyNumIntr[b1->clumpId]),bodyNumIntr[b2->clumpId]);
+		if (b1->isClumpMember()) maxIntr=max(maxIntr,bodyNumIntr[b1->clumpId]);
+		if (b2->isClumpMember()) maxIntr=max(maxIntr,bodyNumIntr[b2->clumpId]);
 	}
 	vector<int> bins; bins.resize(maxIntr+1,0);
 	for(size_t id=0; id<bodyNumIntr.size(); id++){
