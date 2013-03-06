@@ -29,8 +29,10 @@ sigmaIso=-1e5
 
 # generate loose packing
 from yade import pack, qt, plot
+
+O.periodic=True
 sp=pack.SpherePack()
-if 0:
+if 1:
 	## uniform distribution
 	sp.makeCloud((0,0,0),(2,2,2),rMean=.1,rRelFuzz=.3,periodic=True)
 elif 0:
@@ -38,7 +40,7 @@ elif 0:
 	## passing: cummulative percentage
 	sp.particleSD2(radii=[.09,.1,.2],passing=[40,80,100],periodic=True,numSph=1000)
 else:
-	## create packing from clumps
+	## create packing from clumps (FIXME: currently not working very well due to big overlaps)
 	# configuration of one clump
 	c1=pack.SpherePack([((0,0,0),.1),((.15,0,0),.05),((0,.1,0),.05)])
 	# make cloud using the configuration c1 (there could c2, c3, ...; selection between them would be random)
