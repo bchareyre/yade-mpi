@@ -470,7 +470,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 			// check against bounding spheres of other clumps, and only check individual spheres if there is overlap
 			if(!periodic){
 				// check overlap with box margins first
-				if((pos+rad*Vector3r::Ones()).cwise().max(mx)!=mx || (pos-rad*Vector3r::Ones()).cwise().min(mn)!=mn){ FOREACH(const Sph& s, C.pack) if((s.c+s.r*Vector3r::Ones()).cwise().max(mx)!=mx || (s.c-s.r*Vector3r::Ones()).cwise().min(mn)!=mn) goto overlap; }
+				if((pos+rad*Vector3r::Ones()).cwiseMax(mx)!=mx || (pos-rad*Vector3r::Ones()).cwiseMin(mn)!=mn){ FOREACH(const Sph& s, C.pack) if((s.c+s.r*Vector3r::Ones()).cwiseMax(mx)!=mx || (s.c-s.r*Vector3r::Ones()).cwiseMin(mn)!=mn) goto overlap; }
 				// check overlaps with bounding spheres of other clumps
 				FOREACH(const ClumpInfo& cInfo, clumpInfos){
 					bool detailedCheck=false;

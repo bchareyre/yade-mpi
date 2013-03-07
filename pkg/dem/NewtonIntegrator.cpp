@@ -31,7 +31,7 @@ Vector3r NewtonIntegrator::computeAccel(const Vector3r& force, const Real& mass,
 	return ret;
 }
 Vector3r NewtonIntegrator::computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs){
-	if(blockedDOFs==0) return torque.cwise()/inertia;
+	if(blockedDOFs==0) return torque.cwiseQuotient(inertia);
 	Vector3r ret(Vector3r::Zero());
 	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,true))) ret[i]+=torque[i]/inertia[i];
 	return ret;
@@ -41,9 +41,9 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	assert(b->isStandalone() || b->isClump());
 	// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
 	if(damping!=0. && state->isDamped){
-		scene->energy->add(fluctVel.cwise().abs().dot(f.cwise().abs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
+		scene->energy->add(fluctVel.cwiseAbs().dot(f.cwiseAbs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
 		// when the aspherical integrator is used, torque is damped instead of ang acceleration; this code is only approximate
-		scene->energy->add(state->angVel.cwise().abs().dot(m.cwise().abs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,false);
+		scene->energy->add(state->angVel.cwiseAbs().dot(m.cwiseAbs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,false);
 	}
 	// kinetic energy
 	Real Etrans=.5*state->mass*fluctVel.squaredNorm();
@@ -53,7 +53,7 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 		Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 		Matrix3r T(state->ori);
 		Erot=.5*b->state->angVel.transpose().dot((T.transpose()*mI*T)*b->state->angVel);
-	} else { Erot=0.5*state->angVel.dot(state->inertia.cwise()*state->angVel); }
+	} else { Erot=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel)); }
 	if(!kinSplit) scene->energy->add(Etrans+Erot,"kinetic",kinEnergyIx,/*non-incremental*/true);
 	else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
 }
@@ -244,13 +244,13 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 	Matrix3r A=state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2. * M; // global angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
-	Vector3r angVel_b_n = l_b_n.cwise()/state->inertia; // local angular velocity at time n
+	Vector3r angVel_b_n = l_b_n.cwiseQuotient(state->inertia); // local angular velocity at time n
 	if (densityScaling) angVel_b_n*=state->densityScaling;
 	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
 	const Quaternionr Q_half = state->ori + dt/2. * dotQ_n; // Q at time n+1/2
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
-	Vector3r angVel_b_half = l_b_half.cwise()/state->inertia; // local angular velocity at time n+1/2
+	Vector3r angVel_b_half = l_b_half.cwiseQuotient(state->inertia); // local angular velocity at time n+1/2
 	if (densityScaling) angVel_b_half*=state->densityScaling;
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
 	state->ori=state->ori+dt*dotQ_half; // Q at time n+1

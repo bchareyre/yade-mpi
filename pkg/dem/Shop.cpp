@@ -207,7 +207,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
 		}
-		else { E+=0.5*state->angVel.dot(state->inertia.cwise()*state->angVel);}
+		else { E+=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel));}
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}

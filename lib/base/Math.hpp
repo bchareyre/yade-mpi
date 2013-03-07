@@ -14,7 +14,6 @@
 // disable optimization which are "unsafe":
 // eigen objects cannot be passed by-value, otherwise they will no be aligned
 
-#define EIGEN2_SUPPORT  // This makes Eigen3 migration easier
 #define EIGEN_DONT_VECTORIZE
 #define EIGEN_DONT_ALIGN
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
@@ -25,6 +24,7 @@
 #include<Eigen/QR>
 #include<Eigen/LU>
 #include<Eigen/SVD>
+#include<Eigen/Eigenvalues>
 #include<float.h>
 
 // templates of those types with single parameter are not possible, use macros for now

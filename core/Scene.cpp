@@ -202,9 +202,10 @@ void Scene::updateBound(){
 				if(!isinf(b->bound->min[i])) mn[i]=min(mn[i],b->bound->min[i]);
 			}
 		} else {
-	 		mx=mx.cwise().max(b->state->pos);
- 			mn=mn.cwise().min(b->state->pos);
+	 		mx=mx.cwiseMax(b->state->pos);
+ 			mn=mn.cwiseMin(b->state->pos);
 		}
 	}
-	bound->min=mn; bound->max=mx;
+	bound->min=mn; 
+  bound->max=mx;
 }

@@ -68,7 +68,9 @@ void TranslationEngine::apply(const vector<Body::id_t>& ids){
 void HarmonicMotionEngine::apply(const vector<Body::id_t>& ids){
 	if (ids.size()>0) {
 		Vector3r w = f*2.0*Mathr::PI; 										 								//Angular frequency
-		Vector3r velocity = ((((w*scene->time + fi).cwise().sin())*(-1.0)).cwise()*A).cwise()*w;	//Linear velocity at current time
+		Vector3r velocity = (((w*scene->time + fi).array().sin())*(-1.0));
+    velocity = velocity.cwiseProduct(A);
+    velocity = velocity.cwiseProduct(w);
 		FOREACH(Body::id_t id,ids){
 			assert(id<(Body::id_t)scene->bodies->size());
 			Body* b=Body::byId(id,scene).get();

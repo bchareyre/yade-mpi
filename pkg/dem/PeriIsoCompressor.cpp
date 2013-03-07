@@ -374,7 +374,7 @@ void Peri3dController::action(){
 			//for (int i=0; i<lenPs; i++) { strainRate(ps(i)) -= maxStrainRate; }
 		}
 		else { // actual predictor
-			Real sr=strainRate.cwise().abs().maxCoeff();
+			Real sr=strainRate.cwiseAbs().maxCoeff();
 			for (int i=0; i<lenPs; i++) {
 				int j=ps(i);
 				// linear extrapolation of stress error (difference between actual and ideal stress)
@@ -387,7 +387,7 @@ void Peri3dController::action(){
 	}
 
 	// correction coefficient ix strainRate.maxabs() > maxStrainRate
-	Real srCorr = (strainRate.cwise().abs().maxCoeff() > maxStrainRate)? (maxStrainRate/strainRate.cwise().abs().maxCoeff()):1.;
+	Real srCorr = (strainRate.cwiseAbs().maxCoeff() > maxStrainRate)? (maxStrainRate/strainRate.cwiseAbs().maxCoeff()):1.;
 	strainRate *= srCorr;
 
 	// Actual action (see the documentation for more info)
@@ -408,7 +408,7 @@ void Peri3dController::action(){
 	velGrad = ((rot*nonrot)*trsf.inverse()- Matrix3r::Identity()) / dt ;
 	progress += srCorr/nSteps;
 
-	if (progress >= 1. || strain.cwise().abs().maxCoeff() > maxStrain) {
+	if (progress >= 1. || strain.cwiseAbs().maxCoeff() > maxStrain) {
 		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; Omega::instance().pause(); }
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 	}
