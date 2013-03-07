@@ -53,24 +53,24 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_L3Geom()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_L3Geom_FrictPhys_ElPerfPl()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	NewtonIntegrator(damping=.6),
 	PeriTriaxController(label='triax',
 		# specify target values and whether they are strains or stresses
 		goal=(sigmaIso,sigmaIso,sigmaIso),stressMask=7,
 		# type of servo-control
-		dynCell=True,maxStrainRate=(.1,.1,.1),
+		dynCell=True,maxStrainRate=(10,10,10),
 		# wait until the unbalanced force goes below this value
 		maxUnbalanced=.1,relStressTol=1e-3,
 		# call this function when goal is reached and the packing is stable
 		doneHook='compactionFinished()'
 	),
+	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
 ]
-O.dt=.5*utils.PWaveTimeStep()
+O.dt=.1*utils.PWaveTimeStep()
 
 def addPlotData():
 	plot.addData(unbalanced=utils.unbalancedForce(),i=O.iter,
