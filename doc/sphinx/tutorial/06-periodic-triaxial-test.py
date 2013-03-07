@@ -70,7 +70,7 @@ O.engines=[
 	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
 ]
-O.dt=.1*utils.PWaveTimeStep()
+O.dt=.5*utils.PWaveTimeStep()
 
 def addPlotData():
 	plot.addData(unbalanced=utils.unbalancedForce(),i=O.iter,
