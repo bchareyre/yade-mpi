@@ -2,14 +2,6 @@
 
 #pragma once
 
-// temporary fix:
-// clang #includes  first /usr/include/c++/4.4/fenv.h, which through some obscure #ifdefs does not eventually include any code
-// why...?
-#ifdef __clang__
-	#include</usr/include/fenv.h>
-#endif
-
-
 #include<iostream>
 #include<vector>
 #include<cstdlib>
