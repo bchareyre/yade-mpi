@@ -57,7 +57,6 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	NewtonIntegrator(damping=.6),
 	PeriTriaxController(label='triax',
 		# specify target values and whether they are strains or stresses
 		goal=(sigmaIso,sigmaIso,sigmaIso),stressMask=7,
@@ -68,6 +67,7 @@ O.engines=[
 		# call this function when goal is reached and the packing is stable
 		doneHook='compactionFinished()'
 	),
+	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
 	PyRunner(command='calm()',iterPeriod=10,label='calmRunner'),
 	PyRunner(command='calmManager()',iterPeriod=10,label='calmManager')
