@@ -59,7 +59,11 @@ This example can be found in examples/concrete/uniax-post.py ::
 
 """
 from yade.wrapper import *
-from miniEigen import *
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 class Flatten:
 	"""Abstract class for converting 3d point into 2d. Used by post2d.data2d."""

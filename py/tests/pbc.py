@@ -8,11 +8,14 @@ Various computations affected by the periodic boundary conditions.
 import unittest
 import random,math
 from yade.wrapper import *
-from miniEigen import *
 from yade._customConverters import *
 from yade import utils
 from yade import *
 
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 class TestPBC(unittest.TestCase):
 	# prefix test names with PBC: 

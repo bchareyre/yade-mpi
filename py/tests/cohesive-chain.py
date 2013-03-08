@@ -8,11 +8,15 @@ Motion of a "sinusoidal" beam made of cylinders. The test checks the position an
 import unittest
 import random
 from yade.wrapper import *
-from miniEigen import *
 from yade._customConverters import *
 from yade import utils
 from yade import *
 from math import *
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 class TestCohesiveChain(unittest.TestCase):
 	# prefix test names with PBC:

@@ -4,8 +4,12 @@ Miscellaneous functions, which are useful for handling bodies.
 """
 
 from yade.wrapper import *
-from miniEigen import *
 import utils,math,numpy
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 #spheresPackDimensions==================================================
 def spheresPackDimensions(idSpheres=[],mask=-1):

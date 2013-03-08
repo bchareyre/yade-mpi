@@ -4,8 +4,12 @@ Creates geometry objects from facets.
 """
 
 from yade.wrapper import *
-from miniEigen import *
 import utils,math,numpy
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 #facetBox===============================================================
 def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):

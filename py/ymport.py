@@ -3,8 +3,12 @@ Import geometry from various formats ('import' is python keyword, hence the name
 """
 
 from yade.wrapper import *
-from miniEigen import *
 from yade import utils
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 	"""Load sphere coordinates from file in specific format, create spheres, insert them to the simulation.

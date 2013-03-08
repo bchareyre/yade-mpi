@@ -34,6 +34,7 @@ INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
 INCLUDE(FindNumPy)
 INCLUDE(FindLoki)
+INCLUDE(FindPythonModule)
 #===========================================================
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
@@ -328,13 +329,20 @@ ELSE (CHUNKSIZE)
   ADD_LIBRARY(support SHARED ${SRC_LIB})
 ENDIF (CHUNKSIZE)
 #===========================================================
+find_python_module(minieigen)
+IF (PY_minieigen)
+  MESSAGE(STATUS "Use system minieigen version")
+ELSE (PY_minieigen)
+  MESSAGE(STATUS "Use embedded version of minieigen. Please, consider installing the corresponding package")
+ENDIF (PY_minieigen)
+#===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
 TARGET_LINK_LIBRARIES(core support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} -lrt)
+TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
 
-TARGET_LINK_LIBRARIES(plugins support core miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
 IF(ENABLE_VTK)
   TARGET_LINK_LIBRARIES(plugins vtkHybrid)
 ENDIF(ENABLE_VTK)
@@ -344,11 +352,13 @@ IF(ENABLE_GUI)
   TARGET_LINK_LIBRARIES(support ${GUI_LIBS})
 ENDIF(ENABLE_GUI)
 
-TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
-SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-
+#====================================
+IF (NOT (PY_minieigen))
+  ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
+  SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
+  TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+  INSTALL(TARGETS miniEigen DESTINATION ${YADE_PY_PATH})
+ENDIF (NOT (PY_minieigen))
 #====================================
 #Back compatibility with scons
 SET (realVersion ${YADE_VERSION})
@@ -380,7 +390,7 @@ INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
 INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH})
 INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH})
 INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH})
-INSTALL(TARGETS miniEigen DESTINATION ${YADE_PY_PATH})
+
 #===========================================================
 MESSAGE(STATUS "===========================================================")
 MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
