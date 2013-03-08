@@ -42,9 +42,9 @@ elif 0:
 else:
 	## create packing from clumps
 	# configuration of one clump
-	c1=pack.SpherePack([((0,0,0),.1),((.15,0,0),.05),((0,.1,0),.05)])
+	c1=pack.SpherePack([((0,0,0),.03333),((.03,0,0),.017),((0,.03,0),.017)])
 	# make cloud using the configuration c1 (there could c2, c3, ...; selection between them would be random)
-	sp.makeClumpCloud((0,0,0),(2,2,2),[c1],periodic=True)
+	sp.makeClumpCloud((0,0,0),(2,2,2),[c1],periodic=True,num=500)
 
 # setup periodic boundary, insert the packing
 sp.toSimulation()
@@ -69,22 +69,8 @@ O.engines=[
 	),
 	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
-	PyRunner(command='calm()',iterPeriod=10,label='calmRunner'),
-	PyRunner(command='calmManager()',iterPeriod=10,label='calmManager')
 ]
 O.dt=.5*utils.PWaveTimeStep()
-
-def calmManager():
-	if O.iter == 200:
-		calmRunner.iterPeriod = 100
-		print 'set iter period of calmRunner to 100'
-	if O.iter == 2000:
-		calmRunner.iterPeriod = 1000
-		print 'set iter period of calmRunner to 1000'
-	if O.iter == 10000:
-		print 'deactivating calmRunner'
-		calmRunner.dead=True
-		calmManager.dead=True
 
 def addPlotData():
 	plot.addData(unbalanced=utils.unbalancedForce(),i=O.iter,
