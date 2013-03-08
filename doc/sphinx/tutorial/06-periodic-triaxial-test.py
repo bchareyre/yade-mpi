@@ -32,7 +32,7 @@ from yade import pack, qt, plot
 
 O.periodic=True
 sp=pack.SpherePack()
-if 1:
+if 0:
 	## uniform distribution
 	sp.makeCloud((0,0,0),(2,2,2),rMean=.1,rRelFuzz=.3,periodic=True)
 elif 0:
@@ -40,7 +40,7 @@ elif 0:
 	## passing: cummulative percentage
 	sp.particleSD2(radii=[.09,.1,.2],passing=[40,80,100],periodic=True,numSph=1000)
 else:
-	## create packing from clumps (FIXME: currently not working very well due to big overlaps)
+	## create packing from clumps
 	# configuration of one clump
 	c1=pack.SpherePack([((0,0,0),.1),((.15,0,0),.05),((0,.1,0),.05)])
 	# make cloud using the configuration c1 (there could c2, c3, ...; selection between them would be random)
@@ -57,6 +57,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
+	NewtonIntegrator(damping=.6),
 	PeriTriaxController(label='triax',
 		# specify target values and whether they are strains or stresses
 		goal=(sigmaIso,sigmaIso,sigmaIso),stressMask=7,
@@ -67,10 +68,23 @@ O.engines=[
 		# call this function when goal is reached and the packing is stable
 		doneHook='compactionFinished()'
 	),
-	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
+	PyRunner(command='calm()',iterPeriod=10,label='calmRunner'),
+	PyRunner(command='calmManager()',iterPeriod=10,label='calmManager')
 ]
 O.dt=.5*utils.PWaveTimeStep()
+
+def calmManager():
+	if O.iter == 200:
+		calmRunner.iterPeriod = 100
+		print 'set iter period of calmRunner to 100'
+	if O.iter == 2000:
+		calmRunner.iterPeriod = 1000
+		print 'set iter period of calmRunner to 1000'
+	if O.iter == 10000:
+		print 'deactivating calmRunner'
+		calmRunner.dead=True
+		calmManager.dead=True
 
 def addPlotData():
 	plot.addData(unbalanced=utils.unbalancedForce(),i=O.iter,
