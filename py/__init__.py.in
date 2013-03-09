@@ -94,7 +94,7 @@ import utils # some others?
 __all__+=['utils',]+dir(wrapper)
 
 try:
-	__all__+=+dir(miniEigen)
+	__all__+=dir(miniEigen)
 except NameError:
 	pass
 
