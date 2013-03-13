@@ -1053,7 +1053,7 @@ For simulations that seek static equilibrium, the :yref:`yade._utils.unbalancedF
 	def checkUnbalanced():
 		if utils.unbalancedForce<1e-2: O.pause()
 
-	O.engines=O.engines+[PyRunner(command="checkUnbalanced",iterPeriod=100)]
+	O.engines=O.engines+[PyRunner(command="checkUnbalanced()",iterPeriod=100)]
 
 	# this would work as well, without the function defined apart:
 	#   PyRunner(command="if utils.unablancedForce<1e-2: O.pause()",iterPeriod=100)
