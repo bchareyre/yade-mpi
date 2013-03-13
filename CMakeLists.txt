@@ -335,6 +335,7 @@ IF (PY_minieigen)
 ELSE (PY_minieigen)
   MESSAGE(STATUS "Use embedded version of minieigen. Please, consider installing the corresponding package")
 ENDIF (PY_minieigen)
+find_python_module(Tkinter REQUIRED)
 #===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
