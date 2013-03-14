@@ -2,16 +2,15 @@
 // © 2008 Václav Šmilauer
 #pragma once
 
-#include<yade/core/Omega.hpp>
-
 #ifndef Q_MOC_RUN 
+#include<yade/core/Omega.hpp>
 #include<yade/pkg/common/OpenGLRenderer.hpp>
 #include<yade/pkg/common/PeriodicEngines.hpp>
+#include<boost/date_time/posix_time/posix_time.hpp>
 #endif 
 
 #include<QGLViewer/qglviewer.h>
 #include<QGLViewer/constraint.h>
-#include<boost/date_time/posix_time/posix_time.hpp>
 #include<set>
 
 /*! Class handling user interaction with the openGL rendering of simulation.
