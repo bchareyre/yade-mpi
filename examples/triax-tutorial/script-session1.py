@@ -29,7 +29,7 @@ from yade import pack
 nRead=utils.readParamsFromTable(
 	num_spheres=1000,# number of spheres
 	compFricDegree = 30, # contact friction during the confining phase
-	key='_triax_base_' # put you simulation's name here
+	key='_triax_base_', # put you simulation's name here
 	unknownOk=True
 )
 from yade.params import table
@@ -106,7 +106,7 @@ O.engines=[
 	## We will use the global stiffness of each body to determine an optimal timestep (see https://yade-dem.org/w/images/1/1b/Chareyre&Villard2005_licensed.pdf)
 	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=100,timestepSafetyCoefficient=0.8),
 	triax,
-	TriaxialStateRecorder(iterPeriod=100,file='WallStresses'+key),
+	TriaxialStateRecorder(iterPeriod=100,file='WallStresses'+table.key),
 	newton
 ]
 
