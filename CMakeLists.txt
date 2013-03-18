@@ -402,7 +402,7 @@ ELSE (DEBUG)
   MESSAGE(STATUS "Optimized build")
 ENDIF (DEBUG)
 IF (CHUNKSIZE)
-  MESSAGE(STATUS "CHUNKSIZE ist set to " ${CHUNKSIZE})
+  MESSAGE(STATUS "CHUNKSIZE is set to " ${CHUNKSIZE})
 ENDIF (CHUNKSIZE)
 MESSAGE(STATUS "===========================================================")
 #===========================================================
