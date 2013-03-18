@@ -2,15 +2,19 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import QtGui
-#from PyQt4 import Qwt5
 
 import re,itertools
 import logging
 logging.trace=logging.debug
 logging.basicConfig(level=logging.INFO)
-#from logging import debug,info,warning,error
+
 from yade import *
 import yade.qt
+
+try:
+  from minieigen import *
+except ImportError:
+  from miniEigen import *
 
 seqSerializableShowType=True # show type headings in serializable sequences (takes vertical space, but makes the type hyperlinked)
 
