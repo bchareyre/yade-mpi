@@ -885,7 +885,7 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 {
 	Scene* scene = Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
-		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
+		if (dynamicOnly && !b->isDynamic()) continue;
 		int ci=b->shape->getClassIndex();
 		if(b->isClump() || ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
 		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
@@ -894,7 +894,6 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
 	}
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
-		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
 		if(b->isClump()){
 			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
 			clumpSt->updateProperties(b, 0);
