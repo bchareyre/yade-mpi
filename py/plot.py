@@ -18,8 +18,8 @@ except:
   try:
     import PIL.Image
   except:
-    raise ImportError("PIL (python-imaging package) must be installed to use yade.plot")
-
+    import warnings
+    warnings.warn("PIL (python-imaging package) must be installed to use yade.plot")
 
 
 import matplotlib,os,time,math,itertools
