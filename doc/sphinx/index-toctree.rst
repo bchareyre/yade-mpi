@@ -35,8 +35,6 @@ See older `tentative contents <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc
 
   modules.rst
 
-  external.rst
-
   citing.rst
 
   publications.rst
