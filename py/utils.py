@@ -31,21 +31,29 @@ def saveVars(mark='',loadNow=True,**kw):
 
 	For example, variables *a*, *b* and *c* are defined. To save them, use::
 
-		>>> from yade import utils
-		>>> utils.saveVars('something',a=1,b=2,c=3)
+		>>> saveVars('something',a=1,b=2,c=3)
 		>>> from yade.params.something import *
 		>>> a,b,c
 		(1, 2, 3)
 
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
 
-		>>> utils.loadVars('something')
+		>>> loadVars('something')
 
 	and they will be defined in the yade.params.\ *mark* module. The *loadNow* parameter calls :yref:`yade.utils.loadVars` after saving automatically.
+	
+	If 'something' already exists, given variables will be inserted.
 	"""
 	import cPickle
-	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
+	try: 
+		d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])	#load dictionary d
+		for key in kw.keys():
+			d[key]=kw[key]							#insert new variables into d
+	except KeyError: 
+		d = kw
+	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(d)
 	if loadNow: loadVars(mark)
+
 
 def loadVars(mark=None):
 	"""Load variables from :yref:`yade.utils.saveVars`, which are saved inside the simulation.

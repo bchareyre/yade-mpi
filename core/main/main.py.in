@@ -4,9 +4,9 @@
 
 import sys,os,os.path,time
 try:
- import _io
+	import _io
 except ImportError:
- import io
+	import io
 
 # get yade path (allow YADE_PREFIX to override)
 prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
