@@ -435,8 +435,6 @@ ADD_CUSTOM_COMMAND(
                   )
 ADD_CUSTOM_COMMAND( 
                   TARGET doc POST_BUILD
-                  COMMAND pandoc  +RTS -K160000000 -RTS -o Yade.epub Yade.tex || true
-                  COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.epub ${YADE_DOC_PATH}/ || true
                   COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/epub/Yade.epub ${YADE_DOC_PATH}/ || true
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
