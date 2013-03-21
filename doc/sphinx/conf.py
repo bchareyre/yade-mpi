@@ -39,6 +39,7 @@ import docutils
 import __builtin__
 if 'latex' in sys.argv: __builtin__.writer='latex'
 elif 'html' in sys.argv: __builtin__.writer='html'
+elif 'epub' in sys.argv: __builtin__.writer='epub'
 else: raise RuntimeError("Must have either 'latex' or 'html' on the command line (hack for reference styles)")
 
 
