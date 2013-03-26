@@ -346,10 +346,12 @@ def getNumCores():
 	return nCpu
 numCores=getNumCores()
 maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
+features,version='${features}'.split(','),'${realVersion}'
 
 prog = os.path.basename(sys.argv[0])
 parser=argparse.ArgumentParser(usage='%s [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]'%prog,description='%s runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.'%prog)
 parser.add_argument('-j','--jobs',dest='maxJobs',type=int,help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
+parser.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
 parser.add_argument('--job-threads',dest='defaultThreads',type=int,help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to 1.",metavar='NUM',default=1)
 parser.add_argument('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see \-j), even if !THREADS colums specifies more.')
 parser.add_argument('--log',dest='logFormat',help='Format of job log files: must contain a $, %% or @, which will be replaced by script name, line number or by description column respectively (default: $.@.log)',metavar='FORMAT',default='$.@.log')
@@ -374,6 +376,10 @@ opts=parser.parse_args()
 args = opts.args
 
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
+
+if opts.version:
+	print 'Yade version: %s, features: %s'%(version,','.join(features))
+	sys.exit(0)
 
 if opts.manpage:
 	import yade.manpage
