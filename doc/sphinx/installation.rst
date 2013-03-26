@@ -123,7 +123,7 @@ should have root privileges
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf python-argparse \
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libgmp3-dev libcgal-dev
+		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man
 
 	* **Fedora**::
 
@@ -192,6 +192,8 @@ and a compilation time dramatically increases.
 For building the documentation you should at first execute the command "make install"
 and then "make doc" to build it. The generated files will be stored in your current
 build directory/doc/sphinx/_build.
+
+"make manpage" command generates and moves in a standard place manpages.
 
 Yade can be compiled not only by GCC-compiler, but also by `CLANG <http://clang.llvm.org/>`_ 
 front-end for the LLVM compiler. For that you set the environment variables CC and CXX 

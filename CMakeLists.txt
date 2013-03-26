@@ -280,6 +280,7 @@ SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/${LIBRARY_OUTPUT_PATH}/yade${SUFFIX})
 SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
 SET(YADE_DOC_PATH ${CMAKE_INSTALL_PREFIX}/share/doc/yade${SUFFIX})
+SET(YADE_MAN_PATH ${CMAKE_INSTALL_PREFIX}/share/man/man1)
 
 
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -439,3 +440,16 @@ ADD_CUSTOM_COMMAND(
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
                   )
+#===========================================================
+#Building manpage
+ADD_CUSTOM_TARGET(manpage)
+ADD_CUSTOM_COMMAND( 
+                  TARGET manpage POST_BUILD
+                  COMMAND help2man ${YADE_EXEC_PATH}/yade${SUFFIX} > yade${SUFFIX}.1
+                  COMMAND help2man ${YADE_EXEC_PATH}/yade${SUFFIX}-batch > yade${SUFFIX}-batch.1
+                  COMMAND mkdir -p ${YADE_MAN_PATH}
+                  COMMAND mv *.1 ${YADE_MAN_PATH}
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} /usr/bin/help2man
+                  )
+#===========================================================
