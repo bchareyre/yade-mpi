@@ -30,7 +30,16 @@ try:
 except ImportError: # argparse not present, print error message
 	raise RuntimeError("\n\nPlease install 'python-argparse' package.\n")
 prog = os.path.basename(sys.argv[0])
-par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.py [script options]]'%prog,prog=prog,description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s)."%(version,','.join(features)))
+par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.py [script options]]'%prog,
+  prog=prog,description="Yade: open-source platform for dynamic compuations. It\
+  is an extensible open-source framework for discrete numerical models, focused\
+  on Discrete Element Method. The computation parts are written in c++ using\
+  flexible object model, allowing independent implementation of new algorithms\
+  and interfaces. Python is used for rapid and concise scene construction, \
+  simulation control, postprocessing and debugging.\
+  Available features: %s.\
+  Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade."%features
+  )
 par.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
 par.add_argument('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type=int)
 par.add_argument('--cores',help='Set number of OpenMP threads (as \-\-threads) and in addition set affinity of threads to the cores given.',dest='cores',type=str)
@@ -48,7 +57,7 @@ opts=par.parse_args()
 args = opts.args
 
 if opts.version:
-	print 'Yade version: %s, features: %s'%(version,','.join(features))
+	print 'Yade version: %s'%version
 	sys.exit(0)
 
 if opts.script:
