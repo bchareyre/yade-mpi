@@ -80,8 +80,6 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	  -x                    Exit when the script finishes
 	  -n                    Run without graphical interface (equivalent to
 	                        unsetting the DISPLAY environment variable)
-	  --generate-manpage=FILE
-	                        Generate man page documenting this program and exit
 	  --test                Run regression test suite and exit; the exists status
 	                        is 0 if all tests pass, 1 if a test fails and 2 for an
 	                        unspecified exception.
