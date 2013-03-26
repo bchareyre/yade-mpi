@@ -193,7 +193,8 @@ For building the documentation you should at first execute the command "make ins
 and then "make doc" to build it. The generated files will be stored in your current
 build directory/doc/sphinx/_build.
 
-"make manpage" command generates and moves in a standard place manpages.
+"make manpage" command generates and moves manpages in a standard place.
+"make check" command executes standard test to check the functionality of compiled program.
 
 Yade can be compiled not only by GCC-compiler, but also by `CLANG <http://clang.llvm.org/>`_ 
 front-end for the LLVM compiler. For that you set the environment variables CC and CXX 

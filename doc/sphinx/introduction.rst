@@ -83,7 +83,7 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	  --test                Run regression test suite and exit; the exists status
 	                        is 0 if all tests pass, 1 if a test fails and 2 for an
 	                        unspecified exception.
-	  --checks              Run a series of user-defined check tests as described
+	  --check               Run a series of user-defined check tests as described
 	                        in /build/buildd/yade-
 	                        daily-1+3021+27~lucid1/scripts/test/checks/README
 	  --performance         Starts a test to measure the productivity

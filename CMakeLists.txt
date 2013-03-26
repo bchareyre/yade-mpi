@@ -453,3 +453,13 @@ ADD_CUSTOM_COMMAND(
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} /usr/bin/help2man
                   )
 #===========================================================
+#Execute standard checks
+ADD_CUSTOM_TARGET(check)
+ADD_CUSTOM_COMMAND( 
+                  TARGET check POST_BUILD
+                  COMMAND ${YADE_EXEC_PATH}/yade${SUFFIX} --test
+                  COMMAND ${YADE_EXEC_PATH}/yade${SUFFIX} --check
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
+                  )
+#===========================================================
