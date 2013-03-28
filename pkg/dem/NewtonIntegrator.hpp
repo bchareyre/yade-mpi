@@ -7,7 +7,7 @@
 *************************************************************************/
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
+#include<yade/pkg/common/FieldApplier.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/pkg/common/Callbacks.hpp>
@@ -22,7 +22,7 @@
  */
 class State;
 
-class NewtonIntegrator : public GlobalEngine{
+class NewtonIntegrator : public FieldApplier{
 	inline void cundallDamp1st(Vector3r& force, const Vector3r& vel);
 	inline void cundallDamp2nd(const Real& dt, const Vector3r& vel, Vector3r& accel);
 	inline void leapfrogTranslate(State*, const Body::id_t& id, const Real& dt); // leap-frog translate

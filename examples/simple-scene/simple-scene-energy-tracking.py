@@ -107,7 +107,7 @@ def myAddPlotData():
 	if(two_spheres):## for more bodies we better use the energy tracker, because it's tracking all bodies
 		E_kin_translation = E_tracker['kinTrans']
 		E_kin_rotation    = E_tracker['kinRot']
-		#E_pot             = E_tracker['gravWork'] 	#will cause a python crash!!!
+		E_pot             = E_tracker['gravWork']
 
 	else: ## for one sphere we can just calculate, and it will be correct
 		sph=O.bodies[1]
