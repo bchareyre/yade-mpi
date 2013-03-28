@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # encoding: utf-8
-from yade import utils, ymport, qt, plot
+from yade import  ymport, qt, plot
 
 ## definition of some colors for colored text output in terminal
 BLUE = '\033[94m'
@@ -35,8 +35,8 @@ netMat = O.materials.append(WireMat(young=young,poisson=poisson,frictionAngle=ra
 
 
 #### create boddies, default: dynamic=True
-O.bodies.append( utils.sphere([0,0,0], radius, wire=False, color=[1,0,0], highlight=False, material=netMat, fixed=True) )
-O.bodies.append( utils.sphere([0,a,0], radius, wire=False, color=[0,1,0], highlight=False, material=netMat) )
+O.bodies.append( sphere([0,0,0], radius, wire=False, color=[1,0,0], highlight=False, material=netMat, fixed=True) )
+O.bodies.append( sphere([0,a,0], radius, wire=False, color=[0,1,0], highlight=False, material=netMat) )
 
 FixedSphere=O.bodies[0]
 MovingSphere=O.bodies[1]
