@@ -53,7 +53,7 @@ class EnergyTracker: public Serializable{
 	typedef std::map<std::string,int> mapStringInt;
 	typedef std::pair<std::string,int> pairStringInt;
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(EnergyTracker,Serializable,"Storage for tracing energies. Only to be used if O.traceEnergy is True.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(EnergyTracker,Serializable,"Storage for tracing energies. Only to be used if :yref:`O.trackEnergy<Omega.trackEnergy>` is True.",
 		((OpenMPArrayAccumulator<Real>,energies,,,"Energy values, in linear array"))
 		((mapStringInt,names,,Attr::hidden,"Associate textual name to an index in the energies array."))
 		((vector<bool>,resetStep,,Attr::hidden,"Whether the respective energy value should be reset at every step."))
