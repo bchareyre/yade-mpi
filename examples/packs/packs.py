@@ -31,10 +31,10 @@ O.bodies.append(
 	pack.regularHexa(
 		(pack.inSphere((0,0,4),2)-pack.inSphere((0,-2,5),2)) & pack.notInNotch(centerPoint=(0,0,4),edge=(0,1,0),normal=(-1,1,-1),aperture=.2)
 		,radius=rad,gap=gap,color=(0,1,0),material=0) # head
-	+[utils.sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),utils.sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),utils.sphere((0,2.4,4),radius=.4,color=(1,0,0),material=0)] # eyes and nose
+	+[sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),sphere((0,2.4,4),radius=.4,color=(1,0,0),material=0)] # eyes and nose
 	+pack.regularHexa(pack.inCylinder((-1,2.2,3.3),(1,2.2,3.3),2*rad),radius=rad,gap=gap/3,color=(0.929,0.412,0.412),material=0) #mouth
 )
-groundId=O.bodies.append(utils.facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)) # ground
+groundId=O.bodies.append(facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)) # ground
 
 for part in [
 	pack.regularHexa (
@@ -111,7 +111,7 @@ O.bodies.append(pack.regularHexa(pack.inSphere((-15,5,-5),1.5),radius=rad*2.0,ga
 O.bodies.append(geom.facetBox((-15,5,-5),(2,2,2),wallMask=15,**kwMeshes))
 vibrationRotationPlate = O.bodies.append(geom.facetBox((-15,5,-5),(2,2,2),wallMask=16,**kwBoxes))
 
-O.bodies.append(utils.wall((0,0,-10),axis=2))
+O.bodies.append(wall((0,0,-10),axis=2))
 
 try:
 	from yade import qt
@@ -153,7 +153,7 @@ Size:       Mass, %      Cumulative   Cum. mass
 '''
 
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.saveTmp()
 O.timingEnabled=True
 #O.run(10000,True)
