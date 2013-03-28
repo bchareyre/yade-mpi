@@ -4,7 +4,7 @@
 
 O.bodies.append(
 	geom.facetBox(center=(0,0,.1),extents=(.5,.5,.1),wallMask=31,color=(0,0,1))+
-	[utils.sphere((0,0,.1),.04,color=(1,1,1))]
+	[sphere((0,0,.1),.04,color=(1,1,1))]
 )
 
 O.engines=[
@@ -14,7 +14,7 @@ O.engines=[
 	HdapsGravityEngine(calibrate=(-495,-495),calibrated=True,zeroGravity=(0,0,-1)),
 	NewtonIntegrator(damping=.3),
 ]
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 
 import yade.qt
 yade.qt.View()

@@ -30,7 +30,7 @@ SphereMat=O.materials[id_SphereMat]
 #generate particles:
 sp=pack.SpherePack()
 sp.makeCloud(lowercorner,uppercorner,.0002,rRelFuzz=.3)
-O.bodies.append([utils.sphere(c,r,material=SphereMat) for c,r in sp])
+O.bodies.append([sphere(c,r,material=SphereMat) for c,r in sp])
 
 #generate boundary:
 O.bodies.append(geom.facetBox(uppercorner/2,uppercorner/2,wire=True,fixed=True,material=SphereMat))
@@ -65,7 +65,7 @@ else:
 	]
 
 #set time step and run simulation:
-O.dt=0.5*utils.PWaveTimeStep()
+O.dt=0.5*PWaveTimeStep()
 
 from yade import qt
 qt.View()

@@ -13,7 +13,7 @@ O.bodies.append(pack.gtsSurface2Facets(surf))
 
 sp=pack.SpherePack()
 sp.makeCloud(Vector3(-1,-9,30),Vector3(1,-13,32),.2,rRelFuzz=.3)
-O.bodies.append([utils.sphere(c,r) for c,r in sp])
+O.bodies.append([sphere(c,r) for c,r in sp])
 
 O.engines=[
 	ForceResetter(), 
@@ -27,7 +27,7 @@ O.engines=[
 	NewtonIntegrator(gravity=(0,0,-9.81)),
 	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/p1-')
 ]
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 
 
 from yade import qt
