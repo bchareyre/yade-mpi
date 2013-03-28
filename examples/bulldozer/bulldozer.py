@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation
-from yade import utils
 from numpy import linspace
 from numpy import arange
 import gts
@@ -60,7 +59,7 @@ for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(
 
 from yade import qt
 
-O.dt=2*utils.PWaveTimeStep() # We do not need now a high accuracy
+O.dt=2*PWaveTimeStep() # We do not need now a high accuracy
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
@@ -81,4 +80,4 @@ r=qt.Renderer()
 r.lightPos=Vector3(0,0,50)
 O.stopAtIter=2000
 O.run()
-#utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)
+#encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)
