@@ -18,16 +18,16 @@ O.engines=[FacetTopologyAnalyzer(projectionAxis=(1,1,1),label='topo'),]
 # most simple case: no touch at all
 if 1:
 	O.bodies.append([
-		utils.facet([(0,0,0),(1,0,0),(0,1,0)]),
-		utils.facet([(0,0,1),(1,0,1),(0,1,1)]),
+		facet([(0,0,0),(1,0,0),(0,1,0)]),
+		facet([(0,0,1),(1,0,1),(0,1,1)]),
 	])
 	O.step();
 	assert(topo['commonEdgesFound']==0)
 if 1:
 	O.bodies.clear()
 	O.bodies.append([
-		utils.facet([(0,0,0),(1,0,0),(0,1,0)]),
-		utils.facet([(1,1,0),(1,0,0),(0,1,0)]),
+		facet([(0,0,0),(1,0,0),(0,1,0)]),
+		facet([(1,1,0),(1,0,0),(0,1,0)]),
 	])
 	O.step()
 	assert(O.bodies[0].shape['edgeAdjIds'][1]==0 and O.bodies[1].shape['edgeAdjIds'][1]==1)
@@ -35,8 +35,8 @@ if 1:
 if 1:
 	O.bodies.clear()
 	O.bodies.append([
-		utils.facet([(0,0,0),(1,0,0),(0,1,0)]),
-		utils.facet([(1,1,1),(1,0,0),(0,1,0)]),
+		facet([(0,0,0),(1,0,0),(0,1,0)]),
+		facet([(1,1,1),(1,0,0),(0,1,0)]),
 	])
 	O.step()
 	assert(O.bodies[0].shape['edgeAdjIds'][1]==0 and O.bodies[1].shape['edgeAdjIds'][1]==1)
@@ -58,8 +58,8 @@ if 1:
 		return rr*cos(phi),rr*sin(phi),-r*cos(theta)
 	for i in range(0,nPoly/2):
 		for j in range(0,nPoly):
-			if i!=0: O.bodies.append(utils.facet([sphPt(i,j),sphPt(i,j+1),sphPt(i+1,j)]))
-			if i!=nPoly/2-1: O.bodies.append(utils.facet([sphPt(i+1,j),sphPt(i,j+1),sphPt(i+1,j+1)]))
+			if i!=0: O.bodies.append(facet([sphPt(i,j),sphPt(i,j+1),sphPt(i+1,j)]))
+			if i!=nPoly/2-1: O.bodies.append(facet([sphPt(i+1,j),sphPt(i,j+1),sphPt(i+1,j+1)]))
 	print 'Sphere created, has',len(O.bodies),'facets'
 	O.step()
 	assert(topo['commonVerticesFound']==nPoly*(nPoly/2-1)+2)

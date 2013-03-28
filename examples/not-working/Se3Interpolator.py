@@ -14,7 +14,7 @@ NameError: name 'Se3Interpolator' is not defined
 """
 
 O.bodies.append([
-	utils.sphere([0,0,0],radius=.5),
+	sphere([0,0,0],radius=.5),
 ])
 
 O.engines=[
