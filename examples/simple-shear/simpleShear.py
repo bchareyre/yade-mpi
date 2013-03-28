@@ -33,17 +33,17 @@ rMean = pow( ((1-porosity) * length * height * width) / (nSpheres * 4.0/3.0 * pi
 #Definition of bodies constituing the numerical model : six boxes corresponding to sids of the simple shear box, containing a particle samples
 pred=inAlignedBox((0,0,-0.02),(0.1,0.02,0.02))
 
-leftBox = utils.box( center=(-thickness/2.0,(height)/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,fixed=True,wire=True)
+leftBox = box( center=(-thickness/2.0,(height)/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,fixed=True,wire=True)
 
-lowBox = utils.box( center=(length/2.0,-thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,fixed=True,wire=True)
+lowBox = box( center=(length/2.0,-thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,fixed=True,wire=True)
 
-rightBox = utils.box( center=(length+thickness/2.0,height/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,fixed=True,wire=True)
+rightBox = box( center=(length+thickness/2.0,height/2.0,0), extents=(thickness/2.0,5*(height/2.0+thickness),width/2.0) ,fixed=True,wire=True)
 
-upBox = utils.box( center=(length/2.0,height+thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,fixed=True,wire=True)
+upBox = box( center=(length/2.0,height+thickness/2.0,0), extents=(length/2.0,thickness/2.0,width/2.0) ,fixed=True,wire=True)
 
-behindBox = utils.box( center=(length/2.0,height/2.0,-width/2.0-thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), fixed=True,wire=True)
+behindBox = box( center=(length/2.0,height/2.0,-width/2.0-thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), fixed=True,wire=True)
 
-inFrontBox = utils.box( center=(length/2.0,height/2.0,width/2.0+thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), fixed=True,wire=True)
+inFrontBox = box( center=(length/2.0,height/2.0,width/2.0+thickness/2.0), extents=(2.5*length/2.0,height/2.0+thickness,thickness/2.0), fixed=True,wire=True)
 
 O.bodies.append([leftBox,lowBox,rightBox,upBox,behindBox,inFrontBox])
 
@@ -54,7 +54,7 @@ O.bodies.append([leftBox,lowBox,rightBox,upBox,behindBox,inFrontBox])
 
 sp=yade._packSpheres.SpherePack()
 sp.makeCloud(Vector3(0,0.0,-width/2.0),Vector3(length,height,width/2.0),rMean,.15)
-O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
+O.bodies.append([sphere(s[0],s[1]) for s in sp])
 
 
 #---- Def of the engines ----#
@@ -91,7 +91,7 @@ qt.View()
 #---- Compression ----
 O.engines = O.engines+[KinemCTDEngine(compSpeed=0.5,sigma_save=(),temoin_save=(),targetSigma=40000.0,LOG=False)]
 
-O.dt=.4*utils.PWaveTimeStep()
+O.dt=.4*PWaveTimeStep()
 print ''
 print 'Be patient, running in progress (the shear box is being compressed)'
 O.run(14000,True)
