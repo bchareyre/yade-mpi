@@ -98,7 +98,7 @@ class OpenMPAccumulator{
 		if(succ!=0) throw std::runtime_error("OpenMPAccumulator: posix_memalign failed to allocate memory.");
 		reset();
 	}
-	~OpenMPAccumulator() { free((void*)&data); }
+	~OpenMPAccumulator() { free((void*)data); }
 	// lock-free addition
 	void operator+=(const T& val){ *((T*)(data+omp_get_thread_num()*eSize))+=val; }
 	// return summary value; must not be used concurrently
