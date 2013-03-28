@@ -48,7 +48,7 @@ O.engines=[
 	PyRunner(iterPeriod=1000,command='timing.stats(); O.pause();'),
 	PyRunner(iterPeriod=10,command='addPlotData()')
 ]
-O.dt=.7*utils.PWaveTimeStep()
+O.dt=.7*PWaveTimeStep()
 O.saveTmp()
 O.timingEnabled=True
 O.trackEnergy=True
