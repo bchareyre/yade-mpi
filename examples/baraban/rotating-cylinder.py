@@ -35,7 +35,7 @@ sp=pack.SpherePack(); wd=cylRd*sqrt(2); rMean=(.2*wd*wd*cylHt/(nSpheres*(4/3.)*p
 print 'Generating cloud…'
 sp.makeCloud((-wd/2,-wd/2,-.5*cylHt),(wd/2,wd/2,.5*cylHt),rMean,0,int(nSpheres),False)
 sp.rotate((1,0,0),-pi/4)
-O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
+O.bodies.append([sphere(s[0],s[1]) for s in sp])
 
 O.engines=[
 	ForceResetter(),
@@ -48,7 +48,7 @@ O.engines=[
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(0,1,1),angularVelocity=30*(2*pi/60),ids=cylIds,label='rotor'),
 	NewtonIntegrator(damping=.3,gravity=(0,0,-1e3)), # gravity artificially high, to make it faster going ;-)
 ]
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.stopAtIter=int(2*pi/(rotor.angularVelocity*O.dt))
 O.timingEnabled=True; timing.reset()
 
