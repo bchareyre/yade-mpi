@@ -1,5 +1,5 @@
 # encoding: utf-8
-from yade import utils,pack,geom,qt
+from yade import pack,geom,qt
 from pylab import *
 import math
 qt.View()
@@ -16,12 +16,12 @@ rCyl=0.006
 
 cylindersBodies=[]
 for i in arange(0,0.3,0.3/15.):
-	cylindersBodies.append(utils.chainedCylinder(begin=Vector3(i,0,0),radius=rCyl,end=Vector3(i+0.3/15.,0,0),fixed=False,wire=False,material='cylindermat'))
+	cylindersBodies.append(chainedCylinder(begin=Vector3(i,0,0),radius=rCyl,end=Vector3(i+0.3/15.,0,0),fixed=False,wire=False,material='cylindermat'))
 ChainedState.currentChain=ChainedState.currentChain+1
 O.bodies[0].state.blockedDOFs='xyzXYZ'
 O.bodies[-1].state.blockedDOFs='xyzXYZ'
 
-O.bodies.append(utils.sphere([0.15,0,2.*rCyl],rCyl,wire=False,fixed=False,material='spheremat'))
+O.bodies.append(sphere([0.15,0,2.*rCyl],rCyl,wire=False,fixed=False,material='spheremat'))
 
 def main():
 	global Fn,Ft
