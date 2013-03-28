@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from yade import utils,pack,geom,qt
+from yade import pack,geom,qt
 from pylab import *
 import math
 qt.View()
@@ -34,14 +34,14 @@ nodesIds=[]
 #Create all nodes first :
 for i in range(0,nbL):
 	for j in range(0,nbl):
-		nodesIds.append( O.bodies.append(utils.gridNode([i*L/nbL,j*l/nbl,0],r,wire=False,fixed=False,material='spheremat',color=color)) )
+		nodesIds.append( O.bodies.append(gridNode([i*L/nbL,j*l/nbl,0],r,wire=False,fixed=False,material='spheremat',color=color)) )
 
 #Create connection between the nodes
 for i in range(0,len(nodesIds)):
 	for j in range(i+1,len(nodesIds)):
 		dist=(O.bodies[i].state.pos - O.bodies[j].state.pos).norm()
 		if(dist<=L/nbL*1.01):
-			O.bodies.append( utils.gridConnection(i,j,r,color=color) )
+			O.bodies.append( gridConnection(i,j,r,color=color) )
 
 #Set a fixed node
 O.bodies[0].dynamic=False
