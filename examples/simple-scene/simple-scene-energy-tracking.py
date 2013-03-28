@@ -47,17 +47,16 @@ O.engines=[
 		[Ip2_CohFrictMat_CohFrictMat_CohFrictPhys()],
 		[law]
 	),
-	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=50),
+	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=50,timestepSafetyCoefficient=.0001),
 	NewtonIntegrator(damping=damping,kinSplit=True,gravity=(0,0,-g)),
 	PyRunner(iterPeriod=20,command='myAddPlotData()')
 ]
 
-from yade import utils
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0],material='granular_material'))
-O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],material='granular_material'))
+O.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0],material='granular_material'))
+O.bodies.append(sphere([0,0,2],1,color=[0,1,0],material='granular_material'))
 if(two_spheres):
-	O.bodies.append(utils.sphere([0,0,4],1,color=[0,1,0],material='granular_material'))
-O.dt=.002*utils.PWaveTimeStep()
+	O.bodies.append(sphere([0,0,4],1,color=[0,1,0],material='granular_material'))
+O.dt=.002*PWaveTimeStep()
 O.bodies[1].state.angVel[1]=angVel
 if(rotate_in_two_directions):
 	O.bodies[1].state.angVel[2]=angVel
@@ -66,7 +65,6 @@ if(rotate_in_two_directions):
 ##### now the part pertaining to plots #####
 ############################################
 
-from math import *
 from yade import plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)
@@ -148,7 +146,7 @@ plot.liveInterval=2
 plot.plot(subPlots=False)
 #from yade import qt
 #qt.View()
-O.run(int(2./O.dt));
+O.run(int(20./O.dt));
 #plot.saveGnuplot('/tmp/a')
 ## you can also access the data in plot.data['t'], etc, under the labels they were saved.
 
