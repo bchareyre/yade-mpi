@@ -1,9 +1,9 @@
 "Script showing shear interaction between facet/wall and sphere."
 O.bodies.append([
-	#utils.sphere([0,0,0],1,dynamic=False,color=(0,1,0),wire=True),
-	utils.facet(([2,2,1],[-2,0,1],[2,-2,1]),fixed=True,color=(0,1,0),wire=False),
-	#utils.wall([0,0,1],axis=2,color=(0,1,0)),
-	utils.sphere([-1,0,2],1,fixed=False,color=(1,0,0),wire=True),
+	#sphere([0,0,0],1,dynamic=False,color=(0,1,0),wire=True),
+	facet(([2,2,1],[-2,0,1],[2,-2,1]),fixed=True,color=(0,1,0),wire=False),
+	#wall([0,0,1],axis=2,color=(0,1,0)),
+	sphere([-1,0,2],1,fixed=False,color=(1,0,0),wire=True),
 ])
 O.engines=[
 	ForceResetter(),

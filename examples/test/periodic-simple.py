@@ -16,16 +16,16 @@ O.engines=[
 	TranslationEngine(translationAxis=(1,0,0),velocity=10,ids=[0]),
 	NewtonIntegrator(damping=.4,gravity=[0,0,-10])
 ]
-O.bodies.append(utils.sphere([-4,0,11],2,fixed=True))
-O.bodies.append(utils.sphere([0,-2,5.5],2))
-O.bodies.append(utils.sphere([0,2,5.5],2))
-O.bodies.appendClumped([utils.sphere([0,4,8],.8),utils.sphere([0,5,7],.6)])
+O.bodies.append(sphere([-4,0,11],2,fixed=True))
+O.bodies.append(sphere([0,-2,5.5],2))
+O.bodies.append(sphere([0,2,5.5],2))
+O.bodies.appendClumped([sphere([0,4,8],.8),sphere([0,5,7],.6)])
 # sets up the periodic cell
 O.periodic=True
 O.cell.setBox(10,10,10)
 # normally handled in by the simulation... but we want to have the rendering right before start
 #O.cell.postProcessAttributes()
-O.dt=.1*utils.PWaveTimeStep()
+O.dt=.1*PWaveTimeStep()
 O.saveTmp()
 from yade import qt
 qt.Controller()

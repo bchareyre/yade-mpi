@@ -7,8 +7,8 @@ loadFrom='/tmp/triax.xml'
 TriaxialTest(numberOfGrains=2000,noFiles=True).generate(loadFrom)
 O.load(loadFrom)
 
-collider=utils.typedEngine('InsertionSortCollider')
-newton=utils.typedEngine('NewtonIntegrator')
+collider=typedEngine('InsertionSortCollider')
+newton=typedEngine('NewtonIntegrator')
 
 # use striding; say "if 0:" to disable striding and compare to regular runs
 if 1:

@@ -26,14 +26,14 @@ mat=FrictMat(young=600.0e6,poisson=0.6,density=2.60e3,frictionAngle=26,label='Fr
 O.materials.append(mat)
 
 ## create two spheres (one will be fixed) and append them
-from yade import utils
-s0=utils.sphere([0,0,0],1,color=[0,1,0],fixed=False,wire=True,material='Friction')
-s1=utils.sphere([2,0,0],1,color=[0,2,0],fixed=True,wire=True,material='Friction')
+
+s0=sphere([0,0,0],1,color=[0,1,0],fixed=False,wire=True,material='Friction')
+s1=sphere([2,0,0],1,color=[0,2,0],fixed=True,wire=True,material='Friction')
 O.bodies.append(s0)
 O.bodies.append(s1)
 
 ## time step
-O.dt=.2*utils.PWaveTimeStep()
+O.dt=.2*PWaveTimeStep()
 O.saveTmp('Mindlin')
 
 from yade import qt

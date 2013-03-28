@@ -26,7 +26,7 @@ def plotAddData():
 # in how many time steps should be the goal state reached
 nSteps=4000
 
-O.dt=utils.PWaveTimeStep()/2
+O.dt=PWaveTimeStep()/2
 EnlargeFactor=1.5
 EnlargeFactor=1.0
 O.engines=[

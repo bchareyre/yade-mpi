@@ -16,12 +16,12 @@ O.engines=[
 	RotationEngine(ids=[1],rotationAxis=[1,0,0],angularVelocity=.01),
 	NewtonIntegrator(damping=0.2)
 ]
-from yade import utils
-scale=.1
-O.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],fixed=True,color=[1,0,0]))
-O.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],wire=True,fixed=True))
 
-O.dt=.4*utils.PWaveTimeStep()
+scale=.1
+O.bodies.append(facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],fixed=True,color=[1,0,0]))
+O.bodies.append(sphere([0,0,.99*scale],1*scale,color=[0,1,0],wire=True,fixed=True))
+
+O.dt=.4*PWaveTimeStep()
 from yade import qt
 qt.View()
 renderer=qt.Renderer()

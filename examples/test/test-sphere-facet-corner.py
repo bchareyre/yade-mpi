@@ -1,6 +1,6 @@
 # -*- encoding=utf-8 -*-
 
-from yade import utils
+
 
 ## PhysicalParameters 
 Young = 7e6
@@ -11,9 +11,9 @@ Density=2700
 mat=O.materials.append(FrictMat(young=Young,poisson=Poisson,density=Density,frictionAngle=26))
 
 O.bodies.append([
-        utils.sphere([0,0,0.6],0.25,material=mat),
-        utils.facet([[-0.707,-0.707,0.1],[0,1.414,0],[1.414,0,0]],dynamic=False,color=[1,0,0],material=mat),
-        utils.facet([[0,1.414,0],[1.414,0,0],[0.707,0.707,-2.0]],dynamic=False,color=[1,0,0],material=mat)])
+        sphere([0,0,0.6],0.25,material=mat),
+        facet([[-0.707,-0.707,0.1],[0,1.414,0],[1.414,0,0]],dynamic=False,color=[1,0,0],material=mat),
+        facet([[0,1.414,0],[1.414,0,0],[0.707,0.707,-2.0]],dynamic=False,color=[1,0,0],material=mat)])
 
 ## Engines 
 O.engines=[

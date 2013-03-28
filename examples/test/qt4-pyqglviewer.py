@@ -11,7 +11,7 @@ class Viewer(QGLViewer):
 	def draw(self):
 		self.renderer.render()
 
-O.bodies.append([utils.sphere((0,0,-.4),.3),utils.sphere((0,0,.4),.3)])
+O.bodies.append([sphere((0,0,-.4),.3),sphere((0,0,.4),.3)])
 
 viewer=Viewer()
 viewer.setWindowTitle('Yade')

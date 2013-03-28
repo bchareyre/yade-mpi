@@ -17,9 +17,9 @@ O.materials.append(FrictMat(young=15e6,poisson=.4,frictionAngle=0,density=0,labe
 
 
 ## copy spheres from the packing into the scene
-O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
+O.bodies.append([sphere(center,rad,material='spheres') for center,rad in sp])
 ## create walls around the packing
-walls=utils.aabbWalls(material='frictionlessWalls')
+walls=aabbWalls(material='frictionlessWalls')
 wallIds=O.bodies.append(walls)
 
 triax=TriaxialCompressionEngine(

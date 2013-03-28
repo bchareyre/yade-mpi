@@ -5,11 +5,11 @@
 mat=O.materials.append(FrictMat(young=30e9,poisson=.2,density=4000,frictionAngle=.5))
 
 O.bodies.append([
-	utils.facet([[1,0,0],[-1,2,0],[-1,-2,0]],material=mat),
-	utils.sphere([0,0,2],.5,color=(0,1,0),material=mat)
+	facet([[1,0,0],[-1,2,0],[-1,-2,0]],material=mat),
+	sphere([0,0,2],.5,color=(0,1,0),material=mat)
 ])
 O.bodies[1].state.vel=Vector3(0,0,-1)
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 
 O.engines=[
 	ForceResetter(),

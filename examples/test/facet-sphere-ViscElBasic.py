@@ -11,15 +11,15 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+params=getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) 
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 
-facetId=O.bodies.append(utils.facet( [ (-1,0,0), (1,1,0), (1,-1,0)], material=facetMat,color=(1,0,0)))
+facetId=O.bodies.append(facet( [ (-1,0,0), (1,1,0), (1,-1,0)], material=facetMat,color=(1,0,0)))
 
 sphIds=O.bodies.append([
-	utils.sphere( (0,0,0.1),0.1, material=sphereMat,color=(0,1,0)), 
-	utils.sphere( (0.9,0,0.1),0.1, material=sphereMat,color=(0,1,0))
+	sphere( (0,0,0.1),0.1, material=sphereMat,color=(0,1,0)), 
+	sphere( (0.9,0,0.1),0.1, material=sphereMat,color=(0,1,0))
 	])
 
 O.bodies[sphIds[1]].state.blockedDOFs='XYZ'

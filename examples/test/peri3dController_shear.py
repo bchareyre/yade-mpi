@@ -30,7 +30,7 @@ def plotAddData():
 		eyz=p3d.strain[3],ezx=p3d.strain[4],exy=p3d.strain[5],
 	)
 
-O.dt=utils.PWaveTimeStep()/2
+O.dt=PWaveTimeStep()/2
 
 # define the first part of simulation, hydrostatic compression
 enlargeFactor=1.5
