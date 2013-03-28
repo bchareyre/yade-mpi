@@ -22,7 +22,7 @@ for xyz in itertools.product(arange(0,d),arange(0,d),arange(0,d)):
 	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((mn[0]+xyz[0]*(mx[0]-mn[0])/d,mn[0]+xyz[1]*(mx[1]-mn[1])/d,mn[2]+xyz[2]*(mx[2]-mn[2])/d),(0.45+random.random()*0.1,0.45+random.random()*0.1,0.45+random.random()*0.1)),radius=0.15+random.random()*0.05,gap=0,color=[random.random(),random.random(),random.random()]))
 
 ## create walls around the packing
-walls=utils.aabbWalls(material='frictionless')
+walls=aabbWalls(material='frictionless')
 wallIds=O.bodies.append(walls)
 
 from yade import qt

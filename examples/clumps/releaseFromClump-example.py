@@ -20,7 +20,7 @@ O.engines=[
 ]
 
 #create a box:
-id_box = O.bodies.append(utils.box((0,0,0),(5,5,.1),fixed=True,material=Mat))
+id_box = O.bodies.append(box((0,0,0),(5,5,.1),fixed=True,material=Mat))
 
 
 #### show how to use clump():
@@ -29,12 +29,12 @@ id_box = O.bodies.append(utils.box((0,0,0),(5,5,.1),fixed=True,material=Mat))
 #create spheres parallel to x-axis:
 bodyList1 = []
 for ii in range(-2,2):
-	bodyList1.append(O.bodies.append(utils.sphere((ii,0,1),radius=.5,material=Mat)))
+	bodyList1.append(O.bodies.append(sphere((ii,0,1),radius=.5,material=Mat)))
 
 #create spheres parallel to y-axis:
 bodyList2 = []
 for ii in range(-3,2):
-	bodyList2.append(O.bodies.append(utils.sphere((-1,ii,1.5),radius=.5,material=Mat)))
+	bodyList2.append(O.bodies.append(sphere((-1,ii,1.5),radius=.5,material=Mat)))
 
 #create 2 clumps, and give each clump a different color
 idClump1=O.bodies.clump(bodyList1)

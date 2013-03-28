@@ -25,12 +25,12 @@ qt.Controller()
 qt.View()
 
 #create a box:
-id_box = O.bodies.append(utils.box((0,0,0),(2,2,.1),fixed=True,material=Mat))
+id_box = O.bodies.append(box((0,0,0),(2,2,.1),fixed=True,material=Mat))
 
 #create assembly of spheres:
 sp=pack.SpherePack()
 sp.makeCloud(minCorner=(-1.5,-1.5,.1),maxCorner=(1.5,1.5,2),rMean=.2,rRelFuzz=.5,num=100,periodic=False)
-O.bodies.append([utils.sphere(c,r,material=Mat) for c,r in sp])
+O.bodies.append([sphere(c,r,material=Mat) for c,r in sp])
 
 print len(sp),' particles generated.'
 
@@ -51,9 +51,9 @@ relRadList3 = [1,1,1,1,1]
 relPosList3 = [[0,1,0],[0,2,0],[0,3,0],[0,4,0],[0,5,0]]
 
 templates= []
-templates.append(utils.clumpTemplate(relRadii=relRadList1,relPositions=relPosList1))
-templates.append(utils.clumpTemplate(relRadii=relRadList2,relPositions=relPosList2))
-templates.append(utils.clumpTemplate(relRadii=relRadList3,relPositions=relPosList3))
+templates.append(clumpTemplate(relRadii=relRadList1,relPositions=relPosList1))
+templates.append(clumpTemplate(relRadii=relRadList2,relPositions=relPosList2))
+templates.append(clumpTemplate(relRadii=relRadList3,relPositions=relPosList3))
 
 
 #### show how to use replaceByClumps():

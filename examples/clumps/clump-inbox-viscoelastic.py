@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 
-from yade import utils,pack,export,qt,geom
+from yade import pack,export,qt,geom
 import gts,os,random,itertools
 from numpy import *
 
@@ -11,7 +11,7 @@ es=.3  # tangential restitution coefficient
 frictionAngle=radians(35)# 
 density=2700
 # facets material
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+params=getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 # default spheres material
 dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params)) 
@@ -25,11 +25,11 @@ box = O.bodies.append(geom.facetBox((0,0,0),(1,1,1),wallMask=31,material=facetMa
 
 # Create clumps...
 for j in xrange(10):
-	clpId,sphId=O.bodies.appendClumped([utils.sphere(Vector3(0,Rs*2*i,(j+1)*Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
+	clpId,sphId=O.bodies.appendClumped([sphere(Vector3(0,Rs*2*i,(j+1)*Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
 	
 
 # ... and spheres
-sphAloneId=O.bodies.append( [utils.sphere( Vector3(0.5,Rs*2*i,(j+1)*Rs*2), Rs, material=dfltSpheresMat) for i in xrange(4) ] )
+sphAloneId=O.bodies.append( [sphere( Vector3(0.5,Rs*2*i,(j+1)*Rs*2), Rs, material=dfltSpheresMat) for i in xrange(4) ] )
 
 # Create engines
 O.engines=[

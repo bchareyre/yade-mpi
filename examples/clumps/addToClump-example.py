@@ -20,7 +20,7 @@ O.engines=[
 ]
 
 #create a box:
-id_box = O.bodies.append(utils.box((0,0,0),(2,2,.1),fixed=True,material=Mat))
+id_box = O.bodies.append(box((0,0,0),(2,2,.1),fixed=True,material=Mat))
 
 
 #### show how to use appendClumped():
@@ -28,12 +28,12 @@ id_box = O.bodies.append(utils.box((0,0,0),(2,2,.1),fixed=True,material=Mat))
 
 #create 2 clumps:
 clump1=O.bodies.appendClumped([\
-utils.sphere([0,0,1], material=Mat, radius=0.5),\
-utils.sphere([0.2,0,1], material=Mat, radius=0.5)\
+sphere([0,0,1], material=Mat, radius=0.5),\
+sphere([0.2,0,1], material=Mat, radius=0.5)\
 ])
 clump2=O.bodies.appendClumped([\
-utils.sphere([3,1,2], material=Mat, radius=0.5),\
-utils.sphere([3.2,1,2], material=Mat, radius=0.5)\
+sphere([3,1,2], material=Mat, radius=0.5),\
+sphere([3.2,1,2], material=Mat, radius=0.5)\
 ])
 
 #get clump ids:
@@ -54,7 +54,7 @@ def getClumpInfo():
 
 
 #create a new sphere:
-id_new=O.bodies.append(utils.sphere([0,0.2,1], material=Mat, radius=0.5))
+id_new=O.bodies.append(sphere([0,0.2,1], material=Mat, radius=0.5))
 
 print '\nSTATE before adding sphere to clump ------------'
 getClumpInfo()
