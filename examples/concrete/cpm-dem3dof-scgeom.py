@@ -16,14 +16,14 @@ p1,p2=Vector3(0,0,0),Vector3(dist,0,0)
 O.materials.append(CpmMat(young=30e9,poisson=.2,frictionAngle=atan(.8),sigmaT=3e6,crackOpening=1e-6,epsCrackOnset=1e-4,neverDamage=False,plTau=-1,plRateExp=0,dmgTau=-1,dmgRateExp=0))#,G_over_E=.2
 # first 2 spheres used for Dem3DofGeom
 # the other 2 used for ScGeom (#3 is dynamic, since ScGeom needs that)
-O.bodies.append([utils.sphere(p1,r1,fixed=True),utils.sphere(p2,r2,fixed=True)])
-O.bodies.append([utils.sphere(p1+offset,r1,fixed=True),utils.sphere(p2+offset,r2,fixed=True)])
+O.bodies.append([sphere(p1,r1,fixed=True),sphere(p2,r2,fixed=True)])
+O.bodies.append([sphere(p1+offset,r1,fixed=True),sphere(p2+offset,r2,fixed=True)])
 
 
 O.engines=[IGeomDispatcher([Ig2_Sphere_Sphere_Dem3DofGeom()]),IPhysDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]
-i1=utils.createInteraction(0,1) # caches functors, no need to specify them in the main loop
+i1=createInteraction(0,1) # caches functors, no need to specify them in the main loop
 O.engines=[IGeomDispatcher([Ig2_Sphere_Sphere_ScGeom()]),IPhysDispatcher([Ip2_CpmMat_CpmMat_CpmPhys()])]
-i2=utils.createInteraction(2,3)
+i2=createInteraction(2,3)
 
 O.engines=[
 	ForceResetter(),

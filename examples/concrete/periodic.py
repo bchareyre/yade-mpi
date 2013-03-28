@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-from yade import utils,plot,pack
+from yade import plot,pack
 import time, sys, os, copy
 
 """
@@ -33,7 +33,7 @@ is 1000 for tension and 100 for compression.
 
 
 # default parameters or from table
-utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
+readParamsFromTable(noTableOk=True, # unknownOk=True,
 	young=24e9,
 	poisson=.2,
 	sigmaT=3.5e6,
@@ -79,13 +79,13 @@ sp.cellSize=sphDict['cell']
 
 import numpy
 avgRadius=numpy.average([r for c,r in sp])
-O.bodies.append([utils.sphere(c,r,color=utils.randomColor()) for c,r in sp])
+O.bodies.append([sphere(c,r,color=randomColor()) for c,r in sp])
 O.periodic=True
 O.cell.setBox(sp.cellSize)
 axis=2
 ax1=(axis+1)%3
 ax2=(axis+2)%3
-O.dt=dtSafety*utils.PWaveTimeStep()
+O.dt=dtSafety*PWaveTimeStep()
 
 import yade.plot as yp
 
@@ -186,5 +186,5 @@ def addPlotData():
 	yade.plot.addData(t=O.time,i=O.iter,eps=strainer.strain[axis],eps_=strainer.strain[axis],sigma=strainer.stress[axis]+isoPrestress,eps1=strainer.strain[ax1],eps2=strainer.strain[ax2],sig1=strainer.stress[ax1],sig2=strainer.stress[ax2],relResid=updater.avgRelResidual)
 
 initTest()
-utils.waitIfBatch()
+waitIfBatch()
 

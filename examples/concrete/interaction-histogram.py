@@ -41,6 +41,6 @@ pylab.bar(left=bins[:-1],height=values,width=.7*pi/20);
 
 # predefined function
 pylab.figure()
-utils.plotDirections(noShow=True).savefig('/tmp/a.pdf')
+plotDirections(noShow=True).savefig('/tmp/a.pdf')
 
 pylab.show()

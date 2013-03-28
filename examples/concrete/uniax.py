@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-from yade import utils,plot,pack,timing,eudoxos
+from yade import plot,pack,timing,eudoxos
 import time, sys, os, copy
 
 #import matplotlib
@@ -39,7 +39,7 @@ is 1000 for tension and 100 for compression.
 
 
 # default parameters or from table
-utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
+readParamsFromTable(noTableOk=True, # unknownOk=True,
 	young=24e9,
 	poisson=.2,
 
@@ -80,14 +80,14 @@ concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poi
 spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
 #spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')
 O.bodies.append(spheres)
-bb=utils.uniaxialTestFeatures()
+bb=uniaxialTestFeatures()
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
-O.dt=dtSafety*utils.PWaveTimeStep()
+O.dt=dtSafety*PWaveTimeStep()
 print 'Timestep',O.dt
 
-mm,mx=[pt[axis] for pt in utils.aabbExtrema()]
+mm,mx=[pt[axis] for pt in aabbExtrema()]
 coord_25,coord_50,coord_75=mm+.25*(mx-mm),mm+.5*(mx-mm),mm+.75*(mx-mm)
-area_25,area_50,area_75=utils.approxSectionArea(coord_25,axis),utils.approxSectionArea(coord_50,axis),utils.approxSectionArea(coord_75,axis)
+area_25,area_50,area_75=approxSectionArea(coord_25,axis),approxSectionArea(coord_50,axis),approxSectionArea(coord_75,axis)
 
 O.engines=[
 	ForceResetter(),
@@ -172,12 +172,12 @@ def stopIfDamaged():
 		
 def addPlotData():
 	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer.strain,'sigma':strainer.avgStress+isoPrestress,
-		'sigma.25':utils.forcesOnCoordPlane(coord_25,axis)[axis]/area_25+isoPrestress,
-		'sigma.50':utils.forcesOnCoordPlane(coord_50,axis)[axis]/area_50+isoPrestress,
-		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,
+		'sigma.25':forcesOnCoordPlane(coord_25,axis)[axis]/area_25+isoPrestress,
+		'sigma.50':forcesOnCoordPlane(coord_50,axis)[axis]/area_50+isoPrestress,
+		'sigma.75':forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,
 		})
 plot.plot(subPlots=False)
 #O.run()
 initTest()
-utils.waitIfBatch()
+waitIfBatch()
 
