@@ -26,7 +26,7 @@ from yade import pack
 ############################################
 
 # The following 5 lines will be used later for batch execution
-nRead=utils.readParamsFromTable(
+nRead=readParamsFromTable(
 	num_spheres=1000,# number of spheres
 	compFricDegree = 30, # contact friction during the confining phase
 	key='_triax_base_', # put you simulation's name here
@@ -51,7 +51,7 @@ O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=radians(compFr
 O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=0,density=0,label='walls'))
 
 ## create walls around the packing
-walls=utils.aabbWalls([mn,mx],thickness=thick,material='walls')
+walls=aabbWalls([mn,mx],thickness=thick,material='walls')
 wallIds=O.bodies.append(walls)
 
 ## use a SpherePack object to generate a random loose particles packing
@@ -70,7 +70,7 @@ if clumps:
  sp.toSimulation(material='spheres')
 else:
  sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95,seed=1) #"seed" make the "random" generation always the same
- O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
+ O.bodies.append([sphere(center,rad,material='spheres') for center,rad in sp])
  #or alternatively (higher level function doing exactly the same):
  #sp.toSimulation(material='spheres')
 
