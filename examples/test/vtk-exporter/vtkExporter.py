@@ -1,12 +1,12 @@
 from yade import *
-from yade import utils,export
+from yade import export
 
 O.bodies.append([
-	utils.sphere((0,0,0),1),
-	utils.sphere((0,2,0),1),
-	utils.sphere((0,2,3),2),
-	utils.facet([Vector3(0,-3,-1),Vector3(0,-2,5),Vector3(5,4,0)]),
-	utils.facet([Vector3(0,-3,-1),Vector3(0,-2,5),Vector3(-5,4,0)])
+	sphere((0,0,0),1),
+	sphere((0,2,0),1),
+	sphere((0,2,3),2),
+	facet([Vector3(0,-3,-1),Vector3(0,-2,5),Vector3(5,4,0)]),
+	facet([Vector3(0,-3,-1),Vector3(0,-2,5),Vector3(-5,4,0)])
 ])
 
 vtkExporter = export.VTKExporter('vtkExporterTesting')
