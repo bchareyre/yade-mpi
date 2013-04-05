@@ -43,7 +43,6 @@ damp=0.2 # damping coefficient
 stabilityThreshold=0.01 # we test unbalancedForce against this value in different loops (see below)
 young=5e6 # contact stiffness
 mn,mx=Vector3(0,0,0),Vector3(1,1,1) # corners of the initial packing
-thick = 0.01 # thickness of the plates
 
 
 ## create materials for spheres and plates
@@ -83,7 +82,7 @@ triax=TriaxialStressController(
 	## this control of boundary conditions was used for instance in http://dx.doi.org/10.1016/j.ijengsci.2008.07.002
 	maxMultiplier=1.+2e4/young, # spheres growing factor (fast growth)
 	finalMaxMultiplier=1.+2e3/young, # spheres growing factor (slow growth)
-	thickness = thick,
+	thickness = 0,
 	## switch stress/strain control using a bitmask. What is a bitmask, huh?!
 	## Say x=1 if stess is controlled on x, else x=0. Same for for y and z, which are 1 or 0.
 	## Then an integer uniquely defining the combination of all these tests is: mask = x*1 + y*2 + z*4
@@ -130,11 +129,8 @@ triax.goal1=triax.goal2=triax.goal3=10000
   #O.run(1000, True)
   ##the global unbalanced force on dynamic bodies, thus excluding boundaries, which are not at equilibrium
   #unb=unbalancedForce()
-  ##average stress
-  ##note: triax.stress(k) returns a stress vector, so we need to keep only the normal component
-  #meanS=(triax.stress(triax.wall_right_id)[0]+triax.stress(triax.wall_top_id)[1]+triax.stress(triax.wall_front_id)[2])/3
-  #print 'unbalanced force:',unb,' mean stress: ',meanS
-  #if unb<stabilityThreshold and abs(meanS-triax.sigma_iso)/triax.sigma_iso<0.001:
+  #print 'unbalanced force:',unb,' mean stress: ',triax.meanStress
+  #if unb<stabilityThreshold and abs(10000-triax.meanStress)/10000<0.001:
     #break
 
 #O.save('confinedState'+key+'.yade.gz')
