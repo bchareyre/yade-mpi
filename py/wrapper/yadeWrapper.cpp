@@ -221,7 +221,9 @@ class pyBodyContainer{
 		
 		//get number of spherical particles and a list of all spheres:
 		vector<shared_ptr<Body> > sphereList;
-		FOREACH(const shared_ptr<Body>& b, *proxee) if (!b->isAspherical()) sphereList.push_back(b);
+		shared_ptr<Sphere> sph (new Sphere);
+		int Sph_Index = sph->getClassIndexStatic();
+		FOREACH(const shared_ptr<Body>& b, *proxee) if ( b->shape->getClassIndex() ==  Sph_Index ) sphereList.push_back(b);
 		int num = sphereList.size();
 		
 		//loop over templates:
