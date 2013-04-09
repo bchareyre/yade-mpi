@@ -56,6 +56,8 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	} else { Erot=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel)); }
 	if(!kinSplit) scene->energy->add(Etrans+Erot,"kinetic",kinEnergyIx,/*non-incremental*/true);
 	else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
+	// gravitational work (work done by gravity is "negative", since the energy appears in the system from outside)
+	scene->energy->add(-gravity.dot(b->state->vel)*b->state->mass*scene->dt,"gravWork",fieldWorkIx,/*non-incremental*/false);
 }
 
 void NewtonIntegrator::saveMaximaVelocity(const Body::id_t& id, State* state){
