@@ -165,8 +165,8 @@ void TriaxialStressController::action()
 	{
 		p_bottom->vel=Vector3r::Zero(); p_top->vel=Vector3r::Zero(); p_left->vel=Vector3r::Zero(); p_right->vel=Vector3r::Zero(); p_back->vel=Vector3r::Zero(); p_front->vel=Vector3r::Zero();
 		if (isARadiusControlIteration) {
-			Real sigma_iso_ = (stressMask & 1)*goal1 + (stressMask & 2)*goal2 + (stressMask & 4)*goal3;
-			sigma_iso_ /= (stressMask & 1) + (stressMask & 2) + (stressMask & 4);
+			Real sigma_iso_ = bool(stressMask & 1)*goal1 +  bool(stressMask & 2)*goal2 +  bool(stressMask & 4)*goal3;
+			sigma_iso_ /=  bool(stressMask & 1) +  bool(stressMask & 2) +  bool(stressMask & 4);
 			if (sigma_iso_<=meanStress) maxMultiplier = finalMaxMultiplier;
 			if (meanStress==0) previousMultiplier = maxMultiplier;
 			else {
