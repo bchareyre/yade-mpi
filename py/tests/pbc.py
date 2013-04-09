@@ -34,17 +34,16 @@ class TestPBC(unittest.TestCase):
 		O.cell.velGrad=Matrix3(0,0,0, 0,0,0, 0,0,-1)
 		O.dt=0 # do not change positions with dt=0 in NewtonIntegrator, but still update velocities from velGrad
 	def testVelGrad(self):
-		'PBC: velGrad changes hSize but not hSize0, accumulates in trsf'
+		'PBC: velGrad changes hSize, accumulates in trsf'
 		O.dt=1e-3
 		hSize,trsf=O.cell.hSize,Matrix3.Identity
 		hSize0=hSize
+		O.step()
 		for i in range(0,10):
 			O.step(); hSize+=O.dt*O.cell.velGrad*hSize; trsf+=O.dt*O.cell.velGrad*trsf
 		for i in range(0,len(O.cell.hSize)):
 			self.assertAlmostEqual(hSize[i],O.cell.hSize[i])
 			self.assertAlmostEqual(trsf[i],O.cell.trsf[i])
-			# ?? should work
-			#self.assertAlmostEqual(hSize0[i],O.cell.hSize0[i])
 	def testTrsfChange(self):
 		'PBC: chaing trsf changes hSize0, but does not modify hSize'
 		O.dt=1e-2
@@ -67,7 +66,7 @@ class TestPBC(unittest.TestCase):
 		self.assertAlmostEqual(s1.vel[2],self.initVel[2]+self.initPos[2]*O.cell.velGrad[2,2])
 	def testScGeomIncidentVelocity(self):
 		"PBC: ScGeom computes incident velocity correctly"
-		O.step()
+		O.run(2,1)
 		O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 		i=utils.createInteraction(0,1)
 		self.assertEqual(self.initVel,i.geom.incidentVel(i,avoidGranularRatcheting=True))
