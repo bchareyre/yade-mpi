@@ -10,6 +10,8 @@ void Cell::integrateAndUpdate(Real dt){
 	trsf+=_trsfInc*trsf;
 	_invTrsf=trsf.inverse();
 	// hSize contains colums with updated base vectors
+	prevHSize=hSize;
+	_vGradTimesPrevH = velGrad*prevHSize;
 	hSize+=_trsfInc*hSize;
 	if(hSize.determinant()==0){ throw runtime_error("Cell is degenerate (zero volume)."); }
 	// lengths of transformed cell vectors, skew cosines

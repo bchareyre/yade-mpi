@@ -54,6 +54,7 @@ class Cell: public Serializable{
 	private:
 		Matrix3r _invTrsf;
 		Matrix3r _trsfInc;
+		Matrix3r _vGradTimesPrevH;
 		Vector3r _size, _cos;
 		Vector3r _refSize;
 		bool _hasShear;
@@ -89,7 +90,7 @@ class Cell: public Serializable{
 
 	// relative position and velocity for interaction accross multiple cells
 	Vector3r intrShiftPos(const Vector3i& cellDist) const { return hSize*cellDist.cast<Real>(); }
-	Vector3r intrShiftVel(const Vector3i& cellDist) const { return velGrad*hSize*cellDist.cast<Real>(); }
+	Vector3r intrShiftVel(const Vector3i& cellDist) const { return _vGradTimesPrevH*cellDist.cast<Real>(); }
 	// return body velocity while taking away mean field velocity (coming from velGrad) if the mean field velocity is applied on velocity
 	Vector3r bodyFluctuationVel(const Vector3r& pos, const Vector3r& vel, const Matrix3r& prevVelGrad) const { return (vel-prevVelGrad*pos); }
 
@@ -99,6 +100,8 @@ class Cell: public Serializable{
 	// set current transformation; has no influence on current configuration (hSize); sets display refHSize as side-effect
 	Matrix3r getTrsf() const { return trsf; }
 	void setTrsf(const Matrix3r& m){ trsf=m; postLoad(*this); }
+	Matrix3r getVelGrad() const { return velGrad; }
+	void setVelGrad(const Matrix3r& m){ nextVelGrad=m; velGradChanged=true;}
 	//BEGIN Deprecated (see refSize property)
 	// get undeformed shape
 	Matrix3r getHSize0() const { return _invTrsf*hSize; }
@@ -149,10 +152,13 @@ class Cell: public Serializable{
 		((Matrix3r,trsf,Matrix3r::Identity(),,"[overridden]")) //"Current transformation matrix of the cell, which defines how far is the current cell geometry (:yref:`hSize<Cell.hSize>`) from the reference configuration. Changing trsf will not change :yref:`hSize<Cell.hSize>`, it serves only as accumulator for transformations applied via :yref:`velGrad<Cell.velGrad>`."))
 		((Matrix3r,refHSize,Matrix3r::Identity(),,"Reference cell configuration, only used with :yref:`OpenGLRenderer.dispScale`. Updated automatically when :yref:`hSize<Cell.hSize>` or :yref:`trsf<Cell.trsf>` is assigned directly; also modified by :yref:`yade.utils.setRefSe3` (called e.g. by the :gui:`Reference` button in the UI)."))
 		((Matrix3r,hSize,Matrix3r::Identity(),,"[overridden below]"))
+		((Matrix3r,prevHSize,Matrix3r::Identity(),Attr::readonly,":yref:`hSize<Cell.hSize>` from the previous step, used in the definition of relative velocity across periods."))
 		/* normal attributes */
-		((Matrix3r,velGrad,Matrix3r::Zero(),,"Velocity gradient of the transformation; used in :yref:`NewtonIntegrator`. Values of :yref:`velGrad<Cell.velGrad>` accumulate in :yref:`trsf<Cell.trsf>` at every step."))
+		((Matrix3r,velGrad,Matrix3r::Zero(),,"[overridden below]"))
+		((Matrix3r,nextVelGrad,Matrix3r::Zero(),Attr::readonly,"see :yref:`Cell.velGrad`."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
-		((bool,homoDeform,true,,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions and velocities of bodies. The velocity change is obtained by deriving the expression v=∇v.x, where ∇v is the macroscopic velocity gradient, giving in an incremental form: Δv=Δ ∇v x + ∇v Δx. As a result, velocities are modified as soon as ``velGrad`` changes, according to the first term: Δv(t)=Δ ∇v x(t), while the 2nd term reflects a convective term: Δv'= ∇v v(t-dt/2).")),
+		((bool,homoDeform,true,,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions and velocities of bodies. The velocity change is obtained by deriving the expression v=∇v.x, where ∇v is the macroscopic velocity gradient, giving in an incremental form: Δv=Δ ∇v x + ∇v Δx. As a result, velocities are modified as soon as ``velGrad`` changes, according to the first term: Δv(t)=Δ ∇v x(t), while the 2nd term reflects a convective term: Δv'= ∇v v(t-dt/2)."))
+		((bool,velGradChanged,false,Attr::readonly,"true when velGrad has been changed manually (see also :yref:`Cell.nextVelGrad`)")),
 		/*deprec*/
 		((Hsize,hSize,"conform to Yade's names convention.")),
 		/*init*/ ,
@@ -164,6 +170,7 @@ class Cell: public Serializable{
 		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell (lengths of initial cell vectors, i.e. column norms of :yref:`hSize<Cell.hSize>`).\n\n.. note:: Modifying this value is deprecated, use :yref:`setBox<Cell.setBox>` instead.\n\n")
 		// useful properties
 		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Current transformation matrix of the cell, obtained from time integration of :yref:`Cell.velGrad`.")
+		.add_property("velGrad",&Cell::getVelGrad,&Cell::setVelGrad,"Velocity gradient of the transformation; used in :yref:`NewtonIntegrator`. Values of :yref:`velGrad<Cell.velGrad>` accumulate in :yref:`trsf<Cell.trsf>` at every step.\n\n NOTE: changing velGrad at the begining of a simulation loop would lead to inacurate integration for one step, as it should normaly be changed after the contact laws (but before Newton). To avoid this problem, assignment is deferred automaticaly. The target value typed in terminal is actually stored in :yref:`Cell.nextVelGrad` and will be applied right in time by Newton integrator.")
 		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of the 3 cell lateral vectors contained in :yref:`Cell.hSize` columns. Updated automatically at every step.")
 		.add_property("volume",&Cell::getVolume,"Current volume of the cell.")
 		// functions
