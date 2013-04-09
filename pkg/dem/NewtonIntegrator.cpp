@@ -56,8 +56,6 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	} else { Erot=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel)); }
 	if(!kinSplit) scene->energy->add(Etrans+Erot,"kinetic",kinEnergyIx,/*non-incremental*/true);
 	else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
-	// gravitational work (work done by gravity is "negative", since the energy appears in the system from outside)
-	scene->energy->add(-gravity.dot(b->state->vel)*b->state->mass*scene->dt,"gravWork",fieldWorkIx,/*non-incremental*/false);
 }
 
 void NewtonIntegrator::saveMaximaVelocity(const Body::id_t& id, State* state){
@@ -107,6 +105,8 @@ void NewtonIntegrator::action()
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
 	const Real& dt=scene->dt;
+	//Take care of user's request to change velGrad. Safe to change it here after the interaction loop.
+	if (scene->cell->velGradChanged) {scene->cell->velGrad=scene->cell->nextVelGrad; scene->cell->velGradChanged=0;}
 	homoDeform=scene->cell->homoDeform;
 	dVelGrad=scene->cell->velGrad-prevVelGrad;
 	// account for motion of the periodic boundary, if we remember its last position
@@ -270,12 +270,9 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 bool NewtonIntegrator::get_densityScaling() {
 	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
 		GlobalStiffnessTimeStepper* ts=dynamic_cast<GlobalStiffnessTimeStepper*>(e.get());
-		if (ts) {
-			if (densityScaling != ts->densityScaling) LOG_ERROR("inconsistent set of densityScaling in Newton and TimeStepper, did you change the TimeStepper's value?");
-			return ts->densityScaling;
-		}
-	} LOG_ERROR("Density scaling needs GlobalStiffnessTimeStepper present in O.engines.");
-	return 0;
+		if (ts && densityScaling != ts->densityScaling) LOG_WARN("density scaling is not active in the timeStepper, it will have no effect unless a scaling is specified manually for some bodies");}
+	LOG_WARN("GlobalStiffnessTimeStepper not present in O.engines, density scaling will have no effect unless a scaling is specified manually for some bodies");
+	return densityScaling;;
 }
 
 void NewtonIntegrator::set_densityScaling(bool dsc) {
@@ -284,9 +281,10 @@ void NewtonIntegrator::set_densityScaling(bool dsc) {
 		if (ts) {
 			ts->densityScaling=dsc;
 			densityScaling=dsc;
+			LOG_WARN("GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the the timestepper if you don't want the scaling adjusted automaticaly.");
 			return;
 		}
-	} LOG_ERROR("Density scaling needs GlobalStiffnessTimeStepper present in O.engines. Not set.");
+	} LOG_WARN("GlobalStiffnessTimeStepper not found in O.engines. Density scaling will have no effect unless a scaling is specified manually for some bodies");
 }
 
 
