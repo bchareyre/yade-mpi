@@ -21,7 +21,12 @@ class ViscElMat : public Material {
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,ks,NaN,,"Shear elastic stiffness"))
 		((Real,cs,NaN,,"Shear viscous constant"))
-		((Real,frictionAngle,NaN,,"Friction angle [rad]")),
+		((Real,frictionAngle,NaN,,"Friction angle [rad]"))
+		((bool,Capillar,false,,"True, if capillar forces need to be added."))
+		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
+		((Real,gamma,NaN,,"Surface tension [N/m]"))
+		((Real,theta,NaN,,"Contact angle [°]"))
+		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett, Weigert, Herminghaus")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(ViscElMat,Material);
@@ -32,9 +37,17 @@ REGISTER_SERIALIZABLE(ViscElMat);
 class ViscElPhys : public FrictPhys{
 	public:
 		virtual ~ViscElPhys();
+		Real R;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
-		((Real,cs,NaN,,"Shear viscous constant")),
+		((Real,cs,NaN,,"Shear viscous constant"))
+		((bool,Capillar,false,,"True, if capillar forces need to be added."))
+		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
+		((Real,sCrit,false,,"Critical bridge length [m]"))
+		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
+		((Real,gamma,NaN,,"Surface tension [N/m]"))
+		((Real,theta,NaN,,"Contact angle [rad]"))
+		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett, Weigert, Herminghaus")),
 		createIndex();
 	)
 };
