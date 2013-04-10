@@ -1183,14 +1183,12 @@ The batch can be run as ::
 
 	yade-batch parameters.table simulation.py
 
-and it will intelligently run one simulation for each parameter table line.
+and it will intelligently run one simulation for each parameter table line. A minimal example is found in :ysrc:`examples/test/batch/params.table` and :ysrc:`examples/test/batch/sim.py`, another example follows.
 
 Example
 --------
 
-This example is found in :ysrc:`scripts/batch.table` and :ysrc:`scripts/batch.py`.
-
-Suppsoe we want to study influence of parameters *density* and *initialVelocity* on position of a sphere falling on fixed box. We create parameter table like this::
+Suppose we want to study influence of parameters *density* and *initialVelocity* on position of a sphere falling on fixed box. We create parameter table like this::
 
  description density initialVelocity # first non-empty line are column headings
  reference   2400    10
