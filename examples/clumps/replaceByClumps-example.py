@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-'''This example shows usage of clumpTemplate() and replaceByClumps().'''
+'''This example shows usage of clumpTemplate(), replaceByClumps() and getRoundness().'''
 
 #define material for all bodies:
 id_Mat=O.materials.append(FrictMat(young=1e7,poisson=0.3,density=1000,frictionAngle=1))
@@ -33,6 +33,7 @@ sp.makeCloud(minCorner=(-1.5,-1.5,.1),maxCorner=(1.5,1.5,2),rMean=.2,rRelFuzz=.5
 O.bodies.append([sphere(c,r,material=Mat) for c,r in sp])
 
 print len(sp),' particles generated.'
+print 'Roundness coefficient without clumps is: ',O.bodies.getRoundness([])			#give an empty list [] if no body should be excluded
 
 
 #### show how to use makeClumpTemplate():
@@ -61,6 +62,19 @@ templates.append(clumpTemplate(relRadii=relRadList3,relPositions=relPosList3))
 
 #replace by 50% dyads, 30% peanuts and 10% sticks:
 O.bodies.replaceByClumps(templates,[.5,.3,.1])
+
+
+#### show how to use getRoundness():
+
+
+#create a list of all standalone spheres:
+standaloneList = []
+for b in O.bodies:
+	if b.isStandalone:
+		standaloneList.append(b.id)
+
+print 'Roundness coefficient for spheres and clumps is: ',O.bodies.getRoundness([])			#give an empty list [] if no body should be excluded
+print 'Roundness coefficient just for clumps is: ',O.bodies.getRoundness(standaloneList)
 
 O.dt=1e-6
 
