@@ -388,7 +388,7 @@ class pyBodyContainer{
 				assert(member->isClumpMember());
 				if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
 					const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
-					if ((rndPoint - member->state->pos).norm() <= sphere->radius) isInside = true;
+					if ((rndPoint - member->state->pos).squaredNorm() <= pow(sphere->radius,2.)) { isInside = true; break; }
 				}
 			}
 			if (isInside) c_in += 1;
