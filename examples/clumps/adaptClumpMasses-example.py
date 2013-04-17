@@ -44,7 +44,10 @@ def printClumpMasses():
 print 'Mass info BEFORE adaptClumpMasses() is called: ----------------'
 printClumpMasses()
 
-massInfo = O.bodies.adaptClumpMasses([],10000000)		#give an empty list [] if no body should be excluded, number of tries for Monte-Carlo is set to 10000000
+massInfo = O.bodies.adaptClumpMasses([],10000000)		#give an empty list [] if no body should be excluded, number of grid points is set to 10000000
+
+#NOTE: the higher the number of grid points, the more precisely is the result, 
+#      but high numbers of clumps + high number of grid points = a looooong coffee break ...
 
 print 'Mass info AFTER adaptClumpMasses() is called: -----------------'
 printClumpMasses()

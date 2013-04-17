@@ -343,15 +343,11 @@ class pyBodyContainer{
 		}
 		return ret;
 	}
-	Real getClumpVolume(const shared_ptr<Body>& b, int num_tries){//Monte Carlo algorithm for estimation of clump volumes
+	Real getClumpVolume(const shared_ptr<Body>& b, int numTries){//algorithm for estimation of clump volumes
 		checkClump(b);
 		Scene* scene(Omega::instance().getScene().get());	// get scene
 		shared_ptr<Sphere> sph (new Sphere);
 		int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
-		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
-		static boost::minstd_rand randGen((int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
-		typedef boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > UniRandGen;
-		static UniRandGen rndUnit(randGen,boost::uniform_real<>(0,1));
 		//get boundaries of clump:
 		const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
 		std::map<Body::id_t,Se3r>& members = clump->members;
@@ -376,25 +372,30 @@ class pyBodyContainer{
 			}
 			else {PyErr_Warn(PyExc_UserWarning,("Warning: getClumpVolume method detected, that clump with id "+lexical_cast<string>(b->getId())+" has non-spherical members.").c_str()); return 0;}
 		}
-		//generate random points and check if point is inside or outside of clump:
-		Vector3r rndPoint;
+		//generate regular grid points and check if point is inside or outside of clump:
+		Vector3r gridPoint;
 		int c_in = 0;
-		for (int ii = 0; ii < num_tries; ii++){
-			bool isInside = false;
-			rndPoint = Vector3r(xmin + (xmax-xmin)*rndUnit(), ymin + (ymax-ymin)*rndUnit(), zmin + (zmax-zmin)*rndUnit());
-			FOREACH(MemberMap::value_type& mm, members){
-				const Body::id_t& memberId=mm.first;
-				const shared_ptr<Body>& member=Body::byId(memberId,scene);
-				assert(member->isClumpMember());
-				if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
-					const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
-					if ((rndPoint - member->state->pos).squaredNorm() <= pow(sphere->radius,2.)) { isInside = true; break; }
+		int numPoints1D = ceil(pow(numTries,1./3.));
+		for (int ii = 0; ii < numPoints1D; ii++){
+			for (int jj = 0; jj < numPoints1D; jj++){
+				for (int kk = 0; kk < numPoints1D; kk++){
+					bool isInside = false;
+					gridPoint = Vector3r(xmin + (xmax-xmin)*(ii+.5)/numPoints1D,ymin + (ymax-ymin)*(jj+.5)/numPoints1D,zmin + (zmax-zmin)*(kk+.5)/numPoints1D);
+					FOREACH(MemberMap::value_type& mm, members){
+						const Body::id_t& memberId=mm.first;
+						const shared_ptr<Body>& member=Body::byId(memberId,scene);
+						assert(member->isClumpMember());
+						if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
+							const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
+							if ((gridPoint - member->state->pos).squaredNorm() <= pow(sphere->radius,2.)) { isInside = true; break; }
+						}
+					}
+					if (isInside) c_in += 1;
 				}
 			}
-			if (isInside) c_in += 1;
 		}
 		//return estimated volume:
-		Real vol_estimated = ((1.*c_in)/(1.*num_tries))*abs(xmax-xmin)*abs(ymax-ymin)*abs(zmax-zmin);
+		Real vol_estimated = ((1.*c_in)/(1.*pow(numPoints1D,3.)))*abs(xmax-xmin)*abs(ymax-ymin)*abs(zmax-zmin);
 		if (vol_estimated <= 0.0) {PyErr_Warn(PyExc_UserWarning,("Something went wrong in getClumpVolume method (clump volume <= 0 detected for clump with id "+lexical_cast<string>(b->getId())+").").c_str()); return 0;}
 		else return vol_estimated;
 	}
@@ -941,8 +942,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns ``clumpId``.")
 		.def("addToClump",&pyBodyContainer::addToClump,"Add body b to an existing clump c. c must be clump and b may not be a clump member of c.\n\nSee **/examples/clumps/addToClump-example.py** for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
 		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release body b from clump c. b must be a clump member of c.\n\nSee **/examples/clumps/releaseFromClump-example.py** for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
-		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
-		.def("adaptClumpMasses",&pyBodyContainer::adaptClumpMasses,"Adapt clump masses via Monte-Carlo algorithm, that determines clump volume; returns a list of tuples: ``[(clumpId1,estimatedMassOfClump1),(clumpId2,estimatedMassOfClump2),...]``.\n\nIt is recommended to use this method, when clumps where created via :yref:`clump()<BodyContainer.clump>` or :yref:`appendClumped()<BodyContainer.appendClump>`. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.adaptClumpMasses([ids],100000) #number of tries for Monte-Carlo is set to 100000*\n\nSee **/examples/clumps/adaptClumpMasses-example.py** for an example script.")
+		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps, to adapt masses of clumps with multiple overlaps use :yref:`adaptClumpMasses()<BodyContainer.adaptClumpMasses>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
+		.def("adaptClumpMasses",&pyBodyContainer::adaptClumpMasses,"Adapt clump masses and inertia via deterministic Monte-Carlo algorithm, that estimates clump volume using a regular grid of points; returns a list of tuples: ``[(clumpId1,estimatedMassOfClump1),(clumpId2,estimatedMassOfClump2),...]``.\n\nIt is recommended to use this method, when clumps where created via :yref:`clump()<BodyContainer.clump>` or :yref:`appendClumped()<BodyContainer.appendClumped>`. This method could also be used to adapt masses of clumps with multiple overlaps (e.g. triple sections). Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.adaptClumpMasses([ids],1000000) #number of grid points is set to 1000000*\n\nSee **/examples/clumps/adaptClumpMasses-example.py** for an example script.")
 		.def("getRoundness",&pyBodyContainer::getRoundness,"Returns roundness coefficient RC = R2/R1. R1 is the theoretical radius of a sphere, with same volume as clump. R2 is the minimum radius of a sphere, that imbeds clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
