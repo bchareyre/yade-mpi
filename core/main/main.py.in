@@ -174,7 +174,7 @@ def userSession(qt4=False,qapp=None):
 			runScript(arg0)
 	if yade.runtime.opts.exitAfter: sys.exit(0)
 	# common ipython configuration
-	banner='[[ ^L clears screen, ^U kills line. '+', '.join((['F12 controller','F11 3d view','F10 both','F9 generator'] if (qt4) else [])+['F8 plot'])+'. ]]'
+	banner='[[ ^L clears screen, ^U kills line. '+', '.join((['F12 controller','F11 3d view (use h-key for showing help)','F10 both','F9 generator'] if (qt4) else [])+['F8 plot'])+'. ]]'
 	ipconfig=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py
 		prompt_in1='Yade [\#]: ',
 		prompt_in2='     .\D.: ',
