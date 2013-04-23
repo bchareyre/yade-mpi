@@ -13,6 +13,7 @@
 #include<yade/pkg/common/Wall.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib/base/Math.hpp>
+#include<yade/pkg/common/InteractionLoop.hpp>
 
 YADE_PLUGIN((Ig2_Facet_Sphere_ScGeom)(Ig2_Wall_Sphere_ScGeom));
 
@@ -26,6 +27,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 							const bool& force,
 							const shared_ptr<Interaction>& c)
 {
+	TIMING_DELTAS_START();
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	Facet*   facet = static_cast<Facet*>(cm1.get());
 	/* could be written as (needs to be tested):
@@ -45,7 +47,10 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	if (L<0) {normal=-normal; L=-L; }
 
 	Real sphereRadius = static_cast<Sphere*>(cm2.get())->radius;
-	if (L>sphereRadius && !c->isReal() && !force)  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
+	if (L>sphereRadius && !c->isReal() && !force) { // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
+		TIMING_DELTAS_CHECKPOINT("Ig2_Facet_Sphere_ScGeom");
+		return false;
+	}
 
 	Vector3r cp = cl - L*normal;
 	const Vector3r* ne = facet->ne;
@@ -111,8 +116,10 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 		scm->radius2 = sphereRadius;
 		if (isNew) c->geom = scm;
 		scm->precompute(state1,state2,scene,c,normal,isNew,shift2,false/*avoidGranularRatcheting only for sphere-sphere*/);
+		TIMING_DELTAS_CHECKPOINT("Ig2_Facet_Sphere_ScGeom");
 		return true;
 	}
+	TIMING_DELTAS_CHECKPOINT("Ig2_Facet_Sphere_ScGeom");
 	return false;
 }
 

@@ -50,7 +50,11 @@ class Engine: public Serializable{
 		((bool,dead,false,,"If true, this engine will not run at all; can be used for making an engine temporarily deactivated and only resurrect it at a later point."))
 		((int, ompThreads, -1,,"Number of threads to be used in the engine. If ompThreads<0 (default), the number will be typically OMP_NUM_THREADS or the number N defined by 'yade -jN' (this behavior can depend on the engine though). This attribute will only affect engines whose code includes openMP parallel regions (e.g. :yref:`InteractionLoop`). This attribute is mostly usefull for experiments or when combining :yref:`ParallelEngine` with engines that run parallel regions, resulting in nested OMP loops with different number of threads at each level."))
 		((string,label,,,"Textual label for this object; must be valid python identifier, you can refer to it directly from python.")),
-		/* ctor */ scene=Omega::instance().getScene().get() ,
+		/* ctor */ scene=Omega::instance().getScene().get();
+		#ifdef USE_TIMING_DELTAS
+			timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+		#endif
+		,
 		/* py */
 		.add_property("execTime",&Engine::timingInfo_nsec_get,&Engine::timingInfo_nsec_set,"Cummulative time this Engine took to run (only used if :yref:`O.timingEnabled<Omega.timingEnabled>`\\ ==\\ ``True``).")
 		.add_property("execCount",&Engine::timingInfo_nExec_get,&Engine::timingInfo_nExec_set,"Cummulative count this engine was run (only used if :yref:`O.timingEnabled<Omega.timingEnabled>`\\ ==\\ ``True``).")

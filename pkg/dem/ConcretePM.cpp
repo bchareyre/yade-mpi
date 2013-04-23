@@ -3,8 +3,10 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
+#include<yade/pkg/common/InteractionLoop.hpp>
 
-YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_SomeGeom_CpmPhys_Cpm)(Law2_Dem3DofGeom_CpmPhys_Cpm)(Law2_ScGeom_CpmPhys_Cpm)
+
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_ScGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(Gl1_CpmPhys)
 	#endif	
@@ -16,9 +18,11 @@ YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_Fr
 
 CREATE_LOGGER(Ip2_FrictMat_CpmMat_FrictPhys);
 void Ip2_FrictMat_CpmMat_FrictPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
+	TIMING_DELTAS_START();
 	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(pp1);
 	const shared_ptr<CpmMat>& mat2 = YADE_PTR_CAST<CpmMat>(pp2);
 	Ip2_FrictMat_FrictMat_FrictPhys().go(mat1,mat2,interaction);
+	TIMING_DELTAS_CHECKPOINT("end of Ip2_FritPhys");
 }
 
 
@@ -26,6 +30,7 @@ void Ip2_FrictMat_CpmMat_FrictPhys::go(const shared_ptr<Material>& pp1, const sh
 
 CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
+	TIMING_DELTAS_START();
 	// no updates of an already existing contact necessary
 	if (interaction->phys) return;
 	shared_ptr<CpmPhys> cpmPhys(new CpmPhys());
@@ -84,8 +89,9 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 		#undef _AVGATTR
 	}
 
-	// NOTE: some params are not assigned until in Law2_SomeGeom_CpmPhys_Cpm, since they need geometry as well; those are:
+	// NOTE: some params are not assigned until in Law2_ScGeom_CpmPhys_Cpm, since they need geometry as well; those are:
 	// 	crossSection, kn, ks, refLength
+	TIMING_DELTAS_CHECKPOINT("end of Ip2_CpmPhys");
 }
 
 
@@ -230,8 +236,7 @@ void CpmPhys::setRelResidualStrength(Real r) {
 
 
 
-/********************** Law2_SomeGeom_CpmPhys_Cpm ****************************/
-CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
+/********************** Law2_ScGeom_CpmPhys_Cpm ****************************/
 CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
@@ -241,53 +246,10 @@ CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 // #undef CPM_MATERIAL_MODEL (force trunk version of the model)
 
 
-#ifdef CPM_MATERIAL_MODEL
-	#define CPM_MATERIAL_MODEL_A \
-		Real& epsNPl(phys->epsNPl);\
-		const Real& dt = scene->dt;\
-		const Real& dmgTau(phys->dmgTau);\
-		const Real& plTau(phys->plTau);\
-		const Real& yieldLogSpeed(this->yieldLogSpeed);\
-		const int& yieldSurfType(this->yieldSurfType);\
-		const Real& yieldEllipseShift(this->yieldEllipseShift);\
-		const Real& epsSoft(this->epsSoft);\
-		const Real& relKnSoft(this->relKnSoft);
-#else
-	#define CPM_MATERIAL_MODEL_A
-#endif
 
 
-// constitutive law 
-#ifdef CPM_MATERIAL_MODEL
-	#define CPM_MATERIAL_MODEL_B \
-		/* complicated version */ \
-		if (epsSoft >= 0) epsN += phys->isoPrestress/E; \
-		else { /* take softening into account for the prestress */ \
-			Real sigmaSoft=E*epsSoft;\
-			if (phys->isoPrestress >= sigmaSoft) epsN += phys -> isoPrestress/E; /* on the non-softened branch yet */ \
-			/* otherwise take the regular and softened branches separately (different moduli) */ \
-			else epsN += sigmaSoft/E+(phys->isoPrestress-sigmaSoft)/(E*relKnSoft);\
-		} \
-		CPM_MATERIAL_MODEL
-#else
-	#define CPM_MATERIAL_MODEL_B \
-		/* simplified public model */ \
-		epsN += phys->isoPrestress/E; \
-		/* very simplified version of the constitutive law */ \
-		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */ \
-		/* Real epsFracture = crackOpening/geom->refLength; */ \
-		omega = isCohesive? phys->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */ \
-		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */ \
-		sigmaT = G*epsT; /* trial stress */ \
-		Real yieldSigmaT = max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); /* Mohr-Coulomb law with damage */ \
-		if (sigmaT.squaredNorm() > yieldSigmaT*yieldSigmaT) { \
-			Real scale = yieldSigmaT/sigmaT.norm(); \
-			sigmaT *= scale; /* stress return */ \
-			epsT *= scale; \
-			/* epsPlSum += yieldSigmaT*geom->slipToStrainTMax(yieldSigmaT/G);*/ /* adjust strain */ \
-		} \
-		relResidualStrength = isCohesive? (kappaD<epsCrackOnset? 1. : (1-omega)*(kappaD)/epsCrackOnset) : 0;
-#endif
+
+
 
 
 #ifdef YADE_DEBUG
@@ -305,114 +267,117 @@ CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 #define NNAN(a) YADE_VERIFY(!isnan(a));
 #define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
 
-
-
-#define CPM_GO_A \
-	/* just the first time */ \
-	if (I->isFresh(scene)) { \
-		Vector3r pos1 = scene->bodies->operator[](I->id1)->state->pos; \
-		Vector3r pos2 = scene->bodies->operator[](I->id2)->state->pos; \
-		Real minRad = (geom->refR1 <= 0? geom->refR2 : (geom->refR2 <=0? geom->refR1 : min(geom->refR1,geom->refR2))); \
-		Vector3r shift2 = scene->isPeriodic? Vector3r(scene->cell->hSize*I->cellDist.cast<Real>()) : Vector3r::Zero();\
-		phys->refLength = (pos2 - pos1 + shift2).norm(); \
-		phys->crossSection = Mathr::PI*pow(minRad,2); \
-		phys->refPD = geom->refR1 + geom->refR2 - phys->refLength; \
-		phys->kn = phys->crossSection*phys->E/phys->refLength; \
-		phys->ks = phys->crossSection*phys->G/phys->refLength; \
-		phys->epsFracture = isnan(phys->crackOpening)? phys->epsCrackOnset*phys->relDuctility : phys->crackOpening/(2*minRad); /* *geom->refLength */; \
-	} \
-	\
-	/* shorthands */ \
-	Real& epsN(phys->epsN); \
-	Vector3r& epsT(phys->epsT); \
-	Real& kappaD(phys->kappaD); \
-	/* Real& epsPlSum(phys->epsPlSum); */ \
-	const Real& E(phys->E); \
-	const Real& undamagedCohesion(phys->undamagedCohesion); \
-	const Real& tanFrictionAngle(phys->tanFrictionAngle); \
-	const Real& G(phys->G); \
-	const Real& crossSection(phys->crossSection); \
-	const Real& omegaThreshold(this->omegaThreshold); \
-	const Real& epsCrackOnset(phys->epsCrackOnset); \
-	Real& relResidualStrength(phys->relResidualStrength); \
-	/*const Real& crackOpening(phys->crackOpening); */ \
-	/*const Real& relDuctility(phys->relDuctility); */ \
-	const Real& epsFracture(phys->epsFracture); \
-	const int& damLaw(phys->damLaw); \
-	const bool& neverDamage(phys->neverDamage); \
-	Real& omega(phys->omega); \
-	Real& sigmaN(phys->sigmaN); \
-	Vector3r& sigmaT(phys->sigmaT); \
-	Real& Fn(phys->Fn); \
-	Vector3r& Fs(phys->Fs); /* for python access */ \
-	const bool& isCohesive(phys->isCohesive); \
-	\
-	CPM_MATERIAL_MODEL_A
-
-#define CPM_GO_B \
-	/* debugging */ \
-	CPM_YADE_DEBUG_A \
-	\
-	NNAN(epsN); NNANV(epsT); \
-	\
-	/* constitutive law */ \
-	CPM_MATERIAL_MODEL_B \
-	\
-	sigmaN -= phys->isoPrestress; \
-	\
-	NNAN(kappaD); NNAN(epsFracture); NNAN(omega); \
-	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection); \
-	\
-	/* handle broken contacts */ \
-	if (epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)) { \
-		/* if (isCohesive) { */ \
-			 const shared_ptr<Body>& body1 = Body::byId(I->getId1(),scene), body2 = Body::byId(I->getId2(),scene); assert(body1); assert(body2); \
-			 const shared_ptr<CpmState>& st1 = YADE_PTR_CAST<CpmState>(body1->state), st2 = YADE_PTR_CAST<CpmState>(body2->state); \
-			/* nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/ */ \
-			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive += 1; /* st1->epsPlBroken += epsPlSum; */ } \
-			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive += 1; /* st2->epsPlBroken += epsPlSum; */ } \
-		/* } */ \
-		scene->interactions->requestErase(I); \
-		return; \
-	} \
-	\
-	Fn = sigmaN*crossSection; phys->normalForce = -Fn*geom->normal; \
-	Fs = sigmaT*crossSection; phys->shearForce = -Fs;
-
-
-
-
-
-
-void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
-	Dem3DofGeom* geom = static_cast<Dem3DofGeom*>(_geom.get());
-	CpmPhys* phys = static_cast<CpmPhys*>(_phys.get());
-	
-	CPM_GO_A
-
-	epsN = geom->strainN();
-	epsT = geom->strainT();
-
-	CPM_GO_B
-
-	applyForceAtContactPoint(-phys->normalForce - phys->shearForce, geom->contactPoint, I->getId1(), geom->se31.position, I->getId2(), geom->se32.position);
-}
-
-
-
-
-
 void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
+	TIMING_DELTAS_START();
 	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
 	CpmPhys* phys=static_cast<CpmPhys*>(_phys.get());
 
-	CPM_GO_A
+	/* just the first time */
+	if (I->isFresh(scene)) {
+		Vector3r pos1 = scene->bodies->operator[](I->id1)->state->pos;
+		Vector3r pos2 = scene->bodies->operator[](I->id2)->state->pos;
+		Real minRad = (geom->refR1 <= 0? geom->refR2 : (geom->refR2 <=0? geom->refR1 : min(geom->refR1,geom->refR2)));
+		Vector3r shift2 = scene->isPeriodic? Vector3r(scene->cell->hSize*I->cellDist.cast<Real>()) : Vector3r::Zero();
+		phys->refLength = (pos2 - pos1 + shift2).norm();
+		phys->crossSection = Mathr::PI*pow(minRad,2);
+		phys->refPD = geom->refR1 + geom->refR2 - phys->refLength;
+		phys->kn = phys->crossSection*phys->E/phys->refLength;
+		phys->ks = phys->crossSection*phys->G/phys->refLength;
+		phys->epsFracture = isnan(phys->crackOpening)? phys->epsCrackOnset*phys->relDuctility : phys->crackOpening/(2*minRad); /* *geom->refLength */;
+	}
+	
+	/* shorthands */
+	Real& epsN(phys->epsN);
+	Vector3r& epsT(phys->epsT);
+	Real& kappaD(phys->kappaD);
+	/* Real& epsPlSum(phys->epsPlSum); */
+	const Real& E(phys->E); \
+	const Real& undamagedCohesion(phys->undamagedCohesion);
+	const Real& tanFrictionAngle(phys->tanFrictionAngle);
+	const Real& G(phys->G);
+	const Real& crossSection(phys->crossSection);
+	const Real& omegaThreshold(this->omegaThreshold);
+	const Real& epsCrackOnset(phys->epsCrackOnset);
+	Real& relResidualStrength(phys->relResidualStrength);
+	/*const Real& crackOpening(phys->crackOpening); */
+	/*const Real& relDuctility(phys->relDuctility); */
+	const Real& epsFracture(phys->epsFracture);
+	const int& damLaw(phys->damLaw);
+	const bool& neverDamage(phys->neverDamage);
+	Real& omega(phys->omega);
+	Real& sigmaN(phys->sigmaN);
+	Vector3r& sigmaT(phys->sigmaT);
+	Real& Fn(phys->Fn);
+	Vector3r& Fs(phys->Fs); /* for python access */
+	const bool& isCohesive(phys->isCohesive);
+
+	#ifdef CPM_MATERIAL_MODEL
+		Real& epsNPl(phys->epsNPl);
+		const Real& dt = scene->dt;
+		const Real& dmgTau(phys->dmgTau);
+		const Real& plTau(phys->plTau);
+		const Real& yieldLogSpeed(this->yieldLogSpeed);
+		const int& yieldSurfType(this->yieldSurfType);
+		const Real& yieldEllipseShift(this->yieldEllipseShift);
+		const Real& epsSoft(this->epsSoft);
+		const Real& relKnSoft(this->relKnSoft);
+	#endif
+
+	TIMING_DELTAS_CHECKPOINT("GO A");
 	
 	epsN = - (-phys->refPD + geom->penetrationDepth) / phys->refLength;
 	epsT = geom->rotate(epsT);
 	epsT += geom->shearIncrement() / (phys->refLength + phys->refPD) ; 
 
-	CPM_GO_B
+	/* debugging */
+	CPM_YADE_DEBUG_A
+
+	NNAN(epsN); NNANV(epsT);
+
+	/* constitutive law */
+	#ifdef CPM_MATERIAL_MODEL
+		CPM_MATERIAL_MODEL
+	#else
+		/* simplified public model */
+		epsN += phys->isoPrestress/E;
+		/* very simplified version of the constitutive law */
+		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */
+		/* Real epsFracture = crackOpening/geom->refLength; */
+		omega = isCohesive? phys->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */
+		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */
+		sigmaT = G*epsT; /* trial stress */
+		Real yieldSigmaT = max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); /* Mohr-Coulomb law with damage */
+		if (sigmaT.squaredNorm() > yieldSigmaT*yieldSigmaT) {
+			Real scale = yieldSigmaT/sigmaT.norm();
+			sigmaT *= scale; /* stress return */
+			epsT *= scale;
+			/* epsPlSum += yieldSigmaT*geom->slipToStrainTMax(yieldSigmaT/G);*/ /* adjust strain */
+		}
+		relResidualStrength = isCohesive? (kappaD<epsCrackOnset? 1. : (1-omega)*(kappaD)/epsCrackOnset) : 0;
+	#endif
+
+	sigmaN -= phys->isoPrestress;
+
+	NNAN(kappaD); NNAN(epsFracture); NNAN(omega);
+	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
+
+	/* handle broken contacts */
+	if (epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)) {
+		/* if (isCohesive) { */
+			 const shared_ptr<Body>& body1 = Body::byId(I->getId1(),scene), body2 = Body::byId(I->getId2(),scene); assert(body1); assert(body2);
+			 const shared_ptr<CpmState>& st1 = YADE_PTR_CAST<CpmState>(body1->state), st2 = YADE_PTR_CAST<CpmState>(body2->state);
+			/* nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/ */
+			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive += 1; /* st1->epsPlBroken += epsPlSum; */ }
+			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive += 1; /* st2->epsPlBroken += epsPlSum; */ }
+		/* } */
+		scene->interactions->requestErase(I);
+		return;
+	} \
+
+	Fn = sigmaN*crossSection; phys->normalForce = -Fn*geom->normal;
+	Fs = sigmaT*crossSection; phys->shearForce = -Fs;
+
+	TIMING_DELTAS_CHECKPOINT("GO B");
 
 	Body::id_t id1 = I->getId1();
  	Body::id_t id2 = I->getId2();
@@ -429,6 +394,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		scene->forces.addTorque(id1,(geom->radius1+.5*(phys->refPD-geom->penetrationDepth))*geom->normal.cross(f));
 		scene->forces.addTorque(id2,(geom->radius2+.5*(phys->refPD-geom->penetrationDepth))*geom->normal.cross(f));
 	}
+	TIMING_DELTAS_CHECKPOINT("rest");
 }
 
 

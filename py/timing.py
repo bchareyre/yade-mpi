@@ -45,7 +45,7 @@ def _delta_stats(deltas,totalTime,level):
 	for d in deltas.data:
 		print _formatLine(d[0],d[1],d[2],totalTime,level); ret+=1
 	if len(deltas.data)>1:
-		print _formatLine('TOTAL',deltaTime,-1,totalTime,level); ret+=1
+		print _formatLine('TOTAL',deltaTime,sum(d[2] for d in deltas.data),totalTime,level); ret+=1
 	return ret
 
 def _engines_stats(engines,totalTime,level):
@@ -54,7 +54,7 @@ def _engines_stats(engines,totalTime,level):
 		if not isinstance(e,Functor): print _formatLine(u'"'+e.label+'"' if e.label else e.__class__.__name__,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
 		if e.timingDeltas: 
 			if isinstance(e,Functor):
-				print _formatLine(e.__class__.__name__,-1,-1,-1,level); lines+=1; hereLines+=1
+				print _formatLine(e.__class__.__name__,sum(d[1] for d in e.timingDeltas.data),sum(d[2] for d in e.timingDeltas.data),totalTime,level); lines+=1; hereLines+=1
 				execTime=sum([d[1] for d in e.timingDeltas.data])
 			else: execTime=e.execTime
 			lines+=_delta_stats(e.timingDeltas,execTime,level+1)

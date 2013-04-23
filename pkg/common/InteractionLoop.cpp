@@ -19,18 +19,8 @@ void InteractionLoop::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
 	t=python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
 }
 
-// #define IDISP_TIMING
-
-#ifdef IDISP_TIMING
-	#define IDISP_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)
-#else
-	#define IDISP_CHECKPOINT(cpt)
-#endif
 
 void InteractionLoop::action(){
-	#ifdef IDISP_TIMING
-		timingDeltas->start();
-	#endif
 	if(eraseIntsInLoop && scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;

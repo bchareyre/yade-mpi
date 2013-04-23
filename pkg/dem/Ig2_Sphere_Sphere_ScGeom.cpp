@@ -8,15 +8,21 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/core/Omega.hpp>
+#include<yade/pkg/common/InteractionLoop.hpp>
 
 bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
 {
+	TIMING_DELTAS_START();
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	const Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
 	Vector3r normal=(se32.position+shift2)-se31.position;
 	if (!c->isReal() && !force) {//don't fast-check distance if geometry will be updated anyway
 		Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.squaredNorm();
-		if (penetrationDepthSq<0) return false;}
+		if (penetrationDepthSq<0) {
+			TIMING_DELTAS_CHECKPOINT("Ig2_Sphere_Sphere_ScGeom");
+			return false;
+		}
+	}
 	shared_ptr<ScGeom> scm;
 	bool isNew = !c->geom;
 	if(!isNew) scm=YADE_PTR_CAST<ScGeom>(c->geom);
@@ -31,6 +37,7 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1, const shared_pt
 	scm->radius1=s1->radius;
 	scm->radius2=s2->radius;
 	scm->precompute(state1,state2,scene,c,normal,isNew,shift2,avoidGranularRatcheting);
+	TIMING_DELTAS_CHECKPOINT("Ig2_Sphere_Sphere_ScGeom");
 	return true;
 }
 

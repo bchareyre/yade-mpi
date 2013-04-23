@@ -99,7 +99,7 @@ class CpmMat: public FrictMat {
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\n\t:yref:`Density<Material::density>` is initialized to 4800 kgm⁻³automatically, which gives approximate 2800 kgm⁻³ on 0.5 density packing.\n\nConcrete Particle Model (CPM)\n\n\n:yref:`CpmMat` is particle material, :yref:`Ip2_CpmMat_CpmMat_CpmPhys` averages two particles' materials, creating :yref:`CpmPhys`, which is then used in interaction resultion by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`. :yref:`CpmState` is associated to :yref:`CpmMat` and keeps state defined on particles rather than interactions (such as number of completely damaged interactions).\n\nThe model is contained in externally defined macro CPM_MATERIAL_MODEL, which features damage in tension, plasticity in shear and compression and rate-dependence. For commercial reasons, rate-dependence and compression-plasticity is not present in reduced version of the model, used when CPM_MATERIAL_MODEL is not defined. The full model will be described in detail in my (Václav Šmilauer) thesis along with calibration procedures (rigidity, poisson's ratio, compressive/tensile strength ratio, fracture energy, behavior under confinement, rate-dependent behavior).\n\nEven the public model is useful enough to run simulation on concrete samples, such as :ysrc:`uniaxial tension-compression test<examples/concrete/uniax.py>`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\n\t:yref:`Density<Material::density>` is initialized to 4800 kgm⁻³automatically, which gives approximate 2800 kgm⁻³ on 0.5 density packing.\n\nConcrete Particle Model (CPM)\n\n\n:yref:`CpmMat` is particle material, :yref:`Ip2_CpmMat_CpmMat_CpmPhys` averages two particles' materials, creating :yref:`CpmPhys`, which is then used in interaction resultion by :yref:`Law2_ScGeom_CpmPhys_Cpm`. :yref:`CpmState` is associated to :yref:`CpmMat` and keeps state defined on particles rather than interactions (such as number of completely damaged interactions).\n\nThe model is contained in externally defined macro CPM_MATERIAL_MODEL, which features damage in tension, plasticity in shear and compression and rate-dependence. For commercial reasons, rate-dependence and compression-plasticity is not present in reduced version of the model, used when CPM_MATERIAL_MODEL is not defined. The full model will be described in detail in my (Václav Šmilauer) thesis along with calibration procedures (rigidity, poisson's ratio, compressive/tensile strength ratio, fracture energy, behavior under confinement, rate-dependent behavior).\n\nEven the public model is useful enough to run simulation on concrete samples, such as :ysrc:`uniaxial tension-compression test<examples/concrete/uniax.py>`.",
 		((Real,sigmaT,NaN,,"Initial cohesion [Pa]"))
 		((bool,neverDamage,false,,"If true, no damage will occur (for testing only)."))
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
@@ -132,14 +132,14 @@ REGISTER_SERIALIZABLE(CpmMat);
 
 /*! @brief representation of a single interaction of the CPM type: storage for relevant parameters.
  *
- * Evolution of the contact is governed by Law2_Dem3DofGeom_CpmPhys_Cpm:
+ * Evolution of the contact is governed by Law2_ScGeom_CpmPhys_Cpm:
  * that includes damage effects and chages of parameters inside CpmPhys.
  *
  */
 class CpmPhys: public NormShearPhys {
 	public:
 		static long cummBetaIter, cummBetaCount;
-		/*! auxiliary variable for visualization, recalculated in Law2_Dem3DofGeom_CpmPhys_Cpm at every iteration */
+		/*! auxiliary variable for visualization, recalculated in Law2_ScGeom_CpmPhys_Cpm at every iteration */
 		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormShearPhys 
 		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r sigmaT, Fs;
 
@@ -156,7 +156,7 @@ class CpmPhys: public NormShearPhys {
 		void setRelResidualStrength(Real r);
 
 		virtual ~CpmPhys();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` or :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :yref:`cpm-model<CpmMat>` for details.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :yref:`cpm-model<CpmMat>` for details.",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,G,NaN,,"shear modulus [Pa]"))
 			((Real,tanFrictionAngle,NaN,,"tangens of internal friction angle [-]"))
@@ -182,7 +182,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,epsTrans,0,,"Transversal strain (perpendicular to the contact axis)"))
 			//((Real,epsPlSum,0,,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than zero."))
-			((Vector3r,epsT,Vector3r::Zero(),,"Total shear strain (either computed from increments with :yref:`ScGeom` or simple copied with :yref:`Dem3DofGeom`) |yupdate|"))
+			((Vector3r,epsT,Vector3r::Zero(),,"Total shear strain (either computed from increments with :yref:`ScGeom`) |yupdate|"))
 			,
 			createIndex(); epsT=Fs=Vector3r::Zero(); Fn=0; omega=0;
 			,
@@ -250,10 +250,9 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 *
 *********************************************************************************/
 
-class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
+class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
-	/* Damage evolution law */
-
+	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) {
 #ifdef CPM_MATERIAL_MODEL
@@ -267,7 +266,7 @@ class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 	//void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 
 	FUNCTOR2D(GenericSpheresContact,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SomeGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
 		((int,yieldSurfType,2,,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
 		((Real,yieldLogSpeed,.1,,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
 		((Real,yieldEllipseShift,NaN,,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
@@ -275,39 +274,7 @@ class Law2_SomeGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
-		.def("yieldSigmaTMagnitude",&Law2_SomeGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
-	);
-	DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(Law2_SomeGeom_CpmPhys_Cpm);
-
-
-
-
-class Law2_Dem3DofGeom_CpmPhys_Cpm: public Law2_SomeGeom_CpmPhys_Cpm{
-	public:
-	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
-
-	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,Law2_SomeGeom_CpmPhys_Cpm,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
-		,
-		/*ctor*/,
-	);
-	DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
-
-
-
-
-class Law2_ScGeom_CpmPhys_Cpm: public Law2_SomeGeom_CpmPhys_Cpm{
-	public:
-	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
-
-	FUNCTOR2D(ScGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_CpmPhys_Cpm,Law2_SomeGeom_CpmPhys_Cpm,"Constitutive law for the :yref:`cpm-model<CpmMat>`.",
-		,
-		/*ctor*/,
+		.def("yieldSigmaTMagnitude",&Law2_ScGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;
 };
@@ -328,7 +295,6 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 * C P M   O P E N   G L
 *
 *********************************************************************************/
-
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg/common/GLDrawFunctors.hpp>
