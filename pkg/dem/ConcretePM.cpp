@@ -42,12 +42,12 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	if (!mat1->neverDamage) {
 		assert(!isnan(mat1->sigmaT));
 		assert(!isnan(mat1->epsCrackOnset));
-		!isnan(mat1->relDuctility));
+		assert(!isnan(mat1->relDuctility));
 	}
 	if (!mat2->neverDamage) {
 		assert(!isnan(mat2->sigmaT));
 		assert(!isnan(mat2->epsCrackOnset));
-		!isnan(mat2->relDuctility));
+		assert(!isnan(mat2->relDuctility));
 	}
 
 	cpmPhys->damLaw = mat1->damLaw;
