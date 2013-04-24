@@ -1158,7 +1158,7 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 		   YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"docstring",
 		      /* attrs */,
 		      /* constructor */
-		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas); // timingDeltas object is automatically initialized when using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option
 		   );
 		   // ...
 		};
@@ -1184,6 +1184,25 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 		   timingDeltas->checkpoint("material");
 		   // apply forces, cleanup here
 		   timingDeltas->checkpoint("rest");
+		}
+
+#. Alternatively, you can compile Yade using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option and use predefined macros TIMING_DELTAS_START and TIMING_DELTAS_CHECKPOINT. Without -DUSE_TIMING_DELTAS options, those macros are empty and do nothing.
+	.. code-block:: c++
+
+		void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
+		                                      shared_ptr<IPhys>& _phys,
+		                                      Interaction* I,
+		                                      Scene* scene)
+		{
+		   TIMING_DELTAS_START();
+		   // prepare some variables etc here
+		   TIMING_DELTAS_CHECKPOINT("setup")
+		   // find geometrical data (deformations) here
+		   TIMING_DELTAS_CHECKPOINT("geom")
+		   // compute forces here
+		   TIMING_DELTAS_CHECKPOINT("material")
+		   // apply forces, cleanup here
+		   TIMING_DELTAS_CHECKPOINT("rest")
 		}
 
 The output might look like this (note that functors are nested inside dispatchers and ``TimingDeltas`` inside their engine/functor)::

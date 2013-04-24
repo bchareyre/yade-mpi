@@ -344,7 +344,11 @@ def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 	for line in f:
 		if line.startswith('134'): # read nodes coordinates
 			ls = line.split(',')
-			v = Vector3( float(ls[1]), float(ls[2]), float(ls[3]) ) * scale + shift 
+			v = Vector3(
+				float(ls[1])*scale + shift[0],
+				float(ls[2])*scale + shift[1],
+				float(ls[3])*scale + shift[2]
+			)
 			nodes.append(v)
 		if line.startswith('136'): # read elements
 			ls = line.split(',')

@@ -64,7 +64,7 @@ def _engines_stats(engines,totalTime,level):
 			lines+=_engines_stats(e.physDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.lawDispatcher.functors,e.execTime,level+1)
 		elif isinstance(e,ParallelEngine): lines+=_engines_stats(e.slave,e.execTime,level+1)
-	if hereLines>1:
+	if hereLines>1 and not isinstance(e,Functor):
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1
 	return lines
 
@@ -73,27 +73,50 @@ def stats():
 
 	.. code-block:: none
 
-		Name                                     Count                 Time        Rel. time
-		------------------------------------------------------------------------------------
-		ForceResetter                        400               9449μs            0.01%      
-		BoundingVolumeMetaEngine             400            1171770μs            1.15%      
-		PersistentSAPCollider                400            9433093μs            9.24%      
-		InteractionGeometryMetaEngine        400           15177607μs           14.87%      
-		InteractionPhysicsMetaEngine         400            9518738μs            9.33%      
-		ConstitutiveLawDispatcher            400           64810867μs           63.49%      
-		  ef2_Spheres_Brefcom_BrefcomLaw                                                    
-			 setup                            4926145            7649131μs           15.25%  
-			 geom                             4926145           23216292μs           46.28%  
-			 material                         4926145            8595686μs           17.14%  
-			 rest                             4926145           10700007μs           21.33%  
-			 TOTAL                                              50161117μs          100.00%  
-		"damper"                             400            1866816μs            1.83%      
-		"strainer"                           400              21589μs            0.02%      
-		"plotDataCollector"                  160              64284μs            0.06%      
-		"damageChecker"                        9               3272μs            0.00%      
-		TOTAL                                             102077490μs          100.00%      
+		Name                                                    Count                 Time            Rel. time
+		-------------------------------------------------------------------------------------------------------
+		ForceResetter                                       102               2150us                0.02%      
+		"collider"                                            5              64200us                0.60%      
+		InteractionLoop                                     102           10571887us               98.49%      
+		"combEngine"                                        102               8362us                0.08%      
+		"newton"                                            102              73166us                0.68%      
+		"cpmStateUpdater"                                     1               9605us                0.09%      
+		PyRunner                                              1                136us                0.00%      
+		"plotDataCollector"                                   1                291us                0.00%      
+		TOTAL                                                             10733564us              100.00%
+
+
+	sample output (compiled with -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" option):
+
+	.. code-block:: none
+
+		Name                                                    Count                 Time            Rel. time
+		-------------------------------------------------------------------------------------------------------
+		ForceResetter                                       102               2150us                0.02%      
+		"collider"                                            5              64200us                0.60%      
+		InteractionLoop                                     102           10571887us               98.49%      
+		  Ig2_Sphere_Sphere_ScGeom                        1222186            1723168us               16.30%    
+		    Ig2_Sphere_Sphere_ScGeom                        1222186            1723168us              100.00%  
+		  Ig2_Facet_Sphere_ScGeom                             753               1157us                0.01%    
+		    Ig2_Facet_Sphere_ScGeom                             753               1157us              100.00%  
+		  Ip2_CpmMat_CpmMat_CpmPhys                         11712              26015us                0.25%    
+		    end of Ip2_CpmPhys                                11712              26015us              100.00%  
+		  Ip2_FrictMat_CpmMat_FrictPhys                         0                  0us                0.00%    
+		  Law2_ScGeom_CpmPhys_Cpm                         3583872            4819289us               45.59%    
+		    GO A                                            1194624            1423738us               29.54%  
+		    GO B                                            1194624            1801250us               37.38%  
+		    rest                                            1194624            1594300us               33.08%  
+		    TOTAL                                           3583872            4819289us              100.00%  
+		  Law2_ScGeom_FrictPhys_CundallStrack                   0                  0us                0.00%    
+		"combEngine"                                        102               8362us                0.08%      
+		"newton"                                            102              73166us                0.68%      
+		"cpmStateUpdater"                                     1               9605us                0.09%      
+		PyRunner                                              1                136us                0.00%      
+		"plotDataCollector"                                   1                291us                0.00%      
+		TOTAL                                                             10733564us              100.00%
 
 	"""
+
 	print 'Name'.ljust(_statCols['label'])+' '+'Count'.rjust(_statCols['count'])+' '+'Time'.rjust(_statCols['time'])+' '+'Rel. time'.rjust(_statCols['relTime'])
 	print '-'*(sum([_statCols[k] for k in _statCols])+len(_statCols)-1)
 	_engines_stats(O.engines,sum([e.execTime for e in O.engines]),0)
