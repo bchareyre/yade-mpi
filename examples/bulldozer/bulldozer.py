@@ -64,9 +64,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_L3Geom(),Ig2_Facet_Sphere_L3Geom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_L3Geom_FrictPhys_ElPerfPl()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	TranslationEngine(translationAxis=[1,0,0],velocity=5,ids=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=.3,gravity=(0,0,-9.8)),

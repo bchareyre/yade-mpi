@@ -93,16 +93,16 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb')],verletDist=.05*avgRadius),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
+		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ss2d3dg')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
-		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
+		[Law2_ScGeom_CpmPhys_Cpm()],
 	),
 	NewtonIntegrator(damping=damping,label='newton'),
 	CpmStateUpdater(realPeriod=1,label='updater'),
 	#
 	#UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	#
-	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),label='strainer',useDem3Dof=False,globUpdate=2),
+	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),label='strainer',globUpdate=2),
 	PyRunner(virtPeriod=1e-5/strainRateTension,command='addPlotData()',label='plotDataCollector'),
 	PyRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
@@ -147,7 +147,7 @@ def initTest():
 	print "init done, will now run."
 	O.step(); O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
-	ss2d3dg.distFactor=-1.
+	ss2d3dg.interactionDetectionFactor=-1.
 	is2aabb.aabbEnlargeFactor=-1.
 	O.run()
 

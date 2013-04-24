@@ -38,8 +38,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=enlargeFactor,label='bo1s')]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=enlargeFactor,label='ig2ss')],
-		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_Dem3DofGeom_CpmPhys_Cpm()]),
+		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=enlargeFactor,label='ig2ss')],
+		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_ScGeom_CpmPhys_Cpm()]),
 	NewtonIntegrator(),
 	Peri3dController(	goal=(0,0,0, 0,0,5e-3), # Vector6 of prescribed final values
 							stressMask=0b011111,
@@ -51,7 +51,7 @@ O.engines=[
 	PyRunner(command='plotAddData()',iterPeriod=1),
 ]
 O.step()
-#bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
+bo1s.aabbEnlargeFactor=ig2ss.interactionDetectionFactor=1.0
 
 renderer=qt.Renderer()
 renderer.intrPhys,renderer.shape=True,False

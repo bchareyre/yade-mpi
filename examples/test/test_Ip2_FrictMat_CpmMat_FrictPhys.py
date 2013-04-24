@@ -10,7 +10,6 @@ frictionAngle=atan(1)
 density=4800 ## 4800  # twice the density, since porosity is about .5 (.62)
 epsCrackOnset=1e-4
 relDuctility=300
-#crackOpening=.15e-3*1e-4*30*100
 intRadius=1.5
 
 concMat  = O.materials.append(CpmMat(young=young,poisson=poisson,density=4800,sigmaT=3e6,relDuctility=30,epsCrackOnset=1e-4,neverDamage=False))

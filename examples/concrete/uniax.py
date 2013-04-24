@@ -46,7 +46,7 @@ readParamsFromTable(noTableOk=True, # unknownOk=True,
 	sigmaT=3.5e6,
 	frictionAngle=atan(0.8),
 	epsCrackOnset=1e-4,
-	crackOpening=1e-6,
+	relDuctility=30,
 
 	intRadius=1.5,
 	dtSafety=.8,
@@ -62,9 +62,6 @@ readParamsFromTable(noTableOk=True, # unknownOk=True,
 
 	# isotropic confinement (should be negative)
 	isoPrestress=0,
-
-	# use the ScGeom variant
-	scGeom=False
 )
 
 from yade.params.table import *
@@ -75,7 +72,7 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,crackOpening=crackOpening,epsCrackOnset=epsCrackOnset,isoPrestress=isoPrestress))
+concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,isoPrestress=isoPrestress))
 
 spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
 #spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')
@@ -93,12 +90,12 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),],verletDist=.05*sphereRadius),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg') if not scGeom else Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ss2sc')],
+		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ss2sc')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
-		[Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0) if not scGeom else Law2_ScGeom_CpmPhys_Cpm()],
+		[Law2_ScGeom_CpmPhys_Cpm()],
 	),
 	NewtonIntegrator(damping=damping,label='damper'),
-	CpmStateUpdater(realPeriod=1),
+	CpmStateUpdater(realPeriod=.5),
 	UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	PyRunner(virtPeriod=1e-6/strainRateTension,realPeriod=1,command='addPlotData()',label='plotDataCollector',initRun=True),
 	PyRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
@@ -132,8 +129,7 @@ def initTest():
 	print "init done, will now run."
 	O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
-	if not scGeom: ss2d3dg.distFactor=-1.
-	else: ss2sc.interactionDetectionFactor=1.
+	ss2sc.interactionDetectionFactor=1.
 	is2aabb.aabbEnlargeFactor=-1.
 
 	O.run()

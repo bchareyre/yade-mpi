@@ -14,7 +14,7 @@
    id="svg2"
    inkscape:label="Pozadí"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="dispatch-loop.svg">
   <defs
      id="defs3">
@@ -75,16 +75,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="217.86473"
-     inkscape:cy="22.154429"
+     inkscape:zoom="3.959798"
+     inkscape:cx="178.77018"
+     inkscape:cy="36.389346"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="false"
+     showgrid="true"
      inkscape:window-width="1920"
-     inkscape:window-height="1126"
+     inkscape:window-height="1176"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata6">
@@ -94,7 +94,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -153,25 +153,34 @@
        d="m 144.6741,34.3507 72.2864,6.121424"
        id="path2831"
        inkscape:connector-type="polyline"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.96579325px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="m 141.90933,51.57065 74.7855,-9.125578"
        id="path2833"
        inkscape:connector-type="polyline"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="fill:#8800aa;fill-opacity:0.34181818;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.35636363;stroke-dasharray:none"
+       id="rect3832"
+       width="94.701797"
+       height="22.728432"
+       x="234.35539"
+       y="31.097958" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot2837"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
-       transform="translate(62.124381,-4.7982246)"><flowRegion
+       transform="translate(82.481524,-4.7982246)"><flowRegion
          id="flowRegion2839"><rect
            id="rect2841"
            width="95.459412"
            height="20.455587"
            x="173.4937"
            y="39.431717" /></flowRegion><flowPara
-         id="flowPara2843">Dem3DofGeom</flowPara><flowPara
+         id="flowPara2843">ScGeom</flowPara><flowPara
          id="flowPara2845" /></flowRoot>    <rect
        style="fill:#5555ff;fill-opacity:0.34181818;stroke:#000000;stroke-opacity:0.46545458"
        id="rect3649"
@@ -195,7 +204,8 @@
        d="M 153.79573,80.847971 227.28432,71.50406"
        id="path2855"
        inkscape:connector-type="polyline"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot2857"
@@ -234,38 +244,38 @@
          id="flowPara3647-7">Material</flowPara></flowRoot>    <text
        xml:space="preserve"
        style="font-size:4px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
-       x="148.87294"
-       y="17.31669"
+       x="156.61877"
+       y="17.649073"
        id="text3682"
        sodipodi:linespacing="100%"
        transform="matrix(0.99541901,0.09560851,-0.09560851,0.99541901,0,0)"><tspan
          sodipodi:role="line"
          id="tspan3684"
-         x="148.87294"
-         y="17.31669">Ig2_Sphere_Sphere_Dem3DofGeom</tspan></text>
+         x="156.61877"
+         y="17.649073">Ig2_Sphere_Sphere_ScGeom</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:4px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
-       x="140.26605"
-       y="75.324471"
+       x="145.51669"
+       y="75.111023"
        id="text3682-9"
        sodipodi:linespacing="100%"
        transform="matrix(0.99154808,-0.12973973,0.12973973,0.99154808,0,0)"><tspan
          sodipodi:role="line"
-         x="140.26605"
-         y="75.324471"
-         id="tspan3711">Ig2_Facet_Sphere_Dem3DofGeom</tspan></text>
+         x="145.51669"
+         y="75.111023"
+         id="tspan3711">Ig2_Facet_Sphere_ScGeom</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:4px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans"
-       x="149.65134"
-       y="94.587654"
+       x="148.28229"
+       y="95.502068"
        id="text3682-9-2"
        sodipodi:linespacing="100%"
        transform="matrix(0.99283737,-0.11947368,0.11947368,0.99283737,0,0)"><tspan
          sodipodi:role="line"
-         x="149.65134"
-         y="94.587654"
+         x="148.28229"
+         y="95.502068"
          id="tspan3711-0">Ip2_FrictMat_FrictMat_FrictPhys</tspan></text>
     <flowRoot
        xml:space="preserve"
@@ -326,13 +336,6 @@
        height="24.496199"
        x="249.76022"
        y="59.129692" />
-    <rect
-       style="fill:#8800aa;fill-opacity:0.34181818;stroke:#000000;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.35636363;stroke-dasharray:none"
-       id="rect3832"
-       width="94.701797"
-       height="22.728432"
-       x="234.35539"
-       y="31.097958" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 306.07622,43.289354 15.15229,0 -0.50508,33.335034 -25.75889,0"
@@ -349,6 +352,6 @@
          sodipodi:role="line"
          id="tspan3684-6"
          x="349.99075"
-         y="59.732277">Law2_Dem3DofGeom_FrictPhys_Basic</tspan></text>
+         y="59.732277">Law2_ScGeom_FrictPhys_CundallStrack</tspan></text>
   </g>
 </svg>

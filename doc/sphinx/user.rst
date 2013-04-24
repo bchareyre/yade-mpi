@@ -413,14 +413,14 @@ Creating interactions
 
 In typical cases, interactions are created during simulations as particles collide. This is done by a :yref:`Collider` detecting approximate contact between particles and then an :yref:`IGeomFunctor` detecting exact collision.
 
-Some material models (such as the :yref:`concrete model<Law2_Dem3DofGeom_CpmPhys_Cpm>`) rely on initial interaction network which is denser than geometrical contact of spheres: sphere's radii as "enlarged" by a dimensionless factor called *interaction radius* (or *interaction ratio*) to create this initial network. This is done typically in this way (see :ysrc:`examples/concrete/uniax.py` for an example):
+Some material models (such as the :yref:`concrete model<Law2_ScGeom_CpmPhys_Cpm>`) rely on initial interaction network which is denser than geometrical contact of spheres: sphere's radii as "enlarged" by a dimensionless factor called *interaction radius* (or *interaction ratio*) to create this initial network. This is done typically in this way (see :ysrc:`examples/concrete/uniax.py` for an example):
 
 #. Approximate collision detection is adjusted so that approximate contacts are detected also between particles within the interaction radius. This consists in setting value of :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` to the interaction radius value.
 
 #. The geometry functor (``Ig2``)
    would normally say that "there is no contact" if given 2 spheres that are not in contact. Therefore, the same value as for :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` must be given to it. (Either :yref:`Ig2_Sphere_Sphere_Dem3DofGeom.distFactor` or :yref:`Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor`, depending on the functor that is in use.
 
-   Note that only :yref:`Sphere` + :yref:`Sphere` interactions are supported; there is no parameter analogous to :yref:`distFactor<Ig2_Sphere_Sphere_Dem3DofGeom.distFactor>` in :yref:`Ig2_Facet_Sphere_Dem3DofGeom`. This is on purpose, since the interaction radius is meaningful in bulk material represented by sphere packing, whereas facets usually represent boundary conditions which should be exempt from this dense interaction network.
+   Note that only :yref:`Sphere` + :yref:`Sphere` interactions are supported; there is no parameter analogous to :yref:`distFactor<Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor>` in :yref:`Ig2_Facet_Sphere_ScGeom`. This is on purpose, since the interaction radius is meaningful in bulk material represented by sphere packing, whereas facets usually represent boundary conditions which should be exempt from this dense interaction network.
 
 #. Run one single step of the simulation so that the initial network is created.
 
@@ -442,11 +442,11 @@ In code, such scenario might look similar to this one (labeling is explained in 
 	   InteractionLoop(
 	      [
 	         # enlarge here
-	         Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ig2ss'),
-	         Ig2_Facet_Sphere_Dem3DofGeom(),
+	         Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ig2ss'),
+	         Ig2_Facet_Sphere_ScGeom(),
 	      ],
 	      [Ip2_CpmMat_CpmMat_CpmPhys()],
-	      [Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0)], # deactivated
+	      [Law2_ScGeom_CpmPhys_Cpm(epsSoft=0)], # deactivated
 	   ),
 	   NewtonIntegrator(damping=damping,label='damper'),
 	]
@@ -455,9 +455,8 @@ In code, such scenario might look similar to this one (labeling is explained in 
 	O.step()
 
 	# reset interaction radius to the default value
-	# see documentation of those attributes for the meaning of negative values
-	bo1s.aabbEnlargeFactor=-1
-	ig2ss.distFactor=-1
+	bo1s.aabbEnlargeFactor=1.0
+	ig2ss.interactionDetectionFactor=1.0
 
 	# now continue simulation
 	O.run()
@@ -482,7 +481,7 @@ It is possible to create an interaction between a pair of particles independentl
 	# only add InteractionLoop, no other engines are needed now
 	Yade [1]: O.engines=[
 	   ...:    InteractionLoop(
-	   ...:        [Ig2_Sphere_Sphere_Dem3DofGeom(),],
+	   ...:        [Ig2_Sphere_Sphere_ScGeom(),],
 	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
 	   ...:        [] # not needed now
 	   ...:    )
@@ -566,22 +565,22 @@ Ig2 functors
 #. shape combinations that should collide;
    for instance::
 
-      InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[],[])
+      InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[],[])
 
    will handle collisions for :yref:`Sphere` + :yref:`Sphere`, but not for :yref:`Facet` + :yref:`Sphere` -- if that is desired, an additional functor must be used::
    
       InteractionLoop([
-         Ig2_Sphere_Sphere_Dem3DofGeom(),
-         Ig2_Facet_Sphere_Dem3DofGeom()
+         Ig2_Sphere_Sphere_ScGeom(),
+         Ig2_Facet_Sphere_ScGeom()
       ],[],[])
    
    Again, missing combination will cause given shape combinations to freely interpenetrate one another.
 
-#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` accepts :yref:`Dem3DofGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`ScGeom`, the above example would simply change to::
+#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_ScGeom_CpmPhys_Cpm` accepts :yref:`ScGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`Dem3DofGeom`, the above example would simply change to::
 
       InteractionLoop([
-         Ig2_Sphere_Sphere_ScGeom(),
-         Ig2_Facet_Sphere_ScGeom()
+         Ig2_Sphere_Sphere_Dem3DofGeom(),
+         Ig2_Facet_Sphere_Dem3DofGeom()
       ],[],[])
 
 Ip2 functors
@@ -629,18 +628,18 @@ The result will be therefore::
 
 Concrete model
 ^^^^^^^^^^^^^^^
-In this case, our goal is to use the :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` constitutive law.
+In this case, our goal is to use the :yref:`Law2_ScGeom_CpmPhys_Cpm` constitutive law.
 
-* We use :yref:`spheres<Sphere>` and :yref:`facets<Facet>` in the simulation, which selects ``Ig2`` functors accepting those types and producing :yref:`Dem3DofGeom`: :yref:`Ig2_Sphere_Sphere_Dem3DofGeom` and :yref:`Ig2_Facet_Sphere_Dem3DofGeom`.
+* We use :yref:`spheres<Sphere>` and :yref:`facets<Facet>` in the simulation, which selects ``Ig2`` functors accepting those types and producing :yref:`ScGeom`: :yref:`Ig2_Sphere_Sphere_ScGeom` and :yref:`Ig2_Facet_Sphere_ScGeom`.
 
 * We have to use :yref:`Material` which can be used for creating :yref:`CpmPhys`. We find that :yref:`CpmPhys` is only  created by :yref:`Ip2_CpmMat_CpmMat_CpmPhys`, which determines the choice of :yref:`CpmMat` for all particles.
 
 Therefore, we will use::
 
    InteractionLoop(
-      [Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+      [Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
       [Ip2_CpmMat_CpmMat_CpmPhys()],
-      [Law2_Dem3DofGeom_CpmPhys_Cpm()]
+      [Law2_ScGeom_CpmPhys_Cpm()]
    )
 
 

@@ -262,7 +262,7 @@ The value of $R_I$ directly influences the average number of interactions per sp
 
 Contact cross-section
 """""""""""""""""""""
-Some constitutive laws are formulated with strains and stresses (:yref:`Law2_Dem3DofGeom_CpmPhys_Cpm`, the concrete model described later, for instance); in that case, equivalent cross-section of the contact must be introduced for the sake of dimensionality. The exact definition is rather arbitrary; the CPM model (:yref:`Ip2_CpmMat_CpmMat_CpmPhys`) uses the relation
+Some constitutive laws are formulated with strains and stresses (:yref:`Law2_ScGeom_CpmPhys_Cpm`, the concrete model described later, for instance); in that case, equivalent cross-section of the contact must be introduced for the sake of dimensionality. The exact definition is rather arbitrary; the CPM model (:yref:`Ip2_CpmMat_CpmMat_CpmPhys`) uses the relation
 
 .. math:: A_{\rm eq}=\pi\min(r_1,r_2)^2
 	:label: eq-strain-crosssection
@@ -428,7 +428,7 @@ Stress evaluation (example)
 ===========================
 Once strain on a contact is computed, it can be used to compute stresses/forces acting on both spheres.
 
-The constitutive law presented here is the most usual DEM formulation, originally proposed by Cundall. While the strain evaluation will be similar to algorithms described in the previous section regardless of stress evaluation, stress evaluation itself depends on the nature of the material being modeled. The constitutive law presented here is the most simple non-cohesive elastic case with dry friction, which Yade implements in :yref:`Law2_Dem3DofGeom_FrictPhys_Basic` (all constitutive laws derive from base class :yref:`LawFunctor`).
+The constitutive law presented here is the most usual DEM formulation, originally proposed by Cundall. While the strain evaluation will be similar to algorithms described in the previous section regardless of stress evaluation, stress evaluation itself depends on the nature of the material being modeled. The constitutive law presented here is the most simple non-cohesive elastic case with dry friction, which Yade implements in :yref:`Law2_ScGeom_FrictPhys_CundallStrack` (all constitutive laws derive from base class :yref:`LawFunctor`).
 		
 In DEM generally, some constitutive laws are expressed using strains and stresses while others prefer displacement/force formulation. The law described here falls in the latter category.
 

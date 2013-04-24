@@ -214,8 +214,8 @@ Functors
 	To give a few examples:
 
 	* :yref:`Bo1_Sphere_Aabb` is a :yref:`BoundFunctor` which is called for :yref:`Sphere`, creating an instance of :yref:`Aabb`.
-	* :yref:`Ig2_Facet_Sphere_Dem3DofGeom` is binary functor called for :yref:`Facet` and :yref:`Sphere`, creating and instace of :yref:`Dem3DofGeom`.
-	* :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` is binary functor (:yref:`LawFunctor`) called for types :yref:`Dem3Dof (Geom)<Dem3DofGeom>` and :yref:`CpmPhys`.
+	* :yref:`Ig2_Facet_Sphere_ScGeom` is binary functor called for :yref:`Facet` and :yref:`Sphere`, creating and instace of :yref:`ScGeom`.
+	* :yref:`Law2_ScGeom_CpmPhys_Cpm` is binary functor (:yref:`LawFunctor`) called for types :yref:`ScGeom (Geom)<ScGeom>` and :yref:`CpmPhys`.
 
 .. [#opengldispatchers] Not considering OpenGL dispatchers, which might be replaced by regular virtual functions in the future.
 
@@ -988,11 +988,11 @@ Dispatch hierarchy for a particular class can be shown with the ``dispHierarchy(
 
 .. ipython::
 
-	Yade [7]: Dem3DofGeom().dispHierarchy()       # parent class of all other Dem3DofGeom_ classes
+	Yade [7]: ScGeom().dispHierarchy()       # parent class of all other ScGeom_ classes
 
-	Yade [8]: Dem3DofGeom_SphereSphere().dispHierarchy(), Dem3DofGeom_FacetSphere().dispHierarchy(), Dem3DofGeom_WallSphere().dispHierarchy()
+	Yade [8]: ScGridCoGeom().dispHierarchy(), ScGeom6D().dispHierarchy(), CylScGeom().dispHierarchy()
 
-	Yade [8]: Dem3DofGeom_WallSphere().dispHierarchy(names=False)   # show numeric indices instead
+	Yade [8]: CylScGeom().dispHierarchy(names=False)   # show numeric indices instead
 
 
 Dispatchers can also be inspected, using the .dispMatrix() method:
@@ -1000,9 +1000,9 @@ Dispatchers can also be inspected, using the .dispMatrix() method:
 .. ipython::
 
 	Yade [3]: ig=IGeomDispatcher([
-	   ...:    Ig2_Sphere_Sphere_Dem3DofGeom(),
-	   ...:    Ig2_Facet_Sphere_Dem3DofGeom(),
-	   ...:    Ig2_Wall_Sphere_Dem3DofGeom()
+	   ...:    Ig2_Sphere_Sphere_ScGeom(),
+	   ...:    Ig2_Facet_Sphere_ScGeom(),
+	   ...:    Ig2_Wall_Sphere_ScGeom()
 	   ...: ])
 
 	Yade [4]: ig.dispMatrix()
@@ -1015,13 +1015,13 @@ Finally, dispatcher can be asked to return functor suitable for given argument(s
 
 .. ipython::
 
-	Yade [6]: ld=LawDispatcher([Law2_Dem3DofGeom_CpmPhys_Cpm()])
+	Yade [6]: ld=LawDispatcher([Law2_ScGeom_CpmPhys_Cpm()])
 
 	Yade [7]: ld.dispMatrix()
 
-	# see how the entry for Dem3DofGeom_SphereSphere will be filled after this request
+	# see how the entry for ScGridCoGeom will be filled after this request
 
-	Yade [8]: ld.dispFunctor(Dem3DofGeom_SphereSphere(),CpmPhys())       
+	Yade [8]: ld.dispFunctor(ScGridCoGeom(),CpmPhys())       
 
 	Yade [9]: ld.dispMatrix()
 
@@ -1153,9 +1153,9 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 	.. code-block:: c++
 		
 		// header file
-		class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor {
+		class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor {
 		   /* … */
-		   YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"docstring",
+		   YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"docstring",
 		      /* attrs */,
 		      /* constructor */
 		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas); // timingDeltas object is automatically initialized when using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option
@@ -1170,7 +1170,7 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 
 	.. code-block:: c++
 
-		void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
+		void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
 		                                      shared_ptr<IPhys>& _phys,
 		                                      Interaction* I,
 		                                      Scene* scene)
@@ -1189,7 +1189,7 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 #. Alternatively, you can compile Yade using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option and use predefined macros TIMING_DELTAS_START and TIMING_DELTAS_CHECKPOINT. Without -DUSE_TIMING_DELTAS options, those macros are empty and do nothing.
 	.. code-block:: c++
 
-		void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
+		void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
 		                                      shared_ptr<IPhys>& _phys,
 		                                      Interaction* I,
 		                                      Scene* scene)
@@ -1215,7 +1215,7 @@ The output might look like this (note that functors are nested inside dispatcher
 	IGeomDispatcher       400           15177607μs             14.87%      
 	IPhysDispatcher        400            9518738μs              9.33%      
 	LawDispatcher                       400           64810867μs             63.49%      
-	  Law2_Dem3DofGeom_CpmPhys_Cpm                                                     
+	  Law2_ScGeom_CpmPhys_Cpm                                                     
 	    setup                           4926145            7649131μs             15.25%  
 	    geom                            4926145           23216292μs             46.28%  
 	    material                        4926145            8595686μs             17.14%  

@@ -42,12 +42,12 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	if (!mat1->neverDamage) {
 		assert(!isnan(mat1->sigmaT));
 		assert(!isnan(mat1->epsCrackOnset));
-		assert(!isnan(mat1->crackOpening) || !isnan(mat1->relDuctility));
+		!isnan(mat1->relDuctility));
 	}
 	if (!mat2->neverDamage) {
 		assert(!isnan(mat2->sigmaT));
 		assert(!isnan(mat2->epsCrackOnset));
-		assert(!isnan(mat2->crackOpening) || !isnan(mat2->relDuctility));
+		!isnan(mat2->relDuctility));
 	}
 
 	cpmPhys->damLaw = mat1->damLaw;
@@ -60,7 +60,6 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 		cpmPhys->isCohesive = (cohesiveThresholdIter < 0 || scene->iter < cohesiveThresholdIter);
 		#define _CPATTR(a) cpmPhys->a=mat1->a
 			_CPATTR(epsCrackOnset);
-			_CPATTR(crackOpening);
 			_CPATTR(relDuctility);
 			_CPATTR(neverDamage);
 			_CPATTR(dmgTau);
@@ -78,7 +77,6 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 			cpmPhys->undamagedCohesion = .5*(mat1->sigmaT + mat2->sigmaT);
 			cpmPhys->isCohesive = (cohesiveThresholdIter < 0 || scene->iter < cohesiveThresholdIter);
 			_AVGATTR(epsCrackOnset);
-			_AVGATTR(crackOpening);
 			_AVGATTR(relDuctility);
 			cpmPhys->neverDamage = (mat1->neverDamage || mat2->neverDamage);
 			_AVGATTR(dmgTau);
@@ -283,7 +281,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		phys->refPD = geom->refR1 + geom->refR2 - phys->refLength;
 		phys->kn = phys->crossSection*phys->E/phys->refLength;
 		phys->ks = phys->crossSection*phys->G/phys->refLength;
-		phys->epsFracture = isnan(phys->crackOpening)? phys->epsCrackOnset*phys->relDuctility : phys->crackOpening/(2*minRad); /* *geom->refLength */;
+		phys->epsFracture = phys->epsCrackOnset*phys->relDuctility;
 	}
 	
 	/* shorthands */
@@ -299,7 +297,6 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	const Real& omegaThreshold(this->omegaThreshold);
 	const Real& epsCrackOnset(phys->epsCrackOnset);
 	Real& relResidualStrength(phys->relResidualStrength);
-	/*const Real& crackOpening(phys->crackOpening); */
 	/*const Real& relDuctility(phys->relDuctility); */
 	const Real& epsFracture(phys->epsFracture);
 	const int& damLaw(phys->damLaw);
@@ -342,7 +339,6 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		epsN += phys->isoPrestress/E;
 		/* very simplified version of the constitutive law */
 		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */
-		/* Real epsFracture = crackOpening/geom->refLength; */
 		omega = isCohesive? phys->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */
 		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */
 		sigmaT = G*epsT; /* trial stress */

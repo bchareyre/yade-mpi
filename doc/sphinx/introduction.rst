@@ -352,7 +352,7 @@ Suppose now interactions have been already created. We can access them by the id
 .. ipython::
 	:suppress:
 
-	In [1]: O.engines=[InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
+	In [1]: O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 
 	In [2]: utils.createInteraction(0,1);
 
@@ -370,7 +370,7 @@ Suppose now interactions have been already created. We can access them by the id
 	(0, 1)
 
 	In [4]: i.geom
-	<Dem3Dof_Sphere_Sphere instance at 0x9403838>
+	<ScGeom instance at 0x9403838>
 
 	In [5]: i.phys
 	<ElasticContactInteraction instance at 0x94038d0>
@@ -437,9 +437,9 @@ Simulation loop, shown at img. img-yade-iter-loop_, can be described as follows 
 		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 		# handle interactions
 		InteractionLoop(
-			[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+			[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 			[Ip2_FrictMat_FrictMat_FrictPhys()],
-			[Law2_Dem3Dof_Elastic_Elastic()],
+			[Law2_ScGeom_FrictPhys_CundallStrack()],
 		),
 		# apply other conditions
 		GravityEngine(gravity=(0,0,-9.81)),
@@ -476,9 +476,9 @@ The next part, reading
 .. code-block:: python
 
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_Dem3Dof_Elastic_Elastic()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
@@ -486,9 +486,9 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 :yref:`IGeomDispatcher`
 	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shapes>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
 
-	#. The first functor, :yref:`Ig2_Sphere_Sphere_Dem3DofGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`Dem3DofGeom` instance, if appropriate.
+	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
-	#. The second functor, :yref:`Ig2_Facet_Sphere_Dem3DofGeom`, is called for interaction of :yref:`Facet` with :yref:`Sphere` and might create (again) a :yref:`Dem3DofGeom` instance.
+	#. The second functor, :yref:`Ig2_Facet_Sphere_ScGeom`, is called for interaction of :yref:`Facet` with :yref:`Sphere` and might create (again) a :yref:`ScGeom` instance.
 
 	All ``Ig2`` functors derive from :yref:`IGeomFunctor` (they are documented at the same place).
 
@@ -508,7 +508,7 @@ There is chain of types produced by earlier functors and accepted by later ones;
 .. figure:: fig/dispatch-loop.*
 	:width: 13cm
 
-	Chain of functors producing and accepting certain types. In the case shown, the ``Ig2`` functors produce :yref:`Dem3DofGeom` instances from all handled :yref:`Shape` combinations; the ``Ig2`` functor produces :yref:`FrictMat`. The constitutive law functor ``Law2`` accepts the combination of types produced. Note that the types are stated in the functor's class names.
+	Chain of functors producing and accepting certain types. In the case shown, the ``Ig2`` functors produce :yref:`ScfGeom` instances from all handled :yref:`Shape` combinations; the ``Ig2`` functor produces :yref:`FrictMat`. The constitutive law functor ``Law2`` accepts the combination of types produced. Note that the types are stated in the functor's class names.
 
 .. note::
 	When Yade starts, O.engines is filled with a reasonable default list, so that it is not strictly necessary to redefine it when trying simple things. The default scene will handle spheres, boxes, and facets with :yref:`frictional<FrictMat>` properties correctly, and adjusts the timestep dynamically. You can find an example in simple-scene-default-engines.py.

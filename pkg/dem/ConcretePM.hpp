@@ -17,8 +17,8 @@ mechanical behavior of concrete. Several classes are needed for Cpm.
 3. CpmPhys (Cpm (interaction)Physics) holds various parameters as well as internal
    variables of the contact that can change as result of plasticity, damage, viscosity.
 
-4. Law2_Dem3DofGeom_CpmPhys_Cpm is constitutive law that takes geometry of the interaction
-	(Dem3Dof, which can be either Dem3Dof_SphereSphere or Dem3Dof_FacetSphere) and
+4. Law2_ScGeom_CpmPhys_Cpm is constitutive law that takes geometry of the interaction
+	(ScGeom) and
 	CpmPhys, computing forces on both bodies and updating contact variables.
 
 	The model itself is defined in the macro CPM_MATERIAL_MODEL, but due to 
@@ -103,7 +103,6 @@ class CpmMat: public FrictMat {
 		((Real,sigmaT,NaN,,"Initial cohesion [Pa]"))
 		((bool,neverDamage,false,,"If true, no damage will occur (for testing only)."))
 		((Real,epsCrackOnset,NaN,,"Limit elastic strain [-]"))
-		((Real,crackOpening,NaN,,"Crack opening when the crack is fully broken in tension. [m]"))
 		((Real,relDuctility,NaN,,"relative ductility of bonds in normal direction"))
 		((int,damLaw,1,,"Law for damage evolution in uniaxial tension. 0 for linear stress-strain softening branch, 1 (default) for exponential damage evolution law"))
 		((Real,dmgTau,((void)"deactivated if negative",-1),,"Characteristic time for normal viscosity. [s]"))
@@ -165,7 +164,6 @@ class CpmPhys: public NormShearPhys {
 			((Real,refLength,NaN,,"initial length of interaction [m]"))
 			((Real,refPD,NaN,,"initial penetration depth of interaction [m] (used with ScGeom)"))
 			((Real,epsCrackOnset,NaN,,"strain at which the material starts to behave non-linearly"))
-			((Real,crackOpening,NaN,,"Crack opening (extansion of the bond) when the bond is fully broken in tension. [m]"))
 			((Real,relDuctility,NaN,,"Relative ductility of bonds in normal direction"))
 			((Real,epsFracture,NaN,,"strain at which the bond is fully broken [-]"))
 			((Real,dmgTau,-1,,"characteristic time for damage (if non-positive, the law without rate-dependence is used)"))
