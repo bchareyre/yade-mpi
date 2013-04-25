@@ -41,6 +41,28 @@ class Ig2_Facet_Sphere_ScGeom : public IGeomFunctor
 
 REGISTER_SERIALIZABLE(Ig2_Facet_Sphere_ScGeom);
 
+class Ig2_Facet_Sphere_ScGeom6D : public Ig2_Facet_Sphere_ScGeom
+{
+	public :
+		virtual bool go(const shared_ptr<Shape>& cm1,
+					const shared_ptr<Shape>& cm2,
+					const State& state1,
+					const State& state2,
+					const Vector3r& shift2,
+					const bool& force,
+					const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1,
+					const shared_ptr<Shape>& cm2,
+					const State& state1,
+					const State& state2,
+					const Vector3r& shift2,
+					const bool& force,
+					const shared_ptr<Interaction>& c);
+	YADE_CLASS_BASE_DOC(Ig2_Facet_Sphere_ScGeom6D,Ig2_Facet_Sphere_ScGeom,"Create an interaction geometry :yref:`ScGeom6D` from :yref:`Facet` and :yref:`Sphere`, representing the Facet with a projected virtual sphere of same radius.")
+	FUNCTOR2D(Facet,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
+};
+REGISTER_SERIALIZABLE(Ig2_Facet_Sphere_ScGeom6D);
 
 class Ig2_Wall_Sphere_ScGeom: public IGeomFunctor{
 	public:
