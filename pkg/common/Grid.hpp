@@ -22,11 +22,12 @@
 
 #pragma once
 #include "Sphere.hpp"
-#include<yade/pkg/dem/FrictPhys.hpp>
+#include <yade/pkg/dem/FrictPhys.hpp>
+#include <yade/pkg/dem/CohFrictPhys.hpp>
 #include <yade/pkg/dem/ScGeom.hpp>
 #include <yade/core/Body.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include <yade/pkg/common/Dispatching.hpp>
+#include <yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #ifdef YADE_OPENGL
 	#include<yade/pkg/common/GLDrawFunctors.hpp>
 #endif
@@ -85,12 +86,12 @@ class GridNodeGeom6D: public ScGeom6D {
 REGISTER_SERIALIZABLE(GridNodeGeom6D);
 
 //!			O/
-class ScGridCoGeom: public ScGeom {
+class ScGridCoGeom: public ScGeom6D {
 	public:
 		/// Emulate a sphere whose position is the projection of sphere's center on cylinder sphere, and with motion linearly interpolated between nodes
 		State fictiousState;
 		virtual ~ScGridCoGeom ();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ScGridCoGeom,ScGeom,"Geometry of a :yref:`GridConnection`-:yref:`Sphere` contact.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ScGridCoGeom,ScGeom6D,"Geometry of a :yref:`GridConnection`-:yref:`Sphere` contact.",
 		((int,isDuplicate,0,,"this flag is turned true (1) automatically if the contact is shared between two Connections. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
 		((int,trueInt,-1,,"Defines the body id of the :yref:`GridConnection` where the contact is real, when :yref:`ScGridCoGeom::isDuplicate`>0."))
 		((int,id3,0,,"id of the first :yref:`GridNode`. |yupdate|"))
@@ -98,7 +99,7 @@ class ScGridCoGeom: public ScGeom {
 		((Real,relPos,0,,"position of the contact on the connection (0: node-, 1:node+) |yupdate|")),
 		createIndex(); /*ctor*/
 	);
-	REGISTER_CLASS_INDEX(ScGridCoGeom,ScGeom);
+	REGISTER_CLASS_INDEX(ScGridCoGeom,ScGeom6D);
 };
 REGISTER_SERIALIZABLE(ScGridCoGeom);
 
@@ -141,7 +142,6 @@ class Law2_ScGridCoGeom_FrictPhys_CundallStrack: public LawFunctor{
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGridCoGeom_FrictPhys_CundallStrack,LawFunctor,"Law between a frictional :yref:`GridConnection` and a frictional :yref:`Sphere`. Almost the same than :yref:`Law2_ScGeom_FrictPhys_CundallStrack`, but the force is divided and applied on the two :yref:`GridNodes<GridNode>` only.",
 		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
-		((bool,traceEnergy,false,Attr::hidden,"Define the total energy dissipated in plastic slips at all contacts."))
 		((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
 		((int,elastPotentialIx,-1,(Attr::hidden|Attr::noSave),"Index for elastic potential energy (with O.trackEnergy)"))
 		,,
@@ -150,6 +150,17 @@ class Law2_ScGridCoGeom_FrictPhys_CundallStrack: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_ScGridCoGeom_FrictPhys_CundallStrack);
 
+class Law2_ScGridCoGeom_CohFrictPhys_CundallStrack: public LawFunctor{
+	public:
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGridCoGeom_CohFrictPhys_CundallStrack,LawFunctor,"Law between a cohesive frictional :yref:`GridConnection` and a cohesive frictional :yref:`Sphere`. Almost the same than :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`, but THE ROTATIONAL MOMENTS ARE NOT COMPUTED.",
+		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
+		((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
+		,,
+	);
+	FUNCTOR2D(ScGridCoGeom,CohFrictPhys);
+};
+REGISTER_SERIALIZABLE(Law2_ScGridCoGeom_CohFrictPhys_CundallStrack);
 
 
 //!##################	Bounds   #####################
@@ -179,8 +190,8 @@ class Gl1_GridConnection : public GlShapeFunctor{
 	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_GridConnection,GlShapeFunctor,"Renders :yref:`Cylinder` object",
 		((bool,wire,false,,"Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``."))
 		((bool,glutNormalize,true,,"Fix normals for non-wire rendering"))
-		((int,glutSlices,8,,"Number of sphere slices."))
-		((int,glutStacks,4,,"Number of sphere stacks."))
+		((int,glutSlices,8,,"Number of cylinder slices."))
+		((int,glutStacks,4,,"Number of cylinder stacks."))
 	);
 	RENDERS(GridConnection);
 };

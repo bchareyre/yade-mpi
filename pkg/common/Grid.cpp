@@ -77,7 +77,6 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 						const shared_ptr<Interaction>& c)
 {	// Useful variables :
 	const State*    sphereSt  = YADE_CAST<const State*>(&state1);
-	//const State*    gridCoSt  = YADE_CAST<const State*>(&state2);
 	Sphere*         sphere    = YADE_CAST<Sphere*>(cm1.get());
 	GridConnection* gridCo    = YADE_CAST<GridConnection*>(cm2.get());
 	GridNode*       gridNo1   = YADE_CAST<GridNode*>(gridCo->node1->shape.get());
@@ -98,10 +97,23 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 		if(abs(branchN[i])<1e-14) branchN[i]=0.0;
 	}
 	Real relPos = branch.dot(segt)/(len*len);
-	if(scm->isDuplicate==2 && scm->trueInt!=c->id2)return true;	//the contact will be deleted into the Law.
+	if(scm->isDuplicate==2 && scm->trueInt!=c->id2)return true;	//the contact will be deleted into the Law, no need to compute here.
 	scm->isDuplicate=0;
 	scm->trueInt=-1;
 	
+	/*
+	The 4 conditions below are used to avoid double contact between a sphere and two cylinders, and to follow contact properties when the sphere is sliding along different consecutive GridConnections.
+	If none of these conditions are satisfied, the classic contact will be done at the bottom of the Ig2. Else the contact may be copied (if sliding), deleted (if just copied and/or duplicated) and the return statement may be used to abort the Ig2.
+	
+	The first and the second conditions detect if a sphere's projections is outside the connection. So the contact :
+	 - have to be created if the projection is outside all neighbours and not already created.
+	 - have to be ignored if the projection is inside at least one neighbour.
+	 - if the contact is sliding out to another connection (detected via isNew), mark it as duplicated (it will be ignored by the law and imported (copied) by the new contact).
+	 
+	 The third and the fourth conditions detect if a sphere's projections is inside the connection. So if the contact is new and :
+	  - is before the middle of the connection, we search an old contact that may have slided from one of the previous connections. If we find one, we import it here.
+	  - is after the middle of the connection, we search an old contact that may have slided from one of the following connections. If we find one, we import it here.
+	 */
 	if(relPos<=0){	// if the sphere projection is BEFORE the segment ...
 		if(gridNo1->ConnList.size()>1){//	if the node is not an extremity of the Grid (only one connection)
 			for(int unsigned i=0;i<gridNo1->ConnList.size();i++){	// ... loop on all the Connections of the same Node ...
@@ -180,6 +192,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 						scm=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
 						c->geom=scm;
 						c->phys=intr->phys;
+						c->iterMadeReal=intr->iterMadeReal;
 						scm->trueInt=c->id2;
 						scm->isDuplicate=2;	//command the old contact deletion.
 						isNew=0;
@@ -209,6 +222,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 						scm=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
 						c->geom=scm;
 						c->phys=intr->phys;
+						c->iterMadeReal=intr->iterMadeReal;
 						scm->trueInt=c->id2;
 						scm->isDuplicate=2;	//command the old contact deletion.
 						isNew=0;
@@ -264,7 +278,6 @@ YADE_PLUGIN((Ig2_Sphere_GridConnection_ScGridCoGeom));
 //!			O/
 void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
-
 	ScGridCoGeom* geom= static_cast<ScGridCoGeom*>(ig.get());
 	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
 	if(geom->penetrationDepth <0){
@@ -309,28 +322,86 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 		// compute elastic energy as well
 		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
 	}
-// 	if (!scene->isPeriodic) {
+	Vector3r force = -phys->normalForce-shearForce;
+	scene->forces.addForce(id1,force);
+	scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
+	Vector3r twist = (geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force);
+	scene->forces.addForce(geom->id3,(geom->relPos-1)*force);
+	scene->forces.addTorque(geom->id3,(1-geom->relPos)*twist);
+	scene->forces.addForce(geom->id4,(-geom->relPos)*force);
+	scene->forces.addTorque(geom->id4,geom->relPos*twist);
+}
+YADE_PLUGIN((Law2_ScGridCoGeom_FrictPhys_CundallStrack));
+
+
+void Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+	const int &id1 = contact->getId1();
+	const int &id2 = contact->getId2();
+	ScGridCoGeom* geom  = YADE_CAST<ScGridCoGeom*> (ig.get());
+	CohFrictPhys* phys = YADE_CAST<CohFrictPhys*> (ip.get());
+	
+	if (geom->isDuplicate) {
+		if (id2!=geom->trueInt) {
+			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
+			if (geom->isDuplicate==2) {
+				//cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
+				scene->interactions->requestErase(contact);
+			}
+			return;
+		}
+	}
+	
+	Vector3r& shearForce    = phys->shearForce;
+	if (contact->isFresh(scene) && geom->isDuplicate!=2) shearForce = Vector3r::Zero();
+	Real un     = geom->penetrationDepth;
+	Real Fn    = phys->kn*(un-phys->unp);
+	
+	if (phys->fragile && (-Fn)> phys->normalAdhesion) {
+		// BREAK due to tension
+		scene->interactions->requestErase(contact); return;
+	} else {
+		if ((-Fn)> phys->normalAdhesion) {//normal plasticity
+			Fn=-phys->normalAdhesion;
+			phys->unp = un+phys->normalAdhesion/phys->kn;
+			if (phys->unpMax && phys->unp<phys->unpMax)
+				scene->interactions->requestErase(contact); return;
+		}
+		phys->normalForce = Fn*geom->normal;
+		Vector3r& shearForce = geom->rotate(phys->shearForce);
+		const Vector3r& dus = geom->shearIncrement();
+
+		//Linear elasticity giving "trial" shear force
+		shearForce -= phys->ks*dus;
+
+		Real Fs = phys->shearForce.norm();
+		Real maxFs = phys->shearAdhesion;
+		if (!phys->cohesionDisablesFriction || maxFs==0)
+			maxFs += Fn*phys->tangensOfFrictionAngle;
+		maxFs = std::max((Real) 0, maxFs);
+		if (Fs  > maxFs) {//Plasticity condition on shear force
+			if (phys->fragile && !phys->cohesionBroken) {
+				phys->SetBreakingState();
+				maxFs = max((Real) 0, Fn*phys->tangensOfFrictionAngle);
+			}
+			maxFs = maxFs / Fs;
+			Vector3r trialForce=shearForce;
+			shearForce *= maxFs;
+			if (scene->trackEnergy){
+				Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+				if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);}
+			if (Fn<0)  phys->normalForce = Vector3r::Zero();//Vector3r::Zero()
+		}
 		Vector3r force = -phys->normalForce-shearForce;
 		scene->forces.addForce(id1,force);
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-		//FIXME : include moment due to axis-contact distance in forces on node
 		Vector3r twist = (geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force);
 		scene->forces.addForce(geom->id3,(geom->relPos-1)*force);
 		scene->forces.addTorque(geom->id3,(1-geom->relPos)*twist);
 		scene->forces.addForce(geom->id4,(-geom->relPos)*force);
 		scene->forces.addTorque(geom->id4,geom->relPos*twist);
-// 	}
-// // 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
-// 	else {//FIXME : periodicity not implemented here :
-// 		Vector3r force = -phys->normalForce-shearForce;
-// 		scene->forces.addForce(id1,force);
-// 		scene->forces.addForce(id2,-force);
-// 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-// 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-// 	}
+	}
 }
-YADE_PLUGIN((Law2_ScGridCoGeom_FrictPhys_CundallStrack));
-
+YADE_PLUGIN((Law2_ScGridCoGeom_CohFrictPhys_CundallStrack));
 
 //!##################	Bounds   #####################
 
