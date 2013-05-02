@@ -5,6 +5,7 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/pkg/common/InteractionLoop.hpp>
 #include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/common/Wall.hpp>
 
 
 YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_ScGeom_CpmPhys_Cpm)
@@ -276,6 +277,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		const shared_ptr<Body> b2 = Body::byId(I->id2,scene);
 		const int sphereIndex = Sphere::getClassIndexStatic();
 		const int facetIndex = Facet::getClassIndexStatic();
+		const int wallIndex = Wall::getClassIndexStatic();
 		const int b1index = b1->shape->getClassIndex();
 		const int b2index = b2->shape->getClassIndex();
 		if (b1index == sphereIndex && b2index == sphereIndex) { // both bodies are spheres
@@ -286,10 +288,10 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 			phys->refLength = (pos2 - pos1 + shift2).norm();
 			phys->crossSection = Mathr::PI*pow(minRad,2);
 			phys->refPD = geom->refR1 + geom->refR2 - phys->refLength;
-		} else if (b1index == facetIndex || b2index == facetIndex) { // one body is facet
-			shared_ptr<Body> sphere,facet;
-			if (b1index == facetIndex) { facet = b1; sphere = b2; }
-			else { facet = b2; sphere = b1; }
+		} else if (b1index == facetIndex || b2index == facetIndex || b1index == wallIndex || b2index == wallIndex) { // one body is facet or wall
+			shared_ptr<Body> sphere, plane;
+			if (b1index == facetIndex || b1index == wallIndex) { plane = b1; sphere = b2; }
+			else { plane = b2; sphere = b1; }
 			Real rad = ( (Sphere*) sphere->shape.get() )->radius;
 			phys->refLength = rad;
 			phys->crossSection = Mathr::PI*pow(rad,2);
