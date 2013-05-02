@@ -4,6 +4,7 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/pkg/common/InteractionLoop.hpp>
+#include<yade/pkg/common/Facet.hpp>
 
 
 YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_ScGeom_CpmPhys_Cpm)
@@ -30,9 +31,9 @@ void Ip2_FrictMat_CpmMat_FrictPhys::go(const shared_ptr<Material>& pp1, const sh
 
 CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
-	TIMING_DELTAS_START();
 	// no updates of an already existing contact necessary
 	if (interaction->phys) return;
+	TIMING_DELTAS_START();
 	shared_ptr<CpmPhys> cpmPhys(new CpmPhys());
 	interaction->phys = cpmPhys;
 	CpmMat* mat1 = YADE_CAST<CpmMat*>(pp1.get());
@@ -183,7 +184,6 @@ Real CpmPhys::funcGInv(const Real& omega, const Real& epsCrackOnset, const Real&
 				dfg = CpmPhys::funcGDKappa(ret,epsCrackOnset,epsFracture,neverDamage,damLaw);
 				decr = fg/dfg;
 				ret -= decr;
-				//printf("i %d fg %e dfg %e decr %e ret %e\n",i,fg,dfg,decr,ret);
 				if (fabs(decr/epsCrackOnset) < tol) {
 					return ret;
 				}
@@ -272,13 +272,29 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 	/* just the first time */
 	if (I->isFresh(scene)) {
-		Vector3r pos1 = scene->bodies->operator[](I->id1)->state->pos;
-		Vector3r pos2 = scene->bodies->operator[](I->id2)->state->pos;
-		Real minRad = (geom->refR1 <= 0? geom->refR2 : (geom->refR2 <=0? geom->refR1 : min(geom->refR1,geom->refR2)));
-		Vector3r shift2 = scene->isPeriodic? Vector3r(scene->cell->hSize*I->cellDist.cast<Real>()) : Vector3r::Zero();
-		phys->refLength = (pos2 - pos1 + shift2).norm();
-		phys->crossSection = Mathr::PI*pow(minRad,2);
-		phys->refPD = geom->refR1 + geom->refR2 - phys->refLength;
+		const shared_ptr<Body> b1 = Body::byId(I->id1,scene);
+		const shared_ptr<Body> b2 = Body::byId(I->id2,scene);
+		const int sphereIndex = Sphere::getClassIndexStatic();
+		const int facetIndex = Facet::getClassIndexStatic();
+		const int b1index = b1->shape->getClassIndex();
+		const int b2index = b2->shape->getClassIndex();
+		if (b1index == sphereIndex && b2index == sphereIndex) { // both bodies are spheres
+			const Vector3r& pos1 = Body::byId(I->id1,scene)->state->pos;
+			const Vector3r& pos2 = Body::byId(I->id2,scene)->state->pos;
+			Real minRad = (geom->refR1 <= 0? geom->refR2 : (geom->refR2 <=0? geom->refR1 : min(geom->refR1,geom->refR2)));
+			Vector3r shift2 = scene->isPeriodic? Vector3r(scene->cell->hSize*I->cellDist.cast<Real>()) : Vector3r::Zero();
+			phys->refLength = (pos2 - pos1 + shift2).norm();
+			phys->crossSection = Mathr::PI*pow(minRad,2);
+			phys->refPD = geom->refR1 + geom->refR2 - phys->refLength;
+		} else if (b1index == facetIndex || b2index == facetIndex) { // one body is facet
+			shared_ptr<Body> sphere,facet;
+			if (b1index == facetIndex) { facet = b1; sphere = b2; }
+			else { facet = b2; sphere = b1; }
+			Real rad = ( (Sphere*) sphere->shape.get() )->radius;
+			phys->refLength = rad;
+			phys->crossSection = Mathr::PI*pow(rad,2);
+			phys->refPD = 0.;
+		}
 		phys->kn = phys->crossSection*phys->E/phys->refLength;
 		phys->ks = phys->crossSection*phys->G/phys->refLength;
 		phys->epsFracture = phys->epsCrackOnset*phys->relDuctility;
@@ -368,7 +384,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		/* } */
 		scene->interactions->requestErase(I);
 		return;
-	} \
+	}
 
 	Fn = sigmaN*crossSection; phys->normalForce = -Fn*geom->normal;
 	Fs = sigmaT*crossSection; phys->shearForce = -Fs;
