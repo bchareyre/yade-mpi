@@ -1,6 +1,7 @@
 /*************************************************************************
-*  Copyright (C) 2009 by Emanuele Catalano                               *
-*  emanuele.catalano@hmg.inpg.fr                                         *
+*  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2012 by Donia Marzougui <donia.marzougui@grenoble-inp.fr>*
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -298,7 +299,7 @@ void FlowEngine::setPositionsBuffer(bool current)
 	shared_ptr<Sphere> sph ( new Sphere );
         const int Sph_Index = sph->getClassIndexStatic();
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if (!b || (ignoredBody>=0) && ignoredBody==b->getId()) continue;
+                if (!b || ignoredBody==b->getId()) continue;
                 posData& dat = buffer[b->getId()];
 		dat.id=b->getId();
 		dat.pos=b->state->pos;
@@ -658,7 +659,8 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 			const int& id2 = flow.Edge_ids[i].second;
 			
 			int hasFictious= Tes.vertex ( id1 )->info().isFictious +  Tes.vertex ( id2 )->info().isFictious;
-			if (hasFictious==2) continue;
+// 			if (hasFictious==2) continue;
+			if (hasFictious>0 or id1==id2) continue;
 			const shared_ptr<Body>& sph1 = Body::byId ( id1, scene );
 			const shared_ptr<Body>& sph2 = Body::byId ( id2, scene );
 			Sphere* s1=YADE_CAST<Sphere*> ( sph1->shape.get() );
@@ -715,22 +717,14 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 		
                 if ( Debug ) cout << "la force visqueuse entre " << id1 << " et " << id2 << "est " << visc_f << endl;
 
-///    //(1) directement sur le body Yade...
-//     scene->forces.addForce(flow->Edge_ids[i].first,visc_f);
-//     scene->forces.addForce(flow->Edge_ids[i].second,-visc_f);
 
-///   //(2) ou dans CGAL? On a le choix (on pourrait même avoir info->viscousF pour faire la différence entre les deux types de forces... mais ça prend un peu plus de mémoire et de temps de calcul)
-//     Tes.vertex(flow->Edge_ids[i].first)->info().forces=Tes.vertex(flow->Edge_ids[i].first)->info().forces+makeCgVect(visc_f);
-//     Tes.vertex(flow->Edge_ids[i].second)->info().forces=Tes.vertex(flow->Edge_ids[i].second)->info().forces+makeCgVect(visc_f);
-
-/// //(3) ou dans un vecteur séparé (rapide)
 			if (viscousShear || shearLubrication){
 				flow.viscousShearForces[id1]+=visc_f;
 				flow.viscousShearForces[id2]+=(-visc_f);
 				flow.viscousShearTorques[id1]+=O1C_vect.cross(visc_f);
 				flow.viscousShearTorques[id2]+=O2C_vect.cross(-visc_f);
 		
-/// Compute the viscous shear stress on each particle
+				/// Compute the viscous shear stress on each particle
 				if (viscousShearBodyStress){
 					flow.viscousBodyStress[id1] += visc_f * O1C_vect.transpose()/ (4/3 *3.14* pow(r1,3));
 					flow.viscousBodyStress[id2] += (-visc_f) * O2C_vect.transpose()/ (4/3 *3.14* pow(r2,3));}
@@ -738,14 +732,14 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 					
 					
 		
-/// Compute the normal lubrication force applied on each particle
+			/// Compute the normal lubrication force applied on each particle
 			if (normalLubrication){
 				deltaNormV = normal.dot(deltaV);
 				lub_f = flow.computeNormalLubricationForce (deltaNormV, surfaceDist, i,eps,stiffness,scene->dt,meanRad)*normal;
 				flow.normLubForce[id1]+=lub_f;
 				flow.normLubForce[id2]+=(-lub_f);
-		
-/// Compute the normal lubrication stress on each particle
+
+			/// Compute the normal lubrication stress on each particle
 				if (viscousNormalBodyStress){
 					flow.lubBodyStress[id1] += lub_f * O1C_vect.transpose()/ (4/3 *3.14* pow(r1,3));
 					flow.lubBodyStress[id2] += (-lub_f) *O2C_vect.transpose() / (4/3 *3.14* pow(r2,3));}
@@ -776,8 +770,11 @@ void PeriodicFlowEngine:: action()
 	if (first) {
 		if (multithread) setPositionsBuffer(false);
 		cachedCell= Cell(*(scene->cell));
-		Build_Triangulation(P_zero,solver); Initialize_volumes(solver); backgroundSolver=solver; backgroundCompleted=true;}
+		Build_Triangulation(P_zero,solver);
+		if (solver->errorCode>0) {LOG_INFO("triangulation error, pausing"); Omega::instance().pause(); return;}
+		Initialize_volumes(solver); backgroundSolver=solver; backgroundCompleted=true;}
 //         if ( first ) {Build_Triangulation ( P_zero ); Update_Triangulation = false; Initialize_volumes();}
+	
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
         Eps_Vol_Cumulative += eps_vol_max;
@@ -849,7 +846,6 @@ void PeriodicFlowEngine:: action()
 			ComputeViscousForces(*solver);
                		Update_Triangulation = false;}
         }
-// 	if (velocity_profile) /*flow->FluidVelocityProfile();*/solver->Average_Fluid_Velocity();
         first=false;
 	timingDeltas->checkpoint("Ending");
 }
@@ -868,8 +864,6 @@ void PeriodicFlowEngine::backgroundAction()
 
 void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
 {
-//         shared_ptr<Sphere> sph ( new Sphere );
-//         int Sph_Index = sph->getClassIndexStatic();
         Tesselation& Tes = flow->T[flow->currentTes];
 	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
 	FOREACH ( const posData& b, buffer ) {
@@ -884,7 +878,9 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
                 const Real& z = wpos[2];
                 Vertex_handle vh0=Tes.insert ( x, y, z, rad, id );
 //                 Vertex_handle vh0=Tes.insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
-		if (vh0==NULL) {LOG_ERROR("Vh NULL in PeriodicFlowEngine::Triangulate(), check input data"); continue;}
+		if (vh0==NULL) {
+			flow->errorCode = 2;
+			LOG_ERROR("Vh NULL in PeriodicFlowEngine::Triangulate(), check input data"); continue;}
 		for ( int k=0;k<3;k++ ) vh0->info().period[k]=-period[k];
                 const Vector3r cellSize ( cachedCell.getSize() );
 		//FIXME: if hasShear, comment in
@@ -896,17 +892,18 @@ void PeriodicFlowEngine::Triangulate( shared_ptr<FlowSolver>& flow )
                 for ( i[0]=-1; i[0]<=1; i[0]++ )
                         for ( i[1]=-1;i[1]<=1; i[1]++ )
                                 for ( i[2]=-1; i[2]<=1; i[2]++ ) {
-                                        if ( i[0]==0 && i[1]==0 && i[2]==0 ) continue; // middle; already rendered above
+                                        if ( i[0]!=0 || i[1]!=0 || i[2]!=0 ) { // middle; already rendered above
                                         Vector3r pos2=wpos+Vector3r ( cellSize[0]*i[0],cellSize[1]*i[1],cellSize[2]*i[2] ); // shift, but without shear!
                                         pmin=pos2-halfSize;
                                         pmax=pos2+halfSize;
-                                        if ( pmin[0]<=cellSize[0] && pmax[0]>=0 && pmin[1]<=cellSize[1] && pmax[1]>=0 && pmin[2]<=cellSize[2] && pmax[2]>=0 ) {
+                                        if ( (pmin[0]<=cellSize[0]) && (pmax[0]>=0) && (pmin[1]<=cellSize[1]) && (pmax[1]>=0) && (pmin[2]<=cellSize[2]) && (pmax[2]>=0) ) {
                                                 //with shear:
                                                 //Vector3r pt=scene->cell->shearPt ( pos2 );
                                                 //without shear:
                                                 const Vector3r& pt= pos2;
                                                 Vertex_handle vh=Tes.insert ( pt[0],pt[1],pt[2],rad,id,false,id );
                                                 for ( int k=0;k<3;k++ ) vh->info().period[k]=i[k]-period[k];}}
+				}
 		//re-assign the original vertex pointer since duplicates may have overwrite it
 		Tes.vertexHandles[id]=vh0;
         }
@@ -958,7 +955,10 @@ Real PeriodicFlowEngine::Volume_cell_single_fictious ( Cell_handle cell )
 
 void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count)
 {
-        if (count>10) LOG_ERROR("More than 10 attempts to locate a cell, duplicateThreshold may be too small, resulting in periodicity inconsistencies.");
+        if (count>10) {
+		LOG_ERROR("More than 10 attempts to locate a cell, duplicateThreshold may be too small, resulting in periodicity inconsistencies.");
+		flow->errorCode=1; return;
+	}
 	PeriFlowTesselation::Cell_Info& base_info = baseCell->info();
         //already located, return FIXME: is inline working correctly? else move this test outside the function, just before the calls
 	if ( base_info.index>0 || base_info.isGhost ) return;
@@ -986,7 +986,6 @@ void PeriodicFlowEngine::locateCell ( Cell_handle baseCell, unsigned int& index,
 			base_info.isGhost=false;
 			return;
 		}
-// 		const Vertex_handle& v0 = flow->T[flow->currentTes].vertexHandles[baseCell->vertex(0)->info().id()];
 		Cell_handle ch= Tri.locate ( CGT::Point ( wdCenter[0],wdCenter[1],wdCenter[2] )
 // 					     ,/*hint*/ v0
 					     );
@@ -1112,7 +1111,9 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero, shared_ptr<FlowSol
 	Tes.cellHandles.resize(Tes.Triangulation().number_of_finite_cells());
 	const Finite_cells_iterator cellend=Tes.Triangulation().finite_cells_end();
         for ( Finite_cells_iterator cell=Tes.Triangulation().finite_cells_begin(); cell!=cellend; cell++ ){
+// 		if (cell->vertex(0)->info().isGhost && cell->vertex(1)->info().isGhost && cell->vertex(2)->info().isGhost && cell->vertex(3)->info().isGhost) { cell->info().isGhost=true; continue;} //crash, why?
                 locateCell ( cell,index,baseIndex,flow );
+		if (flow->errorCode>0) return;
 		//Fill this vector than can be later used to speedup loops
 		if (!cell->info().isGhost) Tes.cellHandles[cell->info().baseIndex]=cell;
 	}
