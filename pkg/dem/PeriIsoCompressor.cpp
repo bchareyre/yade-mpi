@@ -213,8 +213,8 @@ void PeriTriaxController::action()
 		//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
  	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
-	//Update energy input
-	Real dW=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->hSize.determinant();
+	//Update energy input FIXME: replace trace by norm, so it works for any kind of deformation
+	Real dW=(0.5*(scene->cell->prevVelGrad + scene->cell->velGrad)*stressTensor).trace()*scene->dt*(scene->cell->hSize.determinant());
 	externalWork+=dW;
 	if(scene->trackEnergy) scene->energy->add(-dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
 	prevGrow = strainRate;
