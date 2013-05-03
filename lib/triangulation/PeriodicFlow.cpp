@@ -617,8 +617,8 @@ void  PeriodicFlow::computeEdgesSurfaces()
     if (((ed_it->first)->vertex(ed_it->second)->info().isGhost) && ((ed_it->first)->vertex(ed_it->third)->info().isFictious)) continue;
     if (((ed_it->first)->vertex(ed_it->second)->info().isFictious) && ((ed_it->first)->vertex(ed_it->third)->info().isGhost)) continue;
 
-    int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
-    int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
+    unsigned int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
+    unsigned int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
     double area = T[currentTes].ComputeVFacetArea(ed_it);
     Edge_Surfaces.push_back(area);
     Edge_ids.push_back(pair<int,int>(id1,id2));
