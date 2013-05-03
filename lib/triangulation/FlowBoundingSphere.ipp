@@ -1,5 +1,7 @@
 /*************************************************************************
-*  Copyright (C) 2010 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2012 by Donia Marzougui <donia.marzougui@grenoble-inp.fr>*
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -94,6 +96,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	minKdivKmean=0.0001;
 	maxKdivKmean=100.;
 	ompThreads=1;
+	errorCode=0;
 }
 
 template <class Tesselation> 
@@ -928,7 +931,7 @@ double FlowBoundingSphere<Tesselation>::Compute_EffectiveRadius(Cell_handle cell
 	Vecteur x = B/sqrt(B.squared_length());
 	Vecteur C = cell->vertex(facetVertices[j][2])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
 	Vecteur z = CGAL::cross_product(x,C);
-	z = z/sqrt(z.squared_length());
+// 	z = z/sqrt(z.squared_length());
 	Vecteur y = CGAL::cross_product(x,z);
 	y = y/sqrt(y.squared_length());
 
@@ -952,9 +955,12 @@ double FlowBoundingSphere<Tesselation>::Compute_EffectiveRadius(Cell_handle cell
 
 	if ((pow(b,2)-4*a*c)<0){cout << "NEGATIVE DETERMINANT" << endl; }
 	double reff = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
-	if (reff<0 || reff==0) {cout << "reff1 = " << reff << endl; reff = (-b-sqrt(pow(b,2)-4*a*c))/(2*a); cout << endl << "reff2 = " << reff << endl;return reff;} else
-	return reff;
+	if (reff<0) return 0;//happens very rarely, with bounding spheres most probably
+	//if the facet involves one ore more bounding sphere, we return R with a minus sign
+	if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious) return -reff;
+	else return reff;
 }
+
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::Compute_EquivalentRadius(Cell_handle cell, int j)
 {
@@ -1630,8 +1636,8 @@ void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
     if (hasFictious==2) continue;
     double area = T[currentTes].ComputeVFacetArea(ed_it);
     Edge_Surfaces.push_back(area);
-    int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
-    int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
+    unsigned int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
+    unsigned int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
     Edge_ids.push_back(pair<int,int>(id1,id2));
     
     //For persistant edges, we must transfer the lub. force value from the older triangulation structure

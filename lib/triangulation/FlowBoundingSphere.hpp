@@ -1,5 +1,7 @@
 /*************************************************************************
-*  Copyright (C) 2010 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2012 by Donia Marzougui <donia.marzougui@grenoble-inp.fr>*
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -49,6 +51,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
+		int errorCode;
 		
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
