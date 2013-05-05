@@ -1019,7 +1019,9 @@ To avoid big range differences on the $y$ axis, it is possible to have left and 
 Exporting
 ^^^^^^^^^
 
-Plots can be exported to external files for later post-processing via that :yref:`yade.plot.saveGnuplot` function.
+Plots can be exported to external files for later post-processing via that :yref:`yade.plot.saveGnuplot` function. Note that all data you added via plot.addData is saved - even data that you don't plot live during simulation. 
+By editing the generated .gnuplot file you can plot any of the added Data afterwards.
+
 
 * Data file is saved (compressed using bzip2) separately from the gnuplot file, so any other programs can be used to process them. In particular, the ``numpy.genfromtxt`` (documented `here <http://docs.scipy.org/doc/numpy/reference/generated/numpy.genfromtxt.html>`_) can be useful to import those data back to python; the decompression happens automatically.
 
@@ -1132,7 +1134,7 @@ Python prompt
 --------------
 ``TCP python prompt`` is telnet server with authenticated connection, providing full python command-line. It listens on port 9000, or higher if already occupied (by another yade instance, for example).
 
-Using the authentication cookie, connection can be made::
+Using the authentication cookie, connection can be made using telnet::
 
 	\$ telnet localhost 9000
 	Trying 127.0.0.1...
@@ -1154,7 +1156,7 @@ The python pseudo-prompt ``>>>`` lets you write commands to manipulate simulatio
 #. The (fake) ``>>>`` interpreter does not have rich interactive feature of IPython, which handles the usual command-line ``Yade [1]:``; therefore, you will have no command history, ``?`` help and so on.
 
 .. note::
-	By giving access to python interpreter, full control of the system (including reading user's files) is possible. For this reason, **connection are only allowed from localhost**, not over network remotely.
+	By giving access to python interpreter, full control of the system (including reading user's files) is possible. For this reason, **connection are only allowed from localhost**, not over network remotely. Of course you can log into the system via SSH over network to get remote access.
 
 .. warning::
 	Authentication cookie is trivial to crack via bruteforce attack. Although the listener stalls for 5 seconds after every failed login attempt (and disconnects), the cookie could be guessed by trial-and-error during very long simulations on a shared computer.
@@ -1176,7 +1178,7 @@ simulation script
 	:yref:`yade.utils.readParamsFromTable` knows which parameter file and which line to read by inspecting the ``PARAM_TABLE`` environment variable, set by the batch system.
 
 parameter table
-	simple text file, each line representing one parameter set. This file is read by :yref:`yade.utils.readParamsFromTable` (using :yref:`yade.utils.TableParamReader` class), called from simulation script, as explained above.
+	simple text file, each line representing one parameter set. This file is read by :yref:`yade.utils.readParamsFromTable` (using :yref:`yade.utils.TableParamReader` class), called from simulation script, as explained above. For better reading of the text file you can make use of tabulators, these will be ignored by :yref:`yade.utils.readParamsFromTable`. Parameters are not restricted to numerical values. You can also make use of strings by "quoting" them ('  ' may also be used instead of "  "). This can be useful for nominal parameters.
 
 The batch can be run as ::
 
@@ -1266,7 +1268,7 @@ information about job status changes is being printed, until::
 
 Separating output files from jobs
 ----------------------------------
-As one might output data to external files during simulation (using classes such as :yref:`VTKRecorder`, it is important to name files in such way that they are not overwritten by next (or concurrent) job in the same batch. A special tag ``O.tags['id']`` is provided for such purposes: it is comprised of date, time and PID, which makes it always unique (e.g. ``20100413T144723p7625``); additional advantage is that alphabetical order of the ``id`` tag is also chronological.
+As one might output data to external files during simulation (using classes such as :yref:`VTKRecorder`, it is important to name files in such way that they are not overwritten by next (or concurrent) job in the same batch. A special tag ``O.tags['id']`` is provided for such purposes: it is comprised of date, time and PID, which makes it always unique (e.g. ``20100413T144723p7625``); additional advantage is that alphabetical order of the ``id`` tag is also chronological. To add the used parameterset or if set the description of the job you could add O.tags['params'] to the filename.
 
 For smaller simulations, prepending all output file names with ``O.tags['id']`` can be sufficient:
 
@@ -1309,7 +1311,7 @@ Data are collected in usual way during the simulation (using :yref:`yade.plot.ad
 
 	print 'gnuplot',plot.saveGnuplot(O.tags['id'])
 
-and the end of the script, which prints::
+and the end of the script (even after utils.waitIfBatch()) , which prints::
 
 	gnuplot 20100413T144723p7625.gnuplot
 
