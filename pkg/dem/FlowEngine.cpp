@@ -726,8 +726,8 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 		
 				/// Compute the viscous shear stress on each particle
 				if (viscousShearBodyStress){
-					flow.viscousBodyStress[id1] += visc_f * O1C_vect.transpose()/ (4/3 *3.14* pow(r1,3));
-					flow.viscousBodyStress[id2] += (-visc_f) * O2C_vect.transpose()/ (4/3 *3.14* pow(r2,3));}
+					flow.viscousBodyStress[id1] += visc_f * O1C_vect.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
+					flow.viscousBodyStress[id2] += (-visc_f) * O2C_vect.transpose()/ (4.0/3.0 *3.14* pow(r2,3));}
 			}
 					
 					
@@ -741,8 +741,8 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 
 			/// Compute the normal lubrication stress on each particle
 				if (viscousNormalBodyStress){
-					flow.lubBodyStress[id1] += lub_f * O1C_vect.transpose()/ (4/3 *3.14* pow(r1,3));
-					flow.lubBodyStress[id2] += (-lub_f) *O2C_vect.transpose() / (4/3 *3.14* pow(r2,3));}
+					flow.lubBodyStress[id1] += lub_f * O1C_vect.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
+					flow.lubBodyStress[id2] += (-lub_f) *O2C_vect.transpose() / (4.0/3.0 *3.14* pow(r2,3));}
 			if ( Debug ) cout << "la force normale entre " << id1 << " et " << id2 << "est " << lub_f << endl;
 			}
 		
