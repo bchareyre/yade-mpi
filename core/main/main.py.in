@@ -108,7 +108,8 @@ if opts.cores:
 elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
 
-sys.stderr.write('Welcome to Yade '+version+'\n')
+if __name__ == "__main__": # do not print this while importing yade in other python application
+	sys.stderr.write('Welcome to Yade '+version+'\n')
 
 # initialization and c++ plugins import
 import yade
@@ -242,10 +243,11 @@ if gui:
 		# let's just pretend any exception means the display would not work
 		gui=None
 
-# run remote access things, before actually starting the user session
-from yade import remote
-yade.remote.useQThread=(gui=='qt4')
-yade.remote.runServers()
+# run remote access things, before actually starting the user session (not while imported by other python application)
+if __name__ == "__main__":
+	from yade import remote
+	yade.remote.useQThread=(gui=='qt4')
+	yade.remote.runServers()
 
 if gui==None:
 	userSession()
