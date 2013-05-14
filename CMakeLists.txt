@@ -48,7 +48,7 @@ IF (CMAKE_CXX_FLAGS)
     SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -fPIC")
   ENDIF (DEBUG)
 ELSE (CMAKE_CXX_FLAGS)
-  #If flags are not set, add all usefull flags
+  #If flags are not set, add all useful flags
   IF (DEBUG)
     SET(CMAKE_VERBOSE_MAKEFILE 1)
     SET(CMAKE_BUILD_TYPE Debug)
@@ -177,7 +177,7 @@ ELSE(ENABLE_GUI)
   SET(DISABLED_FEATS "${DISABLED_FEATS} GUI")
 ENDIF(ENABLE_GUI)
 #===========================================================
-# This one will automaticaly enable CGAL
+# This one will automatically enable CGAL
 IF(ENABLE_PFVFLOW)
   IF (NOT ENABLE_CGAL)
     MESSAGE(STATUS "PFVFLOW depends on CGAL, attempting to turn ENABLE_CGAL ON")

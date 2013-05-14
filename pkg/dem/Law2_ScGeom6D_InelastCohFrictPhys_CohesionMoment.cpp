@@ -131,7 +131,7 @@ void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig,
 // 	}
 	
 	// 	cout<<"Tension-Comp normalF= "<<phys->normalForce<<endl;
-	///end tension-compresion///
+	///end tension-compression///
 	
 	///Shear/// ELASTOPLASTIC perfect law TO BE DONE
 	//FIXME:: TO DO::Shear ElastoPlastic perfect LAW  

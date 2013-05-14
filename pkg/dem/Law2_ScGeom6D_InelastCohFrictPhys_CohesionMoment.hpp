@@ -16,7 +16,7 @@ class Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment: public LawFunctor{
 		((int,plastDissipIx,-1,,"Index for plastic dissipation (with O.trackEnergy)"))
 		((bool,onplastB,false,,"true if plasticity achieved on bending"))
 		((bool,onplastTw,false,,"true if plasticity achieved on twisting"))
-		((bool,onplastT,false,,"true if plasticity achieved on traction/compresion")) // if plasticity achieved in traction, also for later compresion, and inverse
+		((bool,onplastT,false,,"true if plasticity achieved on traction/compression")) // if plasticity achieved in traction, also for later compression, and inverse
 		((Real,lastPlastUn,0,,"last tension compression un value of plasticity"))
 		((Real,lastPlastBend,0,,"last bend  value of plasticity"))
 		((Real,lastPlastTw,0,,"last bend  value of plasticity"))

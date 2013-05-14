@@ -66,7 +66,7 @@ timing.stats()
 O.reload()
 timing.reset()
 O.dt=1000000 #or whatever
-#We force dt=1. The inertia of bodies will adjusted automaticaly...
+#We force dt=1. The inertia of bodies will adjusted automatically...
 newton.densityScaling=True
 #... but not that of cell, hence we have to adjust it or the problem becomes unstable
 triax.mass=triax.mass*(1e4)**2

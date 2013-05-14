@@ -835,7 +835,7 @@ Periodic boundary conditions
 ============================
 While most DEM simulations happen in $R^3$ space, it is frequently useful to avoid boundary effects by using periodic space instead. In order to satisfy periodicity conditions, periodic space is created by repetition of parallelepiped-shaped cell. In Yade, periodic space is implemented in the :yref:`Cell` class. The geometry of the cell in the reference coordinates system is defined by three edges of the parallepiped. The corresponding base vectors are stored in the columns of matrix $\mat{H}$ (:yref:`Cell.hSize`).
 
-The initial $\mat{H}$ can be explicitly defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial cell.
+The initial $\mat{H}$ can be explicitly defined as a 3x3 matrix at the beginning of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial cell.
 If the base vectors are axis-aligned, defining only their sizes can be more convenient than defining the full $\mat{H}$ matrix; in that case it is enough to define the norms of columns in $\mat{H}$ (see :yref:`Cell.size`).
 
 After the definition of the initial cell's geometry, $\mat{H}$ should generally not be modified by direct assignment. Instead, its deformation rate will be defined via the velocity gradient :yref:`Cell.velGrad` described below. It is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).
