@@ -1398,8 +1398,8 @@ Click on the "Apply" button in the "Object inspector" sub-window to make loaded 
 .. _img-paraview-rendering-apply:
 .. figure:: fig/paraview-rendering-apply.png
 
-Rendering spherical particles
-"""""""""""""""""""""""""""""
+Rendering spherical particles. Glyphs
+"""""""""""""""""""""""""""""""""""""""""""
 
 .. |paraview-glyph-icon| image:: fig/paraview-glyph-icon.png
 
@@ -1412,6 +1412,19 @@ Spheres will only appear as points. To make them look as spheres, you have to ad
 * optionally uncheck "Mask points" and "Random mode" (they make some particles not to be rendered for performance reasons, controlled by the "Maximum Number of Points")
 
 After clicking "Apply", spheres will appear. They will be rendered over the original white points, which you can disable by clicking on the eye icon next to ``p1-spheres.*`` in the Pipeline browser.
+
+Rendering spherical particles. PointSprite
+"""""""""""""""""""""""""""""""""""""""""""
+
+Another opportunity to display spheres is an using *PointSprite* plugin. This technique requires much less RAM in comparison to Glyphs.
+
+* "Tools -> Manage Plugins"
+* "PointSprite_Plugin -> Load selected  -> Close"
+* Load VTU-files
+* "Representation -> Point Sprite"
+* "Point Sprite -> Scale By -> radii"
+* "Edit Radius Transfer Function -> Proportional -> Multiplier = 1.0 -> Close"
+
 
 Facet transparency
 """""""""""""""""""
