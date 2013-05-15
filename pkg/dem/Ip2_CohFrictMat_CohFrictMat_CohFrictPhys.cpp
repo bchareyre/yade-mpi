@@ -59,14 +59,8 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive)
 			{
 				contactPhysics->cohesionBroken = false;
-				if (geom->cylCyl){
-					contactPhysics->normalAdhesion = std::min(sdec1->cylCylNormalCoh,sdec2->cylCylNormalCoh)*pow(std::min(Db, Da),2);
-					contactPhysics->shearAdhesion = std::min(sdec1->cylCylShearCoh,sdec2->cylCylShearCoh)*pow(std::min(Db, Da),2);
-				}
-				else{
-					contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(Db, Da),2);
-					contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(Db, Da),2);
-				}
+				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(Db, Da),2);
+				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(Db, Da),2);
 				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
 			}
 			contactPhysics->kn = Kn;
@@ -81,14 +75,9 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 			if ((setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) || contactPhysics->initCohesion)
 			{
 				contactPhysics->cohesionBroken = false;
-				if (geom->cylCyl){
-					contactPhysics->normalAdhesion = std::min(sdec1->cylCylNormalCoh,sdec2->cylCylNormalCoh)*pow(std::min(geom->radius2, geom->radius1),2);
-					contactPhysics->shearAdhesion = std::min(sdec1->cylCylShearCoh,sdec2->cylCylShearCoh)*pow(std::min(geom->radius2, geom->radius1),2);
-				}
-				else{
-					contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
-					contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
-				}
+				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
+				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
+
 				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
 				contactPhysics->initCohesion=false;
 			}

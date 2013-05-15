@@ -2,14 +2,6 @@
 
 #pragma once
 
-// temporary fix:
-// clang #includes  first /usr/include/c++/4.4/fenv.h, which through some obscure #ifdefs does not eventually include any code
-// why...?
-#ifdef __clang__
-	#include</usr/include/fenv.h>
-#endif
-
-
 #include<iostream>
 #include<vector>
 #include<cstdlib>
@@ -20,7 +12,8 @@
 #include<boost/foreach.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<boost/math/distributions/normal.hpp>
 
 

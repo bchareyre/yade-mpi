@@ -1,6 +1,7 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
@@ -28,8 +29,8 @@ py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
-		minimum=minimum.cwise().min(b->state->pos-(centers?Vector3r::Zero():rrr));
-		maximum=maximum.cwise().max(b->state->pos+(centers?Vector3r::Zero():rrr));
+		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
+		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
 	}
 	Vector3r dim=maximum-minimum;
 	return py::make_tuple(Vector3r(minimum+.5*cutoff*dim),Vector3r(maximum-.5*cutoff*dim));
@@ -145,16 +146,27 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
 		const Body::id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
-		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id1]+=1;
-		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id2]+=1;
+		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) {
+			if (b1->isClumpMember()) bodyNumIntr[b1->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			else bodyNumIntr[id1]+=1;
+		}
+		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) {
+			if (b2->isClumpMember()) bodyNumIntr[b2->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			else bodyNumIntr[id2]+=1;
+		}
 		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
+		if (b1->isClumpMember()) maxIntr=max(maxIntr,bodyNumIntr[b1->clumpId]);
+		if (b2->isClumpMember()) maxIntr=max(maxIntr,bodyNumIntr[b2->clumpId]);
 	}
 	vector<int> bins; bins.resize(maxIntr+1,0);
 	for(size_t id=0; id<bodyNumIntr.size(); id++){
-		if(bodyNumIntr[id]>0) bins[bodyNumIntr[id]]+=1;
-		// 0 is handled specially: add body to the 0 bin only if it is inside the bb requested (if applicable)
-		// otherwise don't do anything, since it is outside the volume of interest
-		else if((useBB && isInBB(Body::byId(id,rb)->state->pos,bbMin,bbMax)) || !useBB) bins[0]+=1;
+		const shared_ptr<Body>& b=Body::byId(id,rb);
+		if (b) {
+			if(bodyNumIntr[id]>0) bins[bodyNumIntr[id]]+=1;
+			// 0 is handled specially: add body to the 0 bin only if it is inside the bb requested (if applicable)
+			// otherwise don't do anything, since it is outside the volume of interest
+			else if(((useBB && isInBB(b->state->pos,bbMin,bbMax)) || !useBB) && !(b->isClumpMember())) bins[0]+=1;
+		}
 	}
 	py::list count,num;
 	for(size_t n=0; n<bins.size(); n++){
@@ -303,24 +315,6 @@ bool pointInsidePolygon(py::tuple xy, py::object vertices){
 	return inside;
 }
 
-#if 0
-/* Compute convex hull of given points, given as python list of Vector2 */
-py::list convexHull2d(const py::list& pts){
-	size_t l=py::len(pts);
-	py::list ret;
-	std::list<Vector2r> pts2;
-	for(size_t i=0; i<l; i++){
-		pts2.push_back(py::extract<Vector2r>(pts[i]));
-		cerr<<*pts2.rbegin()<<endl;
-	}
-	ConvexHull2d ch2d(pts2);
-	vector<Vector2r> hull=ch2d();
-	FOREACH(const Vector2r& v, hull) ret.append(v);
-	cout<<pts2.size()<<" "<<hull.size()<<"@@@"<<endl;
-	return ret;
-}
-#endif 
-
 /* Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.
 
 	All spheres that touch the plane are projected as hexagons on their circumference to the plane.
@@ -457,6 +451,42 @@ void setNewVerticesOfFacet(const shared_ptr<Body>& b, const Vector3r& v1, const 
 	b->state->pos = center;
 }
 
+py::list intrsOfEachBody() {
+	py::list ret, temp;
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	size_t n = rb->bodies->size();
+	// create list of size len(O.bodies) full of zeros
+	for (size_t i=0; i<n; i++) {
+		ret.append(py::list());
+	}
+	// loop over all interactions and fill the list ret
+	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions) {
+		if (!i->isReal()) { continue; }
+		temp = py::extract<py::list>(ret[i->getId1()]);
+		temp.append( i );
+		temp = py::extract<py::list>(ret[i->getId2()]);
+		temp.append( i );
+	}
+	return ret;
+}
+
+py::list numIntrsOfEachBody() {
+	py::list ret;
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	size_t n = rb->bodies->size();
+	// create list of size len(O.bodies) full of zeros
+	for (size_t i=0; i<n; i++) {
+		ret.append(0);
+	}
+	// loop over all interactions and fill the list ret
+	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions) {
+		if (!i->isReal()) continue;
+		ret[i->getId1()] += 1;
+		ret[i->getId2()] += 1;
+	}
+	return ret;
+}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -473,9 +503,6 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("ptInAABB",isInBB,"Return True/False whether the point p is within box given by its min and max corners");
 	py::def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(py::args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
-	#if 0
-		py::def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
-	#endif
 	py::def("coordsAndDisplacements",coordsAndDisplacements,(python::arg("axis"),python::arg("Aabb")=python::tuple()),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered.");
 	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
 	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
@@ -504,8 +531,8 @@ BOOST_PYTHON_MODULE(_utils){
 	//py::def("stressTensorOfPeriodicCell",Shop__stressTensorOfPeriodicCell,(py::args("smallStrains")=false),"Compute overall (macroscopic) stress of periodic cell using equation published in [Kuhl2001]_:\n\n.. math:: \\vec{\\sigma}=\\frac{1}{V}\\sum_cl^c[\\vec{N}^cf_N^c+\\vec{T}^{cT}\\cdot\\vec{f}^c_T],\n\nwhere $V$ is volume of the cell, $l^c$ length of interaction $c$, $f^c_N$ normal force and $\\vec{f}^c_T$ shear force. Sumed are values over all interactions $c$. $\\vec{N}^c$ and $\\vec{T}^{cT}$ are projection tensors (see the original publication for more details):\n\n.. math:: \\vec{N}=\\vec{n}\\otimes\\vec{n}\\rightarrow N_{ij}=n_in_j\n\n.. math:: \\vec{T}^T=\\vec{I}_{sym}\\cdot\\vec{n}-\\vec{n}\\otimes\\vec{n}\\otimes\\vec{n}\\rightarrow T^T_{ijk}=\\frac{1}{2}(\\delta_{ik}\\delta_{jl}+\\delta_{il}\\delta_{jk})n_l-n_in_jn_k\n\n.. math:: \\vec{T}^T\\cdot\\vec{f}_T\\equiv T^T_{ijk}f_k=(\\delta_{ik}n_j/2+\\delta_{jk}n_i/2-n_in_jn_k)f_k=n_jf_i/2+n_if_j/2-n_in_jn_kf_k,\n\nwhere $n$ is unit vector oriented along the interaction (:yref:`normal<GenericSpheresContact::normal>`) and $\\delta$ is Kronecker's delta. As $\\vec{n}$ and $\\vec{f}_T$ are perpendicular (therfore $n_if_i=0$) we can write\n\n.. math:: \\sigma_{ij}=\\frac{1}{V}\\sum l[n_in_jf_N+n_jf^T_i/2+n_if^T_j/2]\n\n:param bool smallStrains: if false (large strains), real values of volume and interaction lengths are computed. If true, only :yref:`refLength<Dem3DofGeom::refLength>` of interactions and initial volume are computed (can save some time).\n\n:return: macroscopic stress tensor as Matrix3");
 	py::def("normalShearStressTensors",Shop__normalShearStressTensors,(py::args("compressionPositive")=false,py::args("splitNormalTensor")=false,py::args("thresholdForce")=NaN),"Compute overall stress tensor of the periodic cell decomposed in 2 parts, one contributed by normal forces, the other by shear forces. The formulation can be found in [Thornton2000]_, eq. (3):\n\n.. math:: \\tens{\\sigma}_{ij}=\\frac{2}{V}\\sum R N \\vec{n}_i \\vec{n}_j+\\frac{2}{V}\\sum R T \\vec{n}_i\\vec{t}_j\n\nwhere $V$ is the cell volume, $R$ is \"contact radius\" (in our implementation, current distance between particle centroids), $\\vec{n}$ is the normal vector, $\\vec{t}$ is a vector perpendicular to $\\vec{n}$, $N$ and $T$ are norms of normal and shear forces.\n\n:param bool splitNormalTensor: if true the function returns normal stress tensor split into two parts according to the two subnetworks of strong an weak forces.\n\n:param Real thresholdForce: threshold value according to which the normal stress tensor can be split (e.g. a zero value would make distinction between tensile and compressive forces).");
 	py::def("fabricTensor",Shop__fabricTensor,(py::args("splitTensor")=false,py::args("revertSign")=false,py::args("thresholdForce")=NaN),"Compute the fabric tensor of the periodic cell. The original paper can be found in [Satake1982]_.\n\n:param bool splitTensor: split the fabric tensor into two parts related to the strong and weak contact forces respectively.\n\n:param bool revertSign: it must be set to true if the contact law's convention takes compressive forces as positive.\n\n:param Real thresholdForce: if the fabric tensor is split into two parts, a threshold value can be specified otherwise the mean contact force is considered by default. It is worth to note that this value has a sign and the user needs to set it according to the convention adopted for the contact law. To note that this value could be set to zero if one wanted to make distinction between compressive and tensile forces.");
-	py::def("bodyStressTensors",Shop__getStressLWForEachBody,"Compute and return a table with per-particle stress tensors. Each tensor represents the average stress in one particle, obtained from the contour integral of applied load as detailed below. This definition is considering each sphere as a continuum. It can be considered exact in the context of spheres at static equilibrium, interacting at contact points with negligible volume changes of the solid phase (this last assumption is not restricting possible deformations and volume changes at the packing scale).\n\nProof:\n\nFirst, we remark the identity:  $\\sigma_{ij}=\\delta_{ij}\\sigma_{ij}=x_{i,j}\\sigma_{ij}=(x_{i}\\sigma_{ij})_{,j}-x_{i}\\sigma_{ij,j}$.\n\nAt equilibrium, the divergence of stress is null: $\\sigma_{ij,j}=\\vec{0}$. Consequently, after divergence theorem: $\\frac{1}{V}\\int_V \\sigma_{ij}dV = \\frac{1}{V}\\int_V (x_{i}\\sigma_{ij})_{,j}dV = \\frac{1}{V}\\int_{\\partial V}x_i.\\sigma_{ij}.\\vec{n_j}.dS = \\frac{1}{V}\\sum_kx_i^k.f_j^k$.\n\nThe last equality is implicitely based on the representation of external loads as Dirac distributions whose zeros are the so-called *contact points*: 0-sized surfaces on which the *contact forces* are applied, located at $x_i$ in the deformed configuration.\n\nA weighted average of per-body stresses will give the average stress inside the solid phase. There is a simple relation between the stress inside the solid phase and the stress in an equivalent continuum in the absence of fluid pressure. For porosity $n$, the relation reads: $\\sigma_{ij}^{equ.}=(1-n)\\sigma_{ij}^{solid}$.");
-	py::def("getStress",Shop::getStress,(py::args("volume")=0),"Compute and return Love-Weber stress tensor:\n\n $\\sigma_{ij}=\\frac{1}{V}\\sum l_i f_j^k$, where the sum is over all interactions, with $l$ the branch vector (joining centers of the bodies) and $f$ is the contact force. $V$ can be passed to the function. If it is not, it will be equal to one in non-periodic cases, or equal to the volume of the cell in periodic cases.");
+	py::def("bodyStressTensors",Shop__getStressLWForEachBody,"Compute and return a table with per-particle stress tensors. Each tensor represents the average stress in one particle, obtained from the contour integral of applied load as detailed below. This definition is considering each sphere as a continuum. It can be considered exact in the context of spheres at static equilibrium, interacting at contact points with negligible volume changes of the solid phase (this last assumption is not restricting possible deformations and volume changes at the packing scale).\n\nProof:\n\nFirst, we remark the identity:  $\\sigma_{ij}=\\delta_{ik}\\sigma_{kj}=x_{i,k}\\sigma_{kj}=(x_{i}\\sigma_{kj})_{,k}-x_{i}\\sigma_{kj,k}$.\n\nAt equilibrium, the divergence of stress is null: $\\sigma_{kj,k}=\\vec{0}$. Consequently, after divergence theorem: $\\frac{1}{V}\\int_V \\sigma_{ij}dV = \\frac{1}{V}\\int_V (x_{i}\\sigma_{kj})_{,k}dV = \\frac{1}{V}\\int_{\\partial V}x_i\\sigma_{kj}n_kdS = \\frac{1}{V}\\sum_bx_i^bf_j^b$.\n\nThe last equality is implicitely based on the representation of external loads as Dirac distributions whose zeros are the so-called *contact points*: 0-sized surfaces on which the *contact forces* are applied, located at $x_i$ in the deformed configuration.\n\nA weighted average of per-body stresses will give the average stress inside the solid phase. There is a simple relation between the stress inside the solid phase and the stress in an equivalent continuum in the absence of fluid pressure. For porosity $n$, the relation reads: $\\sigma_{ij}^{equ.}=(1-n)\\sigma_{ij}^{solid}$.");
+	py::def("getStress",Shop::getStress,(py::args("volume")=0),"Compute and return Love-Weber stress tensor:\n\n $\\sigma_{ij}=\\frac{1}{V}\\sum_b l_i^b f_j^b$, where the sum is over all interactions, with $l$ the branch vector (joining centers of the bodies) and $f$ is the contact force. $V$ can be passed to the function. If it is not, it will be equal to one in non-periodic cases, or equal to the volume of the cell in periodic cases.");
 	py::def("getBodyIdsContacts",Shop__getBodyIdsContacts,(py::args("bodyID")=0),"Get a list of body-ids, which contacts the given body.");
 	py::def("maxOverlapRatio",maxOverlapRatio,"Return maximum overlap ration in interactions (with :yref:`ScGeom`) of two :yref:`spheres<Sphere>`. The ratio is computed as $\\frac{u_N}{2(r_1 r_2)/r_1+r_2}$, where $u_N$ is the current overlap distance and $r_1$, $r_2$ are radii of the two spheres in contact.");
 	py::def("shiftBodies",shiftBodies,(py::arg("ids"),py::arg("shift")),"Shifts bodies listed in ids without updating their velocities.");
@@ -513,4 +540,6 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("setNewVerticesOfFacet",setNewVerticesOfFacet,(py::arg("b"),py::arg("v1"),py::arg("v2"),py::arg("v3")),"Sets new vertices (in global coordinates) to given facet.");
 	py::def("setContactFriction",Shop::setContactFriction,py::arg("angleRad"),"Modify the friction angle (in radians) inside the material classes and existing contacts. The friction for non-dynamic bodies is not modified.");
 	py::def("growParticles",Shop::growParticles,(py::args("multiplier"), py::args("updateMass")=true, py::args("dynamicOnly")=true), "Change the size of spheres and sphere clumps by the multiplier. If updateMass=True, then the mass is updated. dynamicOnly=True is mandatory in many cases since in current implementation the function would crash on the non-spherical and non-dynamic bodies (e.g. facets, boxes, etc.)");
+	py::def("intrsOfEachBody",intrsOfEachBody,"returns list of lists of interactions of each body");
+	py::def("numIntrsOfEachBody",numIntrsOfEachBody,"returns list of number of interactions of each body");
 }

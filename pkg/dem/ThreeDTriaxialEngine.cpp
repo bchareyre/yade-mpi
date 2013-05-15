@@ -30,7 +30,8 @@ ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 
 void ThreeDTriaxialEngine::action()
 {
-
+	static int warn = 0;
+	if (!warn++) LOG_WARN ("This engine is deprecated, please switch to TriaxialStressController if you expect long term support.")
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
@@ -59,7 +60,7 @@ void ThreeDTriaxialEngine::action()
 
 		//internalCompaction=false;  //is needed to avoid a control for internal compaction by the TriaxialStressController engine
 
-		isAxisymetric=false; //is needed to avoid a stress control according the parameter sigma_iso (but according to sigma1, sigma2 and sigma3)
+// 		isAxisymetric=false; //is needed to avoid a stress control according the parameter sigma_iso (but according to sigma1, sigma2 and sigma3)
 
 		firstRun=false;
 

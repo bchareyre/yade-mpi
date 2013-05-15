@@ -72,18 +72,46 @@ deprecatedTypes=system.cxxCtorsDict()
 globals().update(deprecatedTypes)
 # declare what should be imported for "from yade import *"
 __all__=deprecatedTypes.keys()+['O']
-# fake miniWm3 and wrapper being in yade itself
-from miniEigen import *
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
+
 from wrapper import *
 # import to separate namespace to be able to call dir(miniEigen) and dir(wrapper) below
-import miniEigen,wrapper 
+import wrapper 
+
+try:
+	import minieigen
+except ImportError:
+	import miniEigen
+
 # out-of-class docstrings for some classes
 import _extraDocs
 # import a few "important" modules along with *
 import utils # some others?
-__all__+=['utils',]+dir(miniEigen)+dir(wrapper)
+__all__+=['utils',]+dir(wrapper)
+
+try:
+	__all__+=dir(miniEigen)
+except NameError:
+	pass
+
 # make O and wrapper.Omega part of __builtin__ (equvialent to global)
 import __builtin__
 __builtin__.__dict__['O'] = O
 __builtin__.__dict__['Omega'] = wrapper.Omega
+# define a default list of engine
+O.engines=[
+		ForceResetter(),
+		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()]),
+		InteractionLoop(
+			[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
+			[Ip2_FrictMat_FrictMat_FrictPhys()],	#for linear model only
+			[Law2_ScGeom_FrictPhys_CundallStrack()],	#for linear model only
+		),
+		GlobalStiffnessTimeStepper(timeStepUpdateInterval=10),
+		NewtonIntegrator()
+	]
 

@@ -7,7 +7,7 @@
 *************************************************************************/
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
+#include<yade/pkg/common/FieldApplier.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/pkg/common/Callbacks.hpp>
@@ -22,7 +22,7 @@
  */
 class State;
 
-class NewtonIntegrator : public GlobalEngine{
+class NewtonIntegrator : public FieldApplier{
 	inline void cundallDamp1st(Vector3r& force, const Vector3r& vel);
 	inline void cundallDamp2nd(const Real& dt, const Vector3r& vel, Vector3r& accel);
 	inline void leapfrogTranslate(State*, const Body::id_t& id, const Real& dt); // leap-frog translate
@@ -83,7 +83,7 @@ class NewtonIntegrator : public GlobalEngine{
 				threadMaxVelocitySq.resize(omp_get_max_threads()); syncEnsured=false;
 			#endif
 		,/*py*/
-		.add_property("densityScaling",&NewtonIntegrator::get_densityScaling,&NewtonIntegrator::set_densityScaling,"if True, then density scaling [Pfc3dManual30]_ will be applied in order to have a critical timestep equal to :yref:`GlobalStiffnessTimeStepper::targetDt` for all bodies. This option makes the simulation unrealistic from a dynamic point of view, but may speedup quasistatic simulations.")
+		.add_property("densityScaling",&NewtonIntegrator::get_densityScaling,&NewtonIntegrator::set_densityScaling,"if True, then density scaling [Pfc3dManual30]_ will be applied in order to have a critical timestep equal to :yref:`GlobalStiffnessTimeStepper::targetDt` for all bodies. This option makes the simulation unrealistic from a dynamic point of view, but may speedup quasistatic simulations. In rare situations, it could be useful to not set the scalling factor automatically for each body (which the time-stepper does). In such case revert :yref:`GlobalStiffnessTimeStepper.densityScaling` to False.")
 	);
 	DECLARE_LOGGER;
 };

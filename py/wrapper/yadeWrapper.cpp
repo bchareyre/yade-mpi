@@ -46,12 +46,19 @@
 
 // #include<yade/pkg/dem/Shop.hpp>
 #include<yade/core/Clump.hpp>
+#include <yade/pkg/common/Sphere.hpp>
 
 #if BOOST_VERSION>=104700
 	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
 #else
 	#include<boost/math/nonfinite_num_facets.hpp>
 #endif
+
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
+
+#include<yade/core/Timing.hpp>
 
 #include<locale>
 #include<boost/archive/codecvt_null.hpp>
@@ -62,7 +69,8 @@ namespace py = boost::python;
 
 #include<yade/lib/serialization/ObjectIO.hpp>
 
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
@@ -81,6 +89,14 @@ class pyBodyIterator{
 };
 
 class pyBodyContainer{
+	private:
+		void checkClump(shared_ptr<Body> b){
+			if (!(b->isClump())){
+				PyErr_SetString(PyExc_TypeError,("Error: Body"+lexical_cast<string>(b->getId())+" is not a clump.").c_str()); 
+				python::throw_error_already_set();
+			}
+		}
+		typedef std::map<Body::id_t,Se3r> MemberMap;
 	public:
 	const shared_ptr<BodyContainer> proxee;
 	pyBodyIterator pyIter(){return pyBodyIterator(proxee);}
@@ -141,6 +157,326 @@ class pyBodyContainer{
 		vector<Body::id_t> ids(appendList(bb));
 		// clump them together (the clump fcn) and return
 		return python::make_tuple(clump(ids),ids);
+	}
+	void addToClump(Body::id_t bid, Body::id_t cid){
+		Scene* scene(Omega::instance().getScene().get());	// get scene
+		shared_ptr<Body> bp = Body::byId(bid,scene);		// get body pointer
+		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
+		checkClump(clp);
+		if (bp->isClump()){
+			if (bp == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" and clump "+lexical_cast<string>(cid)+" are the same bodies. Body was not added.").c_str()); return;}
+			Clump::add(clp,bp);//add clump bid to clump cid
+			Clump::updateProperties(clp,/*intersecting*/false);
+			proxee->erase(bid);//erase old clump
+			return;
+		}
+		else if (bp->isClumpMember()){
+			Body::id_t bpClumpId = bp->clumpId;
+			shared_ptr<Body> bpClumpPointer = Body::byId(bpClumpId,scene);
+			if (bpClumpPointer == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is already a clump member of clump "+lexical_cast<string>(cid)+". Body was not added.").c_str()); return;} 
+			Clump::add(clp,bpClumpPointer);//add clump bpClumpId to clump cid
+			Clump::updateProperties(clp,/*intersecting*/false);
+			proxee->erase(bpClumpId);//erase old clump
+			return;
+		}
+		else {Clump::add(clp,bp); Clump::updateProperties(clp,/*intersecting*/false);}// bp must be a standalone!
+	}
+	void releaseFromClump(Body::id_t bid, Body::id_t cid){
+		Scene* scene(Omega::instance().getScene().get());	// get scene
+		shared_ptr<Body> bp = Body::byId(bid,scene);		// get body pointer
+		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
+		checkClump(clp);
+		if (bp->isClumpMember()){
+			Body::id_t bpClumpId = bp->clumpId;
+			if (cid == bpClumpId){
+				const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clp->shape);
+				std::map<Body::id_t,Se3r>& members = clump->members;
+				if (members.size() == 2) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" not released from clump "+lexical_cast<string>(cid)+", because number of clump members would get < 2!").c_str()); return;}
+				Clump::del(clp,bp);//release bid from cid
+				Clump::updateProperties(clp,/*intersecting*/false);
+			} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" must be a clump member of clump "+lexical_cast<string>(cid)+". Body was not released.").c_str()); return;}
+		} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is not a clump member. Body was not released.").c_str()); return;}
+	}
+	python::list replaceByClumps(python::list ctList, vector<Real> amounts){
+		python::list ret;
+		Real checkSum = 0.0;
+		FOREACH(Real amount, amounts) {
+			if (amount < 0.0) {
+				PyErr_SetString(PyExc_ValueError,("Error: One or more of given amounts are negative!")); 
+				python::throw_error_already_set();
+			}
+			else checkSum += amount;
+		}
+		if (checkSum > 1.0){
+			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
+			python::throw_error_already_set();
+		}
+		if (python::len(ctList) != (unsigned) amounts.size()) {//avoid unsigned comparison warning
+			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+lexical_cast<string>(amounts.size())+") differs from length of template list ("+lexical_cast<string>(python::len(ctList))+").").c_str()); 
+			python::throw_error_already_set();
+		}
+		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
+		static boost::minstd_rand randGen((int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
+		typedef boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > UniRandGen;
+		static UniRandGen rndUnit(randGen,boost::uniform_real<>(-1,1));
+		
+		//get number of spherical particles and a list of all spheres:
+		vector<shared_ptr<Body> > sphereList;
+		shared_ptr<Sphere> sph (new Sphere);
+		int Sph_Index = sph->getClassIndexStatic();
+		FOREACH(const shared_ptr<Body>& b, *proxee) if ( (b->shape->getClassIndex() == Sph_Index) && (b->isStandalone()) ) sphereList.push_back(b);
+		int num = sphereList.size();
+		
+		//loop over templates:
+		int numSphereList = num, numTemplates = amounts.size();
+		for (int ii = 0; ii < numTemplates; ii++) {
+			//ctList: [<ct1>,<ct2>, ...] = [<int,[double,double, ... ],[Vector3r,Vector3r, ...]>,<int,[double,double, ... ],[Vector3r,Vector3r, ...]>, ...]
+			//ct: <len(relRadList),relRadList,relPosList> = <int,[double,double, ... ],[Vector3r,Vector3r, ...]> (python objects)
+			//relRadList: [relRad1,relRad2, ...] (list of doubles)
+			//relPosList: [relPos1,relPos2, ...] (list of vectors)
+			
+			//extract attributes from python objects:
+			python::object ctTmp = ctList[ii];
+			int numCM = python::extract<int>(ctTmp.attr("numCM"))();
+			python::list relRadListTmp = python::extract<python::list>(ctTmp.attr("relRadii"))();
+			python::list relPosListTmp = python::extract<python::list>(ctTmp.attr("relPositions"))();
+			
+			//get relative radii and positions; calc. volumes; get balance point:
+			vector<Real> relRadTmp(numCM), relVolTmp(numCM);
+			vector<Vector3r> relPosTmp(numCM);
+			Vector3r relPosTmpMean = Vector3r::Zero();
+			for (int jj = 0; jj < numCM; jj++) {
+				relRadTmp[jj] = python::extract<Real>(relRadListTmp[jj])();
+				relVolTmp[jj] = (4./3.)*Mathr::PI*pow(relRadTmp[jj],3.);
+				relPosTmp[jj] = python::extract<Vector3r>(relPosListTmp[jj])();
+				relPosTmpMean += relPosTmp[jj];
+			}
+			relPosTmpMean /= numCM;//balance point
+
+			//check for overlaps and correct volumes (-= volume of spherical caps):
+			Real distCMTmp, overlapTmp, hCapjj, hCapkk;
+			for (int jj = 0; jj < numCM; jj++) {
+				for (int kk = jj; kk < numCM; kk++) {
+					if (jj != kk) {
+						distCMTmp = (relPosTmp[jj] - relPosTmp[kk]).norm(); //distance between two spheres
+						overlapTmp = (relRadTmp[jj] + relRadTmp[kk]) - distCMTmp;//positive if overlapping ...
+						if (overlapTmp > 0.0) {//calculation of overlapping spheres, see http://mathworld.wolfram.com/Sphere-SphereIntersection.html
+							hCapjj = relRadTmp[jj] - (distCMTmp*distCMTmp - relRadTmp[kk]*relRadTmp[kk] + relRadTmp[jj]*relRadTmp[jj])/(2*distCMTmp);
+							hCapkk = relRadTmp[kk] - (distCMTmp*distCMTmp - relRadTmp[jj]*relRadTmp[jj] + relRadTmp[kk]*relRadTmp[kk])/(2*distCMTmp);
+							//calculation of spherical cap, see http://en.wikipedia.org/wiki/Spherical_cap
+							relVolTmp[jj] -= (1./3.)*Mathr::PI*hCapjj*hCapjj*(3.*relRadTmp[jj] - hCapjj);// correct relative volumes
+							relVolTmp[kk] -= (1./3.)*Mathr::PI*hCapkk*hCapkk*(3.*relRadTmp[kk] - hCapkk);
+						}
+					}
+				}
+			}
+			
+			//get relative volume of the clump:
+			Real relVolSumTmp = 0.0;
+			for (int jj = 0; jj < numCM; jj++) relVolSumTmp += relVolTmp[jj];
+			
+			//get pointer lists of spheres, that should be replaced:
+			int numReplaceTmp = round(num*amounts[ii]);
+			vector<shared_ptr<Body> > bpListTmp(numReplaceTmp);
+			int a = 0, c = 0;//counters
+			vector<int> posTmp;
+			FOREACH (const shared_ptr<Body>& b, sphereList) {
+				if (c == a*numSphereList/numReplaceTmp) {
+					bpListTmp[a] = b; a++;
+					posTmp.push_back(c);//remember position in sphereList
+				} c++;
+			}
+			for (int jj = 0; jj < a; jj++) {
+				sphereList.erase(sphereList.begin()+posTmp[jj]-jj);//remove bodies from sphereList, that were already found
+				numSphereList--;
+			}
+			
+			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
+			FOREACH (const shared_ptr<Body>& b, bpListTmp) {
+				//get sphere, that should be replaced:
+				const Sphere* sphere = YADE_CAST<Sphere*> (b->shape.get());
+				shared_ptr<Material> matTmp = b->material;
+				
+				//get a random rotation quaternion:
+				Quaternionr randAxisTmp = (Quaternionr) AngleAxisr(2*Mathr::PI*rndUnit(),Vector3r(rndUnit(),rndUnit(),rndUnit()));
+				randAxisTmp.normalize();
+				
+				//convert geometries in global coordinates (scaling):
+				Real scalingFactorVolume = ((4./3.)*Mathr::PI*pow(sphere->radius,3.))/relVolSumTmp;
+				Real scalingFactor1D = pow(scalingFactorVolume,1./3.);//=((vol. sphere)/(relative clump volume))^(1/3)
+				vector<Vector3r> newPosTmp(numCM);
+				vector<Real> newRadTmp(numCM);
+				vector<Body::id_t> idsTmp(numCM);
+				for (int jj = 0; jj < numCM; jj++) {
+					newPosTmp[jj] = relPosTmp[jj] - relPosTmpMean;	//shift position, to get balance point at (0,0,0)
+					newPosTmp[jj] = randAxisTmp*newPosTmp[jj];	//rotate around balance point
+					newRadTmp[jj] = relRadTmp[jj] * scalingFactor1D;//scale radii
+					newPosTmp[jj] = newPosTmp[jj] * scalingFactor1D;//scale position
+					newPosTmp[jj] += b->state->pos;			//translate new position to spheres center
+					
+					//create spheres:
+					shared_ptr<Body> newSphere = shared_ptr<Body>(new Body());
+					newSphere->state->blockedDOFs = State::DOF_NONE;
+					newSphere->state->mass = scalingFactorVolume*relVolTmp[jj]*matTmp->density;//vol. corrected mass for clump members
+					Real inertiaTmp = 2.0/5.0*newSphere->state->mass*newRadTmp[jj]*newRadTmp[jj];
+					newSphere->state->inertia	= Vector3r(inertiaTmp,inertiaTmp,inertiaTmp);
+					newSphere->state->pos = newPosTmp[jj];
+					newSphere->material = matTmp;
+					
+					shared_ptr<Sphere> sphereTmp = shared_ptr<Sphere>(new Sphere());
+					sphereTmp->radius = newRadTmp[jj];
+					sphereTmp->color = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+					sphereTmp->color.normalize();
+					newSphere->shape = sphereTmp;
+					
+					shared_ptr<Aabb> aabbTmp = shared_ptr<Aabb>(new Aabb());
+					aabbTmp->color = Vector3r(0,1,0);
+					newSphere->bound = aabbTmp;
+					proxee->insert(newSphere);
+					LOG_DEBUG("New body (sphere) "<<newSphere->id<<" added.");
+					idsTmp[jj] = newSphere->id;
+				}
+				Body::id_t newClumpId = clump(idsTmp);
+				ret.append(python::make_tuple(newClumpId,idsTmp));
+				erase(b->id);
+			}
+		}
+		return ret;
+	}
+	Real getClumpVolume(const shared_ptr<Body>& b, int numTries){//algorithm for estimation of clump volumes
+		checkClump(b);
+		Scene* scene(Omega::instance().getScene().get());	// get scene
+		shared_ptr<Sphere> sph (new Sphere);
+		int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
+		//get boundaries of clump:
+		const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
+		std::map<Body::id_t,Se3r>& members = clump->members;
+		Real xmax = -1e10;
+		Real ymax = xmax;
+		Real zmax = xmax;
+		Real xmin = 1e10;
+		Real ymin = xmin;
+		Real zmin = xmin;
+		FOREACH(MemberMap::value_type& mm, members){
+			const Body::id_t& memberId=mm.first;
+			const shared_ptr<Body>& member=Body::byId(memberId,scene);
+			assert(member->isClumpMember());
+			if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
+				const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
+				xmax = max(member->state->pos[0] + sphere->radius, xmax);
+				ymax = max(member->state->pos[1] + sphere->radius, ymax);
+				zmax = max(member->state->pos[2] + sphere->radius, zmax);
+				xmin = min(member->state->pos[0] - sphere->radius, xmin);
+				ymin = min(member->state->pos[1] - sphere->radius, ymin);
+				zmin = min(member->state->pos[2] - sphere->radius, zmin);
+			}
+			else {PyErr_Warn(PyExc_UserWarning,("Warning: getClumpVolume method detected, that clump with id "+lexical_cast<string>(b->getId())+" has non-spherical members.").c_str()); return 0;}
+		}
+		//generate regular grid points and check if point is inside or outside of clump:
+		Vector3r gridPoint;
+		int c_in = 0;
+		int numPoints1D = ceil(pow(numTries,1./3.));
+		for (int ii = 0; ii < numPoints1D; ii++){
+			for (int jj = 0; jj < numPoints1D; jj++){
+				for (int kk = 0; kk < numPoints1D; kk++){
+					bool isInside = false;
+					gridPoint = Vector3r(xmin + (xmax-xmin)*(ii+.5)/numPoints1D,ymin + (ymax-ymin)*(jj+.5)/numPoints1D,zmin + (zmax-zmin)*(kk+.5)/numPoints1D);
+					FOREACH(MemberMap::value_type& mm, members){
+						const Body::id_t& memberId=mm.first;
+						const shared_ptr<Body>& member=Body::byId(memberId,scene);
+						assert(member->isClumpMember());
+						if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
+							const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
+							if ((gridPoint - member->state->pos).squaredNorm() <= pow(sphere->radius,2.)) { isInside = true; break; }
+						}
+					}
+					if (isInside) c_in += 1;
+				}
+			}
+		}
+		//return estimated volume:
+		Real vol_estimated = ((1.*c_in)/(1.*pow(numPoints1D,3.)))*abs(xmax-xmin)*abs(ymax-ymin)*abs(zmax-zmin);
+		if (vol_estimated <= 0.0) {PyErr_Warn(PyExc_UserWarning,("Something went wrong in getClumpVolume method (clump volume <= 0 detected for clump with id "+lexical_cast<string>(b->getId())+").").c_str()); return 0;}
+		else return vol_estimated;
+	}
+	python::list adaptClumpMasses(python::list excludeList, int num_tries){
+		python::list ret;
+		Scene* scene(Omega::instance().getScene().get());	// get scene
+		shared_ptr<Sphere> sph (new Sphere);
+		int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
+		//convert excludeList to a c++ list
+		vector<Body::id_t> excludeListC;
+		for (int ii = 0; ii < python::len(excludeList); ii++) excludeListC.push_back(python::extract<Body::id_t>(excludeList[ii])());
+		Real volClump, estimatedMass, radTmp, volSum, memberMass, inertiaTmp;
+		FOREACH(const shared_ptr<Body>& b, *proxee){
+			if ( ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) && (b->isClump()) ){
+				volClump = getClumpVolume(b,num_tries);
+				const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
+				std::map<Body::id_t,Se3r>& members = clump->members;
+				volSum = 0.0;
+				estimatedMass = 0.0;
+				for (int ii = 0; ii < 2; ii++){
+					FOREACH(MemberMap::value_type& mm, members){
+						const Body::id_t& memberId=mm.first;
+						const shared_ptr<Body>& member=Body::byId(memberId,scene);
+						assert(member->isClumpMember());
+						radTmp = 0.0;
+						if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
+							const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
+							radTmp = sphere->radius;
+						}
+						if (ii == 0) volSum += (4./3.)*Mathr::PI*pow(radTmp,3.);
+						else {
+							shared_ptr<Material> matTmp = member->material;
+							memberMass = (volClump/volSum)*(4./3.)*Mathr::PI*pow(radTmp,3.)*matTmp->density;
+							member->state->mass = memberMass;//set vol. corrected mass for clump members
+							inertiaTmp = 2.0/5.0*memberMass*radTmp*radTmp;
+							member->state->inertia = Vector3r(inertiaTmp,inertiaTmp,inertiaTmp);
+							estimatedMass += memberMass;
+						}
+					}
+				}
+				Clump::updateProperties(b,/*intersecting*/ false);
+				ret.append(python::make_tuple(b->getId(),estimatedMass));
+			}
+		}
+		return ret;
+	}
+	Real getRoundness(python::list excludeList){
+		Scene* scene(Omega::instance().getScene().get());	// get scene
+		shared_ptr<Sphere> sph (new Sphere);
+		int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
+		//convert excludeList to a c++ list
+		vector<Body::id_t> excludeListC;
+		for (int ii = 0; ii < python::len(excludeList); ii++) excludeListC.push_back(python::extract<Body::id_t>(excludeList[ii])());
+		Real RC_sum = 0.0;	//sum of local roundnesses
+		Real R1, R2, vol_tmp;
+		int c = 0;		//counter
+		FOREACH(const shared_ptr<Body>& b, *proxee){
+			if ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) {
+				if ((b->shape->getClassIndex() ==  Sph_Index) && (b->isStandalone())) { RC_sum += 1.0; c += 1; }
+				if (b->isClump()){
+					R2 = 0.0;
+					const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
+					std::map<Body::id_t,Se3r>& members = clump->members;
+					FOREACH(MemberMap::value_type& mm, members){
+						const Body::id_t& memberId=mm.first;
+						const shared_ptr<Body>& member=Body::byId(memberId,scene);
+						assert(member->isClumpMember());
+						if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
+							const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
+							R2 = max((member->state->pos - b->state->pos).norm() + sphere->radius, R2);	//get minimum radius of a sphere, that imbeds clump
+						}
+					}
+					vol_tmp = getClumpVolume(b,100000);//for RC an accuracy of +/- 1/100000 should be ok
+					R1 = pow((3.*vol_tmp)/(4.*Mathr::PI),1./3.);	//get theoretical radius of a sphere, with same volume as clump
+					if (R2 < R1) {PyErr_Warn(PyExc_UserWarning,("Something went wrong in getRoundness method (R2 < R1 detected).")); return 0;}
+					RC_sum += R1/R2; c += 1;
+				}
+			}
+		}
+		if (c == 0) c = 1;	//in case no spheres and no clumps are present in the scene: RC = 0
+		return RC_sum/c;	//return roundness coefficient RC
 	}
 	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
@@ -400,7 +736,7 @@ class pyOmega{
 		return OMEGA.memSavedSimulations[":memory:"+mark];
 	}
 
-	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
+	void reset(){OMEGA.stop(); OMEGA.reset(); }
 	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
 	void resetCurrentScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetCurrentScene(); OMEGA.createSimulationLoop();}
 	void resetTime(){ OMEGA.getScene()->iter=0; OMEGA.getScene()->time=0; OMEGA.timeInit(); }
@@ -564,7 +900,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("addScene",&pyOmega::addScene,"Add new scene to Omega, returns its number")
 		.def("switchToScene",&pyOmega::switchToScene,"Switch to defined scene. Default scene has number 0, other scenes have to be created by addScene method.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
-		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example::\n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider.nBins=5 ## collider has become a variable after assignment to O.engines automatically)")
+		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example:\n\n\t *O.engines=[InsertionSortCollider(label='collider')]*\n\n\t *collider.nBins=5 # collider has become a variable after assignment to O.engines automatically*")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
 		.def("_sceneObj",&pyOmega::scene_get,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
@@ -602,8 +938,13 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__iter__",&pyBodyContainer::pyIter)
 		.def("append",&pyBodyContainer::append,"Append one Body instance, return its id.")
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
-		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids.")
-		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns clump id.")
+		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); returns a tuple of ``(clumpId,[memberId1,memberId2,...])``.")
+		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns ``clumpId``.")
+		.def("addToClump",&pyBodyContainer::addToClump,"Add body b to an existing clump c. c must be clump and b may not be a clump member of c.\n\nSee **/examples/clumps/addToClump-example.py** for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
+		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release body b from clump c. b must be a clump member of c.\n\nSee **/examples/clumps/releaseFromClump-example.py** for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
+		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps, to adapt masses of clumps with multiple overlaps use :yref:`adaptClumpMasses()<BodyContainer.adaptClumpMasses>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
+		.def("adaptClumpMasses",&pyBodyContainer::adaptClumpMasses,"Adapt clump masses and inertia via deterministic Monte-Carlo algorithm, that estimates clump volume using a regular grid of points; returns a list of tuples: ``[(clumpId1,estimatedMassOfClump1),(clumpId2,estimatedMassOfClump2),...]``.\n\nIt is recommended to use this method, when clumps where created via :yref:`clump()<BodyContainer.clump>` or :yref:`appendClumped()<BodyContainer.appendClumped>`. This method could also be used to adapt masses of clumps with multiple overlaps (e.g. triple sections). Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.adaptClumpMasses([ids],1000000) #number of grid points is set to 1000000*\n\nSee **/examples/clumps/adaptClumpMasses-example.py** for an example script.")
+		.def("getRoundness",&pyBodyContainer::getRoundness,"Returns roundness coefficient RC = R2/R1. R1 is the theoretical radius of a sphere, with same volume as clump. R2 is the minimum radius of a sphere, that imbeds clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
 		.def("replace",&pyBodyContainer::replace);

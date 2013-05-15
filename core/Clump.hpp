@@ -78,7 +78,7 @@ class Clump: public Shape {
 				// velocity update
 				subState->vel=clumpState->vel+clumpState->angVel.cross(subState->pos-clumpState->pos);
 				subState->angVel=clumpState->angVel;
-				if(likely(integrator)) integrator->saveMaximaDisplacement(b);
+				if(integrator) integrator->saveMaximaDisplacement(b);
 			}
 		}
 

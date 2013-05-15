@@ -35,7 +35,7 @@ class IntrSmooth3d():
 		>>> from yade import utils
 		>>> O.bodies.append([utils.sphere((0,0,0),1),utils.sphere((0,0,1.9),1)])
 		[0, 1]
-		>>> O.engines=[InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom(),],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
+		>>> O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom(),],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 		>>> utils.createInteraction(0,1) #doctest: +ELLIPSIS
 		<Interaction instance at 0x...>
 
@@ -127,7 +127,7 @@ def oofemTextExport(fName):
 	The format is line-oriented as follows::
 
 		E G                                                 # elastic material parameters
-		epsCrackOnset crackOpening xiShear transStrainCoeff # tensile parameters; epsFr=crackOpening/len
+		epsCrackOnset relDuctility xiShear transStrainCoeff # tensile parameters; epsFr=epsCrackOnset*relDuctility
 		cohesionT tanPhi                                    # shear parameters
 		number_of_spheres number_of_links
 		id x y z r boundary                                 # spheres; boundary: -1 negative, 0 none, 1 positive

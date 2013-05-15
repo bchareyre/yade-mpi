@@ -10,7 +10,7 @@ O.cell.hSize=Matrix3(1.0, -0.15, -0.10,
 		    0.3, -0.3, 1.0)
 sp=pack.SpherePack()
 num=sp.makeCloud(hSize=O.cell.hSize, rMean=-0.01,rRelFuzz=.2, num=500,periodic=True, porosity=0.52,distributeMass=False)
-O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
+O.bodies.append([sphere(s[0],s[1]) for s in sp])
 
 
 O.engines=[
@@ -26,7 +26,7 @@ O.engines=[
 	NewtonIntegrator(damping=.2),
 	#PyRunner(iterPeriod=500,command='print "strain: ",triax.strain," stress: ",triax.stress')
 ]
-O.dt=0.5*utils.PWaveTimeStep()
+O.dt=0.5*PWaveTimeStep()
 qt.View()
 
 phase=0

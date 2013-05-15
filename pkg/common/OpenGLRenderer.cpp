@@ -99,7 +99,7 @@ void OpenGLRenderer::setBodiesDispInfo(){
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling
 		bodyDisp[id].pos=cellPos; // point of reference (inside the cell for periodic)
-		if(scaleDisplacements) bodyDisp[id].pos+=dispScale.cwise()*Vector3r(pos-refPos); // add scaled translation to the point of reference
+		if(scaleDisplacements) bodyDisp[id].pos+=dispScale.cwiseProduct(Vector3r(pos-refPos)); // add scaled translation to the point of reference
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
 			Quaternionr relRot=refOri.conjugate()*ori;
@@ -120,7 +120,7 @@ void OpenGLRenderer::drawPeriodicCell(){
 		if(dispScale!=Vector3r::Ones()){
 			const Matrix3r& refHSize(scene->cell->refHSize);
 			Matrix3r scaledHSize;
-			for(int i=0; i<3; i++) scaledHSize.col(i)=refHSize.col(i)+dispScale.cwise()*Vector3r(hSize.col(i)-refHSize.col(i));
+			for(int i=0; i<3; i++) scaledHSize.col(i)=refHSize.col(i)+dispScale.cwiseProduct(Vector3r(hSize.col(i)-refHSize.col(i)));
 			GLUtils::Parallelepiped(scaledHSize.col(0),scaledHSize.col(1),scaledHSize.col(2));
 		} else {
 			GLUtils::Parallelepiped(hSize.col(0),hSize.col(1),hSize.col(2));

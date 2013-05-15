@@ -14,7 +14,6 @@
 // disable optimization which are "unsafe":
 // eigen objects cannot be passed by-value, otherwise they will no be aligned
 
-#define EIGEN2_SUPPORT  // This makes Eigen3 migration easier
 #define EIGEN_DONT_VECTORIZE
 #define EIGEN_DONT_ALIGN
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
@@ -22,25 +21,11 @@
 
 #include<Eigen/Core>
 #include<Eigen/Geometry>
-#if EIGEN_WORLD_VERSION==2
-	#include<Eigen/Array>
-#endif
 #include<Eigen/QR>
 #include<Eigen/LU>
 #include<Eigen/SVD>
+#include<Eigen/Eigenvalues>
 #include<float.h>
-
-// USING_PART_OF_NAMESPACE_EIGEN
-//using namespace eigen; // for eigen3
-// 
-
-// mimick expectation macros that linux has (see e.g. http://kerneltrap.org/node/4705)
-#ifndef likely
-	#define likely(x) __builtin_expect(!!(x),1)
-#endif
-#ifndef unlikely
-	#define unlikely(x) __builtin_expect(!!(x),1)
-#endif
 
 // templates of those types with single parameter are not possible, use macros for now
 #define VECTOR2_TEMPLATE(Scalar) Eigen::Matrix<Scalar,2,1>

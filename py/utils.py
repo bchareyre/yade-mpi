@@ -12,11 +12,15 @@ Devs: please DO NOT ADD more functions here, it is getting too crowded!
 import math,random,doctest,geom,numpy
 from yade import *
 from yade.wrapper import *
-from miniEigen import *
 try: # use psyco if available
 	import psyco
 	psyco.full()
 except ImportError: pass
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 
 # c++ implementations for performance reasons
@@ -27,21 +31,29 @@ def saveVars(mark='',loadNow=True,**kw):
 
 	For example, variables *a*, *b* and *c* are defined. To save them, use::
 
-		>>> from yade import utils
-		>>> utils.saveVars('something',a=1,b=2,c=3)
+		>>> saveVars('something',a=1,b=2,c=3)
 		>>> from yade.params.something import *
 		>>> a,b,c
 		(1, 2, 3)
 
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
 
-		>>> utils.loadVars('something')
+		>>> loadVars('something')
 
 	and they will be defined in the yade.params.\ *mark* module. The *loadNow* parameter calls :yref:`yade.utils.loadVars` after saving automatically.
+	
+	If 'something' already exists, given variables will be inserted.
 	"""
 	import cPickle
-	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
+	try: 
+		d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])	#load dictionary d
+		for key in kw.keys():
+			d[key]=kw[key]							#insert new variables into d
+	except KeyError: 
+		d = kw
+	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(d)
 	if loadNow: loadVars(mark)
+
 
 def loadVars(mark=None):
 	"""Load variables from :yref:`yade.utils.saveVars`, which are saved inside the simulation.
@@ -203,7 +215,7 @@ def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highligh
 	b.mask=mask
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
+def box(center,extents,orientation=Quaternion(1,0,0,0),dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):
 	"""Create box (cuboid) with given parameters.
 
 	:param Vector3 extents: half-sizes along x,y,z axes
@@ -214,6 +226,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=None,fixed=False,wire=False
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material,pos=center,dynamic=dynamic,fixed=fixed)
+	b.state.ori=orientation
 	b.mask=mask
 	b.aspherical=True
 	return b
@@ -261,22 +274,26 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
+	i=createInteraction(id1,id2)
+	nodeMat=sph1.material
 	b.shape.node1=sph1 ; b.shape.node2=sph2
 	sph1.shape.addConnection(b) ; sph2.shape.addConnection(b)
-	segt=sph2.state.pos - sph1.state.pos
+	if(O.periodic):
+		if(cellDist!=None):
+			i.cellDist=cellDist
+		segt=sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos
+	else: segt=sph2.state.pos - sph1.state.pos
 	L=segt.norm()
 	V=0.5*L*math.pi*radius**2
 	geomInert=(2./5.)*V*radius**2
-	_commonBodySetup(b,V,Vector3(0.,0.,0.),material,pos=sph1.state.pos,dynamic=False,fixed=True)
-	sph1.state.mass = sph1.state.mass + V*b.material.density
-	sph2.state.mass = sph2.state.mass + V*b.material.density
-	for i in [0,1,2]:
-		sph1.state.inertia[i] = sph1.state.inertia[i] + geomInert*b.material.density
-		sph2.state.inertia[i] = sph2.state.inertia[i] + geomInert*b.material.density
+	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=sph1.state.pos,dynamic=False,fixed=True)
+	sph1.state.mass = sph1.state.mass + V*nodeMat.density
+	sph2.state.mass = sph2.state.mass + V*nodeMat.density
+	for k in [0,1,2]:
+		sph1.state.inertia[k] = sph1.state.inertia[k] + geomInert*nodeMat.density
+		sph2.state.inertia[k] = sph2.state.inertia[k] + geomInert*nodeMat.density
 	b.aspherical=False
-	i=createInteraction(id1,id2)
 	if O.periodic:
-		if(cellDist!=None):i.cellDist=cellDist
 		i.phys.unp= -(sph2.state.pos + O.cell.hSize*i.cellDist - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius
 		b.shape.periodic=True
 		b.shape.cellDist=i.cellDist
@@ -284,11 +301,11 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 		i.phys.unp= -(sph2.state.pos - sph1.state.pos).norm() + sph1.shape.radius + sph2.shape.radius	
 	i.geom.connectionBody=b
 	I=math.pi*(2.*radius)**4/64.
-	E=sph1.material.young
+	E=nodeMat.young
 	i.phys.kn=E*math.pi*(radius**2)/L
 	i.phys.kr=2.*E*I/L
 	i.phys.ks=12.*E*I/(L**3)
-	G=E/(2.*(1+sph1.material.poisson))
+	G=E/(2.*(1+nodeMat.poisson))
 	i.phys.ktw=2.*I*G/L
 	b.mask=mask
 	return b
@@ -412,12 +429,13 @@ def randomizeColors(onlyDynamic=False):
 		color=(random.random(),random.random(),random.random())
 		if b.dynamic or not onlyDynamic: b.shape.color=color
 
-def avgNumInteractions(cutoff=0.,skipFree=False):
+def avgNumInteractions(cutoff=0.,skipFree=False,considerClumps=False):
 	r"""Return average numer of interactions per particle, also known as *coordination number* $Z$. This number is defined as
 
 	.. math:: Z=2C/N
 
-	where $C$ is number of contacts and $N$ is number of particles.
+	where $C$ is number of contacts and $N$ is number of particles. When clumps are present, number of particles is the sum of standalone spheres plus the sum of clumps.
+	Clumps are considered in the calculation if cutoff != 0 or skipFree = True. If cutoff=0 (default) and skipFree=False (default) one needs to set considerClumps=True to consider clumps in the calculation.
 
 	With *skipFree*, particles not contributing to stable state of the packing are skipped, following equation (8) given in [Thornton2000]_:
 
@@ -425,20 +443,20 @@ def avgNumInteractions(cutoff=0.,skipFree=False):
 
 	:param cutoff: cut some relative part of the sample's bounding box away.
 	:param skipFree: see above.
+	:param considerClumps: also consider clumps if cutoff=0 and skipFree=False; for further explanation see above.
 	
 """
-	if cutoff==0 and not skipFree: return 2*O.interactions.countReal()*1./len(O.bodies)
+	if cutoff==0 and not skipFree and not considerClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
 	else:
 		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 		## CC is 2*C
 		CC=sum([nums[i]*counts[i] for i in range(len(nums))]); N=sum(counts)
-		if not skipFree: return CC*1./N
+		if not skipFree: return CC*1./N if N>0 else float('nan')
 		## find bins with 0 and 1 spheres
 		N0=0 if (0 not in nums) else counts[nums.index(0)]
 		N1=0 if (1 not in nums) else counts[nums.index(1)]
 		NN=N-N0-N1
 		return (CC-N1)*1./NN if NN>0 else float('nan')
-
 
 def plotNumInteractionsHistogram(cutoff=0.):
 	"Plot histogram with number of interactions per body, optionally cutting away *cutoff* relative axis-aligned box from specimen margin."
@@ -883,3 +901,26 @@ def psd(bins=5, mass=True, mask=-1):
 			binsProc[i] = binsSumCum[i]/binsSumCum[len(binsSumCum)-1]
 			i+=1
 	return binsSizes, binsProc, binsSumCum
+
+class clumpTemplate:
+	"""Create a clump template by a list of relative radii and a list of relative positions. Both lists must have the same length.
+	
+	:param [float,float,...] relRadii: list of relative radii (minimum length = 2)
+	:param [Vector3,Vector3,...] relPositions: list of relative positions (minimum length = 2)
+	
+	"""
+	def __init__(self,relRadii=[],relPositions=[[],[]]):
+		if (len(relRadii) != len(relPositions)):
+			raise ValueError("Given lists must have same length! Given lists does not match clump template structure.");
+		if (len(relRadii) < 2):
+			raise ValueError("One or more of given lists for relative radii have length < 2! Given lists does not match clump template structure.");
+		for ii in range(0,len(relPositions)):
+			if len(relPositions[ii]) != 3:
+				raise ValueError("One or more of given lists for relative positions do not have length of 3! Given lists does not match clump template structure.");
+			for jj in range(ii,len(relPositions)):
+				if ii != jj:
+					if (relPositions[ii] == relPositions[jj]): 
+						raise ValueError("Two or more of given lists for relative positions are equal! Given lists does not match clump template structure.");
+		self.numCM = len(relRadii)
+		self.relRadii = relRadii
+		self.relPositions = relPositions

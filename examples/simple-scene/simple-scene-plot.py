@@ -19,17 +19,15 @@ O.engines=[
 	### whichever comes soones. virtTimeLim attribute is unset, hence virtual time period is not taken into account.
 	PyRunner(iterPeriod=20,command='myAddPlotData()')
 ]
-from yade import utils
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0]))
-O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
-O.dt=.002*utils.PWaveTimeStep()
+O.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0]))
+O.bodies.append(sphere([0,0,2],1,color=[0,1,0]))
+O.dt=.002*PWaveTimeStep()
 
 
 ############################################
 ##### now the part pertaining to plots #####
 ############################################
 
-from math import *
 from yade import plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)

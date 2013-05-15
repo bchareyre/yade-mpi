@@ -17,7 +17,7 @@ class Body;
 class InteractionContainer;
 
 #if YADE_OPENMP
-	#define YADE_PARALLEL_FOREACH_BODY_BEGIN(b_,bodies) const Body::id_t _sz(bodies->size()); _Pragma("omp parallel for") for(Body::id_t _id=0; _id<_sz; _id++){ if(unlikely(!(*bodies)[_id]))  continue; b_((*bodies)[_id]);
+	#define YADE_PARALLEL_FOREACH_BODY_BEGIN(b_,bodies) const Body::id_t _sz(bodies->size()); _Pragma("omp parallel for") for(Body::id_t _id=0; _id<_sz; _id++){ if(!(*bodies)[_id])  continue; b_((*bodies)[_id]);
 	#define YADE_PARALLEL_FOREACH_BODY_END() }
 #else
 	#define YADE_PARALLEL_FOREACH_BODY_BEGIN(b,bodies) FOREACH(b,*(bodies)){

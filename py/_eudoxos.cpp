@@ -4,7 +4,8 @@
 
 #include<yade/pkg/dem/ConcretePM.hpp>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 
@@ -156,7 +157,7 @@ struct HelixInteractionLocator2d{
 			boost::tie(r,h,theta)=Shop::spiralProject(ge->contactPoint,dH_dTheta,axis,periodStart,theta0);
 			if(!isnan(thetaMin) && theta<thetaMin) continue;
 			if(!isnan(thetaMax) && theta>thetaMax) continue;
-			lo=lo.cwise().min(Vector2r(r,h)); hi=hi.cwise().max(Vector2r(r,h));
+			lo=lo.cwiseMin(Vector2r(r,h)); hi=hi.cwiseMax(Vector2r(r,h));
 			minD0=min(minD0,ge->refLength); maxD0=max(maxD0,ge->refLength);
 			minTheta=min(minTheta,theta); maxTheta=max(maxTheta,theta);
 			intrs.push_back(FlatInteraction(r,h,theta,i));

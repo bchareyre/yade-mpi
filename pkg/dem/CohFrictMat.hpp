@@ -27,10 +27,9 @@ class CohFrictMat : public FrictMat
 		((Real,normalCohesion,0,,""))
 		((Real,shearCohesion,0,,""))
 		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
-		((Real,cylCylNormalCoh,0,,"Normal cohesion between two different chained cylinders."))
-        ((Real,cylCylShearCoh,0,,"Shear cohesion between two different chained cylinders.")),
+		,
 		createIndex();
-					);
+		);
 /// Indexable
 	REGISTER_CLASS_INDEX(CohFrictMat,FrictMat);
 };

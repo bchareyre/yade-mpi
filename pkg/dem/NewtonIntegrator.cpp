@@ -25,13 +25,13 @@ void NewtonIntegrator::cundallDamp2nd(const Real& dt, const Vector3r& vel, Vecto
 }
 
 Vector3r NewtonIntegrator::computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs){
-	if(likely(blockedDOFs==0)) return (force/mass + gravity);
+	if(blockedDOFs==0) return (force/mass + gravity);
 	Vector3r ret(Vector3r::Zero());
 	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,false))) ret[i]+=force[i]/mass+gravity[i];
 	return ret;
 }
 Vector3r NewtonIntegrator::computeAngAccel(const Vector3r& torque, const Vector3r& inertia, int blockedDOFs){
-	if(likely(blockedDOFs==0)) return torque.cwise()/inertia;
+	if(blockedDOFs==0) return torque.cwiseQuotient(inertia);
 	Vector3r ret(Vector3r::Zero());
 	for(int i=0; i<3; i++) if(!(blockedDOFs & State::axisDOF(i,true))) ret[i]+=torque[i]/inertia[i];
 	return ret;
@@ -41,9 +41,9 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	assert(b->isStandalone() || b->isClump());
 	// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
 	if(damping!=0. && state->isDamped){
-		scene->energy->add(fluctVel.cwise().abs().dot(f.cwise().abs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
+		scene->energy->add(fluctVel.cwiseAbs().dot(f.cwiseAbs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,/*non-incremental*/false);
 		// when the aspherical integrator is used, torque is damped instead of ang acceleration; this code is only approximate
-		scene->energy->add(state->angVel.cwise().abs().dot(m.cwise().abs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,false);
+		scene->energy->add(state->angVel.cwiseAbs().dot(m.cwiseAbs())*damping*scene->dt,"nonviscDamp",nonviscDampIx,false);
 	}
 	// kinetic energy
 	Real Etrans=.5*state->mass*fluctVel.squaredNorm();
@@ -53,9 +53,11 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 		Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 		Matrix3r T(state->ori);
 		Erot=.5*b->state->angVel.transpose().dot((T.transpose()*mI*T)*b->state->angVel);
-	} else { Erot=0.5*state->angVel.dot(state->inertia.cwise()*state->angVel); }
+	} else { Erot=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel)); }
 	if(!kinSplit) scene->energy->add(Etrans+Erot,"kinetic",kinEnergyIx,/*non-incremental*/true);
 	else{ scene->energy->add(Etrans,"kinTrans",kinEnergyTransIx,true); scene->energy->add(Erot,"kinRot",kinEnergyRotIx,true); }
+	// gravitational work (work done by gravity is "negative", since the energy appears in the system from outside)
+	scene->energy->add(-gravity.dot(b->state->vel)*b->state->mass*scene->dt,"gravWork",fieldWorkIx,/*non-incremental*/false);
 }
 
 void NewtonIntegrator::saveMaximaVelocity(const Body::id_t& id, State* state){
@@ -87,7 +89,7 @@ void NewtonIntegrator::ensureSync()
 {
 	if (syncEnsured) return;	
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
-		if(b->isClump()) continue;
+// 		if(b->isClump()) continue;
 		scene->forces.addForce(b->getId(),Vector3r(0,0,0));
 	} YADE_PARALLEL_FOREACH_BODY_END();
 	syncEnsured=true;
@@ -105,6 +107,8 @@ void NewtonIntegrator::action()
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
 	const Real& dt=scene->dt;
+	//Take care of user's request to change velGrad. Safe to change it here after the interaction loop.
+	if (scene->cell->velGradChanged) {scene->cell->velGrad=scene->cell->nextVelGrad; scene->cell->velGradChanged=0;}
 	homoDeform=scene->cell->homoDeform;
 	dVelGrad=scene->cell->velGrad-prevVelGrad;
 	// account for motion of the periodic boundary, if we remember its last position
@@ -134,14 +138,14 @@ void NewtonIntegrator::action()
 	#endif
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 			// clump members are handled inside clumps
-			if(unlikely(b->isClumpMember())) continue;
+			if(b->isClumpMember()) continue;
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
 			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();
 			// clumps forces
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
 				#ifdef YADE_OPENMP
-				//it is safe here, since onky one thread will read/write
+				//it is safe here, since only one thread will read/write
 				scene->forces.getTorqueUnsynced(id)+=m;
 				scene->forces.getForceUnsynced(id)+=f;
 				#else
@@ -163,7 +167,7 @@ void NewtonIntegrator::action()
 			Vector3r fluctVel=isPeriodic?scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,prevVelGrad):state->vel;
 
 			// numerical damping & kinetic energy
-			if(unlikely(trackEnergy)) updateEnergy(b,state,fluctVel,f,m);
+			if(trackEnergy) updateEnergy(b,state,fluctVel,f,m);
 
 			// whether to use aspherical rotation integration for this body; for no accelerations, spherical integrator is "exact" (and faster)
 			bool useAspherical=(exactAsphericalRot && b->isAspherical() && state->blockedDOFs!=State::DOF_ALL);
@@ -210,7 +214,7 @@ void NewtonIntegrator::action()
 	#ifdef YADE_OPENMP
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
-	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize(); prevVelGrad=scene->cell->velGrad; }
+	if(scene->isPeriodic) { prevCellSize=scene->cell->getSize(); prevVelGrad=scene->cell->prevVelGrad=scene->cell->velGrad; }
 }
 
 void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, const Real& dt){
@@ -244,13 +248,13 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 	Matrix3r A=state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2. * M; // global angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
-	Vector3r angVel_b_n = l_b_n.cwise()/state->inertia; // local angular velocity at time n
+	Vector3r angVel_b_n = l_b_n.cwiseQuotient(state->inertia); // local angular velocity at time n
 	if (densityScaling) angVel_b_n*=state->densityScaling;
 	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
 	const Quaternionr Q_half = state->ori + dt/2. * dotQ_n; // Q at time n+1/2
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
-	Vector3r angVel_b_half = l_b_half.cwise()/state->inertia; // local angular velocity at time n+1/2
+	Vector3r angVel_b_half = l_b_half.cwiseQuotient(state->inertia); // local angular velocity at time n+1/2
 	if (densityScaling) angVel_b_half*=state->densityScaling;
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
 	state->ori=state->ori+dt*dotQ_half; // Q at time n+1
@@ -268,12 +272,9 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 bool NewtonIntegrator::get_densityScaling() {
 	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
 		GlobalStiffnessTimeStepper* ts=dynamic_cast<GlobalStiffnessTimeStepper*>(e.get());
-		if (ts) {
-			if (densityScaling != ts->densityScaling) LOG_ERROR("inconsistent set of densityScaling in Newton and TimeStepper, did you change the TimeStepper's value?");
-			return ts->densityScaling;
-		}
-	} LOG_ERROR("Density scaling needs GlobalStiffnessTimeStepper present in O.engines.");
-	return 0;
+		if (ts && densityScaling != ts->densityScaling) LOG_WARN("density scaling is not active in the timeStepper, it will have no effect unless a scaling is specified manually for some bodies");}
+	LOG_WARN("GlobalStiffnessTimeStepper not present in O.engines, density scaling will have no effect unless a scaling is specified manually for some bodies");
+	return densityScaling;;
 }
 
 void NewtonIntegrator::set_densityScaling(bool dsc) {
@@ -282,9 +283,10 @@ void NewtonIntegrator::set_densityScaling(bool dsc) {
 		if (ts) {
 			ts->densityScaling=dsc;
 			densityScaling=dsc;
+			LOG_WARN("GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the the timestepper if you don't want the scaling adjusted automatically.");
 			return;
 		}
-	} LOG_ERROR("Density scaling needs GlobalStiffnessTimeStepper present in O.engines. Not set.");
+	} LOG_WARN("GlobalStiffnessTimeStepper not found in O.engines. Density scaling will have no effect unless a scaling is specified manually for some bodies");
 }
 
 

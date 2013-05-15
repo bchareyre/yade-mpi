@@ -15,17 +15,17 @@ O.engines=[
 	]
 
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0]),
-	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True)
+	facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0]),
+	facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True)
 ])
 
 import random
 for i in range(0,100):
-	s=utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05))
+	s=sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05))
 	s.state.vel=Vector3(random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1))
 	O.bodies.append(s)
 
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.run()
 O.saveTmp('init')
 

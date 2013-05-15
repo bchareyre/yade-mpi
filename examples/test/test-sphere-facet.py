@@ -37,8 +37,8 @@ O.engines=[
 	PyRunner(iterPeriod=4000,command='setGravity()'),
 	]
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0],material=mat),
-	utils.sphere([0,0,sign*.49999],radius=.5,wire=True,material=mat),
+	facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0],material=mat),
+	sphere([0,0,sign*.49999],radius=.5,wire=True,material=mat),
 ])
 O.timingEnabled=True
 O.saveTmp()

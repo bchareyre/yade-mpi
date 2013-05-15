@@ -4,8 +4,7 @@
 
 # Experiment beam-like behaviour with chained cylinders + CohFrict connexions
 
-from yade import utils,pack
-import math
+from yade import pack
 
 young=4.0e6
 poisson=3
@@ -32,8 +31,8 @@ else:
  	Ns=sp.makeCloud(Vector3(-0.3,0.2,-1.0),Vector3(+0.3,+0.5,+1.0),-1,.2,Ns,False,0.8)
 	sp.save("cloud4cylinders"+`Ns`)
 
-O.bodies.append([utils.sphere(center,rad,material='spheremat') for center,rad in sp])
-walls=utils.aabbWalls((Vector3(-0.3,-0.15,-1),Vector3(+0.3,+1.0,+1)),thickness=.1,material='walllmat')
+O.bodies.append([sphere(center,rad,material='spheremat') for center,rad in sp])
+walls=aabbWalls((Vector3(-0.3,-0.15,-1),Vector3(+0.3,+1.0,+1)),thickness=.1,material='walllmat')
 wallIds=O.bodies.append(walls)
 
 O.initializers=[
@@ -71,10 +70,10 @@ for j in range(-Nc, Nc+1):
 		omega=20/float(Ne); hy=0.0; hz=0.05; hx=1.5;
 		px=float(i)*hx/float(Ne)-0.8+dxj; py=sin(float(i)*omega)*hy+dyj; pz=cos(float(i)*omega)*hz+dzj;
 		px2=float(i+1.)*hx/float(Ne)-0.8+dxj; py2=sin(float(i+1.)*omega)*hy+dyj; pz2=cos(float(i+1.)*omega)*hz+dzj;
-		utils.chainedCylinder(begin=Vector3(pz,py,px), radius=0.02,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5),material='cylindermat')
+		chainedCylinder(begin=Vector3(pz,py,px), radius=0.02,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5),material='cylindermat')
 		if (i == Ne-1): #close the chain with a node of size 0
 			print "closing chain"
-			b=utils.chainedCylinder(begin=Vector3(pz2,py2,px2), radius=0.02,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5),material='cylindermat')
+			b=chainedCylinder(begin=Vector3(pz2,py2,px2), radius=0.02,end=Vector3(pz2,py2,px2),color=Vector3(0.6,0.5,0.5),material='cylindermat')
 			b.state.blockedDOFs='xyzXYZ'
 	ChainedState.currentChain=ChainedState.currentChain+1
 

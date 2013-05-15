@@ -210,14 +210,16 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-
 global writer
 writer=None
 
-for w in ['html','latex']: #['html','latex']:
-	if 'nolatex' in sys.argv and w=='latex': continue # skip latex build if passed nolatex (used in debian packages)
+for w in ['html','latex','epub']:
 	writer=w
 	genWrapperRst()
 	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
 	sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
 	sphinx.main(sys.argv)
-	makeBaseClassesClickable((outDir+'/html/yade.wrapper.html' if writer=='html' else outDir+'/latex/Yade.tex'),writer)
+	if writer=='html':
+		makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
+	elif writer=='latex':
+		makeBaseClassesClickable((outDir+'/latex/Yade.tex'),writer)
 	if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
 		os.system('rm '+ outDir+'/html/_static/jquery.js')
 		os.system('ln -s /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')

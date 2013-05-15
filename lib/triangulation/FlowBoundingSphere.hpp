@@ -1,5 +1,7 @@
 /*************************************************************************
-*  Copyright (C) 2010 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
+*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2012 by Donia Marzougui <donia.marzougui@grenoble-inp.fr>*
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -49,6 +51,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
+		int errorCode;
 		
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
@@ -76,14 +79,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Finite_edges_iterator>  Edge_list;
 		vector <double> Edge_Surfaces;
 		vector <pair<int,int> > Edge_ids;
-		vector <Vector3r> Edge_force_point;
-		vector <Real> Edge_HydRad;
-		vector <Vector3r> Edge_normal;
-		vector <Real> Edge_surfaceDist;
 		vector <Real> edgeNormalLubF;
-		vector <Vector3r>Edge_centerDistVect;
-		vector <Real> Edge_centerDist;
-		vector <Real> Edge_meanRad;
 		vector <Vector3r> viscousShearForces;
 		vector <Vector3r> viscousShearTorques;
 		vector <Vector3r> normLubForce;
@@ -138,10 +134,10 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		void GenerateVoxelFile ( );
 		
-		void ComputeEdgesSurfaces();
-		Vector3r ComputeViscousForce(Vector3r deltaV, int edge_id);
-		Real ComputeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt);
-		Vector3r ComputeShearLubricationForce(Vector3r deltaV,int edge_id, Real eps);
+		void computeEdgesSurfaces();
+		Vector3r computeViscousShearForce(const Vector3r& deltaV, const int& edge_id, const Real& Rh);
+		Real computeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt, const Real& meanRad);
+		Vector3r computeShearLubricationForce(const Vector3r& deltaShearV, const Real& dist, const int& edge_id, const Real& eps, const Real& centerDist, const Real& meanRad);
 
 		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 

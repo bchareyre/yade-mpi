@@ -24,8 +24,8 @@ class LawTester: public PartialEngine{
 		virtual void action();
 		void postLoad(LawTester&);
 		void warnDeprec(const string& s1, const string& s2){ if(!warnedDeprecPtRot){ warnedDeprecPtRot=true; LOG_WARN("LawTester."<<s1<<" is deprecated, use LawTester."<<s2<<" instead.");} }
-		Vector3r get_ptOurs(){ warnDeprec("ptOurs","uTest.head()"); return uTest.start<3>(); } Vector3r get_ptGeom(){ warnDeprec("ptGeom","uGeom.head()"); return uGeom.start<3>(); }
-		Vector3r get_rotOurs(){ warnDeprec("rotOurs","uTest.tail()"); return uTest.end<3>(); }  Vector3r get_rotGeom(){ warnDeprec("rotGeom","uGeom.tail()"); return uGeom.end<3>(); }
+		Vector3r get_ptOurs(){ warnDeprec("ptOurs","uTest.head()"); return uTest.head<3>(); } Vector3r get_ptGeom(){ warnDeprec("ptGeom","uGeom.head()"); return uGeom.head<3>(); }
+		Vector3r get_rotOurs(){ warnDeprec("rotOurs","uTest.tail()"); return uTest.tail<3>(); }  Vector3r get_rotGeom(){ warnDeprec("rotGeom","uGeom.tail()"); return uGeom.tail<3>(); }
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of local normal and shear displacements and rotations (using either :yref:`disPpath<LawTester.disPath>` and :yref:`rotPath<LawTester.rotPath>` [or :yref:`path<LawTester.path>` in the future]). Supported :yref:`IGeom` types are :yref:`ScGeom`, :yref:`L3Geom` and :yref:`L6Geom`. \n\nSee :ysrc:`scripts/test/law-test.py` for an example.",
 		((vector<Vector3r>,disPath,,Attr::triggerPostLoad,"Loading path, where each Vector3 contains desired normal displacement and two components of the shear displacement (in local coordinate system, which is being tracked automatically. If shorter than :yref:`rotPath<LawTester.rotPath>`, the last value is repeated."))

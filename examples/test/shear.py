@@ -4,8 +4,8 @@
 #
 
 O.bodies.append([
-	utils.sphere([0,0,0],.5000001,fixed=True,color=(1,0,0)),
-	utils.sphere([0,0,1],.5000001,fixed=False,color=(0,0,1))
+	sphere([0,0,0],.5000001,fixed=True,color=(1,0,0)),
+	sphere([0,0,1],.5000001,fixed=False,color=(0,0,1))
 ])
 O.engines=[
 	ForceResetter(),

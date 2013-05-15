@@ -11,7 +11,7 @@ O.materials.append(FrictMat(young=30e9,density=2400))
 p=pack.SpherePack()
 p.makeCloud(Vector3(0,0,0),Vector3(20,20,10),1,.5,700,True)
 for sph in p:
-	O.bodies.append(utils.sphere(sph[0],sph[1]))
+	O.bodies.append(sphere(sph[0],sph[1]))
 
 
 O.timingEnabled=True
@@ -26,7 +26,7 @@ O.engines=[
 	PeriIsoCompressor(charLen=.5,stresses=[-50e9,-1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
 	NewtonIntegrator(damping=.4)
 ]
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.saveTmp()
 #print O.cell.refSize
 from yade import qt; qt.Controller(); qt.View()
@@ -45,4 +45,4 @@ timing.stats()
 #sp.cellFill((30,30,30))
 #print sp.cellSize
 #for s in sp:
-#	O.bodies.append(utils.sphere(s[0],s[1]))
+#	O.bodies.append(sphere(s[0],s[1]))

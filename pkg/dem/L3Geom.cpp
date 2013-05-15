@@ -291,7 +291,7 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 
 	// compute force
 	Vector3r& localF(geom->F);
-	localF=geom->relU().cwise()*Vector3r(phys->kn,phys->ks,phys->ks);
+	localF=geom->relU().cwiseProduct(Vector3r(phys->kn,phys->ks,phys->ks));
 	// break if necessary
 	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I); return; }
 
@@ -304,10 +304,10 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 			Vector3r u0slip=(1-ratio)*Vector3r(/*no slip in the normal sense*/0,geom->relU()[1],geom->relU()[2]);
 			geom->u0+=u0slip; // increment plastic displacement
 			Fs*=ratio; // decrement shear force value;
-			if(unlikely(scene->trackEnergy)){ Real dissip=Fs.norm()*u0slip.norm(); if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false); }
+			if(scene->trackEnergy){ Real dissip=Fs.norm()*u0slip.norm(); if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false); }
 		}
 	}
-	if(unlikely(scene->trackEnergy)){ scene->energy->add(0.5*(pow(geom->relU()[0],2)*phys->kn+(pow(geom->relU()[1],2)+pow(geom->relU()[2],2))*phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true); }
+	if(scene->trackEnergy)	{ scene->energy->add(0.5*(pow(geom->relU()[0],2)*phys->kn+(pow(geom->relU()[1],2)+pow(geom->relU()[2],2))*phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true); }
 	// apply force: this converts the force to global space, updates NormShearPhys::{normal,shear}Force, applies to particles
 	geom->applyLocalForce(localF,I,scene,phys);
 }
@@ -317,8 +317,8 @@ void Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& 
 	L6Geom& geom=ig->cast<L6Geom>(); FrictPhys& phys=ip->cast<FrictPhys>();
 
 	// simple linear relationships
-	Vector3r localF=geom.relU().cwise()*Vector3r(phys.kn,phys.ks,phys.ks);
-	Vector3r localT=charLen*(geom.relPhi().cwise()*Vector3r(phys.kn,phys.ks,phys.ks));
+	Vector3r localF=geom.relU().cwiseProduct(Vector3r(phys.kn,phys.ks,phys.ks));
+	Vector3r localT=charLen*(geom.relPhi().cwiseProduct(Vector3r(phys.kn,phys.ks,phys.ks)));
 
 	geom.applyLocalForceTorque(localF,localT,I,scene,static_cast<NormShearPhys*>(ip.get()));
 }

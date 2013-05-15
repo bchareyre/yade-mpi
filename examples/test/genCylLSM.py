@@ -14,8 +14,6 @@ http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-modu
 https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/
 """
 from yade import pack,ymport
-from yade import utils
-from math import *
 
 try:
 	from GenGeo import *

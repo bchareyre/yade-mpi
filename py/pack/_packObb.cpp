@@ -4,7 +4,8 @@
 
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/lib/base/Logging.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/pyutil/doc_opts.hpp>
@@ -24,7 +25,8 @@ Real computeOBB(const std::vector<Vector3r>& pts, const Matrix3r& rot, Vector3r&
 	Vector3r mn(inf,inf,inf), mx(-inf,-inf,-inf);
 	FOREACH(const Vector3r& pt, pts){
 		Vector3r ptT=rot*pt;
-		mn=mn.cwise().min(ptT); mx=mx.cwise().max(ptT);
+		mn=mn.cwiseMin(ptT); 
+		mx=mx.cwiseMax(ptT);
 	}
 	halfSize=.5*(mx-mn);
 	center=.5*(mn+mx);

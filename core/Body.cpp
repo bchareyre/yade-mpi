@@ -13,11 +13,10 @@ const shared_ptr<Body>& Body::byId(Body::id_t _id, shared_ptr<Scene> rb){return 
 
 // return list of interactions of this particle
 python::list Body::py_intrs(){
-	Scene* scene=Omega::instance().getScene().get(); // potentially unsafe with multiple simulations
 	python::list ret;
-	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-		if(!I->isReal()) continue;
-		if(I->getId1()==id || I->getId2()==id) ret.append(I);
+	for(Body::MapId2IntrT::iterator it=this->intrs.begin(),end=this->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
+		if(!(*it).second->isReal()) continue;
+		ret.append((*it).second);
 	}
 	return ret;
 }

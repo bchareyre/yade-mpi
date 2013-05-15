@@ -15,7 +15,7 @@ Traceback (most recent call last):
   File "/home/me/YADE/YADE3041/bin/yade-bzr3041", line 182, in runScript                                                             
     execfile(script,globals())                                                                                                       
   File "triax-identical-results.py", line 20, in <module>                                                                            
-    utils.spheresToFile(inSph)                                                                                                       
+    spheresToFile(inSph)                                                                                                       
 AttributeError: 'module' object has no attribute 'spheresToFile' 
 """
 
@@ -31,10 +31,10 @@ if exists(inSph): print "Using existing initial configuration",inSph
 else:
 	TriaxialTest(noFiles=True).load()
 	print "Using new initial configuration in",inSph
-	utils.spheresToFile(inSph)
+	spheresToFile(inSph)
 TriaxialTest(importFilename=inSph,noFiles=True).load()
 O.usesTimeStepper=False
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 #
 # uncomment this line to enable shear computation in ScGeom and then compare results with this line commented
 #
@@ -44,6 +44,6 @@ if 1:
 	#	#	O.save('/tmp/a.%03d.xml'%O.iter)
 	#	O.step()
 	O.run(2000,True)
-	utils.spheresToFile(outSph)
+	spheresToFile(outSph)
 	print "Results saved to",outSph
 	#quit()

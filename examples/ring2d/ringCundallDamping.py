@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from yade import utils
 from yade import ymport
 
 sphereRadius=0.05
@@ -18,7 +17,7 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					x = cylinderOrigin[0]+2*r*sphereRadius*cos(dfi*a)
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
-					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius)
+					s=sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius)
 					O.bodies.append(s)
 					spheresCount+=1
 	return spheresCount
@@ -55,7 +54,7 @@ O.engines=[
 for b in O.bodies:
     if isinstance(b.shape,Sphere): b.state.blockedDOFs='z' # blocked movement along Z
 
-O.dt=0.02*utils.PWaveTimeStep()
+O.dt=0.02*PWaveTimeStep()
 
 O.saveTmp('init');
 

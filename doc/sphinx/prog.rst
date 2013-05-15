@@ -175,7 +175,6 @@ The following rules that should be respected; documentation is treated separatel
 * programming style
 
   * Be defensive, if it has no significant performance impact. Use assertions abundantly: they don't affect performance (in the optimized build) and make spotting error conditions much easier.
-  * Use logging abundantly. Again, ``LOG_TRACE`` and ``LOG_DEBUG`` are eliminated from optimized code; unless turned on explicitly, the ouput will be suppressed even in the debug build (see below).
   * Use ``YADE_CAST`` and ``YADE_PTR_CAST`` where you want type-check during debug builds, but fast casting in optimized build. 
   * Initialize all class variables in the default constructor. This avoids bugs that may manifest randomly and are difficult to fix. Initializing with NaN's will help you find otherwise unitialized variable. (This is taken care of by :ref:`YADE_CLASS_BASE_DOC` macros for user classes)
 
@@ -215,8 +214,8 @@ Functors
 	To give a few examples:
 
 	* :yref:`Bo1_Sphere_Aabb` is a :yref:`BoundFunctor` which is called for :yref:`Sphere`, creating an instance of :yref:`Aabb`.
-	* :yref:`Ig2_Facet_Sphere_Dem3DofGeom` is binary functor called for :yref:`Facet` and :yref:`Sphere`, creating and instace of :yref:`Dem3DofGeom`.
-	* :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` is binary functor (:yref:`LawFunctor`) called for types :yref:`Dem3Dof (Geom)<Dem3DofGeom>` and :yref:`CpmPhys`.
+	* :yref:`Ig2_Facet_Sphere_ScGeom` is binary functor called for :yref:`Facet` and :yref:`Sphere`, creating and instace of :yref:`ScGeom`.
+	* :yref:`Law2_ScGeom_CpmPhys_Cpm` is binary functor (:yref:`LawFunctor`) called for types :yref:`ScGeom (Geom)<ScGeom>` and :yref:`CpmPhys`.
 
 .. [#opengldispatchers] Not considering OpenGL dispatchers, which might be replaced by regular virtual functions in the future.
 
@@ -389,7 +388,7 @@ Yade additionally defines a class named :yref:`Se3r`, which contains spatial pos
 
 Eigen provides full rich linear algebra functionality. Some code firther uses the [cgal]_ library for computational geometry.
 
-In Python, basic numeric types are wrapped and imported from the ``miniEigen`` module; the types drop the ``r`` type qualifier at the end, the syntax is otherwise similar. ``Se3r`` is not wrapped at all, only converted automatically, rarely as it is needed, from/to a ``(Vector3,Quaternion)`` tuple/list.
+In Python, basic numeric types are wrapped and imported from the ``minieigen`` module; the types drop the ``r`` type qualifier at the end, the syntax is otherwise similar. ``Se3r`` is not wrapped at all, only converted automatically, rarely as it is needed, from/to a ``(Vector3,Quaternion)`` tuple/list.
 
 .. ipython::
 
@@ -989,11 +988,11 @@ Dispatch hierarchy for a particular class can be shown with the ``dispHierarchy(
 
 .. ipython::
 
-	Yade [7]: Dem3DofGeom().dispHierarchy()       # parent class of all other Dem3DofGeom_ classes
+	Yade [7]: ScGeom().dispHierarchy()       # parent class of all other ScGeom_ classes
 
-	Yade [8]: Dem3DofGeom_SphereSphere().dispHierarchy(), Dem3DofGeom_FacetSphere().dispHierarchy(), Dem3DofGeom_WallSphere().dispHierarchy()
+	Yade [8]: ScGridCoGeom().dispHierarchy(), ScGeom6D().dispHierarchy(), CylScGeom().dispHierarchy()
 
-	Yade [8]: Dem3DofGeom_WallSphere().dispHierarchy(names=False)   # show numeric indices instead
+	Yade [8]: CylScGeom().dispHierarchy(names=False)   # show numeric indices instead
 
 
 Dispatchers can also be inspected, using the .dispMatrix() method:
@@ -1001,9 +1000,9 @@ Dispatchers can also be inspected, using the .dispMatrix() method:
 .. ipython::
 
 	Yade [3]: ig=IGeomDispatcher([
-	   ...:    Ig2_Sphere_Sphere_Dem3DofGeom(),
-	   ...:    Ig2_Facet_Sphere_Dem3DofGeom(),
-	   ...:    Ig2_Wall_Sphere_Dem3DofGeom()
+	   ...:    Ig2_Sphere_Sphere_ScGeom(),
+	   ...:    Ig2_Facet_Sphere_ScGeom(),
+	   ...:    Ig2_Wall_Sphere_ScGeom()
 	   ...: ])
 
 	Yade [4]: ig.dispMatrix()
@@ -1016,13 +1015,13 @@ Finally, dispatcher can be asked to return functor suitable for given argument(s
 
 .. ipython::
 
-	Yade [6]: ld=LawDispatcher([Law2_Dem3DofGeom_CpmPhys_Cpm()])
+	Yade [6]: ld=LawDispatcher([Law2_ScGeom_CpmPhys_Cpm()])
 
 	Yade [7]: ld.dispMatrix()
 
-	# see how the entry for Dem3DofGeom_SphereSphere will be filled after this request
+	# see how the entry for ScGridCoGeom will be filled after this request
 
-	Yade [8]: ld.dispFunctor(Dem3DofGeom_SphereSphere(),CpmPhys())       
+	Yade [8]: ld.dispFunctor(ScGridCoGeom(),CpmPhys())       
 
 	Yade [9]: ld.dispMatrix()
 
@@ -1102,63 +1101,6 @@ At places which are susceptible of being accessed concurrently from multiple thr
 * simultaneously writeable container for :ref:`ForceContainer`,
 * mutex for :yref:`Body::state`.
 
-.. _logging:
-
-Logging
---------
-
-Regardless of whether the library log4cxx is used or not, yade provides logging macros. [#log4cxxup]_ If log4cxx is enabled, these macros internally operate on the local logger instance (named ``logger``, but that is hidden for the user); if log4cxx is disabled, they send their arguments to standard error output (``cerr``).
-
-.. [#log4cxxup] Because of (seemingly?) no upstream development of log4cxx and a few problems it has, Yade will very likely move to the hypothetical ``boost::logging`` library once it exists. The logging code will not have to be changed, however, as the log4cxx logic is hidden behind these macros.
-
-Log messages are classified by their *severity*, which is one of ``TRACE`` (tracing variables), ``DEBUG`` (generally uninsteresting messages useful for debugging), ``INFO`` (information messages -- only use sparingly), ``WARN`` (warning), ``FATAL`` (serious error, consider throwing an exception with description instead). Logging level determines which messages will be shown -- by default, ``INFO`` and higher will be shown; if you run yade with ``-v`` or ``-vv``, ``DEBUG`` and ``TRACE`` messages will be also enabled (with log4cxx).
-
-Every class using logging should create logger using these 2 macros (they expand to nothing if log4cxx is not used):
-
-``DECLARE_LOGGER;``
-	in class declaration body (in the ``.hpp`` file); this declares static variable ``logger``;
-``CREATE_LOGGER(ClassName);``
-	in the implementation file; it creates and initializes that static variable. The logger will be named ``yade.ClassName``.
-
-The logging macros are the following:
-
-* ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL`` (increasing severity); their argument is fed to the logger stream, hence can contain the ``<<`` operation:
-
-	.. code-block:: c++
-
-		LOG_WARN("Exceeded "<<maxSteps<<" steps in attempts to converge, the result returned will not be precise (relative error "<<relErr<<", tolerance "<<relTol<<")");
-
-	Every log message is prepended filename, line number and function name; the final message that will appear will look like this::
-
-		237763 WARN  yade.ViscosityIterSolver /tmp/yade/trunk/extra/ViscosityIterSolver.cpp:316 newtonRaphsonSolve: Exceeded 30 steps in attempts to converge, the result returned will not be precise (relative error 5.2e-3, tolerance 1e-3)
-
-	The ``237763 WARN  yade.ViscosityIterSolver`` (microseconds from start, severity, logger name) is added by log4cxx and is completely configurable, either programatically, or by using file ``~/.yade-\$SUFFIX/logging.conf``, which is loaded at startup, if present (FIXME: see more etc user's guide)
-
-
-* special tracing macros ``TRVAR1``, ``TRVAR2``, … ``TRVAR6``, which show both variable name and its value (there are several more macros defined inside ``/lib/base/Logging.hpp``, but they are not generally in use):
-
-	.. code-block:: c++
-
-		TRVAR3(var1,var2,var3);
-		// will be expanded to:
-		LOG_TRACE("var1="<<var1<<"; var2="<<var2<<"; var3="<<var3);
-
-
-.. note:: For performance reasons, optimized builds eliminate ``LOG_TRACE`` and ``LOG_DEBUG`` from the code at preprocessor level.
-
-.. note:: Builds without log4cxx (even in debug mode) eliminate ``LOG_TRACE`` and ``LOG_DEBUG``. As there is no way to enable/disable them selectively, the log amount would be huge.
-
-Python provides rudimentary control for the logging system in ``yade.log`` module (FIXME: ref to docs):
-
-.. ipython::
-
-	Yade [2]: from yade import log
-
-	Yade [3]: log.setLevel('InsertionSortCollider',log.DEBUG)  # sets logging level of the yade.InsertionSortCollider logger
-
-	Yade [4]: log.setLevel('',log.WARN)                        # sets logging level of all yade.* loggers (they inherit level from the parent logger, except when overridden)
-
-As of now, there is no python interface for performing logging into log4cxx loggers themselves.
 
 .. _timing:
 
@@ -1211,12 +1153,12 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 	.. code-block:: c++
 		
 		// header file
-		class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor {
+		class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor {
 		   /* … */
-		   YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"docstring",
+		   YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"docstring",
 		      /* attrs */,
 		      /* constructor */
-		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas); // timingDeltas object is automatically initialized when using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option
 		   );
 		   // ...
 		};
@@ -1228,7 +1170,7 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 
 	.. code-block:: c++
 
-		void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
+		void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
 		                                      shared_ptr<IPhys>& _phys,
 		                                      Interaction* I,
 		                                      Scene* scene)
@@ -1244,6 +1186,25 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 		   timingDeltas->checkpoint("rest");
 		}
 
+#. Alternatively, you can compile Yade using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option and use predefined macros TIMING_DELTAS_START and TIMING_DELTAS_CHECKPOINT. Without -DUSE_TIMING_DELTAS options, those macros are empty and do nothing.
+	.. code-block:: c++
+
+		void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,
+		                                      shared_ptr<IPhys>& _phys,
+		                                      Interaction* I,
+		                                      Scene* scene)
+		{
+		   TIMING_DELTAS_START();
+		   // prepare some variables etc here
+		   TIMING_DELTAS_CHECKPOINT("setup")
+		   // find geometrical data (deformations) here
+		   TIMING_DELTAS_CHECKPOINT("geom")
+		   // compute forces here
+		   TIMING_DELTAS_CHECKPOINT("material")
+		   // apply forces, cleanup here
+		   TIMING_DELTAS_CHECKPOINT("rest")
+		}
+
 The output might look like this (note that functors are nested inside dispatchers and ``TimingDeltas`` inside their engine/functor)::
 
 	Name                                    Count                 Time          Rel. time
@@ -1254,7 +1215,7 @@ The output might look like this (note that functors are nested inside dispatcher
 	IGeomDispatcher       400           15177607μs             14.87%      
 	IPhysDispatcher        400            9518738μs              9.33%      
 	LawDispatcher                       400           64810867μs             63.49%      
-	  Law2_Dem3DofGeom_CpmPhys_Cpm                                                     
+	  Law2_ScGeom_CpmPhys_Cpm                                                     
 	    setup                           4926145            7649131μs             15.25%  
 	    geom                            4926145           23216292μs             46.28%  
 	    material                        4926145            8595686μs             17.14%  
@@ -1593,7 +1554,7 @@ Startup sequence
 Yade's main program is python script in :ysrc:`core/main/main.py.in`; the build system replaces a few ``\${variables}`` in that file before copying it to its install location. It does the following:
 
 #. Process command-line options, set environment variables based on those options.
-#. Import main yade module (``import yade``), residing in :ysrc:`py/__init__.py.in`. This module locates plugins (recursive search for files ``lib*.so`` in the ``lib`` installation directory). :ysrc:`yade.boot<core/main/pyboot.cpp>` module is used to setup logging, temporary directory, … and, most importantly, loads plugins.
+#. Import main yade module (``import yade``), residing in :ysrc:`py/__init__.py.in`. This module locates plugins (recursive search for files ``lib*.so`` in the ``lib`` installation directory). :ysrc:`yade.boot<core/main/pyboot.cpp>` module is used to setup temporary directory, … and, most importantly, loads plugins.
 #. Manage further actions, such as running scripts given at command line, opening :yref:`yade.qt.Controller` (if desired), launching the ``ipython`` prompt.
 
 
@@ -1735,7 +1696,7 @@ When an object is crossing c++/python boundary, boost::python's global "converte
 
 .. [#wrap]
 	Wrapped classes are automatically registered when the class wrapper is created. If wrapped class derives from another wrapped class (and if this dependency is declared with the ``boost::python::bases`` template, which Yade's classes do automatically), parent class must be registered before derived class, however. (This is handled via loop in ``Omega::buildDynlibDatabase``, which reiterates over classes, skipping failures, until they all successfully register)
-	Math classes (Vector3, Matrix3, Quaternion) are wrapped by hand, to be found in :ysrc:`py/mathWrap/miniEigen.cpp`; this module is imported at startup.
+	Math classes (Vector3, Matrix3, Quaternion) are wrapped by hand, to be found in :ysrc:`py/mathWrap/miniEigen.cpp`; this module is imported at startup. On systems, where minieigen is available as a separate package, the Yade's miniEigen is skipped.
 
 
 Maintaining compatibility

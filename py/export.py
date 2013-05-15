@@ -46,6 +46,7 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	out.close()
 	return count
 
+#VTKWriter===============================================================
 class VTKWriter:
 	"""
 	USAGE:
@@ -174,7 +175,7 @@ def text(filename,mask=-1):
 
 
 
-
+#VTKExporter===============================================================
 
 class VTKExporter:
 	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reason, you are not able to use VTKRecorder). Export of spheres and facets is supported.
@@ -376,3 +377,115 @@ class VTKExporter:
 					outFile.write("%g\n"%(eval(command)))
 		outFile.close()
 		self.facetsSnapCount += 1
+
+#gmshGeoExport===============================================================
+def gmshGeo(filename, comment='',mask=-1,accuracy=-1):
+	"""Save spheres in geo-file for the following using in GMSH (http://www.geuz.org/gmsh/doc/texinfo/) program. The spheres can be there meshed.
+
+	:param string filename: the name of the file, where sphere coordinates will be exported.
+	:param int mask: export only spheres with the corresponding mask export only spheres with the corresponding mask
+	:param float accuracy: the accuracy parameter, which will be set for the poinst in geo-file. By default: 1./10. of the minimal sphere diameter.
+	:return: number of spheres which were exported.
+	:rtype: int
+	"""
+	O=Omega()
+	
+	try:
+		out=open(filename,'w')
+	except:
+		raise RuntimeError("Problem to write into the file")
+	
+	count=0
+	#out.write('#format \n')
+	# Find the minimal diameter
+	if (accuracy<0.0):
+		dMin = -1.0
+		for b in O.bodies:
+			try:
+				if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
+					if (((dMin>0.0) and (dMin>b.shape.radius*2.0)) or (dMin<0.0)):
+						dMin = b.shape.radius*2.0
+			except AttributeError:
+				pass
+		accuracy = dMin/10.0
+	# Export bodies
+	PTS = 0
+	CRS = 0
+	out.write('Acc = %g;\n'%(accuracy))
+	for b in O.bodies:
+		try:
+			if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
+				r = b.shape.radius
+				x = b.state.pos[0]
+				y = b.state.pos[1]
+				z = b.state.pos[2]
+				out.write('Rad = %g;\n'%(r))
+				out.write('Point(%d) = {%g, %g, %g, Acc};\n\
+Point(%d) = {%g, %g, %g, Acc};\n\
+Point(%d) = {%g, %g, %g, Acc};\n\
+Point(%d) = {%g, %g, %g, Acc};\n\
+Point(%d) = {%g, %g, %g, Acc};\n\
+Point(%d) = {%g, %g, %g, Acc};\n\
+Point(%d) = {%g, %g, %g, Acc};\n\n'%(
+				PTS+1, x, y, z, 
+				PTS+2, r+x, y, z, 
+				PTS+3, -r+x, y, z, 
+				PTS+4, x, y, r+z, 
+				PTS+5, x, y, -r+z, 
+				PTS+6, x, r+y, z, 
+				PTS+7, x, -r+y, z
+				))
+				out.write('\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n\
+Circle(%d) = {%d, %d, %d};\n'%(
+				CRS+1, PTS+4, PTS+1, PTS+6,
+				CRS+2, PTS+6, PTS+1, PTS+5,
+				CRS+3, PTS+6, PTS+1, PTS+3,
+				CRS+4, PTS+3, PTS+1, PTS+7,
+				CRS+5, PTS+7, PTS+1, PTS+5,
+				CRS+6, PTS+7, PTS+1, PTS+2,
+				CRS+7, PTS+2, PTS+1, PTS+6,
+				CRS+8, PTS+7, PTS+1, PTS+4,
+				CRS+9, PTS+2, PTS+1, PTS+5,
+				CRS+10, PTS+5, PTS+1, PTS+3,
+				CRS+11, PTS+3, PTS+1, PTS+4,
+				CRS+12, PTS+4, PTS+1, PTS+2,
+				))
+				
+				out.write('\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\
+Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\n\
+'%(
+				(CRS+13), +(CRS+1), -(CRS+7), -(CRS+12), (CRS+14), (CRS+13),
+				(CRS+15), +(CRS+7), +(CRS+2), -(CRS+9), (CRS+16), (CRS+15),
+				(CRS+17), +(CRS+2), +(CRS+10), -(CRS+3), (CRS+18), (CRS+17),
+				(CRS+19), +(CRS+3), +(CRS+11), +(CRS+1), (CRS+20), (CRS+19),
+				(CRS+21), +(CRS+8), +(CRS+12), -(CRS+6), (CRS+22), (CRS+21),
+				(CRS+23), +(CRS+4), +(CRS+8), -(CRS+11), (CRS+24), (CRS+23),
+				(CRS+25), +(CRS+5), +(CRS+10), (CRS+4), (CRS+26), (CRS+25),
+				(CRS+27), +(CRS+6), +(CRS+9), -(CRS+5), (CRS+28), (CRS+27),
+				))
+				PTS+=7
+				CRS+=28
+				
+				count+=1
+		except AttributeError:
+			pass
+	out.close()
+	return count

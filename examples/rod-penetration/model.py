@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from yade import utils
 import random
 from yade import ymport
 
@@ -31,11 +30,11 @@ for i in xrange(nbSpheres[0]):
 			if (i==0 or i==nbSpheres[0]-1 or j==nbSpheres[1]-1 or k==0 or k==nbSpheres[2]-1):
 				fixed = True
 				color=[0.21,0.22,0.1]
-			O.bodies.append(utils.sphere([x,y,z],r,color=color,fixed=fixed))
+			O.bodies.append(sphere([x,y,z],r,color=color,fixed=fixed))
 print "done\n"
 
 ## Estimate time step
-#O.dt=utils.PWaveTimeStep()
+#O.dt=PWaveTimeStep()
 O.dt=0.0001
 
 

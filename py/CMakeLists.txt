@@ -1,4 +1,31 @@
+#==================pygts=========================================
+IF(ENABLE_GTS)
+  find_python_module(gts)
+  IF (PY_gts)
+    MESSAGE(STATUS "Use system gts version")
+  ELSE (PY_gts)
+    MESSAGE(STATUS "Use embedded version of gts. Please, consider installing the corresponding package")
+    FILE(GLOB SRC_PYGTS "${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/pygts-0.3.1/*.c")
+    ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
+    SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
+    TARGET_LINK_LIBRARIES(_gts gts)
+    INSTALL(FILES 3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
+    INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
+    INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
+  ENDIF (PY_gts)
+ENDIF(ENABLE_GTS)
+#==================pygts=========================================
+
 #==================pyModules=========================================
+
+FILE(GLOB filesPY "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
+SET(filesPY "${filesPY};${CMAKE_CURRENT_SOURCE_DIR}/pack/pack.py")
+INSTALL(FILES ${filesPY} DESTINATION ${YADE_PY_PATH}/yade)
+INSTALL(FILES 3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH}/py)
+FILE(GLOB filesPYTests "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py")
+INSTALL(FILES ${filesPYTests} DESTINATION ${YADE_PY_PATH}/yade/tests)
+FILE(GLOB filesPYPerf "${CMAKE_CURRENT_SOURCE_DIR}/../examples/test/performance/*")
+INSTALL(FILES ${filesPYPerf} DESTINATION ${YADE_PY_PATH}/yade/tests/checks/performance)
 ADD_LIBRARY(WeightedAverage2d SHARED "${CMAKE_CURRENT_SOURCE_DIR}/WeightedAverage2d.cpp")
 SET_TARGET_PROPERTIES(WeightedAverage2d PROPERTIES PREFIX "")
 INSTALL(TARGETS WeightedAverage2d DESTINATION "${YADE_PY_PATH}/yade/")
@@ -17,9 +44,9 @@ INSTALL(TARGETS _utils DESTINATION "${YADE_PY_PATH}/yade/")
 ADD_LIBRARY(_packPredicates SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp")
 SET_TARGET_PROPERTIES(_packPredicates PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(_packPredicates plugins support core)
-IF(ENABLE_GTS)
+IF(ENABLE_GTS AND NOT(PY_gts))
   TARGET_LINK_LIBRARIES(_packPredicates _gts)
-ENDIF(ENABLE_GTS)
+ENDIF(ENABLE_GTS AND NOT(PY_gts))
 
 
 INSTALL(TARGETS _packPredicates DESTINATION "${YADE_PY_PATH}/yade/")
@@ -42,29 +69,6 @@ ADD_LIBRARY(_customConverters SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/custom
 SET_TARGET_PROPERTIES(_customConverters PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(_customConverters plugins support)
 INSTALL(TARGETS _customConverters DESTINATION "${YADE_PY_PATH}/yade/")
-
-#==================pyModules=========================================
-
-#==================pygts=========================================
-IF(ENABLE_GTS)
-  FILE(GLOB SRC_PYGTS "${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/pygts-0.3.1/*.c")
-  ADD_LIBRARY(_gts SHARED ${SRC_PYGTS})
-  SET_TARGET_PROPERTIES(_gts PROPERTIES PREFIX "")
-  TARGET_LINK_LIBRARIES(_gts gts)
-  INSTALL(FILES 3rd-party/pygts-0.3.1/__init__.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-  INSTALL(FILES 3rd-party/pygts-0.3.1/pygts.py DESTINATION ${YADE_LIB_PATH}/py/gts)
-  INSTALL(TARGETS _gts DESTINATION ${YADE_LIB_PATH}/py/gts)
-ENDIF(ENABLE_GTS)
-#==================pygts=========================================
-
-FILE(GLOB filesPY "${CMAKE_CURRENT_SOURCE_DIR}/*.py")
-SET(filesPY "${filesPY};${CMAKE_CURRENT_SOURCE_DIR}/pack/pack.py")
-INSTALL(FILES ${filesPY} DESTINATION ${YADE_PY_PATH}/yade)
-INSTALL(FILES 3rd-party/mtTkinter-0.3/mtTkinter.py DESTINATION ${YADE_LIB_PATH}/py)
-FILE(GLOB filesPYTests "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py")
-INSTALL(FILES ${filesPYTests} DESTINATION ${YADE_PY_PATH}/yade/tests)
-FILE(GLOB filesPYPerf "${CMAKE_CURRENT_SOURCE_DIR}/../examples/test/performance/*")
-INSTALL(FILES ${filesPYPerf} DESTINATION ${YADE_PY_PATH}/yade/tests/checks/performance)
 
 
 

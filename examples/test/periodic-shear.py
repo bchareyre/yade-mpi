@@ -1,9 +1,9 @@
 O.periodic=True
 O.cell.setBox(.55,.55,.55)
-O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
-O.bodies.append(utils.sphere([.3,.1,.4],.05,fixed=False))
-O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,fixed=True))
-O.bodies.append(utils.sphere([.3,0,0],.1,fixed=True))
+O.bodies.append(facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
+O.bodies.append(sphere([.3,.1,.4],.05,fixed=False))
+O.bodies.append(sphere([.200001,.2000001,.4],.05,fixed=True))
+O.bodies.append(sphere([.3,0,0],.1,fixed=True))
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='isc'),
@@ -18,7 +18,7 @@ O.engines=[
 
 def doCellFlip():
 	flip=1 if O.cell.trsf[1,2]<0 else -1;
-	utils.flipCell(Matrix3(0,0,0, 0,0,flip, 0,0,0))
+	flipCell(Matrix3(0,0,0, 0,0,flip, 0,0,0))
 
 #g=0.
 #while False:
@@ -26,14 +26,13 @@ def doCellFlip():
 #	time.sleep(0.001)
 #	g+=1e-3
 O.cell.trsf=Matrix3(1,0,0, 0,1,.5, 0,0,1)
-O.dt=2e-2*utils.PWaveTimeStep()
+O.dt=2e-2*PWaveTimeStep()
 O.step()
 O.saveTmp()
 rrr=yade.qt.Renderer()
 rrr.intrAllWire,rrr.bound=True,True
 #isc.watch1,isc.watch2=0,-1
 
-#from yade import log
 #import yade.qt,time
 #v=yade.qt.View()
 #v.axes=True

@@ -3,12 +3,15 @@
 import unittest
 import random
 from yade.wrapper import *
-from miniEigen import *
 from yade._customConverters import *
 from yade import utils
 from yade import *
 from math import *
 
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 class TestKinematicEngines(unittest.TestCase):
 	def testKinematicEngines(self):

@@ -1,5 +1,5 @@
-O.bodies.append(utils.sphere([0,0,10],.5))
-#O.bodies.append(utils.sphere([0,0,0],.5,fixed=True))
+O.bodies.append(sphere([0,0,10],.5))
+#O.bodies.append(sphere([0,0,0],.5,fixed=True))
 
 O.engines=[
 	ForceResetter(),
@@ -12,7 +12,7 @@ O.engines=[
 	NewtonIntegrator(damping=.1,gravity=[0,0,-1e4])
 ]
 collider.verletDist=.5
-O.dt=8e-2*utils.PWaveTimeStep()
+O.dt=8e-2*PWaveTimeStep()
 O.saveTmp()
 from yade import timing
 O.timingEnabled=True

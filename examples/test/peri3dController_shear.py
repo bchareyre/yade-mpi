@@ -8,7 +8,7 @@
 from yade import pack,plot,qt
 
 # define material
-O.materials.append(CpmMat(young=25e9,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,crackOpening=1e-6))
+O.materials.append(CpmMat(young=25e9,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,relDuctility=1e-6))
 
 # create periodic assembly of particles
 initSize=1.2
@@ -30,7 +30,7 @@ def plotAddData():
 		eyz=p3d.strain[3],ezx=p3d.strain[4],exy=p3d.strain[5],
 	)
 
-O.dt=utils.PWaveTimeStep()/2
+O.dt=PWaveTimeStep()/2
 
 # define the first part of simulation, hydrostatic compression
 enlargeFactor=1.5
@@ -38,8 +38,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=enlargeFactor,label='bo1s')]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=enlargeFactor,label='ig2ss')],
-		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_Dem3DofGeom_CpmPhys_Cpm()]),
+		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=enlargeFactor,label='ig2ss')],
+		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_ScGeom_CpmPhys_Cpm()]),
 	NewtonIntegrator(),
 	Peri3dController(	goal=(0,0,0, 0,0,5e-3), # Vector6 of prescribed final values
 							stressMask=0b011111,
@@ -51,7 +51,7 @@ O.engines=[
 	PyRunner(command='plotAddData()',iterPeriod=1),
 ]
 O.step()
-#bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
+bo1s.aabbEnlargeFactor=ig2ss.interactionDetectionFactor=1.0
 
 renderer=qt.Renderer()
 renderer.intrPhys,renderer.shape=True,False

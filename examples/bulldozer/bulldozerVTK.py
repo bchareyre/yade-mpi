@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation with VTK recorder
 ### vtk-files are saved in /tmp directory with names buldozer-*.vtk
-from yade import utils
 from numpy import linspace
 from numpy import arange
 import gts
@@ -28,7 +27,7 @@ en = 0.3
 es = 0.3
 
 ## Materials
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+params=getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 

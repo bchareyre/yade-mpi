@@ -10,7 +10,8 @@
 
 #include<yade/lib/pyutil/numpy.hpp>
 #include<boost/python.hpp>
-#include<yade/extra/boost_python_len.hpp>
+#include<boost/python/object.hpp>
+#include<boost/version.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
 #include<yade/lib/triangulation/Timer.h>

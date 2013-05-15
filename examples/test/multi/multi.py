@@ -2,8 +2,8 @@
 # https://yade-dem.org/wiki/ScriptParametricStudy
 #
 ## read parameters from table here
-from yade import utils, plot
-utils.readParamsFromTable(gravity=-9.81,density=2400,initialSpeed=10,noTableOk=True)
+from yade import  plot
+readParamsFromTable(gravity=-9.81,density=2400,initialSpeed=10,noTableOk=True)
 from yade.params.table import *
 print gravity,density,initialSpeed
 
@@ -21,13 +21,13 @@ O.engines=[
 	NewtonIntegrator(damping=0.4,gravity=(0,0,gravity))## here we use the 'gravity' parameter
 ]
 O.bodies.append([
-	utils.box([0,50,0],extents=[1,50,1],fixed=True,color=[1,0,0]),
-	utils.sphere([0,0,10],1,color=[0,1,0])
+	box([0,50,0],extents=[1,50,1],fixed=True,color=[1,0,0]),
+	sphere([0,0,10],1,color=[0,1,0])
 ])
 
 O.bodies[1].state.vel=(0,initialSpeed,0) ## assign initial velocity
 
-O.dt=.8*utils.PWaveTimeStep()
+O.dt=.8*PWaveTimeStep()
 ## o.saveTmp('initial')
 def myAddPlotData():
 	s=O.bodies[1]

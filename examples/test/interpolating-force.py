@@ -36,12 +36,12 @@ O.engines=[
 ]
 
 O.bodies.append([
-	utils.sphere([0,0,0],1,fixed=True,color=[1,0,0]),
-	utils.sphere([0,0,2],1,color=[0,1,0])
+	sphere([0,0,0],1,fixed=True,color=[1,0,0]),
+	sphere([0,0,2],1,color=[0,1,0])
 ])
 
 # elastic timestep
-O.dt=.5*utils.PWaveTimeStep()
+O.dt=.5*PWaveTimeStep()
 
 # callback for plotDataCollector
 import yade.plot as yp

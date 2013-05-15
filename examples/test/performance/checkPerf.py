@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 
-from yade import utils,pack,export,geom,timing,bodiesHandling
+from yade import pack,export,geom,timing,bodiesHandling
 import time,numpy
 	
 radRAD=[23.658,				#5000 elements
@@ -44,7 +44,7 @@ for z in range(numberTests):
 		frictionAngle=radians(35)
 		density=2300
 		
-		params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+		params=getViscoelasticFromSpheresInteraction(tc,en,es)
 		defMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 		
 		O.dt=.1*tc # time step
@@ -61,7 +61,7 @@ for z in range(numberTests):
 		floorId+=O.bodies.append(geom.facetBox(geometryParameters['center'],geometryParameters['extends']/2.0*1.05,material=defMat)) #Floor
 		
 		#Calculate the mass of spheres
-		sphMass = utils.getSpheresVolume()*density
+		sphMass = getSpheresVolume()*density
 		
 		# Create engines
 		O.engines=[
@@ -76,7 +76,10 @@ for z in range(numberTests):
 		]
 		
 		print "number of bodies %d"%len(O.bodies)
+		# Initialize the collider else it is not possible to compare the results with different nbIter
+		O.run(1,1)
 		O.timingEnabled=True
+		timing.reset()
 		tStart=time.time()
 		
 		O.run(nbIter)

@@ -490,7 +490,6 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 		else{	//else create the geometry.
 			if(!isNew) scm=YADE_PTR_CAST<ChCylGeom6D>(c->geom);
 			else { scm=shared_ptr<ChCylGeom6D>(new ChCylGeom6D()); c->geom=scm; }
-			scm->cylCyl=1;	//mark the geometry as contact between two different chainedCylinders : allows CohFrictPhys to compute the right contact parameters.
 			scm->relPos1=colinearVectors?0.5:k ; scm->relPos2=colinearVectors?0.5:m;
 			scm->fictiousState1.pos=A + k*a;
 			scm->fictiousState2.pos=B + m*b;
@@ -517,7 +516,6 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 		shared_ptr<ScGeom6D> scm;
 		if(!isNew) scm=YADE_PTR_CAST<ScGeom6D>(c->geom);
 		else { scm=shared_ptr<ScGeom6D>(new ScGeom6D()); c->geom=scm; }
-		scm->cylCyl=0;
 		Real length=(bchain2.pos-bchain1.pos).norm();
 		Vector3r segt =pChain2->pos-pChain1->pos;
 		if(isNew) {/*scm->normal=scm->prevNormal=segt/length;*/bs1->initLength=length;}
@@ -682,7 +680,7 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 	shearForce -= phys->ks*shearDisp;
 	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-	if (likely(!scene->trackEnergy)){//Update force but don't compute energy terms (see below))
+	if (!scene->trackEnergy){//Update force but don't compute energy terms (see below))
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
 		if( shearForce.squaredNorm() > maxFs ){
 			Real ratio = sqrt(maxFs) / shearForce.norm();

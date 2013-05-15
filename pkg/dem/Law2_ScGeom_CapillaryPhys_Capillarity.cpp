@@ -553,6 +553,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
 
 bool BodiesMenisciiList::insert(const shared_ptr< Interaction >& interaction)
 {
+  checkLengthBuffer(interaction);
 	interactionsOnBody[interaction->getId1()].push_back(interaction);
 	interactionsOnBody[interaction->getId2()].push_back(interaction);
 	return true;
@@ -561,9 +562,17 @@ bool BodiesMenisciiList::insert(const shared_ptr< Interaction >& interaction)
 
 bool BodiesMenisciiList::remove(const shared_ptr< Interaction >& interaction)
 {
+  checkLengthBuffer(interaction);
 	interactionsOnBody[interaction->getId1()].remove(interaction);
 	interactionsOnBody[interaction->getId2()].remove(interaction);
 	return true;
+}
+
+void BodiesMenisciiList::checkLengthBuffer(const shared_ptr<Interaction>& interaction) {
+	Body::id_t maxBodyId = std::max(interaction->getId1(), interaction->getId2());
+	if (unsigned(maxBodyId) >= interactionsOnBody.size()) {
+		interactionsOnBody.resize(maxBodyId+1);
+	}
 }
 
 list< shared_ptr<Interaction> >&  BodiesMenisciiList::operator[] (int index)

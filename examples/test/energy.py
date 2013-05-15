@@ -1,6 +1,6 @@
 from yade import pack,plot
 
-utils.readParamsFromTable(useL3Geom=True,nonviscDamp=0,frictAngle=0,useClumps=False,noTableOk=True)
+readParamsFromTable(useL3Geom=True,nonviscDamp=0,frictAngle=0,useClumps=False,noTableOk=True)
 from yade.params import table
 
 if 1:
@@ -10,8 +10,8 @@ if 1:
 	# use clumps of 2 spheres instead, to have rotation without friction 
 	else: sp.makeClumpCloud((0,0,0),(1,1,1),[pack.SpherePack([((0,0,0),.05),((0,0,.08),.02)])],periodic=False)
 	sp.toSimulation()
-else: O.bodies.append(utils.sphere((0,0,2),radius=.5)) # one single bouncing ball
-O.bodies.append(utils.wall(position=0,axis=2,sense=1))
+else: O.bodies.append(sphere((0,0,2),radius=.5)) # one single bouncing ball
+O.bodies.append(wall(position=0,axis=2,sense=1))
 
 O.engines=[
 	ForceResetter(),
@@ -20,10 +20,10 @@ O.engines=[
 	NewtonIntegrator(damping=table.nonviscDamp,kinSplit=True,gravity=(0,0,-9.81)),
 	PyRunner(iterPeriod=1,command='addPlotData()'),
 ]
-O.dt=.1*utils.PWaveTimeStep()
+O.dt=.1*PWaveTimeStep()
 
 def addPlotData():
-	Ek,maxId=utils.kineticEnergy(findMaxId=True)
+	Ek,maxId=kineticEnergy(findMaxId=True)
 	plot.addData(i=O.iter,total=O.energy.total(),maxId=maxId,**O.energy)
 
 # turn on energy tracking

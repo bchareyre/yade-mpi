@@ -11,16 +11,16 @@ O.engines=[
 ]
 mat=O.materials.append(FrictMat(young=1e3,poisson=.2,density=1000,frictionAngle=20))
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0],material=mat),
-	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True,material=mat)
+	facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0],material=mat),
+	facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True,material=mat)
 ])
 import random
 if 1:
 	for i in range(0,100):
-		O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),material=mat))
+		O.bodies.append(sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),material=mat))
 		O.bodies[len(O.bodies)-1].state.vel=Vector3(random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1))
 else:
-	O.bodies.append(utils.sphere([0,0,.6],.5),material=mat)
+	O.bodies.append(sphere([0,0,.6],.5),material=mat)
 O.dt=1e-4
 O.saveTmp('init')
 
@@ -31,7 +31,7 @@ if 1:
 	for collider in InsertionSortCollider(),PersistentTriangulationCollider(haveDistantTransient=True):
 		for i in range(2):
 			O.loadTmp('init')
-			utils.replaceCollider(collider)
+			replaceCollider(collider)
 			O.run(100,True)
 			timing.reset()
 			O.run(50000,True)

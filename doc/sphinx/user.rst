@@ -66,16 +66,16 @@ As shown above, bodies are added one by one or several at the same time using th
 	@suppress
 	Yade [0]: O.reset()
 
-	Yade [1]: O.bodies.append(utils.sphere((0,0,0),1))
+	Yade [1]: O.bodies.append(utils.sphere((0,10,0),1))
 
 	Yade [2]: O.bodies.append(utils.sphere((0,0,2),1))
 
 	# this is the same, but in one function call
 
 	Yade [3]: O.bodies.append([
-	     ...:    utils.sphere((0,0,0),1),
-		  ...:    utils.sphere((0,0,2),1)
-		  ...: ])
+	   ...:   utils.sphere((0,0,0),1),
+	   ...:   utils.sphere((0,0,2),1)
+	   ...: ])
 
 Many functions introduced in next sections return list of bodies which can be readily added to the simulation, including
 
@@ -89,7 +89,16 @@ As those functions use :yref:`yade.utils.sphere` and :yref:`yade.utils.facet` in
 Clumping particles together
 ----------------------------
 
-In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation); a special function :yref:`BodyContainer.appendClumped` is designed for this task; for instance, we might add 2 spheres tied together:
+In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation). This we call a :yref:`clump<Clump>`. 
+A clump is internally represented by a special :yref:`body<Body>`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`). 
+Like every body a clump has a :yref:`position<State.pos>`, which is the balance point between all members. 
+A clump body itself has no :yref:`interactions<Interaction>` with other bodies. Interactions between clumps is internally represented by interactions between clump members. There are also no interactions between clump members with same clumpId. 
+
+YADE supports different ways of creating clumps:
+
+* Create clumps and spheres (clump members) directly with one command:
+
+The function :yref:`appendClumped()<BodyContainer.appendClumped>` is designed for this task. For instance, we might add 2 spheres tied together:
 
 .. ipython::
 
@@ -97,9 +106,9 @@ In some cases, you might want to create rigid aggregate of individual particles 
 	Yade [0]: O.reset()
 
 	Yade [1]: O.bodies.appendClumped([
-	     ...:    utils.sphere([0,0,0],1),
-		  ...:    utils.sphere([0,0,2],1)
-		  ...: ])
+	   ...:    utils.sphere([0,0,0],1),
+	   ...:    utils.sphere([0,0,2],1)
+	   ...: ])
 
 	Yade [2]: len(O.bodies)
 
@@ -107,8 +116,38 @@ In some cases, you might want to create rigid aggregate of individual particles 
 
 	Yade [2]: O.bodies[2].isClump, O.bodies[2].clumpId
 	
+-> :yref:`appendClumped()<BodyContainer.appendClumped>` returns a tuple of ids ``(clumpId,[memberId1,memberId2,...])``
 
-:yref:`appendClumped<BodyContainer.appendClumped>` returns a tuple of ``(clumpId,[memberId1,memberId2])``: clump is internally represented by a special :yref:`Body`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`).
+* Use existing spheres and clump them together:
+
+For this case the function :yref:`clump()<BodyContainer.clump>` can be used. One way to do this is to create a list of bodies, that should be clumped before using the :yref:`clump()<BodyContainer.clump>` command:
+
+.. ipython::
+
+	@suppress
+	Yade [0]: O.reset()
+
+	Yade [1]: bodyList = []
+
+	Yade [2]: for ii in range(0,5):
+	   ...:    bodyList.append(O.bodies.append(utils.sphere([ii,0,1],.5)))#create a "chain" of 5 spheres
+	   ...:
+
+	Yade [3]: print bodyList
+
+	Yade [4]: idClump=O.bodies.clump(bodyList)
+	
+-> :yref:`clump()<BodyContainer.clump>` returns ``clumpId``
+
+* Another option is to replace :yref:`standalone<Body.isStandalone>` spheres from a given packing (see :yref:`SpherePack<yade._packSpheres.SpherePack>` and :yref:`makeCloud<yade._packSpheres.SpherePack.makeCloud>`) using clump templates.
+
+This is done by a function called :yref:`replaceByClumps()<BodyContainer.replaceByClumps>`. This function takes a list of :yref:`clumpTemplates()<yade.utils.clumpTemplate>` and a list of amounts and replaces spheres by clumps. The volume of a new clump will be the same as the volume of the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps).
+
+-> :yref:`replaceByClumps()<yade.wrapper.BodyContainer.replaceByClumps>` returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``
+
+It is also possible to :yref:`add<BodyContainer.addToClump>` bodies to a clump and :yref:`release<BodyContainer.releaseFromClump>` bodies from a clump. Also you can :yref:`erase<BodyContainer.erase>` the clump (clump members will get standalone spheres).
+
+.. note:: Have a look at ``examples/clumps/`` folder. There you will find some examples, that show usage of different functions for clumps.
 
 Sphere packings
 ===============
@@ -374,14 +413,14 @@ Creating interactions
 
 In typical cases, interactions are created during simulations as particles collide. This is done by a :yref:`Collider` detecting approximate contact between particles and then an :yref:`IGeomFunctor` detecting exact collision.
 
-Some material models (such as the :yref:`concrete model<Law2_Dem3DofGeom_CpmPhys_Cpm>`) rely on initial interaction network which is denser than geometrical contact of spheres: sphere's radii as "enlarged" by a dimensionless factor called *interaction radius* (or *interaction ratio*) to create this initial network. This is done typically in this way (see :ysrc:`examples/concrete/uniax.py` for an example):
+Some material models (such as the :yref:`concrete model<Law2_ScGeom_CpmPhys_Cpm>`) rely on initial interaction network which is denser than geometrical contact of spheres: sphere's radii as "enlarged" by a dimensionless factor called *interaction radius* (or *interaction ratio*) to create this initial network. This is done typically in this way (see :ysrc:`examples/concrete/uniax.py` for an example):
 
 #. Approximate collision detection is adjusted so that approximate contacts are detected also between particles within the interaction radius. This consists in setting value of :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` to the interaction radius value.
 
 #. The geometry functor (``Ig2``)
    would normally say that "there is no contact" if given 2 spheres that are not in contact. Therefore, the same value as for :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` must be given to it. (Either :yref:`Ig2_Sphere_Sphere_Dem3DofGeom.distFactor` or :yref:`Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor`, depending on the functor that is in use.
 
-   Note that only :yref:`Sphere` + :yref:`Sphere` interactions are supported; there is no parameter analogous to :yref:`distFactor<Ig2_Sphere_Sphere_Dem3DofGeom.distFactor>` in :yref:`Ig2_Facet_Sphere_Dem3DofGeom`. This is on purpose, since the interaction radius is meaningful in bulk material represented by sphere packing, whereas facets usually represent boundary conditions which should be exempt from this dense interaction network.
+   Note that only :yref:`Sphere` + :yref:`Sphere` interactions are supported; there is no parameter analogous to :yref:`distFactor<Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor>` in :yref:`Ig2_Facet_Sphere_ScGeom`. This is on purpose, since the interaction radius is meaningful in bulk material represented by sphere packing, whereas facets usually represent boundary conditions which should be exempt from this dense interaction network.
 
 #. Run one single step of the simulation so that the initial network is created.
 
@@ -403,11 +442,11 @@ In code, such scenario might look similar to this one (labeling is explained in 
 	   InteractionLoop(
 	      [
 	         # enlarge here
-	         Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ig2ss'),
-	         Ig2_Facet_Sphere_Dem3DofGeom(),
+	         Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=intRadius,label='ig2ss'),
+	         Ig2_Facet_Sphere_ScGeom(),
 	      ],
 	      [Ip2_CpmMat_CpmMat_CpmPhys()],
-	      [Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0)], # deactivated
+	      [Law2_ScGeom_CpmPhys_Cpm(epsSoft=0)], # deactivated
 	   ),
 	   NewtonIntegrator(damping=damping,label='damper'),
 	]
@@ -416,9 +455,8 @@ In code, such scenario might look similar to this one (labeling is explained in 
 	O.step()
 
 	# reset interaction radius to the default value
-	# see documentation of those attributes for the meaning of negative values
-	bo1s.aabbEnlargeFactor=-1
-	ig2ss.distFactor=-1
+	bo1s.aabbEnlargeFactor=1.0
+	ig2ss.interactionDetectionFactor=1.0
 
 	# now continue simulation
 	O.run()
@@ -436,18 +474,18 @@ It is possible to create an interaction between a pair of particles independentl
 	Yade [1]: O.materials.append(FrictMat(young=3e10,poisson=.2,density=1000))
 
 	Yade [1]: O.bodies.append([
-	     ...:    utils.sphere([0,0,0],1),
-	     ...:    utils.sphere([0,0,1000],1)
-	     ...: ])
+	   ...:    utils.sphere([0,0,0],1),
+	   ...:    utils.sphere([0,0,1000],1)
+	   ...: ])
 
 	# only add InteractionLoop, no other engines are needed now
 	Yade [1]: O.engines=[
-	     ...:    InteractionLoop(
-	     ...:        [Ig2_Sphere_Sphere_Dem3DofGeom(),],
-	     ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
-	     ...:        [] # not needed now
-	     ...:    )
-	     ...: ]
+	   ...:    InteractionLoop(
+	   ...:        [Ig2_Sphere_Sphere_ScGeom(),],
+	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
+	   ...:        [] # not needed now
+	   ...:    )
+	   ...: ]
 
 	Yade [1]: i=utils.createInteraction(0,1)
 
@@ -492,6 +530,9 @@ must be used instead. For inserting an engine after position #2 (for example), u
 
 	O.engines=O.engines[:2]+[SomeEngine()]+O.engines[2:]
 
+.. note::
+	When Yade starts, O.engines is filled with a reasonable default list, so that it is not strictly necessary to redefine it when trying simple things. The default scene will handle spheres, boxes, and facets with :yref:`frictional<FrictMat>` properties correctly, and adjusts the timestep dynamically. You can find an example in simple-scene-default-engines.py.
+
 Functors choice
 ----------------
 
@@ -524,22 +565,22 @@ Ig2 functors
 #. shape combinations that should collide;
    for instance::
 
-      InteractionLoop([Ig2_Sphere_Sphere_Dem3DofGeom()],[],[])
+      InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[],[])
 
    will handle collisions for :yref:`Sphere` + :yref:`Sphere`, but not for :yref:`Facet` + :yref:`Sphere` -- if that is desired, an additional functor must be used::
    
       InteractionLoop([
-         Ig2_Sphere_Sphere_Dem3DofGeom(),
-         Ig2_Facet_Sphere_Dem3DofGeom()
+         Ig2_Sphere_Sphere_ScGeom(),
+         Ig2_Facet_Sphere_ScGeom()
       ],[],[])
    
    Again, missing combination will cause given shape combinations to freely interpenetrate one another.
 
-#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` accepts :yref:`Dem3DofGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`ScGeom`, the above example would simply change to::
+#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_ScGeom_CpmPhys_Cpm` accepts :yref:`ScGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`Dem3DofGeom`, the above example would simply change to::
 
       InteractionLoop([
-         Ig2_Sphere_Sphere_ScGeom(),
-         Ig2_Facet_Sphere_ScGeom()
+         Ig2_Sphere_Sphere_Dem3DofGeom(),
+         Ig2_Facet_Sphere_Dem3DofGeom()
       ],[],[])
 
 Ip2 functors
@@ -561,6 +602,8 @@ Law2 functor(s)
 In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :yref:`IGeom` and :yref:`IPhys` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :yref:`Shapes<Shape>` and :yref:`Materials<Material>`).
 
 .. note:: As in the case of ``Ip2`` functors, receiving a combination of :yref:`IGeom` and :yref:`IPhys` which is not handled by any ``Law2`` functor is an error.
+
+.. warning:: Many ``Law2`` exist in Yade, and new ones can appear at any time. In some cases different functors are only different implementations of the same contact law (e.g. :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_L3Geom_FrictPhys_ElPerfPl`). Also, sometimes, the peculiarity of one functor may be reproduced as a special case of a more general one. Therefore, for a given constitutive behavior, the user may have the choice between different functors. It is strongly recommended to favor the most used and most validated implementation when facing such choice. A list of available functors classified from mature to unmaintained is updated `here <https://yade-dem.org/wiki/ConstitutiveLaws`_ to guide this choice.
 
 Examples
 ^^^^^^^^
@@ -585,18 +628,18 @@ The result will be therefore::
 
 Concrete model
 ^^^^^^^^^^^^^^^
-In this case, our goal is to use the :yref:`Law2_Dem3DofGeom_CpmPhys_Cpm` constitutive law.
+In this case, our goal is to use the :yref:`Law2_ScGeom_CpmPhys_Cpm` constitutive law.
 
-* We use :yref:`spheres<Sphere>` and :yref:`facets<Facet>` in the simulation, which selects ``Ig2`` functors accepting those types and producing :yref:`Dem3DofGeom`: :yref:`Ig2_Sphere_Sphere_Dem3DofGeom` and :yref:`Ig2_Facet_Sphere_Dem3DofGeom`.
+* We use :yref:`spheres<Sphere>` and :yref:`facets<Facet>` in the simulation, which selects ``Ig2`` functors accepting those types and producing :yref:`ScGeom`: :yref:`Ig2_Sphere_Sphere_ScGeom` and :yref:`Ig2_Facet_Sphere_ScGeom`.
 
 * We have to use :yref:`Material` which can be used for creating :yref:`CpmPhys`. We find that :yref:`CpmPhys` is only  created by :yref:`Ip2_CpmMat_CpmMat_CpmPhys`, which determines the choice of :yref:`CpmMat` for all particles.
 
 Therefore, we will use::
 
    InteractionLoop(
-      [Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+      [Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
       [Ip2_CpmMat_CpmMat_CpmPhys()],
-      [Law2_Dem3DofGeom_CpmPhys_Cpm()]
+      [Law2_ScGeom_CpmPhys_Cpm()]
    )
 
 
@@ -949,9 +992,9 @@ Since :yref:`yade.plot.plots` is a dictionary, multiple entries with the same ke
 .. ipython::
 	
 	Yade [1]: plot.plots={
-	     ...:    'i':('t',),
-	     ...:    'i':('z1','v1')
-	     ...: }
+	   ...:    'i':('t',),
+	   ...:    'i':('z1','v1')
+	   ...: }
 
 	Yade [2]: plot.plots
 
@@ -960,9 +1003,9 @@ You can, however, distinguish them by prepending/appending space to the x-axis v
 .. ipython::
 	
 	Yade [1]: plot.plots={
-	     ...:    'i':('t',),
-	     ...:    'i ':('z1','v1') # note the space in 'i '
-	     ...: }
+	   ...:    'i':('t',),
+	   ...:    'i ':('z1','v1') # note the space in 'i '
+	   ...: }
 
 	Yade [2]: plot.plots
 
@@ -976,7 +1019,9 @@ To avoid big range differences on the $y$ axis, it is possible to have left and 
 Exporting
 ^^^^^^^^^
 
-Plots can be exported to external files for later post-processing via that :yref:`yade.plot.saveGnuplot` function.
+Plots can be exported to external files for later post-processing via that :yref:`yade.plot.saveGnuplot` function. Note that all data you added via plot.addData is saved - even data that you don't plot live during simulation. 
+By editing the generated .gnuplot file you can plot any of the added Data afterwards.
+
 
 * Data file is saved (compressed using bzip2) separately from the gnuplot file, so any other programs can be used to process them. In particular, the ``numpy.genfromtxt`` (documented `here <http://docs.scipy.org/doc/numpy/reference/generated/numpy.genfromtxt.html>`_) can be useful to import those data back to python; the decompression happens automatically.
 
@@ -1009,7 +1054,7 @@ For simulations that seek static equilibrium, the :yref:`yade._utils.unbalancedF
 	def checkUnbalanced():
 		if utils.unbalancedForce<1e-2: O.pause()
 
-	O.engines=O.engines+[PyRunner(command="checkUnbalanced",iterPeriod=100)]
+	O.engines=O.engines+[PyRunner(command="checkUnbalanced()",iterPeriod=100)]
 
 	# this would work as well, without the function defined apart:
 	#   PyRunner(command="if utils.unablancedForce<1e-2: O.pause()",iterPeriod=100)
@@ -1089,7 +1134,7 @@ Python prompt
 --------------
 ``TCP python prompt`` is telnet server with authenticated connection, providing full python command-line. It listens on port 9000, or higher if already occupied (by another yade instance, for example).
 
-Using the authentication cookie, connection can be made::
+Using the authentication cookie, connection can be made using telnet::
 
 	\$ telnet localhost 9000
 	Trying 127.0.0.1...
@@ -1111,7 +1156,7 @@ The python pseudo-prompt ``>>>`` lets you write commands to manipulate simulatio
 #. The (fake) ``>>>`` interpreter does not have rich interactive feature of IPython, which handles the usual command-line ``Yade [1]:``; therefore, you will have no command history, ``?`` help and so on.
 
 .. note::
-	By giving access to python interpreter, full control of the system (including reading user's files) is possible. For this reason, **connection are only allowed from localhost**, not over network remotely.
+	By giving access to python interpreter, full control of the system (including reading user's files) is possible. For this reason, **connection are only allowed from localhost**, not over network remotely. Of course you can log into the system via SSH over network to get remote access.
 
 .. warning::
 	Authentication cookie is trivial to crack via bruteforce attack. Although the listener stalls for 5 seconds after every failed login attempt (and disconnects), the cookie could be guessed by trial-and-error during very long simulations on a shared computer.
@@ -1133,20 +1178,18 @@ simulation script
 	:yref:`yade.utils.readParamsFromTable` knows which parameter file and which line to read by inspecting the ``PARAM_TABLE`` environment variable, set by the batch system.
 
 parameter table
-	simple text file, each line representing one parameter set. This file is read by :yref:`yade.utils.readParamsFromTable` (using :yref:`yade.utils.TableParamReader` class), called from simulation script, as explained above.
+	simple text file, each line representing one parameter set. This file is read by :yref:`yade.utils.readParamsFromTable` (using :yref:`yade.utils.TableParamReader` class), called from simulation script, as explained above. For better reading of the text file you can make use of tabulators, these will be ignored by :yref:`yade.utils.readParamsFromTable`. Parameters are not restricted to numerical values. You can also make use of strings by "quoting" them ('  ' may also be used instead of "  "). This can be useful for nominal parameters.
 
 The batch can be run as ::
 
 	yade-batch parameters.table simulation.py
 
-and it will intelligently run one simulation for each parameter table line.
+and it will intelligently run one simulation for each parameter table line. A minimal example is found in :ysrc:`examples/test/batch/params.table` and :ysrc:`examples/test/batch/sim.py`, another example follows.
 
 Example
 --------
 
-This example is found in :ysrc:`scripts/batch.table` and :ysrc:`scripts/batch.py`.
-
-Suppsoe we want to study influence of parameters *density* and *initialVelocity* on position of a sphere falling on fixed box. We create parameter table like this::
+Suppose we want to study influence of parameters *density* and *initialVelocity* on position of a sphere falling on fixed box. We create parameter table like this::
 
  description density initialVelocity # first non-empty line are column headings
  reference   2400    10
@@ -1225,7 +1268,7 @@ information about job status changes is being printed, until::
 
 Separating output files from jobs
 ----------------------------------
-As one might output data to external files during simulation (using classes such as :yref:`VTKRecorder`, it is important to name files in such way that they are not overwritten by next (or concurrent) job in the same batch. A special tag ``O.tags['id']`` is provided for such purposes: it is comprised of date, time and PID, which makes it always unique (e.g. ``20100413T144723p7625``); additional advantage is that alphabetical order of the ``id`` tag is also chronological.
+As one might output data to external files during simulation (using classes such as :yref:`VTKRecorder`, it is important to name files in such way that they are not overwritten by next (or concurrent) job in the same batch. A special tag ``O.tags['id']`` is provided for such purposes: it is comprised of date, time and PID, which makes it always unique (e.g. ``20100413T144723p7625``); additional advantage is that alphabetical order of the ``id`` tag is also chronological. To add the used parameterset or if set the description of the job you could add O.tags['params'] to the filename.
 
 For smaller simulations, prepending all output file names with ``O.tags['id']`` can be sufficient:
 
@@ -1268,7 +1311,7 @@ Data are collected in usual way during the simulation (using :yref:`yade.plot.ad
 
 	print 'gnuplot',plot.saveGnuplot(O.tags['id'])
 
-and the end of the script, which prints::
+and the end of the script (even after utils.waitIfBatch()) , which prints::
 
 	gnuplot 20100413T144723p7625.gnuplot
 
@@ -1355,8 +1398,8 @@ Click on the "Apply" button in the "Object inspector" sub-window to make loaded 
 .. _img-paraview-rendering-apply:
 .. figure:: fig/paraview-rendering-apply.png
 
-Rendering spherical particles
-"""""""""""""""""""""""""""""
+Rendering spherical particles. Glyphs
+"""""""""""""""""""""""""""""""""""""""""""
 
 .. |paraview-glyph-icon| image:: fig/paraview-glyph-icon.png
 
@@ -1369,6 +1412,19 @@ Spheres will only appear as points. To make them look as spheres, you have to ad
 * optionally uncheck "Mask points" and "Random mode" (they make some particles not to be rendered for performance reasons, controlled by the "Maximum Number of Points")
 
 After clicking "Apply", spheres will appear. They will be rendered over the original white points, which you can disable by clicking on the eye icon next to ``p1-spheres.*`` in the Pipeline browser.
+
+Rendering spherical particles. PointSprite
+"""""""""""""""""""""""""""""""""""""""""""
+
+Another opportunity to display spheres is an using *PointSprite* plugin. This technique requires much less RAM in comparison to Glyphs.
+
+* "Tools -> Manage Plugins"
+* "PointSprite_Plugin -> Load selected  -> Close"
+* Load VTU-files
+* "Representation -> Point Sprite"
+* "Point Sprite -> Scale By -> radii"
+* "Edit Radius Transfer Function -> Proportional -> Multiplier = 1.0 -> Close"
+
 
 Facet transparency
 """""""""""""""""""
@@ -1383,7 +1439,30 @@ You can move between frames (snapshots that were saved) via the "Animation" menu
 Python specialties and tricks
 ******************************
 
+Importing Yade in other Python applications
+===========================================
+Yade can be imported in other Python applications. To do so, you need somehow to make yade executable .py extended. The easiest way is to create a symbolic link, i.e. (suppose your Yade executable file is called "yade-trunk" and you want make it "yadeimport.py"):
+
+.. code-block:: console
+	
+	\$ cd /path/where/you/want/yadeimport
+	\$ ln -s /path/to/yade/executable/yade-trunk yadeimport.py
+
+Then you need to make your yadeimport.py findable by Python. You can export PYTHONPATH environment variable, or simply use sys.path directly in Python script:
+
+.. code-block:: python
+
+	import sys
+	sys.path.append('/path/where/you/want/yadeimport')
+	from yadeimport import *
+
+	print Matrix3(1,2,3, 4,5,6, 7,8,9)
+	print O.bodies
+	# any other Yade code
+
 .. perhaps turn this section into a list of FAQs on python as gathered from the yade-users list?
+
+
 
 
  

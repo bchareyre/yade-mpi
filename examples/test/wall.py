@@ -1,15 +1,15 @@
 """
 Show basic wall functionality (infinite axis-aligned planes).
 """
-from yade import utils
+
 O.materials.append(FrictMat(young=30e9,density=1000,poisson=.2,frictionAngle=.5))
 O.bodies.append([
-	utils.wall(1,axis=2,sense=-1),
-	utils.wall(-5,axis=0,sense=1),
-	utils.wall(1,axis=1),
-	utils.wall((1,0,0),0),
-	utils.sphere([0,0,0],.5),
-	utils.sphere([-4,-4,-3],.5)
+	wall(1,axis=2,sense=-1),
+	wall(-5,axis=0,sense=1),
+	wall(1,axis=1),
+	wall((1,0,0),0),
+	sphere([0,0,0],.5),
+	sphere([-4,-4,-3],.5)
 ])
 Gl1_Wall(div=10)
 
@@ -29,14 +29,14 @@ O.engines=[
 	NewtonIntegrator(damping=0.01,gravity=[1e2,1e2,1e2]),
 	]
 
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.save('/tmp/a.xml')
 O.saveTmp()
 
 O.run()
 #O.bodies.append([
-#	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
-#	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False,young=1e3)
+#	facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
+#	facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False,young=1e3)
 #])
 #import random
 

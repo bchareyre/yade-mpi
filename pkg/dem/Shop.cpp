@@ -39,6 +39,7 @@
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
 
+#include<yade/pkg/common/Grid.hpp>
 
 #include<yade/pkg/dem/Tetra.hpp>
 
@@ -206,7 +207,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
 		}
-		else { E+=0.5*state->angVel.dot(state->inertia.cwise()*state->angVel);}
+		else { E+=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel));}
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}
@@ -382,15 +383,16 @@ Real Shop::getVoxelPorosity(const shared_ptr<Scene>& _scene, int _resolution, Ve
 	return ( std::pow(S,3) - Vv ) / std::pow(S,3);
 };
 
-vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
+vector<tuple<Vector3r,Real,int> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
 	if(!boost::filesystem::exists(fname)) {
 		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");
 	}
-	vector<pair<Vector3r,Real> > spheres;
+	vector<tuple<Vector3r,Real,int> > spheres;
 	ifstream sphereFile(fname.c_str());
 	if(!sphereFile.good()) throw std::runtime_error("File with spheres `"+fname+"' couldn't be opened.");
 	Vector3r C;
 	Real r=0;
+	int clumpId=-1;
 	string line;
 	size_t lineNo=0;
 	while(std::getline(sphereFile, line, '\n')){
@@ -403,11 +405,12 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(const string& fname, Vect
 			if(cellSize){ *cellSize=Vector3r(lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]),lexical_cast<Real>(tokens[3])); }
 			continue;
 		}
-		if(tokens.size()!=4) throw std::invalid_argument(("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(tokens.size())+" columns (must be 4).").c_str());
+		if(tokens.size()!=5 and tokens.size()!=4) throw std::invalid_argument(("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(tokens.size())+" columns (must be 4 or 5).").c_str());
 		C=Vector3r(lexical_cast<Real>(tokens[0]),lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]));
 		r=lexical_cast<Real>(tokens[3]);
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
-		spheres.push_back(pair<Vector3r,Real>(C,r));
+		if(tokens.size()==5)clumpId=lexical_cast<int>(tokens[4]);
+		spheres.push_back(tuple<Vector3r,Real,int>(C,r,clumpId));
 	}
 	return spheres;
 }
@@ -764,8 +767,11 @@ Matrix3r Shop::getStress(Real volume){
 	const bool isPeriodic = scene->isPeriodic;
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if (!I->isReal()) continue;
+		shared_ptr<Body> b1 = Body::byId(I->getId1(),scene);
+		shared_ptr<Body> b2 = Body::byId(I->getId2(),scene);
+		if (b1->shape->getClassIndex()==GridNode::getClassIndexStatic()) continue; //no need to check b2 because a GridNode can only be in interaction with an oher GridNode.
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
-		Vector3r branch=Body::byId(I->getId1(),scene)->state->pos -Body::byId(I->getId2(),scene)->state->pos;
+		Vector3r branch=b1->state->pos -b2->state->pos;
 		if (isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
 		stressTensor += (nsi->normalForce+nsi->shearForce)*branch.transpose();
 	}
@@ -830,11 +836,13 @@ void Shop::calm(const shared_ptr<Scene>& _scene, int mask){
 	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b || !b->isDynamic()) continue;
+		if(((mask>0) and ((b->groupMask & mask)==0))) continue;
 		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
-		if((!s) or ((mask>0) and ((b->groupMask & mask)==0))) continue;
-		b->state->vel=Vector3r::Zero();
-		b->state->angVel=Vector3r::Zero();
-		b->state->angMom=Vector3r::Zero();
+		if ( (s) or ( (!s) && (b->isClump()) ) ){
+			b->state->vel=Vector3r::Zero();
+			b->state->angVel=Vector3r::Zero();
+			b->state->angMom=Vector3r::Zero();
+		}
 	}
 }
 
@@ -877,15 +885,23 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 {
 	Scene* scene = Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
-		if (dynamicOnly && !b->isDynamic() && !b->isClumpMember()) continue;
+		if (dynamicOnly && !b->isDynamic()) continue;
+		int ci=b->shape->getClassIndex();
+		if(b->isClump() || ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
 		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
-		if(b->isClump()) continue;
 		(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
 		// Clump volume variation with homothetic displacement from its center
 		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
 	}
-
+	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+		if(b->isClump()){
+			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
+			clumpSt->updateProperties(b, 0);
+		}
+	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
+		int ci=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
+		if(ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
 		if (ii->isReal()) {
 			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
 			if (!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic())

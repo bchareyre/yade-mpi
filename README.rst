@@ -12,6 +12,7 @@ postprocessing and debugging.
 
 - https://www.yade-dem.org/doc/ (includes c++ and python reference)
 - https://yade-dem.org/doc/Yade.pdf (PDF-file with documentation)
+- https://yade-dem.org/doc/Yade.epub (EPUB-file with documentation)
  
 **Downloads:**
 
@@ -21,9 +22,9 @@ postprocessing and debugging.
   - Daily-builds: https://launchpad.net/~yade-pkg/+archive/snapshots
   - External packages: https://launchpad.net/~yade-users/+archive/external
 
-- Tarballs of different revisions: 
+- Tarballs of different versions: 
 
-  - https://www.yade-dem.org/source/
+  - https://github.com/yade/trunk/tags
   - Repository on github.com: https://github.com/yade
   - Repository on git.debian.org: http://git.debian.org/?p=debian-science/packages/yade.git
 

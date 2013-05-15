@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from yade import pack
-#from utils import *
 
 num_spheres=500
 ## corners of the initial packing
@@ -17,7 +16,7 @@ O.materials.append(FrictMat(young=5e6,poisson=0.5,frictionAngle=radians(compFric
 O.materials.append(FrictMat(young=5e6,poisson=0.5,frictionAngle=0,density=0,label='walls'))
 
 ## create walls around the packing
-walls=utils.aabbWalls([mn,mx],thickness=thick,material='walls')
+walls=aabbWalls([mn,mx],thickness=thick,material='walls')
 wallIds=O.bodies.append(walls)
 
 sp=pack.SpherePack()
@@ -30,16 +29,16 @@ clumps=False
 if clumps:
 	c1=pack.SpherePack([((-0.2*mean_rad,0,0),0.5*mean_rad),((0.2*mean_rad,0,0),0.5*mean_rad)])
 	sp.makeClumpCloud((0,0,0),(1,1,1),[c1],periodic=False)
-	O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
+	O.bodies.append([sphere(center,rad,material='spheres') for center,rad in sp])
 	standalone,clumps=sp.getClumps()
 	for clump in clumps:
 		O.bodies.clump(clump)
 		for i in clump[1:]: O.bodies[i].shape.color=O.bodies[clump[0]].shape.color
 	#sp.toSimulation()
 else:
-	O.bodies.append([utils.sphere(center,rad,material='spheres') for center,rad in sp])
+	O.bodies.append([sphere(center,rad,material='spheres') for center,rad in sp])
 
-O.dt=.5*utils.PWaveTimeStep() # initial timestep, to not explode right away
+O.dt=.5*PWaveTimeStep() # initial timestep, to not explode right away
 O.usesTimeStepper=True
 
 triax=ThreeDTriaxialEngine(
@@ -69,7 +68,7 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=100,timestepSafetyCoefficient=0.8, defaultDt=4*utils.PWaveTimeStep()),
+	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=100,timestepSafetyCoefficient=0.8, defaultDt=4*PWaveTimeStep()),
 	triax,
 	TriaxialStateRecorder(iterPeriod=100,file='WallStresses'+key),
 	newton

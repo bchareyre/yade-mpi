@@ -1,6 +1,5 @@
 from yade import *
-from yade import utils
-utils.readParamsFromTable(unknownOk=True,
+readParamsFromTable(unknownOk=True,
 	important=6,
 	unimportant='foo',
 	this=-1,

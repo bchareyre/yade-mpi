@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 
-from yade import utils,pack,export,qt
+from yade import pack,export,qt
 import gts,os
 
 def Plane(v1,v2,v3,v4):
@@ -13,8 +13,8 @@ en=0.3  # normal restitution coefficient
 es=0.3  # tangential restitution coefficient
 frictionAngle=radians(35)# 
 density=2700
-kw=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+kw=getViscoelasticFromSpheresInteraction(tc,en,es)
+params=getViscoelasticFromSpheresInteraction(tc,en,es)
 # facets material
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) 
 # default spheres material
@@ -36,7 +36,7 @@ fctIds=O.bodies.append(pack.gtsSurface2Facets(fct,material=facetMat,color=(1,0,0
 # Create spheres
 sp=pack.SpherePack(); 
 sp.makeCloud(Vector3(-.5, -.5, 0),Vector3(.5, .5, .2), Rs, Rf, int(nSpheres), False)
-spheres=O.bodies.append([utils.sphere(s[0],s[1],color=(0.929,0.412,0.412),material=dfltSpheresMat) for s in sp])
+spheres=O.bodies.append([sphere(s[0],s[1],color=(0.929,0.412,0.412),material=dfltSpheresMat) for s in sp])
 
 # Create engines
 O.engines=[

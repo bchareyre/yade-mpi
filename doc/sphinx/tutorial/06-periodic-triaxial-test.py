@@ -29,6 +29,8 @@ sigmaIso=-1e5
 
 # generate loose packing
 from yade import pack, qt, plot
+
+O.periodic=True
 sp=pack.SpherePack()
 if 0:
 	## uniform distribution
@@ -40,9 +42,9 @@ elif 0:
 else:
 	## create packing from clumps
 	# configuration of one clump
-	c1=pack.SpherePack([((0,0,0),.1),((.15,0,0),.05),((0,.1,0),.05)])
+	c1=pack.SpherePack([((0,0,0),.03333),((.03,0,0),.017),((0,.03,0),.017)])
 	# make cloud using the configuration c1 (there could c2, c3, ...; selection between them would be random)
-	sp.makeClumpCloud((0,0,0),(2,2,2),[c1],periodic=True)
+	sp.makeClumpCloud((0,0,0),(2,2,2),[c1],periodic=True,num=500)
 
 # setup periodic boundary, insert the packing
 sp.toSimulation()
@@ -51,21 +53,21 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_L3Geom()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_L3Geom_FrictPhys_ElPerfPl()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	NewtonIntegrator(damping=.6),
 	PeriTriaxController(label='triax',
 		# specify target values and whether they are strains or stresses
 		goal=(sigmaIso,sigmaIso,sigmaIso),stressMask=7,
 		# type of servo-control
-		dynCell=True,maxStrainRate=(.1,.1,.1),
+		dynCell=True,maxStrainRate=(10,10,10),
 		# wait until the unbalanced force goes below this value
 		maxUnbalanced=.1,relStressTol=1e-3,
 		# call this function when goal is reached and the packing is stable
 		doneHook='compactionFinished()'
 	),
+	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
 ]
 O.dt=.5*utils.PWaveTimeStep()

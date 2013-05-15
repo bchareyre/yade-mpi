@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 
-from yade import utils,pack,export,qt
+from yade import pack,export,qt
 import gts,os,random,itertools
 from numpy import *
 
@@ -12,7 +12,7 @@ es=.3  # tangential restitution coefficient
 frictionAngle=radians(35)# 
 density=2700
 # facets material
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+params=getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 # default spheres material
 dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params)) 
@@ -29,7 +29,7 @@ plnSurf1 = pack.sweptPolylines2gtsSurface([[Vector3(-.5,-.5,-.5),Vector3(.5,-.5,
 plnIds1=O.bodies.append(pack.gtsSurface2Facets(plnSurf1,material=facetMat,color=(0,1,0)))
 
 # Create clumps
-clpId,sphId=O.bodies.appendClumped([utils.sphere(Vector3(0,Rs*2*i,Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
+clpId,sphId=O.bodies.appendClumped([sphere(Vector3(0,Rs*2*i,Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
 
 # Create engines
 O.engines=[

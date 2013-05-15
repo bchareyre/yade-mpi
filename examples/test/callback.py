@@ -1,7 +1,7 @@
 O.materials.append(FrictMat(young=30e9,poisson=.2,density=4000,frictionAngle=.5))
 O.bodies.append([
-	utils.sphere((0,0,0),1,fixed=True),
-	utils.sphere((0,0,2.1),1)
+	sphere((0,0,0),1,fixed=True),
+	sphere((0,0,2.1),1)
 ])
 O.engines=[
 	ForceResetter(),
@@ -13,9 +13,9 @@ O.engines=[
 	),
 	NewtonIntegrator(label='newton',gravity=(0,0,-9.81))
 ]
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 
-disp=utils.typedEngine('InteractionLoop')
+disp=typedEngine('InteractionLoop')
 
 disp.callbacks=[SumIntrForcesCb()]
 #newton.callbacks=[SumBodyForcesCb()]

@@ -11,7 +11,7 @@ O.cell.setBox(.1,.1,.1)
 sp=pack.SpherePack()
 radius=5e-3
 num=sp.makeCloud((0,0,0),(.1,.1,.1),radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
-O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
+O.bodies.append([sphere(s[0],s[1]) for s in sp])
 
 
 O.engines=[
@@ -41,7 +41,7 @@ def triaxDone():
 		#print 'Done, pausing now.'
 		#O.pause()
 		
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.run(7000);
 qt.View()
 #r=qt.Renderer()

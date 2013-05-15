@@ -54,9 +54,9 @@ Labels
 	Yade [1]: from yade import *
 	
 	Yade [1]: O.engines=[
-	     ...:    NewtonIntegrator(damping=.2,label='newton')
-	     ...: ]
-	     ...:
+	   ...:    NewtonIntegrator(damping=.2,label='newton')
+	   ...: ]
+	   ...:
 
 	Yade [1]: newton.damping=.4
 

@@ -4,6 +4,14 @@
 #include<yade/pkg/common/Callbacks.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
 
+#ifdef USE_TIMING_DELTAS
+	#define TIMING_DELTAS_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)
+	#define TIMING_DELTAS_START() timingDeltas->start()
+#else
+	#define TIMING_DELTAS_CHECKPOINT(cpt)
+	#define TIMING_DELTAS_START()
+#endif
+
 class InteractionLoop: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
 	typedef std::pair<Body::id_t, Body::id_t> idPair;
@@ -26,9 +34,6 @@ class InteractionLoop: public GlobalEngine {
 			((bool, eraseIntsInLoop, false,,"Defines if the interaction loop should erase pending interactions, else the collider takes care of that alone (depends on what collider is used)."))
 			,
 			/*ctor*/ alreadyWarnedNoCollider=false;
-				#ifdef IDISP_TIMING
-					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
-				#endif
 				#ifdef YADE_OPENMP
 					eraseAfterLoopIds.resize(omp_get_max_threads());
 				#endif

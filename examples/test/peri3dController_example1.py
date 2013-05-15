@@ -4,7 +4,7 @@
 from yade import pack, plot
 
 # create some material
-O.materials.append(CpmMat(young=25e9,frictionAngle=.7,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,crackOpening=5e-6))
+O.materials.append(CpmMat(neverDamage=True,young=25e9,frictionAngle=.7,poisson=.2,sigmaT=3e6,epsCrackOnset=1e-4,relDuctility=30))
 
 # create periodic assembly of particles
 initSize=1.2
@@ -26,16 +26,18 @@ def plotAddData():
 # in how many time steps should be the goal state reached
 nSteps=4000
 
-O.dt=utils.PWaveTimeStep()/2
+O.dt=PWaveTimeStep()/2
 EnlargeFactor=1.5
+EnlargeFactor=1.0
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=EnlargeFactor,label='bo1s')]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=EnlargeFactor,label='ig2ss')],
-		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_Dem3DofGeom_CpmPhys_Cpm()]),
+		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=EnlargeFactor,label='ig2ss')],
+		[Ip2_CpmMat_CpmMat_CpmPhys()],[Law2_ScGeom_CpmPhys_Cpm()]),
 	NewtonIntegrator(),
-	Peri3dController(	goal=(10e-4,-3e-4,0, -5e6,3e-4,2e6), # Vector6 of prescribed final values
+	Peri3dController(
+							goal=(20e-4,-6e-4,0, -2e6,3e-4,2e6), # Vector6 of prescribed final values (xx,yy,zz, yz,zx,xy)
 							stressMask=0b101100,    # prescribed ex,ey,sz,syz,ezx,sxy;   e..strain;  s..stress
 							nSteps=nSteps, 			# how many time steps the simulation will last
 							# after reaching nSteps do doneHook action
@@ -59,7 +61,7 @@ O.engines=[
 ]
 
 O.step()
-#bo1s.aabbEnlargeFactor=ig2ss.distFactor=-1
+bo1s.aabbEnlargeFactor=ig2ss.interactionDetectionFactor=1.
 
 O.run(); #O.wait()
 plot.plot(subPlots=False)

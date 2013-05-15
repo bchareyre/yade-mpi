@@ -3,8 +3,8 @@
 # The second engine does the same on body #1 as the first one does on #0 (the local rotation is not present)
 
 O.bodies.append([
-	utils.sphere((-1,0,0),.3,color=(1,0,.5),fixed=False,wire=True),
-	utils.sphere((1,0,0),.3,color=(0,1,0),fixed=False,wire=True)
+	sphere((-1,0,0),.3,color=(1,0,.5),fixed=False,wire=True),
+	sphere((1,0,0),.3,color=(0,1,0),fixed=False,wire=True)
 ])
 
 O.engines=[

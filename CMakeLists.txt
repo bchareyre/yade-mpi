@@ -32,24 +32,27 @@ INCLUDE(FindOpenGL)
 INCLUDE(FindGTS)
 INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
-
+INCLUDE(FindNumPy)
+INCLUDE(FindLoki)
+INCLUDE(FindPythonModule)
+INCLUDE(GNUInstallDirs)
 #===========================================================
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
   IF (DEBUG)
     SET(CMAKE_VERBOSE_MAKEFILE 1)
     SET(CMAKE_BUILD_TYPE Debug)
-    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -ggdb2")
+    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG")
   ELSE (DEBUG)
     SET(CMAKE_BUILD_TYPE Release)
     SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -fPIC")
   ENDIF (DEBUG)
 ELSE (CMAKE_CXX_FLAGS)
-  #If flags are not set, add all usefull flags
+  #If flags are not set, add all useful flags
   IF (DEBUG)
     SET(CMAKE_VERBOSE_MAKEFILE 1)
     SET(CMAKE_BUILD_TYPE Debug)
-    SET(CMAKE_CXX_FLAGS  "-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -ggdb2")
+    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security")
   ELSE (DEBUG)
     SET(CMAKE_BUILD_TYPE Release)
     SET(CMAKE_CXX_FLAGS  "-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
@@ -57,6 +60,7 @@ ELSE (CMAKE_CXX_FLAGS)
 ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
+
 FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
@@ -65,7 +69,14 @@ MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
-FIND_PACKAGE(Eigen3)
+#===========================================================
+FIND_PACKAGE(NumPy REQUIRED)
+INCLUDE_DIRECTORIES(${NUMPY_INCLUDE_DIRS})
+
+FIND_PACKAGE(Loki REQUIRED)
+FIND_PACKAGE(Eigen3 REQUIRED)
+#===========================================================
+
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
 SET(LINKLIBS "")
 SET(CONFIGURED_FEATS "")
@@ -85,15 +96,6 @@ IF (EIGEN3_FOUND)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
   MESSAGE(STATUS "Found Eigen3")
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
-ELSE (EIGEN3_FOUND)
-  FIND_PACKAGE(Eigen2)
-  if (EIGEN2_FOUND)
-    INCLUDE_DIRECTORIES(${EIGEN2_INCLUDE_DIR})
-    MESSAGE(STATUS "Found Eigen2")
-    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen2")
-  ELSE (EIGEN2_FOUND)
-    MESSAGE(FATAL_ERROR "None Eigen2 or Eigen3 were found!")
-  ENDIF (EIGEN2_FOUND)
 ENDIF(EIGEN3_FOUND)
 #===========================================================
 IF(ENABLE_VTK)
@@ -102,7 +104,7 @@ IF(ENABLE_VTK)
     INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
     LINK_DIRECTORIES( ${VTK_LIBRARY_DIRS} )
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DYADE_VTK")
-    SET(features "${features},vtk")
+    SET(features "${features} vtk")
     MESSAGE(STATUS "Found VTK")
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} VTK")
   ELSE(VTK_FOUND)
@@ -117,10 +119,10 @@ ENDIF(ENABLE_VTK)
 IF(ENABLE_OPENMP)
   FIND_PACKAGE(OpenMP)
   IF(OPENMP_FOUND)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DYADE_OPENMP -fopenmp")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DYADE_OPENMP ${OpenMP_CXX_FLAGS}")
     MESSAGE(STATUS "Found OpenMP")
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} OpenMP")
-    SET(features "${features},openmp")
+    SET(features "${features} openmp")
   ELSE(OPENMP_FOUND)
     MESSAGE(STATUS "OpenMP NOT found")
     SET(ENABLE_OPENMP OFF)
@@ -140,7 +142,7 @@ IF(ENABLE_GTS)
     INCLUDE_DIRECTORIES(${GLIB2_INCLUDE_DIRS})
     MESSAGE(STATUS "Found GTS")
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} GTS")
-    SET(features "${features},gts")
+    SET(features "${features} gts")
   ELSE(GTS_FOUND AND GLIB2_FOUND)
     MESSAGE(STATUS "GTS NOT found")
     SET(DISABLED_FEATS "${DISABLED_FEATS} GTS")
@@ -159,7 +161,7 @@ IF(ENABLE_GUI)
   IF(QT4_FOUND AND OPENGL_FOUND AND GLUT_FOUND AND GLIB2_FOUND AND QGLVIEWER_FOUND)
     SET(GUI_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${QGLVIEWER_LIBRARIES})
     SET(GUI_SRC_LIB "lib/opengl/GLUtils.cpp")
-    SET(features "${features},qt4,opengl")
+    SET(features "${features} qt4 opengl")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DYADE_OPENGL")
     INCLUDE_DIRECTORIES(${GLIB2_INCLUDE_DIRS})
     INCLUDE_DIRECTORIES(${QT_INCLUDES})
@@ -174,6 +176,16 @@ IF(ENABLE_GUI)
 ELSE(ENABLE_GUI)
   SET(DISABLED_FEATS "${DISABLED_FEATS} GUI")
 ENDIF(ENABLE_GUI)
+#===========================================================
+# This one will automatically enable CGAL
+IF(ENABLE_PFVFLOW)
+  IF (NOT ENABLE_CGAL)
+    MESSAGE(STATUS "PFVFLOW depends on CGAL, attempting to turn ENABLE_CGAL ON")
+    SET(ENABLE_CGAL ON)
+  ENDIF (NOT ENABLE_CGAL)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFLOW_ENGINE")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PFVflow")
+ENDIF(ENABLE_PFVFLOW)
 #===========================================================
 IF(ENABLE_CGAL)  
   INCLUDE(FindGMP)
@@ -212,7 +224,7 @@ IF(ENABLE_LINSOLV)
     SET(ENABLE_LINSOLV OFF)
   ENDIF(CHOLMOD_FOUND)
 ENDIF(ENABLE_LINSOLV)
-#===========================================================
+#===============================================
 IF(ENABLE_GL2PS)
   FIND_PACKAGE(GL2PS)
   IF(GL2PS_FOUND)
@@ -253,7 +265,7 @@ IF(NOSUFFIX)   #For packaging
 ENDIF(NOSUFFIX)   #For packaging
 
 IF(NOT LIBRARY_OUTPUT_PATH)   #For packaging
-  SET (LIBRARY_OUTPUT_PATH "lib")
+  SET (LIBRARY_OUTPUT_PATH ${CMAKE_INSTALL_LIBDIR})
 ENDIF(NOT LIBRARY_OUTPUT_PATH)   #For packaging
 
 IF (NOT runtimePREFIX)
@@ -266,9 +278,10 @@ MESSAGE (STATUS "runtimePREFIX is set to " ${runtimePREFIX})
 #===========================================================
 
 SET(YADE_LIB_PATH ${CMAKE_INSTALL_PREFIX}/${LIBRARY_OUTPUT_PATH}/yade${SUFFIX})
-SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+SET(YADE_EXEC_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})
 SET(YADE_PY_PATH ${YADE_LIB_PATH}/py)
-SET(YADE_DOC_PATH ${CMAKE_INSTALL_PREFIX}/share/doc/yade${SUFFIX})
+SET(YADE_DOC_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc/yade${SUFFIX})
+SET(YADE_MAN_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR})
 
 
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -318,13 +331,21 @@ ELSE (CHUNKSIZE)
   ADD_LIBRARY(support SHARED ${SRC_LIB})
 ENDIF (CHUNKSIZE)
 #===========================================================
+find_python_module(minieigen)
+IF (PY_minieigen)
+  MESSAGE(STATUS "Use system minieigen version")
+ELSE (PY_minieigen)
+  MESSAGE(STATUS "Use embedded version of minieigen. Please, consider installing the corresponding package")
+ENDIF (PY_minieigen)
+find_python_module(Tkinter REQUIRED)
+#===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
 TARGET_LINK_LIBRARIES(core support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} -lrt)
+TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
 
-TARGET_LINK_LIBRARIES(plugins support core miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
 IF(ENABLE_VTK)
   TARGET_LINK_LIBRARIES(plugins vtkHybrid)
 ENDIF(ENABLE_VTK)
@@ -334,11 +355,13 @@ IF(ENABLE_GUI)
   TARGET_LINK_LIBRARIES(support ${GUI_LIBS})
 ENDIF(ENABLE_GUI)
 
-TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
-SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-
+#====================================
+IF (NOT (PY_minieigen))
+  ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
+  SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
+  TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+  INSTALL(TARGETS miniEigen DESTINATION ${YADE_PY_PATH})
+ENDIF (NOT (PY_minieigen))
 #====================================
 #Back compatibility with scons
 SET (realVersion ${YADE_VERSION})
@@ -370,7 +393,7 @@ INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
 INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH})
 INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH})
 INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH})
-INSTALL(TARGETS miniEigen DESTINATION ${YADE_PY_PATH})
+
 #===========================================================
 MESSAGE(STATUS "===========================================================")
 MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
@@ -381,7 +404,7 @@ ELSE (DEBUG)
   MESSAGE(STATUS "Optimized build")
 ENDIF (DEBUG)
 IF (CHUNKSIZE)
-  MESSAGE(STATUS "CHUNKSIZE ist set to " ${CHUNKSIZE})
+  MESSAGE(STATUS "CHUNKSIZE is set to " ${CHUNKSIZE})
 ENDIF (CHUNKSIZE)
 MESSAGE(STATUS "===========================================================")
 #===========================================================
@@ -404,3 +427,40 @@ ADD_CUSTOM_COMMAND(
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
                   )
+ADD_CUSTOM_COMMAND( 
+                  TARGET doc POST_BUILD
+                  COMMAND rm -rf ${YADE_DOC_PATH}/html
+                  COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/html ${YADE_DOC_PATH}/html
+                  COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.pdf ${YADE_DOC_PATH}/
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
+                  )
+ADD_CUSTOM_COMMAND( 
+                  TARGET doc POST_BUILD
+                  COMMAND mv ${CMAKE_BINARY_DIR}/doc/sphinx/_build/epub/Yade.epub ${YADE_DOC_PATH}/ || true
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} ${CMAKE_BINARY_DIR}/doc/sphinx/_build/latex/Yade.tex
+                  )
+#===========================================================
+#Building manpage
+ADD_CUSTOM_TARGET(manpage)
+ADD_CUSTOM_COMMAND( 
+                  TARGET manpage POST_BUILD
+                  COMMAND help2man ${YADE_EXEC_PATH}/yade${SUFFIX} > yade${SUFFIX}.1
+                  COMMAND help2man ${YADE_EXEC_PATH}/yade${SUFFIX}-batch > yade${SUFFIX}-batch.1
+                  COMMAND mkdir -p ${YADE_MAN_PATH}
+                  COMMAND mv *.1 ${YADE_MAN_PATH}
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX} /usr/bin/help2man
+                  )
+#===========================================================
+#Execute standard checks
+ADD_CUSTOM_TARGET(check)
+ADD_CUSTOM_COMMAND( 
+                  TARGET check POST_BUILD
+                  COMMAND ${YADE_EXEC_PATH}/yade${SUFFIX} --test
+                  COMMAND ${YADE_EXEC_PATH}/yade${SUFFIX} --check
+                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                  DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
+                  )
+#===========================================================

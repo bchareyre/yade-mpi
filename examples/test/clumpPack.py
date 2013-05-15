@@ -6,7 +6,7 @@ sp=pack.SpherePack()
 print 'Generated # of clumps:',sp.makeClumpCloud((0,0,0),(15,15,15),[c1,c2],periodic=False)
 sp.toSimulation()
 
-O.bodies.append(utils.wall(position=0,axis=2))
+O.bodies.append(wall(position=0,axis=2))
 
 O.engines=[
 	#SubdomainBalancer(),
@@ -19,7 +19,7 @@ O.engines=[
 	),
 	NewtonIntegrator(damping=.4,gravity=(0,0,-100))
 ]
-O.dt=.7*utils.PWaveTimeStep()
+O.dt=.7*PWaveTimeStep()
 O.saveTmp()
 O.step()
 

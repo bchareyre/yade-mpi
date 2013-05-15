@@ -15,12 +15,12 @@ O.engines=[
 ]
 import random
 for i in xrange(250):
-	O.bodies.append(utils.sphere(Vector3(10*random.random(),10*random.random(),10*random.random()),.5+random.random()))
+	O.bodies.append(sphere(Vector3(10*random.random(),10*random.random(),10*random.random()),.5+random.random()))
 cubeSize=20
 # absolute positioning of the cell is not important
 O.periodic=True
 O.cell.setBox(cubeSize,cubeSize,cubeSize)
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.saveTmp()
 from yade import qt
 qt.Controller(); qt.View()
@@ -32,8 +32,8 @@ print 'Please be patient...'
 
 for i in range(0,25):
 	O.run(2000,True)
-	F,stiff=utils.totalForceInVolume()
+	F,stiff=totalForceInVolume()
 	dim=O.cell.refSize; A=Vector3(dim[1]*dim[2],dim[0]*dim[2],dim[0]*dim[1])
 	avgStress=sum([F[i]/A[i] for i in 0,1,2])/3.
-	print 'strain',(cubeSize-dim[0])/cubeSize,'avg. stress ',avgStress,'unbalanced ',utils.unbalancedForce()
+	print 'strain',(cubeSize-dim[0])/cubeSize,'avg. stress ',avgStress,'unbalanced ',unbalancedForce()
 #O.timingEnabled=True; timing.reset(); O.run(200000,True); timing.stats()

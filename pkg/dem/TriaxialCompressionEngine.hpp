@@ -87,6 +87,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		"Transition from COMPACTION to UNLOADING is done automatically if autoUnload==true;\n\n Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is done automatically if autoCompressionActivation=true; Both autoUnload and autoCompressionActivation are true by default.\n\n"
 		"\n\n.. note::\n\t Most of the algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
+		((int, warn, 0,,"counter used for sending a deprecation warning once"))
 		((Real,strainRate,0,,"target strain rate (./s)"))
 		((Real,currentStrainRate,0,,"current strain rate - converging to :yref:`TriaxialCompressionEngine::strainRate` (./s)"))
 		((Real,UnbalancedForce,1,,"mean resultant forces divided by mean contact force"))
@@ -109,6 +110,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		((Real,fixedPoroCompaction,false,,"A special type of compaction with imposed final porosity :yref:`TriaxialCompressionEngine::fixedPorosity` (WARNING : can give unrealistic results!)"))
 		((Real,fixedPorosity,0,,"Value of porosity chosen by the user"))
 		((Real,maxStress,0,,"Max value of stress during the simulation (for post-processing)"))
+		((Real,sigma_iso,0,,"prescribed confining stress (see :yref:TriaxialCompressionEngine::isAxisymetric`)"))
+		((bool,isAxisymetric,false,,"if true, sigma_iso is assigned to sigma1, 2 and 3 (applies at each iteration and overrides user-set values of s1,2,3)"))
 		,
 		translationAxisx=Vector3r(1,0,0);
 		translationAxisz=Vector3r(0,0,1);
@@ -121,6 +124,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		previousSigmaIso=sigma_iso;
 		boxVolume=0;
 		saveSimulation=false;
+		isAxisymetric=true;
 		,
 	 	.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
 		)

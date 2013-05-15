@@ -3,7 +3,7 @@
 
 # Script to test the contact damping in HM (both in the normal and shear direction)
 
-from yade import utils
+
 
 #__________________________________________________________________
 # Geometry sphere and box
@@ -21,8 +21,8 @@ frictionAngle=26 # [°]
 
 # Append geometry and material
 O.materials.append(FrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle))
-O.bodies.append(utils.box(center=center,extents=extents,fixed=True,wire=True)) # body id=0
-O.bodies.append(utils.sphere(p2,r2,fixed=True,wire=True)) # body id=1
+O.bodies.append(box(center=center,extents=extents,fixed=True,wire=True)) # body id=0
+O.bodies.append(sphere(p2,r2,fixed=True,wire=True)) # body id=1
 m_sphere=O.bodies[1].state.mass
 O.bodies[0].state.mass=m_sphere # set the mass of the box the same as the mass of the sphere
 O.bodies[1].state.blockedDOFs='XYZ' # block particles rotations
@@ -50,7 +50,7 @@ damping.useDamping=True
 
 #__________________________________________________________________
 # time step
-O.dt=.2*utils.PWaveTimeStep()
+O.dt=.2*PWaveTimeStep()
 O.saveTmp('init')
 
 #__________________________________________________________________
@@ -60,7 +60,6 @@ qt.Controller()
 
 #__________________________________________________________________
 # plot some results
-from math import *
 from yade import plot
 
 plot.labels=dict(Fn='$Normal\,force$',un='$Overlapping$',time='$Time$',time_='$Time$',Fs='$Shear\,force$',t='$Time$')

@@ -274,6 +274,8 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
+	//This prevent the deprecation warning. In fact this preprocessor in itself is becoming deprecated
+	triaxialcompressionEngine->warn = 1;
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
 	triaxialcompressionEngine-> sigmaIsoCompaction = sigmaIsoCompaction;

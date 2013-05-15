@@ -8,8 +8,6 @@
 # in this case there is almost no difference, but in script peri3dController_shear,
 # the cell rotation has significant effect)
 
-#FIXME: Law2_Dem3DofGeom_FrictPhys_CundallStrack replaced by Law2_ScGeom_FrictPhys_CundallStrack because the first is removed, but Peri3DEngine is broken by this change due to sign inversion in stress. A 'useDem3dof' flag like in PeriTriaxController is needed.
-
 from yade import pack,plot,qt
 
 # define material
@@ -34,7 +32,7 @@ def plotAddData():
 		eyz=p3d.strain[3],ezx=p3d.strain[4],exy=p3d.strain[5],
 	)
 
-O.dt=utils.PWaveTimeStep()/2
+O.dt=PWaveTimeStep()/2
 
 # define the first part of simulation, hydrostatic compression
 O.engines=[

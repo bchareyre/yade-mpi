@@ -19,8 +19,8 @@ O.materials.append(NormalInelasticMat(density=2600,young=4.0e9,poisson=.04,frict
 #O.materials.append(FrictMat(young=10e9,poisson=.25,frictionAngle=0.5,density=1e3))
 
 #Def of the bodies of the simulations : 2 spheres, with names which will be useful after
-O.bodies.append(utils.sphere([0,0,0], 1, fixed=True, wire=False, color=None, highlight=False)) #'Materiau1', as the latest material defined, will be used
-O.bodies.append(utils.sphere([0,2,0], 1, fixed=True, wire=False, color=None, highlight=False))
+O.bodies.append(sphere([0,0,0], 1, fixed=True, wire=False, color=None, highlight=False)) #'Materiau1', as the latest material defined, will be used
+O.bodies.append(sphere([0,2,0], 1, fixed=True, wire=False, color=None, highlight=False))
 
 lowerSphere=O.bodies[0]
 upperSphere=O.bodies[1]

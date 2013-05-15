@@ -1,6 +1,6 @@
 # encoding: utf-8
 # Copyright (C) 2012 by Bruno Chareyre
-# An update of the original script for Janek Kozicki
+# An update of the original script from Janek Kozicki
 
 from yade import pack
 from numpy import arange
@@ -22,8 +22,13 @@ for xyz in itertools.product(arange(0,d),arange(0,d),arange(0,d)):
 	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((mn[0]+xyz[0]*(mx[0]-mn[0])/d,mn[0]+xyz[1]*(mx[1]-mn[1])/d,mn[2]+xyz[2]*(mx[2]-mn[2])/d),(0.45+random.random()*0.1,0.45+random.random()*0.1,0.45+random.random()*0.1)),radius=0.15+random.random()*0.05,gap=0,color=[random.random(),random.random(),random.random()]))
 
 ## create walls around the packing
-walls=utils.aabbWalls(material='frictionless')
+walls=aabbWalls(material='frictionless')
 wallIds=O.bodies.append(walls)
+
+from yade import qt
+qt.Controller()
+qt.View()
+
 
 ## hope that we got the ids right?!
 triax=TriaxialCompressionEngine(
@@ -63,8 +68,6 @@ O.engines=[
 	# you can add TriaxialStateRecorder and such here…
 	NewtonIntegrator(damping=.4)
 ]
-
-O.dt=.5*utils.PWaveTimeStep() # initial timestep, to not explode right away
 
 #yade.plot.plots={'eps':('sigma',)}
 

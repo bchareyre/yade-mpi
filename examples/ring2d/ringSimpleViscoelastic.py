@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from yade import utils
 from yade import ymport
 
 ## Omega
@@ -16,7 +15,7 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-params=utils.getViscoelasticFromSpheresInteraction(tc,en,es)
+params=getViscoelasticFromSpheresInteraction(tc,en,es)
 facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 
@@ -31,7 +30,7 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					x = cylinderOrigin[0]+2*r*sphereRadius*cos(dfi*a)
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
-					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,material=sphereMat)
+					s=sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,material=sphereMat)
 					o.bodies.append(s)
 					spheresCount+=1
 	return spheresCount

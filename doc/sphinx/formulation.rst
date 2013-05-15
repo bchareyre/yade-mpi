@@ -189,7 +189,7 @@ The algorithm commonly used in Yade computes normal interaction stiffness as sti
    
 	Series of 2 springs representing normal stiffness of contact between 2 spheres.
 				
-Let us define distance $l=l_1+l_2$, where $l_i$ are distances between contact point and sphere centers, which are initially (roughly speaking) equal to sphere radii. Change of distance between the spehre centers $\Delta l$ is distributed onto deformations of both spheres $\Delta l=\Delta l_1+\Delta l_2$ proportionally to their compliances. Displacement change $\Delta l_i$ generates force $F_i=K_i \Delta l_i$, where $K_i$ assures proportionality and has physical meaning and dimension of stiffness; $K_i$ is related to the sphere material modulus $E_i$ and some length $\tilde l_i$ proportional to $r_i$.
+Let us define distance $l=l_1+l_2$, where $l_i$ are distances between contact point and sphere centers, which are initially (roughly speaking) equal to sphere radii. Change of distance between the sphere centers $\Delta l$ is distributed onto deformations of both spheres $\Delta l=\Delta l_1+\Delta l_2$ proportionally to their compliances. Displacement change $\Delta l_i$ generates force $F_i=K_i \Delta l_i$, where $K_i$ assures proportionality and has physical meaning and dimension of stiffness; $K_i$ is related to the sphere material modulus $E_i$ and some length $\tilde l_i$ proportional to $r_i$.
 
 .. math::
 	:nowrap:
@@ -262,7 +262,7 @@ The value of $R_I$ directly influences the average number of interactions per sp
 
 Contact cross-section
 """""""""""""""""""""
-Some constitutive laws are formulated with strains and stresses (:yref:`Law2_Dem3DofGeom_CpmPhys_Cpm`, the concrete model described later, for instance); in that case, equivalent cross-section of the contact must be introduced for the sake of dimensionality. The exact definition is rather arbitrary; the CPM model (:yref:`Ip2_CpmMat_CpmMat_CpmPhys`) uses the relation
+Some constitutive laws are formulated with strains and stresses (:yref:`Law2_ScGeom_CpmPhys_Cpm`, the concrete model described later, for instance); in that case, equivalent cross-section of the contact must be introduced for the sake of dimensionality. The exact definition is rather arbitrary; the CPM model (:yref:`Ip2_CpmMat_CpmMat_CpmPhys`) uses the relation
 
 .. math:: A_{\rm eq}=\pi\min(r_1,r_2)^2
 	:label: eq-strain-crosssection
@@ -428,7 +428,7 @@ Stress evaluation (example)
 ===========================
 Once strain on a contact is computed, it can be used to compute stresses/forces acting on both spheres.
 
-The constitutive law presented here is the most usual DEM formulation, originally proposed by Cundall. While the strain evaluation will be similar to algorithms described in the previous section regardless of stress evaluation, stress evaluation itself depends on the nature of the material being modeled. The constitutive law presented here is the most simple non-cohesive elastic case with dry friction, which Yade implements in :yref:`Law2_Dem3DofGeom_FrictPhys_Basic` (all constitutive laws derive from base class :yref:`LawFunctor`).
+The constitutive law presented here is the most usual DEM formulation, originally proposed by Cundall. While the strain evaluation will be similar to algorithms described in the previous section regardless of stress evaluation, stress evaluation itself depends on the nature of the material being modeled. The constitutive law presented here is the most simple non-cohesive elastic case with dry friction, which Yade implements in :yref:`Law2_ScGeom_FrictPhys_CundallStrack` (all constitutive laws derive from base class :yref:`LawFunctor`).
 		
 In DEM generally, some constitutive laws are expressed using strains and stresses while others prefer displacement/force formulation. The law described here falls in the latter category.
 
@@ -835,7 +835,7 @@ Periodic boundary conditions
 ============================
 While most DEM simulations happen in $R^3$ space, it is frequently useful to avoid boundary effects by using periodic space instead. In order to satisfy periodicity conditions, periodic space is created by repetition of parallelepiped-shaped cell. In Yade, periodic space is implemented in the :yref:`Cell` class. The geometry of the cell in the reference coordinates system is defined by three edges of the parallepiped. The corresponding base vectors are stored in the columns of matrix $\mat{H}$ (:yref:`Cell.hSize`).
 
-The initial $\mat{H}$ can be explicitly defined as a 3x3 matrix at the begining of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial cell.
+The initial $\mat{H}$ can be explicitly defined as a 3x3 matrix at the beginning of the simulation. There are no restricitions on the possible shapes: any parallelepiped is accepted as the initial cell.
 If the base vectors are axis-aligned, defining only their sizes can be more convenient than defining the full $\mat{H}$ matrix; in that case it is enough to define the norms of columns in $\mat{H}$ (see :yref:`Cell.size`).
 
 After the definition of the initial cell's geometry, $\mat{H}$ should generally not be modified by direct assignment. Instead, its deformation rate will be defined via the velocity gradient :yref:`Cell.velGrad` described below. It is the only variable that let the period deformation be correctly accounted for in constitutive laws and Newton integrator (:yref:`NewtonIntegrator`).

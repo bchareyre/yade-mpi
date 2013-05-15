@@ -10,4 +10,3 @@ Type yade.plot.plot() to see strain/stress plot during the simulation.
 See comments at the beginning of uniax.py for more information.
 
 The periodic.py is uniax.py, but running on a periodic sample.
-It is only experimental at this moment.

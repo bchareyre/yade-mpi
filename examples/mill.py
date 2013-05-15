@@ -45,7 +45,7 @@ millIds=O.bodies.append(pack.gtsSurface2Facets(mill,color=(1,0,1),wire=False)) #
 # make the caps less comfortably, but looking better as two triangle couples over the mill
 mrs2=millRad*sqrt(2)
 cap1,cap2=[Vector3(0,0,mrs2),Vector3(0,-mrs2,0),Vector3(0,0,-mrs2)],[Vector3(0,0,mrs2),Vector3(0,0,-mrs2),Vector3(0,mrs2,0)] # 2 triangles at every side
-for xx in -.5*millDp,.5*millDp: millIds+=O.bodies.append([utils.facet([p+Vector3(xx,0,0) for p in cap1],color=(0,0,0)),utils.facet([p+Vector3(xx,0,0) for p in cap2],color=(0,0,0))])
+for xx in -.5*millDp,.5*millDp: millIds+=O.bodies.append([facet([p+Vector3(xx,0,0) for p in cap1],color=(0,0,0)),facet([p+Vector3(xx,0,0) for p in cap2],color=(0,0,0))])
 
 # define domains for initial cloud of red and blue spheres
 packHt=.8*millRad # size of the area
@@ -54,11 +54,11 @@ colors=(1,0,0),(0,0,1)
 for i in (0,1): # red and blue spheres
 	sp=pack.SpherePack(); bb=bboxes[i]; vol=(bb[1][0]-bb[0][0])*(bb[1][1]-bb[0][1])*(bb[1][2]-bb[0][2])
 	sp.makeCloud(bb[0],bb[1],sphRad,sphRadFuzz,int(.25*vol/((4./3)*pi*sphRad**3)),False)
-	O.bodies.append([utils.sphere(s[0],s[1],color=colors[i]) for s in sp])
+	O.bodies.append([sphere(s[0],s[1],color=colors[i]) for s in sp])
 
 print "Numer of grains",len(O.bodies)-len(millIds)
 
-O.dt=.5*utils.PWaveTimeStep()
+O.dt=.5*PWaveTimeStep()
 
 O.engines=[
 	ForceResetter(),
@@ -79,4 +79,4 @@ from yade import qt
 v=qt.View()
 v.eyePosition=(3,.8,.96); v.upVector=(-.4,-.4,.8); v.viewDir=(-.9,-.25,-.3); v.axes=True; v.sceneRadius=1.9
 #O.run(20000); O.wait()
-#utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/mill.ogg',fps=30)
+#encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/mill.ogg',fps=30)

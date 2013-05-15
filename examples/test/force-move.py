@@ -1,4 +1,4 @@
-O.bodies.append(utils.sphere([0,0,0],1,fixed=False))
+O.bodies.append(sphere([0,0,0],1,fixed=False))
 O.engines=[
 	ForceResetter(),
 	PyRunner(command='O.forces.addMove(0,(1e-2,0,0))',iterPeriod=1),

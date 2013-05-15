@@ -213,8 +213,8 @@ void PeriTriaxController::action()
 		//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
  	for (int k=0;k<3;k++) strainRate[k]=scene->cell->velGrad(k,k);
-	//Update energy input
-	Real dW=(scene->cell->velGrad*stressTensor).trace()*scene->dt*scene->cell->hSize.determinant();
+	//Update energy input FIXME: replace trace by norm, so it works for any kind of deformation
+	Real dW=(0.5*(scene->cell->prevVelGrad + scene->cell->velGrad)*stressTensor).trace()*scene->dt*(scene->cell->hSize.determinant());
 	externalWork+=dW;
 	if(scene->trackEnergy) scene->energy->add(-dW,"velGradWork",velGradWorkIx,/*non-incremental*/false);
 	prevGrow = strainRate;
@@ -374,7 +374,7 @@ void Peri3dController::action(){
 			//for (int i=0; i<lenPs; i++) { strainRate(ps(i)) -= maxStrainRate; }
 		}
 		else { // actual predictor
-			Real sr=strainRate.cwise().abs().maxCoeff();
+			Real sr=strainRate.cwiseAbs().maxCoeff();
 			for (int i=0; i<lenPs; i++) {
 				int j=ps(i);
 				// linear extrapolation of stress error (difference between actual and ideal stress)
@@ -387,7 +387,7 @@ void Peri3dController::action(){
 	}
 
 	// correction coefficient ix strainRate.maxabs() > maxStrainRate
-	Real srCorr = (strainRate.cwise().abs().maxCoeff() > maxStrainRate)? (maxStrainRate/strainRate.cwise().abs().maxCoeff()):1.;
+	Real srCorr = (strainRate.cwiseAbs().maxCoeff() > maxStrainRate)? (maxStrainRate/strainRate.cwiseAbs().maxCoeff()):1.;
 	strainRate *= srCorr;
 
 	// Actual action (see the documentation for more info)
@@ -401,13 +401,14 @@ void Peri3dController::action(){
 	   multiplying by time to obtain strain increment and adding it to nonrot (current strain in local coordinates)*/
 	nonrot += rot.transpose()*(epsilonRate*dt)*rot;
 	Matrix3r& velGrad=scene->cell->velGrad;
-	// compute new trsf as rot*nonrot, substract actual trsf (= trsf increment), divide by dt (=trsf rate = velGrad
-	//trsf = rot*nonrot;
-	//velGrad = (rot*nonrot - trsf)/dt;
+	// compute velGrad:
+	//   trsf = rot*nonrot
+	//   dTrsf = dt*velGrad
+	//   trsfNew = trsf + dTrsf*trsf = (I+dTrsf)*trsf = (I+dt*velGrad)*trsf   ->   velGrad
 	velGrad = ((rot*nonrot)*trsf.inverse()- Matrix3r::Identity()) / dt ;
 	progress += srCorr/nSteps;
 
-	if (progress >= 1. || strain.cwise().abs().maxCoeff() > maxStrain) {
+	if (progress >= 1. || strain.cwiseAbs().maxCoeff() > maxStrain) {
 		if(doneHook.empty()){ LOG_INFO("No doneHook set, dying."); dead=true; Omega::instance().pause(); }
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 	}

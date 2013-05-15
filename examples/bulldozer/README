@@ -1,6 +1,6 @@
 bulldozer.py and bulldozerVTK.py show how simple it is possible to simulate relatively difficult things.
 
-bulldozer.py is using Law2_Dem3DofGeom_FrictPhys_Basic constitutive law for interaction between elements.
+bulldozer.py is using Law2_ScGeom_FrictPhys_CundallStrack constitutive law for interaction between elements.
 It stores screenshots from simulation in /tmp/bulldozer-????.png files and creates video then.
 
 bulldozerVTK.py is using Law2_ScGeom_ViscElPhys_Basic - visco-elastic model for interaction between elements.

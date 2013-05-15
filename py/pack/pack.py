@@ -21,9 +21,12 @@ from numpy import arange
 from math import sqrt
 from yade import utils
 
-from miniEigen import *
 from yade.wrapper import *
 
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 ## compatibility hack for python 2.5 (21/8/2009)
 ## can be safely removed at some point
@@ -83,9 +86,11 @@ if not (noPredicate):
     True
     >>> O.cell.refSize
     Vector3(5,5,5)
-    >>> O.cell.hSize
-    Matrix3(3.53553,-3.53553,0, 3.53553,3.53553,0, 0,0,5)
-  
+    """
+  #The following 2 lines do not work, because of accuaracy
+  #>>> O.cell.hSize
+  #Matrix3(3.53553,-3.53553,0, 3.53553,3.53553,0, 0,0,5)
+    """
   The current state (even if rotated) is taken as mechanically undeformed, i.e. with identity transformation:
   
     >>> O.cell.trsf
@@ -105,15 +110,14 @@ if not (noPredicate):
       return O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self])
     else:
       standalone,clumps=self.getClumps()
-      idsOffset=len(O.bodies)
       ids=O.bodies.append([utils.sphere(rot*c,r,**kw) for c,r in self]) # append all spheres first
       clumpIds=[]
       userColor='color' in kw
       for clump in clumps:
-        clumpIds.append(O.bodies.clump([clump[0]+idsOffset,clump[1]+idsOffset])) # clump spheres with given ids together, creating the clump object as well
+        clumpIds.append(O.bodies.clump([ids[i] for i in clump])) # clump spheres with given ids together, creating the clump object as well
         # make all spheres within one clump a single color, unless color was specified by the user
         if not userColor:
-          for i in clump[1:]: O.bodies[i+idsOffset].shape.color=O.bodies[clump[0]+idsOffset].shape.color
+          for i in clump[1:]: O.bodies[ids[i]].shape.color=O.bodies[ids[clump[0]]].shape.color
       return ids+clumpIds
   
   SpherePack.toSimulation=SpherePack_toSimulation
@@ -444,7 +448,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		#print x1,y1,z1,radius,rRelFuzz
 		O.materials.append(FrictMat(young=3e10,density=2400))
 		num=sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,spheresInCell,True)
-		O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=5,verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
+		O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
 		O.materials.append(FrictMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 		O.dt=utils.PWaveTimeStep()
@@ -493,7 +497,7 @@ def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False):
 	#O.cell.refSize=initSize
 	O.cell.setBox(initSize)
 	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True)
-	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],nBins=2,verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
+	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 	O.dt=utils.PWaveTimeStep()

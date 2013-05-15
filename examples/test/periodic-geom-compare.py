@@ -13,7 +13,7 @@ num=sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,.6,-1,periodic=True) # min
 sp.toSimulation()
 
 # specify which family of geometry functors to use
-utils.readParamsFromTable(noTableOk=True,geom='sc')
+readParamsFromTable(noTableOk=True,geom='sc')
 from yade.params.table import geom
 
 if geom=='sc':
@@ -31,7 +31,7 @@ O.engines=[
 	loop,
 	NewtonIntegrator(damping=.6),
 ]
-O.dt=0.5*utils.PWaveTimeStep()
+O.dt=0.5*PWaveTimeStep()
 try:
 	from yade import qt
 	qt.View()
@@ -42,7 +42,7 @@ O.saveTmp()
 #O.run(10000,True);
 #rrr=qt.Renderer(); rrr.intrAllWire,rrr.intrGeom=True,False
 
-if utils.runningInBatch():
+if runningInBatch():
 	O.timingEnabled=True
 	O.run(300000,True)
 	O.timingEnabled

@@ -13,7 +13,7 @@ n=1000
 
 sp=pack.SpherePack()
 num=sp.makeCloud(Vector3().Zero,O.cell.refSize,rRelFuzz=.5,num=n,periodic=True,seed=1)
-O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
+O.bodies.append([sphere(s[0],s[1]) for s in sp])
 
 #make the problem more interesting by giving a smaller mass to one of the bodies, different stiffness present similar difficulties
 O.bodies[3].state.mass = O.bodies[n-1].state.mass*0.01
@@ -43,7 +43,7 @@ O.saveTmp()
 
 #======   First, we won't use a timestepper at all, we fix O.dt using PWave timestep   =========#
 timing.reset()
-O.dt=0.8*utils.PWaveTimeStep() #for fair comparison, we use the same safety factor as in GS timestepper, allthough many scripts use 0.5 or even 0.1*utils.PWaveTimeStep()
+O.dt=0.8*PWaveTimeStep() #for fair comparison, we use the same safety factor as in GS timestepper, allthough many scripts use 0.5 or even 0.1*PWaveTimeStep()
 ts.active=False
 O.run(100000,True);#it will actually stop before 100k iterations as soon as the packing is stable
 print "--------------------------------"
@@ -66,7 +66,7 @@ timing.stats()
 O.reload()
 timing.reset()
 O.dt=1000000 #or whatever
-#We force dt=1. The inertia of bodies will adjusted automaticaly...
+#We force dt=1. The inertia of bodies will adjusted automatically...
 newton.densityScaling=True
 #... but not that of cell, hence we have to adjust it or the problem becomes unstable
 triax.mass=triax.mass*(1e4)**2

@@ -74,8 +74,8 @@ void Gl1_NormPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>
 		const Vector3r& dispScale=scene->renderer ? scene->renderer->dispScale : Vector3r::Ones(); 
 		if(dispScale!=Vector3r::Ones()){
 			// move p1 and p2 by the same amounts as particles themselves would be moved
-			p1+=dispScale.cwise()*Vector3r(b1->state->pos-b1->state->refPos);
-			p2+=dispScale.cwise()*Vector3r(b2->state->pos-b2->state->refPos);
+			p1+=dispScale.cwiseProduct(Vector3r(b1->state->pos-b1->state->refPos));
+			p2+=dispScale.cwiseProduct(Vector3r(b2->state->pos-b2->state->refPos));
 		}
 		Vector3r relPos=p2-p1;
 		Real dist=relPos.norm(); //max(geom->refR1,0.)+max(geom->refR2,0.);

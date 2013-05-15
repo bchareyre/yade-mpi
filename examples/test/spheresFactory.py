@@ -1,5 +1,5 @@
 
-from yade import geom,utils,log
+from yade import geom,log
 
 shotsId,steelId=O.materials.append([
 	FrictMat(young=50e9,density=6000,poisson=.2,label='shots'),
@@ -36,8 +36,8 @@ O.engines=[
 	PyRunner(iterPeriod=10000,command='if factory.numParticles>=factory.maxParticles: O.stopAtIter=O.iter+8000; timing.stats()')
 ]
 # the timestep must be smaller because of high linear velocities of particles
-# we cannot use utils.PWaveTimeStep directly, since there are no spheres generated yet
-O.dt=utils.SpherePWaveTimeStep(factory.rMin,O.materials[factory.materialId].density,O.materials[factory.materialId].young)
+# we cannot use PWaveTimeStep directly, since there are no spheres generated yet
+O.dt=SpherePWaveTimeStep(factory.rMin,O.materials[factory.materialId].density,O.materials[factory.materialId].young)
 O.saveTmp()
 #O.timingEnabled=True
 from yade import timing

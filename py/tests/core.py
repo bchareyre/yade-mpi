@@ -7,11 +7,15 @@ Core functionality (Scene in c++), such as accessing bodies, materials, interact
 import unittest
 import random
 from yade.wrapper import *
-from miniEigen import *
 from yade._customConverters import *
 from yade import utils
 from yade import *
 from math import *
+
+try:
+	from minieigen import *
+except ImportError:
+	from miniEigen import *
 
 ## TODO tests
 class TestForce(unittest.TestCase): pass

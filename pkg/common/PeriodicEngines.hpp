@@ -14,6 +14,7 @@ class PeriodicEngine:  public GlobalEngine {
 			const Real& virtNow=scene->time;
 			Real realNow=getClock();
 			const long& iterNow=scene->iter;
+			if (iterNow<iterLast) nDone=0;//handle O.resetTime(), all counters will be initialized again
 			if((nDo<0 || nDone<nDo) &&
 				((virtPeriod>0 && virtNow-virtLast>=virtPeriod) ||
 				 (realPeriod>0 && realNow-realLast>=realPeriod) ||

@@ -174,11 +174,18 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 			}
 
 	}
-
+	
+	//convert the original sphere vector (with clump info) to a BasicSphere vector.
 	vector<BasicSphere> sphere_list;
-	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+	typedef tuple<Vector3r,Real,int> tupleVector3rRealInt;
+	if(importFilename!=""){
+		vector<tuple<Vector3r,Real,int> >sphereListClumpInfo = Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+		FOREACH(tupleVector3rRealInt t, sphereListClumpInfo){
+			sphere_list.push_back(make_pair(get<0>(t),get<1>(t)));
+		};
+	}
 	else message=GenerateCloud_cohesive(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
-
+	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
 

@@ -5,13 +5,13 @@ import numpy
 # radius, number and distance of spheres
 rad,num=1,6; dist=1.9999*rad
 # one arm
-O.bodies.append([utils.sphere((0,y,0),rad,wire=True) for y in numpy.arange(0,2*num-1,dist)])
+O.bodies.append([sphere((0,y,0),rad,wire=True) for y in numpy.arange(0,2*num-1,dist)])
 # the lateral arm
-O.bodies.append([utils.sphere((x,(num-1)*2*rad,0),rad,wire=True) for x in numpy.arange(dist,1+num/2,dist)])
+O.bodies.append([sphere((x,(num-1)*2*rad,0),rad,wire=True) for x in numpy.arange(dist,1+num/2,dist)])
 # support sphere
 O.bodies[0].state.blockedDOFs='xyzXYZ'
 # small dt to see in realtime how it swings; real critical is higher, but much less than p-wave
-O.dt=.01*utils.PWaveTimeStep() 
+O.dt=.01*PWaveTimeStep() 
 
 O.engines=[
 	ForceResetter(),
@@ -34,7 +34,7 @@ try:
 	Gl1_L6Geom.phiScale=30; Gl1_L3Geom.uScale=20
 	#O.engines=O.engines+[
 	#	qt.SnapshotEngine(fileBase=O.tmpFilename(),label='snapper',iterPeriod=300,deadTimeout=20),
-	#	PyRunner(iterPeriod=330000,command='utils.makeVideo(snapper.snapshots,out="beam-l6geom.avi"); snapper.dead=True; O.pause()')
+	#	PyRunner(iterPeriod=330000,command='makeVideo(snapper.snapshots,out="beam-l6geom.avi"); snapper.dead=True; O.pause()')
 	#]
 except ImportError: pass
 O.run()

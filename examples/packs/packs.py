@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from yade import pack,ymport,export,geom,bodiesHandling
-import math
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -31,10 +30,10 @@ O.bodies.append(
 	pack.regularHexa(
 		(pack.inSphere((0,0,4),2)-pack.inSphere((0,-2,5),2)) & pack.notInNotch(centerPoint=(0,0,4),edge=(0,1,0),normal=(-1,1,-1),aperture=.2)
 		,radius=rad,gap=gap,color=(0,1,0),material=0) # head
-	+[utils.sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),utils.sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),utils.sphere((0,2.4,4),radius=.4,color=(1,0,0),material=0)] # eyes and nose
+	+[sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),sphere((0,2.4,4),radius=.4,color=(1,0,0),material=0)] # eyes and nose
 	+pack.regularHexa(pack.inCylinder((-1,2.2,3.3),(1,2.2,3.3),2*rad),radius=rad,gap=gap/3,color=(0.929,0.412,0.412),material=0) #mouth
 )
-groundId=O.bodies.append(utils.facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)) # ground
+groundId=O.bodies.append(facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)) # ground
 
 for part in [
 	pack.regularHexa (
@@ -48,36 +47,36 @@ for part in [
 
 
 # Example of geom.facetBox usage 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi/3))
+oriBody = Quaternion(Vector3(0,0,1),(pi/3))
 O.bodies.append(geom.facetBox((12,0,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
+oriBody = Quaternion(Vector3(0,0,1),(pi/2))
 O.bodies.append(geom.facetBox((0,12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi))
+oriBody = Quaternion(Vector3(0,0,1),(pi))
 O.bodies.append(geom.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),oriBody,**kwBoxes))
 
 # Example of geom.facetParallelepiped usage 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi/3))
+oriBody = Quaternion(Vector3(0,0,1),(pi/3))
 O.bodies.append(geom.facetParallelepiped(center=Vector3(12,0,-6+2.7),extents=Vector3(1,0.7,0.9),height=0.5, orientation=oriBody,**kwBoxes))
 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
+oriBody = Quaternion(Vector3(0,0,1),(pi/2))
 O.bodies.append(geom.facetParallelepiped(center=Vector3(0,12,-6+2.7),extents=Vector3(1,0.7,0.9),height=0.5, orientation=oriBody,**kwBoxes))
 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi))
+oriBody = Quaternion(Vector3(0,0,1),(pi))
 O.bodies.append(geom.facetParallelepiped(center=Vector3(-12,-12,-6+2.7),extents=Vector3(1,0.7,0.9),height=0.5, orientation=oriBody,**kwBoxes))
 
 # Example of geom.facetCylinder, facetHelix and RotationEngine usage example
-oriBody = Quaternion(Vector3(1,0,0),(math.pi/2.0))
-rotateIDs=O.bodies.append(geom.facetHelix((-7.0,-6.0,-5.0),radiusOuter=2.0,radiusInner=0.1,pitch=2.0,orientation=oriBody,segmentsNumber=50,angleRange=[math.pi*8.0,0],**kwBoxes))
+oriBody = Quaternion(Vector3(1,0,0),(pi/2.0))
+rotateIDs=O.bodies.append(geom.facetHelix((-7.0,-6.0,-5.0),radiusOuter=2.0,radiusInner=0.1,pitch=2.0,orientation=oriBody,segmentsNumber=50,angleRange=[pi*8.0,0],**kwBoxes))
 O.bodies.append(geom.facetCylinder((-7.0,-12.0,-5.0),radius=2.0,height=7.0,orientation=oriBody,segmentsNumber=10,wallMask=4,**kwMeshes))
-O.bodies.append(geom.facetCylinder((-7.0,-7.0,-5.0),radius=2.0,height=4.0,segmentsNumber=10,wallMask=4,angleRange=[-math.pi*0.2,math.pi*1.2],**kwMeshes))
+O.bodies.append(geom.facetCylinder((-7.0,-7.0,-5.0),radius=2.0,height=4.0,segmentsNumber=10,wallMask=4,angleRange=[-pi*0.2,pi*1.2],**kwMeshes))
 
-oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
+oriBody = Quaternion(Vector3(0,0,1),(pi/2))
 O.bodies.append(ymport.gmsh('cone.mesh',orientation=oriBody,**kwMeshes))#generates facets from the mesh file
 
 SpheresID=[]
-oriBody = Quaternion(Vector3(0,0,1),(math.pi/2))
+oriBody = Quaternion(Vector3(0,0,1),(pi/2))
 SpheresID+=O.bodies.append(ymport.gengeoFile('LSMGenGeo.geo',shift=Vector3(-7.0,-7.0,0.0),scale=1.0,orientation=oriBody,color=(1,0,1),**kw))
 
 #Demonstration of spheresPackDimensions function. The "Edge" particles are colored with blue color
@@ -88,7 +87,7 @@ for v in [geometryParameters['minId'],geometryParameters['maxId']]:
 
 #Example of bodiesHandling.spheresModify()
 hat=O.bodies.append(pack.regularOrtho(pack.inCylinder((0,0,6),(0,0,7),20*rad),radius=0.2,gap=0,color=(1,0,0))) # hat
-oriBody = Quaternion(Vector3(0,1,0),(math.pi/8))
+oriBody = Quaternion(Vector3(0,1,0),(pi/8))
 hat_upper=O.bodies.append(bodiesHandling.spheresModify(hat,shift=(0.0,0.0,1.4),scale=0.7,orientation=oriBody,copy=True))		#Duplicate the "heart", shifting, scaling and rotating it
 
 #change the color of upper part of the hat
@@ -111,7 +110,7 @@ O.bodies.append(pack.regularHexa(pack.inSphere((-15,5,-5),1.5),radius=rad*2.0,ga
 O.bodies.append(geom.facetBox((-15,5,-5),(2,2,2),wallMask=15,**kwMeshes))
 vibrationRotationPlate = O.bodies.append(geom.facetBox((-15,5,-5),(2,2,2),wallMask=16,**kwBoxes))
 
-O.bodies.append(utils.wall((0,0,-10),axis=2))
+O.bodies.append(wall((0,0,-10),axis=2))
 
 try:
 	from yade import qt
@@ -139,7 +138,7 @@ O.engines=[
 	HarmonicRotationEngine(A=0.2, f=20.0, fi = pi, rotationAxis=[1.0,0.0,0.0], rotateAroundZero = True, zeroPoint = [-15.0,3.0,-7.0], ids = vibrationRotationPlate),
 	BoxFactory(maxParticles=300, extents=(1.0,1.0,1.0),center=(0.0,12.0,0.0),vMin=200.0,vMax=250.0,
 		PSDsizes=(0.1, 0.2, 0.3, 0.5, 0.7), PSDcum=(0.1, 0.5, 0.8, 1.0), PSDcalculateMass=True, exactDiam=False,
-		vAngle=math.pi/3.0,massFlowRate=50000.0,normal=(0.0,0.0,1.0),label='factory',mask=7,silent=True,stopIfFailed=False)
+		vAngle=pi/3.0,massFlowRate=50000.0,normal=(0.0,0.0,1.0),label='factory',mask=7,silent=True,stopIfFailed=False)
 ]
 '''
 Boxfactory is an example of usage SpheresFactory. Produces PSD-dispersion:
@@ -153,7 +152,7 @@ Size:       Mass, %      Cumulative   Cum. mass
 '''
 
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
-O.dt=utils.PWaveTimeStep()
+O.dt=PWaveTimeStep()
 O.saveTmp()
 O.timingEnabled=True
 #O.run(10000,True)

@@ -353,7 +353,7 @@ void VTKRecorder::action(){
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
 					const Matrix3r& ss=YADE_PTR_CAST<CpmState>(b->state)->stress;
 					//float s[3]={ss[0],ss[1],ss[2]};
-					float s[9]={ (float) ss[0,0], (float) ss[0,1], (float) ss[0,2], (float) ss[1,0], (float) ss[1,1], (float) ss[1,2], (float) ss[2,0], (float) ss[2,1], (float) ss[2,2]};
+					float s[9]={ (float) ss(0,0), (float) ss(0,1), (float) ss(0,2), (float) ss(1,0), (float) ss(1,1), (float) ss(1,2), (float) ss(2,0), (float) ss(2,1), (float) ss(2,2)};
 					cpmStress->InsertNextTupleValue(s);
 				}
 				if (recActive[REC_RPM]){

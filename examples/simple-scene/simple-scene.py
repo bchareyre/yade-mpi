@@ -50,7 +50,8 @@ o.engines=[
 
 ## The yade.utils module contains some handy functions, like yade.utils.box and yade.utils.sphere.
 ## After this import, they will be accessible as utils.box and utils.sphere.
-from yade import utils
+### UPDATE: utils is loaded automatically, no longer need to import
+#from yade import utils
 
 ## create bodies in the simulation: one box in the origin and one floating above it.
 ##
@@ -59,18 +60,18 @@ from yade import utils
 ## * center: position of the center of the box
 ## * dynamic: it is not dynamic, i.e. will not move during simulation, even if forces are applied to it
 
-o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],fixed=True))
+o.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],fixed=True))
 
 ## The sphere
 ##
 ## * First two arguments are radius and center, respectively. They are used as "positional arguments" here:
 ## python will deduce based on where they are what they mean.
 ##
-## It could also be written without using utils.sphere - see gui/py/utils.py for the code of the utils.sphere function
-o.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
+## It could also be written without using sphere - see gui/py/utils.py for the code of the sphere function
+o.bodies.append(sphere([0,0,2],1,color=[0,1,0]))
 
 ## Estimate timestep from p-wave speed and multiply it by safety factor of .2
-o.dt=.01*utils.PWaveTimeStep()
+o.dt=.01*PWaveTimeStep()
 
 ## Save the scene to file, so that it can be loaded later. Supported extension are: .xml, .xml.gz, .xml.bz2.
 o.save('/tmp/a.xml.bz2');
@@ -78,7 +79,7 @@ o.save('/tmp/a.xml.bz2');
 
 def onBodySelect(id):
 	print "Selected:",id
-	utils.highlightNone()
+	highlightNone()
 	for i in O.interactions.withBody(id):
 		O.bodies[i.id2 if i.id1==id else i.id1].shape.highlight=True
 		print i.id1,i.id2,i.phys,i.geom
