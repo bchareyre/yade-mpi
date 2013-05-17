@@ -33,7 +33,6 @@ class FlowEngine : public PartialEngine
 	typedef FlowSolver::Finite_vertices_iterator                    	Finite_vertices_iterator;
 	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
 	typedef FlowSolver::Cell_handle						Cell_handle;
-	typedef FlowSolver::Vertex_handle					Vertex_handle;
 	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
 	typedef FlowSolver::Vertex_handle                    			Vertex_handle;
 

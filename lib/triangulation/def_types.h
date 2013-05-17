@@ -107,12 +107,14 @@ class FlowCellInfo : public SimpleCellInfo {
 	std::vector<double> RayHydr;
 // 	std::vector<double> flow_rate;
 	std::vector<double> module_permeability;
+	std::vector<double> pore_radius;
 	// Partial surfaces of spheres in the double-tetrahedron linking two voronoi centers. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
 	double solidSurfaces [4][4];
 
 	FlowCellInfo (void)
 	{
 		module_permeability.resize(4, 0);
+		pore_radius.resize(4);
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
 		facetFluidSurfacesRatio.resize(4);
