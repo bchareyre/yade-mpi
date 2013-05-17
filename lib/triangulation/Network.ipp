@@ -449,7 +449,7 @@ double Network<Tesselation>::surface_solid_facet(Sphere ST1, Sphere ST2, Sphere 
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlanes()
+void Network<Tesselation>::AddBoundingPlanes(double altFAR)
 {
 	Tesselation& Tes = T[currentTes];
 	
@@ -472,30 +472,30 @@ void Network<Tesselation>::AddBoundingPlanes()
 	
 	id_offset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
 	
-	AddBoundingPlane (true, Vecteur(0,1,0) , y_min_id);
-	AddBoundingPlane (true, Vecteur(0,-1,0) , y_max_id);
-	AddBoundingPlane (true, Vecteur(-1,0,0) , x_max_id);
-	AddBoundingPlane (true, Vecteur(1,0,0) , x_min_id);
-	AddBoundingPlane (true, Vecteur(0,0,1) , z_min_id);
-	AddBoundingPlane (true, Vecteur(0,0,-1) , z_max_id);
+	AddBoundingPlane (true, Vecteur(0,1,0) , y_min_id, altFAR);
+	AddBoundingPlane (true, Vecteur(0,-1,0) , y_max_id, altFAR);
+	AddBoundingPlane (true, Vecteur(-1,0,0) , x_max_id, altFAR);
+	AddBoundingPlane (true, Vecteur(1,0,0) , x_min_id, altFAR);
+	AddBoundingPlane (true, Vecteur(0,0,1) , z_min_id, altFAR);
+	AddBoundingPlane (true, Vecteur(0,0,-1) , z_max_id, altFAR);
 
 // 	AddBoundingPlanes(true);
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall)
+void Network<Tesselation>::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall, double altFAR)
 {
 	  Tesselation& Tes = T[currentTes];
-	  
+	  if (altFAR==0) altFAR=FAR;
 	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
 	  
 	  double pivot = Normal[Coordinate]<0 ? 
 	  Corner_max.x()*abs(Normal[0])+Corner_max.y()*abs(Normal[1])+Corner_max.z()*abs(Normal[2]) : Corner_min.x()*abs(Normal[0])+Corner_min.y()*abs(Normal[1])+Corner_min.z()*abs(Normal[2]);
 	
-	  Tes.insert(0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
-		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
-		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
-		     FAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
+	  Tes.insert(0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*altFAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
+		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*altFAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
+		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*altFAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
+		     altFAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
 
 	  if (Normal[Coordinate]<0) boundaries[id_wall-id_offset].p = Corner_max;
 	  else boundaries[id_wall-id_offset].p = Corner_min;
@@ -510,16 +510,16 @@ void Network<Tesselation>::AddBoundingPlane (bool yade, Vecteur Normal, int id_w
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall )
+void Network<Tesselation>::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall, double altFAR )
 {
 	  Tesselation& Tes = T[currentTes];
-	  
+	   if (altFAR==0) altFAR=FAR;
 	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
 	  
-	  Tes.insert((center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
-		     (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
-		     (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
-		     FAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
+	  Tes.insert((center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*altFAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
+		     (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*altFAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
+		     (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*altFAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
+		     altFAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
 	  
  	  Point P (center[0],center[1],center[2]);
 	  boundaries[id_wall-id_offset].p = P;

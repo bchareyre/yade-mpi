@@ -55,9 +55,9 @@ class Network
 		
 		int fictious_vertex;
 
-		void AddBoundingPlanes();
-		void AddBoundingPlane (bool yade, Vecteur Normal, int id_wall);
-		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall );
+		void AddBoundingPlanes(double altFAR=0);
+		void AddBoundingPlane (bool yade, Vecteur Normal, int id_wall, double altFAR=0);
+		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall, double altFAR=0);
 
 		void Define_fictious_cells( );
 		int Detect_facet_fictious_vertices (Cell_handle& cell, int& j);
