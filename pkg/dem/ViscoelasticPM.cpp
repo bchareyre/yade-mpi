@@ -211,26 +211,11 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
         throw runtime_error("CapillarType is unknown, please, use only Willett, Weigert or Herminghaus");
       }
 
-			/*
-			std::cerr<<"R: "<<phys.R<<std::endl;
-			std::cerr<<"s: "<<s<<std::endl;
-			std::cerr<<"Vb: "<<phys.Vb<<std::endl;
-			std::cerr<<"Theta: "<<phys.theta<<std::endl;
-			std::cerr<<"Gamma: "<<phys.gamma<<std::endl;
-			std::cerr<<"beta: "<<beta<<std::endl;
-			std::cerr<<"r1: "<<r1<<std::endl;
-			std::cerr<<"r2: "<<r2<<std::endl;
-			std::cerr<<"Pc: "<<Pc<<std::endl;
-			std::cerr<<"Scrit: "<<phys.sCrit<<std::endl;
-			std::cerr<<"Fc: "<<fC<<std::endl<<std::endl;
-			*/
-			
 			phys.normalForce = -fC*geom.normal;
 		  if (I->isActive) {
 				addForce (id1,-phys.normalForce,scene);
 				addForce (id2, phys.normalForce,scene);
 			};
-			//std::cerr<<"Capillar: "<<phys.normalForce<<"; Pen Depth: "<< geom.penetrationDepth <<"; Schritt "<< phys.sCrit <<std::endl;
 			return;
 		} else {
 			scene->interactions->requestErase(I);
@@ -245,8 +230,6 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 
 	if (not(phys.liqBridgeCreated) and phys.Capillar) {
 		phys.liqBridgeCreated = true;
-		//std::cerr<<"First contact! Setting corresponding variables."<<std::endl;     
-		//phys.sCrit = (1+0.5*phys.theta)*pow(phys.Vb,1/3.0);                              // Willett, equation (2)
 		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // Herminghaus, equation (8)
 		Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
 		Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
@@ -262,11 +245,6 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	Vector3r& shearForce = phys.shearForce;
 	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
 	const Real& dt = scene->dt;
-	//Vector3r axis = phys.prevNormal.cross(geom.normal);
-	//shearForce -= shearForce.cross(axis);
-	//const Real angle = dt*0.5*geom.normal.dot(de1.angVel + de2.angVel);
-	//axis = angle*geom.normal;
-	//shearForce -= shearForce.cross(axis);
 	shearForce = geom.rotate(shearForce);
 	
 
