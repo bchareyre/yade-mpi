@@ -16,7 +16,7 @@ The transformation is split between "normal" part and "rotation/shear" part for 
 #include<yade/lib/serialization/Serializable.hpp>
 #include<yade/lib/base/Math.hpp>
 
-#include<yade/pkg/dem/Shop.hpp>
+//#include<yade/pkg/dem/Shop.hpp>
 
 class Cell: public Serializable{
 	public:
@@ -143,8 +143,8 @@ class Cell: public Serializable{
 	Matrix3r getRightStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return trsf*R.transpose(); }
 
 	// stress measures
-	Matrix3r getStress() { return Shop::getStress(); }
-	Matrix3r getCauchyStress() { Matrix3r s=getStress(); return .5*(s+s.transpose()); }
+	//Matrix3r getStress() { return Shop::getStress(); }
+	//Matrix3r getCauchyStress() { Matrix3r s=getStress(); return .5*(s+s.transpose()); }
 
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
