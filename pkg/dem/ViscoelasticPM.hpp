@@ -71,6 +71,8 @@ REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_ViscElPhys);
 class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 	public :
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+	private:
+		Real calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys);
 	FUNCTOR2D(ScGeom,ViscElPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`.");
 };

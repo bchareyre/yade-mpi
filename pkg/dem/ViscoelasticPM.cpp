@@ -93,8 +93,92 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
       // No need to recalculate them at each step.
       // It needs to be fixed.
       
-      Real fC = 0.0;
-      if (phys.CapillarType  == "Weigert") {
+      
+			phys.normalForce = -calculateCapillarForce(geom, phys)*geom.normal;
+		  if (I->isActive) {
+				addForce (id1,-phys.normalForce,scene);
+				addForce (id2, phys.normalForce,scene);
+			};
+			return;
+		} else {
+			scene->interactions->requestErase(I);
+			return;
+		};
+	};
+
+	const BodyContainer& bodies = *scene->bodies;
+
+	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
+	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
+
+	if (not(phys.liqBridgeCreated) and phys.Capillar) {
+		phys.liqBridgeCreated = true;
+		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // Herminghaus, equation (8)
+		Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
+		Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
+		if (s1 and s2) {
+			phys.R = 2 * s1->radius * s2->radius / (s1->radius + s2->radius);
+		} else if (s1 and not(s2)) {
+			phys.R = s1->radius;
+		} else {
+			phys.R = s2->radius;
+		}
+	}
+
+	Vector3r& shearForce = phys.shearForce;
+	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
+	const Real& dt = scene->dt;
+	shearForce = geom.rotate(shearForce);
+	
+
+	// Handle periodicity.
+	const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
+	const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
+
+	const Vector3r c1x = (geom.contactPoint - de1.pos);
+	const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
+	
+	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
+	const Real normalVelocity	= geom.normal.dot(relativeVelocity);
+	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
+
+	// As Chiara Modenese suggest, we store the elastic part 
+	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
+	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
+	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
+	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
+
+	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
+	//phys.prevNormal = geom.normal;
+
+	const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
+	if( shearForce.squaredNorm() > maxFs )
+	{
+		// Then Mohr-Coulomb is violated (so, we slip), 
+		// we have the max value of the shear force, so 
+		// we consider only friction damping.
+		const Real ratio = sqrt(maxFs) / shearForce.norm();
+		shearForce *= ratio;
+	} 
+	else 
+	{
+		// Then no slip occurs we consider friction damping + viscous damping.
+		shearForceVisc = phys.cs*shearVelocity; 
+	}
+	
+	if (I->isActive) {
+		//std::cerr<<"Contact: "<<phys.normalForce<<std::endl;
+		const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
+		addForce (id1,-f,scene);
+		addForce (id2, f,scene);
+		addTorque(id1,-c1x.cross(f),scene);
+		addTorque(id2, c2x.cross(f),scene);
+  }
+}
+
+Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys) {
+  Real fC = 0.0;
+  if (phys.CapillarType  == "Weigert") {
       /* Capillar model from Weigert
        * http://onlinelibrary.wiley.com/doi/10.1002/%28SICI%291521-4117%28199910%2916:5%3C238::AID-PPSC238%3E3.0.CO;2-E/abstract
        * 
@@ -210,85 +294,5 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
       } else {
         throw runtime_error("CapillarType is unknown, please, use only Willett, Weigert or Herminghaus");
       }
-
-			phys.normalForce = -fC*geom.normal;
-		  if (I->isActive) {
-				addForce (id1,-phys.normalForce,scene);
-				addForce (id2, phys.normalForce,scene);
-			};
-			return;
-		} else {
-			scene->interactions->requestErase(I);
-			return;
-		};
-	};
-
-	const BodyContainer& bodies = *scene->bodies;
-
-	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
-	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
-
-	if (not(phys.liqBridgeCreated) and phys.Capillar) {
-		phys.liqBridgeCreated = true;
-		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // Herminghaus, equation (8)
-		Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
-		Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
-		if (s1 and s2) {
-			phys.R = 2 * s1->radius * s2->radius / (s1->radius + s2->radius);
-		} else if (s1 and not(s2)) {
-			phys.R = s1->radius;
-		} else {
-			phys.R = s2->radius;
-		}
-	}
-
-	Vector3r& shearForce = phys.shearForce;
-	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
-	const Real& dt = scene->dt;
-	shearForce = geom.rotate(shearForce);
-	
-
-	// Handle periodicity.
-	const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
-	const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
-
-	const Vector3r c1x = (geom.contactPoint - de1.pos);
-	const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
-	
-	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
-	const Real normalVelocity	= geom.normal.dot(relativeVelocity);
-	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
-
-	// As Chiara Modenese suggest, we store the elastic part 
-	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
-	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
-	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
-	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
-
-	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
-	//phys.prevNormal = geom.normal;
-
-	const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
-	if( shearForce.squaredNorm() > maxFs )
-	{
-		// Then Mohr-Coulomb is violated (so, we slip), 
-		// we have the max value of the shear force, so 
-		// we consider only friction damping.
-		const Real ratio = sqrt(maxFs) / shearForce.norm();
-		shearForce *= ratio;
-	} 
-	else 
-	{
-		// Then no slip occurs we consider friction damping + viscous damping.
-		shearForceVisc = phys.cs*shearVelocity; 
-	}
-	
-	if (I->isActive) {
-		//std::cerr<<"Contact: "<<phys.normalForce<<std::endl;
-		const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
-		addForce (id1,-f,scene);
-		addForce (id2, f,scene);
-		addTorque(id1,-c1x.cross(f),scene);
-		addTorque(id2, c2x.cross(f),scene);
-  }
+  return fC;
 }
