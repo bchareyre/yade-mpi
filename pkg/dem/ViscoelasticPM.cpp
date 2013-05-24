@@ -200,14 +200,27 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real c0 = 0.96;
         Real c1 = 1.1;
         Real R = phys.R;
-        Real s = -geom.penetrationDepth;
+        Real a = -geom.penetrationDepth;
         
-        Real beta = asin(pow(phys.Vb/((c0*R*R*R*(1+3*s/R)*(1+c1*sin(phys.theta)))), 1.0/4.0));    // Weigert, equation (19), small modifications
-        Real r1 = (R*(1-cos(beta)) + s/2.0)/(cos(beta+phys.theta));                               // Weigert, equation (5), small modifications
-        Real r2 = R*sin(beta) + r1*(sin(beta+phys.theta)-1);                                      // Weigert, equation (6), small modifications
-        Real Pc = phys.gamma*(1/r1 + 1/r2);                                                       // Weigert, equation (22), small modifications
-  
-        fC = M_PI*R*R*Pc*sin(beta)*sin(beta) + 2*M_PI*phys.gamma*R*sin(beta)*sin(beta+phys.theta);// Weigert, equation (22)
+        Real Eps = 0.36;                                                                          //Porosity
+        
+        
+        Real fi = phys.Vb/(2.0*Mathr::PI/6.0*pow(R*2.0,3.));                                      // Weigert, equation (13)
+        Real S = Mathr::PI*(1-Eps)/(Eps*Eps)*fi;                                                  // Weigert, equation (14)
+        Real Ca = (1.0 + 6*a/(R*2.0));                                                            // Weigert, equation (16)
+        Real Ct = (1.0 + 1.1*sin(phys.theta));                                                    // Weigert, equation (17)
+        
+        Real beta = asin(pow((S/0.36)*(Eps*Eps/(1-Eps))*(1.0/Ca)*(1.0/Ct), 1.0/4.0));             // Weigert, equation (19)
+        
+        
+        Real r1 = (2.0*R*(1-cos(beta)) + a)/(2.0*cos(beta+phys.theta));                           // Weigert, equation (5)
+        Real r2 = R*sin(beta) + r1*(sin(beta+phys.theta)-1);                                      // Weigert, equation (6)
+        Real Pk = phys.gamma*(1/r1 + 1/r2);                                                       // Weigert, equation (22)
+        
+        //fC = M_PI*2.0*R*phys.gamma/(1+tan(0.5*beta));                                           // Weigert, equation (23)
+        fC = M_PI/4.0*((2.0*R)*(2.0*R))*(sin(beta)*sin(beta))*Pk +
+             phys.gamma*M_PI*2.0*R*sin(beta)*sin(beta+phys.theta);                                // Weigert, equation (21)
+        
       } else if (phys.CapillarType  == "Willett") {
       
         /* Capillar model from Willett
