@@ -130,7 +130,7 @@ def initTest():
 	O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
 	ss2sc.interactionDetectionFactor=1.
-	is2aabb.aabbEnlargeFactor=-1.
+	is2aabb.aabbEnlargeFactor=1.
 
 	O.run()
 
@@ -143,7 +143,6 @@ def stopIfDamaged():
 	if extremum==0: return
 	# uncomment to get graph for the very first time stopIfDamaged() is called
 	#eudoxos.estimatePoissonYoung(principalAxis=axis,stress=strainer.avgStress,plot=True,cutoff=0.3)
-	print O.tags['id'],mode,strainer.strain,sigma[-1]
 	import sys;	sys.stdout.flush()
 	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>(5e-3 if isoPrestress==0 else 5e-2):
 		if mode=='tension' and doModes & 2: # only if compression is enabled
@@ -163,8 +162,8 @@ def stopIfDamaged():
 			title=O.tags['description'] if 'description' in O.tags.keys() else O.tags['params']
 			print 'gnuplot',plot.saveGnuplot(O.tags['id'],title=title)
 			print 'Bye.'
-			#O.pause()
-			sys.exit(0)
+			O.pause()
+			#sys.exit(0) # results in some threading exception
 		
 def addPlotData():
 	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer.strain,'sigma':strainer.avgStress+isoPrestress,
