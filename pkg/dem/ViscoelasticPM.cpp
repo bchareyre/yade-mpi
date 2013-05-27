@@ -87,13 +87,6 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	
 	if (geom.penetrationDepth<0) {
 		if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
-      // Capillar
-      // 
-      // Some equations have constants, which can be calculated only once per contact.
-      // No need to recalculate them at each step.
-      // It needs to be fixed.
-      
-      
 			phys.normalForce = -calculateCapillarForce(geom, phys)*geom.normal;
 		  if (I->isActive) {
 				addForce (id1,-phys.normalForce,scene);
@@ -113,7 +106,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 
 	if (not(phys.liqBridgeCreated) and phys.Capillar) {
 		phys.liqBridgeCreated = true;
-		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // Herminghaus, equation (8)
+		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
 		Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
 		Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
 		if (s1 and s2) {
@@ -178,73 +171,46 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 
 Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys) {
   Real fC = 0.0;
+  
+  /* Capillar
+    * Some equations have constants, which can be calculated only once per contact. 
+    * No need to recalculate them at each step. 
+    * It needs to be fixed.
+    * 
+    */
+     
   if (phys.CapillarType  == "Weigert") {
-      /* Capillar model from Weigert
-       * http://onlinelibrary.wiley.com/doi/10.1002/%28SICI%291521-4117%28199910%2916:5%3C238::AID-PPSC238%3E3.0.CO;2-E/abstract
-       * 
-        ﻿@article {PPSC:PPSC238,
-        author = {Weigert, Tom and Ripperger, Siegfried},
-        title = {Calculation of the Liquid Bridge Volume and Bulk Saturation from the Half-filling Angle},
-        journal = {Particle & Particle Systems Characterization},
-        volume = {16},
-        number = {5},
-        publisher = {WILEY-VCH Verlag GmbH},
-        issn = {1521-4117},
-        url = {http://dx.doi.org/10.1002/(SICI)1521-4117(199910)16:5<238::AID-PPSC238>3.0.CO;2-E},
-        doi = {10.1002/(SICI)1521-4117(199910)16:5<238::AID-PPSC238>3.0.CO;2-E},
-        pages = {238--242},
-        year = {1999},
-        }
-        * 
+      /* Capillar model from [Weigert1999]
        */
         Real R = phys.R;
         Real a = -geom.penetrationDepth;
-        Real Ca = (1.0 + 6.0*a/(R*2.0));                                                          // Weigert, equation (16)
-        Real Ct = (1.0 + 1.1*sin(phys.theta));                                                    // Weigert, equation (17)
+        Real Ca = (1.0 + 6.0*a/(R*2.0));                                                          // [Weigert1999], equation (16)
+        Real Ct = (1.0 + 1.1*sin(phys.theta));                                                    // [Weigert1999], equation (17)
         
         /*
         Real Eps = 0.36;                                                                          // Porosity
-        Real fi = phys.Vb/(2.0*M_PI/6.0*pow(R*2.0,3.));                                           // Weigert, equation (13)
-        Real S = M_PI*(1-Eps)/(pow(Eps, 2.0))*fi;                                                 // Weigert, equation (14)
-        Real beta = asin(pow(((S/0.36)*(pow(Eps, 2.0)/(1-Eps))*(1.0/Ca)*(1.0/Ct)), 1.0/4.0));     // Weigert, equation (19)
+        Real fi = phys.Vb/(2.0*M_PI/6.0*pow(R*2.0,3.));                                           // [Weigert1999], equation (13)
+        Real S = M_PI*(1-Eps)/(pow(Eps, 2.0))*fi;                                                 // [Weigert1999], equation (14)
+        Real beta = asin(pow(((S/0.36)*(pow(Eps, 2.0)/(1-Eps))*(1.0/Ca)*(1.0/Ct)), 1.0/4.0));     // [Weigert1999], equation (19)
         */
         
+        Real beta = asin(pow(phys.Vb/(0.12*Ca*Ct*pow(2.0*R, 3.0)), 1.0/4.0));                     // [Weigert1999], equation (15), against Vb
         
-        Real beta = asin(pow(phys.Vb/(0.12*Ca*Ct*pow(2.0*R, 3.0)), 1.0/4.0));                     // Weigert, equation (15), against Vb
-        
-        
-        
-        Real r1 = (2.0*R*(1-cos(beta)) + a)/(2.0*cos(beta+phys.theta));                           // Weigert, equation (5)
-        Real r2 = R*sin(beta) + r1*(sin(beta+phys.theta)-1);                                      // Weigert, equation (6)
-        Real Pk = phys.gamma*(1/r1 - 1/r2);                                                       /* Weigert, equation (22),
+        Real r1 = (2.0*R*(1-cos(beta)) + a)/(2.0*cos(beta+phys.theta));                           // [Weigert1999], equation (5)
+        Real r2 = R*sin(beta) + r1*(sin(beta+phys.theta)-1);                                      // [Weigert1999], equation (6)
+        Real Pk = phys.gamma*(1/r1 - 1/r2);                                                       /* [Weigert1999], equation (22),
                                                                                                    * see also a sentence over the equation
                                                                                                    * "R1 was taken as positive and R2 was taken as negative"
                                                                                                    */ 
 
-        
-        //fC = M_PI*2.0*R*phys.gamma/(1+tan(0.5*beta));                                           // Weigert, equation (23), [Fisher]
+        //fC = M_PI*2.0*R*phys.gamma/(1+tan(0.5*beta));                                           // [Weigert1999], equation (23), [Fisher]
         
         fC = M_PI/4.0*pow((2.0*R),2.0)*pow(sin(beta),2.0)*Pk +
-             phys.gamma*M_PI*2.0*R*sin(beta)*sin(beta+phys.theta);                                // Weigert, equation (21)
+             phys.gamma*M_PI*2.0*R*sin(beta)*sin(beta+phys.theta);                                // [Weigert1999], equation (21)
         
       } else if (phys.CapillarType  == "Willett_numeric") {
       
-        /* Capillar model from Willett
-         * http://pubs.acs.org/doi/abs/10.1021/la000657y
-         * 
-          @article{doi:10.1021/la000657y,
-          author = {Willett, Christopher D. and Adams, Michael J. and Johnson, Simon A. and Seville, Jonathan P. K.},
-          title = {Capillary Bridges between Two Spherical Bodies},
-          journal = {Langmuir},
-          volume = {16},
-          number = {24},
-          pages = {9396-9405},
-          year = {2000},
-          doi = {10.1021/la000657y},
-          
-          URL = {http://pubs.acs.org/doi/abs/10.1021/la000657y},
-          eprint = {http://pubs.acs.org/doi/pdf/10.1021/la000657y}
-          }
+        /* Capillar model from [Willett2000]
          */ 
         
         Real R = phys.R;
@@ -257,7 +223,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real Gamma = phys.gamma;
         
         /*
-         * Willett, equations in Anhang
+         * [Willett2000], equations in Anhang
         */
         Real f1 = (-0.44507 + 0.050832*Th1 - 1.1466*Th2) + 
                   (-0.1119 - 0.000411*Th1 - 0.1490*Th2) * log(VbS) +
@@ -267,7 +233,6 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real f2 = (1.9222 - 0.57473*Th1 - 1.2918*Th2) +
                   (-0.0668 - 0.1201*Th1 - 0.22574*Th2) * log(VbS) +
                   (-0.0013375 - 0.0068988*Th1 - 0.01137*Th2) *log(VbS)*log(VbS);
-                  
                   
         Real f3 = (1.268 - 0.01396*Th1 - 0.23566*Th2) +
                   (0.198 + 0.092*Th1 - 0.06418*Th2) * log(VbS) +
@@ -285,26 +250,9 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         
         fC = FS * 2.0 * M_PI* R * Gamma;
       } else if (phys.CapillarType  == "Willett_analytic") {
-        /* Capillar model from Willet (analytical solution), but used in the work of Herminghaus
-         * 
-         * http://www.tandfonline.com/doi/abs/10.1080/00018730500167855
-         * 
-          @article{doi:10.1080/00018730500167855,
-          author = {Herminghaus * , S.},
-          title = {Dynamics of wet granular matter},
-          journal = {Advances in Physics},
-          volume = {54},
-          number = {3},
-          pages = {221-261},
-          year = {2005},
-          doi = {10.1080/00018730500167855},
-          
-          URL = {http://www.tandfonline.com/doi/abs/10.1080/00018730500167855},
-          eprint = {http://www.tandfonline.com/doi/pdf/10.1080/00018730500167855}
-          }
+        /* Capillar model from Willet [Willett2000] (analytical solution), but 
+         * used also in the work of Herminghaus [Herminghaus2005]
          */
-         
-         
          
         Real R = phys.R;
         Real Gamma = phys.gamma;
@@ -313,15 +261,14 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
                 
         /*
         
-        Real sPl = s/sqrt(Vb/R);                                                            // Herminghaus, equation (sentence between (7) and (8))
-        fC = 2.0 * M_PI* R * Gamma * cos(phys.theta)/(1 + 1.05*sPl + 2.5 *sPl * sPl);       // Herminghaus, equation (7)
+        Real sPl = s/sqrt(Vb/R);                                                            // [Herminghaus2005], equation (sentence between (7) and (8))
+        fC = 2.0 * M_PI* R * Gamma * cos(phys.theta)/(1 + 1.05*sPl + 2.5 *sPl * sPl);       // [Herminghaus2005], equation (7)
         
         */ 
         
-        
-        Real sPl = (s/2.0)/sqrt(Vb/R);                                                      // Willet, equation (sentence after (11)), s - half-separation, so s*2.0
-        Real f_star = cos(phys.theta)/(1 + 2.1*sPl + 10.0 * pow(sPl, 2.0));                 // Willet, equation (12)
-        fC = f_star * (2*M_PI*R*Gamma);                                                     // Willet, equation (13), against F
+        Real sPl = (s/2.0)/sqrt(Vb/R);                                                      // [Willett2000], equation (sentence after (11)), s - half-separation, so s*2.0
+        Real f_star = cos(phys.theta)/(1 + 2.1*sPl + 10.0 * pow(sPl, 2.0));                 // [Willett2000], equation (12)
+        fC = f_star * (2*M_PI*R*Gamma);                                                     // [Willett2000], equation (13), against F
         
       } else {
         throw runtime_error("CapillarType is unknown, please, use only Willett_numeric, Willett_analytic or Weigert");
