@@ -197,28 +197,37 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         }
         * 
        */
-        Real c0 = 0.96;
-        Real c1 = 1.1;
         Real R = phys.R;
         Real a = -geom.penetrationDepth;
         
         Real Eps = 0.36;                                                                          //Porosity
         
         
-        Real fi = phys.Vb/(2.0*Mathr::PI/6.0*pow(R*2.0,3.));                                      // Weigert, equation (13)
-        Real S = Mathr::PI*(1-Eps)/(Eps*Eps)*fi;                                                  // Weigert, equation (14)
-        Real Ca = (1.0 + 6*a/(R*2.0));                                                            // Weigert, equation (16)
+        Real fi = phys.Vb/(2.0*M_PI/6.0*pow(R*2.0,3.));                                           // Weigert, equation (13)
+        Real S = M_PI*(1-Eps)/(pow(Eps, 2.0))*fi;                                                 // Weigert, equation (14)
+        Real Ca = (1.0 + 6.0*a/(R*2.0));                                                          // Weigert, equation (16)
         Real Ct = (1.0 + 1.1*sin(phys.theta));                                                    // Weigert, equation (17)
         
-        Real beta = asin(pow((S/0.36)*(Eps*Eps/(1-Eps))*(1.0/Ca)*(1.0/Ct), 1.0/4.0));             // Weigert, equation (19)
+        /*
+        Real beta = asin(pow(((S/0.36)*(pow(Eps, 2.0)/(1-Eps))*(1.0/Ca)*(1.0/Ct)), 1.0/4.0));     // Weigert, equation (19)
+        */
+        
+        
+        Real beta = asin(pow(phys.Vb/(0.12*Ca*Ct*pow(2.0*R, 3.0)), 1.0/4.0));                     // Weigert, equation (15), against Vb
+        
         
         
         Real r1 = (2.0*R*(1-cos(beta)) + a)/(2.0*cos(beta+phys.theta));                           // Weigert, equation (5)
         Real r2 = R*sin(beta) + r1*(sin(beta+phys.theta)-1);                                      // Weigert, equation (6)
-        Real Pk = phys.gamma*(1/r1 + 1/r2);                                                       // Weigert, equation (22)
+        Real Pk = phys.gamma*(1/r1 - 1/r2);                                                       /* Weigert, equation (22),
+                                                                                                   * see also a sentence over the equation
+                                                                                                   * "R1 was taken as positive and R2 was taken as negative"
+                                                                                                   */ 
+
         
-        //fC = M_PI*2.0*R*phys.gamma/(1+tan(0.5*beta));                                           // Weigert, equation (23)
-        fC = M_PI/4.0*((2.0*R)*(2.0*R))*(sin(beta)*sin(beta))*Pk +
+        //fC = M_PI*2.0*R*phys.gamma/(1+tan(0.5*beta));                                           // Weigert, equation (23), [Fisher]
+        
+        fC = M_PI/4.0*pow((2.0*R),2.0)*pow(sin(beta),2.0)*Pk +
              phys.gamma*M_PI*2.0*R*sin(beta)*sin(beta+phys.theta);                                // Weigert, equation (21)
         
       } else if (phys.CapillarType  == "Willett") {
