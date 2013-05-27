@@ -26,7 +26,7 @@ class ViscElMat : public Material {
 		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
 		((Real,gamma,NaN,,"Surface tension [N/m]"))
 		((Real,theta,NaN,,"Contact angle [°]"))
-		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett, Weigert, Herminghaus")),
+		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(ViscElMat,Material);

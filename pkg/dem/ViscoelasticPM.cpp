@@ -199,16 +199,13 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
        */
         Real R = phys.R;
         Real a = -geom.penetrationDepth;
-        
-        Real Eps = 0.36;                                                                          //Porosity
-        
-        
-        Real fi = phys.Vb/(2.0*M_PI/6.0*pow(R*2.0,3.));                                           // Weigert, equation (13)
-        Real S = M_PI*(1-Eps)/(pow(Eps, 2.0))*fi;                                                 // Weigert, equation (14)
         Real Ca = (1.0 + 6.0*a/(R*2.0));                                                          // Weigert, equation (16)
         Real Ct = (1.0 + 1.1*sin(phys.theta));                                                    // Weigert, equation (17)
         
         /*
+        Real Eps = 0.36;                                                                          // Porosity
+        Real fi = phys.Vb/(2.0*M_PI/6.0*pow(R*2.0,3.));                                           // Weigert, equation (13)
+        Real S = M_PI*(1-Eps)/(pow(Eps, 2.0))*fi;                                                 // Weigert, equation (14)
         Real beta = asin(pow(((S/0.36)*(pow(Eps, 2.0)/(1-Eps))*(1.0/Ca)*(1.0/Ct)), 1.0/4.0));     // Weigert, equation (19)
         */
         
@@ -230,7 +227,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         fC = M_PI/4.0*pow((2.0*R),2.0)*pow(sin(beta),2.0)*Pk +
              phys.gamma*M_PI*2.0*R*sin(beta)*sin(beta+phys.theta);                                // Weigert, equation (21)
         
-      } else if (phys.CapillarType  == "Willett") {
+      } else if (phys.CapillarType  == "Willett_numeric") {
       
         /* Capillar model from Willett
          * http://pubs.acs.org/doi/abs/10.1021/la000657y
@@ -287,8 +284,9 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real FS = exp(lnFS);
         
         fC = FS * 2.0 * M_PI* R * Gamma;
-      } else if (phys.CapillarType  == "Herminghaus") {
-        /* Capillar model from Herminghaus
+      } else if (phys.CapillarType  == "Willett_analytic") {
+        /* Capillar model from Willet (analytical solution), but used in the work of Herminghaus
+         * 
          * http://www.tandfonline.com/doi/abs/10.1080/00018730500167855
          * 
           @article{doi:10.1080/00018730500167855,
@@ -306,15 +304,27 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
           }
          */
          
+         
+         
         Real R = phys.R;
         Real Gamma = phys.gamma;
         Real s = -geom.penetrationDepth;
         Real Vb = phys.Vb;
-        Real sPl = s/sqrt(Vb/R);
-        fC = 2.0 * M_PI* R * Gamma * cos(phys.theta)/(1 + 1.05*sPl + 2.5 *sPl * sPl);         // Herminghaus, equation (7)
+                
+        /*
+        
+        Real sPl = s/sqrt(Vb/R);                                                            // Herminghaus, equation (sentence between (7) and (8))
+        fC = 2.0 * M_PI* R * Gamma * cos(phys.theta)/(1 + 1.05*sPl + 2.5 *sPl * sPl);       // Herminghaus, equation (7)
+        
+        */ 
+        
+        
+        Real sPl = (s/2.0)/sqrt(Vb/R);                                                      // Willet, equation (sentence after (11)), s - half-separation, so s*2.0
+        Real f_star = cos(phys.theta)/(1 + 2.1*sPl + 10.0 * pow(sPl, 2.0));                 // Willet, equation (12)
+        fC = f_star * (2*M_PI*R*Gamma);                                                     // Willet, equation (13), against F
         
       } else {
-        throw runtime_error("CapillarType is unknown, please, use only Willett, Weigert or Herminghaus");
+        throw runtime_error("CapillarType is unknown, please, use only Willett_numeric, Willett_analytic or Weigert");
       }
   return fC;
 }
