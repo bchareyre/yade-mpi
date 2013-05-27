@@ -104,6 +104,13 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
 	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
 
+  /*
+   * This part for implementation of the capillar model.
+   * All main equations are in calculateCapillarForce function. 
+   * There is only the determination of critical distance between spheres, 
+   * after that the liquid bridge will be broken.
+   */ 
+   
 	if (not(phys.liqBridgeCreated) and phys.Capillar) {
 		phys.liqBridgeCreated = true;
 		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
