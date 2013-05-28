@@ -125,7 +125,7 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
 	ret=fscanf(fp, "%*s %f %f %f\n", &v[2][0],  &v[2][1],  &v[2][2]);
 	ret=fscanf(fp, "%*s"); // end loop
 	ret=fscanf(fp, "%*s"); // end facet
-	if(ret < 0 || feof(fp)) break;
+	if(feof(fp)) break;
 
 	int vid[3];
 	for(int i=0;i<3;++i)

@@ -256,8 +256,6 @@ public:
                                      );
     FUNCTOR2D(CylScGeom6D,CohFrictPhys);
     DECLARE_LOGGER;
-private:
-    Real currentContactPhysics;
 
 };
 REGISTER_SERIALIZABLE(Law2_CylScGeom6D_CohFrictPhys_CohesionMoment);
@@ -281,8 +279,6 @@ public:
                                      );
     FUNCTOR2D(ChCylGeom6D,CohFrictPhys);
     DECLARE_LOGGER;
-private:
-    Real currentContactPhysics;
 
 };
 REGISTER_SERIALIZABLE(Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment);

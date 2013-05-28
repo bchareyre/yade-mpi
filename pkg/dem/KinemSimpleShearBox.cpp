@@ -194,7 +194,7 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 // 	cout << "Alors que f0 =  = "<< f0 << endl;
 // 	cout << "Car terme correctif = " << KnC * 1.0e9 * Scontact * (hCurrent-y0)<< endl;
 
-	if( (stiffness==0) )
+	if( stiffness==0 )
 	{
 		deltaH=0;
 		cerr << "Stiffness(sample) = 0 => DNC in fact : not CNL or CNS..." << endl;

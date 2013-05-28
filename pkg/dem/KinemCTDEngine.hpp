@@ -14,8 +14,7 @@
 class KinemCTDEngine : public KinemSimpleShearBox
 {
 	private :
-		Real	dalpha	// the increment over alpha to set, to cancel the offset due to vertical displacement of upper box
-			,current_sigma		// Computed in kPa
+		Real current_sigma		// Computed in kPa
 			;
 
 		int		temoin;

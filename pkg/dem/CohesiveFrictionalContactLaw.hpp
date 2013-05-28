@@ -34,8 +34,6 @@ class Law2_ScGeom6D_CohFrictPhys_CohesionMoment: public LawFunctor{
 	);
 	FUNCTOR2D(ScGeom6D,CohFrictPhys);
 	DECLARE_LOGGER;
-	private:
-	Real currentContactPhysics;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 

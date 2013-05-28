@@ -28,7 +28,5 @@ class Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment: public LawFunctor{
 	);
 	FUNCTOR2D(ScGeom6D,InelastCohFrictPhys);
 	DECLARE_LOGGER;
-	private:
-	Real currentContactPhysics;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment);

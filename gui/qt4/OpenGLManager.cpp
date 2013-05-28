@@ -41,7 +41,7 @@ void OpenGLManager::resizeViewSlot(int id, int wd, int ht){
 
 void OpenGLManager::closeViewSlot(int id){
 	boost::mutex::scoped_lock lock(viewsMutex);
-	for(size_t i=views.size()-1; (!views[i]) && i>=0; i--){ views.resize(i); } // delete empty views from the end
+	for(size_t i=views.size()-1; (!views[i]); i--){ views.resize(i); } // delete empty views from the end
 	if(id<0){ // close the last one existing
 		assert(*views.rbegin()); // this should have been sanitized by the loop above
 		views.resize(views.size()-1); // releases the pointer as well
