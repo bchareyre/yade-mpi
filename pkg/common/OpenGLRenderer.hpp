@@ -93,6 +93,7 @@ class OpenGLRenderer : public Serializable
 		((Vector3r,light2Pos,Vector3r(-130,75,30),,"Position of secondary OpenGL light source in the scene."))
 		((Vector3r,lightColor,Vector3r(0.6,0.6,0.6),,"Per-color intensity of primary light (RGB)."))
 		((Vector3r,light2Color,Vector3r(0.5,0.5,0.1),,"Per-color intensity of secondary light (RGB)."))
+		((Vector3r,cellColor,Vector3r(1,1,0),,"Color of the periodic cell (RGB)."))
 		((Vector3r,bgColor,Vector3r(.2,.2,.2),,"Color of the background canvas (RGB)"))
 		((bool,wire,false,,"Render all bodies with wire only (faster)"))
 		((bool,light1,true,,"Turn light 1 on."))
