@@ -46,7 +46,7 @@ void CapillaryStressRecorder::action()
 	Real f1_cap_x=0, f1_cap_y=0, f1_cap_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
 	
 	Real sig11_cap=0, sig22_cap=0, sig33_cap=0, sig12_cap=0, sig13_cap=0,
-	sig23_cap=0, Vwater = 0, CapillaryPressure = 0;
+	sig23_cap=0, Vwater = 0, capillaryPressure = 0;
 	int j = 0;
 		
 	InteractionContainer::iterator ii    = scene->interactions->begin();
@@ -67,7 +67,7 @@ void CapillaryStressRecorder::action()
                         unsigned int id1 = interaction -> getId1();
 			unsigned int id2 = interaction -> getId2();
 			
-			Vector3r fcap = meniscusParameters->Fcap;
+			Vector3r fcap = meniscusParameters->fCap;
 			
 			f1_cap_x=fcap[0];
 			f1_cap_y=fcap[1];
@@ -94,8 +94,8 @@ void CapillaryStressRecorder::action()
 			
 			/// Liquid volume
 			
- 			Vwater += meniscusParameters->Vmeniscus;
- 			CapillaryPressure=meniscusParameters->CapillaryPressure;
+ 			Vwater += meniscusParameters->vMeniscus;
+ 			capillaryPressure=meniscusParameters->capillaryPressure;
 			
 			}
 			
@@ -148,7 +148,7 @@ void CapillaryStressRecorder::action()
 		<< lexical_cast<string>(SIG_12_cap) << " "
 		<< lexical_cast<string>(SIG_13_cap)<< " "
 		<< lexical_cast<string>(SIG_23_cap)<< "   "
-		<< lexical_cast<string>(CapillaryPressure) << " "
+		<< lexical_cast<string>(capillaryPressure) << " "
 		<< lexical_cast<string>(Sr)<< " " 
 		<< lexical_cast<string>(w)<< " "
 		<< endl;

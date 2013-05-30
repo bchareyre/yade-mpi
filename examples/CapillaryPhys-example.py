@@ -45,7 +45,7 @@ if model_type == 1:#hertz model with capillary forces
 			[Ip2_FrictMat_FrictMat_MindlinCapillaryPhys(label='ContactModel')],#for hertz model only
 			[Law2_ScGeom_MindlinPhys_Mindlin()]#for hertz model only
 		),
-		Law2_ScGeom_CapillaryPhys_Capillarity(CapillaryPressure=10000),#for hertz model only
+		Law2_ScGeom_CapillaryPhys_Capillarity(capillaryPressure=10000),#for hertz model only
 		NewtonIntegrator(damping=local_damping,gravity=(0,0,-9.81)),
 	]
 	ContactModel.betan=viscous_normal
@@ -60,7 +60,7 @@ else:
 			[Ip2_FrictMat_FrictMat_CapillaryPhys()],	#for linear model only
 			[Law2_ScGeom_FrictPhys_CundallStrack()],	#for linear model only
 		),
-		Law2_ScGeom_CapillaryPhys_Capillarity(CapillaryPressure=10000),#for linear model only
+		Law2_ScGeom_CapillaryPhys_Capillarity(capillaryPressure=10000),#for linear model only
 		NewtonIntegrator(damping=local_damping,gravity=(0,0,-9.81)),
 	]
 
