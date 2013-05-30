@@ -6,15 +6,6 @@
 
 import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, random
 
-pynotifyAvailable = False
-n = 0;
-try:
-	import pynotify
-	pynotifyAvailable = True
-	pynotify.init("Yade")
-except ImportError:
-	pynotifyAvailable = False
-
 #socket.setdefaulttimeout(10) 
 
 ## replaced by scons automatically
@@ -369,6 +360,7 @@ parser.add_argument('--refresh',type=int,dest='refresh',help='Refresh rate of au
 parser.add_argument('--timing',type=int,dest='timing',default=0,metavar='COUNT',help='Repeat each job COUNT times, and output a simple table with average/variance/minimum/maximum job duration; used for measuring how various parameters affect execution time. Jobs can override the global value with the !COUNT column.')
 parser.add_argument('--timing-output',type=str,metavar='FILE',dest='timingOut',default=None,help='With \-\-timing, save measured durations to FILE, instead of writing to standard output.')
 parser.add_argument('--randomize',action='store_true',dest='randomize',help='Randomize job order (within constraints given by assigned cores).')
+parser.add_argument('--disable-pynotify',action='store_true',dest='disablePynotify',help='Disable screen notifications')
 parser.add_argument('args',nargs=argparse.REMAINDER,help=argparse.SUPPRESS) # see argparse doc, par.disable_interspersed_args() from optargs module
 #parser.add_argument('--serial',action='store_true',dest='serial',default=False,help='Run all jobs serially, even if there are free cores
 opts=parser.parse_args()
@@ -395,6 +387,16 @@ elif len(args)==1:
 else:
 	parser.print_help()
 	sys.exit(1)
+
+pynotifyAvailable = False
+n = 0;
+if not opts.disablePynotify:
+	try:
+		import pynotify
+		pynotifyAvailable = True
+		pynotify.init("Yade")
+	except ImportError:
+		pynotifyAvailable = False
 
 print "Will run simulation(s) %s using `%s', nice value %d, using max %d cores."%(scripts,executable,nice,maxJobs)
 

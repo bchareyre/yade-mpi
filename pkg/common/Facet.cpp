@@ -25,7 +25,10 @@ void Facet::postLoad(Facet&)
 	#define CHECK_EDGE(i) if(e[i].squaredNorm()==0){LOG_FATAL("Facet has coincident vertices "<<i<<" ("<<vertices[i]<<") and "<<(i+1)%3<<" ("<<vertices[(i+1)%3]<<")!");}
 		CHECK_EDGE(0); CHECK_EDGE(1);CHECK_EDGE(2);
 	#undef CHECK_EDGE
-	normal = e[0].cross(e[1]); normal.normalize();
+	normal = e[0].cross(e[1]);
+	area = .5*normal.norm();
+	normal /= 2*area;
+	//normal.normalize();
 	for(int i=0; i<3; ++i){
 		ne[i]=e[i].cross(normal); ne[i].normalize();
 		vl[i]=vertices[i].norm();

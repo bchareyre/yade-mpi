@@ -448,19 +448,18 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 	const int maxTry=200;
 	int nGen=0; // number of clumps generated
 	// random point coordinate generator, with non-zero margins if aperiodic
-	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
-	typedef boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > UniRandGen;
-	static UniRandGen rndX(randGen,boost::uniform_real<>(mn[0],mx[0]));
-	static UniRandGen rndY(randGen,boost::uniform_real<>(mn[1],mx[1]));
-	static UniRandGen rndZ(randGen,boost::uniform_real<>(mn[2],mx[2]));
-	static UniRandGen rndUnit(randGen,boost::uniform_real<>(0,1));
+ 	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
+ 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
 	while(nGen<num || num<0){
-		int clumpChoice=rand()%clumps.size();
+		int clumpChoice=(int)(rnd()*(clumps.size()-1e-20));
 		int tries=0;
 		while(true){ // check for tries at the end
-			Vector3r pos(rndX(),rndY(),rndZ()); // random point
+			Vector3r pos(0.,0.,0.);
+			for(int i=0;i<3;i++){
+				pos[i]=rnd()*(mx[i]-mn[i])+mn[i];
+			}
 			// TODO: check this random orientation is homogeneously distributed
-			Quaternionr ori(rndUnit(),rndUnit(),rndUnit(),rndUnit()); ori.normalize();
+			Quaternionr ori(rnd(),rnd(),rnd(),rnd()); ori.normalize();
 			// copy the packing and rotate
 			SpherePack C(clumps[clumpChoice]); C.rotateAroundOrigin(ori); C.translate(pos);
 			const Real& rad(boundRad[clumpChoice]);

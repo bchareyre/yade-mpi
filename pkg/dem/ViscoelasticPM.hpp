@@ -21,7 +21,12 @@ class ViscElMat : public Material {
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,ks,NaN,,"Shear elastic stiffness"))
 		((Real,cs,NaN,,"Shear viscous constant"))
-		((Real,frictionAngle,NaN,,"Friction angle [rad]")),
+		((Real,frictionAngle,NaN,,"Friction angle [rad]"))
+		((bool,Capillar,false,,"True, if capillar forces need to be added."))
+		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
+		((Real,gamma,NaN,,"Surface tension [N/m]"))
+		((Real,theta,NaN,,"Contact angle [°]"))
+		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic [Willett2000]_ , Weigert [Weigert1999]_ ")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(ViscElMat,Material);
@@ -32,9 +37,17 @@ REGISTER_SERIALIZABLE(ViscElMat);
 class ViscElPhys : public FrictPhys{
 	public:
 		virtual ~ViscElPhys();
+		Real R;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
-		((Real,cs,NaN,,"Shear viscous constant")),
+		((Real,cs,NaN,,"Shear viscous constant"))
+		((bool,Capillar,false,,"True, if capillar forces need to be added."))
+		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
+		((Real,sCrit,false,,"Critical bridge length [m]"))
+		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
+		((Real,gamma,NaN,,"Surface tension [N/m]"))
+		((Real,theta,NaN,,"Contact angle [rad]"))
+		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett, Weigert, Herminghaus")),
 		createIndex();
 	)
 };
@@ -58,6 +71,8 @@ REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_ViscElPhys);
 class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 	public :
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+	private:
+		Real calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys);
 	FUNCTOR2D(ScGeom,ViscElPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`.");
 };

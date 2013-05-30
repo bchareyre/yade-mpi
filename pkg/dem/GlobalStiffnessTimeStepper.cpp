@@ -13,6 +13,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Clump.hpp>
+#include<yade/pkg/dem/Shop.hpp>
 
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN((GlobalStiffnessTimeStepper));

@@ -27,7 +27,6 @@ class TriaxialStateRecorder : public Recorder
 {
 	private :
 		shared_ptr<TriaxialStressController> triaxialStressController; 
-		bool changed;
 	public :
 		virtual ~TriaxialStateRecorder ();
 		virtual void action();

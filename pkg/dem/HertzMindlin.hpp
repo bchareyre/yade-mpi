@@ -118,9 +118,6 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_HertzWithLinearShear);
 
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
-		// just for the deprecation warning, can be removed later
-		Real _beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys; 
-		bool _nothing;
 	public:
 
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
@@ -149,9 +146,6 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 			((OpenMPAccumulator<Real>,shearDampDissip,,Attr::noSave,"Energy dissipated by tangential damping"))						
 			
 			, /*deprec*/
-			((betan,_beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys,"!Moved to MindlinPhys, where the value is assigned by the appropriate Ip2 functor."))
-			((betas,_beta_parameters_of_Ip2_FrictMat_FrictMat_MindlinPhys,"!Moved to MindlinPhys, where the value is assigned by the appropriate Ip2 functor."))
-			((useDamping,_nothing,"Damping is now turned on automatically if either of MindlinPhys.betan or MindlinPhys.betas or MindlinPhys.alpha are non-zero."))
 			, /* init */
 			, /* ctor */
 			, /* py */
