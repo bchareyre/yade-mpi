@@ -19,6 +19,7 @@
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/dem/ViscoelasticPM.hpp>
+#include<yade/pkg/dem/CapillaryPhys.hpp>
 
 #include<yade/pkg/common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg/common/Bo1_Box_Aabb.hpp>
@@ -774,6 +775,23 @@ Matrix3r Shop::getStress(Real volume){
 		Vector3r branch=b1->state->pos -b2->state->pos;
 		if (isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
 		stressTensor += (nsi->normalForce+nsi->shearForce)*branch.transpose();
+	}
+	return stressTensor/volume;
+}
+
+Matrix3r Shop::getCapillaryStress(Real volume){
+	Scene* scene=Omega::instance().getScene().get();
+	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():1;
+	Matrix3r stressTensor = Matrix3r::Zero();
+	const bool isPeriodic = scene->isPeriodic;
+	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
+		if (!I->isReal()) continue;
+		shared_ptr<Body> b1 = Body::byId(I->getId1(),scene);
+		shared_ptr<Body> b2 = Body::byId(I->getId2(),scene);
+		CapillaryPhys* nsi=YADE_CAST<CapillaryPhys*> ( I->phys.get() );
+		Vector3r branch=b1->state->pos -b2->state->pos;
+		if (isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
+		stressTensor += (nsi->fCap)*branch.transpose();
 	}
 	return stressTensor/volume;
 }

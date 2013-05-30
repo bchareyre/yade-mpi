@@ -121,6 +121,7 @@ class Shop{
 		
 		//! Function to compute overall ("macroscopic") stress.
 		static Matrix3r getStress(Real volume=0);
+		static Matrix3r getCapillaryStress(Real volume=0);
 		static Matrix3r stressTensorOfPeriodicCell() { LOG_WARN("Shop::stressTensorOfPeriodicCelli is DEPRECATED: use getStress instead"); return Shop::getStress(); }
 		//! This version is restricted to periodic BCs and Dem3Dof
 		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
