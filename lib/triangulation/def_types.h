@@ -114,7 +114,7 @@ class FlowCellInfo : public SimpleCellInfo {
 	FlowCellInfo (void)
 	{
 		module_permeability.resize(4, 0);
-		pore_radius.resize(4);
+		pore_radius.resize(4, 0);
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
 		facetFluidSurfacesRatio.resize(4);
