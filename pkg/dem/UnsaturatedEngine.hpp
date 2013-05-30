@@ -67,10 +67,8 @@ class UnsaturatedEngine : public PartialEngine
 		TPL Real getSaturation(Solver& flow);
 		TPL int saveListOfNodes(Solver& flow);
 		TPL int saveListOfConnections(Solver& flow);
-// 		TPL int saveCellSphereRadius(Solver& flow);//temp		
+
 // 		TPL int saveLatticeNodes(Solver& flow); //not work
-// 		template<class Cellhandle>
-// 		int printLength(Cellhandle cell);//temp
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -107,7 +105,6 @@ class UnsaturatedEngine : public PartialEngine
 		Real 		_getSaturation () {return getSaturation(solver);}
 		int		_saveListOfNodes() {return saveListOfNodes(solver);}
 		int		_saveListOfConnections() {return saveListOfConnections(solver);}
-// 		int		_saveCellSphereRadius() {return saveCellSphereRadius(solver);}
 // 		int		_saveLatticeNodes() {return saveLatticeNodes(solver);}
 
 		virtual ~UnsaturatedEngine();
@@ -169,7 +166,6 @@ class UnsaturatedEngine : public PartialEngine
 					.def("getMinEntryValue",&UnsaturatedEngine::_get_min_EntryValue,"get the minimum air entry pressure for the next invade step")
 					.def("saveListOfNodes",&UnsaturatedEngine::_saveListOfNodes,"Save the list of nodes.")
 					.def("saveListOfConnnections",&UnsaturatedEngine::_saveListOfConnections,"Save the connections between cells.")
-// 					.def("saveCellSphereRadius",&UnsaturatedEngine::_saveCellSphereRadius,"temp file for saving cells and sphere radius")
 // 					.def("saveLatticeNodes",&UnsaturatedEngine::_saveLatticeNodes,"Save the statement of lattice nodes. 0 for out of sphere; 1 for inside of sphere.")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
 					)
