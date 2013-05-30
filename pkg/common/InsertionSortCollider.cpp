@@ -22,7 +22,6 @@ CREATE_LOGGER(InsertionSortCollider);
 void InsertionSortCollider::handleBoundInversion(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(!periodic);
 	assert(id1!=id2);
-	///fast
 	if (spatialOverlap(id1,id2) && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()) && !interactions->found(id1,id2))
 		interactions->insert(shared_ptr<Interaction>(new Interaction(id1,id2)));
 }
