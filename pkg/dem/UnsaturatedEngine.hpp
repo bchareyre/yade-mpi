@@ -65,10 +65,12 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void invade (Solver& flow );
 		TPL Real get_min_EntryValue (Solver& flow );
 		TPL Real getSaturation(Solver& flow);
-		TPL int saveListOfNodes(Solver& flow);
-		TPL int saveListOfConnections(Solver& flow);
+		TPL void saveListOfNodes(Solver& flow);
+		TPL void saveListOfConnections(Solver& flow);
 
-// 		TPL int saveLatticeNodes(Solver& flow); //not work
+		TPL void saveLatticeNodeX(Solver& flow,double x); 
+		TPL void saveLatticeNodeY(Solver& flow,double y); 
+		TPL void saveLatticeNodeZ(Solver& flow,double z); 
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -103,9 +105,11 @@ class UnsaturatedEngine : public PartialEngine
 		void		_invade() {invade(solver);}
 		Real		_get_min_EntryValue() {return get_min_EntryValue(solver);}
 		Real 		_getSaturation () {return getSaturation(solver);}
-		int		_saveListOfNodes() {return saveListOfNodes(solver);}
-		int		_saveListOfConnections() {return saveListOfConnections(solver);}
-// 		int		_saveLatticeNodes() {return saveLatticeNodes(solver);}
+		void		_saveListOfNodes() {saveListOfNodes(solver);}
+		void		_saveListOfConnections() {saveListOfConnections(solver);}
+ 		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
+ 		void		_saveLatticeNodeY(double y) {saveLatticeNodeY(solver,y);}
+ 		void		_saveLatticeNodeZ(double z) {saveLatticeNodeZ(solver,z);}
 
 		virtual ~UnsaturatedEngine();
 
@@ -165,8 +169,10 @@ class UnsaturatedEngine : public PartialEngine
 					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation")
 					.def("getMinEntryValue",&UnsaturatedEngine::_get_min_EntryValue,"get the minimum air entry pressure for the next invade step")
 					.def("saveListOfNodes",&UnsaturatedEngine::_saveListOfNodes,"Save the list of nodes.")
-					.def("saveListOfConnnections",&UnsaturatedEngine::_saveListOfConnections,"Save the connections between cells.")
-// 					.def("saveLatticeNodes",&UnsaturatedEngine::_saveLatticeNodes,"Save the statement of lattice nodes. 0 for out of sphere; 1 for inside of sphere.")
+					.def("saveListOfConnections",&UnsaturatedEngine::_saveListOfConnections,"Save the connections between cells.")
+					.def("saveLatticeNodeX",&UnsaturatedEngine::_saveLatticeNodeX,(python::arg("x")),"Save the slice of lattice nodes for x_normal(x). 0: out of sphere; 1: inside of sphere.")
+					.def("saveLatticeNodeY",&UnsaturatedEngine::_saveLatticeNodeY,(python::arg("y")),"Save the slice of lattice nodes for y_normal(y). 0: out of sphere; 1: inside of sphere.")
+					.def("saveLatticeNodeZ",&UnsaturatedEngine::_saveLatticeNodeZ,(python::arg("z")),"Save the slice of lattice nodes for z_normal(z). 0: out of sphere; 1: inside of sphere.")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
 					)
 		DECLARE_LOGGER;

@@ -76,6 +76,13 @@ Real UnsaturatedEngine::testFunction()
 	}
 	cout << "number_of_cells with air: "<< m <<endl;
 	
+// 	cout<<"xmin: "<<solver->x_min<<endl;
+// 	cout<<"xmax: "<<solver->x_max<<endl;
+// 	cout<<"ymin: "<<solver->y_min<<endl;
+// 	cout<<"ymax: "<<solver->y_max<<endl;
+// 	cout<<"zmin: "<<solver->z_min<<endl;
+// 	cout<<"zmax: "<<solver->z_max<<endl;
+	
 	/*	FlowSolver FS;
 	double surface_tension = 1; //hypothesis that's surface tension
 	
@@ -952,7 +959,7 @@ Real UnsaturatedEngine::getSaturation (Solver& flow )
 }
 
 template<class Solver>
-int UnsaturatedEngine::saveListOfNodes(Solver& flow)
+void UnsaturatedEngine::saveListOfNodes(Solver& flow)
 {
     ofstream file;
     file.open("ListOfNodes.txt");
@@ -963,11 +970,10 @@ int UnsaturatedEngine::saveListOfNodes(Solver& flow)
         file << cell->info().index << " " <<cell->neighbor(0)->info().index << " " << cell->neighbor(1)->info().index << " " << cell->neighbor(2)->info().index << " " << cell->neighbor(3)->info().index << endl;
     }
     file.close();
-    return 0;
 }
 
 template<class Solver>
-int UnsaturatedEngine::saveListOfConnections(Solver& flow)
+void UnsaturatedEngine::saveListOfConnections(Solver& flow)
 {
     ofstream file;
     file.open("ListOfConnections.txt");
@@ -984,44 +990,127 @@ int UnsaturatedEngine::saveListOfConnections(Solver& flow)
         file << cell->info().index << " " <<cell->neighbor(3)->info().index << " " << surface_tension/cell->info().pore_radius[3] << " " << cell->info().pore_radius[3] << endl;
     }
     file.close();
-    return 0;
 }
 
-/*
 template<class Solver>
-int UnsaturatedEngine::saveLatticeNodes(Solver& flow)
+void UnsaturatedEngine::saveLatticeNodeX(Solver& flow, double x)
 {
-    ofstream file;
-    file.open("LatticeNode.txt");
-    file << "#Statements Of LatticeNodes: 0 for out of sphere; 1 for inside of sphere  \n";
-    Real delta_x = 0.1;
-    Real delta_y = 0.1;
-    Real delta_z = 0.1;
-    int N=3;// ?? change according to the scale of model
-    for (int i=0; i<N+1; i++) {
+    RTriangulation& tri = flow->T[solver->currentTes].Triangulation();
+    if((x<flow->x_min)||(x>flow->x_max)) {
+        cerr<<"x is out of range! "<<"pleas set x between "<<flow->x_min<<" and "<<flow->x_max<<endl;
+    }
+    else {
+        int N=100;// the default Node number for each slice is 100X100
+        ofstream file;
+	std::ostringstream fileNameStream(".txt");
+	fileNameStream << "LatticeNodeX_"<< x;
+	std::string fileName = fileNameStream.str();
+        file.open(fileName.c_str());
+//     file << "#Slice Of LatticeNodes: 0: out of sphere; 1: inside of sphere  \n";
+        Real delta_y = (flow->y_max-flow->y_min)/N;
+        Real delta_z = (flow->z_max-flow->z_min)/N;
         for (int j=0; j<N+1; j++) {
             for (int k=0; k<N+1; k++) {
-                double x=i*delta_x;
-                double y=j*delta_y;
-                double z=k*delta_z;
+                double y=flow->y_min+j*delta_y;
+                double z=flow->z_min+k*delta_z;
+                int M=0;
                 Vector3r LatticeNode = Vector3r(x,y,z);
-                for (Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); V_it != flow->T[flow->currentTes].Triangulation().finite_vertices_end(); V_it++) {
-                   Vector3r SphereCenter = makeVector3r2(V_it->point().point());
-                    if ((LatticeNode-SphereCenter).norm() > pow(V_it->point().weight(),1.0)) {
-                        file << "0";
+                for (Finite_vertices_iterator V_it = tri.finite_vertices_begin(); V_it != tri.finite_vertices_end(); V_it++) {
+                    if(V_it->info().isFictious) continue;
+                    Vector3r SphereCenter = makeVector3r2(V_it->point().point());
+                    if ((LatticeNode-SphereCenter).squaredNorm() < V_it->point().weight()) {
+                        M=1;
+// 		    cerr<<"dfdsf";
+                        break;
                     }
-                    else {
-                        file << "1";
-                    }           		  
-		}		
+                }
+                file << M;
             }
             file << "\n";
         }
+        file.close();
     }
-    file.close();
-    return 0;
 }
-*/
+
+template<class Solver>
+void UnsaturatedEngine::saveLatticeNodeY(Solver& flow, double y)
+{
+    RTriangulation& tri = flow->T[solver->currentTes].Triangulation();
+    if((y<flow->y_min)||(y>flow->y_max)) {
+        cerr<<"y is out of range! "<<"pleas set y between "<<flow->y_min<<" and "<<flow->y_max<<endl;
+    }
+    else {
+        int N=100;// the default Node number for each slice is 100X100
+        ofstream file;
+	std::ostringstream fileNameStream(".txt");
+	fileNameStream << "LatticeNodeY_"<< y;
+	std::string fileName = fileNameStream.str();
+        file.open(fileName.c_str());
+//     file << "#Slice Of LatticeNodes: 0: out of sphere; 1: inside of sphere  \n";
+        Real delta_x = (flow->x_max-flow->x_min)/N;
+        Real delta_z = (flow->z_max-flow->z_min)/N;
+        for (int j=0; j<N+1; j++) {
+            for (int k=0; k<N+1; k++) {
+                double x=flow->x_min+j*delta_x;
+                double z=flow->z_min+k*delta_z;
+                int M=0;
+                Vector3r LatticeNode = Vector3r(x,y,z);
+                for (Finite_vertices_iterator V_it = tri.finite_vertices_begin(); V_it != tri.finite_vertices_end(); V_it++) {
+                    if(V_it->info().isFictious) continue;
+                    Vector3r SphereCenter = makeVector3r2(V_it->point().point());
+                    if ((LatticeNode-SphereCenter).squaredNorm() < V_it->point().weight()) {
+                        M=1;
+// 		    cerr<<"dfdsf";
+                        break;
+                    }
+                }
+                file << M;
+            }
+            file << "\n";
+        }
+        file.close();
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::saveLatticeNodeZ(Solver& flow, double z)
+{
+    RTriangulation& tri = flow->T[solver->currentTes].Triangulation();
+    if((z<flow->z_min)||(z>flow->z_max)) {
+        cerr<<"z is out of range! "<<"pleas set z between "<<flow->z_min<<" and "<<flow->z_max<<endl;
+    }
+    else {
+        int N=100;// the default Node number for each slice is 100X100
+        ofstream file;
+	std::ostringstream fileNameStream(".txt");
+	fileNameStream << "LatticeNodeZ_"<< z;
+	std::string fileName = fileNameStream.str();
+        file.open(fileName.c_str());
+//     file << "#Slice Of LatticeNodes: 0: out of sphere; 1: inside of sphere  \n";
+        Real delta_x = (flow->x_max-flow->x_min)/N;
+        Real delta_y = (flow->y_max-flow->y_min)/N;
+        for (int j=0; j<N+1; j++) {
+            for (int k=0; k<N+1; k++) {
+                double x=flow->x_min+j*delta_x;
+                double y=flow->z_min+k*delta_y;
+                int M=0;
+                Vector3r LatticeNode = Vector3r(x,y,z);
+                for (Finite_vertices_iterator V_it = tri.finite_vertices_begin(); V_it != tri.finite_vertices_end(); V_it++) {
+                    if(V_it->info().isFictious) continue;
+                    Vector3r SphereCenter = makeVector3r2(V_it->point().point());
+                    if ((LatticeNode-SphereCenter).squaredNorm() < V_it->point().weight()) {
+                        M=1;
+// 		    cerr<<"dfdsf";
+                        break;
+                    }
+                }
+                file << M;
+            }
+            file << "\n";
+        }
+        file.close();
+    }
+}
 
 template<class Solver>
 void UnsaturatedEngine::setImposedPressure ( unsigned int cond, Real p,Solver& flow )
