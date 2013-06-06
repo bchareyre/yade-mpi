@@ -22,6 +22,7 @@ class ViscElMat : public Material {
 		((Real,ks,NaN,,"Shear elastic stiffness"))
 		((Real,cs,NaN,,"Shear viscous constant"))
 		((Real,frictionAngle,NaN,,"Friction angle [rad]"))
+		((bool,massMultiply,true,,"Stiffness and viscosity are multiplied by the reduced mass. If massMultiply=false, these parameter are set explicitly without mass multiplication"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_."))
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))

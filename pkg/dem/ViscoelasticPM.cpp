@@ -20,8 +20,14 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	if(interaction->phys) return;
 	ViscElMat* mat1 = static_cast<ViscElMat*>(b1.get());
 	ViscElMat* mat2 = static_cast<ViscElMat*>(b2.get());
-	const Real mass1 = Body::byId(interaction->getId1())->state->mass;
-	const Real mass2 = Body::byId(interaction->getId2())->state->mass;
+	Real mass1 = 1.0;
+	Real mass2 = 1.0;
+	
+	if (mat1->massMultiply and mat2->massMultiply) {
+		mass1 = Body::byId(interaction->getId1())->state->mass;
+		mass2 = Body::byId(interaction->getId2())->state->mass;
+	}
+	
 	const Real kn1 = mat1->kn*mass1; const Real cn1 = mat1->cn*mass1;
 	const Real ks1 = mat1->ks*mass1; const Real cs1 = mat1->cs*mass1;
 	const Real mR1 = mat1->mR;      const Real mR2 = mat2->mR; 
