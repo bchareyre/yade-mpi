@@ -24,9 +24,10 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	const Real mass2 = Body::byId(interaction->getId2())->state->mass;
 	const Real kn1 = mat1->kn*mass1; const Real cn1 = mat1->cn*mass1;
 	const Real ks1 = mat1->ks*mass1; const Real cs1 = mat1->cs*mass1;
+	const Real mR1 = mat1->mR;      const Real mR2 = mat2->mR; 
+	const int mRtype1 = mat1->mRtype; const int mRtype2 = mat2->mRtype;
 	const Real kn2 = mat2->kn*mass2; const Real cn2 = mat2->cn*mass2;
 	const Real ks2 = mat2->ks*mass2; const Real cs2 = mat2->cs*mass2;
-	
 		
 	ViscElPhys* phys = new ViscElPhys();
 	
@@ -41,11 +42,23 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 		phys->ks = 0;
 	} 
 	
+  if ((mR1>0) or (mR2>0)) {
+		phys->mR = 1/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );
+	} else {
+		phys->mR = 0;
+	}
+  
 	phys->cn = (cn1?1/cn1:0) + (cn2?1/cn2:0); phys->cn = phys->cn?1/phys->cn:0;
 	phys->cs = (cs1?1/cs1:0) + (cs2?1/cs2:0); phys->cs = phys->cs?1/phys->cs:0;
-	
+  
 	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
+	
+	if ((mRtype1 != mRtype2) or (mRtype1>2) or (mRtype2>2) or (mRtype1<1) or (mRtype2<1) ) {
+		throw runtime_error("mRtype should be equal for both materials and have the values 1 or 2!");
+	} else {
+		phys->mRtype = mRtype1;
+	}
 	
 	if (mat1->Capillar and mat2->Capillar)  {
 		if (mat1->Vb == mat2->Vb) {
@@ -141,7 +154,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
 	const Real normalVelocity	= geom.normal.dot(relativeVelocity);
 	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
-
+	
 	// As Chiara Modenese suggest, we store the elastic part 
 	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
 	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
@@ -149,8 +162,20 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
-	//phys.prevNormal = geom.normal;
 
+	
+	Vector3r momentResistance = Vector3r::Zero();
+	if (phys.mR>0.0) {
+		const Vector3r relAngVel  = de1.angVel - de2.angVel;
+		relAngVel.normalized();
+		
+		if (phys.mRtype == 1) { 
+			momentResistance = -phys.mR*phys.normalForce.norm()*relAngVel;																														// [Zhou1999536], equation (3)
+		} else if (phys.mRtype == 2) { 
+			momentResistance = -phys.mR*(c1x.cross(de1.angVel) - c2x.cross(de2.angVel)).norm()*phys.normalForce.norm()*relAngVel;			// [Zhou1999536], equation (4)
+		}
+	}
+	
 	const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
 	if( shearForce.squaredNorm() > maxFs )
 	{
@@ -167,12 +192,11 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	}
 	
 	if (I->isActive) {
-		//std::cerr<<"Contact: "<<phys.normalForce<<std::endl;
 		const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
 		addForce (id1,-f,scene);
 		addForce (id2, f,scene);
-		addTorque(id1,-c1x.cross(f),scene);
-		addTorque(id2, c2x.cross(f),scene);
+		addTorque(id1,-c1x.cross(f)+momentResistance,scene);
+		addTorque(id2, c2x.cross(f)-momentResistance,scene);
   }
 }
 

@@ -22,6 +22,8 @@ class ViscElMat : public Material {
 		((Real,ks,NaN,,"Shear elastic stiffness"))
 		((Real,cs,NaN,,"Shear viscous constant"))
 		((Real,frictionAngle,NaN,,"Friction angle [rad]"))
+		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
+		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_."))
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
 		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
 		((Real,gamma,NaN,,"Surface tension [N/m]"))
@@ -41,6 +43,8 @@ class ViscElPhys : public FrictPhys{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant"))
+		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
+		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_"))
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
 		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
 		((Real,sCrit,false,,"Critical bridge length [m]"))
