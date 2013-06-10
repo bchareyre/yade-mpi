@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2012 by Chao Yuan & Bruno Chareyre                      *
-*  chao.yuan@3sr-grenoble.fr & bruno.chareyre@hmg.inpg.fr                *
+*  Copyright (C) 2012 by Chao Yuan <chao.yuan@3sr-grenoble.fr>           *
+*  Copyright (C) 2012 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -56,21 +56,33 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void Initialize_volumes (Solver& flow);
 		TPL void BoundaryConditions(Solver& flow);
 		TPL void initializeCellIndex(Solver& flow);
-		TPL void get_pore_radius(Solver& flow);
+		TPL void getPoreRadius(Solver& flow);
+		TPL void initWaterReservoirBound(Solver& flow);
+		TPL void updateWaterReservoir(Solver& flow);
+		TPL void waterReservoirRecursion(Cell_handle cell, Solver& flow);
+		TPL void initAirReservoirBound(Solver& flow);
+		TPL void updateAirReservoir(Solver& flow);
+		TPL void airReservoirRecursion(Cell_handle cell, Solver& flow);
 
 		TPL unsigned int imposePressure(Vector3r pos, Real p,Solver& flow);
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
 		TPL void invadeSingleCell(Cell_handle cell, double pressure, Solver& flow);
+		TPL void invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow);
 		TPL void invade (Solver& flow );
-		TPL Real get_min_EntryValue (Solver& flow );
+		TPL void invade2 (Solver& flow );
+		TPL Real getMinEntryValue (Solver& flow );
+		TPL Real getMinEntryValue2 (Solver& flow);
 		TPL Real getSaturation(Solver& flow);
 		TPL void saveListOfNodes(Solver& flow);
 		TPL void saveListOfConnections(Solver& flow);
 
 		TPL void saveLatticeNodeX(Solver& flow,double x); 
 		TPL void saveLatticeNodeY(Solver& flow,double y); 
-		TPL void saveLatticeNodeZ(Solver& flow,double z); 
+		TPL void saveLatticeNodeZ(Solver& flow,double z);
+		TPL void saveListAdjCellsTopBound(Solver& flow);
+		TPL void saveListAdjCellsBottomBound(Solver& flow);		
+
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -103,13 +115,19 @@ class UnsaturatedEngine : public PartialEngine
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
 		void 		_buildTriangulation() {setPositionsBuffer(true); Build_Triangulation(solver);}
 		void		_invade() {invade(solver);}
-		Real		_get_min_EntryValue() {return get_min_EntryValue(solver);}
+		void		_invade2() {invade2(solver);}
+		Real		_getMinEntryValue() {return getMinEntryValue(solver);}
+		Real		_getMinEntryValue2() {return getMinEntryValue2(solver);}		
 		Real 		_getSaturation () {return getSaturation(solver);}
 		void		_saveListOfNodes() {saveListOfNodes(solver);}
 		void		_saveListOfConnections() {saveListOfConnections(solver);}
  		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
  		void		_saveLatticeNodeY(double y) {saveLatticeNodeY(solver,y);}
  		void		_saveLatticeNodeZ(double z) {saveLatticeNodeZ(solver,z);}
+ 		void 		_saveListAdjCellsTopBound() {saveListAdjCellsTopBound(solver);}
+ 		void 		_saveListAdjCellsBottomBound() {saveListAdjCellsBottomBound(solver);}
+ 		void		_updateWaterReservoir() {updateWaterReservoir(solver);}
+ 		void		_updateAirReservoir() {updateAirReservoir(solver);}
 
 		virtual ~UnsaturatedEngine();
 
@@ -167,13 +185,19 @@ class UnsaturatedEngine : public PartialEngine
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
 					.def("buildTriangulation",&UnsaturatedEngine::_buildTriangulation,"Triangulate spheres of the current scene.")
 					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation")
-					.def("getMinEntryValue",&UnsaturatedEngine::_get_min_EntryValue,"get the minimum air entry pressure for the next invade step")
+					.def("getMinEntryValue",&UnsaturatedEngine::_getMinEntryValue,"get the minimum air entry pressure for the next invade step")
+					.def("getMinEntryValue2",&UnsaturatedEngine::_getMinEntryValue2,"get the minimum air entry pressure for the next invade step(version2)")
 					.def("saveListOfNodes",&UnsaturatedEngine::_saveListOfNodes,"Save the list of nodes.")
 					.def("saveListOfConnections",&UnsaturatedEngine::_saveListOfConnections,"Save the connections between cells.")
 					.def("saveLatticeNodeX",&UnsaturatedEngine::_saveLatticeNodeX,(python::arg("x")),"Save the slice of lattice nodes for x_normal(x). 0: out of sphere; 1: inside of sphere.")
 					.def("saveLatticeNodeY",&UnsaturatedEngine::_saveLatticeNodeY,(python::arg("y")),"Save the slice of lattice nodes for y_normal(y). 0: out of sphere; 1: inside of sphere.")
 					.def("saveLatticeNodeZ",&UnsaturatedEngine::_saveLatticeNodeZ,(python::arg("z")),"Save the slice of lattice nodes for z_normal(z). 0: out of sphere; 1: inside of sphere.")
+					.def("saveListAdjCellsTopBound",&UnsaturatedEngine::_saveListAdjCellsTopBound,"Save the cells IDs adjacent top boundary")
+					.def("saveListAdjCellsBottomBound",&UnsaturatedEngine::_saveListAdjCellsBottomBound,"Save the cells IDs adjacent bottom boundary")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
+					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2) ")
+					.def("updateWaterReservoir",&UnsaturatedEngine::_updateWaterReservoir,"Update the water reservoir. ")
+					.def("updateAirReservoir",&UnsaturatedEngine::_updateAirReservoir,"Update the air reservoir. ")
 					)
 		DECLARE_LOGGER;
 };

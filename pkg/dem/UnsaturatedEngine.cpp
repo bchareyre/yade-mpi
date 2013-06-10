@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2009 by Emanuele Catalano                               *
-*  emanuele.catalano@hmg.inpg.fr                                         *
+*  Copyright (C) 2012 by Chao Yuan <chao.yuan@3sr-grenoble.fr>           *
+*  Copyright (C) 2012 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -54,7 +54,7 @@ Real UnsaturatedEngine::testFunction()
 		//then create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
 		Build_Triangulation(P_zero,solver);
 		initializeCellIndex(solver);
-		get_pore_radius(solver);
+		getPoreRadius(solver);
 	}
 	
 	//Now, you can use "triangulation", with all the functions listed in CGAL documentation
@@ -67,6 +67,29 @@ Real UnsaturatedEngine::testFunction()
 // 	Cell_handle cell = triangulation.locate(Point(0.5,0.5,0.5));
 // 	cell->info().p()= gasPressure; //initialised air entry pressure	
 // 	show number_of_cells with air	
+	
+//         ofstream fileWater;
+//         fileWater.open("waterReservoir.txt");
+//         fileWater << "#List of Water Reservoir Cells IDs\n";
+// 	Finite_cells_iterator cell_end = triangulation.finite_cells_end();
+// 	for ( Finite_cells_iterator cell = triangulation.finite_cells_begin(); cell != cell_end; cell++ )
+// 	{
+// 	  if(cell->info().isWaterReservoir == true)
+// 	    fileWater << cell->info().index << endl;
+// 	}
+// 	fileWater.close();
+// 	
+//         ofstream fileAir;
+//         fileAir.open("airReservoir.txt");
+//         fileAir << "#List of Air Reservoir Cells IDs\n";
+// 	Finite_cells_iterator cell_endAir = triangulation.finite_cells_end();
+// 	for ( Finite_cells_iterator cellAir = triangulation.finite_cells_begin(); cellAir != cell_endAir; cellAir++ )
+// 	{
+// 	  if(cellAir->info().isAirReservoir == true)
+// 	    fileAir << cellAir->info().index << endl;
+// 	}
+// 	fileAir.close();	
+	
 	unsigned int m=0;
 	Finite_cells_iterator cell_end = triangulation.finite_cells_end();
 	for ( Finite_cells_iterator cell = triangulation.finite_cells_begin(); cell != cell_end; cell++ )
@@ -75,7 +98,6 @@ Real UnsaturatedEngine::testFunction()
 	    m++;
 	}
 	cout << "number_of_cells with air: "<< m <<endl;
-	
 // 	cout<<"xmin: "<<solver->x_min<<endl;
 // 	cout<<"xmax: "<<solver->x_max<<endl;
 // 	cout<<"ymin: "<<solver->y_min<<endl;
@@ -101,7 +123,6 @@ Real UnsaturatedEngine::testFunction()
 	//FIXME CHao, the coordinates of measurments must be correct with respect to the simulation sizes,needs to be adapted here
 	//cell_pressure = FS.MeasurePorePressure (6, 7, 6);
 	cout << "the pressure in cell(6,7,6) is: " << cell_pressure << endl;*/
-	
 	solver->noCache = false;
 }
 
@@ -113,7 +134,7 @@ void UnsaturatedEngine::invadeSingleCell(Cell_handle cell, double pressure, Solv
     {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
 	if (cell->neighbor(facet)->info().p() >= pressure) continue;
-        double n_cell_pe = surface_tension/cell->info().pore_radius[facet];
+        double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
         if (pressure > n_cell_pe)
         {   Cell_handle n_cell = cell->neighbor(facet);
             n_cell->info().p() = pressure;
@@ -140,7 +161,7 @@ void UnsaturatedEngine::invade (Solver& flow )
 }
 
 template<class Solver>
-Real UnsaturatedEngine::get_min_EntryValue (Solver& flow )
+Real UnsaturatedEngine::getMinEntryValue (Solver& flow )
 {
     Real nextEntry = 1e50;
     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
@@ -156,9 +177,84 @@ Real UnsaturatedEngine::get_min_EntryValue (Solver& flow )
                 if (cell->neighbor(facet)->info().p()!=0) continue;
                 if (cell->neighbor(facet)->info().p()==0)
                 {
-                    double n_cell_pe = surface_tension/cell->info().pore_radius[facet];
+                    double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
                     nextEntry = min(nextEntry,n_cell_pe);
                 }
+            }
+        }
+    }
+    if (nextEntry==1e50) {
+        cout << "please set initial air pressure for the cell !" << endl;
+    }
+    else {
+        return nextEntry;
+    }
+}
+
+//invade version2. updateAirReservoir and updateWaterReservoir before invade. And invade gradually, not Suddenly jump from 0 to .p()
+template<class Solver>
+void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow)
+{
+    updateAirReservoir(flow);
+    updateWaterReservoir(flow);
+    double surface_tension = surfaceTension ; 
+    for (int facet = 0; facet < 4; facet ++)
+    {
+        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+	if (cell->neighbor(facet)->info().p() != 0) continue;
+	if (cell->neighbor(facet)->info().isWaterReservoir == false) continue;
+        double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
+        if (pressure > n_cell_pe)
+        {   Cell_handle n_cell = cell->neighbor(facet);
+            n_cell->info().p() = pressure;
+            invadeSingleCell2(n_cell, pressure, flow);
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::invade2 (Solver& flow)
+{
+    updateAirReservoir(flow);
+    updateWaterReservoir(flow);
+    BoundaryConditions(flow);
+    flow->pressureChanged=true;
+    flow->reApplyBoundaryConditions();
+//here, we update the cells inside (.isAirReservoir=true) pressure to Pressure_BOTTOM_Boundary
+    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (cell->info().isAirReservoir == true)
+            cell->info().p() = Pressure_BOTTOM_Boundary;//FIXME:how to change cell inside pressure to boundary condition.?
+//             cerr<<"cell index: "<<cell->info().index <<" "<< "pressure: " << cell->info().p()<<endl;
+    }
+
+    Finite_cells_iterator _cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( Finite_cells_iterator _cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); _cell != _cell_end; _cell++ ) {
+        if(_cell->info().p() != 0)
+            invadeSingleCell2(_cell,_cell->info().p(),flow);
+    }
+
+}
+
+template<class Solver>
+Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
+{
+    updateAirReservoir(flow);
+    updateWaterReservoir(flow);
+    Real nextEntry = 1e50;
+    double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
+    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+    {
+        if (cell->info().p()!=0)
+        {
+            for (int facet=0; facet<4; facet ++)
+            {
+                if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+                if (cell->neighbor(facet)->info().p()!=0) continue;
+                if (cell->neighbor(facet)->info().isWaterReservoir == false) continue;
+                double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
+                nextEntry = min(nextEntry,n_cell_pe);
             }
         }
     }
@@ -373,205 +469,6 @@ double UnsaturatedEngine::computeDeltaPressure(Cellhandle cell,int j, double rca
     return deltaPressure;
 }
 
-/*//suppose fluid-air interface tangent with two spheres A,B and line AB. The results proved that's not the maximum EffPoreRadius.
-template<class Cellhandle>
-double UnsaturatedEngine::compute_EffPoreRadius(Cellhandle cell, int j)
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    if (tri.is_infinite(cell->neighbor(j))) return 0;
-
-    Vector3r posA = makeVector3r2(cell->vertex(facetVertices[j][0])->point().point());
-    Vector3r posB = makeVector3r2(cell->vertex(facetVertices[j][1])->point().point());
-    Vector3r posC = makeVector3r2(cell->vertex(facetVertices[j][2])->point().point());
-
-    double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
-    double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
-    double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
-
-    double AB = (posA-posB).norm();
-    double AC = (posA-posC).norm();
-    double BC = (posB-posC).norm();
-
-    double A = acos(((posB-posA).dot(posC-posA))/((posB-posA).norm()*(posC-posA).norm()));
-    double B = acos(((posA-posB).dot(posC-posB))/((posA-posB).norm()*(posC-posB).norm()));
-    double C = acos(((posA-posC).dot(posB-posC))/((posA-posC).norm()*(posB-posC).norm()));
-    double r12=0; double r13=0; double r23=0;
-    
-    //for particle A,B;circle r12 is tangent with A,B and line AB;
-    double a1 = 4*pow((rA-rB),2);
-    double b1 = 4*pow((rA-rB),2)*(rA+rB)-4*pow(AB,2)*(rA-rB)-8*pow(AB,2)*rB;
-    double c1 = pow((pow(rA,2)-pow(rB,2)),2)-2*pow(AB,2)*(pow(rA,2)-pow(rB,2))+pow(AB,4)-4*pow(AB,2)*pow(rB,2);
-    
-    if ((pow(b1,2)-4*a1*c1)<0) {
-        cout << "NEGATIVE DETERMINANT" << endl;
-    }
-    if (rA==rB) {
-        r12 = (0.25*pow(AB,2)-pow(rA,2))/(2*rA);
-    }
-    else {
-        r12 = (-b1-sqrt(pow(b1,2)-4*a1*c1))/(2*a1);
-    }
-    if (r12<0) {
-//         cout << "r12 = " << r12 << endl;
-        r12 = (-b1+sqrt(pow(b1,2)-4*a1*c1))/(2*a1);
-//         cout << endl << "r12 = " << r12 << endl;
-    }
-    if (rA+rB>=AB) {
-//         cout << "r12 = " << r12 << endl;  
-	r12 = 0;
-//         cout << endl << "r12 = " << r12 << endl;
-    }
-
-    double beta12 = acos(r12/(r12+rA));
-    double beta21 = acos(r12/(r12+rB));
-    double Area_LiquidBridge12 = 0.5*AB*r12 - 0.5*pow(rA,2)*(0.5*Mathr::PI-beta12) - 0.5*pow(rB,2)*(0.5*Mathr::PI-beta21) - 0.5*pow(r12,2)*(beta12+beta21);
-    double Length_LiquidBridge12 = (beta12+beta21)*r12;
-
-    //for particle A,C;circle r13 is tangent with A,C and line AC;
-    double a2 = 4*pow((rA-rC),2);
-    double b2 = 4*pow((rA-rC),2)*(rA+rC)-4*pow(AC,2)*(rA-rC)-8*pow(AC,2)*rC;
-    double c2 = pow((pow(rA,2)-pow(rC,2)),2)-2*pow(AC,2)*(pow(rA,2)-pow(rC,2))+pow(AC,4)-4*pow(AC,2)*pow(rC,2);
-
-    if ((pow(b2,2)-4*a2*c2)<0) {
-        cout << "NEGATIVE DETERMINANT" << endl;
-    }
-    if (rA==rC) {
-        r13 = (0.25*pow(AC,2)-pow(rA,2))/(2*rA);
-    }
-    else {
-        r13 = (-b2-sqrt(pow(b2,2)-4*a2*c2))/(2*a2);
-    }
-    if (r13<0) {
-//         cout << "r13 = " << r13 << endl;
-        r13 = (-b2+sqrt(pow(b2,2)-4*a2*c2))/(2*a2);
-//         cout << endl << "r13 = " << r13 << endl;
-    }
-    if (rA+rC>=AC) {
-//         cout << "r13 = " << r13 << endl;  
-	r13 = 0;
-// 	cout << endl << "r13 = " << r13 << endl;
-    }
-
-    double beta13 = acos(r13/(r13+rA));
-    double beta31 = acos(r13/(r13+rC));
-    double Area_LiquidBridge13 = 0.5*AC*r13 - 0.5*pow(rA,2)*(0.5*Mathr::PI-beta13) - 0.5*pow(rC,2)*(0.5*Mathr::PI-beta31) - 0.5*pow(r13,2)*(beta13+beta31);
-    double Length_LiquidBridge13 = (beta13+beta31)*r13;
-
-    //for particle B,C;circle r23 is tangent with B,C and line BC;
-    double a3 = 4*pow((rB-rC),2);
-    double b3 = 4*pow((rB-rC),2)*(rB+rC)-4*pow(BC,2)*(rB-rC)-8*pow(BC,2)*rC;
-    double c3 = pow((pow(rB,2)-pow(rC,2)),2)-2*pow(BC,2)*(pow(rB,2)-pow(rC,2))+pow(BC,4)-4*pow(BC,2)*pow(rC,2);
-
-    if ((pow(b3,2)-4*a3*c3)<0) {
-        cout << "NEGATIVE DETERMINANT" << endl;
-    }
-    if (rB==rC) {
-        r23 = (0.25*pow(BC,2)-pow(rB,2))/(2*rB);
-    }
-    else {
-        r23 = (-b3-sqrt(pow(b3,2)-4*a3*c3))/(2*a3);
-    }
-    if (r23<0) {
-//         cout << "r23 = " << r23 << endl;
-        r23 = (-b3+sqrt(pow(b3,2)-4*a3*c3))/(2*a3);
-//         cout << endl << "r23 = " << r23 << endl;
-    }
-    if (rB+rC>=BC) {
-//         cout << "r23 = " << r23 << endl;  
-	r23 = 0;
-// 	cout << endl << "r23 = " << r23 << endl;
-    }
-
-    double beta23 = acos(r23/(r23+rB));
-    double beta32 = acos(r23/(r23+rC));
-    double Area_LiquidBridge23 = 0.5*BC*r23 - 0.5*pow(rB,2)*(0.5*Mathr::PI-beta23) - 0.5*pow(rC,2)*(0.5*Mathr::PI-beta32) - 0.5*pow(r23,2)*(beta23+beta32);
-    double Length_LiquidBridge23 = (beta23+beta32)*r23;
-
-    //effective radius for pore throat: radius = Area/Perimeter
-    double Area_SolidA = 0.5*A*pow(rA,2);
-    double Area_SolidB = 0.5*B*pow(rB,2);
-    double Area_SolidC = 0.5*C*pow(rC,2);
-    double Area_Pore = 0.5 * ((posB-posA).cross(posC-posA)).norm() - Area_SolidA - Area_SolidB-Area_SolidC-Area_LiquidBridge12-Area_LiquidBridge13-Area_LiquidBridge23;
-    double Perimeter_Pore = (A-(0.5*Mathr::PI-beta12)-(0.5*Mathr::PI-beta13))*rA + (B-(0.5*Mathr::PI-beta21)-(0.5*Mathr::PI-beta23))*rB + (C-(0.5*Mathr::PI-beta31)-(0.5*Mathr::PI-beta32))*rC + Length_LiquidBridge12 + Length_LiquidBridge13 + Length_LiquidBridge23;
-    
-    double Effective_PoreRadius = Area_Pore/Perimeter_Pore; 
-    //Note:here Effective_PoreRadius is different from eff_radius = 2*Area/Perimeter; eff_radius is for calculating 2D plan effective radius. Here EntryValue*Area_Pore = tension*Perimeter_Pore, EntryValue = tension/Effective_PoreRadius = tension/(Area_Pore/Perimeter_Pore);
-    
-//     cout << "AB: " << AB <<endl; cout<< "AC: " << AC <<endl; cout << "BC: " << BC << endl;
-//     cout << "rA: " << rA <<endl; cout<< "rB: " << rB <<endl; cout << "rC: " << rC << endl; 
-//     cout << "r12: " << r12 <<endl; cout << "r13:" << r13 <<endl; cout <<"r23: "<<r23<<endl;
-//     cout << "0.5 * ((posB-posA).cross(posC-posA)).norm():  " << 0.5 * ((posB-posA).cross(posC-posA)).norm() <<endl;
-//     cout << "Area_SolidA: " << Area_SolidA << endl;
-//     cout << "Area_SolidB: " << Area_SolidB << endl;
-//     cout << "Area_SolidC: " << Area_SolidC << endl;
-//     cout << "Area_LiquidBridge12: " << Area_LiquidBridge12 << endl;
-//     cout << "Area_LiquidBridge13: " << Area_LiquidBridge13 << endl;
-//     cout << "Area_LiquidBridge23: " << Area_LiquidBridge23 << endl;
-//     cout << "Area_Pore: " << Area_Pore <<endl;
-//     cout << "Perimeter_Pore: " << Perimeter_Pore <<endl;  
-//       if (Area_Pore<0) {cout << "0" << endl;}
-//       if (Perimeter_Pore<0) {cout << "1" << endl;}
-      if (Effective_PoreRadius<0) {Effective_PoreRadius=1.0e-5; return Effective_PoreRadius;} 
-      //if Effective_PoreRadius<0, it means three particle are close to each other no pore generated.
-      else return Effective_PoreRadius;
-}
-*/
-/*//suppose there is not liquid bridge between two spheres A,B. But that's also what we want.
-template<class Cellhandle>//waste
-double UnsaturatedEngine::compute_EffPoreRadius(Cellhandle cell, int j)
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    if (tri.is_infinite(cell->neighbor(j))) return 0;
-
-    Vector3r posA = makeVector3r2(cell->vertex(facetVertices[j][0])->point().point());
-    Vector3r posB = makeVector3r2(cell->vertex(facetVertices[j][1])->point().point());
-    Vector3r posC = makeVector3r2(cell->vertex(facetVertices[j][2])->point().point());
-
-    double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
-    double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
-    double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
-
-    double AB = (posA-posB).norm();
-    double AC = (posA-posC).norm();
-    double BC = (posB-posC).norm();
-
-    double A = acos(((posB-posA).dot(posC-posA))/((posB-posA).norm()*(posC-posA).norm()));
-    double B = acos(((posA-posB).dot(posC-posB))/((posA-posB).norm()*(posC-posB).norm()));
-    double C = acos(((posA-posC).dot(posB-posC))/((posA-posC).norm()*(posB-posC).norm()));
-    
-    double gapAB=0; double gapAC=0; double gapBC=0;
-    //for particle A,B;
-    if (rA+rB>=AB) {gapAB = 0;}
-    else {gapAB = AB - rA -rB;}
-    //for particle A,C;
-    if (rA+rC>=AC) {gapAC = 0;}
-    else {gapAC = AC - rA -rC;}
-    //for particle B,C;
-    if (rB+rC>=BC) {gapBC = 0;}
-    else {gapBC = BC - rB -rC;}
-    
-    //effective radius for pore throat: radius = Area/Perimeter
-    double Area_SolidA = 0.5*A*pow(rA,2);
-    double Area_SolidB = 0.5*B*pow(rB,2);
-    double Area_SolidC = 0.5*C*pow(rC,2);
-    double Area_Pore = 0.5 * ((posB-posA).cross(posC-posA)).norm() - Area_SolidA - Area_SolidB - Area_SolidC;
-    double Perimeter_Pore = A*rA + B*rB + C*rC + gapAB + gapAC + gapBC;
-    double Effective_PoreRadius = Area_Pore/Perimeter_Pore; 
-    //Note:here Effective_PoreRadius is different from eff_radius = 2*Area/Perimeter; eff_radius is for calculating 2D plan effective radius. Here EntryValue*Area_Pore = tension*Perimeter_Pore, EntryValue = tension/Effective_PoreRadius = tension/(Area_Pore/Perimeter_Pore);
-    
-//     cout << "0.5 * ((posB-posA).cross(posC-posA)).norm():  " << 0.5 * ((posB-posA).cross(posC-posA)).norm() <<endl;    
-//     cout << "Area_SolidA: " << Area_SolidA << endl;
-//     cout << "Area_SolidB: " << Area_SolidB << endl;
-//     cout << "Area_SolidC: " << Area_SolidC << endl;
-//     cout << "Area_Pore: " << Area_Pore <<endl;    
-//     cout << "Perimeter_Pore: " << Perimeter_Pore <<endl;
-//       if (Area_Pore<0) {cout << "0" << endl;}
-//       if (Perimeter_Pore<0) {cout << "1" << endl;}    
-    if (Effective_PoreRadius<0) {Effective_PoreRadius=1.0e-5; return Effective_PoreRadius;}
-      //if Effective_PoreRadius<0, it means three particle are close to each other no pore generated.    
-    else return Effective_PoreRadius;
-}
-*/
 void UnsaturatedEngine::action()
 {
 	//This will be used later
@@ -814,7 +711,7 @@ void UnsaturatedEngine::initializeCellIndex(Solver& flow)
     }
 }
 template<class Solver>
-void UnsaturatedEngine::get_pore_radius(Solver& flow)
+void UnsaturatedEngine::getPoreRadius(Solver& flow)
 {
     RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -823,8 +720,8 @@ void UnsaturatedEngine::get_pore_radius(Solver& flow)
         for (int j=0; j<4; j++) {
             neighbour_cell = cell->neighbor(j);
             if (!Tri.is_infinite(neighbour_cell)) {
-                    cell->info().pore_radius[j]=compute_EffPoreRadius(cell, j);
-                    neighbour_cell->info().pore_radius[Tri.mirror_index(cell, j)]= cell->info().pore_radius[j];
+                    cell->info().poreRadius[j]=compute_EffPoreRadius(cell, j);
+                    neighbour_cell->info().poreRadius[Tri.mirror_index(cell, j)]= cell->info().poreRadius[j];
             }
         }
      }
@@ -963,7 +860,8 @@ void UnsaturatedEngine::saveListOfNodes(Solver& flow)
 {
     ofstream file;
     file.open("ListOfNodes.txt");
-    file << "#List Of Nodes \n";
+    file << "#List Of Nodes. For one cell,there are four neighbour cells \n";
+    file << "Cell_ID" << " " << "NeighborCell_ID" << endl;
     Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
     {
@@ -984,10 +882,10 @@ void UnsaturatedEngine::saveListOfConnections(Solver& flow)
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
     {
 	if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
-	file << cell->info().index << " " <<cell->neighbor(0)->info().index << " " << surface_tension/cell->info().pore_radius[0] << " " << cell->info().pore_radius[0] << endl;
-        file << cell->info().index << " " <<cell->neighbor(1)->info().index << " " << surface_tension/cell->info().pore_radius[1] << " " << cell->info().pore_radius[1] << endl;
-        file << cell->info().index << " " <<cell->neighbor(2)->info().index << " " << surface_tension/cell->info().pore_radius[2] << " " << cell->info().pore_radius[2] << endl;
-        file << cell->info().index << " " <<cell->neighbor(3)->info().index << " " << surface_tension/cell->info().pore_radius[3] << " " << cell->info().pore_radius[3] << endl;
+	file << cell->info().index << " " <<cell->neighbor(0)->info().index << " " << surface_tension/cell->info().poreRadius[0] << " " << cell->info().poreRadius[0] << endl;
+        file << cell->info().index << " " <<cell->neighbor(1)->info().index << " " << surface_tension/cell->info().poreRadius[1] << " " << cell->info().poreRadius[1] << endl;
+        file << cell->info().index << " " <<cell->neighbor(2)->info().index << " " << surface_tension/cell->info().poreRadius[2] << " " << cell->info().poreRadius[2] << endl;
+        file << cell->info().index << " " <<cell->neighbor(3)->info().index << " " << surface_tension/cell->info().poreRadius[3] << " " << cell->info().poreRadius[3] << endl;
     }
     file.close();
 }
@@ -1113,6 +1011,151 @@ void UnsaturatedEngine::saveLatticeNodeZ(Solver& flow, double z)
 }
 
 template<class Solver>
+void UnsaturatedEngine::saveListAdjCellsTopBound(Solver& flow)
+{
+//Here,boundsIds according to the enumeration of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
+//For drainage and imbibition situations, we only care about top(3) and bottom(2) boundaries.(0-xmin,1-xmax,2-ymin,3-ymax,4-zmin,5-zmax)
+//And in python script, don't forget set: Flow_imposed_TOP_Boundary=False,Flow_imposed_BOTTOM_Boundary=False,
+    if(flow->boundingCells[3].size()==0) {
+        cerr << "please set Flow_imposed_TOP_Boundary=False" << endl;
+    }
+    else {
+        vector<Cell_handle>::iterator it = flow->boundingCells[3].begin();
+        ofstream file;
+        file.open("ListAdjacentCellsTopBoundary.txt");
+        file << "#List of Cells IDs adjacent top boundary \n";
+        for ( it ; it != flow->boundingCells[3].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+// 	  cerr << (*it)->info().index << " ";
+            file << (*it)->info().index << endl;
+        }
+        file.close();
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::saveListAdjCellsBottomBound(Solver& flow)
+{
+    if(flow->boundingCells[2].size()==0) {
+        cerr << "please set Flow_imposed_BOTTOM_Boundary=False"<< endl;
+    }
+    else {
+        vector<Cell_handle>::iterator it = flow->boundingCells[2].begin();
+        ofstream file;
+        file.open("ListAdjacentCellsBottomBoundary.txt");
+        file << "#List of Cells IDs adjacent bottom boundary \n";
+        for ( it ; it != flow->boundingCells[2].end(); it++) {
+            if ((*it)->info().index == 0) continue;	  
+            file << (*it)->info().index << endl;
+        }
+        file.close();
+    }
+}
+
+
+//initialize the boundingCells info().isWaterReservoir=true,  on condition that those cells meet (flow->boundingCells[bound].size()!=0 && cell->info().p()==0) 
+template<class Solver>
+void UnsaturatedEngine::initWaterReservoirBound(Solver& flow)
+{
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        cell->info().isWaterReservoir = false;
+    }
+    for (int bound=0; bound<6; bound++) {
+        if (flow->boundingCells[bound].size()==0) continue;
+        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
+        for ( it ; it != flow->boundingCells[bound].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+            if((*it)->info().p()!=0) continue;//FIXME: the default pressure for water is 0
+            (*it)->info().isWaterReservoir = true;
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::updateWaterReservoir(Solver& flow)
+{
+    initWaterReservoirBound(flow);
+    for (int bound=0; bound<6; bound++) {
+        if (flow->boundingCells[bound].size()==0) continue;
+        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
+        for ( it ; it != flow->boundingCells[bound].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+            if((*it)->info().isWaterReservoir == false) continue;
+            waterReservoirRecursion((*it),flow);
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::waterReservoirRecursion(Cell_handle cell, Solver& flow)
+{
+    if(cell->info().isWaterReservoir == true) {
+        for (int facet = 0; facet < 4; facet ++)
+        {
+            if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+            if (cell->neighbor(facet)->info().p()!=0) continue;
+            if (cell->neighbor(facet)->info().isWaterReservoir==true) continue;
+            Cell_handle n_cell = cell->neighbor(facet);
+            n_cell->info().isWaterReservoir = true;
+            waterReservoirRecursion(n_cell,flow);
+        }
+    }
+}
+
+//initialize the boundingCells info().isAirReservoir=true, on condition that those cells meet (flow->boundingCells[bound].size()!=0 && cell->info().p()!=0) 
+template<class Solver>
+void UnsaturatedEngine::initAirReservoirBound(Solver& flow)
+{
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        cell->info().isAirReservoir = false;
+    }
+    for (int bound=0; bound<6; bound++) {
+        if (flow->boundingCells[bound].size()==0) continue;
+        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
+        for ( it ; it != flow->boundingCells[bound].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+            if((*it)->info().p() == 0) continue;//FIXME: the default pressure for water is 0
+            (*it)->info().isAirReservoir = true;
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::updateAirReservoir(Solver& flow)
+{
+    initAirReservoirBound(flow);
+    for (int bound=0; bound<6; bound++) {
+        if (flow->boundingCells[bound].size()==0) continue;
+        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
+        for ( it ; it != flow->boundingCells[bound].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+            if((*it)->info().isAirReservoir == false) continue;
+            airReservoirRecursion((*it),flow);
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::airReservoirRecursion(Cell_handle cell, Solver& flow)
+{
+    if(cell->info().isAirReservoir == true) {
+        for (int facet = 0; facet < 4; facet ++)
+        {
+            if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+            if (cell->neighbor(facet)->info().p() == 0) continue;
+            if (cell->neighbor(facet)->info().isAirReservoir == true) continue;
+            Cell_handle n_cell = cell->neighbor(facet);
+            n_cell->info().isAirReservoir = true;
+            airReservoirRecursion(n_cell,flow);
+        }
+    }
+}
+
+template<class Solver>
 void UnsaturatedEngine::setImposedPressure ( unsigned int cond, Real p,Solver& flow )
 {
         if ( cond>=flow->imposedP.size() ) LOG_ERROR ( "Setting p with cond higher than imposedP size." );
@@ -1131,3 +1174,202 @@ YADE_PLUGIN ( ( UnsaturatedEngine ) );
 #endif /* YADE_CGAL */
 
 
+/*//suppose fluid-air interface tangent with two spheres A,B and line AB. The results proved that's not the maximum EffPoreRadius.
+template<class Cellhandle>
+double UnsaturatedEngine::compute_EffPoreRadius(Cellhandle cell, int j)
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if (tri.is_infinite(cell->neighbor(j))) return 0;
+
+    Vector3r posA = makeVector3r2(cell->vertex(facetVertices[j][0])->point().point());
+    Vector3r posB = makeVector3r2(cell->vertex(facetVertices[j][1])->point().point());
+    Vector3r posC = makeVector3r2(cell->vertex(facetVertices[j][2])->point().point());
+
+    double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
+    double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
+    double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
+
+    double AB = (posA-posB).norm();
+    double AC = (posA-posC).norm();
+    double BC = (posB-posC).norm();
+
+    double A = acos(((posB-posA).dot(posC-posA))/((posB-posA).norm()*(posC-posA).norm()));
+    double B = acos(((posA-posB).dot(posC-posB))/((posA-posB).norm()*(posC-posB).norm()));
+    double C = acos(((posA-posC).dot(posB-posC))/((posA-posC).norm()*(posB-posC).norm()));
+    double r12=0; double r13=0; double r23=0;
+    
+    //for particle A,B;circle r12 is tangent with A,B and line AB;
+    double a1 = 4*pow((rA-rB),2);
+    double b1 = 4*pow((rA-rB),2)*(rA+rB)-4*pow(AB,2)*(rA-rB)-8*pow(AB,2)*rB;
+    double c1 = pow((pow(rA,2)-pow(rB,2)),2)-2*pow(AB,2)*(pow(rA,2)-pow(rB,2))+pow(AB,4)-4*pow(AB,2)*pow(rB,2);
+    
+    if ((pow(b1,2)-4*a1*c1)<0) {
+        cout << "NEGATIVE DETERMINANT" << endl;
+    }
+    if (rA==rB) {
+        r12 = (0.25*pow(AB,2)-pow(rA,2))/(2*rA);
+    }
+    else {
+        r12 = (-b1-sqrt(pow(b1,2)-4*a1*c1))/(2*a1);
+    }
+    if (r12<0) {
+//         cout << "r12 = " << r12 << endl;
+        r12 = (-b1+sqrt(pow(b1,2)-4*a1*c1))/(2*a1);
+//         cout << endl << "r12 = " << r12 << endl;
+    }
+    if (rA+rB>=AB) {
+//         cout << "r12 = " << r12 << endl;  
+	r12 = 0;
+//         cout << endl << "r12 = " << r12 << endl;
+    }
+
+    double beta12 = acos(r12/(r12+rA));
+    double beta21 = acos(r12/(r12+rB));
+    double Area_LiquidBridge12 = 0.5*AB*r12 - 0.5*pow(rA,2)*(0.5*Mathr::PI-beta12) - 0.5*pow(rB,2)*(0.5*Mathr::PI-beta21) - 0.5*pow(r12,2)*(beta12+beta21);
+    double Length_LiquidBridge12 = (beta12+beta21)*r12;
+
+    //for particle A,C;circle r13 is tangent with A,C and line AC;
+    double a2 = 4*pow((rA-rC),2);
+    double b2 = 4*pow((rA-rC),2)*(rA+rC)-4*pow(AC,2)*(rA-rC)-8*pow(AC,2)*rC;
+    double c2 = pow((pow(rA,2)-pow(rC,2)),2)-2*pow(AC,2)*(pow(rA,2)-pow(rC,2))+pow(AC,4)-4*pow(AC,2)*pow(rC,2);
+
+    if ((pow(b2,2)-4*a2*c2)<0) {
+        cout << "NEGATIVE DETERMINANT" << endl;
+    }
+    if (rA==rC) {
+        r13 = (0.25*pow(AC,2)-pow(rA,2))/(2*rA);
+    }
+    else {
+        r13 = (-b2-sqrt(pow(b2,2)-4*a2*c2))/(2*a2);
+    }
+    if (r13<0) {
+//         cout << "r13 = " << r13 << endl;
+        r13 = (-b2+sqrt(pow(b2,2)-4*a2*c2))/(2*a2);
+//         cout << endl << "r13 = " << r13 << endl;
+    }
+    if (rA+rC>=AC) {
+//         cout << "r13 = " << r13 << endl;  
+	r13 = 0;
+// 	cout << endl << "r13 = " << r13 << endl;
+    }
+
+    double beta13 = acos(r13/(r13+rA));
+    double beta31 = acos(r13/(r13+rC));
+    double Area_LiquidBridge13 = 0.5*AC*r13 - 0.5*pow(rA,2)*(0.5*Mathr::PI-beta13) - 0.5*pow(rC,2)*(0.5*Mathr::PI-beta31) - 0.5*pow(r13,2)*(beta13+beta31);
+    double Length_LiquidBridge13 = (beta13+beta31)*r13;
+
+    //for particle B,C;circle r23 is tangent with B,C and line BC;
+    double a3 = 4*pow((rB-rC),2);
+    double b3 = 4*pow((rB-rC),2)*(rB+rC)-4*pow(BC,2)*(rB-rC)-8*pow(BC,2)*rC;
+    double c3 = pow((pow(rB,2)-pow(rC,2)),2)-2*pow(BC,2)*(pow(rB,2)-pow(rC,2))+pow(BC,4)-4*pow(BC,2)*pow(rC,2);
+
+    if ((pow(b3,2)-4*a3*c3)<0) {
+        cout << "NEGATIVE DETERMINANT" << endl;
+    }
+    if (rB==rC) {
+        r23 = (0.25*pow(BC,2)-pow(rB,2))/(2*rB);
+    }
+    else {
+        r23 = (-b3-sqrt(pow(b3,2)-4*a3*c3))/(2*a3);
+    }
+    if (r23<0) {
+//         cout << "r23 = " << r23 << endl;
+        r23 = (-b3+sqrt(pow(b3,2)-4*a3*c3))/(2*a3);
+//         cout << endl << "r23 = " << r23 << endl;
+    }
+    if (rB+rC>=BC) {
+//         cout << "r23 = " << r23 << endl;  
+	r23 = 0;
+// 	cout << endl << "r23 = " << r23 << endl;
+    }
+
+    double beta23 = acos(r23/(r23+rB));
+    double beta32 = acos(r23/(r23+rC));
+    double Area_LiquidBridge23 = 0.5*BC*r23 - 0.5*pow(rB,2)*(0.5*Mathr::PI-beta23) - 0.5*pow(rC,2)*(0.5*Mathr::PI-beta32) - 0.5*pow(r23,2)*(beta23+beta32);
+    double Length_LiquidBridge23 = (beta23+beta32)*r23;
+
+    //effective radius for pore throat: radius = Area/Perimeter
+    double Area_SolidA = 0.5*A*pow(rA,2);
+    double Area_SolidB = 0.5*B*pow(rB,2);
+    double Area_SolidC = 0.5*C*pow(rC,2);
+    double Area_Pore = 0.5 * ((posB-posA).cross(posC-posA)).norm() - Area_SolidA - Area_SolidB-Area_SolidC-Area_LiquidBridge12-Area_LiquidBridge13-Area_LiquidBridge23;
+    double Perimeter_Pore = (A-(0.5*Mathr::PI-beta12)-(0.5*Mathr::PI-beta13))*rA + (B-(0.5*Mathr::PI-beta21)-(0.5*Mathr::PI-beta23))*rB + (C-(0.5*Mathr::PI-beta31)-(0.5*Mathr::PI-beta32))*rC + Length_LiquidBridge12 + Length_LiquidBridge13 + Length_LiquidBridge23;
+    
+    double Effective_PoreRadius = Area_Pore/Perimeter_Pore; 
+    //Note:here Effective_PoreRadius is different from eff_radius = 2*Area/Perimeter; eff_radius is for calculating 2D plan effective radius. Here EntryValue*Area_Pore = tension*Perimeter_Pore, EntryValue = tension/Effective_PoreRadius = tension/(Area_Pore/Perimeter_Pore);
+    
+//     cout << "AB: " << AB <<endl; cout<< "AC: " << AC <<endl; cout << "BC: " << BC << endl;
+//     cout << "rA: " << rA <<endl; cout<< "rB: " << rB <<endl; cout << "rC: " << rC << endl; 
+//     cout << "r12: " << r12 <<endl; cout << "r13:" << r13 <<endl; cout <<"r23: "<<r23<<endl;
+//     cout << "0.5 * ((posB-posA).cross(posC-posA)).norm():  " << 0.5 * ((posB-posA).cross(posC-posA)).norm() <<endl;
+//     cout << "Area_SolidA: " << Area_SolidA << endl;
+//     cout << "Area_SolidB: " << Area_SolidB << endl;
+//     cout << "Area_SolidC: " << Area_SolidC << endl;
+//     cout << "Area_LiquidBridge12: " << Area_LiquidBridge12 << endl;
+//     cout << "Area_LiquidBridge13: " << Area_LiquidBridge13 << endl;
+//     cout << "Area_LiquidBridge23: " << Area_LiquidBridge23 << endl;
+//     cout << "Area_Pore: " << Area_Pore <<endl;
+//     cout << "Perimeter_Pore: " << Perimeter_Pore <<endl;  
+//       if (Area_Pore<0) {cout << "0" << endl;}
+//       if (Perimeter_Pore<0) {cout << "1" << endl;}
+      if (Effective_PoreRadius<0) {Effective_PoreRadius=1.0e-5; return Effective_PoreRadius;} 
+      //if Effective_PoreRadius<0, it means three particle are close to each other no pore generated.
+      else return Effective_PoreRadius;
+}
+*/
+/*//suppose there is not liquid bridge between two spheres A,B. But that's also what we want.
+template<class Cellhandle>//waste
+double UnsaturatedEngine::compute_EffPoreRadius(Cellhandle cell, int j)
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if (tri.is_infinite(cell->neighbor(j))) return 0;
+
+    Vector3r posA = makeVector3r2(cell->vertex(facetVertices[j][0])->point().point());
+    Vector3r posB = makeVector3r2(cell->vertex(facetVertices[j][1])->point().point());
+    Vector3r posC = makeVector3r2(cell->vertex(facetVertices[j][2])->point().point());
+
+    double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
+    double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
+    double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
+
+    double AB = (posA-posB).norm();
+    double AC = (posA-posC).norm();
+    double BC = (posB-posC).norm();
+
+    double A = acos(((posB-posA).dot(posC-posA))/((posB-posA).norm()*(posC-posA).norm()));
+    double B = acos(((posA-posB).dot(posC-posB))/((posA-posB).norm()*(posC-posB).norm()));
+    double C = acos(((posA-posC).dot(posB-posC))/((posA-posC).norm()*(posB-posC).norm()));
+    
+    double gapAB=0; double gapAC=0; double gapBC=0;
+    //for particle A,B;
+    if (rA+rB>=AB) {gapAB = 0;}
+    else {gapAB = AB - rA -rB;}
+    //for particle A,C;
+    if (rA+rC>=AC) {gapAC = 0;}
+    else {gapAC = AC - rA -rC;}
+    //for particle B,C;
+    if (rB+rC>=BC) {gapBC = 0;}
+    else {gapBC = BC - rB -rC;}
+    
+    //effective radius for pore throat: radius = Area/Perimeter
+    double Area_SolidA = 0.5*A*pow(rA,2);
+    double Area_SolidB = 0.5*B*pow(rB,2);
+    double Area_SolidC = 0.5*C*pow(rC,2);
+    double Area_Pore = 0.5 * ((posB-posA).cross(posC-posA)).norm() - Area_SolidA - Area_SolidB - Area_SolidC;
+    double Perimeter_Pore = A*rA + B*rB + C*rC + gapAB + gapAC + gapBC;
+    double Effective_PoreRadius = Area_Pore/Perimeter_Pore; 
+    //Note:here Effective_PoreRadius is different from eff_radius = 2*Area/Perimeter; eff_radius is for calculating 2D plan effective radius. Here EntryValue*Area_Pore = tension*Perimeter_Pore, EntryValue = tension/Effective_PoreRadius = tension/(Area_Pore/Perimeter_Pore);
+    
+//     cout << "0.5 * ((posB-posA).cross(posC-posA)).norm():  " << 0.5 * ((posB-posA).cross(posC-posA)).norm() <<endl;    
+//     cout << "Area_SolidA: " << Area_SolidA << endl;
+//     cout << "Area_SolidB: " << Area_SolidB << endl;
+//     cout << "Area_SolidC: " << Area_SolidC << endl;
+//     cout << "Area_Pore: " << Area_Pore <<endl;    
+//     cout << "Perimeter_Pore: " << Perimeter_Pore <<endl;
+//       if (Area_Pore<0) {cout << "0" << endl;}
+//       if (Perimeter_Pore<0) {cout << "1" << endl;}    
+    if (Effective_PoreRadius<0) {Effective_PoreRadius=1.0e-5; return Effective_PoreRadius;}
+      //if Effective_PoreRadius<0, it means three particle are close to each other no pore generated.    
+    else return Effective_PoreRadius;
+}
+*/
