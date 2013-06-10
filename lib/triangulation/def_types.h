@@ -88,6 +88,8 @@ class FlowCellInfo : public SimpleCellInfo {
 	unsigned int index;
 	int volumeSign;
 	bool Pcondition;
+	bool isWaterReservoir;
+	bool isAirReservoir;
 	Real invVoidV;
 	Real t;
 	int fict;
@@ -107,14 +109,14 @@ class FlowCellInfo : public SimpleCellInfo {
 	std::vector<double> RayHydr;
 // 	std::vector<double> flow_rate;
 	std::vector<double> module_permeability;
-	std::vector<double> pore_radius;
+	std::vector<double> poreRadius;
 	// Partial surfaces of spheres in the double-tetrahedron linking two voronoi centers. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
 	double solidSurfaces [4][4];
 
 	FlowCellInfo (void)
 	{
 		module_permeability.resize(4, 0);
-		pore_radius.resize(4, 0);
+		poreRadius.resize(4, 0);
 		cell_force.resize(4);
 		facetSurfaces.resize(4);
 		facetFluidSurfacesRatio.resize(4);
@@ -124,7 +126,7 @@ class FlowCellInfo : public SimpleCellInfo {
 		RayHydr.resize(4, 0);
 // 		isInside = false;
 		inv_sum_k=0;
-		isFictious=false; Pcondition = false; isGhost = false;
+		isFictious=false; Pcondition = false; isGhost = false; isWaterReservoir = false; isAirReservoir = false;
 // 		isInferior = false; isSuperior = false; isLateral = false; isExternal=false;
 		isvisited = false;
 		index=0;
