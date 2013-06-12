@@ -307,8 +307,25 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real f_star = cos(phys.theta)/(1 + 2.1*sPl + 10.0 * pow(sPl, 2.0));                 // [Willett2000], equation (12)
         fC = f_star * (2*M_PI*R*Gamma);                                                     // [Willett2000], equation (13), against F
         
+      } else if (phys.CapillarType  == "Rabinovich") {
+        /* Capillar model from Rabinovich [Rabinov2005]
+         */
+         
+        Real R = phys.R;
+        Real Gamma = phys.gamma;
+        Real H = -geom.penetrationDepth;
+        Real V = phys.Vb;
+        
+        Real alpha = sqrt(H/R*(-1+ sqrt(1 + 2.0*V/(M_PI*R*H*H))));                          // [Rabinov2005], equation (A3)
+        
+        Real dsp = H/2.0*(-1.0 + sqrt(1.0 + 2.0*V/(M_PI*R*H*H)));                           // [Rabinov2005], equation (20)
+        
+        fC = -(2*M_PI*R*Gamma*cos(phys.theta))/(1+(H/(2*dsp))) - 
+              2*M_PI*R*Gamma*sin(alpha)*sin(phys.theta + alpha);                            // [Rabinov2005], equation (19)
+        fC *=-1;
+        
       } else {
-        throw runtime_error("CapillarType is unknown, please, use only Willett_numeric, Willett_analytic or Weigert");
+        throw runtime_error("CapillarType is unknown, please, use only Willett_numeric, Willett_analytic, Weigert or Rabinovich");
       }
   return fC;
 }
