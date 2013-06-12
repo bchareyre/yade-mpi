@@ -49,7 +49,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	} 
 	
   if ((mR1>0) or (mR2>0)) {
-		phys->mR = 1/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );
+		phys->mR = 2.0/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );
 	} else {
 		phys->mR = 0;
 	}
