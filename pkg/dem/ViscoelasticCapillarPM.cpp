@@ -115,12 +115,20 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real H = -geom.penetrationDepth;
         Real V = phys.Vb;
         
-        Real alpha = sqrt(H/R*(-1+ sqrt(1 + 2.0*V/(M_PI*R*H*H))));                          // [Rabinov2005], equation (A3)
+        Real alpha = 0.0;
+        Real dsp = 0.0;
+        if (H!=0.0) {
+          alpha = sqrt(H/R*(-1+ sqrt(1 + 2.0*V/(M_PI*R*H*H))));                          // [Rabinov2005], equation (A3)
         
-        Real dsp = H/2.0*(-1.0 + sqrt(1.0 + 2.0*V/(M_PI*R*H*H)));                           // [Rabinov2005], equation (20)
+          dsp = H/2.0*(-1.0 + sqrt(1.0 + 2.0*V/(M_PI*R*H*H)));                           // [Rabinov2005], equation (20)
         
-        fC = -(2*M_PI*R*Gamma*cos(phys.theta))/(1+(H/(2*dsp))) - 
-              2*M_PI*R*Gamma*sin(alpha)*sin(phys.theta + alpha);                            // [Rabinov2005], equation (19)
+          fC = -(2*M_PI*R*Gamma*cos(phys.theta))/(1+(H/(2*dsp))) - 
+              2*M_PI*R*Gamma*sin(alpha)*sin(phys.theta + alpha);                         // [Rabinov2005], equation (19)
+        } else {
+          fC = -(2*M_PI*R*Gamma*cos(phys.theta)) - 
+              2*M_PI*R*Gamma*sin(alpha)*sin(phys.theta + alpha);                         // [Rabinov2005], equation (19)
+        }
+        
         fC *=-1;
         
       } else {
