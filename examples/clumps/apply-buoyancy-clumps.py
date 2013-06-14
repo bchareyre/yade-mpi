@@ -91,9 +91,6 @@ def apply_buo(water_height,saturatedList,startMass):
 					saturatedList.append(b)
 	return saturatedList
 
-saturatedList = []
-t0 = O.time
-
 #STEP1: reduce overlaps from replaceByClumps() method:
 O.dt=1e-6 #small time step for preparation steps via calm()
 print '\nSTEP1 in progress. Please wait a minute ...\n'
@@ -120,6 +117,7 @@ for b in O.bodies:
 
 #start PyRunner engine to apply buoyancy:
 saturatedList = []
+t0 = O.time
 O.engines=O.engines+[PyRunner(iterPeriod=100,command='saturatedList=apply_buo(((O.time-t0) * v_iw),saturatedList,startMass)',label='buoLabel')]
 
 #create 2 facets, that show water height:
