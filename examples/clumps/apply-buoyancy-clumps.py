@@ -5,12 +5,15 @@
 	under condition of an increasing water-level. Water-level at start of the sim-
 	ulation is at the lower boundary of the model. During the calculation particles
 	gets partly surrounded by water and buoyancy (=density*volumeOfDisplacedWater)
-	is increasing until particle is completely surrounded. In this case 
-	volumeOfDisplacedWater is equal to the volume of the particle. Buoyancy for 
-	clumps is also considered. For calculation of buoyancy of a clump the theoretical
-	radius R = ( 3*mass/(4*pi*b.mat.density) )^1/3 of a sphere with clump mass and 
-	clump volume V (=(4*pi*R^3)/3 = mass/density) is used. This approximation can
-	be used for well rounded clumps.
+	is increasing until particle is completely surrounded. When particle is sur-
+	rounded volumeOfDisplacedWater is equal to the volume of the particle.
+	
+	For calculation of buoyancy of a clump the theoretical radius 
+	R = (3*mass/(4*pi*density))^1/3 
+	of a sphere with clump mass and clump volume 
+	V = (4*pi*R^3)/3 = mass/density
+	is used. This approximation can be used for well rounded clumps.
+	
 	Buoyancy is included via reduced mass (=massAtStart - dm), where dm is the 
 	buoyancy. Reduced mass must be corrected via density scaling for calculation
 	of correct particle accelerations.'''
@@ -19,10 +22,8 @@
 shear_modulus			= 3.2e10
 poisson_ratio			= 0.15
 young_modulus			= 2*shear_modulus*(1+poisson_ratio)
-friction_coeff			= 10
-angle					= atan(friction_coeff)
+angle					= 0.5	#friction angle in radians
 rho_p					= 2650	#density of particles
-suction					= 10000	#suction (pressure difference between water and air)
 
 v_iw					= 1  #velocity of increasing water-level
 
