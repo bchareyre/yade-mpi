@@ -195,8 +195,8 @@ Real UnsaturatedEngine::getMinEntryValue (Solver& flow )
 template<class Solver>
 void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow)
 {
-    updateAirReservoir(flow);
-    updateWaterReservoir(flow);
+//     updateAirReservoir(flow);
+//     updateWaterReservoir(flow);
     double surface_tension = surfaceTension ; 
     for (int facet = 0; facet < 4; facet ++)
     {
@@ -876,7 +876,7 @@ void UnsaturatedEngine::saveListOfConnections(Solver& flow)
     ofstream file;
     file.open("ListOfConnections.txt");
     file << "#List of Connections \n";
-    file << "Cell_ID" << " " << "NeighborCell_ID" << " " << "EntryValue" << " " << "Inscribed_Radius" <<endl;
+    file << "Cell_ID" << " " << "NeighborCell_ID" << " " << "EntryValue" << " " << "poreRadius" <<endl;
     double surface_tension = surfaceTension ; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
     Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
@@ -1055,7 +1055,7 @@ void UnsaturatedEngine::saveListAdjCellsBottomBound(Solver& flow)
 
 //initialize the boundingCells info().isWaterReservoir=true,  on condition that those cells meet (flow->boundingCells[bound].size()!=0 && cell->info().p()==0) 
 template<class Solver>
-void UnsaturatedEngine::initWaterReservoirBound(Solver& flow)
+void UnsaturatedEngine::initWaterReservoirBound(Solver& flow/*, int boundN*/)
 {
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = tri.finite_cells_end();
