@@ -28,6 +28,7 @@
 #include <yade/core/Body.hpp>
 #include <yade/pkg/common/Dispatching.hpp>
 #include <yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include <yade/pkg/dem/ElasticContactLaw.hpp>
 #ifdef YADE_OPENGL
 	#include<yade/pkg/common/GLDrawFunctors.hpp>
 #endif
@@ -103,6 +104,21 @@ class ScGridCoGeom: public ScGeom6D {
 };
 REGISTER_SERIALIZABLE(ScGridCoGeom);
 
+//!			-|-
+class GridCoGridCoGeom: public ScGeom {
+	public:
+		/// Emulate a sphere whose position is the projection of sphere's center on cylinder sphere, and with motion linearly interpolated between nodes
+		State fictiousState1,fictiousState2;
+		virtual ~GridCoGridCoGeom ();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(GridCoGridCoGeom,ScGeom,"Geometry of a :yref:`GridConnection`-:yref:`GridConnection` contact.",
+		((Real,relPos1,0,,"position of the contact on the first connection (0: node-, 1:node+) |yupdate|"))
+		((Real,relPos2,0,,"position of the contact on the first connection (0: node-, 1:node+) |yupdate|")),
+		createIndex(); /*ctor*/
+	);
+	REGISTER_CLASS_INDEX(ScGridCoGeom,ScGeom);
+};
+REGISTER_SERIALIZABLE(GridCoGridCoGeom);
+
 //!##################	IGeom Functors   #####################
 
 //!			O-O
@@ -119,6 +135,19 @@ class Ig2_GridNode_GridNode_GridNodeGeom6D: public Ig2_Sphere_Sphere_ScGeom{
 	DEFINE_FUNCTOR_ORDER_2D(GridNode,GridNode);
 };
 REGISTER_SERIALIZABLE(Ig2_GridNode_GridNode_GridNodeGeom6D);
+
+//!			-/-
+class Ig2_GridConnection_GridConnection_GridCoGridCoGeom: public IGeomFunctor{
+	public:
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_GridConnection_GridConnection_GridCoGridCoGeom,IGeomFunctor,"Create/update a :yref:`GridCoGridCoGeom` instance representing the geometry of a contact point between two :yref:`GridConnection` , including relative rotations.",
+	);
+	FUNCTOR2D(GridConnection,GridConnection);
+	DEFINE_FUNCTOR_ORDER_2D(GridConnection,GridConnection);
+};
+REGISTER_SERIALIZABLE(Ig2_GridConnection_GridConnection_GridCoGridCoGeom);
+
 
 //!			O/
 class Ig2_Sphere_GridConnection_ScGridCoGeom: public IGeomFunctor{
@@ -161,6 +190,18 @@ class Law2_ScGridCoGeom_CohFrictPhys_CundallStrack: public LawFunctor{
 	FUNCTOR2D(ScGridCoGeom,CohFrictPhys);
 };
 REGISTER_SERIALIZABLE(Law2_ScGridCoGeom_CohFrictPhys_CundallStrack);
+
+//!			-/-
+class Law2_GridCoGridCoGeom_FrictPhys_CundallStrack: public Law2_ScGeom_FrictPhys_CundallStrack{
+	public:
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		YADE_CLASS_BASE_DOC_ATTRS(Law2_GridCoGridCoGeom_FrictPhys_CundallStrack,Law2_ScGeom_FrictPhys_CundallStrack,"Frictional elastic contact law between two :yref:`gridConnection` . See :yref:`Law2_ScGeom_FrictPhys_CundallStrack` for more details.",
+		/*ATTRS*/
+	);
+	FUNCTOR2D(GridCoGridCoGeom,FrictPhys);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_GridCoGridCoGeom_FrictPhys_CundallStrack);
 
 
 //!##################	Bounds   #####################

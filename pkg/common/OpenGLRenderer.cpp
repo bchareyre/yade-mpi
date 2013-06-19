@@ -113,7 +113,7 @@ void OpenGLRenderer::setBodiesDispInfo(){
 // draw periodic cell, if active
 void OpenGLRenderer::drawPeriodicCell(){
 	if(!scene->isPeriodic) return;
-	glColor3v(Vector3r(1,1,0));
+	glColor3v(cellColor);
 	glPushMatrix();
 		// Vector3r size=scene->cell->getSize();
 		const Matrix3r& hSize=scene->cell->hSize;

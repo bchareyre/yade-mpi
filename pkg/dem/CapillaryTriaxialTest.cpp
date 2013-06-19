@@ -338,7 +338,7 @@ void CapillaryTriaxialTest::createActors(shared_ptr<Scene>& scene)
 
 	// capillary
 	shared_ptr<Law2_ScGeom_CapillaryPhys_Capillarity> capillaryCohesiveLaw(new Law2_ScGeom_CapillaryPhys_Capillarity); 
-	capillaryCohesiveLaw->CapillaryPressure = CapillaryPressure;
+	capillaryCohesiveLaw->capillaryPressure = capillaryPressure;
 // 	capillaryCohesiveLaw->fusionDetection = fusionDetection;
 // 	capillaryCohesiveLaw->binaryFusion = binaryFusion;
 

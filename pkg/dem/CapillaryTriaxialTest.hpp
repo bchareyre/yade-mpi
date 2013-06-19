@@ -71,7 +71,7 @@ class CapillaryTriaxialTest : public FileGenerator
 		((string,importFilename,"",,"File with positions and sizes of spheres."))
 		((string,Key,"",,"A code that is added to output filenames."))
 		((string,fixedBoxDims,"",,"string that contains some subset (max. 2) of {'x','y','z'} ; contains axes will have box dimension hardcoded, even if box is scaled as mean_radius is prescribed: scaling will be applied on the rest."))
-		((Real,CapillaryPressure,0,,"Define succion in the packing [Pa]. This is the value used in the capillary model."))
+		((Real,capillaryPressure,0,,"Define succion in the packing [Pa]. This is the value used in the capillary model."))
 		((bool,water,true,,"activate capillary model"))
 		((bool,fusionDetection,false,,"test overlaps between liquid bridges on modify forces if overlaps exist"))
 		((bool,binaryFusion,true,,"Defines how overlapping bridges affect the capillary forces (see :yref:`CapillaryTriaxialTest::fusionDetection`). If binary=true, the force is null as soon as there is an overlap detected, if not, the force is divided by the number of overlaps."))

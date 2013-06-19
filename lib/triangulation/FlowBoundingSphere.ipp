@@ -897,8 +897,13 @@ vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> constrictions;
-	for (Finite_facets_iterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++)
+	for (Finite_facets_iterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
+		//in the periodic case, we skip facets with lowest id out of the base period
+		if ( ((f_it->first->info().index < f_it->first->neighbor(f_it->second)->info().index) && f_it->first->info().isGhost)
+		||  ((f_it->first->info().index > f_it->first->neighbor(f_it->second)->info().index) && f_it->first->neighbor(f_it->second)->info().isGhost)
+		|| f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
 		constrictions.push_back(Compute_EffectiveRadius(f_it->first, f_it->second));
+	}
 	return constrictions;
 }
 
@@ -908,6 +913,10 @@ vector<Constriction> FlowBoundingSphere<Tesselation>::getConstrictionsFull()
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<Constriction> constrictions;
 	for (Finite_facets_iterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
+		//in the periodic case, we skip facets with lowest id out of the base period
+ 		 if ( ((f_it->first->info().index < f_it->first->neighbor(f_it->second)->info().index) && f_it->first->info().isGhost)
+		||  ((f_it->first->info().index > f_it->first->neighbor(f_it->second)->info().index) && f_it->first->neighbor(f_it->second)->info().isGhost)
+		|| f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
 		vector<double> rn;
 		const Vecteur& normal = f_it->first->info().facetSurfaces[f_it->second];
 		if (!normal[0] && !normal[1] && !normal[2]) continue;

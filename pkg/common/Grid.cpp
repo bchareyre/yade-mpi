@@ -24,6 +24,9 @@ YADE_PLUGIN((GridNodeGeom6D));
 ScGridCoGeom::~ScGridCoGeom(){}
 YADE_PLUGIN((ScGridCoGeom));
 
+GridCoGridCoGeom::~GridCoGridCoGeom(){}
+YADE_PLUGIN((GridCoGridCoGeom));
+
 void GridNode::addConnection(shared_ptr<Body> GC){
 	ConnList.push_back(GC);
 }
@@ -69,6 +72,96 @@ bool Ig2_GridNode_GridNode_GridNodeGeom6D::goReverse( const shared_ptr<Shape>& c
 }
 YADE_PLUGIN((Ig2_GridNode_GridNode_GridNodeGeom6D));
 
+//!			\\//
+bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
+{
+	/*FIXME : /!\ Note that this geometry doesn't take care of any unwished duplicated contact or shear force following. /!\*/
+	GridConnection* conn1 = YADE_CAST<GridConnection*>(cm1.get());
+	GridConnection* conn2 = YADE_CAST<GridConnection*>(cm2.get());
+	State* stNode11 = conn1->node1->state.get();
+	State* stNode12 = conn1->node2->state.get();
+	State* stNode21 = conn2->node1->state.get();
+	State* stNode22 = conn2->node2->state.get();
+	
+	if(conn1->node1==conn2->node1 || conn1->node1==conn2->node2 || conn1->node2==conn2->node1 || conn1->node2==conn2->node2){
+		//Two connections share at least one node, so they are contiguous => they must not interact.
+		return false;
+	}
+	//There could be a contact between to connections. Check this now.
+	bool isNew = !c->geom;
+	Real k,m;
+	Vector3r A=stNode11->pos, a=stNode12->pos-A; //"A" is an extremity of conn1, "a" is the connection's segment.
+	Vector3r B=stNode21->pos, b=stNode22->pos-B; //"B" is an extremity of conn2, "b" is the connection's segment.
+	B+=shift2;//periodicity.
+	Vector3r N=a.cross(b);	//"N" is orthogonal to "a" and "b". It means that "N" describes the common plan between a and b.
+	if(N.norm()>1e-14){	//If "a" and "b" are colinear, "N==0" and this is a special case.
+		Real dist=N.dot(B-A)/(N.norm());	//here "dist" is oriented, so it's sign depends on the orientation of "N" against "AB".
+		Vector3r pB=B-dist*(N/(N.norm()));	//"pB" is the projection of the point "B" in the plane defined by his normal vector "N".
+		//Now we have pB, so we will compute the intersection of two segments into a plane.
+		int b0, b1; //2 base vectors used to compute the segment intersection. For more accuracy and to avoid det==0, don't choose the axis where N is max.
+		if(abs(N[0])<abs(N[1]) || abs(N[0])<abs(N[2])){b0=0 ; b1=abs(N[1])<abs(N[2])?1:2;}
+		else { b0=1;b1=2;}
+		Real det=a[b0]*b[b1]-a[b1]*b[b0];
+		if (abs(det)>1e-14){
+			//Now compute k and m, who are the parameters (relative position on the connections) of the intersection on conn1 ("A" and "a") and conn2 ("B" and "b") respectively.
+			k = (b[b1]*(pB[b0]-A[b0])+b[b0]*(A[b1]-pB[b1]))/det;
+			m = (a[b0]*(-pB[b1]+A[b1])+a[b1]*(pB[b0]-A[b0]))/det;
+			//This is a little bit tricky : if we haven't 0<k,m<1, it means that the intersection is not inside both segments,
+			//but the contact can occurs anyway between a connection's extremity and a connection's edge or between two connection's extremity.
+			//So the three next lines : don't modify k and m if (0<k,m<1), but modify them otherwise to compute later the right normal and penetrationDepth of the contact.
+			k = max(min( k,1.0),0.0);
+			m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,1.0),0.0);
+			k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,1.0),0.0);
+		}
+		else {//should never happen
+			k=0;m=0;
+			cout<<"Error in Ig2_GridConnection_GridConnection_GridCoGridCoGeom : det=="<<det<<endl;
+			cout<<"Details : N="<<N<<" b0="<<b0<<" b1="<<b1<<"  a="<<a<<" b="<<b<<endl;
+		}
+	}
+	else{ //this is a special case for perfectly colinear vectors ("a" and "b")
+		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min(1.0,max(0.0,PA));
+		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min(1.0,max(0.0,Pa));
+		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min(1.0,max(0.0,PB));
+		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min(1.0,max(0.0,Pb));
+		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
+	}
+	
+	//Compute the geometry if "penetrationDepth" is positive.
+	double penetrationDepth = conn1->radius + conn2->radius - (A+k*a - (B+m*b)).norm();
+	shared_ptr<GridCoGridCoGeom> scm;
+	if(isNew){
+		if(penetrationDepth<0)return false;
+		scm=shared_ptr<GridCoGridCoGeom>(new GridCoGridCoGeom());
+		c->geom=scm;
+	}
+	else scm=YADE_PTR_CAST<GridCoGridCoGeom>(c->geom);
+	//k and m are used to compute almost everything...
+	//Fictious states (spheres) are generated at k or m of each connection, they will handle the contact.
+	scm->relPos1=k ; scm->relPos2=m;
+	scm->fictiousState1.pos=A + k*a ; scm->fictiousState2.pos=B + m*b;
+	scm->radius1 = conn1->radius ; scm->radius2 = conn2->radius;
+	scm->fictiousState1.vel = (1-k)*stNode11->vel + k*stNode12->vel;
+	scm->fictiousState2.vel = (1-m)*stNode21->vel + m*stNode22->vel;
+	Vector3r direction = a/(a.norm());
+	scm->fictiousState1.angVel = ((1-k)*stNode11->angVel + k*stNode12->angVel).dot(direction)*direction //twist part : interpolated
+	+ a.cross(stNode12->vel - stNode11->vel);// non-twist part : defined from nodes velocities
+	direction = b/(b.norm());
+	scm->fictiousState2.angVel = ((1-m)*stNode21->angVel + m*stNode22->angVel).dot(direction)*direction //twist part : interpolated
+	+ b.cross(stNode22->vel - stNode21->vel);// non-twist part : defined from nodes velocities
+	Vector3r normal= scm->fictiousState2.pos - scm->fictiousState1.pos;
+	normal/=normal.norm();
+	scm->contactPoint = scm->fictiousState1.pos + (scm->radius1-0.5*penetrationDepth)*normal;
+	scm->penetrationDepth=penetrationDepth;
+	scm->precompute(scm->fictiousState1,scm->fictiousState2,scene,c,normal,isNew,shift2,true);
+	return true;
+}
+
+bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::goReverse( const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
+{
+	return go(cm1,cm2,state2,state1,-shift2,force,c);
+}
+YADE_PLUGIN((Ig2_GridConnection_GridConnection_GridCoGridCoGeom));
 
 //!			O/
 bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
@@ -403,6 +496,63 @@ void Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sha
 }
 YADE_PLUGIN((Law2_ScGridCoGeom_CohFrictPhys_CundallStrack));
 
+void Law2_GridCoGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+	int id1 = contact->getId1(), id2 = contact->getId2();
+	id_t id11 = (static_cast<GridConnection*>((&Body::byId(id1)->shape)->get()))->node1->getId();
+	id_t id12 = (static_cast<GridConnection*>((&Body::byId(id1)->shape)->get()))->node2->getId();
+	id_t id21 = (static_cast<GridConnection*>((&Body::byId(id2)->shape)->get()))->node1->getId();
+	id_t id22 = (static_cast<GridConnection*>((&Body::byId(id2)->shape)->get()))->node2->getId();
+	GridCoGridCoGeom*    geom= static_cast<GridCoGridCoGeom*>(ig.get());
+	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
+	if(geom->penetrationDepth <0){
+		if (neverErase) {
+			phys->shearForce = Vector3r::Zero();
+			phys->normalForce = Vector3r::Zero();}
+		else 	scene->interactions->requestErase(contact);
+		return;}
+	Real& un=geom->penetrationDepth;
+	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
+
+	Vector3r& shearForce = geom->rotate(phys->shearForce);
+	const Vector3r& shearDisp = geom->shearIncrement();
+	shearForce -= phys->ks*shearDisp;
+	Real maxFs = phys->normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
+
+	if (!scene->trackEnergy  && !traceEnergy){//Update force but don't compute energy terms (see below))
+		// PFC3d SlipModel, is using friction angle. CoulombCriterion
+		if( shearForce.squaredNorm() > maxFs ){
+			Real ratio = sqrt(maxFs) / shearForce.norm();
+			shearForce *= ratio;}
+	} else {
+		//almost the same with additional Vector3r instatinated for energy tracing, 
+		//duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
+		if(shearForce.squaredNorm() > maxFs){
+			Real ratio = sqrt(maxFs) / shearForce.norm();
+			Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
+			//define the plastic work input and increment the total plastic energy dissipated
+			shearForce *= ratio;
+			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+			if (traceEnergy) plasticDissipation += dissip;
+			else if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);
+		}
+		// compute elastic energy as well
+		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
+	}
+	Vector3r force = -phys->normalForce-shearForce;
+	Vector3r torque1 = (geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force);
+	Vector3r torque2 = (geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force);
+	
+	scene->forces.addForce(id11,(1-geom->relPos1)*force);
+	scene->forces.addForce(id12,geom->relPos1*force);
+	scene->forces.addForce(id21,-(1-geom->relPos2)*force);
+	scene->forces.addForce(id22,-geom->relPos2*force);
+	
+	scene->forces.addTorque(id11,(1-geom->relPos1)*torque1);
+	scene->forces.addTorque(id12,geom->relPos1*torque1);
+	scene->forces.addTorque(id21,(1-geom->relPos2)*torque2);
+	scene->forces.addTorque(id22,geom->relPos2*torque2);
+}
+YADE_PLUGIN((Law2_GridCoGridCoGeom_FrictPhys_CundallStrack));
 //!##################	Bounds   #####################
 
 void Bo1_GridConnection_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){
