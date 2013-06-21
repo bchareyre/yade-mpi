@@ -134,7 +134,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
 	
 	/**
-	algorithm for estimation of volumes and inertia tensor fro clumps using summation/integration scheme with regular grid spacing
+	algorithm for estimation of volumes and inertia tensor from clumps using summation/integration scheme with regular grid spacing
 	(some parts copied from woo: http://bazaar.launchpad.net/~eudoxos/woo/trunk/view/head:/pkg/dem/Clump.cpp)
 	*/
 	if(intersecting){	
