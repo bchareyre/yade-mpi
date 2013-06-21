@@ -132,15 +132,46 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 	Real M=0; // mass
 	Vector3r Sg(0,0,0); // static moment, for getting clump's centroid
 	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
-
-	if(intersecting){
-		vector<Real> volAndInertia;
-		volAndInertia = Clump::getClumpVolumeAndAdaptInertia(clumpBody,/*adapt inertia*/true);
-		Real volClump = volAndInertia[0];
-		//write vector into inertia tensor:
-		Ig << volAndInertia[1], volAndInertia[2], volAndInertia[3],
-		      volAndInertia[4], volAndInertia[5], volAndInertia[6],
-		      volAndInertia[7], volAndInertia[8], volAndInertia[9];
+	
+	/**
+	algorithm for estimation of volumes and inertia tensor fro clumps using summation/integration scheme with regular grid spacing
+	(some parts copied from woo: http://bazaar.launchpad.net/~eudoxos/woo/trunk/view/head:/pkg/dem/Clump.cpp)
+	*/
+	if(intersecting){	
+		//get boundaries and minimum radius of clump:
+		Real rMin=1./0.; AlignedBox3r aabb;
+		FOREACH(MemberMap::value_type& mm, clump->members){
+			const shared_ptr<Body> subBody = Body::byId(mm.first);
+			if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
+				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
+				aabb.extend(subBody->state->pos + Vector3r::Constant(sphere->radius));
+				aabb.extend(subBody->state->pos - Vector3r::Constant(sphere->radius));
+				rMin=min(rMin,sphere->radius);
+			}
+		}
+		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
+		int divisor = 15; 		//TODO: make it choosable by users
+		Real dx = rMin/divisor; 	//edge length of cell
+		Real dv = pow(dx,3);		//volume of cell
+		Vector3r x;			//position vector (center) of cell
+		Real volClump = 0.0;
+		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
+			for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
+				for(x.z()=aabb.min().z()+dx/2.; x.z()<aabb.max().z(); x.z()+=dx){
+					FOREACH(MemberMap::value_type& mm, clump->members){
+						const shared_ptr<Body> subBody = Body::byId(mm.first);
+						if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
+							const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
+							if((x-subBody->state->pos).squaredNorm() < pow(sphere->radius,2)){
+								volClump += dv;
+								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
+								Ig += ( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/)*subBody->material->density*dv;
+							}
+						}
+					}
+				}
+			}
+		}
 		Real volSum = 0.0;
 		for (int ii = 0; ii < 2; ii++){
 			FOREACH(MemberMap::value_type& mm, clump->members){
@@ -234,55 +265,4 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I,const Matrix3r& T){
 Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 	Matrix3r T=rot.toRotationMatrix();
 	return inertiaTensorRotate(I,T);
-}
-
-vector<Real> Clump::getClumpVolumeAndAdaptInertia(const shared_ptr<Body>& clumpBody, bool adaptInertia){//algorithm for estimation of clump volumes and approximation of inertia tensor (some parts copied from woo)
-	shared_ptr<Sphere> sph (new Sphere);
-	int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
-	const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
-	//get boundaries and minimum radius of clump:
-	//(see also http://bazaar.launchpad.net/~eudoxos/woo/trunk/view/head:/pkg/dem/Clump.cpp)
-	Real rMin=1./0.; AlignedBox3r aabb;
-	FOREACH(MemberMap::value_type& mm, clump->members){
-		const shared_ptr<Body> subBody = Body::byId(mm.first);
-		if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
-			const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
-			aabb.extend(subBody->state->pos + Vector3r::Constant(sphere->radius));
-			aabb.extend(subBody->state->pos - Vector3r::Constant(sphere->radius));
-			rMin=min(rMin,sphere->radius);
-		}
-	}
-	int divisor = 15; 		//TODO: make it choosable by users
-	Real dx=rMin/divisor; 		//edge length of cell
-	Real dv=pow(dx,3);		//volume of cell
-	Vector3r x;			//position vector of cell
-	Matrix3r I(Matrix3r::Zero());	//inertia tensor
-	vector<Real> volAndInertia(10);
-	Real estimatedVol = 0.0;
-	for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
-		for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
-			for(x.z()=aabb.min().z()+dx/2.; x.z()<aabb.max().z(); x.z()+=dx){
-				FOREACH(MemberMap::value_type& mm, clump->members){
-					const shared_ptr<Body> subBody = Body::byId(mm.first);
-					if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
-						const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
-						if((x-subBody->state->pos).squaredNorm()<pow(sphere->radius,2)){
-							estimatedVol += dv;
-							if (adaptInertia){
-								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
-								I += ( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/)*subBody->material->density*dv;
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-	//write inertia tensor and estimated volume into a vector:
-	volAndInertia[0] = estimatedVol;
-	volAndInertia[1] = I(0,0); volAndInertia[2] = I(0,1); volAndInertia[3] = I(0,2);
-	volAndInertia[4] = I(1,0); volAndInertia[5] = I(1,1); volAndInertia[6] = I(1,2);
-	volAndInertia[7] = I(2,0); volAndInertia[8] = I(2,1); volAndInertia[9] = I(2,2);
-	return volAndInertia;
 }

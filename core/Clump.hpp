@@ -96,8 +96,6 @@ class Clump: public Shape {
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Matrix3r& T);
 		//! Recalculate body's inertia tensor in rotated coordinates.
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
-		//! get clump volume and adapt inertia
-		static vector<Real> getClumpVolumeAndAdaptInertia(const shared_ptr<Body>& clumpBody, const bool adaptInertia);
 
 		python::dict members_get();
 	
