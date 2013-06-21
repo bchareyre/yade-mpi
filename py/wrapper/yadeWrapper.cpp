@@ -351,13 +351,13 @@ class pyBodyContainer{
 		vector<Body::id_t> excludeListC;
 		for (int ii = 0; ii < python::len(excludeList); ii++) excludeListC.push_back(python::extract<Body::id_t>(excludeList[ii])());
 		Real RC_sum = 0.0;	//sum of local roundnesses
-		Real R1, R2;
+		Real R1, R2, vol, dens;
 		int c = 0;		//counter
 		FOREACH(const shared_ptr<Body>& b, *proxee){
 			if ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) {
 				if ((b->shape->getClassIndex() ==  Sph_Index) && (b->isStandalone())) { RC_sum += 1.0; c += 1; }
 				if (b->isClump()){
-					R2 = 0.0;
+					R2 = 0.0; dens = 0.0; vol = 0.0;
 					const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
 					std::map<Body::id_t,Se3r>& members = clump->members;
 					FOREACH(MemberMap::value_type& mm, members){
@@ -367,11 +367,11 @@ class pyBodyContainer{
 						if (member->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
 							const Sphere* sphere = YADE_CAST<Sphere*> (member->shape.get());
 							R2 = max((member->state->pos - b->state->pos).norm() + sphere->radius, R2);	//get minimum radius of a sphere, that imbeds clump
+							dens = member->material->density;
 						}
 					}
-					vector<Real> volAndInertia(10);
-					volAndInertia = Clump::getClumpVolumeAndAdaptInertia(b,/*adapt inertia*/false);
-					R1 = pow((3.*volAndInertia[0])/(4.*Mathr::PI),1./3.);	//get theoretical radius of a sphere, with same volume as clump
+					if (dens > 0.) vol = b->state->mass/dens;
+					R1 = pow((3.*vol)/(4.*Mathr::PI),1./3.);	//get theoretical radius of a sphere, with same volume as clump
 					if (R2 < R1) {PyErr_Warn(PyExc_UserWarning,("Something went wrong in getRoundness method (R2 < R1 detected).")); return 0;}
 					RC_sum += R1/R2; c += 1;
 				}
