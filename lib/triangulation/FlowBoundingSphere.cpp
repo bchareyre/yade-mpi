@@ -6,7 +6,7 @@
 *************************************************************************/
 #ifdef FLOW_ENGINE
 
-#include "FlowBoundingSphere.hpp"
+#include "yade/lib/triangulation/FlowBoundingSphere.hpp"
 
 namespace CGT {
 Vecteur PeriodicCellInfo::gradP;
