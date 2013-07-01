@@ -32,18 +32,18 @@ INSTALL(TARGETS WeightedAverage2d DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_eudoxos SHARED "${CMAKE_CURRENT_SOURCE_DIR}/_eudoxos.cpp")
 SET_TARGET_PROPERTIES(_eudoxos PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_eudoxos plugins support core)
+TARGET_LINK_LIBRARIES(_eudoxos yade)
 INSTALL(TARGETS _eudoxos DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_utils SHARED "${CMAKE_CURRENT_SOURCE_DIR}/_utils.cpp")
 SET_TARGET_PROPERTIES(_utils PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_utils plugins support core)
+TARGET_LINK_LIBRARIES(_utils yade)
 INSTALL(TARGETS _utils DESTINATION "${YADE_PY_PATH}/yade/")
 
 
 ADD_LIBRARY(_packPredicates SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp")
 SET_TARGET_PROPERTIES(_packPredicates PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_packPredicates plugins support core)
+TARGET_LINK_LIBRARIES(_packPredicates yade)
 IF(ENABLE_GTS AND NOT(PY_gts))
   TARGET_LINK_LIBRARIES(_packPredicates _gts)
 ENDIF(ENABLE_GTS AND NOT(PY_gts))
@@ -53,7 +53,7 @@ INSTALL(TARGETS _packPredicates DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_packSpheres SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packSpheres.cpp")
 SET_TARGET_PROPERTIES(_packSpheres PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_packSpheres plugins support core)
+TARGET_LINK_LIBRARIES(_packSpheres yade)
 INSTALL(TARGETS _packSpheres DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_packObb SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packObb.cpp")
@@ -62,14 +62,10 @@ INSTALL(TARGETS _packObb DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(wrapper SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/yadeWrapper.cpp")
 SET_TARGET_PROPERTIES(wrapper PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(wrapper plugins support)
+TARGET_LINK_LIBRARIES(wrapper yade)
 INSTALL(TARGETS wrapper DESTINATION "${YADE_PY_PATH}/yade/")
 
 ADD_LIBRARY(_customConverters SHARED "${CMAKE_CURRENT_SOURCE_DIR}/wrapper/customConverters.cpp")
 SET_TARGET_PROPERTIES(_customConverters PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(_customConverters plugins support)
+TARGET_LINK_LIBRARIES(_customConverters yade)
 INSTALL(TARGETS _customConverters DESTINATION "${YADE_PY_PATH}/yade/")
-
-
-
-
