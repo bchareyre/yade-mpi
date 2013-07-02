@@ -6,7 +6,6 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
 #include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
 
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
