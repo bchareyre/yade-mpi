@@ -12,6 +12,8 @@
 #  ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
 #  ENABLE_GTS: enable GTS-option (ON by default)
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
+#  ENABLE_LINSOLV: enable LINSOLV-option (OFF by default)
+#  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -89,6 +91,7 @@ OPTION(ENABLE_GUI "Enable GUI" ${DEFAULT})
 OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
 OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" OFF)
+OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -183,8 +186,6 @@ IF(ENABLE_PFVFLOW)
     MESSAGE(STATUS "PFVFLOW depends on CGAL, attempting to turn ENABLE_CGAL ON")
     SET(ENABLE_CGAL ON)
   ENDIF (NOT ENABLE_CGAL)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFLOW_ENGINE")
-  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PFVflow")
 ENDIF(ENABLE_PFVFLOW)
 #===========================================================
 IF(ENABLE_CGAL)  
@@ -201,10 +202,21 @@ IF(ENABLE_CGAL)
     SET(LINKLIBS  "${LINKLIBS};${CGAL_LIBRARIES};${GMP_LIBRARIES};${GMPXX_LIBRARIES};")
     MESSAGE(STATUS "Found CGAL")
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} CGAL")
+
+    IF(ENABLE_PFVFLOW)
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFLOW_ENGINE")
+      SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PFVflow")
+    ENDIF(ENABLE_PFVFLOW)
+
   ELSE(CGAL_FOUND AND GMP_FOUND AND (NOT("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")))
     MESSAGE(STATUS "CGAL NOT found")
     SET(DISABLED_FEATS "${DISABLED_FEATS} CGAL")
     SET(ENABLE_CGAL OFF)
+    IF(ENABLE_PFVFLOW)
+      SET(DISABLED_FEATS "${DISABLED_FEATS} PFVflow")
+      MESSAGE(STATUS "CGAL NOT found: PFVFLOW disabled")
+    ENDIF(ENABLE_PFVFLOW)
+
   ENDIF(CGAL_FOUND AND GMP_FOUND AND (NOT("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")))
 ELSE(ENABLE_CGAL)
   SET(DISABLED_FEATS "${DISABLED_FEATS} CGAL")
