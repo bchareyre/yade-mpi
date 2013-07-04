@@ -1,5 +1,5 @@
 # - Find Loki library
-# Find the native GL2PS includes and library
+# 
 # This module defines
 #  LOKI_INCLUDE_DIR, where to find loki/Typelist.h, etc.
 #  LOKI_LIBRARY, libraries to link against to use GL2PS.

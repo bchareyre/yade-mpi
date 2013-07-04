@@ -9,7 +9,7 @@
 /**
 === OVERVIEW OF WirePM ===
 
-A particle model to simulate single wires and rockfall meshes (see Bertrad et al. 2005, Bertrad et al. 2008).
+A particle model to simulate single wires and rockfall meshes (see Bertrad et al. 2005, Bertrad et al. 2008, Thoeni et al. 2013).
 
 Features of the interaction law:
 
@@ -19,8 +19,8 @@ Features of the interaction law:
 
 3. The force displacement curve which defines the interaction forces is piecewise linear and defined by the stress-strain curve of the wire material. Any piecewise linear curve can be used. 
 
-Remarks:
-- The contact law is new and still needs some testing :-) 
+4. Three different types of wire models are available.
+
 */
 
 #pragma once
@@ -48,12 +48,22 @@ class WireMat: public FrictMat {
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<WireState*>(s); }
 		void postLoad(WireMat&);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,FrictMat,"Material for use with the Wire classes",
-		((Real,diameter,0.0027,,"Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
-		((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed!"))
-		((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
-		((Real,lambdaEps,0.4,,"Parameter between 0 and 1 to reduce the failure strain of the double-twisted wire (as used by [Bertrand2008]_). [-]"))
-		((Real,lambdak,0.21,,"Parameter between 0 and 1 to compute the elastic stiffness of the double-twisted wire (as used by [Bertrand2008]_): $k^D=2(\\lambda_k k_h + (1-\\lambda_k)k^S)$. [-]"))
-		((Real,as,0,Attr::readonly,"Cross-section area of a single wire used for the computation of the limit normal contact forces. [m²]"))
+			((Real,diameter,0.0027,,"Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
+			((unsigned int,type,0,,"Three different types are considered:\n\n"
+			"== ===============================================================\n"
+			"type=0  Corresponds to Bertrand's approach (see [Bertrand2008]_): only one stress-strain curve is used\n"
+			"type=1  New approach: two stress-strain curves (see [Thoeni2013]_)\n"
+			"type=2  New approach: two stress-strain curves with changed initial stiffness and horizontal shift (shift is random if $\\text{seed}\\geq0$, for more details see [Thoeni2013]_)\n"
+			"== ==============================================================="))
+			((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed! NOTE: Vector needs to be initialized!"))
+			((vector<Vector2r>,strainStressValuesDT,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for the double twist. Tension only is considered and the point (0,0) is not needed! If this value is given the calculation will be based on two different stress-strain curves without considering the parameter introduced by [Bertrand2008]_ (see [Thoeni2013]_)."))
+			((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
+			((Real,lambdaEps,0.47,,"Parameter between 0 and 1 to reduce strain at failure of a double-twisted wire (as used by [Bertrand2008]_). [-]"))
+			((Real,lambdak,0.73,,"Parameter between 0 and 1 to compute the elastic stiffness of a double-twisted wire (as used by [Bertrand2008]_): $k^D=2(\\lambda_k k_h + (1-\\lambda_k)k^S)$. [-]"))
+			((int,seed,12345,,"Integer used to initialize the random number generator for the calculation of the distortion. If the integer is equal to 0 a internal seed number based on the time is computed. [-]"))
+			((Real,lambdau,0.2,,"Parameter between 0 and 1 introduced by [Thoeni2013]_ which defines the maximum shift of the force-displacement curve in order to take an additional initial elongation (e.g. wire distortion/imperfections, slipping, system flexibility) into account: $\\Delta l^*=\\lambda_u l_0 \\text{rnd(seed)}$. [-]"))
+			((Real,lambdaF,1.0,,"Parameter between 0 and 1 introduced by [Thoeni2013]_ which defines where the shifted force-displacement curve intersects with the new initial stiffness: $F^*=\\lambda_F F_{\\text{elastic}}$. [-]"))
+			((Real,as,0.,Attr::readonly,"Cross-section area of a single wire used to transform stress into force. [m²]"))
 		,
 		createIndex();
 	);
@@ -69,13 +79,15 @@ class WirePhys: public FrictPhys {
 		virtual ~WirePhys();
 	
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(WirePhys,FrictPhys,"Representation of a single interaction of the WirePM type, storage for relevant parameters",
-			((Real,initD,0,,"Equilibrium distance for particles. Computed as the initial inter-particular distance when particle are linked."))
+			((Real,initD,0.,,"Equilibrium distance for particles. Computed as the initial inter-particular distance when particle are linked."))
 			((bool,isLinked,false,,"If true particles are linked and will interact. Interactions are linked automatically by the definition of the corresponding interaction radius. The value is false if the wire breaks (no more interaction)."))
 			((bool,isDoubleTwist,false,,"If true the properties of the interaction will be defined as a double-twisted wire."))
 			((vector<Vector2r>,displForceValues,,Attr::readonly,"Defines the values for force-displacement curve."))
-			((vector<Real>,stiffnessValues,,Attr::readonly,"Defines the values for the different stiffness (first value corresponds to elastic stiffness kn)."))
-			((Real,plastD,0,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero (see [Bertrand2005]_).\n\n.."))
-			((Real,limitFactor,0.,Attr::readonly,"This value indicates on how far from failing the wire is, e.g. actual normal displacement divided by admissible normal displacement multiplied by actual normal force divided by admissible normal force."))
+			((vector<Real>,stiffnessValues,,Attr::readonly,"Defines the values for the various stiffnesses (the elastic stiffness is stored as kn)."))
+			((Real,plastD,0.,Attr::readonly,"Plastic part of the inter-particular distance of the previous step. \n\n.. note::\n\t Only elastic displacements are reversible (the elastic stiffness is used for unloading) and compressive forces are inadmissible. The compressive stiffness is assumed to be equal to zero.\n\n.."))
+			((Real,limitFactor,0.,Attr::readonly,"This value indicates on how far from failing the wire is, e.g. actual normal displacement divided by admissible normal displacement."))
+			((bool,isShifted,false,Attr::readonly,"If true :yref:`WireMat` type=2 and the force-displacement curve will be shifted."))
+			((Real,dL,0.,Attr::readonly,"Additional wire length for considering the distortion for :yref:`WireMat` type=2 (see [Thoeni2013]_)."))
 			,
 			createIndex();
 			,

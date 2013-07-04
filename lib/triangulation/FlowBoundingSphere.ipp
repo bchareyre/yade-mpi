@@ -787,8 +787,8 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 				
 				if(permeability_map){
 				  Cell_handle c = cell;
-				  cell->info().s = cell->info().s + k*distance/fluidArea*Volume_Pore_VoronoiFraction (c,j);
-				  volume_sub_pore += Volume_Pore_VoronoiFraction (c,j);}
+				  cell->info().s = cell->info().s + k*distance/fluidArea*this->Volume_Pore_VoronoiFraction (c,j);
+				  volume_sub_pore += this->Volume_Pore_VoronoiFraction (c,j);}
 				
 			}
 		}
@@ -982,8 +982,8 @@ double FlowBoundingSphere<Tesselation>::Compute_HydraulicRadius(Cell_handle cell
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
 
-        double Vpore = Volume_Pore_VoronoiFraction(cell, j);
-	double Ssolid = Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS);
+        double Vpore = this->Volume_Pore_VoronoiFraction(cell, j);
+	double Ssolid = this->Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS);
 
 	//handle symmetry (tested ok)
 	if (SLIP_ON_LATERALS && fictious_vertex>0) {

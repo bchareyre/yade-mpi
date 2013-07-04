@@ -1,7 +1,17 @@
+/*************************************************************************
+*  Copyright (C) 2012 by Ignacio Olmedo nolmedo.manich@gmail.com         *
+*  Copyright (C) 2012 by François Kneib   francois.kneib@gmail.com       *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
+
+
+
 #include "Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment.hpp"
 
 Real Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::normElastEnergy()
-{
+{	//FIXME : this have to be checked and adapted
 	Real normEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
@@ -13,7 +23,7 @@ Real Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::normElastEnergy()
 	return normEnergy;
 }
 Real Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::shearElastEnergy()
-{
+{	//FIXME : this have to be checked and adapted
 	Real shearEnergy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
@@ -29,251 +39,188 @@ Real Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::shearElastEnergy()
 
 void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
-// 	cout<<"Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment"<<endl;
-	const Real& dt = scene->dt;
+//FIXME : non cohesive contact are not implemented, it would be useful to use setCohesionNow, setCohesionOnNewContacts etc ...
 	const int &id1 = contact->getId1();
 	const int &id2 = contact->getId2();
+	const Real& dt = scene->dt;
 	ScGeom6D* geom  = YADE_CAST<ScGeom6D*> (ig.get());
 	InelastCohFrictPhys* phys = YADE_CAST<InelastCohFrictPhys*> (ip.get());
-	Vector3r& shearForce    = phys->shearForce;
-			
-	cout<<"id1= "<<id1<<" id2= "<<id2<<endl;
+	if (contact->isFresh(scene)) phys->shearForce = Vector3r::Zero();
 	
-	if (contact->isFresh(scene)) shearForce   = Vector3r::Zero();
-		
-	///Tension-Compresion///
-	
-	Real un     = geom->penetrationDepth;
-	Real Fn = phys->knT*(un);
-	//FIXME: Check signs on TESTS
+	Real un	= geom->penetrationDepth-phys->unp;
+	Real Fn;
+
 	State* de1 = Body::byId(id1,scene)->state.get();
 	State* de2 = Body::byId(id2,scene)->state.get();
 	
 	
-	if(!(phys->isBrokenT)){
-		
-		/// Tension ///
-		if(un<=0){
-			if((un>= -(phys->dElT)) && !onplastT){
-				Fn = phys->knT*(un);
-// 				cout<<"TENSION ELASTIC Fn= "<<Fn<<" un= "<<un<<endl;
-			}
-			if(un< -(phys->dElT) || onplastT){
-				onplastT = true;
-				Fn = phys->knT*(-phys->dElT) + phys->crpT*(un+phys->dElT);
-// 				cout<<"TENSION PLASTIC Fn= "<<Fn<<" un= "<<un<<" normalF= "<<phys->normalForce.norm()<<endl;
-				
-				if(phys->unloadedT ||(-phys->normalForce.norm()<=Fn)){
-					Fn = phys->knT*(-phys->dElT)+ phys->crpT*(lastPlastUn+phys->dElT) + phys->unldT*(un-lastPlastUn);
-					phys->unloadedT = true; 
-// 					cout<<"TENSION PLASTIC unloading Fn= "<<Fn<<" un= "<<un<<endl;
-					
-					if(un<=lastPlastUn){ // Recovers creep after unload and reload
-						phys->unloadedT=false;
-						Fn = phys->knT*(-phys->dElT) + phys->crpT*(un+phys->dElT);
-// 						cout<<"TENSION PLASTIC load aftr unld Fn= "<<Fn<<" un= "<<un<<" LPun= "<<lastPlastUn<<endl;
-					}
-					
-				} // Unloading::  //FIXME: ?? Check Fn Sign
-				else{// loading, applying Creeping
-					lastPlastUn = un;
-// 					cout<<"TENSION PLASTIC Creep Fn= "<<Fn<<" un= "<<un<<endl;
-					
-					if (un<-phys->epsMaxT){ // Plastic rupture //
-						Fn = 0.0;
-						phys->isBrokenT = true;  
-// 						cout<<"TENSION PLASTIC creep BROKEN Fn= "<<Fn<<" un= "<<un<<endl;
-					}
-				}  
-			}
+	if(un<=0){/// tension ///
+		if(-un>phys->maxExten || phys->isBroken){//plastic failure.
+			phys->isBroken=1;
+			phys->normalForce=phys->shearForce=phys->moment_twist=phys->moment_bending=Vector3r(0,0,0);
+			scene->interactions->requestErase(contact);
+			return;
 		}
-		/// Compresion ///
-		if(un>0){
-			if((un<=phys->dElC) && !onplastT){
-				Fn = phys->knC*(un);
-// 				cout<<"COMPRESION ELASTIC Fn= "<<Fn<<" un= "<<un<<endl;
-
+		Fn=phys->knT*un; //elasticity
+		if(-Fn>phys->maxElT || phys->onPlastT){ //so we are on plastic deformation.
+			phys->onPlastT=1;
+			phys->onPlastC=1; //if plasticity is reached on tension, set it to compression too.
+			if(phys->maxCrpRchdT[0]<un){ //unloading/reloading on plastic deformation.
+				Fn = phys->kTUnld*(un-phys->maxCrpRchdT[0])+phys->maxCrpRchdT[1];
 			}
-			if(un>phys->dElC || onplastT){
-				onplastT = true;
-				Fn = phys->knC*(phys->dElC) + phys->crpT*(un-phys->dElC);
-				if(phys->unloadedC || (phys->normalForce.norm()>=Fn)){
-					Fn = phys->knC*(phys->dElC)+ phys->crpT*(lastPlastUn-phys->dElC) + phys->unldT*(un-lastPlastUn);
-					phys->unloadedC = true; 
-// 					cout<<"COMPRESION PLASTIC unloading Fn= "<<Fn<<" un= "<<un<<endl;
-					
-					if(un>=lastPlastUn){ // Recovers creep after unload and reload
-						phys->unloadedC=false;
-						Fn = phys->knC*(phys->dElC) + phys->crpT*(un-phys->dElC);
-// 						cout<<"COMPRESION PLASTIC load aftr unld Fn= "<<Fn<<" un= "<<un<<" LPun= "<<lastPlastUn<<endl;
-					}
-				
-				} // Unloading::  //FIXME: Verify Fn Sign
-				else{// loading, applying Creeping
-					lastPlastUn = un;
-// 					cout<<"COMPRESION PLASTIC Creep Fn= "<<Fn<<" un= "<<un<<endl;
-					// Fn stills Fn = phys->crpT*(un-phys->unp) ;}
-					if (un>phys->epsMaxC){ // Plastic rupture //
-						Fn = 0.0;
-						phys->isBrokenT = true;  
-// 						cout<<"COMPRESION PLASTIC creep BROKEN Fn= "<<Fn<<" un= "<<un<<endl;
-					}
-				}  
+			else{//loading on plastic deformation : creep.
+				Fn = -phys->maxElT+phys->kTCrp*(un+phys->maxElT/phys->knT);
+				phys->maxCrpRchdT[0]=un; //new maximum is reached.
+				phys->maxCrpRchdT[1]=Fn;
 			}
+		if (Fn>0){ //so the contact just passed the equilibrium state, set new "unp" who stores the plastic equilibrium state.
+			phys->unp=geom->penetrationDepth;
+			phys->maxCrpRchdT[0]=1e20;
+			phys->maxElT=0;
 		}
-	phys->normalForce = Fn*geom->normal;
+		}
+		else{ //elasticity
+			phys->maxCrpRchdT[0]=un;
+			phys->maxCrpRchdT[1]=Fn;
+		}
 	}
-// 	if ((-Fn)> phys->normalAdhesion) {//normal plasticity
-// 		Fn=-phys->normalAdhesion;
-// 		phys->unp = un+phys->normalAdhesion/phys->kn;
-// 		if (phys->unpMax && phys->unp<phys->unpMax)
-// 			scene->interactions->requestErase(contact); return;
-// 	}
 	
-	// 	cout<<"Tension-Comp normalF= "<<phys->normalForce<<endl;
-	///end tension-compression///
-	
-	///Shear/// ELASTOPLASTIC perfect law TO BE DONE
-	//FIXME:: TO DO::Shear ElastoPlastic perfect LAW  
-	///////////////////////// CREEP START ///////////
-	if (shear_creep) shearForce -= phys->ks*(shearForce*dt/creep_viscosity);
-	///////////////////////// CREEP END ////////////
+	else{/// compression /// similar to tension.
+		if(un>phys->maxContract || phys->isBroken){
+			phys->isBroken=1;
+			phys->normalForce=phys->shearForce=phys->moment_twist=phys->moment_bending=Vector3r(0,0,0);
+			if(geom->penetrationDepth<=0){ //do not erase the contact while penetrationDepth<0 because it would be recreated at next timestep.
+				scene->interactions->requestErase(contact);
+			}
+			return;
+		}
+		Fn=phys->knC*un;
+		if(Fn>phys->maxElC || phys->onPlastC){
+			phys->onPlastC=1;
+			if(phys->maxCrpRchdC[0]>un){
+				Fn = phys->kTUnld*(un-phys->maxCrpRchdC[0])+phys->maxCrpRchdC[1];
+			}
+			else{
+				Fn = phys->maxElC+phys->kTCrp*(un-phys->maxElC/phys->knC);
+				phys->maxCrpRchdC[0]=un;
+				phys->maxCrpRchdC[1]=Fn;
+			}
+		if (Fn<0){
+			phys->unp=geom->penetrationDepth;
+			phys->maxCrpRchdC[0]=-1e20;
+			phys->maxElC=0;
+		}
+		}
+		else{
+			phys->maxCrpRchdC[0]=un;
+			phys->maxCrpRchdC[1]=Fn;
+		}
+	}
 
-	shearForce = geom->rotate(phys->shearForce);
+	/// Shear ///
+	Vector3r shearForce = geom->rotate(phys->shearForce);
 	const Vector3r& dus = geom->shearIncrement();
 
 	//Linear elasticity giving "trial" shear force
-	shearForce -= phys->ks*dus;
-	
-	
-	Real Fs = phys->shearForce.norm();
+	shearForce += phys->ks*dus;
+	Real Fs = shearForce.norm();
 	Real maxFs = phys->shearAdhesion;
-	
-	
-	if (!phys->cohesionDisablesFriction || maxFs==0)
-		maxFs += Fn*phys->tangensOfFrictionAngle;
-		maxFs = std::max((Real) 0, maxFs);
+	if (maxFs==0)maxFs = Fn*phys->tangensOfFrictionAngle;
+	maxFs = std::max((Real) 0, maxFs);
 	if (Fs  > maxFs) {//Plasticity condition on shear force
-// 		cout<<"Plastshear ShearAdh= "<<phys->shearAdhesion<<endl;
-		if (phys->fragile && !phys->cohesionBroken) {
-			phys->SetBreakingState();
+		if (!phys->cohesionBroken) {
+			phys->cohesionBroken=1;
+			phys->shearAdhesion=0;
 			maxFs = max((Real) 0, Fn*phys->tangensOfFrictionAngle);
 		}
 		maxFs = maxFs / Fs;
-		Vector3r trialForce=shearForce;
 		shearForce *= maxFs;
-		if (scene->trackEnergy){
-			Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
-			if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);}
-		if (Fn<0)  phys->normalForce = Vector3r::Zero();//Vector3r::Zero()
-	}
-// 	cout<<"Fs= "<<Fs<<" maxFs= "<<maxFs<<endl;
-
-	//Apply the force
-	applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position + (scene->isPeriodic ? scene->cell->intrShiftPos(contact->cellDist): Vector3r::Zero()));
-// 		Vector3r force = -phys->normalForce-shearForce;
-// 		scene->forces.addForce(id1,force);
-// 		scene->forces.addForce(id2,-force);
-// 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-// 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-	/// end Shear ///
-	
-	/// Moment law  ///
-	/// Bending///
-	if(!(phys->isBrokenB)){
-		Vector3r relAngVel = geom->getRelAngVel(de1,de2,dt);
-		Vector3r relAngVelBend = relAngVel - geom->normal.dot(relAngVel)*geom->normal; // keep only the bending part
-		Vector3r relRotBend = relAngVelBend*dt; // relative rotation due to rolling behaviour	
-		Vector3r& momentBend = phys->moment_bending;
-		momentBend = geom->rotate(momentBend); // rotate moment vector (updated)
-
-		//To check if in elastic zone in current iteration
-		Real BendValue = (phys->moment_bending-phys->kr*relRotBend).norm();
-		Real MaxElastB = phys->maxElastB;
-		bool elasticBState = (BendValue<=MaxElastB);
-		
-		if(!onplastB && elasticBState){
-			momentBend = momentBend-phys->kr*relRotBend;
-// 			cout<<"BENDING Elastic"<<" momentB= "<<momentBend<<endl;
-		
-		}else{  ///Bending Plasticity///
-			onplastB = true;
-			BendValue = (phys->moment_bending-phys->crpB*relRotBend).norm();
-// 			cout<<"BENDING Plastic"<<" momentB= "<<momentBend<<endl;
-			// Unloading:: RelRotBend > 0 ::::
-			if(phys->unloadedB || phys->moment_bending.norm()>=BendValue){
-				momentBend = momentBend-phys->unldB*relRotBend;
-				phys->unloadedB = true; 
-// 				cout<<"BENDING Plastic UNLD"<<" momentB= "<<momentBend<<endl;
-				if(BendValue>=lastPlastBend){phys->unloadedB = false;} 
-				
-			} 
-			else{
-				momentBend = momentBend-phys->crpB*relRotBend;// loading, applying Creeping
-				Vector3r AbsRot = de1->rot()-de2->rot();
-				Real AbsBending = (AbsRot - geom->normal.dot(AbsRot)*geom->normal).norm();
-				lastPlastBend= BendValue;
-				if (AbsBending>phys->phBMax){ // Plastic rupture //FIXME: This line is not ok, need to find the compare the total(or just plastic) angular displacement to PhBmax, true meaning of relRotBend??
-					momentBend = Vector3r(0,0,0);
-					phys->isBrokenB = true;
-// 					cout<<"BENDING Plastic BREAK"<<" momentB= "<<momentBend<<endl;
-				}
-			}	
-		}
-		phys->moment_bending = momentBend;
-	}	
-	
-	///Twist///
-	
-	if(!(phys->isBrokenTw)){
-		Vector3r relAngVel = geom->getRelAngVel(de1,de2,dt);
-		Vector3r relAngVelTwist = geom->normal.dot(relAngVel)*geom->normal;
-		Vector3r relRotTwist = relAngVelTwist*dt; // component of relative rotation along n  FIXME: sign?
-		Vector3r& momentTwist = phys->moment_twist;
-		momentTwist = geom->rotate(momentTwist); // rotate moment vector (updated)
-		
-		//To check if in elastic zone in current iteration
-		Real TwistValue = (phys->moment_twist-phys->kt*relRotTwist).norm();
-		Real MaxElastTw = phys->maxElastTw;
-		bool elasticTwState = (TwistValue<=MaxElastTw);
-		
-		if (!onplastTw && elasticTwState){
-			momentTwist = momentTwist-phys->kt*relRotTwist; // FIXME: sign?
-// 			cout<<"TWIST Elast"<<" momentTwist="<<momentTwist<<endl;
-		}else {  ///Twist Plasticity///
-			onplastTw = true;
-			TwistValue = (phys->moment_twist-phys->crpTw*relRotTwist).norm();
-// 			cout<<"TWIST Plast"<<endl;
-			if (phys->unloadedTw || phys->moment_twist.norm()>=TwistValue){// Unloading:: RelRotTwist > 0 
-				momentTwist = momentTwist-phys->unldTw*relRotTwist;
-				phys->unloadedTw = true; 
-// 				cout<<"TWIST Plast UNLD"<<endl;
-				if(TwistValue>=lastPlastTw){phys->unloadedTw = false;} 
-			} 
-			    
-			else{momentTwist = momentTwist-phys->crpTw*relRotTwist;// loading, applying Creeping
-				Vector3r AbsRot = de1->rot()-de2->rot();
-				Real AbsTwist = (geom->normal.dot(AbsRot)*geom->normal).norm();
-				lastPlastTw= TwistValue;
-// 				cout<<"TWIST Creep momentTwist="<<momentTwist<<" AbsTwist="<<AbsTwist<<endl;
-				if (AbsTwist>phys->phTwMax){ // Plastic rupture //FIXME: This line is not ok, need to find the compare the total(or just plastic) angular displacement to PhBmax, true meaning of relRotBend??
-					momentTwist = Vector3r(0,0,0);
-					phys->isBrokenTw = true;
-				}
-			} 
-		}
-		phys->moment_twist = momentTwist;
 	}
 	
-// 	cout<<"moment Twist= "<<phys->moment_twist<<endl;
-
+	//rotational moment are only applied if the cohesion is not broken.
+	/// Twist /// the twist law is driven by twist displacement ("getTwist()").
+	if(!phys->cohesionBroken){
+		Real twist = geom->getTwist() - phys->twp;
+		Real twistM=twist*phys->ktw; //elastic twist moment.
+		bool sgnChanged=0; //whether the twist moment just passed the equilibrium state.
+		if(!contact->isFresh(scene) && phys->moment_twist.dot(twistM*geom->normal)<0)sgnChanged=1;
+		if(abs(twist)>phys->maxTwist){
+			phys->cohesionBroken=1;
+			twistM=0;
+		}
+		else{
+			if(abs(twistM)>phys->maxElTw || phys->onPlastTw){ //plastic deformation.
+				phys->onPlastTw=1;
+				if(abs(phys->maxCrpRchdTw[0])>abs(twist)){ //unloading/reloading
+					twistM = phys->kTwUnld*(twist-phys->maxCrpRchdTw[0])+phys->maxCrpRchdTw[1];
+				}
+				else{//creep loading.
+					int sign = twist<0?-1:1;
+					twistM = sign*phys->maxElTw+phys->kTwCrp*(twist-sign*phys->maxElTw/phys->ktw);	//creep
+					phys->maxCrpRchdTw[0]=twist; //new maximum reached
+					phys->maxCrpRchdTw[1]=twistM;
+				}
+			if(sgnChanged){
+				phys->maxElTw=0;
+				phys->twp=geom->getTwist();
+				phys->maxCrpRchdTw[0]=0;
+			}
+			}
+			else{ //elasticity
+				phys->maxCrpRchdTw[0]=twist;
+				phys->maxCrpRchdTw[1]=twistM;
+			}
+		}
+		phys->moment_twist = twistM * geom->normal;
+	}
+	else phys->moment_twist=Vector3r(0,0,0);
 	
-	// Apply moments now
-	Vector3r moment = phys->moment_twist + phys->moment_bending;
-	scene->forces.addTorque(id1,-moment);
-	scene->forces.addTorque(id2, moment);			
-	/// Moment law END ///
-
+	/// Bending /// incremental form.
+	if(!phys->cohesionBroken){
+		Vector3r bendM = phys->moment_bending;
+		Vector3r relAngVel = geom->getRelAngVel(de1,de2,dt);
+		Vector3r relRotBend = (relAngVel - geom->normal.dot(relAngVel)*geom->normal)*dt; // relative rotation due to rolling behaviour
+		bendM = geom->rotate(phys->moment_bending); // rotate moment vector (updated)
+		phys->pureCreep=geom->rotate(phys->pureCreep); // pure creep is updated to compute the damage.
+		Vector3r bendM_elast = bendM-phys->kr*relRotBend;
+		if(bendM_elast.norm()>phys->maxElB || phys->onPlastB){ // plastic behavior 
+			phys->onPlastB=1;
+			bendM=bendM-phys->kDam*relRotBend; //trial bending
+			if(bendM.norm()<phys->moment_bending.norm()){ // if bending decreased, we are unloading ...
+				bendM = bendM+phys->kDam*relRotBend-phys->kRUnld*relRotBend; // ... so undo bendM and apply unload coefficient.
+				Vector3r newPureCreep = phys->pureCreep-phys->kRCrp*relRotBend; // trial pure creep.
+				phys->pureCreep = newPureCreep.norm()<phys->pureCreep.norm()?newPureCreep:phys->pureCreep+phys->kRCrp*relRotBend; // while unloading, pure creep must decrease.
+				phys->kDam=phys->kr+(phys->kRCrp-phys->kr)*(phys->maxCrpRchdB.norm()-phys->maxElB)/(phys->maxBendMom-phys->maxElB); // compute the damage coefficient.
+			}
+			else{ // bending increased, so we are loading (bendM has to be unchanged).
+				Vector3r newPureCreep = phys->pureCreep-phys->kRCrp*relRotBend;
+				phys->pureCreep = newPureCreep.norm()>phys->pureCreep.norm()?newPureCreep:phys->pureCreep+phys->kRCrp*relRotBend; // while loading, pure creep must increase.
+				if(phys->pureCreep.norm()<bendM.norm()) bendM=phys->pureCreep; // bending moment can't be greather than pure creep.
+				if(phys->pureCreep.norm()>phys->maxCrpRchdB.norm()) phys->maxCrpRchdB=phys->pureCreep; // maxCrpRchdB must follow the maximum of pure creep.
+				if(phys->pureCreep.norm()>phys->maxBendMom){
+					phys->cohesionBroken=1;
+					bendM=bendM_elast=Vector3r(0,0,0);
+				}
+			}
+			phys->moment_bending=bendM;
+		}
+		else{//elasticity
+			phys->pureCreep=phys->moment_bending=phys->maxCrpRchdB=bendM_elast;
+			phys->kDam=phys->kRCrp;
+		}
+	}
+	phys->shearForce=shearForce;
+	phys->normalForce=-Fn*geom->normal;
+	applyForceAtContactPoint(phys->normalForce+phys->shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position + (scene->isPeriodic ? scene->cell->intrShiftPos(contact->cellDist): Vector3r::Zero()));
+	scene->forces.addTorque(id1,-phys->moment_bending-phys->moment_twist);
+	scene->forces.addTorque(id2,phys->moment_bending+phys->moment_twist);
 }
 
 YADE_PLUGIN((Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment));
+
+
+
+
+
+
+
