@@ -43,16 +43,16 @@ class TestSimpleClump(unittest.TestCase):
 		# centroid
 		S=b1.state.mass*b1.state.pos+b2.state.mass*b2.state.pos
 		c=S/bC.state.mass
-		self.assertEqual(bC.state.pos,c);
+		self.assertAlmostEqual(bC.state.pos,c);
 		# inertia
 		i1,i2=(8./15)*pi*b1.material.density*b1.shape.radius**5, (8./15)*pi*b2.material.density*b2.shape.radius**5 # inertia of spheres
 		iMax=i1+i2+b1.state.mass*(b1.state.pos-c).norm()**2+b2.state.mass*(b2.state.pos-c).norm()**2 # minimum principal inertia
 		iMin=i1+i2 # perpendicular to the 
 		# the order of bC.state.inertia is arbitrary (though must match the orientation)
 		iC=list(bC.state.inertia); iC.sort()
-		self.assertAlmostEqual(iC[0],iMin)
-		self.assertAlmostEqual(iC[1],iMax)
-		self.assertAlmostEqual(iC[2],iMax)
+		self.assertAlmostEqual(iC[0]*1000.0,iMin)
+		self.assertAlmostEqual(iC[1]*1000.0,iMax)
+		self.assertAlmostEqual(iC[2]*1000.0,iMax)
 		# check orientation...?
 		#self.assertAlmostEqual
 	def testVelocity(self):
