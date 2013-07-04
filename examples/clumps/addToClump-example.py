@@ -61,7 +61,6 @@ getClumpInfo()
 
 #add a sphere to the clump:
 O.bodies.addToClump(id_new,id_clump1)
-input()
 
 print '\nSTATE after adding sphere to clump ------------'
 getClumpInfo()
