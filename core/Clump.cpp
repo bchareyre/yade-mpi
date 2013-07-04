@@ -129,6 +129,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 		c: local clump coordinates
 	*/
 	Real M=0; // mass
+	Real dens=0;//density
 	Vector3r Sg(0,0,0); // static moment, for getting clump's centroid
 	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
 	
@@ -154,40 +155,22 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 		if (max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z())/dx > 100) dx = 100;//limit dx
 		Real dv = pow(dx,3);		//volume of cell
 		Vector3r x;			//position vector (center) of cell
-		Real volClump = 0.0;
 		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
 			for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
 				for(x.z()=aabb.min().z()+dx/2.; x.z()<aabb.max().z(); x.z()+=dx){
 					FOREACH(MemberMap::value_type& mm, clump->members){
 						const shared_ptr<Body> subBody = Body::byId(mm.first);
 						if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
+							dens = subBody->material->density;
 							const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
 							if((x-subBody->state->pos).squaredNorm() < pow(sphere->radius,2)){
-								volClump += dv;
+								M += dv;
+								Sg += dv*x;
 								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
-								Ig += ( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/)*subBody->material->density*dv;
+								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/);
 							}
 						}
 					}
-				}
-			}
-		}
-		Real volSum = 0.0;
-		for (int ii = 0; ii < 2; ii++){
-			FOREACH(MemberMap::value_type& mm, clump->members){
-				const shared_ptr<Body> subBody=Body::byId(mm.first);
-				assert(subBody->isClumpMember());
-				Real radTmp = 0.0;
-				if (subBody->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
-					const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
-					radTmp = sphere->radius;
-				}
-				if (ii == 0) volSum += (4./3.)*Mathr::PI*pow(radTmp,3.);
-				else {
-					Real subBodyMass = (volClump/volSum)*(4./3.)*Mathr::PI*pow(radTmp,3.)*subBody->material->density;
-					subBody->state->mass = subBodyMass;//set vol. corrected mass for clump members
-					M += subBodyMass;
-					Sg += subBodyMass*subBody->state->pos;
 				}
 			}
 		}
@@ -196,12 +179,14 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 		FOREACH(MemberMap::value_type& mm, clump->members){
 			// I.first is Body::id_t, I.second is Se3r of that body
 			const shared_ptr<Body> subBody=Body::byId(mm.first);
+			dens = subBody->material->density;
 			if (subBody->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
 				State* subState=subBody->state.get();
-				M+=subState->mass;
-				Sg+=subState->mass*subState->pos;
 				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
-				Ig+=Clump::inertiaTensorTranslate(Vector3r::Constant((2/5.)*subState->mass*pow(sphere->radius,2)).asDiagonal(),subState->mass,-1.*subState->pos);
+				Real vol = (4./3.)*Mathr::PI*pow(sphere->radius,3.);
+				M+=vol;
+				Sg+=vol*subState->pos;
+				Ig+=Clump::inertiaTensorTranslate(Vector3r::Constant((2/5.)*vol*pow(sphere->radius,2)).asDiagonal(),vol,-1.*subState->pos);
 			}
 		}
 	}
@@ -219,7 +204,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 	// set quaternion from rotation matrix
 	state->ori=Quaternionr(R_g2c); state->ori.normalize();
 	state->inertia=decomposed.eigenvalues();
-	state->mass=M;
+	state->mass=M*dens;
 	
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
 	state->vel=state->angVel=Vector3r::Zero();
