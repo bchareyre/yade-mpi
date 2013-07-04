@@ -153,7 +153,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 		int divisor = 15; 		//TODO: make it choosable by users
 		Real dx = rMin/divisor; 	//edge length of cell
 		Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
-		if (aabbMax/dx > 200) dx = aabbMax/200;//limit dx
+		if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
 		Real dv = pow(dx,3);		//volume of cell
 		Vector3r x;			//position vector (center) of cell
 		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
