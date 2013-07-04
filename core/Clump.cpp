@@ -151,6 +151,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
 		int divisor = 15; 		//TODO: make it choosable by users
 		Real dx = rMin/divisor; 	//edge length of cell
+		if (max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z())/dx > 100) dx = 100;//limit dx
 		Real dv = pow(dx,3);		//volume of cell
 		Vector3r x;			//position vector (center) of cell
 		Real volClump = 0.0;
