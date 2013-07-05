@@ -26,7 +26,10 @@ o.engines = [
   ),
   NewtonIntegrator(damping=0,gravity=[0,0,-9.81],label='newtonInt'),
   TranslationEngine(translationAxis=[0,0,1],velocity=-2.0,ids=idTop,dead=False,label='translat'),
-  ServoPIDController(axis=[0,0,1],maxVelocity=2.0,iterPeriod=1000,ids=idTop,target=1.0e7,kP=1.0,kI=1.0,kD=1.0,dead=True,label='servo'),
+  
+  CombinedKinematicEngine(ids=idTop,label='combEngine',dead=True) + 
+    ServoPIDController(axis=[0,0,1],maxVelocity=2.0,iterPeriod=1000,ids=idTop,target=1.0e7,kP=1.0,kI=1.0,kD=1.0) + 
+    RotationEngine(rotationAxis=(0,0,1), angularVelocity=10.0, rotateAroundZero=True, zeroPoint=(0,0,0)),
   PyRunner(command='addPlotData()',iterPeriod=1000, label='graph'),
   PyRunner(command='switchTranslationEngine()',iterPeriod=45000, nDo = 2, label='switchEng'),
 ]
@@ -47,7 +50,8 @@ def addPlotData():
 def switchTranslationEngine():
   print "Switch from TranslationEngine engine to ServoPIDController"
   translat.dead = True
-  servo.dead = False
+  combEngine.dead = False
+  
 
 
 plot.plots={'z':('pMove','pFest')}; plot.plot()
