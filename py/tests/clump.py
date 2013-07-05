@@ -50,9 +50,9 @@ class TestSimpleClump(unittest.TestCase):
 		iMin=i1+i2 # perpendicular to the 
 		# the order of bC.state.inertia is arbitrary (though must match the orientation)
 		iC=list(bC.state.inertia); iC.sort()
-		self.assertAlmostEqual(iC[0]*1000.0,iMin)
-		self.assertAlmostEqual(iC[1]*1000.0,iMax)
-		self.assertAlmostEqual(iC[2]*1000.0,iMax)
+		self.assertAlmostEqual(iC[0],iMin)
+		self.assertAlmostEqual(iC[1],iMax)
+		self.assertAlmostEqual(iC[2],iMax)
 		# check orientation...?
 		#self.assertAlmostEqual
 	def testVelocity(self):
