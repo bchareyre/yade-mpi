@@ -61,7 +61,7 @@ class Clump: public Shape {
 		static void add(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
 		static void del(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
 		//! Recalculate physical properties of Clump.
-		static void updateProperties(const shared_ptr<Body>& clump, bool intersecting);
+		static void updateProperties(const shared_ptr<Body>& clump);
 		//! Calculate positions and orientations of members based on relative Se3; newton pointer (if non-NULL) calls NewtonIntegrator::saveMaximaVelocity
 		// done as template to avoid cross-dependency between clump and newton (not necessary if all plugins are linked together)
 		template<class IntegratorT>

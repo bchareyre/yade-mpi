@@ -5,7 +5,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
-
+#include<yade/pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
@@ -64,8 +64,6 @@ void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vec
 
 /*! Clump's se3 will be updated (origin at centroid and axes coincident with principal inertia axes) and subSe3 modified in such a way that members positions in world coordinates will not change.
 
-	TODO: numerical integration of inertia based on regular space sampling with relative tolerance WRT minimum sphere radius
-
 	Note: velocities and angularVelocities of constituents are zeroed.
 
 	OLD DOCS (will be cleaned up):
@@ -84,7 +82,7 @@ void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vec
 
 */
 
-void Clump::updateProperties(const shared_ptr<Body>& clumpBody, bool intersecting){
+void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 	LOG_DEBUG("Updating clump #"<<clumpBody->id<<" parameters");
 	const shared_ptr<State> state(clumpBody->state);
 	const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
@@ -108,84 +106,118 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, bool intersectin
 		state->angVel=Vector3r::Zero();
 		return;
 	}
-
+	//check for intersections:
+	bool intersecting = false;
+	shared_ptr<Sphere> sph (new Sphere);
+	int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
+	FOREACH(MemberMap::value_type& mm, clump->members){
+		const shared_ptr<Body> subBody1=Body::byId(mm.first);
+		FOREACH(MemberMap::value_type& mm, clump->members){
+			const shared_ptr<Body> subBody2=Body::byId(mm.first);
+			if ((subBody1->shape->getClassIndex() ==  Sph_Index) && (subBody2->shape->getClassIndex() ==  Sph_Index) && (subBody1!=subBody2)){//clump members should be spheres
+				Vector3r dist = subBody1->state->pos - subBody2->state->pos;
+				const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
+				const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
+				Real un = (sphere1->radius+sphere2->radius) - dist.norm();
+				if (un > 0.) {intersecting = true; break;}
+			}
+		}
+	}
 	/* quantities suffixed by
 		g: global (world) coordinates
 		s: local subBody's coordinates
 		c: local clump coordinates
 	*/
-	double M=0; // mass
+	Real M=0; // mass
+	Real dens=0;//density
 	Vector3r Sg(0,0,0); // static moment, for getting clump's centroid
 	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
-
-	if(intersecting){
-		LOG_WARN("Self-intersecting clumps not yet implemented, intersections will be ignored.");
-		intersecting=false;
-	}
-
-	// begin non-intersecting loop here
-	if(!intersecting){
-		FOREACH(MemberMap::value_type& I, clump->members){
-			// I.first is Body::id_t, I.second is Se3r of that body
-			shared_ptr<Body> subBody=Body::byId(I.first);
-			State* subState=subBody->state.get();
-			M+=subState->mass;
-			Sg+=subState->mass*subState->pos;
-			// transform from local to global coords
-			Quaternionr subState_ori_conjugate=subState->ori.conjugate();
-			Matrix3r Imatrix=Matrix3r::Zero(); Imatrix.diagonal()=subState->inertia; 
-			// TRWM3MAT(Imatrix); TRWM3QUAT(subRBP_orientation_conjugate);
-			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subState_ori_conjugate),subState->mass,-1.*subState->pos);
-			//TRWM3MAT(Clump::inertiaTensorRotate(Matrix3r(subRBP->inertia),subRBP_orientation_conjugate));
+	
+	/**
+	algorithm for estimation of volumes and inertia tensor from clumps using summation/integration scheme with regular grid spacing
+	(some parts copied from woo: http://bazaar.launchpad.net/~eudoxos/woo/trunk/view/head:/pkg/dem/Clump.cpp)
+	*/
+	if(intersecting){	
+		//get boundaries and minimum radius of clump:
+		Real rMin=1./0.; AlignedBox3r aabb;
+		FOREACH(MemberMap::value_type& mm, clump->members){
+			const shared_ptr<Body> subBody = Body::byId(mm.first);
+			if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
+				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
+				aabb.extend(subBody->state->pos + Vector3r::Constant(sphere->radius));
+				aabb.extend(subBody->state->pos - Vector3r::Constant(sphere->radius));
+				rMin=min(rMin,sphere->radius);
+			}
+		}
+		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
+		int divisor = 15; 		//TODO: make it choosable by users
+		Real dx = rMin/divisor; 	//edge length of cell
+		Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
+		if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
+		Real dv = pow(dx,3);		//volume of cell
+		Vector3r x;			//position vector (center) of cell
+		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
+			for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
+				for(x.z()=aabb.min().z()+dx/2.; x.z()<aabb.max().z(); x.z()+=dx){
+					FOREACH(MemberMap::value_type& mm, clump->members){
+						const shared_ptr<Body> subBody = Body::byId(mm.first);
+						if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
+							dens = subBody->material->density;
+							const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
+							if((x-subBody->state->pos).squaredNorm() < pow(sphere->radius,2)){
+								M += dv;
+								Sg += dv*x;
+								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
+								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
-	TRVAR1(M); TRWM3MAT(Ig); TRWM3VEC(Sg);
-	assert(M>0);
-
-	state->pos=Sg/M; // clump's centroid
+	if(!intersecting){
+		FOREACH(MemberMap::value_type& mm, clump->members){
+			// I.first is Body::id_t, I.second is Se3r of that body
+			const shared_ptr<Body> subBody=Body::byId(mm.first);
+			dens = subBody->material->density;
+			if (subBody->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
+				State* subState=subBody->state.get();
+				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
+				Real vol = (4./3.)*Mathr::PI*pow(sphere->radius,3.);
+				M+=vol;
+				Sg+=vol*subState->pos;
+				Ig+=Clump::inertiaTensorTranslate(Vector3r::Constant((2/5.)*vol*pow(sphere->radius,2)).asDiagonal(),vol,-1.*subState->pos);
+			}
+		}
+	}
+	assert(M>0); LOG_TRACE("M=\n"<<M<<"\nIg=\n"<<Ig<<"\nSg=\n"<<Sg);
+	// clump's centroid
+	state->pos=Sg/M;
 	// this will calculate translation only, since rotation is zero
-	Matrix3r Ic_orientG=Clump::inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, state->pos); // inertia at clump's centroid but with world orientation
-	TRWM3MAT(Ic_orientG);
-
-	Matrix3r R_g2c(Matrix3r::Zero()); //rotation matrix
+	Matrix3r Ic_orientG=inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, state->pos); // inertia at clump's centroid but with world orientation
+	LOG_TRACE("Ic_orientG=\n"<<Ic_orientG);
 	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
-	//TRWM3MAT(Ic_orientG);
-	matrixEigenDecomposition(Ic_orientG,R_g2c,Ic);
-	/*! @bug eigendecomposition might be wrong. see http://article.gmane.org/gmane.science.physics.yade.devel/99 for message. It is worked around below, however.
-	*/
-	// has NaNs for identity matrix!
-	TRWM3MAT(R_g2c);
-
+	Eigen::SelfAdjointEigenSolver<Matrix3r> decomposed(Ic_orientG);
+	const Matrix3r& R_g2c(decomposed.eigenvectors());
+	// has NaNs for identity matrix??
+	LOG_TRACE("R_g2c=\n"<<R_g2c);
 	// set quaternion from rotation matrix
 	state->ori=Quaternionr(R_g2c); state->ori.normalize();
-	// now Ic is diagonal
-	state->inertia=Ic.diagonal();
-	state->mass=M;
-
-
-	// this block will be removed once EigenDecomposition works for diagonal matrices
-	#if 1
-		if(isnan(R_g2c(0,0))||isnan(R_g2c(0,1))||isnan(R_g2c(0,2))||isnan(R_g2c(1,0))||isnan(R_g2c(1,1))||isnan(R_g2c(1,2))||isnan(R_g2c(2,0))||isnan(R_g2c(2,1))||isnan(R_g2c(2,2))){
-			throw std::logic_error("Clump::updateProperties: NaNs in eigen-decomposition of inertia matrix?!");
-		}
-	#endif
-	TRWM3VEC(state->inertia);
-
+	state->inertia=dens*decomposed.eigenvalues();
+	state->mass=dens*M;
+	
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
 	state->vel=state->angVel=Vector3r::Zero();
-
 	clumpBody->setAspherical(state->inertia[0]!=state->inertia[1] || state->inertia[0]!=state->inertia[2]);
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
 	FOREACH(MemberMap::value_type& I, clump->members){
-		// now, I->first is Body::id_t, I->second is Se3r of that body
 		shared_ptr<Body> subBody=Body::byId(I.first);
-		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 		State* subState=subBody->state.get();
 		I.second.orientation=state->ori.conjugate()*subState->ori;
 		I.second.position=state->ori.conjugate()*(subState->pos-state->pos);
 	}
-
 }
 
 /*! @brief Recalculates inertia tensor of a body after translation away from (default) or towards its centroid.
@@ -196,19 +228,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, bool intersectin
  * @return inertia tensor in the new coordinate system; the matrix is symmetric.
  */
 Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off){
-	Real ooff=off.dot(off);
-	Matrix3r I2=I;
-	// TODO: replace by nicer eigen code
-
-	// translation away from centroid
-	/* I^c_jk=I'_jk-M*(delta_jk R.R - R_j*R_k) [http://en.wikipedia.org/wiki/Moments_of_inertia#Parallel_axes_theorem] */
-	Matrix3r dI; dI<</* dIxx */ ooff-off[0]*off[0], /* dIxy */ -off[0]*off[1], /* dIxz */ -off[0]*off[2],
-		/* sym */ 0., /* dIyy */ ooff-off[1]*off[1], /* dIyz */ -off[1]*off[2],
-		/* sym */ 0., /* sym */ 0., /* dIzz */ ooff-off[2]*off[2];
-	I2+=m*dI;
-	I2(1,0)=I2(0,1); I2(2,0)=I2(0,2); I2(2,1)=I2(1,2); // symmetrize
-	//TRWM3MAT(I2);
-	return I2;
+	return I+m*(off.dot(off)*Matrix3r::Identity()-off*off.transpose());
 }
 
 /*! @brief Recalculate body's inertia tensor in rotated coordinates.
@@ -219,7 +239,6 @@ Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vec
  */
 Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I,const Matrix3r& T){
 	/* [http://www.kwon3d.com/theory/moi/triten.html] */
-	//TRWM3MAT(I); TRWM3MAT(T);
 	return T.transpose()*I*T;
 }
 
@@ -233,5 +252,3 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 	Matrix3r T=rot.toRotationMatrix();
 	return inertiaTensorRotate(I,T);
 }
-
-

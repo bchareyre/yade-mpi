@@ -1,5 +1,13 @@
-#include "Ip2_2xInelastCohFrictMat_InelastCohFrictPhys.hpp"
+/*************************************************************************
+*  Copyright (C) 2012 by Ignacio Olmedo nolmedo.manich@gmail.com         *
+*  Copyright (C) 2012 by François Kneib   francois.kneib@gmail.com       *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
 
+
+#include "Ip2_2xInelastCohFrictMat_InelastCohFrictPhys.hpp"
+#include<yade/pkg/dem/ScGeom.hpp>
 
 
 
@@ -11,99 +19,53 @@ void Ip2_2xInelastCohFrictMat_InelastCohFrictPhys::go(const shared_ptr<Material>
 	InelastCohFrictMat* sdec1 = static_cast<InelastCohFrictMat*>(b1.get());
 	InelastCohFrictMat* sdec2 = static_cast<InelastCohFrictMat*>(b2.get());
 	ScGeom6D* geom = YADE_CAST<ScGeom6D*>(interaction->geom.get());
-
-	//Create cohesive interractions only once
-	if (setCohesionNow && cohesionDefinitionIteration==-1) cohesionDefinitionIteration=scene->iter;
-	if (setCohesionNow && cohesionDefinitionIteration!=-1 && cohesionDefinitionIteration!=scene->iter) {
-		cohesionDefinitionIteration = -1;
-		setCohesionNow = 0;}
+	
+	//FIXME : non cohesive contact are not implemented, it would be useful to use setCohesionNow, setCohesionOnNewContacts etc ...
 
 	if (geom) {
 		if (!interaction->phys) {
 			interaction->phys = shared_ptr<InelastCohFrictPhys>(new InelastCohFrictPhys());
 			InelastCohFrictPhys* contactPhysics = YADE_CAST<InelastCohFrictPhys*>(interaction->phys.get());
-// 			Real Ea 	= sdec1->young;
-// 			Real Eb 	= sdec2->young;
-// 			Real Va 	= sdec1->poisson;
-// 			Real Vb 	= sdec2->poisson;
-			Real Da 	= geom->radius1;
-			Real Db 	= geom->radius2;
-			Real fa 	= sdec1->frictionAngle;
-			Real fb 	= sdec2->frictionAngle;
-			//Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
-
-			// harmonic average of modulus
-			Real ETC = 2.0*sdec1->eTC*sdec2->eTC/(sdec1->eTC+sdec2->eTC);
-			Real ETT = 2.0*sdec1->eTT*sdec2->eTT/(sdec1->eTT+sdec2->eTT);
-
-			Real EB = 2.0*sdec1->eB*sdec2->eB/(sdec1->eB+sdec2->eB);
-			Real GTw = 2.0*sdec1->gTw*sdec2->gTw/(sdec1->gTw+sdec2->gTw);
-
-			contactPhysics->crpT = std::min(sdec1->creepT,sdec2->creepT);
-			contactPhysics->crpB = std::min(sdec1->creepB,sdec2->creepB);
-			contactPhysics->crpTw = std::min(sdec1->creepTw,sdec2->creepTw);
-			//
-			
-// 			Real Ks;
-// 			if (Va && Vb) Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
-// 			else Ks=0;
-
-			Vector3r segment = (Body::byId(interaction->getId1(),scene)->state->pos) - (Body::byId(interaction->getId2(),scene)->state->pos);
-			Real length = segment.norm();
 			Real pi = 3.14159265;
-			Real area = (pow(std::min(Db, Da),2))*pi;
-			Real iG = (pow(std::min(2*Db, 2*Da),4))*pi/32.;
-			Real iB = (pow(std::min(2*Db, 2*Da),4))*pi/64.;
-			// Ignacio Olmedo-Manich, non size-dependent mechanical params.
+			Real r1 	= geom->radius1;
+			Real r2 	= geom->radius2;
+			Real f1 	= sdec1->frictionAngle;
+			Real f2 	= sdec2->frictionAngle;
 			
-			contactPhysics->knT = ETT*area/length;
-			contactPhysics->knC = ETC*area/length;
-			contactPhysics->kt = GTw*iG/length;
-			contactPhysics->ks = 12*EB*iB/(pow(length,3));
-			contactPhysics->kr = EB*iB/length;
+			contactPhysics->tangensOfFrictionAngle	= tan(min(f1,f2));
 			
-			contactPhysics->crpT = std::min(sdec1->creepT,sdec2->creepT);
-			contactPhysics->crpB = std::min(sdec1->creepB,sdec2->creepB);
-			contactPhysics->crpTw = std::min(sdec1->creepTw,sdec2->creepTw);
+			// harmonic average of modulus
+			contactPhysics->knC = 2.0*sdec1->compressionModulus*r1*sdec2->compressionModulus*r2/(sdec1->compressionModulus*r1+sdec2->compressionModulus*r2);
+			contactPhysics->knT = 2.0*sdec1->tensionModulus*r1*sdec2->tensionModulus*r2/(sdec1->tensionModulus*r1+sdec2->tensionModulus*r2);
+			contactPhysics->ks = 2.0*sdec1->shearModulus*r1*sdec2->shearModulus*r2/(sdec1->shearModulus*r1+sdec2->shearModulus*r2); 
 			
-			contactPhysics->tangensOfFrictionAngle	= std::tan(std::min(fa,fb));
+			// harmonic average of coeficients for bending and twist coeficients
+			Real AlphaKr = 2.0*sdec1->alphaKr*sdec2->alphaKr/(sdec1->alphaKr+sdec2->alphaKr);
+			Real AlphaKtw = 2.0*sdec1->alphaKtw*sdec2->alphaKtw/(sdec1->alphaKtw+sdec2->alphaKtw);
 			
-			contactPhysics->maxElastB = iB*std::min(sdec1->sigmaB,sdec2->sigmaB);
-			contactPhysics->maxElastTw = iB*std::min(sdec1->sigmaTw,sdec2->sigmaTw);
-						
-			contactPhysics->unldB = std::min(sdec1->unloadB,sdec2->unloadB);
-			contactPhysics->unldT = std::min(sdec1->unloadT,sdec2->unloadT);
-			contactPhysics->unldTw = std::min(sdec1->unloadTw,sdec2->unloadTw);
+			contactPhysics->kr = r1*r2*contactPhysics->ks*AlphaKr;
+			contactPhysics->ktw = r1*r2*contactPhysics->ks*AlphaKtw;
 			
-			contactPhysics->dElT = std::min(sdec1->disElT,sdec2->disElT);
-			contactPhysics->dElC = std::min(sdec1->disElC,sdec2->disElC);
+			contactPhysics->kTCrp	= contactPhysics->knT*min(sdec1->creepTension,sdec2->creepTension);
+			contactPhysics->kRCrp	= contactPhysics->kr*min(sdec1->creepBending,sdec2->creepBending);
+			contactPhysics->kTwCrp	= contactPhysics->ktw*min(sdec1->creepTwist,sdec2->creepTwist);
 			
-			contactPhysics->epsMaxT = std::min(sdec1->epsilonMaxT,sdec2->epsilonMaxT);
-			contactPhysics->epsMaxC = std::min(sdec1->epsilonMaxC,sdec2->epsilonMaxC);
+			contactPhysics->kRUnld =  contactPhysics->kr*min(sdec1->unloadBending,sdec2->unloadBending);
+			contactPhysics->kTUnld =  contactPhysics->knT*min(sdec1->unloadTension,sdec2->unloadTension);
+			contactPhysics->kTwUnld = contactPhysics->ktw*min(sdec1->unloadTwist,sdec2->unloadTwist);
+
+			contactPhysics->maxElC =  min(sdec1->sigmaCompression,sdec2->sigmaCompression)*pow(min(r2, r1),2);
+			contactPhysics->maxElT =  min(sdec1->sigmaTension,sdec2->sigmaTension)*pow(min(r2, r1),2);
+			contactPhysics->maxElB =  min(sdec1->nuBending,sdec2->nuBending)*pow(min(r2, r1),3);
+			contactPhysics->maxElTw = min(sdec1->nuTwist,sdec2->nuTwist)*pow(min(r2, r1),3);
+								
+			contactPhysics->shearAdhesion = min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(min(r1, r2),2);
 			
-			contactPhysics->phBMax = std::min(sdec1->phiBMax,sdec2->phiBMax);
-			contactPhysics->phTwMax = std::min(sdec1->phiTwMax,sdec2->phiTwMax);
+			contactPhysics->maxExten = min(sdec1->epsilonMaxTension*r1,sdec2->epsilonMaxTension*r2);
+			contactPhysics->maxContract = min(sdec1->epsilonMaxCompression*r1,sdec2->epsilonMaxCompression*r2);
 			
-			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive)
-			{
-				contactPhysics->cohesionBroken = false;
-				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(Db, Da),2);
-				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(Db, Da),2);
-				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
-			}
-					
-			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
-		}
-		else {// !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
-			InelastCohFrictPhys* contactPhysics = YADE_CAST<InelastCohFrictPhys*>(interaction->phys.get());
-			if ((setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) || contactPhysics->initCohesion)
-			{
-				contactPhysics->cohesionBroken = false;
-				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
-				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
-				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
-				contactPhysics->initCohesion=false;
-			}
+			contactPhysics->maxBendMom = min(sdec1->etaMaxBending,sdec2->etaMaxBending)*pow(min(r2, r1),3);
+			contactPhysics->maxTwist = 2*pi*min(sdec1->etaMaxTwist,sdec2->etaMaxTwist);
 		}
 	}
 };

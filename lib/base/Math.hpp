@@ -55,6 +55,8 @@ typedef MATRIX6_TEMPLATE(Real) Matrix6r;
 
 typedef Eigen::Quaternion<Real> Quaternionr;
 typedef Eigen::AngleAxis<Real> AngleAxisr;
+typedef Eigen::AlignedBox<Real,2> AlignedBox2r;
+typedef Eigen::AlignedBox<Real,3> AlignedBox3r;
 using Eigen::AngleAxis; using Eigen::Quaternion;
 
 // in some cases, we want to initialize types that have no default constructor (OpenMPAccumulator, for instance)

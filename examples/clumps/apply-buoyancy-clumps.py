@@ -78,7 +78,7 @@ def apply_buo(water_height,saturatedList,startMass):
 					pos = O.bodies[keys[ii]].state.pos
 					h_low = min(h_low,pos[2]-O.bodies[keys[ii]].shape.radius)
 					h_high = max(h_high,pos[2]+O.bodies[keys[ii]].shape.radius)
-				rad = ( 3*startMass[b.id]/(4*pi*O.bodies[keys[ii]].mat.density) )**(1./3.)		#get radius from startMass
+				rad = ( 3*startMass[b.id]/(4*pi*O.bodies[keys[0]].mat.density) )**(1./3.)		#get radius from startMass
 			else:
 				continue
 			if water_height > h_low:

@@ -4,7 +4,7 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/lib/smoothing/LinearInterpolate.hpp>
 
-YADE_PLUGIN((KinematicEngine)(CombinedKinematicEngine)(TranslationEngine)(HarmonicMotionEngine)(RotationEngine)(HelixEngine)(InterpolatingHelixEngine)(HarmonicRotationEngine));
+YADE_PLUGIN((KinematicEngine)(CombinedKinematicEngine)(TranslationEngine)(HarmonicMotionEngine)(RotationEngine)(HelixEngine)(InterpolatingHelixEngine)(HarmonicRotationEngine)(ServoPIDController));
 
 CREATE_LOGGER(KinematicEngine);
 
@@ -140,5 +140,45 @@ void HarmonicRotationEngine::apply(const vector<Body::id_t>& ids){
 	Real w = f*2.0*Mathr::PI; 			//Angular frequency
 	angularVelocity = -1.0*A*w*sin(w*time + fi);
 	RotationEngine::apply(ids);
+}
+
+void ServoPIDController::apply(const vector<Body::id_t>& ids){
+  
+  if (iterPrevStart < 0 or ((scene->iter-iterPrevStart)>=iterPeriod)) {
+  
+    Vector3r tmpForce = Vector3r::Zero();
+    
+    if (ids.size()>0) {
+      FOREACH(Body::id_t id,ids){
+        assert(id<(Body::id_t)scene->bodies->size());
+        tmpForce += scene->forces.getForce(id);
+      }
+    } else {
+      LOG_WARN("The list of ids is empty!");
+    }
+    
+    axis.normalize();
+    tmpForce = tmpForce.cwiseProduct(axis);   // Take into account given axis
+    errorCur = tmpForce.norm() - target;      // Find error
+    
+    const Real pTerm = errorCur*kP;               // Calculate proportional term
+    iTerm += errorCur*kI;                         // Calculate integral term
+    const Real dTerm = (errorCur-errorPrev)*kD;   // Calculate derivative term
+    
+    errorPrev = errorCur;                         // Save the current value of the error
+    
+    curVel = (pTerm + iTerm + dTerm);             // Calculate current velocity
+    
+    if (fabs(curVel) > fabs(maxVelocity)) {
+      curVel*=fabs(maxVelocity)/fabs(curVel);
+    }
+    
+    iterPrevStart = scene->iter;
+  }
+  
+  translationAxis = axis;
+  velocity = curVel;
+  
+  TranslationEngine::apply(ids);
 }
 

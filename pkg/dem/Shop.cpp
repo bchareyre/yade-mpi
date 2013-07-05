@@ -914,7 +914,7 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if(b->isClump()){
 			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
-			clumpSt->updateProperties(b, 0);
+			clumpSt->updateProperties(b);
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
