@@ -48,6 +48,8 @@ def getClumpInfo():
 			keys = b.shape.members.keys()
 			for ii in range(0,len(keys)):
 				print '- Body ',keys[ii]
+			print 'inertia:',b.state.inertia
+			print 'mass:',b.state.mass,'\n'
 
 
 #### show how to use addToClump():
