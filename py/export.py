@@ -401,17 +401,17 @@ class VTKExporter:
 				i = O.interactions[j,k]
 				if not i: continue
 				intrs.append(i)
-		n = len(intrs)
+		n = len([i for i in intrs if i.isReal])
 		ids = [None for j in xrange(n)]
 		outFile = open(self.baseName+'-intrs-%04d'%self.intrsSnapCount+'.vtk', 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,2*n))
 		for j,i in enumerate(intrs):
-			id1,id2 = i.id1,i.id2
-			pos = O.bodies[id1].state.pos
+			if not i.isReal: continue
+			pos = O.bodies[i.id1].state.pos
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
-			pos = O.bodies[id2].state.pos
+			pos = O.bodies[i.id2].state.pos + i.cellDist
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
-			ids[j] = (id1,id2)
+			ids[j] = (2*j-1,2*j)
 		outFile.write("LINES %d %d\n"%(n,3*n))
 		for j,i in enumerate(intrs):
 			outFile.write("2 %d %d\n"%(ids[j][0]+1,ids[j][1]+1))
@@ -437,7 +437,7 @@ class VTKExporter:
 			else:
 				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
 		outFile.close()
-		self.spheresSnapCount += 1
+		self.intrsSnapCount += 1
 
 
 
