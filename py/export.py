@@ -163,6 +163,8 @@ class VTKWriter:
 		outFile.close()
 		self.snapCount+=1
 		
+
+#text===============================================================
 def text(filename,mask=-1):
 	"""Save sphere coordinates into a text file; the format of the line is: x y z r. Non-spherical bodies are silently skipped. Example added to examples/regular-sphere-pack/regular-sphere-pack.py
 
@@ -192,12 +194,13 @@ class VTKExporter:
 	def __init__(self,baseName,startSnap=0):
 		self.spheresSnapCount = startSnap
 		self.facetsSnapCount = startSnap
+		self.intrsSnapCount = startSnap
 		self.baseName = baseName
 
 	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None):
 		"""exports spheres (positions and radius) and defined properties.
 
-		:param ids: if dd "all", then export all spheres, otherwise only spheres from integer list
+		:param ids: if "all", then export all spheres, otherwise only spheres from integer list
 		:type ids: [int] | "all"
 		:param what: what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
 		:type what: [tuple(2)]
@@ -377,6 +380,66 @@ class VTKExporter:
 					outFile.write("%g\n"%(eval(command)))
 		outFile.close()
 		self.facetsSnapCount += 1
+
+	def exportInteractions(self,ids='all',what=[],comment="comment",numLabel=None):
+		"""exports interactions and defined properties.
+
+		:param ids: if "all", then export all interactions, otherwise only interactions from (integer,integer) list
+		:type ids: [(int,int)] | "all"
+		:param what: what to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the interactions are labeled as i in this function. Scalar, vector and tensor variables are supported. For example, to export stiffness difference from certain value (1e9) (named as dStiff) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
+		:type what: [tuple(2)]
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		"""
+		allIds = False
+		if ids=='all':
+			intrs=O.interactions
+			allIds = True
+		else:
+			intrs = []
+			for j,k in ids:
+				i = O.interactions[j,k]
+				if not i: continue
+				intrs.append(i)
+		n = len([i for i in intrs if i.isReal])
+		ids = [None for j in xrange(n)]
+		outFile = open(self.baseName+'-intrs-%04d'%self.intrsSnapCount+'.vtk', 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,2*n))
+		for j,i in enumerate(intrs):
+			if not i.isReal: continue
+			pos = O.bodies[i.id1].state.pos
+			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
+			pos = O.bodies[i.id2].state.pos + i.cellDist
+			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
+			ids[j] = (2*j-1,2*j)
+		outFile.write("LINES %d %d\n"%(n,3*n))
+		for j,i in enumerate(intrs):
+			outFile.write("2 %d %d\n"%(ids[j][0]+1,ids[j][1]+1))
+		outFile.write("\nCELL_DATA %d\n"%(n))
+		for name,command in what:
+			test = eval(command)
+			if isinstance(test,Matrix3):
+				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, Matrix3 output not (yet?) supported'
+				#outFile.write("\nTENSORS %s double\n"%(name))
+				#for i in intrs:
+				#	t = eval(command)
+				#	outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+			elif isinstance(test,Vector3):
+				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, Vector3 output not (yet?) supported'
+				#outFile.write("\nVECTORS %s double\n"%(name))
+				#for i in intrs:
+				#	v = eval(command)
+				#	outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+			elif isinstance(test,(int,float)):
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
+				for i in intrs:
+					outFile.write("%g\n"%(eval(command)))
+			else:
+				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
+		outFile.close()
+		self.intrsSnapCount += 1
+
+
 
 #gmshGeoExport===============================================================
 def gmshGeo(filename, comment='',mask=-1,accuracy=-1):
