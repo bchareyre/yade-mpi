@@ -342,9 +342,7 @@ IF (CHUNKSIZE)
   FILE(GLOB SRC_LIB_COMBINED "${CMAKE_BINARY_DIR}/lib.*.cpp")
   ADD_LIBRARY(support SHARED ${SRC_LIB_COMBINED})
 ELSE (CHUNKSIZE)
-  ADD_LIBRARY(core SHARED ${SRC_CORE})
-  ADD_LIBRARY(plugins SHARED ${SRC_PKG})
-  ADD_LIBRARY(support SHARED ${SRC_LIB})
+  ADD_LIBRARY(yade SHARED ${SRC_CORE} ${SRC_PKG} ${SRC_LIB})
 ENDIF (CHUNKSIZE)
 #===========================================================
 find_python_module(minieigen)
@@ -358,17 +356,14 @@ find_python_module(Tkinter REQUIRED)
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
-TARGET_LINK_LIBRARIES(core support ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} -lrt)
-TARGET_LINK_LIBRARIES(boot plugins support core ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS})
+TARGET_LINK_LIBRARIES(yade ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} -lrt)
+TARGET_LINK_LIBRARIES(boot yade)
 
 IF(ENABLE_VTK)
-  TARGET_LINK_LIBRARIES(plugins vtkHybrid)
+  TARGET_LINK_LIBRARIES(yade vtkHybrid)
 ENDIF(ENABLE_VTK)
 IF(ENABLE_GUI)
-  TARGET_LINK_LIBRARIES(core ${GUI_LIBS})
-  TARGET_LINK_LIBRARIES(plugins _GLViewer ${GUI_LIBS})
-  TARGET_LINK_LIBRARIES(support ${GUI_LIBS})
+  TARGET_LINK_LIBRARIES(yade _GLViewer ${GUI_LIBS})
 ENDIF(ENABLE_GUI)
 
 #====================================
@@ -406,9 +401,7 @@ INSTALL(FILES ${filesPYChecksData} DESTINATION ${YADE_PY_PATH}/yade/tests/checks
 INSTALL(FILES "${CMAKE_CURRENT_SOURCE_DIR}/doc/yade-logo-note.png" DESTINATION "${YADE_DOC_PATH}/img")
 
 INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
-INSTALL(TARGETS core DESTINATION ${YADE_LIB_PATH})
-INSTALL(TARGETS plugins DESTINATION ${YADE_LIB_PATH})
-INSTALL(TARGETS support DESTINATION ${YADE_LIB_PATH})
+INSTALL(TARGETS yade DESTINATION ${YADE_LIB_PATH})
 
 #===========================================================
 MESSAGE(STATUS "===========================================================")
