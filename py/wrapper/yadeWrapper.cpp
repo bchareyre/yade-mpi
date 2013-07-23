@@ -650,12 +650,15 @@ class pyOmega{
 	string sceneToString(){
 		ostringstream oss;
 		yade::ObjectIO::save<typeof(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
+		oss.flush();
 		return oss.str();
 	}
-	string stringToScene(const string &sstring, string mark=""){
+	void stringToScene(const string &sstring, string mark=""){
+		Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS;
+		assertScene();
 		OMEGA.memSavedSimulations[":memory:"+mark]=sstring;
 		OMEGA.sceneFile=":memory:"+mark;
-		load(OMEGA.sceneFile,false);
+		load(OMEGA.sceneFile,true);
 	}
 
 	void save(std::string fileName,bool quiet=false){
