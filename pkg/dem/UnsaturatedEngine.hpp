@@ -13,7 +13,7 @@
 
 class Flow;
 class TesselationWrapper;
-#define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
+#define _FlowSolver CGT::FlowBoundingSphere<UnsatTesselation>
 #define TPL template<class Solver>
 
 class UnsaturatedEngine : public PartialEngine
@@ -92,9 +92,9 @@ class UnsaturatedEngine : public PartialEngine
 		template<class Cellhandle>
 		Real Volume_cell (Cellhandle cell);
 		template<class Cellhandle>
-		Real capillary_Volume_cell (Cellhandle cell);
+		Real volumeCapillaryCell (Cellhandle cell);
 		template<class Cellhandle>
-		double compute_EffPoreRadius(Cellhandle cell, int j);
+		double computeEffPoreRadius(Cellhandle cell, int j);
 		template<class Cellhandle>
 		double bisection(Cellhandle cell, int j, double a, double b);
 		template<class Cellhandle>
@@ -126,14 +126,12 @@ class UnsaturatedEngine : public PartialEngine
  		void		_saveLatticeNodeZ(double z) {saveLatticeNodeZ(solver,z);}
  		void 		_saveListAdjCellsTopBound() {saveListAdjCellsTopBound(solver);}
  		void 		_saveListAdjCellsBottomBound() {saveListAdjCellsBottomBound(solver);}
- 		void		_updateWaterReservoir() {updateWaterReservoir(solver);}
- 		void		_updateAirReservoir() {updateAirReservoir(solver);}
 
 		virtual ~UnsaturatedEngine();
 
 		virtual void action();
 
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(UnsaturatedEngine,PartialEngine,"Preliminary version of a model for unsaturated soils",
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(UnsaturatedEngine,PartialEngine,"Preliminary version engine of a model for unsaturated soils",
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool, Debug, false,,"Activate debug messages"))
 					((double, wall_thickness,0.001,,"Walls thickness"))
@@ -195,9 +193,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("saveListAdjCellsTopBound",&UnsaturatedEngine::_saveListAdjCellsTopBound,"Save the cells IDs adjacent top boundary")
 					.def("saveListAdjCellsBottomBound",&UnsaturatedEngine::_saveListAdjCellsBottomBound,"Save the cells IDs adjacent bottom boundary")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
-					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2) ")
-					.def("updateWaterReservoir",&UnsaturatedEngine::_updateWaterReservoir,"Update the water reservoir. ")
-					.def("updateAirReservoir",&UnsaturatedEngine::_updateAirReservoir,"Update the air reservoir. ")
+					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2,water can be trapped in cells) ")
 					)
 		DECLARE_LOGGER;
 };
