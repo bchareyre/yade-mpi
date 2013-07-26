@@ -14,9 +14,17 @@
 #include "Timer.h"
 #include "basicVTKwritter.hpp"
 
+/**
+Defines class Network. Which contains the geometrical representation of a pore network on the basis of regular triangulation (using CGAL lib)
+The class is the base of the pore-flow model. It has basic functions to compute quantities like void volumes and solid surfaces in the triangulation's elements.
+
+The same data structure is used with different template parameters for periodic and aperiodic boundary conditions. The network is bounded by infinite planes represented in the triangulation by very large spheres (so that their surface looks flat at the scale of the network).
+
+Two triangulations are in fact contained in the network, so that a simulation can switch between them and pass data from one to the other. Otherwise, some info would be lost when the problem is retriangulated.
+*/
 
 namespace CGT {
-
+/// Representation of a boundary condition along an axis aligned plane.
 struct Boundary
 {
 	Point p;//position
@@ -55,7 +63,7 @@ class Network
 		int vtk_infinite_vertices, vtk_infinite_cells, num_particles;
 
 		void AddBoundingPlanes();
-		void AddBoundingPlane (bool yade, Vecteur Normal, int id_wall);
+		void AddBoundingPlane (Vecteur Normal, int id_wall);
 		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall );
 
 		void Define_fictious_cells( );

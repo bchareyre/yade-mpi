@@ -461,41 +461,31 @@ void Network<Tesselation>::AddBoundingPlanes()
 	
 	id_offset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
 	
-	AddBoundingPlane (true, Vecteur(0,1,0) , y_min_id);
-	AddBoundingPlane (true, Vecteur(0,-1,0) , y_max_id);
-	AddBoundingPlane (true, Vecteur(-1,0,0) , x_max_id);
-	AddBoundingPlane (true, Vecteur(1,0,0) , x_min_id);
-	AddBoundingPlane (true, Vecteur(0,0,1) , z_min_id);
-	AddBoundingPlane (true, Vecteur(0,0,-1) , z_max_id);
+	AddBoundingPlane (Vecteur(0,1,0) , y_min_id);
+	AddBoundingPlane (Vecteur(0,-1,0) , y_max_id);
+	AddBoundingPlane (Vecteur(-1,0,0) , x_max_id);
+	AddBoundingPlane (Vecteur(1,0,0) , x_min_id);
+	AddBoundingPlane (Vecteur(0,0,1) , z_min_id);
+	AddBoundingPlane (Vecteur(0,0,-1) , z_max_id);
 
 // 	AddBoundingPlanes(true);
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall)
+void Network<Tesselation>::AddBoundingPlane (Vecteur Normal, int id_wall)
 {
-	  Tesselation& Tes = T[currentTes];
-	  
+// 	  Tesselation& Tes = T[currentTes];
+	  //FIXME: pre-condition: the normal is axis-aligned
 	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
 	  
 	  double pivot = Normal[Coordinate]<0 ? 
 	  Corner_max.x()*abs(Normal[0])+Corner_max.y()*abs(Normal[1])+Corner_max.z()*abs(Normal[2]) : Corner_min.x()*abs(Normal[0])+Corner_min.y()*abs(Normal[1])+Corner_min.z()*abs(Normal[2]);
-	
-	  Tes.insert(0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
-		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
-		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
-		     FAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
 
-	  if (Normal[Coordinate]<0) boundaries[id_wall-id_offset].p = Corner_max;
-	  else boundaries[id_wall-id_offset].p = Corner_min;
+	  Real center [3] ={ 0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+pivot*abs(Normal[0]),
+		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+pivot*abs(Normal[1]),
+		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+pivot*abs(Normal[2])};
 	  
-	  boundaries[id_wall-id_offset].normal = Normal;
-	  boundaries[id_wall-id_offset].coordinate = Coordinate;
-	  
-          boundaries[id_wall-id_offset].flowCondition = 1;
-          boundaries[id_wall-id_offset].value = 0;
-	  
-	  if(DEBUG_OUT) cout << "A boundary -max/min-has been created. ID = " << id_wall << " position = " << 0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << 0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " << 0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2])  << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
+	  AddBoundingPlane(center,0,Normal,id_wall);
 }
 
 template<class Tesselation>
