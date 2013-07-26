@@ -38,14 +38,13 @@ template<class Tesselation>
 Network<Tesselation>::Network(){
 	facetF1=facetF2=facetRe1=facetRe2=facetRe3=0;
 	F1=F2=Re1=Re2=0;
-	facet_detected = false;
-
+// 	facet_detected = false;
 }
 
 template<class Tesselation>
-int Network<Tesselation>::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
+int Network<Tesselation>::detectFacetFictiousVertices (Cell_handle& cell, int& j)
 {
-	fictious_vertex = 0;
+	facetNFictious = 0;
 	int real_vertex=0;
 	Sphere v [3];
         Vertex_handle W [3];
@@ -54,28 +53,27 @@ int Network<Tesselation>::Detect_facet_fictious_vertices (Cell_handle& cell, int
                 W[kk] = cell->vertex(facetVertices[j][kk]);
                 v[kk] = cell->vertex(facetVertices[j][kk])->point();
                 if (W[kk]->info().isFictious) {
-                        if (fictious_vertex==0) {F1=facetVertices[j][kk];facetF1=kk;} else
+                        if (facetNFictious==0) {F1=facetVertices[j][kk];facetF1=kk;} else
 			{F2 = facetVertices[j][kk];facetF2=kk;}
-                        fictious_vertex +=1;
+                        facetNFictious +=1;
                 } else {
                         if (real_vertex==0) {Re1=facetVertices[j][kk];facetRe1=kk;} else if (real_vertex==1)
 			{Re2=facetVertices[j][kk];facetRe2=kk;} else if (real_vertex==2)
 			{Re2=facetVertices[j][kk];facetRe3=kk;}
                         real_vertex+=1;}}
-        facet_detected = true;
-	return fictious_vertex;
+	return facetNFictious;
 }
 
 template<class Tesselation>
-double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
+double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j, bool reuseFacetData)
 {
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
-  fictious_vertex = Detect_facet_fictious_vertices (cell,j);
+  if (!reuseFacetData) facetNFictious = detectFacetFictiousVertices (cell,j);
   Sphere v [3];
   Vertex_handle W [3];
   for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);v[kk] = cell->vertex(facetVertices[j][kk])->point();}
-  switch (fictious_vertex) {
+  switch (facetNFictious) {
     case (0) : {
 		Vertex_handle& SV1 = W[0];
                 Vertex_handle& SV2 = W[1];
@@ -269,11 +267,9 @@ Real Network<Tesselation>::fast_solid_angle(const Point& STA1, const Point& PTA1
 }
 
 template<class Tesselation>
-double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS)
+double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData)
 {
-  if (!facet_detected) fictious_vertex=Detect_facet_fictious_vertices(cell,j);
-
-//   RTriangulation& Tri = T[currentTes].Triangulation();
+  if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
 
@@ -287,7 +283,7 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
 	  W[kk] = cell->vertex(facetVertices[j][kk]);
 	  v[kk] = cell->vertex(facetVertices[j][kk])->point();}
 
-  switch (fictious_vertex) {
+  switch (facetNFictious) {
     case (0) : {
 		Vertex_handle& SV1 = W[0];
                 Vertex_handle& SV2 = W[1];

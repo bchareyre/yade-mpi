@@ -68,7 +68,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	x_min = 1000.0, x_max = -10000.0, y_min = 1000.0, y_max = -10000.0, z_min = 1000.0, z_max = -10000.0;
 	currentTes = 0;
 	nOfSpheres = 0;
-	fictious_vertex = 0;
+// 	fictious_vertex = 0;
 	SectionArea = 0, Height=0, Vtotale=0;
 	vtk_infinite_vertices=0, vtk_infinite_cells=0;
 	VISCOSITY = 1;
@@ -986,9 +986,9 @@ double FlowBoundingSphere<Tesselation>::Compute_HydraulicRadius(Cell_handle cell
 	double Ssolid = this->Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS);
 
 	//handle symmetry (tested ok)
-	if (SLIP_ON_LATERALS && fictious_vertex>0) {
+	if (SLIP_ON_LATERALS && facetNFictious>0) {
 		//! Include a multiplier so that permeability will be K/2 or K/4 in symmetry conditions
-		Real mult= fictious_vertex==1 ? multSym1 : multSym2;
+		Real mult= facetNFictious==1 ? multSym1 : multSym2;
 		return Vpore/Ssolid*mult;}
 	return Vpore/Ssolid;
 }
