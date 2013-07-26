@@ -155,5 +155,5 @@ class PeriodicTesselation : public Tesselation
 typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes>		SimpleTesselation;
 typedef CGT::_Tesselation<CGT::FlowTriangulationTypes>			FlowTesselation;
 typedef CGT::PeriodicTesselation<CGT::_Tesselation<CGT::PeriFlowTriangulationTypes> >	PeriFlowTesselation;
-
+typedef CGT::_Tesselation<CGT::UnsatFlowTriangulationTypes>			UnsatTesselation;
 

@@ -21,6 +21,8 @@ FlowBoundingSphere ex;
 #ifdef LINSOLV
 typedef CGT::FlowBoundingSphereLinSolv<FlowBoundingSphere> FlowBoundingSphereLinSolv;
 FlowBoundingSphereLinSolv exls;
+typedef CGT::FlowBoundingSphere<UnsatTesselation> UnsatFlowBoundingSphere;
+UnsatFlowBoundingSphere unex;
 #endif
 
 
