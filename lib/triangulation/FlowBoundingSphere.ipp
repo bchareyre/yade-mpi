@@ -68,7 +68,6 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	x_min = 1000.0, x_max = -10000.0, y_min = 1000.0, y_max = -10000.0, z_min = 1000.0, z_max = -10000.0;
 	currentTes = 0;
 	nOfSpheres = 0;
-// 	fictious_vertex = 0;
 	SectionArea = 0, Height=0, Vtotale=0;
 	vtk_infinite_vertices=0, vtk_infinite_cells=0;
 	VISCOSITY = 1;
@@ -90,7 +89,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	RAVERAGE = false; /** use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
 	OUTPUT_BOUDARIES_RADII = false;
 	RAVERAGE = false; /** if true use the average between the effective radius (inscribed sphere in facet) and the equivalent (circle surface = facet fluid surface) **/
-	areaR2Permeability=true;
+// 	areaR2Permeability=true;
 	permeability_map = false;
 	computedOnce=false;
 	minKdivKmean=0.0001;
@@ -218,9 +217,6 @@ Tesselation& FlowBoundingSphere<Tesselation>::Compute_Action(int argc, char *arg
 
 	ComputeFacetForcesWithCache();
         clock.top("Compute_Forces");
-
-        /** VISUALISATION FILES **/
-        MGPost();
 
         ///*** VUE 3D ***///
   
@@ -406,7 +402,7 @@ vector<Real> FlowBoundingSphere<Tesselation>::Average_Fluid_Velocity_On_Sphere(u
 	return result;
 }
 template <class Tesselation> 
-double FlowBoundingSphere<Tesselation>::MeasurePorePressure (double X, double Y, double Z)
+double FlowBoundingSphere<Tesselation>::getPorePressure (double X, double Y, double Z)
 {
 	if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
@@ -424,7 +420,7 @@ double FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
 }
 
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, double Wall_down_y)
+void FlowBoundingSphere<Tesselation>::measurePressureProfile(double Wall_up_y, double Wall_down_y)
 {  
 	if (noCache && T[!currentTes].Max_id()<=0) return;//the engine never solved anything
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
@@ -450,7 +446,7 @@ void FlowBoundingSphere<Tesselation>::MeasurePressureProfile(double Wall_up_y, d
 	
 }
 template <class Tesselation> 
-double FlowBoundingSphere<Tesselation>::MeasureAveragedPressure(double Y)
+double FlowBoundingSphere<Tesselation>::averageSlicePressure(double Y)
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
   double P_ave = 0.f;
@@ -468,7 +464,7 @@ double FlowBoundingSphere<Tesselation>::MeasureAveragedPressure(double Y)
   return P_ave;
 }
 template <class Tesselation> 
-double FlowBoundingSphere<Tesselation>::MeasureTotalAveragedPressure()
+double FlowBoundingSphere<Tesselation>::averagePressure()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
   double P = 0.f, Ppond=0.f, Vpond=0.f;
@@ -656,16 +652,25 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
         Cell_handle old_cell;
-
-        RTriangulation& NewTri = NewTes.Triangulation();
         RTriangulation& Tri = Tes.Triangulation();
-        Finite_cells_iterator cell_end = NewTri.finite_cells_end();
-        /*CALCULATION OF VORONOI CENTRES*/
-//        if ( !NewTes.Computed() ) NewTes.Compute();
-        for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
-		if (new_cell->info().Pcondition) continue;
-                old_cell = Tri.locate((Point) new_cell->info());
-                new_cell->info().p() = old_cell->info().p();
+	for (typename Vector_Cell::iterator cell_it=NewTes.cellHandles.begin(); cell_it!=NewTes.cellHandles.end(); cell_it++){
+		Cell_handle& new_cell = *cell_it;
+		if (new_cell->info().Pcondition || new_cell->info().isGhost) continue;
+		Vecteur center ( 0,0,0 );
+		if (new_cell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(new_cell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+		else {
+			Real boundPos=0; int coord=0;
+			for ( int k=0;k<4;k++ ) {
+				if (!new_cell->vertex (k)->info().isFictious) center= center+0.3333333333*(Tes.vertex(new_cell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+				else {
+					coord=boundary (new_cell->vertex(k)->info().id()).coordinate;
+					boundPos=boundary (new_cell->vertex(k)->info().id()).p[coord];
+				}
+			}
+			center=Vecteur(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
+		}
+                old_cell = Tri.locate(Point(center[0],center[1],center[2]));
+                new_cell->info().p() = old_cell->info().shiftedP();
         }
 //  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
 }
@@ -703,17 +708,13 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 	int NEG=0, POS=0, pass=0;
 
 	bool ref = Tri.finite_cells_begin()->info().isvisited;
-	Vecteur n;
-//         std::ofstream oFile( "Radii",std::ios::out);
-// 	std::ofstream fFile( "Radii_Fictious",std::ios::out);
-//         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
+// 	Vecteur n;
 	Real meanK=0, STDEV=0, meanRadius=0, meanDistance=0;
 	Real infiniteK=1e10;
 
-	double volume_sub_pore = 0.f;
+// 	double volume_sub_pore = 0.f;
 
 	for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
-// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		Cell_handle& cell = *cell_it;
 		Point& p1 = cell->info();
 		for (int j=0; j<4; j++) {
@@ -728,21 +729,16 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 				Sphere& v0 = W[0]->point();
 				Sphere& v1 = W[1]->point();
 				Sphere& v2 = W[2]->point();
-#ifdef USE_FAST_MATH
-				//FIXME : code not compiling,, do the same as in "else"
-				assert((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point())>=0 && (W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point())<=1);
-				for (int jj=0;jj<3;jj++)
-					cell->info().facetSphereCrossSections[j][jj]=0.5*W[jj]->point().weight()*Wm3::FastInvCos1((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point()));
-#else
+
 				cell->info().facetSphereCrossSections[j]=Vecteur(
 				   W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
 				   W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
 				   W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
-#endif
+
 				pass+=1;
 				Vecteur l = p1 - p2;
 				distance = sqrt(l.squared_length());
-				n = l/distance;
+// 				n = l/distance;
 				if (!RAVERAGE) radius = 2* Compute_HydraulicRadius(cell, j);
 				else radius = (Compute_EffectiveRadius(cell, j)+Compute_EquivalentRadius(cell,j))*0.5;
 				if (radius<0) NEG++;
@@ -752,7 +748,7 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 				}
 // 				Real h,d;
 				Real fluidArea=0;
-				int test=0;
+// 				int test=0;
 				if (distance!=0) {
 					if (minPermLength>0 && distance_correction) distance=max(minPermLength,distance);
 					const Vecteur& Surfk = cell->info().facetSurfaces[j];
@@ -777,24 +773,25 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 					 meanK +=  k*k_factor;
 
 				if (k<0 && DEBUG_OUT) {surfneg+=1;
-				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
+				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<endl;}
 					     
 				} else  {cout <<"infinite K1!"<<endl; k = infiniteK;}//Will be corrected in the next loop
 
 				(cell->info().k_norm())[j]= k*k_factor;
-				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
+// 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
+				if (!neighbour_cell->info().isGhost) (neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= (cell->info().k_norm())[j];
 
 				
-				if(permeability_map){
-				  Cell_handle c = cell;
-				  cell->info().s = cell->info().s + k*distance/fluidArea*this->Volume_Pore_VoronoiFraction (c,j);
-				  volume_sub_pore += this->Volume_Pore_VoronoiFraction (c,j);}
-				
+// 				if(permeability_map){
+// 				  Cell_handle c = cell;
+// 				  cell->info().s = cell->info().s + k*distance/fluidArea*this->Volume_Pore_VoronoiFraction (c,j);
+// 				  volume_sub_pore += this->Volume_Pore_VoronoiFraction (c,j);}
+// 				
 			}
 		}
 		cell->info().isvisited = !ref;
-		if(permeability_map){cell->info().s = cell->info().s/volume_sub_pore;
-		volume_sub_pore = 0.f;}
+// 		if(permeability_map){cell->info().s = cell->info().s/volume_sub_pore;
+// 		volume_sub_pore = 0.f;}
 	}
 	if (DEBUG_OUT) cout<<"surfneg est "<<surfneg<<endl;
 	meanK /= pass;
@@ -814,26 +811,21 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 	pass=0;
 
 	if (clampKValues) for (VCell_iterator cell_it=T[currentTes].cellHandles.begin(); cell_it!=T[currentTes].cellHandles.end(); cell_it++){
-// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		Cell_handle& cell = *cell_it;
 		for (int j=0; j<4; j++) {
 			neighbour_cell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref) {
 				pass++;
-// 				(cell->info().k_norm())[j] = min((cell->info().k_norm())[j], maxKdivKmean*meanK);
 				(cell->info().k_norm())[j] = max(minKdivKmean*globalK ,min((cell->info().k_norm())[j], maxKdivKmean*globalK));
 				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]=(cell->info().k_norm())[j];
-// 				cout<<(cell->info().k_norm())[j]<<endl;
-// 				kFile << (cell->info().k_norm())[j] << endl;
 			}
-		}/*cell->info().isvisited = !ref;*/
-
+		}
 	}
 	if (DEBUG_OUT) cout << "PassKcorrect = " << pass << endl;
 
 	if (DEBUG_OUT) cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
 
-// A loop to compute the standard deviation of the local K distribution, and use it to include/exclude K values higher then (meanK +/- K_opt_factor*STDEV)
+	// A loop to compute the standard deviation of the local K distribution, and use it to include/exclude K values higher then (meanK +/- K_opt_factor*STDEV)
 	if (meanKStat)
 	{
 		std::ofstream k_opt_file("k_stdev.txt" ,std::ios::out);
@@ -877,21 +869,17 @@ void FlowBoundingSphere<Tesselation>::Compute_Permeability()
 		Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
 		Real Vgrains = 0;
 		int grains=0;
-
 		for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
-			if (!V_it->info().isFictious) {
+			if (!V_it->info().isFictious && !V_it->info().isGhost) {
 				grains +=1;
-				Vgrains += 1.33333333 * M_PI * pow(V_it->point().weight(),1.5);
-			}
-		}
+				Vgrains += 1.33333333 * M_PI * pow(V_it->point().weight(),1.5);}}
 		cout<<grains<<"grains - " <<"Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << (Vtotale-Vgrains) << endl;
 		cout << "Vtotalissimo = " << Vtotalissimo/2 << " Vsolid_tot = " << Vsolid_tot/2 << " Vporale2 = " << Vporale/2  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
-
 		if (!RAVERAGE) cout << "------Hydraulic Radius is used for permeability computation------" << endl << endl;
 		else cout << "------Average Radius is used for permeability computation------" << endl << endl;
 		cout << "-----Computed_Permeability-----" << endl;}
-// 	cout << "Negative Permeabilities = " << count_k_neg << endl; 
 }
+
 template <class Tesselation> 
 vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 {
@@ -981,9 +969,8 @@ double FlowBoundingSphere<Tesselation>::Compute_HydraulicRadius(Cell_handle cell
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
-
-        double Vpore = this->Volume_Pore_VoronoiFraction(cell, j);
-	double Ssolid = this->Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS);
+	double Vpore = this->Volume_Pore_VoronoiFraction(cell, j);
+	double Ssolid = this->Surface_Solid_Pore(cell, j, SLIP_ON_LATERALS, /*reuse the same facet data*/ true);
 
 	//handle symmetry (tested ok)
 	if (SLIP_ON_LATERALS && facetNFictious>0) {
@@ -1087,11 +1074,6 @@ void FlowBoundingSphere<Tesselation>::GaussSeidel(Real dt)
 			t_dp_max.resize(num_threads);
 			t_p_max.resize(num_threads);
 			t_sum_p.resize(num_threads);
-// 			cerr <<"====    THREADS : "<<num_threads<<"    ===="<<endl;
-
-//         cout << "tolerance = " << tolerance << endl;
-//         cout << "relax = " << relax << endl;
-
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	#ifdef GS_OPEN_MP
 		vector<Finite_cells_iterator> cells_its;
@@ -1380,11 +1362,6 @@ void FlowBoundingSphere<Tesselation>::saveVtk()
         }
         vtkfile.end_cells();
 
-// 	vtkfile.begin_data("Force",POINT_DATA,VECTORS,FLOAT);
-// 	for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v)
-// 	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[0],(v->info().forces)[1],(v->info().forces)[2]);}
-// 	vtkfile.end_data();
-
 	if (permeability_map){
 	vtkfile.begin_data("Permeability",CELL_DATA,SCALARS,FLOAT);
 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
@@ -1400,7 +1377,6 @@ void FlowBoundingSphere<Tesselation>::saveVtk()
 	}
 	vtkfile.end_data();}
 
-
 	if (1){
 	Average_Relative_Cell_Velocity();
 	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
@@ -1410,44 +1386,7 @@ void FlowBoundingSphere<Tesselation>::saveVtk()
 	}
 	vtkfile.end_data();}
 }
-template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::MGPost()
-{
-	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
-        Point P;
 
-        ofstream file("mgp.out.001");
-        file << "<?xml version=\"1.0\"?>" << endl;
-        file << "<mgpost mode=\"3D\">" << endl;
-        file << " <state time=\"0\">" << endl;
-
-        Finite_cells_iterator cell_end = Tri.finite_cells_end();
-
-        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-                if (cell->info().fictious()==0) {
-                        double p [3] = {0,0,0};
-
-                        for (int j2=0; j2!=4; j2++) {
-                                Vertex_handle v = cell->vertex(j2);
-                                for (int i=0; i<3;  i++) {
-                                        p[i] += 0.25* v->point().point()[i];
-                                }
-                        }
-
-                        double pressure =  cell->info().p();
-                        double rad = 0.00025;
-
-                        file << "  <body>" << endl;
-                        file << "   <SPHER r=\""  <<  rad << "\">" << endl;
-                        file << "    <position x=\""  <<  p[0] << "\" y=\"" << p[1] << "\" z=\"" << p[2] << "\"/>" << endl;
-                        file << "    <velocity x=\""  <<  pressure << "\" y=\"" << pressure << "\" z=\"" << pressure << "\"/>" << endl;
-                        file << "   </SPHER>" << endl;
-                        file << "  </body>" << endl;
-                }
-        }
-        file << " </state>" << endl;
-        file << "</mgpost>" << endl;
-}
 #ifdef XVIEW
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::Dessine_Triangulation(Vue3D &Vue, RTriangulation &T)
@@ -1494,26 +1433,8 @@ void FlowBoundingSphere<Tesselation>::GenerateVoxelFile( )
                 }
         }
 }
-template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::mplot (char *filename)
-{
-	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
-	std::ofstream plot (filename, std::ios::out);
-	Cell_handle permeameter;
-	int intervals = 30;
-	double Rx = (x_max-x_min) /intervals;
-	double Ry = (y_max-y_min) /intervals;
-	double Z = (z_max+z_min)/2.0;
-	double Press = 0;
-	for (double Y=y_min; Y<y_max; Y=Y+Ry) {
-		for (double X=x_min; X<x_max; X=X+Rx) {
-				permeameter = Tri.locate(Point(X, Y, Z));
-				permeameter->info().p()<0? Press=0 : Press=permeameter->info().p();
-				plot << Y << " " << X << " " << Press << endl;
-		}
-	}
-}
-template <class Tesselation> 
+
+template <class Tesselation>
 double FlowBoundingSphere<Tesselation>::Sample_Permeability(double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max/*, string key*/)
 {
         double Section = (x_Max-x_Min) * (z_Max-z_Min);

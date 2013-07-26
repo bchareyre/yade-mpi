@@ -16,10 +16,6 @@
 #include "basicVTKwritter.hpp"
 #include "Timer.h"
 
-#ifdef XVIEW
-#include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
-#endif
-
 typedef pair<pair<int,int>, vector<double> > Constriction;
 
 using namespace std;
@@ -42,7 +38,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
  		FlowBoundingSphere();
 
 		bool SLIP_ON_LATERALS;
-		bool areaR2Permeability;
+// 		bool areaR2Permeability;
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
@@ -86,7 +82,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Matrix3r> viscousBodyStress;
 		vector <Matrix3r> lubBodyStress;
 		
-		void mplot ( char *filename);
 		void Localize();
 		void Compute_Permeability();
 		virtual void GaussSeidel (Real dt=0);
@@ -115,7 +110,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk ( );
-		void MGPost ( );
 #ifdef XVIEW
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
@@ -151,10 +145,10 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
-		double MeasurePorePressure (double X, double Y, double Z);
-		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
-		double MeasureAveragedPressure(double Y);
-		double MeasureTotalAveragedPressure();
+		double getPorePressure (double X, double Y, double Z);
+		void measurePressureProfile(double Wall_up_y, double Wall_down_y);
+		double averageSlicePressure(double Y);
+		double averagePressure();
 		double getCell (double X,double Y,double Z);
 		double boundaryFlux(unsigned int boundaryId);
 		
@@ -162,7 +156,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO, 3:CHOLMOD)
 };
-
 
 } //namespace CGT
 
@@ -174,4 +167,5 @@ class FlowBoundingSphere : public Network<_Tesselation>
 #include "yade/lib/triangulation/FlowBoundingSphere.ipp"
 
 #endif //FLOW_ENGINE
+
 #endif

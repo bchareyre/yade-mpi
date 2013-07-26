@@ -51,7 +51,7 @@ class FlowEngine : public PartialEngine
 
 	public :
 		int retriangulationLastIter;
-		enum {wall_left=0, wall_right, wall_bottom, wall_top, wall_back, wall_front};
+		enum {wall_xmin, wall_xmax, wall_ymin, wall_ymax, wall_zmin, wall_zmax};
 		Vector3r normal [6];
 		bool currentTes;
 		int id_offset;
@@ -118,14 +118,14 @@ class FlowEngine : public PartialEngine
 		void Oedometer_Boundary_Conditions();
 		void Average_real_cell_velocity();
 		void saveVtk() {solver->saveVtk();}
-		vector<Real> AvFlVelOnSph(unsigned int id_sph) {return solver->Average_Fluid_Velocity_On_Sphere(id_sph);}
+		vector<Real> avFlVelOnSph(unsigned int id_sph) {return solver->Average_Fluid_Velocity_On_Sphere(id_sph);}
 
-		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; Update_Triangulation=true;}
-		void PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
-		double MeasurePorePressure(Vector3r pos){return solver->MeasurePorePressure(pos[0], pos[1], pos[2]);}
+// 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; updateTriangulation=true;}
+		void pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
+		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
-		double MeasureAveragedPressure(double posY){return solver->MeasureAveragedPressure(posY);}
-		double MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
+		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
+		double averagePressure(){return solver->averagePressure();}
 		#ifdef LINSOLV
 		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver==3) flow->exportMatrix(filename.c_str());
 			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
@@ -169,72 +169,47 @@ class FlowEngine : public PartialEngine
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
 					((Real, dt, 0,,"timestep [s]"))
-// 					((bool,save_vtk,false,,"Enable/disable vtk files creation for visualization"))
 					((bool,permeability_map,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
-					((bool, save_mgpost, false,,"Enable/disable mgpost file creation"))
-					((bool, slice_pressures, false, ,"Enable/Disable slice pressure measurement"))
-					((bool, velocity_profile, false, ,"Enable/Disable slice velocity measurement"))
-					((bool, consolidation,false,,"Enable/Disable storing consolidation files"))
 					((bool, slip_boundary, true,, "Controls friction condition on lateral walls"))
 					((bool,WaveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
-					((double, Sinus_Amplitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied"))
-					((double, Sinus_Average, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
-					((bool, CachedForces, true,,"Des/Activate the cached forces calculation"))
+					((double, sineMagnitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied (p )"))
+					((double, sineAverage, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
 					((bool, Debug, false,,"Activate debug messages"))
 					((double, wall_thickness,0.001,,"Walls thickness"))
-					((double,P_zero,0,,"Initial internal pressure for oedometer test"))
+					((double,P_zero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
 					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
 					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
-					((bool, Update_Triangulation, 0,,"If true the medium is retriangulated. Can be switched on to force retriangulation after some events (else it will be true periodicaly based on :yref:`FlowEngine::EpsVolPercent_RTRG` and :yref:`FlowEngine::PermuteInterval`"))
-					((int,PermuteInterval,1000,,"Maximum number of timesteps between re-triangulation events. See also :yref:`FlowEngine::EpsVolPercent_RTRG`."))
-					((double, eps_vol_max, 0,,"Maximal absolute volumetric strain computed at each iteration"))
-					((double, EpsVolPercent_RTRG,0.01,,"Percentuage of cumulate eps_vol at which retriangulation of pore space is performed"))
-					((double, porosity, 0,,"Porosity computed at each retriangulation"))
-					((bool,compute_K,false,,"Activates permeability measure within a granular sample"))
-					((bool,meanKStat,false,,"Local permeabilities' correction through an optimized threshold"))
-					((bool,clampKValues,true,,"If true, clamp local permeabilities between min/max*globalK threshold. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
+					((bool, updateTriangulation, 0,,"If true the medium is retriangulated. Can be switched on to force retriangulation after some events (else it will be true periodicaly based on :yref:`FlowEngine::defTolerance` and :yref:`FlowEngine::meshUpdateInterval`. Of course, it costs CPU time."))
+					((int,meshUpdateInterval,1000,,"Maximum number of timesteps between re-triangulation events. See also :yref:`FlowEngine::defTolerance`."))
+					((double, eps_vol_max, 0,(Attr::readonly),"Maximal absolute volumetric strain computed at each iteration. |yupdate|"))
+					((double, defTolerance,0.05,,"Cumulated deformation threshold for which retriangulation of pore space is performed. If negative, the triangulation update will occure with a fixed frequency on the basis of :yref:`FlowEngine::meshUpdateInterval`"))
+					((double, porosity, 0,(Attr::readonly),"Porosity computed at each retriangulation |yupdate|"))
+					((bool,meanKStat,false,,"report the local permeabilities' correction"))
+					((bool,clampKValues,true,,"If true, clamp local permeabilities in [minKdivKmean,maxKdivKmean]*globalK. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
 					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
 					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
-					((double,permeability_factor,0.0,,"permability multiplier"))
-					((double,viscosity,1.0,,"viscosity of fluid"))
-					((double,stiffness, 10000,,"stiffness modulus"))
-					((Real,loadFactor,1.1,,"Load multiplicator for oedometer test"))
-					((double, K, 0,, "Permeability of the sample"))
+					((double,permeabilityFactor,0.0,,"permability multiplier"))
+					((double,viscosity,1.0,,"viscosity of the fluid"))
+					((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
-// 					((std::string,key,"",,"A string appended at the output files, use it to name simulations."))
-					((double, V_d, 0,,"darcy velocity of fluid in sample"))
-					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
-					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
-					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))
-					((bool, Flow_imposed_BACK_Boundary, true,, "if false involve pressure imposed condition"))
-					((bool, Flow_imposed_LEFT_Boundary, true,, "if false involve pressure imposed condition"))
-					((bool, Flow_imposed_RIGHT_Boundary, true,,"if false involve pressure imposed condition"))
-					((double, Pressure_TOP_Boundary, 0,, "Pressure imposed on top boundary"))
-					((double, Pressure_BOTTOM_Boundary,  0,, "Pressure imposed on bottom boundary"))
-					((double, Pressure_FRONT_Boundary,  0,, "Pressure imposed on front boundary"))
-					((double, Pressure_BACK_Boundary,  0,,"Pressure imposed on back boundary"))
-					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
-					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
-					((Vector3r, topBoundaryVelocity, Vector3r::Zero(),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
-					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
-					((int, wallTopId,3,,"Id of top boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((int, wallBottomId,2,,"Id of bottom boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((int, wallFrontId,5,,"Id of front boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((int, wallBackId,4,,"Id of back boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((int, wallLeftId,0,,"Id of left boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((int, wallRightId,1,,"Id of right boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, TOP_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, RIGHT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, LEFT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, FRONT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, BACK_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, areaR2Permeability, 1,,"Use corrected formula for permeabilities calculation in flowboundingsphere (areaR2permeability variable)"))
-					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui"))
-					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule"))
-					((double, eps, 0.00001,,"minimum distance between particles"))
-					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
+					((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
+					((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+					((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+					((int, ymax,3,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+					((int, zmin,4,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+					((int, zmax,5,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
 
+					((vector<bool>, bndCondIsPressure, vector<bool>(6,false),,"defines the type of boundary condition for each side. True if pressure is imposed, False for no-flux. Indexes can be retrieved with :yref:`FlowEngine::xmin` and friends."))
+					((vector<double>, bndCondValue, vector<double>(6,0),,"Imposed value of a boundary condition. Only applies if the boundary condition is imposed pressure, else the imposed flux is always zero presently (may be generalized to non-zero imposed fluxes in the future)."))
+					//FIXME: to be implemented:
+					((vector<Vector3r>, boundaryVelocity, vector<Vector3r>(6,Vector3r::Zero()),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
+					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
+					((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
+					((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
+					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui (FIXME: ref.)"))
+					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule (FIXME: ref.) "))
+					((double, eps, 0.00001,,"roughness defined as a fraction of particles size, giving the minimum distance between particles in the lubrication model."))
+					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
 					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
 					((bool, viscousNormalBodyStress, false,,"Compute normal viscous stress applied on each body"))
 					((bool, viscousShearBodyStress, false,,"Compute shear viscous stress applied on each body"))
@@ -243,19 +218,17 @@ class FlowEngine : public PartialEngine
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
 					#endif
-					((Real, allDeprecs, 0,,"transitory variable: point removed attributes to this so that older scripts won't crash."))
 					,
 					/*deprec*/
 					((meanK_opt,clampKValues,"the name changed"))
-					((meanK_correction,allDeprecs,"the name changed"))
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
-					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
-					normal[wall_bottom].y()=normal[wall_left].x()=normal[wall_back].z()=1;
-					normal[wall_top].y()=normal[wall_right].x()=normal[wall_front].z()=-1;					
+					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero(); wallIds[i]=i;}
+					normal[wall_ymin].y()=normal[wall_xmin].x()=normal[wall_zmin].z()=1;
+					normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
 					solver = shared_ptr<FlowSolver> (new FlowSolver);
 					first=true;
-					Update_Triangulation=false;
+					updateTriangulation=false;
 					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 					ReTrg=1;
 					backgroundCompleted=true;
@@ -267,25 +240,23 @@ class FlowEngine : public PartialEngine
 					.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
 					.def("getCellFlux",&FlowEngine::_getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
-					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
+					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note::\n\t The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
-					.def("AvFlVelOnSph",&FlowEngine::AvFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
+					.def("avFlVelOnSph",&FlowEngine::avFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
 					.def("shearLubTorque",&FlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
 					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
-					.def("setBoundaryVel",&FlowEngine::setBoundaryVel,(python::arg("vel")),"Change velocity on top boundary.")
-					.def("PressureProfile",&FlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
-					.def("MeasurePorePressure",&FlowEngine::MeasurePorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
-					.def("MeasureAveragedPressure",&FlowEngine::MeasureAveragedPressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
-					.def("MeasureTotalAveragedPressure",&FlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume")
-
+					.def("pressureProfile",&FlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+					.def("getPorePressure",&FlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+					.def("averageSlicePressure",&FlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
+					.def("averagePressure",&FlowEngine::averagePressure,"Measure averaged pore pressure in the entire volume")
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
+					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
 					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
@@ -302,7 +273,7 @@ unsigned int FlowEngine::imposePressure(Vector3r pos, Real p,Solver& flow)
 	if (!flow) LOG_ERROR("no flow defined yet, run at least one iter");
 	flow->imposedP.push_back( pair<CGT::Point,Real>(CGT::Point(pos[0],pos[1],pos[2]),p) );
 	//force immediate update of boundary conditions
-	Update_Triangulation=true;
+	updateTriangulation=true;
 	return flow->imposedP.size()-1;
 }
 
@@ -364,9 +335,9 @@ class PeriodicFlowEngine : public FlowEngine
 		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
 			
 		void 		_updateBCs() {updateBCs(solver);}
-		double 		MeasurePorePressure(Vector3r pos){return solver->MeasurePorePressure(pos[0], pos[1], pos[2]);}
-		double 		MeasureTotalAveragedPressure(){return solver->MeasureTotalAveragedPressure();}
-		void 		PressureProfile(double wallUpY, double wallDownY) {return solver->MeasurePressureProfile(wallUpY,wallDownY);}
+		double 		getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
+		double 		averagePressure(){return solver->averagePressure();}
+		void 		pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
 
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
 		#ifdef LINSOLV
@@ -390,13 +361,14 @@ class PeriodicFlowEngine : public FlowEngine
 			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes(); LOG_WARN("Computing all volumes now, as you did not request it explicitely.");}
 			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"An engine to solve flow problem in saturated granular media",
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"A variant of :yref:`FlowEngine` implementing periodic boundary conditions. The API is very similar.",
 			((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
 			((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
 			,,
-			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
+			wallIds=vector<int>(6,-1);
+// 			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
 			solver = shared_ptr<FlowSolver> (new FlowSolver);
-			Update_Triangulation=false;
+			updateTriangulation=false;
 			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 			ReTrg=1;
 			first=true;
@@ -413,9 +385,9 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 			.def("getBoundaryFlux",&PeriodicFlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
-			.def("MeasurePorePressure",&PeriodicFlowEngine::MeasurePorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
-			.def("MeasureTotalAveragedPressure",&PeriodicFlowEngine::MeasureTotalAveragedPressure,"Measure averaged pore pressure in the entire volume") 
-			.def("PressureProfile",&PeriodicFlowEngine::PressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+			.def("getPorePressure",&PeriodicFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+			.def("averagePressure",&PeriodicFlowEngine::averagePressure,"Measure averaged pore pressure in the entire volume")
+			.def("pressureProfile",&PeriodicFlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 
 			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 			
