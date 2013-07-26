@@ -19,13 +19,7 @@ using namespace std;
 // using namespace boost;
 namespace CGT {
 
-//	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
-//	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
-//	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
-//	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
-//	template<class Tesselation> const int Network<Tesselation>::permut4 [4][4]  = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
-
-	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
+// 	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
 	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
 	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
@@ -36,9 +30,9 @@ Network<Tesselation>::~Network(){}
 
 template<class Tesselation>
 Network<Tesselation>::Network(){
+	FAR = 50000;
 	facetF1=facetF2=facetRe1=facetRe2=facetRe3=0;
 	F1=F2=Re1=Re2=0;
-// 	facet_detected = false;
 }
 
 template<class Tesselation>
@@ -448,7 +442,6 @@ template<class Tesselation>
 void Network<Tesselation>::AddBoundingPlanes()
 {
 	Tesselation& Tes = T[currentTes];
-	
 	//FIXME: Id's order in boundsIds is done according to the enumerotation of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
 	y_min_id = Tes.Max_id() + 2;
         boundsIds[0]=&y_min_id;

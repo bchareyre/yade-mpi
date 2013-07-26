@@ -19,13 +19,13 @@ namespace CGT {
 
 struct Boundary
 {
-	Point p;
-	Vecteur normal;
-	Vector3r velocity;
-	int coordinate;
+	Point p;//position
+	Vecteur normal;//orientation
+	Vector3r velocity;//motion
+	int coordinate;//the axis perpendicular to the boundary
 	bool flowCondition;//flowCondition=0, pressure is imposed // flowCondition=1, flow is imposed
-	Real value;
-	bool useMaxMin;
+	Real value;// value of imposed pressure
+	bool useMaxMin;// tells if this boundary was placed following the particles (using min/max of them) or with user defined position
 };
 
 
@@ -80,10 +80,9 @@ class Network
 
 		int facetF1, facetF2, facetRe1, facetRe2, facetRe3;
 		int F1, F2, Re1, Re2;
-		int real_vertex;
-// 		bool facet_detected;
 		int facetNFictious;
-		static const double FAR;
+		int real_vertex;
+		double FAR;
 		static const double ONE_THIRD;
 		static const int facetVertices [4][3];
 		static const int permut3 [3][3];
