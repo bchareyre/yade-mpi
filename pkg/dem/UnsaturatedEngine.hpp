@@ -99,6 +99,10 @@ class UnsaturatedEngine : public PartialEngine
 		double bisection(Cellhandle cell, int j, double a, double b);
 		template<class Cellhandle>
 		double computeDeltaPressure(Cellhandle cell,int j, double rcap);
+		template<class Cellhandle>
+		Real computePoreArea(Cellhandle cell, int j);
+		template<class Cellhandle>
+		Real computePorePerimeter(Cellhandle cell, int j);		
 		void saveVtk() {solver->saveVtk();}
 		python::list getConstrictions() {
 			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
