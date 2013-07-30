@@ -93,3 +93,25 @@ struct HarmonicRotationEngine: public RotationEngine{
 };
 REGISTER_SERIALIZABLE(HarmonicRotationEngine);
 
+struct ServoPIDController: public TranslationEngine{
+  virtual void apply(const vector<Body::id_t>& ids);
+  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ServoPIDController,TranslationEngine,"PIDController servo-engine for applying prescribed force on bodies. http://en.wikipedia.org/wiki/PID_controller",
+    ((Real,maxVelocity,0.0,,"Velocity [m/s]"))
+    ((Vector3r,axis,Vector3r::Zero(),,"Unit vector along which apply the velocity [-]"))
+    ((Real,target,0.0,,"Target value for the controller [N]"))
+    ((Real,kP,0.0,,"Proportional gain/coefficient for the PID-controller [-]"))
+    ((Real,kI,0.0,,"Integral gain/coefficient for the PID-controller [-]"))
+    ((Real,kD,0.0,,"Derivative gain/coefficient for the PID-controller [-]"))
+    ((Real,iTerm,0.0,,"Integral term [N]"))
+    ((Real,curVel,0.0,,"Current applied velocity [m/s]"))
+    ((Real,errorCur,0.0,,"Current error [N]"))
+    ((Real,errorPrev,0.0,,"Previous error [N]"))
+    ((long,iterPeriod,100.0,,"Periodicity criterion of velocity correlation [-]"))
+    ((long,iterPrevStart,-1.0,,"Previous iteration of velocity correlation [-]"))
+    /* attrs*/, 
+    /* ctor */, 
+    /* py */
+  )
+  DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(ServoPIDController);

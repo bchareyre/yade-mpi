@@ -50,7 +50,7 @@ O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=radians(compFr
 O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=0,density=0,label='walls'))
 
 ## create walls around the packing
-walls=aabbWalls([mn,mx],thickness=thick,material='walls')
+walls=aabbWalls([mn,mx],thickness=0,material='walls')
 wallIds=O.bodies.append(walls)
 
 ## use a SpherePack object to generate a random loose particles packing

@@ -16,10 +16,6 @@
 #include "basicVTKwritter.hpp"
 #include "Timer.h"
 
-#ifdef XVIEW
-#include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
-#endif
-
 typedef pair<pair<int,int>, vector<double> > Constriction;
 
 using namespace std;
@@ -34,7 +30,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		DECLARE_TESSELATION_TYPES(Network<Tesselation>)
 		
 		//painfull, but we need that for templates inheritance...
-		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::fictious_vertex; using _N::boundingCells; using _N::facetVertices;
+		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::boundingCells; using _N::facetVertices; using _N::facetNFictious;
 		//same for functions
 		using _N::Define_fictious_cells; using _N::AddBoundingPlanes; using _N::boundary;
 
@@ -42,7 +38,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
  		FlowBoundingSphere();
 
 		bool SLIP_ON_LATERALS;
-		bool areaR2Permeability;
+// 		bool areaR2Permeability;
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
@@ -86,7 +82,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Matrix3r> viscousBodyStress;
 		vector <Matrix3r> lubBodyStress;
 		
-		void mplot ( char *filename);
 		void Localize();
 		void Compute_Permeability();
 		virtual void GaussSeidel (Real dt=0);
@@ -115,7 +110,6 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk ( );
-		void MGPost ( );
 #ifdef XVIEW
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
@@ -151,10 +145,10 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void Average_Fluid_Velocity();
 		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
 		bool isOnSolid  (double X, double Y, double Z);
-		double MeasurePorePressure (double X, double Y, double Z);
-		void MeasurePressureProfile(double Wall_up_y, double Wall_down_y);
-		double MeasureAveragedPressure(double Y);
-		double MeasureTotalAveragedPressure();
+		double getPorePressure (double X, double Y, double Z);
+		void measurePressureProfile(double Wall_up_y, double Wall_down_y);
+		double averageSlicePressure(double Y);
+		double averagePressure();
 		double getCell (double X,double Y,double Z);
 		double boundaryFlux(unsigned int boundaryId);
 		

@@ -647,6 +647,19 @@ class pyOmega{
 	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
 	int addScene(){return OMEGA.addScene();}
 	void switchToScene(int i){OMEGA.switchToScene(i);}
+	string sceneToString(){
+		ostringstream oss;
+		yade::ObjectIO::save<typeof(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
+		oss.flush();
+		return oss.str();
+	}
+	void stringToScene(const string &sstring, string mark=""){
+		Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS;
+		assertScene();
+		OMEGA.memSavedSimulations[":memory:"+mark]=sstring;
+		OMEGA.sceneFile=":memory:"+mark;
+		load(OMEGA.sceneFile,true);
+	}
 
 	void save(std::string fileName,bool quiet=false){
 		assertScene();
@@ -802,6 +815,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("addScene",&pyOmega::addScene,"Add new scene to Omega, returns its number")
 		.def("switchToScene",&pyOmega::switchToScene,"Switch to defined scene. Default scene has number 0, other scenes have to be created by addScene method.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
+		.def("sceneToString",&pyOmega::sceneToString,"Return the entire scene as a string. Equivalent to using O.save(...) except that the scene goes to a string instead of a file. (see also stringToScene())")
+		.def("stringToScene",&pyOmega::stringToScene,(python::arg("mark")=""),"Load simulation from a string passed as argument (see also sceneToString).")
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example:\n\n\t *O.engines=[InsertionSortCollider(label='collider')]*\n\n\t *collider.nBins=5 # collider has become a variable after assignment to O.engines automatically*")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")

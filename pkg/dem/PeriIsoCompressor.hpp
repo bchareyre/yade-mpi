@@ -79,14 +79,14 @@ REGISTER_SERIALIZABLE(PeriTriaxController);
 
 class Peri3dController: public BoundaryController{
 	public:
-		Vector6r stressOld, stressGoal, strainGoal;
-		Vector6i pe, ps;
+		Vector6r stressOld;//, stressGoal, strainGoal;
+		//Vector6i pe, ps;
 		Matrix3r sigma, epsilon, epsilonRate, rot, nonrot;
-		int pathSizes[6], pathsCounter[6], lenPe, lenPs;
-		vector<Vector2r>* paths[6];
+		//int pathSizes[6], pathsCounter[6], lenPe, lenPs;
+		//vector<Vector2r>* paths[6];
 		
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Detailed documentation is in py/_extraDocs.py.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Detailed documentation is in py/_extraDocs.py.",
 		((Vector6r,stress,Vector6r::Zero(),,"Current stress vector ($\\sigma_x$,$\\sigma_y$,$\\sigma_z$,$\\tau_{yz}$,$\\tau_{zx}$,$\\tau_{xy}$)|yupdate|."))
 		((Vector6r,strain,Vector6r::Zero(),,"Current strain (deformation) vector ($\\varepsilon_x$,$\\varepsilon_y$,$\\varepsilon_z$,$\\gamma_{yz}$,$\\gamma_{zx}$,$\\gamma_{xy}$) |yupdate|."))
 		((Vector6r,strainRate,Vector6r::Zero(),,"Current strain rate vector."))
@@ -108,9 +108,22 @@ class Peri3dController: public BoundaryController{
 		((Real,maxStrain,1e6,,"Maximal asolute value of :yref:`strain<Peri3dController.strain>` allowed in the simulation. If reached, the simulation is considered as finished"))
 		((Real,youngEstimation,1e20,,"Estimation of macroscopic Young's modulus, used for the first simulation step"))
 		((Real,poissonEstimation,.25,,"Estimation of macroscopic Poisson's ratio, used used for the first simulation step"))
+		//
+		((Vector6r,stressGoal,Vector6r::Zero(),Attr::readonly,"Peri3dController internal variable"))
+		((Vector6r,strainGoal,Vector6r::Zero(),Attr::readonly,"Peri3dController internal variable"))
+		((Vector6i,pe,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
+		((Vector6i,ps,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
+		((Vector6i,pathSizes,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
+		((Vector6i,pathsCounter,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
+		((int,lenPe,NaN,Attr::readonly,"Peri3dController internal variable"))
+		((int,lenPs,NaN,Attr::readonly,"Peri3dController internal variable"))
 		// not yet used
 		//((Real,currUnbalanced,NaN,,"current unbalanced force |yupdate|"))
 		//((Real,maxUnbalanced,1e-4,,"Maximum unbalanced force"))
+		,
+		/*ctor*/
+		,
+		/*py*/
 			
 	);
 	DECLARE_LOGGER;

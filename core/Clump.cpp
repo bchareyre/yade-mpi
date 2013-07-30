@@ -204,8 +204,8 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 	LOG_TRACE("R_g2c=\n"<<R_g2c);
 	// set quaternion from rotation matrix
 	state->ori=Quaternionr(R_g2c); state->ori.normalize();
-	state->inertia=decomposed.eigenvalues();
-	state->mass=M*dens;
+	state->inertia=dens*decomposed.eigenvalues();
+	state->mass=dens*M;
 	
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
 	state->vel=state->angVel=Vector3r::Zero();

@@ -125,8 +125,10 @@ static bool Quaternionr__neq__(const Quaternionr& q1, const Quaternionr& q2){ re
 #include<Eigen/SVD>
 static bp::tuple Matrix3r_polarDecomposition(const Matrix3r& self){ Matrix3r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
 static bp::tuple Matrix3r_eigenDecomposition(const Matrix3r& self){ Matrix3r rot,diag; matrixEigenDecomposition(self,rot,diag); return bp::make_tuple(rot,Vector3r(diag.diagonal())); }
+static bp::tuple Matrix3r_svd(const Matrix3r& self){ Matrix3r u,s,v; Matrix_SVD(self,&u,&s,&v); return bp::make_tuple(u,s,v); }
 static bp::tuple Matrix6r_polarDecomposition(const Matrix6r& self){ Matrix6r unitary,positive; Matrix_computeUnitaryPositive(self,&unitary,&positive); return bp::make_tuple(unitary,positive); }
 static bp::tuple Matrix6r_eigenDecomposition(const Matrix6r& self){ Matrix6r rot,diag; matrixEigenDecomposition(self,rot,diag); return bp::make_tuple(rot,Vector6r(diag.diagonal())); }
+static bp::tuple Matrix6r_svd(const Matrix6r& self){ Matrix6r u,s,v; Matrix_SVD(self,&u,&s,&v); return bp::make_tuple(u,s,v); }
 
 #undef IDX_CHECK
 
@@ -237,6 +239,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("transpose",&Matrix3r_transpose)
 		.def("polarDecomposition",&Matrix3r_polarDecomposition)
 		.def("eigenDecomposition",&Matrix3r_eigenDecomposition)
+		.def("svd",&Matrix3r_svd)
 		.def("diagonal",&Matrix3r_diagonal)
 		.def("row",&Matrix3r_row)
 		.def("col",&Matrix3r_col)
@@ -275,6 +278,7 @@ BOOST_PYTHON_MODULE(miniEigen){
 		.def("col",&Matrix6r_col)
 		.def("polarDecomposition",&Matrix6r_polarDecomposition)
 		.def("eigenDecomposition",&Matrix6r_eigenDecomposition)
+		.def("svd",&Matrix6r_svd)
 		//
 		.def("__neg__",&Matrix6r__neg__)
 		.def("__add__",&Matrix6r__add__Matrix6r).def("__iadd__",&Matrix6r__iadd__Matrix6r)

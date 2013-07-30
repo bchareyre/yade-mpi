@@ -8,7 +8,6 @@
 #include <yade/lib/base/Math.hpp>
 
 //Define basic types from CGAL templates
-
 #ifndef _Def_types
 #define _Def_types
 
@@ -22,7 +21,6 @@
 #include <CGAL/circulator.h>
 #include <CGAL/number_utils.h>
 #include <boost/static_assert.hpp>
-
 
 namespace CGT {
 //Robust kernel
@@ -132,6 +130,7 @@ class FlowCellInfo : public SimpleCellInfo {
 		pression=0;
 		invVoidV=0;
  		fict=0;
+		isGhost=false;
 	}	
 	bool isGhost;
 	double inv_sum_k;
@@ -171,6 +170,8 @@ public:
 	FlowVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
 	FlowVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
 	Vecteur forces;
+	bool isGhost;
+	FlowVertexInfo (void) {isGhost=false;}
 	inline Vecteur& force (void) {return forces;}
 	inline Vecteur& vel (void) {return Grain_Velocity;}
 	inline Real& vol_cells (void) {return volume_incident_cells;}
@@ -192,7 +193,6 @@ class PeriodicCellInfo : public FlowCellInfo
 	PeriodicCellInfo (void){
 		_pression=&pression;
 		period[0]=period[1]=period[2]=0;
-		isGhost=false;
 		baseIndex=-1;
 		volumeSign=0;}
 	~PeriodicCellInfo (void) {}
@@ -211,7 +211,6 @@ class PeriodicVertexInfo : public FlowVertexInfo {
 	PeriodicVertexInfo& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
 	PeriodicVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
 	PeriodicVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
-	bool isGhost;
 	int period[3];
 	//FIXME: the name is misleading, even non-ghost can be out of the period and therefore they need to be shifted as well
 	inline const Vecteur ghostShift (void) {

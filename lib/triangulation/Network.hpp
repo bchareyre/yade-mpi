@@ -14,17 +14,26 @@
 #include "Timer.h"
 #include "basicVTKwritter.hpp"
 
-namespace CGT {
+/**
+Defines class Network. Which contains the geometrical representation of a pore network on the basis of regular triangulation (using CGAL lib)
+The class is the base of the pore-flow model. It has basic functions to compute quantities like void volumes and solid surfaces in the triangulation's elements.
 
+The same data structure is used with different template parameters for periodic and aperiodic boundary conditions. The network is bounded by infinite planes represented in the triangulation by very large spheres (so that their surface looks flat at the scale of the network).
+
+Two triangulations are in fact contained in the network, so that a simulation can switch between them and pass data from one to the other. Otherwise, some info would be lost when the problem is retriangulated.
+*/
+
+namespace CGT {
+/// Representation of a boundary condition along an axis aligned plane.
 struct Boundary
 {
-	Point p;
-	Vecteur normal;
-	Vector3r velocity;
-	int coordinate;
+	Point p;//position
+	Vecteur normal;//orientation
+	Vector3r velocity;//motion
+	int coordinate;//the axis perpendicular to the boundary
 	bool flowCondition;//flowCondition=0, pressure is imposed // flowCondition=1, flow is imposed
-	Real value;
-	bool useMaxMin;
+	Real value;// value of imposed pressure
+	bool useMaxMin;// tells if this boundary was placed following the particles (using min/max of them) or with user defined position
 };
 
 
@@ -52,17 +61,13 @@ class Network
 		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		short id_offset;
 		int vtk_infinite_vertices, vtk_infinite_cells, num_particles;
-		
-		int fictious_vertex;
 
-		void AddBoundingPlanes(double altFAR=0);
-		void AddBoundingPlane (bool yade, Vecteur Normal, int id_wall, double altFAR=0);
-		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall, double altFAR=0);
+		void AddBoundingPlanes();
+		void AddBoundingPlane (Vecteur Normal, int id_wall);
+		void AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall );
 
 		void Define_fictious_cells( );
-		int Detect_facet_fictious_vertices (Cell_handle& cell, int& j);
-
-		double Volume_Pore_VoronoiFraction ( Cell_handle& cell, int& j);
+		int detectFacetFictiousVertices (Cell_handle& cell, int& j);
 		double volumeSolidPore (const Cell_handle& cell);
 		double volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
 		double volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface);
@@ -72,7 +77,8 @@ class Network
 		Real fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3);
 		double volume_double_fictious_pore(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1);
 		double volume_single_fictious_pore(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1);
-		double Surface_Solid_Pore( Cell_handle cell, int j, bool SLIP_ON_LATERALS);
+		double Volume_Pore_VoronoiFraction ( Cell_handle& cell, int& j, bool reuseFacetData=false);
+		double Surface_Solid_Pore( Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData=false);
 		double spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
 		
 		Vecteur surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3);
@@ -82,9 +88,9 @@ class Network
 
 		int facetF1, facetF2, facetRe1, facetRe2, facetRe3;
 		int F1, F2, Re1, Re2;
+		int facetNFictious;
 		int real_vertex;
-		bool facet_detected;
-		static const double FAR;
+		double FAR;
 		static const double ONE_THIRD;
 		static const int facetVertices [4][3];
 		static const int permut3 [3][3];
