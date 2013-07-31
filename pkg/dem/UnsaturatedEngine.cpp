@@ -148,7 +148,8 @@ void UnsaturatedEngine::invade2 (Solver& flow)
     Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
         if (cell->info().isAirReservoir == true)
-            cell->info().p() = Pressure_BOTTOM_Boundary;//FIXME:how to change cell inside pressure to boundary condition.?
+//             cell->info().p() = Pressure_BOTTOM_Boundary;//FIXME:how to change cell inside pressure to boundary condition.?
+            cell->info().p() = bndCondValue[2];//FIXME: x_min_id=wallLeftId=0, x_max_id =wallRightId=1, y_min_id=wallBottomId=2, y_max_id=wallTopId=3, z_min_id=wallBackId=4,z_max_id=wallFrontId=5           
 //             cerr<<"cell index: "<<cell->info().index <<" "<< "pressure: " << cell->info().p()<<endl;
     }
 
@@ -353,31 +354,42 @@ unsigned int UnsaturatedEngine::imposePressure(Vector3r pos, Real p,Solver& flow
 template<class Solver>
 void UnsaturatedEngine::BoundaryConditions ( Solver& flow )
 {
-        if ( flow->y_min_id>=0 ) {
-                flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
-                flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
-        }
-        if ( flow->y_max_id>=0 ) {
-                flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
-                flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
-        }
-        if ( flow->x_max_id>=0 ) {
-                flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
-                flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
-        }
-        if ( flow->x_min_id>=0 ) {
-                flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
-                flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
-        }
-        if ( flow->z_max_id>=0 ) {
-                flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
-                flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
-        }
-        if ( flow->z_min_id>=0 ) {
-                flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
-                flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
-        }
+
+	for (int k=0;k<6;k++)	{
+		flow->boundary (wallIds[k]).flowCondition=!bndCondIsPressure[k];
+                flow->boundary (wallIds[k]).value=bndCondValue[k];
+                flow->boundary (wallIds[k]).velocity = boundaryVelocity[k];//FIXME: needs correct implementation, maybe update the cached pos/vel?
+	}
 }
+
+// template<class Solver>
+// void UnsaturatedEngine::BoundaryConditions ( Solver& flow )
+// {
+//         if ( flow->y_min_id>=0 ) {
+//                 flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
+//                 flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
+//         }
+//         if ( flow->y_max_id>=0 ) {
+//                 flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
+//                 flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
+//         }
+//         if ( flow->x_max_id>=0 ) {
+//                 flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
+//                 flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
+//         }
+//         if ( flow->x_min_id>=0 ) {
+//                 flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
+//                 flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
+//         }
+//         if ( flow->z_max_id>=0 ) {
+//                 flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
+//                 flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
+//         }
+//         if ( flow->z_min_id>=0 ) {
+//                 flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
+//                 flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
+//         }
+// }
 
 template<class Solver>
 void UnsaturatedEngine::initSolver ( Solver& flow )
@@ -469,19 +481,12 @@ void UnsaturatedEngine::AddBoundary ( Solver& flow )
         flow->id_offset = id_offset;
         flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
         flow->Vtotale = ( flow->x_max-flow->x_min ) * ( flow->y_max-flow->y_min ) * ( flow->z_max-flow->z_min );
-        flow->y_min_id=wallBottomId;
-        flow->y_max_id=wallTopId;
-        flow->x_max_id=wallRightId;
-        flow->x_min_id=wallLeftId;
-        flow->z_min_id=wallBackId;
-        flow->z_max_id=wallFrontId;
-
-        if ( flow->y_min_id>=0 ) flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
-        if ( flow->y_max_id>=0 ) flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
-        if ( flow->x_max_id>=0 ) flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
-        if ( flow->x_min_id>=0 ) flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
-        if ( flow->z_max_id>=0 ) flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
-        if ( flow->z_min_id>=0 ) flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;
+        flow->y_min_id=wallIds[ymin];
+        flow->y_max_id=wallIds[ymax];
+        flow->x_max_id=wallIds[xmax];
+        flow->x_min_id=wallIds[xmin];
+        flow->z_min_id=wallIds[zmin];
+        flow->z_max_id=wallIds[zmax];
 
         //FIXME: Id's order in boundsIds is done according to the enumeration of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
         flow->boundsIds[0]= &flow->x_min_id;
@@ -491,20 +496,18 @@ void UnsaturatedEngine::AddBoundary ( Solver& flow )
         flow->boundsIds[4]= &flow->z_min_id;
         flow->boundsIds[5]= &flow->z_max_id;
 
+	for (int k=0;k<6;k++) flow->boundary ( *flow->boundsIds[k] ).useMaxMin = boundaryUseMaxMin[k];
+
+//         if ( flow->y_min_id>=0 ) flow->boundary ( flow->y_min_id ).useMaxMin = boundaryUseMaxMin[ymin];
+//         if ( flow->y_max_id>=0 ) flow->boundary ( flow->y_max_id ).useMaxMin = boundaryUseMaxMin[ymax];
+//         if ( flow->x_max_id>=0 ) flow->boundary ( flow->x_max_id ).useMaxMin = boundaryUseMaxMin[xmax];
+//         if ( flow->x_min_id>=0 ) flow->boundary ( flow->x_min_id ).useMaxMin = boundaryUseMaxMin[xmin];
+//         if ( flow->z_max_id>=0 ) flow->boundary ( flow->z_max_id ).useMaxMin = boundaryUseMaxMin[zmax];
+//         if ( flow->z_min_id>=0 ) flow->boundary ( flow->z_min_id ).useMaxMin = boundaryUseMaxMin[zmin];
+
         flow->Corner_min = CGT::Point ( flow->x_min, flow->y_min, flow->z_min );
         flow->Corner_max = CGT::Point ( flow->x_max, flow->y_max, flow->z_max );
-
-        if ( Debug ) {
-                cout << "Section area = " << flow->SectionArea << endl;
-                cout << "Vtotale = " << flow->Vtotale << endl;
-                cout << "x_min = " << flow->x_min << endl;
-                cout << "x_max = " << flow->x_max << endl;
-                cout << "y_max = " << flow->y_max << endl;
-                cout << "y_min = " << flow->y_min << endl;
-                cout << "z_min = " << flow->z_min << endl;
-                cout << "z_max = " << flow->z_max << endl;
-                cout << endl << "Adding Boundary------" << endl;
-        }
+ 
         //assign BCs types and values
         BoundaryConditions ( flow );
 
@@ -512,13 +515,90 @@ void UnsaturatedEngine::AddBoundary ( Solver& flow )
         for ( int i=0; i<6; i++ ) {
                 if ( *flow->boundsIds[i]<0 ) continue;
                 CGT::Vecteur Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
-                if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->AddBoundingPlane ( true, Normal, *flow->boundsIds[i],5000.0 );
+                if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->AddBoundingPlane(Normal, *flow->boundsIds[i] );
                 else {
 			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow->boundsIds[i]].pos[h];
-                        flow->AddBoundingPlane ( center, wall_thickness, Normal,*flow->boundsIds[i],5000.0 );
+// 			cerr << "id="<<*flow->boundsIds[i] <<" center="<<center[0]<<","<<center[1]<<","<<center[2]<<endl;
+                        flow->AddBoundingPlane ( center, wall_thickness, Normal,*flow->boundsIds[i] );
                 }
         }
 }
+
+// template<class Solver>
+// void UnsaturatedEngine::AddBoundary ( Solver& flow )
+// {
+// 	vector<posData>& buffer = positionBufferCurrent;
+//         solver->x_min = Mathr::MAX_REAL, solver->x_max = -Mathr::MAX_REAL, solver->y_min = Mathr::MAX_REAL, solver->y_max = -Mathr::MAX_REAL, solver->z_min = Mathr::MAX_REAL, solver->z_max = -Mathr::MAX_REAL;
+//         FOREACH ( const posData& b, buffer ) {
+//                 if ( !b.exists ) continue;
+//                 if ( b.isSphere ) {
+//                         const Real& rad = b.radius;
+//                         const Real& x = b.pos[0];
+//                         const Real& y = b.pos[1];
+//                         const Real& z = b.pos[2];
+//                         flow->x_min = min ( flow->x_min, x-rad );
+//                         flow->x_max = max ( flow->x_max, x+rad );
+//                         flow->y_min = min ( flow->y_min, y-rad );
+//                         flow->y_max = max ( flow->y_max, y+rad );
+//                         flow->z_min = min ( flow->z_min, z-rad );
+//                         flow->z_max = max ( flow->z_max, z+rad );
+//                 }
+//         }
+// 	//FIXME id_offset must be set correctly, not the case here (always 0), then we need walls first or it will fail
+//         id_offset = flow->T[flow->currentTes].max_id+1;
+//         flow->id_offset = id_offset;
+//         flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
+//         flow->Vtotale = ( flow->x_max-flow->x_min ) * ( flow->y_max-flow->y_min ) * ( flow->z_max-flow->z_min );
+//         flow->y_min_id=wallBottomId;
+//         flow->y_max_id=wallTopId;
+//         flow->x_max_id=wallRightId;
+//         flow->x_min_id=wallLeftId;
+//         flow->z_min_id=wallBackId;
+//         flow->z_max_id=wallFrontId;
+// 
+//         if ( flow->y_min_id>=0 ) flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
+//         if ( flow->y_max_id>=0 ) flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
+//         if ( flow->x_max_id>=0 ) flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
+//         if ( flow->x_min_id>=0 ) flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
+//         if ( flow->z_max_id>=0 ) flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
+//         if ( flow->z_min_id>=0 ) flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;
+// 
+//         //FIXME: Id's order in boundsIds is done according to the enumeration of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
+//         flow->boundsIds[0]= &flow->x_min_id;
+//         flow->boundsIds[1]= &flow->x_max_id;
+//         flow->boundsIds[2]= &flow->y_min_id;
+//         flow->boundsIds[3]= &flow->y_max_id;
+//         flow->boundsIds[4]= &flow->z_min_id;
+//         flow->boundsIds[5]= &flow->z_max_id;
+// 
+//         flow->Corner_min = CGT::Point ( flow->x_min, flow->y_min, flow->z_min );
+//         flow->Corner_max = CGT::Point ( flow->x_max, flow->y_max, flow->z_max );
+// 
+//         if ( Debug ) {
+//                 cout << "Section area = " << flow->SectionArea << endl;
+//                 cout << "Vtotale = " << flow->Vtotale << endl;
+//                 cout << "x_min = " << flow->x_min << endl;
+//                 cout << "x_max = " << flow->x_max << endl;
+//                 cout << "y_max = " << flow->y_max << endl;
+//                 cout << "y_min = " << flow->y_min << endl;
+//                 cout << "z_min = " << flow->z_min << endl;
+//                 cout << "z_max = " << flow->z_max << endl;
+//                 cout << endl << "Adding Boundary------" << endl;
+//         }
+//         //assign BCs types and values
+//         BoundaryConditions ( flow );
+// 
+//         double center[3];
+//         for ( int i=0; i<6; i++ ) {
+//                 if ( *flow->boundsIds[i]<0 ) continue;
+//                 CGT::Vecteur Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
+//                 if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->AddBoundingPlane ( true, Normal, *flow->boundsIds[i],5000.0 );
+//                 else {
+// 			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow->boundsIds[i]].pos[h];
+//                         flow->AddBoundingPlane ( center, wall_thickness, Normal,*flow->boundsIds[i],5000.0 );
+//                 }
+//         }
+// }
 
 template<class Solver>
 void UnsaturatedEngine::Triangulate ( Solver& flow )
