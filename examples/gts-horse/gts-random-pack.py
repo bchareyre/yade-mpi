@@ -37,7 +37,9 @@ O.bodies.append(pack.gtsSurface2Facets(surf,color=(1,0,1)))
 # it will load the packing instead of running the triaxial compaction again.
 # Try running for the second time to see the speed difference!
 memoizeDb='/tmp/gts-triax-packings.sqlite'
-O.bodies.append(pack.randomDensePack(pack.inGtsSurface(surf),radius=5e-3,rRelFuzz=1e-4,memoizeDb=memoizeDb))
+sp=SpherePack()
+sp=pack.randomDensePack(pack.inGtsSurface(surf),radius=5e-3,rRelFuzz=1e-4,memoizeDb=memoizeDb,returnSpherePack=True)
+sp.toSimulation()
 # We could also fill the horse with triaxial packing, but have nice approximation, the triaxial would run terribly long,
 # since horse discard most volume of its bounding box
 # Here, we would use a very crude one, however
@@ -45,8 +47,10 @@ if 1:
 	import gts
 	horse=gts.read(open('horse.coarse.gts')) #; horse.scale(.25,.25,.25)
 	O.bodies.append(pack.gtsSurface2Facets(horse))
-	O.bodies.append(pack.randomDensePack(pack.inGtsSurface(horse),radius=5e-3,memoizeDb=memoizeDb))
+	sp=pack.randomDensePack(pack.inGtsSurface(horse),radius=5e-3,memoizeDb=memoizeDb,returnSpherePack=True)
+	sp.toSimulation()
 	horse.translate(.07,0,0)
 	O.bodies.append(pack.gtsSurface2Facets(horse))
 	# specifying spheresInCell makes the packing periodic, with the given number of spheres, proportions being equal to that of the predicate
-	O.bodies.append(pack.randomDensePack(pack.inGtsSurface(horse),radius=1e-3,spheresInCell=2000,memoizeDb=memoizeDb))
+	sp=pack.randomDensePack(pack.inGtsSurface(horse),radius=1e-3,spheresInCell=2000,memoizeDb=memoizeDb,returnSpherePack=True)
+	sp.toSimulation()

@@ -15,7 +15,7 @@ from yade.pack import *
 O=Omega() 
 
 #Def of the material which will be used
-O.materials.append(NormalInelasticMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,coeff_dech=3.0,label='Materiau1'))
+O.materials.append(NormalInelasticMat(density=2600,young=4.0e9,poisson=.04,frictionAngle=.6,coeff_dech=3.0,label='Material1'))
 
 #Def of dimensions of the box
 #length=5
@@ -47,14 +47,13 @@ inFrontBox = box( center=(length/2.0,height/2.0,width/2.0+thickness/2.0), extent
 
 O.bodies.append([leftBox,lowBox,rightBox,upBox,behindBox,inFrontBox])
 
-#memoizeDb='/tmp/simpleshear-triax-packings.sqlite'
-#ListSph=randomDensePack(pred,radius=0.002,rRelFuzz=0.15,memoDbg=True,memoizeDb=memoizeDb)
-#ListSph=randomDensePack(pred,radius=0.002,rRelFuzz=0.15,memoDbg=True,memoizeDb=memoizeDb,spheresInCell=100)
-#O.bodies.append(ListSph)
 
-sp=yade._packSpheres.SpherePack()
+sp=SpherePack()
+#memoizeDb='/tmp/simpleshear-triax-packings.sqlite'
+#sp=randomDensePack(pred,radius=0.002,rRelFuzz=0.15,memoDbg=True,memoizeDb=memoizeDb,returnSpherePack=True)
+#sp=randomDensePack(pred,radius=0.002,rRelFuzz=0.15,memoDbg=True,memoizeDb=memoizeDb,spheresInCell=100,returnSpherePack=True)
 sp.makeCloud(Vector3(0,0.0,-width/2.0),Vector3(length,height,width/2.0),rMean,.15)
-O.bodies.append([sphere(s[0],s[1]) for s in sp])
+sp.toSimulation()
 
 
 #---- Def of the engines ----#

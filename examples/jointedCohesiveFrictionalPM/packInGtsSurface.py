@@ -27,10 +27,12 @@ if surface.is_closed():
 	### regular packing
 	#O.bodies.append(pack.regularHexa(pred,radius=radius,gap=0.,color=(0.9,0.8,0.6)))
 	#O.bodies.append(pack.regularOrtho(pred,radius=radius,gap=0.,color=(0.9,0.8,0.6)))
+	sp=SpherePack()
 	# random packing
-	O.bodies.append(pack.randomDensePack(pred,radius=radius,rRelFuzz=0.3,useOBB=True,memoizeDb='/tmp/gts-triax-packings.sqlite',returnSpherePack=False,color=(0.9,0.8,0.6))) # returnSpherePack=True(?),cropLayers=5 (not to use),'
+	sp=pack.randomDensePack(pred,radius=radius,rRelFuzz=0.3,useOBB=True,memoizeDb='/tmp/gts-triax-packings.sqlite',returnSpherePack=True) # cropLayers=5 (not to use)
 	# periodic random packing
-	#O.bodies.append(pack.randomDensePack(pred,radius=radius,rRelFuzz=0.3,useOBB=True,spheresInCell=2000,memoizeDb='/tmp/gts-triax-packings.sqlite',returnSpherePack=False,color=(0.9,0.8,0.6))) # returnSpherePack=True(?),cropLayers=5 (not to use),'
+	#sp=pack.randomDensePack(pred,radius=radius,rRelFuzz=0.3,useOBB=True,spheresInCell=2000,memoizeDb='/tmp/gts-triax-packings.sqlite',returnSpherePack=True) # cropLayers=5 (not to use)
+	sp.toSimulation(color=(0.9,0.8,0.6))
 
 #### import mesh
 O.bodies.append(pack.gtsSurface2Facets(surface,color=(0.8,0.8,0.8),wire=True))
