@@ -545,7 +545,7 @@ def vmData():
 	l=_procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
 	return int(ll[1])
 
-def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
+def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,distFactor=2.2,**kw):
 	"""Get some data about the current packing useful for uniaxial test:
 
 #. Find the dimensions that is the longest (uniaxial loading axis)
@@ -571,7 +571,7 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 	assert(axis in (0,1,2))
 	import numpy
 	areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
-	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
+	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=distFactor)
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
 def voxelPorosityTriaxial(triax,resolution=200,offset=0):

@@ -337,12 +337,11 @@ def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 		:param float scale: factor scales the given data.
 		:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.facet`
 		:param bool returnConnectivityTable: if True, apart from facets returns also nodes (list of (x,y,z) nodes coordinates) and elements (list of (id1,id2,id3) element nodes ids). If False (default), returns only facets
-	
-	Example: :ysrc:`examples/test/unv-read/unvRead.py`."""
+	"""
 	nodes,elems = [],[]
 	f = open(fileName)
 	for line in f:
-		if line.startswith('134'): # read nodes coordinates
+		if line.startswith('134,'): # read nodes coordinates
 			ls = line.split(',')
 			v = Vector3(
 				float(ls[1])*scale + shift[0],
@@ -350,9 +349,9 @@ def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 				float(ls[3])*scale + shift[2]
 			)
 			nodes.append(v)
-		if line.startswith('136'): # read elements
+		if line.startswith('136,'): # read elements
 			ls = line.split(',')
-			i1,i2,i3 = int(ls[3])/2, int(ls[4])/2, int(ls[5])/2 # the numbering of nodes is 1,3,5,7,..., hense this int(ls[*])/2
+			i1,i2,i3 = int(ls[3])/2, int(ls[4])/2, int(ls[5])/2 # the numbering of nodes is 1,3,5,7,..., hence this int(ls[*])/2
 			elems.append( (i1,i2,i3) )
 	facets = [utils.facet( ( nodes[e[0]], nodes[e[1]], nodes[e[2]] ), **kw) for e in elems]
 	if returnConnectivityTable:
