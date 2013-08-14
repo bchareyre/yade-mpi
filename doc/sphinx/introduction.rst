@@ -15,7 +15,7 @@ Getting started
 Before you start moving around in Yade, you should have some prior knowledge.
 
 * Basics of command line in your Linux system are necessary for running yade. Look on the web for tutorials.
-* Python language; we recommend the official `Python tutorial <http://docs.python.org/tutorial>`_. Reading further documents on the topis, such as `Dive into Python <http://diveintopython.org/>`_ will certainly not hurt either.
+* Python language; we recommend the official `Python tutorial <http://docs.python.org/tutorial>`_. Reading further documents on the topis, such as `Dive into Python <http://www.diveintopython.net/>`_ will certainly not hurt either.
 
 You are advised to try all commands described yourself. Don't be afraid to experiment.
 

@@ -64,7 +64,7 @@ def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
 	m=re.match('(.*)\s*<(.*)>\s*',id)
 	if m:
 		txt,id=m.group(1),m.group(2)
-	return [nodes.reference(rawtext,docutils.utils.unescape(txt),refuri='http://bazaar.launchpad.net/~yade-dev/yade/trunk/%s/head%%3A/%s'%('files' if txt.endswith('/') else 'annotate',id))],[] ### **options should be passed to nodes.reference as well
+	return [nodes.reference(rawtext,docutils.utils.unescape(txt),refuri='https://github.com/yade/trunk/blob/master/%s'%id)],[] ### **options should be passed to nodes.reference as well
 
 # map modules to their html (rst) filenames. Used for sub-modules, where e.g. SpherePack is yade._packSphere.SpherePack, but is documented from yade.pack.rst
 moduleMap={

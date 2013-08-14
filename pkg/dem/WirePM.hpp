@@ -51,10 +51,12 @@ class WireMat: public FrictMat {
 			((Real,diameter,0.0027,,"Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
 			((unsigned int,type,0,,"Three different types are considered:\n\n"
 			"== ===============================================================\n"
-			"type=0  Corresponds to Bertrand's approach (see [Bertrand2008]_): only one stress-strain curve is used\n"
-			"type=1  New approach: two stress-strain curves (see [Thoeni2013]_)\n"
-			"type=2  New approach: two stress-strain curves with changed initial stiffness and horizontal shift (shift is random if $\\text{seed}\\geq0$, for more details see [Thoeni2013]_)\n"
-			"== ==============================================================="))
+			"0  Corresponds to Bertrand's approach (see [Bertrand2008]_): only one stress-strain curve is used\n"
+			"1  New approach: two separate stress-strain curves can be used (see [Thoeni2013]_)\n"
+			"2  New approach with stochastically distorted contact model: two separate stress-strain curves with changed initial stiffness and horizontal shift (shift is random if $\\text{seed}\\geq0$, for more details see [Thoeni2013]_)\n"
+			"== ===============================================================\n\n"
+			"By default the type is 0."
+			))
 			((vector<Vector2r>,strainStressValues,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for one single wire. Tension only is considered and the point (0,0) is not needed! NOTE: Vector needs to be initialized!"))
 			((vector<Vector2r>,strainStressValuesDT,,Attr::triggerPostLoad,"Piecewise linear definition of the stress-strain curve by set of points (strain[-]>0,stress[Pa]>0) for the double twist. Tension only is considered and the point (0,0) is not needed! If this value is given the calculation will be based on two different stress-strain curves without considering the parameter introduced by [Bertrand2008]_ (see [Thoeni2013]_)."))
 			((bool,isDoubleTwist,false,,"Type of the mesh. If true two particles of the same material which body ids differ by one will be considered as double-twisted interaction."))
