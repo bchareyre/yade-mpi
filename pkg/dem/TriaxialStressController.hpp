@@ -70,8 +70,9 @@ class TriaxialStressController : public BoundaryController
 		void computeStressStrain();
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
     		Real ComputeUnbalancedForce(bool maxUnbalanced=false);
-		///! Getter for stress in python
+		///! Getter for stress and rates in python
 		Vector3r getStress(int boundId);
+		Vector3r getStrainRate();
 
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
 		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. sigmaIso has to be defined during growing phases."
@@ -138,6 +139,7 @@ class TriaxialStressController : public BoundaryController
 		porosity=1;
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
+		.def_readonly("strainRate",&TriaxialStressController::getStrainRate,"Current strain rate in a vector d/dt(exx,eyy,ezz).")
  		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
 		.def_readonly("spheresVolume",&TriaxialStressController::spheresVolume,"Total volume pf spheres.")

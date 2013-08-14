@@ -1,0 +1,13 @@
+Every files contained in this folder are part of ongoing work initiated by luc scholtes and phd students on the modelling of fractured/jointed media. For details/remarks/improvements, please send emails to lscholtes63@gmail.com. Also, please refer to following references for more details and explananations:
+-[1] Harthong B., Scholtès L., Donzé F.V. (2012). Strength characterisation of rock masses using a DEM-DFN model, Geophys J Int, 191, 467-480.
+-[2] Scholtès L., Donzé F.V. (2012). Modelling progressive failure in fractured rock masses using a 3D Discrete Element Method, Int J Rock Mech Min Sci, 52,18-30.
+-[3] Scholtès L., Donzé F.V. (2011). Scale effects on strength of geomaterials, case study: coal, J Mech Phys Solids, 59(5), 1131-1146.
+
+jcfPM folder contains files illustrating how Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM can be used to deal with jointed media (media containing pre-existing discontinuity surfaces (fractures)).
+
+1-packInGtsSurface.py is a simple script used to generate a packing (parallellepiped_10.spheres) from a meshed closed surface (parallellepiped.gts).
+Packing generation can be done with other methods. The point here is to generate a packing and to save it in a text file (parallellepiped_10.spheres).
+
+2-identificationSpheresOnJoint.py is a script used to identify the spheres belonging to a predefined packing (parallellepiped_10.spheres) interacting along pre-existing discontinuity surfaces defined by a meshed surface (persistentPlane30Deg.stl). Executing this script produces 2 text files containing respectively spheres from packing (parallellepiped_10_persistentPlane30Deg.spheres) and spheres attributes regarding jcfPM variables (parallellepiped_10_persistentPlane30Deg_jointedPM.spheres). 
+
+3-gravityLoading.py is a simple example showing how to use Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM. It simulates the loading of a pre-fractured packing (parallellepiped_10_persistentPlane30Deg.spheres) by gravity to emphasize how the pre-existing discontinuity affects the behavior. User can play along with joint surface properties (smooth contact logic or not, joint friction angle,...) to see the effect on the simulated behavior.

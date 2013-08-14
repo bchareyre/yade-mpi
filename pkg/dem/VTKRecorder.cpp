@@ -26,7 +26,6 @@
 #include<yade/pkg/common/Facet.hpp>
 #include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/dem/ConcretePM.hpp>
-#include<yade/pkg/dem/RockPM.hpp>
 #include<yade/pkg/dem/WirePM.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
@@ -58,7 +57,6 @@ void VTKRecorder::action(){
 		else if(rec=="mass") recActive[REC_MASS]=true;
 		else if((rec=="colors") || (rec=="color"))recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
-		else if(rec=="rpm") recActive[REC_RPM]=true;
 		else if(rec=="wpm") recActive[REC_WPM]=true;
 		else if(rec=="intr") recActive[REC_INTR]=true;
 		else if((rec=="ids") || (rec=="id")) recActive[REC_ID]=true;
@@ -66,7 +64,7 @@ void VTKRecorder::action(){
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
 		else if(rec=="stress") recActive[REC_STRESS]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, rpm, wpm, intr, id, clumpId, materialId). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -199,17 +197,6 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
 	cpmStress->SetNumberOfComponents(9);
 	cpmStress->SetName("cpmStress");
-
-	// extras for RPM
-	vtkSmartPointer<vtkFloatArray> rpmSpecNum = vtkSmartPointer<vtkFloatArray>::New();
-	rpmSpecNum->SetNumberOfComponents(1);
-	rpmSpecNum->SetName("rpmSpecNum");
-	vtkSmartPointer<vtkFloatArray> rpmSpecMass = vtkSmartPointer<vtkFloatArray>::New();
-	rpmSpecMass->SetNumberOfComponents(1);
-	rpmSpecMass->SetName("rpmSpecMass");
-	vtkSmartPointer<vtkFloatArray> rpmSpecDiam = vtkSmartPointer<vtkFloatArray>::New();
-	rpmSpecDiam->SetNumberOfComponents(1);
-	rpmSpecDiam->SetName("rpmSpecDiam");
 
 	// extras for WireMatPM
 	vtkSmartPointer<vtkFloatArray> wpmNormalForce = vtkSmartPointer<vtkFloatArray>::New();
@@ -356,11 +343,6 @@ void VTKRecorder::action(){
 					float s[9]={ (float) ss(0,0), (float) ss(0,1), (float) ss(0,2), (float) ss(1,0), (float) ss(1,1), (float) ss(1,2), (float) ss(2,0), (float) ss(2,1), (float) ss(2,2)};
 					cpmStress->InsertNextTupleValue(s);
 				}
-				if (recActive[REC_RPM]){
-					rpmSpecNum->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenNumber);
-					rpmSpecMass->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenMass);
-					rpmSpecDiam->InsertNextValue(YADE_PTR_CAST<RpmState>(b->state)->specimenMaxDiam);
-				}
 				
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
 				continue;
@@ -479,11 +461,6 @@ void VTKRecorder::action(){
 		if (recActive[REC_CPM]){
 			spheresUg->GetPointData()->AddArray(cpmDamage);
 			spheresUg->GetPointData()->AddArray(cpmStress);
-		}
-		if (recActive[REC_RPM]){
-			spheresUg->GetPointData()->AddArray(rpmSpecNum);
-			spheresUg->GetPointData()->AddArray(rpmSpecMass);
-			spheresUg->GetPointData()->AddArray(rpmSpecDiam);
 		}
 
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);

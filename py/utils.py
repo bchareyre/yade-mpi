@@ -855,7 +855,7 @@ def psd(bins=5, mass=True, mask=-1):
 	:param int mask: :yref:`Body.mask` for the body
 	:return:
 		* binsSizes: list of bin's sizes
-		* binsProc: how much material (in procents) are in the bin, cumulative
+		* binsProc: how much material (in percents) are in the bin, cumulative
 		* binsSumCum: how much material (in units) are in the bin, cumulative
 
 		binsSizes, binsProc, binsSumCum
@@ -876,13 +876,12 @@ def psd(bins=5, mass=True, mask=-1):
 	binsMass = numpy.zeros(bins)
 	binsNumbers = numpy.zeros(bins)
 	
-		
 	for b in O.bodies:
 		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)<>0))):
 			d=2*b.shape.radius
 			
 			basketId = int(math.floor( (d-minD) / deltaBinD ) )
-			if (d == maxD): basketId = bins-1												 #If the diametr equals the maximal diameter, put the particle into the last bin
+			if (d == maxD): basketId = bins-1												 #If the diameter equals the maximal diameter, put the particle into the last bin
 			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses into the bin 
 			binsNumbers[basketId] = binsNumbers[basketId] + 1					#Put numbers into the bin 
 			

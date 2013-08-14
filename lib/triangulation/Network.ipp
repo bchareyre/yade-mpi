@@ -19,13 +19,7 @@ using namespace std;
 // using namespace boost;
 namespace CGT {
 
-//	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
-//	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
-//	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
-//	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
-//	template<class Tesselation> const int Network<Tesselation>::permut4 [4][4]  = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
-
-	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
+// 	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
 	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;
 	template<class Tesselation> const int Network<Tesselation>::facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 	template<class Tesselation> const int Network<Tesselation>::permut3 [3][3]  = {{0,1,2},{1,2,0},{2,0,1}};
@@ -36,16 +30,15 @@ Network<Tesselation>::~Network(){}
 
 template<class Tesselation>
 Network<Tesselation>::Network(){
+	FAR = 50000;
 	facetF1=facetF2=facetRe1=facetRe2=facetRe3=0;
 	F1=F2=Re1=Re2=0;
-	facet_detected = false;
-
 }
 
 template<class Tesselation>
-int Network<Tesselation>::Detect_facet_fictious_vertices (Cell_handle& cell, int& j)
+int Network<Tesselation>::detectFacetFictiousVertices (Cell_handle& cell, int& j)
 {
-	fictious_vertex = 0;
+	facetNFictious = 0;
 	int real_vertex=0;
 	Sphere v [3];
         Vertex_handle W [3];
@@ -54,28 +47,27 @@ int Network<Tesselation>::Detect_facet_fictious_vertices (Cell_handle& cell, int
                 W[kk] = cell->vertex(facetVertices[j][kk]);
                 v[kk] = cell->vertex(facetVertices[j][kk])->point();
                 if (W[kk]->info().isFictious) {
-                        if (fictious_vertex==0) {F1=facetVertices[j][kk];facetF1=kk;} else
+                        if (facetNFictious==0) {F1=facetVertices[j][kk];facetF1=kk;} else
 			{F2 = facetVertices[j][kk];facetF2=kk;}
-                        fictious_vertex +=1;
+                        facetNFictious +=1;
                 } else {
                         if (real_vertex==0) {Re1=facetVertices[j][kk];facetRe1=kk;} else if (real_vertex==1)
 			{Re2=facetVertices[j][kk];facetRe2=kk;} else if (real_vertex==2)
 			{Re2=facetVertices[j][kk];facetRe3=kk;}
                         real_vertex+=1;}}
-        facet_detected = true;
-	return fictious_vertex;
+	return facetNFictious;
 }
 
 template<class Tesselation>
-double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j)
+double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j, bool reuseFacetData)
 {
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
-  fictious_vertex = Detect_facet_fictious_vertices (cell,j);
+  if (!reuseFacetData) facetNFictious = detectFacetFictiousVertices (cell,j);
   Sphere v [3];
   Vertex_handle W [3];
   for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);v[kk] = cell->vertex(facetVertices[j][kk])->point();}
-  switch (fictious_vertex) {
+  switch (facetNFictious) {
     case (0) : {
 		Vertex_handle& SV1 = W[0];
                 Vertex_handle& SV2 = W[1];
@@ -269,11 +261,9 @@ Real Network<Tesselation>::fast_solid_angle(const Point& STA1, const Point& PTA1
 }
 
 template<class Tesselation>
-double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS)
+double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData)
 {
-  if (!facet_detected) fictious_vertex=Detect_facet_fictious_vertices(cell,j);
-
-//   RTriangulation& Tri = T[currentTes].Triangulation();
+  if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
 
@@ -287,7 +277,7 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
 	  W[kk] = cell->vertex(facetVertices[j][kk]);
 	  v[kk] = cell->vertex(facetVertices[j][kk])->point();}
 
-  switch (fictious_vertex) {
+  switch (facetNFictious) {
     case (0) : {
 		Vertex_handle& SV1 = W[0];
                 Vertex_handle& SV2 = W[1];
@@ -452,7 +442,6 @@ template<class Tesselation>
 void Network<Tesselation>::AddBoundingPlanes()
 {
 	Tesselation& Tes = T[currentTes];
-	
 	//FIXME: Id's order in boundsIds is done according to the enumerotation of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
 	y_min_id = Tes.Max_id() + 2;
         boundsIds[0]=&y_min_id;
@@ -472,41 +461,31 @@ void Network<Tesselation>::AddBoundingPlanes()
 	
 	id_offset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
 	
-	AddBoundingPlane (true, Vecteur(0,1,0) , y_min_id);
-	AddBoundingPlane (true, Vecteur(0,-1,0) , y_max_id);
-	AddBoundingPlane (true, Vecteur(-1,0,0) , x_max_id);
-	AddBoundingPlane (true, Vecteur(1,0,0) , x_min_id);
-	AddBoundingPlane (true, Vecteur(0,0,1) , z_min_id);
-	AddBoundingPlane (true, Vecteur(0,0,-1) , z_max_id);
+	AddBoundingPlane (Vecteur(0,1,0) , y_min_id);
+	AddBoundingPlane (Vecteur(0,-1,0) , y_max_id);
+	AddBoundingPlane (Vecteur(-1,0,0) , x_max_id);
+	AddBoundingPlane (Vecteur(1,0,0) , x_min_id);
+	AddBoundingPlane (Vecteur(0,0,1) , z_min_id);
+	AddBoundingPlane (Vecteur(0,0,-1) , z_max_id);
 
 // 	AddBoundingPlanes(true);
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlane (bool yade, Vecteur Normal, int id_wall)
+void Network<Tesselation>::AddBoundingPlane (Vecteur Normal, int id_wall)
 {
-	  Tesselation& Tes = T[currentTes];
-	  
+// 	  Tesselation& Tes = T[currentTes];
+	  //FIXME: pre-condition: the normal is axis-aligned
 	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
 	  
 	  double pivot = Normal[Coordinate]<0 ? 
 	  Corner_max.x()*abs(Normal[0])+Corner_max.y()*abs(Normal[1])+Corner_max.z()*abs(Normal[2]) : Corner_min.x()*abs(Normal[0])+Corner_min.y()*abs(Normal[1])+Corner_min.z()*abs(Normal[2]);
-	
-	  Tes.insert(0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
-		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
-		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
-		     FAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
 
-	  if (Normal[Coordinate]<0) boundaries[id_wall-id_offset].p = Corner_max;
-	  else boundaries[id_wall-id_offset].p = Corner_min;
+	  Real center [3] ={ 0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+pivot*abs(Normal[0]),
+		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+pivot*abs(Normal[1]),
+		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+pivot*abs(Normal[2])};
 	  
-	  boundaries[id_wall-id_offset].normal = Normal;
-	  boundaries[id_wall-id_offset].coordinate = Coordinate;
-	  
-          boundaries[id_wall-id_offset].flowCondition = 1;
-          boundaries[id_wall-id_offset].value = 0;
-	  
-	  if(DEBUG_OUT) cout << "A boundary -max/min-has been created. ID = " << id_wall << " position = " << 0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+(pivot-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << 0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+(pivot-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " << 0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+(pivot-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2])  << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
+	  AddBoundingPlane(center,0,Normal,id_wall);
 }
 
 template<class Tesselation>

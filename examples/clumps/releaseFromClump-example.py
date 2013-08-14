@@ -40,9 +40,9 @@ for ii in range(-3,2):
 idClump1=O.bodies.clump(bodyList1)
 idClump2=O.bodies.clump(bodyList2)
 for ii in bodyList1:
-	O.bodies[ii].shape.color=(100,100,100)
+	O.bodies[ii].shape.color=(.1,.5,.1)
 for ii in bodyList2:
-	O.bodies[ii].shape.color=(200,200,200)
+	O.bodies[ii].shape.color=(.2,.2,.7)
 
 #definition for getting informations from all clumps:
 def getClumpInfo():

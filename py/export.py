@@ -38,6 +38,8 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				elif (format=='id_x_y_z_r_matId'):
 					out.write('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				elif (format=='jointedPM'):
+					out.write('%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n'%(b.id,b.mat.onJoint,b.mat.joint,b.mat.jointNormal1[0],b.mat.jointNormal1[1],b.mat.jointNormal1[2],b.mat.jointNormal2[0],b.mat.jointNormal2[1],b.mat.jointNormal2[2],b.mat.jointNormal3[0],b.mat.jointNormal3[1],b.mat.jointNormal3[2]))
 				else:
 					raise RuntimeError("Please, specify a correct format output!");
 				count+=1

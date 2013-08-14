@@ -23,6 +23,14 @@ TriaxialStressController::~TriaxialStressController(){}
 
 Vector3r TriaxialStressController::getStress(int boundId) {assert (boundId>=0 && boundId<=5); return stress[boundId];}
 
+Vector3r TriaxialStressController::getStrainRate() {
+	return Vector3r (
+		(Body::byId(wall_right_id,scene)->state->vel[0]-Body::byId(wall_left_id,scene)->state->vel[0])/width,
+		(Body::byId(wall_top_id,scene)->state->vel[1]-Body::byId(wall_bottom_id,scene)->state->vel[1])/height,
+		(Body::byId(wall_front_id,scene)->state->vel[2]-Body::byId(wall_back_id,scene)->state->vel[2])/depth
+	);
+}
+
 void TriaxialStressController::updateStiffness ()
 {
 	for (int i=0; i<6; ++i) stiffness[i] = 0;
