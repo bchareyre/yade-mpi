@@ -12,8 +12,8 @@
 #  ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
 #  ENABLE_GTS: enable GTS-option (ON by default)
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
-#  ENABLE_LINSOLV: enable LINSOLV-option (OFF by default)
-#  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (OFF by default)
+#  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
+#  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -91,8 +91,8 @@ OPTION(ENABLE_GTS "Enable GTS" ${DEFAULT})
 OPTION(ENABLE_GUI "Enable GUI" ${DEFAULT})
 OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
-OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" OFF)
-OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" OFF)
+OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" ${DEFAULT})
+OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" ${DEFAULT})
 
 #===========================================================
 # Use Eigen3 by default
