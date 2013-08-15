@@ -123,7 +123,8 @@ should have root privileges
 		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf python-argparse \
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man
+		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man libsuitesparse-dev \
+		libopenblas-dev libmetis-dev
 
 	* **Fedora**::
 
