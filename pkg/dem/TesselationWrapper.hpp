@@ -113,7 +113,7 @@ public:
 	Finite_edges_iterator facet_it;
 	MicroMacroAnalyser mma;
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities: currently volume, porosity and local deformation for each sphere. The calculation of microstrain is using a definition similar to the one of  [Calvetti1997]_ or [Bagi2006]_\n\nSee example usage in script example/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities: currently volume, porosity and local deformation for each sphere. The calculation of microstrain is explained in [Catalano2013a]_ \n\nSee example usage in script example/tesselationWrapper/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",
 	((unsigned int,n_spheres,0,,"|ycomp|"))
 	,/*ctor*/
   	Tes = new Tesselation;

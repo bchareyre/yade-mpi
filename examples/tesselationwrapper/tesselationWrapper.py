@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 #2012 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 """Example usage of a TesselationWrapper object for getting microscale quantities."""
+# See Catalano2013a for the definition of micro-strain
+# (http://dx.doi.org/10.1002/nag.2198 or free-access at arxiv http://arxiv.org/pdf/1304.4895.pdf)
 
 tt=TriaxialTest()
 tt.generate("test.yade")
