@@ -28,5 +28,4 @@ doc/sphinx/yade.ymport.rst
 .kdev4/yade.kdev4
 yade.kdev4
 *.pyc
-.gitignore
 
