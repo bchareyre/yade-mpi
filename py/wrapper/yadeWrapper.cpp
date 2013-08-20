@@ -471,10 +471,10 @@ class pyForceContainer{
 	public:
 		pyForceContainer(shared_ptr<Scene> _scene): scene(_scene) { }
 		void checkId(long id){ if(id<0 || (size_t)id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* never reached */ throw; } }
-		Vector3r force_get(long id){  checkId(id); return scene->forces.getForceSingle(id); /* scene->forces.sync(); return scene->forces.getForce(id); */}
-		Vector3r torque_get(long id){ checkId(id); return scene->forces.getTorqueSingle(id); }
-		Vector3r move_get(long id){   checkId(id); return scene->forces.getMoveSingle(id); }
-		Vector3r rot_get(long id){    checkId(id); return scene->forces.getRotSingle(id); }
+		Vector3r force_get(long id, bool sync){  checkId(id); if (!sync) return scene->forces.getForceSingle(id); scene->forces.sync(); return scene->forces.getForce(id);}
+		Vector3r torque_get(long id, bool sync){ checkId(id); if (!sync) return scene->forces.getTorqueSingle(id); scene->forces.sync(); return scene->forces.getTorque(id);}
+		Vector3r move_get(long id){ checkId(id); return scene->forces.getMoveSingle(id); }
+		Vector3r rot_get(long id){ checkId(id); return scene->forces.getRotSingle(id); }
 		void force_add(long id, const Vector3r& f){  checkId(id); scene->forces.addForce (id,f); }
 		void torque_add(long id, const Vector3r& t){ checkId(id); scene->forces.addTorque(id,t);}
 		void move_add(long id, const Vector3r& t){   checkId(id); scene->forces.addMove(id,t);}
@@ -884,9 +884,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("next",&pyInteractionIterator::pyNext);
 
 	python::class_<pyForceContainer>("ForceContainer",python::init<pyForceContainer&>())
-		.def("f",&pyForceContainer::force_get,(python::arg("id")),"Force applied on body.")
-		.def("t",&pyForceContainer::torque_get,(python::arg("id")),"Torque applied on body.")
-		.def("m",&pyForceContainer::torque_get,(python::arg("id")),"Deprecated alias for t (torque).")
+		.def("f",&pyForceContainer::force_get,(python::arg("id"),python::arg("sync")=false),"Force applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
+		.def("t",&pyForceContainer::torque_get,(python::arg("id"),python::arg("sync")=false),"Torque applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
+		.def("m",&pyForceContainer::torque_get,(python::arg("id"),python::arg("sync")=false),"Deprecated alias for t (torque).")
 		.def("move",&pyForceContainer::move_get,(python::arg("id")),"Displacement applied on body.")
 		.def("rot",&pyForceContainer::rot_get,(python::arg("id")),"Rotation applied on body.")
 		.def("addF",&pyForceContainer::force_add,(python::arg("id"),python::arg("f")),"Apply force on body (accumulates).")
