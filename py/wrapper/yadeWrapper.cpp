@@ -158,28 +158,29 @@ class pyBodyContainer{
 		// clump them together (the clump fcn) and return
 		return python::make_tuple(clump(ids),ids);
 	}
-	void addToClump(Body::id_t bid, Body::id_t cid){
+	void addToClump(vector<Body::id_t> bids, Body::id_t cid){
 		Scene* scene(Omega::instance().getScene().get());	// get scene
-		shared_ptr<Body> bp = Body::byId(bid,scene);		// get body pointer
 		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
 		checkClump(clp);
-		if (bp->isClump()){
-			if (bp == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" and clump "+lexical_cast<string>(cid)+" are the same bodies. Body was not added.").c_str()); return;}
-			Clump::add(clp,bp);//add clump bid to clump cid
-			Clump::updateProperties(clp);
-			proxee->erase(bid);//erase old clump
-			return;
+		vector<Body::id_t> eraseList;
+		FOREACH(Body::id_t bid, bids) {
+			shared_ptr<Body> bp = Body::byId(bid,scene);		// get body pointer
+			if (bp->isClump()){
+				if (bp == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" and clump "+lexical_cast<string>(cid)+" are the same bodies. Body was not added.").c_str()); return;}
+				Clump::add(clp,bp);//add clump bid to clump cid
+				eraseList.push_back(bid);
+			}
+			else if (bp->isClumpMember()){
+				Body::id_t bpClumpId = bp->clumpId;
+				shared_ptr<Body> bpClumpPointer = Body::byId(bpClumpId,scene);
+				if (bpClumpPointer == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is already a clump member of clump "+lexical_cast<string>(cid)+". Body was not added.").c_str()); return;} 
+				Clump::add(clp,bpClumpPointer);//add clump bpClumpId to clump cid
+				eraseList.push_back(bpClumpId);
+			}
+			else Clump::add(clp,bp);// bp must be a standalone!
 		}
-		else if (bp->isClumpMember()){
-			Body::id_t bpClumpId = bp->clumpId;
-			shared_ptr<Body> bpClumpPointer = Body::byId(bpClumpId,scene);
-			if (bpClumpPointer == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is already a clump member of clump "+lexical_cast<string>(cid)+". Body was not added.").c_str()); return;} 
-			Clump::add(clp,bpClumpPointer);//add clump bpClumpId to clump cid
-			Clump::updateProperties(clp);
-			proxee->erase(bpClumpId);//erase old clump
-			return;
-		}
-		else {Clump::add(clp,bp); Clump::updateProperties(clp);}// bp must be a standalone!
+		Clump::updateProperties(clp);
+		FOREACH(Body::id_t bid, eraseList) proxee->erase(bid);//erase old clumps
 	}
 	void releaseFromClump(Body::id_t bid, Body::id_t cid){
 		Scene* scene(Omega::instance().getScene().get());	// get scene
@@ -857,7 +858,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
 		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); returns a tuple of ``(clumpId,[memberId1,memberId2,...])``. Clump masses and inertia are adapted automatically. If clump members are overlapping this is done by integration/summation over mass points using a regular grid of cells. For non-overlapping members inertia of the clump is the sum of inertias from members.")
 		.def("clump",&pyBodyContainer::clump,"Clump given bodies together (creating a rigid aggregate); returns ``clumpId``. Clump masses and inertia are adapted automatically (see :yref:`appendClumped()<BodyContainer.appendClumped>`).")
-		.def("addToClump",&pyBodyContainer::addToClump,"Add body b to an existing clump c. c must be clump and b may not be a clump member of c.\n\nSee **/examples/clumps/addToClump-example.py** for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
+		.def("addToClump",&pyBodyContainer::addToClump,"Add body b (or a list of bodies) to an existing clump c. c must be clump and b may not be a clump member of c.\n\nSee **/examples/clumps/addToClump-example.py** for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
 		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,"Release body b from clump c. b must be a clump member of c.\n\nSee **/examples/clumps/releaseFromClump-example.py** for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
 		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps, to adapt masses of clumps with multiple overlaps use :yref:`adaptClumpMasses()<BodyContainer.adaptClumpMasses>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")
 		.def("getRoundness",&pyBodyContainer::getRoundness,"Returns roundness coefficient RC = R2/R1. R1 is the theoretical radius of a sphere, with same volume as clump. R2 is the minimum radius of a sphere, that imbeds clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee **/examples/clumps/replaceByClumps-example.py** for an example script.")

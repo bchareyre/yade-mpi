@@ -62,13 +62,13 @@ print '\nSTATE before adding sphere to clump ------------'
 getClumpInfo()
 
 #add a sphere to the clump:
-O.bodies.addToClump(id_new,id_clump1)
+O.bodies.addToClump([id_new],id_clump1)
 
 print '\nSTATE after adding sphere to clump ------------'
 getClumpInfo()
 
 #add a clump to a clump:
-O.bodies.addToClump(id_clump2,id_clump1)
+O.bodies.addToClump([id_clump2],id_clump1)
 
 print '\nSTATE after adding the second clump to clump ------------'
 getClumpInfo()
