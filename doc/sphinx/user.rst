@@ -1437,8 +1437,8 @@ Animation
 """"""""""
 You can move between frames (snapshots that were saved) via the "Animation" menu. After setting the view angle, zoom etc to your satisfaction, the animation can be saved with *File/Save animation*.
 
-Micro-stress and micro-strain using TesselationWrapper
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Micro-stress and micro-strain
+=============================
 It is sometimes useful to visualize a DEM simulation through equivalent strain fields or stress fields. This is possible with :yref:`TesselationWrapper`. This class handles the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities: volume, porosity and local deformation for each sphere. The definition of microstrain and microstress is at the scale of particle-centered subdomains shown below, as explained in [Catalano2013a]_ .
 
 .. figure:: fig/micro-domains.*
