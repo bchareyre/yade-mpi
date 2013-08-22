@@ -8,8 +8,7 @@
 *************************************************************************/
 #ifdef FLOW_ENGINE
 
-#ifndef _FLOWBOUNDINGSPHERE_H
-#define _FLOWBOUNDINGSPHERE_H
+#pragma once
 
 #include "Network.hpp"
 #include "Timer.h"
@@ -167,5 +166,3 @@ class FlowBoundingSphere : public Network<_Tesselation>
 #include "yade/lib/triangulation/FlowBoundingSphere.ipp"
 
 #endif //FLOW_ENGINE
-
-#endif

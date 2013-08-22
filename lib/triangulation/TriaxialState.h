@@ -9,9 +9,7 @@
 /**
 @author Bruno Chareyre
 */
-#ifndef TRIAXIALSTATE_H
-#define TRIAXIALSTATE_H
-
+#pragma once
 
 #include "Tesselation.h"
 #include <vector>
@@ -108,4 +106,3 @@ private :
 };
 
 } // namespace CGT
-#endif

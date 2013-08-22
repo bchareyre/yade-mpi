@@ -8,8 +8,7 @@
 #include <yade/lib/base/Math.hpp>
 
 //Define basic types from CGAL templates
-#ifndef _Def_types
-#define _Def_types
+#pragma once
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Cartesian.h>
@@ -221,5 +220,3 @@ class PeriodicVertexInfo : public FlowVertexInfo {
 
 
 } // namespace CGT
-
-#endif

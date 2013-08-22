@@ -5,8 +5,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef _PERIODICFLOWLINSOLV_H
-#define _PERIODICFLOWLINSOLV_H
+#pragma once
+
 #include "FlowBoundingSphere.hpp"
 
 #ifdef FLOW_ENGINE
@@ -34,5 +34,3 @@ public:
 } //namespace CGTF
 
 #endif //FLOW_ENGINE
-
-#endif

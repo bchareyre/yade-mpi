@@ -50,4 +50,3 @@ typedef TriangulationTypes<FlowVertexInfo,FlowCellInfo>				FlowTriangulationType
 typedef TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo>			PeriFlowTriangulationTypes;
 
 } // namespace CGT
-
