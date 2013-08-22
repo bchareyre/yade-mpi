@@ -476,12 +476,16 @@ class pyForceContainer{
 		Vector3r torque_get(long id, bool sync){ checkId(id); if (!sync) return scene->forces.getTorqueSingle(id); scene->forces.sync(); return scene->forces.getTorque(id);}
 		Vector3r move_get(long id){ checkId(id); return scene->forces.getMoveSingle(id); }
 		Vector3r rot_get(long id){ checkId(id); return scene->forces.getRotSingle(id); }
-		void force_add(long id, const Vector3r& f){  checkId(id); scene->forces.addForce (id,f); }
-		void torque_add(long id, const Vector3r& t){ checkId(id); scene->forces.addTorque(id,t);}
+		void force_add(long id, const Vector3r& f, bool permanent){  checkId(id); if (!permanent) scene->forces.addForce (id,f); else scene->forces.addPermForce (id,f); }
+		void torque_add(long id, const Vector3r& t, bool permanent){ checkId(id); if (!permanent) scene->forces.addTorque(id,t); else scene->forces.addPermTorque(id,t);}
 		void move_add(long id, const Vector3r& t){   checkId(id); scene->forces.addMove(id,t);}
 		void rot_add(long id, const Vector3r& t){    checkId(id); scene->forces.addRot(id,t);}
+		Vector3r permForce_get(long id){  checkId(id); return scene->forces.getPermForce(id);}
+		Vector3r permTorque_get(long id){  checkId(id); return scene->forces.getPermTorque(id);}
+		void reset(bool resetAll) {scene->forces.reset(scene->iter,resetAll);}
 		long syncCount_get(){ return scene->forces.syncCount;}
 		void syncCount_set(long count){ scene->forces.syncCount=count;}
+		bool getPermForceUsed() {return scene->forces.getPermForceUsed();}
 };
 
 class pyMaterialContainer{
@@ -890,10 +894,14 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("m",&pyForceContainer::torque_get,(python::arg("id"),python::arg("sync")=false),"Deprecated alias for t (torque).")
 		.def("move",&pyForceContainer::move_get,(python::arg("id")),"Displacement applied on body.")
 		.def("rot",&pyForceContainer::rot_get,(python::arg("id")),"Rotation applied on body.")
-		.def("addF",&pyForceContainer::force_add,(python::arg("id"),python::arg("f")),"Apply force on body (accumulates).")
-		.def("addT",&pyForceContainer::torque_add,(python::arg("id"),python::arg("t")),"Apply torque on body (accumulates).")
+		.def("addF",&pyForceContainer::force_add,(python::arg("id"),python::arg("f"),python::arg("permanent")=false),"Apply force on body (accumulates).\n\n # If permanent=false (default), the force applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addF(id,f,True) or removed by reset(resetAll=True). The permanent force on a body can be checked with permF(id).")
+		.def("addT",&pyForceContainer::torque_add,(python::arg("id"),python::arg("t"),python::arg("permanent")=false),"Apply torque on body (accumulates). \n\n # If permanent=false (default), the torque applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addT(id,f,True) or removed by reset(resetAll=True). The permanent torque on a body can be checked with permT(id).")
+		.def("permF",&pyForceContainer::permForce_get,(python::arg("id")),"read the value of permanent force on body (set with setPermF()).")
+		.def("permT",&pyForceContainer::permTorque_get,(python::arg("id")),"read the value of permanent torque on body (set with setPermT()).")
 		.def("addMove",&pyForceContainer::move_add,(python::arg("id"),python::arg("m")),"Apply displacement on body (accumulates).")
 		.def("addRot",&pyForceContainer::rot_add,(python::arg("id"),python::arg("r")),"Apply rotation on body (accumulates).")
+		.def("reset",&pyForceContainer::reset,(python::arg("resetAll")=true),"Reset the force container, including user defined permanent forces/torques. resetAll=False will keep permanent forces/torques unchanged.")
+		.def("getPermForceUsed",&pyForceContainer::getPermForceUsed,"Check wether permanent forces are present.")
 		.add_property("syncCount",&pyForceContainer::syncCount_get,&pyForceContainer::syncCount_set,"Number of synchronizations  of ForceContainer (cummulative); if significantly higher than number of steps, there might be unnecessary syncs hurting performance.")
 		;
 

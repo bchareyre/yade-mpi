@@ -659,8 +659,6 @@ Motion constraints
 
      utils.sphere([x,y,z],radius,dynamic=False)
 
-  .. note:: There is an open `bug #398089 <https://bugs.launchpad.net/yade/+bug/398089>`_ to define exactly what the ``dynamic`` flag does. Please read it before writing a new engine relying on this flag.
-
 * :yref:`State.blockedDOFs` permits selective blocking
   of any of 6 degrees of freedom in global space. For instance, a sphere can be made to move only in the xy plane by saying:
 
@@ -671,9 +669,9 @@ Motion constraints
 
      Yade [1]: O.bodies.append(utils.sphere((0,0,0),1))
 
-     Yade [1]: O.bodies[0].state.blockedDOFs=['z','rx','ry']
+     Yade [1]: O.bodies[0].state.blockedDOFs='zXY'
 
-  In contrast to :yref:`Body.dynamic`, :yref:`blockedDOFs<State.blockedDOFs>` will only block forces (and acceleration) in that direction being effective; if you prescribed linear or angular velocity, they will be applied regardless of :yref:`blockedDOFs<State.blockedDOFs>`. (This is also related to `bug #398089 <https://bugs.launchpad.net/yade/+bug/398089>`_ mentioned above)
+  In contrast to :yref:`Body.dynamic`, :yref:`blockedDOFs<State.blockedDOFs>` will only block forces (and acceleration) in that direction being effective; if you prescribed linear or angular velocity, they will be applied regardless of :yref:`blockedDOFs<State.blockedDOFs>`. It also implies that if the velocity is not zero when degrees of freedom are blocked the body will keep moving at the velocity it has at the time of blocking.
 
 It might be desirable to constrain motion of some particles constructed from a generated sphere packing, following some condition, such as being at the bottom of a specimen; this can be done by looping over all bodies with a conditional::
 
@@ -690,6 +688,34 @@ Arbitrary spatial predicates introduced above can be expoited here as well::
 	   # ask the predicate if we are inside
 	   if pred(b.state.pos,b.shape.radius): b.dynamic=False
 
+.. _imposing_motion_force:
+
+Imposing motion and forces
+--------------------------
+
+* If a degree of freedom is blocked and a velocity is assigned along that direction (translational or rotational velocity), then the body will move at constant velocity. This is the simpler and recommended method to impose the motion of a body. This, for instance, will result in a constant velocity along $x$::
+
+	O.bodies.append(utils.sphere((0,0,0),1))
+	O.bodies[0].state.blockedDOFs='x'
+	O.bodies[0].state.vel=(10,0,0)
+
+  Conversely, modifying the position directly is likely to break Yade's algorithms, especially those related to collision detection and contact laws, as they are based oon bodies velocities. Therefore, unless you really know what you are doing, don't do that for imposing a motion::
+
+	O.bodies.append(utils.sphere((0,0,0),1))
+	O.bodies[0].state.blockedDOFs='x'
+	O.bodies[0].state.pos=10*O.dt #REALLY BAD! Don't assign position
+
+* Applying a force or a torque on a body is done via functions of the :yref:`ForceContainer`. It is as simple as this::
+
+	O.forces.addF(0,(1,0,0)) #applies for one step
+  
+  By default, the force applies for one time step only, and is resetted at the beginning of each step. For this reason, imposing a force at the begining of one step will have no effect at all, since it will be immediatly resetted. The only way is to place a :yref:`PyRunner` inside the simulation loop.
+
+  Applying the force permanently is possible with an optional argument (in this case it does not matter if the command comes at the begining of the time step)::
+
+	O.forces.addF(0,(1,0,0),permanent=True) #applies permanently
+
+  The force  will persist across iterations, until it is overwritten by another call to ``O.forces.addF(id,f,True)`` or erased by ``O.forces.reset(resetAll=True)``. The permanent force on a body can be checked with ``O.forces.permF(id)``.
 
 Boundary controllers
 --------------------
@@ -714,7 +740,7 @@ Engines deriving from :yref:`PartialEngine` define the :yref:`ids<PartialEngine.
 * :yref:`ForceEngine` and :yref:`TorqueEngine` applying given values of force/torque on subscribed bodies at every step.
 * :yref:`StepDisplacer` for applying generalized displacement delta at every timestep; designed for precise control of motion when testing constitutive laws on 2 particles.
 
-If you need an engine applying non-constant value instead, there are several interpolating engines (:yref:`InterpolatingDirectedForceEngine` for applying force with varying magnitude, :yref:`InterpolatingSpiralEngine` for applying spiral displacement with varying angular velocity and possibly others); writing a new interpolating engine is rather simple using examples of those that already exist.
+The real value of partial engines is if you need to prescribe complex types of force or displacement fields. For moving a body at constant velocity or for imposing a single force, the methods explained in `Imposing motion and forces`_ are much simpler. There are several interpolating engines (:yref:`InterpolatingDirectedForceEngine` for applying force with varying magnitude, :yref:`InterpolatingSpiralEngine` for applying spiral displacement with varying angular velocity and possibly others); writing a new interpolating engine is rather simple using examples of those that already exist.
 
 
 Convenience features
