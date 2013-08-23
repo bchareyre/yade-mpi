@@ -21,6 +21,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "UnsaturatedEngine.hpp"
+#include <CGAL/Plane_3.h>
 
 CREATE_LOGGER ( UnsaturatedEngine );
 
@@ -208,59 +209,77 @@ double UnsaturatedEngine::computeEffPoreRadius(Cellhandle cell, int j)
     double rAB = 0.5*(AB-rA-rB); if (rAB<0) { rAB=0; }
     double rBC = 0.5*(BC-rB-rC); if (rBC<0) { rBC=0; }
     double rAC = 0.5*(AC-rA-rC); if (rAC<0) { rAC=0; }
-    double Area_ABC = 0.5 * ((posB-posA).cross(posC-posA)).norm();
-    double Area_SolidA = 0.5*A*pow(rA,2);
-    double Area_SolidB = 0.5*B*pow(rB,2);
-    double Area_SolidC = 0.5*C*pow(rC,2);
+//     double Area_ABC = 0.5 * ((posB-posA).cross(posC-posA)).norm();
+//     double Area_SolidA = 0.5*A*pow(rA,2);
+//     double Area_SolidB = 0.5*B*pow(rB,2);
+//     double Area_SolidC = 0.5*C*pow(rC,2);
 
     double rmin = max(rAB,max(rBC,rAC));
-    if (rmin==0) {
-        rmin= 1.0e-10;
-    }
+    if (rmin==0) { rmin= 1.0e-10; }
     double rmax = abs(solver->Compute_EffectiveRadius(cell, j));
     
-    if (rmin>rmax) {cerr<<"rmin: "<< rmin << " " << "rmax" << rmax <<endl;}
+    if((computeDeltaForce(cell,j,rmax)<0)||(rmin>rmax)) {
+      double EffPoreRadius = rmax;
+//       cerr<<"0";
+      return EffPoreRadius;
+    }
+    else if((computeDeltaForce(cell,j,rmin)<0)&&(computeDeltaForce(cell,j,rmax)>0)) {
+      double effPoreRadius = bisection(cell,j,rmin,rmax);
+//       cerr<<"1";
+      return effPoreRadius;
+    }
+    else if((computeDeltaForce(cell,j,rmin)>0)&&(computeDeltaForce(cell,j,rmin)<computeDeltaForce(cell,j,rmax))) {
+      double EffPoreRadius = rmin;
+//       cerr<<"2";
+      return EffPoreRadius;
+    }
+    else if ((computeDeltaForce(cell,j,rmin)>computeDeltaForce(cell,j,rmax))&&(computeDeltaForce(cell,j,rmax)>0)) {
+      double EffPoreRadius = rmax;
+//       cerr<<"3";
+      return EffPoreRadius;
+    }
+//     if (rmin>rmax) {cerr<<"rmin: "<< rmin << " " << "rmax" << rmax << " rA="<<rA<<" rB="<<rB <<" rC="<<rC<<endl;}
     
-    if ((Area_ABC-Area_SolidA-Area_SolidB-Area_SolidC)<0) {
-        double EffPoreRadius = rmax;//for cells close to boundary spheres, the effPoreRadius set to inscribe radius.
+//     if (((Area_ABC-Area_SolidA-Area_SolidB-Area_SolidC)<0)||(rmin>rmax)) {
+//         double EffPoreRadius = rmax;//for cells close to boundary spheres, the effPoreRadius set to inscribe radius.
 //         cerr<<"1";
-        return EffPoreRadius;
-    }
-    else if( ( computeDeltaPressure(cell,j,rmin)>0 ) && ( computeDeltaPressure(cell,j,rmin)<computeDeltaPressure(cell,j,rmax)) ) {
-        double EffPoreRadius = rmin;
-//         cerr<<"2";
-	return EffPoreRadius;
-    }
-    else if( ( computeDeltaPressure(cell,j,rmin)<0 ) && ( computeDeltaPressure(cell,j,rmax)>0) ) {
-        double effPoreRadius = bisection(cell,j,rmin,rmax);
-//         cerr<<"3";
-	return effPoreRadius;
-    }
-    else if( ( computeDeltaPressure(cell,j,rmin)<computeDeltaPressure(cell,j,rmax) ) && ( computeDeltaPressure(cell,j,rmax)<0) ) {
-        double EffPoreRadius = rmax;
-//         cerr<<"1";
-	return EffPoreRadius;
-    }
-    else if( ( computeDeltaPressure(cell,j,rmin)>computeDeltaPressure(cell,j,rmax) ) && ( computeDeltaPressure(cell,j,rmax)>0) ) {
-        double EffPoreRadius = rmax;
-//         cerr<<"1";
-	return EffPoreRadius;
-    }
-    else if( ( computeDeltaPressure(cell,j,rmin)>0 ) && ( computeDeltaPressure(cell,j,rmax)<0) ) {
-        double effPoreRadius = bisection(cell,j,rmin,rmax);
-//         cerr<<"3";
-	return effPoreRadius;
-    }
-    else if( ( computeDeltaPressure(cell,j,rmin)> computeDeltaPressure(cell,j,rmax) ) && (computeDeltaPressure(cell,j,rmin)<0) ) {
-        double EffPoreRadius = rmin;
-//         cerr<<"2";
-	return EffPoreRadius;
-    }
-    else {
-        double EffPoreRadius = rmax;
-//         cerr<<"4";
-	return EffPoreRadius;
-    }
+//         return EffPoreRadius;
+//     }
+//     if( ( computeDeltaForce(cell,j,rmin)>0 ) && ( computeDeltaForce(cell,j,rmin)<computeDeltaForce(cell,j,rmax)) ) {
+//         double EffPoreRadius = rmin;
+// //         cerr<<"2 ";
+// 	return EffPoreRadius;
+//     }
+//     else if( ( computeDeltaForce(cell,j,rmin)<0 ) && ( computeDeltaForce(cell,j,rmax)>0) ) {
+//         double effPoreRadius = bisection(cell,j,rmin,rmax);
+// //         cerr<<"3 ";
+// 	return effPoreRadius;
+//     }
+//     else if( ( computeDeltaForce(cell,j,rmin)<computeDeltaForce(cell,j,rmax) ) && ( computeDeltaForce(cell,j,rmax)<0) ) {
+//         double EffPoreRadius = rmax;
+// //         cerr<<"4 ";
+// 	return EffPoreRadius;
+//     }
+//     else if( ( computeDeltaForce(cell,j,rmin)>computeDeltaForce(cell,j,rmax) ) && ( computeDeltaForce(cell,j,rmax)>0) ) {
+//         double EffPoreRadius = rmax;
+// //         cerr<<"5 ";
+// 	return EffPoreRadius;
+//     }
+//     else if( ( computeDeltaForce(cell,j,rmin)>0 ) && ( computeDeltaForce(cell,j,rmax)<0) ) {
+//         double effPoreRadius = bisection(cell,j,rmin,rmax);
+// //         cerr<<"6 ";
+// 	return effPoreRadius;
+//     }
+//     else if( ( computeDeltaForce(cell,j,rmin)> computeDeltaForce(cell,j,rmax) ) && (computeDeltaForce(cell,j,rmin)<0) ) {
+//         double EffPoreRadius = rmin;
+// //         cerr<<"7 ";
+// 	return EffPoreRadius;
+//     }
+//     else {
+//         double EffPoreRadius = rmax;
+// //         cerr<<"8";
+// 	return EffPoreRadius;
+//     }
 }
 
 template<class Cellhandle>
@@ -268,7 +287,7 @@ double UnsaturatedEngine::bisection(Cellhandle cell, int j, double a, double b)
 {
     double m = 0.5*(a+b);
     if (abs(b-a)>abs((solver->Compute_EffectiveRadius(cell, j)*1.0e-6))) {
-        if ( computeDeltaPressure(cell,j,m) * computeDeltaPressure(cell,j,a) < 0 ) {
+        if ( computeDeltaForce(cell,j,m) * computeDeltaForce(cell,j,a) < 0 ) {
             b = m;
             return bisection(cell,j,a,b);
         }
@@ -281,7 +300,7 @@ double UnsaturatedEngine::bisection(Cellhandle cell, int j, double a, double b)
 }
 
 template<class Cellhandle>
-double UnsaturatedEngine::computeDeltaPressure(Cellhandle cell,int j, double rcap)
+double UnsaturatedEngine::computeDeltaForce(Cellhandle cell,int j, double rcap)
 {
     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -296,51 +315,75 @@ double UnsaturatedEngine::computeDeltaPressure(Cellhandle cell,int j, double rca
     double AB = (posA-posB).norm();
     double AC = (posA-posC).norm();
     double BC = (posB-posC).norm();
+    
     double A = acos(((posB-posA).dot(posC-posA))/((posB-posA).norm()*(posC-posA).norm()));
     double B = acos(((posA-posB).dot(posC-posB))/((posA-posB).norm()*(posC-posB).norm()));
     double C = acos(((posA-posC).dot(posB-posC))/((posA-posC).norm()*(posB-posC).norm()));
-    double Area_ABC = 0.5 * ((posB-posA).cross(posC-posA)).norm();
-    double Area_SolidA = 0.5*A*pow(rA,2);
-    double Area_SolidB = 0.5*B*pow(rB,2);
-    double Area_SolidC = 0.5*C*pow(rC,2);
+    double rAB = 0.5*(AB-rA-rB); if (rAB<0) { rAB=0; }
+    double rBC = 0.5*(BC-rB-rC); if (rBC<0) { rBC=0; }
+    double rAC = 0.5*(AC-rA-rC); if (rAC<0) { rAC=0; }
+//     double Area_ABC = 0.5 * ((posB-posA).cross(posC-posA)).norm();
+//     double Area_SolidA = 0.5*A*pow(rA,2);//??Area for boundary ERROR ?? FIXME
+//     double Area_SolidB = 0.5*B*pow(rB,2);
+//     double Area_SolidC = 0.5*C*pow(rC,2);
 
     //for triangulation ArB,rcap is the radius of sphere r; Note: (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB) maybe >1, bug here!
-    double _AB = pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2)/(2*(rA+rcap)*AB); if (_AB>1) { _AB=1.0; }
+    double _AB = (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB); if(_AB>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_AB>1.0  _AB="<<_AB<<endl;*/ _AB=1.0;} if(_AB<-1.0) {cerr<<"_AB<-1.0  _AB="<<_AB<<endl; _AB=-1.0;}
     double alphaAB = acos(_AB);
-    double _BA = pow((rB+rcap),2)+pow(AB,2)-pow((rA+rcap),2)/(2*(rB+rcap)*AB); if (_BA>1) { _BA=1.0; }
+    double _BA = (pow((rB+rcap),2)+pow(AB,2)-pow((rA+rcap),2))/(2*(rB+rcap)*AB); if(_BA>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_BA>1.0  _BA="<<_BA<<endl;*/ _BA=1.0;} if(_BA<-1.0) {cerr<<"_BA<-1.0  _BA="<<_BA<<endl; _BA=-1.0;}
     double alphaBA = acos(_BA);
-    double betaAB = 0.5*Mathr::PI - alphaAB;
-    double betaBA = 0.5*Mathr::PI - alphaBA;
-    double length_liquidAB = (betaAB+betaBA)*rcap;
-    double AreaArB = 0.5*AB*(rA+rcap)*sin(alphaAB);
-    double Area_liquidAB = AreaArB-0.5*alphaAB*pow(rA,2)-0.5*alphaBA*pow(rB,2)-0.5*(betaAB+betaBA)*pow(rcap,2);
+    double _ArB = (pow((rA+rcap),2)+pow((rB+rcap),2)-pow(AB,2))/(2*(rA+rcap)*(rB+rcap)); if(_ArB>1.0) {_ArB=1.0;} if(_ArB<-1.0) {_ArB=-1.0;}
+    double alphaArB = acos(_ArB);
+//     double D=alphaAB + alphaBA + alphaArB; cerr<<D<<" ";
+    double length_liquidAB = alphaArB*rcap;
+    double AreaArB = 0.5*(rA+rcap)*(rB+rcap)*sin(alphaArB);
+    double Area_liquidAB = AreaArB-0.5*alphaAB*pow(rA,2)-0.5*alphaBA*pow(rB,2)-0.5*alphaArB*pow(rcap,2);
 
     //for triangulation ArC, rcap is the radius of sphere r;
-    double _AC = pow((rA+rcap),2)+pow(AC,2)-pow((rC+rcap),2)/(2*(rA+rcap)*AC); if (_AC>1) { _AC=1.0; }
+    double _AC = (pow((rA+rcap),2)+pow(AC,2)-pow((rC+rcap),2))/(2*(rA+rcap)*AC); if(_AC>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_AC>1.0  _AC="<<_AC<<endl;*/ _AC=1.0;} if(_AC<-1.0) {cerr<<"_AC<-1.0  _AC="<<_AC<<endl; _AC=-1.0;}
     double alphaAC = acos(_AC);
-    double _CA = pow((rC+rcap),2)+pow(AC,2)-pow((rA+rcap),2)/(2*(rC+rcap)*AC); if (_CA>1) { _CA=1.0; }
+    double _CA = (pow((rC+rcap),2)+pow(AC,2)-pow((rA+rcap),2))/(2*(rC+rcap)*AC); if(_CA>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_CA>1.0  _CA="<<_CA<<endl;*/ _CA=1.0;} if(_CA<-1.0) {cerr<<"_CA<-1.0  _CA="<<_CA<<endl; _CA=-1.0;}
     double alphaCA = acos(_CA);
-    double betaAC = 0.5*Mathr::PI - alphaAC;
-    double betaCA = 0.5*Mathr::PI - alphaCA;
-    double length_liquidAC = (betaAC+betaCA)*rcap;
-    double AreaArC = 0.5*AC*(rA+rcap)*sin(alphaAC);
-    double Area_liquidAC = AreaArC-0.5*alphaAC*pow(rA,2)-0.5*alphaCA*pow(rC,2)-0.5*(betaAC+betaCA)*pow(rcap,2);
+    double _ArC = (pow((rA+rcap),2)+pow((rC+rcap),2)-pow(AC,2))/(2*(rA+rcap)*(rC+rcap)); if(_ArC>1.0) {_ArC=1.0;} if(_ArC<-1.0) {_ArC=-1.0;}
+    double alphaArC = acos(_ArC);
+//     double D=alphaAC + alphaCA + alphaArC; cerr<<D<<" ";
+    double length_liquidAC = alphaArC*rcap;
+    double AreaArC = 0.5*(rA+rcap)*(rC+rcap)*sin(alphaArC);
+    double Area_liquidAC = AreaArC-0.5*alphaAC*pow(rA,2)-0.5*alphaCA*pow(rC,2)-0.5*alphaArC*pow(rcap,2);
 
     //for triangulation BrC, rcap is the radius of sphere r;
-    double _BC = pow((rB+rcap),2)+pow(BC,2)-pow((rC+rcap),2)/(2*(rB+rcap)*BC); if (_BC>1) { _BC=1.0; }
+    double _BC = (pow((rB+rcap),2)+pow(BC,2)-pow((rC+rcap),2))/(2*(rB+rcap)*BC); if(_BC>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_BC>1.0  _BC="<<_BC<<endl;*/ _BC=1.0;} if(_BC<-1.0) {cerr<<"_BC<-1.0  _BC="<<_BC<<endl; _BC=-1.0;}
     double alphaBC = acos(_BC);
-    double _CB = pow((rC+rcap),2)+pow(BC,2)-pow((rB+rcap),2)/(2*(rC+rcap)*BC); if (_CB>1) { _CB=1.0; }
+    double _CB = (pow((rC+rcap),2)+pow(BC,2)-pow((rB+rcap),2))/(2*(rC+rcap)*BC); if(_CB>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_CB>1.0  _CB="<<_CB<<endl;*/ _CB=1.0;} if(_CB<-1.0) {cerr<<"_CB<-1.0  _CB="<<_CB<<endl; _CB=-1.0;}
     double alphaCB = acos(_CB);
-    double betaBC = 0.5*Mathr::PI - alphaBC;
-    double betaCB = 0.5*Mathr::PI - alphaCB;
-    double length_liquidBC = (betaBC+betaCB)*rcap;
-    double AreaBrC = 0.5*BC*(rB+rcap)*sin(alphaBC);
-    double Area_liquidBC = AreaBrC-0.5*alphaBC*pow(rB,2)-0.5*alphaCB*pow(rC,2)-0.5*(betaBC+betaCB)*pow(rcap,2);
+    double _BrC = (pow((rB+rcap),2)+pow((rC+rcap),2)-pow(BC,2))/(2*(rB+rcap)*(rC+rcap)); if(_BrC>1.0) {_BrC=1.0;} if(_BrC<-1.0) {_BrC=-1.0;}
+    double alphaBrC = acos(_BrC);
+//     double D=alphaBC + alphaCB + alphaBrC; cerr<<D<<" ";    
+    double length_liquidBC = alphaBrC*rcap;
+    double AreaBrC = 0.5*(rB+rcap)*(rC+rcap)*sin(alphaBrC);
+    double Area_liquidBC = AreaBrC-0.5*alphaBC*pow(rB,2)-0.5*alphaCB*pow(rC,2)-0.5*alphaBrC*pow(rcap,2);
 
-    double Area_pore = Area_ABC - Area_liquidAB - Area_liquidAC - Area_liquidBC - Area_SolidA - Area_SolidB - Area_SolidC;
-    double Perimeter_pore = length_liquidAB + length_liquidAC + length_liquidBC + (A - alphaAB - alphaAC)*rA + (B - alphaBA - alphaBC)*rB + (C - alphaCA - alphaCB)*rC;
-    double deltaPressure = surface_tension*Perimeter_pore - Area_pore*(surface_tension/rcap);
-    return deltaPressure;
+    double areaCap = sqrt(cell->info().facetSurfaces[j].squared_length()) * cell->info().facetFluidSurfacesRatio[j];
+    double areaPore = areaCap - Area_liquidAB - Area_liquidAC - Area_liquidBC;
+//     double Area_pore = Area_ABC - Area_liquidAB - Area_liquidAC - Area_liquidBC - Area_SolidA - Area_SolidB - Area_SolidC;
+//     if(areaCap<0) {cerr<<"areaCap="<<areaCap<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;}
+    if(areaPore<0) {cerr<<"areaPore="<<areaPore<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;}
+//     double Area_pore1= Area_ABC - Area_SolidA - Area_SolidB - Area_SolidC;
+//         if(Area_pore1<0) {cerr<<"Area_pore1="<<Area_pore1<<" rAB="<<rAB<<" rAC="<<rAC<<" rBC="<<rBC<<" Area_ABC="<<Area_ABC<<" Area_SolidA="<<Area_SolidA<<" Area_SolidB="<<Area_SolidB<<" Area_SolidC="<<Area_SolidC<<endl;} //here because big boundary spheres 
+//     if((Area_pore1>0)&&(Area_pore<0))
+//     {   double rAB = 0.5*(AB-rA-rB);
+//         double rBC = 0.5*(BC-rB-rC);
+//         double rAC = 0.5*(AC-rA-rC);
+//         double rInscr=abs(solver->Compute_EffectiveRadius(cell, j));
+//         if((rAB>0)&&(rBC>0)&&(rAC>0))
+//         {	cerr<<"rA= "<<rA<<" rB="<<rB<<" rC="<<rC<<" rInscr="<<rInscr<<" Area_pore="<<Area_pore<<endl;
+//         }
+//     } //here also because big boundary spheres
+    double Perimeter_pore = length_liquidAB + length_liquidAC + length_liquidBC + (A - alphaAB - alphaAC)*rA + (B - alphaBA - alphaBC)*rB + (C - alphaCA - alphaCB)*rC; if(Perimeter_pore<0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*double t1=(A - alphaAB - alphaAC)*rA; double t2= (B - alphaBA - alphaBC)*rB; double t3=(C - alphaCA - alphaCB)*rC; cerr<<"cellID="<<cell->info().index<<"  Perimeter_pore<0  Perimeter_pore="<<Perimeter_pore<<" liquidAB="<<length_liquidAB<<" liquidAC="<<length_liquidAC<<" liquidBC="<<length_liquidBC<<" t1="<<t1<<" t2="<<t2<<" t3="<<t3<<endl;*/}
+    if(Perimeter_pore<0) {cerr<<"Perimeter_pore="<<Perimeter_pore<<" rA= "<<rA<<" rB="<<rB<<" rC="<<rC<<endl;}
+    double deltaForce = surface_tension*Perimeter_pore - areaPore*(surface_tension/rcap);
+//     if((Area_pore<0)&&(deltaForce>0)) {cerr<<"rA= "<<rA<<" rB="<<rB<<" rC="<<rC<<endl;}
+    return deltaForce;
 }
 
 template<class Solver>
@@ -777,10 +820,11 @@ Real UnsaturatedEngine::Volume_cell ( Cellhandle cell )
 template<class Cellhandle>
 Real UnsaturatedEngine::volumeCapillaryCell ( Cellhandle cell )
 {
-    Real volume = abs( Volume_cell(cell) ) - solver->volumeSolidPore(cell);
-    if (volume<0) {
-        volume=0;   //FIXME:volume<0, set volume = 0 ?
-    }
+    Initialize_volumes(solver);  
+    Real volume = abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
+    if (cell->info().volume()<0) { cerr << "cell ID: " << cell->info().index << "  cell volume: " << cell->info().volume() << endl; }
+    if (solver->volumeSolidPore(cell)<0) { cerr << "cell ID: " << cell->info().index << "  volumeSolidPore: " << solver->volumeSolidPore(cell) << endl; }
+    if (volume<0) { cerr<<"cell ID: " << cell->info().index << "cell volume: " << cell->info().volume() << "  volumeSolidPore: " << solver->volumeSolidPore(cell) << endl; }
     return volume;
 }
 
@@ -1108,8 +1152,8 @@ void UnsaturatedEngine::setImposedPressure ( unsigned int cond, Real p,Solver& f
 template<class Solver>
 void UnsaturatedEngine::clearImposedPressure ( Solver& flow ) { flow->imposedP.clear(); flow->IPCells.clear();}
 
-//tempt function for Vahid Joekar-Niasar's data
-template<class Cellhandle>
+//----tempt function for Vahid Joekar-Niasar's data----
+template<class Cellhandle>//ERROR! check later
 Real UnsaturatedEngine::computePoreArea(Cellhandle cell, int j)
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -1148,7 +1192,7 @@ Real UnsaturatedEngine::computePoreArea(Cellhandle cell, int j)
 //     else if (cell->info().poreRadius[j] > rmax) {cerr<<"poreRadius Error: "<<cell->info().poreRadius[j];}
     else {
         //for triangulation ArB,rcap is the radius of sphere r; Note: (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB) maybe >1, bug here!
-        double _AB = pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2)/(2*(rA+rcap)*AB);
+        double _AB = pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2)/(2*(rA+rcap)*AB); //ERROR HERE!
         if (_AB>1) { _AB=1.0; }
         double alphaAB = acos(_AB);
         double _BA = pow((rB+rcap),2)+pow(AB,2)-pow((rA+rcap),2)/(2*(rB+rcap)*AB);
@@ -1273,6 +1317,83 @@ Real UnsaturatedEngine::computePorePerimeter(Cellhandle cell, int j)
         return porePerimeter;
     }
 }
+template<class Solver>
+void UnsaturatedEngine::savePoreBodyInfo(Solver& flow)
+{
+    ofstream file;
+    file.open("PoreBodyInfo.txt");
+    file << "#List of pore bodies position (or Voronoi centers) and size (volume) \n";
+    file << "Cell_ID " << " x " << " y " << " z " << " volume "<< endl;
+    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
+        file << cell->info().index << " " << cell->info() << " " << volumeCapillaryCell(cell)<< endl;
+    }
+    file.close();
+}
+template<class Solver>
+void UnsaturatedEngine::debugTemp(Solver& flow)
+{
+    double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
+    ofstream file;
+    file.open("bug.txt");
+//     file<<"cellID   "<<"deltaForce  "<<"inscribeRadius*PI*tension  "<<endl;
+    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
+	double rmax0= abs(solver->Compute_EffectiveRadius(cell, 0));double D0=surface_tension*rmax0*Mathr::PI ;
+	double rmax1= abs(solver->Compute_EffectiveRadius(cell, 1));double D1=surface_tension*rmax1*Mathr::PI ;
+	double rmax2= abs(solver->Compute_EffectiveRadius(cell, 2));double D2=surface_tension*rmax2*Mathr::PI ;
+	double rmax3= abs(solver->Compute_EffectiveRadius(cell, 3));double D3=surface_tension*rmax3*Mathr::PI ;
+	file << cell->info().index << "  " <<computeDeltaForce(cell,0,rmax0)<<"  "<<computeDeltaMin(cell, 0)<<endl;
+	file << cell->info().index << "  " <<computeDeltaForce(cell,1,rmax1)<<"  "<<computeDeltaMin(cell, 1)<<endl;
+	file << cell->info().index << "  " <<computeDeltaForce(cell,2,rmax2)<<"  "<<computeDeltaMin(cell, 2)<<endl;
+	file << cell->info().index << "  " <<computeDeltaForce(cell,3,rmax3)<<"  "<<computeDeltaMin(cell, 3)<<endl;
+    }
+    file.close();
+}
+template<class Cellhandle>
+double UnsaturatedEngine::computeDeltaMin(Cellhandle cell, int j)
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if (tri.is_infinite(cell->neighbor(j))) return 0;
+
+    Vector3r posA = makeVector3r2(cell->vertex(facetVertices[j][0])->point().point());
+    Vector3r posB = makeVector3r2(cell->vertex(facetVertices[j][1])->point().point());
+    Vector3r posC = makeVector3r2(cell->vertex(facetVertices[j][2])->point().point());
+    double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
+    double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
+    double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
+    double AB = (posA-posB).norm();
+    double AC = (posA-posC).norm();
+    double BC = (posB-posC).norm();
+    double A = acos(((posB-posA).dot(posC-posA))/((posB-posA).norm()*(posC-posA).norm()));
+    double B = acos(((posA-posB).dot(posC-posB))/((posA-posB).norm()*(posC-posB).norm()));
+    double C = acos(((posA-posC).dot(posB-posC))/((posA-posC).norm()*(posB-posC).norm()));
+    double rAB = 0.5*(AB-rA-rB); if (rAB<0) { rAB=0; }
+    double rBC = 0.5*(BC-rB-rC); if (rBC<0) { rBC=0; }
+    double rAC = 0.5*(AC-rA-rC); if (rAC<0) { rAC=0; }
+//     double Area_ABC = 0.5 * ((posB-posA).cross(posC-posA)).norm();
+//     double Area_SolidA = 0.5*A*pow(rA,2);
+//     double Area_SolidB = 0.5*B*pow(rB,2);
+//     double Area_SolidC = 0.5*C*pow(rC,2);
+    
+    double rmax = abs(solver->Compute_EffectiveRadius(cell, j));
+    double rmin = max(rAB,max(rBC,rAC));
+    if (rmin==0) {/*cerr<<"1";*/
+        rmin= 1.0e-10;
+    }
+    double deltaMin = computeDeltaForce(cell,j,rmin);
+    if(deltaMin>0) {
+        if((rAB!=0)&&(rBC!=0)&&(rAC!=0)) {
+         /*   cerr<<"rAB= "<<rAB<<" rBC="<<rBC<<" rAC="<<rAC<<" rmin="<<rmin<<endl;
+        */double deltaMax = computeDeltaForce(cell,j,rmax);
+// 	     cerr<<"deltaMax="<<deltaMax<<" deltaMin="<<deltaMin<<" rmax="<<rmax<<" rmin="<<rmin<<" rA= "<<rA<<" rB="<<rB<<" rC="<<rC<<endl;       
+	}
+    }
+    return deltaMin;
+}
+//----------end tempt function for Vahid Joekar-Niasar's data (clear later)---------------------
 YADE_PLUGIN ( ( UnsaturatedEngine ) );
 
 #endif //FLOW_ENGINE

@@ -83,6 +83,8 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void saveLatticeNodeZ(Solver& flow,double z);
 		TPL void saveListAdjCellsTopBound(Solver& flow);
 		TPL void saveListAdjCellsBottomBound(Solver& flow);		
+		TPL void savePoreBodyInfo(Solver& flow);
+		TPL void debugTemp(Solver& flow);
 
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
@@ -99,11 +101,13 @@ class UnsaturatedEngine : public PartialEngine
 		template<class Cellhandle>
 		double bisection(Cellhandle cell, int j, double a, double b);
 		template<class Cellhandle>
-		double computeDeltaPressure(Cellhandle cell,int j, double rcap);
+		double computeDeltaForce(Cellhandle cell,int j, double rcap);
 		template<class Cellhandle>
 		Real computePoreArea(Cellhandle cell, int j);
 		template<class Cellhandle>
 		Real computePorePerimeter(Cellhandle cell, int j);		
+		template<class Cellhandle>
+		double computeDeltaMin(Cellhandle cell, int j);
 		void saveVtk() {solver->saveVtk();}
 		python::list getConstrictions() {
 			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
@@ -131,6 +135,8 @@ class UnsaturatedEngine : public PartialEngine
  		void		_saveLatticeNodeZ(double z) {saveLatticeNodeZ(solver,z);}
  		void 		_saveListAdjCellsTopBound() {saveListAdjCellsTopBound(solver);}
  		void 		_saveListAdjCellsBottomBound() {saveListAdjCellsBottomBound(solver);}
+ 		void		_savePoreBodyInfo(){savePoreBodyInfo(solver);}
+ 		void		_debugTemp(){debugTemp(solver);}
 
 		virtual ~UnsaturatedEngine();
 
@@ -216,6 +222,8 @@ class UnsaturatedEngine : public PartialEngine
 					.def("saveLatticeNodeZ",&UnsaturatedEngine::_saveLatticeNodeZ,(python::arg("z")),"Save the slice of lattice nodes for z_normal(z). 0: out of sphere; 1: inside of sphere.")
 					.def("saveListAdjCellsTopBound",&UnsaturatedEngine::_saveListAdjCellsTopBound,"Save the cells IDs adjacent top boundary")
 					.def("saveListAdjCellsBottomBound",&UnsaturatedEngine::_saveListAdjCellsBottomBound,"Save the cells IDs adjacent bottom boundary")
+					.def("savePoreBodyInfo",&UnsaturatedEngine::_savePoreBodyInfo,"Save pore bodies positions/Voronoi centers and size/volume.")
+					.def("debugTemp",&UnsaturatedEngine::_debugTemp,"debug temp file.")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
 					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2,water can be trapped in cells) ")
 					)
