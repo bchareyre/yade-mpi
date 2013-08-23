@@ -1191,48 +1191,45 @@ Real UnsaturatedEngine::computePoreArea(Cellhandle cell, int j)
     }
 //     else if (cell->info().poreRadius[j] > rmax) {cerr<<"poreRadius Error: "<<cell->info().poreRadius[j];}
     else {
-        //for triangulation ArB,rcap is the radius of sphere r; Note: (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB) maybe >1, bug here!
-        double _AB = pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2)/(2*(rA+rcap)*AB); //ERROR HERE!
-        if (_AB>1) { _AB=1.0; }
-        double alphaAB = acos(_AB);
-        double _BA = pow((rB+rcap),2)+pow(AB,2)-pow((rA+rcap),2)/(2*(rB+rcap)*AB);
-        if (_BA>1) { _BA=1.0; }
-        double alphaBA = acos(_BA);
-        double betaAB = 0.5*Mathr::PI - alphaAB;
-        double betaBA = 0.5*Mathr::PI - alphaBA;
-        double length_liquidAB = (betaAB+betaBA)*rcap;
-        double AreaArB = 0.5*AB*(rA+rcap)*sin(alphaAB);
-        double Area_liquidAB = AreaArB-0.5*alphaAB*pow(rA,2)-0.5*alphaBA*pow(rB,2)-0.5*(betaAB+betaBA)*pow(rcap,2);
+    //for triangulation ArB,rcap is the radius of sphere r; Note: (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB) maybe >1, bug here!
+    double _AB = (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB); if(_AB>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_AB>1.0  _AB="<<_AB<<endl;*/ _AB=1.0;} if(_AB<-1.0) {cerr<<"_AB<-1.0  _AB="<<_AB<<endl; _AB=-1.0;}
+    double alphaAB = acos(_AB);
+    double _BA = (pow((rB+rcap),2)+pow(AB,2)-pow((rA+rcap),2))/(2*(rB+rcap)*AB); if(_BA>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_BA>1.0  _BA="<<_BA<<endl;*/ _BA=1.0;} if(_BA<-1.0) {cerr<<"_BA<-1.0  _BA="<<_BA<<endl; _BA=-1.0;}
+    double alphaBA = acos(_BA);
+    double _ArB = (pow((rA+rcap),2)+pow((rB+rcap),2)-pow(AB,2))/(2*(rA+rcap)*(rB+rcap)); if(_ArB>1.0) {_ArB=1.0;} if(_ArB<-1.0) {_ArB=-1.0;}
+    double alphaArB = acos(_ArB);
+//     double D=alphaAB + alphaBA + alphaArB; cerr<<D<<" ";
+    double length_liquidAB = alphaArB*rcap;
+    double AreaArB = 0.5*(rA+rcap)*(rB+rcap)*sin(alphaArB);
+    double Area_liquidAB = AreaArB-0.5*alphaAB*pow(rA,2)-0.5*alphaBA*pow(rB,2)-0.5*alphaArB*pow(rcap,2);
 
-        //for triangulation ArC, rcap is the radius of sphere r;
-        double _AC = pow((rA+rcap),2)+pow(AC,2)-pow((rC+rcap),2)/(2*(rA+rcap)*AC);
-        if (_AC>1) { _AC=1.0; }
-        double alphaAC = acos(_AC);
-        double _CA = pow((rC+rcap),2)+pow(AC,2)-pow((rA+rcap),2)/(2*(rC+rcap)*AC);
-        if (_CA>1) { _CA=1.0; }
-        double alphaCA = acos(_CA);
-        double betaAC = 0.5*Mathr::PI - alphaAC;
-        double betaCA = 0.5*Mathr::PI - alphaCA;
-        double length_liquidAC = (betaAC+betaCA)*rcap;
-        double AreaArC = 0.5*AC*(rA+rcap)*sin(alphaAC);
-        double Area_liquidAC = AreaArC-0.5*alphaAC*pow(rA,2)-0.5*alphaCA*pow(rC,2)-0.5*(betaAC+betaCA)*pow(rcap,2);
+    //for triangulation ArC, rcap is the radius of sphere r;
+    double _AC = (pow((rA+rcap),2)+pow(AC,2)-pow((rC+rcap),2))/(2*(rA+rcap)*AC); if(_AC>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_AC>1.0  _AC="<<_AC<<endl;*/ _AC=1.0;} if(_AC<-1.0) {cerr<<"_AC<-1.0  _AC="<<_AC<<endl; _AC=-1.0;}
+    double alphaAC = acos(_AC);
+    double _CA = (pow((rC+rcap),2)+pow(AC,2)-pow((rA+rcap),2))/(2*(rC+rcap)*AC); if(_CA>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_CA>1.0  _CA="<<_CA<<endl;*/ _CA=1.0;} if(_CA<-1.0) {cerr<<"_CA<-1.0  _CA="<<_CA<<endl; _CA=-1.0;}
+    double alphaCA = acos(_CA);
+    double _ArC = (pow((rA+rcap),2)+pow((rC+rcap),2)-pow(AC,2))/(2*(rA+rcap)*(rC+rcap)); if(_ArC>1.0) {_ArC=1.0;} if(_ArC<-1.0) {_ArC=-1.0;}
+    double alphaArC = acos(_ArC);
+//     double D=alphaAC + alphaCA + alphaArC; cerr<<D<<" ";
+    double length_liquidAC = alphaArC*rcap;
+    double AreaArC = 0.5*(rA+rcap)*(rC+rcap)*sin(alphaArC);
+    double Area_liquidAC = AreaArC-0.5*alphaAC*pow(rA,2)-0.5*alphaCA*pow(rC,2)-0.5*alphaArC*pow(rcap,2);
 
-        //for triangulation BrC, rcap is the radius of sphere r;
-        double _BC = pow((rB+rcap),2)+pow(BC,2)-pow((rC+rcap),2)/(2*(rB+rcap)*BC);
-        if (_BC>1) { _BC=1.0; }
-        double alphaBC = acos(_BC);
-        double _CB = pow((rC+rcap),2)+pow(BC,2)-pow((rB+rcap),2)/(2*(rC+rcap)*BC);
-        if (_CB>1) { _CB=1.0; }
-        double alphaCB = acos(_CB);
-        double betaBC = 0.5*Mathr::PI - alphaBC;
-        double betaCB = 0.5*Mathr::PI - alphaCB;
-        double length_liquidBC = (betaBC+betaCB)*rcap;
-        double AreaBrC = 0.5*BC*(rB+rcap)*sin(alphaBC);
-        double Area_liquidBC = AreaBrC-0.5*alphaBC*pow(rB,2)-0.5*alphaCB*pow(rC,2)-0.5*(betaBC+betaCB)*pow(rcap,2);
+    //for triangulation BrC, rcap is the radius of sphere r;
+    double _BC = (pow((rB+rcap),2)+pow(BC,2)-pow((rC+rcap),2))/(2*(rB+rcap)*BC); if(_BC>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_BC>1.0  _BC="<<_BC<<endl;*/ _BC=1.0;} if(_BC<-1.0) {cerr<<"_BC<-1.0  _BC="<<_BC<<endl; _BC=-1.0;}
+    double alphaBC = acos(_BC);
+    double _CB = (pow((rC+rcap),2)+pow(BC,2)-pow((rB+rcap),2))/(2*(rC+rcap)*BC); if(_CB>1.0) {/*cerr<<"cellID="<<cell->info().index<<" rA="<<rA<<" rB="<<rB<<" rC="<<rC<<endl;*//*cerr<<"_CB>1.0  _CB="<<_CB<<endl;*/ _CB=1.0;} if(_CB<-1.0) {cerr<<"_CB<-1.0  _CB="<<_CB<<endl; _CB=-1.0;}
+    double alphaCB = acos(_CB);
+    double _BrC = (pow((rB+rcap),2)+pow((rC+rcap),2)-pow(BC,2))/(2*(rB+rcap)*(rC+rcap)); if(_BrC>1.0) {_BrC=1.0;} if(_BrC<-1.0) {_BrC=-1.0;}
+    double alphaBrC = acos(_BrC);
+//     double D=alphaBC + alphaCB + alphaBrC; cerr<<D<<" ";    
+    double length_liquidBC = alphaBrC*rcap;
+    double AreaBrC = 0.5*(rB+rcap)*(rC+rcap)*sin(alphaBrC);
+    double Area_liquidBC = AreaBrC-0.5*alphaBC*pow(rB,2)-0.5*alphaCB*pow(rC,2)-0.5*alphaBrC*pow(rcap,2);
 
-        double poreArea = Area_ABC - Area_liquidAB - Area_liquidAC - Area_liquidBC - Area_SolidA - Area_SolidB - Area_SolidC;
-        if (poreArea<0) { poreArea=Mathr::PI*pow(rmax,2); }
-	return poreArea;
+    double areaCap = sqrt(cell->info().facetSurfaces[j].squared_length()) * cell->info().facetFluidSurfacesRatio[j];
+    double areaPore = areaCap - Area_liquidAB - Area_liquidAC - Area_liquidBC;
+    return areaPore;
     }
 }
 template<class Cellhandle>
