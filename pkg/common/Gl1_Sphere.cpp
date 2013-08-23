@@ -137,7 +137,7 @@ void Gl1_Sphere::initGlutGlList(){
 	glNewList(glGlutSphereList,GL_COMPILE);
 		glEnable(GL_LIGHTING);
 		glShadeModel(GL_SMOOTH);
-		glutSolidSphere(1.0,max(quality*glutSlices,2.),max(quality*glutStacks,3.));
+		glutSolidSphere(1.0,max(quality*glutSlices,(Real)2.),max(quality*glutStacks,(Real)3.));
 	glEndList();
 }
 

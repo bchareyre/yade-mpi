@@ -109,9 +109,9 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 			//This is a little bit tricky : if we haven't 0<k,m<1, it means that the intersection is not inside both segments,
 			//but the contact can occurs anyway between a connection's extremity and a connection's edge or between two connection's extremity.
 			//So the three next lines : don't modify k and m if (0<k,m<1), but modify them otherwise to compute later the right normal and penetrationDepth of the contact.
-			k = max(min( k,1.0),0.0);
-			m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,1.0),0.0);
-			k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,1.0),0.0);
+			k = max(min( k,(Real)1.0),(Real)0.0);
+			m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,(Real)1.0),(Real)0.0);
+			k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,(Real)1.0),(Real)0.0);
 		}
 		else {//should never happen
 			k=0;m=0;
@@ -120,10 +120,10 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 		}
 	}
 	else{ //this is a special case for perfectly colinear vectors ("a" and "b")
-		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min(1.0,max(0.0,PA));
-		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min(1.0,max(0.0,Pa));
-		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min(1.0,max(0.0,PB));
-		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min(1.0,max(0.0,Pb));
+		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min((Real)1.0,max((Real)0.0,PA));
+		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min((Real)1.0,max((Real)0.0,Pa));
+		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
+		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
 		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
 	}
 	

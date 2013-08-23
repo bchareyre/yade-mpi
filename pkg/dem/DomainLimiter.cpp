@@ -248,11 +248,8 @@ void GlExtra_LawTester::render(){
 
 	// switch to local coordinates
 	glTranslatev(tester->contPt);
-	#if EIGEN_WORLD_VERSION==2
- 		glMultMatrixd(Eigen::Transform3d(tester->trsf.transpose()).data());
-	#elif EIGEN_WORLD_VERSION==3
- 		glMultMatrixd(Eigen::Affine3d(tester->trsf.transpose()).data());
-	#endif
+	//glMultMatrixd(Eigen::Affine3d(tester->trsf.transpose()).data());
+	glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(tester->trsf.transpose()).data());
 
 
 	glDisable(GL_LIGHTING); 

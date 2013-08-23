@@ -297,7 +297,7 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 
 	if(!noSlip){
 		// plastic slip, if necessary; non-zero elastic limit only for compression
-		Real maxFs=-min(0.,localF[0]*phys->tangensOfFrictionAngle); Eigen::Map<Vector2r> Fs(&localF[1]);
+		Real maxFs=-min((Real)0.,localF[0]*phys->tangensOfFrictionAngle); Eigen::Map<Vector2r> Fs(&localF[1]);
 		//cerr<<"u="<<geom->relU()<<", maxFs="<<maxFs<<", Fn="<<localF[0]<<", |Fs|="<<Fs.norm()<<", Fs="<<Fs<<endl;
 		if(Fs.squaredNorm()>maxFs*maxFs){
 			Real ratio=sqrt(maxFs*maxFs/Fs.squaredNorm());
@@ -338,17 +338,11 @@ void Gl1_L3Geom::draw(const shared_ptr<IGeom>& ig, bool isL6Geom, const Real& ph
 	const L3Geom& g(ig->cast<L3Geom>());
 	glTranslatev(g.contactPoint);
 	#ifdef L3_TRSF_QUATERNION
-		#if EIGEN_WORLD_VERSION==2
- 			glMultMatrixd(Eigen::Transform3d(Matrix3r(g.trsf).transpose()).data());
-		#elif EIGEN_WORLD_VERSION==3
- 			glMultMatrixd(Eigen::Affine3d(Matrix3r(g.trsf).transpose()).data());
-		#endif
+		//glMultMatrixd(Eigen::Affine3d(Matrix3r(g.trsf).transpose()).data());
+		glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(Matrix3r(g.trsf).transpose()).data());
 	#else
-		#if EIGEN_WORLD_VERSION==2
- 			glMultMatrixd(Eigen::Transform3d(g.trsf.transpose()).data());
-		#elif EIGEN_WORLD_VERSION==3
- 			glMultMatrixd(Eigen::Affine3d(g.trsf.transpose()).data());
-		#endif
+		//glMultMatrixd(Eigen::Affine3d(g.trsf.transpose()).data());
+		glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(g.trsf.transpose()).data());
 	#endif
 	Real rMin=g.refR1<=0?g.refR2:(g.refR2<=0?g.refR1:min(g.refR1,g.refR2));
 	if(axesWd>0){

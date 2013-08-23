@@ -270,7 +270,7 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 		int bin=int(bins*(2*s.r-minD)/(maxD-minD)); bin=min(bin,bins-1); // to make sure
 		if (mass) hist[bin]+=pow(s.r,3)/vol; else hist[bin]+=1./N;
 	}
-	for(int i=0; i<bins; i++) cumm[i+1]=min(1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
+	for(int i=0; i<bins; i++) cumm[i+1]=min((Real)1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
 	return py::make_tuple(edges,cumm);
 }
 

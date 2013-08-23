@@ -379,7 +379,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		/* simplified public model */
 		epsN += phys->isoPrestress/E;
 		/* very simplified version of the constitutive law */
-		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */
+		kappaD = max(max((Real)0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */
 		omega = isCohesive? phys->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */
 		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */
 		sigmaT = G*epsT; /* trial stress */

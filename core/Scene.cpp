@@ -107,11 +107,7 @@ void Scene::moveToNextTimeStep(){
 			long dif = duration.total_microseconds();
 			SpeedElements(iter%nSpeedIter,0)=1000000.0 / dif;
 			
-			#if EIGEN_WORLD_VERSION==2
-				speed = SpeedElements.sum()/nSpeedIter;
-			#elif EIGEN_WORLD_VERSION==3
-				speed = SpeedElements.mean();
-			#endif
+			speed = SpeedElements.mean();
 			
 			prevTime = timeNow;
 		}

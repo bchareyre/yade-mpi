@@ -60,7 +60,7 @@ class Ig2_Facet_Sphere_Dem3DofGeom:public IGeomFunctor{
 		// algo: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
 		Vector3r BA=B-A;
 		Real u=(P.dot(BA)-A.dot(BA))/(BA.squaredNorm());
-		return A+min(1.,max(0.,u))*BA;
+		return A+min((Real)1.,max((Real)0.,u))*BA;
 	}
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
