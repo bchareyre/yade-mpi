@@ -693,29 +693,35 @@ Arbitrary spatial predicates introduced above can be expoited here as well::
 Imposing motion and forces
 --------------------------
 
-* If a degree of freedom is blocked and a velocity is assigned along that direction (translational or rotational velocity), then the body will move at constant velocity. This is the simpler and recommended method to impose the motion of a body. This, for instance, will result in a constant velocity along $x$::
+Imposed velocity
+^^^^^^^^^^^^^^^^
+
+If a degree of freedom is blocked and a velocity is assigned along that direction (translational or rotational velocity), then the body will move at constant velocity. This is the simpler and recommended method to impose the motion of a body. This, for instance, will result in a constant velocity along $x$::
 
 	O.bodies.append(utils.sphere((0,0,0),1))
 	O.bodies[0].state.blockedDOFs='x'
 	O.bodies[0].state.vel=(10,0,0)
 
-  Conversely, modifying the position directly is likely to break Yade's algorithms, especially those related to collision detection and contact laws, as they are based oon bodies velocities. Therefore, unless you really know what you are doing, don't do that for imposing a motion::
+Conversely, modifying the position directly is likely to break Yade's algorithms, especially those related to collision detection and contact laws, as they are based oon bodies velocities. Therefore, unless you really know what you are doing, don't do that for imposing a motion::
 
 	O.bodies.append(utils.sphere((0,0,0),1))
 	O.bodies[0].state.blockedDOFs='x'
 	O.bodies[0].state.pos=10*O.dt #REALLY BAD! Don't assign position
 
-* Applying a force or a torque on a body is done via functions of the :yref:`ForceContainer`. It is as simple as this::
+Imposed force
+^^^^^^^^^^^^^
+
+Applying a force or a torque on a body is done via functions of the :yref:`ForceContainer`. It is as simple as this::
 
 	O.forces.addF(0,(1,0,0)) #applies for one step
   
-  By default, the force applies for one time step only, and is resetted at the beginning of each step. For this reason, imposing a force at the begining of one step will have no effect at all, since it will be immediatly resetted. The only way is to place a :yref:`PyRunner` inside the simulation loop.
+By default, the force applies for one time step only, and is resetted at the beginning of each step. For this reason, imposing a force at the begining of one step will have no effect at all, since it will be immediatly resetted. The only way is to place a :yref:`PyRunner` inside the simulation loop.
 
-  Applying the force permanently is possible with an optional argument (in this case it does not matter if the command comes at the begining of the time step)::
+Applying the force permanently is possible with an optional argument (in this case it does not matter if the command comes at the begining of the time step)::
 
 	O.forces.addF(0,(1,0,0),permanent=True) #applies permanently
 
-  The force  will persist across iterations, until it is overwritten by another call to ``O.forces.addF(id,f,True)`` or erased by ``O.forces.reset(resetAll=True)``. The permanent force on a body can be checked with ``O.forces.permF(id)``.
+The force  will persist across iterations, until it is overwritten by another call to ``O.forces.addF(id,f,True)`` or erased by ``O.forces.reset(resetAll=True)``. The permanent force on a body can be checked with ``O.forces.permF(id)``.
 
 Boundary controllers
 --------------------
@@ -1049,7 +1055,7 @@ Plots can be exported to external files for later post-processing via that :yref
 By editing the generated .gnuplot file you can plot any of the added Data afterwards.
 
 
-* Data file is saved (compressed using bzip2) separately from the gnuplot file, so any other programs can be used to process them. In particular, the ``numpy.genfromtxt`` (documented `here <http://docs.scipy.org/doc/numpy/reference/generated/numpy.genfromtxt.html>`_) can be useful to import those data back to python; the decompression happens automatically.
+* Data file is saved (compressed using bzip2) separately from the gnuplot file, so any other programs can be used to process them. In particular, the ``numpy.genfromtxt`` (`documented here <http://docs.scipy.org/doc/numpy/reference/generated/numpy.genfromtxt.html>`_) can be useful to import those data back to python; the decompression happens automatically.
 
 * The gnuplot file can be run through gnuplot to produce the figure; see :yref:`yade.plot.saveGnuplot` documentation for details.
 
@@ -1470,7 +1476,7 @@ It is sometimes useful to visualize a DEM simulation through equivalent strain f
 .. figure:: fig/micro-domains.*
 
 Micro-strain
-""""""""""""
+------------
 Below is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.). The output is visualized with paraview, as explained in the previous section. Similar results can be generated from simulations:
 
 .. code-block:: python
@@ -1493,7 +1499,7 @@ Below is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` functio
 .. figure:: fig/localstrain.*
 
 Micro-stress
-""""""""""""
+------------
 Stress fields can be generated by combining the volume returned by TesselationWrapper to per-particle stress given by :yref:`bodyStressTensors`. Since the stress $\sigma$ from bodyStressTensor implies a division by the volume $V_b$ of the solid particle, one has to re-normalize it in order to obtain the micro-stress as defined in [Catalano2013a]_ (equation 39 therein), i.e. $\overline{\sigma}^k = \sigma^k \times V_b^k / V_{\sigma}^k$ where $V_{\sigma}^k$ is the volume assigned to particle $k$ in the tesselation. For instance:
 
 .. code-block:: python
