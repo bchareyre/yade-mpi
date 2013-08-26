@@ -72,7 +72,7 @@ class ForceContainer{
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), permSize(0),syncedSizes(true),synced(true),moveRotUsed(false),_zero(Vector3r::Zero()),syncCount(0),lastReset(0){
+		ForceContainer(): size(0), permSize(0),syncedSizes(true),synced(true),moveRotUsed(false),permForceUsed(false),_zero(Vector3r::Zero()),syncCount(0),lastReset(0){
 			nThreads=omp_get_max_threads();
 			for(int i=0; i<nThreads; i++){
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
@@ -220,7 +220,7 @@ class ForceContainer {
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), permSize(0), moveRotUsed(false), syncCount(0), lastReset(0){}
+		ForceContainer(): size(0), permSize(0), moveRotUsed(false), permForceUsed(false), syncCount(0), lastReset(0){}
 		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}
 		void  addForce(Body::id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(Body::id_t id){ensureSize(id); return _torque[id];}
