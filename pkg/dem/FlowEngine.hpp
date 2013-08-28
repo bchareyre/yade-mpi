@@ -188,7 +188,7 @@ class FlowEngine : public PartialEngine
 					((bool,clampKValues,true,,"If true, clamp local permeabilities in [minKdivKmean,maxKdivKmean]*globalK. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
 					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
 					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
-					((double,permeabilityFactor,0.0,,"permability multiplier"))
+					((double,permeabilityFactor,1.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of the fluid"))
 					((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
