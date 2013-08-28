@@ -132,7 +132,6 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
    
 	if (not(phys.liqBridgeCreated) and phys.Capillar) {
 		phys.liqBridgeCreated = true;
-		phys.sCrit = (1+0.5*phys.theta)*(pow(phys.Vb,1/3.0) + 0.1*pow(phys.Vb,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
 		Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
 		Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
 		if (s1 and s2) {
@@ -142,6 +141,11 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		} else {
 			phys.R = s2->radius;
 		}
+		
+		const Real Vstar = phys.Vb/(phys.R*phys.R*phys.R);
+		const Real Sstar = (1+0.5*phys.theta)*(pow(Vstar,1/3.0) + 0.1*pow(Vstar,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
+		
+		phys.sCrit = Sstar*phys.R;
 	}
 
 	Vector3r& shearForce = phys.shearForce;
