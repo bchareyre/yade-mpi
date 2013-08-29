@@ -35,8 +35,6 @@ _deprecated={
 	'ElasticMat':'ElastMat', # Sun Jan 10 09:53:15 2010, vaclav@flux
 	'ElasticContactInteraction':'FrictPhys', # Sun Jan 10 09:57:59 2010, vaclav@flux
 	'ef2_Spheres_Elastic_ElasticLaw':'Law2_ScGeom_FrictPhys_Basic', # Sun Jan 10 09:59:42 2010, vaclav@flux
-	'Law2_Dem3Dof_Elastic_Elastic':'Law2_Dem3Dof_FrictPhys_Basic', # Sun Jan 10 10:00:25 2010, vaclav@flux
-	'Law2_Dem3Dof_FrictPhys_Basic':'Law2_Dem3DofGeom_FrictPhys_Basic', # Sun Jan 10 10:01:27 2010, vaclav@flux
 	'Ip2_FrictMat_FrictMat_NormShearPhys':'Ip2_FrictMat_FrictMat_FrictPhys', # Sun Jan 10 10:07:40 2010, vaclav@flux
 	'GLDrawCpmPhys':'Gl1_CpmPhys', # Sat Feb  6 14:46:08 2010, vaclav@flux
 	'RockJointLawRelationships':'Ip2_2xCohFrictMat_NormalInelasticityPhys', # Mon Feb  8 11:17:59 2010, jduriez@c1solimara-l
