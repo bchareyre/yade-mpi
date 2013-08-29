@@ -75,8 +75,9 @@ triax.goal2=10000; O.run(2000,1)
 e22=e22-triax.strain[1]
 modulus = 1000./abs(e22)
 
-if abs((modulus-263673.1423)/263673.1423)>tolerance :
-	print "DEM-PFV: difference in bulk modulus"
+target=263673.1423
+if abs((modulus-target)/target)>tolerance :
+	print "DEM-PFV: difference in bulk modulus:", modulus, "vs. target ",target
 	errors+=1
 
 #B. Activate flow engine and set boundary conditions in order to get permeability
@@ -99,9 +100,10 @@ permeability = abs(Qin)/1.e-4 #size is one, we compute K=V/∇H
 if abs(Qin+Qout)>1e-15 :
 	print "DEM-PFV: unbalanced Qin vs. Qout"
 	errors+=1
-
-if abs((permeability-0.0512650663801)/0.0512650663801)>tolerance :
-	print "DEM-PFV: difference in permeability"
+	
+target=0.0512650663801
+if abs((permeability-target)/target)>tolerance :
+	print "DEM-PFV: difference in permeability:",permeability," vs. target ",target
 	errors+=1
 
 #C. now the oedometer test, drained at the top, impermeable at the bottom plate
@@ -117,16 +119,17 @@ O.timingEnabled=1
 from yade import timing
 O.run(3000,1)
 
-if abs((flow.getPorePressure((0.5,0.1,0.5))-528.554831762)/528.554831762)>tolerance :
-	print "DEM-PFV: difference in final pressure"
+target=528.554831762
+if abs((flow.getPorePressure((0.5,0.1,0.5))-target)/target)>tolerance :
+	print "DEM-PFV: difference in final pressure:",flow.getPorePressure((0.5,0.1,0.5))," vs. target ",target
 	errors+=1
-
-if abs((triax.strain[1]-zeroe22-0.00265188596144)/0.00265188596144)>tolerance :
-	print "DEM-PFV: difference in final deformation"
+target=0.00265188596144
+if abs((triax.strain[1]-zeroe22-target)/target)>tolerance :
+	print "DEM-PFV: difference in final deformation",triax.strain[1]-zeroe22," vs. target ",target
 	errors+=1
 
 if (float(flow.execTime)/float(sum([e.execTime for e in O.engines])))>0.6 :
-	print "DEM-PFV: More than 60\% of cpu time in FlowEngine. Should not happen with efficient libraries (check blas/lapack/cholmod implementations)"
+	print "DEM-PFV: More than 60\% of cpu time in FlowEngine (",100.*(float(flow.execTime)/float(sum([e.execTime for e in O.engines]))) ,"%). Should not happen with efficient libraries (check blas/lapack/cholmod implementations)"
 	errors+=1
 
 if (errors):
