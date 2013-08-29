@@ -20,7 +20,6 @@ for script in scriptsToRun:
 		except:
 			print script," failure"
 		O.reset()
-		print 	resultStatus	
 if (resultStatus>0):
 	print resultStatus, " tests are failed"
 	sys.exit(1)
