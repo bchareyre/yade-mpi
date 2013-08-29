@@ -3,7 +3,6 @@
 # Check test version for WirePM tensile test
 
 tolerance=0.01
-resultStatus=0
 errors=0
 
 #### define parameters for the net
