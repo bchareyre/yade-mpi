@@ -559,44 +559,23 @@ void Shop::getStressForEachBody(vector<Shop::bodyState>& bodyStates){
 		Vector3r normalStress,shearStress;
 		if(!I->isReal()) continue;
 		
-		//NormShearPhys + Dem3DofGeom
-		const NormShearPhys* physNSP = YADE_CAST<NormShearPhys*>(I->phys.get());
-		//Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
-		// FIXME: slower, but does not crash
-		Dem3DofGeom* geomDDG=dynamic_cast<Dem3DofGeom*>(I->geom.get());	//For the moment only for Dem3DofGeom!!!
-		
-		//FrictPhys + ScGeom
 		const FrictPhys* physFP = YADE_CAST<FrictPhys*>(I->phys.get());
-		ScGeom* geomScG=dynamic_cast<ScGeom*>(I->geom.get());
+		ScGeom* geomScG=YADE_CAST<ScGeom*>(I->geom.get());
 		
 		const Body::id_t id1=I->getId1(), id2=I->getId2();
 		
-		if(((physNSP) and (geomDDG)) or ((physFP) and (geomScG))){
-			if ((physNSP) and (geomDDG)) {
-				Real minRad=(geomDDG->refR1<=0?geomDDG->refR2:(geomDDG->refR2<=0?geomDDG->refR1:min(geomDDG->refR1,geomDDG->refR2)));
-				Real crossSection=Mathr::PI*pow(minRad,2);
-		
-				normalStress=((1./crossSection)*geomDDG->normal.dot(physNSP->normalForce))*geomDDG->normal;
-				for(int i=0; i<3; i++){
-					int ix1=(i+1)%3,ix2=(i+2)%3;
-					shearStress[i]=geomDDG->normal[ix1]*physNSP->shearForce[ix1]+geomDDG->normal[ix2]*physNSP->shearForce[ix2];
-					shearStress[i]/=crossSection;
-				}
-			}	else if ((physFP) and (geomScG)) {
-				Real minRad=(geomScG->radius1<=0?geomScG->radius2:(geomScG->radius2<=0?geomScG->radius1:min(geomScG->radius1,geomScG->radius2)));
-				Real crossSection=Mathr::PI*pow(minRad,2);
+		if((physFP) and (geomScG)){
+			Real minRad=(geomScG->radius1<=0?geomScG->radius2:(geomScG->radius2<=0?geomScG->radius1:min(geomScG->radius1,geomScG->radius2)));
+			Real crossSection=Mathr::PI*pow(minRad,2);
 				
-				normalStress=((1./crossSection)*geomScG->normal.dot(physFP->normalForce))*geomScG->normal;
-				for(int i=0; i<3; i++){
-					int ix1=(i+1)%3,ix2=(i+2)%3;
-					shearStress[i]=geomScG->normal[ix1]*physFP->shearForce[ix1]+geomScG->normal[ix2]*physFP->shearForce[ix2];
-					shearStress[i]/=crossSection;
-				}
+			normalStress=((1./crossSection)*geomScG->normal.dot(physFP->normalForce))*geomScG->normal;
+			for(int i=0; i<3; i++){
+				int ix1=(i+1)%3,ix2=(i+2)%3;
+				shearStress[i]=geomScG->normal[ix1]*physFP->shearForce[ix1]+geomScG->normal[ix2]*physFP->shearForce[ix2];
+				shearStress[i]/=crossSection;
 			}
-			
 			bodyStates[id1].normStress+=normalStress;
 			bodyStates[id2].normStress+=normalStress;
-
 			bodyStates[id1].shearStress+=shearStress;
 			bodyStates[id2].shearStress+=shearStress;
 		}
@@ -795,33 +774,6 @@ Matrix3r Shop::getCapillaryStress(Real volume){
 	}
 	return stressTensor/volume;
 }
-
-/*
-Matrix3r Shop::stressTensorOfPeriodicCell(bool smallStrains){
-	Scene* scene=Omega::instance().getScene().get();
-	if (!scene->isPeriodic){ throw runtime_error("Can't compute stress of periodic cell in aperiodic simulation."); }
-// 	if (smallStrains){volume = scene->getVolume()cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];}
-// 	else volume = scene->cell->trsf.determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
-	// Using the function provided by Cell (BC)
-	Real volume = scene->cell->getVolume();
-	Matrix3r stress = Matrix3r::Zero();
-	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-		if(!I->isReal()) continue;
-		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->geom.get());
-		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
-		Real l;
-		if (smallStrains){l = geom->refLength;}
-		else l=(geom->se31.position-geom->se32.position).norm();
-		Vector3r& n=geom->normal;
-		Vector3r& fT=phys->shearForce;
-		Real fN=phys->normalForce.dot(n);
-
-		stress += l*(fN*n*n.transpose() + .5*(fT*n.transpose() + n*fT.transpose()));
-	}
-	stress/=volume;
-	return stress;
-}
-*/
 
 void Shop::getStressLWForEachBody(vector<Matrix3r>& bStresses){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
