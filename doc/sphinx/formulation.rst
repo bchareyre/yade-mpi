@@ -314,8 +314,6 @@ Shear strain
 -------------
 In order to keep $\vec{u}_T$ consistent (e.g. that $\vec{u}_T$ must be constant if two spheres retain mutually constant configuration but move arbitrarily in space), then either $\vec{u}_T$ must track spheres' spatial motion or must (somehow) rely on sphere-local data exclusively.
 
-These two possibilities lead to two algorithms of computing shear strains. They should give the same results (disregarding numerical imprecision), but there is a trade-off between computational cost of the incremental method and robustness of the total one.
-
 Geometrical meaning of shear strain is shown in `fig-shear-2d`_.
 
 .. _fig-shear-2d:
@@ -323,9 +321,7 @@ Geometrical meaning of shear strain is shown in `fig-shear-2d`_.
 	
 	Evolution of shear displacement $\vec{u}_T$ due to mutual motion of spheres, both linear and rotational. Left configuration is the initial contact, right configuration is after displacement and rotation of one particle.
 
-Incremental algorithm
-^^^^^^^^^^^^^^^^^^^^^
-The incremental algorithm is widely used in DEM codes and is described frequently ([Luding2008]_, [Alonso2004]_). Yade implements this algorithm in the :yref:`ScGeom` class. At each step, shear displacement $\uT$ is updated; the update increment can be decomposed in 2 parts: motion of the interaction (i.e. $\vec{C}$ and $\vec{n}$) in global space and mutual motion of spheres.
+The classical incremental algorithm is widely used in DEM codes and is described frequently ([Luding2008]_, [Alonso2004]_). Yade implements this algorithm in the :yref:`ScGeom` class. At each step, shear displacement $\uT$ is updated; the update increment can be decomposed in 2 parts: motion of the interaction (i.e. $\vec{C}$ and $\vec{n}$) in global space and mutual motion of spheres.
 
 #. Contact moves dues to changes of the spheres' positions $\vec{C}_1$ and $\vec{C}_2$, which updates current $\currC$ and $\currn$ as per :eq:`eq-contact-point` and :eq:`eq-contact-normal`. $\prevuT$ is perpendicular to the contact plane at the previous step $\prevn$ and must be updated so that $\prevuT+(\Delta\uT)=\curruT\perp\currn$; this is done by perpendicular projection to the plane first (which might decrease $|\uT|$) and adding what corresponds to spatial rotation of the interaction instead:
   
@@ -353,74 +349,6 @@ Finally, we compute
 
 .. math:: \curruT=\prevuT+(\Delta\uT)_1 + (\Delta\uT)_2 + (\Delta\uT)_3.
 
-.. _sect-formulation-total-shear:
-
-Total algorithm
-^^^^^^^^^^^^^^^
-The following algorithm, aiming at stabilization of response even with large rotation speeds or $\Delta t$ approaching stability limit, was designed in [Smilauer2010b]_. (A similar algorithm based on total formulation, which covers additionally bending and torsion, was proposed in [Wang2009]_.) It is based on tracking original contact points (with zero shear) in the particle-local frame.
-
-In this section, variable symbols implicitly denote their current values unless explicitly stated otherwise.
-
-Shear strain may have two sources: mutual rotation of spheres or transversal displacement of one sphere with respect to the other. Shear strain does not change if both spheres move or rotate but are not in linear or angular motion mutually. To accurately and reliably model this situation, for every new contact the initial contact point $\bar{\vec{C}}$ is mapped into local sphere coordinates ($\vec{p}_{01}$, $\vec{p}_{02}$). As we want to determine the distance between both points (i.e. how long the trajectory in on both spheres' surfaces together), the shortest path from current $\vec{C}$ to the initial locally mapped point on the sphere's surface is „unrolled“ to the contact plane ($\vec{p}'_{01}$, $\vec{p}'_{02}$); then we can measure their linear distance $\uT$ and define shear strain $\vec{\eps}_T=\uT/d_0$ (fig. `fig-shear-displacement`_).
-
-More formally, taking $\bar{\vec{C}}_i$, $\bar{q}_i$ for the sphere initial positions and orientations (as quaterions) in global coordinates, the initial sphere-local contact point *orientation* (relative to sphere-local axis $\hat{x}$) is remembered:
-
-.. math::
-	:nowrap:
-	
-	\begin{align*}
-		\bar{\vec{n}}&=\normalized{{\vec{C}}_1-{\vec{C}}_2}, \\
-		\bar{q}_{01}&=\Align(\hat x,\bar{q}_1^*\bar{\vec{n}} \bar{q}_1^{**}), \\ 
-		\bar{q}_{02}&=\Align(\hat x,\bar{q}_2^* (-\bar{\vec{n}}) \bar{q}_2^{**}).
-	\end{align*}
-	
-.. (See \autoref{sect-quaternions} for definition of $\Align$.)
-
-				
-After some spheres motion, the original point can be "unrolled" to the current contact plane:
-
-.. math::
-	:nowrap:
-	
-	\begin{align*}
-		q&=\Align(\vec{n},q_1 \bar{q}_{01} \hat x (q_1 \bar{q}_{01})^*) \quad\hbox{(auxiliary)} \\
-		\vec{p}'_{01}&=q_{\theta}d_1(q_{\vec{u}} \times \vec{n})
-	\end{align*}
-
-where $q_{\vec{u}}$, $q_{\theta}$ are axis and angle components of $q$ and $p_{01}'$ is the unrolled point. Similarly,
-
-.. math::
-	:nowrap:
-
-	\begin{align*}
-		q&=\Align(\vec{n},q_2 \bar{q}_{02} \hat x (q_2 \bar{q}_{02})^*) \\
-		\vec{p}'_{02}&=q_{\theta}d_1(q_{\vec{u}} \times (-\vec{n})).
-	\end{align*}
-
-Shear displacement and strain are then computed easily:
-
-.. math::
-	:nowrap:
-
-	\begin{align*}
-		\uT&=\vec{p}'_{02}-\vec{p}'_{01} \\
-		\vec{\eps}_T&=\frac{\uT}{d_0}
-	\end{align*}
-
-When using material law with plasticity in shear, it may be necessary to limit maximum shear strain, in which case the mapped points are moved closer together to the requested distance (without changing $\hat{\vec{u}}_T$). This allows us to remember the previous strain direction and also avoids summation of increments of plastic strain at every step (`fig-shear-slip`_).
-
-.. _fig-shear-displacement:
-.. figure:: fig/shear-displacement.*
-
-	Shear displacement computation for two spheres in relative motion.
-
-
-.. _fig-shear-slip:
-.. figure:: fig/shear-slip.*
-
-	Shear plastic slip for two spheres.
-
-This algorithm is straightforwardly modified to facet-sphere interactions. In Yade, it is implemented by :yref:`Dem3DofGeom` and related classes.
 
 .. _sect-formulation-stress-cundall:
 

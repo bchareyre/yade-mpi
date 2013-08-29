@@ -418,7 +418,7 @@ Some material models (such as the :yref:`concrete model<Law2_ScGeom_CpmPhys_Cpm>
 #. Approximate collision detection is adjusted so that approximate contacts are detected also between particles within the interaction radius. This consists in setting value of :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` to the interaction radius value.
 
 #. The geometry functor (``Ig2``)
-   would normally say that "there is no contact" if given 2 spheres that are not in contact. Therefore, the same value as for :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` must be given to it. (Either :yref:`Ig2_Sphere_Sphere_Dem3DofGeom.distFactor` or :yref:`Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor`, depending on the functor that is in use.
+   would normally say that "there is no contact" if given 2 spheres that are not in contact. Therefore, the same value as for :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor` must be given to it (:yref:`Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor` ).
 
    Note that only :yref:`Sphere` + :yref:`Sphere` interactions are supported; there is no parameter analogous to :yref:`distFactor<Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor>` in :yref:`Ig2_Facet_Sphere_ScGeom`. This is on purpose, since the interaction radius is meaningful in bulk material represented by sphere packing, whereas facets usually represent boundary conditions which should be exempt from this dense interaction network.
 
@@ -576,12 +576,7 @@ Ig2 functors
    
    Again, missing combination will cause given shape combinations to freely interpenetrate one another.
 
-#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_ScGeom_CpmPhys_Cpm` accepts :yref:`ScGeom`). This is (for most cases) either :yref:`Dem3DofGeom` (total shear formulation) or :yref:`ScGeom` (incremental shear formulation). For :yref:`Dem3DofGeom`, the above example would simply change to::
-
-      InteractionLoop([
-         Ig2_Sphere_Sphere_Dem3DofGeom(),
-         Ig2_Facet_Sphere_Dem3DofGeom()
-      ],[],[])
+#. :yref:`IGeom` type accepted by the ``Law2`` functor (below); it is the first part of functor's name after ``Law2`` (for instance, :yref:`Law2_ScGeom_CpmPhys_Cpm` accepts :yref:`ScGeom`).
 
 Ip2 functors
 ^^^^^^^^^^^^

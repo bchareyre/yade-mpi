@@ -872,7 +872,7 @@ Functor derived from IGeomFunctor must then
 
 .. code-block:: c++
 
-	class Ig2_Facet_Sphere_Dem3DofGeom: public IGeomFunctor{
+	class Ig2_Facet_Sphere_ScGeom: public IGeomFunctor{
 	   public:
 
 	   // override the IGeomFunctor::go
@@ -914,7 +914,7 @@ The dispatcher doesn't always have functors that exactly match the actual types 
 
 If no functor is able to accept given types (first condition violated) or multiple functors have the same distance (in condition 2), an exception is thrown.
 
-This resolution mechanism makes it possible, for instance, to have a hierarchy of :yref:`Dem3DofGeom` classes (for different combination of shapes: :yref:`Dem3DofGeom_SphereSphere`, :yref:`Dem3DofGeom_FacetSphere`, :yref:`Dem3DofGeom_WallSphere`), but only provide a :yref:`LawFunctor` accepting ``Dem3DofGeom``, rather than having different laws for each shape combination.
+This resolution mechanism makes it possible, for instance, to have a hierarchy of :yref:`ScGeom` classes (for different combination of shapes), but only provide a :yref:`LawFunctor` accepting ``ScGeom``, rather than having different laws for each shape combination.
 
 .. note:: Performance implications of dispatch resolution are relatively low. The dispatcher lookup is only done once, and uses fast lookup matrix (1D or 2D); then, the functor found for this type(s) is cached within the ``Interaction`` (or ``Body``) instance. Thus, regular functor call costs the same as dereferencing pointer and calling virtual method. There is `blueprint <https://blueprints.launchpad.net/yade/+spec/devirtualize-functor-calls>`__ to avoid virtual function call as well.
 
