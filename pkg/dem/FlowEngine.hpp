@@ -59,8 +59,10 @@ class FlowEngine : public PartialEngine
 		int ReTrg;
 		int ellapsedIter;
 		TPL void initSolver (Solver& flow);
+		#ifdef LINSOLV
 		TPL void setForceMetis (Solver& flow, bool force);
 		TPL bool getForceMetis (Solver& flow);
+		#endif
 		TPL void Triangulate (Solver& flow);
 		TPL void AddBoundary (Solver& flow);
 		TPL void Build_Triangulation (double P_zero, Solver& flow);

@@ -220,7 +220,7 @@ void FlowEngine::initSolver ( Solver& flow )
         flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 }
 
-
+#ifdef LINSOLV
 template<class Solver>
 void FlowEngine::setForceMetis ( Solver& flow, bool force )
 {
@@ -232,6 +232,7 @@ void FlowEngine::setForceMetis ( Solver& flow, bool force )
 
 template<class Solver>
 bool FlowEngine::getForceMetis ( Solver& flow ) {return (flow->eSolver.cholmod().nmethods==1);}
+#endif
 
 template<class Solver>
 void FlowEngine::Build_Triangulation ( Solver& flow )
