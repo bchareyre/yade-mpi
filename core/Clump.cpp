@@ -119,7 +119,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 				const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
 				const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
 				Real un = (sphere1->radius+sphere2->radius) - dist.norm();
-				if (un > 0.) {intersecting = true; break;}
+				if (un > -0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
 			}
 		}
 	}
