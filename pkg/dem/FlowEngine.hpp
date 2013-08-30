@@ -59,6 +59,8 @@ class FlowEngine : public PartialEngine
 		int ReTrg;
 		int ellapsedIter;
 		TPL void initSolver (Solver& flow);
+		TPL void setForceMetis (Solver& flow, bool force);
+		TPL bool getForceMetis (Solver& flow);
 		TPL void Triangulate (Solver& flow);
 		TPL void AddBoundary (Solver& flow);
 		TPL void Build_Triangulation (double P_zero, Solver& flow);
@@ -155,6 +157,13 @@ class FlowEngine : public PartialEngine
 		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		void		_setForceMetis (bool force) {setForceMetis(solver,force);}
+		bool		_getForceMetis () {return getForceMetis (solver);}
+		void		cholmodStats() {
+					cerr << cholmod_print_common("PFV Cholmod factorization",&(solver->eSolver.cholmod()))<<endl;
+					cerr << "cholmod method:" << solver->eSolver.cholmod().selected<<endl;
+					cerr << "METIS called:"<<solver->eSolver.cholmod().called_nd<<endl;}
+		bool		metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
 		#endif
 		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
 		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
@@ -217,6 +226,7 @@ class FlowEngine : public PartialEngine
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
+// 					((bool, forceMetis, 0,,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation"))
 					#endif
 					,
 					/*deprec*/
@@ -261,6 +271,9 @@ class FlowEngine : public PartialEngine
 					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+					.def("cholmodStats",&FlowEngine::cholmodStats,"get statistics of cholmod solver activity")
+					.def("metisUsed",&FlowEngine::metisUsed,"check wether metis lib is effectively used")
+					.add_property("forceMetis",&FlowEngine::_getForceMetis,&FlowEngine::_setForceMetis,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation")
 					#endif
 					)
 		DECLARE_LOGGER;

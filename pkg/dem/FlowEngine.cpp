@@ -219,6 +219,19 @@ void FlowEngine::initSolver ( Solver& flow )
         flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 }
 
+
+template<class Solver>
+void FlowEngine::setForceMetis ( Solver& flow, bool force )
+{
+        if (force) {
+		flow->eSolver.cholmod().nmethods=1;
+		flow->eSolver.cholmod().method[0].ordering=CHOLMOD_METIS;
+	} else cholmod_defaults(&(flow->eSolver.cholmod()));
+}
+
+template<class Solver>
+bool FlowEngine::getForceMetis ( Solver& flow ) {return (flow->eSolver.cholmod().nmethods==1);}
+
 template<class Solver>
 void FlowEngine::Build_Triangulation ( Solver& flow )
 {
