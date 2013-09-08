@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-
+# 2011 © Klaus Thoeni <klaus.thoeni@gmail.com>
 # Check test version for WirePM tensile test
 
 tolerance=0.01
-resultStatus=0
 errors=0
 
 #### define parameters for the net
@@ -120,8 +119,7 @@ NewtonIntegrator(damping=0.5),
 ## critical time step proposed by Bertrand
 kn = 16115042 # stiffness of single wire from code
 O.dt = 0.2*sqrt(particleMass/(2.*kn))
-
-O.run(350000,True)
+O.run(30000,True)
 
 Fn = 0.
 for i in posIds:
@@ -134,11 +132,15 @@ for i in posIds:
 un = O.bodies[O.bodies[posIds[0]].id].state.pos[1] - O.bodies[O.bodies[posIds[0]].id].state.refPos[1]
 
 
-if abs((un-0.04)/0.04)>tolerance :
+if abs((un-0.0034)/0.034)>tolerance :
 	print "WirePM checkTest: difference on peak displacement"
+	print "Reference value:",0.034
+	print "Calculated value:",un
 	errors+=1
-if abs((Fn-33626.44)/33626.44)>tolerance :
+if abs((Fn-6458.9)/6458.9)>tolerance :
 	print "WirePM checkTest: difference on peak Force"
+	print "Reference value:",6458.9
+	print "Calculated value:",Fn
 	errors+=1
 
 if (errors):

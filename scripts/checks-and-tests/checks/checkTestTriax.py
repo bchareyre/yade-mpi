@@ -24,6 +24,9 @@ if abs((O.engines[4].stress(3)[1]-107157.2)/107157.2)>tolerance :
 if abs((O.engines[4].stress(1)[0]-50058.7)/50058.7)>tolerance :
 	print "Triaxial checkTest: difference on confining stress"
 	errors+=1
+	
+if (errors):
+	resultStatus +=1	#Test is failed
 
 if (errors):
 	resultStatus +=1	#Test is failed

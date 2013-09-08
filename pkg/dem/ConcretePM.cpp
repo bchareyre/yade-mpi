@@ -345,7 +345,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	Vector3r& Fs(phys->Fs); /* for python access */
 	const bool& isCohesive(phys->isCohesive);
 
-	Vector3r& epsTPl(phys->epsTPl);
+// 	Vector3r& epsTPl(phys->epsTPl);
 
 	#ifdef CPM_MATERIAL_MODEL
 		Real& epsNPl(phys->epsNPl);
@@ -589,7 +589,7 @@ void CpmStateUpdater::update(Scene* _scene){
 			}
 		}
 	}
-	Real tr;
+// 	Real tr;
 	FOREACH(shared_ptr<Body> B, *scene->bodies){
 		if (!B) continue;
 		const Body::id_t& id = B->getId();

@@ -198,7 +198,6 @@ LawTester uses, as much as possible, :yref:`IGeom` to provide useful data (such 
 :yref:`L6Geom`      6     full
 :yref:`ScGeom`      3     emulate local coordinate system
 :yref:`ScGeom6D`    6     emulate local coordinate system
-:yref:`Dem3DofGeom` 3     *not supported*
 =================== ===== ==================================
 
 Depending on :yref:`IGeom`, 3 ($u_x$, $u_y$, $u_z$) or 6 ($u_x$, $u_y$, $u_z$, $\phi_x$, $\phi_y$, $\phi_z$) degrees of freedom (DoFs) are controlled with LawTester, by prescribing linear and angular velocities of both particles in contact. All DoFs controlled with LawTester are orthogonal (fully decoupled) and are controlled independently.

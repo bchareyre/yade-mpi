@@ -127,8 +127,6 @@ class Shop{
 		static Matrix3r getStress(Real volume=0);
 		static Matrix3r getCapillaryStress(Real volume=0);
 		static Matrix3r stressTensorOfPeriodicCell() { LOG_WARN("Shop::stressTensorOfPeriodicCelli is DEPRECATED: use getStress instead"); return Shop::getStress(); }
-		//! This version is restricted to periodic BCs and Dem3Dof
-		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
 		static py::tuple normalShearStressTensors(bool compressionPositive=false, bool splitNormalTensor=false, Real thresholdForce=NaN);

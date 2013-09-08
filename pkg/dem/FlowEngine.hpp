@@ -59,6 +59,10 @@ class FlowEngine : public PartialEngine
 		int ReTrg;
 		int ellapsedIter;
 		TPL void initSolver (Solver& flow);
+		#ifdef LINSOLV
+		TPL void setForceMetis (Solver& flow, bool force);
+		TPL bool getForceMetis (Solver& flow);
+		#endif
 		TPL void Triangulate (Solver& flow);
 		TPL void AddBoundary (Solver& flow);
 		TPL void Build_Triangulation (double P_zero, Solver& flow);
@@ -155,6 +159,13 @@ class FlowEngine : public PartialEngine
 		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		void		_setForceMetis (bool force) {setForceMetis(solver,force);}
+		bool		_getForceMetis () {return getForceMetis (solver);}
+		void		cholmodStats() {
+					cerr << cholmod_print_common("PFV Cholmod factorization",&(solver->eSolver.cholmod()))<<endl;
+					cerr << "cholmod method:" << solver->eSolver.cholmod().selected<<endl;
+					cerr << "METIS called:"<<solver->eSolver.cholmod().called_nd<<endl;}
+		bool		metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
 		#endif
 		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
 		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
@@ -164,7 +175,7 @@ class FlowEngine : public PartialEngine
 		virtual void action();
 		virtual void backgroundAction();
 
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::\n\t Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`FlowEngine::multithread`=True with  multithread :yref:`FlowEngine::numSolveThreads`=:yref:`FlowEngine::numFactorizeThreads`=4 means that openblas will mobilize 8 processors at some point, if the system doesn't have so many procs. it will hurt performance.",
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
@@ -188,7 +199,7 @@ class FlowEngine : public PartialEngine
 					((bool,clampKValues,true,,"If true, clamp local permeabilities in [minKdivKmean,maxKdivKmean]*globalK. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
 					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
 					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
-					((double,permeabilityFactor,0.0,,"permability multiplier"))
+					((double,permeabilityFactor,1.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of the fluid"))
 					((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
@@ -217,6 +228,7 @@ class FlowEngine : public PartialEngine
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
+// 					((bool, forceMetis, 0,,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation"))
 					#endif
 					,
 					/*deprec*/
@@ -240,7 +252,7 @@ class FlowEngine : public PartialEngine
 					.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
 					.def("getCellFlux",&FlowEngine::_getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
-					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note::\n\t The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
+					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
@@ -261,6 +273,9 @@ class FlowEngine : public PartialEngine
 					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+					.def("cholmodStats",&FlowEngine::cholmodStats,"get statistics of cholmod solver activity")
+					.def("metisUsed",&FlowEngine::metisUsed,"check wether metis lib is effectively used")
+					.add_property("forceMetis",&FlowEngine::_getForceMetis,&FlowEngine::_setForceMetis,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation")
 					#endif
 					)
 		DECLARE_LOGGER;

@@ -380,7 +380,6 @@ SET (version ${YADE_VERSION})
 SET (pyExecutable ${PYTHON_EXECUTABLE})
 SET (profile "default")
 SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")
-SET (libstdcxx "/usr/lib/libstdc++.so.6")     #This is a hack, which is not needed for modern systems. Should be deleted.
 #====================================
 
 CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-batch")
@@ -409,6 +408,7 @@ MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
 MESSAGE(STATUS "Disabled features:${DISABLED_FEATS}")
 IF (DEBUG)
   MESSAGE(STATUS "Debug build")
+  SET (debugbuild " (debug build)")
 ELSE (DEBUG)
   MESSAGE(STATUS "Optimized build")
 ENDIF (DEBUG)

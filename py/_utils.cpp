@@ -76,32 +76,33 @@ void setRefSe3(){
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 Real RayleighWaveTimeStep(){return Shop::RayleighWaveTimeStep();};
 
-Real elasticEnergyInAABB(py::tuple Aabb){
-	Vector3r bbMin=py::extract<Vector3r>(Aabb[0])(), bbMax=py::extract<Vector3r>(Aabb[1])();
-	shared_ptr<Scene> rb=Omega::instance().getScene();
-	Real E=0;
-	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
-		if(!i->phys) continue;
-		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->phys); if(!bc) continue;
-		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->geom); if(!geom){LOG_ERROR("NormShearPhys contact doesn't have Dem3DofGeom associated?!"); continue;}
-		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
-		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
-		if(!isIn1 && !isIn2) continue;
-		LOG_DEBUG("Interaction #"<<i->getId1()<<"--#"<<i->getId2());
-		Real weight=1.;
-		if((!isIn1 && isIn2) || (isIn1 && !isIn2)){
-			//shared_ptr<Body> bIn=isIn1?b1:b2, bOut=isIn2?b2:b1;
-			Vector3r vIn=(isIn1?b1:b2)->state->pos, vOut=(isIn2?b1:b2)->state->pos;
-			#define _WEIGHT_COMPONENT(axis) if(vOut[axis]<bbMin[axis]) weight=min(weight,abs((vOut[axis]-bbMin[axis])/(vOut[axis]-vIn[axis]))); else if(vOut[axis]>bbMax[axis]) weight=min(weight,abs((vOut[axis]-bbMax[axis])/(vOut[axis]-vIn[axis])));
-			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
-			assert(weight>=0 && weight<=1);
-			//cerr<<"Interaction crosses Aabb boundary, weight is "<<weight<<endl;
-			//LOG_DEBUG("Interaction crosses Aabb boundary, weight is "<<weight);
-		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().norm(),2));
-	}
-	return E;
-}
+// FIXME: rewrite for ScGeom or remove
+// Real elasticEnergyInAABB(py::tuple Aabb){
+// 	Vector3r bbMin=py::extract<Vector3r>(Aabb[0])(), bbMax=py::extract<Vector3r>(Aabb[1])();
+// 	shared_ptr<Scene> rb=Omega::instance().getScene();
+// 	Real E=0;
+// 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
+// 		if(!i->phys) continue;
+// 		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->phys); if(!bc) continue;
+// 		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->geom); if(!geom){LOG_ERROR("NormShearPhys contact doesn't have Dem3DofGeom associated?!"); continue;}
+// 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
+// 		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
+// 		if(!isIn1 && !isIn2) continue;
+// 		LOG_DEBUG("Interaction #"<<i->getId1()<<"--#"<<i->getId2());
+// 		Real weight=1.;
+// 		if((!isIn1 && isIn2) || (isIn1 && !isIn2)){
+// 			//shared_ptr<Body> bIn=isIn1?b1:b2, bOut=isIn2?b2:b1;
+// 			Vector3r vIn=(isIn1?b1:b2)->state->pos, vOut=(isIn2?b1:b2)->state->pos;
+// 			#define _WEIGHT_COMPONENT(axis) if(vOut[axis]<bbMin[axis]) weight=min(weight,abs((vOut[axis]-bbMin[axis])/(vOut[axis]-vIn[axis]))); else if(vOut[axis]>bbMax[axis]) weight=min(weight,abs((vOut[axis]-bbMax[axis])/(vOut[axis]-vIn[axis])));
+// 			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
+// 			assert(weight>=0 && weight<=1);
+// 			//cerr<<"Interaction crosses Aabb boundary, weight is "<<weight<<endl;
+// 			//LOG_DEBUG("Interaction crosses Aabb boundary, weight is "<<weight);
+// 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
+// 		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().norm(),2));
+// 	}
+// 	return E;
+// }
 
 /* return histogram ([bin1Min,bin2Min,…],[value1,value2,…]) from projections of interactions
  * to the plane perpendicular to axis∈[0,1,2]; the number of bins can be specified and they cover
@@ -354,34 +355,35 @@ Real approxSectionArea(Real coord, int axis){
 	upper part" (lower and upper parts with respect to the plane's normal).
 
 	(This could be easily extended to return sum of only normal forces or only of shear forces.)
+	// FIXME: adapt to ScGeom or remove
 */
-Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
-	Vector3r ret(Vector3r::Zero());
-	Scene* scene=Omega::instance().getScene().get();
-	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
-		if(!I->isReal()) continue;
-		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->phys.get());
-		if(!nsi) continue;
-		Vector3r pos1,pos2;
-		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->geom.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
-		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
-		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
-		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
-		if(dot1*dot2>0) continue; // both (centers of) bodies are on the same side of the plane=> this interaction has to be disregarded
-		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
-		// otherwise, reverse its contribution. So that we return finally
-		// Sum [ ( normal(plane) dot normal(interaction= from 1 to 2) ) "nsi->force" ]
-		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
-	}
-	return ret;
-}
+// Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
+// 	Vector3r ret(Vector3r::Zero());
+// 	Scene* scene=Omega::instance().getScene().get();
+// 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
+// 		if(!I->isReal()) continue;
+// 		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->phys.get());
+// 		if(!nsi) continue;
+// 		Vector3r pos1,pos2;
+// 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->geom.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
+// 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
+// 		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
+// 		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
+// 		if(dot1*dot2>0) continue; // both (centers of) bodies are on the same side of the plane=> this interaction has to be disregarded
+// 		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
+// 		// otherwise, reverse its contribution. So that we return finally
+// 		// Sum [ ( normal(plane) dot normal(interaction= from 1 to 2) ) "nsi->force" ]
+// 		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
+// 	}
+// 	return ret;
+// }
 
 /* Less general than forcesOnPlane, computes force on plane perpendicular to axis, passing through coordinate coord. */
-Vector3r forcesOnCoordPlane(Real coord, int axis){
-	Vector3r planePt(Vector3r::Zero()); planePt[axis]=coord;
-	Vector3r normal(Vector3r::Zero()); normal[axis]=1;
-	return forcesOnPlane(planePt,normal);
-}
+// /*Vector3r forcesOnCoordPlane(Real coord, int axis){
+// 	Vector3r planePt(Vector3r::Zero()); planePt[axis]=coord;
+// 	Vector3r normal(Vector3r::Zero()); normal[axis]=1;
+// 	return forcesOnPlane(planePt,normal);
+// }*/
 
 
 py::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
@@ -508,15 +510,15 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
 	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
 	py::def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(py::args("aabb")));
-	py::def("elasticEnergy",elasticEnergyInAABB);
+// 	py::def("elasticEnergy",elasticEnergyInAABB);
 	py::def("inscribedCircleCenter",inscribedCircleCenter,(py::arg("v1"),py::arg("v2"),py::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
 	py::def("unbalancedForce",&Shop__unbalancedForce,(py::args("useMaxForce")=false),"Compute the ratio of mean (or maximum, if *useMaxForce*) summary force on bodies and mean force magnitude on interactions. For perfectly static equilibrium, summary force on all bodies is zero (since forces from interactions cancel out and induce no acceleration of particles); this ratio will tend to zero as simulation stabilizes, though zero is never reached because of finite precision computation. Sufficiently small value can be e.g. 1e-2 or smaller, depending on how much equilibrium it should be.");
 	py::def("kineticEnergy",Shop__kineticEnergy,(py::args("findMaxId")=false),"Compute overall kinetic energy of the simulation as\n\n.. math:: \\sum\\frac{1}{2}\\left(m_i\\vec{v}_i^2+\\vec{\\omega}(\\mat{I}\\vec{\\omega}^T)\\right).\n\nFor :yref:`aspherical<Body.aspherical>` bodies, the inertia tensor $\\mat{I}$ is transformed to global frame, before multiplied by $\\vec{\\omega}$, therefore the value should be accurate.\n");
 	py::def("sumForces",sumForces,(py::arg("ids"),py::arg("direction")),"Return summary force on bodies with given *ids*, projected on the *direction* vector.");
 	py::def("sumTorques",sumTorques,(py::arg("ids"),py::arg("axis"),py::arg("axisPt")),"Sum forces and torques on bodies given in *ids* with respect to axis specified by a point *axisPt* and its direction *axis*.");
 	py::def("sumFacetNormalForces",sumFacetNormalForces,(py::arg("ids"),py::arg("axis")=-1),"Sum force magnitudes on given bodies (must have :yref:`shape<Body.shape>` of the :yref:`Facet` type), considering only part of forces perpendicular to each :yref:`facet's<Facet>` face; if *axis* has positive value, then the specified axis (0=x, 1=y, 2=z) will be used instead of facet's normals.");
-	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
-	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
+// 	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
+// 	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
 	py::def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
 	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`IGeomDispatcher` and :yref:`IPhysDispatcher` (might be both hidden in :yref:`InteractionLoop`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<IGeomDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning:: This function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
 	py::def("spiralProject",spiralProject,(py::arg("pt"),py::arg("dH_dTheta"),py::arg("axis")=2,py::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),py::arg("theta0")=0));

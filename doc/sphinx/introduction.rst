@@ -343,7 +343,7 @@ Interactions
 :yref:`IGeom`
 	holding geometrical configuration of the two particles in collision; it is updated automatically as the particles in question move and can be queried for various geometrical characteristics, such as penetration distance or shear strain.
 	
-	Based on combination of types of :yref:`Shapes<Shape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<Dem3DofGeom_SphereSphere>`, :yref:`Facet+Sphere<Dem3DofGeom_FacetSphere>` etc.
+	Based on combination of types of :yref:`Shapes<Shape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<ScGeom>`, :yref:`Cylinder+Sphere<CylScGeom>` etc. Note, however, that it is possible to represent many type of contacts with the basic sphere-sphere geometry (for instance in :yref:`Ig2_Wall_Sphere_ScGeom`).
 :yref:`IPhys`
 	representing non-geometrical features of the interaction; some are computed from :yref:`Materials<Material>` of the particles in contact using some averaging algorithm (such as contact stiffness from Young's moduli of particles), others might be internal variables like damage.
 

@@ -86,6 +86,7 @@ class Ip2_FrictMat_FrictMat_MindlinPhys: public IPhysFunctor{
 			((shared_ptr<MatchMaker>,es,,,"Shear coefficient of restitution $e_s$."))
 			((shared_ptr<MatchMaker>,betan,,,"Normal viscous damping coefficient $\\beta_n$."))
 			((shared_ptr<MatchMaker>,betas,,,"Shear viscous damping coefficient $\\beta_s$."))
+			((shared_ptr<MatchMaker>,frictAngle,,,"Instance of :yref:`MatchMaker` determining how to compute the friction angle of an interaction. If ``None``, minimum value is used."))
 	);
 	DECLARE_LOGGER;
 };
