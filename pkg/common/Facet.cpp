@@ -28,7 +28,6 @@ void Facet::postLoad(Facet&)
 	normal = e[0].cross(e[1]);
 	area = .5*normal.norm();
 	normal /= 2*area;
-	//normal.normalize();
 	for(int i=0; i<3; ++i){
 		ne[i]=e[i].cross(normal); ne[i].normalize();
 		vl[i]=vertices[i].norm();

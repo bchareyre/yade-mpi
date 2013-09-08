@@ -7,6 +7,7 @@
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/common/Facet.hpp>
+#include<yade/pkg/dem/Tetra.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/lib/computational-geometry/Hull2d.hpp>
@@ -543,4 +544,11 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("growParticles",Shop::growParticles,(py::args("multiplier"), py::args("updateMass")=true, py::args("dynamicOnly")=true), "Change the size of spheres and sphere clumps by the multiplier. If updateMass=True, then the mass is updated. dynamicOnly=True is mandatory in many cases since in current implementation the function would crash on the non-spherical and non-dynamic bodies (e.g. facets, boxes, etc.)");
 	py::def("intrsOfEachBody",intrsOfEachBody,"returns list of lists of interactions of each body");
 	py::def("numIntrsOfEachBody",numIntrsOfEachBody,"returns list of number of interactions of each body");
+	py::def("TetrahedronSignedVolume",static_cast<Real (*)(const vector<Vector3r>&)>(&TetrahedronSignedVolume),"TODO");
+	py::def("TetrahedronVolume",static_cast<Real (*)(const vector<Vector3r>&)>(&TetrahedronVolume),"TODO");
+	py::def("TetrahedronInertiaTensor",TetrahedronInertiaTensor,"TODO");
+	py::def("TetrahedronCentralInertiaTensor",TetrahedronCentralInertiaTensor,"TODO");
+	py::def("TetrahedronWithLocalAxesPrincipal",TetrahedronWithLocalAxesPrincipal,"TODO");
+	py::def("momentum",Shop::momentum,"TODO");
+	py::def("angularMomentum",Shop::angularMomentum,(py::args("origin")=Vector3r(Vector3r::Zero())),"TODO");
 }

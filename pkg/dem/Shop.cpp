@@ -206,7 +206,8 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 			// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
 			// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
 			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
-			E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
+			//E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
+			E+=.5*state->angVel.transpose().dot((T*mI*T.transpose())*state->angVel);
 		}
 		else { E+=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel));}
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
@@ -214,6 +215,27 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 	}
 	return ret;
 }
+
+Vector3r Shop::momentum() {
+	Vector3r ret = Vector3r::Zero();
+	Scene* scene=Omega::instance().getScene().get();
+	FOREACH(const shared_ptr<Body> b, *scene->bodies){
+		ret += b->state->mass * b->state->vel;
+	}
+	return ret;
+}
+
+Vector3r Shop::angularMomentum(Vector3r origin) {
+	Vector3r ret = Vector3r::Zero();
+	Scene* scene=Omega::instance().getScene().get();
+	Matrix3r T,Iloc;
+	FOREACH(const shared_ptr<Body> b, *scene->bodies){
+		ret += (b->state->pos-origin).cross(b->state->mass * b->state->vel);
+		ret += b->state->angMom;
+	}
+	return ret;
+}
+
 
 shared_ptr<FrictMat> Shop::defaultGranularMat(){
 	shared_ptr<FrictMat> mat(new FrictMat);

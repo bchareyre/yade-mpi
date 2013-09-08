@@ -348,6 +348,37 @@ def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,
 	b.chain=chain
 	return b
 
+def tetra(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
+	"""Create tetrahedron with given parameters.
+
+	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
+	:param bool strictCheck: checks vertices order, raise RuntimeError for negative volume
+
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
+	b=Body()
+	center = .25*sum(vertices,Vector3.Zero)
+	volume = TetrahedronSignedVolume(vertices)
+	if volume < 0:
+		if strictCheck:
+			raise RuntimeError, "tetra: wrong order of vertices"
+		temp = vertices[3]
+		vertices[3] = vertices[2]
+		vertices[2] = temp
+		volume = TetrahedronSignedVolume(vertices)
+	assert(volume>0)
+	b.shape = Tetra(v=vertices,color=color if color else randomColor(),wire=wire,highlight=highlight)
+	# modifies pos, ori and inertia
+	ori = TetrahedronWithLocalAxesPrincipal(b)
+	_commonBodySetup(b,volume,b.state.inertia,material,noBound=noBound,pos=center,fixed=fixed)
+	b.state.ori = b.state.refOri = ori
+	b.aspherical = True
+	b.mask = mask
+	b.chain = chain
+	return b
+
+
+
+
 #def setNewVerticesOfFacet(b,vertices):
 #	center = inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 #	vertices = Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center

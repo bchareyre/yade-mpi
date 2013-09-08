@@ -1,16 +1,23 @@
 // © 2007 Václav Šmilauer <eudoxos@arcig.cz>
+// © 2013 Jan Stránský <jan.stransky@fsv.cvut.cz>
 
 #include"Tetra.hpp"
 
-YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (Bo1_Tetra_Aabb) 
-	/* some code in cpp (this file): */ (TetraVolumetricLaw) (Ig2_Tetra_Tetra_TTetraGeom)
+YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (TTetraSimpleGeom) (Bo1_Tetra_Aabb) 
+	/* some code in cpp (this file): */ (TetraVolumetricLaw) 
+	(Ig2_Tetra_Tetra_TTetraGeom)
+	#ifdef YADE_CGAL
+		(Ig2_Tetra_Tetra_TTetraSimpleGeom)
+	#endif
 	#ifdef YADE_OPENGL
 		(Gl1_Tetra)
 	#endif	
+	(Law2_TTetraSimpleGeom_NormPhys_Simple)
 	);
 
 Tetra::~Tetra(){}
 TTetraGeom::~TTetraGeom(){}
+TTetraSimpleGeom::~TTetraSimpleGeom(){}
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
@@ -19,6 +26,11 @@ TTetraGeom::~TTetraGeom(){}
 #include<yade/pkg/common/ElastMat.hpp>
 
 #include<yade/pkg/common/Aabb.hpp>
+
+#ifdef YADE_CGAL
+	#include <CGAL/intersections.h>
+#endif
+
 
 void Bo1_Tetra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 	Tetra* t=static_cast<Tetra*>(ig.get());
@@ -31,6 +43,569 @@ void Bo1_Tetra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, cons
 		aabb->max=se3.position+Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
 	#undef __VOP
 }
+
+
+
+
+#ifdef YADE_CGAL
+const int Ig2_Tetra_Tetra_TTetraSimpleGeom::psMap[4][3] = { // segments of point
+	{0,2,3},
+	{0,1,4},
+	{1,2,5},
+	{3,4,5}
+};
+
+const int Ig2_Tetra_Tetra_TTetraSimpleGeom::ptMap[4][3] = { // triangles of point
+	{0,1,3},
+	{0,1,2},
+	{1,2,3},
+	{0,2,3}
+};
+
+const int Ig2_Tetra_Tetra_TTetraSimpleGeom::stMap[6][2] = { // triangles of segments
+	{0,1},
+	{1,2},
+	{1,3},
+	{0,3},
+	{0,2},
+	{2,3}
+};
+
+const int Ig2_Tetra_Tetra_TTetraSimpleGeom::ppsMap[4][4] = { // point-point pair to segment
+	{-1, 0, 2, 3},
+	{ 0,-1, 1, 4},
+	{ 2, 1,-1, 5},
+	{ 3, 4, 5,-1}
+};
+
+const int Ig2_Tetra_Tetra_TTetraSimpleGeom::tsMap[4][3] = { // segmnts of triangle
+	{0,3,4},
+	{0,1,2},
+	{1,4,5},
+	{2,3,5}
+};
+
+const int Ig2_Tetra_Tetra_TTetraSimpleGeom::sstMap[6][6] = { // segment-segment pair to triangle
+	{-1, 1, 1, 0, 0,-1},
+	{ 1,-1, 1,-1, 2, 2},
+	{ 1, 1,-1, 3,-1, 3},
+	{ 0,-1, 3,-1, 0, 3},
+	{ 0, 2,-1, 0,-1, 2},
+	{-1, 2, 3, 3, 2,-1}
+};
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkVertexToTriangleCase(
+														const Triangle tA[4],
+														const Point pB[4],
+														const Segment sB[6],
+														Vector3r& normal,
+														Vector3r& contactPoint,
+														Real& penetrationVolume)
+{
+	for (int i=0; i<4; i++) { // loop over triangles 1
+		const Triangle& t = tA[i]; // choose triangle 1
+		for (int j=0; j<4; j++) { // loop over vertices 2
+			const Point& p = pB[j]; // choose vertex 2
+			// choose edges posessing p
+			const Segment& sa = sB[psMap[j][0]];
+			const Segment& sb = sB[psMap[j][1]];
+			const Segment& sc = sB[psMap[j][2]];
+			if ( !(do_intersect(t,sa) && do_intersect(t,sb) && do_intersect(t,sc)) ) { continue; }// if all edges intersect with t
+				// evaluate the points
+			CGAL::Object oa = intersection(t,sa);
+			const Point* pa = CGAL::object_cast<Point>(&oa);
+			CGAL::Object ob = intersection(t,sb);
+			const Point* pb = CGAL::object_cast<Point>(&ob);
+			CGAL::Object oc = intersection(t,sc);
+			const Point* pc = CGAL::object_cast<Point>(&oc);
+			if ( !(pa && pb && pc) ) { continue; } // check that the intrsection really exists
+			Vector_3 n = CGAL::normal(t[0],t[1],t[2]); // normal of triangle
+			for (int k=0; k<3; k++) {
+				normal[k] = n[k]; // sets normal of contact = nornal of triangle
+				// contact point is center of mass of overlaping tetrahedron
+				contactPoint[k] = .25*(p[k]+pa->operator[](k)+pb->operator[](k)+pc->operator[](k));
+			}
+			normal.normalize();
+			const Point* v[4] = {&p,pa,pb,pc};
+			penetrationVolume = TetrahedronVolume(v);
+			Real vol = TetrahedronVolume(pB);
+			if (penetrationVolume > .5*vol) { penetrationVolume = vol-penetrationVolume; }
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToEdgeCase(
+														const Segment sA[6],
+														const Segment sB[6],
+														const Triangle tA[4],
+														const Triangle tB[4],
+														Vector3r& normal,
+														Vector3r& contactPoint,
+														Real& penetrationVolume)
+{
+	for (int i=0; i<6; i++) {
+		const Segment& sa = sA[i];
+		bool b[4];
+		const Triangle& ta0 = tA[stMap[i][0]];
+		const Triangle& ta1 = tA[stMap[i][1]];
+		for (int j=0; j<6; j++) {
+			const Segment sb = sB[j];
+			if ( !(do_intersect(sb,ta0) && do_intersect(sb,ta1) ) ) { continue; }
+			const Triangle tb0 = tB[stMap[j][0]];
+			const Triangle tb1 = tB[stMap[j][1]];
+			if ( !(do_intersect(sa,tb0) && do_intersect(sa,tb1) ) ) { continue; }
+			CGAL::Object osb1 = intersection(sb,ta0);
+			CGAL::Object osb2 = intersection(sb,ta1);
+			CGAL::Object osa1 = intersection(sa,tb0);
+			CGAL::Object osa2 = intersection(sa,tb1);
+			const Point* psb1 = CGAL::object_cast<Point>(&osb1);
+			const Point* psb2 = CGAL::object_cast<Point>(&osb2);
+			const Point* psa1 = CGAL::object_cast<Point>(&osa1);
+			const Point* psa2 = CGAL::object_cast<Point>(&osa2);
+			if ( !(psb1 && psb2 && psa1 && psa2) ) { continue; }
+			Vector_3 n = CGAL::cross_product(sa.to_vector(),sb.to_vector());
+			Vector3r nApprox;
+			for (int k=0; k<3; k++) {
+				normal[k] = n[k];
+				#define OP(p) p->operator[](k)
+				nApprox[k] = .5*(OP(psa1)+OP(psa2)) - .5*(OP(psb1)+OP(psb2));
+				contactPoint[k] = .25*(OP(psa1)+OP(psa2)+OP(psb1)+OP(psb2));
+				#undef OP
+			}
+			if ( nApprox.dot(normal) < 0 ) { normal *= (Real)-1.; }
+			normal.normalize();
+			const Point* p[4] = {psb1,psb2,psa1,psa2};
+			penetrationVolume = TetrahedronVolume(p);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToTriangleCase1( // edge smaller than triangle
+														const Triangle tA[4],
+														const Segment sB[6],
+														const Point pB[6],
+														Vector3r& normal,
+														Vector3r& contactPoint,
+														Real& penetrationVolume)
+{
+	for (int i=0; i<4; i++) {
+		const Triangle& ta = tA[i];
+		int ni = 0;
+		for (int j=0; j<6; j++) {
+			const Segment& s = sB[j];
+			if ( do_intersect(ta,s) ) { ni++; }
+		}
+		if ( ni != 4 ) { continue; }
+		Vector_3 n = CGAL::normal(ta[0],ta[1],ta[2]);
+		for (int j=0; j<3; j++) {
+			const Point& p1 = pB[j];
+			if ( Vector_3(ta[0],p1)*n > 0.) { continue; }
+			const Segment& s10 = sB[psMap[j][0]];
+			const Segment& s11 = sB[psMap[j][1]];
+			const Segment& s12 = sB[psMap[j][2]];
+			bool b10 = do_intersect(ta,s10);
+			bool b11 = do_intersect(ta,s11);
+			bool b12 = do_intersect(ta,s12);
+			if ( !((b10 && b11) || (b11 && b12) || (b12 && b10) ) ) { continue; }
+			for (int k=j+1; k<4; k++) {
+				const Point& p2 = pB[k];
+				if ( Vector_3(ta[0],p2)*n > 0. ) { continue; }
+				const Segment& s20 = sB[psMap[k][0]];
+				const Segment& s21 = sB[psMap[k][1]];
+				const Segment& s22 = sB[psMap[k][2]];
+				bool b20 = do_intersect(ta,s20);
+				bool b21 = do_intersect(ta,s21);
+				bool b22 = do_intersect(ta,s22);
+				if ( !((b20 && b21) || (b21 && b22) || (b22 && b20) ) ) { continue; }
+				int si = ppsMap[j][k];
+				const Segment& sb = sB[si];
+				int l,m;
+				for (l=0; l<3; l++) {
+					if (l!=j && l!=k) { break; }
+				}
+				for (m=l+1; m<4; m++) {
+					if (m!=j && m!=k) { break; }
+				}
+				const Point& p3 = pB[l];
+				const Point& p4 = pB[m];
+				const Segment& s13 = sB[ppsMap[j][l]];
+				const Segment& s14 = sB[ppsMap[j][m]];
+				const Segment& s23 = sB[ppsMap[k][l]];
+				const Segment& s24 = sB[ppsMap[k][m]];
+				CGAL::Object o13 = intersection(ta,s13);
+				CGAL::Object o14 = intersection(ta,s14);
+				CGAL::Object o23 = intersection(ta,s23);
+				CGAL::Object o24 = intersection(ta,s24);
+				const Point* ps13 = CGAL::object_cast<Point>(&o13);
+				const Point* ps14 = CGAL::object_cast<Point>(&o14);
+				const Point* ps23 = CGAL::object_cast<Point>(&o23);
+				const Point* ps24 = CGAL::object_cast<Point>(&o24);
+				if ( !(ps13 && ps14 && ps23 && ps24) ) { continue; }
+				const Point* pp1[4] = {&p1,&p2,ps13,ps14};
+				const Point* pp2[4] = {&p2,ps23,ps24,ps14};
+				const Point* pp3[4] = {&p2,ps23,ps13,ps14};
+				Real v1 = TetrahedronVolume(pp1);
+				Real v2 = TetrahedronVolume(pp2);
+				Real v3 = TetrahedronVolume(pp3);
+				Vector3r cg1,cg2,cg3;
+				for (l=0; l<3; l++) {
+					normal[l] = n[l];
+					#define OP(p) p->operator[](l)
+					cg1[l] = .25*(p1[l]+p2[l]+OP(ps13)+OP(ps14));
+					cg2[l] = .25*(p2[l]+OP(ps23)+OP(ps24)+OP(ps14));
+					cg3[l] = .25*(p2[l]+OP(ps23)+OP(ps13)+OP(ps14));
+					#undef OP
+				}
+				penetrationVolume = v1 + v2 + v3;
+				contactPoint = (v1*cg1 + v2*cg2 + v3*cg3) / penetrationVolume;
+				normal.normalize();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToTriangleCase2( // edge larger than triangle
+														const Triangle tA[4],
+														const Triangle tB[4],
+														const Segment sA[6],
+														const Segment sB[6],
+														Vector3r& normal,
+														Vector3r& contactPoint,
+														Real& penetrationVolume)
+{
+
+	for (int i=0; i<6; i++) {
+		const Segment& sb = sB[i];
+		int ni = 0;
+		for (int j=0; j<4; j++) {
+			const Triangle& t = tA[j];
+			if ( do_intersect(t,sb) ) { ni++; }
+		}
+		if ( ni != 2 ) { continue; }
+		for (int j=0; j<3; j++) {
+			const Triangle& ta1 = tA[j];
+			if ( !(do_intersect(ta1,sb) ) ) { continue; }
+			for (int k=j+1; k<4; k++) {
+				const Triangle& ta2 = tA[k];
+				if ( !(do_intersect(ta2,sb) ) ) { continue; }
+				const Triangle& tb1 = tB[stMap[i][0]];
+				const Triangle& tb2 = tB[stMap[i][1]];
+				const Segment& sa1a = sA[tsMap[j][0]];
+				const Segment& sa1b = sA[tsMap[j][1]];
+				const Segment& sa1c = sA[tsMap[j][2]];
+				bool b1a = do_intersect(sa1a,tb1) && do_intersect(sa1a,tb2);
+				bool b1b = do_intersect(sa1b,tb1) && do_intersect(sa1b,tb2);
+				bool b1c = do_intersect(sa1c,tb1) && do_intersect(sa1c,tb2);
+				if ( !(b1a || b1b || b1c) ) { continue; }
+				const Segment& sa2a = sA[tsMap[k][0]];
+				const Segment& sa2b = sA[tsMap[k][1]];
+				const Segment& sa2c = sA[tsMap[k][2]];
+				bool b2a = do_intersect(sa2a,tb1) && do_intersect(sa2a,tb2);
+				bool b2b = do_intersect(sa2b,tb1) && do_intersect(sa2b,tb2);
+				bool b2c = do_intersect(sa2c,tb1) && do_intersect(sa2c,tb2);
+				if ( !(b2a || b2b || b2c) ) { continue; } 
+				int l = b1a? tsMap[j][0] : b1b? tsMap[j][1] : tsMap[j][2];
+				int m = b2a? tsMap[k][0] : b2b? tsMap[k][1] : tsMap[k][2];
+				const Segment& sa1 = sA[l];
+				const Segment& sa2 = sA[m];
+				const Triangle& taN = tA[sstMap[l][m]];
+				CGAL::Object o1  = intersection(sb,ta1);
+				CGAL::Object o2  = intersection(sb,ta2);
+				CGAL::Object o11 = intersection(sa1,tb1);
+				CGAL::Object o12 = intersection(sa1,tb2);
+				CGAL::Object o21 = intersection(sa2,tb1);
+				CGAL::Object o22 = intersection(sa2,tb2);
+				const Point* p1  = CGAL::object_cast<Point>(&o1);
+				const Point* p2  = CGAL::object_cast<Point>(&o2);
+				const Point* p11 = CGAL::object_cast<Point>(&o11);
+				const Point* p12 = CGAL::object_cast<Point>(&o12);
+				const Point* p21 = CGAL::object_cast<Point>(&o21);
+				const Point* p22 = CGAL::object_cast<Point>(&o22);
+				if ( !(p1 && p2 && p11 && p12 && p21 && p22) ) { continue; }
+				const Point* pp1[4] = {p1,p2,p11,p12};
+				const Point* pp2[4] = {p2,p21,p22,p12};
+				const Point* pp3[4] = {p2,p21,p11,p12};
+				Real v1 = TetrahedronVolume(pp1);
+				Real v2 = TetrahedronVolume(pp2);
+				Real v3 = TetrahedronVolume(pp3);
+				Vector3r cg1,cg2,cg3;
+				Vector_3 n = CGAL::normal(taN[0],taN[1],taN[2]);
+				for (int l=0; l<3; l++) {
+					normal[l] = n[l];
+					#define OP(p) p->operator[](l)
+					cg1[l] = .25*(OP(p1)+OP(p2)+OP(p11)+OP(p12));
+					cg2[l] = .25*(OP(p2)+OP(p21)+OP(p22)+OP(p12));
+					cg3[l] = .25*(OP(p2)+OP(p21)+OP(p11)+OP(p12));
+					#undef OP
+				}
+				penetrationVolume = v1 + v2 + v3;
+				contactPoint = (v1*cg1 + v2*cg2 + v3*cg3) / penetrationVolume;
+				normal.normalize();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkVertexToEdgeCase(
+														const Point pA[4],
+														const Segment sA[6],
+														const Triangle tA[4],
+														const Segment sB[6],
+														const Triangle tB[4],
+														Vector3r& normal,
+														Vector3r& contactPoint,
+														Real& penetrationVolume)
+{
+	for (int i=0; i<4; i++) {
+		const Point& pa = pA[i];
+		if ( Vector_3(tB[0][0],pa)*CGAL::normal(tB[0][0],tB[0][1],tB[0][2]) > 0. ) { continue; }
+		if ( Vector_3(tB[1][0],pa)*CGAL::normal(tB[1][0],tB[1][1],tB[1][2]) > 0. ) { continue; }
+		if ( Vector_3(tB[2][0],pa)*CGAL::normal(tB[2][0],tB[2][1],tB[2][2]) > 0. ) { continue; }
+		if ( Vector_3(tB[3][0],pa)*CGAL::normal(tB[3][0],tB[3][1],tB[3][2]) > 0. ) { continue; }
+		const Segment& sa1 = sA[psMap[i][0]];
+		const Segment& sa2 = sA[psMap[i][1]];
+		const Segment& sa3 = sA[psMap[i][2]];
+		for (int j=0; j<6; j++) {
+			const Segment& sb = sB[j];
+			const Triangle& tb1 = tB[stMap[j][0]];
+			const Triangle& tb2 = tB[stMap[j][1]];
+			const Triangle& ta1 = tA[ptMap[i][0]];
+			const Triangle& ta2 = tA[ptMap[i][1]];
+			const Triangle& ta3 = tA[ptMap[i][2]];
+			bool bsa1tb1 = do_intersect(sa1,tb1);
+			bool bsa1tb2 = do_intersect(sa1,tb2);
+			bool bsa2tb1 = do_intersect(sa2,tb1);
+			bool bsa2tb2 = do_intersect(sa2,tb2);
+			bool bsa3tb1 = do_intersect(sa3,tb1);
+			bool bsa3tb2 = do_intersect(sa3,tb2);
+			bool bsbta1 = do_intersect(sb,ta1);
+			bool bsbta2 = do_intersect(sb,ta2);
+			bool bsbta3 = do_intersect(sb,ta3);
+			if ( !( (bsa1tb1 || bsa1tb2) && (bsa2tb1 || bsa2tb2) && (bsa3tb1 || bsa3tb2) && ((bsbta1 && bsbta2) || (bsbta2 && bsbta3) || (bsbta3 && bsbta1)) ) ) { continue; }
+			CGAL::Object oa1 = intersection(sa1,bsa1tb1? tb1 : tb2);
+			CGAL::Object oa2 = intersection(sa2,bsa2tb1? tb1 : tb2);
+			CGAL::Object oa3 = intersection(sa3,bsa3tb1? tb1 : tb2);
+			CGAL::Object ob1 = intersection(sb, (bsbta1 && bsbta2)? ta1 : (bsbta2 && bsbta3)? ta2 : ta3);
+			CGAL::Object ob2 = intersection(sb, (bsbta1 && bsbta2)? ta2 : (bsbta2 && bsbta3)? ta3 : ta1);
+			const Point* pa1 = CGAL::object_cast<Point>(&oa1);
+			const Point* pa2 = CGAL::object_cast<Point>(&oa2);
+			const Point* pa3 = CGAL::object_cast<Point>(&oa3);
+			const Point* pb1 = CGAL::object_cast<Point>(&ob1);
+			const Point* pb2 = CGAL::object_cast<Point>(&ob2);
+			if ( !(pa1 && pa2 && pa3 && pb1 && pb2) ) { continue; }
+			Segment sa(*pa1,*pa2);
+			Real d1 = sqrt(CGAL::squared_distance(sa,*pb1));
+			Real d2 = sqrt(CGAL::squared_distance(sa,*pb2));
+			const Point* ppb1 = d1<d2? pb1 : pb2;
+			const Point* ppb2 = d1<d2? pb2 : pb1;
+			const Point* pp1[4] = {&pa,pa1,pa2,pa3};
+			const Point* pp2[4] = {pa1,pa2,pa3,ppb2};
+			const Point* pp3[4] = {pa1,pa2,ppb1,ppb2};
+			Real v1 = TetrahedronVolume(pp1);
+			Real v2 = TetrahedronVolume(pp2);
+			Real v3 = TetrahedronVolume(pp3);
+			Vector3r cg1,cg2,cg3;
+			Vector_3 n(pa,sb.supporting_line().projection(pa));
+			for (int l=0; l<3; l++) {
+				normal[l] = n[l];
+				#define OP(p) p->operator[](l)
+				cg1[l] = .25*(pa[l]+OP(pa1)+OP(pa2)+OP(pa3));
+				cg2[l] = .25*(OP(pa1)+OP(pa2)+OP(pa3)+OP(ppb2));
+				cg3[l] = .25*(OP(pa1)+OP(pa2)+OP(ppb1)+OP(ppb2));
+				#undef OP
+			}
+			penetrationVolume = v1 + v2 + v3;
+			contactPoint = (v1*cg1 + v2*cg2 + v3*cg3) / penetrationVolume;
+			normal.normalize();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkVertexToVertexCase(
+														const Point pA[4],
+														const Point pB[4],
+														const Segment sA[6],
+														const Triangle tA[4],
+														const Triangle tB[4],
+														Vector3r& normal,
+														Vector3r& contactPoint,
+														Real& penetrationVolume)
+{
+	for (int i=0; i<4; i++) {
+		const Point& pa = pA[i];
+		if ( Vector_3(tB[0][0],pa)*CGAL::normal(tB[0][0],tB[0][1],tB[0][2]) > 0. ) { continue; }
+		if ( Vector_3(tB[1][0],pa)*CGAL::normal(tB[1][0],tB[1][1],tB[1][2]) > 0. ) { continue; }
+		if ( Vector_3(tB[2][0],pa)*CGAL::normal(tB[2][0],tB[2][1],tB[2][2]) > 0. ) { continue; }
+		if ( Vector_3(tB[3][0],pa)*CGAL::normal(tB[3][0],tB[3][1],tB[3][2]) > 0. ) { continue; }
+		const Segment& sa1 = sA[psMap[i][0]];
+		const Segment& sa2 = sA[psMap[i][1]];
+		const Segment& sa3 = sA[psMap[i][2]];
+		for (int j=0; j<4; j++) {
+			const Point& pb = pB[j];
+			if ( Vector_3(tA[0][0],pb)*CGAL::normal(tA[0][0],tA[0][1],tA[0][2]) > 0. ) { continue; }
+			if ( Vector_3(tA[1][0],pb)*CGAL::normal(tA[1][0],tA[1][1],tA[1][2]) > 0. ) { continue; }
+			if ( Vector_3(tA[2][0],pb)*CGAL::normal(tA[2][0],tA[2][1],tA[2][2]) > 0. ) { continue; }
+			if ( Vector_3(tA[3][0],pb)*CGAL::normal(tA[3][0],tB[3][1],tB[3][2]) > 0. ) { continue; }
+			const Triangle& tb1 = tB[ptMap[j][0]];
+			const Triangle& tb2 = tB[ptMap[j][1]];
+			const Triangle& tb3 = tB[ptMap[j][2]];
+			bool b11 = do_intersect(sa1,tb1);
+			bool b12 = do_intersect(sa1,tb2);
+			bool b13 = do_intersect(sa1,tb3);
+			bool b21 = do_intersect(sa2,tb1);
+			bool b22 = do_intersect(sa2,tb2);
+			bool b23 = do_intersect(sa2,tb3);
+			bool b31 = do_intersect(sa3,tb1);
+			bool b32 = do_intersect(sa3,tb2);
+			bool b33 = do_intersect(sa3,tb3);
+			if ( !(b11 || b12 || b13) && (b21 || b22 || b23) && (b31 || b32 || b33) ) { continue; }
+			CGAL::Object o1 = intersection(sa1, b11? tb1: b12? tb2 : tb3);
+			CGAL::Object o2 = intersection(sa2, b21? tb1: b22? tb2 : tb3);
+			CGAL::Object o3 = intersection(sa3, b31? tb1: b32? tb2 : tb3);
+			const Point* p1 = CGAL::object_cast<Point>(&o1);
+			const Point* p2 = CGAL::object_cast<Point>(&o2);
+			const Point* p3 = CGAL::object_cast<Point>(&o3);
+			if ( !(p1 && p2 && p3) ) { continue; }
+			const Point* pp1[4] = {&pa,p1,p2,p3};
+			const Point* pp2[4] = {&pb,p2,p3,p3};
+			Real v1 = TetrahedronVolume(pp1);
+			Real v2 = TetrahedronVolume(pp2);
+			Vector3r cg1,cg2;
+			Vector_3 n(pa,pb);
+			for (int l=0; l<3; l++) {
+				normal[l] = n[l];
+				#define OP(p) p->operator[](l)
+				cg1[l] = .25*(pa[l]+OP(p1)+OP(p2)+OP(p3));
+				cg2[l] = .25*(pb[l]+OP(p1)+OP(p2)+OP(p3));
+				#undef OP
+			}
+			penetrationVolume = v1 + v2;
+			contactPoint = (v1*cg1 + v2*cg2) / penetrationVolume;
+			normal.normalize();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Ig2_Tetra_Tetra_TTetraSimpleGeom::go(
+														const shared_ptr<Shape>& cm1,
+														const shared_ptr<Shape>& cm2,
+														const State& state1,
+														const State& state2,
+														const Vector3r& shift2,
+														const bool& force,
+														const shared_ptr<Interaction>& interaction)
+{
+	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
+	Tetra* shape1 = static_cast<Tetra*>(cm1.get());
+	Tetra* shape2 = static_cast<Tetra*>(cm2.get());
+
+	Point p1[4], p2[4];
+	Vector3r vTemp;
+	// vertices in global coordinates
+	for (int i=0; i<4; i++) {
+		vTemp = se31.position + se31.orientation*shape1->v[i];
+		p1[i] = Point(vTemp[0],vTemp[1],vTemp[2]);
+		vTemp = se32.position + se32.orientation*shape2->v[i];
+		p2[i] = Point(vTemp[0],vTemp[1],vTemp[2]);
+	}
+
+	// Faces (CGAL triangles) of each tetra
+	#define T(p,i,j,k) Triangle(p[i],p[j],p[k])
+	const Triangle t1[4] = {T(p1,0,1,3),T(p1,0,2,1),T(p1,1,2,3),T(p1,0,3,2)};
+	const Triangle t2[4] = {T(p2,0,1,3),T(p2,0,2,1),T(p2,1,2,3),T(p2,0,3,2)};
+	#undef T
+	// Edges (CGAL segments) of each tetra
+	#define S(p,i,j) Segment(p[i],p[j])
+	const Segment s1[6] = {S(p1,0,1),S(p1,1,2),S(p1,0,2),S(p1,0,3),S(p1,1,3),S(p1,2,3)};
+	const Segment s2[6] = {S(p2,0,1),S(p2,1,2),S(p2,0,2),S(p2,0,3),S(p2,1,3),S(p2,2,3)};
+	#undef S
+
+	Vector3r n;
+	Vector3r cp;
+	Real V;
+	int flag;
+
+	# define SET_GEOM_AND_RETURN_TRUE \
+		shared_ptr<TTetraSimpleGeom> geom; \
+		if (!interaction->geom) geom=shared_ptr<TTetraSimpleGeom>(new TTetraSimpleGeom()); \
+		else geom=YADE_PTR_CAST<TTetraSimpleGeom>(interaction->geom); \
+		interaction->geom=geom; \
+		geom->normal = n; \
+		geom->contactPoint = cp; \
+		geom->penetrationVolume = V; \
+		geom->flag = flag; \
+		return true;
+
+	if (checkVertexToTriangleCase(t1,p2,s2,n,cp,V)) {
+		flag = 1;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkVertexToTriangleCase(t2,p1,s1,n,cp,V)) {
+		n *= -1.;
+		flag = 2;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkEdgeToEdgeCase(s1,s2,t1,t2,n,cp,V)) {
+		flag = 3;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkEdgeToTriangleCase1(t1,s2,p2,n,cp,V)) {
+		flag = 4;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkEdgeToTriangleCase1(t2,s1,p1,n,cp,V)) {
+		n *= -1.;
+		flag = 5;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkEdgeToTriangleCase2(t1,t2,s1,s2,n,cp,V)) {
+		flag = 6;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkEdgeToTriangleCase2(t2,t1,s2,s1,n,cp,V)) {
+		n *= -1.;
+		flag = 7;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkVertexToEdgeCase(p1,s1,t1,s2,t2,n,cp,V)) {
+		n *= -1.;
+		flag = 8;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+	if (checkVertexToEdgeCase(p2,s2,t2,s1,t1,n,cp,V)) {
+		flag = 9;
+		SET_GEOM_AND_RETURN_TRUE
+	}
+
+	#undef SET_GEOM_AND_RETURN_TRUE
+	
+	if (interaction->geom) {
+		TTetraSimpleGeom* geom = static_cast<TTetraSimpleGeom*>(interaction->geom.get());
+		geom->penetrationVolume = (Real)-1.;
+		geom->flag = 0;
+		return true;
+	}
+	return false;
+}
+#endif
+
+
+
+
+
+
 
 CREATE_LOGGER(Ig2_Tetra_Tetra_TTetraGeom);
 
@@ -107,7 +682,9 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 		tA=Tetra(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
 	#endif
 	list<Tetra> tAB=Tetra2TetraIntersection(tA,tB);
-	if(tAB.size()==0) { /* LOG_DEBUG("No intersection."); */ return false;} //no intersecting volume
+	if (!interaction->isReal() && !force) {
+		if(tAB.size()==0) { /* LOG_DEBUG("No intersection."); */ return false;} //no intersecting volume
+	}
 
 	Real V(0); // volume of intersection (cummulative)
 	Vector3r Sg(0,0,0); // static moment of intersection
@@ -185,6 +762,8 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	Real maxPenetrationDepthA=sqrt(6*(IA(ix,ix)+IA(ixx,ixx)-IA(ixxx,ixxx))/V);
 	Real maxPenetrationDepthB=sqrt(6*(IB(ix,ix)+IB(ixx,ixx)-IB(ixxx,ixxx))/V);
 	TRVAR2(maxPenetrationDepthA,maxPenetrationDepthB);
+
+	//normal = se32.position - se31.position; normal.normalize();
 
 	/* store calculated stuff in bang; some is redundant */
 	bang->normal=normal;
@@ -367,6 +946,7 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const V
 	return(ret); // prevent warning
 }
 
+
 CREATE_LOGGER(TetraVolumetricLaw);
 
 /*! Apply forces on tetrahedra in collision based on geometric configuration provided by Ig2_Tetra_Tetra_TTetraGeom.
@@ -413,12 +993,13 @@ void TetraVolumetricLaw::action()
 
 #ifdef YADE_OPENGL
 	#include<yade/lib/opengl/OpenGLWrapper.hpp>
-	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
+	bool Gl1_Tetra::wire;
+	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3r(cm->color[0],cm->color[1],cm->color[2]));
 		glColor3v(cm->color);
 		Tetra* t=static_cast<Tetra*>(cm.get());
-		if (0) { // wireframe, as for Tetrahedron
+		if (wire && wire2) { // wireframe, as for Tetrahedron
 			glDisable(GL_LIGHTING);
 			glBegin(GL_LINES);
 				#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
@@ -432,10 +1013,10 @@ void TetraVolumetricLaw::action()
 			glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
 				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]); n.normalize(); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
-					__ONEFACE(3,0,1);
-					__ONEFACE(0,1,2);
+					__ONEFACE(0,2,1);
+					__ONEFACE(0,1,3);
 					__ONEFACE(1,2,3);
-					__ONEFACE(2,3,0);
+					__ONEFACE(0,3,2);
 				#undef __ONEFACE
 			glEnd();
 		}
@@ -599,6 +1180,47 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 }
 
 
-Real TetrahedronVolume(const Vector3r v[4]) { return fabs((Vector3r(v[3])-Vector3r(v[0])).dot((Vector3r(v[3])-Vector3r(v[1])).cross(Vector3r(v[3])-Vector3r(v[2]))))/6.; }
-Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(Vector3r(v[1]-v[0]).dot(Vector3r(v[2]-v[0]).cross(v[3]-v[0])))/6.; }
+
+
+Real TetrahedronSignedVolume(const Vector3r v[4]) { return (Vector3r(v[3])-Vector3r(v[0])).dot((Vector3r(v[3])-Vector3r(v[1])).cross(Vector3r(v[3])-Vector3r(v[2])))/6.; }
+Real TetrahedronVolume(const Vector3r v[4]) { return fabs(TetrahedronSignedVolume(v)); }
+Real TetrahedronSignedVolume(const vector<Vector3r>& v) { return Vector3r(v[1]-v[0]).dot(Vector3r(v[2]-v[0]).cross(v[3]-v[0]))/6.; }
+Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(TetrahedronSignedVolume(v)); }
+Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> >* v[4]) {
+	Vector3r vv[4];
+	for (int i=0; i<4; i++) {
+		for (int j=0; j<3; j++) {
+			vv[i][j] = v[i]->operator[](j);
+		}
+	}
+	return TetrahedronVolume(vv);
+}
+Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> > v[4]) {
+	Vector3r vv[4];
+	for (int i=0; i<4; i++) {
+		for (int j=0; j<3; j++) {
+			vv[i][j] = v[i][j];
+		}
+	}
+	return TetrahedronVolume(vv);
+}
+
+
+
+void Law2_TTetraSimpleGeom_NormPhys_Simple::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+	int id1 = contact->getId1(), id2 = contact->getId2();
+	TTetraSimpleGeom* geom= static_cast<TTetraSimpleGeom*>(ig.get());
+	NormPhys* phys = static_cast<NormPhys*>(ip.get());
+	if ( geom->flag == 0 || geom->penetrationVolume <= 0. ) {
+		scene->interactions->requestErase(contact);
+		return;
+	}
+	Real& un=geom->penetrationVolume;
+	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
+
+	State* de1 = Body::byId(id1,scene)->state.get();
+	State* de2 = Body::byId(id2,scene)->state.get();
+	applyForceAtContactPoint(-phys->normalForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
+	// TODO periodic
+}
 

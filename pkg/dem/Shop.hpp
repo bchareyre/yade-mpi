@@ -84,6 +84,10 @@ class Shop{
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, Scene* _rb=NULL);
 		static Real kineticEnergy(Scene* _rb=NULL, Body::id_t* maxId=NULL);
+		//! get total momentum of current simulation
+		static Vector3r momentum();
+		//! get total angular momentum of current simulation
+		static Vector3r angularMomentum(Vector3r origin = Vector3r::Zero());
 
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 
