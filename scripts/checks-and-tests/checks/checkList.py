@@ -5,8 +5,11 @@ import yade,math,os,sys
 scriptsToRun=os.listdir(checksPath)
 resultStatus = 0
 nFailed=0
+
+skipScripts = ['checkList.py']
+
 for script in scriptsToRun:
-	if (script[len(script)-3:]==".py" and not(script=="checkList.py")):
+	if (script[len(script)-3:]==".py" and script not in skipScripts):
 		try:
 	 		print "###################################"
 			print "running: ",script
