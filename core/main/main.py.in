@@ -248,6 +248,7 @@ if gui:
 		# usually Xlib.error.DisplayError, but there can be Xlib.error.XauthError etc as well
 		# let's just pretend any exception means the display would not work
 		gui=None
+		print 'Warning: no X rendering available (see https://bbs.archlinux.org/viewtopic.php?id=13189)'
 
 # run remote access things, before actually starting the user session (not while imported by other python application)
 if __name__ == "__main__":
