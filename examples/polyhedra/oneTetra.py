@@ -1,6 +1,6 @@
 ################################################################################
 # 
-# Script to test tetra gl functions and prescribe dmotion
+# Script to test tetra gl functions and prescribed motion
 #
 ################################################################################
 v1 = (0,0,0)
@@ -29,6 +29,7 @@ O.engines = [
 	NewtonIntegrator(),
 	PyRunner(iterPeriod=1,command="changeVelocity()"),
 ]
+O.step()
 
 
 try:

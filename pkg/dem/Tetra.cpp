@@ -3,22 +3,6 @@
 
 #include"Tetra.hpp"
 
-YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (TTetraSimpleGeom) (Bo1_Tetra_Aabb) 
-	/* some code in cpp (this file): */ (TetraVolumetricLaw) 
-	(Ig2_Tetra_Tetra_TTetraGeom)
-	#ifdef YADE_CGAL
-		(Ig2_Tetra_Tetra_TTetraSimpleGeom)
-	#endif
-	#ifdef YADE_OPENGL
-		(Gl1_Tetra)
-	#endif	
-	(Law2_TTetraSimpleGeom_NormPhys_Simple)
-	);
-
-Tetra::~Tetra(){}
-TTetraGeom::~TTetraGeom(){}
-TTetraSimpleGeom::~TTetraSimpleGeom(){}
-
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
@@ -30,6 +14,23 @@ TTetraSimpleGeom::~TTetraSimpleGeom(){}
 #ifdef YADE_CGAL
 	#include <CGAL/intersections.h>
 #endif
+
+YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (TTetraSimpleGeom) (Bo1_Tetra_Aabb) 
+	/* some code in cpp (this file): */ (TetraVolumetricLaw) 
+	(Ig2_Tetra_Tetra_TTetraGeom)
+	#ifdef YADE_CGAL
+		(Ig2_Tetra_Tetra_TTetraSimpleGeom)
+		(Law2_TTetraSimpleGeom_NormPhys_Simple)
+	#endif
+	#ifdef YADE_OPENGL
+		(Gl1_Tetra)
+	#endif	
+	);
+
+Tetra::~Tetra(){}
+TTetraGeom::~TTetraGeom(){}
+TTetraSimpleGeom::~TTetraSimpleGeom(){}
+
 
 
 void Bo1_Tetra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
@@ -1186,6 +1187,7 @@ Real TetrahedronSignedVolume(const Vector3r v[4]) { return (Vector3r(v[3])-Vecto
 Real TetrahedronVolume(const Vector3r v[4]) { return fabs(TetrahedronSignedVolume(v)); }
 Real TetrahedronSignedVolume(const vector<Vector3r>& v) { return Vector3r(v[1]-v[0]).dot(Vector3r(v[2]-v[0]).cross(v[3]-v[0]))/6.; }
 Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(TetrahedronSignedVolume(v)); }
+#ifdef YADE_CGAL
 Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> >* v[4]) {
 	Vector3r vv[4];
 	for (int i=0; i<4; i++) {
@@ -1204,9 +1206,11 @@ Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> > v[4]) {
 	}
 	return TetrahedronVolume(vv);
 }
+#endif
 
 
 
+#ifdef YADE_CGAL
 void Law2_TTetraSimpleGeom_NormPhys_Simple::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 	TTetraSimpleGeom* geom= static_cast<TTetraSimpleGeom*>(ig.get());
@@ -1223,4 +1227,5 @@ void Law2_TTetraSimpleGeom_NormPhys_Simple::go(shared_ptr<IGeom>& ig, shared_ptr
 	applyForceAtContactPoint(-phys->normalForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
 	// TODO periodic
 }
+#endif
 

@@ -954,3 +954,76 @@ class clumpTemplate:
 		self.numCM = len(relRadii)
 		self.relRadii = relRadii
 		self.relPositions = relPositions
+
+class UnstructuredGrid:
+	"""EXPERIMENTAL. TODO docs
+	"""
+	def __init__(self,vertices={},connectivityTable={},**kw):
+		self.vertices = vertices
+		self.connectivityTable = connectivityTable
+		self.forces = dict( (i,Vector3(0,0,0)) for i in vertices)
+		self.build(**kw)
+	def setup(self,vertices,connectivityTable,toSimulation=False,**kw):
+		self.vertices = dict( (i,v) for i,v in vertices.iteritems())
+		self.connectivityTable = dict( (i,e) for i,e in connectivityTable.iteritems())
+		self.build(**kw)
+		if toSimulation:
+			self.toSimulation()
+	def build(self,**kw):
+		self.elements = {}
+		for i,c in self.connectivityTable.iteritems():
+			if len(c) == 3:
+				b = facet([self.vertices[j] for j in c],**kw)
+			elif len(c) == 4:
+				b = tetra([self.vertices[j] for j in c],**kw)
+			else:
+				raise RuntimeError, "TODO"
+			self.elements[i] = b
+	def resetForces(self):
+		for i in self.vertices:
+			self.forces[i] = Vector3(0,0,0)
+	def getForcesOfNodes(self):
+		self.resetForces()
+		for i,e in self.elements.iteritems():
+			ie = self.connectivityTable[i]
+			for i in e.intrs():
+				fn = i.phys.normalForce
+				fs = i.phys.shearForce if hasattr(i.phys,"shearForce") else Vector3.Zero
+				f = (fn+fs) * (-1 if e.id == i.id1 else +1 if e.id == i.id2 else 'ERROR')
+				cp = i.geom.contactPoint
+				if isinstance(e.shape,Facet):
+					v0,v1,v2 = [Vector3(self.vertices[j]) for j in ie]
+					w0 = ((cp-v1).cross(v2-v1)).norm()
+					w1 = ((cp-v2).cross(v0-v2)).norm()
+					w2 = ((cp-v0).cross(v1-v0)).norm()
+					ww = w0+w1+w2
+					self.forces[ie[0]] += f*w0/ww
+					self.forces[ie[1]] += f*w1/ww
+					self.forces[ie[2]] += f*w2/ww
+				elif isinstance(e.shape,Tetra):
+					v0,v1,v2,v3 = [Vector3(self.vertices[j]) for j in ie]
+					w0 = TetrahedronVolume((cp,v1,v2,v3))
+					w1 = TetrahedronVolume((cp,v2,v3,v0))
+					w2 = TetrahedronVolume((cp,v3,v0,v1))
+					w3 = TetrahedronVolume((cp,v0,v1,v2))
+					ww = w0+w1+w2+w3
+					self.forces[ie[0]] += f*w0/ww
+					self.forces[ie[1]] += f*w1/ww
+					self.forces[ie[2]] += f*w2/ww
+					self.forces[ie[3]] += f*w3/ww
+		return self.forces
+	def setPositionsOfNodes(self,newPoss):
+		for i in self.vertices:
+			self.vertices[i] = newPoss[i]
+		self.updateElements()
+	def updateElements(self):
+		for i,c in self.connectivityTable.iteritems():
+			e = self.elements[i]
+			e.state.pos = Vector3(0,0,0)
+			e.state.ori = Quaternion((1,0,0),0)
+			if isinstance(e.shape,Facet):
+				e.shape.vertices = [self.vertices[j] for j in c]
+			elif isinstance(e.shape,Tetra):
+				e.shape.v = [self.vertices[j] for j in c]
+	def toSimulation(self):
+		O.bodies.append(self.elements.values())

@@ -165,7 +165,6 @@ class Ig2_Tetra_Tetra_TTetraSimpleGeom: public IGeomFunctor
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ig2_Tetra_Tetra_TTetraSimpleGeom);
-#endif
 
 
 
@@ -178,6 +177,7 @@ class Law2_TTetraSimpleGeom_NormPhys_Simple: public LawFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_TTetraSimpleGeom_NormPhys_Simple);
+#endif
 
 
 
