@@ -4,6 +4,7 @@
 # module documentation
 #
 import sys,os,os.path
+
 outDir=sys.argv[2] if len(sys.argv)>2 else '_build'
 for d in (outDir,outDir+'/latex',outDir+'/html'):
 	if not os.path.exists(d):
@@ -34,7 +35,7 @@ yade.%s module
 #
 # don't forget to put the module in index.rst as well!
 #
-mods={'export':[],'eudoxos':['_eudoxos'],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[]}
+mods={'export':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb'],'plot':[],'timing':[],'utils':['_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[]}
 #
 # generate documentation, in alphabetical order
 mm=mods.keys(); mm.sort()
@@ -110,7 +111,8 @@ def genWrapperRst():
 	global docClasses
 	docClasses=set() # reset globals
 	wrapper=file('yade.wrapper.rst','w')
-	wrapper.write(""".. _yade.wrapper
+	wrapper.write(""".. _yade.wrapper::
+
 Class reference (yade.wrapper module)
 =======================================
 
