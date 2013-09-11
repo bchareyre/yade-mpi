@@ -247,7 +247,7 @@ Sphinx documentation
 ^^^^^^^^^^^^^^^^^^^^^
 Most c++ classes are wrapped in Python, which provides good introspection and interactive documentation (try writing ``Material?`` in the ipython prompt; or ``help(CpmState)``).
 
-Syntax of documentation is `ReST <http://docutils.sourceforge.net/rst.html`__ (reStructuredText, see `reStructuredText Primer <http://sphinx.pocoo.org/rest.html>`__). It is the same for c++ and python code.
+Syntax of documentation is `ReST <http://docutils.sourceforge.net/rst.html>`__ (reStructuredText, see `reStructuredText Primer <http://sphinx.pocoo.org/rest.html>`__). It is the same for c++ and python code.
 
 * Documentation of c++ classes exposed to python is given as 3rd argument to :ref:`YADE_CLASS_BASE_DOC` introduced below.
 
