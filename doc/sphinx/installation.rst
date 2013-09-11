@@ -106,7 +106,11 @@ Yade relies on a number of external software to run; its installation is checked
 * `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 
-Most of the list above is very likely already packaged for your distribution. 
+Most of the list above is very likely already packaged for your distribution. In case you are confronted
+with some errors concerning not available packages (e.g. Package libmetis-dev is not available) it may be necessary 
+to add yade external ppa from https://launchpad.net/~yade-users/+archive/external::
+	sudo add-apt-repository ppa:yade-users/external 
+	sudo apt-get update 
 The following commands have to be executed in command line of corresponding 
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
