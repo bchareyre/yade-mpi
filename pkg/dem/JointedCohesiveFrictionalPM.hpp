@@ -77,11 +77,11 @@ class Ip2_JCFpmMat_JCFpmMat_JCFpmPhys: public IPhysFunctor{
 		
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_JCFpmMat_JCFpmMat_JCFpmPhys,IPhysFunctor,"converts 2 JCFpmMat instances to JCFpmPhys with corresponding parameters.",
 			((int,cohesiveTresholdIteration,1,,"should new contacts be cohesive? They will before this iter, they won't afterward."))
-			((Real,alpha,0.,,"defines the shear to normal stiffness ratio ks/kn."))
+			((Real,alpha,0.,,"defines the shear to normal stiffness ratio ks/kn in the matrix."))
 			((Real,tensileStrength,0.,,"defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection in the matrix. [Pa]"))
 			((Real,cohesion,0.,,"defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection in the matrix. [Pa]"))
-			((Real,jointNormalStiffness,0.,,"defines the normal stiffness on the joint surface. "))
-			((Real,jointShearStiffness,0.,,"defines the shear stiffness on the joint surface."))
+			((Real,jointNormalStiffness,0.,,"defines the normal stiffness on the joint surface. [Pa]"))
+			((Real,jointShearStiffness,0.,,"defines the shear stiffness on the joint surface. [Pa]"))
 			((Real,jointTensileStrength,0.,,"defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection on the joint surface. [Pa]"))
 			((Real,jointCohesion,0.,,"defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection on the joint surface. [Pa]"))
 			((Real,jointFrictionAngle,-1,,"defines Coulomb friction on the joint surface. [rad]"))

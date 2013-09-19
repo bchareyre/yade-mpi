@@ -286,7 +286,8 @@ def regularHexa(predicate,radius,gap,**kw):
 	return ret
 
 def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
-	"""Using given SpherePack instance, return spheres the satisfy predicate.
+	"""Using given SpherePack instance, return spheres that satisfy predicate.
+	It returns either a :yref:`yade._packSpheres.SpherePack` (if returnSpherePack) or a list.
 	The packing will be recentered to match the predicate and warning is given if the predicate
 	is larger than the packing."""
 	if returnSpherePack==None:
@@ -386,7 +387,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 	:param predicate: solid-defining predicate for which we generate packing
 	:param spheresInCell: if given, the packing will be periodic, with given number of spheres in the periodic cell.
 	:param radius: mean radius of spheres
-	:param rRelFuzz: relative fuzz of the radius -- e.g. radius=10, rRelFuzz=.2, then spheres will have radii 10 ± (10*.2)).
+	:param rRelFuzz: relative fuzz of the radius -- e.g. radius=10, rRelFuzz=.2, then spheres will have radii 10 ± (10*.2)), with an uniform distribution.
 		0 by default, meaning all spheres will have exactly the same radius.
 	:param cropLayers: (aperiodic only) how many layers of spheres will be added to the computed dimension of the box so that there no
 		(or not so much, at least) boundary effects at the boundaries of the predicate.
@@ -398,9 +399,9 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		least number spheres will be loaded and returned.
 	:param useOBB: effective only if a inGtsSurface predicate is given. If true (not default), oriented bounding box will be
 		computed first; it can reduce substantially number of spheres for the triaxial compression (like 10× depending on
-		how much asymmetric the body is), see scripts/test/gts-triax-pack-obb.py.
-	:param memoDbg: show packigns that are considered and reasons why they are rejected/accepted
-	:param returnSpherePack: see :yref:`filterSpherePack`
+		how much asymmetric the body is), see examples/gts-horse/gts-random-pack-obb.py
+	:param memoDbg: show packings that are considered and reasons why they are rejected/accepted
+	:param returnSpherePack: see the corresponding argument in :yref:`yade.pack.filterSpherePack`
 
 	:return: SpherePack object with spheres, filtered by the predicate.
 	"""

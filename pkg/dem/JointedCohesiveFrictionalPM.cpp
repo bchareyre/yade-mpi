@@ -174,7 +174,7 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	
 	shared_ptr<JCFpmPhys> contactPhysics(new JCFpmPhys()); 
 	
-	/* From interaction physics */
+	/* From material properties */
 	Real E1 	= yade1->young;
 	Real E2 	= yade2->young;
 	Real f1 	= yade1->frictionAngle;
@@ -185,7 +185,7 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	Real R2= geom->radius2;
 	contactPhysics->crossSection = Mathr::PI*pow(min(R1,R2),2);
 
-	/* Pass values to JCFpmPhys */
+	/* Pass values to JCFpmPhys. In case of a "jointed" interaction, the following values will be replaced by other ones later (in few if(){} blocks)*/
 	
 	// frictional properties
 	contactPhysics->kn = 2.*E1*R1*E2*R2/(E1*R1+E2*R2);
