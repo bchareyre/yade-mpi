@@ -124,7 +124,7 @@ should have root privileges
 		gtk2-engines-pixbuf python-argparse \
 		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man libsuitesparse-dev \
-		libopenblas-dev libmetis-dev
+		libopenblas-dev libmetis-dev python-gts
 
 	* **Fedora**::
 
@@ -165,6 +165,8 @@ The following options are available:
 	* ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
 	* ENABLE_GTS: enable GTS-option (ON by default)
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
+  * ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
+  * ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
