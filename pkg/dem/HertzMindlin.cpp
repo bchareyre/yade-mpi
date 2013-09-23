@@ -346,12 +346,32 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/**************************************/
 	
 	// normal force must be updated here before we apply the Mohr-Coulomb criterion
-	if (useDamping){ // get normal viscous component 
+	if (useDamping){ // get normal viscous component
 		phys->normalViscous = cn*incidentVn;
-		// add normal viscous component if damping is included
-		phys->normalForce -= phys->normalViscous;
+		Vector3r normTemp = phys->normalForce - phys->normalViscous; // temporary normal force
+		// viscous force should not exceed the value of current normal force, i.e. no attraction force should be permitted if particles are non-adhesive
+		// if particles are adhesive, then fixed the viscous force at maximum equal to the adhesion force
+		// *** enforce normal force to zero if no adhesion is permitted ***
+		if (phys->adhesionForce==0.0 || !includeAdhesion){
+						if (normTemp.dot(scg->normal)<0.0){
+										phys->normalForce = Vector3r::Zero();
+										phys->normalViscous = phys->normalViscous + normTemp; // normal viscous force is such that the total applied force is null - it is necessary to compute energy correctly!
+						}
+						else{phys->normalForce -= phys->normalViscous;}
+		}
+		else if (includeAdhesion && phys->adhesionForce!=0.0){
+						// *** limit viscous component to the max adhesive force ***
+						if (normTemp.dot(scg->normal)<0.0 && (phys->normalViscous.norm() > phys->adhesionForce) ){
+										Real normVisc = phys->normalViscous.norm(); Vector3r normViscVector = phys->normalViscous/normVisc;
+										phys->normalViscous = phys->adhesionForce*normViscVector;
+										phys->normalForce -= phys->normalViscous;
+						}
+						// *** apply viscous component - in the presence of adhesion ***
+						else {phys->normalForce -= phys->normalViscous;}
+		}
 		if (calcEnergy) {normDampDissip += phys->normalViscous.dot(incidentVn*dt);} // calc dissipation of energy due to normal damping
 	}
+	
 
 	/*************************************/
 	/* SHEAR DISPLACEMENT (elastic only) */
