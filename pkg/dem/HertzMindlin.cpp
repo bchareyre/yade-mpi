@@ -86,7 +86,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	// en or es specified, just compute alpha, otherwise alpha remains 0
 	if(en || es){
 		Real logE = log((*en)(mat1->id,mat2->id));
-		contactPhysics->alpha = -sqrt(5/6.)*2*logE/sqrt(pow(logE,2)+pow(Mathr::PI,2))*sqrt(2*E*sqrt(R)); // (see Tsuji, 1992)
+		contactPhysics->alpha = -sqrt(5/6.)*2*logE/sqrt(pow(logE,2)+pow(Mathr::PI,2))*sqrt(2*E*sqrt(R)); // (see Tsuji, 1992), also [Antypov2011] eq. 17
 	}
 	
 	// betan specified, use that value directly; otherwise give zero
@@ -319,7 +319,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	}
 	else if (useDamping){ // (see Tsuji, 1992)
 		Real mbar = (!b1->isDynamic() && b2->isDynamic()) ? de2->mass : ((!b2->isDynamic() && b1->isDynamic()) ? de1->mass : (de1->mass*de2->mass / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
-		cn = phys->alpha*sqrt(mbar)*pow(uN,0.25); // normal viscous coefficient
+		cn = phys->alpha*sqrt(mbar)*pow(uN,0.25); // normal viscous coefficient, see also [Antypov2011] eq. 10
 		cs = cn; // same value for shear viscous coefficient
 	}
 
