@@ -122,7 +122,7 @@ should have root privileges
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf python-argparse \
-		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
+		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man libsuitesparse-dev \
 		libopenblas-dev libmetis-dev python-gts
 
