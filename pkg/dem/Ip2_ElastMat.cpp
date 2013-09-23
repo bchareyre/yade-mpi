@@ -46,7 +46,7 @@ void Ip2_ElastMat_ElastMat_NormShearPhys::go( const shared_ptr<Material>& b1
 	Real Vb 	= mat2->poisson;
 	interaction->phys = shared_ptr<NormShearPhys>(new NormShearPhys());
 	const shared_ptr<NormShearPhys>& phys = YADE_PTR_CAST<NormShearPhys>(interaction->phys);
-	Real Kn, Ks;
+	Real Kn=0.0, Ks=0.0;
 	GenericSpheresContact* geom=dynamic_cast<GenericSpheresContact*>(interaction->geom.get());
 	if (geom) {
 		Real Ra,Rb;//Vector3r normal;

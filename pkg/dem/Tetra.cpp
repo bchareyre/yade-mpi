@@ -148,7 +148,6 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToEdgeCase(
 {
 	for (int i=0; i<6; i++) {
 		const Segment& sa = sA[i];
-		bool b[4];
 		const Triangle& ta0 = tA[stMap[i][0]];
 		const Triangle& ta1 = tA[stMap[i][1]];
 		for (int j=0; j<6; j++) {
@@ -222,8 +221,6 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToTriangleCase1( // edge smaller
 				bool b21 = do_intersect(ta,s21);
 				bool b22 = do_intersect(ta,s22);
 				if ( !((b20 && b21) || (b21 && b22) || (b22 && b20) ) ) { continue; }
-				int si = ppsMap[j][k];
-				const Segment& sb = sB[si];
 				int l,m;
 				for (l=0; l<3; l++) {
 					if (l!=j && l!=k) { break; }
@@ -231,8 +228,6 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToTriangleCase1( // edge smaller
 				for (m=l+1; m<4; m++) {
 					if (m!=j && m!=k) { break; }
 				}
-				const Point& p3 = pB[l];
-				const Point& p4 = pB[m];
 				const Segment& s13 = sB[ppsMap[j][l]];
 				const Segment& s14 = sB[ppsMap[j][m]];
 				const Segment& s23 = sB[ppsMap[k][l]];

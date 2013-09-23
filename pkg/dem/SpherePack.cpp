@@ -410,7 +410,7 @@ long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool period
 					for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
 				} else {
 					for(size_t j=0; j<packSize; j++){
-						Vector3r dr;
+						Vector3r dr=Vector3r::Zero();
 						for(int axis=0; axis<2; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
 						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 					}

@@ -395,7 +395,6 @@ void FlowEngine::Initialize_volumes ( Solver& flow )
 	typedef typename Solver::element_type Flow;
 	typedef typename Flow::Finite_vertices_iterator Finite_vertices_iterator;
 	typedef typename Solver::element_type Flow;
-	typedef typename Flow::Finite_cells_iterator Finite_cells_iterator;
 	
 	Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
 	CGT::Vecteur Zero(0,0,0);
