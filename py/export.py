@@ -26,25 +26,53 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	
 	count=0
 	
-	out.write('#format ' + format + '\n')
-	if (comment):
-		out.write('# ' + comment + '\n')
+	output = ''
+	outputVel=''
+	if (format<>'liggghts_in'):
+		output = '#format ' + format + '\n'
+		if (comment):
+			output += '# ' + comment + '\n'
+	
+	minCoord= Vector3.Zero
+	maxCoord= Vector3.Zero
+	maskNumber = []
+	
 	for b in O.bodies:
 		try:
 			if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
 				if (format=='x_y_z_r'):
-					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
+					output+=('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
 				elif (format=='x_y_z_r_matId'):
-					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+					output+=('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				elif (format=='id_x_y_z_r_matId'):
-					out.write('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+					output+=('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				elif (format=='jointedPM'):
-					out.write('%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n'%(b.id,b.mat.onJoint,b.mat.joint,b.mat.jointNormal1[0],b.mat.jointNormal1[1],b.mat.jointNormal1[2],b.mat.jointNormal2[0],b.mat.jointNormal2[1],b.mat.jointNormal2[2],b.mat.jointNormal3[0],b.mat.jointNormal3[1],b.mat.jointNormal3[2]))
+					output+=('%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n'%(b.id,b.mat.onJoint,b.mat.joint,b.mat.jointNormal1[0],b.mat.jointNormal1[1],b.mat.jointNormal1[2],b.mat.jointNormal2[0],b.mat.jointNormal2[1],b.mat.jointNormal2[2],b.mat.jointNormal3[0],b.mat.jointNormal3[1],b.mat.jointNormal3[2]))
+				elif (format=='liggghts_in'):
+					output+=('%g %g %g %g %g %g %g\n'%(count+1,b.mask,b.shape.radius,b.material.density,b.state.pos[0],b.state.pos[1],b.state.pos[2]))
+					outputVel+=('%g %g %g %g %g %g %g\n'%(count+1,b.state.vel[0],b.state.vel[1],b.state.vel[2],b.state.angVel[0],b.state.angVel[1],b.state.angVel[2]))
 				else:
 					raise RuntimeError("Please, specify a correct format output!");
 				count+=1
+				if  (count==1):
+					minCoord = b.state.pos - Vector3(b.shape.radius,b.shape.radius,b.shape.radius)
+					maxCoord = b.state.pos + Vector3(b.shape.radius,b.shape.radius,b.shape.radius)
+				else:
+					minCoord = Vector3(min(minCoord[0], b.state.pos[0]-b.shape.radius),min(minCoord[1], b.state.pos[1]-b.shape.radius),min(minCoord[2], b.state.pos[2]-b.shape.radius))
+					maxCoord = Vector3(max(maxCoord[0], b.state.pos[0]+b.shape.radius),max(maxCoord[1], b.state.pos[1]+b.shape.radius),max(minCoord[2], b.state.pos[2]+b.shape.radius))
+				if b.mask not in maskNumber:
+					maskNumber.append(b.mask)
 		except AttributeError:
 			pass
+			
+	if (format=='liggghts_in'):
+		outputHeader = 'LIGGGHTS Description\n\n'
+		outputHeader += '%d atoms\n%d atom types\n\n'%(count,len(maskNumber))
+		outputHeader += '%g %g xlo xhi\n%g %g ylo yhi\n%g %g zlo zhi\n\n'%(minCoord[0],maxCoord[0],minCoord[1],maxCoord[1],minCoord[2],maxCoord[2])
+		
+		
+		output=outputHeader + 'Atoms\n\n' + output + '\nVelocities\n\n' + outputVel
+	out.write(output)
 	out.close()
 	return count
 
