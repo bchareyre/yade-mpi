@@ -12,6 +12,9 @@ class JCFpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(JCFpmState,State,"JCFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
 		((int,tensBreak,0,,"number of tensile breakages. [-]"))
                 ((int,shearBreak,0,,"number of shear breakages. [-]"))
+		// ((int,noIniLinks,0,,"number of initial cohesive interactions. [-]"))
+		// ((Real,tensBreakRel,0,,"relative number of tensile breakages (compared with noIniLinks). [-]"))
+		// ((Real,shearBreakRel,0,,"relative number of shear breakages (compared with noIniLinks). [-]"))
                 ,
 		createIndex();
 	);
@@ -97,7 +100,7 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,JCFpmPhys);
 
-		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"interaction law for jointed frictional material. Basically, this law adds the possibility to define joint surfaces into a cohesive frictional material as defined by :yref:'Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM'. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure).",
+		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"interaction law for jointed frictional material. Basically, this law adds the possibility to define joint surfaces into a cohesive frictional material as defined by :yref:`Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM`. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure).",
 			((bool,smoothJoint,false,,"if true, particles belonging to joint surface have a smooth contact logic."))
 			((bool,recordCracks,false,,"if true a text file cracks.txt will be created (iteration, position, type (tensile or shear), cross section and contact normal)."))
 			((bool,cracksFileExist,false,,"If true, text file already exists and its content won't be reset."))
