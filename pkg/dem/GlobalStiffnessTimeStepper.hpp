@@ -39,7 +39,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		virtual void computeTimeStep(Scene*);
 		virtual bool isActivated();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(
-			GlobalStiffnessTimeStepper,TimeStepper,"An engine assigning the time-step as a fraction of the minimum eigen-period in the problem. The derivation is detailed in the chapter on `DEM formulation <https://www.yade-dem.org/doc/formulation.html#dem-simulations>`_. The viscEl option enables to evaluate the timestep in a similar way for the visco-elastic contact law :yref:`Law2_ScGeom_ViscElPhys_Basic`, more detail in :yref:`GlobalStiffnessTimestepper::viscEl`. ",
+			GlobalStiffnessTimeStepper,TimeStepper,"An engine assigning the time-step as a fraction of the minimum eigen-period in the problem. The derivation is detailed in the chapter on `DEM formulation <https://www.yade-dem.org/doc/current/formulation.html#dem-simulations>`_. The viscEl option enables to evaluate the timestep in a similar way for the visco-elastic contact law :yref:`Law2_ScGeom_ViscElPhys_Basic`, more detail in :yref:`GlobalStiffnessTimestepper::viscEl`. ",
 			((Real,defaultDt,-1,,"used as the initial value of the timestep (especially useful in the first steps when no contact exist). If negative, it will be defined by :yref:`utils.PWaveTimeStep` * :yref:`GlobalStiffnessTimeStepper::timestepSafetyCoefficient`"))
 			((Real,maxDt,Mathr::MAX_REAL,,"if positive, used as max value of the timestep whatever the computed value"))
 			((Real,previousDt,1,,"last computed dt |yupdate|"))
