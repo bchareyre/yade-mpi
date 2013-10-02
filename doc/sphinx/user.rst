@@ -102,8 +102,8 @@ Clumping particles together
 
 In some cases, you might want to create rigid aggregate of individual particles (i.e. particles will retain their mutual position during simulation). This we call a :yref:`clump<Clump>`. 
 A clump is internally represented by a special :yref:`body<Body>`, referenced by :yref:`clumpId<Body.clumpId>` of its members (see also  :yref:`isClump<Body.isClump>`, :yref:`isClumpMember<Body.isClumpMember>` and :yref:`isStandalone<Body.isStandalone>`). 
-Like every body a clump has a :yref:`position<State.pos>`, which is the balance point between all members. 
-A clump body itself has no :yref:`interactions<Interaction>` with other bodies. Interactions between clumps is internally represented by interactions between clump members. There are also no interactions between clump members with same clumpId. 
+Like every body a clump has a :yref:`position<State.pos>`, which is the (mass) balance point between all members. 
+A clump body itself has no :yref:`interactions<Interaction>` with other bodies. Interactions between clumps is represented by interactions between clump members. There are no interactions between clump members of the same clump. 
 
 YADE supports different ways of creating clumps:
 
@@ -150,7 +150,7 @@ For this case the function :yref:`clump()<BodyContainer.clump>` can be used. One
 	
 -> :yref:`clump()<BodyContainer.clump>` returns ``clumpId``
 
-* Another option is to replace :yref:`standalone<Body.isStandalone>` spheres from a given packing (see :yref:`SpherePack<yade._packSpheres.SpherePack>` and :yref:`makeCloud<yade._packSpheres.SpherePack.makeCloud>`) using clump templates.
+* Another option is to replace :yref:`standalone<Body.isStandalone>` spheres from a given packing (see :yref:`SpherePack<yade._packSpheres.SpherePack>` and :yref:`makeCloud<yade._packSpheres.SpherePack.makeCloud>`) by clumps using clump templates.
 
 This is done by a function called :yref:`replaceByClumps()<BodyContainer.replaceByClumps>`. This function takes a list of :yref:`clumpTemplates()<yade.clumpTemplate>` and a list of amounts and replaces spheres by clumps. The volume of a new clump will be the same as the volume of the sphere, that was replaced (clump volume/mass/inertia is accounting for overlaps assuming that there are only pair overlaps).
 
@@ -158,7 +158,29 @@ This is done by a function called :yref:`replaceByClumps()<BodyContainer.replace
 
 It is also possible to :yref:`add<BodyContainer.addToClump>` bodies to a clump and :yref:`release<BodyContainer.releaseFromClump>` bodies from a clump. Also you can :yref:`erase<BodyContainer.erase>` the clump (clump members will get standalone spheres).
 
+Additionally YADE supports to achieve the :yref:`roundness<BodyContainer.getRoundness>` of a clump or roundness coefficient of a packing. Parts of the packing can be excluded from roundness measurement via exclude list.
+
+.. ipython::
+
+	@suppress
+	Yade [0]: O.reset()
+
+	Yade [1]: bodyList = []
+
+	Yade [2]: for ii in range(1,5):
+	   ...:    bodyList.append(O.bodies.append(sphere([ii,ii,ii],.5)))
+	   ...:
+
+	Yade [4]: O.bodies.clump(bodyList)
+
+	Yade [5]: RC=O.bodies.getRoundness([]) # empty list [] is needed if no body should be excluded
+
+	Yade [3]: print RC
+	
+-> :yref:`getRoundness()<BodyContainer.getRoundness>` returns roundness coefficient RC of a packing or a part of the packing
+
 .. note:: Have a look at ``examples/clumps/`` folder. There you will find some examples, that show usage of different functions for clumps.
+
 
 Sphere packings
 ===============
