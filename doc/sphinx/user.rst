@@ -679,7 +679,7 @@ Motion constraints
 
 * :yref:`Body.dynamic` determines whether a body will be accelerated by :yref:`NewtonIntegrator`; it is mandatory to make it false for bodies with zero mass, where applying non-zero force would result in infinite displacement.
 
-  :yref:`Facets<Facet>` are case in the point: :yref:`yade.facet` makes them non-dynamic by default, as they have zero volume and zero mass (this can be changed, by passing ``dynamic=True`` to :yref:`yade.facet` or setting :yref:`Body.dynamic`; setting :yref:`State.mass` to a non-zero value must be done as well). The same is true for :yref:`yade.wall`.
+  :yref:`Facets<Facet>` are case in the point: :yref:`facet<yade.utils.facet>` makes them non-dynamic by default, as they have zero volume and zero mass (this can be changed, by passing ``dynamic=True`` to :yref:`facet<yade.utils.facet>` or setting :yref:`Body.dynamic`; setting :yref:`State.mass` to a non-zero value must be done as well). The same is true for :yref:`wall<yade.utils.wall>`.
 
   Making sphere non-dynamic is achieved simply by::
 
@@ -793,18 +793,18 @@ Engines deriving from :yref:`BoundaryController` impose boundary conditions duri
 Field appliers
 ---------------
 
-Engines deriving from :yref:`FieldApplier` acting on all particles. The one most used is :yref:`GravityEngine` applying uniform acceleration field.
+Engines deriving from :yref:`FieldApplier` acting on all particles. The one most used is :yref:`GravityEngine` applying uniform acceleration field (:yref:`GravityEngine` is deprecated, use :yref:`NewtonIntegrator.gravity` instead!).
 
 Partial engines
 ---------------
 
-Engines deriving from :yref:`PartialEngine` define the :yref:`ids<PartialEngine.subscribedBodies>` attribute determining bodies which will be affected. Several of them warrant explicit mention here:
+Engines deriving from :yref:`PartialEngine` define the :yref:`ids<PartialEngine.ids>` attribute determining bodies which will be affected. Several of them warrant explicit mention here:
 
 * :yref:`TranslationEngine` and :yref:`RotationEngine` for applying constant speed linear and rotational motion on subscribers. 
 * :yref:`ForceEngine` and :yref:`TorqueEngine` applying given values of force/torque on subscribed bodies at every step.
 * :yref:`StepDisplacer` for applying generalized displacement delta at every timestep; designed for precise control of motion when testing constitutive laws on 2 particles.
 
-The real value of partial engines is if you need to prescribe complex types of force or displacement fields. For moving a body at constant velocity or for imposing a single force, the methods explained in `Imposing motion and forces`_ are much simpler. There are several interpolating engines (:yref:`InterpolatingDirectedForceEngine` for applying force with varying magnitude, :yref:`InterpolatingSpiralEngine` for applying spiral displacement with varying angular velocity and possibly others); writing a new interpolating engine is rather simple using examples of those that already exist.
+The real value of partial engines is if you need to prescribe complex types of force or displacement fields. For moving a body at constant velocity or for imposing a single force, the methods explained in `Imposing motion and forces`_ are much simpler. There are several interpolating engines (:yref:`InterpolatingDirectedForceEngine` for applying force with varying magnitude, :yref:`InterpolatingHelixEngine` for applying spiral displacement with varying angular velocity and possibly others); writing a new interpolating engine is rather simple using examples of those that already exist.
 
 
 Convenience features
@@ -857,9 +857,9 @@ You can add your own tags by simply assigning value, with the restriction that t
 Saving python variables
 ------------------------
 
-Python variable lifetime is limited; in particular, if you save simulation, variables will be lost after reloading. Yade provides limited support for data persistence for this reason (internally, it uses special values of ``O.tags``). The functions in question are :yref:`yade.saveVars` and :yref:`yade.loadVars`. 
+Python variable lifetime is limited; in particular, if you save simulation, variables will be lost after reloading. Yade provides limited support for data persistence for this reason (internally, it uses special values of ``O.tags``). The functions in question are :yref:`saveVars<yade.utils.saveVars>` and :yref:`loadVars<yade.utils.loadVars>`. 
 
-:yref:`yade.saveVars` takes dictionary (variable names and their values) and a *mark* (identification string for the variable set); it saves the dictionary inside the simulation. These variables can be re-created (after the simulation was loaded from a XML file, for instance) in the ``yade.params.``\ *mark* namespace by calling :yref:`yade.loadVars` with the same identification *mark*:
+:yref:`saveVars<yade.utils.saveVars>` takes dictionary (variable names and their values) and a *mark* (identification string for the variable set); it saves the dictionary inside the simulation. These variables can be re-created (after the simulation was loaded from a XML file, for instance) in the ``yade.params.``\ *mark* namespace by calling :yref:`loadVars<yade.utils.loadVars>` with the same identification *mark*:
 
 .. ipython::
 
@@ -902,7 +902,7 @@ Enumeration of variables can be tedious if they are many; creating local scope (
 	from yade.params.geom import *
 	# use the variables now
 
-.. note:: Only types that can be `pickled <http://docs.python.org/library/pickle.html>`_ can be passed to :yref:`yade.saveVars`.
+.. note:: Only types that can be `pickled <http://docs.python.org/library/pickle.html>`_ can be passed to :yref:`saveVars<yade.utils.saveVars>`.
 
 
 
@@ -919,7 +919,7 @@ Running python code
 
 A special engine :yref:`PyRunner` can be used to periodically call python code, specified via the ``command`` parameter. Periodicity can be controlled by specifying computation time (``realPeriod``), virutal time (``virtPeriod``) or iteration number (``iterPeriod``).
 
-For instance, to print kinetic energy (using :yref:`yade.kineticEnergy`) every 5 seconds, this engine will be put to ``O.engines``::
+For instance, to print kinetic energy (using :yref:`kineticEnergy<yade.utils.kineticEnergy>`) every 5 seconds, this engine will be put to ``O.engines``::
 	PyRunner(command="print 'kinetic energy',kineticEnergy()",realPeriod=5)
 
 For running more complex commands, it is convenient to define an external function and only call it from within the engine. Since the ``command`` is run in the script's namespace, functions defined within scripts can be called. Let us print information on interaction between bodies 0 and 1 periodically::
@@ -995,9 +995,9 @@ Labels can be conveniently used to access engines in the ``myAddData`` function:
 		UniaxialStrainer(...,label='strainer')
 	]
 	def myAddData():
-		plot.addData(sigma=strainer.stress,eps=strainer.strain)
+		plot.addData(sigma=strainer.avgStress,eps=strainer.strain)
 
-In that case, naturally, the labeled object must define attributes which are used (:yref:`UniaxialStrainer.strain` and :yref:`UniaxialStrainer.stress` in this case).
+In that case, naturally, the labeled object must define attributes which are used (:yref:`UniaxialStrainer.strain` and :yref:`UniaxialStrainer.avgStress` in this case).
 
 Plotting variables
 -------------------
@@ -1138,7 +1138,7 @@ causes the simulation to run 35466 iterations, then stopping.
 
 Frequently, decisions have to be made based on evolution of the simulation itself, which is not yet known. In such case, a function checking some specific condition is called periodically; if the condition is satisfied, ``O.pause`` or other functions can be called to stop the stimulation. See documentation for :yref:`Omega.run`, :yref:`Omega.pause`, :yref:`Omega.step`, :yref:`Omega.stopAtIter` for details.
 
-For simulations that seek static equilibrium, the :yref:`yade._unbalancedForce` can provide a useful metrics (see its documentation for details); for a desired value of ``1e-2`` or less, for instance, we can use::
+For simulations that seek static equilibrium, the :yref:`unbalancedForce<yade.utils.unbalancedForce>` can provide a useful metrics (see its documentation for details); for a desired value of ``1e-2`` or less, for instance, we can use::
 
 	
 	def checkUnbalanced():
@@ -1255,7 +1255,7 @@ Info provider
 -------------
 ``TCP Info provider`` listens at port 21000 (or higher) and returns some basic information about current simulation upon connection; the connection terminates immediately afterwards. The information is python dictionary represented as string (serialized) using standard `pickle <http://docs.python.org/library/pickle.html>`_ module.
 
-This functionality is used by the batch system (described below) to be informed about individual simulation progress and estimated times. If you want to access this information yourself, you can study :ysrc:`core/main/yade-multi.in` for details.
+This functionality is used by the batch system (described below) to be informed about individual simulation progress and estimated times. If you want to access this information yourself, you can study :ysrc:`core/main/yade-batch.in` for details.
 
 Batch queuing and execution (yade-batch)
 ========================================
@@ -1263,12 +1263,12 @@ Batch queuing and execution (yade-batch)
 Yade features light-weight system for running one simulation with different parameters; it handles assignment of parameter values to python variables in simulation script, scheduling jobs based on number of available and required cores and more. The whole batch consists of 2 files:
 
 simulation script
-	regular Yade script, which calls :yref:`yade.readParamsFromTable` to obtain parameters from parameter table. In order to make the script runnable outside the batch, :yref:`yade.readParamsFromTable` takes default values of parameters, which might be overridden from the parameter table.
+	regular Yade script, which calls :yref:`readParamsFromTable<yade.utils.readParamsFromTable>` to obtain parameters from parameter table. In order to make the script runnable outside the batch, :yref:`readParamsFromTable<yade.utils.readParamsFromTable>` takes default values of parameters, which might be overridden from the parameter table.
 	
-	:yref:`yade.readParamsFromTable` knows which parameter file and which line to read by inspecting the ``PARAM_TABLE`` environment variable, set by the batch system.
+	:yref:`readParamsFromTable<yade.utils.readParamsFromTable>` knows which parameter file and which line to read by inspecting the ``PARAM_TABLE`` environment variable, set by the batch system.
 
 parameter table
-	simple text file, each line representing one parameter set. This file is read by :yref:`yade.readParamsFromTable` (using :yref:`yade.TableParamReader` class), called from simulation script, as explained above. For better reading of the text file you can make use of tabulators, these will be ignored by :yref:`yade.readParamsFromTable`. Parameters are not restricted to numerical values. You can also make use of strings by "quoting" them ('  ' may also be used instead of "  "). This can be useful for nominal parameters.
+	simple text file, each line representing one parameter set. This file is read by :yref:`readParamsFromTable<yade.utils.readParamsFromTable>` (using :yref:`TableParamReader<yade.utils.TableParamReader>` class), called from simulation script, as explained above. For better reading of the text file you can make use of tabulators, these will be ignored by :yref:`readParamsFromTable<yade.utils.readParamsFromTable>`. Parameters are not restricted to numerical values. You can also make use of strings by "quoting" them ('  ' may also be used instead of "  "). This can be useful for nominal parameters.
 
 The batch can be run as ::
 
@@ -1308,7 +1308,7 @@ In the simulation file, we read parameters from table, at the beginning of the s
 	from yade.params.table import *
 	print gravity, density, initialVelocity
 
-after the call to :yref:`yade.readParamsFromTable`, corresponding python variables are created in the ``yade.params.table`` module and can be readily used in the script, e.g.
+after the call to :yref:`readParamsFromTable<yade.utils.readParamsFromTable>`, corresponding python variables are created in the ``yade.params.table`` module and can be readily used in the script, e.g.
 
 .. code-block:: python
 
@@ -1443,14 +1443,14 @@ There are multiple ways to produce a video of simulation:
 
 #. Capture screen output (the 3d rendering window) during the simulation − there are tools available for that (such as `Istanbul <http://live.gnome.org/Istanbul>`_ or `RecordMyDesktop <http://recordmydesktop.sourceforge.net/about.php>`_, which are also packaged for most Linux distributions).  The output is "what you see is what you get", with all the advantages and disadvantages.
 
-#. Periodic frame snapshot using :yref:`SnapshotEngine` (see :ysrc:`examples/bulldozer.py` for a full example)::
+#. Periodic frame snapshot using :yref:`SnapshotEngine` (see :ysrc:`examples/bulldozer/bulldozer.py` for a full example)::
    
       O.engines=[
       	#...
       	SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',viewNo=0,label='snapshooter')
       ]
 
-   which will save numbered files like ``/tmp/bulldozer-0000.png``. These files can be processed externally (with `mencoder <http://www.mplayerhq.hu>`_ and similar tools) or directly with the :yref:`yade.makeVideo`::
+   which will save numbered files like ``/tmp/bulldozer-0000.png``. These files can be processed externally (with `mencoder <http://www.mplayerhq.hu>`_ and similar tools) or directly with the :yref:`makeVideo<yade.utils.makeVideo>`::
 
       makeVideo(frameSpec,out,renameNotOverwrite=True,fps=24,kbps=6000,bps=None)
    
@@ -1473,10 +1473,7 @@ Paraview is based on the `Visualization Toolkit <http://www.vtk.org>`_, which de
 
 * :yref:`iterPeriod<PeriodicEngine.iterPeriod>` determines how often to save simulation data (besides :yref:`iterPeriod<PeriodicEngine.iterPeriod>`, you can also use :yref:`virtPeriod<PeriodicEngine.virtPeriod>` or :yref:`realPeriod<PeriodicEngine.realPeriod>`). If the period is too high (and data are saved only few times), the video will have few frames. 
 * :yref:`fileName<VTKRecorder.fileName>` is the prefix for files being saved. In this case, output files will be named ``/tmp/p1-spheres.0.vtu`` and ``/tmp/p1-facets.0.vtu``, where the number is the number of iteration; many files are created, putting them in a separate directory is advisable.
-* :yref:`recorders<VTKRecorder.recorders>` determines what data to save (see the :yref:`documentation<VTKRecorder.recorders>`)
-
-:yref:`VTKExporter` plays a similar role, with the difference that it is more flexible. It will save any user defined variable associated to the bodies. 
-
+* :yref:`recorders<VTKRecorder.recorders>` determines what data to save
 
 Loading data into Paraview
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1558,7 +1555,7 @@ Below is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` functio
 
 Micro-stress
 ------------
-Stress fields can be generated by combining the volume returned by TesselationWrapper to per-particle stress given by :yref:`bodyStressTensors`. Since the stress $\sigma$ from bodyStressTensor implies a division by the volume $V_b$ of the solid particle, one has to re-normalize it in order to obtain the micro-stress as defined in [Catalano2013a]_ (equation 39 therein), i.e. $\overline{\sigma}^k = \sigma^k \times V_b^k / V_{\sigma}^k$ where $V_{\sigma}^k$ is the volume assigned to particle $k$ in the tesselation. For instance:
+Stress fields can be generated by combining the volume returned by TesselationWrapper to per-particle stress given by :yref:`bodyStressTensors<yade.utils.bodyStressTensors>`. Since the stress $\sigma$ from bodyStressTensor implies a division by the volume $V_b$ of the solid particle, one has to re-normalize it in order to obtain the micro-stress as defined in [Catalano2013a]_ (equation 39 therein), i.e. $\overline{\sigma}^k = \sigma^k \times V_b^k / V_{\sigma}^k$ where $V_{\sigma}^k$ is the volume assigned to particle $k$ in the tesselation. For instance:
 
 .. code-block:: python
 
@@ -1568,7 +1565,7 @@ Stress fields can be generated by combining the volume returned by TesselationWr
 	s=bodyStressTensors()
 	stress = s[b.id]**4.*pi/3.*b.shape.radius**3/TW.volume(b.id)
 
-As any other value, the stress can be exported to a vtk file for display in Paraview using :yref:`VTKExporter`.
+As any other value, the stress can be exported to a vtk file for display in Paraview using :yref:`VTKRecorder`.
 
 ******************************
 Python specialties and tricks
