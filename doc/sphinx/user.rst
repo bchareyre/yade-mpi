@@ -25,16 +25,16 @@ The :yref:`BodyContainer` holds :yref:`Body` objects in the simulation; it is ac
 Creating Body objects
 ----------------------
 
-:yref:`Body` objects are only rarely constructed by hand by their components (:yref:`Shape`, :yref:`Bound`, :yref:`State`, :yref:`Material`); instead, convenience functions :yref:`yade.utils.sphere`, :yref:`yade.utils.facet` and :yref:`yade.utils.wall` are used to create them. Using these functions also ensures better future compatibility, if internals of :yref:`Body` change in some way. These functions receive geometry of the particle and several other characteristics. See their documentation for details. If the same :yref:`Material` is used for several (or many) bodies, it can be shared by adding it in ``O.materials``, as explained below.
+:yref:`Body` objects are only rarely constructed by hand by their components (:yref:`Shape`, :yref:`Bound`, :yref:`State`, :yref:`Material`); instead, convenience functions :yref:`sphere<yade.utils.sphere>`, :yref:`facet<yade.utils.facet>` and :yref:`wall<yade.utils.wall>` are used to create them. Using these functions also ensures better future compatibility, if internals of :yref:`Body` change in some way. These functions receive geometry of the particle and several other characteristics. See their documentation for details. If the same :yref:`Material` is used for several (or many) bodies, it can be shared by adding it in ``O.materials``, as explained below.
 
 Defining materials
 ------------------
 
 The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined shared materials for bodies. It only supports addition, and will typically hold only a few instance (though there is no limit).
 
-``label`` given to each material is optional, but can be passed to :yref:`sphere` and other functions for constructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`sphere` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
+``label`` given to each material is optional, but can be passed to :yref:`sphere<yade.utils.sphere>` and other functions for constructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`sphere<yade.utils.sphere>` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
 
-If no :yref:`Material` is specified when calling :yref:`sphere`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created using :yref:`defaultMaterial`; this should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
+If no :yref:`Material` is specified when calling :yref:`sphere<yade.utils.sphere>`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created using :yref:`defaultMaterial`; this should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
 
 .. ipython::
 
@@ -94,7 +94,7 @@ Many functions introduced in next sections return list of bodies which can be re
 * surface function :yref:`yade.pack.gtsSurface2Facets`
 * import functions :yref:`yade.ymport.gmsh`, :yref:`yade.ymport.stl`, …
 
-As those functions use :yref:`yade.sphere` and :yref:`yade.facet` internally, they accept additional argument passed to those function. In particular, material for each body is selected following the rules above (last one if not specified, by label, by index, etc.).
+As those functions use :yref:`sphere<yade.utils.sphere>` and :yref:`facet<yade.utils.facet>` internally, they accept additional argument passed to those function. In particular, material for each body is selected following the rules above (last one if not specified, by label, by index, etc.).
 
 
 Clumping particles together
