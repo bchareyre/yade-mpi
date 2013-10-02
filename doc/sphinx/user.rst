@@ -364,8 +364,6 @@ Irregular
 """"""""""
 Random geometric algorithms do not integrate at all with volume predicates described above; rather, they take their own boundary/volume definition, which is used during sphere positioning. On the other hand, this makes it possible for them to respect boundary in the sense of making spheres touch it at appropriate places, rather than leaving empty space in-between.
 
-:yref:`yade._packSpherePadder.SpherePadder`
-	constructs dense sphere packing based on pre-computed tetrahedron mesh; it is documented in :yref:`yade._packSpherePadder.SpherePadder` documentation; sample script is in :ysrc:`scripts/test/SpherePadder.py`. :yref:`yade._packSpherePadder.SpherePadder` does not return :yref:`Body` list as other algorithms, but a :yref:`yade._packSpheres.SpherePack` object; it can be iterated over, adding spheres to the simulation, as shown in its documentation.
 GenGeo
 	is library (python module) for packing generation developed with `ESyS-Particle <http://www.launchpad.net/esys-particle>`_. It creates packing by random insertion of spheres with given radius range. Inserted spheres touch each other exactly and, more importantly, they also touch the boundary, if in its neighbourhood. Boundary is represented as special object of the GenGeo library (Sphere, cylinder, box, convex polyhedron, …). Therefore, GenGeo cannot be used with volume represented by yade predicates as explained above.
 
