@@ -255,7 +255,10 @@ class VTKExporter:
 		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,n))
 		for b in bodies:
-			pos = b.state.refPos if useRef else b.state.pos
+			if O.periodic:
+				pos = O.cell.wrap(O.cell.b.state.refPos if useRef else b.state.pos)
+			else:
+				pos = O.cell.b.state.refPos if useRef else b.state.pos
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		outFile.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
 		for b in bodies:
@@ -522,6 +525,36 @@ class VTKExporter:
 				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
 		outFile.close()
 		self.intrsSnapCount += 1
+
+	def exportPeriodicCell(self,comment="comment",numLabel=None):
+		"""exports spheres (positions and radius) and defined properties.
+
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		"""
+		if not O.periodic:
+			print 'WARNING: export.VTKExporter.exportPeriodicCell: scene is not periodic, no export...'
+			return
+		hSize = O.cell.hSize
+		fName = self.baseName+'-periCell-%04d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET UNSTRUCTURED_GRID\nPOINTS 8 double\n"%(comment))
+		vertices = [
+			hSize*Vector3(0,0,1),
+			hSize*Vector3(0,1,1),
+			hSize*Vector3(1,1,1),
+			hSize*Vector3(1,0,1),
+			hSize*Vector3(0,0,0),
+			hSize*Vector3(0,1,0),
+			hSize*Vector3(1,1,0),
+			hSize*Vector3(1,0,0),
+		]
+		for v in vertices:
+			outFile.write('%g %g %g\n'%(v[0],v[1],v[2]))
+		outFile.write('\nCELLS 1 9\n')
+		outFile.write('8 0 1 2 3 4 5 6 7\n')
+		outFile.write('\nCELL_TYPES 1\n12\n')
+		outFile.close()
 
 
 

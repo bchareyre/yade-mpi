@@ -16,6 +16,7 @@
 #include<vtkTriangle.h>
 #include<vtkLine.h>
 #include<vtkQuad.h>
+#include<vtkHexahedron.h>
 #ifdef YADE_VTK_MULTIBLOCK
   #include<vtkXMLMultiBlockDataWriter.h>
   #include<vtkMultiBlockDataSet.h>
@@ -49,6 +50,7 @@ void VTKRecorder::action(){
 			recActive[REC_CLUMPID]=true;
 			recActive[REC_MATERIALID]=true;
 			recActive[REC_STRESS]=true;
+			if (scene->isPeriodic) { recActive[REC_PERICELL]=true; }
 		}
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="velocity") recActive[REC_VELOCITY]=true;
@@ -64,7 +66,8 @@ void VTKRecorder::action(){
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
 		else if(rec=="stress") recActive[REC_STRESS]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId). Ignored.");
+		else if(rec=="pericell" && scene->isPeriodic) recActive[REC_PERICELL]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, pericell). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -188,6 +191,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
 	intrAbsForceT->SetNumberOfComponents(3);
 	intrAbsForceT->SetName("absForceT");
+
+	// pericell
+	vtkSmartPointer<vtkPoints> pericellPoints = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkCellArray> pericellHexa = vtkSmartPointer<vtkCellArray>::New();
 
 	// extras for CPM
 	if(recActive[REC_CPM]){ CpmStateUpdater csu; csu.update(scene); }
@@ -433,6 +440,32 @@ void VTKRecorder::action(){
 		}
 	}
 
+	if (recActive[REC_PERICELL]) {
+		const Matrix3r& hSize = scene->cell->hSize;
+		Vector3r v0 = hSize*Vector3r(0,0,1);
+		Vector3r v1 = hSize*Vector3r(0,1,1);
+		Vector3r v2 = hSize*Vector3r(1,1,1);
+		Vector3r v3 = hSize*Vector3r(1,0,1);
+		Vector3r v4 = hSize*Vector3r(0,0,0);
+		Vector3r v5 = hSize*Vector3r(0,1,0);
+		Vector3r v6 = hSize*Vector3r(1,1,0);
+		Vector3r v7 = hSize*Vector3r(1,0,0);
+		pericellPoints->InsertNextPoint(v0[0],v0[1],v0[2]);
+		pericellPoints->InsertNextPoint(v1[0],v1[1],v1[2]);
+		pericellPoints->InsertNextPoint(v2[0],v2[1],v2[2]);
+		pericellPoints->InsertNextPoint(v3[0],v3[1],v3[2]);
+		pericellPoints->InsertNextPoint(v4[0],v4[1],v4[2]);
+		pericellPoints->InsertNextPoint(v5[0],v5[1],v5[2]);
+		pericellPoints->InsertNextPoint(v6[0],v6[1],v6[2]);
+		pericellPoints->InsertNextPoint(v7[0],v7[1],v7[2]);
+		vtkSmartPointer<vtkHexahedron> h = vtkSmartPointer<vtkHexahedron>::New();
+		vtkIdList* l = h->GetPointIds();
+		for (int i=0; i<8; i++) {
+			l->SetId(i,i);
+		}
+		pericellHexa->InsertNextCell(h);
+	}
+
 	
 	vtkSmartPointer<vtkDataCompressor> compressor;
 	if(compress) compressor=vtkSmartPointer<vtkZLibDataCompressor>::New();
@@ -464,7 +497,7 @@ void VTKRecorder::action(){
 		}
 
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
-		
+
 		#ifdef YADE_VTK_MULTIBLOCK
 		if(!multiblock)
 		#endif
@@ -549,6 +582,23 @@ void VTKRecorder::action(){
 			writer->Write();
 		}
 	}
+	vtkSmartPointer<vtkUnstructuredGrid> pericellUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+	if (recActive[REC_PERICELL]){
+		pericellUg->SetPoints(pericellPoints);
+		pericellUg->SetCells(12,pericellHexa);
+		#ifdef YADE_VTK_MULTIBLOCK
+			if(!multiblock)
+		#endif
+			{
+			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			if(compress) writer->SetCompressor(compressor);
+			if(ascii) writer->SetDataModeToAscii();
+			string fn=fileName+"pericell."+lexical_cast<string>(scene->iter)+".vtu";
+			writer->SetFileName(fn.c_str());
+			writer->SetInput(pericellUg);
+			writer->Write();
+		}
+	}
 	#ifdef YADE_VTK_MULTIBLOCK
 		if(multiblock){
 			vtkSmartPointer<vtkMultiBlockDataSet> multiblockDataset = vtkSmartPointer<vtkMultiBlockDataSet>::New();
@@ -556,6 +606,7 @@ void VTKRecorder::action(){
 			if(recActive[REC_SPHERES]) multiblockDataset->SetBlock(i++,spheresUg);
 			if(recActive[REC_FACETS]) multiblockDataset->SetBlock(i++,facetsUg);
 			if(recActive[REC_INTR]) multiblockDataset->SetBlock(i++,intrPd);
+			if(recActive[REC_PERICELL]) multiblockDataset->SetBlock(i++,pericellUg);
 			vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+lexical_cast<string>(scene->iter)+".vtm";
@@ -564,6 +615,8 @@ void VTKRecorder::action(){
 			writer->Write();	
 		}
 	#endif
+
+
 };
 
 void VTKRecorder::addWallVTK (vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<vtkPoints>& boxesPos, Vector3r& W1, Vector3r& W2, Vector3r& W3, Vector3r& W4) {
