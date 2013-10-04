@@ -123,7 +123,7 @@ for j in O.interactions:
 	    jointNormalRef=O.bodies[j.id2].mat.jointNormal3
 	else : continue
 	facetCenter=O.bodies[j.id1].state.pos
-	#### seek for each sphere interacting with the identified sphere i.id2
+	#### seek for each sphere interacting with the identified sphere j.id2
 	for n in O.interactions.withBody(j.id2) :
 	    if n.id1==j.id2 and isinstance(O.bodies[n.id2].shape,Sphere): 
 		facetSphereDir=(O.bodies[n.id2].state.pos-facetCenter)
