@@ -33,7 +33,7 @@ sp.makeCloud(minCorner=(-1.5,-1.5,.1),maxCorner=(1.5,1.5,2),rMean=.2,rRelFuzz=.5
 O.bodies.append([sphere(c,r,material=Mat) for c,r in sp])
 
 print len(sp),' particles generated.'
-print 'Roundness coefficient without clumps is: ',O.bodies.getRoundness([])			#give an empty list [] if no body should be excluded
+print 'Roundness coefficient without clumps is: ',O.bodies.getRoundness()
 
 
 #### show how to use makeClumpTemplate():
@@ -73,7 +73,7 @@ for b in O.bodies:
 	if b.isStandalone:
 		standaloneList.append(b.id)
 
-print 'Roundness coefficient for spheres and clumps is: ',O.bodies.getRoundness([])			#give an empty list [] if no body should be excluded
+print 'Roundness coefficient for spheres and clumps is: ',O.bodies.getRoundness()
 print 'Roundness coefficient just for clumps is: ',O.bodies.getRoundness(standaloneList)
 
 O.dt=1e-6

@@ -173,7 +173,7 @@ Additionally YADE supports to achieve the :yref:`roundness<BodyContainer.getRoun
 
 	Yade [4]: O.bodies.clump(bodyList)
 
-	Yade [5]: RC=O.bodies.getRoundness([]) # empty list [] is needed if no body should be excluded
+	Yade [5]: RC=O.bodies.getRoundness()
 
 	Yade [3]: print RC
 	
