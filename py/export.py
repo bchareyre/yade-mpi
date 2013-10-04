@@ -199,7 +199,7 @@ class VTKExporter:
 		self.intrsSnapCount = startSnap
 		self.baseName = baseName
 
-	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None):
+	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None,useRef=False):
 		"""exports spheres (positions and radius) and defined properties.
 
 		:param ids: if "all", then export all spheres, otherwise only spheres from integer list
@@ -208,6 +208,7 @@ class VTKExporter:
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		:param bool useRef: if False (default), use current position of the spheres for export, use reference position otherwise
 		"""
 		allIds = False
 		if ids=='all':
@@ -226,7 +227,7 @@ class VTKExporter:
 		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,n))
 		for b in bodies:
-			pos = b.state.pos
+			pos = b.state.refPos if useRef else b.state.pos
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		outFile.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
 		for b in bodies:

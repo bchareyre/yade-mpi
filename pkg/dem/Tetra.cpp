@@ -280,7 +280,6 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToTriangleCase2( // edge larger 
 														Vector3r& contactPoint,
 														Real& penetrationVolume)
 {
-
 	for (int i=0; i<6; i++) {
 		const Segment& sb = sB[i];
 		int ni = 0;
@@ -313,6 +312,7 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::checkEdgeToTriangleCase2( // edge larger 
 				if ( !(b2a || b2b || b2c) ) { continue; } 
 				int l = b1a? tsMap[j][0] : b1b? tsMap[j][1] : tsMap[j][2];
 				int m = b2a? tsMap[k][0] : b2b? tsMap[k][1] : tsMap[k][2];
+            if (sstMap[l][m] == -1) { continue; }
 				const Segment& sa1 = sA[l];
 				const Segment& sa2 = sA[m];
 				const Triangle& taN = tA[sstMap[l][m]];
@@ -549,6 +549,7 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::go(
 		geom->flag = flag; \
 		return true;
 
+
 	if (checkVertexToTriangleCase(t1,p2,s2,n,cp,V)) {
 		flag = 1;
 		SET_GEOM_AND_RETURN_TRUE
@@ -591,6 +592,7 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::go(
 	}
 
 	#undef SET_GEOM_AND_RETURN_TRUE
+
 	
 	if (interaction->geom) {
 		TTetraSimpleGeom* geom = static_cast<TTetraSimpleGeom*>(interaction->geom.get());

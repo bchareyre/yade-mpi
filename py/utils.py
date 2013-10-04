@@ -956,19 +956,33 @@ class clumpTemplate:
 		self.relPositions = relPositions
 
 class UnstructuredGrid:
-	"""EXPERIMENTAL. TODO docs
+	"""EXPERIMENTAL.
+	Class representing triangulated FEM-like unstructured grid. It is used for transfereing data from ad to YADE and external FEM program. The main purpose of this class is to store information about individual grid vertices/nodes coords (since facets stores only coordinates of vertices in local coords) and to avaluate and/or apply nodal forces from contact forces (from actual contact force and contact point the force is distributed to nodes using linear approximation).
+
+	TODO rewrite to C++
+	TODO better docs
+
+	:param dict vertices: dict of {internal vertex label:vertex}, e.g. {5:(0,0,0),22:(0,1,0),23:(1,0,0)}
+	:param dict connectivityTable: dict of {internal element label:[indices of vertices]}, e.g. {88:[5,22,23]}
 	"""
 	def __init__(self,vertices={},connectivityTable={},**kw):
 		self.vertices = vertices
 		self.connectivityTable = connectivityTable
 		self.forces = dict( (i,Vector3(0,0,0)) for i in vertices)
 		self.build(**kw)
-	def setup(self,vertices,connectivityTable,toSimulation=False,**kw):
+	def setup(self,vertices,connectivityTable,toSimulation=False,bodies=None,**kw):
+		"""Sets new information to receiver
+		
+		:param dict vertices: see constructor for explanation
+		:param dict connectivityTable: see constructor for explanation
+		:param bool toSimulation: if new information should be inserted to Yade simulation (create new bodies or not)
+		:param [[int]]|None bodies: list of list of bodies indices to be appended as clumps (thus no contact detection is done within one body)
+		"""
 		self.vertices = dict( (i,v) for i,v in vertices.iteritems())
 		self.connectivityTable = dict( (i,e) for i,e in connectivityTable.iteritems())
 		self.build(**kw)
 		if toSimulation:
-			self.toSimulation()
+			self.toSimulation(bodies)
 	def build(self,**kw):
 		self.elements = {}
 		for i,c in self.connectivityTable.iteritems():
@@ -977,12 +991,14 @@ class UnstructuredGrid:
 			elif len(c) == 4:
 				b = tetra([self.vertices[j] for j in c],**kw)
 			else:
-				raise RuntimeError, "TODO"
+				raise RuntimeError, "Unsupported cell shape (should be triangle or tetrahedron)"
 			self.elements[i] = b
 	def resetForces(self):
 		for i in self.vertices:
 			self.forces[i] = Vector3(0,0,0)
 	def getForcesOfNodes(self):
+		"""Computes forces for each vertex/node. The nodal force is computed from contact force and contact point using linear approximation
+		"""
 		self.resetForces()
 		for i,e in self.elements.iteritems():
 			ie = self.connectivityTable[i]
@@ -1013,10 +1029,16 @@ class UnstructuredGrid:
 					self.forces[ie[3]] += f*w3/ww
 		return self.forces
 	def setPositionsOfNodes(self,newPoss):
+		"""Sets new position of nodes and also updates all elements in the simulation
+
+		:param [Vector3] newPoss: list of new positions
+		"""
 		for i in self.vertices:
 			self.vertices[i] = newPoss[i]
 		self.updateElements()
 	def updateElements(self):
+		"""Updates positions of all elements in the simulation
+		"""
 		for i,c in self.connectivityTable.iteritems():
 			e = self.elements[i]
 			e.state.pos = Vector3(0,0,0)
@@ -1025,5 +1047,12 @@ class UnstructuredGrid:
 				e.shape.vertices = [self.vertices[j] for j in c]
 			elif isinstance(e.shape,Tetra):
 				e.shape.v = [self.vertices[j] for j in c]
-	def toSimulation(self):
-		O.bodies.append(self.elements.values())
+	def toSimulation(self,bodies=None):
+		"""Insert all elements to Yade simulation
+		"""
+		if bodies:
+			e = self.elements.values()
+			for b in bodies:
+				O.bodies.appendClumped([e[i] for i in b])
+		else:
+			O.bodies.append(self.elements.values())

@@ -25,7 +25,6 @@ O.engines = [
 	),
 	NewtonIntegrator(damping=0),
 	PyRunner(iterPeriod=500,command="addPlotData()"),
-	PyRunner(iterPeriod=1000,command="printt()"),
 	PyRunner(iterPeriod=1,command="runExamples()"),
 ]
 

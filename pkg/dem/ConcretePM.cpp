@@ -345,9 +345,9 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	Vector3r& Fs(phys->Fs); /* for python access */
 	const bool& isCohesive(phys->isCohesive);
 
-// 	Vector3r& epsTPl(phys->epsTPl);
 
 	#ifdef CPM_MATERIAL_MODEL
+		Vector3r& epsTPl(phys->epsTPl);
 		Real& epsNPl(phys->epsNPl);
 		const Real& dt = scene->dt;
 		const Real& dmgTau(phys->dmgTau);
@@ -394,9 +394,15 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	#endif
 
 	sigmaN -= phys->isoPrestress;
-
-	NNAN(kappaD); NNAN(epsFracture); NNAN(omega);
-	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
+   
+   NNAN(sigmaN);
+   NNANV(sigmaT);
+   NNAN(crossSection);
+   if (!neverDamage) {
+      NNAN(kappaD);
+      NNAN(epsFracture);
+      NNAN(omega);
+   }
 
 	/* handle broken contacts */
 	if (epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)) {
