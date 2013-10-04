@@ -63,7 +63,7 @@ ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
-FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization system REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})

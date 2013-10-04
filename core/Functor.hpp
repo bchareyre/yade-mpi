@@ -25,7 +25,7 @@ class Functor: public Serializable
 	Scene* scene;
 	virtual ~Functor(); // defined in Dispatcher.cpp
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Functor,Serializable,"Function-like object that is called by Dispatcher, if types of arguments match those the Functor declares to accept.",
-		((string,label,,,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+		((string,label,,,"Textual label for this object; must be a valid python identifier, you can refer to it directly from python.")),
 		/*ctor*/
 		#ifdef USE_TIMING_DELTAS
 			timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);

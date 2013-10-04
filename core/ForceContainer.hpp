@@ -234,8 +234,22 @@ class ForceContainer {
 		const Vector3r& getPermForce(Body::id_t id) { ensureSize(id); return _permForce[id]; }
 		const Vector3r& getPermTorque(Body::id_t id) { ensureSize(id); return _permTorque[id]; }
 		// single getters do the same as globally synced ones in the non-parallel flavor
-		const Vector3r& getForceSingle (Body::id_t id){ ensureSize(id); return _force [id] + permForceUsed?_permForce[id]:_zero; }
-		const Vector3r& getTorqueSingle(Body::id_t id){ ensureSize(id); return _torque[id]; + permForceUsed?_permTorque[id]:_zero;}
+		const Vector3r& getForceSingle (Body::id_t id){ 
+			ensureSize(id); 
+			if (permForceUsed) {
+				return _force [id] + _permForce[id];
+			} else {
+				return _force [id];
+			}
+		}
+		const Vector3r& getTorqueSingle(Body::id_t id){ 
+			ensureSize(id); 
+			if (permForceUsed) {
+				return _torque[id] + _permTorque[id];
+			} else {
+				return _torque[id];
+			}
+		}
 		const Vector3r& getMoveSingle  (Body::id_t id){ ensureSize(id); return _move  [id]; }
 		const Vector3r& getRotSingle   (Body::id_t id){ ensureSize(id); return _rot   [id]; }
 
@@ -258,7 +272,7 @@ class ForceContainer {
 		
 		void sync(){
 			if (permForceUsed) for(long id=0; id<(long)size; id++)
-				{_force[id]+=permForce[id]; _torque[id]+=permTorque[id];}
+				{_force[id]+=_permForce[id]; _torque[id]+=_permTorque[id];}
 			return;}
 		unsigned long syncCount;
 		// interaction in which the container was last reset; used by NewtonIntegrator to detect whether ForceResetter was not forgotten

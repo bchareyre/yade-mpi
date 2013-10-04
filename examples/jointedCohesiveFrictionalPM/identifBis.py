@@ -1,44 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from yade import pack, utils, ymport, export
+# ---- Script to detect spheres which are "onJoint", according to JCFpm. -----
+# To be called directly within an other script, for example, with execfile('identifBis.py')
+# The sample (spheres + facets) has to exist already, with their JCFpmMat
 
-packing='parallellepiped_10'
-DFN='persistentPlane30Deg'
-
-############################ material definition
-facetMat = O.materials.append(JCFpmMat(type=0,young=1,frictionAngle=radians(1),poisson=0.4,density=1))
-def sphereMat(): return JCFpmMat(type=1,young=1,frictionAngle=radians(1),density=1)
-
-############################ Import of the sphere assembly
-O.bodies.append(ymport.text(packing+'.spheres',scale=1,shift=Vector3(0,0,0),material=sphereMat)) #(-3,-4,-8)
-
-#### some preprocessing (not mandatory)
-dim=utils.aabbExtrema()
-xinf=dim[0][0]
-xsup=dim[1][0]
-yinf=dim[0][1]
-ysup=dim[1][1]
-zinf=dim[0][2]
-zsup=dim[1][2]
-
-R=0
-Rmax=0
-numSpheres=0.
-for o in O.bodies:
- if isinstance(o.shape,Sphere):
-   o.shape.color=(0,0,1)
-   numSpheres+=1
-   R+=o.shape.radius
-   if o.shape.radius>Rmax:
-     Rmax=o.shape.radius
- else :
-   o.shape.color=(0,0,0)
-Rmean=R/numSpheres
-
-print 'number of spheres=', numSpheres, ' | Rmean=', Rmean, ' | dim=', dim
-
-############################ import stl file
-O.bodies.append(ymport.stl(DFN+'.stl',color=(0.9,0.9,0.9),wire=False,material=facetMat)) 
 
 ############################ engines definition
 interactionRadius=1.;
@@ -58,9 +23,9 @@ O.engines=[
 ############################ timestep + opening yade windows
 O.dt=0.001*utils.PWaveTimeStep()
 
-from yade import qt
-v=qt.Controller()
-v=qt.View()
+# from yade import qt
+# v=qt.Controller()
+# v=qt.View()
 
 ############################ Identification spheres on joint
 #### color set for particles on joint
@@ -75,6 +40,7 @@ O.step();
 
 for i in O.interactions:
     ##if not i.isReal : continue
+    ### Rk: facet are only stored in id1 
     if isinstance(O.bodies[i.id1].shape,Facet) and isinstance(O.bodies[i.id2].shape,Sphere): 
 	vertices=O.bodies[i.id1].shape.vertices
 	normalRef=vertices[0].cross(vertices[1]) # defines the normal to the facet normalRef
@@ -111,7 +77,8 @@ for i in O.interactions:
 #### second step -> find spheres interacting with spheres on facet (could be executed in the same timestep as step 1?)
 for j in O.interactions:
     #if not i.isReal : continue
-    if isinstance(O.bodies[j.id1].shape,Facet) and isinstance(O.bodies[j.id2].shape,Sphere):
+    ## Rk: facet are only stored in id1 
+    if isinstance(O.bodies[j.id1].shape,Facet) and isinstance(O.bodies[j.id2].shape,Sphere): 
 	vertices=O.bodies[j.id1].shape.vertices
 	normalRef=vertices[0].cross(vertices[1]) # defines the normal to the facet normalRef
 	nRef=normalRef/(normalRef.norm()) ## normalizes normalRef
@@ -125,60 +92,38 @@ for j in O.interactions:
 	facetCenter=O.bodies[j.id1].state.pos
 	#### seek for each sphere interacting with the identified sphere j.id2
 	for n in O.interactions.withBody(j.id2) :
-	    if n.id1==j.id2 and isinstance(O.bodies[n.id2].shape,Sphere): 
-		facetSphereDir=(O.bodies[n.id2].state.pos-facetCenter)
-		if O.bodies[n.id2].mat.onJoint==True :
-		    if O.bodies[n.id2].mat.joint==3 and ((O.bodies[n.id2].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[n.id2].mat.jointNormal2.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[n.id2].mat.jointNormal3.cross(jointNormalRef)).norm()>0.05):
-			O.bodies[n.id2].mat.joint=4
-			O.bodies[n.id2].shape.color=jointcolor5
-		    elif O.bodies[n.id2].mat.joint==2 and ((O.bodies[n.id2].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[n.id2].mat.jointNormal2.cross(jointNormalRef)).norm()>0.05):
-			O.bodies[n.id2].mat.joint=3
+            if isinstance(O.bodies[n.id1].shape,Sphere) and isinstance(O.bodies[n.id2].shape,Sphere):
+                if j.id2==n.id1: # the sphere that was detected on facet (that is, j.id2) is id1 of interaction n
+                    sphOnF=n.id1
+                    othSph=n.id2
+                elif j.id2==n.id2: # here, this sphere that was detected on facet (that is, j.id2) is id2 of interaction n
+                    sphOnF=n.id2
+                    othSph=n.id1
+		facetSphereDir=(O.bodies[othSph].state.pos-facetCenter)
+		if O.bodies[othSph].mat.onJoint==True :
+		    if O.bodies[othSph].mat.joint==3 and ((O.bodies[othSph].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[othSph].mat.jointNormal2.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[othSph].mat.jointNormal3.cross(jointNormalRef)).norm()>0.05):
+			O.bodies[othSph].mat.joint=4
+			O.bodies[othSph].shape.color=jointcolor5
+		    elif O.bodies[othSph].mat.joint==2 and ((O.bodies[othSph].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[othSph].mat.jointNormal2.cross(jointNormalRef)).norm()>0.05):
+			O.bodies[othSph].mat.joint=3
 			if facetSphereDir.dot(jointNormalRef)>=0:
-			    O.bodies[n.id2].mat.jointNormal3=jointNormalRef
+			    O.bodies[othSph].mat.jointNormal3=jointNormalRef
 			elif facetSphereDir.dot(jointNormalRef)<0:
-			    O.bodies[n.id2].mat.jointNormal3=-jointNormalRef 
-		    elif O.bodies[n.id2].mat.joint==1 and ((O.bodies[n.id2].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) :
-			O.bodies[n.id2].mat.joint=2
+			    O.bodies[othSph].mat.jointNormal3=-jointNormalRef 
+		    elif O.bodies[othSph].mat.joint==1 and ((O.bodies[othSph].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) :
+			O.bodies[othSph].mat.joint=2
 			if facetSphereDir.dot(jointNormalRef)>=0:
-			    O.bodies[n.id2].mat.jointNormal2=jointNormalRef
+			    O.bodies[othSph].mat.jointNormal2=jointNormalRef
 			elif facetSphereDir.dot(jointNormalRef)<0:
-			    O.bodies[n.id2].mat.jointNormal2=-jointNormalRef
-		elif  O.bodies[n.id2].mat.onJoint==False :
-		    O.bodies[n.id2].mat.onJoint=True
-		    O.bodies[n.id2].mat.joint=1
-		    O.bodies[n.id2].shape.color=jointcolor4
+			    O.bodies[othSph].mat.jointNormal2=-jointNormalRef
+		elif  O.bodies[othSph].mat.onJoint==False :
+		    O.bodies[othSph].mat.onJoint=True
+		    O.bodies[othSph].mat.joint=1
+		    O.bodies[othSph].shape.color=jointcolor4
 		    if facetSphereDir.dot(jointNormalRef)>=0:
-			O.bodies[n.id2].mat.jointNormal1=jointNormalRef
+			O.bodies[othSph].mat.jointNormal1=jointNormalRef
 		    elif facetSphereDir.dot(jointNormalRef)<0:
-			O.bodies[n.id2].mat.jointNormal1=-jointNormalRef
-
-	    elif n.id2==j.id2 and isinstance(O.bodies[n.id1].shape,Sphere): 
-		facetSphereDir=(O.bodies[n.id1].state.pos-facetCenter)
-		if O.bodies[n.id1].mat.onJoint==True :
-		    if O.bodies[n.id1].mat.joint==3 and ((O.bodies[n.id1].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[n.id1].mat.jointNormal2.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[n.id1].mat.jointNormal3.cross(jointNormalRef)).norm()>0.05):
-			O.bodies[n.id1].mat.joint=4
-			O.bodies[n.id1].shape.color=jointcolor5
-		    elif O.bodies[n.id1].mat.joint==2 and ((O.bodies[n.id1].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) and ((O.bodies[n.id1].mat.jointNormal2.cross(jointNormalRef)).norm()>0.05):
-			O.bodies[n.id1].mat.joint=3
-			if facetSphereDir.dot(jointNormalRef)>=0:
-			    O.bodies[n.id1].mat.jointNormal3=jointNormalRef
-			elif facetSphereDir.dot(jointNormalRef)<0:
-			    O.bodies[n.id1].mat.jointNormal3=-jointNormalRef
-		    elif O.bodies[n.id1].mat.joint==1 and ((O.bodies[n.id1].mat.jointNormal1.cross(jointNormalRef)).norm()>0.05) :
-			O.bodies[n.id1].mat.joint=2
-			if facetSphereDir.dot(jointNormalRef)>=0:
-			    O.bodies[n.id1].mat.jointNormal2=jointNormalRef
-			elif facetSphereDir.dot(jointNormalRef)<0:
-			    O.bodies[n.id1].mat.jointNormal2=-jointNormalRef
-		elif  O.bodies[n.id1].mat.onJoint==False :
-		    O.bodies[n.id1].mat.onJoint=True
-		    O.bodies[n.id1].mat.joint=1
-		    O.bodies[n.id1].shape.color=jointcolor4
-		    if facetSphereDir.dot(jointNormalRef)>=0:
-			O.bodies[n.id1].mat.jointNormal1=jointNormalRef
-		    elif facetSphereDir.dot(jointNormalRef)<0:
-			O.bodies[n.id1].mat.jointNormal1=-jointNormalRef
-
+			O.bodies[othSph].mat.jointNormal1=-jointNormalRef
 
 #### for visualization:
 #bj=0
@@ -202,8 +147,15 @@ for j in O.interactions:
 	    ##print o.mat.jointNormal.dot(vert)
 
 
-#### Save text file with informations on each sphere
-export.text(packing+'_'+DFN+'.spheres')
-export.textExt(packing+'_'+DFN+'_jointedPM.spheres',format='jointedPM')
+##### to delete facets (should be OK to start the simulation after that!
+for b in O.bodies:
+    if isinstance(b.shape,Facet):
+	O.bodies.erase(b.id)
 
-O.wait()
+O.resetTime()
+O.interactions.clear()
+print ''
+print 'IdentificationSpheresOnJoint executed ! Spheres onJoint (and so on...) detected, facets deleted'
+print ''
+
+

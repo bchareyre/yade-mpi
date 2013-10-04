@@ -111,20 +111,19 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
     
     vector<Vrtx> vcs;
     set<pair<int,int> > egs;
-    size_t ret;
 
     /* Read a single facet from an ASCII .STL file */
     while(!feof(fp))
     {
 	float n[3];
 	Vrtx v[3];
-	ret=fscanf(fp, "%*s %*s %f %f %f\n", &n[0], &n[1], &n[2]);
-	ret=fscanf(fp, "%*s %*s");
-	ret=fscanf(fp, "%*s %f %f %f\n", &v[0][0],  &v[0][1],  &v[0][2]);
-	ret=fscanf(fp, "%*s %f %f %f\n", &v[1][0],  &v[1][1],  &v[1][2]);
-	ret=fscanf(fp, "%*s %f %f %f\n", &v[2][0],  &v[2][1],  &v[2][2]);
-	ret=fscanf(fp, "%*s"); // end loop
-	ret=fscanf(fp, "%*s"); // end facet
+	fscanf(fp, "%*s %*s %f %f %f\n", &n[0], &n[1], &n[2]);
+	fscanf(fp, "%*s %*s");
+	fscanf(fp, "%*s %f %f %f\n", &v[0][0],  &v[0][1],  &v[0][2]);
+	fscanf(fp, "%*s %f %f %f\n", &v[1][0],  &v[1][1],  &v[1][2]);
+	fscanf(fp, "%*s %f %f %f\n", &v[2][0],  &v[2][1],  &v[2][2]);
+	fscanf(fp, "%*s"); // end loop
+	fscanf(fp, "%*s"); // end facet
 	if(feof(fp)) break;
 
 	int vid[3];

@@ -120,20 +120,20 @@ should have root privileges
 		libboost-iostreams-dev python-dev libboost-python-dev ipython \
 		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
-		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
+		python-xlib python-qt4 pyqt4-dev-tools \
 		gtk2-engines-pixbuf python-argparse \
-		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
+		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man libsuitesparse-dev \
-		libopenblas-dev libmetis-dev
+		libopenblas-dev libmetis-dev python-gts
 
-	* **Fedora**::
+If you are using other distribuition, than Debian or its derivatives, you should
+install the software, which is listed above. Their names can differ from the 
+names of Debian-packages.
 
-		yum install cmake qt3-devel freeglut-devel boost-devel boost-date-time \
-		boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
-		python-devel boost-python ipython python-matplotlib \
-		sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
-		graphviz-python vtk-devel ScientificPython eigen2-devel libQGLViewer-devel \
-		loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging python-sphinx python-bibtex
+Some of packages (for example, cmake, eigen3) are mandatory, some of them
+are optional. Watch for notes and warnings/errors, which are shown
+by cmake during configuration step. If the missing package is optional,
+some of Yade features will be disabled (see the messages at the end of configuration).
 
 
 Compilation
@@ -165,6 +165,8 @@ The following options are available:
 	* ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
 	* ENABLE_GTS: enable GTS-option (ON by default)
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
+	* ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
+	* ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 

@@ -664,7 +664,7 @@ Estimating timestep in absence of interactions is based on the connection betwee
 			 
 In Yade, particles have associated :yref:`Material` which defines density $\rho$ (:yref:`Material.density`), and also may define (in :yref:`ElastMat` and derived classes) particle's "Young's modulus" $E$ (:yref:`ElastMat.young`). $\rho$ is used when particle's mass $m$ is initially computed from its $\rho$, while $E$ is taken in account when creating new interaction between particles, affecting stiffness $K_N$. Knowing $m$ and $K_N$, we can estimate :eq:`eq-dtcr-particle-stiffness` for each particle; we obviously neglect 
 
-* number of interactions per particle $N_i$; for a "reasonable" radius distribution, however, there is a geometrically imposed upper limit (6 for a packing of spheres with equal radii, for instance);
+* number of interactions per particle $N_i$; for a "reasonable" radius distribution, however, there is a geometrically imposed upper limit (6 for a 2D-packing of spheres with equal radii, for instance);
 * the exact relationship the between particles' rigidities $E_i$, $E_j$, supposing only that $K_N$ is somehow proportional to them.
 
 By defining $E$ and $\rho$, particles have continuum-like quantities. Explicit integration schemes for continuum equations impose a critical timestep based on sonic speed $\sqrt{E/\rho}$; the elastic wave must not propagate farther than the minimum distance of integration points $l_{\rm min}$ during one step. Since $E$, $\rho$ are parameters of the elastic continuum and $l_{\rm min}$ is fixed beforehand, we obtain

@@ -12,6 +12,9 @@ class JCFpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(JCFpmState,State,"JCFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
 		((int,tensBreak,0,,"number of tensile breakages. [-]"))
                 ((int,shearBreak,0,,"number of shear breakages. [-]"))
+		// ((int,noIniLinks,0,,"number of initial cohesive interactions. [-]"))
+		// ((Real,tensBreakRel,0,,"relative number of tensile breakages (compared with noIniLinks). [-]"))
+		// ((Real,shearBreakRel,0,,"relative number of shear breakages (compared with noIniLinks). [-]"))
                 ,
 		createIndex();
 	);
@@ -77,11 +80,11 @@ class Ip2_JCFpmMat_JCFpmMat_JCFpmPhys: public IPhysFunctor{
 		
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_JCFpmMat_JCFpmMat_JCFpmPhys,IPhysFunctor,"converts 2 JCFpmMat instances to JCFpmPhys with corresponding parameters.",
 			((int,cohesiveTresholdIteration,1,,"should new contacts be cohesive? They will before this iter, they won't afterward."))
-			((Real,alpha,0.,,"defines the shear to normal stiffness ratio ks/kn."))
+			((Real,alpha,0.,,"defines the shear to normal stiffness ratio ks/kn in the matrix."))
 			((Real,tensileStrength,0.,,"defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection in the matrix. [Pa]"))
 			((Real,cohesion,0.,,"defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection in the matrix. [Pa]"))
-			((Real,jointNormalStiffness,0.,,"defines the normal stiffness on the joint surface. "))
-			((Real,jointShearStiffness,0.,,"defines the shear stiffness on the joint surface."))
+			((Real,jointNormalStiffness,0.,,"defines the normal stiffness on the joint surface. [Pa]"))
+			((Real,jointShearStiffness,0.,,"defines the shear stiffness on the joint surface. [Pa]"))
 			((Real,jointTensileStrength,0.,,"defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection on the joint surface. [Pa]"))
 			((Real,jointCohesion,0.,,"defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection on the joint surface. [Pa]"))
 			((Real,jointFrictionAngle,-1,,"defines Coulomb friction on the joint surface. [rad]"))
@@ -97,7 +100,7 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,JCFpmPhys);
 
-		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"interaction law for jointed frictional material. Basically, this law adds the possibility to define joint surfaces into a cohesive frictional material as defined by :yref:'Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM'. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure).",
+		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"interaction law for jointed frictional material. Basically, this law adds the possibility to define joint surfaces into a cohesive frictional material as defined by :yref:`Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM`. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure).",
 			((bool,smoothJoint,false,,"if true, particles belonging to joint surface have a smooth contact logic."))
 			((bool,recordCracks,false,,"if true a text file cracks.txt will be created (iteration, position, type (tensile or shear), cross section and contact normal)."))
 			((bool,cracksFileExist,false,,"If true, text file already exists and its content won't be reset."))

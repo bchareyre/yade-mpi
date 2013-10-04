@@ -1,4 +1,230 @@
 ==================================================
+yade-1.00.0
+Sun Sep 29 23:10:48 2013 +0200
+
+Anton Gladky (64):
+      Remove release file.
+      Add documentation, how to render particle with ParaView`s PointSprite plugin.
+      Fix spelling errors.
+      Add Changelog.
+      Add different capillar models into ViscoElasticPM.
+      Add links to equations, consider not only monodisperse particles.
+      Fix s parameter for Willet-formulation of capillar.
+      Add one more critical-calculation to capillar model.
+      Cleanings in viscoelastic capillar modell.
+      Move capillar calculation into another function not to overload VPM.
+      Modify Weigart`s model.
+      Update equations for Weigart`s capillar model.
+      Update capillar equations and names of schemas.
+      Move references to a references.bib.
+      Add comment on liquid bridges.
+      Fix some warnings (clang).
+      Fix compilation.
+      Implement rotational resistance in ViscoElasticPM.
+      Add massMultiply-parameter to ViscoElasticPM to have an opportunity to set kn, kt, cn and ct without multiplication on mass.
+      Implement Rabinovich`s capillar model.
+      Fix wrong calculation of the average rotational resistance.
+      Split ViscoelasticPM on capillar and dry parts.
+      Prevent devision by 0 in capillar Rabinovich model.
+      Prepare for flowengine compilation.
+      Merge libplugins, libsupport and libcore in libyade.
+      Fix FindCholmod.cmake.
+      Fix compilation of FlowBoundingSphere.ipp
+      Replace Cholmod-Feature by LinSolv.
+      Minor fix in CMakeList (FlowEnginge).
+      Implement PID controller to have a servo-engine.
+      Fix tests due to failing clumps-autotests.
+      Use combinedengine for ServoPIDController.
+      Fix hopefully clumps-autotests.
+      Add LudingPM.
+      Merge branch 'ndyck'
+      Add an example for LudingPM.
+      Use libyade again. Revert Bruno`s revert.
+      Fix configuration issue with CHUNKSIZE>0.
+      Drop RockPM.
+      Remove ParticleSizeDistrbutionRPMRecorder.
+      Remove CohesiveStateRPMRecorder.
+      Show PFVflow and LinSolv in disabled features, if they are disabled.
+      Include loki-library dirs and link against them. Fixes compilation on HPC TU Freiberg.
+      Set LinSolv and PFVFLOW ON by default.
+      Add recommended build-dependency for LinSolv and PFVFlow into documentation.
+      Replace ifndef/define-constructions by "#pragma once" in lib/triangulation, where it is possible.
+      Minor fix in capillary models in ViscoelasticPM.
+      Add [Pournin2001] into the description of ViscoelasticPM.
+      Minor fix in calculation s_crit in ViscoelasticPM.
+      Add information about github-hosting into the main page.
+      Add a notification to the screen, whether the current build is debugbuild.
+      Remove explicit linking of libstdcxx.
+      Use skipScripts variable to skip some scripts on check-tests.
+      Skip temporarly DEM-PFV-check.py to let daily-builds packages be built.
+      Remove kde-files from the trunk.
+      Minor fix in installation section of documentation.
+      Remove Fedora list package from documentation. The list is unsupported.
+      Add Antypov2011 reference and some links in Hertz-Mindlin model.
+      Fix some compilation warnings (GCC).
+      Replace libqglviewer-qt4-dev on libqglviewer-dev in installation section.
+      Fix errors in ForceContainer, detected by clang.
+      Fix compilation error.
+      Add export into LIGGGHTS-format.
+      1.00.0
+
+Bruno Chareyre (68):
+      +1 journal article
+      Add the color of the periodic cell a registered attribute.
+      - fix a bug that would let the capillary tables empty when postLoad was not triggered
+      Add function getCapillaryStress(), equivalent of getStress() but for capillary forces
+      -code cleaning
+      fix a latex equation
+      FlowEngine: exclude corner cases when listing constrictions sizes along the void path
+      +1 article
+      -fix url of an article
+      +4 journal papers
+      +1 journal article
+      - add "LINSOLV" source code for DEM-PFV coupling with direct sparse solvers
+      add strainRate attribute to TriaxialStressController + fix bug in example script
+      Revert "Merge libplugins, libsupport and libcore in libyade." Cause: the new cmake system breaks buildbot and does not work for chunkSize>0
+      - add getSceneAsString() to pass scenes between instances without going through the hard drive
+      fix CMakeList for chunkSize>=1
+      - enable load/save from/to python strings with O.sceneToString and O.stringToScene (for communication between parallel instances of yade)
+      -fix the return type of stringToScene()
+      clean the flow code (part 1)
+      cleaning the flow code (smallfix of part 1)
+      cleaning the flow code (part2)
+      cleaning the flow code (part3 and last)
+      -first example script for the fluid coupling with the DEM-PFV method
+      - new conference and journal papers
+      fixed reference
+      +1 PhD thesis
+      - more documentation of TesselationWrapper, with a section in user manual and pointer to published equations.
+      git ignore changes to .gitignore
+      undo previous change in gitignore, not the right way to fix
+      Turn a LOG_DEBUG into LOG_ERROR/return, to escape segfault. (ref: https://bugs.launchpad.net/bugs/1208878)
+      Add an optional argument to O.forces.f() and O.forces.t() to get correct forces on clumps.
+      doc improvement and more cross-links for TesselationWrapper and FlowEngine
+      -enable user defined forces on bodies applying permanently (with updated user manual)
+      +1 conference paper
+      -workaround https://bugs.launchpad.net/yade/+bug/1183402#3, allowing startup imports with optional argument     example: $yade -lscipy.interpolate
+      -fix '-l' command line option (no import lib was crashing)
+      fix uninitialized member of ForceContainer
+      fix compile warnings (unused variables)
+      - smallfixes in documentation
+      fix FlowEngine docstring
+      fix duplicate bib reference
+      small fix in bib entries
+      remove duplicate bib reference
+      commit small fix and update in bib files
+      make default FlowEngine::permeabilityFactor less absurd (crashing by default sucks)
+      regression (check-)test for FlowEngine
+      remove Dem3Dof form Yade (also eudoxos module, mostly based on Dem3Dof)
+      - remove Dem3Dof from documentation
+      remove eudoxos from build system (+ remove from VTKRecorder, that was left behind)
+      remove Dem3Dof from a docstring
+      remove Dem3Dof from alias
+      various fixes and improvements in checkTests
+      - increase verbosity of DEM-PFV checkTest
+      remove some debugging code left in chekList.py
+      make sure FlowEngine has been compiled before trying the checkTest DEM-PFV, as suggested by Klaus
+      make the DEM-PFV checktest fully determinist with a data file for initial positions
+      new attributes in FlowEngine to access low level cholmod/metis data
+      \#include <cholmod.h> in FlowEngine.cpp (why is it not needed on lucid?!)
+      add #ifdef LINSOLV guards in appropriate places in case someone (e.g. buildbot) compiles without cholmod
+      one more #ifdef LINSOLV guard
+      add a cmake path for metis.h on wheezy
+      Return a warning at startup if X rendering is unavailable despite gui is required.
+      User manual: correct the meaning of body.dynamic + remove utils. prefixes
+      Typo fix in prog.rst
+      Fix sphinx warning (no :gui: role)
+      yadeSphinx.py: remove eudoxos module from the build list
+      -remove empty section of doc: External modules
+      revert 3d7ca8577 (doc/current hyperlink), see also https://lists.launchpad.net/yade-dev/msg10035.html.
+
+Chiara Modenese (1):
+      Prevent the normal force become negative when viscous damping is applied.
+
+Christian Jakob (23):
+      added new example showing implementation of buoyancy
+      small fix in new example from previous commit
+      small fix of description in new buoyancy example
+      include integration scheme for inertia tensors of clumps; inertia/masses/volumes of clumps are updated automatically by call of updateProperties method; removed adaptClumpMasses method and example script
+      Merge branch 'master' of github.com:yade/trunk
+      make getRoundness() faster
+      shorten the code of Clump.cpp: switched getClumpVolumeAndAdaptInertia() method into updateProperties()
+      small fix of a comment
+      small fix in an example script
+      Merge branch 'master' of github.com:yade/trunk
+      remove unused #include in Clump.cpp
+      limit number of cubes for clump inertia integration scheme to 1000000; avoids worst case scenario with R_clump_member(s)<<R_clump
+      shorten code of Clump.cpp; improve inertia intergration scheme
+      undo unwanted changes in addToClump example from previous commit
+      bug fix of a previous commit
+      set maximum number of cubes for clump inertia integration scheme to 3375000 in Clump.cpp
+      fix inertia calculation and clump test
+      add output of inertia and mass to addToClump-example.py
+      Merge branch 'master' of github.com:yade/trunk
+      Merge branch 'master' of github.com:yade/trunk
+      Merge branch 'master' of github.com:yade/trunk
+      fix colors in releaseFromClump-example.py
+      improve addToClump() method, make it possible to add body lists
+
+Francois Kneib (3):
+      Fix bug #1161847 : Cannot create two clumpClouds in the same simulation (https://bugs.launchpad.net/yade/+bug/1161847).     Modified makeClumpCloud(...) in SpherePack.cpp : the random generator was wrong, fixed it.
+      Make the interaction between two Grids possible. It comes with a set of new classes, all in Grid.cpp/hpp :     - The geometry of interaction : GridCoGridCoGeom     - Its instanciation : Ig2_GridConnection_GridConnection_GridCoGridCoGeom     - An elastic frictional law : Law2_GridCoGridCoGeom_FrictPhys_CundallStrack
+      Lots of changes in the inelastic cohesive set of classes.     - correct a lot of bugs and comment the inelastic cohesive law : pkg/dem/Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment     - change some variables names and comments : pkg/dem/InelastCohFrictMat pkg/dem/InelastCohFrictPhys pkg/dem/Ip2_2xInelastCohFrictMat_InelastCohFrictPhys
+
+Jan Stránský (14):
+      added --diable-pynotify to yade-batch     Removed #include Shop.hpp from Cell.*pp     added area attribute to Facet
+      added triaxal test on cylinder example
+      Created classes for bubble interaction according to question #230574
+      Tetra modification (Ig2_Tetra_Tetra_TTtraSimpleGeom, Law2_TTetraSimpleGeom_NormPhys_Simple, modified GL functor, examples, utils.tetra)     added Ip2_ElastMat_... functors     fixed bug in utils.kineticEnergy for aspherical bodies
+      Merge branch 'master' of github.com:yade/trunk
+      added utils.UnstructuredGrid class for manipulating (external forces evaluation and positin changes) of FEM-like triangular and tetrahedral meshes     hopefully fixed CGAL compilation problem in pkg/dem/Tetra.*pp reported by Klaus
+      Improved documentation about O.load and O.save, motivated by question #230900
+      export.VTKExporter improvement (intaractions export), SVD matrix decomposition in python, Peri3dController improvement (compatibility with O.save/O.load)
+      doc improvement of Peri3dController
+      Merge branch 'master' of http://github.com/yade/trunk
+      midified exporter.VTKExporter for correct interactions export in periodic case
+      ConcretePM: modified damage tensor computetion, added elasticEnergy function, added export.VTKExporter.exportInteractions function, modified ymport.iges function
+      Merge branch 'master' of http://github.com/yade/trunk
+      Modifying code to enable compilation with QUAD_PRECISION without errors (does not work yet for CGAL enabled)
+
+Jerome Duriez (7):
+      - few changes in comments in JointedCohesiveFrictionalPM.*     - typos corrected in doxygen and sphinx docs of TriaxialTest (there was some "Trixial" instead of "Triaxial")     - correction of typo, broken links, and add of two precisions in the doc of a function of pack.py
+      Typo in NewtonIntegrator doc
+      Correction of link-syntax in doc of Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM
+      Typo and redundancies corrected in doc of Functor.label
+      Typo in a figure legend
+      Precision in the doc relative to dt (6 is the maximal contact number in 2D)
+      Correction of a broken link in GSTS doc
+
+Klaus Thoeni (11):
+      various wire contact laws available now, add reference with details, add a check script for the wire model
+      various wire contact laws available now (new version), add reference with details
+      resolve clash between utils.box and box loaded from pylab
+      correct some spelling and make some example scripts working (more checks needed)
+      move one level up
+      use returnSpherePack=True in randomDensePack
+      fix some typos and links in documentation
+      Merge branch 'master' of github.com:yade/trunk
+      make script faster
+      introduce tolerence in overlap check for intersecting spheres
+      add MatchMaker for friction angle
+
+Luc Scholtes (4):
+      Merge branch 'master' of github.com:yade/trunk
+      cleanup in yade publications list
+      remove CohesiveFrictionalPM from trunk
+      add a new class for modelling jointed media (JointedCohesiveFrictionalPM) and examples to illustrate how to use it (examples/jointedCohesiveFrictionalPM/)
+      new reference added
+
+Nolan Dyck (2):
+      Updated function descriptions for BubbleMat
+      Merge branch 'master' of https://github.com/yade/trunk
+
+Raphaël Maurin (1):
+      Modify GlobalStiffnessTimeStepper for visco-elastic contact law.
+
+
+==================================================
 yade-0.97.0
 Sun May 12 14:48:29 2013 +0200
 

@@ -270,7 +270,7 @@ def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highli
 	b.mask=0	#avoid contact detection with the nodes. Manual interaction will be set for them in "gridConnection" below.
 	return b
 
-def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask="none",cellDist=None):
+def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask=1,cellDist=None):
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]

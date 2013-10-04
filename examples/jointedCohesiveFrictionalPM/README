@@ -11,3 +11,6 @@ Packing generation can be done with other methods. The point here is to generate
 2-identificationSpheresOnJoint.py is a script used to identify the spheres belonging to a predefined packing (parallellepiped_10.spheres) interacting along pre-existing discontinuity surfaces defined by a meshed surface (persistentPlane30Deg.stl). Executing this script produces 2 text files containing respectively spheres from packing (parallellepiped_10_persistentPlane30Deg.spheres) and spheres attributes regarding jcfPM variables (parallellepiped_10_persistentPlane30Deg_jointedPM.spheres). 
 
 3-gravityLoading.py is a simple example showing how to use Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM. It simulates the loading of a pre-fractured packing (parallellepiped_10_persistentPlane30Deg.spheres) by gravity to emphasize how the pre-existing discontinuity affects the behavior. User can play along with joint surface properties (smooth contact logic or not, joint friction angle,...) to see the effect on the simulated behavior.
+
+
+A more compact way of use is proposed in gravityBis.py. This script is stand-alone, and calls itself the scrit identifBis.py. This later script can be called from any script in JCFpm modelling to detect spheres that should interact according to smooth contact logic.

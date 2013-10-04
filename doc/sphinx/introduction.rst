@@ -417,7 +417,7 @@ In a typical DEM simulation, the following sequence is run repeatedly:
 .. _img-yade-iter-loop:
 .. figure:: fig/yade-iter-loop.*
 
-	Typical simulation loop; each step begins at body-cented bit at 11 o'clock, continues with interaction bit, force application bit, miscillanea and ends with time update.
+	Typical simulation loop; each step begins at body-centered bit at 11 o'clock, continues with interaction bit, force application bit, miscillanea and ends with time update.
 
 Each of these actions is represented by an :yref:`Engine<Engine>`, functional element of simulation. The sequence of engines is called *simulation loop*.
 
