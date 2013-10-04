@@ -28,6 +28,7 @@
 #include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/dem/ConcretePM.hpp>
 #include<yade/pkg/dem/WirePM.hpp>
+#include<yade/pkg/dem/JointedCohesiveFrictionalPM.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
 
@@ -66,12 +67,17 @@ void VTKRecorder::action(){
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
 		else if(rec=="stress") recActive[REC_STRESS]=true;
+		else if(rec=="jcfpm") recActive[REC_JCFPM]=true;
+		else if(rec=="cracks") recActive[REC_CRACKS]=true;
 		else if(rec=="pericell" && scene->isPeriodic) recActive[REC_PERICELL]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, pericell). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, pericell). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
 	
+	// jcfpm needs interactions
+	if(recActive[REC_JCFPM]) recActive[REC_INTR]=true;
+
 	// wpm needs interactions
 	if(recActive[REC_WPM]) recActive[REC_INTR]=true;
 	
@@ -205,6 +211,52 @@ void VTKRecorder::action(){
 	cpmStress->SetNumberOfComponents(9);
 	cpmStress->SetName("cpmStress");
 
+	// extras for JCFpm
+	vtkSmartPointer<vtkFloatArray> damage = vtkSmartPointer<vtkFloatArray>::New();
+	damage->SetNumberOfComponents(1);;
+	damage->SetName("damage");
+	vtkSmartPointer<vtkFloatArray> damageRel = vtkSmartPointer<vtkFloatArray>::New();
+	damageRel->SetNumberOfComponents(1);;
+	damageRel->SetName("damageRel");
+	vtkSmartPointer<vtkFloatArray> intrIsCohesive = vtkSmartPointer<vtkFloatArray>::New();
+	intrIsCohesive->SetNumberOfComponents(1);
+	intrIsCohesive->SetName("isCohesive");
+	vtkSmartPointer<vtkFloatArray> intrIsOnJoint = vtkSmartPointer<vtkFloatArray>::New();
+	intrIsOnJoint->SetNumberOfComponents(1);
+	intrIsOnJoint->SetName("isOnJoint");
+	
+	// extras for cracks
+	vtkSmartPointer<vtkPoints> crackPos = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkCellArray> crackCells = vtkSmartPointer<vtkCellArray>::New();
+	vtkSmartPointer<vtkFloatArray> iter = vtkSmartPointer<vtkFloatArray>::New();
+	iter->SetNumberOfComponents(1);
+	iter->SetName("iter");
+	vtkSmartPointer<vtkFloatArray> crackType = vtkSmartPointer<vtkFloatArray>::New();
+	crackType->SetNumberOfComponents(1);
+	crackType->SetName("crackType");
+	vtkSmartPointer<vtkFloatArray> crackSize = vtkSmartPointer<vtkFloatArray>::New();
+	crackSize->SetNumberOfComponents(1);
+	crackSize->SetName("crackSize");
+	vtkSmartPointer<vtkFloatArray> crackNorm = vtkSmartPointer<vtkFloatArray>::New();
+	crackNorm->SetNumberOfComponents(3);
+	crackNorm->SetName("crackNorm");
+
+// 	// the same for newly created cracks
+// 	vtkSmartPointer<vtkPoints> crackPosNew = vtkSmartPointer<vtkPoints>::New();
+// 	vtkSmartPointer<vtkCellArray> crackCellsNew = vtkSmartPointer<vtkCellArray>::New();
+// 	vtkSmartPointer<vtkFloatArray> iterNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	iterNew->SetNumberOfComponents(1);
+// 	iterNew->SetName("iter");
+// 	vtkSmartPointer<vtkFloatArray> crackTypeNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	crackTypeNew->SetNumberOfComponents(1);
+// 	crackTypeNew->SetName("crackType");
+// 	vtkSmartPointer<vtkFloatArray> crackSizeNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	crackSizeNew->SetNumberOfComponents(1);
+// 	crackSizeNew->SetName("crackSize");
+// 	vtkSmartPointer<vtkFloatArray> crackNormNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	crackNormNew->SetNumberOfComponents(3);
+// 	crackNormNew->SetName("crackNorm");
+	
 	// extras for WireMatPM
 	vtkSmartPointer<vtkFloatArray> wpmNormalForce = vtkSmartPointer<vtkFloatArray>::New();
 	wpmNormalForce->SetNumberOfComponents(1);
@@ -290,6 +342,13 @@ void VTKRecorder::action(){
 						wpmLimitFactor->InsertNextValue(NaN);
 					}
 				}
+				else if (recActive[REC_JCFPM]){
+					const JCFpmPhys* jcfpmphys = YADE_CAST<JCFpmPhys*>(I->phys.get());
+					intrIsCohesive->InsertNextValue(jcfpmphys->isCohesive);
+					intrIsOnJoint->InsertNextValue(jcfpmphys->isOnJoint);
+					intrForceN->InsertNextValue(fn);
+				}
+
 				else {
 					intrForceN->InsertNextValue(fn);
 				}
@@ -351,6 +410,11 @@ void VTKRecorder::action(){
 					cpmStress->InsertNextTupleValue(s);
 				}
 				
+				if (recActive[REC_JCFPM]){
+					damage->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreak + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreak);
+// 					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
+				}
+
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
 				continue;
 			}
@@ -496,6 +560,9 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(cpmStress);
 		}
 
+		if (recActive[REC_JCFPM]) {
+			spheresUg->GetPointData()->AddArray(damage);
+		}
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
 
 		#ifdef YADE_VTK_MULTIBLOCK
@@ -565,6 +632,10 @@ void VTKRecorder::action(){
 		intrPd->SetLines(intrCells);
 		intrPd->GetCellData()->AddArray(intrForceN);
 		intrPd->GetCellData()->AddArray(intrAbsForceT);
+		if (recActive[REC_JCFPM]) { 
+			intrPd->GetCellData()->AddArray(intrIsCohesive);
+			intrPd->GetCellData()->AddArray(intrIsOnJoint);
+		}
 		if (recActive[REC_WPM]){
 			intrPd->GetCellData()->AddArray(wpmNormalForce);
 			intrPd->GetCellData()->AddArray(wpmLimitFactor);
@@ -599,6 +670,70 @@ void VTKRecorder::action(){
 			writer->Write();
 		}
 	}
+
+	if (recActive[REC_CRACKS]) {
+		std::ifstream file ("cracks.txt",std::ios::in);
+		vtkSmartPointer<vtkUnstructuredGrid> crackUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		vtkSmartPointer<vtkUnstructuredGrid> crackUgNew = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		
+		 if(file){
+			 while ( !file.eof() ){
+				std::string line;
+				Real i,p0,p1,p2,t,s,n0,n1,n2;
+				while ( std::getline(file, line)/* writes into string "line", a line of file "file". To go along diff. lines*/ ) 
+				{
+					file >> i >> p0 >> p1 >> p2 >> t >> s >> n0 >> n1 >> n2;
+					vtkIdType pid[1];
+					pid[0] = crackPos->InsertNextPoint(p0, p1, p2);
+					crackCells->InsertNextCell(1,pid);
+					crackType->InsertNextValue(t);
+					crackSize->InsertNextValue(s);
+					iter->InsertNextValue(i);
+					float n[3] = { n0, n1, n2 };
+					crackNorm->InsertNextTupleValue(n);
+// 					if (i > scene->iter - iterPeriod)
+// 					{
+// 					  pid[0] = crackPosNew->InsertNextPoint(p0, p1, p2);
+// 					  crackCellsNew->InsertNextCell(1,pid);
+// 					  crackTypeNew->InsertNextValue(t);
+// 					  crackSizeNew->InsertNextValue(s);
+// 					  iterNew->InsertNextValue(i);
+// 					  crackNormNew->InsertNextTupleValue(n);
+// 					}
+					  
+				}
+			 }
+			 file.close();
+		} 
+
+		crackUg->SetPoints(crackPos);
+		crackUg->SetCells(VTK_VERTEX, crackCells);
+		crackUg->GetPointData()->AddArray(iter);
+		crackUg->GetPointData()->AddArray(crackType);
+		crackUg->GetPointData()->AddArray(crackSize);
+		crackUg->GetPointData()->AddArray(crackNorm); //orientation of 2D glyphs does not match this direction (some work to do in order to have the good orientation) 
+		
+		/*crackUgNew->SetPoints(crackPosNew);
+		crackUgNew->SetCells(VTK_VERTEX, crackCellsNew);
+		crackUgNew->GetPointData()->AddArray(iterNew);
+		crackUgNew->GetPointData()->AddArray(crackTypeNew);
+		crackUgNew->GetPointData()->AddArray(crackSizeNew);
+		crackUgNew->GetPointData()->AddArray(crackNormNew); //same remark...*/
+	
+		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+		if(compress) writer->SetCompressor(compressor);
+		if(ascii) writer->SetDataModeToAscii();
+		string fn=fileName+"cracks."+lexical_cast<string>(scene->iter)+".vtu";
+		writer->SetFileName(fn.c_str());
+		writer->SetInput(crackUg);
+		writer->Write();
+		
+// 		fn=fileName+"newcracks."+lexical_cast<string>(scene->iter)+".vtu";
+// 		writer->SetFileName(fn.c_str());
+// 		writer->SetInput(crackUgNew);
+// 		writer->Write();
+	}
+
 	#ifdef YADE_VTK_MULTIBLOCK
 		if(multiblock){
 			vtkSmartPointer<vtkMultiBlockDataSet> multiblockDataset = vtkSmartPointer<vtkMultiBlockDataSet>::New();
@@ -615,8 +750,6 @@ void VTKRecorder::action(){
 			writer->Write();	
 		}
 	#endif
-
-
 };
 
 void VTKRecorder::addWallVTK (vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<vtkPoints>& boxesPos, Vector3r& W1, Vector3r& W2, Vector3r& W3, Vector3r& W4) {
