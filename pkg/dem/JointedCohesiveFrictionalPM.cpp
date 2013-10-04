@@ -60,6 +60,8 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
 	    st1->tensBreak+=1;
 	    st2->tensBreak+=1;
+	    //st1->tensBreakRel+=1.0/st1->noIniLinks;
+	    //st2->tensBreakRel+=1.0/st2->noIniLinks;
 	    
     	    // create a text file to record properties of the broken bond (iteration, position, type (tensile), cross section and contact normal orientation)
 	    if (recordCracks){
@@ -118,6 +120,8 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
 	    st1->shearBreak+=1;
 	    st2->shearBreak+=1;
+	    //st1->shearBreakRel+=1.0/st1->noIniLinks;
+	    //st2->shearBreakRel+=1.0/st2->noIniLinks;
 
 	    // create a text file to record properties of the broken bond (iteration, position, type (shear), cross section and contact normal orientation)
 	    if (recordCracks){
@@ -195,7 +199,13 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	
 	// cohesive properties
 	///to set if the contact is cohesive or not
-	if ((scene->iter < cohesiveTresholdIteration) && (tensileStrength>0 || cohesion>0) && (yade1->type == yade2->type)){ contactPhysics->isCohesive=true; }
+	if ((scene->iter < cohesiveTresholdIteration) && (tensileStrength>0 || cohesion>0) && (yade1->type == yade2->type)){ 
+	  contactPhysics->isCohesive=true;
+// 	  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
+// 	  st1->noIniLinks++;
+// 	  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
+// 	  st2->noIniLinks++;
+	}
 	
 	if ( contactPhysics->isCohesive ) {
 	  contactPhysics->FnMax = tensileStrength*contactPhysics->crossSection;
@@ -221,7 +231,13 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 			contactPhysics->tanDilationAngle = std::tan(contactPhysics->dilationAngle);
 		  
 			///to set if the contact is cohesive or not
-			if ((scene->iter < cohesiveTresholdIteration) && (jointCohesion>0 || jointTensileStrength>0)) { contactPhysics->isCohesive=true; } 
+			if ((scene->iter < cohesiveTresholdIteration) && (jointCohesion>0 || jointTensileStrength>0)) {
+			  contactPhysics->isCohesive=true;
+// 			  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
+// 			  st1->noIniLinks++;
+// 			  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
+// 			  st2->noIniLinks++;
+			} 
 			else { contactPhysics->isCohesive=false; contactPhysics->FnMax=0; contactPhysics->FsMax=0; }
 		  
 			if ( contactPhysics->isCohesive ) {

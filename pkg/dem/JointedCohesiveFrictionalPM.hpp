@@ -100,8 +100,8 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,JCFpmPhys);
 
-		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"interaction law for jointed frictional material. Basically, this law adds the possibility to define joint surfaces into a cohesive frictional material as defined by :yref:`Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM`. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure).",
-			((bool,smoothJoint,false,,"if true, particles belonging to joint surface have a smooth contact logic."))
+		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"Interaction law for cohesive frictional material, e.g. rock, possibly presenting joint surfaces. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure), and can be mechanically described with a smooth contact logic [Ivars2011]_ (implemented in Yade in [Scholtes2012]_).",
+			((bool,smoothJoint,false,,"if true, particles belonging to joint surface have a smooth contact logic [Ivars2011]_, [Scholtes2012]_."))
 			((bool,recordCracks,false,,"if true a text file cracks.txt will be created (iteration, position, type (tensile or shear), cross section and contact normal)."))
 			((bool,cracksFileExist,false,,"If true, text file already exists and its content won't be reset."))
 		);
