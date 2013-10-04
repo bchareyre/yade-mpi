@@ -145,7 +145,7 @@ class Shop{
 		static void setContactFriction(Real angleRad);
 
 		//! Homothetic change of sizes of spheres and clumps
-		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly);
+		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization, bool integrateInertia);
 
 
 };

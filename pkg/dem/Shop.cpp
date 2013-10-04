@@ -873,7 +873,7 @@ void Shop::setContactFriction(Real angleRad){
 	}
 }
 
-void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
+void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization, bool integrateInertia)
 {
 	Scene* scene = Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
@@ -888,7 +888,7 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if(b->isClump()){
 			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
-			clumpSt->updateProperties(b);
+			clumpSt->updateProperties(b, discretization, integrateInertia);
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){

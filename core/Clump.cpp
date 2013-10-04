@@ -82,7 +82,7 @@ void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vec
 
 */
 
-void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
+void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int discretization, bool integrateInertia){
 	LOG_DEBUG("Updating clump #"<<clumpBody->id<<" parameters");
 	const shared_ptr<State> state(clumpBody->state);
 	const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
@@ -110,16 +110,18 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 	bool intersecting = false;
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
-	FOREACH(MemberMap::value_type& mm, clump->members){
-		const shared_ptr<Body> subBody1=Body::byId(mm.first);
+	if (integrateInertia){
 		FOREACH(MemberMap::value_type& mm, clump->members){
-			const shared_ptr<Body> subBody2=Body::byId(mm.first);
-			if ((subBody1->shape->getClassIndex() ==  Sph_Index) && (subBody2->shape->getClassIndex() ==  Sph_Index) && (subBody1!=subBody2)){//clump members should be spheres
-				Vector3r dist = subBody1->state->pos - subBody2->state->pos;
-				const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
-				const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
-				Real un = (sphere1->radius+sphere2->radius) - dist.norm();
-				if (un > -0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
+			const shared_ptr<Body> subBody1=Body::byId(mm.first);
+			FOREACH(MemberMap::value_type& mm, clump->members){
+				const shared_ptr<Body> subBody2=Body::byId(mm.first);
+				if ((subBody1->shape->getClassIndex() ==  Sph_Index) && (subBody2->shape->getClassIndex() ==  Sph_Index) && (subBody1!=subBody2)){//clump members should be spheres
+					Vector3r dist = subBody1->state->pos - subBody2->state->pos;
+					const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
+					const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
+					Real un = (sphere1->radius+sphere2->radius) - dist.norm();
+					if (un > -0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
+				}
 			}
 		}
 	}
@@ -150,8 +152,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody){
 			}
 		}
 		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
-		int divisor = 15; 		//TODO: make it choosable by users
-		Real dx = rMin/divisor; 	//edge length of cell
+		Real dx = rMin/discretization; 	//edge length of cell
 		Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
 		if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
 		Real dv = pow(dx,3);		//volume of cell
