@@ -255,10 +255,7 @@ class VTKExporter:
 		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,n))
 		for b in bodies:
-			if O.periodic:
-				pos = O.cell.wrap(O.cell.b.state.refPos if useRef else b.state.pos)
-			else:
-				pos = O.cell.b.state.refPos if useRef else b.state.pos
+			pos = b.state.refPos if useRef else b.state.pos if not O.periodic else O.cell.wrap(b.state.pos)
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		outFile.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
 		for b in bodies:
