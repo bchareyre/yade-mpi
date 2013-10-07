@@ -497,6 +497,7 @@ def plotNumInteractionsHistogram(cutoff=0.):
 	pylab.title('Number of interactions histogram, average %g (cutoff=%g)'%(avgNumInteractions(cutoff),cutoff))
 	pylab.xlabel('Number of interactions')
 	pylab.ylabel('Body count')
+	pylab.ion()
 	pylab.show()
 
 def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
@@ -524,7 +525,9 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
 		pylab.axvline(x=avg,linewidth=3,color='r')
 		pylab.ylabel('Body count')
 	if noShow: return pylab.gcf()
-	else: pylab.show()
+	else:
+		pylab.ion()
+		pylab.show()
 
 
 def encodeVideoFromFrames(*args,**kw):
