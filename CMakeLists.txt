@@ -78,6 +78,7 @@ FIND_PACKAGE(NumPy REQUIRED)
 FIND_PACKAGE(Loki REQUIRED)
   INCLUDE_DIRECTORIES(${LOKI_INCLUDE_DIR})
 FIND_PACKAGE(Eigen3 REQUIRED)
+FIND_PACKAGE(BZip2 REQUIRED)
 #===========================================================
 
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
@@ -101,6 +102,9 @@ IF (EIGEN3_FOUND)
   MESSAGE(STATUS "Found Eigen3")
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
 ENDIF(EIGEN3_FOUND)
+#===========================================================
+INCLUDE_DIRECTORIES(${BZIP2_INCLUDE_DIR})
+SET(LINKLIBS  "${LINKLIBS};${BZIP2_LIBRARIES};")
 #===========================================================
 IF(ENABLE_VTK)
   FIND_PACKAGE(VTK COMPONENTS Common) 
