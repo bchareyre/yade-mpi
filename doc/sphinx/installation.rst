@@ -124,7 +124,7 @@ should have root privileges
 		gtk2-engines-pixbuf python-argparse \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man libsuitesparse-dev \
-		libopenblas-dev libmetis-dev python-gts
+		libopenblas-dev libmetis-dev python-gts libbz2-dev zlib1g-dev
 
 If you are using other distribuition, than Debian or its derivatives, you should
 install the software, which is listed above. Their names can differ from the 
