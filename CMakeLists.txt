@@ -79,6 +79,7 @@ FIND_PACKAGE(Loki REQUIRED)
   INCLUDE_DIRECTORIES(${LOKI_INCLUDE_DIR})
 FIND_PACKAGE(Eigen3 REQUIRED)
 FIND_PACKAGE(BZip2 REQUIRED)
+FIND_PACKAGE(ZLIB REQUIRED)
 #===========================================================
 
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
@@ -104,7 +105,8 @@ IF (EIGEN3_FOUND)
 ENDIF(EIGEN3_FOUND)
 #===========================================================
 INCLUDE_DIRECTORIES(${BZIP2_INCLUDE_DIR})
-SET(LINKLIBS  "${LINKLIBS};${BZIP2_LIBRARIES};")
+INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
+SET(LINKLIBS  "${LINKLIBS};${BZIP2_LIBRARIES};${ZLIB_LIBRARIES};")
 #===========================================================
 IF(ENABLE_VTK)
   FIND_PACKAGE(VTK COMPONENTS Common) 
