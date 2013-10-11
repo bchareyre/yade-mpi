@@ -93,10 +93,9 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
   
   if (phys.DeltMax/phys.DeltPMax >= 1.0) {                           // [Luding2008], equation (8)
     phys.k2 = phys.kp;                                               // [Singh2013], equation (10)
+  } else {
+    phys.k2 = phys.k1 + (phys.kp - phys.k1)*phys.DeltMax/phys.DeltPMax;
   }
-  
-  phys.k2 = phys.k1 + (phys.kp - phys.k1)*phys.DeltMax/phys.DeltPMax;
-  
   
   if (phys.k2>phys.kp) { 
     phys.k2 = phys.kp;
@@ -135,7 +134,6 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
       forceHys = k2DeltTtmp;
     }
   }
-  
   
   phys.DeltPrev = Delt;
   
