@@ -35,6 +35,9 @@ class LudingPhys : public FrictPhys{
 		((Real,ThetMax,NaN,,"Maximum overlap between particles for a collision"))
 		((Real,ThetPMax,NaN,,"Maximum overlap between particles for the limit case"))
 		((Real,ThetNull,NaN,,"Force free overlap, plastic contact deformation"))
+		((Real,ThetPNull,NaN,,"Max force free overlap, plastic contact deformation"))
+    ((Real,ThetaPrev,NaN,,"Previous value of delta"))
+    ((Real,ThetaMin,NaN,,"MinimalTheta value of delta"))
 		((Real,G0,NaN,,"Viscous damping")),
 		createIndex();
 	)
