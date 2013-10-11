@@ -56,13 +56,13 @@ void Ip2_LudingMat_LudingMat_LudingPhys::go(const shared_ptr<Material>& b1, cons
   phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
   
   phys->shearForce = Vector3r(0,0,0);
-  phys->ThetMax = 0.0;
-  phys->ThetNull = 0.0;
-  phys->ThetPMax = phys->kp/(phys->kp-phys->k1)*phys->PhiF*2*a1*a2/(a1+a2);   // [Luding2008], equation (7)
+  phys->DeltMax = 0.0;
+  phys->DeltNull = 0.0;
+  phys->DeltPMax = phys->kp/(phys->kp-phys->k1)*phys->PhiF*2*a1*a2/(a1+a2);   // [Luding2008], equation (7)
                                                                               // [Singh2013], equation (11)
-  phys->ThetPNull = phys->PhiF*2*a1*a2/(a1+a2);                               // [Singh2013], equation (12)
-  phys->ThetaPrev = 0.0;
-  phys->ThetaMin = 0.0;
+  phys->DeltPNull = phys->PhiF*2*a1*a2/(a1+a2);                               // [Singh2013], equation (12)
+  phys->DeltPrev = 0.0;
+  phys->DeltMin = 0.0;
   interaction->phys = shared_ptr<LudingPhys>(phys);
 }
 
@@ -79,9 +79,9 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
   const int id1 = I->getId1();
   const int id2 = I->getId2();
   
-  const Real Theta = geom.penetrationDepth;
+  const Real Delt = geom.penetrationDepth;
   
-  if (Theta<0) {
+  if (Delt<0) {
     scene->interactions->requestErase(I);
     return;
   };
@@ -91,11 +91,11 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
   
   Real forceHys = 0.0;
   
-  if (phys.ThetMax/phys.ThetPMax >= 1.0) {                           // [Luding2008], equation (8)
+  if (phys.DeltMax/phys.DeltPMax >= 1.0) {                           // [Luding2008], equation (8)
     phys.k2 = phys.kp;                                               // [Singh2013], equation (10)
   }
   
-  phys.k2 = phys.k1 + (phys.kp - phys.k1)*phys.ThetMax/phys.ThetPMax;
+  phys.k2 = phys.k1 + (phys.kp - phys.k1)*phys.DeltMax/phys.DeltPMax;
   
   
   if (phys.k2>phys.kp) { 
@@ -106,39 +106,38 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
     phys.k1 = phys.k2;
   }
   
-  phys.ThetaMin = (phys.k2- phys.k1)/(phys.k2 + phys.kc);
+  phys.DeltMin = (phys.k2- phys.k1)/(phys.k2 + phys.kc);
     
-  if (Theta > phys.ThetMax) {
-    phys.ThetMax  = Theta;
-    phys.ThetNull  = std::min((1.0 - phys.k1/phys.k2)*phys.ThetMax, phys.ThetPNull);  // [Luding2008], equation over Fig 1
+  if (Delt > phys.DeltMax) {
+    phys.DeltMax  = Delt;
+    phys.DeltNull  = std::min((1.0 - phys.k1/phys.k2)*phys.DeltMax, phys.DeltPNull);  // [Luding2008], equation over Fig 1
                                                                                       // [Singh2013], equation (8)
   }
   
-  Real k2DeltaTtmp = phys.k2*(Theta - phys.ThetNull);                
-                                                                     // [Luding2008], equation (6)
+  Real k2DeltTtmp = phys.k2*(Delt - phys.DeltNull);                  // [Luding2008], equation (6)
                                                                      // [Singh2013], equation (6)
   
-  if ( k2DeltaTtmp >= phys.k1*Theta) {
-    if (Theta<phys.ThetPMax){
-      forceHys = phys.k1*Theta;                                        
+  if ( k2DeltTtmp >= phys.k1*Delt) {
+    if (Delt<phys.DeltPMax){
+      forceHys = phys.k1*Delt;                                        
     } else {
-      forceHys = k2DeltaTtmp;                                        
+      forceHys = k2DeltTtmp;                                        
     }
-  } else if (k2DeltaTtmp > -phys.kc*Theta and k2DeltaTtmp < phys.k1*Theta) {
-    forceHys = k2DeltaTtmp;
-  } else if (k2DeltaTtmp<=-phys.kc*Theta) {
-    if ((Theta - phys.ThetaPrev) < 0) {
-      forceHys = -phys.kc*Theta;
-      phys.ThetMax = Theta*(phys.k2 + phys.kc)/(phys.k2 - phys.k1);                     // [Singh2013], equation (9)
-      phys.ThetNull  = std::min((1.0 - phys.k1/phys.k2)*phys.ThetMax, phys.ThetPNull);  // [Luding2008], equation over Fig 1
+  } else if (k2DeltTtmp > -phys.kc*Delt and k2DeltTtmp < phys.k1*Delt) {
+    forceHys = k2DeltTtmp;
+  } else if (k2DeltTtmp<=-phys.kc*Delt) {
+    if ((Delt - phys.DeltPrev) < 0) {
+      forceHys = -phys.kc*Delt;
+      phys.DeltMax = Delt*(phys.k2 + phys.kc)/(phys.k2 - phys.k1);                     // [Singh2013], equation (9)
+      phys.DeltNull  = std::min((1.0 - phys.k1/phys.k2)*phys.DeltMax, phys.DeltPNull);  // [Luding2008], equation over Fig 1
                                                                                         // [Singh2013], equation (8)
     } else {
-      forceHys = k2DeltaTtmp;
+      forceHys = k2DeltTtmp;
     }
   }
   
   
-  phys.ThetaPrev = Theta;
+  phys.DeltPrev = Delt;
   
   //===================================================================
   //===================================================================

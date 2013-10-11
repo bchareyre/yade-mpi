@@ -32,12 +32,12 @@ class LudingPhys : public FrictPhys{
 		((Real,kp,NaN,,"Slope of unloading and reloading limit elastic branch"))
 		((Real,kc,NaN,,"Slope of irreversible, tensile adhesive branch"))
 		((Real,PhiF,NaN,,"Dimensionless plasticity depth"))
-		((Real,ThetMax,NaN,,"Maximum overlap between particles for a collision"))
-		((Real,ThetPMax,NaN,,"Maximum overlap between particles for the limit case"))
-		((Real,ThetNull,NaN,,"Force free overlap, plastic contact deformation"))
-		((Real,ThetPNull,NaN,,"Max force free overlap, plastic contact deformation"))
-    ((Real,ThetaPrev,NaN,,"Previous value of delta"))
-    ((Real,ThetaMin,NaN,,"MinimalTheta value of delta"))
+		((Real,DeltMin,NaN,,"MinimalDelta value of delta"))
+		((Real,DeltMax,NaN,,"Maximum overlap between particles for a collision"))
+		((Real,DeltPMax,NaN,,"Maximum overlap between particles for the limit case"))
+		((Real,DeltNull,NaN,,"Force free overlap, plastic contact deformation"))
+		((Real,DeltPNull,NaN,,"Max force free overlap, plastic contact deformation"))
+		((Real,DeltPrev,NaN,,"Previous value of delta"))
 		((Real,G0,NaN,,"Viscous damping")),
 		createIndex();
 	)
