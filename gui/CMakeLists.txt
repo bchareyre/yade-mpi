@@ -3,7 +3,7 @@ IF(${ENABLE_GUI})
   INCLUDE_DIRECTORIES(${QGLVIEWER_INCLUDE_DIR})
   
   SET(_GLViewer_MOC_HEADERS qt4/GLViewer.hpp;qt4/OpenGLManager.hpp)
-  SET(_GLViewer_SOURCE_FILES qt4/GLViewer.cpp;qt4/_GLViewer.cpp;qt4/OpenGLManager.cpp)
+  SET(_GLViewer_SOURCE_FILES qt4/GLViewer.cpp;qt4/_GLViewer.cpp;qt4/OpenGLManager.cpp;qt4/GLViewerDisplay.cpp;qt4/GLViewerMouse.cpp)
   
   QT4_WRAP_CPP(_GLViewer_MOC_OUTFILES ${_GLViewer_MOC_HEADERS})
   
