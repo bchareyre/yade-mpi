@@ -36,6 +36,12 @@ TARGET_LINK_LIBRARIES(_utils yade)
 INSTALL(TARGETS _utils DESTINATION "${YADE_PY_PATH}/yade/")
 
 
+ADD_LIBRARY(_polyhedra_utils SHARED "${CMAKE_CURRENT_SOURCE_DIR}/_polyhedra_utils.cpp")
+SET_TARGET_PROPERTIES(_polyhedra_utils PROPERTIES PREFIX "")
+TARGET_LINK_LIBRARIES(_polyhedra_utils)
+INSTALL(TARGETS _polyhedra_utils DESTINATION "${YADE_PY_PATH}/yade/")
+
+
 ADD_LIBRARY(_packPredicates SHARED "${CMAKE_CURRENT_SOURCE_DIR}/pack/_packPredicates.cpp")
 SET_TARGET_PROPERTIES(_packPredicates PROPERTIES PREFIX "")
 TARGET_LINK_LIBRARIES(_packPredicates yade)
