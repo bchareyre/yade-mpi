@@ -8,7 +8,7 @@ v2 = (1,0,0)
 v3 = (0,1,0)
 v4 = (0,0,1)
 
-t1 = tetraOld((v1,v2,v3,v4),color=(0,1,0))
+t1 = tetraPoly((v1,v2,v3,v4),color=(0,1,0))
 O.bodies.append((t1))
 
 def changeVelocity():
@@ -24,7 +24,7 @@ def changeVelocity():
 
 O.engines = [
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Tetra_Aabb()]),
+	InsertionSortCollider([Bo1_Polyhedra_Aabb()]),
 	InteractionLoop([],[],[]),
 	NewtonIntegrator(),
 	PyRunner(iterPeriod=1,command="changeVelocity()"),
