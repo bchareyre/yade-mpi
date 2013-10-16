@@ -36,7 +36,6 @@ using namespace boost;
 #endif
 
 static int last(-1);
-static unsigned initBlocked(State::DOF_NONE);
 
 void GLViewer::useDisplayParameters(size_t n){
 	LOG_DEBUG("Loading display parameters from #"<<n);

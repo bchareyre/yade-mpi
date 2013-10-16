@@ -35,8 +35,6 @@ using namespace boost;
 	#include<gl2ps.h>
 #endif
 
-static int last(-1);
-static unsigned initBlocked(State::DOF_NONE);
 void GLViewer::mouseMovesCamera(){
 	camera()->frame()->setWheelSensitivity(-1.0f);
 
