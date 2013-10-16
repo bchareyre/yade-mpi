@@ -31,6 +31,7 @@ void CombinedKinematicEngine::action(){
 		}
 		// apply one engine after another
 		FOREACH(const shared_ptr<KinematicEngine>& e, comb){
+			if (e->dead) continue;
 			e->scene=scene; e->apply(ids);
 		}
 	} else {
