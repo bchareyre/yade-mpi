@@ -95,6 +95,16 @@ class FlowEngine : public PartialEngine
 			return (flow->viscousBodyStress.size()>id_sph)?flow->viscousBodyStress[id_sph]:Matrix3r::Zero();}
 		TPL Matrix3r bodyNormalLubStress(unsigned int id_sph, Solver& flow) {
 			return (flow->lubBodyStress.size()>id_sph)?flow->lubBodyStress[id_sph]:Matrix3r::Zero();}
+		TPL Vector3r shearVelocity(unsigned int interaction, Solver& flow) {
+			return (flow->deltaShearVel[interaction]);}
+		TPL Vector3r normalVelocity(unsigned int interaction, Solver& flow) {
+			return (flow->deltaNormVel[interaction]);}
+		TPL Vector3r normalVect(unsigned int interaction, Solver& flow) {
+			return (flow->normalV[interaction]);}
+		TPL Real surfaceDistanceParticle(unsigned int interaction, Solver& flow) {
+			return (flow->surfaceDistance[interaction]);}
+		TPL Real edgeSize(Solver& flow) {
+			return (flow->Edge_ids.size());}
 		TPL python::list getConstrictions(bool all, Solver& flow) {
 			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k]!=0) || csd[k]>0) pycsd.append(csd[k]); return pycsd;}
@@ -147,6 +157,10 @@ class FlowEngine : public PartialEngine
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
+		Vector3r 	_shearVelocity(unsigned int interaction) {return shearVelocity(interaction,solver);}
+		Vector3r 	_normalVelocity(unsigned int interaction) {return normalVelocity(interaction,solver);}
+		Vector3r 	_normalVect(unsigned int interaction) {return normalVect(interaction,solver);}
+		Real	 	_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
@@ -217,6 +231,9 @@ class FlowEngine : public PartialEngine
 					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
 					((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
 					((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
+					((bool, affiche_vitesse, false,,"show the relative velocities between particles"))
+					((bool, affiche_force, false,,"show the lubrication force applied on particles"))
+					((bool, create_file, false,,"create file of velocities"))
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui (FIXME: ref.)"))
 					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule (FIXME: ref.) "))
 					((double, eps, 0.00001,,"roughness defined as a fraction of particles size, giving the minimum distance between particles in the lubrication model."))
@@ -263,6 +280,11 @@ class FlowEngine : public PartialEngine
 					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
+					.def("shearVelocity",&FlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+					.def("normalVelocity",&FlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
+					.def("normalVect",&FlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
+					.def("surfaceDistanceParticle",&FlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+					
 					.def("pressureProfile",&FlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("getPorePressure",&FlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("averageSlicePressure",&FlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
@@ -343,6 +365,11 @@ class PeriodicFlowEngine : public FlowEngine
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
+		Vector3r 	_shearVelocity(unsigned int id_sph) {return shearVelocity(id_sph,solver);}
+		Vector3r 	_normalVelocity(unsigned int id_sph) {return normalVelocity(id_sph,solver);}
+		Vector3r 	_normalVect(unsigned int id_sph) {return normalVect(id_sph,solver);}
+		Real		_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
+		Real		_edgeSize() {return edgeSize(solver);}
 
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
@@ -395,6 +422,11 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("normalLubForce",&PeriodicFlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
+			.def("shearVelocity",&PeriodicFlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+			.def("normalVelocity",&PeriodicFlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
+			.def("normalVect",&PeriodicFlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
+			.def("surfaceDistanceParticle",&PeriodicFlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+			.def("edgeSize",&PeriodicFlowEngine::_edgeSize,"Return the number of interactions.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
