@@ -276,7 +276,7 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 	
         if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
         if ( WaveAction ) flow->ApplySinusoidalPressure ( flow->T[flow->currentTes].Triangulation(), sineMagnitude, sineAverage, 30 );
-        if (normalLubrication || shearLubrication) flow->computeEdgesSurfaces();
+        if (normalLubrication || shearLubrication || viscousShear) flow->computeEdgesSurfaces();
 }
 
 void FlowEngine::setPositionsBuffer(bool current)
@@ -595,13 +595,13 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 		const Tesselation& Tes = flow.T[flow.currentTes];
 		flow.deltaShearVel.clear(); flow.normalV.clear(); flow.deltaNormVel.clear(); flow.surfaceDistance.clear(); 
 
+
 		for ( int i=0; i< ( int ) flow.Edge_ids.size(); i++ ) {
 			const int& id1 = flow.Edge_ids[i].first;
 			const int& id2 = flow.Edge_ids[i].second;
 			
 			int hasFictious= Tes.vertex ( id1 )->info().isFictious +  Tes.vertex ( id2 )->info().isFictious;
 			if (hasFictious>0 or id1==id2) continue;
-			if (hasFictious==2) continue;
 			const shared_ptr<Body>& sph1 = Body::byId ( id1, scene );
 			const shared_ptr<Body>& sph2 = Body::byId ( id2, scene );
 			Sphere* s1=YADE_CAST<Sphere*> ( sph1->shape.get() );
@@ -653,8 +653,7 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 			flow.deltaShearVel.push_back(deltaShearV);
 			flow.normalV.push_back(normal);
 			flow.surfaceDistance.push_back(max(surfaceDist, 0.) + eps*meanRad);
-			if (affiche_vitesse) cout << "le vecteur normal entre " << id1 << " et " << id2 << "est " << normal <<" total " << ( int ) flow.Edge_ids.size()<< endl;
-			
+
 			if (shearLubrication)
 				visc_f = flow.computeShearLubricationForce(deltaShearV,surfaceDist,i,eps,O1O2,meanRad);
 			else if (viscousShear) 
@@ -687,8 +686,13 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 					flow.lubBodyStress[id1] += lub_f * O1C_vect.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
 					flow.lubBodyStress[id2] += (-lub_f) *O2C_vect.transpose() / (4.0/3.0 *3.14* pow(r2,3));}
 			}
+
+			if (create_file){
+			  std::ofstream velocity_file("result_velocity.txt",ios::app);
+			  velocity_file << i << "\t" << deltaNormV * normal[0] << "\t" << deltaNormV * normal[1] << "\t" << deltaNormV * normal[2] << "\t" << deltaShearV[0] << "\t" << deltaShearV[1] << "\t" << deltaShearV[2] << "\t" << normal[0] << "\t" << normal[1] << "\t" << normal[2] << "\t" << max(surfaceDist, 0.) + eps*meanRad <<  endl;
+			  velocity_file.close(); }
 			  
-			if (affiche_force) cout<<"force tangentielle "<<visc_f<< " force normale "<< lub_f<<endl;
+			if (display_force) cout<<"force tangentielle "<<visc_f<< " force normale "<< lub_f<<endl;
 		}
 	}
 }
@@ -1100,7 +1104,8 @@ void PeriodicFlowEngine::Build_Triangulation ( double P_zero, shared_ptr<FlowSol
 // 	if ( !first && (useSolver==0 || fluidBulkModulus>0)) flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 	
         if ( WaveAction ) flow->ApplySinusoidalPressure ( Tes.Triangulation(), sineMagnitude, sineAverage, 30 );
-        if (normalLubrication || shearLubrication) flow->computeEdgesSurfaces();
+
+        if (normalLubrication || shearLubrication || viscousShear) flow->computeEdgesSurfaces();
 	if ( Debug ) cout << endl << "end buildTri------" << endl << endl;
 }
 
