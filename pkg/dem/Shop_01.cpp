@@ -1,17 +1,4 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
-#include <assert.h>                     // for assert
-#include <algorithm>                    // for max
-#include <boost/exception/exception.hpp>  // for shared_ptr
-#include <boost/foreach.hpp>            // for auto_any_base
-#include <limits>                       // for numeric_limits
-#include <ostream>                      // for basic_ostream, char_traits, etc
-#include "Shop.hpp"                     // for Shop
-#include "yade/core/Body.hpp"           // for Body, Body::id_t
-#include "yade/core/Engine.hpp"         // for FOREACH, Engine (ptr only)
-#include "yade/lib/base/Logging.hpp"    // for LOG_WARN, TRWM3MAT, etc
-#include "yade/lib/base/Math.hpp"       // for Real
-
-/*
 #include"Shop.hpp"
 
 #include<boost/filesystem/convenience.hpp>
@@ -54,7 +41,6 @@
 #include"yade/pkg/common/Grid.hpp"
 
 #include"yade/pkg/dem/Tetra.hpp"
-*/
 
 #ifdef YADE_OPENGL
 	#include"yade/pkg/common/Gl1_NormPhys.hpp"
