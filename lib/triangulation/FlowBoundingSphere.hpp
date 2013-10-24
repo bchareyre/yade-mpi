@@ -85,6 +85,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Vector3r> normalV;
 		vector <Real> surfaceDistance;
 		vector <int> onlySpheresInteractions;
+		vector <Matrix3r> shearStressInteraction;
+		vector <Matrix3r> normalStressInteraction;
 		
 		void Localize();
 		void Compute_Permeability();

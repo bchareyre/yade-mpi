@@ -99,6 +99,10 @@ class FlowEngine : public PartialEngine
 			return (flow->deltaShearVel[interaction]);}
 		TPL Vector3r normalVelocity(unsigned int interaction, Solver& flow) {
 			return (flow->deltaNormVel[interaction]);}
+		TPL Matrix3r normalStressInteraction(unsigned int interaction, Solver& flow) {
+			return (flow->normalStressInteraction[interaction]);}
+		TPL Matrix3r shearStressInteraction(unsigned int interaction, Solver& flow) {
+			return (flow->shearStressInteraction[interaction]);}
 		TPL Vector3r normalVect(unsigned int interaction, Solver& flow) {
 			return (flow->normalV[interaction]);}
 		TPL Real surfaceDistanceParticle(unsigned int interaction, Solver& flow) {
@@ -163,6 +167,8 @@ class FlowEngine : public PartialEngine
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		Vector3r 	_shearVelocity(unsigned int interaction) {return shearVelocity(interaction,solver);}
 		Vector3r 	_normalVelocity(unsigned int interaction) {return normalVelocity(interaction,solver);}
+		Matrix3r 	_normalStressInteraction(unsigned int interaction) {return normalStressInteraction(interaction,solver);}
+		Matrix3r 	_shearStressInteraction(unsigned int interaction) {return shearStressInteraction(interaction,solver);}
 		Vector3r 	_normalVect(unsigned int interaction) {return normalVect(interaction,solver);}
 		Real	 	_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
 		int	 	_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
@@ -371,6 +377,8 @@ class PeriodicFlowEngine : public FlowEngine
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
+		Matrix3r 	_normalStressInteraction(unsigned int interaction) {return normalStressInteraction(interaction,solver);}
+		Matrix3r 	_shearStressInteraction(unsigned int interaction) {return shearStressInteraction(interaction,solver);}
 		Vector3r 	_shearVelocity(unsigned int id_sph) {return shearVelocity(id_sph,solver);}
 		Vector3r 	_normalVelocity(unsigned int id_sph) {return normalVelocity(id_sph,solver);}
 		Vector3r 	_normalVect(unsigned int id_sph) {return normalVect(id_sph,solver);}
@@ -431,6 +439,8 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
 			.def("shearVelocity",&PeriodicFlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+			.def("normalStressInteraction",&PeriodicFlowEngine::_normalStressInteraction,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+			.def("shearStressInteraction",&PeriodicFlowEngine::_shearStressInteraction,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
 			.def("normalVelocity",&PeriodicFlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
 			.def("normalVect",&PeriodicFlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
 			.def("surfaceDistanceParticle",&PeriodicFlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")

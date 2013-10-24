@@ -593,7 +593,7 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 
 		typedef typename Solver::Tesselation Tesselation;
 		const Tesselation& Tes = flow.T[flow.currentTes];
-		flow.deltaShearVel.clear(); flow.normalV.clear(); flow.deltaNormVel.clear(); flow.surfaceDistance.clear(); flow.onlySpheresInteractions.clear();
+		flow.deltaShearVel.clear(); flow.normalV.clear(); flow.deltaNormVel.clear(); flow.surfaceDistance.clear(); flow.onlySpheresInteractions.clear(); flow.normalStressInteraction.clear(); flow.shearStressInteraction.clear();
 
 
 		for ( int i=0; i< ( int ) flow.Edge_ids.size(); i++ ) {
@@ -670,7 +670,9 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 				/// Compute the viscous shear stress on each particle
 				if (viscousShearBodyStress){
 					flow.viscousBodyStress[id1] += visc_f * O1C_vect.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
-					flow.viscousBodyStress[id2] += (-visc_f) * O2C_vect.transpose()/ (4.0/3.0 *3.14* pow(r2,3));}
+					flow.viscousBodyStress[id2] += (-visc_f) * O2C_vect.transpose()/ (4.0/3.0 *3.14* pow(r2,3));
+					flow.shearStressInteraction.push_back(visc_f * O1O2_vect.transpose()/(4.0/3.0 *3.14* pow(r1,3)));
+				}
 			}
 
 			/// Compute the normal lubrication force applied on each particle
@@ -684,7 +686,9 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 			/// Compute the normal lubrication stress on each particle
 				if (viscousNormalBodyStress){
 					flow.lubBodyStress[id1] += lub_f * O1C_vect.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
-					flow.lubBodyStress[id2] += (-lub_f) *O2C_vect.transpose() / (4.0/3.0 *3.14* pow(r2,3));}
+					flow.lubBodyStress[id2] += (-lub_f) *O2C_vect.transpose() / (4.0/3.0 *3.14* pow(r2,3));
+					flow.normalStressInteraction.push_back(lub_f * O1O2_vect.transpose()/(4.0/3.0 *3.14* pow(r1,3)));
+				}
 			}
 
 			if (create_file){
