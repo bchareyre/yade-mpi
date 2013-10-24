@@ -105,6 +105,10 @@ class FlowEngine : public PartialEngine
 			return (flow->surfaceDistance[interaction]);}
 		TPL Real edgeSize(Solver& flow) {
 			return (flow->Edge_ids.size());}
+		TPL Real OSI(Solver& flow) {
+			return (flow->onlySpheresInteractions.size());}
+		TPL int onlySpheresInteractions(unsigned int interaction, Solver& flow) {
+			return (flow->onlySpheresInteractions[interaction]);}
 		TPL python::list getConstrictions(bool all, Solver& flow) {
 			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k]!=0) || csd[k]>0) pycsd.append(csd[k]); return pycsd;}
@@ -161,6 +165,7 @@ class FlowEngine : public PartialEngine
 		Vector3r 	_normalVelocity(unsigned int interaction) {return normalVelocity(interaction,solver);}
 		Vector3r 	_normalVect(unsigned int interaction) {return normalVect(interaction,solver);}
 		Real	 	_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
+		int	 	_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
@@ -283,6 +288,8 @@ class FlowEngine : public PartialEngine
 					.def("normalVelocity",&FlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
 					.def("normalVect",&FlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
 					.def("surfaceDistanceParticle",&FlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+					.def("onlySpheresInteractions",&FlowEngine::_onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
+					
 					
 					.def("pressureProfile",&FlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("getPorePressure",&FlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
@@ -368,7 +375,9 @@ class PeriodicFlowEngine : public FlowEngine
 		Vector3r 	_normalVelocity(unsigned int id_sph) {return normalVelocity(id_sph,solver);}
 		Vector3r 	_normalVect(unsigned int id_sph) {return normalVect(id_sph,solver);}
 		Real		_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
+		int		_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
 		Real		_edgeSize() {return edgeSize(solver);}
+		Real		_OSI() {return OSI(solver);}
 
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
@@ -425,7 +434,9 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("normalVelocity",&PeriodicFlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
 			.def("normalVect",&PeriodicFlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
 			.def("surfaceDistanceParticle",&PeriodicFlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+			.def("onlySpheresInteractions",&PeriodicFlowEngine::_onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
 			.def("edgeSize",&PeriodicFlowEngine::_edgeSize,"Return the number of interactions.")
+			.def("OSI",&PeriodicFlowEngine::_OSI,"Return the number of interactions only between spheres.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")

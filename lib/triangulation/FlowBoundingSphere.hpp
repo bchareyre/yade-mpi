@@ -84,6 +84,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Vector3r> deltaShearVel;
 		vector <Vector3r> normalV;
 		vector <Real> surfaceDistance;
+		vector <int> onlySpheresInteractions;
 		
 		void Localize();
 		void Compute_Permeability();

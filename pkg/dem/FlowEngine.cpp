@@ -593,7 +593,7 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 
 		typedef typename Solver::Tesselation Tesselation;
 		const Tesselation& Tes = flow.T[flow.currentTes];
-		flow.deltaShearVel.clear(); flow.normalV.clear(); flow.deltaNormVel.clear(); flow.surfaceDistance.clear(); 
+		flow.deltaShearVel.clear(); flow.normalV.clear(); flow.deltaNormVel.clear(); flow.surfaceDistance.clear(); flow.onlySpheresInteractions.clear();
 
 
 		for ( int i=0; i< ( int ) flow.Edge_ids.size(); i++ ) {
@@ -693,6 +693,9 @@ void FlowEngine::ComputeViscousForces ( Solver& flow )
 			  velocity_file.close(); }
 			  
 			if (display_force) cout<<"force tangentielle "<<visc_f<< " force normale "<< lub_f<<endl;
+			if (!hasFictious)
+				flow.onlySpheresInteractions.push_back(i);
+				
 		}
 	}
 }
