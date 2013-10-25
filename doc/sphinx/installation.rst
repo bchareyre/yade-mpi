@@ -12,18 +12,10 @@ Packages
 
 Packages from Launchpad PPA service (package personal archive) are 
 provided for all currently supported Ubuntu versions for 
-`stable <https://launchpad.net/~yade-pkg/+archive/stable>`_ and 
 `daily <https://launchpad.net/~yade-pkg/+archive/snapshots>`_ releases.
 ``yade-daily`` is a automatically daily (if there were some commtis during
-the previous days) geenrated package, which includes all the newly added 
+the previous days) generated package, which includes all the newly added 
 features. To install version from PPA, run the following:
-
-* For stable releases::
-
-	sudo add-apt-repository ppa:yade-pkg/stable       # for stable releases 
-	sudo add-apt-repository ppa:yade-users/external   # optional (updates of other packages)
-	sudo apt-get update
-	sudo apt-get install yade-stable
 
 * For latest builds from trunk::
 
@@ -31,8 +23,8 @@ features. To install version from PPA, run the following:
 	sudo apt-get update
 	sudo apt-get install yade-daily
 
-After you added whether stable or snapshot PPAs, you will get automatically
-the updates of the package, when they arrive the PPA.
+After you added snapshot PPA, you will get automatically the updates of the package, 
+when they arrive the PPA.
 
 More detailed instructions are available at the corresponding pages of 
 ppa`s (links above).
