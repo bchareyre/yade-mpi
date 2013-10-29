@@ -574,7 +574,11 @@ void VTKRecorder::action(){
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+"spheres."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(spheresUg);
+			#ifdef YADE_VTK6
+				writer->SetInputData(spheresUg);
+			#else
+				writer->SetInput(spheresUg);
+			#endif
 			writer->Write();
 		}
 	}
@@ -598,7 +602,11 @@ void VTKRecorder::action(){
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+"facets."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(facetsUg);
+			#ifdef YADE_VTK6
+				writer->SetInputData(facetsUg);
+			#else
+				writer->SetInput(facetsUg);
+			#endif
 			writer->Write();	
 		}
 	}
@@ -622,7 +630,11 @@ void VTKRecorder::action(){
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+"boxes."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(boxesUg);
+			#ifdef YADE_VTK6
+				writer->SetInputData(boxesUg);
+			#else
+				writer->SetInput(boxesUg);
+			#endif
 			writer->Write();	
 		}
 	}
@@ -649,7 +661,11 @@ void VTKRecorder::action(){
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+"intrs."+lexical_cast<string>(scene->iter)+".vtp";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(intrPd);
+			#ifdef YADE_VTK6
+				writer->SetInputData(intrPd);
+			#else
+				writer->SetInput(intrPd);
+			#endif
 			writer->Write();
 		}
 	}
@@ -666,7 +682,11 @@ void VTKRecorder::action(){
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+"pericell."+lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(pericellUg);
+			#ifdef YADE_VTK6
+				writer->SetInputData(pericellUg);
+			#else
+				writer->SetInput(pericellUg);
+			#endif
 			writer->Write();
 		}
 	}
@@ -725,13 +745,12 @@ void VTKRecorder::action(){
 		if(ascii) writer->SetDataModeToAscii();
 		string fn=fileName+"cracks."+lexical_cast<string>(scene->iter)+".vtu";
 		writer->SetFileName(fn.c_str());
-		writer->SetInput(crackUg);
+		#ifdef YADE_VTK6
+			writer->SetInputData(crackUg);
+		#else
+			writer->SetInput(crackUg);
+		#endif
 		writer->Write();
-		
-// 		fn=fileName+"newcracks."+lexical_cast<string>(scene->iter)+".vtu";
-// 		writer->SetFileName(fn.c_str());
-// 		writer->SetInput(crackUgNew);
-// 		writer->Write();
 	}
 
 	#ifdef YADE_VTK_MULTIBLOCK
@@ -746,7 +765,11 @@ void VTKRecorder::action(){
 			if(ascii) writer->SetDataModeToAscii();
 			string fn=fileName+lexical_cast<string>(scene->iter)+".vtm";
 			writer->SetFileName(fn.c_str());
-			writer->SetInput(multiblockDataset);
+			#ifdef YADE_VTK6
+				writer->SetInputData(multiblockDataset);
+			#else
+				writer->SetInput(multiblockDataset);
+			#endif
 			writer->Write();	
 		}
 	#endif
