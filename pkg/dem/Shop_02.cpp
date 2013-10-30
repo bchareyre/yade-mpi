@@ -511,3 +511,16 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly, uns
 	}
 }
 
+void Shop::growParticle(Body::id_t bodyID, Real multiplier, bool updateMass)
+{
+	const shared_ptr<Body>& b = Body::byId(bodyID);
+	Real& rad = YADE_CAST<Sphere*>(b->shape.get())->radius;	
+	rad *= multiplier;
+	if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
+	for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
+		if(!(*it).second->isReal()) continue;
+		GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>((*it).second->geom.get());
+		if (bodyID==it->second->getId1()) contact->refR1 = rad;
+		else contact->refR2 = rad;
+	}
+}
