@@ -79,8 +79,8 @@ For those behind firewall, you can download `any revision  <https://www.yade-dem
 
 Release and trunk sources are compiled in the same way.
 
-Prerequisities
-^^^^^^^^^^^^^^^
+Prerequisites
+^^^^^^^^^^^^^
 
 Yade relies on a number of external software to run; its installation is checked before the compilation starts. 
 
@@ -97,6 +97,7 @@ Yade relies on a number of external software to run; its installation is checked
 * `sqlite3 <http://www.sqlite.org>`_ database engine
 * `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
+* `CGAL <http://www.cgal.org/>`_ library (optional)
 
 Most of the list above is very likely already packaged for your distribution. 
 The following commands have to be executed in command line of corresponding 
@@ -111,7 +112,7 @@ should have root privileges
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		python-xlib python-qt4 pyqt4-dev-tools gtk2-engines-pixbuf python-argparse \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man libsuitesparse-dev \
+		libxmu-dev libxi-dev libcgal-dev help2man libsuitesparse-dev \
 		libopenblas-dev libmetis-dev python-gts libbz2-dev zlib1g-dev
 
 If you are using other distribuition, than Debian or its derivatives, you should
