@@ -241,7 +241,7 @@ void VTKRecorder::action(){
 	crackNorm->SetNumberOfComponents(3);
 	crackNorm->SetName("crackNorm");
 
-// 	// the same for newly created cracks
+	// the same for newly created cracks
 // 	vtkSmartPointer<vtkPoints> crackPosNew = vtkSmartPointer<vtkPoints>::New();
 // 	vtkSmartPointer<vtkCellArray> crackCellsNew = vtkSmartPointer<vtkCellArray>::New();
 // 	vtkSmartPointer<vtkFloatArray> iterNew = vtkSmartPointer<vtkFloatArray>::New();
@@ -412,7 +412,7 @@ void VTKRecorder::action(){
 				
 				if (recActive[REC_JCFPM]){
 					damage->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreak + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreak);
-// 					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
+					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
 				}
 
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
@@ -692,7 +692,8 @@ void VTKRecorder::action(){
 	}
 
 	if (recActive[REC_CRACKS]) {
-		std::ifstream file ("cracks.txt",std::ios::in);
+		string fileCracks = "cracks_"+Key+".txt";
+		std::ifstream file (fileCracks.c_str(),std::ios::in);
 		vtkSmartPointer<vtkUnstructuredGrid> crackUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		vtkSmartPointer<vtkUnstructuredGrid> crackUgNew = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		
@@ -711,6 +712,7 @@ void VTKRecorder::action(){
 					iter->InsertNextValue(i);
 					float n[3] = { n0, n1, n2 };
 					crackNorm->InsertNextTupleValue(n);
+					// Then, taking care only of newly created cracks :
 // 					if (i > scene->iter - iterPeriod)
 // 					{
 // 					  pid[0] = crackPosNew->InsertNextPoint(p0, p1, p2);
@@ -719,8 +721,7 @@ void VTKRecorder::action(){
 // 					  crackSizeNew->InsertNextValue(s);
 // 					  iterNew->InsertNextValue(i);
 // 					  crackNormNew->InsertNextTupleValue(n);
-// 					}
-					  
+// 					}  
 				}
 			 }
 			 file.close();
@@ -733,13 +734,6 @@ void VTKRecorder::action(){
 		crackUg->GetPointData()->AddArray(crackSize);
 		crackUg->GetPointData()->AddArray(crackNorm); //orientation of 2D glyphs does not match this direction (some work to do in order to have the good orientation) 
 		
-		/*crackUgNew->SetPoints(crackPosNew);
-		crackUgNew->SetCells(VTK_VERTEX, crackCellsNew);
-		crackUgNew->GetPointData()->AddArray(iterNew);
-		crackUgNew->GetPointData()->AddArray(crackTypeNew);
-		crackUgNew->GetPointData()->AddArray(crackSizeNew);
-		crackUgNew->GetPointData()->AddArray(crackNormNew); //same remark...*/
-	
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
 		if(ascii) writer->SetDataModeToAscii();
@@ -751,6 +745,23 @@ void VTKRecorder::action(){
 			writer->SetInput(crackUg);
 		#endif
 		writer->Write();
+		
+		// Same operations, for newly created cracks :
+// 		crackUgNew->SetPoints(crackPosNew);
+// 		crackUgNew->SetCells(VTK_VERTEX, crackCellsNew);
+// 		crackUgNew->GetPointData()->AddArray(iterNew);
+// 		crackUgNew->GetPointData()->AddArray(crackTypeNew);
+// 		crackUgNew->GetPointData()->AddArray(crackSizeNew);
+// 		crackUgNew->GetPointData()->AddArray(crackNormNew); //same remark about the orientation...
+// 	
+// 		fn=fileName+"newcracks."+lexical_cast<string>(scene->iter)+".vtu";
+// 		writer->SetFileName(fn.c_str());
+// 		#ifdef YADE_VTK6
+// 			writer->SetInputData(crackUgNew);
+// 		#else
+// 			writer->SetInput(crackUgNew);
+// 		#endif
+// 		writer->Write();
 	}
 
 	#ifdef YADE_VTK_MULTIBLOCK
