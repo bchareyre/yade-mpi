@@ -13,7 +13,7 @@ pred = pack.inAlignedBox((0,0,0),(dimModele,dimModele,dimModele))
 
 # the packing of spheres :
 
-def mat(): return JCFpmMat(type=1,young=1e8,poisson=0.3,frictionAngle=radians(30),density=3000)
+def mat(): return JCFpmMat(type=1,young=1e8,poisson=0.3,frictionAngle=radians(30),density=3000,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1e7,jointShearStiffness=1e7,jointCohesion=1e6,jointFrictionAngle=radians(20),jointDilationAngle=0.0)
 nSpheres = 3000.0
 poros=0.13
 rMeanSpheres = dimModele * pow(3.0/4.0*(1-poros)/(pi*nSpheres),1.0/3.0)
@@ -86,7 +86,8 @@ O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom()],
-		[Ip2_JCFpmMat_JCFpmMat_JCFpmPhys(cohesiveTresholdIteration=1,alpha=0.3,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1e7,jointShearStiffness=1e7,jointCohesion=1e6,jointFrictionAngle=radians(20),jointDilationAngle=0.0)],
+#		[Ip2_JCFpmMat_JCFpmMat_JCFpmPhys(cohesiveTresholdIteration=1,alpha=0.3,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1e7,jointShearStiffness=1e7,jointCohesion=1e6,jointFrictionAngle=radians(20),jointDilationAngle=0.0)],
+		[Ip2_JCFpmMat_JCFpmMat_JCFpmPhys(cohesiveTresholdIteration=1)],
 		[Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM(smoothJoint=True)]
 	),
 	GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.8),
@@ -98,8 +99,8 @@ O.engines=[
 
 #### dataCollector
 from yade import plot
-#plot.plots={'iterations':('v',)}
-plot.plots={'x':('z',)}
+plot.plots={'iterations':('v',)}
+#plot.plots={'x':('z',)}
 def dataCollector():
 	R=O.bodies[refPoint]
 	plot.addData(v=R.state.vel[2],z=R.state.pos[2],x=R.state.pos[0],iterations=O.iter,t=O.realtime)
@@ -110,7 +111,7 @@ stableVel=0.001
 degrade=True
 def jointStrengthDegradation():
     global degrade
-    if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[1])<stableVel :
+    if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[2])<stableVel :
 	print '!joint cohesion total degradation!', ' | iteration=', O.iter
 	degrade=False
 	for i in O.interactions:

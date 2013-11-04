@@ -56,11 +56,11 @@ for line in inFile:
     j31 = float(line.split()[9])
     j32 = float(line.split()[10])
     j33 = float(line.split()[11])
-    O.bodies[id].mat.onJoint=onJ
-    O.bodies[id].mat.joint=nj
-    O.bodies[id].mat.jointNormal1=(j11,j12,j13)
-    O.bodies[id].mat.jointNormal2=(j21,j22,j23)
-    O.bodies[id].mat.jointNormal3=(j31,j32,j33)
+    O.bodies[id].state.onJoint=onJ
+    O.bodies[id].state.joint=nj
+    O.bodies[id].state.jointNormal1=(j11,j12,j13)
+    O.bodies[id].state.jointNormal2=(j21,j22,j23)
+    O.bodies[id].state.jointNormal3=(j31,j32,j33)
 inFile.close
 
 #### Boundary conditions
