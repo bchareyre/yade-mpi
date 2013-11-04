@@ -12,9 +12,9 @@ class JCFpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(JCFpmState,State,"JCFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
 		((int,tensBreak,0,,"number of tensile breakages. [-]"))
                 ((int,shearBreak,0,,"number of shear breakages. [-]"))
-		// ((int,noIniLinks,0,,"number of initial cohesive interactions. [-]"))
-		// ((Real,tensBreakRel,0,,"relative number of tensile breakages (compared with noIniLinks). [-]"))
-		// ((Real,shearBreakRel,0,,"relative number of shear breakages (compared with noIniLinks). [-]"))
+		((int,noIniLinks,0,,"number of initial cohesive interactions. [-]"))
+		((Real,tensBreakRel,0,,"relative number of tensile breakages (compared with noIniLinks). [-]"))
+		((Real,shearBreakRel,0,,"relative number of shear breakages (compared with noIniLinks). [-]"))
                 ,
 		createIndex();
 	);
@@ -55,9 +55,9 @@ class JCFpmPhys: public NormShearPhys {
 			((Real,tanFrictionAngle,0,,"tangent of frictionAngle. [-]"))
 			((Real,crossSection,0,,"crossSection=pi*Rmin^2. [m2]"))
 			((Real,FnMax,0,,"defines the maximum admissible normal force in traction FnMax=tensileStrength*crossSection. [N]"))
-			((Real,FsMax,0,,"defines the maximum admissible tangential force in shear FsMax=cohesion*FnMax. [N]"))
+			((Real,FsMax,0,,"defines the maximum admissible tangential force in shear FsMax=cohesion*crossSection. [N]"))
 			((Vector3r,jointNormal,Vector3r::Zero(),,"Normal direction to the joint."))
-			((Real,jointCumulativeSliding,0,,"sliding distance for particles interacting on a joint. Used when soothJoint is true in Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM to take into account dilatancy due to shearing. [-]"))
+			((Real,jointCumulativeSliding,0,,"sliding distance for particles interacting on a joint. Used, when :yref:`<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint>` is true, to take into account dilatancy due to shearing. [-]"))
 			((Real,dilationAngle,0,,"defines the dilatancy of the joint surface. [rad]"))
 			((Real,tanDilationAngle,0,,"tangent of dilationAngle. [-]"))
 			((Real,dilation,0,,"defines the normal displacement in the joint after sliding treshold. [m]"))
@@ -102,7 +102,8 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 
 		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM,LawFunctor,"Interaction law for cohesive frictional material, e.g. rock, possibly presenting joint surfaces. Joint surfaces can be defined in a preprocessing phase through .stl meshes (see ref for details of the procedure), and can be mechanically described with a smooth contact logic [Ivars2011]_ (implemented in Yade in [Scholtes2012]_).",
 			((bool,smoothJoint,false,,"if true, particles belonging to joint surface have a smooth contact logic [Ivars2011]_, [Scholtes2012]_."))
-			((bool,recordCracks,false,,"if true a text file cracks.txt will be created (iteration, position, type (tensile or shear), cross section and contact normal)."))
+			((bool,recordCracks,false,,"if true a text file cracksKey.txt (see below) will be created (iteration, position, type (tensile or shear), cross section and contact normal)."))
+			((string,Key,"",,"string specifying the name of saved file 'cracks.....txt'"))
 			((bool,cracksFileExist,false,,"If true, text file already exists and its content won't be reset."))
 		);
 		DECLARE_LOGGER;	

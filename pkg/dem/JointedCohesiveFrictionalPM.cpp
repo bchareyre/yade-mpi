@@ -23,6 +23,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 
 	Real Dtensile=phys->FnMax/phys->kn;
 	
+	string fileCracks = "cracks_"+Key+".txt";
 	/// Defines the interparticular distance used for computation
 	Real D = 0;
 
@@ -60,12 +61,12 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
 	    st1->tensBreak+=1;
 	    st2->tensBreak+=1;
-	    //st1->tensBreakRel+=1.0/st1->noIniLinks;
-	    //st2->tensBreakRel+=1.0/st2->noIniLinks;
+	    st1->tensBreakRel+=1.0/st1->noIniLinks;
+	    st2->tensBreakRel+=1.0/st2->noIniLinks;
 	    
     	    // create a text file to record properties of the broken bond (iteration, position, type (tensile), cross section and contact normal orientation)
 	    if (recordCracks){
-	      std::ofstream file ("cracks.txt", !cracksFileExist ? std::ios::trunc : std::ios::app);
+	      std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
 	      if(file.tellp()==0){ file <<"i p0 p1 p2 t s norm0 norm1 norm2"<<endl; }
 	      Vector3r crackNormal=Vector3r::Zero();
 	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
@@ -120,12 +121,12 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
 	    st1->shearBreak+=1;
 	    st2->shearBreak+=1;
-	    //st1->shearBreakRel+=1.0/st1->noIniLinks;
-	    //st2->shearBreakRel+=1.0/st2->noIniLinks;
+	    st1->shearBreakRel+=1.0/st1->noIniLinks;
+	    st2->shearBreakRel+=1.0/st2->noIniLinks;
 
 	    // create a text file to record properties of the broken bond (iteration, position, type (shear), cross section and contact normal orientation)
 	    if (recordCracks){
-	      std::ofstream file ("cracks.txt", !cracksFileExist ? std::ios::trunc : std::ios::app);
+	      std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
 	      if(file.tellp()==0){ file <<"i p0 p1 p2 t s norm0 norm1 norm2"<<endl; }
 	      Vector3r crackNormal=Vector3r::Zero();
 	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
@@ -201,10 +202,10 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	///to set if the contact is cohesive or not
 	if ((scene->iter < cohesiveTresholdIteration) && (tensileStrength>0 || cohesion>0) && (yade1->type == yade2->type)){ 
 	  contactPhysics->isCohesive=true;
-// 	  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
-// 	  st1->noIniLinks++;
-// 	  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
-// 	  st2->noIniLinks++;
+	  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
+	  st1->noIniLinks++;
+	  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
+	  st2->noIniLinks++;
 	}
 	
 	if ( contactPhysics->isCohesive ) {
@@ -233,10 +234,10 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 			///to set if the contact is cohesive or not
 			if ((scene->iter < cohesiveTresholdIteration) && (jointCohesion>0 || jointTensileStrength>0)) {
 			  contactPhysics->isCohesive=true;
-// 			  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
-// 			  st1->noIniLinks++;
-// 			  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
-// 			  st2->noIniLinks++;
+			  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
+			  st1->noIniLinks++;
+			  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
+			  st2->noIniLinks++;
 			} 
 			else { contactPhysics->isCohesive=false; contactPhysics->FnMax=0; contactPhysics->FsMax=0; }
 		  
