@@ -12,7 +12,7 @@ output='jointDip30_jointFrict20'
 maxIter=10000
 
 #### Import of the sphere assembly
-def sphereMat(): return JCFpmMat(type=1,young=1e8,frictionAngle=radians(30),density=3000) ## Rq: density needs to be adapted as porosity of real rock is different to granular assembly due to difference in porosity (utils.sumForces(baseBodies,(0,1,0))/(Z*X) should be equal to Gamma*g*h with h=Y, g=9.82 and Gamma=2700 kg/m3
+def sphereMat(): return JCFpmMat(type=1,young=1e8,frictionAngle=radians(30),density=3000,poisson=0.3,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1e7,jointShearStiffness=1e7,jointCohesion=1e6,jointFrictionAngle=jointFrict,jointDilationAngle=jointDil) ## Rq: density needs to be adapted as porosity of real rock is different to granular assembly due to difference in porosity (utils.sumForces(baseBodies,(0,1,0))/(Z*X) should be equal to Gamma*g*h with h=Y, g=9.82 and Gamma=2700 kg/m3
 O.bodies.append(ymport.text(packing+'.spheres',scale=1.,shift=Vector3(0,0,0),material=sphereMat))
 
 ## preprocessing to get dimensions of the packing
@@ -94,7 +94,7 @@ O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=interactionRadius,label='is2aabb'),]),
 	InteractionLoop(
 		[Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=interactionRadius,label='ss2d3dg')],
-		[Ip2_JCFpmMat_JCFpmMat_JCFpmPhys(cohesiveTresholdIteration=1,alpha=0.3,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1e7,jointShearStiffness=1e7,jointCohesion=1e6,jointFrictionAngle=jointFrict,jointDilationAngle=jointDil,label='interactionPhys')],
+		[Ip2_JCFpmMat_JCFpmMat_JCFpmPhys(cohesiveTresholdIteration=1,label='interactionPhys')],
 		[Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM(smoothJoint=smoothContact,label='interactionLaw')]
 	),
 	GlobalStiffnessTimeStepper(timestepSafetyCoefficient=0.8),
