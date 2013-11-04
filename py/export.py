@@ -47,7 +47,7 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 				elif (format=='id_x_y_z_r_matId'):
 					output+=('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				elif (format=='jointedPM'):
-					output+=('%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n'%(b.id,b.mat.onJoint,b.mat.joint,b.mat.jointNormal1[0],b.mat.jointNormal1[1],b.mat.jointNormal1[2],b.mat.jointNormal2[0],b.mat.jointNormal2[1],b.mat.jointNormal2[2],b.mat.jointNormal3[0],b.mat.jointNormal3[1],b.mat.jointNormal3[2]))
+					output+=('%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n'%(b.id,b.state.onJoint,b.state.joint,b.state.jointNormal1[0],b.state.jointNormal1[1],b.state.jointNormal1[2],b.state.jointNormal2[0],b.state.jointNormal2[1],b.state.jointNormal2[2],b.state.jointNormal3[0],b.state.jointNormal3[1],b.state.jointNormal3[2]))
 				elif (format=='liggghts_in'):
 					output+=('%g %g %g %g %g %g %g\n'%(count+1,b.mask,b.shape.radius,b.material.density,b.state.pos[0],b.state.pos[1],b.state.pos[2]))
 					outputVel+=('%g %g %g %g %g %g %g\n'%(count+1,b.state.vel[0],b.state.vel[1],b.state.vel[2],b.state.angVel[0],b.state.angVel[1],b.state.angVel[2]))

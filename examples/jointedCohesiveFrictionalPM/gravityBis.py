@@ -13,7 +13,7 @@ pred = pack.inAlignedBox((0,0,0),(dimModele,dimModele,dimModele))
 
 # the packing of spheres :
 
-def mat(): return JCFpmMat(type=1,young=1e8,frictionAngle=radians(30),density=3000)
+def mat(): return JCFpmMat(type=1,young=1e8,poisson=0.3,frictionAngle=radians(30),density=3000)
 nSpheres = 3000.0
 poros=0.13
 rMeanSpheres = dimModele * pow(3.0/4.0*(1-poros)/(pi*nSpheres),1.0/3.0)

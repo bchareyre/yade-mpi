@@ -176,14 +176,22 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 
 	const shared_ptr<JCFpmMat>& yade1 = YADE_PTR_CAST<JCFpmMat>(b1);
 	const shared_ptr<JCFpmMat>& yade2 = YADE_PTR_CAST<JCFpmMat>(b2);
+	JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
+	JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
 	
 	shared_ptr<JCFpmPhys> contactPhysics(new JCFpmPhys()); 
 	
 	/* From material properties */
 	Real E1 	= yade1->young;
 	Real E2 	= yade2->young;
+	Real v1 	= yade1->poisson;
+	Real v2 	= yade2->poisson;
 	Real f1 	= yade1->frictionAngle;
 	Real f2 	= yade2->frictionAngle;
+	Real SigT1	= yade1->tensileStrength;
+	Real SigT2	= yade2->tensileStrength;
+	Real Coh1	= yade1->cohesion;
+	Real Coh2	= yade2->cohesion;
 
 	/* From interaction geometry */
 	Real R1= geom->radius1;
@@ -194,56 +202,82 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	
 	// frictional properties
 	contactPhysics->kn = 2.*E1*R1*E2*R2/(E1*R1+E2*R2);
-	contactPhysics->ks = alpha*contactPhysics->kn;
-	contactPhysics->frictionAngle = std::min(f1,f2); 
-	contactPhysics->tanFrictionAngle = std::tan(contactPhysics->frictionAngle);
+	contactPhysics->ks = 2.*E1*R1*v1*E2*R2*v2/(E1*R1*v1+E2*R2*v2);//alpha*contactPhysics->kn;
+	contactPhysics->tanFrictionAngle = std::tan(std::min(f1,f2));
 	
 	// cohesive properties
 	///to set if the contact is cohesive or not
-	if ((scene->iter < cohesiveTresholdIteration) && (tensileStrength>0 || cohesion>0) && (yade1->type == yade2->type)){ 
+	if ((scene->iter < cohesiveTresholdIteration) && (std::min(SigT1,SigT2)>0 || std::min(Coh1,Coh2)>0) && (yade1->type == yade2->type)){ 
 	  contactPhysics->isCohesive=true;
-	  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
 	  st1->noIniLinks++;
-	  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
 	  st2->noIniLinks++;
 	}
 	
 	if ( contactPhysics->isCohesive ) {
-	  contactPhysics->FnMax = tensileStrength*contactPhysics->crossSection;
-	  contactPhysics->FsMax = cohesion*contactPhysics->crossSection;
+	  contactPhysics->FnMax = std::min(SigT1,SigT2)*contactPhysics->crossSection;
+	  contactPhysics->FsMax = std::min(Coh1,Coh2)*contactPhysics->crossSection;
 	}
 
 	/// +++ Jointed interactions ->NOTE: geom->normal is oriented from 1 to 2 / jointNormal from plane to sphere 
-	if ( yade1->onJoint && yade2->onJoint ) {
-
-		if ( (((yade1->jointNormal1.cross(yade2->jointNormal1)).norm()<0.1) && (yade1->jointNormal1.dot(yade2->jointNormal1)<0)) || (((yade1->jointNormal1.cross(yade2->jointNormal2)).norm()<0.1) && (yade1->jointNormal1.dot(yade2->jointNormal2)<0)) || (((yade1->jointNormal1.cross(yade2->jointNormal3)).norm()<0.1) && (yade1->jointNormal1.dot(yade2->jointNormal3)<0)) ) { contactPhysics->isOnJoint = true; contactPhysics->jointNormal = yade1->jointNormal1; }
-		else if ( (((yade1->jointNormal2.cross(yade2->jointNormal1)).norm()<0.1) && (yade1->jointNormal2.dot(yade2->jointNormal1)<0)) || (((yade1->jointNormal2.cross(yade2->jointNormal2)).norm()<0.1) && (yade1->jointNormal2.dot(yade2->jointNormal2)<0)) || (((yade1->jointNormal2.cross(yade2->jointNormal3)).norm()<0.1) && (yade1->jointNormal2.dot(yade2->jointNormal3)<0)) ) { contactPhysics->isOnJoint = true; contactPhysics->jointNormal = yade1->jointNormal2; }
-		else if ( (((yade1->jointNormal3.cross(yade2->jointNormal1)).norm()<0.1) && (yade1->jointNormal3.dot(yade2->jointNormal1)<0)) || (((yade1->jointNormal3.cross(yade2->jointNormal2)).norm()<0.1) && (yade1->jointNormal3.dot(yade2->jointNormal2)<0)) || (((yade1->jointNormal3.cross(yade2->jointNormal3)).norm()<0.1) && (yade1->jointNormal3.dot(yade2->jointNormal3)<0)) ) { contactPhysics->isOnJoint = true; contactPhysics->jointNormal = yade1->jointNormal3; }
-		else if ( (yade1->joint>3 || yade2->joint>3) && ( ( ((yade1->jointNormal1.cross(yade2->jointNormal1)).norm()>0.1) && ((yade1->jointNormal1.cross(yade2->jointNormal2)).norm()>0.1) && ((yade1->jointNormal1.cross(yade2->jointNormal3)).norm()>0.1) ) || ( ((yade1->jointNormal2.cross(yade2->jointNormal1)).norm()>0.1) && ((yade1->jointNormal2.cross(yade2->jointNormal2)).norm()>0.1) && ((yade1->jointNormal2.cross(yade2->jointNormal3)).norm()>0.1) ) || ( ((yade1->jointNormal3.cross(yade2->jointNormal1)).norm()>0.1) && ((yade1->jointNormal3.cross(yade2->jointNormal2)).norm()>0.1) && ((yade1->jointNormal3.cross(yade2->jointNormal3)).norm()>0.1) ) ) )  { contactPhysics->isOnJoint = true; contactPhysics->more = true; contactPhysics->jointNormal = geom->normal; }
+	if ( st1->onJoint && st2->onJoint )
+	{
+		if ( (((st1->jointNormal1.cross(st2->jointNormal1)).norm()<0.1) && (st1->jointNormal1.dot(st2->jointNormal1)<0)) || (((st1->jointNormal1.cross(st2->jointNormal2)).norm()<0.1) && (st1->jointNormal1.dot(st2->jointNormal2)<0)) || (((st1->jointNormal1.cross(st2->jointNormal3)).norm()<0.1) && (st1->jointNormal1.dot(st2->jointNormal3)<0)) )
+		{
+		  contactPhysics->isOnJoint = true;
+		  contactPhysics->jointNormal = st1->jointNormal1;
+		}
+		else if ( (((st1->jointNormal2.cross(st2->jointNormal1)).norm()<0.1) && (st1->jointNormal2.dot(st2->jointNormal1)<0)) || (((st1->jointNormal2.cross(st2->jointNormal2)).norm()<0.1) && (st1->jointNormal2.dot(st2->jointNormal2)<0)) || (((st1->jointNormal2.cross(st2->jointNormal3)).norm()<0.1) && (st1->jointNormal2.dot(st2->jointNormal3)<0)) )
+		{
+		  contactPhysics->isOnJoint = true;
+		  contactPhysics->jointNormal = st1->jointNormal2;
+		}
+		else if ( (((st1->jointNormal3.cross(st2->jointNormal1)).norm()<0.1) && (st1->jointNormal3.dot(st2->jointNormal1)<0)) || (((st1->jointNormal3.cross(st2->jointNormal2)).norm()<0.1) && (st1->jointNormal3.dot(st2->jointNormal2)<0)) || (((st1->jointNormal3.cross(st2->jointNormal3)).norm()<0.1) && (st1->jointNormal3.dot(st2->jointNormal3)<0)) )
+		{
+		  contactPhysics->isOnJoint = true;
+		  contactPhysics->jointNormal = st1->jointNormal3;
+		}
+		else if ( (st1->joint>3 || st2->joint>3) && ( ( ((st1->jointNormal1.cross(st2->jointNormal1)).norm()>0.1) && ((st1->jointNormal1.cross(st2->jointNormal2)).norm()>0.1) && ((st1->jointNormal1.cross(st2->jointNormal3)).norm()>0.1) ) || ( ((st1->jointNormal2.cross(st2->jointNormal1)).norm()>0.1) && ((st1->jointNormal2.cross(st2->jointNormal2)).norm()>0.1) && ((st1->jointNormal2.cross(st2->jointNormal3)).norm()>0.1) ) || ( ((st1->jointNormal3.cross(st2->jointNormal1)).norm()>0.1) && ((st1->jointNormal3.cross(st2->jointNormal2)).norm()>0.1) && ((st1->jointNormal3.cross(st2->jointNormal3)).norm()>0.1) ) ) )  {  contactPhysics->isOnJoint = true; contactPhysics->more = true; contactPhysics->jointNormal = geom->normal; }
 	}
 	
 	///to specify joint properties 
 	if ( contactPhysics->isOnJoint ) {
-			contactPhysics->frictionAngle = (jointFrictionAngle>=0 ? jointFrictionAngle : std::min(f1,f2)); 
-			contactPhysics->tanFrictionAngle = std::tan(contactPhysics->frictionAngle);
-			contactPhysics->kn = jointNormalStiffness*2.*R1*R2/(R1+R2);
-			contactPhysics->ks = jointShearStiffness*2.*R1*R2/(R1+R2); 
-			contactPhysics->dilationAngle = jointDilationAngle;
-			contactPhysics->tanDilationAngle = std::tan(contactPhysics->dilationAngle);
+			Real jf1 	= yade1->jointFrictionAngle;
+			Real jf2 	= yade2->jointFrictionAngle;
+			Real jkn1 	= yade1->jointNormalStiffness;
+			Real jkn2 	= yade2->jointNormalStiffness;
+			Real jks1 	= yade1->jointShearStiffness;
+			Real jks2 	= yade2->jointShearStiffness;
+			Real jdil1 	= yade1->jointDilationAngle;
+			Real jdil2 	= yade2->jointDilationAngle;
+			Real jcoh1 	= yade1->jointCohesion;
+			Real jcoh2 	= yade2->jointCohesion;
+			Real jSigT1	= yade1->jointTensileStrength;
+			Real jSigT2	= yade2->jointTensileStrength;
+			
+			//contactPhysics->frictionAngle = (jointFrictionAngle>=0 ? jointFrictionAngle : std::min(f1,f2)); 
+			contactPhysics->tanFrictionAngle = std::tan(std::min(jf1,jf2));
+			
+			//contactPhysics->kn = jointNormalStiffness*2.*R1*R2/(R1+R2); // very first expression from Luc
+			//contactPhysics->kn = (jkn1+jkn2)/2.0*2.*R1*R2/(R1+R2); // after putting jointNormalStiffness in material
+			contactPhysics->kn = ( jkn1*Mathr::PI*pow(R1,2) + jkn2*Mathr::PI*pow(R2,2) )/2.0; // for a size independant expression
+			
+			//contactPhysics->ks = jointShearStiffness*2.*R1*R2/(R1+R2);
+			//contactPhysics->ks = (jks1+jks2)/2.0*2.*R1*R2/(R1+R2);
+			contactPhysics->ks = ( jks1*Mathr::PI*pow(R1,2) + jks2*Mathr::PI*pow(R2,2) )/2.0; // for a size independant expression
+			
+			contactPhysics->tanDilationAngle = std::tan(std::min(jdil1,jdil2));
 		  
 			///to set if the contact is cohesive or not
-			if ((scene->iter < cohesiveTresholdIteration) && (jointCohesion>0 || jointTensileStrength>0)) {
+			if ((scene->iter < cohesiveTresholdIteration) && (std::min(jcoh1,jcoh2)>0 || std::min(jSigT1,jSigT2)/2.0>0)) {
 			  contactPhysics->isCohesive=true;
-			  JCFpmState* st1=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId1(),scene)->state.get());
 			  st1->noIniLinks++;
-			  JCFpmState* st2=dynamic_cast<JCFpmState*>(Body::byId(interaction->getId2(),scene)->state.get());
 			  st2->noIniLinks++;
 			} 
 			else { contactPhysics->isCohesive=false; contactPhysics->FnMax=0; contactPhysics->FsMax=0; }
 		  
 			if ( contactPhysics->isCohesive ) {
-				contactPhysics->FnMax = jointTensileStrength*contactPhysics->crossSection;
-				contactPhysics->FsMax = jointCohesion*contactPhysics->crossSection;
+				contactPhysics->FnMax = std::min(jSigT1,jSigT2)*contactPhysics->crossSection;
+				contactPhysics->FsMax = std::min(jcoh1,jcoh2)*contactPhysics->crossSection;
 			}
 	}
 	interaction->phys = contactPhysics;
