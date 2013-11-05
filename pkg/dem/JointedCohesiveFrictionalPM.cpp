@@ -254,7 +254,6 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 			Real jSigT1	= yade1->jointTensileStrength;
 			Real jSigT2	= yade2->jointTensileStrength;
 			
-			//contactPhysics->frictionAngle = (jointFrictionAngle>=0 ? jointFrictionAngle : std::min(f1,f2)); 
 			contactPhysics->tanFrictionAngle = std::tan(std::min(jf1,jf2));
 			
 			//contactPhysics->kn = jointNormalStiffness*2.*R1*R2/(R1+R2); // very first expression from Luc
