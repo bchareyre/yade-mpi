@@ -728,13 +728,13 @@ Concrete particle model
          K_N&=\frac{A_{\rm eq}E}{d_0}.
       \end{align*}
 
-   $d_0$ is the initial contact length, which will be, for interaction radius :eq:`eq-strain-interaction-radius` $R_I>1$, in average larger than $2R$. For $R_I=1.5$ (sect.~\ref{sect-calibration-elastic-properties}), we can roughly estimate $\overline{d}_0=1.25\cdot2R=\frac{5}{2}R$, getting
+   $d_0$ is the initial contact length, which will be, for interaction radius :eq:`eq-strain-interaction-radius` $R_I>1$, in average larger than $2R$. For $R_I=1.5$ (sect. :ref:`sect-calibration-elastic-properties`), we can roughly estimate $\overline{d}_0=1.25\cdot2R=\frac{5}{2}R$, getting
 
    .. math:: K_N=E\left(\frac{2}{5}\pi\right)R
 
    where $\frac{2}{5}\pi=\pi'$ by comparison with :eq:`eq-dt-kn`.
 
-   Interaction radius $R_I=1.5$ leads to average $N\approx12$ interactions per sphere for dense packing of spheres with the same radius $R$. $\xi=0.2$ is calibrated (sect.~\ref{sect-calibration-elastic-properties}) to match the desired macroscopic Poisson's ratio $\nu=0.2$.
+   Interaction radius $R_I=1.5$ leads to average $N\approx12$ interactions per sphere for dense packing of spheres with the same radius $R$. $\xi=0.2$ is calibrated (sect. :ref:`sect-calibration-elastic-properties`) to match the desired macroscopic Poisson's ratio $\nu=0.2$.
 
    Finally, we obtain the ratio
 
@@ -743,7 +743,7 @@ Concrete particle model
    showing significant overestimation by the p-wave algorithm.
                   
 Non-cohesive dry friction model
-   is the basic model proposed by Cundall explained in \ref{sect-formulation-stress-cundall}. Supposing almost-constant sphere radius $R$ and rather dense packing, each sphere will have $N=6$ interactions on average (that corresponds to maximally dense packing of spheres with a constant radius). If we use the :yref:`Ip2_FrictMat_FrictMat_FrictPhys` class, we have $\pi'=2$, as $K_N=E2R$; we again use $\xi=0.2$ (for lack of a more significant value). In this case, we obtain the result
+   is the basic model proposed by Cundall explained in :ref:`sect-formulation-stress-cundall`. Supposing almost-constant sphere radius $R$ and rather dense packing, each sphere will have $N=6$ interactions on average (that corresponds to maximally dense packing of spheres with a constant radius). If we use the :yref:`Ip2_FrictMat_FrictMat_FrictPhys` class, we have $\pi'=2$, as $K_N=E2R$; we again use $\xi=0.2$ (for lack of a more significant value). In this case, we obtain the result
 
    .. math:: \frac{\Dtcr^{(p)}}{\Dtcr}=2\sqrt{\frac{6(1-2\cdot0.2)}{\pi/2}}=3.02
 
@@ -789,7 +789,7 @@ In usual implementations, particle positions are forced to be inside the cell by
 
 Approximate collision detection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Pass 1 collision detection (based on sweep and prune algorithm, sect.~\ref{sect-sweep-and-prune}) operates on axis-aligned bounding boxes (:yref:`Aabb`) of particles. During the collision detection phase, bounds of all :yref:`Aabb's<Aabb>` are wrapped inside the cell in the first step. At subsequent runs, every bound remembers by how many cells it was initially shifted from coordinate given by the :yref:`Aabb` and uses this offset repeatedly as it is being updated from :yref:`Aabb` during particle's motion. Bounds are sorted using the periodic insertion sort algorithm (sect.~\ref{sect-periodic-insertion-sort}), which tracks periodic cell boundary $||$.
+Pass 1 collision detection (based on sweep and prune algorithm, sect. :ref:`sect-sweep-and-prune`) operates on axis-aligned bounding boxes (:yref:`Aabb`) of particles. During the collision detection phase, bounds of all :yref:`Aabb's<Aabb>` are wrapped inside the cell in the first step. At subsequent runs, every bound remembers by how many cells it was initially shifted from coordinate given by the :yref:`Aabb` and uses this offset repeatedly as it is being updated from :yref:`Aabb` during particle's motion. Bounds are sorted using the periodic insertion sort algorithm (sect. :ref:`sect-periodic-insertion-sort`), which tracks periodic cell boundary $||$.
 
 Upon inversion of two :yref:`Aabb`'s, their collision along all three axes is checked, wrapping real coordinates inside the cell for that purpose.
 
@@ -898,7 +898,7 @@ Cost
 ----
 The DEM computation using an explicit integration scheme demands a relatively high number of steps during simulation, compared to implicit scehemes. The total computation time $Z$ of simulation spanning $T$ seconds (of simulated time), containing $N$ particles in volume $V$ depends on:
 
-* linearly, the number of steps $i=T/(s_t \Dtcr)$, where $s_t$ is timestep safety factor; $\Dtcr$ can be estimated by p-wave velocity using $E$ and $\rho$ (sect.~\ref{sect-dt-pwave}) as $\Dtcr^{(p)}=r\sqrt{\frac{\rho}{E}}$. Therefore
+* linearly, the number of steps $i=T/(s_t \Dtcr)$, where $s_t$ is timestep safety factor; $\Dtcr$ can be estimated by p-wave velocity using $E$ and $\rho$ (sect. :ref:`sect-dt-pwave`) as $\Dtcr^{(p)}=r\sqrt{\frac{\rho}{E}}$. Therefore
 
   .. math:: i=\frac{T}{s_t r}\sqrt{\frac{E}{\rho}}.
 
@@ -908,7 +908,7 @@ The DEM computation using an explicit integration scheme demands a relatively hi
   
   where $p$ is packing porosity, roughly $\frac{1}{2}$ for dense irregular packings of spheres of similar radius.
 
-  The dependency is not strictly linear (which would be the best case), as some algorithms do not scale linearly; a case in point is the sweep and prune collision detection algorithm introduced in sect.~\ref{sect-sweep-and-prune}, with scaling roughly $\bigO{N \log N}$.
+  The dependency is not strictly linear (which would be the best case), as some algorithms do not scale linearly; a case in point is the sweep and prune collision detection algorithm introduced in sect. :ref:`sect-sweep-and-prune`, with scaling roughly $\bigO{N \log N}$.
 
   The number of interactions scales with $N$, as long as packing characteristics are the same.
 * the number of computational cores $\numCPU$; in the ideal case, the dependency would be inverse-linear were all algorithms parallelized (in Yade, collision detection is not).
