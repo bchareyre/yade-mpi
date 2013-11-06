@@ -3,7 +3,7 @@ import yade.runtime
 if not yade.runtime.hasDisplay:
 	msg = "Connecting to DISPLAY at Yade startup failed, unable to activate the qt4 interface."
 	import os
-	'YADE_BATCH' in os.environ:
+	if 'YADE_BATCH' in os.environ:
 		msg += "\nDo not import qt when running in batch mode."
 	raise ImportError(msg)
 
