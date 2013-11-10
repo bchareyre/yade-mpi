@@ -18,7 +18,6 @@ postprocessing and debugging.
 
 - Packages for Ubuntu:
   
-  - Stable-builds: https://launchpad.net/~yade-pkg/+archive/stable
   - Daily-builds: https://launchpad.net/~yade-pkg/+archive/snapshots
   - External packages: https://launchpad.net/~yade-users/+archive/external
 
