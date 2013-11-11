@@ -115,3 +115,15 @@ struct ServoPIDController: public TranslationEngine{
   DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ServoPIDController);
+
+struct BicyclePedalEngine: public KinematicEngine{
+	virtual void apply(const vector<Body::id_t>& ids);
+	void postLoad(BicyclePedalEngine&){ rotationAxis.normalize(); }
+	YADE_CLASS_BASE_DOC_ATTRS(BicyclePedalEngine,KinematicEngine,"Engine applying the linear motion of ``bicycle pedal`` e.g. moving points around the axis without rotation",
+		((Real,angularVelocity,0,,"Angular velocity. [rad/s]"))
+		((Vector3r,rotationAxis,Vector3r::UnitX(),Attr::triggerPostLoad,"Axis of rotation (direction); will be normalized automatically."))
+		((Real,radius,-1.0,,"Rotation radius. [m]"))
+		((Real,fi,Mathr::PI/2.0,,"Initial phase [radians]"))
+	);
+};
+REGISTER_SERIALIZABLE(BicyclePedalEngine);
