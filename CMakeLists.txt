@@ -40,15 +40,15 @@ INCLUDE(FindPythonModule)
 INCLUDE(GNUInstallDirs)
 #===========================================================
 # HACK!!! If the version of gcc is 4.8 or greater, we add -ftrack-macro-expansion=0 
-# to compiler to reduce the memory consumption during compilation step.
+# and -save-temps into compiler to reduce the memory consumption during compilation.
 # See http://bugs.debian.org/726009 for more information
 # Can be removed later, if gcc fixes its regression
 # Taken from http://stackoverflow.com/questions/4058565/check-gcc-minor-in-cmake
  
 EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 IF (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-  MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0")
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ftrack-macro-expansion=0 ")
+  MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0 and -save-temps")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ftrack-macro-expansion=0 -save-temps")
 ENDIF()
 
 #===========================================================
