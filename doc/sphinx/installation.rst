@@ -113,7 +113,16 @@ should have root privileges
 		python-xlib python-qt4 pyqt4-dev-tools gtk2-engines-pixbuf python-argparse \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libsuitesparse-dev \
-		libopenblas-dev libmetis-dev python-gts libbz2-dev zlib1g-dev
+		libopenblas-dev libbz2-dev zlib1g-dev
+
+Additional packages, which can become mandatory later::
+
+		sudo apt-get install libmetis-dev python-gts python-minieigen \
+
+Some packages, which are listed here, are relatively new and they can absent
+in your distribution (for example, libmetis-dev or python-gts). They can be 
+installed from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_
+or just ignored. In this case some features can be disabled.
 
 If you are using other distribuition, than Debian or its derivatives, you should
 install the software, which is listed above. Their names can differ from the 
