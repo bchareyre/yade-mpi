@@ -355,35 +355,37 @@ Real approxSectionArea(Real coord, int axis){
 	upper part" (lower and upper parts with respect to the plane's normal).
 
 	(This could be easily extended to return sum of only normal forces or only of shear forces.)
-	// FIXME: adapt to ScGeom or remove
 */
-// Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
-// 	Vector3r ret(Vector3r::Zero());
-// 	Scene* scene=Omega::instance().getScene().get();
-// 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
-// 		if(!I->isReal()) continue;
-// 		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->phys.get());
-// 		if(!nsi) continue;
-// 		Vector3r pos1,pos2;
-// 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->geom.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
-// 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
-// 		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
-// 		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
-// 		if(dot1*dot2>0) continue; // both (centers of) bodies are on the same side of the plane=> this interaction has to be disregarded
-// 		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
-// 		// otherwise, reverse its contribution. So that we return finally
-// 		// Sum [ ( normal(plane) dot normal(interaction= from 1 to 2) ) "nsi->force" ]
-// 		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
-// 	}
-// 	return ret;
-// }
+Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
+	Vector3r ret(Vector3r::Zero());
+	Scene* scene=Omega::instance().getScene().get();
+	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
+		if(!I->isReal()) continue;
+		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->phys.get());
+		if(!nsi) continue;
+		Vector3r pos1,pos2;
+		/*
+		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->geom.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
+		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
+		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
+		*/
+		pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos;
+		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
+		if(dot1*dot2>0) continue; // both (centers of) bodies are on the same side of the plane=> this interaction has to be disregarded
+		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
+		// otherwise, reverse its contribution. So that we return finally
+		// Sum [ ( normal(plane) dot normal(interaction= from 1 to 2) ) "nsi->force" ]
+		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
+	}
+	return ret;
+}
 
 /* Less general than forcesOnPlane, computes force on plane perpendicular to axis, passing through coordinate coord. */
-// /*Vector3r forcesOnCoordPlane(Real coord, int axis){
-// 	Vector3r planePt(Vector3r::Zero()); planePt[axis]=coord;
-// 	Vector3r normal(Vector3r::Zero()); normal[axis]=1;
-// 	return forcesOnPlane(planePt,normal);
-// }*/
+Vector3r forcesOnCoordPlane(Real coord, int axis){
+	Vector3r planePt(Vector3r::Zero()); planePt[axis]=coord;
+	Vector3r normal(Vector3r::Zero()); normal[axis]=1;
+	return forcesOnPlane(planePt,normal);
+}
 
 
 py::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
@@ -517,8 +519,8 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("sumForces",sumForces,(py::arg("ids"),py::arg("direction")),"Return summary force on bodies with given *ids*, projected on the *direction* vector.");
 	py::def("sumTorques",sumTorques,(py::arg("ids"),py::arg("axis"),py::arg("axisPt")),"Sum forces and torques on bodies given in *ids* with respect to axis specified by a point *axisPt* and its direction *axis*.");
 	py::def("sumFacetNormalForces",sumFacetNormalForces,(py::arg("ids"),py::arg("axis")=-1),"Sum force magnitudes on given bodies (must have :yref:`shape<Body.shape>` of the :yref:`Facet` type), considering only part of forces perpendicular to each :yref:`facet's<Facet>` face; if *axis* has positive value, then the specified axis (0=x, 1=y, 2=z) will be used instead of facet's normals.");
-// 	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
-// 	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
+	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
+	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
 	py::def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
 	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`IGeomDispatcher` and :yref:`IPhysDispatcher` (might be both hidden in :yref:`InteractionLoop`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<IGeomDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning:: This function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
 	py::def("spiralProject",spiralProject,(py::arg("pt"),py::arg("dH_dTheta"),py::arg("axis")=2,py::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),py::arg("theta0")=0));
