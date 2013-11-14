@@ -133,6 +133,9 @@ are optional. Watch for notes and warnings/errors, which are shown
 by cmake during configuration step. If the missing package is optional,
 some of Yade features will be disabled (see the messages at the end of configuration).
 
+.. warning:: if you have Ubuntu 12.10 or older, you should install libqglviewer-qt4-dev
+ package instead of libqglviewer-dev.
+
 
 Compilation
 ^^^^^^^^^^^
