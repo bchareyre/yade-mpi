@@ -18,11 +18,11 @@ Vecteur PeriodicCellInfo::deltaP;
 //Forcing instanciation of the template to avoid linkage problems 
 typedef CGT::FlowBoundingSphere<FlowTesselation> FlowBoundingSphere;
 FlowBoundingSphere ex;
+typedef CGT::FlowBoundingSphere<UnsatTesselation> UnsatFlowBoundingSphere;
+UnsatFlowBoundingSphere unex;
 #ifdef LINSOLV
 typedef CGT::FlowBoundingSphereLinSolv<FlowBoundingSphere> FlowBoundingSphereLinSolv;
 FlowBoundingSphereLinSolv exls;
-typedef CGT::FlowBoundingSphere<UnsatTesselation> UnsatFlowBoundingSphere;
-UnsatFlowBoundingSphere unex;
 #endif
 
 

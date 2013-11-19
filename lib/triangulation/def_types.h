@@ -240,6 +240,10 @@ public:
 	UnsatVertexInfo& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
 	UnsatVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
 	UnsatVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
+	UnsatVertexInfo (void)
+	{
+	  
+	}
 };
 
 } // namespace CGT
