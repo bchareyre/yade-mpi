@@ -57,7 +57,7 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void Initialize_volumes (Solver& flow);
 		TPL void BoundaryConditions(Solver& flow);
 		TPL void initializeCellIndex(Solver& flow);
-		TPL void getPoreRadius(Solver& flow);
+		TPL void initializePoreRadius(Solver& flow);
 		TPL void initWaterReservoirBound(Solver& flow);
 		TPL void updateWaterReservoir(Solver& flow);
 		TPL void waterReservoirRecursion(Cell_handle cell, Solver& flow);
@@ -75,8 +75,8 @@ class UnsaturatedEngine : public PartialEngine
 		TPL Real getMinEntryValue (Solver& flow );
 		TPL Real getMinEntryValue2 (Solver& flow);
 		TPL Real getSaturation(Solver& flow);
-		TPL void saveListOfNodes(Solver& flow);
-		TPL void saveListOfConnections(Solver& flow);
+		TPL void saveListNodes(Solver& flow);
+		TPL void saveListConnection(Solver& flow);
 
 		TPL void saveLatticeNodeX(Solver& flow,double x); 
 		TPL void saveLatticeNodeY(Solver& flow,double y); 
@@ -84,8 +84,11 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void saveListAdjCellsTopBound(Solver& flow);
 		TPL void saveListAdjCellsBottomBound(Solver& flow);		
 		TPL void savePoreBodyInfo(Solver& flow);
+		TPL void savePoreThroatInfo(Solver& flow);
 		TPL void debugTemp(Solver& flow);
 
+		template<class Cellhandle >
+		double getRadiusMin(Cellhandle cell, int j);
 		template<class Cellhandle>
 		Real Volume_cell_single_fictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -99,6 +102,8 @@ class UnsaturatedEngine : public PartialEngine
 		template<class Cellhandle>
 		double computeEffPoreRadius(Cellhandle cell, int j);
 		template<class Cellhandle>
+		double computeEffPoreRadiusNormal(Cellhandle cell, int j);
+		template<class Cellhandle>
 		double bisection(Cellhandle cell, int j, double a, double b);
 		template<class Cellhandle>
 		double computeDeltaForce(Cellhandle cell,int j, double rcap);
@@ -106,8 +111,6 @@ class UnsaturatedEngine : public PartialEngine
 		Real computePoreArea(Cellhandle cell, int j);
 		template<class Cellhandle>
 		Real computePorePerimeter(Cellhandle cell, int j);		
-		template<class Cellhandle>
-		double computeDeltaMin(Cellhandle cell, int j);
 		void saveVtk() {solver->saveVtk();}
 		python::list getConstrictions() {
 			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
@@ -128,14 +131,15 @@ class UnsaturatedEngine : public PartialEngine
 		Real		_getMinEntryValue() {return getMinEntryValue(solver);}
 		Real		_getMinEntryValue2() {return getMinEntryValue2(solver);}		
 		Real 		_getSaturation () {return getSaturation(solver);}
-		void		_saveListOfNodes() {saveListOfNodes(solver);}
-		void		_saveListOfConnections() {saveListOfConnections(solver);}
+		void		_saveListNodes() {saveListNodes(solver);}
+		void		_saveListConnection() {saveListConnection(solver);}
  		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
  		void		_saveLatticeNodeY(double y) {saveLatticeNodeY(solver,y);}
  		void		_saveLatticeNodeZ(double z) {saveLatticeNodeZ(solver,z);}
  		void 		_saveListAdjCellsTopBound() {saveListAdjCellsTopBound(solver);}
  		void 		_saveListAdjCellsBottomBound() {saveListAdjCellsBottomBound(solver);}
  		void		_savePoreBodyInfo(){savePoreBodyInfo(solver);}
+ 		void		_savePoreThroatInfo(){savePoreThroatInfo(solver);}
  		void		_debugTemp(){debugTemp(solver);}
 
 		virtual ~UnsaturatedEngine();
@@ -215,14 +219,15 @@ class UnsaturatedEngine : public PartialEngine
 					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation")
 					.def("getMinEntryValue",&UnsaturatedEngine::_getMinEntryValue,"get the minimum air entry pressure for the next invade step")
 					.def("getMinEntryValue2",&UnsaturatedEngine::_getMinEntryValue2,"get the minimum air entry pressure for the next invade step(version2)")
-					.def("saveListOfNodes",&UnsaturatedEngine::_saveListOfNodes,"Save the list of nodes.")
-					.def("saveListOfConnections",&UnsaturatedEngine::_saveListOfConnections,"Save the connections between cells.")
+					.def("saveListNodes",&UnsaturatedEngine::_saveListNodes,"Save the list of nodes.")
+					.def("saveListConnection",&UnsaturatedEngine::_saveListConnection,"Save the connections between cells.")
 					.def("saveLatticeNodeX",&UnsaturatedEngine::_saveLatticeNodeX,(python::arg("x")),"Save the slice of lattice nodes for x_normal(x). 0: out of sphere; 1: inside of sphere.")
 					.def("saveLatticeNodeY",&UnsaturatedEngine::_saveLatticeNodeY,(python::arg("y")),"Save the slice of lattice nodes for y_normal(y). 0: out of sphere; 1: inside of sphere.")
 					.def("saveLatticeNodeZ",&UnsaturatedEngine::_saveLatticeNodeZ,(python::arg("z")),"Save the slice of lattice nodes for z_normal(z). 0: out of sphere; 1: inside of sphere.")
-					.def("saveListAdjCellsTopBound",&UnsaturatedEngine::_saveListAdjCellsTopBound,"Save the cells IDs adjacent top boundary")
-					.def("saveListAdjCellsBottomBound",&UnsaturatedEngine::_saveListAdjCellsBottomBound,"Save the cells IDs adjacent bottom boundary")
+					.def("saveListAdjCellsTopBound",&UnsaturatedEngine::_saveListAdjCellsTopBound,"Save the cells IDs adjacent top boundary(connecting water reservoir).")
+					.def("saveListAdjCellsBottomBound",&UnsaturatedEngine::_saveListAdjCellsBottomBound,"Save the cells IDs adjacent bottom boundary(connecting air reservoir).")
 					.def("savePoreBodyInfo",&UnsaturatedEngine::_savePoreBodyInfo,"Save pore bodies positions/Voronoi centers and size/volume.")
+					.def("savePoreThroatInfo",&UnsaturatedEngine::_savePoreThroatInfo,"Save pore throat area, inscribed radius and perimeter.")
 					.def("debugTemp",&UnsaturatedEngine::_debugTemp,"debug temp file.")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
 					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2,water can be trapped in cells) ")
