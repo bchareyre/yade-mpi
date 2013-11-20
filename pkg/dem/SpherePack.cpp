@@ -207,10 +207,10 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 				if (mode!=RDIST_RMEAN) {
 					//if rMean is not imposed, then we call makeCloud recursively, scaling the PSD down until the target num is obtained
 					Real nextPoro = porosity+(1-porosity)/10.;
-					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
+					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
 					pack.clear();
 					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass,seed,hSizeFound?hSize:Matrix3r::Zero());}
-				else LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num<<".");
+				else LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<num<<".");
 			}
 			return i;}
 	}
@@ -270,7 +270,7 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 		int bin=int(bins*(2*s.r-minD)/(maxD-minD)); bin=min(bin,bins-1); // to make sure
 		if (mass) hist[bin]+=pow(s.r,3)/vol; else hist[bin]+=1./N;
 	}
-	for(int i=0; i<bins; i++) cumm[i+1]=min(1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
+	for(int i=0; i<bins; i++) cumm[i+1]=min((Real)1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
 	return py::make_tuple(edges,cumm);
 }
 
@@ -365,7 +365,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 				if(!overlap) { pack.push_back(Sph(c,r)); break; }
 			}
 			if (t==maxTry) {
-				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
+				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
 				return i;
 			}
 		}
@@ -410,7 +410,7 @@ long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool period
 					for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
 				} else {
 					for(size_t j=0; j<packSize; j++){
-						Vector3r dr;
+						Vector3r dr=Vector3r::Zero();
 						for(int axis=0; axis<2; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
 						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 					}
@@ -418,7 +418,7 @@ long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool period
 				if(!overlap) { pack.push_back(Sph(c,r)); break; }
 			}
 			if (t==maxTry) {
-				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
+				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
 				return i;
 			}
 		}

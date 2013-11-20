@@ -51,4 +51,3 @@ typedef TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo>			PeriFlowTriang
 typedef TriangulationTypes<UnsatVertexInfo,UnsatCellInfo>       			UnsatFlowTriangulationTypes;
 
 } // namespace CGT
-

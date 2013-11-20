@@ -59,6 +59,10 @@ class FlowEngine : public PartialEngine
 		int ReTrg;
 		int ellapsedIter;
 		TPL void initSolver (Solver& flow);
+		#ifdef LINSOLV
+		TPL void setForceMetis (Solver& flow, bool force);
+		TPL bool getForceMetis (Solver& flow);
+		#endif
 		TPL void Triangulate (Solver& flow);
 		TPL void AddBoundary (Solver& flow);
 		TPL void Build_Triangulation (double P_zero, Solver& flow);
@@ -91,6 +95,24 @@ class FlowEngine : public PartialEngine
 			return (flow->viscousBodyStress.size()>id_sph)?flow->viscousBodyStress[id_sph]:Matrix3r::Zero();}
 		TPL Matrix3r bodyNormalLubStress(unsigned int id_sph, Solver& flow) {
 			return (flow->lubBodyStress.size()>id_sph)?flow->lubBodyStress[id_sph]:Matrix3r::Zero();}
+		TPL Vector3r shearVelocity(unsigned int interaction, Solver& flow) {
+			return (flow->deltaShearVel[interaction]);}
+		TPL Vector3r normalVelocity(unsigned int interaction, Solver& flow) {
+			return (flow->deltaNormVel[interaction]);}
+		TPL Matrix3r normalStressInteraction(unsigned int interaction, Solver& flow) {
+			return (flow->normalStressInteraction[interaction]);}
+		TPL Matrix3r shearStressInteraction(unsigned int interaction, Solver& flow) {
+			return (flow->shearStressInteraction[interaction]);}
+		TPL Vector3r normalVect(unsigned int interaction, Solver& flow) {
+			return (flow->normalV[interaction]);}
+		TPL Real surfaceDistanceParticle(unsigned int interaction, Solver& flow) {
+			return (flow->surfaceDistance[interaction]);}
+		TPL Real edgeSize(Solver& flow) {
+			return (flow->Edge_ids.size());}
+		TPL Real OSI(Solver& flow) {
+			return (flow->onlySpheresInteractions.size());}
+		TPL int onlySpheresInteractions(unsigned int interaction, Solver& flow) {
+			return (flow->onlySpheresInteractions[interaction]);}
 		TPL python::list getConstrictions(bool all, Solver& flow) {
 			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k]!=0) || csd[k]>0) pycsd.append(csd[k]); return pycsd;}
@@ -143,6 +165,13 @@ class FlowEngine : public PartialEngine
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
+		Vector3r 	_shearVelocity(unsigned int interaction) {return shearVelocity(interaction,solver);}
+		Vector3r 	_normalVelocity(unsigned int interaction) {return normalVelocity(interaction,solver);}
+		Matrix3r 	_normalStressInteraction(unsigned int interaction) {return normalStressInteraction(interaction,solver);}
+		Matrix3r 	_shearStressInteraction(unsigned int interaction) {return shearStressInteraction(interaction,solver);}
+		Vector3r 	_normalVect(unsigned int interaction) {return normalVect(interaction,solver);}
+		Real	 	_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
+		int	 	_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
 		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
@@ -155,6 +184,13 @@ class FlowEngine : public PartialEngine
 		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
+		void		_setForceMetis (bool force) {setForceMetis(solver,force);}
+		bool		_getForceMetis () {return getForceMetis (solver);}
+		void		cholmodStats() {
+					cerr << cholmod_print_common("PFV Cholmod factorization",&(solver->eSolver.cholmod()))<<endl;
+					cerr << "cholmod method:" << solver->eSolver.cholmod().selected<<endl;
+					cerr << "METIS called:"<<solver->eSolver.cholmod().called_nd<<endl;}
+		bool		metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
 		#endif
 		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
 		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
@@ -164,7 +200,7 @@ class FlowEngine : public PartialEngine
 		virtual void action();
 		virtual void backgroundAction();
 
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media.\n\n.. note::\n\t Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`FlowEngine::multithread`=True with  multithread :yref:`FlowEngine::numSolveThreads`=:yref:`FlowEngine::numFactorizeThreads`=4 means that openblas will mobilize 8 processors at some point, if the system doesn't have so many procs. it will hurt performance.",
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
 					((bool,isActivated,true,,"Activates Flow Engine"))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
@@ -188,7 +224,7 @@ class FlowEngine : public PartialEngine
 					((bool,clampKValues,true,,"If true, clamp local permeabilities in [minKdivKmean,maxKdivKmean]*globalK. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
 					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
 					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
-					((double,permeabilityFactor,0.0,,"permability multiplier"))
+					((double,permeabilityFactor,1.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of the fluid"))
 					((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
 					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
@@ -206,6 +242,8 @@ class FlowEngine : public PartialEngine
 					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
 					((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
 					((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
+					((bool, display_force, false,,"display the lubrication force applied on particles"))
+					((bool, create_file, false,,"create file of velocities"))
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui (FIXME: ref.)"))
 					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule (FIXME: ref.) "))
 					((double, eps, 0.00001,,"roughness defined as a fraction of particles size, giving the minimum distance between particles in the lubrication model."))
@@ -217,6 +255,7 @@ class FlowEngine : public PartialEngine
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
+// 					((bool, forceMetis, 0,,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation"))
 					#endif
 					,
 					/*deprec*/
@@ -240,7 +279,7 @@ class FlowEngine : public PartialEngine
 					.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
 					.def("getCellFlux",&FlowEngine::_getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
-					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note::\n\t The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
+					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
@@ -251,6 +290,13 @@ class FlowEngine : public PartialEngine
 					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
+					.def("shearVelocity",&FlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+					.def("normalVelocity",&FlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
+					.def("normalVect",&FlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
+					.def("surfaceDistanceParticle",&FlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+					.def("onlySpheresInteractions",&FlowEngine::_onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
+					
+					
 					.def("pressureProfile",&FlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 					.def("getPorePressure",&FlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("averageSlicePressure",&FlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
@@ -261,6 +307,9 @@ class FlowEngine : public PartialEngine
 					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+					.def("cholmodStats",&FlowEngine::cholmodStats,"get statistics of cholmod solver activity")
+					.def("metisUsed",&FlowEngine::metisUsed,"check wether metis lib is effectively used")
+					.add_property("forceMetis",&FlowEngine::_getForceMetis,&FlowEngine::_setForceMetis,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation")
 					#endif
 					)
 		DECLARE_LOGGER;
@@ -328,6 +377,15 @@ class PeriodicFlowEngine : public FlowEngine
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
+		Matrix3r 	_normalStressInteraction(unsigned int interaction) {return normalStressInteraction(interaction,solver);}
+		Matrix3r 	_shearStressInteraction(unsigned int interaction) {return shearStressInteraction(interaction,solver);}
+		Vector3r 	_shearVelocity(unsigned int id_sph) {return shearVelocity(id_sph,solver);}
+		Vector3r 	_normalVelocity(unsigned int id_sph) {return normalVelocity(id_sph,solver);}
+		Vector3r 	_normalVect(unsigned int id_sph) {return normalVect(id_sph,solver);}
+		Real		_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
+		int		_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
+		Real		_edgeSize() {return edgeSize(solver);}
+		Real		_OSI() {return OSI(solver);}
 
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
 		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
@@ -380,6 +438,15 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("normalLubForce",&PeriodicFlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
+			.def("shearVelocity",&PeriodicFlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+			.def("normalStressInteraction",&PeriodicFlowEngine::_normalStressInteraction,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+			.def("shearStressInteraction",&PeriodicFlowEngine::_shearStressInteraction,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
+			.def("normalVelocity",&PeriodicFlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
+			.def("normalVect",&PeriodicFlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
+			.def("surfaceDistanceParticle",&PeriodicFlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+			.def("onlySpheresInteractions",&PeriodicFlowEngine::_onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
+			.def("edgeSize",&PeriodicFlowEngine::_edgeSize,"Return the number of interactions.")
+			.def("OSI",&PeriodicFlowEngine::_OSI,"Return the number of interactions only between spheres.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")

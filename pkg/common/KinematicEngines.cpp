@@ -4,7 +4,7 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/lib/smoothing/LinearInterpolate.hpp>
 
-YADE_PLUGIN((KinematicEngine)(CombinedKinematicEngine)(TranslationEngine)(HarmonicMotionEngine)(RotationEngine)(HelixEngine)(InterpolatingHelixEngine)(HarmonicRotationEngine)(ServoPIDController));
+YADE_PLUGIN((KinematicEngine)(CombinedKinematicEngine)(TranslationEngine)(HarmonicMotionEngine)(RotationEngine)(HelixEngine)(InterpolatingHelixEngine)(HarmonicRotationEngine)(ServoPIDController)(BicyclePedalEngine));
 
 CREATE_LOGGER(KinematicEngine);
 
@@ -31,6 +31,7 @@ void CombinedKinematicEngine::action(){
 		}
 		// apply one engine after another
 		FOREACH(const shared_ptr<KinematicEngine>& e, comb){
+			if (e->dead) continue;
 			e->scene=scene; e->apply(ids);
 		}
 	} else {
@@ -108,7 +109,6 @@ void HelixEngine::apply(const vector<Body::id_t>& ids){
 	}
 }
 
-
 void RotationEngine::apply(const vector<Body::id_t>& ids){
 	if (ids.size()>0) {
 		#ifdef YADE_OPENMP
@@ -182,3 +182,33 @@ void ServoPIDController::apply(const vector<Body::id_t>& ids){
   TranslationEngine::apply(ids);
 }
 
+
+void BicyclePedalEngine::apply(const vector<Body::id_t>& ids){
+	if (ids.size()>0) {
+		Quaternionr qRotateZVec(Quaternionr().setFromTwoVectors(Vector3r(0,0,1), rotationAxis));
+		
+		Vector3r newPos = Vector3r(cos(fi + angularVelocity*scene->dt)*radius, sin(fi + angularVelocity*scene->dt)*radius, 0.0);
+		Vector3r oldPos = Vector3r(cos(fi)*radius, sin(fi)*radius, 0.0);
+		
+		Vector3r newVel = (oldPos - newPos)/scene->dt;
+		
+		fi += angularVelocity*scene->dt;
+		newVel =  qRotateZVec*newVel;
+		
+		#ifdef YADE_OPENMP
+		const long size=ids.size();
+		#pragma omp parallel for schedule(static)
+		for(long i=0; i<size; i++){
+			const Body::id_t& id=ids[i];
+		#else
+		FOREACH(Body::id_t id,ids){
+		#endif
+			assert(id<(Body::id_t)scene->bodies->size());
+			Body* b=Body::byId(id,scene).get();
+			if(!b) continue;
+			b->state->vel+=newVel;
+		}
+	} else {
+		LOG_WARN("The list of ids is empty! Can't move any body.");
+	}
+}

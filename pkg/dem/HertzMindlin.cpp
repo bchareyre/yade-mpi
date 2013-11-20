@@ -31,8 +31,8 @@ CREATE_LOGGER(Ip2_FrictMat_FrictMat_MindlinPhys);
 
 void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
 	if(interaction->phys) return; // no updates of an already existing contact necessary
-	shared_ptr<MindlinPhys> mindlinPhys(new MindlinPhys());
-	interaction->phys = mindlinPhys;
+	shared_ptr<MindlinPhys> contactPhysics(new MindlinPhys());
+	interaction->phys = contactPhysics;
 	FrictMat* mat1 = YADE_CAST<FrictMat*>(b1.get());
 	FrictMat* mat2 = YADE_CAST<FrictMat*>(b2.get());
 	
@@ -64,20 +64,20 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	Real Rmean = (Da+Db)/2.; // mean radius
 	Real Kno = 4./3.*E*sqrt(R); // coefficient for normal stiffness
 	Real Kso = 2*sqrt(4*R)*G/(2-V); // coefficient for shear stiffness
-	Real frictionAngle = std::min(fa,fb);
+	Real frictionAngle = (!frictAngle) ? std::min(fa,fb) : (*frictAngle)(mat1->id,mat2->id,mat1->frictionAngle,mat2->frictionAngle);
 
 	Real Adhesion = 4.*Mathr::PI*R*gamma; // calculate adhesion force as predicted by DMT theory
 
 	/* pass values calculated from above to MindlinPhys */
-	mindlinPhys->tangensOfFrictionAngle = std::tan(frictionAngle); 
-	//mindlinPhys->prevNormal = scg->normal; // used to compute relative rotation
-	mindlinPhys->kno = Kno; // this is just a coeff
-	mindlinPhys->kso = Kso; // this is just a coeff
-	mindlinPhys->adhesionForce = Adhesion;
+	contactPhysics->tangensOfFrictionAngle = std::tan(frictionAngle); 
+	//contactPhysics->prevNormal = scg->normal; // used to compute relative rotation
+	contactPhysics->kno = Kno; // this is just a coeff
+	contactPhysics->kso = Kso; // this is just a coeff
+	contactPhysics->adhesionForce = Adhesion;
 	
-	mindlinPhys->kr = krot;
-	mindlinPhys->ktw = ktwist;
-	mindlinPhys->maxBendPl = eta*Rmean; // does this make sense? why do we take Rmean?
+	contactPhysics->kr = krot;
+	contactPhysics->ktw = ktwist;
+	contactPhysics->maxBendPl = eta*Rmean; // does this make sense? why do we take Rmean?
 
 	/* compute viscous coefficients */
 	if(en && betan) throw std::invalid_argument("Ip2_FrictMat_FrictMat_MindlinPhys: only one of en, betan can be specified.");
@@ -86,13 +86,13 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1,const 
 	// en or es specified, just compute alpha, otherwise alpha remains 0
 	if(en || es){
 		Real logE = log((*en)(mat1->id,mat2->id));
-		mindlinPhys->alpha = -sqrt(5/6.)*2*logE/sqrt(pow(logE,2)+pow(Mathr::PI,2))*sqrt(2*E*sqrt(R)); // (see Tsuji, 1992)
+		contactPhysics->alpha = -sqrt(5/6.)*2*logE/sqrt(pow(logE,2)+pow(Mathr::PI,2))*sqrt(2*E*sqrt(R)); // (see Tsuji, 1992), also [Antypov2011] eq. 17
 	}
 	
 	// betan specified, use that value directly; otherwise give zero
 	else{	
-		mindlinPhys->betan=betan ? (*betan)(mat1->id,mat2->id) : 0; 
-		mindlinPhys->betas=betas ? (*betas)(mat1->id,mat2->id) : mindlinPhys->betan;
+		contactPhysics->betan=betan ? (*betan)(mat1->id,mat2->id) : 0; 
+		contactPhysics->betas=betas ? (*betas)(mat1->id,mat2->id) : contactPhysics->betan;
 	}
 }
 
@@ -319,7 +319,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	}
 	else if (useDamping){ // (see Tsuji, 1992)
 		Real mbar = (!b1->isDynamic() && b2->isDynamic()) ? de2->mass : ((!b2->isDynamic() && b1->isDynamic()) ? de1->mass : (de1->mass*de2->mass / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
-		cn = phys->alpha*sqrt(mbar)*pow(uN,0.25); // normal viscous coefficient
+		cn = phys->alpha*sqrt(mbar)*pow(uN,0.25); // normal viscous coefficient, see also [Antypov2011] eq. 10
 		cs = cn; // same value for shear viscous coefficient
 	}
 
@@ -346,12 +346,32 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	/**************************************/
 	
 	// normal force must be updated here before we apply the Mohr-Coulomb criterion
-	if (useDamping){ // get normal viscous component 
+	if (useDamping){ // get normal viscous component
 		phys->normalViscous = cn*incidentVn;
-		// add normal viscous component if damping is included
-		phys->normalForce -= phys->normalViscous;
+		Vector3r normTemp = phys->normalForce - phys->normalViscous; // temporary normal force
+		// viscous force should not exceed the value of current normal force, i.e. no attraction force should be permitted if particles are non-adhesive
+		// if particles are adhesive, then fixed the viscous force at maximum equal to the adhesion force
+		// *** enforce normal force to zero if no adhesion is permitted ***
+		if (phys->adhesionForce==0.0 || !includeAdhesion){
+						if (normTemp.dot(scg->normal)<0.0){
+										phys->normalForce = Vector3r::Zero();
+										phys->normalViscous = phys->normalViscous + normTemp; // normal viscous force is such that the total applied force is null - it is necessary to compute energy correctly!
+						}
+						else{phys->normalForce -= phys->normalViscous;}
+		}
+		else if (includeAdhesion && phys->adhesionForce!=0.0){
+						// *** limit viscous component to the max adhesive force ***
+						if (normTemp.dot(scg->normal)<0.0 && (phys->normalViscous.norm() > phys->adhesionForce) ){
+										Real normVisc = phys->normalViscous.norm(); Vector3r normViscVector = phys->normalViscous/normVisc;
+										phys->normalViscous = phys->adhesionForce*normViscVector;
+										phys->normalForce -= phys->normalViscous;
+						}
+						// *** apply viscous component - in the presence of adhesion ***
+						else {phys->normalForce -= phys->normalViscous;}
+		}
 		if (calcEnergy) {normDampDissip += phys->normalViscous.dot(incidentVn*dt);} // calc dissipation of energy due to normal damping
 	}
+	
 
 	/*************************************/
 	/* SHEAR DISPLACEMENT (elastic only) */

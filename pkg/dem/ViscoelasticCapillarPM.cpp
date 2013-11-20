@@ -50,7 +50,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
          */ 
         
         Real R = phys.R;
-        Real s = -geom.penetrationDepth/2.0;
+        Real s = -geom.penetrationDepth;
         Real Vb = phys.Vb;
         
         Real VbS = Vb/(R*R*R);
@@ -79,7 +79,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
                   (0.03345 + 0.04543*Th1 - 0.09056*Th2) * log(VbS) +
                   (0.0018574 + 0.004456*Th1 - 0.006257*Th2) *log(VbS)*log(VbS);
   
-        Real sPl = s/sqrt(Vb/R);
+        Real sPl = (s/2.0)/sqrt(Vb/R);
         
         Real lnFS = f1 - f2*exp(f3*log(sPl) + f4*log(sPl)*log(sPl));
         Real FS = exp(lnFS);

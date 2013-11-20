@@ -19,12 +19,16 @@ O.bodies.append(pack.gtsSurface2Facets(surf,color=(1,0,1)))
 # fill this solid with triaxial packing; it will compute minimum-volume oriented bounding box
 # to minimize the number of throw-away spheres.
 # It does away with about 3k spheres for radius 3e-2
-O.bodies.append(pack.randomDensePack(pack.inGtsSurface(surf),radius=3e-2,rRelFuzz=1e-1,memoizeDb='/tmp/gts-triax.sqlite'))
+sp1=SpherePack()
+sp1=pack.randomDensePack(pack.inGtsSurface(surf),radius=3e-2,rRelFuzz=1e-1,memoizeDb='/tmp/gts-triax.sqlite',returnSpherePack=True)
+sp1.toSimulation()
 # translate the surface away and pack it again with sphere, but without the oriented bounding box (useOBB=False)
 # Here, we need 20k spheres (with more or less the same result)
 surf.translate(0,0,1);
 O.bodies.append(pack.gtsSurface2Facets(surf,color=(1,0,0)))
-O.bodies.append(pack.randomDensePack(pack.inGtsSurface(surf),radius=3e-2,rRelFuzz=1e-1,memoizeDb='/tmp/gts-triax-packings.sqlite',useOBB=False))
+sp2=SpherePack()
+sp2=pack.randomDensePack(pack.inGtsSurface(surf),radius=3e-2,rRelFuzz=1e-1,memoizeDb='/tmp/gts-triax-packings.sqlite',useOBB=False,returnSpherePack=True)
+sp2.toSimulation()
 
 from yade import qt
 qt.View()

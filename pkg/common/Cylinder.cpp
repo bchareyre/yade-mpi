@@ -430,10 +430,10 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 			//FIXME : contact following have to be done for parallel cylinders.
 			colinearVectors=1;
 			insideCyl1=1 ; insideCyl2=1;
-			Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min(1.0,max(0.0,PA));
-			Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min(1.0,max(0.0,Pa));
-			Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min(1.0,max(0.0,PB));
-			Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min(1.0,max(0.0,Pb));
+			Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min((Real)1.0,max((Real)0.0,PA));
+			Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min((Real)1.0,max((Real)0.0,Pa));
+			Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
+			Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
 			
 			Real h1=(A+0.5*a-B).dot(b)/(b.norm()*b.norm());	//Projection parameter of center of a on b
 			Real h2=(B+0.5*b-A).dot(a)/(a.norm()*a.norm());	//Projection parameter of center of b on a

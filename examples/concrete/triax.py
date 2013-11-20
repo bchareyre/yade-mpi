@@ -56,12 +56,12 @@ frictMat = O.materials.append(FrictMat(
 
 # spheres
 pred = pack.inCylinder((0,0,0),(0,0,height),.5*width) if testType=='cyl' else pack.inAlignedBox((-.5*width,-.5*width,0),(.5*width,.5*width,height)) if testType=='cube' else None
-sp = pack.randomDensePack(pred,spheresInCell=2000,radius=rParticle,memoizeDb='/tmp/triaxTestOnCylinder.sqlite',color=(0,1,1),material=concMat)
-O.bodies.append(sp)
+sp=SpherePack()
+sp = pack.randomDensePack(pred,spheresInCell=2000,radius=rParticle,memoizeDb='/tmp/triaxTestOnCylinder.sqlite',material=concMat,returnSpherePack=True)
+spheres=sp.toSimulation(color=(0,1,1))
 # bottom and top of specimen. Will have prescribed velocity
-bot = [s for s in sp if s.state.pos[2]<rParticle*bcCoeff]
-top = [s for s in sp if s.state.pos[2]>height-rParticle*bcCoeff]
-for s in sp: s.shape.color = (0,1,1)
+bot = [O.bodies[s] for s in spheres if O.bodies[s].state.pos[2]<rParticle*bcCoeff]
+top = [O.bodies[s] for s in spheres if O.bodies[s].state.pos[2]>height-rParticle*bcCoeff]
 vel = strainRate*(height-rParticle*2*bcCoeff)
 for s in bot:
 	s.shape.color = (1,0,0)

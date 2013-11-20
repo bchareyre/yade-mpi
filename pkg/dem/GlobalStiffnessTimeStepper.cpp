@@ -14,6 +14,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Clump.hpp>
 #include<yade/pkg/dem/Shop.hpp>
+#include<yade/pkg/dem/ViscoelasticPM.hpp>
 
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN((GlobalStiffnessTimeStepper));
@@ -25,13 +26,16 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	State* sdec=body->state.get();
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
-	
 	if(body->isClump()) {// if clump, we sum stifnesses of all members
 		const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(body->shape);
 		FOREACH(Clump::MemberMap::value_type& B, clump->members){
 			const shared_ptr<Body>& b = Body::byId(B.first,scene);
 			stiffness+=stiffnesses[b->getId()];
 			Rstiffness+=Rstiffnesses[b->getId()];
+			if (viscEl == true){
+				viscosities[body->getId()]+=viscosities[b->getId()];
+				Rviscosities[body->getId()]+=Rviscosities[b->getId()];
+			}
 		}
 	}
 	
@@ -39,13 +43,15 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 		if (densityScaling) sdec->densityScaling = min(1.0001*sdec->densityScaling, timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0));
 		return; // not possible to compute!
 	}
-	
+
+	//Determine the elastic minimum eigenperiod (and if required determine also the viscous one separately and take the minimum of the two)
+
+	//Elastic
 	Real dtx, dty, dtz;
 	Real dt = max( max (stiffness.x(), stiffness.y()), stiffness.z() );
 	if (dt!=0) {
 		dt = sdec->mass/dt;  computedSomething = true;}//dt = squared eigenperiod of translational motion 
 	else dt = Mathr::MAX_REAL;
-	
 	if (Rstiffness.x()!=0) {
 		dtx = sdec->inertia.x()/Rstiffness.x();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
 	else dtx = Mathr::MAX_REAL;	
@@ -56,15 +62,43 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 		dtz = sdec->inertia.z()/Rstiffness.z();  computedSomething = true;}
 	else dtz = Mathr::MAX_REAL;
 	
-	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for rotational motions
+	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for elastic rotational motions
 	dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
+	
+	//Viscous 
+	if (viscEl == true){		
+		Vector3r&  viscosity = viscosities[body->getId()];
+		Vector3r& Rviscosity = Rviscosities[body->getId()];
+		Real dtx_visc, dty_visc, dtz_visc;
+		Real dt_visc = max(max(viscosity.x(), viscosity.y()), viscosity.z() );
+		if (dt_visc!=0) {
+			dt_visc = sdec->mass/dt_visc;  computedSomething = true;}//dt = eigenperiod of the viscous translational motion 
+		else {dt_visc = Mathr::MAX_REAL;}
+
+		if (Rviscosity.x()!=0) {
+			dtx_visc = sdec->inertia.x()/Rviscosity.x();  computedSomething = true;}//dtx = eigenperiod of viscous rotational motion around x
+		else dtx_visc = Mathr::MAX_REAL;	
+		if (Rviscosity.y()!=0) {
+			dty_visc = sdec->inertia.y()/Rviscosity.y();  computedSomething = true;}
+		else dty_visc = Mathr::MAX_REAL;
+		if (Rviscosity.z()!=0) {
+			dtz_visc = sdec->inertia.z()/Rviscosity.z();  computedSomething = true;}
+		else dtz_visc = Mathr::MAX_REAL;
+	
+		Real Rdt_visc =  std::min( std::min (dtx_visc, dty_visc), dtz_visc );//Rdt = smallest squared eigenperiod for viscous rotational motions
+		dt_visc = 2*timestepSafetyCoefficient*std::min(dt_visc,Rdt_visc);
+
+		//Take the minimum between the elastic and viscous minimum eigenperiod. 
+		dt = std::min(dt,dt_visc);
+	}
+
 	//if there is a target dt, then we apply density scaling on the body, the inertia used in Newton will be mass*scaling, the weight is unmodified
 	if (densityScaling) {
 		sdec->densityScaling = min(sdec->densityScaling,timestepSafetyCoefficient*pow(dt /targetDt,2.0));
 		newDt=targetDt;
 	}
 	//else we update dt normaly
-	else {newDt = std::min(dt,newDt);}
+	else {newDt = std::min(dt,newDt);}   
 }
 
 bool GlobalStiffnessTimeStepper::isActivated()
@@ -97,7 +131,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 		computedOnce = true;}
 	else if (!computedOnce) scene->dt=defaultDt;
 	LOG_INFO("computed timestep " << newDt <<
-			(scene->dt==newDt ? string(", appplied") :
+			(scene->dt==newDt ? string(", applied") :
 			string(", BUT timestep is ")+lexical_cast<string>(scene->dt))<<".");
 }
 
@@ -107,15 +141,24 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 	if(size<rb->bodies->size()){
 		size=rb->bodies->size();
 		stiffnesses.resize(size); Rstiffnesses.resize(size);
+		if (viscEl == true){
+			viscosities.resize(size); Rviscosities.resize(size);
+			}
 	}
 	/* reset stored values */
 	memset(& stiffnesses[0],0,sizeof(Vector3r)*size);
 	memset(&Rstiffnesses[0],0,sizeof(Vector3r)*size);
+	if (viscEl == true){
+		memset(& viscosities[0],0,sizeof(Vector3r)*size);
+		memset(&Rviscosities[0],0,sizeof(Vector3r)*size);
+	}
+
 	FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
 		if(!contact->isReal()) continue;
 
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(contact->geom.get()); assert(geom);
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(contact->phys.get()); assert(phys);
+
 		// all we need for getting stiffness
 		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->refR1; Real& radius2=geom->refR2;
 		Real fn = (static_cast<NormShearPhys *> (contact->phys.get()))->normalForce.squaredNorm();
@@ -134,10 +177,35 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 				std::pow(normal.x(),2)+std::pow(normal.z(),2),
 				std::pow(normal.x(),2)+std::pow(normal.y(),2));
 		diag_Rstiffness *= ks;
+
+
 		//NOTE : contact laws with moments would be handled correctly by summing directly bending+twisting stiffness to diag_Rstiffness. The fact that there is no problem currently with e.g. cohesiveFrict law is probably because final computed dt is constrained by translational motion, not rotations.
 		stiffnesses [contact->getId1()]+=diag_stiffness;
 		Rstiffnesses[contact->getId1()]+=diag_Rstiffness*pow(radius1,2);
 		stiffnesses [contact->getId2()]+=diag_stiffness;
-		Rstiffnesses[contact->getId2()]+=diag_Rstiffness*pow(radius2,2);
+		Rstiffnesses[contact->getId2()]+=diag_Rstiffness*pow(radius2,2);	
+
+		//Same for the Viscous part, if required
+		if (viscEl == true){
+			ViscElPhys* viscPhys = YADE_CAST<ViscElPhys*>(contact->phys.get()); assert(viscPhys);
+			Real& cn=viscPhys->cn; Real& cs=viscPhys->cs;
+			//Diagonal terms of the translational viscous matrix
+			Vector3r diag_viscosity = Vector3r(std::pow(normal.x(),2),std::pow(normal.y(),2),std::pow(normal.z(),2));
+			diag_viscosity *= cn-cs;
+			diag_viscosity = diag_viscosity + Vector3r(1,1,1)*cs;
+			//diagonal terms of the rotational viscous matrix
+			Vector3r diag_Rviscosity =
+				Vector3r(std::pow(normal.y(),2)+std::pow(normal.z(),2),
+					std::pow(normal.x(),2)+std::pow(normal.z(),2),
+					std::pow(normal.x(),2)+std::pow(normal.y(),2));
+			diag_Rviscosity *= cs;			
+			
+			// Add the contact stiffness matrix to the two particles one
+			viscosities [contact->getId1()]+=diag_viscosity;
+			Rviscosities[contact->getId1()]+=diag_Rviscosity*pow(radius1,2);
+			viscosities [contact->getId2()]+=diag_viscosity;
+			Rviscosities[contact->getId2()]+=diag_Rviscosity*pow(radius2,2);
+		}
+
 	}
 }

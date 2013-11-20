@@ -81,15 +81,14 @@ void LawTester::action(){
 	// test object types
 	GenericSpheresContact* gsc=dynamic_cast<GenericSpheresContact*>(I->geom.get());
 	ScGeom* scGeom=dynamic_cast<ScGeom*>(I->geom.get());
-	Dem3DofGeom* d3dGeom=dynamic_cast<Dem3DofGeom*>(I->geom.get());
 	L3Geom* l3Geom=dynamic_cast<L3Geom*>(I->geom.get());
 	L6Geom* l6Geom=dynamic_cast<L6Geom*>(I->geom.get());
 	ScGeom6D* scGeom6d=dynamic_cast<ScGeom6D*>(I->geom.get());
 	bool hasRot=(l6Geom || scGeom6d);
 	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
-	if(!scGeom && !d3dGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom (or L6Geom).");
-	assert(!((bool)scGeom && (bool)d3dGeom && (bool)l3Geom)); // nonsense
+	if(!scGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom (or L6Geom).");
+	assert(!((bool)scGeom && (bool)l3Geom)); // nonsense
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
 	scene->forces.sync();
@@ -125,9 +124,7 @@ void LawTester::action(){
 				if(scGeom6d) uGeom.tail<3>()=-1.*Vector3r(scGeom6d->getTwist(),scGeom6d->getBending().dot(axY),scGeom6d->getBending().dot(axZ));
 			}
 			else{ // d3dGeom
-				throw runtime_error("LawTester: Dem3DofGeom not yet supported.");
-				// essentially copies code from ScGeom, which is not very nice indeed; oh well…
-				// Vector3r vRel=(state2->vel+state2->angVel.cross(-gsc->refR2*gsc->normal))-(state1->vel+state1->angVel.cross(gsc->refR1*gsc->normal));
+				throw runtime_error("Geom type not yet supported.");
 			}
 		}
 		// update the transformation
@@ -248,11 +245,8 @@ void GlExtra_LawTester::render(){
 
 	// switch to local coordinates
 	glTranslatev(tester->contPt);
-	#if EIGEN_WORLD_VERSION==2
- 		glMultMatrixd(Eigen::Transform3d(tester->trsf.transpose()).data());
-	#elif EIGEN_WORLD_VERSION==3
- 		glMultMatrixd(Eigen::Affine3d(tester->trsf.transpose()).data());
-	#endif
+	//glMultMatrixd(Eigen::Affine3d(tester->trsf.transpose()).data());
+	glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(tester->trsf.transpose()).data());
 
 
 	glDisable(GL_LIGHTING); 

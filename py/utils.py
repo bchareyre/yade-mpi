@@ -270,7 +270,7 @@ def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highli
 	b.mask=0	#avoid contact detection with the nodes. Manual interaction will be set for them in "gridConnection" below.
 	return b
 
-def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask="none",cellDist=None):
+def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material=-1,mask=1,cellDist=None):
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	sph1=O.bodies[id1] ; sph2=O.bodies[id2]
@@ -347,6 +347,57 @@ def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,
 	b.mask=mask
 	b.chain=chain
 	return b
+
+def tetraPoly(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
+	"""Create tetrahedron (actually simple Polyhedra) with given parameters.
+
+	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
+
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
+	b=Body()
+	b.shape = Polyhedra(v=vertices,color=color if color else randomColor(),wire=wire,highlight=highlight)
+	volume = b.shape.GetVolume()
+	inertia = b.shape.GetInertia()
+	center = b.shape.GetCentroid()
+	_commonBodySetup(b,volume,inertia,material,noBound=noBound,pos=center,fixed=fixed)
+	b.aspherical=False # mass and inertia are 0 anyway; fell free to change to ``True`` if needed
+	b.state.ori = b.shape.GetOri()
+	b.mask=mask
+	b.chain=chain
+	return b
+
+def tetra(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
+	"""Create tetrahedron with given parameters.
+
+	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
+	:param bool strictCheck: checks vertices order, raise RuntimeError for negative volume
+
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
+	b=Body()
+	center = .25*sum(vertices,Vector3.Zero)
+	volume = TetrahedronSignedVolume(vertices)
+	if volume < 0:
+		if strictCheck:
+			raise RuntimeError, "tetra: wrong order of vertices"
+		temp = vertices[3]
+		vertices[3] = vertices[2]
+		vertices[2] = temp
+		volume = TetrahedronSignedVolume(vertices)
+	assert(volume>0)
+	b.shape = Tetra(v=vertices,color=color if color else randomColor(),wire=wire,highlight=highlight)
+	# modifies pos, ori and inertia
+	ori = TetrahedronWithLocalAxesPrincipal(b)
+	_commonBodySetup(b,volume,b.state.inertia,material,noBound=noBound,pos=center,fixed=fixed)
+	b.state.ori = b.state.refOri = ori
+	b.aspherical = True
+	b.mask = mask
+	b.chain = chain
+	return b
+
+
+
+
+
 
 #def setNewVerticesOfFacet(b,vertices):
 #	center = inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
@@ -466,6 +517,7 @@ def plotNumInteractionsHistogram(cutoff=0.):
 	pylab.title('Number of interactions histogram, average %g (cutoff=%g)'%(avgNumInteractions(cutoff),cutoff))
 	pylab.xlabel('Number of interactions')
 	pylab.ylabel('Body count')
+	pylab.ion()
 	pylab.show()
 
 def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
@@ -493,7 +545,9 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
 		pylab.axvline(x=avg,linewidth=3,color='r')
 		pylab.ylabel('Body count')
 	if noShow: return pylab.gcf()
-	else: pylab.show()
+	else:
+		pylab.ion()
+		pylab.show()
 
 
 def encodeVideoFromFrames(*args,**kw):
@@ -545,7 +599,7 @@ def vmData():
 	l=_procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
 	return int(ll[1])
 
-def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
+def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,distFactor=2.2,**kw):
 	"""Get some data about the current packing useful for uniaxial test:
 
 #. Find the dimensions that is the longest (uniaxial loading axis)
@@ -571,7 +625,7 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 	assert(axis in (0,1,2))
 	import numpy
 	areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
-	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
+	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=distFactor)
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
 def voxelPorosityTriaxial(triax,resolution=200,offset=0):
@@ -855,7 +909,7 @@ def psd(bins=5, mass=True, mask=-1):
 	:param int mask: :yref:`Body.mask` for the body
 	:return:
 		* binsSizes: list of bin's sizes
-		* binsProc: how much material (in procents) are in the bin, cumulative
+		* binsProc: how much material (in percents) are in the bin, cumulative
 		* binsSumCum: how much material (in units) are in the bin, cumulative
 
 		binsSizes, binsProc, binsSumCum
@@ -876,13 +930,12 @@ def psd(bins=5, mass=True, mask=-1):
 	binsMass = numpy.zeros(bins)
 	binsNumbers = numpy.zeros(bins)
 	
-		
 	for b in O.bodies:
 		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)<>0))):
 			d=2*b.shape.radius
 			
 			basketId = int(math.floor( (d-minD) / deltaBinD ) )
-			if (d == maxD): basketId = bins-1												 #If the diametr equals the maximal diameter, put the particle into the last bin
+			if (d == maxD): basketId = bins-1												 #If the diameter equals the maximal diameter, put the particle into the last bin
 			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses into the bin 
 			binsNumbers[basketId] = binsNumbers[basketId] + 1					#Put numbers into the bin 
 			
@@ -924,3 +977,105 @@ class clumpTemplate:
 		self.numCM = len(relRadii)
 		self.relRadii = relRadii
 		self.relPositions = relPositions
+
+class UnstructuredGrid:
+	"""EXPERIMENTAL.
+	Class representing triangulated FEM-like unstructured grid. It is used for transfereing data from ad to YADE and external FEM program. The main purpose of this class is to store information about individual grid vertices/nodes coords (since facets stores only coordinates of vertices in local coords) and to avaluate and/or apply nodal forces from contact forces (from actual contact force and contact point the force is distributed to nodes using linear approximation).
+
+	TODO rewrite to C++
+	TODO better docs
+
+	:param dict vertices: dict of {internal vertex label:vertex}, e.g. {5:(0,0,0),22:(0,1,0),23:(1,0,0)}
+	:param dict connectivityTable: dict of {internal element label:[indices of vertices]}, e.g. {88:[5,22,23]}
+	"""
+	def __init__(self,vertices={},connectivityTable={},**kw):
+		self.vertices = vertices
+		self.connectivityTable = connectivityTable
+		self.forces = dict( (i,Vector3(0,0,0)) for i in vertices)
+		self.build(**kw)
+	def setup(self,vertices,connectivityTable,toSimulation=False,bodies=None,**kw):
+		"""Sets new information to receiver
+		
+		:param dict vertices: see constructor for explanation
+		:param dict connectivityTable: see constructor for explanation
+		:param bool toSimulation: if new information should be inserted to Yade simulation (create new bodies or not)
+		:param [[int]]|None bodies: list of list of bodies indices to be appended as clumps (thus no contact detection is done within one body)
+		"""
+		self.vertices = dict( (i,v) for i,v in vertices.iteritems())
+		self.connectivityTable = dict( (i,e) for i,e in connectivityTable.iteritems())
+		self.build(**kw)
+		if toSimulation:
+			self.toSimulation(bodies)
+	def build(self,**kw):
+		self.elements = {}
+		for i,c in self.connectivityTable.iteritems():
+			if len(c) == 3:
+				b = facet([self.vertices[j] for j in c],**kw)
+			elif len(c) == 4:
+				b = tetra([self.vertices[j] for j in c],**kw)
+			else:
+				raise RuntimeError, "Unsupported cell shape (should be triangle or tetrahedron)"
+			self.elements[i] = b
+	def resetForces(self):
+		for i in self.vertices:
+			self.forces[i] = Vector3(0,0,0)
+	def getForcesOfNodes(self):
+		"""Computes forces for each vertex/node. The nodal force is computed from contact force and contact point using linear approximation
+		"""
+		self.resetForces()
+		for i,e in self.elements.iteritems():
+			ie = self.connectivityTable[i]
+			for i in e.intrs():
+				fn = i.phys.normalForce
+				fs = i.phys.shearForce if hasattr(i.phys,"shearForce") else Vector3.Zero
+				f = (fn+fs) * (-1 if e.id == i.id1 else +1 if e.id == i.id2 else 'ERROR')
+				cp = i.geom.contactPoint
+				if isinstance(e.shape,Facet):
+					v0,v1,v2 = [Vector3(self.vertices[j]) for j in ie]
+					w0 = ((cp-v1).cross(v2-v1)).norm()
+					w1 = ((cp-v2).cross(v0-v2)).norm()
+					w2 = ((cp-v0).cross(v1-v0)).norm()
+					ww = w0+w1+w2
+					self.forces[ie[0]] += f*w0/ww
+					self.forces[ie[1]] += f*w1/ww
+					self.forces[ie[2]] += f*w2/ww
+				elif isinstance(e.shape,Tetra):
+					v0,v1,v2,v3 = [Vector3(self.vertices[j]) for j in ie]
+					w0 = TetrahedronVolume((cp,v1,v2,v3))
+					w1 = TetrahedronVolume((cp,v2,v3,v0))
+					w2 = TetrahedronVolume((cp,v3,v0,v1))
+					w3 = TetrahedronVolume((cp,v0,v1,v2))
+					ww = w0+w1+w2+w3
+					self.forces[ie[0]] += f*w0/ww
+					self.forces[ie[1]] += f*w1/ww
+					self.forces[ie[2]] += f*w2/ww
+					self.forces[ie[3]] += f*w3/ww
+		return self.forces
+	def setPositionsOfNodes(self,newPoss):
+		"""Sets new position of nodes and also updates all elements in the simulation
+
+		:param [Vector3] newPoss: list of new positions
+		"""
+		for i in self.vertices:
+			self.vertices[i] = newPoss[i]
+		self.updateElements()
+	def updateElements(self):
+		"""Updates positions of all elements in the simulation
+		"""
+		for i,c in self.connectivityTable.iteritems():
+			e = self.elements[i]
+			e.state.pos = Vector3(0,0,0)
+			e.state.ori = Quaternion((1,0,0),0)
+			if isinstance(e.shape,Facet):
+				e.shape.vertices = [self.vertices[j] for j in c]
+			elif isinstance(e.shape,Tetra):
+				e.shape.v = [self.vertices[j] for j in c]
+	def toSimulation(self,bodies=None):
+		"""Insert all elements to Yade simulation
+		"""
+		if bodies:
+			e = self.elements.values()
+			for b in bodies:
+				O.bodies.appendClumped([e[i] for i in b])
+		else:
+			O.bodies.append(self.elements.values())

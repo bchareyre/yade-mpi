@@ -11,7 +11,7 @@ except ImportError:
 # get yade path (allow YADE_PREFIX to override)
 prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
-features,version='${features}'.split(' '),'${realVersion}'
+features,version,debugbuild='${features}'.split(' '),'${realVersion}',' ${debugbuild}'
 
 libPATH='${LIBRARY_OUTPUT_PATH}'
 if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
@@ -52,11 +52,17 @@ par.add_argument('--checks',help='Run a series of user-defined check tests as de
 par.add_argument('--performance',help='Starts a test to measure the productivity',dest='performance',action='store_true')
 par.add_argument('script',nargs='?',default='',type=str,help=argparse.SUPPRESS)
 par.add_argument('args',nargs=argparse.REMAINDER,help=argparse.SUPPRESS) # see argparse doc, par.disable_interspersed_args() from optargs module
+par.add_argument('-l',help='import libraries at startup before importing yade libs. May be used when the ordering of imports matter (see e.g. https://bugs.launchpad.net/yade/+bug/1183402/comments/3). The option can be use multiple times, as in "yade -llib1 -llib2"',default=None,action='append',dest='impLibraries',type=str)
 opts=par.parse_args()
 args = opts.args
 
+if opts.impLibraries:
+	sys.path.append('.')
+	for lib in opts.impLibraries:
+		__import__(lib)
+
 if opts.version:
-	print 'Yade version: %s'%version
+	print 'Yade version: %s%s'%(version,debugbuild)
 	sys.exit(0)
 
 if opts.script:
@@ -109,7 +115,7 @@ elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
 
 if __name__ == "__main__": # do not print this while importing yade in other python application
-	sys.stderr.write('Welcome to Yade '+version+'\n')
+	sys.stderr.write('Welcome to Yade '+version+debugbuild+'\n')
 
 # initialization and c++ plugins import
 import yade
@@ -242,6 +248,7 @@ if gui:
 		# usually Xlib.error.DisplayError, but there can be Xlib.error.XauthError etc as well
 		# let's just pretend any exception means the display would not work
 		gui=None
+		print 'Warning: no X rendering available (see https://bbs.archlinux.org/viewtopic.php?id=13189)'
 
 # run remote access things, before actually starting the user session (not while imported by other python application)
 if __name__ == "__main__":

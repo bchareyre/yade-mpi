@@ -238,11 +238,30 @@ void CpmPhys::setRelResidualStrength(Real r) {
 /********************** Law2_ScGeom_CpmPhys_Cpm ****************************/
 CREATE_LOGGER(Law2_ScGeom_CpmPhys_Cpm);
 
+
+
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
 	#include"../../../brefcom-mm.hh"
 #endif
 
 // #undef CPM_MATERIAL_MODEL (force trunk version of the model)
+
+Real Law2_ScGeom_CpmPhys_Cpm::elasticEnergy() {
+	#ifdef YADE_CPM_FULL_MODEL_AVAILABLE
+		CPM_MATERIAL_MODEL_ELE
+	#else
+	Real ret = 0.;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		CpmPhys* phys = dynamic_cast<CpmPhys*>(I->phys.get());
+		if(phys) {
+			ret += 0.5*phys->normalForce.squaredNorm()/((1-(phys->epsN>0?phys->omega:0))*phys->kn);
+			ret += 0.5*phys->shearForce.squaredNorm()/phys->ks;
+		}
+	}
+	return ret;	
+	#endif
+}
 
 
 
@@ -326,7 +345,9 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	Vector3r& Fs(phys->Fs); /* for python access */
 	const bool& isCohesive(phys->isCohesive);
 
+
 	#ifdef CPM_MATERIAL_MODEL
+		Vector3r& epsTPl(phys->epsTPl);
 		Real& epsNPl(phys->epsNPl);
 		const Real& dt = scene->dt;
 		const Real& dmgTau(phys->dmgTau);
@@ -341,8 +362,10 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	TIMING_DELTAS_CHECKPOINT("GO A");
 	
 	epsN = - (-phys->refPD + geom->penetrationDepth) / phys->refLength;
-	epsT = geom->rotate(epsT);
-	epsT += geom->shearIncrement() / (phys->refLength + phys->refPD) ; 
+	//epsT = geom->rotate(epsT);
+	geom->rotate(epsT);
+	//epsT += geom->shearIncrement() / (phys->refLength + phys->refPD) ; 
+	epsT += geom->shearIncrement() / phys->refLength;
 
 	/* debugging */
 	CPM_YADE_DEBUG_A
@@ -356,7 +379,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		/* simplified public model */
 		epsN += phys->isoPrestress/E;
 		/* very simplified version of the constitutive law */
-		kappaD = max(max(0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */
+		kappaD = max(max((Real)0.,epsN),kappaD); /* internal variable, max positive strain (non-decreasing) */
 		omega = isCohesive? phys->funcG(kappaD,epsCrackOnset,epsFracture,neverDamage,damLaw) : 1.; /* damage variable (non-decreasing, as funcG is also non-decreasing) */
 		sigmaN = (1-(epsN>0?omega:0))*E*epsN; /* damage taken in account in tension only */
 		sigmaT = G*epsT; /* trial stress */
@@ -364,16 +387,22 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		if (sigmaT.squaredNorm() > yieldSigmaT*yieldSigmaT) {
 			Real scale = yieldSigmaT/sigmaT.norm();
 			sigmaT *= scale; /* stress return */
-			epsT *= scale;
+			//epsT *= scale;
 			/* epsPlSum += yieldSigmaT*geom->slipToStrainTMax(yieldSigmaT/G);*/ /* adjust strain */
 		}
 		relResidualStrength = isCohesive? (kappaD<epsCrackOnset? 1. : (1-omega)*(kappaD)/epsCrackOnset) : 0;
 	#endif
 
 	sigmaN -= phys->isoPrestress;
-
-	NNAN(kappaD); NNAN(epsFracture); NNAN(omega);
-	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
+   
+   NNAN(sigmaN);
+   NNANV(sigmaT);
+   NNAN(crossSection);
+   if (!neverDamage) {
+      NNAN(kappaD);
+      NNAN(epsFracture);
+      NNAN(omega);
+   }
 
 	/* handle broken contacts */
 	if (epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)) {
@@ -529,6 +558,9 @@ void CpmStateUpdater::update(Scene* _scene){
 	vector<BodyStats> bodyStats; bodyStats.resize(scene->bodies->size());
 	assert(bodyStats[0].nCohLinks == 0); // should be initialized by dfault ctor
 	avgRelResidual = 0; Real nAvgRelResidual = 0;
+	Matrix3r identity = Matrix3r::Identity();
+	Real dmg;
+	Matrix3r incr;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if (!I) continue;
 		if (!I->isReal()) continue;
@@ -556,13 +588,14 @@ void CpmStateUpdater::update(Scene* _scene){
 		nAvgRelResidual += 1;
 		for (int i=0; i<3; i++) {
 			for (int j=0; j<3; j++) {
-				bodyStats[id1].dmgRhs += n*n.transpose()*(1-phys->relResidualStrength);
-				bodyStats[id2].dmgRhs += n*n.transpose()*(1-phys->relResidualStrength);
+				dmg = 1-phys->relResidualStrength;
+				incr = -identity*dmg*1.5 + n*n.transpose()*dmg*7.5;
+				bodyStats[id1].damageTensor += incr;
+				bodyStats[id2].damageTensor += incr;
 			}
 		}
 	}
-	Matrix3r identity = Matrix3r::Identity();
-	Real tr;
+// 	Real tr;
 	FOREACH(shared_ptr<Body> B, *scene->bodies){
 		if (!B) continue;
 		const Body::id_t& id = B->getId();
@@ -577,10 +610,7 @@ void CpmStateUpdater::update(Scene* _scene){
 			if (state->normDmg>1) {
 				LOG_WARN("#"<<id<<" normDmg="<<state->normDmg<<" nCohLinks="<<bodyStats[id].nCohLinks<<", numBrokenCohesive="<<state->numBrokenCohesive<<", dmgSum="<<bodyStats[id].dmgSum<<", numAllCohLinks"<<cohLinksWhenever);
 			}
-			Matrix3r& dmgRhs = bodyStats[id].dmgRhs;
-			dmgRhs *= 15./cohLinksWhenever;
-			tr = 3*state->normDmg;
-			state->damageTensor = .5 * (dmgRhs - tr*identity);
+			state->damageTensor = bodyStats[id].damageTensor / cohLinksWhenever;
 		}
 		else { state->normDmg = 0; /*state->normEpsPl=0;*/ state->damageTensor = Matrix3r::Zero(); }
 		B->shape->color = Vector3r(state->normDmg,1-state->normDmg,B->state->blockedDOFs==State::DOF_ALL?0:1);

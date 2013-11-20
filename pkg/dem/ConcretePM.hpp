@@ -175,6 +175,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,isoPrestress,0,,"\"prestress\" of this link (used to simulate isotropic stress)"))
 			((Real,kappaD,0,,"Up to now maximum normal strain (semi-norm), non-decreasing in time."))
 			((Real,epsNPl,0,,"normal plastic strain (initially zero)"))
+			((Vector3r,epsTPl,Vector3r::Zero(),,"shear plastic strain (initially zero)"))
 			((bool,neverDamage,false,,"the damage evolution function will always return virgin state"))
 			((int,damLaw,1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential (default)"))
 			((Real,epsTrans,0,,"Transversal strain (perpendicular to the contact axis)"))
@@ -251,6 +252,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	Real elasticEnergy();
 
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) {
 #ifdef CPM_MATERIAL_MODEL
@@ -273,6 +275,7 @@ class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
 		.def("yieldSigmaTMagnitude",&Law2_ScGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
+		.def("elasticEnergy",&Law2_ScGeom_CpmPhys_Cpm::elasticEnergy,"Compute and return the total elastic energy in all \"CpmPhys\" contacts")
 	);
 	DECLARE_LOGGER;
 };
@@ -328,7 +331,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 *********************************************************************************/
 
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum /*, epsPlSum*/; Matrix3r stress; Matrix3r dmgRhs; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.) /*, epsPlSum(0.)*/, stress(Matrix3r::Zero()), dmgRhs(Matrix3r::Zero()) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum /*, epsPlSum*/; Matrix3r stress; Matrix3r damageTensor; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.) /*, epsPlSum(0.)*/, stress(Matrix3r::Zero()), damageTensor(Matrix3r::Zero()) {} };
 	public:
 		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);

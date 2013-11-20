@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-from yade import geom,log
+"""Simple script which shows how to create an inlet. 
+"""
 
 shotsId,steelId=O.materials.append([
 	FrictMat(young=50e9,density=6000,poisson=.2,label='shots'),

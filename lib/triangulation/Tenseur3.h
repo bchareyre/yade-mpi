@@ -1,5 +1,4 @@
-#ifndef TENSEUR3_H
-#define TENSEUR3_H
+#pragma once
 
 #include "def_types.h" 
 #include <iostream>
@@ -112,5 +111,3 @@ class Tenseur_anti3 : public Tens
 static const Tenseur3 NULL_TENSEUR3 ( 0,0,0,0,0,0,0,0,0 );
 
 }
-
-#endif

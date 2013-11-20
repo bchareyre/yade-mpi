@@ -111,8 +111,8 @@ class Scene: public Serializable{
 			SpeedElements.Zero();
 		,
 		/* py */
-		.add_property("localCoords",&Scene::usesLocalCoords,"Whether local coordianate system is used on interactions (set by :yref:`Ig2Functor`.")
-		.add_property("compressionNegative",&Scene::usesLocalCoords,"Whether the convention is that compression has negative sign (set by :yref:`Ig2Functor`.")
+		.add_property("localCoords",&Scene::usesLocalCoords,"Whether local coordianate system is used on interactions (set by :yref:`IGeomFunctor`).")
+		.add_property("compressionNegative",&Scene::usesLocalCoords,"Whether the convention is that compression has negative sign (set by :yref:`IGeomFunctor`).")
 	);
 	DECLARE_LOGGER;
 };

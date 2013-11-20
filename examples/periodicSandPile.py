@@ -4,7 +4,7 @@
 """Script showing how large bodies can be combined with periodic boundary conditions using InsertioSortCollider::allowBiggerThanPeriod=True (1)."""
 
 from yade import pack
-from pylab import *
+from pylab import rand
 from yade import qt
 
 O.periodic=True

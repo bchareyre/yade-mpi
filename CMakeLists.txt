@@ -12,8 +12,8 @@
 #  ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
 #  ENABLE_GTS: enable GTS-option (ON by default)
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
-#  ENABLE_LINSOLV: enable LINSOLV-option (OFF by default)
-#  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (OFF by default)
+#  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
+#  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -39,31 +39,46 @@ INCLUDE(FindLoki)
 INCLUDE(FindPythonModule)
 INCLUDE(GNUInstallDirs)
 #===========================================================
+# HACK!!! If the version of gcc is 4.8 or greater, we add -ftrack-macro-expansion=0 
+# and -save-temps into compiler to reduce the memory consumption during compilation.
+# See http://bugs.debian.org/726009 for more information
+# Can be removed later, if gcc fixes its regression
+# Taken from http://stackoverflow.com/questions/4058565/check-gcc-minor-in-cmake
+ 
+EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+IF (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+  MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0 and -save-temps")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ftrack-macro-expansion=0 -save-temps")
+ENDIF()
+
+#===========================================================
+ADD_DEFINITIONS(" -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast ")
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
   IF (DEBUG)
     SET(CMAKE_VERBOSE_MAKEFILE 1)
     SET(CMAKE_BUILD_TYPE Debug)
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG")
+    ADD_DEFINITIONS("-DYADE_DEBUG")
   ELSE (DEBUG)
     SET(CMAKE_BUILD_TYPE Release)
-    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -fPIC")
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC")
   ENDIF (DEBUG)
 ELSE (CMAKE_CXX_FLAGS)
   #If flags are not set, add all useful flags
   IF (DEBUG)
     SET(CMAKE_VERBOSE_MAKEFILE 1)
     SET(CMAKE_BUILD_TYPE Debug)
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -DYADE_DEBUG -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security")
+    ADD_DEFINITIONS("-DYADE_DEBUG")
+    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security")
   ELSE (DEBUG)
     SET(CMAKE_BUILD_TYPE Release)
-    SET(CMAKE_CXX_FLAGS  "-DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast -Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
+    SET(CMAKE_CXX_FLAGS  "-Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
   ENDIF (DEBUG)
 ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
-FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization REQUIRED)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization system REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
@@ -73,10 +88,13 @@ MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
 #===========================================================
 FIND_PACKAGE(NumPy REQUIRED)
-INCLUDE_DIRECTORIES(${NUMPY_INCLUDE_DIRS})
+  INCLUDE_DIRECTORIES(${NUMPY_INCLUDE_DIRS})
 
 FIND_PACKAGE(Loki REQUIRED)
+  INCLUDE_DIRECTORIES(${LOKI_INCLUDE_DIR})
 FIND_PACKAGE(Eigen3 REQUIRED)
+FIND_PACKAGE(BZip2 REQUIRED)
+FIND_PACKAGE(ZLIB REQUIRED)
 #===========================================================
 
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
@@ -90,8 +108,8 @@ OPTION(ENABLE_GTS "Enable GTS" ${DEFAULT})
 OPTION(ENABLE_GUI "Enable GUI" ${DEFAULT})
 OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
-OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" OFF)
-OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" OFF)
+OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" ${DEFAULT})
+OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" ${DEFAULT})
 
 #===========================================================
 # Use Eigen3 by default
@@ -101,8 +119,12 @@ IF (EIGEN3_FOUND)
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
 ENDIF(EIGEN3_FOUND)
 #===========================================================
+INCLUDE_DIRECTORIES(${BZIP2_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
+SET(LINKLIBS  "${LINKLIBS};${BZIP2_LIBRARIES};${ZLIB_LIBRARIES};")
+#===========================================================
 IF(ENABLE_VTK)
-  FIND_PACKAGE(VTK COMPONENTS Common) 
+  FIND_PACKAGE(VTK) 
   IF(VTK_FOUND)
     INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
     LINK_DIRECTORIES( ${VTK_LIBRARY_DIRS} )
@@ -206,6 +228,8 @@ IF(ENABLE_CGAL)
     IF(ENABLE_PFVFLOW)
       SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFLOW_ENGINE")
       SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PFVflow")
+    ELSE(ENABLE_PFVFLOW)
+      SET(DISABLED_FEATS "${DISABLED_FEATS} PFVflow")
     ENDIF(ENABLE_PFVFLOW)
 
   ELSE(CGAL_FOUND AND GMP_FOUND AND (NOT("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")))
@@ -239,6 +263,8 @@ IF(ENABLE_LINSOLV)
     SET(DISABLED_FEATS "${DISABLED_FEATS} LinSolv")
     SET(ENABLE_LINSOLV OFF)
   ENDIF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND)
+ELSE(ENABLE_LINSOLV)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} LinSolv")
 ENDIF(ENABLE_LINSOLV)
 #===============================================
 IF(ENABLE_GL2PS)
@@ -351,11 +377,16 @@ find_python_module(Tkinter REQUIRED)
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
 SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(yade ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} -lrt)
+TARGET_LINK_LIBRARIES(yade ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} ${LOKI_LIBRARY} -lrt)
 TARGET_LINK_LIBRARIES(boot yade)
 
 IF(ENABLE_VTK)
-  TARGET_LINK_LIBRARIES(yade vtkHybrid)
+  IF(${VTK_MAJOR_VERSION} EQUAL 6)
+    TARGET_LINK_LIBRARIES(yade ${VTK_LIBRARIES})
+    ADD_DEFINITIONS("-DYADE_VTK6")
+  ELSE(${VTK_MAJOR_VERSION} EQUAL 6)
+    TARGET_LINK_LIBRARIES(yade vtkHybrid)
+  ENDIF(${VTK_MAJOR_VERSION} EQUAL 6)
 ENDIF(ENABLE_VTK)
 IF(ENABLE_GUI)
   TARGET_LINK_LIBRARIES(yade _GLViewer ${GUI_LIBS})
@@ -375,7 +406,6 @@ SET (version ${YADE_VERSION})
 SET (pyExecutable ${PYTHON_EXECUTABLE})
 SET (profile "default")
 SET (sourceRoot "${CMAKE_CURRENT_SOURCE_DIR}")
-SET (libstdcxx "/usr/lib/libstdc++.so.6")     #This is a hack, which is not needed for modern systems. Should be deleted.
 #====================================
 
 CONFIGURE_FILE(core/main/yade-batch.in "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-batch")
@@ -404,6 +434,7 @@ MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
 MESSAGE(STATUS "Disabled features:${DISABLED_FEATS}")
 IF (DEBUG)
   MESSAGE(STATUS "Debug build")
+  SET (debugbuild " (debug build)")
 ELSE (DEBUG)
   MESSAGE(STATUS "Optimized build")
 ENDIF (DEBUG)

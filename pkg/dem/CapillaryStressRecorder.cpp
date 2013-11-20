@@ -40,11 +40,11 @@ void CapillaryStressRecorder::action()
 				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
 			}
 		}
-		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
+		if ( !triaxialCompressionEngine ) {
+			LOG_ERROR ("Stress controller engine not found, the recorder cannot be used."); return;}
 	}
 	
 	Real f1_cap_x=0, f1_cap_y=0, f1_cap_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
-	
 	Real sig11_cap=0, sig22_cap=0, sig33_cap=0, sig12_cap=0, sig13_cap=0,
 	sig23_cap=0, Vwater = 0, capillaryPressure = 0;
 	int j = 0;

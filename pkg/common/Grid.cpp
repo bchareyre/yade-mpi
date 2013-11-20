@@ -6,9 +6,6 @@
 *************************************************************************/
 
 #include "Grid.hpp"
-#ifdef YADE_OPENGL
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
-#endif
 
 //!##################	SHAPES   #####################
 
@@ -109,9 +106,9 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 			//This is a little bit tricky : if we haven't 0<k,m<1, it means that the intersection is not inside both segments,
 			//but the contact can occurs anyway between a connection's extremity and a connection's edge or between two connection's extremity.
 			//So the three next lines : don't modify k and m if (0<k,m<1), but modify them otherwise to compute later the right normal and penetrationDepth of the contact.
-			k = max(min( k,1.0),0.0);
-			m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,1.0),0.0);
-			k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,1.0),0.0);
+			k = max(min( k,(Real)1.0),(Real)0.0);
+			m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,(Real)1.0),(Real)0.0);
+			k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,(Real)1.0),(Real)0.0);
 		}
 		else {//should never happen
 			k=0;m=0;
@@ -120,10 +117,10 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 		}
 	}
 	else{ //this is a special case for perfectly colinear vectors ("a" and "b")
-		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min(1.0,max(0.0,PA));
-		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min(1.0,max(0.0,Pa));
-		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min(1.0,max(0.0,PB));
-		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min(1.0,max(0.0,Pb));
+		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min((Real)1.0,max((Real)0.0,PA));
+		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min((Real)1.0,max((Real)0.0,Pa));
+		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
+		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
 		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
 	}
 	
@@ -580,61 +577,3 @@ void Bo1_GridConnection_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>&
 }
 
 YADE_PLUGIN((Bo1_GridConnection_Aabb));
-
-#ifdef YADE_OPENGL
-//!##################	Rendering   #####################
-
-bool Gl1_GridConnection::wire;
-bool Gl1_GridConnection::glutNormalize;
-int  Gl1_GridConnection::glutSlices;
-int  Gl1_GridConnection::glutStacks;
-
-void Gl1_GridConnection::out( Quaternionr q )
-{
-	AngleAxisr aa(q);
-	std::cout << " axis: " <<  aa.axis()[0] << " " << aa.axis()[1] << " " << aa.axis()[2] << ", angle: " << aa.angle() << " | ";
-}
-
-void Gl1_GridConnection::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& st ,bool wire2, const GLViewInfo&)
-{	
-	GridConnection *GC=static_cast<GridConnection*>(cm.get());
-	Real r=GC->radius;
-	Real length=GC->getLength();
-	const shared_ptr<Interaction> intr = scene->interactions->find((int)GC->node1->getId(),(int)GC->node2->getId());
-	Vector3r segt = GC->node2->state->pos - GC->node1->state->pos;
-	if (scene->isPeriodic && intr) segt+=scene->cell->intrShiftPos(intr->cellDist);
-	//glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
-
-	glColor3v(cm->color);
-	if(glutNormalize) glPushAttrib(GL_NORMALIZE);
-// 	glPushMatrix();
-	Quaternionr shift;
-	shift.setFromTwoVectors(Vector3r::UnitZ(),segt);
-	if(intr){drawCylinder(wire || wire2, r,length,shift);}
-// 	if (intr && scene->isPeriodic) { glTranslatef(-segt[0],-segt[1],-segt[2]); drawCylinder(wire || wire2, r,length,-shift);}
-	if(glutNormalize) glPopAttrib();
-// 	glPopMatrix();
-	return;
-}
-
-void Gl1_GridConnection::drawCylinder(bool wire, Real radius, Real length, const Quaternionr& shift)
-{
-   glPushMatrix();
-   GLUquadricObj *quadObj = gluNewQuadric();
-   gluQuadricDrawStyle(quadObj, (GLenum) (wire ? GLU_SILHOUETTE : GLU_FILL));
-   gluQuadricNormals(quadObj, (GLenum) GLU_SMOOTH);
-   gluQuadricOrientation(quadObj, (GLenum) GLU_OUTSIDE);
-   AngleAxisr aa(shift);
-   glRotatef(aa.angle()*180.0/Mathr::PI,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
-   gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
-   gluQuadricOrientation(quadObj, (GLenum) GLU_INSIDE);
-   //glutSolidSphere(radius,glutSlices,glutStacks);
-   glTranslatef(0.0,0.0,length);
-
-   //glutSolidSphere(radius,glutSlices,glutStacks);
-//    gluDisk(quadObj,0.0,radius,glutSlices,_loops);
-   gluDeleteQuadric(quadObj);
-   glPopMatrix();
-}
-YADE_PLUGIN((Gl1_GridConnection));
-#endif

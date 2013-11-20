@@ -12,18 +12,10 @@ Packages
 
 Packages from Launchpad PPA service (package personal archive) are 
 provided for all currently supported Ubuntu versions for 
-`stable <https://launchpad.net/~yade-pkg/+archive/stable>`_ and 
 `daily <https://launchpad.net/~yade-pkg/+archive/snapshots>`_ releases.
 ``yade-daily`` is a automatically daily (if there were some commtis during
-the previous days) geenrated package, which includes all the newly added 
+the previous days) generated package, which includes all the newly added 
 features. To install version from PPA, run the following:
-
-* For stable releases::
-
-	sudo add-apt-repository ppa:yade-pkg/stable       # for stable releases 
-	sudo add-apt-repository ppa:yade-users/external   # optional (updates of other packages)
-	sudo apt-get update
-	sudo apt-get install yade-stable
 
 * For latest builds from trunk::
 
@@ -31,8 +23,8 @@ features. To install version from PPA, run the following:
 	sudo apt-get update
 	sudo apt-get install yade-daily
 
-After you added whether stable or snapshot PPAs, you will get automatically
-the updates of the package, when they arrive the PPA.
+After you added snapshot PPA, you will get automatically the updates of the package, 
+when they arrive the PPA.
 
 More detailed instructions are available at the corresponding pages of 
 ppa`s (links above).
@@ -87,8 +79,8 @@ For those behind firewall, you can download `any revision  <https://www.yade-dem
 
 Release and trunk sources are compiled in the same way.
 
-Prerequisities
-^^^^^^^^^^^^^^^
+Prerequisites
+^^^^^^^^^^^^^
 
 Yade relies on a number of external software to run; its installation is checked before the compilation starts. 
 
@@ -105,6 +97,7 @@ Yade relies on a number of external software to run; its installation is checked
 * `sqlite3 <http://www.sqlite.org>`_ database engine
 * `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
+* `CGAL <http://www.cgal.org/>`_ library (optional)
 
 Most of the list above is very likely already packaged for your distribution. 
 The following commands have to be executed in command line of corresponding 
@@ -114,25 +107,34 @@ should have root privileges
 	* **Ubuntu**, **Debian** and their derivatives::
 
 		sudo apt-get install cmake git freeglut3-dev libloki-dev \
-		libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
-		libboost-program-options-dev \
-		libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
-		libboost-iostreams-dev python-dev libboost-python-dev ipython \
-		python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
+		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
+		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
-		binutils-gold python-xlib python-qt4 pyqt4-dev-tools \
-		gtk2-engines-pixbuf python-argparse \
-		libqglviewer-qt4-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libgmp3-dev libcgal-dev help2man
+		python-xlib python-qt4 pyqt4-dev-tools gtk2-engines-pixbuf python-argparse \
+		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
+		libxmu-dev libxi-dev libcgal-dev help2man libsuitesparse-dev \
+		libopenblas-dev libbz2-dev zlib1g-dev
 
-	* **Fedora**::
+Additional packages, which can become mandatory later::
 
-		yum install cmake qt3-devel freeglut-devel boost-devel boost-date-time \
-		boost-filesystem boost-thread boost-regex fakeroot gcc gcc-c++ boost-iostreams \
-		python-devel boost-python ipython python-matplotlib \
-		sqlite-devel python-numeric ScientificPython-tk gnuplot doxygen gts-devel \
-		graphviz-python vtk-devel ScientificPython eigen2-devel libQGLViewer-devel \
-		loki-lib-devel python-xlib PyQt4 PyQt4-devel python-imaging python-sphinx python-bibtex
+		sudo apt-get install libmetis-dev python-gts python-minieigen \
+
+Some packages, which are listed here, are relatively new and they can absent
+in your distribution (for example, libmetis-dev or python-gts). They can be 
+installed from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_
+or just ignored. In this case some features can be disabled.
+
+If you are using other distribuition, than Debian or its derivatives, you should
+install the software, which is listed above. Their names can differ from the 
+names of Debian-packages.
+
+Some of packages (for example, cmake, eigen3) are mandatory, some of them
+are optional. Watch for notes and warnings/errors, which are shown
+by cmake during configuration step. If the missing package is optional,
+some of Yade features will be disabled (see the messages at the end of configuration).
+
+.. warning:: if you have Ubuntu 12.10 or older, you should install libqglviewer-qt4-dev
+ package instead of libqglviewer-dev.
 
 
 Compilation
@@ -164,6 +166,8 @@ The following options are available:
 	* ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
 	* ENABLE_GTS: enable GTS-option (ON by default)
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
+	* ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
+	* ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 

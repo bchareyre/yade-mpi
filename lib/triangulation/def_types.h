@@ -8,8 +8,7 @@
 #include <yade/lib/base/Math.hpp>
 
 //Define basic types from CGAL templates
-#ifndef _Def_types
-#define _Def_types
+#pragma once
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Cartesian.h>
@@ -120,7 +119,7 @@ class FlowCellInfo : public SimpleCellInfo {
 		RayHydr.resize(4, 0);
 // 		isInside = false;
 		inv_sum_k=0;
-		isFictious=false; Pcondition = false; isGhost = false; 
+		isFictious=false; Pcondition = false; isGhost = false;
 // 		isInferior = false; isSuperior = false; isLateral = false; isExternal=false;
 		isvisited = false;
 		index=0;
@@ -219,7 +218,6 @@ class PeriodicVertexInfo : public FlowVertexInfo {
 	virtual bool isReal (void) {return !(isFictious || isGhost);}
 };
 
-
 class UnsatCellInfo : public FlowCellInfo {
   	public:
 	UnsatCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
@@ -247,5 +245,3 @@ public:
 };
 
 } // namespace CGT
-
-#endif

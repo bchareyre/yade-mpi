@@ -26,23 +26,53 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	
 	count=0
 	
-	out.write('#format ' + format + '\n')
-	if (comment):
-		out.write('# ' + comment + '\n')
+	output = ''
+	outputVel=''
+	if (format<>'liggghts_in'):
+		output = '#format ' + format + '\n'
+		if (comment):
+			output += '# ' + comment + '\n'
+	
+	minCoord= Vector3.Zero
+	maxCoord= Vector3.Zero
+	maskNumber = []
+	
 	for b in O.bodies:
 		try:
 			if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
 				if (format=='x_y_z_r'):
-					out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
+					output+=('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
 				elif (format=='x_y_z_r_matId'):
-					out.write('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+					output+=('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				elif (format=='id_x_y_z_r_matId'):
-					out.write('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+					output+=('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				elif (format=='jointedPM'):
+					output+=('%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n'%(b.id,b.state.onJoint,b.state.joint,b.state.jointNormal1[0],b.state.jointNormal1[1],b.state.jointNormal1[2],b.state.jointNormal2[0],b.state.jointNormal2[1],b.state.jointNormal2[2],b.state.jointNormal3[0],b.state.jointNormal3[1],b.state.jointNormal3[2]))
+				elif (format=='liggghts_in'):
+					output+=('%g %g %g %g %g %g %g\n'%(count+1,b.mask,b.shape.radius,b.material.density,b.state.pos[0],b.state.pos[1],b.state.pos[2]))
+					outputVel+=('%g %g %g %g %g %g %g\n'%(count+1,b.state.vel[0],b.state.vel[1],b.state.vel[2],b.state.angVel[0],b.state.angVel[1],b.state.angVel[2]))
 				else:
 					raise RuntimeError("Please, specify a correct format output!");
 				count+=1
+				if  (count==1):
+					minCoord = b.state.pos - Vector3(b.shape.radius,b.shape.radius,b.shape.radius)
+					maxCoord = b.state.pos + Vector3(b.shape.radius,b.shape.radius,b.shape.radius)
+				else:
+					minCoord = Vector3(min(minCoord[0], b.state.pos[0]-b.shape.radius),min(minCoord[1], b.state.pos[1]-b.shape.radius),min(minCoord[2], b.state.pos[2]-b.shape.radius))
+					maxCoord = Vector3(max(maxCoord[0], b.state.pos[0]+b.shape.radius),max(maxCoord[1], b.state.pos[1]+b.shape.radius),max(minCoord[2], b.state.pos[2]+b.shape.radius))
+				if b.mask not in maskNumber:
+					maskNumber.append(b.mask)
 		except AttributeError:
 			pass
+			
+	if (format=='liggghts_in'):
+		outputHeader = 'LIGGGHTS Description\n\n'
+		outputHeader += '%d atoms\n%d atom types\n\n'%(count,len(maskNumber))
+		outputHeader += '%g %g xlo xhi\n%g %g ylo yhi\n%g %g zlo zhi\n\n'%(minCoord[0],maxCoord[0],minCoord[1],maxCoord[1],minCoord[2],maxCoord[2])
+		
+		
+		output=outputHeader + 'Atoms\n\n' + output + '\nVelocities\n\n' + outputVel
+	out.write(output)
 	out.close()
 	return count
 
@@ -180,7 +210,7 @@ def text(filename,mask=-1):
 #VTKExporter===============================================================
 
 class VTKExporter:
-	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reason, you are not able to use VTKRecorder). Export of spheres and facets is supported.
+	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reason, you are not able to use VTKRecorder). Export of spheres, facets and interactions is supported.
 
 	USAGE:
 	create object vtkExporter = VTKExporter('baseFileName'),
@@ -197,7 +227,7 @@ class VTKExporter:
 		self.intrsSnapCount = startSnap
 		self.baseName = baseName
 
-	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None):
+	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None,useRef=False):
 		"""exports spheres (positions and radius) and defined properties.
 
 		:param ids: if "all", then export all spheres, otherwise only spheres from integer list
@@ -206,6 +236,7 @@ class VTKExporter:
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		:param bool useRef: if False (default), use current position of the spheres for export, use reference position otherwise
 		"""
 		allIds = False
 		if ids=='all':
@@ -220,10 +251,11 @@ class VTKExporter:
 				continue
 			bodies.append(b)
 		n = len(bodies)
-		outFile = open(self.baseName+'-spheres-%04d'%self.spheresSnapCount+'.vtk', 'w')
+		fName = self.baseName+'-spheres-%04d'%(numLabel if numLabel else self.spheresSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,n))
 		for b in bodies:
-			pos = b.state.pos
+			pos = b.state.refPos if useRef else b.state.pos if not O.periodic else O.cell.wrap(b.state.pos)
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		outFile.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
 		for b in bodies:
@@ -271,7 +303,8 @@ class VTKExporter:
 				continue
 			bodies.append(b)
 		n = len(bodies)
-		outFile = open(self.baseName+'-facets-%04d'%self.facetsSnapCount+'.vtk', 'w')
+		fName = self.baseName+'-facets-%04d'%(numLabel if numLabel else self.facetsSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,3*n))
 		for b in bodies:
 			p = b.state.pos
@@ -352,7 +385,8 @@ class VTKExporter:
 			nodes[e[0]] = pt1
 			nodes[e[1]] = pt2
 			nodes[e[2]] = pt3
-		outFile = open(self.baseName+'-facets-%04d'%self.facetsSnapCount+'.vtk', 'w')
+		fName = self.baseName+'-facets-%04d'%(numLabel if numLabel else self.facetsSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,len(nodes)))
 		gg = 0
 		for n in nodes:
@@ -381,41 +415,35 @@ class VTKExporter:
 		outFile.close()
 		self.facetsSnapCount += 1
 
-	def exportInteractions(self,ids='all',what=[],comment="comment",numLabel=None):
+	def exportInteractions(self,ids='all',what=[],verticesWhat=[],comment="comment",numLabel=None):
 		"""exports interactions and defined properties.
 
-		:param ids: if "all", then export all interactions, otherwise only interactions from (integer,integer) list
-		:type ids: [(int,int)] | "all"
+		:param ids: if "all", then export all spheres, otherwise only spheres from integer list
+		:type ids: [int] | "all"
 		:param what: what to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the interactions are labeled as i in this function. Scalar, vector and tensor variables are supported. For example, to export stiffness difference from certain value (1e9) (named as dStiff) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		"""
-		allIds = False
 		if ids=='all':
-			intrs=O.interactions
-			allIds = True
-		else:
-			intrs = []
-			for j,k in ids:
-				i = O.interactions[j,k]
-				if not i: continue
-				intrs.append(i)
-		n = len([i for i in intrs if i.isReal])
-		ids = [None for j in xrange(n)]
-		outFile = open(self.baseName+'-intrs-%04d'%self.intrsSnapCount+'.vtk', 'w')
+			ids = [(i.id1,i.id2) for i in O.interactions]
+		intrs = [(2*j-1,2*j) for j in xrange(len(ids))]
+		n = len(intrs)
+		fName = self.baseName+'-intrs-%04d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,2*n))
-		for j,i in enumerate(intrs):
-			if not i.isReal: continue
-			pos = O.bodies[i.id1].state.pos
+		for ii,jj in ids:
+			i = O.interactions[ii,jj]
+			pos = O.bodies[ii].state.pos 
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
-			pos = O.bodies[i.id2].state.pos + i.cellDist
+			pos = O.bodies[jj].state.pos + (O.cell.hSize*i.cellDist if O.periodic else Vector3.Zero)
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
-			ids[j] = (2*j-1,2*j)
 		outFile.write("LINES %d %d\n"%(n,3*n))
 		for j,i in enumerate(intrs):
-			outFile.write("2 %d %d\n"%(ids[j][0]+1,ids[j][1]+1))
+			outFile.write("2 %d %d\n"%(i[0]+1,i[1]+1))
 		outFile.write("\nCELL_DATA %d\n"%(n))
+		for i in O.interactions:
+			if i.isReal: break
 		for name,command in what:
 			test = eval(command)
 			if isinstance(test,Matrix3):
@@ -432,12 +460,98 @@ class VTKExporter:
 				#	outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
 			elif isinstance(test,(int,float)):
 				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
-				for i in intrs:
+				for ii,jj in ids:
+					i = O.interactions[ii,jj]
 					outFile.write("%g\n"%(eval(command)))
+			else:
+				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
+		if verticesWhat:
+			outFile.write("\nPOINT_DATA %d\n"%(2*n))
+			b = b1 = b2 = O.bodies[0]
+		for vWhat in verticesWhat:
+			lw = len(vWhat)
+			if lw == 2:
+				name,command = vWhat
+				test = eval(command)
+			elif lw == 3:
+				name,command1,command2 = vWhat
+				test = eval(command1)
+			if isinstance(test,Matrix3):
+				outFile.write("\nTENSORS %s double\n"%(name))
+				for ii,jj in ids:
+					i = O.interactions[ii,jj]
+					b1 = O.bodies[ii]
+					b2 = O.bodies[jj]
+					if lw==2:
+						for b in (b1,b2):
+							t = eval(command)
+							outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+					elif lw==3:
+						t1 = eval(command1)
+						t2 = eval(command2)
+						outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t1[0,0],t1[0,1],t1[0,2],t1[1,0],t1[1,1],t1[1,2],t1[2,0],t1[2,1],t1[2,2]))
+					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t2[0,0],t2[0,1],t2[0,2],t2[1,0],t2[1,1],t2[1,2],t2[2,0],t2[2,1],t2[2,2]))
+			elif isinstance(test,Vector3):
+				outFile.write("\nVECTORS %s double\n"%(name))
+				for ii,jj in ids:
+					i = O.interactions[ii,jj]
+					b1 = O.bodies[ii]
+					b2 = O.bodies[jj]
+					if lw==2:
+						for b in (b1,b2):
+							v = eval(command)
+							outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+					elif lw==3:
+						v1 = eval(command1)
+						v2 = eval(command2)
+						outFile.write("%g %g %g\n"%(v1[0],v1[1],v1[2]))
+						outFile.write("%g %g %g\n"%(v2[0],v2[1],v2[2]))
+			elif isinstance(test,(int,float)):
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
+				for ii,jj in ids:
+					i = O.interactions[ii,jj]
+					b1 = O.bodies[ii]
+					b2 = O.bodies[jj]
+					if lw==2:
+						for b in (b1,b2):
+							outFile.write("%g\n"%(eval(command)))
+					elif lw==3:
+						outFile.write("%g\n"%(eval(command1)))
+						outFile.write("%g\n"%(eval(command2)))
 			else:
 				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
 		outFile.close()
 		self.intrsSnapCount += 1
+
+	def exportPeriodicCell(self,comment="comment",numLabel=None):
+		"""exports spheres (positions and radius) and defined properties.
+
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		"""
+		if not O.periodic:
+			print 'WARNING: export.VTKExporter.exportPeriodicCell: scene is not periodic, no export...'
+			return
+		hSize = O.cell.hSize
+		fName = self.baseName+'-periCell-%04d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET UNSTRUCTURED_GRID\nPOINTS 8 double\n"%(comment))
+		vertices = [
+			hSize*Vector3(0,0,1),
+			hSize*Vector3(0,1,1),
+			hSize*Vector3(1,1,1),
+			hSize*Vector3(1,0,1),
+			hSize*Vector3(0,0,0),
+			hSize*Vector3(0,1,0),
+			hSize*Vector3(1,1,0),
+			hSize*Vector3(1,0,0),
+		]
+		for v in vertices:
+			outFile.write('%g %g %g\n'%(v[0],v[1],v[2]))
+		outFile.write('\nCELLS 1 9\n')
+		outFile.write('8 0 1 2 3 4 5 6 7\n')
+		outFile.write('\nCELL_TYPES 1\n12\n')
+		outFile.close()
 
 
 

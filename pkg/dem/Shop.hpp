@@ -9,9 +9,9 @@
 #include<boost/any.hpp>
 #include<boost/lambda/lambda.hpp>
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/base/Logging.hpp>
-#include<yade/core/Body.hpp>
+#include "yade/lib/base/Math.hpp"
+#include "yade/lib/base/Logging.hpp"
+#include "yade/core/Body.hpp"
 
 #include<boost/function.hpp>
 
@@ -84,6 +84,10 @@ class Shop{
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, Scene* _rb=NULL);
 		static Real kineticEnergy(Scene* _rb=NULL, Body::id_t* maxId=NULL);
+		//! get total momentum of current simulation
+		static Vector3r momentum();
+		//! get total angular momentum of current simulation
+		static Vector3r angularMomentum(Vector3r origin = Vector3r::Zero());
 
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 
@@ -123,8 +127,6 @@ class Shop{
 		static Matrix3r getStress(Real volume=0);
 		static Matrix3r getCapillaryStress(Real volume=0);
 		static Matrix3r stressTensorOfPeriodicCell() { LOG_WARN("Shop::stressTensorOfPeriodicCelli is DEPRECATED: use getStress instead"); return Shop::getStress(); }
-		//! This version is restricted to periodic BCs and Dem3Dof
-		static Matrix3r stressTensorOfPeriodicCell(bool smallStrains=true);
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
 		static py::tuple normalShearStressTensors(bool compressionPositive=false, bool splitNormalTensor=false, Real thresholdForce=NaN);
@@ -143,7 +145,7 @@ class Shop{
 		static void setContactFriction(Real angleRad);
 
 		//! Homothetic change of sizes of spheres and clumps
-		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly);
-
-
+		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization, bool integrateInertia);
+		//! Change of size of a single sphere or a clump
+		static void growParticle(Body::id_t bodyID, Real multiplier, bool updateMass);
 };

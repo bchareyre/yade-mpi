@@ -46,7 +46,7 @@ Create a scene for triaxal test.
 	.. note:: *Axis conventions.* Boundaries perpendicular to the *x* axis are called "left" and "right", *y* corresponds to "top" and "bottom", and axis *z* to "front" and "back". In the default loading path, strain rate is assigned along *y*, and constant stresses are assigned on *x* and *z*.
 
 **Essential engines**
-	#. The :yref:`TrixaialCompressionEngine` is used for controlling the state of the sample and simulating loading paths. :yref:`TriaxialCompressionEngine` inherits from :yref:`TriaxialStressController`, which computes stress- and strain-like quantities in the packing and maintain a constant level of stress at each boundary. :yref:`TriaxialCompressionEngine` has few more members in order to impose constant strain rate and control the transition between isotropic compression and triaxial test. Transitions are defined by changing some flags of the :yref:`TriaxialStressController`, switching from/to imposed strain rate to/from imposed stress.
+	#. The :yref:`TriaxialCompressionEngine` is used for controlling the state of the sample and simulating loading paths. :yref:`TriaxialCompressionEngine` inherits from :yref:`TriaxialStressController`, which computes stress- and strain-like quantities in the packing and maintain a constant level of stress at each boundary. :yref:`TriaxialCompressionEngine` has few more members in order to impose constant strain rate and control the transition between isotropic compression and triaxial test. Transitions are defined by changing some flags of the :yref:`TriaxialStressController`, switching from/to imposed strain rate to/from imposed stress.
 	#. The class :yref:`TriaxialStateRecorder` is used to write to a file the history of stresses and strains.
 	#. :yref:`TriaxialTest` is using :yref:`GlobalStiffnessTimeStepper` to compute an appropriate $\Dt$ for the numerical scheme. 
 
@@ -198,7 +198,6 @@ LawTester uses, as much as possible, :yref:`IGeom` to provide useful data (such 
 :yref:`L6Geom`      6     full
 :yref:`ScGeom`      3     emulate local coordinate system
 :yref:`ScGeom6D`    6     emulate local coordinate system
-:yref:`Dem3DofGeom` 3     *not supported*
 =================== ===== ==================================
 
 Depending on :yref:`IGeom`, 3 ($u_x$, $u_y$, $u_z$) or 6 ($u_x$, $u_y$, $u_z$, $\phi_x$, $\phi_y$, $\phi_z$) degrees of freedom (DoFs) are controlled with LawTester, by prescribing linear and angular velocities of both particles in contact. All DoFs controlled with LawTester are orthogonal (fully decoupled) and are controlled independently.

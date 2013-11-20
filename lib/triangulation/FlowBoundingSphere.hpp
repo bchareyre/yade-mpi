@@ -8,8 +8,7 @@
 *************************************************************************/
 #ifdef FLOW_ENGINE
 
-#ifndef _FLOWBOUNDINGSPHERE_H
-#define _FLOWBOUNDINGSPHERE_H
+#pragma once
 
 #include "Network.hpp"
 #include "Timer.h"
@@ -81,6 +80,13 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Vector3r> normLubForce;
 		vector <Matrix3r> viscousBodyStress;
 		vector <Matrix3r> lubBodyStress;
+		vector <Vector3r> deltaNormVel;
+		vector <Vector3r> deltaShearVel;
+		vector <Vector3r> normalV;
+		vector <Real> surfaceDistance;
+		vector <int> onlySpheresInteractions;
+		vector <Matrix3r> shearStressInteraction;
+		vector <Matrix3r> normalStressInteraction;
 		
 		void Localize();
 		void Compute_Permeability();
@@ -167,5 +173,3 @@ class FlowBoundingSphere : public Network<_Tesselation>
 #include "yade/lib/triangulation/FlowBoundingSphere.ipp"
 
 #endif //FLOW_ENGINE
-
-#endif

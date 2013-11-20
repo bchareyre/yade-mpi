@@ -6,9 +6,7 @@
 *************************************************************************/
 #ifdef FLOW_ENGINE
 
-#ifndef _NETWORK_H
-#define _NETWORK_H
-#endif
+#pragma once
 
 #include "Tesselation.h"
 #include "Timer.h"

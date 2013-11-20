@@ -116,28 +116,20 @@ typedef Math<Real> Mathr;
 template<typename MatrixT>
 void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT* positive){
 	assert(unitary); assert(positive); 
-	#if EIGEN_WORLD_VERSION==2
-		Eigen::SVD<MatrixT>(in).computeUnitaryPositive(unitary,positive);
-	#elif EIGEN_WORLD_VERSION==3 
-		Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
-		MatrixT mU, mV, mS;
-		mU = svd.matrixU();
-        	mV = svd.matrixV();
-        	mS = svd.singularValues().asDiagonal();
+	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	MatrixT mU, mV, mS;
+	mU = svd.matrixU();
+		mV = svd.matrixV();
+		mS = svd.singularValues().asDiagonal();
 
-		*unitary=mU * mV.adjoint();
-		*positive=mV * mS * mV.adjoint();
-	#endif
+	*unitary=mU * mV.adjoint();
+	*positive=mV * mS * mV.adjoint();
 }
 
 template<typename MatrixT>
 void Matrix_SVD(const MatrixT& in, MatrixT* mU, MatrixT* mS, MatrixT* mV){
 	assert(mU); assert(mS);  assert(mV); 
-	#if EIGEN_WORLD_VERSION==2 // see Matrix_computeUnitaryPositive
-		Eigen::SVD<MatrixT> svd = Eigen::SVD<MatrixT>(in);
-	#elif EIGEN_WORLD_VERSION==3 
-		Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
-	#endif
+	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
 	*mU = svd.matrixU();
 	*mV = svd.matrixV();
 	*mS = svd.singularValues().asDiagonal();

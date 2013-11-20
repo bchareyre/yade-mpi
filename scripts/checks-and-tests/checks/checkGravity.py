@@ -69,8 +69,6 @@ def getCurrentPos(inVel=0):
 def getCurrentVel(inVel=0):
   t = O.time+O.dt
   return inVel + g*t
-  
-resultStatus=0
 
 def warningMessagePos(inVel, y_pos, y_pos_need):
   print "The body with the initial velocity %.3f, has an y-position %.3f, but it should be %.3f" % (inVel, y_pos, y_pos_need)

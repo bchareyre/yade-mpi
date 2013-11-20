@@ -1,7 +1,6 @@
 #ifdef FLOW_ENGINE
 
-#ifndef _PERIFLOWBOUNDINGSPHERE_H
-#define _PERIFLOWBOUNDINGSPHERE_H
+#pragma once
 
 #include<yade/lib/triangulation/FlowBoundingSphere.hpp>//include after #define XVIEW
 // #include "Timer.h"
@@ -44,5 +43,3 @@ namespace CGT{
 
 
 #endif //FLOW_ENGINE
-
-#endif

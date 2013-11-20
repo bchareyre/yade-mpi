@@ -1,4 +1,5 @@
 // © 2007 Václav Šmilauer <eudoxos@arcig.cz>
+// © 2013 Jan Stránský <jan.stransky@fsv.cvut.cz>
 
 #pragma once
 
@@ -10,6 +11,12 @@
 
 #include<yade/pkg/common/Aabb.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+
+#ifdef YADE_CGAL
+	#include <CGAL/Cartesian.h>
+	//#include <CGAL/intersections.h>
+#endif
 
 
 /* Our mold of tetrahedron: just 4 vertices.
@@ -19,14 +26,14 @@ class Tetra: public Shape{
 	public:
 		Tetra(Vector3r v0, Vector3r v1, Vector3r v2, Vector3r v3) { createIndex(); v.resize(4); v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3; } 
 		virtual ~Tetra();
-	protected:
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Tetra,Shape,"Tetrahedron geometry.",
-			((std::vector<Vector3r>,v,std::vector<Vector3r>(4),,"Tetrahedron vertices in global coordinate system.")),
-			/*ctor*/createIndex();
-		);
-		REGISTER_CLASS_INDEX(Tetra,Shape);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Tetra,Shape,"Tetrahedron geometry.",
+		((std::vector<Vector3r>,v,std::vector<Vector3r>(4),,"Tetrahedron vertices (in local coordinate system).")),
+		/*ctor*/createIndex();
+	);
+	REGISTER_CLASS_INDEX(Tetra,Shape);
 };
 REGISTER_SERIALIZABLE(Tetra);
+
 
 
 /*! Collision configuration for Tetra and something.
@@ -36,21 +43,36 @@ REGISTER_SERIALIZABLE(Tetra);
 class TTetraGeom: public IGeom{
 	public:
 		virtual ~TTetraGeom();
-	protected:
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(TTetraGeom,IGeom,"Geometry of interaction between 2 :yref:`tetrahedra<Tetra>`, including volumetric characteristics",
-			((Real,penetrationVolume,NaN,,"Volume of overlap [m³]"))
-			((Real,equivalentCrossSection,NaN,,"Cross-section of the overlap (perpendicular to the axis of least inertia"))
-			((Real,maxPenetrationDepthA,NaN,,"??"))
-			((Real,maxPenetrationDepthB,NaN,,"??"))
-			((Real,equivalentPenetrationDepth,NaN,,"??"))
-			((Vector3r,contactPoint,,,"Contact point (global coords)"))
-			((Vector3r,normal,,,"Normal of the interaction, directed in the sense of least inertia of the overlap volume")),
-			createIndex();
-		);
-		//FUNCTOR2D(Tetra,Tetra);
-		REGISTER_CLASS_INDEX(TTetraGeom,IGeom);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(TTetraGeom,IGeom,"Geometry of interaction between 2 :yref:`tetrahedra<Tetra>`, including volumetric characteristics",
+		((Real,penetrationVolume,NaN,,"Volume of overlap [m³]"))
+		((Real,equivalentCrossSection,NaN,,"Cross-section of the overlap (perpendicular to the axis of least inertia"))
+		((Real,maxPenetrationDepthA,NaN,,"??"))
+		((Real,maxPenetrationDepthB,NaN,,"??"))
+		((Real,equivalentPenetrationDepth,NaN,,"??"))
+		((Vector3r,contactPoint,,,"Contact point (global coords)"))
+		((Vector3r,normal,,,"Normal of the interaction, directed in the sense of least inertia of the overlap volume")),
+		createIndex();
+	);
+	REGISTER_CLASS_INDEX(TTetraGeom,IGeom);
 };
 REGISTER_SERIALIZABLE(TTetraGeom);
+
+
+class TTetraSimpleGeom: public IGeom{
+	public:
+		virtual ~TTetraSimpleGeom();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(TTetraSimpleGeom,IGeom,"EXPERIMENTAL. Geometry of interaction between 2 :yref:`tetrahedra<Tetra>`",
+		((Real,penetrationVolume,NaN,,"Volume of overlap [m³]"))
+		((Vector3r,contactPoint,,,"Contact point (global coords)"))
+		((Vector3r,normal,,,"Normal of the interaction TODO"))
+		((int,flag,0,,"TODO")),
+		createIndex();
+	);
+	REGISTER_CLASS_INDEX(TTetraSimpleGeom,IGeom);
+};
+REGISTER_SERIALIZABLE(TTetraSimpleGeom);
+
+
 
 /*! Creates Aabb from Tetra. 
  *
@@ -69,7 +91,9 @@ REGISTER_SERIALIZABLE(Bo1_Tetra_Aabb);
 	class Gl1_Tetra: public GlShapeFunctor{	
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-		YADE_CLASS_BASE_DOC(Gl1_Tetra,GlShapeFunctor,"Renders :yref:`Tetra` object");
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Tetra,GlShapeFunctor,"Renders :yref:`Tetra` object",
+			((bool,wire,true,,"TODO"))
+		);
 		RENDERS(Tetra);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Tetra);
@@ -108,11 +132,67 @@ class Ig2_Tetra_Tetra_TTetraGeom: public IGeomFunctor
 
 REGISTER_SERIALIZABLE(Ig2_Tetra_Tetra_TTetraGeom);
 
+
+
+#ifdef YADE_CGAL
+class Ig2_Tetra_Tetra_TTetraSimpleGeom: public IGeomFunctor
+{
+	protected:
+		typedef CGAL::Cartesian<Real> K;
+		typedef K::Point_3 Point;
+		typedef CGAL::Tetrahedron_3<K> CGALTetra;
+		typedef CGAL::Segment_3<K> Segment;
+		typedef CGAL::Triangle_3<K> Triangle;
+		typedef CGAL::Vector_3<K> Vector_3;
+		bool checkVertexToTriangleCase(const Triangle tA[4], const Point pB[4], const Segment sB[6], Vector3r& normal, Vector3r& contactPoint, Real& penetrationVolume);
+		bool checkEdgeToEdgeCase(const Segment sA[6], const Segment sB[6], const Triangle tA[4], const Triangle tB[4], Vector3r& normal, Vector3r& contactPoint, Real& penetrationVolume);
+		bool checkEdgeToTriangleCase1(const Triangle tA[4], const Segment sB[6], const Point pB[4], Vector3r& normal, Vector3r& contactPoint, Real& penetrationVolume);
+		bool checkEdgeToTriangleCase2(const Triangle tA[4], const Triangle tB[4], const Segment sA[6], const Segment sB[6], Vector3r& normal, Vector3r& contactPoint, Real& penetrationVolume);
+		bool checkVertexToEdgeCase(const Point pA[4], const Segment sA[6], const Triangle tA[4], const Segment sB[6], const Triangle tB[4], Vector3r& normal, Vector3r& contactPoint, Real& penetrationVolume);
+		bool checkVertexToVertexCase(const Point pA[4], const Point pB[4], const Segment sA[6], const Triangle tA[4], const Triangle tB[4], Vector3r& normal, Vector3r& contactPoint, Real& penetrationVolume);
+		static const int psMap[4][3];
+		static const int ptMap[4][3];
+		static const int stMap[6][2];
+		static const int tsMap[4][3];
+		static const int ppsMap[4][4];
+		static const int sstMap[6][6];
+	public:
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){ throw std::logic_error("Ig2_Tetra_Tetra_TTetraSimpleGeom::goReverse called, but the functor is symmetric."); }
+	FUNCTOR2D(Tetra,Tetra);
+	DEFINE_FUNCTOR_ORDER_2D(Tetra,Tetra);
+	YADE_CLASS_BASE_DOC(Ig2_Tetra_Tetra_TTetraSimpleGeom,IGeomFunctor,"EXPERIMANTAL. Create/update geometry of collision between 2 :yref:`tetrahedra<Tetra>` (:yref:`TTetraSimpleGeom` instance)");
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ig2_Tetra_Tetra_TTetraSimpleGeom);
+
+
+
+
+class Law2_TTetraSimpleGeom_NormPhys_Simple: public LawFunctor{
+	public:
+		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	YADE_CLASS_BASE_DOC(Law2_TTetraSimpleGeom_NormPhys_Simple,LawFunctor,"EXPERIMENTAL. TODO");
+	FUNCTOR2D(TTetraSimpleGeom,NormPhys);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_TTetraSimpleGeom_NormPhys_Simple);
+#endif
+
+
+
+
 // Miscillaneous functions
 //! Tetrahedron's volume.
 /// http://en.wikipedia.org/wiki/Tetrahedron#Surface_area_and_volume
+Real TetrahedronSignedVolume(const Vector3r v[4]);
 Real TetrahedronVolume(const Vector3r v[4]);
+Real TetrahedronSignedVolume(const vector<Vector3r>& v);
 Real TetrahedronVolume(const vector<Vector3r>& v);
+#ifdef YADE_CGAL
+Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> >* v[4]);
+Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> > v[4]);
+#endif
 Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v);
 //Matrix3r TetrahedronInertiaTensor(const Vector3r v[4]);
 Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v);
