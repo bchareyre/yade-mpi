@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import argparse, os, git, shutil
 
-jobsNumber = 4
+
+jobsNumber = 6
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument("g", help="git debian-directory")
@@ -46,12 +47,21 @@ for branch in repodeb.branches:
         components = lines[1].strip()
         archs = lines[2].split()
         keyringuse = lines[3].strip()
+        othermirror = lines[4].strip()
         infile.close()
         for a in archs:
             tarball = "%s/%s_%s.tgz"%(pbdir, branchstr, a.strip())
+            addAllowuntrusted = ""
+            if (othermirror!="#"):
+                addAllowuntrusted =  " --allow-untrusted "
             if not(os.path.isfile(tarball)):
                 createPbTar = ('sudo pbuilder --create --distribution %s --mirror %s --components "%s" --architecture %s --debootstrapopts "--keyring=%s" --basetgz %s'%
                         (branchstr, mirror, components, a, keyringuse, tarball))
+                if (othermirror!="#"):
+                    createPbTar += ' --othermirror "' + othermirror + '"'
+                    addAllowuntrusted =  " --allow-untrusted "
+                print createPbTar
+
                 print "Creating tarball %s"%(tarball)
                 os.system(createPbTar)
             else:
@@ -69,7 +79,7 @@ for branch in repodeb.branches:
             shutil.copytree(gitupsdir, builddirdeb )
             shutil.rmtree(builddirdeb+".git")
             # Get package version
-            versiondebian = repoups.git.describe()
+            versiondebian = repoups.git.describe() + "~" + branchstr
 
             # Get package name
             infilepname = open(gitdebdir+"/changelog"); sourcePackName = infilepname.readlines()[0].split()[0]
@@ -82,10 +92,7 @@ for branch in repodeb.branches:
             os.system('cd %s; dpkg-source -b -I build'%(builddirup))
             os.mkdir(builddirres)
             print "Building package %s_%s"%(sourcePackName, versiondebian)
-            buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s/*.dsc'%
-                (a, tarball, builddirup, jobsNumber, builddirres, builddirup))
+            buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s/*.dsc'%
+                (a, tarball, addAllowuntrusted, builddirup, jobsNumber, builddirres, builddirup))
             print buildPackage
             os.system(buildPackage)
-            shutil.rmtree(builddirdeb)
-            exit(0)
-
