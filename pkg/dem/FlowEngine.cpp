@@ -265,8 +265,10 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 	flow->T[flow->currentTes].cellHandles.clear();
 	flow->T[flow->currentTes].cellHandles.reserve(flow->T[flow->currentTes].Triangulation().number_of_finite_cells());
 	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	int k=0;
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
 		flow->T[flow->currentTes].cellHandles.push_back(cell);
+		cell->info().id=k++;}//define unique numbering now, corresponds to position in cellHandles
         flow->DisplayStatistics ();
         flow->Compute_Permeability();
         porosity = flow->V_porale_porosity/flow->V_totale_porosity;

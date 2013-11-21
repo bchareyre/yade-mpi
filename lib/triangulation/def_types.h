@@ -44,6 +44,9 @@ typedef Traits::Tetrahedron_3								Tetraedre;
 
 class SimpleCellInfo : public Point {
 	public:
+	//"id": unique identifier of each cell, independant of other numberings used in the fluid types.
+	// Care to initialize it, there is no magic numbering to rely on
+	unsigned int id;
 	Real s;
 	bool isFictious;
 	SimpleCellInfo (void) {isFictious=false; s=0;}
