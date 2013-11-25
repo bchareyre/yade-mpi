@@ -62,15 +62,8 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Update_Volumes" );
 	
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( (defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval) {
-                updateTriangulation = true;
-                Eps_Vol_Cumulative=0;
-                retriangulationLastIter=0;
-                ReTrg++;
-        } else  {
-		updateTriangulation = false;
-		retriangulationLastIter++;}
-
+	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
+		(defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
 
         ///Compute flow and and forces here
 	if (pressureForce){
@@ -117,6 +110,7 @@ void FlowEngine::action()
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
 			updateTriangulation=false;
+			Eps_Vol_Cumulative=0;
 			ellapsedIter=0;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
@@ -134,7 +128,10 @@ void FlowEngine::action()
 			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
 			ComputeViscousForces(*solver);
-               		updateTriangulation = false;}
+               		updateTriangulation = false;
+			Eps_Vol_Cumulative=0;
+			retriangulationLastIter=0;
+			ReTrg++;}
         }
         first=false;
         timingDeltas->checkpoint ( "Triangulate + init volumes" );
@@ -732,14 +729,10 @@ void PeriodicFlowEngine:: action()
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( (defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval ) {
-                updateTriangulation = true;
-                Eps_Vol_Cumulative=0;
-                retriangulationLastIter=0;
-                ReTrg++;
-         } else  {
-		updateTriangulation = false;
-		retriangulationLastIter++;}
+	
+	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
+		(defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
+
 	timingDeltas->checkpoint("Update_Volumes");
 
 	///Compute flow and and forces here
@@ -784,6 +777,7 @@ void PeriodicFlowEngine:: action()
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
 			ellapsedIter=0;
+			Eps_Vol_Cumulative=0;
 			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			Initialize_volumes(solver);
@@ -798,7 +792,10 @@ void PeriodicFlowEngine:: action()
 			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
 			ComputeViscousForces(*solver);
-               		updateTriangulation = false;}
+               		updateTriangulation = false;
+			Eps_Vol_Cumulative=0;
+                	retriangulationLastIter=0;
+                	ReTrg++;}
         }
         first=false;
 	timingDeltas->checkpoint("Ending");

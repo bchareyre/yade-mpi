@@ -276,7 +276,6 @@ class FlowEngine : public PartialEngine
 					normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
 					solver = shared_ptr<FlowSolver> (new FlowSolver);
 					first=true;
-					updateTriangulation=false;
 					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 					ReTrg=1;
 					backgroundCompleted=true;
@@ -437,7 +436,6 @@ class PeriodicFlowEngine : public FlowEngine
 			wallIds=vector<int>(6,-1);
 // 			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
 			solver = shared_ptr<FlowSolver> (new FlowSolver);
-			updateTriangulation=false;
 			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 			ReTrg=1;
 			first=true;
