@@ -62,6 +62,7 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Update_Volumes" );
 	
         Eps_Vol_Cumulative += eps_vol_max;
+	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
 		(defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
 
@@ -729,7 +730,7 @@ void PeriodicFlowEngine:: action()
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
         Eps_Vol_Cumulative += eps_vol_max;
-	
+	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
 		(defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
 
