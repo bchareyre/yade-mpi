@@ -111,7 +111,8 @@ should have root privileges
 .. warning:: if you have Ubuntu 12.10 or older, you need to install libqglviewer-qt4-dev
  package instead of libqglviewer-dev.
 
-	* **Ubuntu**, **Debian** and their derivatives::
+ 
+* **Ubuntu**, **Debian** and their derivatives::
 
 		sudo apt-get install cmake git freeglut3-dev libloki-dev \
 		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
