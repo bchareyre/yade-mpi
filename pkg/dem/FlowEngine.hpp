@@ -146,6 +146,13 @@ class FlowEngine : public PartialEngine
 		void pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
+		TPL unsigned int nCells(Solver& flow){return flow->T[flow->currentTes].cellHandles.size();}
+		TPL python::list getVertices(unsigned int id, Solver& flow){
+			python::list ids;
+			if (id>=flow->T[flow->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<flow->T[flow->currentTes].cellHandles.size()); return ids;}			
+			for (unsigned int i=0;i<4;i++) ids.append(flow->T[flow->currentTes].cellHandles[id]->vertex(i)->info().id());
+			return ids;
+		}
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
 		#ifdef LINSOLV
@@ -181,6 +188,8 @@ class FlowEngine : public PartialEngine
 		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
 		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		unsigned int	_nCells() {return nCells(solver);}
+		python::list	_getVertices(unsigned int id) {return getVertices(id,solver);}
 		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
@@ -267,7 +276,6 @@ class FlowEngine : public PartialEngine
 					normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
 					solver = shared_ptr<FlowSolver> (new FlowSolver);
 					first=true;
-					updateTriangulation=false;
 					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 					ReTrg=1;
 					backgroundCompleted=true;
@@ -304,6 +312,8 @@ class FlowEngine : public PartialEngine
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+					.def("nCells",&FlowEngine::_nCells,"get the total number of finite cells in the triangulation.")
+					.def("getVertices",&FlowEngine::_getVertices,(python::arg("id")),"get the vertices of a cell")
 					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
@@ -426,7 +436,6 @@ class PeriodicFlowEngine : public FlowEngine
 			wallIds=vector<int>(6,-1);
 // 			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
 			solver = shared_ptr<FlowSolver> (new FlowSolver);
-			updateTriangulation=false;
 			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 			ReTrg=1;
 			first=true;

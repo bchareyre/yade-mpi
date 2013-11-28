@@ -47,7 +47,6 @@ void PeriodicFlow::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 void PeriodicFlow::ComputeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect(0,0,0);
 	static vector<Vecteur> oldForces;
 	if (oldForces.size()<=Tri.number_of_vertices()) oldForces.resize(Tri.number_of_vertices()+1);

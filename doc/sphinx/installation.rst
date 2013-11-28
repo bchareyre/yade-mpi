@@ -82,7 +82,8 @@ Release and trunk sources are compiled in the same way.
 Prerequisites
 ^^^^^^^^^^^^^
 
-Yade relies on a number of external software to run; its installation is checked before the compilation starts. 
+Yade relies on a number of external software to run; they are checked before the compilation starts.
+Some of them are only optional. The last ones are only relevant for using the fluid coupling module (:yref:`FlowEngine`).
 
 * `cmake <http://www.cmake.org/>`_ build system
 * `gcc <http://www.gcc.gnu.org>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
@@ -98,13 +99,20 @@ Yade relies on a number of external software to run; its installation is checked
 * `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 * `CGAL <http://www.cgal.org/>`_ library (optional)
+* `SuiteSparse <http://www.cise.ufl.edu/research/sparse/SuiteSparse/>`_ sparse algebra library (fluid coupling, optional, requires eigen>=3.1)
+* `OpenBLAS <http://www.openblas.net/>`_ optimized and parallelized alternative to the standard blas+lapack (fluid coupling, optional)
+* `Metis <http://glaros.dtc.umn.edu/gkhome/metis/metis/overview/>`_ matrix preconditioning (fluid coupling, optional)
 
 Most of the list above is very likely already packaged for your distribution. 
 The following commands have to be executed in command line of corresponding 
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
 
-	* **Ubuntu**, **Debian** and their derivatives::
+.. warning:: if you have Ubuntu 12.10 or older, you need to install libqglviewer-qt4-dev
+ package instead of libqglviewer-dev.
+
+ 
+* **Ubuntu**, **Debian** and their derivatives::
 
 		sudo apt-get install cmake git freeglut3-dev libloki-dev \
 		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
@@ -112,17 +120,36 @@ should have root privileges
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		python-xlib python-qt4 pyqt4-dev-tools gtk2-engines-pixbuf python-argparse \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libsuitesparse-dev \
-		libopenblas-dev libmetis-dev python-gts libbz2-dev zlib1g-dev
-
-If you are using other distribuition, than Debian or its derivatives, you should
-install the software, which is listed above. Their names can differ from the 
-names of Debian-packages.
+		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev \
+		
 
 Some of packages (for example, cmake, eigen3) are mandatory, some of them
 are optional. Watch for notes and warnings/errors, which are shown
 by cmake during configuration step. If the missing package is optional,
 some of Yade features will be disabled (see the messages at the end of configuration).
+		
+Additional packages, which can become mandatory later::
+
+		sudo apt-get install python-gts python-minieigen \
+		
+For effective usage of direct solvers in the fluid coupling, the following libraries are recommended, together with eigen>=3.1: blas, lapack, suitesparse, and metis.
+All four of them are available in many different versions. Different combinations are possible and not all of them will work. The following was found to be effective on ubuntu 12.04 and debian wheezy.
+(openblas provides its own version of lapack, and suitesparse-metis will trigger the installation of parmetis)::
+
+		sudo apt-get install libopenblas-dev libsuitesparse-metis-dev \
+
+Some packages listed here are relatively new and they can be absent
+in your distribution (for example, libmetis-dev or python-gts). They can be 
+installed from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_
+or just ignored. In this case some features can be disabled.
+
+If you are using other distribuition, than Debian or its derivatives, you should
+install the softwares listed above. Their names can differ from the 
+names of Debian-packages.
+
+
+
+
 
 
 Compilation

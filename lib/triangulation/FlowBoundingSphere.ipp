@@ -416,7 +416,7 @@ double FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
 	if (noCache) {cerr<<"Triangulation does not exist. Waht did you do?!"<<endl; return -1;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	Cell_handle cell = Tri.locate(Point(X,Y,Z));
-	return cell->info().index;
+	return cell->info().id;
 }
 
 template <class Tesselation> 
@@ -485,7 +485,6 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect(0,0,0);
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
