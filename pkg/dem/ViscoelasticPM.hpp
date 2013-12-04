@@ -66,7 +66,7 @@ class Ip2_ViscElMat_ViscElMat_ViscElPhys: public IPhysFunctor {
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
 	private :
-		Real contactParameterCalculation(Real l1,Real l2);
+		Real contactParameterCalculation(const Real& l1,const Real& l2, const bool& massMultiply);
 	YADE_CLASS_BASE_DOC(Ip2_ViscElMat_ViscElMat_ViscElPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.");
 	FUNCTOR2D(ViscElMat,ViscElMat);
 
