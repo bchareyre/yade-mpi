@@ -1,0 +1,7 @@
+This example shows, how to perform the following conversion:
+GEO->STL->GTS->Yade(clumps)
+
+Then GTS-file (mesh) is importing into Yade-Script and new spheres
+are adding as a clump within the volume of this mesh.
+
+The script requires gmsh and libgts-bin installed.
