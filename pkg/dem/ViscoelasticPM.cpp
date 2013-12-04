@@ -14,8 +14,14 @@ ViscElMat::~ViscElMat(){}
 /* ViscElPhys */
 ViscElPhys::~ViscElPhys(){}
 
+/* Contact parameter calculation function */
+Real Ip2_ViscElMat_ViscElMat_ViscElPhys::contactParameterCalculation(Real l1,Real l2){
+	return (l1>0 or l2>0)?l1*l2/(l1+l2):0;
+}
+
 /* Ip2_ViscElMat_ViscElMat_ViscElPhys */
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
+
 	// no updates of an existing contact 
 	if(interaction->phys) return;
 	ViscElMat* mat1 = static_cast<ViscElMat*>(b1.get());
@@ -36,27 +42,18 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	const Real ks2 = mat2->ks*mass2; const Real cs2 = mat2->cs*mass2;
 		
 	ViscElPhys* phys = new ViscElPhys();
-	
-	if ((kn1>0) or (kn2>0)) {
-		phys->kn = 1/( ((kn1>0)?1/kn1:0) + ((kn2>0)?1/kn2:0) );
-	} else {
-		phys->kn = 0;
-	}
-	if ((ks1>0) or (ks2>0)) {
-		phys->ks = 1/( ((ks1>0)?1/ks1:0) + ((ks2>0)?1/ks2:0) );
-	} else {
-		phys->ks = 0;
-	} 
-	
-  if ((mR1>0) or (mR2>0)) {
+
+	phys->kn = contactParameterCalculation(kn1,kn2);
+	phys->ks = contactParameterCalculation(ks1,ks2);
+	phys->cn = contactParameterCalculation(cn1,cn2);
+	phys->cs = contactParameterCalculation(cs1,cs2);
+
+ 	if ((mR1>0) or (mR2>0)) {
 		phys->mR = 2.0/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );
 	} else {
 		phys->mR = 0;
 	}
-  
-	phys->cn = (cn1?1/cn1:0) + (cn2?1/cn2:0); phys->cn = phys->cn?1/phys->cn:0;
-	phys->cs = (cs1?1/cs1:0) + (cs2?1/cs2:0); phys->cs = phys->cs?1/phys->cs:0;
-  
+
 	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
 	
@@ -209,3 +206,4 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		addTorque(id2, c2x.cross(f)-momentResistance,scene);
   }
 }
+
