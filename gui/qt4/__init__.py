@@ -22,13 +22,13 @@ maxWebWindows=1
 "Number of webkit windows that will be cycled to show help on clickable objects"
 webWindows=[] 
 "holds instances of QtWebKit windows; clicking an url will open it in the window that was the least recently updated"
-sphinxOnlineDocPath='https://www.yade-dem.org/sphinx/'
+sphinxOnlineDocPath='https://www.yade-dem.org/doc/'
 "Base URL for the documentation. Packaged versions should change to the local installation directory."
 
 
 import os.path
 # find if we have docs installed locally from package
-sphinxLocalDocPath=yade.config.prefix+'/share/doc/yade'+yade.config.suffix+'/html/'
+sphinxLocalDocPath=yade.config.prefix+'/share/doc/yade'+yade.config.suffix+'-doc/html/'
 sphinxBuildDocPath=yade.config.sourceRoot+'/doc/sphinx/_build/html/'
 # we prefer the packaged documentation for this version, if installed
 if   os.path.exists(sphinxLocalDocPath+'/index.html'): sphinxPrefix='file://'+sphinxLocalDocPath
