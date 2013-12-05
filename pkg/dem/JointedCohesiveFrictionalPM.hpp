@@ -34,7 +34,7 @@ class JCFpmMat: public FrictMat {
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<JCFpmState*>(s); }
 		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(JCFpmMat,FrictMat,"Possibly jointed, cohesive frictional material, for use with other JCFpm classes",
-		((Real,cohesion,0.,,"Defines the maximum admissible tangential force in shear, for Fn=0, in the matrix (:yref:`FsMax<JCFpmPhys.FsMax>` = cohesion*:yref:`crossSection<JCFpmPhys.crossSection>`). [Pa]"))
+		((Real,cohesion,0.,,"Defines the maximum admissible tangential force in shear, for Fn=0, in the matrix (:yref:`FsMax<JCFpmPhys.FsMax>` = cohesion * :yref:`crossSection<JCFpmPhys.crossSection>`). [Pa]"))
 		((Real,jointCohesion,0.,,"Defines the :yref:`maximum admissible tangential force in shear<JCFpmPhys.FsMax>`, for Fn=0, on the joint surface. [Pa]"))
 		((Real,jointDilationAngle,0,,"Defines the dilatancy of the joint surface (only valid for :yref:`smooth contact logic<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint>`). [rad]"))	
 		((Real,jointFrictionAngle,-1,,"Defines Coulomb friction on the joint surface. [rad]"))
@@ -42,7 +42,7 @@ class JCFpmMat: public FrictMat {
 		((Real,jointShearStiffness,0.,,"Defines the shear stiffness on the joint surface. [Pa/m]"))
 		((Real,jointTensileStrength,0.,,"Defines the :yref:`maximum admissible normal force in traction<JCFpmPhys.FnMax>` on the joint surface. [Pa]"))
 		((int,type,0,,"If particles of two different types interact, it will be with friction only (no cohesion).[-]"))
-		((Real,tensileStrength,0.,,"Defines the maximum admissible normal force in traction in the matrix (:yref:`FnMax<JCFpmPhys.FnMax>` = tensileStrength*:yref:`crossSection<JCFpmPhys.crossSection>`). [Pa]"))
+		((Real,tensileStrength,0.,,"Defines the maximum admissible normal force in traction in the matrix (:yref:`FnMax<JCFpmPhys.FnMax>` = tensileStrength * :yref:`crossSection<JCFpmPhys.crossSection>`). [Pa]"))
 		,
 		createIndex();
 	);
