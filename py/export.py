@@ -75,6 +75,51 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	out.write(output)
 	out.close()
 	return count
+  
+#textExt===============================================================
+def textClumps(filename, format='x_y_z_r_clumpId', comment='',mask=-1):
+	"""Save clumps-members into a text file. Non-clumps members are bodies are silently skipped.
+
+	:param string filename: the name of the file, where sphere coordinates will be exported.
+	:param string comment: the text, which will be added as a comment at the top of file. If you want to create several lines of text, please use '\\\\n#' for next lines.
+	:param int mask: export only spheres with the corresponding mask export only spheres with the corresponding mask
+	:return: number of clumps, number of spheres which were written.
+	:rtype: int
+	"""
+	O=Omega()
+	
+	try:
+		out=open(filename,'w')
+	except:
+		raise RuntimeError("Problem to write into the file")
+	
+	count=0
+	countClumps=0
+	output = ''
+	output = '#format x_y_z_r_clumpId\n'
+	if (comment):
+		output += '# ' + comment + '\n'
+	
+	minCoord= Vector3.Zero
+	maxCoord= Vector3.Zero
+	maskNumber = []
+	
+	for bC in O.bodies:
+		if bC.isClump:
+			keys = bC.shape.members.keys()
+			countClumps+=1
+			for ii in keys:
+				try:
+					b = O.bodies[ii]
+					if (isinstance(b.shape,Sphere) and ((mask<0) or ((mask&b.mask)>0))):
+						output+=('%g\t%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,bC.id))
+						count+=1
+				except AttributeError:
+					pass
+			
+	out.write(output)
+	out.close()
+	return countClumps,count
 
 #VTKWriter===============================================================
 class VTKWriter:
