@@ -24,7 +24,7 @@ readParamsFromTable(noTableOk=True,
 	# prestress
 	preStress = -3e6,
 	# axial strain rate
-	strainRate = -20,
+	strainRate = -100,
 
 	# assamlby parameters
 	rParticle = .075e-3, #
@@ -57,8 +57,9 @@ frictMat = O.materials.append(FrictMat(
 # spheres
 pred = pack.inCylinder((0,0,0),(0,0,height),.5*width) if testType=='cyl' else pack.inAlignedBox((-.5*width,-.5*width,0),(.5*width,.5*width,height)) if testType=='cube' else None
 sp=SpherePack()
-sp = pack.randomDensePack(pred,spheresInCell=2000,radius=rParticle,memoizeDb='/tmp/triaxTestOnCylinder.sqlite',material=concMat,returnSpherePack=True)
-spheres=sp.toSimulation(color=(0,1,1))
+sp = pack.randomDensePack(pred,spheresInCell=2000,radius=rParticle,memoizeDb='/tmp/triaxTestOnCylinder.sqlite',returnSpherePack=True)
+spheres=sp.toSimulation(color=(0,1,1),material=concMat)
+
 # bottom and top of specimen. Will have prescribed velocity
 bot = [O.bodies[s] for s in spheres if O.bodies[s].state.pos[2]<rParticle*bcCoeff]
 top = [O.bodies[s] for s in spheres if O.bodies[s].state.pos[2]>height-rParticle*bcCoeff]
