@@ -8,6 +8,13 @@ try:
 except ImportError:
 	import io
 
+# Add search path for yade Python-modules
+# It allows to use both Yade-versions (packaged and self-compiled one).
+# See LP:1254708 for more details
+# https://bugs.launchpad.net/yade/+bug/1254708
+
+sys.path.insert(1,'${runtimePREFIX}/${LIBRARY_OUTPUT_PATH}/yade${SUFFIX}/py')
+
 # get yade path (allow YADE_PREFIX to override)
 prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
@@ -20,9 +27,6 @@ if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
 libDir=prefix+'/'+libPATH+'/yade'+suffix
 if not (os.path.exists(libDir+'/py/yade/__init__.py')):
 	raise RuntimeError('Libraries are not found! ('+libDir+'/py/yade/__init__.py, /py/yade/__init__.py)')
-
-
-
 
 # handle command-line options first
 try:
