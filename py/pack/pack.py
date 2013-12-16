@@ -459,7 +459,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		# repetition to the required cell size will be done below, after memoizing the result
 	else:
 		assumedFinalDensity=0.6
-		V=(4/3)*pi*radius**3; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
+		V=(4.0/3.0)*pi*radius**3.0; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
 		TriaxialTest(
 			numberOfGrains=int(N),radiusMean=radius,radiusStdDev=rRelFuzz,
 			# upperCorner is just size ratio, if radiusMean is specified
