@@ -55,6 +55,7 @@ class ViscElPhys : public FrictPhys{
 		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich")),
 		createIndex();
 	)
+	REGISTER_CLASS_INDEX(ViscElPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(ViscElPhys);
 
