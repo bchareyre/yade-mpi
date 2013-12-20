@@ -1,19 +1,29 @@
 #!/usr/bin/env python
-import argparse, os, git, shutil
+import argparse, os, git, shutil, sys, time
 
-
-jobsNumber = 6
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument("g", help="git debian-directory")
-parser.add_argument("p", help="direcrory, where will be created pbuilder tarballs")
-parser.add_argument("u", help="git upstream-direcrory")
+parser.add_argument("-i", help="config file")
 parser.add_argument("-u","--update", help="update tarballs, if they are exist", action='store_true')
+parser.add_argument("-j", help="number of processors to build",dest='jobsNumber',default=6, type=int)
 args = parser.parse_args() 
 
-gitdebdir = args.g
-gitupsdir = args.u
-pbdir     = args.p
+
+configfile = args.i
+jobsNumber = args.jobsNumber
+
+infileconf  = open(configfile)
+linesconf   = infileconf.readlines()
+gitdebdir   = linesconf[1].strip()
+pbdir       = linesconf[4].strip()
+gitupsdir   = linesconf[7].strip()
+userg       = linesconf[10].strip()
+groupg      = linesconf[13].strip()
+dputg       = linesconf[16].strip()
+keyg        = linesconf[19].strip()
+keypasspath = linesconf[22].strip()
+keysecrpath = linesconf[25].strip()
+patharchive = linesconf[28].strip()
 
 if not(os.path.isdir(gitdebdir)):
     raise RuntimeError('Git-debian-directory does not exists')
@@ -72,6 +82,7 @@ for branch in repodeb.branches:
                     os.system(updatePbTar)
             
             # Creating dir for building
+
             builddirup="%s_%s/"%(branchstr, a)
             builddirdeb="%s/build/"%(builddirup)
             builddirres="%s/result/"%(builddirup)
@@ -89,6 +100,7 @@ for branch in repodeb.branches:
             shutil.copytree(gitdebdir, builddirdeb+"/debian")
 
             os.system('sed -i.bak -e s/VERSION/%s/ -e s/DISTRIBUTION/%s/ %s/debian/changelog'%(versiondebian,branch,builddirdeb))
+            os.system('sed -i.bak -e s/VERSIONYADEREPLACE/%s/ %s/debian/rules'%(versiondebian,builddirdeb))
             os.system('cd %s; dpkg-source -b -I build'%(builddirup))
             os.mkdir(builddirres)
             print "Building package %s_%s"%(sourcePackName, versiondebian)
@@ -96,3 +108,9 @@ for branch in repodeb.branches:
                 (a, tarball, addAllowuntrusted, builddirup, jobsNumber, builddirres, builddirup))
             print buildPackage
             os.system(buildPackage)
+            os.system('sudo chown %s:%s %s * -R'%(userg, groupg, builddirup))
+            os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitdebdir))
+            os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitupsdir))
+            os.system('cd %s ; su %s -c \'dput %s *.changes\''%(builddirres, userg, dputg))
+            time.sleep(5.0)
+            os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
