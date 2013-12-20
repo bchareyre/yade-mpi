@@ -1,0 +1,6 @@
+[mini]
+fqdn = localhost
+method = local
+incoming = /home/USER/M/Temp/archive/mini-dinstall/incoming
+allow_unsigned_uploads = 1
+post_upload_command = mini-dinstall --batch
