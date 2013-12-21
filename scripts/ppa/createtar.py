@@ -86,7 +86,8 @@ for branch in repodeb.branches:
             builddirup="%s_%s/"%(branchstr, a)
             builddirdeb="%s/build/"%(builddirup)
             builddirres="%s/result/"%(builddirup)
-            shutil.rmtree(builddirdeb,ignore_errors=True)
+            #shutil.rmtree(builddirdeb,ignore_errors=True)
+            shutil.rmtree(builddirup,ignore_errors=True)
             shutil.copytree(gitupsdir, builddirdeb )
             shutil.rmtree(builddirdeb+".git")
             # Get package version
@@ -111,6 +112,9 @@ for branch in repodeb.branches:
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, builddirup))
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitdebdir))
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitupsdir))
-            os.system('cd %s ; su %s -c \'dput %s *.changes\''%(builddirres, userg, dputg))
-            time.sleep(5.0)
-            os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
+        os.system('cd %s ; su %s -c \'dput %s *.changes\''%(builddirres, userg, dputg))
+
+for branch in repodeb.branches:
+    branchstr = str(branch)
+    if (branchstr<>'master'):
+        os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
