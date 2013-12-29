@@ -10,24 +10,36 @@ install source code.
 Packages
 ----------
 
-Packages from Launchpad PPA service (package personal archive) are 
-provided for all currently supported Ubuntu versions for 
-`daily <https://launchpad.net/~yade-pkg/+archive/snapshots>`_ releases.
-``yade-daily`` is a automatically daily (if there were some commtis during
-the previous days) generated package, which includes all the newly added 
-features. To install version from PPA, run the following:
+Pre-built packages are provided for all currently supported Debian and Ubuntu 
+versions of distributions and available on `yade-dem.org <http://yade-dem.org/packages/>`_  
+server. 
 
-* For latest builds from trunk::
+These are ``daily`` versions of packages and are updating regularly and include 
+all the newly added features.
 
-	sudo add-apt-repository ppa:yade-pkg/snapshots    # for latest daily (mostly) releases 
-	sudo apt-get update
-	sudo apt-get install yade-daily
+To install daily-version one needs to add this repository to your 
+/etc/apt/sources.list, add a PGP-key AA915EEB as a trusted and install yadedaily ::
 
-After you added snapshot PPA, you will get automatically the updates of the package, 
-when they arrive the PPA.
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ precise/" >> /etc/apt/sources.list'
+	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
+	sudo apt-get install yadedaily
 
-More detailed instructions are available at the corresponding pages of 
-ppa`s (links above).
+If you have another distribution, not Ubuntu Precise, be sure to use the
+correct name in the first line (for instanse, jessie, trusty or wheezy).
+
+After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
+
+Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
+Each branch corresponds to one distribution e.g. precise, jessie etc.
+The scripts for building all of this stuff is `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`_. 
+It uses pbuilder to build packages, so all packages are building in a clean environment.
+
+If you do not need yadedaily-package any more, just remove the
+corresponding line in /etc/apt/sources.list. To remove our key from
+keyring, execute the following commands::
+
+	sudo apt-key remove AA915EEB
+	sudo apt-get purge yadedaily
 
 Since 2011 all Ubuntu versions (starting from 11.10, Oneiric) and Debian (starting from Wheezy) 
 are having already Yade in their main repositories. There are only stable releases are placed.
