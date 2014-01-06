@@ -16,9 +16,9 @@ postprocessing and debugging.
  
 **Downloads:**
 
-- Packages for Ubuntu:
+- Packages for Ubuntu and Debian:
   
-  - Daily-builds: https://launchpad.net/~yade-pkg/+archive/snapshots
+  - https://yade-dem.org/doc/installation.html#packages
   - External packages: https://launchpad.net/~yade-users/+archive/external
 
 - Tarballs of different versions: 
