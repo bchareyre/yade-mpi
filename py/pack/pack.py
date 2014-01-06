@@ -264,6 +264,8 @@ def regularOrtho(predicate,radius,gap,**kw):
 	xx,yy,zz=[arange(mn[i]+radius,mx[i]-radius,2*radius+gap) for i in 0,1,2]
 	for xyz in itertools.product(xx,yy,zz):
 		if predicate(xyz,radius): ret+=[utils.sphere(xyz,radius=radius,**kw)]
+	if (len(ret)==0):
+		warnings.warn('No spheres are produced by regularOrtho-function',category=RuntimeWarning)
 	return ret
 
 def regularHexa(predicate,radius,gap,**kw):
@@ -283,6 +285,8 @@ def regularHexa(predicate,radius,gap,**kw):
 		if j%2==0: x+= a/2. if k%2==0 else -a/2.
 		if k%2!=0: x+=a/2.; y+=hy/2.
 		if predicate((x,y,z),radius): ret+=[utils.sphere((x,y,z),radius=radius,**kw)]
+	if (len(ret)==0):
+		warnings.warn('No spheres are produced by regularHexa-function',category=RuntimeWarning)
 	return ret
 
 def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
