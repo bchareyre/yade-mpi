@@ -36,20 +36,34 @@ using namespace boost;
 #endif
 
 void GLViewer::mouseMovesCamera(){
-	camera()->frame()->setWheelSensitivity(-1.0f);
+  camera()->frame()->setWheelSensitivity(-1.0f);
+  
+  setWheelBinding(Qt::ShiftModifier , FRAME, ZOOM);
+  setWheelBinding(Qt::NoModifier, CAMERA, ZOOM);
 
-	setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
-	//setMouseBinding(Qt::RightButton, NO_CLICK_ACTION);
-	setMouseBinding(Qt::SHIFT + Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
-	setMouseBinding(Qt::SHIFT + Qt::MidButton, FRAME, TRANSLATE);
-	setMouseBinding(Qt::SHIFT + Qt::RightButton, FRAME, ROTATE);
-	setWheelBinding(Qt::ShiftModifier , FRAME, ZOOM);
-
-	setMouseBinding(Qt::LeftButton + Qt::RightButton, CAMERA, ZOOM);
-	setMouseBinding(Qt::MidButton, CAMERA, ZOOM);
-	setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
-	setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
-	setWheelBinding(Qt::NoModifier, CAMERA, ZOOM);
+#if QGLVIEWER_VERSION>=0x020500
+  setMouseBinding(Qt::ShiftModifier, Qt::LeftButton, SELECT);
+  
+  setMouseBinding(Qt::ShiftModifier, Qt::LeftButton | Qt::RightButton, FRAME, ZOOM);
+  setMouseBinding(Qt::ShiftModifier, Qt::MidButton, FRAME, TRANSLATE);
+  setMouseBinding(Qt::ShiftModifier, Qt::RightButton, FRAME, ROTATE);
+    
+  setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, ZOOM);
+  setMouseBinding(Qt::NoModifier, Qt::MidButton, CAMERA, ZOOM);
+  setMouseBinding(Qt::NoModifier, Qt::LeftButton, CAMERA, ROTATE);
+  setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, TRANSLATE);
+#else
+  setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
+  
+  setMouseBinding(Qt::SHIFT + Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
+  setMouseBinding(Qt::SHIFT + Qt::MidButton, FRAME, TRANSLATE);
+  setMouseBinding(Qt::SHIFT + Qt::RightButton, FRAME, ROTATE);
+  
+  setMouseBinding(Qt::LeftButton + Qt::RightButton, CAMERA, ZOOM);
+  setMouseBinding(Qt::MidButton, CAMERA, ZOOM);
+  setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
+  setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
+#endif
 };
 
 void GLViewer::mouseMovesManipulatedFrame(qglviewer::Constraint* c){
