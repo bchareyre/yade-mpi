@@ -176,8 +176,16 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
 	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
 
-	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 
+	// Prevent appearing of attraction forces due to a viscous component
+	// [Radjai2011], page 3, equation [1.7]
+	// [Schwager2007]
+	const Real normForceReal = phys.kn * geom.penetrationDepth + phys.cn * normalVelocity;
+	if (normForceReal < 0) {
+		phys.normalForce = Vector3r::Zero();
+	} else {
+		phys.normalForce = normForceReal * geom.normal;
+	}
 	
 	Vector3r momentResistance = Vector3r::Zero();
 	if (phys.mR>0.0) {
