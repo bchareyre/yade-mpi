@@ -4,24 +4,25 @@
 
 #pragma once
 
-#include<yade/core/Material.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
+
 
 /* Simple viscoelastic model */
 
 /// Material
 /// Note: Shop::getViscoelasticFromSpheresInteraction can get kn,cn,ks,cs from a analytical solution of a pair spheres interaction problem.
-class ViscElMat : public Material {
+class ViscElMat : public FrictMat {
 	public:
 		virtual ~ViscElMat();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,FrictMat,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
 		((Real,kn,NaN,,"Normal elastic stiffness"))
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,ks,NaN,,"Shear elastic stiffness"))
 		((Real,cs,NaN,,"Shear viscous constant"))
-		((Real,frictionAngle,NaN,,"Friction angle [rad]"))
 		((bool,massMultiply,true,,"Stiffness and viscosity are multiplied by the reduced mass. If massMultiply=false, these parameter are set explicitly without mass multiplication"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_."))
@@ -32,7 +33,7 @@ class ViscElMat : public Material {
 		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic [Willett2000]_ , Weigert [Weigert1999]_ , Rabinovich [Rabinov2005]_ ")),
 		createIndex();
 	);
-	REGISTER_CLASS_INDEX(ViscElMat,Material);
+	REGISTER_CLASS_INDEX(ViscElMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(ViscElMat);
 
@@ -81,7 +82,9 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 	private:
 		Real calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys);
+	public :
 	FUNCTOR2D(ScGeom,ViscElPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`. The model is mostly based on the paper for For details see Pournin [Pournin2001]_ .");
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);

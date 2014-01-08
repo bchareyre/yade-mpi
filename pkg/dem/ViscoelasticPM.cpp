@@ -42,12 +42,22 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 		mass2 = Body::byId(interaction->getId2())->state->mass;
 	}
 	
-	const Real kn1 = mat1->kn*mass1; const Real cn1 = mat1->cn*mass1;
-	const Real ks1 = mat1->ks*mass1; const Real cs1 = mat1->cs*mass1;
+	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
+	Real R1=sphCont->refR1>0?sphCont->refR1:sphCont->refR2;
+	Real R2=sphCont->refR2>0?sphCont->refR2:sphCont->refR1;
+	
+	const Real kn1 = isnan(mat1->kn)?2*mat1->young*R1:mat1->kn*mass1;
+	const Real cn1 = mat1->cn*mass1;
+	const Real ks1 = isnan(mat1->ks)?kn1*mat1->poisson:mat1->ks*mass1;
+	const Real cs1 = mat1->cs*mass1;
+	
 	const Real mR1 = mat1->mR;      const Real mR2 = mat2->mR; 
 	const int mRtype1 = mat1->mRtype; const int mRtype2 = mat2->mRtype;
-	const Real kn2 = mat2->kn*mass2; const Real cn2 = mat2->cn*mass2;
-	const Real ks2 = mat2->ks*mass2; const Real cs2 = mat2->cs*mass2;
+	
+	const Real kn2 = isnan(mat2->kn)?2*mat2->young*R2:mat2->kn*mass2;
+	const Real cn2 = mat2->cn*mass2;
+	const Real ks2 = isnan(mat2->ks)?kn2*mat2->poisson:mat2->ks*mass2;
+	const Real cs2 = mat2->cs*mass2;
 		
 	ViscElPhys* phys = new ViscElPhys();
 
@@ -111,6 +121,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	
 	if (geom.penetrationDepth<0) {
 		if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
+			cout<<id1<<" "<<id2<<endl;
 			phys.normalForce = -calculateCapillarForce(geom, phys)*geom.normal;
 		  if (I->isActive) {
 				addForce (id1,-phys.normalForce,scene);
