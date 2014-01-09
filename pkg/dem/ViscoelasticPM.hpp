@@ -10,7 +10,6 @@
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 
-
 /* Simple viscoelastic model */
 
 /// Material

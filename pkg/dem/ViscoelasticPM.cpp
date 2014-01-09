@@ -121,7 +121,6 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	
 	if (geom.penetrationDepth<0) {
 		if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
-			cout<<id1<<" "<<id2<<endl;
 			phys.normalForce = -calculateCapillarForce(geom, phys)*geom.normal;
 		  if (I->isActive) {
 				addForce (id1,-phys.normalForce,scene);
