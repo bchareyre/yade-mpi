@@ -91,7 +91,7 @@ for branch in repodeb.branches:
             shutil.copytree(gitupsdir, builddirdeb )
             shutil.rmtree(builddirdeb+".git")
             # Get package version
-            versiondebian = repoups.git.describe() + "~" + branchstr
+            versiondebian = repoups.git.describe()[0:-8] + repoups.head.commit.hexsha[0:7] + "~" + branchstr
 
             # Get package name
             infilepname = open(gitdebdir+"/changelog"); sourcePackName = infilepname.readlines()[0].split()[0]
