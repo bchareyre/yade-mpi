@@ -120,7 +120,7 @@ The following commands have to be executed in command line of corresponding
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
 
-.. warning:: if you have Ubuntu 12.10 or older, you need to install libqglviewer-qt4-dev
+.. warning:: If you have Ubuntu 12.10 or older, you need to install libqglviewer-qt4-dev
  package instead of libqglviewer-dev.
 
  
