@@ -39,6 +39,7 @@ void Bo1_Wall_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const
 		a1[ax0]=b1[ax0]=a2[ax0]=b2[ax0]=0;
 		a1[ax1]=mn1-step; a2[ax2]=mn2-step;
 		b1[ax1]=mn1+step*(div+2); b2[ax2]=mn2+step*(div+2);
+		glColor3v(cm->color);
 		glBegin(GL_LINES);
 			for(int i=0; i<=div; i++){
 				a1[ax2]=b1[ax2]=mn1+i*step;
