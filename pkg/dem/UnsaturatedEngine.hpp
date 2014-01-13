@@ -41,7 +41,7 @@ class UnsaturatedEngine : public PartialEngine
 		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
 // 		//copy positions in a buffer for faster and/or parallel access
 		void setPositionsBuffer(bool current);
-		Real testFunction();
+		void testFunction();
 
 	public :
 // 		enum {wall_left=0, wall_right, wall_bottom, wall_top, wall_back, wall_front};
