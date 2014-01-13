@@ -48,6 +48,7 @@ void UnsaturatedEngine::testFunction()
 		Build_Triangulation(P_zero,solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
 		initializeCellIndex(solver);//initialize cell index
 		initializePoreRadius(solver);//save all pore radii before invade
+		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
 	}
 	solver->noCache = false;
 }
@@ -864,29 +865,35 @@ Real UnsaturatedEngine::Volume_cell ( Cellhandle cell )
         return volume;
 }
 
-template<class Cellhandle>
-Real UnsaturatedEngine::volumeCapillaryCell ( Cellhandle cell )
+template<class Solver>
+void UnsaturatedEngine::updateVolumeCapillaryCell ( Solver& flow)
 {
-    Initialize_volumes(solver);  
-    Real volume = abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
-    if (volume<0) { cerr<<"volumeCapillaryCell Negative. cell ID: " << cell->info().index << "cell volume: " << cell->info().volume() << "  volumeSolidPore: " << solver->volumeSolidPore(cell) << endl; }
-    return volume;
+    Initialize_volumes(flow);
+    RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = Tri.finite_cells_end();
+    Cell_handle neighbour_cell;
+    for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+        cell->info().capillaryCellVolume = abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
+//         if (cell->info().capillaryCellVolume<0) {cerr<<"volumeCapillaryCell Negative. cell ID: " << cell->info().index << "cell volume: " << cell->info().volume() << "  volumeSolidPore: " << solver->volumeSolidPore(cell) << endl;        }
+    }
 }
 
 template<class Solver>
 Real UnsaturatedEngine::getSaturation (Solver& flow )
 {
+    updateAirReservoir(flow);
+//     updateWaterReservoir(flow);    
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
-    Real capillary_volume = 0.0; //total volume
+    Real capillary_volume = 0.0; //total capillary volume
     Real air_volume = 0.0; 	//air volume
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if (tri.is_infinite(cell)) continue;
         if (cell->info().Pcondition) continue;
 // 	    if (cell.has_vertex() )
-        capillary_volume = capillary_volume + volumeCapillaryCell ( cell );
-        if (cell->info().p()!=0) {
-            air_volume = air_volume + volumeCapillaryCell (cell);
+        capillary_volume = capillary_volume + cell->info().capillaryCellVolume;
+        if (cell->info().isAirReservoir==true) {
+            air_volume = air_volume + cell->info().capillaryCellVolume;
         }
     }
     Real saturation = 1 - air_volume/capillary_volume;
@@ -1295,7 +1302,7 @@ void UnsaturatedEngine::savePoreBodyInfo(Solver& flow)
     Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
-        file << cell->info().index << " " << cell->info() << " " << volumeCapillaryCell(cell)<< endl;
+        file << cell->info().index << " " << cell->info() << " " << cell->info().capillaryCellVolume << endl;
     }
     file.close();
 }

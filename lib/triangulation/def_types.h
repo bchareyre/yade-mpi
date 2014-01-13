@@ -223,12 +223,13 @@ class UnsatCellInfo : public FlowCellInfo {
 	UnsatCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
   	bool isWaterReservoir;
 	bool isAirReservoir;
+	Real capillaryCellVolume;//for calculating saturation
 	std::vector<double> poreRadius;
 	//pore throat radius for drainage
 	UnsatCellInfo (void)
 	{
 		poreRadius.resize(4, 0);
-		isWaterReservoir = false; isAirReservoir = false;	  
+		isWaterReservoir = false; isAirReservoir = false; capillaryCellVolume = 0;	  
 	}
 };
 

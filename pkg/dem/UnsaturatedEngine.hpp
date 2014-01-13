@@ -97,8 +97,8 @@ class UnsaturatedEngine : public PartialEngine
 		Real Volume_cell_triple_fictious (Cellhandle cell);
 		template<class Cellhandle>
 		Real Volume_cell (Cellhandle cell);
-		template<class Cellhandle>
-		Real volumeCapillaryCell (Cellhandle cell);
+		template<class Solver>
+		void updateVolumeCapillaryCell ( Solver& flow);		
 		template<class Cellhandle>
 		double computeEffPoreRadius(Cellhandle cell, int j);
 		template<class Cellhandle>
