@@ -90,7 +90,10 @@ def facetParallelepiped(center,extents,height,orientation=Quaternion.Identity,wa
 	return ret
 
 #facetCylinder==========================================================
-def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,**kw):
+def facetCylinder(center,radius,height,orientation=Quaternion.Identity,
+	segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,
+	radiusTopInner=-1, radiusBottomInner=-1,
+	**kw):
 	"""
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
@@ -98,6 +101,8 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	:param Vector3 center: center of the created cylinder
 	:param float radius:  cylinder radius
 	:param float height: cylinder height
+	:param float radiusTopInner: inner radius of cylinders top, -1 by default
+	:param float radiusBottomInner: inner radius of cylinders bottom, -1 by default
 	:param Quaternion orientation: orientation of the cylinder; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the cylinder surface (>=5)
 	:param bitmask wallMask: determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls
@@ -109,7 +114,11 @@ def facetCylinder(center,radius,height,orientation=Quaternion.Identity,segmentsN
 	if (radius<=0): raise RuntimeError("The radius should have the positive value");
 	if (height<=0): wallMask = 1;
 	
-	return facetCylinderConeGenerator(center=center,radiusTop=radius,height=height,orientation=orientation,segmentsNumber=segmentsNumber,wallMask=wallMask,angleRange=angleRange,closeGap=closeGap,**kw)
+	return facetCylinderConeGenerator(center=center,radiusTop=radius,height=height,
+		orientation=orientation,segmentsNumber=segmentsNumber,wallMask=wallMask,
+		angleRange=angleRange,closeGap=closeGap,
+		radiusTopInner=radiusTopInner, radiusBottomInner=radiusBottomInner,
+		**kw)
 
 #facetSphere==========================================================
 def facetSphere(center,radius,thetaResolution=8,phiResolution=8,returnElementMap=False,**kw):
@@ -155,7 +164,10 @@ def facetSphere(center,radius,thetaResolution=8,phiResolution=8,returnElementMap
 
 
 #facetCone==============================================================
-def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,**kw):
+def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identity,
+	segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,
+	radiusTopInner=-1, radiusBottomInner=-1,
+	**kw):
 	"""
 	Create arbitrarily-aligned cone composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cone;
@@ -163,6 +175,8 @@ def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identi
 	:param Vector3 center: center of the created cylinder
 	:param float radiusTop:  cone top radius
 	:param float radiusBottom:  cone bottom radius
+	:param float radiusTopInner: inner radius of cones top, -1 by default
+	:param float radiusBottomInner: inner radius of cones bottom, -1 by default
 	:param float height: cone height
 	:param Quaternion orientation: orientation of the cone; the reference orientation has axis along the $+x$ axis.
 	:param int segmentsNumber: number of edges on the cone surface (>=5)
@@ -174,7 +188,11 @@ def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identi
 	# check zero dimentions
 	if ((radiusBottom<=0) and (radiusTop<=0)): raise RuntimeError("The radiusBottom or radiusTop should have the positive value");
 	
-	return facetCylinderConeGenerator(center=center,radiusTop=radiusTop,radiusBottom=radiusBottom,height=height,orientation=orientation,segmentsNumber=segmentsNumber,wallMask=wallMask,angleRange=angleRange,closeGap=closeGap,**kw)
+	return facetCylinderConeGenerator(center=center,radiusTop=radiusTop,
+		radiusBottom=radiusBottom,height=height,orientation=orientation,segmentsNumber=segmentsNumber,
+		wallMask=wallMask,angleRange=angleRange,closeGap=closeGap,
+		radiusTopInner=radiusTopInner, radiusBottomInner=radiusBottomInner,
+		**kw)
 
 #facetPolygon===========================================================
 def facetPolygon(center,radiusOuter,orientation=Quaternion.Identity,segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
@@ -324,7 +342,12 @@ def facetPolygonHelixGenerator(center,radiusOuter,pitch=0,orientation=Quaternion
 
 
 #facetCylinderConeGenerator=============================================
-def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,radiusBottom=-1,**kw):
+def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Identity,
+	segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,
+	radiusBottom=-1,
+	radiusTopInner=-1,
+	radiusBottomInner=-1,
+	**kw):
 	"""
 	Please, do not use this function directly! Use geom.facetCylinder and geom.facetCone instead.
 	This is the base function for generating cylinders and cones from facets.
@@ -336,6 +359,9 @@ def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Id
 	#For cylinders top and bottom radii are equal
 	if (radiusBottom == -1):
 		radiusBottom = radiusTop
+	
+	if ((radiusTopInner > 0 and radiusTopInner > radiusTop) or (radiusBottomInner > 0 and radiusBottomInner > radiusBottom)): 
+		raise RuntimeError("The internal radius cannot be larger than outer");
 	# check zero dimentions
 	if (segmentsNumber<3): raise RuntimeError("The segmentsNumber should be at least 3");
 	if (height<0): raise RuntimeError("The height should have the positive value");
@@ -350,26 +376,47 @@ def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Id
 	anglesInRad = numpy.linspace(angleRange[0], angleRange[1], segmentsNumber+1, endpoint=True)
 	
 	PTop=[]; PTop.append(Vector3(0,0,+height/2))
+	PTopIn=[]; PTopIn.append(Vector3(0,0,+height/2))
+	
 	PBottom=[]; PBottom.append(Vector3(0,0,-height/2))
-
+	PBottomIn=[]; PBottomIn.append(Vector3(0,0,-height/2))
+	
 	for i in anglesInRad:
 		XTop=radiusTop*math.cos(i); YTop=radiusTop*math.sin(i); 
 		PTop.append(Vector3(XTop,YTop,+height/2))
+		if (radiusTopInner > 0):
+			XTopIn=radiusTopInner*math.cos(i); YTopIn=radiusTopInner*math.sin(i); 
+			PTopIn.append(Vector3(XTopIn,YTopIn,+height/2))
 		
 		XBottom=radiusBottom*math.cos(i); YBottom=radiusBottom*math.sin(i); 
 		PBottom.append(Vector3(XBottom,YBottom,-height/2))
+		if (radiusBottomInner > 0):
+			XBottomIn=radiusBottomInner*math.cos(i); YBottomIn=radiusBottomInner*math.sin(i);
+			PBottomIn.append(Vector3(XBottomIn,YBottomIn,-height/2))
 		
 	for i in range(0,len(PTop)):
 		PTop[i]=orientation*PTop[i]+center
 		PBottom[i]=orientation*PBottom[i]+center
+		if (len(PTopIn)>1):
+			PTopIn[i]=orientation*PTopIn[i]+center
+		if (len(PBottomIn)>1):
+			PBottomIn[i]=orientation*PBottomIn[i]+center
 
 	ret=[]
 	for i in range(2,len(PTop)):
 		if (wallMask&1)and(radiusTop!=0):
-			ret.append(utils.facet((PTop[0],PTop[i],PTop[i-1]),**kw))
+			if (len(PTopIn)>1):
+				ret.append(utils.facet((PTop[i-1],PTopIn[i],PTopIn[i-1]),**kw))
+				ret.append(utils.facet((PTop[i-1],PTop[i],PTopIn[i]),**kw))
+			else:
+				ret.append(utils.facet((PTop[0],PTop[i],PTop[i-1]),**kw))
 			
 		if (wallMask&2)and(radiusBottom!=0):
-			ret.append(utils.facet((PBottom[0],PBottom[i-1],PBottom[i]),**kw))
+			if (len(PBottomIn)>1):
+				ret.append(utils.facet((PBottom[i-1],PBottomIn[i],PBottomIn[i-1]),**kw))
+				ret.append(utils.facet((PBottom[i-1],PBottom[i],PBottomIn[i]),**kw))
+			else:
+				ret.append(utils.facet((PBottom[0],PBottom[i-1],PBottom[i]),**kw))
 			
 		if wallMask&4:
 			if (radiusBottom!=0):
