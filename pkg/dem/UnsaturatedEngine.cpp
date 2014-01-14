@@ -127,7 +127,7 @@ void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Sol
     double surface_tension = surfaceTension ;
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-        if (cell->neighbor(facet)->info().p() != 0) continue;
+        if (cell->neighbor(facet)->info().p() == bndCondValue[2]) continue;
         if (cell->neighbor(facet)->info().isWaterReservoir == false) continue;
         double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
         if (pressure > n_cell_pe) {
@@ -157,7 +157,7 @@ void UnsaturatedEngine::invade2 (Solver& flow)
 
     Finite_cells_iterator _cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator _cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); _cell != _cell_end; _cell++ ) {
-        if(_cell->info().p() != 0)
+        if(_cell->info().isAirReservoir == true)
             invadeSingleCell2(_cell,_cell->info().p(),flow);
     }
 }
@@ -171,11 +171,10 @@ Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
     Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (cell->info().p()!=0) {
+        if (cell->info().isAirReservoir == true) {
             for (int facet=0; facet<4; facet ++) {
                 if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-                if (cell->neighbor(facet)->info().p()!=0) continue;
-                if (cell->neighbor(facet)->info().isWaterReservoir == false) continue;
+                if ( (cell->neighbor(facet)->info().isAirReservoir == true) || (cell->neighbor(facet)->info().isWaterReservoir == false) ) continue;
                 double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
                 nextEntry = min(nextEntry,n_cell_pe);
             }
