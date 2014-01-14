@@ -99,7 +99,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 }
 
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::ResetNetwork() {noCache=true;}
+void FlowBoundingSphere<Tesselation>::ResetNetwork() {T[0].Clear();noCache=true;}
 
 template <class Tesselation> 
 Tesselation& FlowBoundingSphere<Tesselation>::Compute_Action()
@@ -494,10 +494,9 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 		perVertexUnitForce.clear(); perVertexPressure.clear();
 // 		vector<const Vecteur*> exf; exf.reserve(20);
 // 		vector<const Real*> exp; exp.reserve(20);
-		perVertexUnitForce.resize(Tri.number_of_vertices());
-		perVertexPressure.resize(Tri.number_of_vertices());}
+		perVertexUnitForce.resize(T[currentTes].max_id+1);
+		perVertexPressure.resize(T[currentTes].max_id+1);}
 	#endif
-
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
@@ -557,6 +556,7 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 		#else
 		#pragma omp parallel for num_threads(ompThreads)
 		for (int vn=0; vn<= T[currentTes].max_id; vn++) {
+			if (T[currentTes].vertexHandles[vn]==NULL) continue;
 			Vertex_handle& v = T[currentTes].vertexHandles[vn];
 // 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v){
 			const int& id =  v->info().id();
