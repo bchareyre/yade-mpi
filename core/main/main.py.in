@@ -220,7 +220,10 @@ def userSession(qt4=False,qapp=None):
 		ipshell=InteractiveShellEmbed()
 		ipshell()
 	elif yade.runtime.ipython_version>=12:
-		from IPython.frontend.terminal.embed import InteractiveShellEmbed
+		if yade.runtime.ipython_version>=100:
+			from IPython.terminal.embed import InteractiveShellEmbed
+		else:
+			from IPython.frontend.terminal.embed import InteractiveShellEmbed
 		from IPython.config.loader import Config
 		cfg = Config()
 		prompt_config = cfg.PromptManager

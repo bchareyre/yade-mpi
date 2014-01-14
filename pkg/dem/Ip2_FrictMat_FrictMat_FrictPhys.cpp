@@ -13,6 +13,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/dem/ViscoelasticPM.hpp>
 #include <cassert>
 
 
@@ -22,20 +23,38 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 					, const shared_ptr<Interaction>& interaction)
 {
 	if(interaction->phys) return;
+	
 	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(b1);
 	const shared_ptr<FrictMat>& mat2 = YADE_PTR_CAST<FrictMat>(b2);
+	
+	Real Ra,Rb;//Vector3r normal;
+	assert(dynamic_cast<GenericSpheresContact*>(interaction->geom.get()));//only in debug mode
+	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
+	Ra=sphCont->refR1>0?sphCont->refR1:sphCont->refR2;
+	Rb=sphCont->refR2>0?sphCont->refR2:sphCont->refR1;
+	
+	//The two contitions above are used in the case of a ViscElMat/FrictMat contact, if kn and ks are set for the ViscElMat. Young and Poisson are deduced. This is not a perfect solution and the user should set young/poisson only.
+	if( b1->getClassIndex()==ViscElMat::getClassIndexStatic()){
+		const shared_ptr<ViscElMat>& mat1 = YADE_PTR_CAST<ViscElMat>(b1);
+		if( (!isnan(mat1->kn)) && (!isnan(mat1->ks)) ){
+			mat1->young=mat1->kn/(2.*Ra);
+			mat1->poisson=mat1->ks/mat1->kn;
+		}
+	}
+	if( b2->getClassIndex()==ViscElMat::getClassIndexStatic()){
+		const shared_ptr<ViscElMat>& mat2 = YADE_PTR_CAST<ViscElMat>(b2);
+		if( (!isnan(mat2->kn)) && (!isnan(mat2->ks)) ){
+			mat2->young=mat2->kn/(2.*Rb);
+			mat2->poisson=mat2->ks/mat2->kn;
+		}
+	}
+	
 	interaction->phys = shared_ptr<FrictPhys>(new FrictPhys());
 	const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->phys);
 	Real Ea 	= mat1->young;
 	Real Eb 	= mat2->young;
 	Real Va 	= mat1->poisson;
 	Real Vb 	= mat2->poisson;
-
-	Real Ra,Rb;//Vector3r normal;
-	assert(dynamic_cast<GenericSpheresContact*>(interaction->geom.get()));//only in debug mode
-	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
-	Ra=sphCont->refR1>0?sphCont->refR1:sphCont->refR2;
-	Rb=sphCont->refR2>0?sphCont->refR2:sphCont->refR1;
 
 	//harmonic average of the two stiffnesses when (2*Ri*Ei) is the stiffness of a contact point on sphere "i"
 	Real Kn = 2*Ea*Ra*Eb*Rb/(Ea*Ra+Eb*Rb);

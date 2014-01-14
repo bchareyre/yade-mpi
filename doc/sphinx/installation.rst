@@ -25,7 +25,7 @@ To install daily-version one needs to add this repository to your
 	sudo apt-get install yadedaily
 
 If you have another distribution, not Ubuntu Precise, be sure to use the
-correct name in the first line (for instanse, jessie, trusty or wheezy).
+correct name in the first line (for instance, jessie, trusty or wheezy).
 
 After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
 
@@ -35,11 +35,13 @@ The scripts for building all of this stuff is `here <https://github.com/yade/tru
 It uses pbuilder to build packages, so all packages are building in a clean environment.
 
 If you do not need yadedaily-package any more, just remove the
-corresponding line in /etc/apt/sources.list. To remove our key from
-keyring, execute the following commands::
+corresponding line in /etc/apt/sources.list and the package itself::
+
+	sudo apt-get remove yadedaily
+
+To remove our key from keyring, execute the following command::
 
 	sudo apt-key remove AA915EEB
-	sudo apt-get purge yadedaily
 
 Since 2011 all Ubuntu versions (starting from 11.10, Oneiric) and Debian (starting from Wheezy) 
 are having already Yade in their main repositories. There are only stable releases are placed.
@@ -47,10 +49,14 @@ To install the program, run the following::
 
 	sudo apt-get install yade
 
-To check, what version of Yade is in specific Distribution, check the links
+To check, what version of Yade is in specific distribution, visit the links
 for `Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ and 
-`Debian <http://packages.qa.debian.org/y/yade.html>`_.
+`Debian <http://packages.qa.debian.org/y/yade.html>`_. 
+`Debian-Backports <http://backports.debian.org/Instructions>`_ 
+repository is updating regularly to bring the newest Yade to a users of stable 
+Debians.
 
+Daily and stable Yade versions can coexist without any conflicts.
 
 Source code
 ------------
@@ -120,7 +126,7 @@ The following commands have to be executed in command line of corresponding
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
 
-.. warning:: if you have Ubuntu 12.10 or older, you need to install libqglviewer-qt4-dev
+.. warning:: If you have Ubuntu 12.10 or older, you need to install libqglviewer-qt4-dev
  package instead of libqglviewer-dev.
 
  

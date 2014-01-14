@@ -254,7 +254,7 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=begin,resetState=False,dynamic=dynamic,fixed=fixed)
 	b.mask=mask
 	b.bound=Aabb(color=[0,1,0])
-	b.state.ori=b.state.ori.setFromTwoVectors(Vector3(0.,0.,1.),segment)
+	b.state.ori.setFromTwoVectors(Vector3(0.,0.,1.),segment)
 	if (end == begin): b.state.ori = Quaternion((1,0,0),0)
 	return b
 

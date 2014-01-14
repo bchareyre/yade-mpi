@@ -1,6 +1,105 @@
 ==================================================
+yade-1.07.0
+Fri, 10 Jan 2014 21:23:33 +0100
+
+Anton Gladky (37):
+      Remove RELEASE file.
+      Add -ftrack-macro-expansion=0, if gcc>=4.8
+      Provide VTK6-support.
+      Use ADD_DEFINITIONS instead of adding those directly in CXX_FLAGS.
+      Remove information about yade-stable from Readme.
+      Add BicyclePedalEngine as a new kinematic motion.
+      Add -save-temps if GCC-4.8 is used.
+      Split Grid into Grid and Grid_GUI.
+      Add information about missing packages in documentation and external PPA. Closes: LP:1250928
+      Add notice about using libqglviewer-qt4-dev instead of libqglviewer-dev on older Ubuntu versions.
+      Add script to create PPA-packages. (Not finished)
+      Use othermirror for some ubuntu versions.
+      Add stl-gts example.
+      Add qt.View() to clumps-example.
+      Add one more check-script to check the functionality of ViscoElastic PM.
+      Consider massMultiply-parameter, calculating parameters in     ViscoElasticPM.
+      Add functions to save and load clumps.
+      Set the higher pripority in sys.path to self-compiled modules. Closes LP:1254708
+      Fix volume calculation. Closes LP:1261415
+      Set the higher pripority in sys.path to self-compiled modules in     yade-batch.
+      Update scripts for PPA.
+      Add configuration files, needed for PPA.
+      Minor update of PPA scripts.
+      Update information about yadedaily prebuilt packages.
+      Add support for qglviewer>=2.5.0.
+      Open GUI in packs/packs.py after 1 step to show all elements.
+      Raise warning, if no spheres are produced by regular* commands.
+      Update information about daily-packages.
+      Set one more paramter -ftemplate-depth-512 for clang
+      Prevent attraction forces in ViscPM due to viscosity
+      Add some more steps to checkWeight-script.
+      Minor formatting in references.
+      Remove cout accidentally added in a prev. commit.
+      Minor change of setFromTwoVectors in utils.py.
+      Rename createtar.py to buildppa.py.
+      Minor fix in docs.
+      Add RELEASE-file.
+
+Bruno Chareyre (17):
+      a function to increase the size of a single sphere (~>Thomas swelling)
+      easier manipulation of state files in TesselationWrapper
+      restore the python wrapping of utils.growParticles() as it was before fb02a74 (changed by mistake, sorry Christian)
+      give unique identifiers to trangulation's cells
+      FlowEngine::nCells retruns the number of finite cells; FlowEngine::getVertices returns the vertices of a cell defined by its id
+      make cmake output more consistent when missing dependency for LinSolv
+      Fix the behavior of FlowEngine.updateTriangulation=True
+      FlowEngine: increment a counter correctly
+      small changes in the installation section regarding suitesparse and related libs
+      installation.rst: smallfix in indentation
+      remove a not necessary sorting in FlowEngine, as it triggers a critical bug in the STL (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=58800)
+      correct target values of the DEM-PFV checktest
+      Fix paths to online and packaged documentation (fix url error with GUI's hyperlinks)
+      DEM Background chapter: a note on the semantic strain vs. displacement for contact kinematics
+      Merge branch 'master' of github.com:yade/trunk
+      fix undefined "key" in triax-tutorial/script-session1.py
+      +1 published paper
+
+Christian Jakob (1):
+      small fix in an example script tetra/oneTetra.py
+
+Francois (3):
+      Fix missing REGISTER_CLASS_INDEX(...) into ViscElPhys. This macro is essential for a right law dispatch !
+      Corrected a minor mistake in code comments : k=2*r*E
+      Allow the contact between (coh)frictMat and viscElMat as frictPhys. Almost everything was done by inheritance, just had to convert stiffnesses to modulus and modulus to stiffnesses to ensure material compatibility.     Note that for the moment the timeStepper cannot handle this kind of simulations -> will be fixed soon.
+
+Jan Stransky (4):
+      Modified error message if not yade.runtime.hasDisplay (bug #1241817)
+      fixed SyntaxError from previous commit
+      uncomment and modify utils.forcesOnCoordPlane function
+      corrected mistake in examples/test/triax.py
+
+Jerome Duriez (15):
+      - Introducing (uncommenting in fact) tens/shearBreakRel variables in JCFpmState : relative part of broken interactions per body (instead of absolute number).     - Few changes in some doc of JCFpm variables.
+      Quite important changes in JCFpm code
+      Modifying JCFpm example scripts so that they still work after previous commit
+      Re-put some commented lines, after discussion of this thread (https://lists.launchpad.net/yade-dev/msg10185.html), thanks Anton. The comments solution is (at the moment ?) finally still used to avoid putting a new variable in VTKRecorder..
+      A script example for JCFpm : two rock parts with one joint in the middle, like in laboratory experiments
+      Some forgotten corrections in some example scripts, so that they still work after changes of today in JCFpm
+      Some corrections in the JCFpm doc (hyperlinks...)
+      (Hopefully) Fixing some rst links in DEM Background doc
+      Some changes in the doc of getStress() function, to be consistent with the source code (https://answers.launchpad.net/yade/+question/239919)
+      Merge branch 'master' of github.com:yade/trunk
+      Idem as previous commit
+      Restoring the 2d version of growParticle previously erased by mistake..
+      Some hyperlinks in JCFpm doc corrected
+      Typos and hyperlinks corrected in Peri3dController doc
+      Correction of a link in TesselationWrapper() doc
+
+Klaus Thoeni (1):
+      add CGAL link and delete libgmp3 from install list
+
+Raphael Maurin (1):
+      Change in the calculation of the normal and tangential stiffness and damping. The change affects only the behavior     when one of the two parameters is zero, e.g. for two particles with different stiffness k1 and k2, the contact     stiffness will always be k = k1*k2/(k1+k2). Before it gave the same except when k2 = 0 (respectively k1 = 0), where it     gave k = k1 (resp. k=k2). This is done to ensure continuity in the behavior when one of the two parameter tend     to zero.     Add a function contactParameterCalculation in Ip2_ViscElMat_ViscElMat_ViscElPhys to avoid code duplication.
+
+==================================================
 yade-1.05.0
-Mon Oct 28 19:49:48 2013 +0200
+Mon, Oct 28 19:49:48 2013 +0200
 
 Anton Gladky (19):
       Add system-component of boost to be linked.
@@ -76,7 +175,7 @@ Klaus Thoeni (2):
 
 ==================================================
 yade-1.00.0
-Sun Sep 29 23:10:48 2013 +0200
+Sun, Sep 29 23:10:48 2013 +0200
 
 Anton Gladky (64):
       Remove release file.
@@ -302,7 +401,7 @@ Raphaël Maurin (1):
 
 ==================================================
 yade-0.97.0
-Sun May 12 14:48:29 2013 +0200
+Sun, May 12 14:48:29 2013 +0200
 
 Anton Gladky (42):
       Remove release-file.
@@ -447,7 +546,7 @@ dmarzougui (1):
 
 ==================================================
 yade-0.95.0
-Tue Mar 5 20:36:40 2013 +0100
+Tue, Mar 5 20:36:40 2013 +0100
 
 Anton Gladky (41):
       Remove RELEASE file.
@@ -640,7 +739,7 @@ françois (1):
 
 ==================================================
 yade-0.90.0
-Sat Oct 13 15:16:55 2012 +0200
+Sat, Oct 13 15:16:55 2012 +0200
 
 Anton Gladky (142):
       Remove RELEASE file.
@@ -912,7 +1011,7 @@ Klaus Thoeni (1):
 
 ==================================================
 yade-0.80.0
-Wed May 2 21:05:12 2012 +0200
+Wed, May 2 21:05:12 2012 +0200
 
 Anton Gladky (81):
       Add forgotten format to ymport.textExt
@@ -1123,7 +1222,7 @@ Rémi Cailletaud (4):
 
 ==================================================
 yade-0.70.0
-Sun Oct 23 16:49:34 2011 +0200
+Sun, Oct 23 16:49:34 2011 +0200
 
 Anton Gladky (129):
       1. Prediction of simulation finish time is added to HTTP-batch server.
@@ -1591,7 +1690,7 @@ Václav Šmilauer (75):
 
 ==================================================
 yade-0.60.0
-Sun Nov 7 09:55:43 2010 +0100
+Sun, Nov 7 09:55:43 2010 +0100
 
 Anton Gladky (54):
       1. utils.facetCylinder and utils.facetBox orientations are changed according to https://lists.launchpad.net/yade-dev/msg04886.html
@@ -1864,7 +1963,7 @@ Václav Šmilauer (88):
 
 ==================================================
 yade-0.50.0
-Wed Jun 9 08:30:02 2010 +0200
+Wed, Jun 9 08:30:02 2010 +0200
 
 Anton Gladky (77):
       Added an example of VTK-recorder using. Thanks Sergei Doroffenko aka Sega
@@ -2464,7 +2563,7 @@ Václav Šmilauer (264):
 
 ==================================================
 yade-0.20.2
-Sat Sep 19 21:41:52 2009 +0200
+Sat, Sep 19 21:41:52 2009 +0200
 
 Anton Gladky (34):
       1. This is my first test commit     2. Added some initial files for mining rocks classes simulation
@@ -2999,7 +3098,7 @@ Václav Šmilauer (313):
 
 ==================================================
 yade-0.20.0
-Sat Sep 19 21:41:52 2009 +0200
+Sat, Sep 19 21:41:52 2009 +0200
 
 Anton Gladky (33):
       1. This is my first test commit     2. Added some initial files for mining rocks classes simulation
@@ -3452,7 +3551,7 @@ Václav Šmilauer (269):
 
 ==================================================
 yade-0.12.1
-Sat Nov 22 22:48:27 2008 +0000
+Sat, Nov 22 22:48:27 2008 +0000
 
 Bruno Chareyre (6):
       A wrong comment on contact laws in PFC3D is removed.
@@ -3551,7 +3650,7 @@ Václav Šmilauer (44):
 
 ==================================================
 yade-0.12.0
-Wed Aug 20 14:37:02 2008 +0000
+Wed, Aug 20 14:37:02 2008 +0000
 
 Janek Kozicki (8):
       testing if SVN commit messages can go to launchpad
@@ -3592,7 +3691,7 @@ Václav Šmilauer (22):
 
 ==================================================
 yade-0.12.0rc1
-Sun Jul 27 10:52:50 2008 +0000
+Sun, Jul 27 10:52:50 2008 +0000
 
 Bruno Chareyre (69):
       Modifications in the equations of "non-viscous" damping. The equations     are now as defined by Cundall.
