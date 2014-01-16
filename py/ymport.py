@@ -11,7 +11,7 @@ except ImportError:
 	from miniEigen import *
 
 def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
-	"""Load sphere coordinates from file in specific format, create spheres, insert them to the simulation.
+	"""Load sphere coordinates from file in specific format, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 	
 	:param str filename: file name
 	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
@@ -89,7 +89,7 @@ def textClumps(fileName,shift=Vector3.Zero,scale=1.0,**kw):
 	return ret
 
 def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
-	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
+	"""Load sphere coordinates from file, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 
 	:param string filename: file which has 4 colums [x, y, z, radius].
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
