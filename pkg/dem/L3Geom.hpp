@@ -33,7 +33,7 @@ Note that:
 
 struct L3Geom: public GenericSpheresContact{
 	const Real& uN;
-	const Vector2r& uT; 
+	const Vector2r uT; 
 	virtual ~L3Geom();
 
 	// utility function
