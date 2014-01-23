@@ -1,4 +1,3 @@
-from yade import *
 from yade import ymport
 
 facets = ymport.unv('shell.unv',shift=(100,200,300),scale=1000)

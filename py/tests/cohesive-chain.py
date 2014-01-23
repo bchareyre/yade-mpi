@@ -10,7 +10,6 @@ import random
 from yade.wrapper import *
 from yade._customConverters import *
 from yade import utils
-from yade import *
 from math import *
 
 try:

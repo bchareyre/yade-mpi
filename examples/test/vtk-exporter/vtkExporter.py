@@ -1,4 +1,3 @@
-from yade import *
 from yade import export
 
 O.bodies.append([

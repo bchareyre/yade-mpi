@@ -1,4 +1,4 @@
-from yade import *
+
 readParamsFromTable(unknownOk=True,
 	important=6,
 	unimportant='foo',
