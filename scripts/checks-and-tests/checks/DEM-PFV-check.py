@@ -23,7 +23,8 @@ else:
 	wallIds=O.bodies.append(walls)
 
 	sp=pack.SpherePack()
-	#sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95,seed=1) #"seed" is not enough for portable determinism it seems, let us use a data file
+	sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95,seed=0) #"seed" is not enough for portable determinism it seems, let us use a data file
+	checksPath="/home/3S-LAB/bchareyre/yade/yade-git/trunk/scripts/checks-and-tests/checks"
 	sp.load(checksPath+'/data/100spheres')
 
 	sp.toSimulation(material='spheres')
@@ -101,8 +102,8 @@ else:
 	Qout = flow.getBoundaryFlux(3)
 	permeability = abs(Qin)/1.e-4 #size is one, we compute K=V/∇H
 
-	if abs(Qin+Qout)>1e-15 :
-		print "DEM-PFV: unbalanced Qin vs. Qout"
+	if abs(Qin+Qout)>1e-10 :
+		print "DEM-PFV: unbalanced Qin vs. Qout (",Qin," vs. ",Qout,")"
 		errors+=1
 
 	target=0.040399916554
