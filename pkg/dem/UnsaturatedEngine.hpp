@@ -29,8 +29,10 @@ class UnsaturatedEngine : public PartialEngine
 	typedef RTriangulation::Vertex_handle					Vertex_handle;
 	typedef RTriangulation::Point						CGALSphere;
 	typedef CGALSphere::Point						Point;
-
 	
+	typedef std::vector<Cell_handle>					Vector_Cell;
+	typedef typename Vector_Cell::iterator					VCell_iterator;
+
 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
@@ -118,6 +120,11 @@ class UnsaturatedEngine : public PartialEngine
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 
+		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined		
+		TPL void computeFacetForcesWithCache(Solver& flow, bool onlyCache=false);
+		vector< vector<const CGT::Vecteur*> > perVertexUnitForce;
+		vector< vector<const Real*> > perVertexPressure;
+		
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
@@ -141,12 +148,13 @@ class UnsaturatedEngine : public PartialEngine
  		void		_savePoreBodyInfo(){savePoreBodyInfo(solver);}
  		void		_savePoreThroatInfo(){savePoreThroatInfo(solver);}
  		void		_debugTemp(){debugTemp(solver);}
-
 		virtual ~UnsaturatedEngine();
 
 		virtual void action();
 
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(UnsaturatedEngine,PartialEngine,"Preliminary version engine of a model for unsaturated soils",
+// 					((bool,drainageActivated,true,,"Activate drainage"))//use later
+// 					((bool,imbibitionActivated,true,,"Activate imbibition"))//use later					
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool, Debug, false,,"Activate debug messages"))
 					((double, wall_thickness,0.001,,"Walls thickness"))

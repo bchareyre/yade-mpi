@@ -350,7 +350,7 @@ double UnsaturatedEngine::computeEffPoreRadiusNormal(Cellhandle cell, int j)
     }
 }
 
-template<class Cellhandle>//waiting check
+template<class Cellhandle>
 double UnsaturatedEngine::bisection(Cellhandle cell, int j, double a, double b)
 {
     double m = 0.5*(a+b);
@@ -881,7 +881,7 @@ template<class Solver>
 Real UnsaturatedEngine::getSaturation (Solver& flow )
 {
     updateAirReservoir(flow);
-//     updateWaterReservoir(flow);    
+    updateWaterReservoir(flow);    
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Real capillary_volume = 0.0; //total capillary volume
     Real air_volume = 0.0; 	//air volume
@@ -1346,6 +1346,103 @@ void UnsaturatedEngine::debugTemp(Solver& flow)
     file.close();
 }*/
 //----------end tempt function for Vahid Joekar-Niasar's data (clear later)---------------------
+
+template <class Solver> 
+void UnsaturatedEngine::computeFacetForcesWithCache(Solver& flow, bool onlyCache)
+{
+	RTriangulation& Tri = flow->T[currentTes].Triangulation();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	CGT::Vecteur nullVect(0,0,0);
+	//reset forces
+	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
+
+	#ifdef parallel_forces
+	if (noCache) {
+		perVertexUnitForce.clear(); perVertexPressure.clear();
+// 		vector<const Vecteur*> exf; exf.reserve(20);
+// 		vector<const Real*> exp; exp.reserve(20);
+		perVertexUnitForce.resize(Tri.number_of_vertices());
+		perVertexPressure.resize(Tri.number_of_vertices());}
+	#endif
+
+	Cell_handle neighbour_cell;
+	Vertex_handle mirror_vertex;
+	CGT::Vecteur tempVect;
+	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
+	if (noCache) {for (VCell_iterator cell_it=flow->T[currentTes].cellHandles.begin(); cell_it!=flow->T[currentTes].cellHandles.end(); cell_it++){
+// 	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+			Cell_handle& cell = *cell_it;
+			//reset cache
+			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
+
+			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
+					neighbour_cell = cell->neighbor(j);
+					const CGT::Vecteur& Surfk = cell->info().facetSurfaces[j];
+					//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
+					//The ratio void surface / facet surface
+					Real area = sqrt(Surfk.squared_length()); if (area<=0) cerr <<"AREA <= 0!!"<<endl;
+					CGT::Vecteur facetNormal = Surfk/area;
+					const std::vector<CGT::Vecteur>& crossSections = cell->info().facetSphereCrossSections;
+					CGT::Vecteur fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
+					/// handle fictious vertex since we can get the projected surface easily here
+					if (cell->vertex(j)->info().isFictious) {
+						Real projSurf=abs(Surfk[flow->boundary(cell->vertex(j)->info().id()).coordinate]);
+						tempVect=-projSurf*flow->boundary(cell->vertex(j)->info().id()).normal;
+						cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
+						//define the cached value for later use with cache*p
+						cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+					}
+					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
+					CGT::Vecteur Facet_Unit_Force = -fluidSurfk*cell->info().solidLine[j][3];
+					CGT::Vecteur Facet_Force = cell->info().p()*cell->info().poreRadius[j]*Facet_Unit_Force;
+					
+					
+					for (int y=0; y<3;y++) {
+						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidLine[j][y];
+						//add to cached value
+						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+Facet_Unit_Force*cell->info().solidLine[j][y];
+						//uncomment to get total force / comment to get only pore tension forces
+						if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
+							cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
+							//add to cached value
+							cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
+						}
+					}
+					#ifdef parallel_forces
+					perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
+					perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
+					#endif
+			}
+		}
+		noCache=false;//cache should always be defined after execution of this function
+		if (onlyCache) return;
+	} else {//use cached values
+		#ifndef parallel_forces
+		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
+			
+		#else
+		#pragma omp parallel for num_threads(ompThreads)
+		for (int vn=0; vn<= flow->T[currentTes].max_id; vn++) {
+			Vertex_handle& v = flow->T[currentTes].vertexHandles[vn];
+// 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v){
+			const int& id =  v->info().id();
+			CGT::Vecteur tf (0,0,0);
+			int k=0;
+			for (vector<const Real*>::iterator c = perVertexPressure[id].begin(); c != perVertexPressure[id].end(); c++)
+				tf = tf + (*(perVertexUnitForce[id][k++]))*(**c);
+			v->info().forces = tf;
+		}
+		#endif
+	}
+	if (flow->DEBUG_OUT) {
+		CGT::Vecteur TotalForce = nullVect;
+		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
+			if (!v->info().isFictious) TotalForce = TotalForce + v->info().forces;
+			else if (flow->boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;	}
+		cout << "TotalForce = "<< TotalForce << endl;}
+}
+
 YADE_PLUGIN ( ( UnsaturatedEngine ) );
 
 #endif //FLOW_ENGINE
