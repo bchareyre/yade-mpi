@@ -300,7 +300,7 @@ double UnsaturatedEngine::computeEffPoreRadius(Cellhandle cell, int j)
     case (2) : { return rInscribe; }; break;    
   }   
 }
-template<class Cellhandle>
+template<class Cellhandle>//seperate rmin=getMinPoreRadius(cell,j) later;
 double UnsaturatedEngine::computeEffPoreRadiusNormal(Cellhandle cell, int j)
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -335,12 +335,10 @@ double UnsaturatedEngine::computeEffPoreRadiusNormal(Cellhandle cell, int j)
     }
     else if(deltaForce_rMin<0) {
         double effPoreRadius = bisection(cell,j,rmin,rmax);// cerr<<"1";//we suppose most cases should be this.
-// 	double deltaF=computeDeltaForce(cell,j,effPoreRadius);cerr<<"deltaForce_rMin: "<<deltaForce_rMin<<" deltaForce_rMax: "<<deltaForce_rMax<<" deltaF: "<<deltaF<<endl;//test rMin<R<rMax ?
         return effPoreRadius;
     }
     else if( (deltaForce_rMin>0) && (deltaForce_rMin<deltaForce_rMax) ) {
         double EffPoreRadius = rmin;// cerr<<"2";
-// 	cerr<<"posA: "<<posA<<" rA: "<<rA<<" posB: "<<posB<<" rB: "<<rB<<" posC: "<<posC<<" rC: "<<rC<<endl;
         return EffPoreRadius;
     }
     else if(deltaForce_rMin>deltaForce_rMax) {
@@ -388,12 +386,7 @@ double UnsaturatedEngine::computeDeltaForce(Cellhandle cell,int j, double rcap)
     double rAB = 0.5*(AB-rA-rB); if (rAB<0) { rAB=0; }
     double rBC = 0.5*(BC-rB-rC); if (rBC<0) { rBC=0; }
     double rAC = 0.5*(AC-rA-rC); if (rAC<0) { rAC=0; }
-/*
-    double Area_ABC = 0.5 * ((posB-posA).cross(posC-posA)).norm();
-    double Area_SolidA = 0.5*A*pow(rA,2);//??Area for boundary ERROR ?? FIXME
-    double Area_SolidB = 0.5*B*pow(rB,2);
-    double Area_SolidC = 0.5*C*pow(rC,2);
-*/
+
     //In triangulation ArB,rcap is the radius of sphere r; 
     double _AB = (pow((rA+rcap),2)+pow(AB,2)-pow((rB+rcap),2))/(2*(rA+rcap)*AB); if(_AB>1.0) {_AB=1.0;} if(_AB<-1.0) {_AB=-1.0;}
     double alphaAB = acos(_AB);
@@ -401,7 +394,7 @@ double UnsaturatedEngine::computeDeltaForce(Cellhandle cell,int j, double rcap)
     double alphaBA = acos(_BA);
     double _ArB = (pow((rA+rcap),2)+pow((rB+rcap),2)-pow(AB,2))/(2*(rA+rcap)*(rB+rcap)); if(_ArB>1.0) {_ArB=1.0;} if(_ArB<-1.0) {_ArB=-1.0;}
     double alphaArB = acos(_ArB);
-//     double D1=alphaAB + alphaBA + alphaArB; cerr<<D<<" ";
+    
     double length_liquidAB = alphaArB*rcap;
     double AreaArB = 0.5*(rA+rcap)*(rB+rcap)*sin(alphaArB);
     double Area_liquidAB = AreaArB-0.5*alphaAB*pow(rA,2)-0.5*alphaBA*pow(rB,2)-0.5*alphaArB*pow(rcap,2);
@@ -412,7 +405,7 @@ double UnsaturatedEngine::computeDeltaForce(Cellhandle cell,int j, double rcap)
     double alphaCA = acos(_CA);
     double _ArC = (pow((rA+rcap),2)+pow((rC+rcap),2)-pow(AC,2))/(2*(rA+rcap)*(rC+rcap)); if(_ArC>1.0) {_ArC=1.0;} if(_ArC<-1.0) {_ArC=-1.0;}
     double alphaArC = acos(_ArC);
-//     double D2=alphaAC + alphaCA + alphaArC; cerr<<D<<" ";
+
     double length_liquidAC = alphaArC*rcap;
     double AreaArC = 0.5*(rA+rcap)*(rC+rcap)*sin(alphaArC);
     double Area_liquidAC = AreaArC-0.5*alphaAC*pow(rA,2)-0.5*alphaCA*pow(rC,2)-0.5*alphaArC*pow(rcap,2);
@@ -423,20 +416,20 @@ double UnsaturatedEngine::computeDeltaForce(Cellhandle cell,int j, double rcap)
     double alphaCB = acos(_CB);
     double _BrC = (pow((rB+rcap),2)+pow((rC+rcap),2)-pow(BC,2))/(2*(rB+rcap)*(rC+rcap)); if(_BrC>1.0) {_BrC=1.0;} if(_BrC<-1.0) {_BrC=-1.0;}
     double alphaBrC = acos(_BrC);
-//     double D3=alphaBC + alphaCB + alphaBrC; cerr<<D<<" ";    
+
     double length_liquidBC = alphaBrC*rcap;
     double AreaBrC = 0.5*(rB+rcap)*(rC+rcap)*sin(alphaBrC);
     double Area_liquidBC = AreaBrC-0.5*alphaBC*pow(rB,2)-0.5*alphaCB*pow(rC,2)-0.5*alphaBrC*pow(rcap,2);
 
     double areaCap = sqrt(cell->info().facetSurfaces[j].squared_length()) * cell->info().facetFluidSurfacesRatio[j];
     double areaPore = areaCap - Area_liquidAB - Area_liquidAC - Area_liquidBC;
+    
+    //FIXME:rethink here,areaPore Negative, Flat facets, do nothing ?
     if(areaPore<0) {cerr<<"areaPore Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;}
-    //areaPore Negative, Flat facets, do nothing here ?
     double perimeterPore = length_liquidAB + length_liquidAC + length_liquidBC + (A - alphaAB - alphaAC)*rA + (B - alphaBA - alphaBC)*rB + (C - alphaCA - alphaCB)*rC;
     if(perimeterPore<0) {cerr<<"perimeterPore Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;}
-//     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-//     double deltaForce = surface_tension*perimeterPore - areaPore*(surface_tension/rcap);
-    double deltaForce = perimeterPore - areaPore/rcap;
+
+    double deltaForce = perimeterPore - areaPore/rcap;//deltaForce=surfaceTension*(perimeterPore - areaPore/rcap)
     return deltaForce;
 }
 
@@ -458,35 +451,6 @@ void UnsaturatedEngine::BoundaryConditions ( Solver& flow )
                 flow->boundary (wallIds[k]).velocity = boundaryVelocity[k];//FIXME: needs correct implementation, maybe update the cached pos/vel?
 	}
 }
-
-// template<class Solver>
-// void UnsaturatedEngine::BoundaryConditions ( Solver& flow )
-// {
-//         if ( flow->y_min_id>=0 ) {
-//                 flow->boundary ( flow->y_min_id ).flowCondition=Flow_imposed_BOTTOM_Boundary;
-//                 flow->boundary ( flow->y_min_id ).value=Pressure_BOTTOM_Boundary;
-//         }
-//         if ( flow->y_max_id>=0 ) {
-//                 flow->boundary ( flow->y_max_id ).flowCondition=Flow_imposed_TOP_Boundary;
-//                 flow->boundary ( flow->y_max_id ).value=Pressure_TOP_Boundary;
-//         }
-//         if ( flow->x_max_id>=0 ) {
-//                 flow->boundary ( flow->x_max_id ).flowCondition=Flow_imposed_RIGHT_Boundary;
-//                 flow->boundary ( flow->x_max_id ).value=Pressure_RIGHT_Boundary;
-//         }
-//         if ( flow->x_min_id>=0 ) {
-//                 flow->boundary ( flow->x_min_id ).flowCondition=Flow_imposed_LEFT_Boundary;
-//                 flow->boundary ( flow->x_min_id ).value=Pressure_LEFT_Boundary;
-//         }
-//         if ( flow->z_max_id>=0 ) {
-//                 flow->boundary ( flow->z_max_id ).flowCondition=Flow_imposed_FRONT_Boundary;
-//                 flow->boundary ( flow->z_max_id ).value=Pressure_FRONT_Boundary;
-//         }
-//         if ( flow->z_min_id>=0 ) {
-//                 flow->boundary ( flow->z_min_id ).flowCondition=Flow_imposed_BACK_Boundary;
-//                 flow->boundary ( flow->z_min_id ).value=Pressure_BACK_Boundary;
-//         }
-// }
 
 template<class Solver>
 void UnsaturatedEngine::initSolver ( Solver& flow )
@@ -613,82 +577,6 @@ void UnsaturatedEngine::AddBoundary ( Solver& flow )
                 }
         }
 }
-
-/*template<class Solver>
-void UnsaturatedEngine::AddBoundary ( Solver& flow )
-{
-	vector<posData>& buffer = positionBufferCurrent;
-        solver->x_min = Mathr::MAX_REAL, solver->x_max = -Mathr::MAX_REAL, solver->y_min = Mathr::MAX_REAL, solver->y_max = -Mathr::MAX_REAL, solver->z_min = Mathr::MAX_REAL, solver->z_max = -Mathr::MAX_REAL;
-        FOREACH ( const posData& b, buffer ) {
-                if ( !b.exists ) continue;
-                if ( b.isSphere ) {
-                        const Real& rad = b.radius;
-                        const Real& x = b.pos[0];
-                        const Real& y = b.pos[1];
-                        const Real& z = b.pos[2];
-                        flow->x_min = min ( flow->x_min, x-rad );
-                        flow->x_max = max ( flow->x_max, x+rad );
-                        flow->y_min = min ( flow->y_min, y-rad );
-                        flow->y_max = max ( flow->y_max, y+rad );
-                        flow->z_min = min ( flow->z_min, z-rad );
-                        flow->z_max = max ( flow->z_max, z+rad );
-                }
-        }
-	//FIXME id_offset must be set correctly, not the case here (always 0), then we need walls first or it will fail
-        id_offset = flow->T[flow->currentTes].max_id+1;
-        flow->id_offset = id_offset;
-        flow->SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
-        flow->Vtotale = ( flow->x_max-flow->x_min ) * ( flow->y_max-flow->y_min ) * ( flow->z_max-flow->z_min );
-        flow->y_min_id=wallBottomId;
-        flow->y_max_id=wallTopId;
-        flow->x_max_id=wallRightId;
-        flow->x_min_id=wallLeftId;
-        flow->z_min_id=wallBackId;
-        flow->z_max_id=wallFrontId;
-
-        if ( flow->y_min_id>=0 ) flow->boundary ( flow->y_min_id ).useMaxMin = BOTTOM_Boundary_MaxMin;
-        if ( flow->y_max_id>=0 ) flow->boundary ( flow->y_max_id ).useMaxMin = TOP_Boundary_MaxMin;
-        if ( flow->x_max_id>=0 ) flow->boundary ( flow->x_max_id ).useMaxMin = RIGHT_Boundary_MaxMin;
-        if ( flow->x_min_id>=0 ) flow->boundary ( flow->x_min_id ).useMaxMin = LEFT_Boundary_MaxMin;
-        if ( flow->z_max_id>=0 ) flow->boundary ( flow->z_max_id ).useMaxMin = FRONT_Boundary_MaxMin;
-        if ( flow->z_min_id>=0 ) flow->boundary ( flow->z_min_id ).useMaxMin = BACK_Boundary_MaxMin;
-
-        //FIXME: Id's order in boundsIds is done according to the enumeration of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
-        flow->boundsIds[0]= &flow->x_min_id;
-        flow->boundsIds[1]= &flow->x_max_id;
-        flow->boundsIds[2]= &flow->y_min_id;
-        flow->boundsIds[3]= &flow->y_max_id;
-        flow->boundsIds[4]= &flow->z_min_id;
-        flow->boundsIds[5]= &flow->z_max_id;
-
-        flow->Corner_min = CGT::Point ( flow->x_min, flow->y_min, flow->z_min );
-        flow->Corner_max = CGT::Point ( flow->x_max, flow->y_max, flow->z_max );
-
-        if ( Debug ) {
-                cout << "Section area = " << flow->SectionArea << endl;
-                cout << "Vtotale = " << flow->Vtotale << endl;
-                cout << "x_min = " << flow->x_min << endl;
-                cout << "x_max = " << flow->x_max << endl;
-                cout << "y_max = " << flow->y_max << endl;
-                cout << "y_min = " << flow->y_min << endl;
-                cout << "z_min = " << flow->z_min << endl;
-                cout << "z_max = " << flow->z_max << endl;
-                cout << endl << "Adding Boundary------" << endl;
-        }
-        //assign BCs types and values
-        BoundaryConditions ( flow );
-
-        double center[3];
-        for ( int i=0; i<6; i++ ) {
-                if ( *flow->boundsIds[i]<0 ) continue;
-                CGT::Vecteur Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
-                if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->AddBoundingPlane ( true, Normal, *flow->boundsIds[i],5000.0 );
-                else {
-			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow->boundsIds[i]].pos[h];
-                        flow->AddBoundingPlane ( center, wall_thickness, Normal,*flow->boundsIds[i],5000.0 );
-                }
-        }
-}*/
 
 template<class Solver>
 void UnsaturatedEngine::Triangulate ( Solver& flow )
@@ -1066,7 +954,6 @@ void UnsaturatedEngine::saveListAdjCellsTopBound(Solver& flow)
 	file << "Cell_ID"<<"	Cell_Pressure"<<"	isWaterReservoir"<<endl;
         for ( it ; it != flow->boundingCells[3].end(); it++) {
             if ((*it)->info().index == 0) continue;
-// 	  cerr << (*it)->info().index << " ";
             file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isWaterReservoir<< endl;
         }
         file.close();
@@ -1136,7 +1023,6 @@ void UnsaturatedEngine::debugTemp(Solver& flow)
 {
     ofstream file;
     file.open("bugTemp.txt");
-//     file<<"cellID   "<<"deltaForce  "<<"inscribeRadius*PI*tension  "<<endl;
     Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
     for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
@@ -1323,32 +1209,10 @@ void UnsaturatedEngine::savePoreThroatInfo(Solver& flow)
     }
     file.close();  
 }
-
-/*template<class Solver>//test computeDeltaForce function
-void UnsaturatedEngine::debugTemp(Solver& flow)
-{
-    double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-    ofstream file;
-    file.open("bug.txt");
-//     file<<"cellID   "<<"deltaForce  "<<"inscribeRadius*PI*tension  "<<endl;
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
-	double rmax0= abs(solver->Compute_EffectiveRadius(cell, 0));double D0=rmax0*Mathr::PI ;
-	double rmax1= abs(solver->Compute_EffectiveRadius(cell, 1));double D1=rmax1*Mathr::PI ;
-	double rmax2= abs(solver->Compute_EffectiveRadius(cell, 2));double D2=rmax2*Mathr::PI ;
-	double rmax3= abs(solver->Compute_EffectiveRadius(cell, 3));double D3=rmax3*Mathr::PI ;
-	file << cell->info().index << "  " <<computeDeltaForce(cell,0,rmax0)<<"  "<<D0<<endl;
-	file << cell->info().index << "  " <<computeDeltaForce(cell,1,rmax1)<<"  "<<D1<<endl;
-	file << cell->info().index << "  " <<computeDeltaForce(cell,2,rmax2)<<"  "<<D2<<endl;
-	file << cell->info().index << "  " <<computeDeltaForce(cell,3,rmax3)<<"  "<<D3<<endl;
-    }
-    file.close();
-}*/
 //----------end tempt function for Vahid Joekar-Niasar's data (clear later)---------------------
 
 template <class Solver> 
-void UnsaturatedEngine::computeFacetForcesWithCache(Solver& flow, bool onlyCache)
+void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache)
 {
 	RTriangulation& Tri = flow->T[currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
@@ -1394,7 +1258,7 @@ void UnsaturatedEngine::computeFacetForcesWithCache(Solver& flow, bool onlyCache
 					}
 					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
 					CGT::Vecteur Facet_Unit_Force = -fluidSurfk*cell->info().solidLine[j][3];
-					CGT::Vecteur Facet_Force = cell->info().p()*cell->info().poreRadius[j]*Facet_Unit_Force;
+					CGT::Vecteur Facet_Force = cell->info().p()*Facet_Unit_Force;
 					
 					
 					for (int y=0; y<3;y++) {

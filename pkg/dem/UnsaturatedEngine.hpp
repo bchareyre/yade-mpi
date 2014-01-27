@@ -46,7 +46,6 @@ class UnsaturatedEngine : public PartialEngine
 		void testFunction();
 
 	public :
-// 		enum {wall_left=0, wall_right, wall_bottom, wall_top, wall_back, wall_front};
 		enum {wall_xmin, wall_xmax, wall_ymin, wall_ymax, wall_zmin, wall_zmax};		
 		Vector3r normal [6];
 		bool currentTes;
@@ -121,7 +120,7 @@ class UnsaturatedEngine : public PartialEngine
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined		
-		TPL void computeFacetForcesWithCache(Solver& flow, bool onlyCache=false);
+		TPL void computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache=false);
 		vector< vector<const CGT::Vecteur*> > perVertexUnitForce;
 		vector< vector<const Real*> > perVertexPressure;
 		
@@ -162,30 +161,6 @@ class UnsaturatedEngine : public PartialEngine
 					((double,gasPressure,0,,"Invasion pressure"))
 					((double,surfaceTension,0.0728,,"Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 					((double, porosity, 0,,"Porosity computed at each retriangulation"))
-// 					((bool, Flow_imposed_TOP_Boundary, true,, "if false involve pressure imposed condition"))
-// 					((bool, Flow_imposed_BOTTOM_Boundary, true,, "if false involve pressure imposed condition"))
-// 					((bool, Flow_imposed_FRONT_Boundary, true,, "if false involve pressure imposed condition"))
-// 					((bool, Flow_imposed_BACK_Boundary, true,, "if false involve pressure imposed condition"))
-// 					((bool, Flow_imposed_LEFT_Boundary, true,, "if false involve pressure imposed condition"))
-// 					((bool, Flow_imposed_RIGHT_Boundary, true,,"if false involve pressure imposed condition"))
-// 					((double, Pressure_TOP_Boundary, 0,, "Pressure imposed on top boundary"))
-// 					((double, Pressure_BOTTOM_Boundary,  0,, "Pressure imposed on bottom boundary"))
-// 					((double, Pressure_FRONT_Boundary,  0,, "Pressure imposed on front boundary"))
-// 					((double, Pressure_BACK_Boundary,  0,,"Pressure imposed on back boundary"))
-// 					((double, Pressure_LEFT_Boundary,  0,, "Pressure imposed on left boundary"))
-// 					((double, Pressure_RIGHT_Boundary,  0,, "Pressure imposed on right boundary"))
-// 					((int, wallTopId,3,,"Id of top boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-// 					((int, wallBottomId,2,,"Id of bottom boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-// 					((int, wallFrontId,5,,"Id of front boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-// 					((int, wallBackId,4,,"Id of back boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-// 					((int, wallLeftId,0,,"Id of left boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-// 					((int, wallRightId,1,,"Id of right boundary (default value is ok if aabbWalls are appended BEFORE spheres.)"))
-// 					((bool, BOTTOM_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-// 					((bool, TOP_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-// 					((bool, RIGHT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-// 					((bool, LEFT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-// 					((bool, FRONT_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-// 					((bool, BACK_Boundary_MaxMin, 1,,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
 					((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
 					((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
 					((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
@@ -196,10 +171,11 @@ class UnsaturatedEngine : public PartialEngine
 					((vector<bool>, bndCondIsPressure, vector<bool>(6,false),,"defines the type of boundary condition for each side. True if pressure is imposed, False for no-flux. Indexes can be retrieved with :yref:`FlowEngine::xmin` and friends."))
 					((vector<double>, bndCondValue, vector<double>(6,0),,"Imposed value of a boundary condition. Only applies if the boundary condition is imposed pressure, else the imposed flux is always zero presently (may be generalized to non-zero imposed fluxes in the future)."))
 					//FIXME: to be implemented:
-
 					((vector<Vector3r>, boundaryVelocity, vector<Vector3r>(6,Vector3r::Zero()),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
 					((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
 					((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))					
+
+					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
 					,
 					/*deprec*/
 					,,
