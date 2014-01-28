@@ -601,8 +601,8 @@ class VTKExporter:
 		outFile.write('\nCELL_TYPES 1\n12\n')
 		outFile.close()
 
-	def exportPolyhedra(self,ids='all',what=[],comment="comment",numLabel=None,useRef=False):
-		"""exports polyhedrons and defined properties.
+	def exportPolyhedra(self,ids='all',what=[],comment="comment",numLabel=None):
+		"""Exports polyhedrons and defined properties.
 
 		:param ids: if "all", then export all polyhedrons, otherwise only polyhedrons from integer list
 		:type ids: [int] | "all"
@@ -610,8 +610,8 @@ class VTKExporter:
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
-		:param bool useRef: if False (default), use current position of the polyhedrons for export, use reference position otherwise
 		"""
+		# TODO useRef?
 		allIds = False
 		if ids=='all':
 			ids=xrange(len(O.bodies))
@@ -626,7 +626,14 @@ class VTKExporter:
 			bodies.append(b)
 		n = len(bodies)
 		nVertices = sum(len(b.shape.v) for b in bodies)
-		nFaces = sum(len(b.shape.GetSurfaceTriangulation()) for b in bodies)/3
+		bodyFaces = []
+		for b in bodies:
+			ff = []
+			f = b.shape.GetSurfaceTriangulation()
+			for i in xrange(len(f)/3):
+				ff.append([f[3*i+j] for j in (0,1,2)])
+			bodyFaces.append(ff)
+		nFaces = sum(len(f) for f in bodyFaces)
 		fName = self.baseName+'-polyhedra-%04d'%(numLabel if numLabel else self.polyhedraSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nVertices))
@@ -638,29 +645,34 @@ class VTKExporter:
 				outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		outFile.write("\nPOLYGONS %d %d\n"%(nFaces,4*nFaces))
 		j = 0
-		for b in bodies:
-			f = b.shape.GetSurfaceTriangulation()
-			nf = len(f)/3
-			for i in xrange(nf):
-				t = tuple([j+f[3*i+k] for k in (0,1,2)])
+		for i,b in enumerate(bodies):
+			faces = bodyFaces[i]
+			for face in faces:
+				t = tuple([j+ii for ii in face])
 				outFile.write("3 %d %d %d\n"%t)
 			j += len(b.shape.v)
-		for iii in []:# name,command in what:
+		if what:
+			outFile.write("\nCELL_DATA %d"%(nFaces))
+		for name,command in what:
 			test = eval(command)
 			if isinstance(test,Matrix3):
 				outFile.write("\nTENSORS %s double\n"%(name))
-				for b in bodies:
+				for i,b in enumerate(bodies):
 					t = eval(command)
-					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+					for f in bodyFaces[i]:
+						outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
 			elif isinstance(test,Vector3):
 				outFile.write("\nVECTORS %s double\n"%(name))
-				for b in bodies:
+				for i,b in enumerate(bodies):
 					v = eval(command)
-					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+					for f in bodyFaces[i]:
+						outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
 			elif isinstance(test,(int,float)):
 				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
-				for b in bodies:
-					outFile.write("%g\n"%(eval(command)))
+				for i,b in enumerate(bodies):
+					e = eval(command)
+					for f in bodyFaces[i]:
+						outFile.write("%g\n"%e)
 			else:
 				print 'WARNING: export.VTKExporter.exportPolyhedra: wrong `what` parameter, vtk output might be corrupted'
 		outFile.close()
