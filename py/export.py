@@ -270,6 +270,7 @@ class VTKExporter:
 		self.spheresSnapCount = startSnap
 		self.facetsSnapCount = startSnap
 		self.intrsSnapCount = startSnap
+		self.polyhedraSnapCount = startSnap
 		self.baseName = baseName
 
 	def exportSpheres(self,ids='all',what=[],comment="comment",numLabel=None,useRef=False):
@@ -277,7 +278,7 @@ class VTKExporter:
 
 		:param ids: if "all", then export all spheres, otherwise only spheres from integer list
 		:type ids: [int] | "all"
-		:param what: what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
+		:param what: what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
@@ -465,7 +466,7 @@ class VTKExporter:
 
 		:param ids: if "all", then export all spheres, otherwise only spheres from integer list
 		:type ids: [int] | "all"
-		:param what: what to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Node that the interactions are labeled as i in this function. Scalar, vector and tensor variables are supported. For example, to export stiffness difference from certain value (1e9) (named as dStiff) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
+		:param what: what to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the interactions are labeled as i in this function. Scalar, vector and tensor variables are supported. For example, to export stiffness difference from certain value (1e9) (named as dStiff) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
@@ -487,29 +488,31 @@ class VTKExporter:
 		for j,i in enumerate(intrs):
 			outFile.write("2 %d %d\n"%(i[0]+1,i[1]+1))
 		outFile.write("\nCELL_DATA %d\n"%(n))
+		i = None
 		for i in O.interactions:
 			if i.isReal: break
-		for name,command in what:
-			test = eval(command)
-			if isinstance(test,Matrix3):
-				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, Matrix3 output not (yet?) supported'
-				#outFile.write("\nTENSORS %s double\n"%(name))
-				#for i in intrs:
-				#	t = eval(command)
-				#	outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
-			elif isinstance(test,Vector3):
-				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, Vector3 output not (yet?) supported'
-				#outFile.write("\nVECTORS %s double\n"%(name))
-				#for i in intrs:
-				#	v = eval(command)
-				#	outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
-			elif isinstance(test,(int,float)):
-				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
-				for ii,jj in ids:
-					i = O.interactions[ii,jj]
-					outFile.write("%g\n"%(eval(command)))
-			else:
-				print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
+		if i:
+			for name,command in what:
+				test = eval(command)
+				if isinstance(test,Matrix3):
+					print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, Matrix3 output not (yet?) supported'
+					#outFile.write("\nTENSORS %s double\n"%(name))
+					#for i in intrs:
+					#	t = eval(command)
+					#	outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+				elif isinstance(test,Vector3):
+					print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, Vector3 output not (yet?) supported'
+					#outFile.write("\nVECTORS %s double\n"%(name))
+					#for i in intrs:
+					#	v = eval(command)
+					#	outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+				elif isinstance(test,(int,float)):
+					outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
+					for ii,jj in ids:
+						i = O.interactions[ii,jj]
+						outFile.write("%g\n"%(eval(command)))
+				else:
+					print 'WARNING: export.VTKExporter.exportInteractions: wrong `what` parameter, vtk output might be corrupted'
 		if verticesWhat:
 			outFile.write("\nPOINT_DATA %d\n"%(2*n))
 			b = b1 = b2 = O.bodies[0]
@@ -598,6 +601,72 @@ class VTKExporter:
 		outFile.write('\nCELL_TYPES 1\n12\n')
 		outFile.close()
 
+	def exportPolyhedra(self,ids='all',what=[],comment="comment",numLabel=None,useRef=False):
+		"""exports polyhedrons and defined properties.
+
+		:param ids: if "all", then export all polyhedrons, otherwise only polyhedrons from integer list
+		:type ids: [int] | "all"
+		:param what: what other than then position to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
+		:type what: [tuple(2)]
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		:param bool useRef: if False (default), use current position of the polyhedrons for export, use reference position otherwise
+		"""
+		allIds = False
+		if ids=='all':
+			ids=xrange(len(O.bodies))
+			allIds = True
+		bodies = []
+		for i in ids:
+			b = O.bodies[i]
+			if not b: continue
+			if b.shape.__class__.__name__!="Polyhedra":
+				if not allIds: print "Warning: body %d is not Polyhedra"%(i)
+				continue
+			bodies.append(b)
+		n = len(bodies)
+		nVertices = sum(len(b.shape.v) for b in bodies)
+		nFaces = sum(len(b.shape.GetSurfaceTriangulation()) for b in bodies)/3
+		fName = self.baseName+'-polyhedra-%04d'%(numLabel if numLabel else self.polyhedraSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nVertices))
+		for b in bodies:
+			bPos = b.state.pos
+			bOri = b.state.ori
+			for v in b.shape.v:
+				pos = bPos + bOri*v
+				outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
+		outFile.write("\nPOLYGONS %d %d\n"%(nFaces,4*nFaces))
+		j = 0
+		for b in bodies:
+			f = b.shape.GetSurfaceTriangulation()
+			nf = len(f)/3
+			for i in xrange(nf):
+				t = tuple([j+f[3*i+k] for k in (0,1,2)])
+				outFile.write("3 %d %d %d\n"%t)
+			j += len(b.shape.v)
+		for iii in []:# name,command in what:
+			test = eval(command)
+			if isinstance(test,Matrix3):
+				outFile.write("\nTENSORS %s double\n"%(name))
+				for b in bodies:
+					t = eval(command)
+					outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+			elif isinstance(test,Vector3):
+				outFile.write("\nVECTORS %s double\n"%(name))
+				for b in bodies:
+					v = eval(command)
+					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+			elif isinstance(test,(int,float)):
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
+				for b in bodies:
+					outFile.write("%g\n"%(eval(command)))
+			else:
+				print 'WARNING: export.VTKExporter.exportPolyhedra: wrong `what` parameter, vtk output might be corrupted'
+		outFile.close()
+		self.polyhedraSnapCount += 1
+
+	
 
 
 #gmshGeoExport===============================================================
