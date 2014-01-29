@@ -84,6 +84,7 @@ class Network
 		double surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3);
 		double surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3);
 		
+		void Line_Solid_Pore( Cell_handle cell, int j);
 		void Line_Solid_Pore( Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData=false);
 		double Line_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3);
 

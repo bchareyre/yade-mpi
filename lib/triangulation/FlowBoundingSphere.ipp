@@ -94,7 +94,9 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	computedOnce=false;
 	minKdivKmean=0.0001;
 	maxKdivKmean=100.;
+	#ifdef parallel_forces
 	ompThreads=1;
+	#endif 
 	errorCode=0;
 }
 

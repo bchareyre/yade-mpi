@@ -87,6 +87,14 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void savePoreBodyInfo(Solver& flow);
 		TPL void savePoreThroatInfo(Solver& flow);
 		TPL void debugTemp(Solver& flow);
+		
+		TPL void vertxID(Solver& flow);
+		TPL void testSolidLine(Solver& flow);
+		TPL void computeSolidLine(Solver& flow);
+		TPL void computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache=false);
+		
+		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
+			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 
 		template<class Cellhandle >
 		double getRadiusMin(Cellhandle cell, int j);
@@ -119,11 +127,6 @@ class UnsaturatedEngine : public PartialEngine
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
 
-		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined		
-		TPL void computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache=false);
-		vector< vector<const CGT::Vecteur*> > perVertexUnitForce;
-		vector< vector<const Real*> > perVertexPressure;
-		
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
@@ -147,6 +150,11 @@ class UnsaturatedEngine : public PartialEngine
  		void		_savePoreBodyInfo(){savePoreBodyInfo(solver);}
  		void		_savePoreThroatInfo(){savePoreThroatInfo(solver);}
  		void		_debugTemp(){debugTemp(solver);}
+ 		void		_computeFacetPoreForcesWithCache(){computeFacetPoreForcesWithCache(solver);}
+ 		void		_vertxID(){vertxID(solver);}
+ 		void		_testSolidLine(){testSolidLine(solver);}
+		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
+ 		
 		virtual ~UnsaturatedEngine();
 
 		virtual void action();
@@ -215,6 +223,10 @@ class UnsaturatedEngine : public PartialEngine
 					.def("debugTemp",&UnsaturatedEngine::_debugTemp,"debug temp file.")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
 					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2,water can be trapped in cells) ")
+					.def("computeForce",&UnsaturatedEngine::_computeFacetPoreForcesWithCache,"Test computeFacetPoreForcesWithCache(). ")
+					.def("vertxID",&UnsaturatedEngine::_vertxID,"cout vertxID. ")
+					.def("testSolidLine",&UnsaturatedEngine::_testSolidLine,"For checking solidLine.")
+					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")					
 					)
 		DECLARE_LOGGER;
 };

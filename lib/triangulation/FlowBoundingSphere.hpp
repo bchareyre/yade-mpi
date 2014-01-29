@@ -65,7 +65,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		bool RAVERAGE;
 		int walls_id[6];
-		#define parallel_forces
+// 		#define parallel_forces
 		#ifdef parallel_forces
 		int ompThreads;
 		vector< vector<const Vecteur*> > perVertexUnitForce;

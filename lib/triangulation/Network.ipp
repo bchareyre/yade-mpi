@@ -571,6 +571,11 @@ void Network<Tesselation>::Define_fictious_cells()
 // }
 
 template<class Tesselation>
+void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j)
+{
+  Line_Solid_Pore(cell, j, false, true);
+}
+template<class Tesselation>
 void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData)
 {
   if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
@@ -603,7 +608,7 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		Boundary &bi =  boundary(SV3->info().id());
 
 		Vecteur AB= SV1->point() - SV2->point();
-		AB[bi.coordinate] = 0;
+//		AB[bi.coordinate] = 0;
 		
 		if (bi.flowCondition && ! SLIP_ON_LATERALS) {
                         cell->info().solidLine[j][facetF1]=sqrt(AB.squared_length());

@@ -49,8 +49,9 @@ void UnsaturatedEngine::testFunction()
 		initializeCellIndex(solver);//initialize cell index
 		initializePoreRadius(solver);//save all pore radii before invade
 		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
+		computeSolidLine(solver);//save cell->info().solidLine[j][y]
 	}
-	solver->noCache = false;
+	solver->noCache = true;
 }
 
 void UnsaturatedEngine::action()
@@ -1214,31 +1215,30 @@ void UnsaturatedEngine::savePoreThroatInfo(Solver& flow)
 template <class Solver> 
 void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache)
 {
-	RTriangulation& Tri = flow->T[currentTes].Triangulation();
+	RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	CGT::Vecteur nullVect(0,0,0);
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 
 	#ifdef parallel_forces
-	if (noCache) {
-		perVertexUnitForce.clear(); perVertexPressure.clear();
+	if (solver->noCache) {
+		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
 // 		vector<const Vecteur*> exf; exf.reserve(20);
 // 		vector<const Real*> exp; exp.reserve(20);
-		perVertexUnitForce.resize(Tri.number_of_vertices());
-		perVertexPressure.resize(Tri.number_of_vertices());}
+		solver->perVertexUnitForce.resize(Tri.number_of_vertices());
+		solver->perVertexPressure.resize(Tri.number_of_vertices());}
 	#endif
 
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	CGT::Vecteur tempVect;
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-	if (noCache) {for (VCell_iterator cell_it=flow->T[currentTes].cellHandles.begin(); cell_it!=flow->T[currentTes].cellHandles.end(); cell_it++){
+	if (solver->noCache) {for (VCell_iterator cell_it=flow->T[currentTes].cellHandles.begin(); cell_it!=flow->T[currentTes].cellHandles.end(); cell_it++){
 // 	if (noCache) for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			Cell_handle& cell = *cell_it;
 			//reset cache
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
-
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
 					neighbour_cell = cell->neighbor(j);
 					const CGT::Vecteur& Surfk = cell->info().facetSurfaces[j];
@@ -1259,8 +1259,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
 					CGT::Vecteur Facet_Unit_Force = -fluidSurfk*cell->info().solidLine[j][3];
 					CGT::Vecteur Facet_Force = cell->info().p()*Facet_Unit_Force;
-					
-					
+										
 					for (int y=0; y<3;y++) {
 						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidLine[j][y];
 						//add to cached value
@@ -1273,12 +1272,12 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 						}
 					}
 					#ifdef parallel_forces
-					perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
-					perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
+					solver->perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
+					solver->perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
 					#endif
 			}
 		}
-		noCache=false;//cache should always be defined after execution of this function
+		solver->noCache=false;//cache should always be defined after execution of this function
 		if (onlyCache) return;
 	} else {//use cached values
 		#ifndef parallel_forces
@@ -1293,8 +1292,8 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 			const int& id =  v->info().id();
 			CGT::Vecteur tf (0,0,0);
 			int k=0;
-			for (vector<const Real*>::iterator c = perVertexPressure[id].begin(); c != perVertexPressure[id].end(); c++)
-				tf = tf + (*(perVertexUnitForce[id][k++]))*(**c);
+			for (vector<const Real*>::iterator c = solver->perVertexPressure[id].begin(); c != solver->perVertexPressure[id].end(); c++)
+				tf = tf + (*(solver->perVertexUnitForce[id][k++]))*(**c);
 			v->info().forces = tf;
 		}
 		#endif
@@ -1305,6 +1304,47 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 			if (!v->info().isFictious) TotalForce = TotalForce + v->info().forces;
 			else if (flow->boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;	}
 		cout << "TotalForce = "<< TotalForce << endl;}
+}
+
+template<class Solver>
+void UnsaturatedEngine::computeSolidLine(Solver& flow)
+{
+    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = Tri.finite_cells_end();
+    for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+        for(int j=0; j<4; j++) {
+            solver->Line_Solid_Pore(cell, j);
+        }
+    }
+}
+
+template<class Solver>//tempt test, clean later
+void UnsaturatedEngine::vertxID(Solver& flow)
+{
+    ofstream file;
+    file.open("vertexID.txt");
+    file << "vertexID	Pos	Force \n";
+    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
+    for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
+        if (!v->info().isFictious) file<<v->info().id()<<"		"<<v->point().point()<<"		"<<v->info().forces<<endl;
+    }
+    file.close();
+}
+
+template<class Solver>//tempt test. clean later
+void UnsaturatedEngine::testSolidLine(Solver& flow)
+{
+    ofstream file;
+    file.open("solidLine.txt");
+    file << "cellID facet solidLine[j][0] solidLine[j][1] solidLine[j][2] solidLine[j][3] \n";
+    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();   
+    for (VCell_iterator cell_it=flow->T[currentTes].cellHandles.begin(); cell_it!=flow->T[currentTes].cellHandles.end(); cell_it++){
+	Cell_handle& cell = *cell_it;      
+      for(int j=0; j<4;j++) {
+	file<<cell->info().index<<" "<<j<<" "<<cell->info().solidLine[j][0]<<" "<<cell->info().solidLine[j][1]<<" "<<cell->info().solidLine[j][2]<<" "<<cell->info().solidLine[j][3]<<endl;
+      }
+    }
+    file.close();
 }
 
 YADE_PLUGIN ( ( UnsaturatedEngine ) );

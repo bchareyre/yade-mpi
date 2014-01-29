@@ -55,8 +55,10 @@ void FlowEngine::action()
 	  backgroundSolver=solver;
 	  backgroundCompleted=true;
 	}
+	#ifdef parallel_forces	
 	solver->ompThreads = ompThreads>0? ompThreads : omp_get_max_threads();
-
+	#endif
+	
         timingDeltas->checkpoint ( "Triangulating" );
 	UpdateVolumes ( solver );
         timingDeltas->checkpoint ( "Update_Volumes" );
