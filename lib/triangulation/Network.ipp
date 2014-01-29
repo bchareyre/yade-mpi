@@ -606,9 +606,17 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		cell->info().solidLine[j][facetRe2]=Line_solid_facet(SV3->point(), SV1->point(), SV2->point());
 
 		Boundary &bi =  boundary(SV3->info().id());
+		double A [3], B[3];
+		for (int m=0;m<3;m++) {A[m]=SV1->point()[m];B[m]= SV2->point()[m];}
+		A[bi.coordinate]=0;
+		B[bi.coordinate]=0;
+		Point AA(A[0],A[1],A[2]);
+		Point BB(B[0],B[1],B[2]);
+		Vecteur AB= AA-BB;
 
-		Vecteur AB= SV1->point() - SV2->point();
-//		AB[bi.coordinate] = 0;
+//		Boundary &bi = boundary(SV3->info().id());
+//		Vecteur AB= SV1->point() - SV2->point();
+//		AB[bi.coordinate] = 0;//FIXME:can not assign read-only CGAL::Vector_3?
 		
 		if (bi.flowCondition && ! SLIP_ON_LATERALS) {
                         cell->info().solidLine[j][facetF1]=sqrt(AB.squared_length());
