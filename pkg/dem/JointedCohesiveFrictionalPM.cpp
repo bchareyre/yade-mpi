@@ -42,7 +42,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	
 	if ( smoothJoint && phys->isOnJoint ) {
 	  if ( phys->more || ( phys->jointCumulativeSliding > (2*min(geom->radius1,geom->radius2)) ) ) { 
-	    scene->interactions->requestErase(contact->getId1(),contact->getId2()); return; 
+	    scene->interactions->requestErase(contact); return; 
 	    } else { 
 	    D = phys->initD - abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); 
 	    }
@@ -52,7 +52,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 
 	/* Determination of interaction */
 	if (D < 0) { //spheres do not touch 
-	  if ( !phys->isCohesive ) { scene->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
+	  if ( !phys->isCohesive ) { scene->interactions->requestErase(contact); return; }
 	  
 	  if ( phys->isCohesive && (phys->FnMax>0) && (abs(D)>Dtensile) ) {
 	    
@@ -75,7 +75,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    cracksFileExist=true;
 
 	    // delete contact
-	    scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+	    scene->interactions->requestErase(contact); return;
 	  }
 	}	  
 	
@@ -136,7 +136,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    
 	    // delete contact if in tension, set the contact properties to friction if in compression
 	    if ( D < 0 ) {
-	      scene->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+	      scene->interactions->requestErase(contact); return;
 	    } else {
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
