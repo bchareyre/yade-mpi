@@ -37,6 +37,7 @@ class ViscElMat : public FrictMat {
 REGISTER_SERIALIZABLE(ViscElMat);
 
 /// Interaction physics
+enum CapType {None_Capillar, Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert};
 class ViscElPhys : public FrictPhys{
 	public:
 		virtual ~ViscElPhys();
@@ -52,7 +53,7 @@ class ViscElPhys : public FrictPhys{
 		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
 		((Real,gamma,NaN,,"Surface tension [N/m]"))
 		((Real,theta,NaN,,"Contact angle [rad]"))
-		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich")),
+		((CapType,CapillarType,None_Capillar,,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert")),
 		createIndex();
 	)
 	REGISTER_CLASS_INDEX(ViscElPhys,FrictPhys);

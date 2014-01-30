@@ -99,8 +99,15 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 		} else {
 			throw runtime_error("Theta should be equal for both particles!.");
 		}
+		
 		if (mat1->CapillarType == mat2->CapillarType and mat2->CapillarType != ""){
-			phys->CapillarType = mat1->CapillarType;
+			
+			if      (mat1->CapillarType == "Willett_numeric")  phys->CapillarType = Willett_numeric;
+			else if (mat1->CapillarType == "Willett_analytic") phys->CapillarType = Willett_analytic;
+			else if (mat1->CapillarType == "Weigert")          phys->CapillarType = Weigert;
+			else if (mat1->CapillarType == "Rabinovich")       phys->CapillarType = Rabinovich;
+			else if (mat1->CapillarType == "Lambert")          phys->CapillarType = Lambert;
+			else                                               phys->CapillarType = None_Capillar;
 		} else {
 			throw runtime_error("CapillarType should be equal for both particles!.");
 		}

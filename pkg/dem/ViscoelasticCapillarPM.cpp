@@ -15,7 +15,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
     * 
     */
      
-  if (phys.CapillarType  == "Weigert") {
+  if (phys.CapillarType == Weigert) {
       /* Capillar model from [Weigert1999]
        */
         Real R = phys.R;
@@ -44,7 +44,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         fC = M_PI/4.0*pow((2.0*R),2.0)*pow(sin(beta),2.0)*Pk +
              phys.gamma*M_PI*2.0*R*sin(beta)*sin(beta+phys.theta);                                // [Weigert1999], equation (21)
         
-      } else if (phys.CapillarType  == "Willett_numeric") {
+      } else if (phys.CapillarType == Willett_numeric) {
       
         /* Capillar model from [Willett2000]
          */ 
@@ -85,7 +85,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real FS = exp(lnFS);
         
         fC = FS * 2.0 * M_PI* R * Gamma;
-      } else if (phys.CapillarType  == "Willett_analytic") {
+      } else if (phys.CapillarType == Willett_analytic) {
         /* Capillar model from Willet [Willett2000] (analytical solution), but 
          * used also in the work of Herminghaus [Herminghaus2005]
          */
@@ -106,7 +106,7 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
         Real f_star = cos(phys.theta)/(1 + 2.1*sPl + 10.0 * pow(sPl, 2.0));                 // [Willett2000], equation (12)
         fC = f_star * (2*M_PI*R*Gamma);                                                     // [Willett2000], equation (13), against F
         
-      } else if ((phys.CapillarType  == "Rabinovich") or (phys.CapillarType  == "Lambert")) {
+      } else if ((phys.CapillarType  == Rabinovich) or (phys.CapillarType  == Lambert)) {
         /* 
          * Capillar model from Rabinovich [Rabinov2005]
          *
@@ -125,14 +125,14 @@ Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, Vi
           dsp = H/2.0*(-1.0 + sqrt(1.0 + 2.0*V/(M_PI*R*H*H)));                            // [Rabinov2005], equation (20)
           fC = -(2*M_PI*R*Gamma*cos(phys.theta))/(1+(H/(2*dsp)));                         // [Lambert2008], equation (65), taken from [Rabinov2005]
           
-          if (phys.CapillarType  == "Rabinovich") {
+          if (phys.CapillarType  == Rabinovich) {
             const Real alpha = sqrt(H/R*(-1+ sqrt(1 + 2.0*V/(M_PI*R*H*H))));              // [Rabinov2005], equation (A3)
             fC -= 2*M_PI*R*Gamma*sin(alpha)*sin(phys.theta + alpha);                      // [Rabinov2005], equation (19)
           }
         } else {
-          
           fC = -(2*M_PI*R*Gamma*cos(phys.theta));
-          if (phys.CapillarType  == "Rabinovich") {
+          
+          if (phys.CapillarType == Rabinovich) {
             const Real alpha = 0.0;
             fC -= 2*M_PI*R*Gamma*sin(alpha)*sin(phys.theta + alpha);                      // [Rabinov2005], equation (19)
           }
