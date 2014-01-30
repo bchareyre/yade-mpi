@@ -95,7 +95,8 @@ class UnsaturatedEngine : public PartialEngine
 		
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-
+		TPL bool testNoCache(Solver&flow){bool testnoCache=flow->noCache; return testnoCache;}//clean later
+		
 		template<class Cellhandle >
 		double getRadiusMin(Cellhandle cell, int j);
 		template<class Cellhandle>
@@ -154,7 +155,8 @@ class UnsaturatedEngine : public PartialEngine
  		void		_vertxID(){vertxID(solver);}
  		void		_testSolidLine(){testSolidLine(solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
- 		
+		bool		_testNoCache() {return testNoCache(solver);}
+		
 		virtual ~UnsaturatedEngine();
 
 		virtual void action();
@@ -226,7 +228,8 @@ class UnsaturatedEngine : public PartialEngine
 					.def("computeForce",&UnsaturatedEngine::_computeFacetPoreForcesWithCache,"Test computeFacetPoreForcesWithCache(). ")
 					.def("vertxID",&UnsaturatedEngine::_vertxID,"cout vertxID. ")
 					.def("testSolidLine",&UnsaturatedEngine::_testSolidLine,"For checking solidLine.")
-					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")					
+					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
+					.def("testNoCache",&UnsaturatedEngine::_testNoCache, "test noCache.")
 					)
 		DECLARE_LOGGER;
 };

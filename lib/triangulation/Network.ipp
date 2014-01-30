@@ -573,7 +573,7 @@ void Network<Tesselation>::Define_fictious_cells()
 template<class Tesselation>
 void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j)
 {
-  Line_Solid_Pore(cell, j, false, true);
+  Line_Solid_Pore(cell, j, false, false);//FIXME:SLIP_ON_LATERALS, reuseFacetData ?? (Chao)
 }
 template<class Tesselation>
 void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData)
@@ -635,11 +635,11 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		double d13 = (SV1->point())[bi1.coordinate] - (SV3->point())[bi1.coordinate];
 		double d23 = (SV2->point())[bi2.coordinate] - (SV3->point())[bi2.coordinate];
 		if (bi1.flowCondition && ! SLIP_ON_LATERALS) {
-			cell->info().solidLine[j][facetF1]= abs(d23);
+			cell->info().solidLine[j][facetF1]= abs(d23); cerr<<"AA  "<<cell->info().solidLine[j][facetF1]<<endl;//FIXME:error here
                 } else cell->info().solidLine[j][facetF1]=0;
 
                 if (bi2.flowCondition && ! SLIP_ON_LATERALS) {
-			cell->info().solidLine[j][facetF2]= abs(d13);                
+			cell->info().solidLine[j][facetF2]= abs(d13); cerr<<"BB  "<<cell->info().solidLine[j][facetF2]<<endl;//FIXME:error here     
                 } else cell->info().solidLine[j][facetF2]=0;
     }; break;
     }

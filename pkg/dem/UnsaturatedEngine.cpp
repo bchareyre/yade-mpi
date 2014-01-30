@@ -51,7 +51,7 @@ void UnsaturatedEngine::testFunction()
 		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
 		computeSolidLine(solver);//save cell->info().solidLine[j][y]
 	}
-	solver->noCache = true;
+	solver->noCache = false;
 }
 
 void UnsaturatedEngine::action()
@@ -1220,7 +1220,9 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 	CGT::Vecteur nullVect(0,0,0);
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
-
+	
+	solver->noCache=true;//FIXME:turn true ??(Chao)
+	
 	#ifdef parallel_forces
 	if (solver->noCache) {
 		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
@@ -1279,7 +1281,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 		}
 		solver->noCache=false;//cache should always be defined after execution of this function
 		if (onlyCache) return;
-	} else {//use cached values
+	} else {//use cached values //FIXME:Never run, currently.(chao)
 		#ifndef parallel_forces
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
