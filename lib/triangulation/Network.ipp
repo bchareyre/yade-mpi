@@ -608,8 +608,8 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		Boundary &bi =  boundary(SV3->info().id());
 		double A [3], B[3];
 		for (int m=0;m<3;m++) {A[m]=SV1->point()[m];B[m]= SV2->point()[m];}
-		A[bi.coordinate]=0;
-		B[bi.coordinate]=0;
+		A[bi.coordinate]=bi.p[bi.coordinate];
+		B[bi.coordinate]=bi.p[bi.coordinate];
 		Point AA(A[0],A[1],A[2]);
 		Point BB(B[0],B[1],B[2]);
 		Vecteur AB= AA-BB;
@@ -617,7 +617,8 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 //		Boundary &bi = boundary(SV3->info().id());
 //		Vecteur AB= SV1->point() - SV2->point();
 //		AB[bi.coordinate] = 0;//FIXME:can not assign read-only CGAL::Vector_3?
-		
+
+		//FIXME::bi.flowCondition should be considered or not?(chao)
 		if (bi.flowCondition && ! SLIP_ON_LATERALS) {
                         cell->info().solidLine[j][facetF1]=sqrt(AB.squared_length());
                 } else 	cell->info().solidLine[j][facetF1]=0;
@@ -632,14 +633,14 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		Boundary &bi1 =  boundary(SV1->info().id());
 		Boundary &bi2 =  boundary(SV2->info().id());
 		
-		double d13 = (SV1->point())[bi1.coordinate] - (SV3->point())[bi1.coordinate];
-		double d23 = (SV2->point())[bi2.coordinate] - (SV3->point())[bi2.coordinate];
+		double d13 = bi1.p[bi1.coordinate] - (SV3->point())[bi1.coordinate];
+		double d23 = bi2.p[bi2.coordinate] - (SV3->point())[bi2.coordinate];
 		if (bi1.flowCondition && ! SLIP_ON_LATERALS) {
-			cell->info().solidLine[j][facetF1]= abs(d23); cerr<<"AA  "<<cell->info().solidLine[j][facetF1]<<endl;//FIXME:error here
+			cell->info().solidLine[j][facetF1]= abs(d23); 
                 } else cell->info().solidLine[j][facetF1]=0;
 
                 if (bi2.flowCondition && ! SLIP_ON_LATERALS) {
-			cell->info().solidLine[j][facetF2]= abs(d13); cerr<<"BB  "<<cell->info().solidLine[j][facetF2]<<endl;//FIXME:error here     
+			cell->info().solidLine[j][facetF2]= abs(d13);
                 } else cell->info().solidLine[j][facetF2]=0;
     }; break;
     }
