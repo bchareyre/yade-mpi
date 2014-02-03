@@ -121,7 +121,11 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `OpenBLAS <http://www.openblas.net/>`_ optimized and parallelized alternative to the standard blas+lapack (fluid coupling, optional)
 * `Metis <http://glaros.dtc.umn.edu/gkhome/metis/metis/overview/>`_ matrix preconditioning (fluid coupling, optional)
 
-Most of the list above is very likely already packaged for your distribution. 
+Most of the list above is very likely already packaged for your distribution. In case you are confronted
+with some errors concerning not available packages (e.g. Package libmetis-dev is not available) it may be necessary 
+to add yade external ppa from https://launchpad.net/~yade-users/+archive/external::
+	sudo add-apt-repository ppa:yade-users/external 
+	sudo apt-get update 
 The following commands have to be executed in command line of corresponding 
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
