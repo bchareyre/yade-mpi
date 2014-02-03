@@ -65,9 +65,9 @@ class InteractionContainer: public Serializable{
 		// required by the class factory... :-|
 		InteractionContainer(): currSize(0),dirty(false),serializeSorted(false),iterColliderLastRun(-1){
 			bodies=NULL;
-			#ifdef YADE_OPENMP
-				threadsPendingErase.resize(omp_get_max_threads());
-			#endif
+// 			#ifdef YADE_OPENMP
+// 				threadsPendingErase.resize(omp_get_max_threads());
+// 			#endif
 		}
 		void clear();
 		// iterators
@@ -101,74 +101,23 @@ class InteractionContainer: public Serializable{
 		bool serializeSorted;
 		// iteration number when the collider was last run; set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionLoop (such as SpatialQuickSortCollider). Other colliders (such as InsertionSortCollider) set it it -1, which is the default
 		long iterColliderLastRun;
-		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state) and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
-		void requestErase(Body::id_t id1, Body::id_t id2, bool force=false);
+		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state) and collider should traverse potential interactions to decide whether to delete them completely or keep them potential
+		void requestErase(Body::id_t id1, Body::id_t id2);
 		void requestErase(const shared_ptr<Interaction>& I);
 		void requestErase(Interaction* I);
-		/*! List of pairs of interactions that will be (maybe) erased by the collider; if force==true, they will be deleted unconditionally.
-			
-			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you).
 
-			If there is, at one point, a multi-threaded collider, pendingEraseMutex should be moved to the public part and used from there as well.
-		*/
-		struct IdsForce{ Body::id_t id1; Body::id_t id2; bool force; };
-		#ifdef YADE_OPENMP
-			vector<list<IdsForce> > threadsPendingErase;
-		#endif
-		list<IdsForce> pendingErase;
-		/*! Erase all pending interactions unconditionally.
-
-			This should be called only in rare cases that collider is not used but still interactions should be erased.
-			Otherwise collider should decide on a case-by-case basis, which interaction to erase for good and which to keep in the potential state
-			(without geom and phys).
-
-			This function doesn't lock pendingEraseMutex, as it is (supposedly) called from no-parallel sections only once per iteration
-		*/
-		int unconditionalErasePending();
-
-		/*! Clear the list of interaction pending erase: all interactions queued for considering erasing them
-		will be dropped; useful for colliders that handle that by themselves, without needing the hint;
-		with openMP, it would not be enough to call pendingErase->clear(), this helper function 
-		does it for all threads. Use this only if you understand this explanation. */
-		void clearPendingErase();
-
-		/*! Traverse all pending interactions and erase them if the (T*)->shouldBeErased(id1,id2) return true
-			and keep it if it return false; finally, pendingErase will be clear()'ed.
-
-			Class using this interface (which is presumably a collider) must define the 
-					
-				bool shouldBeErased(Body::id_t, Body::id_t) const
-
-			method which will be called for every interaction.
-
-			Returns number of interactions, have they been erased or not (this is useful to check if there were some erased, after traversing those)
-		*/
-		template<class T> int erasePending(const T& t, Scene* rb){
-			int ret=0;
-			#ifdef YADE_OPENMP
-				// shadow the this->pendingErase by the local variable, to share the code
-				FOREACH(list<IdsForce>& pendingErase, threadsPendingErase){
-			#endif
-					FOREACH(const IdsForce& p, pendingErase){
-						ret++;
-						if(p.force || t.shouldBeErased(p.id1,p.id2,rb)) erase(p.id1,p.id2);
-					}
-					pendingErase.clear();
-			#ifdef YADE_OPENMP
-				}
-			#endif
-			return ret;
-		}
 		/*! Traverse all interactions and erase them if they are not real and the (T*)->shouldBeErased(id1,id2) return true, or if body(id1) has been deleted
 			Class using this interface (which is presumably a collider) must define the
 				bool shouldBeErased(Body::id_t, Body::id_t) const
 		*/
-		template<class T> void conditionalyEraseNonReal(const T& t, Scene* rb){
+		template<class T> size_t conditionalyEraseNonReal(const T& t, Scene* rb){
 			// beware iterators here, since erase is invalidating them. We need to iterate carefully, and keep in mind that erasing one interaction is moving the last one to the current position.
+			size_t initSize=currSize;
 		 	for (size_t linPos=0; linPos<currSize;){
 				const shared_ptr<Interaction>& i=linIntrs[linPos];
 				if(!i->isReal() && t.shouldBeErased(i->getId1(),i->getId2(),rb)) erase(i->getId1(),i->getId2(),linPos);
 				else linPos++;}
+			return initSize-currSize;
 		}
 
 	// we must call Scene's ctor (and from Scene::postLoad), since we depend on the existing BodyContainer at that point.

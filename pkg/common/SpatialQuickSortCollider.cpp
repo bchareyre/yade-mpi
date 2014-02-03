@@ -26,7 +26,7 @@ void SpatialQuickSortCollider::action()
 
 	// This collider traverses all interactions at every step, therefore all interactions
 	// that were requested for erase might be erased here and will be recreated if necessary.
-	scene->interactions->unconditionalErasePending();
+	scene->interactions->eraseNonReal();
 
 	size_t nbElements=bodies->size();
 	if (nbElements!=rank.size())

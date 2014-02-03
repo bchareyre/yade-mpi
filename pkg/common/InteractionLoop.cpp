@@ -21,10 +21,10 @@ void InteractionLoop::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
 
 
 void InteractionLoop::action(){
-	if(eraseIntsInLoop && scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
-		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
-		alreadyWarnedNoCollider=true;
-	}
+// 	if(eraseIntsInLoop && scene->interactions->conditionalyEraseNonReal(scene)>0 && !alreadyWarnedNoCollider){
+// 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
+// 		alreadyWarnedNoCollider=true;
+// 	}
 	/*
 	if(scene->interactions->dirty){
 		throw std::logic_error("InteractionContainer::dirty is true; the collider should re-initialize in such case and clear the dirty flag.");

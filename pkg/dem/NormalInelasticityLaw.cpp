@@ -41,7 +41,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 // Check if there is a real overlap or not. The Ig2... seems to let exist interactions with negative un (= no overlap). Such interactions seem then to have to be deleted here.
         if (   un < 0      )
         {
-		 scene->interactions->requestErase(contact->getId1(),contact->getId2());// this, among other things, resets the interaction : geometry and physics variables (as forces, ...) are reset to defaut values
+		 scene->interactions->requestErase(contact);// this, among other things, resets the interaction : geometry and physics variables (as forces, ...) are reset to defaut values
 		 return;
         }
 
