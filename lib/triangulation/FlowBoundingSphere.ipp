@@ -1319,13 +1319,13 @@ void FlowBoundingSphere<Tesselation>::DisplayStatistics()
 	num_particles = real;
 }
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::saveVtk()
+void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 {
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[80];
-	mkdir("./VTK", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        sprintf(filename,"./VTK/out_%d.vtk", number++);
+	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"%s/out_%d.vtk",folder,number++);
 	int firstReal=-1;
 
 	//count fictious vertices and cells

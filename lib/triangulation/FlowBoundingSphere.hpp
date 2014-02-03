@@ -115,7 +115,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void ComputeTetrahedralForces();
 		/// Define forces spliting drag and buoyancy terms
 		void ComputeFacetForcesWithCache(bool onlyCache=false);
-		void saveVtk ( );
+		void saveVtk (const char* folder);
 #ifdef XVIEW
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );

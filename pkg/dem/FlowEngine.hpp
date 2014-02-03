@@ -139,7 +139,7 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell (Cellhandle cell);
 		void Oedometer_Boundary_Conditions();
 		void Average_real_cell_velocity();
-		void saveVtk() {solver->saveVtk();}
+		void saveVtk(const char* folder) {solver->saveVtk(folder);}
 		vector<Real> avFlVelOnSph(unsigned int id_sph) {return solver->Average_Fluid_Velocity_On_Sphere(id_sph);}
 
 // 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; updateTriangulation=true;}
@@ -290,7 +290,7 @@ class FlowEngine : public PartialEngine
 					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
-					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
+					.def("saveVtk",&FlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 					.def("avFlVelOnSph",&FlowEngine::avFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
@@ -381,7 +381,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void preparePShifts();
 		
 		//(re)instanciation of templates and others, for python binding
-		void saveVtk() {solver->saveVtk();}
+		void saveVtk(const char* folder) {solver->saveVtk(folder);}
 		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
 		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
@@ -458,7 +458,7 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("OSI",&PeriodicFlowEngine::_OSI,"Return the number of interactions only between spheres.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
-			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
+			.def("saveVtk",&PeriodicFlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 			.def("getBoundaryFlux",&PeriodicFlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
 			.def("getPorePressure",&PeriodicFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
