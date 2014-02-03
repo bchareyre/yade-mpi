@@ -43,7 +43,9 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 
 			// harmonic average of alphas parameters
 			Real AlphaKr = 2.0*sdec1->alphaKr*sdec2->alphaKr/(sdec1->alphaKr+sdec2->alphaKr);
-			Real AlphaKtw = 2.0*sdec1->alphaKtw*sdec2->alphaKtw/(sdec1->alphaKtw+sdec2->alphaKtw);
+			Real AlphaKtw;
+			if (sdec1->alphaKtw && sdec2->alphaKtw) AlphaKtw = 2.0*sdec1->alphaKtw*sdec2->alphaKtw/(sdec1->alphaKtw+sdec2->alphaKtw);
+			else AlphaKtw=0;
 
 			Real Ks;
 			if (Va && Vb) Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
