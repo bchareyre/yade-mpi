@@ -40,8 +40,8 @@ const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 void UnsaturatedEngine::testFunction()
 {
 	cout<<"This is UnsaturatedEngine test program"<<endl;
-	RTriangulation& triangulation = solver->T[solver->currentTes].Triangulation();
-	if (triangulation.number_of_vertices()==0) {
+	RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+	if (tri.number_of_vertices()==0) {
 		cout<< "triangulation is empty: building a new one" << endl;
 		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
 		setPositionsBuffer(true);//copy sphere positions in a buffer...
@@ -51,7 +51,7 @@ void UnsaturatedEngine::testFunction()
 		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
 		computeSolidLine(solver);//save cell->info().solidLine[j][y]
 	}
-	solver->noCache = false;
+	solver->noCache = true;
 }
 
 void UnsaturatedEngine::action()
@@ -84,9 +84,10 @@ void UnsaturatedEngine::invade (Solver& flow )
     BoundaryConditions(flow);
     flow->pressureChanged=true;
     flow->reApplyBoundaryConditions();
-
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if (cell->info().p()!=0) {
             invadeSingleCell(cell,cell->info().p(),flow);
 // 	    cerr << "cell pressure: " << cell->info().p(); //test whether the cell's pressure has been changed
@@ -99,11 +100,12 @@ Real UnsaturatedEngine::getMinEntryValue (Solver& flow )
 {
     Real nextEntry = 1e50;
     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if (cell->info().p()!=0) {
             for (int facet=0; facet<4; facet ++) {
-                if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+                if (tri.is_infinite(cell->neighbor(facet))) continue;
 //              if (cell->info().Pcondition) continue;  //FIXME Add this, the boundary cell pressure will not work; Remove this the initial pressure and initial invade will be chaos.
                 if (cell->neighbor(facet)->info().p()!=0) continue;
                 if (cell->neighbor(facet)->info().p()==0) {
@@ -148,16 +150,17 @@ void UnsaturatedEngine::invade2 (Solver& flow)
     flow->pressureChanged=true;
     flow->reApplyBoundaryConditions();
 //here, we update the pressure of cells inside (.isAirReservoir=true) equal to Pressure_BOTTOM_Boundary
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if (cell->info().isAirReservoir == true)
 //             cell->info().p() = Pressure_BOTTOM_Boundary;//FIXME:how to change cell inside pressure to boundary condition.?
             cell->info().p() = bndCondValue[2];//FIXME: x_min_id=wallLeftId=0, x_max_id =wallRightId=1, y_min_id=wallBottomId=2, y_max_id=wallTopId=3, z_min_id=wallBackId=4,z_max_id=wallFrontId=5           
 //             cerr<<"cell index: "<<cell->info().index <<" "<< "pressure: " << cell->info().p()<<endl;
     }
 
-    Finite_cells_iterator _cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator _cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); _cell != _cell_end; _cell++ ) {
+    Finite_cells_iterator _cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator _cell = tri.finite_cells_begin(); _cell != _cell_end; _cell++ ) {
         if(_cell->info().isAirReservoir == true)
             invadeSingleCell2(_cell,_cell->info().p(),flow);
     }
@@ -170,11 +173,12 @@ Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
     updateWaterReservoir(flow);
     Real nextEntry = 1e50;
     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if (cell->info().isAirReservoir == true) {
             for (int facet=0; facet<4; facet ++) {
-                if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+                if (tri.is_infinite(cell->neighbor(facet))) continue;
                 if ( (cell->neighbor(facet)->info().isAirReservoir == true) || (cell->neighbor(facet)->info().isWaterReservoir == false) ) continue;
                 double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
                 nextEntry = min(nextEntry,n_cell_pe);
@@ -631,8 +635,9 @@ template<class Solver>
 void UnsaturatedEngine::initializeCellIndex(Solver& flow)
 {
     int k=0;
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         cell->info().index=k++;
     }
 }
@@ -640,15 +645,15 @@ void UnsaturatedEngine::initializeCellIndex(Solver& flow)
 template<class Solver>
 void UnsaturatedEngine::initializePoreRadius(Solver& flow)
 {
-    RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
-    Finite_cells_iterator cell_end = Tri.finite_cells_end();
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
     Cell_handle neighbour_cell;
-    for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+    for (Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++) {
         for (int j=0; j<4; j++) {
             neighbour_cell = cell->neighbor(j);
-            if (!Tri.is_infinite(neighbour_cell)) {
+            if (!tri.is_infinite(neighbour_cell)) {
                 cell->info().poreRadius[j]=computeEffPoreRadius(cell, j);
-                neighbour_cell->info().poreRadius[Tri.mirror_index(cell, j)]= cell->info().poreRadius[j];
+                neighbour_cell->info().poreRadius[tri.mirror_index(cell, j)]= cell->info().poreRadius[j];
             }
         }
     }
@@ -757,10 +762,10 @@ template<class Solver>
 void UnsaturatedEngine::updateVolumeCapillaryCell ( Solver& flow)
 {
     Initialize_volumes(flow);
-    RTriangulation& Tri = flow->T[flow->currentTes].Triangulation();
-    Finite_cells_iterator cell_end = Tri.finite_cells_end();
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
     Cell_handle neighbour_cell;
-    for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+    for (Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++) {
         cell->info().capillaryCellVolume = abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
 //         if (cell->info().capillaryCellVolume<0) {cerr<<"volumeCapillaryCell Negative. cell ID: " << cell->info().index << "cell volume: " << cell->info().volume() << "  volumeSolidPore: " << solver->volumeSolidPore(cell) << endl;        }
     }
@@ -791,12 +796,13 @@ Real UnsaturatedEngine::getSaturation (Solver& flow )
 template<class Solver>
 void UnsaturatedEngine::saveListNodes(Solver& flow)
 {
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     ofstream file;
     file.open("ListOfNodes.txt");
     file << "#List Of Nodes. For one cell,there are four neighbour cells \n";
     file << "Cell_ID" << " " << "NeighborCell_ID" << endl;
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         file << cell->info().index << " " <<cell->neighbor(0)->info().index << " " << cell->neighbor(1)->info().index << " " << cell->neighbor(2)->info().index << " " << cell->neighbor(3)->info().index << endl;
     }
     file.close();
@@ -805,14 +811,15 @@ void UnsaturatedEngine::saveListNodes(Solver& flow)
 template<class Solver>
 void UnsaturatedEngine::saveListConnection(Solver& flow)
 {
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     ofstream file;
     file.open("ListConnection.txt");
     file << "#List of Connections \n";
     file << "Cell_ID" << " " << "NeighborCell_ID" << " " << "EntryValue" << " " << "poreRadius" << " " << "poreArea" << " " << "porePerimeter" << endl;
     double surface_tension = surfaceTension ; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
         file << cell->info().index << " " <<cell->neighbor(0)->info().index << " " << surface_tension/cell->info().poreRadius[0] << " " << cell->info().poreRadius[0] << " " << computePoreArea(cell,0) << " " << computePorePerimeter(cell,0) << endl;
         file << cell->info().index << " " <<cell->neighbor(1)->info().index << " " << surface_tension/cell->info().poreRadius[1] << " " << cell->info().poreRadius[1] << " " << computePoreArea(cell,1) << " " << computePorePerimeter(cell,1) << endl;
         file << cell->info().index << " " <<cell->neighbor(2)->info().index << " " << surface_tension/cell->info().poreRadius[2] << " " << cell->info().poreRadius[2] << " " << computePoreArea(cell,2) << " " << computePorePerimeter(cell,2) << endl;
@@ -1022,11 +1029,12 @@ double UnsaturatedEngine::getRadiusMin(Cellhandle cell, int j)
 template<class Solver>
 void UnsaturatedEngine::debugTemp(Solver& flow)
 {
+    RTriangulation& tri = flow->T[solver->currentTes].Triangulation();
     ofstream file;
     file.open("bugTemp.txt");
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
 	file << cell->info().index << "  " <<cell->info().poreRadius[0]<<" "<<getRadiusMin(cell,0)<<" "<<abs(flow->Compute_EffectiveRadius(cell, 0))<<endl;
 	file << cell->info().index << "  " <<cell->info().poreRadius[1]<<" "<<getRadiusMin(cell,1)<<" "<<abs(flow->Compute_EffectiveRadius(cell, 1))<<endl;
 	file << cell->info().index << "  " <<cell->info().poreRadius[2]<<" "<<getRadiusMin(cell,2)<<" "<<abs(flow->Compute_EffectiveRadius(cell, 2))<<endl;
@@ -1181,13 +1189,14 @@ Real UnsaturatedEngine::computePorePerimeter(Cellhandle cell, int j)
 template<class Solver>
 void UnsaturatedEngine::savePoreBodyInfo(Solver& flow)
 {
+    RTriangulation& tri = flow->T[solver->currentTes].Triangulation();
     ofstream file;
     file.open("PoreBodyInfo.txt");
     file << "#pore bodies position (or Voronoi centers) and size (volume) \n";
     file << "Cell_ID " << " x " << " y " << " z " << " volume "<< endl;
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
         file << cell->info().index << " " << cell->info() << " " << cell->info().capillaryCellVolume << endl;
     }
     file.close();
@@ -1196,13 +1205,14 @@ void UnsaturatedEngine::savePoreBodyInfo(Solver& flow)
 template<class Solver>
 void UnsaturatedEngine::savePoreThroatInfo(Solver& flow)
 {
+    RTriangulation& tri = flow->T[solver->currentTes].Triangulation();
     ofstream file;
     file.open("PoreThroatInfo.txt");
     file << "#pore throat area, inscribeRadius and perimeter. \n";
     file << "Cell_ID " << " NeighborCell_ID "<<" area " << " inscribeRadius " << " perimeter " << endl;
-    Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-    for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell)) continue;
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
 	file << cell->info().index <<" "<< cell->neighbor(0)->info().index <<" "<< computePoreArea(cell, 0) <<" "<< abs(flow->Compute_EffectiveRadius(cell, 0)) <<" "<< computePorePerimeter(cell,0) <<endl;  
 	file << cell->info().index <<" "<< cell->neighbor(1)->info().index <<" "<< computePoreArea(cell, 1) <<" "<< abs(flow->Compute_EffectiveRadius(cell, 1)) <<" "<< computePorePerimeter(cell,1) <<endl;  
 	file << cell->info().index <<" "<< cell->neighbor(2)->info().index <<" "<< computePoreArea(cell, 2) <<" "<< abs(flow->Compute_EffectiveRadius(cell, 2)) <<" "<< computePorePerimeter(cell,2) <<endl;  
@@ -1221,7 +1231,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 	
-	solver->noCache=true;//FIXME:turn true ??(Chao)
+// 	solver->noCache=true;//FIXME:turn true ??(Chao)
 	
 	#ifdef parallel_forces
 	if (solver->noCache) {
