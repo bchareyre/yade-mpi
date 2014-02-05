@@ -51,7 +51,7 @@ void UnsaturatedEngine::testFunction()
 		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
 		computeSolidLine(solver);//save cell->info().solidLine[j][y]
 	}
-	solver->noCache = true;
+	solver->noCache = false;
 }
 
 void UnsaturatedEngine::action()
@@ -130,12 +130,15 @@ void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Sol
     double surface_tension = surfaceTension ;
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-        if (cell->neighbor(facet)->info().p() == bndCondValue[2]) continue;
+        if (cell->neighbor(facet)->info().isAirReservoir == true) continue;
         if (cell->neighbor(facet)->info().isWaterReservoir == false) continue;
+        if (cell->neighbor(facet)->info().Pcondition) continue;
         double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
         if (pressure > n_cell_pe) {
             Cell_handle n_cell = cell->neighbor(facet);
             n_cell->info().p() = pressure;
+            n_cell->info().isAirReservoir=true;
+            n_cell->info().isWaterReservoir=false;
             invadeSingleCell2(n_cell, pressure, flow);
         }
     }
@@ -144,21 +147,16 @@ void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Sol
 template<class Solver>
 void UnsaturatedEngine::invade2 (Solver& flow)
 {
-    updateAirReservoir(flow);
-    updateWaterReservoir(flow);
-    BoundaryConditions(flow);
-    flow->pressureChanged=true;
-    flow->reApplyBoundaryConditions();
-//here, we update the pressure of cells inside (.isAirReservoir=true) equal to Pressure_BOTTOM_Boundary
+//     BoundaryConditions(flow);
+//     flow->pressureChanged=true;
+//     flow->reApplyBoundaryConditions();
+    updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
-    Finite_cells_iterator cell_end = tri.finite_cells_end();
-    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (cell->info().isAirReservoir == true)
-//             cell->info().p() = Pressure_BOTTOM_Boundary;//FIXME:how to change cell inside pressure to boundary condition.?
-            cell->info().p() = bndCondValue[2];//FIXME: x_min_id=wallLeftId=0, x_max_id =wallRightId=1, y_min_id=wallBottomId=2, y_max_id=wallTopId=3, z_min_id=wallBackId=4,z_max_id=wallFrontId=5           
-//             cerr<<"cell index: "<<cell->info().index <<" "<< "pressure: " << cell->info().p()<<endl;
-    }
-
+//     Finite_cells_iterator cell_end = tri.finite_cells_end();
+//     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+//         if (cell->info().isAirReservoir == true)
+//             cell->info().p() = bndCondValue[2];
+//     }
     Finite_cells_iterator _cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator _cell = tri.finite_cells_begin(); _cell != _cell_end; _cell++ ) {
         if(_cell->info().isAirReservoir == true)
@@ -169,8 +167,7 @@ void UnsaturatedEngine::invade2 (Solver& flow)
 template<class Solver>
 Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
 {
-    updateAirReservoir(flow);
-    updateWaterReservoir(flow);
+    updateReservoir(flow);
     Real nextEntry = 1e50;
     double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
@@ -180,6 +177,7 @@ Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
             for (int facet=0; facet<4; facet ++) {
                 if (tri.is_infinite(cell->neighbor(facet))) continue;
                 if ( (cell->neighbor(facet)->info().isAirReservoir == true) || (cell->neighbor(facet)->info().isWaterReservoir == false) ) continue;
+                if (cell->neighbor(facet)->info().Pcondition) continue;
                 double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
                 nextEntry = min(nextEntry,n_cell_pe);
             }
@@ -193,8 +191,42 @@ Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
     }
 }
 
-//initialize the boundingCells info().isWaterReservoir=true,  on condition that those cells meet (flow->boundingCells[bound].size()!=0 && cell->info().p()==0) 
 template<class Solver>
+void UnsaturatedEngine::updatePressure(Solver& flow)
+{
+    BoundaryConditions(flow);
+    flow->pressureChanged=true;
+    flow->reApplyBoundaryConditions();
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+      if (cell->info().isAirReservoir==true) cell->info().p()=bndCondValue[2];
+      if (cell->info().isWaterReservoir==true) cell->info().p()=bndCondValue[3];
+    } 
+}
+
+template<class Solver>
+void UnsaturatedEngine::updateReservoir(Solver& flow)
+{
+    updatePressure(flow);
+    updateAirReservoir(flow);
+    updateWaterReservoir(flow);  
+}
+
+template<class Solver>
+void UnsaturatedEngine::updateWaterReservoir(Solver& flow)
+{
+    initWaterReservoirBound(flow);
+    for (int bound=0; bound<6; bound++) {
+        if (flow->boundingCells[bound].size()==0) continue;
+        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
+        for ( it ; it != flow->boundingCells[bound].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+            waterReservoirRecursion((*it),flow);
+        }
+    }
+}
+template<class Solver>//the boundingCells[3] should always connect water reservoir && isWaterReservoir=true
 void UnsaturatedEngine::initWaterReservoirBound(Solver& flow/*, int boundN*/)
 {
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
@@ -207,44 +239,39 @@ void UnsaturatedEngine::initWaterReservoirBound(Solver& flow/*, int boundN*/)
         vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
         for ( it ; it != flow->boundingCells[bound].end(); it++) {
             if ((*it)->info().index == 0) continue;
-            if((*it)->info().p()!=0) continue;//FIXME: the default pressure for water is 0
-            (*it)->info().isWaterReservoir = true;
+            if((*it)->info().p() == bndCondValue[3])
+                (*it)->info().isWaterReservoir = true;
         }
     }
 }
-
-template<class Solver>
-void UnsaturatedEngine::updateWaterReservoir(Solver& flow)
-{
-    initWaterReservoirBound(flow);
-    for (int bound=0; bound<6; bound++) {
-        if (flow->boundingCells[bound].size()==0) continue;
-        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
-        for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            if((*it)->info().isWaterReservoir == false) continue;
-            waterReservoirRecursion((*it),flow);
-        }
-    }
-}
-
 template<class Solver>
 void UnsaturatedEngine::waterReservoirRecursion(Cell_handle cell, Solver& flow)
 {
-    if(cell->info().isWaterReservoir == true) {
-        for (int facet = 0; facet < 4; facet ++) {
-            if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-            if (cell->neighbor(facet)->info().p()!=0) continue;
-            if (cell->neighbor(facet)->info().isWaterReservoir==true) continue;
-            Cell_handle n_cell = cell->neighbor(facet);
-            n_cell->info().isWaterReservoir = true;
-            waterReservoirRecursion(n_cell,flow);
-        }
+    for (int facet = 0; facet < 4; facet ++) {
+        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+        if (cell->neighbor(facet)->info().p() != bndCondValue[3]) continue;
+        if (cell->neighbor(facet)->info().isWaterReservoir==true) continue;
+        Cell_handle n_cell = cell->neighbor(facet);
+        n_cell->info().isWaterReservoir = true;
+        waterReservoirRecursion(n_cell,flow);
     }
 }
 
 //initialize the boundingCells info().isAirReservoir=true, on condition that those cells meet (flow->boundingCells[bound].size()!=0 && cell->info().p()!=0) 
 template<class Solver>
+void UnsaturatedEngine::updateAirReservoir(Solver& flow)
+{
+    initAirReservoirBound(flow);
+    for (int bound=0; bound<6; bound++) {
+        if (flow->boundingCells[bound].size()==0) continue;
+        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
+        for ( it ; it != flow->boundingCells[bound].end(); it++) {
+            if ((*it)->info().index == 0) continue;
+            airReservoirRecursion((*it),flow);
+        }
+    }
+}
+template<class Solver>//the boundingCells[2] should always connect air reservoir && isAirReservoir=true
 void UnsaturatedEngine::initAirReservoirBound(Solver& flow)
 {
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
@@ -256,40 +283,22 @@ void UnsaturatedEngine::initAirReservoirBound(Solver& flow)
         if (flow->boundingCells[bound].size()==0) continue;
         vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
         for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            if((*it)->info().p() == 0) continue;//FIXME: the default pressure for water is 0
-            (*it)->info().isAirReservoir = true;
+            if((*it)->info().index == 0) continue;
+            if((*it)->info().p() == bndCondValue[2])
+                (*it)->info().isAirReservoir = true;
         }
     }
 }
-
-template<class Solver>
-void UnsaturatedEngine::updateAirReservoir(Solver& flow)
-{
-    initAirReservoirBound(flow);
-    for (int bound=0; bound<6; bound++) {
-        if (flow->boundingCells[bound].size()==0) continue;
-        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
-        for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            if((*it)->info().isAirReservoir == false) continue;
-            airReservoirRecursion((*it),flow);
-        }
-    }
-}
-
 template<class Solver>
 void UnsaturatedEngine::airReservoirRecursion(Cell_handle cell, Solver& flow)
 {
-    if(cell->info().isAirReservoir == true) {
-        for (int facet = 0; facet < 4; facet ++) {
-            if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-            if (cell->neighbor(facet)->info().p() == 0) continue;
-            if (cell->neighbor(facet)->info().isAirReservoir == true) continue;
-            Cell_handle n_cell = cell->neighbor(facet);
-            n_cell->info().isAirReservoir = true;
-            airReservoirRecursion(n_cell,flow);
-        }
+    for (int facet = 0; facet < 4; facet ++) {
+        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+        if (cell->neighbor(facet)->info().p() != bndCondValue[2]) continue;
+        if (cell->neighbor(facet)->info().isAirReservoir == true) continue;
+        Cell_handle n_cell = cell->neighbor(facet);
+        n_cell->info().isAirReservoir = true;
+        airReservoirRecursion(n_cell,flow);
     }
 }
 
@@ -774,21 +783,22 @@ void UnsaturatedEngine::updateVolumeCapillaryCell ( Solver& flow)
 template<class Solver>
 Real UnsaturatedEngine::getSaturation (Solver& flow )
 {
-    updateAirReservoir(flow);
-    updateWaterReservoir(flow);    
+//      updateAirReservoir(flow);
+//     updateWaterReservoir(flow);    
+    updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Real capillary_volume = 0.0; //total capillary volume
     Real air_volume = 0.0; 	//air volume
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if (tri.is_infinite(cell)) continue;
-        if (cell->info().Pcondition) continue;
+        if (cell->info().Pcondition) continue;//when calculating saturation, exclude boundary cells?(chao)
 // 	    if (cell.has_vertex() )
         capillary_volume = capillary_volume + cell->info().capillaryCellVolume;
         if (cell->info().isAirReservoir==true) {
             air_volume = air_volume + cell->info().capillaryCellVolume;
         }
-    }
+    }cerr<<"air_volume:"<<air_volume<<"  capillary_volume:"<<capillary_volume<<endl;
     Real saturation = 1 - air_volume/capillary_volume;
     return saturation;
 }

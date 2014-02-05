@@ -65,7 +65,9 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void initAirReservoirBound(Solver& flow);
 		TPL void updateAirReservoir(Solver& flow);
 		TPL void airReservoirRecursion(Cell_handle cell, Solver& flow);
-
+		TPL void updateReservoir(Solver& flow);
+		TPL void updatePressure(Solver& flow);
+		
 		TPL unsigned int imposePressure(Vector3r pos, Real p,Solver& flow);
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
