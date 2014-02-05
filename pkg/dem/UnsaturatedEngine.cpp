@@ -205,7 +205,7 @@ void UnsaturatedEngine::updatePressure(Solver& flow)
     } 
 }
 
-template<class Solver>
+template<class Solver>//update reservoir attr and pressure
 void UnsaturatedEngine::updateReservoir(Solver& flow)
 {
     updatePressure(flow);
@@ -783,8 +783,6 @@ void UnsaturatedEngine::updateVolumeCapillaryCell ( Solver& flow)
 template<class Solver>
 Real UnsaturatedEngine::getSaturation (Solver& flow )
 {
-//      updateAirReservoir(flow);
-//     updateWaterReservoir(flow);    
     updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Real capillary_volume = 0.0; //total capillary volume
@@ -798,7 +796,7 @@ Real UnsaturatedEngine::getSaturation (Solver& flow )
         if (cell->info().isAirReservoir==true) {
             air_volume = air_volume + cell->info().capillaryCellVolume;
         }
-    }cerr<<"air_volume:"<<air_volume<<"  capillary_volume:"<<capillary_volume<<endl;
+    }/*cerr<<"air_volume:"<<air_volume<<"  capillary_volume:"<<capillary_volume<<endl;*/
     Real saturation = 1 - air_volume/capillary_volume;
     return saturation;
 }
