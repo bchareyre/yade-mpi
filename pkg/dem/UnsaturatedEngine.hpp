@@ -94,6 +94,7 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void testSolidLine(Solver& flow);
 		TPL void computeSolidLine(Solver& flow);
 		TPL void computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache=false);
+		TPL void testReservoirAttr(Solver& flow);
 		
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
@@ -158,6 +159,7 @@ class UnsaturatedEngine : public PartialEngine
  		void		_testSolidLine(){testSolidLine(solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		bool		_testNoCache() {return testNoCache(solver);}
+		void		_testReservoir() {return testReservoirAttr(solver);}
 		
 		virtual ~UnsaturatedEngine();
 
@@ -232,6 +234,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("testSolidLine",&UnsaturatedEngine::_testSolidLine,"For checking solidLine.")
 					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("testNoCache",&UnsaturatedEngine::_testNoCache, "test noCache.")
+					.def("testReservoirAttr",&UnsaturatedEngine::_testReservoir, "test reservoir attributes.")
 					)
 		DECLARE_LOGGER;
 };

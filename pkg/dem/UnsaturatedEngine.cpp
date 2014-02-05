@@ -51,7 +51,7 @@ void UnsaturatedEngine::testFunction()
 		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
 		computeSolidLine(solver);//save cell->info().solidLine[j][y]
 	}
-	solver->noCache = false;
+	solver->noCache = true;
 }
 
 void UnsaturatedEngine::action()
@@ -147,16 +147,8 @@ void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Sol
 template<class Solver>
 void UnsaturatedEngine::invade2 (Solver& flow)
 {
-//     BoundaryConditions(flow);
-//     flow->pressureChanged=true;
-//     flow->reApplyBoundaryConditions();
     updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
-//     Finite_cells_iterator cell_end = tri.finite_cells_end();
-//     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
-//         if (cell->info().isAirReservoir == true)
-//             cell->info().p() = bndCondValue[2];
-//     }
     Finite_cells_iterator _cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator _cell = tri.finite_cells_begin(); _cell != _cell_end; _cell++ ) {
         if(_cell->info().isAirReservoir == true)
@@ -1365,6 +1357,20 @@ void UnsaturatedEngine::testSolidLine(Solver& flow)
       }
     }
     file.close();
+}
+
+template<class Solver>
+void UnsaturatedEngine::testReservoirAttr(Solver& flow)
+{
+    ofstream file;
+    file.open("reservoir.txt");
+    file << "cellID	isWaterReservoir	isAirReservoir \n";
+    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = Tri.finite_cells_end();
+    for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+      file<<cell->info().index<<"	"<<cell->info().isWaterReservoir<<"	"<<cell->info().isAirReservoir<<endl;
+    }
+    file.close();  
 }
 
 YADE_PLUGIN ( ( UnsaturatedEngine ) );
