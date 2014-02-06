@@ -226,11 +226,13 @@ class UnsatCellInfo : public FlowCellInfo {
 	Real capillaryCellVolume;//for calculating saturation
 	std::vector<double> poreRadius;//pore throat radius for drainage
 	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_Lines in the facet.
+	double trapCapP;//for calculating the pressure of trapped phase, cell.Pressure_trapped = Pressure_air - trapCapP.
 	UnsatCellInfo (void)
 	{
 		poreRadius.resize(4, 0);
 		isWaterReservoir = false; isAirReservoir = false; capillaryCellVolume = 0;	  
-		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidLine[k][l]=0;		
+		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidLine[k][l]=0;
+		trapCapP = 0;
 	}
 };
 

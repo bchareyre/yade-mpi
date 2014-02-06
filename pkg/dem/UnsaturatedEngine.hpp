@@ -75,6 +75,7 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow);
 		TPL void invade (Solver& flow );
 		TPL void invade2 (Solver& flow );
+		TPL void checkTrap(Solver& flow, double pressure);//check trapped phase, define trapCapP.		
 		TPL Real getMinEntryValue (Solver& flow );
 		TPL Real getMinEntryValue2 (Solver& flow);
 		TPL Real getSaturation(Solver& flow);
@@ -124,7 +125,7 @@ class UnsaturatedEngine : public PartialEngine
 		Real computePoreArea(Cellhandle cell, int j);
 		template<class Cellhandle>
 		Real computePorePerimeter(Cellhandle cell, int j);		
-		void saveVtk() {solver->saveVtk();}
+		void saveVtk() {bool initT= solver->noCache; solver->noCache=false; solver->saveVtk(); solver->noCache=initT;}
 		python::list getConstrictions() {
 			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}

@@ -22,6 +22,7 @@
 
 #include "UnsaturatedEngine.hpp"
 #include <CGAL/Plane_3.h>
+#include <CGAL/Plane_3.h>
 
 CREATE_LOGGER ( UnsaturatedEngine );
 
@@ -149,10 +150,28 @@ void UnsaturatedEngine::invade2 (Solver& flow)
 {
     updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if(cell->info().isAirReservoir == true)
+            invadeSingleCell2(cell,cell->info().p(),flow);
+    }
+    checkTrap(flow,bndCondValue[2]);
     Finite_cells_iterator _cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator _cell = tri.finite_cells_begin(); _cell != _cell_end; _cell++ ) {
-        if(_cell->info().isAirReservoir == true)
-            invadeSingleCell2(_cell,_cell->info().p(),flow);
+        if( (_cell->info().isWaterReservoir) || (_cell->info().isAirReservoir) ) continue;
+        _cell->info().p() = bndCondValue[2] - _cell->info().trapCapP;
+    }
+}
+
+template<class Solver>//check trapped phase, define trapCapP.
+void UnsaturatedEngine::checkTrap(Solver& flow, double pressure)
+{
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+      if( (cell->info().isWaterReservoir) || (cell->info().isAirReservoir) ) continue;
+      if(cell->info().trapCapP!=0) continue;
+      cell->info().trapCapP=pressure;
     }
 }
 
