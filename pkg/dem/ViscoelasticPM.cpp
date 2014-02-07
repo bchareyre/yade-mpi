@@ -40,6 +40,11 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	if (mat1->massMultiply and mat2->massMultiply) {
 		mass1 = Body::byId(interaction->getId1())->state->mass;
 		mass2 = Body::byId(interaction->getId2())->state->mass;
+		if (mass1 == 0.0 and mass2 > 0.0) {
+			mass1 = mass2;
+		} else if (mass2 == 0.0 and mass1 > 0.0) {
+			mass2 = mass1;
+		}
 	}
 	
 	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
