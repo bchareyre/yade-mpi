@@ -303,7 +303,7 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	I=math.pi*(2.*radius)**4/64.
 	E=nodeMat.young
 	i.phys.kn=E*math.pi*(radius**2)/L
-	i.phys.kr=2.*E*I/L
+	i.phys.kr=E*I/L
 	i.phys.ks=12.*E*I/(L**3)
 	G=E/(2.*(1+nodeMat.poisson))
 	i.phys.ktw=2.*I*G/L

@@ -219,8 +219,14 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				// ... and check whether the sphere projection is before the neighbours connections too.
 				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
 				if(relPosPrev<=0){ //if the sphere projection is outside both the current Connection AND this neighbouring connection, then create the interaction if the neighbour did not already do it before.
-					if(intr && intr->isReal() && isNew) return false;
-					if(intr && intr->isReal() && !isNew) {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
+					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
+					if(intr && intr->isReal()){
+						shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
+						if(!intrGeom->isDuplicate==1){ //skip contact.
+							if (isNew) {return false;}
+							else {scm->isDuplicate=1;}/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/
+						}
+					}
 				}
 				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
 					if (isNew)return false;
@@ -247,10 +253,15 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 					if(abs(segtNext[j])<1e-14) segtNext[j]=0.0;
 				}
 				Real relPosNext = (branchN.dot(segtNext))/(segtNext.norm()*segtNext.norm());
-				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo2->ConnList[i]->getId());
 				if(relPosNext<=0){ //if the sphere projection is outside both the current Connection AND this neighbouring connection, then create the interaction if the neighbour did not already do it before.
-					if(intr && intr->isReal() && isNew) return false;
-					if(intr && intr->isReal() && !isNew) {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
+					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo2->ConnList[i]->getId());
+					if(intr && intr->isReal()){
+						shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
+						if(!intrGeom->isDuplicate==1){
+							if (isNew) return false;
+							else scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/
+						}
+					}
 				}
 				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
 					if (isNew)return false;
