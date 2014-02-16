@@ -35,7 +35,6 @@ using namespace boost;
 	#include<gl2ps.h>
 #endif
 
-static int last(-1);
 static unsigned initBlocked(State::DOF_NONE);
 
 CREATE_LOGGER(GLViewer);
@@ -65,7 +64,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	cut_plane_delta = -2;
 	gridSubdivide = false;
 	resize(550,550);
-
+	last=-1;
 	if(viewId==0) setWindowTitle("Primary view");
 	else setWindowTitle(("Secondary view #"+lexical_cast<string>(viewId)).c_str());
 
@@ -87,6 +86,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
 	setKeyDescription(Qt::Key_G,"Toggle grid visibility; g turns on and cycles");
 	setKeyDescription(Qt::Key_G & Qt::ShiftModifier ,"Hide grid.");
+	setKeyDescription(Qt::Key_M, "Move selected object.");
 	setKeyDescription(Qt::Key_X,"Show the xz [shift: xy] (up-right) plane (clip plane: align normal with +x)");
 	setKeyDescription(Qt::Key_Y,"Show the yx [shift: yz] (up-right) plane (clip plane: align normal with +y)");
 	setKeyDescription(Qt::Key_Z,"Show the zy [shift: zx] (up-right) plane (clip plane: align normal with +z)");
@@ -224,8 +224,18 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
 	else if(e->key()==Qt::Key_G) { if(e->modifiers() & Qt::ShiftModifier){ drawGrid=0; return; } else drawGrid++; if(drawGrid>=8) drawGrid=0; }
 	else if (e->key()==Qt::Key_M && selectedName() >= 0){ 
-		if(!(isMoving=!isMoving)){displayMessage("Moving done."); if (last>=0) {Body::byId(Body::id_t(last))->state->blockedDOFs=initBlocked; last=-1; Omega::instance().getScene()->selectedBody = -1;} mouseMovesCamera();}
-		else{ displayMessage("Moving selected object"); mouseMovesManipulatedFrame();}
+		if(!(isMoving=!isMoving)){
+			displayMessage("Moving done.");
+			if (last>=0) {Body::byId(Body::id_t(last))->state->blockedDOFs=initBlocked; last=-1;} mouseMovesCamera();}
+		else{ 	displayMessage("Moving selected object");
+			
+			long selection = Omega::instance().getScene()->selectedBody;
+			initBlocked=Body::byId(Body::id_t(selection))->state->blockedDOFs; last=selection;
+			Body::byId(Body::id_t(selection))->state->blockedDOFs=State::DOF_ALL;
+			Quaternionr& q = Body::byId(selection)->state->ori;
+			Vector3r&    v = Body::byId(selection)->state->pos;
+			manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q.x(),q.y(),q.z(),q.w()));
+			mouseMovesManipulatedFrame();}
 	}
 	else if (e->key() == Qt::Key_T) camera()->setType(camera()->type()==qglviewer::Camera::ORTHOGRAPHIC ? qglviewer::Camera::PERSPECTIVE : qglviewer::Camera::ORTHOGRAPHIC);
 	else if(e->key()==Qt::Key_O) camera()->setFieldOfView(camera()->fieldOfView()*0.9);
@@ -393,19 +403,15 @@ void GLViewer::postSelection(const QPoint& point)
 	}
 	if(selection>=0 && (*(Omega::instance().getScene()->bodies)).exists(selection)){
 		resetManipulation();
+		if (last>=0) {Body::byId(Body::id_t(last))->state->blockedDOFs=initBlocked; last=-1;}
 		if(Body::byId(Body::id_t(selection))->isClumpMember()){ // select clump (invisible) instead of its member
 			LOG_DEBUG("Clump member #"<<selection<<" selected, selecting clump instead.");
 			selection=Body::byId(Body::id_t(selection))->clumpId;			
 		}
-		initBlocked=Body::byId(Body::id_t(selection))->state->blockedDOFs;
-		Body::byId(Body::id_t(selection))->state->blockedDOFs=State::DOF_ALL;
 		
 		setSelectedName(selection);
 		LOG_DEBUG("New selection "<<selection);
 		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
-		Quaternionr& q = Body::byId(selection)->state->ori;
-		Vector3r&    v = Body::byId(selection)->state->pos;
-		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q.x(),q.y(),q.z(),q.w()));
 		Omega::instance().getScene()->selectedBody = selection;
 			PyGILState_STATE gstate;
 			gstate = PyGILState_Ensure();

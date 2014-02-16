@@ -224,7 +224,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 	//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//Reflect mean-field (periodic cell) acceleration in the velocity
 	if(scene->isPeriodic && homoDeform) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
-	if (!bodySelected || scene->selectedBody!=id) state->pos+=state->vel*dt;
+	state->pos+=state->vel*dt;
 }
 
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
