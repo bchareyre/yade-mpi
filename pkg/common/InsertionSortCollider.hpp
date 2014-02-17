@@ -82,7 +82,14 @@ Possible performance improvements & bugs
 
 class NewtonIntegrator;
 
+class Integrator;
+
+class GeneralIntegratorInsertionSortCollider;// Forward decleration of child to decleare it as friend
+
 class InsertionSortCollider: public Collider{
+
+	friend GeneralIntegratorInsertionSortCollider;
+
 	//! struct for storing bounds of bodies
 	struct Bounds{
 		//! coordinate along the given sortAxis
