@@ -7,13 +7,14 @@ from yade.wrapper import *
 from yade import utils,Matrix3,Vector3
 
 #textExt===============================================================
-def textExt(filename, format='x_y_z_r', comment='',mask=-1):
+def textExt(filename, format='x_y_z_r', comment='',mask=-1,attrs=[]):
 	"""Save sphere coordinates and other parameters into a text file in specific format. Non-spherical bodies are silently skipped. Users can add here their own specific format, giving meaningful names. The first file row will contain the format name. Be sure to add the same format specification in ymport.textExt.
 
 	:param string filename: the name of the file, where sphere coordinates will be exported.
-	:param string format: the name of output format. Supported 'x_y_z_r'(default), 'x_y_z_r_matId'
-	:param string comment: the text, which will be added as a comment at the top of file. If you want to create several lines of text, please use '\\\\n#' for next lines.
+	:param string format: the name of output format. Supported 'x_y_z_r'(default), 'x_y_z_r_matId', 'x_y_z_r_attrs' (use proper comment)
+	:param string comment: the text, which will be added as a comment at the top of file. If you want to create several lines of text, please use '\\\\n#' for next lines. With 'x_y_z_r_attrs' format, the last (or only) line should consist of column headers of quantities passed as attrs (1 comment word for scalars, 3 comment words for vectors and 9 comment words for matrices)
 	:param int mask: export only spheres with the corresponding mask export only spheres with the corresponding mask
+	:param [str] attrs: attributes to be exported with 'x_y_z_r_attrs' format. Each str in the list is evaluated for every body exported with body=b (i.e. 'b.state.pos.norm()' would stand for distance of body from coordinate system origin)
 	:return: number of spheres which were written.
 	:rtype: int
 	"""
@@ -26,12 +27,19 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	
 	count=0
 	
+	# TODO use output=[] instrad of ''???
 	output = ''
 	outputVel=''
 	if (format<>'liggghts_in'):
 		output = '#format ' + format + '\n'
 		if (comment):
-			output += '# ' + comment + '\n'
+			if format=='x_y_z_r_attrs':
+				cmts = comment.split('\n')
+				for cmt in cmts[:-1]:
+					output += cmt
+				output += '# x y z r ' + cmts[-1] + '\n'
+			else:
+				output += '# ' + comment + '\n'
 	
 	minCoord= Vector3.Zero
 	maxCoord= Vector3.Zero
@@ -44,6 +52,17 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 					output+=('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
 				elif (format=='x_y_z_r_matId'):
 					output+=('%g\t%g\t%g\t%g\t%d\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
+				elif (format=='x_y_z_r_attrs'):
+					output+=('%g\t%g\t%g\t%g'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius))
+					for cmd in attrs:
+						v = eval(cmd)
+						if isinstance(v,(int,float)):
+							output+='\t%g'%v
+						elif isinstance(v,Vector3):
+							output+='\t%g\t%g\t%g'%tuple(v[i] for i in xrange(3))
+						elif isinstance(v,Matrix3):
+							output+='\t%g'%tuple(v[i] for i in xrange(9))
+					output += '\n'
 				elif (format=='id_x_y_z_r_matId'):
 					output+=('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
 				elif (format=='jointedPM'):
@@ -75,6 +94,29 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1):
 	out.write(output)
 	out.close()
 	return count
+
+	bodies = [b for b in O.bodies if isinstance(b.shape,Sphere) and (True if mask==-1 else b.msak==mask)]
+	data = []
+	for b in bodies:
+		pos = b.state.pos
+		d = [pos[i] for i in (0,1,2)]
+		for name,command in what:
+			val = eval(command)
+			if isinstance(val,Matrix3):
+				d.extend((val[0,0],val[0,1],val[0,2],val[1,0],val[1,1],val[1,2],val[2,0],val[2,1],val[2,2]))
+			elif isinstance(val,Vector3):
+				d.extend((v[0],v[1],v[2]))
+			elif isinstance(val,(int,float)):
+				d.append(val)
+			else:
+				print 'WARNING: export.text: wrong `what` parameter, output might be corrupted'
+				return 0
+		data.append(d)
+	dataw = [' '.join('%e'%v for v in d) for d in data]
+	outFile = open(filename,'w')
+	outFile.writelines(dataw)
+	outFile.close()
+	return len(bodies)
   
 #textExt===============================================================
 def textClumps(filename, format='x_y_z_r_clumpId', comment='',mask=-1):
@@ -792,3 +834,103 @@ Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\n\
 			pass
 	out.close()
 	return count
+
+
+
+
+# external vtk manipulation ===============================================================
+def text2vtk(inFileName,outFileName):
+	"""Converts text file (created by :yref:`yade.export.textExt` function) into vtk file.
+	See :ysrc:`examples/test/paraview-spheres-solid-section/export_text.py` example
+
+	:param str inFileName: name of input text file
+	:param str outFileName: name of output vtk file
+	"""
+	fin  = open(inFileName)
+	fout = open(outFileName,'w')
+	lastLine = None
+	line = '#'
+	while line.startswith('#'):
+		lastLine = line
+		line = fin.readline()
+	columns = lastLine.split()[5:]
+	data = [line.split() for line in fin]
+	fin.close()
+	n = len(data)
+	fout.write('# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n'%(n))
+	fout.writelines('%s %s %s\n'%(d[0],d[1],d[2]) for d in data)
+	fout.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
+	fout.writelines('%s\n'%(d[3]) for d in data)
+	for i,c in enumerate(columns):
+		fout.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(c))
+		fout.writelines('%s\n'%(d[4+i]) for d in data)
+	fout.close()
+
+def text2vtkSection(inFileName,outFileName,point,normal=(1,0,0)):
+	"""Converts section through spheres from text file (created by :yref:`yade.export.textExt` function) into vtk file.
+	See :ysrc:`examples/test/paraview-spheres-solid-section/export_text.py` example
+
+	:param str inFileName: name of input text file
+	:param str outFileName: name of output vtk file
+	:param Vector3|(float,float,float) point: coordinates of a point lying on the section plane
+	:param Vector3|(float,float,float) normal: normal vector of the section plane
+	"""
+	from math import sqrt
+	norm = sqrt(pow(normal[0],2)+pow(normal[1],2)+pow(normal[2],2))
+	normal = (normal[0]/norm,normal[1]/norm,normal[2]/norm)
+	#
+	def computeD(point,normal):
+		# from point and normal computes parameter d in plane equation ax+by+cz+d=0
+		return -normal[0]*point[0] - normal[1]*point[1] - normal[2]*point[2]
+	def computeDistanceFromPlane(dat,point,normal,d=None):
+		# computes distance of sphere dat from plane (point,normal)
+		x,y,z = computeProjectionOnPlane(dat,point,normal,d)
+		cx,cy,cz = dat[0],dat[1],dat[2]
+		return sqrt(pow(x-cx,2)+pow(y-cy,2)+pow(z-cz,2))
+	def computeProjectionOnPlane(self,point,normal,d=None):
+		# computes projection of sphere dat on plane (point,normal)
+		if d is None:
+			d = computeD(point,normal)
+		nx,ny,nz = normal[0],normal[1],normal[2]
+		cx,cy,cz = dat[0],dat[1],dat[2]
+		t = (-d-nx*cx-ny*cy-nz*cz) / (nx*nx+ny*ny+nz*nz)
+		x,y,z = cx+t*nx, cy+t*ny, cz+t*nz
+		return x,y,z
+	#
+	fin  = open(inFileName)
+	lastLine = None
+	line = '#'
+	while line.startswith('#'):
+		lastLine = line
+		line = fin.readline()
+	columns = lastLine.split()[4:]
+	data = [[float(w) for w in line.split()] for line in fin]
+	fin.close()
+	#
+	d = computeD(point,normal)
+	circs = []
+	for dat in data:
+		r = dat[3]
+		dst = computeDistanceFromPlane(dat,point,normal,d)
+		if dst > r:
+			continue
+		x,y,z = computeProjectionOnPlane(dat,point,normal,d)
+		rNew = sqrt(r*r-dst*dst)
+		dNew = [x,y,z,rNew,r]
+		dNew.extend(dat[4:])
+		circs.append(dNew)
+	n = len(circs)
+	fout = open(outFileName,'w')
+	fout.write('# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n'%(n))
+	fout.writelines('%g %g %g\n'%(c[0],c[1],c[2]) for c in circs)
+	fout.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
+	fout.writelines('%g\n'%(c[3]) for c in circs)
+	fout.write("\nSCALARS radiusOrig double 1\nLOOKUP_TABLE default\n")
+	fout.writelines('%g\n'%(c[4]) for c in circs)
+	fout.write("\nVECTORS normal double\n")
+	fout.writelines("%g %g %g\n"%normal for i in circs)
+	for i,c in enumerate(columns):
+		fout.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(c))
+		fout.writelines('%s\n'%(c[4+i]) for c in circs)
+	fout.close()
+
