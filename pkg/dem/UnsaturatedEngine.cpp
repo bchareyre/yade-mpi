@@ -128,19 +128,18 @@ Real UnsaturatedEngine::getMinEntryValue (Solver& flow )
 template<class Solver>
 void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow)
 {
-    double surface_tension = surfaceTension ;
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
         if (cell->neighbor(facet)->info().isAirReservoir == true) continue;
         if (cell->neighbor(facet)->info().isWaterReservoir == false) continue;
         if (cell->neighbor(facet)->info().Pcondition) continue;
-        double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
-        if (pressure > n_cell_pe) {
-            Cell_handle n_cell = cell->neighbor(facet);
-            n_cell->info().p() = pressure;
-            n_cell->info().isAirReservoir=true;
-            n_cell->info().isWaterReservoir=false;
-            invadeSingleCell2(n_cell, pressure, flow);
+        double nCellP = surfaceTension/cell->info().poreRadius[facet];
+        if (pressure > nCellP) {
+            Cell_handle nCell = cell->neighbor(facet);
+            nCell->info().p() = pressure;
+            nCell->info().isAirReservoir=true;
+            nCell->info().isWaterReservoir=false;
+            invadeSingleCell2(nCell, pressure, flow);
         }
     }
 }
@@ -180,7 +179,6 @@ Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
 {
     updateReservoir(flow);
     Real nextEntry = 1e50;
-    double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
@@ -189,7 +187,7 @@ Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
                 if (tri.is_infinite(cell->neighbor(facet))) continue;
                 if ( (cell->neighbor(facet)->info().isAirReservoir == true) || (cell->neighbor(facet)->info().isWaterReservoir == false) ) continue;
                 if (cell->neighbor(facet)->info().Pcondition) continue;
-                double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
+                double n_cell_pe = surfaceTension/cell->info().poreRadius[facet];
                 nextEntry = min(nextEntry,n_cell_pe);
             }
         }
@@ -1250,8 +1248,6 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 	
-// 	solver->noCache=true;//FIXME:turn true ??(Chao)
-	
 	#ifdef parallel_forces
 	if (solver->noCache) {
 		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
@@ -1310,7 +1306,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(Solver& flow, bool onlyC
 		}
 		solver->noCache=false;//cache should always be defined after execution of this function
 		if (onlyCache) return;
-	} else {//use cached values //FIXME:Never run, currently.(chao)
+	} else {//use cached values when triangulation doesn't change
 		#ifndef parallel_forces
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
@@ -1347,49 +1343,6 @@ void UnsaturatedEngine::computeSolidLine(Solver& flow)
             solver->Line_Solid_Pore(cell, j);
         }
     }
-}
-
-template<class Solver>//tempt test, clean later
-void UnsaturatedEngine::vertxID(Solver& flow)
-{
-    ofstream file;
-    file.open("vertexID.txt");
-    file << "vertexID	Pos	Force \n";
-    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
-    for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
-        if (!v->info().isFictious) file<<v->info().id()<<"		"<<v->point().point()<<"		"<<v->info().forces<<endl;
-    }
-    file.close();
-}
-
-template<class Solver>//tempt test. clean later
-void UnsaturatedEngine::testSolidLine(Solver& flow)
-{
-    ofstream file;
-    file.open("solidLine.txt");
-    file << "cellID facet solidLine[j][0] solidLine[j][1] solidLine[j][2] solidLine[j][3] \n";
-    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();   
-    for (VCell_iterator cell_it=flow->T[currentTes].cellHandles.begin(); cell_it!=flow->T[currentTes].cellHandles.end(); cell_it++){
-	Cell_handle& cell = *cell_it;      
-      for(int j=0; j<4;j++) {
-	file<<cell->info().index<<" "<<j<<" "<<cell->info().solidLine[j][0]<<" "<<cell->info().solidLine[j][1]<<" "<<cell->info().solidLine[j][2]<<" "<<cell->info().solidLine[j][3]<<endl;
-      }
-    }
-    file.close();
-}
-
-template<class Solver>
-void UnsaturatedEngine::testReservoirAttr(Solver& flow)
-{
-    ofstream file;
-    file.open("reservoir.txt");
-    file << "cellID	isWaterReservoir	isAirReservoir \n";
-    RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
-    Finite_cells_iterator cell_end = Tri.finite_cells_end();
-    for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-      file<<cell->info().index<<"	"<<cell->info().isWaterReservoir<<"	"<<cell->info().isAirReservoir<<endl;
-    }
-    file.close();  
 }
 
 YADE_PLUGIN ( ( UnsaturatedEngine ) );

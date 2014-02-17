@@ -91,15 +91,11 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void savePoreThroatInfo(Solver& flow);
 		TPL void debugTemp(Solver& flow);
 		
-		TPL void vertxID(Solver& flow);
-		TPL void testSolidLine(Solver& flow);
 		TPL void computeSolidLine(Solver& flow);
 		TPL void computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache=false);
-		TPL void testReservoirAttr(Solver& flow);
 		
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-		TPL bool testNoCache(Solver&flow){bool testnoCache=flow->noCache; return testnoCache;}//clean later
 		
 		template<class Cellhandle >
 		double getRadiusMin(Cellhandle cell, int j);
@@ -156,25 +152,20 @@ class UnsaturatedEngine : public PartialEngine
  		void		_savePoreThroatInfo(){savePoreThroatInfo(solver);}
  		void		_debugTemp(){debugTemp(solver);}
  		void		_computeFacetPoreForcesWithCache(){computeFacetPoreForcesWithCache(solver);}
- 		void		_vertxID(){vertxID(solver);}
- 		void		_testSolidLine(){testSolidLine(solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
-		bool		_testNoCache() {return testNoCache(solver);}
-		void		_testReservoir() {return testReservoirAttr(solver);}
 		
 		virtual ~UnsaturatedEngine();
 
 		virtual void action();
 
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(UnsaturatedEngine,PartialEngine,"Preliminary version engine of a model for unsaturated soils",
-// 					((bool,drainageActivated,true,,"Activate drainage"))//use later
-// 					((bool,imbibitionActivated,true,,"Activate imbibition"))//use later					
+					((bool,isActivated,true,,"Activate UnsaturatedEngine."))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool, Debug, false,,"Activate debug messages"))
 					((double, wall_thickness,0.001,,"Walls thickness"))
 					((double,P_zero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
 					((double,gasPressure,0,,"Invasion pressure"))
-					((double,surfaceTension,0.0728,,"Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
+					((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 					((double, porosity, 0,,"Porosity computed at each retriangulation"))
 					((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
 					((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
@@ -194,11 +185,6 @@ class UnsaturatedEngine : public PartialEngine
 					,
 					/*deprec*/
 					,,
-// 					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero();}
-// 					normal[wall_bottom].y()=normal[wall_left].x()=normal[wall_back].z()=1;
-// 					normal[wall_top].y()=normal[wall_right].x()=normal[wall_front].z()=-1;
-// 					solver = shared_ptr<FlowSolver> (new FlowSolver);
-// 					first=true;
 					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero(); wallIds[i]=i;}
 					normal[wall_ymin].y()=normal[wall_xmin].x()=normal[wall_zmin].z()=1;
 					normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
@@ -231,11 +217,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion from all cells with air pressure. ")
 					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion from all cells with air pressure.(version2,water can be trapped in cells) ")
 					.def("computeForce",&UnsaturatedEngine::_computeFacetPoreForcesWithCache,"Test computeFacetPoreForcesWithCache(). ")
-					.def("vertxID",&UnsaturatedEngine::_vertxID,"cout vertxID. ")
-					.def("testSolidLine",&UnsaturatedEngine::_testSolidLine,"For checking solidLine.")
 					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
-					.def("testNoCache",&UnsaturatedEngine::_testNoCache, "test noCache.")
-					.def("testReservoirAttr",&UnsaturatedEngine::_testReservoir, "test reservoir attributes.")
 					)
 		DECLARE_LOGGER;
 };
