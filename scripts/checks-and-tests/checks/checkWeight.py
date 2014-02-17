@@ -43,7 +43,7 @@ O.engines=[
 ]
 
 
-O.run(10000)
+O.run(30000)
 O.wait()
 curForce = utils.sumForces(ids=floorId,direction=Vector3(0,0,1))*(-1)
 print ("Precalculated weight %f" % sphMass)

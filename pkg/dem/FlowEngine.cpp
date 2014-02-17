@@ -64,15 +64,9 @@ void FlowEngine::action()
         timingDeltas->checkpoint ( "Update_Volumes" );
 	
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( (defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval) {
-                updateTriangulation = true;
-                Eps_Vol_Cumulative=0;
-                retriangulationLastIter=0;
-                ReTrg++;
-        } else  {
-		updateTriangulation = false;
-		retriangulationLastIter++;}
-
+	retriangulationLastIter++;
+	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
+		(defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
 
         ///Compute flow and and forces here
 	if (pressureForce){
@@ -119,6 +113,7 @@ void FlowEngine::action()
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
 			updateTriangulation=false;
+			Eps_Vol_Cumulative=0;
 			ellapsedIter=0;
 			boost::thread workerThread(&FlowEngine::backgroundAction,this);
 			workerThread.detach();
@@ -136,7 +131,10 @@ void FlowEngine::action()
 			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
 			ComputeViscousForces(*solver);
-               		updateTriangulation = false;}
+               		updateTriangulation = false;
+			Eps_Vol_Cumulative=0;
+			retriangulationLastIter=0;
+			ReTrg++;}
         }
         first=false;
         timingDeltas->checkpoint ( "Triangulate + init volumes" );
@@ -267,8 +265,10 @@ void FlowEngine::Build_Triangulation ( double P_zero, Solver& flow )
 	flow->T[flow->currentTes].cellHandles.clear();
 	flow->T[flow->currentTes].cellHandles.reserve(flow->T[flow->currentTes].Triangulation().number_of_finite_cells());
 	Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	int k=0;
+	for ( Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
 		flow->T[flow->currentTes].cellHandles.push_back(cell);
+		cell->info().id=k++;}//define unique numbering now, corresponds to position in cellHandles
         flow->DisplayStatistics ();
         flow->Compute_Permeability();
         porosity = flow->V_porale_porosity/flow->V_totale_porosity;
@@ -732,14 +732,10 @@ void PeriodicFlowEngine:: action()
 	timingDeltas->checkpoint("Triangulating");
         UpdateVolumes (solver);
         Eps_Vol_Cumulative += eps_vol_max;
-        if ( (defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval ) {
-                updateTriangulation = true;
-                Eps_Vol_Cumulative=0;
-                retriangulationLastIter=0;
-                ReTrg++;
-         } else  {
-		updateTriangulation = false;
-		retriangulationLastIter++;}
+	retriangulationLastIter++;
+	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
+		(defTolerance>0 && Eps_Vol_Cumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
+
 	timingDeltas->checkpoint("Update_Volumes");
 
 	///Compute flow and and forces here
@@ -784,6 +780,7 @@ void PeriodicFlowEngine:: action()
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
 			ellapsedIter=0;
+			Eps_Vol_Cumulative=0;
 			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			Initialize_volumes(solver);
@@ -798,7 +795,10 @@ void PeriodicFlowEngine:: action()
 			Build_Triangulation (P_zero, solver);
 			Initialize_volumes(solver);
 			ComputeViscousForces(*solver);
-               		updateTriangulation = false;}
+               		updateTriangulation = false;
+			Eps_Vol_Cumulative=0;
+                	retriangulationLastIter=0;
+                	ReTrg++;}
         }
         first=false;
 	timingDeltas->checkpoint("Ending");

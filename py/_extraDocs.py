@@ -84,9 +84,9 @@ Create a scene for triaxal test.
 wrapper.Peri3dController.__doc__=r'''
 Class for controlling independently all 6 components of "engineering" :yref:`stress<Peri3dController.stress>` and :yref:`strain<Peri3dController.strain>` of periodic :yref:`Cell`. :yref:`goal<Peri3dController.goal>` are the goal values, while :yref:`stressMask<Peri3dController.stressMask>` determines which components prescribe stress and which prescribe strain.
 
-If the strain is prescribed, appropeiate strain rate is directly applied. If the stress is prescribed, the strain predictor is used: from stress values in two previous steps the value of strain rate is prescribed so as the value of stress in the next step is as close as possible to the ideal one. Current algorithm is extremly simple and probably will be changed in future, but is roboust enough and mostly works fine.
+If the strain is prescribed, appropriate strain rate is directly applied. If the stress is prescribed, the strain predictor is used: from stress values in two previous steps the value of strain rate is prescribed so as the value of stress in the next step is as close as possible to the ideal one. Current algorithm is extremly simple and probably will be changed in future, but is roboust enough and mostly works fine.
 
-Stress error (difference between actual and ideal stress)  is evaluated in current and previous steps ($\mathrm{d}\sigma_i,\mathrm{d}\sigma_{i-1}$. Linear extrapolation is used to estimate error in the next step
+Stress error (difference between actual and ideal stress)  is evaluated in current and previous steps ($\mathrm{d}\sigma_i,\mathrm{d}\sigma_{i-1}$). Linear extrapolation is used to estimate error in the next step
 
 .. math:: \mathrm{d}\sigma_{i+1}=2\mathrm{d}\sigma_i - \mathrm{d}\sigma_{i-1}
 
@@ -106,7 +106,7 @@ The new value of :yref:`trsf<Cell.trsf>` is computed at $\mat{T}_{i+1}=\mat{UP}_
 
 Current implementation allow user to define independent loading "path" for each prescribed component. i.e. define the prescribed value as a function of time (or :yref:`progress<Peri3dController.progress>` or steps). See :yref:`Paths<Peri3dController.xxPath>`.
 
-Examples :ysrc:`scripts/test/peri3dController_example1` and :ysrc:`scripts/test/peri3dController_triaxialCompression` explain usage and inputs of Peri3dController, :ysrc:`scripts/test/peri3dController_shear` is an example of using shear components and also simulation on rotatd cell.
+Examples :ysrc:`examples/test/peri3dController_example1.py` and :ysrc:`examples/test/peri3dController_triaxialCompression.py` explain usage and inputs of Peri3dController, :ysrc:`examples/test/peri3dController_shear.py` is an example of using shear components and also simulation on rotated cell.
 '''
 
 

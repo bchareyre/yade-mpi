@@ -1,1 +1,9 @@
+Installation instructions are updating regularly. 
+The most actual instruction can be found on the 
+website:
+
 http://www.yade-dem.org/doc/installation.html
+
+which is generated from the following file:
+
+doc/sphinx/installation.rst

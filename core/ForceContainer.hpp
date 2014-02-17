@@ -234,7 +234,7 @@ class ForceContainer {
 		const Vector3r& getPermForce(Body::id_t id) { ensureSize(id); return _permForce[id]; }
 		const Vector3r& getPermTorque(Body::id_t id) { ensureSize(id); return _permTorque[id]; }
 		// single getters do the same as globally synced ones in the non-parallel flavor
-		const Vector3r& getForceSingle (Body::id_t id){ 
+		const Vector3r getForceSingle (Body::id_t id){ 
 			ensureSize(id); 
 			if (permForceUsed) {
 				return _force [id] + _permForce[id];
@@ -242,7 +242,7 @@ class ForceContainer {
 				return _force [id];
 			}
 		}
-		const Vector3r& getTorqueSingle(Body::id_t id){ 
+		const Vector3r getTorqueSingle(Body::id_t id){ 
 			ensureSize(id); 
 			if (permForceUsed) {
 				return _torque[id] + _permTorque[id];

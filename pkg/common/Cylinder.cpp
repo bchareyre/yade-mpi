@@ -741,13 +741,13 @@ void Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
 
     if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) {
         // BREAK due to tension
-        scene->interactions->requestErase(contact->getId1(),contact->getId2());
+        scene->interactions->requestErase(contact);
     } else {
         if ((-Fn)> currentContactPhysics->normalAdhesion) {//normal plasticity
             Fn=-currentContactPhysics->normalAdhesion;
             currentContactPhysics->unp = un+currentContactPhysics->normalAdhesion/currentContactPhysics->kn;
             if (currentContactPhysics->unpMax && currentContactPhysics->unp<currentContactPhysics->unpMax)
-                scene->interactions->requestErase(contact->getId1(),contact->getId2());
+                scene->interactions->requestErase(contact);
         }
         currentContactPhysics->normalForce = Fn*geom->normal;
         Vector3r& shearForce = geom->rotate(currentContactPhysics->shearForce);
@@ -823,13 +823,13 @@ void Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
     
     if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) {
         // BREAK due to tension
-        scene->interactions->requestErase(contact->getId1(),contact->getId2());
+        scene->interactions->requestErase(contact);
     } else {
         if ((-Fn)> currentContactPhysics->normalAdhesion) {//normal plasticity
             Fn=-currentContactPhysics->normalAdhesion;
             currentContactPhysics->unp = un+currentContactPhysics->normalAdhesion/currentContactPhysics->kn;
             if (currentContactPhysics->unpMax && currentContactPhysics->unp<currentContactPhysics->unpMax)
-                scene->interactions->requestErase(contact->getId1(),contact->getId2());
+                scene->interactions->requestErase(contact);
         }
     
         

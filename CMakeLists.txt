@@ -52,6 +52,12 @@ IF (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
 ENDIF()
 
 #===========================================================
+
+IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ftemplate-depth-512")
+ENDIF()
+
+#===========================================================
 ADD_DEFINITIONS(" -DYADE_PTR_CAST=static_pointer_cast -DYADE_CAST=static_cast ")
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
@@ -259,7 +265,7 @@ IF(ENABLE_LINSOLV)
     MESSAGE(STATUS "Found Metis")
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LinSolv")
   ELSE(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND)
-    MESSAGE(STATUS "CHOLMOD NOT found, LINSOLV disabled")
+    MESSAGE(STATUS "Missing dependency for LINSOLV, disabled")
     SET(DISABLED_FEATS "${DISABLED_FEATS} LinSolv")
     SET(ENABLE_LINSOLV OFF)
   ENDIF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND)

@@ -93,6 +93,7 @@ class Polyhedra: public Shape{
 			.def("GetInertia",&Polyhedra::GetInertia,"return polyhedra's inertia tensor")
 			.def("GetOri",&Polyhedra::GetOri,"return polyhedra's orientation")
 			.def("GetCentroid",&Polyhedra::GetCentroid,"return polyhedra's centroid")
+			.def("GetSurfaceTriangulation",&Polyhedra::GetSurfaceTriangulation,"triangulation of facets (for plotting)")
 		);		
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };

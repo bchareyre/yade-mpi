@@ -85,7 +85,9 @@ bool OpenGLRenderer::pointClipped(const Vector3r& p){
 
 
 void OpenGLRenderer::setBodiesDispInfo(){
-	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
+	if(scene->bodies->size()!=bodyDisp.size()) {
+		bodyDisp.resize(scene->bodies->size());
+		for (Body::id_t k=0; k<scene->bodies->size(); k++) bodyDisp[k].hidden=0;}
 	bool scaleRotations=(rotScale!=1.0);
 	bool scaleDisplacements=(dispScale!=Vector3r::Ones());
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -305,7 +307,7 @@ void OpenGLRenderer::renderBound(){
 
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->bound) continue;
-		if(!bodyDisp[b->getId()].isDisplayed) continue;
+		if(!bodyDisp[b->getId()].isDisplayed or bodyDisp[b->getId()].hidden) continue;
 		if(b->bound && ((b->getGroupMask()&mask) || b->getGroupMask()==0)){
 			glPushMatrix(); boundDispatcher(b->bound,scene.get()); glPopMatrix();
 		}
@@ -339,7 +341,7 @@ void OpenGLRenderer::renderShape(){
 	// but it is still better than crashes if the body gets deleted meanwile.
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if(!b || !b->shape) continue;
-		if(!bodyDisp[b->getId()].isDisplayed) continue;
+		if(!(bodyDisp[b->getId()].isDisplayed and !bodyDisp[b->getId()].hidden)) continue;
 		Vector3r pos=bodyDisp[b->getId()].pos;
 		Quaternionr ori=bodyDisp[b->getId()].ori;
 		if(!b->shape || !((b->getGroupMask()&mask) || b->getGroupMask()==0)) continue;

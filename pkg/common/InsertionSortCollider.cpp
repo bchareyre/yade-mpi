@@ -264,7 +264,7 @@ void InsertionSortCollider::action(){
 					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
 						const Body::id_t& jid=V[j].id;
 						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
-						if(!V[j].flags.isMin) continue;
+						if(!(V[j].flags.isMin && V[j].flags.hasBB)) continue;
 						/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 						handleBoundInversion(iid,jid,interactions,scene);
 						assert(j<2*nBodies-1);
@@ -278,7 +278,7 @@ void InsertionSortCollider::action(){
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
 					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
 						const Body::id_t& jid=V[j].id;
-						if(!V[j].flags.isMin) continue;
+						if(!(V[j].flags.isMin && V[j].flags.hasBB)) continue;
 						handleBoundInversionPeri(iid,jid,interactions,scene);
 						if(cnt++>2*(long)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
 					}

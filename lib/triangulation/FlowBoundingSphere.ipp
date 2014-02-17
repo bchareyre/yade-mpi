@@ -101,7 +101,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 }
 
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::ResetNetwork() {noCache=true;}
+void FlowBoundingSphere<Tesselation>::ResetNetwork() {T[0].Clear();noCache=true;}
 
 template <class Tesselation> 
 Tesselation& FlowBoundingSphere<Tesselation>::Compute_Action()
@@ -418,7 +418,7 @@ double FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
 	if (noCache) {cerr<<"Triangulation does not exist. Waht did you do?!"<<endl; return -1;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	Cell_handle cell = Tri.locate(Point(X,Y,Z));
-	return cell->info().index;
+	return cell->info().id;
 }
 
 template <class Tesselation> 
@@ -487,7 +487,6 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect(0,0,0);
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
@@ -497,10 +496,9 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 		perVertexUnitForce.clear(); perVertexPressure.clear();
 // 		vector<const Vecteur*> exf; exf.reserve(20);
 // 		vector<const Real*> exp; exp.reserve(20);
-		perVertexUnitForce.resize(Tri.number_of_vertices());
-		perVertexPressure.resize(Tri.number_of_vertices());}
+		perVertexUnitForce.resize(T[currentTes].max_id+1);
+		perVertexPressure.resize(T[currentTes].max_id+1);}
 	#endif
-
 	Cell_handle neighbour_cell;
 	Vertex_handle mirror_vertex;
 	Vecteur tempVect;
@@ -560,6 +558,7 @@ void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache
 		#else
 		#pragma omp parallel for num_threads(ompThreads)
 		for (int vn=0; vn<= T[currentTes].max_id; vn++) {
+			if (T[currentTes].vertexHandles[vn]==NULL) continue;
 			Vertex_handle& v = T[currentTes].vertexHandles[vn];
 // 		for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v){
 			const int& id =  v->info().id();
@@ -1322,13 +1321,13 @@ void FlowBoundingSphere<Tesselation>::DisplayStatistics()
 	num_particles = real;
 }
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::saveVtk()
+void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 {
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[80];
-	mkdir("./VTK", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        sprintf(filename,"./VTK/out_%d.vtk", number++);
+	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"%s/out_%d.vtk",folder,number++);
 	int firstReal=-1;
 
 	//count fictious vertices and cells

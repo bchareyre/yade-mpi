@@ -8,7 +8,7 @@ The last section gives the references that we recommend to use for citing Yade i
 
 Citing Yade
 ---------------------
-Corresponding bibtex entries `here <http://bazaar.launchpad.net/~yade-dev/yade/trunk/view/head:/doc/citing_yade.bib>`_. Pdf versions are available for each of them. See also `"Acknowledging Yade" <citing.html>`_.
+Corresponding bibtex entries `here <https://github.com/yade/trunk/blob/master/doc/citing_yade.bib>`_. Pdf versions are available for each of them. See also `"Acknowledging Yade" <citing.html>`_.
 
 @bib2rst.bib2rst('../yade-docref.bib')@
 

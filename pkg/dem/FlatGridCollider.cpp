@@ -11,7 +11,7 @@ CREATE_LOGGER(FlatGridCollider);
 
 bool FlatGridCollider::isActivated(){
 	// keep interactions trequested for deletion as potential (forget removal requests)
-	scene->interactions->clearPendingErase();
+// 	scene->interactions->clearPendingErase();
 	if(!newton) return true;
 	// handle verlet distance
 	fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*scene->dt;

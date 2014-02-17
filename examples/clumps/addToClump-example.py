@@ -3,6 +3,8 @@
 
 '''This example shows usage of addToClump() and appendClumped().'''
 
+from yade import pack,export,qt
+
 #define material for all bodies:
 id_Mat=O.materials.append(FrictMat(young=1e6,poisson=0.3,density=1000,frictionAngle=1))
 Mat=O.materials[id_Mat]
@@ -81,3 +83,5 @@ getClumpInfo()
 O.dt=1e-6
 
 print '\nPress Play button ... '
+renderer = qt.Renderer()
+qt.View()

@@ -89,7 +89,6 @@ void GLViewer::draw()
 		int selection = selectedName();
 		if(selection!=-1 && (*(Omega::instance().getScene()->bodies)).exists(selection) && isMoving){
 			static Real lastTimeMoved(0);
-			static Real initv0(0); static Real initv1(0); static Real initv2(0);
 			float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);
 			if(last == selection) // delay by one redraw, so the body will not jump into 0,0,0 coords
 			{
@@ -98,22 +97,13 @@ void GLViewer::draw()
 				Vector3r&    vel = (*(Omega::instance().getScene()->bodies))[selection]->state->vel;
 				Vector3r&    angVel = (*(Omega::instance().getScene()->bodies))[selection]->state->angVel;
 				angVel=Vector3r::Zero(); 
-				if (!initv0 && !initv1 && !initv2){initv0=v0;initv1=v1;initv2=v2;}
-				if (initv0!=v0 || initv1!=v1 || initv2!=v2) {
-					Real dt=(scene->time-lastTimeMoved); lastTimeMoved=scene->time;
-					if (dt!=0) { 
-						vel[0]=-(v[0]-v0)/dt; vel[1]=-(v[1]-v1)/dt; vel[2]=-(v[2]-v2)/dt;
-						vel[0]=-(initv0-v0)/dt; vel[1]=-(initv1-v1)/dt; vel[2]=-(initv2-v2)/dt;
-						initv0=v0;initv1=v1;initv2=v2;
-					}
-				}
-				else {vel[0]=vel[1]=vel[2]=0; /*v[0]=v0;v[1]=v1;v[2]=v2;*/}
-				v[0]=v0;v[1]=v1;v[2]=v2;
+				Real dt=(scene->time-lastTimeMoved); lastTimeMoved=scene->time;
+				if (dt!=0) { vel[0]=-(v[0]-v0)/dt; vel[1]=-(v[1]-v1)/dt; vel[2]=-(v[2]-v2)/dt;}
+				else vel[0]=vel[1]=vel[2]=0;
 				//FIXME: should update spin like velocity above, when the body is rotated:
 				double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);	q.x()=q0;q.y()=q1;q.z()=q2;q.w()=q3;
 			}
 			(*(Omega::instance().getScene()->bodies))[selection]->userForcedDisplacementRedrawHook();	
-			last=selection;
 		}
 		if(manipulatedClipPlane>=0){
 			assert(manipulatedClipPlane<renderer->numClipPlanes);

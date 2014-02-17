@@ -14,8 +14,22 @@ ViscElMat::~ViscElMat(){}
 /* ViscElPhys */
 ViscElPhys::~ViscElPhys(){}
 
+/* Contact parameter calculation function */
+Real Ip2_ViscElMat_ViscElMat_ViscElPhys::contactParameterCalculation(const Real& l1, const Real& l2, const bool& massMultiply){
+	if (massMultiply) {
+		// If one of paramaters > 0. we DO NOT return 0
+    Real a = (l1?1/l1:0) + (l2?1/l2:0);
+    if (a) return 1/a;
+    else return 0;
+	} else {
+		// If one of paramaters > 0, we return 0
+		return (l1>0 or l2>0)?l1*l2/(l1+l2):0;
+	}
+}
+
 /* Ip2_ViscElMat_ViscElMat_ViscElPhys */
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
+
 	// no updates of an existing contact 
 	if(interaction->phys) return;
 	ViscElMat* mat1 = static_cast<ViscElMat*>(b1.get());
@@ -26,37 +40,43 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	if (mat1->massMultiply and mat2->massMultiply) {
 		mass1 = Body::byId(interaction->getId1())->state->mass;
 		mass2 = Body::byId(interaction->getId2())->state->mass;
+		if (mass1 == 0.0 and mass2 > 0.0) {
+			mass1 = mass2;
+		} else if (mass2 == 0.0 and mass1 > 0.0) {
+			mass2 = mass1;
+		}
 	}
 	
-	const Real kn1 = mat1->kn*mass1; const Real cn1 = mat1->cn*mass1;
-	const Real ks1 = mat1->ks*mass1; const Real cs1 = mat1->cs*mass1;
+	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
+	Real R1=sphCont->refR1>0?sphCont->refR1:sphCont->refR2;
+	Real R2=sphCont->refR2>0?sphCont->refR2:sphCont->refR1;
+	
+	const Real kn1 = isnan(mat1->kn)?2*mat1->young*R1:mat1->kn*mass1;
+	const Real cn1 = mat1->cn*mass1;
+	const Real ks1 = isnan(mat1->ks)?kn1*mat1->poisson:mat1->ks*mass1;
+	const Real cs1 = mat1->cs*mass1;
+	
 	const Real mR1 = mat1->mR;      const Real mR2 = mat2->mR; 
 	const int mRtype1 = mat1->mRtype; const int mRtype2 = mat2->mRtype;
-	const Real kn2 = mat2->kn*mass2; const Real cn2 = mat2->cn*mass2;
-	const Real ks2 = mat2->ks*mass2; const Real cs2 = mat2->cs*mass2;
+	
+	const Real kn2 = isnan(mat2->kn)?2*mat2->young*R2:mat2->kn*mass2;
+	const Real cn2 = mat2->cn*mass2;
+	const Real ks2 = isnan(mat2->ks)?kn2*mat2->poisson:mat2->ks*mass2;
+	const Real cs2 = mat2->cs*mass2;
 		
 	ViscElPhys* phys = new ViscElPhys();
-	
-	if ((kn1>0) or (kn2>0)) {
-		phys->kn = 1/( ((kn1>0)?1/kn1:0) + ((kn2>0)?1/kn2:0) );
-	} else {
-		phys->kn = 0;
-	}
-	if ((ks1>0) or (ks2>0)) {
-		phys->ks = 1/( ((ks1>0)?1/ks1:0) + ((ks2>0)?1/ks2:0) );
-	} else {
-		phys->ks = 0;
-	} 
-	
-  if ((mR1>0) or (mR2>0)) {
+
+	phys->kn = contactParameterCalculation(kn1,kn2, mat1->massMultiply&&mat2->massMultiply);
+	phys->ks = contactParameterCalculation(ks1,ks2, mat1->massMultiply&&mat2->massMultiply);
+	phys->cn = contactParameterCalculation(cn1,cn2, mat1->massMultiply&&mat2->massMultiply);
+	phys->cs = contactParameterCalculation(cs1,cs2, mat1->massMultiply&&mat2->massMultiply);
+
+ 	if ((mR1>0) or (mR2>0)) {
 		phys->mR = 2.0/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );
 	} else {
 		phys->mR = 0;
 	}
-  
-	phys->cn = (cn1?1/cn1:0) + (cn2?1/cn2:0); phys->cn = phys->cn?1/phys->cn:0;
-	phys->cs = (cs1?1/cs1:0) + (cs2?1/cs2:0); phys->cs = phys->cs?1/phys->cs:0;
-  
+
 	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
 	
@@ -84,8 +104,15 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 		} else {
 			throw runtime_error("Theta should be equal for both particles!.");
 		}
+		
 		if (mat1->CapillarType == mat2->CapillarType and mat2->CapillarType != ""){
-			phys->CapillarType = mat1->CapillarType;
+			
+			if      (mat1->CapillarType == "Willett_numeric")  phys->CapillarType = Willett_numeric;
+			else if (mat1->CapillarType == "Willett_analytic") phys->CapillarType = Willett_analytic;
+			else if (mat1->CapillarType == "Weigert")          phys->CapillarType = Weigert;
+			else if (mat1->CapillarType == "Rabinovich")       phys->CapillarType = Rabinovich;
+			else if (mat1->CapillarType == "Lambert")          phys->CapillarType = Lambert;
+			else                                               phys->CapillarType = None_Capillar;
 		} else {
 			throw runtime_error("CapillarType should be equal for both particles!.");
 		}
@@ -171,8 +198,16 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
 	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
 
-	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 
+	// Prevent appearing of attraction forces due to a viscous component
+	// [Radjai2011], page 3, equation [1.7]
+	// [Schwager2007]
+	const Real normForceReal = phys.kn * geom.penetrationDepth + phys.cn * normalVelocity;
+	if (normForceReal < 0) {
+		phys.normalForce = Vector3r::Zero();
+	} else {
+		phys.normalForce = normForceReal * geom.normal;
+	}
 	
 	Vector3r momentResistance = Vector3r::Zero();
 	if (phys.mR>0.0) {
@@ -209,3 +244,4 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		addTorque(id2, c2x.cross(f)-momentResistance,scene);
   }
 }
+

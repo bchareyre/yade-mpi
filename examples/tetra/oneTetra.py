@@ -8,7 +8,7 @@ v2 = (1,0,0)
 v3 = (0,1,0)
 v4 = (0,0,1)
 
-t1 = tetraOld((v1,v2,v3,v4),color=(0,1,0))
+t1 = tetra((v1,v2,v3,v4),color=(0,1,0))
 O.bodies.append((t1))
 
 def changeVelocity():

@@ -139,13 +139,20 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell (Cellhandle cell);
 		void Oedometer_Boundary_Conditions();
 		void Average_real_cell_velocity();
-		void saveVtk() {solver->saveVtk();}
+		void saveVtk(const char* folder) {solver->saveVtk(folder);}
 		vector<Real> avFlVelOnSph(unsigned int id_sph) {return solver->Average_Fluid_Velocity_On_Sphere(id_sph);}
 
 // 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; updateTriangulation=true;}
 		void pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
+		TPL unsigned int nCells(Solver& flow){return flow->T[flow->currentTes].cellHandles.size();}
+		TPL python::list getVertices(unsigned int id, Solver& flow){
+			python::list ids;
+			if (id>=flow->T[flow->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<flow->T[flow->currentTes].cellHandles.size()); return ids;}			
+			for (unsigned int i=0;i<4;i++) ids.append(flow->T[flow->currentTes].cellHandles[id]->vertex(i)->info().id());
+			return ids;
+		}
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
 		#ifdef LINSOLV
@@ -181,6 +188,8 @@ class FlowEngine : public PartialEngine
 		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
 		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
+		unsigned int	_nCells() {return nCells(solver);}
+		python::list	_getVertices(unsigned int id) {return getVertices(id,solver);}
 		#ifdef LINSOLV
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
@@ -267,7 +276,6 @@ class FlowEngine : public PartialEngine
 					normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
 					solver = shared_ptr<FlowSolver> (new FlowSolver);
 					first=true;
-					updateTriangulation=false;
 					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 					ReTrg=1;
 					backgroundCompleted=true;
@@ -282,7 +290,7 @@ class FlowEngine : public PartialEngine
 					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
-					.def("saveVtk",&FlowEngine::saveVtk,"Save pressure field in vtk format.")
+					.def("saveVtk",&FlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 					.def("avFlVelOnSph",&FlowEngine::avFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
@@ -304,6 +312,8 @@ class FlowEngine : public PartialEngine
 					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+					.def("nCells",&FlowEngine::_nCells,"get the total number of finite cells in the triangulation.")
+					.def("getVertices",&FlowEngine::_getVertices,(python::arg("id")),"get the vertices of a cell")
 					#ifdef LINSOLV
 					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
@@ -371,7 +381,7 @@ class PeriodicFlowEngine : public FlowEngine
 		void preparePShifts();
 		
 		//(re)instanciation of templates and others, for python binding
-		void saveVtk() {solver->saveVtk();}
+		void saveVtk(const char* folder) {solver->saveVtk(folder);}
 		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
 		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
@@ -426,7 +436,6 @@ class PeriodicFlowEngine : public FlowEngine
 			wallIds=vector<int>(6,-1);
 // 			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
 			solver = shared_ptr<FlowSolver> (new FlowSolver);
-			updateTriangulation=false;
 			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
 			ReTrg=1;
 			first=true;
@@ -449,7 +458,7 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("OSI",&PeriodicFlowEngine::_OSI,"Return the number of interactions only between spheres.")
 
 // 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
-			.def("saveVtk",&PeriodicFlowEngine::saveVtk,"Save pressure field in vtk format.")
+			.def("saveVtk",&PeriodicFlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 			.def("getBoundaryFlux",&PeriodicFlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
 			.def("getPorePressure",&PeriodicFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")

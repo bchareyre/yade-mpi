@@ -93,11 +93,6 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 }
 
 void IGeomDispatcher::action(){
-	// Erase interaction that were requested for erase, but not processed by the collider, if any (and warn once about that, as it is suspicious)
-	if(scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
-		LOG_WARN("Interactions pending erase found, no collider being used?");
-		alreadyWarnedNoCollider=true;
-	}
 	updateScenePtr();
 
 	shared_ptr<BodyContainer>& bodies = scene->bodies;

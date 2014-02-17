@@ -35,6 +35,7 @@ nRead=readParamsFromTable(
 from yade.params import table
 
 num_spheres=table.num_spheres# number of spheres
+key=table.key
 targetPorosity = 0.43 #the porosity we want for the packing
 compFricDegree = table.compFricDegree # initial contact friction during the confining phase (will be decreased during the REFD compaction process)
 finalFricDegree = 30 # contact friction during the deviatoric loading

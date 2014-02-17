@@ -46,7 +46,6 @@ void InteractionContainer::clear(){
 		if (b) b->intrs.clear(); // delete interactions from bodies
 	}
 	linIntrs.clear(); // clear the linear container
-	pendingErase.clear();
 	currSize=0;
 	dirty=true;
 }
@@ -116,14 +115,9 @@ bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 }
 
 
-void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2, bool force){
+void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2){
 	const shared_ptr<Interaction> I=find(id1,id2); if(!I) return;
-	I->reset(); IdsForce v={id1,id2,force};
-	#ifdef YADE_OPENMP
-		threadsPendingErase[omp_get_thread_num()].push_back(v);
-	#else
-		pendingErase.push_back(v);
-	#endif
+	I->reset();
 }
 
 void InteractionContainer::requestErase(const shared_ptr<Interaction>& I){
@@ -134,41 +128,8 @@ void InteractionContainer::requestErase(Interaction* I){
 	I->reset();
 }
 
-void InteractionContainer::clearPendingErase(){
-	#ifdef YADE_OPENMP
-		FOREACH(list<IdsForce>& pendingErase, threadsPendingErase){
-			pendingErase.clear();
-		}
-	#else
-		pendingErase.clear();
-	#endif
-}
-
-int InteractionContainer::unconditionalErasePending(){
-	int ret=0;
-	#ifdef YADE_OPENMP
-		// shadow this->pendingErase by the local variable, to share code
-		FOREACH(list<IdsForce>& pendingErase, threadsPendingErase){
-	#endif
-			if(!pendingErase.empty()){
-				FOREACH(const IdsForce& p, pendingErase){ ret++; erase(p.id1,p.id2); }
-				pendingErase.clear();
-			}
-	#ifdef YADE_OPENMP
-		}
-	#endif
-	return ret;
-}
-
 void InteractionContainer::eraseNonReal(){
-	typedef pair<int,int> Ids;
-	std::list<Ids> ids;
-	FOREACH(const shared_ptr<Interaction>& i, *this){
-		if(!i->isReal()) ids.push_back(Ids(i->getId1(),i->getId2()));
-	}
-	FOREACH(const Ids& id, ids){
-		this->erase(id.first,id.second);
-	}
+	FOREACH(const shared_ptr<Interaction>& i, *this) if(!i->isReal()) this->erase(i->getId1(),i->getId2());
 }
 
 // compare interaction based on their first id

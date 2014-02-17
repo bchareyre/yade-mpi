@@ -16,6 +16,8 @@ Then, for already existing interactions, the following is performed:
 
 This simplified description serves only to give meaning to the ordering of sections within this chapter. A more detailed description of this *simulation loop* is given later.
 
+In this chapter we refer to kinematic variables of the contacts as \`\`strains``, although at this scale it is also common to speak of \`\`displacements``. Which semantic is more appropriate depends on the conceptual model one is starting from, and therefore it cannot be decided independently of specific problems. The reader familiar with displacements can mentaly replace normal strain and shear strain by normal displacement and shear displacement, respectively, without altering the meaning of what follows.
+
 Collision detection
 =====================
 

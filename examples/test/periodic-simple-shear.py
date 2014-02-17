@@ -2,7 +2,6 @@
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 # 2011 ©Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 "Test and demonstrate use of PeriTriaxController."
-from yade import *
 from yade import pack,qt
 
 O.periodic=True

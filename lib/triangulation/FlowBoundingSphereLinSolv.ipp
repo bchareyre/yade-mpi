@@ -161,7 +161,8 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystem(Real dt)
 		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 			orderedCells.push_back(cell);
 			if (!cell->info().Pcondition) ++ncols;}
-		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
+//		//Segfault on 14.10, and useless overall since SuiteSparse has preconditionners (including metis)
+// 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
 
 		T_cells.clear();
 		T_index=0;

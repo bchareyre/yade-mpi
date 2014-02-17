@@ -264,6 +264,8 @@ def regularOrtho(predicate,radius,gap,**kw):
 	xx,yy,zz=[arange(mn[i]+radius,mx[i]-radius,2*radius+gap) for i in 0,1,2]
 	for xyz in itertools.product(xx,yy,zz):
 		if predicate(xyz,radius): ret+=[utils.sphere(xyz,radius=radius,**kw)]
+	if (len(ret)==0):
+		warnings.warn('No spheres are produced by regularOrtho-function',category=RuntimeWarning)
 	return ret
 
 def regularHexa(predicate,radius,gap,**kw):
@@ -283,6 +285,8 @@ def regularHexa(predicate,radius,gap,**kw):
 		if j%2==0: x+= a/2. if k%2==0 else -a/2.
 		if k%2!=0: x+=a/2.; y+=hy/2.
 		if predicate((x,y,z),radius): ret+=[utils.sphere((x,y,z),radius=radius,**kw)]
+	if (len(ret)==0):
+		warnings.warn('No spheres are produced by regularHexa-function',category=RuntimeWarning)
 	return ret
 
 def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
@@ -459,7 +463,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		# repetition to the required cell size will be done below, after memoizing the result
 	else:
 		assumedFinalDensity=0.6
-		V=(4/3)*pi*radius**3; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
+		V=(4.0/3.0)*pi*radius**3.0; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
 		TriaxialTest(
 			numberOfGrains=int(N),radiusMean=radius,radiusStdDev=rRelFuzz,
 			# upperCorner is just size ratio, if radiusMean is specified

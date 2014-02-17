@@ -1,7 +1,6 @@
 # coding: utf-8
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 "Test and demonstrate use of PeriTriaxController."
-from yade import *
 from yade import pack
 O.periodic=True
 O.cell.setBox(.1,.1,.1)

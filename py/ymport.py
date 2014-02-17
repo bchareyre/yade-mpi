@@ -11,7 +11,7 @@ except ImportError:
 	from miniEigen import *
 
 def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
-	"""Load sphere coordinates from file in specific format, create spheres, insert them to the simulation.
+	"""Load sphere coordinates from file in specific format, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 	
 	:param str filename: file name
 	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
@@ -47,9 +47,49 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 		else:
 			raise RuntimeError("Please, specify a correct format output!");
 	return ret
+  
+def textClumps(fileName,shift=Vector3.Zero,scale=1.0,**kw):
+	"""Load clumps-members from file, insert them to the simulation.
+	
+	:param str filename: file name
+	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
+	:param float scale: factor scales the given data.
+	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.sphere`
+	:returns: list of spheres.
+
+	Lines starting with # are skipped
+	"""
+	infile = open(fileName,"r")
+	lines = infile.readlines()
+	infile.close()
+	ret=[]
+	
+	curClump=[]
+	newClumpId = -1
+	
+	for line in lines:
+		data = line.split()
+		if (data[0][0] == "#"): continue
+		pos = Vector3(float(data[0]),float(data[1]),float(data[2]))
+	
+		if (newClumpId<0 or newClumpId==int(data[4])):
+			idD = curClump.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
+			newClumpId = int(data[4])
+			ret.append(idD)
+		else:
+			newClumpId = int(data[4])
+			O.bodies.appendClumped(curClump)
+			curClump=[]
+			idD = curClump.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
+			ret.append(idD)
+	
+	if (len(curClump)<>0):
+		O.bodies.appendClumped(curClump)
+	return ret
 
 def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
-	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
+	"""Load sphere coordinates from file, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 
 	:param string filename: file which has 4 colums [x, y, z, radius].
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.

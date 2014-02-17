@@ -44,9 +44,12 @@ class OpenGLRenderer : public Serializable
 			Vector3r pos;
 			Quaternionr ori;
 			bool isDisplayed;
+			bool hidden;
 		};
 		//! display data for individual bodies
 		vector<BodyDisp> bodyDisp;
+		void hide(Body::id_t id) {if ((unsigned int) id<bodyDisp.size()) bodyDisp[id].hidden=true; }
+		void show(Body::id_t id) {if ((unsigned int) id<bodyDisp.size()) bodyDisp[id].hidden=false; }
 
 		virtual ~OpenGLRenderer();
 
@@ -119,6 +122,8 @@ class OpenGLRenderer : public Serializable
 		/*py*/
 		.def("setRefSe3",&OpenGLRenderer::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.")
 		.def("render",&OpenGLRenderer::pyRender,"Render the scene in the current OpenGL context.")
+		.def("hideBody",&OpenGLRenderer::hide,(python::arg("id")),"Hide body from id (see :yref:`OpenGLRenderer::showBody`)")
+		.def("showBody",&OpenGLRenderer::show,(python::arg("id")),"Make body visible (see :yref:`OpenGLRenderer::hideBody`)")
 	);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderer);

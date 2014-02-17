@@ -1,18 +1,29 @@
 #!/usr/bin/env python
-import argparse, os, git, shutil
+import argparse, os, git, shutil, sys, time
 
-jobsNumber = 4
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument("g", help="git debian-directory")
-parser.add_argument("p", help="direcrory, where will be created pbuilder tarballs")
-parser.add_argument("u", help="git upstream-direcrory")
+parser.add_argument("-i", help="config file")
 parser.add_argument("-u","--update", help="update tarballs, if they are exist", action='store_true')
+parser.add_argument("-j", help="number of processors to build",dest='jobsNumber',default=6, type=int)
 args = parser.parse_args() 
 
-gitdebdir = args.g
-gitupsdir = args.u
-pbdir     = args.p
+
+configfile = args.i
+jobsNumber = args.jobsNumber
+
+infileconf  = open(configfile)
+linesconf   = infileconf.readlines()
+gitdebdir   = linesconf[1].strip()
+pbdir       = linesconf[4].strip()
+gitupsdir   = linesconf[7].strip()
+userg       = linesconf[10].strip()
+groupg      = linesconf[13].strip()
+dputg       = linesconf[16].strip()
+keyg        = linesconf[19].strip()
+keypasspath = linesconf[22].strip()
+keysecrpath = linesconf[25].strip()
+patharchive = linesconf[28].strip()
 
 if not(os.path.isdir(gitdebdir)):
     raise RuntimeError('Git-debian-directory does not exists')
@@ -46,12 +57,21 @@ for branch in repodeb.branches:
         components = lines[1].strip()
         archs = lines[2].split()
         keyringuse = lines[3].strip()
+        othermirror = lines[4].strip()
         infile.close()
         for a in archs:
             tarball = "%s/%s_%s.tgz"%(pbdir, branchstr, a.strip())
+            addAllowuntrusted = ""
+            if (othermirror!="#"):
+                addAllowuntrusted =  " --allow-untrusted "
             if not(os.path.isfile(tarball)):
                 createPbTar = ('sudo pbuilder --create --distribution %s --mirror %s --components "%s" --architecture %s --debootstrapopts "--keyring=%s" --basetgz %s'%
                         (branchstr, mirror, components, a, keyringuse, tarball))
+                if (othermirror!="#"):
+                    createPbTar += ' --othermirror "' + othermirror + '"'
+                    addAllowuntrusted =  " --allow-untrusted "
+                print createPbTar
+
                 print "Creating tarball %s"%(tarball)
                 os.system(createPbTar)
             else:
@@ -62,14 +82,16 @@ for branch in repodeb.branches:
                     os.system(updatePbTar)
             
             # Creating dir for building
+
             builddirup="%s_%s/"%(branchstr, a)
             builddirdeb="%s/build/"%(builddirup)
             builddirres="%s/result/"%(builddirup)
-            shutil.rmtree(builddirdeb,ignore_errors=True)
+            #shutil.rmtree(builddirdeb,ignore_errors=True)
+            shutil.rmtree(builddirup,ignore_errors=True)
             shutil.copytree(gitupsdir, builddirdeb )
             shutil.rmtree(builddirdeb+".git")
             # Get package version
-            versiondebian = repoups.git.describe()
+            versiondebian = repoups.git.describe()[0:-8] + repoups.head.commit.hexsha[0:7] + "~" + branchstr
 
             # Get package name
             infilepname = open(gitdebdir+"/changelog"); sourcePackName = infilepname.readlines()[0].split()[0]
@@ -79,13 +101,20 @@ for branch in repodeb.branches:
             shutil.copytree(gitdebdir, builddirdeb+"/debian")
 
             os.system('sed -i.bak -e s/VERSION/%s/ -e s/DISTRIBUTION/%s/ %s/debian/changelog'%(versiondebian,branch,builddirdeb))
+            os.system('sed -i.bak -e s/VERSIONYADEREPLACE/%s/ %s/debian/rules'%(versiondebian,builddirdeb))
             os.system('cd %s; dpkg-source -b -I build'%(builddirup))
             os.mkdir(builddirres)
             print "Building package %s_%s"%(sourcePackName, versiondebian)
-            buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s/*.dsc'%
-                (a, tarball, builddirup, jobsNumber, builddirres, builddirup))
+            buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s/*.dsc'%
+                (a, tarball, addAllowuntrusted, builddirup, jobsNumber, builddirres, builddirup))
             print buildPackage
             os.system(buildPackage)
-            shutil.rmtree(builddirdeb)
-            exit(0)
+            os.system('sudo chown %s:%s %s * -R'%(userg, groupg, builddirup))
+            os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitdebdir))
+            os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitupsdir))
+        os.system('cd %s ; su %s -c \'dput %s *.changes\''%(builddirres, userg, dputg))
 
+for branch in repodeb.branches:
+    branchstr = str(branch)
+    if (branchstr<>'master'):
+        os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
