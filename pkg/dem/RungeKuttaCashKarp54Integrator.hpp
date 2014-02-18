@@ -1,3 +1,4 @@
+#ifdef YADE_ODEINT
 #pragma once
 #include <yade/core/Scene.hpp>
 #include<yade/pkg/dem/Integrator.hpp>
@@ -45,6 +46,4 @@ class RungeKuttaCashKarp54Integrator: public Integrator {
 	);
 };
 REGISTER_SERIALIZABLE(RungeKuttaCashKarp54Integrator);
-
-
-
+#endif
