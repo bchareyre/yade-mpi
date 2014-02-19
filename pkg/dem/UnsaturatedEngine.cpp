@@ -56,77 +56,30 @@ void UnsaturatedEngine::testFunction()
 }
 
 void UnsaturatedEngine::action()
-{    
-  //This will be used later
-  /*
-   Build_Triangulation();initializeCellIndex();Initialize_volumes(solver);initializePoreRadius();
-   */
+{
+	if ( !isActivated ) return;
+	RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+	if ( (tri.number_of_vertices()==0) || (solver->updateTriangulation) ) {
+		cout<< "triangulation is empty: building a new one" << endl;
+		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
+		setPositionsBuffer(true);//copy sphere positions in a buffer...
+		Build_Triangulation(P_zero,solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
+		initializeCellIndex(solver);//initialize cell index
+		initializePoreRadius(solver);//save all pore radii before invade
+		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
+		computeSolidLine(solver);//save cell->info().solidLine[j][y]	  
+		solver->noCache = true;
+	}
+	///compute invade
+	/*if ( solver->pressureChanged )*/ solver->invade();
+	///compute force
+	solver->computeFacetPoreForcesWithCache();
+	scene->forces.addForce ( V_it->info().id(), force);
 }
 
+///invade mode 1. update phase reservoir before invasion. Consider no viscous effects, and invade gradually.
 template<class Solver>
 void UnsaturatedEngine::invadeSingleCell(Cell_handle cell, double pressure, Solver& flow)
-{
-    double surface_tension = surfaceTension ; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-    for (int facet = 0; facet < 4; facet ++) {
-        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-        if (cell->neighbor(facet)->info().p() >= pressure) continue;
-        double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
-        if (pressure > n_cell_pe) {
-            Cell_handle n_cell = cell->neighbor(facet);
-            n_cell->info().p() = pressure;
-            invadeSingleCell(n_cell, pressure, flow);
-        }
-    }
-}
-
-template<class Solver>
-void UnsaturatedEngine::invade (Solver& flow )
-{
-    BoundaryConditions(flow);
-    flow->pressureChanged=true;
-    flow->reApplyBoundaryConditions();
-    
-    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
-    Finite_cells_iterator cell_end = tri.finite_cells_end();
-    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (cell->info().p()!=0) {
-            invadeSingleCell(cell,cell->info().p(),flow);
-// 	    cerr << "cell pressure: " << cell->info().p(); //test whether the cell's pressure has been changed
-        }
-    }
-}
-
-template<class Solver>
-Real UnsaturatedEngine::getMinEntryValue (Solver& flow )
-{
-    Real nextEntry = 1e50;
-    double surface_tension = surfaceTension; //Surface Tension in contact with air at 20 Degrees Celsius is:0.0728(N/m)
-    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
-    Finite_cells_iterator cell_end = tri.finite_cells_end();
-    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (cell->info().p()!=0) {
-            for (int facet=0; facet<4; facet ++) {
-                if (tri.is_infinite(cell->neighbor(facet))) continue;
-//              if (cell->info().Pcondition) continue;  //FIXME Add this, the boundary cell pressure will not work; Remove this the initial pressure and initial invade will be chaos.
-                if (cell->neighbor(facet)->info().p()!=0) continue;
-                if (cell->neighbor(facet)->info().p()==0) {
-                    double n_cell_pe = surface_tension/cell->info().poreRadius[facet];
-                    nextEntry = min(nextEntry,n_cell_pe);
-                }
-            }
-        }
-    }
-    if (nextEntry==1e50) {
-        cout << "please set initial air pressure for the cell !" << endl;
-    }
-    else {
-        return nextEntry;
-    }
-}
-
-//invade version2. updateAirReservoir and updateWaterReservoir before invade. And invade gradually, not Suddenly jump from 0 to .p()
-template<class Solver>
-void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow)
 {
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
@@ -139,20 +92,20 @@ void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Sol
             nCell->info().p() = pressure;
             nCell->info().isAirReservoir=true;
             nCell->info().isWaterReservoir=false;
-            invadeSingleCell2(nCell, pressure, flow);
+            invadeSingleCell(nCell, pressure, flow);
         }
     }
 }
 
 template<class Solver>
-void UnsaturatedEngine::invade2 (Solver& flow)
+void UnsaturatedEngine::invade(Solver& flow)
 {
     updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if(cell->info().isAirReservoir == true)
-            invadeSingleCell2(cell,cell->info().p(),flow);
+            invadeSingleCell(cell,cell->info().p(),flow);
     }
     checkTrap(flow,bndCondValue[2]);
     Finite_cells_iterator _cell_end = tri.finite_cells_end();
@@ -175,7 +128,7 @@ void UnsaturatedEngine::checkTrap(Solver& flow, double pressure)
 }
 
 template<class Solver>
-Real UnsaturatedEngine::getMinEntryValue2 (Solver& flow )
+Real UnsaturatedEngine::getMinEntryValue(Solver& flow )
 {
     updateReservoir(flow);
     Real nextEntry = 1e50;
@@ -266,7 +219,6 @@ void UnsaturatedEngine::waterReservoirRecursion(Cell_handle cell, Solver& flow)
     }
 }
 
-//initialize the boundingCells info().isAirReservoir=true, on condition that those cells meet (flow->boundingCells[bound].size()!=0 && cell->info().p()!=0) 
 template<class Solver>
 void UnsaturatedEngine::updateAirReservoir(Solver& flow)
 {
@@ -308,6 +260,76 @@ void UnsaturatedEngine::airReservoirRecursion(Cell_handle cell, Solver& flow)
         Cell_handle n_cell = cell->neighbor(facet);
         n_cell->info().isAirReservoir = true;
         airReservoirRecursion(n_cell,flow);
+    }
+}
+
+///invade mode 2. Consider no trapped phase.
+template<class Solver>
+void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow)
+{
+    for (int facet = 0; facet < 4; facet ++) {
+        if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
+        if (cell->neighbor(facet)->info().Pcondition) continue;
+        if (cell->neighbor(facet)->info().p()!=0) continue;
+        double nCellP = surfaceTension/cell->info().poreRadius[facet];
+        if (pressure > nCellP) {
+            Cell_handle nCell = cell->neighbor(facet);
+            nCell->info().p() = pressure;
+            invadeSingleCell2(nCell, pressure, flow);
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::invade2(Solver& flow )
+{
+    updatePressure2(flow);
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (cell->info().p()!=0) {
+            invadeSingleCell2(cell,cell->info().p(),flow);
+        }
+    }
+}
+
+template<class Solver>
+void UnsaturatedEngine::updatePressure2(Solver& flow)
+{
+    BoundaryConditions(flow);
+    flow->pressureChanged=true;
+    flow->reApplyBoundaryConditions();
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+      if (cell->info().p()!=0) cell->info().p()=bndCondValue[2];
+    }   
+}
+
+template<class Solver>
+Real UnsaturatedEngine::getMinEntryValue2(Solver& flow )
+{
+    Real nextEntry = 1e50;
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (cell->info().p()!=0) {
+            for (int facet=0; facet<4; facet ++) {
+                if (tri.is_infinite(cell->neighbor(facet))) continue;
+                if (cell->neighbor(facet)->info().Pcondition) continue;
+                if (cell->neighbor(facet)->info().p()!=0) continue;
+                if (cell->neighbor(facet)->info().p()==0) {
+                    double n_cell_pe = surfaceTension/cell->info().poreRadius[facet];
+                    nextEntry = min(nextEntry,n_cell_pe);
+                }
+            }
+        }
+    }
+    if (nextEntry==1e50) {
+        cout << "please set initial air pressure for the cell !" << endl;
+    }
+    else {
+        return nextEntry;
     }
 }
 
