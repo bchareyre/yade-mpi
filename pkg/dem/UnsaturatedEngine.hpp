@@ -78,7 +78,9 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void checkTrap(Solver& flow, double pressure);//check trapped phase, define trapCapP.		
 		TPL Real getMinEntryValue (Solver& flow );
 		TPL Real getMinEntryValue2 (Solver& flow);
+		TPL void updatePressure2(Solver& flow);
 		TPL Real getSaturation(Solver& flow);
+		TPL Real getSaturation2(Solver& flow);	
 		TPL void saveListNodes(Solver& flow);
 		TPL void saveListConnection(Solver& flow);
 
@@ -141,6 +143,7 @@ class UnsaturatedEngine : public PartialEngine
 		Real		_getMinEntryValue() {return getMinEntryValue(solver);}
 		Real		_getMinEntryValue2() {return getMinEntryValue2(solver);}		
 		Real 		_getSaturation () {return getSaturation(solver);}
+		Real		_getSaturation2() {return getSaturation2(solver);}
 		void		_saveListNodes() {saveListNodes(solver);}
 		void		_saveListConnection() {saveListConnection(solver);}
  		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
@@ -164,6 +167,7 @@ class UnsaturatedEngine : public PartialEngine
 					((bool, Debug, false,,"Activate debug messages"))
 					((double, wall_thickness,0.001,,"Walls thickness"))
 					((double,P_zero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
+					((bool, updateTriangulation, 0,,"If true the medium is retriangulated."))
 					((double,gasPressure,0,,"Invasion pressure"))
 					((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 					((double, porosity, 0,,"Porosity computed at each retriangulation"))
@@ -202,6 +206,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
 					.def("buildTriangulation",&UnsaturatedEngine::_buildTriangulation,"Triangulate spheres of the current scene.")
 					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation")
+					.def("getSaturation2",&UnsaturatedEngine::_getSaturation2,"get saturation for mode 2")					
 					.def("getMinEntryValue",&UnsaturatedEngine::_getMinEntryValue,"get the minimum air entry pressure for the next invade step")
 					.def("getMinEntryValue2",&UnsaturatedEngine::_getMinEntryValue2,"get the minimum air entry pressure for the next invade step(version2)")
 					.def("saveListNodes",&UnsaturatedEngine::_saveListNodes,"Save the list of nodes.")

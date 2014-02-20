@@ -56,25 +56,32 @@ void UnsaturatedEngine::testFunction()
 }
 
 void UnsaturatedEngine::action()
-{
-	if ( !isActivated ) return;
-	RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-	if ( (tri.number_of_vertices()==0) || (solver->updateTriangulation) ) {
-		cout<< "triangulation is empty: building a new one" << endl;
-		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
-		setPositionsBuffer(true);//copy sphere positions in a buffer...
-		Build_Triangulation(P_zero,solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
-		initializeCellIndex(solver);//initialize cell index
-		initializePoreRadius(solver);//save all pore radii before invade
-		updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
-		computeSolidLine(solver);//save cell->info().solidLine[j][y]	  
-		solver->noCache = true;
-	}
-	///compute invade
-	/*if ( solver->pressureChanged )*/ solver->invade();
-	///compute force
-	solver->computeFacetPoreForcesWithCache();
-	scene->forces.addForce ( V_it->info().id(), force);
+{/*
+    if ( !isActivated ) return;
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if ( (tri.number_of_vertices()==0) || (updateTriangulation) ) {
+        cout<< "triangulation is empty: building a new one" << endl;
+        scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
+        setPositionsBuffer(true);//copy sphere positions in a buffer...
+        Build_Triangulation(P_zero,solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
+        initializeCellIndex(solver);//initialize cell index
+        initializePoreRadius(solver);//save all pore radii before invade
+        updateVolumeCapillaryCell(solver);//save capillary volume of all cells, for calculating saturation
+        computeSolidLine(solver);//save cell->info().solidLine[j][y]
+        solver->noCache = true;
+    }
+    ///compute invade
+    if (pressureForce) {
+        invade(solver);
+    }
+    ///compute force
+    computeFacetPoreForcesWithCache(solver);
+    Vector3r force;
+    Finite_vertices_iterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
+    for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
+        force = pressureForce ? Vector3r ( V_it->info().forces[0],V_it->info().forces[1],V_it->info().forces[2] ): Vector3r(0,0,0);
+        scene->forces.addForce ( V_it->info().id(), force);
+    }*/
 }
 
 ///invade mode 1. update phase reservoir before invasion. Consider no viscous effects, and invade gradually.
@@ -146,7 +153,8 @@ Real UnsaturatedEngine::getMinEntryValue(Solver& flow )
         }
     }
     if (nextEntry==1e50) {
-        cout << "please set initial air pressure for the cell !" << endl;
+        cout << "End drainage !" << endl;
+        return nextEntry=0;
     }
     else {
         return nextEntry;
@@ -263,6 +271,27 @@ void UnsaturatedEngine::airReservoirRecursion(Cell_handle cell, Solver& flow)
     }
 }
 
+template<class Solver>
+Real UnsaturatedEngine::getSaturation (Solver& flow )
+{
+    updateReservoir(flow);
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Real capillary_volume = 0.0; //total capillary volume
+    Real air_volume = 0.0; 	//air volume
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
+        if (cell->info().Pcondition) continue;//when calculating saturation, exclude boundary cells?(chao)
+// 	    if (cell.has_vertex() )
+        capillary_volume = capillary_volume + cell->info().capillaryCellVolume;
+        if (cell->info().isAirReservoir==true) {
+            air_volume = air_volume + cell->info().capillaryCellVolume;
+        }
+    }/*cerr<<"air_volume:"<<air_volume<<"  capillary_volume:"<<capillary_volume<<endl;*/
+    Real saturation = 1 - air_volume/capillary_volume;
+    return saturation;
+}
+
 ///invade mode 2. Consider no trapped phase.
 template<class Solver>
 void UnsaturatedEngine::invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow)
@@ -331,6 +360,26 @@ Real UnsaturatedEngine::getMinEntryValue2(Solver& flow )
     else {
         return nextEntry;
     }
+}
+
+template<class Solver>
+Real UnsaturatedEngine::getSaturation2(Solver& flow )
+{
+    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
+    Real capillary_volume = 0.0;
+    Real water_volume = 0.0;
+    Finite_cells_iterator cell_end = tri.finite_cells_end();
+    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
+        if (cell->info().Pcondition) continue;//when calculating saturation, exclude boundary cells?(chao)
+// 	    if (cell.has_vertex() )
+        capillary_volume = capillary_volume + cell->info().capillaryCellVolume;
+        if (cell->info().p()==0) {
+            water_volume = water_volume + cell->info().capillaryCellVolume;
+        }
+    }
+    Real saturation = water_volume/capillary_volume;
+    return saturation;
 }
 
 template<class Cellhandle>
@@ -809,27 +858,6 @@ void UnsaturatedEngine::updateVolumeCapillaryCell ( Solver& flow)
         cell->info().capillaryCellVolume = abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
 //         if (cell->info().capillaryCellVolume<0) {cerr<<"volumeCapillaryCell Negative. cell ID: " << cell->info().index << "cell volume: " << cell->info().volume() << "  volumeSolidPore: " << solver->volumeSolidPore(cell) << endl;        }
     }
-}
-
-template<class Solver>
-Real UnsaturatedEngine::getSaturation (Solver& flow )
-{
-    updateReservoir(flow);
-    RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
-    Real capillary_volume = 0.0; //total capillary volume
-    Real air_volume = 0.0; 	//air volume
-    Finite_cells_iterator cell_end = tri.finite_cells_end();
-    for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
-        if (tri.is_infinite(cell)) continue;
-        if (cell->info().Pcondition) continue;//when calculating saturation, exclude boundary cells?(chao)
-// 	    if (cell.has_vertex() )
-        capillary_volume = capillary_volume + cell->info().capillaryCellVolume;
-        if (cell->info().isAirReservoir==true) {
-            air_volume = air_volume + cell->info().capillaryCellVolume;
-        }
-    }/*cerr<<"air_volume:"<<air_volume<<"  capillary_volume:"<<capillary_volume<<endl;*/
-    Real saturation = 1 - air_volume/capillary_volume;
-    return saturation;
 }
 
 template<class Solver>
