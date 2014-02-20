@@ -1,3 +1,4 @@
+#ifdef YADE_ODEINT
 #include<yade/pkg/dem/RungeKuttaCashKarp54Integrator.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -30,4 +31,4 @@ void RungeKuttaCashKarp54Integrator::action()
 
 	scene->time=scene->time-dt;//Scene move next time step function already increments the time so we have to decrement it just before it.
 }
-
+#endif

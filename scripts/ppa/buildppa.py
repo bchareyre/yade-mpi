@@ -104,15 +104,20 @@ for branch in repodeb.branches:
             os.system('sed -i.bak -e s/VERSIONYADEREPLACE/%s/ %s/debian/rules'%(versiondebian,builddirdeb))
             os.system('cd %s; dpkg-source -b -I build'%(builddirup))
             os.mkdir(builddirres)
+            
+            buildarch = ''
+            if (len(archs)>1 and a != archs[0]):
+              buildarch = '--binary-arch'     #Build only arch-packages
+            
             print "Building package %s_%s"%(sourcePackName, versiondebian)
-            buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s/*.dsc'%
-                (a, tarball, addAllowuntrusted, builddirup, jobsNumber, builddirres, builddirup))
+            buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s %s/*.dsc'%
+                (a, tarball, addAllowuntrusted, builddirup, jobsNumber, builddirres, buildarch, builddirup))
             print buildPackage
             os.system(buildPackage)
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, builddirup))
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitdebdir))
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitupsdir))
-        os.system('cd %s ; su %s -c \'dput %s *.changes\''%(builddirres, userg, dputg))
+            os.system('cd %s ; su %s -c \'dput %s *.changes\''%(builddirres, userg, dputg))
 
 for branch in repodeb.branches:
     branchstr = str(branch)
