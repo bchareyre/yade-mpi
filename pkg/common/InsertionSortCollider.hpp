@@ -88,7 +88,7 @@ class GeneralIntegratorInsertionSortCollider;// Forward decleration of child to 
 
 class InsertionSortCollider: public Collider{
 
-	friend GeneralIntegratorInsertionSortCollider;
+	friend class GeneralIntegratorInsertionSortCollider;
 
 	//! struct for storing bounds of bodies
 	struct Bounds{
