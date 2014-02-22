@@ -67,7 +67,7 @@ Possible performance improvements & bugs
 
 
 // #define this macro to enable timing within this engine
-//#define ISC_TIMING
+// #define ISC_TIMING
 
 // #define to turn on some tracing information for the periodic part
 // all code under this can be probably removed at some point, when the collider will have been tested thoroughly
@@ -157,6 +157,7 @@ class InsertionSortCollider: public Collider{
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details
 	*/
 	void insertionSort(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
+	void insertionSortParallel(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
 	void handleBoundInversion(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
 // 	bool spatialOverlap(Body::id_t,Body::id_t) const;
 
