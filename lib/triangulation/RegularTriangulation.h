@@ -26,22 +26,22 @@ typedef CGAL::Triangulation_data_structure_3<Vb_info, Cb_info>			Tds;
 typedef CGAL::Triangulation_3<K>						Triangulation;
 typedef CGAL::Regular_triangulation_3<Traits, Tds>				RTriangulation;
 
-typedef typename RTriangulation::Vertex_iterator                    		Vertex_iterator;
-typedef typename RTriangulation::Vertex_handle                      		Vertex_handle;
-typedef typename RTriangulation::Finite_vertices_iterator                    	Finite_vertices_iterator;
-typedef typename RTriangulation::Cell_iterator					Cell_iterator;
-typedef typename RTriangulation::Finite_cells_iterator				Finite_cells_iterator;
-typedef typename RTriangulation::Cell_circulator				Cell_circulator;
-typedef typename RTriangulation::Cell_handle					Cell_handle;
+typedef typename RTriangulation::Vertex_iterator                    		VertexIterator;
+typedef typename RTriangulation::Vertex_handle                      		VertexHandle;
+typedef typename RTriangulation::Finite_vertices_iterator                    	FiniteVerticesIterator;
+typedef typename RTriangulation::Cell_iterator					CellIterator;
+typedef typename RTriangulation::Finite_cells_iterator				FiniteCellsIterator;
+typedef typename RTriangulation::Cell_circulator				CellCirculator;
+typedef typename RTriangulation::Cell_handle					CellHandle;
 
 typedef typename RTriangulation::Facet						Facet;
-typedef typename RTriangulation::Facet_iterator					Facet_iterator;
-typedef typename RTriangulation::Facet_circulator				Facet_circulator;
-typedef typename RTriangulation::Finite_facets_iterator				Finite_facets_iterator;
-typedef typename RTriangulation::Locate_type					Locate_type;
+typedef typename RTriangulation::Facet_iterator				FacetIterator;
+typedef typename RTriangulation::Facet_circulator				FacetCirculator;
+typedef typename RTriangulation::Finite_facets_iterator			FiniteFacetsIterator;
+typedef typename RTriangulation::Locate_type					LocateType;
 
-typedef typename RTriangulation::Edge_iterator					Edge_iterator;
-typedef typename RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
+typedef typename RTriangulation::Edge_iterator					EdgeIterator;
+typedef typename RTriangulation::Finite_edges_iterator				FiniteEdgesIterator;
 };
 
 typedef CGAL::To_double<double>							W_TO_DOUBLE; // foncteur Weight to Real 

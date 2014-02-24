@@ -37,11 +37,11 @@
 
 class TesselationWrapper : public GlobalEngine{
 public:
-	typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes> Tesselation;
+	typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes> 			Tesselation;
 	typedef Tesselation::RTriangulation						RTriangulation;
-	typedef Tesselation::Vertex_Info						Vertex_Info;
-	typedef Tesselation::Cell_Info							Cell_Info;
-	typedef RTriangulation::Finite_edges_iterator					Finite_edges_iterator;
+	typedef Tesselation::VertexInfo							VertexInfo;
+	typedef Tesselation::CellInfo							CellInfo;
+	typedef RTriangulation::Finite_edges_iterator					FiniteEdgesIterator;
 	
 	
 	
@@ -67,9 +67,9 @@ public:
     	void clear2(void);
 
 	/// Add axis aligned bounding planes (modelised as spheres with (almost) infinite radius)
-  	void 	AddBoundingPlanes (void);
+  	void 	addBoundingPlanes (void);
 	/// Force boudaries at positions not equal to precomputed ones
- 	void	AddBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
+ 	void	addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
 	void 	RemoveBoundingPlanes (void);
 	///Compute voronoi centers then stop (don't compute anything else)
  	void	ComputeTesselation (void);
@@ -108,9 +108,9 @@ public:
 
 public:
 	/// edge iterators are used for returning tesselation "facets", i.e. spheres with a common branch in the triangulation, convert CGAL::edge to int pair (b1->id, b2->id)
-	Finite_edges_iterator facet_begin;
-	Finite_edges_iterator facet_end;
-	Finite_edges_iterator facet_it;
+	FiniteEdgesIterator facet_begin;
+	FiniteEdgesIterator facet_end;
+	FiniteEdgesIterator facet_it;
 	MicroMacroAnalyser mma;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities (see also the `dedicated section in user manual <https://yade-dem.org/doc/user.html#micro-stress-and-micro-strain>`_). The calculation of microstrain is explained in [Catalano2013a]_ \n\nSee example usage in script example/tesselationWrapper/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",

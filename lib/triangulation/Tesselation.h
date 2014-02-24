@@ -12,27 +12,27 @@ namespace CGT {
 	
 //Since template inheritance does not automatically give access to the members of the base class, this macro can be used to declare all members at once. 
 #define DECLARE_TESSELATION_TYPES(baseType)\
-		typedef typename baseType::RTriangulation		 		RTriangulation;\
-		typedef typename baseType::Vertex_Info					Vertex_Info;\
-		typedef typename baseType::Cell_Info					Cell_Info;\
-		typedef typename baseType::Vertex_iterator		 		Vertex_iterator;\
-		typedef typename baseType::Vertex_handle                      		Vertex_handle;\
-		typedef typename baseType::Finite_vertices_iterator                    	Finite_vertices_iterator;\
-		typedef typename baseType::Cell_iterator				Cell_iterator;\
-		typedef typename baseType::Finite_cells_iterator			Finite_cells_iterator;\
-		typedef typename baseType::Cell_circulator				Cell_circulator;\
-		typedef typename baseType::Cell_handle					Cell_handle;\
-		typedef typename baseType::Facet					Facet;\
-		typedef typename baseType::Facet_iterator				Facet_iterator;\
-		typedef typename baseType::Facet_circulator				Facet_circulator;\
-		typedef typename baseType::Finite_facets_iterator			Finite_facets_iterator;\
-		typedef typename baseType::Locate_type					Locate_type;\
-		typedef typename baseType::Edge_iterator				Edge_iterator;\
-		typedef typename baseType::Finite_edges_iterator			Finite_edges_iterator;\
-		typedef typename baseType::Vector_Vertex				Vector_Vertex;\
-		typedef typename baseType::Vector_Cell					Vector_Cell;\
-		typedef typename baseType::List_Point					List_Point;\
-		typedef typename baseType::VCell_iterator				VCell_iterator;	
+		typedef typename baseType::RTriangulation		 	RTriangulation;\
+		typedef typename baseType::VertexInfo				VertexInfo;\
+		typedef typename baseType::CellInfo				CellInfo;\
+		typedef typename baseType::VertexIterator			VertexIterator;\
+		typedef typename baseType::VertexHandle				VertexHandle;\
+		typedef typename baseType::FiniteVerticesIterator		FiniteVerticesIterator;\
+		typedef typename baseType::CellIterator				CellIterator;\
+		typedef typename baseType::FiniteCellsIterator			FiniteCellsIterator;\
+		typedef typename baseType::CellCirculator			CellCirculator;\
+		typedef typename baseType::CellHandle				CellHandle;\
+		typedef typename baseType::Facet				Facet;\
+		typedef typename baseType::FacetIterator			FacetIterator;\
+		typedef typename baseType::FacetCirculator			FacetCirculator;\
+		typedef typename baseType::FiniteFacetsIterator			FiniteFacetsIterator;\
+		typedef typename baseType::LocateType				LocateType;\
+		typedef typename baseType::EdgeIterator				EdgeIterator;\
+		typedef typename baseType::FiniteEdgesIterator			FiniteEdgesIterator;\
+		typedef typename baseType::VectorVertex				VectorVertex;\
+		typedef typename baseType::VectorCell				VectorCell;\
+		typedef typename baseType::ListPoint				ListPoint;\
+		typedef typename baseType::VCellIterator			VCellIterator;
 
 // Classe Tesselation, contient les fonctions permettant de calculer la Tessalisation
 // d'une RTriangulation et de stocker les centres dans chacune de ses cellules
@@ -43,28 +43,28 @@ class _Tesselation
 {
 public:
 	typedef typename TT::RTriangulation							RTriangulation;
-	typedef typename TT::Vertex_Info							Vertex_Info;
-	typedef typename TT::Cell_Info								Cell_Info;
-	typedef typename RTriangulation::Vertex_iterator		 			Vertex_iterator;
-	typedef typename RTriangulation::Vertex_handle                      			Vertex_handle;
-	typedef typename RTriangulation::Finite_vertices_iterator                    		Finite_vertices_iterator;
-	typedef typename RTriangulation::Cell_iterator						Cell_iterator;
-	typedef typename RTriangulation::Finite_cells_iterator					Finite_cells_iterator;
-	typedef typename RTriangulation::Cell_circulator					Cell_circulator;
-	typedef typename RTriangulation::Cell_handle						Cell_handle;
+	typedef typename TT::Vertex_Info							VertexInfo;
+	typedef typename TT::Cell_Info								CellInfo;
+	typedef typename RTriangulation::Vertex_iterator		 			VertexIterator;
+	typedef typename RTriangulation::Vertex_handle                      			VertexHandle;
+	typedef typename RTriangulation::Finite_vertices_iterator                    		FiniteVerticesIterator;
+	typedef typename RTriangulation::Cell_iterator						CellIterator;
+	typedef typename RTriangulation::Finite_cells_iterator					FiniteCellsIterator;
+	typedef typename RTriangulation::Cell_circulator					CellCirculator;
+	typedef typename RTriangulation::Cell_handle						CellHandle;
 	typedef typename RTriangulation::Facet							Facet;
-	typedef typename RTriangulation::Facet_iterator						Facet_iterator;
-	typedef typename RTriangulation::Facet_circulator					Facet_circulator;
-	typedef typename RTriangulation::Finite_facets_iterator					Finite_facets_iterator;
-	typedef typename RTriangulation::Locate_type						Locate_type;
-	typedef typename RTriangulation::Edge_iterator						Edge_iterator;
-	typedef typename RTriangulation::Finite_edges_iterator					Finite_edges_iterator;	
+	typedef typename RTriangulation::Facet_iterator						FacetIterator;
+	typedef typename RTriangulation::Facet_circulator					FacetCirculator;
+	typedef typename RTriangulation::Finite_facets_iterator					FiniteFacetsIterator;
+	typedef typename RTriangulation::Locate_type						LocateType;
+	typedef typename RTriangulation::Edge_iterator						EdgeIterator;
+	typedef typename RTriangulation::Finite_edges_iterator					FiniteEdgesIterator;	
 	
-	typedef std::vector<Vertex_handle>							Vector_Vertex;
-	typedef std::vector<Cell_handle>							Vector_Cell;
-	typedef std::list<Point>								List_Point;
-	typedef typename Vector_Cell::iterator							VCell_iterator;
-	int max_id;
+	typedef std::vector<VertexHandle>							VectorVertex;
+	typedef std::vector<CellHandle>								VectorCell;
+	typedef std::list<Point>								ListPoint;
+	typedef typename VectorCell::iterator							VCellIterator;
+	int maxId;
 
 protected:
 	RTriangulation* Tri;
@@ -75,8 +75,8 @@ public:
 	Real area; 
 	Real TotalInternalVoronoiVolume;
 	Real TotalInternalVoronoiPorosity;
-	Vector_Vertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
-	Vector_Cell cellHandles;//for speedup of global loops, iterating on this vector is faster than cellIterator++
+	VectorVertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
+	VectorCell cellHandles;//for speedup of global loops, iterating on this vector is faster than cellIterator++
 	bool redirected;//is vertexHandles filled with current vertex pointers? 	
 
 public:
@@ -85,48 +85,47 @@ public:
 	~_Tesselation(void);
 	
 	///Insert a sphere
-	Vertex_handle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false);
+	VertexHandle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false);
 	/// move a spheres
-	Vertex_handle move (Real x, Real y, Real z, Real rad, unsigned int id);
+	VertexHandle move (Real x, Real y, Real z, Real rad, unsigned int id);
 	///Fill a vector with vertexHandles[i] = handle of vertex with id=i for fast access
 	bool redirect (void);
 	///Remove a sphere
 	bool remove (unsigned int id); 
-	int Max_id (void) {return max_id;}
+	int Max_id (void) {return maxId;}
 	
 	void	Compute ();	//Calcule le centres de Voronoi pour chaque cellule
 	void	Invalidate () {computed=false;}  //Set the tesselation as "not computed" (computed=false), this will launch 						//tesselation internaly when using functions like computeVolumes())
 	// N.B : Compute() must be executed before the functions below are used
 	void	Clear(void);
 
-	static Point	Dual	(const Cell_handle &cell);	
-	static Plan	Dual	(Vertex_handle S1, Vertex_handle S2);
-	static Segment  Dual	(Finite_facets_iterator &facet);	//G�n�re le segment dual d'une facette finie
-	static Real	Volume	(Finite_cells_iterator cell);
-	inline void 	AssignPartialVolume	(Finite_edges_iterator& ed_it);
-// 	inline void 	ComputeVFacetArea	(Finite_edges_iterator& ed_it);
-	double		ComputeVFacetArea (Finite_edges_iterator ed_it);
+	static Point	Dual	(const CellHandle &cell);	
+	static Plane	Dual	(VertexHandle S1, VertexHandle S2);
+	static Segment  Dual	(FiniteFacetsIterator &facet);	//G�n�re le segment dual d'une facette finie
+	static Real	Volume	(FiniteCellsIterator cell);
+	inline void 	AssignPartialVolume	(FiniteEdgesIterator& ed_it);
+	double		ComputeVFacetArea (FiniteEdgesIterator ed_it);
 	void		ResetVCellVolumes	(void);
 	void		ComputeVolumes		(void);//Compute volume each voronoi cell
 	void		ComputePorosity		(void);//Compute volume and porosity of each voronoi cell
 	inline Real&	Volume (unsigned int id) { return vertexHandles[id]->info().v(); }
-	inline const Vertex_handle&	vertex (unsigned int id) const { return vertexHandles[id]; }
+	inline const VertexHandle&	vertex (unsigned int id) const { return vertexHandles[id]; }
 
 	
-	Finite_cells_iterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}
-	Finite_cells_iterator finite_cells_end(void);// {return Tri->finite_cells_end();}
-	void Voisins (Vertex_handle v, Vector_Vertex& Output_vector);// {Tri->incident_vertices(v, back_inserter(Output_vector));}
+// 	FiniteCellsIterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}
+// 	FiniteCellsIterator finiteCellsEnd(void);// {return Tri->finite_cells_end();}
+	void voisins (VertexHandle v, VectorVertex& Output_vector);// {Tri->incident_vertices(v, back_inserter(Output_vector));}
 	RTriangulation& Triangulation (void);// {return *Tri;}
 
 	bool Computed (void) {return computed;}
 
-	bool is_short ( Finite_facets_iterator f_it );
-	inline bool is_internal ( Finite_facets_iterator &facet );//
+	bool is_short ( FiniteFacetsIterator f_it );
+	inline bool is_internal ( FiniteFacetsIterator &facet );//
 
-	long New_liste_edges	( Real** Coordonnes );	//Genere la liste des segments de Voronoi
-	long New_liste_short_edges	( Real** Coordonnes );	//Genere la version tronquee (partie interieure) du graph de Voronoi
-	long New_liste_short_edges2	( Real** Coordonnes );
-	long New_liste_adjacent_edges ( Vertex_handle vertex0, Real** Coordonnes );
+	long newListeEdges	( Real** Coordonnes );	//Genere la liste des segments de Voronoi
+	long newListeShortEdges	( Real** Coordonnes );	//Genere la version tronquee (partie interieure) du graph de Voronoi
+	long newListeShortEdges2	( Real** Coordonnes );
+	long New_liste_adjacent_edges ( VertexHandle vertex0, Real** Coordonnes );
 };
 
 
@@ -138,11 +137,11 @@ class PeriodicTesselation : public Tesselation
 	DECLARE_TESSELATION_TYPES(Tesselation)
 	using Tesselation::Tri;
 	using Tesselation::vertexHandles;
-	using Tesselation::max_id;
+	using Tesselation::maxId;
 	using Tesselation::redirected;
 		
 	///Insert a sphere, which can be a duplicate one from the base period if duplicateOfId>=0
-	Vertex_handle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false, int duplicateOfId=-1);
+	VertexHandle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false, int duplicateOfId=-1);
 	///Fill a vector with vertexHandles[i] = handle of vertex with id=i for fast access, contains only spheres from the base period
 	bool redirect (void);
 };

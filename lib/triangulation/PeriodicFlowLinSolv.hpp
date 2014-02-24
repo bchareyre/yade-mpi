@@ -27,8 +27,8 @@ public:
 	PeriodicFlowLinSolv();
 
 	///Linear system solve
-	virtual int SetLinearSystem(Real dt=0);
-	virtual int SetLinearSystemFullGS(Real dt=0);
+	virtual int setLinearSystem(Real dt=0);
+	virtual int setLinearSystemFullGS(Real dt=0);
 };
 
 } //namespace CGTF

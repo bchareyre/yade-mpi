@@ -137,7 +137,7 @@ class capillarylaw
 	public:
 		capillarylaw();
 		std::vector<Tableau> data_complete;
-		MeniscusParameters Interpolate(Real R1, Real R2, Real D, Real P, int* index);		
+		MeniscusParameters interpolate(Real R1, Real R2, Real D, Real P, int* index);		
 		void fill (const char* filename);
 };
 

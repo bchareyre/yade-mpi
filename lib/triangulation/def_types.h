@@ -21,6 +21,9 @@
 #include <CGAL/number_utils.h>
 #include <boost/static_assert.hpp>
 
+//This include from yade let us use Eigen types
+#include <yade/lib/base/Math.hpp>
+
 namespace CGT {
 //Robust kernel
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -37,15 +40,14 @@ BOOST_STATIC_ASSERT(sizeof(Traits::RT)==sizeof(Real));
 #endif
 typedef Traits::RT									Real; //Dans cartesian, RT = FT
 typedef Traits::Weighted_point								Sphere;
-typedef Traits::Line_3									Droite;
-typedef Traits::Plane_3									Plan;
+typedef Traits::Plane_3									Plane;
 typedef Traits::Triangle_3								Triangle;
-typedef Traits::Tetrahedron_3								Tetraedre;
+typedef Traits::Tetrahedron_3								Tetrahedron;
 
 class SimpleCellInfo : public Point {
 	public:
 	//"id": unique identifier of each cell, independant of other numberings used in the fluid types.
-	// Care to initialize it, there is no magic numbering to rely on
+	// Care to initialize it if you need it, there is no magic numbering to rely on
 	unsigned int id;
 	Real s;
 	bool isFictious;
@@ -91,10 +93,10 @@ class FlowCellInfo : public SimpleCellInfo {
 	Real invVoidV;
 	Real t;
 	int fict;
- 	Real VolumeVariation;
+ 	Real volumeVariation;
 	double pression;
 	 //average relative (fluid - facet translation) velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
-	Vecteur Average_Cell_Velocity;
+	Vecteur averageCellVelocity;
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<Vecteur> facetSurfaces;
 	//Ratio between fluid surface and facet surface 
@@ -103,70 +105,63 @@ class FlowCellInfo : public SimpleCellInfo {
 	std::vector<Vecteur> unitForceVectors;
 	// Store the area of triangle-sphere intersections for each facet (used in forces definition)
 	std::vector<Vecteur> facetSphereCrossSections;
-	std::vector<Vecteur> cell_force;
-	std::vector<double> RayHydr;
-// 	std::vector<double> flow_rate;
-	std::vector<double> module_permeability;
+	std::vector<Vecteur> cellForce;
+	std::vector<double> rayHydr;
+	std::vector<double> modulePermeability;
 	// Partial surfaces of spheres in the double-tetrahedron linking two voronoi centers. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
 	double solidSurfaces [4][4];
 
 	FlowCellInfo (void)
 	{
-		module_permeability.resize(4, 0);
-		cell_force.resize(4);
+		modulePermeability.resize(4, 0);
+		cellForce.resize(4);
 		facetSurfaces.resize(4);
 		facetFluidSurfacesRatio.resize(4);
 		facetSphereCrossSections.resize(4);
 		unitForceVectors.resize(4);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
-		RayHydr.resize(4, 0);
+		rayHydr.resize(4, 0);
 // 		isInside = false;
-		inv_sum_k=0;
+		invSumK=0;
 		isFictious=false; Pcondition = false; isGhost = false;
 // 		isInferior = false; isSuperior = false; isLateral = false; isExternal=false;
 		isvisited = false;
 		index=0;
 		volumeSign=0;
 		s=0;
-		VolumeVariation=0;
+		volumeVariation=0;
 		pression=0;
 		invVoidV=0;
  		fict=0;
 		isGhost=false;
 	}	
 	bool isGhost;
-	double inv_sum_k;
-// 	bool isInside;
-// 	bool isInferior;
-// 	bool isSuperior;
-// 	bool isLateral;
+	double invSumK;
 	bool isvisited;
-// 	bool isExternal;
 	
-	FlowCellInfo& operator= (const std::vector<double> &v) { for (int i=0; i<4;i++) module_permeability[i]= v[i]; return *this; }
+	FlowCellInfo& operator= (const std::vector<double> &v) { for (int i=0; i<4;i++) modulePermeability[i]= v[i]; return *this; }
 	FlowCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
 	FlowCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
 	
 	inline Real& volume (void) {return t;}
 	inline const Real& invVoidVolume (void) const {return invVoidV;}
 	inline Real& invVoidVolume (void) {return invVoidV;}
-	inline Real& dv (void) {return VolumeVariation;}
+	inline Real& dv (void) {return volumeVariation;}
 	inline int& fictious (void) {return fict;}
 	inline double& p (void) {return pression;}
 	//For compatibility with the periodic case
 	inline const double shiftedP (void) const {return pression;}
-	inline const std::vector<double>& k_norm (void) const {return module_permeability;}
-	inline std::vector<double>& k_norm (void) {return module_permeability;}
+	inline const std::vector<double>& kNorm (void) const {return modulePermeability;}
+	inline std::vector<double>& kNorm (void) {return modulePermeability;}
 	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
-	inline std::vector<Vecteur>& force (void) {return cell_force;}
-	inline std::vector<double>& Rh (void) {return RayHydr;}
-
-	inline Vecteur& av_vel (void) {return Average_Cell_Velocity;}
+	inline std::vector<Vecteur>& force (void) {return cellForce;}
+	inline std::vector<double>& Rh (void) {return rayHydr;}
+	inline Vecteur& averageVelocity (void) {return averageCellVelocity;}
 };
 
 class FlowVertexInfo : public SimpleVertexInfo {
-	Vecteur Grain_Velocity;
-	Real volume_incident_cells;
+	Vecteur grainVelocity;
+	Real volumeIncidentCells;
 public:
 	FlowVertexInfo& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
 	FlowVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
@@ -175,8 +170,8 @@ public:
 	bool isGhost;
 	FlowVertexInfo (void) {isGhost=false;}
 	inline Vecteur& force (void) {return forces;}
-	inline Vecteur& vel (void) {return Grain_Velocity;}
-	inline Real& vol_cells (void) {return volume_incident_cells;}
+	inline Vecteur& vel (void) {return grainVelocity;}
+	inline Real& volCells (void) {return volumeIncidentCells;}
 	inline const Vecteur ghostShift (void) {return CGAL::NULL_VECTOR;}
 };
 

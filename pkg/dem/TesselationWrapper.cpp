@@ -68,7 +68,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	BodyContainer::iterator bi = biBegin;
 
 	Body::id_t Ng = 0;
-	Body::id_t& MaxId=Tes.max_id;
+	Body::id_t& MaxId=Tes.maxId;
 	TW.mean_radius = 0;
 
 	shared_ptr<Sphere> sph (new Sphere);
@@ -111,7 +111,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 		else {
 			v->info() = (const unsigned int) p->second;
 			//Vh->info().isFictious = false;//false is the default
-			Tes.max_id = std::max(Tes.max_id,(int) p->second);
+			Tes.maxId = std::max(Tes.maxId,(int) p->second);
 			Tes.vertexHandles[p->second]=v;
 			hint=v->cell();
 			++TW.n_spheres;
@@ -200,13 +200,13 @@ void TesselationWrapper::ComputeTesselation(void)
 
 void TesselationWrapper::ComputeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
 {
-	AddBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
+	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
 	ComputeTesselation();
 }
 
 void TesselationWrapper::ComputeVolumes(void)
 {
-	if (!bounded) AddBoundingPlanes();
+	if (!bounded) addBoundingPlanes();
 	ComputeTesselation();
 	Tes->ComputeVolumes();
 }
@@ -232,7 +232,7 @@ bool TesselationWrapper::nextFacet(std::pair<unsigned int,unsigned int>& facet)
 	return true;
 }
 
-void TesselationWrapper::AddBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz,double dt)
+void TesselationWrapper::addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz,double dt)
 {
 	//Not sure this hack form JFJ works in all cases (?)
 	if (dt == 0) {
@@ -254,7 +254,7 @@ void TesselationWrapper::AddBoundingPlanes(double pminx, double pmaxx, double pm
 	}
 }
 
-void  TesselationWrapper::AddBoundingPlanes(void)
+void  TesselationWrapper::addBoundingPlanes(void)
 {
 	if (!bounded) {
 		if (!rad_divided) {
@@ -357,7 +357,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 			ts = mma.analyser->TS0;}
 		RTriangulation& Tri = Tes->Triangulation();
 		Pmin=ts->box.base; Pmax=ts->box.sommet;
-		//if (!scene->isPeriodic) AddBoundingPlanes();
+		//if (!scene->isPeriodic) addBoundingPlanes();
 		ComputeVolumes();
 		int bodiesDim = Tes->Max_id() + 1; //=scene->bodies->size();
 		cerr<<"bodiesDim="<<bodiesDim<<endl;

@@ -32,46 +32,39 @@ template<class Tesselation>
 Network<Tesselation>::Network(){
 	FAR = 50000;
 	facetF1=facetF2=facetRe1=facetRe2=facetRe3=0;
-	F1=F2=Re1=Re2=0;
+// 	F1=F2=Re1=Re2=0;
 }
 
 template<class Tesselation>
-int Network<Tesselation>::detectFacetFictiousVertices (Cell_handle& cell, int& j)
+int Network<Tesselation>::detectFacetFictiousVertices (CellHandle& cell, int& j)
 {
 	facetNFictious = 0;
-	int real_vertex=0;
-	Sphere v [3];
-        Vertex_handle W [3];
-
-        for (int kk=0; kk<3; kk++) {
-                W[kk] = cell->vertex(facetVertices[j][kk]);
-                v[kk] = cell->vertex(facetVertices[j][kk])->point();
-                if (W[kk]->info().isFictious) {
-                        if (facetNFictious==0) {F1=facetVertices[j][kk];facetF1=kk;} else
-			{F2 = facetVertices[j][kk];facetF2=kk;}
+	for (int kk=0; kk<3; kk++) {
+                if (cell->vertex(facetVertices[j][kk])->info().isFictious) {
+                        if (facetNFictious==0) facetF1=kk; else facetF2=kk;
                         facetNFictious +=1;
                 } else {
-                        if (real_vertex==0) {Re1=facetVertices[j][kk];facetRe1=kk;} else if (real_vertex==1)
-			{Re2=facetVertices[j][kk];facetRe2=kk;} else if (real_vertex==2)
-			{Re2=facetVertices[j][kk];facetRe3=kk;}
+                        if (real_vertex==0) facetRe1=kk;
+                        else if (real_vertex==1) facetRe2=kk;
+                        else if (real_vertex==2) facetRe3=kk;
                         real_vertex+=1;}}
 	return facetNFictious;
 }
 
 template<class Tesselation>
-double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int& j, bool reuseFacetData)
+double Network<Tesselation>::volumePoreVoronoiFraction (CellHandle& cell, int& j, bool reuseFacetData)
 {
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
   if (!reuseFacetData) facetNFictious = detectFacetFictiousVertices (cell,j);
   Sphere v [3];
-  Vertex_handle W [3];
+  VertexHandle W [3];
   for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);v[kk] = cell->vertex(facetVertices[j][kk])->point();}
   switch (facetNFictious) {
     case (0) : {
-		Vertex_handle& SV1 = W[0];
-                Vertex_handle& SV2 = W[1];
-                Vertex_handle& SV3 = W[2];
+		VertexHandle& SV1 = W[0];
+                VertexHandle& SV2 = W[1];
+                VertexHandle& SV3 = W[2];
 
                 cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point()-SV3->point(),SV2->point()-SV3->point());
 		if (cell->info().facetSurfaces[j][0]==0 && cell->info().facetSurfaces[j][1]==0 && cell->info().facetSurfaces[j][2]==0) cerr<<"NULL FACET SURF"<<endl;
@@ -81,37 +74,37 @@ double Network<Tesselation>::Volume_Pore_VoronoiFraction (Cell_handle& cell, int
 		
                 double Vsolid1=0, Vsolid2=0;
                 for (int i=0;i<3;i++) {
-                Vsolid1 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
-                Vsolid2 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);}
+                Vsolid1 += sphericalTriangleVolume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
+                Vsolid2 += sphericalTriangleVolume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);}
 
-		Vsolid_tot += Vsolid1 + Vsolid2;
-		Vporale += Vtot - (Vsolid1 + Vsolid2);
+		VSolidTot += Vsolid1 + Vsolid2;
+		vPoral += Vtot - (Vsolid1 + Vsolid2);
 		
 		bool border=false;
 		for (int i=0;i<4;i++){
 		  if (cell->neighbor(i)->info().fictious()!=0) border=true;}
-		if (!border) {V_porale_porosity += Vtot - (Vsolid1 + Vsolid2);
-		    V_totale_porosity += Vtot;}
+		if (!border) {vPoralPorosity += Vtot - (Vsolid1 + Vsolid2);
+		    vTotalePorosity += Vtot;}
 
 		/**Vpore**/ return Vtot - (Vsolid1 + Vsolid2);
     }; break;
-    case (1) : {return volume_single_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetRe1]), cell->vertex(facetVertices[j][facetRe2]), p1,p2, cell->info().facetSurfaces[j]);}; break;
-    case (2) : {return volume_double_fictious_pore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;
+    case (1) : {return volumeSingleFictiousPore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetRe1]), cell->vertex(facetVertices[j][facetRe2]), p1,p2, cell->info().facetSurfaces[j]);}; break;
+    case (2) : {return volumeDoubleFictiousPore(cell->vertex(facetVertices[j][facetF1]), cell->vertex(facetVertices[j][facetF2]), cell->vertex(facetVertices[j][facetRe1]), p1,p2, cell->info().facetSurfaces[j]);}; break;
     default : return 0;}
 }
 
 template<class Tesselation>
-double Network<Tesselation>::volumeSolidPore (const Cell_handle& cell)
+double Network<Tesselation>::volumeSolidPore (const CellHandle& cell)
 {
   double Vsolid=0;
   for (int i=0;i<4;i++) {
-	if ( !cell->vertex(permut4[i][0])->info().isFictious ) Vsolid += spherical_triangle_volume( cell->vertex(permut4[i][0])->point(), cell->vertex(permut4[i][1])->point(), cell->vertex(permut4[i][2])-> point(), cell->vertex(permut4[i][3])-> point());
+	if ( !cell->vertex(permut4[i][0])->info().isFictious ) Vsolid += sphericalTriangleVolume( cell->vertex(permut4[i][0])->point(), cell->vertex(permut4[i][1])->point(), cell->vertex(permut4[i][2])-> point(), cell->vertex(permut4[i][3])-> point());
   }
   return Vsolid;
 }
 
 template<class Tesselation>
-double Network<Tesselation>::volume_single_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
+double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
 {
         double A [3], B[3];
 
@@ -125,7 +118,7 @@ double Network<Tesselation>::volume_single_fictious_pore(const Vertex_handle& SV
 	
         Point AA(A[0],A[1],A[2]);
         Point BB(B[0],B[1],B[2]);
-        facetSurface = surface_single_fictious_facet(SV1,SV2,SV3);
+        facetSurface = surfaceSingleFictiousFacet(SV1,SV2,SV3);
 	if (facetSurface*(PV2-PV1) > 0) facetSurface = -1.0*facetSurface;
         Real Vtot=ONE_THIRD*abs(facetSurface*(PV1-PV2));
 	Vtotalissimo += Vtot;
@@ -135,17 +128,17 @@ double Network<Tesselation>::volume_single_fictious_pore(const Vertex_handle& SV
         Sphere& SW2 = SV2->point();
         Sphere& SW3 = SV3->point();
 
-        Real Vsolid1 = spherical_triangle_volume(SW2, AA, PV1, PV2)+spherical_triangle_volume(SW2, SW3, PV1, PV2);
-        Real Vsolid2 = spherical_triangle_volume(SW3, BB, PV1, PV2)+spherical_triangle_volume(SW3, SW2, PV1, PV2);
+        Real Vsolid1 = sphericalTriangleVolume(SW2, AA, PV1, PV2)+sphericalTriangleVolume(SW2, SW3, PV1, PV2);
+        Real Vsolid2 = sphericalTriangleVolume(SW3, BB, PV1, PV2)+sphericalTriangleVolume(SW3, SW2, PV1, PV2);
 	
-	Vsolid_tot += Vsolid1 + Vsolid2;
-	Vporale += Vtot - (Vsolid1 + Vsolid2);
+	VSolidTot += Vsolid1 + Vsolid2;
+	vPoral += Vtot - (Vsolid1 + Vsolid2);
 
         return (Vtot - (Vsolid1 + Vsolid2));
 }
 
 template<class Tesselation>
-double Network<Tesselation>::volume_double_fictious_pore(const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface)
+double Network<Tesselation>::volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface)
 {
         double A [3], B[3];
 
@@ -163,37 +156,37 @@ double Network<Tesselation>::volume_double_fictious_pore(const Vertex_handle& SV
         Real Vtot = abs(facetSurface*(PV1-PV2))*ONE_THIRD;
 	Vtotalissimo += Vtot;
 
-        Real Vsolid1 = spherical_triangle_volume(SV3->point(), AA, PV1, PV2);
-        Real Vsolid2 = spherical_triangle_volume(SV3->point(), BB, PV1, PV2);
+        Real Vsolid1 = sphericalTriangleVolume(SV3->point(), AA, PV1, PV2);
+        Real Vsolid2 = sphericalTriangleVolume(SV3->point(), BB, PV1, PV2);
 
-	Vporale += (Vtot - Vsolid1 - Vsolid2);
-	Vsolid_tot += Vsolid1 + Vsolid2;
+	vPoral += (Vtot - Vsolid1 - Vsolid2);
+	VSolidTot += Vsolid1 + Vsolid2;
 
         return (Vtot - Vsolid1 - Vsolid2);
 }
 
 template<class Tesselation>
-double Network<Tesselation>::spherical_triangle_volume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3)
+double Network<Tesselation>::sphericalTriangleVolume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3)
 {
         double rayon = sqrt(ST1.weight());
         if (rayon == 0.0) return 0.0;
-        return ((ONE_THIRD * rayon) * (fast_spherical_triangle_area(ST1, PT1, PT2, PT3))) ;
+        return ((ONE_THIRD * rayon) * (fastSphericalTriangleArea(ST1, PT1, PT2, PT3))) ;
 }
 
 template<class Tesselation>
-double Network<Tesselation>::fast_spherical_triangle_area(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1)
+double Network<Tesselation>::fastSphericalTriangleArea(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1)
 {
         using namespace CGAL;
 #ifndef FAST
-        return spherical_triangle_area(STA1, STA2, STA3, PTA1);
+        return sphericalTriangleArea(STA1, STA2, STA3, PTA1);
 #endif
         double rayon2 = STA1.weight();
         if (rayon2 == 0.0) return 0.0;
-        return rayon2 * fast_solid_angle(STA1,STA2,STA3,PTA1);
+        return rayon2 * fastSolidAngle(STA1,STA2,STA3,PTA1);
 }
 
 template<class Tesselation>
-double Network<Tesselation>::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
+double Network<Tesselation>::sphericalTriangleArea ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
 {
  double rayon = STA1.weight();
  if ( rayon == 0.0 ) return 0.0;
@@ -225,7 +218,7 @@ double Network<Tesselation>::spherical_triangle_area ( Sphere STA1, Sphere STA2,
 }
 
 template<class Tesselation>
-Real Network<Tesselation>::fast_solid_angle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3)
+Real Network<Tesselation>::fastSolidAngle(const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3)
 {
         //! This function needs to be fast because it is used heavily. Avoid using vector operations which require constructing vectors (~50% of cpu time in the non-fast version), and compute angle using the 3x faster formula of Oosterom and StrackeeVan Oosterom, A; Strackee, J (1983). "The Solid Angle of a Plane Triangle". IEEE Trans. Biom. Eng. BME-30 (2): 125-126. (or check http://en.wikipedia.org/wiki/Solid_angle)
         using namespace CGAL;
@@ -261,7 +254,7 @@ Real Network<Tesselation>::fast_solid_angle(const Point& STA1, const Point& PTA1
 }
 
 template<class Tesselation>
-double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData)
+double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipOnLaterals, bool reuseFacetData)
 {
   if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
@@ -271,7 +264,7 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
   double Ssolid1= 0, Ssolid1n= 0, Ssolid2= 0, Ssolid2n= 0, Ssolid3= 0, Ssolid3n= 0;
 
   Sphere v [3];
-  Vertex_handle W [3];
+  VertexHandle W [3];
 
   for (int kk=0; kk<3; kk++) {
 	  W[kk] = cell->vertex(facetVertices[j][kk]);
@@ -279,46 +272,46 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
 
   switch (facetNFictious) {
     case (0) : {
-		Vertex_handle& SV1 = W[0];
-                Vertex_handle& SV2 = W[1];
-                Vertex_handle& SV3 = W[2];
+		VertexHandle& SV1 = W[0];
+                VertexHandle& SV2 = W[1];
+                VertexHandle& SV3 = W[2];
 
-		Ssolid1 = fast_spherical_triangle_area(SV1->point(), SV2->point(), p1, p2);
-                Ssolid1n = fast_spherical_triangle_area(SV1->point(), SV3->point(), p1, p2);
+		Ssolid1 = fastSphericalTriangleArea(SV1->point(), SV2->point(), p1, p2);
+                Ssolid1n = fastSphericalTriangleArea(SV1->point(), SV3->point(), p1, p2);
                 cell->info().solidSurfaces[j][0]=Ssolid1+Ssolid1n;
-                Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
-                Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point(),p1, p2);
+                Ssolid2n = fastSphericalTriangleArea(SV2->point(),SV3->point(),p1, p2);
                 cell->info().solidSurfaces[j][1]=Ssolid2+Ssolid2n;
-                Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
-                Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, p2);
+                Ssolid3n = fastSphericalTriangleArea(SV3->point(),SV1->point(),p1, p2);
                 cell->info().solidSurfaces[j][2]=Ssolid3+Ssolid3n;
 
     }; break;
     case (1) : {
-		Vertex_handle SV1 = cell->vertex(facetVertices[j][facetF1]);
-		Vertex_handle SV2 = cell->vertex(facetVertices[j][facetRe1]);
-		Vertex_handle SV3 = cell->vertex(facetVertices[j][facetRe2]);
+		VertexHandle SV1 = cell->vertex(facetVertices[j][facetF1]);
+		VertexHandle SV2 = cell->vertex(facetVertices[j][facetRe1]);
+		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe2]);
 
 		Boundary &bi1 =  boundary(SV1->info().id());
                 Ssolid1 = 0;
-		if (bi1.flowCondition && ! SLIP_ON_LATERALS) {
+		if (bi1.flowCondition && ! slipOnLaterals) {
                         Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point()-SV3->point())[bi1.coordinate]);
                         cell->info().solidSurfaces[j][facetF1]=Ssolid1;
                 }
-                Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
-                Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point(),p1, p2);
+                Ssolid2n = fastSphericalTriangleArea(SV2->point(),SV3->point(),p1, p2);
                 cell->info().solidSurfaces[j][facetRe1]=Ssolid2+Ssolid2n;
-                Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
-                Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, p2);
+                Ssolid3n = fastSphericalTriangleArea(SV3->point(),SV1->point(),p1, p2);
                 cell->info().solidSurfaces[j][facetRe2]=Ssolid3+Ssolid3n;
     }; break;
     case (2) : {
 
 		double A [3], B[3], C[3];
 
-		Vertex_handle SV1 = cell->vertex(facetVertices[j][facetF1]);
-		Vertex_handle SV2 = cell->vertex(facetVertices[j][facetF2]);
-		Vertex_handle SV3 = cell->vertex(facetVertices[j][facetRe1]);
+		VertexHandle SV1 = cell->vertex(facetVertices[j][facetF1]);
+		VertexHandle SV2 = cell->vertex(facetVertices[j][facetF2]);
+		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe1]);
 
 		Boundary &bi1 =  boundary(SV1->info().id());
                 Boundary &bi2 =  boundary(SV2->info().id());
@@ -337,18 +330,18 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
                 Sphere B1(BB, 0);
                 Sphere C1(CC, 0);
                 //FIXME : we are computing triangle area twice here, because its computed in volume_double_fictious already -> optimize
-                Ssolid1 = fast_spherical_triangle_area(SV3->point(), AA, p1, p2);
-                Ssolid1n = fast_spherical_triangle_area(SV3->point(), BB, p1, p2);
+                Ssolid1 = fastSphericalTriangleArea(SV3->point(), AA, p1, p2);
+                Ssolid1n = fastSphericalTriangleArea(SV3->point(), BB, p1, p2);
                 cell->info().solidSurfaces[j][facetRe1]=Ssolid1+Ssolid1n;
                 //area vector of triangle (p1,sphere,p2)
                 Vecteur p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
-                if (bi1.flowCondition && ! SLIP_ON_LATERALS) {
+                if (bi1.flowCondition && ! slipOnLaterals) {
                         //projection on boundary 1
                         Ssolid2 = abs(p1p2v1Surface[bi1.coordinate]);
                         cell->info().solidSurfaces[j][facetF1]=Ssolid2;
                 } else cell->info().solidSurfaces[j][facetF1]=0;
 
-                if (bi2.flowCondition && ! SLIP_ON_LATERALS) {
+                if (bi2.flowCondition && ! slipOnLaterals) {
                         //projection on boundary 2
                         Ssolid3 = abs(p1p2v1Surface[bi2.coordinate]);
                         cell->info().solidSurfaces[j][facetF2]=Ssolid3;
@@ -361,14 +354,14 @@ double Network<Tesselation>::Surface_Solid_Pore(Cell_handle cell, int j, bool SL
     if (Ssolid)
 	cell->info().solidSurfaces[j][3]=1.0/Ssolid;
     else cell->info().solidSurfaces[j][3]=0;
-    Ssolid_tot += Ssolid;
+    sSolidTot += Ssolid;
 
     return Ssolid;
 
 }
 
 template<class Tesselation>
-Vecteur Network<Tesselation>::surface_double_fictious_facet(Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3)
+Vecteur Network<Tesselation>::surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3)
 {
         //This function is correct only with axis-aligned boundaries
         const Boundary &bi1 = boundary(fSV1->info().id());
@@ -381,7 +374,7 @@ Vecteur Network<Tesselation>::surface_double_fictious_facet(Vertex_handle fSV1, 
 }
 
 template<class Tesselation>
-Vecteur Network<Tesselation>::surface_single_fictious_facet(Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3)
+Vecteur Network<Tesselation>::surfaceSingleFictiousFacet(VertexHandle fSV1, VertexHandle SV2, VertexHandle SV3)
 {
         //This function is correct only with axis-aligned boundaries
         const Boundary &bi1 =  boundary(fSV1->info().id());
@@ -392,7 +385,7 @@ Vecteur Network<Tesselation>::surface_single_fictious_facet(Vertex_handle fSV1, 
 }
 
 template<class Tesselation>
-double Network<Tesselation>::surface_solid_double_fictious_facet(Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3)
+double Network<Tesselation>::surfaceSolidDoubleFictiousFacet(VertexHandle SV1, VertexHandle SV2, VertexHandle SV3)
 {
         double A [3], B [3];
 
@@ -413,13 +406,13 @@ double Network<Tesselation>::surface_solid_double_fictious_facet(Vertex_handle S
         }
         total_surface = sqrt(board1 * board2);
 
-        double solid_surface = surface_solid_facet(SV3->point(),SV2->point(),SV1->point());
+        double solid_surface = surfaceSolidFacet(SV3->point(),SV2->point(),SV1->point());
 
         return total_surface - solid_surface;
 }
 
 template<class Tesselation>
-double Network<Tesselation>::surface_solid_facet(Sphere ST1, Sphere ST2, Sphere ST3)
+double Network<Tesselation>::surfaceSolidFacet(Sphere ST1, Sphere ST2, Sphere ST3)
 {
         double Area;
 
@@ -439,107 +432,107 @@ double Network<Tesselation>::surface_solid_facet(Sphere ST1, Sphere ST2, Sphere 
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlanes()
+void Network<Tesselation>::addBoundingPlanes()
 {
 	Tesselation& Tes = T[currentTes];
 	//FIXME: Id's order in boundsIds is done according to the enumerotation of boundaries from TXStressController.hpp, line 31. DON'T CHANGE IT!
-	y_min_id = Tes.Max_id() + 2;
-        boundsIds[0]=&y_min_id;
-        y_max_id = Tes.Max_id() + 3;
-        boundsIds[1]=&y_max_id;
-        x_min_id = Tes.Max_id() + 0;
-        boundsIds[2]=&x_min_id;
-        x_max_id = Tes.Max_id() + 1;
-        boundsIds[3]=&x_max_id;
-        z_min_id = Tes.Max_id() + 5;
-        boundsIds[4]=&z_max_id;
-        z_max_id = Tes.Max_id() + 6;
-        boundsIds[5]=&z_min_id;
+	yMinId = Tes.Max_id() + 2;
+        boundsIds[0]=&yMinId;
+        yMaxId = Tes.Max_id() + 3;
+        boundsIds[1]=&yMaxId;
+        xMinId = Tes.Max_id() + 0;
+        boundsIds[2]=&xMinId;
+        xMaxId = Tes.Max_id() + 1;
+        boundsIds[3]=&xMaxId;
+        zMinId = Tes.Max_id() + 5;
+        boundsIds[4]=&zMaxId;
+        zMaxId = Tes.Max_id() + 6;
+        boundsIds[5]=&zMinId;
 	
-	Corner_min = Point(x_min, y_min, z_min);
-	Corner_max = Point(x_max, y_max, z_max);
+	cornerMin = Point(xMin, yMin, zMin);
+	cornerMax = Point(xMax, yMax, zMax);
 	
-	id_offset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
+	idOffset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
 	
-	AddBoundingPlane (Vecteur(0,1,0) , y_min_id);
-	AddBoundingPlane (Vecteur(0,-1,0) , y_max_id);
-	AddBoundingPlane (Vecteur(-1,0,0) , x_max_id);
-	AddBoundingPlane (Vecteur(1,0,0) , x_min_id);
-	AddBoundingPlane (Vecteur(0,0,1) , z_min_id);
-	AddBoundingPlane (Vecteur(0,0,-1) , z_max_id);
+	addBoundingPlane (Vecteur(0,1,0) , yMinId);
+	addBoundingPlane (Vecteur(0,-1,0) , yMaxId);
+	addBoundingPlane (Vecteur(-1,0,0) , xMaxId);
+	addBoundingPlane (Vecteur(1,0,0) , xMinId);
+	addBoundingPlane (Vecteur(0,0,1) , zMinId);
+	addBoundingPlane (Vecteur(0,0,-1) , zMaxId);
 
-// 	AddBoundingPlanes(true);
+// 	addBoundingPlanes(true);
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlane (Vecteur Normal, int id_wall)
+void Network<Tesselation>::addBoundingPlane (Vecteur Normal, int id_wall)
 {
 // 	  Tesselation& Tes = T[currentTes];
 	  //FIXME: pre-condition: the normal is axis-aligned
 	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
 	  
 	  double pivot = Normal[Coordinate]<0 ? 
-	  Corner_max.x()*abs(Normal[0])+Corner_max.y()*abs(Normal[1])+Corner_max.z()*abs(Normal[2]) : Corner_min.x()*abs(Normal[0])+Corner_min.y()*abs(Normal[1])+Corner_min.z()*abs(Normal[2]);
+	  cornerMax.x()*abs(Normal[0])+cornerMax.y()*abs(Normal[1])+cornerMax.z()*abs(Normal[2]) : cornerMin.x()*abs(Normal[0])+cornerMin.y()*abs(Normal[1])+cornerMin.z()*abs(Normal[2]);
 
-	  Real center [3] ={ 0.5*(Corner_min.x() +Corner_max.x())*(1-abs(Normal[0]))+pivot*abs(Normal[0]),
-		     0.5*(Corner_max.y() +Corner_min.y())*(1-abs(Normal[1]))+pivot*abs(Normal[1]),
-		     0.5*(Corner_max.z() +Corner_min.z())*(1-abs(Normal[2]))+pivot*abs(Normal[2])};
+	  Real center [3] ={ 0.5*(cornerMin.x() +cornerMax.x())*(1-abs(Normal[0]))+pivot*abs(Normal[0]),
+		     0.5*(cornerMax.y() +cornerMin.y())*(1-abs(Normal[1]))+pivot*abs(Normal[1]),
+		     0.5*(cornerMax.z() +cornerMin.z())*(1-abs(Normal[2]))+pivot*abs(Normal[2])};
 	  
-	  AddBoundingPlane(center,0,Normal,id_wall);
+	  addBoundingPlane(center,0,Normal,id_wall);
 }
 
 template<class Tesselation>
-void Network<Tesselation>::AddBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall )
+void Network<Tesselation>::addBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall )
 {
 	  Tesselation& Tes = T[currentTes];
 	  
 	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
 	  
-	  Tes.insert((center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]),
-		     (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]),
-		     (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]),
-		     FAR*(Corner_max.y()-Corner_min.y()), id_wall, true);
+	  Tes.insert((center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[0]),
+		     (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[1]),
+		     (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[2]),
+		     FAR*(cornerMax.y()-cornerMin.y()), id_wall, true);
 	  
  	  Point P (center[0],center[1],center[2]);
-	  boundaries[id_wall-id_offset].p = P;
-	  boundaries[id_wall-id_offset].normal = Normal;
-	  boundaries[id_wall-id_offset].coordinate = Coordinate;
+	  boundaries[id_wall-idOffset].p = P;
+	  boundaries[id_wall-idOffset].normal = Normal;
+	  boundaries[id_wall-idOffset].coordinate = Coordinate;
 	  
-          boundaries[id_wall-id_offset].flowCondition = 1;
-          boundaries[id_wall-id_offset].value = 0;
+          boundaries[id_wall-idOffset].flowCondition = 1;
+          boundaries[id_wall-idOffset].value = 0;
 	  
-	  if(DEBUG_OUT) cout << "A boundary -center/thick- has been created. ID = " << id_wall << " position = " << (center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[0]) << " , " << (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[1]) << " , " <<  (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(Corner_max.y()-Corner_min.y()))*abs(Normal[2]) << ". Radius = " << FAR*(Corner_max.y()-Corner_min.y()) << endl;
+	  if(debugOut) cout << "A boundary -center/thick- has been created. ID = " << id_wall << " position = " << (center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[0]) << " , " << (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[1]) << " , " <<  (center[2]+Normal[2]*thickness/2)*(1-abs(Normal[2])) + (center[2]+Normal[2]*thickness/2-Normal[2]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[2]) << ". Radius = " << FAR*(cornerMax.y()-cornerMin.y()) << endl;
 }
 
 template<class Tesselation>
-void Network<Tesselation>::Define_fictious_cells()
+void Network<Tesselation>::defineFictiousCells()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 
-	Finite_cells_iterator cell_end = Tri.finite_cells_end();
-	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 	  cell->info().fictious()=0;}
 
 	for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
                 if (id<0) continue;
-                Vector_Cell tmp_cells;
-                tmp_cells.resize(10000);
-                VCell_iterator cells_it = tmp_cells.begin();
-                VCell_iterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
-                for (VCell_iterator it = tmp_cells.begin(); it != cells_end; it++)
+                VectorCell tmpCells;
+                tmpCells.resize(10000);
+                VCellIterator cells_it = tmpCells.begin();
+                VCellIterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+                for (VCellIterator it = tmpCells.begin(); it != cells_end; it++)
 		{
-		  Cell_handle& cell = *it;
+		  CellHandle& cell = *it;
 		  (cell->info().fictious())+=1;
 		  cell->info().isFictious=true;
 		}
 	}
 	
-	if(DEBUG_OUT) cout << "Fictious cell defined" << endl;
+	if(debugOut) cout << "Fictious cell defined" << endl;
 }
 
 
-// double Network::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
+// double Network::sphericalTriangleArea ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
 // {
 //  double rayon = STA1.weight();
 //  if ( rayon == 0.0 ) return 0.0;

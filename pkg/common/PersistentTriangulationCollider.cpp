@@ -60,7 +60,7 @@ void PersistentTriangulationCollider::action ()
 			const Sphere* s = YADE_CAST<Sphere*>(b->shape.get());
 			Tes->insert ( b->state->pos[0],b->state->pos[1],b->state->pos[2], s->radius, b->getId() );
 		}
-		Tes->AddBoundingPlanes();
+		Tes->addBoundingPlanes();
 		isTriangulated = true;
 		triangulationIteration = true;
 		//}

@@ -20,11 +20,11 @@ namespace CGT{
 	class PeriodicFlow : public PeriodicFlowBoundingSphere
 	{
 		public:
-		void Interpolate(Tesselation& Tes, Tesselation& NewTes);
-		void ComputeFacetForcesWithCache(bool onlyCache=false);
-		void Compute_Permeability();
-		void GaussSeidel(Real dt=0);
-		void DisplayStatistics();
+		void interpolate(Tesselation& Tes, Tesselation& NewTes);
+		void computeFacetForcesWithCache(bool onlyCache=false);
+		void computePermeability();
+		void gaussSeidel(Real dt=0);
+		void displayStatistics();
 		void computeEdgesSurfaces();
 		double boundaryFlux(unsigned int boundaryId);
 		#ifdef EIGENSPARSE_LIB

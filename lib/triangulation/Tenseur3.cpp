@@ -1,6 +1,6 @@
 
 #include "Tenseur3.h"
-#include "def_types.h" //pour d�finition de la classe "Vecteur"
+#include "def_types.h" 
 
 using namespace std;
 namespace CGT {

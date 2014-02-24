@@ -30,11 +30,11 @@ class FlowEngine : public PartialEngine
 	typedef _FlowSolver							FlowSolver;
 	typedef FlowTesselation							Tesselation;
 	typedef FlowSolver::RTriangulation					RTriangulation;
-	typedef FlowSolver::Finite_vertices_iterator                    	Finite_vertices_iterator;
-	typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
-	typedef FlowSolver::Cell_handle						Cell_handle;
-	typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
-	typedef FlowSolver::Vertex_handle                    			Vertex_handle;
+	typedef FlowSolver::FiniteVerticesIterator                    		FiniteVerticesIterator;
+	typedef FlowSolver::FiniteCellsIterator					FiniteCellsIterator;
+	typedef FlowSolver::CellHandle						CellHandle;
+	typedef RTriangulation::Finite_edges_iterator				FiniteEdgesIterator;
+	typedef FlowSolver::VertexHandle                    			VertexHandle;
 
 
 	
@@ -51,11 +51,11 @@ class FlowEngine : public PartialEngine
 
 	public :
 		int retriangulationLastIter;
-		enum {wall_xmin, wall_xmax, wall_ymin, wall_ymax, wall_zmin, wall_zmax};
+		enum {wallxMin, wallxMax, wallyMin, wallyMax, wallzMin, wallzMax};
 		Vector3r normal [6];
 		bool currentTes;
-		int id_offset;
-		double Eps_Vol_Cumulative;
+		int idOffset;
+		double epsVolCumulative;
 		int ReTrg;
 		int ellapsedIter;
 		TPL void initSolver (Solver& flow);
@@ -63,15 +63,15 @@ class FlowEngine : public PartialEngine
 		TPL void setForceMetis (Solver& flow, bool force);
 		TPL bool getForceMetis (Solver& flow);
 		#endif
-		TPL void Triangulate (Solver& flow);
-		TPL void AddBoundary (Solver& flow);
-		TPL void Build_Triangulation (double P_zero, Solver& flow);
-		TPL void Build_Triangulation (Solver& flow);
-		TPL void UpdateVolumes (Solver& flow);
-		TPL void Initialize_volumes (Solver& flow);
-		TPL void BoundaryConditions(Solver& flow);
+		TPL void triangulate (Solver& flow);
+		TPL void addBoundary (Solver& flow);
+		TPL void buildTriangulation (double pZero, Solver& flow);
+		TPL void buildTriangulation (Solver& flow);
+		TPL void updateVolumes (Solver& flow);
+		TPL void initializeVolumes (Solver& flow);
+		TPL void boundaryConditions(Solver& flow);
 		TPL void updateBCs ( Solver& flow ) {
-			if (flow->T[flow->currentTes].max_id>0) BoundaryConditions(flow);//avoids crash at iteration 0, when the packing is not bounded yet
+			if (flow->T[flow->currentTes].maxId>0) boundaryConditions(flow);//avoids crash at iteration 0, when the packing is not bounded yet
 			else LOG_ERROR("updateBCs not applied");
 			flow->pressureChanged=true;}
 
@@ -80,21 +80,25 @@ class FlowEngine : public PartialEngine
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
 		TPL void clearImposedFlux(Solver& flow);
-		TPL void ComputeViscousForces(Solver& flow);
+		TPL void computeLubricationContributions(Solver& flow);
 		TPL Real getCellFlux(unsigned int cond, const shared_ptr<Solver>& flow);
 		TPL Real getBoundaryFlux(unsigned int boundary,Solver& flow) {return flow->boundaryFlux(boundary);}
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
 			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		TPL Vector3r shearLubForce(unsigned int id_sph, Solver& flow) {
-			return (flow->viscousShearForces.size()>id_sph)?flow->viscousShearForces[id_sph]:Vector3r::Zero();}
+			return (flow->shearLubricationForces.size()>id_sph)?flow->shearLubricationForces[id_sph]:Vector3r::Zero();}
 		TPL Vector3r shearLubTorque(unsigned int id_sph, Solver& flow) {
-			return (flow->viscousShearTorques.size()>id_sph)?flow->viscousShearTorques[id_sph]:Vector3r::Zero();}
+			return (flow->shearLubricationTorques.size()>id_sph)?flow->shearLubricationTorques[id_sph]:Vector3r::Zero();}
+		TPL Vector3r pumpLubTorque(unsigned int id_sph, Solver& flow) {
+			return (flow->pumpLubricationTorques.size()>id_sph)?flow->pumpLubricationTorques[id_sph]:Vector3r::Zero();}
+		TPL Vector3r twistLubTorque(unsigned int id_sph, Solver& flow) {
+			return (flow->twistLubricationTorques.size()>id_sph)?flow->twistLubricationTorques[id_sph]:Vector3r::Zero();}
 		TPL Vector3r normalLubForce(unsigned int id_sph, Solver& flow) {
-			return (flow->normLubForce.size()>id_sph)?flow->normLubForce[id_sph]:Vector3r::Zero();}
+			return (flow->normalLubricationForce.size()>id_sph)?flow->normalLubricationForce[id_sph]:Vector3r::Zero();}
 		TPL Matrix3r bodyShearLubStress(unsigned int id_sph, Solver& flow) {
-			return (flow->viscousBodyStress.size()>id_sph)?flow->viscousBodyStress[id_sph]:Matrix3r::Zero();}
+			return (flow->shearLubricationBodyStress.size()>id_sph)?flow->shearLubricationBodyStress[id_sph]:Matrix3r::Zero();}
 		TPL Matrix3r bodyNormalLubStress(unsigned int id_sph, Solver& flow) {
-			return (flow->lubBodyStress.size()>id_sph)?flow->lubBodyStress[id_sph]:Matrix3r::Zero();}
+			return (flow->normalLubricationBodyStress.size()>id_sph)?flow->normalLubricationBodyStress[id_sph]:Matrix3r::Zero();}
 		TPL Vector3r shearVelocity(unsigned int interaction, Solver& flow) {
 			return (flow->deltaShearVel[interaction]);}
 		TPL Vector3r normalVelocity(unsigned int interaction, Solver& flow) {
@@ -108,7 +112,7 @@ class FlowEngine : public PartialEngine
 		TPL Real surfaceDistanceParticle(unsigned int interaction, Solver& flow) {
 			return (flow->surfaceDistance[interaction]);}
 		TPL Real edgeSize(Solver& flow) {
-			return (flow->Edge_ids.size());}
+			return (flow->edgeIds.size());}
 		TPL Real OSI(Solver& flow) {
 			return (flow->onlySpheresInteractions.size());}
 		TPL int onlySpheresInteractions(unsigned int interaction, Solver& flow) {
@@ -130,19 +134,16 @@ class FlowEngine : public PartialEngine
 			return pycsd;}
 		
 		template<class Cellhandle>
-		Real Volume_cell_single_fictious (Cellhandle cell);
+		Real volumeCellSingleFictious (Cellhandle cell);
 		template<class Cellhandle>
-		Real Volume_cell_double_fictious (Cellhandle cell);
+		Real volumeCellDoubleFictious (Cellhandle cell);
 		template<class Cellhandle>
-		Real Volume_cell_triple_fictious (Cellhandle cell);
+		Real volumeCellTripleFictious (Cellhandle cell);
 		template<class Cellhandle>
-		Real Volume_cell (Cellhandle cell);
-		void Oedometer_Boundary_Conditions();
-		void Average_real_cell_velocity();
-		void saveVtk(const char* folder) {solver->saveVtk(folder);}
-		vector<Real> avFlVelOnSph(unsigned int id_sph) {return solver->Average_Fluid_Velocity_On_Sphere(id_sph);}
-
-// 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; updateTriangulation=true;}
+		Real volumeCell (Cellhandle cell);
+		void averageRealCellVelocity();
+		void saveVtk() {solver->saveVtk();}
+		vector<Real> avFlVelOnSph(unsigned int id_sph) {return solver->averageFluidVelocityOnSphere(id_sph);}
 		void pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
@@ -168,6 +169,8 @@ class FlowEngine : public PartialEngine
 		//Instanciation of templates for python binding
 		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
 		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
+		Vector3r 	_pumpLubTorque(unsigned int id_sph) {return pumpLubTorque(id_sph,solver);}
+		Vector3r 	_twistLubTorque(unsigned int id_sph) {return twistLubTorque(id_sph,solver);}
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
@@ -214,19 +217,19 @@ class FlowEngine : public PartialEngine
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
 					((Real, dt, 0,,"timestep [s]"))
-					((bool,permeability_map,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
-					((bool, slip_boundary, true,, "Controls friction condition on lateral walls"))
-					((bool,WaveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
+					((bool,permeabilityMap,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
+					((bool, slipBoundary, true,, "Controls friction condition on lateral walls"))
+					((bool,waveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
 					((double, sineMagnitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied (p )"))
 					((double, sineAverage, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
-					((bool, Debug, false,,"Activate debug messages"))
-					((double, wall_thickness,0.001,,"Walls thickness"))
-					((double,P_zero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
-					((double,Tolerance,1e-06,,"Gauss-Seidel Tolerance"))
-					((double,Relax,1.9,,"Gauss-Seidel relaxation"))
+					((bool, debug, false,,"Activate debug messages"))
+					((double, wallThickness,0.001,,"Walls thickness"))
+					((double,pZero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
+					((double,tolerance,1e-06,,"Gauss-Seidel Tolerance"))
+					((double,relax,1.9,,"Gauss-Seidel relaxation"))
 					((bool, updateTriangulation, 0,,"If true the medium is retriangulated. Can be switched on to force retriangulation after some events (else it will be true periodicaly based on :yref:`FlowEngine::defTolerance` and :yref:`FlowEngine::meshUpdateInterval`. Of course, it costs CPU time."))
 					((int,meshUpdateInterval,1000,,"Maximum number of timesteps between re-triangulation events. See also :yref:`FlowEngine::defTolerance`."))
-					((double, eps_vol_max, 0,(Attr::readonly),"Maximal absolute volumetric strain computed at each iteration. |yupdate|"))
+					((double, epsVolMax, 0,(Attr::readonly),"Maximal absolute volumetric strain computed at each iteration. |yupdate|"))
 					((double, defTolerance,0.05,,"Cumulated deformation threshold for which retriangulation of pore space is performed. If negative, the triangulation update will occure with a fixed frequency on the basis of :yref:`FlowEngine::meshUpdateInterval`"))
 					((double, porosity, 0,(Attr::readonly),"Porosity computed at each retriangulation |yupdate|"))
 					((bool,meanKStat,false,,"report the local permeabilities' correction"))
@@ -251,10 +254,10 @@ class FlowEngine : public PartialEngine
 					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
 					((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
 					((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, display_force, false,,"display the lubrication force applied on particles"))
-					((bool, create_file, false,,"create file of velocities"))
 					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui (FIXME: ref.)"))
 					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule (FIXME: ref.) "))
+					((bool, pumpTorque, false,,"Compute pump torque applied on particles "))
+					((bool, twistTorque, false,,"Compute twist torque applied on particles "))
 					((double, eps, 0.00001,,"roughness defined as a fraction of particles size, giving the minimum distance between particles in the lubrication model."))
 					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
 					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
@@ -264,7 +267,6 @@ class FlowEngine : public PartialEngine
 					#ifdef EIGENSPARSE_LIB
 					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
-// 					((bool, forceMetis, 0,,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation"))
 					#endif
 					,
 					/*deprec*/
@@ -272,11 +274,11 @@ class FlowEngine : public PartialEngine
 					,,
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero(); wallIds[i]=i;}
-					normal[wall_ymin].y()=normal[wall_xmin].x()=normal[wall_zmin].z()=1;
-					normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
+					normal[wallyMin].y()=normal[wallxMin].x()=normal[wallzMin].z()=1;
+					normal[wallyMax].y()=normal[wallxMax].x()=normal[wallzMax].z()=-1;
 					solver = shared_ptr<FlowSolver> (new FlowSolver);
 					first=true;
-					eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
+					epsVolMax=epsVolCumulative=retriangulationLastIter=0;
 					ReTrg=1;
 					backgroundCompleted=true;
 					ellapsedIter=0;
@@ -295,6 +297,8 @@ class FlowEngine : public PartialEngine
 					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
 					.def("shearLubTorque",&FlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
+					.def("pumpLubTorque",&FlowEngine::_pumpLubTorque,(python::arg("Id_sph")),"Return the pump torque on sphere Id_sph.")
+					.def("twistLubTorque",&FlowEngine::_twistLubTorque,(python::arg("Id_sph")),"Return the twist torque on sphere Id_sph.")
 					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
@@ -353,24 +357,23 @@ class PeriodicFlowEngine : public FlowEngine
 		typedef _PeriFlowSolver							FlowSolver;
 		typedef PeriFlowTesselation						Tesselation;
 		typedef FlowSolver::RTriangulation					RTriangulation;
-		typedef FlowSolver::Finite_vertices_iterator                    	Finite_vertices_iterator;
-		typedef FlowSolver::Finite_cells_iterator				Finite_cells_iterator;
-		typedef FlowSolver::Cell_handle						Cell_handle;
-		typedef RTriangulation::Finite_edges_iterator				Finite_edges_iterator;
-		typedef RTriangulation::Vertex_handle					Vertex_handle;
+		typedef FlowSolver::FiniteVerticesIterator                    		FiniteVerticesIterator;
+		typedef FlowSolver::FiniteCellsIterator				FiniteCellsIterator;
+		typedef FlowSolver::CellHandle						CellHandle;
+		typedef RTriangulation::Finite_edges_iterator				FiniteEdgesIterator;
+		typedef RTriangulation::Vertex_handle					VertexHandle;
 		
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
 		
-		void Triangulate (shared_ptr<FlowSolver>& flow);
-// 		void AddBoundary ();
-		void Build_Triangulation (Real pzero, shared_ptr<FlowSolver>& flow);
-		void Initialize_volumes (shared_ptr<FlowSolver>&  flow);
-		void UpdateVolumes (shared_ptr<FlowSolver>&  flow);
-		Real Volume_cell (Cell_handle cell);
+		void triangulate (shared_ptr<FlowSolver>& flow);
+		void buildTriangulation (Real pzero, shared_ptr<FlowSolver>& flow);
+		void initializeVolumes (shared_ptr<FlowSolver>&  flow);
+		void updateVolumes (shared_ptr<FlowSolver>&  flow);
+		Real volumeCell (CellHandle cell);
 
-		Real Volume_cell_single_fictious (Cell_handle cell);
-		inline void locateCell(Cell_handle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count=0);
+		Real volumeCellSingleFictious (CellHandle cell);
+		inline void locateCell(CellHandle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count=0);
 		Vector3r meanVelocity();
 
 		virtual ~PeriodicFlowEngine();
@@ -384,6 +387,8 @@ class PeriodicFlowEngine : public FlowEngine
 		void saveVtk(const char* folder) {solver->saveVtk(folder);}
 		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
 		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
+		Vector3r 	_pumpLubTorque(unsigned int id_sph) {return pumpLubTorque(id_sph,solver);}
+		Vector3r 	_twistLubTorque(unsigned int id_sph) {return twistLubTorque(id_sph,solver);}
 		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
 		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
 		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
@@ -412,9 +417,6 @@ class PeriodicFlowEngine : public FlowEngine
 		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
 		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
 		#endif
-		
-// 		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
-// 		void 		_clearImposedPressure() {clearImposedPressure(solver);}
 		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
 		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
 		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
@@ -434,9 +436,8 @@ class PeriodicFlowEngine : public FlowEngine
 			((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
 			,,
 			wallIds=vector<int>(6,-1);
-// 			wallTopId=wallBottomId=wallFrontId=wallBackId=wallLeftId=wallRightId=-1;
 			solver = shared_ptr<FlowSolver> (new FlowSolver);
-			eps_vol_max=Eps_Vol_Cumulative=retriangulationLastIter=0;
+			epsVolMax=epsVolCumulative=retriangulationLastIter=0;
 			ReTrg=1;
 			first=true;
 			,
@@ -444,6 +445,8 @@ class PeriodicFlowEngine : public FlowEngine
 			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 			.def("shearLubForce",&PeriodicFlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
 			.def("shearLubTorque",&PeriodicFlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
+			.def("pumpLubTorque",&PeriodicFlowEngine::_pumpLubTorque,(python::arg("Id_sph")),"Return the pump torque on sphere Id_sph.")
+			.def("twistLubTorque",&PeriodicFlowEngine::_twistLubTorque,(python::arg("Id_sph")),"Return the twist torque on sphere Id_sph.")
 			.def("normalLubForce",&PeriodicFlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
 			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
 			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")

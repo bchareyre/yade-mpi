@@ -44,9 +44,9 @@ public:
 	using FlowType::T;
 	using FlowType::currentTes;
 	using FlowType::boundary;
-	using FlowType::y_min_id;
-	using FlowType::y_max_id;
-	using FlowType::DEBUG_OUT;
+	using FlowType::yMinId;
+	using FlowType::yMaxId;
+	using FlowType::debugOut;
 	using FlowType::TOLERANCE;
 	using FlowType::RELAX;
 	using FlowType::fluidBulkModulus;
@@ -55,7 +55,7 @@ public:
 	using FlowType::computedOnce;
 
 	//! TAUCS DECs
-	vector<Finite_cells_iterator> orderedCells;
+	vector<FiniteCellsIterator> orderedCells;
 	bool isLinearSystemSet;
 	bool isFullLinearSystemGSSet;
 	bool areCellsOrdered;//true when orderedCells is filled, turn it false after retriangulation
@@ -97,7 +97,7 @@ public:
 	vector<int> T_jn;//(size+1);
 	vector<int> T_ia;//(size*5);
 	vector<double> T_f;//(size); // right-hand size vector object
-	vector<Cell_handle> T_cells;//(size)
+	vector<CellHandle> T_cells;//(size)
 	int T_index;
 
 	vector<double> T_b;
@@ -143,35 +143,35 @@ public:
 	FlowBoundingSphereLinSolv();
 
 	///Linear system solve
-	virtual int SetLinearSystem(Real dt);
-	void VectorizedGaussSeidel(Real dt);
-	virtual int SetLinearSystemFullGS(Real dt);
+	virtual int setLinearSystem(Real dt);
+	void vectorizedGaussSeidel(Real dt);
+	virtual int setLinearSystemFullGS(Real dt);
 	
-	int TaucsSolveTest();
-	int TaucsSolve(Real dt);
-	int PardisoSolveTest();
-	int PardisoSolve(Real dt);
+	int taucsSolveTest();
+	int taucsSolve(Real dt);
+	int pardisoSolveTest();
+	int pardisoSolve(Real dt);
 	int eigenSolve(Real dt);
 	
-	void CopyGsToCells();
-	void CopyCellsToGs(Real dt);
+	void copyGsToCells();
+	void copyCellsToGs(Real dt);
 	
-	void CopyLinToCells();
-	void CopyCellsToLin(Real dt);
-	void swap_fwd (double* v, int i);
-	void swap_fwd (int* v, int i);
-	void sort_v(int k1, int k2, int* is, double* ds);
+	void copyLinToCells();
+	void copyCellsToLin(Real dt);
+	void swapFwd (double* v, int i);
+	void swapFwd (int* v, int i);
+	void sortV(int k1, int k2, int* is, double* ds);
 
-	virtual void GaussSeidel (Real dt) {
+	virtual void gaussSeidel (Real dt) {
 		switch (useSolver) {
 		case 0:
-			VectorizedGaussSeidel(dt);
+			vectorizedGaussSeidel(dt);
 			break;
 		case 1:
-			TaucsSolve(dt);
+			taucsSolve(dt);
 			break;
 		case 2:
-			PardisoSolve(dt);
+			pardisoSolve(dt);
 			break;
 		case 3:
 			eigenSolve(dt);
@@ -179,7 +179,7 @@ public:
 		}
 		computedOnce=true;
 	}
-	virtual void ResetNetwork();
+	virtual void resetNetwork();
 };
 
 } //namespace CGT
