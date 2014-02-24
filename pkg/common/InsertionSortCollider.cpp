@@ -64,12 +64,12 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	assert(v.size==(long)v.vec.size());	
 	if (ompThreads<=1) return insertionSort(v,interactions, scene, doCollide);
 	
-	Real chunksVerlet = 2.1*verletDist;//is 2* the theoretical requirement?
+	Real chunksVerlet = 4*verletDist;//is 2* the theoretical requirement?
 	if (chunksVerlet<=0) {LOG_ERROR("Parallel insertion sort needs verletDist>0");}
 	
 	///chunks defines subsets of the bounds lists, we make sure they are not too small wrt. verlet dist.
 	std::vector<unsigned> chunks;
-	unsigned nChunks = 2*ompThreads;
+	unsigned nChunks = ompThreads;
 	unsigned chunkSize = unsigned(v.size/nChunks)+1;
 	for(unsigned n=0; n<nChunks;n++) chunks.push_back(n*chunkSize); chunks.push_back(v.size);
 	while (nChunks>1){
@@ -80,7 +80,7 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 		for(unsigned n=0; n<nChunks;n++) chunks.push_back(n*chunkSize); chunks.push_back(v.size);
 	}
 	static unsigned warnOnce=0;
-	if (nChunks<unsigned(2*ompThreads) && !warnOnce++) LOG_WARN("Parallel insertion: only "<<nChunks <<" thread(s) used. The number of bodies is probably too small, consider setting ompThread=1 for better performance");
+	if (nChunks<unsigned(ompThreads) && !warnOnce++) LOG_WARN("Parallel insertion: only "<<nChunks <<" thread(s) used. The number of bodies is probably too small for allowing more threads. The contact detection should succeed but not all available threads are used.");
 
 	///Define per-thread containers bufferizing the actual insertion of new interactions, since inserting is not thread-safe
 	std::vector<std::vector<std::pair<Body::id_t,Body::id_t> > > newInteractions;
@@ -129,12 +129,12 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 				j--;
 			}
 			v[j+1]=viInit;
-			if (j<=long(chunks[k]-chunkSize*0.5)) LOG_ERROR("parallel sort not guaranteed to succeed, consider turning ompThreads=1");
+			if (j<=long(chunks[k]-chunkSize*0.5)) LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Consider turning ompThreads=1 for thread safety.");
 		}
-		if (i>=long(chunks[k]+chunkSize*0.5)) LOG_ERROR("parallel sort not guaranteed to succeed, consider turning ompThreads=1");
+		if (i>=long(chunks[k]+chunkSize*0.5)) LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning ompThreads=1 for thread safety.")
 	}
 	/// Check again, just to be sure...
-	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) LOG_ERROR("parallel sort not guaranteed to succeed, consider turning ompThreads=1");
+	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) LOG_ERROR("parallel sort failed, consider turning ompThreads=1");
 
 	/// Now insert interactions sequentially	
 	for (int n=0;n<ompThreads;n++) for (size_t k=0, kend=newInteractions[n].size();k<kend;k++) if (!interactions->found(newInteractions[n][k].first,newInteractions[n][k].second)) interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].first,newInteractions[n][k].second)));
@@ -358,14 +358,15 @@ void InsertionSortCollider::action(){
 						const Body::id_t& jid=V[j].id;
 						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
 						if(!(V[j].flags.isMin && V[j].flags.hasBB)) continue;
-						if (spatialOverlap(iid,jid) && Collider::mayCollide(Body::byId(iid,scene).get(),Body::byId(jid,scene).get()) )
-					#ifdef YADE_OPENMP
-						unsigned int threadNum = omp_get_thread_num();
-						newInts[threadNum].push_back(std::pair<Body::id_t,Body::id_t>(iid,jid));
-					#else
-						if (!interactions->found(iid,jid))
-						interactions->insert(shared_ptr<Interaction>(new Interaction(iid,jid)));
-					#endif
+						if (spatialOverlap(iid,jid) && Collider::mayCollide(Body::byId(iid,scene).get(),Body::byId(jid,scene).get()) ){
+						#ifdef YADE_OPENMP
+							unsigned int threadNum = omp_get_thread_num();
+							newInts[threadNum].push_back(std::pair<Body::id_t,Body::id_t>(iid,jid));
+						#else
+							if (!interactions->found(iid,jid))
+							interactions->insert(shared_ptr<Interaction>(new Interaction(iid,jid)));
+						#endif
+						}
 					}
 				}
 				//go through newly created candidates sequentially, duplicates coming from different threads may exist so we check existence with found()
