@@ -180,7 +180,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	}
 	if(!intersecting){
 		FOREACH(MemberMap::value_type& mm, clump->members){
-			// I.first is Body::id_t, I.second is Se3r of that body
+			// mm.first is Body::id_t, mm.second is Se3r of that body
 			const shared_ptr<Body> subBody=Body::byId(mm.first);
 			dens = subBody->material->density;
 			if (subBody->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere

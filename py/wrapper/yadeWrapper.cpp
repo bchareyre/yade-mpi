@@ -238,22 +238,45 @@ class pyBodyContainer{
 			
 			//extract attributes from python objects:
 			python::object ctTmp = ctList[ii];
-			int numCM = python::extract<int>(ctTmp.attr("numCM"))();
+			int numCM = python::extract<int>(ctTmp.attr("numCM"))();// number of clump members
 			python::list relRadListTmp = python::extract<python::list>(ctTmp.attr("relRadii"))();
 			python::list relPosListTmp = python::extract<python::list>(ctTmp.attr("relPositions"))();
 			
-			//get relative radii and positions; calc. volumes; get balance point:
+			//get relative radii and positions; calculate volumes; get balance point: get axis aligned bounding box; get minimum radius;
 			vector<Real> relRadTmp(numCM), relVolTmp(numCM);
 			vector<Vector3r> relPosTmp(numCM);
 			Vector3r relPosTmpMean = Vector3r::Zero();
+			Real rMin=1./0.; AlignedBox3r aabb;
 			for (int jj = 0; jj < numCM; jj++) {
 				relRadTmp[jj] = python::extract<Real>(relRadListTmp[jj])();
 				relVolTmp[jj] = (4./3.)*Mathr::PI*pow(relRadTmp[jj],3.);
 				relPosTmp[jj] = python::extract<Vector3r>(relPosListTmp[jj])();
 				relPosTmpMean += relPosTmp[jj];
+				aabb.extend(relPosTmp[jj] + Vector3r::Constant(relRadTmp[jj]));
+				aabb.extend(relPosTmp[jj] - Vector3r::Constant(relRadTmp[jj]));
+				rMin=min(rMin,relRadTmp[jj]);
 			}
 			relPosTmpMean /= numCM;//balance point
-
+			
+			//get volume of the clump template using regular cubic cell array inside axis aligned bounding box of the clump:
+			//(some parts are duplicated from intergration algorithm in Clump::updateProperties)
+			Real dx = rMin/5.; 	//edge length of cell
+			Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
+			if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
+			Real dv = pow(dx,3);		//volume of a single cell
+			Vector3r x;			//position vector (center) of cell
+			Real relVolSumTmp = 0.0;	//volume of clump template
+			for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
+				for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
+					for(x.z()=aabb.min().z()+dx/2.; x.z()<aabb.max().z(); x.z()+=dx){
+						for (int jj = 0; jj < numCM; jj++) {
+							if((x-relPosTmp[jj]).squaredNorm() < pow(relRadTmp[jj],2)){ relVolSumTmp += dv; break; }
+						}
+					}
+				}
+			}
+			/**
+			### old method, not working for multiple overlaps:
 			//check for overlaps and correct volumes (-= volume of spherical caps):
 			Real distCMTmp, overlapTmp, hCapjj, hCapkk;
 			for (int jj = 0; jj < numCM; jj++) {
@@ -271,10 +294,9 @@ class pyBodyContainer{
 					}
 				}
 			}
-			
 			//get relative volume of the clump:
-			Real relVolSumTmp = 0.0;
 			for (int jj = 0; jj < numCM; jj++) relVolSumTmp += relVolTmp[jj];
+			**/
 			
 			//get pointer lists of spheres, that should be replaced:
 			int numReplaceTmp = round(num*amounts[ii]);
