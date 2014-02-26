@@ -169,7 +169,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 								M += dv;
 								Sg += dv*x;
 								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
-								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/);
+								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose())/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/;
 								break;
 							}
 						}
