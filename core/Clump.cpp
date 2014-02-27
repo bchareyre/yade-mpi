@@ -82,7 +82,7 @@ void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vec
 
 */
 
-void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int discretization, bool integrateInertia){
+void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int discretization){
 	LOG_DEBUG("Updating clump #"<<clumpBody->id<<" parameters");
 	const shared_ptr<State> state(clumpBody->state);
 	const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
@@ -110,7 +110,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	bool intersecting = false;
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
-	if (integrateInertia){
+	if (discretization>0){
 		FOREACH(MemberMap::value_type& mm, clump->members){
 			const shared_ptr<Body> subBody1=Body::byId(mm.first);
 			FOREACH(MemberMap::value_type& mm, clump->members){
