@@ -123,7 +123,7 @@ class UnsaturatedEngine : public PartialEngine
 		Real computePoreArea(Cellhandle cell, int j);
 		template<class Cellhandle>
 		Real computePorePerimeter(Cellhandle cell, int j);		
-		void saveVtk() {bool initT= solver->noCache; solver->noCache=false; solver->saveVtk(); solver->noCache=initT;}
+		void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
 		python::list getConstrictions() {
 			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) pycsd.append(csd[k]); return pycsd;}
@@ -199,7 +199,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("setImposedPressure",&UnsaturatedEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 					.def("clearImposedPressure",&UnsaturatedEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
 					.def("getConstrictions",&UnsaturatedEngine::getConstrictions,"Get the list of constrictions (inscribed circle) for all finite facets.")
-					.def("saveVtk",&UnsaturatedEngine::saveVtk,"Save pressure field in vtk format.")
+					.def("saveVtk",&UnsaturatedEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 					.def("getPorePressure",&UnsaturatedEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 					.def("emulateAction",&UnsaturatedEngine::emulateAction,"get scene and run action (may be used to manipulate engine outside the main loop).")
 					.def("getCell",&UnsaturatedEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")

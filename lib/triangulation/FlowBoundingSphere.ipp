@@ -487,6 +487,7 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::ComputeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect(0,0,0);
 	//reset forces
 	if (!onlyCache) for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;

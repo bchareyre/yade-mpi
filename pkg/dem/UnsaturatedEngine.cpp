@@ -56,7 +56,7 @@ void UnsaturatedEngine::testFunction()
 }
 
 void UnsaturatedEngine::action()
-{/*
+{
     if ( !isActivated ) return;
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     if ( (tri.number_of_vertices()==0) || (updateTriangulation) ) {
@@ -81,7 +81,7 @@ void UnsaturatedEngine::action()
     for ( Finite_vertices_iterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
         force = pressureForce ? Vector3r ( V_it->info().forces[0],V_it->info().forces[1],V_it->info().forces[2] ): Vector3r(0,0,0);
         scene->forces.addForce ( V_it->info().id(), force);
-    }*/
+    }
 }
 
 ///invade mode 1. update phase reservoir before invasion. Consider no viscous effects, and invade gradually.
