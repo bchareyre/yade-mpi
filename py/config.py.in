@@ -2,7 +2,7 @@
 """
 Compile-time configuration for yade.
 
-Template file is processed by scons to create the actual configuration at build-time.
+Template file is processed by cmake to create the actual configuration at build-time.
 """
 import os,datetime,os.path
 prefix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX']
@@ -14,7 +14,7 @@ if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
 libDir=os.path.abspath(prefix+'/'+libPATH+'/yade${SUFFIX}')
 confDir=os.environ['HOME']+'/.yade${SUFFIX}'
 libstdcxx='${libstdcxx}'
-features='${features}'.split(',')
+features='${features}'.split(' ')
 revision='${realVersion}'
 version='${version}'
 sourceRoot='${sourceRoot}'

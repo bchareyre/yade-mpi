@@ -22,9 +22,10 @@ To install daily-version one needs to add this repository to your
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ precise/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
+	sudo apt-get update
 	sudo apt-get install yadedaily
 
-If you have another distribution, not Ubuntu Precise, be sure to use the
+If you have another distribution, not Ubuntu Precise (Version 12.04), be sure to use the
 correct name in the first line (for instance, jessie, trusty or wheezy).
 
 After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
@@ -178,10 +179,20 @@ Compilation
 ^^^^^^^^^^^
 
 You should create a separate build-place-folder, where Yade will be configured 
-and where the source code will be compiled. Then inside this build-directory you
-should start cmake to configure the compilation process::
+and where the source code will be compiled. Here is an example for a folderstructure:
+
+    myYade/           ## base directory
+            trunk/      ## folder for sourcecode in which you use github
+            build/      ## folder in which sources will be compiled; build-directory; use cmake here
+            install/    ## installfolder
+
+Then inside this build-directory you should start cmake to configure the compilation process::
 
 	cmake -DINSTALL_PREFIX=/path/to/installfolder /path/to/sources
+
+For the folder structure given above call the following command in folder "build":
+
+    cmake -DINSTALL_PREFIX=../install ../trunk
 
 Additional options can be configured in the same line with the following 
 syntax::
@@ -228,7 +239,11 @@ parameter on many cores systems ``-j`` can be added to decrease compilation time
 and split the compilation on many cores. For example, on 4-core machines
 it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
 approximately 2GB/core for compilation, otherwise the swap-file will be used
-and a compilation time dramatically increases.
+and a compilation time dramatically increases. After compilation finished successfully
+the new built can be started by navigating to /path/to/installfolder/bin and calling yade via (based on version yade-2014-02-20.git-a7048f4)::
+    
+    cd /path/to/installfolder/bin 
+    ./yade-2014-02-20.git-a7048f4
 
 For building the documentation you should at first execute the command "make install"
 and then "make doc" to build it. The generated files will be stored in your current
