@@ -315,7 +315,17 @@ class pyBodyContainer{
 			}
 			
 			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
+			omp_lock_t locker;
+			#ifdef YADE_OPENMP
+			omp_init_lock(&locker);//since bodies are created and deleted in following sections, it is neccessary to lock critical parts of the code (avoid seg fault)
+			#pragma omp parallel for schedule(dynamic) shared(locker)
+			for(int i=0; i<numReplaceTmp; i++) {
+				while (! omp_test_lock(&locker)) usleep(1);
+				const shared_ptr<Body>& b = bpListTmp[i];
+				LOG_DEBUG("replaceByClumps: Started processing body "<<bpListTmp[i]->id<<" in parallel ...");
+			#else
 			FOREACH (const shared_ptr<Body>& b, bpListTmp) {
+			#endif
 				//get sphere, that should be replaced:
 				const Sphere* sphere = YADE_CAST<Sphere*> (b->shape.get());
 				shared_ptr<Material> matTmp = b->material;
@@ -359,6 +369,8 @@ class pyBodyContainer{
 					LOG_DEBUG("New body (sphere) "<<newSphere->id<<" added.");
 					idsTmp[jj] = newSphere->id;
 				}
+				//cout << "thread " << omp_get_thread_num() << " unsets locker" << endl;
+				omp_unset_lock(&locker);//end of critical section
 				Body::id_t newClumpId = clump(idsTmp, discretization);
 				ret.append(python::make_tuple(newClumpId,idsTmp));
 				erase(b->id);
