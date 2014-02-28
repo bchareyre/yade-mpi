@@ -84,9 +84,40 @@ void UnsaturatedEngine::action()
     }
 }
 
+template<class Solver>
+void UnsaturatedEngine::invade(Solver& flow)
+{
+    if (isPhaseTrapped) {
+        invade1(solver);
+    }
+    else {
+        invade2(solver);
+    }
+}
+template<class Solver>
+Real UnsaturatedEngine::getMinEntryValue(Solver& flow )
+{
+    if (isPhaseTrapped) {
+        return getMinEntryValue1(solver);
+    }
+    else {
+        return getMinEntryValue2(solver);
+    }
+}
+template<class Solver>
+Real UnsaturatedEngine::getSaturation(Solver& flow )
+{
+    if (isPhaseTrapped) {
+        return getSaturation1(solver);
+    }
+    else {
+        return getSaturation2(solver);
+    }
+}
+
 ///invade mode 1. update phase reservoir before invasion. Consider no viscous effects, and invade gradually.
 template<class Solver>
-void UnsaturatedEngine::invadeSingleCell(Cell_handle cell, double pressure, Solver& flow)
+void UnsaturatedEngine::invadeSingleCell1(Cell_handle cell, double pressure, Solver& flow)
 {
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
@@ -99,20 +130,20 @@ void UnsaturatedEngine::invadeSingleCell(Cell_handle cell, double pressure, Solv
             nCell->info().p() = pressure;
             nCell->info().isAirReservoir=true;
             nCell->info().isWaterReservoir=false;
-            invadeSingleCell(nCell, pressure, flow);
+            invadeSingleCell1(nCell, pressure, flow);
         }
     }
 }
 
 template<class Solver>
-void UnsaturatedEngine::invade(Solver& flow)
+void UnsaturatedEngine::invade1(Solver& flow)
 {
     updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         if(cell->info().isAirReservoir == true)
-            invadeSingleCell(cell,cell->info().p(),flow);
+            invadeSingleCell1(cell,cell->info().p(),flow);
     }
     checkTrap(flow,bndCondValue[2]);
     Finite_cells_iterator _cell_end = tri.finite_cells_end();
@@ -135,7 +166,7 @@ void UnsaturatedEngine::checkTrap(Solver& flow, double pressure)
 }
 
 template<class Solver>
-Real UnsaturatedEngine::getMinEntryValue(Solver& flow )
+Real UnsaturatedEngine::getMinEntryValue1(Solver& flow )
 {
     updateReservoir(flow);
     Real nextEntry = 1e50;
@@ -272,7 +303,7 @@ void UnsaturatedEngine::airReservoirRecursion(Cell_handle cell, Solver& flow)
 }
 
 template<class Solver>
-Real UnsaturatedEngine::getSaturation (Solver& flow )
+Real UnsaturatedEngine::getSaturation1 (Solver& flow )
 {
     updateReservoir(flow);
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();

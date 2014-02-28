@@ -59,31 +59,36 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void BoundaryConditions(Solver& flow);
 		TPL void initializeCellIndex(Solver& flow);
 		TPL void initializePoreRadius(Solver& flow);
+		
+		TPL void invade (Solver& flow );
+		TPL Real getMinEntryValue (Solver& flow);
+		TPL Real getSaturation(Solver& flow);
+		
+		TPL void invadeSingleCell1(Cell_handle cell, double pressure, Solver& flow);
+		TPL void invade1 (Solver& flow );
+		TPL void checkTrap(Solver& flow, double pressure);//check trapped phase, define trapCapP.	
+		TPL Real getMinEntryValue1 (Solver& flow);
+		TPL void updatePressure(Solver& flow);
+		TPL void updateReservoir(Solver& flow);		
 		TPL void initWaterReservoirBound(Solver& flow);
 		TPL void updateWaterReservoir(Solver& flow);
 		TPL void waterReservoirRecursion(Cell_handle cell, Solver& flow);
 		TPL void initAirReservoirBound(Solver& flow);
 		TPL void updateAirReservoir(Solver& flow);
 		TPL void airReservoirRecursion(Cell_handle cell, Solver& flow);
-		TPL void updateReservoir(Solver& flow);
-		TPL void updatePressure(Solver& flow);
+		TPL Real getSaturation1(Solver& flow);
+
+		TPL void invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow);
+		TPL void invade2 (Solver& flow );
+		TPL void updatePressure2(Solver& flow);
+		TPL Real getMinEntryValue2 (Solver& flow);
+		TPL Real getSaturation2(Solver& flow);	
 		
 		TPL unsigned int imposePressure(Vector3r pos, Real p,Solver& flow);
 		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
 		TPL void clearImposedPressure(Solver& flow);
-		TPL void invadeSingleCell(Cell_handle cell, double pressure, Solver& flow);
-		TPL void invadeSingleCell2(Cell_handle cell, double pressure, Solver& flow);
-		TPL void invade (Solver& flow );
-		TPL void invade2 (Solver& flow );
-		TPL void checkTrap(Solver& flow, double pressure);//check trapped phase, define trapCapP.		
-		TPL Real getMinEntryValue (Solver& flow );
-		TPL Real getMinEntryValue2 (Solver& flow);
-		TPL void updatePressure2(Solver& flow);
-		TPL Real getSaturation(Solver& flow);
-		TPL Real getSaturation2(Solver& flow);	
 		TPL void saveListNodes(Solver& flow);
 		TPL void saveListConnection(Solver& flow);
-
 		TPL void saveLatticeNodeX(Solver& flow,double x); 
 		TPL void saveLatticeNodeY(Solver& flow,double y); 
 		TPL void saveLatticeNodeZ(Solver& flow,double z);
@@ -139,11 +144,14 @@ class UnsaturatedEngine : public PartialEngine
 		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
 		void 		_buildTriangulation() {setPositionsBuffer(true); Build_Triangulation(solver);}
 		void		_invade() {invade(solver);}
-		void		_invade2() {invade2(solver);}
+// 		void		_invade1() {invade1(solver);}
+// 		void		_invade2() {invade2(solver);}
 		Real		_getMinEntryValue() {return getMinEntryValue(solver);}
-		Real		_getMinEntryValue2() {return getMinEntryValue2(solver);}		
-		Real 		_getSaturation () {return getSaturation(solver);}
-		Real		_getSaturation2() {return getSaturation2(solver);}
+// 		Real		_getMinEntryValue1() {return getMinEntryValue1(solver);}
+// 		Real		_getMinEntryValue2() {return getMinEntryValue2(solver);}
+		Real		_getSaturation() {return getSaturation(solver);}
+// 		Real 		_getSaturation1 () {return getSaturation1(solver);}
+// 		Real		_getSaturation2() {return getSaturation2(solver);}
 		void		_saveListNodes() {saveListNodes(solver);}
 		void		_saveListConnection() {saveListConnection(solver);}
  		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
@@ -165,6 +173,7 @@ class UnsaturatedEngine : public PartialEngine
 					((bool,isActivated,true,,"Activate UnsaturatedEngine."))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool, Debug, false,,"Activate debug messages"))
+					((bool, isPhaseTrapped, true,,"Activate invade mode. If True, the wetting phase can be trapped, activate invade mode 1; if false, the wetting phase cann't be trapped, activate invade mode 2."))
 					((double, wall_thickness,0.001,,"Walls thickness"))
 					((double,P_zero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
 					((bool, updateTriangulation, 0,,"If true the medium is retriangulated."))
@@ -205,10 +214,12 @@ class UnsaturatedEngine : public PartialEngine
 					.def("getCell",&UnsaturatedEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
 					.def("buildTriangulation",&UnsaturatedEngine::_buildTriangulation,"Triangulate spheres of the current scene.")
-					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation")
-					.def("getSaturation2",&UnsaturatedEngine::_getSaturation2,"get saturation for mode 2")					
-					.def("getMinEntryValue",&UnsaturatedEngine::_getMinEntryValue,"get the minimum air entry pressure for the next invade step")
-					.def("getMinEntryValue2",&UnsaturatedEngine::_getMinEntryValue2,"get the minimum air entry pressure for the next invade step(version2)")
+					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation.")					
+// 					.def("getSaturation1",&UnsaturatedEngine::_getSaturation1,"get saturation for mode 1")
+// 					.def("getSaturation2",&UnsaturatedEngine::_getSaturation2,"get saturation for mode 2")
+					.def("getMinEntryValue",&UnsaturatedEngine::_getMinEntryValue,"get the minimum air entry pressure for the next invade step.")
+// 					.def("getMinEntryValue1",&UnsaturatedEngine::_getMinEntryValue1,"get the minimum air entry pressure for the next invade step")
+// 					.def("getMinEntryValue2",&UnsaturatedEngine::_getMinEntryValue2,"get the minimum air entry pressure for the next invade step(version2)")
 					.def("saveListNodes",&UnsaturatedEngine::_saveListNodes,"Save the list of nodes.")
 					.def("saveListConnection",&UnsaturatedEngine::_saveListConnection,"Save the connections between cells.")
 					.def("saveLatticeNodeX",&UnsaturatedEngine::_saveLatticeNodeX,(python::arg("x")),"Save the slice of lattice nodes for x_normal(x). 0: out of sphere; 1: inside of sphere.")
@@ -219,8 +230,9 @@ class UnsaturatedEngine : public PartialEngine
 					.def("savePoreBodyInfo",&UnsaturatedEngine::_savePoreBodyInfo,"Save pore bodies positions/Voronoi centers and size/volume.")
 					.def("savePoreThroatInfo",&UnsaturatedEngine::_savePoreThroatInfo,"Save pore throat area, inscribed radius and perimeter.")
 					.def("debugTemp",&UnsaturatedEngine::_debugTemp,"debug temp file.")
-					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion mode 1. Consider trapped phase. ")
-					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion mode 2. Consider no trapped phase.")
+					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion.")
+// 					.def("invade1",&UnsaturatedEngine::_invade,"Run the drainage invasion mode 1. Consider trapped phase. ")
+// 					.def("invade2",&UnsaturatedEngine::_invade2,"Run the drainage invasion mode 2. Consider no trapped phase.")
 					.def("computeForce",&UnsaturatedEngine::_computeFacetPoreForcesWithCache,"Test computeFacetPoreForcesWithCache(). ")
 					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
 					)
