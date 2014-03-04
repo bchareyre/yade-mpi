@@ -120,9 +120,10 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 					const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
 					const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
 					Real un = (sphere1->radius+sphere2->radius) - dist.norm();
-					if (un > -0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
+					if (un > 0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
 				}
 			}
+			if (intersecting) break;
 		}
 	}
 	/* quantities suffixed by
@@ -153,9 +154,11 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 		}
 		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
 		Real dx = rMin/discretization; 	//edge length of cell
-		Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
-		if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
+		//Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
+		//if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx: leads to bug, when long chain of clump members is created (https://bugs.launchpad.net/yade/+bug/1273172)
 		Real dv = pow(dx,3);		//volume of cell
+		long nCells=(aabb.sizes()/dx).prod();
+		if(nCells>1e7) LOG_WARN("Clump::updateProperties: Cell array has "<<nCells<<" cells. Integrate inertia may take a while ...");
 		Vector3r x;			//position vector (center) of cell
 		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
 			for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
