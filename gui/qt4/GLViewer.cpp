@@ -25,8 +25,7 @@
 #include<boost/algorithm/string/case_conv.hpp>
 #include<yade/lib/serialization/ObjectIO.hpp>
 #include<yade/lib/pyutil/gil.hpp>
-
-
+#include<QGLViewer/manipulatedFrame.h>
 #include<QtGui/qevent.h>
 
 using namespace boost;
