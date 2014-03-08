@@ -36,15 +36,15 @@ using namespace boost;
 #endif
 
 void GLViewer::mouseMovesCamera(){
-  camera()->frame()->setWheelSensitivity(-1.0f);
-  
   setWheelBinding(Qt::ShiftModifier , FRAME, ZOOM);
   setWheelBinding(Qt::NoModifier, CAMERA, ZOOM);
 
 #if QGLVIEWER_VERSION>=0x020500
+  manipulatedFrame()->setWheelSensitivity(-1.0f);
   setMouseBinding(Qt::ShiftModifier, Qt::LeftButton, SELECT);
   
-  setMouseBinding(Qt::ShiftModifier, Qt::LeftButton | Qt::RightButton, FRAME, ZOOM);
+  setMouseBinding(Qt::ShiftModifier, Qt::LeftButton, FRAME, ZOOM);
+  setMouseBinding(Qt::ShiftModifier, Qt::RightButton, FRAME, ZOOM);
   setMouseBinding(Qt::ShiftModifier, Qt::MidButton, FRAME, TRANSLATE);
   setMouseBinding(Qt::ShiftModifier, Qt::RightButton, FRAME, ROTATE);
     
@@ -53,8 +53,9 @@ void GLViewer::mouseMovesCamera(){
   setMouseBinding(Qt::NoModifier, Qt::LeftButton, CAMERA, ROTATE);
   setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, TRANSLATE);
 #else
-  setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
+  camera()->frame()->setWheelSensitivity(-1.0f);
   
+  setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
   setMouseBinding(Qt::SHIFT + Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
   setMouseBinding(Qt::SHIFT + Qt::MidButton, FRAME, TRANSLATE);
   setMouseBinding(Qt::SHIFT + Qt::RightButton, FRAME, ROTATE);
@@ -102,7 +103,6 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
 #endif
 	switch (event->button()){
 		case Qt::LeftButton:  manipulatedFrame()->alignWithFrame(NULL,true); LOG_DEBUG("Aligning cutting plane"); break;
-		// case Qt::RightButton: projectOnLine(camera->position(), camera->viewDirection()); break;
 		default: break; // avoid warning
 	}
 }
@@ -113,8 +113,6 @@ void GLViewer::wheelEvent(QWheelEvent* event){
 	if(manipulatedClipPlane<0){ QGLViewer::wheelEvent(event); return; }
 	assert(manipulatedClipPlane<renderer->numClipPlanes);
 	float distStep=1e-3*sceneRadius();
-	//const float wheelSensitivityCoef = 8E-4f;
-	//Vec trans(0.0, 0.0, -event->delta()*wheelSensitivity()*wheelSensitivityCoef*(camera->position()-position()).norm());
 	float dist=event->delta()*manipulatedFrame()->wheelSensitivity()*distStep;
 	Vector3r normal=renderer->clipPlaneSe3[manipulatedClipPlane].orientation*Vector3r(0,0,1);
 	qglviewer::Vec newPos=manipulatedFrame()->position()+qglviewer::Vec(normal[0],normal[1],normal[2])*dist;
