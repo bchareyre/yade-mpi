@@ -106,12 +106,15 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  
 	}
 	
-	/* Morh-Coulomb criterion */
+	/* Mohr-Coulomb criterion */
 	Real maxFs = phys->FsMax + Fn*phys->tanFrictionAngle;
 	Real scalarShearForce = shearForce.norm();
 	  
 	if (scalarShearForce > maxFs) {
-	  shearForce*=maxFs/scalarShearForce;
+	  if (scalarShearForce != 0)
+	    shearForce*=maxFs/scalarShearForce;
+	  else
+	    shearForce=Vector3r::Zero();
 	  if ((smoothJoint) && (phys->isOnJoint)) {phys->dilation=phys->jointCumulativeSliding*phys->tanDilationAngle-D; phys->initD+=(jointSliding*phys->tanDilationAngle);}
 	  // take into account shear cracking -> are those lines critical? -> TODO testing with and without
 	  if ( phys->isCohesive ) { 
@@ -202,12 +205,15 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	
 	// frictional properties
 	contactPhysics->kn = 2.*E1*R1*E2*R2/(E1*R1+E2*R2);
-	contactPhysics->ks = 2.*E1*R1*v1*E2*R2*v2/(E1*R1*v1+E2*R2*v2);//alpha*contactPhysics->kn;
+	if ( (v1==0)&&(v2==0) )
+	  contactPhysics->ks = 0;
+	else
+	  contactPhysics->ks = 2.*E1*R1*v1*E2*R2*v2/(E1*R1*v1+E2*R2*v2);
 	contactPhysics->tanFrictionAngle = std::tan(std::min(f1,f2));
 	
 	// cohesive properties
 	///to set if the contact is cohesive or not
-	if ((scene->iter < cohesiveTresholdIteration) && (std::min(SigT1,SigT2)>0 || std::min(Coh1,Coh2)>0) && (yade1->type == yade2->type)){ 
+	if ( ((cohesiveTresholdIteration < 0) || (scene->iter < cohesiveTresholdIteration)) && (std::min(SigT1,SigT2)>0 || std::min(Coh1,Coh2)>0) && (yade1->type == yade2->type)){ 
 	  contactPhysics->isCohesive=true;
 	  st1->noIniLinks++;
 	  st2->noIniLinks++;
@@ -267,7 +273,7 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 			contactPhysics->tanDilationAngle = std::tan(std::min(jdil1,jdil2));
 		  
 			///to set if the contact is cohesive or not
-			if ((scene->iter < cohesiveTresholdIteration) && (std::min(jcoh1,jcoh2)>0 || std::min(jSigT1,jSigT2)/2.0>0)) {
+			if ( ((cohesiveTresholdIteration < 0) || (scene->iter < cohesiveTresholdIteration)) && (std::min(jcoh1,jcoh2)>0 || std::min(jSigT1,jSigT2)>0) ) {
 			  contactPhysics->isCohesive=true;
 			  st1->noIniLinks++;
 			  st2->noIniLinks++;
