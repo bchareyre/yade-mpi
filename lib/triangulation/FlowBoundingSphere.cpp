@@ -9,9 +9,9 @@
 #include "yade/lib/triangulation/FlowBoundingSphere.hpp"
 
 namespace CGT {
-Vecteur PeriodicCellInfo::gradP;
-Vecteur PeriodicCellInfo::hSize[3];
-Vecteur PeriodicCellInfo::deltaP;
+CVector PeriodicCellInfo::gradP;
+CVector PeriodicCellInfo::hSize[3];
+CVector PeriodicCellInfo::deltaP;
 }
 
 

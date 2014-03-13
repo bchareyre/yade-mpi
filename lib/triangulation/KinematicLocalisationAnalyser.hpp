@@ -78,7 +78,7 @@ class KinematicLocalisationAnalyser
 		void SetDisplacementIncrements (void);
 
 		///Add surface*displacement to T
-		void Grad_u ( Finite_cells_iterator cell, int facet, Vecteur &V, Tenseur3& T );
+		void Grad_u ( Finite_cells_iterator cell, int facet, CVector &V, Tenseur3& T );
 		///Compute grad_u in cell (by default, T= average grad_u in cell, if !vol_divide, T=grad_u*volume
 		void Grad_u ( Finite_cells_iterator cell, Tenseur3& T, bool vol_divide=true );
 		/// Compute grad_u for all particles, by summing grad_u of all adjaent cells using current states
@@ -88,8 +88,8 @@ class KinematicLocalisationAnalyser
 		///Compute porisity from cumulated spheres volumes and positions of boxes
 		Real ComputeMacroPorosity (void );
 
-		Vecteur Deplacement ( Cell_handle cell );  //donne le d�placement d'un sommet de voronoi
-		Vecteur Deplacement ( Finite_cells_iterator cell, int facet ); //mean displacement on a facet		
+		CVector Deplacement ( Cell_handle cell );  //donne le d�placement d'un sommet de voronoi
+		CVector Deplacement ( Finite_cells_iterator cell, int facet ); //mean displacement on a facet		
 
 		// Calcul du tenseur d'orientation des voisins
 		//Tenseur_sym3 Orientation_voisins (Tesselation& Tes);

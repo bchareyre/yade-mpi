@@ -1,8 +1,8 @@
 #pragma once
 
-#include "def_types.h" 
 #include <iostream>
 #include <fstream>
+#include "RegularTriangulation.h"
 
 namespace CGT {
 
@@ -13,12 +13,12 @@ class Tenseur3;
 class Tenseur_sym3;
 class Tenseur_anti3;
 
-Vecteur operator* ( Tens& tens, Vecteur& vect );
-Vecteur& NormalizedVecteur ( Vecteur& vect );
+CVector operator* ( Tens& tens, CVector& vect );
+CVector& NormalizedCVector ( CVector& vect );
 
 
-void Tenseur_produit ( Vecteur &v1, Vecteur &v2, Tenseur3 &result );
-void Somme ( Tenseur3 &result, Vecteur &v1, Vecteur &v2 );
+void Tenseur_produit ( CVector &v1, CVector &v2, Tenseur3 &result );
+void Somme ( Tenseur3 &result, CVector &v1, CVector &v2 );
 
 std::ostream& operator<< ( std::ostream& os,const Tenseur3& T );
 std::ostream& operator<< ( std::ostream& os,const Tenseur_sym3& T );

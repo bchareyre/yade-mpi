@@ -6,6 +6,30 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+
+/*!
+
+FlowEngine is mainly an interface to the fluid solvers defined in lib/triangulation and using the PFV scheme.
+There are also a few non-trivial functions defined here, such has building triangulation and computating of elements volumes.
+
+PeriodicFlowEngine is a variant for periodic boundary conditions.
+
+Which solver will be actually used internally to obtain pore pressure will depend on compile time flags (libcholmod available and #define LINSOLV),
+and on runtime settings (useSolver=0: Gauss-Seidel (iterative), useSolver=1: CHOLMOD if available (direct sparse cholesky)).
+
+The files defining lower level classes are in yade/lib. The code uses CGAL::Triangulation3 for managing the mesh and storing data; eigen3::Sparse, suitesparse::cholmod, and metis for direct resolution of the linear systems. The Gauss-Seidel iterative solver OTOH is implemented directly in Yade.
+
+Most classes in lib/triangulation are templates, and therefore completely defined in header files.
+A pseudo hpp/cpp split is reproduced for clarity, with hpp/ipp extensions (but again, in the end they are all included).
+The files are
+- RegularTriangulation.h : declaration of info types embeded in the mesh (template parameters of CGAL::Triangulation3), and instanciation of RTriangulation classes
+- Tesselation.h/ipp : encapsulate RegularTriangulation and adds functions to manipulate the dual (Voronoi) graph of the triangulation
+- Network.hpp/ipp : specialized for PFV model (the two former are used independently by TesselationWrapper), a set of functions to determine volumes and surfaces of intersections between spheres and various subdomains. Contains two triangulations for smooth transitions while remeshing - e.g. interpolating values in the new mesh using the previous one.
+- FlowBoundingSphere.hpp/ipp and PeriodicFlow.hpp/ipp + LinSolv variants: implement the solver in itself (mesh, boundary conditions, solving, defining fluid-particles interactions)
+- FlowEngine.hpp/cpp (this file)
+
+*/
+
 #pragma once
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
@@ -84,7 +108,7 @@ class FlowEngine : public PartialEngine
 		TPL Real getCellFlux(unsigned int cond, const shared_ptr<Solver>& flow);
 		TPL Real getBoundaryFlux(unsigned int boundary,Solver& flow) {return flow->boundaryFlux(boundary);}
 		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
-			const CGT::Vecteur& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
+			const CGT::CVector& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		TPL Vector3r shearLubForce(unsigned int id_sph, Solver& flow) {
 			return (flow->shearLubricationForces.size()>id_sph)?flow->shearLubricationForces[id_sph]:Vector3r::Zero();}
 		TPL Vector3r shearLubTorque(unsigned int id_sph, Solver& flow) {
@@ -157,10 +181,10 @@ class FlowEngine : public PartialEngine
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
 		#ifdef LINSOLV
-		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver==3) flow->exportMatrix(filename.c_str());
-			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
-		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver==3) flow->exportTriplets(filename.c_str());
-			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver>0) flow->exportMatrix(filename.c_str());
+			else LOG_ERROR("available for Cholmod solver (useSolver>0)");}
+		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver>0) flow->exportTriplets(filename.c_str());
+			else LOG_ERROR("available for Cholmod solver (useSolver>0)");}
 		#endif
 
 		void emulateAction(){
@@ -239,7 +263,7 @@ class FlowEngine : public PartialEngine
 					((double,permeabilityFactor,1.0,,"permability multiplier"))
 					((double,viscosity,1.0,,"viscosity of the fluid"))
 					((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
-					((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
+					((int, useSolver, 0,, "Solver to use: 0=Gauss-Seidel (iterative), 1=CHOLMOD (direct sparse cholesky)"))
 					((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
 					((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
 					((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))

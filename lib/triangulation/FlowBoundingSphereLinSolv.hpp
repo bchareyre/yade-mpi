@@ -47,8 +47,8 @@ public:
 	using FlowType::yMinId;
 	using FlowType::yMaxId;
 	using FlowType::debugOut;
-	using FlowType::TOLERANCE;
-	using FlowType::RELAX;
+	using FlowType::tolerance;
+	using FlowType::relax;
 	using FlowType::fluidBulkModulus;
 	using FlowType::reApplyBoundaryConditions;
 	using FlowType::pressureChanged;

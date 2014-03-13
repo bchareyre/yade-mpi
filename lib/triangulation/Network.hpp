@@ -26,7 +26,7 @@ namespace CGT {
 struct Boundary
 {
 	Point p;//position
-	Vecteur normal;//orientation
+	CVector normal;//orientation
 	Vector3r velocity;//motion
 	int coordinate;//the axis perpendicular to the boundary
 	bool flowCondition;//flowCondition=0, pressure is imposed // flowCondition=1, flow is imposed
@@ -61,14 +61,14 @@ class Network
 		int vtkInfiniteVertices, vtkInfiniteCells, num_particles;
 
 		void addBoundingPlanes();
-		void addBoundingPlane (Vecteur Normal, int id_wall);
-		void addBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall );
+		void addBoundingPlane (CVector Normal, int id_wall);
+		void addBoundingPlane (Real center[3], double thickness, CVector Normal, int id_wall );
 
 		void defineFictiousCells( );
 		int detectFacetFictiousVertices (CellHandle& cell, int& j);
 		double volumeSolidPore (const CellHandle& cell);
-		double volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
-		double volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface);
+		double volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, CVector& facetSurface);
+		double volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, CVector& facetSurface);
 		double sphericalTriangleVolume(const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3);
 		
 		double fastSphericalTriangleArea(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1);
@@ -79,8 +79,8 @@ class Network
 		double surfaceSolidPore( CellHandle cell, int j, bool slipOnLaterals, bool reuseFacetData=false);
 		double sphericalTriangleArea ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
 		
-		Vecteur surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3);
-		Vecteur surfaceSingleFictiousFacet(VertexHandle fSV1, VertexHandle SV2, VertexHandle SV3);
+		CVector surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3);
+		CVector surfaceSingleFictiousFacet(VertexHandle fSV1, VertexHandle SV2, VertexHandle SV3);
 		double surfaceSolidDoubleFictiousFacet(VertexHandle SV1, VertexHandle SV2, VertexHandle SV3);
 		double surfaceSolidFacet(Sphere ST1, Sphere ST2, Sphere ST3);
 

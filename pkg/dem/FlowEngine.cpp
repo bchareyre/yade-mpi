@@ -30,10 +30,9 @@
 CREATE_LOGGER ( FlowEngine );
 CREATE_LOGGER ( PeriodicFlowEngine );
 
-CGT::Vecteur makeCgVect ( const Vector3r& yv ) {return CGT::Vecteur ( yv[0],yv[1],yv[2] );}
-CGT::Point makeCgPoint ( const Vector3r& yv ) {return CGT::Point ( yv[0],yv[1],yv[2] );}
+CGT::CVector makeCgVect ( const Vector3r& yv ) {return CGT::CVector ( yv[0],yv[1],yv[2] );}
 Vector3r makeVector3r ( const CGT::Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
-Vector3r makeVector3r ( const CGT::Vecteur& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+Vector3r makeVector3r ( const CGT::CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
 
 
 FlowEngine::~FlowEngine()
@@ -213,9 +212,9 @@ void FlowEngine::initSolver ( Solver& flow )
 	flow->numFactorizeThreads = numFactorizeThreads;
 	#endif
 	flow->meanKStat = meanKStat;
-        flow->VISCOSITY = viscosity;
-        flow->TOLERANCE=tolerance;
-        flow->RELAX=relax;
+        flow->viscosity = viscosity;
+        flow->tolerance=tolerance;
+        flow->relax=relax;
         flow->clampKValues = clampKValues;
 	flow->maxKdivKmean = maxKdivKmean;
 	flow->minKdivKmean = minKdivKmean;
@@ -353,7 +352,7 @@ void FlowEngine::addBoundary ( Solver& flow )
         double center[3];
         for ( int i=0; i<6; i++ ) {
                 if ( *flow->boundsIds[i]<0 ) continue;
-                CGT::Vecteur Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
+                CGT::CVector Normal ( normal[i].x(), normal[i].y(), normal[i].z() );
                 if ( flow->boundary ( *flow->boundsIds[i] ).useMaxMin ) flow->addBoundingPlane(Normal, *flow->boundsIds[i] );
                 else {
 			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow->boundsIds[i]].pos[h];
@@ -397,7 +396,7 @@ void FlowEngine::initializeVolumes ( Solver& flow )
 	typedef typename Solver::element_type Flow;
 	
 	FiniteVerticesIterator verticesEnd = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
-	CGT::Vecteur Zero(0,0,0);
+	CGT::CVector Zero(0,0,0);
 	for (FiniteVerticesIterator vIt = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); vIt!= verticesEnd; vIt++) vIt->info().forces=Zero;
 
 	FOREACH(CellHandle& cell, flow->T[flow->currentTes].cellHandles)
@@ -408,9 +407,9 @@ void FlowEngine::initializeVolumes ( Solver& flow )
 			case ( 1 ) : cell->info().volume() = volumeCellSingleFictious ( cell ); break;
 			case ( 2 ) : cell->info().volume() = volumeCellDoubleFictious ( cell ); break;
 			case ( 3 ) : cell->info().volume() = volumeCellTripleFictious ( cell ); break;
-			default: break; 
+			default: break;
 		}
-		if (flow->fluidBulkModulus>0) { cell->info().invVoidVolume() = 1 / ( abs(cell->info().volume()) - flow->volumeSolidPore(cell) ); }
+		if (flow->fluidBulkModulus>0) { cell->info().invVoidVolume() = 1. / ( abs(cell->info().volume()) - flow->volumeSolidPore(cell) ); }
 	}
 	if (debug) cout << "Volumes initialised." << endl;
 }
@@ -431,14 +430,14 @@ void FlowEngine::averageRealCellVelocity()
                 RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
                 CGT::Point posAvFacet;
                 double volumeFacetTranslation = 0;
-                CGT::Vecteur velAv ( Vel[0], Vel[1], Vel[2] );
+                CGT::CVector velAv ( Vel[0], Vel[1], Vel[2] );
                 for ( int i=0; i<4; i++ ) {
                         volumeFacetTranslation = 0;
                         if ( !Tri.is_infinite ( cell->neighbor ( i ) ) ) {
-                                CGT::Vecteur Surfk = cell->info()-cell->neighbor ( i )->info();
+                                CGT::CVector Surfk = cell->info()-cell->neighbor ( i )->info();
                                 Real area = sqrt ( Surfk.squared_length() );
                                 Surfk = Surfk/area;
-                                CGT::Vecteur branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+                                CGT::CVector branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
                                 posAvFacet = ( CGT::Point ) cell->info() + ( branch*Surfk ) *Surfk;
                                 volumeFacetTranslation += velAv*cell->info().facetSurfaces[i];
                                 cell->info().averageVelocity() = cell->info().averageVelocity() - volumeFacetTranslation/cell->info().volume() * ( posAvFacet-CGAL::ORIGIN );
@@ -1077,7 +1076,7 @@ void PeriodicFlowEngine::updateVolumes (shared_ptr<FlowSolver>& flow)
 void PeriodicFlowEngine::initializeVolumes (shared_ptr<FlowSolver>& flow)
 {
         FiniteVerticesIterator verticesEnd = flow->T[flow->currentTes].Triangulation().finite_vertices_end();
-        CGT::Vecteur Zero ( 0,0,0 );
+        CGT::CVector Zero ( 0,0,0 );
         for ( FiniteVerticesIterator vIt = flow->T[flow->currentTes].Triangulation().finite_vertices_begin(); vIt!= verticesEnd; vIt++ ) vIt->info().forces=Zero;
 
 	FOREACH(CellHandle& cell, flow->T[flow->currentTes].cellHandles){
@@ -1131,7 +1130,7 @@ void PeriodicFlowEngine::buildTriangulation ( double pZero, shared_ptr<FlowSolve
 	if ( debug ) cout << endl << "locateCell------" << endl << endl;
         flow->computePermeability ( );
         porosity = flow->vPoralPorosity/flow->vTotalePorosity;
-        flow->TOLERANCE=tolerance;flow->RELAX=relax;
+        flow->tolerance=tolerance;flow->relax=relax;
 	
         flow->displayStatistics ();
         //FIXME: check interpolate() for the periodic case, at least use the mean pressure from previous step.
@@ -1150,7 +1149,7 @@ void PeriodicFlowEngine::preparePShifts()
         CGT::PeriodicCellInfo::hSize[0] = makeCgVect ( scene->cell->hSize.col ( 0 ) );
         CGT::PeriodicCellInfo::hSize[1] = makeCgVect ( scene->cell->hSize.col ( 1 ) );
         CGT::PeriodicCellInfo::hSize[2] = makeCgVect ( scene->cell->hSize.col ( 2 ) );
-        CGT::PeriodicCellInfo::deltaP=CGT::Vecteur (
+        CGT::PeriodicCellInfo::deltaP=CGT::CVector (
                                               CGT::PeriodicCellInfo::hSize[0]*CGT::PeriodicCellInfo::gradP,
                                               CGT::PeriodicCellInfo::hSize[1]*CGT::PeriodicCellInfo::gradP,
                                               CGT::PeriodicCellInfo::hSize[2]*CGT::PeriodicCellInfo::gradP );

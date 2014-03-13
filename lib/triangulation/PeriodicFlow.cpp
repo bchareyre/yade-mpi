@@ -2,10 +2,6 @@
 
 #include"PeriodicFlow.hpp"
 
-#define FAST
-#define TESS_BASED_FORCES
-#define FACET_BASED_FORCES 1
-
 #ifdef YADE_OPENMP
 //   #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
 #endif
@@ -20,7 +16,7 @@ void PeriodicFlow::interpolate(Tesselation& Tes, Tesselation& NewTes)
 	for (VectorCell::iterator cellIt=NewTes.cellHandles.begin(); cellIt!=NewTes.cellHandles.end(); cellIt++){
 		CellHandle& newCell = *cellIt;
 		if (newCell->info().Pcondition || newCell->info().isGhost) continue;
-		Vecteur center ( 0,0,0 );
+		CVector center ( 0,0,0 );
 		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
 		else {
 			Real boundPos=0; int coord=0;
@@ -31,7 +27,7 @@ void PeriodicFlow::interpolate(Tesselation& Tes, Tesselation& NewTes)
 					boundPos=boundary (newCell->vertex(k)->info().id()).p[coord];
 				}
 			}
-			center=Vecteur(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
+			center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
 		}
                 oldCell = Tri.locate(Point(center[0],center[1],center[2]));
                 newCell->info().p() = oldCell->info().shiftedP();
@@ -44,8 +40,8 @@ void PeriodicFlow::interpolate(Tesselation& Tes, Tesselation& NewTes)
 void PeriodicFlow::computeFacetForcesWithCache(bool onlyCache)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-	Vecteur nullVect(0,0,0);
-	static vector<Vecteur> oldForces;
+	CVector nullVect(0,0,0);
+	static vector<CVector> oldForces;
 	if (oldForces.size()<=Tri.number_of_vertices()) oldForces.resize(Tri.number_of_vertices()+1);
 	//reset forces
 	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
@@ -54,7 +50,7 @@ void PeriodicFlow::computeFacetForcesWithCache(bool onlyCache)
 	}
 	CellHandle neighbourCell;
 	VertexHandle mirrorVertex;
-	Vecteur tempVect;
+	CVector tempVect;
 	
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
 	if (noCache) {
@@ -66,13 +62,13 @@ void PeriodicFlow::computeFacetForcesWithCache(bool onlyCache)
 // 				if (!cell->info().Pcondition) ++nPCells;
 // 				#endif
 				neighbourCell = cell->neighbor(j);
-				const Vecteur& Surfk = cell->info().facetSurfaces[j];
+				const CVector& Surfk = cell->info().facetSurfaces[j];
 				//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
 				//The ratio void surface / facet surface
 				Real area = sqrt(Surfk.squared_length());
-				Vecteur facetNormal = Surfk/area;
-				const std::vector<Vecteur>& crossSections = cell->info().facetSphereCrossSections;
-				Vecteur fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
+				CVector facetNormal = Surfk/area;
+				const std::vector<CVector>& crossSections = cell->info().facetSphereCrossSections;
+				CVector fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
 				/// handle fictious vertex since we can get the projected surface easily here
 				if (cell->vertex(j)->info().isFictious) {
 					Real projSurf=abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
@@ -81,7 +77,7 @@ void PeriodicFlow::computeFacetForcesWithCache(bool onlyCache)
 					cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
 				}
 				/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
-				Vecteur facetUnitForce = -fluidSurfk*cell->info().solidSurfaces[j][3];
+				CVector facetUnitForce = -fluidSurfk*cell->info().solidSurfaces[j][3];
 				for (int y=0; y<3;y++) {
 					//add to cached value
 					cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidSurfaces[j][y];
@@ -114,7 +110,7 @@ void PeriodicFlow::computeFacetForcesWithCache(bool onlyCache)
 		}
 	}
 	if (debugOut) {
-		Vecteur totalForce = nullVect;
+		CVector totalForce = nullVect;
 		for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); v++)
 		{
 			if (!v->info().isFictious /*&& !v->info().isGhost*/ ){
@@ -133,13 +129,10 @@ void PeriodicFlow::computePermeability()
 	VSolidTot = 0, Vtotalissimo = 0, vPoral = 0, sSolidTot = 0, vTotalePorosity=0, vPoralPorosity=0;
 	CellHandle neighbourCell;
 
-	double k=0, distance = 0, radius = 0, viscosity = VISCOSITY;
-	int surfneg=0;
-	int NEG=0, POS=0, pass=0;
-
+	double k=0, distance = 0, radius = 0;
+	int surfneg=0; int NEG=0, POS=0, pass=0;
 	Real meanK=0, STDEV=0, meanRadius=0, meanDistance=0;
 	Real infiniteK=1e3;
-
 	double volume_sub_pore = 0.f;
 	VectorCell& cellHandles= T[currentTes].cellHandles;
 	for (VectorCell::iterator cellIt=T[currentTes].cellHandles.begin(); cellIt!=T[currentTes].cellHandles.end(); cellIt++){
@@ -163,13 +156,13 @@ void PeriodicFlow::computePermeability()
 					for (int jj=0;jj<3;jj++)
 						cell->info().facetSphereCrossSections[j][jj]=0.5*W[jj]->point().weight()*Wm3::FastInvCos1((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point()));
 #else
-					cell->info().facetSphereCrossSections[j]=Vecteur(
+					cell->info().facetSphereCrossSections[j]=CVector(
 					W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
 					W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
 					W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
 #endif
 					pass+=1;
-					Vecteur l = p1 - p2;
+					CVector l = p1 - p2;
 					distance = sqrt(l.squared_length());
 					if (!RAVERAGE) radius = 2* computeHydraulicRadius(cell, j);
 					else radius = (computeEffectiveRadius(cell, j)+computeEquivalentRadius(cell,j))*0.5;
@@ -182,9 +175,9 @@ void PeriodicFlow::computePermeability()
 					int test=0;
 					if (distance!=0) {
 						if (minPermLength>0 && distance_correction) distance=max(minPermLength,distance);
-						const Vecteur& Surfk = cell->info().facetSurfaces[j];
+						const CVector& Surfk = cell->info().facetSurfaces[j];
 						Real area = sqrt(Surfk.squared_length());
-						const Vecteur& crossSections = cell->info().facetSphereCrossSections[j];
+						const CVector& crossSections = cell->info().facetSphereCrossSections[j];
 							Real S0=0;
 							S0=checkSphereFacetOverlap(v0,v1,v2);
 							if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0);
@@ -200,12 +193,11 @@ void PeriodicFlow::computePermeability()
 					if (k<0 && debugOut) {surfneg+=1;
 					cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
-					} else  {
-						cout <<"infinite K2! surfaces will be missing (FIXME)"<<endl; k = infiniteK;
-					}//Will be corrected in the next loop
+					} else  cout <<"infinite K2! surfaces will be missing (FIXME)"<<endl; k = infiniteK;
+					//Will be corrected in the next loop
 					(cell->info().kNorm())[j]= k*kFactor;
 					if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
-					//The following block is correct but very usefull, since all values are clamped below with MIN and MAX, skip for now
+					//The following block is correct but not very usefull, since all values are clamped below with MIN and MAX, skip for now
 // 					else {//find the real neighbor connected to our cell through periodicity
 // 						CellHandle true_neighbour_cell = cellHandles[neighbour_cell->info().baseIndex];
 // 						for (int ii=0;ii<4;ii++)
@@ -305,8 +297,6 @@ void PeriodicFlow::computePermeability()
 		}
 		if (debugOut) cout << "PassKopt = " << pass << endl;
 	}
-
-
 	if (debugOut) {
 		FiniteVerticesIterator verticesEnd = Tri.finite_vertices_end();
 		Real Vgrains = 0;
@@ -338,8 +328,6 @@ void PeriodicFlow::gaussSeidel(Real dt)
     double compFlowFactor=0;
     vector<Real> previousP;
     previousP.resize(Tri.number_of_finite_cells());
-    double tolerance = TOLERANCE;
-    double relax = RELAX;
     const int num_threads=1;
     bool compressible= fluidBulkModulus>0;
 

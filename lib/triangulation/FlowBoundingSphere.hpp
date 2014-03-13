@@ -37,8 +37,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
  		FlowBoundingSphere();
 
 		bool slipOnLaterals;
-		double TOLERANCE;
-		double RELAX;
+		double tolerance;
+		double relax;
 		double ks; //Hydraulic Conductivity
 		bool clampKValues, meanKStat, distance_correction;
 		bool OUTPUT_BOUDARIES_RADII;
@@ -67,7 +67,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		#define parallel_forces
 		#ifdef parallel_forces
 		int ompThreads;
-		vector< vector<const Vecteur*> > perVertexUnitForce;
+		vector< vector<const CVector*> > perVertexUnitForce;
 		vector< vector<const Real*> > perVertexPressure;
 		#endif
 		vector <double> edgeSurfaces;
@@ -100,18 +100,12 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool tessBasedForce; //allow the force computation method to be chosen from FlowEngine
 		Real minPermLength; //min branch length for Poiseuille
 
-		double VISCOSITY;
+		double viscosity;
 		double fluidBulkModulus;
 		
-		Tesselation& computeAction ( );
-		Tesselation& computeAction ( int argc, char *argv[ ], char *envp[ ] );
-		Tesselation& loadPositions(int argc, char *argv[ ], char *envp[ ]);
 		void displayStatistics();
 		void initializePressures ( double pZero );
 		bool reApplyBoundaryConditions ();
-		/// Define forces using the same averaging volumes as for permeability
-		void computeTetrahedralForces();
-		/// Define forces spliting drag and buoyancy terms
 		void computeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk (const char* folder );
 #ifdef XVIEW
@@ -123,7 +117,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double computeHydraulicRadius (CellHandle cell, int j );
 		Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2);
 
-		double dotProduct ( Vecteur x, Vecteur y );
+		double dotProduct ( CVector x, CVector y );
 		double computeEffectiveRadius(CellHandle cell, int j);
 		double computeEquivalentRadius(CellHandle cell, int j);
 		//return the list of constriction values
@@ -162,7 +156,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		
 		vector<Real> averageFluidVelocityOnSphere(unsigned int Id_sph);
 		//Solver?
-		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO, 3:CHOLMOD)
+		int useSolver;//(0 : GaussSeidel, 1:CHOLMOD)
 };
 
 } //namespace CGT

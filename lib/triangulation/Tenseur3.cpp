@@ -1,6 +1,6 @@
 
 #include "Tenseur3.h"
-#include "def_types.h" 
+#include "RegularTriangulation.h" 
 
 using namespace std;
 namespace CGT {
@@ -14,16 +14,16 @@ Real Tens::Norme2(void)
     return N;
 }
 
-Vecteur operator* (Tens& tens, Vecteur& vect)
+CVector operator* (Tens& tens, CVector& vect)
 {
-	Vecteur result;
-	result = Vecteur( tens(1,1)*vect.x()+ tens(1,2)*vect.y()+ tens(1,3)*vect.z(),
+	CVector result;
+	result = CVector( tens(1,1)*vect.x()+ tens(1,2)*vect.y()+ tens(1,3)*vect.z(),
 		tens(2,1)*vect.x()+ tens(2,2)*vect.y()+ tens(2,3)*vect.z(),
 		tens(3,1)*vect.x()+ tens(3,2)*vect.y()+ tens(3,3)*vect.z() );
 	return result;
 }
 
-Vecteur& NormalizedVecteur (Vecteur& vect)
+CVector& NormalizedCVector (CVector& vect)
 {
 	vect = vect*(1.0/sqrt(pow(vect.x(),2)+pow(vect.y(),2)+pow(vect.z(),2)));
 	return vect;
@@ -233,7 +233,7 @@ Real Tenseur_anti3::operator() (int i, int j) const
 	}
 }
 
-void Tenseur_produit (Vecteur &v1, Vecteur &v2, Tenseur3 &result)
+void Tenseur_produit (CVector &v1, CVector &v2, Tenseur3 &result)
 {
 	result(1,1) = v1.x()*v2.x();
 	result(1,2) = v1.x()*v2.y(); 
@@ -246,7 +246,7 @@ void Tenseur_produit (Vecteur &v1, Vecteur &v2, Tenseur3 &result)
 	result(3,3) = v1.z()*v2.z(); 
 }
 
-void Somme (Tenseur3 &result, Vecteur &v1, Vecteur &v2)
+void Somme (Tenseur3 &result, CVector &v1, CVector &v2)
 {
 	result(1,1) += v1.x()*v2.x();
 	result(1,2) += v1.x()*v2.y(); 

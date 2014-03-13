@@ -172,7 +172,7 @@ vector<KinematicLocalisationAnalyser::Edge_iterator>& KinematicLocalisationAnaly
 				&& TS1->inside(T.segment(*ed_it).source())
 				&& TS1->inside(T.segment(*ed_it).target())) {
 			Segment s = T.segment(*ed_it);
-			Vecteur v = s.to_vector();
+			CVector v = s.to_vector();
 			Real ny = abs(v.y()/sqrt(s.squared_length()));
 
 			if (Nymin < ny && ny <= Nymax) filteredList.push_back(ed_it);
@@ -272,7 +272,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 	for (Edge_iterator ed_it = T.edges_begin(); ed_it != ed_end; ++ed_it) {
 		if (!T.is_infinite(*ed_it)) {
 			Segment s = T.segment(*ed_it);
-			Vecteur v = s.to_vector();
+			CVector v = s.to_vector();
 			Real xx = abs(v.z()/sqrt(s.squared_length()));
 
 			if (xx>0.95) edges.push_back(ed_it);
@@ -284,7 +284,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 	for (Edge_iterator ed_it = T.edges_begin(); ed_it != ed_end; ++ed_it) {
 		if (!T.is_infinite(*ed_it)) {
 			Segment s = T.segment(*ed_it);
-			Vecteur v = s.to_vector();
+			CVector v = s.to_vector();
 			Real xx = abs(v.z()/sqrt(s.squared_length()));
 
 			if (xx<0.05) edges.push_back(ed_it);
@@ -296,7 +296,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 	for (Edge_iterator ed_it = T.edges_begin(); ed_it != ed_end; ++ed_it) {
 		if (!T.is_infinite(*ed_it)) {
 			Segment s = T.segment(*ed_it);
-			Vecteur v = s.to_vector();
+			CVector v = s.to_vector();
 			Real xx = abs(v.z()/sqrt(s.squared_length()));
 
 			if (xx>0.65 && xx<0.75) edges.push_back(ed_it);
@@ -369,7 +369,7 @@ Tenseur_sym3 KinematicLocalisationAnalyser::Neighbor_fabric(TriaxialState&
 	RTriangulation& T = state.tesselation().Triangulation();
 	Edge_iterator ed_end = T.edges_end();
 	Tenseur_sym3 Tens;
-	Vecteur v;
+	CVector v;
 	Segment s;
 	for (Edge_iterator ed_it = T.edges_begin(); ed_it != ed_end; ++ed_it) {
 		if (!T.is_infinite(*ed_it)) {
@@ -397,7 +397,7 @@ Tenseur_sym3 KinematicLocalisationAnalyser::Contact_fabric(TriaxialState&
 		state)
 {
 	Tenseur_sym3 Tens;
-	Vecteur v;
+	CVector v;
 	TriaxialState::ContactIterator cend = state.contacts_end();
 
 	for (TriaxialState::ContactIterator cit = state.contacts_begin();
@@ -438,7 +438,7 @@ NormalDisplacementDistribution(vector<Edge_iterator>& edges, vector<pair<Real,Re
 	vector<Real> Un_values;
 	Un_values.resize(edges.size());
 	Real UNmin(100000), UNmax(-100000);
-	Vecteur branch, U;
+	CVector branch, U;
 	Real Un;
 	Vertex_handle Vh1, Vh2;
 	vector<Edge_iterator>::iterator ed_end = edges.end();
@@ -598,7 +598,7 @@ AllNeighborDistributionToFile(ofstream& output_file)
 
 	RTriangulation& T = (*TS1).tesselation().Triangulation();
 	Segment s;
-	Vecteur v;
+	CVector v;
 	for (Edge_iterator ed_it = T.edges_begin(); ed_it != T.edges_end(); ed_it++) {
 		if (!T.is_infinite(*ed_it)) {
 			s = T.segment(*ed_it);
@@ -717,22 +717,22 @@ StrictNeighborDistributionToFile(ofstream& output_file)
 	return output_file;
 }
 
-Vecteur KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, int facet)  
+CVector KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, int facet)  
 {
-	Vecteur v(0.f, 0.f, 0.f);
+	CVector v(0.f, 0.f, 0.f);
 	int id;// ident. de la particule
-	Vecteur fixedPoint = 0.5*((TS0->box.base-CGAL::ORIGIN)+(TS0->box.sommet-CGAL::ORIGIN));
+	CVector fixedPoint = 0.5*((TS0->box.base-CGAL::ORIGIN)+(TS0->box.sommet-CGAL::ORIGIN));
 	for (int i=0; i<4; i++) {
 		//  char msg [256];
 		if (i!=facet) {
 			id = cell->vertex(i)->info().id();
-			Vecteur meanFieldDisp =Vecteur(TS0->grain(id).sphere.point().x(), TS0->grain(id).sphere.point().y(), TS0->grain(id).sphere.point().z())-fixedPoint;
+			CVector meanFieldDisp =CVector(TS0->grain(id).sphere.point().x(), TS0->grain(id).sphere.point().y(), TS0->grain(id).sphere.point().z())-fixedPoint;
 			if (1){//fluctuations
-				meanFieldDisp = Vecteur(
+				meanFieldDisp = CVector(
 				meanFieldDisp[0]*Delta_epsilon(0,0),
 				meanFieldDisp[1]*Delta_epsilon(1,1),
 				meanFieldDisp[2]*Delta_epsilon(2,2));
-			} else meanFieldDisp=Vecteur(0,0,0);
+			} else meanFieldDisp=CVector(0,0,0);
 			if (consecutive) v = v + TS1->grain(id).translation-meanFieldDisp;
 			else  v = v + (TS1->grain(id).sphere.point() - TS0->grain(id).sphere.point()-meanFieldDisp);
 		}
@@ -741,9 +741,9 @@ Vecteur KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, i
 	return v;
 }
 
-void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet, Vecteur &V, Tenseur3& T)
+void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet, CVector &V, Tenseur3& T)
 {
-	Vecteur S = cross_product((cell->vertex(l_vertices[facet][1])->point())
+	CVector S = cross_product((cell->vertex(l_vertices[facet][1])->point())
 							  - (cell->vertex(l_vertices[facet][0])->point()),
 							  (cell->vertex(l_vertices[facet][2])->point()) -
 							  (cell->vertex(l_vertices[facet][1])->point())) /2.f;
@@ -754,7 +754,7 @@ void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell,
 		Tenseur3& T, bool vol_divide)// Calcule le gradient de d�p.
 {
 	T.reset();
-	Vecteur v;
+	CVector v;
 	for (int facet=0; facet<4; facet++) {
 		v = Deplacement(cell, facet);
 		Grad_u(cell, facet, v, T);

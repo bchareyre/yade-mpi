@@ -1,5 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2006 by Bruno Chareyre                                *
+*  Copyright (C) 2006 by Bruno Chareyre                                  *
 *  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *

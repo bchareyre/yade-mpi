@@ -104,7 +104,7 @@ double Network<Tesselation>::volumeSolidPore (const CellHandle& cell)
 }
 
 template<class Tesselation>
-double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
+double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, CVector& facetSurface)
 {
         double A [3], B[3];
 
@@ -138,7 +138,7 @@ double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, c
 }
 
 template<class Tesselation>
-double Network<Tesselation>::volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, Vecteur& facetSurface)
+double Network<Tesselation>::volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, CVector& facetSurface)
 {
         double A [3], B[3];
 
@@ -177,9 +177,6 @@ template<class Tesselation>
 double Network<Tesselation>::fastSphericalTriangleArea(const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1)
 {
         using namespace CGAL;
-#ifndef FAST
-        return sphericalTriangleArea(STA1, STA2, STA3, PTA1);
-#endif
         double rayon2 = STA1.weight();
         if (rayon2 == 0.0) return 0.0;
         return rayon2 * fastSolidAngle(STA1,STA2,STA3,PTA1);
@@ -191,9 +188,9 @@ double Network<Tesselation>::sphericalTriangleArea ( Sphere STA1, Sphere STA2, S
  double rayon = STA1.weight();
  if ( rayon == 0.0 ) return 0.0;
 
- Vecteur v12 = STA2.point() - STA1.point();
- Vecteur v13 = STA3.point() - STA1.point();
- Vecteur v14 = PTA1 - STA1.point();
+ CVector v12 = STA2.point() - STA1.point();
+ CVector v13 = STA3.point() - STA1.point();
+ CVector v14 = PTA1 - STA1.point();
 
  double norme12 = ( v12.squared_length() );
  double norme13 = ( v13.squared_length() );
@@ -334,7 +331,7 @@ double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipO
                 Ssolid1n = fastSphericalTriangleArea(SV3->point(), BB, p1, p2);
                 cell->info().solidSurfaces[j][facetRe1]=Ssolid1+Ssolid1n;
                 //area vector of triangle (p1,sphere,p2)
-                Vecteur p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
+                CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
                 if (bi1.flowCondition && ! slipOnLaterals) {
                         //projection on boundary 1
                         Ssolid2 = abs(p1p2v1Surface[bi1.coordinate]);
@@ -361,7 +358,7 @@ double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipO
 }
 
 template<class Tesselation>
-Vecteur Network<Tesselation>::surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3)
+CVector Network<Tesselation>::surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3)
 {
         //This function is correct only with axis-aligned boundaries
         const Boundary &bi1 = boundary(fSV1->info().id());
@@ -370,16 +367,16 @@ Vecteur Network<Tesselation>::surfaceDoubleFictiousFacet(VertexHandle fSV1, Vert
         double surf [3] = {1,1,1};
         surf[bi1.coordinate]=0;
         surf[bi2.coordinate]=0;
-        return area*Vecteur(surf[0],surf[1],surf[2]);
+        return area*CVector(surf[0],surf[1],surf[2]);
 }
 
 template<class Tesselation>
-Vecteur Network<Tesselation>::surfaceSingleFictiousFacet(VertexHandle fSV1, VertexHandle SV2, VertexHandle SV3)
+CVector Network<Tesselation>::surfaceSingleFictiousFacet(VertexHandle fSV1, VertexHandle SV2, VertexHandle SV3)
 {
         //This function is correct only with axis-aligned boundaries
         const Boundary &bi1 =  boundary(fSV1->info().id());
 //  const Boundary &bi2 = boundary ( fSV2->info().id() );
-        Vecteur mean_height = (bi1.p[bi1.coordinate]-0.5*(SV3->point()[bi1.coordinate]+SV2->point()[bi1.coordinate]))*bi1.normal;
+        CVector mean_height = (bi1.p[bi1.coordinate]-0.5*(SV3->point()[bi1.coordinate]+SV2->point()[bi1.coordinate]))*bi1.normal;
 
         return CGAL::cross_product(mean_height,SV3->point()-SV2->point());
 }
@@ -418,8 +415,8 @@ double Network<Tesselation>::surfaceSolidFacet(Sphere ST1, Sphere ST2, Sphere ST
 
         double squared_radius = ST1.weight();
 
-        Vecteur v12 = ST2.point() - ST1.point();
-        Vecteur v13 = ST3.point() - ST1.point();
+        CVector v12 = ST2.point() - ST1.point();
+        CVector v13 = ST3.point() - ST1.point();
 
         double norme12 =  v12.squared_length();
         double norme13 =  v13.squared_length();
@@ -454,18 +451,18 @@ void Network<Tesselation>::addBoundingPlanes()
 	
 	idOffset = Tes.Max_id() +1;//so that boundaries[vertex->id - offset] gives the ordered boundaries (also see function Boundary& boundary(int b))
 	
-	addBoundingPlane (Vecteur(0,1,0) , yMinId);
-	addBoundingPlane (Vecteur(0,-1,0) , yMaxId);
-	addBoundingPlane (Vecteur(-1,0,0) , xMaxId);
-	addBoundingPlane (Vecteur(1,0,0) , xMinId);
-	addBoundingPlane (Vecteur(0,0,1) , zMinId);
-	addBoundingPlane (Vecteur(0,0,-1) , zMaxId);
+	addBoundingPlane (CVector(0,1,0) , yMinId);
+	addBoundingPlane (CVector(0,-1,0) , yMaxId);
+	addBoundingPlane (CVector(-1,0,0) , xMaxId);
+	addBoundingPlane (CVector(1,0,0) , xMinId);
+	addBoundingPlane (CVector(0,0,1) , zMinId);
+	addBoundingPlane (CVector(0,0,-1) , zMaxId);
 
 // 	addBoundingPlanes(true);
 }
 
 template<class Tesselation>
-void Network<Tesselation>::addBoundingPlane (Vecteur Normal, int id_wall)
+void Network<Tesselation>::addBoundingPlane (CVector Normal, int id_wall)
 {
 // 	  Tesselation& Tes = T[currentTes];
 	  //FIXME: pre-condition: the normal is axis-aligned
@@ -482,7 +479,7 @@ void Network<Tesselation>::addBoundingPlane (Vecteur Normal, int id_wall)
 }
 
 template<class Tesselation>
-void Network<Tesselation>::addBoundingPlane (Real center[3], double thickness, Vecteur Normal, int id_wall )
+void Network<Tesselation>::addBoundingPlane (Real center[3], double thickness, CVector Normal, int id_wall )
 {
 	  Tesselation& Tes = T[currentTes];
 	  
@@ -537,9 +534,9 @@ void Network<Tesselation>::defineFictiousCells()
 //  double rayon = STA1.weight();
 //  if ( rayon == 0.0 ) return 0.0;
 //
-//  Vecteur v12 = STA2.point() - STA1.point();
-//  Vecteur v13 = STA3.point() - STA1.point();
-//  Vecteur v14 = PTA1 - STA1.point();
+//  CVector v12 = STA2.point() - STA1.point();
+//  CVector v13 = STA3.point() - STA1.point();
+//  CVector v14 = PTA1 - STA1.point();
 //
 //  double norme12 = ( v12.squared_length() );
 //  double norme13 = ( v13.squared_length() );

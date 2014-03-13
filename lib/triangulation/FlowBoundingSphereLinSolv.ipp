@@ -9,8 +9,6 @@
 
 // #define XVIEW
 #include "FlowBoundingSphereLinSolv.hpp"//include after #define XVIEW
-// #include "def_types.h"
-// #include "def_flow_types.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 #include <CGAL/Width_3.h>
 #include <iostream>
@@ -426,8 +424,6 @@ void FlowBoundingSphereLinSolv<FlowType>::vectorizedGaussSeidel(Real dt)
 	
 	int j = 0;
 	double dp_max, p_max, sum_p, p_moy, dp_moy, sum_dp;
-	double tolerance = TOLERANCE;
-	double relax = RELAX;
 	
 #ifdef GS_OPEN_MP
 	const int num_threads=1;
