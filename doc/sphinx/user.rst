@@ -1379,7 +1379,7 @@ For larger simulations, it is advisable to create separate directory of that nam
 	# …
 	O.saveGnuplot(O.tags['id']+'/'+'graph1')
 
-Controlling parallel compuation
+Controlling parallel computation
 -------------------------------
 
 Default total number of available cores is determined from ``/proc/cpuinfo`` (provided by Linux kernel); in addition, if ``OMP_NUM_THREADS`` environment variable is set, minimum of these two is taken. The ``-j``/``--jobs`` option can be used to override this number.
