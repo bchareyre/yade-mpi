@@ -40,7 +40,8 @@ void GLViewer::mouseMovesCamera(){
   setWheelBinding(Qt::NoModifier, CAMERA, ZOOM);
 
 #if QGLVIEWER_VERSION>=0x020500
-  manipulatedFrame()->setWheelSensitivity(-1.0f);
+	if(manipulatedFrame()==0) setManipulatedFrame(new qglviewer::ManipulatedFrame());
+  manipulatedFrame()->setWheelSensitivity(-1.0);
   setMouseBinding(Qt::ShiftModifier, Qt::LeftButton, SELECT);
   
   setMouseBinding(Qt::ShiftModifier, Qt::LeftButton, FRAME, ZOOM);
