@@ -32,9 +32,9 @@ void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 			assert(member->isClumpMember());
 			member->clumpId=clumpBody->id;
 			clump->members[memberId]=Se3r();// meaningful values will be put in by Clump::updateProperties
-			LOG_DEBUG("Added body #"<<memberId->id<<" to clump #"<<clumpBody->id);
+			//LOG_DEBUG("Added body #"<<memberId->id<<" to clump #"<<clumpBody->id);
 		}
-		LOG_DEBUG("Clump #"<<subClump->id<<" will be erased.");// see addToClump() in yadeWrapper.cpp
+		//LOG_DEBUG("Clump #"<<subClump->id<<" will be erased.");// see addToClump() in yadeWrapper.cpp
 	}
 	else{	// subBody must be a standalone!
 		clump->members[subId]=Se3r();// meaningful values will be put in by Clump::updateProperties
