@@ -74,9 +74,10 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	if(manipulatedFrame()==0) setManipulatedFrame(new qglviewer::ManipulatedFrame());
 
 	xyPlaneConstraint=shared_ptr<qglviewer::LocalConstraint>(new qglviewer::LocalConstraint());
-	//xyPlaneConstraint->setTranslationConstraint(qglviewer::AxisPlaneConstraint::AXIS,qglviewer::Vec(0,0,1));
-	//xyPlaneConstraint->setRotationConstraint(qglviewer::AxisPlaneConstraint::FORBIDDEN,qglviewer::Vec(0,0,1));
 	manipulatedFrame()->setConstraint(NULL);
+#if QGLVIEWER_VERSION>=0x020500
+  manipulatedFrame()->setWheelSensitivity(-1.0f);
+#endif
 
 	setKeyDescription(Qt::Key_A,"Toggle visibility of global axes.");
 	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
@@ -95,12 +96,6 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_P,"Set wider field of view");
 	setKeyDescription(Qt::Key_R,"Revolve around scene center");
 	setKeyDescription(Qt::Key_V,"Save PDF of the current view to /tmp/yade-snapshot-0001.pdf (whichever number is available first). (Must be compiled with the gl2ps feature.)");
-#if 0
-	setKeyDescription(Qt::Key_Plus,    "Cut plane increase");
-	setKeyDescription(Qt::Key_Minus,   "Cut plane decrease");
-	setKeyDescription(Qt::Key_Slash,   "Cut plane step decrease");
-	setKeyDescription(Qt::Key_Asterisk,"Cut plane step increase");
-#endif
  	setPathKey(-Qt::Key_F1);
  	setPathKey(-Qt::Key_F2);
 	setKeyDescription(Qt::Key_Escape,"Manipulate scene (default)");
@@ -120,9 +115,6 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_Space,"Center scene (same as Alt-C); clip plane: activate/deactivate");
 
 	centerScene();
-
-	//connect(&GLGlobals::redrawTimer,SIGNAL(timeout()),this,SLOT(updateGL()));
-
 }
 
 bool GLViewer::isManipulating(){
