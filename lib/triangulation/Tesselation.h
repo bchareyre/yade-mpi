@@ -69,7 +69,7 @@ public:
 protected:
 	RTriangulation* Tri;
 	RTriangulation* Tes; //=NULL or Tri depending on the constructor used.
-	bool computed;
+
 public:
 	Real TotalFiniteVoronoiVolume;
 	Real area; 
@@ -77,10 +77,10 @@ public:
 	Real TotalInternalVoronoiPorosity;
 	VectorVertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
 	VectorCell cellHandles;//for speedup of global loops, iterating on this vector is faster than cellIterator++
-	bool redirected;//is vertexHandles filled with current vertex pointers? 	
+	bool redirected;//is vertexHandles filled with current vertex pointers? 
+	bool computed;
 
-public:
-		_Tesselation(void);
+	_Tesselation(void);
 	_Tesselation(RTriangulation &T);// : Tri(&T) { Calcule(); }
 	~_Tesselation(void);
 	
@@ -94,9 +94,9 @@ public:
 	bool remove (unsigned int id); 
 	int Max_id (void) {return maxId;}
 	
-	void	Compute ();	//Calcule le centres de Voronoi pour chaque cellule
+	void	compute ();	//Calcule le centres de Voronoi pour chaque cellule
 	void	Invalidate () {computed=false;}  //Set the tesselation as "not computed" (computed=false), this will launch 						//tesselation internaly when using functions like computeVolumes())
-	// N.B : Compute() must be executed before the functions below are used
+	// N.B : compute() must be executed before the functions below are used
 	void	Clear(void);
 
 	static Point	Dual	(const CellHandle &cell);	
@@ -104,10 +104,10 @@ public:
 	static Segment  Dual	(FiniteFacetsIterator &facet);	//G�n�re le segment dual d'une facette finie
 	static Real	Volume	(FiniteCellsIterator cell);
 	inline void 	AssignPartialVolume	(FiniteEdgesIterator& ed_it);
-	double		ComputeVFacetArea (FiniteEdgesIterator ed_it);
+	double		computeVFacetArea (FiniteEdgesIterator ed_it);
 	void		ResetVCellVolumes	(void);
-	void		ComputeVolumes		(void);//Compute volume each voronoi cell
-	void		ComputePorosity		(void);//Compute volume and porosity of each voronoi cell
+	void		computeVolumes		(void);//compute volume each voronoi cell
+	void		computePorosity		(void);//compute volume and porosity of each voronoi cell
 	inline Real&	Volume (unsigned int id) { return vertexHandles[id]->info().v(); }
 	inline const VertexHandle&	vertex (unsigned int id) const { return vertexHandles[id]; }
 
@@ -117,7 +117,7 @@ public:
 	void voisins (VertexHandle v, VectorVertex& Output_vector);// {Tri->incident_vertices(v, back_inserter(Output_vector));}
 	RTriangulation& Triangulation (void);// {return *Tri;}
 
-	bool Computed (void) {return computed;}
+// 	bool computed (void) {return computed;}
 
 	bool is_short ( FiniteFacetsIterator f_it );
 	inline bool is_internal ( FiniteFacetsIterator &facet );//
@@ -152,7 +152,6 @@ class PeriodicTesselation : public Tesselation
 
 //Explicit instanciation
 typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes>		SimpleTesselation;
-typedef CGT::_Tesselation<CGT::FlowTriangulationTypes>			FlowTesselation;
-typedef CGT::PeriodicTesselation<CGT::_Tesselation<CGT::PeriFlowTriangulationTypes> >	PeriFlowTesselation;
+
 
 

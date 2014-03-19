@@ -60,15 +60,15 @@ extern  "C" int F77_FUNC(pardiso)
 #ifdef XVIEW
 Vue3D Vue1;
 #endif
-template<class FlowType>
-FlowBoundingSphereLinSolv<FlowType>::~FlowBoundingSphereLinSolv()
+template<class _Tesselation, class FlowType>
+FlowBoundingSphereLinSolv<_Tesselation,FlowType>::~FlowBoundingSphereLinSolv()
 {
 	#ifdef TAUCS_LIB
 	if (Fccs) taucs_ccs_free(Fccs);
 	#endif
 }
-template<class FlowType>
-FlowBoundingSphereLinSolv<FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
+template<class _Tesselation, class FlowType>
+FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
 	useSolver=0;
 	isLinearSystemSet=0;
 	isFullLinearSystemGSSet=0;
@@ -90,10 +90,10 @@ FlowBoundingSphereLinSolv<FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
 }
 
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::swapFwd (double* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::swapFwd (int* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::swapFwd (double* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::swapFwd (int* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
@@ -117,8 +117,8 @@ struct CellTraits_for_spatial_sort : public Triangulation::Geom_traits {
 	Less_z_3  less_z_3_object() const {return Less_z_3();}
 };
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::resetNetwork() {
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetNetwork() {
 	FlowType::resetNetwork();
 	isLinearSystemSet=false;
 	isFullLinearSystemGSSet=false;
@@ -140,8 +140,8 @@ void FlowBoundingSphereLinSolv<FlowType>::resetNetwork() {
 	}
 #endif
 }
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::setLinearSystem(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 {
 
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -285,11 +285,11 @@ int FlowBoundingSphereLinSolv<FlowType>::setLinearSystem(Real dt)
 	return ncols;
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::copyGsToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=gsP[ii];}
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyGsToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=gsP[ii];}
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::copyCellsToGs (Real dt)
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToGs (Real dt)
 {
 	for (int ii=1; ii<=ncols; ii++){
 		gsP[ii]=T_cells[ii]->info().p();
@@ -298,11 +298,11 @@ void FlowBoundingSphereLinSolv<FlowType>::copyCellsToGs (Real dt)
 	}
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) {T_cells[ii]->info().p()=T_x[ii-1];} }
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) {T_cells[ii]->info().p()=T_x[ii-1];} }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::copyCellsToLin (Real dt)
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
 {
 	for (int ii=1; ii<=ncols; ii++) {
 		T_bv[ii-1]=T_b[ii-1]-T_cells[ii]->info().dv();
@@ -310,9 +310,9 @@ void FlowBoundingSphereLinSolv<FlowType>::copyCellsToLin (Real dt)
 }
 
 /// For Gauss Seidel, we need the full matrix
-template<class FlowType>
-// int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS()
-int FlowBoundingSphereLinSolv<FlowType>::setLinearSystemFullGS(Real dt)
+template<class _Tesselation, class FlowType>
+// int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::SetLinearSystemFullGS()
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystemFullGS(Real dt)
 {
 	//WARNING : boundary conditions (Pcondition, p values) must have been set for a correct definition
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -333,7 +333,7 @@ int FlowBoundingSphereLinSolv<FlowType>::setLinearSystemFullGS(Real dt)
 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
 
 // 		double pZero=0;
-// 		if (y_min_id>=0 and y_max_id>y_min_id) pZero = abs((boundary(y_min_id).value-boundary(y_max_id).value)/2);
+// 		if (yMinId>=0 and yMaxId>yMinId) pZero = abs((boundary(yMinId).value-boundary(yMaxId).value)/2);
 		gsP.resize(ncols+1);
 // 		_gsP.resize(ncols+1);
 		gsB.resize(ncols+1);
@@ -415,8 +415,8 @@ int FlowBoundingSphereLinSolv<FlowType>::setLinearSystemFullGS(Real dt)
 	return ncols;
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::vectorizedGaussSeidel(Real dt)
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::vectorizedGaussSeidel(Real dt)
 {
 // 	cout<<"VectorizedGaussSeidel"<<endl;
 	if (!isFullLinearSystemGSSet || (isFullLinearSystemGSSet && reApplyBoundaryConditions())) setLinearSystemFullGS(dt);
@@ -498,8 +498,8 @@ void FlowBoundingSphereLinSolv<FlowType>::vectorizedGaussSeidel(Real dt)
 	if (debugOut) cerr <<"GS iterations : "<<j-1<<endl;
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::sortV(int k1, int k2, int* is, double* ds){
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::sortV(int k1, int k2, int* is, double* ds){
 	for (int k=k1; k<k2; k++) {
 		int kk=k;
 		while (kk>=k1 && is[kk]>is[kk+1]) {
@@ -509,8 +509,8 @@ void FlowBoundingSphereLinSolv<FlowType>::sortV(int k1, int k2, int* is, double*
 	}
 }
 
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::eigenSolve(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 {
 #ifdef EIGENSPARSE_LIB
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions())) ncols = setLinearSystem(dt);
@@ -541,8 +541,8 @@ int FlowBoundingSphereLinSolv<FlowType>::eigenSolve(Real dt)
 }
 
 
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::taucsSolve(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::taucsSolve(Real dt)
 {
 #ifdef TAUCS_LIB
 	if (debugOut) cerr <<endl<<"TAUCS solve"<<endl;
@@ -597,8 +597,8 @@ int FlowBoundingSphereLinSolv<FlowType>::taucsSolve(Real dt)
 #endif
 	return 0;
 }
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::pardisoSolve(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::pardisoSolve(Real dt)
 {
 	cerr <<endl<<"PardisoSolve solve"<<endl;
 	#ifndef PARDISO
@@ -738,8 +738,8 @@ int FlowBoundingSphereLinSolv<FlowType>::pardisoSolve(Real dt)
 }
 
 
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::pardisoSolveTest()
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::pardisoSolveTest()
 {
 	#ifndef PARDISO
 	return 0;
@@ -886,8 +886,8 @@ int FlowBoundingSphereLinSolv<FlowType>::pardisoSolveTest()
 	return 0;
 	#endif
 }
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::taucsSolveTest()
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::taucsSolveTest()
 {
 #ifdef TAUCS_LIB
     cout <<endl<<"TAUCS solve test"<<endl;

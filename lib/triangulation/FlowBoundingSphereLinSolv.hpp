@@ -34,7 +34,7 @@ using namespace std;
 
 namespace CGT {
 
-template<class FlowType>
+template<class _Tesselation, class FlowType=FlowBoundingSphere<_Tesselation> >
 class FlowBoundingSphereLinSolv : public FlowType
 {
 public:
@@ -53,6 +53,7 @@ public:
 	using FlowType::reApplyBoundaryConditions;
 	using FlowType::pressureChanged;
 	using FlowType::computedOnce;
+	using FlowType::resetNetwork;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;

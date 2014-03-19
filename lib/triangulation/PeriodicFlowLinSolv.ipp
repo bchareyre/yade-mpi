@@ -41,14 +41,15 @@ extern  "C" int F77_FUNC(pardiso)
      double *, int *, int *, int *, int *, int *,
      int *, double *, double *, int *, double *);
 #endif
-
-PeriodicFlowLinSolv::~PeriodicFlowLinSolv()
+template<class _Tesselation>
+PeriodicFlowLinSolv<_Tesselation>::~PeriodicFlowLinSolv()
 {
 }
+template<class _Tesselation>
+PeriodicFlowLinSolv<_Tesselation>::PeriodicFlowLinSolv(): BaseFlowSolver() {}
 
-PeriodicFlowLinSolv::PeriodicFlowLinSolv(): LinSolver() {}
-
-int PeriodicFlowLinSolv::setLinearSystem(Real dt)
+template<class _Tesselation>
+int PeriodicFlowLinSolv<_Tesselation>::setLinearSystem(Real dt)
 {
 //WARNING : boundary conditions (Pcondition, p values) must have been set for a correct definition of
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -135,66 +136,8 @@ int PeriodicFlowLinSolv::setLinearSystem(Real dt)
 		}
 	}
 	if (!isLinearSystemSet) {
-		if (useSolver==1 || useSolver==2){
-		#ifdef TAUCS_LIB
-			clen.resize(ncols+1);
-			T_jn.resize(ncols+1);
-			T_A->colptr = &T_jn[0];
-			T_ia.resize(T_nnz);
-			T_A->rowind = &T_ia[0];
-			T_A->flags = (TAUCS_DOUBLE | TAUCS_SYMMETRIC | TAUCS_LOWER);
-			T_an.resize(T_nnz);
-			T_A->values.d = &T_an[0];
-			T_A->n      = ncols;
-			T_A->m      = ncols;
-			int i,j,k;
-			for (j=0; j<ncols; j++) clen[j] = 0;
-			for (k=0; k<T_nnz; k++) {
-				i = is[k]-1; /* make it 1-based */
-				j = js[k]-1; /* make it 1-based */
-				(clen[j])++;
-			}
-			/* now compute column pointers */
-			k = 0;
-			for (j=0; j<ncols; j++) {
-				int tmp;
-				tmp =  clen[j];
-				clen[j] = (T_A->colptr[j]) = k;
-				k += tmp;
-			}
-			clen[ncols] = (T_A->colptr[ncols]) = k;
-
-			/* now read matrix into data structure */
-			for (k=0; k<T_nnz; k++) {
-				i = is[k] - 1; /* make it 1-based */
-				j = js[k] - 1; /* make it 1-based */
-				assert(i < ncols);
-				assert(j < ncols);
-				(T_A->taucs_values)[clen[j]] = vs[k];
-				(T_A->rowind)[clen[j]] = i;
-				clen[j] ++;
-			}
-		#else
-			cerr<<"yade compiled without Taucs, FlowEngine.useSolver="<< useSolver <<" not supported"<<endl;
-		#endif //TAUCS_LIB
-		} else if (useSolver==3){
+		if (useSolver>0){
 		#ifdef EIGENSPARSE_LIB
-// 			//here the matrix can be exported in in MatrixMarket format for experiments 
-// 			static int mn=0;
-// 			ofstream file; ofstream file2; ofstream file3;
-// 			stringstream ss,ss2,ss3;
-// 			ss<<"matrix"<<mn;
-// 			ss3<<"matrixf2"<<mn;
-// 			ss2<<"matrixf"<<mn++;
-// 			file.open(ss.str().c_str());
-// 			file2.open(ss2.str().c_str());
-// 			file3.open(ss3.str().c_str());
-// 			file <<"%%MatrixMarket matrix coordinate real symmetric"<<endl;
-// 			file2 <<"%%MatrixMarket matrix coordinate real symmetric"<<endl;
-// 			file3 <<"%%MatrixMarket matrix coordinate real symmetric"<<endl;
-// 			file <<ncols<<" "<<ncols<<" "<<T_nnz<<" -1"<<endl;
-// 			file2 <<ncols<<" "<<ncols<<" "<<T_nnz<<" -1"<<endl;
-// 			file3 <<ncols<<" "<<ncols<<" "<<T_nnz<<" -1"<<endl;
 			tripletList.clear(); tripletList.resize(T_nnz);
 			for(int k=0;k<T_nnz;k++) {
 				tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
@@ -202,7 +145,7 @@ int PeriodicFlowLinSolv::setLinearSystem(Real dt)
 			A.resize(ncols,ncols);
 			A.setFromTriplets(tripletList.begin(), tripletList.end());
 		#else
-			cerr<<"yade compiled without CHOLMOD, FlowEngine.useSolver="<< useSolver <<" not supported"<<endl;
+			cerr<<"yade compiled without CHOLMOD, FlowEngine.useSolver="<< useSolver <<">0 not supported"<<endl;
 		#endif
 		}
 		isLinearSystemSet=true;
@@ -213,8 +156,8 @@ int PeriodicFlowLinSolv::setLinearSystem(Real dt)
 
 
 /// For Gauss Seidel, we need the full matrix
-
-int PeriodicFlowLinSolv::setLinearSystemFullGS(Real dt)
+template<class _Tesselation>
+int PeriodicFlowLinSolv<_Tesselation>::setLinearSystemFullGS(Real dt)
 {
 	//WARNING : boundary conditions (Pcondition, p values) must have been set for a correct definition
 	RTriangulation& Tri = T[currentTes].Triangulation();

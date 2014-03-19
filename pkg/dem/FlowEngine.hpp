@@ -9,18 +9,19 @@
 
 /*!
 
-FlowEngine is mainly an interface to the fluid solvers defined in lib/triangulation and using the PFV scheme.
+FlowEngine is an interface between Yade and the fluid solvers defined in lib/triangulation and using the PFV scheme.
 There are also a few non-trivial functions defined here, such has building triangulation and computating of elements volumes.
+FlowEngine is defined via the template class TemplateFlowEngine, allowing flexible definition of cell info and vertex info types for handling different types of models and couplings, via inheritance and/or template specialization.
 
 PeriodicFlowEngine is a variant for periodic boundary conditions.
 
-Which solver will be actually used internally to obtain pore pressure will depend on compile time flags (libcholmod available and #define LINSOLV),
+Which solver will be actually used internally to obtain pore pressure will depend partly on compile time flags (libcholmod available and #define LINSOLV),
 and on runtime settings (useSolver=0: Gauss-Seidel (iterative), useSolver=1: CHOLMOD if available (direct sparse cholesky)).
 
 The files defining lower level classes are in yade/lib. The code uses CGAL::Triangulation3 for managing the mesh and storing data; eigen3::Sparse, suitesparse::cholmod, and metis for direct resolution of the linear systems. The Gauss-Seidel iterative solver OTOH is implemented directly in Yade.
 
 Most classes in lib/triangulation are templates, and therefore completely defined in header files.
-A pseudo hpp/cpp split is reproduced for clarity, with hpp/ipp extensions (but again, in the end they are all included).
+A pseudo hpp/cpp split is reproduced for clarity, with hpp/ipp extensions (but again, in the end they are all include files).
 The files are
 - RegularTriangulation.h : declaration of info types embeded in the mesh (template parameters of CGAL::Triangulation3), and instanciation of RTriangulation classes
 - Tesselation.h/ipp : encapsulate RegularTriangulation and adds functions to manipulate the dual (Voronoi) graph of the triangulation
@@ -37,31 +38,44 @@ The files are
 #include<yade/lib/triangulation/FlowBoundingSphere.hpp>
 #include<yade/lib/triangulation/PeriodicFlow.hpp>
 
-class Flow;
-class TesselationWrapper;
+/// Converters for Eigen and CGAL vectors
+CGT::CVector makeCgVect ( const Vector3r& yv ) {return CGT::CVector ( yv[0],yv[1],yv[2] );}
+CGT::Point makeCgPoint ( const Vector3r& yv ) {return CGT::Point ( yv[0],yv[1],yv[2] );}
+Vector3r makeVector3r ( const CGT::Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+Vector3r makeVector3r ( const CGT::CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+/*
+
+typedef TriangulationTypes<FlowVertexInfo,FlowCellInfo>			FlowTriangulationTypes;
+typedef CGT::_Tesselation<FlowTriangulationTypes>			FlowTesselation;
+
+
 #ifdef LINSOLV
 #define _FlowSolver CGT::FlowBoundingSphereLinSolv<CGT::FlowBoundingSphere<FlowTesselation> >
 #else
 #define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
-#endif
+#endif*/
 
-#define TPL template<class Solver>
-
-
-class FlowEngine : public PartialEngine
-{
+template< class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=CGT::FlowBoundingSphere<_Tesselation> >
+class TemplateFlowEngine : public PartialEngine
+{	
 	public :
-	typedef _FlowSolver							FlowSolver;
-	typedef FlowTesselation							Tesselation;
-	typedef FlowSolver::RTriangulation					RTriangulation;
-	typedef FlowSolver::FiniteVerticesIterator                    		FiniteVerticesIterator;
-	typedef FlowSolver::FiniteCellsIterator					FiniteCellsIterator;
-	typedef FlowSolver::CellHandle						CellHandle;
-	typedef RTriangulation::Finite_edges_iterator				FiniteEdgesIterator;
-	typedef FlowSolver::VertexHandle                    			VertexHandle;
-
-
-	
+		#ifdef LINSOLV
+		typedef CGT::FlowBoundingSphereLinSolv<typename solverT::Tesselation,solverT>		FlowSolver;
+		#else
+		typedef solverT						FlowSolver;
+		#endif
+// 		typedef solverT									FlowSolver;
+		typedef FlowSolver								Solver;//FIXME: useless alias, search/replace then remove
+		typedef typename FlowSolver::Tesselation					Tesselation;
+		typedef typename FlowSolver::RTriangulation					RTriangulation;
+		typedef typename FlowSolver::FiniteVerticesIterator                  	  	FiniteVerticesIterator;
+		typedef typename FlowSolver::FiniteCellsIterator				FiniteCellsIterator;
+		typedef typename FlowSolver::CellHandle						CellHandle;
+		typedef typename FlowSolver::FiniteEdgesIterator				FiniteEdgesIterator;
+		typedef typename FlowSolver::VertexHandle                    			VertexHandle;
+		typedef typename RTriangulation::Triangulation_data_structure::Cell::Info       CellInfo;
+		typedef typename RTriangulation::Triangulation_data_structure::Vertex::Info     VertexInfo;
+		
 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
@@ -75,77 +89,78 @@ class FlowEngine : public PartialEngine
 
 	public :
 		int retriangulationLastIter;
-		enum {wallxMin, wallxMax, wallyMin, wallyMax, wallzMin, wallzMax};
+		enum {wall_xmin, wall_xmax, wall_ymin, wall_ymax, wall_zmin, wall_zmax};
 		Vector3r normal [6];
 		bool currentTes;
 		int idOffset;
 		double epsVolCumulative;
 		int ReTrg;
 		int ellapsedIter;
-		TPL void initSolver (Solver& flow);
+		void initSolver (FlowSolver& flow);
 		#ifdef LINSOLV
-		TPL void setForceMetis (Solver& flow, bool force);
-		TPL bool getForceMetis (Solver& flow);
+		void setForceMetis (Solver& flow, bool force);
+		bool getForceMetis (Solver& flow);
 		#endif
-		TPL void triangulate (Solver& flow);
-		TPL void addBoundary (Solver& flow);
-		TPL void buildTriangulation (double pZero, Solver& flow);
-		TPL void buildTriangulation (Solver& flow);
-		TPL void updateVolumes (Solver& flow);
-		TPL void initializeVolumes (Solver& flow);
-		TPL void boundaryConditions(Solver& flow);
-		TPL void updateBCs ( Solver& flow ) {
-			if (flow->T[flow->currentTes].maxId>0) boundaryConditions(flow);//avoids crash at iteration 0, when the packing is not bounded yet
+		void triangulate (Solver& flow);
+		void addBoundary (Solver& flow);
+		void buildTriangulation (double pZero, Solver& flow);
+		void buildTriangulation (Solver& flow);
+		void updateVolumes (Solver& flow);
+		void initializeVolumes (Solver& flow);
+		void boundaryConditions(Solver& flow);
+		void updateBCs ( Solver& flow ) {
+			if (flow.T[flow.currentTes].maxId>0) boundaryConditions(flow);//avoids crash at iteration 0, when the packing is not bounded yet
 			else LOG_ERROR("updateBCs not applied");
-			flow->pressureChanged=true;}
+			flow.pressureChanged=true;}
 
-		TPL void imposeFlux(Vector3r pos, Real flux,Solver& flow);
-		TPL unsigned int imposePressure(Vector3r pos, Real p,Solver& flow);
-		TPL void setImposedPressure(unsigned int cond, Real p,Solver& flow);
-		TPL void clearImposedPressure(Solver& flow);
-		TPL void clearImposedFlux(Solver& flow);
-		TPL void computeLubricationContributions(Solver& flow);
-		TPL Real getCellFlux(unsigned int cond, const shared_ptr<Solver>& flow);
-		TPL Real getBoundaryFlux(unsigned int boundary,Solver& flow) {return flow->boundaryFlux(boundary);}
-		TPL Vector3r fluidForce(unsigned int id_sph, Solver& flow) {
-			const CGT::CVector& f=flow->T[flow->currentTes].vertex(id_sph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
-		TPL Vector3r shearLubForce(unsigned int id_sph, Solver& flow) {
-			return (flow->shearLubricationForces.size()>id_sph)?flow->shearLubricationForces[id_sph]:Vector3r::Zero();}
-		TPL Vector3r shearLubTorque(unsigned int id_sph, Solver& flow) {
-			return (flow->shearLubricationTorques.size()>id_sph)?flow->shearLubricationTorques[id_sph]:Vector3r::Zero();}
-		TPL Vector3r pumpLubTorque(unsigned int id_sph, Solver& flow) {
-			return (flow->pumpLubricationTorques.size()>id_sph)?flow->pumpLubricationTorques[id_sph]:Vector3r::Zero();}
-		TPL Vector3r twistLubTorque(unsigned int id_sph, Solver& flow) {
-			return (flow->twistLubricationTorques.size()>id_sph)?flow->twistLubricationTorques[id_sph]:Vector3r::Zero();}
-		TPL Vector3r normalLubForce(unsigned int id_sph, Solver& flow) {
-			return (flow->normalLubricationForce.size()>id_sph)?flow->normalLubricationForce[id_sph]:Vector3r::Zero();}
-		TPL Matrix3r bodyShearLubStress(unsigned int id_sph, Solver& flow) {
-			return (flow->shearLubricationBodyStress.size()>id_sph)?flow->shearLubricationBodyStress[id_sph]:Matrix3r::Zero();}
-		TPL Matrix3r bodyNormalLubStress(unsigned int id_sph, Solver& flow) {
-			return (flow->normalLubricationBodyStress.size()>id_sph)?flow->normalLubricationBodyStress[id_sph]:Matrix3r::Zero();}
-		TPL Vector3r shearVelocity(unsigned int interaction, Solver& flow) {
-			return (flow->deltaShearVel[interaction]);}
-		TPL Vector3r normalVelocity(unsigned int interaction, Solver& flow) {
-			return (flow->deltaNormVel[interaction]);}
-		TPL Matrix3r normalStressInteraction(unsigned int interaction, Solver& flow) {
-			return (flow->normalStressInteraction[interaction]);}
-		TPL Matrix3r shearStressInteraction(unsigned int interaction, Solver& flow) {
-			return (flow->shearStressInteraction[interaction]);}
-		TPL Vector3r normalVect(unsigned int interaction, Solver& flow) {
-			return (flow->normalV[interaction]);}
-		TPL Real surfaceDistanceParticle(unsigned int interaction, Solver& flow) {
-			return (flow->surfaceDistance[interaction]);}
-		TPL Real edgeSize(Solver& flow) {
-			return (flow->edgeIds.size());}
-		TPL Real OSI(Solver& flow) {
-			return (flow->onlySpheresInteractions.size());}
-		TPL int onlySpheresInteractions(unsigned int interaction, Solver& flow) {
-			return (flow->onlySpheresInteractions[interaction]);}
-		TPL python::list getConstrictions(bool all, Solver& flow) {
-			vector<Real> csd=flow->getConstrictions(); python::list pycsd;
+		void imposeFlux(Vector3r pos, Real flux);
+		unsigned int imposePressure(Vector3r pos, Real p);
+		void setImposedPressure(unsigned int cond, Real p);
+		void clearImposedPressure();
+		void clearImposedFlux();
+		void computeViscousForces(Solver& flow);
+		Real getCellFlux(unsigned int cond);
+		Real getBoundaryFlux(unsigned int boundary) {return solver->boundaryFlux(boundary);}
+		Vector3r fluidForce(unsigned int idSph) {
+			const CGT::CVector& f=solver->T[solver->currentTes].vertex(idSph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
+			
+		Vector3r shearLubForce(unsigned int id_sph) {
+			return (solver->shearLubricationForces.size()>id_sph)?solver->shearLubricationForces[id_sph]:Vector3r::Zero();}
+		Vector3r shearLubTorque(unsigned int id_sph) {
+			return (solver->shearLubricationTorques.size()>id_sph)?solver->shearLubricationTorques[id_sph]:Vector3r::Zero();}
+		Vector3r pumpLubTorque(unsigned int id_sph) {
+			return (solver->pumpLubricationTorques.size()>id_sph)?solver->pumpLubricationTorques[id_sph]:Vector3r::Zero();}
+		Vector3r twistLubTorque(unsigned int id_sph) {
+			return (solver->twistLubricationTorques.size()>id_sph)?solver->twistLubricationTorques[id_sph]:Vector3r::Zero();}
+		Vector3r normalLubForce(unsigned int id_sph) {
+			return (solver->normalLubricationForce.size()>id_sph)?solver->normalLubricationForce[id_sph]:Vector3r::Zero();}
+		Matrix3r bodyShearLubStress(unsigned int id_sph) {
+			return (solver->shearLubricationBodyStress.size()>id_sph)?solver->shearLubricationBodyStress[id_sph]:Matrix3r::Zero();}
+		Matrix3r bodyNormalLubStress(unsigned int id_sph) {
+			return (solver->normalLubricationBodyStress.size()>id_sph)?solver->normalLubricationBodyStress[id_sph]:Matrix3r::Zero();}	
+		Vector3r shearVelocity(unsigned int interaction) {
+			return (solver->deltaShearVel[interaction]);}
+		Vector3r normalVelocity(unsigned int interaction) {
+			return (solver->deltaNormVel[interaction]);}
+		Matrix3r normalStressInteraction(unsigned int interaction) {
+			return (solver->normalStressInteraction[interaction]);}
+		Matrix3r shearStressInteraction(unsigned int interaction) {
+			return (solver->shearStressInteraction[interaction]);}
+		Vector3r normalVect(unsigned int interaction) {
+			return (solver->normalV[interaction]);}
+		Real surfaceDistanceParticle(unsigned int interaction) {
+			return (solver->surfaceDistance[interaction]);}
+		Real edgeSize() {
+			return (solver->edgeIds.size());}
+		Real OSI() {
+			return (solver->onlySpheresInteractions.size());}
+		int onlySpheresInteractions(unsigned int interaction) {
+			return (solver->onlySpheresInteractions[interaction]);}
+		python::list getConstrictions(bool all) {
+			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k]!=0) || csd[k]>0) pycsd.append(csd[k]); return pycsd;}
-		TPL python::list getConstrictionsFull(bool all, Solver& flow) {
-			vector<Constriction> csd=flow->getConstrictionsFull(); python::list pycsd;
+		python::list getConstrictionsFull(bool all) {
+			vector<Constriction> csd=solver->getConstrictionsFull(); python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k].second[0]!=0) || csd[k].second[0]>0) {
 				python::list cons;
 				cons.append(csd[k].first.first);
@@ -165,344 +180,380 @@ class FlowEngine : public PartialEngine
 		Real volumeCellTripleFictious (Cellhandle cell);
 		template<class Cellhandle>
 		Real volumeCell (Cellhandle cell);
+		void Oedometer_Boundary_Conditions();
 		void averageRealCellVelocity();
-		void saveVtk() {solver->saveVtk();}
-		vector<Real> avFlVelOnSph(unsigned int id_sph) {return solver->averageFluidVelocityOnSphere(id_sph);}
+		void saveVtk(const char* folder) {solver->saveVtk(folder);}
+		vector<Real> avFlVelOnSph(unsigned int idSph) {return solver->averageFluidVelocityOnSphere(idSph);}
+
+// 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; updateTriangulation=true;}
 		void pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
-		TPL int getCell(double posX, double posY, double posZ, Solver& flow){return flow->getCell(posX, posY, posZ);}
-		TPL unsigned int nCells(Solver& flow){return flow->T[flow->currentTes].cellHandles.size();}
-		TPL python::list getVertices(unsigned int id, Solver& flow){
+		int getCell(double posX, double posY, double posZ){return solver->getCell(posX, posY, posZ);}
+		unsigned int nCells(){return solver->T[solver->currentTes].cellHandles.size();}
+		python::list getVertices(unsigned int id){
 			python::list ids;
-			if (id>=flow->T[flow->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<flow->T[flow->currentTes].cellHandles.size()); return ids;}			
-			for (unsigned int i=0;i<4;i++) ids.append(flow->T[flow->currentTes].cellHandles[id]->vertex(i)->info().id());
+			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}			
+			for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->vertex(i)->info().id());
 			return ids;
 		}
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
 		#ifdef LINSOLV
-		TPL void exportMatrix(string filename,Solver& flow) {if (useSolver>0) flow->exportMatrix(filename.c_str());
-			else LOG_ERROR("available for Cholmod solver (useSolver>0)");}
-		TPL void exportTriplets(string filename,Solver& flow) {if (useSolver>0) flow->exportTriplets(filename.c_str());
-			else LOG_ERROR("available for Cholmod solver (useSolver>0)");}
+		void exportMatrix(string filename) {if (useSolver==3) solver->exportMatrix(filename.c_str());
+			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		void exportTriplets(string filename) {if (useSolver==3) solver->exportTriplets(filename.c_str());
+			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
 		#endif
 
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
-		//Instanciation of templates for python binding
-		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
-		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
-		Vector3r 	_pumpLubTorque(unsigned int id_sph) {return pumpLubTorque(id_sph,solver);}
-		Vector3r 	_twistLubTorque(unsigned int id_sph) {return twistLubTorque(id_sph,solver);}
-		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
-		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
-		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
-		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
-		Vector3r 	_shearVelocity(unsigned int interaction) {return shearVelocity(interaction,solver);}
-		Vector3r 	_normalVelocity(unsigned int interaction) {return normalVelocity(interaction,solver);}
-		Matrix3r 	_normalStressInteraction(unsigned int interaction) {return normalStressInteraction(interaction,solver);}
-		Matrix3r 	_shearStressInteraction(unsigned int interaction) {return shearStressInteraction(interaction,solver);}
-		Vector3r 	_normalVect(unsigned int interaction) {return normalVect(interaction,solver);}
-		Real	 	_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
-		int	 	_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
-		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
-		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,solver);}	
-		void 		_setImposedPressure(unsigned int cond, Real p) {setImposedPressure(cond,p,solver);}
-		void 		_clearImposedPressure() {clearImposedPressure(solver);}
-		void 		_clearImposedFlux() {clearImposedFlux(solver);}
-		void 		_updateBCs() {updateBCs(solver);}
-		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
-		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
-		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
-		unsigned int	_nCells() {return nCells(solver);}
-		python::list	_getVertices(unsigned int id) {return getVertices(id,solver);}
 		#ifdef LINSOLV
-		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
-		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
-		void		_setForceMetis (bool force) {setForceMetis(solver,force);}
-		bool		_getForceMetis () {return getForceMetis (solver);}
 		void		cholmodStats() {
 					cerr << cholmod_print_common("PFV Cholmod factorization",&(solver->eSolver.cholmod()))<<endl;
 					cerr << "cholmod method:" << solver->eSolver.cholmod().selected<<endl;
 					cerr << "METIS called:"<<solver->eSolver.cholmod().called_nd<<endl;}
 		bool		metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
 		#endif
-		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
-		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
 
-		virtual ~FlowEngine();
-
+		virtual ~TemplateFlowEngine();
 		virtual void action();
 		virtual void backgroundAction();
-
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
-					((bool,isActivated,true,,"Activates Flow Engine"))
-					((bool,first,true,,"Controls the initialization/update phases"))
-					((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
-					((Real, dt, 0,,"timestep [s]"))
-					((bool,permeabilityMap,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
-					((bool, slipBoundary, true,, "Controls friction condition on lateral walls"))
-					((bool,waveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
-					((double, sineMagnitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied (p )"))
-					((double, sineAverage, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
-					((bool, debug, false,,"Activate debug messages"))
-					((double, wallThickness,0.001,,"Walls thickness"))
-					((double,pZero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
-					((double,tolerance,1e-06,,"Gauss-Seidel Tolerance"))
-					((double,relax,1.9,,"Gauss-Seidel relaxation"))
-					((bool, updateTriangulation, 0,,"If true the medium is retriangulated. Can be switched on to force retriangulation after some events (else it will be true periodicaly based on :yref:`FlowEngine::defTolerance` and :yref:`FlowEngine::meshUpdateInterval`. Of course, it costs CPU time."))
-					((int,meshUpdateInterval,1000,,"Maximum number of timesteps between re-triangulation events. See also :yref:`FlowEngine::defTolerance`."))
-					((double, epsVolMax, 0,(Attr::readonly),"Maximal absolute volumetric strain computed at each iteration. |yupdate|"))
-					((double, defTolerance,0.05,,"Cumulated deformation threshold for which retriangulation of pore space is performed. If negative, the triangulation update will occure with a fixed frequency on the basis of :yref:`FlowEngine::meshUpdateInterval`"))
-					((double, porosity, 0,(Attr::readonly),"Porosity computed at each retriangulation |yupdate|"))
-					((bool,meanKStat,false,,"report the local permeabilities' correction"))
-					((bool,clampKValues,true,,"If true, clamp local permeabilities in [minKdivKmean,maxKdivKmean]*globalK. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
-					((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
-					((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
-					((double,permeabilityFactor,1.0,,"permability multiplier"))
-					((double,viscosity,1.0,,"viscosity of the fluid"))
-					((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
-					((int, useSolver, 0,, "Solver to use: 0=Gauss-Seidel (iterative), 1=CHOLMOD (direct sparse cholesky)"))
-					((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
-					((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
-					((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
-					((int, ymax,3,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
-					((int, zmin,4,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
-					((int, zmax,5,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
-
-					((vector<bool>, bndCondIsPressure, vector<bool>(6,false),,"defines the type of boundary condition for each side. True if pressure is imposed, False for no-flux. Indexes can be retrieved with :yref:`FlowEngine::xmin` and friends."))
-					((vector<double>, bndCondValue, vector<double>(6,0),,"Imposed value of a boundary condition. Only applies if the boundary condition is imposed pressure, else the imposed flux is always zero presently (may be generalized to non-zero imposed fluxes in the future)."))
-					//FIXME: to be implemented:
-					((vector<Vector3r>, boundaryVelocity, vector<Vector3r>(6,Vector3r::Zero()),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
-					((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
-					((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
-					((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
-					((bool, viscousShear, false,,"Compute viscous shear terms as developped by Donia Marzougui (FIXME: ref.)"))
-					((bool, shearLubrication, false,,"Compute shear lubrication force as developped by Brule (FIXME: ref.) "))
-					((bool, pumpTorque, false,,"Compute pump torque applied on particles "))
-					((bool, twistTorque, false,,"Compute twist torque applied on particles "))
-					((double, eps, 0.00001,,"roughness defined as a fraction of particles size, giving the minimum distance between particles in the lubrication model."))
-					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
-					((bool, normalLubrication, false,,"Compute normal lubrication force as developped by Brule"))
-					((bool, viscousNormalBodyStress, false,,"Compute normal viscous stress applied on each body"))
-					((bool, viscousShearBodyStress, false,,"Compute shear viscous stress applied on each body"))
-					((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
-					#ifdef EIGENSPARSE_LIB
-					((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
-					((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
-					#endif
-					,
-					/*deprec*/
-					((meanK_opt,clampKValues,"the name changed"))
-					,,
-					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
-					for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero(); wallIds[i]=i;}
-					normal[wallyMin].y()=normal[wallxMin].x()=normal[wallzMin].z()=1;
-					normal[wallyMax].y()=normal[wallxMax].x()=normal[wallzMax].z()=-1;
-					solver = shared_ptr<FlowSolver> (new FlowSolver);
-					first=true;
-					epsVolMax=epsVolCumulative=retriangulationLastIter=0;
-					ReTrg=1;
-					backgroundCompleted=true;
-					ellapsedIter=0;
-					,
-					.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
-					.def("imposePressure",&FlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
-					.def("setImposedPressure",&FlowEngine::_setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
-					.def("clearImposedPressure",&FlowEngine::_clearImposedPressure,"Clear the list of points with pressure imposed.")
-					.def("clearImposedFlux",&FlowEngine::_clearImposedFlux,"Clear the list of points with flux imposed.")
-					.def("getCellFlux",&FlowEngine::_getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
-					.def("getBoundaryFlux",&FlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
-					.def("getConstrictions",&FlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
-					.def("getConstrictionsFull",&FlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
-					.def("saveVtk",&FlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
-					.def("avFlVelOnSph",&FlowEngine::avFlVelOnSph,(python::arg("Id_sph")),"Compute a sphere-centered average fluid velocity")
-					.def("fluidForce",&FlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
-					.def("shearLubForce",&FlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
-					.def("shearLubTorque",&FlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
-					.def("pumpLubTorque",&FlowEngine::_pumpLubTorque,(python::arg("Id_sph")),"Return the pump torque on sphere Id_sph.")
-					.def("twistLubTorque",&FlowEngine::_twistLubTorque,(python::arg("Id_sph")),"Return the twist torque on sphere Id_sph.")
-					.def("normalLubForce",&FlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
-					.def("bodyShearLubStress",&FlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
-					.def("bodyNormalLubStress",&FlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
-					.def("shearVelocity",&FlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
-					.def("normalVelocity",&FlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
-					.def("normalVect",&FlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
-					.def("surfaceDistanceParticle",&FlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
-					.def("onlySpheresInteractions",&FlowEngine::_onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
-					
-					
-					.def("pressureProfile",&FlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
-					.def("getPorePressure",&FlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
-					.def("averageSlicePressure",&FlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
-					.def("averagePressure",&FlowEngine::averagePressure,"Measure averaged pore pressure in the entire volume")
-					.def("updateBCs",&FlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-					.def("emulateAction",&FlowEngine::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
-					.def("getCell",&FlowEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
-					.def("nCells",&FlowEngine::_nCells,"get the total number of finite cells in the triangulation.")
-					.def("getVertices",&FlowEngine::_getVertices,(python::arg("id")),"get the vertices of a cell")
-					#ifdef LINSOLV
-					.def("exportMatrix",&FlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
-					.def("exportTriplets",&FlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
-					.def("cholmodStats",&FlowEngine::cholmodStats,"get statistics of cholmod solver activity")
-					.def("metisUsed",&FlowEngine::metisUsed,"check wether metis lib is effectively used")
-					.add_property("forceMetis",&FlowEngine::_getForceMetis,&FlowEngine::_setForceMetis,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation")
-					#endif
-					)
-		DECLARE_LOGGER;
-};
-
-
-template<class Solver>
-unsigned int FlowEngine::imposePressure(Vector3r pos, Real p,Solver& flow)
-{
-	if (!flow) LOG_ERROR("no flow defined yet, run at least one iter");
-	flow->imposedP.push_back( pair<CGT::Point,Real>(CGT::Point(pos[0],pos[1],pos[2]),p) );
-	//force immediate update of boundary conditions
-	updateTriangulation=true;
-	return flow->imposedP.size()-1;
-}
-
-
-
-REGISTER_SERIALIZABLE(FlowEngine);
-
-#ifdef LINSOLV
-#define _PeriFlowSolver CGT::PeriodicFlowLinSolv
-#else
-#define _PeriFlowSolver CGT::PeriodicFlow
-#endif
-
-class PeriodicFlowEngine : public FlowEngine
-{
-	public :
-		public :
-		typedef _PeriFlowSolver							FlowSolver;
-		typedef PeriFlowTesselation						Tesselation;
-		typedef FlowSolver::RTriangulation					RTriangulation;
-		typedef FlowSolver::FiniteVerticesIterator                    		FiniteVerticesIterator;
-		typedef FlowSolver::FiniteCellsIterator				FiniteCellsIterator;
-		typedef FlowSolver::CellHandle						CellHandle;
-		typedef RTriangulation::Finite_edges_iterator				FiniteEdgesIterator;
-		typedef RTriangulation::Vertex_handle					VertexHandle;
 		
-		shared_ptr<FlowSolver> solver;
-		shared_ptr<FlowSolver> backgroundSolver;
-		
-		void triangulate (shared_ptr<FlowSolver>& flow);
-		void buildTriangulation (Real pzero, shared_ptr<FlowSolver>& flow);
-		void initializeVolumes (shared_ptr<FlowSolver>&  flow);
-		void updateVolumes (shared_ptr<FlowSolver>&  flow);
-		Real volumeCell (CellHandle cell);
-
-		Real volumeCellSingleFictious (CellHandle cell);
-		inline void locateCell(CellHandle baseCell, unsigned int& index, int& baseIndex, shared_ptr<FlowSolver>& flow, unsigned int count=0);
-		Vector3r meanVelocity();
-
-		virtual ~PeriodicFlowEngine();
-
-		virtual void action();
-		void backgroundAction();
-		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
-		void preparePShifts();
-		
-		//(re)instanciation of templates and others, for python binding
-		void saveVtk(const char* folder) {solver->saveVtk(folder);}
-		Vector3r 	_shearLubForce(unsigned int id_sph) {return shearLubForce(id_sph,solver);}
-		Vector3r 	_shearLubTorque(unsigned int id_sph) {return shearLubTorque(id_sph,solver);}
-		Vector3r 	_pumpLubTorque(unsigned int id_sph) {return pumpLubTorque(id_sph,solver);}
-		Vector3r 	_twistLubTorque(unsigned int id_sph) {return twistLubTorque(id_sph,solver);}
-		Vector3r 	_normalLubForce(unsigned int id_sph) {return normalLubForce(id_sph,solver);}
-		Matrix3r 	_bodyShearLubStress(unsigned int id_sph) {return bodyShearLubStress(id_sph,solver);}
-		Matrix3r 	_bodyNormalLubStress(unsigned int id_sph) {return bodyNormalLubStress(id_sph,solver);}
-		Matrix3r 	_normalStressInteraction(unsigned int interaction) {return normalStressInteraction(interaction,solver);}
-		Matrix3r 	_shearStressInteraction(unsigned int interaction) {return shearStressInteraction(interaction,solver);}
-		Vector3r 	_shearVelocity(unsigned int id_sph) {return shearVelocity(id_sph,solver);}
-		Vector3r 	_normalVelocity(unsigned int id_sph) {return normalVelocity(id_sph,solver);}
-		Vector3r 	_normalVect(unsigned int id_sph) {return normalVect(id_sph,solver);}
-		Real		_surfaceDistanceParticle(unsigned int interaction) {return surfaceDistanceParticle(interaction,solver);}
-		int		_onlySpheresInteractions(unsigned int interaction) {return onlySpheresInteractions(interaction,solver);}
-		Real		_edgeSize() {return edgeSize(solver);}
-		Real		_OSI() {return OSI(solver);}
-
-		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph, solver);}
-		void 		_imposeFlux(Vector3r pos, Real flux) {return imposeFlux(pos,flux,*solver);}
-		unsigned int 	_imposePressure(Vector3r pos, Real p) {return imposePressure(pos,p,this->solver);}
-		Real 		_getBoundaryFlux(unsigned int boundary) {return getBoundaryFlux(boundary,solver);}
-			
-		void 		_updateBCs() {updateBCs(solver);}
-		double 		getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
-		double 		averagePressure(){return solver->averagePressure();}
-		void 		pressureProfile(double wallUpY, double wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
-
-		int		_getCell(Vector3r pos) {return getCell(pos[0],pos[1],pos[2],solver);}
-		#ifdef LINSOLV
-		void 		_exportMatrix(string filename) {exportMatrix(filename,solver);}
-		void 		_exportTriplets(string filename) {exportTriplets(filename,solver);}
-		#endif
-		Real 		_getCellFlux(unsigned int cond) {return getCellFlux(cond,solver);}
-		python::list 	_getConstrictions(bool all) {return getConstrictions(all,solver);}
-		python::list 	_getConstrictionsFull(bool all) {return getConstrictionsFull(all,solver);}
-
 		//commodities
 		void compTessVolumes() {
-			solver->T[solver->currentTes].Compute();
-			solver->T[solver->currentTes].ComputeVolumes();
+			solver->T[solver->currentTes].compute();
+			solver->T[solver->currentTes].computeVolumes();
 		}
 		Real getVolume (Body::id_t id) {
 			if (solver->T[solver->currentTes].Max_id() <= 0) {emulateAction(); LOG_WARN("Not triangulated yet, emulating action");}
 			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes(); LOG_WARN("Computing all volumes now, as you did not request it explicitely.");}
 			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine,"A variant of :yref:`FlowEngine` implementing periodic boundary conditions. The API is very similar.",
-			((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
-			((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
-			,,
-			wallIds=vector<int>(6,-1);
-			solver = shared_ptr<FlowSolver> (new FlowSolver);
-			epsVolMax=epsVolCumulative=retriangulationLastIter=0;
-			ReTrg=1;
-			first=true;
-			,
-			.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
-			.def("fluidForce",&PeriodicFlowEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
-			.def("shearLubForce",&PeriodicFlowEngine::_shearLubForce,(python::arg("Id_sph")),"Return the shear lubrication force on sphere Id_sph.")
-			.def("shearLubTorque",&PeriodicFlowEngine::_shearLubTorque,(python::arg("Id_sph")),"Return the shear lubrication torque on sphere Id_sph.")
-			.def("pumpLubTorque",&PeriodicFlowEngine::_pumpLubTorque,(python::arg("Id_sph")),"Return the pump torque on sphere Id_sph.")
-			.def("twistLubTorque",&PeriodicFlowEngine::_twistLubTorque,(python::arg("Id_sph")),"Return the twist torque on sphere Id_sph.")
-			.def("normalLubForce",&PeriodicFlowEngine::_normalLubForce,(python::arg("Id_sph")),"Return the normal lubrication force on sphere Id_sph.")
-			.def("bodyShearLubStress",&PeriodicFlowEngine::_bodyShearLubStress,(python::arg("Id_sph")),"Return the shear lubrication stress on sphere Id_sph.")
-			.def("bodyNormalLubStress",&PeriodicFlowEngine::_bodyNormalLubStress,(python::arg("Id_sph")),"Return the normal lubrication stress on sphere Id_sph.")
-			.def("shearVelocity",&PeriodicFlowEngine::_shearVelocity,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
-			.def("normalStressInteraction",&PeriodicFlowEngine::_normalStressInteraction,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
-			.def("shearStressInteraction",&PeriodicFlowEngine::_shearStressInteraction,(python::arg("id_sph")),"Return the shear velocity of the interaction.")
-			.def("normalVelocity",&PeriodicFlowEngine::_normalVelocity,(python::arg("id_sph")),"Return the normal velocity of the interaction.")
-			.def("normalVect",&PeriodicFlowEngine::_normalVect,(python::arg("id_sph")),"Return the normal vector between particles.")
-			.def("surfaceDistanceParticle",&PeriodicFlowEngine::_surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
-			.def("onlySpheresInteractions",&PeriodicFlowEngine::_onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
-			.def("edgeSize",&PeriodicFlowEngine::_edgeSize,"Return the number of interactions.")
-			.def("OSI",&PeriodicFlowEngine::_OSI,"Return the number of interactions only between spheres.")
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
+		((bool,isActivated,true,,"Activates Flow Engine"))
+		((bool,first,true,,"Controls the initialization/update phases"))
+		((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
+		((Real, dt, 0,,"timestep [s]"))
+		((bool,permeabilityMap,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
+		((bool, slipBoundary, true,, "Controls friction condition on lateral walls"))
+		((bool,waveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
+		((double, sineMagnitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied (p )"))
+		((double, sineAverage, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
+		((bool, debug, false,,"Activate debug messages"))
+		((double, wallThickness,0.001,,"Walls thickness"))
+		((double,pZero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
+		((double,tolerance,1e-06,,"Gauss-Seidel tolerance"))
+		((double,relax,1.9,,"Gauss-Seidel relaxation"))
+		((bool, updateTriangulation, 0,,"If true the medium is retriangulated. Can be switched on to force retriangulation after some events (else it will be true periodicaly based on :yref:`FlowEngine::defTolerance` and :yref:`FlowEngine::meshUpdateInterval`. Of course, it costs CPU time."))
+		((int,meshUpdateInterval,1000,,"Maximum number of timesteps between re-triangulation events. See also :yref:`FlowEngine::defTolerance`."))
+		((double, epsVolMax, 0,(Attr::readonly),"Maximal absolute volumetric strain computed at each iteration. |yupdate|"))
+		((double, defTolerance,0.05,,"Cumulated deformation threshold for which retriangulation of pore space is performed. If negative, the triangulation update will occure with a fixed frequency on the basis of :yref:`FlowEngine::meshUpdateInterval`"))
+		((double, porosity, 0,(Attr::readonly),"Porosity computed at each retriangulation |yupdate|"))
+		((bool,meanKStat,false,,"report the local permeabilities' correction"))
+		((bool,clampKValues,true,,"If true, clamp local permeabilities in [minKdivKmean,maxKdivKmean]*globalK. This clamping can avoid singular values in the permeability matrix and may reduce numerical errors in the solve phase. It will also hide junk values if they exist, or bias all values in very heterogeneous problems. So, use this with care."))
+		((Real,minKdivKmean,0.0001,,"define the min K value (see :yref:`FlowEngine::clampKValues`)"))
+		((Real,maxKdivKmean,100,,"define the max K value (see :yref:`FlowEngine::clampKValues`)"))
+		((double,permeabilityFactor,1.0,,"permability multiplier"))
+		((double,viscosity,1.0,,"viscosity of the fluid"))
+		((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
+		((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
+		((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
+		((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+		((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+		((int, ymax,3,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+		((int, zmin,4,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
+		((int, zmax,5,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
 
-// 			.def("imposeFlux",&FlowEngine::_imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
-			.def("saveVtk",&PeriodicFlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
-			.def("imposePressure",&PeriodicFlowEngine::_imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
-			.def("getBoundaryFlux",&PeriodicFlowEngine::_getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.")
-			.def("getPorePressure",&PeriodicFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
-			.def("averagePressure",&PeriodicFlowEngine::averagePressure,"Measure averaged pore pressure in the entire volume")
-			.def("pressureProfile",&PeriodicFlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+		((vector<bool>, bndCondIsPressure, vector<bool>(6,false),,"defines the type of boundary condition for each side. True if pressure is imposed, False for no-flux. Indexes can be retrieved with :yref:`FlowEngine::xmin` and friends."))
+		((vector<double>, bndCondValue, vector<double>(6,0),,"Imposed value of a boundary condition. Only applies if the boundary condition is imposed pressure, else the imposed flux is always zero presently (may be generalized to non-zero imposed fluxes in the future)."))
+		//FIXME: to be implemented:
+		((vector<Vector3r>, boundaryVelocity, vector<Vector3r>(6,Vector3r::Zero()),, "velocity on top boundary, only change it using :yref:`FlowEngine::setBoundaryVel`"))
+		((int, ignoredBody,-1,,"Id of a sphere to exclude from the triangulation.)"))
+		((vector<int>, wallIds,vector<int>(6),,"body ids of the boundaries (default values are ok only if aabbWalls are appended before spheres, i.e. numbered 0,...,5)"))
+		((vector<bool>, boundaryUseMaxMin, vector<bool>(6,true),,"If true (default value) bounding sphere is added as function of max/min sphere coord, if false as function of yade wall position"))
+// 					((bool, display_force, false,,"display the lubrication force applied on particles"))
+// 					((bool, create_file, false,,"create file of velocities"))
+		((bool, viscousShear, false,,"compute viscous shear terms as developped by Donia Marzougui (FIXME: ref.)"))
+		((bool, shearLubrication, false,,"compute shear lubrication force as developped by Brule (FIXME: ref.) "))
+		((bool, pumpTorque, false,,"Compute pump torque applied on particles "))
+		((bool, twistTorque, false,,"Compute twist torque applied on particles "))
+		((double, eps, 0.00001,,"roughness defined as a fraction of particles size, giving the minimum distance between particles in the lubrication model."))
+		((bool, pressureForce, true,,"compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
+		((bool, normalLubrication, false,,"compute normal lubrication force as developped by Brule"))
+		((bool, viscousNormalBodyStress, false,,"compute normal viscous stress applied on each body"))
+		((bool, viscousShearBodyStress, false,,"compute shear viscous stress applied on each body"))
+		((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
+		#ifdef EIGENSPARSE_LIB
+		((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
+		((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
+		#endif
+		,
+		/*deprec*/
+		((meanK_opt,clampKValues,"the name changed"))
+		,,
+		timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+		for (int i=0; i<6; ++i){normal[i]=Vector3r::Zero(); wallIds[i]=i;}
+		normal[wall_ymin].y()=normal[wall_xmin].x()=normal[wall_zmin].z()=1;
+		normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
+		solver = shared_ptr<FlowSolver> (new FlowSolver);
+		first=true;
+		epsVolMax=epsVolCumulative=retriangulationLastIter=0;
+		ReTrg=1;
+		backgroundCompleted=true;
+		ellapsedIter=0;
+		,
+		.def("imposeFlux",&TemplateFlowEngine::imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
+		.def("imposePressure",&TemplateFlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
+		.def("setImposedPressure",&TemplateFlowEngine::setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
+		.def("clearImposedPressure",&TemplateFlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
+		.def("clearImposedFlux",&TemplateFlowEngine::clearImposedFlux,"Clear the list of points with flux imposed.")
+		.def("getCellFlux",&TemplateFlowEngine::getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+		.def("getBoundaryFlux",&TemplateFlowEngine::getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
+		.def("getConstrictions",&TemplateFlowEngine::getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
+		.def("getConstrictionsFull",&TemplateFlowEngine::getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
+		.def("edgeSize",&TemplateFlowEngine::edgeSize,"Return the number of interactions.")
+		.def("OSI",&TemplateFlowEngine::OSI,"Return the number of interactions only between spheres.")
+		
+		.def("saveVtk",&TemplateFlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
+		.def("avFlVelOnSph",&TemplateFlowEngine::avFlVelOnSph,(python::arg("idSph")),"compute a sphere-centered average fluid velocity")
+		.def("fluidForce",&TemplateFlowEngine::fluidForce,(python::arg("idSph")),"Return the fluid force on sphere idSph.")
+		.def("shearLubForce",&TemplateFlowEngine::shearLubForce,(python::arg("idSph")),"Return the shear lubrication force on sphere idSph.")
+		.def("shearLubTorque",&TemplateFlowEngine::shearLubTorque,(python::arg("idSph")),"Return the shear lubrication torque on sphere idSph.")
+		.def("normalLubForce",&TemplateFlowEngine::normalLubForce,(python::arg("idSph")),"Return the normal lubrication force on sphere idSph.")
+		.def("bodyShearLubStress",&TemplateFlowEngine::bodyShearLubStress,(python::arg("idSph")),"Return the shear lubrication stress on sphere idSph.")
+		.def("bodyNormalLubStress",&TemplateFlowEngine::bodyNormalLubStress,(python::arg("idSph")),"Return the normal lubrication stress on sphere idSph.")
+		.def("shearVelocity",&TemplateFlowEngine::shearVelocity,(python::arg("idSph")),"Return the shear velocity of the interaction.")
+		.def("normalVelocity",&TemplateFlowEngine::normalVelocity,(python::arg("idSph")),"Return the normal velocity of the interaction.")
+		.def("normalVect",&TemplateFlowEngine::normalVect,(python::arg("idSph")),"Return the normal vector between particles.")
+		.def("surfaceDistanceParticle",&TemplateFlowEngine::surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
+		.def("onlySpheresInteractions",&TemplateFlowEngine::onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
+		
+		
+		.def("pressureProfile",&TemplateFlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+		.def("getPorePressure",&TemplateFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+		.def("averageSlicePressure",&TemplateFlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
+		.def("averagePressure",&TemplateFlowEngine::averagePressure,"Measure averaged pore pressure in the entire volume")
+		.def("updateBCs",&TemplateFlowEngine::updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
+		.def("emulateAction",&TemplateFlowEngine::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
+		.def("getCell",&TemplateFlowEngine::getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+		.def("nCells",&TemplateFlowEngine::nCells,"get the total number of finite cells in the triangulation.")
+		.def("getVertices",&TemplateFlowEngine::getVertices,(python::arg("id")),"get the vertices of a cell")
+		#ifdef LINSOLV
+		.def("exportMatrix",&TemplateFlowEngine::exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
+		.def("exportTriplets",&TemplateFlowEngine::exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+		.def("cholmodStats",&TemplateFlowEngine::cholmodStats,"get statistics of cholmod solver activity")
+		.def("metisUsed",&TemplateFlowEngine::metisUsed,"check wether metis lib is effectively used")
+		.add_property("forceMetis",&TemplateFlowEngine::getForceMetis,&TemplateFlowEngine::setForceMetis,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation")
+		#endif
+		.def("compTessVolumes",&TemplateFlowEngine::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
+		.def("volume",&TemplateFlowEngine::getVolume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
+		)
+};
+// Definition of functions in a separate file for clarity 
+#include<yade/pkg/dem/FlowEngine.ipp>
 
-			.def("updateBCs",&PeriodicFlowEngine::_updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
-			
-			.def("getCell",&PeriodicFlowEngine::_getCell,python::arg("pos"),"get id of the cell containing 'pos'.")
-			.def("getConstrictions",&PeriodicFlowEngine::_getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
-			.def("getConstrictionsFull",&PeriodicFlowEngine::_getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
-			#ifdef LINSOLV
-			.def("exportMatrix",&PeriodicFlowEngine::_exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
-			.def("exportTriplets",&PeriodicFlowEngine::_exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
-			#endif
-			.def("compTessVolumes",&PeriodicFlowEngine::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
-			.def("volume",&PeriodicFlowEngine::getVolume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
+// using namespace CGT;
+typedef CGT::CVector CVector;
+typedef CGT::Point Point;
+
+class FlowCellInfo : public CGT::SimpleCellInfo {
+	public:
+	//For vector storage of all cells
+	unsigned int index;
+	int volumeSign;
+	bool Pcondition;
+	Real invVoidV;
+	Real t;
+	int fict;
+ 	Real volumeVariation;
+	double pression;
+	 //average relative (fluid - facet translation) velocity defined for a single cell as 1/Volume * SUM_ON_FACETS(x_average_facet*average_facet_flow_rate)
+	CVector averageCellVelocity;
+	// Surface vectors of facets, pointing from outside toward inside the cell
+	std::vector<CVector> facetSurfaces;
+	//Ratio between fluid surface and facet surface 
+	std::vector<Real> facetFluidSurfacesRatio;
+	// Reflects the geometrical property of the cell, so that the force by cell fluid on grain "i" is pressure*unitForceVectors[i]
+	std::vector<CVector> unitForceVectors;
+	// Store the area of triangle-sphere intersections for each facet (used in forces definition)
+	std::vector<CVector> facetSphereCrossSections;
+	std::vector<CVector> cellForce;
+	std::vector<double> rayHydr;
+	std::vector<double> modulePermeability;
+	// Partial surfaces of spheres in the double-tetrahedron linking two voronoi centers. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
+	double solidSurfaces [4][4];
+
+	FlowCellInfo (void)
+	{
+		modulePermeability.resize(4, 0);
+		cellForce.resize(4);
+		facetSurfaces.resize(4);
+		facetFluidSurfacesRatio.resize(4);
+		facetSphereCrossSections.resize(4);
+		unitForceVectors.resize(4);
+		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
+		rayHydr.resize(4, 0);
+		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=0;
+		isFictious=false; Pcondition = false; isGhost = false;
+		isvisited = false; 		
+		isGhost=false;
+	}	
+	bool isGhost;
+	double invSumK;
+	bool isvisited;
+	
+	FlowCellInfo& operator= (const std::vector<double> &v) { for (int i=0; i<4;i++) modulePermeability[i]= v[i]; return *this; }
+	FlowCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
+	FlowCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
+	
+	inline Real& volume (void) {return t;}
+	inline const Real& invVoidVolume (void) const {return invVoidV;}
+	inline Real& invVoidVolume (void) {return invVoidV;}
+	inline Real& dv (void) {return volumeVariation;}
+	inline int& fictious (void) {return fict;}
+	inline double& p (void) {return pression;}
+	//For compatibility with the periodic case
+	inline const double shiftedP (void) const {return pression;}
+	inline const std::vector<double>& kNorm (void) const {return modulePermeability;}
+	inline std::vector<double>& kNorm (void) {return modulePermeability;}
+	inline std::vector< CVector >& facetSurf (void) {return facetSurfaces;}
+	inline std::vector<CVector>& force (void) {return cellForce;}
+	inline std::vector<double>& Rh (void) {return rayHydr;}
+	inline CVector& averageVelocity (void) {return averageCellVelocity;}
+};
+
+class FlowVertexInfo : public CGT::SimpleVertexInfo {
+	CVector grainVelocity;
+	Real volumeIncidentCells;
+public:
+	FlowVertexInfo& operator= (const CVector &u) { CVector::operator= (u); return *this; }
+	FlowVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
+	FlowVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
+	CVector forces;
+	bool isGhost;
+	FlowVertexInfo (void) {isGhost=false;}
+	inline CVector& force (void) {return forces;}
+	inline CVector& vel (void) {return grainVelocity;}
+	inline Real& volCells (void) {return volumeIncidentCells;}
+	inline const CVector ghostShift (void) {return CGAL::NULL_VECTOR;}
+};
+
+typedef CGT::TriangulationTypes<FlowVertexInfo,FlowCellInfo>			FlowTriangulationTypes;
+typedef CGT::_Tesselation<FlowTriangulationTypes>			FlowTesselation;
+
+
+#ifdef LINSOLV
+#define _FlowSolver CGT::FlowBoundingSphereLinSolv<FlowTesselation,CGT::FlowBoundingSphere<FlowTesselation> >
+#else
+#define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
+#endif
+
+// typedef CGT::FlowBoundingSphereLinSolv<CGT::FlowBoundingSphere<FlowTesselation> > tparam; 
+typedef TemplateFlowEngine<FlowCellInfo,FlowVertexInfo> FlowEngine;
+REGISTER_SERIALIZABLE(FlowEngine);
+
+// YADE_PLUGIN((FlowEngine));
+
+///==========================================
+class PeriodicCellInfo : public FlowCellInfo
+{	
+	public:
+	static CVector gradP;
+	//for real cell, baseIndex is the rank of the cell in cellHandles. For ghost cells, it is the baseIndex of the corresponding real cell.
+	//Unlike ordinary index, baseIndex is also indexing cells with imposed pressures
+	int baseIndex;
+	int period[3];
+	static CVector hSize[3];
+	static CVector deltaP;
+	int ghost;
+	Real* _pression;
+	PeriodicCellInfo (void){
+		_pression=&pression;
+		period[0]=period[1]=period[2]=0;
+		baseIndex=-1;
+		volumeSign=0;}
+	~PeriodicCellInfo (void) {}
+	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
+	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
+	
+	inline const double shiftedP (void) const {return isGhost? (*_pression)+pShift() :(*_pression) ;}
+	inline const double pShift (void) const {return deltaP[0]*period[0] + deltaP[1]*period[1] +deltaP[2]*period[2];}
+// 	inline const double p (void) {return shiftedP();}
+	inline void setP (const Real& p) {pression=p;}
+	virtual bool isReal (void) {return !(isFictious || isGhost);}
+};
+CVector PeriodicCellInfo::hSize[]={CVector(),CVector(),CVector()};
+CVector PeriodicCellInfo::deltaP=CVector();
+CVector PeriodicCellInfo::gradP=CVector();
+
+class PeriodicVertexInfo : public FlowVertexInfo {
+	public:
+	PeriodicVertexInfo& operator= (const CVector &u) { CVector::operator= (u); return *this; }
+	PeriodicVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
+	PeriodicVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
+	int period[3];
+	//FIXME: the name is misleading, even non-ghost can be out of the period and therefore they need to be shifted as well
+	inline const CVector ghostShift (void) {
+		return period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2];}
+	PeriodicVertexInfo (void) {isFictious=false; s=0; i=0; period[0]=period[1]=period[2]=0; isGhost=false;}
+	virtual bool isReal (void) {return !(isFictious || isGhost);}
+};
+
+typedef CGT::TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo>			PeriFlowTriangulationTypes;
+typedef CGT::PeriodicTesselation<CGT::_Tesselation<PeriFlowTriangulationTypes> >	PeriFlowTesselation;
+#ifdef LINSOLV
+#define _PeriFlowSolver CGT::PeriodicFlowLinSolv<PeriFlowTesselation>
+#else
+#define _PeriFlowSolver CGT::PeriodicFlow<PeriFlowTesselation>
+#endif
+//CGT::PeriodicFlowLinSolv<CGT::PeriodicTesselation<CGT::_Tesselation<TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo> > > >
+
+typedef TemplateFlowEngine<	PeriodicCellInfo,
+				PeriodicVertexInfo,
+				CGT::PeriodicTesselation<CGT::_Tesselation<CGT::TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo> > >,
+				_PeriFlowSolver>
+				FlowEngine_PeriodicInfo;
+REGISTER_SERIALIZABLE(FlowEngine_PeriodicInfo);
+
+// template<>
+// TFlowEng::~TFlowEng()
+// {
+// }
+YADE_PLUGIN((FlowEngine_PeriodicInfo));
+
+
+class PeriodicFlowEngine : public FlowEngine_PeriodicInfo
+{
+	public :
+		void triangulate (FlowSolver& flow);
+		void buildTriangulation (Real pzero, FlowSolver& flow);
+		void initializeVolumes (FlowSolver&  flow);
+		void updateVolumes (FlowSolver&  flow);
+		Real volumeCell (CellHandle cell);
+
+		Real volumeCellSingleFictious (CellHandle cell);
+		inline void locateCell(CellHandle baseCell, unsigned int& index, int& baseIndex, FlowSolver& flow, unsigned int count=0);
+		Vector3r meanVelocity();
+
+		virtual ~PeriodicFlowEngine();
+
+		virtual void action();
+		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
+		void preparePShifts();
+		
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine_PeriodicInfo,"A variant of :yref:`FlowEngine` implementing periodic boundary conditions. The API is very similar.",
+		((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
+		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
+		,,
+		wallIds=vector<int>(6,-1);
+		solver = shared_ptr<FlowSolver> (new FlowSolver);
+		epsVolMax=epsVolCumulative=retriangulationLastIter=0;
+		ReTrg=1;
+		first=true;
+		,
+		//nothing special to define, we re-use FlowEngine methods
+		//.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 		)
 		DECLARE_LOGGER;
 
@@ -510,6 +561,5 @@ class PeriodicFlowEngine : public FlowEngine
 };
 
 REGISTER_SERIALIZABLE(PeriodicFlowEngine);
-
 
 // #endif

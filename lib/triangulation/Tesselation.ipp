@@ -32,7 +32,7 @@ template<class TT>
 _Tesselation<TT>::_Tesselation ( RTriangulation &T ) : Tri ( &T ), Tes ( &T ), computed ( false )
 {
 	std::cout << "Tesselation(RTriangulation &T)" << std::endl;
-	Compute();
+	compute();
 }
 
 template<class TT>
@@ -140,7 +140,7 @@ Point _Tesselation<TT>::Dual ( const CellHandle &cell )
 }
 
 template<class TT>
-void _Tesselation<TT>::Compute ()
+void _Tesselation<TT>::compute ()
 {
 	if (!redirected) redirect();
 	FiniteCellsIterator cellEnd = Tri->finite_cells_end();
@@ -170,7 +170,7 @@ Segment _Tesselation<TT>::Dual ( FiniteFacetsIterator &f_it )
 }
 
 template<class TT>
-double _Tesselation<TT>::ComputeVFacetArea ( FiniteEdgesIterator ed_it )
+double _Tesselation<TT>::computeVFacetArea ( FiniteEdgesIterator ed_it )
 {
 	CellCirculator cell0 = Tri->incident_cells ( *ed_it );
 	CellCirculator cell2 = cell0;
@@ -239,9 +239,9 @@ void _Tesselation<TT>::ResetVCellVolumes ( void )
 }
 
 template<class TT>
-void _Tesselation<TT>::ComputeVolumes ( void )
+void _Tesselation<TT>::computeVolumes ( void )
 {
-	if ( !computed ) Compute();
+	if ( !computed ) compute();
 	ResetVCellVolumes();
 	for ( FiniteEdgesIterator ed_it=Tri->finite_edges_begin(); ed_it!=Tri->finite_edges_end();ed_it++ )
 	{
@@ -251,9 +251,9 @@ void _Tesselation<TT>::ComputeVolumes ( void )
 }
 
 template<class TT>
-void _Tesselation<TT>::ComputePorosity ( void )  //WARNING : This function will erase real volumes of cells
+void _Tesselation<TT>::computePorosity ( void )  //WARNING : This function will erase real volumes of cells
 {
-	ComputeVolumes();
+	computeVolumes();
 	FiniteVerticesIterator verticesEnd = Tri->finite_vertices_end ();
 	for ( FiniteVerticesIterator vIt = Tri->finite_vertices_begin (); vIt !=  verticesEnd; vIt++ )
 	{

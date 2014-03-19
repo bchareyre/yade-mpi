@@ -189,26 +189,26 @@ bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned
 	}
 }
 
-void TesselationWrapper::ComputeTesselation(void)
+void TesselationWrapper::computeTesselation(void)
 {
 	if (!rad_divided) {
 		mean_radius /= n_spheres;
 		rad_divided = true;
 	}
-	Tes->Compute();
+	Tes->compute();
 }
 
-void TesselationWrapper::ComputeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
+void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
 {
 	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
-	ComputeTesselation();
+	computeTesselation();
 }
 
-void TesselationWrapper::ComputeVolumes(void)
+void TesselationWrapper::computeVolumes(void)
 {
 	if (!bounded) addBoundingPlanes();
-	ComputeTesselation();
-	Tes->ComputeVolumes();
+	computeTesselation();
+	Tes->computeVolumes();
 }
 unsigned int TesselationWrapper::NumberOfFacets(bool initIters)
 {
@@ -349,7 +349,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 		delete Tes;
 		CGT::TriaxialState* ts;
 		if (deformation){//use the final state to compute volumes
-			/*const vector<CGT::Tenseur3>& def =*/ mma.analyser->ComputeParticlesDeformation();
+			/*const vector<CGT::Tenseur3>& def =*/ mma.analyser->computeParticlesDeformation();
 			Tes = &mma.analyser->TS1->tesselation();
 			ts = mma.analyser->TS1;
 			}
@@ -358,7 +358,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 		RTriangulation& Tri = Tes->Triangulation();
 		Pmin=ts->box.base; Pmax=ts->box.sommet;
 		//if (!scene->isPeriodic) addBoundingPlanes();
-		ComputeVolumes();
+		computeVolumes();
 		int bodiesDim = Tes->Max_id() + 1; //=scene->bodies->size();
 		cerr<<"bodiesDim="<<bodiesDim<<endl;
 		int dim1[]={bodiesDim};

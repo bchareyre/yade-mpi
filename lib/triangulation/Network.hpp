@@ -54,7 +54,7 @@ class Network
 		vector<CellHandle> boundingCells [6];
 		Point cornerMin;
 		Point cornerMax;
-		Real VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalePorosity;
+		Real VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalPorosity;
 		Boundary boundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-idOffset];}
 		short idOffset;
@@ -76,7 +76,7 @@ class Network
 		double volumeDoubleFictiousPore(VertexHandle SV1, VertexHandle SV2, VertexHandle SV3, Point PV1);
 		double volumeSingleFictiousPore(VertexHandle SV1, VertexHandle SV2, VertexHandle SV3, Point PV1);
 		double volumePoreVoronoiFraction ( CellHandle& cell, int& j, bool reuseFacetData=false);
-		double surfaceSolidPore( CellHandle cell, int j, bool slipOnLaterals, bool reuseFacetData=false);
+		double surfaceSolidPore( CellHandle cell, int j, bool slipBoundary, bool reuseFacetData=false);
 		double sphericalTriangleArea ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
 		
 		CVector surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3);

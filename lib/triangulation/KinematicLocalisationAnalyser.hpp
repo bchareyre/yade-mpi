@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-/*! \brief Computes statistics of micro-variables assuming axi-symetry.
+/*! \brief computes statistics of micro-variables assuming axi-symetry.
 	
  */
 
@@ -53,7 +53,7 @@ class KinematicLocalisationAnalyser
 		
 
 		bool DistribsToFile (const char* output_file_name);
-		///Write the averaged deformation on each grain in a file (vertices and cells lists included in the file), no need to call ComputeParticlesDeformation()
+		///Write the averaged deformation on each grain in a file (vertices and cells lists included in the file), no need to call computeParticlesDeformation()
 		bool DefToFile (const char* output_file_name = "deformations");
 		bool DefToFile (const char* state_file1, const char* state_file0, const char* output_file_name="deformation.vtk", bool usebz2=false);
 		///Save/Load states using bz2 compression
@@ -79,14 +79,14 @@ class KinematicLocalisationAnalyser
 
 		///Add surface*displacement to T
 		void Grad_u ( Finite_cells_iterator cell, int facet, CVector &V, Tenseur3& T );
-		///Compute grad_u in cell (by default, T= average grad_u in cell, if !vol_divide, T=grad_u*volume
+		///compute grad_u in cell (by default, T= average grad_u in cell, if !vol_divide, T=grad_u*volume
 		void Grad_u ( Finite_cells_iterator cell, Tenseur3& T, bool vol_divide=true );
-		/// Compute grad_u for all particles, by summing grad_u of all adjaent cells using current states
-		const vector<Tenseur3>& ComputeParticlesDeformation (void);
+		/// compute grad_u for all particles, by summing grad_u of all adjaent cells using current states
+		const vector<Tenseur3>& computeParticlesDeformation (void);
 		/// Do everything in one step by giving some final (file1) and initial (file0) positions 
-		const vector<Tenseur3>& ComputeParticlesDeformation(const char* state_file1, const char* state_file0, bool usebz2 = true);
-		///Compute porisity from cumulated spheres volumes and positions of boxes
-		Real ComputeMacroPorosity (void );
+		const vector<Tenseur3>& computeParticlesDeformation(const char* state_file1, const char* state_file0, bool usebz2 = true);
+		///compute porisity from cumulated spheres volumes and positions of boxes
+		Real computeMacroPorosity (void );
 
 		CVector Deplacement ( Cell_handle cell );  //donne le d�placement d'un sommet de voronoi
 		CVector Deplacement ( Finite_cells_iterator cell, int facet ); //mean displacement on a facet		

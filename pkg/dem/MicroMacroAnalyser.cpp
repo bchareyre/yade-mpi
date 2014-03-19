@@ -58,7 +58,7 @@ void MicroMacroAnalyser::action()
 	} else if (scene->iter % interval == 0) {
 		setState(2, true, compIncrt);
 		if (compDeformation) {
-			analyser->ComputeParticlesDeformation();
+			analyser->computeParticlesDeformation();
 			//for (int i=0; i<analyser->ParticleDeformation.size();i++) cerr<< analyser->ParticleDeformation[i]<<endl;
 			ostringstream oss;
 			oss<<"deformation"<<incrtNumber++<<".vtk";
@@ -214,8 +214,8 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 		TS.haut = triaxialCompressionEngine->height;//find_parameter("haut=", Statefile);
 		TS.larg = triaxialCompressionEngine->width;//find_parameter("larg=", Statefile);
 		TS.prof = triaxialCompressionEngine->depth;//find_parameter("prof=", Statefile);
-		TS.porom = 0/*analyser->ComputeMacroPorosity() crasher?*/;//find_parameter("porom=", Statefile);
-		TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
+		TS.porom = 0/*analyser->computeMacroPorosity() crasher?*/;//find_parameter("porom=", Statefile);
+		TS.ratio_f = triaxialCompressionEngine->ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
 	} else TS.wszzh=TS.wsxxd=TS.wsyyfa=TS.eps3=TS.eps1=TS.eps2=TS.haut=TS.larg=TS.prof=TS.porom=TS.ratio_f=0;
 	if (filename!=NULL) TS.to_file(filename);
 	return TS;
@@ -223,7 +223,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 
 // const vector<CGT::Tenseur3>& MicroMacroAnalyser::makeDeformationArray(const char* state_file1, const char* state_file0)
 // {
-// 	return analyser->ComputeParticlesDeformation(state_file1, state_file0);
+// 	return analyser->computeParticlesDeformation(state_file1, state_file0);
 // }
 
 #endif /* YADE_CGAL */

@@ -84,7 +84,7 @@ double Network<Tesselation>::volumePoreVoronoiFraction (CellHandle& cell, int& j
 		for (int i=0;i<4;i++){
 		  if (cell->neighbor(i)->info().fictious()!=0) border=true;}
 		if (!border) {vPoralPorosity += Vtot - (Vsolid1 + Vsolid2);
-		    vTotalePorosity += Vtot;}
+		    vTotalPorosity += Vtot;}
 
 		/**Vpore**/ return Vtot - (Vsolid1 + Vsolid2);
     }; break;
@@ -251,7 +251,7 @@ Real Network<Tesselation>::fastSolidAngle(const Point& STA1, const Point& PTA1, 
 }
 
 template<class Tesselation>
-double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipOnLaterals, bool reuseFacetData)
+double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipBoundary, bool reuseFacetData)
 {
   if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
@@ -291,7 +291,7 @@ double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipO
 
 		Boundary &bi1 =  boundary(SV1->info().id());
                 Ssolid1 = 0;
-		if (bi1.flowCondition && ! slipOnLaterals) {
+		if (bi1.flowCondition && ! slipBoundary) {
                         Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point()-SV3->point())[bi1.coordinate]);
                         cell->info().solidSurfaces[j][facetF1]=Ssolid1;
                 }
@@ -332,13 +332,13 @@ double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipO
                 cell->info().solidSurfaces[j][facetRe1]=Ssolid1+Ssolid1n;
                 //area vector of triangle (p1,sphere,p2)
                 CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
-                if (bi1.flowCondition && ! slipOnLaterals) {
+                if (bi1.flowCondition && ! slipBoundary) {
                         //projection on boundary 1
                         Ssolid2 = abs(p1p2v1Surface[bi1.coordinate]);
                         cell->info().solidSurfaces[j][facetF1]=Ssolid2;
                 } else cell->info().solidSurfaces[j][facetF1]=0;
 
-                if (bi2.flowCondition && ! slipOnLaterals) {
+                if (bi2.flowCondition && ! slipBoundary) {
                         //projection on boundary 2
                         Ssolid3 = abs(p1p2v1Surface[bi2.coordinate]);
                         cell->info().solidSurfaces[j][facetF2]=Ssolid3;

@@ -75,7 +75,7 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char*
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
 }
 
-const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformation(const char* state_file1, const char* state_file0, bool usebz2)
+const vector<Tenseur3>& KinematicLocalisationAnalyser::computeParticlesDeformation(const char* state_file1, const char* state_file0, bool usebz2)
 {
 	consecutive = false;
 	bz2 = usebz2;
@@ -85,7 +85,7 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
-	return ComputeParticlesDeformation();
+	return computeParticlesDeformation();
 }
 
 
@@ -193,7 +193,7 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* state_file1, const cha
 
 bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 {
-	ComputeParticlesDeformation();
+	computeParticlesDeformation();
 	Tesselation& Tes = TS1->tesselation();
 	RTriangulation& Tri = Tes.Triangulation();
 	basicVTKwritter vtk(n_real_vertices, n_real_cells);
@@ -762,7 +762,7 @@ void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell,
 	if (vol_divide) T/= Tesselation::Volume(cell);
 }
 
-const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformation(void)
+const vector<Tenseur3>& KinematicLocalisationAnalyser::computeParticlesDeformation(void)
 {
 	Tesselation& Tes = TS1->tesselation();
 	RTriangulation& Tri = Tes.Triangulation();
@@ -777,8 +777,8 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
 
-	//Compute Voronoi tesselation (i.e. voronoi center of each cell)
-	if (!Tes.Computed()) Tes.Compute();
+	//compute Voronoi tesselation (i.e. voronoi center of each cell)
+	if (!Tes.computed) Tes.compute();
 	if (ParticleDeformation.size() != (unsigned int)(Tes.Max_id() + 1)) {
 		ParticleDeformation.clear();
 		ParticleDeformation.resize(Tes.Max_id() + 1);
@@ -794,7 +794,7 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
 	Finite_cells_iterator cell0 = Tri.finite_cells_end();
 	
-	//Compute grad_u and volumes of all cells in the triangulation, and assign them to each of the vertices ( volume*grad_u is added here rather than grad_u, the weighted average is computed later )
+	//compute grad_u and volumes of all cells in the triangulation, and assign them to each of the vertices ( volume*grad_u is added here rather than grad_u, the weighted average is computed later )
 	//define the number of non-fictious cells, i.e. not in contact with a boundary
 	n_real_cells=0;
 	for (; cell != cell0; cell++) { // calcule la norme du d�viateur dans chaque cellule
@@ -839,7 +839,7 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 	return ParticleDeformation;
 }
 
-Real KinematicLocalisationAnalyser::ComputeMacroPorosity(void)
+Real KinematicLocalisationAnalyser::computeMacroPorosity(void)
 {
 	return (1-v_solid_total/(TS1->haut*TS1->larg*TS1->prof));
 }
