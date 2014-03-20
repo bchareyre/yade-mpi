@@ -14,6 +14,7 @@
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
 #  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
 #  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
+#  ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -116,6 +117,7 @@ OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
 OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" ${DEFAULT})
 OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" ${DEFAULT})
+OPTION(ENABLE_LBMFLOW "Enable LBM engine (very experimental)" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -306,6 +308,16 @@ ENDIF(ENABLE_GL2PS)
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
+
+#===========================================================
+IF(ENABLE_LBMFLOW)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLBM_ENGINE")
+  #ADD_DEFINITIONS("-DLBM_ENGINE")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LBMFLOW")
+  MESSAGE("LBMFLOW is still experimental, building and running LBM engine are at your own risk!")
+ELSE(ENABLE_LBMFLOW)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} LBMFLOW")
+ENDIF(ENABLE_LBMFLOW)
 
 #===========================================================
 
