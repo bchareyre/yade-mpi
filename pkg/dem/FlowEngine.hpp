@@ -1,7 +1,7 @@
 /*************************************************************************
 *  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
 *  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
-*  Copyright (C) 2012 by Donia Marzougui <donia.marzougui@grenoble-inp.fr>*
+
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -43,28 +43,16 @@ CGT::CVector makeCgVect ( const Vector3r& yv ) {return CGT::CVector ( yv[0],yv[1
 CGT::Point makeCgPoint ( const Vector3r& yv ) {return CGT::Point ( yv[0],yv[1],yv[2] );}
 Vector3r makeVector3r ( const CGT::Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
 Vector3r makeVector3r ( const CGT::CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
-/*
 
-typedef TriangulationTypes<FlowVertexInfo,FlowCellInfo>			FlowTriangulationTypes;
-typedef CGT::_Tesselation<FlowTriangulationTypes>			FlowTesselation;
-
-
-#ifdef LINSOLV
-#define _FlowSolver CGT::FlowBoundingSphereLinSolv<CGT::FlowBoundingSphere<FlowTesselation> >
-#else
-#define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
-#endif*/
-
-template< class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=CGT::FlowBoundingSphere<_Tesselation> >
+template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=CGT::FlowBoundingSphere<_Tesselation> >
 class TemplateFlowEngine : public PartialEngine
 {	
 	public :
 		#ifdef LINSOLV
-		typedef CGT::FlowBoundingSphereLinSolv<typename solverT::Tesselation,solverT>		FlowSolver;
+		typedef CGT::FlowBoundingSphereLinSolv<typename solverT::Tesselation,solverT>	FlowSolver;
 		#else
-		typedef solverT						FlowSolver;
+		typedef solverT									FlowSolver;
 		#endif
-// 		typedef solverT									FlowSolver;
 		typedef FlowSolver								Solver;//FIXME: useless alias, search/replace then remove
 		typedef typename FlowSolver::Tesselation					Tesselation;
 		typedef typename FlowSolver::RTriangulation					RTriangulation;
@@ -86,6 +74,7 @@ class TemplateFlowEngine : public PartialEngine
 		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
 		//copy positions in a buffer for faster and/or parallel access
 		void setPositionsBuffer(bool current);
+		virtual void trickPermeability() {};
 
 	public :
 		int retriangulationLastIter;
@@ -403,10 +392,6 @@ class FlowCellInfo : public CGT::SimpleCellInfo {
 	double invSumK;
 	bool isvisited;
 	
-	FlowCellInfo& operator= (const std::vector<double> &v) { for (int i=0; i<4;i++) modulePermeability[i]= v[i]; return *this; }
-	FlowCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
-	FlowCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
-	
 	inline Real& volume (void) {return t;}
 	inline const Real& invVoidVolume (void) const {return invVoidV;}
 	inline Real& invVoidVolume (void) {return invVoidV;}
@@ -427,9 +412,6 @@ class FlowVertexInfo : public CGT::SimpleVertexInfo {
 	CVector grainVelocity;
 	Real volumeIncidentCells;
 public:
-	FlowVertexInfo& operator= (const CVector &u) { CVector::operator= (u); return *this; }
-	FlowVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
-	FlowVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
 	CVector forces;
 	bool isGhost;
 	FlowVertexInfo (void) {isGhost=false;}
@@ -439,127 +421,22 @@ public:
 	inline const CVector ghostShift (void) {return CGAL::NULL_VECTOR;}
 };
 
-typedef CGT::TriangulationTypes<FlowVertexInfo,FlowCellInfo>			FlowTriangulationTypes;
-typedef CGT::_Tesselation<FlowTriangulationTypes>			FlowTesselation;
+// To register properly, we need to first instantiate an intermediate class, then inherit from it with correct class names in YADE_CLASS macro
+// The intermediate one would be seen with the name "TemplateFlowEngine" by python, thus it would not work when more than one class are derived, they would all
+// be named "TemplateFlowEngine" ...
+typedef TemplateFlowEngine<FlowCellInfo,FlowVertexInfo> FlowEngineT;
+REGISTER_SERIALIZABLE(FlowEngineT);
 
-
-#ifdef LINSOLV
-#define _FlowSolver CGT::FlowBoundingSphereLinSolv<FlowTesselation,CGT::FlowBoundingSphere<FlowTesselation> >
-#else
-#define _FlowSolver CGT::FlowBoundingSphere<FlowTesselation>
-#endif
-
-// typedef CGT::FlowBoundingSphereLinSolv<CGT::FlowBoundingSphere<FlowTesselation> > tparam; 
-typedef TemplateFlowEngine<FlowCellInfo,FlowVertexInfo> FlowEngine;
-REGISTER_SERIALIZABLE(FlowEngine);
-
-// YADE_PLUGIN((FlowEngine));
-
-///==========================================
-class PeriodicCellInfo : public FlowCellInfo
-{	
-	public:
-	static CVector gradP;
-	//for real cell, baseIndex is the rank of the cell in cellHandles. For ghost cells, it is the baseIndex of the corresponding real cell.
-	//Unlike ordinary index, baseIndex is also indexing cells with imposed pressures
-	int baseIndex;
-	int period[3];
-	static CVector hSize[3];
-	static CVector deltaP;
-	int ghost;
-	Real* _pression;
-	PeriodicCellInfo (void){
-		_pression=&pression;
-		period[0]=period[1]=period[2]=0;
-		baseIndex=-1;
-		volumeSign=0;}
-	~PeriodicCellInfo (void) {}
-	PeriodicCellInfo& operator= (const Point &p) { Point::operator= (p); return *this; }
-	PeriodicCellInfo& operator= (const float &scalar) { s=scalar; return *this; }
-	
-	inline const double shiftedP (void) const {return isGhost? (*_pression)+pShift() :(*_pression) ;}
-	inline const double pShift (void) const {return deltaP[0]*period[0] + deltaP[1]*period[1] +deltaP[2]*period[2];}
-// 	inline const double p (void) {return shiftedP();}
-	inline void setP (const Real& p) {pression=p;}
-	virtual bool isReal (void) {return !(isFictious || isGhost);}
-};
-CVector PeriodicCellInfo::hSize[]={CVector(),CVector(),CVector()};
-CVector PeriodicCellInfo::deltaP=CVector();
-CVector PeriodicCellInfo::gradP=CVector();
-
-class PeriodicVertexInfo : public FlowVertexInfo {
-	public:
-	PeriodicVertexInfo& operator= (const CVector &u) { CVector::operator= (u); return *this; }
-	PeriodicVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
-	PeriodicVertexInfo& operator= (const unsigned int &id) { i= id; return *this; }
-	int period[3];
-	//FIXME: the name is misleading, even non-ghost can be out of the period and therefore they need to be shifted as well
-	inline const CVector ghostShift (void) {
-		return period[0]*PeriodicCellInfo::hSize[0]+period[1]*PeriodicCellInfo::hSize[1]+period[2]*PeriodicCellInfo::hSize[2];}
-	PeriodicVertexInfo (void) {isFictious=false; s=0; i=0; period[0]=period[1]=period[2]=0; isGhost=false;}
-	virtual bool isReal (void) {return !(isFictious || isGhost);}
-};
-
-typedef CGT::TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo>			PeriFlowTriangulationTypes;
-typedef CGT::PeriodicTesselation<CGT::_Tesselation<PeriFlowTriangulationTypes> >	PeriFlowTesselation;
-#ifdef LINSOLV
-#define _PeriFlowSolver CGT::PeriodicFlowLinSolv<PeriFlowTesselation>
-#else
-#define _PeriFlowSolver CGT::PeriodicFlow<PeriFlowTesselation>
-#endif
-//CGT::PeriodicFlowLinSolv<CGT::PeriodicTesselation<CGT::_Tesselation<TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo> > > >
-
-typedef TemplateFlowEngine<	PeriodicCellInfo,
-				PeriodicVertexInfo,
-				CGT::PeriodicTesselation<CGT::_Tesselation<CGT::TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo> > >,
-				_PeriFlowSolver>
-				FlowEngine_PeriodicInfo;
-REGISTER_SERIALIZABLE(FlowEngine_PeriodicInfo);
-
-// template<>
-// TFlowEng::~TFlowEng()
-// {
-// }
-YADE_PLUGIN((FlowEngine_PeriodicInfo));
-
-
-class PeriodicFlowEngine : public FlowEngine_PeriodicInfo
+class FlowEngine : public FlowEngineT
 {
 	public :
-		void triangulate (FlowSolver& flow);
-		void buildTriangulation (Real pzero, FlowSolver& flow);
-		void initializeVolumes (FlowSolver&  flow);
-		void updateVolumes (FlowSolver&  flow);
-		Real volumeCell (CellHandle cell);
-
-		Real volumeCellSingleFictious (CellHandle cell);
-		inline void locateCell(CellHandle baseCell, unsigned int& index, int& baseIndex, FlowSolver& flow, unsigned int count=0);
-		Vector3r meanVelocity();
-
-		virtual ~PeriodicFlowEngine();
-
-		virtual void action();
-		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
-		void preparePShifts();
-		
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine_PeriodicInfo,"A variant of :yref:`FlowEngine` implementing periodic boundary conditions. The API is very similar.",
-		((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
-		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,FlowEngineT,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
 		,,
-		wallIds=vector<int>(6,-1);
-		solver = shared_ptr<FlowSolver> (new FlowSolver);
-		epsVolMax=epsVolCumulative=retriangulationLastIter=0;
-		ReTrg=1;
-		first=true;
 		,
-		//nothing special to define, we re-use FlowEngine methods
+		//nothing special to define here, we simply re-use FlowEngine methods
 		//.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 		)
 		DECLARE_LOGGER;
-
-
 };
+REGISTER_SERIALIZABLE(FlowEngine);
 
-REGISTER_SERIALIZABLE(PeriodicFlowEngine);
-
-// #endif

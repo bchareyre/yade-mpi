@@ -56,7 +56,7 @@ typename _Tesselation<TT>::VertexHandle _Tesselation<TT>::insert ( Real x, Real 
 	Vh = Tri->insert(Sphere(Point(x,y,z),pow(rad,2)));
 	if ( Vh!=NULL )
 	{
-		Vh->info() = id;
+		Vh->info().setId(id);
 		Vh->info().isFictious = isFictious;
 		assert (vertexHandles.size()>id);
 		vertexHandles[id] = Vh;
@@ -74,7 +74,7 @@ typename _Tesselation<TT>::VertexHandle _Tesselation<TT>::move ( Real x, Real y,
 	if ( Vh!=NULL )
 	{
 		vertexHandles[id] = Vh;
-		Vh->info() = id;
+		Vh->info().setId(id);
 		Vh->info().isFictious = fictious;
 	}
 	else cerr << "Vh==NULL" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
@@ -158,7 +158,7 @@ void _Tesselation<TT>::compute ()
 			S2.point().x(), S2.point().y(), S2.point().z(), S2.weight(),
 			S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
 			x, y, z );
-		cell->info() =Point ( x,y,z );
+		cell->info().setPoint(Point(x,y,z));
 	}
 	computed = true;
 }

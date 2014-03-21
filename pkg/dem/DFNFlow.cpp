@@ -10,7 +10,7 @@
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
-// #define DFNFLOW
+#define DFNFLOW
 #ifdef DFNFLOW
 
 #include <yade/pkg/dem/FlowEngine.hpp>
@@ -35,7 +35,7 @@ YADE_PLUGIN((DFNFlowEngineT));
 class DFNFlowEngine : public DFNFlowEngineT
 {
 	public :
-	void pyTrickPermeability(Real somethingBig);
+	void trickPermeability();
 	void trickPermeability (RTriangulation::Facet_circulator& facet,Real somethingBig);
 	void trickPermeability (RTriangulation::Finite_edges_iterator& edge,Real somethingBig);
 
@@ -43,7 +43,6 @@ class DFNFlowEngine : public DFNFlowEngineT
 	((Real, myNewAttribute, 0,,"useless example"))
 	,/*DFNFlowEngineT()*/,
 	,
-	.def("trickPermeability",&DFNFlowEngine::pyTrickPermeability,(python::arg("somethingBig")=10.),"change permeability inside a plane")
 	)
 	DECLARE_LOGGER;
 };
@@ -70,8 +69,9 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Finite_edges_iterator& edg
 }
 
 
-void DFNFlowEngine::pyTrickPermeability(Real somethingBig)
+void DFNFlowEngine::trickPermeability()
 {
+	Real somethingBig=10;//is that big??
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
 	//We want to change permeability perpendicular to the 10th edge, let's say.
 	//in the end this function should have a loop on all edges I guess

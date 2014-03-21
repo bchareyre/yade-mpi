@@ -109,7 +109,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 		if (v==RTriangulation::Vertex_handle())
 			hint=c;
 		else {
-			v->info() = (const unsigned int) p->second;
+			v->info().setId((const unsigned int) p->second);
 			//Vh->info().isFictious = false;//false is the default
 			Tes.maxId = std::max(Tes.maxId,(int) p->second);
 			Tes.vertexHandles[p->second]=v;
