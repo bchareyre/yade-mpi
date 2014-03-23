@@ -86,7 +86,6 @@ class Network
 
 		int facetF1, facetF2, facetRe1, facetRe2, facetRe3;
 		int facetNFictious;
-		int real_vertex;
 		double FAR;
 		static const double ONE_THIRD;
 		static const int facetVertices [4][3];
