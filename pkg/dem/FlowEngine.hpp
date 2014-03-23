@@ -1,7 +1,6 @@
 /*************************************************************************
 *  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
 *  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
-
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -10,24 +9,25 @@
 /*!
 
 FlowEngine is an interface between Yade and the fluid solvers defined in lib/triangulation and using the PFV scheme.
-There are also a few non-trivial functions defined here, such has building triangulation and computating of elements volumes.
-FlowEngine is defined via the template class TemplateFlowEngine, allowing flexible definition of cell info and vertex info types for handling different types of models and couplings, via inheritance and/or template specialization.
-
+There are also a few non-trivial functions defined here, such has building triangulation and computating elements volumes.
+The code strongly relies on CGAL library for building triangulations on the top of sphere packings.
+CGAL's trangulations introduce the data associated to each element of the triangulation through template parameters (Cell_info and Vertex_info).  
+FlowEngine is thus defined via the template class TemplateFlowEngine(Cellinfo,VertexInfo), for easier addition of variables in various couplings.
 PeriodicFlowEngine is a variant for periodic boundary conditions.
 
 Which solver will be actually used internally to obtain pore pressure will depend partly on compile time flags (libcholmod available and #define LINSOLV),
 and on runtime settings (useSolver=0: Gauss-Seidel (iterative), useSolver=1: CHOLMOD if available (direct sparse cholesky)).
 
-The files defining lower level classes are in yade/lib. The code uses CGAL::Triangulation3 for managing the mesh and storing data; eigen3::Sparse, suitesparse::cholmod, and metis for direct resolution of the linear systems. The Gauss-Seidel iterative solver OTOH is implemented directly in Yade.
+The files defining lower level classes are in yade/lib. The code uses CGAL::Triangulation3 for managing the mesh and storing data. Eigen3::Sparse, suitesparse::cholmod, and metis are used for solving the linear systems with a direct method (Cholesky). An iterative method (Gauss-Seidel) is implemented directly in Yade and can be used as a fallback (see FlowEngine::useSolver).
 
-Most classes in lib/triangulation are templates, and therefore completely defined in header files.
+Most classes in lib/triangulation are templates, and are therefore completely defined in header files.
 A pseudo hpp/cpp split is reproduced for clarity, with hpp/ipp extensions (but again, in the end they are all include files).
 The files are
 - RegularTriangulation.h : declaration of info types embeded in the mesh (template parameters of CGAL::Triangulation3), and instanciation of RTriangulation classes
 - Tesselation.h/ipp : encapsulate RegularTriangulation and adds functions to manipulate the dual (Voronoi) graph of the triangulation
 - Network.hpp/ipp : specialized for PFV model (the two former are used independently by TesselationWrapper), a set of functions to determine volumes and surfaces of intersections between spheres and various subdomains. Contains two triangulations for smooth transitions while remeshing - e.g. interpolating values in the new mesh using the previous one.
 - FlowBoundingSphere.hpp/ipp and PeriodicFlow.hpp/ipp + LinSolv variants: implement the solver in itself (mesh, boundary conditions, solving, defining fluid-particles interactions)
-- FlowEngine.hpp/cpp (this file)
+- FlowEngine.hpp/ipp/cpp (this file)
 
 */
 
@@ -39,10 +39,10 @@ The files are
 #include<yade/lib/triangulation/PeriodicFlow.hpp>
 
 /// Converters for Eigen and CGAL vectors
-CGT::CVector makeCgVect ( const Vector3r& yv ) {return CGT::CVector ( yv[0],yv[1],yv[2] );}
-CGT::Point makeCgPoint ( const Vector3r& yv ) {return CGT::Point ( yv[0],yv[1],yv[2] );}
-Vector3r makeVector3r ( const CGT::Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
-Vector3r makeVector3r ( const CGT::CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+inline CGT::CVector makeCgVect ( const Vector3r& yv ) {return CGT::CVector ( yv[0],yv[1],yv[2] );}
+inline CGT::Point makeCgPoint ( const Vector3r& yv ) {return CGT::Point ( yv[0],yv[1],yv[2] );}
+inline Vector3r makeVector3r ( const CGT::Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+inline Vector3r makeVector3r ( const CGT::CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
 
 template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=CGT::FlowBoundingSphere<_Tesselation> >
 class TemplateFlowEngine : public PartialEngine
@@ -317,8 +317,6 @@ class TemplateFlowEngine : public PartialEngine
 		.def("normalVect",&TemplateFlowEngine::normalVect,(python::arg("idSph")),"Return the normal vector between particles.")
 		.def("surfaceDistanceParticle",&TemplateFlowEngine::surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
 		.def("onlySpheresInteractions",&TemplateFlowEngine::onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
-		
-		
 		.def("pressureProfile",&TemplateFlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 		.def("getPorePressure",&TemplateFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 		.def("averageSlicePressure",&TemplateFlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
@@ -342,7 +340,6 @@ class TemplateFlowEngine : public PartialEngine
 // Definition of functions in a separate file for clarity 
 #include<yade/pkg/dem/FlowEngine.ipp>
 
-// using namespace CGT;
 typedef CGT::CVector CVector;
 typedef CGT::Point Point;
 
