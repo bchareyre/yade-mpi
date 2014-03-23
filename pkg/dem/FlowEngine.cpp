@@ -14,9 +14,6 @@ YADE_PLUGIN((FlowEngineT));
 CREATE_LOGGER(FlowEngine );
 YADE_PLUGIN((FlowEngine));
 
-#include <yade/pkg/dem/PeriodicFlowEngine.cpp>
-#include <yade/pkg/dem/DFNFlow.cpp>
-
 #endif //FLOW_ENGINE
 
 #endif /* YADE_CGAL */
