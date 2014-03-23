@@ -39,15 +39,16 @@ template<class Tesselation>
 int Network<Tesselation>::detectFacetFictiousVertices (CellHandle& cell, int& j)
 {
 	facetNFictious = 0;
+	int nRealVtx=0;
 	for (int kk=0; kk<3; kk++) {
                 if (cell->vertex(facetVertices[j][kk])->info().isFictious) {
                         if (facetNFictious==0) facetF1=kk; else facetF2=kk;
                         facetNFictious +=1;
                 } else {
-                        if (real_vertex==0) facetRe1=kk;
-                        else if (real_vertex==1) facetRe2=kk;
-                        else if (real_vertex==2) facetRe3=kk;
-                        real_vertex+=1;}}
+                        if (nRealVtx==0) facetRe1=kk;
+                        else if (nRealVtx==1) facetRe2=kk;
+                        else if (nRealVtx==2) facetRe3=kk;
+                        nRealVtx+=1;}}
 	return facetNFictious;
 }
 
