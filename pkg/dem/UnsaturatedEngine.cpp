@@ -74,7 +74,9 @@ void UnsaturatedEngine::action()
     if (pressureForce) {
         invade(solver);
     }
+
     ///compute force
+    if(computeForceActivated){
     computeFacetPoreForcesWithCache(solver);
     Vector3r force;
     Finite_vertices_iterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
@@ -82,6 +84,7 @@ void UnsaturatedEngine::action()
         force = pressureForce ? Vector3r ( V_it->info().forces[0],V_it->info().forces[1],V_it->info().forces[2] ): Vector3r(0,0,0);
         scene->forces.addForce ( V_it->info().id(), force);
     }
+}
 }
 
 template<class Solver>
