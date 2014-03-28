@@ -204,8 +204,8 @@ void UnsaturatedEngine::updatePressure(Solver& flow)
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
-      if (cell->info().isAirReservoir==true) cell->info().p()=bndCondValue[2];
-      if (cell->info().isWaterReservoir==true) cell->info().p()=bndCondValue[3];
+      if (cell->info().isWaterReservoir==true) cell->info().p()=bndCondValue[2];
+      if (cell->info().isAirReservoir==true) cell->info().p()=bndCondValue[3];
     } 
 }
 
@@ -221,39 +221,38 @@ template<class Solver>
 void UnsaturatedEngine::updateWaterReservoir(Solver& flow)
 {
     initWaterReservoirBound(flow);
-    for (int bound=0; bound<6; bound++) {
-        if (flow->boundingCells[bound].size()==0) continue;
-        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
-        for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            waterReservoirRecursion((*it),flow);
-        }
+    vector<Cell_handle>::iterator it = flow->boundingCells[2].begin();
+    for ( it ; it != flow->boundingCells[2].end(); it++) {
+        if ((*it)->info().index == 0) continue;
+        waterReservoirRecursion((*it),flow);
     }
 }
-template<class Solver>//the boundingCells[3] should always connect water reservoir && isWaterReservoir=true
-void UnsaturatedEngine::initWaterReservoirBound(Solver& flow/*, int boundN*/)
+template<class Solver>//boundingCells[2] is water reservoir. 
+void UnsaturatedEngine::initWaterReservoirBound(Solver& flow)
 {
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
     Finite_cells_iterator cell_end = tri.finite_cells_end();
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         cell->info().isWaterReservoir = false;
     }
-    for (int bound=0; bound<6; bound++) {
-        if (flow->boundingCells[bound].size()==0) continue;
-        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
-        for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            if((*it)->info().p() == bndCondValue[3])
-                (*it)->info().isWaterReservoir = true;
-        }
+    if (flow->boundingCells[2].size()==0) {
+        cerr<<"set bndCondIsPressure[2] true. boundingCells.size=0!";
+        continue;
     }
+    vector<Cell_handle>::iterator it = flow->boundingCells[2].begin();
+    for ( it ; it != flow->boundingCells[2].end(); it++) {
+        if ((*it)->info().index == 0) continue;
+        if((*it)->info().p() == bndCondValue[2])
+            (*it)->info().isWaterReservoir = true;
+    }
+
 }
 template<class Solver>
 void UnsaturatedEngine::waterReservoirRecursion(Cell_handle cell, Solver& flow)
 {
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-        if (cell->neighbor(facet)->info().p() != bndCondValue[3]) continue;
+        if (cell->neighbor(facet)->info().p() != bndCondValue[2]) continue;
         if (cell->neighbor(facet)->info().isWaterReservoir==true) continue;
         Cell_handle n_cell = cell->neighbor(facet);
         n_cell->info().isWaterReservoir = true;
@@ -265,16 +264,13 @@ template<class Solver>
 void UnsaturatedEngine::updateAirReservoir(Solver& flow)
 {
     initAirReservoirBound(flow);
-    for (int bound=0; bound<6; bound++) {
-        if (flow->boundingCells[bound].size()==0) continue;
-        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
-        for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            airReservoirRecursion((*it),flow);
-        }
+    vector<Cell_handle>::iterator it = flow->boundingCells[3].begin();
+    for ( it ; it != flow->boundingCells[3].end(); it++) {
+        if ((*it)->info().index == 0) continue;
+        airReservoirRecursion((*it),flow);
     }
 }
-template<class Solver>//the boundingCells[2] should always connect air reservoir && isAirReservoir=true
+template<class Solver>//boundingCells[3] is air reservoir
 void UnsaturatedEngine::initAirReservoirBound(Solver& flow)
 {
     RTriangulation& tri = flow->T[flow->currentTes].Triangulation();
@@ -282,14 +278,15 @@ void UnsaturatedEngine::initAirReservoirBound(Solver& flow)
     for ( Finite_cells_iterator cell = tri.finite_cells_begin(); cell != cell_end; cell++ ) {
         cell->info().isAirReservoir = false;
     }
-    for (int bound=0; bound<6; bound++) {
-        if (flow->boundingCells[bound].size()==0) continue;
-        vector<Cell_handle>::iterator it = flow->boundingCells[bound].begin();
-        for ( it ; it != flow->boundingCells[bound].end(); it++) {
-            if((*it)->info().index == 0) continue;
-            if((*it)->info().p() == bndCondValue[2])
-                (*it)->info().isAirReservoir = true;
-        }
+    if (flow->boundingCells[3].size()==0) {
+        cerr<<"set bndCondIsPressure[3] true. boundingCells.size=0!";
+        continue;
+    }
+    vector<Cell_handle>::iterator it = flow->boundingCells[3].begin();
+    for ( it ; it != flow->boundingCells[bound].end(); it++) {
+        if((*it)->info().index == 0) continue;
+        if((*it)->info().p() == bndCondValue[3])
+            (*it)->info().isAirReservoir = true;
     }
 }
 template<class Solver>
@@ -297,7 +294,7 @@ void UnsaturatedEngine::airReservoirRecursion(Cell_handle cell, Solver& flow)
 {
     for (int facet = 0; facet < 4; facet ++) {
         if (flow->T[flow->currentTes].Triangulation().is_infinite(cell->neighbor(facet))) continue;
-        if (cell->neighbor(facet)->info().p() != bndCondValue[2]) continue;
+        if (cell->neighbor(facet)->info().p() != bndCondValue[3]) continue;
         if (cell->neighbor(facet)->info().isAirReservoir == true) continue;
         Cell_handle n_cell = cell->neighbor(facet);
         n_cell->info().isAirReservoir = true;

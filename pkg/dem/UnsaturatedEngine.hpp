@@ -190,6 +190,7 @@ class UnsaturatedEngine : public PartialEngine
 
 					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
 					((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
+					((bool, invadeBoundary, false,,"Invade from boundaries."))
 					,
 					/*deprec*/
 					,,
