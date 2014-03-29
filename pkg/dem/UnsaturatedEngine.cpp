@@ -1113,19 +1113,36 @@ template<class Solver>
 void UnsaturatedEngine::saveReservoirInfo(Solver& flow,int boundN)
 {
     if(flow->boundingCells[boundN].size()==0) {
-        cerr << "please set corresponding bndCondIsPressure[bound] to true ."<< endl;
+        cerr << "please set corresponding bndCondIsPressure[bound] to be true ."<< endl;
     }
     else {
-        ofstream file;
-        file.open("reservoirInfo.txt");//FIXME:how to name a text file with varieables?
-        file << "#Checking the reservoir cells statement";
-        file << "Cell_ID"<<"	Cell_Pressure"<<"	isAirReservoir"<<"	isWaterReservoir"<<endl;
-        vector<Cell_handle>::iterator it = flow->boundingCells[boundN].begin();
-        for ( it ; it != flow->boundingCells[boundN].end(); it++) {
-            if ((*it)->info().index == 0) continue;
-            file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isAirReservoir<<" "<<(*it)->info().isWaterReservoir<<endl;
+        if (boundN==2) {
+            ofstream file;
+            file.open("waterReservoirBoundInfo.txt");
+            file << "#Checking the water reservoir cells statement";
+            file << "Cell_ID"<<"	Cell_Pressure"<<"	isAirReservoir"<<"	isWaterReservoir"<<endl;
+            vector<Cell_handle>::iterator it = flow->boundingCells[boundN].begin();
+            for ( it ; it != flow->boundingCells[boundN].end(); it++) {
+                if ((*it)->info().index == 0) continue;
+                file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isAirReservoir<<" "<<(*it)->info().isWaterReservoir<<endl;
+            }
+            file.close();
         }
-        file.close();
+        else if (boundN==3) {
+            ofstream file;
+            file.open("airReservoirBoundInfo.txt");
+            file << "#Checking the air reservoir cells statement";
+            file << "Cell_ID"<<"	Cell_Pressure"<<"	isAirReservoir"<<"	isWaterReservoir"<<endl;
+            vector<Cell_handle>::iterator it = flow->boundingCells[boundN].begin();
+            for ( it ; it != flow->boundingCells[boundN].end(); it++) {
+                if ((*it)->info().index == 0) continue;
+                file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isAirReservoir<<" "<<(*it)->info().isWaterReservoir<<endl;
+            }
+            file.close();
+        }
+        else {
+            cerr<<"This is not a reservoir boundary. Please set boundN to be 2(waterReservoirBound) or 3(airReservoirBound)."<<endl;
+        }
     }
 }
 
