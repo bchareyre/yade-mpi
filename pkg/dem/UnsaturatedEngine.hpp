@@ -69,7 +69,8 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void checkTrap(Solver& flow, double pressure);//check trapped phase, define trapCapP.	
 		TPL Real getMinEntryValue1 (Solver& flow);
 		TPL void updatePressure(Solver& flow);
-		TPL void updateReservoir(Solver& flow);		
+		TPL void updatePressureReservoir(Solver& flow);
+		TPL void initReservoirBound(Solver& flow);
 		TPL void initWaterReservoirBound(Solver& flow);
 		TPL void updateWaterReservoir(Solver& flow);
 		TPL void waterReservoirRecursion(Cell_handle cell, Solver& flow);
@@ -92,8 +93,8 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void saveLatticeNodeX(Solver& flow,double x); 
 		TPL void saveLatticeNodeY(Solver& flow,double y); 
 		TPL void saveLatticeNodeZ(Solver& flow,double z);
-		TPL void saveListAdjCellsTopBound(Solver& flow);
-		TPL void saveListAdjCellsBottomBound(Solver& flow);		
+		TPL void saveReservoirInfo(Solver& flow,int boundN);
+		TPL void saveBoundingCellsInfo(Solver& flow);
 		TPL void savePoreBodyInfo(Solver& flow);
 		TPL void savePoreThroatInfo(Solver& flow);
 		TPL void debugTemp(Solver& flow);
@@ -151,8 +152,8 @@ class UnsaturatedEngine : public PartialEngine
  		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
  		void		_saveLatticeNodeY(double y) {saveLatticeNodeY(solver,y);}
  		void		_saveLatticeNodeZ(double z) {saveLatticeNodeZ(solver,z);}
- 		void 		_saveListAdjCellsTopBound() {saveListAdjCellsTopBound(solver);}
- 		void 		_saveListAdjCellsBottomBound() {saveListAdjCellsBottomBound(solver);}
+		void 		_saveReservoirInfo(int boundN) {saveReservoirInfo(solver,boundN);}
+		void		_saveBoundingCellsInfo(){saveBoundingCellsInfo(solver);}
  		void		_savePoreBodyInfo(){savePoreBodyInfo(solver);}
  		void		_savePoreThroatInfo(){savePoreThroatInfo(solver);}
  		void		_debugTemp(){debugTemp(solver);}
@@ -163,7 +164,7 @@ class UnsaturatedEngine : public PartialEngine
 
 		virtual void action();
 
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(UnsaturatedEngine,PartialEngine,"Preliminary version engine of a model for unsaturated soils",
+		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(UnsaturatedEngine,PartialEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.",
 					((bool,isActivated,true,,"Activate UnsaturatedEngine."))
 					((bool,first,true,,"Controls the initialization/update phases"))
 					((bool, Debug, false,,"Activate debug messages"))
@@ -217,8 +218,8 @@ class UnsaturatedEngine : public PartialEngine
 					.def("saveLatticeNodeX",&UnsaturatedEngine::_saveLatticeNodeX,(python::arg("x")),"Save the slice of lattice nodes for x_normal(x). 0: out of sphere; 1: inside of sphere.")
 					.def("saveLatticeNodeY",&UnsaturatedEngine::_saveLatticeNodeY,(python::arg("y")),"Save the slice of lattice nodes for y_normal(y). 0: out of sphere; 1: inside of sphere.")
 					.def("saveLatticeNodeZ",&UnsaturatedEngine::_saveLatticeNodeZ,(python::arg("z")),"Save the slice of lattice nodes for z_normal(z). 0: out of sphere; 1: inside of sphere.")
-					.def("saveListAdjCellsTopBound",&UnsaturatedEngine::_saveListAdjCellsTopBound,"Save the cells IDs adjacent top boundary(connecting water reservoir).")
-					.def("saveListAdjCellsBottomBound",&UnsaturatedEngine::_saveListAdjCellsBottomBound,"Save the cells IDs adjacent bottom boundary(connecting air reservoir).")
+					.def("saveReservoirInfo",&UnsaturatedEngine::_saveReservoirInfo,(python::arg("boundN")),"Test reservoir cells statement.(temporary)")
+					.def("saveBoundingCellsInfo",&UnsaturatedEngine::_saveBoundingCellsInfo,"Test boundary cells (without reservoir) statement.(temporary)")
 					.def("savePoreBodyInfo",&UnsaturatedEngine::_savePoreBodyInfo,"Save pore bodies positions/Voronoi centers and size/volume.")
 					.def("savePoreThroatInfo",&UnsaturatedEngine::_savePoreThroatInfo,"Save pore throat area, inscribed radius and perimeter.")
 					.def("debugTemp",&UnsaturatedEngine::_debugTemp,"debug temp file.")
