@@ -626,7 +626,7 @@ class pyOmega{
 	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIter; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIter=s; }
-	long stopAtTime_get(){return OMEGA.getScene()->stopAtTime; }
+	Real stopAtTime_get(){return OMEGA.getScene()->stopAtTime; }
 	void stopAtTime_set(long s){OMEGA.getScene()->stopAtTime=s; }
 
 
