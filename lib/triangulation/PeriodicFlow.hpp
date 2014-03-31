@@ -204,8 +204,8 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 					pass+=1;
 					CVector l = p1 - p2;
 					distance = sqrt(l.squared_length());
-					if (!rAverage) radius = 2* computeHydraulicRadius(cell, j);
-					else radius = (computeEffectiveRadius(cell, j)+computeEquivalentRadius(cell,j))*0.5;
+					if (!rAverage) radius = 2* this->computeHydraulicRadius(cell, j);
+					else radius = (this->computeEffectiveRadius(cell, j)+this->computeEquivalentRadius(cell,j))*0.5;
 					if (radius<0) NEG++;
 					else POS++;
 					if (radius==0) {
@@ -247,8 +247,8 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 // 					}
 					if(permeabilityMap){
 						CellHandle c = cell;
-						cell->info().s = cell->info().s + k*distance/fluidArea*volumePoreVoronoiFraction (c,j);
-						volume_sub_pore += volumePoreVoronoiFraction (c,j);
+						cell->info().s = cell->info().s + k*distance/fluidArea*this->volumePoreVoronoiFraction (c,j);
+						volume_sub_pore += this->volumePoreVoronoiFraction (c,j);
 					}
 				}
 			}
