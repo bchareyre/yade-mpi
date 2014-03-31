@@ -48,7 +48,7 @@ class UniaxialStrainer: public BoundaryController {
 			((Real,crossSectionArea,NaN,,"crossSection perpendicular to he strained axis; must be given explicitly [m²]"))
 			((Real,strain,0,,"Current strain value, elongation/originalLength |yupdate| [-]")) 
 			((Real,avgStress,0,,"Current average stress  |yupdate| [Pa]"))
-			((bool,blockDisplacements,false,,"Whether displacement of boundary bodies perpendicular to the strained axis are blocked of are free"))
+			((bool,blockDisplacements,false,,"Whether displacement of boundary bodies perpendicular to the strained axis are blocked or are free"))
 			((bool,blockRotations,false,,"Whether rotations of boundary bodies are blocked."))
 			((bool,setSpeeds,false,,"should we set speeds at the beginning directly, instead of increasing strain rate progressively?"))
 			((int,stressUpdateInterval,10,,"How often to recompute stress on supports.")),

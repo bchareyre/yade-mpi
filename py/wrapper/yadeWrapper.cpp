@@ -626,6 +626,8 @@ class pyOmega{
 	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIter; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIter=s; }
+	long stopAtTime_get(){return OMEGA.getScene()->stopAtTime; }
+	void stopAtTime_set(long s){OMEGA.getScene()->stopAtTime=s; }
 
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
@@ -827,6 +829,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("subStep",&pyOmega::subStep,"Get the current subStep number (only meaningful if O.subStepping==True); -1 when outside the loop, otherwise either 0 (O.subStepping==False) or number of engine to be run (O.subStepping==True)")
 		.add_property("subStepping",&pyOmega::subStepping_get,&pyOmega::subStepping_set,"Get/set whether subStepping is active.")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
+		.add_property("stopAtTime",&pyOmega::stopAtTime_get,&pyOmega::stopAtTime_set,"Get/set time after which the simulation will stop.")
 		.add_property("time",&pyOmega::time,"Return virtual (model world) time of the simulation.")
 		.add_property("realtime",&pyOmega::realTime,"Return clock (human world) time the simulation has been running.")
 		.add_property("speed",&pyOmega::speed,"Return current calculation speed [iter/sec].")

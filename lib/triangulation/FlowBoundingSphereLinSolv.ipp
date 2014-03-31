@@ -9,8 +9,6 @@
 
 // #define XVIEW
 #include "FlowBoundingSphereLinSolv.hpp"//include after #define XVIEW
-// #include "def_types.h"
-// #include "def_flow_types.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 #include <CGAL/Width_3.h>
 #include <iostream>
@@ -62,15 +60,15 @@ extern  "C" int F77_FUNC(pardiso)
 #ifdef XVIEW
 Vue3D Vue1;
 #endif
-template<class FlowType>
-FlowBoundingSphereLinSolv<FlowType>::~FlowBoundingSphereLinSolv()
+template<class _Tesselation, class FlowType>
+FlowBoundingSphereLinSolv<_Tesselation,FlowType>::~FlowBoundingSphereLinSolv()
 {
 	#ifdef TAUCS_LIB
 	if (Fccs) taucs_ccs_free(Fccs);
 	#endif
 }
-template<class FlowType>
-FlowBoundingSphereLinSolv<FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
+template<class _Tesselation, class FlowType>
+FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
 	useSolver=0;
 	isLinearSystemSet=0;
 	isFullLinearSystemGSSet=0;
@@ -92,10 +90,10 @@ FlowBoundingSphereLinSolv<FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
 }
 
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::swap_fwd (double* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::swap_fwd (int* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::swapFwd (double* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::swapFwd (int* v, int i) {double temp = v[i]; v[i]=v[i+1]; v[i+1]=temp;}
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
@@ -119,9 +117,9 @@ struct CellTraits_for_spatial_sort : public Triangulation::Geom_traits {
 	Less_z_3  less_z_3_object() const {return Less_z_3();}
 };
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::ResetNetwork() {
-	FlowType::ResetNetwork();
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetNetwork() {
+	FlowType::resetNetwork();
 	isLinearSystemSet=false;
 	isFullLinearSystemGSSet=false;
 	areCellsOrdered=false;
@@ -142,8 +140,8 @@ void FlowBoundingSphereLinSolv<FlowType>::ResetNetwork() {
 	}
 #endif
 }
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystem(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 {
 
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -157,8 +155,8 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystem(Real dt)
 		ncols=0;
 		///Ordered cells
 		orderedCells.clear();
-		const Finite_cells_iterator cell_end = Tri.finite_cells_end();
-		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		const FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			orderedCells.push_back(cell);
 			if (!cell->info().Pcondition) ++ncols;}
 //		//Segfault on 14.10, and useless overall since SuiteSparse has preconditionners (including metis)
@@ -187,12 +185,12 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystem(Real dt)
 		T_nnz=0;}
 	for (int kk=0; kk<ncols;kk++) T_b[kk]=0;
 	///Ordered cells
-	int index=0, nIndex=0; Cell_handle neighbour_cell;
+	int index=0, nIndex=0; CellHandle neighbourCell;
 	for (int i=0; i<n_cells; i++)
 	{
-		Finite_cells_iterator& cell = orderedCells[i];
+		FiniteCellsIterator& cell = orderedCells[i];
 		///Non-ordered cells
-// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		if (!cell->info().Pcondition) {
 			index=cell->info().index;
 			if (index==0) {
@@ -203,27 +201,27 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystem(Real dt)
 				//Add diagonal term
 				is[T_nnz] = index;
 				js[T_nnz] = index;
-				vs[T_nnz] = (cell->info().k_norm())[0]+ (cell->info().k_norm())[1]+ (cell->info().k_norm())[2]+ (cell->info().k_norm())[3];
+				vs[T_nnz] = (cell->info().kNorm())[0]+ (cell->info().kNorm())[1]+ (cell->info().kNorm())[2]+ (cell->info().kNorm())[3];
 				if (fluidBulkModulus>0) vs[T_nnz] += (1.f/(dt*fluidBulkModulus*cell->info().invVoidVolume()));
 				++T_nnz;
 			}
 			for (int j=0; j<4; j++) {
-				neighbour_cell = cell->neighbor(j);
-				nIndex=neighbour_cell->info().index;
-				if (Tri.is_infinite(neighbour_cell)) continue;
-				if (!isLinearSystemSet  &&  !neighbour_cell->info().Pcondition) {
+				neighbourCell = cell->neighbor(j);
+				nIndex=neighbourCell->info().index;
+				if (Tri.is_infinite(neighbourCell)) continue;
+				if (!isLinearSystemSet  &&  !neighbourCell->info().Pcondition) {
 					if (nIndex==0) {
-						T_cells[++T_index]=neighbour_cell;
-						neighbour_cell->info().index=nIndex=T_index;
+						T_cells[++T_index]=neighbourCell;
+						neighbourCell->info().index=nIndex=T_index;
 					} else if (index > nIndex) {
 						is[T_nnz] = index;
 						js[T_nnz] = nIndex;
-						vs[T_nnz] = - (cell->info().k_norm())[j];
+						vs[T_nnz] = - (cell->info().kNorm())[j];
 						T_nnz++;
 					}
-				} else if (neighbour_cell->info().Pcondition) {
+				} else if (neighbourCell->info().Pcondition) {
 					//ADD TO b, FIXME : use updated volume change
-					T_b[index-1]+=cell->info().k_norm()[j]*neighbour_cell->info().p();
+					T_b[index-1]+=cell->info().kNorm()[j]*neighbourCell->info().p();
 				}
 			}
 		}
@@ -287,11 +285,11 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystem(Real dt)
 	return ncols;
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::CopyGsToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=gsP[ii];}
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyGsToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=gsP[ii];}
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::CopyCellsToGs (Real dt)
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToGs (Real dt)
 {
 	for (int ii=1; ii<=ncols; ii++){
 		gsP[ii]=T_cells[ii]->info().p();
@@ -300,11 +298,11 @@ void FlowBoundingSphereLinSolv<FlowType>::CopyCellsToGs (Real dt)
 	}
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::CopyLinToCells() {for (int ii=1; ii<=ncols; ii++) {T_cells[ii]->info().p()=T_x[ii-1];} }
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) {T_cells[ii]->info().p()=T_x[ii-1];} }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::CopyCellsToLin (Real dt)
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
 {
 	for (int ii=1; ii<=ncols; ii++) {
 		T_bv[ii-1]=T_b[ii-1]-T_cells[ii]->info().dv();
@@ -312,9 +310,9 @@ void FlowBoundingSphereLinSolv<FlowType>::CopyCellsToLin (Real dt)
 }
 
 /// For Gauss Seidel, we need the full matrix
-template<class FlowType>
-// int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS()
-int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS(Real dt)
+template<class _Tesselation, class FlowType>
+// int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::SetLinearSystemFullGS()
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystemFullGS(Real dt)
 {
 	//WARNING : boundary conditions (Pcondition, p values) must have been set for a correct definition
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -324,18 +322,18 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS(Real dt)
 		T_index=0;
 		T_nnz=0;
 		ncols=0;
-		const Finite_cells_iterator cell_end = Tri.finite_cells_end();
+		const FiniteCellsIterator cellEnd = Tri.finite_cells_end();
 		orderedCells.clear();
 
-		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			orderedCells.push_back(cell);
 			if (!cell->info().Pcondition) ++ncols;
 		}
 		//FIXME: does it really help? test by commenting this "sorting" line
 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
 
-// 		double P_zero=0;
-// 		if (y_min_id>=0 and y_max_id>y_min_id) P_zero = abs((boundary(y_min_id).value-boundary(y_max_id).value)/2);
+// 		double pZero=0;
+// 		if (yMinId>=0 and yMaxId>yMinId) pZero = abs((boundary(yMinId).value-boundary(yMaxId).value)/2);
 		gsP.resize(ncols+1);
 // 		_gsP.resize(ncols+1);
 		gsB.resize(ncols+1);
@@ -348,7 +346,7 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS(Real dt)
 			fullAcolumns[k].resize(4);
 			fullAvalues[k].resize(5);
 			gsdV[k]=0;
-// 			gsP[k]=P_zero;
+// 			gsP[k]=pZero;
 		}
 // 		_gsP[0]= &ZERO;
 		gsP[0]=0;
@@ -362,9 +360,9 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS(Real dt)
 	///Ordered cells
 	for (int i=0; i<n_cells; i++)
 	{
-		Finite_cells_iterator& cell = orderedCells[i];
+		FiniteCellsIterator& cell = orderedCells[i];
 	///Non-ordered cells
-// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		if (!cell->info().Pcondition) {
 			if (cell->info().index==0) {
 				T_cells[++T_index]=cell;
@@ -372,29 +370,29 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS(Real dt)
 			}
 			gsP[cell->info().index]=cell->info().pression;
 			//Add diagonal term
-			double num = (cell->info().k_norm())[0]+ (cell->info().k_norm())[1]+ (cell->info().k_norm())[2]+ (cell->info().k_norm())[3];
+			double num = (cell->info().kNorm())[0]+ (cell->info().kNorm())[1]+ (cell->info().kNorm())[2]+ (cell->info().kNorm())[3];
 			if (fluidBulkModulus>0) num += (1.f/(dt*fluidBulkModulus*cell->info().invVoidVolume()));
 			fullAvalues[cell->info().index][4] = 1.f/num;
 			++T_nnz;
 			
 			for (int j=0; j<4; j++) {
-				Cell_handle neighbour_cell = cell->neighbor(j);
-				if (Tri.is_infinite(neighbour_cell)) {
+				CellHandle neighbourCell = cell->neighbor(j);
+				if (Tri.is_infinite(neighbourCell)) {
 					fullAvalues[cell->info().index][j] = 0;
 					fullAcolumns[cell->info().index][j] = &gsP[0];
 					continue;}
-				if (!neighbour_cell->info().Pcondition) {
-					if (neighbour_cell->info().index==0) {
-						T_cells[++T_index]=neighbour_cell;
-						neighbour_cell->info().index=T_index;
+				if (!neighbourCell->info().Pcondition) {
+					if (neighbourCell->info().index==0) {
+						T_cells[++T_index]=neighbourCell;
+						neighbourCell->info().index=T_index;
 					}
 					++T_nnz;
-					fullAvalues[cell->info().index][j] = (cell->info().k_norm())[j];
-					fullAcolumns[cell->info().index][j] = &gsP[neighbour_cell->info().index];
+					fullAvalues[cell->info().index][j] = (cell->info().kNorm())[j];
+					fullAcolumns[cell->info().index][j] = &gsP[neighbourCell->info().index];
 				} else {
      					fullAvalues[cell->info().index][j] = 0;
 					fullAcolumns[cell->info().index][j] = &gsP[0];
-					gsB[cell->info().index]+=cell->info().k_norm()[j]*neighbour_cell->info().p();
+					gsB[cell->info().index]+=cell->info().kNorm()[j]*neighbourCell->info().p();
 				}
 			}
 		}
@@ -404,30 +402,28 @@ int FlowBoundingSphereLinSolv<FlowType>::SetLinearSystemFullGS(Real dt)
 	///Ordered cells
 	for (int i=0; i<n_cells; i++)
 	{
-		Finite_cells_iterator& cell = orderedCells[i];
+		FiniteCellsIterator& cell = orderedCells[i];
 	///Non-ordered cells
-// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		if (!cell->info().Pcondition) for (int j=0; j<4; j++) {
-			Cell_handle neighbour_cell = cell->neighbor(j);
-			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().Pcondition) 
-				gsB[cell->info().index]+=cell->info().k_norm()[j]*neighbour_cell->info().p();
+			CellHandle neighbourCell = cell->neighbor(j);
+			if (!Tri.is_infinite(neighbourCell) && neighbourCell->info().Pcondition) 
+				gsB[cell->info().index]+=cell->info().kNorm()[j]*neighbourCell->info().p();
 		}
 	}
 	isFullLinearSystemGSSet=true;
 	return ncols;
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::VectorizedGaussSeidel(Real dt)
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::vectorizedGaussSeidel(Real dt)
 {
 // 	cout<<"VectorizedGaussSeidel"<<endl;
-	if (!isFullLinearSystemGSSet || (isFullLinearSystemGSSet && reApplyBoundaryConditions())) SetLinearSystemFullGS(dt);
-	CopyCellsToGs(dt);
+	if (!isFullLinearSystemGSSet || (isFullLinearSystemGSSet && reApplyBoundaryConditions())) setLinearSystemFullGS(dt);
+	copyCellsToGs(dt);
 	
 	int j = 0;
 	double dp_max, p_max, sum_p, p_moy, dp_moy, sum_dp;
-	double tolerance = TOLERANCE;
-	double relax = RELAX;
 	
 #ifdef GS_OPEN_MP
 	const int num_threads=1;
@@ -490,35 +486,35 @@ void FlowBoundingSphereLinSolv<FlowType>::VectorizedGaussSeidel(Real dt)
 		if (j2==0) {
 			p_moy = sum_p/ncols;
 			dp_moy = sum_dp/ncols;
-			if (DEBUG_OUT) cerr <<"GS : j="<<j<<" p_moy="<<p_moy<<" dp_moy="<<dp_moy<<endl;
+			if (debugOut) cerr <<"GS : j="<<j<<" p_moy="<<p_moy<<" dp_moy="<<dp_moy<<endl;
 		}
 #ifdef GS_OPEN_MP
 #pragma omp master
 #endif
 		j++;
 	} while ((dp_max/p_max) > tolerance && j<20000 /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
-	CopyGsToCells();
+	copyGsToCells();
 	if (j>=20000) cerr<<"GS did not converge in 20k iterations (maybe because the reference pressure is 0?)"<<endl;
-	if (DEBUG_OUT) cerr <<"GS iterations : "<<j-1<<endl;
+	if (debugOut) cerr <<"GS iterations : "<<j-1<<endl;
 }
 
-template<class FlowType>
-void FlowBoundingSphereLinSolv<FlowType>::sort_v(int k1, int k2, int* is, double* ds){
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::sortV(int k1, int k2, int* is, double* ds){
 	for (int k=k1; k<k2; k++) {
 		int kk=k;
 		while (kk>=k1 && is[kk]>is[kk+1]) {
-			swap_fwd(is,kk);
-			swap_fwd(ds,kk);
+			swapFwd(is,kk);
+			swapFwd(ds,kk);
 			--kk;}
 	}
 }
 
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::eigenSolve(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 {
 #ifdef EIGENSPARSE_LIB
-	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions())) ncols = SetLinearSystem(dt);
-	CopyCellsToLin(dt);
+	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions())) ncols = setLinearSystem(dt);
+	copyCellsToLin(dt);
 	//FIXME: we introduce new Eigen vectors, then we have to copy from/to c-arrays, can be optimized later
 	Eigen::VectorXd eb(ncols); Eigen::VectorXd ex(ncols);
 	for (int k=0; k<ncols; k++) eb[k]=T_bv[k];
@@ -537,7 +533,7 @@ int FlowBoundingSphereLinSolv<FlowType>::eigenSolve(Real dt)
 	openblas_set_num_threads(numSolveThreads);
 	ex = eSolver.solve(eb);
 	for (int k=0; k<ncols; k++) T_x[k]=ex[k];
-	CopyLinToCells();
+	copyLinToCells();
 #else
 	cerr<<"Flow engine not compiled with eigen, nothing computed if useSolver=3"<<endl;
 #endif
@@ -545,19 +541,19 @@ int FlowBoundingSphereLinSolv<FlowType>::eigenSolve(Real dt)
 }
 
 
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::TaucsSolve(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::taucsSolve(Real dt)
 {
 #ifdef TAUCS_LIB
-	if (DEBUG_OUT) cerr <<endl<<"TAUCS solve"<<endl;
+	if (debugOut) cerr <<endl<<"TAUCS solve"<<endl;
 	double t = taucs_ctime();//timer
 	double t2 = taucs_ctime();//global timer
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions())) {
-		ncols = SetLinearSystem(dt);
-		if (DEBUG_OUT) cerr << "Assembling the matrix : " <<  taucs_ctime()-t << endl; t = taucs_ctime();}
+		ncols = setLinearSystem(dt);
+		if (debugOut) cerr << "Assembling the matrix : " <<  taucs_ctime()-t << endl; t = taucs_ctime();}
 
-	CopyCellsToLin(dt);
-	if (DEBUG_OUT) cerr << "Updating dv's (Yade->LinSolver) : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
+	copyCellsToLin(dt);
+	if (debugOut) cerr << "Updating dv's (Yade->LinSolver) : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
 	//taucs_logfile("stdout");//! VERY USEFULL!!!!!!!!!!! (disable to exclude output time from taucs_ctime() measurments)
 
 	taucs_double* x = &T_x[0];// the unknown vector to solve Ax=b
@@ -565,14 +561,14 @@ int FlowBoundingSphereLinSolv<FlowType>::TaucsSolve(Real dt)
 	taucs_double* xod = &xodv[0];
 
 	if (Fccs==NULL) {
-		if (DEBUG_OUT) cerr << "_entering taucs_" << endl;
+		if (debugOut) cerr << "_entering taucs_" << endl;
 		// 1) Reordering
 		taucs_ccs_order(T_A, &perm, &invperm, (char*)"metis");
-		if (DEBUG_OUT) cerr << "_entering taucs_" << endl;
+		if (debugOut) cerr << "_entering taucs_" << endl;
 		taucs_ccs_matrix*  Aod;
-		if (DEBUG_OUT) cerr << "_entering taucs_" << endl;
+		if (debugOut) cerr << "_entering taucs_" << endl;
 		Aod = taucs_ccs_permute_symmetrically(T_A, perm, invperm);
-		if (DEBUG_OUT) cerr << "Reordering : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
+		if (debugOut) cerr << "Reordering : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
 
 		// 2) Factoring
 		F = taucs_ccs_factor_llt_mf(Aod);
@@ -582,27 +578,27 @@ int FlowBoundingSphereLinSolv<FlowType>::TaucsSolve(Real dt)
 		Fccs = taucs_supernodal_factor_to_ccs(F);
 		//... then delete F
 		taucs_supernodal_factor_free(F); F=NULL;
-		if (DEBUG_OUT) cerr << "Factoring : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
+		if (debugOut) cerr << "Factoring : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
 	}
 	taucs_vec_permute(ncols, TAUCS_DOUBLE, &T_bv[0], bod, perm);
 	// 3) Back substitution and reodering the solution back
 	taucs_ccs_solve_llt(Fccs, xod, bod);//the ccs format (faster)
 // 	taucs_supernodal_solve_llt(F, xod, bod);//the blackbox format (slower)
-	if (DEBUG_OUT) cerr << "Solving : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
+	if (debugOut) cerr << "Solving : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
 	t = taucs_ctime();
 	taucs_vec_ipermute(ncols, TAUCS_DOUBLE, xod, x, perm);
 //     	cerr << "Deordering : " <<  taucs_ctime()-t << endl; t = taucs_ctime();
 	// 4) Copy back to the triangulation
-	CopyLinToCells();
+	copyLinToCells();
 // 	cerr << "Updating P (LinSolver->Yade) : " <<  taucs_ctime()-t << endl;
-	if (DEBUG_OUT) cerr << "Total TAUCS time ................ : " <<  taucs_ctime()-t2 << endl;
+	if (debugOut) cerr << "Total TAUCS time ................ : " <<  taucs_ctime()-t2 << endl;
 #else
 	cerr<<"Flow engine not compiled with taucs, nothing computed if useSolver=1"<<endl;
 #endif
 	return 0;
 }
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::pardisoSolve(Real dt)
 {
 	cerr <<endl<<"PardisoSolve solve"<<endl;
 	#ifndef PARDISO
@@ -610,29 +606,29 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 	#else
 	double iniT = taucs_ctime();
 
-	if (DEBUG_OUT) cerr << "_entering pardiso_" << endl;
+	if (debugOut) cerr << "_entering pardiso_" << endl;
 	/* Matrix data. */
 	double t = taucs_ctime();//timer
 	bool wasLSystemSet= isLinearSystemSet;
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions())) {
-		ncols = SetLinearSystem(dt);
-		if (DEBUG_OUT) cerr << "Assembling the matrix : " <<  taucs_ctime()-t << endl; t = taucs_ctime();}
+		ncols = setLinearSystem(dt);
+		if (debugOut) cerr << "Assembling the matrix : " <<  taucs_ctime()-t << endl; t = taucs_ctime();}
 
-	if (DEBUG_OUT) cerr<<taucs_ctime()-t<<"s : set system"<<endl;
+	if (debugOut) cerr<<taucs_ctime()-t<<"s : set system"<<endl;
 	t=taucs_ctime();
 	ia = T_A->colptr;
 	ja = T_A->rowind;
 	a = T_A->values.d;
-	if (DEBUG_OUT)  cerr<<taucs_ctime()-t<<"s : set system"<<endl;
-	if (!wasLSystemSet) for (int k=0; k<ncols; k++) sort_v(ia[k],ia[k+1]-1,ja,a);
-	if (DEBUG_OUT) cout<<taucs_ctime()-t<<"s for ordering CCS format"<<endl;
+	if (debugOut)  cerr<<taucs_ctime()-t<<"s : set system"<<endl;
+	if (!wasLSystemSet) for (int k=0; k<ncols; k++) sortV(ia[k],ia[k+1]-1,ja,a);
+	if (debugOut) cout<<taucs_ctime()-t<<"s for ordering CCS format"<<endl;
 	t=taucs_ctime();
 
 	nnz = ia[ncols];
 //    int mtype = -2;        /* Real symmetric matrix */
 	mtype = 2;        /* Real symmetric positive def. matrix */
 	/* RHS and solution vectors. */
-	CopyCellsToLin(dt);
+	copyCellsToLin(dt);
 	b = &T_bv[0];
 // 	P_x.resize(n);
 	x = &T_x[0];// the unknown vector to solve Ax=b
@@ -652,9 +648,9 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 			num_procs=1;
 			cerr<<"Set environment OMP_NUM_THREADS to something. Pardiso needs it defined!"<<endl;
 		}
-		if (DEBUG_OUT) cerr<<taucs_ctime()-t<<"pardisoinit"<<endl;
+		if (debugOut) cerr<<taucs_ctime()-t<<"pardisoinit"<<endl;
 		F77_FUNC(pardisoinit)(pt,  &mtype, &solver, iparm, dparm, &error);
-		if (DEBUG_OUT) cerr<<taucs_ctime()-t<<"pardisoinit'ed"<<endl;
+		if (debugOut) cerr<<taucs_ctime()-t<<"pardisoinit'ed"<<endl;
 		pardisoInitialized=true;
 		if (error != 0) {
 			if (error == -10) printf("No license file found \n");
@@ -669,7 +665,7 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 
 		/* ..  Convert matrix from 0-based C-notation to Fortran 1-based        */
 		/*     notation.                                                        */
-		if (DEBUG_OUT) cout<<taucs_ctime()-t<<"tuning"<<endl;
+		if (debugOut) cout<<taucs_ctime()-t<<"tuning"<<endl;
 		t=taucs_ctime();
 		for (i = 0; i < ncols+1; i++) {
 			ia[i] += 1;
@@ -677,7 +673,7 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 		for (i = 0; i < nnz; i++) {
 			ja[i] += 1;
 		}
-		if (DEBUG_OUT) cout<<taucs_ctime()-t<<"s : Convert matrix from 0-based"<<endl;
+		if (debugOut) cout<<taucs_ctime()-t<<"s : Convert matrix from 0-based"<<endl;
 		t=taucs_ctime();
 		/* ..  Reordering and Symbolic Factorization.  This step also allocates */
 		/*     all memory that is necessary for the factorization.              */
@@ -689,7 +685,7 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 			printf("\nERROR during symbolic factorization: %d", error);
 			exit(1);
 		}
-		if (DEBUG_OUT) cout<<taucs_ctime()-t<<"s : Reordering and Symbolic Factorization"<<endl;
+		if (debugOut) cout<<taucs_ctime()-t<<"s : Reordering and Symbolic Factorization"<<endl;
 		t=taucs_ctime();
 
 		/* ..  Numerical factorization.                                         */
@@ -702,7 +698,7 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 			printf("\nERROR during numerical factorization: %d", error);
 			exit(2);
 		}
-		if (DEBUG_OUT) cerr<<taucs_ctime()-t<<"s : Numerical factorization. "<<endl;
+		if (debugOut) cerr<<taucs_ctime()-t<<"s : Numerical factorization. "<<endl;
 		t=taucs_ctime();
 	}
 	/* ..  Back substitution and iterative refinement.                      */
@@ -716,10 +712,10 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 		printf("\nERROR during solution: %d", error);
 		exit(3);
 	}
-	if (DEBUG_OUT) cerr<<taucs_ctime()-t<<"s : Back substitution and iterative refinement."<<endl;
+	if (debugOut) cerr<<taucs_ctime()-t<<"s : Back substitution and iterative refinement."<<endl;
 	t=taucs_ctime();
-	CopyLinToCells();
-	if (DEBUG_OUT) cerr<<taucs_ctime()-t<<"s : Copy back."<<endl;
+	copyLinToCells();
+	if (debugOut) cerr<<taucs_ctime()-t<<"s : Copy back."<<endl;
 
 	if (wasLSystemSet){
 		pTime1N++; pTime1+=(taucs_ctime()-iniT);
@@ -742,8 +738,8 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolve(Real dt)
 }
 
 
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::PardisoSolveTest()
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::pardisoSolveTest()
 {
 	#ifndef PARDISO
 	return 0;
@@ -751,7 +747,7 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolveTest()
 	/* Matrix data. */
 	double t = taucs_ctime();//timer
 	bool wasLSystemSet= isLinearSystemSet;
-	int    n = SetLinearSystem();
+	int    n = setLinearSystem();
 // 	ncols=n;//for VectorizesGS
 	cout<<taucs_ctime()-t<<"s : set system"<<endl;
 	t=taucs_ctime();
@@ -759,7 +755,7 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolveTest()
 	int*    ja = T_A->rowind;
 	double*  a = T_A->values.d;
 
-	if (!wasLSystemSet) for (int k=0; k<n; k++) sort_v(ia[k],ia[k+1]-1,ja,a);
+	if (!wasLSystemSet) for (int k=0; k<n; k++) sortV(ia[k],ia[k+1]-1,ja,a);
 	cout<<taucs_ctime()-t<<"s for ordering CCS format"<<endl;
 	t=taucs_ctime();
 
@@ -890,14 +886,14 @@ int FlowBoundingSphereLinSolv<FlowType>::PardisoSolveTest()
 	return 0;
 	#endif
 }
-template<class FlowType>
-int FlowBoundingSphereLinSolv<FlowType>::TaucsSolveTest()
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::taucsSolveTest()
 {
 #ifdef TAUCS_LIB
     cout <<endl<<"TAUCS solve test"<<endl;
 
     double t = taucs_ctime();//timer
-    ncols = SetLinearSystem();
+    ncols = setLinearSystem();
 
 //taucs_logfile("stdout");//! VERY USEFULL!!!!!!!!!!! (disable to exclude output time from taucs_ctime() measurments)
 
@@ -972,8 +968,8 @@ double t4 = taucs_ctime();
 //         }
 
 
-//     const Finite_cells_iterator cell_end = T[currentTes].Triangulation().finite_cells_end();
-//     if (DEBUG_OUT) for (Finite_cells_iterator cell = T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++)
+//     const FiniteCellsIterator cell_end = T[currentTes].Triangulation().finite_cells_end();
+//     if (debugOut) for (FiniteCellsIterator cell = T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++)
 //         {
 //
 //             if (cell->info().index>0) {

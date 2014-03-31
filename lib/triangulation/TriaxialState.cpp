@@ -144,7 +144,7 @@ bool TriaxialState::inside(Real x, Real y, Real z)
 			z <= (box.sommet.z()-filter_distance*mean_radius) );
 }
 
-bool TriaxialState::inside(Vecteur v)
+bool TriaxialState::inside(CVector v)
 {
 	return TriaxialState::inside(v.x(), v.y(), v.z());
 }
@@ -182,7 +182,7 @@ bool TriaxialState::from_file(const char* filename, bool bz2)
 	//Real tx, ty, tz;
 	Point pos(CGAL::ORIGIN);
 	mean_radius=0;
-	Vecteur trans, rot;
+	CVector trans, rot;
 	Real rad; //coordonn�es/rayon
 	bool isSphere;
 
@@ -221,7 +221,7 @@ bool TriaxialState::from_file(const char* filename, bool bz2)
 
 	long id1, id2;
 	int stat;
-	Vecteur c_pos, normal, old_fs, fs;
+	CVector c_pos, normal, old_fs, fs;
 	Real old_fn, fn, frictional_work;
 	Statefile >> Nc;
 	contacts.resize(Nc);

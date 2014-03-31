@@ -68,7 +68,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	BodyContainer::iterator bi = biBegin;
 
 	Body::id_t Ng = 0;
-	Body::id_t& MaxId=Tes.max_id;
+	Body::id_t& MaxId=Tes.maxId;
 	TW.mean_radius = 0;
 
 	shared_ptr<Sphere> sph (new Sphere);
@@ -109,9 +109,9 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 		if (v==RTriangulation::Vertex_handle())
 			hint=c;
 		else {
-			v->info() = (const unsigned int) p->second;
+			v->info().setId((const unsigned int) p->second);
 			//Vh->info().isFictious = false;//false is the default
-			Tes.max_id = std::max(Tes.max_id,(int) p->second);
+			Tes.maxId = std::max(Tes.maxId,(int) p->second);
 			Tes.vertexHandles[p->second]=v;
 			hint=v->cell();
 			++TW.n_spheres;
@@ -189,26 +189,26 @@ bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned
 	}
 }
 
-void TesselationWrapper::ComputeTesselation(void)
+void TesselationWrapper::computeTesselation(void)
 {
 	if (!rad_divided) {
 		mean_radius /= n_spheres;
 		rad_divided = true;
 	}
-	Tes->Compute();
+	Tes->compute();
 }
 
-void TesselationWrapper::ComputeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
+void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
 {
-	AddBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
-	ComputeTesselation();
+	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
+	computeTesselation();
 }
 
-void TesselationWrapper::ComputeVolumes(void)
+void TesselationWrapper::computeVolumes(void)
 {
-	if (!bounded) AddBoundingPlanes();
-	ComputeTesselation();
-	Tes->ComputeVolumes();
+	if (!bounded) addBoundingPlanes();
+	computeTesselation();
+	Tes->computeVolumes();
 }
 unsigned int TesselationWrapper::NumberOfFacets(bool initIters)
 {
@@ -232,7 +232,7 @@ bool TesselationWrapper::nextFacet(std::pair<unsigned int,unsigned int>& facet)
 	return true;
 }
 
-void TesselationWrapper::AddBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz,double dt)
+void TesselationWrapper::addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz,double dt)
 {
 	//Not sure this hack form JFJ works in all cases (?)
 	if (dt == 0) {
@@ -254,7 +254,7 @@ void TesselationWrapper::AddBoundingPlanes(double pminx, double pmaxx, double pm
 	}
 }
 
-void  TesselationWrapper::AddBoundingPlanes(void)
+void  TesselationWrapper::addBoundingPlanes(void)
 {
 	if (!bounded) {
 		if (!rad_divided) {
@@ -349,7 +349,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 		delete Tes;
 		CGT::TriaxialState* ts;
 		if (deformation){//use the final state to compute volumes
-			/*const vector<CGT::Tenseur3>& def =*/ mma.analyser->ComputeParticlesDeformation();
+			/*const vector<CGT::Tenseur3>& def =*/ mma.analyser->computeParticlesDeformation();
 			Tes = &mma.analyser->TS1->tesselation();
 			ts = mma.analyser->TS1;
 			}
@@ -357,8 +357,8 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 			ts = mma.analyser->TS0;}
 		RTriangulation& Tri = Tes->Triangulation();
 		Pmin=ts->box.base; Pmax=ts->box.sommet;
-		//if (!scene->isPeriodic) AddBoundingPlanes();
-		ComputeVolumes();
+		//if (!scene->isPeriodic) addBoundingPlanes();
+		computeVolumes();
 		int bodiesDim = Tes->Max_id() + 1; //=scene->bodies->size();
 		cerr<<"bodiesDim="<<bodiesDim<<endl;
 		int dim1[]={bodiesDim};
