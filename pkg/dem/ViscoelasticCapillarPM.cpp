@@ -269,6 +269,29 @@ Real Law2_ScGeom_ViscElCapPhys_Basic::calculateCapillarForce(const ScGeom& geom,
         
         fC *=-1;
         
+      } else if (phys.CapillarType  == Soulie) {
+        /* 
+         * Capillar model from Soulie [Soulie2006]
+         *
+         * !!! In this implementation the radiis of particles are taken equal
+         * to get the symmetric forces.
+         * 
+         * Please, use this model only for testing purposes.
+         * 
+         */
+           
+        const Real R = phys.R;
+        const Real Gamma = phys.gamma;
+        const Real D = -geom.penetrationDepth;
+        const Real V = phys.Vb;
+        const Real Theta = phys.theta;
+        
+        
+        const Real a = -1.1*pow((V/(R*R*R)), -0.53);
+        const Real b = (-0.148*log(V/(R*R*R)) - 0.96)*Theta*Theta -0.0082*log(V/(R*R*R)) + 0.48;
+        const Real c = 0.0018*log(V/(R*R*R)) + 0.078;
+        
+        fC = Mathr::PI*Gamma*sqrt(R*R)*(c+exp(a*D/R+b));
       } else {
         throw runtime_error("CapillarType is unknown, please, use only Willett_numeric, Willett_analytic, Weigert or Rabinovich");
       }
