@@ -10,7 +10,7 @@
 ## Example script for using the DEM-PFV coupling introduced with E. Catalano, as reported in:
 ## * [Chareyre2012a] Chareyre, B., Cortis, A., Catalano, E., Barthélemy, E. (2012), Pore-scale modeling of viscous flow and induced forces in dense sphere packings. Transport in Porous Media (92), pages 473-493. DOI 10.1007/s11242-011-9915-6
 ## http://dx.doi.org/10.1007/s11242-011-9915-6
-## * [Catalano2013a] Catalano, E., Chareyre, B., Barthélémy, E. (2013), Pore-scale modeling of fluid-particles interaction and emerging poromechanical effects. International Journal for Numerical and Analytical Methods in Geomechanics. DOI 10.1002/nag.2198
+## * [Catalano2014a] Catalano, E., Chareyre, B., Barthélémy, E. (2013), Pore-scale modeling of fluid-particles interaction and emerging poromechanical effects. International Journal for Numerical and Analytical Methods in Geomechanics. DOI 10.1002/nag.2198
 ## http://arxiv.org/pdf/1304.4895.pdf
 ## Also used in:
 ## * Tong et al.2012 (http://dx.doi.org/10.2516/ogst/2012032)
