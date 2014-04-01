@@ -110,6 +110,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::action()
 			if (fluidBulkModulus>0) solver->interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
 			solver=backgroundSolver;
 			backgroundSolver = shared_ptr<FlowSolver> (new FlowSolver);
+			if (metisForced) {backgroundSolver->eSolver.cholmod().nmethods=1; backgroundSolver->eSolver.cholmod().method[0].ordering=CHOLMOD_METIS;}
 			//Copy imposed pressures/flow from the old solver
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
@@ -161,7 +162,6 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::backgroundA
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::boundaryConditions ( Solver& flow )
 {
-
 	for (int k=0;k<6;k++)	{
 		flow.boundary (wallIds[k]).flowCondition=!bndCondIsPressure[k];
                 flow.boundary (wallIds[k]).value=bndCondValue[k];
@@ -226,15 +226,16 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::initSolver 
 
 #ifdef LINSOLV
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
-void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::setForceMetis ( Solver& flow, bool force )
+void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::setForceMetis ( bool force )
 {
         if (force) {
-		flow.eSolver.cholmod().nmethods=1;
-		flow.eSolver.cholmod().method[0].ordering=CHOLMOD_METIS;
-	} else cholmod_defaults(&(flow.eSolver.cholmod()));
+		metisForced=true;
+		solver->eSolver.cholmod().nmethods=1;
+		solver->eSolver.cholmod().method[0].ordering=CHOLMOD_METIS;
+	} else {cholmod_defaults(&(solver->eSolver.cholmod())); metisForced=false;}
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
-bool TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::getForceMetis ( Solver& flow ) {return (flow.eSolver.cholmod().nmethods==1);}
+bool TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::getForceMetis () {return (solver->eSolver.cholmod().nmethods==1);}
 #endif
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::buildTriangulation ( Solver& flow )

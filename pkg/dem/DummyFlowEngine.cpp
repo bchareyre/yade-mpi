@@ -13,7 +13,7 @@
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
 // #define DUMMYFLOW
 #ifdef DUMMYFLOW
-
+#define TEMPLATE_FLOW_NAME DummyFlowEngineT
 #include <yade/pkg/dem/FlowEngine.hpp>
 
 /// We can add data to the Info types by inheritance
@@ -29,11 +29,11 @@ class DummyVertexInfo : public FlowVertexInfo {
 	//same here if needed
 };
 
-typedef TemplateFlowEngine<DummyCellInfo,DummyVertexInfo> DummyFlowEngineT;
-REGISTER_SERIALIZABLE(DummyFlowEngineT);
-YADE_PLUGIN((DummyFlowEngineT));
+typedef TemplateFlowEngine<DummyCellInfo,DummyVertexInfo> TEMPLATE_FLOW_NAME;
+REGISTER_SERIALIZABLE(TEMPLATE_FLOW_NAME);
+YADE_PLUGIN((TEMPLATE_FLOW_NAME));
 
-class DummyFlowEngine : public DummyFlowEngineT
+class DummyFlowEngine : public TEMPLATE_FLOW_NAME
 {
 	public :
 	//We can overload every functions of the base engine to make it behave differently

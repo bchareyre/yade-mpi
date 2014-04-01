@@ -10,9 +10,9 @@
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
-#define DFNFLOW
+// #define DFNFLOW
 #ifdef DFNFLOW
-
+#define TEMPLATE_FLOW_NAME DFNFlowEngineT
 #include <yade/pkg/dem/FlowEngine.hpp>
 
 class DFNCellInfo : public FlowCellInfo

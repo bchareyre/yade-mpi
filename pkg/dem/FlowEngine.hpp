@@ -29,6 +29,8 @@ The files are
 - FlowBoundingSphere.hpp/ipp and PeriodicFlow.hpp/ipp + LinSolv variants: implement the solver in itself (mesh, boundary conditions, solving, defining fluid-particles interactions)
 - FlowEngine.hpp/ipp/cpp (this file)
 
+Variants for periodic boundary conditions are also present.
+
 */
 
 #pragma once
@@ -38,12 +40,23 @@ The files are
 #include<yade/lib/triangulation/FlowBoundingSphere.hpp>
 #include<yade/lib/triangulation/PeriodicFlow.hpp>
 
-/// Converters for Eigen and CGAL vectors
-inline CGT::CVector makeCgVect ( const Vector3r& yv ) {return CGT::CVector ( yv[0],yv[1],yv[2] );}
-inline CGT::Point makeCgPoint ( const Vector3r& yv ) {return CGT::Point ( yv[0],yv[1],yv[2] );}
-inline Vector3r makeVector3r ( const CGT::Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
-inline Vector3r makeVector3r ( const CGT::CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+/// Frequently used:
+typedef CGT::CVector CVector;
+typedef CGT::Point Point;
 
+/// Converters for Eigen and CGAL vectors
+inline CVector makeCgVect ( const Vector3r& yv ) {return CVector ( yv[0],yv[1],yv[2] );}
+inline Point makeCgPoint ( const Vector3r& yv ) {return Point ( yv[0],yv[1],yv[2] );}
+inline Vector3r makeVector3r ( const Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+inline Vector3r makeVector3r ( const CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+
+/// C++ templates and YADE_CLASS_... macro family are not very compatible, this #define is a hack to make it work
+/// TEMPLATE_FLOW_NAME will be the name of a serializable TemplateFlowEngine<...> instance, which can in turn be
+/// inherited from. The instance itself will be useless for actual simulations.
+#ifndef TEMPLATE_FLOW_NAME
+#error You must define TEMPLATE_FLOW_NAME in your source file before including FlowEngine.hpp
+#endif
+	
 template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=CGT::FlowBoundingSphere<_Tesselation> >
 class TemplateFlowEngine : public PartialEngine
 {	
@@ -81,14 +94,15 @@ class TemplateFlowEngine : public PartialEngine
 		enum {wall_xmin, wall_xmax, wall_ymin, wall_ymax, wall_zmin, wall_zmax};
 		Vector3r normal [6];
 		bool currentTes;
+		bool metisForced;
 		int idOffset;
 		double epsVolCumulative;
 		int ReTrg;
 		int ellapsedIter;
 		void initSolver (FlowSolver& flow);
 		#ifdef LINSOLV
-		void setForceMetis (Solver& flow, bool force);
-		bool getForceMetis (Solver& flow);
+		void setForceMetis (bool force);
+		bool getForceMetis ();
 		#endif
 		void triangulate (Solver& flow);
 		void addBoundary (Solver& flow);
@@ -187,22 +201,20 @@ class TemplateFlowEngine : public PartialEngine
 		}
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
-		#ifdef LINSOLV
-		void exportMatrix(string filename) {if (useSolver==3) solver->exportMatrix(filename.c_str());
-			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
-		void exportTriplets(string filename) {if (useSolver==3) solver->exportTriplets(filename.c_str());
-			else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
-		#endif
 
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
 		#ifdef LINSOLV
-		void		cholmodStats() {
-					cerr << cholmod_print_common("PFV Cholmod factorization",&(solver->eSolver.cholmod()))<<endl;
+		void	exportMatrix(string filename) {if (useSolver==3) solver->exportMatrix(filename.c_str());
+				else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		void	exportTriplets(string filename) {if (useSolver==3) solver->exportTriplets(filename.c_str());
+				else cerr<<"available for Cholmod solver (useSolver==3)"<<endl;}
+		void	cholmodStats() {
+					cerr << cholmod_print_common((char*)string("PFV Cholmod factorization").c_str(),&(solver->eSolver.cholmod()))<<endl;
 					cerr << "cholmod method:" << solver->eSolver.cholmod().selected<<endl;
 					cerr << "METIS called:"<<solver->eSolver.cholmod().called_nd<<endl;}
-		bool		metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
+		bool	metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
 		#endif
 
 		virtual ~TemplateFlowEngine();
@@ -219,7 +231,7 @@ class TemplateFlowEngine : public PartialEngine
 			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes(); LOG_WARN("Computing all volumes now, as you did not request it explicitely.");}
 			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
+		YADE_CLASS_PYCLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine,TEMPLATE_FLOW_NAME,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2014a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
 		((bool,isActivated,true,,"Activates Flow Engine"))
 		((bool,first,true,,"Controls the initialization/update phases"))
 		((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
@@ -291,6 +303,7 @@ class TemplateFlowEngine : public PartialEngine
 		ReTrg=1;
 		backgroundCompleted=true;
 		ellapsedIter=0;
+		metisForced=false;
 		,
 		.def("imposeFlux",&TemplateFlowEngine::imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
 		.def("imposePressure",&TemplateFlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
@@ -339,9 +352,6 @@ class TemplateFlowEngine : public PartialEngine
 };
 // Definition of functions in a separate file for clarity 
 #include<yade/pkg/dem/FlowEngine.ipp>
-
-typedef CGT::CVector CVector;
-typedef CGT::Point Point;
 
 class FlowCellInfo : public CGT::SimpleCellInfo {
 	public:
@@ -418,22 +428,5 @@ public:
 	inline const CVector ghostShift (void) {return CGAL::NULL_VECTOR;}
 };
 
-// To register properly, we need to first instantiate an intermediate class, then inherit from it with correct class names in YADE_CLASS macro
-// The intermediate one would be seen with the name "TemplateFlowEngine" by python, thus it would not work when more than one class are derived, they would all
-// be named "TemplateFlowEngine" ...
-typedef TemplateFlowEngine<FlowCellInfo,FlowVertexInfo> FlowEngineT;
-REGISTER_SERIALIZABLE(FlowEngineT);
 
-class FlowEngine : public FlowEngineT
-{
-	public :
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FlowEngine,FlowEngineT,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2013a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
-		,,
-		,
-		//nothing special to define here, we simply re-use FlowEngine methods
-		//.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
-		)
-		DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(FlowEngine);
 

@@ -6,12 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
- 
-
 #ifdef YADE_CGAL
 #ifdef FLOW_ENGINE
 
+#define TEMPLATE_FLOW_NAME FlowEngine_PeriodicInfo
 #include "PeriodicFlowEngine.hpp"
+#undef TEMPLATE_FLOW_NAME
 
 CVector PeriodicCellInfo::hSize[]={CVector(),CVector(),CVector()};
 CVector PeriodicCellInfo::deltaP=CVector();

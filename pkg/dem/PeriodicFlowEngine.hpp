@@ -10,7 +10,6 @@
 /// It is a bit more complicated as for FlowEngine, though, because we need template inheriting from template, which breaks YADE_CLASS_XXX logic_error
 /// See below the commented exemple, for a possible solution
 
-
 #include <yade/pkg/dem/FlowEngine.hpp>
 
 class PeriodicCellInfo : public FlowCellInfo
@@ -109,31 +108,3 @@ class PeriodicFlowEngine : public FlowEngine_PeriodicInfo
 
 };
 REGISTER_SERIALIZABLE(PeriodicFlowEngine);
-
-
-
-// //Keep this: Example of inheriting from template combined with YADE_CLASS_... macro. checkPyClassRegistersItself has to be defined, or it wont compile.
-// template<class T>
-// class Test : public T
-// {
-// 	public :
-// 		virtual ~Test();
-// // 		typedef TemplateFlowEngine<T,T> FlowEngineT;
-// 		virtual void checkPyClassRegistersItself(const std::string& thisClassName) const
-// 		{
-// 			if(getClassName()!=thisClassName) throw std::logic_error(("Class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR*, would not be accessible from python.").c_str());
-// 		}
-// 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Test,PeriodicFlowEngine,"A variant of :yref:`FlowEngine` implementing periodic boundary conditions. The API is very similar.",
-// 		((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
-// 		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
-// 		,,,
-// 	
-// 		,
-// 		//nothing special to define, we re-use FlowEngine methods
-// 		//.def("meanVelocity",&Test::meanVelocity,"measure the mean velocity in the period")
-// 		)
-// 		DECLARE_LOGGER;
-// 
-// 
-// };
-// // REGISTER_SERIALIZABLE(Test);
