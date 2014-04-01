@@ -5,10 +5,139 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
-Real Law2_ScGeom_ViscElPhys_Basic::calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys) {
+YADE_PLUGIN((ViscElCapMat)(ViscElCapPhys)(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys)(Law2_ScGeom_ViscElCapPhys_Basic));
+
+/* ViscElCapMat */
+ViscElCapMat::~ViscElCapMat(){}
+
+/* ViscElCapPhys */
+ViscElCapPhys::~ViscElCapPhys(){}
+
+/* Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys */
+void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
+  // no updates of an existing contact 
+  if(interaction->phys) return;
+  
+  ViscElPhys* physT = Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction); 
+  
+  shared_ptr<ViscElCapPhys> phys (new ViscElCapPhys());
+  phys->kn = physT->kn;
+  phys->ks = physT->ks;
+  phys->cn = physT->cn;
+  phys->cs = physT->cs;
+  phys->tangensOfFrictionAngle = physT->tangensOfFrictionAngle;
+  phys->shearForce = physT->shearForce;
+  phys->mRtype = physT->mRtype;
+  
+  ViscElCapMat* mat1 = static_cast<ViscElCapMat*>(b1.get());
+  ViscElCapMat* mat2 = static_cast<ViscElCapMat*>(b2.get());
+  
+  if (mat1->Capillar and mat2->Capillar)  {
+    if (mat1->Vb == mat2->Vb) {
+      phys->Vb = mat1->Vb;
+    } else {
+      throw runtime_error("Vb should be equal for both particles!.");
+    }
+    
+    if (mat1->gamma == mat2->gamma) {
+      phys->gamma = mat1->gamma;
+    } else {
+      throw runtime_error("Gamma should be equal for both particles!.");
+    }
+  
+    if (mat1->theta == mat2->theta) {
+      phys->theta = (mat1->theta*M_PI/180.0);
+    } else {
+      throw runtime_error("Theta should be equal for both particles!.");
+    }
+    
+    if (mat1->CapillarType == mat2->CapillarType and mat2->CapillarType != ""){
+      
+      if      (mat1->CapillarType == "Willett_numeric")  phys->CapillarType = Willett_numeric;
+      else if (mat1->CapillarType == "Willett_analytic") phys->CapillarType = Willett_analytic;
+      else if (mat1->CapillarType == "Weigert")          phys->CapillarType = Weigert;
+      else if (mat1->CapillarType == "Rabinovich")       phys->CapillarType = Rabinovich;
+      else if (mat1->CapillarType == "Lambert")          phys->CapillarType = Lambert;
+      else                                               phys->CapillarType = None_Capillar;
+    } else {
+      throw runtime_error("CapillarType should be equal for both particles!.");
+    }
+    phys->Capillar=true;
+  }
+  
+  interaction->phys = phys;
+}
+
+/* Law2_ScGeom_ViscElCapPhys_Basic */
+void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
+  Vector3r force = Vector3r::Zero();
+  
+  const int id1 = I->getId1();
+  const int id2 = I->getId2();
+    
+  const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
+  Scene* scene=Omega::instance().getScene().get();
+  ViscElCapPhys& phys=*static_cast<ViscElCapPhys*>(_phys.get());
+  const BodyContainer& bodies = *scene->bodies;
+  
+   /*
+   * This part for implementation of the capillar model.
+   * All main equations are in calculateCapillarForce function. 
+   * There is only the determination of critical distance between spheres, 
+   * after that the liquid bridge will be broken.
+   */ 
+   
+  if (not(phys.liqBridgeCreated) and phys.Capillar) {
+    phys.liqBridgeCreated = true;
+    Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
+    Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
+    if (s1 and s2) {
+      phys.R = 2 * s1->radius * s2->radius / (s1->radius + s2->radius);
+    } else if (s1 and not(s2)) {
+      phys.R = s1->radius;
+    } else {
+      phys.R = s2->radius;
+    }
+    
+    const Real Vstar = phys.Vb/(phys.R*phys.R*phys.R);
+    const Real Sstar = (1+0.5*phys.theta)*(pow(Vstar,1/3.0) + 0.1*pow(Vstar,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
+    
+    phys.sCrit = Sstar*phys.R;
+  }
+  
+  if (geom.penetrationDepth<0) {
+    if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
+      phys.normalForce = -calculateCapillarForce(geom, phys)*geom.normal;
+      if (I->isActive) {
+        addForce (id1,-phys.normalForce,scene);
+        addForce (id2, phys.normalForce,scene);
+      };
+      return;
+    } else {
+      scene->interactions->requestErase(I);
+      return;
+    };
+  };
+  
+  if (I->isActive) {
+    
+    Vector3r torque1 = Vector3r::Zero();
+    Vector3r torque2 = Vector3r::Zero();
+    
+    computeForceTorqueViscEl(_geom, _phys, I, force, torque1, torque2);
+    
+    addForce (id1,-force,scene);
+    addForce (id2, force,scene);
+    addTorque(id1, torque1,scene);
+    addTorque(id2, torque2,scene);
+  }
+}
+
+Real Law2_ScGeom_ViscElCapPhys_Basic::calculateCapillarForce(const ScGeom& geom, ViscElCapPhys& phys) {
   Real fC = 0.0;
   
-  /* Capillar
+    /* 
+    * Capillar
     * Some equations have constants, which can be calculated only once per contact. 
     * No need to recalculate them at each step. 
     * It needs to be fixed.

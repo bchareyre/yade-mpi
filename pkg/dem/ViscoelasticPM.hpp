@@ -37,7 +37,6 @@ class ViscElMat : public FrictMat {
 REGISTER_SERIALIZABLE(ViscElMat);
 
 /// Interaction physics
-enum CapType {None_Capillar, Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert};
 class ViscElPhys : public FrictPhys{
 	public:
 		virtual ~ViscElPhys();
@@ -46,14 +45,7 @@ class ViscElPhys : public FrictPhys{
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
-		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_"))
-		((bool,Capillar,false,,"True, if capillar forces need to be added."))
-		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
-		((Real,sCrit,false,,"Critical bridge length [m]"))
-		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
-		((Real,gamma,NaN,,"Surface tension [N/m]"))
-		((Real,theta,NaN,,"Contact angle [rad]"))
-		((CapType,CapillarType,None_Capillar,,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert")),
+		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_")),
 		createIndex();
 	)
 	REGISTER_CLASS_INDEX(ViscElPhys,FrictPhys);
@@ -67,8 +59,6 @@ class Ip2_ViscElMat_ViscElMat_ViscElPhys: public IPhysFunctor {
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	private :
-		Real contactParameterCalculation(const Real& l1,const Real& l2, const bool& massMultiply);
 	YADE_CLASS_BASE_DOC(Ip2_ViscElMat_ViscElMat_ViscElPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.");
 	FUNCTOR2D(ViscElMat,ViscElMat);
 
@@ -80,9 +70,6 @@ REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_ViscElPhys);
 class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 	public :
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
-	private:
-		Real calculateCapillarForce(const ScGeom& geom, ViscElPhys& phys);
-		void computeForceTorque(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);
 	public :
 	FUNCTOR2D(ScGeom,ViscElPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`. The model is mostly based on the paper for For details see Pournin [Pournin2001]_ .");
@@ -90,3 +77,6 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 
+Real contactParameterCalculation(const Real& l1,const Real& l2, const bool& massMultiply);
+ViscElPhys* Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction);
+void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);
