@@ -123,8 +123,23 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 }
 
 /* Law2_ScGeom_ViscElPhys_Basic */
-void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
+void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
+	Vector3r force = Vector3r::Zero();
+	Vector3r torque1 = Vector3r::Zero();
+	Vector3r torque2 = Vector3r::Zero();
+	computeForceTorque(_geom, _phys, I, force, torque1, torque2);
+	if (I->isActive) {
+		const int id1 = I->getId1();
+		const int id2 = I->getId2();
+		
+		addForce (id1,-force,scene);
+		addForce (id2, force,scene);
+		addTorque(id1, torque1,scene);
+		addTorque(id2, torque2,scene);
+  }
+}
 
+void Law2_ScGeom_ViscElPhys_Basic::computeForceTorque(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2) {
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
 
@@ -179,7 +194,6 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
 	const Real& dt = scene->dt;
 	shearForce = geom.rotate(shearForce);
-	
 
 	// Handle periodicity.
 	const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
@@ -235,13 +249,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		// Then no slip occurs we consider friction damping + viscous damping.
 		shearForceVisc = phys.cs*shearVelocity; 
 	}
-	
-	if (I->isActive) {
-		const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
-		addForce (id1,-f,scene);
-		addForce (id2, f,scene);
-		addTorque(id1,-c1x.cross(f)+momentResistance,scene);
-		addTorque(id2, c2x.cross(f)-momentResistance,scene);
-  }
+	force = phys.normalForce + shearForce + shearForceVisc;
+	torque1 = -c1x.cross(force)+momentResistance;
+	torque2 =  c2x.cross(force)-momentResistance;
 }
-

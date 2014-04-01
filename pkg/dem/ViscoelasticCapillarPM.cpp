@@ -1,4 +1,4 @@
-#include"ViscoelasticPM.hpp"
+#include"ViscoelasticCapillarPM.hpp"
 #include<yade/core/State.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
