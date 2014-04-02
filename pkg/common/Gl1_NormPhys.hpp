@@ -17,7 +17,7 @@ class Gl1_NormPhys: public GlIPhysFunctor{
 		((int,signFilter,0,,"If non-zero, only display contacts with negative (-1) or positive (+1) normal forces; if zero, all contacts will be displayed."))
 		((Real,refRadius,std::numeric_limits<Real>::infinity(),,"Reference (minimum) particle radius; used only if :yref:`maxRadius<Gl1_NormPhys.maxRadius>` is negative. This value will be decreased (but *not increased* ) automatically. |yupdate|"))
 		((Real,maxRadius,-1,,"Cylinder radius corresponding to the maximum normal force. If negative, auto-updated :yref:`refRadius<Gl1_NormPhys.refRadius>` will be used instead."))
-		((int,slices,6,,"Number of sphere slices; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`_)"))
+		((int,slices,6,,"Number of sphere slices; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`_)")) // FIXME: the link does not exist
 		((int,stacks,1,,"Number of sphere stacks; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`_)"))
 		// strong/weak fabric attributes
 		((Real,maxWeakFn,NaN,,"Value that divides contacts by their normal force into the 'weak fabric' and 'strong fabric'. This value is set as side-effect by :yref:`utils.fabricTensor`."))
