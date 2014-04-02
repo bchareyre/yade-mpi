@@ -124,38 +124,90 @@ ViscElPhys* Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>&
 	Real mass1 = 1.0;
 	Real mass2 = 1.0;
 	
-	if (mat1->massMultiply and mat2->massMultiply) {
-		mass1 = Body::byId(interaction->getId1())->state->mass;
-		mass2 = Body::byId(interaction->getId2())->state->mass;
-		if (mass1 == 0.0 and mass2 > 0.0) {
-			mass1 = mass2;
-		} else if (mass2 == 0.0 and mass1 > 0.0) {
-			mass2 = mass1;
-		}
+	if ((isnormal(mat1->kn) and  not (isnormal(mat2->kn))) or
+			(isnormal(mat2->kn) and  not (isnormal(mat1->kn))) or
+			(isnormal(mat1->ks) and  not (isnormal(mat2->ks))) or
+			(isnormal(mat2->ks) and  not (isnormal(mat1->ks))) or
+			(isnormal(mat1->cn) and  not (isnormal(mat2->cn))) or
+			(isnormal(mat2->cn) and  not (isnormal(mat1->cn))) or
+			(isnormal(mat1->cs) and  not (isnormal(mat2->cs))) or
+			(isnormal(mat2->cs) and  not (isnormal(mat1->cs))) or
+			(isnormal(mat1->tc) and  not (isnormal(mat2->tc))) or
+			(isnormal(mat2->tc) and  not (isnormal(mat1->tc))) or
+			(isnormal(mat1->en) and  not (isnormal(mat2->en))) or
+			(isnormal(mat2->en) and  not (isnormal(mat1->en))) or
+			(isnormal(mat1->et) and  not (isnormal(mat2->et))) or
+			(isnormal(mat2->et) and  not (isnormal(mat1->et)))) {
+				throw runtime_error("Both materials should have the same defined set of variables e.g. tc, ks etc.!"); 
+			}
+			
+	mass1 = Body::byId(interaction->getId1())->state->mass;
+	mass2 = Body::byId(interaction->getId2())->state->mass;
+	if (mass1 == 0.0 and mass2 > 0.0) {
+		mass1 = mass2;
+	} else if (mass2 == 0.0 and mass1 > 0.0) {
+		mass2 = mass1;
 	}
+	
+	const Real massR = 2*mass1*mass2/(mass1+mass2);
 	
 	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
 	Real R1=sphCont->refR1>0?sphCont->refR1:sphCont->refR2;
 	Real R2=sphCont->refR2>0?sphCont->refR2:sphCont->refR1;
 	
-	const Real kn1 = isnan(mat1->kn)?2*mat1->young*R1:mat1->kn*mass1;
-	const Real cn1 = mat1->cn*mass1;
-	const Real ks1 = isnan(mat1->ks)?kn1*mat1->poisson:mat1->ks*mass1;
-	const Real cs1 = mat1->cs*mass1;
+	Real kn1 = 0.0; Real kn2 = 0.0;
+	Real cn1 = 0.0; Real cn2 = 0.0;
+	Real ks1 = 0.0; Real ks2 = 0.0;
+	Real cs1 = 0.0; Real cs2 = 0.0;
+	
+	if ((isnormal(mat1->tc)) and (isnormal(mat1->en)) and (isnormal(mat1->et))) {
+		//Set parameters according to [Pournin2001]
+		
+		const Real tc = (mat1->tc+mat2->tc)/2.0;
+		const Real en = (mat1->en+mat2->en)/2.0;
+		const Real et = (mat1->et+mat2->et)/2.0;
+		
+		kn1 = kn2 = 1/tc/tc * ( Mathr::PI*Mathr::PI + pow(log(en),2) )*massR;
+		cn1 = cn2 = -2.0 /tc * log(en)*massR;
+		ks1 = ks2 = 2.0/7.0 /tc/tc * ( Mathr::PI*Mathr::PI + pow(log(et),2) )*massR;
+		cs1 = cs2 = -2.0/7.0 /tc * log(et)*massR;
+	
+		if (abs(cn1) <= Mathr::ZERO_TOLERANCE ) cn1=0;
+		if (abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
+		if (abs(cs1) <= Mathr::ZERO_TOLERANCE ) cs1=0;
+		if (abs(cs2) <= Mathr::ZERO_TOLERANCE ) cs2=0;
+	} else if ((isnormal(mat1->kn)) and (isnormal(mat1->ks)) and (isnormal(mat1->cn)) and (isnormal(mat1->cs))) {
+		//Set parameters explicitly
+		kn1 = mat1->kn;
+		kn2 = mat2->kn;
+		ks1 = mat1->ks;
+		ks2 = mat2->ks;
+		cn1 = mat1->cn;
+		cn2 = mat2->cn;
+		cs1 = mat1->cs;
+		cs2 = mat2->cs;
+	} else {
+		//Set parameters on the base of young modulus
+		kn1 = 2*mat1->young*R1;
+		kn2 = 2*mat2->young*R2;
+		ks1 = kn1*mat1->poisson;
+		ks2 = kn2*mat2->poisson;
+		if ((isnormal(mat1->cn)) and (isnormal(mat1->cs))) {
+			cn1 = mat1->cn;
+			cn2 = mat2->cn;
+			cs1 = mat1->cs;
+			cs2 = mat2->cs;
+		}
+	}
 	
 	const Real mR1 = mat1->mR;      const Real mR2 = mat2->mR; 
 	const int mRtype1 = mat1->mRtype; const int mRtype2 = mat2->mRtype;
 	
-	const Real kn2 = isnan(mat2->kn)?2*mat2->young*R2:mat2->kn*mass2;
-	const Real cn2 = mat2->cn*mass2;
-	const Real ks2 = isnan(mat2->ks)?kn2*mat2->poisson:mat2->ks*mass2;
-	const Real cs2 = mat2->cs*mass2;
 	
-
-	phys->kn = contactParameterCalculation(kn1,kn2, mat1->massMultiply&&mat2->massMultiply);
-	phys->ks = contactParameterCalculation(ks1,ks2, mat1->massMultiply&&mat2->massMultiply);
-	phys->cn = contactParameterCalculation(cn1,cn2, mat1->massMultiply&&mat2->massMultiply);
-	phys->cs = contactParameterCalculation(cs1,cs2, mat1->massMultiply&&mat2->massMultiply);
+	phys->kn = contactParameterCalculation(kn1,kn2, 1);
+	phys->ks = contactParameterCalculation(ks1,ks2, 1);
+	phys->cn = contactParameterCalculation(cn1,cn2, 1);
+	phys->cs = contactParameterCalculation(cs1,cs2, 1);
 
  	if ((mR1>0) or (mR2>0)) {
 		phys->mR = 2.0/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );

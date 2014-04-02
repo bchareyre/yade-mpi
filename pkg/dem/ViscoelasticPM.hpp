@@ -18,11 +18,13 @@ class ViscElMat : public FrictMat {
 	public:
 		virtual ~ViscElMat();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,FrictMat,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
-		((Real,kn,NaN,,"Normal elastic stiffness"))
-		((Real,cn,NaN,,"Normal viscous constant"))
-		((Real,ks,NaN,,"Shear elastic stiffness"))
-		((Real,cs,NaN,,"Shear viscous constant"))
-		((bool,massMultiply,true,,"Stiffness and viscosity are multiplied by the reduced mass. If massMultiply=false, these parameter are set explicitly without mass multiplication"))
+		((Real,tc,NaN,,"Contact time"))
+		((Real,en,NaN,,"Restitution coefficient in normal direction"))
+		((Real,et,NaN,,"Restitution coefficient in tangential direction"))
+		((Real,kn,NaN,,"Normal elastic stiffness. Attention, this parameter cannot be set if tc, en or es is defined!"))
+		((Real,cn,NaN,,"Normal viscous constant. Attention, this parameter cannot be set if tc, en or es is defined!"))
+		((Real,ks,NaN,,"Shear elastic stiffness. Attention, this parameter cannot be set if tc, en or es is defined!"))
+		((Real,cs,NaN,,"Shear viscous constant. Attention, this parameter cannot be set if tc, en or es is defined!"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_."))
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
