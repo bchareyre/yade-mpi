@@ -18,16 +18,8 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
   // no updates of an existing contact 
   if(interaction->phys) return;
   
-  ViscElPhys* physT = Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction); 
-  
   shared_ptr<ViscElCapPhys> phys (new ViscElCapPhys());
-  phys->kn = physT->kn;
-  phys->ks = physT->ks;
-  phys->cn = physT->cn;
-  phys->cs = physT->cs;
-  phys->tangensOfFrictionAngle = physT->tangensOfFrictionAngle;
-  phys->shearForce = physT->shearForce;
-  phys->mRtype = physT->mRtype;
+  Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction, phys);
   
   ViscElCapMat* mat1 = static_cast<ViscElCapMat*>(b1.get());
   ViscElCapMat* mat2 = static_cast<ViscElCapMat*>(b2.get());

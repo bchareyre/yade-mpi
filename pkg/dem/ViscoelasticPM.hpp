@@ -9,6 +9,7 @@
 #include<yade/pkg/common/Dispatching.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<yade/pkg/common/MatchMaker.hpp>
 
 /* Simple viscoelastic model */
 
@@ -61,9 +62,12 @@ class Ip2_ViscElMat_ViscElMat_ViscElPhys: public IPhysFunctor {
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	YADE_CLASS_BASE_DOC(Ip2_ViscElMat_ViscElMat_ViscElPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.");
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_ViscElMat_ViscElMat_ViscElPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.",
+ 		((shared_ptr<MatchMaker>,tc,,,"Contact time"))
+		((shared_ptr<MatchMaker>,en,,,"Restitution coefficient in normal direction"))
+		((shared_ptr<MatchMaker>,et,,,"Restitution coefficient in tangential direction")));
+	virtual void Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction, shared_ptr<ViscElPhys> phys);
 	FUNCTOR2D(ViscElMat,ViscElMat);
-
 };
 REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_ViscElPhys);
 
@@ -80,5 +84,4 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 
 Real contactParameterCalculation(const Real& l1,const Real& l2, const bool& massMultiply);
-ViscElPhys* Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction);
 void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);

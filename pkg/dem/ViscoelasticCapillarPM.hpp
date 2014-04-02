@@ -36,12 +36,12 @@ class ViscElCapPhys : public ViscElPhys{
 REGISTER_SERIALIZABLE(ViscElCapPhys);
 
 /// Convert material to interaction physics.
-class Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys: public IPhysFunctor {
+class Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys: public Ip2_ViscElMat_ViscElMat_ViscElPhys {
 	public :
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	YADE_CLASS_BASE_DOC(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElCapMat` to :yref:`ViscElCapPhys` using the rule of consecutive connection.");
+	YADE_CLASS_BASE_DOC(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys,Ip2_ViscElMat_ViscElMat_ViscElPhys,"Convert 2 instances of :yref:`ViscElCapMat` to :yref:`ViscElCapPhys` using the rule of consecutive connection.");
 	FUNCTOR2D(ViscElCapMat,ViscElCapMat);
 };
 REGISTER_SERIALIZABLE(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys);

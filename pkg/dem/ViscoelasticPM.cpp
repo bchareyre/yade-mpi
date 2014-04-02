@@ -18,8 +18,9 @@ ViscElPhys::~ViscElPhys(){}
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
 	// no updates of an existing contact 
 	if(interaction->phys) return;
-	ViscElPhys * phys = Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction);
-	interaction->phys = shared_ptr<ViscElPhys>(phys);
+	shared_ptr<ViscElPhys> phys (new ViscElPhys());
+	Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction, phys);
+	interaction->phys = phys;
 }
 
 /* Law2_ScGeom_ViscElPhys_Basic */
@@ -116,9 +117,7 @@ void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 	torque2 =  c2x.cross(force)-momentResistance;
 }
 
-ViscElPhys* Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
-	ViscElPhys* phys = new ViscElPhys();
-	
+void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction, shared_ptr<ViscElPhys> phys) {
 	ViscElMat* mat1 = static_cast<ViscElMat*>(b1.get());
 	ViscElMat* mat2 = static_cast<ViscElMat*>(b2.get());
 	Real mass1 = 1.0;
@@ -160,17 +159,17 @@ ViscElPhys* Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>&
 	Real ks1 = 0.0; Real ks2 = 0.0;
 	Real cs1 = 0.0; Real cs2 = 0.0;
 	
-	if ((isnormal(mat1->tc)) and (isnormal(mat1->en)) and (isnormal(mat1->et))) {
+	if (((isnormal(mat1->tc)) and (isnormal(mat1->en)) and (isnormal(mat1->et)))  or ((tc) and (en) and (et))) {
 		//Set parameters according to [Pournin2001]
 		
-		const Real tc = (mat1->tc+mat2->tc)/2.0;
-		const Real en = (mat1->en+mat2->en)/2.0;
-		const Real et = (mat1->et+mat2->et)/2.0;
+		const Real Tc = (tc) ? (*tc)(mat1->id,mat2->id) : (mat1->tc+mat2->tc)/2.0;
+		const Real En = (en) ? (*en)(mat1->id,mat2->id) : (mat1->en+mat2->en)/2.0;
+		const Real Et = (et) ? (*et)(mat1->id,mat2->id) : (mat1->et+mat2->et)/2.0;
 		
-		kn1 = kn2 = 1/tc/tc * ( Mathr::PI*Mathr::PI + pow(log(en),2) )*massR;
-		cn1 = cn2 = -2.0 /tc * log(en)*massR;
-		ks1 = ks2 = 2.0/7.0 /tc/tc * ( Mathr::PI*Mathr::PI + pow(log(et),2) )*massR;
-		cs1 = cs2 = -2.0/7.0 /tc * log(et)*massR;
+		kn1 = kn2 = 1/Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(En),2) )*massR;
+		cn1 = cn2 = -2.0 /Tc * log(En)*massR;
+		ks1 = ks2 = 2.0/7.0 /Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(Et),2) )*massR;
+		cs1 = cs2 = -2.0/7.0 /Tc * log(Et)*massR;
 	
 		if (abs(cn1) <= Mathr::ZERO_TOLERANCE ) cn1=0;
 		if (abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
@@ -223,8 +222,6 @@ ViscElPhys* Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>&
 	} else {
 		phys->mRtype = mRtype1;
 	}
-	
-	return phys;
 }
 
 /* Contact parameter calculation function */
