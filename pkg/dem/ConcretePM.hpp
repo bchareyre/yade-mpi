@@ -311,7 +311,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 			((bool,epsT,false,,"Show shear strain "))
 			((bool,epsTAxes,false,,"Show axes of shear plane "))
 			((bool,normal,false,,"Show contact normal"))
-			((Real,colorStrainRatio,-1,,"If positive, set the interaction (wire) color based on $\\eps_N$ normalized by $\\eps_0$ × `colorStrainRatio` ($\\eps_0$ = :yref:`CpmPhys.epsCrackOnset` ). Otherwise, color based on the residual strength."))
+			((Real,colorStrainRatio,-1,,"If positive, set the interaction (wire) color based on $\\eps_N$ normalized by $\\eps_0$ × :yref:`colorStrainRatio<CpmPhys.colorStrainRatio>` ($\\eps_0$ = :yref:`CpmPhys.epsCrackOnset` ). Otherwise, color based on the residual strength."))
 			((bool,epsNLabel,false,,"Numerically show normal strain"))
 		);
 	};

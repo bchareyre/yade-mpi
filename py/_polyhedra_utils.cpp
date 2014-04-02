@@ -367,7 +367,7 @@ BOOST_PYTHON_MODULE(_polyhedra_utils){
 	py::def("SieveCurve",SieveCurve,"save sieve curve coordinates into file");
 	py::def("SizeOfPolyhedra",SizeOfPolyhedra,"returns max, middle an min size in perpendicular directions");
 	py::def("SizeRatio",SizeRatio,"save sizes of polyhedra into file");
-	py::def("convexHull",convexHull,"....");
+	py::def("convexHull",convexHull,"");
 	py::def("Split",Split,"split polyhedron perpendicularly to given direction direction");
 }
 

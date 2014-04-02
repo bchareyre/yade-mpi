@@ -1380,7 +1380,7 @@ For larger simulations, it is advisable to create separate directory of that nam
 	O.saveGnuplot(O.tags['id']+'/'+'graph1')
 
 Controlling parallel computation
--------------------------------
+--------------------------------
 
 Default total number of available cores is determined from ``/proc/cpuinfo`` (provided by Linux kernel); in addition, if ``OMP_NUM_THREADS`` environment variable is set, minimum of these two is taken. The ``-j``/``--jobs`` option can be used to override this number.
 
@@ -1391,7 +1391,7 @@ Table column named ``!OMP_NUM_THREADS`` (``!`` prepended to column generally mea
 If number of cores for a job exceeds total number of cores, warning is issued and only the total number of cores is used instead.
 
 Merging gnuplot from individual jobs
--------------------------------------
+------------------------------------
 
 Frequently, it is desirable to obtain single figure for all jobs in the batch, for comparison purposes. Somewhat heiristic way for this functionality is provided by the batch system. ``yade-batch`` must be run with the ``--gnuplot`` option, specifying some file name that will be used for the merged figure::
 
