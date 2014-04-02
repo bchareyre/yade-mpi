@@ -50,6 +50,7 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
       else if (mat1->CapillarType == "Weigert")          phys->CapillarType = Weigert;
       else if (mat1->CapillarType == "Rabinovich")       phys->CapillarType = Rabinovich;
       else if (mat1->CapillarType == "Lambert")          phys->CapillarType = Lambert;
+      else if (mat1->CapillarType == "Soulie")           phys->CapillarType = Soulie;
       else                                               phys->CapillarType = None_Capillar;
     } else {
       throw runtime_error("CapillarType should be equal for both particles!.");
