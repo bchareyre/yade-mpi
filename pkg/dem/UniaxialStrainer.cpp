@@ -109,13 +109,15 @@ void UniaxialStrainer::action(){
 	if(asymmetry!=1){
 		for(size_t i=0; i<negIds.size(); i++){
 			negCoords[i]-=dAX;
-			axisCoord(negIds[i])=negCoords[i]; // update current position
+			//axisCoord(negIds[i])=negCoords[i]; // this line that modifies state->pos is useless with curent velocity defined below, and use of NewtonIntegrator
+			axisVel(negIds[i]) = -dAX/scene->dt; // update current position
 		}
 	}
 	if(asymmetry!=-1){
 		for(size_t i=0; i<posIds.size(); i++){
 			posCoords[i]+=dAX;
-			axisCoord(posIds[i])=posCoords[i];
+			//axisCoord(posIds[i])=posCoords[i]; // idem
+			axisVel(posIds[i]) = dAX/scene->dt;
 		}
 	}
 

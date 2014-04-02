@@ -20,7 +20,8 @@ class UniaxialStrainer: public BoundaryController {
 	private:
 		bool needsInit;
 		void computeAxialForce();
-		Real& axisCoord(Body::id_t id){ return Body::byId(id,scene)->state->pos[axis]; };
+		Real axisCoord(Body::id_t id){ return Body::byId(id,scene)->state->pos[axis]; };
+		Real& axisVel(Body::id_t id){ return Body::byId(id,scene)->state->vel[axis]; };
 		void init();
 	public:
 		virtual bool isActivated(){ return active; }
