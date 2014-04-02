@@ -7,8 +7,7 @@ o = Omega()
 fr = 0.0;rho=2000
 tc = 0.001; en = 0.3; et = 0.3; o.dt = 0.02*tc
 
-param = getViscoelasticFromSpheresInteraction(tc,en,et)
-mat1 = O.materials.append(ViscElMat(frictionAngle=fr, density=rho,**param))
+mat1 = O.materials.append(ViscElMat(frictionAngle=fr, density=rho,tc=tc,en=en,et=et))
 
 spheresID = O.bodies.append(pack.regularHexa(pack.inCylinder((0,0,-2.0),(0,0,2.0),2.0),radius=0.2,gap=0.1,color=(0,1,0),material=mat1))
 
@@ -33,7 +32,7 @@ o.engines = [
   PyRunner(command='addPlotData()',iterPeriod=1000, label='graph'),
   PyRunner(command='switchTranslationEngine()',iterPeriod=45000, nDo = 2, label='switchEng'),
 ]
-
+O.step()
 from yade import qt
 qt.View()
 r=qt.Renderer()

@@ -7,10 +7,8 @@ tc = 0.001; en = 0.7; et = 0.7; o.dt = 0.0002*tc
 
 r = 0.002
 
-param = getViscoelasticFromSpheresInteraction(tc,en,et)
-
-mat1 = O.materials.append(ViscElMat(frictionAngle=fr,mR = 0.05, mRtype = 1, density=rho,**param))
-mat2 = O.materials.append(ViscElMat(frictionAngle=fr,mR = 0.05, mRtype = 2, density=rho,**param))
+mat1 = O.materials.append(ViscElMat(frictionAngle=fr,mR = 0.05, mRtype = 1, density=rho,tc=tc,en=en,et=et))
+mat2 = O.materials.append(ViscElMat(frictionAngle=fr,mR = 0.05, mRtype = 2, density=rho,tc=tc,en=en,et=et))
 
 oriBody = Quaternion(Vector3(1,0,0),(pi/28))
 

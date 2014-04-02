@@ -17,7 +17,6 @@ Theta = 0
 VB = 74.2*1e-12
 
 
-param = getViscoelasticFromSpheresInteraction(tc,en,et)
 CapillarType1 = "Willett_numeric"
 CapillarType2 = "Willett_analytic"
 CapillarType3 = "Rabinovich"
@@ -26,12 +25,12 @@ CapillarType5 = "Weigert"
 CapillarType6 = "Soulie"
 
 
-mat1 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType1,**param))
-mat2 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType2,**param))
-mat3 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType3,**param))
-mat4 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType4,**param))
-mat5 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType5,**param))
-mat6 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType6,**param))
+mat1 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType1,tc=tc,en=en,et=et))
+mat2 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType2,tc=tc,en=en,et=et))
+mat3 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType3,tc=tc,en=en,et=et))
+mat4 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType4,tc=tc,en=en,et=et))
+mat5 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType5,tc=tc,en=en,et=et))
+mat6 = O.materials.append(ViscElCapMat(frictionAngle=fr,density=rho,Vb=VB,gamma=Gamma,theta=Theta,Capillar=True,CapillarType=CapillarType6,tc=tc,en=en,et=et))
 
 
 id1 = O.bodies.append(sphere(center=[0,0,0],radius=r,material=mat1,fixed=True))

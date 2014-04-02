@@ -11,12 +11,11 @@ en=0.3  # normal restitution coefficient
 es=0.3  # tangential restitution coefficient
 density=2700
 frictionAngle=radians(35)# 
-params=getViscoelasticFromSpheresInteraction(tc,en,es)
-facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) 
-sphereMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params))
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,tc=tc,en=en,et=es)) 
+sphereMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,tc=tc,en=en,et=es))
 
 #floor
-n=5.
+n=5
 s=1./n
 for i in range(0,n):
 	for j in range(0,n):

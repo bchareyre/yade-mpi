@@ -27,9 +27,8 @@ en = 0.3
 es = 0.3
 
 ## Materials
-params=getViscoelasticFromSpheresInteraction(tc,en,es)
-facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
-sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,tc=tc,en=en,et=es))
+sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=es))
 
 ### Creating the Buldozer Knife
 ### from facets, using GTS

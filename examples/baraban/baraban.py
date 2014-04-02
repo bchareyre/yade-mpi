@@ -10,9 +10,8 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-params=getViscoelasticFromSpheresInteraction(tc,en,es)
-facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
-sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,tc=tc,en=en,et=es))
+sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=es))
 from yade import ymport
 fctIds=O.bodies.append(ymport.stl('baraban.stl',color=(1,0,0),material=facetMat))
 ## Spheres

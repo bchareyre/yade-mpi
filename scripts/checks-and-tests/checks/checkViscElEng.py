@@ -16,9 +16,7 @@ r1 = 0.003
 r2 = 0.002
 
 
-param = getViscoelasticFromSpheresInteraction(tc,en,et)
-
-mat1 = O.materials.append(ViscElMat(frictionAngle=fr,density=rho,**param))
+mat1 = O.materials.append(ViscElMat(frictionAngle=fr,density=rho,tc=tc,en=en,et=et))
 
 
 id1 = O.bodies.append(sphere(center=[0,0,0],radius=r1,material=mat1,fixed=True))

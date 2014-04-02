@@ -44,8 +44,7 @@ for z in range(numberTests):
 		frictionAngle=radians(35)
 		density=2300
 		
-		params=getViscoelasticFromSpheresInteraction(tc,en,es)
-		defMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+		defMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,tc=tc,en=en,et=es))
 		
 		O.dt=.1*tc # time step
 		rad=0.5 # particle radius
