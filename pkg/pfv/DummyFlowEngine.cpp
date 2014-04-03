@@ -44,7 +44,7 @@ class DummyFlowEngine : public TEMPLATE_FLOW_NAME
 	//if it is useful for everyone
 	void fancyFunction(Real what); {cerr<<"yes, I'm a new function"<<end;}
 
-	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DummyFlowEngine,DummyFlowEngineT,"documentation here",
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DummyFlowEngine,TEMPLATE_FLOW_NAME,"documentation here",
 	((Real, myNewAttribute, 0,,"useless example"))
 	,/*DummyFlowEngineT()*/,
 	,
@@ -56,5 +56,5 @@ REGISTER_SERIALIZABLE(DummyFlowEngine);
 YADE_PLUGIN((DummyFlowEngine));
 
 void DummyFlowEngine::fancyFunction(Real what) {cerr<<"yes, I'm a new function"<<end;}
-
+#undef TEMPLATE_FLOW_NAME DummyFlowEngineT //To be sure it will not conflict, maybe not needed
 #endif //DummyFLOW
