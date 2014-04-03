@@ -28,11 +28,6 @@ class ViscElMat : public FrictMat {
 		((Real,cs,NaN,,"Shear viscous constant. Attention, this parameter cannot be set if tc, en or es is defined!"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_."))
-		((bool,Capillar,false,,"True, if capillar forces need to be added."))
-		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
-		((Real,gamma,NaN,,"Surface tension [N/m]"))
-		((Real,theta,NaN,,"Contact angle [°]"))
-		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic [Willett2000]_ , Weigert [Weigert1999]_ , Rabinovich [Rabinov2005]_ , Lambert (simplified, corrected Rabinovich model) [Lambert2008]_ ")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(ViscElMat,FrictMat);
