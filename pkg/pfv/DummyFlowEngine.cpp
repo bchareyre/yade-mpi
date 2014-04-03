@@ -14,7 +14,7 @@
 // #define DUMMYFLOW
 #ifdef DUMMYFLOW
 #define TEMPLATE_FLOW_NAME DummyFlowEngineT
-#include <yade/pkg/dem/FlowEngine.hpp>
+#include <yade/pkg/pfv/FlowEngine.hpp>
 
 /// We can add data to the Info types by inheritance
 class DummyCellInfo : public FlowCellInfo
