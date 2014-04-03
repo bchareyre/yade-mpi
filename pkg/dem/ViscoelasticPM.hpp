@@ -27,7 +27,7 @@ class ViscElMat : public FrictMat {
 		((Real,ks,NaN,,"Shear elastic stiffness. Attention, this parameter cannot be set if tc, en or es is defined!"))
 		((Real,cs,NaN,,"Shear viscous constant. Attention, this parameter cannot be set if tc, en or es is defined!"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
-		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_."))
+		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_.")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(ViscElMat,FrictMat);
@@ -78,5 +78,5 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 
-Real contactParameterCalculation(const Real& l1,const Real& l2, const bool& massMultiply);
+Real contactParameterCalculation(const Real& l1,const Real& l2);
 void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);
