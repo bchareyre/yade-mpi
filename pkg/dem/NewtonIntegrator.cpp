@@ -108,7 +108,9 @@ void NewtonIntegrator::action()
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
 	const Real& dt=scene->dt;
 	//Take care of user's request to change velGrad. Safe to change it here after the interaction loop.
-	if (scene->cell->velGradChanged) {scene->cell->velGrad=scene->cell->nextVelGrad; scene->cell->velGradChanged=0;}
+	if (scene->cell->velGradChanged || scene->cell->nextVelGrad!=Matrix3r::Zero()) {
+		scene->cell->velGrad=scene->cell->nextVelGrad;
+		scene->cell->velGradChanged=0; scene->cell->nextVelGrad=Matrix3r::Zero();}
 	homoDeform=scene->cell->homoDeform;
 	dVelGrad=scene->cell->velGrad-prevVelGrad;
 	// account for motion of the periodic boundary, if we remember its last position
