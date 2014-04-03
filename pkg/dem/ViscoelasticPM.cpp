@@ -203,10 +203,10 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 	const int mRtype1 = mat1->mRtype; const int mRtype2 = mat2->mRtype;
 	
 	
-	phys->kn = contactParameterCalculation(kn1,kn2, 1);
-	phys->ks = contactParameterCalculation(ks1,ks2, 1);
-	phys->cn = contactParameterCalculation(cn1,cn2, 1);
-	phys->cs = contactParameterCalculation(cs1,cs2, 1);
+	phys->kn = contactParameterCalculation(kn1,kn2);
+	phys->ks = contactParameterCalculation(ks1,ks2);
+	phys->cn = contactParameterCalculation(cn1,cn2);
+	phys->cs = contactParameterCalculation(cs1,cs2);
 
  	if ((mR1>0) or (mR2>0)) {
 		phys->mR = 2.0/( ((mR1>0)?1/mR1:0) + ((mR2>0)?1/mR2:0) );
@@ -225,15 +225,10 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 }
 
 /* Contact parameter calculation function */
-Real contactParameterCalculation(const Real& l1, const Real& l2, const bool& massMultiply){
-  if (massMultiply) {
-    // If one of paramaters > 0. we DO NOT return 0
-    Real a = (l1?1/l1:0) + (l2?1/l2:0);
-    if (a) return 1/a;
-    else return 0;
-  } else { 
-   // If one of paramaters > 0, we return 0
-   return (l1>0 or l2>0)?l1*l2/(l1+l2):0;
-  }
+Real contactParameterCalculation(const Real& l1, const Real& l2){
+  // If one of paramaters > 0. we DO NOT return 0
+  Real a = (l1?1/l1:0) + (l2?1/l2:0);
+  if (a) return 1/a;
+  else return 0;
 }
 
