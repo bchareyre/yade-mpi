@@ -29,29 +29,29 @@ phase=0
 def triaxDone():
 	global phase
 	if phase==0:
-		print 'Here we are: stress',triax['stress'],'strain',triax['strain'],'stiffness',triax['stiff']
+		print 'Here we are: stress',triax.stress,'strain',triax.strain,'stiffness',triax.stiff
 		print 'Now shearing.'
-		O.cell.velGrad[1,2]=6.0
+		O.cell.velGrad=Matrix3(0,6,0, 0,0,0, 0,0,0)
 		triax.stressMask=7
-		triax['goal']=[-1e4,-1e4,-1e4]
+		triax.goal=[-1e4,-1e4,-1e4]
 		phase+=1
-	elif phase==1:
-		print 'Here we are: stress',triax['stress'],'strain',triax['strain'],'stiffness',triax['stiff']
-		#print 'Done, pausing now.'
-		#O.pause()
+		O.pause()
+	#elif phase==1:
+		#print 'Here we are: stress',triax.stress,'strain',triax.strain,'stiffness',triax.stiff
+		#phase+=1
+		##print 'Done, pausing now.'
+		##O.pause()
 		
 O.dt=PWaveTimeStep()
-O.run(7000);
-qt.View()
-#r=qt.Renderer()
-#r.bgColor=1,1,1
-O.wait()
+#O.run(7000);
+#qt.View()
+##r=qt.Renderer()
+##r.bgColor=1,1,1
+#O.wait()
+#O.saveTmp()
+#O.cell.velGrad=Matrix3(0,0,0, -6,0,0, 0,0,0)
+#O.run(5000);
+#O.wait()
 
-O.cell.velGrad[1,2]=0
-O.cell.velGrad[2,1]=-6
-O.run(5000);
-O.wait()
-
-O.cell.velGrad[1,2]=6
-O.cell.velGrad[2,1]=0
-O.run(5000);
+#O.cell.velGrad=Matrix3(0,6,0, 0,0,0, 0,0,0)
+#O.run(5000);
