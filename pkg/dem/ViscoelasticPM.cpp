@@ -123,20 +123,20 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 	Real mass1 = 1.0;
 	Real mass2 = 1.0;
 	
-	if ((isnormal(mat1->kn) and  not (isnormal(mat2->kn))) or
-			(isnormal(mat2->kn) and  not (isnormal(mat1->kn))) or
-			(isnormal(mat1->ks) and  not (isnormal(mat2->ks))) or
-			(isnormal(mat2->ks) and  not (isnormal(mat1->ks))) or
-			(isnormal(mat1->cn) and  not (isnormal(mat2->cn))) or
-			(isnormal(mat2->cn) and  not (isnormal(mat1->cn))) or
-			(isnormal(mat1->cs) and  not (isnormal(mat2->cs))) or
-			(isnormal(mat2->cs) and  not (isnormal(mat1->cs))) or
-			(isnormal(mat1->tc) and  not (isnormal(mat2->tc))) or
-			(isnormal(mat2->tc) and  not (isnormal(mat1->tc))) or
-			(isnormal(mat1->en) and  not (isnormal(mat2->en))) or
-			(isnormal(mat2->en) and  not (isnormal(mat1->en))) or
-			(isnormal(mat1->et) and  not (isnormal(mat2->et))) or
-			(isnormal(mat2->et) and  not (isnormal(mat1->et)))) {
+	if ((isfinite(mat1->kn) and  not (isfinite(mat2->kn))) or
+			(isfinite(mat2->kn) and  not (isfinite(mat1->kn))) or
+			(isfinite(mat1->ks) and  not (isfinite(mat2->ks))) or
+			(isfinite(mat2->ks) and  not (isfinite(mat1->ks))) or
+			(isfinite(mat1->cn) and  not (isfinite(mat2->cn))) or
+			(isfinite(mat2->cn) and  not (isfinite(mat1->cn))) or
+			(isfinite(mat1->cs) and  not (isfinite(mat2->cs))) or
+			(isfinite(mat2->cs) and  not (isfinite(mat1->cs))) or
+			(isfinite(mat1->tc) and  not (isfinite(mat2->tc))) or
+			(isfinite(mat2->tc) and  not (isfinite(mat1->tc))) or
+			(isfinite(mat1->en) and  not (isfinite(mat2->en))) or
+			(isfinite(mat2->en) and  not (isfinite(mat1->en))) or
+			(isfinite(mat1->et) and  not (isfinite(mat2->et))) or
+			(isfinite(mat2->et) and  not (isfinite(mat1->et)))) {
 				throw runtime_error("Both materials should have the same defined set of variables e.g. tc, ks etc.!"); 
 			}
 			
@@ -159,7 +159,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 	Real ks1 = 0.0; Real ks2 = 0.0;
 	Real cs1 = 0.0; Real cs2 = 0.0;
 	
-	if (((isnormal(mat1->tc)) and (isnormal(mat1->en)) and (isnormal(mat1->et)))  or ((tc) and (en) and (et))) {
+	if (((isfinite(mat1->tc)) and (isfinite(mat1->en)) and (isfinite(mat1->et)))  or ((tc) and (en) and (et))) {
 		//Set parameters according to [Pournin2001]
 		
 		const Real Tc = (tc) ? (*tc)(mat1->id,mat2->id) : (mat1->tc+mat2->tc)/2.0;
@@ -175,7 +175,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		if (abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
 		if (abs(cs1) <= Mathr::ZERO_TOLERANCE ) cs1=0;
 		if (abs(cs2) <= Mathr::ZERO_TOLERANCE ) cs2=0;
-	} else if ((isnormal(mat1->kn)) and (isnormal(mat1->ks)) and (isnormal(mat1->cn)) and (isnormal(mat1->cs))) {
+	} else if ((isfinite(mat1->kn)) and (isfinite(mat1->ks)) and (isfinite(mat1->cn)) and (isfinite(mat1->cs))) {
 		//Set parameters explicitly
 		kn1 = mat1->kn;
 		kn2 = mat2->kn;
@@ -191,7 +191,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		kn2 = 2*mat2->young*R2;
 		ks1 = kn1*mat1->poisson;
 		ks2 = kn2*mat2->poisson;
-		if ((isnormal(mat1->cn)) and (isnormal(mat1->cs))) {
+		if ((isfinite(mat1->cn)) and (isfinite(mat1->cs))) {
 			cn1 = mat1->cn;
 			cn2 = mat2->cn;
 			cs1 = mat1->cs;
