@@ -13,7 +13,7 @@
 // #define DFNFLOW
 #ifdef DFNFLOW
 #define TEMPLATE_FLOW_NAME DFNFlowEngineT
-#include <yade/pkg/dem/FlowEngine.hpp>
+#include <yade/pkg/pfv/FlowEngine.hpp>
 
 class DFNCellInfo : public FlowCellInfo
 {

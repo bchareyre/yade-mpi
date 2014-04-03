@@ -12,7 +12,7 @@
 #ifdef SOLUTE_FLOW
 
 #define TEMPLATE_FLOW_NAME SoluteFlowEngineT
-#include <yade/pkg/dem/FlowEngine.hpp>
+#include <yade/pkg/pfv/FlowEngine.hpp>
 #undef TEMPLATE_FLOW_NAME
 
 class SoluteCellInfo : public FlowCellInfo
@@ -144,9 +144,7 @@ void SoluteFlowEngine::soluteTransport (double deltatime, double D)
 	    //Copy data to concentration array
 	    FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles){
 		cell->info().solute()= ex2[cell->info().id];
-
-	      }					
-										
+	    }
 	    tripletList2.clear();
 	    
   }
@@ -156,6 +154,7 @@ void SoluteFlowEngine::soluteBC(unsigned int bcid1, unsigned int bcid2, double b
 	//Boundary conditions according to soluteTransport.
 	//It simply assigns boundary concentrations to cells with a common vertices (e.g. infinite large sphere which makes up the boundary condition in flowEngine)
 	//s is a switch, if 0 only bc_id1 is used (advection only). If >0 than both bc_id1 and bc_id2 are used. 
+	//NOTE (bruno): cell cirulators can be use to get all cells having bcid2 has a vertex more efficiently (see e.g. FlowBoundingSphere.ipp:721)
     	FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles)
 	{
 		for (unsigned int ngb=0;ngb<4;ngb++){ 

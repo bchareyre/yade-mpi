@@ -10,7 +10,7 @@
 /// It is a bit more complicated as for FlowEngine, though, because we need template inheriting from template, which breaks YADE_CLASS_XXX logic_error
 /// See below the commented exemple, for a possible solution
 
-#include <yade/pkg/dem/FlowEngine.hpp>
+#include <yade/pkg/pfv/FlowEngine.hpp>
 
 class PeriodicCellInfo : public FlowCellInfo
 {	

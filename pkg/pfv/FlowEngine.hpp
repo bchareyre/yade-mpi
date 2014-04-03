@@ -351,7 +351,7 @@ class TemplateFlowEngine : public PartialEngine
 		)
 };
 // Definition of functions in a separate file for clarity 
-#include<yade/pkg/dem/FlowEngine.ipp>
+#include<yade/pkg/pfv/FlowEngine.ipp>
 
 class FlowCellInfo : public CGT::SimpleCellInfo {
 	public:
