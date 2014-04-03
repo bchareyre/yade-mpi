@@ -63,9 +63,9 @@ class Ip2_ViscElMat_ViscElMat_ViscElPhys: public IPhysFunctor {
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
 	YADE_CLASS_BASE_DOC_ATTRS(Ip2_ViscElMat_ViscElMat_ViscElPhys,IPhysFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.",
- 		((shared_ptr<MatchMaker>,tc,,,"Contact time"))
-		((shared_ptr<MatchMaker>,en,,,"Restitution coefficient in normal direction"))
-		((shared_ptr<MatchMaker>,et,,,"Restitution coefficient in tangential direction")));
+ 		((shared_ptr<MatchMaker>,tc,,,"Instance of :yref:`MatchMaker` determining contact time"))
+		((shared_ptr<MatchMaker>,en,,,"Instance of :yref:`MatchMaker` determining restitution coefficient in normal direction"))
+		((shared_ptr<MatchMaker>,et,,,"Instance of :yref:`MatchMaker` determining restitution coefficient in tangential direction")));
 	virtual void Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction, shared_ptr<ViscElPhys> phys);
 	FUNCTOR2D(ViscElMat,ViscElMat);
 };
