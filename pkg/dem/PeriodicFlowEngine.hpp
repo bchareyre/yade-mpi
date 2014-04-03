@@ -59,7 +59,6 @@ typedef CGT::PeriodicTesselation<CGT::_Tesselation<PeriFlowTriangulationTypes> >
 #else
 #define _PeriFlowSolver CGT::PeriodicFlow<PeriFlowTesselation>
 #endif
-//CGT::PeriodicFlowLinSolv<CGT::PeriodicTesselation<CGT::_Tesselation<TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo> > > >
 
 typedef TemplateFlowEngine<	PeriodicCellInfo,
 				PeriodicVertexInfo,

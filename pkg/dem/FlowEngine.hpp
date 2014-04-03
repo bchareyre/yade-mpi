@@ -405,14 +405,15 @@ class FlowCellInfo : public CGT::SimpleCellInfo {
 	inline Real& dv (void) {return volumeVariation;}
 	inline int& fictious (void) {return fict;}
 	inline double& p (void) {return pression;}
-	//For compatibility with the periodic case
-	inline const double shiftedP (void) const {return pression;}
+	inline const double shiftedP (void) const {return pression;} //For compatibility with the periodic case
 	inline const std::vector<double>& kNorm (void) const {return modulePermeability;}
 	inline std::vector<double>& kNorm (void) {return modulePermeability;}
 	inline std::vector< CVector >& facetSurf (void) {return facetSurfaces;}
 	inline std::vector<CVector>& force (void) {return cellForce;}
 	inline std::vector<double>& Rh (void) {return rayHydr;}
 	inline CVector& averageVelocity (void) {return averageCellVelocity;}
+	//used for transfering values between two triangulations, overload with more variables in derived classes (see e.g. SoluteFlow)
+	inline void getInfo(const FlowCellInfo& otherCellInfo) {p()=otherCellInfo.shiftedP();} 
 };
 
 class FlowVertexInfo : public CGT::SimpleVertexInfo {

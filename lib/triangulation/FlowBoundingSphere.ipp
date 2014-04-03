@@ -419,7 +419,8 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 			center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
 		}
                 oldCell = Tri.locate(Point(center[0],center[1],center[2]));
-                newCell->info().p() = oldCell->info().shiftedP();
+		newCell->info().getInfo(oldCell->info());
+//                 newCell->info().p() = oldCell->info().shiftedP();
         }
 //  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
 }
