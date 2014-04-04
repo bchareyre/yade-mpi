@@ -11,6 +11,11 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/common/MatchMaker.hpp>
 
+#ifdef YADE_SPH
+#include<yade/pkg/common/SPHEngine.hpp>
+#endif
+
+
 /* Simple viscoelastic model */
 
 /// Material
@@ -27,6 +32,10 @@ class ViscElMat : public FrictMat {
 		((Real,ks,NaN,,"Shear elastic stiffness. Attention, this parameter cannot be set if tc, en or es is defined!"))
 		((Real,cs,NaN,,"Shear viscous constant. Attention, this parameter cannot be set if tc, en or es is defined!"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
+#ifdef YADE_SPH
+		((bool,SPHmode,false,,"True, if SPH-mode is enabled."))
+		((Real,mu,-1,, "Viscosity. See Mueller [Mueller2003]_ ."))                                              // [Mueller2003], (14)
+#endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_.")),
 		createIndex();
 	);
@@ -43,6 +52,11 @@ class ViscElPhys : public FrictPhys{
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
+#ifdef YADE_SPH
+		((bool,SPHmode,false,,"True, if SPH-mode is enabled."))
+		((Real,h,-1,,    "Core radius. See Mueller [Mueller2003]_ ."))                                            // [Mueller2003], (1)
+		((Real,mu,-1,,   "Viscosity. See Mueller [Mueller2003]_ ."))                                              // [Mueller2003], (14)
+#endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_")),
 		createIndex();
 	)

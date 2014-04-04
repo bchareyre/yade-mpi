@@ -14,6 +14,7 @@
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
 #  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
 #  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
+#  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default, experimental)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -116,6 +117,7 @@ OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
 OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" ${DEFAULT})
 OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" ${DEFAULT})
+OPTION(ENABLE_SPH "Enable SPH" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -285,6 +287,13 @@ IF(ENABLE_LINSOLV)
 ELSE(ENABLE_LINSOLV)
   SET(DISABLED_FEATS "${DISABLED_FEATS} LinSolv")
 ENDIF(ENABLE_LINSOLV)
+#===============================================
+IF(ENABLE_SPH)
+  ADD_DEFINITIONS("-DYADE_SPH")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} SPH")
+ELSE(ENABLE_SPH)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} SPH")
+ENDIF(ENABLE_SPH)
 #===============================================
 IF(ENABLE_GL2PS)
   FIND_PACKAGE(GL2PS)

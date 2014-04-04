@@ -6,6 +6,10 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
+#ifdef YADE_SPH
+#include<yade/pkg/common/SPHEngine.hpp>
+#endif
+
 YADE_PLUGIN((ViscElMat)(ViscElPhys)(Ip2_ViscElMat_ViscElMat_ViscElPhys)(Law2_ScGeom_ViscElPhys_Basic));
 
 /* ViscElMat */
@@ -41,13 +45,22 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 }
 
 void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2) {
+	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	Scene* scene=Omega::instance().getScene().get();
-	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
+
+#ifdef YADE_SPH
+//=======================================================================================================
+	if (phys.SPHmode) {
+		computeForceSPH(_geom, _phys, I, force);
+		return;
+	}
+//=======================================================================================================
+#endif
 
 	const int id1 = I->getId1();
 	const int id2 = I->getId2();
-
+	
 	const BodyContainer& bodies = *scene->bodies;
 
 	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
@@ -222,6 +235,12 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 	} else {
 		phys->mRtype = mRtype1;
 	}
+#ifdef YADE_SPH
+		if (mat1->SPHmode and mat2->SPHmode)  {
+			phys->SPHmode=true;
+			phys->mu=(mat1->mu+mat2->mu)/2.0;
+		}
+#endif
 }
 
 /* Contact parameter calculation function */
