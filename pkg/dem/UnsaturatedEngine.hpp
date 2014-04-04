@@ -63,7 +63,10 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void invade (Solver& flow );
 		TPL Real getMinEntryValue (Solver& flow);
 		TPL Real getSaturation(Solver& flow);
-		
+		TPL Real getWindowsSaturation(Solver&flow, int windowsID);
+		TPL Real getWindowsSaturation1(Solver&flow, int i);
+		TPL Real getWindowsSaturation2(Solver&flow, int i);
+
 		TPL void invadeSingleCell1(Cell_handle cell, double pressure, Solver& flow);
 		TPL void invade1 (Solver& flow );
 		TPL void checkTrap(Solver& flow, double pressure);//check trapped phase, define trapCapP.	
@@ -98,7 +101,7 @@ class UnsaturatedEngine : public PartialEngine
 		TPL void savePoreBodyInfo(Solver& flow);
 		TPL void savePoreThroatInfo(Solver& flow);
 		TPL void debugTemp(Solver& flow);
-		
+		TPL void initializeCellWindowsID(Solver&flow);
 		TPL void computeSolidLine(Solver& flow);
 		TPL void computeFacetPoreForcesWithCache(Solver& flow, bool onlyCache=false);
 		
@@ -147,6 +150,7 @@ class UnsaturatedEngine : public PartialEngine
 		void		_invade() {invade(solver);}
 		Real		_getMinEntryValue() {return getMinEntryValue(solver);}
 		Real		_getSaturation() {return getSaturation(solver);}
+		Real		_getWindowsSaturation(int windowsID) {return getWindowsSaturation(solver,windowsID);}
 		void		_saveListNodes() {saveListNodes(solver);}
 		void		_saveListConnection() {saveListConnection(solver);}
  		void		_saveLatticeNodeX(double x) {saveLatticeNodeX(solver,x);}
@@ -157,6 +161,7 @@ class UnsaturatedEngine : public PartialEngine
  		void		_savePoreBodyInfo(){savePoreBodyInfo(solver);}
  		void		_savePoreThroatInfo(){savePoreThroatInfo(solver);}
  		void		_debugTemp(){debugTemp(solver);}
+ 		void		_initializeCellWindowsID(){initializeCellWindowsID(solver);}
  		void		_computeFacetPoreForcesWithCache(){computeFacetPoreForcesWithCache(solver);}
 		Vector3r 	_fluidForce(unsigned int id_sph) {return fluidForce(id_sph,solver);}
 		
@@ -192,6 +197,7 @@ class UnsaturatedEngine : public PartialEngine
 					((bool, pressureForce, true,,"Compute the pressure field and associated fluid forces. WARNING: turning off means fluid flow is not computed at all."))
 					((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
 					((bool, invadeBoundary, false,,"Invade from boundaries."))
+					((int, windowsNo, 10,, "Number of genrated windows/(zoomed samples)."))
 					,
 					/*deprec*/
 					,,
@@ -211,7 +217,8 @@ class UnsaturatedEngine : public PartialEngine
 					.def("getCell",&UnsaturatedEngine::_getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
 					.def("buildTriangulation",&UnsaturatedEngine::_buildTriangulation,"Triangulate spheres of the current scene.")
-					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation.")					
+					.def("getSaturation",&UnsaturatedEngine::_getSaturation,"get saturation.")
+					.def("getWindowsSaturation",&UnsaturatedEngine::_getWindowsSaturation,(python::arg("windowsID")), "get saturation of windowsID")
 					.def("getMinEntryValue",&UnsaturatedEngine::_getMinEntryValue,"get the minimum air entry pressure for the next invade step.")
 					.def("saveListNodes",&UnsaturatedEngine::_saveListNodes,"Save the list of nodes.")
 					.def("saveListConnection",&UnsaturatedEngine::_saveListConnection,"Save the connections between cells.")
@@ -223,6 +230,7 @@ class UnsaturatedEngine : public PartialEngine
 					.def("savePoreBodyInfo",&UnsaturatedEngine::_savePoreBodyInfo,"Save pore bodies positions/Voronoi centers and size/volume.")
 					.def("savePoreThroatInfo",&UnsaturatedEngine::_savePoreThroatInfo,"Save pore throat area, inscribed radius and perimeter.")
 					.def("debugTemp",&UnsaturatedEngine::_debugTemp,"debug temp file.")
+					.def("initializeCellWindowsID",&UnsaturatedEngine::_initializeCellWindowsID,"Initialize cell windows index. A temp function for comparison with experiments, will delete soon")
 					.def("invade",&UnsaturatedEngine::_invade,"Run the drainage invasion.")
 					.def("computeForce",&UnsaturatedEngine::_computeFacetPoreForcesWithCache,"Compute capillary force. ")
 					.def("fluidForce",&UnsaturatedEngine::_fluidForce,(python::arg("Id_sph")),"Return the fluid force on sphere Id_sph.")
