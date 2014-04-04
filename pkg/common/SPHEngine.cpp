@@ -35,9 +35,11 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
       if (Mass == 0) Mass = b->state->mass;
       
       const Real SmoothDist = -geom.penetrationDepth + phys.h;
-      
+     
+      // [Mueller2003], (3) 
       rho += b2->state->mass*smoothkernelPoly6(SmoothDist, phys.h);
     }
+    // [Mueller2003], (3), we need to consider the density of the current body (?)
     rho += b->state->mass*smoothkernelPoly6(0.0, s->radius);
   }
   b->rho = rho;
@@ -46,6 +48,22 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
 Real smoothkernelPoly6(const double & rrj, const double & h) {
   if (rrj<=h) {
     return 315/(64*M_PI*pow(h,9))*pow((h*h - rrj*rrj), 3);   // [Mueller2003], (20)
+  } else {
+    return 0;
+  }
+}
+
+Real smoothkernelPoly6Grad(const double & rrj, const double & h) {
+  if (rrj<=h) {
+    return 315/(64*M_PI*pow(h,9))*(-6*rrj)*pow((h*h - rrj*rrj), 2);
+  } else {
+    return 0;
+  }
+}
+
+Real smoothkernelPoly6Lapl(const double & rrj, const double & h) {
+  if (rrj<=h) {
+    return 315/(64*M_PI*pow(h,9))*(-6)*(h*h - rrj*rrj)*(h*h - 5*rrj*rrj);
   } else {
     return 0;
   }
@@ -125,7 +143,7 @@ void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   
   Real Rho = bodies[id2]->rho;
   if (Rho==0.0 and bodies[id1]->rho!=0.0) {
-    Rho = bodies[id1]->rho!=0.0;
+    Rho = bodies[id1]->rho;
   }
   
   const Vector3r xixj = (-geom.penetrationDepth + phys.h)*geom.normal;
@@ -133,18 +151,19 @@ void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   if (xixj.norm() < phys.h) {
     Real fpressure = 0.0;
     if (Rho!=0.0) {
-      fpressure = Mass * 
+      // [Mueller2003], (10)
+      fpressure = -Mass * 
                   (bodies[id1]->press + bodies[id2]->press)/(2.0*Rho) *
-                  smoothkernelSpiky(xixj.norm(), phys.h);
+                  smoothkernelPoly6Grad(xixj.norm(), phys.h);
     }
     
     Vector3r fvisc = Vector3r::Zero();
     if (Rho!=0.0) {
       fvisc = phys.mu * Mass * 
                   normalVelocity*geom.normal/Rho *
-                  smoothkernelViscoLapl(xixj.norm(), phys.h);
+                  smoothkernelPoly6Lapl(xixj.norm(), phys.h);
     }
-    force = fpressure*geom.normal - fvisc;
+    force = fpressure*geom.normal + fvisc;
     return;
   } else {
     return;

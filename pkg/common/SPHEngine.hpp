@@ -16,6 +16,8 @@ class SPHEngine: public PartialEngine{
 };
 REGISTER_SERIALIZABLE(SPHEngine);
 Real smoothkernelPoly6(const double & rrj, const double & h);       // [Mueller2003] (20)
+Real smoothkernelPoly6Grad(const double & rrj, const double & h);
+Real smoothkernelPoly6Lapl(const double & rrj, const double & h);
 Real smoothkernelSpiky(const double & rrj, const double & h);       // [Mueller2003] (21)
 Real smoothkernelVisco(const double & rrj, const double & h);       // [Mueller2003] (22)
 Real smoothkernelViscoLapl(const double & rrj, const double & h);   // [Mueller2003] (22+)
