@@ -219,7 +219,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::initSolver 
         flow.meanKStat = meanKStat;
         flow.permeabilityMap = permeabilityMap;
         flow.fluidBulkModulus = fluidBulkModulus;
-        flow.T[flow.currentTes].Clear();
+//         flow.T[flow.currentTes].Clear();
         flow.T[flow.currentTes].maxId=-1;
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
 }
@@ -245,13 +245,12 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::buildTriang
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::buildTriangulation ( double pZero, Solver& flow )
 {
-        flow.resetNetwork();
-	if (first) flow.currentTes=0;
+ 	if (first) flow.currentTes=0;
         else {
                 flow.currentTes=!flow.currentTes;
                 if (debug) cout << "--------RETRIANGULATION-----------" << endl;
         }
-
+	flow.resetNetwork();
 	initSolver(flow);
 
         addBoundary ( flow );
@@ -597,8 +596,10 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::computeVisc
 
 
 		for ( int i=0; i< ( int ) flow.edgeIds.size(); i++ ) {
-			const int& id1 = flow.edgeIds[i].first;
-			const int& id2 = flow.edgeIds[i].second;
+			const VertexInfo& vi1 = *flow.edgeIds[i].first;
+			const VertexInfo& vi2 = *flow.edgeIds[i].second;
+			const int& id1 = vi1.id();
+			const int& id2 = vi2.id();
 			
 			int hasFictious= Tes.vertex ( id1 )->info().isFictious +  Tes.vertex ( id2 )->info().isFictious;
 			if (hasFictious>0 or id1==id2) continue;
@@ -613,7 +614,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::computeVisc
 			Vector3r shearLubF; Vector3r normaLubF; Vector3r pumpT; Vector3r deltaAngNormVel; Vector3r twistT; Vector3r angVel1; Vector3r angVel2; 
 		//FIXME: if periodic and velGrad!=0, then deltaV should account for velGrad, not the case currently
 			if ( !hasFictious ){
-				O1O2Vector = sph2->state->pos + makeVector3r(Tes.vertex(id2)->info().ghostShift()) - sph1->state->pos - makeVector3r(Tes.vertex(id1)->info().ghostShift());
+				O1O2Vector = sph2->state->pos + makeVector3r(vi2.ghostShift()) - sph1->state->pos - makeVector3r(vi1.ghostShift());
 				O1O2 = O1O2Vector.norm(); 
 				normal= (O1O2Vector/O1O2);
 				surfaceDist = O1O2 - r2 - r1;

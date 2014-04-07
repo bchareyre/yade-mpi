@@ -89,7 +89,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 }
 
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::resetNetwork() {T[0].Clear();noCache=true;}
+void FlowBoundingSphere<Tesselation>::resetNetwork() {T[currentTes].Clear();noCache=true;}
 
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::averageRelativeCellVelocity()
@@ -1201,41 +1201,44 @@ void FlowBoundingSphere<Tesselation>::sliceField(const char *filename)
 template <class Tesselation>
 void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
 {
-  RTriangulation& Tri = T[currentTes].Triangulation();
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	//first, copy interacting pairs and normal lub forces form prev. triangulation in a sorted structure for initializing the new lub. Forces
+	vector<vector<pair<unsigned int,Real> > > lubPairs;
+	lubPairs.resize(Tri.number_of_vertices()+1);
+	for (unsigned int k=0; k<edgeNormalLubF.size(); k++)
+		lubPairs[min(edgeIds[k].first->id(),edgeIds[k].second->id())].push_back(
+			pair<int,Real> (max(edgeIds[k].first->id(),edgeIds[k].second->id()),edgeNormalLubF[k]));
 
-  //first, copy interacting pairs and normal lub forces form prev. triangulation in a sorted structure for initializing the new lub. Forces
-  vector<vector<pair<unsigned int,Real> > > lubPairs;
-  lubPairs.resize(Tri.number_of_vertices()+1);
-  for (unsigned int k=0; k<edgeNormalLubF.size(); k++)
-	lubPairs[min(edgeIds[k].first,edgeIds[k].second)].push_back(pair<int,Real> (max(edgeIds[k].first,edgeIds[k].second),edgeNormalLubF[k]));
-
-  //Now we reset the containers and initialize them
-  edgeSurfaces.clear(); edgeIds.clear(); edgeNormalLubF.clear();
-  FiniteEdgesIterator ed_it;
-  for ( FiniteEdgesIterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
-  {
-    int hasFictious= (ed_it->first)->vertex(ed_it->second)->info().isFictious +  (ed_it->first)->vertex(ed_it->third)->info().isFictious;
-    if (hasFictious==2) continue;
-    double area = T[currentTes].computeVFacetArea(ed_it);
-    edgeSurfaces.push_back(area);
-    unsigned int id1 = (ed_it->first)->vertex(ed_it->second)->info().id();
-    unsigned int id2 = (ed_it->first)->vertex(ed_it->third)->info().id();
-    edgeIds.push_back(pair<int,int>(id1,id2));
-    
-    //For persistant edges, we must transfer the lub. force value from the older triangulation structure
-    if (id1>id2) swap(id1,id2);
-    unsigned int i=0;
-    //Look for the pair (id1,id2) in lubPairs
-    while (i<lubPairs[id1].size()) {
-		if (lubPairs[id1][i].first == id2) {
-			//it's found, we copy the lub force
-			edgeNormalLubF.push_back(lubPairs[id1][i].second);
-			break;}
-		++i;
-    }
-    // not found, we initialize with zero lub force
-    if (i==lubPairs[id1].size()) edgeNormalLubF.push_back(0);
-  }
+	//Now we reset the containers and initialize them
+	edgeSurfaces.clear(); edgeIds.clear(); edgeNormalLubF.clear();
+	FiniteEdgesIterator ed_it;
+	for ( FiniteEdgesIterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
+	{
+		const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
+		const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
+	  
+		//We eliminate edges that would be periodic replications or involving two bounding objects, i.e. the min id must be non-ghost and non-fictious
+		if (vi1.id()<vi2.id()) {if (vi1.isFictious || vi2.isGhost) continue;}
+		else if (vi2.isFictious || vi2.isGhost) continue;
+		double area = T[currentTes].computeVFacetArea(ed_it);
+		edgeSurfaces.push_back(area);
+		unsigned int id1 = vi1.id();
+		unsigned int id2 = vi2.id();
+		edgeIds.push_back(pair<const VertexInfo*,const VertexInfo*>(&vi1,&vi2));
+		//For persistant edges, we must transfer the lub. force value from the older triangulation structure
+		if (id1>id2) swap(id1,id2);
+		unsigned int i=0;
+		//Look for the pair (id1,id2) in lubPairs
+		while (i<lubPairs[id1].size()) {
+			if (lubPairs[id1][i].first == id2) {
+				//it's found, we copy the lub force
+				edgeNormalLubF.push_back(lubPairs[id1][i].second);
+				break;}
+			++i;
+		}
+		// not found, we initialize with zero lub force
+    		if (i==lubPairs[id1].size()) edgeNormalLubF.push_back(0);
+	}
 }
 
 template <class Tesselation> 

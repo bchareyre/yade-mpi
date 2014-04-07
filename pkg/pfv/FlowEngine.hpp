@@ -56,16 +56,18 @@ inline Vector3r makeVector3r ( const CVector& yv ) {return Vector3r ( yv[0],yv[1
 #ifndef TEMPLATE_FLOW_NAME
 #error You must define TEMPLATE_FLOW_NAME in your source file before including FlowEngine.hpp
 #endif
+
+#ifdef LINSOLV
+#define DEFAULTSOLVER CGT::FlowBoundingSphereLinSolv<_Tesselation>
+#else
+#define DEFAULTSOLVER CGT::FlowBoundingSphere<_Tesselation>
+#endif
 	
-template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=CGT::FlowBoundingSphere<_Tesselation> >
+template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=DEFAULTSOLVER >
 class TemplateFlowEngine : public PartialEngine
 {	
 	public :
-		#ifdef LINSOLV
-		typedef CGT::FlowBoundingSphereLinSolv<typename solverT::Tesselation,solverT>	FlowSolver;
-		#else
 		typedef solverT									FlowSolver;
-		#endif
 		typedef FlowSolver								Solver;//FIXME: useless alias, search/replace then remove
 		typedef typename FlowSolver::Tesselation					Tesselation;
 		typedef typename FlowSolver::RTriangulation					RTriangulation;
@@ -227,8 +229,8 @@ class TemplateFlowEngine : public PartialEngine
 			solver->T[solver->currentTes].computeVolumes();
 		}
 		Real getVolume (Body::id_t id) {
-			if (solver->T[solver->currentTes].Max_id() <= 0) {emulateAction(); LOG_WARN("Not triangulated yet, emulating action");}
-			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes(); LOG_WARN("Computing all volumes now, as you did not request it explicitely.");}
+			if (solver->T[solver->currentTes].Max_id() <= 0) {emulateAction(); /*LOG_WARN("Not triangulated yet, emulating action");*/}
+			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes();/* LOG_WARN("Computing all volumes now, as you did not request it explicitely.");*/}
 			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
 		YADE_CLASS_PYCLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine,TEMPLATE_FLOW_NAME,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2014a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
@@ -426,7 +428,7 @@ public:
 	inline CVector& force (void) {return forces;}
 	inline CVector& vel (void) {return grainVelocity;}
 	inline Real& volCells (void) {return volumeIncidentCells;}
-	inline const CVector ghostShift (void) {return CGAL::NULL_VECTOR;}
+	inline const CVector ghostShift (void) const {return CGAL::NULL_VECTOR;}
 };
 
 

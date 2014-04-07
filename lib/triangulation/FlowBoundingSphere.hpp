@@ -71,7 +71,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector< vector<const Real*> > perVertexPressure;
 		#endif
 		vector <double> edgeSurfaces;
-		vector <pair<int,int> > edgeIds;
+		vector <pair<const VertexInfo*,const VertexInfo*> > edgeIds;
 		vector <Real> edgeNormalLubF;
 		vector <Vector3r> shearLubricationForces;
 		vector <Vector3r> shearLubricationTorques;
