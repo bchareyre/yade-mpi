@@ -35,6 +35,8 @@ class ViscElMat : public FrictMat {
 #ifdef YADE_SPH
 		((bool,SPHmode,false,,"True, if SPH-mode is enabled."))
 		((Real,mu,-1,, "Viscosity. See Mueller [Mueller2003]_ ."))                                              // [Mueller2003], (14)
+		((KernFunctions,KernFunctionPressure,Spiky,, "Kernel function for pressure calculation (by default - Spiky). The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5."))
+		((KernFunctions,KernFunctionVisco,   Visco,, "Kernel function for viscosity calculation (by default - Visco). The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5."))
 #endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_.")),
 		createIndex();
@@ -60,6 +62,8 @@ class ViscElPhys : public FrictPhys{
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_")),
 		createIndex();
 	)
+		Real (*kernelFunctionCurrentPressure)(const double & r, const double & h);
+		Real (*kernelFunctionCurrentVisco)(const double & r, const double & h);
 	REGISTER_CLASS_INDEX(ViscElPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(ViscElPhys);

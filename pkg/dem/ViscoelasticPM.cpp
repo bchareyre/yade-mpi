@@ -240,6 +240,35 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 			phys->SPHmode=true;
 			phys->mu=(mat1->mu+mat2->mu)/2.0;
 		}
+	
+	if (mat1->KernFunctionPressure==Poly6 and mat2->KernFunctionPressure==Poly6) {
+		phys->kernelFunctionCurrentPressure = smoothkernelPoly6Grad;
+	} else if (mat1->KernFunctionPressure==Spiky and mat2->KernFunctionPressure==Spiky) {
+		phys->kernelFunctionCurrentPressure = smoothkernelSpikyGrad;
+	} else if (mat1->KernFunctionPressure==Visco and mat2->KernFunctionPressure==Visco) {
+		phys->kernelFunctionCurrentPressure = smoothkernelViscoGrad;
+	} else if (mat1->KernFunctionPressure==Lucy and mat2->KernFunctionPressure==Lucy) {
+		phys->kernelFunctionCurrentPressure = smoothkernelLucyGrad;
+	} else if (mat1->KernFunctionPressure==Monaghan and mat2->KernFunctionPressure==Monaghan) {
+		phys->kernelFunctionCurrentPressure = smoothkernelMonaghanGrad;
+	} else {
+		throw runtime_error("Kernel types can only have the following types: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5. And for all contacting materials they should be equal.");
+	}
+	
+	if (mat1->KernFunctionVisco==Poly6 and mat2->KernFunctionVisco==Poly6) {
+		phys->kernelFunctionCurrentVisco = smoothkernelPoly6Lapl;
+	} else if (mat1->KernFunctionVisco==Spiky and mat2->KernFunctionVisco==Spiky) {
+		phys->kernelFunctionCurrentVisco = smoothkernelSpikyLapl;
+	} else if (mat1->KernFunctionVisco==Visco and mat2->KernFunctionVisco==Visco) {
+		phys->kernelFunctionCurrentVisco = smoothkernelViscoLapl;
+	} else if (mat1->KernFunctionVisco==Lucy and mat2->KernFunctionVisco==Lucy) {
+		phys->kernelFunctionCurrentVisco = smoothkernelLucyLapl;
+	} else if (mat1->KernFunctionVisco==Monaghan and mat2->KernFunctionVisco==Monaghan) {
+		phys->kernelFunctionCurrentVisco = smoothkernelMonaghanLapl;
+	} else {
+		throw runtime_error("Kernel types can only have the following types: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5. And for all contacting materials they should be equal.");
+	}
+	
 #endif
 }
 
