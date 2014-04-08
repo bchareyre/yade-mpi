@@ -22,21 +22,8 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
   Real rho = 0;
   
   // Pointer to kernel function
-  Real (*kernelFunctionCurrent)(const double & r, const double & h);
-  if (KernFunctionDensity==Poly6) {
-    kernelFunctionCurrent = smoothkernelPoly6;
-  } else if (KernFunctionDensity==Spiky) {
-    kernelFunctionCurrent = smoothkernelSpiky;
-  } else if (KernFunctionDensity==Visco) {
-    kernelFunctionCurrent = smoothkernelVisco;
-  } else if (KernFunctionDensity==Lucy) {
-    kernelFunctionCurrent = smoothkernelLucy;
-  } else if (KernFunctionDensity==Monaghan) {
-    kernelFunctionCurrent = smoothkernelMonaghan;
-  } else {
-    throw runtime_error("Kernel types can only have the following types: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5.");
-  }
-  
+  KernelFunction kernelFunctionCurDensity = returnKernelFunction (KernFunctionDensity, KernFunctionDensity, Norm);
+
   for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
     const shared_ptr<Body> b2 = Body::byId((*it).first,scene);
     Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
@@ -54,10 +41,10 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
       const Real SmoothDist = -geom.penetrationDepth + phys.h;
      
       // [Mueller2003], (3)
-      rho += b2->state->mass*kernelFunctionCurrent(SmoothDist, phys.h);
+      rho += b2->state->mass*kernelFunctionCurDensity(SmoothDist, phys.h);
     }
     // [Mueller2003], (3), we need to consider the density of the current body (?)
-    rho += b->state->mass*smoothkernelPoly6(0.0, s->radius);
+    rho += b->state->mass*kernelFunctionCurDensity(0.0, s->radius);
   }
   b->rho = rho;
 }
@@ -193,6 +180,64 @@ Real smoothkernelMonaghanLapl(const double & r, const double & h) {
     }
   }
   return ret;
+}
+
+KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunctions typeF) {
+  if (a != b) {
+    throw runtime_error("Kernel types should be equal! KERNELFUNCDESCR");
+  }
+  if (a==Poly6) {
+    if (typeF==Norm) {
+      return smoothkernelPoly6;
+    } else if (typeF==Grad) {
+      return smoothkernelPoly6Grad;
+    } else if (typeF==Lapl) {
+      return smoothkernelPoly6Lapl;
+    } else {
+      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+    }
+  } else if (a==Spiky) {
+    if (typeF==Norm) {
+      return smoothkernelSpiky;
+    } else if (typeF==Grad) {
+      return smoothkernelSpikyGrad;
+    } else if (typeF==Lapl) {
+      return smoothkernelSpikyLapl;
+    } else {
+      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+    }
+  } else if (a==Visco) {
+    if (typeF==Norm) {
+      return smoothkernelVisco;
+    } else if (typeF==Grad) {
+      return smoothkernelViscoGrad;
+    } else if (typeF==Lapl) {
+      return smoothkernelViscoLapl;
+    } else {
+    }
+  } else if (a==Lucy) {
+    if (typeF==Norm) {
+      return smoothkernelLucy;
+    } else if (typeF==Grad) {
+      return smoothkernelLucyGrad;
+    } else if (typeF==Lapl) {
+      return smoothkernelLucyLapl;
+    } else {
+      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+    }
+  } else if (a==Monaghan) {
+    if (typeF==Norm) {
+      return smoothkernelMonaghan;
+    } else if (typeF==Grad) {
+      return smoothkernelMonaghanGrad;
+    } else if (typeF==Lapl) {
+      return smoothkernelMonaghanLapl;
+    } else {
+      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+    }
+  } else {
+    throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR!");
+  }
 }
 
 void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force) {

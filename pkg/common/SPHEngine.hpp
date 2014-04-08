@@ -4,16 +4,21 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
 
+typedef Real (* KernelFunction)(const double & r, const double & h);
+
 enum KernFunctions {Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5};
+#define KERNELFUNCDESCR The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5.
+
+enum typeKernFunctions {Norm, Grad, Lapl};
 class SPHEngine: public PartialEngine{
   public:
     void calculateSPHRho(const shared_ptr<Body>& b);
     virtual void action();
-  YADE_CLASS_BASE_DOC_ATTRS(SPHEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step.",
+  YADE_CLASS_BASE_DOC_ATTRS(SPHEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step. ",
     ((int, mask,-1,, "Bitmask for SPH-particles."))
     ((Real,k,-1,,    "Gas constant for SPH-interactions (only for SPH-model). See Mueller [Mueller2003]_ .")) // [Mueller2003], (11)
     ((Real,rho0,-1,, "Rest density. See Mueller [Mueller2003]_ ."))                                           // [Mueller2003], (1)
-    ((KernFunctions,KernFunctionDensity, Poly6,, "Kernel function for density calculation (by default - Poly6). The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5."))
+    ((int,KernFunctionDensity, Poly6,, "Kernel function for density calculation (by default - Poly6). KERNELFUNCDESCR"))
   );
 };
 REGISTER_SERIALIZABLE(SPHEngine);
@@ -32,6 +37,8 @@ Real smoothkernelLucyLapl(const double & r, const double & h);
 Real smoothkernelMonaghan(const double & r, const double & h);         
 Real smoothkernelMonaghanGrad(const double & r, const double & h);     
 Real smoothkernelMonaghanLapl(const double & r, const double & h);
+
+KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunctions typeF);
 
 void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force);
 #endif
