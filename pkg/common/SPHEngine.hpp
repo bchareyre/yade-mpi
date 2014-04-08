@@ -7,7 +7,7 @@
 typedef Real (* KernelFunction)(const double & r, const double & h);
 
 enum KernFunctions {Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5};
-#define KERNELFUNCDESCR The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5.
+#define KERNELFUNCDESCR throw runtime_error("Type of kernel function undefined! The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5.");
 
 enum typeKernFunctions {Norm, Grad, Lapl};
 class SPHEngine: public PartialEngine{
@@ -18,7 +18,7 @@ class SPHEngine: public PartialEngine{
     ((int, mask,-1,, "Bitmask for SPH-particles."))
     ((Real,k,-1,,    "Gas constant for SPH-interactions (only for SPH-model). See Mueller [Mueller2003]_ .")) // [Mueller2003], (11)
     ((Real,rho0,-1,, "Rest density. See Mueller [Mueller2003]_ ."))                                           // [Mueller2003], (1)
-    ((int,KernFunctionDensity, Poly6,, "Kernel function for density calculation (by default - Poly6). KERNELFUNCDESCR"))
+    ((int,KernFunctionDensity, Poly6,, "Kernel function for density calculation (by default - Poly6). The following kernel functions are available: Poly6=1, Spiky=2, Visco=3, Lucy=4, Monaghan=5."))
   );
 };
 REGISTER_SERIALIZABLE(SPHEngine);

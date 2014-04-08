@@ -217,7 +217,7 @@ Real smoothkernelMonaghanLapl(const double & rr, const double & hh) {
 
 KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunctions typeF) {
   if (a != b) {
-    throw runtime_error("Kernel types should be equal! KERNELFUNCDESCR");
+    throw runtime_error("Kernel types should be equal!");
   }
   if (a==Poly6) {
     if (typeF==Norm) {
@@ -227,7 +227,7 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
     } else if (typeF==Lapl) {
       return smoothkernelPoly6Lapl;
     } else {
-      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+      KERNELFUNCDESCR
     }
   } else if (a==Spiky) {
     if (typeF==Norm) {
@@ -237,7 +237,7 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
     } else if (typeF==Lapl) {
       return smoothkernelSpikyLapl;
     } else {
-      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+      KERNELFUNCDESCR
     }
   } else if (a==Visco) {
     if (typeF==Norm) {
@@ -256,7 +256,7 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
     } else if (typeF==Lapl) {
       return smoothkernelLucyLapl;
     } else {
-      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+      KERNELFUNCDESCR
     }
   } else if (a==Monaghan) {
     if (typeF==Norm) {
@@ -266,10 +266,10 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
     } else if (typeF==Lapl) {
       return smoothkernelMonaghanLapl;
     } else {
-      throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR");
+      KERNELFUNCDESCR
     }
   } else {
-    throw runtime_error("Type of kernel function undefined! KERNELFUNCDESCR!");
+    KERNELFUNCDESCR
   }
 }
 
