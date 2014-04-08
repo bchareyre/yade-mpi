@@ -231,10 +231,10 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
 {
-	Vector3r axis = state->angVel;
-	if (axis!=Vector3r::Zero()) {//If we have an angular velocity, we make a rotation
-		Real angle=axis.norm(); axis/=angle;
-		Quaternionr q(AngleAxisr(angle*dt,axis));
+	Real angle2=state->angVel.squaredNorm();
+	if (angle2!=0) {//If we have an angular velocity, we make a rotation
+		Real angle=sqrt(angle2);
+		Quaternionr q(AngleAxisr(angle*dt,state->angVel/angle));
 		state->ori = q*state->ori;
 	}
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
