@@ -8,11 +8,19 @@
 #include<yade/core/Omega.hpp>
 
 void SPHEngine::action(){
-  YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
-    if(mask>0 && (b->groupMask & mask)==0) continue;
-    this->calculateSPHRho(b);
-    b->press=k*(b->rho - b->rho0);
-  } YADE_PARALLEL_FOREACH_BODY_END();
+  {
+    YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
+      if(mask>0 && (b->groupMask & mask)==0) continue;
+      this->calculateSPHRho(b);
+      b->press=k*(b->rho - b->rho0);
+    } YADE_PARALLEL_FOREACH_BODY_END();
+  }
+  {
+    YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
+      if(mask>0 && (b->groupMask & mask)==0) continue;
+      this->calculateSPHCs(b);
+    } YADE_PARALLEL_FOREACH_BODY_END();
+  }
 }
 
 void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
@@ -23,7 +31,8 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
   
   // Pointer to kernel function
   KernelFunction kernelFunctionCurDensity = returnKernelFunction (KernFunctionDensity, KernFunctionDensity, Norm);
-
+  
+  // Calculate rho for every particle
   for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
     const shared_ptr<Body> b2 = Body::byId((*it).first,scene);
     Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
@@ -47,6 +56,39 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
     rho += b->state->mass*kernelFunctionCurDensity(0.0, s->radius);
   }
   b->rho = rho;
+}
+
+void SPHEngine::calculateSPHCs(const shared_ptr<Body>& b) {
+  if (b->Cs<0) {
+    b->Cs = 0.0;
+  }
+  Real Cs = 0;
+  
+  // Pointer to kernel function
+  KernelFunction kernelFunctionCurDensity = returnKernelFunction (KernFunctionDensity, KernFunctionDensity, Norm);
+  
+  // Calculate Cs for every particle
+  for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
+    const shared_ptr<Body> b2 = Body::byId((*it).first,scene);
+    Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
+    if(!s) continue;
+    
+    if (((*it).second)->geom and ((*it).second)->phys) {
+      const ScGeom geom = *(YADE_PTR_CAST<ScGeom>(((*it).second)->geom));
+      const ViscElPhys phys=*(YADE_PTR_CAST<ViscElPhys>(((*it).second)->phys));
+      
+      if((b2->groupMask & mask)==0)  continue;
+      
+      Real Mass = b2->state->mass;
+      if (Mass == 0) Mass = b->state->mass;
+      
+      const Real SmoothDist = -geom.penetrationDepth + phys.h;
+     
+      // [Mueller2003], (15)
+      Cs += b2->state->mass/b2->rho*kernelFunctionCurDensity(SmoothDist, phys.h);
+    }
+  }
+  b->Cs = Cs;
 }
 
 Real smoothkernelPoly6(const double & rr, const double & hh) {

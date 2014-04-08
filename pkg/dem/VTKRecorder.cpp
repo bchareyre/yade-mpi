@@ -97,7 +97,13 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> spheresId = vtkSmartPointer<vtkFloatArray>::New();
 	spheresId->SetNumberOfComponents(1);
 	spheresId->SetName("id");
-	
+
+#ifdef YADE_SPH
+	vtkSmartPointer<vtkFloatArray> spheresCs = vtkSmartPointer<vtkFloatArray>::New();
+	spheresCs->SetNumberOfComponents(1);
+	spheresCs->SetName("cs");
+#endif
+
 	vtkSmartPointer<vtkFloatArray> spheresMask = vtkSmartPointer<vtkFloatArray>::New();
 	spheresMask->SetNumberOfComponents(1);
 	spheresMask->SetName("mask");
@@ -414,7 +420,9 @@ void VTKRecorder::action(){
 					damage->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreak + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreak);
 					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
 				}
-
+#ifdef YADE_SPH
+				spheresCs->InsertNextValue(b->Cs); 
+#endif
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
 				continue;
 			}
@@ -550,6 +558,9 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(spheresLinVelLen);
 			spheresUg->GetPointData()->AddArray(spheresAngVelLen);
 		}
+#ifdef YADE_SPH
+		spheresUg->GetPointData()->AddArray(spheresCs);
+#endif
 		if (recActive[REC_STRESS]){
 			spheresUg->GetPointData()->AddArray(spheresNormalStressVec);
 			spheresUg->GetPointData()->AddArray(spheresShearStressVec);

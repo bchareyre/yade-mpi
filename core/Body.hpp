@@ -88,9 +88,10 @@ class Body: public Serializable{
 		((long,iterBorn,-1,,"Step number at which the body was added to simulation."))
 		((Real,timeBorn,-1,,"Time at which the body was added to simulation."))
 #ifdef YADE_SPH
-		((Real,rho, -1.0,, "Current density (only for SPH-model)"))     // [Mueller2003], (12)
-		((Real,rho0,-1.0,, "Rest density (only for SPH-model)"))        // [Mueller2003], (12) 
-		((Real,press,0.0,,"Pressure (only for SPH-model)"))             // [Mueller2003], (12)
+		((Real,rho, -1.0,, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
+		((Real,rho0,-1.0,, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)
+		((Real,press,0.0,, "Pressure (only for SPH-model)"))             // [Mueller2003], (12)
+		((Real,Cs,0.0,,    "Color field (only for SPH-model)"))          // [Mueller2003], (15)
 #endif
 		,
 		/* ctor */,
