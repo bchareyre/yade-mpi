@@ -315,7 +315,7 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
   }
 }
 
-void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force) {
+bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force) {
   
   const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
   Scene* scene=Omega::instance().getScene().get();
@@ -386,9 +386,9 @@ void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
                   phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
     }
     force = fpressure*geom.normal + fvisc;
-    return;
+    return true;
   } else {
-    return;
+    return false;
   }
 }
 YADE_PLUGIN((SPHEngine));

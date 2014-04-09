@@ -97,4 +97,4 @@ class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 
 Real contactParameterCalculation(const Real& l1,const Real& l2);
-void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);
+bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);

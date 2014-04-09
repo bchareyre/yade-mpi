@@ -32,8 +32,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 	Vector3r force = Vector3r::Zero();
 	Vector3r torque1 = Vector3r::Zero();
 	Vector3r torque2 = Vector3r::Zero();
-	computeForceTorqueViscEl(_geom, _phys, I, force, torque1, torque2);
-	if (I->isActive) {
+	if (computeForceTorqueViscEl(_geom, _phys, I, force, torque1, torque2) and (I->isActive)) {
 		const int id1 = I->getId1();
 		const int id2 = I->getId2();
 		
@@ -41,10 +40,14 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		addForce (id2, force,scene);
 		addTorque(id1, torque1,scene);
 		addTorque(id2, torque2,scene);
-  }
+		return;
+	} else {
+		scene->interactions->requestErase(I);
+		return;
+	}
 }
 
-void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2) {
+bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2) {
 	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	Scene* scene=Omega::instance().getScene().get();
@@ -52,8 +55,11 @@ void computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 #ifdef YADE_SPH
 //=======================================================================================================
 	if (phys.SPHmode) {
-		computeForceSPH(_geom, _phys, I, force);
-		return;
+		if (computeForceSPH(_geom, _phys, I, force)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 //=======================================================================================================
 #endif

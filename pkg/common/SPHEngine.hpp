@@ -41,6 +41,6 @@ Real smoothkernelMonaghanLapl(const double & r, const double & h);
 
 KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunctions typeF);
 
-void computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force);
+bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force);
 #endif
 
