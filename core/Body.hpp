@@ -56,7 +56,7 @@ class Body: public Serializable{
 		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
 		bool isAspherical() const {return flags & FLAG_ASPHERICAL; }
 		void setAspherical(bool d){ if(d) flags|=FLAG_ASPHERICAL; else flags&=~(FLAG_ASPHERICAL); }
-
+		
 		/*! Hook for clump to update position of members when user-forced reposition and redraw (through GUI) occurs.
 		 * This is useful only in cases when engines that do that in every iteration are not active - i.e. when the simulation is paused.
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
@@ -65,6 +65,7 @@ class Body: public Serializable{
 		python::list py_intrs();
 
 		Body::id_t getId() const {return id;};
+		unsigned int coordNumber();  // Number of neighboring particles
 
 		int getGroupMask() {return groupMask; };
 		bool maskOk(int mask){return (mask==0 || (groupMask&mask));}

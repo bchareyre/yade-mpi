@@ -110,6 +110,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkFloatArray> spheresPressSPH = vtkSmartPointer<vtkFloatArray>::New();
 	spheresPressSPH->SetNumberOfComponents(1);
 	spheresPressSPH->SetName("SPH_Press");
+	
+	vtkSmartPointer<vtkFloatArray> spheresCoordNumbSPH = vtkSmartPointer<vtkFloatArray>::New();
+	spheresCoordNumbSPH->SetNumberOfComponents(1);
+	spheresCoordNumbSPH->SetName("SPH_Neigh");
 #endif
 
 	vtkSmartPointer<vtkFloatArray> spheresMask = vtkSmartPointer<vtkFloatArray>::New();
@@ -432,6 +436,7 @@ void VTKRecorder::action(){
 				spheresCsSPH->InsertNextValue(b->Cs); 
 				spheresRhoSPH->InsertNextValue(b->rho); 
 				spheresPressSPH->InsertNextValue(b->press); 
+				spheresCoordNumbSPH->InsertNextValue(b->coordNumber()); 
 #endif
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
 				continue;
@@ -572,6 +577,7 @@ void VTKRecorder::action(){
 		spheresUg->GetPointData()->AddArray(spheresCsSPH);
 		spheresUg->GetPointData()->AddArray(spheresRhoSPH);
 		spheresUg->GetPointData()->AddArray(spheresPressSPH);
+		spheresUg->GetPointData()->AddArray(spheresCoordNumbSPH);
 #endif
 		if (recActive[REC_STRESS]){
 			spheresUg->GetPointData()->AddArray(spheresNormalStressVec);
