@@ -65,7 +65,7 @@ class ViscElPhys : public FrictPhys{
 #ifdef YADE_SPH
 		KernelFunction kernelFunctionCurrentPressure;
 		KernelFunction kernelFunctionCurrentVisco;
-#ifdef YADE_SPH
+#endif
 	REGISTER_CLASS_INDEX(ViscElPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(ViscElPhys);
