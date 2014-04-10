@@ -62,8 +62,10 @@ class ViscElPhys : public FrictPhys{
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_")),
 		createIndex();
 	)
+#ifdef YADE_SPH
 		KernelFunction kernelFunctionCurrentPressure;
 		KernelFunction kernelFunctionCurrentVisco;
+#ifdef YADE_SPH
 	REGISTER_CLASS_INDEX(ViscElPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(ViscElPhys);
