@@ -443,7 +443,7 @@ class VTKExporter:
 					v = eval(command)
 					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
 			else:
-				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"(name))
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
 				for b in bodies:
 					outFile.write("%g\n"%(eval(command)))
 		outFile.close()
@@ -512,7 +512,7 @@ class VTKExporter:
 					v = eval(command)
 					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
 			else:
-				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"(name))
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
 				for b in bodies:
 					outFile.write("%g\n"%(eval(command)))
 		outFile.close()

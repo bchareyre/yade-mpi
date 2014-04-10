@@ -140,7 +140,8 @@ class CpmPhys: public NormShearPhys {
 		static long cummBetaIter, cummBetaCount;
 		/*! auxiliary variable for visualization, recalculated in Law2_ScGeom_CpmPhys_Cpm at every iteration */
 		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormShearPhys 
-		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r sigmaT, Fs;
+		Real omega, Fn, sigmaN, epsN, relResidualStrength, kappaD, epsNPl;
+		Vector3r sigmaT, Fs, epsTPl, epsT;
 
 		static Real solveBeta(const Real c, const Real N);
 		Real computeDmgOverstress(Real dt);
@@ -155,6 +156,7 @@ class CpmPhys: public NormShearPhys {
 		void setRelResidualStrength(Real r);
 
 		virtual ~CpmPhys();
+		#define _ZERO_VECTOR3R(v) v = Vector3r::Zero()
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by :yref:`Law2_ScGeom_CpmPhys_Cpm`, that includes damage effects and chages of parameters inside CpmPhys. See :yref:`cpm-model<CpmMat>` for details.",
 			((Real,E,NaN,,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,G,NaN,,"shear modulus [Pa]"))
@@ -173,25 +175,26 @@ class CpmPhys: public NormShearPhys {
 			((Real,plTau,-1,,"characteristic time for viscoplasticity (if non-positive, no rate-dependence for shear)"))
 			((Real,plRateExp,0,,"exponent in the rate-dependent viscoplasticity"))
 			((Real,isoPrestress,0,,"\"prestress\" of this link (used to simulate isotropic stress)"))
-			((Real,kappaD,0,,"Up to now maximum normal strain (semi-norm), non-decreasing in time."))
-			((Real,epsNPl,0,,"normal plastic strain (initially zero)"))
-			((Vector3r,epsTPl,Vector3r::Zero(),,"shear plastic strain (initially zero)"))
 			((bool,neverDamage,false,,"the damage evolution function will always return virgin state"))
 			((int,damLaw,1,,"Law for softening part of uniaxial tension. 0 for linear, 1 for exponential (default)"))
-			((Real,epsTrans,0,,"Transversal strain (perpendicular to the contact axis)"))
 			//((Real,epsPlSum,0,,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than zero."))
-			((Vector3r,epsT,Vector3r::Zero(),,"Total shear strain (either computed from increments with :yref:`ScGeom`) |yupdate|"))
+			, // ctors
+			createIndex();
+			Fn = omega = kappaD = epsN = kappaD = epsNPl = 0;
+			_ZERO_VECTOR3R(epsT); _ZERO_VECTOR3R(Fs); _ZERO_VECTOR3R(epsTPl);
 			,
-			createIndex(); epsT=Fs=Vector3r::Zero(); Fn=0; omega=0;
-			,
-			.def_readonly("omega",&CpmPhys::omega,"Damage internal variable")
-			.def_readonly("Fn",&CpmPhys::Fn,"Magnitude of normal force.")
-			.def_readonly("Fs",&CpmPhys::Fs,"Magnitude of shear force")
-			.def_readonly("epsN",&CpmPhys::epsN,"Current normal strain")
-			.def_readonly("sigmaN",&CpmPhys::sigmaN,"Current normal stress")
-			.def_readonly("sigmaT",&CpmPhys::sigmaT,"Current shear stress")
-			.def_readonly("relResidualStrength",&CpmPhys::relResidualStrength,"Relative residual strength")
+			.def_readonly("omega",&CpmPhys::omega,"Damage internal variable |yupdate|")
+			.def_readonly("Fn",&CpmPhys::Fn,"Magnitude of normal force |yupdate|")
+			.def_readonly("Fs",&CpmPhys::Fs,"Magnitude of shear force |yupdate|")
+			.def_readonly("epsN",&CpmPhys::epsN,"Current normal strain |yupdate|")
+			.def_readonly("epsT",&CpmPhys::epsT,"Current shear strain |yupdate|")
+			.def_readonly("sigmaN",&CpmPhys::sigmaN,"Current normal stress |yupdate|")
+			.def_readonly("sigmaT",&CpmPhys::sigmaT,"Current shear stress |yupdate|")
+			.def_readonly("kappaD",&CpmPhys::kappaD,"Up to now maximum normal strain (semi-norm), non-decreasing in time |yupdate|")
+			.def_readonly("epsNPl",&CpmPhys::epsNPl,"normal plastic strain (initially zero) |yupdate|")
+			.def_readonly("epsTPl",&CpmPhys::epsTPl,"shear plastic strain (initially zero) |yupdate|")
+			.def_readonly("relResidualStrength",&CpmPhys::relResidualStrength,"Relative residual strength |yupdate|")
 			.def_readonly("cummBetaIter",&CpmPhys::cummBetaIter,"Cummulative number of iterations inside CpmMat::solveBeta (for debugging).")
 			.def_readonly("cummBetaCount",&CpmPhys::cummBetaCount,"Cummulative number of calls of CpmMat::solveBeta (for debugging).")
 			.def("funcG",&CpmPhys::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false,py::arg("damLaw")=1),"Damage evolution law, evaluating the $\\omega$ parameter. $\\kappa_D$ is historically maximum strain, *epsCrackOnset* ($\\varepsilon_0$) = :yref:`CpmPhys.epsCrackOnset`, *epsFracture* = :yref:`CpmPhys.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage). TODO")
@@ -201,6 +204,7 @@ class CpmPhys: public NormShearPhys {
 			.def("setDamage",&CpmPhys::setDamage,"TODO")
 			.def("setRelResidualStrength",&CpmPhys::setRelResidualStrength,"TODO")
 		);
+		#undef _ZERO_VECTOR3R
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(CpmPhys,NormShearPhys);
 };
