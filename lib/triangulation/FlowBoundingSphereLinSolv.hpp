@@ -12,9 +12,9 @@
 // #define TAUCS_LIB //comment this if TAUCS lib is not available, it will disable PARDISO lib as well
 
 #ifdef EIGENSPARSE_LIB
-	#include <eigen3/Eigen/Sparse>
-	#include <eigen3/Eigen/SparseCore>
-	#include <eigen3/Eigen/CholmodSupport>
+	#include <Eigen/Sparse>
+	#include <Eigen/SparseCore>
+	#include <Eigen/CholmodSupport>
 #endif
 #ifdef TAUCS_LIB
 #define TAUCS_CORE_DOUBLE

@@ -15,6 +15,8 @@
 #include <yade/pkg/pfv/FlowEngine.hpp>
 #undef TEMPLATE_FLOW_NAME
 
+#include <Eigen/Sparse>
+
 class SoluteCellInfo : public FlowCellInfo
 {	
 	public:
