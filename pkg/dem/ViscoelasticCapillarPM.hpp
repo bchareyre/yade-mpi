@@ -18,9 +18,11 @@ REGISTER_SERIALIZABLE(ViscElCapMat);
 /// Interaction physics
 enum CapType {None_Capillar, Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert, Soulie};
 class ViscElCapPhys : public ViscElPhys{
+	typedef Real (* CapillarFunction)(const ScGeom& geom, ViscElCapPhys& phys);
 	public:
 		virtual ~ViscElCapPhys();
 		Real R;
+		CapillarFunction CapFunct;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElCapPhys,ViscElPhys,"IPhys created from :yref:`ViscElCapMat`, for use with :yref:`Law2_ScGeom_ViscElCapPhys_Basic`.",
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
 		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
@@ -50,8 +52,13 @@ REGISTER_SERIALIZABLE(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys);
 class Law2_ScGeom_ViscElCapPhys_Basic: public LawFunctor {
 	public :
 		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
-	public :
-		Real calculateCapillarForce(const ScGeom& geom, ViscElCapPhys& phys);
+		static Real Willett_numeric_f     (const ScGeom& geom, ViscElCapPhys& phys);
+		static Real Willett_analytic_f    (const ScGeom& geom, ViscElCapPhys& phys);
+		static Real Weigert_f             (const ScGeom& geom, ViscElCapPhys& phys);
+		static Real Rabinovich_f          (const ScGeom& geom, ViscElCapPhys& phys);
+		static Real Lambert_f             (const ScGeom& geom, ViscElCapPhys& phys);
+		static Real Soulie_f              (const ScGeom& geom, ViscElCapPhys& phys);
+		static Real None_f                (const ScGeom& geom, ViscElCapPhys& phys);
 	FUNCTOR2D(ScGeom,ViscElCapPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElCapPhys_Basic,LawFunctor,"Extended version of Linear viscoelastic model with capillary parameters.");
 	DECLARE_LOGGER;
