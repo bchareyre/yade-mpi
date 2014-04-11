@@ -59,6 +59,7 @@ class Law2_ScGeom_ViscElCapPhys_Basic: public LawFunctor {
 		static Real Lambert_f             (const ScGeom& geom, ViscElCapPhys& phys);
 		static Real Soulie_f              (const ScGeom& geom, ViscElCapPhys& phys);
 		static Real None_f                (const ScGeom& geom, ViscElCapPhys& phys);
+		Real critDist(const Real& Vb, const Real& R, const Real& Theta);
 	FUNCTOR2D(ScGeom,ViscElCapPhys);
 	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElCapPhys_Basic,LawFunctor,"Extended version of Linear viscoelastic model with capillary parameters.");
 	DECLARE_LOGGER;

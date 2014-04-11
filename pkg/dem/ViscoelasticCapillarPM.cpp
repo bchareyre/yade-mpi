@@ -80,7 +80,7 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
    * after that the liquid bridge will be broken.
    */ 
    
-  if (not(phys.liqBridgeCreated) and phys.Capillar) {
+  if (not(phys.liqBridgeCreated) and phys.Capillar and geom.penetrationDepth>=0) {
     phys.liqBridgeCreated = true;
     Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
     Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
@@ -91,12 +91,9 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     } else {
       phys.R = s2->radius;
     }
-    
-    const Real Vstar = phys.Vb/(phys.R*phys.R*phys.R);
-    const Real Sstar = (1+0.5*phys.theta)*(pow(Vstar,1/3.0) + 0.1*pow(Vstar,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
-    
-    phys.sCrit = Sstar*phys.R;
   }
+  
+  phys.sCrit = this->critDist(phys.Vb, phys.R, phys.theta);
   
   if (geom.penetrationDepth<0) {
     if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
@@ -124,6 +121,13 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     addTorque(id1, torque1,scene);
     addTorque(id2, torque2,scene);
   }
+}
+
+Real Law2_ScGeom_ViscElCapPhys_Basic::critDist(const Real& Vb, const Real& R, const Real& Theta) {
+  const Real Vstar = Vb/(R*R*R);
+  const Real Sstar = (1+0.5*Theta)*(pow(Vstar,1/3.0) + 0.1*pow(Vstar,2.0/3.0));   // [Willett2000], equation (15), use the full-length e.g 2*Sc
+  const Real critDist = Sstar*R;
+  return critDist;
 }
 
 //=========================================================================================
