@@ -8,12 +8,11 @@
 #ifdef YADE_CGAL
 #ifdef FLOW_ENGINE
 
-#define SOLUTE_FLOW
+// #define SOLUTE_FLOW
 #ifdef SOLUTE_FLOW
 
 #define TEMPLATE_FLOW_NAME SoluteFlowEngineT
 #include <yade/pkg/pfv/FlowEngine.hpp>
-#undef TEMPLATE_FLOW_NAME
 
 #include <Eigen/Sparse>
 
