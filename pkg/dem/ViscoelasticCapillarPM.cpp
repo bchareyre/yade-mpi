@@ -82,6 +82,7 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
    
   if (not(phys.liqBridgeCreated) and phys.Capillar and geom.penetrationDepth>=0) {
     phys.liqBridgeCreated = true;
+    phys.liqBridgeActive = false;
     Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
     Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());
     if (s1 and s2) {
@@ -97,6 +98,11 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
   
   if (geom.penetrationDepth<0) {
     if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
+      if (not(phys.liqBridgeActive)) {
+        phys.liqBridgeActive=true;
+        VLiqBridg += phys.Vb;
+        NLiqBridg += 1;
+      }
       phys.normalForce = -phys.CapFunct(geom, phys)*geom.normal;
       if (I->isActive) {
         addForce (id1,-phys.normalForce,scene);
@@ -104,10 +110,20 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
       };
       return;
     } else {
+      if (phys.liqBridgeActive) {
+        VLiqBridg += -phys.Vb;
+        NLiqBridg += -1;
+      }
       scene->interactions->requestErase(I);
       return;
     };
   };
+  
+  if (phys.liqBridgeActive) {
+    phys.liqBridgeActive=false;
+    VLiqBridg += -phys.Vb;
+    NLiqBridg += -1;
+  }
   
   if (I->isActive) {
     

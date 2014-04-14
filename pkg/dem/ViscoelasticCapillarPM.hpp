@@ -26,6 +26,7 @@ class ViscElCapPhys : public ViscElPhys{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElCapPhys,ViscElPhys,"IPhys created from :yref:`ViscElCapMat`, for use with :yref:`Law2_ScGeom_ViscElCapPhys_Basic`.",
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
 		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
+		((bool,liqBridgeActive,false,, "Whether liquid bridge is active at the moment"))
 		((Real,sCrit,false,,"Critical bridge length [m]"))
 		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
 		((Real,gamma,NaN,,"Surface tension [N/m]"))
@@ -61,7 +62,13 @@ class Law2_ScGeom_ViscElCapPhys_Basic: public LawFunctor {
 		static Real None_f                (const ScGeom& geom, ViscElCapPhys& phys);
 		Real critDist(const Real& Vb, const Real& R, const Real& Theta);
 	FUNCTOR2D(ScGeom,ViscElCapPhys);
-	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElCapPhys_Basic,LawFunctor,"Extended version of Linear viscoelastic model with capillary parameters.");
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ViscElCapPhys_Basic,LawFunctor,"Extended version of Linear viscoelastic model with capillary parameters.",
+		((OpenMPAccumulator<Real>,VLiqBridg,,Attr::noSave,"The total volume of liquid bridges"))
+		((OpenMPAccumulator<int>, NLiqBridg,,Attr::noSave,"The total number of liquid bridges"))
+		,/* ctor */
+		,/* py */
+		;
+	)
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElCapPhys_Basic);
