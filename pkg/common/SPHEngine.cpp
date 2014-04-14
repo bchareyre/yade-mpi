@@ -15,12 +15,14 @@ void SPHEngine::action(){
       b->press=k*(b->rho - b->rho0);
     } YADE_PARALLEL_FOREACH_BODY_END();
   }
+  /*
   {
     YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
       if(mask>0 && (b->groupMask & mask)==0) continue;
       this->calculateSPHCs(b);
     } YADE_PARALLEL_FOREACH_BODY_END();
   }
+  */
 }
 
 void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
