@@ -101,6 +101,7 @@ class OpenMPAccumulator{
 	~OpenMPAccumulator() { free((void*)data); }
 	// lock-free addition
 	void operator+=(const T& val){ *((T*)(data+omp_get_thread_num()*eSize))+=val; }
+	void operator-=(const T& val){ *((T*)(data+omp_get_thread_num()*eSize))-=val; }
 	// return summary value; must not be used concurrently
 	operator T() const { return get(); }
 	// reset to zeroValue; must NOT be used concurrently
@@ -136,6 +137,7 @@ class OpenMPAccumulator{
 	T data;
 public:
 	void operator+=(const T& val){ data+=val; }
+	void operator-=(const T& val){ data-=val; }
 	operator T() const { return get(); }
 	void reset(){ data=ZeroInitializer<T>(); }
 	T get() const { return data; }

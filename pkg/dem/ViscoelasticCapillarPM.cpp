@@ -111,8 +111,8 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
       return;
     } else {
       if (phys.liqBridgeActive) {
-        VLiqBridg += -phys.Vb;
-        NLiqBridg += -1;
+        VLiqBridg -= phys.Vb;
+        NLiqBridg -= 1;
       }
       scene->interactions->requestErase(I);
       return;
@@ -121,8 +121,8 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
   
   if (phys.liqBridgeActive) {
     phys.liqBridgeActive=false;
-    VLiqBridg += -phys.Vb;
-    NLiqBridg += -1;
+    VLiqBridg -= phys.Vb;
+    NLiqBridg -= 1;
   }
   
   if (I->isActive) {
