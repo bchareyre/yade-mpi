@@ -67,73 +67,78 @@ bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 	const int id1 = I->getId1();
 	const int id2 = I->getId2();
 	
-	const BodyContainer& bodies = *scene->bodies;
-
-	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
-	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
-
-	Vector3r& shearForce = phys.shearForce;
-	if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
-	const Real& dt = scene->dt;
-	shearForce = geom.rotate(shearForce);
-
-	// Handle periodicity.
-	const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
-	const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
-
-	const Vector3r c1x = (geom.contactPoint - de1.pos);
-	const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
-	
-	const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
-	const Real normalVelocity	= geom.normal.dot(relativeVelocity);
-	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
-	
-	// As Chiara Modenese suggest, we store the elastic part 
-	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
-	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
-	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
-	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
-
-
-	// Prevent appearing of attraction forces due to a viscous component
-	// [Radjai2011], page 3, equation [1.7]
-	// [Schwager2007]
-	const Real normForceReal = phys.kn * geom.penetrationDepth + phys.cn * normalVelocity;
-	if (normForceReal < 0) {
-		phys.normalForce = Vector3r::Zero();
+	if (geom.penetrationDepth<0) {
+		return false;
 	} else {
-		phys.normalForce = normForceReal * geom.normal;
-	}
+		const BodyContainer& bodies = *scene->bodies;
 	
-	Vector3r momentResistance = Vector3r::Zero();
-	if (phys.mR>0.0) {
-		const Vector3r relAngVel  = de1.angVel - de2.angVel;
-		relAngVel.normalized();
+		const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
+		const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
+	
+		Vector3r& shearForce = phys.shearForce;
+		if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
+		const Real& dt = scene->dt;
+		shearForce = geom.rotate(shearForce);
+	
+		// Handle periodicity.
+		const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
+		const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
+	
+		const Vector3r c1x = (geom.contactPoint - de1.pos);
+		const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
 		
-		if (phys.mRtype == 1) { 
-			momentResistance = -phys.mR*phys.normalForce.norm()*relAngVel;																														// [Zhou1999536], equation (3)
-		} else if (phys.mRtype == 2) { 
-			momentResistance = -phys.mR*(c1x.cross(de1.angVel) - c2x.cross(de2.angVel)).norm()*phys.normalForce.norm()*relAngVel;			// [Zhou1999536], equation (4)
-		}
-	}
+		const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
+		const Real normalVelocity	= geom.normal.dot(relativeVelocity);
+		const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
+		
+		// As Chiara Modenese suggest, we store the elastic part 
+		// and then add the viscous part if we pass the Mohr-Coulomb criterion.
+		// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
+		shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
+		Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
 	
-	const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
-	if( shearForce.squaredNorm() > maxFs )
-	{
-		// Then Mohr-Coulomb is violated (so, we slip), 
-		// we have the max value of the shear force, so 
-		// we consider only friction damping.
-		const Real ratio = sqrt(maxFs) / shearForce.norm();
-		shearForce *= ratio;
-	} 
-	else 
-	{
-		// Then no slip occurs we consider friction damping + viscous damping.
-		shearForceVisc = phys.cs*shearVelocity; 
+	
+		// Prevent appearing of attraction forces due to a viscous component
+		// [Radjai2011], page 3, equation [1.7]
+		// [Schwager2007]
+		const Real normForceReal = phys.kn * geom.penetrationDepth + phys.cn * normalVelocity;
+		if (normForceReal < 0) {
+			phys.normalForce = Vector3r::Zero();
+		} else {
+			phys.normalForce = normForceReal * geom.normal;
+		}
+		
+		Vector3r momentResistance = Vector3r::Zero();
+		if (phys.mR>0.0) {
+			const Vector3r relAngVel  = de1.angVel - de2.angVel;
+			relAngVel.normalized();
+			
+			if (phys.mRtype == 1) { 
+				momentResistance = -phys.mR*phys.normalForce.norm()*relAngVel;																														// [Zhou1999536], equation (3)
+			} else if (phys.mRtype == 2) { 
+				momentResistance = -phys.mR*(c1x.cross(de1.angVel) - c2x.cross(de2.angVel)).norm()*phys.normalForce.norm()*relAngVel;			// [Zhou1999536], equation (4)
+			}
+		}
+		
+		const Real maxFs = phys.normalForce.squaredNorm() * std::pow(phys.tangensOfFrictionAngle,2);
+		if( shearForce.squaredNorm() > maxFs )
+		{
+			// Then Mohr-Coulomb is violated (so, we slip), 
+			// we have the max value of the shear force, so 
+			// we consider only friction damping.
+			const Real ratio = sqrt(maxFs) / shearForce.norm();
+			shearForce *= ratio;
+		} 
+		else 
+		{
+			// Then no slip occurs we consider friction damping + viscous damping.
+			shearForceVisc = phys.cs*shearVelocity; 
+		}
+		force = phys.normalForce + shearForce + shearForceVisc;
+		torque1 = -c1x.cross(force)+momentResistance;
+		torque2 =  c2x.cross(force)-momentResistance;
+		return true;
 	}
-	force = phys.normalForce + shearForce + shearForceVisc;
-	torque1 = -c1x.cross(force)+momentResistance;
-	torque2 =  c2x.cross(force)-momentResistance;
 }
 
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhys(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction, shared_ptr<ViscElPhys> phys) {
