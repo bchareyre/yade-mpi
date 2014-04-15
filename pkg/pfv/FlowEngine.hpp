@@ -385,11 +385,11 @@ class FlowCellInfo : public CGT::SimpleCellInfo {
 	FlowCellInfo (void)
 	{
 		modulePermeability.resize(4, 0);
-		cellForce.resize(4);
-		facetSurfaces.resize(4);
-		facetFluidSurfacesRatio.resize(4);
-		facetSphereCrossSections.resize(4);
-		unitForceVectors.resize(4);
+		cellForce.resize(4,CGAL::NULL_VECTOR);
+		facetSurfaces.resize(4,CGAL::NULL_VECTOR);
+		facetFluidSurfacesRatio.resize(4,0);
+		facetSphereCrossSections.resize(4,CGAL::NULL_VECTOR);
+		unitForceVectors.resize(4,CGAL::NULL_VECTOR);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		rayHydr.resize(4, 0);
 		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=0;
