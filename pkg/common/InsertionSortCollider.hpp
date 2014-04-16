@@ -8,11 +8,6 @@ class InteractionContainer;
 
 /*! Periodic collider notes.
 
-Use
-===
-* scripts/test/periodic-simple.py
-* In the future, triaxial compression working by growing/shrinking the cell should be implemented.
-
 Architecture
 ============
 Values from bounding boxes are added information about period in which they are.
@@ -50,7 +45,8 @@ python:
 
 Requirements
 ============
-* No body can have Aabb larger than about .499*cellSize. Exception is thrown if that is false.
+* By default, no body can have Aabb larger than about .499*cellSize. Exception is thrown if that is false.
+	Large bodies are accepted if allowBiggerThanPeriod (experimental)
 * Constitutive law must not get body positions from Body::state directly.
 	If it does, it uses Interaction::cellDist to compute periodic position.
 * No body can get further away than MAXINT periods. It will do horrible things if there is overflow. Not checked at the moment.

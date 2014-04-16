@@ -143,15 +143,4 @@ void InteractionLoop::action(){
 			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}
 	}
-	
-	// process eraseAfterLoop
-// 	#ifdef YADE_OPENMP
-// 		FOREACH(list<idPair>& l, eraseAfterLoopIds){
-// 			FOREACH(idPair p,l) scene->interactions->erase(p.first,p.second);
-// 			l.clear();
-// 		}
-// 	#else
-// 		FOREACH(idPair p, eraseAfterLoopIds) scene->interactions->erase(p.first,p.second);
-// 		eraseAfterLoopIds.clear();
-// 	#endif
 }
