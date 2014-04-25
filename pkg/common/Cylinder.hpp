@@ -1,3 +1,6 @@
+// 2011 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// 2012 © Kneib Francois <francois.kneib@irstea.fr>
+
 #pragma once
 #include<yade/pkg/common/Dispatching.hpp>
 #include<yade/core/Shape.hpp>

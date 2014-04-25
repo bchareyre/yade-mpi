@@ -1,3 +1,6 @@
+// 2011 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// 2012 © Kneib Francois <francois.kneib@irstea.fr>
+
 #include "Cylinder.hpp"
 #include<yade/pkg/common/Sphere.hpp>
 #ifdef YADE_OPENGL
