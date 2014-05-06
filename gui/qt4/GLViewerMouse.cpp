@@ -38,7 +38,6 @@ using namespace boost;
 void GLViewer::mouseMovesCamera(){
   setWheelBinding(Qt::ShiftModifier , FRAME, ZOOM);
   setWheelBinding(Qt::NoModifier, CAMERA, ZOOM);
-  camera()->frame()->setWheelSensitivity(-1.0f);
 
 #if QGLVIEWER_VERSION>=0x020500
   setMouseBinding(Qt::ShiftModifier, Qt::LeftButton, SELECT);
@@ -62,6 +61,7 @@ void GLViewer::mouseMovesCamera(){
   setMouseBinding(Qt::MidButton, CAMERA, ZOOM);
   setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
   setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
+  camera()->frame()->setWheelSensitivity(-1.0f);
 #endif
 };
 
