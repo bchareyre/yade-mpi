@@ -98,6 +98,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::action()
         }
         ///End compute flow and forces
         timingDeltas->checkpoint ( "Applying Forces" );
+	#ifdef LINSOLV
 	int sleeping = 0;
 	if (multithread && !first) {
 		while (updateTriangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/
@@ -133,6 +134,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::action()
 			ellapsedIter++;
 		}
 	} else {
+	#endif	
 	        if (updateTriangulation && !first) {
 			buildTriangulation (pZero, *solver);
 			initializeVolumes(*solver);
@@ -467,9 +469,9 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::updateVolum
                 cell->info().volume() = newVol;
 		if (defTolerance>0) { //if the criterion is not used, then we skip these updates a save a LOT of time when Nthreads > 1
 			#pragma omp atomic
-			totVol+=newVol;
+			totVol+=cell->info().volumeSign*newVol;
 			#pragma omp atomic
-                	totDVol+=abs(dVol);}
+                	totDVol+=dVol;}
         }
 	if (defTolerance>0)  epsVolMax = totDVol/totVol;
 	for (unsigned int n=0; n<flow.imposedF.size();n++) {
