@@ -573,12 +573,7 @@ void Network<Tesselation>::Define_fictious_cells()
 template<class Tesselation>
 void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j)
 {
-  Line_Solid_Pore(cell, j, false, false);//FIXME:SLIP_ON_LATERALS, reuseFacetData ?? (Chao)
-}
-template<class Tesselation>
-void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON_LATERALS, bool reuseFacetData)
-{
-  if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
+  facetNFictious=detectFacetFictiousVertices(cell,j);
   double solidLine = 0; //total of solidLine[j][0], solidLine[j][1], solidLine[j][2]. 
   Sphere v [3];
   Vertex_handle W [3];
@@ -613,15 +608,7 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		Point AA(A[0],A[1],A[2]);
 		Point BB(B[0],B[1],B[2]);
 		Vecteur AB= AA-BB;
-
-//		Boundary &bi = boundary(SV3->info().id());
-//		Vecteur AB= SV1->point() - SV2->point();
-//		AB[bi.coordinate] = 0;//FIXME:can not assign read-only CGAL::Vector_3?
-
-		//FIXME::bi.flowCondition should be considered or not?(chao)
-		if (bi.flowCondition && ! SLIP_ON_LATERALS) {
-                        cell->info().solidLine[j][facetF1]=sqrt(AB.squared_length());
-                } else 	cell->info().solidLine[j][facetF1]=0;
+		cell->info().solidLine[j][facetF1]=sqrt(AB.squared_length());
     }; break;
      case (2) : {
 		Vertex_handle SV1 = cell->vertex(facetVertices[j][facetF1]);
@@ -635,13 +622,8 @@ void Network<Tesselation>::Line_Solid_Pore(Cell_handle cell, int j, bool SLIP_ON
 		
 		double d13 = bi1.p[bi1.coordinate] - (SV3->point())[bi1.coordinate];
 		double d23 = bi2.p[bi2.coordinate] - (SV3->point())[bi2.coordinate];
-		if (bi1.flowCondition && ! SLIP_ON_LATERALS) {
-			cell->info().solidLine[j][facetF1]= abs(d23); 
-                } else cell->info().solidLine[j][facetF1]=0;
-
-                if (bi2.flowCondition && ! SLIP_ON_LATERALS) {
-			cell->info().solidLine[j][facetF2]= abs(d13);
-                } else cell->info().solidLine[j][facetF2]=0;
+		cell->info().solidLine[j][facetF1]= abs(d23); 
+		cell->info().solidLine[j][facetF2]= abs(d13);
     }; break;
     }
 
