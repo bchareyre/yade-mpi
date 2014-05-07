@@ -133,8 +133,9 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::action()
 			if (debug && !backgroundCompleted) cerr<<"still computing solver in the background, ellapsedIter="<<ellapsedIter<<endl;
 			ellapsedIter++;
 		}
-	} else {
-	#endif	
+	} else
+	#endif
+	 {
 	        if (updateTriangulation && !first) {
 			buildTriangulation (pZero, *solver);
 			initializeVolumes(*solver);
