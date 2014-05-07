@@ -23,11 +23,21 @@
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255 
 #endif
-
+#ifdef YADE_OPENMP
+	#include<omp.h>
+#endif
 
 class Bound;
 #ifdef YADE_OPENGL
 	class OpenGLRenderer;
+#endif
+
+#ifdef YADE_LIQMIGRATION
+struct intReal {
+	public:
+		id_t id;
+		Real Vol;
+};
 #endif
 
 class Scene: public Serializable{
@@ -59,6 +69,11 @@ class Scene: public Serializable{
 
 
 		shared_ptr<Engine> engineByName(const string& s);
+
+		#ifdef YADE_LIQMIGRATION
+			OpenMPVector<Interaction* > addIntrs;    //Array of added interactions, needed for liquid migration.
+			OpenMPVector<intReal > delIntrs;     //Array of deleted interactions, needed for liquid migration.
+		#endif
 
 		#ifdef YADE_OPENGL
 			shared_ptr<OpenGLRenderer> renderer;
