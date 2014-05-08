@@ -16,7 +16,7 @@
 #  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 #  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default, experimental)
 #  ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (OFF by default)
-#  ENABLE_LIQMIGRATION: enable LIQCONTROL-option, see [Mani2013] for details (OFF by default)
+#  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -301,9 +301,9 @@ ENDIF(ENABLE_SPH)
 #===============================================
 IF(ENABLE_LIQMIGRATION)
   ADD_DEFINITIONS("-DYADE_LIQMIGRATION")
-  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LIQCONTROL")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LIQMIGRATION")
 ELSE(ENABLE_LIQMIGRATION)
-  SET(DISABLED_FEATS "${DISABLED_FEATS} LIQCONTROL")
+  SET(DISABLED_FEATS "${DISABLED_FEATS} LIQMIGRATION")
 ENDIF(ENABLE_LIQMIGRATION)
 #===============================================
 IF(ENABLE_GL2PS)
