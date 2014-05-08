@@ -2,20 +2,20 @@
 #pragma once 
 
 // for ZeroInitializer template
-#include<yade/lib/base/Math.hpp>
+#include <yade/lib/base/Math.hpp>
 
-#include<boost/serialization/split_free.hpp>
-#include<boost/lexical_cast.hpp>
-#include<string>
-#include<vector>
-#include<cstdlib>
-#include<unistd.h>
-#include<stdexcept>
-#include<iostream>
+#include <boost/serialization/split_free.hpp>
+#include <boost/lexical_cast.hpp>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <unistd.h>
+#include <stdexcept>
+#include <iostream>
 
 
 #ifdef YADE_OPENMP
-#include"omp.h"
+#include "omp.h"
 
 // O(1) access container which stores data in contiguous chunks of memory
 // each chunk belonging to one thread
@@ -197,7 +197,7 @@ public:
 	std::vector<T> getPerThreadData() const { std::vector<T> ret; ret.push_back(data); return ret; }
 };
 
-using OpenMPVector=std::vector;
+template <typename T> using OpenMPVector=std::vector <T>;
 #endif
 
 // boost serialization
