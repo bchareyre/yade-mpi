@@ -157,14 +157,14 @@ void UnsaturatedEngine::testFunction()
 }
 
 void UnsaturatedEngine::action()
-{/*
+{
     if ( !isActivated ) return;
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     if ( (tri.number_of_vertices()==0) || (updateTriangulation) ) {
         cout<< "triangulation is empty: building a new one" << endl;
         scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
         setPositionsBuffer(true);//copy sphere positions in a buffer...
-        buildTriangulation(pZero,solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
+        buildTriangulation(pZero,*solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
         initializeCellIndex();//initialize cell index
         updatePoreRadius();//save all pore radii before invade
         updateVolumeCapillaryCell();//save capillary volume of all cells, for calculating saturation
@@ -172,20 +172,16 @@ void UnsaturatedEngine::action()
         solver->noCache = true;
     }
     ///compute invade
-    if (pressureForce) {
-        invade();
-    }
+    if (pressureForce) { invade();}
 
     ///compute force
     if(computeForceActivated){
-    computeFacetPoreForcesWithCache(solver);
+    computeFacetPoreForcesWithCache();
     Vector3r force;
     FiniteVerticesIterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
     for ( FiniteVerticesIterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
         force = pressureForce ? Vector3r ( V_it->info().forces[0],V_it->info().forces[1],V_it->info().forces[2] ): Vector3r(0,0,0);
-        scene->forces.addForce ( V_it->info().id(), force);
-    }
-}*/
+        scene->forces.addForce ( V_it->info().id(), force); }}
 }
 
 void UnsaturatedEngine::initializeCellIndex()
@@ -979,12 +975,9 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 	#ifdef parallel_forces
 	if (solver->noCache) {
 		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
-// 		vector<const CVector*> exf; exf.reserve(20);
-// 		vector<const Real*> exp; exp.reserve(20);
-		solver->perVertexUnitForce.resize(Tri.number_of_vertices());
-		solver->perVertexPressure.resize(Tri.number_of_vertices());}
+		solver->perVertexUnitForce.resize(solver->T[currentTes].maxId+1);
+		solver->perVertexPressure.resize(solver->T[currentTes].maxId+1);}
 	#endif
-
 	CellHandle neighbourCell;
 	VertexHandle mirrorVertex;
 	CVector tempVect;
@@ -994,6 +987,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 			CellHandle& cell = *cellIt;
 			//reset cache
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
+
 			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
 					neighbourCell = cell->neighbor(j);
 					const CVector& Surfk = cell->info().facetSurfaces[j];
@@ -1012,13 +1006,13 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 						cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
 					}
 					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
-					CVector Facet_Unit_Force = -fluidSurfk*cell->info().solidLine[j][3];
-					CVector Facet_Force = cell->info().p()*Facet_Unit_Force;
+					CVector facetUnitForce = -fluidSurfk*cell->info().solidLine[j][3];
+					CVector Facet_Force = cell->info().p()*facetUnitForce;
 										
 					for (int y=0; y<3;y++) {
 						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidLine[j][y];
 						//add to cached value
-						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+Facet_Unit_Force*cell->info().solidLine[j][y];
+						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidLine[j][y];
 						//uncomment to get total force / comment to get only pore tension forces
 						if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
 							cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
@@ -1043,7 +1037,6 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 		#pragma omp parallel for num_threads(ompThreads)
 		for (int vn=0; vn<= solver->T[currentTes].maxId; vn++) {
 			VertexHandle& v = solver->T[currentTes].vertexHandles[vn];
-// 		for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v){
 			const int& id =  v->info().id();
 			CVector tf (0,0,0);
 			int k=0;
@@ -1054,11 +1047,11 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 		#endif
 	}
 	if (solver->debugOut) {
-		CVector TotalForce = nullVect;
+		CVector totalForce = nullVect;
 		for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
-			if (!v->info().isFictious) TotalForce = TotalForce + v->info().forces;
-			else if (solver->boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;	}
-		cout << "TotalForce = "<< TotalForce << endl;}
+			if (!v->info().isFictious) totalForce = totalForce + v->info().forces;
+			else if (solver->boundary(v->info().id()).flowCondition==1) totalForce = totalForce + v->info().forces;	}
+		cout << "totalForce = "<< totalForce << endl;}
 }
 
 #endif //UNSATURATED_FLOW
