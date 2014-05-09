@@ -6,9 +6,9 @@ class ViscElCapMat : public ViscElMat {
 		virtual ~ViscElCapMat();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElCapMat,ViscElMat,"Material for extended viscoelastic model of contact with capillary parameters.",
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
-		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
-		((Real,gamma,NaN,,"Surface tension [N/m]"))
-		((Real,theta,NaN,,"Contact angle [°]"))
+		((Real,Vb,0.0,,"Liquid bridge volume [m^3]"))
+		((Real,gamma,0.0,,"Surface tension [N/m]"))
+		((Real,theta,0.0,,"Contact angle [°]"))
 		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic [Willett2000]_ , Weigert [Weigert1999]_ , Rabinovich [Rabinov2005]_ , Lambert (simplified, corrected Rabinovich model) [Lambert2008]_ ")),
 		createIndex();
 	);
@@ -29,12 +29,12 @@ class ViscElCapPhys : public ViscElPhys{
 		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
 		((bool,liqBridgeActive,false,, "Whether liquid bridge is active at the moment"))
 		((Real,sCrit,false,,"Critical bridge length [m]"))
-		((Real,Vb,NaN,,"Liquid bridge volume [m^3]"))
-		((Real,gamma,NaN,,"Surface tension [N/m]"))
-		((Real,theta,NaN,,"Contact angle [rad]"))
+		((Real,Vb,0.0,,"Liquid bridge volume [m^3]"))
+		((Real,gamma,0.0,,"Surface tension [N/m]"))
+		((Real,theta,0.0,,"Contact angle [rad]"))
 		((CapType,CapillarType,None_Capillar,,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert, Soulie"))
 #ifdef YADE_LIQMIGRATION
-		((Real,Vmax,-1,,"Maximal liquid bridge volume [m^3]"))
+		((Real,Vmax,0.0,,"Maximal liquid bridge volume [m^3]"))
 #endif
 		,
 		createIndex();

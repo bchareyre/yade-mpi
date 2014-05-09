@@ -95,8 +95,8 @@ class Body: public Serializable{
 		((Real,Cs,0.0,,    "Color field (only for SPH-model)"))          // [Mueller2003], (15)
 #endif
 #ifdef YADE_LIQMIGRATION
-		((Real,Vf, -1.0,, "Individual amount of liquid"))
-		((Real,Vmin,-1.0,, "Minimal amount of liquid"))
+		((Real,Vf, 0.0,,   "Individual amount of liquid"))
+		((Real,Vmin, 0.0,, "Minimal amount of liquid"))
 #endif
 		,
 		/* ctor */,
