@@ -29,19 +29,18 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		DECLARE_TESSELATION_TYPES(Network<Tesselation>)
 		
 		//painfull, but we need that for templates inheritance...
-		using _N::T; using _N::x_min; using _N::x_max; using _N::y_min; using _N::y_max; using _N::z_min; using _N::z_max; using _N::Rmoy; using _N::SectionArea; using _N::Height; using _N::Vtotale; using _N::currentTes; using _N::DEBUG_OUT; using _N::nOfSpheres; using _N::x_min_id; using _N::x_max_id; using _N::y_min_id; using _N::y_max_id; using _N::z_min_id; using _N::z_max_id; using _N::boundsIds; using _N::Corner_min; using _N::Corner_max;  using _N::Vsolid_tot; using _N::Vtotalissimo; using _N::Vporale; using _N::Ssolid_tot; using _N::V_porale_porosity; using _N::V_totale_porosity; using _N::boundaries; using _N::id_offset; using _N::vtk_infinite_vertices; using _N::vtk_infinite_cells; using _N::num_particles; using _N::boundingCells; using _N::facetVertices; using _N::facetNFictious;
+		using _N::T; using _N::xMin; using _N::xMax; using _N::yMin; using _N::yMax; using _N::zMin; using _N::zMax; using _N::Rmoy; using _N::sectionArea; using _N::Height; using _N::vTotal; using _N::currentTes; using _N::debugOut; using _N::nOfSpheres; using _N::xMinId; using _N::xMaxId; using _N::yMinId; using _N::yMaxId; using _N::zMinId; using _N::zMaxId; using _N::boundsIds; using _N::cornerMin; using _N::cornerMax;  using _N::VSolidTot; using _N::Vtotalissimo; using _N::vPoral; using _N::sSolidTot; using _N::vPoralPorosity; using _N::vTotalPorosity; using _N::boundaries; using _N::idOffset; using _N::vtkInfiniteVertices; using _N::vtkInfiniteCells; using _N::num_particles; using _N::boundingCells; using _N::facetVertices; using _N::facetNFictious;
 		//same for functions
-		using _N::Define_fictious_cells; using _N::AddBoundingPlanes; using _N::boundary;
+		using _N::defineFictiousCells; using _N::addBoundingPlanes; using _N::boundary;
 
 		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
 
-		bool SLIP_ON_LATERALS;
-// 		bool areaR2Permeability;
-		double TOLERANCE;
-		double RELAX;
+		bool slipBoundary;
+		double tolerance;
+		double relax;
 		double ks; //Hydraulic Conductivity
-		bool clampKValues, meanKStat, distance_correction;
+		bool clampKValues, meanKStat, distanceCorrection;
 		bool OUTPUT_BOUDARIES_RADII;
 		bool noCache;//flag for checking if cached values cell->unitForceVectors have been defined
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
@@ -50,36 +49,39 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
-		vector<Cell_handle> IPCells;
+		vector<CellHandle> IPCells;
 		vector<pair<Point,Real> > imposedF;
-		vector<Cell_handle> IFCells;
+		vector<CellHandle> IFCells;
+		//Pointers to vectors used for user defined boundary pressure
+		vector<Real> *pxpos, *ppval;
 		
 		void initNewTri () {noCache=true; /*isLinearSystemSet=false; areCellsOrdered=false;*/}//set flags after retriangulation
-		bool permeability_map;
+		bool permeabilityMap;
 
 		bool computeAllCells;//exececute computeHydraulicRadius for all facets and all spheres (double cpu time but needed for now in order to define crossSections correctly)
-		double K_opt_factor;
+		double KOptFactor;
 		double minKdivKmean;
 		double maxKdivKmean;
 		int Iterations;
 
-		bool RAVERAGE;
+		bool rAverage;
 		int walls_id[6];
-// 		#define parallel_forces
+		#define parallel_forces
 		#ifdef parallel_forces
 		int ompThreads;
-		vector< vector<const Vecteur*> > perVertexUnitForce;
+		vector< vector<const CVector*> > perVertexUnitForce;
 		vector< vector<const Real*> > perVertexPressure;
 		#endif
-		vector <Finite_edges_iterator>  Edge_list;
-		vector <double> Edge_Surfaces;
-		vector <pair<int,int> > Edge_ids;
+		vector <double> edgeSurfaces;
+		vector <pair<const VertexInfo*,const VertexInfo*> > edgeIds;
 		vector <Real> edgeNormalLubF;
-		vector <Vector3r> viscousShearForces;
-		vector <Vector3r> viscousShearTorques;
-		vector <Vector3r> normLubForce;
-		vector <Matrix3r> viscousBodyStress;
-		vector <Matrix3r> lubBodyStress;
+		vector <Vector3r> shearLubricationForces;
+		vector <Vector3r> shearLubricationTorques;
+		vector <Vector3r> pumpLubricationTorques;
+		vector <Vector3r> twistLubricationTorques;
+		vector <Vector3r> normalLubricationForce;
+		vector <Matrix3r> shearLubricationBodyStress;
+		vector <Matrix3r> normalLubricationBodyStress;
 		vector <Vector3r> deltaNormVel;
 		vector <Vector3r> deltaShearVel;
 		vector <Vector3r> normalV;
@@ -89,87 +91,84 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <Matrix3r> normalStressInteraction;
 		
 		void Localize();
-		void Compute_Permeability();
-		virtual void GaussSeidel (Real dt=0);
-		virtual void ResetNetwork();
+		void computePermeability();
+		virtual void gaussSeidel (Real dt=0);
+		virtual void resetNetwork();
 
-		void Fictious_cells ( );
 
-		double k_factor; //permeability moltiplicator
+		double kFactor; //permeability moltiplicator
 		std::string key; //to give to consolidation files a name with iteration number
-		std::vector<double> Pressures; //for automatic write maximum pressures during consolidation
-		bool tess_based_force; //allow the force computation method to be chosen from FlowEngine
+// 		std::vector<double> pressures; //for automatic write maximum pressures during consolidation
+		bool tessBasedForce; //allow the force computation method to be chosen from FlowEngine
 		Real minPermLength; //min branch length for Poiseuille
 
-		double P_SUP, P_INF, P_INS, VISCOSITY;
+		double viscosity;
 		double fluidBulkModulus;
 		
-		Tesselation& Compute_Action ( );
-		Tesselation& Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
-		Tesselation& LoadPositions(int argc, char *argv[ ], char *envp[ ]);
-		void SpheresFileCreator ();
-		void DisplayStatistics();
-		void Initialize_pressures ( double P_zero );
+		void displayStatistics();
+		void initializePressure ( double pZero );
 		bool reApplyBoundaryConditions ();
-		/// Define forces using the same averaging volumes as for permeability
-		void ComputeTetrahedralForces();
-		/// Define forces spliting drag and buoyancy terms
-		void ComputeFacetForcesWithCache(bool onlyCache=false);
+		void computeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk (const char* folder);
 #ifdef XVIEW
-		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
-		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
+		void dessineTriangulation ( Vue3D &Vue, RTriangulation &T );
+		void dessineShortTesselation ( Vue3D &Vue, Tesselation &Tes );
 #endif
-		double Permeameter ( double P_Inf, double P_Sup, double Section, double DeltaY, const char *file );
-		double Sample_Permeability( double& x_Min,double& x_Max ,double& y_Min,double& y_Max,double& z_Min,double& z_Max);
-		double Compute_HydraulicRadius (Cell_handle cell, int j );
+		double permeameter ( double PInf, double PSup, double Section, double DeltaY, const char *file );
+		double samplePermeability( double& xMin,double& xMax ,double& yMin,double& yMax,double& zMin,double& zMax);
+		double computeHydraulicRadius (CellHandle cell, int j );
 		Real checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2);
 
-		double dotProduct ( Vecteur x, Vecteur y );
-		double Compute_EffectiveRadius(Cell_handle cell, int j);
-		double Compute_EquivalentRadius(Cell_handle cell, int j);
+		double dotProduct ( CVector x, CVector y );
+		double computeEffectiveRadius(CellHandle cell, int j);
+		double computeEquivalentRadius(CellHandle cell, int j);
 		//return the list of constriction values
 		vector<double> getConstrictions();
 		vector<Constriction> getConstrictionsFull();
 
-		void GenerateVoxelFile ( );
+		void generateVoxelFile ( );
 		
 		void computeEdgesSurfaces();
 		Vector3r computeViscousShearForce(const Vector3r& deltaV, const int& edge_id, const Real& Rh);
 		Real computeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt, const Real& meanRad);
 		Vector3r computeShearLubricationForce(const Vector3r& deltaShearV, const Real& dist, const int& edge_id, const Real& eps, const Real& centerDist, const Real& meanRad);
+		Vector3r computePumpTorque(const Vector3r& deltaShearAngV, const Real& dist, const int& edge_id, const Real& eps, const Real& meanRad );
+		Vector3r computeTwistTorque(const Vector3r& deltaNormAngV, const Real& dist, const int& edge_id, const Real& eps, const Real& meanRad );
 
-		RTriangulation& Build_Triangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
+
+
+		RTriangulation& buildTriangulation ( Real x, Real y, Real z, Real radius, unsigned const id );
 
 		bool isInsideSphere ( double& x, double& y, double& z );
 
-		void SliceField (const char *filename);
-		void ComsolField();
+		void sliceField (const char *filename);
+		void comsolField();
 
-		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
-		virtual void Average_Relative_Cell_Velocity();
-		void Average_Fluid_Velocity();
-		void ApplySinusoidalPressure(RTriangulation& Tri, double Amplitude, double Average_Pressure, double load_intervals);
+		void interpolate ( Tesselation& Tes, Tesselation& NewTes );
+		virtual void averageRelativeCellVelocity();
+		void averageFluidVelocity();
+		void applySinusoidalPressure(RTriangulation& Tri, double amplitude, double averagePressure, double loadIntervals);
+		void applyUserDefinedPressure(RTriangulation& Tri, vector<Real>& xpos, vector<Real>& pval);
 		bool isOnSolid  (double X, double Y, double Z);
 		double getPorePressure (double X, double Y, double Z);
-		void measurePressureProfile(double Wall_up_y, double Wall_down_y);
+		void measurePressureProfile(double WallUpy, double WallDowny);
 		double averageSlicePressure(double Y);
 		double averagePressure();
 		double getCell (double X,double Y,double Z);
 		double boundaryFlux(unsigned int boundaryId);
 		
-		vector<Real> Average_Fluid_Velocity_On_Sphere(unsigned int Id_sph);
+		vector<Real> averageFluidVelocityOnSphere(unsigned int Id_sph);
 		//Solver?
-		int useSolver;//(0 : GaussSeidel, 1 : TAUCS, 2 : PARDISO, 3:CHOLMOD)
+		int useSolver;//(0 : GaussSeidel, 1:CHOLMOD)
 };
 
 } //namespace CGT
-
+#include <yade/lib/triangulation/FlowBoundingSphere.ipp>
 #ifdef LINSOLV
 #include "yade/lib/triangulation/FlowBoundingSphereLinSolv.hpp"
 #endif
 
 /// _____ Template Implementation ____
-#include "yade/lib/triangulation/FlowBoundingSphere.ipp"
+// #include "yade/lib/triangulation/FlowBoundingSphereLinSolv.ipp"
 
 #endif //FLOW_ENGINE

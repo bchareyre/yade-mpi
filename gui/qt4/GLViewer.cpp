@@ -25,8 +25,6 @@
 #include<boost/algorithm/string/case_conv.hpp>
 #include<yade/lib/serialization/ObjectIO.hpp>
 #include<yade/lib/pyutil/gil.hpp>
-
-
 #include<QtGui/qevent.h>
 
 using namespace boost;
@@ -76,10 +74,9 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	if(manipulatedFrame()==0) setManipulatedFrame(new qglviewer::ManipulatedFrame());
 
 	xyPlaneConstraint=shared_ptr<qglviewer::LocalConstraint>(new qglviewer::LocalConstraint());
-	//xyPlaneConstraint->setTranslationConstraint(qglviewer::AxisPlaneConstraint::AXIS,qglviewer::Vec(0,0,1));
-	//xyPlaneConstraint->setRotationConstraint(qglviewer::AxisPlaneConstraint::FORBIDDEN,qglviewer::Vec(0,0,1));
 	manipulatedFrame()->setConstraint(NULL);
 
+	setKeyDescription(Qt::Key_Return,"Run simulation.");
 	setKeyDescription(Qt::Key_A,"Toggle visibility of global axes.");
 	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
 	setKeyDescription(Qt::Key_C & Qt::AltModifier,"Set scene center to median body position (same as space)");
@@ -97,12 +94,6 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_P,"Set wider field of view");
 	setKeyDescription(Qt::Key_R,"Revolve around scene center");
 	setKeyDescription(Qt::Key_V,"Save PDF of the current view to /tmp/yade-snapshot-0001.pdf (whichever number is available first). (Must be compiled with the gl2ps feature.)");
-#if 0
-	setKeyDescription(Qt::Key_Plus,    "Cut plane increase");
-	setKeyDescription(Qt::Key_Minus,   "Cut plane decrease");
-	setKeyDescription(Qt::Key_Slash,   "Cut plane step decrease");
-	setKeyDescription(Qt::Key_Asterisk,"Cut plane step increase");
-#endif
  	setPathKey(-Qt::Key_F1);
  	setPathKey(-Qt::Key_F2);
 	setKeyDescription(Qt::Key_Escape,"Manipulate scene (default)");
@@ -122,9 +113,6 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_Space,"Center scene (same as Alt-C); clip plane: activate/deactivate");
 
 	centerScene();
-
-	//connect(&GLGlobals::redrawTimer,SIGNAL(timeout()),this,SLOT(updateGL()));
-
 }
 
 bool GLViewer::isManipulating(){
@@ -273,6 +261,11 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		}
 	}
 	else if(e->key()==Qt::Key_Period) gridSubdivide = !gridSubdivide;
+	else if(e->key()==Qt::Key_Return){
+		if (Omega::instance().isRunning()) Omega::instance().pause();
+		else Omega::instance().run();
+		LOG_INFO("Running...");
+	}
 #ifdef YADE_GL2PS
 	else if(e->key()==Qt::Key_V){
 		for(int i=0; ;i++){

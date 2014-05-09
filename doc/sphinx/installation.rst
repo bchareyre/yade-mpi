@@ -22,12 +22,15 @@ To install daily-version one needs to add this repository to your
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ precise/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
+	sudo apt-get update
 	sudo apt-get install yadedaily
 
-If you have another distribution, not Ubuntu Precise, be sure to use the
+If you have another distribution, not Ubuntu Precise (Version 12.04), be sure to use the
 correct name in the first line (for instance, jessie, trusty or wheezy).
 
 After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
+yadedaily on older distributions can have some disabled features due to older library
+versions, shipped with particular distribution. 
 
 Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
 Each branch corresponds to one distribution e.g. precise, jessie etc.
@@ -124,8 +127,10 @@ Some of them are only optional. The last ones are only relevant for using the fl
 Most of the list above is very likely already packaged for your distribution. In case you are confronted
 with some errors concerning not available packages (e.g. Package libmetis-dev is not available) it may be necessary 
 to add yade external ppa from https://launchpad.net/~yade-users/+archive/external::
+
 	sudo add-apt-repository ppa:yade-users/external 
 	sudo apt-get update 
+
 The following commands have to be executed in command line of corresponding 
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
@@ -142,7 +147,7 @@ should have root privileges
 		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
 		python-xlib python-qt4 pyqt4-dev-tools gtk2-engines-pixbuf python-argparse \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev \
+		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev
 		
 
 Some of packages (for example, cmake, eigen3) are mandatory, some of them
@@ -152,36 +157,41 @@ some of Yade features will be disabled (see the messages at the end of configura
 		
 Additional packages, which can become mandatory later::
 
-		sudo apt-get install python-gts python-minieigen \
+		sudo apt-get install python-gts python-minieigen
 		
-For effective usage of direct solvers in the fluid coupling, the following libraries are recommended, together with eigen>=3.1: blas, lapack, suitesparse, and metis.
-All four of them are available in many different versions. Different combinations are possible and not all of them will work. The following was found to be effective on ubuntu 12.04 and debian wheezy.
-(openblas provides its own version of lapack, and suitesparse-metis will trigger the installation of parmetis)::
+For effective usage of direct solvers in the PFV-type fluid coupling, the following libraries are recommended, together with eigen>=3.1: blas, lapack, suitesparse, and metis.
+All four of them are available in many different versions. Different combinations are possible and not all of them will work. The following was found to be effective on recent deb-based systems. On ubuntu 12.04, better compile openblas with USE_OPENMP=1, else yade will run on a single core::
 
-		sudo apt-get install libopenblas-dev libsuitesparse-metis-dev \
+		sudo apt-get install libopenblas-dev libsuitesparse-metis-dev
 
 Some packages listed here are relatively new and they can be absent
 in your distribution (for example, libmetis-dev or python-gts). They can be 
 installed from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_
 or just ignored. In this case some features can be disabled.
 
-If you are using other distribuition, than Debian or its derivatives, you should
+If you are using other distribution, than Debian or its derivatives, you should
 install the softwares listed above. Their names can differ from the 
 names of Debian-packages.
-
-
-
-
 
 
 Compilation
 ^^^^^^^^^^^
 
 You should create a separate build-place-folder, where Yade will be configured 
-and where the source code will be compiled. Then inside this build-directory you
-should start cmake to configure the compilation process::
+and where the source code will be compiled. Here is an example for a folderstructure:
+
+    myYade/           ## base directory
+            trunk/      ## folder for sourcecode in which you use github
+            build/      ## folder in which sources will be compiled; build-directory; use cmake here
+            install/    ## installfolder
+
+Then inside this build-directory you should start cmake to configure the compilation process::
 
 	cmake -DINSTALL_PREFIX=/path/to/installfolder /path/to/sources
+
+For the folder structure given above call the following command in folder "build":
+
+    cmake -DINSTALL_PREFIX=../install ../trunk
 
 Additional options can be configured in the same line with the following 
 syntax::
@@ -228,7 +238,11 @@ parameter on many cores systems ``-j`` can be added to decrease compilation time
 and split the compilation on many cores. For example, on 4-core machines
 it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
 approximately 2GB/core for compilation, otherwise the swap-file will be used
-and a compilation time dramatically increases.
+and a compilation time dramatically increases. After compilation finished successfully
+the new built can be started by navigating to /path/to/installfolder/bin and calling yade via (based on version yade-2014-02-20.git-a7048f4)::
+    
+    cd /path/to/installfolder/bin 
+    ./yade-2014-02-20.git-a7048f4
 
 For building the documentation you should at first execute the command "make install"
 and then "make doc" to build it. The generated files will be stored in your current

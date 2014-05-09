@@ -11,9 +11,8 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-params=getViscoelasticFromSpheresInteraction(tc,en,es)
-facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) 
-sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,tc=tc,en=en,et=es)) 
+sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=es))
 
 facetId=O.bodies.append(facet( [ (-1,0,0), (1,1,0), (1,-1,0)], material=facetMat,color=(1,0,0)))
 

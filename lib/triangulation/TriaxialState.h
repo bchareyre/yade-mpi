@@ -41,8 +41,8 @@ public:
 					int id;
 					bool isSphere;
 					Sphere sphere;
-					Vecteur translation;
-					Vecteur rotation;
+					CVector translation;
+					CVector rotation;
 					VectorContact contacts;
 					
 					Grain(void) {id=-1; isSphere=true;}
@@ -52,12 +52,12 @@ public:
 					
 					Grain* grain1;
 					Grain* grain2;
-					Vecteur position;
-					Vecteur normal;
+					CVector position;
+					CVector normal;
 					Real fn;
-					Vecteur fs;
+					CVector fs;
 					Real old_fn;
-					Vecteur old_fs;
+					CVector old_fs;
 					Real frictional_work;
 					bool visited;
 					Status status;
@@ -70,7 +70,7 @@ public:
 	bool from_file(const char* filename, bool bz2=false);
 	bool to_file(const char* filename, bool bz2=false);
 	bool inside(Real x, Real y, Real z);
-	bool inside(Vecteur v);
+	bool inside(CVector v);
 	bool inside(Point p);
 	static Real find_parameter (const char* parameter_name, const char* filename);
 	static Real find_parameter (const char* parameter_name, boost::iostreams::filtering_istream& file);

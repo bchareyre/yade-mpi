@@ -1,5 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
-
+// 2013 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 #pragma once
 #include<yade/pkg/common/Collider.hpp>
 #include<yade/core/Scene.hpp>
@@ -7,11 +7,6 @@ class InteractionContainer;
 
 
 /*! Periodic collider notes.
-
-Use
-===
-* scripts/test/periodic-simple.py
-* In the future, triaxial compression working by growing/shrinking the cell should be implemented.
 
 Architecture
 ============
@@ -50,7 +45,8 @@ python:
 
 Requirements
 ============
-* No body can have Aabb larger than about .499*cellSize. Exception is thrown if that is false.
+* By default, no body can have Aabb larger than about .499*cellSize. Exception is thrown if that is false.
+	Large bodies are accepted if allowBiggerThanPeriod (experimental)
 * Constitutive law must not get body positions from Body::state directly.
 	If it does, it uses Interaction::cellDist to compute periodic position.
 * No body can get further away than MAXINT periods. It will do horrible things if there is overflow. Not checked at the moment.
@@ -67,7 +63,7 @@ Possible performance improvements & bugs
 
 
 // #define this macro to enable timing within this engine
-//#define ISC_TIMING
+// #define ISC_TIMING
 
 // #define to turn on some tracing information for the periodic part
 // all code under this can be probably removed at some point, when the collider will have been tested thoroughly
@@ -157,6 +153,7 @@ class InsertionSortCollider: public Collider{
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details
 	*/
 	void insertionSort(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
+	void insertionSortParallel(VecBounds& v,InteractionContainer*,Scene*,bool doCollide=true);
 	void handleBoundInversion(Body::id_t,Body::id_t,InteractionContainer*,Scene*);
 // 	bool spatialOverlap(Body::id_t,Body::id_t) const;
 
@@ -194,7 +191,7 @@ class InsertionSortCollider: public Collider{
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(InsertionSortCollider,Collider,"\
 		Collider with O(n log(n)) complexity, using :yref:`Aabb` for bounds.\
 		\n\n\
-		At the initial step, Bodies' bounds (along sortAxis) are first std::sort'ed along one axis (sortAxis), then collided. The initial sort has :math:`O(n^2)` complexity, see `Colliders' performance <https://yade-dem.org/index.php/Colliders_performace>`_ for some information (There are scripts in examples/collider-perf for measurements). \
+		At the initial step, Bodies' bounds (along :yref:`sortAxis<InsertionSortCollider.sortAxis>`) are first std::sort'ed along this (sortAxis) axis, then collided. The initial sort has :math:`O(n^2)` complexity, see `Colliders' performance <https://yade-dem.org/index.php/Colliders_performace>`_ for some information (There are scripts in examples/collider-perf for measurements). \
 		\n\n \
 		Insertion sort is used for sorting the bound list that is already pre-sorted from last iteration, where each inversion	calls checkOverlap which then handles either overlap (by creating interaction if necessary) or its absence (by deleting interaction if it is only potential).	\
 		\n\n \

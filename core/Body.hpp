@@ -56,7 +56,7 @@ class Body: public Serializable{
 		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
 		bool isAspherical() const {return flags & FLAG_ASPHERICAL; }
 		void setAspherical(bool d){ if(d) flags|=FLAG_ASPHERICAL; else flags&=~(FLAG_ASPHERICAL); }
-
+		
 		/*! Hook for clump to update position of members when user-forced reposition and redraw (through GUI) occurs.
 		 * This is useful only in cases when engines that do that in every iteration are not active - i.e. when the simulation is paused.
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
@@ -65,6 +65,7 @@ class Body: public Serializable{
 		python::list py_intrs();
 
 		Body::id_t getId() const {return id;};
+		unsigned int coordNumber();  // Number of neighboring particles
 
 		int getGroupMask() {return groupMask; };
 		bool maskOk(int mask){return (mask==0 || (groupMask&mask));}
@@ -87,6 +88,16 @@ class Body: public Serializable{
 		((long,chain,-1,,"Id of chain to which the body belongs."))
 		((long,iterBorn,-1,,"Step number at which the body was added to simulation."))
 		((Real,timeBorn,-1,,"Time at which the body was added to simulation."))
+#ifdef YADE_SPH
+		((Real,rho, -1.0,, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
+		((Real,rho0,-1.0,, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)
+		((Real,press,0.0,, "Pressure (only for SPH-model)"))             // [Mueller2003], (12)
+		((Real,Cs,0.0,,    "Color field (only for SPH-model)"))          // [Mueller2003], (15)
+#endif
+#ifdef YADE_LIQMIGRATION
+		((Real,Vf, -1.0,, "Individual amount of liquid"))
+		((Real,Vmin,-1.0,, "Minimal amount of liquid"))
+#endif
 		,
 		/* ctor */,
 		/* py */
@@ -103,6 +114,11 @@ class Body: public Serializable{
 		.add_property("timeBorn",&Body::timeBorn,"Returns time at which the body was added to simulation.")
 		.def_readwrite("chain",&Body::chain,"Returns Id of chain to which the body belongs.")
 		.def("intrs",&Body::py_intrs,"Return all interactions in which this body participates.")
+#ifdef YADE_SPH
+		.add_property("rho",  &Body::rho, "Returns the current density (only for SPH-model).")
+		.add_property("rho0", &Body::rho0,"Returns the rest density (only for SPH-model).")
+		.add_property("press",&Body::press,"Returns the pressure (only for SPH-model).")
+#endif
 	);
 };
 REGISTER_SERIALIZABLE(Body);

@@ -203,5 +203,6 @@ void Scene::updateBound(){
 		}
 	}
 	bound->min=mn; 
-  bound->max=mx;
+	bound->max=mx;
 }
+

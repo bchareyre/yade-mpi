@@ -37,11 +37,11 @@
 
 class TesselationWrapper : public GlobalEngine{
 public:
-	typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes> Tesselation;
+	typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes> 			Tesselation;
 	typedef Tesselation::RTriangulation						RTriangulation;
-	typedef Tesselation::Vertex_Info						Vertex_Info;
-	typedef Tesselation::Cell_Info							Cell_Info;
-	typedef RTriangulation::Finite_edges_iterator					Finite_edges_iterator;
+	typedef Tesselation::VertexInfo							VertexInfo;
+	typedef Tesselation::CellInfo							CellInfo;
+	typedef RTriangulation::Finite_edges_iterator					FiniteEdgesIterator;
 	
 	
 	
@@ -67,22 +67,22 @@ public:
     	void clear2(void);
 
 	/// Add axis aligned bounding planes (modelised as spheres with (almost) infinite radius)
-  	void 	AddBoundingPlanes (void);
+  	void 	addBoundingPlanes (void);
 	/// Force boudaries at positions not equal to precomputed ones
- 	void	AddBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
+ 	void	addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
 	void 	RemoveBoundingPlanes (void);
-	///Compute voronoi centers then stop (don't compute anything else)
- 	void	ComputeTesselation (void);
- 	void	ComputeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
+	///compute voronoi centers then stop (don't compute anything else)
+ 	void	computeTesselation (void);
+ 	void	computeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
 
-	///Compute Voronoi vertices + volumes of all cells
-	///use ComputeTesselation to force update, e.g. after spheres positions have been updated
-  	void	ComputeVolumes	(void);
-	void	computeDeformations (void) {mma.analyser->ComputeParticlesDeformation();}
+	///compute Voronoi vertices + volumes of all cells
+	///use computeTesselation to force update, e.g. after spheres positions have been updated
+  	void	computeVolumes	(void);
+	void	computeDeformations (void) {mma.analyser->computeParticlesDeformation();}
 	///Get volume of the sphere inserted with indentifier "id""
 	double	Volume	(unsigned int id);
 	double	deformation (unsigned int id,unsigned int i,unsigned int j) {
-		if (!mma.analyser->ParticleDeformation.size()) {LOG_ERROR("Compute deformations first"); return 0;}
+		if (!mma.analyser->ParticleDeformation.size()) {LOG_ERROR("compute deformations first"); return 0;}
 		if (mma.analyser->ParticleDeformation.size()<id) {LOG_ERROR("id out of bounds"); return 0;}
 		return mma.analyser->ParticleDeformation[id](i,j);}
 
@@ -108,12 +108,12 @@ public:
 
 public:
 	/// edge iterators are used for returning tesselation "facets", i.e. spheres with a common branch in the triangulation, convert CGAL::edge to int pair (b1->id, b2->id)
-	Finite_edges_iterator facet_begin;
-	Finite_edges_iterator facet_end;
-	Finite_edges_iterator facet_it;
+	FiniteEdgesIterator facet_begin;
+	FiniteEdgesIterator facet_end;
+	FiniteEdgesIterator facet_it;
 	MicroMacroAnalyser mma;
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities (see also the `dedicated section in user manual <https://yade-dem.org/doc/user.html#micro-stress-and-micro-strain>`_). The calculation of microstrain is explained in [Catalano2013a]_ \n\nSee example usage in script example/tesselationWrapper/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities (see also the `dedicated section in user manual <https://yade-dem.org/doc/user.html#micro-stress-and-micro-strain>`_). The calculation of microstrain is explained in [Catalano2014a]_ \n\nSee example usage in script example/tesselationWrapper/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",
 	((unsigned int,n_spheres,0,,"|ycomp|"))
 	,/*ctor*/
   	Tes = new Tesselation;
@@ -132,9 +132,9 @@ public:
  	.def("defToVtk",&TesselationWrapper::defToVtk,(python::arg("outputFile")="def.vtk"),"Write local deformations in vtk format from states 0 and 1.")
  	.def("defToVtkFromStates",&TesselationWrapper::defToVtkFromStates,(python::arg("input1")="state1",python::arg("input2")="state2",python::arg("outputFile")="def.vtk",python::arg("bz2")=true),"Write local deformations in vtk format from state files (since the file format is very special, consider using defToVtkFromPositions if the input files were not generated by TesselationWrapper).")
  	.def("defToVtkFromPositions",&TesselationWrapper::defToVtkFromPositions,(python::arg("input1")="pos1",python::arg("input2")="pos2",python::arg("outputFile")="def.vtk",python::arg("bz2")=false),"Write local deformations in vtk format from positions files (one sphere per line, with x,y,z,rad separated by spaces).")
- 	.def("computeVolumes",&TesselationWrapper::ComputeVolumes,"Compute volumes of all Voronoi's cells.")
+ 	.def("computeVolumes",&TesselationWrapper::computeVolumes,"compute volumes of all Voronoi's cells.")
 	.def("getVolPoroDef",&TesselationWrapper::getVolPoroDef,(python::arg("deformation")=false),"Return a table with per-sphere computed quantities. Include deformations on the increment defined by states 0 and 1 if deformation=True (make sure to define states 0 and 1 consistently).")
-	.def("ComputeDeformations",&TesselationWrapper::computeDeformations,"Compute per-particle deformation. Get it with :yref:`TesselationWrapper::deformation` (id,i,j).")
+	.def("computeDeformations",&TesselationWrapper::computeDeformations,"compute per-particle deformation. Get it with :yref:`TesselationWrapper::deformation` (id,i,j).")
 	.def("deformation",&TesselationWrapper::deformation,(python::arg("id"),python::arg("i"),python::arg("j")),"Get particle deformation")
 	);
 	DECLARE_LOGGER;

@@ -147,13 +147,7 @@ Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, con
 
 void Shop::getViscoelasticFromSpheresInteraction( Real tc, Real en, Real es, shared_ptr<ViscElMat> b)
 {
-    b->kn = 1/tc/tc * ( Mathr::PI*Mathr::PI + pow(log(en),2) );
-    b->cn = -2.0 /tc * log(en);
-    b->ks = 2.0/7.0 /tc/tc * ( Mathr::PI*Mathr::PI + pow(log(es),2) );
-    b->cs = -2.0/7.0 /tc * log(es);
-
-    if (abs(b->cn) <= Mathr::ZERO_TOLERANCE ) b->cn=0;
-    if (abs(b->cs) <= Mathr::ZERO_TOLERANCE ) b->cs=0;
+    throw runtime_error("Setting parameters in ViscoElastic model is changed. You do not need to use getViscoelasticFromSpheresInteraction function any more, because this functino is deprecated. You need to set the parameters tc, en and es directly in material properties. Please, update your scripts. How to do it you can see in the following commit https://github.com/yade/trunk/commit/1987c2febdb8a6ce2d27f2dc1bb29df0dc5f686e");
 }
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale
@@ -477,7 +471,7 @@ void Shop::setContactFriction(Real angleRad){
 	}
 }
 
-void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization, bool integrateInertia)
+void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization)
 {
 	Scene* scene = Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
@@ -492,7 +486,7 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly, uns
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if(b->isClump()){
 			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
-			clumpSt->updateProperties(b, discretization, integrateInertia);
+			clumpSt->updateProperties(b, discretization);
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){

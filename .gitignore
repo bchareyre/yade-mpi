@@ -29,4 +29,4 @@ doc/sphinx/yade.polyhedra_utils.rst
 .kdev4/
 *.kdev4
 *.pyc
-
+*~

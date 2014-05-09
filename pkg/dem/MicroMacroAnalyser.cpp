@@ -58,7 +58,7 @@ void MicroMacroAnalyser::action()
 	} else if (scene->iter % interval == 0) {
 		setState(2, true, compIncrt);
 		if (compDeformation) {
-			analyser->ComputeParticlesDeformation();
+			analyser->computeParticlesDeformation();
 			//for (int i=0; i<analyser->ParticleDeformation.size();i++) cerr<< analyser->ParticleDeformation[i]<<endl;
 			ostringstream oss;
 			oss<<"deformation"<<incrtNumber++<<".vtk";
@@ -130,7 +130,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			//    TS.grains[Idg].translation = trans;
 			AngleAxisr aa((*bi)->state->ori);
 			Vector3r rotVec=aa.axis()*aa.angle();
-			TS.grains[Idg].rotation = CGT::Vecteur(rotVec[0],rotVec[1],rotVec[2]);
+			TS.grains[Idg].rotation = CGT::CVector(rotVec[0],rotVec[1],rotVec[2]);
 			TS.box.base = CGT::Point(min(TS.box.base.x(), pos.x()-rad),
 					min(TS.box.base.y(), pos.y()-rad),
 					    min(TS.box.base.z(), pos.z()-rad));
@@ -173,12 +173,12 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			c->grain2 = & (TS.grains[id2]);
 			grains[id1].contacts.push_back(c);
 			grains[id2].contacts.push_back(c);
-			c->normal = CGT::Vecteur((YADE_CAST<ScGeom*> ((*ii)->geom.get()))->normal.x(),
+			c->normal = CGT::CVector((YADE_CAST<ScGeom*> ((*ii)->geom.get()))->normal.x(),
 					(YADE_CAST<ScGeom*> ((*ii)->geom.get()))->normal.y(),
 					 (YADE_CAST<ScGeom*> ((*ii)->geom.get()))->normal.z());
 //    c->normal = ( grains[id2].sphere.point()-grains[id1].sphere.point() );
 //    c->normal = c->normal/sqrt ( pow ( c->normal.x(),2 ) +pow ( c->normal.y(),2 ) +pow ( c->normal.z(),2 ) );
-			c->position = CGT::Vecteur((YADE_CAST<ScGeom*> ((*ii)->geom.get()))->contactPoint.x(),
+			c->position = CGT::CVector((YADE_CAST<ScGeom*> ((*ii)->geom.get()))->contactPoint.x(),
 					(YADE_CAST<ScGeom*> ((*ii)->geom.get()))->contactPoint.y(),
 					 (YADE_CAST<ScGeom*> ((*ii)->geom.get()))->contactPoint.z());
 //    c->position = 0.5* ( ( grains[id1].sphere.point()-CGAL::ORIGIN ) +
@@ -187,7 +187,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 //          ( grains[id2].sphere.weight() *c->normal ) );
 			c->fn = YADE_CAST<FrictPhys*> (((*ii)->phys.get()))->normalForce.dot((YADE_CAST<ScGeom*> ((*ii)->geom.get()))->normal);
 			Vector3r fs = YADE_CAST<FrictPhys*> ((*ii)->phys.get())->shearForce;
-			c->fs = CGT::Vecteur(fs.x(),fs.y(),fs.z());
+			c->fs = CGT::CVector(fs.x(),fs.y(),fs.z());
 			c->old_fn = c->fn;
 			c->old_fs = c->fs;
 			c->frictional_work = 0;
@@ -214,8 +214,8 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 		TS.haut = triaxialCompressionEngine->height;//find_parameter("haut=", Statefile);
 		TS.larg = triaxialCompressionEngine->width;//find_parameter("larg=", Statefile);
 		TS.prof = triaxialCompressionEngine->depth;//find_parameter("prof=", Statefile);
-		TS.porom = 0/*analyser->ComputeMacroPorosity() crasher?*/;//find_parameter("porom=", Statefile);
-		TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
+		TS.porom = 0/*analyser->computeMacroPorosity() crasher?*/;//find_parameter("porom=", Statefile);
+		TS.ratio_f = triaxialCompressionEngine->ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
 	} else TS.wszzh=TS.wsxxd=TS.wsyyfa=TS.eps3=TS.eps1=TS.eps2=TS.haut=TS.larg=TS.prof=TS.porom=TS.ratio_f=0;
 	if (filename!=NULL) TS.to_file(filename);
 	return TS;
@@ -223,7 +223,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 
 // const vector<CGT::Tenseur3>& MicroMacroAnalyser::makeDeformationArray(const char* state_file1, const char* state_file0)
 // {
-// 	return analyser->ComputeParticlesDeformation(state_file1, state_file0);
+// 	return analyser->computeParticlesDeformation(state_file1, state_file0);
 // }
 
 #endif /* YADE_CGAL */

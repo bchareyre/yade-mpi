@@ -143,7 +143,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				int* currentIndexes =  hertzOn? mindlinContactPhysics->currentIndexes : cundallContactPhysics->currentIndexes;
 				//If P=0, we use null solution
 				MeniscusParameters
-				solution(Pinterpol? capillary->Interpolate(R1,R2,Dinterpol, Pinterpol, currentIndexes) : MeniscusParameters());
+				solution(Pinterpol? capillary->interpolate(R1,R2,Dinterpol, Pinterpol, currentIndexes) : MeniscusParameters());
 				/// capillary adhesion force
 				Real Finterpol = solution.F;
 				Vector3r fCap = Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->normal;
@@ -284,7 +284,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 	}
 }
 
-MeniscusParameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* index)
+MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, int* index)
 {	//cerr << "interpolate" << endl;
         if (R1 > R2) {
                 Real R3 = R1;

@@ -14,6 +14,9 @@
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
 #  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
 #  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
+#  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default, experimental)
+#  ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (OFF by default)
+#  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 
@@ -84,7 +87,7 @@ ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
-FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread date_time filesystem iostreams regex serialization system REQUIRED)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
@@ -116,6 +119,9 @@ OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
 OPTION(ENABLE_GL2PS "Enable GL2PS" ${DEFAULT})
 OPTION(ENABLE_LINSOLV "Enable direct solver for the flow engines (experimental)" ${DEFAULT})
 OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" ${DEFAULT})
+OPTION(ENABLE_SPH "Enable SPH" OFF)
+OPTION(ENABLE_LBMFLOW "Enable LBM engine (very experimental)" OFF)
+OPTION(ENABLE_LIQMIGRATION "Enable liquid control (very experimental), see [Mani2013] for details" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -286,6 +292,20 @@ ELSE(ENABLE_LINSOLV)
   SET(DISABLED_FEATS "${DISABLED_FEATS} LinSolv")
 ENDIF(ENABLE_LINSOLV)
 #===============================================
+IF(ENABLE_SPH)
+  ADD_DEFINITIONS("-DYADE_SPH")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} SPH")
+ELSE(ENABLE_SPH)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} SPH")
+ENDIF(ENABLE_SPH)
+#===============================================
+IF(ENABLE_LIQMIGRATION)
+  ADD_DEFINITIONS("-DYADE_LIQMIGRATION")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LIQMIGRATION")
+ELSE(ENABLE_LIQMIGRATION)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} LIQMIGRATION")
+ENDIF(ENABLE_LIQMIGRATION)
+#===============================================
 IF(ENABLE_GL2PS)
   FIND_PACKAGE(GL2PS)
   IF(GL2PS_FOUND)
@@ -306,6 +326,15 @@ ENDIF(ENABLE_GL2PS)
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
+
+#===========================================================
+IF(ENABLE_LBMFLOW)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLBM_ENGINE")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LBMFLOW")
+  MESSAGE("LBMFLOW is still experimental, building and running LBM engine are at your own risk!")
+ELSE(ENABLE_LBMFLOW)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} LBMFLOW")
+ENDIF(ENABLE_LBMFLOW)
 
 #===========================================================
 
@@ -395,14 +424,15 @@ find_python_module(Tkinter REQUIRED)
 #===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
-SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "")
-TARGET_LINK_LIBRARIES(yade ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} ${LOKI_LIBRARY} -lrt)
+SET_TARGET_PROPERTIES(boot PROPERTIES PREFIX "" LINK_FLAGS "-Wl,--as-needed" )
+TARGET_LINK_LIBRARIES(yade ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${LINKLIBS} -lrt)
 TARGET_LINK_LIBRARIES(boot yade)
 
 IF(ENABLE_VTK)
   IF(${VTK_MAJOR_VERSION} EQUAL 6)
     TARGET_LINK_LIBRARIES(yade ${VTK_LIBRARIES})
     ADD_DEFINITIONS("-DYADE_VTK6")
+    MESSAGE(STATUS "VTK version 6 is found")
   ELSE(${VTK_MAJOR_VERSION} EQUAL 6)
     TARGET_LINK_LIBRARIES(yade vtkHybrid)
   ENDIF(${VTK_MAJOR_VERSION} EQUAL 6)

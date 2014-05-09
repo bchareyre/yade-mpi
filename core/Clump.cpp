@@ -32,9 +32,9 @@ void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 			assert(member->isClumpMember());
 			member->clumpId=clumpBody->id;
 			clump->members[memberId]=Se3r();// meaningful values will be put in by Clump::updateProperties
-			LOG_DEBUG("Added body #"<<memberId->id<<" to clump #"<<clumpBody->id);
+			//LOG_DEBUG("Added body #"<<memberId->id<<" to clump #"<<clumpBody->id);
 		}
-		LOG_DEBUG("Clump #"<<subClump->id<<" will be erased.");// see addToClump() in yadeWrapper.cpp
+		//LOG_DEBUG("Clump #"<<subClump->id<<" will be erased.");// see addToClump() in yadeWrapper.cpp
 	}
 	else{	// subBody must be a standalone!
 		clump->members[subId]=Se3r();// meaningful values will be put in by Clump::updateProperties
@@ -82,7 +82,7 @@ void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vec
 
 */
 
-void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int discretization, bool integrateInertia){
+void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int discretization){
 	LOG_DEBUG("Updating clump #"<<clumpBody->id<<" parameters");
 	const shared_ptr<State> state(clumpBody->state);
 	const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
@@ -110,7 +110,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	bool intersecting = false;
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
-	if (integrateInertia){
+	if (discretization>0){
 		FOREACH(MemberMap::value_type& mm, clump->members){
 			const shared_ptr<Body> subBody1=Body::byId(mm.first);
 			FOREACH(MemberMap::value_type& mm, clump->members){
@@ -120,9 +120,10 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 					const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
 					const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
 					Real un = (sphere1->radius+sphere2->radius) - dist.norm();
-					if (un > -0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
+					if (un > 0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
 				}
 			}
+			if (intersecting) break;
 		}
 	}
 	/* quantities suffixed by
@@ -153,9 +154,11 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 		}
 		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
 		Real dx = rMin/discretization; 	//edge length of cell
-		Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
-		if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
+		//Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
+		//if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx: leads to bug, when long chain of clump members is created (https://bugs.launchpad.net/yade/+bug/1273172)
 		Real dv = pow(dx,3);		//volume of cell
+		long nCells=(aabb.sizes()/dx).prod();
+		if(nCells>1e7) LOG_WARN("Clump::updateProperties: Cell array has "<<nCells<<" cells. Integrate inertia may take a while ...");
 		Vector3r x;			//position vector (center) of cell
 		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
 			for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
@@ -169,7 +172,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 								M += dv;
 								Sg += dv*x;
 								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
-								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose()/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/);
+								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose())/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/;
 								break;
 							}
 						}
@@ -180,7 +183,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	}
 	if(!intersecting){
 		FOREACH(MemberMap::value_type& mm, clump->members){
-			// I.first is Body::id_t, I.second is Se3r of that body
+			// mm.first is Body::id_t, mm.second is Se3r of that body
 			const shared_ptr<Body> subBody=Body::byId(mm.first);
 			dens = subBody->material->density;
 			if (subBody->shape->getClassIndex() ==  Sph_Index){//clump member should be a sphere
