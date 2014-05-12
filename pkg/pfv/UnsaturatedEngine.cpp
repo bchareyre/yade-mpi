@@ -61,6 +61,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 		double computeDeltaForce(CellHandle cell,int j, double rCap);
 		void computeSolidLine();
 		void computeFacetPoreForcesWithCache(bool onlyCache=false);	
+		void computeCapillaryForce() {computeFacetPoreForcesWithCache(false);}
 		
 		void invade();
 		Real getMinEntryValue();
@@ -129,7 +130,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 					.def("debugTemp",&UnsaturatedEngine::debugTemp,"debug temp file.(temporary)")
 					.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temp function for comparison with experiments, will delete soon")
 					.def("invade",&UnsaturatedEngine::invade,"Run the drainage invasion.")
-					.def("computeForce",&UnsaturatedEngine::computeFacetPoreForcesWithCache,"Compute capillary force. ")
+					.def("computeCapillaryForce",&UnsaturatedEngine::computeCapillaryForce,"Compute capillary force. ")
 					)
 		DECLARE_LOGGER;
 };
@@ -176,7 +177,7 @@ void UnsaturatedEngine::action()
 
     ///compute force
     if(computeForceActivated){
-    computeFacetPoreForcesWithCache();
+    computeCapillaryForce();
     Vector3r force;
     FiniteVerticesIterator vertices_end = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
     for ( FiniteVerticesIterator V_it = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); V_it !=  vertices_end; V_it++ ) {
@@ -612,13 +613,13 @@ double UnsaturatedEngine::computeEffPoreRadiusFine(CellHandle cell, int j)
 
     double rmin = max(rAB,max(rBC,rAC)); if (rmin==0) { rmin= 1.0e-10; }
     double rmax = abs(solver->computeEffectiveRadius(cell, j));//rmin>rmax ?
-    if(rmin>rmax) { cerr<<"WARNING! rmin>rmax. rmin="<<rmin<<" ,rmax="<<rmax<<endl; }
+//     if(rmin>rmax) { cerr<<"WARNING! rmin>rmax. rmin="<<rmin<<" ,rmax="<<rmax<<endl; }
     
     double deltaForceRMin = computeDeltaForce(cell,j,rmin);
     double deltaForceRMax = computeDeltaForce(cell,j,rmax);
     if(deltaForceRMax<0) {
         double effPoreRadius = rmax;
-        cerr<<"deltaForceRMax Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;
+//         cerr<<"deltaForceRMax Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;
         return effPoreRadius;}
     else if(deltaForceRMin<0) {
         double effPoreRadius = bisection(cell,j,rmin,rmax);// cerr<<"1";//we suppose most cases should be this.
@@ -628,7 +629,7 @@ double UnsaturatedEngine::computeEffPoreRadiusFine(CellHandle cell, int j)
         return effPoreRadius;}
     else if(deltaForceRMin>deltaForceRMax) {
         double effPoreRadius = rmax;
-        cerr<<"WARNING! deltaForceRMin>deltaForceRMax. cellID: "<<cell->info().index<<"; deltaForceRMin="<<deltaForceRMin<<"; deltaForceRMax="<<deltaForceRMax<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;
+//         cerr<<"WARNING! deltaForceRMin>deltaForceRMax. cellID: "<<cell->info().index<<"; deltaForceRMin="<<deltaForceRMin<<"; deltaForceRMax="<<deltaForceRMax<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;
         return effPoreRadius;}
 }
 
@@ -704,9 +705,9 @@ double UnsaturatedEngine::computeDeltaForce(CellHandle cell,int j, double rCap)
     double areaPore = areaCap - areaLiquidAB - areaLiquidAC - areaLiquidBC;
     
     //FIXME:rethink here,areaPore Negative, Flat facets, do nothing ?
-    if(areaPore<0) {cerr<<"ERROR! areaPore Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;}
+//     if(areaPore<0) {cerr<<"ERROR! areaPore Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;}
     double perimeterPore = lengthLiquidAB + lengthLiquidAC + lengthLiquidBC + (A - alphaAB - alphaAC)*rA + (B - alphaBA - alphaBC)*rB + (C - alphaCA - alphaCB)*rC;
-    if(perimeterPore<0) {cerr<<"ERROR! perimeterPore Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;}
+//     if(perimeterPore<0) {cerr<<"ERROR! perimeterPore Negative. cellID: "<<cell->info().index<<". posA="<<posA<<"; posB="<<posB<<"; posC="<< posC<<"; rA="<< rA<<"; rB="<< rB<<"; rC="<<rC<<endl;}
 
     double deltaForce = perimeterPore - areaPore/rCap;//deltaForce=surfaceTension*(perimeterPore - areaPore/rCap)
     return deltaForce;
@@ -972,18 +973,17 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 	//reset forces
 	if (!onlyCache) for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 	
-	#ifdef parallel_forces
-	if (solver->noCache) {
-		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
-		solver->perVertexUnitForce.resize(solver->T[currentTes].maxId+1);
-		solver->perVertexPressure.resize(solver->T[currentTes].maxId+1);}
-	#endif
+// 	#ifdef parallel_forces
+// 	if (solver->noCache) {
+// 		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
+// 		solver->perVertexUnitForce.resize(solver->T[currentTes].maxId+1);
+// 		solver->perVertexPressure.resize(solver->T[currentTes].maxId+1);}
+// 	#endif
 	CellHandle neighbourCell;
 	VertexHandle mirrorVertex;
 	CVector tempVect;
 	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
 	if (solver->noCache) {for (FlowSolver::VCellIterator cellIt=solver->T[currentTes].cellHandles.begin(); cellIt!=solver->T[currentTes].cellHandles.end(); cellIt++){
-// 	if (noCache) for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			CellHandle& cell = *cellIt;
 			//reset cache
 			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
@@ -1007,10 +1007,10 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 					}
 					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
 					CVector facetUnitForce = -fluidSurfk*cell->info().solidLine[j][3];
-					CVector Facet_Force = cell->info().p()*facetUnitForce;
+					CVector facetForce = cell->info().p()*facetUnitForce;
 										
 					for (int y=0; y<3;y++) {
-						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidLine[j][y];
+						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + facetForce*cell->info().solidLine[j][y];
 						//add to cached value
 						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidLine[j][y];
 						//uncomment to get total force / comment to get only pore tension forces
@@ -1020,31 +1020,31 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 							cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
 						}
 					}
-					#ifdef parallel_forces
-					solver->perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
-					solver->perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
-					#endif
+// 					#ifdef parallel_forces
+// 					solver->perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
+// 					solver->perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
+// 					#endif
 			}
 		}
 		solver->noCache=false;//cache should always be defined after execution of this function
 		if (onlyCache) return;
 	} else {//use cached values when triangulation doesn't change
-		#ifndef parallel_forces
+// 		#ifndef parallel_forces
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
 			
-		#else
-		#pragma omp parallel for num_threads(ompThreads)
-		for (int vn=0; vn<= solver->T[currentTes].maxId; vn++) {
-			VertexHandle& v = solver->T[currentTes].vertexHandles[vn];
-			const int& id =  v->info().id();
-			CVector tf (0,0,0);
-			int k=0;
-			for (vector<const Real*>::iterator c = solver->perVertexPressure[id].begin(); c != solver->perVertexPressure[id].end(); c++)
-				tf = tf + (*(solver->perVertexUnitForce[id][k++]))*(**c);
-			v->info().forces = tf;
-		}
-		#endif
+//  		#else
+// 		#pragma omp parallel for num_threads(ompThreads)
+// 		for (int vn=0; vn<= solver->T[currentTes].maxId; vn++) {
+// 			VertexHandle& v = solver->T[currentTes].vertexHandles[vn];
+// 			const int& id =  v->info().id();
+// 			CVector tf (0,0,0);
+// 			int k=0;
+// 			for (vector<const Real*>::iterator c = solver->perVertexPressure[id].begin(); c != solver->perVertexPressure[id].end(); c++)
+// 				tf = tf + (*(solver->perVertexUnitForce[id][k++]))*(**c);
+// 			v->info().forces = tf;
+// 		}
+// 		#endif
 	}
 	if (solver->debugOut) {
 		CVector totalForce = nullVect;
