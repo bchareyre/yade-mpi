@@ -76,16 +76,14 @@ def textClumps(fileName,shift=Vector3.Zero,scale=1.0,**kw):
 		if (newClumpId<0 or newClumpId==int(data[4])):
 			idD = curClump.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
 			newClumpId = int(data[4])
-			ret.append(idD)
 		else:
 			newClumpId = int(data[4])
 			O.bodies.appendClumped(curClump)
 			curClump=[]
 			idD = curClump.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
-			ret.append(idD)
 	
 	if (len(curClump)<>0):
-		O.bodies.appendClumped(curClump)
+		ret = O.bodies.appendClumped(curClump)
 	return ret
 
 def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
