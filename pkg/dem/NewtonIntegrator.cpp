@@ -226,18 +226,20 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 	//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//Reflect mean-field (periodic cell) acceleration in the velocity
 	if(scene->isPeriodic && homoDeform) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
-	state->pos+=state->vel*dt;
+	if (not(state->blockedMovement)) {
+		state->pos+=state->vel*dt;
+	}
 }
 
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
 {
 	Real angle2=state->angVel.squaredNorm();
-	if (angle2!=0) {//If we have an angular velocity, we make a rotation
+	if (angle2!=0 and not(state->blockedMovement)) {//If we have an angular velocity, we make a rotation
 		Real angle=sqrt(angle2);
 		Quaternionr q(AngleAxisr(angle*dt,state->angVel/angle));
 		state->ori = q*state->ori;
 	}
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
+	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero() and not(state->blockedMovement)) {
 		Vector3r r(scene->forces.getRot(id));
 		Real norm=r.norm(); r/=norm;
 		Quaternionr q(AngleAxisr(norm,r));
