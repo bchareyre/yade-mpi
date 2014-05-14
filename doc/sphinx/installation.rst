@@ -26,7 +26,8 @@ To install daily-version one needs to add this repository to your
 	sudo apt-get install yadedaily
 
 If you have another distribution, not Ubuntu Precise (Version 12.04), be sure to use the
-correct name in the first line (for instance, jessie, trusty or wheezy).
+correct name in the first line (for instance, jessie, trusty or wheezy). For the list
+of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
 After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
 yadedaily on older distributions can have some disabled features due to older library
