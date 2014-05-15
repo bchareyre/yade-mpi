@@ -190,7 +190,7 @@ class pyBodyContainer{
 			else Clump::add(clp,bp);// bp must be a standalone!
 		}
 		Clump::updateProperties(clp, discretization);
-		FOREACH(Body::id_t bid, eraseList) proxee->erase(bid);//erase old clumps
+		FOREACH(Body::id_t bid, eraseList) proxee->erase(bid,false);//erase old clumps
 	}
 	void releaseFromClump(Body::id_t bid, Body::id_t cid, unsigned int discretization){
 		Scene* scene(Omega::instance().getScene().get());	// get scene
@@ -385,7 +385,7 @@ class pyBodyContainer{
         #endif
 				Body::id_t newClumpId = clump(idsTmp, discretization);
 				ret.append(python::make_tuple(newClumpId,idsTmp));
-				erase(b->id);
+				erase(b->id,false);
 			}
 		}
 		return ret;
@@ -430,7 +430,7 @@ class pyBodyContainer{
 	vector<Body::id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
-	bool erase(Body::id_t id){ return proxee->erase(id); }
+	bool erase(Body::id_t id, bool eraseClumpMembers){ return proxee->erase(id,eraseClumpMembers); }
 };
 
 
@@ -917,7 +917,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,(python::arg("discretization")=0),"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
 		.def("getRoundness",&pyBodyContainer::getRoundness,(python::arg("excludeList")=python::list()),"Returns roundness coefficient RC = R2/R1. R1 is the theoretical radius of a sphere, with same volume as clump. R2 is the minimum radius of a sphere, that imbeds clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
-		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step.")
+		.def("erase", &pyBodyContainer::erase,(python::arg("eraseClumpMembers")=0),"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step. If a clump is erased use *O.bodies.erase(clumpId,True)* to erase the clump AND its members.")
 		.def("replace",&pyBodyContainer::replace);
 	python::class_<pyBodyIterator>("BodyIterator",python::init<pyBodyIterator&>())
 		.def("__iter__",&pyBodyIterator::pyIter)

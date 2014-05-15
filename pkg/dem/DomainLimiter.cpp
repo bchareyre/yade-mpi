@@ -23,7 +23,7 @@ void DomainLimiter::action(){
 		}
 	}
 	FOREACH(Body::id_t id, out){
-		scene->bodies->erase(id);
+		scene->bodies->erase(id,false);
 	}
 }
 
