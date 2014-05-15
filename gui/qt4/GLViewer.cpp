@@ -346,29 +346,26 @@ void GLViewer::centerScene(){
 	Scene* rb=Omega::instance().getScene().get();
 	if (!rb) return;
 	if(rb->isPeriodic){ centerPeriodic(); return; }
-
 	LOG_INFO("Select with shift, press 'm' to move.");
 	Vector3r min,max;	
-	if(rb->bound){
-		min=rb->bound->min; max=rb->bound->max;
-		bool hasNan=(isnan(min[0])||isnan(min[1])||isnan(min[2])||isnan(max[0])||isnan(max[1])||isnan(max[2]));
-		Real minDim=std::min(max[0]-min[0],std::min(max[1]-min[1],max[2]-min[2]));
-		if(minDim<=0 || hasNan){
-			// Aabb is not yet calculated...
-			LOG_DEBUG("scene's bound not yet calculated or has zero or nan dimension(s), attempt get that from bodies' positions.");
-			Real inf=std::numeric_limits<Real>::infinity();
-			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
-			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-				if(!b) continue;
-				max=max.cwiseMax(b->state->pos);
-				min=min.cwiseMin(b->state->pos);
-			}
-			if(isinf(min[0])||isinf(min[1])||isinf(min[2])||isinf(max[0])||isinf(max[1])||isinf(max[2])){ LOG_DEBUG("No min/max computed from bodies either, setting cube (-1,-1,-1)×(1,1,1)"); min=-Vector3r::Ones(); max=Vector3r::Ones(); }
-		} else {LOG_DEBUG("Using scene's Aabb");}
-	} else {
-		LOG_DEBUG("No scene's Aabb; setting scene in cube (-1,-1,-1)x(1,1,1)");
-		min=Vector3r(-1,-1,-1); max=Vector3r(1,1,1);
-	}
+	if(not(rb->bound)){ rb->updateBound();}
+	
+	min=rb->bound->min; max=rb->bound->max;
+	bool hasNan=(isnan(min[0])||isnan(min[1])||isnan(min[2])||isnan(max[0])||isnan(max[1])||isnan(max[2]));
+	Real minDim=std::min(max[0]-min[0],std::min(max[1]-min[1],max[2]-min[2]));
+	if(minDim<=0 || hasNan){
+		// Aabb is not yet calculated...
+		LOG_DEBUG("scene's bound not yet calculated or has zero or nan dimension(s), attempt get that from bodies' positions.");
+		Real inf=std::numeric_limits<Real>::infinity();
+		min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
+		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+			if(!b) continue;
+			max=max.cwiseMax(b->state->pos);
+			min=min.cwiseMin(b->state->pos);
+		}
+		if(isinf(min[0])||isinf(min[1])||isinf(min[2])||isinf(max[0])||isinf(max[1])||isinf(max[2])){ LOG_DEBUG("No min/max computed from bodies either, setting cube (-1,-1,-1)×(1,1,1)"); min=-Vector3r::Ones(); max=Vector3r::Ones(); }
+	} else {LOG_DEBUG("Using scene's Aabb");}
+
 	LOG_DEBUG("Got scene box min="<<min<<" and max="<<max);
 	Vector3r center = (max+min)*0.5;
 	Vector3r halfSize = (max-min)*0.5;
