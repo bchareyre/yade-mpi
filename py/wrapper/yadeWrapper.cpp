@@ -158,6 +158,16 @@ class pyBodyContainer{
 		// clump them together (the clump fcn) and return
 		return python::make_tuple(clump(ids, discretization),ids);
 	}
+	void updateClumpProperties(python::list excludeList,unsigned int discretization){
+		//convert excludeList to a c++ list
+		vector<Body::id_t> excludeListC;
+		for (int ii = 0; ii < python::len(excludeList); ii++) excludeListC.push_back(python::extract<Body::id_t>(excludeList[ii])());
+		FOREACH(const shared_ptr<Body>& b, *proxee){
+			if ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) {
+				if (b->isClump()) Clump::updateProperties(b, discretization);
+			}
+		}
+	}
 	void addToClump(vector<Body::id_t> bids, Body::id_t cid, unsigned int discretization){
 		Scene* scene(Omega::instance().getScene().get());	// get scene
 		shared_ptr<Body> clp = Body::byId(cid,scene);		// get clump pointer
@@ -901,6 +911,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
 		.def("appendClumped",&pyBodyContainer::appendClump,(python::arg("discretization")=0),"Append given list of bodies as a clump (rigid aggregate); returns a tuple of ``(clumpId,[memberId1,memberId2,...])``. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).")
 		.def("clump",&pyBodyContainer::clump,(python::arg("discretization")=0),"Clump given bodies together (creating a rigid aggregate); returns ``clumpId``. Clump masses and inertia are adapted automatically when discretization>0. If clump members are overlapping this is done by integration/summation over mass points using a regular grid of cells (number of grid cells in one direction is defined as $R_{min}/discretization$, where $R_{min}$ is minimum clump member radius). For non-overlapping members inertia of the clump is the sum of inertias from members. If discretization<=0 sum of inertias from members is used (faster, but inaccurate).")
+		.def("updateClumpProperties",&pyBodyContainer::updateClumpProperties,(python::arg("excludeList")=python::list(),python::arg("discretization")=5),"Update clump properties mass, volume and inertia (for details of 'discretization' value see :yref:`clump()<BodyContainer.clump>`). Clumps can be excluded from the calculation by giving a list of ids: *O.bodies.updateProperties([ids])*.")
 		.def("addToClump",&pyBodyContainer::addToClump,(python::arg("discretization")=0),"Add body b (or a list of bodies) to an existing clump c. c must be clump and b may not be a clump member of c. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).\n\nSee :ysrc:`examples/clumps/addToClump-example.py` for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
 		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,(python::arg("discretization")=0),"Release body b from clump c. b must be a clump member of c. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).\n\nSee :ysrc:`examples/clumps/releaseFromClump-example.py` for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
 		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,(python::arg("discretization")=0),"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
