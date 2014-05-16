@@ -55,8 +55,12 @@ void Clump::del(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 
 void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vector3r& F, Vector3r& T){
 	FOREACH(const MemberMap::value_type& mm, members){
-		const Body::id_t& memberId=mm.first; const shared_ptr<Body>& member=Body::byId(memberId,scene); assert(member->isClumpMember()); State* memberState=member->state.get();
-		const Vector3r& f=scene->forces.getForce(memberId); const Vector3r& t=scene->forces.getTorque(memberId);
+		const Body::id_t& memberId=mm.first; 
+		const shared_ptr<Body>& member=Body::byId(memberId,scene); 
+		assert(member->isClumpMember()); 
+		State* memberState=member->state.get();
+		const Vector3r& f=scene->forces.getForce(memberId); 
+		const Vector3r& t=scene->forces.getTorque(memberId);
 		F+=f;
 		T+=t+(memberState->pos-clumpState->pos).cross(f);
 	}
