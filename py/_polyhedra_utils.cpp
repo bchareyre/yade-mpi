@@ -103,8 +103,7 @@ Real PWaveTimeStep(){
 			Real density=b->state->mass/p->GetVolume();
 			//get equivalent radius and use same equation as for sphere
 			Real equi_radius=pow(p->GetVolume()/((4./3.)*Mathr::PI),1./3.);				
-			//dt=min(dt,equi_radius/sqrt(ebp->Kn*equi_radius/density));
-			dt=min(dt,equi_radius/sqrt(ebp->Kn/equi_radius/density));
+			dt=min(dt,equi_radius/sqrt(ebp->Kn*equi_radius/density));
 		}
 	}
 	if (dt==std::numeric_limits<Real>::infinity()) {
@@ -326,10 +325,182 @@ vector<Vector3r> fillBox_cpp(Vector3r minCoord, Vector3r maxCoord, Vector3r size
 	return v;
 } 
 
+//**************************************************************************
+/* Generate truncated icosahedron*/
+vector<Vector3r> TruncIcosaHedPoints(Vector3r radii){
+    vector<Vector3r> v;
+
+    double p = (1.+sqrt(5.))/2.;
+    Vector3r f,c,b;
+    f = radii/sqrt(9.*p + 1.);
+    vector<Vector3r> A,B;
+    A.push_back(Vector3r(0.,1.,3.*p)); A.push_back(Vector3r(2.,1.+2.*p,p)); A.push_back(Vector3r(1.,2.+p,2.*p));
+    for(int i=0;i<(int) A.size() ;i++){
+        B.clear();
+	c = Vector3r(A[i][0]*f[0],A[i][1]*f[1],A[i][2]*f[2]);
+	B.push_back(c); B.push_back(Vector3r(c[1],c[2],c[0])); B.push_back(Vector3r(c[2],c[0],c[1]));
+        for(int j=0;j<(int) B.size() ;j++){
+		b = B[j];
+		v.push_back(b);
+		if (b[0] != 0.){ 
+			v.push_back(Vector3r(-b[0], b[1], b[2]));	
+			if (b[1] != 0.){ 
+				v.push_back(Vector3r(-b[0],-b[1], b[2]));
+				if (b[2] != 0.) v.push_back(Vector3r(-b[0],-b[1],-b[2]));
+			}
+			if (b[2] != 0.) v.push_back(Vector3r(-b[0], b[1],-b[2]));
+		}
+		if (b[1] != 0.){ 
+			v.push_back(Vector3r( b[0],-b[1], b[2]));
+			if (b[2] != 0.)	v.push_back(Vector3r( b[0],-b[1],-b[2]));
+		}
+		if (b[2] != 0.)	v.push_back(Vector3r( b[0], b[1],-b[2]));
+	}
+    }
+    return v;
+}
+
+//**************************************************************************
+/* Generate SnubCube*/
+vector<Vector3r> SnubCubePoints(Vector3r radii){
+    vector<Vector3r> v;
+
+    double c1 = 0.337754;
+    double c2 = 1.14261;
+    double c3 = 0.621226;
+    Vector3r f,b;
+    f = radii/1.3437133737446;
+    vector<Vector3r> A;
+    A.push_back(Vector3r(c2,c1,c3)); A.push_back(Vector3r(c1,c3,c2)); A.push_back(Vector3r(c3,c2,c1)); 
+    A.push_back(Vector3r(-c1,-c2,-c3)); A.push_back(Vector3r(-c2,-c3,-c1)); A.push_back(Vector3r(-c3,-c1,-c2));
+    for(int i=0;i<(int) A.size();i++){
+	b = Vector3r(A[i][0]*f[0],A[i][1]*f[1],A[i][2]*f[2]);
+	v.push_back(b);
+	v.push_back(Vector3r(-b[0],-b[1], b[2]));
+	v.push_back(Vector3r(-b[0], b[1],-b[2]));
+	v.push_back(Vector3r( b[0],-b[1],-b[2]));
+    }
+    return v;
+}
+
+//**************************************************************************
+/* Generate ball*/
+vector<Vector3r> BallPoints(Vector3r radii, int NumFacets,int seed){
+        vector<Vector3r> v;
+	if (NumFacets == 60) v = TruncIcosaHedPoints(radii);
+	if (NumFacets == 24) v = SnubCubePoints(radii);
+	else{
+		double inc = Mathr::PI * (3. - pow(5.,0.5));
+    		double off = 2. / double(NumFacets);
+		double y,r,phi;
+        	for(int k=0; k<NumFacets; k++){
+	            y = double(k) * off - 1. + (off / 2.);
+        	    r = pow(1. - y*y,0.5);
+        	    phi = double(k) * inc;
+        	    v.push_back(Vector3r(cos(phi)*r*radii[0], y*radii[1], sin(phi)*r*radii[2]));
+		}
+	}
+
+	// randomly rotate
+        srand(seed);
+	Quaternionr Rot(double(rand())/RAND_MAX,double(rand())/RAND_MAX,double(rand())/RAND_MAX,double(rand())/RAND_MAX);
+	Rot.normalize();
+	for(int i=0; i< (int) v.size();i++) {
+		v[i] = Rot*(Vector3r(v[i][0],v[i][1],v[i][2]));
+	}
+        return v;
+}
+
+//**********************************************************************************
+//generate "packing" of non-overlapping balls
+vector<Vector3r> fillBoxByBalls_cpp(Vector3r minCoord, Vector3r maxCoord, Vector3r sizemin, Vector3r sizemax, Vector3r ratio, int seed, shared_ptr<Material> mat, int NumPoints){	
+	vector<Vector3r> v;
+	Polyhedra trialP;
+	Polyhedron trial, trial_moved;
+	srand(seed);
+	int it = 0;
+	vector<Polyhedron> polyhedrons;
+	vector<vector<Vector3r> > vv;
+	Vector3r position;
+	bool intersection;
+	int count = 0;
+	Vector3r radii;
+
+	
+	bool fixed_ratio = 0;
+	if (ratio[0] > 0 && ratio[1] > 0 && ratio[2]>0){
+		fixed_ratio = 1;
+		sizemax[0] = min(min(sizemax[0]/ratio[0],  sizemax[1]/ratio[1]),  sizemax[2]/ratio[2]);
+		sizemin[0] = max(max(sizemin[0]/ratio[0],  sizemin[1]/ratio[1]),  sizemin[2]/ratio[2]);
+	}
+
+	fixed_ratio = 1; //force spherical
+
+	//it - number of trials to make packing possibly more/less dense
+	Vector3r random_size;
+	while (it<1000){
+		it = it+1;
+		if (it == 1){	
+			if (fixed_ratio) {
+				double rrr = (rand()*(sizemax[0]-sizemin[0])/RAND_MAX + sizemin[0])/2.;
+				radii = Vector3r(rrr,rrr,rrr);
+			}else  {
+				radii = Vector3r(rand()*(sizemax[0]-sizemin[0])/2.,rand()*(sizemax[1]-sizemin[1])/2.,rand()*(sizemax[2]-sizemin[2])/2.)/RAND_MAX + sizemin/2.;
+			}				
+			trialP.v = BallPoints(radii,NumPoints,rand());
+			trialP.Initialize();
+			trial = trialP.GetPolyhedron();	
+			Matrix3r rot_mat = (trialP.GetOri()).toRotationMatrix();
+			Transformation t_rot(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),1.);	
+			std::transform( trial.points_begin(), trial.points_end(), trial.points_begin(), t_rot);			
+		}		
+		position = Vector3r(rand()*(maxCoord[0]-minCoord[0]),rand()*(maxCoord[1]-minCoord[1]),rand()*(maxCoord[2]-minCoord[2]))/RAND_MAX + minCoord;
+
+		//move CGAL structure Polyhedron
+		Transformation transl(CGAL::TRANSLATION, ToCGALVector(position));
+		trial_moved = trial;		
+		std::transform( trial_moved.points_begin(), trial_moved.points_end(), trial_moved.points_begin(), transl);
+		//calculate plane equations
+		std::transform( trial_moved.facets_begin(), trial_moved.facets_end(), trial_moved.planes_begin(),Plane_equation());	
+
+		intersection = false;	
+		//call test with boundary
+		for(Polyhedron::Vertex_iterator vi = trial_moved.vertices_begin(); (vi !=  trial_moved.vertices_end()) && (!intersection); vi++){
+			intersection = (vi->point().x()<minCoord[0]) || (vi->point().x()>maxCoord[0]) || (vi->point().y()<minCoord[1]) || (vi->point().y()>maxCoord[1]) || (vi->point().z()<minCoord[2]) || (vi->point().z()>maxCoord[2]);
+		}
+		//call test with other polyhedrons	
+		for(vector<Polyhedron>::iterator a = polyhedrons.begin(); (a != polyhedrons.end()) && (!intersection); a++){	
+			intersection = do_intersect(*a,trial_moved);
+		        if (intersection) break;
+		}
+		if (!intersection){
+			polyhedrons.push_back(trial_moved);
+			v.clear();
+			for(Polyhedron::Vertex_iterator vi = trial_moved.vertices_begin(); vi !=  trial_moved.vertices_end(); vi++){
+				v.push_back(FromCGALPoint(vi->point()));
+			}
+			vv.push_back(v);
+			it = 0;
+			count ++;
+
+		}
+	}
+	cout << "generated " << count << " polyhedrons"<< endl;
+
+	//can't be used - no information about material
+	Scene* scene=Omega::instance().getScene().get();
+	for(vector<vector<Vector3r> >::iterator p=vv.begin(); p!=vv.end(); ++p){
+		shared_ptr<Body> BP = NewPolyhedra(*p, mat);
+		BP->shape->color = Vector3r(double(rand())/RAND_MAX,double(rand())/RAND_MAX,double(rand())/RAND_MAX);
+		scene->bodies->insert(BP);
+	}
+	return v;
+} 
+
 //**********************************************************************************
 //split polyhedra
-void Split(const shared_ptr<Body> body, Vector3r direction){
-	SplitPolyhedra(body, direction);
+void Split(const shared_ptr<Body> body, Vector3r direction, Vector3r point){
+	SplitPolyhedra(body, direction, point);
 }
 
 //**********************************************************************************
@@ -361,14 +532,15 @@ BOOST_PYTHON_MODULE(_polyhedra_utils){
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
 	py::def("do_Polyhedras_Intersect",do_Polyhedras_Intersect,"check polyhedras intersection");
 	py::def("fillBox_cpp",fillBox_cpp,"Generate non-overlaping polyhedrons in box");
+	py::def("fillBoxByBalls_cpp",fillBoxByBalls_cpp,"Generate non-overlaping 'spherical' polyhedrons in box");
 	py::def("MinCoord",MinCoord,"returns min coordinates");
 	py::def("MaxCoord",MaxCoord,"returns max coordinates");
 	py::def("SieveSize",SieveSize,"returns approximate sieve size of polyhedron");
 	py::def("SieveCurve",SieveCurve,"save sieve curve coordinates into file");
 	py::def("SizeOfPolyhedra",SizeOfPolyhedra,"returns max, middle an min size in perpendicular directions");
 	py::def("SizeRatio",SizeRatio,"save sizes of polyhedra into file");
-	py::def("convexHull",convexHull,"");
-	py::def("Split",Split,"split polyhedron perpendicularly to given direction direction");
+	py::def("convexHull",convexHull,"....");
+	py::def("Split",Split,"split polyhedron perpendicularly to given direction through given point");
 }
 
 #endif // YADE_CGAL

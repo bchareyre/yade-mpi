@@ -16,7 +16,7 @@
 YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (PolyhedraVolumetricLaw)
 	/* some code in cpp (this file): */ 
 	#ifdef YADE_OPENGL
-		(Gl1_Polyhedra)
+		(Gl1_Polyhedra) (Gl1_PolyhedraGeom) (Gl1_PolyhedraPhys)
 	#endif	
 	);
 
@@ -197,9 +197,9 @@ void Polyhedra::GenerateRandomGeometry(){
 	Triangulation dt(nuclei.begin(), nuclei.end());
 	Triangulation::Vertex_handle zero_point = dt.insert(CGALpoint(5.,5.,5.));
 	v.clear();
-        std::vector<Triangulation::Cell_handle>  ch_cells;
+        std::vector<typename Triangulation::Cell_handle>  ch_cells;
     	dt.incident_cells(zero_point,std::back_inserter(ch_cells));
-	for(std::vector<Triangulation::Cell_handle>::iterator ci = ch_cells.begin(); ci !=ch_cells.end(); ++ci){
+	for(std::vector<typename Triangulation::Cell_handle>::iterator ci = ch_cells.begin(); ci !=ch_cells.end(); ++ci){
 		v.push_back(FromCGALPoint(dt.dual(*ci))-Vector3r(5.,5.,5.));				
 	}
 
@@ -256,14 +256,15 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 
 #ifdef YADE_OPENGL
 	#include<yade/lib/opengl/OpenGLWrapper.hpp>
-	void Gl1_Polyhedra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
+	bool Gl1_Polyhedra::wire;
+	void Gl1_Polyhedra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3r(cm->color[0],cm->color[1],cm->color[2]));
 		glColor3v(cm->color);
 		Polyhedra* t=static_cast<Polyhedra*>(cm.get());
 		vector<int> faceTri = t->GetSurfaceTriangulation();
 
-		if (0) { 
+		if (wire || wire2) { 
 			glDisable(GL_LIGHTING);
 			glBegin(GL_LINES);
 				#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
@@ -282,6 +283,58 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 				#undef __ONEFACE
 			glEnd();
 		}
+	}
+
+
+	void Gl1_PolyhedraGeom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool){ draw(ig);}
+
+	void Gl1_PolyhedraGeom::draw(const shared_ptr<IGeom>& ig){		
+	};
+
+	GLUquadric* Gl1_PolyhedraPhys::gluQuadric=NULL;
+	Real Gl1_PolyhedraPhys::maxFn;
+	Real Gl1_PolyhedraPhys::refRadius;
+	Real Gl1_PolyhedraPhys::maxRadius;
+	int Gl1_PolyhedraPhys::signFilter;
+	int Gl1_PolyhedraPhys::slices;
+	int Gl1_PolyhedraPhys::stacks;
+
+	void Gl1_PolyhedraPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+		if(!gluQuadric){ gluQuadric=gluNewQuadric(); if(!gluQuadric) throw runtime_error("Gl1_PolyhedraPhys::go unable to allocate new GLUquadric object (out of memory?)."); }
+		PolyhedraPhys* np=static_cast<PolyhedraPhys*>(ip.get());
+		shared_ptr<IGeom> ig(i->geom); if(!ig) return; // changed meanwhile?
+		PolyhedraGeom* geom=YADE_CAST<PolyhedraGeom*>(ig.get());
+		Real fnNorm=np->normalForce.dot(geom->normal);
+		if((signFilter>0 && fnNorm<0) || (signFilter<0 && fnNorm>0)) return;
+		int fnSign=fnNorm>0?1:-1;
+		fnNorm=abs(fnNorm);
+		Real radiusScale=1.;
+		maxFn=max(fnNorm,maxFn);
+		Real realMaxRadius;
+		if(maxRadius<0){
+			refRadius=min(0.03,refRadius);
+			realMaxRadius=refRadius;
+		}
+		else realMaxRadius=maxRadius;
+		Real radius=radiusScale*realMaxRadius*(fnNorm/maxFn); 
+		if (radius<=0.) radius = 1E-8;
+		Vector3r color=Shop::scalarOnColorScale(fnNorm*fnSign,-maxFn,maxFn);
+		
+		Vector3r p1=b1->state->pos, p2=b2->state->pos;
+		Vector3r relPos;
+		relPos=p2-p1;
+		Real dist=relPos.norm();
+				
+		glDisable(GL_CULL_FACE); 
+		glPushMatrix();
+			glTranslatef(p1[0],p1[1],p1[2]);
+			Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r(0,0,1),relPos/dist /* normalized */));
+			// using Transform with OpenGL: http://eigen.tuxfamily.org/dox/TutorialGeometry.html
+			//glMultMatrixd(Eigen::Affine3d(q).data());
+			glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(q).data());
+			glColor3v(color);
+			gluCylinder(gluQuadric,radius,radius,dist,slices,stacks);
+		glPopMatrix();
 	}
 #endif
 
@@ -362,9 +415,9 @@ Real PolyhedraVolumetricLaw::elasticEnergy()
 // Apply forces on polyhedrons in collision based on geometric configuration
 void PolyhedraVolumetricLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
 
-		if (!I->geom) {I->phys=shared_ptr<IPhys>(); return;} 
+		if (!I->geom) {return;} 
 		const shared_ptr<PolyhedraGeom>& contactGeom(dynamic_pointer_cast<PolyhedraGeom>(I->geom));
-		if(!contactGeom) {I->phys=shared_ptr<IPhys>(); return;} 
+		if(!contactGeom) {return;} 
 		const Body::id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 
@@ -373,11 +426,12 @@ void PolyhedraVolumetricLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, In
 		//erase the interaction when aAbB shows separation, otherwise keep it to be able to store previous separating plane for fast detection of separation 
 		if (A->bound->min[0] >= B->bound->max[0] || B->bound->min[0] >= A->bound->max[0] || A->bound->min[1] >= B->bound->max[1] || B->bound->min[1] >= A->bound->max[1] || A->bound->min[2] >= B->bound->max[2] || B->bound->min[2] >= A->bound->max[2])  {
 			scene->interactions->requestErase(I);
+			phys->normalForce = Vector3r(0.,0.,0.); phys->shearForce = Vector3r(0.,0.,0.);
 			return;
 		}
 			
 		//zero penetration depth means no interaction force
-		if(!(contactGeom->penetrationVolume > 0) ) {I->phys=shared_ptr<IPhys>(); return;} 
+		if(!(contactGeom->equivalentPenetrationDepth > 1E-18) || !(contactGeom->penetrationVolume > 0)) {phys->normalForce = Vector3r(0.,0.,0.); phys->shearForce = Vector3r(0.,0.,0.); return;} 
 		Vector3r normalForce=contactGeom->normal*contactGeom->penetrationVolume*phys->kn;
 
 		//shear force: in case the polyhdras are separated and come to contact again, one should not use the previous shear force
@@ -418,7 +472,22 @@ void PolyhedraVolumetricLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, In
 		scene->forces.addForce (idB, -F);
 		scene->forces.addTorque(idA, -(A->state->pos-contactGeom->contactPoint).cross(F));
 		scene->forces.addTorque(idB, (B->state->pos-contactGeom->contactPoint).cross(F));	
-	
+
+		/*
+		FILE * fin = fopen("Forces.dat","a");
+		fprintf(fin,"************** IDS %d %d **************\n",idA, idB);
+		Vector3r T = (B->state->pos-contactGeom->contactPoint).cross(F);
+		fprintf(fin,"volume\t%e\n",contactGeom->penetrationVolume);	
+		fprintf(fin,"normal_force\t%e\t%e\t%e\n",normalForce[0],normalForce[1],normalForce[2]);	
+		fprintf(fin,"shear_force\t%e\t%e\t%e\n",shearForce[0],shearForce[1],shearForce[2]);	
+		fprintf(fin,"total_force\t%e\t%e\t%e\n",F[0],F[1],F[2]);		
+		fprintf(fin,"torsion\t%e\t%e\t%e\n",T[0],T[1],T[2]);
+		fprintf(fin,"A\t%e\t%e\t%e\n",A->state->pos[0],A->state->pos[1],A->state->pos[2]);
+		fprintf(fin,"B\t%e\t%e\t%e\n",B->state->pos[0],B->state->pos[1],B->state->pos[2]);
+		fprintf(fin,"centroid\t%e\t%e\t%e\n",contactGeom->contactPoint[0],contactGeom->contactPoint[1],contactGeom->contactPoint[2]);
+		fclose(fin);	
+		*/		
+
 		//needed to be able to acces interaction forces in other parts of yade
 		phys->normalForce = normalForce;
 		phys->shearForce = shearForce;

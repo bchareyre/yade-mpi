@@ -79,7 +79,53 @@ def polyhedralBall(radius, N, material, center,mask=1):
 	ball = polyhedra(material,v=pts)
 	ball.state.pos = center
 	return ball
+    
+#**********************************************************************************
+def polyhedraTruncIcosaHed(radius, material, centre,mask=1):
+    pts = []
+ 
+    p = (1.+math.sqrt(5.))/2.
+    f = radius/math.sqrt(9.*p + 1.)
+    A = [[0.,1.,3.*p],[2.,1.+2.*p,p],[1.,2.+p,2.*p]]
+    for a in A:
+	a = [a[0]*f,a[1]*f,a[2]*f]
+	B = [a,[a[1],a[2],a[0]],[a[2],a[0],a[1]]]
+        for b in B:
+		pts.append(b)
+		if not b[0] == 0: 
+			pts.append([-b[0], b[1], b[2]])	
+			if not b[1] == 0:
+				pts.append([-b[0],-b[1], b[2]])	
+				if not b[2] == 0: pts.append([-b[0],-b[1],-b[2]])
+			if not b[2] == 0:
+				pts.append([-b[0], b[1],-b[2]])	
+		if not b[1] == 0: 
+			pts.append([ b[0],-b[1], b[2]])	
+			if not b[2] == 0:
+				pts.append([ b[0],-b[1],-b[2]])
+		if not b[2] == 0: pts.append([ b[0], b[1],-b[2]])
+    ball = polyhedra(material,v=pts)
+    ball.state.pos = centre
+    return ball
 
+#**********************************************************************************
+def polyhedraSnubCube(radius, material, centre, mask=1):
+    pts = []
+ 
+    f = radius/1.3437133737446
+    c1 = 0.337754
+    c2 = 1.14261
+    c3 = 0.621226
+    A = [[c2,c1,c3],[c1,c3,c2],[c3,c2,c1],[-c1,-c2,-c3],[-c2,-c3,-c1],[-c3,-c1,-c2]]
+    for a in A:
+	a = [a[0]*f,a[1]*f,a[2]*f]
+	pts.append([-a[0],-a[1], a[2]])	
+	pts.append([ a[0],-a[1],-a[2]])	
+	pts.append([-a[0], a[1],-a[2]])	
+	pts.append([ a[0], a[1], a[2]])	
+    ball = polyhedra(material,v=pts)
+    ball.state.pos = centre
+    return ball    
 #**********************************************************************************
 #fill box [mincoord, maxcoord] by non-overlaping polyhedrons with random geometry and sizes within the range (uniformly distributed)
 def fillBox(mincoord, maxcoord,material,sizemin=[1,1,1],sizemax=[1,1,1],ratio=[0,0,0],seed=None,mask=1):
@@ -93,6 +139,17 @@ def fillBox(mincoord, maxcoord,material,sizemin=[1,1,1],sizemax=[1,1,1],ratio=[0
 	"""
 	random.seed(seed);
 	v = fillBox_cpp(mincoord, maxcoord, sizemin,sizemax,  ratio, random.randint(0,1E6), material)
+	#lastnan = -1
+	#for i in range(0,len(v)):
+	#	if(math.isnan(v[i][0])):
+	#		O.bodies.append(polyhedra(material,seed=random.randint(0,1E6),v=v[lastnan+1:i],mask=1,fixed=False))
+	#		lastnan = i
+
+#**********************************************************************************
+#fill box [mincoord, maxcoord] by non-overlaping polyhedrons with random geometry and sizes within the range (uniformly distributed)
+def fillBoxByBalls(mincoord, maxcoord,material,sizemin=[1,1,1],sizemax=[1,1,1],ratio=[0,0,0],seed=None,mask=1,numpoints=60):
+	random.seed(seed);
+	v = fillBoxByBalls_cpp(mincoord, maxcoord, sizemin,sizemax,  ratio, random.randint(0,1E6), material,numpoints)
 	#lastnan = -1
 	#for i in range(0,len(v)):
 	#	if(math.isnan(v[i][0])):

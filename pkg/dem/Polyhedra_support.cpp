@@ -10,13 +10,15 @@
 
 //EMPRIRICAL CONSTANTS - ADJUST IF SEGMENTATION FAULT OCCUR, IT IS A PROBLEM OF CGAL. THESE ARE USED TO CHECK CGAL IMPUTS
 //DISTANCE_LIMIT controls numerical issues in calculating intersection. It should be small enough to neglect only extremely small overlaps, but large enough to prevent errors during computation of convex hull
-#define DISTANCE_LIMIT 1E-11	//-11
+#define DISTANCE_LIMIT 2E-11	//-11
 //MERGE_PLANES_LIMIT - if two facets of two intersecting polyhedron differ less, then they are treated ose one only
 #define MERGE_PLANES_LIMIT 1E-18 //18
 //SIMPLIFY_LIMIT - if two facets of one polyhedron differ less, then they are joint into one facet
-#define SIMPLIFY_LIMIT 1E-20 //19
+#define SIMPLIFY_LIMIT 1E-19 //19
 //FIND_NORMAL_LIMIT - to determine which facet of intersection belongs to which polyhedron
 #define FIND_NORMAL_LIMIT 1E-40
+//SPLITTER_GAP - creates gap between splitted polyhedrons
+#define SPLITTER_GAP 1E-8
 
 
 //**********************************************************************************
@@ -288,6 +290,30 @@ Polyhedron Simplify(Polyhedron P, double limit){
 
 //**********************************************************************************
 //list of facets + edges
+void PrintPolyhedron2File(Polyhedron P,FILE* X){
+	Vector3r A,B,C;
+	fprintf(X,"*** faces ***\n");
+ 	for (Polyhedron::Facet_iterator fIter = P.facets_begin(); fIter!=P.facets_end(); ++fIter){
+		Polyhedron::Halfedge_around_facet_circulator hfc0;
+		hfc0 = fIter->facet_begin();
+		int n = fIter->facet_degree();	
+		A = FromCGALPoint(hfc0->vertex()->point());
+		C = FromCGALPoint(hfc0->next()->vertex()->point());
+		for (int i=2; i<n; i++){
+			++hfc0;
+			B = C;
+			C = FromCGALPoint(hfc0->next()->vertex()->point());
+			fprintf(X,"%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",A[0],A[1],A[2],B[0],B[1],B[2],C[0],C[1],C[2]);
+		}
+	}
+	fprintf(X,"*** edges ***\n");
+ 	for (Polyhedron::Edge_iterator hei = P.edges_begin(); hei!=P.edges_end(); ++hei){
+		fprintf(X,"%e\t%e\t%e\t%e\t%e\t%e\n",hei->vertex()->point()[0],hei->vertex()->point()[1],hei->vertex()->point()[2], hei->opposite()->vertex()->point()[0], hei->opposite()->vertex()->point()[1], hei->opposite()->vertex()->point()[2]);
+	}
+}
+
+//**********************************************************************************
+//list of facets + edges
 void PrintPolyhedron(Polyhedron P){
 	Vector3r A,B,C;
 	cout << "*** faces ***" << endl;
@@ -478,6 +504,7 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 	// test if do intersect, find some intersecting point
 	bool intersection_found = false;
 	double lim = pow(DISTANCE_LIMIT,2);
+	std::transform( A.facets_begin(), A.facets_end(), A.planes_begin(),Plane_equation());
 	// test centroid of previous intersection
 	if(Is_inside_Polyhedron(A,X,DISTANCE_LIMIT) && Oriented_squared_distance(B,X)<=-lim) {
 		intersection_found = true;
@@ -486,20 +513,24 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
  	} else {	
 		for(Polyhedron::Vertex_iterator vIter = A.vertices_begin(); vIter != A.vertices_end() && !intersection_found ; vIter++){
 			if(Oriented_squared_distance(B,vIter->point())<=-lim) {
-				intersection_found = true;			
-				CGAL::Object result = CGAL::intersection(Line(vIter->point(),centroid), B);			
-				if (const CGALpoint *ipoint = CGAL::object_cast<CGALpoint>(&result)) {
-					inside = vIter->point() + 0.5*CGALvector(vIter->point(),*ipoint);
+				if (Oriented_squared_distance(B,centroid)<lim/10.){
+					inside = vIter->point() + 0.5*CGALvector(vIter->point(),centroid);
 				}else{
-					cerr << "Error in line-plane intersection" << endl; 
+					CGAL::Object result = CGAL::intersection(Line(vIter->point(),centroid), B);			
+					if (const CGALpoint *ipoint = CGAL::object_cast<CGALpoint>(&result)) {
+						inside = vIter->point() + 0.5*CGALvector(vIter->point(),*ipoint);
+					}else{
+						cerr << "Error in line-plane intersection" << endl; 
+					}
 				}
+				if(Is_inside_Polyhedron(A,inside,DISTANCE_LIMIT) && Oriented_squared_distance(B,inside)<=-lim) intersection_found = true;
 			}
 		}
 	}
 	//no intersectiong point => no intersection polyhedron
 	if(!intersection_found) return Intersection;
 
-	
+
 	//set the intersection point to origin	
 	Transformation transl_back(CGAL::TRANSLATION, inside - CGALpoint(0.,0.,0.));
 	Transformation transl(CGAL::TRANSLATION, CGALpoint(0.,0.,0.)-inside);
@@ -520,7 +551,7 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 
  	//compute convex hull of it
 	Intersection = ConvexHull(dual_planes);
-	if (Intersection.empty()) {cout << "0" << endl; cout.flush(); return Intersection;}
+	if (Intersection.empty()) return Intersection;
 
 	//simplify
 	std::transform( Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(),Plane_equation());
@@ -542,7 +573,7 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 }
 
 //**********************************************************************************
-//returnes intersecting polyhedron of polyhedron & plane defined by diriction and point
+//returnes intersecting polyhedron of polyhedron & plane defined by direction and point
 Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Vector3r direction,  Vector3r plane_point){
 	Plane B(ToCGALPoint(plane_point), ToCGALVector(direction)); 
 	CGALpoint X = ToCGALPoint(plane_point) - 1E-8*ToCGALVector(direction);
@@ -633,7 +664,7 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 
  	//compute convex hull of it
 	Intersection = ConvexHull(dual_planes);
-	if (Intersection.empty()) {cout << "0" << endl; cout.flush(); return Intersection;};
+	if (Intersection.empty())  return Intersection;
 
 	//simplify
 	std::transform( Intersection.facets_begin(), Intersection.facets_end(), Intersection.planes_begin(),Plane_equation());
@@ -759,10 +790,11 @@ shared_ptr<Body> NewPolyhedra(vector<Vector3r> v, shared_ptr<Material> mat){
 	return body;
 }
 
-
 //**********************************************************************************
 //split polyhedra
-void SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction){
+shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point){
+
+	direction.normalize();
 
 	const Se3r& se3=body->state->se3; 
 	Polyhedra* A = static_cast<Polyhedra*>(body->shape.get());
@@ -779,10 +811,14 @@ void SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction){
 	Polyhedron PA = A->GetPolyhedron();
 	std::transform( PA.points_begin(), PA.points_end(), PA.points_begin(), t_rot_trans);
  
-        //calculate splitted polyhedrons
-	Polyhedron S1 = Polyhedron_Plane_intersection(PA, direction,  trans_vec);
-	Polyhedron S2 = Polyhedron_Plane_intersection(PA, (-1)*direction,  trans_vec);
-	
+	//calculate first splitted polyhedrons
+	Plane B(ToCGALPoint(point-direction*SPLITTER_GAP), ToCGALVector(direction)); 
+	Polyhedron S1 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) - 1E-6*ToCGALVector(direction));
+	B = Plane(ToCGALPoint(point+direction*SPLITTER_GAP), ToCGALVector((-1.)*direction)); 
+	Polyhedron S2 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) + 1E-6*ToCGALVector(direction));
+	Scene* scene=Omega::instance().getScene().get();
+	//scene->bodies->erase(body->id);
+
 	
 	//replace original polyhedron
 	A->Clear();		
@@ -793,6 +829,8 @@ void SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction){
 	X->mass=body->material->density*A->GetVolume();
 	X->refPos[0] = X->refPos[0]+1.;
 	X->inertia =A->GetInertia()*body->material->density;
+	X->vel = OrigVel + OrigAngVel.cross(X->pos-OrigPos);
+	X->angVel = OrigAngVel;	
 	
 	//second polyhedron
 	vector<Vector3r> v2;
@@ -800,18 +838,12 @@ void SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction){
 	shared_ptr<Body> BP = NewPolyhedra(v2, body->material);
 	//BP->shape->color = body->shape->color;
 	BP->shape->color = Vector3r(double(rand())/RAND_MAX,double(rand())/RAND_MAX,double(rand())/RAND_MAX);
-
-	//append to the rest
-	Scene* scene=Omega::instance().getScene().get();
-	//scene->bodies->erase(body->id);
 	scene->bodies->insert(BP);
-
 	//set proper state variables
-	X->vel = OrigVel + OrigAngVel.cross(X->pos-OrigPos);
 	BP->state->vel = OrigVel + OrigAngVel.cross(BP->state->pos-OrigPos);
-	X->angVel = OrigAngVel;	
 	BP->state->angVel = OrigAngVel;
 
+	return BP;
 }
 
 #endif // YADE_CGAL

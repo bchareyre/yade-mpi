@@ -22,11 +22,9 @@ void getStressForEachBody(vector<Matrix3r>& bStresses){
 		PolyhedraPhys* phys=YADE_CAST<PolyhedraPhys*>(I->phys.get());
 		if(!geom || !phys) continue;
 		Vector3r f=phys->normalForce+phys->shearForce;
-		//Sum f_i*l_j for each contact of each particle
+		//Sum f_i*l_j for each contact of each particle	
 		bStresses[I->getId1()] -=f*((geom->contactPoint-Body::byId(I->getId1(),scene)->state->pos).transpose());
 		bStresses[I->getId2()] +=f*((geom->contactPoint-Body::byId(I->getId2(),scene)->state->pos).transpose());
-
-		
 	}
 }
 
@@ -52,6 +50,20 @@ void PolyhedraSplitter::Symmetrize(Matrix3r & bStress){
 	bStress(2,1) = bStress(1,2);
 }
 
+//**********************************************************************************
+//split polyhedra
+void SplitPolyhedraDouble(const shared_ptr<Body>& body, Vector3r direction1, Vector3r direction2){
+
+	const Se3r& se3=body->state->se3; 
+	Vector3r point = se3.position;
+
+	shared_ptr<Body> B2 = SplitPolyhedra(body, direction1, point);
+	shared_ptr<Body> B3 = SplitPolyhedra(B2, direction2, point);
+	shared_ptr<Body> B4 = SplitPolyhedra(body, direction2, point);
+
+}
+
+
 //*********************************************************************************
 /* Split if stress exceed strength */
 
@@ -61,7 +73,7 @@ void PolyhedraSplitter::action()
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 
 	vector<shared_ptr<Body> > bodies;
-	vector<Vector3r > directions;
+	vector<Vector3r > directions1, directions2;
 	vector<double > sigmas;
 
 
@@ -69,16 +81,14 @@ void PolyhedraSplitter::action()
 	vector<Matrix3r> bStresses;
 	getStressForEachBody(bStresses);
 
-	int i = -1;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		i++;
 		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<Polyhedra> p=dynamic_pointer_cast<Polyhedra>(b->shape);
 		shared_ptr<PolyhedraMat> m=dynamic_pointer_cast<PolyhedraMat>(b->material);
 	
 		if(p && m->IsSplitable){
 			//not real strees, to get real one, it has to be divided by body volume
-			Matrix3r stress = bStresses[i];
+			Matrix3r stress = bStresses[b->id];
 
 			//get eigenstresses
 			Symmetrize(stress);
@@ -93,16 +103,18 @@ void PolyhedraSplitter::action()
 			
 			//division of stress by volume
 			double comp_stress = I_valu(min_i,min_i)/p->GetVolume();
-			double tens_stress = I_valu(max_i,max_i)/p->GetVolume();
+			double tens_stress = I_valu(max_i,max_i)/p->GetVolume();			
 			Vector3r dirC = I_vect.col(max_i);
 			Vector3r dirT = I_vect.col(min_i);
-			Vector3r dir  = dirC.normalized() + dirT.normalized();;	
-			double sigma_t = -comp_stress/2.+ tens_stress;
-			if (sigma_t > getStrength(p->GetVolume(),m->GetStrength())) {bodies.push_back(b); directions.push_back(dir); sigmas.push_back(sigma_t);};
+			Vector3r dir1  = dirC.normalized() + dirT.normalized();	
+			Vector3r dir2  = dirC.normalized() - dirT.normalized();	
+			//double sigma_t = -comp_stress/2.+ tens_stress;
+			double sigma_t = pow((pow(I_valu(0,0)-I_valu(1,1),2)+pow(I_valu(0,0)-I_valu(2,2),2)+pow(I_valu(1,1)-I_valu(2,2),2))/2.,0.5)/p->GetVolume();
+			if (sigma_t > getStrength(p->GetVolume(),m->GetStrength())) {bodies.push_back(b); directions1.push_back(dir1.normalized()); directions2.push_back(dir2.normalized()); sigmas.push_back(sigma_t);};
 		}		
 	}
 	for(int i=0; i<int(bodies.size()); i++){
-		SplitPolyhedra(bodies[i], directions[i]);
+		SplitPolyhedraDouble(bodies[i], directions1[i], directions2[i]);
 	}
 }
 
