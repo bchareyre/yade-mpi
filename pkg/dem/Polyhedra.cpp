@@ -197,9 +197,9 @@ void Polyhedra::GenerateRandomGeometry(){
 	Triangulation dt(nuclei.begin(), nuclei.end());
 	Triangulation::Vertex_handle zero_point = dt.insert(CGALpoint(5.,5.,5.));
 	v.clear();
-        std::vector<typename Triangulation::Cell_handle>  ch_cells;
+        std::vector<Triangulation::Cell_handle>  ch_cells;
     	dt.incident_cells(zero_point,std::back_inserter(ch_cells));
-	for(std::vector<typename Triangulation::Cell_handle>::iterator ci = ch_cells.begin(); ci !=ch_cells.end(); ++ci){
+	for(std::vector<Triangulation::Cell_handle>::iterator ci = ch_cells.begin(); ci !=ch_cells.end(); ++ci){
 		v.push_back(FromCGALPoint(dt.dual(*ci))-Vector3r(5.,5.,5.));				
 	}
 
