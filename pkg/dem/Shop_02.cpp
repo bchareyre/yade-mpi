@@ -427,12 +427,9 @@ void Shop::calm(const shared_ptr<Scene>& _scene, int mask){
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b || !b->isDynamic()) continue;
 		if(((mask>0) and ((b->groupMask & mask)==0))) continue;
-		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
-		if ( (s) or ( (!s) && (b->isClump()) ) ){
-			b->state->vel=Vector3r::Zero();
-			b->state->angVel=Vector3r::Zero();
-			b->state->angMom=Vector3r::Zero();
-		}
+		b->state->vel=Vector3r::Zero();
+		b->state->angVel=Vector3r::Zero();
+		b->state->angMom=Vector3r::Zero();
 	}
 }
 
