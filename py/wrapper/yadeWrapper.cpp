@@ -380,9 +380,9 @@ class pyBodyContainer{
 					idsTmp[jj] = newSphere->id;
 				}
 				//cout << "thread " << omp_get_thread_num() << " unsets locker" << endl;
-			  #ifdef YADE_OPENMP
+				#ifdef YADE_OPENMP
 				omp_unset_lock(&locker);//end of critical section
-        #endif
+				#endif
 				Body::id_t newClumpId = clump(idsTmp, discretization);
 				ret.append(python::make_tuple(newClumpId,idsTmp));
 				erase(b->id,false);
