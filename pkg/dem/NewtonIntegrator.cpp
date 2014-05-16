@@ -146,14 +146,8 @@ void NewtonIntegrator::action()
 			// clumps forces
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
-				#ifdef YADE_OPENMP
-				//it is safe here, since only one thread will read/write
-				scene->forces.getTorqueUnsynced(id)+=m;
-				scene->forces.getForceUnsynced(id)+=f;
-				#else
 				scene->forces.addTorque(id,m);
 				scene->forces.addForce(id,f);
-				#endif
 			}
 			//in most cases, the initial force on clumps will be zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
 			f=scene->forces.getForce(id); m=scene->forces.getTorque(id);
