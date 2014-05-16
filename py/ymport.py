@@ -52,7 +52,7 @@ def textClumps(fileName,shift=Vector3.Zero,discretization=0,scale=1.0,**kw):
 	"""Load clumps-members from file, insert them to the simulation.
 	
 	:param str filename: file name
-	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_clumpId`
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
 	:param float scale: factor scales the given data.
 	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.sphere`
@@ -78,12 +78,12 @@ def textClumps(fileName,shift=Vector3.Zero,discretization=0,scale=1.0,**kw):
 			newClumpId = int(data[4])
 		else:
 			newClumpId = int(data[4])
-			O.bodies.appendClumped(curClump,discretization=discretization)
+			ret.append(O.bodies.appendClumped(curClump,discretization=discretization))
 			curClump=[]
 			idD = curClump.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
 	
 	if (len(curClump)<>0):
-		ret = O.bodies.appendClumped(curClump,discretization=discretization)
+		ret.append(O.bodies.appendClumped(curClump,discretization=discretization))
 	return ret
 
 def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
