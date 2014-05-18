@@ -1,4 +1,249 @@
 ==================================================
+yade-1.09.0
+
+
+Alexander Eulitz (1):
+      corrected a little bug in description of yadedaily-installation and added example and folder structure for compilation
+
+Anton Gladky (97):
+      Remove RELEASE-file.
+      Fix setting of wall's color.
+      +1 reference.
+      Replace some bazaar-links by github.
+      Update installation instructions.
+      Update INSTALL file.
+      Fix version definition for IPython>1.0.0
+      Fix warning for IPython > 1.0.0
+      Add radiusTopInner, radiusBottomInner to facetCone and facetCylinder.
+      Increase number of steps in checkWeight.py
+      Prevent returning a reference to local temp object.
+      Prevent binding a reference member to a temp. value.
+      Remove notice on the main page about daily packages on Launchpad.
+      Some more changes on the main page.
+      Add Lambert formulation into capillary models.
+      Use enum instead of string to keep capyllar type.
+      Update config of mini-dinstall.
+      Do not ignore k* and c* parameters if mass==0
+      Add billiard example script.
+      Introduce YADE_ODEINT feature
+      Implement binary-arch only builds for yadedaily.
+      Fix split delimiter
+      Fix library name for new openblas.
+      Output some additional messages, when DEBUG mode is enabled.
+      Fix compilation with libqglviewer>=2.5.1
+      Fix compilation with libqglviewer>=2.5.1
+      Add informational message, if VTK6 is found.
+      Disable some debug-messages, because they break compilation.
+      Check, whether manipulatedFrame exist, if not - create it.
+      Set mouse parameters, only if frame is created.
+      Better fix for QGLviewer next version.
+      Fix compilation.
+      Move all force and torque calculation into separate function
+      Move capillary functions out of ViscEl-classes.
+      Implement Soulie capillary model.
+      Add an example to test different capillary models.
+      Deprecate getViscoelasticFromSpheresInteraction.
+      Update examples and test-scripts due to deprecating of getViscoelasticFromSpheresInteraction.
+      Update Warning about last changes.
+      Use MatchMaker to set tc, et and en in ViscEl model
+      Update URL in getViscoelastic
+      Fix compilation in ViscElCap.
+      Minor description update.
+      Replace isnan by isfinite to let the numbers be 0.
+      Remove last capillar-parameters from ViscEl.
+      Remove massMultiply paramter
+      Fix compilation.
+      Implement experimental SPH-model
+      Add gradients and laplacian of the kernel functions.
+      Implement some more kernel functions.
+      Remove duplicated code.
+      Normalize parameters of kernel functions.
+      Produce meaningful error message.
+      Add Cs parameters to particles, visualize them in VTK.
+      Export in VTK some more SPH-parameters.
+      Get a coordination number from body.
+      Use bool return type for force calculation.
+      Add watercolumn example for SPH.
+      Add example script to test different kernel functions.
+      Add README to examples SPH.
+      Fix conflict.
+      Fix eigen3 inclusions.
+      Add one more example for sph.
+      Split all capillary function into smaller one.
+      Add YADE_SPH macroses to fix FTBFS, when SPH disabled
+      Minor fix (replace #ifdef by #endif)
+      Add an opportunity to change liquid volume during simulation.
+      Disable temporarly Cs calculation in SPH.
+      Fix interaction removal in VeiscoElPM
+      Store an information about active liquid contacts.
+      Add -= operator to OpenMPAccumulator.
+      Fix compilation with clang, when openmp is switched off.
+      Add OpenMPVector for thread-safe vector work.
+      Minor fix in installation section of documentation.
+      Export current value from PIDController.
+      Add a note in installation section of docs.
+      Do not link libloki and boost_date_time.
+      Fix scrolling direction for libQGLviewer > 2.5.0
+      One more minor fix in zooming.
+      Implement Liquid Migration model (experimental).
+      Replace LIQCONTROL by LIQMIGRATION.
+      Fix compilation with clang.
+      Set capillary parameters to 0. instead of -1.
+      Fix Id export in ymport.textClumps
+      Remove YADE_DEPREC_DOF_LIST prepocessor.
+      Add blockedMovement parameter to state of body
+      Add conveyor example.
+      Minor fix in documentation/installation.
+      Add mask parameter to NewtonIntegrator
+      Replace png-pictures by xpm.
+      Fix the beginning camera position in GUI.
+      Remove integrateInertia=False from packs.py.
+      Add discretization parameter to appendClumped.
+      Do not use getTorqueUnsynced and forces.getForceUnsynced in clumps
+      Make addForceTorqueFromMembers more readable.
+      Revert last change in Newtonintegrator.
+      One more revert in NewtonIntegrator.
+
+Bruno Chareyre (60):
+      avoid crash when Vh==NULL in FlowEngine. The sphere is ignored in the flow problem, otherwise FlowEngine runs as usual.
+      Merge branch 'master' of github.com:yade/trunk
+      remove redundant "from yade import *" in example scripts, as it mess-up scopes
+      small change in PFV checkTest
+      fix a bug in ISCollider that would create interactions with unbounded bodies
+      remove deprecated code linked to queuing requestErase'd interactions in an older version of the collider
+      Merge pull request #39 from lsibille/master
+      Merge pull request #38 from Kubeu/patch-4
+      Merge pull request #37 from Kubeu/patch-3
+      Merge pull request #36 from Kubeu/patch-2
+      Better behavior of QGLViewer for shift+select and moving bodies (fixes LP bug 806469)
+      let libparmetis be used as an alternative of libmetis
+      Add hideBody/showBody to selectively display bodies in the 3D view
+      Merge pull request #40 from burak-er/master
+      Parallel InsertionSortCollider
+      fix compilation issues for ENABLE_OPENMP=OFF
+      some renaming and code cleaning in PFV code
+      some renaming and code cleaning in PFV code (part2)
+      PFV: First step in refactoring templates
+      dummy engine for showing how to derive from FlowEngine + a preliminary version of DFNFlow
+      make FlowEngine a template yade class
+      Periodic version of flow engine in separate source files
+      PFV: simplify (c++ wise) value assignement to Info types. More refactoring. Final step of code cleaning.
+      fix a bug in PFV code (fictious vetices not defined correctly)
+      minor changes in FlowEngine
+      remove a useless data member
+      fix compile error due to dirty hack (cpp's included by another cpp)
+      Added documentation for changing the velocity gradient of periodic cell
+      TriaxialStressController: reference sample sizes can be modified by users (was previously read-only)
+      ignore *~ files in git status
+      update biblio references
+      Hack YADE_CLASS macro to make it work with c++ templates (introduces a macro for pyClass name different from c++ class name)
+      new YADE_CLASS_PYCLASS_... macro, missing in previous commit
+      update bibliographic reference in a script
+      introduce CellInfo::getInfo() for more generic interpolation between triangulations
+      better detection of changes in Cell::velGrad
+      fix the example script periodic-simple-shear.py
+      - introduce SoluteFlowEngine (from Thomas Sweijen)     - move Flow classes to a separate folder
+      fix include paths after moving files to pkg/pfv
+      fix include path pkg/pfv
+      Bugfixes in PeriodicFlowEngine, as discussed with Donia
+      remove useless FlowBoundingSphere.cpp
+      fix https://bugs.launchpad.net/yade/+bug/1301443
+      undef flag, so SoluteFlow doesn't break compilation on buildbot.
+      update about openblas+openmp on 12.04
+      initialize CellInfo members (avoids hardly detectable bugs) + remove artifact facets from loop when cell1==cell2
+      remove an inacurate reference, introduce another one
+      fix bad link to capillary files
+      clean of commented blocks
+      Merge pull request #43 from bchareyre/pc
+      fix gravity checkScript (es -> 'et')
+      enable run/pause from QGLViewer (retun key) + fix compile warning
+      remove empty file
+      add FlowEngine::doInterpolate to force interpolation during mesh swap
+      Add user defined boundary condition to FlowEngine
+      add authors in files headers
+      -fix bibliographic link
+      add missing #ifdef, breaking compilation without LINSOLV + better volume computation
+      fix compile error in 298f0b6
+      switch to 1-thread colliding when problem detected in parallel run (fix https://bugs.launchpad.net/yade/+bug/1314736)
+
+Burak Er (1):
+      added an adaptive Runge Kutta integrator scheme. Also, added an example using this integrator.
+
+Christian Jakob (15):
+      allow user to set an output folder for PFV-based saveVtk() method
+      Merge branch 'master' of github.com:yade/trunk
+      fix compilation bug in InsertionSortCollider.hpp
+      fix a bug in inertia tensor calculation for clumps if integrateInertia=True
+      extend/fix replaceByClumps() method for multiple overlapping clump templates
+      absorb bool integrateInertia from Clump::updateProperties by int discretization
+      Merge branch 'master' of github.com:yade/trunk
+      Parallelize replaceByClumps(): drastically reduce generation time of clump replacement if discretization>0
+      fix bugs in Clump::updateProperties, fixes https://bugs.launchpad.net/yade/+bug/1273172
+      introduce updateClumpProperties() method in yadeWrapper - can be used e.g. when clumps are imported in yade
+      update of O.bodies.erase(): it can erase clump members too when erasing a clump
+      Merge branch 'master' of github.com:yade/trunk
+      remove typenames from Polyhedra.cpp (fixes compiler error)
+      let ymport.textClumps() return all ids from members and clumps
+      fix some indents
+
+Francois (2):
+      Undo modifications about ViscElMat into Ip2_FrictMat_FrictMat_FrictPhys. The young modulus and poisson ratio have to be set for both materials to perform a contact between a frictMat body and a viscElMat body. Add a comment for that.
+      Fix 2 bugs linked to the Grids :     - in utils.py : remove a factor 2 in the calculation of the bending stiffness kr.     - in Grid.cpp : fix a bug that occured in the Sphere-GridConnection contact. The contact was not detected in a very specific case : if the sphere was next to a node and the node goes from a convex (angle>180°) form to a concav (angle<180°) form.
+
+Jan Stransky (13):
+      added vtk export of polyhedral particles
+      improvement of previous commit (vtk polyhedra export)
+      added example of paraview sphere "solid sections"     improvement of export.textExt function to support arbitrary quantity export
+      added O.stopAtTime (question246284)
+      chenged return type of O.stopAtTime from previous commit
+      fixed some errors and warnings for documentation build
+      one more little info inside code
+      export.VTKExporter: improved comments, fixed bug (thanks Jan Havelka for reporting), updated corresponding example script
+      code cleanup in ConcretePM, fixed one more bug in export.VTKExporter
+      added exportContactPoints function to exporter.VTKExporter, updated example script
+      fixed export.VTKExporter.exportContactPoints for nonexisting interactions
+      Polyhedra implementation improvement (Contributed by Jan Elias)
+      modification of utils.calm function (bug 1318513)
+
+Jerome Duriez (15):
+      Change in the doc of ymport.text/textExt to better reflect the behaviour
+      A doc sentence for pericell recorder in VTKRecorder
+      Typo in doc of CohFric Law2 : the shear adhesion is a_s, not a_n
+      Typos and link syntax in doc of CohFrictPhys
+      Typo correction in porosity() doc : porosity instead of poro sity (in 2 words)
+      Use of correct version of requestErase() in JCFpm (https://bugs.launchpad.net/yade/+bug/1273775)
+      Small changes in JCFpm IP logic : it is now possible to have new contacts that are always cohesive, and "poisson"=0 is possible (=> ks = 0 rather than infinity...)
+      Small improvement in JCFPM doc about the cracks file, and typo in user.rst
+      Mistake in hyperlink previous commit
+      Copy paste mistake in State and typo UniaxialStrainer doc
+      Proposal of correction of UniaxialStrainer, in relation with https://bugs.launchpad.net/yade/+bug/1300167
+      Add of an external reference, about the "derivation" of bodyStressTensor
+      Correction of copy-paste mistake in doc of Bound
+      Hyperlink about sortAxis in InsertionSortCollider doc
+      Minor changes (not affecting results) in these scripts towards an easier understanding
+
+Klaus Thoeni (2):
+      Correct shear stiffness averaging for Ip2_FrictMat_FrictMat_ViscoFrictPhys
+      new simple contact law with normal viscose damping which allows to specify kn and ks/kn in Ip2
+
+Kubeu (3):
+      Added Antons hint to first install external depencies of Yade before following installation instructions
+      small typo fix
+      typofix
+
+Luc Sibille (10):
+      add test on alphaKtw to allow nil value of twisting stiffness
+      engine to compute a fluid flow with the lattice Boltzmann method LBM
+      Definition of the basic elements used by the LBM engine
+      definition of the compilation option ENABLE_LBMFLOW to make the compilation of the LBM engine optional, this option is disable by default
+      remove all LBM file
+      Merge remote-tracking branch 'upstream/master'
+      definition of the LBM engine inside a lbm directory, with license GPLv2
+      definition of the compilation option ENABLE_LBMFLOW to make the compilation of the LBM engine optional, this option is disable by default
+      A buoyancy example for the DEM-LBM coupling
+      Merge branch 'master' of github.com:yade/trunk
+
+==================================================
 yade-1.07.0
 Fri, 10 Jan 2014 21:23:33 +0100
 
