@@ -21,11 +21,11 @@ class CohFrictMat : public FrictMat
 /// Serialization
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictMat,FrictMat,"",
 		((bool,isCohesive,true,,""))
-		((Real,alphaKr,2.0,,"Dimensionless coefficient used for the rolling stiffness."))
-		((Real,alphaKtw,2.0,,"Dimensionless coefficient used for the twist stiffness."))
-		((Real,etaRoll,-1.,,"Dimensionless coefficient used to calculate the plastic rolling moment (if negative, plasticity will not be applied)."))	
-		((Real,normalCohesion,0,,""))
-		((Real,shearCohesion,0,,""))
+		((Real,alphaKr,2.0,,"Dimensionless rolling stiffness."))
+		((Real,alphaKtw,2.0,,"Dimensionless twist stiffness."))
+		((Real,etaRoll,-1.,,"Dimensionless rolling (aka 'bending') strength. If negative, rolling will be elastic."))	
+		((Real,normalCohesion,0,,"Tensile strength, homogeneous to a pressure"))
+		((Real,shearCohesion,0,,"Shear strength, homogeneous to a pressure"))
 		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
 		,
 		createIndex();
