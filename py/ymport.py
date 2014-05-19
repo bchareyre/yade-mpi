@@ -48,7 +48,7 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 			raise RuntimeError("Please, specify a correct format output!");
 	return ret
   
-def textClumps(fileName,shift=Vector3.Zero,discretization=0,scale=1.0,**kw):
+def textClumps(fileName,shift=Vector3.Zero,discretization=0,orientation=Quaternion.Identity,scale=1.0,**kw):
 	"""Load clumps-members from file, insert them to the simulation.
 	
 	:param str filename: file name
@@ -71,7 +71,7 @@ def textClumps(fileName,shift=Vector3.Zero,discretization=0,scale=1.0,**kw):
 	for line in lines:
 		data = line.split()
 		if (data[0][0] == "#"): continue
-		pos = Vector3(float(data[0]),float(data[1]),float(data[2]))
+		pos = orientation*Vector3(float(data[0]),float(data[1]),float(data[2]))
 	
 		if (newClumpId<0 or newClumpId==int(data[4])):
 			idD = curClump.append(utils.sphere(shift+scale*pos,scale*float(data[3]),**kw))
