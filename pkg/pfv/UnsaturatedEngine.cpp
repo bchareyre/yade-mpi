@@ -49,8 +49,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 {
 		double totalCellVolume;
 	protected:
-		void testFunction();
-		
+		void testFunction();		
 
 	public :
 		void initializeCellIndex();
@@ -108,6 +107,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 		double getWindowsSaturation2(int i);
 		double getRadiusMin(CellHandle cell, int j);
 		void debugTemp();
+		bool checknoCache() {return solver->noCache;}
 				
 		virtual ~UnsaturatedEngine();
 
@@ -136,6 +136,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 					.def("checkBoundingCellsInfo",&UnsaturatedEngine::checkBoundingCellsInfo,"Check boundary cells (without reservoirs) statement and export to 'boundInfo.txt'.")
 					
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
+					.def("checknoCache",&UnsaturatedEngine::checknoCache,"check noCache. (temp func.)")
 					.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(python::arg("windowsID")), "get saturation of windowsID")
 					.def("debugTemp",&UnsaturatedEngine::debugTemp,"debug temp file.(temporary)")
 					.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temp function for comparison with experiments, will delete soon")
@@ -148,7 +149,7 @@ YADE_PLUGIN((UnsaturatedEngine));
 
 UnsaturatedEngine::~UnsaturatedEngine(){}
 
-void UnsaturatedEngine::testFunction()
+/*void UnsaturatedEngine::testFunction()
 {
 	cout<<"This is UnsaturatedEngine test program"<<endl;
 	RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -164,6 +165,18 @@ void UnsaturatedEngine::testFunction()
 		computeSolidLine();//save cell->info().solidLine[j][y]
 	}
 	solver->noCache = true;
+}*/
+void UnsaturatedEngine::testFunction()
+{
+		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
+		setPositionsBuffer(true);//copy sphere positions in a buffer...
+		buildTriangulation(pZero,*solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
+		initializeCellIndex();//initialize cell index
+		updatePoreRadius();//save all pore radii before invade
+		updateTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (invadeBoundary==True or False), aiming to calculate specific interfacial area.
+		updateVolumeCapillaryCell();//save capillary volume of all cells, for fast calculating saturation
+		computeSolidLine();//save cell->info().solidLine[j][y]
+		solver->noCache = true;
 }
 
 void UnsaturatedEngine::action()
@@ -184,7 +197,7 @@ void UnsaturatedEngine::action()
     }
     ///compute invade
     if (pressureForce) { invade();}
-
+    
     ///compute force
     if(computeForceActivated){
     computeCapillaryForce();
@@ -531,7 +544,7 @@ double UnsaturatedEngine::getSpecificInterfacialArea1()
                     if (cell->neighbor(facet)->info().isFictious) continue;
                     if (cell->neighbor(facet)->info().isAirReservoir==false)
                         interfacialArea = interfacialArea + computeCellInterfacialArea(cell, facet, cell->info().poreRadius[facet]);}}}}
-    cerr<<"InterArea:"<<interfacialArea<<"  totalCellVolume:"<<totalCellVolume<<endl;
+//     cerr<<"InterArea:"<<interfacialArea<<"  totalCellVolume:"<<totalCellVolume<<endl;
     return interfacialArea/totalCellVolume;
 }
 
@@ -671,12 +684,17 @@ double UnsaturatedEngine::getSpecificInterfacialArea2()
                     if (cell->neighbor(facet)->info().isFictious) continue;
                     if (cell->neighbor(facet)->info().p()==0)
                         interfacialArea = interfacialArea + computeCellInterfacialArea(cell, facet, cell->info().poreRadius[facet]);}}}}
-    cerr<<"InterArea:"<<interfacialArea<<"  totalCellVolume:"<<totalCellVolume<<endl;
+//     cerr<<"InterArea:"<<interfacialArea<<"  totalCellVolume:"<<totalCellVolume<<endl;
     return interfacialArea/totalCellVolume;
 }
 
 double UnsaturatedEngine::computeCellInterfacialArea(CellHandle cell, int j, double rCap)
 {
+    double rInscribe = abs(solver->computeEffectiveRadius(cell, j));  
+    CellHandle cellh = CellHandle(cell);
+    int facetNFictious = solver->detectFacetFictiousVertices (cellh,j);
+  switch (facetNFictious) {
+    case (0) : {     
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     if (tri.is_infinite(cell->neighbor(j))) return 0;
 
@@ -732,7 +750,12 @@ double UnsaturatedEngine::computeCellInterfacialArea(CellHandle cell, int j, dou
 
     double areaCap = sqrt(cell->info().facetSurfaces[j].squared_length()) * cell->info().facetFluidSurfacesRatio[j];
     double areaPore = areaCap - areaLiquidAB - areaLiquidAC - areaLiquidBC;
-    return areaPore;
+    if (areaPore<0) cerr<<"areaPore:"<<areaPore<<" posA:"<<posA<<" rA:"<<rA<<" posB"<<posB<<" rB"<<rB<<" posC:"<<posC<<" rC"<<rC<<endl;
+    if (areaPore>10) cerr<<"areaPore:"<<areaPore<<" posA:"<<posA<<" rA:"<<rA<<" posB"<<posB<<" rB"<<rB<<" posC:"<<posC<<" rC"<<rC<<endl;    
+    return areaPore;}; break;
+    case (1) : { return Mathr::PI*pow(rInscribe,2); }; break;
+    case (2) : { return Mathr::PI*pow(rInscribe,2); }; break;    
+  }   
 }
 
 double UnsaturatedEngine::computeEffPoreRadius(CellHandle cell, int j)
