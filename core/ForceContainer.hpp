@@ -97,8 +97,8 @@ class ForceContainer{
 		/*! Function to allow friend classes to get force even if not synced. Used for clumps by NewtonIntegrator.
 		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
 		* for a particular body id. */
-		const Vector3r& getForceUnsynced (Body::id_t id){return ((size_t)id<size)?_force[id]:_zero;}
-		const Vector3r& getTorqueUnsynced(Body::id_t id){return ((size_t)id<size)?_torque[id]:_zero;}
+		const Vector3r& getForceUnsynced (Body::id_t id){assert ((size_t)id<size); return _force[id];}
+		const Vector3r& getTorqueUnsynced(Body::id_t id){assert ((size_t)id<size); return _torque[id];}
 		void  addForceUnsynced(Body::id_t id, const Vector3r& f){ assert ((size_t)id<size); _force[id]+=f; }
 		void  addTorqueUnsynced(Body::id_t id, const Vector3r& m){ assert ((size_t)id<size); _torque[id]+=m; }
 		
