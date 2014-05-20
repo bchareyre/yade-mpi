@@ -106,8 +106,8 @@ stateVector& Integrator::getSceneStateDot(void){
 				b->shape->cast<Clump>().addForceTorqueFromMembers(b->state.get(),scene,force,moment);
 				#ifdef YADE_OPENMP
 				//it is safe here, since only one thread will read/write
-				scene->forces.getTorqueUnsynced(id)+=moment;
-				scene->forces.getForceUnsynced(id)+=force;
+				scene->forces.addTorqueUnsynced(id,moment);
+				scene->forces.addForceUnsynced(id,force);
 				#else
 				scene->forces.addTorque(id,moment);
 				scene->forces.addForce(id,force);

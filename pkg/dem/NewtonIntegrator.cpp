@@ -142,14 +142,15 @@ void NewtonIntegrator::action()
 			// clump members are handled inside clumps
 			if(b->isClumpMember()) continue;
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
-			Vector3r f=Vector3r::Zero(), m=Vector3r::Zero();
+			Vector3r f=Vector3r::Zero(); 
+			Vector3r m=Vector3r::Zero();
 			// clumps forces
 			if(b->isClump()) {
 				b->shape->cast<Clump>().addForceTorqueFromMembers(state,scene,f,m);
 				#ifdef YADE_OPENMP
-				//it is safe here, since only one 
-				scene->forces.getTorqueUnsynced(id)+=m;
-				scene->forces.getForceUnsynced(id)+=f;
+				//it is safe here, since only one thread is adding forces/torques
+				scene->forces.addTorqueUnsynced(id,m);
+				scene->forces.addForceUnsynced(id,f);
 				#else
 				scene->forces.addTorque(id,m);
 				scene->forces.addForce(id,f);
@@ -201,6 +202,7 @@ void NewtonIntegrator::action()
 			leapfrogTranslate(state,id,dt);
 			if(!useAspherical) leapfrogSphericalRotate(state,id,dt);
 			else leapfrogAsphericalRotate(state,id,dt,m);
+			
 			saveMaximaDisplacement(b);
 			// move individual members of the clump, save maxima velocity (for collider stride)
 			if(b->isClump()) Clump::moveMembers(b,scene,this);
