@@ -132,16 +132,16 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 			}
 			v[j+1]=viInit;
 			if (j<=long(chunks[k]-chunkSize*0.5)) {
-				LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Parallel colliding aborted, starting again in single thread. Consider turning ompThreads=1 for not wasting CPU time.");
+				LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Parallel colliding aborted, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
 				parallelFailed=true;}
 		}
 		if (i>=long(chunks[k]+chunkSize*0.5)) {
-			LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning ompThreads=1 for not wasting CPU time.");
+			LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning collider.ompThreads=1 for not wasting CPU time.");
 			parallelFailed=true;}
 	}
 	/// Check again, just to be sure...
 	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) {
-		LOG_ERROR("Parallel colliding failed, starting again in single thread. Consider turning ompThreads=1 for not wasting CPU time.");
+		LOG_ERROR("Parallel colliding failed, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
 		parallelFailed=true;}
 	
 	if (parallelFailed) return insertionSort(v,interactions, scene, doCollide);
