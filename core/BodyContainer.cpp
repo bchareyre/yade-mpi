@@ -47,10 +47,8 @@ Body::id_t BodyContainer::insert(shared_ptr<Body>& b, Body::id_t id){
 	
 	body[id]=b;
 
-	// Add Null-Vectors to force and torque containers to be sure they will have
-	// enough place for new body
-	scene->forces.addTorque(id,Vector3r::Zero());
-	scene->forces.addForce(id,Vector3r::Zero());
+	// Notify ForceContainer about new id
+	scene->forces.addMaxId(id);
 	return id;
 }
 

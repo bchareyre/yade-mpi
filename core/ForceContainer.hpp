@@ -50,6 +50,7 @@ class ForceContainer{
 		std::vector<vvector> _torqueData;
 		std::vector<vvector> _moveData;
 		std::vector<vvector> _rotData;
+		std::vector<Body::id_t>  _maxId;
 		vvector _force, _torque, _move, _rot, _permForce, _permTorque;
 		std::vector<size_t> sizeOfThreads;
 		size_t size;
@@ -62,8 +63,10 @@ class ForceContainer{
 
 		inline void ensureSize(Body::id_t id, int threadN){
 			assert(nThreads>omp_get_thread_num());
-			if (threadN<0) resizePerm(min((size_t)1.5*(id+100),(size_t)(id+2000)));
-			else if (sizeOfThreads[threadN]<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)),threadN);
+			const Body::id_t idMaxTmp = max(id, _maxId[threadN]);
+			_maxId[threadN] = 0;
+			if (threadN<0) resizePerm(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
+			else if (sizeOfThreads[threadN]<=(size_t)idMaxTmp) resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)),threadN);
 		}
 
 		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
@@ -78,6 +81,7 @@ class ForceContainer{
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
 				_moveData.push_back(vvector());  _rotData.push_back(vvector());
 				sizeOfThreads.push_back(0);
+				_maxId.push_back(0);
 			}
 		}
 		const Vector3r& getForce(Body::id_t id)         { ensureSynced(); return ((size_t)id<size)?_force[id]:_zero; }
@@ -88,6 +92,7 @@ class ForceContainer{
 		void  addMove(Body::id_t id, const Vector3r& m) { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
 		const Vector3r& getRot(Body::id_t id)           { ensureSynced(); return ((size_t)id<size)?_rot[id]:_zero; }
 		void  addRot(Body::id_t id, const Vector3r& r)  { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
+		void  addMaxId(Body::id_t id)                   { _maxId[omp_get_thread_num()]=id;}
 
 		void  addPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id,-1); synced=false;   _permForce[id]=f; permForceUsed=true;}
 		void addPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id,-1); synced=false;   _permTorque[id]=t; permForceUsed=true;}
@@ -211,9 +216,14 @@ class ForceContainer {
 		std::vector<Vector3r> _move;
 		std::vector<Vector3r> _rot;
 		std::vector<Vector3r> _permForce, _permTorque;
+		Body::id_t _maxId;
 		size_t size;
 		size_t permSize;
-		inline void ensureSize(Body::id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
+		inline void ensureSize(Body::id_t id){ 
+			const Body::id_t idMaxTmp = max(id, _maxId);
+			_maxId = 0;
+			if(size<=(size_t)idMaxTmp) resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
+		}
 		#if 0
 			const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
 			const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
@@ -222,7 +232,7 @@ class ForceContainer {
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), permSize(0), moveRotUsed(false), permForceUsed(false), syncCount(0), lastReset(0){}
+		ForceContainer(): size(0), permSize(0), moveRotUsed(false), permForceUsed(false), syncCount(0), lastReset(0), _maxId(0){}
 		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}
 		void  addForce(Body::id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(Body::id_t id){ensureSize(id); return _torque[id];}
@@ -233,6 +243,7 @@ class ForceContainer {
 		void  addRot(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
 		void  addPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id);  _permForce[id]=f; permForceUsed=true;}
 		void addPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id);  _permTorque[id]=t; permForceUsed=true;}
+		void  addMaxId(Body::id_t id) { _maxId=id;}
 		const Vector3r& getPermForce(Body::id_t id) { ensureSize(id); return _permForce[id]; }
 		const Vector3r& getPermTorque(Body::id_t id) { ensureSize(id); return _permTorque[id]; }
 		// single getters do the same as globally synced ones in the non-parallel flavor
