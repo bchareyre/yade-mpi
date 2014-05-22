@@ -36,7 +36,7 @@ class EnergyTracker: public Serializable{
 	}
 	Real getItem_py(const std::string& name){
 		int id=-1; findId(name,id,false,false); 
-		if (id<0) {PyErr_SetString(PyExc_KeyError,("Unknown energy name '"+name+"'.").c_str());  python::throw_error_already_set(); }
+		if (id<0) {PyErr_SetString(PyExc_KeyError,("Unknown energy name '"+name+"'.").c_str());  py::throw_error_already_set(); }
 		return energies.get(id);
 	}
 	void setItem_py(const std::string& name, Real val){

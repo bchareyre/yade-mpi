@@ -16,12 +16,18 @@
 #include<boost/version.hpp>
 #include<boost/math/distributions/normal.hpp>
 
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include<boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include<memory>
+	using std::shared_ptr;
+#endif
 
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
 #endif
 using namespace std;
-using namespace boost;
 
 #include<yade/lib/base/Math.hpp>
 
@@ -46,7 +52,7 @@ struct GridContainer{
 	Vector2i xy2cell(Vector2r xy, bool* inGrid=NULL) const {
 		Vector2i ret((int)(floor((xy[0]-lo[0])/cellSizes[0])),(int)(floor((xy[1]-lo[1])/cellSizes[1])));
 		if(ret[0]<0 || ret[0]>=nCells[0] || ret[1]<0 || ret[1]>=nCells[1]){
-			if(inGrid) *inGrid=false; else throw std::invalid_argument("Cell coordinates outside grid (xy="+lexical_cast<string>(xy[0])+","+lexical_cast<string>(xy[1])+", computed cell coordinates "+lexical_cast<string>(ret[0])+","+lexical_cast<string>(ret[1])+").");
+			if(inGrid) *inGrid=false; else throw std::invalid_argument("Cell coordinates outside grid (xy="+boost::lexical_cast<string>(xy[0])+","+boost::lexical_cast<string>(xy[1])+", computed cell coordinates "+boost::lexical_cast<string>(ret[0])+","+boost::lexical_cast<string>(ret[1])+").");
 		} else {if(inGrid) *inGrid=true;}
 		return ret;
 	}
@@ -170,13 +176,13 @@ struct SGDA_Scalar2d: public WeightedAverage<Scalar2d,Real> {
  * */
 class pyGaussAverage{
 	//struct Scalar2d{Vector2r pos; Real val;};
-	Vector2r tuple2vec2r(const python::tuple& t){return Vector2r(python::extract<Real>(t[0])(),python::extract<Real>(t[1])());}
-	Vector2i tuple2vec2i(const python::tuple& t){return Vector2i(python::extract<int>(t[0])(),python::extract<int>(t[1])());}
+	Vector2r tuple2vec2r(const boost::python::tuple& t){return Vector2r(boost::python::extract<Real>(t[0])(),boost::python::extract<Real>(t[1])());}
+	Vector2i tuple2vec2i(const boost::python::tuple& t){return Vector2i(boost::python::extract<int>(t[0])(),boost::python::extract<int>(t[1])());}
 	shared_ptr<SGDA_Scalar2d> sgda;
 	struct Poly2d{vector<Vector2r> vertices; bool inclusive;};
 	vector<Poly2d> clips;
 	public:
-	pyGaussAverage(python::tuple lo, python::tuple hi, python::tuple nCells, Real stDev, Real relThreshold=3.){
+	pyGaussAverage(boost::python::tuple lo, boost::python::tuple hi, boost::python::tuple nCells, Real stDev, Real relThreshold=3.){
 		shared_ptr<GridContainer<Scalar2d> > g(new GridContainer<Scalar2d>(tuple2vec2r(lo),tuple2vec2r(hi),tuple2vec2i(nCells)));
 		sgda=shared_ptr<SGDA_Scalar2d>(new SGDA_Scalar2d(g,stDev));
 		sgda->relThreshold=relThreshold;
@@ -189,36 +195,36 @@ class pyGaussAverage{
 		}
 		return false;
 	}
-	bool addPt(Real val, python::tuple pos){Scalar2d d; d.pos=tuple2vec2r(pos); if(ptIsClipped(d.pos)) return false; d.val=val; sgda->grid->add(d,d.pos); return true; } 
+	bool addPt(Real val, boost::python::tuple pos){Scalar2d d; d.pos=tuple2vec2r(pos); if(ptIsClipped(d.pos)) return false; d.val=val; sgda->grid->add(d,d.pos); return true; } 
 	Real avg(Vector2r pt){ if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgda->computeAverage(pt);}
 	Real avgPerUnitArea(Vector2r pt){ if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgda->computeAvgPerUnitArea(pt); }
 	Real stDev_get(){return sgda->stDev;} void stDev_set(Real s){sgda->stDev=s;}
 	Real relThreshold_get(){return sgda->relThreshold;} void relThreshold_set(Real rt){sgda->relThreshold=rt;}
-	python::tuple aabb_get(){return python::make_tuple(sgda->grid->getLo(),sgda->grid->getHi());}
-	python::list clips_get(){
-		python::list ret;
+	boost::python::tuple aabb_get(){return boost::python::make_tuple(sgda->grid->getLo(),sgda->grid->getHi());}
+	boost::python::list clips_get(){
+		boost::python::list ret;
 		FOREACH(const Poly2d& poly, clips){
-			python::list vertices;
-			FOREACH(const Vector2r& v, poly.vertices) vertices.append(python::make_tuple(v[0],v[1]));
-			ret.append(python::make_tuple(vertices,poly.inclusive));
+			boost::python::list vertices;
+			FOREACH(const Vector2r& v, poly.vertices) vertices.append(boost::python::make_tuple(v[0],v[1]));
+			ret.append(boost::python::make_tuple(vertices,poly.inclusive));
 		}
 		return ret;
 	}
-	void clips_set(python::list l){
+	void clips_set(boost::python::list l){
 		/* [ ( [(x1,y1),(x2,y2),…], true), … ] */
 		clips.clear();
-		for(int i=0; i<python::len(l); i++){
-			python::tuple polyDesc=python::extract<python::tuple>(l[i])();
-			python::list coords=python::extract<python::list>(polyDesc[0]);
-			Poly2d poly; poly.inclusive=python::extract<bool>(polyDesc[1]);
-			for(int j=0; j<python::len(coords); j++){
-				poly.vertices.push_back(tuple2vec2r(python::extract<python::tuple>(coords[j])));
+		for(int i=0; i<boost::python::len(l); i++){
+			boost::python::tuple polyDesc=boost::python::extract<boost::python::tuple>(l[i])();
+			boost::python::list coords=boost::python::extract<boost::python::list>(polyDesc[0]);
+			Poly2d poly; poly.inclusive=boost::python::extract<bool>(polyDesc[1]);
+			for(int j=0; j<boost::python::len(coords); j++){
+				poly.vertices.push_back(tuple2vec2r(boost::python::extract<boost::python::tuple>(coords[j])));
 			}
 			clips.push_back(poly);
 		}
 	}
-	python::tuple data_get(){
-		python::list x,y,val;
+	boost::python::tuple data_get(){
+		boost::python::list x,y,val;
 		const Vector2i& dim=sgda->grid->getSize();
 		for(int i=0; i<dim[0]; i++){
 			for(int j=0; j<dim[1]; j++){
@@ -227,7 +233,7 @@ class pyGaussAverage{
 				}
 			}
 		}
-		return python::make_tuple(x,y,val);
+		return boost::python::make_tuple(x,y,val);
 	}
 	Vector2i nCells_get(){ return sgda->grid->getSize(); }
 	int cellNum(const Vector2i& cell){ return sgda->grid->grid[cell[0]][cell[1]].size(); }
