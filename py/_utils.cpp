@@ -76,34 +76,6 @@ void setRefSe3(){
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 Real RayleighWaveTimeStep(){return Shop::RayleighWaveTimeStep();};
 
-// FIXME: rewrite for ScGeom or remove
-// Real elasticEnergyInAABB(py::tuple Aabb){
-// 	Vector3r bbMin=py::extract<Vector3r>(Aabb[0])(), bbMax=py::extract<Vector3r>(Aabb[1])();
-// 	shared_ptr<Scene> rb=Omega::instance().getScene();
-// 	Real E=0;
-// 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
-// 		if(!i->phys) continue;
-// 		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->phys); if(!bc) continue;
-// 		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->geom); if(!geom){LOG_ERROR("NormShearPhys contact doesn't have Dem3DofGeom associated?!"); continue;}
-// 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
-// 		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
-// 		if(!isIn1 && !isIn2) continue;
-// 		LOG_DEBUG("Interaction #"<<i->getId1()<<"--#"<<i->getId2());
-// 		Real weight=1.;
-// 		if((!isIn1 && isIn2) || (isIn1 && !isIn2)){
-// 			//shared_ptr<Body> bIn=isIn1?b1:b2, bOut=isIn2?b2:b1;
-// 			Vector3r vIn=(isIn1?b1:b2)->state->pos, vOut=(isIn2?b1:b2)->state->pos;
-// 			#define _WEIGHT_COMPONENT(axis) if(vOut[axis]<bbMin[axis]) weight=min(weight,abs((vOut[axis]-bbMin[axis])/(vOut[axis]-vIn[axis]))); else if(vOut[axis]>bbMax[axis]) weight=min(weight,abs((vOut[axis]-bbMax[axis])/(vOut[axis]-vIn[axis])));
-// 			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
-// 			assert(weight>=0 && weight<=1);
-// 			//cerr<<"Interaction crosses Aabb boundary, weight is "<<weight<<endl;
-// 			//LOG_DEBUG("Interaction crosses Aabb boundary, weight is "<<weight);
-// 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-// 		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().norm(),2));
-// 	}
-// 	return E;
-// }
-
 /* return histogram ([bin1Min,bin2Min,…],[value1,value2,…]) from projections of interactions
  * to the plane perpendicular to axis∈[0,1,2]; the number of bins can be specified and they cover
  * the range (0,π), since interactions are bidirecional, hence periodically the same on (π,2π).
@@ -364,11 +336,6 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->phys.get());
 		if(!nsi) continue;
 		Vector3r pos1,pos2;
-		/*
-		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->geom.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
-		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
-		else{ pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos; }
-		*/
 		pos1=Body::byId(I->getId1(),scene)->state->pos; pos2=Body::byId(I->getId2(),scene)->state->pos;
 		Real dot1=(pos1-planePt).dot(normal), dot2=(pos2-planePt).dot(normal);
 		if(dot1*dot2>0) continue; // both (centers of) bodies are on the same side of the plane=> this interaction has to be disregarded
@@ -533,7 +500,6 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r(Matrix3r::Zero())),"Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that periodic cell defines by repetition or its corners regular grid of points in $R^3$; however, all cells generating identical grid are equivalent and can be flipped one over another. This necessiatates adjustment of :yref:`Interaction.cellDist` for interactions that cross boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is accessible as ``Shop::flipCell``.\n\n.. warning:: This function is currently broken and should not be used.");
 	py::def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction,(py::arg("tc"),py::arg("en"),py::arg("es")),"Attention! The function is deprecated! Compute viscoelastic interaction parameters from analytical solution of a pair spheres collision problem:\n\n.. math:: k_n=\\frac{m}{t_c^2}\\left(\\pi^2+(\\ln e_n)^2\\right) \\\\ c_n=-\\frac{2m}{t_c}\\ln e_n \\\\  k_t=\\frac{2}{7}\\frac{m}{t_c^2}\\left(\\pi^2+(\\ln e_t)^2\\right) \\\\ c_t=-\\frac{2}{7}\\frac{m}{t_c}\\ln e_t \n\n\nwhere $k_n$, $c_n$ are normal elastic and viscous coefficients and $k_t$, $c_t$ shear elastic and viscous coefficients. For details see [Pournin2001]_.\n\n:param float m: sphere mass $m$\n:param float tc: collision time $t_c$\n:param float en: normal restitution coefficient $e_n$\n:param float es: tangential restitution coefficient $e_s$\n:return: dictionary with keys ``kn`` (the value of $k_n$), ``cn`` ($c_n$), ``kt`` ($k_t$), ``ct`` ($c_t$).");
 	py::def("stressTensorOfPeriodicCell",Shop::getStress,(py::args("volume")=0),"Deprecated, use utils.getStress instead |ydeprecated|");
-	//py::def("stressTensorOfPeriodicCell",Shop__stressTensorOfPeriodicCell,(py::args("smallStrains")=false),"Compute overall (macroscopic) stress of periodic cell using equation published in [Kuhl2001]_:\n\n.. math:: \\vec{\\sigma}=\\frac{1}{V}\\sum_cl^c[\\vec{N}^cf_N^c+\\vec{T}^{cT}\\cdot\\vec{f}^c_T],\n\nwhere $V$ is volume of the cell, $l^c$ length of interaction $c$, $f^c_N$ normal force and $\\vec{f}^c_T$ shear force. Sumed are values over all interactions $c$. $\\vec{N}^c$ and $\\vec{T}^{cT}$ are projection tensors (see the original publication for more details):\n\n.. math:: \\vec{N}=\\vec{n}\\otimes\\vec{n}\\rightarrow N_{ij}=n_in_j\n\n.. math:: \\vec{T}^T=\\vec{I}_{sym}\\cdot\\vec{n}-\\vec{n}\\otimes\\vec{n}\\otimes\\vec{n}\\rightarrow T^T_{ijk}=\\frac{1}{2}(\\delta_{ik}\\delta_{jl}+\\delta_{il}\\delta_{jk})n_l-n_in_jn_k\n\n.. math:: \\vec{T}^T\\cdot\\vec{f}_T\\equiv T^T_{ijk}f_k=(\\delta_{ik}n_j/2+\\delta_{jk}n_i/2-n_in_jn_k)f_k=n_jf_i/2+n_if_j/2-n_in_jn_kf_k,\n\nwhere $n$ is unit vector oriented along the interaction (:yref:`normal<GenericSpheresContact::normal>`) and $\\delta$ is Kronecker's delta. As $\\vec{n}$ and $\\vec{f}_T$ are perpendicular (therfore $n_if_i=0$) we can write\n\n.. math:: \\sigma_{ij}=\\frac{1}{V}\\sum l[n_in_jf_N+n_jf^T_i/2+n_if^T_j/2]\n\n:param bool smallStrains: if false (large strains), real values of volume and interaction lengths are computed. If true, only :yref:`refLength<Dem3DofGeom::refLength>` of interactions and initial volume are computed (can save some time).\n\n:return: macroscopic stress tensor as Matrix3");
 	py::def("normalShearStressTensors",Shop__normalShearStressTensors,(py::args("compressionPositive")=false,py::args("splitNormalTensor")=false,py::args("thresholdForce")=NaN),"Compute overall stress tensor of the periodic cell decomposed in 2 parts, one contributed by normal forces, the other by shear forces. The formulation can be found in [Thornton2000]_, eq. (3):\n\n.. math:: \\tens{\\sigma}_{ij}=\\frac{2}{V}\\sum R N \\vec{n}_i \\vec{n}_j+\\frac{2}{V}\\sum R T \\vec{n}_i\\vec{t}_j\n\nwhere $V$ is the cell volume, $R$ is \"contact radius\" (in our implementation, current distance between particle centroids), $\\vec{n}$ is the normal vector, $\\vec{t}$ is a vector perpendicular to $\\vec{n}$, $N$ and $T$ are norms of normal and shear forces.\n\n:param bool splitNormalTensor: if true the function returns normal stress tensor split into two parts according to the two subnetworks of strong an weak forces.\n\n:param Real thresholdForce: threshold value according to which the normal stress tensor can be split (e.g. a zero value would make distinction between tensile and compressive forces).");
 	py::def("fabricTensor",Shop__fabricTensor,(py::args("splitTensor")=false,py::args("revertSign")=false,py::args("thresholdForce")=NaN),"Compute the fabric tensor of the periodic cell. The original paper can be found in [Satake1982]_.\n\n:param bool splitTensor: split the fabric tensor into two parts related to the strong and weak contact forces respectively.\n\n:param bool revertSign: it must be set to true if the contact law's convention takes compressive forces as positive.\n\n:param Real thresholdForce: if the fabric tensor is split into two parts, a threshold value can be specified otherwise the mean contact force is considered by default. It is worth to note that this value has a sign and the user needs to set it according to the convention adopted for the contact law. To note that this value could be set to zero if one wanted to make distinction between compressive and tensile forces.");
 	py::def("bodyStressTensors",Shop__getStressLWForEachBody,"Compute and return a table with per-particle stress tensors. Each tensor represents the average stress in one particle, obtained from the contour integral of applied load as detailed below. This definition is considering each sphere as a continuum. It can be considered exact in the context of spheres at static equilibrium, interacting at contact points with negligible volume changes of the solid phase (this last assumption is not restricting possible deformations and volume changes at the packing scale).\n\nProof: \n\nFirst, we remark the identity:  $\\sigma_{ij}=\\delta_{ik}\\sigma_{kj}=x_{i,k}\\sigma_{kj}=(x_{i}\\sigma_{kj})_{,k}-x_{i}\\sigma_{kj,k}$.\n\nAt equilibrium, the divergence of stress is null: $\\sigma_{kj,k}=\\vec{0}$. Consequently, after divergence theorem: $\\frac{1}{V}\\int_V \\sigma_{ij}dV = \\frac{1}{V}\\int_V (x_{i}\\sigma_{kj})_{,k}dV = \\frac{1}{V}\\int_{\\partial V}x_i\\sigma_{kj}n_kdS = \\frac{1}{V}\\sum_bx_i^bf_j^b$.\n\nThe last equality is implicitely based on the representation of external loads as Dirac distributions whose zeros are the so-called *contact points*: 0-sized surfaces on which the *contact forces* are applied, located at $x_i$ in the deformed configuration.\n\nA weighted average of per-body stresses will give the average stress inside the solid phase. There is a simple relation between the stress inside the solid phase and the stress in an equivalent continuum in the absence of fluid pressure. For porosity $n$, the relation reads: $\\sigma_{ij}^{equ.}=(1-n)\\sigma_{ij}^{solid}$.\n\nThis last relation may not be very useful if porosity is not homogeneous. If it happens, one can define the equivalent bulk stress a the particles scale by assigning a volume to each particle. This volume can be obtained from :yref:`TesselationWrapper` (see e.g. [Catalano2014a]_)");
