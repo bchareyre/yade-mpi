@@ -87,6 +87,9 @@ ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
+IF ( NOT LocalBoost )
+  SET(LocalBoost "1.47.0") # Minimal required Boost version
+ENDIF ( NOT LocalBoost )
 FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
@@ -324,7 +327,6 @@ ELSE(ENABLE_GL2PS)
 ENDIF(ENABLE_GL2PS)
 
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 
 #===========================================================
