@@ -18,7 +18,7 @@
 CREATE_LOGGER(SpherePack);
 
 using namespace std;
-using namespace boost;
+
 namespace py=boost::python;
 
 
@@ -36,7 +36,7 @@ void SpherePack::fromList(const py::list& l){
 
 void SpherePack::fromLists(const vector<Vector3r>& centers, const vector<Real>& radii){
 	pack.clear();
-	if(centers.size()!=radii.size()) throw std::invalid_argument(("The same number of centers and radii must be given (is "+lexical_cast<string>(centers.size())+", "+lexical_cast<string>(radii.size())+")").c_str());
+	if(centers.size()!=radii.size()) throw std::invalid_argument(("The same number of centers and radii must be given (is "+boost::lexical_cast<string>(centers.size())+", "+boost::lexical_cast<string>(radii.size())+")").c_str());
 	size_t l=centers.size();
 	for(size_t i=0; i<l; i++){
 		add(centers[i],radii[i]);
@@ -118,7 +118,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	// transform sizes and cummulated fractions values in something convenient for the generation process
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
-		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+lexical_cast<string>(psdSizes.size())+"!="+lexical_cast<string>(psdCumm.size())).c_str());
+		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+boost::lexical_cast<string>(psdSizes.size())+"!="+boost::lexical_cast<string>(psdCumm.size())).c_str());
 		if(psdSizes.size()<=1) throw invalid_argument("SpherePack.makeCloud: psdSizes must have at least 2 items");
 		if((*psdCumm.begin())!=0. && (*psdCumm.rbegin())!=1.) throw invalid_argument("SpherePack.makeCloud: first and last items of psdCumm *must* be exactly 0 and 1.");
 		psdRadii.reserve(psdSizes.size());
@@ -129,7 +129,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 				if (i==0) psdCumm2.push_back(0);
 				else psdCumm2.push_back(psdCumm2[i-1] + 3.0* (volume?volume:(area*psdSizes[psdSizes.size()-1])) *(1-porosity)/Mathr::PI*(psdCumm[i]-psdCumm[i-1])/(psdSizes[i]-psdSizes[i-1])*(pow(psdSizes[i-1],-2)-pow(psdSizes[i],-2)));
 			}
-			LOG_DEBUG(i<<". "<<psdRadii[i]<<", cdf="<<psdCumm[i]<<", cdf2="<<(distributeMass?lexical_cast<string>(psdCumm2[i]):string("--")));
+			LOG_DEBUG(i<<". "<<psdRadii[i]<<", cdf="<<psdCumm[i]<<", cdf2="<<(distributeMass?boost::lexical_cast<string>(psdCumm2[i]):string("--")));
 			// check monotonicity
 			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
 		}
@@ -540,7 +540,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 }
 
 bool SpherePack::hasClumps() const { FOREACH(const Sph& s, pack){ if(s.clumpId>=0) return true; } return false; }
-python::tuple SpherePack::getClumps() const{
+py::tuple SpherePack::getClumps() const{
 	std::map<int,py::list> clumps;
 	py::list standalone; size_t packSize=pack.size();
 	for(size_t i=0; i<packSize; i++){
@@ -552,6 +552,6 @@ python::tuple SpherePack::getClumps() const{
 	py::list clumpList;
 	typedef std::pair<int,py::list> intListPair;
 	FOREACH(const intListPair& c, clumps) clumpList.append(c.second);
-	return python::make_tuple(standalone,clumpList); 
+	return py::make_tuple(standalone,clumpList); 
 }
 

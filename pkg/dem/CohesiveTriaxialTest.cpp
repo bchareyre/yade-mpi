@@ -49,9 +49,6 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-
-
-using namespace boost;
 using namespace std;
 
 
@@ -391,14 +388,14 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 				break;
 			}
 		}
-		if (t==tries) return "More than " + lexical_cast<string>(tries) +
+		if (t==tries) return "More than " + boost::lexical_cast<string>(tries) +
 					" tries while generating sphere number " +
-					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
+					boost::lexical_cast<string>(i+1) + "/" + boost::lexical_cast<string>(number) + ".";
 	}
-	return "Generated a sample with " + lexical_cast<string>(number) + "spheres inside box of dimensions: ("
-			+ lexical_cast<string>(dimensions[0]) + ","
-			+ lexical_cast<string>(dimensions[1]) + ","
-			+ lexical_cast<string>(dimensions[2]) + ").";
+	return "Generated a sample with " + boost::lexical_cast<string>(number) + "spheres inside box of dimensions: ("
+			+ boost::lexical_cast<string>(dimensions[0]) + ","
+			+ boost::lexical_cast<string>(dimensions[1]) + ","
+			+ boost::lexical_cast<string>(dimensions[2]) + ").";
 }
 
 

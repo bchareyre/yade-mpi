@@ -2,7 +2,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/dem/Integrator.hpp>
 #include<boost/python.hpp>
-using namespace boost;
+
 #ifdef YADE_OPENMP
   #include<omp.h>
 #endif
@@ -325,25 +325,25 @@ void Integrator::saveMaximaDisplacement(const shared_ptr<Body>& b){
 	maxVelocitySq=max(maxVelocitySq,maxDisp);
 }
 
-void Integrator::slaves_set(const python::list& slaves2){
+void Integrator::slaves_set(const boost::python::list& slaves2){
 std::cout<<"Adding slaves";
-	int len=python::len(slaves2);
+	int len=boost::python::len(slaves2);
 	slaves.clear();
 	for(int i=0; i<len; i++){
-		python::extract<std::vector<shared_ptr<Engine> > > serialGroup(slaves2[i]);
+		boost::python::extract<std::vector<shared_ptr<Engine> > > serialGroup(slaves2[i]);
 		if (serialGroup.check()){ slaves.push_back(serialGroup()); continue; }
-		python::extract<shared_ptr<Engine> > serialAlone(slaves2[i]);
+		boost::python::extract<shared_ptr<Engine> > serialAlone(slaves2[i]);
 		if (serialAlone.check()){ vector<shared_ptr<Engine> > aloneWrap; aloneWrap.push_back(serialAlone()); slaves.push_back(aloneWrap); continue; }
 		PyErr_SetString(PyExc_TypeError,"Engines that are given to Integrator should be in two cases (a) in an ordered group, (b) alone engines");
-		python::throw_error_already_set();
+		boost::python::throw_error_already_set();
 	}
 }
 
-python::list Integrator::slaves_get(){
-	python::list ret;
+boost::python::list Integrator::slaves_get(){
+	boost::python::list ret;
 	FOREACH(vector<shared_ptr<Engine > >& grp, slaves){
-		if(grp.size()==1) ret.append(python::object(grp[0]));
-		else ret.append(python::object(grp));
+		if(grp.size()==1) ret.append(boost::python::object(grp[0]));
+		else ret.append(boost::python::object(grp));
 	}
 	return ret;
 }

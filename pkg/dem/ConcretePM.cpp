@@ -465,7 +465,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 
 	void Gl1_CpmPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-		const shared_ptr<CpmPhys>& phys = static_pointer_cast<CpmPhys>(ip);
+		const shared_ptr<CpmPhys>& phys = boost::static_pointer_cast<CpmPhys>(ip);
 		const shared_ptr<GenericSpheresContact>& geom = YADE_PTR_CAST<GenericSpheresContact>(i->geom);
 		// FIXME: get the scene for periodicity; ugly!
 		Scene* scene=Omega::instance().getScene().get();
@@ -518,7 +518,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 			glPopMatrix();
 		}
 
-		Vector3r cp = static_pointer_cast<GenericSpheresContact>(i->geom)->contactPoint;
+		Vector3r cp = boost::static_pointer_cast<GenericSpheresContact>(i->geom)->contactPoint;
 		if (scene->isPeriodic) {cp = scene->cell->wrapShearedPt(cp);}
 		if (epsT) {
 			Real maxShear = (phys->undamagedCohesion-phys->sigmaN*phys->tanFrictionAngle)/phys->G;

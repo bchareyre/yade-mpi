@@ -40,7 +40,7 @@ Because we need literal functor and class names for registration in python, we p
 #define _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(Dim,DispatcherT,FunctorT,doc,attrs,ctor,py) \
 	typedef FunctorT FunctorType; \
 	void updateScenePtr(){ FOREACH(shared_ptr<FunctorT> f, functors){ f->scene=scene; }} \
-	void postLoad(DispatcherT&){ clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(static_pointer_cast<FunctorT>(f)); } \
+	void postLoad(DispatcherT&){ clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(boost::static_pointer_cast<FunctorT>(f)); } \
 	virtual void add(FunctorT* f){ add(shared_ptr<FunctorT>(f)); } \
 	virtual void add(shared_ptr<FunctorT> f){ bool dupe=false; string fn=f->getClassName(); FOREACH(const shared_ptr<FunctorT>& f, functors) { if(fn==f->getClassName()) dupe=true; } if(!dupe) functors.push_back(f); addFunctor(f); } \
 	BOOST_PP_CAT(_YADE_DISPATCHER,BOOST_PP_CAT(Dim,D_FUNCTOR_ADD))(FunctorT,f) \

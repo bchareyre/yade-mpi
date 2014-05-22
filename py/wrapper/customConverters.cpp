@@ -43,11 +43,7 @@
 #endif
 #include<yade/pkg/common/MatchMaker.hpp>
 
-
-
-
 using namespace boost::python;
-
 
 // move this to the miniEigen wrapper later
 
@@ -154,43 +150,7 @@ struct custom_ptrMatchMaker_from_float{
 	}
 };
 
-#if 0
-template<typename numT, int dim>
-struct custom_numpyBoost_to_py{
-	static PyObject* convert(numpy_boost<numT, dim> nb){
-		return nb.py_ptr(); // handles incref internally
-	}
-};
-#endif
-
-#if 0
-template<typename T>
-std::string vectorRepr(const vector<T>& v){ std::string ret("["); for(size_t i=0; i<v.size(); i++) { if(i>0) ret+=","; ret+=lexical_cast<string>(v[i]); } return ret+"]"; }
-template<>
-std::string vectorRepr(const vector<std::string>& v){ std::string ret("["); for(size_t i=0; i<v.size(); i++) { if(i>0) ret+=","; ret+="'"+lexical_cast<string>(v[i])+"'"; } return ret+"]"; }
-
-// is not picked up?
-bool operator<(const Vector3r& a, const Vector3r& b){ return a[0]<b[0]; }
-#endif
-
-
-using namespace boost::python;
-
 BOOST_PYTHON_MODULE(_customConverters){
-
-	// syntax ??
-	//   http://language-binding.net/pyplusplus/documentation/indexing_suite_v2.html.html#container_proxy
-	//   http://www.mail-archive.com/cplusplus-sig@python.org/msg00862.html
-	//class_<indexing::container_proxy<std::vector<string> >,bases<class_<std::vector<string> > > >("vecStr").def(indexing::container_suite<indexing::container_proxy<std::vector<string> > >());
-	//class_<std::vector<string> >("vecStr").def(indexing::container_suite<std::vector<string> >());
-
-	#if 0
-		custom_vector_from_seq<string>(); class_<std::vector<string> >("vector_" "string").def(indexing::container_suite<std::vector<string> >()).def("__repr__",&vectorRepr<string>);
-		custom_vector_from_seq<int>(); class_<std::vector<int> >("vector_" "int").def(indexing::container_suite<std::vector<int> >()).def("__repr__",&vectorRepr<int>);
-		custom_vector_from_seq<Real>(); class_<std::vector<Real> >("vector_" "Real").def(indexing::container_suite<std::vector<Real> >()).def("__repr__",&vectorRepr<Real>);
-		// this needs operator< for Vector3r (defined above, but not picked up for some reason)
-		custom_vector_from_seq<Vector3r>(); class_<std::vector<Vector3r> >("vector_" "Vector3r").def(indexing::container_suite<std::vector<Vector3r> >()).def("__repr__",&vectorRepr<Vector3r>);
-	#endif
 
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
 

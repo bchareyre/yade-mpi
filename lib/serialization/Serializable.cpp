@@ -14,7 +14,7 @@
 void Serializable::pyRegisterClass(boost::python::object _scope) {
 	checkPyClassRegistersItself("Serializable");
 	boost::python::scope thisScope(_scope); 
-	boost::python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
+	boost::python::class_<Serializable, shared_ptr<Serializable>, boost::noncopyable >("Serializable")
 		.def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr)
 		.def("dict",&Serializable::pyDict,"Return dictionary of attributes.")
 		.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary")
@@ -40,8 +40,8 @@ void Serializable::checkPyClassRegistersItself(const std::string& thisClassName)
 void Serializable::pyUpdateAttrs(const boost::python::dict& d){	
 	boost::python::list l=d.items(); size_t ll=boost::python::len(l); if(ll==0) return;
 	for(size_t i=0; i<ll; i++){
-		boost::python::tuple t=boost::python::extract<python::tuple>(l[i]);
-		string key=python::extract<string>(t[0]);
+		boost::python::tuple t=boost::python::extract<boost::python::tuple>(l[i]);
+		string key=boost::python::extract<string>(t[0]);
 		pySetAttr(key,t[1]);
 	}
 	callPostLoad();

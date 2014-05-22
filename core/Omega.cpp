@@ -167,7 +167,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 		if(getenv("YADE_DEBUG")) cerr<<endl<<"[[[ Round "<<i<<" ]]]: ";
 		std::list<string> done;
 		for(std::list<string>::iterator I=pythonables.begin(); I!=pythonables.end(); ){
-			shared_ptr<Serializable> s=static_pointer_cast<Serializable>(ClassFactory::instance().createShared(*I));
+			shared_ptr<Serializable> s=boost::static_pointer_cast<Serializable>(ClassFactory::instance().createShared(*I));
 			try{
 				if(getenv("YADE_DEBUG")) cerr<<"{{"<<*I<<"}}";
 				s->pyRegisterClass(wrapperScope);

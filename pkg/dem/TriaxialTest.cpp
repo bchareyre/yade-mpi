@@ -56,7 +56,6 @@
 CREATE_LOGGER(TriaxialTest);
 YADE_PLUGIN((TriaxialTest));
 
-using namespace boost;
 using namespace std;
 
 TriaxialTest::~TriaxialTest () {}

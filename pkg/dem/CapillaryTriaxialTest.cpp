@@ -53,11 +53,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-
-
-using namespace boost;
 using namespace std;
-
 
 typedef pair<Vector3r, Real> BasicSphere;
 //! generate a list of non-overlapping spheres

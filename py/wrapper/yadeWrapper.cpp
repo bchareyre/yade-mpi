@@ -63,7 +63,6 @@
 #include<locale>
 #include<boost/archive/codecvt_null.hpp>
 
-using namespace boost;
 using namespace std;
 namespace py = boost::python;
 
@@ -84,7 +83,7 @@ class pyBodyIterator{
 	shared_ptr<Body> pyNext(){
 		BodyContainer::iterator ret;
 		while(I!=Iend){ ret=I; ++I; if(*ret) return *ret; }
-		PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); /* never reached, but makes the compiler happier */ throw;
+		PyErr_SetNone(PyExc_StopIteration); py::throw_error_already_set(); /* never reached, but makes the compiler happier */ throw;
 	}
 };
 
@@ -93,7 +92,7 @@ class pyBodyContainer{
 		void checkClump(shared_ptr<Body> b){
 			if (!(b->isClump())){
 				PyErr_SetString(PyExc_TypeError,("Error: Body"+lexical_cast<string>(b->getId())+" is not a clump.").c_str());
-				python::throw_error_already_set();
+				py::throw_error_already_set();
 			}
 		}
 		typedef std::map<Body::id_t,Se3r> MemberMap;
@@ -103,12 +102,12 @@ class pyBodyContainer{
 	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
 	shared_ptr<Body> pyGetitem(Body::id_t _id){
 		int id=(_id>=0 ? _id : proxee->size()+_id);
-		if(id<0 || (size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
+		if(id<0 || (size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); py::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
 		else return (*proxee)[id];
 	}
 	Body::id_t append(shared_ptr<Body> b){
 		// shoud be >=0, but Body is by default created with id 0... :-|
-		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); python::throw_error_already_set(); }
+		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); py::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
 	vector<Body::id_t> appendList(vector<shared_ptr<Body> > bb){
@@ -152,16 +151,16 @@ class pyBodyContainer{
 		Clump::updateProperties(clumpBody, discretization);
 		return clumpBody->getId();
 	}
-	python::tuple appendClump(vector<shared_ptr<Body> > bb, unsigned int discretization){
+	py::tuple appendClump(vector<shared_ptr<Body> > bb, unsigned int discretization){
 		// append constituent particles
 		vector<Body::id_t> ids(appendList(bb));
 		// clump them together (the clump fcn) and return
-		return python::make_tuple(clump(ids, discretization),ids);
+		return py::make_tuple(clump(ids, discretization),ids);
 	}
-	void updateClumpProperties(python::list excludeList,unsigned int discretization){
+	void updateClumpProperties(py::list excludeList,unsigned int discretization){
 		//convert excludeList to a c++ list
 		vector<Body::id_t> excludeListC;
-		for (int ii = 0; ii < python::len(excludeList); ii++) excludeListC.push_back(python::extract<Body::id_t>(excludeList[ii])());
+		for (int ii = 0; ii < py::len(excludeList); ii++) excludeListC.push_back(py::extract<Body::id_t>(excludeList[ii])());
 		FOREACH(const shared_ptr<Body>& b, *proxee){
 			if ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) {
 				if (b->isClump()) Clump::updateProperties(b, discretization);
@@ -208,23 +207,23 @@ class pyBodyContainer{
 			} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" must be a clump member of clump "+lexical_cast<string>(cid)+". Body was not released.").c_str()); return;}
 		} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is not a clump member. Body was not released.").c_str()); return;}
 	}
-	python::list replaceByClumps(python::list ctList, vector<Real> amounts, unsigned int discretization){
-		python::list ret;
+	py::list replaceByClumps(py::list ctList, vector<Real> amounts, unsigned int discretization){
+		py::list ret;
 		Real checkSum = 0.0;
 		FOREACH(Real amount, amounts) {
 			if (amount < 0.0) {
 				PyErr_SetString(PyExc_ValueError,("Error: One or more of given amounts are negative!")); 
-				python::throw_error_already_set();
+				py::throw_error_already_set();
 			}
 			else checkSum += amount;
 		}
 		if (checkSum > 1.0){
 			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
-			python::throw_error_already_set();
+			py::throw_error_already_set();
 		}
-		if (python::len(ctList) != (unsigned) amounts.size()) {//avoid unsigned comparison warning
-			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+lexical_cast<string>(amounts.size())+") differs from length of template list ("+lexical_cast<string>(python::len(ctList))+").").c_str()); 
-			python::throw_error_already_set();
+		if (py::len(ctList) != (unsigned) amounts.size()) {//avoid unsigned comparison warning
+			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+lexical_cast<string>(amounts.size())+") differs from length of template list ("+lexical_cast<string>(py::len(ctList))+").").c_str()); 
+			py::throw_error_already_set();
 		}
 		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
 		static boost::minstd_rand randGen((int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
@@ -247,10 +246,10 @@ class pyBodyContainer{
 			//relPosList: [relPos1,relPos2, ...] (list of vectors)
 			
 			//extract attributes from python objects:
-			python::object ctTmp = ctList[ii];
-			int numCM = python::extract<int>(ctTmp.attr("numCM"))();// number of clump members
-			python::list relRadListTmp = python::extract<python::list>(ctTmp.attr("relRadii"))();
-			python::list relPosListTmp = python::extract<python::list>(ctTmp.attr("relPositions"))();
+			py::object ctTmp = ctList[ii];
+			int numCM = py::extract<int>(ctTmp.attr("numCM"))();// number of clump members
+			py::list relRadListTmp = py::extract<py::list>(ctTmp.attr("relRadii"))();
+			py::list relPosListTmp = py::extract<py::list>(ctTmp.attr("relPositions"))();
 			
 			//get relative radii and positions; calculate volumes; get balance point: get axis aligned bounding box; get minimum radius;
 			vector<Real> relRadTmp(numCM), relVolTmp(numCM);
@@ -258,9 +257,9 @@ class pyBodyContainer{
 			Vector3r relPosTmpMean = Vector3r::Zero();
 			Real rMin=1./0.; AlignedBox3r aabb;
 			for (int jj = 0; jj < numCM; jj++) {
-				relRadTmp[jj] = python::extract<Real>(relRadListTmp[jj])();
+				relRadTmp[jj] = py::extract<Real>(relRadListTmp[jj])();
 				relVolTmp[jj] = (4./3.)*Mathr::PI*pow(relRadTmp[jj],3.);
-				relPosTmp[jj] = python::extract<Vector3r>(relPosListTmp[jj])();
+				relPosTmp[jj] = py::extract<Vector3r>(relPosListTmp[jj])();
 				relPosTmpMean += relPosTmp[jj];
 				aabb.extend(relPosTmp[jj] + Vector3r::Constant(relRadTmp[jj]));
 				aabb.extend(relPosTmp[jj] - Vector3r::Constant(relRadTmp[jj]));
@@ -384,19 +383,19 @@ class pyBodyContainer{
 				omp_unset_lock(&locker);//end of critical section
 				#endif
 				Body::id_t newClumpId = clump(idsTmp, discretization);
-				ret.append(python::make_tuple(newClumpId,idsTmp));
+				ret.append(py::make_tuple(newClumpId,idsTmp));
 				erase(b->id,false);
 			}
 		}
 		return ret;
 	}
-	Real getRoundness(python::list excludeList){
+	Real getRoundness(py::list excludeList){
 		Scene* scene(Omega::instance().getScene().get());	// get scene
 		shared_ptr<Sphere> sph (new Sphere);
 		int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
 		//convert excludeList to a c++ list
 		vector<Body::id_t> excludeListC;
-		for (int ii = 0; ii < python::len(excludeList); ii++) excludeListC.push_back(python::extract<Body::id_t>(excludeList[ii])());
+		for (int ii = 0; ii < py::len(excludeList); ii++) excludeListC.push_back(py::extract<Body::id_t>(excludeList[ii])());
 		Real RC_sum = 0.0;	//sum of local roundnesses
 		Real R1, R2, vol, dens;
 		int c = 0;		//counter
@@ -444,18 +443,18 @@ class pyTags{
 				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); return val1;}
 			}
 			PyErr_SetString(PyExc_KeyError,("Invalid key: "+key+".").c_str());
-			python::throw_error_already_set(); /* make compiler happy; never reached */ return string();
+			py::throw_error_already_set(); /* make compiler happy; never reached */ return string();
 		}
 		void setItem(const string& key,const string& item){
 			if(key.find("=")!=string::npos) {
 				PyErr_SetString(PyExc_KeyError, "Key must not contain the '=' character (implementation limitation; sorry).");
-				python::throw_error_already_set();
+				py::throw_error_already_set();
 			}
 			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=key+"="+item; return; } }
 			mb->tags.push_back(key+"="+item);
 			}
-		python::list keys(){
-			python::list ret;
+		py::list keys(){
+			py::list ret;
 			FOREACH(string val, mb->tags){
 				size_t i=val.find("=");
 				if(i==string::npos) throw runtime_error("Tags must be in the key=value format (internal error?)");
@@ -474,7 +473,7 @@ class pyInteractionIterator{
 	shared_ptr<Interaction> pyNext(){
 		InteractionContainer::iterator ret;
 		while(I!=Iend){ ret=I; ++I; if((*ret)->isReal()) return *ret; }
-		PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set();
+		PyErr_SetNone(PyExc_StopIteration); py::throw_error_already_set();
 		throw; // to avoid compiler warning; never reached
 		//InteractionContainer::iterator ret=I; ++I; return *ret;
 	}
@@ -487,11 +486,11 @@ class pyInteractionContainer{
 		pyInteractionIterator pyIter(){return pyInteractionIterator(proxee);}
 		shared_ptr<Interaction> pyGetitem(vector<Body::id_t> id12){
 			//if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
-			//if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
+			//if(py::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
 			if(id12.size()==2){
 				//if(max(id12[0],id12[1])>
 				shared_ptr<Interaction> i=proxee->find(id12[0],id12[1]);
-				if(i) return i; else { PyErr_SetString(PyExc_IndexError,"No such interaction"); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>(); }
+				if(i) return i; else { PyErr_SetString(PyExc_IndexError,"No such interaction"); py::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>(); }
 			}
 			else if(id12.size()==1){ return (*proxee)[id12[0]];}
 			else throw invalid_argument("2 integers (id1,id2) or 1 integer (nth) required.");
@@ -500,12 +499,12 @@ class pyInteractionContainer{
 		shared_ptr<Interaction> pyNth(long n){
 			long i=0; FOREACH(shared_ptr<Interaction> I, *proxee){ if(!I->isReal()) continue; if(i++==n) return I; }
 			PyErr_SetString(PyExc_IndexError,(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").").c_str());
-			python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>();
+			py::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>();
 		}
 		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
-		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(I);} return ret;}
-		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(I);} return ret; }
+		py::list withBody(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(I);} return ret;}
+		py::list withBodyAll(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(I);} return ret; }
 		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
@@ -517,7 +516,7 @@ class pyForceContainer{
 		shared_ptr<Scene> scene;
 	public:
 		pyForceContainer(shared_ptr<Scene> _scene): scene(_scene) { }
-		void checkId(long id){ if(id<0 || (size_t)id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* never reached */ throw; } }
+		void checkId(long id){ if(id<0 || (size_t)id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); py::throw_error_already_set(); /* never reached */ throw; } }
 		Vector3r force_get(long id, bool sync){  checkId(id); if (!sync) return scene->forces.getForceSingle(id); scene->forces.sync(); return scene->forces.getForce(id);}
 		Vector3r torque_get(long id, bool sync){ checkId(id); if (!sync) return scene->forces.getTorqueSingle(id); scene->forces.sync(); return scene->forces.getTorque(id);}
 		Vector3r move_get(long id){ checkId(id); return scene->forces.getMoveSingle(id); }
@@ -538,11 +537,11 @@ class pyMaterialContainer{
 		shared_ptr<Scene> scene;
 	public:
 		pyMaterialContainer(shared_ptr<Scene> _scene): scene(_scene) { }
-		shared_ptr<Material> getitem_id(int _id){ int id=(_id>=0 ? _id : scene->materials.size()+_id); if(id<0 || (size_t)id>=scene->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); python::throw_error_already_set(); /* never reached */ throw; } return Material::byId(id,scene); }
+		shared_ptr<Material> getitem_id(int _id){ int id=(_id>=0 ? _id : scene->materials.size()+_id); if(id<0 || (size_t)id>=scene->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); py::throw_error_already_set(); /* never reached */ throw; } return Material::byId(id,scene); }
 		shared_ptr<Material> getitem_label(string label){
 			// translate runtime_error to KeyError (instead of RuntimeError) if the material doesn't exist
 			try { return Material::byLabel(label,scene);	}
-			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); python::throw_error_already_set(); /* never reached; avoids warning */ throw; }
+			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); py::throw_error_already_set(); /* never reached; avoids warning */ throw; }
 		}
 		int append(shared_ptr<Material> m){ scene->materials.push_back(m); m->id=scene->materials.size()-1; return m->id; }
 		vector<int> appendList(vector<shared_ptr<Material> > mm){ vector<int> ret; FOREACH(shared_ptr<Material>& m, mm) ret.push_back(append(m)); return ret; }
@@ -598,11 +597,11 @@ class pyOmega{
 			#undef _TRY_DISPATCHER
 		}
 	}
-	python::object labeled_engine_get(string label){
+	py::object labeled_engine_get(string label){
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
-			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(f->label==label) return python::object(f); }}
+			#define _DO_FUNCTORS(functors,FunctorT){ FOREACH(const shared_ptr<FunctorT>& f, functors){ if(f->label==label) return py::object(f); }}
 			#define _TRY_DISPATCHER(DispatcherT) { DispatcherT* d=dynamic_cast<DispatcherT*>(e.get()); if(d){ _DO_FUNCTORS(d->functors,DispatcherT::FunctorType); } }
-			if(e->label==label){ return python::object(e); }
+			if(e->label==label){ return py::object(e); }
 			_TRY_DISPATCHER(BoundDispatcher); _TRY_DISPATCHER(IGeomDispatcher); _TRY_DISPATCHER(IPhysDispatcher); _TRY_DISPATCHER(LawDispatcher);
 			InteractionLoop* id=dynamic_cast<InteractionLoop*>(e.get());
 			if(id){
@@ -666,7 +665,7 @@ class pyOmega{
 		LOG_ERROR("Simulation error encountered."); OMEGA.simulationLoop->workerThrew=false; throw OMEGA.simulationLoop->workerException;
 	}
 	bool isRunning(){ return OMEGA.isRunning(); }
-	python::object get_filename(){ string f=OMEGA.sceneFile; if(f.size()>0) return python::object(f); return python::object();}
+	py::object get_filename(){ string f=OMEGA.sceneFile; if(f.size()>0) return py::object(f); return py::object();}
 	void load(std::string fileName,bool quiet=false) {
 		Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; 
 		OMEGA.loadSimulation(fileName,quiet);
@@ -676,7 +675,7 @@ class pyOmega{
 	void reload(bool quiet=false){	load(OMEGA.sceneFile,quiet);}
 	void saveTmp(string mark="", bool quiet=false){ save(":memory:"+mark,quiet);}
 	void loadTmp(string mark="", bool quiet=false){ load(":memory:"+mark,quiet);}
-	python::list lsTmp(){ python::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
+	py::list lsTmp(){ py::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
 	void tmpToFile(string mark, string filename){
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
 		iostreams::filtering_ostream out;
@@ -720,8 +719,8 @@ class pyOmega{
 		// OMEGA.sceneFile=fileName; // done in Omega::saveSimulation;
 	}
 	
-	python::list miscParams_get(){
-		python::list ret;
+	py::list miscParams_get(){
+		py::list ret;
 		FOREACH(shared_ptr<Serializable>& s, OMEGA.getScene()->miscParams){
 			ret.append(s);
 		}
@@ -755,8 +754,8 @@ class pyOmega{
 	pyMaterialContainer materials_get(void){return pyMaterialContainer(OMEGA.getScene());}
 	
 
-	python::list listChildClassesNonrecursive(const string& base){
-		python::list ret;
+	py::list listChildClassesNonrecursive(const string& base){
+		py::list ret;
 		for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
 		return ret;
 	}
@@ -765,9 +764,9 @@ class pyOmega{
 		return (Omega::instance().isInheritingFrom_recursive(child,base));
 	}
 
-	python::list plugins_get(){
+	py::list plugins_get(){
 		const map<string,DynlibDescriptor>& plugins=Omega::instance().getDynlibsDescriptor();
-		std::pair<string,DynlibDescriptor> p; python::list ret;
+		std::pair<string,DynlibDescriptor> p; py::list ret;
 		FOREACH(p, plugins) ret.append(p.first);
 		return ret;
 	}
@@ -825,18 +824,18 @@ class pyOmega{
 
 BOOST_PYTHON_MODULE(wrapper)
 {
-	python::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
+	py::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
 
 	YADE_SET_DOCSTRING_OPTS;
 
-	python::enum_<yade::Attr::flags>("AttrFlags")
+	py::enum_<yade::Attr::flags>("AttrFlags")
 		.value("noSave",yade::Attr::noSave)
 		.value("readonly",yade::Attr::readonly)
 		.value("triggerPostLoad",yade::Attr::triggerPostLoad)
 		.value("noResize",yade::Attr::noResize)
     ;
 
-	python::class_<pyOmega>("Omega")
+	py::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
 		.add_property("subStep",&pyOmega::subStep,"Get the current subStep number (only meaningful if O.subStepping==True); -1 when outside the loop, otherwise either 0 (O.subStepping==False) or number of engine to be run (O.subStepping==True)")
 		.add_property("subStepping",&pyOmega::subStepping_get,&pyOmega::subStepping_set,"Get/set whether subStepping is active.")
@@ -854,9 +853,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("loadTmp",&pyOmega::loadTmp,(py::arg("mark")="",py::arg("quiet")=false),"Load simulation previously stored in memory by saveTmp. *mark* optionally distinguishes multiple saved simulations")
 		.def("saveTmp",&pyOmega::saveTmp,(py::arg("mark")="",py::arg("quiet")=false),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
 		.def("lsTmp",&pyOmega::lsTmp,"Return list of all memory-saved simulations.")
-		.def("tmpToFile",&pyOmega::tmpToFile,(python::arg("fileName"),python::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
-		.def("tmpToString",&pyOmega::tmpToString,(python::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")
-		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.")
+		.def("tmpToFile",&pyOmega::tmpToFile,(py::arg("fileName"),py::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
+		.def("tmpToString",&pyOmega::tmpToString,(py::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")
+		.def("run",&pyOmega::run,(py::arg("nSteps")=-1,py::arg("wait")=false),"Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.")
 		.def("pause",&pyOmega::pause,"Stop simulation execution. (May be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
@@ -870,7 +869,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("switchToScene",&pyOmega::switchToScene,"Switch to defined scene. Default scene has number 0, other scenes have to be created by addScene method.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
 		.def("sceneToString",&pyOmega::sceneToString,"Return the entire scene as a string. Equivalent to using O.save(...) except that the scene goes to a string instead of a file. (see also stringToScene())")
-		.def("stringToScene",&pyOmega::stringToScene,(python::arg("mark")=""),"Load simulation from a string passed as argument (see also sceneToString).")
+		.def("stringToScene",&pyOmega::stringToScene,(py::arg("mark")=""),"Load simulation from a string passed as argument (see also sceneToString).")
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example:\n\n\t *O.engines=[InsertionSortCollider(label='collider')]*\n\n\t *collider.nBins=5 # collider has become a variable after assignment to O.engines automatically*")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
@@ -893,36 +892,36 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
 		.add_property("cell",&pyOmega::cell_get,"Periodic cell of the current scene (None if the scene is aperiodic).")
 		.add_property("periodic",&pyOmega::periodic_get,&pyOmega::periodic_set,"Get/set whether the scene is periodic or not (True/False).")
-		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(python::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
+		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(py::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
 		.def("tmpFilename",&pyOmega::tmpFilename,"Return unique name of file in temporary directory which will be deleted when yade exits.")
 		;
-	python::class_<pyTags>("TagsWrapper","Container emulating dictionary semantics for accessing tags associated with simulation. Tags are accesed by strings.",python::init<pyTags&>())
+	py::class_<pyTags>("TagsWrapper","Container emulating dictionary semantics for accessing tags associated with simulation. Tags are accesed by strings.",py::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
 		.def("__setitem__",&pyTags::setItem)
 		.def("keys",&pyTags::keys)
 		.def("has_key",&pyTags::hasKey);
-	python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
+	py::class_<pyBodyContainer>("BodyContainer",py::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
 		.def("__len__",&pyBodyContainer::length)
 		.def("__iter__",&pyBodyContainer::pyIter)
 		.def("append",&pyBodyContainer::append,"Append one Body instance, return its id.")
 		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
-		.def("appendClumped",&pyBodyContainer::appendClump,(python::arg("discretization")=0),"Append given list of bodies as a clump (rigid aggregate); returns a tuple of ``(clumpId,[memberId1,memberId2,...])``. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).")
-		.def("clump",&pyBodyContainer::clump,(python::arg("discretization")=0),"Clump given bodies together (creating a rigid aggregate); returns ``clumpId``. Clump masses and inertia are adapted automatically when discretization>0. If clump members are overlapping this is done by integration/summation over mass points using a regular grid of cells (number of grid cells in one direction is defined as $R_{min}/discretization$, where $R_{min}$ is minimum clump member radius). For non-overlapping members inertia of the clump is the sum of inertias from members. If discretization<=0 sum of inertias from members is used (faster, but inaccurate).")
-		.def("updateClumpProperties",&pyBodyContainer::updateClumpProperties,(python::arg("excludeList")=python::list(),python::arg("discretization")=5),"Update clump properties mass, volume and inertia (for details of 'discretization' value see :yref:`clump()<BodyContainer.clump>`). Clumps can be excluded from the calculation by giving a list of ids: *O.bodies.updateProperties([ids])*.")
-		.def("addToClump",&pyBodyContainer::addToClump,(python::arg("discretization")=0),"Add body b (or a list of bodies) to an existing clump c. c must be clump and b may not be a clump member of c. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).\n\nSee :ysrc:`examples/clumps/addToClump-example.py` for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
-		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,(python::arg("discretization")=0),"Release body b from clump c. b must be a clump member of c. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).\n\nSee :ysrc:`examples/clumps/releaseFromClump-example.py` for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
-		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,(python::arg("discretization")=0),"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
-		.def("getRoundness",&pyBodyContainer::getRoundness,(python::arg("excludeList")=python::list()),"Returns roundness coefficient RC = R2/R1. R1 is the theoretical radius of a sphere, with same volume as clump. R2 is the minimum radius of a sphere, that imbeds clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
+		.def("appendClumped",&pyBodyContainer::appendClump,(py::arg("discretization")=0),"Append given list of bodies as a clump (rigid aggregate); returns a tuple of ``(clumpId,[memberId1,memberId2,...])``. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).")
+		.def("clump",&pyBodyContainer::clump,(py::arg("discretization")=0),"Clump given bodies together (creating a rigid aggregate); returns ``clumpId``. Clump masses and inertia are adapted automatically when discretization>0. If clump members are overlapping this is done by integration/summation over mass points using a regular grid of cells (number of grid cells in one direction is defined as $R_{min}/discretization$, where $R_{min}$ is minimum clump member radius). For non-overlapping members inertia of the clump is the sum of inertias from members. If discretization<=0 sum of inertias from members is used (faster, but inaccurate).")
+		.def("updateClumpProperties",&pyBodyContainer::updateClumpProperties,(py::arg("excludeList")=py::list(),py::arg("discretization")=5),"Update clump properties mass, volume and inertia (for details of 'discretization' value see :yref:`clump()<BodyContainer.clump>`). Clumps can be excluded from the calculation by giving a list of ids: *O.bodies.updateProperties([ids])*.")
+		.def("addToClump",&pyBodyContainer::addToClump,(py::arg("discretization")=0),"Add body b (or a list of bodies) to an existing clump c. c must be clump and b may not be a clump member of c. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).\n\nSee :ysrc:`examples/clumps/addToClump-example.py` for an example script.\n\n.. note:: If b is a clump itself, then all members will be added to c and b will be deleted. If b is a clump member of clump d, then all members from d will be added to c and d will be deleted. If you need to add just clump member b, :yref:`release<BodyContainer.releaseFromClump>` this member from d first.")
+		.def("releaseFromClump",&pyBodyContainer::releaseFromClump,(py::arg("discretization")=0),"Release body b from clump c. b must be a clump member of c. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`).\n\nSee :ysrc:`examples/clumps/releaseFromClump-example.py` for an example script.\n\n.. note:: If c contains only 2 members b will not be released and a warning will appear. In this case clump c should be :yref:`erased<BodyContainer.erase>`.")
+		.def("replaceByClumps",&pyBodyContainer::replaceByClumps,(py::arg("discretization")=0),"Replace spheres by clumps using a list of clump templates and a list of amounts; returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``. A new clump will have the same volume as the sphere, that was replaced. Clump masses and inertia are adapted automatically (for details see :yref:`clump()<BodyContainer.clump>`). \n\n\t *O.bodies.replaceByClumps( [utils.clumpTemplate([1,1],[.5,.5])] , [.9] ) #will replace 90 % of all standalone spheres by 'dyads'*\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
+		.def("getRoundness",&pyBodyContainer::getRoundness,(py::arg("excludeList")=py::list()),"Returns roundness coefficient RC = R2/R1. R1 is the theoretical radius of a sphere, with same volume as clump. R2 is the minimum radius of a sphere, that imbeds clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
-		.def("erase", &pyBodyContainer::erase,(python::arg("eraseClumpMembers")=0),"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step. If a clump is erased use *O.bodies.erase(clumpId,True)* to erase the clump AND its members.")
+		.def("erase", &pyBodyContainer::erase,(py::arg("eraseClumpMembers")=0),"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step. If a clump is erased use *O.bodies.erase(clumpId,True)* to erase the clump AND its members.")
 		.def("replace",&pyBodyContainer::replace);
-	python::class_<pyBodyIterator>("BodyIterator",python::init<pyBodyIterator&>())
+	py::class_<pyBodyIterator>("BodyIterator",py::init<pyBodyIterator&>())
 		.def("__iter__",&pyBodyIterator::pyIter)
 		.def("next",&pyBodyIterator::pyNext);
-	python::class_<pyInteractionContainer>("InteractionContainer","Access to :yref:`interactions<Interaction>` of simulation, by using \n\n#. id's of both :yref:`Bodies<Body>` of the interactions, e.g. ``O.interactions[23,65]``\n#. iteraction over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. note::\n\tIteration silently skips interactions that are not :yref:`real<Interaction.isReal>`.",python::init<pyInteractionContainer&>())
+	py::class_<pyInteractionContainer>("InteractionContainer","Access to :yref:`interactions<Interaction>` of simulation, by using \n\n#. id's of both :yref:`Bodies<Body>` of the interactions, e.g. ``O.interactions[23,65]``\n#. iteraction over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. note::\n\tIteration silently skips interactions that are not :yref:`real<Interaction.isReal>`.",py::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
@@ -934,28 +933,28 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("erase",&pyInteractionContainer::erase,"Erase one interaction, given by id1, id2 (internally, ``requestErase`` is called -- the interaction might still exist as potential, if the :yref:`Collider` decides so).")
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
 		.def("clear",&pyInteractionContainer::clear,"Remove all interactions, and invalidate persistent collider data (if the collider supports it).");
-	python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
+	py::class_<pyInteractionIterator>("InteractionIterator",py::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
 
-	python::class_<pyForceContainer>("ForceContainer",python::init<pyForceContainer&>())
-		.def("f",&pyForceContainer::force_get,(python::arg("id"),python::arg("sync")=false),"Force applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
-		.def("t",&pyForceContainer::torque_get,(python::arg("id"),python::arg("sync")=false),"Torque applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
-		.def("m",&pyForceContainer::torque_get,(python::arg("id"),python::arg("sync")=false),"Deprecated alias for t (torque).")
-		.def("move",&pyForceContainer::move_get,(python::arg("id")),"Displacement applied on body.")
-		.def("rot",&pyForceContainer::rot_get,(python::arg("id")),"Rotation applied on body.")
-		.def("addF",&pyForceContainer::force_add,(python::arg("id"),python::arg("f"),python::arg("permanent")=false),"Apply force on body (accumulates).\n\n # If permanent=false (default), the force applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addF(id,f,True) or removed by reset(resetAll=True). The permanent force on a body can be checked with permF(id).")
-		.def("addT",&pyForceContainer::torque_add,(python::arg("id"),python::arg("t"),python::arg("permanent")=false),"Apply torque on body (accumulates). \n\n # If permanent=false (default), the torque applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addT(id,f,True) or removed by reset(resetAll=True). The permanent torque on a body can be checked with permT(id).")
-		.def("permF",&pyForceContainer::permForce_get,(python::arg("id")),"read the value of permanent force on body (set with setPermF()).")
-		.def("permT",&pyForceContainer::permTorque_get,(python::arg("id")),"read the value of permanent torque on body (set with setPermT()).")
-		.def("addMove",&pyForceContainer::move_add,(python::arg("id"),python::arg("m")),"Apply displacement on body (accumulates).")
-		.def("addRot",&pyForceContainer::rot_add,(python::arg("id"),python::arg("r")),"Apply rotation on body (accumulates).")
-		.def("reset",&pyForceContainer::reset,(python::arg("resetAll")=true),"Reset the force container, including user defined permanent forces/torques. resetAll=False will keep permanent forces/torques unchanged.")
+	py::class_<pyForceContainer>("ForceContainer",py::init<pyForceContainer&>())
+		.def("f",&pyForceContainer::force_get,(py::arg("id"),py::arg("sync")=false),"Force applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
+		.def("t",&pyForceContainer::torque_get,(py::arg("id"),py::arg("sync")=false),"Torque applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
+		.def("m",&pyForceContainer::torque_get,(py::arg("id"),py::arg("sync")=false),"Deprecated alias for t (torque).")
+		.def("move",&pyForceContainer::move_get,(py::arg("id")),"Displacement applied on body.")
+		.def("rot",&pyForceContainer::rot_get,(py::arg("id")),"Rotation applied on body.")
+		.def("addF",&pyForceContainer::force_add,(py::arg("id"),py::arg("f"),py::arg("permanent")=false),"Apply force on body (accumulates).\n\n # If permanent=false (default), the force applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addF(id,f,True) or removed by reset(resetAll=True). The permanent force on a body can be checked with permF(id).")
+		.def("addT",&pyForceContainer::torque_add,(py::arg("id"),py::arg("t"),py::arg("permanent")=false),"Apply torque on body (accumulates). \n\n # If permanent=false (default), the torque applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addT(id,f,True) or removed by reset(resetAll=True). The permanent torque on a body can be checked with permT(id).")
+		.def("permF",&pyForceContainer::permForce_get,(py::arg("id")),"read the value of permanent force on body (set with setPermF()).")
+		.def("permT",&pyForceContainer::permTorque_get,(py::arg("id")),"read the value of permanent torque on body (set with setPermT()).")
+		.def("addMove",&pyForceContainer::move_add,(py::arg("id"),py::arg("m")),"Apply displacement on body (accumulates).")
+		.def("addRot",&pyForceContainer::rot_add,(py::arg("id"),py::arg("r")),"Apply rotation on body (accumulates).")
+		.def("reset",&pyForceContainer::reset,(py::arg("resetAll")=true),"Reset the force container, including user defined permanent forces/torques. resetAll=False will keep permanent forces/torques unchanged.")
 		.def("getPermForceUsed",&pyForceContainer::getPermForceUsed,"Check wether permanent forces are present.")
 		.add_property("syncCount",&pyForceContainer::syncCount_get,&pyForceContainer::syncCount_set,"Number of synchronizations  of ForceContainer (cummulative); if significantly higher than number of steps, there might be unnecessary syncs hurting performance.")
 		;
 
-	python::class_<pyMaterialContainer>("MaterialContainer","Container for :yref:`Materials<Material>`. A material can be accessed using \n\n #. numerical index in range(0,len(cont)), like cont[2]; \n #. textual label that was given to the material, like cont['steel']. This etails traversing all materials and should not be used frequently.",python::init<pyMaterialContainer&>())
+	py::class_<pyMaterialContainer>("MaterialContainer","Container for :yref:`Materials<Material>`. A material can be accessed using \n\n #. numerical index in range(0,len(cont)), like cont[2]; \n #. textual label that was given to the material, like cont['steel']. This etails traversing all materials and should not be used frequently.",py::init<pyMaterialContainer&>())
 		.def("append",&pyMaterialContainer::append,"Add new shared :yref:`Material`; changes its id and return it.")
 		.def("append",&pyMaterialContainer::appendList,"Append list of :yref:`Material` instances, return list of ids.")
 		.def("index",&pyMaterialContainer::index,"Return id of material, given its label.")
@@ -963,14 +962,14 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__getitem__",&pyMaterialContainer::getitem_label)
 		.def("__len__",&pyMaterialContainer::len);
 
-	python::class_<STLImporter>("STLImporter").def("ymport",&STLImporter::import);
+	py::class_<STLImporter>("STLImporter").def("ymport",&STLImporter::import);
 
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
-	Serializable().pyRegisterClass(python::scope());
+	Serializable().pyRegisterClass(py::scope());
 
-	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData,"Get timing data as list of tuples (label, execTime[nsec], execCount) (one tuple per checkpoint)").def("reset",&TimingDeltas::reset,"Reset timing information");
+	py::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData,"Get timing data as list of tuples (label, execTime[nsec], execCount) (one tuple per checkpoint)").def("reset",&TimingDeltas::reset,"Reset timing information");
 
-	python::scope().attr("O")=pyOmega();
+	py::scope().attr("O")=pyOmega();
 }
 
