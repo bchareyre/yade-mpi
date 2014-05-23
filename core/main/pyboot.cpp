@@ -38,7 +38,7 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 	#ifdef YADE_DEBUG
 		ofstream gdbBatch;
 		O.gdbCrashBatch=O.tmpFilename();
-		gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
+		gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<boost::lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
 		signal(SIGABRT,crashHandler);
 		signal(SIGSEGV,crashHandler);
 	#endif

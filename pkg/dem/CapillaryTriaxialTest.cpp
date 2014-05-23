@@ -197,7 +197,7 @@ bool CapillaryTriaxialTest::generate(std::string& message)
 	
 	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
-//  		+ lexical_cast<string>(lowerCorner[0]) + "," 
+//  		+ boost::lexical_cast<string>(lowerCorner[0]) + "," 
 //  		+ boost::lexical_cast<string>(lowerCorner[1]) + "," 
 //  		+ boost::lexical_cast<string>(lowerCorner[2]) + ") and (" 
 //  		+ boost::lexical_cast<string>(upperCorner[0]) + "," 

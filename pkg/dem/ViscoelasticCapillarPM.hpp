@@ -97,8 +97,8 @@ class LiqControl: public PartialEngine{
 		((Real,vMaxCoef,0.03,, "Coefficient for vMax, [-]."))
 		,/* ctor */
 		,/* py */
-		.def("totalLiq",&LiqControl::totalLiqVol,(python::arg("mask")=0),"Return total volume of water in simulation.")
-		.def("liqBody",&LiqControl::liqVolBody,(python::arg("id")=-1),"Return total volume of water in body.")
+		.def("totalLiq",&LiqControl::totalLiqVol,(boost::python::arg("mask")=0),"Return total volume of water in simulation.")
+		.def("liqBody",&LiqControl::liqVolBody,(boost::python::arg("id")=-1),"Return total volume of water in body.")
   );
 };
 

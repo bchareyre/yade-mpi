@@ -46,10 +46,10 @@ class SoluteFlowEngine : public SoluteFlowEngineT
 		///No additional variable yet, else input here
 // 		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
 		,,,
-		.def("soluteTransport",&SoluteFlowEngine::soluteTransport,(python::arg("deltatime"),python::arg("D")),"Solute transport (advection and diffusion) engine for diffusion use a diffusion coefficient (D) other than 0.")
-		.def("getConcentration",&SoluteFlowEngine::getConcentration,(python::arg("id")),"get concentration of pore with ID")
-		.def("insertConcentration",&SoluteFlowEngine::insertConcentration,(python::arg("id"),python::arg("conc")),"Insert Concentration (ID, Concentration)")
-		.def("solute_BC",&SoluteFlowEngine::soluteBC,(python::arg("bc_id1"),python::arg("bc_id2"),python::arg("bc_concentration1"),python::arg("bc_concentration2"),python::arg("s")),"Enter X,Y,Z for concentration observation'.")
+		.def("soluteTransport",&SoluteFlowEngine::soluteTransport,(boost::python::arg("deltatime"),boost::python::arg("D")),"Solute transport (advection and diffusion) engine for diffusion use a diffusion coefficient (D) other than 0.")
+		.def("getConcentration",&SoluteFlowEngine::getConcentration,(boost::python::arg("id")),"get concentration of pore with ID")
+		.def("insertConcentration",&SoluteFlowEngine::insertConcentration,(boost::python::arg("id"),boost::python::arg("conc")),"Insert Concentration (ID, Concentration)")
+		.def("solute_BC",&SoluteFlowEngine::soluteBC,(boost::python::arg("bc_id1"),boost::python::arg("bc_id2"),boost::python::arg("bc_concentration1"),boost::python::arg("bc_concentration2"),boost::python::arg("s")),"Enter X,Y,Z for concentration observation'.")
 		//I guess there is getConcentrationPlane missing here, but it is not on github
 		)
 };
