@@ -647,7 +647,7 @@ void VTKRecorder::action(){
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			if(ascii) writer->SetDataModeToAscii();
-			string fn=fileName+"spheres."+lexical_cast<string>(scene->iter)+".vtu";
+			string fn=fileName+"spheres."+boost::lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			#ifdef YADE_VTK6
 				writer->SetInputData(spheresUg);
@@ -675,7 +675,7 @@ void VTKRecorder::action(){
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			if(ascii) writer->SetDataModeToAscii();
-			string fn=fileName+"facets."+lexical_cast<string>(scene->iter)+".vtu";
+			string fn=fileName+"facets."+boost::lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			#ifdef YADE_VTK6
 				writer->SetInputData(facetsUg);
@@ -703,7 +703,7 @@ void VTKRecorder::action(){
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			if(ascii) writer->SetDataModeToAscii();
-			string fn=fileName+"boxes."+lexical_cast<string>(scene->iter)+".vtu";
+			string fn=fileName+"boxes."+boost::lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			#ifdef YADE_VTK6
 				writer->SetInputData(boxesUg);
@@ -740,7 +740,7 @@ void VTKRecorder::action(){
 			vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			if(ascii) writer->SetDataModeToAscii();
-			string fn=fileName+"intrs."+lexical_cast<string>(scene->iter)+".vtp";
+			string fn=fileName+"intrs."+boost::lexical_cast<string>(scene->iter)+".vtp";
 			writer->SetFileName(fn.c_str());
 			#ifdef YADE_VTK6
 				writer->SetInputData(intrPd);
@@ -761,7 +761,7 @@ void VTKRecorder::action(){
 			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			if(compress) writer->SetCompressor(compressor);
 			if(ascii) writer->SetDataModeToAscii();
-			string fn=fileName+"pericell."+lexical_cast<string>(scene->iter)+".vtu";
+			string fn=fileName+"pericell."+boost::lexical_cast<string>(scene->iter)+".vtu";
 			writer->SetFileName(fn.c_str());
 			#ifdef YADE_VTK6
 				writer->SetInputData(pericellUg);
@@ -818,7 +818,7 @@ void VTKRecorder::action(){
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
 		if(ascii) writer->SetDataModeToAscii();
-		string fn=fileName+"cracks."+lexical_cast<string>(scene->iter)+".vtu";
+		string fn=fileName+"cracks."+boost::lexical_cast<string>(scene->iter)+".vtu";
 		writer->SetFileName(fn.c_str());
 		#ifdef YADE_VTK6
 			writer->SetInputData(crackUg);
@@ -835,7 +835,7 @@ void VTKRecorder::action(){
 // 		crackUgNew->GetPointData()->AddArray(crackSizeNew);
 // 		crackUgNew->GetPointData()->AddArray(crackNormNew); //same remark about the orientation...
 // 	
-// 		fn=fileName+"newcracks."+lexical_cast<string>(scene->iter)+".vtu";
+// 		fn=fileName+"newcracks."+boost::lexical_cast<string>(scene->iter)+".vtu";
 // 		writer->SetFileName(fn.c_str());
 // 		#ifdef YADE_VTK6
 // 			writer->SetInputData(crackUgNew);
@@ -855,7 +855,7 @@ void VTKRecorder::action(){
 			if(recActive[REC_PERICELL]) multiblockDataset->SetBlock(i++,pericellUg);
 			vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
 			if(ascii) writer->SetDataModeToAscii();
-			string fn=fileName+lexical_cast<string>(scene->iter)+".vtm";
+			string fn=fileName+boost::lexical_cast<string>(scene->iter)+".vtm";
 			writer->SetFileName(fn.c_str());
 			#ifdef YADE_VTK6
 				writer->SetInputData(multiblockDataset);

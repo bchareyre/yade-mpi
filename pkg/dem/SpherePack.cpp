@@ -51,12 +51,12 @@ py::list SpherePack::toList() const {
 };
 
 void SpherePack::fromFile(string file) {
-	typedef tuple<Vector3r,Real,int> tupleVector3rRealInt;
+	typedef boost::tuple<Vector3r,Real,int> tupleVector3rRealInt;
 	vector<tupleVector3rRealInt> ss;
 	Vector3r mn,mx;
 	ss=Shop::loadSpheresFromFile(file,mn,mx,&cellSize);
 	pack.clear();
-	FOREACH(const tupleVector3rRealInt& s, ss) pack.push_back(Sph(get<0>(s),get<1>(s),get<2>(s)));
+	FOREACH(const tupleVector3rRealInt& s, ss) pack.push_back(Sph(boost::get<0>(s),boost::get<1>(s),boost::get<2>(s)));
 }
 
 void SpherePack::toFile(const string fname) const {
@@ -75,7 +75,7 @@ void SpherePack::fromSimulation() {
 	Scene* scene=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b) continue;
-		shared_ptr<Sphere> intSph=dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<Sphere> intSph=boost::dynamic_pointer_cast<Sphere>(b->shape);
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius,(b->isClumpMember()?b->clumpId:-1)));
 	}

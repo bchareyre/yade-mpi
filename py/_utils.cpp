@@ -28,7 +28,7 @@ py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
+		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
 		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
@@ -42,7 +42,7 @@ py::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();
 	py::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
+		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
 	}
@@ -76,17 +76,6 @@ void setRefSe3(){
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 Real RayleighWaveTimeStep(){return Shop::RayleighWaveTimeStep();};
 
-/* return histogram ([bin1Min,bin2Min,…],[value1,value2,…]) from projections of interactions
- * to the plane perpendicular to axis∈[0,1,2]; the number of bins can be specified and they cover
- * the range (0,π), since interactions are bidirecional, hence periodically the same on (π,2π).
- *
- * Only contacts using ScGeom are considered.
- * Both bodies must be in the mask (except if mask is 0, when all bodies are considered)
- * If the projection is shorter than minProjLen, it is skipped.
- *
- * If both bodies are _outside_ the aabb (if specified), the interaction is skipped.
- *
- */
 py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::tuple aabb=py::tuple(), Real minProjLen=1e-6){
 	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
 	Vector3r bbMin(Vector3r::Zero()), bbMax(Vector3r::Zero()); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
@@ -245,7 +234,7 @@ void wireSome(string filter){
 		switch(mode){
 			case none: wire=false; break;
 			case all: wire=true; break;
-			case noSpheres: wire=!(bool)(dynamic_pointer_cast<Sphere>(b->shape)); break;
+			case noSpheres: wire=!(bool)(boost::dynamic_pointer_cast<Sphere>(b->shape)); break;
 			default: throw logic_error("No such case possible");
 		}
 		b->shape->wire=wire;
@@ -475,7 +464,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("ptInAABB",isInBB,"Return True/False whether the point p is within box given by its min and max corners");
 	py::def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(py::args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
-	py::def("coordsAndDisplacements",coordsAndDisplacements,(python::arg("axis"),python::arg("Aabb")=python::tuple()),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered.");
+	py::def("coordsAndDisplacements",coordsAndDisplacements,(py::arg("axis"),py::arg("Aabb")=py::tuple()),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered.");
 	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
 	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
 	py::def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(py::args("aabb")));

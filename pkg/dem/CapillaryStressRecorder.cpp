@@ -141,16 +141,16 @@ void CapillaryStressRecorder::action()
 	SIG_13_cap = sig13_cap/V;
 	SIG_23_cap = sig23_cap/V;
 	
-	out << lexical_cast<string> ( scene->iter ) << " "
-		<< lexical_cast<string>(SIG_11_cap) << " " 
-		<< lexical_cast<string>(SIG_22_cap) << " " 
-		<< lexical_cast<string>(SIG_33_cap) << " " 
-		<< lexical_cast<string>(SIG_12_cap) << " "
-		<< lexical_cast<string>(SIG_13_cap)<< " "
-		<< lexical_cast<string>(SIG_23_cap)<< "   "
-		<< lexical_cast<string>(capillaryPressure) << " "
-		<< lexical_cast<string>(Sr)<< " " 
-		<< lexical_cast<string>(w)<< " "
+	out << boost::lexical_cast<string> ( scene->iter ) << " "
+		<< boost::lexical_cast<string>(SIG_11_cap) << " " 
+		<< boost::lexical_cast<string>(SIG_22_cap) << " " 
+		<< boost::lexical_cast<string>(SIG_33_cap) << " " 
+		<< boost::lexical_cast<string>(SIG_12_cap) << " "
+		<< boost::lexical_cast<string>(SIG_13_cap)<< " "
+		<< boost::lexical_cast<string>(SIG_23_cap)<< "   "
+		<< boost::lexical_cast<string>(capillaryPressure) << " "
+		<< boost::lexical_cast<string>(Sr)<< " " 
+		<< boost::lexical_cast<string>(w)<< " "
 		<< endl;
 	
 }

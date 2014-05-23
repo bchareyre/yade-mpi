@@ -262,25 +262,25 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowe
 		}
 		if (t==tries) 
 		{
-		string str1="Generated a sample with " + lexical_cast<string>(i) + " spheres inside box of dimensions: (" 
-			+ lexical_cast<string>(dimensions[0]) + "," 
-			+ lexical_cast<string>(dimensions[1]) + "," 
-			+ lexical_cast<string>(dimensions[2]) + ").\n";
-		return str1 + "More than " + lexical_cast<string>(tries) +	" tries while generating sphere number " +
-					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
+		string str1="Generated a sample with " + boost::lexical_cast<string>(i) + " spheres inside box of dimensions: (" 
+			+ boost::lexical_cast<string>(dimensions[0]) + "," 
+			+ boost::lexical_cast<string>(dimensions[1]) + "," 
+			+ boost::lexical_cast<string>(dimensions[2]) + ").\n";
+		return str1 + "More than " + boost::lexical_cast<string>(tries) +	" tries while generating sphere number " +
+					boost::lexical_cast<string>(i+1) + "/" + boost::lexical_cast<string>(number) + ".";
 		}
 	}
-	return "Generated a sample with " + lexical_cast<string>(number) + " spheres inside box of dimensions: (" 
-			+ lexical_cast<string>(dimensions[0]) + "," 
-			+ lexical_cast<string>(dimensions[1]) + "," 
-			+ lexical_cast<string>(dimensions[2]) + ").";
+	return "Generated a sample with " + boost::lexical_cast<string>(number) + " spheres inside box of dimensions: (" 
+			+ boost::lexical_cast<string>(dimensions[0]) + "," 
+			+ boost::lexical_cast<string>(dimensions[1]) + "," 
+			+ boost::lexical_cast<string>(dimensions[2]) + ").";
 }
 
 std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list,string importFilename)
 {
 	sphere_list.clear();
 	int nombre=0;
-	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
+	if(importFilename.size() != 0 && boost::filesystem::exists(importFilename) )
 	{
 		ifstream loadFile(importFilename.c_str()); // cree l'objet loadFile de la classe ifstream qui va permettre de lire ce qu'il y a dans importFilename
 
@@ -308,7 +308,7 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 			sphere_list.push_back(s);
 			nombre++;
 		}		
-		return std::make_pair(std::string("Echantillon correctement genere : " + lexical_cast<string>(nombre) + " billes"),true);
+		return std::make_pair(std::string("Echantillon correctement genere : " + boost::lexical_cast<string>(nombre) + " billes"),true);
 	}
 	else
 	{

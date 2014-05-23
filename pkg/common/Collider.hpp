@@ -32,7 +32,7 @@ class Collider: public GlobalEngine {
 		virtual void invalidatePersistentData(){}
 
 		// ctor with functors for the integrated BoundDispatcher
-		virtual void pyHandleCustomCtorArgs(python::tuple& t, python::dict& d);
+		virtual void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d);
 
 		// backwards-compatility func, can be removed later
 		void findBoundDispatcherInEnginesIfNoFunctorsAndWarn();

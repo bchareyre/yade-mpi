@@ -129,12 +129,12 @@ void TriaxialCompressionEngine::action()
 	{
 		if(!noFiles){
 			string fileName = "./"+ Key + "_" + Phase1End + "_" +
-							  lexical_cast<string> ( scene->iter ) + "_" +
-							  lexical_cast<string> ( currentState ) + ".xml";
+							  boost::lexical_cast<string> ( scene->iter ) + "_" +
+							  boost::lexical_cast<string> ( currentState ) + ".xml";
 			LOG_INFO ( "saving snapshot: "<<fileName );
 			Omega::instance().saveSimulation ( fileName );
-			fileName="./"+ Key + "_"+Phase1End+"_"+lexical_cast<string> ( scene->iter ) + "_" +
-					 lexical_cast<string> ( currentState ) +".spheres";
+			fileName="./"+ Key + "_"+Phase1End+"_"+boost::lexical_cast<string> ( scene->iter ) + "_" +
+					 boost::lexical_cast<string> ( currentState ) +".spheres";
 			LOG_INFO ( "saving spheres: "<<fileName );
 			Shop::saveSpheresToFile ( fileName );
 		}

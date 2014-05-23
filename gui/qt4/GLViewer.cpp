@@ -62,7 +62,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	resize(550,550);
 	last=-1;
 	if(viewId==0) setWindowTitle("Primary view");
-	else setWindowTitle(("Secondary view #"+lexical_cast<string>(viewId)).c_str());
+	else setWindowTitle(("Secondary view #"+boost::lexical_cast<string>(viewId)).c_str());
 
 	show();
 	
@@ -132,7 +132,7 @@ void GLViewer::startClipPlaneManipulation(int planeNo){
 	const Se3r se3(renderer->clipPlaneSe3[planeNo]);
 	manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(se3.position[0],se3.position[1],se3.position[2]),qglviewer::Quaternion(se3.orientation.x(),se3.orientation.y(),se3.orientation.z(),se3.orientation.w()));
 	string grp=strBoundGroup();
-	displayMessage("Manipulating clip plane #"+lexical_cast<string>(planeNo+1)+(grp.empty()?grp:" (bound planes:"+grp+")"));
+	displayMessage("Manipulating clip plane #"+boost::lexical_cast<string>(planeNo+1)+(grp.empty()?grp:" (bound planes:"+grp+")"));
 }
 
 string GLViewer::getState(){
@@ -169,7 +169,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		else { resetManipulation(); displayMessage("Manipulating scene."); }
 	}
 	else if(e->key()==Qt::Key_Space){
-		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; }
+		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+boost::lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; }
 		else{ centerMedianQuartile(); }
 	}
 	/* function keys */
@@ -184,8 +184,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		int n=0; if(e->key()==Qt::Key_1) n=1; else if(e->key()==Qt::Key_2) n=2; else if(e->key()==Qt::Key_3) n=3; assert(n>0); int planeId=n-1;
 		if(planeId>=renderer->numClipPlanes) return; // no such clipping plane
 		if(e->modifiers() & Qt::AltModifier){
-			if(boundClipPlanes.count(planeId)==0) {boundClipPlanes.insert(planeId); displayMessage("Added plane #"+lexical_cast<string>(planeId+1)+" to the bound group: "+strBoundGroup());}
-			else {boundClipPlanes.erase(planeId); displayMessage("Removed plane #"+lexical_cast<string>(planeId+1)+" from the bound group: "+strBoundGroup());}
+			if(boundClipPlanes.count(planeId)==0) {boundClipPlanes.insert(planeId); displayMessage("Added plane #"+boost::lexical_cast<string>(planeId+1)+" to the bound group: "+strBoundGroup());}
+			else {boundClipPlanes.erase(planeId); displayMessage("Removed plane #"+boost::lexical_cast<string>(planeId+1)+" from the bound group: "+strBoundGroup());}
 		}
 		else if(manipulatedClipPlane>=0 && manipulatedClipPlane!=planeId) {
 			const Quaternionr& o=renderer->clipPlaneSe3[planeId].orientation;
@@ -232,7 +232,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			Quaternionr& ori=renderer->clipPlaneSe3[manipulatedClipPlane].orientation;
 			ori=Quaternionr(AngleAxisr(Mathr::PI,Vector3r(0,1,0)))*ori; 
 			manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
-			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane+1)+" reversed.");
+			displayMessage("Plane #"+boost::lexical_cast<string>(manipulatedClipPlane+1)+" reversed.");
 		}
 		else {
 			camera()->setRevolveAroundPoint(sceneCenter());
@@ -277,17 +277,17 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if( e->key()==Qt::Key_Plus ){
 			cut_plane = std::min(1.0, cut_plane + std::pow(10.0,(double)cut_plane_delta));
 			static_cast<YadeCamera*>(camera())->setCuttingDistance(cut_plane);
-			displayMessage("Cut plane: "+lexical_cast<std::string>(cut_plane));
+			displayMessage("Cut plane: "+boost::lexical_cast<std::string>(cut_plane));
 	}else if( e->key()==Qt::Key_Minus ){
 			cut_plane = std::max(0.0, cut_plane - std::pow(10.0,(double)cut_plane_delta));
 			static_cast<YadeCamera*>(camera())->setCuttingDistance(cut_plane);
-			displayMessage("Cut plane: "+lexical_cast<std::string>(cut_plane));
+			displayMessage("Cut plane: "+boost::lexical_cast<std::string>(cut_plane));
 	}else if( e->key()==Qt::Key_Slash ){
 			cut_plane_delta -= 1;
-			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+lexical_cast<std::string>(cut_plane_delta));
+			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+boost::lexical_cast<std::string>(cut_plane_delta));
 	}else if( e->key()==Qt::Key_Asterisk ){
 			cut_plane_delta = std::min(1+cut_plane_delta,-1);
-			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+lexical_cast<std::string>(cut_plane_delta));
+			displayMessage("Cut plane increment: 1e"+(cut_plane_delta>0?std::string("+"):std::string(""))+boost::lexical_cast<std::string>(cut_plane_delta));
 	}
 #endif
 
@@ -399,16 +399,16 @@ void GLViewer::postSelection(const QPoint& point)
 		
 		setSelectedName(selection);
 		LOG_DEBUG("New selection "<<selection);
-		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
+		displayMessage("Selected body #"+boost::lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
 		Omega::instance().getScene()->selectedBody = selection;
 			PyGILState_STATE gstate;
 			gstate = PyGILState_Ensure();
-				python::object main=python::import("__main__");
-				python::object global=main.attr("__dict__");
+      boost::python::object main=boost::python::import("__main__");
+      boost::python::object global=main.attr("__dict__");
 				// the try/catch block must be properly nested inside PyGILState_Ensure and PyGILState_Release
 				try{
-					python::eval(string("onBodySelect("+lexical_cast<string>(selection)+")").c_str(),global,global);
-				} catch (python::error_already_set const &) {
+          boost::python::eval(string("onBodySelect("+boost::lexical_cast<string>(selection)+")").c_str(),global,global);
+				} catch (boost::python::error_already_set const &) {
 					LOG_DEBUG("unable to call onBodySelect. Not defined?");
 				}
 			PyGILState_Release(gstate);

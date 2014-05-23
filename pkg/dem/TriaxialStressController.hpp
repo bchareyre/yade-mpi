@@ -146,7 +146,7 @@ class TriaxialStressController : public BoundaryController
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel3",&TriaxialStressController::max_vel3,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
-		.def("stress",&TriaxialStressController::getStress,(python::arg("id")),"Return the mean stress vector acting on boundary 'id', with 'id' between 0 and 5.")
+		.def("stress",&TriaxialStressController::getStress,(boost::python::arg("id")),"Return the mean stress vector acting on boundary 'id', with 'id' between 0 and 5.")
 		)
 		DECLARE_LOGGER;
 };

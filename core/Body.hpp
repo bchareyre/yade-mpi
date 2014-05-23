@@ -62,7 +62,7 @@ class Body: public Serializable{
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
 		virtual void userForcedDisplacementRedrawHook(){return;}
 
-		python::list py_intrs();
+    boost::python::list py_intrs();
 
 		Body::id_t getId() const {return id;};
 		unsigned int coordNumber();  // Number of neighboring particles

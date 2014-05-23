@@ -63,7 +63,7 @@ void LawTester::action(){
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
 	LOG_DEBUG("=================== LawTester step "<<step<<" ========================");
 	const shared_ptr<Interaction> Inew=scene->interactions->find(ids[0],ids[1]);
-	string strIds("##"+lexical_cast<string>(ids[0])+"+"+lexical_cast<string>(ids[1]));
+	string strIds("##"+boost::lexical_cast<string>(ids[0])+"+"+boost::lexical_cast<string>(ids[1]));
 	// interaction not found at initialization
 	if(!I && (!Inew || !Inew->isReal())){
 		LOG_WARN("Interaction "<<strIds<<" does not exist (yet?), no-op."); return;
@@ -237,7 +237,7 @@ void GlExtra_LawTester::render(){
 	// scene object changed (after reload, for instance), for re-initialization
 	if(tester && tester->scene!=scene) tester=shared_ptr<LawTester>();
 
-	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
+	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=boost::dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
 
 	//if(tester->renderLength<=0) return;

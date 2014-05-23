@@ -10,10 +10,10 @@
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
 
-python::dict Clump::members_get(){
-	python::dict ret;
+boost::python::dict Clump::members_get(){
+  boost::python::dict ret;
 	FOREACH(MemberMap::value_type& b, members){
-		ret[b.first]=python::make_tuple(b.second.position,b.second.orientation);
+		ret[b.first]=boost::python::make_tuple(b.second.position,b.second.orientation);
 	}
 	return ret;
 }
@@ -21,8 +21,8 @@ python::dict Clump::members_get(){
 void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBody){
 	Body::id_t subId=subBody->getId();
 	const shared_ptr<Clump> clump=YADE_PTR_CAST<Clump>(clumpBody->shape);
-	if(clump->members.count(subId)!=0) throw std::invalid_argument(("Body #"+lexical_cast<string>(subId)+" is already part of this clump #"+lexical_cast<string>(clumpBody->id)).c_str());
-	if(subBody->isClumpMember()) throw std::invalid_argument(("Body #"+lexical_cast<string>(subId)+" is already a clump member of #"+lexical_cast<string>(subBody->clumpId)).c_str());
+	if(clump->members.count(subId)!=0) throw std::invalid_argument(("Body #"+boost::lexical_cast<string>(subId)+" is already part of this clump #"+boost::lexical_cast<string>(clumpBody->id)).c_str());
+	if(subBody->isClumpMember()) throw std::invalid_argument(("Body #"+boost::lexical_cast<string>(subId)+" is already a clump member of #"+boost::lexical_cast<string>(subBody->clumpId)).c_str());
 	else if(subBody->isClump()){
 		const shared_ptr<Clump> subClump=YADE_PTR_CAST<Clump>(subBody->shape);
 		FOREACH(const MemberMap::value_type& mm, subClump->members){
@@ -48,7 +48,7 @@ void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 void Clump::del(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBody){
 	// erase the subBody; removing body that is not part of the clump throws
 	const shared_ptr<Clump> clump=YADE_PTR_CAST<Clump>(clumpBody->shape);
-	if(clump->members.erase(subBody->id)!=1) throw std::invalid_argument(("Body #"+lexical_cast<string>(subBody->id)+" not part of clump #"+lexical_cast<string>(clumpBody->id)+"; not removing.").c_str());
+	if(clump->members.erase(subBody->id)!=1) throw std::invalid_argument(("Body #"+boost::lexical_cast<string>(subBody->id)+" not part of clump #"+boost::lexical_cast<string>(clumpBody->id)+"; not removing.").c_str());
 	subBody->clumpId=Body::ID_NONE;
 	LOG_DEBUG("Removed body #"<<subBody->id<<" from clump #"<<clumpBody->id);
 }

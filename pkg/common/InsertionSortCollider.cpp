@@ -274,7 +274,7 @@ void InsertionSortCollider::action(){
 		if(verletDist>0){
 			// get NewtonIntegrator, to ask for the maximum velocity value
 			if(!newton){
-				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
 				if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 			}
 		}
@@ -546,20 +546,20 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 	return true;
 }
 
-python::tuple InsertionSortCollider::dumpBounds(){
-	python::list bl[3]; // 3 bound lists, inserted into the tuple at the end
+boost::python::tuple InsertionSortCollider::dumpBounds(){
+  boost::python::list bl[3]; // 3 bound lists, inserted into the tuple at the end
 	for(int axis=0; axis<3; axis++){
 		VecBounds& V=BB[axis];
 		if(periodic){
 			for(long i=0; i<V.size; i++){
 				long ii=V.norm(i); // start from the period boundary
-				bl[axis].append(python::make_tuple(V[ii].coord,(V[ii].flags.isMin?-1:1)*V[ii].id,V[ii].period));
+				bl[axis].append(boost::python::make_tuple(V[ii].coord,(V[ii].flags.isMin?-1:1)*V[ii].id,V[ii].period));
 			}
 		} else {
 			for(long i=0; i<V.size; i++){
-				bl[axis].append(python::make_tuple(V[i].coord,(V[i].flags.isMin?-1:1)*V[i].id));
+				bl[axis].append(boost::python::make_tuple(V[i].coord,(V[i].flags.isMin?-1:1)*V[i].id));
 			}
 		}
 	}
-	return python::make_tuple(bl[0],bl[1],bl[2]);
+	return boost::python::make_tuple(bl[0],bl[1],bl[2]);
 }

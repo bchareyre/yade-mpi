@@ -4,7 +4,7 @@
 
 YADE_PLUGIN((RungeKuttaCashKarp54Integrator));
 
-shared_ptr<Integrator> RungeKuttaCashKarp54Integrator_ctor_list(const python::list& slaves){ shared_ptr<Integrator> instance(new RungeKuttaCashKarp54Integrator); instance->slaves_set(slaves); return instance; }
+shared_ptr<Integrator> RungeKuttaCashKarp54Integrator_ctor_list(const boost::python::list& slaves){ shared_ptr<Integrator> instance(new RungeKuttaCashKarp54Integrator); instance->slaves_set(slaves); return instance; }
 
 void RungeKuttaCashKarp54Integrator::action()
 {

@@ -91,7 +91,7 @@ class pyBodyContainer{
 	private:
 		void checkClump(shared_ptr<Body> b){
 			if (!(b->isClump())){
-				PyErr_SetString(PyExc_TypeError,("Error: Body"+lexical_cast<string>(b->getId())+" is not a clump.").c_str());
+				PyErr_SetString(PyExc_TypeError,("Error: Body"+boost::lexical_cast<string>(b->getId())+" is not a clump.").c_str());
 				py::throw_error_already_set();
 			}
 		}
@@ -107,7 +107,7 @@ class pyBodyContainer{
 	}
 	Body::id_t append(shared_ptr<Body> b){
 		// shoud be >=0, but Body is by default created with id 0... :-|
-		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); py::throw_error_already_set(); }
+		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+boost::lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); py::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
 	vector<Body::id_t> appendList(vector<shared_ptr<Body> > bb){
@@ -175,14 +175,14 @@ class pyBodyContainer{
 		FOREACH(Body::id_t bid, bids) {
 			shared_ptr<Body> bp = Body::byId(bid,scene);		// get body pointer
 			if (bp->isClump()){
-				if (bp == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" and clump "+lexical_cast<string>(cid)+" are the same bodies. Body was not added.").c_str()); return;}
+				if (bp == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+boost::lexical_cast<string>(bid)+" and clump "+boost::lexical_cast<string>(cid)+" are the same bodies. Body was not added.").c_str()); return;}
 				Clump::add(clp,bp);//add clump bid to clump cid
 				eraseList.push_back(bid);
 			}
 			else if (bp->isClumpMember()){
 				Body::id_t bpClumpId = bp->clumpId;
 				shared_ptr<Body> bpClumpPointer = Body::byId(bpClumpId,scene);
-				if (bpClumpPointer == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is already a clump member of clump "+lexical_cast<string>(cid)+". Body was not added.").c_str()); return;} 
+				if (bpClumpPointer == clp) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+boost::lexical_cast<string>(bid)+" is already a clump member of clump "+boost::lexical_cast<string>(cid)+". Body was not added.").c_str()); return;} 
 				Clump::add(clp,bpClumpPointer);//add clump bpClumpId to clump cid
 				eraseList.push_back(bpClumpId);
 			}
@@ -201,11 +201,11 @@ class pyBodyContainer{
 			if (cid == bpClumpId){
 				const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clp->shape);
 				std::map<Body::id_t,Se3r>& members = clump->members;
-				if (members.size() == 2) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" not released from clump "+lexical_cast<string>(cid)+", because number of clump members would get < 2!").c_str()); return;}
+				if (members.size() == 2) {PyErr_Warn(PyExc_UserWarning,("Warning: Body "+boost::lexical_cast<string>(bid)+" not released from clump "+boost::lexical_cast<string>(cid)+", because number of clump members would get < 2!").c_str()); return;}
 				Clump::del(clp,bp);//release bid from cid
 				Clump::updateProperties(clp, discretization);
-			} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" must be a clump member of clump "+lexical_cast<string>(cid)+". Body was not released.").c_str()); return;}
-		} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+lexical_cast<string>(bid)+" is not a clump member. Body was not released.").c_str()); return;}
+			} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+boost::lexical_cast<string>(bid)+" must be a clump member of clump "+boost::lexical_cast<string>(cid)+". Body was not released.").c_str()); return;}
+		} else { PyErr_Warn(PyExc_UserWarning,("Warning: Body "+boost::lexical_cast<string>(bid)+" is not a clump member. Body was not released.").c_str()); return;}
 	}
 	py::list replaceByClumps(py::list ctList, vector<Real> amounts, unsigned int discretization){
 		py::list ret;
@@ -218,11 +218,11 @@ class pyBodyContainer{
 			else checkSum += amount;
 		}
 		if (checkSum > 1.0){
-			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
+			PyErr_SetString(PyExc_ValueError,("Error: Sum of amounts "+boost::lexical_cast<string>(checkSum)+" should not be bigger than 1.0!").c_str()); 
 			py::throw_error_already_set();
 		}
 		if (py::len(ctList) != (unsigned) amounts.size()) {//avoid unsigned comparison warning
-			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+lexical_cast<string>(amounts.size())+") differs from length of template list ("+lexical_cast<string>(py::len(ctList))+").").c_str()); 
+			PyErr_SetString(PyExc_ValueError,("Error: Length of amounts list ("+boost::lexical_cast<string>(amounts.size())+") differs from length of template list ("+boost::lexical_cast<string>(py::len(ctList))+").").c_str()); 
 			py::throw_error_already_set();
 		}
 		//set a random generator (code copied from pkg/dem/SpherePack.cpp):
@@ -437,10 +437,10 @@ class pyTags{
 	public:
 		pyTags(const shared_ptr<Scene> _mb): mb(_mb){}
 		const shared_ptr<Scene> mb;
-		bool hasKey(const string& key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
+		bool hasKey(const string& key){ FOREACH(string val, mb->tags){ if(boost::algorithm::starts_with(val,key+"=")){ return true;} } return false; }
 		string getItem(const string& key){
 			FOREACH(string& val, mb->tags){
-				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); return val1;}
+				if(boost::algorithm::starts_with(val,key+"=")){ string val1(val); boost::algorithm::erase_head(val1,key.size()+1); return val1;}
 			}
 			PyErr_SetString(PyExc_KeyError,("Invalid key: "+key+".").c_str());
 			py::throw_error_already_set(); /* make compiler happy; never reached */ return string();
@@ -450,7 +450,7 @@ class pyTags{
 				PyErr_SetString(PyExc_KeyError, "Key must not contain the '=' character (implementation limitation; sorry).");
 				py::throw_error_already_set();
 			}
-			FOREACH(string& val, mb->tags){if(algorithm::starts_with(val,key+"=")){ val=key+"="+item; return; } }
+			FOREACH(string& val, mb->tags){if(boost::algorithm::starts_with(val,key+"=")){ val=key+"="+item; return; } }
 			mb->tags.push_back(key+"="+item);
 			}
 		py::list keys(){
@@ -458,7 +458,7 @@ class pyTags{
 			FOREACH(string val, mb->tags){
 				size_t i=val.find("=");
 				if(i==string::npos) throw runtime_error("Tags must be in the key=value format (internal error?)");
-				algorithm::erase_tail(val,val.size()-i); ret.append(val);
+				boost::algorithm::erase_tail(val,val.size()-i); ret.append(val);
 			}
 			return ret;
 		}
@@ -498,7 +498,7 @@ class pyInteractionContainer{
 		/* return nth _real_ iteration from the container (0-based index); this is to facilitate picking random interaction */
 		shared_ptr<Interaction> pyNth(long n){
 			long i=0; FOREACH(shared_ptr<Interaction> I, *proxee){ if(!I->isReal()) continue; if(i++==n) return I; }
-			PyErr_SetString(PyExc_IndexError,(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").").c_str());
+			PyErr_SetString(PyExc_IndexError,(string("Interaction number out of range (")+boost::lexical_cast<string>(n)+">="+boost::lexical_cast<string>(i)+").").c_str());
 			py::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>();
 		}
 		long len(){return proxee->size();}
@@ -575,7 +575,7 @@ class pyOmega{
 		// a call to this functions would have to be added to pyMaterialContainer::append
 		#if 0
 			FOREACH(const shared_ptr<Material>& m, OMEGA.getScene()->materials){
-				if(!m->label.empty()) { PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+m->label+"=Omega().materials["+lexical_cast<string>(m->id)+"]").c_str()); PyGILState_Release(gstate); }
+				if(!m->label.empty()) { PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+m->label+"=Omega().materials["+boost::lexical_cast<string>(m->id)+"]").c_str()); PyGILState_Release(gstate); }
 			}
 		#endif
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
@@ -653,7 +653,7 @@ class pyOmega{
 		OMEGA.run();
 		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
 		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
-		LOG_DEBUG("RUN"<<((scene->stopAtIter-scene->iter)>0?string(" ("+lexical_cast<string>(scene->stopAtIter-scene->iter)+" to go)"):string(""))<<"!");
+		LOG_DEBUG("RUN"<<((scene->stopAtIter-scene->iter)>0?string(" ("+boost::lexical_cast<string>(scene->stopAtIter-scene->iter)+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.pause(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
@@ -678,9 +678,9 @@ class pyOmega{
 	py::list lsTmp(){ py::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
 	void tmpToFile(string mark, string filename){
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
-		iostreams::filtering_ostream out;
-		if(algorithm::ends_with(filename,".bz2")) out.push(iostreams::bzip2_compressor());
-		out.push(iostreams::file_sink(filename));
+		boost::iostreams::filtering_ostream out;
+		if(boost::algorithm::ends_with(filename,".bz2")) out.push(boost::iostreams::bzip2_compressor());
+		out.push(boost::iostreams::file_sink(filename));
 		if(!out.good()) throw runtime_error("Error while opening file `"+filename+"' for writing.");
 		LOG_INFO("Saving :memory:"<<mark<<" to "<<filename);
 		out<<OMEGA.memSavedSimulations[":memory:"+mark];
@@ -776,7 +776,7 @@ class pyOmega{
 	void interactionContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
 		if(rb->interactions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
-		shared_ptr<InteractionContainer> ic=dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
+		shared_ptr<InteractionContainer> ic=boost::dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
 		rb->interactions=ic;
 	}
 	string interactionContainer_get(string clss){ return OMEGA.getScene()->interactions->getClassName(); }
@@ -784,7 +784,7 @@ class pyOmega{
 	void bodyContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
 		if(rb->bodies->size()>0) throw std::runtime_error("Body container not empty, will not change its class.");
-		shared_ptr<BodyContainer> bc=dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
+		shared_ptr<BodyContainer> bc=boost::dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
 		rb->bodies=bc;
 	}
 	string bodyContainer_get(string clss){ return OMEGA.getScene()->bodies->getClassName(); }
@@ -968,7 +968,7 @@ BOOST_PYTHON_MODULE(wrapper)
 ///////////// proxyless wrappers 
 	Serializable().pyRegisterClass(py::scope());
 
-	py::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData,"Get timing data as list of tuples (label, execTime[nsec], execCount) (one tuple per checkpoint)").def("reset",&TimingDeltas::reset,"Reset timing information");
+	py::class_<TimingDeltas, shared_ptr<TimingDeltas>, boost::noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData,"Get timing data as list of tuples (label, execTime[nsec], execCount) (one tuple per checkpoint)").def("reset",&TimingDeltas::reset,"Reset timing information");
 
 	py::scope().attr("O")=pyOmega();
 }

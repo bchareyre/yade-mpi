@@ -159,7 +159,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	rb->forces.sync();
 	shared_ptr<NewtonIntegrator> newton;
 	Vector3r gravity = Vector3r::Zero();
-	FOREACH(shared_ptr<Engine>& e, rb->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) {gravity=newton->gravity; break;} }
+	FOREACH(shared_ptr<Engine>& e, rb->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) {gravity=newton->gravity; break;} }
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
@@ -293,7 +293,7 @@ void Shop::saveSpheresToFile(string fname){
 
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b->isDynamic()) continue;
-		shared_ptr<Sphere>	intSph=dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<Sphere>	intSph=boost::dynamic_pointer_cast<Sphere>(b->shape);
 		if(!intSph) continue;
 		const Vector3r& pos=b->state->pos;
 		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
@@ -404,11 +404,11 @@ Real Shop::getVoxelPorosity(const shared_ptr<Scene>& _scene, int _resolution, Ve
 	return ( std::pow(S,3) - Vv ) / std::pow(S,3);
 };
 
-vector<tuple<Vector3r,Real,int> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
+vector<boost::tuple<Vector3r,Real,int> > Shop::loadSpheresFromFile(const string& fname, Vector3r& minXYZ, Vector3r& maxXYZ, Vector3r* cellSize){
 	if(!boost::filesystem::exists(fname)) {
 		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");
 	}
-	vector<tuple<Vector3r,Real,int> > spheres;
+	vector<boost::tuple<Vector3r,Real,int> > spheres;
 	ifstream sphereFile(fname.c_str());
 	if(!sphereFile.good()) throw std::runtime_error("File with spheres `"+fname+"' couldn't be opened.");
 	Vector3r C;
@@ -422,16 +422,16 @@ vector<tuple<Vector3r,Real,int> > Shop::loadSpheresFromFile(const string& fname,
 		vector<string> tokens; FOREACH(const string& s, toks) tokens.push_back(s);
 		if(tokens.empty()) continue;
 		if(tokens[0]=="##PERIODIC::"){
-			if(tokens.size()!=4) throw std::invalid_argument(("Spheres file "+fname+":"+lexical_cast<string>(lineNo)+" contains ##PERIODIC::, but the line is malformed.").c_str());
-			if(cellSize){ *cellSize=Vector3r(lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]),lexical_cast<Real>(tokens[3])); }
+			if(tokens.size()!=4) throw std::invalid_argument(("Spheres file "+fname+":"+boost::lexical_cast<string>(lineNo)+" contains ##PERIODIC::, but the line is malformed.").c_str());
+			if(cellSize){ *cellSize=Vector3r(boost::lexical_cast<Real>(tokens[1]),boost::lexical_cast<Real>(tokens[2]),boost::lexical_cast<Real>(tokens[3])); }
 			continue;
 		}
-		if(tokens.size()!=5 and tokens.size()!=4) throw std::invalid_argument(("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(tokens.size())+" columns (must be 4 or 5).").c_str());
-		C=Vector3r(lexical_cast<Real>(tokens[0]),lexical_cast<Real>(tokens[1]),lexical_cast<Real>(tokens[2]));
-		r=lexical_cast<Real>(tokens[3]);
+		if(tokens.size()!=5 and tokens.size()!=4) throw std::invalid_argument(("Line "+boost::lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+boost::lexical_cast<string>(tokens.size())+" columns (must be 4 or 5).").c_str());
+		C=Vector3r(boost::lexical_cast<Real>(tokens[0]),boost::lexical_cast<Real>(tokens[1]),boost::lexical_cast<Real>(tokens[2]));
+		r=boost::lexical_cast<Real>(tokens[3]);
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
-		if(tokens.size()==5)clumpId=lexical_cast<int>(tokens[4]);
-		spheres.push_back(tuple<Vector3r,Real,int>(C,r,clumpId));
+		if(tokens.size()==5)clumpId=boost::lexical_cast<int>(tokens[4]);
+		spheres.push_back(boost::tuple<Vector3r,Real,int>(C,r,clumpId));
 	}
 	return spheres;
 }
@@ -441,8 +441,8 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
-		shared_ptr<ElastMat> ebp=dynamic_pointer_cast<ElastMat>(b->material);
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<ElastMat> ebp=boost::dynamic_pointer_cast<ElastMat>(b->material);
+		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape);
 		if(!ebp || !s) continue;
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));

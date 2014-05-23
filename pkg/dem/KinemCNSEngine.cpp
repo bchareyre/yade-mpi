@@ -38,7 +38,7 @@ void KinemCNSEngine::action()
 	}
 	else if (temoin==2 && (scene->iter==(it_stop+5000)) )
 	{
-		Omega::instance().saveSimulation(Key + "finCis" +lexical_cast<string> (scene->iter ) + ".xml");
+		Omega::instance().saveSimulation(Key + "finCis" +boost::lexical_cast<string> (scene->iter ) + ".xml");
 		Omega::instance().pause();
 	}
 

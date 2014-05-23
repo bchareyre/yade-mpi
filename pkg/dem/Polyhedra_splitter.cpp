@@ -83,8 +83,8 @@ void PolyhedraSplitter::action()
 
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
-		shared_ptr<Polyhedra> p=dynamic_pointer_cast<Polyhedra>(b->shape);
-		shared_ptr<PolyhedraMat> m=dynamic_pointer_cast<PolyhedraMat>(b->material);
+		shared_ptr<Polyhedra> p=boost::dynamic_pointer_cast<Polyhedra>(b->shape);
+		shared_ptr<PolyhedraMat> m=boost::dynamic_pointer_cast<PolyhedraMat>(b->material);
 	
 		if(p && m->IsSplitable){
 			//not real strees, to get real one, it has to be divided by body volume

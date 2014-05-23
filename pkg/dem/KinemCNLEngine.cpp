@@ -16,7 +16,7 @@ void KinemCNLEngine::action()
 	if(LOG)	cout << "debut applyCondi du CNCEngine !!" << endl;
 	KinemSimpleShearBox::getBoxes_Dt();
 	
-	if(LOG)	cout << "gamma = " << lexical_cast<string>(gamma) << "  et gammalim = " << lexical_cast<string>(gammalim) << endl;
+	if(LOG)	cout << "gamma = " << boost::lexical_cast<string>(gamma) << "  et gammalim = " << boost::lexical_cast<string>(gammalim) << endl;
 	if(gamma<=gammalim)
 	{
 		if(LOG)	cout << "Je suis bien dans la partie gamma < gammalim" << endl;
@@ -41,7 +41,7 @@ void KinemCNLEngine::action()
 	}
 	else if (temoin==2 && (scene->iter==(it_stop+5000)) )
 	{
-		Omega::instance().saveSimulation(Key + "endShear" +lexical_cast<string> ( scene->iter ) + ".xml");
+		Omega::instance().saveSimulation(Key + "endShear" +boost::lexical_cast<string> ( scene->iter ) + ".xml");
 		Omega::instance().pause();
 	}
 
@@ -50,7 +50,7 @@ void KinemCNLEngine::action()
 		if ((gamma > gamma_save[j]) && (temoin_save[j]==0))
 		{
 			stopMovement();		// reset of all the speeds before the save
-			Omega::instance().saveSimulation(Key+"_"+lexical_cast<string> (floor(gamma*1000)) +"_" +lexical_cast<string> (floor(gamma*10000)-10*floor(gamma*1000))+ "mmsheared.xml");
+			Omega::instance().saveSimulation(Key+"_"+boost::lexical_cast<string> (floor(gamma*1000)) +"_" +boost::lexical_cast<string> (floor(gamma*10000)-10*floor(gamma*1000))+ "mmsheared.xml");
 			temoin_save[j]=1;
 		}
 	}

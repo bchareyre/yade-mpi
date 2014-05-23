@@ -55,7 +55,7 @@ void OpenGLRenderer::init(){
 	// reported http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01482.html
 	#if 0
 		int e=glGetError();
-		if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderer::init returned GL error ")+lexical_cast<string>(e)).c_str());
+		if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderer::init returned GL error ")+boost::lexical_cast<string>(e)).c_str());
 	#endif
 }
 

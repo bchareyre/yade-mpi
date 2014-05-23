@@ -90,10 +90,10 @@ bool TriaxialTest::generate(string& message)
 			upperCorner=lowerCorner+dimensions;
 			num=sphere_pack.makeCloud(lowerCorner,upperCorner,radiusMean,radiusStdDev,numberOfGrains);
 		}
-		message+="Generated a sample with " + lexical_cast<string>(num) + " spheres inside box of dimensions: ("
-			+ lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + ","
-			+ lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + ","
-			+ lexical_cast<string>(upperCorner[2]-lowerCorner[2]) + ").";}
+		message+="Generated a sample with " + boost::lexical_cast<string>(num) + " spheres inside box of dimensions: ("
+			+ boost::lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + ","
+			+ boost::lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + ","
+			+ boost::lexical_cast<string>(upperCorner[2]-lowerCorner[2]) + ").";}
 	else {
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
 		sphere_pack.fromFile(importFilename);

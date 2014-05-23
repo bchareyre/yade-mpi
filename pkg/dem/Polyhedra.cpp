@@ -416,7 +416,7 @@ Real PolyhedraVolumetricLaw::elasticEnergy()
 void PolyhedraVolumetricLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
 
 		if (!I->geom) {return;} 
-		const shared_ptr<PolyhedraGeom>& contactGeom(dynamic_pointer_cast<PolyhedraGeom>(I->geom));
+		const shared_ptr<PolyhedraGeom>& contactGeom(boost::dynamic_pointer_cast<PolyhedraGeom>(I->geom));
 		if(!contactGeom) {return;} 
 		const Body::id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);

@@ -12,8 +12,8 @@ const shared_ptr<Body>& Body::byId(Body::id_t _id, Scene* rb){return (*((rb?rb:O
 const shared_ptr<Body>& Body::byId(Body::id_t _id, shared_ptr<Scene> rb){return (*(rb->bodies))[_id];}
 
 // return list of interactions of this particle
-python::list Body::py_intrs(){
-	python::list ret;
+boost::python::list Body::py_intrs(){
+  boost::python::list ret;
 	for(Body::MapId2IntrT::iterator it=this->intrs.begin(),end=this->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
 		if(!(*it).second->isReal()) continue;
 		ret.append((*it).second);

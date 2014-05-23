@@ -176,11 +176,11 @@ bool CapillaryTriaxialTest::generate(std::string& message)
 	
 	//convert the original sphere vector (with clump info) to a BasicSphere vector.
 	vector<BasicSphere> sphere_list;
-	typedef tuple<Vector3r,Real,int> tupleVector3rRealInt;
+	typedef boost::tuple<Vector3r,Real,int> tupleVector3rRealInt;
 	if(importFilename!=""){
-		vector<tuple<Vector3r,Real,int> >sphereListClumpInfo = Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+		vector<boost::tuple<Vector3r,Real,int> >sphereListClumpInfo = Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
 		FOREACH(tupleVector3rRealInt t, sphereListClumpInfo){
-			sphere_list.push_back(make_pair(get<0>(t),get<1>(t)));
+			sphere_list.push_back(make_pair(boost::get<0>(t),boost::get<1>(t)));
 		};
 	}
 	else message+=GenerateCloud_water(sphere_list, lowerCorner, upperCorner, numberOfGrains, Rdispersion, 0.75);
@@ -198,11 +198,11 @@ bool CapillaryTriaxialTest::generate(std::string& message)
 	return true;
 //  	return "Generated a sample inside box of dimensions: (" 
 //  		+ lexical_cast<string>(lowerCorner[0]) + "," 
-//  		+ lexical_cast<string>(lowerCorner[1]) + "," 
-//  		+ lexical_cast<string>(lowerCorner[2]) + ") and (" 
-//  		+ lexical_cast<string>(upperCorner[0]) + "," 
-//  		+ lexical_cast<string>(upperCorner[1]) + "," 
-//  		+ lexical_cast<string>(upperCorner[2]) + ").";
+//  		+ boost::lexical_cast<string>(lowerCorner[1]) + "," 
+//  		+ boost::lexical_cast<string>(lowerCorner[2]) + ") and (" 
+//  		+ boost::lexical_cast<string>(upperCorner[0]) + "," 
+//  		+ boost::lexical_cast<string>(upperCorner[1]) + "," 
+//  		+ boost::lexical_cast<string>(upperCorner[2]) + ").";
 
 }
 
@@ -460,17 +460,17 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 				Rmax = std::max(Rmax,s.second);
 				break;}
 		}
-		if (t==tries) return "More than " + lexical_cast<string>(tries) +
+		if (t==tries) return "More than " + boost::lexical_cast<string>(tries) +
 					" tries while generating sphere number " +
-					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
+					boost::lexical_cast<string>(i+1) + "/" + boost::lexical_cast<string>(number) + ".";
 	}
-	return "Generated a sample with " + lexical_cast<string>(number) + "spheres inside box of dimensions: (" 
-			+ lexical_cast<string>(dimensions[0]) + "," 
-			+ lexical_cast<string>(dimensions[1]) + "," 
-			+ lexical_cast<string>(dimensions[2]) + ")."
-			+ "  mean radius=" + lexical_cast<string>(mean_radius) +
-			+ "  Rmin =" + lexical_cast<string>(Rmin) +
-			+ "  Rmax =" + lexical_cast<string>(Rmax) + ".";
+	return "Generated a sample with " + boost::lexical_cast<string>(number) + "spheres inside box of dimensions: (" 
+			+ boost::lexical_cast<string>(dimensions[0]) + "," 
+			+ boost::lexical_cast<string>(dimensions[1]) + "," 
+			+ boost::lexical_cast<string>(dimensions[2]) + ")."
+			+ "  mean radius=" + boost::lexical_cast<string>(mean_radius) +
+			+ "  Rmin =" + boost::lexical_cast<string>(Rmin) +
+			+ "  Rmax =" + boost::lexical_cast<string>(Rmax) + ".";
 }
 
 

@@ -63,7 +63,7 @@ class GridNode: public Sphere{
 		/*ctor*/
 		createIndex();,
 		/*py*/
-		.def("addConnection",&GridNode::addConnection,(python::arg("Body")),"Add a GridConnection to the GridNode.")
+		.def("addConnection",&GridNode::addConnection,(boost::python::arg("Body")),"Add a GridConnection to the GridNode.")
 	);
 	REGISTER_CLASS_INDEX(GridNode,Sphere);
 };

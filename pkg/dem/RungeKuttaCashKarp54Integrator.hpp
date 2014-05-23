@@ -12,7 +12,7 @@ typedef boost::numeric::odeint::controlled_runge_kutta< error_stepper_type > con
 typedef boost::numeric::odeint::default_error_checker< error_stepper_type::value_type,error_stepper_type::algebra_type ,error_stepper_type::operations_type > error_checker_type; //Error checker type that is redefined for initialization using different tolerance values
 
 
-shared_ptr<Integrator> RungeKuttaCashKarp54Integrator_ctor_list(const python::list& slaves);
+shared_ptr<Integrator> RungeKuttaCashKarp54Integrator_ctor_list(const boost::python::list& slaves);
 class RungeKuttaCashKarp54Integrator: public Integrator {
 	
 	public:
@@ -41,7 +41,7 @@ class RungeKuttaCashKarp54Integrator: public Integrator {
 		/*ctor*/
 		init();
 		,
-		.def("__init__",python::make_constructor(RungeKuttaCashKarp54Integrator_ctor_list),"Construct from (possibly nested) list of slaves.")
+		.def("__init__",boost::python::make_constructor(RungeKuttaCashKarp54Integrator_ctor_list),"Construct from (possibly nested) list of slaves.")
 		/*py*/
 	);
 };

@@ -38,14 +38,14 @@ static int last(-1);
 void GLViewer::useDisplayParameters(size_t n){
 	LOG_DEBUG("Loading display parameters from #"<<n);
 	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;
-	if(dispParams.size()<=(size_t)n){ throw std::invalid_argument(("Display parameters #"+lexical_cast<string>(n)+" don't exist (number of entries "+lexical_cast<string>(dispParams.size())+")").c_str());; return;}
+	if(dispParams.size()<=(size_t)n){ throw std::invalid_argument(("Display parameters #"+boost::lexical_cast<string>(n)+" don't exist (number of entries "+boost::lexical_cast<string>(dispParams.size())+")").c_str());; return;}
 	const shared_ptr<DisplayParameters>& dp=dispParams[n];
 	string val;
 	if(dp->getValue("OpenGLRenderer",val)){ istringstream oglre(val);
 		yade::ObjectIO::load<typeof(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
 	}
 	else { LOG_WARN("OpenGLRenderer configuration not found in display parameters, skipped.");}
-	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val); displayMessage("Loaded view configuration #"+lexical_cast<string>(n)); }
+	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val); displayMessage("Loaded view configuration #"+boost::lexical_cast<string>(n)); }
 	else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
 }
 
@@ -58,7 +58,7 @@ void GLViewer::saveDisplayParameters(size_t n){
 	yade::ObjectIO::save<typeof(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
 	dp->setValue("OpenGLRenderer",oglre.str());
 	dp->setValue("GLViewer",GLViewer::getState());
-	displayMessage("Saved view configuration ot #"+lexical_cast<string>(n));
+	displayMessage("Saved view configuration ot #"+boost::lexical_cast<string>(n));
 }
 
 void GLViewer::draw()

@@ -37,8 +37,6 @@
 
 
 using namespace std;
-using namespace boost;
-
 
 struct DynLibDispatcher_Item2D{ int ix1, ix2; std::string functorName; DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){}; };
 struct DynLibDispatcher_Item1D{ int ix1     ; std::string functorName; DynLibDispatcher_Item1D(int a,        std::string c):ix1(a),       functorName(c){}; };
@@ -184,13 +182,13 @@ class DynLibDispatcher
 
 		shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1){
 		  	int ix1;
-			if(arg1->getClassIndex()<0) throw runtime_error("No functor for type "+arg1->getClassName()+" (index "+lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
+			if(arg1->getClassIndex()<0) throw runtime_error("No functor for type "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
 			if(locateMultivirtualFunctor1D(ix1,arg1)) return callBacks[ix1];
 			return shared_ptr<Executor>();
 		}
 
 		shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1, shared_ptr<BaseClass2>& arg2){
-			if(arg1->getClassIndex()<0 || arg2->getClassIndex()<0) throw runtime_error("No functor for types "+arg1->getClassName()+" (index "+lexical_cast<string>(arg1->getClassIndex())+") + "+arg2->getClassName()+" (index "+lexical_cast<string>(arg2->getClassIndex())+"), since some of the indices is invalid (negative).");
+			if(arg1->getClassIndex()<0 || arg2->getClassIndex()<0) throw runtime_error("No functor for types "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+") + "+arg2->getClassName()+" (index "+boost::lexical_cast<string>(arg2->getClassIndex())+"), since some of the indices is invalid (negative).");
 			int ix1,ix2;
 			if(locateMultivirtualFunctor2D(ix1,ix2,arg1,arg2)) return callBacks[ix1][ix2];
 			return shared_ptr<Executor>();

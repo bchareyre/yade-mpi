@@ -66,7 +66,7 @@ Vector2i HdapsGravityEngine::readSysfsFile(const string& name){
    boost::cmatch matches;
 	if(!boost::regex_match(buf,matches,re)) throw std::runtime_error(("HdapsGravityEngine: error parsing data from "+name).c_str());
 	//cerr<<matches[1]<<","<<matches[2]<<endl;
-	return Vector2i(lexical_cast<int>(matches[1]),lexical_cast<int>(matches[2]));
+	return Vector2i(boost::lexical_cast<int>(matches[1]),boost::lexical_cast<int>(matches[2]));
 
 }
 

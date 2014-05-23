@@ -9,13 +9,13 @@
 
 namespace py=boost::python;
 
-qglviewer::Vec tuple2vec(py::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){py::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
+qglviewer::Vec tuple2vec(py::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){py::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+boost::lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 py::tuple vec2tuple(qglviewer::Vec v){return py::make_tuple(v[0],v[1],v[2]);};
 
 class pyGLViewer{
 	const size_t viewNo;
 	public:
-		#define GLV if((OpenGLManager::self->views.size()<=viewNo) || !(OpenGLManager::self->views[viewNo])) throw runtime_error("No view #"+lexical_cast<string>(viewNo)); GLViewer* glv=OpenGLManager::self->views[viewNo].get();
+		#define GLV if((OpenGLManager::self->views.size()<=viewNo) || !(OpenGLManager::self->views[viewNo])) throw runtime_error("No view #"+boost::lexical_cast<string>(viewNo)); GLViewer* glv=OpenGLManager::self->views[viewNo].get();
 		pyGLViewer(size_t _viewNo=0): viewNo(_viewNo){}
 		void close(){ GLV; QCloseEvent* e(new QCloseEvent); QApplication::postEvent(glv,e); }
 		py::tuple get_grid(){GLV; return py::make_tuple(bool(glv->drawGrid & 1),bool(glv->drawGrid & 2),bool(glv->drawGrid & 4));}
@@ -40,7 +40,7 @@ class pyGLViewer{
 		void center(bool median){GLV;  if(median)glv->centerMedianQuartile(); else glv->centerScene();}
 		Vector2i get_screenSize(){GLV;  return Vector2i(glv->width(),glv->height());}
 		void set_screenSize(Vector2i t){ /*GLV;*/ OpenGLManager::self->emitResizeView(viewNo,t[0],t[1]);}
-		string pyStr(){return string("<GLViewer for view #")+lexical_cast<string>(viewNo)+">";}
+		string pyStr(){return string("<GLViewer for view #")+boost::lexical_cast<string>(viewNo)+">";}
 		void saveDisplayParameters(size_t n){GLV;  glv->saveDisplayParameters(n);}
 		void useDisplayParameters(size_t n){GLV;  glv->useDisplayParameters(n);}
 		string get_timeDisp(){GLV;  const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}

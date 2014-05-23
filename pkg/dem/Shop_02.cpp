@@ -67,8 +67,8 @@ Real Shop::RayleighWaveTimeStep(const shared_ptr<Scene> _rb){
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
 		
-		shared_ptr<ElastMat> ebp=dynamic_pointer_cast<ElastMat>(b->material);
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<ElastMat> ebp=boost::dynamic_pointer_cast<ElastMat>(b->material);
+		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape);
 		if(!ebp || !s) continue;
 		
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
@@ -118,7 +118,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	IGeomDispatcher* geomMeta=NULL;
 	IPhysDispatcher* physMeta=NULL;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	if(rb->interactions->find(Body::id_t(id1),Body::id_t(id2))!=0) throw runtime_error(string("Interaction #")+lexical_cast<string>(id1)+"+#"+lexical_cast<string>(id2)+" already exists.");
+	if(rb->interactions->find(Body::id_t(id1),Body::id_t(id2))!=0) throw runtime_error(string("Interaction #")+boost::lexical_cast<string>(id1)+"+#"+boost::lexical_cast<string>(id2)+" already exists.");
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<IGeomDispatcher*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<IPhysDispatcher*>(e.get()); if(physMeta) continue; }
@@ -129,8 +129,8 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	if(!geomMeta) throw runtime_error("No IGeomDispatcher in engines or inside InteractionLoop.");
 	if(!physMeta) throw runtime_error("No IPhysDispatcher in engines or inside InteractionLoop.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
-	if(!b1) throw runtime_error(("No body #"+lexical_cast<string>(id1)).c_str());
-	if(!b2) throw runtime_error(("No body #"+lexical_cast<string>(id2)).c_str());
+	if(!b1) throw runtime_error(("No body #"+boost::lexical_cast<string>(id1)).c_str());
+	if(!b2) throw runtime_error(("No body #"+boost::lexical_cast<string>(id2)).c_str());
 	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2,/*force*/force);
 	assert(force && i);
 	if(!i) return i;
