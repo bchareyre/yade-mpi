@@ -565,7 +565,7 @@ template<class Tesselation>
 void Network<Tesselation>::lineSolidPore(CellHandle cell, int j)
 {
   facetNFictious=detectFacetFictiousVertices(cell,j);
-  double solidLine = 0; //total of solidLine[j][0], solidLine[j][1], solidLine[j][2]. 
+  double lSolid = 0; //total of solidLine[j][0], solidLine[j][1], solidLine[j][2]. 
   Sphere v [3];
   VertexHandle W [3];
 
@@ -618,7 +618,7 @@ void Network<Tesselation>::lineSolidPore(CellHandle cell, int j)
     }; break;
     }
 
-    double lSolid = cell->info().solidLine[j][0] + cell->info().solidLine[j][1] + cell->info().solidLine[j][2];
+    lSolid = cell->info().solidLine[j][0] + cell->info().solidLine[j][1] + cell->info().solidLine[j][2];
     if (lSolid)
 	cell->info().solidLine[j][3]=1.0/lSolid;
     else cell->info().solidLine[j][3]=0;

@@ -1043,10 +1043,9 @@ void UnsaturatedEngine::debugTemp()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (tri.is_infinite(cell)) continue;
-	file << cell->info().index << "  " <<cell->info().poreRadius[0]<<" "<<getRadiusMin(cell,0)<<" "<<abs(solver->computeEffectiveRadius(cell, 0))<<endl;
-	file << cell->info().index << "  " <<cell->info().poreRadius[1]<<" "<<getRadiusMin(cell,1)<<" "<<abs(solver->computeEffectiveRadius(cell, 1))<<endl;
-	file << cell->info().index << "  " <<cell->info().poreRadius[2]<<" "<<getRadiusMin(cell,2)<<" "<<abs(solver->computeEffectiveRadius(cell, 2))<<endl;
-	file << cell->info().index << "  " <<cell->info().poreRadius[3]<<" "<<getRadiusMin(cell,3)<<" "<<abs(solver->computeEffectiveRadius(cell, 3))<<endl;
+        for(int i=0; i<4; i++) {
+            file << cell->info().index << "  " <<cell->info().solidLine[i][0]<<"  " <<cell->info().solidLine[i][1]<<"  " <<cell->info().solidLine[i][2]<<"  " <<cell->info().solidLine[i][3]<<endl;
+        }
     }
     file.close();
 }//----------end temp function for Vahid Joekar-Niasar's data (clear later)---------------------
@@ -1143,12 +1142,12 @@ void UnsaturatedEngine::computeSolidLine()
             solver->lineSolidPore(cell, j);
         }
     }
+    if(solver->debugOut) {cout<<"----computeSolidLine-----."<<endl;}
 }
 
 void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 {
-	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+	RTriangulation& Tri = solver->T[currentTes].Triangulation();
 	CVector nullVect(0,0,0);
 	//reset forces
 	if (!onlyCache) for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
@@ -1210,7 +1209,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 		if (onlyCache) return;
 	} else {//use cached values when triangulation doesn't change
 // 		#ifndef parallel_forces
-		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
 			
 //  		#else
