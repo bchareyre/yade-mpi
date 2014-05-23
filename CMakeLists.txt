@@ -90,7 +90,7 @@ ENDIF (CMAKE_CXX_FLAGS)
 IF ( NOT LocalBoost )
   SET(LocalBoost "1.47.0") # Minimal required Boost version
 ENDIF ( NOT LocalBoost )
-FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system REQUIRED)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system date_time REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
