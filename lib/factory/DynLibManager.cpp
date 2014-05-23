@@ -20,7 +20,6 @@
 
 
 //using namespace std;
-using namespace boost;
 
 CREATE_LOGGER(DynLibManager);
 

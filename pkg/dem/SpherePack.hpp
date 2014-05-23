@@ -11,11 +11,18 @@ using namespace std; // sorry
 #include<boost/python.hpp>
 #include<boost/python/object.hpp>
 #include<boost/version.hpp>
-using namespace boost;
 
 #include<boost/foreach.hpp>
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
+#endif
+
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include<boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include<memory>
+	using std::shared_ptr;
 #endif
 
 #include<yade/lib/base/Logging.hpp>
@@ -41,25 +48,25 @@ public:
 	struct Sph{
 		Vector3r c; Real r; int clumpId;
 		Sph(const Vector3r& _c, Real _r, int _clumpId=-1): c(_c), r(_r), clumpId(_clumpId) {};
-		python::tuple asTuple() const {
-			if(clumpId<0) return python::make_tuple(c,r);
-			return python::make_tuple(c,r,clumpId);
+		boost::python::tuple asTuple() const {
+			if(clumpId<0) return boost::python::make_tuple(c,r);
+			return boost::python::make_tuple(c,r,clumpId);
 		}
-		python::tuple asTupleNoClump() const { return python::make_tuple(c,r); }
+		boost::python::tuple asTupleNoClump() const { return boost::python::make_tuple(c,r); }
 	};
 	std::vector<Sph> pack;
 	Vector3r cellSize;
 	Real appliedPsdScaling;//a scaling factor that can be applied on size distribution
 	bool isPeriodic;
 	SpherePack(): cellSize(Vector3r::Zero()), appliedPsdScaling(1.), isPeriodic(0) {};
-	SpherePack(const python::list& l):cellSize(Vector3r::Zero()){ fromList(l); }
+	SpherePack(const boost::python::list& l):cellSize(Vector3r::Zero()){ fromList(l); }
 	// add single sphere
 	void add(const Vector3r& c, Real r){ pack.push_back(Sph(c,r)); }
 
 	// I/O
-	void fromList(const python::list& l);
+	void fromList(const boost::python::list& l);
 	void fromLists(const vector<Vector3r>& centers, const vector<Real>& radii); // used as ctor in python
-	python::list toList() const;
+	boost::python::list toList() const;
 	void fromFile(const string file);
 	void toFile(const string file) const;
 	void fromSimulation();
@@ -89,7 +96,7 @@ public:
 
 	// spatial characteristics
 	Vector3r dim() const {Vector3r mn,mx; aabb(mn,mx); return mx-mn;}
-	python::tuple aabb_py() const { Vector3r mn,mx; aabb(mn,mx); return python::make_tuple(mn,mx); }
+	boost::python::tuple aabb_py() const { Vector3r mn,mx; aabb(mn,mx); return boost::python::make_tuple(mn,mx); }
 	void aabb(Vector3r& mn, Vector3r& mx) const {
 		Real inf=std::numeric_limits<Real>::infinity(); mn=Vector3r(inf,inf,inf); mx=Vector3r(-inf,-inf,-inf);
 		FOREACH(const Sph& s, pack){ 
@@ -105,9 +112,9 @@ public:
 		sphVol*=(4/3.)*Mathr::PI;
 		return sphVol/(dd[0]*dd[1]*dd[2]);
 	}
-	python::tuple psd(int bins=10, bool mass=false) const;
+	boost::python::tuple psd(int bins=10, bool mass=false) const;
 	bool hasClumps() const;
-	python::tuple getClumps() const;
+	boost::python::tuple getClumps() const;
 
 	// transformations
 	void translate(const Vector3r& shift){ FOREACH(Sph& s, pack) s.c+=shift; }
@@ -133,13 +140,13 @@ public:
 
 	// iteration 
 	size_t len() const{ return pack.size(); }
-	python::tuple getitem(size_t idx){ if(idx>=pack.size()) throw runtime_error("Index "+lexical_cast<string>(idx)+" out of range 0.."+lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
+	boost::python::tuple getitem(size_t idx){ if(idx>=pack.size()) throw runtime_error("Index "+boost::lexical_cast<string>(idx)+" out of range 0.."+boost::lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
 	struct _iterator{
 		const SpherePack& sPack; size_t pos;
 		_iterator(const SpherePack& _sPack): sPack(_sPack), pos(0){}
 		_iterator iter(){ return *this;}
-		python::tuple next(){
-			if(pos==sPack.pack.size()){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
+		boost::python::tuple next(){
+			if(pos==sPack.pack.size()){ PyErr_SetNone(PyExc_StopIteration); boost::python::throw_error_already_set(); }
 			return sPack.pack[pos++].asTupleNoClump();
 		}
 	};

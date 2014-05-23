@@ -23,7 +23,7 @@ void DomainLimiter::action(){
 		}
 	}
 	FOREACH(Body::id_t id, out){
-		scene->bodies->erase(id);
+		scene->bodies->erase(id,false);
 	}
 }
 
@@ -63,7 +63,7 @@ void LawTester::action(){
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
 	LOG_DEBUG("=================== LawTester step "<<step<<" ========================");
 	const shared_ptr<Interaction> Inew=scene->interactions->find(ids[0],ids[1]);
-	string strIds("##"+lexical_cast<string>(ids[0])+"+"+lexical_cast<string>(ids[1]));
+	string strIds("##"+boost::lexical_cast<string>(ids[0])+"+"+boost::lexical_cast<string>(ids[1]));
 	// interaction not found at initialization
 	if(!I && (!Inew || !Inew->isReal())){
 		LOG_WARN("Interaction "<<strIds<<" does not exist (yet?), no-op."); return;
@@ -87,7 +87,7 @@ void LawTester::action(){
 	bool hasRot=(l6Geom || scGeom6d);
 	//NormShearPhys* phys=dynamic_cast<NormShearPhys*>(I->phys.get());			//Disabled because of warning
 	if(!gsc) throw std::invalid_argument("LawTester: IGeom of "+strIds+" not a GenericSpheresContact.");
-	if(!scGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor Dem3DofGeom, nor L3Geom (or L6Geom).");
+	if(!scGeom && !l3Geom) throw std::invalid_argument("LawTester: IGeom of "+strIds+" is neither ScGeom, nor L3Geom (or L6Geom).");
 	assert(!((bool)scGeom && (bool)l3Geom)); // nonsense
 	// get body objects
 	State *state1=Body::byId(id1,scene)->state.get(), *state2=Body::byId(id2,scene)->state.get();
@@ -237,7 +237,7 @@ void GlExtra_LawTester::render(){
 	// scene object changed (after reload, for instance), for re-initialization
 	if(tester && tester->scene!=scene) tester=shared_ptr<LawTester>();
 
-	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
+	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=boost::dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
 
 	//if(tester->renderLength<=0) return;

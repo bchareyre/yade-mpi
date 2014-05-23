@@ -79,7 +79,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 		}
 	}
 	if(linIx<0) {
-		LOG_ERROR("InteractionContainer::erase: attempt to delete interaction with a deleted body (the definition of linPos in the call to erase() should fix the problem) for  ##"+lexical_cast<string>(id1)+"+"+lexical_cast<string>(id2));
+		LOG_ERROR("InteractionContainer::erase: attempt to delete interaction with a deleted body (the definition of linPos in the call to erase() should fix the problem) for  ##"+boost::lexical_cast<string>(id1)+"+"+boost::lexical_cast<string>(id2));
 		return false;}
 	// iid is not the last element; we have to move last one to its place
 	if (linIx<(int)currSize-1) {

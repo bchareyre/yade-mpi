@@ -70,7 +70,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      if(file.tellp()==0){ file <<"i p0 p1 p2 t s norm0 norm1 norm2"<<endl; }
 	      Vector3r crackNormal=Vector3r::Zero();
 	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
-	      file << lexical_cast<string> ( scene->iter )<<" "<< lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 0 <<" "<< lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< lexical_cast<string> ( crackNormal[0] ) <<" "<< lexical_cast<string> ( crackNormal[1] ) <<" "<< lexical_cast<string> ( crackNormal[2] ) << endl;
+	      file << boost::lexical_cast<string> ( scene->iter )<<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 0 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) << endl;
 	    }
 	    cracksFileExist=true;
 
@@ -133,7 +133,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      if(file.tellp()==0){ file <<"i p0 p1 p2 t s norm0 norm1 norm2"<<endl; }
 	      Vector3r crackNormal=Vector3r::Zero();
 	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
-	      file << lexical_cast<string> ( scene->iter )<<" "<< lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< lexical_cast<string> ( crackNormal[0] ) <<" "<< lexical_cast<string> ( crackNormal[1] ) <<" "<< lexical_cast<string> ( crackNormal[2] ) << endl;
+	      file << boost::lexical_cast<string> ( scene->iter )<<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) << endl;
 	    }
 	    cracksFileExist=true;
 	    

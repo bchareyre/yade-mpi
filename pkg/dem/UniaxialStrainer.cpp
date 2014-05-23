@@ -37,7 +37,7 @@ void UniaxialStrainer::init(){
 	originalLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<axisCoord(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<axisCoord(negIds[0]));
 	LOG_INFO("Setting initial length to "<<originalLength<<" (between #"<<negIds[0]<<" and #"<<posIds[0]<<")");
-	if(originalLength<=0) throw runtime_error(("UniaxialStrainer: Initial length is negative or zero (swapped reference particles?)! "+lexical_cast<string>(originalLength)).c_str());
+	if(originalLength<=0) throw runtime_error(("UniaxialStrainer: Initial length is negative or zero (swapped reference particles?)! "+boost::lexical_cast<string>(originalLength)).c_str());
 	/* this happens is nan propagates from e.g. brefcom consitutive law in case 2 bodies have _exactly_ the same position
 	 * (the the normal strain is 0./0.=nan). That is an user's error, however and should not happen. */
 	if(isnan(originalLength)) throw logic_error("UniaxialStrainer: Initial length is NaN!");
@@ -67,7 +67,7 @@ void UniaxialStrainer::init(){
 			case -1: v0=-absSpeed; v1=0; break;
 			case  0: v0=-absSpeed/2; v1=absSpeed/2; break;
 			case  1: v0=0; v1=absSpeed; break;
-			default: throw std::invalid_argument(("UniaxialStrainer: unknown asymmetry value "+lexical_cast<string>(asymmetry)+" (should be -1,0,1)").c_str());
+			default: throw std::invalid_argument(("UniaxialStrainer: unknown asymmetry value "+boost::lexical_cast<string>(asymmetry)+" (should be -1,0,1)").c_str());
 		}
 		assert(p1>p0);
 		// set speeds for particles on the boundary

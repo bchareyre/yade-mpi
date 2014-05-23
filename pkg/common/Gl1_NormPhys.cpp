@@ -67,7 +67,7 @@
 			Real dist=relPos.norm();
 		#else
 			// get endpoints from geom
-			// max(r,0) handles r<0 which is the case for "radius" of the facet in Dem3DofGeom_FacetSphere
+			// max(r,0) handles r<0 which is the case for "radius" of the facet
 			Vector3r cp=scene->isPeriodic? scene->cell->wrapShearedPt(geom->contactPoint) : geom->contactPoint;
 			Vector3r p1=cp-max(geom->refR1,(Real)0.)*geom->normal;
 			Vector3r p2=cp+max(geom->refR2,(Real)0.)*geom->normal;

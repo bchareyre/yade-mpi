@@ -109,8 +109,9 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	}
 	
 	///In the second sort, the chunks are connected consistently.
-	///If sorting requires to move a bound past half-chunk, the algorithm is not thread safe, if it happens we error out.
-	///Better than computing with messed up interactions
+	///If sorting requires to move a bound past half-chunk, the algorithm is not thread safe,
+	/// if it happens we roll-back and run the 1-thread sort + send warning
+	bool parallelFailed=false;
 	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for (unsigned k=1; k<nChunks;k++) {
 		
@@ -130,12 +131,20 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 				j--;
 			}
 			v[j+1]=viInit;
-			if (j<=long(chunks[k]-chunkSize*0.5)) LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Consider turning ompThreads=1 for thread safety.");
+			if (j<=long(chunks[k]-chunkSize*0.5)) {
+				LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Parallel colliding aborted, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
+				parallelFailed=true;}
 		}
-		if (i>=long(chunks[k]+chunkSize*0.5)) LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning ompThreads=1 for thread safety.")
+		if (i>=long(chunks[k]+chunkSize*0.5)) {
+			LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning collider.ompThreads=1 for not wasting CPU time.");
+			parallelFailed=true;}
 	}
 	/// Check again, just to be sure...
-	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) LOG_ERROR("parallel sort failed, consider turning ompThreads=1");
+	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) {
+		LOG_ERROR("Parallel colliding failed, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
+		parallelFailed=true;}
+	
+	if (parallelFailed) return insertionSort(v,interactions, scene, doCollide);
 
 	/// Now insert interactions sequentially	
 	for (int n=0;n<ompThreads;n++) for (size_t k=0, kend=newInteractions[n].size();k<kend;k++) if (!interactions->found(newInteractions[n][k].first,newInteractions[n][k].second)) interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].first,newInteractions[n][k].second)));
@@ -265,7 +274,7 @@ void InsertionSortCollider::action(){
 		if(verletDist>0){
 			// get NewtonIntegrator, to ask for the maximum velocity value
 			if(!newton){
-				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
 				if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 			}
 		}
@@ -537,20 +546,20 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 	return true;
 }
 
-python::tuple InsertionSortCollider::dumpBounds(){
-	python::list bl[3]; // 3 bound lists, inserted into the tuple at the end
+boost::python::tuple InsertionSortCollider::dumpBounds(){
+  boost::python::list bl[3]; // 3 bound lists, inserted into the tuple at the end
 	for(int axis=0; axis<3; axis++){
 		VecBounds& V=BB[axis];
 		if(periodic){
 			for(long i=0; i<V.size; i++){
 				long ii=V.norm(i); // start from the period boundary
-				bl[axis].append(python::make_tuple(V[ii].coord,(V[ii].flags.isMin?-1:1)*V[ii].id,V[ii].period));
+				bl[axis].append(boost::python::make_tuple(V[ii].coord,(V[ii].flags.isMin?-1:1)*V[ii].id,V[ii].period));
 			}
 		} else {
 			for(long i=0; i<V.size; i++){
-				bl[axis].append(python::make_tuple(V[i].coord,(V[i].flags.isMin?-1:1)*V[i].id));
+				bl[axis].append(boost::python::make_tuple(V[i].coord,(V[i].flags.isMin?-1:1)*V[i].id));
 			}
 		}
 	}
-	return python::make_tuple(bl[0],bl[1],bl[2]);
+	return boost::python::make_tuple(bl[0],bl[1],bl[2]);
 }

@@ -46,7 +46,7 @@ void Scene::fillDefaultTags(){
 	string gecos(pw->pw_gecos), gecos2; size_t p=gecos.find(","); if(p!=string::npos) boost::algorithm::erase_tail(gecos,gecos.size()-p); for(size_t i=0;i<gecos.size();i++){gecos2.push_back(((unsigned char)gecos[i])<128 ? gecos[i] : '?'); }
 	tags.push_back(boost::algorithm::replace_all_copy(string("author=")+gecos2+" ("+string(pw->pw_name)+"@"+hostname+")"," ","~"));
 	tags.push_back(string("isoTime="+boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())));
-	string id=boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())+"p"+lexical_cast<string>(getpid());
+	string id=boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())+"p"+boost::lexical_cast<string>(getpid());
 	tags.push_back("id="+id);
 	tags.push_back("d.id="+id);
 	tags.push_back("id.d="+id);
@@ -150,7 +150,7 @@ shared_ptr<Engine> Scene::engineByName(const string& s){
 bool Scene::timeStepperPresent(){
 	int n=0;
 	FOREACH(const shared_ptr<Engine>&e, engines){ if(dynamic_cast<TimeStepper*>(e.get())) n++; }
-	if(n>1) throw std::runtime_error(string("Multiple ("+lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
+	if(n>1) throw std::runtime_error(string("Multiple ("+boost::lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
 	return n>0;
 }
 
@@ -159,7 +159,7 @@ bool Scene::timeStepperActive(){
 	FOREACH(const shared_ptr<Engine>&e, engines){
 		TimeStepper* ts=dynamic_cast<TimeStepper*>(e.get()); if(ts) { ret=ts->active; n++; }
 	}
-	if(n>1) throw std::runtime_error(string("Multiple ("+lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
+	if(n>1) throw std::runtime_error(string("Multiple ("+boost::lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
 	return ret;
 }
 
@@ -169,7 +169,7 @@ bool Scene::timeStepperActivate(bool a){
 		TimeStepper* ts=dynamic_cast<TimeStepper*>(e.get());
 		if(ts) { ts->setActive(a); n++; }
 	}
-	if(n>1) throw std::runtime_error(string("Multiple ("+lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
+	if(n>1) throw std::runtime_error(string("Multiple ("+boost::lexical_cast<string>(n)+") TimeSteppers in the simulation?!").c_str());
 	return n>0;
 }
 
@@ -178,9 +178,9 @@ bool Scene::timeStepperActivate(bool a){
 void Scene::checkStateTypes(){
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b || !b->material) continue;
-		if(b->material && !b->state) throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": has Body::material, but NULL Body::state.");
+		if(b->material && !b->state) throw std::runtime_error("Body #"+boost::lexical_cast<string>(b->getId())+": has Body::material, but NULL Body::state.");
 		if(!b->material->stateTypeOk(b->state.get())){
-			throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": Body::material type "+b->material->getClassName()+" doesn't correspond to Body::state type "+b->state->getClassName()+" (should be "+b->material->newAssocState()->getClassName()+" instead).");
+			throw std::runtime_error("Body #"+boost::lexical_cast<string>(b->getId())+": Body::material type "+b->material->getClassName()+" doesn't correspond to Body::state type "+b->state->getClassName()+" (should be "+b->material->newAssocState()->getClassName()+" instead).");
 		}
 	}
 }

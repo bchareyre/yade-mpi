@@ -145,19 +145,6 @@ class Bo1_Polyhedra_Aabb: public BoundFunctor{
 REGISTER_SERIALIZABLE(Bo1_Polyhedra_Aabb);
 
 //***************************************************************************
-#ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
-	/*! Draw Polyhedra using OpenGL */
-	class Gl1_Polyhedra: public GlShapeFunctor{	
-		public:
-			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-			YADE_CLASS_BASE_DOC(Gl1_Polyhedra,GlShapeFunctor,"Renders :yref:`Polyhedra` object");
-			RENDERS(Polyhedra);
-	};
-	REGISTER_SERIALIZABLE(Gl1_Polyhedra);
-#endif
-
-//***************************************************************************
 /*! Elastic material */
 class PolyhedraMat: public Material{
 	public:
@@ -191,6 +178,53 @@ class PolyhedraPhys: public IPhys{
 	REGISTER_CLASS_INDEX(PolyhedraPhys,IPhys);
 };
 REGISTER_SERIALIZABLE(PolyhedraPhys);
+
+//***************************************************************************
+#ifdef YADE_OPENGL
+	#include<yade/pkg/common/GLDrawFunctors.hpp>
+	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<yade/lib/opengl/GLUtils.hpp>
+	#include<GL/glu.h>
+	#include<yade/pkg/dem/Shop.hpp>
+	
+	/*! Draw Polyhedra using OpenGL */
+	class Gl1_Polyhedra: public GlShapeFunctor{	
+		public:
+			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+			YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Polyhedra,GlShapeFunctor,"Renders :yref:`Polyhedra` object",
+			((bool,wire,false,,"Only show wireframe"))
+			);
+			RENDERS(Polyhedra);
+	};
+	REGISTER_SERIALIZABLE(Gl1_Polyhedra);
+
+	struct Gl1_PolyhedraGeom: public GlIGeomFunctor{
+		RENDERS(PolyhedraGeom);
+		void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
+		void draw(const shared_ptr<IGeom>&);
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PolyhedraGeom,GlIGeomFunctor,"Render :yref:`PolyhedraGeom` geometry.",
+		);
+	};
+	REGISTER_SERIALIZABLE(Gl1_PolyhedraGeom);
+
+	class Gl1_PolyhedraPhys: public GlIPhysFunctor{	
+		static GLUquadric* gluQuadric; // needed for gluCylinder, initialized by ::go if no initialized yet
+		public:
+			virtual void go(const shared_ptr<IPhys>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PolyhedraPhys,GlIPhysFunctor,"Renders :yref:`PolyhedraPhys` objects as cylinders of which diameter and color depends on :yref:`PolyhedraPhys::normForce` magnitude.",
+			((Real,maxFn,0,,"Value of :yref:`NormPhys.normalForce` corresponding to :yref:`maxDiameter<Gl1_NormPhys.maxDiameter>`. This value will be increased (but *not decreased* ) automatically."))
+			((Real,refRadius,std::numeric_limits<Real>::infinity(),,"Reference (minimum) particle radius"))
+			((int,signFilter,0,,"If non-zero, only display contacts with negative (-1) or positive (+1) normal forces; if zero, all contacts will be displayed."))
+			((Real,maxRadius,-1,,"Cylinder radius corresponding to the maximum normal force."))
+			((int,slices,6,,"Number of sphere slices; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))
+		(	(int,stacks,1,,"Number of sphere stacks; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))			
+		);
+		RENDERS(PolyhedraPhys);
+	};
+	REGISTER_SERIALIZABLE(Gl1_PolyhedraPhys);
+
+#endif
+
 
 //***************************************************************************
 class Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys: public IPhysFunctor{
@@ -247,6 +281,8 @@ Matrix3r TetraInertiaTensor(Vector3r av,Vector3r bv,Vector3r cv,Vector3r dv);
 Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpoint X, CGALpoint centroidA, CGALpoint centroidB,  std::vector<int> &code);
 //return intersection of plane & polyhedron 
 Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centroid, CGALpoint X);
+//Test if point is inside Polyhedron
+bool Is_inside_Polyhedron(Polyhedron P, CGALpoint inside);
 //return approximate intersection of sphere & polyhedron 
 bool Sphere_Polyhedron_intersection(Polyhedron A, double r, CGALpoint C, CGALpoint centroid,  double volume, CGALvector normal, double area);
 //return volume and centroid of polyhedra
@@ -263,12 +299,13 @@ bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int> &sep_plane);
 Polyhedron Simplify(Polyhedron P, double lim);
 //list of facets and edges
 void PrintPolyhedron(Polyhedron P);
+void PrintPolyhedron2File(Polyhedron P,FILE* X);
 //normal by least square fitting of separating segments
 Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB);
 //calculate area of projection of polyhedron into the plane
 double CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal);
 //split polyhedron
-void SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction);
+shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point);
 //new polyhedra
 shared_ptr<Body> NewPolyhedra(vector<Vector3r> v, shared_ptr<Material> mat);
 

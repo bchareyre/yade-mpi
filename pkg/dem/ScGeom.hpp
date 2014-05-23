@@ -55,8 +55,8 @@ class ScGeom: public GenericSpheresContact {
 		,
 		/* extra initializers */ ((radius1,GenericSpheresContact::refR1)) ((radius2,GenericSpheresContact::refR2)),
 		/* ctor */ createIndex(); twist_axis=orthonormal_axis=Vector3r::Zero();,
-		/* py */ .def("incidentVel",&ScGeom::getIncidentVel_py,(python::arg("i"),python::arg("avoidGranularRatcheting")=true),"Return incident velocity of the interaction (see also :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting` for explanation of the ratcheting argument).")
-		.def("relAngVel",&ScGeom::getRelAngVel_py,(python::arg("i")),"Return relative angular velocity of the interaction.")
+		/* py */ .def("incidentVel",&ScGeom::getIncidentVel_py,(boost::python::arg("i"),boost::python::arg("avoidGranularRatcheting")=true),"Return incident velocity of the interaction (see also :yref:`Ig2_Sphere_Sphere_ScGeom.avoidGranularRatcheting` for explanation of the ratcheting argument).")
+		.def("relAngVel",&ScGeom::getRelAngVel_py,(boost::python::arg("i")),"Return relative angular velocity of the interaction.")
 	);
 	REGISTER_CLASS_INDEX(ScGeom,GenericSpheresContact);
 };

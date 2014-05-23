@@ -161,13 +161,13 @@ class TemplateFlowEngine : public PartialEngine
 			return (solver->onlySpheresInteractions.size());}
 		int onlySpheresInteractions(unsigned int interaction) {
 			return (solver->onlySpheresInteractions[interaction]);}
-		python::list getConstrictions(bool all) {
-			vector<Real> csd=solver->getConstrictions(); python::list pycsd;
+		boost::python::list getConstrictions(bool all) {
+			vector<Real> csd=solver->getConstrictions(); boost::python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k]!=0) || csd[k]>0) pycsd.append(csd[k]); return pycsd;}
-		python::list getConstrictionsFull(bool all) {
-			vector<Constriction> csd=solver->getConstrictionsFull(); python::list pycsd;
+		boost::python::list getConstrictionsFull(bool all) {
+			vector<Constriction> csd=solver->getConstrictionsFull(); boost::python::list pycsd;
 			for (unsigned int k=0;k<csd.size();k++) if ((all && csd[k].second[0]!=0) || csd[k].second[0]>0) {
-				python::list cons;
+				boost::python::list cons;
 				cons.append(csd[k].first.first);
 				cons.append(csd[k].first.second);
 				cons.append(csd[k].second[0]);
@@ -195,8 +195,8 @@ class TemplateFlowEngine : public PartialEngine
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		int getCell(double posX, double posY, double posZ){return solver->getCell(posX, posY, posZ);}
 		unsigned int nCells(){return solver->T[solver->currentTes].cellHandles.size();}
-		python::list getVertices(unsigned int id){
-			python::list ids;
+		boost::python::list getVertices(unsigned int id){
+			boost::python::list ids;
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}			
 			for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->vertex(i)->info().id());
 			return ids;
@@ -310,49 +310,49 @@ class TemplateFlowEngine : public PartialEngine
 		ellapsedIter=0;
 		metisForced=false;
 		,
-		.def("imposeFlux",&TemplateFlowEngine::imposeFlux,(python::arg("pos"),python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
-		.def("imposePressure",&TemplateFlowEngine::imposePressure,(python::arg("pos"),python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
-		.def("setImposedPressure",&TemplateFlowEngine::setImposedPressure,(python::arg("cond"),python::arg("p")),"Set pressure value at the point indexed 'cond'.")
+		.def("imposeFlux",&TemplateFlowEngine::imposeFlux,(boost::python::arg("pos"),boost::python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
+		.def("imposePressure",&TemplateFlowEngine::imposePressure,(boost::python::arg("pos"),boost::python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
+		.def("setImposedPressure",&TemplateFlowEngine::setImposedPressure,(boost::python::arg("cond"),boost::python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 		.def("clearImposedPressure",&TemplateFlowEngine::clearImposedPressure,"Clear the list of points with pressure imposed.")
 		.def("clearImposedFlux",&TemplateFlowEngine::clearImposedFlux,"Clear the list of points with flux imposed.")
-		.def("getCellFlux",&TemplateFlowEngine::getCellFlux,(python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
-		.def("getBoundaryFlux",&TemplateFlowEngine::getBoundaryFlux,(python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
-		.def("getConstrictions",&TemplateFlowEngine::getConstrictions,(python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
-		.def("getConstrictionsFull",&TemplateFlowEngine::getConstrictionsFull,(python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
+		.def("getCellFlux",&TemplateFlowEngine::getCellFlux,(boost::python::arg("cond")),"Get influx in cell associated to an imposed P (indexed using 'cond').")
+		.def("getBoundaryFlux",&TemplateFlowEngine::getBoundaryFlux,(boost::python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
+		.def("getConstrictions",&TemplateFlowEngine::getConstrictions,(boost::python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
+		.def("getConstrictionsFull",&TemplateFlowEngine::getConstrictionsFull,(boost::python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 		.def("edgeSize",&TemplateFlowEngine::edgeSize,"Return the number of interactions.")
 		.def("OSI",&TemplateFlowEngine::OSI,"Return the number of interactions only between spheres.")
 		
-		.def("saveVtk",&TemplateFlowEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
-		.def("avFlVelOnSph",&TemplateFlowEngine::avFlVelOnSph,(python::arg("idSph")),"compute a sphere-centered average fluid velocity")
-		.def("fluidForce",&TemplateFlowEngine::fluidForce,(python::arg("idSph")),"Return the fluid force on sphere idSph.")
-		.def("shearLubForce",&TemplateFlowEngine::shearLubForce,(python::arg("idSph")),"Return the shear lubrication force on sphere idSph.")
-		.def("shearLubTorque",&TemplateFlowEngine::shearLubTorque,(python::arg("idSph")),"Return the shear lubrication torque on sphere idSph.")
-		.def("normalLubForce",&TemplateFlowEngine::normalLubForce,(python::arg("idSph")),"Return the normal lubrication force on sphere idSph.")
-		.def("bodyShearLubStress",&TemplateFlowEngine::bodyShearLubStress,(python::arg("idSph")),"Return the shear lubrication stress on sphere idSph.")
-		.def("bodyNormalLubStress",&TemplateFlowEngine::bodyNormalLubStress,(python::arg("idSph")),"Return the normal lubrication stress on sphere idSph.")
-		.def("shearVelocity",&TemplateFlowEngine::shearVelocity,(python::arg("idSph")),"Return the shear velocity of the interaction.")
-		.def("normalVelocity",&TemplateFlowEngine::normalVelocity,(python::arg("idSph")),"Return the normal velocity of the interaction.")
-		.def("normalVect",&TemplateFlowEngine::normalVect,(python::arg("idSph")),"Return the normal vector between particles.")
-		.def("surfaceDistanceParticle",&TemplateFlowEngine::surfaceDistanceParticle,(python::arg("interaction")),"Return the distance between particles.")
-		.def("onlySpheresInteractions",&TemplateFlowEngine::onlySpheresInteractions,(python::arg("interaction")),"Return the id of the interaction only between spheres.")
-		.def("pressureProfile",&TemplateFlowEngine::pressureProfile,(python::arg("wallUpY"),python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
-		.def("getPorePressure",&TemplateFlowEngine::getPorePressure,(python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
-		.def("averageSlicePressure",&TemplateFlowEngine::averageSlicePressure,(python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
+		.def("saveVtk",&TemplateFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
+		.def("avFlVelOnSph",&TemplateFlowEngine::avFlVelOnSph,(boost::python::arg("idSph")),"compute a sphere-centered average fluid velocity")
+		.def("fluidForce",&TemplateFlowEngine::fluidForce,(boost::python::arg("idSph")),"Return the fluid force on sphere idSph.")
+		.def("shearLubForce",&TemplateFlowEngine::shearLubForce,(boost::python::arg("idSph")),"Return the shear lubrication force on sphere idSph.")
+		.def("shearLubTorque",&TemplateFlowEngine::shearLubTorque,(boost::python::arg("idSph")),"Return the shear lubrication torque on sphere idSph.")
+		.def("normalLubForce",&TemplateFlowEngine::normalLubForce,(boost::python::arg("idSph")),"Return the normal lubrication force on sphere idSph.")
+		.def("bodyShearLubStress",&TemplateFlowEngine::bodyShearLubStress,(boost::python::arg("idSph")),"Return the shear lubrication stress on sphere idSph.")
+		.def("bodyNormalLubStress",&TemplateFlowEngine::bodyNormalLubStress,(boost::python::arg("idSph")),"Return the normal lubrication stress on sphere idSph.")
+		.def("shearVelocity",&TemplateFlowEngine::shearVelocity,(boost::python::arg("idSph")),"Return the shear velocity of the interaction.")
+		.def("normalVelocity",&TemplateFlowEngine::normalVelocity,(boost::python::arg("idSph")),"Return the normal velocity of the interaction.")
+		.def("normalVect",&TemplateFlowEngine::normalVect,(boost::python::arg("idSph")),"Return the normal vector between particles.")
+		.def("surfaceDistanceParticle",&TemplateFlowEngine::surfaceDistanceParticle,(boost::python::arg("interaction")),"Return the distance between particles.")
+		.def("onlySpheresInteractions",&TemplateFlowEngine::onlySpheresInteractions,(boost::python::arg("interaction")),"Return the id of the interaction only between spheres.")
+		.def("pressureProfile",&TemplateFlowEngine::pressureProfile,(boost::python::arg("wallUpY"),boost::python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
+		.def("getPorePressure",&TemplateFlowEngine::getPorePressure,(boost::python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
+		.def("averageSlicePressure",&TemplateFlowEngine::averageSlicePressure,(boost::python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
 		.def("averagePressure",&TemplateFlowEngine::averagePressure,"Measure averaged pore pressure in the entire volume")
 		.def("updateBCs",&TemplateFlowEngine::updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 		.def("emulateAction",&TemplateFlowEngine::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
-		.def("getCell",&TemplateFlowEngine::getCell,(python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+		.def("getCell",&TemplateFlowEngine::getCell,(boost::python::arg("pos")),"get id of the cell containing (X,Y,Z).")
 		.def("nCells",&TemplateFlowEngine::nCells,"get the total number of finite cells in the triangulation.")
-		.def("getVertices",&TemplateFlowEngine::getVertices,(python::arg("id")),"get the vertices of a cell")
+		.def("getVertices",&TemplateFlowEngine::getVertices,(boost::python::arg("id")),"get the vertices of a cell")
 		#ifdef LINSOLV
-		.def("exportMatrix",&TemplateFlowEngine::exportMatrix,(python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
-		.def("exportTriplets",&TemplateFlowEngine::exportTriplets,(python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
+		.def("exportMatrix",&TemplateFlowEngine::exportMatrix,(boost::python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
+		.def("exportTriplets",&TemplateFlowEngine::exportTriplets,(boost::python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
 		.def("cholmodStats",&TemplateFlowEngine::cholmodStats,"get statistics of cholmod solver activity")
 		.def("metisUsed",&TemplateFlowEngine::metisUsed,"check wether metis lib is effectively used")
 		.add_property("forceMetis",&TemplateFlowEngine::getForceMetis,&TemplateFlowEngine::setForceMetis,"If true, METIS is used for matrix preconditioning, else Cholmod is free to choose the best method (which may be METIS to, depending on the matrix). See ``nmethods`` in Cholmod documentation")
 		#endif
 		.def("compTessVolumes",&TemplateFlowEngine::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
-		.def("volume",&TemplateFlowEngine::getVolume,(python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
+		.def("volume",&TemplateFlowEngine::getVolume,(boost::python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
 		)
 };
 // Definition of functions in a separate file for clarity 

@@ -16,7 +16,6 @@
 
 
 using namespace std;
-// using namespace boost;
 namespace CGT {
 
 // 	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;

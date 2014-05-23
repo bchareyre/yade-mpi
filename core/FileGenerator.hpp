@@ -31,7 +31,7 @@ class FileGenerator: public Serializable
 		/*attrs*/,
 		/*ctor*/
 		,
-		.def("generate",&FileGenerator::pyGenerate,(python::arg("out")),"Generate scene, save to given file")
+		.def("generate",&FileGenerator::pyGenerate,(boost::python::arg("out")),"Generate scene, save to given file")
 		.def("load",&FileGenerator::pyLoad,"Generate scene, save to temporary file and load immediately");
 	);
 	DECLARE_LOGGER;

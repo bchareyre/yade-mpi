@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="img.qrc">
-    <normaloff>:/img/yade-favicon.png</normaloff>:/img/yade-favicon.png</iconset>
+    <normaloff>:/img/yade-favicon.xpm</normaloff>:/img/yade-favicon.xpm</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <property name="margin">
@@ -460,7 +460,7 @@
              </property>
              <property name="icon">
               <iconset resource="img.qrc">
-               <normaloff>:/img/XYZ.png</normaloff>:/img/XYZ.png</iconset>
+               <normaloff>:/img/XYZ.xpm</normaloff>:/img/XYZ.xpm</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -483,7 +483,7 @@
              </property>
              <property name="icon">
               <iconset resource="img.qrc">
-               <normaloff>:/img/YZX.png</normaloff>:/img/YZX.png</iconset>
+               <normaloff>:/img/YZX.xpm</normaloff>:/img/YZX.xpm</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -506,7 +506,7 @@
              </property>
              <property name="icon">
               <iconset resource="img.qrc">
-               <normaloff>:/img/ZXY.png</normaloff>:/img/ZXY.png</iconset>
+               <normaloff>:/img/ZXY.xpm</normaloff>:/img/ZXY.xpm</iconset>
              </property>
              <property name="iconSize">
               <size>

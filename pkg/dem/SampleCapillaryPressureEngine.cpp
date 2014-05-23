@@ -16,7 +16,6 @@
 #include<yade/lib/base/Math.hpp>
 #include <boost/lexical_cast.hpp>
 
-using namespace boost;
 using namespace std;
 
 YADE_PLUGIN((SampleCapillaryPressureEngine));
@@ -43,7 +42,7 @@ void SampleCapillaryPressureEngine::updateParameters()
 	  if ((S > (sigma_iso - (sigma_iso*SigmaPrecision))) && (S < (sigma_iso + (sigma_iso*SigmaPrecision)))) {
 	    
 	    string fileName = "../data/" + Phase1End + "_" + 
-	    lexical_cast<string>(scene->iter) + ".xml";
+	    boost::lexical_cast<string>(scene->iter) + ".xml";
 	    cerr << "saving snapshot: " << fileName << " ...";
 	    Omega::instance().saveSimulation(fileName);
 	    pressureVariationActivated = true;

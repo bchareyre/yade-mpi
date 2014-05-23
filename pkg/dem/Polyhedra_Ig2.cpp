@@ -29,6 +29,7 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	Transformation t_rot_trans(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PA = A->GetPolyhedron();
 	std::transform( PA.points_begin(), PA.points_end(), PA.points_begin(), t_rot_trans);
+	std::transform( PA.facets_begin(), PA.facets_end(), PA.planes_begin(),Plane_equation());	
 
 
 	//move and rotate 2nd the CGAL structure Polyhedron
@@ -37,6 +38,7 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	t_rot_trans = Transformation(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PB = B->GetPolyhedron();
 	std::transform( PB.points_begin(), PB.points_end(), PB.points_begin(), t_rot_trans);
+	std::transform( PB.facets_begin(), PB.facets_end(), PB.planes_begin(),Plane_equation());
 
 	shared_ptr<PolyhedraGeom> bang;
 	if (isNew) {
@@ -62,6 +64,7 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
  	if(isnan(volume) || volume<=1E-25 || volume > min(A->GetVolume(),B->GetVolume())) {bang->equivalentPenetrationDepth=0; 	return true;}
+	if ( (!Is_inside_Polyhedron(PA, ToCGALPoint(centroid))) or (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid))))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//find normal direction
         Vector3r normal = FindNormal(Int, PA, PB);
@@ -80,6 +83,17 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
 	bang->normal=normal;
 	
+	/*
+	FILE * fin = fopen("Interactions.dat","a");
+	fprintf(fin,"************** IDS %d %d **************\n",interaction->id1, interaction->id2);
+	fprintf(fin,"volume\t%e\n",volume);	
+	fprintf(fin,"centroid\t%e\t%e\t%e\n",centroid[0],centroid[1],centroid[2]);
+	PrintPolyhedron2File(PA,fin);
+	PrintPolyhedron2File(PB,fin);
+	PrintPolyhedron2File(Int,fin);
+	fclose(fin);
+	*/
+
 	return true;	
 }
 
@@ -131,6 +145,7 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sha
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
 	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume())  {bang->equivalentPenetrationDepth=0; return true;}
+	if (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//calculate area of projection of Intersection into the normal plane
         double area = volume/1E-8;
@@ -167,6 +182,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sh
 	Transformation t_rot_trans(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PB = B->GetPolyhedron();
 	std::transform( PB.points_begin(), PB.points_end(), PB.points_begin(), t_rot_trans);
+	std::transform( PB.facets_begin(), PB.facets_end(), PB.planes_begin(),Plane_equation());
 
 	//move and rotate facet
 	vector<CGALpoint> v;
@@ -224,6 +240,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sh
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
  	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume()) {bang->equivalentPenetrationDepth=0; return true;}
+	if (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//find normal direction
 	Vector3r normal = FindNormal(Int, PA, PB);

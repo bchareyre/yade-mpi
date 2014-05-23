@@ -77,7 +77,7 @@ void Disp2DPropLoadEngine::action()
 	else if ( (scene->iter-it_begin) == nbre_iter)
 	{
 		stopMovement();
-		string fileName=Key + "DR"+lexical_cast<string> (nbre_iter)+"ItAtV_"+lexical_cast<string> (v)+"done.xml";
+		string fileName=Key + "DR"+boost::lexical_cast<string> (nbre_iter)+"ItAtV_"+boost::lexical_cast<string> (v)+"done.xml";
 // 		Omega::instance().saveSimulation ( fileName );
 		saveData();
 	}
@@ -210,11 +210,11 @@ void Disp2DPropLoadEngine::saveData()
 		,d2W = dSigN * du + dTau * dgamma
 		;
 
-	ofile << lexical_cast<string> (theta) << " "<< lexical_cast<string> (dTau) << " " << lexical_cast<string> (dSigN) << " "
-		<< lexical_cast<string> (dgamma)<<" " << lexical_cast<string> (du) << " " << lexical_cast<string> (Tau0) << " "
-		<< lexical_cast<string> (SigN0) << " " << lexical_cast<string> (d2W) << " " 
-		<< lexical_cast<string> (coordSs0) << " " << lexical_cast<string> (coordTot0) << " "
-		<< lexical_cast<string> (coordSs) << " " << lexical_cast<string> (coordTot) <<endl;
+	ofile << boost::lexical_cast<string> (theta) << " "<< boost::lexical_cast<string> (dTau) << " " << boost::lexical_cast<string> (dSigN) << " "
+		<< boost::lexical_cast<string> (dgamma)<<" " << boost::lexical_cast<string> (du) << " " << boost::lexical_cast<string> (Tau0) << " "
+		<< boost::lexical_cast<string> (SigN0) << " " << boost::lexical_cast<string> (d2W) << " " 
+		<< boost::lexical_cast<string> (coordSs0) << " " << boost::lexical_cast<string> (coordTot0) << " "
+		<< boost::lexical_cast<string> (coordSs) << " " << boost::lexical_cast<string> (coordTot) <<endl;
 }
 
 

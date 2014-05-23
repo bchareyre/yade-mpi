@@ -122,8 +122,8 @@ class OpenGLRenderer : public Serializable
 		/*py*/
 		.def("setRefSe3",&OpenGLRenderer::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.")
 		.def("render",&OpenGLRenderer::pyRender,"Render the scene in the current OpenGL context.")
-		.def("hideBody",&OpenGLRenderer::hide,(python::arg("id")),"Hide body from id (see :yref:`OpenGLRenderer::showBody`)")
-		.def("showBody",&OpenGLRenderer::show,(python::arg("id")),"Make body visible (see :yref:`OpenGLRenderer::hideBody`)")
+		.def("hideBody",&OpenGLRenderer::hide,(boost::python::arg("id")),"Hide body from id (see :yref:`OpenGLRenderer::showBody`)")
+		.def("showBody",&OpenGLRenderer::show,(boost::python::arg("id")),"Make body visible (see :yref:`OpenGLRenderer::hideBody`)")
 	);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderer);

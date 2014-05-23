@@ -26,7 +26,7 @@
 #endif
 
 /* Initialize yade, loading given plugins */
-void yadeInitialize(python::list& pp, const std::string& confDir){
+void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 
 	PyEval_InitThreads();
 
@@ -38,16 +38,16 @@ void yadeInitialize(python::list& pp, const std::string& confDir){
 	#ifdef YADE_DEBUG
 		ofstream gdbBatch;
 		O.gdbCrashBatch=O.tmpFilename();
-		gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
+		gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<boost::lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
 		signal(SIGABRT,crashHandler);
 		signal(SIGSEGV,crashHandler);
 	#endif
-	vector<string> ppp; for(int i=0; i<python::len(pp); i++) ppp.push_back(python::extract<string>(pp[i]));
+	vector<string> ppp; for(int i=0; i<boost::python::len(pp); i++) ppp.push_back(boost::python::extract<string>(pp[i]));
 	Omega::instance().loadPlugins(ppp);
 }
 void yadeFinalize(){ Omega::instance().cleanupTemps(); }
 
 BOOST_PYTHON_MODULE(boot){
-	python::scope().attr("initialize")=&yadeInitialize;
-	python::scope().attr("finalize")=&yadeFinalize; //,"Finalize yade (only to be used internally).")
+  boost::python::scope().attr("initialize")=&yadeInitialize;
+  boost::python::scope().attr("finalize")=&yadeFinalize; //,"Finalize yade (only to be used internally).")
 }

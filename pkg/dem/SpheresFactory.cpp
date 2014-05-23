@@ -24,7 +24,7 @@ void SpheresFactory::pickRandomPosition(Vector3r&,Real){
 void SpheresFactory::action(){
 
 	if(!collider){
-		FOREACH(const shared_ptr<Engine>& e, scene->engines){ collider=dynamic_pointer_cast<Collider>(e); if(collider) break; }
+		FOREACH(const shared_ptr<Engine>& e, scene->engines){ collider=boost::dynamic_pointer_cast<Collider>(e); if(collider) break; }
 		if(!collider) throw runtime_error("SpheresFactory: No Collider instance found in engines (needed for collision detection).");
 	}
 	
@@ -162,7 +162,7 @@ void SpheresFactory::action(){
 		
 		// create particle
 		int mId=(materialId>=0 ? materialId : scene->materials.size()+materialId);
-		if(mId<0 || (size_t) mId>=scene->materials.size()) throw std::invalid_argument(("SpheresFactory: invalid material id "+lexical_cast<string>(materialId)).c_str());
+		if(mId<0 || (size_t) mId>=scene->materials.size()) throw std::invalid_argument(("SpheresFactory: invalid material id "+boost::lexical_cast<string>(materialId)).c_str());
 		const shared_ptr<Material>& material=scene->materials[mId];
 		shared_ptr<Body> b(new Body);
 		shared_ptr<Sphere> sphere(new Sphere); 

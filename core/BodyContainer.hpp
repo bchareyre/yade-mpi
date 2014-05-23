@@ -34,6 +34,7 @@ Any alternative implementation should use the same API.
 class BodyContainer: public Serializable{
 	private:
 		typedef std::vector<shared_ptr<Body> > ContainerT;
+		typedef std::map<Body::id_t,Se3r> MemberMap;
 		ContainerT body;
 		Body::id_t lowestFree;
 		Body::id_t findFreeId();
@@ -86,7 +87,7 @@ class BodyContainer: public Serializable{
 		const shared_ptr<Body>& operator[](unsigned int id) const { return body[id]; }
 
 		bool exists(Body::id_t id) const { return (id>=0) && ((size_t)id<body.size()) && ((bool)body[id]); }
-		bool erase(Body::id_t id);
+		bool erase(Body::id_t id, bool eraseClumpMembers);
 		
 		REGISTER_CLASS_AND_BASE(BodyContainer,Serializable);
 		REGISTER_ATTRIBUTES(Serializable,(body));

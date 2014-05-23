@@ -48,7 +48,7 @@ class DummyFlowEngine : public TEMPLATE_FLOW_NAME
 	((Real, myNewAttribute, 0,,"useless example"))
 	,/*DummyFlowEngineT()*/,
 	,
-	.def("fancyFunction",&DummyFlowEngine::fancyFunction,(python::arg("what")=0),"test function")
+	.def("fancyFunction",&DummyFlowEngine::fancyFunction,(boost::python::arg("what")=0),"test function")
 	)
 	DECLARE_LOGGER;
 };

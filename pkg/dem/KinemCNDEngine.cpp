@@ -38,7 +38,7 @@ void KinemCNDEngine::action()
 		if ( ( ( (shearSpeed>0)&&(gamma > gamma_save[j]) ) || ((shearSpeed<0)&&(gamma < gamma_save[j])) ) && (temoin_save[j]==0) )
 		{
 			stopMovement();		// reset of all the speeds before the save
-			Omega::instance().saveSimulation(Key+"_"+lexical_cast<string> (floor(gamma*1000)) + "mmsheared.xml");
+			Omega::instance().saveSimulation(Key+"_"+boost::lexical_cast<string> (floor(gamma*1000)) + "mmsheared.xml");
 			temoin_save[j]=1;
 		}
 	}

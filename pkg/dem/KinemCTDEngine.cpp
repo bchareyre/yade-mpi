@@ -29,9 +29,9 @@ void KinemCTDEngine::action()
 	{
 		if(temoin!=0)
 		{
-// 			cout << "j'ai ici un temoin #0 visiblement. En effet temoin =" <<lexical_cast<string>(temoin) << endl;
+// 			cout << "j'ai ici un temoin #0 visiblement. En effet temoin =" <<boost::lexical_cast<string>(temoin) << endl;
 			temoin=0;
-// 			cout << "Maintenant (toujours dans le if temoin!=0), temoin =" <<lexical_cast<string>(temoin) << endl;
+// 			cout << "Maintenant (toujours dans le if temoin!=0), temoin =" <<boost::lexical_cast<string>(temoin) << endl;
 		}
 		
 		letMove(0.0,-compSpeed*dt);
@@ -39,17 +39,17 @@ void KinemCTDEngine::action()
 	else if (temoin==0)
 	{
 		stopMovement();
-// 		cout << "Mouvement stoppe, temoin = " << lexical_cast<string>(temoin) << endl;
-// 		cout << " Dans le if, temoin =" << lexical_cast<string>(temoin) << endl;
+// 		cout << "Mouvement stoppe, temoin = " << boost::lexical_cast<string>(temoin) << endl;
+// 		cout << " Dans le if, temoin =" << boost::lexical_cast<string>(temoin) << endl;
 		string f;
 		if (compSpeed > 0)
 			f="Sigmax_";
 		else
 			f="Sigmin_";
 
-		Omega::instance().saveSimulation(Key + f +lexical_cast<string> (floor(targetSigma)) + "kPaReached.xml");
+		Omega::instance().saveSimulation(Key + f +boost::lexical_cast<string> (floor(targetSigma)) + "kPaReached.xml");
 		temoin=1;
-// 		cout << " Fin du if, temoin =" << lexical_cast<string>(temoin) << endl << endl;
+// 		cout << " Fin du if, temoin =" << boost::lexical_cast<string>(temoin) << endl << endl;
 	}
 
 	
@@ -58,11 +58,11 @@ void KinemCTDEngine::action()
 		if( (  ( (compSpeed>0)&&(current_sigma > sigma_save[j]) ) || ((compSpeed<0)&&(current_sigma < sigma_save[j])) ) && (temoin_save[j]==0))
 		{
 			stopMovement();
-			Omega::instance().saveSimulation(Key + "SigInt_" +lexical_cast<string> (floor(current_sigma)) + "kPareached.xml");
+			Omega::instance().saveSimulation(Key + "SigInt_" +boost::lexical_cast<string> (floor(current_sigma)) + "kPareached.xml");
 			temoin_save[j]=1;
 		}
 	}
-// 	cout << "Fin de ApplyCondi, temoin = " << lexical_cast<string>(temoin) << endl;
+// 	cout << "Fin de ApplyCondi, temoin = " << boost::lexical_cast<string>(temoin) << endl;
 
 }
 

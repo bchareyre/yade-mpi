@@ -147,7 +147,7 @@ class InsertionSortCollider: public Collider{
 	bool periodic;
 
 	// return python representation of the BB struct, as ([...],[...],[...]).
-	python::tuple dumpBounds();
+  boost::python::tuple dumpBounds();
 
 	/*! sorting routine; insertion sort is very fast for strongly pre-sorted lists, which is our case
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details

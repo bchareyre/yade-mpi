@@ -52,9 +52,9 @@ struct ObjectIO{
 	template<class T>
 	static void save(const string fileName, const string& objectTag, T& object){
 		boost::iostreams::filtering_ostream out;
-		if(boost::algorithm::ends_with(fileName,".bz2")) out.push(iostreams::bzip2_compressor());
-		if(boost::algorithm::ends_with(fileName,".gz")) out.push(iostreams::gzip_compressor());
-		out.push(iostreams::file_sink(fileName));
+		if(boost::algorithm::ends_with(fileName,".bz2")) out.push(boost::iostreams::bzip2_compressor());
+		if(boost::algorithm::ends_with(fileName,".gz")) out.push(boost::iostreams::gzip_compressor());
+		out.push(boost::iostreams::file_sink(fileName));
 		if(!out.good()) throw std::runtime_error("Error opening file "+fileName+" for writing.");
 		if(isXmlFilename(fileName)) save<T,boost::archive::xml_oarchive>(out,objectTag,object);
 		else save<T,boost::archive::binary_oarchive>(out,objectTag,object);
@@ -63,9 +63,9 @@ struct ObjectIO{
 	template<class T>
 	static void load(const string& fileName, const string& objectTag, T& object){
 		boost::iostreams::filtering_istream in;
-		if(boost::algorithm::ends_with(fileName,".bz2")) in.push(iostreams::bzip2_decompressor());
-		if(boost::algorithm::ends_with(fileName,".gz")) in.push(iostreams::gzip_decompressor());
-		in.push(iostreams::file_source(fileName));
+		if(boost::algorithm::ends_with(fileName,".bz2")) in.push(boost::iostreams::bzip2_decompressor());
+		if(boost::algorithm::ends_with(fileName,".gz")) in.push(boost::iostreams::gzip_decompressor());
+		in.push(boost::iostreams::file_source(fileName));
 		if(!in.good()) throw std::runtime_error("Error opening file "+fileName+" for reading.");
 		if(isXmlFilename(fileName)) load<T,boost::archive::xml_iarchive>(in,objectTag,object);
 		else load<T,boost::archive::binary_iarchive>(in,objectTag,object);

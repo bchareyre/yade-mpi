@@ -3,20 +3,20 @@
 YADE_PLUGIN((InteractionLoop));
 CREATE_LOGGER(InteractionLoop);
 
-void InteractionLoop::pyHandleCustomCtorArgs(python::tuple& t, python::dict& d){
-	if(python::len(t)==0) return; // nothing to do
-	if(python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
+void InteractionLoop::pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d){
+	if(boost::python::len(t)==0) return; // nothing to do
+	if(boost::python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
 	// parse custom arguments (3 lists) and do in-place modification of args
 	typedef std::vector<shared_ptr<IGeomFunctor> > vecGeom;
 	typedef std::vector<shared_ptr<IPhysFunctor> > vecPhys;
 	typedef std::vector<shared_ptr<LawFunctor> > vecLaw;
-	vecGeom vg=python::extract<vecGeom>(t[0])();
-	vecPhys vp=python::extract<vecPhys>(t[1])();
-	vecLaw vl=python::extract<vecLaw>(t[2])();
+	vecGeom vg=boost::python::extract<vecGeom>(t[0])();
+	vecPhys vp=boost::python::extract<vecPhys>(t[1])();
+	vecLaw vl=boost::python::extract<vecLaw>(t[2])();
 	FOREACH(shared_ptr<IGeomFunctor> gf, vg) this->geomDispatcher->add(gf);
 	FOREACH(shared_ptr<IPhysFunctor> pf, vp) this->physDispatcher->add(pf);
 	FOREACH(shared_ptr<LawFunctor> cf, vl) this->lawDispatcher->add(cf);
-	t=python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
+	t=boost::python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
 }
 
 

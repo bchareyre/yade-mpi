@@ -344,7 +344,7 @@ void TesselationWrapper::defToVtk (string outputFile){
 	mma.analyser->DefToFile(outputFile.c_str());
 }
 
-python::dict TesselationWrapper::getVolPoroDef(bool deformation)
+boost::python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 {
 		delete Tes;
 		CGT::TriaxialState* ts;
@@ -379,7 +379,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 			if (deformation) MATRIX3R_TO_NUMPY(mma.analyser->ParticleDeformation[id],def[id]);
  			//cerr << V_it->info().v()<<" "<<ParticleDeformation[id]<<endl;
  		}
- 		python::dict ret;
+ 		boost::python::dict ret;
  		ret["vol"]=vol;
  		ret["poro"]=poro;
  		if (deformation) ret["def"]=def;

@@ -48,7 +48,6 @@
 class Scene;
 class ThreadRunner;
 
-using namespace boost;
 using namespace boost::posix_time;
 using namespace std;
 

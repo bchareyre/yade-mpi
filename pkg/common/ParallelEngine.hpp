@@ -3,7 +3,7 @@
 #include<boost/python.hpp>
 
 class ParallelEngine;
-shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves);
+shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const boost::python::list& slaves);
 
 class ParallelEngine: public Engine {
 	public:
@@ -20,7 +20,7 @@ class ParallelEngine: public Engine {
 		ompThreads=2;
 		,
 		/*py*/
-		.def("__init__",python::make_constructor(ParallelEngine_ctor_list),"Construct from (possibly nested) list of slaves.")
+		.def("__init__",boost::python::make_constructor(ParallelEngine_ctor_list),"Construct from (possibly nested) list of slaves.")
 		.add_property("slaves",&ParallelEngine::slaves_get,&ParallelEngine::slaves_set,"List of lists of Engines; each top-level group will be run in parallel with other groups, while Engines inside each group will be run sequentially, in given order.");
 	);
 };
