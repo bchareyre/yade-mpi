@@ -79,7 +79,7 @@ class TemplateFlowEngine : public PartialEngine
 		typedef typename RTriangulation::Triangulation_data_structure::Cell::Info       CellInfo;
 		typedef typename RTriangulation::Triangulation_data_structure::Vertex::Info     VertexInfo;
 		
-	protected:
+// 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
 		volatile bool backgroundCompleted;

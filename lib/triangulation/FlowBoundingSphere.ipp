@@ -217,9 +217,9 @@ double FlowBoundingSphere<Tesselation>::getPorePressure (double X, double Y, dou
 }
 
 template <class Tesselation>
-double FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
+int FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
 {
-	if (noCache) {cerr<<"Triangulation does not exist. Waht did you do?!"<<endl; return -1;}
+	if (noCache) {cout<<"Triangulation does not exist. Waht did you do?!"<<endl; return -1;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	CellHandle cell = Tri.locate(Point(X,Y,Z));
 	return cell->info().id;
@@ -348,8 +348,9 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 			}
 		}
 		noCache=false;//cache should always be defined after execution of this function
+	}
 		if (onlyCache) return;
-	} else {//use cached values
+// 	} else {//use cached values
 		#ifndef parallel_forces
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
@@ -367,7 +368,7 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 			v->info().forces = tf;
 		}
 		#endif
-	}
+// 	}
 	if (debugOut) {
 		CVector totalForce = nullVect;
 		for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
