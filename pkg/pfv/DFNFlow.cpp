@@ -42,7 +42,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"documentation here",
 	((Real, myNewAttribute, 0,,"useless example"))
-	((bool, updatePositions, False,,"update particles positions when rebuilding the mesh (experimental)"))
+	((bool, updatePositions, false,,"update particles positions when rebuilding the mesh (experimental)"))
 	,/*DFNFlowEngineT()*/,
 	,
 	)
