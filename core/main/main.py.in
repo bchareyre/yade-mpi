@@ -20,6 +20,8 @@ prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else o
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
 features,version,debugbuild='${CONFIGURED_FEATS}'.split(' '),'${realVersion}',' ${debugbuild}'
 
+if (features[0]==''): features=features[1:]
+
 libPATH='${LIBRARY_OUTPUT_PATH}'
 if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
 

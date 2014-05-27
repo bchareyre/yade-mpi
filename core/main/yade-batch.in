@@ -345,6 +345,7 @@ def getNumCores():
 numCores=getNumCores()
 maxOmpThreads=numCores if 'OpenMP' in yade.config.features else 1
 features,version='${CONFIGURED_FEATS}'.split(','),'${realVersion}'
+if (features[0]==''): features=features[1:]
 
 prog = os.path.basename(sys.argv[0])
 parser=argparse.ArgumentParser(usage='%s [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]'%prog,description='%s runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.'%prog)
