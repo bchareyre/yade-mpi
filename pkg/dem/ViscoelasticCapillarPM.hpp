@@ -35,6 +35,8 @@ class ViscElCapPhys : public ViscElPhys{
 		((CapType,CapillarType,None_Capillar,,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert, Soulie"))
 #ifdef YADE_LIQMIGRATION
 		((Real,Vmax,0.0,,"Maximal liquid bridge volume [m^3]"))
+		((Real,Vf1,0.0,, "Liquid which will be returned to the 1st body after rupture [m^3]"))
+		((Real,Vf2,0.0,, "Liquid which will be returned to the 2nd body after rupture [m^3]"))
 #endif
 		,
 		createIndex();
@@ -95,6 +97,7 @@ class LiqControl: public PartialEngine{
 		((Real,liqVolRup,0.,, "Liquid volume (integral value), which has been freed after rupture occured, [m^3]."))
 		((Real,liqVolShr,0.,, "Liquid volume (integral value), which has been shared among of contacts, [m^3]."))
 		((Real,vMaxCoef,0.03,, "Coefficient for vMax, [-]."))
+		((bool,particleconserve,false,, "If True, the particle will have the same liquid volume during simulation e.g. liquid will not migrate [false]."))
 		,/* ctor */
 		,/* py */
 		.def("totalLiq",&LiqControl::totalLiqVol,(boost::python::arg("mask")=0),"Return total volume of water in simulation.")

@@ -118,8 +118,12 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
         NLiqBridg -= 1;
       }
       #ifdef YADE_LIQMIGRATION
-        const intReal B1={id1, phys.Vb/2.0};
-        const intReal B2={id2, phys.Vb/2.0};
+        if (phys.Vb > 0.0 and ((phys.Vf1+phys.Vf2) == 0.0)) {
+          phys.Vf1 = phys.Vb/2.0;
+          phys.Vf2 = phys.Vb/2.0;
+        }
+        const intReal B1={id1, phys.Vf1};
+        const intReal B2={id2, phys.Vf2};
         scene->delIntrs.push_back(B1);
         scene->delIntrs.push_back(B2);
       #endif
@@ -411,6 +415,13 @@ void LiqControl::action(){
     addBodyMapReal(bodyUpdateLiquid, id2, -Vf2);
     
     Vb->Vb = Vrup;
+    if (particleconserve) {
+      Vb->Vf1 = Vf1;
+      Vb->Vf2 = Vf2;
+    } else {
+      Vb->Vf1 = Vrup/2.0;
+      Vb->Vf2 = Vrup/2.0;
+    }
   }
   
   scene->addIntrs.clear();
@@ -462,8 +473,19 @@ void LiqControl::updateLiquid(shared_ptr<Body> b){
         if(!((*it).second) or !(((*it).second)->isReal()))  continue;
         ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(((*it).second)->phys.get());
         if (physT->Vb<physT->Vmax) {
-          liqVolShr += (physT->Vmax - physT->Vb)*FillLevel;
-          physT->Vb += (physT->Vmax - physT->Vb)*FillLevel;
+          const Real addVolLiq =  (physT->Vmax - physT->Vb)*FillLevel;
+          liqVolShr += addVolLiq;
+          physT->Vb += addVolLiq;
+          if (particleconserve) {
+            if (((*it).second)->getId1() == (*it).first) {
+              physT->Vf1+=addVolLiq;
+            } else if (((*it).second)->getId2() == (*it).first) {
+              physT->Vf2+=addVolLiq;
+            }
+          } else {
+            physT->Vf1+=addVolLiq/2.0;
+            physT->Vf2+=addVolLiq/2.0;
+          }
         }
       }
       return;
