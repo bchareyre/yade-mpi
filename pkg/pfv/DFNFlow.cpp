@@ -38,6 +38,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 	void trickPermeability();
 	void trickPermeability (RTriangulation::Facet_circulator& facet,Real somethingBig);
 	void trickPermeability (RTriangulation::Finite_edges_iterator& edge,Real somethingBig);
+	void setPositionsBuffer(bool current);
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"documentation here",
 	((Real, myNewAttribute, 0,,"useless example"))
