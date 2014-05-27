@@ -14,7 +14,7 @@ if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
 libDir=os.path.abspath(prefix+'/'+libPATH+'/yade${SUFFIX}')
 confDir=os.environ['HOME']+'/.yade${SUFFIX}'
 libstdcxx='${libstdcxx}'
-features='${features}'.split(' ')
+features='${CONFIGURED_FEATS}'.split(' ')
 revision='${realVersion}'
 version='${version}'
 sourceRoot='${sourceRoot}'

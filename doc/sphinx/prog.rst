@@ -62,7 +62,7 @@ declare features that are necessary for this file to be compiled::
 	YADE_REQUIRE_FEATURE(vtk);
 	YADE_REQUIRE_FEATURE(gts);
 
-This file will be compiled only if *both* ``vtk`` and ``gts`` features are enabled. 
+This file will be compiled only if *both* ``VTK`` and ``GTS`` features are enabled. 
 Depending on current feature set, only selection of plugins will be compiled.
 
 It is possible to disable compilation of a file by requiring any non-existent feature, such as::

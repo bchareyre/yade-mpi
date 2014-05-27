@@ -343,8 +343,8 @@ def getNumCores():
 	if os.environ.has_key("OMP_NUM_THREADS"): return min(int(os.environ['OMP_NUM_THREADS']),nCpu)
 	return nCpu
 numCores=getNumCores()
-maxOmpThreads=numCores if 'openmp' in yade.config.features else 1
-features,version='${features}'.split(','),'${realVersion}'
+maxOmpThreads=numCores if 'OpenMP' in yade.config.features else 1
+features,version='${CONFIGURED_FEATS}'.split(','),'${realVersion}'
 
 prog = os.path.basename(sys.argv[0])
 parser=argparse.ArgumentParser(usage='%s [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]'%prog,description='%s runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.'%prog)
@@ -473,7 +473,7 @@ for i,l in enumerate(useLines):
 			nCores=maxJobs
 		else:
 			logging.warning('WARNING: job #%d will use %d cores but only %d are available'%(i,nCores,maxJobs))
-		if 'openmp' not in yade.config.features and nCores>1:
+		if 'OpenMP' not in yade.config.features and nCores>1:
 			logging.warning('Job #%d will be uselessly run with %d threads (compiled without OpenMP support).'%(i,nCores))
 	executables.add(jobExecutable)
 	# compose command-line: build the hyper-linked variant, then strip HTML tags (ugly, but ensures consistency)
