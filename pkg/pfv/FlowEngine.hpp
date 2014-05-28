@@ -79,7 +79,7 @@ class TemplateFlowEngine : public PartialEngine
 		typedef typename RTriangulation::Triangulation_data_structure::Cell::Info       CellInfo;
 		typedef typename RTriangulation::Triangulation_data_structure::Vertex::Info     VertexInfo;
 		
-	protected:
+// 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
 		volatile bool backgroundCompleted;
@@ -88,7 +88,7 @@ class TemplateFlowEngine : public PartialEngine
 		vector<posData> positionBufferCurrent;//reflect last known positions before we start computations
 		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
 		//copy positions in a buffer for faster and/or parallel access
-		void setPositionsBuffer(bool current);
+		virtual void setPositionsBuffer(bool current);
 		virtual void trickPermeability() {};
 
 	public :

@@ -16,6 +16,9 @@
 YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom6D_CohFrictPhys_CohesionMoment));
 CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 
+Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::getPlasticDissipation() {return (Real) plasticDissipation;}
+void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
+
 Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::normElastEnergy()
 {
 	Real normEnergy=0;
@@ -40,6 +43,50 @@ Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::shearElastEnergy()
 	}
 	return shearEnergy;
 }
+
+Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::bendingElastEnergy()
+{
+	Real bendingEnergy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
+		if (phys) {
+			bendingEnergy += 0.5*(phys->moment_bending.squaredNorm()/phys->kr);
+		}
+	}
+	return bendingEnergy;
+}
+
+Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::twistElastEnergy()
+{
+	Real twistEnergy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
+		if (phys) {
+			twistEnergy += 0.5*(phys->moment_twist.squaredNorm()/phys->ktw);
+		}
+	}
+	return twistEnergy;
+}
+
+Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::totalElastEnergy()
+{
+	Real totalEnergy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		CohFrictPhys* phys = YADE_CAST<CohFrictPhys*>(I->phys.get());
+		if (phys) {
+			totalEnergy += 0.5*(phys->normalForce.squaredNorm()/phys->kn);
+			totalEnergy += 0.5*(phys->shearForce.squaredNorm()/phys->ks);
+			totalEnergy += 0.5*(phys->moment_bending.squaredNorm()/phys->kr);
+			totalEnergy += 0.5*(phys->moment_twist.squaredNorm()/phys->ktw);
+		}
+	}
+	return totalEnergy;
+}
+
+
 
 void CohesiveFrictionalContactLaw::action()
 {
@@ -104,17 +151,12 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			Vector3r trialForce=shearForce;
 			shearForce *= maxFs;
 			if (scene->trackEnergy){
-				Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
-				if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset*/false);}
+				Real sheardissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+				if(sheardissip>0) scene->energy->add(sheardissip,"shearDissip",shearDissipIx,/*reset*/false);}
 			if (Fn<0)  phys->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
 		//Apply the force
 		applyForceAtContactPoint(-phys->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position + (scene->isPeriodic ? scene->cell->intrShiftPos(contact->cellDist): Vector3r::Zero()));
-// 		Vector3r force = -phys->normalForce-shearForce;
-// 		scene->forces.addForce(id1,force);
-// 		scene->forces.addForce(id2,-force);
-// 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
-// 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 
 		/// Moment law  ///
 		if (phys->momentRotationLaw && (!phys->cohesionBroken || always_use_moment_law)) {
@@ -152,22 +194,28 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			/// Plasticity ///
 			// limit rolling moment to the plastic value, if required
 			Real RollMax = phys->maxRollPl*phys->normalForce.norm();
-			if (RollMax>0.){ // do we want to apply plasticity?
+			if (RollMax>=0.){ // do we want to apply plasticity?
 				if (!useIncrementalForm) LOG_WARN("If :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::useIncrementalForm` is false, then plasticity will not be applied correctly (the total formulation would not reproduce irreversibility).");
 				Real scalarRoll = phys->moment_bending.norm();
 				if (scalarRoll>RollMax){ // fix maximum rolling moment
 					Real ratio = RollMax/scalarRoll;
 					phys->moment_bending *= ratio;
-				}	
+					if (scene->trackEnergy){
+						Real bendingdissip=((1/phys->kr)*(scalarRoll-RollMax)*RollMax)/*active force*/;
+						if(bendingdissip>0) scene->energy->add(bendingdissip,"bendingDissip",bendingDissipIx,/*reset*/false);}
+				}
 			}
 			// limit twisting moment to the plastic value, if required
-			Real TwistMax = phys->maxTwistMoment.norm();
-			if (TwistMax>0.){ // do we want to apply plasticity?
+			Real TwistMax = phys->maxTwistPl*phys->normalForce.norm();
+			if (TwistMax>=0.){ // do we want to apply plasticity?
 				if (!useIncrementalForm) LOG_WARN("If :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::useIncrementalForm` is false, then plasticity will not be applied correctly (the total formulation would not reproduce irreversibility).");
 				Real scalarTwist= phys->moment_twist.norm();
 				if (scalarTwist>TwistMax){ // fix maximum rolling moment
 					Real ratio = TwistMax/scalarTwist;
 					phys->moment_twist *= ratio;
+					if (scene->trackEnergy){
+						Real twistdissip=((1/phys->ktw)*(scalarTwist-TwistMax)*TwistMax)/*active force*/;
+						if(twistdissip>0) scene->energy->add(twistdissip,"twistDissip",twistDissipIx,/*reset*/false);}
 				}	
 			}
 			// Apply moments now

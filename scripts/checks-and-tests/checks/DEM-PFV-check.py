@@ -2,11 +2,8 @@
 # Here, we are testing bulk modulus, then permeability, then the consolidation of a specimen.
 # the test is based on examples/FluidCouplingPFV/oedometer.py, only slightly simplified and using less particles
 
-try: FlowEngine
-except NameError:
-	print "skip DEM-PFV check, FlowEngine not available"
-else:
 
+if ('PFVflow' in features):
 	errors=0
 	tolerance=0.01
 
@@ -144,3 +141,5 @@ else:
 
 	if (errors):
 		resultStatus +=1	#Test is failed
+else:
+	print "skip DEM-PFV check, FlowEngine not available"

@@ -38,9 +38,11 @@ class DFNFlowEngine : public DFNFlowEngineT
 	void trickPermeability();
 	void trickPermeability (RTriangulation::Facet_circulator& facet,Real somethingBig);
 	void trickPermeability (RTriangulation::Finite_edges_iterator& edge,Real somethingBig);
+	void setPositionsBuffer(bool current);
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"documentation here",
 	((Real, myNewAttribute, 0,,"useless example"))
+	((bool, updatePositions, false,,"update particles positions when rebuilding the mesh (experimental)"))
 	,/*DFNFlowEngineT()*/,
 	,
 	)
@@ -48,6 +50,26 @@ class DFNFlowEngine : public DFNFlowEngineT
 };
 REGISTER_SERIALIZABLE(DFNFlowEngine);
 YADE_PLUGIN((DFNFlowEngine));
+//In this version, we never update positions when !updatePositions, i.e. keep triangulating the same positions
+void DFNFlowEngine::setPositionsBuffer(bool current)
+{
+	vector<posData>& buffer = current? positionBufferCurrent : positionBufferParallel;
+	if (!updatePositions && buffer.size()>0) return;
+	buffer.clear();
+	buffer.resize(scene->bodies->size());
+	shared_ptr<Sphere> sph ( new Sphere );
+        const int Sph_Index = sph->getClassIndexStatic();
+	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
+                if (!b || ignoredBody==b->getId()) continue;
+                posData& dat = buffer[b->getId()];
+		dat.id=b->getId();
+		dat.pos=b->state->pos;
+		dat.isSphere= (b->shape->getClassIndex() ==  Sph_Index);
+		if (dat.isSphere) dat.radius = YADE_CAST<Sphere*>(b->shape.get())->radius;
+		dat.exists=true;
+	}
+}
+
 
 void DFNFlowEngine::trickPermeability (RTriangulation::Facet_circulator& facet, Real somethingBig)
 {

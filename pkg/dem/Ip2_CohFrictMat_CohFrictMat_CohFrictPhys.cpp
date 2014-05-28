@@ -51,9 +51,6 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 			if (Va && Vb) Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 			else Ks=0;
 
-			// Jean-Patrick Plassiard, Noura Belhaine, Frederic
-			// Victor Donze, "Calibration procedure for spherical
-			// discrete elements using a local moemnt law".
 			contactPhysics->kr = Da*Db*Ks*AlphaKr;
 			contactPhysics->ktw = Da*Db*Ks*AlphaKtw;
 			contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
@@ -69,8 +66,8 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 			contactPhysics->ks = Ks;
 
 			contactPhysics->maxRollPl = min(sdec1->etaRoll*Da,sdec2->etaRoll*Db);
+			contactPhysics->maxTwistPl = min(sdec1->etaTwist*Da,sdec2->etaTwist*Db);
 			contactPhysics->momentRotationLaw=(sdec1->momentRotationLaw && sdec2->momentRotationLaw);
-			//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 		}
 		else {// !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
 			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->phys.get());

@@ -55,23 +55,15 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 	Real Ysup = topbox->state->pos.y();
 	Real Ylat = leftbox->state->pos.y();
 
-// 	Changes in vertical and horizontal position :
-
-	
-	topbox->state->pos += Vector3r(dX,dY,0);
-
-	leftbox->state->pos += Vector3r(dX/2.0,dY/2.0,0);
-	rightbox->state->pos += Vector3r(dX/2.0,dY/2.0,0);
-	if(LOG)	cout << "dY reellemt applique :" << dY << endl;
-	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).y() << endl;
-	
-	Real Ysup_mod = topbox->state->pos.y();
-	Real Ylat_mod = leftbox->state->pos.y();
-
-//	with the corresponding velocities :
+// 	Changes in vertical and horizontal velocities :
 	topbox->state->vel = Vector3r(dX/dt,dY/dt,0);
 	leftbox->state->vel = Vector3r(dX/(2.0 * dt),dY/(2.0 * dt),0);
 	rightbox->state->vel = Vector3r(dX/(2.0 * dt),dY/(2.0*dt),0);
+
+	if(LOG)	cout << "dY that will be applied by NewtonIntegrator :" << dY << endl;
+	
+	Real Ysup_mod = Ysup + dY;
+	Real Ylat_mod = Ylat + dY;
 
 	computeAlpha();
 //	Then computation of the angle of the rotation,dalpha, to be done :
@@ -87,11 +79,8 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 
 	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 
-// Rotation is applied : orientation and angular velocity of plates are modified.
-	leftbox->state->ori	= qcorr*leftbox->state->ori;
+//	Rotation is applied through velocities (and NewtonIntegrator)
 	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
-
-	rightbox->state->ori	= qcorr*rightbox->state->ori;
 	rightbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
 }

@@ -154,7 +154,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void measurePressureProfile(double WallUpy, double WallDowny);
 		double averageSlicePressure(double Y);
 		double averagePressure();
-		double getCell (double X,double Y,double Z);
+		int getCell (double X,double Y,double Z);
 		double boundaryFlux(unsigned int boundaryId);
 		
 		vector<Real> averageFluidVelocityOnSphere(unsigned int Id_sph);

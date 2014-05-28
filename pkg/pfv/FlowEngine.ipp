@@ -249,10 +249,7 @@ template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT 
 void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::buildTriangulation ( double pZero, Solver& flow )
 {
  	if (first) flow.currentTes=0;
-        else {
-                flow.currentTes=!flow.currentTes;
-                if (debug) cout << "--------RETRIANGULATION-----------" << endl;
-        }
+        else {  flow.currentTes=!flow.currentTes; if (debug) cout << "--------RETRIANGULATION-----------" << endl;}
 	flow.resetNetwork();
 	initSolver(flow);
 

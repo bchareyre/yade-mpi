@@ -84,6 +84,10 @@ def textClumps(fileName,shift=Vector3.Zero,discretization=0,orientation=Quaterni
 	
 	if (len(curClump)<>0):
 		ret.append(O.bodies.appendClumped(curClump,discretization=discretization))
+	
+	# Set the mask to a clump the same as the first member of it
+	for i in range(len(ret)):
+		O.bodies[ret[i][0]].mask = O.bodies[ret[i][1][0]].mask
 	return ret
 
 def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
