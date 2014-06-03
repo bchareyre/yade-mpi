@@ -23,7 +23,7 @@
 class ViscElMat : public FrictMat {
 	public:
 		virtual ~ViscElMat();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,FrictMat,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,FrictMat,"Material for simple viscoelastic model of contact from analytical solution of a pair spheres interaction problem  [Pournin2001]_ .",
 		((Real,tc,NaN,,"Contact time"))
 		((Real,en,NaN,,"Restitution coefficient in normal direction"))
 		((Real,et,NaN,,"Restitution coefficient in tangential direction"))
