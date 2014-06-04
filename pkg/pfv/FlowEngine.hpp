@@ -113,10 +113,10 @@ class TemplateFlowEngine : public PartialEngine
 		void updateVolumes (Solver& flow);
 		void initializeVolumes (Solver& flow);
 		void boundaryConditions(Solver& flow);
-		void updateBCs ( Solver& flow ) {
-			if (flow.T[flow.currentTes].maxId>0) boundaryConditions(flow);//avoids crash at iteration 0, when the packing is not bounded yet
+		void updateBCs () {
+			if (solver->tesselation().maxId>0) boundaryConditions(*solver);//avoids crash at iteration 0, when the packing is not bounded yet
 			else LOG_ERROR("updateBCs not applied");
-			flow.pressureChanged=true;}
+			solver->pressureChanged=true;}
 
 		void imposeFlux(Vector3r pos, Real flux);
 		unsigned int imposePressure(Vector3r pos, Real p);
@@ -128,6 +128,7 @@ class TemplateFlowEngine : public PartialEngine
 		Real getBoundaryFlux(unsigned int boundary) {return solver->boundaryFlux(boundary);}
 		Vector3r fluidForce(unsigned int idSph) {
 			const CGT::CVector& f=solver->T[solver->currentTes].vertex(idSph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
+		Vector3r averageVelocity();
 			
 		Vector3r shearLubForce(unsigned int id_sph) {
 			return (solver->shearLubricationForces.size()>id_sph)?solver->shearLubricationForces[id_sph]:Vector3r::Zero();}
@@ -353,6 +354,7 @@ class TemplateFlowEngine : public PartialEngine
 		#endif
 		.def("compTessVolumes",&TemplateFlowEngine::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
 		.def("volume",&TemplateFlowEngine::getVolume,(boost::python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
+		.def("averageVelocity",&TemplateFlowEngine::averageVelocity,"measure the mean velocity in the period")
 		)
 };
 // Definition of functions in a separate file for clarity 

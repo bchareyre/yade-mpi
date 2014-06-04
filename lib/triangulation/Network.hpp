@@ -46,6 +46,8 @@ class Network
 		
 		Tesselation T [2];
 		bool currentTes;
+		Tesselation& tesselation() {return T[currentTes];};
+		
 		double xMin, xMax, yMin, yMax, zMin, zMax, Rmoy, sectionArea, Height, vTotal;
 		bool debugOut;
 		int nOfSpheres;
