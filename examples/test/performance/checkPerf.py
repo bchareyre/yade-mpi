@@ -3,32 +3,40 @@
 from yade import pack,export,geom,timing,bodiesHandling
 import time,numpy
 	
-radRAD=[23.658,				#5000 elements
+radRAD=[
+	23.658,				#5000 elements
 	40.455,				#25000 elements
 	50.97,				#50000 elements
 	64.218,				#100000 elements
-	80.91]				#200000 elements
-	#109.811]			#500000 elements
+	80.91,				#200000 elements
+	#109.811,			#500000 elements
+]
 
-iterN=[12000,	#5000 elements
+iterN=[
+	12000,			#5000 elements
 	2500,				#25000 elements
 	1400,				#50000 elements
 	800,				#100000 elements
-	200]				#200000 elements
-	#10]			#500000 elements
+	200,				#200000 elements
+	#10,				#500000 elements
+]
 
-coefCor=[110,
+coefCor=[
+	110,
 	28,
 	18,
 	9,
-	2]
-	#0.1]
+	2,
+	#0.1,
+]
 
 iterVel=[]
 testTime=[]
 particlesNumber=[]
+data=[]
 
 numberTests = 3
+initIter = 1	# number of initial iterations excluded from performance check (e.g. Collider is initialised in first step therefore exclude first step from performance check)
 
 tStartAll=time.time()
 
@@ -43,7 +51,6 @@ for z in range(numberTests):
 		es=.003
 		frictionAngle=radians(35)
 		density=2300
-		
 		defMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle,tc=tc,en=en,et=es))
 		
 		O.dt=.1*tc # time step
@@ -76,12 +83,12 @@ for z in range(numberTests):
 		
 		print "number of bodies %d"%len(O.bodies)
 		# Initialize the collider else it is not possible to compare the results with different nbIter
-		O.run(1,1)
+		O.run(initIter,1)
 		O.timingEnabled=True
 		timing.reset()
 		tStart=time.time()
-		
-		O.run(nbIter)
+		# add initIter to nbIter to so that the iterations considered in the perfromance analysis are actually nbIter
+		O.run(nbIter+initIter)
 		O.wait()
 		
 		tEnd=time.time()
@@ -102,24 +109,56 @@ print "Common time ", commonTime, "s"
 print
 print
 
+print "___________________________________________________"
+print
+print "SUMMARY"
+print
 scoreIterVel=0.0
 for i in range(len(radRAD)):
 	iterAv=0.0
-	iterVelNumpy=numpy.empty(3)
+	iterVelNumpy=numpy.empty(numberTests)
 	for z in range(numberTests):
 		iterVelNumpy[z]=iterVel[z*len(radRAD)+i]
 	avgVel = numpy.average(iterVelNumpy)
 	dispVel = numpy.std(iterVelNumpy)/numpy.average(iterVelNumpy)*100.0
-	if (dispVel>10):
+	if (dispVel>10.):
 		print "Calculation velocity is unstable, try to close all programs and start performance tests again"
 	
-	print particlesNumber[i]," spheres, velocity=",avgVel, "+-",dispVel,"%"
+	print particlesNumber[i]," spheres, calculation velocity=",avgVel, "iter/sec +/-",dispVel,"%"
+	data+=[[particlesNumber[i],avgVel,avgVel*dispVel/100.]]
 	scoreIterVel+=avgVel/coefCor[i]*1000.0
 print
-print
 scoreIterVel = int(scoreIterVel)
-print  "SCORE: " + str(scoreIterVel)
-print "Number of threads ", os.environ['OMP_NUM_THREADS']
-print"___________________________________________________"
-print "CPU info", os.system('cat /proc/cpuinfo')
+## write output file for graph
+import subprocess
+cmd = "cat /proc/cpuinfo | grep \'model name\' | uniq"
+#processor = subprocess.check_output(cmd, shell=True).lstrip('model name\t:').strip() # needs python >=2.7.0
+process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+processor = process.communicate()[0].lstrip('model name\t:').strip()
+cmd = "cat /proc/cpuinfo | grep processor | wc -l"
+#cores = subprocess.check_output("cat /proc/cpuinfo | grep processor | wc -l", shell=True).strip() # needs python >=2.7.0 
+process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+cores = process.communicate()[0].strip()
+header='# '+ processor + ' ('+cores+' cores)'
+numThreads=os.environ['OMP_NUM_THREADS'] if (len(os.environ['OMP_NUM_THREADS'])==2) else ('0'+os.environ['OMP_NUM_THREADS'])
+filename=version+"_j"+numThreads+".dat"
+#numpy.savetxt(filename,numpy.array(data),fmt=['%i','%g','%g'], header=header) # needs numpy >=1.7.0
+fid = open( filename, 'w' )
+fid.write(header+"\n")
+for l in data:
+	fid.write("%d %f %f\n"%(l[0],l[1],l[2]))
+fid.close()
+print "Summary saved to "+filename
+print 
+print "SCORE: " + str(scoreIterVel)
+print "Number of threads: ", os.environ['OMP_NUM_THREADS']
+print "___________________________________________________"
+print
+
+print "CPU info:"
+cmd = "lscpu"
+#cpuinfo=subprocess.check_output(cmd, shell=True) # needs python >=2.7.0
+process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+cpuinfo = process.communicate()[0].lstrip('model name\t:').strip()
+print cpuinfo
 sys.exit(0)
