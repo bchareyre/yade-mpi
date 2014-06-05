@@ -37,6 +37,12 @@
 YADE_PLUGIN((VTKRecorder));
 CREATE_LOGGER(VTKRecorder);
 
+#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
+#define GET_MASK(b) boost::python::extract<int>(b->groupMask)
+#else
+#define GET_MASK(b) b->groupMask
+#endif
+
 void VTKRecorder::action(){
 	vector<bool> recActive(REC_SENTINEL,false);
 	FOREACH(string& rec, recorders){
@@ -414,7 +420,7 @@ void VTKRecorder::action(){
 	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
-		if(mask!=0 && (b->groupMask & mask)==0) continue;
+		if(mask!=0 && !b->maskCompatible(mask)) continue;
 		if (recActive[REC_SPHERES]){
 			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get()); 
 			if (sphere){
@@ -425,7 +431,7 @@ void VTKRecorder::action(){
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
-				if (recActive[REC_MASK]) spheresMask->InsertNextValue(b->groupMask);
+				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
 				if (recActive[REC_CLUMPID]) clumpId->InsertNextValue(b->clumpId);
 				if (recActive[REC_COLORS]){
@@ -508,7 +514,7 @@ void VTKRecorder::action(){
 					facetsForceLen->InsertNextValue(stress.norm());
 				}
 				if (recActive[REC_MATERIALID]) facetsMaterialId->InsertNextValue(b->material->id);
-				if (recActive[REC_MASK]) facetsMask->InsertNextValue(b->groupMask);
+				if (recActive[REC_MASK]) facetsMask->InsertNextValue(GET_MASK(b));
 				continue;
 			}
 		}
@@ -560,7 +566,7 @@ void VTKRecorder::action(){
 						boxesForceLen->InsertNextValue(stress.norm());
 					}
 					if (recActive[REC_MATERIALID]) boxesMaterialId->InsertNextValue(b->material->id);
-					if (recActive[REC_MASK]) boxesMask->InsertNextValue(b->groupMask);
+					if (recActive[REC_MASK]) boxesMask->InsertNextValue(GET_MASK(b));
 				}
 				continue;
 			}
@@ -885,3 +891,4 @@ void VTKRecorder::addWallVTK (vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<v
 };
 
 #endif /* YADE_VTK */
+#undef GET_MASK

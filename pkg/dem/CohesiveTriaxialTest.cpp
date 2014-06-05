@@ -200,7 +200,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 
 void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=2;
+	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(2);
 	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -243,7 +243,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 
 void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=2;
+	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(2);
 	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 

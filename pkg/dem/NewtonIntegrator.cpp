@@ -229,7 +229,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 		//Reflect mean-field (periodic cell) acceleration in the velocity
 	if(scene->isPeriodic && homoDeform) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
 	
-	if ( (mask<=0) or ((mask>0) and ((Body::byId(id)->groupMask & mask)!=0)) ) {
+	if ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) ) {
 		state->pos+=state->vel*dt;
 	}
 }
@@ -237,13 +237,13 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
 {
 	Real angle2=state->angVel.squaredNorm();
-	if (angle2!=0 and ( (mask<=0) or ((mask>0) and ((Body::byId(id)->groupMask & mask)!=0)) )) {//If we have an angular velocity, we make a rotation
+	if (angle2!=0 and ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) )) {//If we have an angular velocity, we make a rotation
 		Real angle=sqrt(angle2);
 		Quaternionr q(AngleAxisr(angle*dt,state->angVel/angle));
 		state->ori = q*state->ori;
 	}
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero() 
-		and ( (mask<=0) or ((mask>0) and ((Body::byId(id)->groupMask & mask)!=0)) )) {
+		and ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) )) {
 		Vector3r r(scene->forces.getRot(id));
 		Real norm=r.norm(); r/=norm;
 		Quaternionr q(AngleAxisr(norm,r));

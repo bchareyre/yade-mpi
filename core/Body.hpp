@@ -20,6 +20,7 @@
 #include<yade/lib/serialization/Serializable.hpp>
 #include<yade/lib/multimethods/Indexable.hpp>
 
+
 class Scene;
 class Interaction;
 
@@ -29,6 +30,13 @@ class Body: public Serializable{
 		typedef int id_t;
 		// internal structure to hold some interaction of a body; used by InteractionContainer;
 		typedef std::map<Body::id_t, shared_ptr<Interaction> > MapId2IntrT;
+		// groupMask type
+#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
+		typedef boost::python::long_ groupMask_t;
+#else
+		typedef int groupMask_t;
+#endif
+
 
 		// bits for Body::flags
 		enum { FLAG_BOUNDED=1, FLAG_ASPHERICAL=2 }; /* add powers of 2 as needed */
@@ -62,13 +70,18 @@ class Body: public Serializable{
 		 * (otherwise, GLViewer would depend on Clump and therefore Clump would have to go to core...) */
 		virtual void userForcedDisplacementRedrawHook(){return;}
 
-    boost::python::list py_intrs();
+		boost::python::list py_intrs();
 
 		Body::id_t getId() const {return id;};
 		unsigned int coordNumber();  // Number of neighboring particles
 
-		int getGroupMask() {return groupMask; };
-		bool maskOk(int mask){return (mask==0 || (groupMask&mask));}
+		Body::groupMask_t getGroupMask() const {return groupMask; };
+		bool maskOk(int mask) const {return (mask==0 || (bool)(groupMask & mask));}
+		bool maskCompatible(int mask) const { return (bool)(groupMask & mask); }
+#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
+		bool maskOk(const boost::python::long_& mask) const {return (mask==0 || (bool)(groupMask & mask));}
+		bool maskCompatible(const boost::python::long_& mask) const { return (bool)(groupMask & mask); }
+#endif
 
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
@@ -76,7 +89,7 @@ class Body: public Serializable{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
 		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
-		((int,groupMask,1,,"Bitmask for determining interactions."))
+		((Body::groupMask_t,groupMask,1,,"Bitmask for determining interactions."))
 		((int,flags,FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
 
 		((shared_ptr<Material>,material,,,":yref:`Material` instance associated with this body."))
@@ -122,3 +135,16 @@ class Body: public Serializable{
 	);
 };
 REGISTER_SERIALIZABLE(Body);
+
+
+#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
+namespace boost { namespace serialization {
+template<class Archive>
+void serialize(Archive & ar, boost::python::long_ & l, const unsigned int version){
+	namespace bp = boost::python;
+	std::string value = bp::extract<std::string>(bp::str(l));
+	ar & BOOST_SERIALIZATION_NVP(value);
+	l = bp::long_(value);
+}
+}} // namespace boost::serialization
+#endif
