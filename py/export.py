@@ -468,6 +468,7 @@ class VTKExporter:
 		"""
 		# get list of bodies to export
 		bodies = self._getBodies(ids,Facet)
+		ids = [b.id for b in bodies]
 		if not bodies: return
 		nBodies = len(bodies)
 		if connectivityTable is None:
