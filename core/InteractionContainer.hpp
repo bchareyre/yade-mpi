@@ -108,29 +108,12 @@ class InteractionContainer: public Serializable{
 		*/
 		template<class T> size_t conditionalyEraseNonReal(const T& t, Scene* rb){
 			// beware iterators here, since erase is invalidating them. We need to iterate carefully, and keep in mind that erasing one interaction is moving the last one to the current position.
-			// For the parallel flavor we build the list to be erased in parallel, then it is erased sequentially. Still significant speedup since checking bounds is the most expensive part.
-		#ifndef YADE_OPENMP
 			size_t initSize=currSize;
 		 	for (size_t linPos=0; linPos<currSize;){
 				const shared_ptr<Interaction>& i=linIntrs[linPos];
 				if(!i->isReal() && t.shouldBeErased(i->getId1(),i->getId2(),rb)) erase(i->getId1(),i->getId2(),linPos);
 				else linPos++;}
 			return initSize-currSize;
-		#else
-			unsigned nThreads= omp_get_max_threads();
-			assert(nThreads>0);
-			std::vector<std::vector<Vector3i > >toErase;
-			toErase.resize(nThreads,std::vector<Vector3i >());
-			for (unsigned kk=0;  kk<nThreads; kk++) toErase[kk].reserve(1000);//A smarter value than 1000?			
-			size_t initSize=currSize;
-			#pragma omp parallel for schedule(guided,100) num_threads(nThreads)
-			for (size_t linPos=0; linPos<currSize;linPos++){
-				const shared_ptr<Interaction>& i=linIntrs[linPos];
-				if(!i->isReal() && t.shouldBeErased(i->getId1(),i->getId2(),rb)) toErase[omp_get_thread_num()].push_back(Vector3i(i->getId1(),i->getId2(),linPos)) ;
-				}
-			for (unsigned int kk=0;  kk<nThreads; kk++) for (size_t ii(0), jj(toErase[kk].size()); ii<jj;ii++) erase(toErase[kk][ii][0],toErase[kk][ii][1],toErase[kk][ii][2]);
-			return initSize-currSize;
-		#endif
 		}
 		
 	// we must call Scene's ctor (and from Scene::postLoad), since we depend on the existing BodyContainer at that point.

@@ -186,8 +186,9 @@ Real smoothkernelViscoLapl(const double & rr, const double & hh) {
 
 Real smoothkernelLucy(const double & rr, const double & hh) {
   if (rr<=hh and rr!=0 and hh!=0) {
-    const Real h = 1; const Real r = rr/hh;
+    //const Real h = 1; 
     //return 5/(9*M_PI*pow(h,2))*(1+3*r/h)*pow((1-r/h),3);
+    const Real r = rr/hh;
     return 5/(9*M_PI)*(1+3*r)*pow((1-r),3);
   } else {
     return 0;
@@ -196,8 +197,9 @@ Real smoothkernelLucy(const double & rr, const double & hh) {
 
 Real smoothkernelLucyGrad(const double & rr, const double & hh) {
   if (rr<=hh and rr!=0 and hh!=0) {
-    const Real h = 1; const Real r = rr/hh;
+    //const Real h = 1; 
     //return -5/(9*M_PI*pow(h,2))*(-12*r/(h*h))*pow((1-r/h),2);
+    const Real r = rr/hh;
     return -5/(9*M_PI)*(-12*r)*pow((1-r),2);
   } else {
     return 0;
@@ -206,8 +208,9 @@ Real smoothkernelLucyGrad(const double & rr, const double & hh) {
 
 Real smoothkernelLucyLapl(const double & rr, const double & hh) {
   if (rr<=hh and rr!=0 and hh!=0) {
-    const Real h = 1; const Real r = rr/hh;
+    //const Real h = 1; 
     //return  5/(9*M_PI*pow(h,2))*(-12/(h*h))*(1-r/h)*(1-3*r/h);
+    const Real r = rr/hh;
     return  5/(9*M_PI)*(-12)*(1-r)*(1-3*r);
   } else {
     return 0;
@@ -217,7 +220,8 @@ Real smoothkernelLucyLapl(const double & rr, const double & hh) {
 Real smoothkernelMonaghan(const double & rr, const double & hh) {
   Real ret = 0.0;
   if (hh!=0) {
-    const Real h = 1; const Real r = rr/hh;
+    //const Real h = 1; 
+    const Real r = rr/hh;
     if (rr/hh<0.5) {
       //ret = 40/(7*M_PI*h*h)*(1 - 6*pow((r/h),2) + 6*pow((r/h),3));
       ret = 40/(7*M_PI)*(1 - 6*pow((r),2) + 6*pow((r),3));
@@ -247,7 +251,8 @@ Real smoothkernelMonaghanGrad(const double & rr, const double & hh) {
 Real smoothkernelMonaghanLapl(const double & rr, const double & hh) {
   Real ret = 0.0;
   if (hh!=0) {
-    const Real h = 1; const Real r = rr/hh;
+    //const Real h = 1; 
+    const Real r = rr/hh;
     if (rr/hh<0.5) {
       //ret = 40/(7*M_PI*h*h)*( - 12/(h*h))*(1 - 3 * r/(h*h*h*h*h));
       ret = 40/(7*M_PI)*( - 12)*(1 - 3 * r);
@@ -343,7 +348,7 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   
   const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
   const Real normalVelocity	= geom.normal.dot(relativeVelocity);
-  const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
+  //const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
   
   // Copy-paste
   //////////////////////////////////////////////////////////////////

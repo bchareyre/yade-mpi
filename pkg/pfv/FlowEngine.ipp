@@ -222,8 +222,8 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::initSolver 
         flow.meanKStat = meanKStat;
         flow.permeabilityMap = permeabilityMap;
         flow.fluidBulkModulus = fluidBulkModulus;
-//         flow.T[flow.currentTes].Clear();
-        flow.T[flow.currentTes].maxId=-1;
+//         flow.tesselation().Clear();
+        flow.tesselation().maxId=-1;
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
 }
 
@@ -256,16 +256,16 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::buildTriang
         addBoundary ( flow );
         triangulate ( flow );
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
-        flow.T[flow.currentTes].compute();
+        flow.tesselation().compute();
 
         flow.defineFictiousCells();
 	// For faster loops on cells define this vector
-	flow.T[flow.currentTes].cellHandles.clear();
-	flow.T[flow.currentTes].cellHandles.reserve(flow.T[flow.currentTes].Triangulation().number_of_finite_cells());
-	FiniteCellsIterator cell_end = flow.T[flow.currentTes].Triangulation().finite_cells_end();
+	flow.tesselation().cellHandles.clear();
+	flow.tesselation().cellHandles.reserve(flow.tesselation().Triangulation().number_of_finite_cells());
+	FiniteCellsIterator cell_end = flow.tesselation().Triangulation().finite_cells_end();
 	int k=0;
-	for ( FiniteCellsIterator cell = flow.T[flow.currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
-		flow.T[flow.currentTes].cellHandles.push_back(cell);
+	for ( FiniteCellsIterator cell = flow.tesselation().Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
+		flow.tesselation().cellHandles.push_back(cell);
 		cell->info().id=k++;}//define unique numbering now, corresponds to position in cellHandles
         flow.displayStatistics ();
         flow.computePermeability();
@@ -276,9 +276,9 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::buildTriang
         boundaryConditions ( flow );
         flow.initializePressure ( pZero );
 	
-        if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate)) flow.interpolate ( flow.T[!flow.currentTes], flow.T[flow.currentTes] );
-        if ( waveAction ) flow.applySinusoidalPressure ( flow.T[flow.currentTes].Triangulation(), sineMagnitude, sineAverage, 30 );
-	else if (boundaryPressure.size()!=0) flow.applyUserDefinedPressure ( flow.T[flow.currentTes].Triangulation(), boundaryXPos , boundaryPressure);
+        if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate)) flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
+        if ( waveAction ) flow.applySinusoidalPressure ( flow.tesselation().Triangulation(), sineMagnitude, sineAverage, 30 );
+	else if (boundaryPressure.size()!=0) flow.applyUserDefinedPressure ( flow.tesselation().Triangulation(), boundaryXPos , boundaryPressure);
         if (normalLubrication || shearLubrication || viscousShear) flow.computeEdgesSurfaces();
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
@@ -320,7 +320,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::addBoundary
                 }
         }
 	//FIXME idOffset must be set correctly, not the case here (always 0), then we need walls first or it will fail
-        idOffset = flow.T[flow.currentTes].maxId+1;
+        idOffset = flow.tesselation().maxId+1;
         flow.idOffset = idOffset;
         flow.sectionArea = ( flow.xMax - flow.xMin ) * ( flow.zMax-flow.zMin );
         flow.vTotal = ( flow.xMax-flow.xMin ) * ( flow.yMax-flow.yMin ) * ( flow.zMax-flow.zMin );
@@ -365,7 +365,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::triangulate
 ///Using Tesselation wrapper (faster)
 // 	TesselationWrapper TW;
 // 	if (TW.Tes) delete TW.Tes;
-// 	TW.Tes = &(flow.T[flow.currentTes]);//point to the current Tes we have in Flowengine
+// 	TW.Tes = &(flow.tesselation());//point to the current Tes we have in Flowengine
 // 	TW.insertSceneSpheres();//TW is now really inserting in TemplateFlowEngine, using the faster insert(begin,end)
 // 	TW.Tes = NULL;//otherwise, Tes would be deleted by ~TesselationWrapper() at the end of the function.
 ///Using one-by-one insertion
@@ -374,27 +374,27 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::triangulate
                 if ( !b.exists ) continue;
                 if ( b.isSphere ) {
 			if (b.id==ignoredBody) continue;
-                        flow.T[flow.currentTes].insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );}
+                        flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );}
         }
-	flow.T[flow.currentTes].redirected=true;//By inserting one-by-one, we already redirected
-	flow.shearLubricationForces.resize ( flow.T[flow.currentTes].maxId+1 );
-	flow.shearLubricationTorques.resize ( flow.T[flow.currentTes].maxId+1 );
-	flow.pumpLubricationTorques.resize ( flow.T[flow.currentTes].maxId+1 );
-	flow.twistLubricationTorques.resize ( flow.T[flow.currentTes].maxId+1 );
-	flow.shearLubricationBodyStress.resize ( flow.T[flow.currentTes].maxId+1 );
-	flow.normalLubricationForce.resize ( flow.T[flow.currentTes].maxId+1 );
-	flow.normalLubricationBodyStress.resize ( flow.T[flow.currentTes].maxId+1 );
+	flow.tesselation().redirected=true;//By inserting one-by-one, we already redirected
+	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
+	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );
+	flow.pumpLubricationTorques.resize ( flow.tesselation().maxId+1 );
+	flow.twistLubricationTorques.resize ( flow.tesselation().maxId+1 );
+	flow.shearLubricationBodyStress.resize ( flow.tesselation().maxId+1 );
+	flow.normalLubricationForce.resize ( flow.tesselation().maxId+1 );
+	flow.normalLubricationBodyStress.resize ( flow.tesselation().maxId+1 );
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::initializeVolumes ( Solver& flow )
 {
 	typedef typename Solver::FiniteVerticesIterator FiniteVerticesIterator;
 	
-	FiniteVerticesIterator vertices_end = flow.T[flow.currentTes].Triangulation().finite_vertices_end();
+	FiniteVerticesIterator vertices_end = flow.tesselation().Triangulation().finite_vertices_end();
 	CGT::CVector Zero(0,0,0);
-	for (FiniteVerticesIterator V_it = flow.T[flow.currentTes].Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++) V_it->info().forces=Zero;
+	for (FiniteVerticesIterator V_it = flow.tesselation().Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++) V_it->info().forces=Zero;
 
-	FOREACH(CellHandle& cell, flow.T[flow.currentTes].cellHandles)
+	FOREACH(CellHandle& cell, flow.tesselation().cellHandles)
 	{
 		switch ( cell->info().fictious() )
 		{
@@ -448,12 +448,12 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::updateVolum
         epsVolMax=0;
         Real totVol=0; Real totDVol=0;
 	#ifdef YADE_OPENMP
-	const long size=flow.T[flow.currentTes].cellHandles.size();
+	const long size=flow.tesselation().cellHandles.size();
 	#pragma omp parallel for num_threads(ompThreads>0 ? ompThreads : 1)
 	for(long i=0; i<size; i++){
-		CellHandle& cell = flow.T[flow.currentTes].cellHandles[i];
+		CellHandle& cell = flow.tesselation().cellHandles[i];
 	#else
-	FOREACH(CellHandle& cell, flow.T[flow.currentTes].cellHandles){
+	FOREACH(CellHandle& cell, flow.tesselation().cellHandles){
 	#endif
 		double newVol, dVol;
                 switch ( cell->info().fictious() ) {
@@ -592,7 +592,7 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::computeVisc
 		for ( unsigned int k=0; k<flow.normalLubricationBodyStress.size(); k++) flow.normalLubricationBodyStress[k]=Matrix3r::Zero();
 
 		typedef typename Solver::Tesselation Tesselation;
-		const Tesselation& Tes = flow.T[flow.currentTes];
+		const Tesselation& Tes = flow.tesselation();
 		flow.deltaShearVel.clear(); flow.normalV.clear(); flow.deltaNormVel.clear(); flow.surfaceDistance.clear(); flow.onlySpheresInteractions.clear(); flow.normalStressInteraction.clear(); flow.shearStressInteraction.clear();
 
 
@@ -724,6 +724,24 @@ void TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::computeVisc
 				
 		}
 	}
+}
+
+template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
+Vector3r TemplateFlowEngine<_CellInfo,_VertexInfo,_Tesselation,solverT>::averageVelocity()
+{
+        solver->averageRelativeCellVelocity();
+        Vector3r meanVel ( 0,0,0 );
+        Real volume=0;
+        FiniteCellsIterator cell_end = solver->T[solver->currentTes].Triangulation().finite_cells_end();
+        for ( FiniteCellsIterator cell = solver->T[solver->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ) {
+		//We could also define velocity using cell's center
+//                 if ( !cell->info().isReal() ) continue;
+                if ( cell->info().isGhost ) continue;
+                for ( int i=0;i<3;i++ )
+                        meanVel[i]=meanVel[i]+ ( ( cell->info().averageVelocity() ) [i] * abs ( cell->info().volume() ) );
+                volume+=abs ( cell->info().volume() );
+        }
+        return ( meanVel/volume );
 }
 
 #endif //FLOW_ENGINE

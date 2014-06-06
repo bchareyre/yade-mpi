@@ -25,8 +25,8 @@ class CohFrictMat : public FrictMat
 		((Real,alphaKtw,2.0,,"Dimensionless twist stiffness."))
 		((Real,etaRoll,-1.,,"Dimensionless rolling (aka 'bending') strength. If negative, rolling moment will be elastic."))
 		((Real,etaTwist,-1.,,"Dimensionless twisting strength. If negative, twist moment will be elastic."))
-		((Real,normalCohesion,0,,"Tensile strength, homogeneous to a pressure"))
-		((Real,shearCohesion,0,,"Shear strength, homogeneous to a pressure"))
+		((Real,normalCohesion,-1,,"Tensile strength, homogeneous to a pressure. If negative the normal force is purely elastic."))
+		((Real,shearCohesion,-1,,"Shear strength, homogeneous to a pressure. If negative the shear force is purely elastic."))
 		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
 		,
 		createIndex();

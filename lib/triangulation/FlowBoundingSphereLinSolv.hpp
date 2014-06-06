@@ -54,6 +54,7 @@ public:
 	using FlowType::pressureChanged;
 	using FlowType::computedOnce;
 	using FlowType::resetNetwork;
+	using FlowType::tesselation;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;

@@ -65,12 +65,13 @@ class ForceContainer{
 			assert(nThreads>omp_get_thread_num());
 			const Body::id_t idMaxTmp = max(id, _maxId[threadN]);
 			_maxId[threadN] = 0;
-			if (threadN<0) resizePerm(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
-			else if (sizeOfThreads[threadN]<=(size_t)idMaxTmp) resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)),threadN);
+			if (threadN<0) {
+				resizePerm(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
+			} else if (sizeOfThreads[threadN]<=(size_t)idMaxTmp) {
+				resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)),threadN);
+			}
 		}
-
 		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
-
 		
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
@@ -133,10 +134,17 @@ class ForceContainer{
 		 * Locks globalMutex, since one thread modifies common data (_force&_torque).
 		 * Must be called before get* methods are used. Exception is thrown otherwise, since data are not consistent. */
 		inline void sync(){
+			for(int i=0; i<nThreads; i++){
+				if (_maxId[i] > 0) { synced = false;}
+			}
 			if(synced) return;
 			boost::mutex::scoped_lock lock(globalMutex);
 			if(synced) return; // if synced meanwhile
-
+			
+			for(int i=0; i<nThreads; i++){
+				if (_maxId[i] > 0) { ensureSize(_maxId[i],i);}
+			}
+			
 			syncSizesOfContainers();
 
 			for(long id=0; id<(long)size; id++){
@@ -283,10 +291,16 @@ class ForceContainer {
 			lastReset=iter;
 		}
 		
-		void sync(){
-			if (permForceUsed) for(long id=0; id<(long)size; id++)
-				{_force[id]+=_permForce[id]; _torque[id]+=_permTorque[id];}
-			return;}
+		void sync() {
+			if (_maxId>0) {ensureSize(_maxId); _maxId=0;}
+			if (permForceUsed) {
+				for(long id=0; id<(long)size; id++) {
+					_force[id]+=_permForce[id];
+					_torque[id]+=_permTorque[id];
+				}
+			}
+			return;
+		}
 		unsigned long syncCount;
 		// interaction in which the container was last reset; used by NewtonIntegrator to detect whether ForceResetter was not forgotten
 		long lastReset;

@@ -20,9 +20,9 @@ bool Collider::mayCollide(const Body* b1, const Body* b2){
 		 // do not collide clumps, since they are just containers, never interact
 		!b1->isClump() && !b2->isClump() &&
 		// masks must have at least 1 bit in common
-		(b1->groupMask & b2->groupMask)!=0 &&
+		b1->maskCompatible(b2->groupMask) &&
 		// avoid contact between particles having the same mask compatible with the avoidSelfInteractionMask.
- 		!( (b1->groupMask == b2->groupMask) && ( avoidSelfInteractionMask & b1->groupMask ))
+ 		!( (b1->groupMask == b2->groupMask) && b1->maskCompatible(avoidSelfInteractionMask) )
 	;
 }
 
