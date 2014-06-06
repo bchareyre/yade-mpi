@@ -122,7 +122,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 					((bool, invadeBoundary, false,,"Invade from boundaries."))
 					((int, windowsNo, 10,, "Number of genrated windows(or zoomed samples)."))
 					,,,
-					.def("saveVtk",&UnsaturatedEngine::saveVtk,(python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
+					.def("saveVtk",&UnsaturatedEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 					.def("getMinEntryValue",&UnsaturatedEngine::getMinEntryValue,"get the minimum air entry pressure for the next invade step.")
 					.def("getSaturation",&UnsaturatedEngine::getSaturation,"get saturation.")
 					.def("getSpecificInterfacialArea",&UnsaturatedEngine::getSpecificInterfacialArea,"get specific interfacial area (defined as the amount of fluid-fluid interfacial area per unit volume pf the porous medium).")
@@ -131,13 +131,13 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 
 					.def("checkCellsConnection",&UnsaturatedEngine::checkCellsConnection,"Check cell connections.")
 					.def("checkEntryCapillaryPressure",&UnsaturatedEngine::checkEntryCapillaryPressure,"Check entry capillary pressure between neighbor cells.")
-					.def("checkLatticeNodeY",&UnsaturatedEngine::checkLatticeNodeY,(python::arg("y")),"Check the slice of lattice nodes for yNormal(y). 0: out of sphere; 1: inside of sphere.")
-					.def("checkReservoirInfo",&UnsaturatedEngine::checkReservoirInfo,(python::arg("boundN")),"Check reservoir cells(N=2,3) statement and export to 'waterReservoirBoundInfo.txt' and 'airReservoirBoundInfo.txt'.")
+					.def("checkLatticeNodeY",&UnsaturatedEngine::checkLatticeNodeY,(boost::python::arg("y")),"Check the slice of lattice nodes for yNormal(y). 0: out of sphere; 1: inside of sphere.")
+					.def("checkReservoirInfo",&UnsaturatedEngine::checkReservoirInfo,(boost::python::arg("boundN")),"Check reservoir cells(N=2,3) statement and export to 'waterReservoirBoundInfo.txt' and 'airReservoirBoundInfo.txt'.")
 					.def("checkBoundingCellsInfo",&UnsaturatedEngine::checkBoundingCellsInfo,"Check boundary cells (without reservoirs) statement and export to 'boundInfo.txt'.")
 					
 					.def("testFunction",&UnsaturatedEngine::testFunction,"The playground for Chao's experiments.")
 					.def("checknoCache",&UnsaturatedEngine::checknoCache,"check noCache. (temp func.)")
-					.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(python::arg("windowsID")), "get saturation of windowsID")
+					.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(boost::python::arg("windowsID")), "get saturation of windowsID")
 					.def("debugTemp",&UnsaturatedEngine::debugTemp,"debug temp file.(temporary)")
 					.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temp function for comparison with experiments, will delete soon")
 					)
