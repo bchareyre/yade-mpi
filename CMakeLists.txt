@@ -130,7 +130,13 @@ OPTION(ENABLE_LIQMIGRATION "Enable liquid control (very experimental), see [Mani
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
-  MESSAGE(STATUS "Found Eigen3")
+  MESSAGE(STATUS "Found Eigen3, version: ${EIGEN3_VERSION}")
+  
+  # Minimal recommended version 3.2.1
+  IF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
+    MESSAGE(WARNING "Minimal recommended Eigen3 version is 3.2.1")
+  ENDIF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
+
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
 ENDIF(EIGEN3_FOUND)
 #===========================================================
