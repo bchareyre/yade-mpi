@@ -8,6 +8,8 @@
 	typedef double Real;
 #endif
 
+#define EIGEN_DONT_PARALLELIZE
+
 #include<limits>
 #include<cstdlib>
 
