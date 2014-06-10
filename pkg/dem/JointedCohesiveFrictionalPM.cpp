@@ -270,11 +270,8 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 			
 			//contactPhysics->kn = jointNormalStiffness*2.*R1*R2/(R1+R2); // very first expression from Luc
 			//contactPhysics->kn = (jkn1+jkn2)/2.0*2.*R1*R2/(R1+R2); // after putting jointNormalStiffness in material
-			contactPhysics->kn = ( jkn1*Mathr::PI*pow(R1,2) + jkn2*Mathr::PI*pow(R2,2) )/2.0; // for a size independant expression
-			
-			//contactPhysics->ks = jointShearStiffness*2.*R1*R2/(R1+R2);
-			//contactPhysics->ks = (jks1+jks2)/2.0*2.*R1*R2/(R1+R2);
-			contactPhysics->ks = ( jks1*Mathr::PI*pow(R1,2) + jks2*Mathr::PI*pow(R2,2) )/2.0; // for a size independant expression
+			contactPhysics->kn = ( jkn1 + jkn2 ) /2.0 * contactPhysics->crossSection; // for a size independant expression
+			contactPhysics->ks = ( jks1 + jks2 ) /2.0 * contactPhysics->crossSection; // for a size independant expression
 			
 			contactPhysics->tanDilationAngle = std::tan(std::min(jdil1,jdil2));
 		  
