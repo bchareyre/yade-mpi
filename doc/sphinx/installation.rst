@@ -115,7 +115,7 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `libQGLViewer <http://www.libqglviewer.com>`_
 * `python <http://www.python.org>`_, `numpy <http://numpy.scipy.org>`_, `ipython <http://ipython.scipy.org>`_
 * `matplotlib <http://matplotlib.sf.net>`_
-* `eigen3 <http://eigen.tuxfamily.org>`_ algebra library (minimal recommended version 3.2.1)
+* `eigen3 <http://eigen.tuxfamily.org>`_ algebra library (minimal required version 3.2.1)
 * `gdb <http://www.gnu.org/software/gdb>`_ debugger
 * `sqlite3 <http://www.sqlite.org>`_ database engine
 * `Loki <http://loki-lib.sf.net>`_ library
