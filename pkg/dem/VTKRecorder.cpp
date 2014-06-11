@@ -479,10 +479,12 @@ void VTKRecorder::action(){
 				spheresCoordNumbSPH->InsertNextValue(b->coordNumber()); 
 #endif
 #ifdef YADE_LIQMIGRATION
-				spheresLiqVol->InsertNextValue(b->Vf);
-				const Real tmpVolIter = liqVolIterBody(b);
-				spheresLiqVolIter->InsertNextValue(tmpVolIter);
-				spheresLiqVolTotal->InsertNextValue(tmpVolIter + b->Vf);
+				if (recActive[REC_LIQ]) {
+					spheresLiqVol->InsertNextValue(b->Vf);
+					const Real tmpVolIter = liqVolIterBody(b);
+					spheresLiqVolIter->InsertNextValue(tmpVolIter);
+					spheresLiqVolTotal->InsertNextValue(tmpVolIter + b->Vf);
+				}
 #endif
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);
 				continue;
@@ -626,9 +628,11 @@ void VTKRecorder::action(){
 		spheresUg->GetPointData()->AddArray(spheresCoordNumbSPH);
 #endif
 #ifdef YADE_LIQMIGRATION
-		spheresUg->GetPointData()->AddArray(spheresLiqVol);
-		spheresUg->GetPointData()->AddArray(spheresLiqVolIter);
-		spheresUg->GetPointData()->AddArray(spheresLiqVolTotal);
+		if (recActive[REC_LIQ]) {
+			spheresUg->GetPointData()->AddArray(spheresLiqVol);
+			spheresUg->GetPointData()->AddArray(spheresLiqVolIter);
+			spheresUg->GetPointData()->AddArray(spheresLiqVolTotal);
+		}
 #endif
 		if (recActive[REC_STRESS]){
 			spheresUg->GetPointData()->AddArray(spheresNormalStressVec);
