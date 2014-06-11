@@ -19,7 +19,7 @@
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
-
+#  NOVECTORIZE: disables vectorization and alignment in Eigen3 library, needed for some old systems (OFF by default)
 
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
@@ -138,6 +138,10 @@ IF (EIGEN3_FOUND)
   ENDIF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
 
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
+  IF (NOVECTORIZE)
+    MESSAGE(STATUS "Disable vectorization")
+    ADD_DEFINITIONS("-DEIGEN_DONT_VECTORIZE -DEIGEN_DONT_ALIGN -DEIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT")
+  ENDIF (NOVECTORIZE)
 ENDIF(EIGEN3_FOUND)
 #===========================================================
 INCLUDE_DIRECTORIES(${BZIP2_INCLUDE_DIR})
