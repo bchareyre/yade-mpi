@@ -87,8 +87,8 @@ for z in range(numberTests):
 		O.timingEnabled=True
 		timing.reset()
 		tStart=time.time()
-		# add initIter to nbIter to so that the iterations considered in the perfromance analysis are actually nbIter
-		O.run(nbIter+initIter)
+		# run nbIter iterations
+		O.run(nbIter)
 		O.wait()
 		
 		tEnd=time.time()
