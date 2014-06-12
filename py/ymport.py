@@ -48,7 +48,7 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 			raise RuntimeError("Please, specify a correct format output!");
 	return ret
   
-def textClumps(fileName,shift=Vector3.Zero,discretization=0,orientation=Quaternion.Identity,scale=1.0,**kw):
+def textClumps(fileName,shift=Vector3.Zero,discretization=0,orientation=Quaternion((0,1,0),0.0),scale=1.0,**kw):
 	"""Load clumps-members from file, insert them to the simulation.
 	
 	:param str filename: file name
@@ -140,7 +140,7 @@ def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
 	surf.translate(shift) 
 	yade.pack.gtsSurface2Facets(surf,**kw)
 
-def gmsh(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,**kw):
+def gmsh(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quaternion((0,1,0),0.0),**kw):
 	""" Imports geometry from mesh file and creates facets.
 
 	:Parameters:
@@ -211,7 +211,7 @@ def gmsh(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quaternio
 		ret.append(utils.facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
 	return ret
 
-def gengeoFile(fileName="file.geo",shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,**kw):
+def gengeoFile(fileName="file.geo",shift=Vector3.Zero,scale=1.0,orientation=Quaternion((0,1,0),0.0),**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres. 
 	Since 2012 the package is available in Debian/Ubuntu and known as python-demgengeo
 	http://packages.qa.debian.org/p/python-demgengeo.html
