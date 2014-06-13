@@ -568,4 +568,22 @@ Real LiqControl::totalLiqVol(int mask=0) const{
   }
   return totalLiqVol;
 }
+
+bool LiqControl::addLiqInter(id_t id1, id_t id2, Real liq) {
+  if (id1<0 or id2<0 or id1==id2 or liq<=0) return false;
+  
+  Scene* scene=Omega::instance().getScene().get();
+  shared_ptr<InteractionContainer>& intrs=scene->interactions;
+  const shared_ptr<Interaction>& I=intrs->find(id1,id2);
+  if (I->isReal()) {
+    ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(I->phys.get());
+    if (physT and physT->Vb <= physT->Vmax and liq <= (physT->Vmax - physT->Vb)) {
+      physT->Vb += liq;
+      physT->Vf1 += liq/2.0;
+      physT->Vf2 += liq/2.0;
+      return true;
+    }
+  }
+  return false;
+}
 #endif
