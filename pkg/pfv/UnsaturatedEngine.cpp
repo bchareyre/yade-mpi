@@ -100,6 +100,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 		void checkReservoirInfo(int boundN);
 		void checkBoundingCellsInfo();
 		void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
+		void savePhaseVtk(const char* folder);
 		//temp functions
 		void initializeCellWindowsID();
 		double getWindowsSaturation(int windowsID);
@@ -123,6 +124,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 					((int, windowsNo, 10,, "Number of genrated windows(or zoomed samples)."))
 					,,,
 					.def("saveVtk",&UnsaturatedEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
+					.def("savePhaseVtk",&UnsaturatedEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save W-phase and Nw-phase in vtk format. W-phase=1, NW-phase=0 (also can be seen as saturation of single cell.). Specify a folder name for output.")
 					.def("getMinEntryValue",&UnsaturatedEngine::getMinEntryValue,"get the minimum air entry pressure for the next invade step.")
 					.def("getSaturation",&UnsaturatedEngine::getSaturation,"get saturation.")
 					.def("getSpecificInterfacialArea",&UnsaturatedEngine::getSpecificInterfacialArea,"get specific interfacial area (defined as the amount of fluid-fluid interfacial area per unit volume pf the porous medium).")
@@ -1007,6 +1009,81 @@ void UnsaturatedEngine::checkReservoirInfo(int boundN)
             cerr<<"This is not a reservoir boundary. Please set boundN to be 2(waterReservoirBound) or 3(airReservoirBound)."<<endl;
         }
     }
+}
+
+void UnsaturatedEngine::savePhaseVtk(const char* folder)
+{
+// 	RTriangulation& Tri = T[solver->noCache?(!currentTes):currentTes].Triangulation();
+	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+        static unsigned int number = 0;
+        char filename[80];
+	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"%s/out_%d.vtk",folder,number++);
+	int firstReal=-1;
+
+	//count fictious vertices and cells
+	solver->vtkInfiniteVertices=solver->vtkInfiniteCells=0;
+ 	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (!isDrawable) solver->vtkInfiniteCells+=1;
+	}
+	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+                if (!v->info().isReal()) solver->vtkInfiniteVertices+=1;
+                else if (firstReal==-1) firstReal=solver->vtkInfiniteVertices;}
+
+        basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-solver->vtkInfiniteVertices, (unsigned int) Tri.number_of_finite_cells()-solver->vtkInfiniteCells);
+
+        vtkfile.open(filename,"test");
+
+        vtkfile.begin_vertices();
+        double x,y,z;
+        for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+		if (v->info().isReal()){
+		x = (double)(v->point().point()[0]);
+                y = (double)(v->point().point()[1]);
+                z = (double)(v->point().point()[2]);
+                vtkfile.write_point(x,y,z);}
+        }
+        vtkfile.end_vertices();
+
+        vtkfile.begin_cells();
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+        	if (isDrawable){vtkfile.write_cell(cell->vertex(0)->info().id()-firstReal, cell->vertex(1)->info().id()-firstReal, cell->vertex(2)->info().id()-firstReal, cell->vertex(3)->info().id()-firstReal);}
+        }
+        vtkfile.end_cells();
+
+	vtkfile.begin_data("Phase",CELL_DATA,SCALARS,FLOAT);
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(!cell->info().isAirReservoir);}
+	}
+	vtkfile.end_data();
+	
+// 	if (permeabilityMap){
+// 	vtkfile.begin_data("Permeability",CELL_DATA,SCALARS,FLOAT);
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+// 		if (isDrawable){vtkfile.write_data(cell->info().s);}
+// 	}
+// 	vtkfile.end_data();}
+// 	else{
+// 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+// 		if (isDrawable){vtkfile.write_data(cell->info().p());}
+// 	}
+// 	vtkfile.end_data();}
+
+// 	if (1){
+// 	averageRelativeCellVelocity();
+// 	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+// 		if (isDrawable){vtkfile.write_data(cell->info().averageVelocity()[0],cell->info().averageVelocity()[1],cell->info().averageVelocity()[2]);}
+// 	}
+// 	vtkfile.end_data();}  
 }
 
 //----temp function for Vahid Joekar-Niasar's data----
