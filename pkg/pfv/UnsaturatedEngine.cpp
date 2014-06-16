@@ -1224,75 +1224,77 @@ void UnsaturatedEngine::computeSolidLine()
 
 void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 {
-	RTriangulation& Tri = solver->T[currentTes].Triangulation();
-	CVector nullVect(0,0,0);
-	//reset forces
-	if (!onlyCache) for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
-	
+    RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+    CVector nullVect(0,0,0);
+    //reset forces
+    if (!onlyCache) for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
 // 	#ifdef parallel_forces
 // 	if (solver->noCache) {
 // 		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
-// 		solver->perVertexUnitForce.resize(solver->T[currentTes].maxId+1);
-// 		solver->perVertexPressure.resize(solver->T[currentTes].maxId+1);}
+// 		solver->perVertexUnitForce.resize(solver->T[solver->currentTes].maxId+1);
+// 		solver->perVertexPressure.resize(solver->T[solver->currentTes].maxId+1);}
 // 	#endif
-	CellHandle neighbourCell;
-	VertexHandle mirrorVertex;
-	CVector tempVect;
-	//FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-	if (solver->noCache) {for (FlowSolver::VCellIterator cellIt=solver->T[currentTes].cellHandles.begin(); cellIt!=solver->T[currentTes].cellHandles.end(); cellIt++){
-			CellHandle& cell = *cellIt;
-			//reset cache
-			for (int k=0;k<4;k++) cell->info().unitForceVectors[k]=nullVect;
+// 	CellHandle neighbourCell;
+// 	VertexHandle mirrorVertex;
+    CVector tempVect(0,0,0);
+    //FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
+    if (solver->noCache) {//WARNING:all currentTes must be solver->T[solver->currentTes], should NOT be solver->T[currentTes]
+        for (FlowSolver::VCellIterator cellIt=solver->T[solver->currentTes].cellHandles.begin(); cellIt!=solver->T[solver->currentTes].cellHandles.end(); cellIt++) {
+            CellHandle& cell = *cellIt;
+            //reset cache
+            for (int k=0; k<4; k++) cell->info().unitForceVectors[k]=nullVect;
 
-			for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
-					neighbourCell = cell->neighbor(j);
-					const CVector& Surfk = cell->info().facetSurfaces[j];
-					//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
-					//The ratio void surface / facet surface
-					Real area = sqrt(Surfk.squared_length()); if (area<=0) cerr <<"AREA <= 0!!"<<endl;
-					CVector facetNormal = Surfk/area;
-					const std::vector<CVector>& crossSections = cell->info().facetSphereCrossSections;
-					CVector fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
-					/// handle fictious vertex since we can get the projected surface easily here
-					if (cell->vertex(j)->info().isFictious) {
-						Real projSurf=abs(Surfk[solver->boundary(cell->vertex(j)->info().id()).coordinate]);
-						tempVect=-projSurf*solver->boundary(cell->vertex(j)->info().id()).normal;
-						cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
-						//define the cached value for later use with cache*p
-						cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
-					}
-					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
-					CVector facetUnitForce = -fluidSurfk*cell->info().solidLine[j][3];
-					CVector facetForce = cell->info().p()*facetUnitForce;
-										
-					for (int y=0; y<3;y++) {
-						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + facetForce*cell->info().solidLine[j][y];
-						//add to cached value
-						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidLine[j][y];
-						//uncomment to get total force / comment to get only pore tension forces
-						if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
-							cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
-							//add to cached value
-							cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
-						}
-					}
-// 					#ifdef parallel_forces
-// 					solver->perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
-// 					solver->perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
-// 					#endif
-			}
-		}
-		solver->noCache=false;//cache should always be defined after execution of this function
-		if (onlyCache) return;
-	} else {//use cached values when triangulation doesn't change
+            for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
+                    const CVector& Surfk = cell->info().facetSurfaces[j];
+                    //FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
+                    //The ratio void surface / facet surface
+                    Real area = sqrt(Surfk.squared_length());
+                    if (area<=0) cerr <<"AREA <= 0!! AREA="<<area<<endl;
+                    CVector facetNormal = Surfk/area;
+                    const std::vector<CVector>& crossSections = cell->info().facetSphereCrossSections;
+                    CVector fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
+                    /// handle fictious vertex since we can get the projected surface easily here
+                    if (cell->vertex(j)->info().isFictious) {
+                        Real projSurf=abs(Surfk[solver->boundary(cell->vertex(j)->info().id()).coordinate]);
+                        tempVect=-projSurf*solver->boundary(cell->vertex(j)->info().id()).normal;
+                        cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
+                        //define the cached value for later use with cache*p
+                        cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+                    }
+                    /// Apply weighted forces f_k=sqRad_k/sumSqRad*f
+                    CVector facetUnitForce = -fluidSurfk*cell->info().solidLine[j][3];
+                    CVector facetForce = cell->info().p()*facetUnitForce;
+
+                    for (int y=0; y<3; y++) {
+                        cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + facetForce*cell->info().solidLine[j][y];
+                        //add to cached value
+                        cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidLine[j][y];
+                        //uncomment to get total force / comment to get only pore tension forces
+                        if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
+                            cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
+                            //add to cached value
+                            cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
+                        }
+                    }
+// 	#ifdef parallel_forces
+// 	solver->perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
+// 	solver->perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
+// 	#endif
+                }
+        }
+        solver->noCache=false;//cache should always be defined after execution of this function
+        if (onlyCache) return;
+    } 
+        
+    else {//use cached values when triangulation doesn't change
 // 		#ifndef parallel_forces
-		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
-			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
-			
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
+            for (int yy=0; yy<4; yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
+
 //  		#else
 // 		#pragma omp parallel for num_threads(ompThreads)
-// 		for (int vn=0; vn<= solver->T[currentTes].maxId; vn++) {
-// 			VertexHandle& v = solver->T[currentTes].vertexHandles[vn];
+// 		for (int vn=0; vn<= solver->T[solver->currentTes].maxId; vn++) {
+// 			VertexHandle& v = solver->T[solver->currentTes].vertexHandles[vn];
 // 			const int& id =  v->info().id();
 // 			CVector tf (0,0,0);
 // 			int k=0;
@@ -1301,13 +1303,16 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 // 			v->info().forces = tf;
 // 		}
 // 		#endif
-	}
-	if (solver->debugOut) {
-		CVector totalForce = nullVect;
-		for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
-			if (!v->info().isFictious) totalForce = totalForce + v->info().forces;
-			else if (solver->boundary(v->info().id()).flowCondition==1) totalForce = totalForce + v->info().forces;	}
-		cout << "totalForce = "<< totalForce << endl;}
+    }
+    
+    if (solver->debugOut) {
+        CVector totalForce = nullVect;
+        for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
+            if (!v->info().isFictious) totalForce = totalForce + v->info().forces;
+            else if (solver->boundary(v->info().id()).flowCondition==1) totalForce = totalForce + v->info().forces;
+        }
+        cout << "totalForce = "<< totalForce << endl;
+    }
 }
 
 #endif //UNSATURATED_FLOW
