@@ -130,9 +130,9 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 		scene->dt=previousDt;
 		computedOnce = true;}
 	else if (!computedOnce) scene->dt=defaultDt;
-	LOG_INFO("computed timestep " << newDt <<
-			(scene->dt==newDt ? string(", applied") :
-			string(", BUT timestep is ")+boost::lexical_cast<string>(scene->dt))<<".");
+// 	LOG_INFO("computed timestep " << newDt <<
+// 			(scene->dt==newDt ? string(", applied") :
+// 			string(", BUT timestep is ")+boost::lexical_cast<string>(scene->dt))<<".");
 }
 
 void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
