@@ -149,6 +149,38 @@ struct custom_ptrMatchMaker_from_float{
 	}
 };
 
+
+
+#ifdef YADE_MASK_ARBITRARY
+struct custom_mask_to_long{
+	static PyObject* convert(const mask_t& mask){
+		return PyLong_FromString(const_cast<char*>(mask.to_string().c_str()),NULL,2);
+	}
+};
+struct custom_mask_from_long{
+	custom_mask_from_long(){
+		 boost::python::converter::registry::push_back(&convertible,&construct,boost::python::type_id<mask_t>());
+	}
+	static void* convertible(PyObject* obj_ptr){
+		return (PyLong_Check(obj_ptr) || PyInt_Check(obj_ptr))? obj_ptr : 0;
+	}
+	static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data){
+		void* storage=((boost::python::converter::rvalue_from_python_storage<mask_t>*)(data))->storage.bytes;
+		new (storage) mask_t; mask_t* mask=(mask_t*)storage;
+		if (PyInt_Check(obj_ptr)) obj_ptr = PyLong_FromLong(PyInt_AsLong(obj_ptr));
+		obj_ptr = _PyLong_Format(obj_ptr,2,0,0);
+		std::string s(PyString_AsString(obj_ptr));
+		//
+		if (s.substr(0,2).compare("0b")==0) s = s.substr(2);
+		if (s[s.length()-1]=='L') s = s.substr(0,s.length()-1);
+		// TODO?
+		*mask = mask_t(s);
+		data->convertible=storage;
+	}
+};
+#endif
+
+
 BOOST_PYTHON_MODULE(_customConverters){
 
 	custom_Se3r_from_seq(); boost::python::to_python_converter<Se3r,custom_se3_to_tuple>();
@@ -166,6 +198,11 @@ BOOST_PYTHON_MODULE(_customConverters){
 	boost::python::to_python_converter<std::vector<std::vector<std::string> >,custom_vvector_to_list<std::string> >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
+
+#ifdef YADE_MASK_ARBITRARY
+	custom_mask_from_long();
+	boost::python::to_python_converter<mask_t,custom_mask_to_long>();
+#endif
 
 	// register 2-way conversion between c++ vector and python homogeneous sequence (list/tuple) of corresponding type
 	#define VECTOR_SEQ_CONV(Type) custom_vector_from_seq<Type>();  boost::python::to_python_converter<std::vector<Type>, custom_vector_to_list<Type> >();

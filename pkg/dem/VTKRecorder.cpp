@@ -37,8 +37,8 @@
 YADE_PLUGIN((VTKRecorder));
 CREATE_LOGGER(VTKRecorder);
 
-#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
-#define GET_MASK(b) boost::python::extract<int>(b->groupMask)
+#ifdef YADE_MASK_ARBITRARY
+#define GET_MASK(b) b->groupMask.to_ulong()
 #else
 #define GET_MASK(b) b->groupMask
 #endif

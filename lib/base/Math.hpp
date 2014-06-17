@@ -12,6 +12,9 @@
 
 #include<limits>
 #include<cstdlib>
+#ifdef YADE_MASK_ARBITRARY
+#include<bitset>
+#endif
 
 #include<Eigen/Core>
 #include<Eigen/Geometry>
@@ -203,10 +206,34 @@ class Se3
 template<typename Scalar> Scalar unitVectorsAngle(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return acos(a.dot(b)); }
 // operators
 
+
+/*
+ * Mask
+ */
+#ifdef YADE_MASK_ARBITRARY
+typedef std::bitset<YADE_MASK_ARBITRARY_SIZE> mask_t;
+bool operator==(const mask_t& g, int i);
+bool operator==(int i, const mask_t& g);
+bool operator!=(const mask_t& g, int i);
+bool operator!=(int i, const mask_t& g);
+mask_t operator&(const mask_t& g, int i);
+mask_t operator&(int i, const mask_t& g);
+mask_t operator|(const mask_t& g, int i);
+mask_t operator|(int i, const mask_t& g);
+bool operator||(const mask_t& g, bool b);
+bool operator||(bool b, const mask_t& g);
+bool operator&&(const mask_t& g, bool b);
+bool operator&&(bool b, const mask_t& g);
+#else
+typedef int mask_t;
+#endif
+
+
 /*
  * typedefs
  */
 typedef Se3<Real> Se3r;
+
 
 
 /*
@@ -306,6 +333,15 @@ void serialize(Archive & ar, Matrix6r & m, const unsigned int version){
 	   BOOST_SERIALIZATION_NVP(m40) & BOOST_SERIALIZATION_NVP(m41) & BOOST_SERIALIZATION_NVP(m42) & BOOST_SERIALIZATION_NVP(m43) & BOOST_SERIALIZATION_NVP(m44) & BOOST_SERIALIZATION_NVP(m45) &
 	   BOOST_SERIALIZATION_NVP(m50) & BOOST_SERIALIZATION_NVP(m51) & BOOST_SERIALIZATION_NVP(m52) & BOOST_SERIALIZATION_NVP(m53) & BOOST_SERIALIZATION_NVP(m54) & BOOST_SERIALIZATION_NVP(m55);
 }
+
+#ifdef YADE_MASK_ARBITRARY
+template<class Archive>
+void serialize(Archive & ar, mask_t& v, const unsigned int version){
+	std::string str = v.to_string();
+	ar & BOOST_SERIALIZATION_NVP(str);
+	v = mask_t(str);
+}
+#endif
 
 } // namespace serialization
 } // namespace boost

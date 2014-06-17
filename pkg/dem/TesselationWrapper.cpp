@@ -306,7 +306,7 @@ void TesselationWrapper::defToVtkFromStates (string inputFile1, string inputFile
 
 void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(2);
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<Sphere> iSphere(new Sphere);
 	body->state->blockedDOFs=State::DOF_NONE;
 	body->state->pos=position;
