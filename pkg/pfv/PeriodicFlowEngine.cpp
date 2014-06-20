@@ -42,7 +42,7 @@ class PeriodicCellInfo : public FlowCellInfo_FlowEngine_PeriodicInfo
 };
 
 
-class PeriodicVertexInfo : public FlowVertexInfo_DummyFlowEngineT {
+class PeriodicVertexInfo : public FlowVertexInfo_FlowEngine_PeriodicInfo {
 	public:
 	PeriodicVertexInfo& operator= (const CVector &u) { CVector::operator= (u); return *this; }
 	PeriodicVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
