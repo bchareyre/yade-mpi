@@ -25,7 +25,7 @@ class SoluteCellInfo : public FlowCellInfo_SoluteFlowEngineT
 	inline void getInfo (const SoluteCellInfo& otherCellInfo) {FlowCellInfo_SoluteFlowEngineT::getInfo(otherCellInfo); solute()=otherCellInfo.solute();}
 };
 
-typedef TemplateFlowEngine_SoluteFlowEngineT<SoluteCellInfo,FlowVertexInfo_DummyFlowEngineT> SoluteFlowEngineT;
+typedef TemplateFlowEngine_SoluteFlowEngineT<SoluteCellInfo,FlowVertexInfo_SoluteFlowEngineT> SoluteFlowEngineT;
 REGISTER_SERIALIZABLE(SoluteFlowEngineT);
 YADE_PLUGIN((SoluteFlowEngineT));
 

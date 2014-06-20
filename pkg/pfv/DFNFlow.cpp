@@ -23,7 +23,7 @@ class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 };
 
 
-class DFNVertexInfo : public FlowVertexInfo_DummyFlowEngineT {
+class DFNVertexInfo : public FlowVertexInfo_DFNFlowEngineT {
 	public:
 	//same here if needed
 };
