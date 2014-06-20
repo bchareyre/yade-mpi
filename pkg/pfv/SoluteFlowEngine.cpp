@@ -11,22 +11,21 @@
 // #define SOLUTE_FLOW
 #ifdef SOLUTE_FLOW
 
-#define TEMPLATE_FLOW_NAME SoluteFlowEngineT
-#include <yade/pkg/pfv/FlowEngine.hpp>
+#include "FlowEngine_SoluteFlowEngineT.hpp"
 
 #include <Eigen/Sparse>
 
-class SoluteCellInfo : public FlowCellInfo
+class SoluteCellInfo : public FlowCellInfo_SoluteFlowEngineT
 {	
 	public:
 	Real solute_concentration;
-	SoluteCellInfo (void) : FlowCellInfo() {solute_concentration=0;}
+	SoluteCellInfo (void) : FlowCellInfo_SoluteFlowEngineT() {solute_concentration=0;}
 	inline Real& solute (void) {return solute_concentration;}
 	inline const Real& solute (void) const {return solute_concentration;}
-	inline void getInfo (const SoluteCellInfo& otherCellInfo) {FlowCellInfo::getInfo(otherCellInfo); solute()=otherCellInfo.solute();}
+	inline void getInfo (const SoluteCellInfo& otherCellInfo) {FlowCellInfo_SoluteFlowEngineT::getInfo(otherCellInfo); solute()=otherCellInfo.solute();}
 };
 
-typedef TemplateFlowEngine<SoluteCellInfo,FlowVertexInfo> SoluteFlowEngineT;
+typedef TemplateFlowEngine_SoluteFlowEngineT<SoluteCellInfo,FlowVertexInfo_DummyFlowEngineT> SoluteFlowEngineT;
 REGISTER_SERIALIZABLE(SoluteFlowEngineT);
 YADE_PLUGIN((SoluteFlowEngineT));
 

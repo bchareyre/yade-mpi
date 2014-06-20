@@ -13,27 +13,27 @@
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
 // #define DUMMYFLOW
 #ifdef DUMMYFLOW
-#define TEMPLATE_FLOW_NAME DummyFlowEngineT
-#include <yade/pkg/pfv/FlowEngine.hpp>
+
+#include "FlowEngine_DummyFlowEngineT.hpp"
 
 /// We can add data to the Info types by inheritance
-class DummyCellInfo : public FlowCellInfo
+class DummyCellInfo : public FlowCellInfo_DummyFlowEngineT
 {
 	public:
 	Real anotherVariable;
 	void anotherFunction() {};
 };
 
-class DummyVertexInfo : public FlowVertexInfo {
+class DummyVertexInfo : public FlowVertexInfo_DummyFlowEngineT {
 	public:
 	//same here if needed
 };
 
-typedef TemplateFlowEngine<DummyCellInfo,DummyVertexInfo> TEMPLATE_FLOW_NAME;
-REGISTER_SERIALIZABLE(TEMPLATE_FLOW_NAME);
-YADE_PLUGIN((TEMPLATE_FLOW_NAME));
+typedef TemplateFlowEngine_DummyFlowEngineT<DummyCellInfo,DummyVertexInfo> DummyFlowEngineT;
+REGISTER_SERIALIZABLE(DummyFlowEngineT);
+YADE_PLUGIN((DummyFlowEngineT));
 
-class DummyFlowEngine : public TEMPLATE_FLOW_NAME
+class DummyFlowEngine : public DummyFlowEngineT
 {
 	public :
 	//We can overload every functions of the base engine to make it behave differently
@@ -42,9 +42,9 @@ class DummyFlowEngine : public TEMPLATE_FLOW_NAME
 	
 	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine
 	//if it is useful for everyone
-	void fancyFunction(Real what); {cerr<<"yes, I'm a new function"<<end;}
+	void fancyFunction(Real what);
 
-	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DummyFlowEngine,TEMPLATE_FLOW_NAME,"documentation here",
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DummyFlowEngine,DummyFlowEngineT,"documentation here",
 	((Real, myNewAttribute, 0,,"useless example"))
 	,/*DummyFlowEngineT()*/,
 	,
@@ -55,6 +55,5 @@ class DummyFlowEngine : public TEMPLATE_FLOW_NAME
 REGISTER_SERIALIZABLE(DummyFlowEngine);
 YADE_PLUGIN((DummyFlowEngine));
 
-void DummyFlowEngine::fancyFunction(Real what) {cerr<<"yes, I'm a new function"<<end;}
-#undef TEMPLATE_FLOW_NAME DummyFlowEngineT //To be sure it will not conflict, maybe not needed
+void DummyFlowEngine::fancyFunction(Real what) {std::cerr<<"yes, I'm a new function"<<std::endl;}
 #endif //DummyFLOW

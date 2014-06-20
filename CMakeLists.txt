@@ -499,6 +499,17 @@ CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
 CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
 #===========================================================
+# Create header files for PFV from FlowEngine.hpp.in-template.
+# All @TEMPLATE_FLOW_NAME@ are replacing by a given names
+
+SET (TEMPLATE_FLOW_NAMES DFNFlowEngineT DummyFlowEngineT FlowEngineT FlowEngine_PeriodicInfo SoluteFlowEngineT)
+FOREACH(TF ${TEMPLATE_FLOW_NAMES})
+  SET (TEMPLATE_FLOW_NAME ${TF})
+  CONFIGURE_FILE(pkg/pfv/FlowEngine.hpp.in "${CMAKE_BINARY_DIR}/pkg/pfv/FlowEngine_${TF}.hpp" @ONLY)
+  CONFIGURE_FILE(pkg/pfv/FlowEngine.ipp.in "${CMAKE_BINARY_DIR}/pkg/pfv/FlowEngine_${TF}.ipp" @ONLY)
+ENDFOREACH(TF)
+INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/pkg/pfv/")
+#===========================================================
 
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-batch" DESTINATION ${YADE_EXEC_PATH}/)
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}" DESTINATION ${YADE_EXEC_PATH}/)

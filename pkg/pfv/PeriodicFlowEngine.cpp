@@ -13,10 +13,9 @@
 /// It is a bit more complicated as for FlowEngine, though, because we need template inheriting from template, which breaks YADE_CLASS_XXX logic_error
 /// See below the commented exemple, for a possible solution
 
-#define TEMPLATE_FLOW_NAME FlowEngine_PeriodicInfo
-#include <yade/pkg/pfv/FlowEngine.hpp>
+#include "FlowEngine_FlowEngine_PeriodicInfo.hpp"
 
-class PeriodicCellInfo : public FlowCellInfo
+class PeriodicCellInfo : public FlowCellInfo_FlowEngine_PeriodicInfo
 {	
 	public:
 	static CVector gradP;
@@ -43,7 +42,7 @@ class PeriodicCellInfo : public FlowCellInfo
 };
 
 
-class PeriodicVertexInfo : public FlowVertexInfo {
+class PeriodicVertexInfo : public FlowVertexInfo_DummyFlowEngineT {
 	public:
 	PeriodicVertexInfo& operator= (const CVector &u) { CVector::operator= (u); return *this; }
 	PeriodicVertexInfo& operator= (const float &scalar) { s=scalar; return *this; }
@@ -64,7 +63,7 @@ typedef CGT::PeriodicTesselation<CGT::_Tesselation<PeriFlowTriangulationTypes> >
 #define _PeriFlowSolver CGT::PeriodicFlow<PeriFlowTesselation>
 #endif
 
-typedef TemplateFlowEngine<	PeriodicCellInfo,
+typedef TemplateFlowEngine_FlowEngine_PeriodicInfo<	PeriodicCellInfo,
 				PeriodicVertexInfo,
 				CGT::PeriodicTesselation<CGT::_Tesselation<CGT::TriangulationTypes<PeriodicVertexInfo,PeriodicCellInfo> > >,
 				_PeriFlowSolver>

@@ -11,11 +11,11 @@
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
 // #define DFNFLOW
-#ifdef DFNFLOW
-#define TEMPLATE_FLOW_NAME DFNFlowEngineT
-#include <yade/pkg/pfv/FlowEngine.hpp>
 
-class DFNCellInfo : public FlowCellInfo
+#ifdef DFNFLOW
+#include "FlowEngine_DFNFlowEngineT.hpp"
+
+class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 {
 	public:
 	Real anotherVariable;
@@ -23,12 +23,12 @@ class DFNCellInfo : public FlowCellInfo
 };
 
 
-class DFNVertexInfo : public FlowVertexInfo {
+class DFNVertexInfo : public FlowVertexInfo_DummyFlowEngineT {
 	public:
 	//same here if needed
 };
 
-typedef TemplateFlowEngine<DFNCellInfo,DFNVertexInfo> DFNFlowEngineT;
+typedef TemplateFlowEngine_DFNFlowEngineT<DFNCellInfo,DFNVertexInfo> DFNFlowEngineT;
 REGISTER_SERIALIZABLE(DFNFlowEngineT);
 YADE_PLUGIN((DFNFlowEngineT));
 

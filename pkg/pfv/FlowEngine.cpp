@@ -8,13 +8,12 @@
 #ifdef YADE_CGAL
 #ifdef FLOW_ENGINE
 
-#define TEMPLATE_FLOW_NAME FlowEngineT
-#include "FlowEngine.hpp"
+#include "FlowEngine_FlowEngineT.hpp"
 
 // To register properly, we need to first instantiate an intermediate class, then inherit from it with correct class names in YADE_CLASS macro
 // The intermediate one would be seen with the name "TemplateFlowEngine" by python, thus it would not work when more than one class are derived, they would all
 // be named "TemplateFlowEngine" ...
-typedef TemplateFlowEngine<FlowCellInfo,FlowVertexInfo> FlowEngineT;
+typedef TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_DummyFlowEngineT> FlowEngineT;
 REGISTER_SERIALIZABLE(FlowEngineT);
 
 class FlowEngine : public FlowEngineT
