@@ -17,9 +17,10 @@
 #  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default, experimental)
 #  ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (OFF by default)
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
+#  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
-
+#  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8)
@@ -125,13 +126,27 @@ OPTION(ENABLE_PFVFLOW "Enable flow engine (experimental)" ${DEFAULT})
 OPTION(ENABLE_SPH "Enable SPH" OFF)
 OPTION(ENABLE_LBMFLOW "Enable LBM engine (very experimental)" OFF)
 OPTION(ENABLE_LIQMIGRATION "Enable liquid control (very experimental), see [Mani2013] for details" OFF)
+OPTION(ENABLE_MASK_ARBITRARY "Enable arbitrary precision of bitmask variables (only Body::groupMask yet implemented) (experimental). Use -DMASK_ARBITRARY_SIZE=int to set number of used bits (256 by default)" OFF)
 
 #===========================================================
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
-  MESSAGE(STATUS "Found Eigen3")
+  MESSAGE(STATUS "Found Eigen3, version: ${EIGEN3_VERSION}")
+  
+  # Minimal required version 3.2.1
+  IF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
+    MESSAGE(FATAL_ERROR "Minimal required Eigen3 version is 3.2.1, please update Eigen3!")
+  ENDIF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
+
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
+  IF (NOT VECTORIZE)
+    MESSAGE(STATUS "Disable vectorization")
+    ADD_DEFINITIONS("-DEIGEN_DONT_VECTORIZE -DEIGEN_DONT_ALIGN -DEIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT")
+  ELSE (NOT VECTORIZE)
+    MESSAGE(STATUS "Enable vectorization")
+  ENDIF (NOT VECTORIZE)
+  
 ENDIF(EIGEN3_FOUND)
 #===========================================================
 INCLUDE_DIRECTORIES(${BZIP2_INCLUDE_DIR})
@@ -343,6 +358,18 @@ IF(ENABLE_LBMFLOW)
 ELSE(ENABLE_LBMFLOW)
   SET(DISABLED_FEATS "${DISABLED_FEATS} LBMFLOW")
 ENDIF(ENABLE_LBMFLOW)
+#===============================================
+IF(ENABLE_MASK_ARBITRARY)
+  ADD_DEFINITIONS("-DYADE_MASK_ARBITRARY")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} MASK_ARBITRARY")
+  IF(NOT MASK_ARBITRARY_SIZE)
+    SET(MASK_ARBITRARY_SIZE "256")
+  ENDIF(NOT MASK_ARBITRARY_SIZE)
+  ADD_DEFINITIONS(-DYADE_MASK_ARBITRARY_SIZE=${MASK_ARBITRARY_SIZE})
+  MESSAGE("MASK_ARBITRARY_SIZE = ${MASK_ARBITRARY_SIZE}")
+ELSE(ENABLE_MASK_ARBITRARY)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} MASK_ARBITRARY")
+ENDIF(ENABLE_MASK_ARBITRARY)
 
 #===========================================================
 
@@ -471,6 +498,17 @@ CONFIGURE_FILE(core/main/main.py.in "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}")
 CONFIGURE_FILE(py/config.py.in "${CMAKE_BINARY_DIR}/config.py")
 CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 
+#===========================================================
+# Create header files for PFV from FlowEngine.hpp.in-template.
+# All @TEMPLATE_FLOW_NAME@ are replacing by a given names
+
+SET (TEMPLATE_FLOW_NAMES DFNFlowEngineT DummyFlowEngineT FlowEngineT FlowEngine_PeriodicInfo SoluteFlowEngineT)
+FOREACH(TF ${TEMPLATE_FLOW_NAMES})
+  SET (TEMPLATE_FLOW_NAME ${TF})
+  CONFIGURE_FILE(pkg/pfv/FlowEngine.hpp.in "${CMAKE_BINARY_DIR}/pkg/pfv/FlowEngine_${TF}.hpp" @ONLY)
+  CONFIGURE_FILE(pkg/pfv/FlowEngine.ipp.in "${CMAKE_BINARY_DIR}/pkg/pfv/FlowEngine_${TF}.ipp" @ONLY)
+ENDFOREACH(TF)
+INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/pkg/pfv/")
 #===========================================================
 
 INSTALL(PROGRAMS "${CMAKE_BINARY_DIR}/bins/yade${SUFFIX}-batch" DESTINATION ${YADE_EXEC_PATH}/)

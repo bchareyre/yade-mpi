@@ -70,7 +70,9 @@ void InteractionLoop::action(){
 		const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
 
 		if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I); continue; }
-
+    
+    // Skip interaction with clumps
+    if (b1_->isClump() || b2_->isClump()) { continue; }
 		// we know there is no geometry functor already, take the short path
 		if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
 		// no interaction geometry for either of bodies; no interaction possible
@@ -107,7 +109,7 @@ void InteractionLoop::action(){
 			if(wasReal) scene->interactions->requestErase(I); // fully created interaction without geometry is reset and perhaps erased in the next step
 			continue; // in any case don't care about this one anymore
 		}
-
+		
 		// IPhysDispatcher
 		if(!I->functorCache.phys){
 			I->functorCache.phys=physDispatcher->getFunctor2D(b1->material,b2->material,swap);

@@ -12,7 +12,7 @@ except ImportError:
 	from miniEigen import *
 
 #facetBox===============================================================
-def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
+def facetBox(center,extents,orientation=Quaternion((0,1,0),0.0),wallMask=63,**kw):
 	"""
 	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
@@ -28,7 +28,7 @@ def facetBox(center,extents,orientation=Quaternion.Identity,wallMask=63,**kw):
 	return facetParallelepiped(center=center, extents=extents, height=extents[2], orientation=orientation, wallMask=wallMask, **kw)
 
 #facetParallelepiped===============================================================
-def facetParallelepiped(center,extents,height,orientation=Quaternion.Identity,wallMask=63,**kw):
+def facetParallelepiped(center,extents,height,orientation=Quaternion((0,1,0),0.0),wallMask=63,**kw):
 	"""
 	Create arbitrarily-aligned Parallelepiped composed of facets, with given center, extents, height  and orientation.
 	If any of the parallelepiped dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the parallelepiped.
@@ -90,7 +90,7 @@ def facetParallelepiped(center,extents,height,orientation=Quaternion.Identity,wa
 	return ret
 
 #facetCylinder==========================================================
-def facetCylinder(center,radius,height,orientation=Quaternion.Identity,
+def facetCylinder(center,radius,height,orientation=Quaternion((0,1,0),0.0),
 	segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,
 	radiusTopInner=-1, radiusBottomInner=-1,
 	**kw):
@@ -164,7 +164,7 @@ def facetSphere(center,radius,thetaResolution=8,phiResolution=8,returnElementMap
 
 
 #facetCone==============================================================
-def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identity,
+def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion((0,1,0),0.0),
 	segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,
 	radiusTopInner=-1, radiusBottomInner=-1,
 	**kw):
@@ -195,7 +195,7 @@ def facetCone(center,radiusTop,radiusBottom,height,orientation=Quaternion.Identi
 		**kw)
 
 #facetPolygon===========================================================
-def facetPolygon(center,radiusOuter,orientation=Quaternion.Identity,segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
+def facetPolygon(center,radiusOuter,orientation=Quaternion((0,1,0),0.0),segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
 	"""
 	Create arbitrarily-aligned polygon composed of facets, with given center, radius (outer and inner) and orientation.
 	Return List of facets forming the polygon;
@@ -214,7 +214,7 @@ def facetPolygon(center,radiusOuter,orientation=Quaternion.Identity,segmentsNumb
 	return facetPolygonHelixGenerator(center=center,radiusOuter=radiusOuter,orientation=orientation,segmentsNumber=segmentsNumber,angleRange=angleRange,radiusInner=radiusInner,**kw)
 
 #facetHelix===========================================================
-def facetHelix(center,radiusOuter,pitch,orientation=Quaternion.Identity,segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
+def facetHelix(center,radiusOuter,pitch,orientation=Quaternion((0,1,0),0.0),segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
 	"""
 	Create arbitrarily-aligned helix composed of facets, with given center, radius (outer and inner), pitch and orientation.
 	Return List of facets forming the helix;
@@ -233,7 +233,7 @@ def facetHelix(center,radiusOuter,pitch,orientation=Quaternion.Identity,segments
 	return facetPolygonHelixGenerator(center=center,radiusOuter=radiusOuter,orientation=orientation,segmentsNumber=segmentsNumber,angleRange=angleRange,radiusInner=radiusInner,pitch=pitch,**kw)
 	
 #facetBunker============================================================
-def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Quaternion.Identity,segmentsNumber=10,wallMask=4,angleRange=None,closeGap=False,**kw):
+def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Quaternion((0,1,0),0.0),segmentsNumber=10,wallMask=4,angleRange=None,closeGap=False,**kw):
 	"""
 	Create arbitrarily-aligned bunker, composed of facets, with given center, radii, heights and orientation.
 	Return List of facets forming the bunker;
@@ -297,7 +297,7 @@ def facetBunker(center,dBunker,dOutput,hBunker,hOutput,hPipe=0.0,orientation=Qua
 	return ret
 
 #facetPolygonHelixGenerator==================================================
-def facetPolygonHelixGenerator(center,radiusOuter,pitch=0,orientation=Quaternion.Identity,segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
+def facetPolygonHelixGenerator(center,radiusOuter,pitch=0,orientation=Quaternion((0,1,0),0.0),segmentsNumber=10,angleRange=None,radiusInner=0,**kw):
 	"""
 	Please, do not use this function directly! Use geom.facetPloygon and geom.facetHelix instead.
 	This is the base function for generating polygons and helixes from facets.
@@ -342,7 +342,7 @@ def facetPolygonHelixGenerator(center,radiusOuter,pitch=0,orientation=Quaternion
 
 
 #facetCylinderConeGenerator=============================================
-def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion.Identity,
+def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion((0,1,0),0.0),
 	segmentsNumber=10,wallMask=7,angleRange=None,closeGap=False,
 	radiusBottom=-1,
 	radiusTopInner=-1,

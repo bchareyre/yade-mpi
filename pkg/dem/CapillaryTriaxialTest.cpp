@@ -209,7 +209,7 @@ bool CapillaryTriaxialTest::generate(std::string& message)
 
 void CapillaryTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(2);
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 
@@ -254,7 +254,7 @@ void CapillaryTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positi
 
 void CapillaryTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(2);
+	body = shared_ptr<Body>(new Body); body->groupMask=2;
 	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Box> iBox(new Box);

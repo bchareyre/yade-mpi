@@ -29,8 +29,8 @@ id4 = O.bodies.append(sphere(center=[(r1+r2)*d,(r1+r2)*d*2,0],  radius=r2,materi
 id5 = O.bodies.append(sphere(center=[(r1+r2)*d*2,(r1+r2)*d,0],  radius=r2,material=mat1,fixed=True, color=[0,1,0]))
 
 
-Vf = 0.5e-1
-Vfmin = 0.1e-1
+Vf = 0.0e-1
+Vfmin = 0.0e-1
 
 O.bodies[id1].Vf = Vf
 O.bodies[id1].Vmin = Vfmin
@@ -61,7 +61,7 @@ o.engines = [
     [Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys()],
     [Law2_ScGeom_ViscElCapPhys_Basic()],
   ),
-  LiqControl(),
+  LiqControl(label='lqc'),
   NewtonIntegrator(damping=0,gravity=[0,0,0]),
   PyRunner(command='showData()',iterPeriod=1),
 ]
@@ -105,14 +105,18 @@ for i in range(5):
   O.bodies[i].Vf = 0
   O.bodies[i].Vmin = 0
 
-O.interactions[id1,id2].phys.Vb = 1.0
 O.interactions[id1,id2].phys.Vmax = 5.0
-O.interactions[id2,id3].phys.Vb = 1.0
+lqc.addLiqInter(id1, id2, 1.0)
+
 O.interactions[id2,id3].phys.Vmax = 5.0
-O.interactions[id3,id4].phys.Vb = 1.0
+lqc.addLiqInter(id2, id3, 1.0)
+
 O.interactions[id3,id4].phys.Vmax = 5.0
-O.interactions[id3,id5].phys.Vb = 1.0
+lqc.addLiqInter(id3, id4, 1.0)
+
 O.interactions[id3,id5].phys.Vmax = 5.0
+lqc.addLiqInter(id3, id5, 1.0)
+
 
 O.run(1, True)
 

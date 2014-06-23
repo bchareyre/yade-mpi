@@ -168,7 +168,7 @@ def facetsDimensions(idFacets=[],mask=-1):
 	return dimensions
 
 #spheresPackDimensions==================================================
-def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=Quaternion.Identity,copy=False):
+def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=Quaternion((0,1,0),0.0),copy=False):
 	"""The function accepts the list of spheres id's or list of bodies and modifies them: rotating, scaling, shifting.
 	if copy=True copies bodies and modifies them.
 	Also the mask can be given. If idSpheres not empty, the function affects only bodies, where the mask passes.

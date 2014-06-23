@@ -1068,7 +1068,7 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 {
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
-        char filename[80];
+        char filename[250];
 	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         sprintf(filename,"%s/out_%d.vtk",folder,number++);
 	int firstReal=-1;

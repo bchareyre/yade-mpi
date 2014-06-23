@@ -182,7 +182,7 @@ void SpheresFactory::action(){
 		b->shape=sphere; 
 		b->state=state; 
 		b->material=material;
-		if (mask>0) {b->groupMask=Body::groupMask_t(mask);}
+		if (mask>0) {b->groupMask=mask;}
 		// insert particle in the simulation
 		scene->bodies->insert(b);
 		ids.push_back(b->getId());

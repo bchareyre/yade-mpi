@@ -83,6 +83,7 @@ class Ip2_FrictMat_FrictViscoMat_FrictViscoPhys: public IPhysFunctor{
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		
 		FUNCTOR2D(FrictMat,FrictViscoMat);
+		DEFINE_FUNCTOR_ORDER_2D(FrictMat,FrictViscoMat);
 		
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictViscoMat_FrictViscoPhys,IPhysFunctor,"Converts a :yref:`FrictMat` and :yref:`FrictViscoMat` instance to :yref:`FrictViscoPhys` with corresponding parameters. Basically this functor corresponds to :yref:`Ip2_FrictMat_FrictMat_FrictPhys` with the only difference that damping in normal direction can be considered.",
 		((shared_ptr<MatchMaker>,kn,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's normal contact stiffnesses. If this value is not given the elastic properties (i.e. young) of the two colliding materials are used to calculate the stiffness."))

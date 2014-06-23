@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-from yade import plot,pack,timing,eudoxos
+from yade import plot,pack,timing
 import time, sys, os, copy
 
 #import matplotlib
@@ -142,8 +142,6 @@ def stopIfDamaged():
 	extremum=max(sigma) if (strainer.strainRate>0) else min(sigma)
 	minMaxRatio=0.5 if mode=='tension' else 0.5
 	if extremum==0: return
-	# uncomment to get graph for the very first time stopIfDamaged() is called
-	#eudoxos.estimatePoissonYoung(principalAxis=axis,stress=strainer.avgStress,plot=True,cutoff=0.3)
 	import sys;	sys.stdout.flush()
 	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>(5e-3 if isoPrestress==0 else 5e-2):
 		if mode=='tension' and doModes & 2: # only if compression is enabled

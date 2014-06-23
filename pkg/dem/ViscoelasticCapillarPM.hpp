@@ -92,6 +92,7 @@ class LiqControl: public PartialEngine{
 		Real vMax(shared_ptr<Body> b1, shared_ptr<Body> b2);
 		Real totalLiqVol(int mask) const;
 		Real liqVolBody(id_t id) const;
+		bool addLiqInter(id_t id1, id_t id2, Real liq);
 		void updateLiquid(shared_ptr<Body> b);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LiqControl,PartialEngine,"This engine implements liquid migration model, introduced here [Mani2013]_ . ",
 		((int,mask,0,, "Bitmask for liquid  creation."))
@@ -103,6 +104,7 @@ class LiqControl: public PartialEngine{
 		,/* py */
 		.def("totalLiq",&LiqControl::totalLiqVol,(boost::python::arg("mask")=0),"Return total volume of water in simulation.")
 		.def("liqBody",&LiqControl::liqVolBody,(boost::python::arg("id")=-1),"Return total volume of water in body.")
+		.def("addLiqInter",&LiqControl::addLiqInter,(boost::python::arg("id1")=-1, boost::python::arg("id2")=-1, boost::python::arg("liq")=-1),"Add liquid into the interaction.")
   );
 };
 

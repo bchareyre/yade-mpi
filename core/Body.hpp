@@ -21,6 +21,8 @@
 #include<yade/lib/multimethods/Indexable.hpp>
 
 
+
+
 class Scene;
 class Interaction;
 
@@ -31,12 +33,6 @@ class Body: public Serializable{
 		// internal structure to hold some interaction of a body; used by InteractionContainer;
 		typedef std::map<Body::id_t, shared_ptr<Interaction> > MapId2IntrT;
 		// groupMask type
-#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
-		typedef boost::python::long_ groupMask_t;
-#else
-		typedef int groupMask_t;
-#endif
-
 
 		// bits for Body::flags
 		enum { FLAG_BOUNDED=1, FLAG_ASPHERICAL=2 }; /* add powers of 2 as needed */
@@ -75,12 +71,12 @@ class Body: public Serializable{
 		Body::id_t getId() const {return id;};
 		unsigned int coordNumber();  // Number of neighboring particles
 
-		Body::groupMask_t getGroupMask() const {return groupMask; };
-		bool maskOk(int mask) const {return (mask==0 || (bool)(groupMask & mask));}
-		bool maskCompatible(int mask) const { return (bool)(groupMask & mask); }
-#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
-		bool maskOk(const boost::python::long_& mask) const {return (mask==0 || (bool)(groupMask & mask));}
-		bool maskCompatible(const boost::python::long_& mask) const { return (bool)(groupMask & mask); }
+		mask_t getGroupMask() const {return groupMask; };
+		bool maskOk(int mask) const;
+		bool maskCompatible(int mask) const;
+#ifdef YADE_MASK_ARBITRARY
+		bool maskOk(const mask_t& mask) const;
+		bool maskCompatible(const mask_t& mask) const;
 #endif
 
 		// only BodyContainer can set the id of a body
@@ -89,7 +85,7 @@ class Body: public Serializable{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
 		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
-		((Body::groupMask_t,groupMask,1,,"Bitmask for determining interactions."))
+		((mask_t,groupMask,1,,"Bitmask for determining interactions."))
 		((int,flags,FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
 
 		((shared_ptr<Material>,material,,,":yref:`Material` instance associated with this body."))
@@ -119,7 +115,7 @@ class Body: public Serializable{
 		.add_property("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether this body will be moved by forces. (In c++, use ``Body::isDynamic``/``Body::setDynamic``) :ydefault:`true`")
 		.add_property("bounded",&Body::isBounded,&Body::setBounded,"Whether this body should have :yref:`Body.bound` created. Note that bodies without a :yref:`bound <Body.bound>` do not participate in collision detection. (In c++, use ``Body::isBounded``/``Body::setBounded``) :ydefault:`true`")
 		.add_property("aspherical",&Body::isAspherical,&Body::setAspherical,"Whether this body has different inertia along principal axes; :yref:`NewtonIntegrator` makes use of this flag to call rotation integration routine for aspherical bodies, which is more expensive. :ydefault:`false`")
-		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")
+		.add_property("mask",boost::python::make_getter(&Body::groupMask,boost::python::return_value_policy<boost::python::return_by_value>()),boost::python::make_setter(&Body::groupMask,boost::python::return_value_policy<boost::python::return_by_value>()),"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")
 		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise.")
@@ -135,16 +131,3 @@ class Body: public Serializable{
 	);
 };
 REGISTER_SERIALIZABLE(Body);
-
-
-#ifdef BODY_GROUP_MASK_ARBITRARY_PRECISION
-namespace boost { namespace serialization {
-template<class Archive>
-void serialize(Archive & ar, boost::python::long_ & l, const unsigned int version){
-	namespace bp = boost::python;
-	std::string value = bp::extract<std::string>(bp::str(l));
-	ar & BOOST_SERIALIZATION_NVP(value);
-	l = bp::long_(value);
-}
-}} // namespace boost::serialization
-#endif

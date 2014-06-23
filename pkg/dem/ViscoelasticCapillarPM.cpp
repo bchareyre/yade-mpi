@@ -361,8 +361,13 @@ void LiqControl::action(){
   
   // Calculate, how much new contacts will be at each body
   for (unsigned int i=0; i<scene->addIntrs.size(); i++) {
-    addBodyMapInt( bI, scene->addIntrs[i]->getId1() );
-    addBodyMapInt( bI, scene->addIntrs[i]->getId2() );
+    shared_ptr<Body> b1 = Body::byId(scene->addIntrs[i]->getId1(),scene);
+    shared_ptr<Body> b2 = Body::byId(scene->addIntrs[i]->getId2(),scene);
+    
+    if(not(mask!=0 && ((b1->groupMask & b2->groupMask & mask)==0))) {
+      addBodyMapInt( bI, scene->addIntrs[i]->getId1() );
+      addBodyMapInt( bI, scene->addIntrs[i]->getId2() );
+    }
   }
   
   // Update volume water at each deleted interaction for each body
@@ -384,43 +389,42 @@ void LiqControl::action(){
     const id_t id2 = b2->id;
     
     ViscElCapPhys* Vb=dynamic_cast<ViscElCapPhys*>(scene->addIntrs[i]->phys.get());
-    const Real Vmax = vMax(b1, b2);
-    Vb->Vmax = Vmax;
-    
-    Real Vf1 = 0.0;
-    Real Vf2 = 0.0;
-    
-    if ((b1->Vmin)<b1->Vf) {
-      Vf1 = (b1->Vf - b1->Vmin)/bI[id1];
-    }
-
-    if ((b2->Vmin)<b2->Vf) {
-      Vf2 = (b2->Vf - b2->Vmin)/bI[id2];
-    }
-    
-    Real Vrup = Vf1+Vf2;
-    
+     
     if(mask!=0 && ((b1->groupMask & b2->groupMask & mask)==0)) {
-      Vf1 = 0;
-      Vf2 = 0;
-      Vrup = 0;
-    } else if (Vrup > Vmax) {
-      Vf1 *= Vmax/Vrup;
-      Vf2 *= Vmax/Vrup;
-      Vrup = Vf1 + Vf2;
-    }
-    
-    liqVolShr += Vrup;
-    addBodyMapReal(bodyUpdateLiquid, id1, -Vf1);
-    addBodyMapReal(bodyUpdateLiquid, id2, -Vf2);
-    
-    Vb->Vb = Vrup;
-    if (particleconserve) {
-      Vb->Vf1 = Vf1;
-      Vb->Vf2 = Vf2;
+      Vb->Vb = 0.0;
+      Vb->Vf1 = 0.0;
+      Vb->Vf2 = 0.0;
+      Vb->Vmax = 0.0;
     } else {
-      Vb->Vf1 = Vrup/2.0;
-      Vb->Vf2 = Vrup/2.0;
+      const Real Vmax = vMax(b1, b2);
+      Vb->Vmax = Vmax;
+      
+      Real Vf1 = 0.0;
+      Real Vf2 = 0.0;
+      
+      if ((b1->Vmin)<b1->Vf) { Vf1 = (b1->Vf - b1->Vmin)/bI[id1]; }
+      if ((b2->Vmin)<b2->Vf) { Vf2 = (b2->Vf - b2->Vmin)/bI[id2]; }
+      
+      Real Vrup = Vf1+Vf2;
+      
+      if (Vrup > Vmax) {
+        Vf1 *= Vmax/Vrup;
+        Vf2 *= Vmax/Vrup;
+        Vrup = Vf1 + Vf2;
+      }
+      
+      liqVolShr += Vrup;
+      addBodyMapReal(bodyUpdateLiquid, id1, -Vf1);
+      addBodyMapReal(bodyUpdateLiquid, id2, -Vf2);
+      
+      Vb->Vb = Vrup;
+      if (particleconserve) {
+        Vb->Vf1 = Vf1;
+        Vb->Vf2 = Vf2;
+      } else {
+        Vb->Vf1 = Vrup/2.0;
+        Vb->Vf2 = Vrup/2.0;
+      }
     }
   }
   
@@ -435,7 +439,6 @@ void LiqControl::action(){
   for (mapBodyInt::const_iterator it = bodyNeedUpdate.begin(); it != bodyNeedUpdate.end(); ++it) {
     updateLiquid(Body::byId(it->first));
   }
-  
 }
 
 void LiqControl::updateLiquid(shared_ptr<Body> b){
@@ -451,7 +454,7 @@ void LiqControl::updateLiquid(shared_ptr<Body> b){
     for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
       if(!((*it).second) or !(((*it).second)->isReal()))  continue;
       ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(((*it).second)->phys.get());
-      if (physT->Vb<physT->Vmax) {
+      if ((physT->Vb < physT->Vmax) and (physT->Vmax > 0)) {
         LiqContactsAccept+=physT->Vmax-physT->Vb;
         contactN++;
       }
@@ -472,15 +475,15 @@ void LiqControl::updateLiquid(shared_ptr<Body> b){
       for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
         if(!((*it).second) or !(((*it).second)->isReal()))  continue;
         ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(((*it).second)->phys.get());
-        if (physT->Vb<physT->Vmax) {
+        if ((physT->Vb < physT->Vmax) and (physT->Vmax > 0)) {
           const Real addVolLiq =  (physT->Vmax - physT->Vb)*FillLevel;
           liqVolShr += addVolLiq;
           physT->Vb += addVolLiq;
           if (particleconserve) {
             if (((*it).second)->getId1() == (*it).first) {
-              physT->Vf1+=addVolLiq;
-            } else if (((*it).second)->getId2() == (*it).first) {
               physT->Vf2+=addVolLiq;
+            } else if (((*it).second)->getId2() == (*it).first) {
+              physT->Vf1+=addVolLiq;
             }
           } else {
             physT->Vf1+=addVolLiq/2.0;
@@ -531,14 +534,30 @@ Real LiqControl::vMax(shared_ptr<Body> const b1, shared_ptr<Body> const b2) {
 
 Real liqVolIterBody (shared_ptr<Body> b) {
   Real LiqVol = 0.0;
-  for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
-    if(!((*it).second) or !(((*it).second)->isReal()))  continue;
-    ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(((*it).second)->phys.get());
-    if (physT->Vb>0) {
-      LiqVol += physT->Vb/2.0;
+  if (!b) {
+    return LiqVol;
+  } else {
+    for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
+      if(!((*it).second) or !(((*it).second)->isReal()))  continue;
+      ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(((*it).second)->phys.get());
+      if (physT and physT->Vb and physT->Vb>0) {
+        if (((*it).second)->id1 == b->id) {
+          if (physT->Vf1 > 0 or physT->Vf2 > 0) {
+            LiqVol += physT->Vf1;
+          } else {
+            LiqVol += physT->Vb/2.0;
+          }
+        } else {
+          if (physT->Vf1 > 0 or physT->Vf2 > 0) {
+            LiqVol += physT->Vf2;
+          } else {
+            LiqVol += physT->Vb/2.0;
+          }
+        }
+      }
     }
+    return LiqVol;
   }
-  return LiqVol;
 }
 
 Real LiqControl::liqVolBody (id_t id) const {
@@ -563,5 +582,23 @@ Real LiqControl::totalLiqVol(int mask=0) const{
     if (b->Vf > 0) {totalLiqVol +=b->Vf;}
   }
   return totalLiqVol;
+}
+
+bool LiqControl::addLiqInter(id_t id1, id_t id2, Real liq) {
+  if (id1<0 or id2<0 or id1==id2 or liq<=0) return false;
+  
+  Scene* scene=Omega::instance().getScene().get();
+  shared_ptr<InteractionContainer>& intrs=scene->interactions;
+  const shared_ptr<Interaction>& I=intrs->find(id1,id2);
+  if (I->isReal()) {
+    ViscElCapPhys* physT=dynamic_cast<ViscElCapPhys*>(I->phys.get());
+    if (physT and physT->Vb <= physT->Vmax and liq <= (physT->Vmax - physT->Vb)) {
+      physT->Vb += liq;
+      physT->Vf1 += liq/2.0;
+      physT->Vf2 += liq/2.0;
+      return true;
+    }
+  }
+  return false;
 }
 #endif

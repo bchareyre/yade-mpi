@@ -116,7 +116,7 @@ bool SimpleShear::generate(std::string& message)
 
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(1);
+	body = shared_ptr<Body>(new Body); body->groupMask=1;
 	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -147,7 +147,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
-	body = shared_ptr<Body>(new Body); body->groupMask=Body::groupMask_t(1);
+	body = shared_ptr<Body>(new Body); body->groupMask=1;
 	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<BoxModel> gBox(new BoxModel);

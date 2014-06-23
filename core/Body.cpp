@@ -31,3 +31,13 @@ unsigned int Body::coordNumber(){
 	return intrSize;
 }
 
+
+bool Body::maskOk(int mask) const { return (mask==0 || ((groupMask & mask) != 0)); }
+bool Body::maskCompatible(int mask) const { return (groupMask & mask) != 0; }
+#ifdef YADE_MASK_ARBITRARY
+bool Body::maskOk(const mask_t& mask) const { return (mask==0 || ((groupMask & mask) != 0)); }
+bool Body::maskCompatible(const mask_t& mask) const { return (groupMask & mask) != 0; }
+#endif
+
+
+

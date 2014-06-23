@@ -62,7 +62,7 @@ class JCFpmPhys: public NormShearPhys {
 			((bool,isOnJoint,false,,"defined as true when both interacting particles are :yref:`on joint<JCFpmState.onJoint>` and are in opposite sides of the joint surface. In this case, mechanical parameters of the interaction are derived from the ''joint...'' material properties of the particles, and normal of the interaction is re-oriented (see also :yref:`Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM`)."))
 			((Real,tanFrictionAngle,0,,"tangent of Coulomb friction angle for this interaction (auto. computed). [-]"))
 			((Real,crossSection,0,,"crossSection=pi*Rmin^2. [m2]"))
-			((Real,FnMax,0,,"computed from :yref:`tensile strength<JCFpmMat.tensileStrength>` (or joint variant) to define the maximum admissible normal force in traction. [N]"))
+			((Real,FnMax,0,,"positiv value computed from :yref:`tensile strength<JCFpmMat.tensileStrength>` (or joint variant) to define the maximum admissible normal force in traction: Fn >= -FnMax. [N]"))
 			((Real,FsMax,0,,"computed from :yref:`cohesion<JCFpmMat.cohesion>` (or jointCohesion) to define the maximum admissible tangential force in shear, for Fn=0. [N]"))
 			((Vector3r,jointNormal,Vector3r::Zero(),,"normal direction to the joint, deduced from e.g. :yref:`<JCFpmState.jointNormal1>`."))
 			((Real,jointCumulativeSliding,0,,"sliding distance for particles interacting on a joint. Used, when :yref:`<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint>` is true, to take into account dilatancy due to shearing. [-]"))
