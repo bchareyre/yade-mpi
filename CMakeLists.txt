@@ -502,7 +502,7 @@ CONFIGURE_FILE(py/__init__.py.in "${CMAKE_BINARY_DIR}/__init__.py")
 # Create header files for PFV from FlowEngine.hpp.in-template.
 # All @TEMPLATE_FLOW_NAME@ are replacing by a given names
 
-SET (TEMPLATE_FLOW_NAMES DFNFlowEngineT DummyFlowEngineT FlowEngineT FlowEngine_PeriodicInfo SoluteFlowEngineT)
+SET (TEMPLATE_FLOW_NAMES DFNFlowEngineT DummyFlowEngineT FlowEngineT FlowEngine_PeriodicInfo SoluteFlowEngineT UnsaturatedEngineT)
 FOREACH(TF ${TEMPLATE_FLOW_NAMES})
   SET (TEMPLATE_FLOW_NAME ${TF})
   CONFIGURE_FILE(pkg/pfv/FlowEngine.hpp.in "${CMAKE_BINARY_DIR}/pkg/pfv/FlowEngine_${TF}.hpp" @ONLY)
