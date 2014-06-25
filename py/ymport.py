@@ -112,12 +112,9 @@ def stl(file, dynamic=None,fixed=True,wire=True,color=None,highlight=False,noBou
 		b.shape.color=color if color else utils.randomColor()
 		b.shape.wire=wire
 		b.shape.highlight=highlight
-		pos,ori=b.state.pos,b.state.ori
+		pos=b.state.pos
 		utils._commonBodySetup(b,0,Vector3(0,0,0),material=material,pos=pos,noBound=noBound,dynamic=dynamic,fixed=fixed)
-		#b.state.pos,b.state.ori=pos,ori
-		b.state.ori=ori
-		b.aspherical=False 
-		#b.dynamic=dynamic
+		b.aspherical=False
 	return facets
 
 def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
