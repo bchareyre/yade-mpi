@@ -161,8 +161,6 @@ ELSE((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
     ((Boost_MINOR_VERSION EQUAL 53) OR (Boost_MINOR_VERSION GREATER 53)))
   SET(DISABLED_FEATS "${DISABLED_FEATS} Odeint")
   MESSAGE(STATUS "Boost Odeint can be enabled, only if Boost>=1.53 is used")
-  MESSAGE(STATUS ${Boost_MAJOR_VERSION})
-  MESSAGE(STATUS ${Boost_MINOR_VERSION})
 ENDIF((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
      ((Boost_MINOR_VERSION EQUAL 53) OR (Boost_MINOR_VERSION GREATER 53)))
 #===========================================================
