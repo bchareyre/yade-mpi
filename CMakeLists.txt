@@ -134,9 +134,9 @@ IF (EIGEN3_FOUND)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
   MESSAGE(STATUS "Found Eigen3, version: ${EIGEN3_VERSION}")
   
-  # Minimal recommended version 3.2.1
+  # Minimal required version 3.2.1
   IF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
-    MESSAGE(WARNING "Minimal recommended Eigen3 version is 3.2.1")
+    MESSAGE(FATAL_ERROR "Minimal required Eigen3 version is 3.2.1, please update Eigen3!")
   ENDIF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
 
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
