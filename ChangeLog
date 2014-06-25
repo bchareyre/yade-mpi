@@ -1,4 +1,97 @@
 ==================================================
+yade-1.10.0
+Wed, 25 Jun 2014 19:35:00 +0200
+
+Anton Gladky (47):
+      Delete Release file.
+      Add orientation parameter to ymport.textClumps
+      Resize ForceContainer after each body insert
+      Added assert to get*Unsynced function
+      Better fix for ForceContainer-size-change
+      Remove extra/floating_point_utilities_v3
+      Remove some 'using namespace boost'
+      Remove some more `using namespace boost`.
+      Remove all remaining `using namespace boost`
+      Fix compilation in DEBIG-mode.
+      Link against libboost_date. Fix LP:1322274
+      Set the mask to a clump the same as the first member of it.
+      Revert removal of embedded floating_point_utilities_v3.
+      Add particleconserve parameter to LiqControl.
+      Replace features by CONFIGURED_FEATS.
+      Prevent first empty item in features.
+      Add checkLiquidMigration autotest.
+      Better check for DEM-PFV-check.py
+      Add missing header.
+      Add --as-needed flag to yade-lib.
+      Comment some lines, where defined unused variables.
+      Minor fix in documentation of viscoelastic.
+      At every sync check,  whether ForceContainer is large enough.
+      Disable parallel code in conditionalyEraseNonReal
+      Skip interactions, where one of body isClump
+      Fix doc-compilation for IPython >=2
+      Enable vectorization in eigen3-lib
+      Do not use Eigen3 in parallel mode.
+      Recommend minimal Eigen3 version 3.2.1.
+      Set minimal required Eigen3 version 3.2.1
+      Add NOVECTORIZE option
+      Prevent adding liqVol-parameters into VTK-files
+      Prevent crash in liqVolIterBody
+      Disable vectorization by default.
+      Replace Quaternion.Identity by Quaternion((1,0,0),0)
+      In state pos_set and ori_set use passing by value.
+      Add addLiqInter function to set liquid "properly"
+      Liquid migration model, code refactoring.
+      Add script to changes commit`s author`s names.
+      Fix typo in installation.
+      PFV code refactoring.
+      Fix typo in previous commit.
+      Fix templates names.
+      Clean in ymport.stl
+      Remove service-messages in CMakeLists
+      Add missed #pragma once
+      Add RELEASE file.
+
+Bruno Chareyre (11):
+      CohFritMat documentation
+      document Ip2_CohFrictMat more
+      make the parallel collider warning more explicit regarding turning collider.ompThreads=1
+      CohesiveFrictional contacts: make them elastic only if strength<0 (previous condition was <=0) + Lingran's elastic energy of contact moments
+      fix fluidForce=0 after remeshing + allow constant positions for DFNFlowEngine
+      make FlowEngine::setPositionsBuffer virtual
+      missing declaration of function
+      fix default attribute in DFNFlow
+      CohesiveFrictionalContactLaw does not warn about incremental formulation of rolling/twisting moments when the moments are elastic
+      fix bug in FlowEngine::updateBCs() (reported by Luc Scholtes, thanks)
+      Revert "Set minimal required Eigen3 version 3.2.1"
+
+Christian Jakob (2):
+      remove relicts of Dem3Dof and code cleaning
+      increase maximum length of char filename in saveVtk method for FlowEngine
+
+Francois (1):
+      Update the documentation for Law2_ScGridCoGeom_NormalInelasticityPhys. At this moment it's not done, but it will be fixed and come with a reference article during 2014.
+
+Jan Stransky (4):
+      Body::groupMask may be optionally boost::python::long_, subsequently modified code where necessary
+      fixed bug in yade.export.exportFacetsAsMesh (thanks Jan Havelka for reporting)
+      added mask_t type for bitmask variables to be int or optionally std::bitset of fixed (yet arbitrary) size. Added bitset to/from python long conversion. Added MASK_ARBITRARY cmake option. Subsequent changes in other files
+      corrected git warning in CMakeLists.txt
+
+Jerome Duriez (6):
+      Correction of mispelling in example script name of one Law2
+      Minor changes in JCFpm
+      Important change in Kinem.. engines. Both changes in position and velocities of boundary bodies were still existing, while now changes in position should be handled by NewtonIntegrator
+      JCFpm : doc of JCFpmPhys.FnMax precised (minor change). And formulation of kn for onJoint interactions according to JCFpmPhys.crossSection (rather than mean of surfaces) to be consistent with the whole formulation ("major" change : this may impact the results of previous scripts depending on psd and how much the mechanical behaviour of joint is important)
+      Doc of VTKRecorder.skipFacetIntr precised so that it better corresponds to code
+      Extra s in previous commit removed..
+
+Klaus Thoeni (4):
+      remove old code
+      improve output and remove first iteration in calculation velocity estimation
+      add definition for functor order
+      set number of iterations to be run correctly (thanks Alex)
+
+==================================================
 yade-1.09.0
 Sun, 18 May 2014 17:32:07 +0200
 
