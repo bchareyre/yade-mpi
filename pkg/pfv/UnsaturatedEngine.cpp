@@ -97,9 +97,9 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 		void savePhaseVtk(const char* folder);
 		//temp functions
 		void initializeCellWindowsID();
-		double getWindowsSaturation(int windowsID);
-		double getWindowsSaturation1(int i);
-		double getWindowsSaturation2(int i);
+		double getWindowsSaturation(int i);
+// 		double getWindowsSaturation1(int i);
+// 		double getWindowsSaturation2(int i);
 		double getRadiusMin(CellHandle cell, int j);
 		void debugTemp();
 		bool checknoCache() {return solver->noCache;}
@@ -332,7 +332,7 @@ void UnsaturatedEngine::invadeSingleCell(CellHandle cell, double pressure)
                 invadeSingleCell(nCell, pressure);}}}
 }
 
-///invade mode 1. update phase reservoir before invasion. Consider no viscous effects, and invade gradually.
+///invade mode 1: withTrap
 void UnsaturatedEngine::invade1()
 {
     ///update Pw, Pn according to reservoirInfo.
@@ -420,7 +420,7 @@ void UnsaturatedEngine::airReservoirRecursion(CellHandle cell)
     }
 }
 
-///invade mode 2. Consider no trapped phase.
+///invade mode 2: withoutTrap
 void UnsaturatedEngine::invade2()
 {
     ///update Pw, Pn according to reservoirInfo.
@@ -918,73 +918,27 @@ void UnsaturatedEngine::initializeCellWindowsID()
     }
 }
 
-double UnsaturatedEngine::getWindowsSaturation(int windowsID)
+double UnsaturatedEngine::getWindowsSaturation(int i)
 {
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if (cell->info().windowsID==0) {cerr<<"Please initialize windowsID"<<endl;break;}
-    }
-    if (isPhaseTrapped) {
-        return getWindowsSaturation1(windowsID);
-    }
-    else {
-        return getWindowsSaturation2(windowsID);
-    }
-}
-double UnsaturatedEngine::getWindowsSaturation1(int i)
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     double capillaryVolume = 0.0; //total capillary volume
     double airVolume = 0.0; 	//air volume
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
 
-    if (isInvadeBoundary==true) {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if (tri.is_infinite(cell)) continue;
-            if (cell->info().Pcondition) continue;//NOTE:reservoirs cells should not be included in saturation
-	    if (cell->info().windowsID != i) continue;
-            capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
-            if (cell->info().isAirReservoir==true) {
-                airVolume = airVolume + cell->info().capillaryCellVolume;}}}
-    else {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if (tri.is_infinite(cell)) continue;
-            if (cell->info().Pcondition) continue;
-            if (cell->info().isFictious) continue;
-	    if (cell->info().windowsID != i) continue;
-            capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
-            if (cell->info().isAirReservoir==true) {
-                airVolume = airVolume + cell->info().capillaryCellVolume;}}}
+    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+        if (tri.is_infinite(cell)) continue;
+        if (cell->info().Pcondition) continue;
+        if ( (cell->info().isFictious) && (!isInvadeBoundary) ) continue;
+        if (cell->info().windowsID != i) continue;
+        capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
+        if (cell->info().p()==bndCondValue[3]) {
+            airVolume = airVolume + cell->info().capillaryCellVolume;
+        }
+    }
     double saturation = 1 - airVolume/capillaryVolume;
     return saturation;
 }
-double UnsaturatedEngine::getWindowsSaturation2(int i)
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    double capillaryVolume = 0.0;
-    double waterVolume = 0.0;
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    if (isInvadeBoundary==true) {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if (tri.is_infinite(cell)) continue;
-            if (cell->info().Pcondition) continue;
-	    if (cell->info().windowsID != i) continue;
-            capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
-            if (cell->info().p()==0) {
-                waterVolume = waterVolume + cell->info().capillaryCellVolume;}}}
-    else {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if (tri.is_infinite(cell)) continue;
-            if (cell->info().Pcondition) continue;
-            if (cell->info().isFictious) continue;
-	    if (cell->info().windowsID != i) continue;
-            capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
-            if (cell->info().p()==0) {
-                waterVolume = waterVolume + cell->info().capillaryCellVolume;}}}
-    double saturation = waterVolume/capillaryVolume;
-    return saturation;
-}//----------end temp functions for comparison with experiment-------------------
+//--------------end of comparison with experiment----------------------------
 
 ///compute forces
 void UnsaturatedEngine::computeSolidLine()
