@@ -33,6 +33,7 @@
 
 
 namespace bfs=boost::filesystem;
+using std::ofstream;
 
 template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(Scalar s, const VECTOR3_TEMPLATE(Scalar)& v) {return v*s;}
 inline Vector3i vect3rToVect3i(Vector3r vect){Vector3i newvect((int)vect[0],(int)vect[1],(int)vect[2]);return(newvect);}
@@ -1183,7 +1184,7 @@ void HydrodynamicsLawLBM::saveStats(int iter_number, Real timestep)
     cerr <<"START: HydrodynamicsLawLBM::saveStats()"<<endl;
     #endif
     cerr << "| Save stats ..."<<endl;
-    ofstream file(LBMmachFile.c_str(), ios::app);
+    ofstream file(LBMmachFile.c_str(), std::ios::app);
     file <<iter_number<<" "<<iter_number*timestep<<" "<<VmaxC<<" "<<VmaxC/c<<endl;
     #ifdef LBM_VERBOSE
     cerr <<"END: HydrodynamicsLawLBM::saveStats()"<<endl;
@@ -1203,7 +1204,7 @@ void HydrodynamicsLawLBM::saveObservedPtc(int iter_number, Real timestep)
 {
 
     cerr << "| Save Observed Ptc ..."<<endl;
-    ofstream file(ObservedPtcFile.c_str(), ios::app);
+    ofstream file(ObservedPtcFile.c_str(), std::ios::app);
     file <<iter_number<<" "<<iter_number*timestep<<" ";
     file <<dx*LBbodies[ObservedPtc].pos.x()<<" "<<dx*LBbodies[ObservedPtc].pos.y()<<" "<<dx*LBbodies[ObservedPtc].pos.z()<<" ";
     file <<dx*LBbodies[ObservedPtc].radius<<" ";
