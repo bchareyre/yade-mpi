@@ -274,7 +274,7 @@ void InsertionSortCollider::action(){
 		if(verletDist>0){
 			// get NewtonIntegrator, to ask for the maximum velocity value
 			if(!newton){
-				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=YADE_PTR_DYN_CAST<NewtonIntegrator>(e); if(newton) break; }
 				if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 			}
 		}

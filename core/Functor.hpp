@@ -50,7 +50,7 @@ class Functor1D: public Functor,
 {
 	public:
 		typedef _DispatchType1 DispatchType1; typedef _ReturnType ReturnType; typedef _ArgumentTypes ArgumentTypes; 
-		#define FUNCTOR1D(type1) public: std::string get1DFunctorType1(void){return string(#type1);} int checkArgTypes(const shared_ptr<DispatchType1>& arg1){ return (bool)boost::dynamic_pointer_cast<type1>(arg1)?1:0; }
+		#define FUNCTOR1D(type1) public: std::string get1DFunctorType1(void){return string(#type1);} int checkArgTypes(const shared_ptr<DispatchType1>& arg1){ return (bool)YADE_PTR_DYN_CAST<type1>(arg1)?1:0; }
 		virtual std::string get1DFunctorType1(void){throw runtime_error("Class "+this->getClassName()+" did not use FUNCTOR1D to declare its argument type?"); }
 		virtual vector<string> getFunctorTypes(void){vector<string> ret; ret.push_back(get1DFunctorType1()); return ret;};
 		// check that the object can be correctly cast to the derived class handled by the functor (will be used if ever utils.createInteraction can be called with list of functors only)
@@ -72,7 +72,7 @@ class Functor2D:	public Functor,
 {
 	public:
 		typedef _DispatchType1 DispatchType1; typedef _DispatchType2 DispatchType2; typedef _ReturnType ReturnType; typedef _ArgumentTypes ArgumentTypes; 
-		#define FUNCTOR2D(type1,type2) public: std::string get2DFunctorType1(void){return string(#type1);}; std::string get2DFunctorType2(void){return string(#type2);}; int checkArgTypes(const shared_ptr<DispatchType1>& arg1, const shared_ptr<DispatchType2>& arg2){ if(boost::dynamic_pointer_cast<type1>(arg1)&&boost::dynamic_pointer_cast<type2>(arg2)) return 1; if(boost::dynamic_pointer_cast<type1>(arg2)&&boost::dynamic_pointer_cast<type2>(arg1)) return -1; return 0; }
+		#define FUNCTOR2D(type1,type2) public: std::string get2DFunctorType1(void){return string(#type1);}; std::string get2DFunctorType2(void){return string(#type2);}; int checkArgTypes(const shared_ptr<DispatchType1>& arg1, const shared_ptr<DispatchType2>& arg2){ if(YADE_PTR_DYN_CAST<type1>(arg1)&&YADE_PTR_DYN_CAST<type2>(arg2)) return 1; if(YADE_PTR_DYN_CAST<type1>(arg2)&&YADE_PTR_DYN_CAST<type2>(arg1)) return -1; return 0; }
 		virtual std::string get2DFunctorType1(void){throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
 		virtual std::string get2DFunctorType2(void){throw logic_error("Class "+this->getClassName()+" did not use FUNCTOR2D to declare its argument types?");}
 		virtual vector<string> getFunctorTypes(){vector<string> ret; ret.push_back(get2DFunctorType1()); ret.push_back(get2DFunctorType2()); return ret;};

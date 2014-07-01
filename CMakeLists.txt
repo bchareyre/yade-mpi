@@ -62,7 +62,7 @@ IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
 ENDIF()
 
 #===========================================================
-ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast ")
+ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast -DYADE_PTR_DYN_CAST=boost::dynamic_pointer_cast ")
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
   IF (DEBUG)

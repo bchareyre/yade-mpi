@@ -111,7 +111,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 		if(verletDist>0){
 			// get the Integrator, to ask for the maximum velocity value
 			if(!integrator){
- 				FOREACH(shared_ptr<Engine>& e, scene->engines){ integrator=boost::dynamic_pointer_cast<Integrator>(e); if(integrator) break; }
+ 				FOREACH(shared_ptr<Engine>& e, scene->engines){ integrator=YADE_PTR_DYN_CAST<Integrator>(e); if(integrator) break; }
 				if(!integrator){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate any Integrator within O.engines."); }
 			}
 		}

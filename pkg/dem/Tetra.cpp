@@ -956,14 +956,14 @@ void TetraVolumetricLaw::action()
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use phys at all
 		if (!I->geom) continue; // Ig2_Tetra_Tetra_TTetraGeom::go returned false for this interaction, skip it
-		const shared_ptr<TTetraGeom>& contactGeom(boost::dynamic_pointer_cast<TTetraGeom>(I->geom));
+		const shared_ptr<TTetraGeom>& contactGeom(YADE_PTR_DYN_CAST<TTetraGeom>(I->geom));
 		if(!contactGeom) continue;
 
 		const Body::id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 			
-		const shared_ptr<ElastMat>& physA(boost::dynamic_pointer_cast<ElastMat>(A->material));
-		const shared_ptr<ElastMat>& physB(boost::dynamic_pointer_cast<ElastMat>(B->material));
+		const shared_ptr<ElastMat>& physA(YADE_PTR_DYN_CAST<ElastMat>(A->material));
+		const shared_ptr<ElastMat>& physB(YADE_PTR_DYN_CAST<ElastMat>(B->material));
 		
 
 		/* Cross-section is volumetrically equivalent to the penetration configuration */
@@ -1143,7 +1143,7 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	//const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
 	State* rbp=tetraBody->state.get();
-	const shared_ptr<Tetra>& tMold(boost::dynamic_pointer_cast<Tetra>(tetraBody->shape));
+	const shared_ptr<Tetra>& tMold(YADE_PTR_DYN_CAST<Tetra>(tetraBody->shape));
 
 	#define v0 tMold->v[0]
 	#define v1 tMold->v[1]

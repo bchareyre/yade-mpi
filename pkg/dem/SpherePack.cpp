@@ -75,7 +75,7 @@ void SpherePack::fromSimulation() {
 	Scene* scene=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b) continue;
-		shared_ptr<Sphere> intSph=boost::dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<Sphere> intSph=YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius,(b->isClumpMember()?b->clumpId:-1)));
 	}

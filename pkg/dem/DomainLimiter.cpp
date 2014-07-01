@@ -237,7 +237,7 @@ void GlExtra_LawTester::render(){
 	// scene object changed (after reload, for instance), for re-initialization
 	if(tester && tester->scene!=scene) tester=shared_ptr<LawTester>();
 
-	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=boost::dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
+	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=YADE_PTR_DYN_CAST<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
 
 	//if(tester->renderLength<=0) return;

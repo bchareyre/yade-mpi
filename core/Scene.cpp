@@ -194,8 +194,8 @@ void Scene::updateBound(){
 		if(!b) continue;
 		if(b->bound){
 			for(int i=0; i<3; i++){
-				if(!isinf(b->bound->max[i])) mx[i]=max(mx[i],b->bound->max[i]);
-				if(!isinf(b->bound->min[i])) mn[i]=min(mn[i],b->bound->min[i]);
+				if(!std::isinf(b->bound->max[i])) mx[i]=max(mx[i],b->bound->max[i]);
+				if(!std::isinf(b->bound->min[i])) mn[i]=min(mn[i],b->bound->min[i]);
 			}
 		} else {
 	 		mx=mx.cwiseMax(b->state->pos);

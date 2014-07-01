@@ -145,9 +145,9 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 		try {
 			LOG_DEBUG("Factoring plugin "<<name);
 			f = ClassFactory::instance().createShared(name);
-			dynlibs[name].isIndexable    = boost::dynamic_pointer_cast<Indexable>(f);
-			dynlibs[name].isFactorable   = boost::dynamic_pointer_cast<Factorable>(f);
-			dynlibs[name].isSerializable = boost::dynamic_pointer_cast<Serializable>(f);
+			dynlibs[name].isIndexable    = YADE_PTR_DYN_CAST<Indexable>(f);
+			dynlibs[name].isFactorable   = YADE_PTR_DYN_CAST<Factorable>(f);
+			dynlibs[name].isSerializable = YADE_PTR_DYN_CAST<Serializable>(f);
 			for(int i=0;i<f->getBaseClassNumber();i++){
 				dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
 			}

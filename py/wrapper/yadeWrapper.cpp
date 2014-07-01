@@ -776,7 +776,7 @@ class pyOmega{
 	void interactionContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
 		if(rb->interactions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
-		shared_ptr<InteractionContainer> ic=boost::dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
+		shared_ptr<InteractionContainer> ic=YADE_PTR_DYN_CAST<InteractionContainer>(ClassFactory::instance().createShared(clss));
 		rb->interactions=ic;
 	}
 	string interactionContainer_get(string clss){ return OMEGA.getScene()->interactions->getClassName(); }
@@ -784,7 +784,7 @@ class pyOmega{
 	void bodyContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
 		if(rb->bodies->size()>0) throw std::runtime_error("Body container not empty, will not change its class.");
-		shared_ptr<BodyContainer> bc=boost::dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
+		shared_ptr<BodyContainer> bc=YADE_PTR_DYN_CAST<BodyContainer>(ClassFactory::instance().createShared(clss));
 		rb->bodies=bc;
 	}
 	string bodyContainer_get(string clss){ return OMEGA.getScene()->bodies->getClassName(); }

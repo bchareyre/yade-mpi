@@ -38,7 +38,7 @@ void Collider::pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::di
 void Collider::findBoundDispatcherInEnginesIfNoFunctorsAndWarn(){
 	if(boundDispatcher->functors.size()>0) return;
 	shared_ptr<BoundDispatcher> bd;
-	FOREACH(shared_ptr<Engine>& e, scene->engines){ bd=boost::dynamic_pointer_cast<BoundDispatcher>(e); if(bd) break; }
+	FOREACH(shared_ptr<Engine>& e, scene->engines){ bd=YADE_PTR_DYN_CAST<BoundDispatcher>(e); if(bd) break; }
 	if(!bd) return;
 	LOG_WARN("Collider.boundDispatcher had no functors defined, while there was a BoundDispatcher found in O.engines. Since version 0.60 (r2396), Collider has boundDispatcher integrated in itself; separate BoundDispatcher should not be used anymore. For now, I will fix it for you, but change your script! Where it reads e.g.\n\n\tO.engines=[...,\n\t\tBoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),\n\t\t"<<getClassName()<<"(),\n\t\t...\n\t]\n\nit should become\n\n\tO.engines=[...,\n\t\t"<<getClassName()<<"([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),\n\t\t...\n\t]\n\ninstead.")
 	boundDispatcher=bd;

@@ -24,7 +24,7 @@ void SpheresFactory::pickRandomPosition(Vector3r&,Real){
 void SpheresFactory::action(){
 
 	if(!collider){
-		FOREACH(const shared_ptr<Engine>& e, scene->engines){ collider=boost::dynamic_pointer_cast<Collider>(e); if(collider) break; }
+		FOREACH(const shared_ptr<Engine>& e, scene->engines){ collider=YADE_PTR_DYN_CAST<Collider>(e); if(collider) break; }
 		if(!collider) throw runtime_error("SpheresFactory: No Collider instance found in engines (needed for collision detection).");
 	}
 	

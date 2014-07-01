@@ -17,7 +17,7 @@ void FacetTopologyAnalyzer::action(){
 	// minimum facet edge length (tolerance scale)
 	Real minSqLen=numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		shared_ptr<Facet> f=boost::dynamic_pointer_cast<Facet>(b->shape);
+		shared_ptr<Facet> f=YADE_PTR_DYN_CAST<Facet>(b->shape);
 		if(!f) continue;
 		const Vector3r& pos=b->state->pos;
 		for(size_t i=0; i<3; i++){

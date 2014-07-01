@@ -87,18 +87,18 @@ Real PWaveTimeStep(){
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
-		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape);
-		shared_ptr<Polyhedra> p=boost::dynamic_pointer_cast<Polyhedra>(b->shape);
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape);
+		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		if(!s && !p) continue;
 		if(!p){
 			//spheres
-			shared_ptr<ElastMat> ebp=boost::dynamic_pointer_cast<ElastMat>(b->material);
+			shared_ptr<ElastMat> ebp=YADE_PTR_DYN_CAST<ElastMat>(b->material);
  			if(!ebp) continue;
 			Real density=b->state->mass/((4./3.)*Mathr::PI*pow(s->radius,3));
 			dt=min(dt,s->radius/sqrt(ebp->young/density));
 		}else{
 			//polyhedrons
-			shared_ptr<PolyhedraMat> ebp=boost::dynamic_pointer_cast<PolyhedraMat>(b->material);
+			shared_ptr<PolyhedraMat> ebp=YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
  			if(!ebp) continue;
 			Real density=b->state->mass/p->GetVolume();
 			//get equivalent radius and use same equation as for sphere
@@ -163,7 +163,7 @@ void SieveCurve(){
 	double total_volume = 0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->shape) continue;
-		shared_ptr<Polyhedra> p=boost::dynamic_pointer_cast<Polyhedra>(b->shape);
+		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		if(p){
 			sieve_volume.push_back(std::pair<double,double>(SieveSize(p),p->GetVolume()));
 			total_volume += p->GetVolume();
@@ -191,7 +191,7 @@ void SizeRatio(){
   	myfile.open ("sizes.dat");
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->shape) continue;
-		shared_ptr<Polyhedra> p=boost::dynamic_pointer_cast<Polyhedra>(b->shape);
+		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		if(p){
 			myfile << SizeOfPolyhedra(p) << endl; 
 		}

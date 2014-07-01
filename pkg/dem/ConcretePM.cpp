@@ -564,7 +564,7 @@ void CpmStateUpdater::update(Scene* _scene){
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if (!I) continue;
 		if (!I->isReal()) continue;
-		shared_ptr<CpmPhys> phys = boost::dynamic_pointer_cast<CpmPhys>(I->phys);
+		shared_ptr<CpmPhys> phys = YADE_PTR_DYN_CAST<CpmPhys>(I->phys);
 		if (!phys) continue;
 		const Body::id_t id1 = I->getId1(), id2 = I->getId2();
 		GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());

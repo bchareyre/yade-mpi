@@ -159,7 +159,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	rb->forces.sync();
 	shared_ptr<NewtonIntegrator> newton;
 	Vector3r gravity = Vector3r::Zero();
-	FOREACH(shared_ptr<Engine>& e, rb->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) {gravity=newton->gravity; break;} }
+	FOREACH(shared_ptr<Engine>& e, rb->engines){ newton=YADE_PTR_DYN_CAST<NewtonIntegrator>(e); if(newton) {gravity=newton->gravity; break;} }
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF; int nb=0;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
@@ -293,7 +293,7 @@ void Shop::saveSpheresToFile(string fname){
 
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
 		if (!b->isDynamic()) continue;
-		shared_ptr<Sphere>	intSph=boost::dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<Sphere>	intSph=YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		if(!intSph) continue;
 		const Vector3r& pos=b->state->pos;
 		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
@@ -441,8 +441,8 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
-		shared_ptr<ElastMat> ebp=boost::dynamic_pointer_cast<ElastMat>(b->material);
-		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape);
+		shared_ptr<ElastMat> ebp=YADE_PTR_DYN_CAST<ElastMat>(b->material);
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		if(!ebp || !s) continue;
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));

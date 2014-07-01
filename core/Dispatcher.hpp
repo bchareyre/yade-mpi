@@ -40,7 +40,7 @@ Because we need literal functor and class names for registration in python, we p
 #define _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(Dim,DispatcherT,FunctorT,doc,attrs,ctor,py) \
 	typedef FunctorT FunctorType; \
 	void updateScenePtr(){ FOREACH(shared_ptr<FunctorT> f, functors){ f->scene=scene; }} \
-	void postLoad(DispatcherT&){ clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(boost::static_pointer_cast<FunctorT>(f)); } \
+	void postLoad(DispatcherT&){ clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(YADE_PTR_CAST<FunctorT>(f)); } \
 	virtual void add(FunctorT* f){ add(shared_ptr<FunctorT>(f)); } \
 	virtual void add(shared_ptr<FunctorT> f){ bool dupe=false; string fn=f->getClassName(); FOREACH(const shared_ptr<FunctorT>& f, functors) { if(fn==f->getClassName()) dupe=true; } if(!dupe) functors.push_back(f); addFunctor(f); } \
 	BOOST_PP_CAT(_YADE_DISPATCHER,BOOST_PP_CAT(Dim,D_FUNCTOR_ADD))(FunctorT,f) \
@@ -71,7 +71,7 @@ std::string Dispatcher_indexToClassName(int idx){
 	FOREACH(classItemType clss, Omega::instance().getDynlibsDescriptor()){
 		if(Omega::instance().isInheritingFrom_recursive(clss.first,topName) || clss.first==topName){
 			// create instance, to ask for index
-			shared_ptr<topIndexable> inst=boost::dynamic_pointer_cast<topIndexable>(ClassFactory::instance().createShared(clss.first));
+			shared_ptr<topIndexable> inst=YADE_PTR_DYN_CAST<topIndexable>(ClassFactory::instance().createShared(clss.first));
 			assert(inst);
 			if(inst->getClassIndex()<0 && inst->getClassName()!=top->getClassName()){
 				throw logic_error("Class "+inst->getClassName()+" didn't use REGISTER_CLASS_INDEX("+inst->getClassName()+","+top->getClassName()+") and/or forgot to call createIndex() in the ctor. [[ Please fix that! ]]");
@@ -107,7 +107,7 @@ boost::python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, 
 template<typename DispatcherT>
 std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
 	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
-	FOREACH(const shared_ptr<Functor>& functor, self->functors){ shared_ptr<typename DispatcherT::functorType> functorRightType(boost::dynamic_pointer_cast<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
+	FOREACH(const shared_ptr<Functor>& functor, self->functors){ shared_ptr<typename DispatcherT::functorType> functorRightType(YADE_PTR_DYN_CAST<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
 	return ret;
 }
 

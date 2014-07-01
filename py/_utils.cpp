@@ -28,7 +28,7 @@ py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
 		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
@@ -42,7 +42,7 @@ py::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();
 	py::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		shared_ptr<Sphere> s=boost::dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
 	}
@@ -234,7 +234,7 @@ void wireSome(string filter){
 		switch(mode){
 			case none: wire=false; break;
 			case all: wire=true; break;
-			case noSpheres: wire=!(bool)(boost::dynamic_pointer_cast<Sphere>(b->shape)); break;
+			case noSpheres: wire=!(bool)(YADE_PTR_DYN_CAST<Sphere>(b->shape)); break;
 			default: throw logic_error("No such case possible");
 		}
 		b->shape->wire=wire;
