@@ -16,8 +16,6 @@
 #include<yade/lib/base/Math.hpp>
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((SampleCapillaryPressureEngine));
 CREATE_LOGGER(SampleCapillaryPressureEngine);
 
@@ -38,12 +36,12 @@ void SampleCapillaryPressureEngine::updateParameters()
 	if ( Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated) {
 	  
 	  Real S = meanStress;
-	  cerr << "Smoy = " << meanStress << endl;
+	  std::cerr << "Smoy = " << meanStress << endl;
 	  if ((S > (sigma_iso - (sigma_iso*SigmaPrecision))) && (S < (sigma_iso + (sigma_iso*SigmaPrecision)))) {
 	    
-	    string fileName = "../data/" + Phase1End + "_" + 
-	    boost::lexical_cast<string>(scene->iter) + ".xml";
-	    cerr << "saving snapshot: " << fileName << " ...";
+	    std::string fileName = "../data/" + Phase1End + "_" + 
+	    boost::lexical_cast<std::string>(scene->iter) + ".xml";
+	    std::cerr << "saving snapshot: " << fileName << " ...";
 	    Omega::instance().saveSimulation(fileName);
 	    pressureVariationActivated = true;
 	  }	
@@ -56,7 +54,7 @@ void SampleCapillaryPressureEngine::action()
 	TriaxialStressController::action();
 	if (pressureVariationActivated)		
 		{
-			if (scene->iter % 100 == 0) cerr << "pressure variation!!" << endl;
+			if (scene->iter % 100 == 0) std::cerr << "pressure variation!!" << endl;
 		
 			if ((Pressure>=0) && (Pressure<=1000000000)) Pressure += PressureVariation;
 			capillaryCohesiveLaw->capillaryPressure = Pressure;
@@ -67,7 +65,7 @@ void SampleCapillaryPressureEngine::action()
 		else { capillaryCohesiveLaw->capillaryPressure = Pressure;
 		       capillaryCohesiveLaw->fusionDetection = fusionDetection;
 		       capillaryCohesiveLaw->binaryFusion = binaryFusion;}
-		if (scene->iter % 100 == 0) cerr << "capillary pressure = " << Pressure << endl;
+		if (scene->iter % 100 == 0) std::cerr << "capillary pressure = " << Pressure << endl;
 		capillaryCohesiveLaw->scene=scene;;
 		capillaryCohesiveLaw->action();
 		UnbalancedForce = ComputeUnbalancedForce(scene);

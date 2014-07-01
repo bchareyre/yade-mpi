@@ -40,6 +40,9 @@ struct intReal {
 };
 #endif
 
+using std::min;
+using std::max;
+
 class Scene: public Serializable{
 	public:
 		//! Adds material to Scene::materials. It also sets id of the material accordingly and returns it.
@@ -106,7 +109,7 @@ class Scene: public Serializable{
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 		((int,flags,0,Attr::readonly,"Various flags of the scene; 1 (Scene::LOCAL_COORDS): use local coordinate system rather than global one for per-interaction quantities (set automatically from the functor)."))
 
-		((list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
+		((std::list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
 		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))
 		((vector<shared_ptr<Engine> >,_nextEngines,,Attr::hidden,"Engines to be used from the next step on; is returned transparently by O.engines if in the middle of the loop (controlled by subStep>=0)."))
 		// NOTE: bodies must come before interactions, since InteractionContainer is initialized with a reference to BodyContainer::body

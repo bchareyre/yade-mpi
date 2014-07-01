@@ -8,6 +8,11 @@
 #endif
 #include<yade/pkg/common/Aabb.hpp>
 
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::min;
+using std::max;
 Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}
 ChainedState::~ChainedState(){}

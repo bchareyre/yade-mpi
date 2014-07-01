@@ -10,6 +10,8 @@
 #include<yade/pkg/common/SPHEngine.hpp>
 #endif
 
+using std::isfinite;
+
 YADE_PLUGIN((ViscElMat)(ViscElPhys)(Ip2_ViscElMat_ViscElMat_ViscElPhys)(Law2_ScGeom_ViscElPhys_Basic));
 
 /* ViscElMat */

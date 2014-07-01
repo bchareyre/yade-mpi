@@ -46,7 +46,7 @@ class RenderMutexLock: public boost::mutex::scoped_lock{
 CREATE_LOGGER(Omega);
 SINGLETON_SELF(Omega);
 
-const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
+const std::map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
 const shared_ptr<Scene>& Omega::getScene(){return scenes.at(currentSceneNb);}
 void Omega::resetCurrentScene(){ RenderMutexLock lock; scenes.at(currentSceneNb) = shared_ptr<Scene>(new Scene);}
@@ -164,28 +164,28 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 	for now, just loop until we succeed; proper solution will be to build graphs of classes
 	and traverse it from the top. It will be done once all classes are pythonable. */
 	for(int i=0; i<100 && pythonables.size()>0; i++){
-		if(getenv("YADE_DEBUG")) cerr<<endl<<"[[[ Round "<<i<<" ]]]: ";
+		if(getenv("YADE_DEBUG")) std::cerr<<std::endl<<"[[[ Round "<<i<<" ]]]: ";
 		std::list<string> done;
 		for(std::list<string>::iterator I=pythonables.begin(); I!=pythonables.end(); ){
 			shared_ptr<Serializable> s=boost::static_pointer_cast<Serializable>(ClassFactory::instance().createShared(*I));
 			try{
-				if(getenv("YADE_DEBUG")) cerr<<"{{"<<*I<<"}}";
+				if(getenv("YADE_DEBUG")) std::cerr<<"{{"<<*I<<"}}";
 				s->pyRegisterClass(wrapperScope);
 				std::list<string>::iterator prev=I++;
 				pythonables.erase(prev);
 			} catch (...){
-				if(getenv("YADE_DEBUG")){ cerr<<"["<<*I<<"]"; PyErr_Print(); }
+				if(getenv("YADE_DEBUG")){ std::cerr<<"["<<*I<<"]"; PyErr_Print(); }
 				boost::python::handle_exception();
 				I++;
 			}
 		}
 	}
 
-	map<string,DynlibDescriptor>::iterator dli    = dynlibs.begin();
-	map<string,DynlibDescriptor>::iterator dliEnd = dynlibs.end();
+	std::map<string,DynlibDescriptor>::iterator dli    = dynlibs.begin();
+	std::map<string,DynlibDescriptor>::iterator dliEnd = dynlibs.end();
 	for( ; dli!=dliEnd ; ++dli){
-		set<string>::iterator bci    = (*dli).second.baseClasses.begin();
-		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
+		std::set<string>::iterator bci    = (*dli).second.baseClasses.begin();
+		std::set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
 		for( ; bci!=bciEnd ; ++bci){
 			string name = *bci;
 			if (name=="Dispatcher1D" || name=="Dispatcher2D") (*dli).second.baseClasses.insert("Dispatcher");
@@ -230,7 +230,7 @@ void Omega::loadPlugins(vector<string> pluginFiles){
 			abort();
 		}
 	}
-	list<string>& plugins(ClassFactory::instance().pluginClasses);
+	std::list<string>& plugins(ClassFactory::instance().pluginClasses);
 	plugins.sort(); plugins.unique();
 	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
 }
@@ -255,7 +255,7 @@ void Omega::loadSimulation(const string& f, bool quiet){
 			yade::ObjectIO::load(f,"scene",scene);
 		}
 	}
-	if(scene->getClassName()!="Scene") throw logic_error("Wrong file format (scene is not a Scene!?) in "+f);
+	if(scene->getClassName()!="Scene") throw std::logic_error("Wrong file format (scene is not a Scene!?) in "+f);
 	sceneFile=f;
 	timeInit();
 	if(!quiet) LOG_DEBUG("Simulation loaded");
@@ -271,7 +271,7 @@ void Omega::saveSimulation(const string& f, bool quiet){
 	//shared_ptr<Scene>& scene = getScene();
 	if(boost::algorithm::starts_with(f,":memory:")){
 		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
-		ostringstream oss;
+		std::ostringstream oss;
 		yade::ObjectIO::save<typeof(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
 		memSavedSimulations[f]=oss.str();
 	}

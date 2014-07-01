@@ -5,7 +5,7 @@ CREATE_LOGGER(InteractionLoop);
 
 void InteractionLoop::pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d){
 	if(boost::python::len(t)==0) return; // nothing to do
-	if(boost::python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
+	if(boost::python::len(t)!=3) throw std::invalid_argument("Exactly 3 lists of functors must be given");
 	// parse custom arguments (3 lists) and do in-place modification of args
 	typedef std::vector<shared_ptr<IGeomFunctor> > vecGeom;
 	typedef std::vector<shared_ptr<IPhysFunctor> > vecPhys;
@@ -53,7 +53,7 @@ void InteractionLoop::action(){
 
 	#ifdef YADE_OPENMP
 	const long size=scene->interactions->size();
-	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? std::min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for(long i=0; i<size; i++){
 		const shared_ptr<Interaction>& I=(*scene->interactions)[i];
 	#else

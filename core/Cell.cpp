@@ -13,7 +13,7 @@ void Cell::integrateAndUpdate(Real dt){
 	prevHSize=hSize;
 	_vGradTimesPrevH = velGrad*prevHSize;
 	hSize+=_trsfInc*hSize;
-	if(hSize.determinant()==0){ throw runtime_error("Cell is degenerate (zero volume)."); }
+	if(hSize.determinant()==0){ throw std::runtime_error("Cell is degenerate (zero volume)."); }
 	// lengths of transformed cell vectors, skew cosines
 	Matrix3r Hnorm; // normalized transformed base vectors
 	for(int i=0; i<3; i++){

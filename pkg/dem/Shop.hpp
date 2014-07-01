@@ -23,8 +23,6 @@ class ViscElMat;
 class FrictMat;
 class Interaction;
 
-using namespace std;
-using boost::shared_ptr;
 namespace py = boost::python;
 
 /*! Miscillaneous utility functions which are believed to be generally useful.

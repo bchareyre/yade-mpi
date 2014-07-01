@@ -142,7 +142,7 @@ string GLViewer::getState(){
 	LOG_DEBUG("State saved to temp file "<<tmpFile);
 	// read tmp file contents and return it as string
 	// this will replace all whitespace by space (nowlines will disappear, which is what we want)
-	ifstream in(tmpFile.c_str()); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
+	std::ifstream in(tmpFile.c_str()); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
 	boost::filesystem::remove(boost::filesystem::path(tmpFile));
 	return ret;
 }

@@ -14,7 +14,7 @@
 CREATE_LOGGER(FileGenerator);
 
 
-bool FileGenerator::generate(std::string& msg){ throw invalid_argument("Calling abstract FileGenerator::generate() does not make sense."); }
+bool FileGenerator::generate(std::string& msg){ throw std::invalid_argument("Calling abstract FileGenerator::generate() does not make sense."); }
 
 
 bool FileGenerator::generateAndSave(const string& outputFileName, string& message)

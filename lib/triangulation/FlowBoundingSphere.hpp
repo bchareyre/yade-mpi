@@ -17,7 +17,6 @@
 
 typedef pair<pair<int,int>, vector<double> > Constriction;
 
-using namespace std;
 namespace CGT {
 
 template<class _Tesselation>

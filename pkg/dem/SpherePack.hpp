@@ -2,11 +2,14 @@
 
 #pragma once
 
-#include<vector>
-#include<string>	
-#include<limits>
-#include<iostream>
-using namespace std; // sorry
+#include <vector>
+#include <string>
+#include <limits>
+#include <iostream>
+#include <stdexcept>
+
+using std::vector;
+using std::string;
 
 #include<boost/python.hpp>
 #include<boost/python/object.hpp>
@@ -38,7 +41,7 @@ class SpherePack{
 	}
 	Real periPtDistSq(const Vector3r& p1, const Vector3r& p2){
 		Vector3r dr;
-		for(int ax=0; ax<3; ax++) dr[ax]=min(cellWrapRel(p1[ax],p2[ax],p2[ax]+cellSize[ax]),cellWrapRel(p2[ax],p1[ax],p1[ax]+cellSize[ax]));
+		for(int ax=0; ax<3; ax++) dr[ax]=std::min(cellWrapRel(p1[ax],p2[ax],p2[ax]+cellSize[ax]),cellWrapRel(p2[ax],p1[ax],p1[ax]+cellSize[ax]));
 		return dr.squaredNorm();
 	}
 	struct ClumpInfo{ int clumpId; Vector3r center; Real rad; int minId, maxId; };
@@ -140,7 +143,7 @@ public:
 
 	// iteration 
 	size_t len() const{ return pack.size(); }
-	boost::python::tuple getitem(size_t idx){ if(idx>=pack.size()) throw runtime_error("Index "+boost::lexical_cast<string>(idx)+" out of range 0.."+boost::lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
+	boost::python::tuple getitem(size_t idx){ if(idx>=pack.size()) throw std::runtime_error("Index "+boost::lexical_cast<string>(idx)+" out of range 0.."+boost::lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
 	struct _iterator{
 		const SpherePack& sPack; size_t pos;
 		_iterator(const SpherePack& _sPack): sPack(_sPack), pos(0){}

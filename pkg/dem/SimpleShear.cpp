@@ -41,8 +41,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
 
-using namespace std;
-
 YADE_PLUGIN((SimpleShear))
 CREATE_LOGGER(SimpleShear);
 
@@ -282,7 +280,7 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 	int nombre=0;
 	if(importFilename.size() != 0 && boost::filesystem::exists(importFilename) )
 	{
-		ifstream loadFile(importFilename.c_str()); // cree l'objet loadFile de la classe ifstream qui va permettre de lire ce qu'il y a dans importFilename
+		std::ifstream loadFile(importFilename.c_str()); // cree l'objet loadFile de la classe ifstream qui va permettre de lire ce qu'il y a dans importFilename
 
 // 		Real zJF;
 // 		while( !loadFile.eof() )	// tant qu'on n'est pas a la fin du fichier

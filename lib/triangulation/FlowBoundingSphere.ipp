@@ -31,8 +31,6 @@
 
 // #define USE_FAST_MATH 1
 
-
-using namespace std;
 namespace CGT
 {
 
@@ -1254,7 +1252,7 @@ void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
 		unsigned int id2 = vi2.id();
 		edgeIds.push_back(pair<const VertexInfo*,const VertexInfo*>(&vi1,&vi2));
 		//For persistant edges, we must transfer the lub. force value from the older triangulation structure
-		if (id1>id2) swap(id1,id2);
+		if (id1>id2) std::swap(id1,id2);
 		unsigned int i=0;
 		//Look for the pair (id1,id2) in lubPairs
 		while (i<lubPairs[id1].size()) {

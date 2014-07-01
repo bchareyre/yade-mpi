@@ -14,6 +14,12 @@
 #include<QGLViewer/constraint.h>
 #include<set>
 
+using std::ostringstream;
+using std::setfill;
+using std::setw;
+using std::set;
+using std::setprecision;
+
 /*! Class handling user interaction with the openGL rendering of simulation.
  *
  * Clipping planes:

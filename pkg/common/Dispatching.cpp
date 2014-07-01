@@ -17,7 +17,7 @@ void BoundDispatcher::action()
 	updateScenePtr();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	const long numBodies=(long)bodies->size();
-	#pragma omp parallel for num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#pragma omp parallel for num_threads(ompThreads>0 ? std::min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for(int id=0; id<numBodies; id++){
 		if(!bodies->exists(id)) continue; // don't delete this check  - Janek
 		const shared_ptr<Body>& b=(*bodies)[id];
@@ -36,11 +36,11 @@ void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 			Real& sweepLength = b->bound->sweepLength;
 			if (targetInterv>=0) {
 				Vector3r disp = b->state->pos-b->bound->refPos;
-				Real dist = max(abs(disp[0]),max(abs(disp[1]),abs(disp[2])));
+				Real dist = std::max(abs(disp[0]),std::max(abs(disp[1]),abs(disp[2])));
 				if (dist){
 					Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
-					newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
-					sweepLength=max(minSweepDistFactor*sweepDist,min(newLength,sweepDist));}
+					newLength = std::max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
+					sweepLength=std::max(minSweepDistFactor*sweepDist,std::min(newLength,sweepDist));}
 				else sweepLength=0;
 			} else sweepLength=sweepDist;
 		} 
@@ -84,12 +84,12 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 		// FIXME: this code is more or less duplicated from InteractionLoop :-(
 		bool swap=false;
 		I->functorCache.geom=getFunctor2D(b1->shape,b2->shape,swap);
-		if(!I->functorCache.geom) throw invalid_argument("IGeomDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+").");
+		if(!I->functorCache.geom) throw std::invalid_argument("IGeomDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+").");
 		if(swap){I->swapOrder();}
 		const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
 		bool succ=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/true,I);
-		if(!succ) throw logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force IGeom creation. Please report bug.");
+		if(!succ) throw std::logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force IGeom creation. Please report bug.");
 		return I;
 	} else {
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
@@ -144,11 +144,11 @@ void IGeomDispatcher::action(){
 
 void IPhysDispatcher::explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& I){
 	updateScenePtr();
-	if(!I->geom) throw invalid_argument(string(__FILE__)+": explicitAction received interaction without geom.");
+	if(!I->geom) throw std::invalid_argument(string(__FILE__)+": explicitAction received interaction without geom.");
 	if(!I->functorCache.phys){
 		bool dummy;
 		I->functorCache.phys=getFunctor2D(pp1,pp2,dummy);
-		if(!I->functorCache.phys) throw invalid_argument("IPhysDispatcher::explicitAction did not find a suitable dispatch for types "+pp1->getClassName()+" and "+pp2->getClassName());
+		if(!I->functorCache.phys) throw std::invalid_argument("IPhysDispatcher::explicitAction did not find a suitable dispatch for types "+pp1->getClassName()+" and "+pp2->getClassName());
 		I->functorCache.phys->go(pp1,pp2,I);
 	}
 }

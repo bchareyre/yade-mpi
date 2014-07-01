@@ -2,7 +2,6 @@
 #include "Tenseur3.h"
 #include "RegularTriangulation.h" 
 
-using namespace std;
 namespace CGT {
 
 Real Tens::Norme2(void)
@@ -272,7 +271,7 @@ operator<<(std::ostream& os, const Tenseur3& T)
 		{
 			os << T(j,i) << " ";
 		}
-		os  << endl;
+		os  << std::endl;
 	}	
 	return os;
 }
@@ -287,7 +286,7 @@ operator<<(std::ostream& os, const Tenseur_sym3& T)
 		{
 			os << T(j,i) << " ";
 		}
-		os  << endl;
+		os  << std::endl;
 	}	
 	return os;
 }
@@ -300,9 +299,9 @@ operator<<(std::ostream& os, const Tenseur_anti3& T)
 	{
 		for (int i=1; i<4; i++)
 		{
-			os << (Real) T(j,i) << (string) " ";
+			os << (Real) T(j,i) << (std::string) " ";
 		}
-		os  << endl;
+		os  << std::endl;
 	}	
 	return os;
 }

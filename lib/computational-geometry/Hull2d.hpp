@@ -10,7 +10,7 @@
 	Look there for detailed description and more information.
 */
 class ConvexHull2d{
-	list<Vector2r> raw_points, lower_partition_points, upper_partition_points, hull;
+  std::list<Vector2r> raw_points, lower_partition_points, upper_partition_points, hull;
 	Vector2r left, right;
 	static Real direction(const Vector2r& p0, const Vector2r& p1, const Vector2r& p2) {
 		return ((p0[0]-p1[0])*(p2[1]-p1[1]))-((p2[0]-p1[0])*(p0[1]-p1[1]));
@@ -28,7 +28,7 @@ class ConvexHull2d{
 			else lower_partition_points.push_back(p);
 		}
 	}
-	vector<Vector2r> build_half_hull(list<Vector2r>& in, int factor){
+	vector<Vector2r> build_half_hull(std::list<Vector2r>& in, int factor){
 		vector<Vector2r> out;
 		in.push_back(right); out.push_back(left);
 		while(in.size()>0){
@@ -42,7 +42,7 @@ class ConvexHull2d{
 		return out;
 	}
 	public:
-	ConvexHull2d(const list<Vector2r>& pts){raw_points.assign(pts.begin(),pts.end());};
+	ConvexHull2d(const std::list<Vector2r>& pts){raw_points.assign(pts.begin(),pts.end());};
 	ConvexHull2d(const vector<Vector2r>& pts){raw_points.assign(pts.begin(),pts.end());};
 	vector<Vector2r> operator()(void){
 		partition_points();

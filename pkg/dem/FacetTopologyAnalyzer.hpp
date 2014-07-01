@@ -2,6 +2,9 @@
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Interaction.hpp>
+
+using std::min;
+using std::max;
 /*! Initializer for filling adjacency geometry data for facets.
  *
  * Common vertices and common edges are identified and mutual angle between facet faces

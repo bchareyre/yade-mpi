@@ -24,8 +24,6 @@
 namespace CGT
 {
 
-using namespace std;
-
 #ifdef PARDISO
 #ifdef AIX
 #define F77_FUNC(func)  func

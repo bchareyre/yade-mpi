@@ -18,8 +18,9 @@
 
 #include<yade/lib/base/Logging.hpp>
 
-using namespace std;
-
+using std::string;
+using std::vector;
+using std::istringstream;
 
 class DynLibManager 
 {

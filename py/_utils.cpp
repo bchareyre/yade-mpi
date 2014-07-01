@@ -17,14 +17,13 @@
 
 #include<numpy/ndarrayobject.h>
 
-using namespace std;
 namespace py = boost::python;
 
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
 /* \todo implement groupMask */
 py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
-	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
+	if(cutoff<0. || cutoff>1.) throw std::invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
@@ -77,7 +76,7 @@ Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 Real RayleighWaveTimeStep(){return Shop::RayleighWaveTimeStep();};
 
 py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::tuple aabb=py::tuple(), Real minProjLen=1e-6){
-	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
+	if(axis<0||axis>2) throw std::invalid_argument("Axis must be from {0,1,2}=x,y,z.");
 	Vector3r bbMin(Vector3r::Zero()), bbMax(Vector3r::Zero()); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
@@ -235,7 +234,7 @@ void wireSome(string filter){
 			case none: wire=false; break;
 			case all: wire=true; break;
 			case noSpheres: wire=!(bool)(YADE_PTR_DYN_CAST<Sphere>(b->shape)); break;
-			default: throw logic_error("No such case possible");
+      default: throw std::logic_error("No such case possible");
 		}
 		b->shape->wire=wire;
 	}
@@ -267,8 +266,8 @@ bool pointInsidePolygon(py::tuple xy, py::object vertices){
 	Real testx=py::extract<double>(xy[0])(),testy=py::extract<double>(xy[1])();
 	char** vertData; int rows, cols; PyArrayObject* vert=(PyArrayObject*)vertices.ptr();
 	int result=PyArray_As2D((PyObject**)&vert /* is replaced */ ,&vertData,&rows,&cols,PyArray_DOUBLE);
-	if(result!=0) throw invalid_argument("Unable to cast vertices to 2d array");
-	if(cols!=2 || rows<3) throw invalid_argument("Vertices must have 2 columns (x and y) and at least 3 rows.");
+	if(result!=0) throw std::invalid_argument("Unable to cast vertices to 2d array");
+	if(cols!=2 || rows<3) throw std::invalid_argument("Vertices must have 2 columns (x and y) and at least 3 rows.");
 	int i /*current node*/, j/*previous node*/; bool inside=false;
 	for(i=0,j=rows-1; i<rows; j=i++){
 		double vx_i=*(double*)(vert->data+i*vert->strides[0]), vy_i=*(double*)(vert->data+i*vert->strides[0]+vert->strides[1]), vx_j=*(double*)(vert->data+j*vert->strides[0]), vy_j=*(double*)(vert->data+j*vert->strides[0]+vert->strides[1]);
@@ -287,7 +286,7 @@ bool pointInsidePolygon(py::tuple xy, py::object vertices){
 */
 Real approxSectionArea(Real coord, int axis){
 	std::list<Vector2r> cloud;
-	if(axis<0 || axis>2) throw invalid_argument("Axis must be ∈ {0,1,2}");
+	if(axis<0 || axis>2) throw std::invalid_argument("Axis must be ∈ {0,1,2}");
 	const int ax1=(axis+1)%3, ax2=(axis+2)%3;
 	const Real sqrt3=sqrt(3);
 	Vector2r mm,mx; int i=0;

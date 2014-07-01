@@ -124,7 +124,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 					const Sphere* sphere1 = YADE_CAST<Sphere*> (subBody1->shape.get());
 					const Sphere* sphere2 = YADE_CAST<Sphere*> (subBody2->shape.get());
 					Real un = (sphere1->radius+sphere2->radius) - dist.norm();
-					if (un > 0.001*min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
+					if (un > 0.001*std::min(sphere1->radius,sphere2->radius)) {intersecting = true; break;}
 				}
 			}
 			if (intersecting) break;
@@ -153,7 +153,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
 				aabb.extend(subBody->state->pos + Vector3r::Constant(sphere->radius));
 				aabb.extend(subBody->state->pos - Vector3r::Constant(sphere->radius));
-				rMin=min(rMin,sphere->radius);
+				rMin=std::min(rMin,sphere->radius);
 			}
 		}
 		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:

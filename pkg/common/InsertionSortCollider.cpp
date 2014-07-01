@@ -16,8 +16,6 @@
   #include<omp.h>
 #endif
 
-using namespace std;
-
 YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
 
@@ -89,7 +87,7 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	for (int kk=0;  kk<ompThreads; kk++) newInteractions[kk].reserve(100);
 	
 	/// First sort, independant in each chunk
-	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? std::min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for (unsigned k=0; k<nChunks;k++) {
 		int threadNum = omp_get_thread_num();
 		for(long i=chunks[k]+1; i<chunks[k+1]; i++){
@@ -112,7 +110,7 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	///If sorting requires to move a bound past half-chunk, the algorithm is not thread safe,
 	/// if it happens we roll-back and run the 1-thread sort + send warning
 	bool parallelFailed=false;
-	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? std::min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for (unsigned k=1; k<nChunks;k++) {
 		
 		int threadNum = omp_get_thread_num();
@@ -153,7 +151,7 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 
 
 vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
-	if(periodic){ throw invalid_argument("InsertionSortCollider::probeBoundingVolume: handling periodic boundary not implemented."); }
+	if(periodic){ throw std::invalid_argument("InsertionSortCollider::probeBoundingVolume: handling periodic boundary not implemented."); }
 	vector<Body::id_t> ret;
 	for( vector<Bounds>::iterator 
 			it=BB[0].vec.begin(),et=BB[0].vec.end(); it < et; ++it)
@@ -248,7 +246,7 @@ void InsertionSortCollider::action(){
 				if(!b || !b->shape) continue;
 				Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
 				if(!s) continue;
-				minR=min(s->radius,minR);
+				minR=std::min(s->radius,minR);
 			}
 			if (isinf(minR)) LOG_ERROR("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive verletDist in your script.");
 			// if no spheres, disable stride
@@ -290,7 +288,7 @@ void InsertionSortCollider::action(){
 	ISC_CHECKPOINT("bound");
 
 	// copy bounds along given axis into our arrays 
-	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? std::min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for(long i=0; i<2*nBodies; i++){
 // 		const long cacheIter = scene->iter;
 		for(int j=0; j<3; j++){

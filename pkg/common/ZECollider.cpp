@@ -14,8 +14,6 @@
 #include<vector>
 #include<boost/static_assert.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((ZECollider))
 CREATE_LOGGER(ZECollider);
 
@@ -69,7 +67,7 @@ void ZECollider::action(){
 				if(!b || !b->shape) continue;
 				Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
 				if(!s) continue;
-				minR=min(s->radius,minR);
+				minR=std::min(s->radius,minR);
 			}
 			// if no spheres, disable stride
 			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;

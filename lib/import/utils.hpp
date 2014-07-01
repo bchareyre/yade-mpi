@@ -1,12 +1,11 @@
 #pragma once
 
 #include<utility>
-using namespace std;
 
 template<class T>
-pair<T,T> minmax(const T &a, const T &b) 
+std::pair<T,T> minmax(const T &a, const T &b) 
 {
-    return (a<b) ? pair<T,T>(a,b) : pair<T,T>(b,a);
+    return (a<b) ? std::pair<T,T>(a,b) : std::pair<T,T>(b,a);
 }
 
 template<class T>

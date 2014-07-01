@@ -56,7 +56,7 @@ class TriaxialTest : public FileGenerator
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
 		void createActors(shared_ptr<Scene>& scene);
 		void positionRootBody(shared_ptr<Scene>& scene);
-		typedef pair<Vector3r, Real> BasicSphere;	
+		typedef std::pair<Vector3r, Real> BasicSphere;	
 	public : 
 		~TriaxialTest ();
 		bool generate(string& message);

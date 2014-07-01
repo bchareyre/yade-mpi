@@ -12,8 +12,6 @@
 #include<vector>
 #include<boost/static_assert.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((GeneralIntegratorInsertionSortCollider))
 CREATE_LOGGER(GeneralIntegratorInsertionSortCollider);
 

@@ -16,24 +16,6 @@
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 
-
-using namespace std;
-		
-// PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
-// {
-// 	haveDistantTransient=false;
-// 	isTriangulated = false;
-// 	Tes = new ( TesselationWrapper );
-// 
-// 	nbObjects=0;
-// 	xBounds.clear();
-// 	yBounds.clear();
-// 	zBounds.clear();
-// 	minima.clear();
-// 	maxima.clear();
-// }
-
-
 PersistentTriangulationCollider::~PersistentTriangulationCollider()
 {
 	delete Tes;

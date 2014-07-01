@@ -14,6 +14,7 @@
 /// See below the commented exemple, for a possible solution
 
 #include "FlowEngine_FlowEngine_PeriodicInfo.hpp"
+using std::max;
 
 class PeriodicCellInfo : public FlowCellInfo_FlowEngine_PeriodicInfo
 {	
@@ -434,7 +435,7 @@ void PeriodicFlowEngine::updateVolumes (FlowSolver& flow)
                 totVol+=newVol;
                 dVol=cell->info().volumeSign * ( newVol - cell->info().volume() );
                 totDVol+=dVol;
-                epsVolMax = max ( epsVolMax, abs ( dVol/newVol ) );
+                epsVolMax =  max ( epsVolMax, fabs ( dVol/newVol ) );
                 cell->info().dv() = dVol * invDeltaT;
                 cell->info().volume() = newVol;
         }

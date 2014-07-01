@@ -35,9 +35,6 @@
 #include<string>
 #include<ostream>
 
-
-using namespace std;
-
 struct DynLibDispatcher_Item2D{ int ix1, ix2; std::string functorName; DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){}; };
 struct DynLibDispatcher_Item1D{ int ix1     ; std::string functorName; DynLibDispatcher_Item1D(int a,        std::string c):ix1(a),       functorName(c){}; };
 ///
@@ -182,13 +179,13 @@ class DynLibDispatcher
 
 		shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1){
 		  	int ix1;
-			if(arg1->getClassIndex()<0) throw runtime_error("No functor for type "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
+			if(arg1->getClassIndex()<0) throw std::runtime_error("No functor for type "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
 			if(locateMultivirtualFunctor1D(ix1,arg1)) return callBacks[ix1];
 			return shared_ptr<Executor>();
 		}
 
 		shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1, shared_ptr<BaseClass2>& arg2){
-			if(arg1->getClassIndex()<0 || arg2->getClassIndex()<0) throw runtime_error("No functor for types "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+") + "+arg2->getClassName()+" (index "+boost::lexical_cast<string>(arg2->getClassIndex())+"), since some of the indices is invalid (negative).");
+			if(arg1->getClassIndex()<0 || arg2->getClassIndex()<0) throw std::runtime_error("No functor for types "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+") + "+arg2->getClassName()+" (index "+boost::lexical_cast<string>(arg2->getClassIndex())+"), since some of the indices is invalid (negative).");
 			int ix1,ix2;
 			if(locateMultivirtualFunctor2D(ix1,ix2,arg1,arg2)) return callBacks[ix1][ix2];
 			return shared_ptr<Executor>();
@@ -253,7 +250,7 @@ class DynLibDispatcher
 			callBacks[index] = executor;
 						
 			#if 0
-				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
+				std::cerr <<" New class added to DynLibDispatcher 1D: " << libName << std::endl;
 			#endif
 		};
 
@@ -320,7 +317,7 @@ class DynLibDispatcher
 			}
 
 			#if 0
-				cerr <<"Added new 2d functor "<<executor->getClassName()<<", callBacks size is "<<callBacks.size()<<","<<(callBacks.size()>0?callBacks[0].size():0)<<endl;
+				std::cerr <<"Added new 2d functor "<<executor->getClassName()<<", callBacks size is "<<callBacks.size()<<","<<(callBacks.size()>0?callBacks[0].size():0)<<std::endl;
 			#endif
 		  }
 		
@@ -397,8 +394,8 @@ class DynLibDispatcher
 					distTooBig=false;
 					if(callBacks[ix1][ix2]){
 						if(foundIx1!=-1 && callBacks[foundIx1][foundIx2]!=callBacks[ix1][ix2]){ // we found a callback, but there already was one at this distance and it was different from the current one
-							cerr<<__FILE__<<":"<<__LINE__<<": ambiguous 2d dispatch ("<<"arg1="<<base1->getClassName()<<", arg2="<<base2->getClassName()<<", distance="<<dist<<"), dispatch matrix:"<<endl;
-							dumpDispatchMatrix2D(cerr,"AMBIGUOUS: "); throw runtime_error("Ambiguous dispatch.");
+							std::cerr<<__FILE__<<":"<<__LINE__<<": ambiguous 2d dispatch ("<<"arg1="<<base1->getClassName()<<", arg2="<<base2->getClassName()<<", distance="<<dist<<"), dispatch matrix:"<<std::endl;
+							dumpDispatchMatrix2D(std::cerr,"AMBIGUOUS: "); throw std::runtime_error("Ambiguous dispatch.");
 						}
 						foundIx1=ix1; foundIx2=ix2;
 						callBacks[index1][index2]=callBacks[ix1][ix2]; callBacksInfo[index1][index2]=callBacksInfo[ix1][ix2];

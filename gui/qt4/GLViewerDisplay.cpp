@@ -250,7 +250,7 @@ void GLViewer::postDraw(){
 		if(timeDispMask & GLViewer::TIME_ITER){
 			ostringstream oss;
 			oss<<"#"<<rb->iter;
-			if(rb->stopAtIter>rb->iter) oss<<" ("<<setiosflags(ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->iter)/rb->stopAtIter<<"%)";
+			if(rb->stopAtIter>rb->iter) oss<<" ("<<setiosflags(std::ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->iter)/rb->stopAtIter<<"%)";
 			QGLViewer::drawText(x,y,oss.str().c_str());
 			y-=lineHt;
 		}

@@ -63,15 +63,15 @@ class ForceContainer{
 
 		inline void ensureSize(Body::id_t id, int threadN){
 			assert(nThreads>omp_get_thread_num());
-			const Body::id_t idMaxTmp = max(id, _maxId[threadN]);
+			const Body::id_t idMaxTmp = std::max(id, _maxId[threadN]);
 			_maxId[threadN] = 0;
 			if (threadN<0) {
-				resizePerm(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
+				resizePerm(std::min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
 			} else if (sizeOfThreads[threadN]<=(size_t)idMaxTmp) {
-				resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)),threadN);
+				resize(std::min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)),threadN);
 			}
 		}
-		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
+		inline void ensureSynced(){ if(!synced) throw std::runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
 		
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
@@ -228,9 +228,9 @@ class ForceContainer {
 		size_t size;
 		size_t permSize;
 		inline void ensureSize(Body::id_t id){ 
-			const Body::id_t idMaxTmp = max(id, _maxId);
+			const Body::id_t idMaxTmp = std::max(id, _maxId);
 			_maxId = 0;
-			if(size<=(size_t)idMaxTmp) resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
+			if(size<=(size_t)idMaxTmp) resize(std::min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
 		}
 		#if 0
 			const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}

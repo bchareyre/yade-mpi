@@ -159,13 +159,13 @@ class ClassFactory : public Singleton<ClassFactory>
 			\param tp type info of the type to test
 			\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
 		*/
-		bool isFactorable(const type_info& tp,bool& fundamental);
+		bool isFactorable(const std::type_info& tp,bool& fundamental);
 
 		bool load(const string& fullFileName);
 		std::string lastError();
 
 		void registerPluginClasses(const char* fileAndClasses[]);
-		list<string> pluginClasses;
+		std::list<string> pluginClasses;
 
 		virtual string getClassName() const { return "Factorable"; };
 		virtual string getBaseClassName(int ) const { return "";};

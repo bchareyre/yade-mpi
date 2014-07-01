@@ -63,8 +63,8 @@
 #include<locale>
 #include<boost/archive/codecvt_null.hpp>
 
-using namespace std;
 namespace py = boost::python;
+using std::vector;
 
 #include<yade/lib/serialization/ObjectIO.hpp>
 
@@ -493,7 +493,7 @@ class pyInteractionContainer{
 				if(i) return i; else { PyErr_SetString(PyExc_IndexError,"No such interaction"); py::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Interaction>(); }
 			}
 			else if(id12.size()==1){ return (*proxee)[id12[0]];}
-			else throw invalid_argument("2 integers (id1,id2) or 1 integer (nth) required.");
+			else throw std::invalid_argument("2 integers (id1,id2) or 1 integer (nth) required.");
 		}
 		/* return nth _real_ iteration from the container (0-based index); this is to facilitate picking random interaction */
 		shared_ptr<Interaction> pyNth(long n){
@@ -675,7 +675,7 @@ class pyOmega{
 	void reload(bool quiet=false){	load(OMEGA.sceneFile,quiet);}
 	void saveTmp(string mark="", bool quiet=false){ save(":memory:"+mark,quiet);}
 	void loadTmp(string mark="", bool quiet=false){ load(":memory:"+mark,quiet);}
-	py::list lsTmp(){ py::list ret; typedef pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
+	py::list lsTmp(){ py::list ret; typedef std::pair<std::string,string> strstr; FOREACH(const strstr& sim,OMEGA.memSavedSimulations){ string mark=sim.first; boost::algorithm::replace_first(mark,":memory:",""); ret.append(mark); } return ret; }
 	void tmpToFile(string mark, string filename){
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
 		boost::iostreams::filtering_ostream out;
@@ -700,7 +700,7 @@ class pyOmega{
 	int addScene(){return OMEGA.addScene();}
 	void switchToScene(int i){OMEGA.switchToScene(i);}
 	string sceneToString(){
-		ostringstream oss;
+    std::ostringstream oss;
 		yade::ObjectIO::save<typeof(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
 		oss.flush();
 		return oss.str();
@@ -756,7 +756,7 @@ class pyOmega{
 
 	py::list listChildClassesNonrecursive(const string& base){
 		py::list ret;
-		for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
+		for(std::map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
 		return ret;
 	}
 
@@ -765,7 +765,7 @@ class pyOmega{
 	}
 
 	py::list plugins_get(){
-		const map<string,DynlibDescriptor>& plugins=Omega::instance().getDynlibsDescriptor();
+		const std::map<string,DynlibDescriptor>& plugins=Omega::instance().getDynlibsDescriptor();
 		std::pair<string,DynlibDescriptor> p; py::list ret;
 		FOREACH(p, plugins) ret.append(p.first);
 		return ret;
