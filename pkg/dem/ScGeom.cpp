@@ -71,7 +71,7 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, b
 }
 
 Vector3r ScGeom::getIncidentVel_py(shared_ptr<Interaction> i, bool avoidGranularRatcheting){
-	if(i->geom.get()!=this) throw std::invalid_argument("ScGeom object is not the same as Interaction.geom.");
+	if(i->geom.get()!=this) throw invalid_argument("ScGeom object is not the same as Interaction.geom.");
 	Scene* scene=Omega::instance().getScene().get();
 	return getIncidentVel(Body::byId(i->getId1(),scene)->state.get(),Body::byId(i->getId2(),scene)->state.get(),
 		scene->dt,
@@ -86,7 +86,7 @@ Vector3r ScGeom::getRelAngVel(const State* rbp1, const State* rbp2, Real dt){
 }
 
 Vector3r ScGeom::getRelAngVel_py(shared_ptr<Interaction> i){
-	if(i->geom.get()!=this) throw std::invalid_argument("ScGeom object is not the same as Interaction.geom.");
+	if(i->geom.get()!=this) throw invalid_argument("ScGeom object is not the same as Interaction.geom.");
 	Scene* scene=Omega::instance().getScene().get();
 	return getRelAngVel(Body::byId(i->getId1(),scene)->state.get(),Body::byId(i->getId2(),scene)->state.get(),scene->dt);
 }

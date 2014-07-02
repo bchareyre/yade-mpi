@@ -14,8 +14,7 @@
 #include <cmath>
 #include "utils.hpp"
 
-using std::pair;
-using std::set;
+using namespace std;
 
 class STLReader {
     public:

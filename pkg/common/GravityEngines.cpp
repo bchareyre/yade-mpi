@@ -59,7 +59,7 @@ void AxialGravityEngine::action(){
 
 Vector2i HdapsGravityEngine::readSysfsFile(const string& name){
 	char buf[256];
-	std::ifstream f(name.c_str());
+	ifstream f(name.c_str());
 	if(!f.is_open()) throw std::runtime_error(("HdapsGravityEngine: unable to open file "+name).c_str());
 	f.read(buf,256);f.close();
 	const boost::regex re("\\(([0-9+-]+),([0-9+-]+)\\).*");

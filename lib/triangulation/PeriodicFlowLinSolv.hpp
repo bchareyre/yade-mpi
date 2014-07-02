@@ -11,6 +11,8 @@
 
 #ifdef FLOW_ENGINE
 
+using namespace std;
+
 namespace CGT {
 
 template<class _Tesselation>

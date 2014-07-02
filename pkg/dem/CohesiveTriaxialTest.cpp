@@ -49,7 +49,10 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-typedef std::pair<Vector3r, Real> BasicSphere;
+using namespace std;
+
+
+typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
 string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
@@ -175,7 +178,7 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	if(importFilename!=""){
 		vector<boost::tuple<Vector3r,Real,int> >sphereListClumpInfo = Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
 		FOREACH(tupleVector3rRealInt t, sphereListClumpInfo){
-			sphere_list.push_back(std::make_pair(boost::get<0>(t),boost::get<1>(t)));
+			sphere_list.push_back(make_pair(boost::get<0>(t),boost::get<1>(t)));
 		};
 	}
 	else message=GenerateCloud_cohesive(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);

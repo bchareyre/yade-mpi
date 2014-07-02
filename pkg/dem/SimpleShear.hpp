@@ -11,8 +11,11 @@
 #include<yade/core/FileGenerator.hpp>
 
 
-typedef std::pair<Vector3r, Real> BasicSphere;
+typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
+
+using namespace std;
+
 
 class SimpleShear : public FileGenerator
 {

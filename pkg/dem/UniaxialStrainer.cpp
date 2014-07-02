@@ -40,7 +40,7 @@ void UniaxialStrainer::init(){
 	if(originalLength<=0) throw runtime_error(("UniaxialStrainer: Initial length is negative or zero (swapped reference particles?)! "+boost::lexical_cast<string>(originalLength)).c_str());
 	/* this happens is nan propagates from e.g. brefcom consitutive law in case 2 bodies have _exactly_ the same position
 	 * (the the normal strain is 0./0.=nan). That is an user's error, however and should not happen. */
-	if(isnan(originalLength)) throw std::logic_error("UniaxialStrainer: Initial length is NaN!");
+	if(isnan(originalLength)) throw logic_error("UniaxialStrainer: Initial length is NaN!");
 	assert(originalLength>0 && !isnan(originalLength));
 
 	assert(!isnan(strainRate) || !isnan(absSpeed));

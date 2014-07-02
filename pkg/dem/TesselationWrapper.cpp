@@ -163,6 +163,7 @@ double TesselationWrapper::Volume(unsigned int id) {return ((unsigned int) Tes->
 
 bool TesselationWrapper::insert(double x, double y, double z, double rad, unsigned int id)
 {
+	using namespace std;
 	checkMinMax(x,y,z,rad);
 	mean_radius += rad;
 	++n_spheres;
@@ -171,20 +172,20 @@ bool TesselationWrapper::insert(double x, double y, double z, double rad, unsign
 
 void TesselationWrapper::checkMinMax(double x, double y, double z, double rad)
 {
-	using std::min;
-	using std::max;
-	Pmin = CGT::Point(std::min(Pmin.x(), x-rad), std::min(Pmin.y(), y-rad), std::min(Pmin.z(), z-rad));
-	Pmax = CGT::Point(std::max(Pmax.x(), x+rad), std::max(Pmax.y(), y+rad), std::max(Pmax.z(), z+rad));
+	using namespace std;
+	Pmin = CGT::Point(min(Pmin.x(), x-rad), min(Pmin.y(), y-rad),  min(Pmin.z(), z-rad));
+	Pmax = CGT::Point(max(Pmax.x(), x+rad),  max(Pmax.y(), y+rad),  max(Pmax.z(), z+rad));
 }
 
 
 bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned int id)
 {
+	using namespace std;
 	checkMinMax(x,y,z,rad);
 	if (Tes->move(x,y,z,rad,id)!=NULL)
 		return true;
 	else {
-		std::cerr << "Tes->move(x,y,z,rad,id)==NULL" << std::endl; return false;
+		cerr << "Tes->move(x,y,z,rad,id)==NULL" << endl; return false;
 	}
 }
 

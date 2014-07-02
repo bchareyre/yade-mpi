@@ -58,7 +58,7 @@ class CapillaryTriaxialTest : public FileGenerator
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
 		void createActors(shared_ptr<Scene>& scene);
 		void positionRootBody(shared_ptr<Scene>& scene);
-		typedef std::pair<Vector3r, Real> BasicSphere;	
+		typedef pair<Vector3r, Real> BasicSphere;	
 	public : 
 		~CapillaryTriaxialTest ();
 		bool generate(std::string& message);

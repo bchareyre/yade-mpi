@@ -39,8 +39,8 @@ CREATE_LOGGER(LawTester);
 void LawTester::postLoad(LawTester&){
 	if(ids.size()==0) return; // uninitialized object, don't do nothing at all
 	if(ids.size()!=2) throw std::invalid_argument("LawTester.ids: exactly two values must be given.");
-	if(disPath.empty() && rotPath.empty()) throw std::invalid_argument("LawTester.{disPath,rotPath}: at least one point must be given.");
-	if(pathSteps.empty()) throw std::invalid_argument("LawTester.pathSteps: at least one value must be given.");
+	if(disPath.empty() && rotPath.empty()) throw invalid_argument("LawTester.{disPath,rotPath}: at least one point must be given.");
+	if(pathSteps.empty()) throw invalid_argument("LawTester.pathSteps: at least one value must be given.");
 	size_t pathSize=max(disPath.size(),rotPath.size());
 	// update path points
 	_path.clear(); _path.push_back(Vector6r::Zero());
@@ -306,7 +306,7 @@ void GlExtra_LawTester::render(){
 void GlExtra_OctreeCubes::postLoad(GlExtra_OctreeCubes&){
 	if(boxesFile.empty()) return;
 	boxes.clear();
-  std::ifstream txt(boxesFile.c_str());
+	ifstream txt(boxesFile.c_str());
 	while(!txt.eof()){
 		Real data[8];
 		for(int i=0; i<8; i++){ if(i<7 && txt.eof()) goto done; txt>>data[i]; }

@@ -27,8 +27,7 @@
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
 #endif
-
-using std::vector;
+using namespace std;
 
 #include<yade/lib/base/Math.hpp>
 
@@ -53,7 +52,7 @@ struct GridContainer{
 	Vector2i xy2cell(Vector2r xy, bool* inGrid=NULL) const {
 		Vector2i ret((int)(floor((xy[0]-lo[0])/cellSizes[0])),(int)(floor((xy[1]-lo[1])/cellSizes[1])));
 		if(ret[0]<0 || ret[0]>=nCells[0] || ret[1]<0 || ret[1]>=nCells[1]){
-			if(inGrid) *inGrid=false; else throw std::invalid_argument("Cell coordinates outside grid (xy="+boost::lexical_cast<std::string>(xy[0])+","+boost::lexical_cast<std::string>(xy[1])+", computed cell coordinates "+boost::lexical_cast<std::string>(ret[0])+","+boost::lexical_cast<std::string>(ret[1])+").");
+			if(inGrid) *inGrid=false; else throw std::invalid_argument("Cell coordinates outside grid (xy="+boost::lexical_cast<string>(xy[0])+","+boost::lexical_cast<string>(xy[1])+", computed cell coordinates "+boost::lexical_cast<string>(ret[0])+","+boost::lexical_cast<string>(ret[1])+").");
 		} else {if(inGrid) *inGrid=true;}
 		return ret;
 	}
@@ -89,8 +88,8 @@ struct GridContainer{
 	}
 
 	// graphical representation of a set of filtered cells
-	std::string dumpGrid(vector<Vector2i> v){
-		vector<vector<bool> > vvb; std::string ret; vvb.resize(nCells[0]); for(size_t i=0; i<(size_t)nCells[0]; i++) vvb[i].resize(nCells[1],false); FOREACH(Vector2i& vv, v) vvb[vv[0]][vv[1]]=true;
+	string dumpGrid(vector<Vector2i> v){
+		vector<vector<bool> > vvb; string ret; vvb.resize(nCells[0]); for(size_t i=0; i<(size_t)nCells[0]; i++) vvb[i].resize(nCells[1],false); FOREACH(Vector2i& vv, v) vvb[vv[0]][vv[1]]=true;
 		for(int cy=nCells[1]-1; cy>=0; cy--){ ret+="|"; for(int cx=0; cx<nCells[0]; cx++){ ret+=vvb[cx][cy]?"@":"."; }	ret+="|\n";	}
 		return ret;
 	}

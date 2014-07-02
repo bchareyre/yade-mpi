@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 /// @brief Produces spheres over the course of a simulation. 
 class ResetRandomPosition : public PeriodicEngine {
 public:

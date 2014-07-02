@@ -13,9 +13,6 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib/base/Math.hpp>
 
-using std::endl;
-using std::cout;
-using std::cerr;
 
 YADE_PLUGIN((Disp2DPropLoadEngine));
 

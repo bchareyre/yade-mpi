@@ -6,18 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+using namespace std;
+
 //FIXME: handle that a better way
 #define MAX_ID 200000
-using std::endl;
-using std::cout;
-using std::cerr;
-using std::vector;
-using std::string;
-using std::min;
-using std::max;
-using std::ifstream;
-using std::ofstream;
-using std::pair;
 
 namespace CGT {
 

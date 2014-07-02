@@ -36,6 +36,7 @@
 
 #include<yade/lib/base/Math.hpp>
 
+using namespace std;
 // empty functions for ADL
 //namespace{
 	template<typename T>	void preLoad(T&){}; template<typename T> void postLoad(T& obj){ /* cerr<<"Generic no-op postLoad("<<typeid(T).name()<<"&) called for "<<obj.getClassName()<<std::endl; */ }
@@ -100,7 +101,7 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 #define _DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc)  _DEF_READWRITE_BY_VALUE(thisClass,attr,doc)
 // the conditional yade::py_wrap_ref should be eliminated by compiler at compile-time, as it depends only on types, not their values
 // most of this could be written with templates, including flags (ints can be template args)
-#define _DEF_READWRITE_CUSTOM(thisClass,attr) if(!(_ATTR_FLG(attr) & yade::Attr::hidden)){ bool _ro(_ATTR_FLG(attr) & Attr::readonly), _post(_ATTR_FLG(attr) & Attr::triggerPostLoad), _ref(yade::py_wrap_ref<typeof(thisClass::_ATTR_NAM(attr))>::value); std::string docStr(_ATTR_DOC(attr)); docStr+=" :yattrflags:`"+boost::lexical_cast<std::string>(_ATTR_FLG(attr))+"` "; \
+#define _DEF_READWRITE_CUSTOM(thisClass,attr) if(!(_ATTR_FLG(attr) & yade::Attr::hidden)){ bool _ro(_ATTR_FLG(attr) & Attr::readonly), _post(_ATTR_FLG(attr) & Attr::triggerPostLoad), _ref(yade::py_wrap_ref<typeof(thisClass::_ATTR_NAM(attr))>::value); std::string docStr(_ATTR_DOC(attr)); docStr+=" :yattrflags:`"+boost::lexical_cast<string>(_ATTR_FLG(attr))+"` "; \
 	if      ( _ref && !_ro && !_post) _classObj.def_readwrite(_ATTR_NAM_STR(attr),&thisClass::_ATTR_NAM(attr),docStr.c_str()); \
 	else if ( _ref && !_ro &&  _post) _classObj.add_property(_ATTR_NAM_STR(attr),boost::python::make_getter(&thisClass::_ATTR_NAM(attr)),make_setter_postLoad<thisClass,typeof(thisClass::_ATTR_NAM(attr)),&thisClass::_ATTR_NAM(attr)>,docStr.c_str()); \
 	else if ( _ref &&  _ro)           _classObj.def_readonly(_ATTR_NAM_STR(attr),&thisClass::_ATTR_NAM(attr),docStr.c_str()); \
@@ -156,7 +157,7 @@ void make_setter_postLoad(C& instance, const T& val){ instance.*A=val; /* cerr<<
 
 
 // print warning about deprecated attribute; thisClass is type name, not string
-#define _DEPREC_WARN(thisClass,deprec)  std::cerr<<"WARN: "<<getClassName()<<"."<<BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(deprec))<<" is deprecated, use "<<BOOST_PP_STRINGIZE(thisClass)<<"."<<BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(deprec))<<" instead. "; if(_DEPREC_COMMENT(deprec)){ if(std::string(_DEPREC_COMMENT(deprec))[0]=='!'){ std::cerr<<std::endl; throw std::invalid_argument(BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(deprec)) " is deprecated; throwing exception requested. Reason: " _DEPREC_COMMENT(deprec));} else std::cerr<<"("<<_DEPREC_COMMENT(deprec)<<")"; } std::cerr<<std::endl;
+#define _DEPREC_WARN(thisClass,deprec)  std::cerr<<"WARN: "<<getClassName()<<"."<<BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(deprec))<<" is deprecated, use "<<BOOST_PP_STRINGIZE(thisClass)<<"."<<BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(deprec))<<" instead. "; if(_DEPREC_COMMENT(deprec)){ if(std::string(_DEPREC_COMMENT(deprec))[0]=='!'){ std::cerr<<endl; throw std::invalid_argument(BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(deprec)) " is deprecated; throwing exception requested. Reason: " _DEPREC_COMMENT(deprec));} else std::cerr<<"("<<_DEPREC_COMMENT(deprec)<<")"; } std::cerr<<std::endl;
 
 // getters for individual fields
 #define _ATTR_TYP(s) BOOST_PP_TUPLE_ELEM(5,0,s)
@@ -289,7 +290,7 @@ class Serializable: public Factorable {
 		virtual void pyHandleCustomCtorArgs(boost::python::tuple& args, boost::python::dict& kw){ return; }
 		
 		//! string representation of this object
-		std::string pyStr() { return "<"+getClassName()+" instance at "+boost::lexical_cast<std::string>(this)+">"; }
+		std::string pyStr() { return "<"+getClassName()+" instance at "+boost::lexical_cast<string>(this)+">"; }
 
 	REGISTER_CLASS_NAME(Serializable);
 	REGISTER_BASE_CLASS_NAME(Factorable);
@@ -302,7 +303,7 @@ shared_ptr<T> Serializable_ctor_kwAttrs(boost::python::tuple& t, boost::python::
 	shared_ptr<T> instance;
 	instance=shared_ptr<T>(new T);
 	instance->pyHandleCustomCtorArgs(t,d); // can change t and d in-place
-	if(boost::python::len(t)>0) throw std::runtime_error("Zero (not "+boost::lexical_cast<std::string>(boost::python::len(t))+") non-keyword constructor arguments required [in Serializable_ctor_kwAttrs; Serializable::pyHandleCustomCtorArgs might had changed it after your call].");
+	if(boost::python::len(t)>0) throw runtime_error("Zero (not "+boost::lexical_cast<string>(boost::python::len(t))+") non-keyword constructor arguments required [in Serializable_ctor_kwAttrs; Serializable::pyHandleCustomCtorArgs might had changed it after your call].");
 	if(boost::python::len(d)>0){ instance->pyUpdateAttrs(d); instance->callPostLoad(); }
 	return instance;
 }

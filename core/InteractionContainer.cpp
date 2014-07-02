@@ -17,7 +17,7 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	Body::id_t id1=i->getId1();
 	Body::id_t id2=i->getId2();
 	
-	if (id1>id2) std::swap(id1,id2); 
+	if (id1>id2) swap(id1,id2); 
 	
 	assert((Body::id_t)bodies->size()>id1); // the bodies must exist already
 	assert((Body::id_t)bodies->size()>id2); 
@@ -54,7 +54,7 @@ void InteractionContainer::clear(){
 bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
-	if (id1>id2) std::swap(id1,id2);
+	if (id1>id2) swap(id1,id2);
 	if(id2>=(Body::id_t)bodies->size()) return false; // no such interaction
 	
 	const shared_ptr<Body>& b1((*bodies)[id1]);
@@ -95,7 +95,7 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 
 const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
-	if (id1>id2) std::swap(id1,id2); 
+	if (id1>id2) swap(id1,id2); 
 	// those checks could be perhaps asserts, but pyInteractionContainer has no access to the body container...
 	if(id2>=(Body::id_t)bodies->size()){ empty=shared_ptr<Interaction>(); return empty; }
 	const shared_ptr<Body>& b1((*bodies)[id1]);

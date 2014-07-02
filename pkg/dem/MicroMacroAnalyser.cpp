@@ -21,7 +21,6 @@
 #include<boost/iostreams/device/file.hpp>
 #include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
 #include "MicroMacroAnalyser.hpp"
-using std::ostringstream;
 
 YADE_PLUGIN((MicroMacroAnalyser));
 CREATE_LOGGER(MicroMacroAnalyser);

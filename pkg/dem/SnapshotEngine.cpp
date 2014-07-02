@@ -6,7 +6,7 @@ YADE_PLUGIN((SnapshotEngine));
 CREATE_LOGGER(SnapshotEngine);
 
 void SnapshotEngine::action(){
-	if(!OpenGLManager::self) throw std::logic_error("No OpenGLManager instance?!");
+	if(!OpenGLManager::self) throw logic_error("No OpenGLManager instance?!");
 	if(OpenGLManager::self->views.size()==0){
 		int viewNo=OpenGLManager::self->waitForNewView(deadTimeout);
 		if(viewNo<0){

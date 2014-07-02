@@ -17,7 +17,10 @@
 
 CREATE_LOGGER(SpherePack);
 
+using namespace std;
+
 namespace py=boost::python;
+
 
 void SpherePack::fromList(const py::list& l){
 	pack.clear();
@@ -57,8 +60,8 @@ void SpherePack::fromFile(string file) {
 }
 
 void SpherePack::toFile(const string fname) const {
-  std::ofstream f(fname.c_str());
-	if(!f.good()) throw std::runtime_error("Unable to open file `"+fname+"'");
+	ofstream f(fname.c_str());
+	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 	if(cellSize!=Vector3r::Zero()){ f<<"##PERIODIC:: "<<cellSize[0]<<" "<<cellSize[1]<<" "<<cellSize[2]<<endl; }
 	FOREACH(const Sph& s, pack){
 		//if(s.clumpId>=0) throw std::invalid_argument("SpherePack with clumps cannot be (currently) exported to a text file.");
@@ -97,7 +100,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	Matrix3r invHsize =hSize.inverse();
 	Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
 	if (!volume) {
-		if (hSizeFound) throw std::invalid_argument("The period defined by hSize has null length in at least one direction, this is not supported. Define flat boxes via min-max and keep hSize undefined if you want a 2D packing.");
+		if (hSizeFound) throw invalid_argument("The period defined by hSize has null length in at least one direction, this is not supported. Define flat boxes via min-max and keep hSize undefined if you want a 2D packing.");
 		else LOG_WARN("The volume of the min-max box is null, we will assume that the packing is 2D. If it is not what you want then you defined wrong input values; check that min and max corners are defined correctly.");}
 	int mode=-1; bool err=false;
 	// determine the way we generate radii
@@ -109,15 +112,15 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
 		if (volume) rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);
 		else {//The volume is null, we will generate a 2D packing with the following rMean
-			if (!area) throw std::invalid_argument("The box defined has null volume AND null surface. Define at least maxCorner of the box, or hSize if periodic.");
+			if (!area) throw invalid_argument("The box defined has null volume AND null surface. Define at least maxCorner of the box, or hSize if periodic.");
 			rMean=pow(area*(1-porosity)/(Mathr::PI*(1+rRelFuzz*rRelFuzz)*num),0.5);}
 	}
 	// transform sizes and cummulated fractions values in something convenient for the generation process
 	if(psdSizes.size()>0){
 		err=(mode>=0); mode=RDIST_PSD;
-		if(psdSizes.size()!=psdCumm.size()) throw std::invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+boost::lexical_cast<string>(psdSizes.size())+"!="+boost::lexical_cast<string>(psdCumm.size())).c_str());
-		if(psdSizes.size()<=1) throw std::invalid_argument("SpherePack.makeCloud: psdSizes must have at least 2 items");
-		if((*psdCumm.begin())!=0. && (*psdCumm.rbegin())!=1.) throw std::invalid_argument("SpherePack.makeCloud: first and last items of psdCumm *must* be exactly 0 and 1.");
+		if(psdSizes.size()!=psdCumm.size()) throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("+boost::lexical_cast<string>(psdSizes.size())+"!="+boost::lexical_cast<string>(psdCumm.size())).c_str());
+		if(psdSizes.size()<=1) throw invalid_argument("SpherePack.makeCloud: psdSizes must have at least 2 items");
+		if((*psdCumm.begin())!=0. && (*psdCumm.rbegin())!=1.) throw invalid_argument("SpherePack.makeCloud: first and last items of psdCumm *must* be exactly 0 and 1.");
 		psdRadii.reserve(psdSizes.size());
 		for(size_t i=0; i<psdSizes.size(); i++) {
 			psdRadii.push_back(/* radius, not diameter */ .5*psdSizes[i]);
@@ -128,7 +131,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			}
 			LOG_DEBUG(i<<". "<<psdRadii[i]<<", cdf="<<psdCumm[i]<<", cdf2="<<(distributeMass?boost::lexical_cast<string>(psdCumm2[i]):string("--")));
 			// check monotonicity
-			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw std::invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
+			if(i>0 && (psdSizes[i-1]>psdSizes[i] || psdCumm[i-1]>psdCumm[i])) throw invalid_argument("SpherePack:makeCloud: psdSizes and psdCumm must be both non-decreasing.");
 		}
 		// check the consistency between sizes, num, and poro if all three are imposed. If target number will not fit in (1-poro)*volume, scale down particles sizes
 		if (num>1){
@@ -147,7 +150,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 		//Normalize psdCumm2 so it's between 0 and 1
 		if(distributeMass) for(size_t i=1; i<psdSizes.size(); i++) psdCumm2[i]/=psdCumm2[psdSizes.size()-1];
 	}
-	if(err || mode<0) throw std::invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
+	if(err || mode<0) throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
 	const int maxTry=1000;
 	if(periodic && volume && !hSizeFound)(cellSize=size);
@@ -186,7 +189,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 				for(size_t j=0; j<packSize; j++){
 					Vector3r dr=Vector3r::Zero();
 					if (!hSizeFound) {//The box is axis-aligned, use the wrap methods
-						for(int axis=0; axis<3; axis++) dr[axis]=size[axis]? std::min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis])) : 0;
+						for(int axis=0; axis<3; axis++) dr[axis]=size[axis]? min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis])) : 0;
 					} else {//not aligned, find closest neighbor in a cube of size 1, then transform distance to cartesian coordinates
 						Vector3r c1c2=invHsize*(pack[j].c-c);
 						for(int axis=0; axis<3; axis++){
@@ -257,17 +260,17 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 	Real minD=std::numeric_limits<Real>::infinity(); Real maxD=-minD;
 	// volume, but divided by π*4/3
 	Real vol=0; long N=pack.size();
-	FOREACH(const Sph& s, pack){ maxD=max(2*s.r,maxD); minD=std::min(2*s.r,minD); vol+=pow(s.r,3); }
+	FOREACH(const Sph& s, pack){ maxD=max(2*s.r,maxD); minD=min(2*s.r,minD); vol+=pow(s.r,3); }
 	if(minD==maxD){ minD-=.5; maxD+=.5; } // emulates what numpy.histogram does
 	// create bins and bin edges
 	vector<Real> hist(bins,0); vector<Real> cumm(bins+1,0); /* cummulative values compute from hist at the end */
 	vector<Real> edges(bins+1); for(int i=0; i<=bins; i++){ edges[i]=minD+i*(maxD-minD)/bins; }
 	// weight each grain by its "volume" relative to overall "volume"
 	FOREACH(const Sph& s, pack){
-		int bin=int(bins*(2*s.r-minD)/(maxD-minD)); bin=std::min(bin,bins-1); // to make sure
+		int bin=int(bins*(2*s.r-minD)/(maxD-minD)); bin=min(bin,bins-1); // to make sure
 		if (mass) hist[bin]+=pow(s.r,3)/vol; else hist[bin]+=1./N;
 	}
-	for(int i=0; i<bins; i++) cumm[i+1]=std::min((Real)1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
+	for(int i=0; i<bins; i++) cumm[i+1]=min((Real)1.,cumm[i]+hist[i]); // cumm[i+1] is OK, cumm.size()==bins+1
 	return py::make_tuple(edges,cumm);
 }
 
@@ -355,7 +358,7 @@ long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic,
 				} else {
 					for(size_t j=0; j<packSize; j++){
 						Vector3r dr;
-						for(int axis=0; axis<3; axis++) dr[axis]=std::min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
 						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 					}
 				}
@@ -408,7 +411,7 @@ long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool period
 				} else {
 					for(size_t j=0; j<packSize; j++){
 						Vector3r dr=Vector3r::Zero();
-						for(int axis=0; axis<2; axis++) dr[axis]=std::min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+						for(int axis=0; axis<2; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
 						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
 					}
 				}
@@ -508,7 +511,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 					for(size_t j=0; j<pack.size(); j++){
 						const Vector3r& c(C.pack[i].c); const Real& r(C.pack[i].r);
 						Vector3r dr;
-						for(int axis=0; axis<3; axis++) dr[axis]=std::min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
 						if(pow(pack[j].r+r,2)>= dr.squaredNorm()) goto overlap;
 					}
 				}

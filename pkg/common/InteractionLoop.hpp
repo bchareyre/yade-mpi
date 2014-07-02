@@ -20,7 +20,7 @@ class InteractionLoop: public GlobalEngine {
 		std::vector<std::list<idPair> > eraseAfterLoopIds;
 		void eraseAfterLoop(Body::id_t id1,Body::id_t id2){ eraseAfterLoopIds[omp_get_thread_num()].push_back(idPair(id1,id2)); }
 	#else
-    std::list<idPair> eraseAfterLoopIds;
+		list<idPair> eraseAfterLoopIds;
 		void eraseAfterLoop(Body::id_t id1,Body::id_t id2){ eraseAfterLoopIds.push_back(idPair(id1,id2)); }
 	#endif
 	public:

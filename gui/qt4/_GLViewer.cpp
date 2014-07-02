@@ -9,7 +9,7 @@
 
 namespace py=boost::python;
 
-qglviewer::Vec tuple2vec(py::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){py::extract<Real> e(t[i]); if(!e.check()) throw std::invalid_argument("Element #"+boost::lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
+qglviewer::Vec tuple2vec(py::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){py::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+boost::lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 py::tuple vec2tuple(qglviewer::Vec v){return py::make_tuple(v[0],v[1],v[2]);};
 
 class pyGLViewer{
@@ -44,7 +44,7 @@ class pyGLViewer{
 		void saveDisplayParameters(size_t n){GLV;  glv->saveDisplayParameters(n);}
 		void useDisplayParameters(size_t n){GLV;  glv->useDisplayParameters(n);}
 		string get_timeDisp(){GLV;  const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}
-		void set_timeDisp(string s){GLV;  int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw std::invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
+		void set_timeDisp(string s){GLV;  int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
 		void set_bgColor(const Vector3r& c){ QColor cc(255*c[0],255*c[1],255*c[2]); GLV;  glv->setBackgroundColor(cc);} Vector3r get_bgColor(){ GLV;  QColor c(glv->backgroundColor()); return Vector3r(c.red()/255.,c.green()/255.,c.blue()/255.);}
 		#undef GLV
 		#undef VEC_GET_SET

@@ -30,6 +30,8 @@ extern "C" {
 
 ///_____ Declaration ____
 
+using namespace std;
+
 namespace CGT {
 
 template<class _Tesselation, class FlowType=FlowBoundingSphere<_Tesselation> >

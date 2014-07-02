@@ -15,8 +15,6 @@
 	#include <CGAL/intersections.h>
 #endif
 
-using std::list;
-
 YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (TTetraSimpleGeom) (Bo1_Tetra_Aabb) 
 	/* some code in cpp (this file): */ (TetraVolumetricLaw) 
 	(Ig2_Tetra_Tetra_TTetraGeom)

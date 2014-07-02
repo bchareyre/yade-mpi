@@ -46,7 +46,7 @@ Because we need literal functor and class names for registration in python, we p
 	BOOST_PP_CAT(_YADE_DISPATCHER,BOOST_PP_CAT(Dim,D_FUNCTOR_ADD))(FunctorT,f) \
 	boost::python::list functors_get(void) const { boost::python::list ret; FOREACH(const shared_ptr<FunctorT>& f, functors){ ret.append(f); } return ret; } \
 	void functors_set(const vector<shared_ptr<FunctorT> >& ff){ functors.clear(); FOREACH(const shared_ptr<FunctorT>& f, ff) add(f); postLoad(*this); } \
-	void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d){ if(boost::python::len(t)==0)return; if(boost::python::len(t)!=1) throw std::invalid_argument("Exactly one list of " BOOST_PP_STRINGIZE(FunctorT) " must be given."); typedef std::vector<shared_ptr<FunctorT> > vecF; vecF vf=boost::python::extract<vecF>(t[0])(); functors_set(vf); t=boost::python::tuple(); } \
+	void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d){ if(boost::python::len(t)==0)return; if(boost::python::len(t)!=1) throw invalid_argument("Exactly one list of " BOOST_PP_STRINGIZE(FunctorT) " must be given."); typedef std::vector<shared_ptr<FunctorT> > vecF; vecF vf=boost::python::extract<vecF>(t[0])(); functors_set(vf); t=boost::python::tuple(); } \
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DispatcherT,Dispatcher,"Dispatcher calling :yref:`functors<" BOOST_PP_STRINGIZE(FunctorT) ">` based on received argument type(s).\n\n" doc, \
 		((vector<shared_ptr<FunctorT> >,functors,,,"Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs, \
 		/*ctor*/ ctor, /*py*/ py .add_property("functors",&DispatcherT::functors_get,&DispatcherT::functors_set,"Functors associated with this dispatcher." " :yattrtype:`vector<shared_ptr<" BOOST_PP_STRINGIZE(FunctorT) "> >` ") \
@@ -74,12 +74,12 @@ std::string Dispatcher_indexToClassName(int idx){
 			shared_ptr<topIndexable> inst=YADE_PTR_DYN_CAST<topIndexable>(ClassFactory::instance().createShared(clss.first));
 			assert(inst);
 			if(inst->getClassIndex()<0 && inst->getClassName()!=top->getClassName()){
-				throw std::logic_error("Class "+inst->getClassName()+" didn't use REGISTER_CLASS_INDEX("+inst->getClassName()+","+top->getClassName()+") and/or forgot to call createIndex() in the ctor. [[ Please fix that! ]]");
+				throw logic_error("Class "+inst->getClassName()+" didn't use REGISTER_CLASS_INDEX("+inst->getClassName()+","+top->getClassName()+") and/or forgot to call createIndex() in the ctor. [[ Please fix that! ]]");
 			}
 			if(inst->getClassIndex()==idx) return clss.first;
 		}
 	}
-	throw std::runtime_error("No class with index "+boost::lexical_cast<string>(idx)+" found (top-level indexable is "+topName+")");
+	throw runtime_error("No class with index "+boost::lexical_cast<string>(idx)+" found (top-level indexable is "+topName+")");
 }
 
 //! Return class index of given indexable
@@ -107,7 +107,7 @@ boost::python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, 
 template<typename DispatcherT>
 std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
 	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
-	FOREACH(const shared_ptr<Functor>& functor, self->functors){ shared_ptr<typename DispatcherT::functorType> functorRightType(YADE_PTR_DYN_CAST<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw std::logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
+	FOREACH(const shared_ptr<Functor>& functor, self->functors){ shared_ptr<typename DispatcherT::functorType> functorRightType(YADE_PTR_DYN_CAST<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
 	return ret;
 }
 

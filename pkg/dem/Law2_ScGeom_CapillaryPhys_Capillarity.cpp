@@ -27,6 +27,8 @@
 
 YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 
+using namespace std;
+
 void Law2_ScGeom_CapillaryPhys_Capillarity::postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&){
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw);
@@ -64,7 +66,7 @@ MeniscusParameters::~MeniscusParameters()
 
 void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 {
-	if (!scene) std::cerr << "scene not defined!";
+	if (!scene) cerr << "scene not defined!";
 	if (!capillary) postLoad(*this);//when the script does not define arguments, postLoad is never called
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	if (fusionDetection && !bodiesMenisciiList.initialized) bodiesMenisciiList.prepare(scene);
@@ -188,7 +190,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					//BINARY VERSION : if fusionNumber!=0 then no capillary force
 					short int& fusionNumber = hertzOn?mindlinContactPhysics->fusionNumber:cundallContactPhysics->fusionNumber;
 					if (binaryFusion) {
-						if (fusionNumber!=0) {	//std::cerr << "fusion" << std::endl;
+						if (fusionNumber!=0) {	//cerr << "fusion" << endl;
 							hertzOn?mindlinContactPhysics->fCap:cundallContactPhysics->fCap = Vector3r::Zero();
 							continue;
 						}
@@ -257,9 +259,9 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 						if (i == (*currentMeniscus)->getId1()) angle2=mindlinInteractionPhysics2->Delta1;//get angle of meniscus2 on body i
 						else angle2=mindlinInteractionPhysics2->Delta2;
 					}
-					if (angle1==0 || angle2==0) std::cerr << "THIS SHOULD NOT HAPPEN!!"<< std::endl;
+					if (angle1==0 || angle2==0) cerr << "THIS SHOULD NOT HAPPEN!!"<< endl;
 
-					//std::cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << std::endl;
+					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;
 
 					Vector3r normalFirstMeniscus = YADE_CAST<ScGeom*>((*firstMeniscus)->geom.get())->normal;
 					Vector3r normalCurrentMeniscus = YADE_CAST<ScGeom*>((*currentMeniscus)->geom.get())->normal;
@@ -283,7 +285,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 }
 
 MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, int* index)
-{	//std::cerr << "interpolate" << std::endl;
+{	//cerr << "interpolate" << endl;
         if (R1 > R2) {
                 Real R3 = R1;
                 R1 = R2;
@@ -291,7 +293,7 @@ MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, i
         }
 
         Real R = R2/R1;
-        //std::cerr << "R = " << R << std::endl;
+        //cerr << "R = " << R << endl;
 
         MeniscusParameters result_inf;
         MeniscusParameters result_sup;
@@ -301,7 +303,7 @@ MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, i
         for ( ; i < (NB_R_VALUES); i++)
         {
                 Real data_R = data_complete[i].R;
-                //std::cerr << "i = " << i << std::endl;
+                //cerr << "i = " << i << endl;
 
                 if (data_R > R)	// Attention a l'ordre ds lequel vont etre ranges les tableau R (croissant)
                 {
@@ -319,14 +321,14 @@ MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, i
                         result.delta2 = result_inf.delta2*(1-r) + r*result_sup.delta2;
 
                         i=NB_R_VALUES;
-                        //std::cerr << "i = " << i << std::endl;
+                        //cerr << "i = " << i << endl;
 
                 }
                 else if (data_complete[i].R == R)
                 {
                         result = data_complete[i].Interpolate2(D,P, index[0], index[1]);
                         i=NB_R_VALUES;
-                        //std::cerr << "i = " << i << std::endl;
+                        //cerr << "i = " << i << endl;
                 }
         }
         return result;
@@ -338,9 +340,9 @@ Tableau::Tableau()
 Tableau::Tableau(const char* filename)
 
 {
-        std::ifstream file (filename);
+        ifstream file (filename);
         file >> R;
-        //std::cerr << "r = " << R << std::endl;
+        //cerr << "r = " << R << endl;
         int n_D;	//number of D values
         file >> n_D;
 
@@ -349,7 +351,7 @@ Tableau::Tableau(const char* filename)
 		static bool first=true;
 		if(first)
 		{
-	                cout << "WARNING: cannot open files used for capillary law, all forces will be null. Instructions on how to download and install them is found here : https://yade-dem.org/wiki/CapillaryTriaxialTest." << std::endl;
+	                cout << "WARNING: cannot open files used for capillary law, all forces will be null. Instructions on how to download and install them is found here : https://yade-dem.org/wiki/CapillaryTriaxialTest." << endl;
 			first=false;
 		}
 		return;
@@ -365,7 +367,7 @@ Tableau::~Tableau()
 
 MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index2)
 
-{	//std::cerr << "interpolate2" << std::endl;
+{	//cerr << "interpolate2" << endl;
         MeniscusParameters result;
         MeniscusParameters result_inf;
         MeniscusParameters result_sup;
@@ -401,13 +403,13 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
 TableauD::TableauD()
 {}
 
-TableauD::TableauD(std::ifstream& file)
+TableauD::TableauD(ifstream& file)
 {
         int i=0;
         Real x;
         int n_lines;	//pb: n_lines is real!!!
         file >> n_lines;
-        //cout << n_lines << std::endl;
+        //cout << n_lines << endl;
 
         file.ignore(200, '\n'); // saute les caract�res (200 au maximum) jusque au caract�re \n (fin de ligne)*_
 
@@ -424,7 +426,7 @@ TableauD::TableauD(std::ifstream& file)
 }
 
 MeniscusParameters TableauD::Interpolate3(Real P, int& index)
-{	//std::cerr << "interpolate3" << std::endl;
+{	//cerr << "interpolate3" << endl;
         MeniscusParameters result;
         int dataSize = data.size();
 
@@ -456,10 +458,10 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
 	//compteur2+=1;
         for (int k=1; k < dataSize; ++k) 	// Length(data) ??
 
-        {	//std::cerr << "k = " << k << std::endl;
+        {	//cerr << "k = " << k << endl;
                 if ( data[k][1] > P) 	// OK si P rangés ds l'ordre croissant
 
-                {	//std::cerr << "if" << std::endl;
+                {	//cerr << "if" << endl;
                         Real Pinf=data[k-1][1];
                         Real Finf=data[k-1][3];
                         Real Vinf=data[k-1][2];
@@ -482,7 +484,7 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
                 }
                 else if (data[k][1] == P)
 
-                {	//std::cerr << "elseif" << std::endl;
+                {	//cerr << "elseif" << endl;
                         result.V = data[k][2];
                         result.F = data[k][3];
                         result.delta1 = data[k][4];
@@ -501,16 +503,16 @@ TableauD::~TableauD()
 
 std::ostream& operator<<(std::ostream& os, Tableau& T)
 {
-        os << "Tableau : R=" << T.R << std::endl;
+        os << "Tableau : R=" << T.R << endl;
         for (unsigned int i=0; i<T.full_data.size(); i++) {
-                os << "TableauD : D=" << T.full_data[i].D << std::endl;
+                os << "TableauD : D=" << T.full_data[i].D << endl;
                 for (unsigned int j=0; j<T.full_data[i].data.size();j++) {
                         for (unsigned int k=0; k<T.full_data[i].data[j].size(); k++)
                                 os << T.full_data[i].data[j][k] << " ";
-                        os << std::endl;
+                        os << endl;
                 }
         }
-        os << std::endl;
+        os << endl;
         return os;
 }
 
@@ -522,7 +524,7 @@ BodiesMenisciiList::BodiesMenisciiList(Scene * scene)
 
 bool BodiesMenisciiList::prepare(Scene * scene)
 {
-	//std::cerr << "preparing bodiesInteractionsList" << std::endl;
+	//cerr << "preparing bodiesInteractionsList" << endl;
 	interactionsOnBody.clear();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
@@ -593,18 +595,18 @@ void BodiesMenisciiList::display()
 		if ( !interactionsOnBody[i].empty() )
 		{
 			lastMeniscus = interactionsOnBody[i].end();
-			//std::cerr << "size = "<<interactionsOnBody[i].size() << " empty="<<interactionsOnBody[i].empty() <<std::endl;
+			//cerr << "size = "<<interactionsOnBody[i].size() << " empty="<<interactionsOnBody[i].empty() <<endl;
 			for ( firstMeniscus=interactionsOnBody[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )
 			{
 				if ( *firstMeniscus ){
 					if ( firstMeniscus->get() )
-						std::cerr << "(" << ( *firstMeniscus )->getId1() << ", " << ( *firstMeniscus )->getId2() <<") ";
-					else std::cerr << "(void)";
+						cerr << "(" << ( *firstMeniscus )->getId1() << ", " << ( *firstMeniscus )->getId2() <<") ";
+					else cerr << "(void)";
 				}
 			}
-			std::cerr << std::endl;
+			cerr << endl;
 		}
-		else std::cerr << "empty" << std::endl;
+		else cerr << "empty" << endl;
 	}
 }
 

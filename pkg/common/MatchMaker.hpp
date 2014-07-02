@@ -15,8 +15,8 @@ class MatchMaker: public Serializable {
 	#if 1
 		Real fbZero(Real v1, Real v2) const{ return 0.; }
 		Real fbAvg(Real v1, Real v2) const{ return (v1+v2)/2.; }
-		Real fbMin(Real v1, Real v2) const{ return std::min(v1,v2); }
-		Real fbMax(Real v1, Real v2) const{ return std::max(v1,v2); }
+		Real fbMin(Real v1, Real v2) const{ return min(v1,v2); }
+		Real fbMax(Real v1, Real v2) const{ return max(v1,v2); }
 		Real fbHarmAvg(Real v1, Real v2) const { return 2*v1*v2/(v1+v2); }
 		Real fbVal(Real v1, Real v2) const { return val; }
 		Real (MatchMaker::*fbPtr)(Real,Real) const;

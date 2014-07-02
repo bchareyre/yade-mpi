@@ -20,9 +20,6 @@
 #include <fstream>
 #include <string>
 
-using std::vector;
-using std::list;
-
 /**
 This law allows one to take into account capillary forces/effects between spheres coming from the presence of interparticular liquid bridges (menisci).
 refs:

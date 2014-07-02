@@ -18,6 +18,9 @@
 
 #include "ClassFactory.hpp"
 
+
+//using namespace std;
+
 CREATE_LOGGER(DynLibManager);
 
 

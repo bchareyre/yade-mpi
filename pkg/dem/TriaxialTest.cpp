@@ -56,6 +56,8 @@
 CREATE_LOGGER(TriaxialTest);
 YADE_PLUGIN((TriaxialTest));
 
+using namespace std;
+
 TriaxialTest::~TriaxialTest () {}
 
 bool TriaxialTest::generate(string& message)

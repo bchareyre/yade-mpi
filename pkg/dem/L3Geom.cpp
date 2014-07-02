@@ -246,7 +246,7 @@ bool Ig2_Wall_Sphere_L3Geom::go(const shared_ptr<Shape>& s1, const shared_ptr<Sh
 
 	// check that the normal did not change orientation (would be abrup here)
 	if(I->geom && I->geom->cast<L3Geom>().normal!=normal){
-    std::ostringstream oss; oss<<"Ig2_Wall_Sphere_L3Geom: normal changed from ("<<I->geom->cast<L3Geom>().normal<<" to "<<normal<<" in Wall+Sphere ##"<<I->getId1()<<"+"<<I->getId2()<<" (with Wall.sense=0, a particle might cross the Wall plane, if Δt is too high)"; throw std::logic_error(oss.str().c_str());
+		ostringstream oss; oss<<"Ig2_Wall_Sphere_L3Geom: normal changed from ("<<I->geom->cast<L3Geom>().normal<<" to "<<normal<<" in Wall+Sphere ##"<<I->getId1()<<"+"<<I->getId2()<<" (with Wall.sense=0, a particle might cross the Wall plane, if Δt is too high)"; throw std::logic_error(oss.str().c_str());
 	}
 	handleSpheresLikeContact(I,state1,state2,shift2,/*is6Dof*/false,normal,contPt,uN,/*r1*/0,/*r2*/radius);
 	return true;
@@ -274,8 +274,8 @@ bool Ig2_Facet_Sphere_L3Geom::go(const shared_ptr<Shape>& s1, const shared_ptr<S
 			case 3: contactPt=facet.vertices[1]; break; // ++- (v1)
 			case 5: contactPt=facet.vertices[0]; break; // +-+ (v0)
 			case 6: contactPt=facet.vertices[2]; break; // -++ (v2)
-      case 7: throw std::logic_error("Ig2_Facet_Sphere_L3Geom: Impossible sphere-facet intersection (all points are outside the edges). (please report bug)"); // +++ (impossible)
-      default: throw std::logic_error("Ig2_Facet_Sphere_L3Geom: Nonsense intersection value. (please report bug)");
+			case 7: throw logic_error("Ig2_Facet_Sphere_L3Geom: Impossible sphere-facet intersection (all points are outside the edges). (please report bug)"); // +++ (impossible)
+			default: throw logic_error("Ig2_Facet_Sphere_L3Geom: Nonsense intersection value. (please report bug)");
 		}
 		normal=cogLine-contactPt; // normal is now the contact normal, still in local coords
 		if(!I->isReal() && normal.squaredNorm()>radius*radius && !force) { return false; } // fast test before sqrt

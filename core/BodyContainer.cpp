@@ -54,7 +54,7 @@ Body::id_t BodyContainer::insert(shared_ptr<Body>& b, Body::id_t id){
 
 bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is false (as before)
 	if(!exists(id)) return false;
-	lowestFree=std::min(lowestFree,id);
+	lowestFree=min(lowestFree,id);
 	
 	const shared_ptr<Body>& b=Body::byId(id);
 	

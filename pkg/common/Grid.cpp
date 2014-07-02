@@ -6,8 +6,7 @@
 *************************************************************************/
 
 #include "Grid.hpp"
-using std::min;
-using std::max;
+
 //!##################	SHAPES   #####################
 
 GridNode::~GridNode(){}
@@ -113,8 +112,8 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 		}
 		else {//should never happen
 			k=0;m=0;
-			std::cout<<"Error in Ig2_GridConnection_GridConnection_GridCoGridCoGeom : det=="<<det<<endl;
-			std::cout<<"Details : N="<<N<<" b0="<<b0<<" b1="<<b1<<"  a="<<a<<" b="<<b<<endl;
+			cout<<"Error in Ig2_GridConnection_GridConnection_GridCoGridCoGeom : det=="<<det<<endl;
+			cout<<"Details : N="<<N<<" b0="<<b0<<" b1="<<b1<<"  a="<<a<<" b="<<b<<endl;
 		}
 	}
 	else{ //this is a special case for perfectly colinear vectors ("a" and "b")

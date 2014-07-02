@@ -16,10 +16,9 @@
 
 #include<numpy/ndarrayobject.h>
 
+using namespace std;
 namespace py = boost::python;
-using std::min;
-using std::max;
-using std::ofstream;
+
 
 //**********************************************************************************
 //print polyhedron in basic position
@@ -178,7 +177,7 @@ void SieveCurve(){
   	myfile.open ("sieve_curve.dat");
 	for(std::vector< std::pair<double,double> > :: iterator i = sieve_volume.begin(); i != sieve_volume.end(); ++i) {
 		cumul_vol += i->second/total_volume;
-		myfile << i->first << "\t" << cumul_vol << std::endl;
+		myfile << i->first << "\t" << cumul_vol << endl;
 	}
   	myfile.close();
 }
@@ -194,7 +193,7 @@ void SizeRatio(){
 		if(!b || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		if(p){
-			myfile << SizeOfPolyhedra(p) << std::endl; 
+			myfile << SizeOfPolyhedra(p) << endl; 
 		}
 	}
   	myfile.close();
@@ -314,7 +313,7 @@ vector<Vector3r> fillBox_cpp(Vector3r minCoord, Vector3r maxCoord, Vector3r size
 
 		}
 	}
-	std::cout << "generated " << count << " polyhedrons"<< std::endl;
+	cout << "generated " << count << " polyhedrons"<< endl;
 
 	//can't be used - no information about material
 	Scene* scene=Omega::instance().getScene().get();
@@ -486,7 +485,7 @@ vector<Vector3r> fillBoxByBalls_cpp(Vector3r minCoord, Vector3r maxCoord, Vector
 
 		}
 	}
-	std::cout << "generated " << count << " polyhedrons"<< std::endl;
+	cout << "generated " << count << " polyhedrons"<< endl;
 
 	//can't be used - no information about material
 	Scene* scene=Omega::instance().getScene().get();

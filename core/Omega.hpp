@@ -49,22 +49,17 @@ class Scene;
 class ThreadRunner;
 
 using namespace boost::posix_time;
-using std::string;
-using std::vector;
-using std::runtime_error;
-using std::endl;
-using std::cout;
-using std::cerr;
+using namespace std;
 
 struct DynlibDescriptor{
-	std::set<string> baseClasses;
+	set<string> baseClasses;
 	bool isIndexable, isFactorable, isSerializable;
 };
 
 class Omega: public Singleton<Omega>{
 	shared_ptr<ThreadRunner> simulationLoop;
 	SimulationFlow simulationFlow_;
-	std::map<string,DynlibDescriptor> dynlibs; // FIXME : should store that in ClassFactory ?
+	map<string,DynlibDescriptor> dynlibs; // FIXME : should store that in ClassFactory ?
 	void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 	
 	vector<shared_ptr<Scene> > scenes;
@@ -73,7 +68,7 @@ class Omega: public Singleton<Omega>{
 
 	ptime startupLocalTime;
 
-	std::map<string,string> memSavedSimulations;
+	map<string,string> memSavedSimulations;
 
 	// to avoid accessing simulation when it is being loaded (should avoid crashes with the UI)
 	boost::mutex loadingSimulationMutex;
@@ -88,7 +83,7 @@ class Omega: public Singleton<Omega>{
 		void timeInit();
 		void initTemps();
 		void cleanupTemps();
-		const std::map<string,DynlibDescriptor>& getDynlibsDescriptor();
+		const map<string,DynlibDescriptor>& getDynlibsDescriptor();
 		void loadPlugins(vector<string> pluginFiles);
 		bool isInheritingFrom(const string& className, const string& baseClassName );
 		bool isInheritingFrom_recursive(const string& className, const string& baseClassName );

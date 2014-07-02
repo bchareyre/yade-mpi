@@ -288,7 +288,7 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 
 void Shop::saveSpheresToFile(string fname){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
-  std::ofstream f(fname.c_str());
+	ofstream f(fname.c_str());
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
@@ -409,7 +409,7 @@ vector<boost::tuple<Vector3r,Real,int> > Shop::loadSpheresFromFile(const string&
 		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");
 	}
 	vector<boost::tuple<Vector3r,Real,int> > spheres;
-  std::ifstream sphereFile(fname.c_str());
+	ifstream sphereFile(fname.c_str());
 	if(!sphereFile.good()) throw std::runtime_error("File with spheres `"+fname+"' couldn't be opened.");
 	Vector3r C;
 	Real r=0;
