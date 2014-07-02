@@ -9,7 +9,7 @@
 /// The info types that will be used and the namespace in which the types will be defined (a unique namespace with different info types would give name conflicts)
 
 #include "TriaxialState.h"
-#include <math.h>
+#include <cmath>
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
