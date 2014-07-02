@@ -71,8 +71,8 @@ void Omega::switchToScene(int i) {
 
 
 
-Real Omega::getRealTime(){ return (microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
-time_duration Omega::getRealTime_duration(){return microsec_clock::local_time()-startupLocalTime;}
+Real Omega::getRealTime(){ return (boost::posix_time::microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
+boost::posix_time::time_duration Omega::getRealTime_duration(){return boost::posix_time::microsec_clock::local_time()-startupLocalTime;}
 
 
 void Omega::initTemps(){
@@ -107,7 +107,7 @@ void Omega::init(){
 }
 
 void Omega::timeInit(){
-	startupLocalTime=microsec_clock::local_time();
+	startupLocalTime=boost::posix_time::microsec_clock::local_time();
 }
 
 void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}

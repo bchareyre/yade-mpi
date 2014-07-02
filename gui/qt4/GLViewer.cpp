@@ -425,7 +425,7 @@ void GLViewer::endSelection(const QPoint &point){
 
 string GLViewer::getRealTimeString(){
 	ostringstream oss;
-	time_duration t=Omega::instance().getRealTime_duration();
+  boost::posix_time::time_duration t=Omega::instance().getRealTime_duration();
 	unsigned d=t.hours()/24,h=t.hours()%24,m=t.minutes(),s=t.seconds();
 	oss<<"clock ";
 	if(d>0) oss<<d<<"days "<<_W2<<h<<":"<<_W2<<m<<":"<<_W2<<s;
