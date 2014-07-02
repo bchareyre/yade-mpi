@@ -8,7 +8,6 @@
 #include<iostream>
 
 namespace py=boost::python;
-using namespace std;
 
 /*
 This file contains various predicates that say whether a given point is within the solid,
@@ -306,7 +305,7 @@ extern "C" {
 
 }
 /* Helper function for inGtsSurface::aabb() */
-static void vertex_aabb(GtsVertex *vertex, pair<Vector3r,Vector3r> *bb)
+static void vertex_aabb(GtsVertex *vertex, std::pair<Vector3r,Vector3r> *bb)
 {
 	GtsPoint *_p=GTS_POINT(vertex);
 	Vector3r p(_p->x,_p->y,_p->z);
@@ -326,16 +325,16 @@ class inGtsSurface: public Predicate{
 	GNode* tree;
 public:
 	inGtsSurface(py::object _surf, bool _noPad=false): pySurf(_surf), noPad(_noPad), noPadWarned(false) {
-		if(!pygts_surface_check(_surf.ptr())) throw invalid_argument("Ctor must receive a gts.Surface() instance."); 
+		if(!pygts_surface_check(_surf.ptr())) throw std::invalid_argument("Ctor must receive a gts.Surface() instance."); 
 		surf=PYGTS_SURFACE_AS_GTS_SURFACE(PYGTS_SURFACE(_surf.ptr()));
-	 	if(!gts_surface_is_closed(surf)) throw invalid_argument("Surface is not closed.");
+	 	if(!gts_surface_is_closed(surf)) throw std::invalid_argument("Surface is not closed.");
 		is_open=gts_surface_volume(surf)<0.;
-		if((tree=gts_bb_tree_surface(surf))==NULL) throw runtime_error("Could not create GTree.");
+		if((tree=gts_bb_tree_surface(surf))==NULL) throw std::runtime_error("Could not create GTree.");
 	}
 	~inGtsSurface(){g_node_destroy(tree);}
 	py::tuple aabb() const {
 		Real inf=std::numeric_limits<Real>::infinity();
-		pair<Vector3r,Vector3r> bb; bb.first=Vector3r(inf,inf,inf); bb.second=Vector3r(-inf,-inf,-inf);
+		std::pair<Vector3r,Vector3r> bb; bb.first=Vector3r(inf,inf,inf); bb.second=Vector3r(-inf,-inf,-inf);
 		gts_surface_foreach_vertex(surf,(GtsFunc)vertex_aabb,&bb);
 		return vvec2tuple(bb.first,bb.second);
 	}

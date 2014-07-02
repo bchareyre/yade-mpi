@@ -6,6 +6,11 @@ enum DataPosition {POINT_DATA,CELL_DATA};
 enum DataName     {SCALARS,VECTORS,TENSORS};
 enum DataType     {INT,FLOAT};
 
+using std::ios_base;
+using std::endl;
+using std::cout;
+using std::cerr;
+
 // Really simplistic struct for vtk file creation
 struct basicVTKwritter
 {

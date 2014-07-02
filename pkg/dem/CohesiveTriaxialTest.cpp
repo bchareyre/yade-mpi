@@ -49,9 +49,6 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-using namespace std;
-
-
 typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
 string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);

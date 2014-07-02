@@ -41,8 +41,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
 
-using namespace std;
-
 YADE_PLUGIN((SimpleShear))
 CREATE_LOGGER(SimpleShear);
 

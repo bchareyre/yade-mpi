@@ -21,7 +21,9 @@
  */
 
 namespace CGT {
-using namespace std;
+
+using std::string;
+using std::min;
 
 class TriaxialState
 {

@@ -1,8 +1,6 @@
-
 #include "Tenseur3.h"
 #include "RegularTriangulation.h" 
 
-using namespace std;
 namespace CGT {
 
 Real Tens::Norme2(void)

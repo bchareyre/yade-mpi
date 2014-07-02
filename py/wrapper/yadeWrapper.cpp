@@ -54,22 +54,18 @@
 	#include<boost/math/nonfinite_num_facets.hpp>
 #endif
 
+#include <locale>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/archive/codecvt_null.hpp>
+#include <boost/python/object.hpp>
+#include <boost/version.hpp>
 
-#include<yade/core/Timing.hpp>
+#include <yade/core/Timing.hpp>
+#include <yade/lib/serialization/ObjectIO.hpp>
 
-#include<locale>
-#include<boost/archive/codecvt_null.hpp>
-
-using namespace std;
 namespace py = boost::python;
-
-#include<yade/lib/serialization/ObjectIO.hpp>
-
-#include<boost/python/object.hpp>
-#include<boost/version.hpp>
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.

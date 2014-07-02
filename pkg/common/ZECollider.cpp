@@ -14,8 +14,6 @@
 #include<vector>
 #include<boost/static_assert.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((ZECollider))
 CREATE_LOGGER(ZECollider);
 

@@ -11,8 +11,6 @@
 #include <yade/core/InteractionContainer.hpp>
 #include <vector>
 
-using namespace std;
-
 class SpatialQuickSortCollider : public Collider {
     protected:
 

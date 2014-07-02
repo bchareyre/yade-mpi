@@ -16,9 +16,6 @@
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 
-
-using namespace std;
-		
 // PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 // {
 // 	haveDistantTransient=false;

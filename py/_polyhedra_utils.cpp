@@ -16,7 +16,6 @@
 
 #include<numpy/ndarrayobject.h>
 
-using namespace std;
 namespace py = boost::python;
 
 

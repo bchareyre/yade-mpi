@@ -17,7 +17,6 @@
 
 #include<numpy/ndarrayobject.h>
 
-using namespace std;
 namespace py = boost::python;
 
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}

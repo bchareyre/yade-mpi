@@ -17,8 +17,6 @@
 
 CREATE_LOGGER(SpherePack);
 
-using namespace std;
-
 namespace py=boost::python;
 
 

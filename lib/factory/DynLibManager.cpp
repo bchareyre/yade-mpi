@@ -9,7 +9,6 @@
 
 #include "DynLibManager.hpp"
 
-
 #include<fstream>
 #include<stdexcept>
 #include<boost/filesystem/operations.hpp>
@@ -17,9 +16,6 @@
 #include<string.h>
 
 #include "ClassFactory.hpp"
-
-
-//using namespace std;
 
 CREATE_LOGGER(DynLibManager);
 

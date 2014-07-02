@@ -3,10 +3,9 @@
 #pragma once
 
 #include<vector>
-#include<string>	
+#include<string>
 #include<limits>
 #include<iostream>
-using namespace std; // sorry
 
 #include<boost/python.hpp>
 #include<boost/python/object.hpp>
@@ -27,6 +26,11 @@ using namespace std; // sorry
 
 #include<yade/lib/base/Logging.hpp>
 #include<yade/lib/base/Math.hpp>
+
+using std::vector;
+using std::string;
+using std::min;
+using std::runtime_error;
 
 /*! Class representing geometry of spherical packing, with some utility functions. */
 class SpherePack{

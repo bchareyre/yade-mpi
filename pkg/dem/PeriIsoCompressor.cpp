@@ -8,8 +8,6 @@
 #include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/lib/pyutil/gil.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(Peri3dController))
 
 CREATE_LOGGER(PeriIsoCompressor);

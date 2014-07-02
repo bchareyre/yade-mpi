@@ -31,8 +31,6 @@
 
 // #define USE_FAST_MATH 1
 
-
-using namespace std;
 namespace CGT
 {
 

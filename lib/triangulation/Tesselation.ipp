@@ -6,12 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-using namespace std;
-
 //FIXME: handle that a better way
 #define MAX_ID 200000
 
 namespace CGT {
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::max;
+using std::vector;
+using std::ifstream;
 
 template<class TT>
 _Tesselation<TT>::_Tesselation ( void )

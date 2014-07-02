@@ -16,8 +16,6 @@
   #include<omp.h>
 #endif
 
-using namespace std;
-
 YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
 

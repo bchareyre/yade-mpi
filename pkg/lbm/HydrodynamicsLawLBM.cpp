@@ -33,7 +33,6 @@
 
 
 namespace bfs=boost::filesystem;
-using namespace std;
 
 template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(Scalar s, const VECTOR3_TEMPLATE(Scalar)& v) {return v*s;}
 inline Vector3i vect3rToVect3i(Vector3r vect){Vector3i newvect((int)vect[0],(int)vect[1],(int)vect[2]);return(newvect);}

@@ -16,8 +16,6 @@
 #include<yade/lib/base/Math.hpp>
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((SampleCapillaryPressureEngine));
 CREATE_LOGGER(SampleCapillaryPressureEngine);
 
