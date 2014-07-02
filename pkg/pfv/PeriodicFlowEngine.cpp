@@ -434,7 +434,7 @@ void PeriodicFlowEngine::updateVolumes (FlowSolver& flow)
                 totVol+=newVol;
                 dVol=cell->info().volumeSign * ( newVol - cell->info().volume() );
                 totDVol+=dVol;
-                epsVolMax = max ( epsVolMax, abs ( dVol/newVol ) );
+                epsVolMax = max ( epsVolMax, std::abs ( dVol/newVol ) );
                 cell->info().dv() = dVol * invDeltaT;
                 cell->info().volume() = newVol;
         }

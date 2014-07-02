@@ -15,11 +15,18 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <set>
+#include <list>
 
 #include<yade/lib/base/Logging.hpp>
 
-using namespace std;
-
+using std::type_info;
+using std::string;
+using std::vector;
+using std::list;
+using std::set;
+using std::map;
+using std::istringstream;
 
 class DynLibManager 
 {
@@ -34,18 +41,18 @@ class DynLibManager
 
 		bool load(const std::string& libName);
 
-		bool unload (const string& libName);
-		bool isLoaded (const string& libName);
+		bool unload (const std::string& libName);
+		bool isLoaded (const std::string& libName);
 		bool unloadAll ();
 		void setAutoUnload ( bool enabled );
 
-		string lastError();
+    std::string lastError();
 		DECLARE_LOGGER;
 
 	private :
-		bool closeLib(const string libName);
+		bool closeLib(const std::string libName);
 		bool error();
-		string lastError_;
+    std::string lastError_;
 };
 
 

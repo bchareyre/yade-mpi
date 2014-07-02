@@ -36,7 +36,28 @@
 
 #include<yade/lib/base/Math.hpp>
 
-using namespace std;
+using std::endl;
+using std::cout;
+using std::cerr;
+using std::vector;
+using std::string;
+using std::list;
+using std::min;
+using std::max;
+using std::ifstream;
+using std::ofstream;
+using std::pair;
+using std::runtime_error;
+using std::logic_error;
+using std::invalid_argument;
+using std::ios;
+using std::ios_base;
+using std::fstream;
+using std::ostream;
+using std::ostringstream;
+using std::swap;
+using std::make_pair;
+
 // empty functions for ADL
 //namespace{
 	template<typename T>	void preLoad(T&){}; template<typename T> void postLoad(T& obj){ /* cerr<<"Generic no-op postLoad("<<typeid(T).name()<<"&) called for "<<obj.getClassName()<<std::endl; */ }
