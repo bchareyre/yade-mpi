@@ -196,10 +196,10 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		ks1 = ks2 = 2.0/7.0 /Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(Et),2) )*massR;
 		cs1 = cs2 = -2.0/7.0 /Tc * log(Et)*massR;
 	
-		if (abs(cn1) <= Mathr::ZERO_TOLERANCE ) cn1=0;
-		if (abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
-		if (abs(cs1) <= Mathr::ZERO_TOLERANCE ) cs1=0;
-		if (abs(cs2) <= Mathr::ZERO_TOLERANCE ) cs2=0;
+		if (std::abs(cn1) <= Mathr::ZERO_TOLERANCE ) cn1=0;
+		if (std::abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
+		if (std::abs(cs1) <= Mathr::ZERO_TOLERANCE ) cs1=0;
+		if (std::abs(cs2) <= Mathr::ZERO_TOLERANCE ) cs2=0;
 	} else if ((isfinite(mat1->kn)) and (isfinite(mat1->ks)) and (isfinite(mat1->cn)) and (isfinite(mat1->cs))) {
 		//Set parameters explicitly
 		kn1 = mat1->kn;

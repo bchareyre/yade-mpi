@@ -84,7 +84,7 @@ void TriaxialCompressionEngine::updateParameters ()
 
 	if (  (currentState!=STATE_TRIAX_LOADING && currentState==STATE_ISO_COMPACTION) || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION || autoCompressionActivation)
 	{
-		if (UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && fixedPoroCompaction==false )
+		if (UnbalancedForce<=StabilityCriterion && std::abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && fixedPoroCompaction==false )
 		{
 			// only go to UNLOADING if it is needed
 			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
@@ -123,7 +123,7 @@ void TriaxialCompressionEngine::action()
 	{
 		updateParameters ();
 		maxStress = max(maxStress,stress[wall_top][1]);
-		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
+		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< std::abs ( ( meanStress-sigma_iso ) /sigma_iso ));
 	}
 	if ( saveSimulation )
 	{
@@ -163,7 +163,7 @@ void TriaxialCompressionEngine::action()
 		if (scene->iter % 100 == 0) LOG_DEBUG("Compression active.");
 		const Real& dt = scene->dt;
 
-		if (abs(epsilonMax) > abs(strain[1])) {
+		if (std::abs(epsilonMax) > std::abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003;
 			/* Move top and bottom wall according to strain rate */
 			State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();

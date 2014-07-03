@@ -316,7 +316,7 @@ void Integrator::ensureSync()
 void Integrator::saveMaximaDisplacement(const shared_ptr<Body>& b){
 	if (!b->bound) return;//clumps for instance, have no bounds, hence not saved
 	Vector3r disp=b->state->pos-b->bound->refPos;
-	Real maxDisp=max(abs(disp[0]),max(abs(disp[1]),abs(disp[2])));
+	Real maxDisp=max(std::abs(disp[0]),max(std::abs(disp[1]),std::abs(disp[2])));
 	if (!maxDisp || maxDisp<b->bound->sweepLength) {/*b->bound->isBounding = (updatingDispFactor>0 && (updatingDispFactor*maxDisp)<b->bound->sweepLength);*/
 	maxDisp=0.5;//not 0, else it will be seen as "not updated" by the collider, but less than 1 means no colliding
 	}

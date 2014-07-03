@@ -89,7 +89,7 @@ void UniaxialStrainer::action(){
 	//nothing to do
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
-	if(abs(currentStrainRate)<abs(strainRate)){
+	if(std::abs(currentStrainRate)<std::abs(strainRate)){
 		if(initAccelTime_s!=0) currentStrainRate=(scene->time/initAccelTime_s)*strainRate;
 		else currentStrainRate=strainRate;
 	} else currentStrainRate=strainRate;
@@ -98,7 +98,7 @@ void UniaxialStrainer::action(){
 	if(!isnan(stopStrain)){
 		Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 		Real newStrain=(axialLength+dAX)/originalLength-1;
-		if((newStrain*stopStrain>0) && abs(newStrain)>=stopStrain){ // same sign of newStrain and stopStrain && over the limit from below in abs values
+		if((newStrain*stopStrain>0) && std::abs(newStrain)>=stopStrain){ // same sign of newStrain and stopStrain && over the limit from below in abs values
 			dAX=originalLength*(stopStrain+1)-axialLength;
 			LOG_INFO("Reached stopStrain "<<stopStrain<<", deactivating self and stopping in "<<idleIterations+1<<" iterations.");
 			this->active=false;

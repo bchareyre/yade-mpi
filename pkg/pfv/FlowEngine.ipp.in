@@ -391,7 +391,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			case ( 3 ) : cell->info().volume() = volumeCellTripleFictious ( cell ); break;
 			default: break; 
 		}
-		if (flow.fluidBulkModulus>0) { cell->info().invVoidVolume() = 1 / ( abs(cell->info().volume()) - flow.volumeSolidPore(cell) ); }
+		if (flow.fluidBulkModulus>0) { cell->info().invVoidVolume() = 1 / ( std::abs(cell->info().volume()) - flow.volumeSolidPore(cell) ); }
 	}
 	if (debug) cout << "Volumes initialised." << endl;
 }
@@ -486,7 +486,7 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                 }
         }
         Real Volume = 0.5* ( ( V[0]-V[1] ).cross ( V[0]-V[2] ) ) [solver->boundary ( b ).coordinate] * ( 0.33333333333* ( V[0][solver->boundary ( b ).coordinate]+ V[1][solver->boundary ( b ).coordinate]+ V[2][solver->boundary ( b ).coordinate] ) - Wall_coordinate );
-        return abs ( Volume );
+        return std::abs ( Volume );
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 template<class Cellhandle>
@@ -521,7 +521,7 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         Real Vol1=0.5* ( ( A-BS ).cross ( B-BS ) ) [coord[1]]* ( 0.333333333* ( 2*B[coord[1]]+A[coord[1]] )-Wall_coordinate[1] );
         //second pyramid with triangular base (A,AS,BS)
         Real Vol2=0.5* ( ( AS-BS ).cross ( A-BS ) ) [coord[1]]* ( 0.333333333* ( B[coord[1]]+2*A[coord[1]] )-Wall_coordinate[1] );
-        return abs ( Vol1+Vol2 );
+        return std::abs ( Vol1+Vol2 );
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 template<class Cellhandle>
@@ -549,7 +549,7 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                 }
         }
         Real Volume = ( A[coord[0]]-Wall_coordinate[0] ) * ( A[coord[1]]-Wall_coordinate[1] ) * ( A[coord[2]]-Wall_coordinate[2] );
-        return abs ( Volume );
+        return std::abs ( Volume );
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 template<class Cellhandle>
@@ -620,7 +620,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 					bool v1fictious = Tes.vertex ( id1 )->info().isFictious;
 					int bnd = v1fictious? id1 : id2;
 					int coord = flow.boundary(bnd).coordinate;
-					O1O2 = v1fictious ? abs((sph2->state->pos + makeVector3r(Tes.vertex(id2)->info().ghostShift()))[coord] - flow.boundary(bnd).p[coord]) : abs((sph1->state->pos + makeVector3r(Tes.vertex(id1)->info().ghostShift()))[coord] - flow.boundary(bnd).p[coord]);
+					O1O2 = v1fictious ? std::abs((sph2->state->pos + makeVector3r(Tes.vertex(id2)->info().ghostShift()))[coord] - flow.boundary(bnd).p[coord]) : std::abs((sph1->state->pos + makeVector3r(Tes.vertex(id1)->info().ghostShift()))[coord] - flow.boundary(bnd).p[coord]);
 					if(v1fictious)
 						normal = makeVector3r(flow.boundary(id1).normal);
 					else
@@ -725,8 +725,8 @@ Vector3r TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselat
 //                 if ( !cell->info().isReal() ) continue;
                 if ( cell->info().isGhost ) continue;
                 for ( int i=0;i<3;i++ )
-                        meanVel[i]=meanVel[i]+ ( ( cell->info().averageVelocity() ) [i] * abs ( cell->info().volume() ) );
-                volume+=abs ( cell->info().volume() );
+                        meanVel[i]=meanVel[i]+ ( ( cell->info().averageVelocity() ) [i] * std::abs ( cell->info().volume() ) );
+                volume+=std::abs ( cell->info().volume() );
         }
         return ( meanVel/volume );
 }

@@ -146,7 +146,7 @@ Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*>(I->phys.get());
-		force+=Vector3r(abs(nsi->normalForce[0]+nsi->shearForce[0]),abs(nsi->normalForce[1]+nsi->shearForce[1]),abs(nsi->normalForce[2]+nsi->shearForce[2]));
+		force+=Vector3r(std::abs(nsi->normalForce[0]+nsi->shearForce[0]),std::abs(nsi->normalForce[1]+nsi->shearForce[1]),std::abs(nsi->normalForce[2]+nsi->shearForce[2]));
 		stiff+=(1/3.)*nsi->kn+(2/3.)*nsi->ks; // count kn in one direction and ks in the other two
 		n++;
 	}

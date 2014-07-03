@@ -113,7 +113,7 @@ void Polyhedra::Initialize(){
 		inertia_tensor = inertia_tensor + Itet1 + Itet2*vtet; 
 	}	
 
-	if(abs(inertia_tensor(0,1))+abs(inertia_tensor(0,2))+abs(inertia_tensor(1,2)) < 1E-13){
+	if(std::abs(inertia_tensor(0,1))+std::abs(inertia_tensor(0,2))+std::abs(inertia_tensor(1,2)) < 1E-13){
 		// no need to rotate, inertia already diagonal
 		orientation = Quaternionr::Identity();
 		inertia = Vector3r(inertia_tensor(0,0),inertia_tensor(1,1),inertia_tensor(2,2));
@@ -127,14 +127,14 @@ void Polyhedra::Initialize(){
 		// set positove direction of vectors - otherwise reloading does not work
 		Matrix3r sign(Matrix3r::Zero()); 
 		double max_v_signed = I_rot(0,0);
-		double max_v = abs(I_rot(0,0));
-		if (max_v < abs(I_rot(1,0))) {max_v_signed = I_rot(1,0); max_v = abs(I_rot(1,0));} 
-		if (max_v < abs(I_rot(2,0))) {max_v_signed = I_rot(2,0); max_v = abs(I_rot(2,0));} 
+		double max_v = std::abs(I_rot(0,0));
+		if (max_v < std::abs(I_rot(1,0))) {max_v_signed = I_rot(1,0); max_v = std::abs(I_rot(1,0));} 
+		if (max_v < std::abs(I_rot(2,0))) {max_v_signed = I_rot(2,0); max_v = std::abs(I_rot(2,0));} 
 		sign(0,0) = max_v_signed/max_v;
 		max_v_signed = I_rot(0,1);
-		max_v = abs(I_rot(0,1));
-		if (max_v < abs(I_rot(1,1))) {max_v_signed = I_rot(1,1); max_v = abs(I_rot(1,1));} 
-		if (max_v < abs(I_rot(2,1))) {max_v_signed = I_rot(2,1); max_v = abs(I_rot(2,1));} 
+		max_v = std::abs(I_rot(0,1));
+		if (max_v < std::abs(I_rot(1,1))) {max_v_signed = I_rot(1,1); max_v = std::abs(I_rot(1,1));} 
+		if (max_v < std::abs(I_rot(2,1))) {max_v_signed = I_rot(2,1); max_v = std::abs(I_rot(2,1));} 
 		sign(1,1) = max_v_signed/max_v;
 		sign(2,2) = 1.;
 		I_rot = I_rot*sign;
@@ -307,7 +307,7 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 		Real fnNorm=np->normalForce.dot(geom->normal);
 		if((signFilter>0 && fnNorm<0) || (signFilter<0 && fnNorm>0)) return;
 		int fnSign=fnNorm>0?1:-1;
-		fnNorm=abs(fnNorm);
+		fnNorm=std::abs(fnNorm);
 		Real radiusScale=1.;
 		maxFn=max(fnNorm,maxFn);
 		Real realMaxRadius;

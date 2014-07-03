@@ -199,9 +199,9 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 	deltaH = (1-wallDamping)*deltaH;
 	if(LOG)	cout << "deltaH apres amortissement :" << deltaH << endl;
 
-	if(abs(deltaH) > max_vel*scene->dt)
+	if(std::abs(deltaH) > max_vel*scene->dt)
 	{
-		deltaH=deltaH/abs(deltaH)*max_vel*scene->dt;
+		deltaH=deltaH/std::abs(deltaH)*max_vel*scene->dt;
 		if(LOG) cout << "Correction appliquee pour ne pas depasser vmax(comp)" << endl;
 	}
 

@@ -79,7 +79,7 @@ Matrix3r TetraInertiaTensor(Vector3r av,Vector3r bv,Vector3r cv,Vector3r dv){
 	// Jacobian of transformation to the reference 4hedron
 	double detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
 		-(x2-x1)*(y4-y1)*(z3-z1)-(x3-x1)*(y2-y1)*(z4-z1)-(x4-x1)*(y3-y1)*(z2-z1);
-	detJ=fabs(detJ);
+	detJ=std::abs(detJ);
 	double a=detJ*(y1*y1+y1*y2+y2*y2+y1*y3+y2*y3+
 		y3*y3+y1*y4+y2*y4+y3*y4+y4*y4+z1*z1+z1*z2+
 		z2*z2+z1*z3+z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
@@ -470,7 +470,7 @@ double CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal){
 		if(norm2 < 1E-20) continue;
 		abs_size = 0.5*sqrt((cross_product(CGALvector(hfc0->vertex()->point(),hfc0->next()->vertex()->point()),CGALvector(hfc0->vertex()->point(),hfc0->next()->next()->vertex()->point()))).squared_length());
 		// factor 0.5 because this procedure returnes doubles projected area
- 		if (abs_size>0) area += 0.5*abs_size*abs(CGALnormal*normal2/sqrt(norm2));
+ 		if (abs_size>0) area += 0.5*abs_size*std::abs(CGALnormal*normal2/sqrt(norm2));
 	}
 	return area;
 }
@@ -625,8 +625,8 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 			for (Polyhedron::Facet_iterator fIter = B.facets_begin(); fIter != B.facets_end() && !intersection_found; fIter++){
 				dist_S = Oriented_squared_distance(fIter->plane(), eIter->vertex()->point());
 				dist_T = Oriented_squared_distance(fIter->plane(), eIter->opposite()->vertex()->point());
-				if (dist_S*dist_T >= 0 || abs(dist_S)<lim2 || abs(dist_T)<lim2) continue;
-				inside = eIter->vertex()->point() + (eIter->opposite()->vertex()->point()-eIter->vertex()->point())*sqrt(abs(dist_S))/(sqrt(abs(dist_S))+sqrt(abs(dist_T)));
+				if (dist_S*dist_T >= 0 || std::abs(dist_S)<lim2 || std::abs(dist_T)<lim2) continue;
+				inside = eIter->vertex()->point() + (eIter->opposite()->vertex()->point()-eIter->vertex()->point())*sqrt(std::abs(dist_S))/(sqrt(std::abs(dist_S))+sqrt(std::abs(dist_T)));
 				// the fact that edge intersects the facet (not only its plane) is not explicitely checked, it sufices to check that the resulting point is inside both polyhedras
 				Plane p1 = fIter->plane();
 				Plane p2 = eIter->facet()->plane();

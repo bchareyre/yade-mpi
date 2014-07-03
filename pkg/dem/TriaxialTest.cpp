@@ -108,9 +108,9 @@ bool TriaxialTest::generate(string& message)
 	 	Vector3r center		= Vector3r((lowerCorner[0]+upperCorner[0])/2,
 	 					lowerCorner[1]-thickness/2.0,
 	 					(lowerCorner[2]+upperCorner[2])/2);
-	 	Vector3r halfSize	= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 	Vector3r halfSize	= Vector3r(wallOversizeFactor*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
 						thickness/2.0,
-	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 					wallOversizeFactor*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,true);
 	 	scene->bodies->insert(body);
 		triaxialcompressionEngine->wall_bottom_id = body->getId();
@@ -118,9 +118,9 @@ bool TriaxialTest::generate(string& message)
 	 	center			= Vector3r((lowerCorner[0]+upperCorner[0])/2,
 	 					upperCorner[1]+thickness/2.0,
 	 					(lowerCorner[2]+upperCorner[2])/2);
-	 	halfSize		= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 	halfSize		= Vector3r(wallOversizeFactor*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
 	 					thickness/2.0,
-	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 					wallOversizeFactor*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,true);
 	 	scene->bodies->insert(body);
 		triaxialcompressionEngine->wall_top_id = body->getId();
@@ -129,8 +129,8 @@ bool TriaxialTest::generate(string& message)
 	 					(lowerCorner[1]+upperCorner[1])/2,
 	 					(lowerCorner[2]+upperCorner[2])/2);
 		halfSize		= Vector3r(thickness/2.0,
-	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 					wallOversizeFactor*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 					wallOversizeFactor*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,true);
 	 	scene->bodies->insert(body);
 		triaxialcompressionEngine->wall_left_id = body->getId();
@@ -139,8 +139,8 @@ bool TriaxialTest::generate(string& message)
 	 					(lowerCorner[1]+upperCorner[1])/2,
 						(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(thickness/2.0,
-	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 					wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 					wallOversizeFactor*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 					wallOversizeFactor*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 
 		createBox(body,center,halfSize,true);
 	 	scene->bodies->insert(body);
@@ -149,8 +149,8 @@ bool TriaxialTest::generate(string& message)
 	 	center			= Vector3r((lowerCorner[0]+upperCorner[0])/2,
 	 					(lowerCorner[1]+upperCorner[1])/2,
 	 					lowerCorner[2]-thickness/2.0);
-	 	halfSize		= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 	halfSize		= Vector3r(wallOversizeFactor*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 					wallOversizeFactor*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 					thickness/2.0);
 		createBox(body,center,halfSize,true);
 	 	scene->bodies->insert(body);
@@ -159,8 +159,8 @@ bool TriaxialTest::generate(string& message)
 	 	center			= Vector3r((lowerCorner[0]+upperCorner[0])/2,
 	 					(lowerCorner[1]+upperCorner[1])/2,
 	 					upperCorner[2]+thickness/2.0);
-	 	halfSize		= Vector3r(wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 					wallOversizeFactor*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 	halfSize		= Vector3r(wallOversizeFactor*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 					wallOversizeFactor*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 					thickness/2.0);
 		createBox(body,center,halfSize,true);
 	 	scene->bodies->insert(body);

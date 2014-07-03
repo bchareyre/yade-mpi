@@ -34,7 +34,7 @@ void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool 
 	if (wire || wire2) glutWireSphere(r,quality*glutSlices,quality*glutStacks);
 	else {
 		//Check if quality has been modified or if previous lists are invalidated (e.g. by creating a new qt view), then regenerate lists
-		bool somethingChanged = (abs(quality-prevQuality)>0.001 || glIsList(glStripedSphereList)!=GL_TRUE);
+		bool somethingChanged = (std::abs(quality-prevQuality)>0.001 || glIsList(glStripedSphereList)!=GL_TRUE);
 		if (somethingChanged) {initStripedGlList(); initGlutGlList(); prevQuality=quality;}
 		glScalef(r,r,r);
 		if(stripes) glCallList(glStripedSphereList);

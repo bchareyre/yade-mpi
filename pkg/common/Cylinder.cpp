@@ -396,17 +396,17 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 		Vector3r N=a.cross(b);
 		Vector3r normal;
 		if(N.norm()>1e-14){
-			dist=abs(N.dot(B-A)/(N.norm()));	//distance between the two LINES.
+			dist=std::abs(N.dot(B-A)/(N.norm()));	//distance between the two LINES.
 			//But we need to check that the intersection point is inside the two SEGMENTS ...
 			//Projection of B to have a common plan between the two segments.
 			Vector3r projB1=B+dist*(N/(N.norm())) , projB2=B-dist*(N/(N.norm()));
 			Real distB1A=(projB1-A).norm() , distB2A=(projB2-A).norm() ;
 			Vector3r projB=(distB1A<=distB2A)*projB1 + (distB1A>distB2A)*projB2;
 			int b1=0, b2=1; //base vectors used to compute the segment intersection (if N is aligned with an axis, we can't use this axis)
-			if(abs(N[1])<1e-14 && abs(N[2])<1e-14){b1=1;b2=2;}
-			if(abs(N[0])<1e-14 && abs(N[2])<1e-14){b1=0;b2=2;}
+			if(std::abs(N[1])<1e-14 && std::abs(N[2])<1e-14){b1=1;b2=2;}
+			if(std::abs(N[0])<1e-14 && std::abs(N[2])<1e-14){b1=0;b2=2;}
 			Real det=a[b1]*b[b2]-a[b2]*b[b1];
-			if(abs(det)>1e-14){	//Check if the two segments are intersected (using k and m)
+			if(std::abs(det)>1e-14){	//Check if the two segments are intersected (using k and m)
 				k = (b[b2]*(projB[b1]-A[b1])+b[b1]*(A[b2]-projB[b2]))/det;
 				m = (a[b1]*(-projB[b2]+A[b2])+a[b2]*(projB[b1]-A[b1]))/det;
 				if( k<0.0 || k>=1.0 || m<0.0 || m>=1.0 ) {	//so they are not intersected

@@ -96,7 +96,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	if (hSizeFound && !periodic) LOG_WARN("hSize can be defined only for periodic cells.");
 	Real volume=hSize.determinant();
 	Matrix3r invHsize =hSize.inverse();
-	Real area=abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
+	Real area=std::abs(size[0]*size[2]+size[0]*size[1]+size[1]*size[2]);//2 terms will be null if one coordinate is 0, the other is the area
 	if (!volume) {
 		if (hSizeFound) throw invalid_argument("The period defined by hSize has null length in at least one direction, this is not supported. Define flat boxes via min-max and keep hSize undefined if you want a 2D packing.");
 		else LOG_WARN("The volume of the min-max box is null, we will assume that the packing is 2D. If it is not what you want then you defined wrong input values; check that min and max corners are defined correctly.");}
@@ -191,7 +191,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 					} else {//not aligned, find closest neighbor in a cube of size 1, then transform distance to cartesian coordinates
 						Vector3r c1c2=invHsize*(pack[j].c-c);
 						for(int axis=0; axis<3; axis++){
-							if (abs(c1c2[axis])<abs(c1c2[axis] - Mathr::Sign(c1c2[axis]))) dr[axis]=c1c2[axis];
+							if (std::abs(c1c2[axis])<std::abs(c1c2[axis] - Mathr::Sign(c1c2[axis]))) dr[axis]=c1c2[axis];
 							else dr[axis] = c1c2[axis] - Mathr::Sign(c1c2[axis]);}
 						dr=hSize*dr;//now in cartesian coordinates
 					}

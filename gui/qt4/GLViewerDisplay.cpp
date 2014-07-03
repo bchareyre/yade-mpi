@@ -183,7 +183,7 @@ void GLViewer::postDraw(){
 		}
 		//LOG_DEBUG("Screen offsets for axes: "<<" x("<<screenDxDy[0][0]<<","<<screenDxDy[0][1]<<") y("<<screenDxDy[1][0]<<","<<screenDxDy[1][1]<<") z("<<screenDxDy[2][0]<<","<<screenDxDy[2][1]<<")");
 		int margin=10; // screen pixels
-		int scaleCenter[2]; scaleCenter[0]=abs(extremalDxDy[0])+margin; scaleCenter[1]=abs(extremalDxDy[1])+margin;
+		int scaleCenter[2]; scaleCenter[0]=std::abs(extremalDxDy[0])+margin; scaleCenter[1]=std::abs(extremalDxDy[1])+margin;
 		//LOG_DEBUG("Center of scale "<<scaleCenter[0]<<","<<scaleCenter[1]);
 		//displayMessage(QString().sprintf("displayed scene radius %g",displayedSceneRadius()));
 		startScreenCoordinatesSystem();

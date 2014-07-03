@@ -830,8 +830,8 @@ void HydrodynamicsLawLBM::action()
 //                for (int s=NB_WALLS ; s<NB_BODIES; s++)	{FmoyCur = FmoyCur + LBbodies[s].force.norm();}
 //                FmoyCur = FmoyCur/(NB_DYNGRAINS);
 //                if (FmoyCur!=0.){
-//                    Real ErrorA = abs(FmoyCur-FmoyPrev)/abs(FmoyCur);
-//                    Real ErrorB = abs(FmoyCur-FmoyPrevPrev)/abs(FmoyCur);
+//                    Real ErrorA = std::abs(FmoyCur-FmoyPrev)/std::abs(FmoyCur);
+//                    Real ErrorB = std::abs(FmoyCur-FmoyPrevPrev)/std::abs(FmoyCur);
 //                    Error=max(ErrorA,ErrorB);
 //                    FmoyPrevPrev=FmoyPrev;
 //                    FmoyPrev=FmoyCur;
@@ -844,8 +844,8 @@ void HydrodynamicsLawLBM::action()
 //                /*--------------------------------------------------------*/
 //                if((LBM_ITER > 100) & (LBM_ITER % 10 == 0)){
 //                if (VmeanFluidC!=0.){
-//                    Real ErrorA = abs(VmeanFluidC-PrevVmeanFluidC)/abs(VmeanFluidC);
-//                    //Real ErrorB = abs(VmeanFluidC-PrevPrevVmeanFluidC)/abs(VmeanFluidC);
+//                    Real ErrorA = std::abs(VmeanFluidC-PrevVmeanFluidC)/std::abs(VmeanFluidC);
+//                    //Real ErrorB = std::abs(VmeanFluidC-PrevPrevVmeanFluidC)/std::abs(VmeanFluidC);
 //                    //Error=max(ErrorA,ErrorB);
 //                    Error= ErrorA;
 //                    PrevPrevVmeanFluidC=PrevVmeanFluidC;

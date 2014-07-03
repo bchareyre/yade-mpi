@@ -34,7 +34,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  if ((smoothJoint) && (phys->isOnJoint)) {
 	    phys->jointNormal = geom->normal.dot(phys->jointNormal)*phys->jointNormal; //to set the joint normal colinear with the interaction normal
 	    phys->jointNormal.normalize();
-	    phys->initD = abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); // to set the initial gap as the equilibrium gap
+	    phys->initD = std::abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); // to set the initial gap as the equilibrium gap
 	  } else { 
 	    phys->initD = geom->penetrationDepth; 
 	  }
@@ -44,7 +44,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  if ( phys->more || ( phys->jointCumulativeSliding > (2*min(geom->radius1,geom->radius2)) ) ) {
 	    scene->interactions->requestErase(contact); return; 
 	    } else { 
-	    D = phys->initD - abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); 
+	    D = phys->initD - std::abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); 
 	    }
 	} else { 
 	  D = geom->penetrationDepth - phys->initD; 
@@ -57,7 +57,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    scene->interactions->requestErase(contact); return;
 	  }
 	  
-	  if ( phys->isCohesive && (phys->FnMax>0) && (abs(D)>Dtensile) ) {
+	  if ( phys->isCohesive && (phys->FnMax>0) && (std::abs(D)>Dtensile) ) {
 	    
 	    // update body state with the number of broken bonds
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());

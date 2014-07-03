@@ -73,9 +73,9 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						lowerCorner[1]-thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
 	 	Vector3r halfSize	= Vector3r(
-	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
 							thickness/2.0,
-	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
@@ -93,9 +93,9 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						upperCorner[1]+thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(
-	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
 	 						thickness/2.0,
-	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
@@ -111,8 +111,8 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						(lowerCorner[2]+upperCorner[2])/2);
 		halfSize		= Vector3r(
 							thickness/2.0,
-	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 		createBox(body,center,halfSize,wall_1_wire);
 	 	if(wall_1) {
 			scene->bodies->insert(body);
@@ -126,8 +126,8 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 							(lowerCorner[2]+upperCorner[2])/2);
 	 	halfSize		= Vector3r(
 	 						thickness/2.0,
-	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
-	 						1.5*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
+	 						1.5*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*std::abs(lowerCorner[2]-upperCorner[2])/2+thickness);
 
 		createBox(body,center,halfSize,wall_2_wire);
 	 	if(wall_2) {
@@ -141,8 +141,8 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						(lowerCorner[1]+upperCorner[1])/2,
 	 						lowerCorner[2]-thickness/2.0);
 	 	halfSize		= Vector3r(
-	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_3) {
@@ -157,8 +157,8 @@ bool CohesiveTriaxialTest::generate(std::string& message)
 	 						(lowerCorner[1]+upperCorner[1])/2,
 	 						upperCorner[2]+thickness/2.0);
 	 	halfSize		= Vector3r(
-	 						1.5*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
-	 						1.5*fabs(lowerCorner[1]-upperCorner[1])/2+thickness,
+	 						1.5*std::abs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 						1.5*std::abs(lowerCorner[1]-upperCorner[1])/2+thickness,
 	 						thickness/2.0);
 		createBox(body,center,halfSize,wall_3_wire);
 	 	if(wall_4) {

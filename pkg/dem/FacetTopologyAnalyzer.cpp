@@ -34,9 +34,9 @@ void FacetTopologyAnalyzer::action(){
 		j=i;
 		while(++j<nVertices && (vv[j]->coord-vv[i]->coord)<=tolerance){
 			shared_ptr<VertexData> &vi=vv[i], &vj=vv[j];
-			if(abs(vi->pos[0]-vj->pos[0])<=tolerance &&
-				abs(vi->pos[1]-vj->pos[1])<=tolerance &&
-				abs(vi->pos[2]-vj->pos[2])<=tolerance &&
+			if(std::abs(vi->pos[0]-vj->pos[0])<=tolerance &&
+				std::abs(vi->pos[1]-vj->pos[1])<=tolerance &&
+				std::abs(vi->pos[2]-vj->pos[2])<=tolerance &&
 				(vi->pos-vj->pos).squaredNorm()<=tolerance*tolerance){
 				// OK, these two vertices touch
 				// LOG_TRACE("Vertices "<<vi->id<<"/"<<vi->vertexNo<<" and "<<vj->id<<"/"<<vj->vertexNo<<" close enough.");

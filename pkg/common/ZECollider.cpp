@@ -70,7 +70,7 @@ void ZECollider::action(){
 				minR=min(s->radius,minR);
 			}
 			// if no spheres, disable stride
-			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
+			verletDist=isinf(minR) ? 0 : std::abs(verletDist)*minR;
 		}
 		
 		// update bounds via boundDispatcher
