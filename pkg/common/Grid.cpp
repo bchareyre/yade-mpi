@@ -90,6 +90,7 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 	Vector3r A=stNode11->pos, a=stNode12->pos-A; //"A" is an extremity of conn1, "a" is the connection's segment.
 	Vector3r B=stNode21->pos, b=stNode22->pos-B; //"B" is an extremity of conn2, "b" is the connection's segment.
 	B+=shift2;//periodicity.
+	/* NOW STARTS THE OLD VERSION. IT SHOULD BE REMOVED LATER.
 	Vector3r N=a.cross(b);	//"N" is orthogonal to "a" and "b". It means that "N" describes the common plan between a and b.
 	if(N.norm()>1e-14){	//If "a" and "b" are colinear, "N==0" and this is a special case.
 		Real dist=N.dot(B-A)/(N.norm());	//here "dist" is oriented, so it's sign depends on the orientation of "N" against "AB".
@@ -122,7 +123,26 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
 		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
 		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
+	} OLD VERSION END*/
+	
+	/* NOW STARTS THE NEW VERSION */
+	Real denom=a.dot(a)*b.dot(b)-pow(a.dot(b),2);
+	if(denom!=0){
+		k = (a.dot(B-A)*b.dot(b)-a.dot(b)*b.dot(B-A))/denom;
+// 		m = (a.dot(b)*a.dot(B-A)-b.dot(B-A)*a.dot(a))/denom; //USELESS BECAUSE DETERMINED FROM k
+		k = max(min( k,(Real)1.0),(Real)0.0);
+		m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,(Real)1.0),(Real)0.0);
+		k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,(Real)1.0),(Real)0.0);
+// 		cout<<"k="<<k<<" m="<<m<<"\n"<<"kc="<<kc<<" mc="<<mc<<"\n\n"<<endl;//}
 	}
+	else{
+		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min((Real)1.0,max((Real)0.0,PA));
+		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min((Real)1.0,max((Real)0.0,Pa));
+		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
+		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
+		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
+	}
+	/*NEW VERSION END*/
 	
 	//Compute the geometry if "penetrationDepth" is positive.
 	double penetrationDepth = conn1->radius + conn2->radius - (A+k*a - (B+m*b)).norm();
