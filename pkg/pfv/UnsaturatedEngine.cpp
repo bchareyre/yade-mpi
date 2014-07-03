@@ -103,6 +103,10 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 		double getRadiusMin(CellHandle cell, int j);
 		void debugTemp();
 		bool checknoCache() {return solver->noCache;}
+		
+		double getRMin(CellHandle cell, int j);
+		double getRMax(CellHandle cell, int j);
+		void checkRCompare();
 				
 		virtual ~UnsaturatedEngine();
 
@@ -114,7 +118,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 					((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 
 					((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
-					((bool, isInvadeBoundary, false,,"Invade from boundaries."))
+					((bool, isInvadeBoundary, true,,"Invade from boundaries."))
 					((int, windowsNo, 10,, "Number of genrated windows(or zoomed samples)."))
 					,,,
 					.def("saveVtk",&UnsaturatedEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
@@ -136,6 +140,7 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 					.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(boost::python::arg("windowsID")), "get saturation of windowsID")
 					.def("debugTemp",&UnsaturatedEngine::debugTemp,"debug temp file.(temporary)")
 					.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temp function for comparison with experiments, will delete soon")
+					.def("checkRCompare",&UnsaturatedEngine::checkRCompare,"debug R RMin RMax.")
 					)
 		DECLARE_LOGGER;
 };
@@ -701,6 +706,130 @@ double UnsaturatedEngine::computeDeltaForce(CellHandle cell,int j, double rCap)
     double deltaForce = perimeterPore - areaPore/rCap;//deltaForce=surfaceTension*(perimeterPore - areaPore/rCap)
     return deltaForce;
 }
+
+// ------------------for checking----------
+double UnsaturatedEngine::getRMin(CellHandle cell, int j)
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if (tri.is_infinite(cell->neighbor(j))) {return 0;cerr<<"tri.is_infinite(cell->neighbor(j)"<<endl;}
+
+    Vector3r posA = makeVector3r(cell->vertex(facetVertices[j][0])->point().point());
+    Vector3r posB = makeVector3r(cell->vertex(facetVertices[j][1])->point().point());
+    Vector3r posC = makeVector3r(cell->vertex(facetVertices[j][2])->point().point());
+    double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
+    double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
+    double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
+    double AB = (posA-posB).norm();
+    double AC = (posA-posC).norm();
+    double BC = (posB-posC).norm();
+    double rAB = 0.5*(AB-rA-rB); if (rAB<0) { rAB=0; }
+    double rBC = 0.5*(BC-rB-rC); if (rBC<0) { rBC=0; }
+    double rAC = 0.5*(AC-rA-rC); if (rAC<0) { rAC=0; }
+
+    double rmin = max(rAB,max(rBC,rAC)); if (rmin==0) { rmin= 1.0e-10; }
+    return rmin;
+}
+double UnsaturatedEngine::getRMax(CellHandle cell, int j)
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if (tri.is_infinite(cell->neighbor(j))) {return 0;cerr<<"tri.is_infinite(cell->neighbor(j)"<<endl;}
+    double rmax = abs(solver->computeEffectiveRadius(cell, j));//rmin>rmax ?
+    return rmax;
+}
+void UnsaturatedEngine::checkRCompare()
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    ofstream file;
+    file.open("rCompareSum.txt");
+    file<<"cellID	"<<"j	"<<"rmin	"<<"r	"<<"rmax	"<<endl;
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+        file << cell->info().index << "	" <<"0"<< "	" <<getRMin(cell,0) << "	" << computeEffPoreRadius(cell,0)<< "	" <<getRMax(cell,0) << endl;
+        file << cell->info().index << "	" <<"1"<< "	" <<getRMin(cell,1) << "	" << computeEffPoreRadius(cell,1)<< "	" <<getRMax(cell,1) << endl;
+        file << cell->info().index << "	" <<"2"<< "	" <<getRMin(cell,2) << "	" << computeEffPoreRadius(cell,2)<< "	" <<getRMax(cell,2) << endl;
+        file << cell->info().index << "	" <<"3"<< "	" <<getRMin(cell,3) << "	" << computeEffPoreRadius(cell,3)<< "	" <<getRMax(cell,3) << endl;
+    }
+    file.close();
+
+    file.open("rMinEqualR.txt");
+    file<<"cellID	"<<"j	"<<"rmin	"<<"r	"<<"rmax	"<<endl;
+    FiniteCellsIterator cellEnd1 = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell1 = tri.finite_cells_begin(); cell1 != cellEnd1; cell1++ ) {
+        if(getRMin(cell1,0)==computeEffPoreRadius(cell1,0)) {
+            file << cell1->info().index << "	" <<"0"<< "	" <<getRMin(cell1,0) << "	" << computeEffPoreRadius(cell1,0)<< "	" <<getRMax(cell1,0) << endl;
+        }
+        if(getRMin(cell1,1)==computeEffPoreRadius(cell1,1)) {
+            file << cell1->info().index << "	" <<"1"<< "	" <<getRMin(cell1,1) << "	" << computeEffPoreRadius(cell1,1)<< "	" <<getRMax(cell1,1) << endl;
+        }
+        if(getRMin(cell1,2)==computeEffPoreRadius(cell1,2)) {
+            file << cell1->info().index << "	" <<"2"<< "	" <<getRMin(cell1,2) << "	" << computeEffPoreRadius(cell1,2)<< "	" <<getRMax(cell1,2) << endl;
+        }
+        if(getRMin(cell1,3)==computeEffPoreRadius(cell1,3)) {
+            file << cell1->info().index << "	" <<"3"<< "	" <<getRMin(cell1,3) << "	" << computeEffPoreRadius(cell1,3)<< "	" <<getRMax(cell1,3) << endl;
+        }
+    }
+    file.close();
+
+    file.open("rMaxEqualR.txt");
+    file<<"cellID	"<<"j	"<<"rmin	"<<"r	"<<"rmax	"<<endl;
+    FiniteCellsIterator cellEnd2 = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell2 = tri.finite_cells_begin(); cell2 != cellEnd2; cell2++ ) {
+        if(getRMax(cell2,0)==computeEffPoreRadius(cell2,0)) {
+            file << cell2->info().index << "	" <<"0"<< "	" <<getRMin(cell2,0) << "	" << computeEffPoreRadius(cell2,0)<< "	" <<getRMax(cell2,0) << endl;
+        }
+        if(getRMax(cell2,1)==computeEffPoreRadius(cell2,1)) {
+            file << cell2->info().index << "	" <<"1"<< "	" <<getRMin(cell2,1) << "	" << computeEffPoreRadius(cell2,1)<< "	" <<getRMax(cell2,1) << endl;
+        }
+        if(getRMax(cell2,2)==computeEffPoreRadius(cell2,2)) {
+            file << cell2->info().index << "	" <<"2"<< "	" <<getRMin(cell2,2) << "	" << computeEffPoreRadius(cell2,2)<< "	" <<getRMax(cell2,2) << endl;
+        }
+        if(getRMax(cell2,3)==computeEffPoreRadius(cell2,3)) {
+            file << cell2->info().index << "	" <<"3"<< "	" <<getRMin(cell2,3) << "	" << computeEffPoreRadius(cell2,3)<< "	" <<getRMax(cell2,3) << endl;
+        }
+    }
+    file.close();
+
+    file.open("rFine.txt");
+    file<<"cellID	"<<"j	"<<"rmin	"<<"r	"<<"rmax	"<<endl;
+    FiniteCellsIterator cellEnd3 = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell3 = tri.finite_cells_begin(); cell3 != cellEnd3; cell3++ ) {
+        if( (getRMax(cell3,0)>computeEffPoreRadius(cell3,0)) && (getRMin(cell3,0)<computeEffPoreRadius(cell3,0)) ) {
+            file << cell3->info().index << "	" <<"0"<< "	" <<getRMin(cell3,0) << "	" << computeEffPoreRadius(cell3,0)<< "	" <<getRMax(cell3,0) << endl;
+        }
+        if( (getRMax(cell3,1)>computeEffPoreRadius(cell3,1)) && (getRMin(cell3,1)<computeEffPoreRadius(cell3,1)) ) {
+            file << cell3->info().index << "	" <<"1"<< "	" <<getRMin(cell3,1) << "	" << computeEffPoreRadius(cell3,1)<< "	" <<getRMax(cell3,1) << endl;
+        }
+        if( (getRMax(cell3,2)>computeEffPoreRadius(cell3,2)) && (getRMin(cell3,2)<computeEffPoreRadius(cell3,2)) ) {
+            file << cell3->info().index << "	" <<"2"<< "	" <<getRMin(cell3,2) << "	" << computeEffPoreRadius(cell3,2)<< "	" <<getRMax(cell3,2) << endl;
+        }
+        if( (getRMax(cell3,3)>computeEffPoreRadius(cell3,3)) && (getRMin(cell3,3)<computeEffPoreRadius(cell3,3)) ) {
+            file << cell3->info().index << "	" <<"3"<< "	" <<getRMin(cell3,3) << "	" << computeEffPoreRadius(cell3,3)<< "	" <<getRMax(cell3,3) << endl;
+        }
+    }
+    file.close();
+
+    file.open("rBug.txt");
+    file<<"cellID	"<<"j	"<<"rmin	"<<"r	"<<"rmax	"<<endl;
+    FiniteCellsIterator cellEnd4 = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell4 = tri.finite_cells_begin(); cell4 != cellEnd4; cell4++ ) {
+        if(getRMax(cell4,0)<getRMin(cell4,0)) {
+            file << cell4->info().index << "	" <<"0"<< "	" <<getRMin(cell4,0) << "	" << computeEffPoreRadius(cell4,0)<< "	" <<getRMax(cell4,0) << endl;
+        }
+        if(getRMax(cell4,1)<getRMin(cell4,1)) {
+            file << cell4->info().index << "	" <<"1"<< "	" <<getRMin(cell4,1) << "	" << computeEffPoreRadius(cell4,1)<< "	" <<getRMax(cell4,1) << endl;
+        }
+        if(getRMax(cell4,2)<getRMin(cell4,2)) {
+            file << cell4->info().index << "	" <<"2"<< "	" <<getRMin(cell4,2) << "	" << computeEffPoreRadius(cell4,2)<< "	" <<getRMax(cell4,2) << endl;
+        }
+        if(getRMax(cell4,3)<getRMin(cell4,3)) {
+            file << cell4->info().index << "	" <<"3"<< "	" <<getRMin(cell4,3) << "	" << computeEffPoreRadius(cell4,3)<< "	" <<getRMax(cell4,3) << endl;
+        }
+    }
+    file.close();
+
+}
+// --------------------------------------
+
 
 void UnsaturatedEngine::checkCellsConnection()
 {
