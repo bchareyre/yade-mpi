@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include<boost/lexical_cast.hpp>
 
 #include<yade/core/Engine.hpp>
 #include<yade/core/Functor.hpp>

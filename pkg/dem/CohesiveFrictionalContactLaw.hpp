@@ -12,7 +12,6 @@
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/CohFrictPhys.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
-#include<set>
 #include<boost/tuple/tuple.hpp>
 
 class Law2_ScGeom6D_CohFrictPhys_CohesionMoment: public LawFunctor{

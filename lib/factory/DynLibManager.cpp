@@ -9,11 +9,8 @@
 
 #include "DynLibManager.hpp"
 
-#include<fstream>
-#include<stdexcept>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
-#include<string.h>
 
 #include "ClassFactory.hpp"
 

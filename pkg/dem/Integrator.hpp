@@ -1,7 +1,6 @@
 #pragma once
 
 #include<yade/core/TimeStepper.hpp>
-#include<boost/python.hpp>
 
 class Integrator;
 

@@ -5,12 +5,6 @@
 #pragma once
 
 #include<yade/lib/serialization/Serializable.hpp>
-
-#include<boost/foreach.hpp>
-#ifndef FOREACH
-#  define FOREACH BOOST_FOREACH
-#endif
-
 #include<boost/tuple/tuple.hpp>
 
 class Body;

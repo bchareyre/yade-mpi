@@ -20,7 +20,6 @@
 #include<yade/core/State.hpp>
 #include<yade/core/TimeStepper.hpp>
 
-#include<boost/version.hpp>
 
 // these two are not accessible from python directly (though they should be in the future, perhaps)
 

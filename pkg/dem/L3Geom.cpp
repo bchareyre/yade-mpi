@@ -4,8 +4,6 @@
 #include<yade/pkg/common/Wall.hpp>
 #include<yade/pkg/common/Facet.hpp>
 
-#include<sstream>
-
 #ifdef YADE_OPENGL
 	#include<yade/lib/opengl/OpenGLWrapper.hpp>
 	#include<yade/lib/opengl/GLUtils.hpp>

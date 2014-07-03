@@ -2,35 +2,9 @@
 
 #pragma once
 
-#include<vector>
-#include<string>
-#include<limits>
-#include<iostream>
-
-#include<boost/python.hpp>
-#include<boost/python/object.hpp>
-#include<boost/version.hpp>
-
-#include<boost/foreach.hpp>
-#ifndef FOREACH
-	#define FOREACH BOOST_FOREACH
-#endif
-
-#ifndef  __GXX_EXPERIMENTAL_CXX0X__
-#	include<boost/shared_ptr.hpp>
-	using boost::shared_ptr;
-#else
-#	include<memory>
-	using std::shared_ptr;
-#endif
 
 #include<yade/lib/base/Logging.hpp>
 #include<yade/lib/base/Math.hpp>
-
-using std::vector;
-using std::string;
-using std::min;
-using std::runtime_error;
 
 /*! Class representing geometry of spherical packing, with some utility functions. */
 class SpherePack{

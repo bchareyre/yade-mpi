@@ -46,11 +46,6 @@
 	#include"yade/pkg/common/Gl1_NormPhys.hpp"
 #endif
 
-#include<boost/foreach.hpp>
-#ifndef FOREACH
-	#define FOREACH BOOST_FOREACH
-#endif
-
 CREATE_LOGGER(Shop);
 
 /*! Flip periodic cell by given number of cells.

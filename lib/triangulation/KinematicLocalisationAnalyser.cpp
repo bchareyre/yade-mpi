@@ -13,8 +13,6 @@
 #include "KinematicLocalisationAnalyser.hpp" //This one first, because it defines the info types
 // #include "Tesselation.h"
 // #include "TriaxialState.h"
-#include <iostream>
-#include <fstream>
 #include <sstream>
 #include "basicVTKwritter.hpp"
 //#include <utility>

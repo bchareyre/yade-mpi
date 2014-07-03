@@ -1,6 +1,5 @@
 
 #include<yade/core/Body.hpp>
-#include<limits>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/InteractionContainer.hpp>

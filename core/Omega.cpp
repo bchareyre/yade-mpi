@@ -15,14 +15,11 @@
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/multimethods/FunctorWrapper.hpp>
 #include<yade/lib/multimethods/Indexable.hpp>
-#include<cstdlib>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
 #include<boost/filesystem/exception.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
-#include<boost/version.hpp>
-#include<boost/python.hpp>
 
 #include<yade/lib/serialization/ObjectIO.hpp>
 

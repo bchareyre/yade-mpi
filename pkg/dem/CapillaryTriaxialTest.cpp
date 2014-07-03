@@ -43,7 +43,6 @@
 #include<yade/pkg/dem/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
 

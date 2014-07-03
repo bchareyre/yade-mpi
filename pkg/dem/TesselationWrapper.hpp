@@ -9,12 +9,8 @@
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/core/Omega.hpp>
-#include <utility>
 #include<yade/core/Scene.hpp>
 #include<yade/lib/triangulation/Tesselation.h>
-#include<boost/python.hpp>
-#include<boost/python/object.hpp>
-#include<boost/version.hpp>
 #include<yade/pkg/dem/MicroMacroAnalyser.hpp>
 
 /*! \class TesselationWrapper

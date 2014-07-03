@@ -10,53 +10,12 @@
 
 #pragma once
 
-#include <boost/any.hpp>
-#include <boost/foreach.hpp>
-#ifndef  __GXX_EXPERIMENTAL_CXX0X__
-#	include<boost/shared_ptr.hpp>
-	using boost::shared_ptr;
-#else
-#	include<memory>
-	using std::shared_ptr;
-#endif
-#include<boost/version.hpp>
-#include<boost/python.hpp>
-#include<boost/type_traits.hpp>
-#include<boost/lexical_cast.hpp>
-#include<boost/preprocessor.hpp>
-#include<boost/type_traits/integral_constant.hpp>
-#include<list>
-#include<map>
-#include<string>
-#include<vector>
-#include<iostream>
-#include<yade/lib/factory/Factorable.hpp>
-#include<yade/lib/pyutil/raw_constructor.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
+#include <boost/type_traits/integral_constant.hpp>
 
-#include<yade/lib/base/Math.hpp>
-
-using std::endl;
-using std::cout;
-using std::cerr;
-using std::vector;
-using std::string;
-using std::list;
-using std::min;
-using std::max;
-using std::ifstream;
-using std::ofstream;
-using std::pair;
-using std::runtime_error;
-using std::logic_error;
-using std::invalid_argument;
-using std::ios;
-using std::ios_base;
-using std::fstream;
-using std::ostream;
-using std::ostringstream;
-using std::swap;
-using std::make_pair;
+#include <yade/lib/base/Math.hpp>
+#include <yade/lib/factory/Factorable.hpp>
+#include <yade/lib/pyutil/raw_constructor.hpp>
+#include <yade/lib/pyutil/doc_opts.hpp>
 
 // empty functions for ADL
 //namespace{

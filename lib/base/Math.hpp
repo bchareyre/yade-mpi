@@ -8,21 +8,86 @@
 	typedef double Real;
 #endif
 
-#define EIGEN_DONT_PARALLELIZE
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <list>
+#include <map>
+#include <set>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <typeinfo>
+#include <utility>
+#include <vector>
 
-#include<limits>
-#include<cstdlib>
-#ifdef YADE_MASK_ARBITRARY
-#include<bitset>
+using std::endl;
+using std::cout;
+using std::cerr;
+using std::vector;
+using std::string;
+using std::list;
+using std::pair;
+using std::min;
+using std::max;
+using std::set;
+using std::map;
+using std::type_info;
+using std::ifstream;
+using std::ofstream;
+using std::runtime_error;
+using std::logic_error;
+using std::invalid_argument;
+using std::ios;
+using std::ios_base;
+using std::fstream;
+using std::ostream;
+using std::ostringstream;
+using std::istringstream;
+using std::swap;
+using std::make_pair;
+
+#include <boost/lexical_cast.hpp>
+#include <boost/python.hpp>
+#include <boost/python/object.hpp>
+#include <boost/version.hpp>
+#include <boost/any.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/preprocessor.hpp>
+#include <boost/python/module.hpp>
+#include <boost/python/class.hpp>
+
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include <boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include <memory>
+	using std::shared_ptr;
 #endif
 
-#include<Eigen/Core>
-#include<Eigen/Geometry>
-#include<Eigen/QR>
-#include<Eigen/LU>
-#include<Eigen/SVD>
-#include<Eigen/Eigenvalues>
-#include<float.h>
+#include <boost/foreach.hpp>
+#ifndef FOREACH
+	#define FOREACH BOOST_FOREACH
+#endif
+
+#define EIGEN_DONT_PARALLELIZE
+
+#ifdef YADE_MASK_ARBITRARY
+	#include <bitset>
+#endif
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <Eigen/QR>
+#include <Eigen/LU>
+#include <Eigen/SVD>
+#include <Eigen/Eigenvalues>
+#include <float.h>
 
 // templates of those types with single parameter are not possible, use macros for now
 #define VECTOR2_TEMPLATE(Scalar) Eigen::Matrix<Scalar,2,1>
@@ -233,8 +298,6 @@ typedef int mask_t;
  * typedefs
  */
 typedef Se3<Real> Se3r;
-
-
 
 /*
  * Serialization of math classes

@@ -9,8 +9,6 @@
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
-#include<algorithm>
-#include<vector>
 #include<boost/static_assert.hpp>
 #ifdef YADE_OPENMP
   #include<omp.h>

@@ -1,7 +1,6 @@
 #include<yade/core/Clump.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/dem/Integrator.hpp>
-#include<boost/python.hpp>
 
 #ifdef YADE_OPENMP
   #include<omp.h>

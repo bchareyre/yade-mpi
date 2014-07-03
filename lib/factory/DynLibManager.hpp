@@ -11,22 +11,8 @@
 
 #include <dlfcn.h>
 
-#include <string>
-#include <iostream>
-#include <map>
-#include <vector>
-#include <set>
-#include <list>
-
 #include<yade/lib/base/Logging.hpp>
-
-using std::type_info;
-using std::string;
-using std::vector;
-using std::list;
-using std::set;
-using std::map;
-using std::istringstream;
+#include<yade/lib/base/Math.hpp>
 
 class DynLibManager 
 {

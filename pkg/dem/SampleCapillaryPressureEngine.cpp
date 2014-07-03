@@ -14,7 +14,6 @@
 #include<yade/core/Omega.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/lib/base/Math.hpp>
-#include <boost/lexical_cast.hpp>
 
 YADE_PLUGIN((SampleCapillaryPressureEngine));
 CREATE_LOGGER(SampleCapillaryPressureEngine);

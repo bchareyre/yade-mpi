@@ -21,10 +21,6 @@
 #include <yade/core/Scene.hpp>
 #include <yade/lib/base/Math.hpp>
 
-
-#include <iostream>
-#include <fstream>
-
 YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 
 void Law2_ScGeom_CapillaryPhys_Capillarity::postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&){

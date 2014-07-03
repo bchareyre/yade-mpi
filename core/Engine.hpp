@@ -14,12 +14,6 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Timing.hpp>
 #include<yade/lib/base/Logging.hpp>
-#include<stdexcept>
-
-#include<boost/foreach.hpp>
-#ifndef FOREACH
-#define FOREACH BOOST_FOREACH
-#endif
 
 class Body;
 class Scene;

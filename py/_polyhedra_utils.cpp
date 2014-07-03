@@ -5,8 +5,6 @@
 
 #include"yade/pkg/dem/Polyhedra.hpp"
 
-#include<boost/python.hpp>
-#include <boost/python/module.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg/common/Sphere.hpp>

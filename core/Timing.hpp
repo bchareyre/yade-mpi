@@ -1,7 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<time.h>
-#include<boost/python.hpp>
 
 struct TimingInfo{
 	typedef unsigned long long delta;

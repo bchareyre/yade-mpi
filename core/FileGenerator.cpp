@@ -4,7 +4,6 @@
 *************************************************************************/
 
 #include<yade/core/Omega.hpp>
-#include<cstdlib>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<yade/lib/pyutil/gil.hpp>
 #include<yade/lib/serialization/ObjectIO.hpp>

@@ -1,7 +1,5 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"UniaxialStrainer.hpp"
-#include<boost/foreach.hpp>
-#include<stdexcept>
 
 #include<yade/core/Scene.hpp>
 #include<yade/core/InteractionContainer.hpp>

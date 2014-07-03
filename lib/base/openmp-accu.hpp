@@ -5,14 +5,8 @@
 #include <yade/lib/base/Math.hpp>
 
 #include <boost/serialization/split_free.hpp>
-#include <boost/lexical_cast.hpp>
-#include <string>
-#include <vector>
 #include <cstdlib>
 #include <unistd.h>
-#include <stdexcept>
-#include <iostream>
-
 
 #ifdef YADE_OPENMP
 #include "omp.h"

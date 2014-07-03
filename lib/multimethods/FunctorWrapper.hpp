@@ -26,7 +26,6 @@
 
 #include <string>
 
-#include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// base template for classes that provide virtual functions for multiple dispatch,		///

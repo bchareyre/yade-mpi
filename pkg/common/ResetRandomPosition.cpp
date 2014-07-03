@@ -18,7 +18,6 @@
 #include<yade/pkg/common/InteractionLoop.hpp>
 //#include<yade/pkg/dem/BodyMacroParameters.hpp>
 #include"ResetRandomPosition.hpp"
-#include<sstream>
 
 YADE_PLUGIN((ResetRandomPosition));
 CREATE_LOGGER(ResetRandomPosition);

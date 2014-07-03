@@ -1,28 +1,17 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 
-#include<sstream>
-#include<map>
-#include<vector>
+#include<yade/lib/base/Math.hpp>
 #include<unistd.h>
 #include<list>
 #include<signal.h>
 
-#include<boost/python.hpp>
 #include<boost/python/raw_function.hpp>
-// unused now
-#if 0
-	#include<boost/python/suite/indexing/vector_indexing_suite.hpp>
-#endif
 #include<boost/bind.hpp>
 #include<boost/lambda/bind.hpp>
 #include<boost/thread/thread.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
-#include<boost/any.hpp>
-#include<boost/python.hpp>
-#include<boost/foreach.hpp>
 #include<boost/algorithm/string.hpp>
-#include<boost/version.hpp>
 
 #include<yade/lib/base/Logging.hpp>
 #include<yade/lib/pyutil/gil.hpp>
@@ -44,8 +33,7 @@
 
 #include<yade/pkg/common/InteractionLoop.hpp>
 
-// #include<yade/pkg/dem/Shop.hpp>
-#include<yade/core/Clump.hpp>
+#include <yade/core/Clump.hpp>
 #include <yade/pkg/common/Sphere.hpp>
 
 #if BOOST_VERSION>=104700
@@ -59,8 +47,6 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/archive/codecvt_null.hpp>
-#include <boost/python/object.hpp>
-#include <boost/version.hpp>
 
 #include <yade/core/Timing.hpp>
 #include <yade/lib/serialization/ObjectIO.hpp>

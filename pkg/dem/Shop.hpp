@@ -2,11 +2,6 @@
 
 #pragma once
 
-#include<string>
-#include<map>
-#include<iostream>
-#include<typeinfo>
-#include<boost/any.hpp>
 #include<boost/lambda/lambda.hpp>
 
 #include "yade/lib/base/Math.hpp"

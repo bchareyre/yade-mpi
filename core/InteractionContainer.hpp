@@ -14,11 +14,6 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/BodyContainer.hpp>
 
-#include<boost/foreach.hpp>
-#ifndef FOREACH
-#  define FOREACH BOOST_FOREACH
-#endif
-
 /* This InteractionContainer implementation has reference to the body container and
 stores interactions in 2 places:
 

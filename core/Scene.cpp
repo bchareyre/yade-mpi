@@ -14,7 +14,6 @@
 #include<yade/core/TimeStepper.hpp>
 
 #include<yade/lib/base/Math.hpp>
-#include<boost/foreach.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/algorithm/string.hpp>
 

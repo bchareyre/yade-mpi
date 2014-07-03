@@ -5,8 +5,6 @@
 #include<yade/core/Scene.hpp>
 class InteractionContainer;
 
-
-
 // #define this macro to enable timing within this engine
 #define ISC_TIMING
 
@@ -18,11 +16,8 @@ class InteractionContainer;
 
 class NewtonIntegrator;
 
-
-
 #include <CGAL/box_intersection_d.h>
 #include <CGAL/Bbox_2.h>
-#include <iostream>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/intersections.h>
 #include <CGAL/point_generators_3.h>
@@ -31,7 +26,6 @@ class NewtonIntegrator;
 #include <CGAL/function_objects.h>
 #include <CGAL/Join_input_iterator.h>
 #include <CGAL/algorithm.h>
-#include <vector>
 
 typedef CGAL::Bbox_3                              CGBbox;
 // typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,shared_ptr<Body> > CGBox;

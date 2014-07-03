@@ -1,11 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
-#include<boost/python.hpp>
-#include<boost/lexical_cast.hpp>
 #include<boost/algorithm/string/trim.hpp>
-#include<string>
-#include<stdexcept>
-#include<sstream>
-#include<iostream>
 
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/pyutil/doc_opts.hpp>

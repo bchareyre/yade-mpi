@@ -1,7 +1,4 @@
 #include<yade/pkg/dem/Shop.hpp>
-#include<boost/python.hpp>
-#include<boost/python/object.hpp>
-#include<boost/version.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg/dem/ScGeom.hpp>
@@ -12,7 +9,6 @@
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/lib/computational-geometry/Hull2d.hpp>
 #include<yade/lib/pyutil/doc_opts.hpp>
-#include<cmath>
 #include<yade/pkg/dem/ViscoelasticPM.hpp>
 
 #include<numpy/ndarrayobject.h>
