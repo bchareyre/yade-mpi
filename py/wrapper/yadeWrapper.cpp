@@ -683,7 +683,7 @@ class pyOmega{
 	void switchToScene(int i){OMEGA.switchToScene(i);}
 	string sceneToString(){
 		ostringstream oss;
-		yade::ObjectIO::save<typeof(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
+		yade::ObjectIO::save<TYPEOF(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
 		oss.flush();
 		return oss.str();
 	}

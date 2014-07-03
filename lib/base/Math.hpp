@@ -62,12 +62,14 @@ using std::make_pair;
 #include <boost/python/module.hpp>
 #include <boost/python/class.hpp>
 
-#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#ifndef DCXX11
 #	include <boost/shared_ptr.hpp>
 	using boost::shared_ptr;
 #else
-#	include <memory>
-	using std::shared_ptr;
+	//#	include <memory>
+	//using std::shared_ptr;
+	#	include <boost/shared_ptr.hpp>
+	using boost::shared_ptr;
 #endif
 
 #include <boost/foreach.hpp>
