@@ -10,21 +10,7 @@
 
 #pragma once
 
-// qt3 sucks
-#ifdef QT_MOC_CPP
-	#undef slots
-	#include<Python.h>
-	#define slots slots
-#else
-	#ifdef slots
-	 #undef slots
-	 #include<Python.h>
-	 #define slots
-	#else
-	 #include<Python.h>
-	#endif
-#endif
-
+#include <Python.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <set>
