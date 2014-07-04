@@ -61,18 +61,11 @@ using std::make_pair;
 #include <boost/preprocessor.hpp>
 #include <boost/python/module.hpp>
 #include <boost/python/class.hpp>
-
-#ifndef CXX11
-#	include <boost/shared_ptr.hpp>
-	using boost::shared_ptr;
-#else
-	//#	include <memory>
-	//using std::shared_ptr;
-	#	include <boost/shared_ptr.hpp>
-	using boost::shared_ptr;
-#endif
-
+#include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
+
+using boost::shared_ptr;
+
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
 #endif
