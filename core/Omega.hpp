@@ -50,7 +50,7 @@ class ThreadRunner;
 
 struct DynlibDescriptor{
 	set<string> baseClasses;
-	bool isIndexable, isFactorable, isSerializable;
+	bool isSerializable;
 };
 
 class Omega: public Singleton<Omega>{

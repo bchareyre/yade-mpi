@@ -62,7 +62,7 @@ using std::make_pair;
 #include <boost/python/module.hpp>
 #include <boost/python/class.hpp>
 
-#ifndef DCXX11
+#ifndef CXX11
 #	include <boost/shared_ptr.hpp>
 	using boost::shared_ptr;
 #else
