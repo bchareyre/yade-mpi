@@ -15,7 +15,6 @@
 
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
-#include <boost/lexical_cast.hpp>
 
 YADE_PLUGIN((CapillaryStressRecorder));
 CREATE_LOGGER(CapillaryStressRecorder);

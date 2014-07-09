@@ -118,7 +118,7 @@ Real CpmPhys::solveBeta(const Real c, const Real N){
 		#endif
 		Real aux = c*exp(N*ret)+exp(ret);
 		f = log(aux);
-		if (fabs(f) < maxError) return ret;
+		if (std::abs(f) < maxError) return ret;
 		Real df = (c*N*exp(N*ret)+exp(ret))/aux;
 		ret -= f/df;
 	}
@@ -185,7 +185,7 @@ Real CpmPhys::funcGInv(const Real& omega, const Real& epsCrackOnset, const Real&
 				dfg = CpmPhys::funcGDKappa(ret,epsCrackOnset,epsFracture,neverDamage,damLaw);
 				decr = fg/dfg;
 				ret -= decr;
-				if (fabs(decr/epsCrackOnset) < tol) {
+				if (std::abs(decr/epsCrackOnset) < tol) {
 					return ret;
 				}
 			}
@@ -218,7 +218,7 @@ void CpmPhys::setRelResidualStrength(Real r) {
 		df = e0i*(1-g-k*dg);
 		decr = f/df;
 		k -= decr;
-		if (fabs(decr) < tol) {
+		if (std::abs(decr) < tol) {
 			kappaD = k;
 			omega = CpmPhys::funcG(k,epsCrackOnset,epsFracture,neverDamage,damLaw);
 			relResidualStrength = r;
@@ -564,7 +564,7 @@ void CpmStateUpdater::update(Scene* _scene){
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if (!I) continue;
 		if (!I->isReal()) continue;
-		shared_ptr<CpmPhys> phys = boost::dynamic_pointer_cast<CpmPhys>(I->phys);
+		shared_ptr<CpmPhys> phys = YADE_PTR_DYN_CAST<CpmPhys>(I->phys);
 		if (!phys) continue;
 		const Body::id_t id1 = I->getId1(), id2 = I->getId2();
 		GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());

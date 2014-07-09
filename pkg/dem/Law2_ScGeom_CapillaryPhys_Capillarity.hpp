@@ -11,14 +11,8 @@
 #pragma once
 
 #include <yade/core/GlobalEngine.hpp>
-#include <set>
 #include <boost/tuple/tuple.hpp>
-#include <vector>
-#include <list>
 #include <utility>
-#include <iostream>
-#include <fstream>
-#include <string>
 
 /**
 This law allows one to take into account capillary forces/effects between spheres coming from the presence of interparticular liquid bridges (menisci).

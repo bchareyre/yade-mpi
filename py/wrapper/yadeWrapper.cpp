@@ -1,28 +1,17 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 
-#include<sstream>
-#include<map>
-#include<vector>
+#include<yade/lib/base/Math.hpp>
 #include<unistd.h>
 #include<list>
 #include<signal.h>
 
-#include<boost/python.hpp>
 #include<boost/python/raw_function.hpp>
-// unused now
-#if 0
-	#include<boost/python/suite/indexing/vector_indexing_suite.hpp>
-#endif
 #include<boost/bind.hpp>
 #include<boost/lambda/bind.hpp>
 #include<boost/thread/thread.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
-#include<boost/any.hpp>
-#include<boost/python.hpp>
-#include<boost/foreach.hpp>
 #include<boost/algorithm/string.hpp>
-#include<boost/version.hpp>
 
 #include<yade/lib/base/Logging.hpp>
 #include<yade/lib/pyutil/gil.hpp>
@@ -44,8 +33,7 @@
 
 #include<yade/pkg/common/InteractionLoop.hpp>
 
-// #include<yade/pkg/dem/Shop.hpp>
-#include<yade/core/Clump.hpp>
+#include <yade/core/Clump.hpp>
 #include <yade/pkg/common/Sphere.hpp>
 
 #if BOOST_VERSION>=104700
@@ -54,22 +42,16 @@
 	#include<boost/math/nonfinite_num_facets.hpp>
 #endif
 
+#include <locale>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/archive/codecvt_null.hpp>
 
-#include<yade/core/Timing.hpp>
+#include <yade/core/Timing.hpp>
+#include <yade/lib/serialization/ObjectIO.hpp>
 
-#include<locale>
-#include<boost/archive/codecvt_null.hpp>
-
-using namespace std;
 namespace py = boost::python;
-
-#include<yade/lib/serialization/ObjectIO.hpp>
-
-#include<boost/python/object.hpp>
-#include<boost/version.hpp>
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
@@ -701,7 +683,7 @@ class pyOmega{
 	void switchToScene(int i){OMEGA.switchToScene(i);}
 	string sceneToString(){
 		ostringstream oss;
-		yade::ObjectIO::save<typeof(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
+		yade::ObjectIO::save<TYPEOF(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
 		oss.flush();
 		return oss.str();
 	}
@@ -776,7 +758,7 @@ class pyOmega{
 	void interactionContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
 		if(rb->interactions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
-		shared_ptr<InteractionContainer> ic=boost::dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
+		shared_ptr<InteractionContainer> ic=YADE_PTR_DYN_CAST<InteractionContainer>(ClassFactory::instance().createShared(clss));
 		rb->interactions=ic;
 	}
 	string interactionContainer_get(string clss){ return OMEGA.getScene()->interactions->getClassName(); }
@@ -784,7 +766,7 @@ class pyOmega{
 	void bodyContainer_set(string clss){
 		Scene* rb=OMEGA.getScene().get();
 		if(rb->bodies->size()>0) throw std::runtime_error("Body container not empty, will not change its class.");
-		shared_ptr<BodyContainer> bc=boost::dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
+		shared_ptr<BodyContainer> bc=YADE_PTR_DYN_CAST<BodyContainer>(ClassFactory::instance().createShared(clss));
 		rb->bodies=bc;
 	}
 	string bodyContainer_get(string clss){ return OMEGA.getScene()->bodies->getClassName(); }

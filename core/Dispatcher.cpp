@@ -11,8 +11,5 @@
 Functor::~Functor(){}; // vtable
 
 #include "Dispatcher.hpp"
-#include<algorithm>
-#include<vector>
-
 
 Dispatcher::~Dispatcher(){}

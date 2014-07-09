@@ -378,7 +378,7 @@ void VTKRecorder::action(){
 			const GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());
 			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
 			float fn=phys->normalForce.dot(geom->normal); 
-			float fs[3]={ (float) abs(phys->shearForce[0]), (float) abs(phys->shearForce[1]), (float) abs(phys->shearForce[2])};
+			float fs[3]={ (float) std::abs(phys->shearForce[0]), (float) std::abs(phys->shearForce[1]), (float) std::abs(phys->shearForce[2])};
 			// add the value once for each interaction object that we created (might be 2 for the periodic boundary)
 			for(int i=0; i<numAddValues; i++){
 				intrAbsForceT->InsertNextTupleValue(fs);

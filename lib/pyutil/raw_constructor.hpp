@@ -1,5 +1,4 @@
 #pragma once
-#include<boost/python.hpp>
 #include<boost/python/raw_function.hpp>
 // many thanks to http://markmail.org/message/s4ksg6nfspw2wxwd
 namespace boost { namespace python { namespace detail {

@@ -1,6 +1,5 @@
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
-#include<boost/python.hpp>
 
 class ParallelEngine;
 shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const boost::python::list& slaves);

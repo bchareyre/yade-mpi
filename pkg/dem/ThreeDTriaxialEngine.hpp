@@ -12,9 +12,6 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/lib/base/Math.hpp>
 #include<yade/pkg/dem/TriaxialStressController.hpp>
-#include<string>
-
-
 
 /** \brief Class for controlling in stress or in strain with respect to each spatial direction a cubical assembly of particles.
  *

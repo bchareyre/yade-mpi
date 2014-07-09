@@ -37,7 +37,7 @@ Real BubblePhys::computeForce(Real penetrationDepth, Real surfaceTension, Real r
 		f = penetrationDepth - ret*c1*ll;
 		df = -c1*(ll + 1);
 		ret -= f/df;
-		residual = fabs(ret - retOld)/retOld;
+		residual = std::abs(ret - retOld)/retOld;
 		if (i++ > newtonIter) {
 			throw runtime_error("BubblePhys::computeForce: no convergence\n");
 		}

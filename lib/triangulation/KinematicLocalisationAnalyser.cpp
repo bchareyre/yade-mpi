@@ -13,8 +13,6 @@
 #include "KinematicLocalisationAnalyser.hpp" //This one first, because it defines the info types
 // #include "Tesselation.h"
 // #include "TriaxialState.h"
-#include <iostream>
-#include <fstream>
 #include <sstream>
 #include "basicVTKwritter.hpp"
 //#include <utility>
@@ -173,7 +171,7 @@ vector<KinematicLocalisationAnalyser::Edge_iterator>& KinematicLocalisationAnaly
 				&& TS1->inside(T.segment(*ed_it).target())) {
 			Segment s = T.segment(*ed_it);
 			CVector v = s.to_vector();
-			Real ny = abs(v.y()/sqrt(s.squared_length()));
+			Real ny = std::abs(v.y()/sqrt(s.squared_length()));
 
 			if (Nymin < ny && ny <= Nymax) filteredList.push_back(ed_it);
 		}
@@ -273,7 +271,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 		if (!T.is_infinite(*ed_it)) {
 			Segment s = T.segment(*ed_it);
 			CVector v = s.to_vector();
-			Real xx = abs(v.z()/sqrt(s.squared_length()));
+			Real xx = std::abs(v.z()/sqrt(s.squared_length()));
 
 			if (xx>0.95) edges.push_back(ed_it);
 		}
@@ -285,7 +283,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 		if (!T.is_infinite(*ed_it)) {
 			Segment s = T.segment(*ed_it);
 			CVector v = s.to_vector();
-			Real xx = abs(v.z()/sqrt(s.squared_length()));
+			Real xx = std::abs(v.z()/sqrt(s.squared_length()));
 
 			if (xx<0.05) edges.push_back(ed_it);
 		}
@@ -297,7 +295,7 @@ bool KinematicLocalisationAnalyser::DistribsToFile(const char* output_file_name)
 		if (!T.is_infinite(*ed_it)) {
 			Segment s = T.segment(*ed_it);
 			CVector v = s.to_vector();
-			Real xx = abs(v.z()/sqrt(s.squared_length()));
+			Real xx = std::abs(v.z()/sqrt(s.squared_length()));
 
 			if (xx>0.65 && xx<0.75) edges.push_back(ed_it);
 		}
@@ -540,11 +538,11 @@ ContactDistributionToFile(ofstream& output_file)
 
 	for (TriaxialState::ContactIterator cit = (*TS1).contacts_begin(); cit!=cend; ++cit) {
 		if ((*TS1).inside((*cit)->grain1->sphere.point()) && (*TS1).inside((*cit)->grain2->sphere.point())) {
-			row[(int)(abs((*cit)->normal.z()) /DZ)].second += 2;
+			row[(int)(std::abs((*cit)->normal.z()) /DZ)].second += 2;
 			nc1 += 2;
 		} else {
 			if ((*TS1).inside((*cit)->grain1->sphere.point()) || (*TS1).inside((*cit)->grain2->sphere.point())) {
-				row[(int)(abs((*cit)->normal.z()) /DZ)].second += 1;
+				row[(int)(std::abs((*cit)->normal.z()) /DZ)].second += 1;
 				++nc1;
 			}
 			//cerr << "(*cit)->normal.z(),DZ : " << (*cit)->normal.z() << " " << DZ << endl;}
@@ -604,12 +602,12 @@ AllNeighborDistributionToFile(ofstream& output_file)
 			s = T.segment(*ed_it);
 			if ((*TS1).inside(s.source()) && (*TS1).inside(s.target())) {
 				v = s.to_vector();
-				row[(int)(abs(v.z() /sqrt(s.squared_length())) /DZ)].second += 2;
+				row[(int)(std::abs(v.z() /sqrt(s.squared_length())) /DZ)].second += 2;
 				nv1 += 2;
 			} else {
 				if ((*TS1).inside(s.source()) || (*TS1).inside(s.target())) {
 					v = s.to_vector();
-					row[(int)(abs(v.z() /sqrt(s.squared_length())) /DZ)].second += 1;
+					row[(int)(std::abs(v.z() /sqrt(s.squared_length())) /DZ)].second += 1;
 					++nv1;
 				} else ++nv2;
 			}

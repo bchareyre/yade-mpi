@@ -659,7 +659,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 			#define v1 iABinfo[i].V[1]
 			#define v2 iABinfo[i].V[2]
 			#define v3 iABinfo[i].V[3]
-			Real dV=fabs(Vector3r(v1-v0).Dot((v2-v0).Cross(v3-v0)))/6.;
+			Real dV=std::abs(Vector3r(v1-v0).Dot((v2-v0).Cross(v3-v0)))/6.;
 			V+=dV;
 			Sg+=dV*(v0+v1+v2+v3)*.25;
 			vector<Vector3r> t; t.push_back(v0); t.push_back(v1); t.push_back(v2); t.push_back(v3);
@@ -956,14 +956,14 @@ void TetraVolumetricLaw::action()
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use phys at all
 		if (!I->geom) continue; // Ig2_Tetra_Tetra_TTetraGeom::go returned false for this interaction, skip it
-		const shared_ptr<TTetraGeom>& contactGeom(boost::dynamic_pointer_cast<TTetraGeom>(I->geom));
+		const shared_ptr<TTetraGeom>& contactGeom(YADE_PTR_DYN_CAST<TTetraGeom>(I->geom));
 		if(!contactGeom) continue;
 
 		const Body::id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 			
-		const shared_ptr<ElastMat>& physA(boost::dynamic_pointer_cast<ElastMat>(A->material));
-		const shared_ptr<ElastMat>& physB(boost::dynamic_pointer_cast<ElastMat>(B->material));
+		const shared_ptr<ElastMat>& physA(YADE_PTR_DYN_CAST<ElastMat>(A->material));
+		const shared_ptr<ElastMat>& physB(YADE_PTR_DYN_CAST<ElastMat>(B->material));
 		
 
 		/* Cross-section is volumetrically equivalent to the penetration configuration */
@@ -1073,7 +1073,7 @@ Matrix3r TetrahedronInertiaTensor(const vector<Vector3r>& v){
 	// Jacobian of transformation to the reference 4hedron
 	double detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
 		-(x2-x1)*(y4-y1)*(z3-z1)-(x3-x1)*(y2-y1)*(z4-z1)-(x4-x1)*(y3-y1)*(z2-z1);
-	detJ=fabs(detJ);
+	detJ=std::abs(detJ);
 	double a=detJ*(y1*y1+y1*y2+y2*y2+y1*y3+y2*y3+
 		y3*y3+y1*y4+y2*y4+y3*y4+y4*y4+z1*z1+z1*z2+
 		z2*z2+z1*z3+z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
@@ -1143,7 +1143,7 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	//const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
 	State* rbp=tetraBody->state.get();
-	const shared_ptr<Tetra>& tMold(boost::dynamic_pointer_cast<Tetra>(tetraBody->shape));
+	const shared_ptr<Tetra>& tMold(YADE_PTR_DYN_CAST<Tetra>(tetraBody->shape));
 
 	#define v0 tMold->v[0]
 	#define v1 tMold->v[1]
@@ -1181,9 +1181,9 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 
 
 Real TetrahedronSignedVolume(const Vector3r v[4]) { return (Vector3r(v[3])-Vector3r(v[0])).dot((Vector3r(v[3])-Vector3r(v[1])).cross(Vector3r(v[3])-Vector3r(v[2])))/6.; }
-Real TetrahedronVolume(const Vector3r v[4]) { return fabs(TetrahedronSignedVolume(v)); }
+Real TetrahedronVolume(const Vector3r v[4]) { return std::abs(TetrahedronSignedVolume(v)); }
 Real TetrahedronSignedVolume(const vector<Vector3r>& v) { return Vector3r(v[1]-v[0]).dot(Vector3r(v[2]-v[0]).cross(v[3]-v[0]))/6.; }
-Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(TetrahedronSignedVolume(v)); }
+Real TetrahedronVolume(const vector<Vector3r>& v) { return std::abs(TetrahedronSignedVolume(v)); }
 #ifdef YADE_CGAL
 Real TetrahedronVolume(const CGAL::Point_3<CGAL::Cartesian<Real> >* v[4]) {
 	Vector3r vv[4];

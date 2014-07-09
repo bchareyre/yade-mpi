@@ -31,7 +31,7 @@
 		Real fnNorm=np->normalForce.dot(geom->normal);
 		if((signFilter>0 && fnNorm<0) || (signFilter<0 && fnNorm>0)) return;
 		int fnSign=fnNorm>0?1:-1;
-		fnNorm=abs(fnNorm);
+		fnNorm=std::abs(fnNorm);
 		Real radiusScale=1.;
 		// weak/strong fabric, only used if maxWeakFn is set
 		if(!isnan(maxWeakFn)){

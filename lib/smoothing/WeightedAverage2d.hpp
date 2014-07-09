@@ -2,35 +2,12 @@
 
 #pragma once
 
-#include<iostream>
-#include<vector>
-#include<cstdlib>
-#include<algorithm>
-#include<cassert>
-#include<cmath>
-#include<stdexcept>
-#include<boost/foreach.hpp>
-#include<boost/lexical_cast.hpp>
-#include<boost/python.hpp>
-#include<boost/python/object.hpp>
-#include<boost/version.hpp>
-#include<boost/math/distributions/normal.hpp>
-
-#ifndef  __GXX_EXPERIMENTAL_CXX0X__
-#	include<boost/shared_ptr.hpp>
-	using boost::shared_ptr;
-#else
-#	include<memory>
-	using std::shared_ptr;
-#endif
-
-#ifndef FOREACH
-	#define FOREACH BOOST_FOREACH
-#endif
-using namespace std;
-
 #include<yade/lib/base/Math.hpp>
 
+#include<boost/math/distributions/normal.hpp>
+
+using std::vector;
+using std::string;
 
 template<typename T>
 struct GridContainer{

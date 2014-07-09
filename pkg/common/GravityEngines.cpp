@@ -77,8 +77,8 @@ void HdapsGravityEngine::action(){
 		Vector2i a=readSysfsFile(hdapsDir+"/position");
 		lastReading=now;
 		a-=calibrate;
-		if(abs(a[0]-accel[0])>updateThreshold) accel[0]=a[0];
-		if(abs(a[1]-accel[1])>updateThreshold) accel[1]=a[1];
+		if(std::abs(a[0]-accel[0])>updateThreshold) accel[0]=a[0];
+		if(std::abs(a[1]-accel[1])>updateThreshold) accel[1]=a[1];
 		Quaternionr trsf(AngleAxisr(.5*accel[0]*M_PI/180.,-Vector3r::UnitY())*AngleAxisr(.5*accel[1]*M_PI/180.,-Vector3r::UnitX()));
 		gravity=trsf*zeroGravity;
 	}

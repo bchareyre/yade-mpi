@@ -9,8 +9,6 @@
 *************************************************************************/
 #pragma once
 
-#include<iostream>
-#include<map>
 #include"Shape.hpp"
 #include"Bound.hpp"
 #include"State.hpp"

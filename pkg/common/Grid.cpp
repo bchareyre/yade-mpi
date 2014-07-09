@@ -90,16 +90,17 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 	Vector3r A=stNode11->pos, a=stNode12->pos-A; //"A" is an extremity of conn1, "a" is the connection's segment.
 	Vector3r B=stNode21->pos, b=stNode22->pos-B; //"B" is an extremity of conn2, "b" is the connection's segment.
 	B+=shift2;//periodicity.
+	/* NOW STARTS THE OLD VERSION. IT SHOULD BE REMOVED LATER.
 	Vector3r N=a.cross(b);	//"N" is orthogonal to "a" and "b". It means that "N" describes the common plan between a and b.
 	if(N.norm()>1e-14){	//If "a" and "b" are colinear, "N==0" and this is a special case.
 		Real dist=N.dot(B-A)/(N.norm());	//here "dist" is oriented, so it's sign depends on the orientation of "N" against "AB".
 		Vector3r pB=B-dist*(N/(N.norm()));	//"pB" is the projection of the point "B" in the plane defined by his normal vector "N".
 		//Now we have pB, so we will compute the intersection of two segments into a plane.
 		int b0, b1; //2 base vectors used to compute the segment intersection. For more accuracy and to avoid det==0, don't choose the axis where N is max.
-		if(abs(N[0])<abs(N[1]) || abs(N[0])<abs(N[2])){b0=0 ; b1=abs(N[1])<abs(N[2])?1:2;}
+		if(std::abs(N[0])<std::abs(N[1]) || std::abs(N[0])<std::abs(N[2])){b0=0 ; b1=std::abs(N[1])<std::abs(N[2])?1:2;}
 		else { b0=1;b1=2;}
 		Real det=a[b0]*b[b1]-a[b1]*b[b0];
-		if (abs(det)>1e-14){
+		if (std::abs(det)>1e-14){
 			//Now compute k and m, who are the parameters (relative position on the connections) of the intersection on conn1 ("A" and "a") and conn2 ("B" and "b") respectively.
 			k = (b[b1]*(pB[b0]-A[b0])+b[b0]*(A[b1]-pB[b1]))/det;
 			m = (a[b0]*(-pB[b1]+A[b1])+a[b1]*(pB[b0]-A[b0]))/det;
@@ -122,7 +123,26 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
 		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
 		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
+	} OLD VERSION END*/
+	
+	/* NOW STARTS THE NEW VERSION */
+	Real denom=a.dot(a)*b.dot(b)-pow(a.dot(b),2);
+	if(denom!=0){
+		k = (a.dot(B-A)*b.dot(b)-a.dot(b)*b.dot(B-A))/denom;
+// 		m = (a.dot(b)*a.dot(B-A)-b.dot(B-A)*a.dot(a))/denom; //USELESS BECAUSE DETERMINED FROM k
+		k = max(min( k,(Real)1.0),(Real)0.0);
+		m = max(min( (A+a*k-B).dot(b)/(pow(b.norm(),2.0)) ,(Real)1.0),(Real)0.0);
+		k = max(min( (B+b*m-A).dot(a)/(pow(a.norm(),2.0)) ,(Real)1.0),(Real)0.0);
+// 		cout<<"k="<<k<<" m="<<m<<"\n"<<"kc="<<kc<<" mc="<<mc<<"\n\n"<<endl;//}
 	}
+	else{
+		Real PA=(A-B).dot(b)/(b.norm()*b.norm()); PA=min((Real)1.0,max((Real)0.0,PA));
+		Real Pa=(A+a-B).dot(b)/(b.norm()*b.norm()); Pa=min((Real)1.0,max((Real)0.0,Pa));
+		Real PB=(B-A).dot(a)/(a.norm()*a.norm()); PB=min((Real)1.0,max((Real)0.0,PB));
+		Real Pb=(B+b-A).dot(a)/(a.norm()*a.norm()); Pb=min((Real)1.0,max((Real)0.0,Pb));
+		k=(PB+Pb)/2. ; m=(PA+Pa)/2.;
+	}
+	/*NEW VERSION END*/
 	
 	//Compute the geometry if "penetrationDepth" is positive.
 	double penetrationDepth = conn1->radius + conn2->radius - (A+k*a - (B+m*b)).norm();
@@ -183,8 +203,8 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 	Vector3r branch = spherePos - gridNo1St->pos;
 	Vector3r branchN = spherePos - gridNo2St->pos;
 	for(int i=0;i<3;i++){
-		if(abs(branch[i])<1e-14) branch[i]=0.0;
-		if(abs(branchN[i])<1e-14) branchN[i]=0.0;
+		if(std::abs(branch[i])<1e-14) branch[i]=0.0;
+		if(std::abs(branchN[i])<1e-14) branchN[i]=0.0;
 	}
 	Real relPos = branch.dot(segt)/(len*len);
 	if(scm->isDuplicate==2 && scm->trueInt!=c->id2)return true;	//the contact will be deleted into the Law, no need to compute here.
@@ -213,7 +233,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo1St->pos;
 				Vector3r segtPrev = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
 				for(int j=0;j<3;j++){
-					if(abs(segtPrev[j])<1e-14) segtPrev[j]=0.0;
+					if(std::abs(segtPrev[j])<1e-14) segtPrev[j]=0.0;
 				}
 				Real relPosPrev = (branch.dot(segtPrev))/(segtPrev.norm()*segtPrev.norm());
 				// ... and check whether the sphere projection is before the neighbours connections too.
@@ -250,7 +270,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo2St->pos;
 				Vector3r segtNext = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
 				for(int j=0;j<3;j++){
-					if(abs(segtNext[j])<1e-14) segtNext[j]=0.0;
+					if(std::abs(segtNext[j])<1e-14) segtNext[j]=0.0;
 				}
 				Real relPosNext = (branchN.dot(segtNext))/(segtNext.norm()*segtNext.norm());
 				if(relPosNext<=0){ //if the sphere projection is outside both the current Connection AND this neighbouring connection, then create the interaction if the neighbour did not already do it before.
@@ -283,7 +303,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo1St->pos;
 				Vector3r segtPrev = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
 				for(int j=0;j<3;j++){
-					if(abs(segtPrev[j])<1e-14) segtPrev[j]=0.0;
+					if(std::abs(segtPrev[j])<1e-14) segtPrev[j]=0.0;
 				}
 				Real relPosPrev = (branch.dot(segtPrev))/(segtPrev.norm()*segtPrev.norm());
 				if(relPosPrev<=0){ //the sphere projection is inside the current Connection and outide this neighbour connection.
@@ -313,7 +333,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				Vector3r segtCandidate2 = GC->node2->state->pos - gridNo2St->pos;
 				Vector3r segtNext = segtCandidate1.norm()>segtCandidate2.norm() ? segtCandidate1:segtCandidate2;
 				for(int j=0;j<3;j++){
-					if(abs(segtNext[j])<1e-14) segtNext[j]=0.0;
+					if(std::abs(segtNext[j])<1e-14) segtNext[j]=0.0;
 				}
 				Real relPosNext = (branchN.dot(segtNext))/(segtNext.norm()*segtNext.norm());
 				if(relPosNext<=0){ //the sphere projection is inside the current Connection and outide this neighbour connection.

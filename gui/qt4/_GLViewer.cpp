@@ -1,6 +1,5 @@
 #include"GLViewer.hpp"
 #include"OpenGLManager.hpp"
-#include<boost/python.hpp>
 #include<yade/pkg/common/OpenGLRenderer.hpp>
 #include<yade/lib/pyutil/doc_opts.hpp>
 

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <time.h>
 
+using std::string;
+
 // SECTION: A Timer Measuring Real-Time
 // ========================================================================
 // 

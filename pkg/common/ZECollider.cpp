@@ -10,11 +10,7 @@
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
-#include<algorithm>
-#include<vector>
 #include<boost/static_assert.hpp>
-
-using namespace std;
 
 YADE_PLUGIN((ZECollider))
 CREATE_LOGGER(ZECollider);
@@ -72,7 +68,7 @@ void ZECollider::action(){
 				minR=min(s->radius,minR);
 			}
 			// if no spheres, disable stride
-			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
+			verletDist=isinf(minR) ? 0 : std::abs(verletDist)*minR;
 		}
 		
 		// update bounds via boundDispatcher
@@ -92,7 +88,7 @@ void ZECollider::action(){
 		if(verletDist>0){
 			// get NewtonIntegrator, to ask for the maximum velocity value
 			if(!newton){
-				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=YADE_PTR_DYN_CAST<NewtonIntegrator>(e); if(newton) break; }
 				if(!newton){ throw runtime_error("ZECollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 			}
 		}

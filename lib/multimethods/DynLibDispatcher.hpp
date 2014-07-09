@@ -35,9 +35,6 @@
 #include<string>
 #include<ostream>
 
-
-using namespace std;
-
 struct DynLibDispatcher_Item2D{ int ix1, ix2; std::string functorName; DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){}; };
 struct DynLibDispatcher_Item1D{ int ix1     ; std::string functorName; DynLibDispatcher_Item1D(int a,        std::string c):ix1(a),       functorName(c){}; };
 ///

@@ -9,14 +9,10 @@
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
-#include<algorithm>
-#include<vector>
 #include<boost/static_assert.hpp>
 #ifdef YADE_OPENMP
   #include<omp.h>
 #endif
-
-using namespace std;
 
 YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
@@ -252,7 +248,7 @@ void InsertionSortCollider::action(){
 			}
 			if (isinf(minR)) LOG_ERROR("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive verletDist in your script.");
 			// if no spheres, disable stride
-			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
+			verletDist=isinf(minR) ? 0 : std::abs(verletDist)*minR;
 		}
 		// if interactions are dirty, force reinitialization
 		if(scene->interactions->dirty){
@@ -274,7 +270,7 @@ void InsertionSortCollider::action(){
 		if(verletDist>0){
 			// get NewtonIntegrator, to ask for the maximum velocity value
 			if(!newton){
-				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+				FOREACH(shared_ptr<Engine>& e, scene->engines){ newton=YADE_PTR_DYN_CAST<NewtonIntegrator>(e); if(newton) break; }
 				if(!newton){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines."); }
 			}
 		}

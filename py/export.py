@@ -572,6 +572,7 @@ class VTKExporter:
 			elif isinstance(test,Vector3):
 				outFile.write("\nVECTORS %s double\n"%(name))
 				for ii,jj in intrs:
+					i = O.interactions[ii,jj]
 					v = eval(command)
 					outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
 			elif isinstance(test,(int,float)):

@@ -10,27 +10,8 @@
 
 #pragma once
 
-
-#include<map>
-#include<string>
-#include<list>
-#include<iostream>
-#include<cstdio>
-
-#ifndef  __GXX_EXPERIMENTAL_CXX0X__
-#	include<boost/shared_ptr.hpp>
-	using boost::shared_ptr;
-#else
-#	include<memory>
-	using std::shared_ptr;
-#endif
-
-
-#include<yade/lib/base/Singleton.hpp>
-
-#include<boost/preprocessor.hpp>
-
-
+#include <yade/lib/base/Math.hpp>
+#include <yade/lib/base/Singleton.hpp>
 #include "DynLibManager.hpp"
 
 /*! define the following macro to enable experimenta boost::serialization support
@@ -38,7 +19,6 @@
 	Python wrapper defines O.saveXML('file.xml') to try it out.
 	Loading is not yet implemented (should be easy)
 */
-#include<boost/version.hpp>
 
 #include<boost/archive/binary_oarchive.hpp>
 #include<boost/archive/binary_iarchive.hpp>
@@ -47,7 +27,6 @@
 
 #include<boost/serialization/export.hpp> // must come after all supported archive types
 
-#include<boost/serialization/base_object.hpp>
 #include<boost/serialization/shared_ptr.hpp>
 #include<boost/serialization/list.hpp>
 #include<boost/serialization/vector.hpp>

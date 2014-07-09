@@ -317,7 +317,7 @@ Real PeriodicFlowEngine::volumeCellSingleFictious ( CellHandle cell )
                 }
         }
         Real Volume = 0.5* ( ( V[0]-V[1] ).cross ( V[0]-V[2] ) ) [solver->boundary ( b ).coordinate] * ( 0.33333333333* ( V[0][solver->boundary ( b ).coordinate]+ V[1][solver->boundary ( b ).coordinate]+ V[2][solver->boundary ( b ).coordinate] ) - Wall_coordinate );
-        return abs ( Volume );
+        return std::abs ( Volume );
 }
 
 
@@ -434,7 +434,7 @@ void PeriodicFlowEngine::updateVolumes (FlowSolver& flow)
                 totVol+=newVol;
                 dVol=cell->info().volumeSign * ( newVol - cell->info().volume() );
                 totDVol+=dVol;
-                epsVolMax = max ( epsVolMax, abs ( dVol/newVol ) );
+                epsVolMax = max ( epsVolMax, std::abs ( dVol/newVol ) );
                 cell->info().dv() = dVol * invDeltaT;
                 cell->info().volume() = newVol;
         }
@@ -456,7 +456,7 @@ void PeriodicFlowEngine::initializeVolumes (FlowSolver& flow)
 			default:  cell->info().volume() = 0; break;
 		}
 		//FIXME: the void volume is negative sometimes, hence crashing...
-		if (flow.fluidBulkModulus>0) { cell->info().invVoidVolume() = 1. / (max(0.1*cell->info().volume(),abs(cell->info().volume()) - flow.volumeSolidPore(cell)) ); }
+		if (flow.fluidBulkModulus>0) { cell->info().invVoidVolume() = 1. / (max(0.1*cell->info().volume(),std::abs(cell->info().volume()) - flow.volumeSolidPore(cell)) ); }
 	}
         if ( debug ) cout << "Volumes initialised." << endl;
 }

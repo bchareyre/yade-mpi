@@ -14,7 +14,6 @@
 #include<yade/pkg/common/Sphere.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
-#include <boost/lexical_cast.hpp>
 #include <yade/pkg/dem/ScGeom.hpp>
 #include <yade/pkg/dem/FrictPhys.hpp>
 #include <yade/pkg/dem/Shop.hpp>

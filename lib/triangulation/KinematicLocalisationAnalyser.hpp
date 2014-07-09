@@ -16,6 +16,10 @@
 #include "Tenseur3.h"
 
 namespace CGT {
+  
+using std::pair;
+using std::ofstream;
+
 #define SPHERE_DISCRETISATION 20; //number of "teta" intervals on the unit sphere
 #define LINEAR_DISCRETISATION 200; //number of intervals on segments like [UNmin,UNmax]
 	

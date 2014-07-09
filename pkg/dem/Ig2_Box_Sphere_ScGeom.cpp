@@ -52,10 +52,10 @@ bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Sh
 	shared_ptr<ScGeom> scm;
 	if (inside){
 		// sphere center inside box. find largest `cOnBox_boxLocal' value:
-		// minCBoxDist_index is the coordinate index that minimizes extents[minCBoxDist_index]-abs(cOnBox_boxLocal[minCBoxDist_index] (sphere center closest to box boundary)
+		// minCBoxDist_index is the coordinate index that minimizes extents[minCBoxDist_index]-std::abs(cOnBox_boxLocal[minCBoxDist_index] (sphere center closest to box boundary)
 		// where cOnBox_boxLocal is minimal (i.e. where sphere center is closest perpendicularly to the box)
-		Real minCBoxDist=extents[0]-fabs(cOnBox_boxLocal[0]); int minCBoxDist_index=0;
-		for (int i=1; i<3; i++){Real tt=extents[i]-fabs(cOnBox_boxLocal[i]); if (tt<minCBoxDist){minCBoxDist=tt; minCBoxDist_index=i;}}
+		Real minCBoxDist=extents[0]-std::abs(cOnBox_boxLocal[0]); int minCBoxDist_index=0;
+		for (int i=1; i<3; i++){Real tt=extents[i]-std::abs(cOnBox_boxLocal[i]); if (tt<minCBoxDist){minCBoxDist=tt; minCBoxDist_index=i;}}
 
 		// contact normal aligned with box edge along largest `cOnBox_boxLocal' value
 		Vector3r normal_boxLocal = Vector3r(0,0,0);

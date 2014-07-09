@@ -15,14 +15,11 @@
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/multimethods/FunctorWrapper.hpp>
 #include<yade/lib/multimethods/Indexable.hpp>
-#include<cstdlib>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
 #include<boost/filesystem/exception.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
-#include<boost/version.hpp>
-#include<boost/python.hpp>
 
 #include<yade/lib/serialization/ObjectIO.hpp>
 
@@ -71,8 +68,8 @@ void Omega::switchToScene(int i) {
 
 
 
-Real Omega::getRealTime(){ return (microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
-time_duration Omega::getRealTime_duration(){return microsec_clock::local_time()-startupLocalTime;}
+Real Omega::getRealTime(){ return (boost::posix_time::microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
+boost::posix_time::time_duration Omega::getRealTime_duration(){return boost::posix_time::microsec_clock::local_time()-startupLocalTime;}
 
 
 void Omega::initTemps(){
@@ -107,7 +104,7 @@ void Omega::init(){
 }
 
 void Omega::timeInit(){
-	startupLocalTime=microsec_clock::local_time();
+	startupLocalTime=boost::posix_time::microsec_clock::local_time();
 }
 
 void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
@@ -145,9 +142,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 		try {
 			LOG_DEBUG("Factoring plugin "<<name);
 			f = ClassFactory::instance().createShared(name);
-			dynlibs[name].isIndexable    = boost::dynamic_pointer_cast<Indexable>(f);
-			dynlibs[name].isFactorable   = boost::dynamic_pointer_cast<Factorable>(f);
-			dynlibs[name].isSerializable = boost::dynamic_pointer_cast<Serializable>(f);
+			dynlibs[name].isSerializable = ((YADE_PTR_DYN_CAST<Serializable>(f)).get()!=0);
 			for(int i=0;i<f->getBaseClassNumber();i++){
 				dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
 			}
@@ -250,7 +245,7 @@ void Omega::loadSimulation(const string& f, bool quiet){
 		RenderMutexLock lock;
 		if(isMem){
 			istringstream iss(memSavedSimulations[f]);
-			yade::ObjectIO::load<typeof(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
+			yade::ObjectIO::load<TYPEOF(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
 		} else {
 			yade::ObjectIO::load(f,"scene",scene);
 		}
@@ -272,7 +267,7 @@ void Omega::saveSimulation(const string& f, bool quiet){
 	if(boost::algorithm::starts_with(f,":memory:")){
 		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
 		ostringstream oss;
-		yade::ObjectIO::save<typeof(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
+		yade::ObjectIO::save<TYPEOF(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
 		memSavedSimulations[f]=oss.str();
 	}
 	else {

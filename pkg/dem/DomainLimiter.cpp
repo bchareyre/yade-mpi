@@ -110,7 +110,7 @@ void LawTester::action(){
 		axX=gsc->normal; /* just in case */ axX.normalize();
 		if(doInit){ // initialization of the new interaction -- define local axes
 			// take vector in the y or z direction, depending on its length; arbitrary, but one of them is sure to be non-zero
-			axY=axX.cross(abs(axX[1])<abs(axX[2])?Vector3r::UnitY():Vector3r::UnitZ());
+			axY=axX.cross(std::abs(axX[1])<std::abs(axX[2])?Vector3r::UnitY():Vector3r::UnitZ());
 			axY.normalize();
 			axZ=axX.cross(axY);
 			LOG_DEBUG("Initial axes x="<<axX<<", y="<<axY<<", z="<<axZ);
@@ -237,7 +237,7 @@ void GlExtra_LawTester::render(){
 	// scene object changed (after reload, for instance), for re-initialization
 	if(tester && tester->scene!=scene) tester=shared_ptr<LawTester>();
 
-	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=boost::dynamic_pointer_cast<LawTester>(e); if(tester) break; } }
+	if(!tester){ FOREACH(shared_ptr<Engine> e, scene->engines){ tester=YADE_PTR_DYN_CAST<LawTester>(e); if(tester) break; } }
 	if(!tester){ LOG_ERROR("No LawTester in O.engines, killing myself."); dead=true; return; }
 
 	//if(tester->renderLength<=0) return;

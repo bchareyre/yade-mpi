@@ -1,7 +1,6 @@
 // (c) 2007-2010 Vaclav Smilauer <eudoxos@arcig.cz> 
 
 #include"Clump.hpp"
-#include<algorithm>
 #include<yade/core/Scene.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>

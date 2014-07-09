@@ -39,8 +39,6 @@ extern "C" { void openblas_set_num_threads(int num_threads); }
 namespace CGT
 {
 
-using namespace std;
-
 #ifdef PARDISO
 #ifdef AIX
 #define F77_FUNC(func)  func

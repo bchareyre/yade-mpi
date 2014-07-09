@@ -14,8 +14,6 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
-#include<iostream>
-
 CREATE_LOGGER(ThreadRunner);
 
 void ThreadRunner::run()

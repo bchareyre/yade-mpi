@@ -2,11 +2,6 @@
 
 #pragma once
 
-#include<string>
-#include<map>
-#include<iostream>
-#include<typeinfo>
-#include<boost/any.hpp>
 #include<boost/lambda/lambda.hpp>
 
 #include "yade/lib/base/Math.hpp"
@@ -23,7 +18,6 @@ class ViscElMat;
 class FrictMat;
 class Interaction;
 
-using namespace std;
 using boost::shared_ptr;
 namespace py = boost::python;
 

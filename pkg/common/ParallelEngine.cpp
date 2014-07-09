@@ -1,5 +1,4 @@
 #include"ParallelEngine.hpp"
-#include<boost/python.hpp>
 
 #ifdef YADE_OPENMP
   #include<omp.h>

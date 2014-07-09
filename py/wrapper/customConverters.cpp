@@ -1,33 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 
-// this is not currently used, but can be enabled if needed
-// probably breaks compilation for older (like <=1.35 or so)
-// boost::python
-#if 0
-	#include<indexing_suite/container_suite.hpp>
-	// #include<indexing_suite/container_proxy.hpp>
-	#include<indexing_suite/vector.hpp>
-#endif
-
-#if 0
-	#include<yade/lib/pyutil/numpy.hpp>
-#endif
-
-#include<boost/python.hpp>
-#include<boost/python/class.hpp>
-#include<boost/python/module.hpp>
-#include<boost/foreach.hpp>
-#ifndef FOREACH
-	#define FOREACH BOOST_FOREACH
-#endif
-
-#include<vector>
-#include<string>
-#include<stdexcept>
-#include<iostream>
-#include<map>
-
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/base/openmp-accu.hpp>
 
@@ -42,7 +15,6 @@
 	#include<yade/pkg/common/OpenGLRenderer.hpp>
 #endif
 #include<yade/pkg/common/MatchMaker.hpp>
-
 
 // move this to the miniEigen wrapper later
 

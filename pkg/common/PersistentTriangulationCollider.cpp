@@ -10,15 +10,9 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/BodyContainer.hpp>
-#include<limits>
-#include<utility>
-#include<vector>
 #include<yade/pkg/common/Sphere.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 
-
-using namespace std;
-		
 // PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 // {
 // 	haveDistantTransient=false;

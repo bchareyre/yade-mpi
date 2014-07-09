@@ -1,7 +1,6 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
 
-#include<stdexcept>
 #include<yade/lib/serialization/Serializable.hpp>
 
 class Interaction;

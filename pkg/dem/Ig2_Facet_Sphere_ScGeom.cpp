@@ -180,7 +180,7 @@ bool Ig2_Wall_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<S
 	const Real radius=static_cast<Sphere*>(cm2.get())->radius;
 	const int& ax(wall->axis);
 	Real dist=(state2.pos)[ax]+shift2[ax]-state1.pos[ax]; // signed "distance" between centers
-	if(!c->isReal() && abs(dist)>radius && !force) { return false; }// wall and sphere too far from each other
+	if(!c->isReal() && std::abs(dist)>radius && !force) { return false; }// wall and sphere too far from each other
 
 	// contact point is sphere center projected onto the wall
 	Vector3r contPt=state2.pos+shift2; contPt[ax]=state1.pos[ax];
@@ -195,7 +195,7 @@ bool Ig2_Wall_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<S
 	const shared_ptr<ScGeom>& ws=YADE_PTR_CAST<ScGeom>(c->geom);
 	ws->radius1=ws->radius2=radius; // do the same as for facet-sphere: wall's "radius" is the same as the sphere's radius
 	ws->contactPoint=contPt;
-	ws->penetrationDepth=-(abs(dist)-radius);
+	ws->penetrationDepth=-(std::abs(dist)-radius);
 	// ws->normal is assigned by precompute
 	ws->precompute(state1,state2,scene,c,normal,isNew,shift2,noRatch);
 	return true;

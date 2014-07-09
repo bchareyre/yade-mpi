@@ -8,7 +8,7 @@
 #include "SpatialQuickSortCollider.hpp"
 #include <yade/core/Scene.hpp>
 #include <yade/core/BodyContainer.hpp>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 YADE_PLUGIN((SpatialQuickSortCollider));

@@ -348,7 +348,7 @@ def facet(vertices,dynamic=None,fixed=True,wire=True,color=None,highlight=False,
 	b.chain=chain
 	return b
 
-def tetraPoly(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
+def tetraPoly(vertices,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
 	"""Create tetrahedron (actually simple Polyhedra) with given parameters.
 
 	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
@@ -360,7 +360,7 @@ def tetraPoly(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color
 	inertia = b.shape.GetInertia()
 	center = b.shape.GetCentroid()
 	_commonBodySetup(b,volume,inertia,material,noBound=noBound,pos=center,fixed=fixed)
-	b.aspherical=False # mass and inertia are 0 anyway; fell free to change to ``True`` if needed
+	b.aspherical=False
 	b.state.ori = b.shape.GetOri()
 	b.mask=mask
 	b.chain=chain
@@ -392,6 +392,24 @@ def tetra(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=Non
 	b.aspherical = True
 	b.mask = mask
 	b.chain = chain
+	return b
+
+def polyhedron(vertices,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
+	"""Create tetrahedron (actually simple Polyhedra) with given parameters.
+
+	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
+
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
+	b=Body()
+	b.shape = Polyhedra(v=vertices,color=color if color else randomColor(),wire=wire,highlight=highlight)
+	volume = b.shape.GetVolume()
+	inertia = b.shape.GetInertia()
+	center = b.shape.GetCentroid()
+	_commonBodySetup(b,volume,inertia,material,noBound=noBound,pos=center,fixed=fixed)
+	b.aspherical=False
+	b.state.ori = b.shape.GetOri()
+	b.mask=mask
+	b.chain=chain
 	return b
 
 
@@ -1013,6 +1031,7 @@ class UnstructuredGrid:
 				b = facet([self.vertices[j] for j in c],**kw)
 			elif len(c) == 4:
 				b = tetra([self.vertices[j] for j in c],**kw)
+				#b = polyhedron([self.vertices[j] for j in c],**kw)
 			else:
 				raise RuntimeError, "Unsupported cell shape (should be triangle or tetrahedron)"
 			self.elements[i] = b
@@ -1050,6 +1069,8 @@ class UnstructuredGrid:
 					self.forces[ie[1]] += f*w1/ww
 					self.forces[ie[2]] += f*w2/ww
 					self.forces[ie[3]] += f*w3/ww
+				else:
+					raise RuntimeError, "TODO"
 		return self.forces
 	def setPositionsOfNodes(self,newPoss):
 		"""Sets new position of nodes and also updates all elements in the simulation
@@ -1070,6 +1091,8 @@ class UnstructuredGrid:
 				e.shape.vertices = [self.vertices[j] for j in c]
 			elif isinstance(e.shape,Tetra):
 				e.shape.v = [self.vertices[j] for j in c]
+			else:
+				raise RuntimeError, "TODO"
 	def toSimulation(self,bodies=None):
 		"""Insert all elements to Yade simulation
 		"""

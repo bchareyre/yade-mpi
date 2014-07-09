@@ -136,7 +136,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 // 	Limitation by plastic threshold of this part of the moment caused by relative twist and bending
 			if (!momentAlwaysElastic)
 			{
-				Real normeMomentMax = currentContactPhysics->forMaxMoment * std::fabs(Fn);
+				Real normeMomentMax = currentContactPhysics->forMaxMoment * std::abs(Fn);
 				if(moment.norm()>normeMomentMax)
 					{
 					moment *= normeMomentMax/moment.norm();

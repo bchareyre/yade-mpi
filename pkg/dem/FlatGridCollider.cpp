@@ -21,7 +21,7 @@ bool FlatGridCollider::isActivated(){
 
 void FlatGridCollider::action(){
 	if(!newton){
-		FOREACH(const shared_ptr<Engine>& e, scene->engines){ newton=boost::dynamic_pointer_cast<NewtonIntegrator>(e); if(newton) break; }
+		FOREACH(const shared_ptr<Engine>& e, scene->engines){ newton=YADE_PTR_DYN_CAST<NewtonIntegrator>(e); if(newton) break; }
 		if(!newton){ throw runtime_error("FlatGridCollider: Unable to find NewtonIntegrator in engines."); }
 	}
 	fastestBodyMaxDist=0;

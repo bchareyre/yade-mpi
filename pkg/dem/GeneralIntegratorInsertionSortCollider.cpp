@@ -12,8 +12,6 @@
 #include<vector>
 #include<boost/static_assert.hpp>
 
-using namespace std;
-
 YADE_PLUGIN((GeneralIntegratorInsertionSortCollider))
 CREATE_LOGGER(GeneralIntegratorInsertionSortCollider);
 
@@ -90,7 +88,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			}
 			if (isinf(minR)) LOG_ERROR("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive verletDist in your script.");
 			// if no spheres, disable stride
-			verletDist=isinf(minR) ? 0 : abs(verletDist)*minR;
+			verletDist=isinf(minR) ? 0 : std::abs(verletDist)*minR;
 		}
 		
 		// update bounds via boundDispatcher
@@ -111,7 +109,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 		if(verletDist>0){
 			// get the Integrator, to ask for the maximum velocity value
 			if(!integrator){
- 				FOREACH(shared_ptr<Engine>& e, scene->engines){ integrator=boost::dynamic_pointer_cast<Integrator>(e); if(integrator) break; }
+ 				FOREACH(shared_ptr<Engine>& e, scene->engines){ integrator=YADE_PTR_DYN_CAST<Integrator>(e); if(integrator) break; }
 				if(!integrator){ throw runtime_error("InsertionSortCollider.verletDist>0, but unable to locate any Integrator within O.engines."); }
 			}
 		}

@@ -1,7 +1,6 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #include<yade/pkg/common/Wall.hpp>
 #include<yade/pkg/common/Aabb.hpp>
-#include<limits>
 
 YADE_PLUGIN((Wall)(Bo1_Wall_Aabb)
 	#ifdef YADE_OPENGL

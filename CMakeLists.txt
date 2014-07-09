@@ -62,7 +62,17 @@ IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
 ENDIF()
 
 #===========================================================
-ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast ")
+
+ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast -DYADE_PTR_DYN_CAST=boost::dynamic_pointer_cast ")
+IF (CXX11)
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++0x")
+  ADD_DEFINITIONS(" -DCXX11 -DTYPEOF=decltype")
+ELSE (CXX11)
+  ADD_DEFINITIONS(" -DTYPEOF=typeof")
+ENDIF (CXX11)
+
+#===========================================================
+
 IF (CMAKE_CXX_FLAGS)
   #If flags are set, add only neccessary flags
   IF (DEBUG)
@@ -134,9 +144,9 @@ IF (EIGEN3_FOUND)
   INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
   MESSAGE(STATUS "Found Eigen3, version: ${EIGEN3_VERSION}")
   
-  # Minimal recommended version 3.2.1
+  # Minimal required version 3.2.1
   IF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
-    MESSAGE(WARNING "Minimal recommended Eigen3 version is 3.2.1")
+    MESSAGE(FATAL_ERROR "Minimal required Eigen3 version is 3.2.1, please update Eigen3!")
   ENDIF ((${EIGEN3_MAJOR_VERSION} LESS 2) OR ((${EIGEN3_MAJOR_VERSION} EQUAL 2) AND (${EIGEN3_MINOR_VERSION} LESS 1)))
 
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} Eigen3")
@@ -161,8 +171,6 @@ ELSE((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
     ((Boost_MINOR_VERSION EQUAL 53) OR (Boost_MINOR_VERSION GREATER 53)))
   SET(DISABLED_FEATS "${DISABLED_FEATS} Odeint")
   MESSAGE(STATUS "Boost Odeint can be enabled, only if Boost>=1.53 is used")
-  MESSAGE(STATUS ${Boost_MAJOR_VERSION})
-  MESSAGE(STATUS ${Boost_MINOR_VERSION})
 ENDIF((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
      ((Boost_MINOR_VERSION EQUAL 53) OR (Boost_MINOR_VERSION GREATER 53)))
 #===========================================================

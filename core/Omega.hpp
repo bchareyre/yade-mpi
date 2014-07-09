@@ -10,21 +10,7 @@
 
 #pragma once
 
-// qt3 sucks
-#ifdef QT_MOC_CPP
-	#undef slots
-	#include<Python.h>
-	#define slots slots
-#else
-	#ifdef slots
-	 #undef slots
-	 #include<Python.h>
-	 #define slots
-	#else
-	 #include<Python.h>
-	#endif
-#endif
-
+#include <Python.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
 #include <set>
@@ -48,12 +34,9 @@
 class Scene;
 class ThreadRunner;
 
-using namespace boost::posix_time;
-using namespace std;
-
 struct DynlibDescriptor{
 	set<string> baseClasses;
-	bool isIndexable, isFactorable, isSerializable;
+	bool isSerializable;
 };
 
 class Omega: public Singleton<Omega>{
@@ -66,7 +49,7 @@ class Omega: public Singleton<Omega>{
 	int currentSceneNb;
 	shared_ptr<Scene> sceneAnother; // used for temporarily running different simulation, in Omega().switchscene()
 
-	ptime startupLocalTime;
+  boost::posix_time::ptime startupLocalTime;
 
 	map<string,string> memSavedSimulations;
 
@@ -117,7 +100,7 @@ class Omega: public Singleton<Omega>{
 		//! Return unique temporary filename. May be deleted by the user; if not, will be deleted at shutdown.
 		string tmpFilename();
 		Real getRealTime();
-		time_duration getRealTime_duration();
+    boost::posix_time::time_duration getRealTime_duration();
 
 		// configuration directory used for logging config and possibly other things
 		std::string confDir;

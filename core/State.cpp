@@ -1,10 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #include<yade/core/State.hpp>
-#include<boost/foreach.hpp>
-#include<stdexcept>
-#ifndef FOREACH
-	#define FOREACH BOOST_FOREACH
-#endif
 
 CREATE_LOGGER(State);
 

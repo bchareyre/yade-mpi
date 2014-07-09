@@ -36,7 +36,7 @@ void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 			Real& sweepLength = b->bound->sweepLength;
 			if (targetInterv>=0) {
 				Vector3r disp = b->state->pos-b->bound->refPos;
-				Real dist = max(abs(disp[0]),max(abs(disp[1]),abs(disp[2])));
+				Real dist = max(std::abs(disp[0]),max(std::abs(disp[1]),std::abs(disp[2])));
 				if (dist){
 					Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
 					newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
@@ -168,7 +168,7 @@ void IPhysDispatcher::action()
 			if(interaction->geom){
 				shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 				shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-				bool hadPhys=interaction->phys;
+				bool hadPhys=(interaction->phys.get() != 0);
 				operator()(b1->material, b2->material, interaction);
 				assert(interaction->phys);
 				if(!hadPhys) interaction->iterMadeReal=scene->iter;

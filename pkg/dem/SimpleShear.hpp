@@ -14,9 +14,6 @@
 typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
 
-using namespace std;
-
-
 class SimpleShear : public FileGenerator
 {
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);

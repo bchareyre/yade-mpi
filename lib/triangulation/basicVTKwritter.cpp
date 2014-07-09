@@ -1,7 +1,5 @@
 #include "basicVTKwritter.hpp"
 
-using namespace std;
-
 bool basicVTKwritter::open(const char * filename, const char * comment)
 {
   file.open(filename,ios_base::out);

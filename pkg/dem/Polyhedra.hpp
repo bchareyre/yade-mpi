@@ -6,7 +6,6 @@
 
 #ifdef YADE_CGAL
 
-#include<vector>
 #include<yade/core/Shape.hpp>
 #include<yade/core/IGeom.hpp>
 #include<yade/core/GlobalEngine.hpp>

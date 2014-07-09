@@ -1,8 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#include<string.h>
-#include<vector>
 #include<yade/lib/base/Math.hpp>
 #include<yade/core/Body.hpp>
 
