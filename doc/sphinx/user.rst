@@ -919,7 +919,8 @@ Running python code
 
 A special engine :yref:`PyRunner` can be used to periodically call python code, specified via the ``command`` parameter. Periodicity can be controlled by specifying computation time (``realPeriod``), virutal time (``virtPeriod``) or iteration number (``iterPeriod``).
 
-For instance, to print kinetic energy (using :yref:`kineticEnergy<yade.utils.kineticEnergy>`) every 5 seconds, this engine will be put to ``O.engines``:
+For instance, to print kinetic energy (using :yref:`kineticEnergy<yade.utils.kineticEnergy>`) every 5 seconds, the following engine will be put to ``O.engines``::
+
 	PyRunner(command="print 'kinetic energy',kineticEnergy()",realPeriod=5)
 
 For running more complex commands, it is convenient to define an external function and only call it from within the engine. Since the ``command`` is run in the script's namespace, functions defined within scripts can be called. Let us print information on interaction between bodies 0 and 1 periodically::
