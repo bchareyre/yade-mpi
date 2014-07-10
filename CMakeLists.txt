@@ -63,13 +63,7 @@ ENDIF()
 
 #===========================================================
 
-ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast -DYADE_PTR_DYN_CAST=boost::dynamic_pointer_cast ")
-IF (CXX11)
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++0x")
-  ADD_DEFINITIONS(" -DCXX11 -DTYPEOF=decltype")
-ELSE (CXX11)
-  ADD_DEFINITIONS(" -DTYPEOF=typeof")
-ENDIF (CXX11)
+ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast -DYADE_PTR_DYN_CAST=boost::dynamic_pointer_cast -DTYPEOF=decltype -std=c++0x")
 
 #===========================================================
 
