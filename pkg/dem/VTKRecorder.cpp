@@ -7,7 +7,7 @@
 #include<vtkPointData.h>
 #include<vtkCellData.h>
 #include<vtkSmartPointer.h>
-#include<vtkFloatArray.h>
+#include<vtkDoubleArray.h>
 #include<vtkUnstructuredGrid.h>
 #include<vtkPolyData.h>
 #include<vtkXMLUnstructuredGridWriter.h>
@@ -98,147 +98,147 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkPoints> spheresPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> spheresCells = vtkSmartPointer<vtkCellArray>::New();
 	
-	vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> radii = vtkSmartPointer<vtkDoubleArray>::New();
 	radii->SetNumberOfComponents(1);
 	radii->SetName("radii");
 	
-	vtkSmartPointer<vtkFloatArray> spheresMass = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresMass = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresMass->SetNumberOfComponents(1);
 	spheresMass->SetName("mass");
 	
-	vtkSmartPointer<vtkFloatArray> spheresId = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresId = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresId->SetNumberOfComponents(1);
 	spheresId->SetName("id");
 
 #ifdef YADE_SPH
-	vtkSmartPointer<vtkFloatArray> spheresCsSPH = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresCsSPH = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresCsSPH->SetNumberOfComponents(1);
 	spheresCsSPH->SetName("SPH_Cs");
 	
-	vtkSmartPointer<vtkFloatArray> spheresRhoSPH = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresRhoSPH = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresRhoSPH->SetNumberOfComponents(1);
 	spheresRhoSPH->SetName("SPH_Rho");
 	
-	vtkSmartPointer<vtkFloatArray> spheresPressSPH = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresPressSPH = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresPressSPH->SetNumberOfComponents(1);
 	spheresPressSPH->SetName("SPH_Press");
 	
-	vtkSmartPointer<vtkFloatArray> spheresCoordNumbSPH = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresCoordNumbSPH = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresCoordNumbSPH->SetNumberOfComponents(1);
 	spheresCoordNumbSPH->SetName("SPH_Neigh");
 #endif
 
 #ifdef YADE_LIQMIGRATION
-	vtkSmartPointer<vtkFloatArray> spheresLiqVol = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresLiqVol = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresLiqVol->SetNumberOfComponents(1);
 	spheresLiqVol->SetName("Liq_Vol");
 	
-	vtkSmartPointer<vtkFloatArray> spheresLiqVolIter = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresLiqVolIter = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresLiqVolIter->SetNumberOfComponents(1);
 	spheresLiqVolIter->SetName("Liq_VolIter");
 	
-	vtkSmartPointer<vtkFloatArray> spheresLiqVolTotal = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresLiqVolTotal = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresLiqVolTotal->SetNumberOfComponents(1);
 	spheresLiqVolTotal->SetName("Liq_VolTotal");
 #endif
 
-	vtkSmartPointer<vtkFloatArray> spheresMask = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresMask = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresMask->SetNumberOfComponents(1);
 	spheresMask->SetName("mask");
 	
-	vtkSmartPointer<vtkFloatArray> clumpId = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> clumpId = vtkSmartPointer<vtkDoubleArray>::New();
 	clumpId->SetNumberOfComponents(1);
 	clumpId->SetName("clumpId");
 	
-	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresColors = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresColors->SetNumberOfComponents(3);
 	spheresColors->SetName("color");
 	
-	vtkSmartPointer<vtkFloatArray> spheresLinVelVec = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresLinVelVec = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresLinVelVec->SetNumberOfComponents(3);
 	spheresLinVelVec->SetName("linVelVec");		//Linear velocity in Vector3 form
 	
-	vtkSmartPointer<vtkFloatArray> spheresLinVelLen = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresLinVelLen = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresLinVelLen->SetNumberOfComponents(1);
 	spheresLinVelLen->SetName("linVelLen");		//Length (magnitude) of linear velocity
 	
-	vtkSmartPointer<vtkFloatArray> spheresAngVelVec = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresAngVelVec = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresAngVelVec->SetNumberOfComponents(3);
 	spheresAngVelVec->SetName("angVelVec");		//Angular velocity in Vector3 form
 	
-	vtkSmartPointer<vtkFloatArray> spheresAngVelLen = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresAngVelLen = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresAngVelLen->SetNumberOfComponents(1);
 	spheresAngVelLen->SetName("angVelLen");		//Length (magnitude) of angular velocity
 	
-	vtkSmartPointer<vtkFloatArray> spheresNormalStressVec = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresNormalStressVec = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresNormalStressVec->SetNumberOfComponents(3);
 	spheresNormalStressVec->SetName("normalStress");
 	
-	vtkSmartPointer<vtkFloatArray> spheresShearStressVec = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresShearStressVec = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresShearStressVec->SetNumberOfComponents(3);
 	spheresShearStressVec->SetName("shearStress");
 	
-	vtkSmartPointer<vtkFloatArray> spheresNormalStressNorm = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresNormalStressNorm = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresNormalStressNorm->SetNumberOfComponents(1);
 	spheresNormalStressNorm->SetName("normalStressNorm");
 	
-	vtkSmartPointer<vtkFloatArray> spheresMaterialId = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> spheresMaterialId = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresMaterialId->SetNumberOfComponents(1);
 	spheresMaterialId->SetName("materialId");
 
 	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> facetsColors = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> facetsColors = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsColors->SetNumberOfComponents(3);
 	facetsColors->SetName("color");
 	
-	vtkSmartPointer<vtkFloatArray> facetsForceVec = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> facetsForceVec = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsForceVec->SetNumberOfComponents(3);
 	facetsForceVec->SetName("stressVec");
 	
-	vtkSmartPointer<vtkFloatArray> facetsForceLen = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> facetsForceLen = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsForceLen->SetNumberOfComponents(1);
 	facetsForceLen->SetName("stressLen");
 	
-	vtkSmartPointer<vtkFloatArray> facetsMaterialId = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> facetsMaterialId = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsMaterialId->SetNumberOfComponents(1);
 	facetsMaterialId->SetName("materialId");
 	
-	vtkSmartPointer<vtkFloatArray> facetsMask = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> facetsMask = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsMask->SetNumberOfComponents(1);
 	facetsMask->SetName("mask");
 
 	// boxes
 	vtkSmartPointer<vtkPoints> boxesPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> boxesCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> boxesColors = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> boxesColors = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesColors->SetNumberOfComponents(3);
 	boxesColors->SetName("color");
 	
-	vtkSmartPointer<vtkFloatArray> boxesForceVec = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> boxesForceVec = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesForceVec->SetNumberOfComponents(3);
 	boxesForceVec->SetName("stressVec");
 	
-	vtkSmartPointer<vtkFloatArray> boxesForceLen = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> boxesForceLen = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesForceLen->SetNumberOfComponents(1);
 	boxesForceLen->SetName("stressLen");
 	
-	vtkSmartPointer<vtkFloatArray> boxesMaterialId = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> boxesMaterialId = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesMaterialId->SetNumberOfComponents(1);
 	boxesMaterialId->SetName("materialId");
 	
-	vtkSmartPointer<vtkFloatArray> boxesMask = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> boxesMask = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesMask->SetNumberOfComponents(1);
 	boxesMask->SetName("mask");
 
 	// interactions
 	vtkSmartPointer<vtkPoints> intrBodyPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> intrCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> intrForceN = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> intrForceN = vtkSmartPointer<vtkDoubleArray>::New();
 	intrForceN->SetNumberOfComponents(1);
 	intrForceN->SetName("forceN");
-	vtkSmartPointer<vtkFloatArray> intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> intrAbsForceT = vtkSmartPointer<vtkDoubleArray>::New();
 	intrAbsForceT->SetNumberOfComponents(3);
 	intrAbsForceT->SetName("absForceT");
 
@@ -248,73 +248,73 @@ void VTKRecorder::action(){
 
 	// extras for CPM
 	if(recActive[REC_CPM]){ CpmStateUpdater csu; csu.update(scene); }
-	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> cpmDamage = vtkSmartPointer<vtkDoubleArray>::New();
 	cpmDamage->SetNumberOfComponents(1);
 	cpmDamage->SetName("cpmDamage");
-	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> cpmStress = vtkSmartPointer<vtkDoubleArray>::New();
 	cpmStress->SetNumberOfComponents(9);
 	cpmStress->SetName("cpmStress");
 
 	// extras for JCFpm
-	vtkSmartPointer<vtkFloatArray> damage = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> damage = vtkSmartPointer<vtkDoubleArray>::New();
 	damage->SetNumberOfComponents(1);;
 	damage->SetName("damage");
-	vtkSmartPointer<vtkFloatArray> damageRel = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> damageRel = vtkSmartPointer<vtkDoubleArray>::New();
 	damageRel->SetNumberOfComponents(1);;
 	damageRel->SetName("damageRel");
-	vtkSmartPointer<vtkFloatArray> intrIsCohesive = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> intrIsCohesive = vtkSmartPointer<vtkDoubleArray>::New();
 	intrIsCohesive->SetNumberOfComponents(1);
 	intrIsCohesive->SetName("isCohesive");
-	vtkSmartPointer<vtkFloatArray> intrIsOnJoint = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> intrIsOnJoint = vtkSmartPointer<vtkDoubleArray>::New();
 	intrIsOnJoint->SetNumberOfComponents(1);
 	intrIsOnJoint->SetName("isOnJoint");
 	
 	// extras for cracks
 	vtkSmartPointer<vtkPoints> crackPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> crackCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> iter = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> iter = vtkSmartPointer<vtkDoubleArray>::New();
 	iter->SetNumberOfComponents(1);
 	iter->SetName("iter");
-	vtkSmartPointer<vtkFloatArray> crackType = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> crackType = vtkSmartPointer<vtkDoubleArray>::New();
 	crackType->SetNumberOfComponents(1);
 	crackType->SetName("crackType");
-	vtkSmartPointer<vtkFloatArray> crackSize = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> crackSize = vtkSmartPointer<vtkDoubleArray>::New();
 	crackSize->SetNumberOfComponents(1);
 	crackSize->SetName("crackSize");
-	vtkSmartPointer<vtkFloatArray> crackNorm = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> crackNorm = vtkSmartPointer<vtkDoubleArray>::New();
 	crackNorm->SetNumberOfComponents(3);
 	crackNorm->SetName("crackNorm");
 	
 #ifdef YADE_LIQMIGRATION
-	vtkSmartPointer<vtkFloatArray> liqVol = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> liqVol = vtkSmartPointer<vtkDoubleArray>::New();
 	liqVol->SetNumberOfComponents(1);
 	liqVol->SetName("liqVol");
 	
-	vtkSmartPointer<vtkFloatArray> liqVolNorm = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> liqVolNorm = vtkSmartPointer<vtkDoubleArray>::New();
 	liqVolNorm->SetNumberOfComponents(1);
 	liqVolNorm->SetName("liqVolNorm");
 #endif
 	// the same for newly created cracks
 // 	vtkSmartPointer<vtkPoints> crackPosNew = vtkSmartPointer<vtkPoints>::New();
 // 	vtkSmartPointer<vtkCellArray> crackCellsNew = vtkSmartPointer<vtkCellArray>::New();
-// 	vtkSmartPointer<vtkFloatArray> iterNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	vtkSmartPointer<vtkDoubleArray> iterNew = vtkSmartPointer<vtkDoubleArray>::New();
 // 	iterNew->SetNumberOfComponents(1);
 // 	iterNew->SetName("iter");
-// 	vtkSmartPointer<vtkFloatArray> crackTypeNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	vtkSmartPointer<vtkDoubleArray> crackTypeNew = vtkSmartPointer<vtkDoubleArray>::New();
 // 	crackTypeNew->SetNumberOfComponents(1);
 // 	crackTypeNew->SetName("crackType");
-// 	vtkSmartPointer<vtkFloatArray> crackSizeNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	vtkSmartPointer<vtkDoubleArray> crackSizeNew = vtkSmartPointer<vtkDoubleArray>::New();
 // 	crackSizeNew->SetNumberOfComponents(1);
 // 	crackSizeNew->SetName("crackSize");
-// 	vtkSmartPointer<vtkFloatArray> crackNormNew = vtkSmartPointer<vtkFloatArray>::New();
+// 	vtkSmartPointer<vtkDoubleArray> crackNormNew = vtkSmartPointer<vtkDoubleArray>::New();
 // 	crackNormNew->SetNumberOfComponents(3);
 // 	crackNormNew->SetName("crackNorm");
 	
 	// extras for WireMatPM
-	vtkSmartPointer<vtkFloatArray> wpmNormalForce = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> wpmNormalForce = vtkSmartPointer<vtkDoubleArray>::New();
 	wpmNormalForce->SetNumberOfComponents(1);
 	wpmNormalForce->SetName("wpmNormalForce");
-	vtkSmartPointer<vtkFloatArray> wpmLimitFactor = vtkSmartPointer<vtkFloatArray>::New();
+	vtkSmartPointer<vtkDoubleArray> wpmLimitFactor = vtkSmartPointer<vtkDoubleArray>::New();
 	wpmLimitFactor->SetNumberOfComponents(1);
 	wpmLimitFactor->SetName("wpmLimitFactor");
 
@@ -377,8 +377,8 @@ void VTKRecorder::action(){
 			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->phys.get());
 			const GenericSpheresContact* geom = YADE_CAST<GenericSpheresContact*>(I->geom.get());
 			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
-			float fn=phys->normalForce.dot(geom->normal); 
-			float fs[3]={ (float) std::abs(phys->shearForce[0]), (float) std::abs(phys->shearForce[1]), (float) std::abs(phys->shearForce[2])};
+			Real fn=phys->normalForce.dot(geom->normal); 
+			Real fs[3]={ (Real) std::abs(phys->shearForce[0]), (Real) std::abs(phys->shearForce[1]), (Real) std::abs(phys->shearForce[2])};
 			// add the value once for each interaction object that we created (might be 2 for the periodic boundary)
 			for(int i=0; i<numAddValues; i++){
 				intrAbsForceT->InsertNextTupleValue(fs);
@@ -436,25 +436,25 @@ void VTKRecorder::action(){
 				if (recActive[REC_CLUMPID]) clumpId->InsertNextValue(b->clumpId);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = sphere->color;
-					float c[3] = { (float) color[0], (float) color[1], (float) color[2]};
+					Real c[3] = { (Real) color[0], (Real) color[1], (Real) color[2]};
 					spheresColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_VELOCITY]){
 					const Vector3r& vel = b->state->vel;
-					float v[3] = { (float) vel[0], (float) vel[1], (float) vel[2] };
+					Real v[3] = { (Real) vel[0], (Real) vel[1], (Real) vel[2] };
 					spheresLinVelVec->InsertNextTupleValue(v);
 					spheresLinVelLen->InsertNextValue(vel.norm());
 					
 					const Vector3r& angVel = b->state->angVel;
-					float av[3] = { (float) angVel[0], (float) angVel[1], (float) angVel[2] };
+					Real av[3] = { (Real) angVel[0], (Real) angVel[1], (Real) angVel[2] };
 					spheresAngVelVec->InsertNextTupleValue(av);
 					spheresAngVelLen->InsertNextValue(angVel.norm());
 				}
 				if(recActive[REC_STRESS]){
 					const Vector3r& stress = bodyStates[b->getId()].normStress;
 					const Vector3r& shear = bodyStates[b->getId()].shearStress;
-					float n[3] = { (float)  stress[0], (float) stress[1], (float) stress[2] };
-					float s[3] = { (float)  shear [0], (float) shear [1], (float) shear [2] };
+					Real n[3] = { (Real)  stress[0], (Real) stress[1], (Real) stress[2] };
+					Real s[3] = { (Real)  shear [0], (Real) shear [1], (Real) shear [2] };
 					spheresNormalStressVec->InsertNextTupleValue(n);
 					spheresShearStressVec->InsertNextTupleValue(s);
 					spheresNormalStressNorm->InsertNextValue(stress.norm());
@@ -463,8 +463,8 @@ void VTKRecorder::action(){
 				if (recActive[REC_CPM]){
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
 					const Matrix3r& ss=YADE_PTR_CAST<CpmState>(b->state)->stress;
-					//float s[3]={ss[0],ss[1],ss[2]};
-					float s[9]={ (float) ss(0,0), (float) ss(0,1), (float) ss(0,2), (float) ss(1,0), (float) ss(1,1), (float) ss(1,2), (float) ss(2,0), (float) ss(2,1), (float) ss(2,2)};
+					//Real s[3]={ss[0],ss[1],ss[2]};
+					Real s[9]={ (Real) ss(0,0), (Real) ss(0,1), (Real) ss(0,2), (Real) ss(1,0), (Real) ss(1,1), (Real) ss(1,2), (Real) ss(2,0), (Real) ss(2,1), (Real) ss(2,2)};
 					cpmStress->InsertNextTupleValue(s);
 				}
 				
@@ -506,12 +506,12 @@ void VTKRecorder::action(){
 				facetsCells->InsertNextCell(tri);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = facet->color;
-					float c[3] = { (float) color[0], (float) color[1], (float) color[2]};
+					Real c[3] = { (Real) color[0], (Real) color[1], (Real) color[2]};
 					facetsColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_STRESS]){
 					const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
-					float s[3] = { (float) stress[0], (float) stress[1], (float) stress[2] };
+					Real s[3] = { (Real) stress[0], (Real) stress[1], (Real) stress[2] };
 					facetsForceVec->InsertNextTupleValue(s);
 					facetsForceLen->InsertNextValue(stress.norm());
 				}
@@ -558,12 +558,12 @@ void VTKRecorder::action(){
 				for(int i=0; i<6; i++){
 					if (recActive[REC_COLORS]){
 						const Vector3r& color = box->color;
-						float c[3] = { (float) color[0], (float) color[1], (float) color[2]};
+						Real c[3] = { (Real) color[0], (Real) color[1], (Real) color[2]};
 						boxesColors->InsertNextTupleValue(c);
 					}
 					if(recActive[REC_STRESS]){
 						const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
-						float s[3] = { (float) stress[0], (float) stress[1], (float) stress[2] };
+						Real s[3] = { (Real) stress[0], (Real) stress[1], (Real) stress[2] };
 						boxesForceVec->InsertNextTupleValue(s);
 						boxesForceLen->InsertNextValue(stress.norm());
 					}
@@ -801,7 +801,7 @@ void VTKRecorder::action(){
 					crackType->InsertNextValue(t);
 					crackSize->InsertNextValue(s);
 					iter->InsertNextValue(i);
-					float n[3] = { n0, n1, n2 };
+					Real n[3] = { n0, n1, n2 };
 					crackNorm->InsertNextTupleValue(n);
 					// Then, taking care only of newly created cracks :
 // 					if (i > scene->iter - iterPeriod)
