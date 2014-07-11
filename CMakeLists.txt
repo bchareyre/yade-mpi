@@ -63,7 +63,7 @@ ENDIF()
 
 #===========================================================
 
-ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast -DYADE_PTR_DYN_CAST=boost::dynamic_pointer_cast -DTYPEOF=decltype -std=c++0x")
+ADD_DEFINITIONS(" -DYADE_PTR_CAST=boost::static_pointer_cast -DYADE_CAST=static_cast -DYADE_PTR_DYN_CAST=boost::dynamic_pointer_cast -std=c++0x")
 
 #===========================================================
 

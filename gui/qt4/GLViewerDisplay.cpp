@@ -40,7 +40,7 @@ void GLViewer::useDisplayParameters(size_t n){
 	const shared_ptr<DisplayParameters>& dp=dispParams[n];
 	string val;
 	if(dp->getValue("OpenGLRenderer",val)){ istringstream oglre(val);
-		yade::ObjectIO::load<TYPEOF(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
+		yade::ObjectIO::load<decltype(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
 	}
 	else { LOG_WARN("OpenGLRenderer configuration not found in display parameters, skipped.");}
 	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val); displayMessage("Loaded view configuration #"+boost::lexical_cast<string>(n)); }
@@ -53,7 +53,7 @@ void GLViewer::saveDisplayParameters(size_t n){
 	if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
 	shared_ptr<DisplayParameters>& dp=dispParams[n];
 	ostringstream oglre;
-	yade::ObjectIO::save<TYPEOF(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
+	yade::ObjectIO::save<decltype(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
 	dp->setValue("OpenGLRenderer",oglre.str());
 	dp->setValue("GLViewer",GLViewer::getState());
 	displayMessage("Saved view configuration ot #"+boost::lexical_cast<string>(n));
