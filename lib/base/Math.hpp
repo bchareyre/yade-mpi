@@ -70,6 +70,18 @@ using boost::shared_ptr;
 	#define FOREACH BOOST_FOREACH
 #endif
 
+#ifndef YADE_PTR_CAST
+	#define YADE_PTR_CAST boost::static_pointer_cast
+#endif
+
+#ifndef YADE_CAST
+	#define YADE_CAST static_cast
+#endif
+
+#ifndef YADE_PTR_DYN_CAST
+	#define YADE_PTR_DYN_CAST boost::dynamic_pointer_cast
+#endif
+
 #define EIGEN_DONT_PARALLELIZE
 
 #ifdef YADE_MASK_ARBITRARY
