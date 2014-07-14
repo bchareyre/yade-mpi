@@ -36,7 +36,6 @@
 #include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
-#include <boost/filesystem/convenience.hpp>
 #include <utility>
 
 YADE_PLUGIN((SimpleShear))

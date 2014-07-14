@@ -1,9 +1,6 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
 #include"Shop.hpp"
-
-#include<boost/filesystem/convenience.hpp>
 #include<boost/tokenizer.hpp>
-#include<boost/tuple/tuple.hpp>
 
 #include"yade/core/Scene.hpp"
 #include"yade/core/Body.hpp"

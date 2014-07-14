@@ -15,9 +15,6 @@
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/multimethods/FunctorWrapper.hpp>
 #include<yade/lib/multimethods/Indexable.hpp>
-#include<boost/filesystem/operations.hpp>
-#include<boost/filesystem/convenience.hpp>
-#include<boost/filesystem/exception.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
 

@@ -3,8 +3,6 @@
 
 #include<signal.h>
 
-#include<boost/filesystem/convenience.hpp>
-
 #ifdef YADE_DEBUG
 	void crashHandler(int sig){
 	switch(sig){

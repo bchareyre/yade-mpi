@@ -16,7 +16,6 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/DisplayParameters.hpp>
-#include<boost/filesystem/operations.hpp>
 #include<boost/algorithm/string.hpp>
 #include<sstream>
 #include<iomanip>

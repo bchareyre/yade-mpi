@@ -10,10 +10,6 @@
 
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/lib/triangulation/KinematicLocalisationAnalyser.hpp>
-#include <set>
-#include <boost/tuple/tuple.hpp>
-#include <string>
-#include <fstream>
 
 /*! \brief compute fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing.
 	

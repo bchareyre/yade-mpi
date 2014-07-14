@@ -39,7 +39,6 @@
 #include<yade/pkg/common/Bo1_Facet_Aabb.hpp>
 #include<yade/pkg/common/Wall.hpp>
 
-#include <boost/filesystem/convenience.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
 // random

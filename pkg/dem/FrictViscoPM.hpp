@@ -26,8 +26,6 @@ Remarks:
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/lib/base/openmp-accu.hpp>
 
-#include<boost/tuple/tuple.hpp>
-
 /** This class holds information associated with each body */
 class FrictViscoMat: public FrictMat {
 	public:

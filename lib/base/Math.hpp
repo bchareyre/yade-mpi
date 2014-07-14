@@ -63,6 +63,11 @@ using std::make_pair;
 #include <boost/python/class.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/exception.hpp>
+#include <boost/numeric/conversion/bounds.hpp>
 
 using boost::shared_ptr;
 

@@ -36,8 +36,6 @@
 
 #include<yade/pkg/dem/Shop.hpp>
 
-#include <boost/filesystem/convenience.hpp>
-#include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
 
 // random

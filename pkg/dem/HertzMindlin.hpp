@@ -18,7 +18,6 @@ The DMT formulation is also considered (for adhesive particles, rigid and small 
 #include<yade/pkg/common/NormShearPhys.hpp>
 #include<yade/pkg/common/MatchMaker.hpp>
 
-#include <set>
 #include <boost/tuple/tuple.hpp>
 #include<yade/lib/base/openmp-accu.hpp>
 
