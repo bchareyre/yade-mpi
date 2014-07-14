@@ -8,7 +8,7 @@
 
 
 #include<yade/pkg/dem/ElasticContactLaw.hpp>
-#include<yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
 #include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/dem/TriaxialStressController.hpp>
@@ -34,7 +34,6 @@
 #include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Facet_Sphere_ScGeom.hpp>
-#include<yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg/common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg/common/Bo1_Box_Aabb.hpp>
 #include<yade/pkg/common/Bo1_Facet_Aabb.hpp>
