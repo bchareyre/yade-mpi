@@ -7,13 +7,15 @@
 *************************************************************************/
 #pragma once
 #include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/common/Dispatching.hpp>
 
 class CapillaryPhys : public FrictPhys
 {
 	public :
 		int currentIndexes [4]; // used for faster interpolation (stores previous positions in tables)
 		
-		virtual ~CapillaryPhys();
+		virtual ~CapillaryPhys() {};
 
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(CapillaryPhys,FrictPhys,"Physics (of interaction) for Law2_ScGeom_CapillaryPhys_Capillarity.",
 				 ((bool,meniscus,false,,"Presence of a meniscus if true"))
@@ -36,5 +38,16 @@ class CapillaryPhys : public FrictPhys
 REGISTER_SERIALIZABLE(CapillaryPhys);
 
 
+class Ip2_FrictMat_FrictMat_CapillaryPhys : public IPhysFunctor
+{
+	public :
+		virtual void go(	const shared_ptr<Material>& b1,
+					const shared_ptr<Material>& b2,
+					const shared_ptr<Interaction>& interaction);
 
+	FUNCTOR2D(FrictMat,FrictMat);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_FrictMat_FrictMat_CapillaryPhys,IPhysFunctor, "RelationShips to use with Law2_ScGeom_CapillaryPhys_Capillarity\n\n In these RelationShips all the interaction attributes are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<IPhysFunctor>`, most of the attributes are computed only once, when the interaction is new.",,;);
+	
+};
+REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_CapillaryPhys);
 
