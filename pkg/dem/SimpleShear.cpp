@@ -25,7 +25,7 @@
 
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/GravityEngines.hpp>
-#include<yade/pkg/dem/KinemCTDEngine.hpp>
+#include<yade/pkg/dem/KinemC__Engine.hpp>
 
 #include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
