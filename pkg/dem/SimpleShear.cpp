@@ -11,9 +11,7 @@
 
 #include "SimpleShear.hpp"
 
-#include <yade/pkg/dem/NormalInelasticMat.hpp>
-#include<yade/pkg/dem/NormalInelasticityLaw.hpp>
-#include <yade/pkg/dem/Ip2_2xNormalInelasticMat_NormalInelasticityPhys.hpp>
+#include <yade/pkg/dem/NormalInelasticPM.hpp>
 #include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
 #include<yade/pkg/common/Aabb.hpp>
