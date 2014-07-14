@@ -10,9 +10,7 @@
 #ifdef YADE_OPENGL
 	#include<yade/pkg/common/GLDrawFunctors.hpp>
 #endif
-#include<yade/pkg/dem/CohFrictPhys.hpp>
-#include<yade/pkg/dem/CohFrictMat.hpp>
-#include<yade/pkg/dem/Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp>
+#include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg/common/CylScGeom6D.hpp>
 
 class Cylinder: public Sphere{

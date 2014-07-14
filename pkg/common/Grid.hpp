@@ -23,7 +23,7 @@
 #pragma once
 #include "Sphere.hpp"
 #include <yade/pkg/dem/FrictPhys.hpp>
-#include <yade/pkg/dem/CohFrictPhys.hpp>
+#include <yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
 #include <yade/pkg/dem/ScGeom.hpp>
 #include <yade/core/Body.hpp>
 #include <yade/pkg/common/Dispatching.hpp>

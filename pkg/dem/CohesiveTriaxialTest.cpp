@@ -9,8 +9,6 @@
 #include "CohesiveTriaxialTest.hpp"
 
 #include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg/dem/Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp>
-#include<yade/pkg/dem/CohFrictMat.hpp>
 #include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
 #include<yade/pkg/dem/TriaxialStressController.hpp>

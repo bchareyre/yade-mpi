@@ -7,7 +7,7 @@
 
 
 #pragma once
-#include "Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp"
+#include "CohesiveFrictionalContactLaw.hpp"
 #include "InelastCohFrictMat.hpp"
 #include "InelastCohFrictPhys.hpp"
 #include<yade/pkg/dem/ScGeom.hpp>

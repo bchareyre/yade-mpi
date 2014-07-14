@@ -9,10 +9,72 @@
 #pragma once
 
 #include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/dem/CohFrictPhys.hpp>
 #include<yade/pkg/common/Dispatching.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/dem/ScGeom.hpp>
 #include<boost/tuple/tuple.hpp>
+#include<yade/pkg/common/NormShearPhys.hpp>
+#include<yade/pkg/dem/FrictPhys.hpp>
+
+
+// The following code was moved from CohFrictMat.hpp
+class CohFrictMat : public FrictMat
+{
+	public :
+		virtual ~CohFrictMat () {};
+
+/// Serialization
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictMat,FrictMat,"",
+		((bool,isCohesive,true,,""))
+		((Real,alphaKr,2.0,,"Dimensionless rolling stiffness."))
+		((Real,alphaKtw,2.0,,"Dimensionless twist stiffness."))
+		((Real,etaRoll,-1.,,"Dimensionless rolling (aka 'bending') strength. If negative, rolling moment will be elastic."))
+		((Real,etaTwist,-1.,,"Dimensionless twisting strength. If negative, twist moment will be elastic."))
+		((Real,normalCohesion,-1,,"Tensile strength, homogeneous to a pressure. If negative the normal force is purely elastic."))
+		((Real,shearCohesion,-1,,"Shear strength, homogeneous to a pressure. If negative the shear force is purely elastic."))
+		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
+		,
+		createIndex();
+		);
+/// Indexable
+	REGISTER_CLASS_INDEX(CohFrictMat,FrictMat);
+};
+
+REGISTER_SERIALIZABLE(CohFrictMat);
+
+// The following code was moved from CohFrictPhys.hpp
+class CohFrictPhys : public FrictPhys
+{
+	public :
+		virtual ~CohFrictPhys() {};
+		void SetBreakingState() {cohesionBroken = true; normalAdhesion = 0; shearAdhesion = 0;};
+
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictPhys,FrictPhys,"",
+		((bool,cohesionDisablesFriction,false,,"is shear strength the sum of friction and adhesion or only adhesion?"))
+		((bool,cohesionBroken,true,,"is cohesion active? Set to false at the creation of a cohesive contact, and set to true when a fragile contact is broken"))
+		((bool,fragile,true,,"do cohesion disapear when contact strength is exceeded?"))
+		((Real,kr,0,,"rotational stiffness [N.m/rad]"))
+		((Real,ktw,0,,"twist stiffness [N.m/rad]"))
+		((Real,maxRollPl,0.0,,"Coefficient of rolling friction (negative means elastic)."))
+		((Real,maxTwistPl,0.0,,"Coefficient of twisting friction (negative means elastic)."))
+		((Real,normalAdhesion,0,,"tensile strength"))
+		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`CohFrictPhys::cohesionDisablesFriction`)"))
+		((Real,unp,0,,"plastic normal displacement, only used for tensile behaviour and if :yref:`CohFrictPhys::fragile` =false."))
+		((Real,unpMax,0,,"maximum value of plastic normal displacement, after that the interaction breaks even if :yref:`CohFrictPhys::fragile` =false. The default value (0) means no maximum."))
+		((bool,momentRotationLaw,false,,"use bending/twisting moment at contacts. See :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::always_use_moment_law` for details."))
+		((bool,initCohesion,false,,"Initialize the cohesive behaviour with current state as equilibrium state (same as :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow` but acting on only one interaction)"))
+		((Real,creep_viscosity,-1,,"creep viscosity [Pa.s/m]."))
+		// internal attributes
+		((Vector3r,moment_twist,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Twist moment"))
+		((Vector3r,moment_bending,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Bending moment"))
+		,
+		createIndex();
+	);
+/// Indexable
+	REGISTER_CLASS_INDEX(CohFrictPhys,FrictPhys);
+};
+
+REGISTER_SERIALIZABLE(CohFrictPhys);
 
 class Law2_ScGeom6D_CohFrictPhys_CohesionMoment: public LawFunctor{
 	public:
@@ -68,3 +130,23 @@ class CohesiveFrictionalContactLaw : public GlobalEngine
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalContactLaw);
 
+// The following code was moved from Ip2_CohFrictMat_CohFrictMat_CohFrictPhys.hpp
+class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys : public IPhysFunctor
+{
+	public :
+		virtual void go(	const shared_ptr<Material>& b1,
+					const shared_ptr<Material>& b2,
+					const shared_ptr<Interaction>& interaction);
+		int cohesionDefinitionIteration;
+
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_CohFrictMat_CohFrictMat_CohFrictPhys,IPhysFunctor,
+		"Generates cohesive-frictional interactions with moments, used in the contact law :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`. The normal/shear stiffness and friction definitions are the same as in :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, check the documentation there for details.\n\nAdhesions related to the normal and the shear components are calculated form :yref:`CohFrictMat::normalCohesion` ($C_n$) and :yref:`CohFrictMat::shearlCohesion` ($C_s$). For particles of size $R_1$,$R_2$ the adhesion will be $a_i=C_i min(R_1,R_2)^2$, $i=n\\,s$.\n\nTwist and rolling stiffnesses are proportional to the shear stiffness through dimensionless factors alphaKtw and alphaKr, such that the rotational stiffnesses are defined by $k_s \\alpha_i R_1 R_2$, $i=tw\\,r$",
+		((bool,setCohesionNow,false,,"If true, assign cohesion to all existing contacts in current time-step. The flag is turned false automatically, so that assignment is done in the current timestep only."))
+		((bool,setCohesionOnNewContacts,false,,"If true, assign cohesion at all new contacts. If false, only existing contacts can be cohesive (also see :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow`), and new contacts are only frictional."))	
+		,
+		cohesionDefinitionIteration = -1;
+		);
+	FUNCTOR2D(CohFrictMat,CohFrictMat);
+};
+
+REGISTER_SERIALIZABLE(Ip2_CohFrictMat_CohFrictMat_CohFrictPhys);
