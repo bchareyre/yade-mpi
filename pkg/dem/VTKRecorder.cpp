@@ -319,21 +319,6 @@ void VTKRecorder::action(){
 	liqVolNorm->SetNumberOfComponents(1);
 	liqVolNorm->SetName("liqVolNorm");
 #endif
-	// the same for newly created cracks
-// 	vtkSmartPointer<vtkPoints> crackPosNew = vtkSmartPointer<vtkPoints>::New();
-// 	vtkSmartPointer<vtkCellArray> crackCellsNew = vtkSmartPointer<vtkCellArray>::New();
-// 	vtkSmartPointer<vtkDoubleArray> iterNew = vtkSmartPointer<vtkDoubleArray>::New();
-// 	iterNew->SetNumberOfComponents(1);
-// 	iterNew->SetName("iter");
-// 	vtkSmartPointer<vtkDoubleArray> crackTypeNew = vtkSmartPointer<vtkDoubleArray>::New();
-// 	crackTypeNew->SetNumberOfComponents(1);
-// 	crackTypeNew->SetName("crackType");
-// 	vtkSmartPointer<vtkDoubleArray> crackSizeNew = vtkSmartPointer<vtkDoubleArray>::New();
-// 	crackSizeNew->SetNumberOfComponents(1);
-// 	crackSizeNew->SetName("crackSize");
-// 	vtkSmartPointer<vtkDoubleArray> crackNormNew = vtkSmartPointer<vtkDoubleArray>::New();
-// 	crackNormNew->SetNumberOfComponents(3);
-// 	crackNormNew->SetName("crackNorm");
 	
 	// extras for WireMatPM
 	vtkSmartPointer<vtkDoubleArray> wpmNormalForce = vtkSmartPointer<vtkDoubleArray>::New();
@@ -463,62 +448,41 @@ void VTKRecorder::action(){
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
 				
-				if (recActive[REC_BSTRESS])
-				{
+				if (recActive[REC_BSTRESS]) {
 				  const Matrix3r& bStress = - bStresses[b->getId()]; // compressive states are negativ for getStressLWForEachBody; I want them as positiv
 				  Eigen::SelfAdjointEigenSolver<Matrix3r> solver(bStress); // bStress is probably not symmetric (= self-adjoint for real matrices), but the solver hopefully works (considering only one half of bStress). And, moreover, existence of (real) eigenvalues is not sure for not symmetric bStress..
 				  Matrix3r dirAll = solver.eigenvectors();
-				  Vector3r valPropres = solver.eigenvalues(); // cf http://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#a30caf3c3884a7f4a46b8ec94efd23c5e to be sure that valPropres[i] * dirAll.col(i) = bStress * dirAll.col(i)
-				  int whereSigI(-1), whereSigII(-1), whereSigIII(-1); // all whereSig_i are in [0;2] : whereSigI = 2 => sigI=valPropres[2]
-				  if ( valPropres[0] > std::max(valPropres[1],valPropres[2]) )
-				  {
+				  Vector3r eigenVal = solver.eigenvalues(); // cf http://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#a30caf3c3884a7f4a46b8ec94efd23c5e to be sure that eigenVal[i] * dirAll.col(i) = bStress * dirAll.col(i)
+				  int whereSigI(-1), whereSigII(-1), whereSigIII(-1); // all whereSig_i are in [0;2] : whereSigI = 2 => sigI=eigenVal[2]
+				  if ( eigenVal[0] > std::max(eigenVal[1],eigenVal[2]) ) {
 				    whereSigI = 0;
-				    if (valPropres[1]>valPropres[2])
-				    {
+				    if (eigenVal[1]>eigenVal[2]) {
 				      whereSigII=1;
-				      whereSigIII=2;
-				    }
-				    else //valPropres[0] > valPropres[2] >= valPropres[1]
-				    {
+				      whereSigIII=2; }
+				    else { //eigenVal[0] > eigenVal[2] >= eigenVal[1]
 				      whereSigII = 2;
-				      whereSigIII=1;
-				    }
-				  }
-				  else // max(lambda1,lambda2) >= lambda0
-				  {
-				    if (valPropres[1]>=valPropres[2]) //max(lambda1,lambda2) = lambda1 : lambda 1 >= lambda2
-				    {
+				      whereSigIII=1; } }
+				  else { // max(lambda1,lambda2) >= lambda0 // lambda = eigenVal in the comments
+				    if (eigenVal[1]>=eigenVal[2]) {//max(lambda1,lambda2) = lambda1 : lambda 1 >= lambda2
 				      whereSigI = 1;
-				      if (valPropres[2]>=valPropres[0]) //lambda1 >= lambda2 >= lambda0
-				      {
+				      if (eigenVal[2]>=eigenVal[0]) {//lambda1 >= lambda2 >= lambda0
 					whereSigII=2;
-					whereSigIII=0;
-				      }
-				      else //lambda1 >= lambda0 > lambda2
-				      {
+					whereSigIII=0; }
+				      else { //lambda1 >= lambda0 > lambda2
 					whereSigII=0;
-					whereSigIII=2;					
-				      }
-				    }
-				    else //max(lambda1,lambda2) = lambda2 : lambda2 > lambda1
-				    {
+					whereSigIII=2; } }
+				    else { //max(lambda1,lambda2) = lambda2 : lambda2 > lambda1
 				      whereSigI = 2;
-				      if (valPropres[1] > valPropres[0])
-				      {
+				      if (eigenVal[1] > eigenVal[0]) {
 					whereSigII = 1;
-					whereSigIII = 0;
-				      }
-				      else
-				      {
+					whereSigIII = 0; }
+				      else {
 					whereSigIII = 1;
-					whereSigII = 0;
-				      }
-				    }
-				  }
-
-				  spheresSigI->InsertNextValue(valPropres[whereSigI]);
-				  spheresSigII->InsertNextValue(valPropres[whereSigII]);
-				  spheresSigIII->InsertNextValue(valPropres[whereSigIII]);
+					whereSigII = 0; } } }
+					
+				  spheresSigI->InsertNextValue(eigenVal[whereSigI]);
+				  spheresSigII->InsertNextValue(eigenVal[whereSigII]);
+				  spheresSigIII->InsertNextValue(eigenVal[whereSigIII]);
 				  Real dirI[3] { (Real) dirAll(0,whereSigI), (Real) dirAll(1,whereSigI), (Real) dirAll(2,whereSigI) };
 				  spheresDirI->InsertNextTupleValue(dirI);
 				  
@@ -526,8 +490,7 @@ void VTKRecorder::action(){
 				  spheresDirII->InsertNextTupleValue(dirII);
 				  
 				  Real dirIII[3] { (Real) dirAll(0,whereSigIII), (Real) dirAll(1,whereSigIII), (Real) dirAll(2,whereSigIII) };
-				  spheresDirIII->InsertNextTupleValue(dirIII);
-				}
+				  spheresDirIII->InsertNextTupleValue(dirIII); }
 				
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
@@ -893,14 +856,12 @@ void VTKRecorder::action(){
 		string fileCracks = "cracks_"+Key+".txt";
 		std::ifstream file (fileCracks.c_str(),std::ios::in);
 		vtkSmartPointer<vtkUnstructuredGrid> crackUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
-		vtkSmartPointer<vtkUnstructuredGrid> crackUgNew = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		
 		 if(file){
 			 while ( !file.eof() ){
 				std::string line;
 				Real i,p0,p1,p2,t,s,n0,n1,n2;
-				while ( std::getline(file, line)/* writes into string "line", a line of file "file". To go along diff. lines*/ ) 
-				{
+				while ( std::getline(file, line) {/* writes into string "line", a line of file "file". To go along diff. lines*/ ) 
 					file >> i >> p0 >> p1 >> p2 >> t >> s >> n0 >> n1 >> n2;
 					vtkIdType pid[1];
 					pid[0] = crackPos->InsertNextPoint(p0, p1, p2);
@@ -909,22 +870,9 @@ void VTKRecorder::action(){
 					crackSize->InsertNextValue(s);
 					iter->InsertNextValue(i);
 					Real n[3] = { n0, n1, n2 };
-					crackNorm->InsertNextTupleValue(n);
-					// Then, taking care only of newly created cracks :
-// 					if (i > scene->iter - iterPeriod)
-// 					{
-// 					  pid[0] = crackPosNew->InsertNextPoint(p0, p1, p2);
-// 					  crackCellsNew->InsertNextCell(1,pid);
-// 					  crackTypeNew->InsertNextValue(t);
-// 					  crackSizeNew->InsertNextValue(s);
-// 					  iterNew->InsertNextValue(i);
-// 					  crackNormNew->InsertNextTupleValue(n);
-// 					}  
-				}
-			 }
-			 file.close();
-		} 
-
+					crackNorm->InsertNextTupleValue(n); } }
+			 file.close(); }
+// 
 		crackUg->SetPoints(crackPos);
 		crackUg->SetCells(VTK_VERTEX, crackCells);
 		crackUg->GetPointData()->AddArray(iter);
@@ -942,25 +890,7 @@ void VTKRecorder::action(){
 		#else
 			writer->SetInput(crackUg);
 		#endif
-		writer->Write();
-		
-		// Same operations, for newly created cracks :
-// 		crackUgNew->SetPoints(crackPosNew);
-// 		crackUgNew->SetCells(VTK_VERTEX, crackCellsNew);
-// 		crackUgNew->GetPointData()->AddArray(iterNew);
-// 		crackUgNew->GetPointData()->AddArray(crackTypeNew);
-// 		crackUgNew->GetPointData()->AddArray(crackSizeNew);
-// 		crackUgNew->GetPointData()->AddArray(crackNormNew); //same remark about the orientation...
-// 	
-// 		fn=fileName+"newcracks."+boost::lexical_cast<string>(scene->iter)+".vtu";
-// 		writer->SetFileName(fn.c_str());
-// 		#ifdef YADE_VTK6
-// 			writer->SetInputData(crackUgNew);
-// 		#else
-// 			writer->SetInput(crackUgNew);
-// 		#endif
-// 		writer->Write();
-	}
+		writer->Write(); }
 
 	#ifdef YADE_VTK_MULTIBLOCK
 		if(multiblock){
