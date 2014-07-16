@@ -79,7 +79,8 @@ void VTKRecorder::action(){
 		else if(rec=="cracks") recActive[REC_CRACKS]=true;
 		else if(rec=="pericell" && scene->isPeriodic) recActive[REC_PERICELL]=true;
 		else if(rec=="liquidcontrol") recActive[REC_LIQ]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, pericell). Ignored.");
+		else if(rec=="bstresses") recActive[REC_BSTRESS]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, pericell, liquidcontrol, bstresses). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -101,6 +102,30 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> radii = vtkSmartPointer<vtkDoubleArray>::New();
 	radii->SetNumberOfComponents(1);
 	radii->SetName("radii");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresSigI = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresSigI->SetNumberOfComponents(1);
+	spheresSigI->SetName("sigI");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresSigII = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresSigII->SetNumberOfComponents(1);
+	spheresSigII->SetName("sigII");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresSigIII = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresSigIII->SetNumberOfComponents(1);
+	spheresSigIII->SetName("sigIII");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresDirI = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresDirI->SetNumberOfComponents(3);
+	spheresDirI->SetName("dirI");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresDirII = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresDirII->SetNumberOfComponents(3);
+	spheresDirII->SetName("dirII");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresDirIII = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresDirIII->SetNumberOfComponents(3);
+	spheresDirIII->SetName("dirIII");
 	
 	vtkSmartPointer<vtkDoubleArray> spheresMass = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresMass->SetNumberOfComponents(1);
@@ -418,6 +443,13 @@ void VTKRecorder::action(){
 	vector<Shop::bodyState> bodyStates;
 	if(recActive[REC_STRESS]) Shop::getStressForEachBody(bodyStates);
 	
+	
+	vector<Matrix3r> bStresses;
+	if (recActive[REC_BSTRESS])
+	{
+	  Shop::getStressLWForEachBody(bStresses);
+	}
+	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 		if(mask!=0 && !b->maskCompatible(mask)) continue;
@@ -430,6 +462,73 @@ void VTKRecorder::action(){
 				pid[0] = spheresPos->InsertNextPoint(pos[0], pos[1], pos[2]);
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
+				
+				if (recActive[REC_BSTRESS])
+				{
+				  const Matrix3r& bStress = - bStresses[b->getId()]; // compressive states are negativ for getStressLWForEachBody; I want them as positiv
+				  Eigen::SelfAdjointEigenSolver<Matrix3r> solver(bStress); // bStress is probably not symmetric (= self-adjoint for real matrices), but the solver hopefully works (considering only one half of bStress). And, moreover, existence of (real) eigenvalues is not sure for not symmetric bStress..
+				  Matrix3r dirAll = solver.eigenvectors();
+				  Vector3r valPropres = solver.eigenvalues(); // cf http://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#a30caf3c3884a7f4a46b8ec94efd23c5e to be sure that valPropres[i] * dirAll.col(i) = bStress * dirAll.col(i)
+				  int whereSigI(-1), whereSigII(-1), whereSigIII(-1); // all whereSig_i are in [0;2] : whereSigI = 2 => sigI=valPropres[2]
+				  if ( valPropres[0] > std::max(valPropres[1],valPropres[2]) )
+				  {
+				    whereSigI = 0;
+				    if (valPropres[1]>valPropres[2])
+				    {
+				      whereSigII=1;
+				      whereSigIII=2;
+				    }
+				    else //valPropres[0] > valPropres[2] >= valPropres[1]
+				    {
+				      whereSigII = 2;
+				      whereSigIII=1;
+				    }
+				  }
+				  else // max(lambda1,lambda2) >= lambda0
+				  {
+				    if (valPropres[1]>=valPropres[2]) //max(lambda1,lambda2) = lambda1 : lambda 1 >= lambda2
+				    {
+				      whereSigI = 1;
+				      if (valPropres[2]>=valPropres[0]) //lambda1 >= lambda2 >= lambda0
+				      {
+					whereSigII=2;
+					whereSigIII=0;
+				      }
+				      else //lambda1 >= lambda0 > lambda2
+				      {
+					whereSigII=0;
+					whereSigIII=2;					
+				      }
+				    }
+				    else //max(lambda1,lambda2) = lambda2 : lambda2 > lambda1
+				    {
+				      whereSigI = 2;
+				      if (valPropres[1] > valPropres[0])
+				      {
+					whereSigII = 1;
+					whereSigIII = 0;
+				      }
+				      else
+				      {
+					whereSigIII = 1;
+					whereSigII = 0;
+				      }
+				    }
+				  }
+
+				  spheresSigI->InsertNextValue(valPropres[whereSigI]);
+				  spheresSigII->InsertNextValue(valPropres[whereSigII]);
+				  spheresSigIII->InsertNextValue(valPropres[whereSigIII]);
+				  Real dirI[3] { (Real) dirAll(0,whereSigI), (Real) dirAll(1,whereSigI), (Real) dirAll(2,whereSigI) };
+				  spheresDirI->InsertNextTupleValue(dirI);
+				  
+				  Real dirII[3] { (Real) dirAll(0,whereSigII), (Real) dirAll(1,whereSigII), (Real) dirAll(2,whereSigII) };
+				  spheresDirII->InsertNextTupleValue(dirII);
+				  
+				  Real dirIII[3] { (Real) dirAll(0,whereSigIII), (Real) dirAll(1,whereSigIII), (Real) dirAll(2,whereSigIII) };
+				  spheresDirIII->InsertNextTupleValue(dirIII);
+				}
+				
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
@@ -647,7 +746,15 @@ void VTKRecorder::action(){
 		if (recActive[REC_JCFPM]) {
 			spheresUg->GetPointData()->AddArray(damage);
 		}
-
+		if (recActive[REC_BSTRESS]) 
+		{
+			spheresUg->GetPointData()->AddArray(spheresSigI);
+			spheresUg->GetPointData()->AddArray(spheresSigII);
+			spheresUg->GetPointData()->AddArray(spheresSigIII);
+			spheresUg->GetPointData()->AddArray(spheresDirI);
+			spheresUg->GetPointData()->AddArray(spheresDirII);
+			spheresUg->GetPointData()->AddArray(spheresDirIII);
+		}
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
 
 		#ifdef YADE_VTK_MULTIBLOCK
