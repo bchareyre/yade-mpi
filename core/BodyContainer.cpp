@@ -10,51 +10,25 @@
 
 
 CREATE_LOGGER(BodyContainer);
- 
-BodyContainer::BodyContainer(): lowestFree(0)
-{}
-
-
-BodyContainer::~BodyContainer(){}
 
 void BodyContainer::clear(){
-	body.clear(); lowestFree=0;
-}
-
-Body::id_t BodyContainer::findFreeId(){
-	Body::id_t max=body.size();
-	for(; lowestFree<max; lowestFree++){
-		if(!(bool)body[lowestFree]) return lowestFree;
-	}
-	return body.size();
+	body.clear();
 }
 
 Body::id_t BodyContainer::insert(shared_ptr<Body>& b){
-	Body::id_t newId=findFreeId();
-	return insert(b,newId);
-}
-
-Body::id_t BodyContainer::insert(shared_ptr<Body>& b, Body::id_t id){
-	assert(id>=0);
-	if((size_t)id>=body.size()) body.resize(id+1);
-	
 	const shared_ptr<Scene>& scene=Omega::instance().getScene(); 
 	b->iterBorn=scene->iter;
 	b->timeBorn=scene->time;
-	b->id=id;
-	
+	b->id=body.size();
 	scene->doSort = true;
-	
-	body[id]=b;
-
+	body.push_back(b);
 	// Notify ForceContainer about new id
-	scene->forces.addMaxId(id);
-	return id;
+	scene->forces.addMaxId(b->id);
+	return b->id;
 }
 
 bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is false (as before)
-	if(!exists(id)) return false;
-	lowestFree=min(lowestFree,id);
+	if(!body[id]) return false;
 	
 	const shared_ptr<Body>& b=Body::byId(id);
 	
@@ -81,7 +55,7 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 	for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all body's interactions
 		scene->interactions->requestErase((*it).second);
 	}
-	body[id]=shared_ptr<Body>();
+	body[id]=nullptr;
 	
 	return true;
 }
