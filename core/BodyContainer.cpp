@@ -55,7 +55,8 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 	for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all body's interactions
 		scene->interactions->requestErase((*it).second);
 	}
-	body[id]=nullptr;
+	
+	body[id].reset();
 	
 	return true;
 }
