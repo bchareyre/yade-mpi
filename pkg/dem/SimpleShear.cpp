@@ -11,9 +11,7 @@
 
 #include "SimpleShear.hpp"
 
-#include <yade/pkg/dem/NormalInelasticMat.hpp>
-#include<yade/pkg/dem/NormalInelasticityLaw.hpp>
-#include <yade/pkg/dem/Ip2_2xNormalInelasticMat_NormalInelasticityPhys.hpp>
+#include <yade/pkg/dem/NormalInelasticPM.hpp>
 #include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
 #include<yade/pkg/common/Aabb.hpp>
@@ -27,7 +25,7 @@
 
 #include<yade/pkg/dem/NewtonIntegrator.hpp>
 #include<yade/pkg/common/GravityEngines.hpp>
-#include<yade/pkg/dem/KinemCTDEngine.hpp>
+#include<yade/pkg/dem/KinemC__Engine.hpp>
 
 #include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
@@ -38,7 +36,6 @@
 #include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/common/Sphere.hpp>
 
-#include <boost/filesystem/convenience.hpp>
 #include <utility>
 
 YADE_PLUGIN((SimpleShear))

@@ -15,9 +15,6 @@
 #include<yade/lib/base/Math.hpp>
 #include<yade/lib/multimethods/FunctorWrapper.hpp>
 #include<yade/lib/multimethods/Indexable.hpp>
-#include<boost/filesystem/operations.hpp>
-#include<boost/filesystem/convenience.hpp>
-#include<boost/filesystem/exception.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
 
@@ -245,7 +242,7 @@ void Omega::loadSimulation(const string& f, bool quiet){
 		RenderMutexLock lock;
 		if(isMem){
 			istringstream iss(memSavedSimulations[f]);
-			yade::ObjectIO::load<TYPEOF(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
+			yade::ObjectIO::load<decltype(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
 		} else {
 			yade::ObjectIO::load(f,"scene",scene);
 		}
@@ -267,7 +264,7 @@ void Omega::saveSimulation(const string& f, bool quiet){
 	if(boost::algorithm::starts_with(f,":memory:")){
 		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
 		ostringstream oss;
-		yade::ObjectIO::save<TYPEOF(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
+		yade::ObjectIO::save<decltype(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
 		memSavedSimulations[f]=oss.str();
 	}
 	else {

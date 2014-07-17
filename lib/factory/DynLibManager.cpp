@@ -8,10 +8,6 @@
 *************************************************************************/
 
 #include "DynLibManager.hpp"
-
-#include<boost/filesystem/operations.hpp>
-#include<boost/filesystem/convenience.hpp>
-
 #include "ClassFactory.hpp"
 
 CREATE_LOGGER(DynLibManager);

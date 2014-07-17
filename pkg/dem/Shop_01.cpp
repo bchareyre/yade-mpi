@@ -1,9 +1,6 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
 #include"Shop.hpp"
-
-#include<boost/filesystem/convenience.hpp>
 #include<boost/tokenizer.hpp>
-#include<boost/tuple/tuple.hpp>
 
 #include"yade/core/Scene.hpp"
 #include"yade/core/Body.hpp"
@@ -24,7 +21,7 @@
 #include"yade/pkg/dem/NewtonIntegrator.hpp"
 #include"yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp"
 #include"yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp"
-#include"yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp"
+#include"yade/pkg/dem/FrictPhys.hpp"
 
 #include"yade/pkg/common/ForceResetter.hpp"
 

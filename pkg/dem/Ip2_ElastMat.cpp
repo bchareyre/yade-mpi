@@ -1,7 +1,6 @@
 #include "Ip2_ElastMat.hpp"
 
 #include <yade/pkg/common/NormShearPhys.hpp>
-#include <yade/pkg/common/NormShearPhys.hpp>
 #include <yade/pkg/dem/DemXDofGeom.hpp>
 
 YADE_PLUGIN((Ip2_ElastMat_ElastMat_NormPhys)(Ip2_ElastMat_ElastMat_NormShearPhys));

@@ -146,8 +146,8 @@ EIG_WRAP_METH0(Vector2r,Zero); EIG_WRAP_METH0(Vector2r,UnitX); EIG_WRAP_METH0(Ve
 EIG_WRAP_METH0(Vector2i,Zero); EIG_WRAP_METH0(Vector2i,UnitX); EIG_WRAP_METH0(Vector2i,UnitY); EIG_WRAP_METH0(Vector2i,Ones);
 EIG_WRAP_METH0(Quaternionr,Identity);
 
-#define EIG_OP1(klass,op,sym) TYPEOF((sym klass()).eval()) klass##op(const klass& self){ return (sym self).eval();}
-#define EIG_OP2(klass,op,sym,klass2) TYPEOF((klass() sym klass2()).eval()) klass##op##klass2(const klass& self, const klass2& other){ return (self sym other).eval(); }
+#define EIG_OP1(klass,op,sym) decltype((sym klass()).eval()) klass##op(const klass& self){ return (sym self).eval();}
+#define EIG_OP2(klass,op,sym,klass2) decltype((klass() sym klass2()).eval()) klass##op##klass2(const klass& self, const klass2& other){ return (self sym other).eval(); }
 #define EIG_OP2_INPLACE(klass,op,sym,klass2) klass klass##op##klass2(klass& self, const klass2& other){ self sym other; return self; }
 
 

@@ -12,7 +12,6 @@
 #include<QGLViewer/qglviewer.h>
 #include<QGLViewer/manipulatedFrame.h>
 #include<QGLViewer/constraint.h>
-#include<set>
 
 using std::setw;
 using std::setfill;

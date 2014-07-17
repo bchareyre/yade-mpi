@@ -13,16 +13,14 @@
 #include <Python.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fstream>
-#include <set>
-#include <list>
 #include <time.h>
 #include <boost/thread/thread.hpp>
 #include <iostream>
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/factory/ClassFactory.hpp>
+#include <yade/lib/base/Math.hpp>
+#include <yade/lib/factory/ClassFactory.hpp>
 
-#include<yade/lib/base/Singleton.hpp>
+#include <yade/lib/base/Singleton.hpp>
 
 #include "SimulationFlow.hpp"
 

@@ -11,8 +11,7 @@
 
 #include<yade/pkg/dem/ElasticContactLaw.hpp>
 #include <yade/pkg/dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
-// #include<yade/pkg/dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
-#include<yade/pkg/dem/Ip2_FrictMat_FrictMat_CapillaryPhys.hpp>
+#include<yade/pkg/dem/CapillaryPhys.hpp>
 #include<yade/pkg/common/ElastMat.hpp>
 #include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
@@ -42,7 +41,6 @@
 
 #include<yade/pkg/dem/Shop.hpp>
 
-#include <boost/filesystem/convenience.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
 

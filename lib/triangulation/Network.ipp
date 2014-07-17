@@ -15,6 +15,8 @@
 #define FAST
 
 namespace CGT {
+	
+using std::abs;
 
 // 	template<class Tesselation> const double Network<Tesselation>::FAR = 50000;
 	template<class Tesselation> const double Network<Tesselation>::ONE_THIRD = 1.0/3.0;

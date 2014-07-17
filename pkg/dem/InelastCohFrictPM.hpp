@@ -8,13 +8,54 @@
 
 #pragma once
 
-#include "FrictPhys.hpp"
+#include <yade/pkg/common/ElastMat.hpp>
+#include <yade/pkg/dem/ScGeom.hpp>
+#include <yade/pkg/dem/FrictPhys.hpp>
+#include "CohesiveFrictionalContactLaw.hpp"
 
+class InelastCohFrictMat : public FrictMat
+{
+	public :
+		virtual ~InelastCohFrictMat () {};
+
+/// Serialization
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InelastCohFrictMat,FrictMat,"",
+		((Real,tensionModulus,0.0,,"Tension elasticity modulus"))
+		((Real,compressionModulus,0.0,,"Compresion elasticity modulus"))
+		((Real,shearModulus,0.0,,"shear elasticity modulus"))
+		((Real,alphaKr,2.0,,"Dimensionless coefficient used for the rolling stiffness."))
+		((Real,alphaKtw,2.0,,"Dimensionless coefficient used for the twist stiffness."))
+
+		((Real,nuBending,0.0,,"Bending elastic stress limit"))
+		((Real,nuTwist,0.0,,"Twist elastic stress limit"))
+		((Real,sigmaTension,0.0,,"Tension elastic stress limit"))
+		((Real,sigmaCompression,0.0,,"Compression elastic stress limit"))
+		((Real,shearCohesion,0.0,,"Shear elastic stress limit"))
+		
+		((Real,creepTension,0.0,,"Tension/compression creeping coefficient. Usual values between 0 and 1."))
+		((Real,creepBending,0.0,,"Bending creeping coefficient. Usual values between 0 and 1."))
+		((Real,creepTwist,0.0,,"Twist creeping coefficient. Usual values between 0 and 1."))
+		
+		((Real,unloadTension,0.0,,"Tension/compression plastic unload coefficient. Usual values between 0 and +infinity."))
+		((Real,unloadBending,0.0,,"Bending plastic unload coefficient. Usual values between 0 and +infinity."))
+		((Real,unloadTwist,0.0,,"Twist plastic unload coefficient. Usual values between 0 and +infinity."))
+		
+		((Real,epsilonMaxTension,0.0,,"Maximal plastic strain tension"))
+		((Real,epsilonMaxCompression,0.0,,"Maximal plastic strain compression"))
+		((Real,etaMaxBending,0.0,,"Maximal plastic bending strain"))
+		((Real,etaMaxTwist,0.0,,"Maximal plastic twist strain")),
+		createIndex();			  
+					);
+/// Indexable
+	REGISTER_CLASS_INDEX(InelastCohFrictMat,FrictMat);
+};
+
+REGISTER_SERIALIZABLE(InelastCohFrictMat);
 
 class InelastCohFrictPhys : public FrictPhys
 {
 	public :
-		virtual ~InelastCohFrictPhys();
+		virtual ~InelastCohFrictPhys() {};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InelastCohFrictPhys,FrictPhys,"",
 		((bool,cohesionBroken,false,,"is cohesion active? will be set false when a fragile contact is broken"))
 		
@@ -72,3 +113,37 @@ class InelastCohFrictPhys : public FrictPhys
 };
 
 REGISTER_SERIALIZABLE(InelastCohFrictPhys);
+
+class Ip2_2xInelastCohFrictMat_InelastCohFrictPhys : public IPhysFunctor
+{
+	public :
+		virtual void go(const shared_ptr<Material>& b1,
+					const shared_ptr<Material>& b2,
+					const shared_ptr<Interaction>& interaction);
+		int cohesionDefinitionIteration;
+
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xInelastCohFrictMat_InelastCohFrictPhys,IPhysFunctor,
+		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment`.",
+		,
+		cohesionDefinitionIteration = -1;
+		);
+	FUNCTOR2D(InelastCohFrictMat,InelastCohFrictMat);
+};
+
+REGISTER_SERIALIZABLE(Ip2_2xInelastCohFrictMat_InelastCohFrictPhys);
+
+
+class Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment: public LawFunctor{
+	public:
+		Real normElastEnergy();
+		Real shearElastEnergy();
+	virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment,LawFunctor,"This law is currently under developpement. Final version and documentation will come before the end of 2014.",
+		,,
+		.def("normElastEnergy",&Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::normElastEnergy,"Compute normal elastic energy.")
+		.def("shearElastEnergy",&Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::shearElastEnergy,"Compute shear elastic energy.")
+	);
+	FUNCTOR2D(ScGeom6D,InelastCohFrictPhys);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment);

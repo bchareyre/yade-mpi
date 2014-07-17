@@ -26,10 +26,9 @@
 #include"HydrodynamicsLawLBM.hpp"
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
-#include<boost/filesystem/operations.hpp>
 #include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/dem/CohFrictPhys.hpp>
+#include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
 
 
 namespace bfs=boost::filesystem;

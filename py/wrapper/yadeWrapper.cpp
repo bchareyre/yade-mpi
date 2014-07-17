@@ -9,7 +9,6 @@
 #include<boost/bind.hpp>
 #include<boost/lambda/bind.hpp>
 #include<boost/thread/thread.hpp>
-#include<boost/filesystem/operations.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/algorithm/string.hpp>
 
@@ -683,7 +682,7 @@ class pyOmega{
 	void switchToScene(int i){OMEGA.switchToScene(i);}
 	string sceneToString(){
 		ostringstream oss;
-		yade::ObjectIO::save<TYPEOF(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
+		yade::ObjectIO::save<decltype(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
 		oss.flush();
 		return oss.str();
 	}

@@ -63,11 +63,28 @@ using std::make_pair;
 #include <boost/python/class.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/exception.hpp>
+#include <boost/numeric/conversion/bounds.hpp>
 
 using boost::shared_ptr;
 
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
+#endif
+
+#ifndef YADE_PTR_CAST
+	#define YADE_PTR_CAST boost::static_pointer_cast
+#endif
+
+#ifndef YADE_CAST
+	#define YADE_CAST static_cast
+#endif
+
+#ifndef YADE_PTR_DYN_CAST
+	#define YADE_PTR_DYN_CAST boost::dynamic_pointer_cast
 #endif
 
 #define EIGEN_DONT_PARALLELIZE
