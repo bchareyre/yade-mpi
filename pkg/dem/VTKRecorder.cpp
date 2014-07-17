@@ -857,11 +857,11 @@ void VTKRecorder::action(){
 		std::ifstream file (fileCracks.c_str(),std::ios::in);
 		vtkSmartPointer<vtkUnstructuredGrid> crackUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		
-		 if(file){
+		if(file){
 			 while ( !file.eof() ){
 				std::string line;
 				Real i,p0,p1,p2,t,s,n0,n1,n2;
-				while ( std::getline(file, line) {/* writes into string "line", a line of file "file". To go along diff. lines*/ ) 
+				while ( std::getline(file, line)) {/* writes into string "line", a line of file "file". To go along diff. lines*/
 					file >> i >> p0 >> p1 >> p2 >> t >> s >> n0 >> n1 >> n2;
 					vtkIdType pid[1];
 					pid[0] = crackPos->InsertNextPoint(p0, p1, p2);
@@ -870,8 +870,11 @@ void VTKRecorder::action(){
 					crackSize->InsertNextValue(s);
 					iter->InsertNextValue(i);
 					Real n[3] = { n0, n1, n2 };
-					crackNorm->InsertNextTupleValue(n); } }
-			 file.close(); }
+					crackNorm->InsertNextTupleValue(n);
+				}
+			}
+			 file.close();
+		}
 // 
 		crackUg->SetPoints(crackPos);
 		crackUg->SetCells(VTK_VERTEX, crackCells);
