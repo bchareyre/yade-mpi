@@ -449,7 +449,7 @@ void VTKRecorder::action(){
 				radii->InsertNextValue(sphere->radius);
 				
 				if (recActive[REC_BSTRESS]) {
-				  const Matrix3r& bStress = - bStresses[b->getId()]; // compressive states are negativ for getStressLWForEachBody; I want them as positiv
+				  const Matrix3r& bStress = bStresses[b->getId()];
 				  Eigen::SelfAdjointEigenSolver<Matrix3r> solver(bStress); // bStress is probably not symmetric (= self-adjoint for real matrices), but the solver hopefully works (considering only one half of bStress). And, moreover, existence of (real) eigenvalues is not sure for not symmetric bStress..
 				  Matrix3r dirAll = solver.eigenvectors();
 				  Vector3r eigenVal = solver.eigenvalues(); // cf http://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#a30caf3c3884a7f4a46b8ec94efd23c5e to be sure that eigenVal[i] * dirAll.col(i) = bStress * dirAll.col(i)
