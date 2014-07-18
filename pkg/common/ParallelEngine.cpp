@@ -1,10 +1,14 @@
 #include"ParallelEngine.hpp"
+#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<yade/pkg/common/ElastMat.hpp>
+#include<yade/pkg/common/PyRunner.hpp>
+#include<yade/pkg/common/Sphere.hpp>
+#include<yade/pkg/common/Aabb.hpp>
+YADE_PLUGIN((PeriodicEngine)(Sphere)(Aabb)(ElastMat)(FrictMat)(PyRunner)(ParallelEngine));
 
 #ifdef YADE_OPENMP
   #include<omp.h>
 #endif
-
-YADE_PLUGIN((ParallelEngine));
 
 //! ParallelEngine's pseudo-ctor (factory), taking nested lists of slave engines (might be moved to real ctor perhaps)
 shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const boost::python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); instance->slaves_set(slaves); return instance; }

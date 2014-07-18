@@ -18,7 +18,7 @@ class BoundFunctor;
 
 class Shape: public Serializable, public Indexable {
 	public:
-		~Shape(); // vtable
+		~Shape() {}; // vtable
 		#ifdef BV_FUNCTOR_CACHE
 			shared_ptr<BoundFunctor> boundFunctor;
 		#endif

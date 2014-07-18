@@ -12,15 +12,16 @@
 #include <vector>
 #include "Interaction.hpp"
 #include "GlobalEngine.hpp"
+#include "Scene.hpp"
 
 class Body;
 
 class TimeStepper: public GlobalEngine{
 	public:
 		virtual void computeTimeStep(Scene* ) { throw; };
-		virtual bool isActivated();
+		virtual bool isActivated() {return (active && (scene->iter % timeStepUpdateInterval == 0));};
 		virtual void action() { computeTimeStep(scene);} ;
-		void setActive(bool a, int nb=-1);
+		void setActive(bool a, int nb=-1) {active = a; if (nb>0) {timeStepUpdateInterval = (unsigned int)nb;}}
 		
 		YADE_CLASS_BASE_DOC_ATTRS(
 			TimeStepper,GlobalEngine,"Engine defining time-step (fundamental class)",
