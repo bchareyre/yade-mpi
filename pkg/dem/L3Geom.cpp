@@ -284,14 +284,14 @@ bool Ig2_Facet_Sphere_L3Geom::go(const shared_ptr<Shape>& s1, const shared_ptr<S
 	return true;
 }
 
-void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
+bool Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
 	L3Geom* geom=static_cast<L3Geom*>(ig.get()); FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
 
 	// compute force
 	Vector3r& localF(geom->F);
 	localF=geom->relU().cwiseProduct(Vector3r(phys->kn,phys->ks,phys->ks));
 	// break if necessary
-	if(localF[0]>0 && !noBreak){ scene->interactions->requestErase(I); return; }
+	if(localF[0]>0 && !noBreak) return false;
 
 	if(!noSlip){
 		// plastic slip, if necessary; non-zero elastic limit only for compression
@@ -308,10 +308,11 @@ void Law2_L3Geom_FrictPhys_ElPerfPl::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>
 	if(scene->trackEnergy)	{ scene->energy->add(0.5*(pow(geom->relU()[0],2)*phys->kn+(pow(geom->relU()[1],2)+pow(geom->relU()[2],2))*phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true); }
 	// apply force: this converts the force to global space, updates NormShearPhys::{normal,shear}Force, applies to particles
 	geom->applyLocalForce(localF,I,scene,phys);
+	return true;
 }
 
 
-void Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
+bool Law2_L6Geom_FrictPhys_Linear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
 	L6Geom& geom=ig->cast<L6Geom>(); FrictPhys& phys=ip->cast<FrictPhys>();
 
 	// simple linear relationships

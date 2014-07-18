@@ -174,7 +174,7 @@ REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_L6Geom);
 
 
 struct Law2_L3Geom_FrictPhys_ElPerfPl: public LawFunctor{
-	virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+	virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 	FUNCTOR2D(L3Geom,FrictPhys);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_L3Geom_FrictPhys_ElPerfPl,LawFunctor,"Basic law for testing :yref:`L3Geom`; it bears no cohesion (unless *noBreak* is ``True``), and plastic slip obeys the Mohr-Coulomb criterion (unless *noSlip* is ``True``).",
 		((bool,noBreak,false,,"Do not break contacts when particles separate."))
@@ -186,7 +186,7 @@ struct Law2_L3Geom_FrictPhys_ElPerfPl: public LawFunctor{
 REGISTER_SERIALIZABLE(Law2_L3Geom_FrictPhys_ElPerfPl);
 
 struct Law2_L6Geom_FrictPhys_Linear: public Law2_L3Geom_FrictPhys_ElPerfPl{
-	virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+	virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 	FUNCTOR2D(L6Geom,FrictPhys);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_L6Geom_FrictPhys_Linear,Law2_L3Geom_FrictPhys_ElPerfPl,"Basic law for testing :yref:`L6Geom` -- linear in both normal and shear sense, without slip or breakage.",
 		((Real,charLen,1,,"Characteristic length with the meaning of the stiffness ratios bending/shear and torsion/normal."))

@@ -62,7 +62,7 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
 }
 
 /* Law2_ScGeom_ViscElCapPhys_Basic */
-void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
+bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
   Vector3r force = Vector3r::Zero();
   
   const int id1 = I->getId1();
@@ -111,7 +111,7 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
         addForce (id1,-phys.normalForce,scene);
         addForce (id2, phys.normalForce,scene);
       };
-      return;
+      return true;
     } else {
       if (phys.liqBridgeActive) {
         VLiqBridg -= phys.Vb;
@@ -127,8 +127,7 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
         scene->delIntrs.push_back(B1);
         scene->delIntrs.push_back(B2);
       #endif
-      scene->interactions->requestErase(I);
-      return;
+      return false;
     };
   };
   
@@ -150,6 +149,7 @@ void Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     addTorque(id1, torque1,scene);
     addTorque(id2, torque2,scene);
   }
+  return true;
 }
 
 Real Law2_ScGeom_ViscElCapPhys_Basic::critDist(const Real& Vb, const Real& R, const Real& Theta) {

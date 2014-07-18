@@ -64,7 +64,7 @@ REGISTER_SERIALIZABLE(Ip2_BubbleMat_BubbleMat_BubblePhys);
 /********************** Law2_ScGeom_BubblePhys_Bubble ****************************/
 class Law2_ScGeom_BubblePhys_Bubble : public LawFunctor{
 	public:
-	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* interaction);
+	bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* interaction);
 	FUNCTOR2D(GenericSpheresContact,BubblePhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_BubblePhys_Bubble,LawFunctor,"Constitutive law for Bubble model.",
 		,

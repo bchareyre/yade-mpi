@@ -242,7 +242,7 @@ REGISTER_SERIALIZABLE(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys);
 
 class PolyhedraVolumetricLaw: public LawFunctor{
 	OpenMPAccumulator<Real> plasticDissipation;
-	virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+	virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 	Real elasticEnergy ();
 	Real getPlasticDissipation();
 	void initPlasticDissipation(Real initVal=0);

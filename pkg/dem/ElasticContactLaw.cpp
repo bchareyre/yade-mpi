@@ -46,7 +46,7 @@ void ElasticContactLaw::action()
 }
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_CundallStrack);
-void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
@@ -55,8 +55,8 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(contact);
-		return;}
+		else return false;
+	}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
 
@@ -98,7 +98,7 @@ void Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 	}
 }
 
-void Law2_ScGeom_ViscoFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGeom_ViscoFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
 	ViscoFrictPhys* phys = static_cast<ViscoFrictPhys*>(ip.get());
 	if (shearCreep) {

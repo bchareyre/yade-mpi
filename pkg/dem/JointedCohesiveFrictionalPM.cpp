@@ -11,7 +11,7 @@ YADE_PLUGIN((JCFpmMat)(JCFpmState)(JCFpmPhys)(Ip2_JCFpmMat_JCFpmMat_JCFpmPhys)(L
 /********************** Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM ****************************/
 CREATE_LOGGER(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM);
 
-void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 
 	const int &id1 = contact->getId1();
 	const int &id2 = contact->getId2();
@@ -42,7 +42,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	
 	if ( smoothJoint && phys->isOnJoint ) {
 	  if ( phys->more || ( phys->jointCumulativeSliding > (2*min(geom->radius1,geom->radius2)) ) ) {
-	    scene->interactions->requestErase(contact); return; 
+	    return false;
 	    } else { 
 	    D = phys->initD - std::abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); 
 	    }
@@ -54,7 +54,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	if (D < 0) { //spheres do not "touch" !
 	  if ( !phys->isCohesive ) 
 	  { 
-	    scene->interactions->requestErase(contact); return;
+	    return false;
 	  }
 	  
 	  if ( phys->isCohesive && (phys->FnMax>0) && (std::abs(D)>Dtensile) ) {
@@ -78,7 +78,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    cracksFileExist=true;
 
 	    // delete contact
-	    scene->interactions->requestErase(contact); return;
+	    return false;
 	  }
 	}	  
 	
@@ -143,7 +143,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    // delete contact if in tension, set the contact properties to friction if in compression
 	    if ( D < 0 )
 	    {
-	      scene->interactions->requestErase(contact); return;
+	      return false;
 	    } 
 	    else 
 	    {
@@ -165,11 +165,12 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	scene->forces.addForce (id2, f);
 	
 	// simple solution to avoid torque computation for particles interacting on a smooth joint 
-	if ( (phys->isOnJoint)&&(smoothJoint) ) return;
+	if ( (phys->isOnJoint)&&(smoothJoint) ) return true;
 	
 	/// those lines are needed if rootBody->forces.addForce and rootBody->forces.addMoment are used instead of applyForceAtContactPoint -> NOTE need to check for accuracy!!!
 	scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(-f));
 	scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(-f));
+	return true;
 	
 }
 

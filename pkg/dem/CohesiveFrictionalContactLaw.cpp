@@ -99,7 +99,7 @@ void CohesiveFrictionalContactLaw::action()
 		functor->go(I->geom, I->phys, I.get());}
 }
 
-void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
+bool Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
 	const Real& dt = scene->dt;
 	const int &id1 = contact->getId1();
@@ -114,13 +114,13 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 
 	if (phys->fragile && (-Fn)> phys->normalAdhesion) {
 		// BREAK due to tension
-		scene->interactions->requestErase(contact); return;
+		return false;
 	} else {
 		if ((-Fn)> phys->normalAdhesion) {//normal plasticity
 			Fn=-phys->normalAdhesion;
 			phys->unp = un+phys->normalAdhesion/phys->kn;
 			if (phys->unpMax && phys->unp<phys->unpMax)
-				scene->interactions->requestErase(contact); return;
+				return false;
 		}
 		phys->normalForce = Fn*geom->normal;
 		State* de1 = Body::byId(id1,scene)->state.get();
@@ -223,6 +223,7 @@ void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 		}
 		/// Moment law END       ///
 	}
+	return true;
 }
 
 

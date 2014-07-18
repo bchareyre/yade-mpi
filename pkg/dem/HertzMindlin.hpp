@@ -93,7 +93,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinPhys);
 
 class Law2_ScGeom_MindlinPhys_MindlinDeresiewitz: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+		virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz,LawFunctor,
 			"Hertz-Mindlin contact law with partial slip solution, as described in [Thornton1991]_.",
@@ -104,7 +104,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz);
 
 class Law2_ScGeom_MindlinPhys_HertzWithLinearShear: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+		virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 		FUNCTOR2D(ScGeom,MindlinPhys);
 		YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_MindlinPhys_HertzWithLinearShear,LawFunctor,
 			"Constitutive law for the Hertz formulation (using :yref:`MindlinPhys.kno`) and linear beahvior in shear (using :yref:`MindlinPhys.kso` for stiffness and :yref:`FrictPhys.tangensOfFrictionAngle`). \n\n.. note:: No viscosity or damping. If you need those, look at  :yref:`Law2_ScGeom_MindlinPhys_Mindlin`, which also includes non-linear Mindlin shear.",
@@ -119,7 +119,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_MindlinPhys_HertzWithLinearShear);
 class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 	public:
 
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		Real normElastEnergy();
 		Real adhesionEnergy(); 	
 		

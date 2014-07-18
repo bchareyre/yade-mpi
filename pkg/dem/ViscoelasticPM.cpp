@@ -29,7 +29,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 }
 
 /* Law2_ScGeom_ViscElPhys_Basic */
-void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
+bool Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
 	Vector3r force = Vector3r::Zero();
 	Vector3r torque1 = Vector3r::Zero();
 	Vector3r torque2 = Vector3r::Zero();
@@ -41,11 +41,8 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 		addForce (id2, force,scene);
 		addTorque(id1, torque1,scene);
 		addTorque(id2, torque2,scene);
-		return;
-	} else {
-		scene->interactions->requestErase(I);
-		return;
-	}
+		return true;
+	} else return false;
 }
 
 bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2) {

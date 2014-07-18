@@ -116,7 +116,7 @@ REGISTER_SERIALIZABLE(Ip2_WireMat_WireMat_WirePhys);
 /** 2d functor creating the interaction law (Law2) based on SphereContactGeometry (ScGeom) and WirePhys of 2 bodies, returning type WirePM */
 class Law2_ScGeom_WirePhys_WirePM: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		
 		FUNCTOR2D(ScGeom,WirePhys);
 

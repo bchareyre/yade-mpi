@@ -146,20 +146,20 @@ Real Law2_ScGeom_MindlinPhys_Mindlin::adhesionEnergy()
 	return adhesionEnergy;
 }
 
-void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Body::id_t id1(contact->getId1()), id2(contact->getId2());
 	ScGeom* geom = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
 	const Real uN=geom->penetrationDepth;
 	if (uN<0) {
-		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return;}
-		else {scene->interactions->requestErase(contact); return;}
+		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return true;}
+		else {return false;}
 	}
 	// normal force
 	Real Fn=phys->kno*pow(uN,3/2.);
 	phys->normalForce=Fn*geom->normal;
 	// exactly zero would not work with the shear formulation, and would give zero shear force anyway
-	if(Fn==0) return;
+	if(Fn==0) return true;
 	//phys->kn=3./2.*phys->kno*std::pow(uN,0.5); // update stiffness, not needed
 
 	// contact radius
@@ -188,14 +188,14 @@ void Law2_ScGeom_MindlinPhys_MindlinDeresiewitz::go(shared_ptr<IGeom>& ig, share
 	scene->forces.addTorque(id2,(geom->radius2-.5*geom->penetrationDepth)*geom->normal.cross(f));
 }
 
-void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	Body::id_t id1(contact->getId1()), id2(contact->getId2());
 	ScGeom* geom = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys=static_cast<MindlinPhys*>(ip.get());	
 	const Real uN=geom->penetrationDepth;
 	if (uN<0) {
-		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return;}
-		else {scene->interactions->requestErase(contact); return;}
+		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return true;}
+		else return false;
 	}
 	// normal force
 	Real Fn=phys->kno*pow(uN,3/2.);
@@ -228,13 +228,14 @@ void Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	scene->forces.addForce(id2,-f);
 	scene->forces.addTorque(id1,(geom->radius1-.5*geom->penetrationDepth)*geom->normal.cross(f));
 	scene->forces.addTorque(id2,(geom->radius2-.5*geom->penetrationDepth)*geom->normal.cross(f));
+	return true;
 }
 
 
 /******************** Law2_ScGeom_MindlinPhys_Mindlin *********/
 CREATE_LOGGER(Law2_ScGeom_MindlinPhys_Mindlin);
 
-void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	const Real& dt = scene->dt; // get time step
 	
 	Body::id_t id1 = contact->getId1(); // get id body 1
@@ -262,8 +263,8 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	
 	Real uN = scg->penetrationDepth; // get overlapping 
 	if (uN<0) {
-		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return;}
-		else {scene->interactions->requestErase(contact); return;}
+		if (neverErase) {phys->shearForce = phys->normalForce = Vector3r::Zero(); phys->kn=phys->ks=0; return true;}
+		else return false;
 	}
 	/* Hertz-Mindlin's formulation (PFC) 
 	Note that the normal stiffness here is a secant value (so as it is cannot be used in the GSTS)
@@ -518,7 +519,7 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 		scene->forces.addTorque(id1,-moment); 
 		scene->forces.addTorque(id2,moment);
 	}
-
+	return true;
 	// update variables
 	//phys->prevNormal = scg->normal;
 }

@@ -59,7 +59,7 @@ REGISTER_SERIALIZABLE(Ip2_LudingMat_LudingMat_LudingPhys);
 
 class Law2_ScGeom_LudingPhys_Basic: public LawFunctor {
   public :
-    virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+    virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
   private:
     Real calculateCapillarForce(const ScGeom& geom, LudingPhys& phys);
   FUNCTOR2D(ScGeom,LudingPhys);

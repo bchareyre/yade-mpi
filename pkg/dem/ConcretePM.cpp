@@ -285,7 +285,7 @@ Real Law2_ScGeom_CpmPhys_Cpm::elasticEnergy() {
 #define NNAN(a) YADE_VERIFY(!isnan(a));
 #define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
 
-void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
+bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 	TIMING_DELTAS_START();
 	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
 	CpmPhys* phys=static_cast<CpmPhys*>(_phys.get());
@@ -413,8 +413,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive += 1; /* st1->epsPlBroken += epsPlSum; */ }
 			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive += 1; /* st2->epsPlBroken += epsPlSum; */ }
 		/* } */
-		scene->interactions->requestErase(I);
-		return;
+		return false;
 	}
 
 	Fn = sigmaN*crossSection; phys->normalForce = -Fn*geom->normal;
@@ -438,6 +437,7 @@ void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 		scene->forces.addTorque(id2,(geom->radius2+.5*(phys->refPD-geom->penetrationDepth))*geom->normal.cross(f));
 	}
 	TIMING_DELTAS_CHECKPOINT("rest");
+	return true;
 }
 
 

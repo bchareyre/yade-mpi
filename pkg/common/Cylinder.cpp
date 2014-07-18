@@ -658,7 +658,7 @@ void Bo1_ChainedCylinder_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>
 	}
 }
 
-void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 
 	CylScGeom* geom= static_cast<CylScGeom*>(ig.get());
@@ -667,13 +667,11 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(contact);
-		return;}
+		else return false;}
 	if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) {/*cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;*/scene->interactions->requestErase(contact);}
-		return;}
+			if (geom->isDuplicate==2) return false;}
 	}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
@@ -721,10 +719,11 @@ void Law2_CylScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_pt
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 	}
+	return true;
 }
 
 
-void Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact) {
+bool Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact) {
 
     int id1 = contact->getId1(), id2 = contact->getId2();
 
@@ -738,19 +737,17 @@ void Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
     if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
  			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) {/*cerr<<"erase duplicate coh "<<id1<<" "<<id2<<endl;*/scene->interactions->requestErase(contact);}
-		return;}
+			if (geom->isDuplicate==2) return false;}
 	}
 
     if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) {
         // BREAK due to tension
-        scene->interactions->requestErase(contact);
+        return false;
     } else {
         if ((-Fn)> currentContactPhysics->normalAdhesion) {//normal plasticity
             Fn=-currentContactPhysics->normalAdhesion;
             currentContactPhysics->unp = un+currentContactPhysics->normalAdhesion/currentContactPhysics->kn;
-            if (currentContactPhysics->unpMax && currentContactPhysics->unp<currentContactPhysics->unpMax)
-                scene->interactions->requestErase(contact);
+            if (currentContactPhysics->unpMax && currentContactPhysics->unp<currentContactPhysics->unpMax) return false;
         }
         currentContactPhysics->normalForce = Fn*geom->normal;
         Vector3r& shearForce = geom->rotate(currentContactPhysics->shearForce);
@@ -794,11 +791,12 @@ void Law2_CylScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
 	}
         //applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position);
     }
+    return true;
 }
 
 
 
-void Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
   int id1 = contact->getId1(), id2 = contact->getId2();
 
     ChCylGeom6D* geom= YADE_CAST<ChCylGeom6D*>(ig.get());
@@ -816,24 +814,15 @@ void Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
     if (contact->isFresh(scene)) shearForce   = Vector3r::Zero(); 			//contact nouveau => force tengentielle = 0,0,0
     Real un     = geom->penetrationDepth;				//un : interpenetration
     Real Fn    = currentContactPhysics->kn*(un-currentContactPhysics->unp);		//Fn : force normale
-    /*if (geom->isDuplicate) {
-		if (id2!=geom->trueInt) {
- 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) {cerr<<"erase duplicate coh "<<id1<<" "<<id2<<endl;scene->interactions->requestErase(contact);}
-		return;}
-	}
-*/
     
-    if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) {
-        // BREAK due to tension
-        scene->interactions->requestErase(contact);
-    } else {
+    if (currentContactPhysics->fragile && (-Fn)> currentContactPhysics->normalAdhesion) return false; // BREAK due to tension
+    else {
         if ((-Fn)> currentContactPhysics->normalAdhesion) {//normal plasticity
             Fn=-currentContactPhysics->normalAdhesion;
             currentContactPhysics->unp = un+currentContactPhysics->normalAdhesion/currentContactPhysics->kn;
             if (currentContactPhysics->unpMax && currentContactPhysics->unp<currentContactPhysics->unpMax)
-                scene->interactions->requestErase(contact);
-        }
+                return false;
+	}
     
         
         currentContactPhysics->normalForce = Fn*geom->normal;
@@ -885,6 +874,7 @@ void Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 	}
     }
+    return true;
 }
 
 

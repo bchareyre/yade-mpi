@@ -169,7 +169,7 @@ REGISTER_SERIALIZABLE(Ig2_Tetra_Tetra_TTetraSimpleGeom);
 
 class Law2_TTetraSimpleGeom_NormPhys_Simple: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 	YADE_CLASS_BASE_DOC(Law2_TTetraSimpleGeom_NormPhys_Simple,LawFunctor,"EXPERIMENTAL. TODO");
 	FUNCTOR2D(TTetraSimpleGeom,NormPhys);
 	DECLARE_LOGGER;

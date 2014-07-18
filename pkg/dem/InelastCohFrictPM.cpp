@@ -91,7 +91,7 @@ Real Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::shearElastEnergy()
 }
 
 
-void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
+bool Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
 //FIXME : non cohesive contact are not implemented, it would be useful to use setCohesionNow, setCohesionOnNewContacts etc ...
 	const int &id1 = contact->getId1();
@@ -112,8 +112,7 @@ void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig,
 		if(-un>phys->maxExten || phys->isBroken){//plastic failure.
 			phys->isBroken=1;
 			phys->normalForce=phys->shearForce=phys->moment_twist=phys->moment_bending=Vector3r(0,0,0);
-			scene->interactions->requestErase(contact);
-			return;
+			return false;
 		}
 		Fn=phys->knT*un; //elasticity
 		if(-Fn>phys->maxElT || phys->onPlastT){ //so we are on plastic deformation.
@@ -144,9 +143,9 @@ void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig,
 			phys->isBroken=1;
 			phys->normalForce=phys->shearForce=phys->moment_twist=phys->moment_bending=Vector3r(0,0,0);
 			if(geom->penetrationDepth<=0){ //do not erase the contact while penetrationDepth<0 because it would be recreated at next timestep.
-				scene->interactions->requestErase(contact);
+				return false;
 			}
-			return;
+			return true;
 		}
 		Fn=phys->knC*un;
 		if(Fn>phys->maxElC || phys->onPlastC){
@@ -268,4 +267,5 @@ void Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig,
 	applyForceAtContactPoint(phys->normalForce+phys->shearForce, geom->contactPoint, id1, de1->se3.position, id2, de2->se3.position + (scene->isPeriodic ? scene->cell->intrShiftPos(contact->cellDist): Vector3r::Zero()));
 	scene->forces.addTorque(id1,-phys->moment_bending-phys->moment_twist);
 	scene->forces.addTorque(id2,phys->moment_bending+phys->moment_twist);
+	return true;
 }

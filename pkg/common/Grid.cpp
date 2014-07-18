@@ -397,7 +397,7 @@ YADE_PLUGIN((Ig2_Sphere_GridConnection_ScGridCoGeom));
 //!##################	Laws   #####################
 
 //!			O/
-void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 	ScGridCoGeom* geom= static_cast<ScGridCoGeom*>(ig.get());
 	FrictPhys* phys = static_cast<FrictPhys*>(ip.get());
@@ -405,16 +405,11 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(contact);
-		return;}
+		else return false;}
 	if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) {
-				//cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
-				scene->interactions->requestErase(contact);
-			}
-			return;
+			if (geom->isDuplicate==2) return false;
 		}
 	}
 	Real& un=geom->penetrationDepth;
@@ -455,7 +450,7 @@ void Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 YADE_PLUGIN((Law2_ScGridCoGeom_FrictPhys_CundallStrack));
 
 
-void Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	const int &id1 = contact->getId1();
 	const int &id2 = contact->getId2();
 	ScGridCoGeom* geom  = YADE_CAST<ScGridCoGeom*> (ig.get());
@@ -464,11 +459,7 @@ void Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sha
 	if (geom->isDuplicate) {
 		if (id2!=geom->trueInt) {
 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
-			if (geom->isDuplicate==2) {
-				//cerr<<"erase duplicate "<<id1<<" "<<id2<<endl;
-				scene->interactions->requestErase(contact);
-			}
-			return;
+			if (geom->isDuplicate==2) return false;
 		}
 	}
 	
@@ -479,13 +470,13 @@ void Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sha
 	
 	if (phys->fragile && (-Fn)> phys->normalAdhesion) {
 		// BREAK due to tension
-		scene->interactions->requestErase(contact); return;
+		return false;
 	} else {
 		if ((-Fn)> phys->normalAdhesion) {//normal plasticity
 			Fn=-phys->normalAdhesion;
 			phys->unp = un+phys->normalAdhesion/phys->kn;
 			if (phys->unpMax && phys->unp<phys->unpMax)
-				scene->interactions->requestErase(contact); return;
+				return false;
 		}
 		phys->normalForce = Fn*geom->normal;
 		Vector3r& shearForce = geom->rotate(phys->shearForce);
@@ -524,7 +515,7 @@ void Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sha
 }
 YADE_PLUGIN((Law2_ScGridCoGeom_CohFrictPhys_CundallStrack));
 
-void Law2_GridCoGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
+bool Law2_GridCoGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 	int id1 = contact->getId1(), id2 = contact->getId2();
 	id_t id11 = (static_cast<GridConnection*>((&Body::byId(id1)->shape)->get()))->node1->getId();
 	id_t id12 = (static_cast<GridConnection*>((&Body::byId(id1)->shape)->get()))->node2->getId();
@@ -536,8 +527,7 @@ void Law2_GridCoGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sh
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(contact);
-		return;}
+		else return false;}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce=phys->kn*std::max(un,(Real) 0)*geom->normal;
 
@@ -579,6 +569,7 @@ void Law2_GridCoGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sh
 	scene->forces.addTorque(id12,geom->relPos1*torque1);
 	scene->forces.addTorque(id21,(1-geom->relPos2)*torque2);
 	scene->forces.addTorque(id22,geom->relPos2*torque2);
+	return true;
 }
 YADE_PLUGIN((Law2_GridCoGridCoGeom_FrictPhys_CundallStrack));
 //!##################	Bounds   #####################

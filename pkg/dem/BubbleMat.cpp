@@ -51,7 +51,7 @@ Real BubblePhys::computeForce(Real penetrationDepth, Real surfaceTension, Real r
 /********************** Law2_ScGeom_BubblePhys_Bubble ****************************/
 CREATE_LOGGER(Law2_ScGeom_BubblePhys_Bubble);
 
-void Law2_ScGeom_BubblePhys_Bubble::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
+bool Law2_ScGeom_BubblePhys_Bubble::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 	ScGeom* geom=static_cast<ScGeom*>(_geom.get());
 	BubblePhys* phys=static_cast<BubblePhys*>(_phys.get());
 
