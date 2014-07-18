@@ -20,7 +20,7 @@ class UnsatCellInfo : public FlowCellInfo_UnsaturatedEngineT {
   	public:
   	bool isWaterReservoir;
 	bool isAirReservoir;
-	double capillaryCellVolume;//abs(cell.volume) - abs(cell.solid.volume)
+	double capillaryCellVolume;//std::abs(cell.volume) - std::abs(cell.solid.volume)
 	std::vector<double> poreRadius;//pore throat radius for drainage
 	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sumLines in the facet.
 	double trapCapP;//for calculating the pressure of trapped phase, cell.pressureTrapped = pressureAir - trapCapP.
@@ -244,13 +244,13 @@ void UnsaturatedEngine::updateTotalCellVolume()
         for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
             if (tri.is_infinite(cell)) continue;
             if (cell->info().Pcondition) continue;//NOTE:reservoirs cells should not be included in totalCellVolume
-            totalCellVolume = totalCellVolume + abs( cell->info().volume() );}}
+            totalCellVolume = totalCellVolume + std::abs( cell->info().volume() );}}
     else {
         for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
             if (tri.is_infinite(cell)) continue;
             if (cell->info().Pcondition) continue;//NOTE:reservoirs cells should not be included in totalCellVolume
             if (cell->info().isFictious) continue;
-            totalCellVolume = totalCellVolume + abs( cell->info().volume() );}}
+            totalCellVolume = totalCellVolume + std::abs( cell->info().volume() );}}
 }
 
 void UnsaturatedEngine::updateVolumeCapillaryCell()
@@ -260,7 +260,7 @@ void UnsaturatedEngine::updateVolumeCapillaryCell()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     CellHandle neighbourCell;
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-        cell->info().capillaryCellVolume = abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
+        cell->info().capillaryCellVolume = std::abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
     }
 }
 
@@ -462,7 +462,7 @@ double UnsaturatedEngine::getMinEntryValue()
                 if ( (cell->neighbor(facet)->info().isFictious) && (!isInvadeBoundary) ) continue;
                 if ( cell->neighbor(facet)->info().isWaterReservoir == true ) {
                     double nCellP = surfaceTension/cell->info().poreRadius[facet];
-                    nextEntry = min(nextEntry,nCellP);}}}}
+                    nextEntry = std::min(nextEntry,nCellP);}}}}
                     
     if (nextEntry==1e50) {
         cout << "End drainage !" << endl;
@@ -513,7 +513,7 @@ double UnsaturatedEngine::getSpecificInterfacialArea()
 
 double UnsaturatedEngine::computeCellInterfacialArea(CellHandle cell, int j, double rC)
 {
-    double rInscribe = abs(solver->computeEffectiveRadius(cell, j));  
+    double rInscribe = std::abs(solver->computeEffectiveRadius(cell, j));  
     CellHandle cellh = CellHandle(cell);
     int facetNFictious = solver->detectFacetFictiousVertices (cellh,j);
     
@@ -568,7 +568,7 @@ double UnsaturatedEngine::computeCellInterfacialArea(CellHandle cell, int j, dou
 
 double UnsaturatedEngine::computeEffPoreRadius(CellHandle cell, int j)
 {
-    double rInscribe = abs(solver->computeEffectiveRadius(cell, j));
+    double rInscribe = std::abs(solver->computeEffectiveRadius(cell, j));
     CellHandle cellh = CellHandle(cell);
     int facetNFictious = solver->detectFacetFictiousVertices (cellh,j);
     double r;
@@ -599,8 +599,8 @@ double UnsaturatedEngine::computeEffPoreRadiusFine(CellHandle cell, int j)
     g[1] = ((e[1]-r[2]-r[0])>0) ? 0.5*(e[1]-r[2]-r[0]):0 ;
     g[2] = ((e[2]-r[0]-r[1])>0) ? 0.5*(e[2]-r[0]-r[1]):0 ;
     
-    double rmin= (max(g[0],max(g[1],g[2]))==0) ? 1.0e-10:max(g[0],max(g[1],g[2])) ;
-    double rmax = abs(solver->computeEffectiveRadius(cell, j));
+    double rmin= (std::max(g[0],std::max(g[1],g[2]))==0) ? 1.0e-10:std::max(g[0],std::max(g[1],g[2])) ;
+    double rmax = std::abs(solver->computeEffectiveRadius(cell, j));
 //     if(rmin>rmax) { cerr<<"WARNING! rmin>rmax. rmin="<<rmin<<" ,rmax="<<rmax<<endl; }
     
     double deltaForceRMin = computeDeltaForce(cell,j,rmin);
@@ -628,7 +628,7 @@ double UnsaturatedEngine::computeEffPoreRadiusFine(CellHandle cell, int j)
 double UnsaturatedEngine::bisection(CellHandle cell, int j, double a, double b)
 {
     double m = 0.5*(a+b);
-    if (abs(b-a)>abs((solver->computeEffectiveRadius(cell, j)*1.0e-6))) {
+    if (std::abs(b-a)>std::abs((solver->computeEffectiveRadius(cell, j)*1.0e-6))) {
         if ( computeDeltaForce(cell,j,m) * computeDeltaForce(cell,j,a) < 0 ) {
             b = m;
             return bisection(cell,j,a,b);}
@@ -772,14 +772,14 @@ double UnsaturatedEngine::getRMin(CellHandle cell, int j)
     g[1] = ((e[1]-r[2]-r[0])>0) ? 0.5*(e[1]-r[2]-r[0]):0 ;
     g[2] = ((e[2]-r[0]-r[1])>0) ? 0.5*(e[2]-r[0]-r[1]):0 ;
     
-    double rmin= (max(g[0],max(g[1],g[2]))==0) ? 1.0e-10:max(g[0],max(g[1],g[2])) ;
+    double rmin= (std::max(g[0],std::max(g[1],g[2]))==0) ? 1.0e-10:std::max(g[0],std::max(g[1],g[2])) ;
     return rmin;
 }
 double UnsaturatedEngine::getRMax(CellHandle cell, int j)
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     if (tri.is_infinite(cell->neighbor(j))) {return 0;cerr<<"tri.is_infinite(cell->neighbor(j)"<<endl;}
-    double rmax = abs(solver->computeEffectiveRadius(cell, j));//rmin>rmax ?
+    double rmax = std::abs(solver->computeEffectiveRadius(cell, j));//rmin>rmax ?
     return rmax;
 }
 void UnsaturatedEngine::checkRCompare()
@@ -1037,7 +1037,7 @@ void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
                     CVector fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
                     /// handle fictious vertex since we can get the projected surface easily here
                     if (cell->vertex(j)->info().isFictious) {
-                        Real projSurf=abs(Surfk[solver->boundary(cell->vertex(j)->info().id()).coordinate]);
+                        Real projSurf=std::abs(Surfk[solver->boundary(cell->vertex(j)->info().id()).coordinate]);
                         tempVect=-projSurf*solver->boundary(cell->vertex(j)->info().id()).normal;
                         cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
                         //define the cached value for later use with cache*p
