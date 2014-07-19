@@ -96,6 +96,7 @@ bool Law2_ScGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<I
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 	}
+	return true;
 }
 
 bool Law2_ScGeom_ViscoFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
@@ -106,5 +107,5 @@ bool Law2_ScGeom_ViscoFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_
 			geom->rotate(phys->creepedShear);
 			phys->creepedShear+= creepStiffness*phys->ks*(phys->shearForce-phys->creepedShear)*dt/viscosity;
 			phys->shearForce -= phys->ks*((phys->shearForce-phys->creepedShear)*dt/viscosity);}
-	Law2_ScGeom_FrictPhys_CundallStrack::go(ig,ip,contact);
+	return Law2_ScGeom_FrictPhys_CundallStrack::go(ig,ip,contact);
 }
