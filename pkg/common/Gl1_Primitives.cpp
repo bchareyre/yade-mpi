@@ -1,6 +1,12 @@
 /*************************************************************************
-*  © 2004 Olivier Galizzi  <olivier.galizzi@imag.fr>                     *
+*  Copyright (C) 2004 by Olivier Galizzi                                 *
+*  olivier.galizzi@imag.fr                                               *
+*                                                                        *
+*  Copyright (C) 2008 by Sergei Dorofeenko                               *
+*  sega@users.berlios.de                                                 *
+*                                                                        *
 *  © 2008 Václav Šmilauer <eudoxos@arcig.cz>                             *
+*                                                                        *
 *  © 2008 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
@@ -9,9 +15,85 @@
 
 #ifdef YADE_OPENGL
 
-#include "Gl1_Sphere.hpp"
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include "Gl1_Primitives.hpp"
+#include <yade/lib/opengl/OpenGLWrapper.hpp>
+#include <yade/core/Scene.hpp>
+
+YADE_PLUGIN((Gl1_Aabb)(Gl1_Box)(Gl1_Facet));
+YADE_PLUGIN((GlBoundFunctor)(GlShapeFunctor)(GlIGeomFunctor)(GlIPhysFunctor)(GlStateFunctor)
+            (GlBoundDispatcher)(GlShapeDispatcher)(GlIGeomDispatcher)(GlIPhysDispatcher)
+            (GlStateDispatcher));
+
+
+void Gl1_Aabb::go(const shared_ptr<Bound>& bv, Scene* scene){
+	Aabb* aabb = static_cast<Aabb*>(bv.get());
+	glColor3v(bv->color);
+	if(!scene->isPeriodic){
+		glTranslatev(Vector3r(.5*(aabb->min+aabb->max)));
+		glScalev(Vector3r(aabb->max-aabb->min));
+	} else {
+		glTranslatev(Vector3r(scene->cell->shearPt(scene->cell->wrapPt(.5*(aabb->min+aabb->max)))));
+		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
+		glScalev(Vector3r(aabb->max-aabb->min));
+	}
+	glutWireCube(1);
+}
+
+void Gl1_Box::go(const shared_ptr<Shape>& cg, const shared_ptr<State>&,bool wire,const GLViewInfo&)
+{
+	glColor3v(cg->color);
+	Vector3r &extents = (static_cast<Box*>(cg.get()))->extents;
+	glScalef(2*extents[0],2*extents[1],2*extents[2]);
+	if (wire) glutWireCube(1);
+	else glutSolidCube(1);
+}
+
+
+bool Gl1_Facet::normals=false;
+
+void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire,const GLViewInfo&)
+{   
+	Facet* facet = static_cast<Facet*>(cm.get());
+	const vector<Vector3r>& vertices = facet->vertices;
+	const Vector3r* ne = facet->ne;
+	const Real& icr = facet->icr;
+
+	if(cm->wire || wire){
+		// facet
+		glBegin(GL_LINE_LOOP);
+			glColor3v(normals ? Vector3r(1,0,0): cm->color);
+		   glVertex3v(vertices[0]);
+		   glVertex3v(vertices[1]);
+		   glVertex3v(vertices[2]);
+	    glEnd();
+		if(!normals) return;
+		// facet's normal 
+		glBegin(GL_LINES);
+			glColor3(0.0,0.0,1.0); 
+			glVertex3(0.0,0.0,0.0);
+			glVertex3v(facet->normal);
+		glEnd();
+		// normal of edges
+		glColor3(0.0,0.0,1.0); 
+		glBegin(GL_LINES);
+			glVertex3(0.0,0.0,0.0); glVertex3v(Vector3r(icr*ne[0]));
+			glVertex3(0.0,0.0,0.0);	glVertex3v(Vector3r(icr*ne[1]));
+			glVertex3(0.0,0.0,0.0);	glVertex3v(Vector3r(icr*ne[2]));
+		glEnd();
+	} else {
+		glDisable(GL_CULL_FACE); 
+		Vector3r normal=(facet->vertices[1]-facet->vertices[0]).cross(facet->vertices[2]-facet->vertices[1]); normal.normalize();
+		glColor3v(cm->color);
+		glBegin(GL_TRIANGLES);
+			glNormal3v(normal); // this makes every triangle different WRT the light direction; important!
+			glVertex3v(facet->vertices[0]);
+			glVertex3v(facet->vertices[1]);
+			glVertex3v(facet->vertices[2]);
+		glEnd();
+	}
+}
+
+// Spheres==========================================
 
 bool Gl1_Sphere::wire;
 bool Gl1_Sphere::stripes;
@@ -140,43 +222,4 @@ void Gl1_Sphere::initGlutGlList(){
 		glutSolidSphere(1.0,max(quality*glutSlices,(Real)2.),max(quality*glutStacks,(Real)3.));
 	glEndList();
 }
-
 #endif /* YADE_OPENGL */
-
-//      ///The old Galizzi's lists
-// 	if (!vertices.size()) {
-// 		Real X = 0.525731112119133606;
-// 		Real Z = 0.850650808352039932;
-// 		vertices.push_back(Vector3r(-X,0,Z));//0
-// 		vertices.push_back(Vector3r(X,0,Z));//1
-// 		vertices.push_back(Vector3r(-X,0,-Z));//2
-// 		vertices.push_back(Vector3r(X,0,-Z));//3
-// 		vertices.push_back(Vector3r(0,Z,X));//4
-// 		vertices.push_back(Vector3r(0,Z,-X));//5
-// 		vertices.push_back(Vector3r(0,-Z,X));//6
-// 		vertices.push_back(Vector3r(0,-Z,-X));//7
-// 		vertices.push_back(Vector3r(Z,X,0));//8
-// 		vertices.push_back(Vector3r(-Z,X,0));//9
-// 		vertices.push_back(Vector3r(Z,-X,0));//10
-// 		vertices.push_back(Vector3r(-Z,-X,0));//11
-// 		faces.push_back(Vector3r(0,4,1));
-// 		faces.push_back(Vector3r(0,9,4));
-// 		faces.push_back(Vector3r(9,5,4));
-// 		faces.push_back(Vector3r(4,5,8));
-// 		faces.push_back(Vector3r(4,8,1));
-// 		faces.push_back(Vector3r(8,10,1));
-// 		faces.push_back(Vector3r(8,3,10));
-// 		faces.push_back(Vector3r(5,3,8));
-// 		faces.push_back(Vector3r(5,2,3));
-// 		faces.push_back(Vector3r(2,7,3));
-// 		faces.push_back(Vector3r(7,10,3));
-// 		faces.push_back(Vector3r(7,6,10));
-// 		faces.push_back(Vector3r(7,11,6));
-// 		faces.push_back(Vector3r(11,0,6));
-// 		faces.push_back(Vector3r(0,1,6));
-// 		faces.push_back(Vector3r(6,1,10));
-// 		faces.push_back(Vector3r(9,0,11));
-// 		faces.push_back(Vector3r(9,11,2));
-// 		faces.push_back(Vector3r(9,2,5));
-// 		faces.push_back(Vector3r(7,2,11));}
-
