@@ -1,9 +1,33 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/pkg/common/MatchMaker.hpp>
+#include <yade/pkg/common/MatchMaker.hpp>
 
 YADE_PLUGIN((MatchMaker));
-MatchMaker::~MatchMaker(){}
+
+
+// =======================================================
+// Some plugins from removed CPP-fiels
+#include <yade/pkg/common/TorqueEngine.hpp>
+#include <yade/pkg/common/ForceResetter.hpp>
+#include <yade/pkg/common/FieldApplier.hpp>
+#include <yade/pkg/common/Callbacks.hpp>
+#include <yade/pkg/common/BoundaryController.hpp>
+#include <yade/pkg/common/NormShearPhys.hpp>
+#include <yade/pkg/common/Recorder.hpp>
+#include <yade/pkg/common/CylScGeom6D.hpp>
+#include <yade/pkg/common/Box.hpp>
+#include <yade/pkg/common/StepDisplacer.hpp>
+
+YADE_PLUGIN((IntrCallback)
+	#ifdef YADE_BODY_CALLBACK
+		(BodyCallback)
+	#endif
+);
+YADE_PLUGIN((ForceResetter)(TorqueEngine)(FieldApplier)(BoundaryController)
+            (NormPhys)(NormShearPhys)(Recorder)(CylScGeom6D)(CylScGeom)(Box)
+            (StepDisplacer));
+
+// =======================================================
 
 Real MatchMaker::operator()(int id1, int id2, Real val1, Real val2) const {
 	FOREACH(const Vector3r& m, matches){

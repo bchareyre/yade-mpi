@@ -8,11 +8,17 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
+#include <yade/core/PartialEngine.hpp>
+#include <yade/core/Scene.hpp>
 
 class TorqueEngine: public PartialEngine{
 	public:
-		virtual void action();
+		virtual void action() {
+			FOREACH(const Body::id_t id, ids){
+			// check that body really exists?
+			scene->forces.addTorque(id,moment);
+		}
+	}
 	YADE_CLASS_BASE_DOC_ATTRS(TorqueEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step.",
 		((Vector3r,moment,Vector3r::Zero(),,"Torque value to be applied."))
 	);

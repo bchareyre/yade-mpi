@@ -1,7 +1,8 @@
 #include<yade/pkg/dem/DomainLimiter.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
-YADE_PLUGIN((DomainLimiter)(LawTester)
+YADE_PLUGIN((DomainLimiter)(LawTester)(GenericSpheresContact)
 	#ifdef YADE_OPENGL
 		(GlExtra_LawTester)(GlExtra_OctreeCubes)
 	#endif

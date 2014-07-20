@@ -16,6 +16,6 @@ class GenericSpheresContact: public IGeom{
 	);
 	REGISTER_CLASS_INDEX(GenericSpheresContact,IGeom);
 
-	virtual ~GenericSpheresContact(); // vtable
+	virtual ~GenericSpheresContact() {};
 };
 REGISTER_SERIALIZABLE(GenericSpheresContact);
