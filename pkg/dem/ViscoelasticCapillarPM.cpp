@@ -65,8 +65,8 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
 bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
   Vector3r force = Vector3r::Zero();
   
-  const int id1 = I->getId1();
-  const int id2 = I->getId2();
+  const id_t id1 = I->getId1();
+  const id_t id2 = I->getId2();
     
   const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
   Scene* scene=Omega::instance().getScene().get();
