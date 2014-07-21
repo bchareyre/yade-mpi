@@ -9,9 +9,13 @@
 #ifdef LBM_ENGINE
 
 #include "LBMnode.hpp"
+#include "LBMlink.hpp"
+#include "LBMbody.hpp"
 
-YADE_PLUGIN((LBMnode));
+YADE_PLUGIN((LBMnode)(LBMlink)(LBMbody));
 LBMnode::~LBMnode(){};
+
+
 
 void LBMnode::MixteBC(string lbmodel,Real density, Vector3r U, string where){
     Real rhoVx=density*U.x();

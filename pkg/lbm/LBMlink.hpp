@@ -14,8 +14,15 @@
 
 class LBMlink: public Serializable{
     public:
-        void ReinitDynamicalProperties();
-        virtual ~LBMlink();
+        void ReinitDynamicalProperties() {
+                sid=-1; fid=-1;
+                idx_sigma_i=-1; isBd=false;
+                VbMid=Vector3r::Zero();
+                DistMid=Vector3r::Zero();
+                ct=0.;
+                return;
+                };
+        virtual ~LBMlink() {};
 
     YADE_CLASS_BASE_DOC_ATTRS_CTOR(LBMlink,Serializable,
         "Link class for Lattice Boltzmann Method ",
