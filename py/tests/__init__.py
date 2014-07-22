@@ -1,7 +1,7 @@
 # encoding: utf-8
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 """All defined functionality tests for yade."""
-import unittest,inspect
+import unittest,inspect,sys
 
 # add any new test suites to the list here, so that they are picked up by testAll
 allTests=['wrapper','core','pbc','clump','cohesive-chain']
@@ -25,7 +25,7 @@ def testModule(module):
 	@param module: fully-qualified module name, e.g. yade.tests.wrapper
 	"""
 	suite=unittest.defaultTestLoader().loadTestsFromName(module)
-	return unittest.TextTestRunner(verbosity=2).run(suite)
+	return unittest.TextTestRunner(stream=sys.stdout,verbosity=2).run(suite)
 
 def testAll():
 	"""Run all tests defined in all yade.tests.* modules and return
@@ -34,7 +34,7 @@ def testAll():
 	import doctest
 	for mod in allModules:
 		suite.addTest(doctest.DocTestSuite(mod))
-	return unittest.TextTestRunner(verbosity=2).run(suite)
+	return unittest.TextTestRunner(stream=sys.stdout,verbosity=2).run(suite)
 
 	
 
