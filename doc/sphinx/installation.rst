@@ -192,7 +192,7 @@ Then inside this build-directory you should start cmake to configure the compila
 
 For the folder structure given above call the following command in folder "build":
 
-    cmake -DINSTALL_PREFIX=../install ../trunk
+	cmake -DINSTALL_PREFIX=../install ../trunk
 
 Additional options can be configured in the same line with the following 
 syntax::
