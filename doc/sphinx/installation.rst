@@ -227,6 +227,13 @@ and disabled options. Then start the standard the compilation process::
 
 	make
 
+The compilation process can take a long time, be patient. An additional
+parameter on many cores systems ``-j`` can be added to decrease compilation time
+and split the compilation on many cores. For example, on 4-core machines
+it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
+approximately 2GB/core for compilation, otherwise the swap-file will be used
+and a compilation time dramatically increases.
+
 Installing performs with the following command::
 
 	make install
@@ -234,12 +241,7 @@ Installing performs with the following command::
 The "install" command will in fact also recompile if source files have been modified. 
 Hence there is no absolute need to type the two commands separately.
 
-The compilation process can take a long time, be patient. An additional
-parameter on many cores systems ``-j`` can be added to decrease compilation time
-and split the compilation on many cores. For example, on 4-core machines
-it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
-approximately 2GB/core for compilation, otherwise the swap-file will be used
-and a compilation time dramatically increases. After compilation finished successfully
+After compilation finished successfully
 the new built can be started by navigating to /path/to/installfolder/bin and calling yade via (based on version yade-2014-02-20.git-a7048f4)::
     
     cd /path/to/installfolder/bin 
