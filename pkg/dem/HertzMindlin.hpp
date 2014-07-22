@@ -52,8 +52,8 @@ class MindlinPhys: public FrictPhys{
 			((bool,isSliding,false,,"check if the contact is sliding (useful to calculate the ratio of sliding contacts)"))
 
 			// Contact damping coefficients as for linear elastic contact law
-			((Real,betan,0.0,,"Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
-			((Real,betas,0.0,,"Fraction of the viscous damping coefficient (shear direction) equal to $\\frac{c_{s}}{C_{s,crit}}$."))
+			((Real,betan,0.0,,"Normal Damping Ratio. Fraction of the viscous damping coefficient (normal direction) equal to $\\frac{c_{n}}{C_{n,crit}}$."))
+			((Real,betas,0.0,,"Shear Damping Ratio. Fraction of the viscous damping coefficient (shear direction) equal to $\\frac{c_{s}}{C_{s,crit}}$."))
 
 			// Contact damping coefficient for non-linear elastic contact law (of Hertz-Mindlin type)
 			((Real,alpha,0.0,,"Constant coefficient to define contact viscous damping for non-linear elastic force-displacement relationship."))
