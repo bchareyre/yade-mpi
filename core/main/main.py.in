@@ -48,7 +48,7 @@ par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.
   )
 par.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
 par.add_argument('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type=int)
-par.add_argument('--cores',help='Set number of OpenMP threads (as \-\-threads) and in addition set affinity of threads to the cores given.',dest='cores',type=str)
+par.add_argument('--cores',help='Set number of OpenMP threads (as \-\-threads) and in addition set affinity of threads to the cores given. Please provide a string with comma-separated core-ids.',dest='cores',type=str)
 par.add_argument('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',nargs='+')
 par.add_argument('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type=int)
 par.add_argument('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
@@ -115,7 +115,7 @@ if opts.cores:
 	except ValueError:
 		raise ValueError('Invalid --cores specification %s, should be a comma-separated list of non-negative integers'%opts.cores)
 	opts.nthreads=len(cores)
-	os.environ['GOMP_CPU_AFFINITY']=' '.join([str(cores[0])]+[str(c) for c in cores])
+	os.environ['GOMP_CPU_AFFINITY']=' '.join([str(c) for c in cores])
 	os.environ['OMP_NUM_THREADS']=str(len(cores))
 elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
