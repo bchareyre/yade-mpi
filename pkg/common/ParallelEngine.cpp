@@ -1,10 +1,5 @@
-#include"ParallelEngine.hpp"
-#include<yade/pkg/common/PeriodicEngines.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/common/PyRunner.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Aabb.hpp>
-YADE_PLUGIN((PeriodicEngine)(Sphere)(Aabb)(ElastMat)(FrictMat)(PyRunner)(ParallelEngine));
+#include <yade/pkg/common/ParallelEngine.hpp>
+YADE_PLUGIN((ParallelEngine));
 
 #ifdef YADE_OPENMP
   #include<omp.h>
