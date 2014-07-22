@@ -121,7 +121,7 @@ elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
 
 if __name__ == "__main__": # do not print this while importing yade in other python application
-	sys.stderr.write('Welcome to Yade '+version+debugbuild+'\n')
+	sys.stdout.write('Welcome to Yade '+version+debugbuild+'\n')
 
 # initialization and c++ plugins import
 import yade
