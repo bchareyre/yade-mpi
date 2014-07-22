@@ -181,10 +181,10 @@ Compilation
 You should create a separate build-place-folder, where Yade will be configured 
 and where the source code will be compiled. Here is an example for a folderstructure:
 
-    myYade/           ## base directory
-            trunk/      ## folder for sourcecode in which you use github
-            build/      ## folder in which sources will be compiled; build-directory; use cmake here
-            install/    ## installfolder
+	myYade/       ## base directory
+		trunk/      ## folder for sourcecode in which you use github
+		build/      ## folder in which sources will be compiled; build-directory; use cmake here
+		install/    ## installfolder
 
 Then inside this build-directory you should start cmake to configure the compilation process::
 
