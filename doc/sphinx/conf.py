@@ -695,7 +695,7 @@ V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, J
 \text{\sffamily\bfseries\LARGE Authors}\\
 \\
 \text{\sffamily\bfseries\Large V\'{a}clav \v{S}milauer}\\
-\text{\sffamily\Large University of Innsbruck}\\
+\text{\sffamily\Large Freelance consultant (http://woodem.eu)}\\
 \\
 \text{\sffamily\bfseries\Large Emanuele Catalano}\\
 \text{\sffamily\Large Grenoble INP, UJF, CNRS, lab. 3SR}\\
