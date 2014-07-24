@@ -68,6 +68,7 @@ if clumps:
  ## generate positions and input them in the simulation
  sp.makeClumpCloud(mn,mx,[c1],periodic=False)
  sp.toSimulation(material='spheres')
+ O.bodies.updateClumpProperties()#get more accurate clump masses/volumes/inertia
 else:
  sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95,seed=1) #"seed" make the "random" generation always the same
  O.bodies.append([sphere(center,rad,material='spheres') for center,rad in sp])
