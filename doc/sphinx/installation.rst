@@ -179,12 +179,12 @@ Compilation
 ^^^^^^^^^^^
 
 You should create a separate build-place-folder, where Yade will be configured 
-and where the source code will be compiled. Here is an example for a folderstructure:
+and where the source code will be compiled. Here is an example for a folder structure::
 
-	myYade/       ## base directory
-		trunk/      ## folder for sourcecode in which you use github
-		build/      ## folder in which sources will be compiled; build-directory; use cmake here
-		install/    ## installfolder
+	myYade/       		## base directory
+		trunk/		## folder for sourcecode in which you use github
+		build/		## folder in which sources will be compiled; build-directory; use cmake here
+		install/	## install folder
 
 Then inside this build-directory you should start cmake to configure the compilation process::
 
@@ -239,7 +239,8 @@ Installing performs with the following command::
 	make install
 
 The "install" command will in fact also recompile if source files have been modified. 
-Hence there is no absolute need to type the two commands separately.
+Hence there is no absolute need to type the two commands separately. You may receive make errors if you don't have root privileges.
+These errors are not critical but without root privileges yade won't be linked in /usr/local/bin/.
 
 After compilation finished successfully
 the new built can be started by navigating to /path/to/installfolder/bin and calling yade via (based on version yade-2014-02-20.git-a7048f4)::
@@ -249,7 +250,7 @@ the new built can be started by navigating to /path/to/installfolder/bin and cal
 
 For building the documentation you should at first execute the command "make install"
 and then "make doc" to build it. The generated files will be stored in your current
-build directory/doc/sphinx/_build.
+build directory/doc/sphinx/_build. Once again root privileges are necessary for linking. Link will be created in /usr/local/share/doc/.
 
 "make manpage" command generates and moves manpages in a standard place.
 "make check" command executes standard test to check the functionality of compiled program.
