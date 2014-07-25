@@ -75,4 +75,5 @@ bool Law2_ScGeom_BubblePhys_Bubble::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhy
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(normalForce));
 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(normalForce));
 	}
+	return true;
 }

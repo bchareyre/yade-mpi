@@ -334,7 +334,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	// *** Compute total fabric tensor from the two tensors above ***/
 	Matrix3r fabricTot(Matrix3r::Zero()); 
 	int q(0);
-	if(!count==0){ // compute only if there are some interactions
+	if(!count){ // compute only if there are some interactions
 		q=nStrong*1./count; 
 		fabricTot=(1-q)*fabricWeak+q*fabricStrong;
 	}
