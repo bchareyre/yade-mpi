@@ -15,7 +15,7 @@ class BubbleMat : public Material {
 		((Real,surfaceTension,0.07197,,"The surface tension in the fluid surrounding the bubbles. The default value is that of water at 25 degrees Celcius."))
 		,
 		createIndex();
-		density=1; // TODO density default value
+		density=1000;
 	);
 	REGISTER_CLASS_INDEX(BubbleMat,Material);
 };
@@ -24,9 +24,14 @@ REGISTER_SERIALIZABLE(BubbleMat);
 
 /********************** BubblePhys ****************************/
 class BubblePhys : public IPhys {
+	private:
+
+	Real coeffA,coeffB; //Coefficents for artificial curve
+  
 	public:
 
-	static Real computeForce(Real penetrationDepth, Real surfaceTension, Real rAvg, int newtonIter, Real newtonTol);
+	void computeCoeffs(Real pctMaxForce,Real surfaceTension, Real c1);
+	static Real computeForce(Real separation, Real surfaceTension, Real rAvg, int newtonIter, Real newtonTol, Real c1, Real fN, BubblePhys* phys);
 
 	virtual ~BubblePhys(){};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(BubblePhys,IPhys,"Physics of bubble-bubble interactions, for use with BubbleMat",
@@ -34,6 +39,7 @@ class BubblePhys : public IPhys {
 		((Real,surfaceTension,NaN,,"Surface tension of the surrounding liquid"))
 		((Real,fN,NaN,,"Contact normal force"))
 		((Real,rAvg,NaN,,"Average radius of the two interacting bubbles"))
+		((Real,Dmax,NaN,,"Maximum penetrationDepth of the bubbles before the force displacement curve changes to an artificial exponential curve. Setting this value will have no effect. See Law2_ScGeom_BubblePhys_Bubble::pctMaxForce for more information"))
 		((Real,newtonIter,50,,"Maximum number of force iterations allowed"))
 		((Real,newtonTol,1e-6,,"Convergence criteria for force iterations"))
 		,
@@ -63,10 +69,16 @@ REGISTER_SERIALIZABLE(Ip2_BubbleMat_BubbleMat_BubblePhys);
 
 /********************** Law2_ScGeom_BubblePhys_Bubble ****************************/
 class Law2_ScGeom_BubblePhys_Bubble : public LawFunctor{
+	private:
+	  
+	  Real c1; //Coeff used for many contacts
+  
 	public:
 	bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* interaction);
 	FUNCTOR2D(GenericSpheresContact,BubblePhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_BubblePhys_Bubble,LawFunctor,"Constitutive law for Bubble model.",
+		((Real,pctMaxForce,0.1,,"Chan[2011] states the contact law is valid only for small interferences; therefore an exponential force-displacement curve models the contact stiffness outside that regime (large penetration). This artificial stiffening ensures that bubbles will not pass through eachother or completely overlap during the simulation. The maximum force is Fmax = (2*pi*surfaceTension*rAvg). pctMaxForce is the percentage of the maximum force dictates the separation threshold, Dmax, for each contact. Penetrations less than Dmax calculate the reaction force from the derived contact law, while penetrations equal to or greater than Dmax calculate the reaction force from the artificial exponential curve."))
+		((Real,surfaceTension,0.07197,,"The surface tension in the liquid surrounding the bubbles. The default value is that of water at 25 degrees Celcius."))
 		,
 		/*ctor*/,
 	);
