@@ -65,8 +65,7 @@ bool Law2_ScGeom_BubblePhys_Bubble::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhy
 	BubblePhys* phys=static_cast<BubblePhys*>(_phys.get());
 	
 	if(geom->penetrationDepth <= 0.0) {
-		scene->interactions->requestErase(I);
-		return;
+		return false;
 	}
 	
 	if (I->isFresh(scene)) {
