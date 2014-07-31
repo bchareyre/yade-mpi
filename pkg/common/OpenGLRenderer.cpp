@@ -9,6 +9,7 @@
 #include<yade/core/Timing.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg/common/Aabb.hpp>
+#include<yade/lib/pyutil/gil.hpp>
 
 #ifdef __APPLE__
 #  include <OpenGL/glu.h>
@@ -140,6 +141,7 @@ void OpenGLRenderer::resetSpecularEmission(){
 
 void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection){
 
+	gilLock lockgil;
 	if(!initDone) init();
 	assert(initDone);
 	selId = selection;
