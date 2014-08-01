@@ -456,32 +456,31 @@ void Shop::setContactFriction(Real angleRad){
 	}
 }
 
-void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization)
+void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 {
 	Scene* scene = Omega::instance().getScene().get();
+	const int sphereIdx = Sphere::getClassIndexStatic();
 	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if (dynamicOnly && !b->isDynamic()) continue;
-		int ci=b->shape->getClassIndex();
-		if(b->isClump() || ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
-		if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
-		(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
-		// Clump volume variation with homothetic displacement from its center
-		if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
-	}
-	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
-		if(b->isClump()){
-			Clump* clumpSt = YADE_CAST<Clump*>(b->shape.get());
-			clumpSt->updateProperties(b, discretization);
+		//We grow only spheres and clumps 
+		if(b->isClump() or sphereIdx == b->shape->getClassIndex()){			
+			if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
+			// for clumps we updated inertia, nothing else to do
+			if (b->isClump()) continue;
+			// for spheres, we update radius
+			(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
+			// and if they are clump members,clump volume variation with homothetic displacement of all members
+			if (b->isClumpMember()) b->state->pos += (multiplier-1) * (b->state->pos - Body::byId(b->clumpId, scene)->state->pos);
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
-		int ci=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
-		if(ci==GridNode::getClassIndexStatic() || ci==GridConnection::getClassIndexStatic()) continue;
+		int ci1=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
+		int ci2=(*(scene->bodies))[ii->getId2()]->shape->getClassIndex();
 		if (ii->isReal()) {
 			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
-			if (!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic())
+			if ((!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic()) && ci1==sphereIdx)
 				contact->refR1 = YADE_CAST<Sphere*>((* (scene->bodies))[ii->getId1()]->shape.get())->radius;
-			if (!dynamicOnly || (*(scene->bodies))[ii->getId2()]->isDynamic())
+			if ((!dynamicOnly || (*(scene->bodies))[ii->getId2()]->isDynamic()) && ci2==sphereIdx)
 				contact->refR2 = YADE_CAST<Sphere*>((* (scene->bodies))[ii->getId2()]->shape.get())->radius;
 			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(ii->phys);
 			contactPhysics->kn*=multiplier; contactPhysics->ks*=multiplier;
