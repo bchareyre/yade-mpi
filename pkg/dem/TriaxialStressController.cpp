@@ -232,34 +232,10 @@ void TriaxialStressController::computeStressStrain()
 	meanStress/=6.;
 }
 
-void TriaxialStressController::controlInternalStress ( Real multiplier ) {
+void TriaxialStressController::controlInternalStress ( Real multiplier )
+{
 	particlesVolume *= pow ( multiplier,3 );
-	BodyContainer::iterator bi    = scene->bodies->begin();
-	BodyContainer::iterator biEnd = scene->bodies->end();
-	for ( ; bi!=biEnd ; ++bi )
-	{
-		if ( ( *bi )->isDynamic() )
-		{
-			( static_cast<Sphere*> ( ( *bi )->shape.get() ) )->radius *= multiplier;
-				(*bi)->state->mass*=pow(multiplier,3);
-				(*bi)->state->inertia*=pow(multiplier,5);
-
-		}
-	}
-	InteractionContainer::iterator ii    = scene->interactions->begin();
-	InteractionContainer::iterator iiEnd = scene->interactions->end();
-	for (; ii!=iiEnd ; ++ii)
-	{
-		if ((*ii)->isReal()) {
-			ScGeom* contact = static_cast<ScGeom*>((*ii)->geom.get());
-			if ((*(scene->bodies))[(*ii)->getId1()]->isDynamic())
-				contact->radius1 = static_cast<Sphere*>((* (scene->bodies))[(*ii)->getId1()]->shape.get())->radius;
-			if ((* (scene->bodies))[(*ii)->getId2()]->isDynamic())
-				contact->radius2 = static_cast<Sphere*>((* (scene->bodies))[(*ii)->getId2()]->shape.get())->radius;
-			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->phys);
-			contactPhysics->kn*=multiplier; contactPhysics->ks*=multiplier;
-		}
-	}
+	Shop::growParticles(multiplier,true,true);
 }
 
 /*!
