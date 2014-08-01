@@ -40,6 +40,7 @@ Variants for periodic boundary conditions are also present.
 #include<yade/lib/triangulation/FlowBoundingSphere.hpp>
 #include<yade/lib/triangulation/PeriodicFlow.hpp>
 #include<yade/pkg/pfv/FlowEngine.hpp>
+#include<yade/core/Clump.hpp>
 
 template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=DEFAULTSOLVER >
 class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
@@ -62,7 +63,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		shared_ptr<FlowSolver> backgroundSolver;
 		volatile bool backgroundCompleted;
 		Cell cachedCell;
-		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool exists; posData(){exists=0;}};
+		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool isClump; bool exists; posData(){exists=0;}};
 		vector<posData> positionBufferCurrent;//reflect last known positions before we start computations
 		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
 		//copy positions in a buffer for faster and/or parallel access
