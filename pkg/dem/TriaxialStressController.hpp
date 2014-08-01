@@ -18,12 +18,11 @@ class Scene;
 class State;
 
 
-/*! \brief Controls the stress on the boundaries of a box and compute strain-like and stress-like quantities for the packing.
-           The algorithms used have been developed initialy for simulations reported in [Chareyre2002a] and [Chareyre2005].
-           They have been ported to Yade in a second step and used in e.g. [Kozicki2008],[Scholtes2009b],[Jerier2010b].
+/*! \brief Controls the stress on the boundaries of a box and compute strain-like and stress-like quantities for the packing. The algorithms used have been developed initialy for simulations reported in [Chareyre2002a] and [Chareyre2005]. They have been ported to Yade in a second step and used in e.g. [Kozicki2008],[Scholtes2009b],[Jerier2010b].
 */
 
-class TriaxialStressController : public BoundaryController {
+class TriaxialStressController : public BoundaryController
+{
 	private :
 		bool first;
 		inline const Vector3r getForce(Scene* rb, Body::id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of action */ }
@@ -70,24 +69,20 @@ class TriaxialStressController : public BoundaryController {
 		//! Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		void computeStressStrain();
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-		Real ComputeUnbalancedForce(bool maxUnbalanced=false);
+    		Real ComputeUnbalancedForce(bool maxUnbalanced=false);
 		///! Getter for stress and rates in python
 		Vector3r getStress(int boundId);
 		Vector3r getStrainRate();
 
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
-		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. \
-		The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) \
-		and target values are defined by goal1,goal2, and goal3. sigmaIso has to be defined during growing phases."
-		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. \
-		They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
+		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. sigmaIso has to be defined during growing phases."
+		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
-		((unsigned int,stiffnessUpdateInterval,10,,"target strain rate (./s)"))
-		((unsigned int,radiusControlInterval,10,,""))
+   		((unsigned int,stiffnessUpdateInterval,10,,"target strain rate (./s)"))
+   		((unsigned int,radiusControlInterval,10,,""))
 		((unsigned int,computeStressStrainInterval,10,,""))
 		((Real,stressDamping,0.25,,"wall damping coefficient for the stress control - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
-		((Real,strainDamping,0.99,,"coefficient used for smoother transitions in the strain rate. \
-		The rate reaches the target value like $d^n$ reaches 0, where $d$ is the damping coefficient and $n$ is the number of steps"))
+		((Real,strainDamping,0.99,,"coefficient used for smoother transitions in the strain rate. The rate reaches the target value like $d^n$ reaches 0, where $d$ is the damping coefficient and $n$ is the number of steps"))
 		((Real,thickness,-1,,"thickness of boxes (needed by some functions)"))
 		((int,wall_bottom_id,2,,"id of boundary ; coordinate 1- (default value is ok if aabbWalls are appended BEFORE spheres.)"))
 		((int,wall_top_id,3,,"id of boundary ; coordinate 1+ (default value is ok if aabbWalls are appended BEFORE spheres.)"))
@@ -111,14 +106,10 @@ class TriaxialStressController : public BoundaryController {
 		((Real,goal1,0,,"prescribed stress/strain rate on axis 1, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
 		((Real,goal2,0,,"prescribed stress/strain rate on axis 2, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
 		((Real,goal3,0,,"prescribed stress/strain rate on axis 3, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
-		((unsigned int,stressMask,7,,"Bitmask determining if the components of :yref:`TriaxialStressController::goal` are stress (1) or strain (0). \
-		0 for none ($0*2^0 + 0*2^1 + 0*2^2 = 0$), 7 for all ($1*2^0 + 1*2^1 + 1*2^2$ = 7), 1 for sigma1 ($1*2^0 + 0*2^1 + 0*2^2$ = 1), etc."))
+		((unsigned int,stressMask,7,,"Bitmask determining if the components of :yref:`TriaxialStressController::goal` are stress (1) or strain (0). 0 for none, 7 for all, 1 for sigma1, etc."))
 		((Real,maxMultiplier,1.001,,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))
-		((Real,max_vel,1,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller \
-		if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. \
-		Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if \
-		each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))
+		((Real,max_vel,1,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))
 		((Real,previousStress,0,Attr::readonly,"|yupdate|"))
 		((Real,previousMultiplier,1,Attr::readonly,"|yupdate|"))
 		((bool,internalCompaction,true,,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
@@ -134,8 +125,8 @@ class TriaxialStressController : public BoundaryController {
 		,
 		/* extra initializers */
 		,
-		/* constructor */
-		first = true;
+   		/* constructor */
+   		first = true;
 		stiffness.resize(6);
 		previousTranslation.assign(Vector3r::Zero());
 		for (int i=0; i<6; ++i){normal[i]=stress[i]=force[i]=Vector3r::Zero();stiffness[i]=0;}
@@ -149,9 +140,9 @@ class TriaxialStressController : public BoundaryController {
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
 		.def_readonly("strainRate",&TriaxialStressController::getStrainRate,"Current strain rate in a vector d/dt(exx,eyy,ezz).")
-		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
+ 		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
-		.def_readonly("spheresVolume",&TriaxialStressController::spheresVolume,"Total volume of spheres.")
+		.def_readonly("spheresVolume",&TriaxialStressController::spheresVolume,"Total volume pf spheres.")
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel3",&TriaxialStressController::max_vel3,"see :yref:`TriaxialStressController::max_vel` |ycomp|")

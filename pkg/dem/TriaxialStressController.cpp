@@ -31,7 +31,8 @@ Vector3r TriaxialStressController::getStrainRate() {
 	);
 }
 
-void TriaxialStressController::updateStiffness () {
+void TriaxialStressController::updateStiffness ()
+{
 	for (int i=0; i<6; ++i) stiffness[i] = 0;
 	InteractionContainer::iterator ii    = scene->interactions->begin();
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
@@ -52,39 +53,42 @@ void TriaxialStressController::updateStiffness () {
 	}
 }
 
-void TriaxialStressController::controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel) {
+void TriaxialStressController::controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel)
+{
 	scene->forces.sync();
 	Real translation=normal[wall].dot(getForce(scene,wall_id[wall])-resultantForce);
 	const bool log=false;
 	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<getForce(scene,wall_id[wall])<<", resultantForce="<<resultantForce<<", translation="<<translation);
-	if (translation!=0) {
-		if (stiffness[wall]!=0) {
+	if (translation!=0)
+	{
+	   if (stiffness[wall]!=0)
+	   {
 			translation /= stiffness[wall];
 			if(log) TRVAR2(translation,wall_max_vel*scene->dt)
 			translation = std::min( std::abs(translation), wall_max_vel*scene->dt ) * Mathr::Sign(translation);
-		}
-		else translation = wall_max_vel * Mathr::Sign(translation)*scene->dt;
+	   }
+	   else translation = wall_max_vel * Mathr::Sign(translation)*scene->dt;
 	}
 	previousTranslation[wall] = (1-stressDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
 	//Don't update position since Newton is doing that starting from bzr2612
-	//p->se3.position += previousTranslation[wall];
+// 	p->se3.position += previousTranslation[wall];
 	externalWork += previousTranslation[wall].dot(getForce(scene,wall_id[wall]));
-	//this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
+	// this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
 	p->vel=previousTranslation[wall]/scene->dt;
 	//if(log)TRVAR2(previousTranslation,p->se3.position);
 }
 
-void TriaxialStressController::action() {
+void TriaxialStressController::action()
+{
 	// sync thread storage of ForceContainer
 	scene->forces.sync();
 	if (first) {// sync boundaries ids in the table
 		wall_id[wall_bottom] = wall_bottom_id;
-		wall_id[wall_top] = wall_top_id;
-		wall_id[wall_left] = wall_left_id;
-		wall_id[wall_right] = wall_right_id;
-		wall_id[wall_front] = wall_front_id;
-		wall_id[wall_back] = wall_back_id;
-	}
+ 		wall_id[wall_top] = wall_top_id;
+ 		wall_id[wall_left] = wall_left_id;
+ 		wall_id[wall_right] = wall_right_id;
+ 		wall_id[wall_front] = wall_front_id;
+ 		wall_id[wall_back] = wall_back_id;}
 
 	if(thickness<0) thickness=2.0*YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,scene)->shape)->extents.y();
 	State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
@@ -102,7 +106,8 @@ void TriaxialStressController::action() {
 		BodyContainer::iterator bi = scene->bodies->begin();
 		BodyContainer::iterator biEnd = scene->bodies->end();
 		spheresVolume = 0;
-		for ( ; bi!=biEnd; ++bi ) {
+		for ( ; bi!=biEnd; ++bi )
+		{
 			if((*bi)->isClump()) continue;
 			const shared_ptr<Body>& b = *bi;
 			if ( b->isDynamic() || b->isClumpMember() ) {
@@ -129,7 +134,9 @@ void TriaxialStressController::action() {
 	if (scene->iter % stiffnessUpdateInterval == 0 || scene->iter<100) updateStiffness();
 	bool isARadiusControlIteration = (scene->iter % radiusControlInterval == 0);
 
-	if (scene->iter % computeStressStrainInterval == 0 || (internalCompaction && isARadiusControlIteration) ) computeStressStrain();
+	if (scene->iter % computeStressStrainInterval == 0 ||
+		 (internalCompaction && isARadiusControlIteration) )
+		computeStressStrain();
 
 	if (!internalCompaction) {
 		Vector3r wallForce (0, goal2*width*depth, 0);
@@ -162,7 +169,8 @@ void TriaxialStressController::action() {
 			else p_front->vel[2] += (-normal[wall_front][2]*0.5*goal3*depth -p_front->vel[2])*(1-strainDamping);
 		} else p_front->vel=Vector3r::Zero();
 	}
-	else { //if internal compaction
+	else //if internal compaction
+	{
 		p_bottom->vel=Vector3r::Zero(); p_top->vel=Vector3r::Zero(); p_left->vel=Vector3r::Zero(); p_right->vel=Vector3r::Zero(); p_back->vel=Vector3r::Zero(); p_front->vel=Vector3r::Zero();
 		if (isARadiusControlIteration) {
 			Real sigma_iso_ = bool(stressMask & 1)*goal1 +  bool(stressMask & 2)*goal2 +  bool(stressMask & 4)*goal3;
@@ -181,7 +189,8 @@ void TriaxialStressController::action() {
 	}
 }
 
-void TriaxialStressController::computeStressStrain() {
+void TriaxialStressController::computeStressStrain()
+{
 	scene->forces.sync();
 	State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
 	State* p_top=Body::byId(wall_top_id,scene)->state.get();
@@ -190,9 +199,9 @@ void TriaxialStressController::computeStressStrain() {
 	State* p_front=Body::byId(wall_front_id,scene)->state.get();
 	State* p_back=Body::byId(wall_back_id,scene)->state.get();
 
-	height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
-	width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
-	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
+ 	height = p_top->se3.position.y() - p_bottom->se3.position.y() - thickness;
+ 	width = p_right->se3.position.x() - p_left->se3.position.x() - thickness;
+ 	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
 
 	meanStress = 0;
 	if (height0 == 0) height0 = height;
@@ -207,31 +216,36 @@ void TriaxialStressController::computeStressStrain() {
 	Real invYSurface = 1.f/(width*depth);
 	Real invZSurface = 1.f/(width*height);
 
-	force[wall_bottom]=getForce(scene,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface;
+ 	force[wall_bottom]=getForce(scene,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface;
 	force[wall_top]=   getForce(scene,wall_id[wall_top]);    stress[wall_top]=force[wall_top]*invYSurface;
 	force[wall_left]=  getForce(scene,wall_id[wall_left]);   stress[wall_left]=force[wall_left]*invXSurface;
 	force[wall_right]= getForce(scene,wall_id[wall_right]);  stress[wall_right]= force[wall_right]*invXSurface;
 	force[wall_front]= getForce(scene,wall_id[wall_front]);  stress[wall_front]=force[wall_front]*invZSurface;
-	force[wall_back]=  getForce(scene,wall_id[wall_back]);   stress[wall_back]= force[wall_back]*invZSurface;
+        force[wall_back]=  getForce(scene,wall_id[wall_back]);   stress[wall_back]= force[wall_back]*invZSurface;
 
 	for (int i=0; i<6; i++) meanStress-=stress[i].dot(normal[i]);
 	meanStress/=6.;
 }
 
-void TriaxialStressController::controlInternalStress ( Real multiplier ) {
+void TriaxialStressController::controlInternalStress ( Real multiplier )
+{
 	spheresVolume *= pow ( multiplier,3 );
 	BodyContainer::iterator bi    = scene->bodies->begin();
 	BodyContainer::iterator biEnd = scene->bodies->end();
-	for ( ; bi!=biEnd ; ++bi ) {
-		if ( ( *bi )->isDynamic() ) {
+	for ( ; bi!=biEnd ; ++bi )
+	{
+		if ( ( *bi )->isDynamic() )
+		{
 			( static_cast<Sphere*> ( ( *bi )->shape.get() ) )->radius *= multiplier;
-			(*bi)->state->mass*=pow(multiplier,3);
-			(*bi)->state->inertia*=pow(multiplier,5);
+				(*bi)->state->mass*=pow(multiplier,3);
+				(*bi)->state->inertia*=pow(multiplier,5);
+
 		}
 	}
 	InteractionContainer::iterator ii    = scene->interactions->begin();
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
-	for (; ii!=iiEnd ; ++ii) {
+	for (; ii!=iiEnd ; ++ii)
+	{
 		if ((*ii)->isReal()) {
 			ScGeom* contact = static_cast<ScGeom*>((*ii)->geom.get());
 			if ((*(scene->bodies))[(*ii)->getId1()]->isDynamic())
@@ -248,3 +262,5 @@ void TriaxialStressController::controlInternalStress ( Real multiplier ) {
     \fn TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced)
  */
 Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced) {return Shop::unbalancedForce(maxUnbalanced,scene);}
+
+
