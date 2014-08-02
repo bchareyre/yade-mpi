@@ -24,7 +24,7 @@ class Dispatcher: public Engine{
 	virtual int getDimension() { throw; };
 	virtual string getBaseClassType(unsigned int ) { throw; };
 	//
-	virtual ~Dispatcher();
+	virtual ~Dispatcher() {};
 	YADE_CLASS_BASE_DOC(Dispatcher,Engine,"Engine dispatching control to its associated functors, based on types of argument it receives. This abstract base class provides no functionality in itself.")
 };
 REGISTER_SERIALIZABLE(Dispatcher);

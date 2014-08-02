@@ -275,14 +275,20 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	buffer.clear();
 	buffer.resize(scene->bodies->size());
 	shared_ptr<Sphere> sph ( new Sphere );
-        const int Sph_Index = sph->getClassIndexStatic();
+	const int Sph_Index = sph->getClassIndexStatic();
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if (!b || ignoredBody==b->getId()) continue;
-                posData& dat = buffer[b->getId()];
+		if (!b || ignoredBody==b->getId() || b->isClumpMember()) continue;
+		posData& dat = buffer[b->getId()];
 		dat.id=b->getId();
 		dat.pos=b->state->pos;
 		dat.isSphere= (b->shape->getClassIndex() ==  Sph_Index);
+		dat.isClump = b->isClump();
 		if (dat.isSphere) dat.radius = YADE_CAST<Sphere*>(b->shape.get())->radius;
+		if (dat.isClump) {
+			const shared_ptr<Clump>& clump = YADE_PTR_CAST<Clump>(b->shape);
+			const shared_ptr<Body>& member = Body::byId(clump->members.begin()->first,scene);
+			dat.radius = pow( (3*b->state->mass)/(4*Mathr::PI*member->material->density) , 1.0/3.0); //use equivalent radius of clump (just valid for nearly spherical clumps)
+		}
 		dat.exists=true;
 	}
 }
@@ -293,7 +299,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         solver->xMin = Mathr::MAX_REAL, solver->xMax = -Mathr::MAX_REAL, solver->yMin = Mathr::MAX_REAL, solver->yMax = -Mathr::MAX_REAL, solver->zMin = Mathr::MAX_REAL, solver->zMax = -Mathr::MAX_REAL;
         FOREACH ( const posData& b, buffer ) {
                 if ( !b.exists ) continue;
-                if ( b.isSphere ) {
+                if ( b.isSphere || b.isClump ) {
                         const Real& rad = b.radius;
                         const Real& x = b.pos[0];
                         const Real& y = b.pos[1];
@@ -358,11 +364,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 ///Using one-by-one insertion
 	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
 	FOREACH ( const posData& b, buffer ) {
-                if ( !b.exists ) continue;
-                if ( b.isSphere ) {
-			if (b.id==ignoredBody) continue;
-                        flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );}
-        }
+		if ( !b.exists || b.id==ignoredBody ) continue;
+		if ( b.isSphere || b.isClump ) flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
+	}
 	flow.tesselation().redirected=true;//By inserting one-by-one, we already redirected
 	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
 	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );

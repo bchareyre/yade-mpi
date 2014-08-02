@@ -40,9 +40,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],label='collider'),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_L3Geom(),Ig2_Facet_Sphere_L3Geom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_L3Geom_FrictPhys_ElPerfPl()],
+		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
 	NewtonIntegrator(damping=.1,gravity=[0,0,-5000]),
 	PyRunner(iterPeriod=1000,command='timing.stats(); O.pause();'),

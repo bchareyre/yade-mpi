@@ -76,11 +76,8 @@ REGISTER_SERIALIZABLE(PeriTriaxController);
 
 class Peri3dController: public BoundaryController{
 	public:
-		Vector6r stressOld;//, stressGoal, strainGoal;
-		//Vector6i pe, ps;
+		Vector6r stressOld;
 		Matrix3r sigma, epsilon, epsilonRate, rot, nonrot;
-		//int pathSizes[6], pathsCounter[6], lenPe, lenPs;
-		//vector<Vector2r>* paths[6];
 		
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Peri3dController,BoundaryController,"Experimental controller of full strain/stress tensors on periodic cell. Detailed documentation is in py/_extraDocs.py.",
@@ -114,15 +111,10 @@ class Peri3dController: public BoundaryController{
 		((Vector6i,pathsCounter,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
 		((int,lenPe,NaN,Attr::readonly,"Peri3dController internal variable"))
 		((int,lenPs,NaN,Attr::readonly,"Peri3dController internal variable"))
-		// not yet used
-		//((Real,currUnbalanced,NaN,,"current unbalanced force |yupdate|"))
-		//((Real,maxUnbalanced,1e-4,,"Maximum unbalanced force"))
 		,
 		/*ctor*/
 		,
 		/*py*/
-			
 	);
-	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Peri3dController);

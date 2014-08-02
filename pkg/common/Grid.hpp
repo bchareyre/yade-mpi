@@ -168,7 +168,7 @@ REGISTER_SERIALIZABLE(Ig2_Sphere_GridConnection_ScGridCoGeom);
 //!			O/
 class Law2_ScGridCoGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGridCoGeom_FrictPhys_CundallStrack,LawFunctor,"Law between a frictional :yref:`GridConnection` and a frictional :yref:`Sphere`. Almost the same than :yref:`Law2_ScGeom_FrictPhys_CundallStrack`, but the force is divided and applied on the two :yref:`GridNodes<GridNode>` only.",
 		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
@@ -181,7 +181,7 @@ REGISTER_SERIALIZABLE(Law2_ScGridCoGeom_FrictPhys_CundallStrack);
 
 class Law2_ScGridCoGeom_CohFrictPhys_CundallStrack: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGridCoGeom_CohFrictPhys_CundallStrack,LawFunctor,"Law between a cohesive frictional :yref:`GridConnection` and a cohesive frictional :yref:`Sphere`. Almost the same than :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`, but THE ROTATIONAL MOMENTS ARE NOT COMPUTED.",
 		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
@@ -194,7 +194,7 @@ REGISTER_SERIALIZABLE(Law2_ScGridCoGeom_CohFrictPhys_CundallStrack);
 //!			-/-
 class Law2_GridCoGridCoGeom_FrictPhys_CundallStrack: public Law2_ScGeom_FrictPhys_CundallStrack{
 	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		YADE_CLASS_BASE_DOC_ATTRS(Law2_GridCoGridCoGeom_FrictPhys_CundallStrack,Law2_ScGeom_FrictPhys_CundallStrack,"Frictional elastic contact law between two :yref:`gridConnection` . See :yref:`Law2_ScGeom_FrictPhys_CundallStrack` for more details.",
 		/*ATTRS*/
 	);

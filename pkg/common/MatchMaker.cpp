@@ -1,9 +1,8 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/pkg/common/MatchMaker.hpp>
+#include <yade/pkg/common/MatchMaker.hpp>
 
 YADE_PLUGIN((MatchMaker));
-MatchMaker::~MatchMaker(){}
 
 Real MatchMaker::operator()(int id1, int id2, Real val1, Real val2) const {
 	FOREACH(const Vector3r& m, matches){

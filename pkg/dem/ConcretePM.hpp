@@ -255,7 +255,7 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
 
 class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
-	void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 	Real elasticEnergy();
 
 	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle) {

@@ -2,8 +2,6 @@
 #include<yade/core/Material.hpp>
 #include<yade/core/Scene.hpp>
 
-Material::~Material(){}
-
 const shared_ptr<Material> Material::byId(int id, Scene* w_){
 	Scene* w=w_?w_:Omega::instance().getScene().get();
 	assert(id>=0 && (size_t)id<w->materials.size());

@@ -71,7 +71,7 @@ Real Ip2_LudingMat_LudingMat_LudingPhys::reduced(Real a1, Real a2){
   return 2.0*a;
 }
 
-void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
+bool Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
   
   const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
   LudingPhys& phys=*static_cast<LudingPhys*>(_phys.get());
@@ -82,8 +82,7 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
   const Real Delt = geom.penetrationDepth;
   
   if (Delt<0) {
-    scene->interactions->requestErase(I);
-    return;
+   return false;
   };
 
   const BodyContainer& bodies = *scene->bodies;
@@ -195,6 +194,6 @@ void Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
     addTorque(id1,-c1x.cross(f),scene);
     addTorque(id2, c2x.cross(f),scene);
   }
-  
+  return true;
   
 }

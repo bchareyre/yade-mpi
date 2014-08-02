@@ -52,7 +52,7 @@ REGISTER_SERIALIZABLE(IPhysFunctor);
 
 class LawFunctor: public Functor2D<
 	/*dispatch types*/ IGeom,IPhys,
-	/*return type*/    void,
+	/*return type*/    bool,
 	/*argument types*/ TYPELIST_3(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*)
 >{
 	public: virtual ~LawFunctor();

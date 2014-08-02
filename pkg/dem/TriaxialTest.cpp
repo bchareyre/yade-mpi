@@ -34,9 +34,7 @@
 #include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg/dem/Ig2_Facet_Sphere_ScGeom.hpp>
-#include<yade/pkg/common/Bo1_Sphere_Aabb.hpp>
-#include<yade/pkg/common/Bo1_Box_Aabb.hpp>
-#include<yade/pkg/common/Bo1_Facet_Aabb.hpp>
+#include<yade/pkg/common/Bo1_Aabb.hpp>
 #include<yade/pkg/common/Wall.hpp>
 
 #include <boost/numeric/conversion/bounds.hpp>

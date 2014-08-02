@@ -137,7 +137,8 @@ void InteractionLoop::action(){
 			assert(!swap); // reverse call would make no sense, as the arguments are of different types
 		}
 		assert(I->functorCache.constLaw);
-		I->functorCache.constLaw->go(I->geom,I->phys,I.get());
+		//If the functor return false, the interaction is reset
+		if (!I->functorCache.constLaw->go(I->geom,I->phys,I.get())) scene->interactions->requestErase(I);
 
 		// process callbacks for this interaction
 		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check

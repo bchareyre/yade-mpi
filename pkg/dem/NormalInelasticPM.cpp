@@ -14,7 +14,7 @@
 YADE_PLUGIN((NormalInelasticMat)(NormalInelasticityPhys)(Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity)(Ip2_2xNormalInelasticMat_NormalInelasticityPhys));
 
 
-void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>& iG, shared_ptr<IPhys>& iP, Interaction* contact)
+bool Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeom>& iG, shared_ptr<IPhys>& iP, Interaction* contact)
 {
 	int id1 = contact->getId1();
 	int id2 = contact->getId2();
@@ -39,8 +39,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 // Check if there is a real overlap or not. The Ig2... seems to let exist interactions with negative un (= no overlap). Such interactions seem then to have to be deleted here.
         if (   un < 0      )
         {
-		 scene->interactions->requestErase(contact);// this, among other things, resets the interaction : geometry and physics variables (as forces, ...) are reset to defaut values
-		 return;
+		 return false;// this, among other things, resets the interaction : geometry and physics variables (as forces, ...) are reset to defaut values
         }
 
 
@@ -87,10 +86,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 //	********	Tangential force				*******	 //
         if (   un < 0      )
         { // BREAK due to tension
-		 scene->interactions->requestErase(contact); return;
-		 // probably not useful anymore
-                currentContactPhysics->normalForce = Vector3r::Zero();
-                currentContactPhysics->shearForce = Vector3r::Zero();
+		return false;
         }
         else
         {
@@ -145,6 +141,7 @@ void Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<IGeo
 		}
 //	********	Moment law END				*******	 //
     }
+    return true;
 }
 
 

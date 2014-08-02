@@ -20,8 +20,8 @@ mask_t operator&(const mask_t& g, int i) { return g & mask_t(i); }
 mask_t operator&(int i, const mask_t& g) { return g & i; }
 mask_t operator|(const mask_t& g, int i) { return g | mask_t(i); }
 mask_t operator|(int i, const mask_t& g) { return g | i; }
-bool operator||(const mask_t& g, bool b) { return (g == 0) || b; }
+bool operator||(const mask_t& g, bool b) { return (g != 0) || b; }
 bool operator||(bool b, const mask_t& g) { return g || b; }
-bool operator&&(const mask_t& g, bool b) { return (g == 0) && b; }
+bool operator&&(const mask_t& g, bool b) { return (g != 0) && b; }
 bool operator&&(bool b, const mask_t& g) { return g && b; }
 #endif

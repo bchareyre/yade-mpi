@@ -29,8 +29,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg/common/Box.hpp>
 #include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Bo1_Sphere_Aabb.hpp>
-#include<yade/pkg/common/Bo1_Box_Aabb.hpp>
+#include<yade/pkg/common/Bo1_Aabb.hpp>
 
 #include<yade/pkg/common/ForceResetter.hpp>
 

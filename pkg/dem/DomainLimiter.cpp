@@ -1,4 +1,5 @@
 #include<yade/pkg/dem/DomainLimiter.hpp>
+#include<yade/pkg/dem/DemXDofGeom.hpp>
 #include<yade/pkg/dem/Shop.hpp>
 
 YADE_PLUGIN((DomainLimiter)(LawTester)

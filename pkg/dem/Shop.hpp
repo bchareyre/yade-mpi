@@ -139,7 +139,8 @@ class Shop{
 		static void setContactFriction(Real angleRad);
 
 		//! Homothetic change of sizes of spheres and clumps
-		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly, unsigned int discretization);
+		static void growParticles(Real multiplier, bool updateMass, bool dynamicOnly);
 		//! Change of size of a single sphere or a clump
+		// DEPREC, update wrt growParticles()
 		static void growParticle(Body::id_t bodyID, Real multiplier, bool updateMass);
 };

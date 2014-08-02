@@ -66,7 +66,7 @@ class Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity : public LawFuncto
 		    ,maxFs; // maximum value of shear force according to Coulomb-like criterion
 		Real un;	 // value of interpenetration in the interaction
 	public :
-		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+		virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 
 	FUNCTOR2D(ScGeom,NormalInelasticityPhys);
 

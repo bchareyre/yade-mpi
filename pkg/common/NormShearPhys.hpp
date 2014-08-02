@@ -6,7 +6,7 @@
 
 class NormPhys:public IPhys {
 	public:
-		virtual ~NormPhys();
+		virtual ~NormPhys() {};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormPhys,IPhys,"Abstract class for interactions that have normal stiffness.",
 		((Real,kn,0,,"Normal stiffness"))
 		((Vector3r,normalForce,Vector3r::Zero(),,"Normal force after previous step (in global coordinates).")),
@@ -18,7 +18,7 @@ REGISTER_SERIALIZABLE(NormPhys);
 
 class NormShearPhys: public NormPhys{
 	public:
-		virtual ~NormShearPhys();
+		virtual ~NormShearPhys() {};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormShearPhys,NormPhys,
 		"Abstract class for interactions that have shear stiffnesses, in addition to normal stiffness. This class is used in the PFC3d-style stiffness timestepper.",
 		((Real,ks,0,,"Shear stiffness"))

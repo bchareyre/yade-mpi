@@ -16,7 +16,7 @@
 class Law2_ScGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:
 		OpenMPAccumulator<Real> plasticDissipation;
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		Real elasticEnergy ();
 		Real getPlasticDissipation();
 		void initPlasticDissipation(Real initVal=0);
@@ -38,7 +38,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_FrictPhys_CundallStrack);
 
 class Law2_ScGeom_ViscoFrictPhys_CundallStrack: public Law2_ScGeom_FrictPhys_CundallStrack{
 	public:
-		virtual void go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ViscoFrictPhys_CundallStrack,Law2_ScGeom_FrictPhys_CundallStrack,"Law similar to :yref:`Law2_ScGeom_FrictPhys_CundallStrack` with the addition of shear creep at contacts.",
 		((bool,shearCreep,false,," "))
 		((Real,viscosity,1,," "))

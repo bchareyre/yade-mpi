@@ -24,11 +24,19 @@
 class Indexable
 {
 	protected :
-		void createIndex();
+		void createIndex() {
+			int& index = getClassIndex();
+			if(index == -1)				// assign new index
+			{
+				index = getMaxCurrentlyUsedClassIndex()+1;
+				// so that other dispatchers will not fall in conflict with this index
+				incrementMaxCurrentlyUsedClassIndex();
+			}
+		}
 
 	public :
-		Indexable ();
-		virtual ~Indexable ();
+		Indexable () {};
+		virtual ~Indexable () {};
 
 		/// Returns the id of the current class. This id is set by a multimethod manager
 		virtual int& getClassIndex()                             { _THROW_NOT_OVERRIDDEN;}; 

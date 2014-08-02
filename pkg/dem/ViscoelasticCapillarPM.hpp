@@ -61,7 +61,7 @@ REGISTER_SERIALIZABLE(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys);
 /// Constitutive law
 class Law2_ScGeom_ViscElCapPhys_Basic: public LawFunctor {
 	public :
-		virtual void go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
+		virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 		static Real Willett_numeric_f     (const ScGeom& geom, ViscElCapPhys& phys);
 		static Real Willett_analytic_f    (const ScGeom& geom, ViscElCapPhys& phys);
 		static Real Weigert_f             (const ScGeom& geom, ViscElCapPhys& phys);

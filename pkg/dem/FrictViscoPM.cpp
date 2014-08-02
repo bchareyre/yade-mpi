@@ -154,7 +154,7 @@ Real Law2_ScGeom_FrictViscoPhys_CundallStrackVisco::elasticEnergy()
 
 CREATE_LOGGER(Law2_ScGeom_FrictViscoPhys_CundallStrackVisco);
 
-void Law2_ScGeom_FrictViscoPhys_CundallStrackVisco::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
+bool Law2_ScGeom_FrictViscoPhys_CundallStrackVisco::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact)
 {
 	LOG_TRACE( "Law2_ScGeom_FrictViscoPhys_CundallStrackVisco::go - create interaction physics" );
 
@@ -166,8 +166,7 @@ void Law2_ScGeom_FrictViscoPhys_CundallStrackVisco::go(shared_ptr<IGeom>& ig, sh
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();}
-		else 	scene->interactions->requestErase(contact);
-		return;
+		else return false;
 	}
 	Real& un=geom->penetrationDepth;
 	phys->normalForce = phys->kn*std::max(un,(Real) 0) * geom->normal;
@@ -224,5 +223,6 @@ void Law2_ScGeom_FrictViscoPhys_CundallStrackVisco::go(shared_ptr<IGeom>& ig, sh
 		scene->forces.addTorque(id1,(geom->radius1-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 		scene->forces.addTorque(id2,(geom->radius2-0.5*geom->penetrationDepth)* geom->normal.cross(force));
 	}
+	return true;
 }
 
