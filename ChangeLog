@@ -1,4 +1,121 @@
 ==================================================
+yade-1.11.0
+Mon, 4 Aug 2014 18:54:00 +0200
+
+Alexander Eulitz (9):
+      small corrections of messed up indentations
+      another indentation fixed
+      rearranged compilation and installing procedure so that hints for multicore compilation are placed directly after the make command
+      typo fix
+      fixed --cores implementation and improved arg-parse argument documentation.
+      improved doc of betan and betas
+      replacing damping coefficient betan and betas by damping ratio betan and betas
+      rearranged indentation of examplarily folder structure for yade complation
+      Added hint about make errors during compilation     when user does not posses root priviledges.
+
+Anton Gladky (58):
+      Delete RELEASE file.
+      Add YADE_PTR_DYN_CAST to define dynamic_cast.
+      Remove all "using namespace std;"
+      Fix compilation with disabled openmp.
+      Roll back last 2 commits.
+      Remove most of "using namespace std;"
+      Replace math.h by cmath in includes.
+      Remove some more "using namespace std;"
+      Remove "using namespace std;" everywhere. Tests are failing.
+      Replace abs by std::abs.
+      Clean up in header inclusions.
+      First stage of C++11 implementing.
+      Add missing header.
+      Remove isIndexable and isFactorable.
+      Use boost::shared_ptr for C++11 as well.
+      Drop Qt3 workaround
+      Enable LBM by default.
+      Enable C++11 by default.
+      Do not consider Eigen3 like a feature.
+      Capitalize feature list.
+      Use double precision for VTKREcorder.
+      Do not use -DTYPEOF, use explicit decltype
+      Move definitions of YADE_PTR_CAST YADE_CAST YADE_PTR_DYN_CAST into     Math.hpp
+      Remove -std=c++0x definition for pygts.
+      Join [CohFrict]Mat, Phys and Ip2_.
+      Move Ip2_*_MindlinCapillaryPhys into HertzMindlin
+      Move Ip2_*_CapillaryPhys. into CapillaryPhys.
+      Move Ip2_FrictMat_* into FrictPhys
+      Move all NormalInelastic files into NormalInelasticPM
+      Join all InelastCohFrict files into InelastCohFrictPM.
+      Join all KinemC*Engine.* into KinemC__Engine.*
+      Set C++11 only for CXX-files, not C
+      Update LICENSE file, does not need exception any more
+      Cut off some header inclusions.
+      Disable reusing of removed body ids.
+      Fix compilation.
+      Replace nullptr by reset().
+      Join all Bo1_* into Bo1_Aabb
+      Remove some more .cpp-files.
+      Move many Gl1_* into Gl1_Primitives.
+      Remove some more small cpp-files.
+      Remove some warnings.
+      Remove LBMbody.cpp and LBMlink.cpp.
+      Remove Indexable.cpp
+      Exclude Indexable.cpp from CMakeLists.txt
+      Redirect --test output into stdout
+      Modify slightly description of save-loadVars
+      Change stderr to stdout in greeting message.
+      Update Vaclav`s occupation in sphinx-doc
+      Cut long line in HertzMindlin.hpp
+      Move some YADE_PLUGINS into common.cpp
+      Fix most of compilation warnings.
+      Return false in BubbleMat, if no penetration.
+      Fix and enable DEM-PFV-check.py.
+      Replace L3eom by SCgeom in stl and gts examples.
+      Use global interpreter lock (GIL) in OpenGLRenderer.
+      Update mtTkinter version.
+      Remove NEWS file (outdated).
+
+Bruno Chareyre (9):
+      Revert "Revert "Set minimal required Eigen3 version 3.2.1"" / Thanks Anton for uploading the backport
+      replace abs by std::abs (complement of https://github.com/yade/trunk/commit/1997c194c0aa759cae101a3dd0a559fcf049b29f)
+      +2 conf papers
+      Law2 return bool - fix https://bugs.launchpad.net/yade/+bug/1324190
+      add missing 'return bool' in some Law2's
+      Revert "implement more accurate porosity calculation..." (temporary required in order to revert 915fd94606af6 without conflict)"
+      Revert "fix typos and indents; cut long lines.. - please no formatting commits (+there is nothing wrong in long lines). Please reapply the documentation part."
+      make growParticles fatser for clumps
+      use Shop::growParticles in TriaxialStressController (fix https://bugs.launchpad.net/yade/+bug/1351275)
+
+Christian Jakob (5):
+      fix typos and indents; cut long lines in TriaxialStressController; bit more documentation of stressMask
+      implement more accurate porosity calculation for clumps in TriaxialStressController; inserted updateClumpProperties command in Triax tutorial
+      Merge branch 'master' of github.com:yade/trunk
+      make PFV compatible with clumps (clumps are treated as spheres with equivalent radius - valid for nearly spherical clumps)
+      reapply 9e512fd50083
+
+Francois (1):
+      Simplify the contact detection in Ig2_GridConnection_GridConnection_GridCoGridCoGeom.
+
+Jan Stransky (3):
+      fixed bug in export.VTKExporter.exportInteractions (question #250922)
+      modification of utils.UnstructuredMesh, added utils.polyhedron
+      fixed bug in MASK_ARBITRARY feature
+
+Jerome Duriez (7):
+      Correction of some broken sphinx links: yade._utils => yade.utils
+      Removal of a double :
+      Improvement of previous commit: there was no extra : but a missing blank line
+      Export principal stresses and directions in VTKRecorder
+      Some shortening in VTKRecorder, mainly according to http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10370.html
+      Revert sign convention in bstresses in VTKRecorder (tension=positiv now)
+      Slight modif in JCFpm doc. To better describe the logic of the code.
+
+Kubeu (1):
+      replaced "root" from last commit
+
+Nolan Dyck (2):
+      Update BubbleMat.hpp and BubbleMat.cpp
+      Update bubble example script.
+
+==================================================
 yade-1.10.0
 Wed, 25 Jun 2014 19:35:00 +0200
 
