@@ -59,6 +59,7 @@ void VTKRecorder::action(){
 			recActive[REC_CLUMPID]=true;
 			recActive[REC_MATERIALID]=true;
 			recActive[REC_STRESS]=true;
+			recActive[REC_FORCE]=true;
 			if (scene->isPeriodic) { recActive[REC_PERICELL]=true; }
 		}
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
@@ -75,6 +76,7 @@ void VTKRecorder::action(){
 		else if((rec=="clumpids") || (rec=="clumpId")) recActive[REC_CLUMPID]=true;
 		else if(rec=="materialId") recActive[REC_MATERIALID]=true;
 		else if(rec=="stress") recActive[REC_STRESS]=true;
+		else if(rec=="force") recActive[REC_FORCE]=true;
 		else if(rec=="jcfpm") recActive[REC_JCFPM]=true;
 		else if(rec=="cracks") recActive[REC_CRACKS]=true;
 		else if(rec=="pericell" && scene->isPeriodic) recActive[REC_PERICELL]=true;
@@ -211,6 +213,22 @@ void VTKRecorder::action(){
 	spheresMaterialId->SetNumberOfComponents(1);
 	spheresMaterialId->SetName("materialId");
 
+	vtkSmartPointer<vtkDoubleArray> spheresForceVec = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresForceVec->SetNumberOfComponents(3);
+	spheresForceVec->SetName("forceVec");
+
+	vtkSmartPointer<vtkDoubleArray> spheresForceLen = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresForceLen->SetNumberOfComponents(1);
+	spheresForceLen->SetName("forceLen");
+
+	vtkSmartPointer<vtkDoubleArray> spheresTorqueVec = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresTorqueVec->SetNumberOfComponents(3);
+	spheresTorqueVec->SetName("torqueVec");
+
+	vtkSmartPointer<vtkDoubleArray> spheresTorqueLen = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresTorqueLen->SetNumberOfComponents(1);
+	spheresTorqueLen->SetName("torqueLen");
+
 	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
@@ -218,13 +236,13 @@ void VTKRecorder::action(){
 	facetsColors->SetNumberOfComponents(3);
 	facetsColors->SetName("color");
 	
-	vtkSmartPointer<vtkDoubleArray> facetsForceVec = vtkSmartPointer<vtkDoubleArray>::New();
-	facetsForceVec->SetNumberOfComponents(3);
-	facetsForceVec->SetName("stressVec");
+	vtkSmartPointer<vtkDoubleArray> facetsStressVec = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsStressVec->SetNumberOfComponents(3);
+	facetsStressVec->SetName("stressVec");
 	
-	vtkSmartPointer<vtkDoubleArray> facetsForceLen = vtkSmartPointer<vtkDoubleArray>::New();
-	facetsForceLen->SetNumberOfComponents(1);
-	facetsForceLen->SetName("stressLen");
+	vtkSmartPointer<vtkDoubleArray> facetsStressLen = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsStressLen->SetNumberOfComponents(1);
+	facetsStressLen->SetName("stressLen");
 	
 	vtkSmartPointer<vtkDoubleArray> facetsMaterialId = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsMaterialId->SetNumberOfComponents(1);
@@ -234,6 +252,22 @@ void VTKRecorder::action(){
 	facetsMask->SetNumberOfComponents(1);
 	facetsMask->SetName("mask");
 
+	vtkSmartPointer<vtkDoubleArray> facetsForceVec = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsForceVec->SetNumberOfComponents(3);
+	facetsForceVec->SetName("forceVec");
+
+	vtkSmartPointer<vtkDoubleArray> facetsForceLen = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsForceLen->SetNumberOfComponents(1);
+	facetsForceLen->SetName("forceLen");
+
+	vtkSmartPointer<vtkDoubleArray> facetsTorqueVec = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsTorqueVec->SetNumberOfComponents(3);
+	facetsTorqueVec->SetName("torqueVec");
+
+	vtkSmartPointer<vtkDoubleArray> facetsTorqueLen = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsTorqueLen->SetNumberOfComponents(1);
+	facetsTorqueLen->SetName("torqueLen");
+
 	// boxes
 	vtkSmartPointer<vtkPoints> boxesPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> boxesCells = vtkSmartPointer<vtkCellArray>::New();
@@ -241,13 +275,13 @@ void VTKRecorder::action(){
 	boxesColors->SetNumberOfComponents(3);
 	boxesColors->SetName("color");
 	
-	vtkSmartPointer<vtkDoubleArray> boxesForceVec = vtkSmartPointer<vtkDoubleArray>::New();
-	boxesForceVec->SetNumberOfComponents(3);
-	boxesForceVec->SetName("stressVec");
+	vtkSmartPointer<vtkDoubleArray> boxesStressVec = vtkSmartPointer<vtkDoubleArray>::New();
+	boxesStressVec->SetNumberOfComponents(3);
+	boxesStressVec->SetName("stressVec");
 	
-	vtkSmartPointer<vtkDoubleArray> boxesForceLen = vtkSmartPointer<vtkDoubleArray>::New();
-	boxesForceLen->SetNumberOfComponents(1);
-	boxesForceLen->SetName("stressLen");
+	vtkSmartPointer<vtkDoubleArray> boxesStressLen = vtkSmartPointer<vtkDoubleArray>::New();
+	boxesStressLen->SetNumberOfComponents(1);
+	boxesStressLen->SetName("stressLen");
 	
 	vtkSmartPointer<vtkDoubleArray> boxesMaterialId = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesMaterialId->SetNumberOfComponents(1);
@@ -256,6 +290,22 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> boxesMask = vtkSmartPointer<vtkDoubleArray>::New();
 	boxesMask->SetNumberOfComponents(1);
 	boxesMask->SetName("mask");
+
+	vtkSmartPointer<vtkDoubleArray> boxesForceVec = vtkSmartPointer<vtkDoubleArray>::New();
+	boxesForceVec->SetNumberOfComponents(3);
+	boxesForceVec->SetName("forceVec");
+
+	vtkSmartPointer<vtkDoubleArray> boxesForceLen = vtkSmartPointer<vtkDoubleArray>::New();
+	boxesForceLen->SetNumberOfComponents(1);
+	boxesForceLen->SetName("forceLen");
+
+	vtkSmartPointer<vtkDoubleArray> boxesTorqueVec = vtkSmartPointer<vtkDoubleArray>::New();
+	boxesTorqueVec->SetNumberOfComponents(3);
+	boxesTorqueVec->SetName("torqueVec");
+
+	vtkSmartPointer<vtkDoubleArray> boxesTorqueLen = vtkSmartPointer<vtkDoubleArray>::New();
+	boxesTorqueLen->SetNumberOfComponents(1);
+	boxesTorqueLen->SetName("torqueLen");
 
 	// interactions
 	vtkSmartPointer<vtkPoints> intrBodyPos = vtkSmartPointer<vtkPoints>::New();
@@ -521,6 +571,19 @@ void VTKRecorder::action(){
 					spheresShearStressVec->InsertNextTupleValue(s);
 					spheresNormalStressNorm->InsertNextValue(stress.norm());
 				}
+				if(recActive[REC_FORCE]){
+					scene->forces.sync();
+					const Vector3r& f = scene->forces.getForce(b->getId());
+					const Vector3r& t = scene->forces.getTorque(b->getId());
+					Real ff[3] = { (Real)  f[0], (Real) f[1], (Real) f[2] };
+					Real tt[3] = { (Real)  t[0], (Real) t[1], (Real) t[2] };
+					Real fn = f.norm();
+					Real tn = t.norm();
+					spheresForceVec->InsertNextTupleValue(ff);
+					spheresForceLen->InsertNextValue(fn);
+					spheresTorqueVec->InsertNextTupleValue(tt);
+					spheresTorqueLen->InsertNextValue(tn);
+				}
 				
 				if (recActive[REC_CPM]){
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
@@ -574,8 +637,21 @@ void VTKRecorder::action(){
 				if(recActive[REC_STRESS]){
 					const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
 					Real s[3] = { (Real) stress[0], (Real) stress[1], (Real) stress[2] };
-					facetsForceVec->InsertNextTupleValue(s);
-					facetsForceLen->InsertNextValue(stress.norm());
+					facetsStressVec->InsertNextTupleValue(s);
+					facetsStressLen->InsertNextValue(stress.norm());
+				}
+				if(recActive[REC_FORCE]){
+					scene->forces.sync();
+					const Vector3r& f = scene->forces.getForce(b->getId());
+					const Vector3r& t = scene->forces.getTorque(b->getId());
+					Real ff[3] = { (Real)  f[0], (Real) f[1], (Real) f[2] };
+					Real tt[3] = { (Real)  t[0], (Real) t[1], (Real) t[2] };
+					Real fn = f.norm();
+					Real tn = t.norm();
+					facetsForceVec->InsertNextTupleValue(ff);
+					facetsForceLen->InsertNextValue(fn);
+					facetsTorqueVec->InsertNextTupleValue(tt);
+					facetsTorqueLen->InsertNextValue(tn);
 				}
 				if (recActive[REC_MATERIALID]) facetsMaterialId->InsertNextValue(b->material->id);
 				if (recActive[REC_MASK]) facetsMask->InsertNextValue(GET_MASK(b));
@@ -585,6 +661,21 @@ void VTKRecorder::action(){
 		if (recActive[REC_BOXES]){
 			const Box* box = dynamic_cast<Box*>(b->shape.get()); 
 			if (box){
+
+				if(recActive[REC_FORCE]){
+					scene->forces.sync();
+					const Vector3r& f = scene->forces.getForce(b->getId());
+					const Vector3r& t = scene->forces.getTorque(b->getId());
+					Real ff[3] = { (Real)  f[0], (Real) f[1], (Real) f[2] };
+					Real tt[3] = { (Real)  t[0], (Real) t[1], (Real) t[2] };
+					Real fn = f.norm();
+					Real tn = t.norm();
+					boxesForceVec->InsertNextTupleValue(ff);
+					boxesForceLen->InsertNextValue(fn);
+					boxesTorqueVec->InsertNextTupleValue(tt);
+					boxesTorqueLen->InsertNextValue(tn);
+				}
+
 				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
 				Vector3r ext(box->extents);
 				vtkSmartPointer<vtkQuad> boxes = vtkSmartPointer<vtkQuad>::New();
@@ -626,8 +717,8 @@ void VTKRecorder::action(){
 					if(recActive[REC_STRESS]){
 						const Vector3r& stress = bodyStates[b->getId()].normStress+bodyStates[b->getId()].shearStress;
 						Real s[3] = { (Real) stress[0], (Real) stress[1], (Real) stress[2] };
-						boxesForceVec->InsertNextTupleValue(s);
-						boxesForceLen->InsertNextValue(stress.norm());
+						boxesStressVec->InsertNextTupleValue(s);
+						boxesStressLen->InsertNextValue(stress.norm());
 					}
 					if (recActive[REC_MATERIALID]) boxesMaterialId->InsertNextValue(b->material->id);
 					if (recActive[REC_MASK]) boxesMask->InsertNextValue(GET_MASK(b));
@@ -701,6 +792,12 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(spheresShearStressVec);
 			spheresUg->GetPointData()->AddArray(spheresNormalStressNorm);
 		}
+		if (recActive[REC_FORCE]){
+			spheresUg->GetPointData()->AddArray(spheresForceVec);
+			spheresUg->GetPointData()->AddArray(spheresForceLen);
+			spheresUg->GetPointData()->AddArray(spheresTorqueVec);
+			spheresUg->GetPointData()->AddArray(spheresTorqueLen);
+		}
 		if (recActive[REC_CPM]){
 			spheresUg->GetPointData()->AddArray(cpmDamage);
 			spheresUg->GetPointData()->AddArray(cpmStress);
@@ -743,8 +840,14 @@ void VTKRecorder::action(){
 		facetsUg->SetCells(VTK_TRIANGLE, facetsCells);
 		if (recActive[REC_COLORS]) facetsUg->GetCellData()->AddArray(facetsColors);
 		if (recActive[REC_STRESS]){
+			facetsUg->GetCellData()->AddArray(facetsStressVec);
+			facetsUg->GetCellData()->AddArray(facetsStressLen);
+		}
+		if (recActive[REC_FORCE]){
 			facetsUg->GetCellData()->AddArray(facetsForceVec);
 			facetsUg->GetCellData()->AddArray(facetsForceLen);
+			facetsUg->GetCellData()->AddArray(facetsTorqueVec);
+			facetsUg->GetCellData()->AddArray(facetsTorqueLen);
 		}
 		if (recActive[REC_MATERIALID]) facetsUg->GetCellData()->AddArray(facetsMaterialId);
 		if (recActive[REC_MASK]) facetsUg->GetCellData()->AddArray(facetsMask);
@@ -771,8 +874,14 @@ void VTKRecorder::action(){
 		boxesUg->SetCells(VTK_QUAD, boxesCells);
 		if (recActive[REC_COLORS]) boxesUg->GetCellData()->AddArray(boxesColors);
 		if (recActive[REC_STRESS]){
+			boxesUg->GetCellData()->AddArray(boxesStressVec);
+			boxesUg->GetCellData()->AddArray(boxesStressLen);
+		}
+		if (recActive[REC_FACETS]){
 			boxesUg->GetCellData()->AddArray(boxesForceVec);
 			boxesUg->GetCellData()->AddArray(boxesForceLen);
+			boxesUg->GetCellData()->AddArray(boxesTorqueVec);
+			boxesUg->GetCellData()->AddArray(boxesTorqueLen);
 		}
 		if (recActive[REC_MATERIALID]) boxesUg->GetCellData()->AddArray(boxesMaterialId);
 		if (recActive[REC_MASK]) boxesUg->GetCellData()->AddArray(boxesMask);
