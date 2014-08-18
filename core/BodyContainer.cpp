@@ -50,6 +50,8 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 				Body::byId(memberId)->clumpId=Body::ID_NONE; // make members standalones
 			}
 		}
+		body[id].reset();
+		return true;
 	}
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all body's interactions
