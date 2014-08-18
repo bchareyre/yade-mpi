@@ -29,6 +29,8 @@ See older `tentative contents <http://bazaar.launchpad.net/~eudoxos/%2Bjunk/ydoc
 
   installation.rst
 
+  github.rst
+
   formulation.rst
 
   yade.wrapper.rst

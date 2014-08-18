@@ -90,8 +90,7 @@ management (install the ``git`` package in your distribution and create a GitHub
 
 		git clone git@github.com:yade/trunk.git
 
-will download the whole code repository of ``trunk``. Check out `Yade on github
-<https://www.yade-dem.org/wiki/Yade_on_github>`_ wiki page for more.
+will download the whole code repository of ``trunk``. Check out :ref:`yade-github-label` for more.
 
 Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the main Yade branch)::
 
