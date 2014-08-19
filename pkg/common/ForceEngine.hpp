@@ -1,5 +1,6 @@
 // 2004 © Janek Kozicki <cosurgi@berlios.de> 
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
+// 2014 © Raphael Maurin <raphael.maurin@irstea.fr> 
 
 #pragma once
 
@@ -67,3 +68,29 @@ class LinearDragEngine: public PartialEngine{
 	);
 };
 REGISTER_SERIALIZABLE(LinearDragEngine);
+
+
+class HydroForceEngine: public PartialEngine{
+	private:
+		vector<Vector2r> vFluct;
+	public:
+		virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(HydroForceEngine,PartialEngine,"Apply drag and lift due to a fluid flow vector (1D) to each sphere + the buoyant weight.\n The applied drag force reads\n\n.. math:: F_{d}=\\frac{1}{2} C_d A\\rho^f|\\vec{v_f - v}| vec{v_f - v} \n\n where $\\rho$ is the medium density (:yref:`density<HydroForceEngine.rhoFluid>`), $v$ is particle's velocity,  $v_f$ is the velocity of the fluid at the particle center,  $A$ is particle projected area (disc), $C_d$ is the drag coefficient. The formulation of the drag coefficient depends on the local particle reynolds number and the solid volume fraction. The formulation of the drag is [Dallavalle1948]_ [RevilBaudard2013]_ with a correction of Richardson-Zaki [Richardson1954]_ to take into account the hindrance effect. This law is classical in sediment transport. It is possible to activate a fluctuation of the drag force for each particle which account for the turbulent fluctuation of the fluid velocity (:yref:`velFluct`). The model implemented for the turbulent velocity fluctuation is a simple discrete random walk which takes as input the reynolds stress tensor Re_{xz} in function of the depth and allows to recover the main property of the fluctuations by imposing <u_x'u_z'> (z) = <Re>(z)/rho^f. It requires as input <Re>(z)/rho^f called :yref:`simplifiedReynoldStresses` in the code. \n The formulation of the lift is taken from [Wiberg1985]_ and is such that : \n\n.. math:: F_{L}=\\frac{1}{2} C_L A\\rho^f((v_f - v)^2{top} - (v_f - v)^2{bottom}) \n\n Where the subscript top and bottom means evaluated at the top (respectively the bottom) of the sphere considered. This formulation of the lift account for the difference of pressure at the top and the bottom of the particle inside a turbulent shear flow. As this formulation is controversial when approaching the threshold of motion [Schmeeckle2007]_ it is possible to desactivate it with the variable :yref:`lift`.\n The buoyancy is taken into account through the buoyant weight : \n\n.. math:: F_{buoyancy}= - rho^f V^p g \n\n, where g is the gravity vector along the vertical, and V^p is the volume of the particle.",
+		((Real,rhoFluid,1000,,"Density of the fluid, by default - density of water"))
+		((Real,viscoDyn,1e-3,,"Dynamic viscosity of the fluid, by default - viscosity of water"))
+		((Real,zRef,,,"Position of the reference point which correspond to the first value of the fluid velocity"))
+		((Real,nCell,,,"Size of the vector of the fluid velocity"))
+		((Real,deltaZ,,,"width of the discretization cell "))
+		((Real,expoRZ,3.1,,"Value of the Richardson-Zaki exponent, for the correction due to hindrance"))
+                ((bool,lift,true,,"Option to activate or not the evaluation of the lift"))
+		((Real,Cl,0.2,,"Value of the lift coefficient taken from [Wiberg1985]_"))
+                ((Vector3r,gravity,,,"Gravity vector (may depend on the slope)."))
+		((vector<Real>,vxFluid,,,"Discretized streamwise fluid velocity profile in function of the depth"))
+		((vector<Real>,phiPart,,,"Discretized solid volume fraction profile in function of the depth"))
+		((bool,velFluct,false,,"If true, activate the determination of turbulent fluid velocity fluctuation at the position of each particle, using a simple discrete random walk model based on the Reynolds stresses :yref:`turbStress<HydroForceEngine.squaredAverageTurbfluct>`"))
+		((vector<Real>,simplifiedReynoldStresses,,,"Vector of size equal to :yref:`turbStress<HydroForceEngine.nCell>` containing the Reynolds stresses divided by the fluid density in function of the depth. simplifiedReynoldStresses(z) =  <u_x'u_z'>(z)^2 "))
+		((Real,bedElevation,,,"Elevation of the bed above which the fluid flow is turbulent and the particles undergo turbulent velocity fluctuation."))
+	);
+};
+REGISTER_SERIALIZABLE(HydroForceEngine);
+
