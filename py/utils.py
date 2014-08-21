@@ -391,7 +391,7 @@ def tetra(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=Non
 	return b
 
 def polyhedron(vertices,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
-	"""Create tetrahedron (actually simple Polyhedra) with given parameters.
+	"""Create polyhedron with given parameters.
 
 	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
 
