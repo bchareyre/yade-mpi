@@ -106,7 +106,7 @@ The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__
 which is used for source code, bug tracking, planning, package downloads and more. 
 
 The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
-tutorial can be found in a `Yade's wiki pages <https://www.yade-dem.org/wiki/Yade_on_github>`__. 
+tutorial can be found in :ref:`yade-github-label`. 
 GIT is a distributed revision control system. It is available packaged for all major linux distributions.
 
 The source code is hosted on `GitHub <https://github.com/yade/>`__ , which is periodically
