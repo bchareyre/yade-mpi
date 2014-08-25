@@ -170,7 +170,8 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		mass2 = mass1;
 	}
 	
-	const Real massR = 2*mass1*mass2/(mass1+mass2);
+	// See [Pournin2001, just below equation (19)]
+	const Real massR = mass1*mass2/(mass1+mass2);
 	
 	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
 	Real R1=sphCont->refR1>0?sphCont->refR1:sphCont->refR2;
