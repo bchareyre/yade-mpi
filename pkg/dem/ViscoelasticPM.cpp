@@ -192,8 +192,12 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		kn1 = kn2 = 1/Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(En),2) )*massR;
 		cn1 = cn2 = -2.0 /Tc * log(En)*massR;
 		ks1 = ks2 = 2.0/7.0 /Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(Et),2) )*massR;
-		cs1 = cs2 = -2.0/7.0 /Tc * log(Et)*massR;
-	
+		
+		// It seems to be an error in [Pournin2001] (22) Eq.4, missing factor 2
+		// Thanks to Dominik Boemer for pointing this out
+		// http://www.mail-archive.com/yade-users@lists.launchpad.net/msg08741.html
+		cs1 = cs2 = -4.0/7.0 /Tc * log(Et)*massR;
+		
 		if (std::abs(cn1) <= Mathr::ZERO_TOLERANCE ) cn1=0;
 		if (std::abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
 		if (std::abs(cs1) <= Mathr::ZERO_TOLERANCE ) cs1=0;
