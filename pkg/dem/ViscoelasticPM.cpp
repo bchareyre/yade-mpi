@@ -188,16 +188,19 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		const Real Tc = (tc) ? (*tc)(mat1->id,mat2->id) : (mat1->tc+mat2->tc)/2.0;
 		const Real En = (en) ? (*en)(mat1->id,mat2->id) : (mat1->en+mat2->en)/2.0;
 		const Real Et = (et) ? (*et)(mat1->id,mat2->id) : (mat1->et+mat2->et)/2.0;
-		
-		kn1 = kn2 = 1/Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(En),2) )*massR;
-		cn1 = cn2 = -2.0 /Tc * log(En)*massR;
-		ks1 = ks2 = 2.0/7.0 /Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(Et),2) )*massR;
-		
-		// It seems to be an error in [Pournin2001] (22) Eq.4, missing factor 2
-		// Thanks to Dominik Boemer for pointing this out
-		// http://www.mail-archive.com/yade-users@lists.launchpad.net/msg08741.html
-		cs1 = cs2 = -4.0/7.0 /Tc * log(Et)*massR;
-		
+    
+    // Factor 2 at the end of each expression is necessary, because we calculate
+    // individual kn1, kn2, ks1, ks2 etc., because kn1 = 2*kn, ks1 = 2*ks
+    // http://www.mail-archive.com/yade-users@lists.launchpad.net/msg08778.html
+    kn1 = kn2 = 1/Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(En),2) )*massR*2;
+    cn1 = cn2 = -2.0 /Tc * log(En)*massR*2;
+    ks1 = ks2 = 2.0/7.0 /Tc/Tc * ( Mathr::PI*Mathr::PI + pow(log(Et),2) )*massR*2;
+    cs1 = cs2 = -4.0/7.0 /Tc * log(Et)*massR*2;
+    //           ^^^
+    // It seems to be an error in [Pournin2001] (22) Eq.4, missing factor 2
+    // Thanks to Dominik Boemer for pointing this out
+    // http://www.mail-archive.com/yade-users@lists.launchpad.net/msg08741.html
+
 		if (std::abs(cn1) <= Mathr::ZERO_TOLERANCE ) cn1=0;
 		if (std::abs(cn2) <= Mathr::ZERO_TOLERANCE ) cn2=0;
 		if (std::abs(cs1) <= Mathr::ZERO_TOLERANCE ) cs1=0;
