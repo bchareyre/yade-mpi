@@ -41,8 +41,9 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 		//erase all members if eraseClumpMembers is true:
 		const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
 		std::map<Body::id_t,Se3r>& members = clump->members;
-		FOREACH(MemberMap::value_type& mm, members){
-			const Body::id_t& memberId=mm.first;
+		std::vector<Body::id_t> idsToRemove;
+		FOREACH(MemberMap::value_type mm, members) idsToRemove.push_back(mm.first); // Prepare an array of ids, which need to be removed.
+		FOREACH(Body::id_t memberId, idsToRemove){
 			if (eraseClumpMembers) {
 				this->erase(memberId,false);	// erase members
 			} else {
