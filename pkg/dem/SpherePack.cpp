@@ -272,156 +272,21 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 	return py::make_tuple(edges,cumm);
 }
 
-/* possible enhacement: proportions parameter, so that the domain is not cube, but box with sides having given proportions */
+
 long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic, Real cloudPorosity, int seed){
-	typedef Eigen::Matrix<Real,Eigen::Dynamic,Eigen::Dynamic> MatrixXr;
-	typedef Eigen::Matrix<Real,Eigen::Dynamic,1> VectorXr;
-	
-	int dim=radii.size()+1;
-	if(passing.size()!=radii.size()) throw std::invalid_argument("SpherePack.particleSD2: radii and passing must have the same length.");
-	MatrixXr M=MatrixXr::Zero(dim,dim);
-	VectorXr rhs=VectorXr::Zero(dim);
-	/*
-	
-	We know percentages for each fraction (Δpi) and their radii (ri), and want to find
-	the number of sphere for each fraction Ni and total solid volume Vs. For each fraction,
-	we know that the volume is equal to Ni*(4/3*πri³), which must be equal to Vs*Δpi (Δpi is
-	relative solid volume of the i-th fraction).
-
-	The last equation says that total number of particles (sum of fractions) is equal to N,
-	which is the total number of particles requested by the user.
-
-	   N1     N2     N3    Vs       rhs
-
-	4/3πr₁³   0      0     -Δp₁   | 0
-	  0     4/3πr₂³  0     -Δp₂   | 0
-	  0       0    4/3πr₃³ -Δp₃   | 0
-     1       1      1      0     | N
-
-	*/
-	for(int i=0; i<dim-1; i++){
-		M(i,i)=(4/3.)*Mathr::PI*pow(radii[i],3);
-		M(i,dim-1)=-(passing[i]-(i>0?passing[i-1]:0))/100.;
-		M(dim-1,i)=1;
-	}
-	rhs[dim-1]=numSph;
-	// NumsVs=M^-1*rhs: number of spheres and volume of solids
-	VectorXr NumsVs(dim); NumsVs=M.inverse()*rhs;
-	Real Vs=NumsVs[dim-1]; // total volume of solids
-	Real Vtot=Vs/(1-cloudPorosity); // total volume of cell containing the packing
-	Vector3r cellSize=pow(Vtot,1/3.)*Vector3r().Ones(); // for now, assume always cubic sample
-	Real rMean=pow(Vs/(numSph*(4/3.)*Mathr::PI),1/3.); // make rMean such that particleSD will compute the right Vs (called a bit confusingly Vtot anyway) inversely
-	// cerr<<"Vs="<<Vs<<", Vtot="<<Vtot<<", rMean="<<rMean<<endl;
-	// cerr<<"cellSize="<<cellSize<<", rMean="<<rMean<<", numSph="<<numSph<<endl;
-	return particleSD(Vector3r::Zero(),cellSize,rMean,periodic,"",numSph,radii,passing,false);
+	//deprecated (https://bugs.launchpad.net/yade/+bug/1024443)
+	LOG_ERROR("particleSD2() has been removed. Please use makeCloud() instead.");
 };
-
-// TODO: header, python wrapper, default params
 
 // Discrete particle size distribution
 long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
-	vector<Real> numbers;
-	if(!passingIsNotPercentageButCount){
-		Real Vtot=numSph*4./3.*Mathr::PI*pow(rMean,3.); // total volume of the packing (computed with rMean)
-		
-		// calculate number of spheres necessary per each radius to match the wanted psd
-		// passing has to contain increasing values
-		for (size_t i=0; i<radii.size(); i++){
-			Real volS=4./3.*Mathr::PI*pow(radii[i],3.);
-			if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
-			else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
-			cout<<"fraction #"<<i<<" ("<<passing[i]<<"%, r="<<radii[i]<<"): "<<numbers[i]<<" spheres, fraction/cloud volumes "<<volS<<"/"<<Vtot<<endl;
-		}
-	} else {
-		FOREACH(Real p, passing) numbers.push_back(p);
-	}
-
-	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(true));
-	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
-
-	const int maxTry=1000;
-	Vector3r size=mx-mn;
-	if(periodic)(cellSize=size);
-	for (int ii=(int)radii.size()-1; ii>=0; ii--){
-		Real r=radii[ii]; // select radius
-		for(int i=0; i<numbers[ii]; i++) { // place as many spheres as required by the psd for the selected radius into the free spot
-			int t;
-			for(t=0; t<maxTry; ++t){
-				Vector3r c;
-				if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
-				else { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
-				size_t packSize=pack.size(); bool overlap=false;
-				if(!periodic){
-					for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
-				} else {
-					for(size_t j=0; j<packSize; j++){
-						Vector3r dr;
-						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
-						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
-					}
-				}
-				if(!overlap) { pack.push_back(Sph(c,r)); break; }
-			}
-			if (t==maxTry) {
-				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
-				return i;
-			}
-		}
-	}
-	return pack.size();
+	//deprecated (https://bugs.launchpad.net/yade/+bug/1024443)
+	LOG_ERROR("particleSD() has been removed. Please use makeCloud() instead.");
 }
 
-// 2d function
 long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
-	vector<Real> numbers;
-	if(!passingIsNotPercentageButCount){
-		Real Vtot=numSph*4./3.*Mathr::PI*pow(rMean,3.); // total volume of the packing (computed with rMean)
-		
-		// calculate number of spheres necessary per each radius to match the wanted psd
-		// passing has to contain increasing values
-		for (size_t i=0; i<radii.size(); i++){
-			Real volS=4./3.*Mathr::PI*pow(radii[i],3.);
-			if (i==0) {numbers.push_back(passing[i]/100.*Vtot/volS);}
-			else {numbers.push_back((passing[i]-passing[i-1])/100.*Vtot/volS);} // 
-			cout<<"fraction #"<<i<<" ("<<passing[i]<<"%, r="<<radii[i]<<"): "<<numbers[i]<<" spheres, fraction/cloud volumes "<<volS<<"/"<<Vtot<<endl;
-		}
-	} else {
-		FOREACH(Real p, passing) numbers.push_back(p);
-	}
-
-	static boost::minstd_rand randGen(seed!=0?seed:(int)TimingInfo::getNow(true));
-	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
-
-	const int maxTry=1000;
-	Vector2r size=mx-mn; 
-	//if(periodic)(cellSize=size); in this case, it must be defined in py script as cell needs the third dimension
-	for (int ii=(int)radii.size()-1; ii>=0; ii--){
-		Real r=radii[ii]; // select radius
-		for(int i=0; i<numbers[ii]; i++) { // place as many spheres as required by the psd for the selected radius into the free spot
-			int t;
-			for(t=0; t<maxTry; ++t){
-				Vector3r c;
-				if(!periodic) { for(int axis=0; axis<2; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
-				else { for(int axis=0; axis<2; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
-				size_t packSize=pack.size(); bool overlap=false;
-				if(!periodic){
-					for(size_t j=0; j<packSize; j++){ if(pow(pack[j].r+r,2) >= (pack[j].c-c).squaredNorm()) { overlap=true; break; } }
-				} else {
-					for(size_t j=0; j<packSize; j++){
-						Vector3r dr=Vector3r::Zero();
-						for(int axis=0; axis<2; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
-						if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
-					}
-				}
-				if(!overlap) { pack.push_back(Sph(c,r)); break; }
-			}
-			if (t==maxTry) {
-				if(numbers[ii]>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<numbers[ii]<<" with radius "<<radii[ii]);
-				return i;
-			}
-		}
-	}
-	return pack.size();
+	//deprecated (https://bugs.launchpad.net/yade/+bug/1024443)
+	LOG_ERROR("particleSD_2d() has been removed. Please use makeCloud() instead.");
 }
 
 long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& _clumps, bool periodic, int num, int seed){
