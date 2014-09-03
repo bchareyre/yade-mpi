@@ -119,7 +119,7 @@ class Shop{
 		
 		//! Function to compute overall ("macroscopic") stress.
 		static Matrix3r getStress(Real volume=0);
-		static Matrix3r getCapillaryStress(Real volume=0);
+		static Matrix3r getCapillaryStress(Real volume=0, bool mindlin=false);
 		static Matrix3r stressTensorOfPeriodicCell() { LOG_WARN("Shop::stressTensorOfPeriodicCelli is DEPRECATED: use getStress instead"); return Shop::getStress(); }
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
