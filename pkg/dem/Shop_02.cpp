@@ -32,6 +32,7 @@
 
 #include<yade/pkg/dem/ScGeom.hpp>
 #include<yade/pkg/dem/FrictPhys.hpp>
+#include<yade/pkg/dem/HertzMindlin.hpp>
 
 #include<yade/pkg/common/Grid.hpp>
 
@@ -366,7 +367,7 @@ Matrix3r Shop::getStress(Real volume){
 	return stressTensor/volume;
 }
 
-Matrix3r Shop::getCapillaryStress(Real volume){
+Matrix3r Shop::getCapillaryStress(Real volume, bool mindlin){
 	Scene* scene=Omega::instance().getScene().get();
 	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():1;
 	Matrix3r stressTensor = Matrix3r::Zero();
@@ -375,10 +376,10 @@ Matrix3r Shop::getCapillaryStress(Real volume){
 		if (!I->isReal()) continue;
 		shared_ptr<Body> b1 = Body::byId(I->getId1(),scene);
 		shared_ptr<Body> b2 = Body::byId(I->getId2(),scene);
-		CapillaryPhys* nsi=YADE_CAST<CapillaryPhys*> ( I->phys.get() );
+		Vector3r fCap = mindlin? YADE_CAST<MindlinCapillaryPhys*> (I->phys.get())->fCap : YADE_CAST<CapillaryPhys*> (I->phys.get())->fCap;
 		Vector3r branch=b1->state->pos -b2->state->pos;
 		if (isPeriodic) branch-= scene->cell->hSize*I->cellDist.cast<Real>();
-		stressTensor += (nsi->fCap)*branch.transpose();
+		stressTensor += fCap*branch.transpose();
 	}
 	return stressTensor/volume;
 }

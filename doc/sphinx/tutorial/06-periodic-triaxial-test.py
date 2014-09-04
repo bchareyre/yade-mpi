@@ -35,10 +35,6 @@ sp=pack.SpherePack()
 if 0:
 	## uniform distribution
 	sp.makeCloud((0,0,0),(2,2,2),rMean=.1,rRelFuzz=.3,periodic=True)
-elif 0:
-	## per-fraction distribution
-	## passing: cummulative percentage
-	sp.particleSD2(radii=[.09,.1,.2],passing=[40,80,100],periodic=True,numSph=1000)
 else:
 	## create packing from clumps
 	# configuration of one clump

@@ -225,7 +225,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((double, sineMagnitude, 0,, "Pressure value (amplitude) when sinusoidal pressure is applied (p )"))
 		((double, sineAverage, 0,,"Pressure value (average) when sinusoidal pressure is applied"))
 		((bool, debug, false,,"Activate debug messages"))
-		((double, wallThickness,0.001,,"Walls thickness"))
+		((double, wallThickness,0,,"Walls thickness"))
 		((double,pZero,0,,"The value used for initializing pore pressure. It is useless for incompressible fluid, but important for compressible model."))
 		((double,tolerance,1e-06,,"Gauss-Seidel tolerance"))
 		((double,relax,1.9,,"Gauss-Seidel relaxation"))

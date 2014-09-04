@@ -19,7 +19,7 @@ boost-python-indexing-suite-v2-noSymlinkHeaders:
 	license: Boost software license 1.0
 	note: only headers are copied here
 
-mtTkinter-0.3:
+mtTkinter-0.4:
 	homepage: http://tkinter.unpythonic.net/wiki/mtTkinter
-	source: http://tkinter.unpythonic.net/attach//mtTkinter/attachments/mtTkinter-0.3.tar.gz
-	license: unspecified
+	source: http://tkinter.unpythonic.net/wiki/mtTkinter?action=AttachFile&do=get&target=mtTkinter-0.4.tar.gz
+	license: gpl lgpl

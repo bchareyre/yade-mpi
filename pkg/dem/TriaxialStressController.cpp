@@ -103,7 +103,7 @@ void TriaxialStressController::action()
 	depth = p_front->se3.position.z() - p_back->se3.position.z() - thickness;
 
 	boxVolume = height * width * depth;
-	if (first) {
+	if ( (first) || (updatePorosity) ) {
 		BodyContainer::iterator bi = scene->bodies->begin();
 		BodyContainer::iterator biEnd = scene->bodies->end();
 
@@ -121,6 +121,7 @@ void TriaxialStressController::action()
 			}
 		}
 		first = false;
+		updatePorosity = false;
 	}
 	max_vel1=3 * width /(height+width+depth)*max_vel;
 	max_vel2=3 * height /(height+width+depth)*max_vel;

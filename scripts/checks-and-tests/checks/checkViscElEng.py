@@ -45,8 +45,8 @@ def addPlotData():
 
   if v0<=0 and v>0:
     en=-v/v0
-    print ("Precalculated en value %f" % 0.736356797441)
-    print ("Obtained en value %f" % en)
+    print ("Precalculated en value %.12f" % 0.736356797441)
+    print ("Obtained en value %.12f" % en)
     O.pause()
   v0=v
 
