@@ -337,8 +337,12 @@ void UnsaturatedEngine::invadeSingleCell(CellHandle cell, double pressure)
 ///invade mode 1: withTrap
 void UnsaturatedEngine::invade1()
 {
+    if(solver->debugOut) {cout<<"----start invade1----"<<endl;}
+
     ///update Pw, Pn according to reservoirInfo.
     updatePressure();
+    if(solver->debugOut) {cout<<"----invade1.updatePressure----"<<endl;}
+    
     ///invadeSingleCell by Pressure difference, only change Pressure.
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
@@ -346,16 +350,24 @@ void UnsaturatedEngine::invade1()
         if(cell->info().p() == bndCondValue[3])
             invadeSingleCell(cell,cell->info().p());
     }
+    if(solver->debugOut) {cout<<"----invade1.invadeSingleCell----"<<endl;}
+    
     ///update W, NW reservoirInfo according Pressure, trapped W-phase is marked by isWaterReservoir=False&&isAirReservoir=False.
     updateReservoirs1();
+    if(solver->debugOut) {cout<<"----invade1.update W, NW reservoirInfo----"<<endl;}
+    
     ///search new trapped W-phase, assign trapCapP for trapped W-phase
     checkTrap(bndCondValue[3]-bndCondValue[2]);
+    if(solver->debugOut) {cout<<"----invade1.checkTrap----"<<endl;}
+
     ///update trapped W-phase Pressure
     FiniteCellsIterator ncellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator ncell = tri.finite_cells_begin(); ncell != ncellEnd; ncell++ ) {
         if( (ncell->info().isWaterReservoir) || (ncell->info().isAirReservoir) ) continue;
         ncell->info().p() = bndCondValue[3] - ncell->info().trapCapP;
     }
+    if(solver->debugOut) {cout<<"----invade1.update trapped W-phase Pressure----"<<endl;}
+    
 }
 
 ///search trapped W-phase, define trapCapP=Pn-Pw.
@@ -378,18 +390,24 @@ void UnsaturatedEngine::updateReservoirs1()
         cell->info().isWaterReservoir = false;
         cell->info().isAirReservoir = false;
     }
+    if(solver->debugOut) {cout<<"----updateReservoirs1.initial----"<<endl;}
 
     initWaterReservoirBound();
+    if(solver->debugOut) {cout<<"----updateReservoirs1.initWaterReservoirBound----"<<endl;}
     initAirReservoirBound();
+    if(solver->debugOut) {cout<<"----updateReservoirs1.initAirReservoirBound----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
         if ((*it)->info().index == 0) continue;
         waterReservoirRecursion(*it);
     }
+    if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion----"<<endl;}
+    
     for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
         if ((*it)->info().index == 0) continue;
         airReservoirRecursion(*it);
     }
+    if(solver->debugOut) {cout<<"----updateReservoirs1.airReservoirRecursion----"<<endl;}
 }
 
 void UnsaturatedEngine::waterReservoirRecursion(CellHandle cell)
