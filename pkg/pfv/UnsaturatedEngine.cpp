@@ -398,13 +398,15 @@ void UnsaturatedEngine::updateReservoirs1()
     if(solver->debugOut) {cout<<"----updateReservoirs1.initAirReservoirBound----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
-        if ((*it)->info().index == 0) continue;
+        cerr<< "iterating on "<<bool((*it)==NULL)<<endl;
+        if ((*it)==NULL or (*it)->info().index == 0) continue;
         waterReservoirRecursion(*it);
     }
     if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
-        if ((*it)->info().index == 0) continue;
+        cerr<< "iterating(2) on "<<bool((*it)==NULL)<<endl;
+        if ((*it)==NULL or (*it)->info().index == 0) continue;
         airReservoirRecursion(*it);
     }
     if(solver->debugOut) {cout<<"----updateReservoirs1.airReservoirRecursion----"<<endl;}
@@ -412,17 +414,25 @@ void UnsaturatedEngine::updateReservoirs1()
 
 void UnsaturatedEngine::waterReservoirRecursion(CellHandle cell)
 {
+    if (cell==NULL) cerr<<"null cell found"<<endl;
+    if(solver->debugOut) cerr<<"checking cell ="<<cell->info().index<<endl;
     for (int facet = 0; facet < 4; facet ++) {
+	if(solver->debugOut) cerr<<"checking facet ="<<facet<<", i.e. cell"<<cell->neighbor(facet)->info().index<<endl;
         CellHandle nCell = cell->neighbor(facet);
-        if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
+	if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
+        
         if (nCell->info().Pcondition) continue;
+	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.1----"<<endl;}
+	
 	if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (nCell->info().p() != bndCondValue[2]) continue;
         if (nCell->info().isWaterReservoir==true) continue;
         nCell->info().isWaterReservoir = true;
 	nCell->info().isAirReservoir = false;
+	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.2----"<<endl;}
         waterReservoirRecursion(nCell);
     }
+//     cerr<<"done"<<endl;
 }
 
 void UnsaturatedEngine::airReservoirRecursion(CellHandle cell)
