@@ -82,7 +82,7 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	///Define per-thread containers bufferizing the actual insertion of new interactions, since inserting is not thread-safe
 	std::vector<std::vector<std::pair<Body::id_t,Body::id_t> > > newInteractions;
 	newInteractions.resize(ompThreads,std::vector<std::pair<Body::id_t,Body::id_t> >());
-	for (int kk=0;  kk<ompThreads; kk++) newInteractions[kk].reserve(100);
+	for (int kk=0;  kk<ompThreads; kk++) newInteractions[kk].reserve(1000);
 	
 	/// First sort, independant in each chunk
 	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
@@ -128,22 +128,25 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 			}
 			v[j+1]=viInit;
 			if (j<=long(chunks[k]-chunkSize*0.5)) {
-				LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Parallel colliding aborted, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
+				LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Parallel colliding will be completed in single thread. Consider turning collider.ompThreads=1, it may be more efficient in this case.");
 				parallelFailed=true;}
 		}
 		if (i>=long(chunks[k]+chunkSize*0.5)) {
-			LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning collider.ompThreads=1 for not wasting CPU time.");
+			LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Parallel colliding will be completed in single thread. Consider turning collider.ompThreads=1, it may be more efficient in this case.");
 			parallelFailed=true;}
 	}
 	/// Check again, just to be sure...
 	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) {
-		LOG_ERROR("Parallel colliding failed, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
+		LOG_WARN("Parallel colliding will be completed in single thread. Consider turning collider.ompThreads=1, it may be more efficient in this case.");
 		parallelFailed=true;}
 	
-	if (parallelFailed) return insertionSort(v,interactions, scene, doCollide);
-
 	/// Now insert interactions sequentially	
-	for (int n=0;n<ompThreads;n++) for (size_t k=0, kend=newInteractions[n].size();k<kend;k++) if (!interactions->found(newInteractions[n][k].first,newInteractions[n][k].second)) interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].first,newInteractions[n][k].second)));
+	for (int n=0;n<ompThreads;n++)
+		for (size_t k=0, kend=newInteractions[n].size();k<kend;k++)
+			/*if (!interactions->found(newInteractions[n][k].first,newInteractions[n][k].second))*/ //Not needed, already checked above
+			interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].first,newInteractions[n][k].second)));
+
+	if (parallelFailed) return insertionSort(v,interactions, scene, doCollide);
 #endif
 }
 
