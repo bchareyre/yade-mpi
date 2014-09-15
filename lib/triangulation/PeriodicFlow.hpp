@@ -179,6 +179,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 	for (VCellIterator cellIt=T[currentTes].cellHandles.begin(); cellIt!=T[currentTes].cellHandles.end(); cellIt++){
 			CellHandle& cell = *cellIt;
 			Point& p1 = cell->info();
+			if (cell->info().isGhost) {cerr<<"skipping a ghost"<<endl; continue;}
 			for (int j=0; j<4; j++){
 				neighbourCell = cell->neighbor(j);
 				Point& p2 = neighbourCell->info();
@@ -219,14 +220,14 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 						const CVector& Surfk = cell->info().facetSurfaces[j];
 						Real area = sqrt(Surfk.squared_length());
 						const CVector& crossSections = cell->info().facetSphereCrossSections[j];
-							Real S0=0;
-							S0=checkSphereFacetOverlap(v0,v1,v2);
-							if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0);
-							if (S0==0) S0=checkSphereFacetOverlap(v2,v0,v1);
-							//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
-							fluidArea=abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
-							cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
-							k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
+						Real S0=0;
+						S0=checkSphereFacetOverlap(v0,v1,v2);
+						if (S0==0) S0=checkSphereFacetOverlap(v1,v2,v0);
+						if (S0==0) S0=checkSphereFacetOverlap(v2,v0,v1);
+						//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
+						fluidArea=abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
+						cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
+						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
 						meanDistance += distance;
 						meanRadius += radius;
 						meanK += k*kFactor;
@@ -234,7 +235,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 					if (k<0 && debugOut) {surfneg+=1;
 					cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					     
-					} else  cout <<"infinite K2! surfaces will be missing (FIXME)"<<endl; k = infiniteK;
+					} else  {cout <<"infinite K2! surfaces will be missing (FIXME)"<<endl; k = infiniteK;}
 					//Will be corrected in the next loop
 					(cell->info().kNorm())[j]= k*kFactor;
 					if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
