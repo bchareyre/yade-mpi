@@ -220,6 +220,7 @@ void Polyhedra::GenerateRandomGeometry(){
 	}
 }
 
+
 //****************************************************************************************
 /* Destructor */
 
@@ -424,7 +425,8 @@ bool PolyhedraVolumetricLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, In
 		PolyhedraPhys* phys = dynamic_cast<PolyhedraPhys*>(I->phys.get());	
 
 		//erase the interaction when aAbB shows separation, otherwise keep it to be able to store previous separating plane for fast detection of separation 
-		if (A->bound->min[0] >= B->bound->max[0] || B->bound->min[0] >= A->bound->max[0] || A->bound->min[1] >= B->bound->max[1] || B->bound->min[1] >= A->bound->max[1] || A->bound->min[2] >= B->bound->max[2] || B->bound->min[2] >= A->bound->max[2])  {
+		Vector3r shift2=scene->cell->hSize*I->cellDist.cast<Real>();
+		if (A->bound->min[0] >= B->bound->max[0]+shift2[0] || B->bound->min[0]+shift2[0] >= A->bound->max[0] || A->bound->min[1] >= B->bound->max[1]+shift2[1] || B->bound->min[1]+shift2[1] >= A->bound->max[1] || A->bound->min[2] >= B->bound->max[2]+shift2[2] || B->bound->min[2]+shift2[2] >= A->bound->max[2])  {
 			return false;
 		}
 			

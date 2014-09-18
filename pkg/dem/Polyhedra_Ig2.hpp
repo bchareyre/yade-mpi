@@ -13,6 +13,7 @@ class Ig2_Polyhedra_Polyhedra_PolyhedraGeom: public IGeomFunctor
 	public:
 		virtual ~Ig2_Polyhedra_Polyhedra_PolyhedraGeom(){};
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c) { return go(cm1,cm2,state2,state1,-shift2,force,c); }
 		FUNCTOR2D(Polyhedra,Polyhedra);
 		DEFINE_FUNCTOR_ORDER_2D(Polyhedra,Polyhedra);
 		YADE_CLASS_BASE_DOC(Ig2_Polyhedra_Polyhedra_PolyhedraGeom,IGeomFunctor,"Create/update geometry of collision between 2 Polyhedras");	

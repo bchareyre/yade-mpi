@@ -34,7 +34,7 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 
 	//move and rotate 2nd the CGAL structure Polyhedron
 	rot_mat = (se32.orientation).toRotationMatrix();
-	trans_vec = se32.position;
+	trans_vec = se32.position + shift2;
 	t_rot_trans = Transformation(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PB = B->GetPolyhedron();
 	std::transform( PB.points_begin(), PB.points_end(), PB.points_begin(), t_rot_trans);
@@ -57,18 +57,23 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 
 	//find intersection Polyhedra
 	Polyhedron Int;
-	Int = Polyhedron_Polyhedron_intersection(PA,PB,ToCGALPoint(bang->contactPoint),ToCGALPoint(se31.position),ToCGALPoint(se32.position), bang->sep_plane);	
+	Int = Polyhedron_Polyhedron_intersection(PA,PB,ToCGALPoint(bang->contactPoint),ToCGALPoint(se31.position),ToCGALPoint(se32.position+shift2), bang->sep_plane);	
 
 	//volume and centroid of intersection
 	double volume;
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
- 	if(isnan(volume) || volume<=1E-25 || volume > min(A->GetVolume(),B->GetVolume())) {bang->equivalentPenetrationDepth=0; 	return true;}
+ 	if(isnan(volume) || volume<=1E-25 || volume > min(A->GetVolume(),B->GetVolume())) {
+		bang->equivalentPenetrationDepth=0;
+		bang->penetrationVolume=min(A->GetVolume(),B->GetVolume());
+		bang->normal = (A->GetVolume()>B->GetVolume() ? 1 : -1)*(se32.position+shift2-se31.position);
+		return true;
+	}
 	if ( (!Is_inside_Polyhedron(PA, ToCGALPoint(centroid))) or (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid))))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//find normal direction
         Vector3r normal = FindNormal(Int, PA, PB);
-	if((se32.position-centroid).dot(normal)<0) normal*=-1;	
+	if((se32.position+shift2-centroid).dot(normal)<0) normal*=-1;	
 
 	//calculate area of projection of Intersection into the normal plane
 	//double area = CalculateProjectionArea(Int, ToCGALVector(normal));
@@ -93,7 +98,6 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	PrintPolyhedron2File(Int,fin);
 	fclose(fin);
 	*/
-
 	return true;	
 }
 
