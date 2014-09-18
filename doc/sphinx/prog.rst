@@ -1508,14 +1508,10 @@ During each step in the simulation, the following operations are performed on in
 
 #. For real interactions, :yref:`InteractionLoop` (via :yref:`LawDispatcher`) calls appropriate :yref:`LawFunctor` based on combination of :yref:`IGeom` and :yref:`IPhys` of the interaction. Again, it is an error if no functor capable of handling it is found.
 
-#. :yref:`LawDispatcher` can decide that an interaction should be removed (such as if bodies get too far apart for non-cohesive laws; or in case of complete damage for damage models). This is done by calling
+#. :yref:`LawDispatcher` takes care of erasing those interactions that are no longer active (such as if bodies get too far apart for non-cohesive laws; or in case of complete damage for damage models). This is triggered by the :yref:`LawFunctor` returning false. For this reason it is of upmost importance for the :yref:`LawFunctor` to return consistently. 
 
-	.. code-block:: c++
+Such interaction will not be deleted immediately, but will be reset to potential state. At the next execution of the collider ``InteractionContainer::conditionalyEraseNonReal`` will be called, which will completely erase interactions only if the bounding boxes ceased to overlap; the rest will be kept in potential state.
 
-		InteractionContainer::requestErase(id1,id2)
-
-	Such interaction will not be deleted immediately, but will be reset to potential state. At next step, the collider will call ``InteractionContainer::erasePending``, which will only completely erase interactions the collider indicates; the rest will be kept in potential state.
-	
 
 Creating interactions explicitly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
