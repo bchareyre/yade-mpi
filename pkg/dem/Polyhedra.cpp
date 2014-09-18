@@ -13,7 +13,7 @@
 
 #define _USE_MATH_DEFINES
 
-YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (PolyhedraVolumetricLaw)
+YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (Law2_PolyhedraGeom_PolyhedraPhys_Volumetric)
 	/* some code in cpp (this file): */ 
 	#ifdef YADE_OPENGL
 		(Gl1_Polyhedra) (Gl1_PolyhedraGeom) (Gl1_PolyhedraPhys)
@@ -396,9 +396,9 @@ void Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys::go( const shared_ptr<Material>
 
 //**************************************************************************************
 #if 1
-Real PolyhedraVolumetricLaw::getPlasticDissipation() {return (Real) plasticDissipation;}
-void PolyhedraVolumetricLaw::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
-Real PolyhedraVolumetricLaw::elasticEnergy()
+Real Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::getPlasticDissipation() {return (Real) plasticDissipation;}
+void Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
+Real Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::elasticEnergy()
 {
 	Real energy=0;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
@@ -414,7 +414,7 @@ Real PolyhedraVolumetricLaw::elasticEnergy()
 
 //**************************************************************************************
 // Apply forces on polyhedrons in collision based on geometric configuration
-bool PolyhedraVolumetricLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
+bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
 
 		if (!I->geom) {return true;} 
 		const shared_ptr<PolyhedraGeom>& contactGeom(YADE_PTR_DYN_CAST<PolyhedraGeom>(I->geom));

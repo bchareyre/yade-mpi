@@ -36,7 +36,7 @@ O.engines=[
    InteractionLoop(
       [Ig2_Wall_Polyhedra_PolyhedraGeom(), Ig2_Polyhedra_Polyhedra_PolyhedraGeom(), Ig2_Facet_Polyhedra_PolyhedraGeom()], 
       [Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys()], # collision "physics"
-      [PolyhedraVolumetricLaw()]   # contact law -- apply forces
+      [Law2_PolyhedraGeom_PolyhedraPhys_Volumetric()]   # contact law -- apply forces
    ),
    #GravityEngine(gravity=(0,0,-9.81)),
    NewtonIntegrator(damping=0.3,gravity=(0,0,-9.81)),
