@@ -180,7 +180,12 @@ def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold
 	
 	Scalar fields contain 'val' (value from *extractor*), vector fields have 'valX' and 'valY' (2 components returned by the *extractor*).
 	"""
-	from miniEigen import Vector3
+	
+	try:
+		from miniEigen import Vector3
+	except ImportError:
+		from minieigen import Vector3
+		
 	xx,yy,dd1,dd2,rr=[],[],[],[],[]
 	nDim=0
 	objects=O.interactions if intr else O.bodies
