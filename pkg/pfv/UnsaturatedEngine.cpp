@@ -398,14 +398,14 @@ void UnsaturatedEngine::updateReservoirs1()
     if(solver->debugOut) {cout<<"----updateReservoirs1.initAirReservoirBound----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
-        cerr<< "iterating on "<<bool((*it)==NULL)<<endl;
+        if(solver->debugOut) cerr<< "iterating on "<<bool((*it)==NULL)<<endl;
         if ((*it)==NULL or (*it)->info().index == 0) continue;
         waterReservoirRecursion(*it);
     }
     if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
-        cerr<< "iterating(2) on "<<bool((*it)==NULL)<<endl;
+        if(solver->debugOut) cerr<< "iterating(2) on "<<bool((*it)==NULL)<<endl;
         if ((*it)==NULL or (*it)->info().index == 0) continue;
         airReservoirRecursion(*it);
     }
