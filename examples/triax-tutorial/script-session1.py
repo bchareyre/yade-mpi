@@ -80,7 +80,7 @@ else:
 ############################
 
 triax=TriaxialStressController(
-	## ThreeDTriaxialEngine will be used to control stress and strain. It controls particles size and plates positions.
+	## TriaxialStressController will be used to control stress and strain. It controls particles size and plates positions.
 	## this control of boundary conditions was used for instance in http://dx.doi.org/10.1016/j.ijengsci.2008.07.002
 	maxMultiplier=1.+2e4/young, # spheres growing factor (fast growth)
 	finalMaxMultiplier=1.+2e3/young, # spheres growing factor (slow growth)
