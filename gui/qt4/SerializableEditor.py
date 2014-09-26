@@ -18,14 +18,11 @@ except ImportError:
 
 seqSerializableShowType=True # show type headings in serializable sequences (takes vertical space, but makes the type hyperlinked)
 
-# BUG: cursor is moved to the beginnign of the input field even if it has focus
-#
+# BUG: cursor is moved to the beginning of the input field even if it has focus
 # checking for focus seems to return True always and cursor is never moved
-#
 # the 'True or' part effectively disables the condition (so that the cursor is moved always), but it might be fixed in the future somehow
-#
 # if True or w.hasFocus(): w.home(False)
-#
+# Janek: It looks like I've fixed this BUG, please do more testing.
 #
 
 def makeWrapperHref(text,className,attr=None,static=False):
@@ -101,7 +98,8 @@ class AttrEditor_Int(AttrEditor,QSpinBox):
 		QSpinBox.__init__(self,parent)
 		self.setRange(int(-1e9),int(1e9)); self.setSingleStep(1);
 		self.valueChanged.connect(self.update)
-	def refresh(self): self.setValue(self.getter())
+	def refresh(self):
+		if (not self.hasFocus()): self.setValue(self.getter())
 	def update(self):  self.trySetter(self.value())
 
 class AttrEditor_Str(AttrEditor,QLineEdit):
@@ -111,7 +109,8 @@ class AttrEditor_Str(AttrEditor,QLineEdit):
 		self.textEdited.connect(self.isHot)
 		self.selectionChanged.connect(self.isHot)
 		self.editingFinished.connect(self.update)
-	def refresh(self): self.setText(self.getter())
+	def refresh(self):
+		if (not self.hasFocus()): self.setText(self.getter())
 	def update(self):  self.trySetter(str(self.text()))
 
 class AttrEditor_Float(AttrEditor,QLineEdit):
@@ -122,11 +121,52 @@ class AttrEditor_Float(AttrEditor,QLineEdit):
 		self.selectionChanged.connect(self.isHot)
 		self.editingFinished.connect(self.update)
 	def refresh(self):
-		self.setText(str(self.getter()));
-		if True or not self.hasFocus(): self.home(False)
+		#if True or not self.hasFocus(): self.home(False)
+		if (not self.hasFocus()):
+			self.setText(str(self.getter()));
+			self.home(False)
 	def update(self):
 		try: self.trySetter(float(self.text()))
 		except ValueError: self.refresh()
+
+class AttrEditor_Complex(AttrEditor,QLineEdit):
+	def __init__(self,parent,getter,setter):
+		AttrEditor.__init__(self,getter,setter)
+		QFrame.__init__(self,parent)
+		self.rows,self.cols=1,2
+		self.setContentsMargins(0,0,0,0)
+		self.first=True
+		val=self.getter()
+		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		for row,col in itertools.product(range(self.rows),range(self.cols)):
+			w=QLineEdit('')
+			self.grid.addWidget(w,row,col);
+			w.textEdited.connect(self.isHot)
+			w.selectionChanged.connect(self.isHot)
+			w.editingFinished.connect(self.update)
+	def refresh(self,force=False):
+		val=self.getter()
+		for row,col in itertools.product(range(self.rows),range(self.cols)):
+			w=self.grid.itemAtPosition(row,col).widget()
+			if(self.first or force):
+				w.setText(str(val.real if col==0 else val.imag))
+			#if True or not w.hasFocus: w.home(False) # make the left-most part visible, if the text is wider than the widget
+			if (not w.hasFocus):
+				w.setText(str(val.real if col==0 else val.imag))
+				w.home(False) # make the left-most part visible, if the text is wider than the widget
+		self.first=False
+	def update(self):
+		try:
+			val=self.getter()
+			w1=self.grid.itemAtPosition(0,0).widget()
+			w2=self.grid.itemAtPosition(0,1).widget()
+			if w1.isModified() or w2.isModified():
+				val=complex(float(w1.text()),float(w2.text()))
+			logging.debug('setting'+str(val))
+			self.trySetter(val)
+		except ValueError:
+			self.refresh(force=True)
+	def setFocus(self): self.grid.itemAtPosition(0,0).widget().setFocus()
 
 class AttrEditor_Quaternion(AttrEditor,QFrame):
 	def __init__(self,parent,getter,setter):
@@ -135,7 +175,8 @@ class AttrEditor_Quaternion(AttrEditor,QFrame):
 		self.grid=QHBoxLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
 		for i in range(4):
 			if i==3:
-				f=QFrame(self); f.setFrameShape(QFrame.VLine); f.setFrameShadow(QFrame.Sunken); f.setFixedWidth(4) # add vertical divider (axis | angle)
+				# add vertical divider (axis | angle)
+				f=QFrame(self); f.setFrameShape(QFrame.VLine); f.setFrameShadow(QFrame.Sunken); f.setFixedWidth(4)
 				self.grid.addWidget(f)
 			w=QLineEdit('')
 			self.grid.addWidget(w);
@@ -145,12 +186,17 @@ class AttrEditor_Quaternion(AttrEditor,QFrame):
 	def refresh(self):
 		val=self.getter(); axis,angle=val.toAxisAngle()
 		for i in (0,1,2,4):
-			w=self.grid.itemAt(i).widget(); w.setText(str(axis[i] if i<3 else angle));
-			if True or not w.hasFocus(): w.home(False)
+			#if True or not w.hasFocus(): w.home(False)
+			w=self.grid.itemAt(i).widget();
+			if (not w.hasFocus()):
+				w.setText(str(axis[i] if i<3 else angle));
+				w.home(False)
 	def update(self):
 		try:
 			x=[float((self.grid.itemAt(i).widget().text())) for i in (0,1,2,4)]
-		except ValueError: self.refresh()
+		except ValueError:
+			self.refresh()
+			return
 		q=Quaternion(Vector3(x[0],x[1],x[2]),x[3]); q.normalize() # from axis-angle
 		self.trySetter(q) 
 	def setFocus(self): self.grid.itemAt(0).widget().setFocus()
@@ -173,16 +219,24 @@ class AttrEditor_Se3(AttrEditor,QFrame):
 	def refresh(self):
 		pos,ori=self.getter(); axis,angle=ori.toAxisAngle()
 		for i in (0,1,2,4):
-			w=self.grid.itemAtPosition(1,i).widget(); w.setText(str(axis[i] if i<3 else angle));
-			if True or not w.hasFocus(): w.home(False)
+			#if True or not w.hasFocus(): w.home(False)
+			w=self.grid.itemAtPosition(1,i).widget();
+			if (not w.hasFocus()):
+				w.setText(str(axis[i] if i<3 else angle));
+				w.home(False)
 		for i in (0,1,2):
-			w=self.grid.itemAtPosition(0,i).widget(); w.setText(str(pos[i]));
-			if True or not w.hasFocus(): w.home(False)
+			#if True or not w.hasFocus(): w.home(False)
+			w=self.grid.itemAtPosition(0,i).widget();
+			if (not w.hasFocus()):
+				w.setText(str(pos[i]));
+				w.home(False)
 	def update(self):
 		try:
 			q=[float((self.grid.itemAtPosition(1,i).widget().text())) for i in (0,1,2,4)]
 			v=[float((self.grid.itemAtPosition(0,i).widget().text())) for i in (0,1,2)]
-		except ValueError: self.refresh()
+		except ValueError:
+			self.refresh()
+			return
 		qq=Quaternion(Vector3(q[0],q[1],q[2]),q[3]); qq.normalize() # from axis-angle
 		self.trySetter((v,qq)) 
 	def setFocus(self): self.grid.itemAtPosition(0,0).widget().setFocus()
@@ -195,6 +249,7 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 		self.rows,self.cols=rows,cols
 		self.idxConverter=idxConverter
 		self.setContentsMargins(0,0,0,0)
+		self.first=True
 		val=self.getter()
 		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
@@ -203,12 +258,16 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 			w.textEdited.connect(self.isHot)
 			w.selectionChanged.connect(self.isHot)
 			w.editingFinished.connect(self.update)
-	def refresh(self):
+	def refresh(self,force=False):
 		val=self.getter()
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
 			w=self.grid.itemAtPosition(row,col).widget()
-			w.setText(str(val[self.idxConverter(row,col)]))
-			if True or not w.hasFocus: w.home(False) # make the left-most part visible, if the text is wider than the widget
+			if(self.first or force):
+				w.setText(str(val[self.idxConverter(row,col)]))
+			if (not w.hasFocus):
+				w.setText(str(val[self.idxConverter(row,col)]))
+				w.home(False) # make the left-most part visible, if the text is wider than the widget
+		self.first=False
 	def update(self):
 		try:
 			val=self.getter()
@@ -217,7 +276,8 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 				if w.isModified(): val[self.idxConverter(row,col)]=float(w.text())
 			logging.debug('setting'+str(val))
 			self.trySetter(val)
-		except ValueError: self.refresh()
+		except ValueError:
+			self.refresh(force=True)
 	def setFocus(self): self.grid.itemAtPosition(0,0).widget().setFocus()
 
 class AttrEditor_MatrixXi(AttrEditor,QFrame):
@@ -276,8 +336,8 @@ class AttrEditor_Matrix3(AttrEditor_MatrixX):
 
 class Se3FakeType: pass
 
-_fundamentalEditorMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,Quaternion:AttrEditor_Quaternion,Vector2:AttrEditor_Vector2,Vector3:AttrEditor_Vector3,Vector6:AttrEditor_Vector6,Matrix3:AttrEditor_Matrix3,Vector6i:AttrEditor_Vector6i,Vector3i:AttrEditor_Vector3i,Vector2i:AttrEditor_Vector2i,Se3FakeType:AttrEditor_Se3}
-_fundamentalInitValues={bool:True,str:'',int:0,float:0.0,Quaternion:Quaternion((0,1,0),0.0),Vector3:Vector3.Zero,Matrix3:Matrix3.Zero,Vector6:Vector6.Zero,Vector6i:Vector6i.Zero,Vector3i:Vector3i.Zero,Vector2i:Vector2i.Zero,Vector2:Vector2.Zero,Se3FakeType:(Vector3.Zero,Quaternion((0,1,0),0.0))}
+_fundamentalEditorMap={bool:AttrEditor_Bool,str:AttrEditor_Str,int:AttrEditor_Int,float:AttrEditor_Float,complex:AttrEditor_Complex,Quaternion:AttrEditor_Quaternion,Vector2:AttrEditor_Vector2,Vector3:AttrEditor_Vector3,Vector6:AttrEditor_Vector6,Matrix3:AttrEditor_Matrix3,Vector6i:AttrEditor_Vector6i,Vector3i:AttrEditor_Vector3i,Vector2i:AttrEditor_Vector2i,Se3FakeType:AttrEditor_Se3}
+_fundamentalInitValues={bool:True,str:'',int:0,float:0.0,complex:0.0j,Quaternion:Quaternion((0,1,0),0.0),Vector3:Vector3.Zero,Matrix3:Matrix3.Zero,Vector6:Vector6.Zero,Vector6i:Vector6i.Zero,Vector3i:Vector3i.Zero,Vector2i:Vector2i.Zero,Vector2:Vector2.Zero,Se3FakeType:(Vector3.Zero,Quaternion((0,1,0),0.0))}
 
 class SerQLabel(QLabel):
 	def __init__(self,parent,label,tooltip,path):
@@ -338,7 +398,7 @@ class SerializableEditor(QFrame):
 			return m
 		vecMap={
 			'bool':bool,'int':int,'long':int,'Body::id_t':long,'size_t':long,
-			'Real':float,'float':float,'double':float,
+			'Real':float,'float':float,'double':float,'complex':complex,'std::complex<Real>':complex,
 			'Vector6r':Vector6,'Vector6i':Vector6i,'Vector3i':Vector3i,'Vector2r':Vector2,'Vector2i':Vector2i,
 			'Vector3r':Vector3,'Matrix3r':Matrix3,'Se3r':Se3FakeType,
 			'string':str,
@@ -365,8 +425,16 @@ class SerializableEditor(QFrame):
 			val=getattr(self.ser,attr) # get the value using serattr, as it might be different from what the dictionary provides (e.g. Body.blockedDOFs)
 			t=None
 			doc=getattr(self.ser.__class__,attr).__doc__;
+			# some attributes are not shown
 			if '|yhidden|' in doc: continue
 			if attr in self.ignoredAttrs: continue
+# FIXME: (Janek) Implementing Quantum Mechanics makes some DEM assumptions
+# invalid.  I think that we should rethink what base class Body contains, so
+# that in QM we would not need to use this hack to hide some variables.
+# However it is great to note that only this little 'cosmetic' hack is needed
+# to make Quantum Mechanics possible in yade
+# See also: class QuantumMechanicalState, class QuantumMechanicalBody, gui/qt4/SerializableEditor.py
+			if hasattr(self.ser,"qtHide") and (attr in getattr(self.ser,"qtHide").split()): continue
 			if isinstance(val,list):
 				t=self.getListTypeFromDocstring(attr)
 				if not t and len(val)==0: t=(val[0].__class__,) # 1-tuple is list of the contained type
@@ -378,6 +446,7 @@ class SerializableEditor(QFrame):
 			flags=int(match.group(1)) if match else 0
 			#logging.debug('Attr %s is of type %s'%(attr,((t[0].__name__,) if isinstance(t,tuple) else t.__name__)))
 			self.entries.append(self.EntryData(name=attr,T=t))
+			#print("name: "+str(attr)+"\tflag: "+str(flags))
 	def getDocstring(self,attr=None):
 		"If attr is *None*, return docstring of the Serializable itself"
 		doc=(getattr(self.ser.__class__,attr).__doc__ if attr else self.ser.__class__.__doc__)
