@@ -180,8 +180,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 			CellHandle& cell = *cellIt;
 			Point& p1 = cell->info();
 			if (cell->info().blocked) {
-				setBlocked(cell);
-				continue;}
+				setBlocked(cell);}
 			if (cell->info().isGhost) {cerr<<"skipping a ghost"<<endl; continue;}
 			for (int j=0; j<4; j++){
 				neighbourCell = cell->neighbor(j);
@@ -206,6 +205,9 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 					W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
 					W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
 #endif
+					//FIXME: it should be possible to skip completely blocked cells, currently the problem is it segfault for undefined areas
+					//if (cell->info().blocked) continue;//We don't need permeability for blocked cells, it will be set to zero anyway
+
 					pass+=1;
 					CVector l = p1 - p2;
 					distance = sqrt(l.squared_length());
