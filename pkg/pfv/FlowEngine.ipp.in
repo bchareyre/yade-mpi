@@ -12,6 +12,8 @@
 #ifdef LINSOLV
 #include <cholmod.h>
 #endif
+//For pyRunString
+#include<yade/lib/pyutil/gil.hpp>
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::~TemplateFlowEngine_@TEMPLATE_FLOW_NAME@() {}
@@ -211,6 +213,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.fluidBulkModulus = fluidBulkModulus;
 //         flow.tesselation().Clear();
         flow.tesselation().maxId=-1;
+	flow.blockedCells.clear();
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
 }
 
@@ -255,6 +258,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		flow.tesselation().cellHandles.push_back(cell);
 		cell->info().id=k++;}//define unique numbering now, corresponds to position in cellHandles
         flow.displayStatistics ();
+	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
         flow.computePermeability();
 	//This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
 	trickPermeability();

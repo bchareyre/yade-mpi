@@ -179,6 +179,9 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 	for (VCellIterator cellIt=T[currentTes].cellHandles.begin(); cellIt!=T[currentTes].cellHandles.end(); cellIt++){
 			CellHandle& cell = *cellIt;
 			Point& p1 = cell->info();
+			if (cell->info().blocked) {
+				setBlocked(cell);
+				continue;}
 			if (cell->info().isGhost) {cerr<<"skipping a ghost"<<endl; continue;}
 			for (int j=0; j<4; j++){
 				neighbourCell = cell->neighbor(j);

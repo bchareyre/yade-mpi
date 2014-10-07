@@ -467,6 +467,19 @@ Real FlowBoundingSphere<Tesselation>::checkSphereFacetOverlap(const Sphere& v0, 
 }
 
 template <class Tesselation> 
+void FlowBoundingSphere<Tesselation>::setBlocked(CellHandle& cell)
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	cerr<<"skipping a blocked cell"<<endl;
+	if (cell->info().Pcondition=true) cell->info().p() = 0;
+	else blockedCells.push_back(cell);
+	for (int j=0; j<4; j++) {
+		(cell->info().kNorm())[j]= 0;
+		(cell->neighbor(j)->info().kNorm())[Tri.mirror_index(cell, j)]= 0;}
+}
+
+
+template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::computePermeability()
 {
 	if (debugOut)  cout << "----Computing_Permeability------" << endl;
@@ -486,6 +499,9 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 
 	for (VCellIterator cellIt=T[currentTes].cellHandles.begin(); cellIt!=T[currentTes].cellHandles.end(); cellIt++){
 		CellHandle& cell = *cellIt;
+		if (cell->info().blocked) {
+			setBlocked(cell);
+			cell->info().isvisited = !ref;}
 		Point& p1 = cell->info();
 		for (int j=0; j<4; j++) {
 			neighbourCell = cell->neighbor(j);
@@ -504,6 +520,8 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 				   W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
 				   W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
 				   W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
+				//FIXME: it should be possible to skip completely blocked cells, currently the problem is it segfault for undefined areas
+// 				if (cell->info().blocked) continue;//We don't need permeability for blocked cells, it will be set to zero anyway
 
 				pass+=1;
 				CVector l = p1 - p2;
@@ -846,7 +864,7 @@ void FlowBoundingSphere<Tesselation>::gaussSeidel(Real dt)
 		int bb=-1;
                 for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			bb++;
-			if ( !cell->info().Pcondition ) {
+			if ( !cell->info().Pcondition && !cell->info().blocked) {
 		                cell2++;
 		#endif
 				if (compressible && j==0) { previousP[bb]=cell->info().p(); }
@@ -913,7 +931,6 @@ void FlowBoundingSphere<Tesselation>::gaussSeidel(Real dt)
 	} while ((dp_max/p_max) > tolerance /*&& j<4000*/ /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 	#endif
 	}
-
         if (debugOut) {cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;}
 	computedOnce=true;
