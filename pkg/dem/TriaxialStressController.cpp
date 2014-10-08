@@ -44,7 +44,7 @@ void TriaxialStressController::updateStiffness() {
 		if (e->getClassName() == "FlowEngine") {
 			TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT>* flow = 
 			dynamic_cast<TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT>*>(e.get());
-			if (flow->fluidBulkModulus > 0) fluidStiffness = flow->fluidBulkModulus/porosity;
+			if ( (flow->fluidBulkModulus > 0) && (!(flow->dead)) ) fluidStiffness = flow->fluidBulkModulus/porosity;
 		}
 	}
 	#endif
