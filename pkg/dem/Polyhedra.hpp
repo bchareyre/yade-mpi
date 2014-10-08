@@ -240,26 +240,26 @@ REGISTER_SERIALIZABLE(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys);
 //***************************************************************************
 /*! Calculate physical response based on penetration configuration given by TTetraGeom. */
 
-class PolyhedraVolumetricLaw: public LawFunctor{
+class Law2_PolyhedraGeom_PolyhedraPhys_Volumetric: public LawFunctor{
 	OpenMPAccumulator<Real> plasticDissipation;
 	virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*);
 	Real elasticEnergy ();
 	Real getPlasticDissipation();
 	void initPlasticDissipation(Real initVal=0);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PolyhedraVolumetricLaw,LawFunctor,"Calculate physical response of 2 :yref:`vector<Polyhedra>` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric,LawFunctor,"Calculate physical response of 2 :yref:`vector<Polyhedra>` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`.",
 	((Vector3r,shearForce,Vector3r::Zero(),,"Shear force from last step"))
 	((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts. This will trace only plastic energy in this law, see O.trackEnergy for a more complete energies tracing"))
 	((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
 	((int,elastPotentialIx,-1,(Attr::hidden|Attr::noSave),"Index for elastic potential energy (with O.trackEnergy)"))
 	,,
-	.def("elasticEnergy",&PolyhedraVolumetricLaw::elasticEnergy,"Compute and return the total elastic energy in all \"FrictPhys\" contacts")
-	.def("plasticDissipation",&PolyhedraVolumetricLaw::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_ScGeom_FrictPhys_CundallStrack::traceEnergy` is true.")
-	.def("initPlasticDissipation",&PolyhedraVolumetricLaw::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
+	.def("elasticEnergy",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::elasticEnergy,"Compute and return the total elastic energy in all \"FrictPhys\" contacts")
+	.def("plasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_ScGeom_FrictPhys_CundallStrack::traceEnergy` is true.")
+	.def("initPlasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
 	);
 	FUNCTOR2D(PolyhedraGeom,PolyhedraPhys);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(PolyhedraVolumetricLaw);
+REGISTER_SERIALIZABLE(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric);
 
 
 //***************************************************************************

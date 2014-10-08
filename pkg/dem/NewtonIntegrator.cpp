@@ -84,25 +84,8 @@ void NewtonIntegrator::saveMaximaDisplacement(const shared_ptr<Body>& b){
 	#endif
 }
 
-#ifdef YADE_OPENMP
-void NewtonIntegrator::ensureSync()
-{
-	if (syncEnsured) return;	
-	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
-// 		if(b->isClump()) continue;
-		scene->forces.addForce(b->getId(),Vector3r(0,0,0));
-	} YADE_PARALLEL_FOREACH_BODY_END();
-	syncEnsured=true;
-}
-#endif
-
 void NewtonIntegrator::action()
 {
-	#ifdef YADE_OPENMP
-	//prevent https://bugs.launchpad.net/yade/+bug/923929
-	ensureSync();
-	#endif
-
 	scene->forces.sync();
 	bodySelected=(scene->selectedBody>=0);
 	if(warnNoForceReset && scene->forces.lastReset<scene->iter) LOG_WARN("O.forces last reset in step "<<scene->forces.lastReset<<", while the current step is "<<scene->iter<<". Did you forget to include ForceResetter in O.engines?");
@@ -291,7 +274,7 @@ void NewtonIntegrator::set_densityScaling(bool dsc) {
 		if (ts) {
 			ts->densityScaling=dsc;
 			densityScaling=dsc;
-			LOG_WARN("GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the the timestepper if you don't want the scaling adjusted automatically.");
+			LOG_WARN("GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the timestepper if you don't want the scaling adjusted automatically.");
 			return;
 		}
 	} LOG_WARN("GlobalStiffnessTimeStepper not found in O.engines. Density scaling will have no effect unless a scaling is specified manually for some bodies");

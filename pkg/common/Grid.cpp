@@ -237,24 +237,24 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				}
 				Real relPosPrev = (branch.dot(segtPrev))/(segtPrev.norm()*segtPrev.norm());
 				// ... and check whether the sphere projection is before the neighbours connections too.
-				const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
 				if(relPosPrev<=0){ //if the sphere projection is outside both the current Connection AND this neighbouring connection, then create the interaction if the neighbour did not already do it before.
 					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
 					if(intr && intr->isReal()){
 						shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
 						if(!(intrGeom->isDuplicate==1)){ //skip contact.
-							if (isNew) {return false;}
-							else {scm->isDuplicate=1;}/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/
+							if (isNew) return false;
+							else {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
 						}
 					}
 				}
 				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
 					if (isNew)return false;
 					else {
-						//cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ;
+// 						cout<<"The contact "<<c->id1<<"-"<<c->id2<<" may be copied and will be deleted now."<<endl ;
 						scm->isDuplicate=1;
 						scm->trueInt=-1;
-						return true;}
+						return true;
+					}
 				}
 			}
 		}
@@ -279,22 +279,24 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 						shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
 						if(!(intrGeom->isDuplicate==1)){
 							if (isNew) return false;
-							else scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/
+							else {scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/}
 						}
-					}
+ 					}
 				}
 				else{//the sphere projection is outside the current Connection but inside the previous neighbour. The contact has to be handled by the Prev GridConnection, not here.
 					if (isNew)return false;
-					else {//cout<<"The contact "<<c->id1<<"-"<<c->id2<<" HAVE to be copied and deleted NOW."<<endl ;
+					else {
+// 						cout<<"The contact "<<c->id1<<"-"<<c->id2<<" may be copied and will be deleted now."<<endl ;
 						scm->isDuplicate=1 ;
 						scm->trueInt=-1 ;
-						return true;}
+						return true;
+					}
 				}
 			}
 		}
 	}
 	
-	else if (isNew && relPos<=0.5){
+	else if (relPos<=0.5){
 		if(gridNo1->ConnList.size()>1){//	if the node is not an extremity of the Grid (only one connection)
 			for(int unsigned i=0;i<gridNo1->ConnList.size();i++){	// ... loop on all the Connections of the same Node ...
 				GridConnection* GC = (GridConnection*)gridNo1->ConnList[i]->shape.get();
@@ -309,11 +311,13 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				if(relPosPrev<=0){ //the sphere projection is inside the current Connection and outide this neighbour connection.
 					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo1->ConnList[i]->getId());
 					if( intr && intr->isReal() ){// if an ineraction exist between the sphere and the previous connection, import parameters.
-						//cout<<"Copying contact geom and phys from "<<intr->id1<<"-"<<intr->id2<<" to here ("<<c->id1<<"-"<<c->id2<<")"<<endl;
 						scm=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
-						c->geom=scm;
-						c->phys=intr->phys;
-						c->iterMadeReal=intr->iterMadeReal;
+						if(isNew){
+// 							cout<<"Copying contact geom and phys from "<<intr->id1<<"-"<<intr->id2<<" to here ("<<c->id1<<"-"<<c->id2<<")"<<endl;
+							c->geom=scm;
+							c->phys=intr->phys;
+							c->iterMadeReal=intr->iterMadeReal;
+						}
 						scm->trueInt=c->id2;
 						scm->isDuplicate=2;	//command the old contact deletion.
 						isNew=0;
@@ -324,7 +328,7 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 		}
 	}
 	
-	else if (isNew && relPos>0.5){
+	else if (relPos>0.5){
 		if(gridNo2->ConnList.size()>1){
 			for(int unsigned i=0;i<gridNo2->ConnList.size();i++){
 				GridConnection* GC = (GridConnection*)gridNo2->ConnList[i]->shape.get();
@@ -339,11 +343,13 @@ bool Ig2_Sphere_GridConnection_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 				if(relPosNext<=0){ //the sphere projection is inside the current Connection and outide this neighbour connection.
 					const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,gridNo2->ConnList[i]->getId());
 					if( intr && intr->isReal() ){// if an ineraction exist between the sphere and the previous connection, import parameters.
-						//cout<<"Copying contact geom and phys from "<<intr->id1<<"-"<<intr->id2<<" to here ("<<c->id1<<"-"<<c->id2<<")"<<endl;
 						scm=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
-						c->geom=scm;
-						c->phys=intr->phys;
-						c->iterMadeReal=intr->iterMadeReal;
+						if(isNew){
+// 							cout<<"Copying contact geom and phys from "<<intr->id1<<"-"<<intr->id2<<" to here ("<<c->id1<<"-"<<c->id2<<")"<<endl;
+							c->geom=scm;
+							c->phys=intr->phys;
+							c->iterMadeReal=intr->iterMadeReal;
+						}
 						scm->trueInt=c->id2;
 						scm->isDuplicate=2;	//command the old contact deletion.
 						isNew=0;
@@ -410,6 +416,7 @@ bool Law2_ScGridCoGeom_FrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared
 		if (id2!=geom->trueInt) {
 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
 			if (geom->isDuplicate==2) return false;
+			return true;
 		}
 	}
 	Real& un=geom->penetrationDepth;
@@ -461,6 +468,7 @@ bool Law2_ScGridCoGeom_CohFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, sha
 		if (id2!=geom->trueInt) {
 			//cerr<<"skip duplicate "<<id1<<" "<<id2<<endl;
 			if (geom->isDuplicate==2) return false;
+			return true;
 		}
 	}
 	

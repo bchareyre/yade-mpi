@@ -131,7 +131,7 @@ Since this topic is more involved, it is explained in the *User's manual*.
 Running simulation
 ------------------
 
-As explained above, the loop consists in running defined sequence of engines. Step number can be queried by ``O.iter`` and advancing by one step is done by ``O.step()``. Every step advances *virtual time* by current timestep, ``O.dt``:
+As explained below, the loop consists in running defined sequence of engines. Step number can be queried by ``O.iter`` and advancing by one step is done by ``O.step()``. Every step advances *virtual time* by current timestep, ``O.dt``:
 
 .. ipython::
 

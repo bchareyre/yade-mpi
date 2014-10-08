@@ -662,20 +662,6 @@ void VTKRecorder::action(){
 			const Box* box = dynamic_cast<Box*>(b->shape.get()); 
 			if (box){
 
-				if(recActive[REC_FORCE]){
-					scene->forces.sync();
-					const Vector3r& f = scene->forces.getForce(b->getId());
-					const Vector3r& t = scene->forces.getTorque(b->getId());
-					Real ff[3] = { (Real)  f[0], (Real) f[1], (Real) f[2] };
-					Real tt[3] = { (Real)  t[0], (Real) t[1], (Real) t[2] };
-					Real fn = f.norm();
-					Real tn = t.norm();
-					boxesForceVec->InsertNextTupleValue(ff);
-					boxesForceLen->InsertNextValue(fn);
-					boxesTorqueVec->InsertNextTupleValue(tt);
-					boxesTorqueLen->InsertNextValue(tn);
-				}
-
 				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
 				Vector3r ext(box->extents);
 				vtkSmartPointer<vtkQuad> boxes = vtkSmartPointer<vtkQuad>::New();

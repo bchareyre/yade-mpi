@@ -142,12 +142,15 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     Vector3r torque1 = Vector3r::Zero();
     Vector3r torque2 = Vector3r::Zero();
     
-    computeForceTorqueViscEl(_geom, _phys, I, force, torque1, torque2);
-    
-    addForce (id1,-force,scene);
-    addForce (id2, force,scene);
-    addTorque(id1, torque1,scene);
-    addTorque(id2, torque2,scene);
+    if (computeForceTorqueViscEl(_geom, _phys, I, force, torque1, torque2)) {
+      addForce (id1,-force,scene);
+      addForce (id2, force,scene);
+      addTorque(id1, torque1,scene);
+      addTorque(id2, torque2,scene);
+      return true;
+    } else {
+      return false;
+    }
   }
   return true;
 }

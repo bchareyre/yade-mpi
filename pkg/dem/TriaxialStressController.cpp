@@ -17,6 +17,11 @@
 #include<yade/pkg/dem/Shop.hpp>
 #include<yade/core/Clump.hpp>
 
+#ifdef FLOW_ENGINE
+//#include<yade/pkg/pfv/FlowEngine.hpp>
+#include "FlowEngine_FlowEngineT.hpp"
+#endif
+
 CREATE_LOGGER(TriaxialStressController);
 YADE_PLUGIN((TriaxialStressController));
 
@@ -32,8 +37,17 @@ Vector3r TriaxialStressController::getStrainRate() {
 	);
 }
 
-void TriaxialStressController::updateStiffness ()
-{
+void TriaxialStressController::updateStiffness() {
+	Real fluidStiffness = 0.;
+	#ifdef FLOW_ENGINE
+	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
+		if (e->getClassName() == "FlowEngine") {
+			TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT>* flow = 
+			dynamic_cast<TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT>*>(e.get());
+			if ( (flow->fluidBulkModulus > 0) && (!(flow->dead)) ) fluidStiffness = flow->fluidBulkModulus/porosity;
+		}
+	}
+	#endif
 	for (int i=0; i<6; ++i) stiffness[i] = 0;
 	InteractionContainer::iterator ii    = scene->interactions->begin();
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
@@ -46,11 +60,18 @@ void TriaxialStressController::updateStiffness ()
 			int id1 = contact->getId1(), id2 = contact->getId2();
 			for (int index=0; index<6; ++index) if ( wall_id[index]==id1 || wall_id[index]==id2 )
 			{
-				FrictPhys* currentContactPhysics =
-				static_cast<FrictPhys*> ( contact->phys.get() );
-				stiffness[index]  += currentContactPhysics->kn;
+				FrictPhys* currentContactPhysics = static_cast<FrictPhys*> ( contact->phys.get() );
+				stiffness[index] += currentContactPhysics->kn;
 			}
 		}
+	}
+	if (fluidStiffness > 0) {
+		stiffness[0] += fluidStiffness*width*depth/height;
+		stiffness[1] += fluidStiffness*width*depth/height;
+		stiffness[2] += fluidStiffness*height*depth/width;
+		stiffness[3] += fluidStiffness*height*depth/width;
+		stiffness[4] += fluidStiffness*width*height/depth;
+		stiffness[5] += fluidStiffness*width*height/depth;
 	}
 }
 

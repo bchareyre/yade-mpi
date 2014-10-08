@@ -27,7 +27,7 @@ O.engines = [
 	InteractionLoop(
 		[Ig2_Polyhedra_Polyhedra_PolyhedraGeom()],
 		[Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys()],
-		[PolyhedraVolumetricLaw()]
+		[Law2_PolyhedraGeom_PolyhedraPhys_Volumetric()]
 	),
 	NewtonIntegrator(damping=0),
 	PyRunner(iterPeriod=500,command="addPlotData()"),

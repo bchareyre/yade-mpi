@@ -212,12 +212,10 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-
 global writer
 writer=None
 
-for w in ['html','latex','epub']:
-	writer=w
+for writer in ['html','latex','epub']:
 	genWrapperRst()
-	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
-	sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
-	sphinx.main(sys.argv)
+        commLine = "sphinx-build -a -E -b %s -d %s . %s"%(writer,outDir+'/doctrees', (outDir+'/%s'%writer))
+        os.system(commLine)
 	if writer=='html':
 		makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
 	elif writer=='latex':
@@ -225,7 +223,7 @@ for w in ['html','latex','epub']:
 	if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
 		os.system('rm '+ outDir+'/html/_static/jquery.js')
 		os.system('ln -s /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')
-    
+
 	# HACK!!!!==========================================================================
 	# New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
 	# That is why xelatex crashes. 

@@ -150,7 +150,9 @@ Check also .git/config file in your local trunk folder (rebase = true):
 
  [branch "master"]
    remote = origin
+
    merge = refs/heads/master
+
    rebase = true
 
 Auto-rebase may have unpleasant side effects by blocking "pull" if you have uncommited changes. In this case you can use "git stash"::

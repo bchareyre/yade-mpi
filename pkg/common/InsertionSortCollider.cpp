@@ -58,7 +58,7 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 #ifdef YADE_OPENMP
 	assert(!periodic);	
-	assert(v.size==(long)v.vec.size());	
+	assert(v.size==(long)v.vec.size());
 	if (ompThreads<=1) return insertionSort(v,interactions, scene, doCollide);
 	
 	Real chunksVerlet = 4*verletDist;//is 2* the theoretical requirement?
@@ -73,16 +73,16 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 		bool changeChunks=false;
 		for(unsigned n=1; n<nChunks;n++) if (chunksVerlet>(v[chunks[n]].coord-v[chunks[n-1]].coord)) changeChunks=true;
 		if (!changeChunks) break;
-		nChunks--; chunkSize = unsigned(v.size/nChunks)+1; chunks.clear();		
+		nChunks--; chunkSize = unsigned(v.size/nChunks)+1; chunks.clear();
 		for(unsigned n=0; n<nChunks;n++) chunks.push_back(n*chunkSize); chunks.push_back(v.size);
 	}
 	static unsigned warnOnce=0;
-	if (nChunks<unsigned(ompThreads) && !warnOnce++) LOG_WARN("Parallel insertion: only "<<nChunks <<" thread(s) used. The number of bodies is probably too small for allowing more threads. The contact detection should succeed but not all available threads are used.");
+	if (nChunks<unsigned(ompThreads) && !warnOnce++) LOG_WARN("Parallel insertion: only "<<nChunks <<" thread(s) used. The number of bodies is probably too small for allowing more threads, or the geometry is flat. The contact detection should succeed but not all available threads are used.");
 
 	///Define per-thread containers bufferizing the actual insertion of new interactions, since inserting is not thread-safe
 	std::vector<std::vector<std::pair<Body::id_t,Body::id_t> > > newInteractions;
 	newInteractions.resize(ompThreads,std::vector<std::pair<Body::id_t,Body::id_t> >());
-	for (int kk=0;  kk<ompThreads; kk++) newInteractions[kk].reserve(100);
+	for (int kk=0;  kk<ompThreads; kk++) newInteractions[kk].reserve(long(chunkSize*0.3));
 	
 	/// First sort, independant in each chunk
 	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
@@ -103,21 +103,22 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 			v[j+1]=viInit;
 		}
 	}
-	
 	///In the second sort, the chunks are connected consistently.
 	///If sorting requires to move a bound past half-chunk, the algorithm is not thread safe,
-	/// if it happens we roll-back and run the 1-thread sort + send warning
+	/// if it happens we run the 1-thread sort at the end
 	bool parallelFailed=false;
 	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for (unsigned k=1; k<nChunks;k++) {
-		
 		int threadNum = omp_get_thread_num();
 		long i=chunks[k];
-		for(; v[i]<v[i-1]; i++){
+		long halfChunkStart = long(i-chunkSize*0.5);
+		long halfChunkEnd = long(i+chunkSize*0.5);
+		for(; i<halfChunkEnd; i++){
+			if (!(v[i]<v[i-1])) break; //contiguous chunks now connected consistently
 			const Bounds viInit=v[i]; long j=i-1; /* cache hasBB; otherwise 1% overall performance hit */ const bool viInitBB=viInit.flags.hasBB;
 			const bool isMin=viInit.flags.isMin; 
 
-			while(j>=chunks[k-1] && viInit<v[j]){
+			while(j>=halfChunkStart && viInit<v[j]){
 				v[j+1]=v[j];
 				if(isMin && !v[j].flags.isMin && doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id)) {
 					const Body::id_t& id1 = v[j].id; const Body::id_t& id2 = viInit.id;
@@ -127,23 +128,17 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 				j--;
 			}
 			v[j+1]=viInit;
-			if (j<=long(chunks[k]-chunkSize*0.5)) {
-				LOG_WARN("parallel sort not guaranteed to succeed; in chunk "<<k<<" of "<<nChunks<< ", bound descending past half-chunk. Parallel colliding aborted, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
-				parallelFailed=true;}
+			if (j<halfChunkStart) parallelFailed=true;
 		}
-		if (i>=long(chunks[k]+chunkSize*0.5)) {
-			LOG_ERROR("parallel sort not guaranteed to succeed; in chunk "<<k+1<<" of "<<nChunks<< ", bound advancing past half-chunk. Consider turning collider.ompThreads=1 for not wasting CPU time.");
-			parallelFailed=true;}
+		if (i>=halfChunkEnd) parallelFailed=true;
 	}
-	/// Check again, just to be sure...
-	for (unsigned k=1; k<nChunks;k++) if (v[chunks[k]]<v[chunks[k]-1]) {
-		LOG_ERROR("Parallel colliding failed, starting again in single thread. Consider turning collider.ompThreads=1 for not wasting CPU time.");
-		parallelFailed=true;}
-	
+	/// Now insert interactions sequentially
+	for (int n=0;n<ompThreads;n++)
+		for (size_t k=0, kend=newInteractions[n].size();k<kend;k++)
+			/*if (!interactions->found(newInteractions[n][k].first,newInteractions[n][k].second))*/ //Not needed, already checked above
+			interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].first,newInteractions[n][k].second)));
+	/// If some bounds traversed more than a half-chunk, we complete colliding with the sequential sort
 	if (parallelFailed) return insertionSort(v,interactions, scene, doCollide);
-
-	/// Now insert interactions sequentially	
-	for (int n=0;n<ompThreads;n++) for (size_t k=0, kend=newInteractions[n].size();k<kend;k++) if (!interactions->found(newInteractions[n][k].first,newInteractions[n][k].second)) interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].first,newInteractions[n][k].second)));
 #endif
 }
 

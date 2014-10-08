@@ -513,7 +513,7 @@ bool Ig2_Tetra_Tetra_TTetraSimpleGeom::go(
 	for (int i=0; i<4; i++) {
 		vTemp = se31.position + se31.orientation*shape1->v[i];
 		p1[i] = Point(vTemp[0],vTemp[1],vTemp[2]);
-		vTemp = se32.position + se32.orientation*shape2->v[i];
+		vTemp = se32.position + se32.orientation*shape2->v[i] + shift2;
 		p2[i] = Point(vTemp[0],vTemp[1],vTemp[2]);
 	}
 

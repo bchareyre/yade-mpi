@@ -175,12 +175,21 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		double getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
 		int getCell(double posX, double posY, double posZ){return solver->getCell(posX, posY, posZ);}
 		unsigned int nCells(){return solver->T[solver->currentTes].cellHandles.size();}
+		CELL_VECTOR_GETTER(,cellCenter)
+		CELL_VECTOR_GETTER(.averageCellVelocity,cellVelocity)
+		CELL_SCALAR_GETTER(double,.p(),pressure)
 		boost::python::list getVertices(unsigned int id){
 			boost::python::list ids;
-			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}			
+			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
 			for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->vertex(i)->info().id());
 			return ids;
 		}
+		void blockCell(unsigned int id, bool blockPressure){
+			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return;}
+			solver->T[solver->currentTes].cellHandles[id]->info().blocked=true;
+			solver->T[solver->currentTes].cellHandles[id]->info().Pcondition=blockPressure;
+		}
+		
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
 
@@ -213,7 +222,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			if (solver->T[solver->currentTes].Volume(id) == -1) {compTessVolumes();/* LOG_WARN("Computing all volumes now, as you did not request it explicitely.");*/}
 			return (solver->T[solver->currentTes].Max_id() >= id) ? solver->T[solver->currentTes].Volume(id) : -1;}
 
-		YADE_CLASS_PYCLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine_@TEMPLATE_FLOW_NAME@,@TEMPLATE_FLOW_NAME@,PartialEngine,"An engine to solve flow problem in saturated granular media. Model description can be found in [Chareyre2012a]_ and [Catalano2014a]_. See the example script FluidCouplingPFV/oedometer.py. More documentation to come.\n\n.. note::Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest, here we specify thread numbers independently using :yref:`FlowEngine::numFactorizeThreads` and :yref:`FlowEngine::numSolveThreads`. These multhreading settings are only impacting the behaviour of openblas library and are relatively independant of :yref:`FlowEngine::multithread`. However, the settings have to be globally consistent. For instance, :yref:`multithread<FlowEngine::multithread>` =True with  yref:`numFactorizeThreads<FlowEngine::numFactorizeThreads>` = yref:`numSolveThreads<FlowEngine::numSolveThreads>` = 4 implies that openblas will mobilize 8 processors at some point. If the system does not have so many procs. it will hurt performance.",
+		YADE_CLASS_PYCLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine_@TEMPLATE_FLOW_NAME@,@TEMPLATE_FLOW_NAME@,PartialEngine,"A generic engine from wich more specialized engines can inherit. It is defined for the sole purpose of inserting the right data classes CellInfo and VertexInfo in the triangulation, and it should not be used directly. Instead, look for specialized engines, e.g. :yref:`FlowEngine`, :yref:`PeriodicFlowEngine`, or :yref:`DFNFlowEngine`.",
 		((bool,isActivated,true,,"Activates Flow Engine"))
 		((bool,first,true,,"Controls the initialization/update phases"))
 		((bool,doInterpolate,false,,"Force the interpolation of cell's info while remeshing. By default, interpolation would be done only for compressible fluids. It can be forced with this flag."))
@@ -274,6 +283,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		#endif
 		((vector<Real>, boundaryPressure,vector<Real>(),,"values defining pressure along x-axis for the top surface. See also :yref:`@TEMPLATE_FLOW_NAME@::boundaryXPos`"))
 		((vector<Real>, boundaryXPos,vector<Real>(),,"values of the x-coordinate for which pressure is defined. See also :yref:`@TEMPLATE_FLOW_NAME@::boundaryPressure`"))
+		((string,blockHook,"",,"Python command to be run after triangulation to define blocked cells (see also :yref:`TemplateFlowEngine_@TEMPLATE_FLOW_NAME@.blockCell`)"))
 		,
 		/*deprec*/
 		((meanK_opt,clampKValues,"the name changed"))
@@ -301,7 +311,6 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("getConstrictionsFull",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getConstrictionsFull,(boost::python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 		.def("edgeSize",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::edgeSize,"Return the number of interactions.")
 		.def("OSI",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::OSI,"Return the number of interactions only between spheres.")
-		
 		.def("saveVtk",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 		.def("avFlVelOnSph",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::avFlVelOnSph,(boost::python::arg("idSph")),"compute a sphere-centered average fluid velocity")
 		.def("fluidForce",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::fluidForce,(boost::python::arg("idSph")),"Return the fluid force on sphere idSph.")
@@ -322,7 +331,9 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("updateBCs",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 		.def("emulateAction",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 		.def("getCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getCell,(boost::python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+		.def("getCellCenter",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellCenter,(boost::python::arg("id")),"get voronoi center of cell 'id'.")
 		.def("nCells",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::nCells,"get the total number of finite cells in the triangulation.")
+		.def("blockCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::blockCell,(boost::python::arg("id"),boost::python::arg("blockPressure")),"block cell 'id'. The cell will be excluded from the fluid flow problem and the conductivity of all incident facets will be null. If blockPressure=False, deformation is reflected in the pressure, else it is constantly 0.")
 		.def("getVertices",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getVertices,(boost::python::arg("id")),"get the vertices of a cell")
 		#ifdef LINSOLV
 		.def("exportMatrix",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::exportMatrix,(boost::python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
@@ -336,7 +347,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("averageVelocity",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::averageVelocity,"measure the mean velocity in the period")
 		)
 };
-// Definition of functions in a separate file for clarity 
+
 
 class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	public:
@@ -344,6 +355,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	unsigned int index;
 	int volumeSign;
 	bool Pcondition;
+	bool blocked;//exclude cell from the fluid domain
 	Real invVoidV;
 	Real t;
 	int fict;
@@ -377,8 +389,9 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 		rayHydr.resize(4, 0);
 		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=0;
 		isFictious=false; Pcondition = false; isGhost = false;
-		isvisited = false; 		
+		isvisited = false;
 		isGhost=false;
+		blocked=false;
 	}	
 	bool isGhost;
 	double invSumK;
@@ -414,4 +427,5 @@ public:
 	inline const CVector ghostShift (void) const {return CGAL::NULL_VECTOR;}
 };
 
+// Implementation of functions in this separate file for clarity 
 #include "FlowEngine_@TEMPLATE_FLOW_NAME@.ipp"

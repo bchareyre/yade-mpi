@@ -16,7 +16,7 @@ YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravi
 CREATE_LOGGER(GravityEngine);
 
 void GravityEngine::action(){
-	if (warnOnce) {warnOnce=false; LOG_ERROR("GravityEngine is deprecated, consider using Newton::gravity instead (unless gravitational energy has to be tracked - not implemented with the newton attribute).")}
+	if (warnOnce) {warnOnce=false; LOG_WARN("GravityEngine is deprecated, consider using Newton::gravity instead (unless gravitational energy has to be tracked - not implemented with the newton attribute).")}
 	const bool trackEnergy(scene->trackEnergy);
 	const Real dt(scene->dt);
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){

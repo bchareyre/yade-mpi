@@ -156,7 +156,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		const FiniteCellsIterator cellEnd = Tri.finite_cells_end();
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			orderedCells.push_back(cell);
-			if (!cell->info().Pcondition) ++ncols;}
+			if (!cell->info().Pcondition && !cell->info().blocked) ++ncols;}
 //		//Segfault on 14.10, and useless overall since SuiteSparse has preconditionners (including metis)
 // 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
 
@@ -189,7 +189,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		FiniteCellsIterator& cell = orderedCells[i];
 		///Non-ordered cells
 // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		if (!cell->info().Pcondition) {
+		if (!cell->info().Pcondition  && !cell->info().blocked) {
 			index=cell->info().index;
 			if (index==0) {
 				T_cells[++T_index]=cell;
@@ -325,7 +325,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystemFullGS(Real
 
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			orderedCells.push_back(cell);
-			if (!cell->info().Pcondition) ++ncols;
+			if (!cell->info().Pcondition && !cell->info().blocked) ++ncols;
 		}
 		//FIXME: does it really help? test by commenting this "sorting" line
 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
@@ -361,7 +361,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystemFullGS(Real
 		FiniteCellsIterator& cell = orderedCells[i];
 	///Non-ordered cells
 // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		if (!cell->info().Pcondition) {
+		if (!cell->info().Pcondition && !cell->info().blocked) {
 			if (cell->info().index==0) {
 				T_cells[++T_index]=cell;
 				cell->info().index=T_index;
@@ -403,7 +403,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystemFullGS(Real
 		FiniteCellsIterator& cell = orderedCells[i];
 	///Non-ordered cells
 // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-		if (!cell->info().Pcondition) for (int j=0; j<4; j++) {
+		if (!cell->info().Pcondition && !cell->info().blocked) for (int j=0; j<4; j++) {
 			CellHandle neighbourCell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbourCell) && neighbourCell->info().Pcondition) 
 				gsB[cell->info().index]+=cell->info().kNorm()[j]*neighbourCell->info().p();
