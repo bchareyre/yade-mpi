@@ -207,7 +207,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 				neighbourCell = cell->neighbor(j);
 				nIndex=neighbourCell->info().index;
 				if (Tri.is_infinite(neighbourCell)) continue;
-				if (!isLinearSystemSet  &&  !neighbourCell->info().Pcondition) {
+				if (!isLinearSystemSet  &&  !(neighbourCell->info().Pcondition || neighbourCell->info().blocked)) {
 					if (nIndex==0) {
 						T_cells[++T_index]=neighbourCell;
 						neighbourCell->info().index=nIndex=T_index;
