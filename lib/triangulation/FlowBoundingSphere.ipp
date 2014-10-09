@@ -470,7 +470,6 @@ template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::setBlocked(CellHandle& cell)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-	cerr<<"skipping a blocked cell"<<endl;
 	if (cell->info().Pcondition=true) cell->info().p() = 0;
 	else blockedCells.push_back(cell);
 	for (int j=0; j<4; j++) {
