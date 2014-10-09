@@ -751,7 +751,7 @@ If the last point's x coord is zero, it will not be duplicated."""
 def _deprecatedUtilsFunction(old,new):
 	"Wrapper for deprecated functions, example below."
 	import warnings
-	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category=DeprecationWarning)
+	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category=UserWarning)
 
 # example of _deprecatedUtilsFunction usage:
 #
