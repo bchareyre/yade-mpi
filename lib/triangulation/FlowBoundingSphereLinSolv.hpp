@@ -179,7 +179,7 @@ public:
 		}
 		computedOnce=true;
 	}
-	virtual void resetNetwork();
+	virtual void resetLinearSystem();
 };
 
 } //namespace CGT

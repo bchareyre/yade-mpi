@@ -88,7 +88,10 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 }
 
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::resetNetwork() {T[currentTes].Clear();noCache=true;}
+void FlowBoundingSphere<Tesselation>::resetNetwork() {T[currentTes].Clear();this->resetLinearSystem();}
+
+template <class Tesselation> 
+void FlowBoundingSphere<Tesselation>::resetLinearSystem() {noCache=true;}
 
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::averageRelativeCellVelocity()

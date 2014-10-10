@@ -177,7 +177,10 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		unsigned int nCells(){return solver->T[solver->currentTes].cellHandles.size();}
 		CELL_VECTOR_GETTER(,cellCenter)
 		CELL_VECTOR_GETTER(.averageCellVelocity,cellVelocity)
-		CELL_SCALAR_GETTER(double,.p(),pressure)
+		CELL_SCALAR_GETTER(double,.p(),cellPressure)
+		CELL_SCALAR_SETTER(double,.p(),setCellPressure)
+		CELL_SCALAR_GETTER(bool,.Pcondition,cellPImposed)
+		CELL_SCALAR_SETTER(bool,.Pcondition,setCellPImposed)
 		boost::python::list getVertices(unsigned int id){
 			boost::python::list ids;
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
@@ -332,6 +335,10 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("emulateAction",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 		.def("getCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getCell,(boost::python::arg("pos")),"get id of the cell containing (X,Y,Z).")
 		.def("getCellCenter",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellCenter,(boost::python::arg("id")),"get voronoi center of cell 'id'.")
+		.def("getCellPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellPressure,(boost::python::arg("id")),"get pressure in cell 'id'.")
+		.def("setCellPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::setCellPressure,(boost::python::arg("id"),boost::python::arg("pressure")),"set pressure in cell 'id'.")
+		.def("getCellPImposed",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellPImposed,(boost::python::arg("id")),"get the status of cell 'id' wrt imposed pressure.")
+		.def("setCellPImposed",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::setCellPImposed,(boost::python::arg("id"),boost::python::arg("pImposed")),"make cell 'id' assignable with imposed pressure.")
 		.def("nCells",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::nCells,"get the total number of finite cells in the triangulation.")
 		.def("blockCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::blockCell,(boost::python::arg("id"),boost::python::arg("blockPressure")),"block cell 'id'. The cell will be excluded from the fluid flow problem and the conductivity of all incident facets will be null. If blockPressure=False, deformation is reflected in the pressure, else it is constantly 0.")
 		.def("getVertices",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getVertices,(boost::python::arg("id")),"get the vertices of a cell")

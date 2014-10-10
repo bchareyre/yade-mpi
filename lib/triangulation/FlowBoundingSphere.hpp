@@ -95,6 +95,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void computePermeability();
 		virtual void gaussSeidel (Real dt=0);
 		virtual void resetNetwork();
+		virtual void resetLinearSystem();
 
 
 		double kFactor; //permeability moltiplicator

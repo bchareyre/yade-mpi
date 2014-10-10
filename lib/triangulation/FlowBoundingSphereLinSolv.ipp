@@ -116,8 +116,8 @@ struct CellTraits_for_spatial_sort : public Triangulation::Geom_traits {
 };
 
 template<class _Tesselation, class FlowType>
-void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetNetwork() {
-	FlowType::resetNetwork();
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetLinearSystem() {
+	FlowType::resetLinearSystem();
 	isLinearSystemSet=false;
 	isFullLinearSystemGSSet=false;
 	areCellsOrdered=false;
@@ -138,6 +138,7 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetNetwork() {
 	}
 #endif
 }
+
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 {

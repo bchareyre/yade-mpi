@@ -17,6 +17,11 @@ type getterName(unsigned int id){\
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return 0;}\
 			return solver->T[solver->currentTes].cellHandles[id]->info()param;}
 			
+#define CELL_SCALAR_SETTER(type, param, setterName) \
+void setterName(unsigned int id, type value){\
+			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return;}\
+			solver->T[solver->currentTes].cellHandles[id]->info()param=value;}
+			
 #define CELL_VECTOR_GETTER(param, getterName) \
 Vector3r getterName(unsigned int id){\
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return Vector3r(0,0,0);}\
