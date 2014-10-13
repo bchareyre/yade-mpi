@@ -10,42 +10,45 @@
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
-#define UNSATURATED_FLOW
+// #define UNSATURATED_FLOW
 #ifdef UNSATURATED_FLOW
 
+#define TWOPHASEFLOW
 #include "FlowEngine_UnsaturatedEngineT.hpp"
+#include "TwoPhaseFlowEngine.hpp"
+// #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
 
-/// We can add data to the Info types by inheritance
-class UnsatCellInfo : public FlowCellInfo_UnsaturatedEngineT {
-  	public:
-  	bool isWaterReservoir;
-	bool isAirReservoir;
-	double capillaryCellVolume;//std::abs(cell.volume) - std::abs(cell.solid.volume)
-	std::vector<double> poreRadius;//pore throat radius for drainage
-	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sumLines in the facet.
-	double trapCapP;//for calculating the pressure of trapped phase, cell.pressureTrapped = pressureAir - trapCapP.
-	int windowsID;//a temp cell info for experiment comparison
-	UnsatCellInfo (void)
-	{
-		poreRadius.resize(4, 0);
-		isWaterReservoir = true; isAirReservoir = false; capillaryCellVolume = 0;	  
-		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidLine[k][l]=0;
-		trapCapP = 0;
-		windowsID = 0;
-	}
-};
+// /// We can add data to the Info types by inheritance
+// class UnsatCellInfo : public FlowCellInfo_UnsaturatedEngineT {
+//   	public:
+//   	bool isWRes;
+// 	bool isNWRes;
+// 	double poreBodyVolume;//std::abs(cell.volume) - std::abs(cell.solid.volume)
+// 	std::vector<double> poreThroatRadius;//pore throat radius for drainage
+// 	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sumLines in the facet.
+// 	double trapCapP;//for calculating the pressure of trapped phase, cell.pressureTrapped = pressureAir - trapCapP.
+// 	int windowsID;//a temp cell info for experiment comparison
+// 	UnsatCellInfo (void)
+// 	{
+// 		poreThroatRadius.resize(4, 0);
+// 		isWRes = true; isNWRes = false; poreBodyVolume = 0;	  
+// 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidLine[k][l]=0;
+// 		trapCapP = 0;
+// 		windowsID = 0;
+// 	}
+// };
+// 
+// class UnsatVertexInfo : public FlowVertexInfo_UnsaturatedEngineT {
+// //	add later;  
+// public:
+// // 	UnsatVertexInfo (void)
+// };
 
-class UnsatVertexInfo : public FlowVertexInfo_UnsaturatedEngineT {
-//	add later;  
-public:
-// 	UnsatVertexInfo (void)
-};
+// typedef TemplateFlowEngine_UnsaturatedEngineT<UnsatCellInfo,UnsatVertexInfo> UnsaturatedEngineT;
+// REGISTER_SERIALIZABLE(UnsaturatedEngineT);
+// YADE_PLUGIN((UnsaturatedEngineT));
 
-typedef TemplateFlowEngine_UnsaturatedEngineT<UnsatCellInfo,UnsatVertexInfo> UnsaturatedEngineT;
-REGISTER_SERIALIZABLE(UnsaturatedEngineT);
-YADE_PLUGIN((UnsaturatedEngineT));
-
-class UnsaturatedEngine : public UnsaturatedEngineT
+class UnsaturatedEngine : public TwoPhaseFlowEngine
 {
 		double totalCellVolume;
 	protected:
@@ -53,13 +56,13 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 
 	public :
 		void initializeReservoirs();///only used for determining first entry pressure
-		void initializeCellIndex();
-		void updatePoreRadius();
-		void updateTotalCellVolume();
-		void updateVolumeCapillaryCell();
+// 		void initializeCellIndex();
+		void computePoreThroatRadius();
+		void computeTotalCellVolume();
+// 		void computePoreBodyVolume();
 		double computeCellInterfacialArea(CellHandle cell, int j, double rC);
-		double computeEffPoreRadius(CellHandle cell, int j);
-		double computeEffPoreRadiusFine(CellHandle cell, int j);
+		double computeEffPoreThroatRadius(CellHandle cell, int j);
+		double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
 		double bisection(CellHandle cell, int j, double a, double b);
 		double computeTriRadian(double a, double b, double c);
 		double computeDeltaForce(CellHandle cell,int j, double rC);		
@@ -110,10 +113,10 @@ class UnsaturatedEngine : public UnsaturatedEngineT
 
 		virtual void action();
 		
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,UnsaturatedEngineT,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.",
-					((bool, isPhaseTrapped, true,,"Activate invade mode. If True, the wetting phase can be trapped, activate invade mode 1; if false, the wetting phase cann't be trapped, activate invade mode 2."))
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,TwoPhaseFlowEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.",
+// 					((bool, isPhaseTrapped, true,,"Activate invade mode. If True, the wetting phase can be trapped, activate invade mode 1; if false, the wetting phase cann't be trapped, activate invade mode 2."))
 					((double,gasPressure,0,,"Invasion pressure"))
-					((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
+// 					((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 
 					((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
 					((bool, isInvadeBoundary, true,,"Invade from boundaries."))
@@ -158,9 +161,9 @@ UnsaturatedEngine::~UnsaturatedEngine(){}
 		buildTriangulation(bndCondValue[2],*solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
 		initializeReservoirs();
 		initializeCellIndex();//initialize cell index
-		updatePoreRadius();//save all pore radii before invade
-		updateTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (isInvadeBoundary==True or False), aiming to calculate specific interfacial area.
-		updateVolumeCapillaryCell();//save capillary volume of all cells, for fast calculating saturation
+		computePoreThroatRadius();//save all pore radii before invade
+		computeTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (isInvadeBoundary==True or False), aiming to calculate specific interfacial area.
+		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
 		computeSolidLine();//save cell->info().solidLine[j][y]
 	}
 	solver->noCache = true;
@@ -172,9 +175,9 @@ void UnsaturatedEngine::testFunction()
 		buildTriangulation(bndCondValue[2],*solver);//create a triangulation and initialize pressure in the elements (connecting with W-reservoir), everything will be contained in "solver"
 		initializeReservoirs();
 		initializeCellIndex();//initialize cell index
-		updatePoreRadius();//save all pore radii before invade
-		updateTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (isInvadeBoundary==True or False), aiming to calculate specific interfacial area.
-		updateVolumeCapillaryCell();//save capillary volume of all cells, for fast calculating saturation
+		computePoreThroatRadius();//save all pore radii before invade
+		computeTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (isInvadeBoundary==True or False), aiming to calculate specific interfacial area.
+		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
 		computeSolidLine();//save cell->info().solidLine[j][y]
 		solver->noCache = true;
 }
@@ -192,9 +195,9 @@ void UnsaturatedEngine::action()
         buildTriangulation(bndCondValue[2],*solver);//create a triangulation and initialize pressure in the elements, everything will be contained in "solver"
 	initializeReservoirs();
         initializeCellIndex();//initialize cell index
-        updatePoreRadius();//save all pore radii before invade
-        updateTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (isInvadeBoundary==True or False), aiming to calculate specific interfacial area.
-        updateVolumeCapillaryCell();//save capillary volume of all cells, for calculating saturation
+        computePoreThroatRadius();//save all pore radii before invade
+        computeTotalCellVolume();//save total volume of porous medium, considering different invading boundaries condition (isInvadeBoundary==True or False), aiming to calculate specific interfacial area.
+        computePoreBodyVolume();//save capillary volume of all cells, for calculating saturation
         computeSolidLine();//save cell->info().solidLine[j][y]
         solver->noCache = true;
     }
@@ -211,16 +214,16 @@ void UnsaturatedEngine::action()
         scene->forces.addForce ( V_it->info().id(), force); }}
 */}
 
-void UnsaturatedEngine::initializeCellIndex()
-{
-    int k=0;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        cell->info().index=k++;}
-}
+// void UnsaturatedEngine::initializeCellIndex()
+// {
+//     int k=0;
+//     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+//     FiniteCellsIterator cellEnd = tri.finite_cells_end();
+//     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+//         cell->info().index=k++;}
+// }
 
-void UnsaturatedEngine::updatePoreRadius()
+void UnsaturatedEngine::computePoreThroatRadius()
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
@@ -229,11 +232,11 @@ void UnsaturatedEngine::updatePoreRadius()
         for (int j=0; j<4; j++) {
             neighbourCell = cell->neighbor(j);
             if (!tri.is_infinite(neighbourCell)) {
-                cell->info().poreRadius[j]=computeEffPoreRadius(cell, j);
-                neighbourCell->info().poreRadius[tri.mirror_index(cell, j)]= cell->info().poreRadius[j];}}}
+                cell->info().poreThroatRadius[j]=computeEffPoreThroatRadius(cell, j);
+                neighbourCell->info().poreThroatRadius[tri.mirror_index(cell, j)]= cell->info().poreThroatRadius[j];}}}
 }
 
-void UnsaturatedEngine::updateTotalCellVolume()
+void UnsaturatedEngine::computeTotalCellVolume()
 {
     initializeVolumes(*solver);
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -253,16 +256,16 @@ void UnsaturatedEngine::updateTotalCellVolume()
             totalCellVolume = totalCellVolume + std::abs( cell->info().volume() );}}
 }
 
-void UnsaturatedEngine::updateVolumeCapillaryCell()
-{
-    initializeVolumes(*solver);
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    CellHandle neighbourCell;
-    for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-        cell->info().capillaryCellVolume = std::abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
-    }
-}
+// void UnsaturatedEngine::computePoreBodyVolume()
+// {
+//     initializeVolumes(*solver);
+//     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+//     FiniteCellsIterator cellEnd = tri.finite_cells_end();
+//     CellHandle neighbourCell;
+//     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+//         cell->info().poreBodyVolume = std::abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
+//     }
+// }
 
 void UnsaturatedEngine::initializeReservoirs()
 {
@@ -271,8 +274,8 @@ void UnsaturatedEngine::initializeReservoirs()
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if (cell->info().p()==bndCondValue[2]) {cell->info().isWaterReservoir=true;cell->info().isAirReservoir=false;}
-      if (cell->info().p()==bndCondValue[3]) {cell->info().isAirReservoir=true;cell->info().isWaterReservoir=false;}
+      if (cell->info().p()==bndCondValue[2]) {cell->info().isWRes=true;cell->info().isNWRes=false;}
+      if (cell->info().p()==bndCondValue[3]) {cell->info().isNWRes=true;cell->info().isWRes=false;}
     }       
 }
 
@@ -284,10 +287,10 @@ void UnsaturatedEngine::updatePressure()
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if (cell->info().isWaterReservoir==true) {cell->info().p()=bndCondValue[2];}
-      if (cell->info().isAirReservoir==true) {cell->info().p()=bndCondValue[3];}
+      if (cell->info().isWRes==true) {cell->info().p()=bndCondValue[2];}
+      if (cell->info().isNWRes==true) {cell->info().p()=bndCondValue[3];}
       if (isPhaseTrapped) {
-	if ( (cell->info().isWaterReservoir==false)&&(cell->info().isAirReservoir==false) ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
+	if ( (cell->info().isWRes==false)&&(cell->info().isNWRes==false) ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
       }
     } 
 }
@@ -299,8 +302,8 @@ void UnsaturatedEngine::initWaterReservoirBound()
     else {
         for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
             if ((*it)->info().index == 0) continue;
-            (*it)->info().isWaterReservoir = true;
-            (*it)->info().isAirReservoir = false;}}
+            (*it)->info().isWRes = true;
+            (*it)->info().isNWRes = false;}}
 }
 ///boundingCells[3] always connect NW-reservoir
 void UnsaturatedEngine::initAirReservoirBound()
@@ -309,8 +312,8 @@ void UnsaturatedEngine::initAirReservoirBound()
     else {
         for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
             if((*it)->info().index == 0) continue;
-            (*it)->info().isAirReservoir = true;
-            (*it)->info().isWaterReservoir = false;}}
+            (*it)->info().isNWRes = true;
+            (*it)->info().isWRes = false;}}
 }
 
 void UnsaturatedEngine::invade()
@@ -328,7 +331,7 @@ void UnsaturatedEngine::invadeSingleCell(CellHandle cell, double pressure)
         if (nCell->info().Pcondition) continue;//FIXME:defensive
         if ( (nCell->info().isFictious) && (!isInvadeBoundary) )continue;
         if (nCell->info().p() == bndCondValue[2]) {
-            double nCellP = surfaceTension/cell->info().poreRadius[facet];
+            double nCellP = surfaceTension/cell->info().poreThroatRadius[facet];
             if (pressure-nCell->info().p() > nCellP) {
                 nCell->info().p() = pressure;
                 invadeSingleCell(nCell, pressure);}}}
@@ -352,7 +355,7 @@ void UnsaturatedEngine::invade1()
     }
     if(solver->debugOut) {cout<<"----invade1.invadeSingleCell----"<<endl;}
     
-    ///update W, NW reservoirInfo according Pressure, trapped W-phase is marked by isWaterReservoir=False&&isAirReservoir=False.
+    ///update W, NW reservoirInfo according Pressure, trapped W-phase is marked by isWRes=False&&isNWRes=False.
     updateReservoirs1();
     if(solver->debugOut) {cout<<"----invade1.update W, NW reservoirInfo----"<<endl;}
     
@@ -363,7 +366,7 @@ void UnsaturatedEngine::invade1()
     ///update trapped W-phase Pressure
     FiniteCellsIterator ncellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator ncell = tri.finite_cells_begin(); ncell != ncellEnd; ncell++ ) {
-        if( (ncell->info().isWaterReservoir) || (ncell->info().isAirReservoir) ) continue;
+        if( (ncell->info().isWRes) || (ncell->info().isNWRes) ) continue;
         ncell->info().p() = bndCondValue[3] - ncell->info().trapCapP;
     }
     if(solver->debugOut) {cout<<"----invade1.update trapped W-phase Pressure----"<<endl;}
@@ -376,7 +379,7 @@ void UnsaturatedEngine::checkTrap(double pressure)
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if( (cell->info().isWaterReservoir) || (cell->info().isAirReservoir) ) continue;
+      if( (cell->info().isWRes) || (cell->info().isNWRes) ) continue;
       if(cell->info().p()!= bndCondValue[2]) continue;
       cell->info().trapCapP=pressure;
     }
@@ -387,8 +390,8 @@ void UnsaturatedEngine::updateReservoirs1()
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        cell->info().isWaterReservoir = false;
-        cell->info().isAirReservoir = false;
+        cell->info().isWRes = false;
+        cell->info().isNWRes = false;
     }
     if(solver->debugOut) {cout<<"----updateReservoirs1.initial----"<<endl;}
 
@@ -426,9 +429,9 @@ void UnsaturatedEngine::waterReservoirRecursion(CellHandle cell)
 	
 	if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (nCell->info().p() != bndCondValue[2]) continue;
-        if (nCell->info().isWaterReservoir==true) continue;
-        nCell->info().isWaterReservoir = true;
-	nCell->info().isAirReservoir = false;
+        if (nCell->info().isWRes==true) continue;
+        nCell->info().isWRes = true;
+	nCell->info().isNWRes = false;
 	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.2----"<<endl;}
         waterReservoirRecursion(nCell);
     }
@@ -443,9 +446,9 @@ void UnsaturatedEngine::airReservoirRecursion(CellHandle cell)
         if (nCell->info().Pcondition) continue;
 	if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (nCell->info().p() != bndCondValue[3]) continue;
-        if (nCell->info().isAirReservoir==true) continue;
-        nCell->info().isAirReservoir = true;
-	nCell->info().isWaterReservoir = false;
+        if (nCell->info().isNWRes==true) continue;
+        nCell->info().isNWRes = true;
+	nCell->info().isWRes = false;
         airReservoirRecursion(nCell);
     }
 }
@@ -471,8 +474,8 @@ void UnsaturatedEngine::updateReservoirs2()
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        if (cell->info().p()==bndCondValue[2]) {cell->info().isWaterReservoir=true; cell->info().isAirReservoir=false;}
-        else if (cell->info().p()==bndCondValue[3]) {cell->info().isAirReservoir=true; cell->info().isWaterReservoir=false;}
+        if (cell->info().p()==bndCondValue[2]) {cell->info().isWRes=true; cell->info().isNWRes=false;}
+        else if (cell->info().p()==bndCondValue[3]) {cell->info().isNWRes=true; cell->info().isWRes=false;}
         else {cerr<<"invade mode2: updateReservoir Error!"<<endl;}
     }
 }
@@ -483,13 +486,13 @@ double UnsaturatedEngine::getMinEntryValue()
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        if (cell->info().isAirReservoir == true) {
+        if (cell->info().isNWRes == true) {
             for (int facet=0; facet<4; facet ++) {
                 if (tri.is_infinite(cell->neighbor(facet))) continue;
                 if (cell->neighbor(facet)->info().Pcondition) continue;
                 if ( (cell->neighbor(facet)->info().isFictious) && (!isInvadeBoundary) ) continue;
-                if ( cell->neighbor(facet)->info().isWaterReservoir == true ) {
-                    double nCellP = surfaceTension/cell->info().poreRadius[facet];
+                if ( cell->neighbor(facet)->info().isWRes == true ) {
+                    double nCellP = surfaceTension/cell->info().poreThroatRadius[facet];
                     nextEntry = std::min(nextEntry,nCellP);}}}}
                     
     if (nextEntry==1e50) {
@@ -510,9 +513,9 @@ double UnsaturatedEngine::getSaturation()
         if (tri.is_infinite(cell)) continue;
         if (cell->info().Pcondition) continue;
         if ( (cell->info().isFictious) && (!isInvadeBoundary) ) continue;
-        capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
+        capillaryVolume = capillaryVolume + cell->info().poreBodyVolume;
         if (cell->info().p()==bndCondValue[3]) {
-            airVolume = airVolume + cell->info().capillaryCellVolume;
+            airVolume = airVolume + cell->info().poreBodyVolume;
         }
     }
     double saturation = 1 - airVolume/capillaryVolume;
@@ -528,13 +531,13 @@ double UnsaturatedEngine::getSpecificInterfacialArea()
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
 //             if (cell->info().Pcondition==true) continue;//NOTE:reservoirs cells interfacialArea should not be included.
             if(cell->info().isFictious) continue;
-            if (cell->info().isAirReservoir==true) {
+            if (cell->info().isNWRes==true) {
                 for (int facet = 0; facet < 4; facet ++) {
                     if (tri.is_infinite(cell->neighbor(facet))) continue;
                     if (cell->neighbor(facet)->info().Pcondition==true) continue;
                     if ( (cell->neighbor(facet)->info().isFictious) && (!isInvadeBoundary) ) continue;
-                    if (cell->neighbor(facet)->info().isAirReservoir==false)
-                        interfacialArea = interfacialArea + computeCellInterfacialArea(cell, facet, cell->info().poreRadius[facet]);}}}
+                    if (cell->neighbor(facet)->info().isNWRes==false)
+                        interfacialArea = interfacialArea + computeCellInterfacialArea(cell, facet, cell->info().poreThroatRadius[facet]);}}}
 //     cerr<<"InterArea:"<<interfacialArea<<"  totalCellVolume:"<<totalCellVolume<<endl;
     return interfacialArea/totalCellVolume;
 }
@@ -594,18 +597,18 @@ double UnsaturatedEngine::computeCellInterfacialArea(CellHandle cell, int j, dou
     }
 }
 
-double UnsaturatedEngine::computeEffPoreRadius(CellHandle cell, int j)
+double UnsaturatedEngine::computeEffPoreThroatRadius(CellHandle cell, int j)
 {
     double rInscribe = std::abs(solver->computeEffectiveRadius(cell, j));
     CellHandle cellh = CellHandle(cell);
     int facetNFictious = solver->detectFacetFictiousVertices (cellh,j);
     double r;
-    if(facetNFictious==0) {r=computeEffPoreRadiusFine(cell,j);}
+    if(facetNFictious==0) {r=computeEffPoreThroatRadiusFine(cell,j);}
     else r=rInscribe;    
     return r;
 }
 
-double UnsaturatedEngine::computeEffPoreRadiusFine(CellHandle cell, int j)
+double UnsaturatedEngine::computeEffPoreThroatRadiusFine(CellHandle cell, int j)
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     if (tri.is_infinite(cell->neighbor(j))) return 0;
@@ -773,7 +776,7 @@ void UnsaturatedEngine::savePhaseVtk(const char* folder)
 	vtkfile.begin_data("Phase",CELL_DATA,SCALARS,FLOAT);
 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(!cell->info().isAirReservoir);}
+		if (isDrawable){vtkfile.write_data(!cell->info().isNWRes);}
 	}
 	vtkfile.end_data();
 }
@@ -819,7 +822,7 @@ void UnsaturatedEngine::checkRCompare()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         for (int facet=0; facet<4; facet++) {
-            file << cell->info().index << "	" <<facet<< "	" <<getRMin(cell,facet) << "	" << computeEffPoreRadius(cell,facet)<< "	" <<getRMax(cell,facet) << endl;
+            file << cell->info().index << "	" <<facet<< "	" <<getRMin(cell,facet) << "	" << computeEffPoreThroatRadius(cell,facet)<< "	" <<getRMax(cell,facet) << endl;
         }
     }
     file.close();
@@ -829,8 +832,8 @@ void UnsaturatedEngine::checkRCompare()
     FiniteCellsIterator cellEnd1 = tri.finite_cells_end();
     for ( FiniteCellsIterator cell1 = tri.finite_cells_begin(); cell1 != cellEnd1; cell1++ ) {
         for (int facet=0; facet<4; facet++) {
-            if(getRMin(cell1,facet)==computeEffPoreRadius(cell1,facet))
-                file << cell1->info().index << "	" <<facet<< "	" <<getRMin(cell1,facet) << "	" << computeEffPoreRadius(cell1,facet)<< "	" <<getRMax(cell1,facet) << endl;
+            if(getRMin(cell1,facet)==computeEffPoreThroatRadius(cell1,facet))
+                file << cell1->info().index << "	" <<facet<< "	" <<getRMin(cell1,facet) << "	" << computeEffPoreThroatRadius(cell1,facet)<< "	" <<getRMax(cell1,facet) << endl;
         }
     }
     file.close();
@@ -840,8 +843,8 @@ void UnsaturatedEngine::checkRCompare()
     FiniteCellsIterator cellEnd2 = tri.finite_cells_end();
     for ( FiniteCellsIterator cell2 = tri.finite_cells_begin(); cell2 != cellEnd2; cell2++ ) {
         for (int facet=0; facet<4; facet++) {
-            if(getRMax(cell2,facet)==computeEffPoreRadius(cell2,facet))
-                file << cell2->info().index << "	" <<facet<< "	" <<getRMin(cell2,facet) << "	" << computeEffPoreRadius(cell2,facet)<< "	" <<getRMax(cell2,facet) << endl;
+            if(getRMax(cell2,facet)==computeEffPoreThroatRadius(cell2,facet))
+                file << cell2->info().index << "	" <<facet<< "	" <<getRMin(cell2,facet) << "	" << computeEffPoreThroatRadius(cell2,facet)<< "	" <<getRMax(cell2,facet) << endl;
         }
     }
     file.close();
@@ -851,8 +854,8 @@ void UnsaturatedEngine::checkRCompare()
     FiniteCellsIterator cellEnd3 = tri.finite_cells_end();
     for ( FiniteCellsIterator cell3 = tri.finite_cells_begin(); cell3 != cellEnd3; cell3++ ) {
       for (int facet=0; facet<4; facet++) {
-	if( (getRMax(cell3,facet)>computeEffPoreRadius(cell3,facet)) && (getRMin(cell3,facet)<computeEffPoreRadius(cell3,facet)) ) {
-            file << cell3->info().index << "	" <<facet<< "	" <<getRMin(cell3,facet) << "	" << computeEffPoreRadius(cell3,facet)<< "	" <<getRMax(cell3,facet) << endl;
+	if( (getRMax(cell3,facet)>computeEffPoreThroatRadius(cell3,facet)) && (getRMin(cell3,facet)<computeEffPoreThroatRadius(cell3,facet)) ) {
+            file << cell3->info().index << "	" <<facet<< "	" <<getRMin(cell3,facet) << "	" << computeEffPoreThroatRadius(cell3,facet)<< "	" <<getRMax(cell3,facet) << endl;
         }
       }
     }
@@ -864,7 +867,7 @@ void UnsaturatedEngine::checkRCompare()
     for ( FiniteCellsIterator cell4 = tri.finite_cells_begin(); cell4 != cellEnd4; cell4++ ) {
       for(int facet=0; facet<4; facet++) {
         if(getRMax(cell4,facet)<getRMin(cell4,facet)) {
-            file << cell4->info().index << "	" <<facet<< "	" <<getRMin(cell4,facet) << "	" << computeEffPoreRadius(cell4,facet)<< "	" <<getRMax(cell4,facet) << endl;
+            file << cell4->info().index << "	" <<facet<< "	" <<getRMin(cell4,facet) << "	" << computeEffPoreThroatRadius(cell4,facet)<< "	" <<getRMax(cell4,facet) << endl;
         }	
       }
     }
@@ -895,7 +898,7 @@ void UnsaturatedEngine::checkEntryCapillaryPressure()
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (tri.is_infinite(cell)) continue;
         for (int facet=0; facet<4; facet++) {
-            file << cell->info().index << " " <<cell->neighbor(facet)->info().index << " " << surfaceTension/cell->info().poreRadius[facet] << endl;
+            file << cell->info().index << " " <<cell->neighbor(facet)->info().index << " " << surfaceTension/cell->info().poreThroatRadius[facet] << endl;
         }
     }
     file.close();
@@ -938,14 +941,14 @@ void UnsaturatedEngine::checkBoundingCellsInfo()
     ofstream file;
     file.open("boundInfo.txt");
     file << "#Checking the boundingCells states\n";
-    file << "CellID" << "	CellPressure" << "	isAirReservoir" << "	isWaterReservoir" <<endl;
+    file << "CellID" << "	CellPressure" << "	isNWRes" << "	isWRes" <<endl;
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (tri.is_infinite(cell)) continue;
         if (cell->info().index==0) continue;
         if ((cell->info().isFictious==true)&&(cell->info().Pcondition==false)) {
-            file << cell->info().index <<" "<<cell->info().p()<<" "<<cell->info().isAirReservoir<<" "<<cell->info().isWaterReservoir<<endl;
+            file << cell->info().index <<" "<<cell->info().p()<<" "<<cell->info().isNWRes<<" "<<cell->info().isWRes<<endl;
         }
     }
 }
@@ -960,10 +963,10 @@ void UnsaturatedEngine::checkReservoirInfo(int boundN)
             ofstream file;
             file.open("waterReservoirBoundInfo.txt");
             file << "#Checking the water reservoir cells states\n";
-            file << "CellID" << "	CellPressure" << "	isAirReservoir" << "	isWaterReservoir" <<endl;
+            file << "CellID" << "	CellPressure" << "	isNWRes" << "	isWRes" <<endl;
             for (FlowSolver::VCellIterator it = solver->boundingCells[boundN].begin() ; it != solver->boundingCells[boundN].end(); it++) {
                 if ((*it)->info().index == 0) continue;
-                file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isAirReservoir<<" "<<(*it)->info().isWaterReservoir<<endl;
+                file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isNWRes<<" "<<(*it)->info().isWRes<<endl;
             }
             file.close();
         }
@@ -971,10 +974,10 @@ void UnsaturatedEngine::checkReservoirInfo(int boundN)
             ofstream file;
             file.open("airReservoirBoundInfo.txt");
             file << "#Checking the air reservoir cells state\n";
-            file << "CellID"<<"	CellPressure"<<"	isAirReservoir"<<"	isWaterReservoir"<<endl;
+            file << "CellID"<<"	CellPressure"<<"	isNWRes"<<"	isWRes"<<endl;
             for (FlowSolver::VCellIterator it = solver->boundingCells[boundN].begin(); it != solver->boundingCells[boundN].end(); it++) {
                 if ((*it)->info().index == 0) continue;
-                file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isAirReservoir<<" "<<(*it)->info().isWaterReservoir<<endl;
+                file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isNWRes<<" "<<(*it)->info().isWRes<<endl;
             }
             file.close();
         }
@@ -1009,9 +1012,9 @@ double UnsaturatedEngine::getWindowsSaturation(int i)
         if (cell->info().Pcondition) continue;
         if ( (cell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (cell->info().windowsID != i) continue;
-        capillaryVolume = capillaryVolume + cell->info().capillaryCellVolume;
+        capillaryVolume = capillaryVolume + cell->info().poreBodyVolume;
         if (cell->info().p()==bndCondValue[3]) {
-            airVolume = airVolume + cell->info().capillaryCellVolume;
+            airVolume = airVolume + cell->info().poreBodyVolume;
         }
     }
     double saturation = 1 - airVolume/capillaryVolume;
