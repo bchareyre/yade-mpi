@@ -26,7 +26,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	bool isTrapW;
 	bool isTrapNW;
 	double saturation;
-	bool isImbibition;
+	bool hasInterface; //Indicated whether a NW-W interface is present within the pore body
 	double trapCapP;//for calculating the pressure of trapped phase, cell->info().p() = pressureNW- trapCapP. OR cell->info().p() = pressureW + trapCapP
 	std::vector<double> poreThroatRadius;
 	double poreBodyRadius;
@@ -35,7 +35,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	{
 		isWRes = true; isNWRes = false; isTrapW = false; isTrapNW = false;
 		saturation = 1.0;
-		isImbibition = false;
+		hasInterface = false;
 		trapCapP = 0;
 		poreThroatRadius.resize(4, 0);
 		poreBodyRadius = 0;
@@ -63,6 +63,10 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine
 	//if it is useful for everyone
 	void fancyFunction(Real what);
+	void computePoreBodyRadius();
+	void computePoreThroatRadius();
+	void computePoreSatAtInterface(CellHandle cell);
+	void computePoreCapillaryPressure(CellHandle cell);
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
