@@ -25,9 +25,10 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	bool isNWRes;
 	bool isTrapW;
 	bool isTrapNW;
-	double saturation;//the saturation of single pore (will be used in imbibition)
+	double saturation;//the saturation of single pore (will be used in quasi-static imbibition and dynamic flow)
 	bool isImbibition;//Flag for marking pore unit which contains NW-W interface (used by Thomas)
 	double trapCapP;//for calculating the pressure of trapped pore, cell->info().p() = pressureNW- trapCapP. OR cell->info().p() = pressureW + trapCapP
+	bool hasInterface; //Indicated whether a NW-W interface is present within the pore body
 	std::vector<double> poreThroatRadius;
 	double poreBodyRadius;
 	double poreBodyVolume;
@@ -38,7 +39,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	{
 		isWRes = true; isNWRes = false; isTrapW = false; isTrapNW = false;
 		saturation = 1.0;
-		isImbibition = false;
+		hasInterface = false;
 		trapCapP = 0;
 		poreThroatRadius.resize(4, 0);
 		poreBodyRadius = 0;
@@ -70,6 +71,10 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void fancyFunction(Real what);
 	void initializeCellIndex();
 	void computePoreBodyVolume();	
+	void computePoreBodyRadius();
+	void computePoreThroatRadius();
+	void computePoreSatAtInterface(CellHandle cell);
+	void computePoreCapillaryPressure(CellHandle cell);
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
